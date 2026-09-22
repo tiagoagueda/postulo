@@ -136,12 +136,13 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_seventeen_of_them_across_eight_kinds():
+def test_there_are_eighteen_of_them_across_eight_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
-    Two of them are notifiers: `email`, which needs the instance's mail, and `browser`, which
-    needs nothing but a browser that allows it (#209).
+    Three of them are notifiers: `email`, which needs the instance's mail, `browser`, which
+    needs nothing but a browser that allows it (#209), and `webhook`, the one for a machine
+    (#240).
 
     Seven govern something other than a service. `phone-numbers` and `email-addresses`
     govern a page -- the second owns no data at all, since the addresses are allauth's, which
@@ -169,6 +170,7 @@ def test_there_are_seventeen_of_them_across_eight_kinds():
         "page-metadata",
         "email",
         "browser",
+        "webhook",
         "local",
         "europass",
         "smtp",
