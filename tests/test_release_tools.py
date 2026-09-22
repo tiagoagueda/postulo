@@ -226,3 +226,115 @@ def test_the_version_shows_in_the_footer_and_the_health_check(client, user):
     client.force_login(user)
     footer = client.get(reverse("core:home")).content.decode()
     assert f"Postulo {__version__}" in footer
+
+
+# ------------------------------------------------------------- the CI gate (#233)
+
+
+def statuses(*pairs):
+    """What Forgejo's combined status says: the latest status per context."""
+    return {
+        "state": "failure",
+        "statuses": [{"context": context, "status": status} for context, status in pairs],
+    }
+
+
+GREEN = statuses(
+    ("CI / test (3.12) (push)", "success"),
+    ("CI / test (3.13) (push)", "success"),
+    ("CI / test (3.14) (push)", "success"),
+    ("CI / browser (push)", "success"),
+    ("CI / security (push)", "success"),
+    # A registry timeout on the dev image says nothing about the code, and the combined
+    # state above is "failure" because of it; the gate reads the jobs, not the state.
+    ("Dev image / image (push)", "failure"),
+)
+
+
+def asking(monkeypatch, answer):
+    asked = []
+
+    def api(method, url, token, body=None, content_type="application/json"):
+        asked.append((method, url, token))
+        return answer
+
+    monkeypatch.setattr(tools, "_api", api)
+    return asked
+
+
+def test_every_test_leg_and_the_browser_green_is_a_go(monkeypatch):
+    asked = asking(monkeypatch, GREEN)
+
+    problems = tools.ci_problems(
+        "v0.3.0", server="https://forge.example.org", repository="postulo/postulo", token="t"
+    )
+
+    assert problems == []
+    assert asked == [
+        ("GET", "https://forge.example.org/api/v1/repos/postulo/postulo/commits/v0.3.0/status", "t")
+    ]
+
+
+def test_one_red_leg_is_named(monkeypatch):
+    asking(
+        monkeypatch,
+        statuses(
+            ("CI / test (3.12) (push)", "success"),
+            ("CI / test (3.14) (push)", "failure"),
+            ("CI / browser (push)", "success"),
+        ),
+    )
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert problems == ["CI / test (3.14) (push): failure"]
+
+
+def test_a_leg_still_running_is_not_a_pass(monkeypatch):
+    asking(
+        monkeypatch,
+        statuses(("CI / test (3.14) (push)", "pending"), ("CI / browser (push)", "success")),
+    )
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert problems == ["CI / test (3.14) (push): pending"]
+
+
+def test_no_ci_at_all_is_refused_rather_than_waved_through(monkeypatch):
+    """A tag on a commit CI never saw has no red job; that is not the same as green."""
+    asking(monkeypatch, statuses(("Dev image / image (push)", "success")))
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert len(problems) == 2
+    assert any("a test leg" in p for p in problems) and any("the browser" in p for p in problems)
+
+
+def test_the_check_command_asks_only_when_told_to(monkeypatch, capsys):
+    """`check vX.Y.Z` stays what it was; `--ci` adds the question and needs the token."""
+    asked = asking(monkeypatch, GREEN)
+    version = "v" + tools.pyproject_version()
+
+    assert tools.main(["check", version]) == 0
+    assert asked == []
+
+    monkeypatch.setenv("FORGEJO_URL", "https://f")
+    monkeypatch.setenv("FORGEJO_REPOSITORY", "o/r")
+    monkeypatch.setenv("FORGEJO_TOKEN", "t")
+    assert tools.main(["check", version, "--ci"]) == 0
+    assert len(asked) == 1
+    assert "every test leg and the browser job passed" in capsys.readouterr().out
+
+
+def test_the_check_command_fails_in_words_when_ci_did_not_pass(monkeypatch, capsys):
+    asking(monkeypatch, statuses(("CI / test (3.14) (push)", "failure")))
+    version = "v" + tools.pyproject_version()
+    monkeypatch.setenv("FORGEJO_URL", "https://f")
+    monkeypatch.setenv("FORGEJO_REPOSITORY", "o/r")
+    monkeypatch.setenv("FORGEJO_TOKEN", "t")
+
+    assert tools.main(["check", version, "--ci"]) != 0
+
+    said = capsys.readouterr().err
+    assert "CI has not passed" in said and "CI / test (3.14) (push): failure" in said

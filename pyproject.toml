@@ -69,6 +69,7 @@ dev = [
     "ruff>=0.16",
     "pre-commit>=4.0",
     "django-stubs[compatible-mypy]>=5.1 ; python_version < '3.14'",
+    "pytest-xdist>=3.8",
 ]
 e2e = [
     "playwright>=1.62",
@@ -165,3 +166,6 @@ omit = ["*/migrations/*", "*/config/wsgi.py", "*/config/asgi.py"]
 [tool.coverage.report]
 skip_covered = true
 show_missing = true
+# The floor. Measured at 94% when this was set (#233); a change that drops the suite below
+# it fails the coverage leg of CI, which is one leg of three so the number is measured once.
+fail_under = 92

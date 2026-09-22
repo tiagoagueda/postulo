@@ -39,6 +39,8 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import logs
+
 from .models import Errand, ErrandState
 
 logger = logging.getLogger(__name__)
@@ -129,21 +131,24 @@ def perform(errand_id: int) -> None:
         return
 
     Errand.objects.filter(pk=errand.pk).update(state=ErrandState.WORKING, started_at=timezone.now())
-    try:
-        outcome = work.run(errand) or {}
-    except Refused as refusal:
-        _finish(errand, ErrandState.FAILED, error=str(refusal))
-    except Exception:
-        # The traceback goes to the log, where an operator can read it; the page gets a
-        # sentence, because a person watching a spinner cannot act on a traceback.
-        logger.exception("Errand %s (%s) failed.", errand.pk, errand.kind)
-        _finish(
-            errand,
-            ErrandState.FAILED,
-            error=str(_("Something went wrong. The server log has the details.")),
-        )
-    else:
-        _finish(errand, ErrandState.DONE, outcome=outcome)
+    # Named in every line it logs, the way a request is (#233): the worker has no request,
+    # so the errand's own number is the id its lines carry.
+    with logs.request_scope(f"errand-{errand.pk}"):
+        try:
+            outcome = work.run(errand) or {}
+        except Refused as refusal:
+            _finish(errand, ErrandState.FAILED, error=str(refusal))
+        except Exception:
+            # The traceback goes to the log, where an operator can read it; the page gets a
+            # sentence, because a person watching a spinner cannot act on a traceback.
+            logger.exception("Errand %s (%s) failed.", errand.pk, errand.kind)
+            _finish(
+                errand,
+                ErrandState.FAILED,
+                error=str(_("Something went wrong. The server log has the details.")),
+            )
+        else:
+            _finish(errand, ErrandState.DONE, outcome=outcome)
 
 
 def _finish(errand: Errand, state: str, *, outcome: dict | None = None, error: str = "") -> None:

@@ -44,7 +44,10 @@ RUN npm run build:css
 # environment, and the source with its catalogues compiled.
 FROM python:3.14-slim-bookworm AS build
 
-COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
+# Pinned to the patch, the same one ci.yml and .pre-commit-config.yaml name, so the tool
+# that reads the lock is as fixed as the lock (#233). The base images above and below stay
+# at a major, on purpose: they are where Debian's security updates arrive from.
+COPY --from=ghcr.io/astral-sh/uv:0.12.17 /uv /usr/local/bin/uv
 
 ENV UV_COMPILE_BYTECODE=1 \
     UV_LINK_MODE=copy \
@@ -137,7 +140,7 @@ FROM python:3.14-slim-bookworm AS runtime
 # pip. Dropping it would not break installing a plugin through the interface; it would make
 # it slower and hand an operator a different resolver than the one this project tests with.
 # A working feature is worth more than 45 MB of a 400 MB image (#157).
-COPY --from=ghcr.io/astral-sh/uv:0.12 /uv /usr/local/bin/uv
+COPY --from=ghcr.io/astral-sh/uv:0.12.17 /uv /usr/local/bin/uv
 
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
@@ -307,8 +310,12 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
 ENV GUNICORN_CMD_ARGS="--timeout 120 --max-requests 500 --max-requests-jitter 50"
 
 ENTRYPOINT ["postulo-entrypoint"]
+# The access line is gunicorn's default with one field added at the end: the X-Request-ID
+# the response carries, which is the id every Postulo log line for that request carries too
+# (#233). Laid side by side, the two logs now say which line belongs to which.
 CMD ["gunicorn", "postulo.config.wsgi:application", \
      "--bind", "0.0.0.0:8000", \
      "--workers", "3", \
      "--access-logfile", "-", \
+     "--access-logformat", "%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\" request=%({x-request-id}o)s", \
      "--error-logfile", "-"]

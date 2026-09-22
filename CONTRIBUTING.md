@@ -22,14 +22,16 @@ uv run manage.py runserver
 ```sh
 uv run ruff format .
 uv run ruff check --fix .
-uv run pytest
+uv run pytest -n auto        # every core; plain `uv run pytest` is the same suite, slower
 uv run manage.py makemigrations --check --dry-run
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
 Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14, plus
 `manage.py check --deploy` against production settings, and it fails if the committed
-stylesheet has drifted from its source. So does `uv run pytest` on your machine, once
+stylesheet has drifted from its source. Coverage is measured on the 3.14 leg only, and
+`fail_under` in `pyproject.toml` is the floor it has to clear; run
+`uv run pytest -n auto --cov` to see the number yourself. So does `uv run pytest` on your machine, once
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
 which is the difference between finding out before the push and after it.
 
@@ -283,9 +285,16 @@ catalogues exist and are waiting for contributors — see
 
 ## Keeping dependencies current
 
-Once a month, or when the `security` job says so: `uv lock --upgrade`, run the suite,
-read the changelogs of anything that moved a major version, and commit the lock file on
-its own. `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
+The `Dependencies` workflow runs `uv lock --upgrade` once a month (and on demand from
+*Actions*), runs the suite against the result, and opens a pull request only if it passed.
+What is left for a person is the reading: the changelogs of anything that moved a major
+version. Merge the lock file on its own. Between runs, when the `security` job says so,
+the same by hand: `uv lock --upgrade`, run the suite, commit the lock file on its own.
+
+The tools CI runs are pinned as the lock is -- uv by version in every workflow, in
+`.pre-commit-config.yaml` and in `docker/Dockerfile`, and zizmor and pip-audit in `ci.yml`
+-- so that a push that changed nothing cannot fail on a tool that did. Bump them together,
+deliberately. `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
 request that touches a boundary answers to it.
 
 ## Writing a changelog entry
@@ -334,7 +343,11 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    code is shaped as it is and says nothing about where the project stands, so this is
    the one moment it is revised (#255).
 4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
-5. Commit, then tag and push the tag: `git tag vX.Y.Z && git push origin vX.Y.Z`.
+5. Commit, push, and **wait for CI to pass on that commit**. Then tag it and push the tag:
+   `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
+   tagged commit's statuses and refuses a tag on which any test leg or the browser job is
+   not a success (`release_tools.py check vX.Y.Z --ci` is the same question, from a
+   terminal); the image workflow asks it again before building a layer (#233).
 6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds
    and scans the image, pushes `X.Y.Z`, `X.Y` and `latest`, asks the registry for all
    three the way `docker pull` would, and attaches the image's bill of materials to the
@@ -345,8 +358,8 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    is the same check, for whoever would rather know than trust (#251).
 
 The `release` workflow does the rest, and it is one job: it refuses a tag that disagrees
-with the code or the changelog, builds the sdist and the wheel, and creates the Forgejo
-release with the changelog section as its notes.
+with the code or the changelog or whose CI did not pass, builds the sdist and the wheel,
+and creates the Forgejo release with the changelog section as its notes.
 
 ### Versions of official plugins
 

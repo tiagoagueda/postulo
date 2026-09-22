@@ -1,6 +1,7 @@
 """What a release needs, in one file the workflow and a person can both run.
 
     python scripts/release_tools.py check v0.2.0             # tag, versions and changelog agree
+    python scripts/release_tools.py check v0.2.0 --ci        # ...and CI passed on that commit
     python scripts/release_tools.py notes 0.2.0 -o notes.md  # that version's changelog section
     python scripts/release_tools.py publish v0.2.0 dist/*    # a Forgejo release with those files
     python scripts/release_tools.py attach v0.2.0 sbom.json  # one more file on that release
@@ -103,6 +104,40 @@ def changelog_section(version: str, root: Path = ROOT) -> str:
     if not body:
         raise ReleaseError(f"The CHANGELOG.md section for {version} is empty.")
     return body + "\n"
+
+
+#: The CI jobs a release has to have passed, by the names Forgejo Actions records a commit
+#: status under: "<workflow> / <job> (<event>)". Every test leg, whichever Pythons the matrix
+#: holds this year, and the browser. The combined state is deliberately not used: the dev
+#: image job fails on a registry timeout often enough that "failure" there says nothing
+#: about the code (#233).
+REQUIRED_JOBS = (
+    ("a test leg", re.compile(r"^CI / test \(")),
+    ("the browser", re.compile(r"^CI / browser ")),
+)
+
+
+def ci_problems(ref: str, *, server: str, repository: str, token: str) -> list[str]:
+    """What stands between ``ref`` and a release: every required job not recorded as a success.
+
+    Empty means go. The combined status is asked for by the tag itself, so the answer is
+    about the commit the tag points at, whichever branch it was pushed from.
+    """
+    base = _repository_api(server, repository)
+    combined = _api("GET", f"{base}/commits/{urllib.parse.quote(ref, safe='')}/status", token)
+    recorded = {
+        status.get("context", ""): status.get("status", "")
+        for status in (combined or {}).get("statuses") or []
+    }
+    problems = []
+    for what, pattern in REQUIRED_JOBS:
+        matching = sorted(context for context in recorded if pattern.match(context))
+        if not matching:
+            problems.append(f"no CI status for {what} on {ref}; has CI run for this commit?")
+        for context in matching:
+            if recorded[context] != "success":
+                problems.append(f"{context}: {recorded[context]}")
+    return problems
 
 
 def check(tag: str, root: Path = ROOT) -> str:
@@ -327,6 +362,14 @@ def main(argv: list[str] | None = None) -> int:
         "check", help="Make sure the tag, the versions and the changelog agree."
     )
     checker.add_argument("tag")
+    checker.add_argument(
+        "--ci",
+        action="store_true",
+        help=(
+            "Also ask Forgejo whether every test leg and the browser job passed on the tagged "
+            "commit. Needs FORGEJO_URL, FORGEJO_REPOSITORY and FORGEJO_TOKEN."
+        ),
+    )
 
     noter = commands.add_parser("notes", help="Print that version's changelog section.")
     noter.add_argument("version")
@@ -355,6 +398,13 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "check":
             version = check(args.tag)
             print(f"{args.tag}: pyproject.toml, __version__ and CHANGELOG.md all say {version}.")
+            if args.ci:
+                server, repository, token = _forgejo()
+                problems = ci_problems(args.tag, server=server, repository=repository, token=token)
+                if problems:
+                    listed = "".join(f"\n  {problem}" for problem in problems)
+                    raise ReleaseError(f"CI has not passed on {args.tag}:{listed}")
+                print(f"{args.tag}: every test leg and the browser job passed.")
         elif args.command == "notes":
             body = changelog_section(args.version)
             if args.output:

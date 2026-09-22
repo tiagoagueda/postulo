@@ -28,6 +28,13 @@ on:
 permissions:
   contents: read
 
+env:
+  # The one version of uv every job installs, the same one .pre-commit-config.yaml and
+  # docker/Dockerfile name. The installer at astral.sh/uv/install.sh hands out whatever is
+  # newest, and a lock file read by an unpinned tool is pinned only in name (#233). Bump all
+  # three together.
+  UV_VERSION: "0.12.17"
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -59,11 +66,24 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      - name: Keep uv's downloads between runs
+        # Forgejo's runner serves the cache API the action talks to. Should this instance's
+        # not, the step is skipped rather than failed -- the run then downloads what the
+        # last one did, which is what it always did.
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-${{ matrix.python-version }}-
+
       - name: Install dependencies
-        run: uv sync --locked --python ${{ matrix.python-version }}
+        # Without the browser group: Playwright is 136 MB of tool this job never starts, and
+        # `default-groups` would otherwise install it on every leg of the matrix (#233).
+        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
 
       - name: Lint
         run: |
@@ -86,7 +106,16 @@ jobs:
         run: uv run python scripts/messages.py compile
 
       - name: Test
-        run: uv run pytest --cov --cov-report=term-missing
+        # On every core the runner has (#233): the suite is one process per core, and the
+        # in-memory database and the temporary directories are each process's own.
+        if: matrix.python-version != '3.14'
+        run: uv run pytest -n auto
+
+      - name: Test, and measure what the suite covers
+        # On one leg only: measuring slows the run, and three copies of the same number are
+        # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
+        if: matrix.python-version == '3.14'
+        run: uv run pytest -n auto --cov --cov-report=term-missing
 
       - name: Production settings deployment check
         # check --deploy, and collectstatic with the manifest storage the image uses,
@@ -170,12 +199,12 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install dependencies
         # --extra postgres, which is where psycopg lives and what the image was missing.
-        run: uv sync --locked --python 3.14 --extra postgres
+        run: uv sync --locked --python 3.14 --extra postgres --no-group e2e
 
       - name: Compile the translations
         run: uv run python scripts/messages.py compile
@@ -236,7 +265,7 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Audit the Python dependencies
@@ -250,7 +279,7 @@ jobs:
         run: |
           uv export --no-emit-project --all-groups --format requirements-txt --no-hashes \
             > /tmp/locked-requirements.txt
-          uv run --with pip-audit pip-audit --strict --progress-spinner off \
+          uv run --with pip-audit==2.10.1 pip-audit --strict --progress-spinner off \
             -r /tmp/locked-requirements.txt
 
       - name: Audit the asset build's Node dependencies
@@ -273,8 +302,11 @@ jobs:
         #
         # This is also why it passed on a laptop: with no token in the environment zizmor
         # defaults to offline, so the failure only ever appeared in CI.
+        #
+        # Pinned, like pip-audit above and uv itself: an auditor that changes under the
+        # project is one whose new rule fails a push that changed nothing (#233).
         run: >
-          uvx zizmor --offline --no-progress --config .forgejo/zizmor.yml
+          uvx zizmor==1.30.1 --offline --no-progress --config .forgejo/zizmor.yml
           --min-severity medium .forgejo/workflows/*.yml
 
   styles:
@@ -339,8 +371,18 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Keep uv's downloads and the browser between runs
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.cache/ms-playwright
+          key: browser-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: browser-${{ runner.os }}-
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --group e2e

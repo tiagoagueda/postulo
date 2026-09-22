@@ -85,6 +85,9 @@ MIDDLEWARE = [
     # First, so nothing downstream sees a forwarding header from somewhere untrusted --
     # SecurityMiddleware reads X-Forwarded-Proto through SECURE_PROXY_SSL_HEADER.
     "postulo.core.proxy.TrustedProxyMiddleware",
+    # Second, so that every line a request logs -- a refusal the security middleware makes
+    # included -- carries the request's id, and the answer echoes it (#233).
+    "postulo.core.middleware.RequestIDMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -685,19 +688,31 @@ POSTULO_EMAIL_OAUTH_CLIENT_SECRET = env("POSTULO_EMAIL_OAUTH_CLIENT_SECRET", def
 POSTULO_LOG_DIR = env("POSTULO_LOG_DIR", default=str(REPO_DIR / "data" / "logs"))
 POSTULO_LOG_MAX_BYTES = env.int("POSTULO_LOG_MAX_BYTES", default=5 * 1024 * 1024)
 POSTULO_LOG_BACKUPS = env.int("POSTULO_LOG_BACKUPS", default=3)
+# What the console gets: "simple", a line a person reads under `docker logs`, or "json",
+# the same one-object-per-line the file keeps, for an instance whose console is collected
+# by something that parses it (#233). The file is always JSON.
+POSTULO_LOG_FORMAT = env("POSTULO_LOG_FORMAT", default="simple").strip().lower()
+
+from postulo.core import logs as _logs  # noqa: E402 - needs POSTULO_LOG_DIR, read just above
 
 # The directory has to exist before logging is configured, and a failure here must not be
 # what stops an instance from starting.
 if POSTULO_LOG_DIR:
-    from postulo.core import logs as _logs
-
     _logs.ensure_directory_at(POSTULO_LOG_DIR)
+
+# Every record carries the id of the request, scheduler pass or errand it was written for,
+# whichever handler formats it (#233).
+_logs.install_record_factory()
 
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "simple": {"format": "{asctime} {levelname} {name}: {message}", "style": "{"},
+        "simple": {
+            "()": "postulo.core.logs.ConsoleFormatter",
+            "format": "{asctime} {levelname} {name}: {message}",
+            "style": "{",
+        },
         # One JSON object per line: a page can filter it, the extras a record carried
         # survive, and a collector can be handed it as it is.
         "json": {"()": "postulo.core.logs.JSONFormatter"},
@@ -705,7 +720,14 @@ LOGGING = {
     "handlers": {
         # Untouched. `docker logs` is how an operator with a terminal reads these, and
         # taking that away in order to add a page would be a poor trade.
-        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
+        # A format the checks would refuse still has to configure logging, or the refusal
+        # itself could not be printed; it falls back to the line a person reads.
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": POSTULO_LOG_FORMAT
+            if POSTULO_LOG_FORMAT in ("simple", "json")
+            else "simple",
+        },
         **(
             {
                 "file": {

@@ -21,11 +21,15 @@ applications, and nothing in Postulo writes a document's contents to a log.
 
 from __future__ import annotations
 
+import contextvars
 import datetime as dt
 import json
 import logging
 import os
+import re
+import uuid
 from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -62,6 +66,78 @@ STANDARD = {
 LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 
 
+# ------------------------------------------------------------ the request id
+
+#: The header a request may arrive with and every response leaves with (#233). A proxy
+#: that sets one gets the same id back and in every line the request wrote, so its access
+#: log, gunicorn's and Postulo's can be laid side by side.
+REQUEST_ID_HEADER = "X-Request-ID"
+
+#: What an id from outside may look like. Anything else is replaced rather than cleaned:
+#: a log line is one place a newline from a stranger must never land.
+ACCEPTABLE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,200}$")
+
+_current: contextvars.ContextVar[str] = contextvars.ContextVar("postulo_request_id", default="")
+
+
+def current_request_id() -> str:
+    """The id of the request, scheduler pass or errand this code is running for, or ``""``."""
+    return _current.get()
+
+
+def new_request_id(prefix: str = "") -> str:
+    """Fresh, unguessable, and short enough to read aloud from a log line."""
+    stamp = uuid.uuid4().hex
+    return f"{prefix}-{stamp[:12]}" if prefix else stamp
+
+
+def acceptable(identifier: str) -> bool:
+    return bool(identifier) and ACCEPTABLE_ID.match(identifier) is not None
+
+
+@contextmanager
+def request_scope(identifier: str | None = None) -> Iterator[str]:
+    """Everything logged inside carries ``identifier``; a fresh one when none is given.
+
+    A context variable rather than thread-local state, so the id follows a request across
+    the async boundaries Django has and the sync ones the scheduler does not.
+    """
+    identifier = identifier or new_request_id()
+    token = _current.set(identifier)
+    try:
+        yield identifier
+    finally:
+        _current.reset(token)
+
+
+def install_record_factory() -> None:
+    """Put the current id on every record ``logging`` makes, whichever handler formats it.
+
+    Idempotent, because the settings module that calls this is imported more than once in a
+    test run and a factory that wrapped itself would grow a stack of wrappers.
+    """
+    previous = logging.getLogRecordFactory()
+    if getattr(previous, "_postulo_request_id", False):
+        return
+
+    def factory(*args, **kwargs):
+        record = previous(*args, **kwargs)
+        record.request_id = _current.get()
+        return record
+
+    factory._postulo_request_id = True  # type: ignore[attr-defined]
+    logging.setLogRecordFactory(factory)
+
+
+class ConsoleFormatter(logging.Formatter):
+    """The plain line, naming the request it belongs to when there is one."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        line = super().format(record)
+        identifier = getattr(record, "request_id", "")
+        return f"{line} [request {identifier}]" if identifier else line
+
+
 class JSONFormatter(logging.Formatter):
     """One object per line: the time, the level, the logger, the message, the extras."""
 
@@ -78,6 +154,10 @@ class JSONFormatter(logging.Formatter):
             payload["traceback"] = self.formatException(record.exc_info)
         for key, value in record.__dict__.items():
             if key in STANDARD or key.startswith("_"):
+                continue
+            if key == "request_id" and not value:
+                # Outside any request there is nothing to correlate, and a field that is
+                # always present and usually empty is noise a reader learns to skip.
                 continue
             try:
                 json.dumps(value)

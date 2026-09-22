@@ -11,6 +11,8 @@ from django.shortcuts import resolve_url
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone, translation
 
+from postulo.core import logs
+
 #: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
 #: completeness; nothing in Postulo answers with either.
 REDIRECTS = frozenset({301, 302, 303, 307, 308})
@@ -177,3 +179,32 @@ class UserPreferencesMiddleware:
         # Missing profiles are possible for rows created before the signal existed,
         # or by a fixture; they should degrade to instance defaults, not an error.
         return getattr(user, "profile", None)
+
+
+class RequestIDMiddleware:
+    """One id per request, in every line it logs and in the answer it gets (#233).
+
+    A gunicorn access line, a Postulo log line and a proxy's own record could not be laid
+    beside each other: nothing they shared said they were the same request. Now each request
+    is given an id -- the one it arrived with in ``X-Request-ID`` if that looks like an id,
+    a fresh one otherwise -- which every record logged while answering it carries and which
+    the response echoes, so a proxy that set one sees it come back and one that did not can
+    read it off the answer. gunicorn's access log prints the same header.
+
+    Second in the chain, after the proxy check, so that a refusal the security middleware
+    makes is logged with the id too. The id from outside is accepted only when it is made
+    of the characters an id is made of; anything else is replaced, never cleaned, because a
+    log line is one place a newline a stranger typed must not land.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        given = request.headers.get(logs.REQUEST_ID_HEADER, "")
+        identifier = given if logs.acceptable(given) else logs.new_request_id()
+        request.request_id = identifier
+        with logs.request_scope(identifier):
+            response = self.get_response(request)
+        response[logs.REQUEST_ID_HEADER] = identifier
+        return response

@@ -55,6 +55,17 @@ class Rate:
 UNLIMITED = Rate(0, 0)
 
 
+def is_well_formed(spec: str | None) -> bool:
+    """Whether `parse` will read this as what was meant: a rate, or a deliberate no-limit.
+
+    `parse` reads anything unreadable as no limit, so an instance with a mistyped rate keeps
+    working. The configuration checks (#233) ask this instead, so the mistype is reported at
+    start-up rather than silently opening the door.
+    """
+    text = str(spec or "").strip()
+    return text in ("", "0") or bool(_SPEC.match(text))
+
+
 def parse(spec: str | None) -> Rate:
     match = _SPEC.match(str(spec or ""))
     if not match:

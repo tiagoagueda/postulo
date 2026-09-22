@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- CI runs the suite on every core with the browser group left out, measures coverage on one leg against a floor, pins uv, zizmor and pip-audit, and refuses a release or an image unless CI passed on the tagged commit; a monthly workflow proposes lock-file upgrades. (#233)
 - The pages that grew with the size of a search no longer do: search, the board, the companies table, the listings tabs, the report, the figures and bulk tagging each do a fixed amount of work whatever you have recorded. (#231)
 - A table's filters live in the column headers: click a column's name to open its filter, and only the ones in use are on screen. **Sorting moved to an icon beside the name**, since the name is now the filter. (#253)
 - On an application's page the status, a new timeline entry and a ticked-off reminder change in place instead of reloading the page and returning you to the top. (#257)
@@ -48,6 +49,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Start-up refuses a setting outside its vocabulary, a malformed rate or a bare `POSTULO_PUBLIC_URL`, with a message naming it. Every log line names its request, scheduler pass or errand, `X-Request-ID` is honoured and echoed, and `POSTULO_LOG_FORMAT=json` is there for a parsed console. (#233)
 - A built-in *Webhook* notifier posts every event as signed JSON to an address you give, delivered by the scheduler with backoff; three new events — a status change, an interview scheduled or moved, an offer recorded — are on for it and off for the notifiers that reach a person. (#240)
 - An offer can be recorded on an application — pay, variable pay, equity, benefits, where, holidays, start and answer-by dates — and every application at *Offer* is compared side by side, amounts brought to a year within a currency; the answer-by date is on the calendar with a reminder. (#237)
 - A filtered, sorted table can be kept under a name and chosen again from *Views*, columns included; one view per table can be what the table opens as. A view saved against a table that has since changed still opens and says what it left out. (#259)

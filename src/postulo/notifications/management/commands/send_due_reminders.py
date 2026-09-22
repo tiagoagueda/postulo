@@ -22,7 +22,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from postulo.applications.models import Reminder
-from postulo.core import scheduler
+from postulo.core import logs, scheduler
 from postulo.notifications.base import Notification, absolute_url
 from postulo.notifications.service import notify
 
@@ -136,7 +136,11 @@ class Command(BaseCommand):
         self.quiet_pass = not options["loop"]
         while True:
             try:
-                self.one_pass(every, budget=options["sync_budget"])
+                # Every line this pass logs names the pass, the way a request's lines name
+                # the request (#233), so a delivery's failure can be found among a day of
+                # passes.
+                with logs.request_scope(logs.new_request_id("pass")):
+                    self.one_pass(every, budget=options["sync_budget"])
                 # The one outbound request this loop makes on the instance's own behalf,
                 # and only if the operator switched it on: once a day, is there a newer
                 # release (#272). A page never asks; this is where the asking happens.

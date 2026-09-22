@@ -26,6 +26,10 @@ on:
 # Nothing is granted by default; the release job needs to write releases, nothing else.
 permissions: {}
 
+env:
+  # The same pin as ci.yml, .pre-commit-config.yaml and docker/Dockerfile (#233).
+  UV_VERSION: "0.12.17"
+
 jobs:
   release:
     runs-on: ubuntu-latest
@@ -40,11 +44,18 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf https://astral.sh/uv/install.sh | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Refuse a tag that disagrees with the code or the changelog
-        run: uv run --no-project python scripts/release_tools.py check "${GITHUB_REF_NAME}"
+      - name: Refuse a tag that disagrees with the code or the changelog, or whose CI did not pass
+        # `--ci` asks Forgejo for the commit statuses of the tagged commit and refuses unless
+        # every test leg and the browser job are recorded as a success. A tag used to publish
+        # the sdist and the wheel whatever CI had said about the commit (#233).
+        env:
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORGEJO_URL: ${{ github.server_url }}
+          FORGEJO_REPOSITORY: ${{ github.repository }}
+        run: uv run --no-project python scripts/release_tools.py check "${GITHUB_REF_NAME}" --ci
 
       - name: Compile the translations into the package
         run: uv run --no-project python scripts/messages.py compile

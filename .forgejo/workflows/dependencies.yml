@@ -1,0 +1,131 @@
+# Keeps the lock file current without anybody remembering to (#233).
+#
+# CONTRIBUTING.md said "once a month, `uv lock --upgrade`", and nothing did it: the weekly
+# audit in ci.yml reports a vulnerability, not staleness, and a lock that is never moved is
+# one whose next move is a year of changes at once. So, monthly and on demand, this upgrades
+# the lock, runs the suite against it, and -- only if the suite passes -- opens a pull
+# request with the result. A person still reads the changelogs of anything that moved a major
+# version and merges; the workflow does the part that was being forgotten.
+#
+# It writes a branch and opens a pull request, so it needs more than `contents: read`. That
+# is why it is its own file with its own permissions rather than a job in ci.yml, where every
+# job only reads.
+name: Dependencies
+
+on:
+  schedule:
+    # The first Monday-ish of the month, at a quiet hour. Cron has no "first Monday", so
+    # this is the 3rd; what matters is once a month, not which day.
+    - cron: "23 5 3 * *"
+  workflow_dispatch:
+
+permissions: {}
+
+env:
+  UV_VERSION: "0.12.17"
+
+jobs:
+  upgrade:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Pushed below with the token handed to that one step, not with one left in
+          # .git/config for every step after the checkout.
+          persist-credentials: false
+
+      - name: Install WeasyPrint's system libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Upgrade the lock
+        id: lock
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          uv lock --upgrade
+          if git diff --quiet -- uv.lock; then
+            echo "Nothing moved."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git diff --stat -- uv.lock
+          fi
+
+      - name: Install the upgraded dependencies
+        if: steps.lock.outputs.changed == 'true'
+        run: uv sync --locked --python 3.14 --no-group e2e
+
+      - name: Run the suite against them
+        # The same checks the test job runs, minus the browser: a lock that fails here is
+        # not proposed at all, and the run's log says what moved and what broke.
+        if: steps.lock.outputs.changed == 'true'
+        run: |
+          uv run ruff check .
+          uv run manage.py makemigrations --check --dry-run
+          uv run python scripts/messages.py compile
+          uv run pytest -n auto
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+
+      - name: Push the branch and open the pull request
+        if: steps.lock.outputs.changed == 'true'
+        env:
+          # Through the environment, never expanded into the script: a value that reaches a
+          # shell as text is data, one pasted into it is code.
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SERVER: ${{ github.server_url }}
+          REPOSITORY: ${{ github.repository }}
+          BASE: ${{ github.ref_name }}
+        run: |
+          branch="dependencies/$(date -u +%Y-%m)"
+          git config user.name "Postulo dependencies"
+          git config user.email "dependencies@postulo.invalid"
+          git checkout -B "$branch"
+          git add uv.lock
+          git commit -m "Upgrade the lock file ($(date -u +%Y-%m-%d))" \
+            -m "Every dependency moved to its newest version the constraints allow; the suite passed against them. Read the changelogs of anything that crossed a major version before merging."
+          # The token in the URL of this one push, not in .git/config.
+          git push --force "${SERVER%%://*}://x-access-token:${TOKEN}@${SERVER#*://}/${REPOSITORY}.git" "HEAD:refs/heads/${branch}"
+          python3 - "$branch" <<'PY'
+          import json, os, sys, urllib.parse, urllib.request
+          branch = sys.argv[1]
+          server, repository, token = os.environ["SERVER"], os.environ["REPOSITORY"], os.environ["TOKEN"]
+          base = os.environ["BASE"]
+          api = f"{server.rstrip('/')}/api/v1/repos/{repository}"
+          def call(method, path, body=None):
+              request = urllib.request.Request(api + path, method=method, data=json.dumps(body).encode() if body else None)
+              request.add_header("Authorization", f"token {token}")
+              request.add_header("Accept", "application/json")
+              if body is not None:
+                  request.add_header("Content-Type", "application/json")
+              with urllib.request.urlopen(request, timeout=60) as response:
+                  return json.loads(response.read() or b"null")
+          open_ones = call("GET", "/pulls?state=open&limit=50")
+          if any(pull.get("head", {}).get("ref") == branch for pull in open_ones):
+              print(f"A pull request for {branch} is already open; the branch was updated under it.")
+          else:
+              pull = call("POST", "/pulls", {
+                  "head": branch,
+                  "base": base,
+                  "title": f"Upgrade the lock file ({branch.split('/')[-1]})",
+                  "body": (
+                      "`uv lock --upgrade`, run by the Dependencies workflow, and the suite passed "
+                      "against the result. Before merging, read the changelogs of anything that "
+                      "crossed a major version, and land the lock file on its own, as CONTRIBUTING.md asks."
+                  ),
+              })
+              print(f"Opened {pull['html_url']}")
+          PY

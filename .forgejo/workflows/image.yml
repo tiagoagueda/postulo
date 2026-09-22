@@ -53,6 +53,18 @@ jobs:
           ref: ${{ inputs.tag }}
           persist-credentials: false
 
+      - name: Refuse a tag whose CI did not pass
+        # The release workflow refuses a tag that disagrees with the code; this refuses one
+        # whose commit CI never passed, before a single layer is built. Asked of Forgejo by
+        # the tag, so the answer is about the commit the tag names, and anything typed into
+        # the dispatch box that CI has not been green on is turned away (#233).
+        env:
+          RELEASE_TAG: ${{ inputs.tag }}
+          FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FORGEJO_URL: ${{ github.server_url }}
+          FORGEJO_REPOSITORY: ${{ github.repository }}
+        run: python3 scripts/release_tools.py check "$RELEASE_TAG" --ci
+
       - name: Work out the tags
         id: tags
         env:
