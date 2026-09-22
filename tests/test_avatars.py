@@ -18,6 +18,23 @@ from postulo.core import importer
 pytestmark = pytest.mark.django_db
 
 
+def noisy_picture(size=(900, 900)) -> bytes:
+    """Noise, so it does not compress away and the byte budget actually has to engage."""
+    import random
+
+    generator = random.Random(11)  # noqa: S311
+    image = Image.new("RGB", size)
+    image.putdata(
+        [
+            (generator.randrange(256), generator.randrange(256), generator.randrange(256))
+            for _ in range(size[0] * size[1])
+        ]
+    )
+    out = io.BytesIO()
+    image.save(out, format="JPEG", quality=92)
+    return out.getvalue()
+
+
 def picture_bytes(size=(300, 200), fmt="JPEG", orientation=None) -> bytes:
     image = Image.new("RGB", size, "orange")
     out = io.BytesIO()
@@ -40,12 +57,40 @@ def profile_page(client, user, **fields):
 
 
 def test_an_upload_becomes_a_square_png_without_its_metadata():
+    """Square still, because a face belongs cropped to the tile it sits in.
+
+    Not resized to a constant, though (#265): the shorter edge decides the square. A 300 by
+    200 picture is a 200-pixel square, not a 256-pixel one — the profile page draws it at
+    288 physical pixels on a phone, so the old ceiling was already being upscaled through.
+    """
     original = picture_bytes((300, 200), orientation=6)
     content = avatars.process(original)
     with Image.open(io.BytesIO(content.read())) as image:
         assert image.format == "PNG"
-        assert image.size == (avatars.AVATAR_SIZE, avatars.AVATAR_SIZE)
+        assert image.width == image.height, "a face is cropped to the tile, not letterboxed"
+        assert image.size == (200, 200), "the shorter edge, kept rather than normalised"
         assert not image.getexif(), "nothing the phone knew survives"
+
+
+def test_a_large_picture_keeps_its_pixels():
+    """The whole point of #265: the one page whose subject is the picture can show it."""
+    content = avatars.process(picture_bytes((900, 900)))
+
+    with Image.open(io.BytesIO(content.read())) as image:
+        assert image.size == (900, 900), "no longer flattened to 256"
+
+
+def test_a_picture_too_heavy_for_the_budget_is_reduced_until_it_fits(monkeypatch):
+    """Re-encoding can grow a file, so the rule reduces rather than refuses."""
+    monkeypatch.setattr(avatars, "MAX_STORED_BYTES", 20_000)
+
+    content = avatars.process(noisy_picture((900, 900)))
+
+    written = content.read()
+    assert len(written) <= 20_000
+    with Image.open(io.BytesIO(written)) as image:
+        assert image.width == image.height, "still square"
+        assert image.width < 900, "reduced"
 
 
 def test_rubbish_and_bombs_are_refused():
@@ -62,7 +107,11 @@ def test_the_gravatar_address_is_sha256_of_the_lowercased_email_and_asks_for_a_4
     url = avatars.gravatar_url("  Applicant@Example.org ")
     assert url.startswith("https://gravatar.com/avatar/")
     assert avatars.gravatar_hash("applicant@example.org") in url
-    assert url.endswith("?s=256&d=404")
+    assert url.endswith(f"?s={avatars.GRAVATAR_SIZE}&d=404")
+    assert avatars.GRAVATAR_SIZE >= 512, (
+        "asked for at a size that can be shown large: the fetch happens once, server-side, "
+        "on opt-in, and a small one can never be shown big afterwards (#265)"
+    )
 
 
 # --------------------------------------------------------------------- uploads
@@ -316,3 +365,16 @@ def test_the_tag_still_draws_initials_for_a_user_without_a_profile():
 
     rendered = Template("{% load postulo %}{% avatar u %}").render(Context({"u": Bare()}))
     assert ">AM</span>" in rendered and "<img" not in rendered
+
+
+def test_the_profile_page_is_no_longer_short_of_pixels():
+    """The measurement #265 opens with, turned into a check.
+
+    `accounts/profile.html` draws the picture at `size-24` — 96 CSS pixels, and 288
+    physical ones on a phone at 3x. Storing 256 meant the one page whose subject is the
+    picture was upscaling it. A 400-pixel upload is now kept at 400.
+    """
+    content = avatars.process(picture_bytes((400, 400)))
+
+    with Image.open(io.BytesIO(content.read())) as image:
+        assert image.width >= 288, "what a phone asks for on the profile page"

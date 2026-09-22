@@ -46,6 +46,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Your picture is kept at the size you gave it rather than 256 square, so the profile page stops upscaling it, and a Gravatar copy is fetched large enough to show. **Pictures already stored stay 256** until re-uploaded or re-fetched. (#265)
 - A company logo or a plugin's mark may be an SVG, sanitised against an allowlist; a raster one is kept at its own size rather than a 256-pixel square. **Logos already stored stay square** — *Refresh* re-fetches one with an address, and an upload is replaced by uploading again. (#264)
 - Form fields explain themselves: what goes in the box, in what form, and what Postulo does with it afterwards. (#205)
 - Postulo asks before a page is left with something typed into it and not saved, so a click in the sidebar no longer discards an unsent letter. (#258)
