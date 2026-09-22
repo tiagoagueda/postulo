@@ -223,20 +223,31 @@ def test_the_empty_state_is_a_component_rather_than_sixteen_copies(client, staff
     assert len(using) >= 6, f"only {len(using)} pages use it"
 
 
-def test_the_empty_states_that_are_left_are_the_ones_that_are_different(client, staff_user):
-    """Not a conversion for its own sake: what still writes its own is what the component
-    does not say -- a conditional sentence, a footer of two buttons, a page-specific shape.
-    This holds the number down so the pattern cannot quietly return."""
+#: The five shapes "there is nothing here" used to be written in, by hand (#291).
+HAND_WRITTEN_NOTHING = (
+    "card py-12 text-center",
+    'class="card text-sm text-ink-500 dark:text-ink-400"',
+    "px-4 py-6 text-sm text-ink-500 dark:text-ink-400",
+)
+
+
+def test_no_template_writes_its_own_nothing(client, staff_user):
+    """Forty-seven of them in five shapes, and every one is `<c-empty>` now (#291): the page's
+    own, `variant="quiet"` for a widget's note, `variant="row"` for a list box with no rows.
+    A conditional sentence goes in the slot, a second button in the footer slot, so nothing
+    is left that the component cannot say. The board column's dashed "Empty" is not one of
+    these: it is a drop target, and the dashes say where a card may be let go."""
     from pathlib import Path as P
 
     root = P(__file__).resolve().parents[1]
     by_hand = [
-        path.relative_to(root)
+        (path.relative_to(root), shape)
         for path in (root / "src/postulo/templates").rglob("*.html")
-        if "card py-12 text-center" in path.read_text("utf-8")
+        for shape in HAND_WRITTEN_NOTHING
+        if path.name != "empty.html" and shape in path.read_text("utf-8")
     ]
 
-    assert len(by_hand) <= 12, f"{len(by_hand)} still write their own: {by_hand}"
+    assert not by_hand, f"still written by hand: {by_hand}"
 
 
 def test_the_gallery_shows_both_kinds_of_nothing(client, staff_user):
@@ -245,7 +256,8 @@ def test_the_gallery_shows_both_kinds_of_nothing(client, staff_user):
     body = html[html.index("<main") : html.index("</main>")]
 
     assert "design-empty" in body
-    assert body.count("empty gap-2") >= 2, "a page with nothing yet, and a filter that missed"
+    assert body.count("empty gap-2") >= 3, "a page with nothing yet, a filter that missed, a note"
+    assert 'data-variant="quiet"' in body, "and the quiet shape a widget leaves (#291)"
 
 
 # ------------------------------------------------------------------ a page's own name

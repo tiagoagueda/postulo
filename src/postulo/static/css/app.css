@@ -2295,6 +2295,14 @@
   .empty > header > p > a:hover {
     color: var(--color-primary);
   }
+  .kbd {
+    pointer-events: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-user-select: none;
+    user-select: none;
+  }
   .fieldset {
     display: flex;
     flex-direction: column;
@@ -3248,6 +3256,58 @@
   .field > input[type="checkbox"]:focus-visible, .input[type="checkbox"]:focus-visible, .field > input[type="radio"]:focus-visible, .input[type="radio"]:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+}
+@layer components {
+  .empty[data-variant="quiet"], .empty[data-variant="row"] {
+    align-items: flex-start;
+    justify-content: flex-start;
+    text-align: start;
+    text-wrap: wrap;
+  }
+  .empty[data-variant="quiet"] > header, .empty[data-variant="row"] > header, .empty[data-variant="quiet"] > footer, .empty[data-variant="row"] > footer {
+    max-width: none;
+    align-items: flex-start;
+  }
+  .empty[data-variant="row"] {
+    padding-inline: calc(var(--spacing) * 4);
+    padding-block: calc(var(--spacing) * 6);
+  }
+  .kbd {
+    border-radius: var(--radius-sm);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-ink-200);
+    background-color: var(--color-ink-100);
+    padding-inline: calc(var(--spacing) * 1.5);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    color: var(--color-ink-700);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      border-color: var(--color-ink-700);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        border-color: var(--color-ink-700);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-800);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-800);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-200);
+      }
+    }
   }
 }
 @layer base {

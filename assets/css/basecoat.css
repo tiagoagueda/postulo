@@ -351,3 +351,44 @@
     outline-offset: 2px;
   }
 }
+
+/* ---------------------------------------------------------- the empty state */
+
+/*
+ * The two quieter shapes of <c-empty> (#291). Basecoat's `empty` is a centred column;
+ * a widget's "Nothing due." and a list box's "no rows" are the same component pulled to
+ * the start edge with the card's ordinary padding, or the row's, because a tile inside a
+ * dashboard is not a page and does not get a page's ceremony.
+ */
+@layer components {
+  .empty[data-variant="quiet"],
+  .empty[data-variant="row"] {
+    @apply items-start justify-start text-start text-wrap;
+  }
+
+  .empty[data-variant="quiet"] > header,
+  .empty[data-variant="row"] > header,
+  .empty[data-variant="quiet"] > footer,
+  .empty[data-variant="row"] > footer {
+    @apply max-w-none items-start;
+  }
+
+  .empty[data-variant="row"] {
+    @apply px-4 py-6;
+  }
+}
+
+/* ------------------------------------------------------------------- kbd */
+
+/*
+ * A key somebody presses, in the sentence that names it (#291). Basecoat's `kbd` is an
+ * inline box that keeps its shape; the paint is a keycap: monospace, a hairline and a
+ * muted ground at 4.5:1, and no rounding beyond `rounded-sm` so it reads as a key rather
+ * than a pill.
+ */
+@layer components {
+  .kbd {
+    @apply rounded-sm border border-ink-200 bg-ink-100 px-1.5 font-mono text-xs text-ink-700
+      dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200;
+  }
+}

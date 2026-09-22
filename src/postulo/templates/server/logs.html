@@ -132,22 +132,14 @@
         </table>
       </c-scroll-box>
     {% else %}
-      <div class="card py-12 text-center">
-        <p class="mb-1 font-medium">
-          {% if filtering %}
-            {% translate "Nothing matches those filters" %}
-          {% else %}
-            {% translate "Nothing has been recorded yet" %}
-          {% endif %}
-        </p>
-        <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% if filtering %}
-            {% translate "Loosen one of them, or start again." %}
-          {% else %}
-            {% translate "A quiet log is the one you want." %}
-          {% endif %}
-        </p>
-      </div>
+      <c-empty icon="{% if filtering %}filter{% else %}circle-dashed{% endif %}"
+               title="{% if filtering %}{% translate 'Nothing matches those filters' %}{% else %}{% translate 'Nothing has been recorded yet' %}{% endif %}">
+        {% if filtering %}
+          {% translate "Loosen one of them, or start again." %}
+        {% else %}
+          {% translate "A quiet log is the one you want." %}
+        {% endif %}
+      </c-empty>
     {% endif %}
 
     {% comment %} `wrap-anywhere`: a path has no spaces, and on some systems no hyphens

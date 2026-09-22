@@ -1,5 +1,5 @@
 {% load i18n postulo %}
-<c-vars icon="" title="" action_url="" action_label="" action_variant="" />
+<c-vars icon="" title="" action_url="" action_label="" action_variant="" variant="" />
 {% comment %} A list with nothing in it (#292).
 
    `<c-empty title="…" icon="inbox" action_url="…" action_label="…">what to do</c-empty>`
@@ -17,8 +17,16 @@
    nothing on it yet offers the thing to do next as a primary button, while a filter that
    matched nothing offers *Clear* as an outline, because clearing is a way back rather than
    a way on.
+
+   Three shapes, one component (#291). The default is the page's own empty state: a card,
+   centred, with room around it. `variant="quiet"` is the note a widget or an aside leaves
+   where its list would be -- "Nothing due." -- a card with one muted sentence, left-aligned,
+   because a dashboard tile is not a page and does not get a page's ceremony. `variant="row"`
+   is the same sentence inside a box that already is a card, a list with no rows: no card of
+   its own, the row's padding. Forty-seven of these were written by hand in five shapes; the
+   test in `tests/test_design_gallery.py` holds that number at nought.
 {% endcomment %}
-<div class="card empty gap-2 py-12">
+<div class="{% if variant != 'row' %}card {% endif %}empty gap-2{% if not variant %} py-12{% endif %}"{% if variant %} data-variant="{{ variant }}"{% endif %}>
   {% if icon %}
     <figure class="mb-1 text-ink-400 dark:text-ink-500">{% icon icon class="size-8" %}</figure>
   {% endif %}

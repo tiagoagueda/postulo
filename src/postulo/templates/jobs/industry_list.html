@@ -74,18 +74,18 @@
         {% translate "Two spellings of the same thing? Edit one and merge it into the other." %}
       </p>
     {% elif q %}
-      <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      <c-empty icon="filter">
         {% blocktranslate trimmed %}
           Nothing here matches that. Only fields you have actually used appear on this page.
         {% endblocktranslate %}
-      </div>
+      </c-empty>
     {% else %}
-      <div class="card py-12 text-center text-sm text-ink-500 dark:text-ink-400">
+      <c-empty icon="circle-dashed">
         {% blocktranslate trimmed %}
           No industries yet. They appear here as you give them to companies — the company
           form suggests a long list, and anything you type joins your own.
         {% endblocktranslate %}
-      </div>
+      </c-empty>
     {% endif %}
   </div>
 {% endblock %}

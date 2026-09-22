@@ -188,15 +188,15 @@ def test_the_capture_review_says_which_keys_it_actually_has(client, user):
     client.force_login(user)
     url = reverse("jobs:capture_review", args=[capture.pk])
 
-    assert "<kbd>d</kbd>" in client.get(url).content.decode()
+    assert '<kbd class="kbd">d</kbd>' in client.get(url).content.decode()
 
     profile = Profile.objects.get(user=user)
     profile.keyboard_shortcuts = False
     profile.save(update_fields=["keyboard_shortcuts"])
     html = client.get(url).content.decode()
 
-    assert "<kbd>d</kbd>" not in html
-    assert "<kbd>Ctrl</kbd>" in html, "a shortcut with a modifier is never switched off"
+    assert '<kbd class="kbd">d</kbd>' not in html
+    assert '<kbd class="kbd">Ctrl</kbd>' in html, "a shortcut with a modifier is never switched off"
 
 
 # --------------------------------------------- 3. a focus indicator in forced colours
