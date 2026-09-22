@@ -14,6 +14,15 @@ device rather than clutter every link.
 
 Nothing here trusts the query string. A sort key or filter that is not declared is
 ignored, and every filter only ever narrows the owner-scoped queryset it is given.
+
+**A saved view is a name for a query string** (#259). "Everything I have not heard back on
+in three weeks" is a question a search asks every week, and every week the same boxes were
+filled in from memory. The filtered, sorted view *is* its address already, so keeping one is
+storing that address under a name -- beside the column widths, on the profile, where it
+leaves with the person's data and comes back with it. A view carries the columns it was
+saved with too, so choosing one restores filters, sort and columns together; and it
+degrades rather than fails when the table it was saved against has changed, which is the
+whole of the risk and where the tests are.
 """
 
 from __future__ import annotations
@@ -25,6 +34,7 @@ from functools import cached_property
 
 from django.db.models import F, Q
 from django.http import QueryDict
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 #: What a column may be dragged to. Narrower than the lower bound is a column nobody can
@@ -35,6 +45,19 @@ MAX_WIDTH = 900
 
 PAGE_SIZES = (25, 50, 100)
 DEFAULT_PAGE_SIZE = 50
+
+#: The query parameter that names a saved view (#259). Not `view`: the applications page
+#: already spends that on its shape, table or board.
+SAVED = "saved"
+#: The value that means *the plain table, whatever the default view is* -- the way out of a
+#: default, which *Clear* has to offer or a default view would be a table nobody can leave.
+PLAIN = "none"
+#: How many views one table keeps. Enough for a week's questions; a menu of forty is a menu
+#: nobody reads, and a limit is what keeps a stuck script from filling a profile.
+MAX_VIEWS = 20
+#: The parameters a view never stores: the page, because a saved page three is a saved
+#: nothing, and the view's own name.
+NOT_SAVED = ("page", SAVED)
 
 
 @dataclass(frozen=True)
@@ -168,6 +191,49 @@ class ChooserRow:
     last: bool = False
 
 
+@dataclass(frozen=True)
+class View:
+    """One saved view: a name, the query string it stands for, the columns it was saved
+    with, and whether the table opens as it (#259)."""
+
+    name: str
+    slug: str
+    query: str
+    columns: tuple[str, ...] = ()
+    default: bool = False
+
+    @classmethod
+    def from_stored(cls, raw) -> View | None:
+        """A view out of the profile's JSON, or nothing for a row that is not one.
+
+        Read defensively: the JSON was written by an older Postulo, or restored from an
+        archive, and a row missing its name is a row rather than an error.
+        """
+        if not isinstance(raw, dict):
+            return None
+        name = str(raw.get("name") or "").strip()[:60]
+        slug = str(raw.get("slug") or slugify(name))[:60]
+        if not name or not slug:
+            return None
+        columns = raw.get("columns")
+        return cls(
+            name=name,
+            slug=slug,
+            query=str(raw.get("query") or ""),
+            columns=tuple(str(key) for key in columns) if isinstance(columns, list) else (),
+            default=bool(raw.get("default")),
+        )
+
+    def stored(self) -> dict:
+        return {
+            "name": self.name,
+            "slug": self.slug,
+            "query": self.query,
+            "columns": list(self.columns),
+            "default": self.default,
+        }
+
+
 class Table:
     """A configurable table. Subclass, declare ``name`` and ``columns``, register."""
 
@@ -203,12 +269,167 @@ class Table:
 
     @cached_property
     def visible(self) -> list[Column]:
-        """The columns to show, in the person's order; the defaults when they chose none."""
+        """The columns to show, in the person's order; the defaults when they chose none.
+
+        A saved view named in the address brings its own columns (#259): choosing a view is
+        meant to restore filters, sort and columns together, and the first two travel in the
+        query string already. Only the columns it names that still exist are shown; a view
+        whose every column has gone falls back to the person's usual ones rather than to
+        nothing, and `view_gaps` says what was dropped.
+        """
         keys = self.settings.get("columns")
         if not isinstance(keys, list):
             keys = self.default_columns()
+        applied = self.applied_view
+        if applied is not None and applied.columns:
+            keys = [key for key in applied.columns if key in self.by_key] or keys
         chosen = [self.by_key[key] for key in keys if key in self.by_key]
         return chosen or [self.by_key[key] for key in self.default_columns()]
+
+    # ------------------------------------------------------------- saved views
+
+    @cached_property
+    def views(self) -> list[View]:
+        """This person's saved views of this table, as stored."""
+        rows = self.settings.get("views")
+        if not isinstance(rows, list):
+            return []
+        found = [View.from_stored(row) for row in rows]
+        return [view for view in found if view is not None]
+
+    @property
+    def default_view(self) -> View | None:
+        return next((view for view in self.views if view.default), None)
+
+    @cached_property
+    def applied_view(self) -> View | None:
+        """The saved view the address names, if it names one that exists."""
+        slug = self.params.get(SAVED, "").strip()
+        if not slug or slug == PLAIN:
+            return None
+        return next((view for view in self.views if view.slug == slug), None)
+
+    @property
+    def view_rows(self) -> list[tuple[View, str, bool]]:
+        """(view, its address, whether it is the one applied), for the *Views* control."""
+        applied = self.applied_view
+        return [(view, self.view_url(view), view == applied) for view in self.views]
+
+    @property
+    def applied_gaps(self) -> tuple[list[str], list[str]]:
+        """`view_gaps` of the applied view, or nothing: what the page says it left out."""
+        applied = self.applied_view
+        return self.view_gaps(applied) if applied is not None else ([], [])
+
+    def view_url(self, view: View, path: str | None = None) -> str:
+        """The address a saved view stands for: the path, its query, and its own name.
+
+        The name is on the address so that the columns it carries can be applied without
+        being stored -- a link, not a change of state, and a bookmark that still works.
+        ``path`` is for the one caller whose request is not the table's page: the view that
+        keeps a view answers a POST to its own address and sends the person to the table's.
+        """
+        query = QueryDict(view.query, mutable=True)
+        query[SAVED] = view.slug
+        return f"{path or self.request.path}?{query.urlencode()}"
+
+    @property
+    def plain_url(self) -> str:
+        """The table with no view applied, said explicitly: the way out of a default."""
+        return f"{self.request.path}?{SAVED}={PLAIN}"
+
+    @property
+    def opening_url(self) -> str | None:
+        """Where a bare address should go instead: the default view's, if there is one.
+
+        Only for an address with no query at all. Anything with a parameter -- a filter, a
+        sort, `saved=none` -- is somebody asking a question, and a default view answers the
+        one they did not ask.
+        """
+        if self.params:
+            return None
+        default = self.default_view
+        return self.view_url(default) if default is not None else None
+
+    @classmethod
+    def known_params(cls) -> set[str]:
+        """Every query parameter this table reads: what a saved view may legitimately hold."""
+        names = {"sort", "page", SAVED, *cls.extra_params}
+        for column in cls.columns:
+            if column.filter == "date":
+                names |= {f"{column.name}_from", f"{column.name}_to"}
+            elif column.filter == "number":
+                names |= {f"{column.name}_min", f"{column.name}_max"}
+            elif column.filter:
+                names.add(column.name)
+        return names
+
+    def view_gaps(self, view: View) -> tuple[list[str], list[str]]:
+        """What a saved view asks for that this table no longer has: (columns, parameters).
+
+        The whole of the risk in keeping a view. A filter on a column that was removed, a
+        sort on a field that was renamed, a column that went away: the view has to degrade to
+        what it can still honour and *say so*, never fail -- and `Table` ignoring anything
+        undeclared is what makes the first half free. This is the second half.
+        """
+        columns = [key for key in view.columns if key not in self.by_key]
+        known = self.known_params()
+        params = sorted(name for name in QueryDict(view.query) if name not in known)
+        sort = QueryDict(view.query).get("sort", "").removeprefix("-")
+        column = self.by_key.get(sort)
+        if sort and (column is None or not column.sortable):
+            params.append(f"sort={sort}")
+        return columns, params
+
+    @classmethod
+    def save_view(cls, current: dict | None, name: str, query: str, columns: list[str]) -> dict:
+        """``current`` with a view called ``name`` holding ``query``: added, or replaced if
+        the name was already taken. The page number and the view's own name are dropped from
+        the query, because neither is part of the question."""
+        name = " ".join((name or "").split())[:60]
+        slug = slugify(name)[:60]
+        if not name or not slug:
+            return dict(current or {})
+        kept = QueryDict(mutable=True)
+        for key, values in QueryDict(query).lists():
+            if key not in NOT_SAVED:
+                kept.setlist(key, values)
+        views = [view for view in cls._views_of(current) if view.slug != slug]
+        was_default = any(view.default for view in cls._views_of(current) if view.slug == slug)
+        views.append(
+            View(
+                name=name,
+                slug=slug,
+                query=kept.urlencode(),
+                columns=tuple(key for key in columns if key in {c.key for c in cls.columns}),
+                default=was_default,
+            )
+        )
+        return cls._with_views(current, views[-MAX_VIEWS:])
+
+    @classmethod
+    def forget_view(cls, current: dict | None, slug: str) -> dict:
+        return cls._with_views(current, [v for v in cls._views_of(current) if v.slug != slug])
+
+    @classmethod
+    def make_default(cls, current: dict | None, slug: str) -> dict:
+        """Make one view the table's opening one, or with an unknown slug, make none."""
+        views = [
+            View(v.name, v.slug, v.query, v.columns, default=(v.slug == slug))
+            for v in cls._views_of(current)
+        ]
+        return cls._with_views(current, views)
+
+    @staticmethod
+    def _views_of(current: dict | None) -> list[View]:
+        rows = (current or {}).get("views")
+        if not isinstance(rows, list):
+            return []
+        return [view for view in (View.from_stored(row) for row in rows) if view is not None]
+
+    @staticmethod
+    def _with_views(current: dict | None, views: list[View]) -> dict:
+        return {**(current or {}), "views": [view.stored() for view in views]}
 
     def width_of(self, column: Column) -> int:
         """How wide this person likes this column, in pixels, or 0 for *let it size itself*.
@@ -220,6 +441,11 @@ class Table:
         widths = self.settings.get("widths")
         value = widths.get(column.key) if isinstance(widths, dict) else None
         return value if isinstance(value, int) and MIN_WIDTH <= value <= MAX_WIDTH else 0
+
+    @property
+    def visible_keys_in_order(self) -> list[str]:
+        """The shown columns' keys in their order: what a saved view records (#259)."""
+        return [column.key for column in self.visible]
 
     @property
     def visible_keys(self) -> set[str]:
@@ -380,11 +606,18 @@ class Table:
 
     @property
     def clear_url(self) -> str:
-        """The list with every filter removed and the sort kept."""
+        """The list with every filter removed and the sort kept.
+
+        Said as the plain table where a default view exists (#259): the bare address opens
+        as the default view, so *Clear* pointing at it would put the filters straight back.
+        """
         path = self.request.path
+        query = QueryDict(mutable=True)
         if self.sort and self.sort != self.default_sort:
-            return f"{path}?sort={self.sort}"
-        return path
+            query["sort"] = self.sort
+        if self.default_view is not None:
+            query[SAVED] = PLAIN
+        return f"{path}?{query.urlencode()}" if query else path
 
     # ---------------------------------------------------------------- template
 

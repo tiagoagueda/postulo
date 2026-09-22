@@ -67,7 +67,7 @@
       {% comment %} The table's own controls appear once there is a table to control. A
          Columns menu and a filter row over nothing at all is worse than the sentence that
          used to be the whole of this page at zero listings (#160). {% endcomment %}
-      {% if has_listings %}{% include "partials/table/columns.html" %}{% endif %}
+      {% if has_listings %}{% include "partials/table/columns.html" %}{% include "partials/table/views.html" %}{% endif %}
       <a href="{% url 'jobs:capture_create' %}" class="btn" data-variant="outline">{% translate "Capture a posting" %}</a>
       <a href="{% url 'listings:create' %}" class="btn">{% translate "Add a listing" %}</a>
     </div>

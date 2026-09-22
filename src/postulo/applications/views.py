@@ -162,6 +162,17 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
         # A board is every card at once; the columns are what make it readable.
         return None if self.on_board else self.table.page_size
 
+    def get(self, request, *args, **kwargs):
+        # A bare address opens as the person's default view, when they have kept one (#259).
+        # Only a bare one: anything with a parameter is a question they asked. Not for an
+        # htmx swap either -- a swap is the page updating itself, not somebody arriving.
+        opening = self.table.opening_url
+        if opening and not getattr(request, "htmx", None):
+            from django.shortcuts import redirect
+
+            return redirect(opening)
+        return super().get(request, *args, **kwargs)
+
     def matching(self):
         """Every application the filters match, whatever shape is being drawn.
 

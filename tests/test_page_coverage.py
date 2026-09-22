@@ -82,6 +82,7 @@ EXCUSED: dict[str, str] = {
     ),
     "core:import_csv_forget": "a POST that discards the stashed spreadsheet",
     "core:table_settings": "a POST that records which columns a table shows",
+    "core:table_views": "a POST that keeps, forgets or defaults a saved view, from a visited page",
     "applications:board": "a redirect to Applications in its board shape, for bookmarks (#102)",
     "server:email_consent": (
         "a POST that sends an administrator to the mail provider's consent screen; the "

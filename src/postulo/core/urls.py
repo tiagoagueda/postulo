@@ -35,4 +35,5 @@ urlpatterns = [
     path("import/template.csv", views_import.import_csv_template, name="import_csv_template"),
     path("import/forget/", views_import.import_csv_forget, name="import_csv_forget"),
     path("tables/<slug:name>/settings/", views_tables.table_settings, name="table_settings"),
+    path("tables/<slug:name>/views/", views_tables.table_views, name="table_views"),
 ]

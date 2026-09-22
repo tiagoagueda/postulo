@@ -52,6 +52,7 @@ EXCUSED: dict[str, str] = {
         "a plugin name, and no record; who may see which logo is tests/test_plugin_logos.py"
     ),
     "core:table_settings": "a table's name in the address, and the settings are the caller's",
+    "core:table_views": "a table's name in the address, and the views are the caller's",
     "resume:item_create": "a section's name in the address, and no record",
 }
 

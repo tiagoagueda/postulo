@@ -68,6 +68,17 @@ class ListingListView(OwnedObjectMixin, ListView):
     def get_paginate_by(self, queryset) -> int:
         return self.table.page_size
 
+    def get(self, request, *args, **kwargs):
+        # A bare address opens as the person's default view, when they have kept one (#259).
+        # Only a bare one: anything with a parameter is a question they asked. Not for an
+        # htmx swap either -- a swap is the page updating itself, not somebody arriving.
+        opening = self.table.opening_url
+        if opening and not getattr(request, "htmx", None):
+            from django.shortcuts import redirect
+
+            return redirect(opening)
+        return super().get(request, *args, **kwargs)
+
     def current_filter(self) -> str:
         wanted = self.request.GET.get("state", "undecided")
         if wanted in LISTING_FILTERS or wanted == "all":

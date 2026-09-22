@@ -1,0 +1,91 @@
+{% load i18n postulo %}
+{% comment %} The Views control: the questions this person keeps asking of this table, kept
+   under a name (#259). A <details> beside *Columns*, in the same shape, for the same reason:
+   it opens without scripts, and every action in it is a form.
+
+   Each saved view is a link, not a button. It stands for an address -- the filters, the
+   sort and the shape as a query string, with its own name on the end so that the columns
+   it was saved with are applied for that request without being stored. A bookmark of it
+   keeps working, and choosing one changes nothing on the profile; only *Keep*, *Open as
+   this* and *Forget* do, and those post.
+
+   A view saved against a table that has since changed still opens, with what it can still
+   honour, and the line above the control says what it had to leave out. That line is the
+   whole of the feature's risk paid for in public rather than swallowed.
+{% endcomment %}
+{% if table.applied_gaps.0 or table.applied_gaps.1 %}
+  <p class="basis-full text-xs text-amber-800 dark:text-amber-200" role="status" data-view-gaps>
+    {% blocktranslate trimmed with name=table.applied_view.name %}
+      “{{ name }}” asks for things this table no longer has, and is shown without them:
+    {% endblocktranslate %}
+    <code>{{ table.applied_gaps.0|join:", " }}{% if table.applied_gaps.0 and table.applied_gaps.1 %}, {% endif %}{{ table.applied_gaps.1|join:", " }}</code>
+  </p>
+{% endif %}
+<details class="relative" data-menu data-views>
+  <summary class="btn cursor-pointer list-none" data-variant="outline">
+    {% icon "star" %} {% translate "Views" %}
+  </summary>
+  <div class="absolute end-0 z-10 mt-2 w-80 rounded-lg border border-ink-200 bg-white p-3 shadow-floating
+              dark:border-ink-700 dark:bg-ink-900">
+    {% if table.view_rows %}
+      <ul class="mb-3 space-y-1 text-sm">
+        {% for view, url, applied in table.view_rows %}
+          <li class="flex flex-wrap items-center gap-1">
+            <a href="{{ url }}" class="tap-target min-w-0 flex-1 truncate hover:underline {% if applied %}font-medium{% endif %}"
+               {% if applied %}aria-current="true"{% endif %}>
+              <bdi>{{ view.name }}</bdi>
+              {% if view.default %}<span class="text-xs text-ink-500 dark:text-ink-400"> · {% translate "opens as this" %}</span>{% endif %}
+            </a>
+            <form method="post" action="{% url 'core:table_views' table.name %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="slug" value="{{ view.slug }}">
+              {% if view.default %}
+                <button type="submit" name="action" value="default" class="btn" data-variant="ghost" data-size="xs"
+                        aria-label="{% blocktranslate trimmed with name=view.name %}Stop opening as {{ name }}{% endblocktranslate %}">
+                  {% translate "Plain again" %}
+                </button>
+              {% else %}
+                <button type="submit" name="action" value="default" class="btn" data-variant="ghost" data-size="xs"
+                        aria-label="{% blocktranslate trimmed with name=view.name %}Open the table as {{ name }}{% endblocktranslate %}">
+                  {% translate "Open as this" %}
+                </button>
+              {% endif %}
+            </form>
+            <form method="post" action="{% url 'core:table_views' table.name %}">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="slug" value="{{ view.slug }}">
+              <button type="submit" name="action" value="delete" class="btn" data-variant="destructive-ghost" data-size="xs"
+                      aria-label="{% blocktranslate trimmed with name=view.name %}Forget {{ name }}{% endblocktranslate %}">
+                {% translate "Forget" %}
+              </button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+      {% if table.default_view %}
+        <p class="mb-3 text-xs">
+          <a href="{{ table.plain_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Plain table" %}</a>
+        </p>
+      {% endif %}
+    {% else %}
+      <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "Narrow and sort the table the way you want it, then keep it under a name." %}
+      </p>
+    {% endif %}
+    {% comment %} What is kept is the address this page has, so a view can only ever hold
+       what the page already showed: nothing is read out of the form but the name. {% endcomment %}
+    <form method="post" action="{% url 'core:table_views' table.name %}" class="flex items-end gap-2">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="action" value="save">
+      <div class="min-w-0 flex-1">
+        <label for="view-name-{{ table.name }}" class="field-label">{% translate "Keep this view as" %}</label>
+        <input type="text" id="view-name-{{ table.name }}" name="name" maxlength="60" required
+               class="field-input w-full px-2 py-1 text-sm" placeholder="{% translate 'Quiet for three weeks' %}">
+      </div>
+      <button type="submit" class="btn" data-size="xs">{% translate "Keep" %}</button>
+    </form>
+  </div>
+</details>
