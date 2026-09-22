@@ -6,6 +6,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
@@ -24,6 +25,7 @@ from .models import (
     Channel,
     EventKind,
     Interview,
+    Offer,
     Priority,
     Reminder,
     Status,
@@ -531,3 +533,57 @@ class TagForm(OwnerScopedModelForm):
         if clash.exists():
             raise forms.ValidationError(_("You already have a tag with that name."))
         return name
+
+
+class OfferForm(OwnerScopedModelForm):
+    """What was offered, in the terms it arrived in (#237).
+
+    Every field but the money is text, deliberately: a bonus is "10% on target", equity is
+    "0.05% over four years with a one-year cliff", benefits are a paragraph, and a form that
+    tried to structure those would refuse the offer as it was actually written. The base
+    pay is a number, a currency and a period, because that is the one thing two offers are
+    compared on and it has to be brought to a year to be.
+    """
+
+    #: The currency box suggests the codes an advert actually carries, and takes any code
+    #: that is one (#224's validator); a select of the world's currencies would be a worse
+    #: question than a short list beside a box that accepts the rest.
+    datalists = {"offer-currencies": OFFERED_CURRENCIES}
+
+    class Meta:
+        model = Offer
+        fields = (
+            "base_amount",
+            "currency",
+            "period",
+            "variable_pay",
+            "equity",
+            "benefits",
+            "location",
+            "holidays",
+            "starts_on",
+            "answer_by",
+            "notes",
+        )
+        widgets = {
+            "currency": forms.TextInput(attrs={"list": "offer-currencies", "maxlength": 3}),
+            "starts_on": forms.DateInput(attrs={"type": "date"}),
+            "answer_by": forms.DateInput(attrs={"type": "date"}),
+            "variable_pay": forms.Textarea(attrs={"rows": 2}),
+            "equity": forms.Textarea(attrs={"rows": 2}),
+            "benefits": forms.Textarea(attrs={"rows": 3}),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "base_amount": _("The figure as they wrote it, before tax."),
+            "notes": _("Anything else worth remembering about it: who made it, what was said."),
+        }
+
+    def clean_currency(self) -> str:
+        return (self.cleaned_data.get("currency") or "").strip().upper()
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned.get("base_amount") is not None and not cleaned.get("currency"):
+            self.add_error("currency", _("Say which currency the amount is in."))
+        return cleaned

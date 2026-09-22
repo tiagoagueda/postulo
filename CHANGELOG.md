@@ -48,6 +48,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An offer can be recorded on an application — pay, variable pay, equity, benefits, where, holidays, start and answer-by dates — and every application at *Offer* is compared side by side, amounts brought to a year within a currency; the answer-by date is on the calendar with a reminder. (#237)
 - A filtered, sorted table can be kept under a name and chosen again from *Views*, columns included; one view per table can be what the table opens as. A view saved against a table that has since changed still opens and says what it left out. (#259)
 - A CV's preview is on its own page, beside the entries, redrawn after every change; a letter's likewise, and its application picker redraws it in place. (#293)
 - The calendar draws application deadlines and listing closing dates as whole days, the key along the top is also the filter, and the diary file carries both as all-day entries. A new notifier event says when a listing you are considering is close to its deadline — three days' warning unless you change it. (#238)

@@ -220,7 +220,7 @@ def test_what_a_kind_is_called_is_said_in_words_as_well_as_colour():
     reminder the word is `sr-only`; for the other two the visible title carries it."""
     for kind, _label, _tone in agenda.KINDS:
         said = agenda.SPOKEN[(kind, False)]
-        assert said or kind in (agenda.DEADLINE, agenda.CLOSING)
+        assert said or kind in (agenda.DEADLINE, agenda.CLOSING, agenda.ANSWER)
 
 
 # ------------------------------------------------------------------- the feed

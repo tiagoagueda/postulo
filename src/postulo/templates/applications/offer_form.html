@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if form.instance.pk %}{% translate "Edit offer" %}{% else %}{% translate "Record an offer" %}{% endif %}{% endblock %}
+
+{% block content %}
+  {% comment %} What was offered, in the terms it arrived in (#237). The money is a number,
+     a currency and a period; everything else is text on purpose, because a bonus is "10% on
+     target" and equity is a sentence, and a form that structured those would refuse the
+     offer as it was written. Recording one moves the application to *Offer* and writes the
+     timeline; an answer-by date goes on the calendar with a reminder the day before.
+  {% endcomment %}
+  <div class="mx-auto max-w-lg">
+    <p class="text-sm text-ink-500 dark:text-ink-400">
+      <a href="{{ application.get_absolute_url }}" class="hover:underline">
+        <bdi>{{ application.posting.title }}</bdi> · <bdi>{{ application.posting.company.name }}</bdi>
+      </a>
+    </p>
+    <c-page-title>
+      {% if form.instance.pk %}{% translate "Edit offer" %}{% else %}{% translate "Record an offer" %}{% endif %}
+      <c-slot name="subtitle">
+        {% if form.instance.pk %}
+          {% translate "A change is written on the timeline as a revision, so the record says what moved." %}
+        {% else %}
+          {% translate "As they wrote it. The application moves to Offer, and an answer-by date goes on the calendar." %}
+        {% endif %}
+      </c-slot>
+    </c-page-title>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          <c-field :field="form.base_amount" />
+          <c-field :field="form.currency" />
+          <c-field :field="form.period" />
+        </div>
+        <c-field :field="form.variable_pay" />
+        <c-field :field="form.equity" />
+        <c-field :field="form.benefits" />
+        <c-field :field="form.location" />
+        <div class="grid gap-x-4 sm:grid-cols-3">
+          <c-field :field="form.holidays" />
+          <c-field :field="form.starts_on" />
+          <c-field :field="form.answer_by" />
+        </div>
+        <c-field :field="form.notes" />
+      </div>
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  </div>
+{% endblock %}

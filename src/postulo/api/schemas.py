@@ -333,10 +333,37 @@ class ApplicationOut(Schema):
     web_url: str
 
 
+# --------------------------------------------------------------------- offers
+
+
+class OfferOut(Schema):
+    id: int
+    application_id: int
+    base_amount: Decimal | None = None
+    currency: str = ""
+    period: str
+    yearly_amount: Decimal | None = Field(
+        None, description="The base pay as a year's worth, within its currency"
+    )
+    variable_pay: str = ""
+    equity: str = ""
+    benefits: str = ""
+    location: str = ""
+    holidays: int | None = None
+    starts_on: dt.date | None = None
+    answer_by: dt.date | None = None
+    notes: str = ""
+    reminder_id: int | None = None
+    web_url: str
+    created_at: dt.datetime
+    updated_at: dt.datetime
+
+
 class ApplicationDetailOut(ApplicationOut):
     events: list[EventOut]
     reminders: list[ReminderOut]
     interviews: list[InterviewOut]
+    offers: list[OfferOut]
     sent_document_ids: list[int]
 
 
@@ -536,6 +563,7 @@ def application_out(request, application, *, detail: bool = False) -> dict:
         ]
         data["reminders"] = [reminder_out(r) for r in application.reminders.all()]
         data["interviews"] = [interview_out(request, i) for i in application.interviews.all()]
+        data["offers"] = [offer_out(request, o) for o in application.offers.all()]
         data["sent_document_ids"] = [d.pk for d in application.rendered_documents.all()]
     return data
 
@@ -648,4 +676,27 @@ def document_out(request, document, *, source: str) -> dict:
         "download_url": request.build_absolute_uri(
             reverse(name, kwargs={"source": source, "pk": document.pk})
         ),
+    }
+
+
+def offer_out(request, offer) -> dict:
+    return {
+        "id": offer.pk,
+        "application_id": offer.application_id,
+        "base_amount": offer.base_amount,
+        "currency": offer.currency,
+        "period": offer.period,
+        "yearly_amount": offer.yearly_amount,
+        "variable_pay": offer.variable_pay,
+        "equity": offer.equity,
+        "benefits": offer.benefits,
+        "location": offer.location,
+        "holidays": offer.holidays,
+        "starts_on": offer.starts_on,
+        "answer_by": offer.answer_by,
+        "notes": offer.notes,
+        "reminder_id": offer.reminder_id,
+        "web_url": request.build_absolute_uri(offer.get_absolute_url()),
+        "created_at": offer.created_at,
+        "updated_at": offer.updated_at,
     }

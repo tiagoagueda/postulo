@@ -302,7 +302,13 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     was, rather than partly overwritten by a file that turned out to be broken.
     """
     from postulo.accounts.models import PersonIdentifier
-    from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
+    from postulo.applications.models import (
+        Application,
+        ApplicationEvent,
+        Interview,
+        Offer,
+        Reminder,
+    )
     from postulo.core.models import Tag, TagIcon, nearest_tone
     from postulo.documents.models import (
         CV,
@@ -591,6 +597,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 event_entries = application_entry.pop("events", [])
                 reminder_entries = application_entry.pop("reminders", [])
                 interview_entries = application_entry.pop("interviews", [])
+                offer_entries = application_entry.pop("offers", [])
                 tag_slugs = application_entry.pop("tags", [])
                 sent_link_ids = application_entry.pop("sent_link_ids", [])
                 old_id = application_entry.pop("id", None)
@@ -669,6 +676,18 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                     )
                     interview.contacts.set([contacts[i] for i in contact_ids if i in contacts])
                     report.interviews += 1
+                for offer_entry in offer_entries:
+                    offer_entry.pop("id", None)
+                    offer_entry.pop("created_at", None)
+                    reminder_id = offer_entry.pop("reminder_id", None)
+                    Offer.objects.create(
+                        owner=user,
+                        application=application,
+                        reminder=reminders.get(reminder_id),
+                        starts_on=_d(offer_entry.pop("starts_on", None)),
+                        answer_by=_d(offer_entry.pop("answer_by", None)),
+                        **offer_entry,
+                    )
 
     # The ownership tree, once every company in the file has been made or matched. A name
     # that matches nothing is left alone rather than guessed at, and a company is never made

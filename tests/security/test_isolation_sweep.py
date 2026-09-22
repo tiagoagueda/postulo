@@ -121,6 +121,12 @@ def reminder(owner):
     )
 
 
+def offer(owner):
+    from postulo.applications.models import Offer
+
+    return Offer.objects.create(owner=owner, application=application(owner), currency="EUR")
+
+
 def suggestion(owner):
     from postulo.applications.models import Suggestion
 
@@ -255,6 +261,9 @@ FACTORIES: dict[str, Callable] = {
     "applications:interview_ics": pk_of(interview),
     "applications:interview_outcome": pk_of(interview),
     "applications:interview_update": pk_of(interview),
+    "applications:offer_create": pk_of(application),
+    "applications:offer_update": pk_of(offer),
+    "applications:offer_delete": pk_of(offer),
     "applications:reminder_complete": pk_of(reminder),
     "applications:reminder_delete": pk_of(reminder),
     "applications:reminder_later": pk_of(reminder),
@@ -339,6 +348,7 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:change_interview": ("patch", pk_of(interview), {"notes": "x"}),
     "postulo-api:record_outcome": ("post", pk_of(interview), {"outcome": "done"}),
     "postulo-api:interview_calendar": ("get", pk_of(interview), {}),
+    "postulo-api:get_offer": ("get", pk_of(offer), {}),
     "postulo-api:get_listing": ("get", pk_of(posting), {}),
     "postulo-api:apply": ("post", pk_of(posting), {}),
     "postulo-api:discard": ("post", pk_of(posting), {}),

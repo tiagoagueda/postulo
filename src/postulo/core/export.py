@@ -172,6 +172,22 @@ INTERVIEW_FIELDS = (
     "reminder_id",
     "created_at",
 )
+OFFER_FIELDS = (
+    "id",
+    "base_amount",
+    "currency",
+    "period",
+    "variable_pay",
+    "equity",
+    "benefits",
+    "location",
+    "holidays",
+    "starts_on",
+    "answer_by",
+    "notes",
+    "reminder_id",
+    "created_at",
+)
 CV_FIELDS = (
     "id",
     "name",
@@ -535,6 +551,10 @@ def build_document(user) -> dict:
                                         "contact_ids": [c.pk for c in interview.contacts.all()],
                                     }
                                     for interview in application.interviews.all()
+                                ],
+                                "offers": [
+                                    _fields(offer, OFFER_FIELDS)
+                                    for offer in application.offers.all()
                                 ],
                             }
                             for application in posting.applications.all()

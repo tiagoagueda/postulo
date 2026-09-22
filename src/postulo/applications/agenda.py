@@ -49,7 +49,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import JobPosting
 
-from .models import Application, Interview, InterviewOutcome, Reminder
+from .models import Application, Interview, InterviewOutcome, Offer, Reminder, Status
 from .reports import week_start
 
 VIEWS = ("month", "week", "day", "agenda")
@@ -65,6 +65,7 @@ INTERVIEW = "interview"
 REMINDER = "reminder"
 DEADLINE = "deadline"
 CLOSING = "closing"
+ANSWER = "answer"
 
 #: Every kind, in the order the legend draws them, with what it is called and the tone the
 #: stylesheet paints it. A tuple rather than a set because the legend is a row somebody
@@ -74,6 +75,7 @@ KINDS: tuple[tuple[str, object, str], ...] = (
     (REMINDER, _("Reminders"), "amber"),
     (DEADLINE, _("Deadlines"), "rose"),
     (CLOSING, _("Closing dates"), "teal"),
+    (ANSWER, _("Answers due"), "violet"),
 )
 
 ALL_KINDS = frozenset(kind for kind, _label, _tone in KINDS)
@@ -99,6 +101,8 @@ SPOKEN: dict[tuple[str, bool], object] = {
     (DEADLINE, True): _("Already sent —"),
     (CLOSING, False): "",
     (CLOSING, True): _("Already decided —"),
+    (ANSWER, False): "",
+    (ANSWER, True): _("Already answered —"),
 }
 
 
@@ -226,6 +230,8 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
         events += _deadlines(user, start, end)
     if CLOSING in wanted:
         events += _closings(user, start, end)
+    if ANSWER in wanted:
+        events += _answers(user, start, end)
     events.sort(key=lambda event: (event.starts_at, event.kind, event.title))
     return events
 
@@ -262,6 +268,33 @@ def _deadlines(user, start: dt.date, end: dt.date) -> list[Event]:
             all_day=True,
         )
         for application in applications
+    ]
+
+
+def _answers(user, start: dt.date, end: dt.date) -> list[Event]:
+    """Every offer whose answer is due in the range (#237).
+
+    Muted once the application has moved on from *Offer* -- accepted, withdrawn, whatever
+    it became -- because the date has been answered, one way or another.
+    """
+    offers = (
+        Offer.objects.for_user(user)
+        .select_related("application", "application__posting", "application__posting__company")
+        .filter(answer_by__gte=start, answer_by__lt=end)
+    )
+    return [
+        Event(
+            kind=ANSWER,
+            title=str(
+                _("Answer by: %(company)s") % {"company": offer.application.posting.company.name}
+            ),
+            url=offer.get_absolute_url(),
+            starts_at=_at_midnight(offer.answer_by),
+            detail=str(offer.application.posting.title),
+            muted=offer.application.status != Status.OFFER,
+            all_day=True,
+        )
+        for offer in offers
     ]
 
 

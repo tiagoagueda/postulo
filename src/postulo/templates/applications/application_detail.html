@@ -169,6 +169,64 @@
         {% endwith %}
       </div>
 
+      {% comment %} What was offered, when it was (#237). One entry per offer, newest first,
+         because offers get revised and each revision is a row and a timeline entry; the
+         comparison page puts this application's latest beside every other at *Offer*.
+      {% endcomment %}
+      {% if offers or application.status == 'offer' %}
+        <div class="card mb-6" id="offers">
+          <div class="mb-3 flex flex-wrap items-center justify-between gap-2">
+            <h2 class="font-medium">{% translate "Offers" %}</h2>
+            <span class="flex flex-wrap items-center gap-3 text-sm">
+              {% if offers %}
+                <a href="{% url 'applications:offer_compare' %}" class="text-brand-600 underline dark:text-brand-400">
+                  {% translate "Compare" %}
+                </a>
+              {% endif %}
+              <a href="{% url 'applications:offer_create' application.pk %}" class="text-brand-600 underline dark:text-brand-400">
+                {% translate "Record an offer" %}
+              </a>
+            </span>
+          </div>
+          {% if offers %}
+            <ul class="space-y-3">
+              {% for offer in offers %}
+                {% comment %} The same row #167 fixed on the career page: the words claim
+                   twelve rem before the controls may sit beside them, and the controls wrap
+                   under rather than squeezing a date into forty-nine pixels in Greek. {% endcomment %}
+                <li id="offer-{{ offer.pk }}" class="flex flex-wrap items-start gap-3">
+                  <div class="min-w-0 grow basis-48 text-sm">
+                    <p class="font-medium">{% if offer.terms %}{{ offer.terms }}{% else %}{% translate "Terms not recorded" %}{% endif %}</p>
+                    <p class="text-xs text-ink-500 dark:text-ink-400">
+                      {{ offer.created_at|date:"DATE_FORMAT" }}
+                      {% if offer.answer_by %} · {% blocktranslate trimmed with day=offer.answer_by|date:"DATE_FORMAT" %}answer by {{ day }}{% endblocktranslate %}{% endif %}
+                      {% if offer.starts_on %} · {% blocktranslate trimmed with day=offer.starts_on|date:"DATE_FORMAT" %}starts {{ day }}{% endblocktranslate %}{% endif %}
+                    </p>
+                    {% if offer.location or offer.holidays %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400">
+                        {{ offer.location }}{% if offer.location and offer.holidays %} · {% endif %}{% if offer.holidays %}{% blocktranslate count counter=offer.holidays trimmed %}{{ counter }} day of holiday{% plural %}{{ counter }} days of holiday{% endblocktranslate %}{% endif %}
+                      </p>
+                    {% endif %}
+                  </div>
+                  <div class="flex items-center gap-1">
+                    <a href="{% url 'applications:offer_update' offer.pk %}" class="btn" data-variant="ghost" data-size="xs">
+                      {% translate "Edit" %}<span class="sr-only">: <bdi>{{ offer }}</bdi></span>
+                    </a>
+                    <a href="{% url 'applications:offer_delete' offer.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                      {% translate "Delete" %}<span class="sr-only">: <bdi>{{ offer }}</bdi></span>
+                    </a>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-sm text-ink-500 dark:text-ink-400">
+              {% translate "It stands at Offer, and what was offered is not written down yet." %}
+            </p>
+          {% endif %}
+        </div>
+      {% endif %}
+
       <div class="card mb-6" id="interviews">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-medium">{% translate "Interviews" %}</h2>

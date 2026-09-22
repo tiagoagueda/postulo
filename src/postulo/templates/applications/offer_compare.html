@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{# A grid: this page empties `main_width` and takes the whole screen (#188). #}
+{% block main_width %}{% endblock %}
+{% load i18n %}
+
+{% block title %}{% translate "Offers" %}{% endblock %}
+
+{% block content %}
+  {% comment %} Every application standing at *Offer*, side by side (#237): one column per
+     offer, one row per term, the base pay brought to a year within its currency so that a
+     monthly figure and an annual one can be read against each other. No score and no
+     recommendation; which to take is not a sum.
+
+     A real table with both kinds of header, and `table-cards` below the `md` breakpoint,
+     where a row becomes a card: the term is the card's title and each offer's cell says
+     whose it is through `data-label`, so a phone reads "Base pay: Aperture: 65,000 EUR a
+     year; Black Mesa: 70,000 USD a year" rather than scrolling sideways.
+  {% endcomment %}
+  <div class="mb-6 flex flex-wrap items-center gap-4">
+    <div>
+      <c-page-title>
+        {% translate "Offers" %}
+        <c-slot name="subtitle">{% translate "What each application standing at Offer was offered, side by side. Nothing here decides for you." %}</c-slot>
+      </c-page-title>
+    </div>
+  </div>
+
+  {% if columns %}
+    <div class="card p-0">
+      <table class="table-cards w-full text-start text-sm" role="table" data-offer-compare>
+        <caption class="sr-only">{% translate "Offers side by side" %}</caption>
+        <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400" role="rowgroup">
+          <tr role="row">
+            <th scope="col" role="columnheader" class="px-4 py-3 font-medium">{% translate "Term" %}</th>
+            {% for offer in columns %}
+              <th scope="col" role="columnheader" class="px-4 py-3 font-medium">
+                <a href="{{ offer.application.get_absolute_url }}" class="hover:underline">
+                  <bdi>{{ offer.application.posting.company.name }}</bdi>
+                </a>
+                <span class="block font-normal text-ink-500 dark:text-ink-400"><bdi>{{ offer.application.posting.title }}</bdi></span>
+              </th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-ink-100 dark:divide-ink-800" role="rowgroup">
+          {% for term, cells in rows %}
+            <tr role="row">
+              <th scope="row" role="rowheader" class="px-4 py-3 text-start font-medium">{{ term }}</th>
+              {% for whose, cell in cells %}
+                <td role="cell" class="px-4 py-3 whitespace-pre-line align-top"
+                    data-label="{{ whose }}">{{ cell|default:"—" }}</td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <c-empty icon="circle-dashed">
+      {% translate "Nothing standing at Offer. Record one from an application's page when it arrives." %}
+    </c-empty>
+  {% endif %}
+{% endblock %}

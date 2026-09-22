@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:31+0000\n"
+"POT-Creation-Date: 2026-09-22 12:56+0000\n"
 "PO-Revision-Date: 2026-09-08 13:26+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: bosanski\n"
@@ -116,7 +116,15 @@ msgstr[0] "%(counter)s dan"
 msgstr[1] "%(counter)s dana"
 msgstr[2] "%(counter)s dana"
 
-#: src/postulo/templates/applications/application_detail.html:237
+#: src/postulo/templates/applications/application_detail.html:212
+#, python-format
+msgid "%(counter)s day of holiday"
+msgid_plural "%(counter)s days of holiday"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: src/postulo/templates/applications/application_detail.html:297
 #, python-format, draft
 msgid "%(counter)s earlier"
 msgid_plural "%(counter)s earlier"
@@ -173,17 +181,22 @@ msgstr[0] "prije %(days)s dan"
 msgstr[1] "prije %(days)s dana"
 msgstr[2] "prije %(days)s dana"
 
-#: src/postulo/applications/agenda.py:558
+#: src/postulo/applications/agenda.py:591
 #, python-format, draft
 msgid "%(days)s days from %(day)s"
 msgstr "%(days)s dana od %(day)s"
 
-#: src/postulo/applications/models.py:388
+#: src/postulo/applications/models.py:390
 #, python-format, draft
 msgid ""
 "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr ""
 "%(department)s je u %(company)s, koja nije dio istog poslodavca kao ovaj oglas."
+
+#: src/postulo/applications/views.py:1343
+#, python-format
+msgid "%(figure)s %(currency)s a year"
+msgstr ""
 
 #: src/postulo/applications/reports.py:108
 #, python-format, draft
@@ -212,22 +225,22 @@ msgstr "%(kilobytes)s na disku"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s napravljeno. Sada odaberite šta ide u njega."
 
-#: src/postulo/applications/services.py:422
+#: src/postulo/applications/services.py:423
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s održan"
 
-#: src/postulo/applications/services.py:375
+#: src/postulo/applications/services.py:376
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s pomjeren sa %(old)s na %(new)s"
 
-#: src/postulo/applications/services.py:433
+#: src/postulo/applications/services.py:434
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(kind)s %(when)s otkazan"
 
-#: src/postulo/applications/services.py:342
+#: src/postulo/applications/services.py:343
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s zakazan za %(when)s"
@@ -423,7 +436,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d odgovorilo, %(broken)d nije; oni koji nisu kažu zašto."
 
-#: src/postulo/applications/services.py:156
+#: src/postulo/applications/services.py:157
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -653,6 +666,10 @@ msgstr ""
 "{{ name }}\n"
 "{{ date }}"
 
+#: src/postulo/applications/models.py:871
+msgid "A bonus, commission, or a target: in their words, since the terms vary."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html:52
 #, draft
 msgid ""
@@ -677,7 +694,7 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: src/postulo/api/api.py:369
+#: src/postulo/api/api.py:370
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Hvatanje ne može doći nakon posljednjeg u svojoj grupi."
@@ -694,6 +711,11 @@ msgstr ""
 
 #: src/postulo/core/design.py:124
 msgid "A card, a table, the masthead once you have scrolled."
+msgstr ""
+
+#: src/postulo/templates/applications/offer_form.html:24
+msgid ""
+"A change is written on the timeline as a revision, so the record says what moved."
 msgstr ""
 
 #: src/postulo/templates/server/design.html:214
@@ -959,7 +981,7 @@ msgstr "Tih dnevnik je onaj koji želite."
 msgid "A reminder falls due"
 msgstr "Podsjetnik dospijeva"
 
-#: src/postulo/applications/forms.py:439
+#: src/postulo/applications/forms.py:441
 #, draft
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Podsjetnik dospijeva dan ranije, kada dan ranije postoji."
@@ -1042,7 +1064,7 @@ msgstr "Probna poruka od %(name)s"
 msgid "A text field"
 msgstr ""
 
-#: src/postulo/jobs/models.py:838
+#: src/postulo/applications/models.py:863 src/postulo/jobs/models.py:838
 #, draft
 msgid "A three-letter ISO 4217 code, such as EUR, GBP or USD."
 msgstr "Troslovni kod ISO 4217, na primjer EUR, GBP ili USD."
@@ -1106,7 +1128,7 @@ msgstr ""
 msgid "Accept"
 msgstr "Prihvati"
 
-#: src/postulo/applications/models.py:58 src/postulo/applications/models.py:721
+#: src/postulo/applications/models.py:60 src/postulo/applications/models.py:723
 #: src/postulo/templates/accounts/invite_list.html:37
 #, draft
 msgid "Accepted"
@@ -1146,7 +1168,7 @@ msgid "Accounts"
 msgstr "Računi"
 
 #: src/postulo/applications/analytics.py:41
-#: src/postulo/applications/models.py:53
+#: src/postulo/applications/models.py:55
 #, draft
 msgid "Acknowledged"
 msgstr "Primljeno na znanje"
@@ -1180,7 +1202,7 @@ msgstr "Radnje za %(name)s"
 msgid "Actions for %(what)s"
 msgstr ""
 
-#: src/postulo/templates/applications/application_detail.html:263
+#: src/postulo/templates/applications/application_detail.html:323
 #: src/postulo/templates/jobs/company_detail.html:195
 #: src/postulo/templates/resume/overview.html:49
 #: src/postulo/templates/resume/overview.html:54
@@ -1303,7 +1325,7 @@ msgid ""
 msgstr ""
 "Dodano %(total)s unosa. Ništa nije prepisano; sve što se udvostručilo vaše je da obrišete."
 
-#: src/postulo/applications/views.py:593 src/postulo/applications/views.py:1215
+#: src/postulo/applications/views.py:598 src/postulo/applications/views.py:1220
 #, draft
 msgid "Added to the timeline."
 msgstr "Dodano na vremensku crtu."
@@ -1353,7 +1375,7 @@ msgstr "savjetnik %(adviser)s"
 msgid "Aerospace"
 msgstr "Vazduhoplovstvo"
 
-#: src/postulo/applications/agenda.py:491
+#: src/postulo/applications/agenda.py:524
 #, draft
 msgid "Agenda"
 msgstr "Agenda"
@@ -1416,11 +1438,15 @@ msgid ""
 "All of them are offered, and a language added in a later release will be too."
 msgstr "Nude se svi, a i jezik dodan u kasnijem izdanju."
 
-#: src/postulo/applications/agenda.py:101
+#: src/postulo/applications/agenda.py:105
+msgid "Already answered —"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:103
 msgid "Already decided —"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:99
+#: src/postulo/applications/agenda.py:101
 msgid "Already sent —"
 msgstr ""
 
@@ -1444,7 +1470,7 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr "Identifikator „ostalo“ treba ime."
 
-#: src/postulo/applications/models.py:641
+#: src/postulo/applications/models.py:643
 #, draft
 msgid "An address, or the link to the call."
 msgstr "Adresa ili veza na poziv."
@@ -1535,6 +1561,29 @@ msgstr ""
 msgid "answer"
 msgstr "odgovor"
 
+#: src/postulo/applications/services.py:524
+#, python-format
+msgid "Answer %(company)s about their offer by %(day)s"
+msgstr ""
+
+#: src/postulo/applications/models.py:888
+msgid "answer by"
+msgstr ""
+
+#: src/postulo/applications/views.py:1366
+msgid "Answer by"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:207
+#, python-format
+msgid "answer by %(day)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:289
+#, python-format
+msgid "Answer by: %(company)s"
+msgstr ""
+
 #: src/postulo/resume/models.py:246
 #, draft
 msgid "Answered"
@@ -1544,6 +1593,10 @@ msgstr "Odgovorio"
 #, python-format, draft
 msgid "Answered %(code)s."
 msgstr "Odgovorio %(code)s."
+
+#: src/postulo/applications/agenda.py:78
+msgid "Answers due"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
@@ -1579,7 +1632,11 @@ msgid ""
 msgstr ""
 "Sve što se ovdje odabere prikazuje se onako kako sada stoji i čuva nepromijenjeno. Mjesecima kasnije, kada vas ispitivač upita o retku u vašem CV-ju, imat ćete verziju koju su oni čitali, a ne onu koju ste otada uređivali."
 
-#: src/postulo/applications/forms.py:382
+#: src/postulo/applications/forms.py:579
+msgid "Anything else worth remembering about it: who made it, what was said."
+msgstr ""
+
+#: src/postulo/applications/forms.py:384
 msgid "Anything longer worth keeping with it. It sits under the line."
 msgstr ""
 
@@ -1612,11 +1669,12 @@ msgstr "API tokeni"
 msgid "Appearance"
 msgstr "Izgled"
 
-#: src/postulo/applications/models.py:362
-#: src/postulo/applications/models.py:472
-#: src/postulo/applications/models.py:530
-#: src/postulo/applications/models.py:630
-#: src/postulo/applications/models.py:759 src/postulo/applications/tables.py:21
+#: src/postulo/applications/models.py:364
+#: src/postulo/applications/models.py:474
+#: src/postulo/applications/models.py:532
+#: src/postulo/applications/models.py:632
+#: src/postulo/applications/models.py:761
+#: src/postulo/applications/models.py:853 src/postulo/applications/tables.py:21
 #: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:1038
 #: src/postulo/templates/core/import_csv_map.html:99
 #, draft
@@ -1631,12 +1689,12 @@ msgstr "prijava"
 msgid "Application"
 msgstr "Prijava"
 
-#: src/postulo/applications/services.py:199
+#: src/postulo/applications/services.py:200
 #, draft
 msgid "Application created"
 msgstr "Prijava stvorena"
 
-#: src/postulo/applications/views.py:499
+#: src/postulo/applications/views.py:504
 #, draft
 msgid "Application deleted."
 msgstr "Prijava obrisana."
@@ -1646,12 +1704,12 @@ msgstr "Prijava obrisana."
 msgid "Application recorded from the capture."
 msgstr "Prijava zabilježena iz hvatanja."
 
-#: src/postulo/applications/views.py:415 src/postulo/jobs/listing_views.py:283
+#: src/postulo/applications/views.py:420 src/postulo/jobs/listing_views.py:283
 #, draft
 msgid "Application recorded."
 msgstr "Prijava zabilježena."
 
-#: src/postulo/applications/views.py:455
+#: src/postulo/applications/views.py:460
 #, draft
 msgid "Application updated."
 msgstr "Prijava ažurirana."
@@ -1669,7 +1727,7 @@ msgstr "Prijava ažurirana."
 msgid "Applications"
 msgstr "Prijave"
 
-#: src/postulo/applications/models.py:363 src/postulo/applications/tables.py:21
+#: src/postulo/applications/models.py:365 src/postulo/applications/tables.py:21
 #, draft
 msgid "applications"
 msgstr "prijave"
@@ -1726,7 +1784,7 @@ msgid "Applications, with their timelines"
 msgstr "Prijave, s njihovim vremenskim crtama"
 
 #: src/postulo/applications/analytics.py:40
-#: src/postulo/applications/models.py:52 src/postulo/applications/tables.py:52
+#: src/postulo/applications/models.py:54 src/postulo/applications/tables.py:52
 #: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:928
 #: src/postulo/templates/core/import_csv_map.html:80
 #, draft
@@ -1738,7 +1796,7 @@ msgstr "Prijavljeno"
 msgid "Applied in the last 30 days"
 msgstr "Prijavljeno u zadnjih 30 dana"
 
-#: src/postulo/applications/forms.py:226
+#: src/postulo/applications/forms.py:228
 #: src/postulo/applications/reports.py:526
 #: src/postulo/jobs/capture_views.py:200
 #: src/postulo/templates/applications/application_detail.html:94
@@ -1748,7 +1806,7 @@ msgstr "Prijavljeno u zadnjih 30 dana"
 msgid "Applied on"
 msgstr "Prijavljeno"
 
-#: src/postulo/applications/models.py:302
+#: src/postulo/applications/models.py:304
 #, draft
 msgid "applied on"
 msgstr "prijavljeno"
@@ -1758,14 +1816,14 @@ msgstr "prijavljeno"
 msgid "Applied on an unknown date"
 msgstr "Prijavljeno na nepoznat datum"
 
-#: src/postulo/applications/forms.py:213 src/postulo/applications/tables.py:77
+#: src/postulo/applications/forms.py:215 src/postulo/applications/tables.py:77
 #: src/postulo/core/csv_import.py:51
 #: src/postulo/templates/applications/application_detail.html:88
 #, draft
 msgid "Applied through"
 msgstr "Prijavljeno preko"
 
-#: src/postulo/applications/models.py:298
+#: src/postulo/applications/models.py:300
 #, draft
 msgid "applied through"
 msgstr "prijavljeno preko"
@@ -1843,14 +1901,19 @@ msgstr ""
 msgid "As they will read it"
 msgstr ""
 
+#: src/postulo/templates/applications/offer_form.html:26
+msgid ""
+"As they wrote it. The application moves to Offer, and an answer-by date goes on the calendar."
+msgstr ""
+
 #: src/postulo/applications/analytics.py:44
-#: src/postulo/applications/models.py:56
+#: src/postulo/applications/models.py:58
 #, draft
 msgid "Assessment"
 msgstr "Procjena"
 
-#: src/postulo/applications/models.py:437
-#: src/postulo/applications/models.py:572
+#: src/postulo/applications/models.py:439
+#: src/postulo/applications/models.py:574
 #, draft
 msgid "Assessment or test"
 msgstr "Procjena ili test"
@@ -1979,10 +2042,26 @@ msgstr ""
 msgid "Banking"
 msgstr "Bankarstvo"
 
+#: src/postulo/applications/models.py:856
+msgid "base pay"
+msgstr ""
+
+#: src/postulo/applications/views.py:1356
+msgid "Base pay"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "Becomes"
 msgstr "Postaje"
+
+#: src/postulo/applications/models.py:875
+msgid "benefits"
+msgstr ""
+
+#: src/postulo/applications/views.py:1360
+msgid "Benefits"
+msgstr ""
 
 #: src/postulo/jobs/industries.py:73
 #, draft
@@ -2012,6 +2091,10 @@ msgstr ""
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "Unošenje tabele"
+
+#: src/postulo/applications/views.py:1357
+msgid "Brought to a year"
+msgstr ""
 
 #: src/postulo/notifications/models.py:30
 #, draft
@@ -2068,7 +2151,7 @@ msgid "C2 — proficient"
 msgstr "C2 — vrsni"
 
 #: src/postulo/core/navigation.py:76
-#: src/postulo/templates/applications/application_detail.html:215
+#: src/postulo/templates/applications/application_detail.html:275
 #: src/postulo/templates/applications/calendar.html:6
 #: src/postulo/templates/applications/calendar.html:67
 #: src/postulo/templates/applications/calendar.html:128
@@ -2083,7 +2166,7 @@ msgstr "Kalendar"
 msgid "Calendar file"
 msgstr "Datoteka kalendara"
 
-#: src/postulo/applications/models.py:655
+#: src/postulo/applications/models.py:657
 #, draft
 msgid "calendar identifier"
 msgstr "identifikator kalendara"
@@ -2093,7 +2176,7 @@ msgstr "identifikator kalendara"
 msgid "Calendar views"
 msgstr "Prikazi kalendara"
 
-#: src/postulo/applications/models.py:433
+#: src/postulo/applications/models.py:435
 #, draft
 msgid "Call"
 msgstr "Poziv"
@@ -2108,6 +2191,7 @@ msgstr "Povratna adresa za registraciju kod njega"
 #: src/postulo/templates/applications/application_form.html:32
 #: src/postulo/templates/applications/application_intake.html:77
 #: src/postulo/templates/applications/interview_form.html:70
+#: src/postulo/templates/applications/offer_form.html:52
 #: src/postulo/templates/applications/reminder_form.html:22
 #: src/postulo/templates/applications/tag_form.html:85
 #: src/postulo/templates/connections/confirm_delete.html:19
@@ -2133,13 +2217,13 @@ msgstr "Povratna adresa za registraciju kod njega"
 msgid "Cancel"
 msgstr "Odustani"
 
-#: src/postulo/applications/models.py:579
+#: src/postulo/applications/models.py:581
 #: src/postulo/templates/applications/partials/interview_outcome.html:11
 #, draft
 msgid "Cancelled"
 msgstr "Otkazano"
 
-#: src/postulo/applications/agenda.py:95
+#: src/postulo/applications/agenda.py:97
 msgid "Cancelled interview:"
 msgstr ""
 
@@ -2314,7 +2398,7 @@ msgid ""
 msgstr ""
 "Promjene napravljene ovdje šalju se u sljedećem prolazu; druga strana se tada također čita."
 
-#: src/postulo/applications/views.py:785
+#: src/postulo/applications/views.py:790
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "Podsjeti %(company)s na %(role)s"
@@ -2408,7 +2492,7 @@ msgstr "Odaberite barem jedan dokument za bilježenje."
 msgid "Choose what kind of identifier this is."
 msgstr "Odaberite kakav je ovo identifikator."
 
-#: src/postulo/applications/views.py:1211
+#: src/postulo/applications/views.py:1216
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Prvo odaberite na koju se prijavu ovo odnosi."
@@ -2464,7 +2548,7 @@ msgstr "Tajna klijenta"
 msgid "Closed"
 msgstr "Zatvoreno"
 
-#: src/postulo/applications/models.py:308 src/postulo/jobs/models.py:863
+#: src/postulo/applications/models.py:310 src/postulo/jobs/models.py:863
 #, draft
 msgid "closed on"
 msgstr "zatvoreno"
@@ -2480,7 +2564,7 @@ msgstr "Zatvoreno ili već popunjeno"
 msgid "Closes"
 msgstr "Zatvara se"
 
-#: src/postulo/applications/agenda.py:284
+#: src/postulo/applications/agenda.py:317
 #, python-format
 msgid "Closes: %(role)s"
 msgstr ""
@@ -2489,7 +2573,7 @@ msgstr ""
 msgid "closing announced for"
 msgstr ""
 
-#: src/postulo/applications/forms.py:163
+#: src/postulo/applications/forms.py:165
 #, draft
 msgid "Closing date"
 msgstr "Datum zatvaranja"
@@ -2499,7 +2583,7 @@ msgstr "Datum zatvaranja"
 msgid "closing date"
 msgstr "datum zatvaranja"
 
-#: src/postulo/applications/agenda.py:76
+#: src/postulo/applications/agenda.py:77
 msgid "Closing dates"
 msgstr ""
 
@@ -2608,7 +2692,7 @@ msgstr "Stvorene kompanije"
 msgid "Companies you have applied to"
 msgstr "Kompanije kojima ste se prijavili"
 
-#: src/postulo/applications/forms.py:73 src/postulo/applications/reports.py:527
+#: src/postulo/applications/forms.py:75 src/postulo/applications/reports.py:527
 #: src/postulo/applications/tables.py:33 src/postulo/core/csv_import.py:40
 #: src/postulo/jobs/tables.py:194
 #: src/postulo/templates/applications/report.html:250
@@ -2652,7 +2736,7 @@ msgstr "identifikatori kompanije"
 msgid "Company updated."
 msgstr "Kompanija ažurirana."
 
-#: src/postulo/applications/models.py:127
+#: src/postulo/applications/models.py:129
 #, draft
 msgid "Company website"
 msgstr "Web stranica kompanije"
@@ -2661,6 +2745,10 @@ msgstr "Web stranica kompanije"
 #, draft
 msgid "Company's Wikidata id"
 msgstr "Wikidata identifikator kompanije"
+
+#: src/postulo/templates/applications/application_detail.html:187
+msgid "Compare"
+msgstr ""
 
 #: src/postulo/plugins/models.py:199
 #, draft
@@ -2791,7 +2879,7 @@ msgstr "kontakti"
 msgid "Containing"
 msgstr "Sadrži"
 
-#: src/postulo/applications/models.py:779
+#: src/postulo/applications/models.py:781
 #, draft
 msgid "context"
 msgstr "kontekst"
@@ -2925,13 +3013,13 @@ msgstr "stvorio"
 msgid "credential link"
 msgstr "veza s pristupnim podacima"
 
-#: src/postulo/applications/forms.py:128
+#: src/postulo/applications/forms.py:130
 #: src/postulo/templates/core/import_csv_map.html:58
 #, draft
 msgid "Currency"
 msgstr "Valuta"
 
-#: src/postulo/jobs/models.py:833
+#: src/postulo/applications/models.py:859 src/postulo/jobs/models.py:833
 #, draft
 msgid "currency"
 msgstr "valuta"
@@ -3012,7 +3100,7 @@ msgstr "Baza podataka"
 msgid "Date applied"
 msgstr "Datum prijave"
 
-#: src/postulo/applications/models.py:777
+#: src/postulo/applications/models.py:779
 #, draft
 msgid "dates offered"
 msgstr "ponuđeni datumi"
@@ -3032,7 +3120,7 @@ msgstr "Datumi se pišu kao"
 msgid "Dates you choose"
 msgstr "Datumi koje sami odaberete"
 
-#: src/postulo/applications/agenda.py:490
+#: src/postulo/applications/agenda.py:523
 #, draft
 msgid "Day"
 msgstr "Dan"
@@ -3050,6 +3138,14 @@ msgstr[2] "dana"
 #, draft
 msgid "day / month / year (31/12/2026)"
 msgstr "dan / mjesec / godina (31/12/2026)"
+
+#: src/postulo/applications/models.py:885
+msgid "days of holiday a year"
+msgstr ""
+
+#: src/postulo/applications/views.py:1363
+msgid "Days of holiday a year"
+msgstr ""
 
 #: src/postulo/accounts/models.py:387
 msgid "Days of warning before a listing you have not decided about closes."
@@ -3079,7 +3175,7 @@ msgstr "Deaktiviraj"
 msgid "Deactivated"
 msgstr "Deaktivirano"
 
-#: src/postulo/applications/models.py:307
+#: src/postulo/applications/models.py:309
 #, draft
 msgid "deadline"
 msgstr "rok"
@@ -3089,12 +3185,12 @@ msgstr "rok"
 msgid "Deadline"
 msgstr "Rok"
 
-#: src/postulo/applications/agenda.py:257
+#: src/postulo/applications/agenda.py:263
 #, python-format
 msgid "Deadline: %(role)s"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:75
+#: src/postulo/applications/agenda.py:76
 msgid "Deadlines"
 msgstr ""
 
@@ -3186,12 +3282,12 @@ msgstr "odlučeno"
 msgid "Decline"
 msgstr "Odbij"
 
-#: src/postulo/applications/models.py:722
+#: src/postulo/applications/models.py:724
 #, draft
 msgid "Declined"
 msgstr "Odbijeno"
 
-#: src/postulo/applications/views.py:1203
+#: src/postulo/applications/views.py:1208
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Odbijeno. Neće se više predlagati."
@@ -3222,6 +3318,7 @@ msgid "Defence"
 msgstr "Odbrana"
 
 #: src/postulo/templates/applications/application_detail.html:40
+#: src/postulo/templates/applications/application_detail.html:221
 #: src/postulo/templates/applications/tag_list.html:38
 #: src/postulo/templates/cotton/reminder_actions.html:60
 #: src/postulo/templates/documents/cv_detail.html:30
@@ -3268,7 +3365,7 @@ msgstr "Vlastiti račun obrišite u Postavkama, ne odavde."
 msgid "density"
 msgstr ""
 
-#: src/postulo/applications/models.py:335 src/postulo/jobs/models.py:521
+#: src/postulo/applications/models.py:337 src/postulo/jobs/models.py:521
 #: src/postulo/jobs/models.py:554
 #, draft
 msgid "department"
@@ -3294,7 +3391,7 @@ msgstr "Ovisi o"
 msgid "Depth"
 msgstr ""
 
-#: src/postulo/applications/forms.py:169 src/postulo/core/csv_import.py:54
+#: src/postulo/applications/forms.py:171 src/postulo/core/csv_import.py:54
 #: src/postulo/jobs/tables.py:294
 #: src/postulo/templates/jobs/posting_detail.html:60
 #, draft
@@ -3324,12 +3421,12 @@ msgstr ""
 msgid "Destructive ghost"
 msgstr ""
 
-#: src/postulo/applications/models.py:767
+#: src/postulo/applications/models.py:769
 #, draft
 msgid "detail"
 msgstr "detalj"
 
-#: src/postulo/applications/models.py:477
+#: src/postulo/applications/models.py:479
 #, draft
 msgid "details"
 msgstr "detalji"
@@ -3457,12 +3554,12 @@ msgstr "Gotovo"
 msgid "done as it is asked for"
 msgstr ""
 
-#: src/postulo/applications/models.py:534
+#: src/postulo/applications/models.py:536
 #, draft
 msgid "done on"
 msgstr "završeno"
 
-#: src/postulo/applications/agenda.py:97
+#: src/postulo/applications/agenda.py:99
 msgid "Done reminder:"
 msgstr ""
 
@@ -3494,7 +3591,7 @@ msgstr "Preuzmi same datoteke"
 msgid "Download the template"
 msgstr "Preuzmi predložak"
 
-#: src/postulo/applications/models.py:51
+#: src/postulo/applications/models.py:53
 #, draft
 msgid "Draft"
 msgstr "Nacrt"
@@ -3557,6 +3654,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:37
 #: src/postulo/templates/applications/application_detail.html:218
+#: src/postulo/templates/applications/application_detail.html:278
 #: src/postulo/templates/applications/interview_list.html:88
 #: src/postulo/templates/applications/tag_list.html:34
 #: src/postulo/templates/connections/list.html:72
@@ -3583,6 +3681,11 @@ msgstr "Uredi prijavu"
 #, draft
 msgid "Edit interview"
 msgstr "Uredi intervju"
+
+#: src/postulo/templates/applications/offer_form.html:4
+#: src/postulo/templates/applications/offer_form.html:21
+msgid "Edit offer"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html:65
 #, draft
@@ -3613,7 +3716,7 @@ msgid ""
 msgstr ""
 "Bilo koji Europass format: JSON koji europass.europa.eu izvozi danas, ili XML koji je stvarao stari CV uređivač i kakav je i dalje stariji izvoz na vašem disku. Postulo sam prepoznaje koji je, pokazuje vam šta je u njemu i ne zapisuje ništa dok ne kažete."
 
-#: src/postulo/applications/models.py:133
+#: src/postulo/applications/models.py:135
 #: src/postulo/core/server_sections.py:32 src/postulo/core/server_views.py:607
 #: src/postulo/templates/server/email.html:6
 #: src/postulo/templates/server/people.html:33
@@ -3643,12 +3746,12 @@ msgstr "Adresa e-pošte (neobavezno)"
 msgid "Email addresses"
 msgstr "Adrese e-pošte"
 
-#: src/postulo/applications/models.py:432
+#: src/postulo/applications/models.py:434
 #, draft
 msgid "Email received"
 msgstr "E-pošta primljena"
 
-#: src/postulo/applications/models.py:431
+#: src/postulo/applications/models.py:433
 #, draft
 msgid "Email sent"
 msgstr "E-pošta poslana"
@@ -3658,12 +3761,12 @@ msgstr "E-pošta poslana"
 msgid "Employer"
 msgstr "Poslodavac"
 
-#: src/postulo/applications/models.py:132 src/postulo/jobs/models.py:217
+#: src/postulo/applications/models.py:134 src/postulo/jobs/models.py:217
 #, draft
 msgid "Employment service"
 msgstr "Služba za zapošljavanje"
 
-#: src/postulo/applications/forms.py:98 src/postulo/jobs/tables.py:246
+#: src/postulo/applications/forms.py:100 src/postulo/jobs/tables.py:246
 #, draft
 msgid "Employment type"
 msgstr "Vrsta zaposlenja"
@@ -3688,7 +3791,7 @@ msgstr "Prazno hvatanje"
 msgid "Empty for the instance default; an account for an exception to it."
 msgstr "Prazno za zadano na instalaciji; račun za izuzetak od toga."
 
-#: src/postulo/applications/models.py:760
+#: src/postulo/applications/models.py:762
 #, draft
 msgid "Empty when the source could not tell which application it is about."
 msgstr "Prazno kada izvor nije mogao reći na koju se prijavu odnosi."
@@ -3698,7 +3801,7 @@ msgstr "Prazno kada izvor nije mogao reći na koju se prijavu odnosi."
 msgid "enabled"
 msgstr "omogućeno"
 
-#: src/postulo/applications/models.py:636
+#: src/postulo/applications/models.py:638
 #, draft
 msgid "ends"
 msgstr "završava"
@@ -3712,6 +3815,14 @@ msgstr "Energetika"
 #, draft
 msgid "Engineering"
 msgstr "Inženjerstvo"
+
+#: src/postulo/applications/models.py:873
+msgid "equity"
+msgstr ""
+
+#: src/postulo/applications/views.py:1359
+msgid "Equity"
+msgstr ""
 
 #: src/postulo/core/models.py:763
 msgid "errand"
@@ -3728,18 +3839,18 @@ msgid ""
 msgstr ""
 "Europass bilježi pet nivoa po jeziku, a Postulo čuva jedan, pa se uzima najniži. Gdje datoteka ne navodi nijedan, ne upisuje se nijedan: nivo je tvrdnja o vama samima koju će neko provjeriti, pa ga poslije upisujete sami."
 
-#: src/postulo/applications/models.py:491
+#: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "događaj"
 
-#: src/postulo/applications/models.py:136
+#: src/postulo/applications/models.py:138
 #, draft
 msgid "Event or fair"
 msgstr "Događaj ili sajam"
 
-#: src/postulo/applications/models.py:492
+#: src/postulo/applications/models.py:494
 #, draft
 msgid "events"
 msgstr "događaji"
@@ -4109,7 +4220,7 @@ msgstr ""
 msgid "Files"
 msgstr "Datoteke"
 
-#: src/postulo/applications/models.py:352
+#: src/postulo/applications/models.py:354
 #, draft
 msgid "files sent"
 msgstr "poslane datoteke"
@@ -4119,7 +4230,7 @@ msgstr "poslane datoteke"
 msgid "Files you already had"
 msgstr "Datoteke koje ste već imali"
 
-#: src/postulo/applications/models.py:353
+#: src/postulo/applications/models.py:355
 #, draft
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr ""
@@ -4215,12 +4326,12 @@ msgstr "Prati vaš profil"
 msgid "Follow-up note"
 msgstr "Bilješka o praćenju"
 
-#: src/postulo/applications/views.py:779
+#: src/postulo/applications/views.py:784
 #, draft
 msgid "Follow-up recorded."
 msgstr "Praćenje zabilježeno."
 
-#: src/postulo/applications/models.py:440 src/postulo/applications/views.py:776
+#: src/postulo/applications/models.py:442 src/postulo/applications/views.py:781
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4314,7 +4425,7 @@ msgstr "Nađen logo na %(url)s."
 msgid "Found on their website"
 msgstr "Nađeno na njihovoj web stranici"
 
-#: src/postulo/applications/forms.py:104
+#: src/postulo/applications/forms.py:106
 #: src/postulo/applications/reports.py:529 src/postulo/core/csv_import.py:52
 #: src/postulo/jobs/tables.py:231
 #: src/postulo/templates/applications/report.html:252
@@ -4405,7 +4516,7 @@ msgstr "S Gravatara"
 msgid "From level"
 msgstr "Od nivoa"
 
-#: src/postulo/applications/models.py:479
+#: src/postulo/applications/models.py:481
 #, draft
 msgid "from status"
 msgstr "iz statusa"
@@ -4444,7 +4555,7 @@ msgstr "Vraća me nazad — prvo treba potvrda"
 msgid "Ghost"
 msgstr ""
 
-#: src/postulo/applications/models.py:61
+#: src/postulo/applications/models.py:63
 #: src/postulo/templates/widgets/gone_quiet.html:55
 #: src/postulo/templates/widgets/outcomes.html:18
 #, draft
@@ -4561,12 +4672,12 @@ msgid ""
 msgstr ""
 "Srodne vještine grupirajte pod naslovom, poput „Jezici“ ili „Infrastruktura“."
 
-#: src/postulo/applications/models.py:768
+#: src/postulo/applications/models.py:770
 #, draft
 msgid "happened"
 msgstr "desilo se"
 
-#: src/postulo/applications/models.py:475
+#: src/postulo/applications/models.py:477
 #, draft
 msgid "happened on"
 msgstr "desilo se"
@@ -4587,7 +4698,7 @@ msgstr "Zdravstvo"
 msgid "Health check"
 msgstr "Provjera zdravlja"
 
-#: src/postulo/applications/models.py:578
+#: src/postulo/applications/models.py:580
 #: src/postulo/templates/applications/partials/interview_outcome.html:8
 #, draft
 msgid "Held"
@@ -4612,7 +4723,7 @@ msgstr "skrivene stavke navigacije"
 msgid "Hide %(what)s"
 msgstr ""
 
-#: src/postulo/applications/models.py:143
+#: src/postulo/applications/models.py:145
 #, draft
 msgid "High"
 msgstr "Visok"
@@ -4650,7 +4761,7 @@ msgstr "Ugostiteljstvo i turizam"
 msgid "How choosy you have been"
 msgstr "Koliko ste bili izbirljivi"
 
-#: src/postulo/templates/applications/application_detail.html:224
+#: src/postulo/templates/applications/application_detail.html:284
 #: src/postulo/templates/applications/interview_list.html:77
 #, draft
 msgid "How did it go?"
@@ -4792,7 +4903,7 @@ msgstr "identifikator"
 msgid "Identifier"
 msgstr "Identifikator"
 
-#: src/postulo/applications/models.py:763
+#: src/postulo/applications/models.py:765
 #, draft
 msgid "identifier at the source"
 msgstr "identifikator na izvoru"
@@ -4955,12 +5066,12 @@ msgstr "u %(kind)s koji ste poslali kompaniji %(company)s %(when)s"
 msgid "In the diary"
 msgstr "U dnevniku"
 
-#: src/postulo/applications/forms.py:413
+#: src/postulo/applications/forms.py:415
 msgid ""
 "In your time zone. Any notifier you have switched on is told at that moment."
 msgstr ""
 
-#: src/postulo/applications/forms.py:446
+#: src/postulo/applications/forms.py:448
 msgid ""
 "In your time zone. The calendar file Postulo makes writes it in UTC, so it lands at the right moment wherever it is opened."
 msgstr ""
@@ -5082,61 +5193,61 @@ msgstr "Interno"
 msgid "Internship"
 msgstr "Praksa"
 
-#: src/postulo/applications/models.py:434
+#: src/postulo/applications/models.py:436
 #, draft
 msgid "Interview"
 msgstr "Intervju"
 
-#: src/postulo/applications/models.py:669
+#: src/postulo/applications/models.py:671
 #, draft
 msgid "interview"
 msgstr "intervju"
 
-#: src/postulo/applications/models.py:436
+#: src/postulo/applications/models.py:438
 #, draft
 msgid "Interview cancelled"
 msgstr "Intervju otkazan"
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
 msgstr "Intervju zabilježen."
 
-#: src/postulo/applications/models.py:435
+#: src/postulo/applications/models.py:437
 #, draft
 msgid "Interview scheduled"
 msgstr "Intervju zakazan"
 
-#: src/postulo/applications/views.py:872
+#: src/postulo/applications/views.py:877
 #, draft
 msgid "Interview scheduled."
 msgstr "Intervju zakazan."
 
-#: src/postulo/applications/services.py:293
+#: src/postulo/applications/services.py:294
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Intervju sutra: %(kind)s u %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:902
+#: src/postulo/applications/views.py:907
 #, draft
 msgid "Interview updated."
 msgstr "Intervju ažuriran."
 
-#: src/postulo/applications/agenda.py:94
+#: src/postulo/applications/agenda.py:96
 #, draft
 msgid "Interview:"
 msgstr "Intervju:"
 
 #: src/postulo/applications/analytics.py:43
-#: src/postulo/applications/models.py:55
+#: src/postulo/applications/models.py:57
 #, draft
 msgid "Interviewing"
 msgstr "U intervjuima"
 
-#: src/postulo/applications/agenda.py:73
+#: src/postulo/applications/agenda.py:74
 #: src/postulo/applications/widgets.py:237
 #: src/postulo/templates/accounts/delete_account.html:24
-#: src/postulo/templates/applications/application_detail.html:177
+#: src/postulo/templates/applications/application_detail.html:237
 #: src/postulo/templates/applications/interview_list.html:6
 #: src/postulo/templates/applications/interview_list.html:11
 #: src/postulo/templates/widgets/industries.html:12
@@ -5145,7 +5256,7 @@ msgstr "U intervjuima"
 msgid "Interviews"
 msgstr "Intervjui"
 
-#: src/postulo/applications/models.py:670
+#: src/postulo/applications/models.py:672
 #, draft
 msgid "interviews"
 msgstr "intervjui"
@@ -5220,7 +5331,7 @@ msgid ""
 msgstr ""
 "Može čitati i mijenjati sve na ovoj instalaciji, za svaku osobu na njoj. Instalirajte samo ono što ste pročitali ili čemu imate razloga vjerovati. Ništa se nikada ne ažurira automatski: ažuriranje je promjena koda, i na njega klikne administrator."
 
-#: src/postulo/applications/forms.py:491
+#: src/postulo/applications/forms.py:493
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Ne može završiti prije nego počne."
@@ -5234,7 +5345,7 @@ msgstr ""
 msgid "it did not finish importing within %(seconds)ss"
 msgstr ""
 
-#: src/postulo/applications/views.py:727
+#: src/postulo/applications/views.py:732
 msgid "It is already done."
 msgstr ""
 
@@ -5279,6 +5390,10 @@ msgid ""
 "It sets the shape the box below starts from, and which themes are offered."
 msgstr ""
 
+#: src/postulo/templates/applications/application_detail.html:229
+msgid "It stands at Offer, and what was offered is not written down yet."
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_created.html:33
 #, python-format
 msgid "It works until %(when)s, or until it is used or revoked."
@@ -5300,7 +5415,7 @@ msgstr ""
 msgid "Its file matches what the official repository signed."
 msgstr "Njegova datoteka odgovara onome što je potpisalo zvanično spremište."
 
-#: src/postulo/applications/models.py:128
+#: src/postulo/applications/models.py:130
 #, draft
 msgid "Job board"
 msgstr "Oglasnik poslova"
@@ -5326,7 +5441,7 @@ msgstr "Izvještaj o traženju posla"
 msgid "Job search report · %(period)s"
 msgstr "Izvještaj o traženju posla · %(period)s"
 
-#: src/postulo/applications/forms.py:77
+#: src/postulo/applications/forms.py:79
 #, draft
 msgid "Job title"
 msgstr "Naziv radnog mjesta"
@@ -5336,7 +5451,7 @@ msgstr "Naziv radnog mjesta"
 msgid "Jobs"
 msgstr "Poslovi"
 
-#: src/postulo/templates/applications/application_detail.html:197
+#: src/postulo/templates/applications/application_detail.html:257
 #: src/postulo/templates/applications/interview_list.html:66
 #, draft
 msgid "Join the call"
@@ -5407,9 +5522,9 @@ msgid ""
 msgstr ""
 "Tipke: <kbd>d</kbd> odbacuje i ide dalje, <kbd>j</kbd> preskače na sljedeće, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> čuva i ide dalje — dok se ništa ne kuca."
 
-#: src/postulo/applications/models.py:474
-#: src/postulo/applications/models.py:633
-#: src/postulo/applications/models.py:765 src/postulo/core/models.py:303
+#: src/postulo/applications/models.py:476
+#: src/postulo/applications/models.py:635
+#: src/postulo/applications/models.py:767 src/postulo/core/models.py:303
 #: src/postulo/core/models.py:528 src/postulo/core/models.py:657
 #: src/postulo/core/models.py:743 src/postulo/documents/models.py:167
 #: src/postulo/documents/models.py:372 src/postulo/documents/models.py:452
@@ -5647,7 +5762,7 @@ msgstr ""
 msgid "Leaving"
 msgstr "Odlazi"
 
-#: src/postulo/applications/forms.py:455
+#: src/postulo/applications/forms.py:457
 #, draft
 msgid "Left blank, it lasts an hour."
 msgstr "Ostavljeno prazno, traje sat vremena."
@@ -5771,7 +5886,7 @@ msgstr "veze"
 msgid "Links issued for this account"
 msgstr "Veze izdate za ovaj račun"
 
-#: src/postulo/applications/models.py:345
+#: src/postulo/applications/models.py:347
 #, draft
 msgid "links sent"
 msgstr "poslane veze"
@@ -5840,7 +5955,7 @@ msgstr ""
 msgid "location"
 msgstr "lokacija"
 
-#: src/postulo/applications/forms.py:85 src/postulo/applications/tables.py:41
+#: src/postulo/applications/forms.py:87 src/postulo/applications/tables.py:41
 #: src/postulo/core/csv_import.py:44 src/postulo/jobs/tables.py:45
 #: src/postulo/jobs/tables.py:202
 #: src/postulo/templates/applications/application_detail.html:66
@@ -5897,7 +6012,7 @@ msgstr ""
 msgid "Loosen one of them, or start again."
 msgstr "Popustite jedan od njih ili počnite iznova."
 
-#: src/postulo/applications/models.py:141
+#: src/postulo/applications/models.py:143
 #, draft
 msgid "Low"
 msgstr "Nizak"
@@ -5994,7 +6109,7 @@ msgstr "posljednja greška pošte"
 msgid "Main"
 msgstr "Glavno"
 
-#: src/postulo/applications/models.py:316
+#: src/postulo/applications/models.py:318
 #, draft
 msgid "main contact"
 msgstr "glavni kontakt"
@@ -6042,7 +6157,7 @@ msgstr "Proizvodnja"
 msgid "Map a column to Company and one to Role first."
 msgstr "Prvo povežite jednu kolonu s Kompanijom, a drugu s Radnim mjestom."
 
-#: src/postulo/applications/views.py:656
+#: src/postulo/applications/views.py:661
 #, draft
 msgid "Marked as done."
 msgstr "Označeno kao gotovo."
@@ -6134,7 +6249,7 @@ msgstr "Novac"
 msgid "Money and dates"
 msgstr "Novac i datumi"
 
-#: src/postulo/applications/agenda.py:488
+#: src/postulo/applications/agenda.py:521
 #: src/postulo/templates/applications/report.html:66
 #, draft
 msgid "Month"
@@ -6359,7 +6474,7 @@ msgstr "Novo otkad ste ovo posljednji put složili"
 msgid "New tag"
 msgstr "Nova oznaka"
 
-#: src/postulo/applications/forms.py:248 src/postulo/applications/forms.py:302
+#: src/postulo/applications/forms.py:250 src/postulo/applications/forms.py:304
 #, draft
 msgid "New tags"
 msgstr "Nove oznake"
@@ -6633,7 +6748,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Ovdje još niko nije zabilježen."
 
-#: src/postulo/applications/services.py:443
+#: src/postulo/applications/services.py:444
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "Niko se nije pojavio na %(kind)s"
@@ -6684,7 +6799,7 @@ msgstr "Još nijedna."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Još nijedan. Ovaj unos ispisuje svoj izvorni tekst na svakom CV-u."
 
-#: src/postulo/applications/models.py:142
+#: src/postulo/applications/models.py:144
 #, draft
 msgid "Normal"
 msgstr "Normalno"
@@ -6832,7 +6947,7 @@ msgstr "Još nije napisano na %(tongue)s. Ovi se ispisuju onakvi kakvi jesu:"
 msgid "note"
 msgstr "bilješka"
 
-#: src/postulo/applications/forms.py:365 src/postulo/applications/models.py:430
+#: src/postulo/applications/forms.py:367 src/postulo/applications/models.py:432
 #, draft
 msgid "Note"
 msgstr "Bilješka"
@@ -6857,17 +6972,18 @@ msgstr "zabilježeno %(when)s"
 msgid "noted on"
 msgstr "zabilježeno"
 
-#: src/postulo/core/csv_import.py:55 src/postulo/jobs/tables.py:118
+#: src/postulo/applications/models.py:893 src/postulo/documents/models.py:463
+#: src/postulo/jobs/models.py:259 src/postulo/jobs/models.py:570
+#, draft
+msgid "notes"
+msgstr "bilješke"
+
+#: src/postulo/applications/views.py:1367 src/postulo/core/csv_import.py:55
+#: src/postulo/jobs/tables.py:118
 #: src/postulo/templates/jobs/company_detail.html:186
 #, draft
 msgid "Notes"
 msgstr "Bilješke"
-
-#: src/postulo/documents/models.py:463 src/postulo/jobs/models.py:259
-#: src/postulo/jobs/models.py:570
-#, draft
-msgid "notes"
-msgstr "bilješke"
 
 #: src/postulo/templates/server/plugins.html:358
 #, draft
@@ -7050,7 +7166,7 @@ msgstr "Još ništa nije zabilježeno."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Na toj stranici nije nađeno ništa što liči na oglas za posao."
 
-#: src/postulo/api/api.py:483
+#: src/postulo/api/api.py:484
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Tamo nije nađeno ništa što liči na oglas za posao."
@@ -7062,7 +7178,7 @@ msgid ""
 msgstr ""
 "Ništa nije sačuvano. Oglasi nestaju s weba; lijepljenje teksta čuva vašu kopiju."
 
-#: src/postulo/templates/applications/application_detail.html:232
+#: src/postulo/templates/applications/application_detail.html:292
 #, draft
 msgid "Nothing scheduled."
 msgstr "Ništa nije zakazano."
@@ -7071,6 +7187,11 @@ msgstr "Ništa nije zakazano."
 #, draft
 msgid "Nothing sent yet."
 msgstr "Još ništa nije poslano."
+
+#: src/postulo/templates/applications/offer_compare.html:61
+msgid ""
+"Nothing standing at Offer. Record one from an application's page when it arrives."
+msgstr ""
 
 #: src/postulo/core/design.py:138 src/postulo/templates/server/design.html:256
 msgid "Nothing there"
@@ -7167,7 +7288,7 @@ msgstr ""
 msgid "Notifications"
 msgstr "Obavještenja"
 
-#: src/postulo/applications/models.py:536
+#: src/postulo/applications/models.py:538
 #, draft
 msgid "notified on"
 msgstr "obaviješteno"
@@ -7204,21 +7325,45 @@ msgstr ""
 "Isključeno. Kod iz aplikacije za potvrdu identiteta, tražen nakon lozinke, znači da procurjela lozinka sama nije dovoljna."
 
 #: src/postulo/applications/analytics.py:45
-#: src/postulo/applications/models.py:57
+#: src/postulo/applications/models.py:59 src/postulo/applications/models.py:910
 #, draft
 msgid "Offer"
 msgstr "Ponuda"
 
-#: src/postulo/applications/models.py:438
+#: src/postulo/applications/models.py:905
+msgid "offer"
+msgstr ""
+
+#: src/postulo/applications/models.py:440
+#: src/postulo/applications/services.py:518
 #, draft
 msgid "Offer received"
 msgstr "Ponuda primljena"
+
+#: src/postulo/applications/views.py:1255
+msgid "Offer recorded."
+msgstr ""
+
+#: src/postulo/applications/services.py:518
+msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/applications/views.py:1281
+msgid "Offer updated."
+msgstr ""
 
 #: src/postulo/core/models.py:903
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Nudi se samo dok pošta ove instance zaista stiže."
 
+#: src/postulo/applications/models.py:906
+msgid "offers"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:183
+#: src/postulo/templates/applications/offer_compare.html:6
+#: src/postulo/templates/applications/offer_compare.html:23
 #: src/postulo/templates/applications/report.html:210
 #: src/postulo/templates/applications/report_print.html:143
 #: src/postulo/templates/widgets/industries.html:13
@@ -7232,6 +7377,10 @@ msgstr "Ponude"
 #, draft
 msgid "Offers on the table"
 msgstr "Ponude na stolu"
+
+#: src/postulo/templates/applications/offer_compare.html:32
+msgid "Offers side by side"
+msgstr ""
 
 #: src/postulo/plugins/models.py:43 src/postulo/plugins/provenance.py:60
 #, draft
@@ -7257,7 +7406,7 @@ msgstr "uključeno"
 msgid "On a board it looks like this:"
 msgstr ""
 
-#: src/postulo/applications/models.py:570 src/postulo/jobs/models.py:590
+#: src/postulo/applications/models.py:572 src/postulo/jobs/models.py:590
 #, draft
 msgid "On site"
 msgstr "Na lokaciji"
@@ -7265,6 +7414,10 @@ msgstr "Na lokaciji"
 #: src/postulo/jobs/forms.py:39
 msgid ""
 "On site is at their address; hybrid is some days there and some not; remote is no address of theirs at all."
+msgstr ""
+
+#: src/postulo/applications/models.py:891
+msgid "On the calendar, with a reminder the day before."
 msgstr ""
 
 #: src/postulo/accounts/forms.py:472
@@ -7605,9 +7758,9 @@ msgstr "Porijeklo"
 msgid "Original posting"
 msgstr "Izvorni oglas"
 
-#: src/postulo/applications/models.py:137
-#: src/postulo/applications/models.py:441
-#: src/postulo/applications/models.py:573 src/postulo/core/models.py:297
+#: src/postulo/applications/models.py:139
+#: src/postulo/applications/models.py:443
+#: src/postulo/applications/models.py:575 src/postulo/core/models.py:297
 #: src/postulo/core/models.py:522 src/postulo/documents/kinds.py:163
 #: src/postulo/documents/models.py:434 src/postulo/jobs/models.py:645
 #: src/postulo/resume/models.py:241
@@ -7631,7 +7784,7 @@ msgstr "Drugi jezici"
 msgid "Other periods"
 msgstr "Drugi periodi"
 
-#: src/postulo/applications/models.py:648
+#: src/postulo/applications/models.py:650
 #, draft
 msgid "outcome"
 msgstr "ishod"
@@ -7696,7 +7849,7 @@ msgstr "Izvorni kod stranice"
 msgid "Pagination"
 msgstr "Straničenje"
 
-#: src/postulo/applications/models.py:571
+#: src/postulo/applications/models.py:573
 #, draft
 msgid "Panel"
 msgstr "Ploča"
@@ -7804,6 +7957,10 @@ msgstr "Na čekanju"
 msgid "Pending only"
 msgstr "Samo na čekanju"
 
+#: src/postulo/applications/models.py:877
+msgid "Pension, insurance, allowances, equipment: whatever was named."
+msgstr ""
+
 #: src/postulo/core/search.py:523 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:175 src/postulo/core/server_views.py:261
 #: src/postulo/core/server_views.py:278 src/postulo/core/server_views.py:356
@@ -7835,11 +7992,15 @@ msgstr "Mjesečno"
 msgid "Per year"
 msgstr "Godišnje"
 
-#: src/postulo/applications/forms.py:135
+#: src/postulo/applications/forms.py:137
 #: src/postulo/templates/applications/calendar.html:83
 #, draft
 msgid "Period"
 msgstr "Period"
+
+#: src/postulo/applications/models.py:866
+msgid "period"
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:68
 #, python-format, draft
@@ -7888,7 +8049,7 @@ msgstr "Telefon"
 msgid "phone"
 msgstr "telefon"
 
-#: src/postulo/applications/models.py:568
+#: src/postulo/applications/models.py:570
 #, draft
 msgid "Phone screen"
 msgstr "Telefonski razgovor"
@@ -8050,7 +8211,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "Portfolio"
 
-#: src/postulo/applications/models.py:346
+#: src/postulo/applications/models.py:348
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Portfoliji, profili i videi na koje ste ih uputili."
@@ -8096,7 +8257,7 @@ msgstr ""
 msgid "posted on"
 msgstr "objavljeno"
 
-#: src/postulo/applications/models.py:293
+#: src/postulo/applications/models.py:295
 #, draft
 msgid "posting"
 msgstr "oglas"
@@ -8122,7 +8283,7 @@ msgstr "Detalji oglasa"
 msgid "Posting updated."
 msgstr "Oglas ažuriran."
 
-#: src/postulo/applications/forms.py:79 src/postulo/core/csv_import.py:43
+#: src/postulo/applications/forms.py:81 src/postulo/core/csv_import.py:43
 #, draft
 msgid "Posting URL"
 msgstr "URL oglasa"
@@ -8253,7 +8414,7 @@ msgstr ""
 msgid "prefix"
 msgstr "prefiks"
 
-#: src/postulo/applications/models.py:646
+#: src/postulo/applications/models.py:648
 #, draft
 msgid "preparation notes"
 msgstr "bilješke za pripremu"
@@ -8314,12 +8475,12 @@ msgstr "glavni"
 msgid "Printed at the top. It takes the same placeholders as the body."
 msgstr ""
 
-#: src/postulo/applications/forms.py:219 src/postulo/applications/tables.py:68
+#: src/postulo/applications/forms.py:221 src/postulo/applications/tables.py:68
 #, draft
 msgid "Priority"
 msgstr "Prioritet"
 
-#: src/postulo/applications/models.py:299
+#: src/postulo/applications/models.py:301
 #, draft
 msgid "priority"
 msgstr "prioritet"
@@ -8429,7 +8590,7 @@ msgstr "Javni sektor"
 msgid "Publication"
 msgstr "Publikacija"
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:737
 #, python-format
 msgid "Put off until %(when)s."
 msgstr ""
@@ -8491,7 +8652,7 @@ msgstr "Tiho"
 msgid "quiet after"
 msgstr "tiho nakon"
 
-#: src/postulo/applications/models.py:357
+#: src/postulo/applications/models.py:359
 #, draft
 msgid "quiet announced on"
 msgstr "tišina prijavljena"
@@ -8637,6 +8798,12 @@ msgstr "Zabilježi"
 msgid "Record an application"
 msgstr "Zabilježi prijavu"
 
+#: src/postulo/templates/applications/application_detail.html:191
+#: src/postulo/templates/applications/offer_form.html:4
+#: src/postulo/templates/applications/offer_form.html:21
+msgid "Record an offer"
+msgstr ""
+
 #: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
@@ -8672,12 +8839,12 @@ msgid ""
 msgstr ""
 "Bilježi se uz sve što je odavde instalirano, pa se kasnije ne može promijeniti bez ostavljanja instaliranog bez roditelja."
 
-#: src/postulo/applications/views.py:923
+#: src/postulo/applications/views.py:928
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Zabilježeno kao otkazano."
 
-#: src/postulo/applications/views.py:922
+#: src/postulo/applications/views.py:927
 #, draft
 msgid "Recorded as held."
 msgstr "Zabilježeno kao održano."
@@ -8687,12 +8854,12 @@ msgid ""
 "Recorded as part of what they were sent. Postulo sends nothing itself — this is the note of what you sent."
 msgstr ""
 
-#: src/postulo/applications/models.py:484
+#: src/postulo/applications/models.py:486
 #, draft
 msgid "recorded by"
 msgstr "zabilježio"
 
-#: src/postulo/applications/models.py:486
+#: src/postulo/applications/models.py:488
 #, draft
 msgid "recorded on"
 msgstr "zabilježeno"
@@ -8702,7 +8869,7 @@ msgstr "zabilježeno"
 msgid "Recorded what you sent."
 msgstr "Zabilježeno šta ste poslali."
 
-#: src/postulo/applications/views.py:924
+#: src/postulo/applications/views.py:929
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Zabilježeno: niko se nije pojavio."
@@ -8727,7 +8894,7 @@ msgstr "Veza za oporavak"
 msgid "recovery links"
 msgstr "veze za oporavak"
 
-#: src/postulo/applications/models.py:135
+#: src/postulo/applications/models.py:137
 #, draft
 msgid "Recruiter"
 msgstr "Regruter"
@@ -8742,7 +8909,7 @@ msgstr "Praćenih preusmjeravanja"
 msgid "Reference"
 msgstr "Preporuka"
 
-#: src/postulo/applications/models.py:134 src/postulo/core/models.py:120
+#: src/postulo/applications/models.py:136 src/postulo/core/models.py:120
 #, draft
 msgid "Referral"
 msgstr "Preko preporuke"
@@ -8794,13 +8961,13 @@ msgstr "Registracija otvorena"
 msgid "Reinstall"
 msgstr "Ponovo instaliraj"
 
-#: src/postulo/applications/models.py:59
+#: src/postulo/applications/models.py:61
 #: src/postulo/templates/widgets/outcomes.html:14
 #, draft
 msgid "Rejected"
 msgstr "Odbijeno"
 
-#: src/postulo/applications/models.py:439
+#: src/postulo/applications/models.py:441
 #, draft
 msgid "Rejection received"
 msgstr "Odbijenica primljena"
@@ -8811,13 +8978,14 @@ msgstr "Odbijenica primljena"
 msgid "Rejections"
 msgstr "Odbijenice"
 
-#: src/postulo/applications/forms.py:436
+#: src/postulo/applications/forms.py:438
 #, draft
 msgid "Remind me the day before"
 msgstr "Podsjeti me dan ranije"
 
-#: src/postulo/applications/models.py:541
-#: src/postulo/applications/models.py:663
+#: src/postulo/applications/models.py:543
+#: src/postulo/applications/models.py:665
+#: src/postulo/applications/models.py:901
 #, draft
 msgid "reminder"
 msgstr "podsjetnik"
@@ -8827,25 +8995,25 @@ msgstr "podsjetnik"
 msgid "Reminder"
 msgstr ""
 
-#: src/postulo/applications/views.py:682
+#: src/postulo/applications/views.py:687
 msgid "Reminder updated."
 msgstr ""
 
-#: src/postulo/applications/agenda.py:96
+#: src/postulo/applications/agenda.py:98
 #, draft
 msgid "Reminder:"
 msgstr "Podsjetnik:"
 
-#: src/postulo/applications/agenda.py:74 src/postulo/core/navigation.py:75
+#: src/postulo/applications/agenda.py:75 src/postulo/core/navigation.py:75
 #: src/postulo/core/search.py:524
-#: src/postulo/templates/applications/application_detail.html:260
+#: src/postulo/templates/applications/application_detail.html:320
 #: src/postulo/templates/applications/reminder_list.html:6
 #: src/postulo/templates/applications/reminder_list.html:10
 #, draft
 msgid "Reminders"
 msgstr "Podsjetnici"
 
-#: src/postulo/applications/models.py:542
+#: src/postulo/applications/models.py:544
 #, draft
 msgid "reminders"
 msgstr "podsjetnici"
@@ -9005,7 +9173,7 @@ msgstr "Pregledaj hvatanje"
 msgid "Reviewed by a speaker"
 msgstr "Pregledao govornik"
 
-#: src/postulo/applications/models.py:792
+#: src/postulo/applications/models.py:794
 #, draft
 msgid "reviewed on"
 msgstr "pregledano"
@@ -9119,7 +9287,7 @@ msgstr "Plata"
 msgid "Salary (one figure or a range)"
 msgstr "Plata (jedan iznos ili raspon)"
 
-#: src/postulo/applications/forms.py:114 src/postulo/core/csv_import.py:48
+#: src/postulo/applications/forms.py:116 src/postulo/core/csv_import.py:48
 #, draft
 msgid "Salary from"
 msgstr "Plata od"
@@ -9134,7 +9302,7 @@ msgstr "plata od"
 msgid "salary period"
 msgstr "period plate"
 
-#: src/postulo/applications/forms.py:121 src/postulo/core/csv_import.py:49
+#: src/postulo/applications/forms.py:123 src/postulo/core/csv_import.py:49
 #, draft
 msgid "Salary to"
 msgstr "Plata do"
@@ -9148,6 +9316,7 @@ msgstr "plata do"
 #: src/postulo/templates/applications/application_form.html:31
 #: src/postulo/templates/applications/application_intake.html:76
 #: src/postulo/templates/applications/interview_form.html:68
+#: src/postulo/templates/applications/offer_form.html:51
 #: src/postulo/templates/applications/reminder_form.html:21
 #: src/postulo/templates/applications/tag_form.html:84
 #: src/postulo/templates/connections/form.html:44
@@ -9238,7 +9407,11 @@ msgstr "Recite šta je ovaj identifikator."
 msgid "Say what this number is."
 msgstr "Recite šta je ovaj broj."
 
-#: src/postulo/templates/applications/application_detail.html:180
+#: src/postulo/applications/forms.py:588
+msgid "Say which currency the amount is in."
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:240
 #: src/postulo/templates/applications/interview_form.html:68
 #, draft
 msgid "Schedule"
@@ -9250,7 +9423,7 @@ msgstr "Zakaži"
 msgid "Schedule an interview"
 msgstr "Zakaži intervju"
 
-#: src/postulo/applications/models.py:577
+#: src/postulo/applications/models.py:579
 #, draft
 msgid "Scheduled"
 msgstr "Zakazano"
@@ -9271,7 +9444,7 @@ msgid "scopes"
 msgstr "opsezi"
 
 #: src/postulo/applications/analytics.py:42
-#: src/postulo/applications/models.py:54
+#: src/postulo/applications/models.py:56
 #, draft
 msgid "Screening"
 msgstr "Predodabir"
@@ -9443,7 +9616,7 @@ msgstr "Poslano s"
 msgid "Separate several with commas. Anything new joins your list."
 msgstr "Više njih odvojite zarezima. Sve novo pridružuje se vašem spisku."
 
-#: src/postulo/applications/forms.py:250 src/postulo/applications/forms.py:304
+#: src/postulo/applications/forms.py:252 src/postulo/applications/forms.py:306
 #, draft
 msgid "Separate them with commas. A tag you have already keeps its colour."
 msgstr "Odvojite ih zarezima. Oznaka koju već imate zadržava svoju boju."
@@ -9480,7 +9653,7 @@ msgid ""
 "Set <code>POSTULO_UPDATE_CHECK=true</code> to let the scheduler ask once a day."
 msgstr ""
 
-#: src/postulo/applications/models.py:305
+#: src/postulo/applications/models.py:307
 #, draft
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Postavlja se automatski prvi put kada status postane „Prijavljeno“."
@@ -9853,7 +10026,7 @@ msgstr "SMTP server"
 msgid "Snooze"
 msgstr "Odgodi"
 
-#: src/postulo/applications/views.py:793
+#: src/postulo/applications/views.py:798
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Odgođeno za dvije sedmice."
@@ -10007,6 +10180,14 @@ msgstr ""
 msgid "Start again"
 msgstr "Počni iznova"
 
+#: src/postulo/applications/models.py:886
+msgid "start date"
+msgstr ""
+
+#: src/postulo/applications/views.py:1365
+msgid "Start date"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
 msgid "Start from a kind"
@@ -10026,10 +10207,15 @@ msgstr ""
 msgid "Starting clean instead?"
 msgstr "Radije počinjete od nule?"
 
-#: src/postulo/applications/models.py:635
+#: src/postulo/applications/models.py:637
 #, draft
 msgid "starts"
 msgstr "počinje"
+
+#: src/postulo/templates/applications/application_detail.html:208
+#, python-format
+msgid "starts %(day)s"
+msgstr ""
 
 #: src/postulo/core/server_forms.py:229
 #, draft
@@ -10055,14 +10241,14 @@ msgstr "stanje"
 msgid "State"
 msgstr "Stanje"
 
-#: src/postulo/api/models.py:175 src/postulo/applications/models.py:296
-#: src/postulo/applications/models.py:782 src/postulo/documents/models.py:741
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
+#: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
 #: src/postulo/jobs/models.py:1021
 #, draft
 msgid "status"
 msgstr "status"
 
-#: src/postulo/applications/forms.py:211 src/postulo/applications/forms.py:363
+#: src/postulo/applications/forms.py:213 src/postulo/applications/forms.py:365
 #: src/postulo/applications/reports.py:531
 #: src/postulo/applications/tables.py:49 src/postulo/core/csv_import.py:45
 #: src/postulo/templates/accounts/invite_list.html:26
@@ -10076,7 +10262,7 @@ msgstr "status"
 msgid "Status"
 msgstr "Status"
 
-#: src/postulo/applications/models.py:429
+#: src/postulo/applications/models.py:431
 #, draft
 msgid "Status change"
 msgstr "Promjena statusa"
@@ -10091,7 +10277,7 @@ msgstr "Status u tabeli: %(text)s"
 msgid "Status of %(title)s at %(company)s"
 msgstr "Status %(title)s u %(company)s"
 
-#: src/postulo/applications/views.py:517
+#: src/postulo/applications/views.py:522
 #, draft
 msgid "Status updated."
 msgstr "Status ažuriran."
@@ -10160,22 +10346,22 @@ msgstr ""
 msgid "subject"
 msgstr "tema"
 
-#: src/postulo/applications/models.py:762
+#: src/postulo/applications/models.py:764
 #, draft
 msgid "suggested by"
 msgstr "predložio"
 
-#: src/postulo/applications/models.py:770
+#: src/postulo/applications/models.py:772
 #, draft
 msgid "suggested status"
 msgstr "predloženi status"
 
-#: src/postulo/applications/models.py:797
+#: src/postulo/applications/models.py:799
 #, draft
 msgid "suggestion"
 msgstr "prijedlog"
 
-#: src/postulo/applications/models.py:798
+#: src/postulo/applications/models.py:800
 #, draft
 msgid "suggestions"
 msgstr "prijedlozi"
@@ -10191,7 +10377,7 @@ msgstr "Prijedlozi"
 msgid "Suggestions from plugins"
 msgstr "Prijedlozi dodataka"
 
-#: src/postulo/applications/models.py:476 src/postulo/documents/models.py:171
+#: src/postulo/applications/models.py:478 src/postulo/documents/models.py:171
 #: src/postulo/resume/models.py:78 src/postulo/resume/models.py:163
 #, draft
 msgid "summary"
@@ -10321,7 +10507,7 @@ msgstr "Oznaka"
 msgid "tagline"
 msgstr "slogan"
 
-#: src/postulo/applications/forms.py:242 src/postulo/applications/tables.py:91
+#: src/postulo/applications/forms.py:244 src/postulo/applications/tables.py:91
 #: src/postulo/core/csv_import.py:53
 #: src/postulo/templates/applications/tag_list.html:6
 #: src/postulo/templates/applications/tag_list.html:12
@@ -10329,7 +10515,7 @@ msgstr "slogan"
 msgid "Tags"
 msgstr "Oznake"
 
-#: src/postulo/applications/models.py:339 src/postulo/core/models.py:193
+#: src/postulo/applications/models.py:341 src/postulo/core/models.py:193
 #, draft
 msgid "tags"
 msgstr "oznake"
@@ -10408,6 +10594,14 @@ msgstr "Predložak"
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr "Predlošci se pojavljuju kada pismo pošaljete uz prijavu."
+
+#: src/postulo/templates/applications/offer_compare.html:35
+msgid "Term"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:204
+msgid "Terms not recorded"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html:57
 #, draft
@@ -10541,7 +10735,7 @@ msgstr "Ovo ne izgleda kao %(scheme)s identifikator (na primjer %(example)s)."
 msgid "That does not look like a complete web address."
 msgstr "Ovo ne izgleda kao potpuna web adresa."
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:604
 #, draft
 msgid "That entry could not be saved."
 msgstr "Taj unos se nije mogao sačuvati."
@@ -10623,12 +10817,12 @@ msgstr "To je mnogo veza za oporavak. Pokušajte ponovo uskoro."
 msgid "That is a lot of tests. Try again in %(seconds)d seconds."
 msgstr ""
 
-#: src/postulo/applications/views.py:519
+#: src/postulo/applications/views.py:524
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "To nije status koji Postulo poznaje."
 
-#: src/postulo/applications/views.py:725
+#: src/postulo/applications/views.py:730
 msgid "That is not a time Postulo can read."
 msgstr ""
 
@@ -10651,17 +10845,17 @@ msgstr ""
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "To nije Ed25519 javni ključ: %(error)s"
 
-#: src/postulo/applications/views.py:916
+#: src/postulo/applications/views.py:921
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "To nije ishod koji Postulo poznaje."
 
-#: src/postulo/applications/views.py:795
+#: src/postulo/applications/views.py:800
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "To nije nešto što Postulo može uraditi po tom pitanju."
 
-#: src/postulo/applications/views.py:292 src/postulo/jobs/listing_views.py:174
+#: src/postulo/applications/views.py:296 src/postulo/jobs/listing_views.py:174
 #: src/postulo/jobs/views.py:170
 #, draft
 msgid "That is not something Postulo can do to several at once."
@@ -10762,7 +10956,7 @@ msgstr "Taj dodatak više nije instaliran."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Taj odgovor nije došao od zahtjeva koji je Postulo napravio."
 
-#: src/postulo/applications/views.py:1198
+#: src/postulo/applications/views.py:1203
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Na taj prijedlog je već odgovoreno."
@@ -10781,7 +10975,7 @@ msgstr ""
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "To bi napravilo petlju: %(name)s je već dio ove."
 
-#: src/postulo/applications/views.py:491 src/postulo/jobs/views.py:426
+#: src/postulo/applications/views.py:496 src/postulo/jobs/views.py:426
 #: src/postulo/jobs/views.py:648
 #, python-format, draft
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -10922,7 +11116,7 @@ msgid ""
 msgstr ""
 "Pregled navodi otvorene prijave u kojima se već neko vrijeme ništa nije desilo, bez ičega planiranog. Savjeti samih regrutera okupljaju se oko dvije do tri sedmice."
 
-#: src/postulo/applications/forms.py:41
+#: src/postulo/applications/forms.py:43
 msgid ""
 "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr ""
@@ -10948,7 +11142,7 @@ msgstr "Preuzeto je daleko veće nego što dodatak treba biti."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Ranija verzija koju ova zamjenjuje. Stara datoteka se čuva."
 
-#: src/postulo/applications/forms.py:357
+#: src/postulo/applications/forms.py:359
 #, draft
 msgid "The employer as a whole"
 msgstr "Poslodavac u cjelini"
@@ -10969,6 +11163,10 @@ msgid ""
 "The fields your companies operate in, in your own words. A company may be in several."
 msgstr ""
 "Područja u kojima vaše kompanije rade, vašim vlastitim riječima. Kompanija može biti u više njih."
+
+#: src/postulo/applications/forms.py:578
+msgid "The figure as they wrote it, before tax."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:29
 #, draft
@@ -11067,7 +11265,7 @@ msgid ""
 msgstr ""
 "Zadnjih deset stvari koje je vremenska crta zabilježila, na kojoj god prijavi bile."
 
-#: src/postulo/applications/forms.py:381
+#: src/postulo/applications/forms.py:383
 msgid "The line the timeline shows."
 msgstr ""
 
@@ -11143,6 +11341,10 @@ msgid ""
 msgstr ""
 "Broj koji vas vraća nazad odvojen je od onoga koji vaši dokumenti štampaju, pa promjena onoga što poslodavac zove ne mijenja kako dokazujete da ste to vi. Prvo mora biti potvrđen, a isključivanje više telefonskih brojeva nikada ga ne oduzima."
 
+#: src/postulo/applications/models.py:883
+msgid "The office, the remote arrangement, or the days of each."
+msgstr ""
+
 #: src/postulo/core/server_views.py:1174
 #, draft
 msgid "The official repository is emptied, not removed."
@@ -11175,7 +11377,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Plaća"
 
-#: src/postulo/applications/forms.py:46
+#: src/postulo/applications/forms.py:48
 msgid "The person at the company this went through, where there was one."
 msgstr ""
 
@@ -11248,7 +11450,7 @@ msgstr ""
 msgid "The role"
 msgstr "Radno mjesto"
 
-#: src/postulo/applications/forms.py:36
+#: src/postulo/applications/forms.py:38
 msgid ""
 "The route it went through. The report counts by this, including how many went through the employment service's own board."
 msgstr ""
@@ -11370,7 +11572,7 @@ msgid ""
 msgstr ""
 "Vremensku zonu postavlja okruženje: <code>%(variable)s</code> = %(zone)s. Uklonite je iz okruženja da biste je mijenjali ovdje."
 
-#: src/postulo/applications/forms.py:179 src/postulo/jobs/forms.py:650
+#: src/postulo/applications/forms.py:181 src/postulo/jobs/forms.py:650
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Gornji iznos ne može biti ispod donjeg."
@@ -11473,7 +11675,7 @@ msgstr ""
 msgid "These records can name people and their applications."
 msgstr "Ovi zapisi mogu imenovati ljude i njihove prijave."
 
-#: src/postulo/applications/models.py:580
+#: src/postulo/applications/models.py:582
 #, draft
 msgid "They did not show up"
 msgstr "Nisu se pojavili"
@@ -11735,7 +11937,7 @@ msgstr "vremenska zona"
 msgid "Time zone for new accounts"
 msgstr "Vremenska zona za nove račune"
 
-#: src/postulo/applications/models.py:790
+#: src/postulo/applications/models.py:792
 #, draft
 msgid "timeline entry"
 msgstr "unos vremenske crte"
@@ -11787,7 +11989,7 @@ msgstr "Za odluku"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Za predaju oglasa (traži opseg captures):"
 
-#: src/postulo/applications/models.py:480
+#: src/postulo/applications/models.py:482
 #, draft
 msgid "to status"
 msgstr "u status"
@@ -12172,6 +12374,14 @@ msgstr ""
 msgid "Utilities"
 msgstr "Komunalne usluge"
 
+#: src/postulo/applications/models.py:869
+msgid "variable pay"
+msgstr ""
+
+#: src/postulo/applications/views.py:1358
+msgid "Variable pay"
+msgstr ""
+
 #: src/postulo/templates/server/design.html:117
 msgid "Variants"
 msgstr ""
@@ -12222,7 +12432,7 @@ msgstr "preko %(actor)s"
 msgid "Video"
 msgstr "Video"
 
-#: src/postulo/applications/models.py:569
+#: src/postulo/applications/models.py:571
 #, draft
 msgid "Video call"
 msgstr "Video poziv"
@@ -12259,7 +12469,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr "Poslije ovog čeka još: %(count)s."
 
-#: src/postulo/applications/models.py:720 src/postulo/jobs/models.py:991
+#: src/postulo/applications/models.py:722 src/postulo/jobs/models.py:991
 #, draft
 msgid "Waiting for review"
 msgstr "Čeka pregled"
@@ -12338,12 +12548,12 @@ msgstr "web stranica"
 msgid "Websites"
 msgstr "Web stranice"
 
-#: src/postulo/applications/agenda.py:489
+#: src/postulo/applications/agenda.py:522
 #, draft
 msgid "Week"
 msgstr "Sedmica"
 
-#: src/postulo/applications/agenda.py:526
+#: src/postulo/applications/agenda.py:559
 #: src/postulo/templates/applications/report.html:159
 #: src/postulo/templates/applications/report.html:185
 #: src/postulo/templates/applications/report_print.html:108
@@ -12413,6 +12623,11 @@ msgstr ""
 msgid "What could not be read"
 msgstr "Šta se nije moglo pročitati"
 
+#: src/postulo/templates/applications/offer_compare.html:24
+msgid ""
+"What each application standing at Offer was offered, side by side. Nothing here decides for you."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "What each plugin does, for everybody"
@@ -12476,7 +12691,7 @@ msgstr ""
 msgid "What it may do"
 msgstr "Šta smije raditi"
 
-#: src/postulo/applications/models.py:766
+#: src/postulo/applications/models.py:768
 #, draft
 msgid "what it says"
 msgstr "šta kaže"
@@ -12531,7 +12746,7 @@ msgstr ""
 msgid "What sort of thing it is, so the lists can be narrowed by it."
 msgstr ""
 
-#: src/postulo/applications/forms.py:376
+#: src/postulo/applications/forms.py:378
 msgid ""
 "What sort of thing it was. A status change and an interview write their own entries, so neither is offered here."
 msgstr ""
@@ -12590,7 +12805,7 @@ msgstr "Šta ova instalacija pokreće i gdje su joj podaci."
 msgid "What to call it"
 msgstr "Kako ga nazvati"
 
-#: src/postulo/applications/models.py:532
+#: src/postulo/applications/models.py:534
 #, draft
 msgid "what to do"
 msgstr "šta uraditi"
@@ -12603,7 +12818,7 @@ msgstr ""
 msgid "What to do about it, in a sentence."
 msgstr ""
 
-#: src/postulo/applications/forms.py:412
+#: src/postulo/applications/forms.py:414
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr ""
 
@@ -12662,7 +12877,7 @@ msgid ""
 msgstr ""
 "Koliko god vam vrijedi, jednom ili s vremena na vrijeme, na <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
 
-#: src/postulo/applications/models.py:533
+#: src/postulo/applications/models.py:535
 #, draft
 msgid "when"
 msgstr "kada"
@@ -12674,7 +12889,7 @@ msgstr "kada"
 msgid "When"
 msgstr "Kada"
 
-#: src/postulo/applications/models.py:774
+#: src/postulo/applications/models.py:776
 #, draft
 msgid "When accepting should also move the application."
 msgstr "Kada prihvatanje treba i pomjeriti prijavu."
@@ -12684,7 +12899,7 @@ msgstr "Kada prihvatanje treba i pomjeriti prijavu."
 msgid "When it entered your listings."
 msgstr "Kada je ušao u vaše oglase."
 
-#: src/postulo/applications/forms.py:380
+#: src/postulo/applications/forms.py:382
 msgid "When it happened, which is not always when you write it down."
 msgstr ""
 
@@ -12692,7 +12907,7 @@ msgstr ""
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr ""
 
-#: src/postulo/applications/forms.py:229
+#: src/postulo/applications/forms.py:231
 #, draft
 msgid ""
 "When you actually sent it. Left empty it is today, which is wrong for a search already under way — and reply times, the months and the report are measured from this date."
@@ -12706,7 +12921,7 @@ msgid ""
 msgstr ""
 "Kad registrujete ovu instancu kod pružaoca, dajte mu ovu adresu na koju će vraćati ljude:"
 
-#: src/postulo/applications/models.py:638
+#: src/postulo/applications/models.py:640
 #, draft
 msgid "where"
 msgstr "gdje"
@@ -12806,6 +13021,14 @@ msgstr "gdje živite"
 msgid "Where you studied, as you would write it on a CV."
 msgstr ""
 
+#: src/postulo/applications/models.py:880
+msgid "where you would work"
+msgstr ""
+
+#: src/postulo/applications/views.py:1361
+msgid "Where you would work"
+msgstr ""
+
 #: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
@@ -12863,7 +13086,7 @@ msgid ""
 msgstr ""
 "Na kojem su jeziku zapisani vaše iskustvo, obrazovanje i projekti. CV na drugom jeziku pokazuje šta ste preveli i kaže šta nije mogao."
 
-#: src/postulo/applications/forms.py:416
+#: src/postulo/applications/forms.py:418
 msgid "Which one it is about. Leave it empty for a reminder about none."
 msgstr ""
 
@@ -12872,7 +13095,7 @@ msgstr ""
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Koji dio Postula je ovo stvorio: web sučelje ili API."
 
-#: src/postulo/applications/models.py:336
+#: src/postulo/applications/models.py:338
 #, draft
 msgid "Which part of the employer this was for, if you know."
 msgstr "Za koji dio poslodavca je ovo bilo, ako znate."
@@ -12904,12 +13127,12 @@ msgstr ""
 msgid "Who may create an account here."
 msgstr "Ko ovdje smije stvoriti račun."
 
-#: src/postulo/applications/models.py:644
+#: src/postulo/applications/models.py:646
 #, draft
 msgid "who you are meeting"
 msgstr "s kim se sastajete"
 
-#: src/postulo/applications/forms.py:450
+#: src/postulo/applications/forms.py:452
 msgid ""
 "Who you are meeting. Only the people you have recorded at this company are offered."
 msgstr ""
@@ -12947,7 +13170,7 @@ msgstr "widgeti koji su već ponuđeni"
 msgid "Width of {column}"
 msgstr "Širina kolone {column}"
 
-#: src/postulo/templates/applications/application_detail.html:205
+#: src/postulo/templates/applications/application_detail.html:265
 #, draft
 msgid "With"
 msgstr "S"
@@ -12972,7 +13195,7 @@ msgstr "S lozinkom: traži se kod. Uvijek."
 msgid "With: %(people)s"
 msgstr "S: %(people)s"
 
-#: src/postulo/applications/models.py:60
+#: src/postulo/applications/models.py:62
 #, draft
 msgid "Withdrawn"
 msgstr "Povučeno"
@@ -12992,7 +13215,7 @@ msgstr "radilo %(when)s"
 msgid "Working"
 msgstr ""
 
-#: src/postulo/applications/forms.py:92 src/postulo/jobs/tables.py:238
+#: src/postulo/applications/forms.py:94 src/postulo/jobs/tables.py:238
 #: src/postulo/templates/applications/application_detail.html:72
 #, draft
 msgid "Working arrangement"
@@ -13103,7 +13326,7 @@ msgstr "Već imate kompaniju s tim imenom."
 msgid "You already have a CV or portfolio with that name."
 msgstr "Već imate biografiju ili portfolio s tim nazivom."
 
-#: src/postulo/applications/forms.py:532
+#: src/postulo/applications/forms.py:534
 #, draft
 msgid "You already have a tag with that name."
 msgstr "Već imate oznaku s tim imenom."
@@ -13306,7 +13529,7 @@ msgstr "Vaši podaci"
 msgid "Your data is ready to download."
 msgstr ""
 
-#: src/postulo/applications/forms.py:236
+#: src/postulo/applications/forms.py:238
 #: src/postulo/templates/applications/application_detail.html:100
 #, draft
 msgid "Your deadline"
@@ -13387,7 +13610,7 @@ msgstr "Vaše vlastito ime"
 msgid "Your own site, if you have one."
 msgstr "Vaša vlastita stranica, ako je imate."
 
-#: src/postulo/applications/forms.py:45
+#: src/postulo/applications/forms.py:47
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr ""
 
@@ -13416,11 +13639,11 @@ msgstr ""
 msgid "Your username has been changed."
 msgstr "Vaše korisničko ime je promijenjeno."
 
-#: src/postulo/applications/forms.py:40
+#: src/postulo/applications/forms.py:42
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."
 msgstr ""
 
-#: src/postulo/applications/forms.py:454
+#: src/postulo/applications/forms.py:456
 msgid "Yours, to prepare with. Nothing here is sent to anybody."
 msgstr ""
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 12:31+0000\n"
+"POT-Creation-Date: 2026-09-22 12:56+0000\n"
 "PO-Revision-Date: 2026-09-08 12:24+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Türkçe\n"
@@ -108,7 +108,14 @@ msgid_plural "%(counter)s days"
 msgstr[0] "%(counter)s gün"
 msgstr[1] "%(counter)s gün"
 
-#: src/postulo/templates/applications/application_detail.html:237
+#: src/postulo/templates/applications/application_detail.html:212
+#, python-format
+msgid "%(counter)s day of holiday"
+msgid_plural "%(counter)s days of holiday"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/templates/applications/application_detail.html:297
 #, python-format, draft
 msgid "%(counter)s earlier"
 msgid_plural "%(counter)s earlier"
@@ -158,17 +165,22 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "%(days)s gün önce"
 msgstr[1] "%(days)s gün önce"
 
-#: src/postulo/applications/agenda.py:558
+#: src/postulo/applications/agenda.py:591
 #, python-format, draft
 msgid "%(days)s days from %(day)s"
 msgstr "%(day)s tarihinden itibaren %(days)s gün"
 
-#: src/postulo/applications/models.py:388
+#: src/postulo/applications/models.py:390
 #, python-format, draft
 msgid ""
 "%(department)s is at %(company)s, which is not part of the same employer as this posting."
 msgstr ""
 "%(department)s, bu ilanla aynı işverene bağlı olmayan %(company)s bünyesinde."
+
+#: src/postulo/applications/views.py:1343
+#, python-format
+msgid "%(figure)s %(currency)s a year"
+msgstr ""
 
 #: src/postulo/applications/reports.py:108
 #, python-format, draft
@@ -197,22 +209,22 @@ msgstr "diskte %(kilobytes)s"
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s oluşturuldu. Şimdi içinde ne olacağını seç."
 
-#: src/postulo/applications/services.py:422
+#: src/postulo/applications/services.py:423
 #, python-format, draft
 msgid "%(kind)s held"
 msgstr "%(kind)s yapıldı"
 
-#: src/postulo/applications/services.py:375
+#: src/postulo/applications/services.py:376
 #, python-format, draft
 msgid "%(kind)s moved from %(old)s to %(new)s"
 msgstr "%(kind)s %(old)s tarihinden %(new)s tarihine taşındı"
 
-#: src/postulo/applications/services.py:433
+#: src/postulo/applications/services.py:434
 #, python-format, draft
 msgid "%(kind)s on %(when)s cancelled"
 msgstr "%(when)s tarihli %(kind)s iptal edildi"
 
-#: src/postulo/applications/services.py:342
+#: src/postulo/applications/services.py:343
 #, python-format, draft
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s %(when)s için planlandı"
@@ -408,7 +420,7 @@ msgstr ""
 msgid "%(ok)d answered, %(broken)d did not; the ones that did not say why."
 msgstr "%(ok)d yanıt verdi, %(broken)d vermedi; vermeyenler nedenini söylüyor."
 
-#: src/postulo/applications/services.py:156
+#: src/postulo/applications/services.py:157
 #, python-format, draft
 msgid "%(old)s → %(new)s"
 msgstr "%(old)s → %(new)s"
@@ -631,6 +643,10 @@ msgstr ""
 "{{ name }}\n"
 "{{ date }}"
 
+#: src/postulo/applications/models.py:871
+msgid "A bonus, commission, or a target: in their words, since the terms vary."
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html:52
 #, draft
 msgid ""
@@ -654,7 +670,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/api/api.py:369
+#: src/postulo/api/api.py:370
 #, draft
 msgid "A capture cannot come after the last of its batch."
 msgstr "Bir yakalama, kendi grubunun sonuncusundan sonra gelemez."
@@ -672,6 +688,11 @@ msgstr ""
 
 #: src/postulo/core/design.py:124
 msgid "A card, a table, the masthead once you have scrolled."
+msgstr ""
+
+#: src/postulo/templates/applications/offer_form.html:24
+msgid ""
+"A change is written on the timeline as a revision, so the record says what moved."
 msgstr ""
 
 #: src/postulo/templates/server/design.html:214
@@ -936,7 +957,7 @@ msgstr "Sessiz bir günlük, istediğiniz günlüktür."
 msgid "A reminder falls due"
 msgstr "Bir hatırlatmanın vakti geliyor"
 
-#: src/postulo/applications/forms.py:439
+#: src/postulo/applications/forms.py:441
 #, draft
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Bir hatırlatmanın vakti bir gün önceden gelir, önünde bir gün varsa."
@@ -1020,7 +1041,7 @@ msgstr "%(name)s kaynağından bir sınama iletisi"
 msgid "A text field"
 msgstr ""
 
-#: src/postulo/jobs/models.py:838
+#: src/postulo/applications/models.py:863 src/postulo/jobs/models.py:838
 #, draft
 msgid "A three-letter ISO 4217 code, such as EUR, GBP or USD."
 msgstr "EUR, GBP ya da USD gibi üç harfli bir ISO 4217 kodu."
@@ -1084,7 +1105,7 @@ msgstr ""
 msgid "Accept"
 msgstr "Kabul et"
 
-#: src/postulo/applications/models.py:58 src/postulo/applications/models.py:721
+#: src/postulo/applications/models.py:60 src/postulo/applications/models.py:723
 #: src/postulo/templates/accounts/invite_list.html:37
 #, draft
 msgid "Accepted"
@@ -1124,7 +1145,7 @@ msgid "Accounts"
 msgstr "Hesaplar"
 
 #: src/postulo/applications/analytics.py:41
-#: src/postulo/applications/models.py:53
+#: src/postulo/applications/models.py:55
 #, draft
 msgid "Acknowledged"
 msgstr "Görüldü"
@@ -1158,7 +1179,7 @@ msgstr "%(name)s için eylemler"
 msgid "Actions for %(what)s"
 msgstr ""
 
-#: src/postulo/templates/applications/application_detail.html:263
+#: src/postulo/templates/applications/application_detail.html:323
 #: src/postulo/templates/jobs/company_detail.html:195
 #: src/postulo/templates/resume/overview.html:49
 #: src/postulo/templates/resume/overview.html:54
@@ -1281,7 +1302,7 @@ msgid ""
 msgstr ""
 "%(total)s girdi eklendi. Hiçbir şeyin üzerine yazılmadı; yinelenen ne varsa silmek size kalmış."
 
-#: src/postulo/applications/views.py:593 src/postulo/applications/views.py:1215
+#: src/postulo/applications/views.py:598 src/postulo/applications/views.py:1220
 #, draft
 msgid "Added to the timeline."
 msgstr "Zaman çizelgesine eklendi."
@@ -1331,7 +1352,7 @@ msgstr "danışman %(adviser)s"
 msgid "Aerospace"
 msgstr "Havacılık ve uzay"
 
-#: src/postulo/applications/agenda.py:491
+#: src/postulo/applications/agenda.py:524
 #, draft
 msgid "Agenda"
 msgstr "Ajanda"
@@ -1393,11 +1414,15 @@ msgid ""
 "All of them are offered, and a language added in a later release will be too."
 msgstr "Hepsi sunuluyor; sonraki bir sürümde eklenen bir dil de sunulacak."
 
-#: src/postulo/applications/agenda.py:101
+#: src/postulo/applications/agenda.py:105
+msgid "Already answered —"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:103
 msgid "Already decided —"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:99
+#: src/postulo/applications/agenda.py:101
 msgid "Already sent —"
 msgstr ""
 
@@ -1421,7 +1446,7 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr "“Diğer” türünde bir tanımlayıcının bir ada ihtiyacı var."
 
-#: src/postulo/applications/models.py:641
+#: src/postulo/applications/models.py:643
 #, draft
 msgid "An address, or the link to the call."
 msgstr "Bir adres ya da görüşmenin bağlantısı."
@@ -1511,6 +1536,29 @@ msgstr ""
 msgid "answer"
 msgstr "yanıt"
 
+#: src/postulo/applications/services.py:524
+#, python-format
+msgid "Answer %(company)s about their offer by %(day)s"
+msgstr ""
+
+#: src/postulo/applications/models.py:888
+msgid "answer by"
+msgstr ""
+
+#: src/postulo/applications/views.py:1366
+msgid "Answer by"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:207
+#, python-format
+msgid "answer by %(day)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:289
+#, python-format
+msgid "Answer by: %(company)s"
+msgstr ""
+
 #: src/postulo/resume/models.py:246
 #, draft
 msgid "Answered"
@@ -1520,6 +1568,10 @@ msgstr "Yanıt verdi"
 #, python-format, draft
 msgid "Answered %(code)s."
 msgstr "%(code)s yanıtı verdi."
+
+#: src/postulo/applications/agenda.py:78
+msgid "Answers due"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
@@ -1555,7 +1607,11 @@ msgid ""
 msgstr ""
 "Burada seçilen her şey şu anki hâliyle işlenir ve değişmeden saklanır. Aylar sonra bir görüşmeci CV'nizdeki bir satırı sorduğunda, o zamandan beri düzenlediğiniz sürüm değil, onların okuduğu sürüm elinizde olur."
 
-#: src/postulo/applications/forms.py:382
+#: src/postulo/applications/forms.py:579
+msgid "Anything else worth remembering about it: who made it, what was said."
+msgstr ""
+
+#: src/postulo/applications/forms.py:384
 msgid "Anything longer worth keeping with it. It sits under the line."
 msgstr ""
 
@@ -1588,11 +1644,12 @@ msgstr "API jetonları"
 msgid "Appearance"
 msgstr "Görünüm"
 
-#: src/postulo/applications/models.py:362
-#: src/postulo/applications/models.py:472
-#: src/postulo/applications/models.py:530
-#: src/postulo/applications/models.py:630
-#: src/postulo/applications/models.py:759 src/postulo/applications/tables.py:21
+#: src/postulo/applications/models.py:364
+#: src/postulo/applications/models.py:474
+#: src/postulo/applications/models.py:532
+#: src/postulo/applications/models.py:632
+#: src/postulo/applications/models.py:761
+#: src/postulo/applications/models.py:853 src/postulo/applications/tables.py:21
 #: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:1038
 #: src/postulo/templates/core/import_csv_map.html:99
 #, draft
@@ -1607,12 +1664,12 @@ msgstr "başvuru"
 msgid "Application"
 msgstr "Başvuru"
 
-#: src/postulo/applications/services.py:199
+#: src/postulo/applications/services.py:200
 #, draft
 msgid "Application created"
 msgstr "Başvuru oluşturuldu"
 
-#: src/postulo/applications/views.py:499
+#: src/postulo/applications/views.py:504
 #, draft
 msgid "Application deleted."
 msgstr "Başvuru silindi."
@@ -1622,12 +1679,12 @@ msgstr "Başvuru silindi."
 msgid "Application recorded from the capture."
 msgstr "Başvuru yakalamadan kaydedildi."
 
-#: src/postulo/applications/views.py:415 src/postulo/jobs/listing_views.py:283
+#: src/postulo/applications/views.py:420 src/postulo/jobs/listing_views.py:283
 #, draft
 msgid "Application recorded."
 msgstr "Başvuru kaydedildi."
 
-#: src/postulo/applications/views.py:455
+#: src/postulo/applications/views.py:460
 #, draft
 msgid "Application updated."
 msgstr "Başvuru güncellendi."
@@ -1645,7 +1702,7 @@ msgstr "Başvuru güncellendi."
 msgid "Applications"
 msgstr "Başvurular"
 
-#: src/postulo/applications/models.py:363 src/postulo/applications/tables.py:21
+#: src/postulo/applications/models.py:365 src/postulo/applications/tables.py:21
 #, draft
 msgid "applications"
 msgstr "başvurular"
@@ -1702,7 +1759,7 @@ msgid "Applications, with their timelines"
 msgstr "Başvurular ve zaman çizelgeleri"
 
 #: src/postulo/applications/analytics.py:40
-#: src/postulo/applications/models.py:52 src/postulo/applications/tables.py:52
+#: src/postulo/applications/models.py:54 src/postulo/applications/tables.py:52
 #: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:928
 #: src/postulo/templates/core/import_csv_map.html:80
 #, draft
@@ -1714,7 +1771,7 @@ msgstr "Başvuruldu"
 msgid "Applied in the last 30 days"
 msgstr "Son 30 günde başvurulan"
 
-#: src/postulo/applications/forms.py:226
+#: src/postulo/applications/forms.py:228
 #: src/postulo/applications/reports.py:526
 #: src/postulo/jobs/capture_views.py:200
 #: src/postulo/templates/applications/application_detail.html:94
@@ -1724,7 +1781,7 @@ msgstr "Son 30 günde başvurulan"
 msgid "Applied on"
 msgstr "Başvurulma tarihi"
 
-#: src/postulo/applications/models.py:302
+#: src/postulo/applications/models.py:304
 #, draft
 msgid "applied on"
 msgstr "başvurulma tarihi"
@@ -1734,14 +1791,14 @@ msgstr "başvurulma tarihi"
 msgid "Applied on an unknown date"
 msgstr "Bilinmeyen bir tarihte başvuruldu"
 
-#: src/postulo/applications/forms.py:213 src/postulo/applications/tables.py:77
+#: src/postulo/applications/forms.py:215 src/postulo/applications/tables.py:77
 #: src/postulo/core/csv_import.py:51
 #: src/postulo/templates/applications/application_detail.html:88
 #, draft
 msgid "Applied through"
 msgstr "Şu yolla başvuruldu"
 
-#: src/postulo/applications/models.py:298
+#: src/postulo/applications/models.py:300
 #, draft
 msgid "applied through"
 msgstr "başvuru yolu"
@@ -1819,14 +1876,19 @@ msgstr ""
 msgid "As they will read it"
 msgstr ""
 
+#: src/postulo/templates/applications/offer_form.html:26
+msgid ""
+"As they wrote it. The application moves to Offer, and an answer-by date goes on the calendar."
+msgstr ""
+
 #: src/postulo/applications/analytics.py:44
-#: src/postulo/applications/models.py:56
+#: src/postulo/applications/models.py:58
 #, draft
 msgid "Assessment"
 msgstr "Değerlendirme"
 
-#: src/postulo/applications/models.py:437
-#: src/postulo/applications/models.py:572
+#: src/postulo/applications/models.py:439
+#: src/postulo/applications/models.py:574
 #, draft
 msgid "Assessment or test"
 msgstr "Değerlendirme ya da sınav"
@@ -1955,10 +2017,26 @@ msgstr ""
 msgid "Banking"
 msgstr "Bankacılık"
 
+#: src/postulo/applications/models.py:856
+msgid "base pay"
+msgstr ""
+
+#: src/postulo/applications/views.py:1356
+msgid "Base pay"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:82
 #, draft
 msgid "Becomes"
 msgstr "Şuna dönüşür"
+
+#: src/postulo/applications/models.py:875
+msgid "benefits"
+msgstr ""
+
+#: src/postulo/applications/views.py:1360
+msgid "Benefits"
+msgstr ""
 
 #: src/postulo/jobs/industries.py:73
 #, draft
@@ -1988,6 +2066,10 @@ msgstr ""
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "Bir hesap tablosunu içeri almak"
+
+#: src/postulo/applications/views.py:1357
+msgid "Brought to a year"
+msgstr ""
 
 #: src/postulo/notifications/models.py:30
 #, draft
@@ -2045,7 +2127,7 @@ msgid "C2 — proficient"
 msgstr "C2 — yetkin"
 
 #: src/postulo/core/navigation.py:76
-#: src/postulo/templates/applications/application_detail.html:215
+#: src/postulo/templates/applications/application_detail.html:275
 #: src/postulo/templates/applications/calendar.html:6
 #: src/postulo/templates/applications/calendar.html:67
 #: src/postulo/templates/applications/calendar.html:128
@@ -2060,7 +2142,7 @@ msgstr "Takvim"
 msgid "Calendar file"
 msgstr "Takvim dosyası"
 
-#: src/postulo/applications/models.py:655
+#: src/postulo/applications/models.py:657
 #, draft
 msgid "calendar identifier"
 msgstr "takvim tanımlayıcısı"
@@ -2070,7 +2152,7 @@ msgstr "takvim tanımlayıcısı"
 msgid "Calendar views"
 msgstr "Takvim görünümleri"
 
-#: src/postulo/applications/models.py:433
+#: src/postulo/applications/models.py:435
 #, draft
 msgid "Call"
 msgstr "Arama"
@@ -2085,6 +2167,7 @@ msgstr "Ona kaydedilecek geri dönüş adresi"
 #: src/postulo/templates/applications/application_form.html:32
 #: src/postulo/templates/applications/application_intake.html:77
 #: src/postulo/templates/applications/interview_form.html:70
+#: src/postulo/templates/applications/offer_form.html:52
 #: src/postulo/templates/applications/reminder_form.html:22
 #: src/postulo/templates/applications/tag_form.html:85
 #: src/postulo/templates/connections/confirm_delete.html:19
@@ -2110,13 +2193,13 @@ msgstr "Ona kaydedilecek geri dönüş adresi"
 msgid "Cancel"
 msgstr "Vazgeç"
 
-#: src/postulo/applications/models.py:579
+#: src/postulo/applications/models.py:581
 #: src/postulo/templates/applications/partials/interview_outcome.html:11
 #, draft
 msgid "Cancelled"
 msgstr "İptal edildi"
 
-#: src/postulo/applications/agenda.py:95
+#: src/postulo/applications/agenda.py:97
 msgid "Cancelled interview:"
 msgstr ""
 
@@ -2290,7 +2373,7 @@ msgid ""
 msgstr ""
 "Burada yapılan değişiklikler bir sonraki turda gönderilir; karşı taraf da o zaman okunur."
 
-#: src/postulo/applications/views.py:785
+#: src/postulo/applications/views.py:790
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "%(company)s şirketine %(role)s için hatırlat"
@@ -2384,7 +2467,7 @@ msgstr "Kaydedilecek en az bir belge seçin."
 msgid "Choose what kind of identifier this is."
 msgstr "Bunun ne tür bir tanımlayıcı olduğunu seçin."
 
-#: src/postulo/applications/views.py:1211
+#: src/postulo/applications/views.py:1216
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Önce bunun hangi başvuruyla ilgili olduğunu seçin."
@@ -2440,7 +2523,7 @@ msgstr "İstemci gizli anahtarı"
 msgid "Closed"
 msgstr "Kapandı"
 
-#: src/postulo/applications/models.py:308 src/postulo/jobs/models.py:863
+#: src/postulo/applications/models.py:310 src/postulo/jobs/models.py:863
 #, draft
 msgid "closed on"
 msgstr "kapanma tarihi"
@@ -2456,7 +2539,7 @@ msgstr "Kapanmış ya da çoktan dolmuş"
 msgid "Closes"
 msgstr "Kapanıyor"
 
-#: src/postulo/applications/agenda.py:284
+#: src/postulo/applications/agenda.py:317
 #, python-format
 msgid "Closes: %(role)s"
 msgstr ""
@@ -2465,7 +2548,7 @@ msgstr ""
 msgid "closing announced for"
 msgstr ""
 
-#: src/postulo/applications/forms.py:163
+#: src/postulo/applications/forms.py:165
 #, draft
 msgid "Closing date"
 msgstr "Kapanış tarihi"
@@ -2475,7 +2558,7 @@ msgstr "Kapanış tarihi"
 msgid "closing date"
 msgstr "kapanış tarihi"
 
-#: src/postulo/applications/agenda.py:76
+#: src/postulo/applications/agenda.py:77
 msgid "Closing dates"
 msgstr ""
 
@@ -2584,7 +2667,7 @@ msgstr "Oluşturulan şirketler"
 msgid "Companies you have applied to"
 msgstr "Başvurduğunuz şirketler"
 
-#: src/postulo/applications/forms.py:73 src/postulo/applications/reports.py:527
+#: src/postulo/applications/forms.py:75 src/postulo/applications/reports.py:527
 #: src/postulo/applications/tables.py:33 src/postulo/core/csv_import.py:40
 #: src/postulo/jobs/tables.py:194
 #: src/postulo/templates/applications/report.html:250
@@ -2628,7 +2711,7 @@ msgstr "şirket tanımlayıcıları"
 msgid "Company updated."
 msgstr "Şirket güncellendi."
 
-#: src/postulo/applications/models.py:127
+#: src/postulo/applications/models.py:129
 #, draft
 msgid "Company website"
 msgstr "Şirket web sitesi"
@@ -2637,6 +2720,10 @@ msgstr "Şirket web sitesi"
 #, draft
 msgid "Company's Wikidata id"
 msgstr "Şirketin Wikidata kimliği"
+
+#: src/postulo/templates/applications/application_detail.html:187
+msgid "Compare"
+msgstr ""
 
 #: src/postulo/plugins/models.py:199
 #, draft
@@ -2768,7 +2855,7 @@ msgstr "kişiler"
 msgid "Containing"
 msgstr "İçeren"
 
-#: src/postulo/applications/models.py:779
+#: src/postulo/applications/models.py:781
 #, draft
 msgid "context"
 msgstr "bağlam"
@@ -2902,13 +2989,13 @@ msgstr "oluşturan"
 msgid "credential link"
 msgstr "kimlik bilgisi bağlantısı"
 
-#: src/postulo/applications/forms.py:128
+#: src/postulo/applications/forms.py:130
 #: src/postulo/templates/core/import_csv_map.html:58
 #, draft
 msgid "Currency"
 msgstr "Para birimi"
 
-#: src/postulo/jobs/models.py:833
+#: src/postulo/applications/models.py:859 src/postulo/jobs/models.py:833
 #, draft
 msgid "currency"
 msgstr "para birimi"
@@ -2989,7 +3076,7 @@ msgstr "Veritabanı"
 msgid "Date applied"
 msgstr "Başvuru tarihi"
 
-#: src/postulo/applications/models.py:777
+#: src/postulo/applications/models.py:779
 #, draft
 msgid "dates offered"
 msgstr "önerilen tarihler"
@@ -3009,7 +3096,7 @@ msgstr "Tarihlerin yazılışı"
 msgid "Dates you choose"
 msgstr "Kendi seçtiğin tarihler"
 
-#: src/postulo/applications/agenda.py:490
+#: src/postulo/applications/agenda.py:523
 #, draft
 msgid "Day"
 msgstr "Gün"
@@ -3026,6 +3113,14 @@ msgstr[1] "gün"
 #, draft
 msgid "day / month / year (31/12/2026)"
 msgstr "gün / ay / yıl (31/12/2026)"
+
+#: src/postulo/applications/models.py:885
+msgid "days of holiday a year"
+msgstr ""
+
+#: src/postulo/applications/views.py:1363
+msgid "Days of holiday a year"
+msgstr ""
 
 #: src/postulo/accounts/models.py:387
 msgid "Days of warning before a listing you have not decided about closes."
@@ -3055,7 +3150,7 @@ msgstr "Devre dışı bırak"
 msgid "Deactivated"
 msgstr "Devre dışı"
 
-#: src/postulo/applications/models.py:307
+#: src/postulo/applications/models.py:309
 #, draft
 msgid "deadline"
 msgstr "son tarih"
@@ -3065,12 +3160,12 @@ msgstr "son tarih"
 msgid "Deadline"
 msgstr "Son tarih"
 
-#: src/postulo/applications/agenda.py:257
+#: src/postulo/applications/agenda.py:263
 #, python-format
 msgid "Deadline: %(role)s"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:75
+#: src/postulo/applications/agenda.py:76
 msgid "Deadlines"
 msgstr ""
 
@@ -3162,12 +3257,12 @@ msgstr "karar tarihi"
 msgid "Decline"
 msgstr "Geri çevir"
 
-#: src/postulo/applications/models.py:722
+#: src/postulo/applications/models.py:724
 #, draft
 msgid "Declined"
 msgstr "Geri çevrildi"
 
-#: src/postulo/applications/views.py:1203
+#: src/postulo/applications/views.py:1208
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Geri çevrildi. Bir daha önerilmeyecek."
@@ -3198,6 +3293,7 @@ msgid "Defence"
 msgstr "Savunma"
 
 #: src/postulo/templates/applications/application_detail.html:40
+#: src/postulo/templates/applications/application_detail.html:221
 #: src/postulo/templates/applications/tag_list.html:38
 #: src/postulo/templates/cotton/reminder_actions.html:60
 #: src/postulo/templates/documents/cv_detail.html:30
@@ -3244,7 +3340,7 @@ msgstr "Kendi hesabınızı buradan değil, Ayarlar'dan silin."
 msgid "density"
 msgstr ""
 
-#: src/postulo/applications/models.py:335 src/postulo/jobs/models.py:521
+#: src/postulo/applications/models.py:337 src/postulo/jobs/models.py:521
 #: src/postulo/jobs/models.py:554
 #, draft
 msgid "department"
@@ -3270,7 +3366,7 @@ msgstr "Şuna bağlı"
 msgid "Depth"
 msgstr ""
 
-#: src/postulo/applications/forms.py:169 src/postulo/core/csv_import.py:54
+#: src/postulo/applications/forms.py:171 src/postulo/core/csv_import.py:54
 #: src/postulo/jobs/tables.py:294
 #: src/postulo/templates/jobs/posting_detail.html:60
 #, draft
@@ -3300,12 +3396,12 @@ msgstr ""
 msgid "Destructive ghost"
 msgstr ""
 
-#: src/postulo/applications/models.py:767
+#: src/postulo/applications/models.py:769
 #, draft
 msgid "detail"
 msgstr "ayrıntı"
 
-#: src/postulo/applications/models.py:477
+#: src/postulo/applications/models.py:479
 #, draft
 msgid "details"
 msgstr "ayrıntılar"
@@ -3434,12 +3530,12 @@ msgstr "Tamam"
 msgid "done as it is asked for"
 msgstr ""
 
-#: src/postulo/applications/models.py:534
+#: src/postulo/applications/models.py:536
 #, draft
 msgid "done on"
 msgstr "tamamlanma tarihi"
 
-#: src/postulo/applications/agenda.py:97
+#: src/postulo/applications/agenda.py:99
 msgid "Done reminder:"
 msgstr ""
 
@@ -3471,7 +3567,7 @@ msgstr "Dosyaların kendisini indir"
 msgid "Download the template"
 msgstr "Şablonu indir"
 
-#: src/postulo/applications/models.py:51
+#: src/postulo/applications/models.py:53
 #, draft
 msgid "Draft"
 msgstr "Taslak"
@@ -3535,6 +3631,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:37
 #: src/postulo/templates/applications/application_detail.html:218
+#: src/postulo/templates/applications/application_detail.html:278
 #: src/postulo/templates/applications/interview_list.html:88
 #: src/postulo/templates/applications/tag_list.html:34
 #: src/postulo/templates/connections/list.html:72
@@ -3561,6 +3658,11 @@ msgstr "Başvuruyu düzenle"
 #, draft
 msgid "Edit interview"
 msgstr "Görüşmeyi düzenle"
+
+#: src/postulo/templates/applications/offer_form.html:4
+#: src/postulo/templates/applications/offer_form.html:21
+msgid "Edit offer"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html:65
 #, draft
@@ -3591,7 +3693,7 @@ msgid ""
 msgstr ""
 "Her iki Europass biçimi de olur: europass.europa.eu'nun bugün dışa aktardığı JSON ya da eski CV düzenleyicisinin ürettiği ve diskinizdeki daha eski bir dışa aktarmanın hâlâ olduğu XML. Postulo hangisi olduğunu kendisi anlar, içinde ne olduğunu size gösterir ve siz söyleyene kadar hiçbir şey yazmaz."
 
-#: src/postulo/applications/models.py:133
+#: src/postulo/applications/models.py:135
 #: src/postulo/core/server_sections.py:32 src/postulo/core/server_views.py:607
 #: src/postulo/templates/server/email.html:6
 #: src/postulo/templates/server/people.html:33
@@ -3621,12 +3723,12 @@ msgstr "E-posta adresi (isteğe bağlı)"
 msgid "Email addresses"
 msgstr "E-posta adresleri"
 
-#: src/postulo/applications/models.py:432
+#: src/postulo/applications/models.py:434
 #, draft
 msgid "Email received"
 msgstr "E-posta alındı"
 
-#: src/postulo/applications/models.py:431
+#: src/postulo/applications/models.py:433
 #, draft
 msgid "Email sent"
 msgstr "E-posta gönderildi"
@@ -3636,12 +3738,12 @@ msgstr "E-posta gönderildi"
 msgid "Employer"
 msgstr "İşveren"
 
-#: src/postulo/applications/models.py:132 src/postulo/jobs/models.py:217
+#: src/postulo/applications/models.py:134 src/postulo/jobs/models.py:217
 #, draft
 msgid "Employment service"
 msgstr "İş kurumu"
 
-#: src/postulo/applications/forms.py:98 src/postulo/jobs/tables.py:246
+#: src/postulo/applications/forms.py:100 src/postulo/jobs/tables.py:246
 #, draft
 msgid "Employment type"
 msgstr "Çalışma türü"
@@ -3666,7 +3768,7 @@ msgstr "Boş yakalama"
 msgid "Empty for the instance default; an account for an exception to it."
 msgstr "Kurulum varsayılanı için boş; ona bir istisna için bir hesap."
 
-#: src/postulo/applications/models.py:760
+#: src/postulo/applications/models.py:762
 #, draft
 msgid "Empty when the source could not tell which application it is about."
 msgstr "Kaynak, bunun hangi başvuruyla ilgili olduğunu söyleyemediğinde boş."
@@ -3676,7 +3778,7 @@ msgstr "Kaynak, bunun hangi başvuruyla ilgili olduğunu söyleyemediğinde boş
 msgid "enabled"
 msgstr "etkin"
 
-#: src/postulo/applications/models.py:636
+#: src/postulo/applications/models.py:638
 #, draft
 msgid "ends"
 msgstr "bitiş"
@@ -3690,6 +3792,14 @@ msgstr "Enerji"
 #, draft
 msgid "Engineering"
 msgstr "Mühendislik"
+
+#: src/postulo/applications/models.py:873
+msgid "equity"
+msgstr ""
+
+#: src/postulo/applications/views.py:1359
+msgid "Equity"
+msgstr ""
 
 #: src/postulo/core/models.py:763
 msgid "errand"
@@ -3706,18 +3816,18 @@ msgid ""
 msgstr ""
 "Europass her dil için beş düzey kaydeder, Postulo ise bir tane tutar; bu yüzden en düşüğü alınır. Dosya hiçbirini belirtmiyorsa hiçbiri yazılmaz: bir düzey, kendiniz hakkında birinin sınayacağı bir iddiadır; onu sonradan ortaya koymak size kalmış."
 
-#: src/postulo/applications/models.py:491
+#: src/postulo/applications/models.py:493
 #: src/postulo/notifications/models.py:23
 #, draft
 msgid "event"
 msgstr "etkinlik"
 
-#: src/postulo/applications/models.py:136
+#: src/postulo/applications/models.py:138
 #, draft
 msgid "Event or fair"
 msgstr "Etkinlik ya da fuar"
 
-#: src/postulo/applications/models.py:492
+#: src/postulo/applications/models.py:494
 #, draft
 msgid "events"
 msgstr "etkinlikler"
@@ -4088,7 +4198,7 @@ msgstr ""
 msgid "Files"
 msgstr "Dosyalar"
 
-#: src/postulo/applications/models.py:352
+#: src/postulo/applications/models.py:354
 #, draft
 msgid "files sent"
 msgstr "gönderilen dosyalar"
@@ -4098,7 +4208,7 @@ msgstr "gönderilen dosyalar"
 msgid "Files you already had"
 msgstr "Zaten sahip olduğunuz dosyalar"
 
-#: src/postulo/applications/models.py:353
+#: src/postulo/applications/models.py:355
 #, draft
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Postulo'nun ürettiği belgelerin aksine, zaten sahip olduğunuz dosyalar."
@@ -4193,12 +4303,12 @@ msgstr "Profilinizi izle"
 msgid "Follow-up note"
 msgstr "Hatırlatma notu"
 
-#: src/postulo/applications/views.py:779
+#: src/postulo/applications/views.py:784
 #, draft
 msgid "Follow-up recorded."
 msgstr "Hatırlatma kaydedildi."
 
-#: src/postulo/applications/models.py:440 src/postulo/applications/views.py:776
+#: src/postulo/applications/models.py:442 src/postulo/applications/views.py:781
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4293,7 +4403,7 @@ msgstr "%(url)s adresinde bir logo bulundu."
 msgid "Found on their website"
 msgstr "Kendi web sitelerinde bulundu"
 
-#: src/postulo/applications/forms.py:104
+#: src/postulo/applications/forms.py:106
 #: src/postulo/applications/reports.py:529 src/postulo/core/csv_import.py:52
 #: src/postulo/jobs/tables.py:231
 #: src/postulo/templates/applications/report.html:252
@@ -4384,7 +4494,7 @@ msgstr "Gravatar'dan"
 msgid "From level"
 msgstr "Şu düzeyden"
 
-#: src/postulo/applications/models.py:479
+#: src/postulo/applications/models.py:481
 #, draft
 msgid "from status"
 msgstr "eski durum"
@@ -4423,7 +4533,7 @@ msgstr "Beni geri alır — önce doğrulanması gerekir"
 msgid "Ghost"
 msgstr ""
 
-#: src/postulo/applications/models.py:61
+#: src/postulo/applications/models.py:63
 #: src/postulo/templates/widgets/gone_quiet.html:55
 #: src/postulo/templates/widgets/outcomes.html:18
 #, draft
@@ -4540,12 +4650,12 @@ msgid ""
 msgstr ""
 "İlgili becerileri “Diller” ya da “Altyapı” gibi bir başlık altında toplayın."
 
-#: src/postulo/applications/models.py:768
+#: src/postulo/applications/models.py:770
 #, draft
 msgid "happened"
 msgstr "gerçekleşti"
 
-#: src/postulo/applications/models.py:475
+#: src/postulo/applications/models.py:477
 #, draft
 msgid "happened on"
 msgstr "gerçekleşme tarihi"
@@ -4566,7 +4676,7 @@ msgstr "Sağlık"
 msgid "Health check"
 msgstr "Sağlık denetimi"
 
-#: src/postulo/applications/models.py:578
+#: src/postulo/applications/models.py:580
 #: src/postulo/templates/applications/partials/interview_outcome.html:8
 #, draft
 msgid "Held"
@@ -4591,7 +4701,7 @@ msgstr "gizli gezinme öğeleri"
 msgid "Hide %(what)s"
 msgstr ""
 
-#: src/postulo/applications/models.py:143
+#: src/postulo/applications/models.py:145
 #, draft
 msgid "High"
 msgstr "Yüksek"
@@ -4629,7 +4739,7 @@ msgstr "Konaklama ve turizm"
 msgid "How choosy you have been"
 msgstr "Ne kadar seçici davrandığınız"
 
-#: src/postulo/templates/applications/application_detail.html:224
+#: src/postulo/templates/applications/application_detail.html:284
 #: src/postulo/templates/applications/interview_list.html:77
 #, draft
 msgid "How did it go?"
@@ -4773,7 +4883,7 @@ msgstr "tanımlayıcı"
 msgid "Identifier"
 msgstr "Tanımlayıcı"
 
-#: src/postulo/applications/models.py:763
+#: src/postulo/applications/models.py:765
 #, draft
 msgid "identifier at the source"
 msgstr "kaynaktaki tanımlayıcı"
@@ -4935,12 +5045,12 @@ msgstr "%(when)s tarihinde %(company)s şirketine gönderdiğiniz %(kind)s için
 msgid "In the diary"
 msgstr "Günlükte"
 
-#: src/postulo/applications/forms.py:413
+#: src/postulo/applications/forms.py:415
 msgid ""
 "In your time zone. Any notifier you have switched on is told at that moment."
 msgstr ""
 
-#: src/postulo/applications/forms.py:446
+#: src/postulo/applications/forms.py:448
 msgid ""
 "In your time zone. The calendar file Postulo makes writes it in UTC, so it lands at the right moment wherever it is opened."
 msgstr ""
@@ -5062,61 +5172,61 @@ msgstr "İç"
 msgid "Internship"
 msgstr "Staj"
 
-#: src/postulo/applications/models.py:434
+#: src/postulo/applications/models.py:436
 #, draft
 msgid "Interview"
 msgstr "Görüşme"
 
-#: src/postulo/applications/models.py:669
+#: src/postulo/applications/models.py:671
 #, draft
 msgid "interview"
 msgstr "görüşme"
 
-#: src/postulo/applications/models.py:436
+#: src/postulo/applications/models.py:438
 #, draft
 msgid "Interview cancelled"
 msgstr "Görüşme iptal edildi"
 
-#: src/postulo/applications/views.py:870
+#: src/postulo/applications/views.py:875
 #, draft
 msgid "Interview recorded."
 msgstr "Görüşme kaydedildi."
 
-#: src/postulo/applications/models.py:435
+#: src/postulo/applications/models.py:437
 #, draft
 msgid "Interview scheduled"
 msgstr "Görüşme planlandı"
 
-#: src/postulo/applications/views.py:872
+#: src/postulo/applications/views.py:877
 #, draft
 msgid "Interview scheduled."
 msgstr "Görüşme planlandı."
 
-#: src/postulo/applications/services.py:293
+#: src/postulo/applications/services.py:294
 #, python-format, draft
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Yarın görüşme: %(company)s şirketinde %(kind)s, %(time)s"
 
-#: src/postulo/applications/views.py:902
+#: src/postulo/applications/views.py:907
 #, draft
 msgid "Interview updated."
 msgstr "Görüşme güncellendi."
 
-#: src/postulo/applications/agenda.py:94
+#: src/postulo/applications/agenda.py:96
 #, draft
 msgid "Interview:"
 msgstr "Görüşme:"
 
 #: src/postulo/applications/analytics.py:43
-#: src/postulo/applications/models.py:55
+#: src/postulo/applications/models.py:57
 #, draft
 msgid "Interviewing"
 msgstr "Görüşmede"
 
-#: src/postulo/applications/agenda.py:73
+#: src/postulo/applications/agenda.py:74
 #: src/postulo/applications/widgets.py:237
 #: src/postulo/templates/accounts/delete_account.html:24
-#: src/postulo/templates/applications/application_detail.html:177
+#: src/postulo/templates/applications/application_detail.html:237
 #: src/postulo/templates/applications/interview_list.html:6
 #: src/postulo/templates/applications/interview_list.html:11
 #: src/postulo/templates/widgets/industries.html:12
@@ -5125,7 +5235,7 @@ msgstr "Görüşmede"
 msgid "Interviews"
 msgstr "Görüşmeler"
 
-#: src/postulo/applications/models.py:670
+#: src/postulo/applications/models.py:672
 #, draft
 msgid "interviews"
 msgstr "görüşmeler"
@@ -5200,7 +5310,7 @@ msgid ""
 msgstr ""
 "Bu kurulumdaki her şeyi, üzerindeki her kişi için okuyabilir ve değiştirebilir. Yalnızca okuduğunuzu ya da güvenmek için nedeniniz olanı kurun. Hiçbir şey kendiliğinden güncellenmez: bir güncelleme bir kod değişikliğidir ve ona bir yönetici tıklar."
 
-#: src/postulo/applications/forms.py:491
+#: src/postulo/applications/forms.py:493
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Başlamadan bitemez."
@@ -5214,7 +5324,7 @@ msgstr ""
 msgid "it did not finish importing within %(seconds)ss"
 msgstr ""
 
-#: src/postulo/applications/views.py:727
+#: src/postulo/applications/views.py:732
 msgid "It is already done."
 msgstr ""
 
@@ -5257,6 +5367,10 @@ msgid ""
 "It sets the shape the box below starts from, and which themes are offered."
 msgstr ""
 
+#: src/postulo/templates/applications/application_detail.html:229
+msgid "It stands at Offer, and what was offered is not written down yet."
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_created.html:33
 #, python-format
 msgid "It works until %(when)s, or until it is used or revoked."
@@ -5277,7 +5391,7 @@ msgstr "Dosyası, bu örnekteki bir deponun imzaladığıyla eşleşiyor."
 msgid "Its file matches what the official repository signed."
 msgstr "Dosyası, resmî deponun imzaladığıyla eşleşiyor."
 
-#: src/postulo/applications/models.py:128
+#: src/postulo/applications/models.py:130
 #, draft
 msgid "Job board"
 msgstr "İş ilan sitesi"
@@ -5303,7 +5417,7 @@ msgstr "İş arama raporu"
 msgid "Job search report · %(period)s"
 msgstr "İş arama raporu · %(period)s"
 
-#: src/postulo/applications/forms.py:77
+#: src/postulo/applications/forms.py:79
 #, draft
 msgid "Job title"
 msgstr "İş unvanı"
@@ -5313,7 +5427,7 @@ msgstr "İş unvanı"
 msgid "Jobs"
 msgstr "İşler"
 
-#: src/postulo/templates/applications/application_detail.html:197
+#: src/postulo/templates/applications/application_detail.html:257
 #: src/postulo/templates/applications/interview_list.html:66
 #, draft
 msgid "Join the call"
@@ -5384,9 +5498,9 @@ msgid ""
 msgstr ""
 "Tuşlar: <kbd>d</kbd> atar ve devam eder, <kbd>j</kbd> sonrakine atlar, <kbd>Ctrl</kbd>+<kbd>Enter</kbd> kaydeder ve devam eder — hiçbir şey yazılmıyorken."
 
-#: src/postulo/applications/models.py:474
-#: src/postulo/applications/models.py:633
-#: src/postulo/applications/models.py:765 src/postulo/core/models.py:303
+#: src/postulo/applications/models.py:476
+#: src/postulo/applications/models.py:635
+#: src/postulo/applications/models.py:767 src/postulo/core/models.py:303
 #: src/postulo/core/models.py:528 src/postulo/core/models.py:657
 #: src/postulo/core/models.py:743 src/postulo/documents/models.py:167
 #: src/postulo/documents/models.py:372 src/postulo/documents/models.py:452
@@ -5624,7 +5738,7 @@ msgstr ""
 msgid "Leaving"
 msgstr "Ayrılıyor"
 
-#: src/postulo/applications/forms.py:455
+#: src/postulo/applications/forms.py:457
 #, draft
 msgid "Left blank, it lasts an hour."
 msgstr "Boş bırakılırsa bir saat sürer."
@@ -5748,7 +5862,7 @@ msgstr "bağlantılar"
 msgid "Links issued for this account"
 msgstr "Bu hesap için verilen bağlantılar"
 
-#: src/postulo/applications/models.py:345
+#: src/postulo/applications/models.py:347
 #, draft
 msgid "links sent"
 msgstr "gönderilen bağlantılar"
@@ -5817,7 +5931,7 @@ msgstr ""
 msgid "location"
 msgstr "yer"
 
-#: src/postulo/applications/forms.py:85 src/postulo/applications/tables.py:41
+#: src/postulo/applications/forms.py:87 src/postulo/applications/tables.py:41
 #: src/postulo/core/csv_import.py:44 src/postulo/jobs/tables.py:45
 #: src/postulo/jobs/tables.py:202
 #: src/postulo/templates/applications/application_detail.html:66
@@ -5874,7 +5988,7 @@ msgstr ""
 msgid "Loosen one of them, or start again."
 msgstr "Birini gevşetin ya da baştan başlayın."
 
-#: src/postulo/applications/models.py:141
+#: src/postulo/applications/models.py:143
 #, draft
 msgid "Low"
 msgstr "Düşük"
@@ -5969,7 +6083,7 @@ msgstr "postanın son hatası"
 msgid "Main"
 msgstr "Ana"
 
-#: src/postulo/applications/models.py:316
+#: src/postulo/applications/models.py:318
 #, draft
 msgid "main contact"
 msgstr "ana kişi"
@@ -6017,7 +6131,7 @@ msgstr "Üretim"
 msgid "Map a column to Company and one to Role first."
 msgstr "Önce bir sütunu Şirket'e, birini de Pozisyon'a eşleyin."
 
-#: src/postulo/applications/views.py:656
+#: src/postulo/applications/views.py:661
 #, draft
 msgid "Marked as done."
 msgstr "Tamamlandı olarak işaretlendi."
@@ -6109,7 +6223,7 @@ msgstr "Para"
 msgid "Money and dates"
 msgstr "Para ve tarihler"
 
-#: src/postulo/applications/agenda.py:488
+#: src/postulo/applications/agenda.py:521
 #: src/postulo/templates/applications/report.html:66
 #, draft
 msgid "Month"
@@ -6334,7 +6448,7 @@ msgstr "Bunu en son düzenlemenizden bu yana yeni"
 msgid "New tag"
 msgstr "Yeni etiket"
 
-#: src/postulo/applications/forms.py:248 src/postulo/applications/forms.py:302
+#: src/postulo/applications/forms.py:250 src/postulo/applications/forms.py:304
 #, draft
 msgid "New tags"
 msgstr "Yeni etiketler"
@@ -6608,7 +6722,7 @@ msgstr ""
 msgid "Nobody recorded here yet."
 msgstr "Burada henüz kayıtlı kimse yok."
 
-#: src/postulo/applications/services.py:443
+#: src/postulo/applications/services.py:444
 #, python-format, draft
 msgid "Nobody showed up for the %(kind)s"
 msgstr "%(kind)s için kimse gelmedi"
@@ -6659,7 +6773,7 @@ msgstr "Henüz yok."
 msgid "None yet. This entry prints its original text on every CV."
 msgstr "Henüz hiçbiri. Bu kayıt her CV’de özgün metnini yazdırır."
 
-#: src/postulo/applications/models.py:142
+#: src/postulo/applications/models.py:144
 #, draft
 msgid "Normal"
 msgstr "Normal"
@@ -6807,7 +6921,7 @@ msgstr "Henüz %(tongue)s dilinde yazılmadı. Bunlar olduğu gibi yazdırılır
 msgid "note"
 msgstr "not"
 
-#: src/postulo/applications/forms.py:365 src/postulo/applications/models.py:430
+#: src/postulo/applications/forms.py:367 src/postulo/applications/models.py:432
 #, draft
 msgid "Note"
 msgstr "Not"
@@ -6832,17 +6946,18 @@ msgstr "%(when)s not edildi"
 msgid "noted on"
 msgstr "not edilme tarihi"
 
-#: src/postulo/core/csv_import.py:55 src/postulo/jobs/tables.py:118
+#: src/postulo/applications/models.py:893 src/postulo/documents/models.py:463
+#: src/postulo/jobs/models.py:259 src/postulo/jobs/models.py:570
+#, draft
+msgid "notes"
+msgstr "notlar"
+
+#: src/postulo/applications/views.py:1367 src/postulo/core/csv_import.py:55
+#: src/postulo/jobs/tables.py:118
 #: src/postulo/templates/jobs/company_detail.html:186
 #, draft
 msgid "Notes"
 msgstr "Notlar"
-
-#: src/postulo/documents/models.py:463 src/postulo/jobs/models.py:259
-#: src/postulo/jobs/models.py:570
-#, draft
-msgid "notes"
-msgstr "notlar"
 
 #: src/postulo/templates/server/plugins.html:358
 #, draft
@@ -7026,7 +7141,7 @@ msgstr "Henüz hiçbir şey kaydedilmedi."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "O sayfada bir iş ilanına benzeyen hiçbir şey bulunamadı."
 
-#: src/postulo/api/api.py:483
+#: src/postulo/api/api.py:484
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Orada bir iş ilanına benzeyen hiçbir şey bulunamadı."
@@ -7038,7 +7153,7 @@ msgid ""
 msgstr ""
 "Hiçbir şey kaydedilmedi. İlanlar internetten kaybolur; metni yapıştırmak sizin kopyanızı saklar."
 
-#: src/postulo/templates/applications/application_detail.html:232
+#: src/postulo/templates/applications/application_detail.html:292
 #, draft
 msgid "Nothing scheduled."
 msgstr "Planlanmış bir şey yok."
@@ -7047,6 +7162,11 @@ msgstr "Planlanmış bir şey yok."
 #, draft
 msgid "Nothing sent yet."
 msgstr "Henüz hiçbir şey gönderilmedi."
+
+#: src/postulo/templates/applications/offer_compare.html:61
+msgid ""
+"Nothing standing at Offer. Record one from an application's page when it arrives."
+msgstr ""
 
 #: src/postulo/core/design.py:138 src/postulo/templates/server/design.html:256
 msgid "Nothing there"
@@ -7143,7 +7263,7 @@ msgstr ""
 msgid "Notifications"
 msgstr "Bildirimler"
 
-#: src/postulo/applications/models.py:536
+#: src/postulo/applications/models.py:538
 #, draft
 msgid "notified on"
 msgstr "bildirilme tarihi"
@@ -7179,21 +7299,45 @@ msgstr ""
 "Kapalı. Paroladan sonra istenen, bir kimlik doğrulayıcı uygulamadan gelen kod, sızan bir parolanın tek başına yetmediği anlamına gelir."
 
 #: src/postulo/applications/analytics.py:45
-#: src/postulo/applications/models.py:57
+#: src/postulo/applications/models.py:59 src/postulo/applications/models.py:910
 #, draft
 msgid "Offer"
 msgstr "Teklif"
 
-#: src/postulo/applications/models.py:438
+#: src/postulo/applications/models.py:905
+msgid "offer"
+msgstr ""
+
+#: src/postulo/applications/models.py:440
+#: src/postulo/applications/services.py:518
 #, draft
 msgid "Offer received"
 msgstr "Teklif alındı"
+
+#: src/postulo/applications/views.py:1255
+msgid "Offer recorded."
+msgstr ""
+
+#: src/postulo/applications/services.py:518
+msgid "Offer revised"
+msgstr ""
+
+#: src/postulo/applications/views.py:1281
+msgid "Offer updated."
+msgstr ""
 
 #: src/postulo/core/models.py:903
 #, draft
 msgid "Offered only while this instance's mail is actually getting through."
 msgstr "Yalnızca bu örneğin postası gerçekten ulaştığı sürece sunulur."
 
+#: src/postulo/applications/models.py:906
+msgid "offers"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:183
+#: src/postulo/templates/applications/offer_compare.html:6
+#: src/postulo/templates/applications/offer_compare.html:23
 #: src/postulo/templates/applications/report.html:210
 #: src/postulo/templates/applications/report_print.html:143
 #: src/postulo/templates/widgets/industries.html:13
@@ -7207,6 +7351,10 @@ msgstr "Teklifler"
 #, draft
 msgid "Offers on the table"
 msgstr "Masadaki teklifler"
+
+#: src/postulo/templates/applications/offer_compare.html:32
+msgid "Offers side by side"
+msgstr ""
 
 #: src/postulo/plugins/models.py:43 src/postulo/plugins/provenance.py:60
 #, draft
@@ -7232,7 +7380,7 @@ msgstr "açık"
 msgid "On a board it looks like this:"
 msgstr ""
 
-#: src/postulo/applications/models.py:570 src/postulo/jobs/models.py:590
+#: src/postulo/applications/models.py:572 src/postulo/jobs/models.py:590
 #, draft
 msgid "On site"
 msgstr "Yerinde"
@@ -7240,6 +7388,10 @@ msgstr "Yerinde"
 #: src/postulo/jobs/forms.py:39
 msgid ""
 "On site is at their address; hybrid is some days there and some not; remote is no address of theirs at all."
+msgstr ""
+
+#: src/postulo/applications/models.py:891
+msgid "On the calendar, with a reminder the day before."
 msgstr ""
 
 #: src/postulo/accounts/forms.py:472
@@ -7564,9 +7716,9 @@ msgstr "Köken"
 msgid "Original posting"
 msgstr "Özgün ilan"
 
-#: src/postulo/applications/models.py:137
-#: src/postulo/applications/models.py:441
-#: src/postulo/applications/models.py:573 src/postulo/core/models.py:297
+#: src/postulo/applications/models.py:139
+#: src/postulo/applications/models.py:443
+#: src/postulo/applications/models.py:575 src/postulo/core/models.py:297
 #: src/postulo/core/models.py:522 src/postulo/documents/kinds.py:163
 #: src/postulo/documents/models.py:434 src/postulo/jobs/models.py:645
 #: src/postulo/resume/models.py:241
@@ -7590,7 +7742,7 @@ msgstr "Diğer diller"
 msgid "Other periods"
 msgstr "Diğer dönemler"
 
-#: src/postulo/applications/models.py:648
+#: src/postulo/applications/models.py:650
 #, draft
 msgid "outcome"
 msgstr "sonuç"
@@ -7655,7 +7807,7 @@ msgstr "Sayfa kaynağı"
 msgid "Pagination"
 msgstr "Sayfalama"
 
-#: src/postulo/applications/models.py:571
+#: src/postulo/applications/models.py:573
 #, draft
 msgid "Panel"
 msgstr "Panel"
@@ -7765,6 +7917,10 @@ msgstr "Beklemede"
 msgid "Pending only"
 msgstr "Yalnızca bekleyenler"
 
+#: src/postulo/applications/models.py:877
+msgid "Pension, insurance, allowances, equipment: whatever was named."
+msgstr ""
+
 #: src/postulo/core/search.py:523 src/postulo/core/server_sections.py:15
 #: src/postulo/core/server_views.py:175 src/postulo/core/server_views.py:261
 #: src/postulo/core/server_views.py:278 src/postulo/core/server_views.py:356
@@ -7796,11 +7952,15 @@ msgstr "Aylık"
 msgid "Per year"
 msgstr "Yıllık"
 
-#: src/postulo/applications/forms.py:135
+#: src/postulo/applications/forms.py:137
 #: src/postulo/templates/applications/calendar.html:83
 #, draft
 msgid "Period"
 msgstr "Dönem"
+
+#: src/postulo/applications/models.py:866
+msgid "period"
+msgstr ""
 
 #: src/postulo/templates/applications/report_print.html:68
 #, python-format, draft
@@ -7849,7 +8009,7 @@ msgstr "Telefon"
 msgid "phone"
 msgstr "telefon"
 
-#: src/postulo/applications/models.py:568
+#: src/postulo/applications/models.py:570
 #, draft
 msgid "Phone screen"
 msgstr "Telefon görüşmesi"
@@ -8011,7 +8171,7 @@ msgstr ""
 msgid "Portfolio"
 msgstr "Portföy"
 
-#: src/postulo/applications/models.py:346
+#: src/postulo/applications/models.py:348
 #, draft
 msgid "Portfolios, profiles and videos you pointed them at."
 msgstr "Onları yönlendirdiğiniz portföyler, profiller ve videolar."
@@ -8057,7 +8217,7 @@ msgstr ""
 msgid "posted on"
 msgstr "yayımlanma tarihi"
 
-#: src/postulo/applications/models.py:293
+#: src/postulo/applications/models.py:295
 #, draft
 msgid "posting"
 msgstr "ilan"
@@ -8083,7 +8243,7 @@ msgstr "İlan ayrıntıları"
 msgid "Posting updated."
 msgstr "İlan güncellendi."
 
-#: src/postulo/applications/forms.py:79 src/postulo/core/csv_import.py:43
+#: src/postulo/applications/forms.py:81 src/postulo/core/csv_import.py:43
 #, draft
 msgid "Posting URL"
 msgstr "İlan URL'si"
@@ -8213,7 +8373,7 @@ msgstr ""
 msgid "prefix"
 msgstr "ön ek"
 
-#: src/postulo/applications/models.py:646
+#: src/postulo/applications/models.py:648
 #, draft
 msgid "preparation notes"
 msgstr "hazırlık notları"
@@ -8274,12 +8434,12 @@ msgstr "birincil"
 msgid "Printed at the top. It takes the same placeholders as the body."
 msgstr ""
 
-#: src/postulo/applications/forms.py:219 src/postulo/applications/tables.py:68
+#: src/postulo/applications/forms.py:221 src/postulo/applications/tables.py:68
 #, draft
 msgid "Priority"
 msgstr "Öncelik"
 
-#: src/postulo/applications/models.py:299
+#: src/postulo/applications/models.py:301
 #, draft
 msgid "priority"
 msgstr "öncelik"
@@ -8389,7 +8549,7 @@ msgstr "Kamu sektörü"
 msgid "Publication"
 msgstr "Yayın"
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:737
 #, python-format
 msgid "Put off until %(when)s."
 msgstr ""
@@ -8451,7 +8611,7 @@ msgstr "Sessiz"
 msgid "quiet after"
 msgstr "şu süreden sonra sessiz"
 
-#: src/postulo/applications/models.py:357
+#: src/postulo/applications/models.py:359
 #, draft
 msgid "quiet announced on"
 msgstr "sessizliğin bildirildiği tarih"
@@ -8596,6 +8756,12 @@ msgstr "Kaydet"
 msgid "Record an application"
 msgstr "Bir başvuru kaydet"
 
+#: src/postulo/templates/applications/application_detail.html:191
+#: src/postulo/templates/applications/offer_form.html:4
+#: src/postulo/templates/applications/offer_form.html:21
+msgid "Record an offer"
+msgstr ""
+
 #: src/postulo/api/models.py:26
 #, draft
 msgid "Record and change: applications, listings, notes, reminders, letters"
@@ -8632,12 +8798,12 @@ msgid ""
 msgstr ""
 "Buradan kurulan her şeye karşı kaydedilir, bu yüzden kurduklarını öksüz bırakmadan sonradan değiştirilemez."
 
-#: src/postulo/applications/views.py:923
+#: src/postulo/applications/views.py:928
 #, draft
 msgid "Recorded as cancelled."
 msgstr "İptal edildi olarak kaydedildi."
 
-#: src/postulo/applications/views.py:922
+#: src/postulo/applications/views.py:927
 #, draft
 msgid "Recorded as held."
 msgstr "Yapıldı olarak kaydedildi."
@@ -8647,12 +8813,12 @@ msgid ""
 "Recorded as part of what they were sent. Postulo sends nothing itself — this is the note of what you sent."
 msgstr ""
 
-#: src/postulo/applications/models.py:484
+#: src/postulo/applications/models.py:486
 #, draft
 msgid "recorded by"
 msgstr "kaydeden"
 
-#: src/postulo/applications/models.py:486
+#: src/postulo/applications/models.py:488
 #, draft
 msgid "recorded on"
 msgstr "kaydedilme tarihi"
@@ -8662,7 +8828,7 @@ msgstr "kaydedilme tarihi"
 msgid "Recorded what you sent."
 msgstr "Ne gönderdiğiniz kaydedildi."
 
-#: src/postulo/applications/views.py:924
+#: src/postulo/applications/views.py:929
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Kaydedildi: kimse gelmedi."
@@ -8687,7 +8853,7 @@ msgstr "Kurtarma bağlantısı"
 msgid "recovery links"
 msgstr "kurtarma bağlantıları"
 
-#: src/postulo/applications/models.py:135
+#: src/postulo/applications/models.py:137
 #, draft
 msgid "Recruiter"
 msgstr "İşe alım uzmanı"
@@ -8702,7 +8868,7 @@ msgstr "İzlenen yönlendirmeler"
 msgid "Reference"
 msgstr "Referans"
 
-#: src/postulo/applications/models.py:134 src/postulo/core/models.py:120
+#: src/postulo/applications/models.py:136 src/postulo/core/models.py:120
 #, draft
 msgid "Referral"
 msgstr "Tavsiye"
@@ -8753,13 +8919,13 @@ msgstr "Kayıt açık"
 msgid "Reinstall"
 msgstr "Yeniden kur"
 
-#: src/postulo/applications/models.py:59
+#: src/postulo/applications/models.py:61
 #: src/postulo/templates/widgets/outcomes.html:14
 #, draft
 msgid "Rejected"
 msgstr "Reddedildi"
 
-#: src/postulo/applications/models.py:439
+#: src/postulo/applications/models.py:441
 #, draft
 msgid "Rejection received"
 msgstr "Ret alındı"
@@ -8770,13 +8936,14 @@ msgstr "Ret alındı"
 msgid "Rejections"
 msgstr "Ret yanıtları"
 
-#: src/postulo/applications/forms.py:436
+#: src/postulo/applications/forms.py:438
 #, draft
 msgid "Remind me the day before"
 msgstr "Bir gün önce bana hatırlat"
 
-#: src/postulo/applications/models.py:541
-#: src/postulo/applications/models.py:663
+#: src/postulo/applications/models.py:543
+#: src/postulo/applications/models.py:665
+#: src/postulo/applications/models.py:901
 #, draft
 msgid "reminder"
 msgstr "hatırlatma"
@@ -8786,25 +8953,25 @@ msgstr "hatırlatma"
 msgid "Reminder"
 msgstr ""
 
-#: src/postulo/applications/views.py:682
+#: src/postulo/applications/views.py:687
 msgid "Reminder updated."
 msgstr ""
 
-#: src/postulo/applications/agenda.py:96
+#: src/postulo/applications/agenda.py:98
 #, draft
 msgid "Reminder:"
 msgstr "Hatırlatma:"
 
-#: src/postulo/applications/agenda.py:74 src/postulo/core/navigation.py:75
+#: src/postulo/applications/agenda.py:75 src/postulo/core/navigation.py:75
 #: src/postulo/core/search.py:524
-#: src/postulo/templates/applications/application_detail.html:260
+#: src/postulo/templates/applications/application_detail.html:320
 #: src/postulo/templates/applications/reminder_list.html:6
 #: src/postulo/templates/applications/reminder_list.html:10
 #, draft
 msgid "Reminders"
 msgstr "Hatırlatmalar"
 
-#: src/postulo/applications/models.py:542
+#: src/postulo/applications/models.py:544
 #, draft
 msgid "reminders"
 msgstr "hatırlatmalar"
@@ -8964,7 +9131,7 @@ msgstr "Yakalamayı gözden geçir"
 msgid "Reviewed by a speaker"
 msgstr "Anadili konuşan biri gözden geçirdi"
 
-#: src/postulo/applications/models.py:792
+#: src/postulo/applications/models.py:794
 #, draft
 msgid "reviewed on"
 msgstr "gözden geçirilme tarihi"
@@ -9078,7 +9245,7 @@ msgstr "Maaş"
 msgid "Salary (one figure or a range)"
 msgstr "Maaş (tek bir rakam ya da bir aralık)"
 
-#: src/postulo/applications/forms.py:114 src/postulo/core/csv_import.py:48
+#: src/postulo/applications/forms.py:116 src/postulo/core/csv_import.py:48
 #, draft
 msgid "Salary from"
 msgstr "Maaş alt sınırı"
@@ -9093,7 +9260,7 @@ msgstr "maaş alt sınırı"
 msgid "salary period"
 msgstr "maaş dönemi"
 
-#: src/postulo/applications/forms.py:121 src/postulo/core/csv_import.py:49
+#: src/postulo/applications/forms.py:123 src/postulo/core/csv_import.py:49
 #, draft
 msgid "Salary to"
 msgstr "Maaş üst sınırı"
@@ -9107,6 +9274,7 @@ msgstr "maaş üst sınırı"
 #: src/postulo/templates/applications/application_form.html:31
 #: src/postulo/templates/applications/application_intake.html:76
 #: src/postulo/templates/applications/interview_form.html:68
+#: src/postulo/templates/applications/offer_form.html:51
 #: src/postulo/templates/applications/reminder_form.html:21
 #: src/postulo/templates/applications/tag_form.html:84
 #: src/postulo/templates/connections/form.html:44
@@ -9197,7 +9365,11 @@ msgstr "Bu tanımlayıcının ne olduğunu belirtin."
 msgid "Say what this number is."
 msgstr "Bu numaranın ne olduğunu söyleyin."
 
-#: src/postulo/templates/applications/application_detail.html:180
+#: src/postulo/applications/forms.py:588
+msgid "Say which currency the amount is in."
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:240
 #: src/postulo/templates/applications/interview_form.html:68
 #, draft
 msgid "Schedule"
@@ -9209,7 +9381,7 @@ msgstr "Planla"
 msgid "Schedule an interview"
 msgstr "Bir görüşme planla"
 
-#: src/postulo/applications/models.py:577
+#: src/postulo/applications/models.py:579
 #, draft
 msgid "Scheduled"
 msgstr "Planlandı"
@@ -9230,7 +9402,7 @@ msgid "scopes"
 msgstr "kapsamlar"
 
 #: src/postulo/applications/analytics.py:42
-#: src/postulo/applications/models.py:54
+#: src/postulo/applications/models.py:56
 #, draft
 msgid "Screening"
 msgstr "Ön eleme"
@@ -9402,7 +9574,7 @@ msgstr "Şununla gönderildi"
 msgid "Separate several with commas. Anything new joins your list."
 msgstr "Birkaç tanesini virgülle ayırın. Yeni olan ne varsa listenize katılır."
 
-#: src/postulo/applications/forms.py:250 src/postulo/applications/forms.py:304
+#: src/postulo/applications/forms.py:252 src/postulo/applications/forms.py:306
 #, draft
 msgid "Separate them with commas. A tag you have already keeps its colour."
 msgstr "Aralarına virgül koyun. Zaten sahip olduğunuz bir etiket rengini korur."
@@ -9439,7 +9611,7 @@ msgid ""
 "Set <code>POSTULO_UPDATE_CHECK=true</code> to let the scheduler ask once a day."
 msgstr ""
 
-#: src/postulo/applications/models.py:305
+#: src/postulo/applications/models.py:307
 #, draft
 msgid "Set automatically the first time the status becomes “Applied”."
 msgstr "Durum ilk kez “Başvuruldu” olduğunda kendiliğinden ayarlanır."
@@ -9813,7 +9985,7 @@ msgstr "SMTP sunucusu"
 msgid "Snooze"
 msgstr "Ertele"
 
-#: src/postulo/applications/views.py:793
+#: src/postulo/applications/views.py:798
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "İki hafta ertelendi."
@@ -9967,6 +10139,14 @@ msgstr ""
 msgid "Start again"
 msgstr "Baştan başla"
 
+#: src/postulo/applications/models.py:886
+msgid "start date"
+msgstr ""
+
+#: src/postulo/applications/views.py:1365
+msgid "Start date"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
 msgid "Start from a kind"
@@ -9986,10 +10166,15 @@ msgstr ""
 msgid "Starting clean instead?"
 msgstr "Bunun yerine sıfırdan mı başlıyorsunuz?"
 
-#: src/postulo/applications/models.py:635
+#: src/postulo/applications/models.py:637
 #, draft
 msgid "starts"
 msgstr "başlangıç"
+
+#: src/postulo/templates/applications/application_detail.html:208
+#, python-format
+msgid "starts %(day)s"
+msgstr ""
 
 #: src/postulo/core/server_forms.py:229
 #, draft
@@ -10015,14 +10200,14 @@ msgstr "durum"
 msgid "State"
 msgstr "Durum"
 
-#: src/postulo/api/models.py:175 src/postulo/applications/models.py:296
-#: src/postulo/applications/models.py:782 src/postulo/documents/models.py:741
+#: src/postulo/api/models.py:175 src/postulo/applications/models.py:298
+#: src/postulo/applications/models.py:784 src/postulo/documents/models.py:741
 #: src/postulo/jobs/models.py:1021
 #, draft
 msgid "status"
 msgstr "durum"
 
-#: src/postulo/applications/forms.py:211 src/postulo/applications/forms.py:363
+#: src/postulo/applications/forms.py:213 src/postulo/applications/forms.py:365
 #: src/postulo/applications/reports.py:531
 #: src/postulo/applications/tables.py:49 src/postulo/core/csv_import.py:45
 #: src/postulo/templates/accounts/invite_list.html:26
@@ -10036,7 +10221,7 @@ msgstr "durum"
 msgid "Status"
 msgstr "Durum"
 
-#: src/postulo/applications/models.py:429
+#: src/postulo/applications/models.py:431
 #, draft
 msgid "Status change"
 msgstr "Durum değişikliği"
@@ -10051,7 +10236,7 @@ msgstr "Hesap tablosundaki durum: %(text)s"
 msgid "Status of %(title)s at %(company)s"
 msgstr "%(company)s şirketindeki %(title)s başvurusunun durumu"
 
-#: src/postulo/applications/views.py:517
+#: src/postulo/applications/views.py:522
 #, draft
 msgid "Status updated."
 msgstr "Durum güncellendi."
@@ -10120,22 +10305,22 @@ msgstr ""
 msgid "subject"
 msgstr "konu"
 
-#: src/postulo/applications/models.py:762
+#: src/postulo/applications/models.py:764
 #, draft
 msgid "suggested by"
 msgstr "öneren"
 
-#: src/postulo/applications/models.py:770
+#: src/postulo/applications/models.py:772
 #, draft
 msgid "suggested status"
 msgstr "önerilen durum"
 
-#: src/postulo/applications/models.py:797
+#: src/postulo/applications/models.py:799
 #, draft
 msgid "suggestion"
 msgstr "öneri"
 
-#: src/postulo/applications/models.py:798
+#: src/postulo/applications/models.py:800
 #, draft
 msgid "suggestions"
 msgstr "öneriler"
@@ -10151,7 +10336,7 @@ msgstr "Öneriler"
 msgid "Suggestions from plugins"
 msgstr "Eklentilerden öneriler"
 
-#: src/postulo/applications/models.py:476 src/postulo/documents/models.py:171
+#: src/postulo/applications/models.py:478 src/postulo/documents/models.py:171
 #: src/postulo/resume/models.py:78 src/postulo/resume/models.py:163
 #, draft
 msgid "summary"
@@ -10281,7 +10466,7 @@ msgstr "Etiket"
 msgid "tagline"
 msgstr "slogan"
 
-#: src/postulo/applications/forms.py:242 src/postulo/applications/tables.py:91
+#: src/postulo/applications/forms.py:244 src/postulo/applications/tables.py:91
 #: src/postulo/core/csv_import.py:53
 #: src/postulo/templates/applications/tag_list.html:6
 #: src/postulo/templates/applications/tag_list.html:12
@@ -10289,7 +10474,7 @@ msgstr "slogan"
 msgid "Tags"
 msgstr "Etiketler"
 
-#: src/postulo/applications/models.py:339 src/postulo/core/models.py:193
+#: src/postulo/applications/models.py:341 src/postulo/core/models.py:193
 #, draft
 msgid "tags"
 msgstr "etiketler"
@@ -10368,6 +10553,14 @@ msgstr "Şablon"
 #, draft
 msgid "Templates appear when you send a letter with an application."
 msgstr "Şablonlar, bir mektubu bir başvuruyla gönderdiğinizde belirir."
+
+#: src/postulo/templates/applications/offer_compare.html:35
+msgid "Term"
+msgstr ""
+
+#: src/postulo/templates/applications/application_detail.html:204
+msgid "Terms not recorded"
+msgstr ""
 
 #: src/postulo/templates/connections/list.html:57
 #, draft
@@ -10501,7 +10694,7 @@ msgstr "Bu bir %(scheme)s tanımlayıcısına benzemiyor (örneğin %(example)s)
 msgid "That does not look like a complete web address."
 msgstr "Bu tam bir web adresine benzemiyor."
 
-#: src/postulo/applications/views.py:599
+#: src/postulo/applications/views.py:604
 #, draft
 msgid "That entry could not be saved."
 msgstr "O girdi kaydedilemedi."
@@ -10583,12 +10776,12 @@ msgstr "Bu çok fazla kurtarma bağlantısı. Birazdan tekrar deneyin."
 msgid "That is a lot of tests. Try again in %(seconds)d seconds."
 msgstr ""
 
-#: src/postulo/applications/views.py:519
+#: src/postulo/applications/views.py:524
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Bu, Postulo'nun tanıdığı bir durum değil."
 
-#: src/postulo/applications/views.py:725
+#: src/postulo/applications/views.py:730
 msgid "That is not a time Postulo can read."
 msgstr ""
 
@@ -10611,17 +10804,17 @@ msgstr ""
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Bu bir Ed25519 açık anahtarı değil: %(error)s"
 
-#: src/postulo/applications/views.py:916
+#: src/postulo/applications/views.py:921
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Bu, Postulo'nun tanıdığı bir sonuç değil."
 
-#: src/postulo/applications/views.py:795
+#: src/postulo/applications/views.py:800
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Postulo bu konuda böyle bir şey yapamaz."
 
-#: src/postulo/applications/views.py:292 src/postulo/jobs/listing_views.py:174
+#: src/postulo/applications/views.py:296 src/postulo/jobs/listing_views.py:174
 #: src/postulo/jobs/views.py:170
 #, draft
 msgid "That is not something Postulo can do to several at once."
@@ -10722,7 +10915,7 @@ msgstr "O eklenti artık kurulu değil."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Bu yanıt Postulo'nun yaptığı bir istekten gelmedi."
 
-#: src/postulo/applications/views.py:1198
+#: src/postulo/applications/views.py:1203
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "O öneri zaten yanıtlanmış."
@@ -10741,7 +10934,7 @@ msgstr ""
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Bu bir döngü oluştururdu: %(name)s zaten bunun parçası."
 
-#: src/postulo/applications/views.py:491 src/postulo/jobs/views.py:426
+#: src/postulo/applications/views.py:496 src/postulo/jobs/views.py:426
 #: src/postulo/jobs/views.py:648
 #, python-format, draft
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -10878,7 +11071,7 @@ msgid ""
 msgstr ""
 "Gösterge paneli, bir süredir hiçbir şey olmayan ve hiçbir şey planlanmamış açık başvuruları listeler. İşe alım uzmanlarının kendi tavsiyeleri iki ila üç hafta çevresinde toplanıyor."
 
-#: src/postulo/applications/forms.py:41
+#: src/postulo/applications/forms.py:43
 msgid ""
 "The date you mean to have sent it by. It is not a reminder — set one of those if you want telling."
 msgstr ""
@@ -10904,7 +11097,7 @@ msgstr "İndirilen, bir eklentinin olması gerekenden çok daha büyük."
 msgid "The earlier version this supersedes. The old file is kept."
 msgstr "Bunun yerine geçtiği önceki sürüm. Eski dosya saklanır."
 
-#: src/postulo/applications/forms.py:357
+#: src/postulo/applications/forms.py:359
 #, draft
 msgid "The employer as a whole"
 msgstr "Bir bütün olarak işveren"
@@ -10925,6 +11118,10 @@ msgid ""
 "The fields your companies operate in, in your own words. A company may be in several."
 msgstr ""
 "Şirketlerinizin çalıştığı alanlar, kendi sözcüklerinizle. Bir şirket birkaçında birden olabilir."
+
+#: src/postulo/applications/forms.py:578
+msgid "The figure as they wrote it, before tax."
+msgstr ""
 
 #: src/postulo/templates/resume/europass_import.html:29
 #, draft
@@ -11021,7 +11218,7 @@ msgid ""
 msgstr ""
 "Zaman çizelgesinin kaydettiği son on şey, hangi başvuruya ait olurlarsa olsunlar."
 
-#: src/postulo/applications/forms.py:381
+#: src/postulo/applications/forms.py:383
 msgid "The line the timeline shows."
 msgstr ""
 
@@ -11097,6 +11294,10 @@ msgid ""
 msgstr ""
 "Sizi geri alan numara, belgelerinizin yazdırdığından ayrıdır; yani bir işe alım uzmanının aradığı numarayı değiştirmek, siz olduğunuzu nasıl kanıtladığınızı değiştirmez. Önce doğrulanması gerekir ve birden çok telefon numarasını kapatmak onu sizden asla almaz."
 
+#: src/postulo/applications/models.py:883
+msgid "The office, the remote arrangement, or the days of each."
+msgstr ""
+
 #: src/postulo/core/server_views.py:1174
 #, draft
 msgid "The official repository is emptied, not removed."
@@ -11129,7 +11330,7 @@ msgstr ""
 msgid "The pay"
 msgstr "Ücret"
 
-#: src/postulo/applications/forms.py:46
+#: src/postulo/applications/forms.py:48
 msgid "The person at the company this went through, where there was one."
 msgstr ""
 
@@ -11202,7 +11403,7 @@ msgstr ""
 msgid "The role"
 msgstr "Pozisyon"
 
-#: src/postulo/applications/forms.py:36
+#: src/postulo/applications/forms.py:38
 msgid ""
 "The route it went through. The report counts by this, including how many went through the employment service's own board."
 msgstr ""
@@ -11322,7 +11523,7 @@ msgid ""
 msgstr ""
 "Saat dilimi ortam tarafından ayarlandı: <code>%(variable)s</code> = %(zone)s. Burada değiştirebilmek için onu ortamdan kaldırın."
 
-#: src/postulo/applications/forms.py:179 src/postulo/jobs/forms.py:650
+#: src/postulo/applications/forms.py:181 src/postulo/jobs/forms.py:650
 #, draft
 msgid "The upper figure cannot be below the lower one."
 msgstr "Üst rakam alt rakamın altında olamaz."
@@ -11423,7 +11624,7 @@ msgstr ""
 msgid "These records can name people and their applications."
 msgstr "Bu kayıtlar kişileri ve başvurularını adlandırabilir."
 
-#: src/postulo/applications/models.py:580
+#: src/postulo/applications/models.py:582
 #, draft
 msgid "They did not show up"
 msgstr "Gelmediler"
@@ -11684,7 +11885,7 @@ msgstr "saat dilimi"
 msgid "Time zone for new accounts"
 msgstr "Yeni hesaplar için saat dilimi"
 
-#: src/postulo/applications/models.py:790
+#: src/postulo/applications/models.py:792
 #, draft
 msgid "timeline entry"
 msgstr "zaman çizelgesi girdisi"
@@ -11736,7 +11937,7 @@ msgstr "Karar verilecek"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Bir ilanı devretmek için (captures kapsamı gerekir):"
 
-#: src/postulo/applications/models.py:480
+#: src/postulo/applications/models.py:482
 #, draft
 msgid "to status"
 msgstr "yeni durum"
@@ -12122,6 +12323,14 @@ msgstr ""
 msgid "Utilities"
 msgstr "Altyapı hizmetleri"
 
+#: src/postulo/applications/models.py:869
+msgid "variable pay"
+msgstr ""
+
+#: src/postulo/applications/views.py:1358
+msgid "Variable pay"
+msgstr ""
+
 #: src/postulo/templates/server/design.html:117
 msgid "Variants"
 msgstr ""
@@ -12172,7 +12381,7 @@ msgstr "%(actor)s aracılığıyla"
 msgid "Video"
 msgstr "Video"
 
-#: src/postulo/applications/models.py:569
+#: src/postulo/applications/models.py:571
 #, draft
 msgid "Video call"
 msgstr "Görüntülü arama"
@@ -12209,7 +12418,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr "Bundan sonra bekleyen: %(count)s."
 
-#: src/postulo/applications/models.py:720 src/postulo/jobs/models.py:991
+#: src/postulo/applications/models.py:722 src/postulo/jobs/models.py:991
 #, draft
 msgid "Waiting for review"
 msgstr "Gözden geçirilmeyi bekliyor"
@@ -12288,12 +12497,12 @@ msgstr "web sitesi"
 msgid "Websites"
 msgstr "Web siteleri"
 
-#: src/postulo/applications/agenda.py:489
+#: src/postulo/applications/agenda.py:522
 #, draft
 msgid "Week"
 msgstr "Hafta"
 
-#: src/postulo/applications/agenda.py:526
+#: src/postulo/applications/agenda.py:559
 #: src/postulo/templates/applications/report.html:159
 #: src/postulo/templates/applications/report.html:185
 #: src/postulo/templates/applications/report_print.html:108
@@ -12363,6 +12572,11 @@ msgstr ""
 msgid "What could not be read"
 msgstr "Ne okunamadı"
 
+#: src/postulo/templates/applications/offer_compare.html:24
+msgid ""
+"What each application standing at Offer was offered, side by side. Nothing here decides for you."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html:41
 #, draft
 msgid "What each plugin does, for everybody"
@@ -12426,7 +12640,7 @@ msgstr ""
 msgid "What it may do"
 msgstr "Ne yapabilir"
 
-#: src/postulo/applications/models.py:766
+#: src/postulo/applications/models.py:768
 #, draft
 msgid "what it says"
 msgstr "ne diyor"
@@ -12481,7 +12695,7 @@ msgstr ""
 msgid "What sort of thing it is, so the lists can be narrowed by it."
 msgstr ""
 
-#: src/postulo/applications/forms.py:376
+#: src/postulo/applications/forms.py:378
 msgid ""
 "What sort of thing it was. A status change and an interview write their own entries, so neither is offered here."
 msgstr ""
@@ -12540,7 +12754,7 @@ msgstr "Bu kurulumda ne çalışıyor ve verisi nerede."
 msgid "What to call it"
 msgstr "Ona ne ad verileceği"
 
-#: src/postulo/applications/models.py:532
+#: src/postulo/applications/models.py:534
 #, draft
 msgid "what to do"
 msgstr "ne yapılacağı"
@@ -12553,7 +12767,7 @@ msgstr ""
 msgid "What to do about it, in a sentence."
 msgstr ""
 
-#: src/postulo/applications/forms.py:412
+#: src/postulo/applications/forms.py:414
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr ""
 
@@ -12615,7 +12829,7 @@ msgid ""
 msgstr ""
 "Sizin için ne değer taşıyorsa, bir kez ya da arada bir, <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a> üzerinden."
 
-#: src/postulo/applications/models.py:533
+#: src/postulo/applications/models.py:535
 #, draft
 msgid "when"
 msgstr "ne zaman"
@@ -12627,7 +12841,7 @@ msgstr "ne zaman"
 msgid "When"
 msgstr "Ne zaman"
 
-#: src/postulo/applications/models.py:774
+#: src/postulo/applications/models.py:776
 #, draft
 msgid "When accepting should also move the application."
 msgstr "Kabul etmenin başvuruyu da ilerletmesi gerektiğinde."
@@ -12637,7 +12851,7 @@ msgstr "Kabul etmenin başvuruyu da ilerletmesi gerektiğinde."
 msgid "When it entered your listings."
 msgstr "İlanlarınıza ne zaman girdiği."
 
-#: src/postulo/applications/forms.py:380
+#: src/postulo/applications/forms.py:382
 msgid "When it happened, which is not always when you write it down."
 msgstr ""
 
@@ -12645,7 +12859,7 @@ msgstr ""
 msgid "When the employer put it up, if the posting says. Empty means unknown."
 msgstr ""
 
-#: src/postulo/applications/forms.py:229
+#: src/postulo/applications/forms.py:231
 #, draft
 msgid ""
 "When you actually sent it. Left empty it is today, which is wrong for a search already under way — and reply times, the months and the report are measured from this date."
@@ -12659,7 +12873,7 @@ msgid ""
 msgstr ""
 "Bu örneği sağlayıcıya kaydederken insanları geri göndereceği bu adresi verin:"
 
-#: src/postulo/applications/models.py:638
+#: src/postulo/applications/models.py:640
 #, draft
 msgid "where"
 msgstr "nerede"
@@ -12759,6 +12973,14 @@ msgstr "nerede yaşadığınız"
 msgid "Where you studied, as you would write it on a CV."
 msgstr ""
 
+#: src/postulo/applications/models.py:880
+msgid "where you would work"
+msgstr ""
+
+#: src/postulo/applications/views.py:1361
+msgid "Where you would work"
+msgstr ""
+
 #: src/postulo/templates/core/dashboard.html:52
 #, draft
 msgid "Where your job search stands today."
@@ -12815,7 +13037,7 @@ msgid ""
 msgstr ""
 "Deneyiminizin, eğitiminizin ve projelerinizin hangi dilde yazıldığı. Başka bir dildeki CV neyi çevirdiğinizi gösterir ve neyi çeviremediğini söyler."
 
-#: src/postulo/applications/forms.py:416
+#: src/postulo/applications/forms.py:418
 msgid "Which one it is about. Leave it empty for a reminder about none."
 msgstr ""
 
@@ -12824,7 +13046,7 @@ msgstr ""
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Bunu Postulo'nun hangi bölümünün ürettiği: web arayüzü mü, API mi."
 
-#: src/postulo/applications/models.py:336
+#: src/postulo/applications/models.py:338
 #, draft
 msgid "Which part of the employer this was for, if you know."
 msgstr "İşverenin hangi bölümü içindi, biliyorsan."
@@ -12856,12 +13078,12 @@ msgstr ""
 msgid "Who may create an account here."
 msgstr "Burada kimin hesap oluşturabileceği."
 
-#: src/postulo/applications/models.py:644
+#: src/postulo/applications/models.py:646
 #, draft
 msgid "who you are meeting"
 msgstr "kiminle görüştüğünüz"
 
-#: src/postulo/applications/forms.py:450
+#: src/postulo/applications/forms.py:452
 msgid ""
 "Who you are meeting. Only the people you have recorded at this company are offered."
 msgstr ""
@@ -12899,7 +13121,7 @@ msgstr "zaten sunulmuş bileşenler"
 msgid "Width of {column}"
 msgstr "{column} sütununun genişliği"
 
-#: src/postulo/templates/applications/application_detail.html:205
+#: src/postulo/templates/applications/application_detail.html:265
 #, draft
 msgid "With"
 msgstr "İle"
@@ -12924,7 +13146,7 @@ msgstr "Parolayla: sizden bir kod istenir. Her zaman."
 msgid "With: %(people)s"
 msgstr "Katılanlar: %(people)s"
 
-#: src/postulo/applications/models.py:60
+#: src/postulo/applications/models.py:62
 #, draft
 msgid "Withdrawn"
 msgstr "Geri çekildi"
@@ -12944,7 +13166,7 @@ msgstr "%(when)s çalışıyordu"
 msgid "Working"
 msgstr ""
 
-#: src/postulo/applications/forms.py:92 src/postulo/jobs/tables.py:238
+#: src/postulo/applications/forms.py:94 src/postulo/jobs/tables.py:238
 #: src/postulo/templates/applications/application_detail.html:72
 #, draft
 msgid "Working arrangement"
@@ -13055,7 +13277,7 @@ msgstr "O adda bir şirketiniz zaten var."
 msgid "You already have a CV or portfolio with that name."
 msgstr "Bu adda bir özgeçmişin veya portfolyon zaten var."
 
-#: src/postulo/applications/forms.py:532
+#: src/postulo/applications/forms.py:534
 #, draft
 msgid "You already have a tag with that name."
 msgstr "O adda bir etiketiniz zaten var."
@@ -13257,7 +13479,7 @@ msgstr "Verileriniz"
 msgid "Your data is ready to download."
 msgstr ""
 
-#: src/postulo/applications/forms.py:236
+#: src/postulo/applications/forms.py:238
 #: src/postulo/templates/applications/application_detail.html:100
 #, draft
 msgid "Your deadline"
@@ -13338,7 +13560,7 @@ msgstr "Kendi adınız"
 msgid "Your own site, if you have one."
 msgstr "Varsa kendi siteniz."
 
-#: src/postulo/applications/forms.py:45
+#: src/postulo/applications/forms.py:47
 msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr ""
 
@@ -13367,11 +13589,11 @@ msgstr ""
 msgid "Your username has been changed."
 msgstr "Kullanıcı adınız değiştirildi."
 
-#: src/postulo/applications/forms.py:40
+#: src/postulo/applications/forms.py:42
 msgid "Yours, not the employer's. The list can be sorted and narrowed by it."
 msgstr ""
 
-#: src/postulo/applications/forms.py:454
+#: src/postulo/applications/forms.py:456
 msgid "Yours, to prepare with. Nothing here is sent to anybody."
 msgstr ""
 

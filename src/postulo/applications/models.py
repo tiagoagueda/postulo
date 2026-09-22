@@ -16,6 +16,7 @@ from the failures.
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -34,10 +35,11 @@ from django.db.models import (
 from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel, Tag
-from postulo.jobs.models import Contact, JobPosting, SalaryPeriod
+from postulo.jobs.models import Contact, JobPosting, SalaryPeriod, currency_code
 
 
 class Status(models.TextChoices):
@@ -816,3 +818,126 @@ class Suggestion(OwnedModel):
     @property
     def is_matched(self) -> bool:
         return self.application_id is not None
+
+
+#: What a year of each period is, for putting two offers beside each other (#237). The
+#: same conventional full-time year `with_salary_order` uses to sort a column (#224): 1,680
+#: hours, 220 days, twelve months. Not anybody's actual contract -- it makes two figures
+#: comparable, it does not make either of them pay.
+YEARLY_UNITS = {
+    SalaryPeriod.HOUR: 1680,
+    SalaryPeriod.DAY: 220,
+    SalaryPeriod.MONTH: 12,
+    SalaryPeriod.YEAR: 1,
+}
+
+
+class Offer(OwnedModel):
+    """What was actually offered, as against what was advertised (#237).
+
+    The moment a search has the most at stake was the one Postulo recorded least: *offer*
+    was a status and a timeline kind, and the only money in the record was the posting's
+    advertised range, which is often not what arrives. One row per offer, several per
+    application because offers get revised, each revision written on the timeline by the
+    service that makes it so the log stays the account of what happened.
+
+    **No score and no recommendation.** The comparison page puts offers side by side with
+    the amounts brought to a year within a currency, and stops there. Which one to take is
+    not a sum, and a page that pretended it was would be wrong in the way that matters.
+    """
+
+    application = models.ForeignKey(
+        Application,
+        on_delete=models.CASCADE,
+        related_name="offers",
+        verbose_name=_("application"),
+    )
+    base_amount = models.DecimalField(
+        _("base pay"), max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    currency = models.CharField(
+        _("currency"),
+        max_length=3,
+        blank=True,
+        validators=[currency_code],
+        help_text=_("A three-letter ISO 4217 code, such as EUR, GBP or USD."),
+    )
+    period = models.CharField(
+        _("period"), max_length=10, choices=SalaryPeriod, default=SalaryPeriod.YEAR
+    )
+    variable_pay = models.TextField(
+        _("variable pay"),
+        blank=True,
+        help_text=_("A bonus, commission, or a target: in their words, since the terms vary."),
+    )
+    equity = models.TextField(_("equity"), blank=True)
+    benefits = models.TextField(
+        _("benefits"),
+        blank=True,
+        help_text=_("Pension, insurance, allowances, equipment: whatever was named."),
+    )
+    location = models.CharField(
+        _("where you would work"),
+        max_length=200,
+        blank=True,
+        help_text=_("The office, the remote arrangement, or the days of each."),
+    )
+    holidays = models.PositiveSmallIntegerField(_("days of holiday a year"), null=True, blank=True)
+    starts_on = models.DateField(_("start date"), null=True, blank=True)
+    answer_by = models.DateField(
+        _("answer by"),
+        null=True,
+        blank=True,
+        help_text=_("On the calendar, with a reminder the day before."),
+    )
+    notes = models.TextField(_("notes"), blank=True)
+    #: The nudge made for the answer-by date, if one was. Kept in step with the date.
+    reminder = models.OneToOneField(
+        Reminder,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="offer",
+        verbose_name=_("reminder"),
+    )
+
+    class Meta:
+        verbose_name = _("offer")
+        verbose_name_plural = _("offers")
+        ordering = ("-created_at", "-pk")
+
+    def __str__(self) -> str:
+        return self.terms or str(_("Offer"))
+
+    def get_absolute_url(self) -> str:
+        return f"{self.application.get_absolute_url()}#offer-{self.pk}"
+
+    @property
+    def amount(self) -> Decimal | None:
+        """The base pay as a `Decimal`, whatever the instance was handed.
+
+        A row read back from the database holds a `Decimal`; one made a moment ago holds
+        whatever the caller passed, and an `int` has no `normalize`. Coerced through `str`
+        so that a float that arrives is the number it printed as, not its binary neighbour.
+        """
+        if self.base_amount is None:
+            return None
+        return Decimal(str(self.base_amount))
+
+    @property
+    def terms(self) -> str:
+        """The money in one line -- *65,000 EUR per year* -- or nothing where none was given."""
+        amount = self.amount
+        if amount is None:
+            return ""
+        figure = number_format(amount.normalize(), use_l10n=True, force_grouping=True)
+        period = str(self.get_period_display()).lower()
+        return f"{figure} {self.currency} {period}".replace("  ", " ").strip()
+
+    @property
+    def yearly_amount(self) -> Decimal | None:
+        """The base pay as a year's worth, for comparing within a currency; `None` if none."""
+        amount = self.amount
+        if amount is None:
+            return None
+        return amount * YEARLY_UNITS.get(self.period, 1)

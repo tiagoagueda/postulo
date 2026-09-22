@@ -54,6 +54,7 @@ from .routers import (
     insights,
     interviews,
     listings,
+    offers,
     reminders,
     search,
 )
@@ -571,6 +572,7 @@ api.add_router("/listings", listings.router)
 api.add_router("/companies", companies.router)
 api.add_router("/reminders", reminders.router)
 api.add_router("/interviews", interviews.router)
+api.add_router("/offers", offers.router)
 api.add_router("", documents.router)
 api.add_router("/insights", insights.router)
 api.add_router("/search", search.router)

@@ -39,6 +39,7 @@ from .forms import (
     ApplicationIntakeForm,
     EventForm,
     InterviewForm,
+    OfferForm,
     ReminderForm,
     StatusChangeForm,
     TagForm,
@@ -50,6 +51,7 @@ from .models import (
     EventKind,
     Interview,
     InterviewOutcome,
+    Offer,
     Reminder,
     Status,
     Suggestion,
@@ -62,7 +64,9 @@ from .services import (
     later_time,
     postpone_reminder,
     record_event,
+    record_offer,
     reschedule_interview,
+    revise_offer,
     schedule_interview,
     settle_interview,
 )
@@ -377,6 +381,7 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         context["group"] = structure.group_of(self.object.posting.company, self.request.user)
         context["events"] = self.object.events.all()
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
+        context["offers"] = list(self.object.offers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
         context["scheduled_interviews"] = [i for i in interviews if i.is_scheduled]
         context["settled_interviews"] = [i for i in interviews if i.is_settled][::-1]
@@ -981,7 +986,7 @@ class InterviewCalendarView(OwnedObjectMixin, View):
             request.user,
             today,
             today + timedelta(days=FEED_DAYS),
-            kinds=(agenda.DEADLINE, agenda.CLOSING),
+            kinds=(agenda.DEADLINE, agenda.CLOSING, agenda.ANSWER),
         )
         return [
             ical.DayEntry(
@@ -1214,3 +1219,150 @@ class SuggestionActionView(OwnedObjectMixin, View):
         suggestions.accept(suggestion, application=application)
         messages.success(request, _("Added to the timeline."))
         return redirect(safe_next(request, fallback))
+
+
+# ---------------------------------------------------------------------- offers
+
+
+class OfferCreateView(OwnedObjectMixin, View):
+    """Record what one application was offered (#237)."""
+
+    template_name = "applications/offer_form.html"
+
+    def get_queryset(self):
+        return Application.objects.for_user(self.request.user).select_related(
+            "posting", "posting__company"
+        )
+
+    def get(self, request, pk: int) -> HttpResponse:
+        application = get_object_or_404(self.get_queryset(), pk=pk)
+        # The advertised range is the obvious starting point, and often not the answer.
+        posting = application.posting
+        initial = {"currency": posting.salary_currency or "", "period": posting.salary_period}
+        if posting.salary_max is not None:
+            initial["base_amount"] = posting.salary_max
+        elif posting.salary_min is not None:
+            initial["base_amount"] = posting.salary_min
+        form = OfferForm(user=request.user, initial=initial)
+        return render(request, self.template_name, {"form": form, "application": application})
+
+    def post(self, request, pk: int) -> HttpResponse:
+        application = get_object_or_404(self.get_queryset(), pk=pk)
+        form = OfferForm(request.POST, user=request.user)
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form, "application": application})
+        record_offer(application, **form.cleaned_data)
+        messages.success(request, _("Offer recorded."))
+        return redirect(f"{application.get_absolute_url()}#offers")
+
+
+class OfferUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    model = Offer
+    form_class = OfferForm
+    template_name = "applications/offer_form.html"
+
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("application", "application__posting", "application__posting__company")
+        )
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["application"] = self.object.application
+        return context
+
+    def form_valid(self, form):
+        offer = form.save()
+        # The revision is written on the timeline and the reminder follows the date, which
+        # is the service's business and not the form's.
+        revise_offer(offer)
+        messages.success(self.request, _("Offer updated."))
+        return redirect(f"{offer.application.get_absolute_url()}#offers")
+
+
+class OfferDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+    model = Offer
+    template_name = "partials/confirm_delete.html"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("application")
+
+    def get_success_url(self) -> str:
+        return f"{self.object.application.get_absolute_url()}#offers"
+
+    def get_cancel_url(self) -> str:
+        return self.get_success_url()
+
+
+class OfferCompareView(LoginRequiredMixin, View):
+    """Every application at *Offer*, side by side, and nothing decided for anybody (#237).
+
+    The latest offer of each application that stands at *Offer* now. One column per offer,
+    one row per term, the base pay brought to a year within its currency so that a monthly
+    figure and an annual one can be read against each other. No score: the person decides.
+    """
+
+    template_name = "applications/offer_compare.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        offers = (
+            Offer.objects.for_user(request.user)
+            .filter(application__status=Status.OFFER)
+            .select_related("application", "application__posting", "application__posting__company")
+            .order_by("application_id", "-created_at", "-pk")
+        )
+        latest: dict[int, Offer] = {}
+        for offer in offers:
+            latest.setdefault(offer.application_id, offer)
+        columns = sorted(latest.values(), key=lambda o: o.application.posting.company.name)
+        return render(
+            request,
+            self.template_name,
+            {"columns": columns, "rows": offer_rows(columns)},
+        )
+
+
+def offer_rows(offers: list) -> list[tuple[str, list[tuple[str, str]]]]:
+    """(term, [(whose, cell) per offer]), in the order a person reads an offer.
+
+    Built here rather than in the template, so that the same rows reach the browser test,
+    the phone layout and anything that later wants a CSV of the comparison. Each cell
+    carries the employer's name because on a phone the header row is gone and the cell has
+    to say whose it is (`table-cards`, `data-label`).
+    """
+    from django.utils.formats import number_format
+
+    def yearly(offer) -> str:
+        amount = offer.yearly_amount
+        if amount is None:
+            return ""
+        figure = number_format(amount.normalize(), use_l10n=True, force_grouping=True)
+        return str(
+            _("%(figure)s %(currency)s a year") % {"figure": figure, "currency": offer.currency}
+        )
+
+    def day(value) -> str:
+        return formats.date_format(value, "DATE_FORMAT") if value else ""
+
+    def whose(offer) -> str:
+        return str(offer.application.posting.company.name)
+
+    def row(term, value) -> tuple[str, list[tuple[str, str]]]:
+        return (str(term), [(whose(offer), value(offer)) for offer in offers])
+
+    return [
+        row(_("Base pay"), lambda o: o.terms),
+        row(_("Brought to a year"), yearly),
+        row(_("Variable pay"), lambda o: o.variable_pay),
+        row(_("Equity"), lambda o: o.equity),
+        row(_("Benefits"), lambda o: o.benefits),
+        row(_("Where you would work"), lambda o: o.location),
+        row(
+            _("Days of holiday a year"), lambda o: str(o.holidays) if o.holidays is not None else ""
+        ),
+        row(_("Start date"), lambda o: day(o.starts_on)),
+        row(_("Answer by"), lambda o: day(o.answer_by)),
+        row(_("Notes"), lambda o: o.notes),
+    ]

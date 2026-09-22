@@ -164,6 +164,21 @@ def furnished(applicant):
         data={"title": "Research Engineer", "company_name": "Black Mesa"},
     )
     interview = application.interviews.first()
+    # An offer with every field, so the comparison page and the card have something to
+    # draw in both themes (#237).
+    from postulo.applications.services import record_offer
+
+    offer = record_offer(
+        application,
+        base_amount=65000,
+        currency="EUR",
+        period="year",
+        variable_pay="10% on target",
+        benefits="Pension",
+        location="Two days in the office",
+        holidays=25,
+        answer_by=timezone.localdate() + dt.timedelta(days=7),
+    )
     # A connection row, so its own pages exist. Nothing is configured behind it and nothing
     # here contacts anything: the pages being checked are a form and a confirmation.
     connection = Connection.objects.create(
@@ -219,6 +234,7 @@ def furnished(applicant):
         "capture": capture,
         "interview": interview,
         "reminder": reminder,
+        "offer": offer,
         "connection": connection,
         "suggestion": suggestion,
     }
@@ -261,6 +277,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     posting = it.get("posting", a)
     interview = it.get("interview", a)
     reminder = it.get("reminder", a)
+    offer = it.get("offer", a)
     connection = it.get("connection", a)
     errand = it.get("errand", a)
     return [
@@ -383,6 +400,10 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/tags/{tag.pk}/delete/",
         f"/applications/reminders/{reminder.pk}/edit/",
         f"/applications/reminders/{reminder.pk}/delete/",
+        "/applications/offers/",
+        f"/applications/{a.pk}/offers/new/",
+        f"/applications/offers/{offer.pk}/edit/",
+        f"/applications/offers/{offer.pk}/delete/",
         f"/jobs/captures/{capture.pk}/review/",
         f"/jobs/companies/{c.pk}/delete/",
         f"/jobs/contacts/{contact.pk}/edit/",
@@ -667,6 +688,7 @@ def walked_url_names() -> frozenset[str]:
                     "posting",
                     "interview",
                     "reminder",
+                    "offer",
                     "connection",
                 ),
                 stand_in,

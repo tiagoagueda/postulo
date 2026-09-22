@@ -28,6 +28,7 @@ from .models import (
     Interview,
     InterviewKind,
     InterviewOutcome,
+    Offer,
     Reminder,
     Status,
 )
@@ -505,3 +506,94 @@ def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
     reminder.due_at, reminder.notified_at = due, None
     reminder.save(update_fields=["due_at", "notified_at", "updated_at"])
     return reminder
+
+
+# ---------------------------------------------------------------------- offers
+
+#: How far ahead of the answer-by date its reminder falls due.
+ANSWER_REMINDER_LEAD = dt.timedelta(days=1)
+
+
+def _offer_summary(offer: Offer, revised: bool) -> str:
+    what = _("Offer revised") if revised else _("Offer received")
+    return str(f"{what}: {offer.terms}" if offer.terms else what)
+
+
+def _answer_reminder_summary(offer: Offer) -> str:
+    return str(
+        _("Answer %(company)s about their offer by %(day)s")
+        % {
+            "company": offer.application.posting.company.name,
+            "day": formats.date_format(offer.answer_by, "DATE_FORMAT"),
+        }
+    )
+
+
+def _remind_to_answer(offer: Offer) -> None:
+    """A reminder the day before the answer is due, kept in step with the date (#237).
+
+    Made when the date is set, moved when it moves, ticked off when it is taken away or has
+    already passed. Through `postpone_reminder`, so a moved date is announced again at its
+    new time rather than silenced by the stamp from the old one.
+    """
+    reminder = offer.reminder
+    if offer.answer_by is None:
+        if reminder is not None and not reminder.is_done:
+            reminder.complete()
+        return
+    due = timezone.make_aware(
+        dt.datetime.combine(offer.answer_by - ANSWER_REMINDER_LEAD, dt.time(9, 0)),
+        timezone.get_current_timezone(),
+    )
+    if due <= timezone.now():
+        if reminder is not None and not reminder.is_done:
+            reminder.complete()
+        return
+    if reminder is None:
+        offer.reminder = Reminder.objects.create(
+            owner=offer.owner,
+            application=offer.application,
+            summary=_answer_reminder_summary(offer),
+            due_at=due,
+        )
+        offer.save(update_fields=["reminder", "updated_at"])
+    else:
+        reminder.summary = _answer_reminder_summary(offer)
+        reminder.save(update_fields=["summary", "updated_at"])
+        if reminder.is_done:
+            reminder.done_at = None
+            reminder.save(update_fields=["done_at", "updated_at"])
+        postpone_reminder(reminder, due)
+
+
+@transaction.atomic
+def record_offer(application: Application, *, actor: str = "", **fields) -> Offer:
+    """Record what was offered: the row, the timeline entry, the reminder, and the status.
+
+    The status moves to *Offer* if the application is open and had not got there -- through
+    `change_status`, so the timeline says so -- and is left alone if it is already there or
+    past it. An offer recorded on an application already accepted is a revision of terms,
+    not a step backwards.
+    """
+    offer = Offer.objects.create(owner=application.owner, application=application, **fields)
+    record_event(
+        application, kind=EventKind.OFFER, summary=_offer_summary(offer, revised=False), actor=actor
+    )
+    _remind_to_answer(offer)
+    order = list(BOARD_STATUSES)
+    if application.status in order and order.index(application.status) < order.index(Status.OFFER):
+        change_status(application, Status.OFFER, actor=actor)
+    return offer
+
+
+@transaction.atomic
+def revise_offer(offer: Offer, *, actor: str = "") -> Offer:
+    """After an offer's row has been edited: the revision on the timeline, the reminder moved."""
+    record_event(
+        offer.application,
+        kind=EventKind.OFFER,
+        summary=_offer_summary(offer, revised=True),
+        actor=actor,
+    )
+    _remind_to_answer(offer)
+    return offer
