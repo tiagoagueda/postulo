@@ -1,17 +1,82 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Tag" %}{% endblock %}
 
 {% block content %}
+  {% comment %} A tag's word, its colour and its icon, with the tag itself above them (#285).
+
+     The preview is the reason this page stopped being a loop over `form`. Somebody choosing
+     between *Violet* and *Rose* for a label called "Dream job" is not choosing between two
+     words, and a select full of colour names asks them to imagine the answer. Here every
+     option draws itself, and the pill at the top is the actual tag: their word, the colour
+     they have clicked, the icon they have clicked.
+
+     It follows a click with no script at all -- `assets/css/app.css` matches the checked
+     radio's value under `.tag-appearance` and paints the preview from it, which is why the
+     wrapper class is on the card and not decoration. The preview carries all twelve icons
+     and the stylesheet folds away the eleven that are not wanted; a page without CSS shows
+     a pill with twelve icons in it, which is honest about being a preview, and the radios
+     underneath work regardless.
+
+     The name in the preview is the *saved* name, not what is being typed -- that part would
+     need script, and a name is the one thing about a tag that needs no previewing.
+  {% endcomment %}
   <div class="mx-auto max-w-md">
-    <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Tag" %}</h1>
+    <c-page-title>{% translate "Tag" %}</c-page-title>
     <form method="post" novalidate>
       {% csrf_token %}
-      <div class="card mb-6">
-        {% for field in form %}
-          <c-field :field="field" />
-        {% endfor %}
+      <div class="tag-appearance card mb-6">
+        <c-field :field="form.name" />
+
+        {% translate "your tag" as unnamed %}
+        <p class="mb-5 flex flex-wrap items-center gap-2 text-sm text-ink-500 dark:text-ink-400">
+          {% translate "On a board it looks like this:" %}
+          <span class="tag tag-grey tag-preview">
+            {% for value, label in form.icon.field.choices %}
+              {% if value %}{% icon value class="size-3" %}{% endif %}
+            {% endfor %}
+            <bdi>{{ form.name.value|default:unnamed }}</bdi>
+          </span>
+        </p>
+
+        <fieldset class="mb-5"{% if form.colour.aria_describedby %} aria-describedby="{{ form.colour.aria_describedby }}"{% endif %}>
+          <legend class="field-label mb-1">{{ form.colour.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.colour.auto_id }}_helptext">
+            {{ form.colour.help_text }}
+          </p>
+          <div class="tag-picker">
+            {% for choice in form.colour %}
+              <label>
+                {{ choice.tag }}
+                <span class="tag tag-{{ choice.data.value }}">{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <c-field-feedback :field="form.colour" errors-only />
+        </fieldset>
+
+        <fieldset{% if form.icon.aria_describedby %} aria-describedby="{{ form.icon.aria_describedby }}"{% endif %}>
+          <legend class="field-label mb-1">{{ form.icon.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.icon.auto_id }}_helptext">
+            {{ form.icon.help_text }}
+          </p>
+          {% comment %} The word beside each icon says what it is *for*, not what it draws:
+             somebody labelling a tag "works from anywhere" is looking for the idea, and a
+             list reading "House, Pin, People" would make them translate twice. {% endcomment %}
+          <div class="tag-picker">
+            {% for choice in form.icon %}
+              <label>
+                {{ choice.tag }}
+                <span class="flex items-center gap-1.5">
+                  {% if choice.data.value %}{% icon choice.data.value class="size-4 text-ink-500 dark:text-ink-400" %}{% endif %}
+                  {{ choice.choice_label }}
+                </span>
+              </label>
+            {% endfor %}
+          </div>
+          <c-field-feedback :field="form.icon" errors-only />
+        </fieldset>
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>

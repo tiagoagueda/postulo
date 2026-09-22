@@ -17,6 +17,8 @@ from dataclasses import dataclass, field
 
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core.models import TagColour
+
 
 @dataclass(frozen=True)
 class Swatch:
@@ -70,9 +72,10 @@ SEMANTIC: tuple[Swatch, ...] = (
     Swatch("ring", "bg-ring"),
 )
 
-#: The tag palette, each tuned to 3:1 against the card in both themes. Six of the seven are
-#: unspent until #285 lights them up; the gallery is where they can be seen meanwhile.
-TAGS: tuple[str, ...] = ("grey", "blue", "amber", "violet", "teal", "green", "rose")
+#: The tag palette, each tuned to 3:1 against the card in both themes. Taken from the model
+#: rather than listed again (#285): these are the colours an applicant can put on a tag, and
+#: a gallery showing a different seven would be a gallery of nothing in particular.
+TAGS: tuple[str, ...] = tuple(colour.value for colour in TagColour)
 
 #: Every way a button is painted, as the attribute a template writes.
 BUTTON_VARIANTS: tuple[tuple[str, str], ...] = (

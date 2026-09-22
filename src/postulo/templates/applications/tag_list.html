@@ -27,7 +27,7 @@
                buttons is one pixel more than 320 allows in Greek, and a row that may not
                wrap pushes the page sideways instead (CI's fonts found it; #113). {% endcomment %}
             <li class="flex flex-wrap items-center gap-3 px-4 py-3">
-              <span class="flex-1">{{ tag.name }}</span>
+              <span class="flex-1"><c-tag :tag="tag" /></span>
               <span class="text-xs text-ink-400">{{ tag.applications.count }}</span>
               <a href="{% url 'applications:tag_update' tag.pk %}" class="btn" data-variant="ghost" data-size="xs">
                 {% translate "Edit" %}<span class="sr-only">: <bdi>{{ tag.name }}</bdi></span>

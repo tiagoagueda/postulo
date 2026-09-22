@@ -39,7 +39,7 @@ from postulo.applications.models import (
     Status,
 )
 from postulo.applications.services import change_status, record_event, schedule_interview
-from postulo.core.models import Tag
+from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.documents.models import (
     CV,
     CoverLetter,
@@ -516,13 +516,13 @@ class Command(BaseCommand):
 
         # ---- tags ------------------------------------------------------------
         tags = {
-            name: Tag.objects.create(owner=user, name=name, colour=colour)
-            for name, colour in [
-                ("Remote", "sky"),
-                ("Dream job", "amber"),
-                ("Backup plan", "slate"),
-                ("Via a friend", "emerald"),
-                ("Relocation", "rose"),
+            name: Tag.objects.create(owner=user, name=name, colour=colour, icon=icon)
+            for name, colour, icon in [
+                ("Remote", TagColour.BLUE, TagIcon.HOME),
+                ("Dream job", TagColour.AMBER, TagIcon.STAR),
+                ("Backup plan", TagColour.GREY, TagIcon.NONE),
+                ("Via a friend", TagColour.GREEN, TagIcon.USERS),
+                ("Relocation", TagColour.ROSE, TagIcon.MAP_PIN),
             ]
         }
 

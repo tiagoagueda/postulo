@@ -6,7 +6,7 @@ from django import forms
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core.models import Tag
+from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
 from postulo.jobs.models import (
@@ -493,9 +493,33 @@ class InterviewForm(OwnerScopedModelForm):
 
 
 class TagForm(OwnerScopedModelForm):
+    """A tag's word, and the two things that make it findable on a crowded board (#285).
+
+    Radio groups rather than two selects. A select is right when the options are a long list
+    of words and wrong when they are seven colours and thirteen pictures: `Violet` and
+    `graduation-cap` read out in a dropdown tell somebody the name of the thing they are
+    choosing and nothing about what they will get, and they cannot be compared without
+    opening the list seven times. Laid out, they are all on screen at once and each one shows
+    itself.
+
+    The choices are set here rather than left to the model field because a `ModelForm` adds
+    its own blank option to a field that allows one, and *both* of these already say what
+    empty means -- grey for a colour, "No icon" for an icon. A second empty row labelled
+    `---------` would be a third answer to a question with two.
+    """
+
     class Meta:
         model = Tag
-        fields = ("name", "colour")
+        fields = ("name", "colour", "icon")
+        widgets = {
+            "colour": forms.RadioSelect,
+            "icon": forms.RadioSelect,
+        }
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.fields["colour"].choices = TagColour.choices
+        self.fields["icon"].choices = TagIcon.choices
 
     def clean_name(self) -> str:
         name = self.cleaned_data["name"].strip()

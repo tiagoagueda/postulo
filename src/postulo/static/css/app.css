@@ -461,6 +461,9 @@
   .mb-4 {
     margin-bottom: calc(var(--spacing) * 4);
   }
+  .mb-5 {
+    margin-bottom: calc(var(--spacing) * 5);
+  }
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
   }
@@ -514,6 +517,10 @@
   }
   .table {
     display: table;
+  }
+  .size-3 {
+    width: calc(var(--spacing) * 3);
+    height: calc(var(--spacing) * 3);
   }
   .size-3\.5 {
     width: calc(var(--spacing) * 3.5);
@@ -2979,6 +2986,7 @@
   .tag {
     display: inline-flex;
     align-items: center;
+    gap: var(--spacing);
     border-radius: calc(infinity * 1px);
     padding-inline: calc(var(--spacing) * 2);
     padding-block: calc(var(--spacing) * 0.5);
@@ -3126,6 +3134,174 @@
         color: var(--color-rose-200);
       }
     }
+  }
+  .tag-picker {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: calc(var(--spacing) * 4);
+    row-gap: calc(var(--spacing) * 2);
+  }
+  .tag-picker label {
+    display: flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-ink-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="grey"]:checked) .tag-preview {
+    background-color: var(--color-ink-100);
+    color: var(--color-ink-600);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-800);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-800);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-300);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-300);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="blue"]:checked) .tag-preview {
+    background-color: var(--color-sky-100);
+    color: var(--color-sky-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-sky-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-sky-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-sky-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-sky-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="teal"]:checked) .tag-preview {
+    background-color: var(--color-teal-100);
+    color: var(--color-teal-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-teal-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-teal-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-teal-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-teal-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="green"]:checked) .tag-preview {
+    background-color: var(--color-emerald-100);
+    color: var(--color-emerald-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-emerald-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-emerald-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-emerald-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-emerald-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="amber"]:checked) .tag-preview {
+    background-color: var(--color-amber-100);
+    color: var(--color-amber-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-amber-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-amber-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-amber-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-amber-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="rose"]:checked) .tag-preview {
+    background-color: var(--color-rose-100);
+    color: var(--color-rose-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-rose-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-rose-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-rose-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-rose-200);
+      }
+    }
+  }
+  .tag-appearance:has([name="colour"][value="violet"]:checked) .tag-preview {
+    background-color: var(--color-violet-100);
+    color: var(--color-violet-800);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-violet-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-violet-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-violet-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-violet-200);
+      }
+    }
+  }
+  .tag-preview [data-icon] {
+    display: none;
+  }
+  .tag-appearance:has([name="icon"][value="home"]:checked) .tag-preview [data-icon="home"], .tag-appearance:has([name="icon"][value="map-pin"]:checked) .tag-preview [data-icon="map-pin"], .tag-appearance:has([name="icon"][value="users"]:checked) .tag-preview [data-icon="users"], .tag-appearance:has([name="icon"][value="star"]:checked) .tag-preview [data-icon="star"], .tag-appearance:has([name="icon"][value="flag"]:checked) .tag-preview [data-icon="flag"], .tag-appearance:has([name="icon"][value="clock"]:checked) .tag-preview [data-icon="clock"], .tag-appearance:has([name="icon"][value="heart"]:checked) .tag-preview [data-icon="heart"], .tag-appearance:has([name="icon"][value="briefcase"]:checked) .tag-preview [data-icon="briefcase"], .tag-appearance:has([name="icon"][value="graduation-cap"]:checked) .tag-preview [data-icon="graduation-cap"], .tag-appearance:has([name="icon"][value="banknote"]:checked) .tag-preview [data-icon="banknote"], .tag-appearance:has([name="icon"][value="globe"]:checked) .tag-preview [data-icon="globe"], .tag-appearance:has([name="icon"][value="shield"]:checked) .tag-preview [data-icon="shield"] {
+    display: block;
   }
   .chip-new {
     --tw-border-style: dashed;
@@ -4085,6 +4261,9 @@ html {
   }
   .menu-item, .nav-link, .nav-link-active, .chip-remove {
     border: 1px solid ButtonText;
+  }
+  .tag {
+    border: 1px solid CanvasText;
   }
   body[data-nav-underline="off"] .nav-link-active {
     text-decoration-line: underline;

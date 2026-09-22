@@ -18,7 +18,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
-from postulo.core.models import Tag
+from postulo.core.models import Tag, TagColour
 
 pytestmark = pytest.mark.django_db
 
@@ -107,7 +107,7 @@ def test_two_spellings_of_a_new_tag_are_one_tag(user):
 
 
 def test_a_tag_that_already_exists_keeps_its_colour(user):
-    Tag.objects.create(owner=user, name="Remote", colour="amber")
+    Tag.objects.create(owner=user, name="Remote", colour=TagColour.AMBER)
 
     found = Tag.named(user, ["remote"])
 
@@ -115,9 +115,13 @@ def test_a_tag_that_already_exists_keeps_its_colour(user):
     assert found[0].name == "Remote", "and it keeps the spelling it was first given"
 
 
-def test_a_new_tag_has_no_colour_of_its_own(user):
-    """Colours are chosen on the tags page, where there is room to see them together."""
-    assert Tag.named(user, ["Remote"])[0].colour == ""
+def test_a_new_tag_is_plain_until_somebody_chooses(user):
+    """A control that exists to accept a typed word does not also ask for a colour and an
+    icon; those are chosen on the tags page, where there is room to see them together. Grey
+    rather than empty since #285 -- the colour is one of seven now, and grey is the plain
+    one."""
+    made = Tag.named(user, ["Remote"])[0]
+    assert (made.colour, made.icon) == (TagColour.GREY, "")
 
 
 def test_typed_and_ticked_tags_are_both_kept(user):

@@ -151,7 +151,11 @@ def furnished(applicant):
         title="Reference",
         file=ContentFile(b"a reference", name="reference.txt"),
     )
-    tag = Tag.objects.create(owner=applicant, name="Remote", slug="remote")
+    # Coloured and with an icon, so that axe reads a tag as it is drawn rather than as
+    # the grey default -- the tones are where a contrast failure would hide (#285).
+    tag = Tag.objects.create(
+        owner=applicant, name="Remote", slug="remote", colour="violet", icon="home"
+    )
     # A capture waiting for review, which is the state its page exists for.
     capture = Capture.objects.create(
         owner=applicant,

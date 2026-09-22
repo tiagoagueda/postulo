@@ -74,12 +74,100 @@ class OwnedModel(TimeStampedModel):
         abstract = True
 
 
+class TagColour(models.TextChoices):
+    """The tones a tag may take, and the whole of them (#285).
+
+    A choice rather than free text. `colour` was a plain `CharField` whose help text invited
+    "a hint for the interface, such as amber or sky", so a person could type *amber*,
+    *Amber*, *orange-ish* or *#f59e0b* -- all accepted, none of them drawn anywhere, all of
+    them meaning nothing.
+
+    **Not a colour picker.** A free value needs a contrast check per tag per theme, breaks
+    under forced colours in a way a fixed palette does not, and hands somebody a decision
+    they never asked to make. These seven are the tones the stylesheet already paints for
+    the plugin pills, each tuned to 4.5:1 against its own ground in both themes, and
+    `tests/test_contrast.py` holds them there.
+    """
+
+    GREY = "grey", _("Grey")
+    BLUE = "blue", _("Blue")
+    TEAL = "teal", _("Teal")
+    GREEN = "green", _("Green")
+    AMBER = "amber", _("Amber")
+    ROSE = "rose", _("Rose")
+    VIOLET = "violet", _("Violet")
+
+
+class TagIcon(models.TextChoices):
+    """A short vocabulary of pictures that mean something in a job search (#285).
+
+    Curated rather than open: each is a lucide name vendored through `assets/icons.txt`, so
+    a name outside this list would draw nothing at all. Blank is the default and stays the
+    default -- a tag with no icon looks exactly as every tag looked before.
+
+    The label beside each name is what it is *for*, not what it depicts: somebody choosing
+    an icon for a "remote" tag is looking for the idea, not for a house. The word on the tag
+    is always the person's own.
+
+    Not emoji. A tag is read aloud as well as looked at, and an emoji announces itself by
+    its Unicode name in the middle of the label, where a lucide icon sits beside the word
+    and says nothing.
+    """
+
+    NONE = "", _("No icon")
+    HOME = "home", _("Remote")
+    MAP_PIN = "map-pin", _("Place")
+    USERS = "users", _("Referral")
+    STAR = "star", _("Favourite")
+    FLAG = "flag", _("Flagged")
+    CLOCK = "clock", _("Waiting")
+    HEART = "heart", _("Liked")
+    BRIEFCASE = "briefcase", _("Work")
+    GRADUATION_CAP = "graduation-cap", _("Study")
+    BANKNOTE = "banknote", _("Pay")
+    GLOBE = "globe", _("Abroad")
+    SHIELD = "shield", _("Stable")
+
+
+#: What a colour somebody typed before #285 most nearly means, in the palette that exists.
+#: The names are Tailwind's, because "a hint for the interface" was as much guidance as the
+#: field gave and Tailwind's names are what somebody looking at this project would reach for;
+#: the plain English ones are what somebody not looking at it would. Migration 0021 carries
+#: its own copy on purpose -- a migration describes one moment and must not follow this list
+#: if it is ever changed.
+NEAREST_TONE = {
+    "sky": "blue", "cyan": "blue", "azure": "blue", "blue": "blue",
+    "slate": "grey", "gray": "grey", "grey": "grey", "zinc": "grey",
+    "stone": "grey", "neutral": "grey", "silver": "grey",
+    "emerald": "green", "green": "green", "lime": "green",
+    "teal": "teal", "turquoise": "teal",
+    "amber": "amber", "yellow": "amber", "orange": "amber", "gold": "amber",
+    "rose": "rose", "red": "rose", "pink": "rose", "crimson": "rose", "fuchsia": "rose",
+    "violet": "violet", "purple": "violet", "indigo": "violet", "magenta": "violet",
+}  # fmt: skip
+
+
+def nearest_tone(typed: str) -> str:
+    """The palette colour a free-text value meant, or grey where it meant nothing (#285).
+
+    Grey rather than a guess. A tag whose colour cannot be read is a tag that was never
+    drawn in that colour anyway -- the column existed for four releases and no page looked
+    at it -- so there is nothing to preserve and a wrong guess would be worse than plain.
+    """
+    return NEAREST_TONE.get((typed or "").strip().lower(), TagColour.GREY.value)
+
+
 class Tag(OwnedModel):
     """A label the applicant invents for themselves.
 
     Deliberately free-form: everyone organises a job search differently, and a fixed
     vocabulary would fit nobody. Slugs are unique per owner, so two people may both
     have a "remote" tag without colliding.
+
+    The *word* is the person's. How it is drawn is not: a colour and an icon out of fixed
+    sets, so that forty labels on one board can be told apart at a glance without any of
+    them leaning on colour to do it. The word is always there beside them, which is the rule
+    #274 sets for every cue in this interface (#285).
     """
 
     name = models.CharField(_("name"), max_length=60)
@@ -87,8 +175,17 @@ class Tag(OwnedModel):
     colour = models.CharField(
         _("colour"),
         max_length=20,
+        choices=TagColour,
+        default=TagColour.GREY,
+        help_text=_("A second signal beside the word, never instead of it."),
+    )
+    icon = models.CharField(
+        _("icon"),
+        max_length=20,
+        choices=TagIcon,
+        default=TagIcon.NONE,
         blank=True,
-        help_text=_("A hint for the interface, such as “amber” or “sky”."),
+        help_text=_("Optional, and decoration: the word is what is read aloud."),
     )
 
     class Meta:
@@ -107,6 +204,31 @@ class Tag(OwnedModel):
             self.slug = slugify(self.name)[:60]
         super().save(*args, **kwargs)
 
+    @property
+    def tone(self) -> str:
+        """The stylesheet class for this tag, whatever the column happens to hold.
+
+        The migration maps the free text that was there before #285 onto the palette and
+        leaves the rest grey, so in principle this never has anything to decide. It decides
+        anyway: a row restored from an old export, or written by a fixture, draws as grey
+        rather than as a class name that does not exist -- which would draw as nothing, and
+        look like a bug in the stylesheet rather than in the data.
+        """
+        known = {choice.value for choice in TagColour}
+        return f"tag-{self.colour if self.colour in known else TagColour.GREY.value}"
+
+    @property
+    def glyph(self) -> str:
+        """The icon to draw before the word, or `""` for none -- and `""` for nonsense.
+
+        `{% icon %}` raises on a name it has no file for, which is right of it: a template
+        asking for an icon nobody vendored is a mistake at the moment it is written. But a
+        tag's icon is *data*, and data arrives from an import written by an older version, so
+        the guard belongs here rather than in the template. A name off the list draws nothing,
+        which is what a tag has looked like all along.
+        """
+        return self.icon if self.icon in {choice.value for choice in TagIcon} else ""
+
     @classmethod
     def named(cls, owner, names) -> "list[Tag]":
         """The owner's tags with these names, made if missing, in the order given.
@@ -116,8 +238,10 @@ class Tag(OwnedModel):
         offers to add a label somebody has not used before needs somewhere for that label to
         land, and this is it (#139).
 
-        A tag made this way has no colour. Colours are chosen on the tags page, where there
-        is room to see them beside each other.
+        A tag made this way is grey and has no icon. Both are chosen on the tags page,
+        where there is room to see them beside each other -- picking a colour out of the
+        corner of a control that exists to accept a typed word would be a worse choice than
+        not offering one.
         """
         found: list[Tag] = []
         seen: set[str] = set()

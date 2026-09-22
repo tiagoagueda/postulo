@@ -73,9 +73,16 @@ def test_it_shows_every_size_the_stylesheet_paints(client, staff_user):
     assert painted - declared == {"icon", "icon-sm", "icon-xs"}
 
 
-def test_it_shows_the_whole_tag_palette_including_what_nothing_spends_yet(client, staff_user):
-    """Six of the seven are dead code until #285. The gallery is where they can be seen."""
-    painted = set(re.findall(r"\.tag-([a-z]+)\s*\{", CSS))
+#: Classes that begin `tag-` and are not tones: the two that dress the picker on the tag
+#: form (#285). Named here rather than matched around, so that a third one has to be
+#: thought about instead of quietly slipping past the assertion below.
+NOT_TONES = {"picker", "preview"}
+
+
+def test_it_shows_the_whole_tag_palette(client, staff_user):
+    """Every colour a tag can be, on one page, in both themes. Six of the seven were unspent
+    until #285 gave applicants the palette; the gallery is still where they can be compared."""
+    painted = set(re.findall(r"\.tag-([a-z]+)\s*\{", CSS)) - NOT_TONES
 
     assert set(design.TAGS) == painted
 

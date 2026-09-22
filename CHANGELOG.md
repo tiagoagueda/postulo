@@ -46,6 +46,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A tag can take one of seven colours and one of twelve icons, drawn wherever the tag is — the board, the table, an application and the tags page — and the colour box that did nothing is a palette. **Colours you typed become the nearest one**, or grey. (#285)
 - Your picture is kept at the size you gave it rather than 256 square, so the profile page stops upscaling it, and a Gravatar copy is fetched large enough to show. **Pictures already stored stay 256** until re-uploaded or re-fetched. (#265)
 - A company logo or a plugin's mark may be an SVG, sanitised against an allowlist; a raster one is kept at its own size rather than a 256-pixel square. **Logos already stored stay square** — *Refresh* re-fetches one with an address, and an upload is replaced by uploading again. (#264)
 - Form fields explain themselves: what goes in the box, in what form, and what Postulo does with it afterwards. (#205)

@@ -445,15 +445,19 @@
       dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100;
   }
 
-  /* A small pill naming a category, on the two plugin pages (#184). Distinct from `.chip`,
-     which is a removable token in a field: a tag is read, never dismissed, so it has no
-     button and pads evenly.
+  /* A small pill naming a category: a plugin's kind (#184), and every tag an applicant
+     invents (#285). Distinct from `.chip`, which is a removable token in a field: a tag is
+     read, never dismissed, so it has no button and pads evenly.
 
      Every tone reaches 4.5:1 against its own ground in both themes, and the word inside is
      what a screen reader announces -- the colour is a second signal for people scanning a
-     list, never the only one. `tag-grey` is where a plugin came from, deliberately plain. */
+     list, never the only one. `tag-grey` is where a plugin came from, deliberately plain,
+     and it is what a tag is until somebody says otherwise.
+
+     `gap-1` for the icon a tag may carry in front of its word. A pill with no icon has one
+     child and a gap between nothing, so the plugin pills are unchanged to the pixel. */
   .tag {
-    @apply inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium;
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
   }
 
   .tag-grey {
@@ -482,6 +486,77 @@
 
   .tag-rose {
     @apply bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200;
+  }
+
+  /* Choosing a tag's colour and its icon, on the one page where that is the subject (#285).
+     Two radio groups and a preview, and the preview is the point: a name out of a select
+     ("Violet", "graduation-cap") tells nobody what they are about to get.
+
+     The radios stay real and stay visible. A swatch that hides its input behind a styled box
+     is the usual way to draw this and it is how the keyboard and the screen reader get lost;
+     what each option shows *is* its label -- the word "Violet" in violet, the icon beside
+     what it is for -- so the accessible name and the picture are the same thing and neither
+     can drift from the other.
+
+     The preview is driven by `:has()` on the checked radio's *value*, so it follows a click
+     with no script and survives Django renumbering the widget ids. Each pairing is written
+     out because CSS cannot correlate one attribute's value with another's: seven tones and
+     twelve icons, and `tests/test_tags.py` fails if a choice is added without its rule. */
+  .tag-picker {
+    @apply flex flex-wrap gap-x-4 gap-y-2;
+  }
+
+  .tag-picker label {
+    @apply flex items-center gap-2 text-sm text-ink-800 dark:text-ink-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="grey"]:checked) .tag-preview {
+    @apply bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-300;
+  }
+
+  .tag-appearance:has([name="colour"][value="blue"]:checked) .tag-preview {
+    @apply bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="teal"]:checked) .tag-preview {
+    @apply bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="green"]:checked) .tag-preview {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="amber"]:checked) .tag-preview {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="rose"]:checked) .tag-preview {
+    @apply bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200;
+  }
+
+  .tag-appearance:has([name="colour"][value="violet"]:checked) .tag-preview {
+    @apply bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200;
+  }
+
+  /* Every icon is in the preview and all but one are folded away. Twelve pairings, one
+     declaration: "no icon" is the absence of a match, which is why it needs no rule. */
+  .tag-preview [data-icon] {
+    @apply hidden;
+  }
+
+  .tag-appearance:has([name="icon"][value="home"]:checked) .tag-preview [data-icon="home"],
+  .tag-appearance:has([name="icon"][value="map-pin"]:checked) .tag-preview [data-icon="map-pin"],
+  .tag-appearance:has([name="icon"][value="users"]:checked) .tag-preview [data-icon="users"],
+  .tag-appearance:has([name="icon"][value="star"]:checked) .tag-preview [data-icon="star"],
+  .tag-appearance:has([name="icon"][value="flag"]:checked) .tag-preview [data-icon="flag"],
+  .tag-appearance:has([name="icon"][value="clock"]:checked) .tag-preview [data-icon="clock"],
+  .tag-appearance:has([name="icon"][value="heart"]:checked) .tag-preview [data-icon="heart"],
+  .tag-appearance:has([name="icon"][value="briefcase"]:checked) .tag-preview [data-icon="briefcase"],
+  .tag-appearance:has([name="icon"][value="graduation-cap"]:checked) .tag-preview [data-icon="graduation-cap"],
+  .tag-appearance:has([name="icon"][value="banknote"]:checked) .tag-preview [data-icon="banknote"],
+  .tag-appearance:has([name="icon"][value="globe"]:checked) .tag-preview [data-icon="globe"],
+  .tag-appearance:has([name="icon"][value="shield"]:checked) .tag-preview [data-icon="shield"] {
+    @apply block;
   }
 
   .chip-new {
@@ -1080,6 +1155,15 @@ html {
   .nav-link-active,
   .chip-remove {
     border: 1px solid ButtonText;
+  }
+
+  /* A tag is a word on a tinted ground, and the theme throws the tint away -- so seven
+     tones become one and the pill stops being a pill. The border brings the shape back in
+     a colour the theme keeps. The icon survives on its own: it is a stroke in
+     `currentColor`, which is repainted rather than dropped, so a tag that carries one is
+     still told apart from a tag that carries another (#285). */
+  .tag {
+    border: 1px solid CanvasText;
   }
 
   /* The preference does not reach this far. A high-contrast theme discards the tint and

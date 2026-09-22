@@ -303,7 +303,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     """
     from postulo.accounts.models import PersonIdentifier
     from postulo.applications.models import Application, ApplicationEvent, Interview, Reminder
-    from postulo.core.models import Tag
+    from postulo.core.models import Tag, TagIcon, nearest_tone
     from postulo.documents.models import (
         CV,
         CoverLetter,
@@ -385,12 +385,21 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             profile.avatar.save(avatar_file.rsplit("/", 1)[-1], ContentFile(content), save=True)
 
     # --------------------------------------------------------------------- tags
+    # An archive written before #285 carries whatever its owner typed into a free-text
+    # colour box, and one written by a later Postulo than this may carry an icon this one
+    # has never heard of. Both are read for what they can mean and neither is refused: an
+    # import that rejects a whole account over the shade of a label would be absurd.
+    known_icons = {choice.value for choice in TagIcon}
     tags_by_slug: dict[str, Tag] = {}
     for entry in document.get("tags", []):
         tag, created = Tag.objects.get_or_create(
             owner=user,
             slug=entry.get("slug") or entry.get("name", "").lower(),
-            defaults={"name": entry.get("name", ""), "colour": entry.get("colour", "")},
+            defaults={
+                "name": entry.get("name", ""),
+                "colour": nearest_tone(entry.get("colour", "")),
+                "icon": entry.get("icon", "") if entry.get("icon", "") in known_icons else "",
+            },
         )
         tags_by_slug[tag.slug] = tag
         report.tags += int(created)

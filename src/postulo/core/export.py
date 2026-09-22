@@ -80,7 +80,7 @@ TRANSLATION_SECTIONS = {
     "languageskill": "languages",
     "link": "links",
 }
-TAG_FIELDS = ("id", "name", "slug", "colour")
+TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
 COMPANY_FIELDS = (
     "id",
     "name",

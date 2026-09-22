@@ -1,0 +1,25 @@
+{% load postulo %}
+<c-vars tag />
+{% comment %} One of the applicant's own labels, drawn (#285).
+
+   `<c-tag :tag="tag" />`
+
+   It was written out six times -- twice in the row partial, once each in the card, the
+   detail page, the tags page and the filter bar -- as the same forty-eight characters of
+   `rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:…`. Four of the six were
+   byte-identical, which is how a tag could be given a colour on its own page and stay grey
+   on every page that mattered. The colour has to be drawn in one place or it is drawn in
+   none.
+
+   **The word is never optional and the other two always are.** The name is what a screen
+   reader announces; the icon is `aria-hidden`, because "star" read out in the middle of
+   somebody's label is noise, and the colour says nothing to begin with. That is #274's rule
+   and it is why a tag can carry these at all -- they are a second way to tell two labels
+   apart at a glance, not the only way.
+
+   `tone` and `glyph` rather than `colour` and `icon`: both are guarded on the model, so a
+   value from an older export draws as a grey tag with no icon instead of a class that does
+   not exist or an `{% templatetag openblock %} icon {% templatetag closeblock %}` that
+   raises. `<bdi>` because the name is the person's own and may run the other way.
+{% endcomment %}
+<span class="tag {{ tag.tone }}">{% if tag.glyph %}{% icon tag.glyph class="size-3" %}{% endif %}<bdi>{{ tag.name }}</bdi></span>

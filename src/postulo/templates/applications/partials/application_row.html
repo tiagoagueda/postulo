@@ -20,9 +20,7 @@
         {% if application.tags.all and 'tags' not in table.visible_keys %}
           <div class="mt-1 flex flex-wrap gap-1">
             {% for tag in application.tags.all %}
-              <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
-                {{ tag.name }}
-              </span>
+              <c-tag :tag="tag" />
             {% endfor %}
           </div>
         {% endif %}
@@ -66,9 +64,7 @@
       <td class="px-4 py-3">
         <div class="flex flex-wrap gap-1">
           {% for tag in application.tags.all %}
-            <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
-              {{ tag.name }}
-            </span>
+            <c-tag :tag="tag" />
           {% empty %}
             <span class="text-ink-400">—</span>
           {% endfor %}
