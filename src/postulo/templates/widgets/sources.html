@@ -2,32 +2,31 @@
 <h2 class="mb-3 font-medium">{{ widget.label }}</h2>
 {% if insights.sources %}
   <c-scroll-box class="card p-0" label="{% translate 'Sources' %}">
-    <table class="w-full text-start text-sm">
-      <thead class="border-b border-ink-200 text-xs text-ink-500
-                    dark:border-ink-800 dark:text-ink-400">
+    <table class="table">
+      <thead>
         <tr>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Source" %}</th>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Sent" %}</th>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Replied" %}</th>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Interviews" %}</th>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Offers" %}</th>
-          <th scope="col" class="px-4 py-3 font-medium">{% translate "Quiet" %}</th>
+          <th scope="col">{% translate "Source" %}</th>
+          <th scope="col">{% translate "Sent" %}</th>
+          <th scope="col">{% translate "Replied" %}</th>
+          <th scope="col">{% translate "Interviews" %}</th>
+          <th scope="col">{% translate "Offers" %}</th>
+          <th scope="col">{% translate "Quiet" %}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in insights.sources %}
-          <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
-            <td class="px-4 py-3">{{ row.name }}</td>
-            <td class="px-4 py-3 tabular-nums">{{ row.applied }}</td>
-            <td class="px-4 py-3 tabular-nums">
+          <tr>
+            <td>{{ row.name }}</td>
+            <td class="tabular-nums">{{ row.applied }}</td>
+            <td class="tabular-nums">
               {{ row.responded }}
               {% if row.response_rate is not None %}
                 <span class="text-xs text-ink-400">({{ row.response_rate|floatformat:0|percent }})</span>
               {% endif %}
             </td>
-            <td class="px-4 py-3 tabular-nums">{{ row.interviewed }}</td>
-            <td class="px-4 py-3 tabular-nums">{{ row.offers }}</td>
-            <td class="px-4 py-3 tabular-nums">
+            <td class="tabular-nums">{{ row.interviewed }}</td>
+            <td class="tabular-nums">{{ row.offers }}</td>
+            <td class="tabular-nums">
               {{ row.quiet }}
               {% if row.quiet %}
                 <span class="text-xs text-ink-400">({{ row.quiet_rate|floatformat:0|percent }})</span>

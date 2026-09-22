@@ -18,21 +18,20 @@
 
   {% if invites %}
     <c-scroll-box class="card p-0" label="{% translate 'Invitations' %}">
-      <table class="w-full text-start text-sm">
-        <thead class="border-b border-ink-200 text-xs text-ink-500
-                      dark:border-ink-800 dark:text-ink-400">
+      <table class="table">
+        <thead>
           <tr>
-            <th class="px-4 py-3 font-medium">{% translate "For" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Status" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Expires" %}</th>
-            <th class="px-4 py-3"><span class="sr-only">{% translate "Actions" %}</span></th>
+            <th>{% translate "For" %}</th>
+            <th>{% translate "Status" %}</th>
+            <th>{% translate "Expires" %}</th>
+            <th><span class="sr-only">{% translate "Actions" %}</span></th>
           </tr>
         </thead>
         <tbody>
           {% for invite in invites %}
-            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
-              <td class="px-4 py-3">{{ invite }}</td>
-              <td class="px-4 py-3">
+            <tr>
+              <td>{{ invite }}</td>
+              <td>
                 {% if invite.is_accepted %}
                   <span class="text-emerald-600 dark:text-emerald-400">{% translate "Accepted" %}</span>
                 {% elif invite.is_expired %}
@@ -41,10 +40,10 @@
                   <span class="text-brand-600 dark:text-brand-400">{% translate "Pending" %}</span>
                 {% endif %}
               </td>
-              <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ invite.expires_at|date:"DATE_FORMAT" }}</td>
+              <td class="text-ink-500 dark:text-ink-400">{{ invite.expires_at|date:"DATE_FORMAT" }}</td>
               {% comment %} No link column. The link was shown once, on the page that made the
                  invitation; the row keeps a fingerprint of it and cannot show it again (#232). {% endcomment %}
-              <td class="px-4 py-3 text-end">
+              <td class="text-end">
                 {% if not invite.is_accepted %}
                   <form method="post" action="{% url 'accounts:invite_revoke' invite.pk %}">
                     {% csrf_token %}

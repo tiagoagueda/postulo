@@ -23,7 +23,7 @@
   <div id="listings-table">
     {% if listings %}
       <c-scroll-box class="card p-0" label="{% translate 'Listings' %}">
-        <table class="w-full text-start text-sm">
+        <table class="table">
           <c-table.head :table="table" table_id="listings-table" form_id="listing-filters"
                         bulk_form_id="listings-bulk" actions_label="{% translate 'What to do about it' %}" />
           <tbody>
@@ -92,7 +92,7 @@
           {% translate "Discard the ticked ones" %}
         </button>
       </form>
-      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+      <ul>
         {% for capture in pending_captures %}
           <li class="flex items-center gap-3 py-2">
             <label class="tap-target shrink-0">

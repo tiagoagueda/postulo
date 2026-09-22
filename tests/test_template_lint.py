@@ -192,6 +192,22 @@ def test_nothing_else_names_a_retired_field_class_either():
         assert not RETIRED_FIELD.search(text), path.name
 
 
+#: The header of a data table, as it was copied into thirteen templates before the table
+#: said `table` and the stylesheet drew it (#291).
+COPIED_HEADER = re.compile(r'<thead class="border-b border-ink-200')
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_copies_the_table_header(path: Path):
+    text = path.read_text(encoding="utf-8")
+    assert not COPIED_HEADER.search(text), (
+        f'{path.name}: a table header written by hand. Say `<table class="table">` and '
+        "leave the <thead>, the rows and the cells bare; the stylesheet draws them."
+    )
+
+
 def test_the_field_detector_knows_the_difference():
     assert RETIRED_FIELD.search('class="field-input w-64"')
     assert RETIRED_FIELD.search('<legend class="field-label">')

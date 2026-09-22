@@ -23,29 +23,29 @@
      only adds "close when the pointer goes elsewhere".
   {% endcomment %}
   <c-scroll-box class="card p-0" label="{% translate 'People' %}">
-    <table class="table-cards w-full text-start text-sm" role="table">
-      <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400"
+    <table class="table table-cards" role="table">
+      <thead
              role="rowgroup">
         <tr role="row">
-          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Username" %}</th>
-          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Name" %}</th>
-          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Email" %}</th>
-          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Last sign-in" %}</th>
-          <th class="px-4 py-3 font-medium" role="columnheader">{% translate "Role" %}</th>
-          <th class="px-4 py-3" role="columnheader"><span class="sr-only">{% translate "Actions" %}</span></th>
+          <th role="columnheader">{% translate "Username" %}</th>
+          <th role="columnheader">{% translate "Name" %}</th>
+          <th role="columnheader">{% translate "Email" %}</th>
+          <th role="columnheader">{% translate "Last sign-in" %}</th>
+          <th role="columnheader">{% translate "Role" %}</th>
+          <th role="columnheader"><span class="sr-only">{% translate "Actions" %}</span></th>
         </tr>
       </thead>
-      <tbody class="divide-y divide-ink-100 dark:divide-ink-800" role="rowgroup">
+      <tbody role="rowgroup">
         {% for person in people %}
           <tr data-person="{{ person.username }}" role="row" {% if not person.is_active %}class="text-ink-400"{% endif %}>
             {% comment %} The username needs no label: it is the card's heading. {% endcomment %}
-            <td class="px-4 py-3 font-medium" role="cell">{{ person.username }}</td>
-            <td class="px-4 py-3" role="cell" data-label="{% translate 'Name' %}">{{ person.get_full_name|default:"—" }}</td>
-            <td class="px-4 py-3 break-all" role="cell" data-label="{% translate 'Email' %}">{{ person.email }}</td>
-            <td class="px-4 py-3 text-ink-500 dark:text-ink-400" role="cell" data-label="{% translate 'Last sign-in' %}">
+            <td class="font-medium" role="cell">{{ person.username }}</td>
+            <td role="cell" data-label="{% translate 'Name' %}">{{ person.get_full_name|default:"—" }}</td>
+            <td class="break-all" role="cell" data-label="{% translate 'Email' %}">{{ person.email }}</td>
+            <td class="text-ink-500 dark:text-ink-400" role="cell" data-label="{% translate 'Last sign-in' %}">
               {{ person.last_login|date:"DATE_FORMAT"|default:"—" }}
             </td>
-            <td class="px-4 py-3" role="cell" data-label="{% translate 'Role' %}">
+            <td role="cell" data-label="{% translate 'Role' %}">
               {% if not person.is_active %}
                 {% translate "Deactivated" %}
               {% elif person.is_staff %}
@@ -54,7 +54,7 @@
                 {% translate "Member" %}
               {% endif %}
             </td>
-            <td class="px-4 py-3" role="cell" data-actions>
+            <td role="cell" data-actions>
               <div class="flex justify-end">
                 <c-dropdown-menu label="{% blocktranslate trimmed with name=person.username %}Actions for {{ name }}{% endblocktranslate %}">
                   <c-slot name="trigger">{% icon "ellipsis-vertical" %}</c-slot>

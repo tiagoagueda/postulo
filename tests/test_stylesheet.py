@@ -172,6 +172,7 @@ def test_the_style_pack_reaches_the_page():
     assert ".field {" in compiled and ".field > label" in compiled
     assert '.field[data-orientation="horizontal"]' in compiled
     assert ".input-group {" in compiled
+    assert ".table {" in compiled and ".table thead" in compiled
 
 
 def test_the_parser_knows_a_definition_from_a_use():

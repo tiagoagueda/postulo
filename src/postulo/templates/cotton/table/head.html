@@ -68,10 +68,10 @@
 {% comment %} The table's name, for anything that lists the tables on a page or lands inside
    one from the keyboard (#260). Screen-reader-only: the heading above already says it to
    eyes. A caption is the table's first child, so it lives here rather than in the pages. {% endcomment %}
+{% comment %} No class on the header: the table says `table` and Basecoat's structure and
+   this project's paint do the rest, here and on every plain table alike (#291). {% endcomment %}
 <caption class="sr-only">{{ table.label }}</caption>
-<thead class="border-b border-ink-200 text-xs text-ink-500
-              dark:border-ink-800 dark:text-ink-400"
-       data-col-settings="{% url 'core:table_settings' table.name %}"
+<thead data-col-settings="{% url 'core:table_settings' table.name %}"
        data-col-here="{{ request.get_full_path }}"
        data-col-resize="{% translate 'Width of {column}' %}"
        data-col-said="{% translate '{column}: {width} pixels' %}"
@@ -83,13 +83,13 @@
        instead, so the script *adds* a control rather than animating a dead one (#134).
     {% endcomment %}
     {% if bulk_form_id %}
-      <th scope="col" class="w-10 px-4 py-3 font-medium">
+      <th scope="col" class="w-10">
         <span class="sr-only">{% translate "Selected" %}</span>
       </th>
     {% endif %}
     {% for header in table.headers %}
       <th scope="col"
-          class="relative px-4 py-3 align-top font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
+          class="relative align-top {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
           data-col="{{ header.key }}" data-col-label="{{ header.label }}"
           {% if header.width %}data-col-width="{{ header.width }}"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
@@ -131,7 +131,7 @@
       </th>
     {% endfor %}
     {% if actions_label %}
-      <th scope="col" class="px-4 py-3 font-medium">
+      <th scope="col">
         <span class="sr-only">{{ actions_label }}</span>
       </th>
     {% endif %}

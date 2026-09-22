@@ -18,20 +18,19 @@
 
   {% if documents %}
     <c-scroll-box class="card p-0" label="{% translate 'Documents' %}">
-      <table class="w-full text-start text-sm">
-        <thead class="border-b border-ink-200 text-xs text-ink-500
-                      dark:border-ink-800 dark:text-ink-400">
+      <table class="table">
+        <thead>
           <tr>
-            <th class="px-4 py-3 font-medium">{% translate "Document" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "Sent with" %}</th>
-            <th class="px-4 py-3 font-medium">{% translate "When" %}</th>
-            <th class="px-4 py-3"></th>
+            <th>{% translate "Document" %}</th>
+            <th>{% translate "Sent with" %}</th>
+            <th>{% translate "When" %}</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {% for document in documents %}
-            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
-              <td class="px-4 py-3">
+            <tr>
+              <td>
                 {{ document.title }}
                 <span class="ms-1 inline-flex items-center gap-1.5 text-xs text-ink-500 dark:text-ink-400">
                   {% comment %} What this PDF declared when it was frozen, not what its source
@@ -41,7 +40,7 @@
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </td>
-              <td class="px-4 py-3">
+              <td>
                 {% if document.application %}
                   <a href="{{ document.application.get_absolute_url }}" class="hover:underline">
                     {{ document.application.posting.title }}
@@ -50,10 +49,10 @@
                   <span class="text-ink-400">{% translate "Exported on its own" %}</span>
                 {% endif %}
               </td>
-              <td class="px-4 py-3 text-ink-500 tabular-nums dark:text-ink-400">
+              <td class="text-ink-500 tabular-nums dark:text-ink-400">
                 {{ document.rendered_at|date:"DATETIME_FORMAT" }}
               </td>
-              <td class="px-4 py-3 text-end">
+              <td class="text-end">
                 <a href="{% url 'documents:rendered_download' document.pk %}"
                    class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
               </td>

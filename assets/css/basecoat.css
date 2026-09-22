@@ -392,3 +392,43 @@
       dark:border-ink-700 dark:bg-ink-800 dark:text-ink-200;
   }
 }
+
+/* ------------------------------------------------------------------ table */
+
+/*
+ * A data table (#291). Basecoat's `table` gives every row a bottom rule and the last one
+ * none, and keys the header, the body and the cells on the elements; this is the paint
+ * the templates carried on every one of them: the header's small muted type over a
+ * darker rule, the body's lighter rules, and the cell's padding, which was `px-4 py-3` on
+ * eighty-seven cells and `px-4 py-3 font-medium` on forty-three headers.
+ *
+ * Two of Basecoat's choices are undone. `whitespace-nowrap` on every cell would run a
+ * long title off the box, and below `md` a `table-cards` table is a stack of cards whose
+ * cells must wrap like any paragraph. And `align-middle` becomes the browser's own, which
+ * is the same thing for a cell and lets a template say `align-top` where it means it.
+ */
+@layer components {
+  .table {
+    @apply w-full text-start text-sm;
+  }
+
+  .table thead {
+    @apply text-xs text-ink-500 dark:text-ink-400;
+  }
+
+  .table thead tr {
+    @apply border-ink-200 dark:border-ink-800;
+  }
+
+  .table tbody tr {
+    @apply border-ink-100 dark:border-ink-800;
+  }
+
+  .table th {
+    @apply px-4 py-3 font-medium whitespace-normal;
+  }
+
+  .table td {
+    @apply px-4 py-3 whitespace-normal;
+  }
+}

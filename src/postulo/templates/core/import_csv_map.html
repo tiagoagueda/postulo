@@ -15,15 +15,15 @@
     <form method="post" data-csv-map>
       {% csrf_token %}
       <div class="card mb-6">
-        <table class="w-full text-start text-sm">
-          <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+        <table class="table">
+          <thead>
             <tr>
-              <th class="px-3 py-2 font-medium">{% translate "Column in the file" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "First value" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "Read as" %}</th>
+              <th class="px-3 py-2">{% translate "Column in the file" %}</th>
+              <th class="px-3 py-2">{% translate "First value" %}</th>
+              <th class="px-3 py-2">{% translate "Read as" %}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+          <tbody>
             {% for index, header, chosen in columns %}
               <tr>
                 <td class="px-3 py-2 font-medium">{{ header|default:"—" }}</td>
@@ -70,18 +70,18 @@
 
       <h2 class="mb-2 font-medium">{% translate "How the first rows will be read" %}</h2>
       <c-scroll-box class="card mb-4 p-0" label="{% translate 'How the first rows will be read' %}">
-        <table class="w-full text-start text-sm">
-          <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+        <table class="table">
+          <thead>
             <tr>
-              <th class="px-3 py-2 font-medium">#</th>
-              <th class="px-3 py-2 font-medium">{% translate "Company" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "Role" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "Applied" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "Status" %}</th>
-              <th class="px-3 py-2 font-medium">{% translate "Becomes" %}</th>
+              <th class="px-3 py-2">#</th>
+              <th class="px-3 py-2">{% translate "Company" %}</th>
+              <th class="px-3 py-2">{% translate "Role" %}</th>
+              <th class="px-3 py-2">{% translate "Applied" %}</th>
+              <th class="px-3 py-2">{% translate "Status" %}</th>
+              <th class="px-3 py-2">{% translate "Becomes" %}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-ink-100 dark:divide-ink-800" data-preview>
+          <tbody data-preview>
             {% for row in preview %}
               <tr>
                 <td class="px-3 py-2 tabular-nums text-ink-400">{{ row.number }}</td>

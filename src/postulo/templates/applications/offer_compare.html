@@ -27,13 +27,13 @@
 
   {% if columns %}
     <div class="card p-0">
-      <table class="table-cards w-full text-start text-sm" role="table" data-offer-compare>
+      <table class="table table-cards" role="table" data-offer-compare>
         <caption class="sr-only">{% translate "Offers side by side" %}</caption>
-        <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400" role="rowgroup">
+        <thead role="rowgroup">
           <tr role="row">
-            <th scope="col" role="columnheader" class="px-4 py-3 font-medium">{% translate "Term" %}</th>
+            <th scope="col" role="columnheader">{% translate "Term" %}</th>
             {% for offer in columns %}
-              <th scope="col" role="columnheader" class="px-4 py-3 font-medium">
+              <th scope="col" role="columnheader">
                 <a href="{{ offer.application.get_absolute_url }}" class="hover:underline">
                   <bdi>{{ offer.application.posting.company.name }}</bdi>
                 </a>
@@ -42,12 +42,12 @@
             {% endfor %}
           </tr>
         </thead>
-        <tbody class="divide-y divide-ink-100 dark:divide-ink-800" role="rowgroup">
+        <tbody role="rowgroup">
           {% for term, cells in rows %}
             <tr role="row">
-              <th scope="row" role="rowheader" class="px-4 py-3 text-start font-medium">{{ term }}</th>
+              <th scope="row" role="rowheader" class="text-start">{{ term }}</th>
               {% for whose, cell in cells %}
-                <td role="cell" class="px-4 py-3 whitespace-pre-line align-top"
+                <td role="cell" class="whitespace-pre-line align-top"
                     data-label="{{ whose }}">{{ cell|default:"—" }}</td>
               {% endfor %}
             </tr>

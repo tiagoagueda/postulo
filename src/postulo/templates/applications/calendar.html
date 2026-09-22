@@ -121,18 +121,18 @@
        and counts the rest, and the count opens the day. A day outside the month is
        greyed, and today is marked in words as well as in colour. {% endcomment %}
     <c-scroll-box class="card p-0" label="{% translate 'Calendar' %}">
-      <table class="w-full table-fixed text-sm" data-calendar="month">
+      <table class="table table-fixed" data-calendar="month">
         <caption class="sr-only">{{ page.title }}</caption>
         <thead>
-          <tr class="border-b border-ink-100 dark:border-ink-800">
+          <tr>
             {% for name in page.weekday_names %}
-              <th scope="col" class="px-2 py-2 text-start text-xs font-medium text-ink-500 dark:text-ink-400">{{ name }}</th>
+              <th scope="col" class="px-2 py-2 text-start text-xs text-ink-500 dark:text-ink-400">{{ name }}</th>
             {% endfor %}
           </tr>
         </thead>
         <tbody>
           {% for week in page.weeks %}
-            <tr class="border-b border-ink-100 last:border-0 dark:border-ink-800">
+            <tr>
               {% for day in week %}
                 <td class="h-28 min-w-28 align-top p-1{% if day.outside %} bg-ink-50 dark:bg-ink-900/40{% endif %}"
                     {% if day.today %}aria-current="date"{% endif %}>

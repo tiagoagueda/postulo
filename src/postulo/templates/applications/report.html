@@ -236,23 +236,23 @@
     </div>
     {% if report.evidence %}
       <c-scroll-box label="{% translate 'Listings' %}">
-        <table class="w-full text-sm">
-          <thead class="border-b border-ink-200 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+        <table class="table">
+          <thead>
             <tr>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Applied on" %}</th>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Company" %}</th>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Role" %}</th>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Found via" %}</th>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Status" %}</th>
-              <th scope="col" class="px-4 py-3 text-start font-medium">{% translate "Last activity" %}</th>
+              <th scope="col" class="text-start">{% translate "Applied on" %}</th>
+              <th scope="col" class="text-start">{% translate "Company" %}</th>
+              <th scope="col" class="text-start">{% translate "Role" %}</th>
+              <th scope="col" class="text-start">{% translate "Found via" %}</th>
+              <th scope="col" class="text-start">{% translate "Status" %}</th>
+              <th scope="col" class="text-start">{% translate "Last activity" %}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+          <tbody>
             {% for row in report.evidence %}
               <tr>
-                <td class="whitespace-nowrap px-4 py-3 tabular-nums">{{ row.applied_on|date:"DATE_FORMAT" }}</td>
-                <td class="px-4 py-3"><bdi>{{ row.company }}</bdi></td>
-                <td class="px-4 py-3">
+                <td class="whitespace-nowrap tabular-nums">{{ row.applied_on|date:"DATE_FORMAT" }}</td>
+                <td><bdi>{{ row.company }}</bdi></td>
+                <td>
                   <a href="{% url 'applications:detail' row.pk %}" class="text-brand-600 underline dark:text-brand-400">
                     <bdi>{{ row.role }}</bdi>
                   </a>
@@ -263,9 +263,9 @@
                     </a>
                   {% endif %}
                 </td>
-                <td class="px-4 py-3">{% if row.source %}<bdi>{{ row.source }}</bdi>{% else %}—{% endif %}</td>
-                <td class="px-4 py-3">{{ row.status }}</td>
-                <td class="whitespace-nowrap px-4 py-3 tabular-nums">
+                <td>{% if row.source %}<bdi>{{ row.source }}</bdi>{% else %}—{% endif %}</td>
+                <td>{{ row.status }}</td>
+                <td class="whitespace-nowrap tabular-nums">
                   {% if row.last_activity_on %}{{ row.last_activity_on|date:"DATE_FORMAT" }}{% else %}—{% endif %}
                 </td>
               </tr>

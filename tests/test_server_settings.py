@@ -181,7 +181,7 @@ def test_every_cell_keeps_its_meaning_when_the_table_becomes_cards(client, admin
     client.force_login(admin)
     html = client.get(reverse("server:people")).content.decode()
 
-    assert 'class="table-cards' in html
+    assert "table-cards" in html
     for role in ('role="table"', 'role="rowgroup"', 'role="row"', 'role="columnheader"'):
         assert role in html, role
     assert html.count('role="cell"') >= 12, "two people, six columns each"

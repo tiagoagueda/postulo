@@ -81,23 +81,22 @@
 
     {% if records %}
       <c-scroll-box class="card p-0" label="{% translate 'Logs' %}">
-        <table class="w-full text-start text-sm">
-          <thead class="border-b border-ink-200 text-xs text-ink-500
-                        dark:border-ink-800 dark:text-ink-400">
+        <table class="table">
+          <thead>
             <tr>
-              <th scope="col" class="px-4 py-3 font-medium">{% translate "When" %}</th>
-              <th scope="col" class="px-4 py-3 font-medium">{% translate "Level" %}</th>
-              <th scope="col" class="px-4 py-3 font-medium">{% translate "From" %}</th>
-              <th scope="col" class="px-4 py-3 font-medium">{% translate "What happened" %}</th>
+              <th scope="col">{% translate "When" %}</th>
+              <th scope="col">{% translate "Level" %}</th>
+              <th scope="col">{% translate "From" %}</th>
+              <th scope="col">{% translate "What happened" %}</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-ink-100 dark:divide-ink-800">
+          <tbody>
             {% for record in records %}
               <tr data-level="{{ record.level }}">
-                <td class="px-4 py-3 align-top whitespace-nowrap text-xs tabular-nums text-ink-500 dark:text-ink-400">
+                <td class="align-top whitespace-nowrap text-xs tabular-nums text-ink-500 dark:text-ink-400">
                   {% if record.when %}{{ record.when }}{% else %}—{% endif %}
                 </td>
-                <td class="px-4 py-3 align-top">
+                <td class="align-top">
                   <span class="rounded px-1.5 py-0.5 text-xs font-medium
                     {% if record.level == 'ERROR' or record.level == 'CRITICAL' %}
                       bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-200
@@ -107,10 +106,10 @@
                       bg-ink-100 text-ink-700 dark:bg-ink-800 dark:text-ink-200
                     {% endif %}">{{ record.level|default:"—" }}</span>
                 </td>
-                <td class="px-4 py-3 align-top text-xs text-ink-500 dark:text-ink-400">
+                <td class="align-top text-xs text-ink-500 dark:text-ink-400">
                   <code>{{ record.logger|default:"—" }}</code>
                 </td>
-                <td class="px-4 py-3 align-top">
+                <td class="align-top">
                   <span class="break-words">{{ record.message }}</span>
                   {% if record.extras %}
                     <details class="mt-1">
