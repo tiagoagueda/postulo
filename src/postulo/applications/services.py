@@ -111,8 +111,24 @@ def change_status(
     ``closed_at``
         Set when the outcome is settled, and cleared if the application reopens — which
         does happen, when a company comes back weeks after a rejection.
+
+    **The status it is moving *from* is read under a lock** (#231). It used to be read off
+    the object the caller happened to be holding, which on a page is a row fetched before
+    the form was drawn. Two things moving one application at the same time -- a board card
+    and an API client, or two tabs -- could each read *applied*, and the second would write
+    a timeline entry saying *applied → offer* over a row that already said *screening*: a
+    transition that never happened, in the record whose whole job is to say what did. The
+    row is re-read with `select_for_update` inside the transaction instead, so the second
+    one waits and then finds what the first one wrote.
+
+    On SQLite this changes nothing and costs one `SELECT`: writes are serialised there
+    anyway. It is PostgreSQL, where they are not, that this is for.
     """
-    previous = application.status
+    # The caller's object is still the one mutated and returned -- it is what they will go
+    # on to use -- but what it is moving *from* comes from the locked row.
+    locked = Application.objects.select_for_update().filter(pk=application.pk).first()
+    previous = locked.status if locked is not None else application.status
+    application.status = previous
     if previous == new_status:
         return None
 

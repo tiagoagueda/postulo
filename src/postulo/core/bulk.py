@@ -114,3 +114,42 @@ def changed(count: int, noun: tuple[str, str]) -> str:
         _("%(count)d %(noun)s changed.")
         % {"count": count, "noun": singular if count == 1 else plural}
     )
+
+
+def link_all(rows, field: str, target) -> int:
+    """Attach ``target`` to every row through the many-to-many ``field``, and say to how
+    many it was new (#231).
+
+    Two queries whatever the selection. It used to be two *per row* -- an `EXISTS` asking
+    whether the link was already there, and an `INSERT` when it was not -- so tagging a
+    hundred applications was about three hundred queries, and all that asking was for the
+    number in the sentence afterwards.
+
+    The per-row `EXISTS` becomes one query for the ids that already have it, and the inserts
+    become one `bulk_create`. `ignore_conflicts` is not laziness about that read: the read
+    decides what to *say*, and the flag is what keeps the write correct if somebody's second
+    tab tagged one of the same rows in between.
+
+    The through model's own field names are asked for rather than guessed at
+    (`application_id`, `tag_id`): they are what Django would call them for an automatic
+    through table, and a table written by hand may call them something else.
+    """
+    rows = list(rows)
+    if not rows:
+        return 0
+    descriptor = getattr(type(rows[0]), field)
+    through = descriptor.through
+    source = f"{descriptor.field.m2m_field_name()}_id"
+    other = f"{descriptor.field.m2m_reverse_field_name()}_id"
+    ids = [row.pk for row in rows]
+    already = set(
+        through.objects.filter(**{f"{source}__in": ids, other: target.pk}).values_list(
+            source, flat=True
+        )
+    )
+    missing = [pk for pk in ids if pk not in already]
+    if missing:
+        through.objects.bulk_create(
+            [through(**{source: pk, other: target.pk}) for pk in missing], ignore_conflicts=True
+        )
+    return len(missing)

@@ -105,6 +105,19 @@ class UserPreferencesMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
+        # The instance's policy row is memoised per request (#231): a dozen little questions
+        # read it and each used to be its own query. This is the request boundary that makes
+        # "per request" true -- a worker thread answers thousands of them and must not hold
+        # an administrator's settings from an hour ago.
+        from postulo.plugins import policy
+
+        from . import site
+
+        site.forget_current()
+        # Likewise for "is this plugin on for this person", which a page asks once per mark
+        # it draws and which reads a file and a table to answer (#231).
+        policy.forget_decisions()
+
         profile = self._profile(request)
 
         # The person's own zone, else the instance default an administrator may have set,

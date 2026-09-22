@@ -113,14 +113,12 @@ def refuse_removing(distribution: str) -> str:
 
 def _plugins_from(distribution: str) -> list:
     """Every installed plugin that came from this package."""
-    from importlib.metadata import packages_distributions
-
-    from .installing import canonicalise
+    from .installing import canonicalise, packages_by_distribution
     from .registry import GROUPS
     from .registry import plugins as registry_plugins
 
     wanted = canonicalise(distribution)
-    mapping = packages_distributions()
+    mapping = packages_by_distribution()
     found = []
     for kind in GROUPS:
         for plugin in registry_plugins(kind):

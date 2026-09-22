@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from asgiref.local import Local
 from django.utils.translation import gettext_lazy as _
 
 #: Kinds a person may hold an opinion about. A transport is deliberately not one of them.
@@ -137,8 +138,42 @@ def is_ungoverned(plugin_name: str) -> bool:
     )
 
 
+#: One request's answers, keyed on the record's stamp so that installing or removing a
+#: plugin throws them away by itself (#231). `decide` reads the record from disk and asks the
+#: policy table, and a company's page asks it six times -- once per mark it draws -- for six
+#: identical answers. Cleared at every request boundary and whenever a policy row is written.
+_memo = Local()
+
+
+def forget_decisions() -> None:
+    """Drop this thread's memoised decisions. See `_memo`."""
+    try:
+        del _memo.answers
+    except AttributeError:
+        pass
+
+
+def _answers() -> dict:
+    from .installing import record_stamp
+
+    stamp = record_stamp()
+    held = getattr(_memo, "answers", None)
+    if held is None or held[0] != stamp:
+        held = (stamp, {})
+        _memo.answers = held
+    return held[1]
+
+
 def decide(plugin_name: str, person) -> Decision:
-    """The one answer, for one plugin and one person."""
+    """The one answer, for one plugin and one person. Memoised for the request."""
+    key = (plugin_name, getattr(person, "pk", None))
+    answers = _answers()
+    if key not in answers:
+        answers[key] = _decide(plugin_name, person)
+    return answers[key]
+
+
+def _decide(plugin_name: str, person) -> Decision:
     from .models import PluginPolicy
 
     # Before anything else, because this is what stops a hand-written POST reaching
@@ -215,6 +250,10 @@ def set_choice(person, plugin_name: str, *, on: bool) -> bool:
         return False
     profile.plugins_off = sorted(chosen)
     profile.save(update_fields=["plugins_off"])
+    # The third thing that makes a memoised decision wrong, beside a policy row and the
+    # plugins record: the person's own list (#231). It is a column on their profile, so
+    # nothing else here would notice.
+    forget_decisions()
     return True
 
 

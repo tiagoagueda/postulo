@@ -41,6 +41,31 @@ def _no_inherited_language():
 
 
 @pytest.fixture(autouse=True)
+def _no_inherited_site_settings():
+    """No test is handed the instance's policy row, or a plugin decision, as the last test
+    left it (#231).
+
+    `site.current()` memoises the row for the request that is reading it, and a test is not
+    a request: the memo is dropped at a request boundary, by `SiteSettings.save`, and at the
+    top of a scheduler pass, none of which happens between two tests in the same worker. A
+    test that saved a row therefore handed it to the next one, whose database had been rolled
+    back underneath it -- passing alone, failing in company, which is the worst shape a
+    failure can have.
+
+    Cleared either side, so a test that reads the row before touching it starts from the
+    database rather than from whatever ran before it.
+    """
+    from postulo.core import site
+    from postulo.plugins import policy
+
+    site.forget_current()
+    policy.forget_decisions()
+    yield
+    site.forget_current()
+    policy.forget_decisions()
+
+
+@pytest.fixture(autouse=True)
 def _no_inherited_environment(monkeypatch):
     """No test inherits the developer's `.env`.
 

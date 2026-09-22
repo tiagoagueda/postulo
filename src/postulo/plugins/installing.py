@@ -200,9 +200,28 @@ def activate() -> None:
 # ------------------------------------------------------------------- the record
 
 
+#: The record as it was last parsed, and the stamp it was parsed at (#231). Read and parsed
+#: on every plugin lookup before this: `decide` asks, `shipped_inside` asks, and a company
+#: page that draws six plugin marks asked six times, each a file read and a JSON parse.
+#:
+#: Keyed on `record_stamp`, which is one `stat`. That is the same test every other process
+#: uses to decide whether to reload, and `write_record` guarantees it moves whenever the
+#: record does -- so this cannot go stale behind an install made by the scheduler or by a
+#: second worker, which a plain memo would.
+_record_cache: tuple[str, list[Installed]] | None = None
+
+
 def read_record() -> list[Installed]:
+    global _record_cache
+
+    stamp = record_stamp()
+    if _record_cache is not None and _record_cache[0] == stamp:
+        # A copy, because callers filter and sort what they are handed and one of them
+        # mutating the list would change what the next one reads.
+        return list(_record_cache[1])
     path = record_path()
     if not path.is_file():
+        _record_cache = (stamp, [])
         return []
     try:
         raw = json.loads(path.read_text(encoding="utf-8"))
@@ -214,7 +233,38 @@ def read_record() -> list[Installed]:
         if isinstance(entry, dict) and entry.get("name"):
             fields = {key: entry.get(key) for key in Installed.__dataclass_fields__ if key in entry}
             found.append(Installed(**fields))
+    _record_cache = (stamp, list(found))
     return found
+
+
+#: Which distribution each importable top-level package came from, cached on the record's
+#: stamp (#231).
+#:
+#: `importlib.metadata.packages_distributions()` walks *every* installed distribution and
+#: reads its file list to build this -- Django, Pillow, WeasyPrint, the lot. On the
+#: administrator's plugins page it was about four and a half seconds of a page load, per
+#: load, and something like forty seconds of every CI run.
+#:
+#: The answer changes only when something is installed or removed, which is exactly when the
+#: record's stamp moves, so that is the key. Nothing else in the process installs packages
+#: while it runs.
+_distributions_cache: tuple[str, dict[str, list[str]]] | None = None
+
+
+def packages_by_distribution() -> dict[str, list[str]]:
+    """``{top-level package: [distribution names]}``, read once per record. See above."""
+    global _distributions_cache
+
+    stamp = record_stamp()
+    if _distributions_cache is None or _distributions_cache[0] != stamp:
+        from importlib.metadata import packages_distributions
+
+        try:
+            mapping = dict(packages_distributions())
+        except Exception:  # pragma: no cover - a broken distribution explains nobody's name
+            mapping = {}
+        _distributions_cache = (stamp, mapping)
+    return _distributions_cache[1]
 
 
 def write_record(entries: list[Installed]) -> None:

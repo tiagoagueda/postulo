@@ -150,6 +150,28 @@ class PluginPolicy(models.Model):
     def __str__(self) -> str:
         return f"{self.plugin}: {self.state}"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        self._forget()
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        self._forget()
+        return result
+
+    @staticmethod
+    def _forget() -> None:
+        """Throw away the memoised decisions (#231).
+
+        `policy.decide` is memoised for the request, keyed on the plugins record's stamp --
+        which moves when a plugin is installed or switched off, and does not move when a row
+        here changes. So writing one of these rows is the other thing that makes an answer
+        wrong, and it says so itself rather than leaving every caller to remember.
+        """
+        from .policy import forget_decisions
+
+        forget_decisions()
+
 
 class ConnectionQuerySet(models.QuerySet):
     def for_user(self, user) -> ConnectionQuerySet:

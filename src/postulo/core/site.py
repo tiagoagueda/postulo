@@ -14,6 +14,7 @@ from __future__ import annotations
 import logging
 import os
 
+from asgiref.local import Local
 from django.conf import settings
 from django.contrib.auth import get_user_model
 
@@ -98,9 +99,45 @@ def overridden_by(field: str) -> str | None:
     return None
 
 
+#: The policy row for the request in flight. One row, read by a dozen little questions --
+#: is registration open, what language does this instance default to, what is it called --
+#: and each of them used to be its own `SELECT`. The middleware asks twice, the `ui` context
+#: processor three times, `is_empty()` once more, and an htmx fragment pays the same as a
+#: page: about five queries for one row, on every request Postulo answers (#231).
+#:
+#: A `Local` rather than the cache, because Postulo's default cache is a table in the same
+#: database -- caching a query in a place that costs a query is not a saving. It is cleared
+#: at the start of every request and whenever the row is saved, so the longest anything can
+#: be stale is one request that was already in flight.
+_memo = Local()
+
+
 def current() -> SiteSettings:
-    """The policy row, or the defaults when nobody has saved one. Never writes."""
-    return SiteSettings.objects.filter(pk=1).first() or SiteSettings()
+    """The policy row, or the defaults when nobody has saved one. Never writes.
+
+    Memoised for the request. Everything here reads it and nothing here writes it, so one
+    read per request is one read too few only if something else changes the row mid-request
+    -- and the thing that would, `SiteSettings.save`, drops the memo itself.
+    """
+    row = getattr(_memo, "row", None)
+    if row is None:
+        row = SiteSettings.objects.filter(pk=1).first() or SiteSettings()
+        _memo.row = row
+    return row
+
+
+def forget_current() -> None:
+    """Drop the memoised row.
+
+    Called at the start of every request, by `SiteSettings.save`, and at the top of each
+    scheduler pass -- the three places where "the row may have changed since I last looked"
+    becomes true. A worker thread lives for thousands of requests and a scheduler loop lives
+    for ever; neither may hold yesterday's mail settings.
+    """
+    try:
+        del _memo.row
+    except AttributeError:
+        pass
 
 
 def registration_open() -> bool:

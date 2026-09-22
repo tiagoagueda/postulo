@@ -162,12 +162,31 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
         # A board is every card at once; the columns are what make it readable.
         return None if self.on_board else self.table.page_size
 
+    def matching(self):
+        """Every application the filters match, whatever shape is being drawn.
+
+        The board draws only the live ones, and the two counts above it are about all of
+        them: *how many match* and *how many of those are settled* are questions about the
+        filter, not about the columns. Answered with `COUNT` rather than by loading the rows
+        and measuring the list, which is what the board did before it stopped loading the
+        rows it does not draw (#231).
+        """
+        return self.filter_queryset(super().get_queryset())
+
     def get_queryset(self):
         queryset = super().get_queryset().with_display_data()
         if self.on_board:
-            # The cards say how long a quiet application has been quiet, so they need the
-            # last activity too.
-            return self.filter_queryset(queryset.with_activity())
+            # The cards say how long a quiet application has been quiet and whether it is,
+            # so they need the activity annotations and the badge that reads them (#231).
+            #
+            # `status__in` in SQL, not in Python. The board used to load every application
+            # ever recorded -- rejected, accepted, withdrawn, all of it -- with four
+            # subqueries each, and then drop the ones its columns do not show. Somebody with
+            # four hundred settled applications and twelve live ones was reading four
+            # hundred and twelve rows to draw twelve.
+            return self.filter_queryset(
+                queryset.with_quiet_flag(quiet.threshold_for(self.request.user))
+            ).filter(status__in=list(BOARD_STATUSES))
         return self.table.apply(self.filter_queryset(queryset.with_table_data()))
 
     def get_template_names(self) -> list[str]:
@@ -205,12 +224,9 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
         )
         if self.on_board:
             applications = list(context["applications"])
-            # The same predicate as the dashboard, so the badge and the block agree.
-            quiet_ids = set(
-                quiet.quiet_applications(self.request.user).values_list("pk", flat=True)
-            )
-            for application in applications:
-                application.is_quiet = application.pk in quiet_ids
+            # `is_quiet` is annotated on the rows (#231). It used to be a second query over
+            # the whole set, comparing primary keys, which is the board's four subqueries run
+            # again for an answer the rows already carried.
             context["columns"] = [
                 {
                     "status": status,
@@ -219,11 +235,13 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
                 }
                 for status in BOARD_STATUSES
             ]
-            context["total"] = len(applications)
+            context["total"] = self.matching().count()
             # Said only when a filter is narrowing: with none, settled applications are
-            # simply not the board's business and the table is where they live.
+            # simply not the board's business and the table is where they live. A `COUNT`
+            # rather than the rows, because the rows are not drawn and were never needed --
+            # and only when the sentence is going to be said at all.
             context["off_board"] = (
-                sum(1 for a in applications if a.status not in BOARD_STATUSES)
+                self.matching().exclude(status__in=list(BOARD_STATUSES)).count()
                 if self.table.filters_active
                 else 0
             )
@@ -273,15 +291,12 @@ class ApplicationBulkView(LoginRequiredMixin, View):
         nobody looked at; a tag arriving as an id is one they already have, re-scoped like
         everything else here.
         """
+        from postulo.core import bulk
+
         tag = Tag.objects.for_user(request.user).filter(pk=_as_int(request.POST.get("tag"))).first()
         if tag is None:
             return 0
-        changed = 0
-        for application in rows:
-            if not application.tags.filter(pk=tag.pk).exists():
-                application.tags.add(tag)
-                changed += 1
-        return changed
+        return bulk.link_all(list(rows), "tags", tag)
 
     def _status(self, request: HttpRequest, rows) -> int:
         from .services import change_status
@@ -403,13 +418,29 @@ class ApplicationUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         return application
 
     def form_valid(self, form):
-        # Save everything except the status, then move the status through the service so
-        # the change reaches the timeline. Otherwise the edit form becomes a quiet way
-        # to end up with a status the log cannot account for.
+        """Save everything but the status, then move the status through the service.
+
+        Otherwise the edit form becomes a quiet way to end up with a status the log cannot
+        account for.
+
+        The status written by the save is the one on the row *now*, read under a lock, not
+        the one the form was drawn with (#231). Writing back what the form was drawn with is
+        a write of a stale value: somebody advancing this application from the board while
+        the form was open had their move overwritten by an edit that was not about the status
+        at all, and `change_status` then found nothing to change and said nothing. The whole
+        thing is one transaction, so the row cannot move between the reading and the writing.
+        """
         requested_status = form.cleaned_data["status"]
-        form.instance.status = self.status_before_edit
-        response = super().form_valid(form)
-        change_status(self.object, requested_status)
+        with transaction.atomic():
+            current = (
+                Application.objects.select_for_update()
+                .filter(pk=form.instance.pk)
+                .values_list("status", flat=True)
+                .first()
+            )
+            form.instance.status = current or self.status_before_edit
+            response = super().form_valid(form)
+            change_status(self.object, requested_status)
         messages.success(self.request, _("Application updated."))
         return response
 

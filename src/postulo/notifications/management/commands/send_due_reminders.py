@@ -163,11 +163,18 @@ class Command(BaseCommand):
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
         from postulo.applications.quiet import announce_quiet_applications
-        from postulo.core import errands
+        from postulo.core import errands, site
         from postulo.core.slow import reap_archives
         from postulo.documents.archiving import send_pending
         from postulo.jobs.closing import announce_closing_postings
+        from postulo.plugins import policy
         from postulo.plugins.syncing import run_syncs
+
+        # This loop has no request boundary, so it is its own: the instance's policy row is
+        # memoised (#231), and a scheduler that ran for a week would otherwise be sending
+        # through last week's mail settings.
+        site.forget_current()
+        policy.forget_decisions()
 
         # Held for a little longer than the gap between passes: a pass that takes longer than
         # that is one whose work the next pass may as well pick up.

@@ -1022,6 +1022,12 @@ class SiteSettings(models.Model):
     def save(self, *args, **kwargs) -> None:
         self.pk = 1
         super().save(*args, **kwargs)
+        # The row is memoised for the request that is reading it (#231); saving it is the
+        # one thing that makes that memo wrong, so it is the one place that clears it.
+        # Imported here rather than at the top: `site` imports this module.
+        from .site import forget_current
+
+        forget_current()
 
     @classmethod
     def get(cls) -> "SiteSettings":

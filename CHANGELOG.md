@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The pages that grew with the size of a search no longer do: search, the board, the companies table, the listings tabs, the report, the figures and bulk tagging each do a fixed amount of work whatever you have recorded. (#231)
 - A table's filters live in the column headers: click a column's name to open its filter, and only the ones in use are on screen. **Sorting moved to an icon beside the name**, since the name is now the filter. (#253)
 - On an application's page the status, a new timeline entry and a ticked-off reminder change in place instead of reloading the page and returning you to the top. (#257)
 - Installing a plugin keeps the directory as it was, checks that the new one imports before recording it, and puts everything back if it does not; `manage.py plugins rollback` undoes the last install. Removing one takes the dependencies nothing else uses. (#246)

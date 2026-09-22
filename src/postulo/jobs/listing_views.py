@@ -99,14 +99,9 @@ class ListingListView(OwnedObjectMixin, ListView):
         context = super().get_context_data(**kwargs)
         everything = JobPosting.objects.for_user(self.request.user)
         current = self.current_filter()
-        counts = {
-            "undecided": everything.undecided().count(),
-            ListingState.SHORTLISTED: everything.in_state(ListingState.SHORTLISTED).count(),
-            ListingState.DISCARDED: everything.in_state(ListingState.DISCARDED).count(),
-            "applied": everything.in_state("applied").count(),
-            "closed": everything.in_state("closed").count(),
-            "all": everything.count(),
-        }
+        # One query for all six numbers (#231). It was six, each grouping the whole table by
+        # posting to count applications it then compared with zero.
+        counts = everything.tab_counts()
         context["current_filter"] = current
         context["filters"] = [
             {

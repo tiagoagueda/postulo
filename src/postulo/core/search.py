@@ -13,14 +13,22 @@ without touching the page.
 
 Ranking is light and deliberate: within a group, a hit in the title comes before a hit in
 the body, and otherwise the newest first.
+
+**The counting and the capping happen in SQL** (#231). They used to happen in Python: every
+matching row of every model was loaded, turned into a `Hit`, sorted, and then five of them
+were shown. Searching *engineer* over three hundred applications and four hundred listings
+loaded seven hundred rows -- including four hundred full descriptions -- to draw fifty
+lines, and the application group cost one further query *per matching row* to find the event
+the term was in. Each group now asks two questions: how many, and the first five. The
+ranking that decided which five is an `ORDER BY`, and the excerpt is a subquery on the row.
 """
 
 from __future__ import annotations
 
-from collections.abc import Callable, Iterable
+from collections.abc import Callable
 from dataclasses import dataclass, field
 
-from django.db.models import Q
+from django.db.models import Case, Exists, IntegerField, OuterRef, Q, Subquery, Value, When
 from django.urls import reverse
 from django.utils import formats
 from django.utils.translation import gettext_lazy as _
@@ -45,6 +53,19 @@ class Hit:
     #: Whether the term was found in the title itself; ranks ahead of body hits.
     in_title: bool = False
     id: int = 0
+
+
+@dataclass
+class Found:
+    """One group's answer: how many there are, and the few that are shown.
+
+    Two numbers rather than a list, because they are two different questions and only one of
+    them needs the rows. A group that says *and 48 more* got that 48 from a `COUNT`, not from
+    building forty-eight `Hit`s and throwing them away.
+    """
+
+    total: int = 0
+    hits: list[Hit] = field(default_factory=list)
 
 
 @dataclass
@@ -106,20 +127,49 @@ def _first_match(query: str, *texts: str) -> str:
     return next((text for text in texts if text), "")
 
 
+def ranked(rows, query: str, title_field: str, *order: str):
+    """``rows`` with title hits first and the group's own order under them, decided in SQL.
+
+    The ordering has to be the database's, or the cap below is a lie: taking the first five
+    of an unranked query and *then* putting the title hits first shows five arbitrary rows
+    rearranged, not the five best. `alias` rather than `annotate` because nothing reads the
+    number -- it exists to be sorted on.
+    """
+    return rows.alias(
+        title_hit=Case(
+            When(**{f"{title_field}__icontains": query}, then=Value(0)),
+            default=Value(1),
+            output_field=IntegerField(),
+        )
+    ).order_by("title_hit", *order)
+
+
+def take(rows, limit: int, build) -> Found:
+    """How many rows match, and ``build`` applied to the first ``limit`` of them.
+
+    Two queries per group, whatever a person has. The `COUNT` is what the *and N more* line
+    needs and the only thing that needs all of them.
+    """
+    return Found(total=rows.count(), hits=[build(row) for row in rows[:limit]])
+
+
 # ----------------------------------------------------------------- per model
 
 
-def search_listings(user, query: str) -> Iterable[Hit]:
+def search_listings(user, query: str, limit: int) -> Found:
     from postulo.jobs.models import JobPosting
 
-    rows = (
+    rows = ranked(
         JobPosting.objects.for_user(user)
         .select_related("company")
-        .filter(contains(query, "title", "description", "location", "source"))
-        .order_by("-noted_at")
+        .filter(contains(query, "title", "description", "location", "source")),
+        query,
+        "title",
+        "-noted_at",
     )
-    for posting in rows:
-        yield Hit(
+
+    def build(posting) -> Hit:
+        return Hit(
             kind="listings",
             id=posting.pk,
             title=posting.title,
@@ -129,33 +179,52 @@ def search_listings(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in posting.title.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_applications(user, query: str) -> Iterable[Hit]:
-    from postulo.applications.models import Application
 
-    rows = (
+def search_applications(user, query: str, limit: int) -> Found:
+    """Applications, with the passage from the timeline entry the term was in.
+
+    The entry used to be a query per matching row, which is the shape the whole issue is
+    about: three hundred applications, three hundred queries, five of them drawn (#231). It
+    is three correlated subqueries on the row now, so the passage arrives with the row.
+
+    `Exists` rather than a join and `.distinct()`. An application with four matching entries
+    was four rows the database then had to de-duplicate, and the `COUNT` above paid for that
+    twice: once to find them, once to fold them back into one.
+    """
+    from postulo.applications.models import Application, ApplicationEvent
+
+    matching = (
+        ApplicationEvent.objects.filter(application=OuterRef("pk"))
+        .filter(contains(query, "summary", "body"))
+        .order_by("-occurred_at")
+    )
+    rows = ranked(
         Application.objects.for_user(user)
         .select_related("posting", "posting__company")
         .filter(
-            contains(
-                query, "posting__title", "posting__company__name", "events__summary", "events__body"
-            )
+            Q(posting__title__icontains=query)
+            | Q(posting__company__name__icontains=query)
+            | Exists(matching)
         )
-        .distinct()
-        .order_by("-created_at")
+        .annotate(
+            hit_summary=Subquery(matching.values("summary")[:1]),
+            hit_body=Subquery(matching.values("body")[:1]),
+            hit_at=Subquery(matching.values("occurred_at")[:1]),
+        ),
+        query,
+        "posting__title",
+        "-created_at",
     )
-    for application in rows:
+
+    def build(application) -> Hit:
         title = application.posting.title
-        event = (
-            application.events.filter(contains(query, "summary", "body"))
-            .order_by("-occurred_at")
-            .first()
-        )
         passage = ""
-        if event is not None:
-            passage = _first_match(query, event.summary, event.body)
-            passage = f"{_day(event.occurred_at)}: {passage}" if passage else ""
-        yield Hit(
+        if application.hit_at is not None:
+            passage = _first_match(query, application.hit_summary or "", application.hit_body or "")
+            passage = f"{_day(application.hit_at)}: {passage}" if passage else ""
+        return Hit(
             kind="applications",
             id=application.pk,
             title=title,
@@ -166,29 +235,29 @@ def search_applications(user, query: str) -> Iterable[Hit]:
             or query.lower() in application.posting.company.name.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_companies(user, query: str) -> Iterable[Hit]:
-    from postulo.jobs.models import Company
 
-    rows = (
+def search_companies(user, query: str, limit: int) -> Found:
+    from postulo.jobs.models import Company, CompanyIdentifier, Industry
+
+    industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
+    identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
+    rows = ranked(
         Company.objects.for_user(user)
         .prefetch_related("industries")
         .filter(
-            contains(
-                query,
-                "name",
-                "notes",
-                "location",
-                "industries__name",
-                "website",
-                "identifiers__value",
-            )
-        )
-        .distinct()
-        .order_by("name")
+            contains(query, "name", "notes", "location", "website")
+            | Q(Exists(industry))
+            | Q(Exists(identifier))
+        ),
+        query,
+        "name",
+        "name",
     )
-    for company in rows:
-        yield Hit(
+
+    def build(company) -> Hit:
+        return Hit(
             kind="companies",
             id=company.pk,
             title=company.name,
@@ -200,18 +269,23 @@ def search_companies(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in company.name.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_contacts(user, query: str) -> Iterable[Hit]:
+
+def search_contacts(user, query: str, limit: int) -> Found:
     from postulo.jobs.models import Contact
 
-    rows = (
+    rows = ranked(
         Contact.objects.for_user(user)
         .select_related("company")
-        .filter(contains(query, "name", "role", "email", "notes"))
-        .order_by("name")
+        .filter(contains(query, "name", "role", "email", "notes")),
+        query,
+        "name",
+        "name",
     )
-    for contact in rows:
-        yield Hit(
+
+    def build(contact) -> Hit:
+        return Hit(
             kind="contacts",
             id=contact.pk,
             title=contact.name,
@@ -227,8 +301,10 @@ def search_contacts(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in contact.name.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_reminders(user, query: str) -> Iterable[Hit]:
+
+def search_reminders(user, query: str, limit: int) -> Found:
     from postulo.applications.models import Reminder
 
     rows = (
@@ -237,8 +313,9 @@ def search_reminders(user, query: str) -> Iterable[Hit]:
         .filter(contains(query, "summary"))
         .order_by("-due_at")
     )
-    for reminder in rows:
-        yield Hit(
+
+    def build(reminder) -> Hit:
+        return Hit(
             kind="reminders",
             id=reminder.pk,
             title=reminder.summary,
@@ -248,20 +325,26 @@ def search_reminders(user, query: str) -> Iterable[Hit]:
                 if reminder.application
                 else reverse("applications:reminder_list")
             ),
+            # A reminder is one line the person wrote, so a match is always a title match;
+            # there is nothing else to rank against and no `ranked()` call above.
             in_title=True,
         )
 
+    return take(rows, limit, build)
 
-def search_letters(user, query: str) -> Iterable[Hit]:
+
+def search_letters(user, query: str, limit: int) -> Found:
     from postulo.documents.models import CoverLetter
 
-    rows = (
-        CoverLetter.objects.for_user(user)
-        .filter(contains(query, "name", "subject", "body"))
-        .order_by("-created_at")
+    rows = ranked(
+        CoverLetter.objects.for_user(user).filter(contains(query, "name", "subject", "body")),
+        query,
+        "name",
+        "-created_at",
     )
-    for letter in rows:
-        yield Hit(
+
+    def build(letter) -> Hit:
+        return Hit(
             kind="letters",
             id=letter.pk,
             title=letter.name,
@@ -271,13 +354,21 @@ def search_letters(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in letter.name.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_cvs(user, query: str) -> Iterable[Hit]:
+
+def search_cvs(user, query: str, limit: int) -> Found:
     from postulo.documents.models import CV
 
-    rows = CV.objects.for_user(user).filter(contains(query, "name", "headline", "summary"))
-    for cv in rows:
-        yield Hit(
+    rows = ranked(
+        CV.objects.for_user(user).filter(contains(query, "name", "headline", "summary")),
+        query,
+        "name",
+        "name",
+    )
+
+    def build(cv) -> Hit:
+        return Hit(
             kind="cvs",
             id=cv.pk,
             title=cv.name,
@@ -287,17 +378,21 @@ def search_cvs(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in cv.name.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_uploads(user, query: str) -> Iterable[Hit]:
+
+def search_uploads(user, query: str, limit: int) -> Found:
     from postulo.documents.models import UploadedDocument
 
-    rows = (
-        UploadedDocument.objects.for_user(user)
-        .filter(contains(query, "title", "notes"))
-        .order_by("-created_at")
+    rows = ranked(
+        UploadedDocument.objects.for_user(user).filter(contains(query, "title", "notes")),
+        query,
+        "title",
+        "-created_at",
     )
-    for upload in rows:
-        yield Hit(
+
+    def build(upload) -> Hit:
+        return Hit(
             kind="uploads",
             id=upload.pk,
             title=upload.title,
@@ -307,18 +402,23 @@ def search_uploads(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in upload.title.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_sent(user, query: str) -> Iterable[Hit]:
+
+def search_sent(user, query: str, limit: int) -> Found:
     """The text of what was actually sent: "what did I claim?" without opening a PDF."""
     from postulo.documents.models import RenderedDocument
 
-    rows = (
+    rows = ranked(
         RenderedDocument.objects.for_user(user)
         .select_related("application", "application__posting", "application__posting__company")
-        .filter(contains(query, "title", "source_text"))
-        .order_by("-rendered_at")
+        .filter(contains(query, "title", "source_text")),
+        query,
+        "title",
+        "-rendered_at",
     )
-    for sent in rows:
+
+    def build(sent) -> Hit:
         application = sent.application
         when = _day(sent.rendered_at)
         if application is not None:
@@ -337,7 +437,7 @@ def search_sent(user, query: str) -> Iterable[Hit]:
                 % {"kind": sent.get_kind_display().lower(), "when": when}
             )
             url = reverse("documents:rendered_list")
-        yield Hit(
+        return Hit(
             kind="sent",
             id=sent.pk,
             title=sent.title,
@@ -347,8 +447,16 @@ def search_sent(user, query: str) -> Iterable[Hit]:
             in_title=query.lower() in sent.title.lower(),
         )
 
+    return take(rows, limit, build)
 
-def search_career(user, query: str) -> Iterable[Hit]:
+
+def search_career(user, query: str, limit: int) -> Found:
+    """Five models under one heading, each counted and capped on its own.
+
+    Ten queries rather than two, and that is the price of the heading: the five have no
+    common table to count across and no field to order against each other by. It is a fixed
+    ten -- five experiences or five hundred, the page asks the same questions.
+    """
     from postulo.resume import models as resume
 
     sections = [
@@ -356,32 +464,54 @@ def search_career(user, query: str) -> Iterable[Hit]:
             resume.Experience,
             "experience",
             ("organisation", "role", "summary", "highlights"),
+            "role",
             lambda r: f"{r.role} · {r.organisation}",
         ),
         (
             resume.Education,
             "education",
             ("institution", "qualification", "field_of_study", "highlights"),
+            "qualification",
             lambda r: f"{r.qualification} · {r.institution}",
         ),
-        (resume.Project, "projects", ("name", "role", "summary", "highlights"), lambda r: r.name),
-        (resume.Certification, "certifications", ("name", "issuer"), lambda r: r.name),
-        (resume.Skill, "skills", ("name",), lambda r: r.name),
+        (
+            resume.Project,
+            "projects",
+            ("name", "role", "summary", "highlights"),
+            "name",
+            lambda r: r.name,
+        ),
+        (resume.Certification, "certifications", ("name", "issuer"), "name", lambda r: r.name),
+        (resume.Skill, "skills", ("name",), "name", lambda r: r.name),
     ]
     overview = reverse("resume:overview")
-    for model, section, fields, title_of in sections:
-        for row in model.objects.for_user(user).filter(contains(query, *fields)):
+    found = Found()
+    for model, section, fields, title_field, title_of in sections:
+        rows = ranked(
+            model.objects.for_user(user).filter(contains(query, *fields)),
+            query,
+            title_field,
+            "pk",
+        )
+
+        def build(row, section=section, fields=fields, title_of=title_of) -> Hit:
             texts = [getattr(row, name, "") or "" for name in fields]
             title = title_of(row)
-            yield Hit(
+            return Hit(
                 kind="career",
                 id=row.pk,
                 title=title,
-                subtitle=str(model._meta.verbose_name),
+                subtitle=str(row._meta.verbose_name),
                 url=f"{overview}#{section}",
                 excerpt=excerpt(_first_match(query, *texts[2:], *texts[:2]), query),
                 in_title=query.lower() in title.lower(),
             )
+
+        part = take(rows, limit, build)
+        found.total += part.total
+        found.hits += part.hits
+    found.hits = sorted(found.hits, key=lambda hit: not hit.in_title)[:limit]
+    return found
 
 
 #: Every group, in the order the page shows them: (kind, label, function, "more" URL name
@@ -411,15 +541,19 @@ def search(user, raw_query: str, *, limit: int = GROUP_LIMIT) -> list[Group]:
         return []
     groups: list[Group] = []
     for kind, label, function, more_name, takes_query in GROUPS:
-        hits = sorted(function(user, query), key=lambda hit: (not hit.in_title,))
-        if not hits:
+        found = function(user, query, limit)
+        if not found.total:
             continue
         more_url = reverse(more_name)
         if takes_query:
             more_url = f"{more_url}?q={query}"
         groups.append(
             Group(
-                kind=kind, label=str(label), hits=hits[:limit], total=len(hits), more_url=more_url
+                kind=kind,
+                label=str(label),
+                hits=found.hits,
+                total=found.total,
+                more_url=more_url,
             )
         )
     return groups

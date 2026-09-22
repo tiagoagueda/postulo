@@ -11,11 +11,23 @@ from __future__ import annotations
 import re
 from datetime import timedelta
 
+from django.apps import apps
 from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Case, Count, DecimalField, F, IntegerField, Max, Q, Value, When
-from django.db.models.functions import Lower
+from django.db.models import (
+    Case,
+    Count,
+    DecimalField,
+    Exists,
+    F,
+    IntegerField,
+    OuterRef,
+    Q,
+    Value,
+    When,
+)
+from django.db.models.functions import Coalesce, Lower
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
@@ -110,18 +122,63 @@ class CompanyQuerySet(OwnedQuerySet):
 
         One annotation per identifier scheme, named as the table's column is, so an
         identifier sorts and filters like a column of the company's own rather than being
-        the one kind of column that could do neither (#173). A subquery per scheme rather
-        than a join: a company with three identifiers is still one row.
+        the one kind of column that could do neither (#173).
+
+        **A correlated subquery per figure, not four aggregates over one join** (#231). The
+        four used to be `Count("postings")`, `Count("postings__applications")`,
+        `Count("contacts")` and `Max("postings__applications__events__occurred_at")` in a
+        single `GROUP BY`, which means the database builds the cross product of all four
+        branches before it counts anything: a company with four postings, five contacts and
+        twelve entries per application is two hundred and forty intermediate rows, of which
+        one survives. `distinct=True` on each count is what made the answers *right*; it did
+        not make them cheap.
+
+        Each figure is its own correlated subquery now -- the shape the identifier columns
+        have used since #173, which is why that comment was the one to follow. Four small
+        indexed lookups per row beat one cross product, they need no `distinct`, and the
+        paginator's `count()` no longer runs the cross product a second time.
         """
         from django.db.models import OuterRef, Subquery
 
         from . import identifiers
 
+        def counted(model, **link):
+            """How many rows of ``model`` point at this company, as a scalar subquery.
+
+            `values(1).annotate(n=Count("*"))` rather than `.count()`: the first is SQL the
+            outer query carries, the second is a query per row.
+            """
+            return Subquery(
+                model.objects.filter(**link)
+                .order_by()
+                .values(placeholder=Value(1))
+                .annotate(n=Count("*"))
+                .values("n")[:1],
+                output_field=IntegerField(),
+            )
+
+        from postulo.applications.models import Application, ApplicationEvent
+
         annotations = {
-            "posting_count": Count("postings", distinct=True),
-            "application_count": Count("postings__applications", distinct=True),
-            "contact_count": Count("contacts", distinct=True),
-            "last_activity_at": Max("postings__applications__events__occurred_at"),
+            # `Coalesce` because a company nothing points at has no subquery row at all, and
+            # the table sorts and narrows on these -- a null where a zero belongs sorts to
+            # the wrong end and answers "fewer than one" with nothing.
+            "posting_count": Coalesce(
+                counted(JobPosting, company=OuterRef("pk")), Value(0), output_field=IntegerField()
+            ),
+            "application_count": Coalesce(
+                counted(Application, posting__company=OuterRef("pk")),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+            "contact_count": Coalesce(
+                counted(Contact, company=OuterRef("pk")), Value(0), output_field=IntegerField()
+            ),
+            "last_activity_at": Subquery(
+                ApplicationEvent.objects.filter(application__posting__company=OuterRef("pk"))
+                .order_by("-occurred_at")
+                .values("occurred_at")[:1]
+            ),
         }
         for key in identifiers.schemes():
             if key == identifiers.OTHER:
@@ -589,6 +646,36 @@ class DiscardReason(models.TextChoices):
 
 
 #: The stored states a listing can be filtered by, plus the two derived ones.
+#: The tabs above the listings table, in the order they are drawn. *Everything* is not
+#: here: it is the absence of a condition rather than one of them.
+TAB_ORDER = ("undecided", ListingState.SHORTLISTED, ListingState.DISCARDED, "applied", "closed")
+
+
+def state_condition(state: str, *, applied=None):
+    """What one listing state *is*, as a condition. ``None`` for "no condition at all".
+
+    Written once and used three ways: to filter a tab's rows, to count every tab in one
+    query, and -- through `in_state` -- by the API. Three places that must agree about what
+    *closed* means, and did agree only because three copies of it happened to match (#231).
+
+    ``applied`` is how "this listing has an application" is expressed. A filtered queryset
+    already annotates `application_count` and compares it; the one-query count cannot, since
+    an aggregate cannot be grouped and totalled at once, so it passes an `Exists` instead.
+    """
+    has_application = applied if applied is not None else Q(application_count__gt=0)
+    no_application = ~Q(has_application) if applied is not None else Q(application_count=0)
+    shut = Q(closed_at__isnull=False) | Q(closes_at__lt=timezone.localdate())
+    if state == "applied":
+        return Q(has_application)
+    if state == "closed":
+        return no_application & shut
+    if state == "undecided":
+        return Q(state__in=(ListingState.NEW, ListingState.SHORTLISTED)) & no_application & ~shut
+    if state in ListingState.values:
+        return Q(state=state) & no_application & ~shut
+    return None
+
+
 LISTING_FILTERS = (
     ListingState.NEW,
     ListingState.SHORTLISTED,
@@ -664,15 +751,7 @@ class JobPostingQuerySet(models.QuerySet):
 
     def undecided(self) -> JobPostingQuerySet:
         """New or shortlisted, not applied to, and still open: what the person must decide."""
-        return (
-            self.with_application_count()
-            .filter(
-                state__in=(ListingState.NEW, ListingState.SHORTLISTED),
-                application_count=0,
-                closed_at__isnull=True,
-            )
-            .exclude(closes_at__lt=timezone.localdate())
-        )
+        return self.with_application_count().filter(state_condition("undecided"))
 
     def closing_soon(self, days: int = 7) -> JobPostingQuerySet:
         today = timezone.localdate()
@@ -683,17 +762,35 @@ class JobPostingQuerySet(models.QuerySet):
     def in_state(self, state: str) -> JobPostingQuerySet:
         """Filter by a stored state or one of the two derived ones."""
         annotated = self.with_application_count()
-        if state == "applied":
-            return annotated.filter(application_count__gt=0)
-        if state == "closed":
-            return annotated.filter(application_count=0).filter(
-                models.Q(closed_at__isnull=False) | models.Q(closes_at__lt=timezone.localdate())
-            )
-        if state in ListingState.values:
-            return annotated.filter(
-                state=state, application_count=0, closed_at__isnull=True
-            ).exclude(closes_at__lt=timezone.localdate())
-        return annotated
+        condition = state_condition(state)
+        return annotated.filter(condition) if condition is not None else annotated
+
+    def tab_counts(self) -> dict[str, int]:
+        """How many listings each tab above the table holds, in one query (#231).
+
+        Six grouped `COUNT`s before this, each of which annotated its own
+        `Count("applications", distinct=True)` and grouped by posting to do it -- six passes
+        over the whole table to draw six numbers, on the page the audit calls the triage
+        page because it is opened more than any other.
+
+        One pass now, with a conditional count per tab. `Exists` rather than the grouped
+        count: *has this listing any applications* is the only thing the tabs ask, and asking
+        it as `COUNT(...) > 0` makes the database group before it can answer.
+        """
+        applied = Exists(
+            apps.get_model("applications", "Application").objects.filter(posting=OuterRef("pk"))
+        )
+        tabs = {name: state_condition(name, applied=applied) for name in TAB_ORDER}
+        counted = self.aggregate(
+            all=Count("pk"),
+            **{
+                f"tab_{index}": Count("pk", filter=condition)
+                for index, (_name, condition) in enumerate(tabs.items())
+            },
+        )
+        answer = {name: counted[f"tab_{index}"] for index, name in enumerate(TAB_ORDER)}
+        answer["all"] = counted["all"]
+        return answer
 
 
 class JobPosting(OwnedModel):

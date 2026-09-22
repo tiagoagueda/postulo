@@ -229,14 +229,20 @@ def _from_the_wheel(plugin) -> dict:
 
     Nothing for a built-in, which came from no package. Defensive because a record that
     cannot be read must not take down a page that only wanted to print an author's name.
+
+    **Asked only about a plugin that could have come from a wheel** (#231). A plugin whose
+    module is inside `postulo` shipped with it, so the answer is known before anything is
+    read -- and reading it meant walking every installed distribution's file list, which is
+    what made the administrator's plugins page take seconds. The walk itself is cached on
+    the plugins record's stamp, so the plugins that *do* come from a wheel pay for it once.
     """
     try:
-        from importlib.metadata import packages_distributions
-
-        from .installing import canonicalise, read_record
+        from .installing import canonicalise, packages_by_distribution, read_record
 
         top_level = type(plugin).__module__.split(".")[0]
-        distributions = {canonicalise(d) for d in packages_distributions().get(top_level, [])}
+        if top_level == "postulo":
+            return {}
+        distributions = {canonicalise(d) for d in packages_by_distribution().get(top_level, [])}
         if not distributions:
             return {}
         for entry in read_record():

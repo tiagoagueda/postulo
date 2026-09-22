@@ -19,7 +19,18 @@ import uuid
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Case, DecimalField, Exists, F, OuterRef, Subquery, Value, When
+from django.db.models import (
+    BooleanField,
+    Case,
+    DecimalField,
+    Exists,
+    F,
+    OuterRef,
+    Q,
+    Subquery,
+    Value,
+    When,
+)
 from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import timezone
@@ -65,6 +76,27 @@ OPEN_STATUSES = frozenset(
 
 #: Statuses an application can go quiet in: open, and actually sent.
 QUIET_STATUSES = frozenset(OPEN_STATUSES - {Status.DRAFT})
+
+
+def quiet_condition(after_days: int, at=None) -> Q:
+    """What *gone quiet* means, as one condition (#231).
+
+    Open, actually sent, nothing for ``after_days`` days, and nothing planned -- no reminder
+    ahead, no interview waiting for an outcome. Written once and used twice: `quiet()`
+    filters by it and `with_quiet_flag()` marks rows with it, so a board badge saying *quiet*
+    and a dashboard block listing the quiet ones can never come to disagree.
+
+    It reads the annotations `with_activity` makes, so it is only meaningful on a queryset
+    that has been through it. Both callers do that themselves.
+    """
+    now = at or timezone.now()
+    return (
+        Q(status__in=list(QUIET_STATUSES))
+        & Q(last_activity_at__lt=now - timezone.timedelta(days=after_days))
+        & Q(has_future_reminder=False)
+        & Q(has_unsettled_interview=False)
+    )
+
 
 #: Statuses that mean the application was actually sent (#222).
 #:
@@ -212,11 +244,23 @@ class ApplicationQuerySet(models.QuerySet):
         badge, the table filter, the figures and the notifier all call this.
         """
         now = at or timezone.now()
-        cutoff = now - timezone.timedelta(days=after_days)
-        return (
-            self.with_activity(at=now)
-            .filter(status__in=list(QUIET_STATUSES), last_activity_at__lt=cutoff)
-            .filter(has_future_reminder=False, has_unsettled_interview=False)
+        return self.with_activity(at=now).filter(quiet_condition(after_days, at=now))
+
+    def with_quiet_flag(self, after_days: int, at=None) -> ApplicationQuerySet:
+        """Annotate ``is_quiet`` rather than asking a second query which rows are (#231).
+
+        The board drew its badge by running `quiet()` over the whole set and comparing
+        primary keys -- which is the same four subqueries a second time, on a page that had
+        already annotated all of them. The condition is the same object either way, so the
+        badge cannot come to mean something the block and the filter do not.
+        """
+        now = at or timezone.now()
+        return self.with_activity(at=now).annotate(
+            is_quiet=Case(
+                When(quiet_condition(after_days, at=now), then=Value(True)),
+                default=Value(False),
+                output_field=BooleanField(),
+            )
         )
 
     def with_next_interview(self, at=None) -> ApplicationQuerySet:
@@ -447,6 +491,14 @@ class ApplicationEvent(models.Model):
         verbose_name = _("event")
         verbose_name_plural = _("events")
         ordering = ("-occurred_at", "-pk")
+        indexes = [
+            # The hottest subquery in the project: *the latest entry for this application*,
+            # which the table, the board, the dashboard and "gone quiet" all ask, once per
+            # row. Ordered descending because that is the direction it is read in, and both
+            # columns together because an index on `application` alone still leaves the
+            # database sorting the entries it found (#231).
+            models.Index(fields=("application", "-occurred_at"), name="event_latest_per_app"),
+        ]
 
     def __str__(self) -> str:
         return self.summary or self.get_kind_display()
@@ -489,6 +541,11 @@ class Reminder(OwnedModel):
         verbose_name = _("reminder")
         verbose_name_plural = _("reminders")
         ordering = ("due_at",)
+        indexes = [
+            # *Has this application anything planned* -- outstanding, soonest first. Asked
+            # per application by `with_activity` and by the quiet predicate (#231).
+            models.Index(fields=("application", "done_at", "due_at"), name="reminder_next_per_app"),
+        ]
 
     def __str__(self) -> str:
         return self.summary
@@ -612,6 +669,14 @@ class Interview(OwnedModel):
         verbose_name = _("interview")
         verbose_name_plural = _("interviews")
         ordering = ("starts_at", "pk")
+        indexes = [
+            # The other half of *anything planned*: the soonest meeting nobody has recorded
+            # an outcome for. `next_interview_at` annotates it on every row of the table and
+            # every card on the board (#231).
+            models.Index(
+                fields=("application", "outcome", "starts_at"), name="interview_next_per_app"
+            ),
+        ]
         constraints = [
             # Unique per calendar, which is per person: two people importing the same
             # archive each keep the identifier their own calendar already knows.

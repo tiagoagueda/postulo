@@ -367,9 +367,11 @@ class Sources:
 
     @cached_property
     def insights(self):
-        from postulo.applications.analytics import build
+        # `insights_for` rather than `build`: the figures are the whole history reduced, and
+        # nothing about a search changes between two page loads (#231).
+        from postulo.applications.analytics import insights_for
 
-        return build(self.user)
+        return insights_for(self.user)
 
     @cached_property
     def quiet(self):

@@ -14,6 +14,7 @@ implying a confidence the sample does not support.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import statistics
 from dataclasses import dataclass, field
 
@@ -242,8 +243,80 @@ def _first_interview_days(applications) -> dict[int, int]:
     return days
 
 
+#: How long a set of figures may sit in the cache at most. The fingerprint below is what
+#: actually decides whether they are still true; this is only so that a key for a state
+#: nobody will ever be in again does not live in the table for ever.
+INSIGHTS_TTL = 60 * 60 * 24
+
+
+def fingerprint(user) -> str:
+    """What the figures depend on, in three small aggregates (#231).
+
+    Everything `build` reads is an application, a timeline entry or a listing of this
+    person's. So: how many of each there are, the newest change to one, and the newest entry
+    written. Any of those moving means the figures may have moved; none of them moving means
+    they cannot have.
+
+    Three indexed aggregates against loading every application, every industry and every
+    status event a search has ever produced, which is what `build` does and what the
+    dashboard did on every view. Counting *and* stamping, because a deletion moves the count
+    and leaves the newest `updated_at` exactly where it was.
+    """
+    from django.db.models import Max
+
+    applications = Application.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    events = ApplicationEvent.objects.filter(application__owner=user).aggregate(
+        n=Count("pk"), at=Max("pk")
+    )
+    listings = JobPosting.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    parts = (
+        getattr(user, "pk", 0),
+        applications["n"],
+        applications["at"],
+        events["n"],
+        events["at"],
+        listings["n"],
+        listings["at"],
+        # The threshold is a preference rather than a record, and `quiet_now` is computed
+        # from it. Somebody changing it from 21 days to 14 changes the figures without
+        # touching anything the three aggregates above can see.
+        getattr(getattr(user, "profile", None), "quiet_after_days", None),
+    )
+    # Hashed rather than joined. The parts hold timestamps, which carry spaces and colons,
+    # and a cache key with either in it is a key some backends refuse -- Django warns about
+    # memcached by name. What is wanted here is "has any of this changed", and a digest
+    # answers that exactly.
+    material = "|".join(str(part) for part in parts).encode("utf-8")
+    return f"insights:{hashlib.sha256(material).hexdigest()}"
+
+
+def insights_for(user) -> Insights:
+    """`build`, but not again until something it reads has changed (#231).
+
+    The dashboard's figures widget asked for the whole thing on every view. Nothing about a
+    job search changes between two page loads a second apart, and the work is proportional
+    to the whole history rather than to what is on screen.
+
+    A cache miss is the old cost plus the fingerprint; a hit is the fingerprint and a read.
+    There is no timer to be wrong about: a key nobody can produce again is a key nobody
+    reads, and `INSIGHTS_TTL` only stops it being kept for ever.
+    """
+    from django.core.cache import cache
+
+    key = fingerprint(user)
+    held = cache.get(key)
+    if held is not None:
+        return held
+    figures = build(user)
+    cache.set(key, figures, INSIGHTS_TTL)
+    return figures
+
+
 def build(user) -> Insights:
-    """Work out what the record says about ``user``'s search."""
+    """Work out what the record says about ``user``'s search.
+
+    Always does the whole of the work. `insights_for` is the one that remembers.
+    """
     applications = list(
         Application.objects.for_user(user)
         .select_related("posting", "posting__company")

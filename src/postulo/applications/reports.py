@@ -31,6 +31,7 @@ import datetime as dt
 from dataclasses import dataclass, field
 from itertools import pairwise
 
+from django.db.models import Min
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -108,6 +109,23 @@ class Period:
             "from": formats.date_format(self.start, "DATE_FORMAT"),
             "to": formats.date_format(self.end, "DATE_FORMAT"),
         }
+
+    def bounds(self):
+        """The period as aware moments, for a `__range` the database can use (#231).
+
+        A report used to load every application ever sent and keep the ones whose date fell
+        inside -- three years of them to report on one month. The comparison is the same
+        comparison; it is where it happens that was wrong. Local midnights made aware in the
+        reader's own zone, because `holds` compares local dates and the two must agree about
+        which day a late evening belongs to.
+        """
+        lower = timezone.make_aware(
+            dt.datetime.combine(self.start, dt.time.min), timezone.get_current_timezone()
+        )
+        upper = timezone.make_aware(
+            dt.datetime.combine(self.end, dt.time.max), timezone.get_current_timezone()
+        )
+        return lower, upper
 
     def holds(self, day: dt.date | None) -> bool:
         return day is not None and self.start <= day <= self.end
@@ -384,30 +402,37 @@ def _first_reaching(user, statuses, period: Period) -> int:
     First rather than any: an application acknowledged, then screened, then interviewed in
     one month has had one reply, and counting three would report a busier month than
     happened.
+
+    The *first* is `Min` in SQL and the period is a `HAVING` (#231). It used to be every
+    status event this person has ever had, read into a dictionary and reduced in Python --
+    three times per report, since replies, offers and rejections each asked. A year of a
+    busy search is thousands of rows, read three times, to produce three integers.
     """
-    earliest: dict[int, dt.datetime] = {}
-    rows = ApplicationEvent.objects.filter(
-        application__owner=user, to_status__in=list(statuses)
-    ).values_list("application_id", "occurred_at")
-    for application_id, when in rows:
-        if application_id not in earliest or when < earliest[application_id]:
-            earliest[application_id] = when
-    return sum(1 for when in earliest.values() if period.holds(timezone.localdate(when)))
+    lower, upper = period.bounds()
+    return (
+        ApplicationEvent.objects.filter(application__owner=user, to_status__in=list(statuses))
+        .values("application_id")
+        .annotate(first_at=Min("occurred_at"))
+        .filter(first_at__range=(lower, upper))
+        .count()
+    )
 
 
 def build(user, period: Period, *, today: dt.date | None = None) -> Report:
     """The report for one person and one period."""
     today = today or timezone.localdate()
 
-    sent = list(
+    # The period narrows the query, not the list that comes back (#231). This used to be
+    # every application ever sent, with four subqueries each, filtered afterwards -- so a
+    # report on last month cost a search's whole history.
+    inside = list(
         Application.objects.for_user(user)
-        .filter(applied_at__isnull=False)
+        .filter(applied_at__range=period.bounds())
         .select_related("posting", "posting__company")
         .prefetch_related("posting__company__industries")
         .with_activity()
         .order_by("applied_at")
     )
-    inside = [a for a in sent if period.holds(timezone.localdate(a.applied_at))]
 
     labels = dict(Application._meta.get_field("status").choices)
     evidence = [

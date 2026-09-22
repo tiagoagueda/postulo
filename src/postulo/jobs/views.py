@@ -168,15 +168,12 @@ class CompanyBulkView(LoginRequiredMixin, View):
             wanted = int(request.POST.get("industry") or 0)
         except (TypeError, ValueError):
             return 0
+        from postulo.core import bulk
+
         industry = Industry.objects.for_user(request.user).filter(pk=wanted).first()
         if industry is None:
             return 0
-        changed = 0
-        for company in rows:
-            if not company.industries.filter(pk=industry.pk).exists():
-                company.industries.add(industry)
-                changed += 1
-        return changed
+        return bulk.link_all(list(rows), "industries", industry)
 
     @staticmethod
     def _back(request: HttpRequest) -> str:

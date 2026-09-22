@@ -860,7 +860,11 @@ class PluginsView(ServerSectionMixin, TemplateView):
                 "module": type(source).__module__,
                 "builtin": type(source).__module__.startswith("postulo."),
             }
-            for source in available_sources(refresh=True)
+            # Not `refresh=True` (#231). Rebuilding the registry from every
+            # installed distribution's entry points is what an install does, and this is a
+            # page somebody opened: `registry.catch_up` already rebuilds when the record's
+            # stamp has moved, which is the only way the answer can have changed.
+            for source in available_sources()
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
         context["installed"] = installing.status()
