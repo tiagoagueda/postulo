@@ -5,22 +5,34 @@
 
 {% block title %}{% translate "Calendar" %}{% endblock %}
 
-{% comment %} One event, wherever it is drawn (#204): a link the height of a target, the
-   kind said by colour and by an icon, the time before the title, and a struck line for
-   one that is over -- a reminder done, an interview cancelled -- because the month is a
-   record as well as a plan. {% endcomment %}
+{% comment %} One event, wherever it is drawn (#204, #238): a link the height of a target,
+   the kind said by colour *and* in words, the time before the title, and a struck line for
+   one that is over -- a reminder done, an interview cancelled, a deadline already met --
+   because the month is a record as well as a plan.
+
+   The kind's colour is `event.tone` and the words are `event.said`, both decided in
+   `agenda.py`. They used to be an `{% templatetag openblock %} if {% templatetag closeblock %}`
+   here, which was readable with two kinds and would be a chain of four now -- and the words
+   are the part that has to be right, so they belong where a test can reach them.
+
+   A deadline and a closing date are whole days, so no time is drawn: the hour an employer
+   stops reading is not something anybody knows, and a midnight in front of the title would
+   be a fact Postulo invented.
+{% endcomment %}
 {% partialdef event %}
   <a href="{{ event.url }}"
-     class="flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline {% if event.kind == 'interview' %}bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100{% else %}bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100{% endif %}{% if event.muted %} line-through{% endif %}"
+     class="cal-event {{ event.tone }}{% if event.muted %} line-through{% endif %}"
      data-event="{{ event.kind }}">
-    <span class="shrink-0 tabular-nums">{{ event.local_start|date:"TIME_FORMAT" }}</span>
+    {% if not event.all_day %}
+      <span class="shrink-0 tabular-nums">{{ event.local_start|date:"TIME_FORMAT" }}</span>
+    {% endif %}
     {% comment %} Two lines rather than one cut with an ellipsis (#278): under the text-spacing
        override every title grew past a month cell's width, and a clamp loses nothing a
        reader cannot see is there. {% endcomment %}
     <span class="min-w-0 {% if compact %}line-clamp-2{% endif %}">
       {% comment %} The strike says "over" to eyes; the word says it to a screen reader, and
          the fading that used to go with the strike took 12-pixel text under 4.5:1 (#274). {% endcomment %}
-      <span class="sr-only">{% if event.kind == 'interview' %}{% if event.muted %}{% translate "Cancelled interview:" %}{% else %}{% translate "Interview:" %}{% endif %}{% else %}{% if event.muted %}{% translate "Done reminder:" %}{% else %}{% translate "Reminder:" %}{% endif %}{% endif %}</span>
+      {% if event.said %}<span class="sr-only">{{ event.said }}</span>{% endif %}
       {{ event.title }}{% if not compact and event.detail %} <span class="font-light">· {{ event.detail }}</span>{% endif %}
     </span>
   </a>
@@ -52,7 +64,7 @@
     <div>
       <c-page-title>{% translate "Calendar" %}</c-page-title>
       <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders." %}
+        {% translate "Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page; a reminder from Reminders." %}
       </p>
     </div>
     {% comment %} Four shapes of the same days: month first, and the agenda for a phone,
@@ -70,6 +82,37 @@
     <a href="{{ page.today }}" class="btn" data-variant="ghost">{% translate "Today" %}</a>
     <a href="{{ page.later }}" class="btn" data-variant="ghost">{% translate "Later" %}</a>
     <h2 class="ms-2 text-lg font-medium">{{ page.title }}</h2>
+  </nav>
+
+  {% comment %} The key and the filter in one row (#238). Four kinds share this page, so
+     something has to say which colour is which -- and a key beside a separate set of
+     checkboxes is two things to read and two things to disagree. Each item is a link that
+     takes its kind out or puts it back, so a narrowed calendar is an address, works with no
+     script, and cannot drift from the key it is drawn as.
+
+     `aria-pressed` on a link would be wrong -- it is not a button, and it navigates -- so
+     what is on and what is off is said in the link's own name: *Hide interviews* is showing,
+     *Show interviews* is not. The fill is the second signal, never the only one (#274).
+  {% endcomment %}
+  <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Kinds of entry' %}" data-legend>
+    {% for kind, label, tone, showing, url in page.legend %}
+      <a href="{{ url }}" data-kind="{{ kind }}" {% if showing %}data-showing="true"{% endif %}
+         class="cal-legend-item {% if showing %}cal-{{ tone }} border-transparent{% else %}border-ink-300 text-ink-500 dark:border-ink-600 dark:text-ink-400{% endif %}">
+        <span aria-hidden="true">{{ label }}</span>
+        <span class="sr-only">
+          {% if showing %}
+            {% blocktranslate trimmed with what=label %}Hide {{ what }}{% endblocktranslate %}
+          {% else %}
+            {% blocktranslate trimmed with what=label %}Show {{ what }}{% endblocktranslate %}
+          {% endif %}
+        </span>
+      </a>
+    {% endfor %}
+    {% if page.narrowed %}
+      <a href="{{ page.everything }}" class="text-xs text-brand-600 underline dark:text-brand-400">
+        {% translate "Show everything" %}
+      </a>
+    {% endif %}
   </nav>
 
   {% if page.view == 'month' %}

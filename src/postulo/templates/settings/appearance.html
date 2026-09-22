@@ -77,6 +77,23 @@
         </p>
       </div>
     </div>
+    {% comment %} Beside *Gone quiet* because it is the same kind of choice -- how much
+       warning this person wants -- and because somebody who came here to change one will
+       have an opinion about the other (#238). {% endcomment %}
+    <div class="card mb-6">
+      <h2 class="mb-1 font-medium">{% translate "Closing soon" %}</h2>
+      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted." %}
+      </p>
+      <div class="flex items-end gap-3">
+        <div class="w-32">
+          <c-field :field="form.closing_notice_days" />
+        </div>
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate count counter=form.closing_days trimmed %}day{% plural %}days{% endblocktranslate %}
+        </p>
+      </div>
+    </div>
     <button type="submit" class="btn">{% translate "Save" %}</button>
   </form>
 {% endblock %}

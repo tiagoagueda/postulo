@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 from functools import cached_property
 
 from django.contrib import messages
@@ -13,7 +13,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.utils.decorators import method_decorator
 from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
@@ -59,6 +59,8 @@ from .services import (
     change_status,
     create_application,
     get_or_create_company,
+    later_time,
+    postpone_reminder,
     record_event,
     reschedule_interview,
     schedule_interview,
@@ -615,6 +617,100 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         return redirect(safe_next(request, reverse("applications:reminder_list")))
 
 
+class ReminderUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+    """Change what a reminder says or when it falls due (#238).
+
+    There was no way to. A reminder could be made and it could be ticked off, so a due time
+    typed wrongly -- half past nine in the evening for half past nine in the morning -- could
+    only be ticked off and written again, losing the fact that it had ever been set.
+
+    The stamp goes with the time, through the same service *Later* uses: a reminder moved
+    into the future has not been announced yet, whatever the column says.
+    """
+
+    model = Reminder
+    form_class = ReminderForm
+    template_name = "applications/reminder_form.html"
+
+    def form_valid(self, form):
+        moved = "due_at" in form.changed_data
+        response = super().form_valid(form)
+        if moved:
+            postpone_reminder(self.object, self.object.due_at)
+        messages.success(self.request, _("Reminder updated."))
+        return response
+
+    def get_success_url(self) -> str:
+        if self.object.application_id:
+            return reverse("applications:detail", args=[self.object.application_id])
+        return reverse("applications:reminder_list")
+
+
+class ReminderDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+    model = Reminder
+    template_name = "partials/confirm_delete.html"
+
+    def get_success_url(self) -> str:
+        if self.object.application_id:
+            return reverse("applications:detail", args=[self.object.application_id])
+        return reverse("applications:reminder_list")
+
+    def get_cancel_url(self) -> str:
+        return self.get_success_url()
+
+
+class ReminderLaterView(OwnedObjectMixin, View):
+    """Put a reminder off: tomorrow, next week, or a day the person names (#238).
+
+    The only postponement Postulo had was *Snooze* on a quiet application, which makes a
+    *new* reminder every time it is pressed -- so pressing it twice left two. This moves the
+    one that is there.
+
+    A `when` of `tomorrow` or `next_week` needs no date; anything else reads `due_at`, which
+    is the same field name and the same format the form uses, so the date control on the row
+    posts here without a form class of its own.
+    """
+
+    def get_queryset(self):
+        return Reminder.objects.for_user(self.request.user).select_related(
+            "application", "application__posting"
+        )
+
+    def post(self, request, pk: int) -> HttpResponse:
+        reminder = get_object_or_404(self.get_queryset(), pk=pk)
+        due = later_time(request.POST.get("when", "")) or _a_named_day(request.POST.get("due_at"))
+        if due is None:
+            messages.error(request, _("That is not a time Postulo can read."))
+        elif reminder.is_done:
+            messages.error(request, _("It is already done."))
+        else:
+            postpone_reminder(reminder, due)
+            messages.success(
+                request,
+                _("Put off until %(when)s.")
+                % {"when": formats.date_format(timezone.localtime(due), "DATETIME_FORMAT")},
+            )
+        if wants_a_detail_fragment(request) and reminder.application_id:
+            return detail_fragments(request, reminder.application, target="reminders")
+        return redirect(safe_next(request, reverse("applications:reminder_list")))
+
+
+def _a_named_day(raw: str | None):
+    """A date or a moment the person typed, made aware in their own zone.
+
+    A bare date means the start of that day, which is what a date control offers and what
+    somebody choosing one means. Anything unreadable is `None` and the view says so rather
+    than moving the reminder somewhere nobody asked for.
+    """
+    for shape in ("%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M", "%Y-%m-%d"):
+        try:
+            naive = datetime.strptime((raw or "").strip(), shape)
+        except ValueError:
+            continue
+        return timezone.make_aware(naive) if timezone.is_naive(naive) else naive
+    return None
+
+
 class ApplicationQuietActionView(OwnedObjectMixin, View):
     """What to do about an application that has gone quiet, from the dashboard.
 
@@ -789,26 +885,72 @@ class InterviewOutcomeView(OwnedObjectMixin, View):
         return redirect(safe_next(request, interview.application.get_absolute_url()))
 
 
+#: How far ahead the feed carries deadlines and closing dates. The interviews in it are
+#: *everything* still ahead, because a diary is short; deadlines and closings are not, and a
+#: year of them in somebody's calendar application is a year of clutter they did not ask
+#: for. Half a year is past any notice period worth planning around (#238).
+FEED_DAYS = 183
+
+
 class InterviewCalendarView(OwnedObjectMixin, View):
-    """An .ics file: one interview, or everything still ahead."""
+    """An .ics file: one interview, or everything still ahead.
+
+    The whole-diary feed carries the deadlines and the closing dates too, as whole days
+    (#238). They were stored and never left Postulo — so somebody who subscribed to the feed
+    to stop missing interviews still had to remember the two dates that actually close.
+
+    The single-interview file does not, and should not: it is a meeting somebody forwards or
+    imports once, and their own deadlines are nothing to do with it.
+
+    The address still says `interviews`. Renaming it would break every subscription already
+    in somebody's calendar, which is exactly the thing a feed must not do.
+    """
 
     def get_queryset(self):
         return Interview.objects.for_user(self.request.user).with_display_data()
 
     def get(self, request, pk: int | None = None) -> HttpResponse:
+        days: list[ical.DayEntry] = []
         if pk is not None:
             interviews = [get_object_or_404(self.get_queryset(), pk=pk)]
             filename = f"interview-{pk}.ics"
         else:
             interviews = list(self.get_queryset().upcoming())
             filename = "interviews.ics"
+            days = self.dated_days(request)
         text = ical.calendar(
             interviews,
             url_for=lambda i: request.build_absolute_uri(i.application.get_absolute_url()),
+            days=days,
         )
         response = HttpResponse(text, content_type="text/calendar; charset=utf-8")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
+
+    def dated_days(self, request) -> list[ical.DayEntry]:
+        """The deadlines and closing dates ahead, as whole days.
+
+        Read through `agenda.events_between`, which is the one place that decides what a
+        deadline is, which ones are over and what they are called -- so the feed and the
+        calendar page can never disagree about somebody's month.
+        """
+        today = timezone.localdate()
+        events = agenda.events_between(
+            request.user,
+            today,
+            today + timedelta(days=FEED_DAYS),
+            kinds=(agenda.DEADLINE, agenda.CLOSING),
+        )
+        return [
+            ical.DayEntry(
+                summary=event.title,
+                day=event.day,
+                url=request.build_absolute_uri(event.url),
+                description=event.detail,
+                over=event.muted,
+            )
+            for event in events
+        ]
 
 
 # ------------------------------------------------------------------------ tags

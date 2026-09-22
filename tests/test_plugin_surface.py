@@ -344,7 +344,12 @@ def test_the_surface_holds_the_notifier_contract():
 
     assert api.NotifierPlugin is not None
     assert api.Notification is not None
-    assert set(api.EVENTS) == {"reminder_due", "capture_received", "went_quiet"}
+    assert set(api.EVENTS) == {
+        "reminder_due",
+        "capture_received",
+        "went_quiet",
+        "posting_closing",
+    }
 
 
 def test_the_surface_holds_what_a_sync_needs():

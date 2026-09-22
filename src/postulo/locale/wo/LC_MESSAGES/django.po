@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 09:20+0000\n"
+"POT-Creation-Date: 2026-09-22 10:10+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Wolof\n"
@@ -63,6 +63,12 @@ msgstr ""
 #, python-format
 msgid "%(count)s application has gone quiet"
 msgid_plural "%(count)s applications have gone quiet"
+msgstr[0] ""
+
+#: src/postulo/jobs/closing.py:139
+#, python-format
+msgid "%(count)s listing you are considering closes soon"
+msgid_plural "%(count)s listings you are considering close soon"
 msgstr[0] ""
 
 #: src/postulo/templates/server/people.html:105
@@ -134,7 +140,7 @@ msgid "%(days)s day ago"
 msgid_plural "%(days)s days ago"
 msgstr[0] ""
 
-#: src/postulo/applications/agenda.py:345
+#: src/postulo/applications/agenda.py:558
 #, python-format
 msgid "%(days)s days from %(day)s"
 msgstr ""
@@ -191,7 +197,7 @@ msgstr ""
 msgid "%(kind)s scheduled for %(when)s"
 msgstr ""
 
-#: src/postulo/applications/ical.py:132
+#: src/postulo/applications/ical.py:147
 #, python-format
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr ""
@@ -208,7 +214,7 @@ msgid ""
 "%(label)s still holds %(count)d record(s), and uninstalling it would leave them in a table nothing can read, export or restore. Empty it from the plugin's own pages first, or switch the plugin off instead — off keeps everything."
 msgstr ""
 
-#: src/postulo/jobs/models.py:869
+#: src/postulo/jobs/models.py:876
 #, python-format
 msgid "%(low)s to %(high)s"
 msgstr ""
@@ -404,6 +410,11 @@ msgstr ""
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
 #, python-format
 msgid "%(role)s at %(company)s"
+msgstr ""
+
+#: src/postulo/jobs/closing.py:124
+#, python-format
+msgid "%(role)s at %(company)s — %(closing)s"
 msgstr ""
 
 #: src/postulo/applications/quiet.py:122
@@ -692,6 +703,10 @@ msgid ""
 "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert."
 msgstr ""
 
+#: src/postulo/notifications/base.py:33
+msgid "A listing you are considering closes soon"
+msgstr ""
+
 #: src/postulo/templates/partials/phone_numbers.html:15
 msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
@@ -811,7 +826,7 @@ msgstr ""
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr ""
 
-#: src/postulo/accounts/models.py:539
+#: src/postulo/accounts/models.py:546
 msgid "A reminder of who this is for."
 msgstr ""
 
@@ -933,11 +948,11 @@ msgstr ""
 msgid "Accepted"
 msgstr ""
 
-#: src/postulo/accounts/models.py:553
+#: src/postulo/accounts/models.py:560
 msgid "accepted at"
 msgstr ""
 
-#: src/postulo/accounts/models.py:560
+#: src/postulo/accounts/models.py:567
 msgid "accepted by"
 msgstr ""
 
@@ -987,6 +1002,11 @@ msgstr ""
 #: src/postulo/templates/server/people.html:61
 #, python-format
 msgid "Actions for %(name)s"
+msgstr ""
+
+#: src/postulo/templates/cotton/reminder_actions.html:39
+#, python-format
+msgid "Actions for %(what)s"
 msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:263
@@ -1092,7 +1112,7 @@ msgid ""
 "Added %(total)s entries. Nothing was overwritten; anything duplicated is yours to delete."
 msgstr ""
 
-#: src/postulo/applications/views.py:549 src/postulo/applications/views.py:1031
+#: src/postulo/applications/views.py:551 src/postulo/applications/views.py:1173
 msgid "Added to the timeline."
 msgstr ""
 
@@ -1111,7 +1131,7 @@ msgid "Address"
 msgstr ""
 
 #: src/postulo/core/models.py:538 src/postulo/core/models.py:664
-#: src/postulo/jobs/models.py:906 src/postulo/notifications/models.py:26
+#: src/postulo/jobs/models.py:913 src/postulo/notifications/models.py:26
 #: src/postulo/resume/models.py:264
 msgid "address"
 msgstr ""
@@ -1134,7 +1154,7 @@ msgstr ""
 msgid "Aerospace"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:282
+#: src/postulo/applications/agenda.py:491
 msgid "Agenda"
 msgstr ""
 
@@ -1185,6 +1205,14 @@ msgstr ""
 #: src/postulo/templates/server/defaults.html:74
 msgid ""
 "All of them are offered, and a language added in a later release will be too."
+msgstr ""
+
+#: src/postulo/applications/agenda.py:101
+msgid "Already decided —"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:99
+msgid "Already sent —"
 msgstr ""
 
 #: src/postulo/templates/accounts/profile.html:172
@@ -1252,13 +1280,13 @@ msgstr ""
 msgid "an unknown file type"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:114
+#: src/postulo/templates/applications/calendar.html:157
 #, python-format
 msgid "and %(counter)s more"
 msgid_plural "and %(counter)s more"
 msgstr[0] ""
 
-#: src/postulo/applications/quiet.py:131
+#: src/postulo/applications/quiet.py:131 src/postulo/jobs/closing.py:136
 #: src/postulo/templates/jobs/partials/company_row.html:56
 #, python-format
 msgid "and %(more)s more"
@@ -1294,6 +1322,11 @@ msgstr ""
 #: src/postulo/templates/applications/partials/filters.html:34
 #: src/postulo/templates/cotton/table/filter.html:49
 msgid "Any"
+msgstr ""
+
+#: src/postulo/templates/settings/appearance.html:90
+msgid ""
+"Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted."
 msgstr ""
 
 #: src/postulo/templates/settings/account.html:31
@@ -1346,7 +1379,7 @@ msgstr ""
 #: src/postulo/applications/models.py:478
 #: src/postulo/applications/models.py:573
 #: src/postulo/applications/models.py:694 src/postulo/applications/tables.py:21
-#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:934
+#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:941
 #: src/postulo/templates/core/import_csv_map.html:99
 msgid "application"
 msgstr ""
@@ -1362,7 +1395,7 @@ msgstr ""
 msgid "Application created"
 msgstr ""
 
-#: src/postulo/applications/views.py:455
+#: src/postulo/applications/views.py:457
 msgid "Application deleted."
 msgstr ""
 
@@ -1370,11 +1403,11 @@ msgstr ""
 msgid "Application recorded from the capture."
 msgstr ""
 
-#: src/postulo/applications/views.py:387 src/postulo/jobs/listing_views.py:277
+#: src/postulo/applications/views.py:389 src/postulo/jobs/listing_views.py:277
 msgid "Application recorded."
 msgstr ""
 
-#: src/postulo/applications/views.py:411
+#: src/postulo/applications/views.py:413
 msgid "Application updated."
 msgstr ""
 
@@ -1435,7 +1468,7 @@ msgstr ""
 
 #: src/postulo/applications/analytics.py:39
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:52
-#: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:824
+#: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:831
 #: src/postulo/templates/core/import_csv_map.html:80
 msgid "Applied"
 msgstr ""
@@ -1715,8 +1748,8 @@ msgstr ""
 #: src/postulo/core/navigation.py:76
 #: src/postulo/templates/applications/application_detail.html:215
 #: src/postulo/templates/applications/calendar.html:6
-#: src/postulo/templates/applications/calendar.html:56
-#: src/postulo/templates/applications/calendar.html:85
+#: src/postulo/templates/applications/calendar.html:67
+#: src/postulo/templates/applications/calendar.html:128
 msgid "Calendar"
 msgstr ""
 
@@ -1730,7 +1763,7 @@ msgstr ""
 msgid "calendar identifier"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:64
+#: src/postulo/templates/applications/calendar.html:75
 msgid "Calendar views"
 msgstr ""
 
@@ -1747,7 +1780,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_form.html:32
 #: src/postulo/templates/applications/application_intake.html:77
 #: src/postulo/templates/applications/interview_form.html:70
-#: src/postulo/templates/applications/reminder_form.html:18
+#: src/postulo/templates/applications/reminder_form.html:22
 #: src/postulo/templates/applications/tag_form.html:85
 #: src/postulo/templates/connections/confirm_delete.html:19
 #: src/postulo/templates/connections/form.html:45
@@ -1776,7 +1809,7 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:95
 msgid "Cancelled interview:"
 msgstr ""
 
@@ -1785,7 +1818,7 @@ msgstr ""
 msgid "Capture"
 msgstr ""
 
-#: src/postulo/jobs/models.py:938
+#: src/postulo/jobs/models.py:945
 msgid "capture"
 msgstr ""
 
@@ -1824,7 +1857,7 @@ msgstr ""
 msgid "Captured %(count)s postings from %(host)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:910
+#: src/postulo/jobs/models.py:917
 msgid "captured from"
 msgstr ""
 
@@ -1833,7 +1866,7 @@ msgstr ""
 msgid "Captured: %(title)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:939
+#: src/postulo/jobs/models.py:946
 msgid "captures"
 msgstr ""
 
@@ -1923,7 +1956,7 @@ msgid ""
 "Changes made here are pushed on the next run; the other side is read then too."
 msgstr ""
 
-#: src/postulo/applications/views.py:647
+#: src/postulo/applications/views.py:743
 #, python-format
 msgid "Chase %(company)s about %(role)s"
 msgstr ""
@@ -1999,11 +2032,11 @@ msgstr ""
 msgid "Choose at least one document to record."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:598 src/postulo/jobs/forms.py:371
+#: src/postulo/accounts/forms.py:614 src/postulo/jobs/forms.py:371
 msgid "Choose what kind of identifier this is."
 msgstr ""
 
-#: src/postulo/applications/views.py:1027
+#: src/postulo/applications/views.py:1169
 msgid "Choose which application this is about first."
 msgstr ""
 
@@ -2047,11 +2080,11 @@ msgstr ""
 msgid "Client secret"
 msgstr ""
 
-#: src/postulo/jobs/listing_views.py:36 src/postulo/jobs/models.py:824
+#: src/postulo/jobs/listing_views.py:36 src/postulo/jobs/models.py:831
 msgid "Closed"
 msgstr ""
 
-#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:759
+#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:766
 msgid "closed on"
 msgstr ""
 
@@ -2064,12 +2097,29 @@ msgstr ""
 msgid "Closes"
 msgstr ""
 
+#: src/postulo/applications/agenda.py:284
+#, python-format
+msgid "Closes: %(role)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py:763
+msgid "closing announced for"
+msgstr ""
+
 #: src/postulo/applications/forms.py:163
 msgid "Closing date"
 msgstr ""
 
 #: src/postulo/jobs/models.py:753
 msgid "closing date"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:76
+msgid "Closing dates"
+msgstr ""
+
+#: src/postulo/templates/settings/appearance.html:88
+msgid "Closing soon"
 msgstr ""
 
 #: src/postulo/templates/widgets/listings.html:22
@@ -2117,7 +2167,7 @@ msgstr ""
 msgid "Comfortable"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:513
+#: src/postulo/accounts/forms.py:514
 msgid ""
 "Comfortable is the default and the roomier of the two. Compact tightens the space around cards and inside tables so that more fits on a screen; nothing you can click or tap gets smaller."
 msgstr ""
@@ -2410,12 +2460,12 @@ msgstr ""
 msgid "Created %(date)s"
 msgstr ""
 
-#: src/postulo/accounts/models.py:383 src/postulo/accounts/models.py:454
-#: src/postulo/accounts/models.py:550 src/postulo/core/models.py:35
+#: src/postulo/accounts/models.py:390 src/postulo/accounts/models.py:461
+#: src/postulo/accounts/models.py:557 src/postulo/core/models.py:35
 msgid "created at"
 msgstr ""
 
-#: src/postulo/accounts/models.py:548
+#: src/postulo/accounts/models.py:555
 msgid "created by"
 msgstr ""
 
@@ -2510,17 +2560,22 @@ msgstr ""
 msgid "Dates you choose"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:281
+#: src/postulo/applications/agenda.py:490
 msgid "Day"
 msgstr ""
 
 #: src/postulo/templates/settings/appearance.html:79
+#: src/postulo/templates/settings/appearance.html:97
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 
 #: src/postulo/templates/core/import_csv_map.html:49
 msgid "day / month / year (31/12/2026)"
+msgstr ""
+
+#: src/postulo/accounts/models.py:387
+msgid "Days of warning before a listing you have not decided about closes."
 msgstr ""
 
 #: src/postulo/applications/widgets.py:226
@@ -2547,6 +2602,15 @@ msgstr ""
 
 #: src/postulo/applications/tables.py:61 src/postulo/core/csv_import.py:47
 msgid "Deadline"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:257
+#, python-format
+msgid "Deadline: %(role)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:75
+msgid "Deadlines"
 msgstr ""
 
 #: src/postulo/documents/models.py:332
@@ -2598,7 +2662,7 @@ msgstr ""
 msgid "Decided by %(who)s on %(when)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:774
+#: src/postulo/jobs/models.py:781
 msgid "decided on"
 msgstr ""
 
@@ -2610,7 +2674,7 @@ msgstr ""
 msgid "Declined"
 msgstr ""
 
-#: src/postulo/applications/views.py:1019
+#: src/postulo/applications/views.py:1161
 msgid "Declined. It will not be suggested again."
 msgstr ""
 
@@ -2637,6 +2701,7 @@ msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:40
 #: src/postulo/templates/applications/tag_list.html:38
+#: src/postulo/templates/cotton/reminder_actions.html:60
 #: src/postulo/templates/documents/cv_detail.html:27
 #: src/postulo/templates/documents/letter_detail.html:25
 #: src/postulo/templates/documents/upload_list.html:58
@@ -2772,7 +2837,7 @@ msgid "Discard this capture"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py:34 src/postulo/jobs/models.py:580
-#: src/postulo/jobs/models.py:889
+#: src/postulo/jobs/models.py:896
 msgid "Discarded"
 msgstr ""
 
@@ -2826,10 +2891,8 @@ msgstr ""
 msgid "Documents you already had. Nothing here is served publicly."
 msgstr ""
 
-#: src/postulo/core/models.py:715
-#: src/postulo/templates/applications/partials/reminders.html:30
-#: src/postulo/templates/applications/reminder_list.html:47
-#: src/postulo/templates/core/dashboard.html:70
+#: src/postulo/core/models.py:715 src/postulo/templates/core/dashboard.html:70
+#: src/postulo/templates/cotton/reminder_actions.html:33
 #: src/postulo/templates/widgets/due_reminders.html:23
 msgid "Done"
 msgstr ""
@@ -2842,7 +2905,7 @@ msgstr ""
 msgid "done on"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:97
 msgid "Done reminder:"
 msgstr ""
 
@@ -2913,7 +2976,7 @@ msgid ""
 "Each stage counts applications that ever reached it, whatever happened afterwards."
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:73
+#: src/postulo/templates/applications/calendar.html:84
 msgid "Earlier"
 msgstr ""
 
@@ -2952,6 +3015,10 @@ msgstr ""
 msgid "Edit or merge"
 msgstr ""
 
+#: src/postulo/templates/cotton/reminder_actions.html:56
+msgid "Edit, or choose another time"
+msgstr ""
+
 #: src/postulo/documents/rendering.py:33 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:81
@@ -2976,7 +3043,7 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:534
+#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:541
 #: src/postulo/jobs/models.py:501 src/postulo/resume/views.py:455
 msgid "email address"
 msgstr ""
@@ -2985,7 +3052,7 @@ msgstr ""
 msgid "Email address"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:796
+#: src/postulo/accounts/forms.py:812
 msgid "Email address (optional)"
 msgstr ""
 
@@ -3021,7 +3088,7 @@ msgstr ""
 msgid "Empty"
 msgstr ""
 
-#: src/postulo/jobs/models.py:944
+#: src/postulo/jobs/models.py:951
 msgid "Empty capture"
 msgstr ""
 
@@ -3094,7 +3161,7 @@ msgid ""
 "Every company under this industry moves to the one chosen, and this one goes."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:763
+#: src/postulo/accounts/forms.py:779
 msgid "Every date and time on these pages is shown in it."
 msgstr ""
 
@@ -3239,7 +3306,7 @@ msgstr ""
 msgid "Expires %(date)s"
 msgstr ""
 
-#: src/postulo/accounts/models.py:455 src/postulo/accounts/models.py:551
+#: src/postulo/accounts/models.py:462 src/postulo/accounts/models.py:558
 #: src/postulo/core/models.py:814
 msgid "expires at"
 msgstr ""
@@ -3463,11 +3530,11 @@ msgstr ""
 msgid "Follow-up note"
 msgstr ""
 
-#: src/postulo/applications/views.py:641
+#: src/postulo/applications/views.py:737
 msgid "Follow-up recorded."
 msgstr ""
 
-#: src/postulo/applications/models.py:396 src/postulo/applications/views.py:638
+#: src/postulo/applications/models.py:396 src/postulo/applications/views.py:734
 #: src/postulo/templates/widgets/gone_quiet.html:40
 msgid "Followed up"
 msgstr ""
@@ -3587,7 +3654,7 @@ msgstr ""
 msgid "From"
 msgstr ""
 
-#: src/postulo/jobs/models.py:874
+#: src/postulo/jobs/models.py:881
 #, python-format
 msgid "from %(low)s"
 msgstr ""
@@ -3785,6 +3852,11 @@ msgstr ""
 msgid "hidden navigation items"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:108
+#, python-format
+msgid "Hide %(what)s"
+msgstr ""
+
 #: src/postulo/applications/models.py:111
 msgid "High"
 msgstr ""
@@ -3853,7 +3925,7 @@ msgstr ""
 msgid "How much room"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:507
+#: src/postulo/accounts/forms.py:508
 msgid "How much room to leave"
 msgstr ""
 
@@ -4023,6 +4095,12 @@ msgstr ""
 msgid "Importer"
 msgstr ""
 
+#: src/postulo/jobs/closing.py:131
+#, python-format
+msgid "in %(days)s day"
+msgid_plural "in %(days)s days"
+msgstr[0] ""
+
 #: src/postulo/api/forms.py:11
 msgid "In 30 days"
 msgstr ""
@@ -4179,7 +4257,7 @@ msgstr ""
 msgid "Interview cancelled"
 msgstr ""
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:828
 msgid "Interview recorded."
 msgstr ""
 
@@ -4187,7 +4265,7 @@ msgstr ""
 msgid "Interview scheduled"
 msgstr ""
 
-#: src/postulo/applications/views.py:734
+#: src/postulo/applications/views.py:830
 msgid "Interview scheduled."
 msgstr ""
 
@@ -4196,11 +4274,11 @@ msgstr ""
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr ""
 
-#: src/postulo/applications/views.py:764
+#: src/postulo/applications/views.py:860
 msgid "Interview updated."
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:94
 msgid "Interview:"
 msgstr ""
 
@@ -4209,10 +4287,7 @@ msgstr ""
 msgid "Interviewing"
 msgstr ""
 
-#: src/postulo/applications/models.py:613
-msgid "interviews"
-msgstr ""
-
+#: src/postulo/applications/agenda.py:73
 #: src/postulo/applications/widgets.py:237
 #: src/postulo/templates/accounts/delete_account.html:24
 #: src/postulo/templates/applications/application_detail.html:177
@@ -4223,9 +4298,8 @@ msgstr ""
 msgid "Interviews"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:58
-msgid ""
-"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
+#: src/postulo/applications/models.py:613
+msgid "interviews"
 msgstr ""
 
 #: src/postulo/templates/applications/report.html:206
@@ -4233,7 +4307,12 @@ msgstr ""
 msgid "Interviews attended"
 msgstr ""
 
-#: src/postulo/accounts/models.py:566
+#: src/postulo/templates/applications/calendar.html:69
+msgid ""
+"Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
+
+#: src/postulo/accounts/models.py:573
 msgid "invitation"
 msgstr ""
 
@@ -4251,7 +4330,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr ""
 
-#: src/postulo/accounts/models.py:567
+#: src/postulo/accounts/models.py:574
 msgid "invitations"
 msgstr ""
 
@@ -4262,7 +4341,7 @@ msgstr ""
 msgid "Invitations"
 msgstr ""
 
-#: src/postulo/accounts/models.py:448 src/postulo/resume/models.py:176
+#: src/postulo/accounts/models.py:455 src/postulo/resume/models.py:176
 msgid "issued by"
 msgstr ""
 
@@ -4291,6 +4370,10 @@ msgstr ""
 #: src/postulo/plugins/installing.py:836
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
+#: src/postulo/applications/views.py:685
+msgid "It is already done."
 msgstr ""
 
 #: src/postulo/documents/views.py:410
@@ -4345,11 +4428,11 @@ msgstr ""
 msgid "Job board"
 msgstr ""
 
-#: src/postulo/jobs/models.py:779
+#: src/postulo/jobs/models.py:786
 msgid "job posting"
 msgstr ""
 
-#: src/postulo/jobs/models.py:780
+#: src/postulo/jobs/models.py:787
 msgid "job postings"
 msgstr ""
 
@@ -4450,6 +4533,10 @@ msgstr ""
 msgid "kind of source"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:101
+msgid "Kinds of entry"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_list.html:21
 msgid "Kinds of letter"
 msgstr ""
@@ -4458,7 +4545,7 @@ msgstr ""
 msgid "label"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:750 src/postulo/resume/forms.py:270
+#: src/postulo/accounts/forms.py:766 src/postulo/resume/forms.py:270
 #: src/postulo/resume/registry.py:77
 msgid "Language"
 msgstr ""
@@ -4588,7 +4675,7 @@ msgstr ""
 msgid "last worked"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:75
+#: src/postulo/templates/applications/calendar.html:86
 #: src/postulo/templates/jobs/capture_review.html:139
 msgid "Later"
 msgstr ""
@@ -4734,7 +4821,7 @@ msgstr ""
 msgid "listening"
 msgstr ""
 
-#: src/postulo/jobs/models.py:925 src/postulo/jobs/tables.py:178
+#: src/postulo/jobs/models.py:932 src/postulo/jobs/tables.py:178
 #: src/postulo/templates/core/import_csv_map.html:101
 msgid "listing"
 msgstr ""
@@ -4935,7 +5022,7 @@ msgstr ""
 msgid "Map a column to Company and one to Role first."
 msgstr ""
 
-#: src/postulo/applications/views.py:612
+#: src/postulo/applications/views.py:614
 msgid "Marked as done."
 msgstr ""
 
@@ -5008,7 +5095,7 @@ msgstr ""
 msgid "Money and dates"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:279
+#: src/postulo/applications/agenda.py:488
 #: src/postulo/templates/applications/report.html:66
 msgid "Month"
 msgstr ""
@@ -5181,8 +5268,8 @@ msgstr ""
 msgid "New letter"
 msgstr ""
 
-#: src/postulo/templates/applications/reminder_form.html:4
 #: src/postulo/templates/applications/reminder_form.html:8
+#: src/postulo/templates/applications/reminder_form.html:12
 #: src/postulo/templates/applications/reminder_list.html:20
 msgid "New reminder"
 msgstr ""
@@ -5441,7 +5528,7 @@ msgstr ""
 msgid "None chosen yet"
 msgstr ""
 
-#: src/postulo/templates/applications/partials/reminders.html:36
+#: src/postulo/templates/applications/partials/reminders.html:32
 msgid "None outstanding."
 msgstr ""
 
@@ -5582,7 +5669,7 @@ msgstr ""
 msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr ""
 
-#: src/postulo/accounts/models.py:539
+#: src/postulo/accounts/models.py:546
 msgid "note"
 msgstr ""
 
@@ -5590,7 +5677,7 @@ msgstr ""
 msgid "Note"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:797
+#: src/postulo/accounts/forms.py:813
 #: src/postulo/templates/applications/partials/status_card.html:29
 msgid "Note (optional)"
 msgstr ""
@@ -5604,7 +5691,7 @@ msgstr ""
 msgid "noted %(when)s"
 msgstr ""
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:779
 msgid "noted on"
 msgstr ""
 
@@ -5667,7 +5754,7 @@ msgid ""
 "Nothing in the diary. When one is offered, schedule it from the application's page."
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:49
+#: src/postulo/templates/applications/calendar.html:60
 msgid "Nothing in this period."
 msgstr ""
 
@@ -5738,7 +5825,7 @@ msgstr ""
 msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:45
+#: src/postulo/templates/applications/calendar.html:56
 msgid "Nothing on this day."
 msgstr ""
 
@@ -5786,7 +5873,7 @@ msgstr ""
 msgid "Nothing there"
 msgstr ""
 
-#: src/postulo/templates/applications/reminder_list.html:56
+#: src/postulo/templates/applications/reminder_list.html:51
 msgid "Nothing to chase."
 msgstr ""
 
@@ -5849,6 +5936,10 @@ msgstr ""
 #: src/postulo/templates/applications/report.html:285
 msgid ""
 "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
+msgstr ""
+
+#: src/postulo/accounts/models.py:384
+msgid "notice before a listing closes"
 msgstr ""
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
@@ -6100,7 +6191,7 @@ msgid ""
 "Only for a provider that no longer accepts a password. Your own mail server needs none of this."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:581
+#: src/postulo/accounts/forms.py:597
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
@@ -6141,7 +6232,7 @@ msgstr ""
 msgid "Optional, and decoration: the word is what is read aloud."
 msgstr ""
 
-#: src/postulo/accounts/models.py:536
+#: src/postulo/accounts/models.py:543
 msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
 
@@ -6261,7 +6352,7 @@ msgstr ""
 msgid "Panel"
 msgstr ""
 
-#: src/postulo/jobs/models.py:915
+#: src/postulo/jobs/models.py:922
 msgid "parsed posting"
 msgstr ""
 
@@ -6374,7 +6465,7 @@ msgid "Per year"
 msgstr ""
 
 #: src/postulo/applications/forms.py:135
-#: src/postulo/templates/applications/calendar.html:72
+#: src/postulo/templates/applications/calendar.html:83
 msgid "Period"
 msgstr ""
 
@@ -6387,7 +6478,7 @@ msgstr ""
 msgid "Permissions"
 msgstr ""
 
-#: src/postulo/accounts/models.py:440 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:447 src/postulo/plugins/models.py:120
 msgid "person"
 msgstr ""
 
@@ -6685,7 +6776,7 @@ msgid ""
 "Postulo stores only a hash of it and cannot show it again. Lose it and you make another."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:580
+#: src/postulo/accounts/forms.py:596
 msgid "Postulo tidies it into the register's own spelling and checks the shape."
 msgstr ""
 
@@ -6782,11 +6873,11 @@ msgstr ""
 msgid "proficiency"
 msgstr ""
 
-#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:394
 msgid "profile"
 msgstr ""
 
-#: src/postulo/accounts/models.py:388
+#: src/postulo/accounts/models.py:395
 msgid "profiles"
 msgstr ""
 
@@ -6845,6 +6936,19 @@ msgstr ""
 
 #: src/postulo/resume/models.py:239
 msgid "Publication"
+msgstr ""
+
+#: src/postulo/applications/views.py:690
+#, python-format
+msgid "Put off until %(when)s."
+msgstr ""
+
+#: src/postulo/templates/cotton/reminder_actions.html:51
+msgid "Put off until next week"
+msgstr ""
+
+#: src/postulo/templates/cotton/reminder_actions.html:48
+msgid "Put off until tomorrow"
 msgstr ""
 
 #: src/postulo/templates/jobs/partials/listing_bulk_fields.html:17
@@ -6941,7 +7045,7 @@ msgstr ""
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr ""
 
-#: src/postulo/jobs/models.py:907
+#: src/postulo/jobs/models.py:914
 msgid "read by"
 msgstr ""
 
@@ -7033,11 +7137,11 @@ msgid ""
 "Recorded against everything installed from here, so it cannot change later without orphaning what it installed."
 msgstr ""
 
-#: src/postulo/applications/views.py:785
+#: src/postulo/applications/views.py:881
 msgid "Recorded as cancelled."
 msgstr ""
 
-#: src/postulo/applications/views.py:784
+#: src/postulo/applications/views.py:880
 msgid "Recorded as held."
 msgstr ""
 
@@ -7058,7 +7162,7 @@ msgstr ""
 msgid "Recorded what you sent."
 msgstr ""
 
-#: src/postulo/applications/views.py:786
+#: src/postulo/applications/views.py:882
 msgid "Recorded: nobody showed up."
 msgstr ""
 
@@ -7066,7 +7170,7 @@ msgstr ""
 msgid "Recovery"
 msgstr ""
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:469
 msgid "recovery link"
 msgstr ""
 
@@ -7075,7 +7179,7 @@ msgstr ""
 msgid "Recovery link"
 msgstr ""
 
-#: src/postulo/accounts/models.py:463
+#: src/postulo/accounts/models.py:470
 msgid "recovery links"
 msgstr ""
 
@@ -7155,19 +7259,29 @@ msgstr ""
 msgid "reminder"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/templates/applications/reminder_form.html:8
+#: src/postulo/templates/applications/reminder_form.html:12
+msgid "Reminder"
+msgstr ""
+
+#: src/postulo/applications/views.py:640
+msgid "Reminder updated."
+msgstr ""
+
+#: src/postulo/applications/agenda.py:96
 msgid "Reminder:"
 msgstr ""
 
-#: src/postulo/applications/models.py:490
-msgid "reminders"
-msgstr ""
-
-#: src/postulo/core/navigation.py:75 src/postulo/core/search.py:394
+#: src/postulo/applications/agenda.py:74 src/postulo/core/navigation.py:75
+#: src/postulo/core/search.py:394
 #: src/postulo/templates/applications/application_detail.html:260
 #: src/postulo/templates/applications/reminder_list.html:6
 #: src/postulo/templates/applications/reminder_list.html:10
 msgid "Reminders"
+msgstr ""
+
+#: src/postulo/applications/models.py:490
+msgid "reminders"
 msgstr ""
 
 #: src/postulo/applications/widgets.py:164
@@ -7315,7 +7429,7 @@ msgstr ""
 msgid "Revoked"
 msgstr ""
 
-#: src/postulo/accounts/models.py:457
+#: src/postulo/accounts/models.py:464
 msgid "revoked at"
 msgstr ""
 
@@ -7416,7 +7530,7 @@ msgstr ""
 #: src/postulo/templates/applications/application_form.html:31
 #: src/postulo/templates/applications/application_intake.html:76
 #: src/postulo/templates/applications/interview_form.html:68
-#: src/postulo/templates/applications/reminder_form.html:17
+#: src/postulo/templates/applications/reminder_form.html:21
 #: src/postulo/templates/applications/tag_form.html:84
 #: src/postulo/templates/connections/form.html:44
 #: src/postulo/templates/documents/cv_form.html:20
@@ -7439,7 +7553,7 @@ msgstr ""
 #: src/postulo/templates/server/plugins.html:116
 #: src/postulo/templates/server/signin.html:89
 #: src/postulo/templates/settings/accessibility.html:59
-#: src/postulo/templates/settings/appearance.html:83
+#: src/postulo/templates/settings/appearance.html:101
 #: src/postulo/templates/settings/locale.html:108
 #: src/postulo/templates/settings/plugins.html:113
 msgid "Save"
@@ -7486,7 +7600,7 @@ msgstr ""
 msgid "Say what this address is."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:608 src/postulo/jobs/forms.py:381
+#: src/postulo/accounts/forms.py:624 src/postulo/jobs/forms.py:381
 #: src/postulo/jobs/models.py:421
 msgid "Say what this identifier is."
 msgstr ""
@@ -7734,7 +7848,7 @@ msgstr ""
 msgid "Set up"
 msgstr ""
 
-#: src/postulo/jobs/models.py:762
+#: src/postulo/jobs/models.py:769
 msgid "Set when the opening is no longer available."
 msgstr ""
 
@@ -7792,6 +7906,11 @@ msgstr ""
 msgid "Show"
 msgstr ""
 
+#: src/postulo/templates/applications/calendar.html:110
+#, python-format
+msgid "Show %(what)s"
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html:23
 #: src/postulo/templates/jobs/capture_list.html:20
 msgid "Show all"
@@ -7799,6 +7918,10 @@ msgstr ""
 
 #: src/postulo/templates/applications/reminder_list.html:17
 msgid "Show done too"
+msgstr ""
+
+#: src/postulo/templates/applications/calendar.html:117
+msgid "Show everything"
 msgstr ""
 
 #: src/postulo/accounts/forms.py:492
@@ -7997,7 +8120,7 @@ msgstr ""
 msgid "Snooze"
 msgstr ""
 
-#: src/postulo/applications/views.py:655
+#: src/postulo/applications/views.py:751
 msgid "Snoozed for two weeks."
 msgstr ""
 
@@ -8094,7 +8217,7 @@ msgid ""
 "Source is the “found via” field on a posting. Fill it in and this table starts earning its place."
 msgstr ""
 
-#: src/postulo/jobs/models.py:908
+#: src/postulo/jobs/models.py:915
 msgid "source version"
 msgstr ""
 
@@ -8151,7 +8274,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr ""
 
-#: src/postulo/core/models.py:745 src/postulo/jobs/models.py:766
+#: src/postulo/core/models.py:745 src/postulo/jobs/models.py:773
 #: src/postulo/plugins/models.py:123
 msgid "state"
 msgstr ""
@@ -8163,7 +8286,7 @@ msgstr ""
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:252
 #: src/postulo/applications/models.py:717 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:917
+#: src/postulo/jobs/models.py:924
 msgid "status"
 msgstr ""
 
@@ -8194,7 +8317,7 @@ msgstr ""
 msgid "Status of %(title)s at %(company)s"
 msgstr ""
 
-#: src/postulo/applications/views.py:473
+#: src/postulo/applications/views.py:475
 msgid "Status updated."
 msgstr ""
 
@@ -8567,7 +8690,7 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr ""
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:557
 msgid "That entry could not be saved."
 msgstr ""
 
@@ -8639,8 +8762,12 @@ msgstr ""
 msgid "That is a lot of tests. Try again in %(seconds)d seconds."
 msgstr ""
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:477
 msgid "That is not a status Postulo recognises."
+msgstr ""
+
+#: src/postulo/applications/views.py:683
+msgid "That is not a time Postulo can read."
 msgstr ""
 
 #: src/postulo/plugins/installing.py:320
@@ -8660,15 +8787,15 @@ msgstr ""
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr ""
 
-#: src/postulo/applications/views.py:778
+#: src/postulo/applications/views.py:874
 msgid "That is not an outcome Postulo recognises."
 msgstr ""
 
-#: src/postulo/applications/views.py:657
+#: src/postulo/applications/views.py:753
 msgid "That is not something Postulo can do about it."
 msgstr ""
 
-#: src/postulo/applications/views.py:261 src/postulo/jobs/listing_views.py:168
+#: src/postulo/applications/views.py:263 src/postulo/jobs/listing_views.py:168
 #: src/postulo/jobs/views.py:159
 msgid "That is not something Postulo can do to several at once."
 msgstr ""
@@ -8751,7 +8878,7 @@ msgstr ""
 msgid "That reply did not come from a request Postulo made."
 msgstr ""
 
-#: src/postulo/applications/views.py:1014
+#: src/postulo/applications/views.py:1156
 msgid "That suggestion has already been answered."
 msgstr ""
 
@@ -8768,7 +8895,7 @@ msgstr ""
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr ""
 
-#: src/postulo/applications/views.py:447 src/postulo/jobs/views.py:418
+#: src/postulo/applications/views.py:449 src/postulo/jobs/views.py:418
 #: src/postulo/jobs/views.py:640
 #, python-format
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -9019,7 +9146,7 @@ msgid ""
 "The link for the page you are on is underlined as well as shaded and set in bolder type. Turn the underline off for a quieter header: the weight and the shade stay, so the page you are on is never marked by colour alone. A high-contrast theme underlines it whatever you choose here, because there the shading is discarded and the underline is not."
 msgstr ""
 
-#: src/postulo/jobs/models.py:926
+#: src/postulo/jobs/models.py:933
 msgid "The listing this capture became, once reviewed."
 msgstr ""
 
@@ -9378,7 +9505,7 @@ msgstr ""
 msgid "This Idempotency-Key was already used for a different capture."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:633 src/postulo/jobs/forms.py:408
+#: src/postulo/accounts/forms.py:649 src/postulo/jobs/forms.py:408
 #: src/postulo/jobs/models.py:410
 msgid "This identifier is already listed."
 msgstr ""
@@ -9442,7 +9569,7 @@ msgid ""
 "This is your own account. A link you make for yourself is not a way back in — you had to sign in to make it. If you are the only administrator here, a passkey or a second administrator is what covers you."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:630 src/postulo/jobs/forms.py:403
+#: src/postulo/accounts/forms.py:646 src/postulo/jobs/forms.py:403
 #: src/postulo/jobs/models.py:390
 msgid "This kind of identifier is already listed."
 msgstr ""
@@ -9540,7 +9667,7 @@ msgstr ""
 msgid "tier"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:760
+#: src/postulo/accounts/forms.py:776
 msgid "Time zone"
 msgstr ""
 
@@ -9598,19 +9725,20 @@ msgstr ""
 msgid "to status"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:74
-msgid "Today"
+#: src/postulo/jobs/closing.py:129
+#: src/postulo/templates/applications/calendar.html:146
+msgid "today"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html:103
-msgid "today"
+#: src/postulo/templates/applications/calendar.html:85
+msgid "Today"
 msgstr ""
 
 #: src/postulo/documents/models.py:367
 msgid "Today's date"
 msgstr ""
 
-#: src/postulo/accounts/models.py:527
+#: src/postulo/accounts/models.py:534
 msgid "token"
 msgstr ""
 
@@ -9684,7 +9812,7 @@ msgstr ""
 msgid "Turn on “Use my Gravatar” first."
 msgstr ""
 
-#: src/postulo/jobs/models.py:888
+#: src/postulo/jobs/models.py:895
 msgid "Turned into an application"
 msgstr ""
 
@@ -9708,7 +9836,7 @@ msgstr ""
 msgid "Type it in instead"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:600 src/postulo/jobs/forms.py:373
+#: src/postulo/accounts/forms.py:616 src/postulo/jobs/forms.py:373
 msgid "Type the identifier."
 msgstr ""
 
@@ -9763,7 +9891,7 @@ msgstr ""
 msgid "until"
 msgstr ""
 
-#: src/postulo/jobs/models.py:876
+#: src/postulo/jobs/models.py:883
 #, python-format
 msgid "up to %(high)s"
 msgstr ""
@@ -9772,7 +9900,7 @@ msgstr ""
 msgid "Update the preview"
 msgstr ""
 
-#: src/postulo/accounts/models.py:384 src/postulo/core/models.py:36
+#: src/postulo/accounts/models.py:391 src/postulo/core/models.py:36
 #: src/postulo/core/models.py:1005
 msgid "updated at"
 msgstr ""
@@ -9847,7 +9975,7 @@ msgstr ""
 msgid "Used"
 msgstr ""
 
-#: src/postulo/accounts/models.py:456
+#: src/postulo/accounts/models.py:463
 msgid "used at"
 msgstr ""
 
@@ -9873,7 +10001,7 @@ msgstr ""
 msgid "user"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:773 src/postulo/templates/server/email.html:22
+#: src/postulo/accounts/forms.py:789 src/postulo/templates/server/email.html:22
 #: src/postulo/templates/server/people.html:31
 msgid "Username"
 msgstr ""
@@ -9972,7 +10100,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr ""
 
-#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:887
+#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:894
 msgid "Waiting for review"
 msgstr ""
 
@@ -9990,6 +10118,10 @@ msgstr ""
 
 #: src/postulo/templates/server/person_recovery.html:76
 msgid "Waiting to be used"
+msgstr ""
+
+#: src/postulo/accounts/forms.py:507
+msgid "Warn me before a listing closes by"
 msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html:93
@@ -10033,11 +10165,11 @@ msgstr ""
 msgid "Websites"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:280
+#: src/postulo/applications/agenda.py:489
 msgid "Week"
 msgstr ""
 
-#: src/postulo/applications/agenda.py:315
+#: src/postulo/applications/agenda.py:526
 #: src/postulo/templates/applications/report.html:159
 #: src/postulo/templates/applications/report.html:185
 #: src/postulo/templates/applications/report_print.html:108
@@ -10169,7 +10301,7 @@ msgstr ""
 msgid "What needs doing"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:754
+#: src/postulo/accounts/forms.py:770
 msgid ""
 "What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
 msgstr ""
@@ -10286,7 +10418,7 @@ msgstr ""
 msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 
-#: src/postulo/accounts/forms.py:776
+#: src/postulo/accounts/forms.py:792
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
 msgstr ""
@@ -10323,7 +10455,7 @@ msgstr ""
 msgid "When accepting should also move the application."
 msgstr ""
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:779
 msgid "When it entered your listings."
 msgstr ""
 
@@ -10479,7 +10611,7 @@ msgstr ""
 msgid "Which one it is about. Leave it empty for a reminder about none."
 msgstr ""
 
-#: src/postulo/jobs/models.py:913
+#: src/postulo/jobs/models.py:920
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr ""
 
@@ -10495,7 +10627,7 @@ msgstr ""
 msgid "Which plugin should this connection be for?"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:579
+#: src/postulo/accounts/forms.py:595
 msgid "Which register the number belongs to. What goes where, above, says."
 msgstr ""
 
@@ -10528,7 +10660,7 @@ msgstr ""
 msgid "Why discarded"
 msgstr ""
 
-#: src/postulo/jobs/models.py:769
+#: src/postulo/jobs/models.py:776
 msgid "why it was discarded"
 msgstr ""
 
@@ -10564,7 +10696,7 @@ msgstr ""
 msgid "With a password: you are asked for a code. Always."
 msgstr ""
 
-#: src/postulo/applications/ical.py:144
+#: src/postulo/applications/ical.py:159
 #, python-format
 msgid "With: %(people)s"
 msgstr ""

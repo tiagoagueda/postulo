@@ -255,6 +255,9 @@ FACTORIES: dict[str, Callable] = {
     "applications:interview_outcome": pk_of(interview),
     "applications:interview_update": pk_of(interview),
     "applications:reminder_complete": pk_of(reminder),
+    "applications:reminder_delete": pk_of(reminder),
+    "applications:reminder_later": pk_of(reminder),
+    "applications:reminder_update": pk_of(reminder),
     "applications:suggestion_action": pk_of(suggestion, action="dismiss"),
     "applications:tag_delete": pk_of(tag),
     "applications:tag_update": pk_of(tag),
@@ -341,6 +344,8 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:restore": ("post", pk_of(posting), {}),
     "postulo-api:shortlist": ("post", pk_of(posting), {}),
     "postulo-api:complete_reminder": ("post", pk_of(reminder), {}),
+    "postulo-api:change_reminder": ("patch", pk_of(reminder), {"summary": "x"}),
+    "postulo-api:delete_reminder": ("delete", pk_of(reminder), {}),
     "postulo-api:document_download": ("get", pk_of(upload, source="upload"), {}),
 }
 

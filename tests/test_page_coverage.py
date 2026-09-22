@@ -93,6 +93,7 @@ EXCUSED: dict[str, str] = {
     "applications:status": "a POST from the board and from the application page",
     "applications:quiet_action": "a POST that dismisses the gone-quiet prompt",
     "applications:reminder_complete": "a POST that marks a reminder done",
+    "applications:reminder_later": "a POST that moves a reminder; its menu is on two visited pages",
     "applications:suggestion_action": "a POST from the suggestions page, which is visited",
     "documents:cv_item_move": "a POST that reorders one entry on a CV",
     "documents:rendered_archive": "a POST that files a sent document away",

@@ -1,11 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "New reminder" %}{% endblock %}
+{% comment %} One form for making a reminder and for changing one (#238). The heading follows
+   the object rather than the URL: a page headed *New reminder* that is editing one is a page
+   somebody will close without saving. {% endcomment %}
+{% block title %}{% if object %}{% translate "Reminder" %}{% else %}{% translate "New reminder" %}{% endif %}{% endblock %}
 
 {% block content %}
   <div class="mx-auto max-w-md">
-    <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "New reminder" %}</h1>
+    <c-page-title>{% if object %}{% translate "Reminder" %}{% else %}{% translate "New reminder" %}{% endif %}</c-page-title>
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">

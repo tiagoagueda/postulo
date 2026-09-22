@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 09:20+0000\n"
+"POT-Creation-Date: 2026-09-22 10:10+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -68,6 +68,13 @@ msgid "%(count)s application has gone quiet"
 msgid_plural "%(count)s applications have gone quiet"
 msgstr[0] "%(count)s Kandidatur ass roueg ginn"
 msgstr[1] "%(count)s Kandidaturen si roueg ginn"
+
+#: src/postulo/jobs/closing.py:139
+#, python-format
+msgid "%(count)s listing you are considering closes soon"
+msgid_plural "%(count)s listings you are considering close soon"
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/templates/server/people.html:105
 #, python-format, draft
@@ -151,7 +158,7 @@ msgid_plural "%(days)s days ago"
 msgstr[0] "viru %(days)s Dag"
 msgstr[1] "viru %(days)s Deeg"
 
-#: src/postulo/applications/agenda.py:345
+#: src/postulo/applications/agenda.py:558
 #, python-format, draft
 msgid "%(days)s days from %(day)s"
 msgstr "%(days)s Deeg vum %(day)s un"
@@ -210,7 +217,7 @@ msgstr "%(kind)s vum %(when)s annuléiert"
 msgid "%(kind)s scheduled for %(when)s"
 msgstr "%(kind)s fir de %(when)s geplangt"
 
-#: src/postulo/applications/ical.py:132
+#: src/postulo/applications/ical.py:147
 #, python-format, draft
 msgid "%(kind)s: %(title)s at %(company)s"
 msgstr "%(kind)s: %(title)s bei %(company)s"
@@ -229,7 +236,7 @@ msgid ""
 msgstr ""
 "%(label)s hält nach ëmmer %(count)d Anträg, an et ze deinstalléieren géif se an enger Tabell loossen, déi näischt liesen, exportéieren oder restauréiere kann. Maacht se fir d'éischt vun de Säite vum Plugin selwer eidel, oder schalt de Plugin amplaz aus — ausgeschalt bleift alles."
 
-#: src/postulo/jobs/models.py:869
+#: src/postulo/jobs/models.py:876
 #, python-format, draft
 msgid "%(low)s to %(high)s"
 msgstr "%(low)s bis %(high)s"
@@ -440,6 +447,11 @@ msgstr ""
 #, python-format, draft
 msgid "%(role)s at %(company)s"
 msgstr "%(role)s bei %(company)s"
+
+#: src/postulo/jobs/closing.py:124
+#, python-format
+msgid "%(role)s at %(company)s — %(closing)s"
+msgstr ""
 
 #: src/postulo/applications/quiet.py:122
 #, python-format, draft
@@ -774,6 +786,10 @@ msgid ""
 msgstr ""
 "Eng Annonce mat dësem Titel bei dëser Firma gëtt et schonn; eng Tafel, déi bei all Besuch eng nei Adress mécht, weist Iech vläicht déi selwecht Annonce."
 
+#: src/postulo/notifications/base.py:33
+msgid "A listing you are considering closes soon"
+msgstr ""
+
 #: src/postulo/templates/partials/phone_numbers.html:15
 #, draft
 msgid ""
@@ -929,7 +945,7 @@ msgstr "Eng Erënnerung gëtt fälleg"
 msgid "A reminder falls due a day ahead, when there is a day ahead."
 msgstr "Eng Erënnerung gëtt en Dag virdru fälleg, wann et en Dag virdru gëtt."
 
-#: src/postulo/accounts/models.py:539
+#: src/postulo/accounts/models.py:546
 #, draft
 msgid "A reminder of who this is for."
 msgstr "Eng Erënnerung, fir wien dat ass."
@@ -1074,12 +1090,12 @@ msgstr "Unhuelen"
 msgid "Accepted"
 msgstr "Ugeholl"
 
-#: src/postulo/accounts/models.py:553
+#: src/postulo/accounts/models.py:560
 #, draft
 msgid "accepted at"
 msgstr "ugeholl den"
 
-#: src/postulo/accounts/models.py:560
+#: src/postulo/accounts/models.py:567
 #, draft
 msgid "accepted by"
 msgstr "ugeholl vun"
@@ -1136,6 +1152,11 @@ msgstr "Aktiounen"
 #, python-format, draft
 msgid "Actions for %(name)s"
 msgstr "Aktioune fir %(name)s"
+
+#: src/postulo/templates/cotton/reminder_actions.html:39
+#, python-format
+msgid "Actions for %(what)s"
+msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:263
 #: src/postulo/templates/jobs/company_detail.html:195
@@ -1260,7 +1281,7 @@ msgid ""
 msgstr ""
 "%(total)s Andréi dobäigesat. Näischt gouf iwwerschriwwen; alles, wat duebel ass, kënnt Dir selwer läschen."
 
-#: src/postulo/applications/views.py:549 src/postulo/applications/views.py:1031
+#: src/postulo/applications/views.py:551 src/postulo/applications/views.py:1173
 #, draft
 msgid "Added to the timeline."
 msgstr "Op d'Zäitlinn dobäigesat."
@@ -1283,7 +1304,7 @@ msgid "Address"
 msgstr "Adress"
 
 #: src/postulo/core/models.py:538 src/postulo/core/models.py:664
-#: src/postulo/jobs/models.py:906 src/postulo/notifications/models.py:26
+#: src/postulo/jobs/models.py:913 src/postulo/notifications/models.py:26
 #: src/postulo/resume/models.py:264
 #, draft
 msgid "address"
@@ -1310,7 +1331,7 @@ msgstr "Beroder %(adviser)s"
 msgid "Aerospace"
 msgstr "Loft- a Raumfaart"
 
-#: src/postulo/applications/agenda.py:282
+#: src/postulo/applications/agenda.py:491
 #, draft
 msgid "Agenda"
 msgstr "Agenda"
@@ -1371,6 +1392,14 @@ msgstr "All Annoncen"
 msgid ""
 "All of them are offered, and a language added in a later release will be too."
 msgstr "All ginn ugebueden, an eng Sprooch aus enger spéiderer Versioun och."
+
+#: src/postulo/applications/agenda.py:101
+msgid "Already decided —"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:99
+msgid "Already sent —"
+msgstr ""
 
 #: src/postulo/templates/accounts/profile.html:172
 #, draft
@@ -1450,14 +1479,14 @@ msgstr ""
 msgid "an unknown file type"
 msgstr "en onbekannten Dateityp"
 
-#: src/postulo/templates/applications/calendar.html:114
+#: src/postulo/templates/applications/calendar.html:157
 #, python-format, draft
 msgid "and %(counter)s more"
 msgid_plural "and %(counter)s more"
 msgstr[0] "an nach %(counter)s"
 msgstr[1] "an nach %(counter)s"
 
-#: src/postulo/applications/quiet.py:131
+#: src/postulo/applications/quiet.py:131 src/postulo/jobs/closing.py:136
 #: src/postulo/templates/jobs/partials/company_row.html:56
 #, python-format, draft
 msgid "and %(more)s more"
@@ -1499,6 +1528,11 @@ msgstr "Huet %(code)s geäntwert."
 #, draft
 msgid "Any"
 msgstr "Egal wéi"
+
+#: src/postulo/templates/settings/appearance.html:90
+msgid ""
+"Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html:31
 #, draft
@@ -1560,7 +1594,7 @@ msgstr "Erscheinungsbild"
 #: src/postulo/applications/models.py:478
 #: src/postulo/applications/models.py:573
 #: src/postulo/applications/models.py:694 src/postulo/applications/tables.py:21
-#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:934
+#: src/postulo/documents/models.py:605 src/postulo/jobs/models.py:941
 #: src/postulo/templates/core/import_csv_map.html:99
 #, draft
 msgid "application"
@@ -1579,7 +1613,7 @@ msgstr "Kandidatur"
 msgid "Application created"
 msgstr "Kandidatur ugeluecht"
 
-#: src/postulo/applications/views.py:455
+#: src/postulo/applications/views.py:457
 #, draft
 msgid "Application deleted."
 msgstr "Kandidatur geläscht."
@@ -1589,12 +1623,12 @@ msgstr "Kandidatur geläscht."
 msgid "Application recorded from the capture."
 msgstr "Kandidatur aus der Erfaassung notéiert."
 
-#: src/postulo/applications/views.py:387 src/postulo/jobs/listing_views.py:277
+#: src/postulo/applications/views.py:389 src/postulo/jobs/listing_views.py:277
 #, draft
 msgid "Application recorded."
 msgstr "Kandidatur notéiert."
 
-#: src/postulo/applications/views.py:411
+#: src/postulo/applications/views.py:413
 #, draft
 msgid "Application updated."
 msgstr "Kandidatur aktualiséiert."
@@ -1670,7 +1704,7 @@ msgstr "Kandidaturen, mat hire Zäitlinnen"
 
 #: src/postulo/applications/analytics.py:39
 #: src/postulo/applications/models.py:41 src/postulo/applications/tables.py:52
-#: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:824
+#: src/postulo/jobs/listing_views.py:35 src/postulo/jobs/models.py:831
 #: src/postulo/templates/core/import_csv_map.html:80
 #, draft
 msgid "Applied"
@@ -2005,8 +2039,8 @@ msgstr "C2 — kompetent"
 #: src/postulo/core/navigation.py:76
 #: src/postulo/templates/applications/application_detail.html:215
 #: src/postulo/templates/applications/calendar.html:6
-#: src/postulo/templates/applications/calendar.html:56
-#: src/postulo/templates/applications/calendar.html:85
+#: src/postulo/templates/applications/calendar.html:67
+#: src/postulo/templates/applications/calendar.html:128
 #, draft
 msgid "Calendar"
 msgstr "Kalenner"
@@ -2023,7 +2057,7 @@ msgstr "Kalennerfichier"
 msgid "calendar identifier"
 msgstr "Kalenner-Identifikateur"
 
-#: src/postulo/templates/applications/calendar.html:64
+#: src/postulo/templates/applications/calendar.html:75
 #, draft
 msgid "Calendar views"
 msgstr "Kalennerusiichten"
@@ -2043,7 +2077,7 @@ msgstr "Réckruffadress fir sech domat ze registréieren"
 #: src/postulo/templates/applications/application_form.html:32
 #: src/postulo/templates/applications/application_intake.html:77
 #: src/postulo/templates/applications/interview_form.html:70
-#: src/postulo/templates/applications/reminder_form.html:18
+#: src/postulo/templates/applications/reminder_form.html:22
 #: src/postulo/templates/applications/tag_form.html:85
 #: src/postulo/templates/connections/confirm_delete.html:19
 #: src/postulo/templates/connections/form.html:45
@@ -2074,7 +2108,7 @@ msgstr "Ofbriechen"
 msgid "Cancelled"
 msgstr "Annuléiert"
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:95
 msgid "Cancelled interview:"
 msgstr ""
 
@@ -2084,7 +2118,7 @@ msgstr ""
 msgid "Capture"
 msgstr "Erfaassung"
 
-#: src/postulo/jobs/models.py:938
+#: src/postulo/jobs/models.py:945
 #, draft
 msgid "capture"
 msgstr "Erfaassung"
@@ -2130,7 +2164,7 @@ msgstr "Erfaassungsquellen, déi dës Installatioun huet"
 msgid "Captured %(count)s postings from %(host)s"
 msgstr "%(count)s Annoncen vun %(host)s erfaasst"
 
-#: src/postulo/jobs/models.py:910
+#: src/postulo/jobs/models.py:917
 #, draft
 msgid "captured from"
 msgstr "erfaasst vun"
@@ -2140,7 +2174,7 @@ msgstr "erfaasst vun"
 msgid "Captured: %(title)s"
 msgstr "Erfaasst: %(title)s"
 
-#: src/postulo/jobs/models.py:939
+#: src/postulo/jobs/models.py:946
 #, draft
 msgid "captures"
 msgstr "Erfaassungen"
@@ -2249,7 +2283,7 @@ msgid ""
 msgstr ""
 "Ännerungen, déi hei gemaach ginn, ginn beim nächsten Duerchgang geschéckt; déi aner Säit gëtt dann och gelies."
 
-#: src/postulo/applications/views.py:647
+#: src/postulo/applications/views.py:743
 #, python-format, draft
 msgid "Chase %(company)s about %(role)s"
 msgstr "%(company)s un %(role)s erënneren"
@@ -2338,12 +2372,12 @@ msgstr "En anere Fichier wielen"
 msgid "Choose at least one document to record."
 msgstr "Wielt op mannst een Dokument fir ze notéieren."
 
-#: src/postulo/accounts/forms.py:598 src/postulo/jobs/forms.py:371
+#: src/postulo/accounts/forms.py:614 src/postulo/jobs/forms.py:371
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Wielt, wat fir eng Zort Identifikateur dat ass."
 
-#: src/postulo/applications/views.py:1027
+#: src/postulo/applications/views.py:1169
 #, draft
 msgid "Choose which application this is about first."
 msgstr "Wielt fir d'éischt, ëm wéi eng Kandidatur et geet."
@@ -2394,12 +2428,12 @@ msgstr "Client-ID"
 msgid "Client secret"
 msgstr "Client-Geheimnis"
 
-#: src/postulo/jobs/listing_views.py:36 src/postulo/jobs/models.py:824
+#: src/postulo/jobs/listing_views.py:36 src/postulo/jobs/models.py:831
 #, draft
 msgid "Closed"
 msgstr "Zou"
 
-#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:759
+#: src/postulo/applications/models.py:264 src/postulo/jobs/models.py:766
 #, draft
 msgid "closed on"
 msgstr "zougemaach den"
@@ -2415,6 +2449,15 @@ msgstr "Zou oder scho besat"
 msgid "Closes"
 msgstr "Mécht zou"
 
+#: src/postulo/applications/agenda.py:284
+#, python-format
+msgid "Closes: %(role)s"
+msgstr ""
+
+#: src/postulo/jobs/models.py:763
+msgid "closing announced for"
+msgstr ""
+
 #: src/postulo/applications/forms.py:163
 #, draft
 msgid "Closing date"
@@ -2424,6 +2467,14 @@ msgstr "Enndatum"
 #, draft
 msgid "closing date"
 msgstr "Enndatum"
+
+#: src/postulo/applications/agenda.py:76
+msgid "Closing dates"
+msgstr ""
+
+#: src/postulo/templates/settings/appearance.html:88
+msgid "Closing soon"
+msgstr ""
 
 #: src/postulo/templates/widgets/listings.html:22
 #, python-format, draft
@@ -2478,7 +2529,7 @@ msgstr "Kolonne gespäichert."
 msgid "Comfortable"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:513
+#: src/postulo/accounts/forms.py:514
 msgid ""
 "Comfortable is the default and the roomier of the two. Compact tightens the space around cards and inside tables so that more fits on a screen; nothing you can click or tap gets smaller."
 msgstr ""
@@ -2828,13 +2879,13 @@ msgstr "Eng Invitatioun uleeën"
 msgid "Created %(date)s"
 msgstr "Ugeluecht %(date)s"
 
-#: src/postulo/accounts/models.py:383 src/postulo/accounts/models.py:454
-#: src/postulo/accounts/models.py:550 src/postulo/core/models.py:35
+#: src/postulo/accounts/models.py:390 src/postulo/accounts/models.py:461
+#: src/postulo/accounts/models.py:557 src/postulo/core/models.py:35
 #, draft
 msgid "created at"
 msgstr "ugeluecht den"
 
-#: src/postulo/accounts/models.py:548
+#: src/postulo/accounts/models.py:555
 #, draft
 msgid "created by"
 msgstr "ugeluecht vun"
@@ -2951,12 +3002,13 @@ msgstr "Datume ginn esou geschriwwen"
 msgid "Dates you choose"
 msgstr "Datumer, déi Dir wielt"
 
-#: src/postulo/applications/agenda.py:281
+#: src/postulo/applications/agenda.py:490
 #, draft
 msgid "Day"
 msgstr "Dag"
 
 #: src/postulo/templates/settings/appearance.html:79
+#: src/postulo/templates/settings/appearance.html:97
 #, draft
 msgid "day"
 msgid_plural "days"
@@ -2967,6 +3019,10 @@ msgstr[1] "Deeg"
 #, draft
 msgid "day / month / year (31/12/2026)"
 msgstr "Dag / Mount / Joer (31/12/2026)"
+
+#: src/postulo/accounts/models.py:387
+msgid "Days of warning before a listing you have not decided about closes."
+msgstr ""
 
 #: src/postulo/applications/widgets.py:226
 #, draft
@@ -3001,6 +3057,15 @@ msgstr "Delai"
 #, draft
 msgid "Deadline"
 msgstr "Delai"
+
+#: src/postulo/applications/agenda.py:257
+#, python-format
+msgid "Deadline: %(role)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py:75
+msgid "Deadlines"
+msgstr ""
 
 #: src/postulo/documents/models.py:332
 #, draft
@@ -3080,7 +3145,7 @@ msgstr "entscheet vun"
 msgid "Decided by %(who)s on %(when)s"
 msgstr "Entscheet vun %(who)s den %(when)s"
 
-#: src/postulo/jobs/models.py:774
+#: src/postulo/jobs/models.py:781
 #, draft
 msgid "decided on"
 msgstr "entscheet den"
@@ -3095,7 +3160,7 @@ msgstr "Ofleenen"
 msgid "Declined"
 msgstr "Ofgeleent"
 
-#: src/postulo/applications/views.py:1019
+#: src/postulo/applications/views.py:1161
 #, draft
 msgid "Declined. It will not be suggested again."
 msgstr "Ofgeleent. Et gëtt net méi proposéiert."
@@ -3127,6 +3192,7 @@ msgstr "Verteidegung"
 
 #: src/postulo/templates/applications/application_detail.html:40
 #: src/postulo/templates/applications/tag_list.html:38
+#: src/postulo/templates/cotton/reminder_actions.html:60
 #: src/postulo/templates/documents/cv_detail.html:27
 #: src/postulo/templates/documents/letter_detail.html:25
 #: src/postulo/templates/documents/upload_list.html:58
@@ -3284,7 +3350,7 @@ msgid "Discard this capture"
 msgstr "Dës Erfaassung verwerfen"
 
 #: src/postulo/jobs/listing_views.py:34 src/postulo/jobs/models.py:580
-#: src/postulo/jobs/models.py:889
+#: src/postulo/jobs/models.py:896
 #, draft
 msgid "Discarded"
 msgstr "Verworf"
@@ -3350,10 +3416,8 @@ msgid "Documents you already had. Nothing here is served publicly."
 msgstr ""
 "Dokumenter, déi Dir scho hat. Näischt dovun hei gëtt ëffentlech ugebueden."
 
-#: src/postulo/core/models.py:715
-#: src/postulo/templates/applications/partials/reminders.html:30
-#: src/postulo/templates/applications/reminder_list.html:47
-#: src/postulo/templates/core/dashboard.html:70
+#: src/postulo/core/models.py:715 src/postulo/templates/core/dashboard.html:70
+#: src/postulo/templates/cotton/reminder_actions.html:33
 #: src/postulo/templates/widgets/due_reminders.html:23
 #, draft
 msgid "Done"
@@ -3368,7 +3432,7 @@ msgstr ""
 msgid "done on"
 msgstr "fäerdeg den"
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:97
 msgid "Done reminder:"
 msgstr ""
 
@@ -3450,7 +3514,7 @@ msgid ""
 msgstr ""
 "All Etapp zielt Kandidaturen, déi se iwwerhaapt erreecht hunn, egal wat duerno geschitt ass."
 
-#: src/postulo/templates/applications/calendar.html:73
+#: src/postulo/templates/applications/calendar.html:84
 #, draft
 msgid "Earlier"
 msgstr "Fréier"
@@ -3496,6 +3560,10 @@ msgstr "Entretien änneren"
 msgid "Edit or merge"
 msgstr "Änneren oder zesummeleeën"
 
+#: src/postulo/templates/cotton/reminder_actions.html:56
+msgid "Edit, or choose another time"
+msgstr ""
+
 #: src/postulo/documents/rendering.py:33 src/postulo/jobs/industries.py:74
 #: src/postulo/resume/registry.py:41 src/postulo/resume/registry.py:42
 #: src/postulo/templates/resume/europass_import.html:81
@@ -3525,7 +3593,7 @@ msgstr ""
 msgid "Email"
 msgstr "E-Mail"
 
-#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:534
+#: src/postulo/accounts/models.py:116 src/postulo/accounts/models.py:541
 #: src/postulo/jobs/models.py:501 src/postulo/resume/views.py:455
 #, draft
 msgid "email address"
@@ -3536,7 +3604,7 @@ msgstr "E-Mail-Adress"
 msgid "Email address"
 msgstr "E-Mail-Adress"
 
-#: src/postulo/accounts/forms.py:796
+#: src/postulo/accounts/forms.py:812
 #, draft
 msgid "Email address (optional)"
 msgstr "E-Mail-Adress (fakultativ)"
@@ -3581,7 +3649,7 @@ msgstr "Aarbechtsverhältnis"
 msgid "Empty"
 msgstr "Eidel"
 
-#: src/postulo/jobs/models.py:944
+#: src/postulo/jobs/models.py:951
 #, draft
 msgid "Empty capture"
 msgstr "Eidel Erfaassung"
@@ -3673,7 +3741,7 @@ msgid ""
 msgstr ""
 "All Firma an dësem Secteur geet op deen ausgewielten iwwer, an dësen hei verschwënnt."
 
-#: src/postulo/accounts/forms.py:763
+#: src/postulo/accounts/forms.py:779
 msgid "Every date and time on these pages is shown in it."
 msgstr ""
 
@@ -3852,7 +3920,7 @@ msgstr "leeft of"
 msgid "Expires %(date)s"
 msgstr "Leeft of %(date)s"
 
-#: src/postulo/accounts/models.py:455 src/postulo/accounts/models.py:551
+#: src/postulo/accounts/models.py:462 src/postulo/accounts/models.py:558
 #: src/postulo/core/models.py:814
 #, draft
 msgid "expires at"
@@ -4121,12 +4189,12 @@ msgstr "Ärem Profil follegen"
 msgid "Follow-up note"
 msgstr "Nofassnotiz"
 
-#: src/postulo/applications/views.py:641
+#: src/postulo/applications/views.py:737
 #, draft
 msgid "Follow-up recorded."
 msgstr "Nofassen notéiert."
 
-#: src/postulo/applications/models.py:396 src/postulo/applications/views.py:638
+#: src/postulo/applications/models.py:396 src/postulo/applications/views.py:734
 #: src/postulo/templates/widgets/gone_quiet.html:40
 #, draft
 msgid "Followed up"
@@ -4266,7 +4334,7 @@ msgstr "vun"
 msgid "From"
 msgstr "Vun"
 
-#: src/postulo/jobs/models.py:874
+#: src/postulo/jobs/models.py:881
 #, python-format, draft
 msgid "from %(low)s"
 msgstr "vun %(low)s"
@@ -4504,6 +4572,11 @@ msgstr "verstoppt"
 msgid "hidden navigation items"
 msgstr "verstoppt Navigatiounselementer"
 
+#: src/postulo/templates/applications/calendar.html:108
+#, python-format
+msgid "Hide %(what)s"
+msgstr ""
+
 #: src/postulo/applications/models.py:111
 #, draft
 msgid "High"
@@ -4588,7 +4661,7 @@ msgstr "Wéi vill Wochen"
 msgid "How much room"
 msgstr ""
 
-#: src/postulo/accounts/forms.py:507
+#: src/postulo/accounts/forms.py:508
 msgid "How much room to leave"
 msgstr ""
 
@@ -4798,6 +4871,13 @@ msgstr "Importéiert vu %(file)s"
 msgid "Importer"
 msgstr "Importer"
 
+#: src/postulo/jobs/closing.py:131
+#, python-format
+msgid "in %(days)s day"
+msgid_plural "in %(days)s days"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/api/forms.py:11
 #, draft
 msgid "In 30 days"
@@ -4986,7 +5066,7 @@ msgstr "Entretien"
 msgid "Interview cancelled"
 msgstr "Entretien annuléiert"
 
-#: src/postulo/applications/views.py:732
+#: src/postulo/applications/views.py:828
 #, draft
 msgid "Interview recorded."
 msgstr "Entretien notéiert."
@@ -4996,7 +5076,7 @@ msgstr "Entretien notéiert."
 msgid "Interview scheduled"
 msgstr "Entretien geplangt"
 
-#: src/postulo/applications/views.py:734
+#: src/postulo/applications/views.py:830
 #, draft
 msgid "Interview scheduled."
 msgstr "Entretien geplangt."
@@ -5006,12 +5086,12 @@ msgstr "Entretien geplangt."
 msgid "Interview tomorrow: %(kind)s at %(company)s, %(time)s"
 msgstr "Entretien muer: %(kind)s bei %(company)s, %(time)s"
 
-#: src/postulo/applications/views.py:764
+#: src/postulo/applications/views.py:860
 #, draft
 msgid "Interview updated."
 msgstr "Entretien aktualiséiert."
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/applications/agenda.py:94
 #, draft
 msgid "Interview:"
 msgstr "Entretien:"
@@ -5022,11 +5102,7 @@ msgstr "Entretien:"
 msgid "Interviewing"
 msgstr "An Entretiener"
 
-#: src/postulo/applications/models.py:613
-#, draft
-msgid "interviews"
-msgstr "Entretiene"
-
+#: src/postulo/applications/agenda.py:73
 #: src/postulo/applications/widgets.py:237
 #: src/postulo/templates/accounts/delete_account.html:24
 #: src/postulo/templates/applications/application_detail.html:177
@@ -5038,12 +5114,10 @@ msgstr "Entretiene"
 msgid "Interviews"
 msgstr "Entretiene"
 
-#: src/postulo/templates/applications/calendar.html:58
+#: src/postulo/applications/models.py:613
 #, draft
-msgid ""
-"Interviews and reminders, by day. Schedule an interview from an application's page; a reminder from Reminders."
-msgstr ""
-"Entretiene an Erënnerungen, no Dag. En Entretien gëtt vun der Säit vun enger Kandidatur aus geplangt; eng Erënnerung vun Erënnerungen aus."
+msgid "interviews"
+msgstr "Entretiene"
 
 #: src/postulo/templates/applications/report.html:206
 #: src/postulo/templates/applications/report_print.html:139
@@ -5051,7 +5125,12 @@ msgstr ""
 msgid "Interviews attended"
 msgstr "Gefouert Gespréicher"
 
-#: src/postulo/accounts/models.py:566
+#: src/postulo/templates/applications/calendar.html:69
+msgid ""
+"Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page; a reminder from Reminders."
+msgstr ""
+
+#: src/postulo/accounts/models.py:573
 #, draft
 msgid "invitation"
 msgstr "Invitatioun"
@@ -5073,7 +5152,7 @@ msgstr ""
 msgid "Invitation revoked."
 msgstr "Invitatioun zréckgezunn."
 
-#: src/postulo/accounts/models.py:567
+#: src/postulo/accounts/models.py:574
 #, draft
 msgid "invitations"
 msgstr "Invitatiounen"
@@ -5086,7 +5165,7 @@ msgstr "Invitatiounen"
 msgid "Invitations"
 msgstr "Invitatiounen"
 
-#: src/postulo/accounts/models.py:448 src/postulo/resume/models.py:176
+#: src/postulo/accounts/models.py:455 src/postulo/resume/models.py:176
 #, draft
 msgid "issued by"
 msgstr "erausginn vun"
@@ -5122,6 +5201,10 @@ msgstr ""
 #: src/postulo/plugins/installing.py:836
 #, python-format
 msgid "it did not finish importing within %(seconds)ss"
+msgstr ""
+
+#: src/postulo/applications/views.py:685
+msgid "It is already done."
 msgstr ""
 
 #: src/postulo/documents/views.py:410
@@ -5190,12 +5273,12 @@ msgstr ""
 msgid "Job board"
 msgstr "Jobbörse"
 
-#: src/postulo/jobs/models.py:779
+#: src/postulo/jobs/models.py:786
 #, draft
 msgid "job posting"
 msgstr "Stellenannonce"
 
-#: src/postulo/jobs/models.py:780
+#: src/postulo/jobs/models.py:787
 #, draft
 msgid "job postings"
 msgstr "Stellenannoncen"
@@ -5320,6 +5403,10 @@ msgstr "Aart vum Entrée"
 msgid "kind of source"
 msgstr "Aart vun der Quell"
 
+#: src/postulo/templates/applications/calendar.html:101
+msgid "Kinds of entry"
+msgstr ""
+
 #: src/postulo/templates/documents/letter_list.html:21
 #, draft
 msgid "Kinds of letter"
@@ -5330,7 +5417,7 @@ msgstr "Zorte vu Bréiwer"
 msgid "label"
 msgstr "Uweisungsnumm"
 
-#: src/postulo/accounts/forms.py:750 src/postulo/resume/forms.py:270
+#: src/postulo/accounts/forms.py:766 src/postulo/resume/forms.py:270
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
@@ -5486,7 +5573,7 @@ msgstr "Fir d'lescht benotzt %(when)s"
 msgid "last worked"
 msgstr "huet fir d'lescht funktionéiert"
 
-#: src/postulo/templates/applications/calendar.html:75
+#: src/postulo/templates/applications/calendar.html:86
 #: src/postulo/templates/jobs/capture_review.html:139
 #, draft
 msgid "Later"
@@ -5668,7 +5755,7 @@ msgstr "Linken, op déi Dir se higewisen hutt"
 msgid "listening"
 msgstr "lauschtert"
 
-#: src/postulo/jobs/models.py:925 src/postulo/jobs/tables.py:178
+#: src/postulo/jobs/models.py:932 src/postulo/jobs/tables.py:178
 #: src/postulo/templates/core/import_csv_map.html:101
 #, draft
 msgid "listing"
@@ -5914,7 +6001,7 @@ msgstr "Produktioun"
 msgid "Map a column to Company and one to Role first."
 msgstr "Verbënnt fir d'éischt eng Kolonn mat Firma an eng mat Posten."
 
-#: src/postulo/applications/views.py:612
+#: src/postulo/applications/views.py:614
 #, draft
 msgid "Marked as done."
 msgstr "Als gemaach markéiert."
@@ -6006,7 +6093,7 @@ msgstr "Suen"
 msgid "Money and dates"
 msgstr "Suen an Datumer"
 
-#: src/postulo/applications/agenda.py:279
+#: src/postulo/applications/agenda.py:488
 #: src/postulo/templates/applications/report.html:66
 #, draft
 msgid "Month"
@@ -6209,8 +6296,8 @@ msgstr "Nei Invitatioun"
 msgid "New letter"
 msgstr "Neie Bréif"
 
-#: src/postulo/templates/applications/reminder_form.html:4
 #: src/postulo/templates/applications/reminder_form.html:8
+#: src/postulo/templates/applications/reminder_form.html:12
 #: src/postulo/templates/applications/reminder_list.html:20
 #, draft
 msgid "New reminder"
@@ -6527,7 +6614,7 @@ msgstr "keng"
 msgid "None chosen yet"
 msgstr "Nach keng ausgewielt"
 
-#: src/postulo/templates/applications/partials/reminders.html:36
+#: src/postulo/templates/applications/partials/reminders.html:32
 #, draft
 msgid "None outstanding."
 msgstr "Näischt méi ausstoend."
@@ -6696,7 +6783,7 @@ msgid "Not yet written in %(tongue)s. These print as they stand:"
 msgstr ""
 "Nach net op %(tongue)s geschriwwen. Déi hei ginn esou gedréckt, wéi se sinn:"
 
-#: src/postulo/accounts/models.py:539
+#: src/postulo/accounts/models.py:546
 #, draft
 msgid "note"
 msgstr "Notiz"
@@ -6706,7 +6793,7 @@ msgstr "Notiz"
 msgid "Note"
 msgstr "Notiz"
 
-#: src/postulo/accounts/forms.py:797
+#: src/postulo/accounts/forms.py:813
 #: src/postulo/templates/applications/partials/status_card.html:29
 #, draft
 msgid "Note (optional)"
@@ -6721,7 +6808,7 @@ msgstr ""
 msgid "noted %(when)s"
 msgstr "notéiert %(when)s"
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:779
 #, draft
 msgid "noted on"
 msgstr "notéiert den"
@@ -6800,7 +6887,7 @@ msgid ""
 msgstr ""
 "Näischt am Agenda. Wann Iech een ugebuede gëtt, plangt en op der Säit vun der Kandidatur."
 
-#: src/postulo/templates/applications/calendar.html:49
+#: src/postulo/templates/applications/calendar.html:60
 #, draft
 msgid "Nothing in this period."
 msgstr "Näischt an dëser Period."
@@ -6885,7 +6972,7 @@ msgid "Nothing on the other service is touched. You can connect it again later."
 msgstr ""
 "Um anere Service gëtt näischt ugefaasst. Dir kënnt Iech méi spéit erëm verbannen."
 
-#: src/postulo/templates/applications/calendar.html:45
+#: src/postulo/templates/applications/calendar.html:56
 #, draft
 msgid "Nothing on this day."
 msgstr "Näischt un dësem Dag."
@@ -6945,7 +7032,7 @@ msgstr "Nach näischt geschéckt."
 msgid "Nothing there"
 msgstr ""
 
-#: src/postulo/templates/applications/reminder_list.html:56
+#: src/postulo/templates/applications/reminder_list.html:51
 #, draft
 msgid "Nothing to chase."
 msgstr "Näischt ze nofaassen."
@@ -7025,6 +7112,10 @@ msgid ""
 "Nothing was sent in this period. That is what the report says, and it is a fact like any other."
 msgstr ""
 "An dëser Period gouf näischt geschéckt. Dat seet de Rapport, an et ass eng Tatsaach wéi all aner."
+
+#: src/postulo/accounts/models.py:384
+msgid "notice before a listing closes"
+msgstr ""
 
 #: src/postulo/notifications/apps.py:8 src/postulo/plugins/kinds.py:27
 #: src/postulo/plugins/views.py:36
@@ -7340,7 +7431,7 @@ msgid ""
 msgstr ""
 "Nëmme fir en Ubidder, deen keng Passwierder méi akzeptéiert. Ären eegene Mailserver brauch näischt dovun."
 
-#: src/postulo/accounts/forms.py:581
+#: src/postulo/accounts/forms.py:597
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
@@ -7390,7 +7481,7 @@ msgstr "Fräi Plazen"
 msgid "Optional, and decoration: the word is what is read aloud."
 msgstr ""
 
-#: src/postulo/accounts/models.py:536
+#: src/postulo/accounts/models.py:543
 #, draft
 msgid "Optional. If set, only this address may use the invitation."
 msgstr ""
@@ -7534,7 +7625,7 @@ msgstr "Säitenopdeelung"
 msgid "Panel"
 msgstr "Panel"
 
-#: src/postulo/jobs/models.py:915
+#: src/postulo/jobs/models.py:922
 #, draft
 msgid "parsed posting"
 msgstr "analyséiert Annonce"
@@ -7669,7 +7760,7 @@ msgid "Per year"
 msgstr "Pro Joer"
 
 #: src/postulo/applications/forms.py:135
-#: src/postulo/templates/applications/calendar.html:72
+#: src/postulo/templates/applications/calendar.html:83
 #, draft
 msgid "Period"
 msgstr "Period"
@@ -7684,7 +7775,7 @@ msgstr "Period: %(period)s"
 msgid "Permissions"
 msgstr "Berechtegungen"
 
-#: src/postulo/accounts/models.py:440 src/postulo/plugins/models.py:120
+#: src/postulo/accounts/models.py:447 src/postulo/plugins/models.py:120
 #, draft
 msgid "person"
 msgstr "Persoun"
@@ -8053,7 +8144,7 @@ msgid ""
 msgstr ""
 "Postulo behält nëmmen en Hash dovun a kann en net nach eemol weisen. Verléiert Dir en, maacht Dir en neien."
 
-#: src/postulo/accounts/forms.py:580
+#: src/postulo/accounts/forms.py:596
 msgid "Postulo tidies it into the register's own spelling and checks the shape."
 msgstr ""
 
@@ -8169,12 +8260,12 @@ msgstr "Erstallt den %(produced)s"
 msgid "proficiency"
 msgstr "niveau"
 
-#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:387
+#: src/postulo/accounts/models.py:169 src/postulo/accounts/models.py:394
 #, draft
 msgid "profile"
 msgstr "profil"
 
-#: src/postulo/accounts/models.py:388
+#: src/postulo/accounts/models.py:395
 #, draft
 msgid "profiles"
 msgstr "profiler"
@@ -8251,6 +8342,19 @@ msgstr "Ëffentleche Secteur"
 #, draft
 msgid "Publication"
 msgstr "Publikatioun"
+
+#: src/postulo/applications/views.py:690
+#, python-format
+msgid "Put off until %(when)s."
+msgstr ""
+
+#: src/postulo/templates/cotton/reminder_actions.html:51
+msgid "Put off until next week"
+msgstr ""
+
+#: src/postulo/templates/cotton/reminder_actions.html:48
+msgid "Put off until tomorrow"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/listing_bulk_fields.html:17
 msgid "Put them back"
@@ -8361,7 +8465,7 @@ msgstr "Als Europass-JSON gelies, d'Format, dat europass.europa.eu exportéiert.
 msgid "Read as Europass XML, the format the CV editor produced."
 msgstr "Als Europass-XML gelies, d'Format, dat den CV-Editor produzéiert huet."
 
-#: src/postulo/jobs/models.py:907
+#: src/postulo/jobs/models.py:914
 #, draft
 msgid "read by"
 msgstr "gelies vun"
@@ -8473,12 +8577,12 @@ msgid ""
 msgstr ""
 "Gëtt bei allem notéiert, wat vun hei installéiert gëtt, also kann en sech net méi änneren, ouni dat elengzeloossen, wat en installéiert huet."
 
-#: src/postulo/applications/views.py:785
+#: src/postulo/applications/views.py:881
 #, draft
 msgid "Recorded as cancelled."
 msgstr "Als annuléiert notéiert."
 
-#: src/postulo/applications/views.py:784
+#: src/postulo/applications/views.py:880
 #, draft
 msgid "Recorded as held."
 msgstr "Als ofgehalen notéiert."
@@ -8503,7 +8607,7 @@ msgstr "notéiert den"
 msgid "Recorded what you sent."
 msgstr "Notéiert, wat Dir geschéckt hutt."
 
-#: src/postulo/applications/views.py:786
+#: src/postulo/applications/views.py:882
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Notéiert: keen ass opgetaucht."
@@ -8512,7 +8616,7 @@ msgstr "Notéiert: keen ass opgetaucht."
 msgid "Recovery"
 msgstr ""
 
-#: src/postulo/accounts/models.py:462
+#: src/postulo/accounts/models.py:469
 #, draft
 msgid "recovery link"
 msgstr "Erhuelungslink"
@@ -8523,7 +8627,7 @@ msgstr "Erhuelungslink"
 msgid "Recovery link"
 msgstr "Erhuelungslink"
 
-#: src/postulo/accounts/models.py:463
+#: src/postulo/accounts/models.py:470
 #, draft
 msgid "recovery links"
 msgstr "Erhuelungslinken"
@@ -8625,23 +8729,33 @@ msgstr "Erënnert mech den Dag virdrun"
 msgid "reminder"
 msgstr "erënnerung"
 
-#: src/postulo/templates/applications/calendar.html:26
+#: src/postulo/templates/applications/reminder_form.html:8
+#: src/postulo/templates/applications/reminder_form.html:12
+msgid "Reminder"
+msgstr ""
+
+#: src/postulo/applications/views.py:640
+msgid "Reminder updated."
+msgstr ""
+
+#: src/postulo/applications/agenda.py:96
 #, draft
 msgid "Reminder:"
 msgstr "Erënnerung:"
 
-#: src/postulo/applications/models.py:490
-#, draft
-msgid "reminders"
-msgstr "erënnerungen"
-
-#: src/postulo/core/navigation.py:75 src/postulo/core/search.py:394
+#: src/postulo/applications/agenda.py:74 src/postulo/core/navigation.py:75
+#: src/postulo/core/search.py:394
 #: src/postulo/templates/applications/application_detail.html:260
 #: src/postulo/templates/applications/reminder_list.html:6
 #: src/postulo/templates/applications/reminder_list.html:10
 #, draft
 msgid "Reminders"
 msgstr "Erënnerungen"
+
+#: src/postulo/applications/models.py:490
+#, draft
+msgid "reminders"
+msgstr "erënnerungen"
 
 #: src/postulo/applications/widgets.py:164
 #, draft
@@ -8819,7 +8933,7 @@ msgstr "zréckgezunn"
 msgid "Revoked"
 msgstr "Zréckgezunn"
 
-#: src/postulo/accounts/models.py:457
+#: src/postulo/accounts/models.py:464
 #, draft
 msgid "revoked at"
 msgstr "zréckgezunn den"
@@ -8940,7 +9054,7 @@ msgstr "salaire bis"
 #: src/postulo/templates/applications/application_form.html:31
 #: src/postulo/templates/applications/application_intake.html:76
 #: src/postulo/templates/applications/interview_form.html:68
-#: src/postulo/templates/applications/reminder_form.html:17
+#: src/postulo/templates/applications/reminder_form.html:21
 #: src/postulo/templates/applications/tag_form.html:84
 #: src/postulo/templates/connections/form.html:44
 #: src/postulo/templates/documents/cv_form.html:20
@@ -8963,7 +9077,7 @@ msgstr "salaire bis"
 #: src/postulo/templates/server/plugins.html:116
 #: src/postulo/templates/server/signin.html:89
 #: src/postulo/templates/settings/accessibility.html:59
-#: src/postulo/templates/settings/appearance.html:83
+#: src/postulo/templates/settings/appearance.html:101
 #: src/postulo/templates/settings/locale.html:108
 #: src/postulo/templates/settings/plugins.html:113
 #, draft
@@ -9019,7 +9133,7 @@ msgstr "Gespäichert."
 msgid "Say what this address is."
 msgstr "Sot, wat dës Adress ass."
 
-#: src/postulo/accounts/forms.py:608 src/postulo/jobs/forms.py:381
+#: src/postulo/accounts/forms.py:624 src/postulo/jobs/forms.py:381
 #: src/postulo/jobs/models.py:421
 #, draft
 msgid "Say what this identifier is."
@@ -9313,7 +9427,7 @@ msgstr "Passwuert setzen"
 msgid "Set up"
 msgstr "Ariichten"
 
-#: src/postulo/jobs/models.py:762
+#: src/postulo/jobs/models.py:769
 #, draft
 msgid "Set when the opening is no longer available."
 msgstr "Gëtt gesat, wann d'Plaz net méi fräi ass."
@@ -9382,6 +9496,11 @@ msgstr "Virgemierkt."
 msgid "Show"
 msgstr "Weisen"
 
+#: src/postulo/templates/applications/calendar.html:110
+#, python-format
+msgid "Show %(what)s"
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html:23
 #: src/postulo/templates/jobs/capture_list.html:20
 #, draft
@@ -9392,6 +9511,10 @@ msgstr "Alles weisen"
 #, draft
 msgid "Show done too"
 msgstr "Och dat weisen, wat gemaach ass"
+
+#: src/postulo/templates/applications/calendar.html:117
+msgid "Show everything"
+msgstr ""
 
 #: src/postulo/accounts/forms.py:492
 #, draft
@@ -9636,7 +9759,7 @@ msgstr "SMTP-Server"
 msgid "Snooze"
 msgstr "Verschiben"
 
-#: src/postulo/applications/views.py:655
+#: src/postulo/applications/views.py:751
 #, draft
 msgid "Snoozed for two weeks."
 msgstr "Ëm zwou Woche verschoben."
@@ -9759,7 +9882,7 @@ msgid ""
 msgstr ""
 "D'Quell ass d'Feld „fonnt iwwer“ op enger Annonce. Fëllt et aus an dës Tabell fänkt un, sech ze rentéieren."
 
-#: src/postulo/jobs/models.py:908
+#: src/postulo/jobs/models.py:915
 #, draft
 msgid "source version"
 msgstr "versioun vun der quell"
@@ -9828,7 +9951,7 @@ msgstr ""
 msgid "STARTTLS, after connecting"
 msgstr "STARTTLS, nom Verbannen"
 
-#: src/postulo/core/models.py:745 src/postulo/jobs/models.py:766
+#: src/postulo/core/models.py:745 src/postulo/jobs/models.py:773
 #: src/postulo/plugins/models.py:123
 #, draft
 msgid "state"
@@ -9842,7 +9965,7 @@ msgstr "Zoustand"
 
 #: src/postulo/api/models.py:175 src/postulo/applications/models.py:252
 #: src/postulo/applications/models.py:717 src/postulo/documents/models.py:741
-#: src/postulo/jobs/models.py:917
+#: src/postulo/jobs/models.py:924
 #, draft
 msgid "status"
 msgstr "status"
@@ -9876,7 +9999,7 @@ msgstr "Status an der Tabell: %(text)s"
 msgid "Status of %(title)s at %(company)s"
 msgstr "Status vu %(title)s bei %(company)s"
 
-#: src/postulo/applications/views.py:473
+#: src/postulo/applications/views.py:475
 #, draft
 msgid "Status updated."
 msgstr "Status aktualiséiert."
@@ -10322,7 +10445,7 @@ msgstr ""
 msgid "That does not look like a complete web address."
 msgstr "Dat gesäit net wéi eng komplett Webadress aus."
 
-#: src/postulo/applications/views.py:555
+#: src/postulo/applications/views.py:557
 #, draft
 msgid "That entry could not be saved."
 msgstr "Deen Andrag konnt net gespäichert ginn."
@@ -10406,10 +10529,14 @@ msgstr ""
 msgid "That is a lot of tests. Try again in %(seconds)d seconds."
 msgstr ""
 
-#: src/postulo/applications/views.py:475
+#: src/postulo/applications/views.py:477
 #, draft
 msgid "That is not a status Postulo recognises."
 msgstr "Dat ass kee Status, deen Postulo kennt."
+
+#: src/postulo/applications/views.py:683
+msgid "That is not a time Postulo can read."
+msgstr ""
 
 #: src/postulo/plugins/installing.py:320
 #, draft
@@ -10430,17 +10557,17 @@ msgstr ""
 msgid "That is not an Ed25519 public key: %(error)s"
 msgstr "Dat ass keen ëffentlechen Ed25519-Schlëssel: %(error)s"
 
-#: src/postulo/applications/views.py:778
+#: src/postulo/applications/views.py:874
 #, draft
 msgid "That is not an outcome Postulo recognises."
 msgstr "Dat ass kee Resultat, dat Postulo kennt."
 
-#: src/postulo/applications/views.py:657
+#: src/postulo/applications/views.py:753
 #, draft
 msgid "That is not something Postulo can do about it."
 msgstr "Dat ass näischt, wat Postulo dogéint maache kann."
 
-#: src/postulo/applications/views.py:261 src/postulo/jobs/listing_views.py:168
+#: src/postulo/applications/views.py:263 src/postulo/jobs/listing_views.py:168
 #: src/postulo/jobs/views.py:159
 #, draft
 msgid "That is not something Postulo can do to several at once."
@@ -10541,7 +10668,7 @@ msgstr "Dee Plugin ass net méi installéiert."
 msgid "That reply did not come from a request Postulo made."
 msgstr "Déi Äntwert koum net vun enger Ufro déi Postulo gemaach huet."
 
-#: src/postulo/applications/views.py:1014
+#: src/postulo/applications/views.py:1156
 #, draft
 msgid "That suggestion has already been answered."
 msgstr "Dee Virschlag gouf schonn beäntwert."
@@ -10560,7 +10687,7 @@ msgstr ""
 msgid "That would make a loop: %(name)s is already part of this one."
 msgstr "Dat géif eng Schlaufe ginn: %(name)s ass scho Deel vun dëser hei."
 
-#: src/postulo/applications/views.py:447 src/postulo/jobs/views.py:418
+#: src/postulo/applications/views.py:449 src/postulo/jobs/views.py:418
 #: src/postulo/jobs/views.py:640
 #, python-format, draft
 msgid "The %(count)d document you sent is kept, and still says where it went."
@@ -10857,7 +10984,7 @@ msgid ""
 "The link for the page you are on is underlined as well as shaded and set in bolder type. Turn the underline off for a quieter header: the weight and the shade stay, so the page you are on is never marked by colour alone. A high-contrast theme underlines it whatever you choose here, because there the shading is discarded and the underline is not."
 msgstr ""
 
-#: src/postulo/jobs/models.py:926
+#: src/postulo/jobs/models.py:933
 #, draft
 msgid "The listing this capture became, once reviewed."
 msgstr ""
@@ -11297,7 +11424,7 @@ msgstr "Dësen Entrée dréckt säin Originaltext op all CV."
 msgid "This Idempotency-Key was already used for a different capture."
 msgstr "Dësen Idempotency-Key gouf schonn fir eng aner Erfaassung benotzt."
 
-#: src/postulo/accounts/forms.py:633 src/postulo/jobs/forms.py:408
+#: src/postulo/accounts/forms.py:649 src/postulo/jobs/forms.py:408
 #: src/postulo/jobs/models.py:410
 #, draft
 msgid "This identifier is already listed."
@@ -11379,7 +11506,7 @@ msgid ""
 msgstr ""
 "Dat ass Äre eegene Kont. E Link, deen Dir Iech selwer maacht, ass kee Wee zréck — Dir hutt Iech missen umellen, fir en ze maachen. Sidd Dir hei deen eenzegen Administrateur, da deckt Iech e Passkey oder en zweeten Administrateur."
 
-#: src/postulo/accounts/forms.py:630 src/postulo/jobs/forms.py:403
+#: src/postulo/accounts/forms.py:646 src/postulo/jobs/forms.py:403
 #: src/postulo/jobs/models.py:390
 #, draft
 msgid "This kind of identifier is already listed."
@@ -11495,7 +11622,7 @@ msgstr ""
 msgid "tier"
 msgstr "stuf"
 
-#: src/postulo/accounts/forms.py:760
+#: src/postulo/accounts/forms.py:776
 #, draft
 msgid "Time zone"
 msgstr "Zäitzon"
@@ -11567,22 +11694,23 @@ msgstr "Fir eng Annonce z'iwwerginn (brauch d'Berechtegung fir Erfaassungen):"
 msgid "to status"
 msgstr "op de status"
 
-#: src/postulo/templates/applications/calendar.html:74
-#, draft
-msgid "Today"
-msgstr "Haut"
-
-#: src/postulo/templates/applications/calendar.html:103
+#: src/postulo/jobs/closing.py:129
+#: src/postulo/templates/applications/calendar.html:146
 #, draft
 msgid "today"
 msgstr "haut"
+
+#: src/postulo/templates/applications/calendar.html:85
+#, draft
+msgid "Today"
+msgstr "Haut"
 
 #: src/postulo/documents/models.py:367
 #, draft
 msgid "Today's date"
 msgstr "D'Datum vun haut"
 
-#: src/postulo/accounts/models.py:527
+#: src/postulo/accounts/models.py:534
 #, draft
 msgid "token"
 msgstr "token"
@@ -11673,7 +11801,7 @@ msgstr "Probéiert manner Wierder, oder eng aner Schreifweis."
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Schalt fir d'éischt „Mäi Gravatar benotzen“ un."
 
-#: src/postulo/jobs/models.py:888
+#: src/postulo/jobs/models.py:895
 #, draft
 msgid "Turned into an application"
 msgstr "Zu enger Kandidatur ginn"
@@ -11703,7 +11831,7 @@ msgstr "Tippt op mannst zwee Zeechen."
 msgid "Type it in instead"
 msgstr "Tippt et amplaz eran"
 
-#: src/postulo/accounts/forms.py:600 src/postulo/jobs/forms.py:373
+#: src/postulo/accounts/forms.py:616 src/postulo/jobs/forms.py:373
 #, draft
 msgid "Type the identifier."
 msgstr "Tippt den Identifikateur."
@@ -11767,7 +11895,7 @@ msgstr ""
 msgid "until"
 msgstr "bis"
 
-#: src/postulo/jobs/models.py:876
+#: src/postulo/jobs/models.py:883
 #, python-format, draft
 msgid "up to %(high)s"
 msgstr "bis %(high)s"
@@ -11777,7 +11905,7 @@ msgstr "bis %(high)s"
 msgid "Update the preview"
 msgstr "D'Virschau aktualiséieren"
 
-#: src/postulo/accounts/models.py:384 src/postulo/core/models.py:36
+#: src/postulo/accounts/models.py:391 src/postulo/core/models.py:36
 #: src/postulo/core/models.py:1005
 #, draft
 msgid "updated at"
@@ -11872,7 +12000,7 @@ msgstr ""
 msgid "Used"
 msgstr "Benotzt"
 
-#: src/postulo/accounts/models.py:456
+#: src/postulo/accounts/models.py:463
 #, draft
 msgid "used at"
 msgstr "benotzt den"
@@ -11903,7 +12031,7 @@ msgstr ""
 msgid "user"
 msgstr "benotzer"
 
-#: src/postulo/accounts/forms.py:773 src/postulo/templates/server/email.html:22
+#: src/postulo/accounts/forms.py:789 src/postulo/templates/server/email.html:22
 #: src/postulo/templates/server/people.html:31
 #, draft
 msgid "Username"
@@ -12021,7 +12149,7 @@ msgstr ""
 msgid "Waiting after this one: %(count)s."
 msgstr "Waarden no dëser: %(count)s."
 
-#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:887
+#: src/postulo/applications/models.py:655 src/postulo/jobs/models.py:894
 #, draft
 msgid "Waiting for review"
 msgstr "Waart op d'Duerchkucken"
@@ -12045,6 +12173,10 @@ msgstr "Waart drop, geschéckt ze ginn"
 #, draft
 msgid "Waiting to be used"
 msgstr "Waart drop benotzt ze ginn"
+
+#: src/postulo/accounts/forms.py:507
+msgid "Warn me before a listing closes by"
+msgstr ""
 
 #: src/postulo/templates/core/import_csv_map.html:93
 #, python-format, draft
@@ -12096,12 +12228,12 @@ msgstr "websäit"
 msgid "Websites"
 msgstr "Websäiten"
 
-#: src/postulo/applications/agenda.py:280
+#: src/postulo/applications/agenda.py:489
 #, draft
 msgid "Week"
 msgstr "Woch"
 
-#: src/postulo/applications/agenda.py:315
+#: src/postulo/applications/agenda.py:526
 #: src/postulo/templates/applications/report.html:159
 #: src/postulo/templates/applications/report.html:185
 #: src/postulo/templates/applications/report_print.html:108
@@ -12255,7 +12387,7 @@ msgstr "Wéi eng Aart vun Arbechtgeber"
 msgid "What needs doing"
 msgstr "Wat ze maachen ass"
 
-#: src/postulo/accounts/forms.py:754
+#: src/postulo/accounts/forms.py:770
 msgid ""
 "What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
 msgstr ""
@@ -12392,7 +12524,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Wat Dir bemierkt hutt an nach net ugepaakt hutt, a wat dës Woch zoumécht."
 
-#: src/postulo/accounts/forms.py:776
+#: src/postulo/accounts/forms.py:792
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -12436,7 +12568,7 @@ msgstr "Wéini"
 msgid "When accepting should also move the application."
 msgstr "Wéini d'Unhuelen d'Kandidatur och soll weiderréckelen."
 
-#: src/postulo/jobs/models.py:772
+#: src/postulo/jobs/models.py:779
 #, draft
 msgid "When it entered your listings."
 msgstr "Wéini se op Är Annoncë komm ass."
@@ -12626,7 +12758,7 @@ msgstr ""
 msgid "Which one it is about. Leave it empty for a reminder about none."
 msgstr ""
 
-#: src/postulo/jobs/models.py:913
+#: src/postulo/jobs/models.py:920
 #, draft
 msgid "Which part of Postulo produced this: the web interface, or the API."
 msgstr "Wéi een Deel vum Postulo dat hei produzéiert huet: d'Websäit oder d'API."
@@ -12646,7 +12778,7 @@ msgstr "Wéi eng Period"
 msgid "Which plugin should this connection be for?"
 msgstr "Fir wéi ee Plugin soll dës Verbindung sinn?"
 
-#: src/postulo/accounts/forms.py:579
+#: src/postulo/accounts/forms.py:595
 msgid "Which register the number belongs to. What goes where, above, says."
 msgstr ""
 
@@ -12682,7 +12814,7 @@ msgstr "Firwat"
 msgid "Why discarded"
 msgstr ""
 
-#: src/postulo/jobs/models.py:769
+#: src/postulo/jobs/models.py:776
 #, draft
 msgid "why it was discarded"
 msgstr "firwat se verworf gouf"
@@ -12727,7 +12859,7 @@ msgstr ""
 msgid "With a password: you are asked for a code. Always."
 msgstr "Mat engem Passwuert: et gëtt no engem Code gefrot. Ëmmer."
 
-#: src/postulo/applications/ical.py:144
+#: src/postulo/applications/ical.py:159
 #, python-format, draft
 msgid "With: %(people)s"
 msgstr "Mat: %(people)s"

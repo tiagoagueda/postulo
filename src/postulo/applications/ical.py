@@ -1,16 +1,31 @@
-"""iCalendar text for interviews, written by hand.
+"""iCalendar text for the dated things of a search, written by hand.
 
-RFC 5545 is a large document, but the part an interview needs — one event with a start,
-an end, a place, a description and some attendees — fits in a page, and every calendar
-application imports it. A dependency would bring the rest of the standard along for
-nothing. Times are written in UTC, which every reader understands and no time-zone table
-can get wrong.
+RFC 5545 is a large document, but the part this needs — an event with a start, an end, a
+place, a description and some attendees — fits in a page, and every calendar application
+imports it. A dependency would bring the rest of the standard along for nothing. Times are
+written in UTC, which every reader understands and no time-zone table can get wrong.
+
+**Two shapes, because there are two kinds of thing.** An interview is a meeting at an hour.
+An application's deadline and a listing's closing date are *days*: nobody knows the hour an
+employer stops reading, and writing one would be inventing a fact. RFC 5545 has exactly this
+distinction — ``DTSTART;VALUE=DATE`` — and a calendar draws it along the top of the day
+rather than at a time, which is where it belongs (#238).
+
+**A day entry's identity comes from its address.** An interview carries a `uid` column
+because it is pushed into other people's calendars and has to keep its name across edits.
+A deadline has no such column, and a UID built from a primary key alone would collide
+between two Postulo instances in the same calendar application. The absolute URL of the
+thing is already unique per instance and stable for its life, so the UID is a UUID over
+that — no migration, no collision, and the same entry updates in place rather than
+doubling when the feed is fetched again.
 """
 
 from __future__ import annotations
 
 import datetime as dt
+import uuid
 from collections.abc import Iterable
+from dataclasses import dataclass
 
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -183,11 +198,62 @@ def event_lines(interview: Interview, *, url: str = "", alarm: bool = False) -> 
     return lines
 
 
-def calendar(interviews: Iterable[Interview], *, url_for=None) -> str:
-    """A complete iCalendar document holding these interviews.
+@dataclass(frozen=True)
+class DayEntry:
+    """One whole day in the feed: a deadline, or the day a listing closes (#238)."""
 
-    ``url_for`` turns an interview into the absolute address of its application page,
-    when the caller has a request to build one from.
+    summary: str
+    day: dt.date
+    url: str = ""
+    description: str = ""
+    #: Drawn as cancelled rather than left out, so a calendar that already has it takes it
+    #: off instead of keeping a date that no longer applies — an application already sent,
+    #: a listing already decided.
+    over: bool = False
+
+    @property
+    def uid(self) -> str:
+        """Stable for the life of the thing, and unique to this instance. See the module."""
+        return f"{uuid.uuid5(uuid.NAMESPACE_URL, self.url or self.summary)}@postulo"
+
+
+def day_lines(entry: DayEntry) -> list[str]:
+    """The VEVENT for a whole day.
+
+    ``DTEND`` is the day *after*, because RFC 5545's end is exclusive: a one-day entry that
+    ends on its own date is zero days long, and calendars disagree about what to draw for
+    one — some nothing at all.
+    """
+    lines = [
+        "BEGIN:VEVENT",
+        f"UID:{entry.uid}",
+        f"DTSTAMP:{stamp(timezone.now())}",
+        f"DTSTART;VALUE=DATE:{entry.day:%Y%m%d}",
+        f"DTEND;VALUE=DATE:{entry.day + dt.timedelta(days=1):%Y%m%d}",
+        f"SUMMARY:{escape(entry.summary)}",
+        f"STATUS:{'CANCELLED' if entry.over else 'CONFIRMED'}",
+        # A day nobody has to be anywhere for. Without this a calendar marks the whole day
+        # busy, and a month of deadlines makes somebody look unavailable to everyone who
+        # can see their free/busy.
+        "TRANSP:TRANSPARENT",
+    ]
+    if entry.description:
+        lines.append(f"DESCRIPTION:{escape(entry.description)}")
+    if entry.url:
+        lines.append(f"URL:{entry.url}")
+    lines.append("END:VEVENT")
+    return lines
+
+
+def calendar(
+    interviews: Iterable[Interview], *, url_for=None, days: Iterable[DayEntry] = ()
+) -> str:
+    """A complete iCalendar document holding these interviews and whole days.
+
+    ``url_for`` turns an interview into the absolute address of its application page, when
+    the caller has a request to build one from. ``days`` is already built, because a deadline
+    and a closing date come from two different models and only the caller knows the request
+    the addresses are absolute against.
     """
     lines = [
         "BEGIN:VCALENDAR",
@@ -198,5 +264,7 @@ def calendar(interviews: Iterable[Interview], *, url_for=None) -> str:
     ]
     for interview in interviews:
         lines += event_lines(interview, url=url_for(interview) if url_for else "")
+    for entry in days:
+        lines += day_lines(entry)
     lines.append("END:VCALENDAR")
     return "\r\n".join(piece for line in lines for piece in fold(line)) + "\r\n"

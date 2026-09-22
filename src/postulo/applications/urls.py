@@ -24,6 +24,9 @@ urlpatterns = [
     path(
         "reminders/<int:pk>/done/", views.ReminderCompleteView.as_view(), name="reminder_complete"
     ),
+    path("reminders/<int:pk>/edit/", views.ReminderUpdateView.as_view(), name="reminder_update"),
+    path("reminders/<int:pk>/delete/", views.ReminderDeleteView.as_view(), name="reminder_delete"),
+    path("reminders/<int:pk>/later/", views.ReminderLaterView.as_view(), name="reminder_later"),
     path("suggestions/", views.SuggestionListView.as_view(), name="suggestion_list"),
     path(
         "suggestions/<int:pk>/<str:action>/",

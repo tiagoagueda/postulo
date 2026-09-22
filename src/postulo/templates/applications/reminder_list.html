@@ -41,12 +41,7 @@
                 {% endif %}
               </p>
             </div>
-            {% if not reminder.is_done %}
-              <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}">
-                {% csrf_token %}
-                <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Done" %}</button>
-              </form>
-            {% endif %}
+            <c-reminder-actions :reminder="reminder" next_url="{{ request.get_full_path }}" />
           </li>
         {% endfor %}
       </ul>

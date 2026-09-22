@@ -559,6 +559,49 @@
     @apply block;
   }
 
+  /* One event on the calendar, painted by its kind (#204, #238).
+
+     Four kinds now -- an interview, a reminder, an application's deadline, a listing's
+     closing date -- which is two more than an `{% if %}` in the template could carry without
+     becoming a chain nobody reads. The kind decides the class and `agenda.TONES` decides
+     which; every event also says what it is in words, because colour is never the only
+     carrier (#274) and four colours is exactly where that stops being obvious.
+
+     The same seven-colour palette the tags use, one shade lighter: a month cell is a wall
+     of these and the tag tint is loud at that density. Each pair is 4.5:1 against its own
+     ground in both themes, which `tests/test_calendar.py` holds. */
+  .cal-event {
+    @apply flex min-h-6 items-start gap-1 rounded px-1 py-0.5 text-xs leading-5 hover:underline;
+  }
+
+  .cal-grey {
+    @apply bg-ink-50 text-ink-800 dark:bg-ink-800 dark:text-ink-100;
+  }
+
+  .cal-brand {
+    @apply bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100;
+  }
+
+  .cal-amber {
+    @apply bg-amber-50 text-amber-900 dark:bg-amber-900 dark:text-amber-100;
+  }
+
+  .cal-rose {
+    @apply bg-rose-50 text-rose-900 dark:bg-rose-900 dark:text-rose-100;
+  }
+
+  .cal-teal {
+    @apply bg-teal-50 text-teal-900 dark:bg-teal-900 dark:text-teal-100;
+  }
+
+  /* The key that is also the filter. A kind that is switched off keeps its outline and
+     loses its fill, so the row still says what the four colours are while showing which of
+     them are being drawn -- and the difference is not carried by colour alone, since the
+     link says *show* or *hide* in its own name. */
+  .cal-legend-item {
+    @apply inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs;
+  }
+
   .chip-new {
     @apply border-dashed border-brand-500 bg-transparent text-brand-700
       dark:border-brand-400 dark:text-brand-300;

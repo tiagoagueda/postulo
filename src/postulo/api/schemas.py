@@ -358,6 +358,24 @@ class ReminderIn(Schema):
     due_at: dt.datetime
 
 
+class ReminderPatch(Schema):
+    """What may be changed about a reminder, and nothing more (#238).
+
+    Every field optional and read with ``exclude_unset``, so a client that sends only
+    ``due_at`` moves the reminder and leaves the rest alone -- the difference between "no
+    application" and "do not touch the application" is the difference between a `PATCH` and
+    a replacement, and `application_id: None` means the first.
+
+    ``done_at`` is not here. Marking one done goes through ``/complete``, which is a verb
+    rather than a column, and a client that could write the stamp directly could write one
+    in the future or in the wrong order.
+    """
+
+    application_id: int | None = None
+    summary: str | None = Field(None, max_length=250)
+    due_at: dt.datetime | None = None
+
+
 # ------------------------------------------------------------------ documents
 
 

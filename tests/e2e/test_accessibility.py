@@ -106,7 +106,7 @@ def furnished(applicant):
     posting = JobPosting.objects.create(owner=applicant, company=company, title="Test Engineer")
     application = Application.objects.create(owner=applicant, posting=posting, status=Status.DRAFT)
     change_status(application, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=30))
-    Reminder.objects.create(
+    reminder = Reminder.objects.create(
         owner=applicant, application=application, summary="Chase", due_at=timezone.now()
     )
     schedule_interview(
@@ -218,6 +218,7 @@ def furnished(applicant):
         "tag": tag,
         "capture": capture,
         "interview": interview,
+        "reminder": reminder,
         "connection": connection,
         "suggestion": suggestion,
     }
@@ -259,6 +260,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     industry = it.get("industry", a)
     posting = it.get("posting", a)
     interview = it.get("interview", a)
+    reminder = it.get("reminder", a)
     connection = it.get("connection", a)
     errand = it.get("errand", a)
     return [
@@ -379,6 +381,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/interviews/{interview.pk}/edit/",
         f"/applications/tags/{tag.pk}/edit/",
         f"/applications/tags/{tag.pk}/delete/",
+        f"/applications/reminders/{reminder.pk}/edit/",
+        f"/applications/reminders/{reminder.pk}/delete/",
         f"/jobs/captures/{capture.pk}/review/",
         f"/jobs/companies/{c.pk}/delete/",
         f"/jobs/contacts/{contact.pk}/edit/",
@@ -662,6 +666,7 @@ def walked_url_names() -> frozenset[str]:
                     "industry",
                     "posting",
                     "interview",
+                    "reminder",
                     "connection",
                 ),
                 stand_in,

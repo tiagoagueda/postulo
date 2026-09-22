@@ -122,17 +122,20 @@ def test_ticking_a_reminder_hands_focus_to_the_next_one(page: Page, live_server,
     """
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}{reminders[0].application.get_absolute_url()}")
-    expect(page.locator("#reminders button")).to_have_count(2)
+    # The ticks, not every button in the block: since #238 each row also carries a menu
+    # with *Put off until tomorrow* and *next week* in it, and those are not what swaps.
+    ticks = page.locator("#reminders button[data-focus-after]")
+    expect(ticks).to_have_count(2)
 
-    page.locator("#reminders button").first.click()
+    ticks.first.click()
 
-    expect(page.locator("#reminders button")).to_have_count(1)
+    expect(ticks).to_have_count(1)
     # `to_be_focused` retries, which is what this needs: focus is handed over when the swap
     # *settles*, a beat after the markup arrives, so reading `activeElement` straight after
     # the text appears reads it too early and calls it lost when it was not yet given.
     # It is also the only way to wait for it here -- the content security policy forbids
     # `unsafe-eval`, and `wait_for_function` evaluates its predicate as a string.
-    expect(page.locator("#reminders button").first).to_be_focused()
+    expect(ticks.first).to_be_focused()
 
 
 def test_ticking_the_last_reminder_lands_on_the_region_rather_than_nowhere(

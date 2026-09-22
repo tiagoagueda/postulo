@@ -500,10 +500,11 @@ class AppearanceForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("theme", "density", "quiet_after_days")
+        fields = ("theme", "density", "quiet_after_days", "closing_notice_days")
         widgets = {"theme": forms.RadioSelect, "density": forms.RadioSelect}
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
+            "closing_notice_days": _("Warn me before a listing closes by"),
             "density": _("How much room to leave"),
         }
         help_texts = {
@@ -519,8 +520,9 @@ class AppearanceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Left blank, the threshold goes back to the default rather than refusing to save.
+        # Left blank, either threshold goes back to its default rather than refusing to save.
         self.fields["quiet_after_days"].required = False
+        self.fields["closing_notice_days"].required = False
 
         from postulo.core import navigation
 
@@ -562,10 +564,24 @@ class AppearanceForm(forms.ModelForm):
         except (TypeError, ValueError):
             return Profile._meta.get_field("quiet_after_days").default
 
+    @property
+    def closing_days(self) -> int:
+        """The same, for the notice before a listing closes (#238)."""
+        try:
+            return int(self["closing_notice_days"].value())
+        except (TypeError, ValueError):
+            return Profile._meta.get_field("closing_notice_days").default
+
     def clean_quiet_after_days(self) -> int:
         value = self.cleaned_data.get("quiet_after_days")
         if value is None:
             return Profile._meta.get_field("quiet_after_days").default
+        return value
+
+    def clean_closing_notice_days(self) -> int:
+        value = self.cleaned_data.get("closing_notice_days")
+        if value is None:
+            return Profile._meta.get_field("closing_notice_days").default
         return value
 
 

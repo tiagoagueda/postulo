@@ -755,6 +755,13 @@ class JobPosting(OwnedModel):
         blank=True,
         help_text=_("The application deadline, if stated."),
     )
+    #: The closing date this posting's *closes soon* message was sent for, or empty where
+    #: nothing has been sent (#238). The date rather than a moment, so that moving the
+    #: closing date announces it again -- a deadline being brought forward is news, and a
+    #: stamp that only said "told them once" would swallow it.
+    closing_announced_for = models.DateField(
+        _("closing announced for"), null=True, blank=True, editable=False
+    )
     closed_at = models.DateTimeField(
         _("closed on"),
         null=True,

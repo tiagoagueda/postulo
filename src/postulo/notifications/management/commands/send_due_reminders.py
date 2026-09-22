@@ -3,11 +3,11 @@
 Something has to look at the clock. For a single-instance application one command a
 few minutes apart is the right size: run it from the host's cron, or as the ``scheduler``
 service in the Compose file, which runs it in a loop. Each pass announces the reminders
-that have fallen due and the applications that have gone quiet. Each is announced once;
-the stamp survives whether or not the person had a notifier at the time, so adding one
-later does not replay a month of old reminders. The same pass sends the copies of
-documents that are waiting for an external store, retries the ones that failed, and runs
-the sync connections whose interval has come round.
+that have fallen due, the applications that have gone quiet and the listings about to close.
+Each is announced once; the stamp survives whether or not the person had a notifier at the
+time, so adding one later does not replay a month of old reminders. The same pass sends the
+copies of documents that are waiting for an external store, retries the ones that failed, and
+runs the sync connections whose interval has come round.
 """
 
 from __future__ import annotations
@@ -106,8 +106,8 @@ def announce_due_reminders() -> tuple[int, int]:
 
 class Command(BaseCommand):
     help = (
-        "Notify people of reminders that have fallen due and applications that have gone "
-        "quiet. Run it from cron, or with --loop."
+        "Notify people of reminders that have fallen due, applications that have gone quiet "
+        "and listings about to close. Run it from cron, or with --loop."
     )
 
     def add_arguments(self, parser) -> None:
@@ -166,6 +166,7 @@ class Command(BaseCommand):
         from postulo.core import errands
         from postulo.core.slow import reap_archives
         from postulo.documents.archiving import send_pending
+        from postulo.jobs.closing import announce_closing_postings
         from postulo.plugins.syncing import run_syncs
 
         # Held for a little longer than the gap between passes: a pass that takes longer than
@@ -176,6 +177,7 @@ class Command(BaseCommand):
                 return
             stamped, delivered = announce_due_reminders()
             quiet, told = announce_quiet_applications()
+            closing, warned = announce_closing_postings()
             copies_sent, copies_failed = send_pending()
             syncs_ran, syncs_failed = run_syncs(budget=budget)
             # The two things #247 leaves lying about: an export archive holding a whole
@@ -188,6 +190,8 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")
         if quiet:
             self.stdout.write(f"{when} {quiet} applications gone quiet, {told} deliveries")
+        if closing:
+            self.stdout.write(f"{when} {closing} listings closing soon, {warned} deliveries")
         if copies_sent or copies_failed:
             self.stdout.write(f"{when} {copies_sent} document copies sent, {copies_failed} failed")
         if syncs_ran:
@@ -195,7 +199,7 @@ class Command(BaseCommand):
         if reaped:
             self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
         if self.quiet_pass and not any(
-            (stamped, quiet, copies_sent, copies_failed, syncs_ran, reaped)
+            (stamped, quiet, closing, copies_sent, copies_failed, syncs_ran, reaped)
         ):
             self.stdout.write("Nothing due.")
 

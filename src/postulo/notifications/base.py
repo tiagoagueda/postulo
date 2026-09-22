@@ -30,6 +30,7 @@ EVENTS = {
     "reminder_due": _("A reminder falls due"),
     "capture_received": _("A posting arrives through the capture API"),
     "went_quiet": _("Applications go quiet"),
+    "posting_closing": _("A listing you are considering closes soon"),
 }
 
 

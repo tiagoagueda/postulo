@@ -442,3 +442,50 @@ def _catch_up(application: Application, kind: str, *, occurred_at, actor: str) -
     order = list(BOARD_STATUSES)
     if application.status in order and order.index(application.status) < order.index(target):
         change_status(application, target, occurred_at=occurred_at, actor=actor)
+
+
+# ------------------------------------------------------------------- reminders
+
+#: What *Later* offers without asking for a date. Two, because a list of six is a decision
+#: and the point of the control is not having to make one; anything else is *a date*.
+LATER_TOMORROW = "tomorrow"
+LATER_NEXT_WEEK = "next_week"
+LATER_CHOICES = (LATER_TOMORROW, LATER_NEXT_WEEK)
+
+#: How far out each of them moves the reminder. A week rather than seven days from the
+#: original: somebody pressing *Later* on a reminder that fell due last Tuesday means a week
+#: from now, not last Tuesday plus seven.
+LATER_DAYS = {LATER_TOMORROW: 1, LATER_NEXT_WEEK: 7}
+
+
+def later_time(choice: str, *, now=None) -> dt.datetime | None:
+    """When ``tomorrow`` or ``next week`` falls, keeping the time of day it was set for.
+
+    Measured from *now* and not from the due time, and the hour is carried across rather
+    than reset to midnight: a reminder to ring somebody at ten was set for ten on purpose,
+    and a postponement is a change of day.
+    """
+    days = LATER_DAYS.get(choice)
+    if days is None:
+        return None
+    return (now or timezone.now()) + dt.timedelta(days=days)
+
+
+def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
+    """Move a reminder to ``due``, and let it be announced again there (#238).
+
+    The stamp has to go with the time. It is the record of *this one has been dealt with*,
+    and a reminder somebody has deliberately moved into the future has not been: leaving
+    `notified_at` set would move the reminder and silence it, which is the failure that
+    looks most like the feature working. `reschedule_interview` has cleared it for the same
+    reason since #224; this is that rule with a name.
+
+    A reminder already done is left alone. Postponing something that is finished is either a
+    mistake or a request to reopen it, and reopening is not what a button called *Later*
+    should quietly do.
+    """
+    if reminder.is_done:
+        return reminder
+    reminder.due_at, reminder.notified_at = due, None
+    reminder.save(update_fields=["due_at", "notified_at", "updated_at"])
+    return reminder

@@ -379,6 +379,13 @@ class Profile(models.Model):
         validators=[MinValueValidator(1), MaxValueValidator(365)],
         help_text=_("Days without anything happening, and nothing planned, before Postulo asks."),
     )
+    #: How much warning to give before a listing the person has not decided about closes.
+    closing_notice_days = models.PositiveSmallIntegerField(
+        _("notice before a listing closes"),
+        default=3,
+        validators=[MinValueValidator(1), MaxValueValidator(90)],
+        help_text=_("Days of warning before a listing you have not decided about closes."),
+    )
 
     created_at = models.DateTimeField(_("created at"), auto_now_add=True)
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
