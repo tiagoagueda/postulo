@@ -19,13 +19,15 @@
     {% else %}
       <form method="post" class="card border-red-300 dark:border-red-900">
         {% csrf_token %}
-        <label class="field-label" for="id_confirm_username">
-          {% blocktranslate trimmed with username=person.username %}
-            Type the username, {{ username }}, to confirm
-          {% endblocktranslate %}
-        </label>
-        <input type="text" id="id_confirm_username" name="confirm_username" class="field-input mb-2" autocomplete="off">
-        {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
+        <div class="field mb-2"{% if error %} data-invalid="true"{% endif %}>
+          <label for="id_confirm_username">
+            {% blocktranslate trimmed with username=person.username %}
+              Type the username, {{ username }}, to confirm
+            {% endblocktranslate %}
+          </label>
+          <input type="text" id="id_confirm_username" name="confirm_username" autocomplete="off">
+          {% if error %}<div role="alert"><p>{{ error }}</p></div>{% endif %}
+        </div>
         <div class="flex items-center gap-3">
           <button type="submit" class="btn" data-variant="destructive">{% translate "Delete the account" %}</button>
           <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>

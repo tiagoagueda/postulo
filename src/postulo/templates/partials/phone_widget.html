@@ -8,23 +8,23 @@
    unusable and a WCAG 2.2 target-size failure. `min-w-0` is what permits that; the browser
    then clips the closed select's text, which is why the dialling code comes first.
 {% endcomment %}
-{% comment %} The flag sits over the select rather than inside it: an <option> holds text
+{% comment %} The flag sits beside the select rather than inside it: an <option> holds text
    and nothing else, in every browser, so no image can go in the list itself (#88). Out
    here it is arguably more use than it was in there -- visible without opening anything.
-   The space is reserved whether or not a flag is showing, so choosing a country moves
-   nothing on the page.
+   The two are one control, Basecoat's `input-group` (#290): the group carries the box and
+   the select inside it has none of its own, which is what an `absolute` flag over a select
+   padded to make room for it used to fake. The space is reserved whether or not a flag is
+   showing, so choosing a country moves nothing on the page.
 
    Each option carries its own flag's URL. That is around 11 KB of repeated attribute per
    field, which gzip takes to about two, and it is the only correct way: static files are
    served under a content hash, so there is no pattern a script could build a URL from.
 {% endcomment %}
 <div class="flex gap-2">
-  <div class="relative w-40 shrink-0">
-    <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center"
-          data-phone-flag>{% flag widget.country %}</span>
+  <div class="input-group w-40 shrink-0">
+    <span data-align="start" data-phone-flag>{% flag widget.country %}</span>
     {% with widget=widget.subwidgets.0 %}
-      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}"
-              class="field-input w-full min-w-0 ps-9"
+      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}" class="min-w-0"
               aria-label="{% translate 'Country the number is in' %}" data-phone-country>
         {% for group, options, index in widget.optgroups %}
           {% for option in options %}<option value="{{ option.value|stringformat:'s' }}" data-flag="{% flag_url option.value %}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
@@ -32,11 +32,9 @@
       </select>
     {% endwith %}
   </div>
-  <div class="min-w-0 flex-1">
-    {% with widget=widget.subwidgets.1 %}
-      <input type="text" name="{{ widget.name }}" id="{{ widget.attrs.id }}"
-             value="{{ widget.value|default_if_none:'' }}"
-             class="field-input w-full" inputmode="tel" autocomplete="tel">
-    {% endwith %}
-  </div>
+  {% with widget=widget.subwidgets.1 %}
+    <input type="text" name="{{ widget.name }}" id="{{ widget.attrs.id }}"
+           value="{{ widget.value|default_if_none:'' }}"
+           class="min-w-0 flex-1" inputmode="tel" autocomplete="tel">
+  {% endwith %}
 </div>

@@ -77,11 +77,9 @@ def test_the_parser_reads_the_tokens_it_is_supposed_to():
 def test_focus_on_a_field_is_an_opaque_ring():
     """At 20% alpha the ring read at about 1.2:1 against white -- the faintest focus in the
     application, on the controls people type into (#274)."""
-    field = CSS[
-        CSS.index("@utility field-input") : CSS.index(
-            "@layer components", CSS.index("@utility field-input")
-        )
-    ]
+    # The rule on the element itself, in the base layer, since #290 retired `field-input`.
+    start = CSS.index("input:where(")
+    field = CSS[start : CSS.index("}", start)]
     assert "focus:ring-2 focus:ring-brand-500 " in field or "focus:ring-brand-500\n" in field
     assert "ring-brand-500/20" not in field
 

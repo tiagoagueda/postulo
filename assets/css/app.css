@@ -29,6 +29,19 @@
 /* The structure of a list with nothing in it (#292): a centred column with a header, a body
    and a footer, and no paint of its own -- which this file supplies, like every other. */
 @import "basecoat-css/components/empty.css";
+/* The form family (#290): a row is `<div class="field">` holding an ordinary <label> and
+   an ordinary control, and the structure is keyed on that shape rather than on a class per
+   control. Eight files, none with a script, and the paint is in `basecoat.css` as ever.
+   `<c-field>` emits the shape; the checkbox, the radio and the input group are the three
+   controls a template draws by hand. */
+@import "basecoat-css/components/field.css";
+@import "basecoat-css/components/label.css";
+@import "basecoat-css/components/input.css";
+@import "basecoat-css/components/textarea.css";
+@import "basecoat-css/components/native-select.css";
+@import "basecoat-css/components/checkbox.css";
+@import "basecoat-css/components/radio.css";
+@import "basecoat-css/components/input-group.css";
 @import "./basecoat.css";
 
 /* Templates and Python live outside this directory, so point Tailwind at them. */
@@ -353,13 +366,53 @@
     @apply bg-ink-50 text-ink-900 antialiased dark:bg-ink-950 dark:text-ink-100;
   }
 
+  /*
+   * The box every control is typed into, on the element itself rather than on a class a
+   * template has to remember (#290). This was `field-input`, a utility applied here and
+   * written out by hand in 29 templates besides -- redundantly, since this rule already
+   * reached every one of them. Basecoat's form family (imported above) gives a control
+   * inside `.field` its structure; this is its paint, and it is the same paint outside
+   * one, so a filter box in a toolbar and a field on a form are the same box.
+   *
+   * `read-only:` is the "greyed out" a field gets when the environment decides its value
+   * and the page is only reporting it. A muted ground and a hand that says "no" is the
+   * whole of it: the text stays at full contrast, the field stays in the tab order, and a
+   * screen reader still reads the value and the line explaining where it came from. The
+   * `disabled` attribute would have given the same look and taken all three away.
+   *
+   * The ring is opaque (#274). At 20% alpha it read at about 1.2:1 against white, which
+   * made the controls people type into the faintest focus in the application; every
+   * button, link and summary keeps the base outline, and a field's ring should say as much.
+   *
+   * `outline-hidden`, not `outline-none`. They look the same and are not the same thing:
+   * `outline-none` compiles to `outline-style: none`, which beats the base `:focus-visible`
+   * rule on specificity and leaves the field with a border colour and a box-shadow ring as
+   * its only cue -- and forced colours discard both, so in a high-contrast theme every
+   * input, select, textarea and table filter in Postulo had no visible focus at all (#227).
+   * `outline-hidden` keeps a transparent outline, which forced colours repaint; the rule at
+   * the foot of this file then says what it should look like rather than leaving it to a
+   * compiler's choice.
+   */
   input:where(
       [type="text"], [type="email"], [type="password"], [type="url"], [type="tel"],
-      [type="number"], [type="date"], [type="datetime-local"], [type="search"]
+      [type="number"], [type="date"], [type="datetime-local"], [type="month"],
+      [type="week"], [type="time"], [type="search"], [type="file"]
     ),
   select,
   textarea {
-    @apply field-input;
+    @apply w-full rounded-lg border border-input bg-white px-3 py-2 text-sm
+      text-ink-900 placeholder:text-ink-400
+      read-only:cursor-not-allowed read-only:bg-ink-50
+      focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-hidden
+      dark:bg-ink-950 dark:text-ink-100
+      dark:read-only:bg-ink-900;
+  }
+
+  /* The tick inside a checked box: Basecoat draws it as a mask in `currentColor`, from a
+     variable its base stylesheet would have defined and this project does not import. The
+     stroke colour is immaterial to a mask; only the shape counts (#290). */
+  :root {
+    --check-icon: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><path d='M20 6 9 17l-5-5'/></svg>");
   }
 
   label {
@@ -389,35 +442,6 @@
 
 @utility alert {
   @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm;
-}
-
-@utility field-input {
-  /*
-   * `read-only:` is the "greyed out" a field gets when the environment decides its value
-   * and the page is only reporting it. A muted ground and a hand that says "no" is the
-   * whole of it: the text stays at full contrast, the field stays in the tab order, and a
-   * screen reader still reads the value and the line explaining where it came from. The
-   * `disabled` attribute would have given the same look and taken all three away.
-   *
-   * The ring is opaque (#274). At 20% alpha it read at about 1.2:1 against white, which
-   * made the controls people type into the faintest focus in the application; every
-   * button, link and summary keeps the base outline, and a field's ring should say as much.
-   *
-   * `outline-hidden`, not `outline-none`. They look the same and are not the same thing:
-   * `outline-none` compiles to `outline-style: none`, which beats the base `:focus-visible`
-   * rule on specificity and leaves the field with a border colour and a box-shadow ring as
-   * its only cue -- and forced colours discard both, so in a high-contrast theme every
-   * input, select, textarea and table filter in Postulo had no visible focus at all (#227).
-   * `outline-hidden` keeps a transparent outline, which forced colours repaint; the rule at
-   * the foot of this file then says what it should look like rather than leaving it to a
-   * compiler's choice.
-   */
-  @apply w-full rounded-lg border border-input bg-white px-3 py-2 text-sm
-    text-ink-900 placeholder:text-ink-400
-    read-only:cursor-not-allowed read-only:bg-ink-50
-    focus:border-brand-500 focus:ring-2 focus:ring-brand-500 focus:outline-hidden
-    dark:bg-ink-950 dark:text-ink-100
-    dark:read-only:bg-ink-900;
 }
 
 @layer components {
@@ -766,18 +790,6 @@
    */
   .scroll-x {
     @apply relative overflow-x-auto;
-  }
-
-  .field-label {
-    @apply mb-1.5 block text-sm font-medium text-ink-700 dark:text-ink-300;
-  }
-
-  .field-help {
-    @apply mt-1.5 text-xs text-ink-500 dark:text-ink-400;
-  }
-
-  .field-error {
-    @apply mt-1.5 text-xs font-medium text-red-600 dark:text-red-400;
   }
 
   /* Weight and an underline as well as the tint (#274): the tint is 1.1:1 against the
@@ -1221,13 +1233,12 @@ html {
  * Written out rather than left to `outline-hidden`'s own forced-colours fallback: that
  * fallback is transparent, which the browser is only *invited* to repaint, and `Highlight`
  * is the colour the system already uses to mean "this is the thing you are on". The
- * selector matches `.field-input:focus` on specificity and comes later, which is what takes
- * the `outline-style: none` off again.
+ * selector matches the field's `:focus` on specificity and comes later, which is what
+ * takes the `outline-style: none` off again.
  *
- * Unlayered and last on purpose: a layered rule loses to `.field-input` whatever it says.
+ * Unlayered and last on purpose: a layered rule loses to the field's own whatever it says.
  * Basecoat's button gets the same treatment in `basecoat.css`, for the same reason. */
 @media (forced-colors: active) {
-  .field-input:focus-visible,
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {

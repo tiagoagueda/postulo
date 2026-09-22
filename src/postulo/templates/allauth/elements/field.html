@@ -1,28 +1,32 @@
 {% load allauth %}
 {% comment %} A single field rendered from attributes rather than from a form: the
-   verification-code pages do this. Same look as everything the field partial renders.
+   verification-code pages do this. The same shape `<c-field>` draws (#290): a `.field`
+   holding the label and the control, or, for a checkbox, the box and then the label.
 {% endcomment %}
 {% if attrs.errors %}<div class="alert-error mb-4" role="alert"><div>{{ attrs.errors }}</div></div>{% endif %}
-<div class="mb-4">
-  {% if attrs.type == "checkbox" or attrs.type == "radio" %}
-    <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200" for="{{ attrs.id }}">
-      <input type="{{ attrs.type }}"
-             {% if attrs.required %}required{% endif %}
-             {% if attrs.disabled %}disabled{% endif %}
-             {% if attrs.readonly %}readonly{% endif %}
-             {% if attrs.checked %}checked{% endif %}
-             {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
-             {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
-             {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}>
-      <span>{% slot label %}{% endslot %}</span>
-    </label>
-  {% else %}
-    <label class="field-label" for="{{ attrs.id }}">
+{% if attrs.type == "checkbox" or attrs.type == "radio" %}
+  <div class="field mb-4" data-orientation="horizontal">
+    <input type="{{ attrs.type }}"
+           {% if attrs.required %}required{% endif %}
+           {% if attrs.disabled %}disabled{% endif %}
+           {% if attrs.readonly %}readonly{% endif %}
+           {% if attrs.checked %}checked{% endif %}
+           {% if attrs.name %}name="{{ attrs.name }}"{% endif %}
+           {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
+           {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}>
+    <section>
+      <label for="{{ attrs.id }}">{% slot label %}{% endslot %}</label>
+      {% if slots.help_text %}<p>{% slot help_text %}{% endslot %}</p>{% endif %}
+    </section>
+  </div>
+{% else %}
+  <div class="field mb-4">
+    <label for="{{ attrs.id }}">
       {% slot label %}{% endslot %}
-      {% if attrs.required %}<span aria-hidden="true" class="text-red-600">*</span>{% endif %}
+      {% if attrs.required %}<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>{% endif %}
     </label>
     {% if attrs.type == "textarea" %}
-      <textarea class="field-input"
+      <textarea
                 {% if attrs.required %}required{% endif %}
                 {% if attrs.rows %}rows="{{ attrs.rows }}"{% endif %}
                 {% if attrs.disabled %}disabled{% endif %}
@@ -31,7 +35,7 @@
                 {% if attrs.id %}id="{{ attrs.id }}"{% endif %}
                 {% if attrs.placeholder %}placeholder="{{ attrs.placeholder }}"{% endif %}>{% slot value %}{% endslot %}</textarea>
     {% else %}
-      <input class="field-input" type="{{ attrs.type }}"
+      <input type="{{ attrs.type }}"
              {% if attrs.required %}required{% endif %}
              {% if attrs.disabled %}disabled{% endif %}
              {% if attrs.readonly %}readonly{% endif %}
@@ -41,6 +45,6 @@
              {% if attrs.autocomplete %}autocomplete="{{ attrs.autocomplete }}"{% endif %}
              {% if attrs.value is not None %}value="{{ attrs.value }}"{% endif %}>
     {% endif %}
-  {% endif %}
-  {% if slots.help_text %}<p class="field-help">{% slot help_text %}{% endslot %}</p>{% endif %}
-</div>
+    {% if slots.help_text %}<p>{% slot help_text %}{% endslot %}</p>{% endif %}
+  </div>
+{% endif %}

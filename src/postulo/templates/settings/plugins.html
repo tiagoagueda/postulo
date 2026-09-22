@@ -22,7 +22,7 @@
      not. {% endcomment %}
   <form method="get" class="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm" data-internal-mark>
     <label class="tap-target inline-flex items-center gap-2">
-      <input type="checkbox" name="internal" value="1" data-autosubmit
+      <input type="checkbox" class="input" name="internal" value="1" data-autosubmit
              {% if showing_internal %}checked{% endif %}>
       <span>{% translate "Show the plugins Postulo ships" %}</span>
     </label>
@@ -61,7 +61,7 @@
               <span class="mt-1 inline-block size-3.5 shrink-0" aria-hidden="true"></span>
             {% else %}
               <input type="checkbox" name="on" value="{{ row.name }}" id="plugin-{{ row.name }}"
-                     class="state-glow mt-1"
+                     class="input state-glow mt-1"
                      {% if row.on %}checked{% endif %}
                      {% if not row.theirs %}disabled{% if row.why %} aria-describedby="why-{{ row.name }}"{% endif %}{% endif %}>
             {% endif %}

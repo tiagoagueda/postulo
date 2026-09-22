@@ -41,7 +41,7 @@
         </p>
 
         <fieldset class="mb-5"{% if form.colour.aria_describedby %} aria-describedby="{{ form.colour.aria_describedby }}"{% endif %}>
-          <legend class="field-label mb-1">{{ form.colour.label }}</legend>
+          <legend class="label mb-1">{{ form.colour.label }}</legend>
           <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.colour.auto_id }}_helptext">
             {{ form.colour.help_text }}
           </p>
@@ -53,11 +53,11 @@
               </label>
             {% endfor %}
           </div>
-          <c-field-feedback :field="form.colour" errors-only />
+          <div class="field"><c-field-feedback :field="form.colour" errors-only /></div>
         </fieldset>
 
         <fieldset{% if form.icon.aria_describedby %} aria-describedby="{{ form.icon.aria_describedby }}"{% endif %}>
-          <legend class="field-label mb-1">{{ form.icon.label }}</legend>
+          <legend class="label mb-1">{{ form.icon.label }}</legend>
           <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.icon.auto_id }}_helptext">
             {{ form.icon.help_text }}
           </p>
@@ -75,7 +75,7 @@
               </label>
             {% endfor %}
           </div>
-          <c-field-feedback :field="form.icon" errors-only />
+          <div class="field"><c-field-feedback :field="form.icon" errors-only /></div>
         </fieldset>
       </div>
       <div class="flex items-center gap-3">

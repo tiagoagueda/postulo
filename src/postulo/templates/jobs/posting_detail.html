@@ -34,7 +34,7 @@
         <form method="post" action="{% url 'listings:discard' posting.pk %}" class="flex items-center gap-1">
           {% csrf_token %}
           <input type="hidden" name="next" value="{% url 'listings:list' %}">
-          <select name="reason" class="field-input w-44 px-2 py-1 text-xs" aria-label="{% translate 'Why' %}">
+          <select name="reason" class="w-44 px-2 py-1 text-xs" aria-label="{% translate 'Why' %}">
             {% for value, label in discard_reasons %}
               <option value="{{ value }}">{{ label }}</option>
             {% endfor %}

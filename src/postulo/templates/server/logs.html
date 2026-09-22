@@ -39,27 +39,27 @@
   {% else %}
     <form method="get" class="card mb-6" id="log-filters">
       <div class="grid gap-4 sm:grid-cols-3">
-        <div>
-          <label class="field-label" for="level">{% translate "From level" %}</label>
-          <select name="level" id="level" class="field-input">
+        <div class="field">
+          <label for="level">{% translate "From level" %}</label>
+          <select name="level" id="level">
             <option value="">{% translate "Everything" %}</option>
             {% for name in levels %}
               <option value="{{ name }}" {% if name == level %}selected{% endif %}>{{ name }}</option>
             {% endfor %}
           </select>
         </div>
-        <div>
-          <label class="field-label" for="logger">{% translate "From" %}</label>
-          <select name="logger" id="logger" class="field-input">
+        <div class="field">
+          <label for="logger">{% translate "From" %}</label>
+          <select name="logger" id="logger">
             <option value="">{% translate "Anywhere" %}</option>
             {% for name in loggers %}
               <option value="{{ name }}" {% if name == logger %}selected{% endif %}>{{ name }}</option>
             {% endfor %}
           </select>
         </div>
-        <div>
-          <label class="field-label" for="q">{% translate "Containing" %}</label>
-          <input type="search" name="q" id="q" value="{{ search }}" class="field-input">
+        <div class="field">
+          <label for="q">{% translate "Containing" %}</label>
+          <input type="search" name="q" id="q" value="{{ search }}">
         </div>
       </div>
       <div class="mt-4 flex items-center gap-3">

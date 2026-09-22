@@ -200,3 +200,154 @@
     @apply my-1 border-t border-border;
   }
 }
+
+/* ------------------------------------------------------------ the form family */
+
+/*
+ * A form row (#290). Basecoat's `field.css` makes `.field` a column whose children are
+ * full-width, keys the label, the control, the help and the errors on the elements
+ * themselves, and turns the whole row red under `data-invalid`; `<c-field>` emits that
+ * shape, and the rows a single field cannot draw write it out. The paint here is what the
+ * four `field-*` classes used to be: the label's weight and tone, the help's size, the
+ * error's colour, and the rhythm between them. The control's own box is in `app.css`,
+ * on the element, because a control outside a field is the same box.
+ *
+ * `gap-1.5` is the `mb-1.5` the label had and the `mt-1.5` the help had, said once.
+ * Basecoat lays a field's label out as a flex row, so it gets a gap for the asterisk
+ * that follows a required one -- and `flex-wrap`, because a row that may not wrap is a
+ * row that runs off a 320-pixel screen: an address beside its "primary" badge on the
+ * email page was 44 pixels over, and in Greek 73.
+ *
+ * The invalid row keeps its own reds rather than Basecoat's `text-destructive`: that
+ * token is red-600 in both themes, and red-600 on the dark page is short of 4.5:1 for
+ * the 14-pixel label. The help stays grey either way -- what it says has not become
+ * wrong -- and the errors are the one thing in the row that is red for a reason.
+ */
+@layer components {
+  .field {
+    @apply gap-1.5;
+  }
+
+  .field[data-orientation="horizontal"] {
+    @apply gap-3;
+  }
+
+  .field > label,
+  .field > section > label,
+  .label {
+    @apply flex-wrap gap-1 text-sm font-medium text-ink-700 dark:text-ink-300;
+  }
+
+  .field[data-invalid] > label,
+  .field[data-invalid] > section > label {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .field > p,
+  .field section > p {
+    @apply text-xs text-ink-500 dark:text-ink-400;
+  }
+
+  .field [role="alert"] p {
+    @apply text-xs font-medium text-red-600 dark:text-red-400;
+  }
+
+  /* Basecoat takes the native chevron off a select and its packs draw one back as a
+     background image. The native one is kept: it follows the platform, it costs no image,
+     and it is what every select in Postulo has always shown. */
+  .field > select,
+  select.select,
+  .input-group > select {
+    @apply appearance-auto;
+  }
+}
+
+/*
+ * The checkbox and the radio (#290). Basecoat's structure is `appearance-none` with the
+ * tick drawn as a mask in `currentColor` and the dot as a `::before`; the paint is the
+ * box, the fill, and a focus outline said out loud for the reason the button's is. Both
+ * are 16 pixels, and the target that meets 24 is the label that switches them, as it
+ * always was -- `tests/e2e/test_target_size.py` measures the label for exactly these two.
+ */
+@layer components {
+  .field > input[type="checkbox"]:not([role="switch"]),
+  .input[type="checkbox"]:not([role="switch"]) {
+    @apply size-4 cursor-pointer rounded-sm border border-input bg-white
+      checked:border-brand-600 checked:bg-brand-600 checked:text-white
+      dark:bg-ink-950 dark:checked:border-brand-500 dark:checked:bg-brand-500;
+  }
+
+  .field > input[type="checkbox"]:not([role="switch"]):checked::after,
+  .input[type="checkbox"]:not([role="switch"]):checked::after {
+    @apply size-full;
+  }
+
+  .field > input[type="radio"],
+  .input[type="radio"] {
+    @apply size-4 cursor-pointer rounded-full border-input bg-white
+      checked:border-brand-600 dark:bg-ink-950 dark:checked:border-brand-500;
+  }
+
+  .field > input[type="radio"]:checked::before,
+  .input[type="radio"]:checked::before {
+    @apply size-2 bg-brand-600 dark:bg-brand-500;
+  }
+
+  .field > input[type="checkbox"]:focus-visible,
+  .input[type="checkbox"]:focus-visible,
+  .field > input[type="radio"]:focus-visible,
+  .input[type="radio"]:focus-visible {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+/*
+ * A control with something attached to it (#290): the flag beside a country chooser, in
+ * the telephone field, the postal address and the instance's default language. Each of
+ * the three used to be a `relative` wrapper with an `absolute` flag over a select padded
+ * to make room for it. Basecoat's `input-group` strips the control's own box and lets the
+ * group carry it, so the box is painted here once: the same border, ground and ring as a
+ * field, with the ring on the group whenever anything inside it is focused.
+ */
+@layer components {
+  .input-group {
+    @apply rounded-lg border border-input bg-white
+      focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500
+      dark:bg-ink-950;
+  }
+
+  .input-group > span {
+    @apply ps-2.5 text-sm text-ink-500 dark:text-ink-400;
+  }
+}
+
+/* Forced colours: a box and a dot in the system's own colours, which the theme keeps
+   where it would throw a brand fill away (#227, #277). */
+@media (forced-colors: active) {
+  .field > input[type="checkbox"],
+  .input[type="checkbox"],
+  .field > input[type="radio"],
+  .input[type="radio"] {
+    border: 1px solid ButtonText;
+    background-color: Canvas;
+  }
+
+  .field > input[type="checkbox"]:checked,
+  .input[type="checkbox"]:checked {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .field > input[type="radio"]:checked::before,
+  .input[type="radio"]:checked::before {
+    background-color: Highlight;
+  }
+
+  .field > input[type="checkbox"]:focus-visible,
+  .input[type="checkbox"]:focus-visible,
+  .field > input[type="radio"]:focus-visible,
+  .input[type="radio"]:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}

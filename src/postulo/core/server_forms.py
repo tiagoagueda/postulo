@@ -103,7 +103,9 @@ class OfferedLanguagesForm(forms.ModelForm):
     offered_languages = forms.MultipleChoiceField(
         label=_("Languages this instance offers"),
         required=False,
-        widget=forms.CheckboxSelectMultiple,
+        # `input` is what asks the stylesheet to draw the box (#290); the rows are laid out
+        # by the template, one checkbox per label.
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "input"}),
         help_text=_(
             "Everything is offered until you narrow it. Tick them all and it stays that "
             "way, so a language added in a later release appears by itself."

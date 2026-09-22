@@ -10,7 +10,7 @@
 {% endcomment %}
 {% for block in links %}
   <fieldset class="card mb-6" data-web-links="{{ block.kind }}" id="section-links-{{ block.kind }}">
-    <legend class="field-label px-1">{{ block.block.legend }}</legend>
+    <legend class="label px-1">{{ block.block.legend }}</legend>
     <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ block.block.intro }}</p>
     {{ block.management_form }}
     {% if block.non_form_errors %}
@@ -23,32 +23,34 @@
           {% comment %} The address on its own line, because it is the subject of the row
              and the long thing in it; the name and the controls share the line under.
           {% endcomment %}
-          <div class="mb-3">
-            <label class="field-label" for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
-            {{ row.url|add_class:"field-input" }}
+          <div class="field mb-3">
+            <label for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
+            {{ row.url }}
           </div>
           <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-            <div>
-              <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
-              {{ row.label|add_class:"field-input" }}
+            <div class="field">
+              <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
+              {{ row.label }}
             </div>
             <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
               <label class="inline-flex items-center gap-2 py-1.5">
-                <input type="radio" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
+                <input type="radio" class="input" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
                        {% if row.instance.is_primary %}checked{% endif %}>
                 <span>{% translate "Primary" %}</span>
               </label>
               {% if row.instance.pk %}
                 <label class="inline-flex items-center gap-2 py-1.5">
-                  {{ row.DELETE }} <span>{% translate "Remove" %}</span>
+                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
                 </label>
               {% endif %}
             </div>
           </div>
-          {% for field in row.visible_fields %}
-            <c-field-feedback :field="field" />
-          {% endfor %}
-          {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+          <div class="field">
+            {% for field in row.visible_fields %}
+              <c-field-feedback :field="field" />
+            {% endfor %}
+            {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
+          </div>
         </li>
       {% endfor %}
     </ol>

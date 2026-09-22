@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Form rows are Basecoat's field family: a label, a box, help and errors in one structure, checkboxes and radios drawn by the stylesheet, and the flag choosers as input groups; the four `field-*` classes are gone. (#290)
 - CI runs the suite on every core with the browser group left out, measures coverage on one leg against a floor, pins uv, zizmor and pip-audit, and refuses a release or an image unless CI passed on the tagged commit; a monthly workflow proposes lock-file upgrades. (#233)
 - The pages that grew with the size of a search no longer do: search, the board, the companies table, the listings tabs, the report, the figures and bulk tagging each do a fixed amount of work whatever you have recorded. (#231)
 - A table's filters live in the column headers: click a column's name to open its filter, and only the ones in use are on screen. **Sorting moved to an icon beside the name**, since the name is now the filter. (#253)

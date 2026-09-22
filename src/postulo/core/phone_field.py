@@ -39,10 +39,9 @@ class PhoneWidget(forms.MultiWidget):
         ]
         super().__init__(
             widgets=[
-                forms.Select(choices=choices, attrs={"class": "field-input"}),
+                forms.Select(choices=choices),
                 forms.TextInput(
                     attrs={
-                        "class": "field-input",
                         "inputmode": "tel",
                         "autocomplete": "tel",
                         **(attrs or {}),

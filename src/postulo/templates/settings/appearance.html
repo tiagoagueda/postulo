@@ -1,5 +1,5 @@
 {% extends "settings/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <c-page-title>
@@ -13,16 +13,16 @@
     {% csrf_token %}
     <div class="card mb-6">
       <fieldset{% if form.theme.aria_describedby %} aria-describedby="{{ form.theme.aria_describedby }}"{% endif %}>
-        <legend class="field-label mb-3">{{ form.theme.label }}</legend>
+        <legend class="label mb-3">{{ form.theme.label }}</legend>
         <div class="space-y-2">
-          {% for choice in form.theme %}
+          {% for choice in form.theme|widgets_classed:"input" %}
             <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
               {{ choice.tag }}
               <span>{{ choice.choice_label }}</span>
             </label>
           {% endfor %}
         </div>
-        <c-field-feedback :field="form.theme" />
+        <div class="field"><c-field-feedback :field="form.theme" /></div>
       </fieldset>
     </div>
     <div class="card mb-6">
@@ -30,34 +30,34 @@
          is the same kind of choice -- what the interface looks like to you -- and because
          somebody who wants more rows on a screen comes looking here. {% endcomment %}
       <fieldset{% if form.density.aria_describedby %} aria-describedby="{{ form.density.aria_describedby }}"{% endif %}>
-        <legend class="field-label mb-1">{{ form.density.label }}</legend>
+        <legend class="label mb-1">{{ form.density.label }}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.density.auto_id }}_helptext">{{ form.density.help_text }}</p>
         <div class="space-y-2">
-          {% for choice in form.density %}
+          {% for choice in form.density|widgets_classed:"input" %}
             <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
               {{ choice.tag }}
               <span>{{ choice.choice_label }}</span>
             </label>
           {% endfor %}
         </div>
-        <c-field-feedback :field="form.density" errors-only />
+        <div class="field"><c-field-feedback :field="form.density" errors-only /></div>
       </fieldset>
     </div>
     <div class="card mb-6">
       <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
-        <legend class="field-label mb-1">{{ form.navigation.label }}</legend>
+        <legend class="label mb-1">{{ form.navigation.label }}</legend>
         {% comment %} The help sits above the choices here rather than under them, so it keeps its
            own place and takes the id the fieldset points at (#114). {% endcomment %}
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.navigation.auto_id }}_helptext">{{ form.navigation.help_text }}</p>
         <div class="grid gap-2 sm:grid-cols-2">
-          {% for choice in form.navigation %}
+          {% for choice in form.navigation|widgets_classed:"input" %}
             <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
               {{ choice.tag }}
               <span>{{ choice.choice_label }}</span>
             </label>
           {% endfor %}
         </div>
-        <c-field-feedback :field="form.navigation" errors-only />
+        <div class="field"><c-field-feedback :field="form.navigation" errors-only /></div>
       </fieldset>
     </div>
     <div class="card mb-6">

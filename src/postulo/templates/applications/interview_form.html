@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% if form.instance.pk %}{% translate "Edit interview" %}{% else %}{% translate "Schedule an interview" %}{% endif %}{% endblock %}
 
@@ -30,15 +30,15 @@
         <c-field :field="form.location" />
         {% if form.contacts.field.queryset %}
           <fieldset class="mb-4" {% if form.contacts.aria_describedby %}aria-describedby="{{ form.contacts.aria_describedby }}"{% endif %}>
-            <legend class="field-label">{{ form.contacts.label }}</legend>
+            <legend class="label">{{ form.contacts.label }}</legend>
             <div class="flex flex-col gap-1 text-sm">
-              {% for checkbox in form.contacts %}
+              {% for checkbox in form.contacts|widgets_classed:"input" %}
                 <label class="flex items-center gap-2">
                   {{ checkbox.tag }} <span>{{ checkbox.choice_label }}</span>
                 </label>
               {% endfor %}
             </div>
-            <c-field-feedback :field="form.contacts" />
+            <div class="field"><c-field-feedback :field="form.contacts" /></div>
           </fieldset>
         {% else %}
           <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">

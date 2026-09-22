@@ -27,6 +27,7 @@ TEMPLATES = Path(__file__).resolve().parents[1] / "src" / "postulo" / "templates
 class NameForm(forms.Form):
     name = forms.CharField(help_text="As it appears on your passport.")
     note = forms.CharField(required=False)
+    agreed = forms.BooleanField(required=False, help_text="Tick to agree.")
 
 
 def render(source: str, **context) -> str:
@@ -52,22 +53,43 @@ def with_templates_in(settings, directory: Path) -> None:
 
 
 def test_a_field_is_its_label_widget_help_and_errors():
+    """Basecoat's shape (#290): a `.field` holding a bare label and a bare control, the help
+    a paragraph and the errors an alert, and `data-invalid` on the row when it has any."""
     form = NameForm(data={})  # bound and empty: the required field has an error
     html = render('{% cotton field :field="form.name" / %}', form=form)
 
-    assert '<label class="field-label" for="id_name">' in html
+    assert '<div class="field mb-4 wrap-anywhere" data-invalid="true">' in html
+    assert '<label for="id_name">' in html
     assert '<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>' in html, (
         "required"
     )
-    assert 'name="name"' in html and 'class="field-input"' in html
-    assert '<p class="field-help" id="id_name_helptext">As it appears on your passport.</p>' in html
+    assert (
+        'name="name"' in html
+        and "field-input" not in html
+        and 'class="' not in html.split("<input", 1)[1].split(">", 1)[0]
+    ), "the control carries no class; the stylesheet keys on the wrapper"
+    assert '<p id="id_name_helptext">As it appears on your passport.</p>' in html
     assert '<div id="id_name_error" role="alert">' in html
-    assert '<p class="field-error">This field is required.</p>' in html
+    assert "<p>This field is required.</p>" in html
 
 
 def test_an_optional_field_has_no_asterisk_and_no_error_block():
     html = render('{% cotton field :field="form.note" / %}', form=NameForm())
-    assert "*" not in html and 'role="alert"' not in html and "field-help" not in html
+    assert "*" not in html and 'role="alert"' not in html and "helptext" not in html
+    assert "data-invalid" not in html
+
+
+def test_a_checkbox_lies_the_other_way():
+    """Box first, then the label beside it with the help under the label: what the settings
+    pages used to build by hand, and Basecoat's `horizontal` orientation (#290)."""
+    html = render('{% cotton field :field="form.agreed" / %}', form=NameForm())
+
+    assert '<div class="field mb-4 wrap-anywhere" data-orientation="horizontal">' in html
+    box = html.index('type="checkbox"')
+    label = html.index('<label for="id_agreed">')
+    assert box < label, "the box comes first"
+    assert "<section>" in html and '<p id="id_agreed_helptext">Tick to agree.</p>' in html
+    assert "*" not in html, "a checkbox is never marked required with an asterisk"
 
 
 def test_feedback_can_leave_the_help_to_the_caller():
@@ -76,8 +98,8 @@ def test_feedback_can_leave_the_help_to_the_caller():
     with_help = render('{% cotton field-feedback :field="form.name" / %}', form=form)
     without = render('{% cotton field-feedback :field="form.name" errors-only / %}', form=form)
 
-    assert "field-help" in with_help
-    assert "field-help" not in without and 'id="id_name_error"' in without
+    assert 'id="id_name_helptext"' in with_help
+    assert "helptext" not in without and 'id="id_name_error"' in without
 
 
 def test_no_template_includes_a_retired_partial():

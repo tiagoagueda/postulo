@@ -142,29 +142,62 @@
   <!-- ------------------------------------------------------------------- fields -->
   <section id="design-fields" class="mb-10" aria-labelledby="design-fields-heading">
     <h2 id="design-fields-heading" class="mb-3 font-medium">{% translate "Fields" %}</h2>
+    {% comment %} Basecoat's form family (#290): a row is a `.field` with an ordinary label
+       and an ordinary control, nothing carrying a class; `data-invalid` reddens the row; a
+       checkbox lies the other way, box first; a flag beside a chooser is an `input-group`. {% endcomment %}
     <div class="card grid gap-4 sm:grid-cols-2">
-      <div>
-        <label class="field-label" for="design-text">{% translate "A text field" %}</label>
-        <input type="text" id="design-text" class="field-input w-full" value="{% translate 'What somebody typed' %}">
-        <p class="field-help">{% translate "Help under a field says what it is for." %}</p>
+      <div class="field">
+        <label for="design-text">{% translate "A text field" %}</label>
+        <input type="text" id="design-text" value="{% translate 'What somebody typed' %}">
+        <p>{% translate "Help under a field says what it is for." %}</p>
       </div>
-      <div>
-        <label class="field-label" for="design-select">{% translate "A choice" %}</label>
-        <select id="design-select" class="field-input w-full">
+      <div class="field">
+        <label for="design-select">{% translate "A choice" %}</label>
+        <select id="design-select">
           <option>{% translate "The first" %}</option>
           <option>{% translate "The second" %}</option>
         </select>
       </div>
-      <div>
-        <label class="field-label" for="design-refused">{% translate "A field that was refused" %}</label>
-        <input type="text" id="design-refused" class="field-input w-full" aria-invalid="true"
+      <div class="field" data-invalid="true">
+        <label for="design-refused">{% translate "A field that was refused" %}</label>
+        <input type="text" id="design-refused" aria-invalid="true"
                aria-describedby="design-refused-error" value="not-an-address">
-        <p class="field-error" id="design-refused-error">{% translate "That is not an address Postulo can use." %}</p>
+        <div id="design-refused-error" role="alert"><p>{% translate "That is not an address Postulo can use." %}</p></div>
       </div>
-      <div>
-        <label class="field-label" for="design-disabled">{% translate "A field nobody may change" %}</label>
-        <input type="text" id="design-disabled" class="field-input w-full" value="{% translate 'Set by the operator' %}" disabled>
+      <div class="field">
+        <label for="design-disabled">{% translate "A field nobody may change" %}</label>
+        <input type="text" id="design-disabled" value="{% translate 'Set by the operator' %}" disabled>
       </div>
+      <div class="field">
+        <label for="design-textarea">{% translate "A longer answer" %}</label>
+        <textarea id="design-textarea" rows="2">{% translate "A box that grows with what is typed into it." %}</textarea>
+      </div>
+      <div class="field">
+        <label for="design-grouped">{% translate "A chooser with a flag beside it" %}</label>
+        <div class="input-group">
+          <span data-align="start">{% flag "PT" %}</span>
+          <select id="design-grouped">
+            <option>{% translate "Portugal" %}</option>
+            <option>{% translate "Somewhere else" %}</option>
+          </select>
+        </div>
+      </div>
+      <div class="field" data-orientation="horizontal">
+        <input type="checkbox" id="design-checkbox" checked>
+        <section>
+          <label for="design-checkbox">{% translate "A yes-or-no question" %}</label>
+          <p>{% translate "The box first, the question beside it, and what it means under that." %}</p>
+        </section>
+      </div>
+      <fieldset class="field">
+        <legend class="label">{% translate "One of a few" %}</legend>
+        <label class="flex items-center gap-2 text-sm font-normal text-ink-800 dark:text-ink-200">
+          <input type="radio" class="input" name="design-radio" checked> {% translate "The first" %}
+        </label>
+        <label class="flex items-center gap-2 text-sm font-normal text-ink-800 dark:text-ink-200">
+          <input type="radio" class="input" name="design-radio"> {% translate "The second" %}
+        </label>
+      </fieldset>
     </div>
   </section>
 

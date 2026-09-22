@@ -168,6 +168,10 @@ def test_the_style_pack_reaches_the_page():
     assert '.btn[data-variant="outline"]' in compiled
     assert '.btn[data-size="icon-xs"]' in compiled
     assert "--color-primary: var(--color-brand-600)" in compiled
+    # The form family (#290): structure from field.css, paint from the pack, one selector.
+    assert ".field {" in compiled and ".field > label" in compiled
+    assert '.field[data-orientation="horizontal"]' in compiled
+    assert ".input-group {" in compiled
 
 
 def test_the_parser_knows_a_definition_from_a_use():

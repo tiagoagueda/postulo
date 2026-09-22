@@ -80,10 +80,10 @@
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
       <input type="hidden" name="action" value="save">
-      <div class="min-w-0 flex-1">
-        <label for="view-name-{{ table.name }}" class="field-label">{% translate "Keep this view as" %}</label>
+      <div class="field min-w-0 flex-1">
+        <label for="view-name-{{ table.name }}">{% translate "Keep this view as" %}</label>
         <input type="text" id="view-name-{{ table.name }}" name="name" maxlength="60" required
-               class="field-input w-full px-2 py-1 text-sm" placeholder="{% translate 'Quiet for three weeks' %}">
+               class="w-full px-2 py-1 text-sm" placeholder="{% translate 'Quiet for three weeks' %}">
       </div>
       <button type="submit" class="btn" data-size="xs">{% translate "Keep" %}</button>
     </form>

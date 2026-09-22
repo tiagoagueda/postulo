@@ -13,16 +13,12 @@
     {% csrf_token %}
     <div class="card mb-6">
       <h2 class="mb-1 font-medium">{% translate "Your career" %}</h2>
-      {% comment %} The number, for somebody who cannot use the arrows (#203). The help is
-         drawn here rather than by the feedback partial, so it carries the id the checkbox's
-         `aria-describedby` names (#207) -- and outside the label, so the name says what the
-         box is and the description says why. Moved here from Appearance (#281). {% endcomment %}
-      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-        {{ form.show_career_order }}
-        <span>{{ form.show_career_order.label }}</span>
-      </label>
-      <p class="field-help" id="{{ form.show_career_order.auto_id }}_helptext">{{ form.show_career_order.help_text }}</p>
-      <c-field-feedback :field="form.show_career_order" errors-only />
+      {% comment %} The number, for somebody who cannot use the arrows (#203). A checkbox
+         through `<c-field>` is the box, then the label beside it with the help under the
+         label (#290) -- the help carries the id the checkbox's `aria-describedby` names
+         (#207), and it is outside the label, so the name says what the box is and the
+         description says why. Moved here from Appearance (#281). {% endcomment %}
+      <c-field :field="form.show_career_order" />
     </div>
 
     <div class="card mb-6">
@@ -31,12 +27,7 @@
          straight away, and somebody dictating to their computer presses every letter of the
          sentence (#227). Moved here from Appearance (#281). {% endcomment %}
       <h2 class="mb-1 font-medium">{% translate "Keyboard shortcuts" %}</h2>
-      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-        {{ form.keyboard_shortcuts }}
-        <span>{{ form.keyboard_shortcuts.label }}</span>
-      </label>
-      <p class="field-help" id="{{ form.keyboard_shortcuts.auto_id }}_helptext">{{ form.keyboard_shortcuts.help_text }}</p>
-      <c-field-feedback :field="form.keyboard_shortcuts" errors-only />
+      <c-field :field="form.keyboard_shortcuts" />
     </div>
 
     <div class="card mb-6">
@@ -45,12 +36,7 @@
          current page is still marked by something that is not colour, and forced colours
          underline it regardless (#289). {% endcomment %}
       <h2 class="mb-1 font-medium">{% translate "Navigation" %}</h2>
-      <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-        {{ form.nav_underline }}
-        <span>{{ form.nav_underline.label }}</span>
-      </label>
-      <p class="field-help" id="{{ form.nav_underline.auto_id }}_helptext">{{ form.nav_underline.help_text }}</p>
-      <c-field-feedback :field="form.nav_underline" errors-only />
+      <c-field :field="form.nav_underline" />
     </div>
 
     <button type="submit" class="btn">{% translate "Save" %}</button>

@@ -25,7 +25,7 @@
        and closes itself with no script at all, and the radios inside submit either way.
     {% endcomment %}
     <fieldset class="card mb-6" {% if form.language.aria_describedby %}aria-describedby="{{ form.language.aria_describedby }}"{% endif %}>
-      <legend class="field-label mb-1">{{ form.language.label }}</legend>
+      <legend class="label mb-1">{{ form.language.label }}</legend>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Each is written in itself, so you can find yours without reading this one." %}
       </p>
@@ -55,7 +55,7 @@
                 {% for option in group.options %}
                   <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
                                 hover:bg-ink-100 dark:hover:bg-ink-800">
-                    <input type="radio" name="language" value="{{ option.code }}"
+                    <input type="radio" class="input" name="language" value="{{ option.code }}"
                            {% if option.selected %}checked{% endif %}>
                     {% comment %} Decorative: the name beside it already says which language
                        this is, and "Greek flag, Ελληνικά" is worse than silence. An image
@@ -96,7 +96,7 @@
         </span>
       </p>
 
-      <c-field-feedback :field="form.language" />
+      <div class="field"><c-field-feedback :field="form.language" /></div>
     </fieldset>
 
     <div class="card mb-6">

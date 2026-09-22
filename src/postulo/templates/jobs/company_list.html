@@ -79,10 +79,10 @@
   <form method="get" id="company-filters" class="mb-6 flex flex-wrap items-end gap-3"
         hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
         hx-target="#companies-table" hx-swap="outerHTML" hx-push-url="true">
-    <div>
-      <label class="field-label" for="company-q">{% translate "Search" %}</label>
+    <div class="field w-auto">
+      <label for="company-q">{% translate "Search" %}</label>
       <input type="search" id="company-q" name="q" value="{{ search }}"
-             placeholder="{% translate 'Name, location or industry' %}" class="field-input w-72">
+             placeholder="{% translate 'Name, location or industry' %}" class="w-72">
     </div>
     <button type="submit" class="btn" data-variant="outline">{% translate "Apply" %}</button>
     {% if table.filters_active %}

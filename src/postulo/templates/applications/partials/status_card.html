@@ -21,12 +21,12 @@
         hx-target="#status-card" hx-swap="outerHTML"
         class="flex flex-wrap items-end gap-3">
     {% csrf_token %}
-    <div>
-      <label class="field-label" for="id_status">{% translate "Status" %}</label>
+    <div class="field w-auto">
+      <label for="id_status">{% translate "Status" %}</label>
       {{ status_form.status }}
     </div>
-    <div class="min-w-64 flex-1">
-      <label class="field-label" for="id_note">{% translate "Note (optional)" %}</label>
+    <div class="field min-w-64 flex-1">
+      <label for="id_note">{% translate "Note (optional)" %}</label>
       {{ status_form.note }}
     </div>
     <button type="submit" class="btn">{% translate "Record" %}</button>

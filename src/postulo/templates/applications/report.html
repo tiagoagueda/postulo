@@ -50,35 +50,35 @@
     <fieldset>
       <legend class="mb-3 font-medium">{% translate "Which period" %}</legend>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <label class="field-label" for="report-period">{% translate "Kind" %}</label>
-          <select name="period" id="report-period" class="field-input">
+        <div class="field">
+          <label for="report-period">{% translate "Kind" %}</label>
+          <select name="period" id="report-period">
             <option value="month" {% if kind == 'month' %}selected{% endif %}>{% translate "A month" %}</option>
             <option value="quarter" {% if kind == 'quarter' %}selected{% endif %}>{% translate "A quarter" %}</option>
             <option value="weeks" {% if kind == 'weeks' %}selected{% endif %}>{% translate "The last few weeks" %}</option>
             <option value="custom" {% if kind == 'custom' %}selected{% endif %}>{% translate "Dates you choose" %}</option>
           </select>
         </div>
-        <div>
-          <label class="field-label" for="report-month">{% translate "Month" %}</label>
-          <input type="month" name="on" id="report-month" value="{{ on_month }}" class="field-input">
+        <div class="field">
+          <label for="report-month">{% translate "Month" %}</label>
+          <input type="month" name="on" id="report-month" value="{{ on_month }}">
           <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
             {% translate "Used for a month, and for the quarter that month falls in." %}
           </p>
         </div>
-        <div>
-          <label class="field-label" for="report-from">{% translate "From" %}</label>
-          <input type="date" name="from" id="report-from" value="{{ period.start|date:'Y-m-d' }}" class="field-input">
+        <div class="field">
+          <label for="report-from">{% translate "From" %}</label>
+          <input type="date" name="from" id="report-from" value="{{ period.start|date:'Y-m-d' }}">
         </div>
-        <div>
-          <label class="field-label" for="report-to">{% translate "To" %}</label>
-          <input type="date" name="to" id="report-to" value="{{ period.end|date:'Y-m-d' }}" class="field-input">
+        <div class="field">
+          <label for="report-to">{% translate "To" %}</label>
+          <input type="date" name="to" id="report-to" value="{{ period.end|date:'Y-m-d' }}">
         </div>
       </div>
       <div class="mt-4 flex flex-wrap items-center gap-3">
-        <div>
-          <label class="field-label" for="report-weeks">{% translate "How many weeks" %}</label>
-          <select name="weeks" id="report-weeks" class="field-input">
+        <div class="field w-auto">
+          <label for="report-weeks">{% translate "How many weeks" %}</label>
+          <select name="weeks" id="report-weeks">
             {% for choice in week_choices %}
               <option value="{{ choice }}" {% if choice == weeks %}selected{% endif %}>{{ choice }}</option>
             {% endfor %}

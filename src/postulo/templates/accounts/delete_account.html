@@ -49,14 +49,16 @@
     <form method="post" novalidate class="card border-red-300 dark:border-red-900" data-delete-account>
       {% csrf_token %}
       <h2 class="mb-2 font-medium text-red-700 dark:text-red-400">{% translate "Then delete" %}</h2>
-      <label class="field-label" for="id_confirm_email">
-        {% blocktranslate trimmed with email=user.email %}
-          Type your address, {{ email }}, to confirm
-        {% endblocktranslate %}
-      </label>
-      <input type="email" id="id_confirm_email" name="confirm_email" class="field-input mb-2"
-             autocomplete="off" {% if last_administrator %}disabled{% endif %}>
-      {% if error %}<p class="field-error mb-2">{{ error }}</p>{% endif %}
+      <div class="field mb-2"{% if error %} data-invalid="true"{% endif %}>
+        <label for="id_confirm_email">
+          {% blocktranslate trimmed with email=user.email %}
+            Type your address, {{ email }}, to confirm
+          {% endblocktranslate %}
+        </label>
+        <input type="email" id="id_confirm_email" name="confirm_email"
+               autocomplete="off" {% if last_administrator %}disabled{% endif %}>
+        {% if error %}<div role="alert"><p>{{ error }}</p></div>{% endif %}
+      </div>
       <button type="submit" class="btn" data-variant="destructive" {% if last_administrator %}disabled{% endif %}>
         {% translate "Delete my account and everything in it" %}
       </button>

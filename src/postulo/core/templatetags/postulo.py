@@ -357,6 +357,22 @@ def add_class(field: BoundField, css_classes: str) -> BoundField:
 
 
 @register.filter
+def widgets_classed(field: BoundField, css_classes: str) -> BoundField:
+    """The same field, with a class on every input its widget renders.
+
+    ``add_class`` renders the field; this one hands it back, for the templates that
+    iterate a choice widget's subwidgets (``{% for choice in form.theme %}``) and draw each
+    ``choice.tag`` inside a label of their own. A radio or a checkbox is drawn by the
+    stylesheet only when it says ``class="input"`` -- Basecoat's structure is keyed on that
+    or on being inside a ``.field``, and a tag drawn in a loop is neither (#290). The widget
+    is the form's own copy, so the attribute reaches nothing but this render.
+    """
+    attrs = field.field.widget.attrs
+    attrs["class"] = f"{attrs.get('class', '')} {css_classes}".strip()
+    return field
+
+
+@register.filter
 def file_name(value) -> str:
     """The name of a stored file, without the path Postulo keeps it at.
 
@@ -387,7 +403,7 @@ def pinned_field(field: BoundField, variable: str) -> dict:
     this is what an honest page looks like, not what stops a hand-written POST.
     """
     described_by = f"pinned-{field.name}"
-    attrs = {"class": "field-input", "readonly": True, "aria-describedby": described_by}
+    attrs = {"readonly": True, "aria-describedby": described_by}
     if isinstance(field.field.widget, Select):
         value = field.value()
         shown = dict(field.field.widget.choices).get(value, value)

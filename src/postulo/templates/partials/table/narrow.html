@@ -18,13 +18,13 @@
     <div class="mt-3 grid gap-3">
       {% for header in table.headers %}
         {% if header.column.filter == 'text' or header.column.filter == 'choice' %}
-          <div>
-            <label class="field-label" for="{{ header.input_id }}-narrow">{{ header.label }}</label>
+          <div class="field">
+            <label for="{{ header.input_id }}-narrow">{{ header.label }}</label>
             <c-table.filter :header="header" suffix="-narrow" labelled />
           </div>
         {% elif header.column.filter %}
           <fieldset>
-            <legend class="field-label">{{ header.label }}</legend>
+            <legend class="label">{{ header.label }}</legend>
             <c-table.filter :header="header" suffix="-narrow" />
           </fieldset>
         {% endif %}

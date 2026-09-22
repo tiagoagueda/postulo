@@ -28,12 +28,14 @@
           class="inline-block align-top" data-cell-editor>
       {% csrf_token %}
       <input type="hidden" name="stamp" value="{{ stamp }}">
-      <label class="sr-only" for="{{ field.id_for_label }}">{{ column.label }}</label>
-      {{ field|add_class:"field-input" }}
-      {% comment %} The same partial every other field uses, and it already carries
-         `role="alert"` for exactly this: an error inserted into a live page by a swap. A
-         second announcement here would be the same sentence twice. {% endcomment %}
-      <c-field-feedback :field="field" />
+      <div class="field"{% if field.errors %} data-invalid="true"{% endif %}>
+        <label class="sr-only" for="{{ field.id_for_label }}">{{ column.label }}</label>
+        {{ field }}
+        {% comment %} The same partial every other field uses, and it already carries
+           `role="alert"` for exactly this: an error inserted into a live page by a swap. A
+           second announcement here would be the same sentence twice. {% endcomment %}
+        <c-field-feedback :field="field" />
+      </div>
       <span class="mt-1 flex items-center gap-2">
         <button type="submit" class="btn" data-size="xs">{% translate "Save" %}</button>
         <button type="button" class="btn" data-variant="ghost" data-size="xs"

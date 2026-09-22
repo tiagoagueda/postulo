@@ -10,7 +10,7 @@
    adding their first two numbers is choosing between rows that do not have keys yet.
 {% endcomment %}
 <fieldset class="card mb-6" data-phone-numbers id="section-phones">
-  <legend class="field-label px-1">{% translate "Telephone numbers" %}</legend>
+  <legend class="label px-1">{% translate "Telephone numbers" %}</legend>
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
       A mobile, a desk line, a switchboard — as many as are worth keeping, with one of
@@ -30,20 +30,20 @@
            a few pixels wide -- unusable, and a WCAG 2.2 2.5.8 target-size failure that axe
            catches. The number is the subject of the row anyway.
         {% endcomment %}
-        <div class="mb-3">
-          <label class="field-label" for="{{ row.number.id_for_label }}">{% translate "Phone" %}</label>
+        <div class="field mb-3">
+          <label for="{{ row.number.id_for_label }}">{% translate "Phone" %}</label>
           {{ row.number }}
         </div>
         {% comment %} The name box only when the kind is Other, following the select without a
            script; kept whatever the kind while it holds something (#284). {% endcomment %}
         <div class="name-if-other-row-short grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
-          <div>
-            <label class="field-label" for="{{ row.kind.id_for_label }}">{% translate "Kind" %}</label>
-            {{ row.kind|add_class:"field-input" }}
+          <div class="field">
+            <label for="{{ row.kind.id_for_label }}">{% translate "Kind" %}</label>
+            {{ row.kind }}
           </div>
-          <div data-name-if-other>
-            <label class="field-label" for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
-            {{ row.label|add_class:"field-input" }}
+          <div class="field" data-name-if-other>
+            <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
+            {{ row.label }}
           </div>
           {% comment %} Two controls side by side, each its own hit area with room around
              it: WCAG 2.2 2.5.8 wants 24 by 24, and a radio touching a checkbox is one
@@ -52,7 +52,7 @@
           {% endcomment %}
           <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
             <label class="inline-flex items-center gap-2 py-1.5">
-              <input type="radio" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
+              <input type="radio" class="input" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
                      {% if row.instance.is_primary %}checked{% endif %}>
               <span>{% translate "Primary" %}</span>
             </label>
@@ -64,7 +64,7 @@
                control (#143). {% endcomment %}
             {% if numbers.recovery_can_be_chosen %}
               <label class="inline-flex items-center gap-2 py-1.5" data-recovery-choice>
-                <input type="radio" name="{{ numbers.prefix }}-recovery" value="{{ row.prefix }}"
+                <input type="radio" class="input" name="{{ numbers.prefix }}-recovery" value="{{ row.prefix }}"
                        {% if row.instance.is_recovery %}checked{% endif %}
                        {% if not row.instance.is_verified %}disabled{% endif %}>
                 <span>
@@ -78,15 +78,17 @@
             {% endif %}
             {% if row.instance.pk %}
               <label class="inline-flex items-center gap-2 py-1.5">
-                {{ row.DELETE }} <span>{% translate "Remove" %}</span>
+                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
               </label>
             {% endif %}
           </div>
         </div>
-        {% for field in row.visible_fields %}
-          <c-field-feedback :field="field" />
-        {% endfor %}
-        {% for error in row.non_field_errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+        <div class="field">
+          {% for field in row.visible_fields %}
+            <c-field-feedback :field="field" />
+          {% endfor %}
+          {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
+        </div>
       </li>
     {% endfor %}
   </ol>

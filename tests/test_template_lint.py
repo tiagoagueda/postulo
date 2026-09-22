@@ -158,6 +158,48 @@ def test_the_script_names_no_retired_button_class_either():
     assert not RETIRED_BUTTON.search(script.read_text(encoding="utf-8"))
 
 
+# ------------------------------------------------------- a field row by its old name
+
+#: The four classes a form row was drawn with before it became Basecoat's `.field` (#290):
+#: a wrapper holding a bare label and a bare control, the help a paragraph and the errors
+#: an alert, keyed on the elements rather than on a class each. Gone from the stylesheet,
+#: so a template that still says one draws an unlabelled box; this says so before a page
+#: does. A legend or a heading that wants a label's look says `label`, Basecoat's own.
+RETIRED_FIELD = re.compile(r"(?<![-\w])field-(?:input|label|help|error)(?![-\w])")
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_names_a_retired_field_class(path: Path):
+    text = path.read_text(encoding="utf-8")
+    found = [text.count("\n", 0, m.start()) + 1 for m in RETIRED_FIELD.finditer(text)]
+    assert not found, (
+        f"{path.name}: a retired field class at line(s) {found}. Wrap the row in "
+        '`<div class="field">` with a bare <label> and a bare control -- `<c-field>` does -- '
+        "and write `label` on a legend that wants the look."
+    )
+
+
+def test_nothing_else_names_a_retired_field_class_either():
+    root = Path(__file__).resolve().parents[1]
+    for path in (
+        root / "src" / "postulo" / "static" / "js" / "app.js",
+        root / "assets" / "css" / "app.css",
+        root / "assets" / "css" / "basecoat.css",
+    ):
+        text = re.sub(r"/\*.*?\*/", "", path.read_text(encoding="utf-8"), flags=re.DOTALL)
+        assert not RETIRED_FIELD.search(text), path.name
+
+
+def test_the_field_detector_knows_the_difference():
+    assert RETIRED_FIELD.search('class="field-input w-64"')
+    assert RETIRED_FIELD.search('<legend class="field-label">')
+    assert not RETIRED_FIELD.search('class="field mb-4"')
+    assert not RETIRED_FIELD.search('data-field-inputs="3"')
+    assert not RETIRED_FIELD.search("field-separator")
+
+
 # ----------------------------------------------------- a box that scrolls on purpose
 
 #: A scroll utility on its own. `.scroll-x` in the stylesheet is the same thing made safe.

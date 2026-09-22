@@ -400,7 +400,7 @@ def test_every_language_says_which_language_it_is_in(client, user):
     client.force_login(user)
     html = client.get(reverse("settings:locale")).content.decode()
 
-    rows = re.findall(r'<input type="radio" name="language" value="([^"]*)"', html)
+    rows = re.findall(r'<input type="radio" class="input" name="language" value="([^"]*)"', html)
     assert len(rows) > 20, "the whole list is there"
 
     for code in rows:

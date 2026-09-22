@@ -17,26 +17,15 @@
 
     <div class="card mb-4">
       <c-field :field="form.label" />
-      <label class="flex items-center gap-3 text-sm">
-        {{ form.enabled }}
-        <span>{{ form.enabled.label }}</span>
-      </label>
+      <c-field :field="form.enabled" />
     </div>
 
     <div class="card mb-6"{{ plugin_attributes }}>
       <h2 class="mb-4 font-medium">{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</h2>
+      {% comment %} A checkbox comes out as a horizontal field, box first, and everything
+         else as a column; the component knows which (#290). {% endcomment %}
       {% for field in form.plugin_fields %}
-        {% if field.field.widget.input_type == "checkbox" %}
-          <div class="mb-4">
-            <label class="flex items-center gap-3 text-sm">
-              {{ field }}
-              <span>{{ field.label }}</span>
-            </label>
-            <c-field-feedback :field="field" />
-          </div>
-        {% else %}
-          <c-field :field="field" />
-        {% endif %}
+        <c-field :field="field" />
       {% endfor %}
     </div>
 
@@ -68,9 +57,9 @@
       {% comment %} Shown rather than described. An operator registering this by hand needs
          the exact string, and building one from a template is where it goes wrong. {% endcomment %}
       <div class="mb-4">
-        <p class="field-label">{% translate "Register this address with the provider" %}</p>
+        <p class="label">{% translate "Register this address with the provider" %}</p>
         <p class="break-all font-mono text-sm" data-consent-callback>{{ consent_callback }}</p>
-        <p class="field-help">
+        <p class="text-xs text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed %}
             Exactly as it appears, including the scheme and any port. If this instance moves,
             register the new one before anybody tries to connect again.
@@ -79,7 +68,7 @@
       </div>
 
       <div class="mb-4">
-        <p class="field-label">{% translate "What is being asked for" %}</p>
+        <p class="label">{% translate "What is being asked for" %}</p>
         <ul class="list-disc space-y-1 ps-5 text-sm text-ink-500 dark:text-ink-400">
           {% for scope in consent.scopes %}<li><code class="text-xs">{{ scope }}</code></li>{% endfor %}
         </ul>

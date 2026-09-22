@@ -15,7 +15,7 @@
       {% for row in table.chooser %}
         <li class="flex items-center gap-2">
           <input type="hidden" name="order" value="{{ row.column.key }}">
-          <input type="checkbox" id="column-{{ table.name }}-{{ row.column.key }}" name="show"
+          <input type="checkbox" class="input" id="column-{{ table.name }}-{{ row.column.key }}" name="show"
                  value="{{ row.column.key }}" {% if row.shown %}checked{% endif %}>
           {% comment %} The label is the target that has to reach 24 pixels: the checkbox beside
              it is 13×13 whatever anybody does, and a label that activates it counts
@@ -37,7 +37,7 @@
     </ul>
     <div class="mb-3 flex items-center gap-2 text-sm">
       <label for="page-size-{{ table.name }}">{% translate "Rows per page" %}</label>
-      <select id="page-size-{{ table.name }}" name="page_size" class="field-input w-20 px-2 py-1 text-xs">
+      <select id="page-size-{{ table.name }}" name="page_size" class="w-20 px-2 py-1 text-xs">
         {% for size in page_sizes %}
           <option value="{{ size }}" {% if size == table.page_size %}selected{% endif %}>{{ size }}</option>
         {% endfor %}

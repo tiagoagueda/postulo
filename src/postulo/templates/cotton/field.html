@@ -10,6 +10,14 @@
    would read out of its context. The `<c-vars>` line above is the whole contract: what this
    takes, and nothing else it reads.
 
+   The shape is Basecoat's `field` (#290): a `.field` holding an ordinary <label> and an
+   ordinary control, with nothing on either carrying a class -- the stylesheet keys on the
+   elements inside the wrapper. `data-invalid` marks the whole row when the field has
+   errors, so the label goes red with them. A checkbox is the other shape, `horizontal`:
+   the box first, then a <section> with the label beside it and the help and errors under
+   the label, which is how a yes-or-no question reads and what the settings pages used to
+   build by hand, one `flex items-center` at a time.
+
    A widget carrying a `list` attribute gets its `<datalist>` drawn here, from the form's
    `datalists` -- so a field that suggests what somebody has already recorded (#261) is one
    line in the form, and the three templates that render it need to know nothing. A form
@@ -22,22 +30,32 @@
    320-pixel screen leaves, in every language, which is what ran the upload form off a phone
    (#167). The path is gone (#191); a long name still cannot break.
 {% endcomment %}
-<div class="mb-4 wrap-anywhere">
-  <label class="field-label" for="{{ field.id_for_label }}">
-    {{ field.label }}
-    {% if field.field.required %}<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>{% endif %}
-  </label>
-  {{ field|add_class:"field-input" }}
-  {% with list_id=field.field.widget.attrs.list %}
-    {% if list_id %}
-      {% with options=field.form.datalists|get_item:list_id %}
-        {% if options %}
-          <datalist id="{{ list_id }}">
-            {% for value in options %}<option value="{{ value }}">{% endfor %}
-          </datalist>
-        {% endif %}
-      {% endwith %}
-    {% endif %}
-  {% endwith %}
-  <c-field-feedback :field="field" />
-</div>
+{% if field.field.widget.input_type == "checkbox" and not field.field.widget.choices %}
+  <div class="field mb-4 wrap-anywhere" data-orientation="horizontal"{% if field.errors %} data-invalid="true"{% endif %}>
+    {{ field }}
+    <section>
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      <c-field-feedback :field="field" />
+    </section>
+  </div>
+{% else %}
+  <div class="field mb-4 wrap-anywhere"{% if field.errors %} data-invalid="true"{% endif %}>
+    <label for="{{ field.id_for_label }}">
+      {{ field.label }}
+      {% if field.field.required %}<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>{% endif %}
+    </label>
+    {{ field }}
+    {% with list_id=field.field.widget.attrs.list %}
+      {% if list_id %}
+        {% with options=field.form.datalists|get_item:list_id %}
+          {% if options %}
+            <datalist id="{{ list_id }}">
+              {% for value in options %}<option value="{{ value }}">{% endfor %}
+            </datalist>
+          {% endif %}
+        {% endwith %}
+      {% endif %}
+    {% endwith %}
+    <c-field-feedback :field="field" />
+  </div>
+{% endif %}

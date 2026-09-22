@@ -1,5 +1,5 @@
 {% extends "settings/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Settings" %} &gt; {% translate "API tokens" %}{% endblock %}
 
@@ -37,17 +37,17 @@
      what the help and the errors are about. `aria_describedby` is Django's own computation of
      the value, so it cannot drift from the ids `field_feedback.html` renders (#114). {% endcomment %}
         <fieldset class="mb-4" {% if form.scopes.aria_describedby %}aria-describedby="{{ form.scopes.aria_describedby }}"{% endif %}>
-          <legend class="field-label mb-2">{{ form.scopes.label }}</legend>
+          <legend class="label mb-2">{{ form.scopes.label }}</legend>
           <div class="space-y-2">
-            {% for choice in form.scopes %}
+            {% for choice in form.scopes|widgets_classed:"input" %}
               <label class="flex items-start gap-3 text-sm">
                 {{ choice.tag }}
                 <span>{{ choice.choice_label }}</span>
               </label>
             {% endfor %}
           </div>
-          <c-field-feedback :field="form.scopes" />
-          <p class="field-help">
+          <div class="field"><c-field-feedback :field="form.scopes" /></div>
+          <p class="text-xs text-ink-500 dark:text-ink-400">
             {% translate "A browser extension needs only the first. Give an agent read alone until you trust it with write." %}
           </p>
         </fieldset>

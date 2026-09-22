@@ -1385,7 +1385,7 @@
 
     var field = document.createElement("input");
     field.type = "text";
-    field.className = "field-input mt-2";
+    field.className = "mt-2";
     field.dataset.labelsInput = "";
     field.autocomplete = "off";
     field.placeholder = box.dataset.labelsPlaceholder || "";

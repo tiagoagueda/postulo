@@ -103,8 +103,10 @@ def test_a_wrong_password_is_shown_as_an_error_and_announced(client, user):
     assert "are not correct" in html
 
 
-def test_every_field_carries_the_shared_input_style(client):
+def test_every_field_is_drawn_in_the_shared_shape(client):
+    """Basecoat's `.field` around each control (#290), where a class on the input used to
+    say it: the login and password fields both, and the button that submits them."""
     html = body(client, "/accounts/login/")
-    assert html.count("field-input") >= 2, "the login and password fields both"
-    assert "field-label" in html
+    assert html.count('class="field') >= 2, "the login and password fields both"
+    assert "field-input" not in html and "field-label" not in html
     assert 'class="btn"' in html, "and the button that submits them"

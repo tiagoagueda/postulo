@@ -61,7 +61,7 @@
     <form method="post" action="{% url 'applications:status' application.pk %}" class="shrink-0">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <select name="status" class="field-input w-32 px-2 py-1 text-xs" data-autosubmit
+      <select name="status" class="w-32 px-2 py-1 text-xs" data-autosubmit
               aria-describedby="board-move-help"
               aria-label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
         {% for value, label in statuses %}

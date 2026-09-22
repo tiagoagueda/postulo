@@ -19,17 +19,17 @@
 
     <div class="card mb-6">
       <h2 class="mb-3 font-medium">{% translate "New accounts" %}</h2>
-      {% comment %} Not `<c-field>`: the chosen language's flag sits over the closed select,
-         as the telephone field's country flag does (#88), because an <option> holds text and
-         nothing else. The server draws the saved language's flag, so without a script the
-         field is right; the script keeps it in step with the choice (#208). The space is
-         reserved whether or not a flag is showing, so choosing a language moves nothing. {% endcomment %}
-      <div class="mb-4 wrap-anywhere">
-        <label class="field-label" for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
-        <div class="relative">
-          <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center"
-                data-flag-holder>{% language_flag form.default_language.value %}</span>
-          {{ form.default_language|add_class:"field-input w-full ps-9" }}
+      {% comment %} Not `<c-field>`: the chosen language's flag sits beside the closed select
+         in an input group, as the telephone field's country flag does (#88, #290), because
+         an <option> holds text and nothing else. The server draws the saved language's flag,
+         so without a script the field is right; the script keeps it in step with the choice
+         (#208). The space is reserved whether or not a flag is showing, so choosing a
+         language moves nothing. {% endcomment %}
+      <div class="field mb-4 wrap-anywhere"{% if form.default_language.errors %} data-invalid="true"{% endif %}>
+        <label for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
+        <div class="input-group">
+          <span data-align="start" data-flag-holder>{% language_flag form.default_language.value %}</span>
+          {{ form.default_language }}
         </div>
         <c-field-feedback :field="form.default_language" />
       </div>

@@ -4,6 +4,11 @@
    `<c-field-feedback :field="form.tags" />`, and `errors-only` for a caller that has already
    drawn the help itself, above the controls rather than under them, and has put the id on it.
 
+   Neither paragraph carries a class (#290): inside a `.field` the stylesheet knows a <p> is
+   the help and a <p> under `role="alert"` is an error, which is Basecoat's shape. Drawn
+   outside one -- a fieldset of choices, a formset row -- the caller wraps it in a `.field`
+   or in nothing, and the words are still the words.
+
    Django renders every widget with `aria-describedby="<auto_id>_helptext <auto_id>_error"`
    and `aria-invalid="true"`, and it is right to. Postulo then drew those two paragraphs
    without the ids, so every input on every form Postulo draws itself announced *I am
@@ -21,10 +26,10 @@
    what the role is for.
 {% endcomment %}
 {% if field.help_text and not errors_only %}
-  <p class="field-help"{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>
+  <p{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>
 {% endif %}
 {% if field.errors %}
   <div{% if field.auto_id %} id="{{ field.auto_id }}_error"{% endif %} role="alert">
-    {% for error in field.errors %}<p class="field-error">{{ error }}</p>{% endfor %}
+    {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
   </div>
 {% endif %}
