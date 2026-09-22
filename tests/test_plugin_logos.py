@@ -5,9 +5,14 @@
 The seventh thing a plugin says about itself, and the only one that is not a string. Three
 constraints shaped it, and all three had been settled once already elsewhere in Postulo: it
 cannot be a static file, because plugins are installed after `collectstatic` has run; it
-cannot be a URL, because `img-src 'self'` is the point rather than the obstacle; and it is
-raster only, because SVG can carry scripts and a direct visit is not the `<img>` context
-where a browser refuses to run them.
+cannot be a URL, because `img-src 'self'` is the point rather than the obstacle; and an
+SVG has to be sanitised, because a direct visit is not the `<img>` context where a browser
+refuses to run what it carries.
+
+Since #264 an SVG is **preferred** for a plugin's mark and kept as a vector. The sanitiser
+still runs, and for this module the reason is privacy rather than script: a remote
+reference in somebody's export would tell a vendor's server which instances run their
+plugin, which is the one thing this module exists to prevent.
 
 A plugin with no logo is the ordinary case, not an error — so the tests that matter most
 here are the ones about what happens when there is nothing to show.
@@ -70,10 +75,12 @@ def loaded(plugin_package):
 
 def test_the_logo_comes_out_of_the_plugins_own_package(loaded):
     """Not from static files, which were collected before this plugin existed."""
-    png = logos.png_for(loaded)
+    found = logos.logo_for(loaded)
 
-    assert png is not None
-    with Image.open(io.BytesIO(png)) as image:
+    assert found is not None
+    mark, content_type = found
+    assert content_type == "image/png"
+    with Image.open(io.BytesIO(mark)) as image:
         assert image.format == "PNG"
 
 
@@ -81,14 +88,18 @@ def test_it_is_written_out_again_rather_than_passed_through(loaded):
     """What is served is an image Postulo produced from what the plugin shipped.
 
     A file that decodes as an image can still be a file with something else appended, and
-    re-encoding settles that without having to reason about it. It also squares the image,
-    so a wide wordmark lines up with every other tile instead of setting its own height.
-    """
-    png = logos.png_for(loaded)
+    re-encoding settles that without having to reason about it.
 
-    assert png != logos.raw_bytes(loaded), "served unchanged"
-    with Image.open(io.BytesIO(png)) as image:
-        assert image.width == image.height, "not fitted to the tile"
+    It is **not** squared any more (#264). The square moved to CSS, where every call site
+    already draws the mark `object-contain` in a square box -- so a wide wordmark
+    letterboxes in the browser exactly as it letterboxed in the file, and what is kept is
+    what the plugin drew rather than a copy flattened to 256 pixels.
+    """
+    mark, _content_type = logos.logo_for(loaded)
+
+    assert mark != logos.raw_bytes(loaded), "served unchanged"
+    with Image.open(io.BytesIO(mark)) as image:
+        assert (image.width, image.height) == (64, 32), "kept at its own shape and size"
 
 
 def test_a_plugin_that_declares_nothing_shows_nothing(loaded, monkeypatch):
@@ -105,7 +116,7 @@ def test_a_plugin_that_declares_nothing_shows_nothing(loaded, monkeypatch):
     monkeypatch.setattr(logos, "manifest_of", base.manifest_of)
     logos.forget()
 
-    assert logos.png_for(loaded) is None
+    assert logos.logo_for(loaded) is None
 
 
 def test_a_declared_file_that_is_not_there_is_not_an_error(loaded, plugin_package):
@@ -113,14 +124,75 @@ def test_a_declared_file_that_is_not_there_is_not_an_error(loaded, plugin_packag
     (plugin_package / "mark.png").unlink()
     logos.forget()
 
-    assert logos.png_for(loaded) is None, "and the administrator finds out from the log"
+    assert logos.logo_for(loaded) is None, "and the administrator finds out from the log"
 
 
 def test_a_declared_file_that_is_not_an_image_is_not_an_error(loaded, plugin_package):
-    (plugin_package / "mark.png").write_bytes(b"<svg xmlns='http://www.w3.org/2000/svg'/>")
+    (plugin_package / "mark.png").write_bytes(b"this is not a picture of anything")
     logos.forget()
 
-    assert logos.png_for(loaded) is None, "raster only, and SVG is the one to refuse"
+    assert logos.logo_for(loaded) is None, "and the administrator finds out from the log"
+
+
+# ----------------------------------------------------------------- a mark as a vector
+
+
+def test_a_plugin_may_ship_an_svg_and_it_stays_one(loaded, plugin_package):
+    """SVG is the better form for a plugin's mark, and #264 chose it deliberately.
+
+    A mark is authored as a vector and the lists draw it at 24 pixels, where being crisp is
+    the whole point. Rasterising it in order to store it throws that away for nothing.
+    """
+    (plugin_package / "mark.png").write_bytes(
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 10 10">'
+        b'<rect width="10" height="10" fill="#00aa00"/></svg>'
+    )
+    logos.forget()
+
+    mark, content_type = logos.logo_for(loaded)
+
+    assert content_type == "image/svg+xml"
+    assert b"<rect" in mark and b"#00aa00" in mark
+
+
+def test_a_plugins_svg_still_goes_through_the_sanitiser(loaded, plugin_package):
+    """Not because of script -- a plugin runs Python in this process already, so a picture
+    is not where the danger is. Because of **privacy**: this module exists so a vendor's
+    server never learns which instances run their plugin, and a designer's export is full
+    of CDN references that would put that leak straight back (#264).
+    """
+    (plugin_package / "mark.png").write_bytes(
+        b'<svg xmlns="http://www.w3.org/2000/svg" onload="alert(1)">'
+        b'<image href="https://vendor.cdn/mark.png"/>'
+        b"<script>fetch('https://vendor.cdn/ping')</script>"
+        b'<rect width="10" height="10"/></svg>'
+    )
+    logos.forget()
+
+    mark, content_type = logos.logo_for(loaded)
+
+    assert content_type == "image/svg+xml"
+    assert b"vendor.cdn" not in mark, "the leak this module exists to prevent"
+    assert b"script" not in mark and b"onload" not in mark
+    assert b"<rect" in mark, "and the drawing survives"
+
+
+def test_the_view_hardens_what_it_serves(client, user, loaded, plugin_package, monkeypatch):
+    """A visit straight to this address is a same-origin document, not an `<img>`."""
+    from postulo.plugins import registry
+
+    (plugin_package / "mark.png").write_bytes(
+        b'<svg xmlns="http://www.w3.org/2000/svg"><rect width="4" height="4"/></svg>'
+    )
+    logos.forget()
+    monkeypatch.setattr(registry, "find_any", lambda name: loaded if name == "logoplug" else None)
+    client.force_login(user)
+
+    response = client.get(reverse("connections:logo", args=["logoplug"]))
+
+    assert response["Content-Type"] == "image/svg+xml"
+    assert response["Content-Security-Policy"] == "default-src 'none'; sandbox"
+    assert response["X-Content-Type-Options"] == "nosniff"
 
 
 def test_something_far_too_large_is_refused_before_it_is_decoded(loaded, plugin_package):

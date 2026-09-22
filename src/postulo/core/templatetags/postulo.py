@@ -284,7 +284,7 @@ def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
     label = str(getattr(plugin, "label", "") or name)
     from postulo.plugins import logos
 
-    if logos.png_for(plugin) is not None:
+    if logos.logo_for(plugin) is not None:
         url = reverse("connections:logo", args=[name])
         return mark_safe(  # noqa: S308
             f'<img src="{url}" alt="" class="{escape(css_class)} shrink-0 rounded object-contain">'

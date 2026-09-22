@@ -48,6 +48,20 @@ def resolve_media_path(name: str) -> Path:
     return candidate
 
 
+#: What a response carrying somebody's file says about what that file may do.
+#:
+#: An SVG served from our own origin is a same-origin *document* when it is visited
+#: directly, not the `<img>` a page renders it as -- so anything it carries runs as us.
+#: `core.pictures` sanitises one on the way in; this is the other half, and it is the half
+#: that holds if the sanitiser is ever wrong about something (#264). `sandbox` with no
+#: tokens denies scripts, plugins, forms, popups and an origin of its own; `default-src
+#: 'none'` denies every fetch the document might make.
+#:
+#: Applied to every private file rather than to SVGs alone, because a rule that is only
+#: on for one content type is a rule somebody has to remember to extend.
+FILE_POLICY = "default-src 'none'; sandbox"
+
+
 def serve_private_file(
     request: HttpRequest,
     file_field,
@@ -97,4 +111,7 @@ def serve_private_file(
     # Private documents have no business in a shared cache.
     response["Cache-Control"] = "private, max-age=0, no-store"
     response["X-Content-Type-Options"] = "nosniff"
+    # See `FILE_POLICY`. Set here rather than at each call site, so a view added later
+    # carries it without anybody having to remember (#264).
+    response["Content-Security-Policy"] = FILE_POLICY
     return response

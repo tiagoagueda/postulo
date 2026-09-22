@@ -20,6 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import DeleteView, ListView
 
+from postulo.core.files import FILE_POLICY
 from postulo.core.mixins import OwnedObjectMixin
 
 from . import logos, registry
@@ -97,11 +98,17 @@ class PluginLogoView(LoginRequiredMixin, View):
             if not decide(name, request.user).on:
                 raise Http404
 
-        png = logos.png_for(plugin)
-        if png is None:
+        found = logos.logo_for(plugin)
+        if found is None:
             raise Http404
+        mark, content_type = found
 
-        response = HttpResponse(png, content_type="image/png")
+        response = HttpResponse(mark, content_type=content_type)
+        # A visit straight to this address is a same-origin document, not the `<img>` a
+        # page draws it as -- which matters now that a mark may be an SVG (#264). The
+        # sanitiser is the first half of that defence and this is the second.
+        response["Content-Security-Policy"] = FILE_POLICY
+        response["X-Content-Type-Options"] = "nosniff"
         # The file cannot change without the plugin being reinstalled, and reinstalling
         # restarts the process. A day is long enough to be worth having and short enough
         # that an upgrade is visible the same afternoon.

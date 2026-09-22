@@ -27,6 +27,27 @@ def an_image(*, size=(120, 40), fmt="PNG", colour=(20, 90, 200, 255)) -> bytes:
     return out.getvalue()
 
 
+def a_photograph(size=(900, 900)) -> bytes:
+    """Noise, so it does not compress away and the budget actually has to engage.
+
+    `random` rather than `secrets` on purpose: this is a picture, and a seeded one so the
+    test weighs the same every run.
+    """
+    import random
+
+    generator = random.Random(7)  # noqa: S311
+    image = Image.new("RGB", size)
+    image.putdata(
+        [
+            (generator.randrange(256), generator.randrange(256), generator.randrange(256))
+            for _ in range(size[0] * size[1])
+        ]
+    )
+    out = io.BytesIO()
+    image.save(out, format="JPEG", quality=92)
+    return out.getvalue()
+
+
 @pytest.fixture
 def web(monkeypatch):
     """A web that answers however the test says, without leaving the machine."""
@@ -63,18 +84,97 @@ def company(user):
 # ------------------------------------------------------------------ the image
 
 
-def test_a_wide_wordmark_is_fitted_rather_than_cropped():
-    content = logos.process(an_image(size=(400, 100)))
+def test_a_wide_wordmark_keeps_its_own_shape_and_size(company):
+    """The 256-pixel square is gone (#264): a logo is bounded by bytes, not by dimensions.
+
+    Nothing of the name was lost before either -- it was letterboxed onto a transparent
+    square. What is different is that the square is CSS's job now, and what is kept is what
+    was given: a design that wants more than 56 pixels later is not blocked by a decision
+    taken today, and the original bytes are not kept to go back to.
+    """
+    content, extension = logos.process(an_image(size=(400, 100)))
+
+    assert extension == "png"
     with Image.open(io.BytesIO(content.read())) as image:
-        assert image.size == (logos.LOGO_SIZE, logos.LOGO_SIZE)
+        assert image.size == (400, 100), "kept, not flattened onto a square"
         assert image.mode == "RGBA"
-        # The padding is transparent, so nothing of the name is lost and the tile lines up.
-        assert image.getpixel((5, 5))[3] == 0
+
+
+def test_a_picture_too_heavy_for_the_budget_is_reduced_until_it_fits(monkeypatch):
+    """The budget exists to stop one file being unreasonable, not to pick a size.
+
+    Re-encoding can *grow* a file -- a photographic logo arriving as JPEG and leaving as
+    PNG -- so the rule cannot be "refuse what is too big"; it has to reduce until it fits.
+    """
+    monkeypatch.setattr(logos, "MAX_STORED_BYTES", 20_000)
+    content, _extension = logos.process(a_photograph((900, 900)))
+
+    written = content.read()
+    assert len(written) <= 20_000
+    with Image.open(io.BytesIO(written)) as image:
+        assert max(image.size) < 900, "reduced"
+        assert max(image.size) >= 64, "and not reduced to nothing"
+
+
+def test_a_file_that_cannot_be_made_to_fit_is_refused_rather_than_looping(monkeypatch):
+    """The floor under the reduction. Without it a pathological file spins for ever."""
+    monkeypatch.setattr(logos, "MAX_STORED_BYTES", 100)
+
+    with pytest.raises(logos.UnusableLogo, match="cannot be made small enough"):
+        logos.process(a_photograph((900, 900)))
 
 
 def test_something_that_is_not_an_image_is_refused():
     with pytest.raises(logos.UnusableLogo, match="could not be read as an image"):
         logos.process(b"<html>not a logo</html>")
+
+
+# --------------------------------------------------------------------- a vector
+
+
+def test_an_svg_is_kept_as_an_svg(company):
+    """The format a logo most often comes in, and the reason #264 exists."""
+    content, extension = logos.process(
+        b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 10">'
+        b'<rect width="40" height="10" fill="#123456"/></svg>'
+    )
+
+    assert extension == "svg"
+    written = content.read()
+    assert b"<rect" in written and b"#123456" in written
+
+
+@pytest.mark.parametrize(
+    "hostile, gone",
+    [
+        (b"<script>alert(1)</script>", b"script"),
+        (b'<image href="https://evil.test/p.png"/>', b"evil.test"),
+        (b"<style>@import url(https://evil.test/a.css);</style>", b"evil.test"),
+        (
+            b'<foreignObject><b xmlns="http://www.w3.org/1999/xhtml">x</b></foreignObject>',
+            b"foreignObject",
+        ),
+    ],
+)
+def test_an_svg_is_stripped_of_what_it_must_not_carry(hostile, gone):
+    """An SVG is a document, not a picture, and the stored file is served from our origin.
+
+    `tests/security/test_svg.py` is the fuller set; these are here so the logo pipeline
+    itself is known to run the sanitiser rather than merely to have one available.
+    """
+    written = logos.process(
+        b'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">'
+        + hostile
+        + b'<rect width="4" height="4"/></svg>'
+    )[0].read()
+
+    assert gone not in written
+    assert b"<rect" in written, "and the drawing survives"
+
+
+def test_an_svg_that_is_not_an_svg_is_refused():
+    with pytest.raises(logos.UnusableLogo, match="could not be read as an image"):
+        logos.process(b"<svg>unclosed and broken")
 
 
 # ---------------------------------------------------------------- fetching it
@@ -97,7 +197,6 @@ def test_a_logo_is_fetched_once_and_kept_here(web, company):
     [
         (404, b"", "text/html", "answered 404"),
         (200, b"", "image/png", "answered with nothing"),
-        (200, b"<svg/>", "image/svg+xml", "SVG"),
         (200, b"hello", "text/html", "not an image Postulo keeps"),
     ],
 )
@@ -376,3 +475,44 @@ def test_a_logo_travels_in_the_export_and_comes_back(user, other_user, web):
     assert restored.logo_source == "url"
     assert restored.logo_fetched_at is not None
     assert web["calls"] == ["https://cdn.example/logo.png"], "still just the one fetch"
+
+
+# --------------------------------------------------------- the two ways in agree
+
+
+def test_an_uploaded_svg_is_accepted_rather_than_called_unreadable(user):
+    """The papercut #264 names, and the reason the field stopped being an `ImageField`.
+
+    An `ImageField` verifies with Pillow, which cannot read an SVG — so the route somebody
+    with an SVG actually uses told them their perfectly valid file "could not be read as an
+    image", while the by-URL route said the useful thing. Now both accept it.
+    """
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from postulo.jobs.forms import CompanyForm
+
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg"><rect width="8" height="8"/></svg>'
+    form = CompanyForm(
+        {"name": "Black Mesa"},
+        {"logo_upload": SimpleUploadedFile("mark.svg", svg, content_type="image/svg+xml")},
+        user=user,
+    )
+
+    assert form.is_valid(), form.errors
+    assert "logo_upload" not in form.errors
+
+
+def test_an_upload_that_is_not_a_picture_says_so_at_the_form(user):
+    """And the form is where somebody finds out, rather than two functions later."""
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from postulo.jobs.forms import CompanyForm
+
+    form = CompanyForm(
+        {"name": "Black Mesa"},
+        {"logo_upload": SimpleUploadedFile("mark.png", b"not a picture", "image/png")},
+        user=user,
+    )
+
+    assert not form.is_valid()
+    assert "could not be read as an image" in str(form.errors["logo_upload"])

@@ -40,6 +40,11 @@ dependencies = [
     # Components for the templates: `<c-field :field="form.name" />` rather than an include
     # with a `with` chain. Server-side only -- no CSS, no script, no CSP surface (#263).
     "django-cotton>=2.7.2",
+    # Parsing an uploaded SVG before sanitising it (#264). Pure Python, and what it buys is
+    # the refusals a plain `xml.etree` will not make: a document type declaration, an
+    # external entity, the billion-laughs expansion. The allowlist walk is ours; this is
+    # the part that has to hold before the walk begins.
+    "defusedxml>=0.7",
 ]
 
 [project.optional-dependencies]

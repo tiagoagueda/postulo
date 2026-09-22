@@ -35,6 +35,8 @@ from __future__ import annotations
 import logging
 from importlib import resources
 
+from postulo.core import pictures
+
 from .base import manifest_of
 
 logger = logging.getLogger(__name__)
@@ -43,7 +45,13 @@ logger = logging.getLogger(__name__)
 MAX_BYTES = 2 * 1024 * 1024
 
 #: What a resolved logo is: the PNG bytes, and the plugin they belong to.
-_cache: dict[str, bytes | None] = {}
+#: What is served for each plugin, and what it is. The type travels with the bytes since
+#: #264: a mark may be a sanitised SVG or a re-encoded PNG, and a cache holding only bytes
+#: left the view to guess.
+_cache: dict[str, tuple[bytes, str] | None] = {}
+
+#: A plugin's mark, re-encoded, may weigh this much. The same budget the company logo uses.
+MAX_STORED_BYTES = 1024 * 1024
 
 
 class Unusable(ValueError):
@@ -51,7 +59,7 @@ class Unusable(ValueError):
 
     Not translated, and deliberately: every one of these reaches a log line an
     administrator reads while working out why a plugin they installed shows no mark.
-    Nothing here is ever rendered to somebody using Postulo -- `png_for` turns all of it
+    Nothing here is ever rendered to somebody using Postulo -- `logo_for` turns all of it
     into the initials tile -- so putting it through thirty-nine catalogues would be work
     for text no reader sees.
     """
@@ -109,7 +117,7 @@ def raw_bytes(plugin) -> bytes:
     return data
 
 
-def png_for(plugin) -> bytes | None:
+def logo_for(plugin) -> tuple[bytes, str] | None:
     """The logo as a square PNG, or ``None`` where there is not one to show.
 
     Never raises: a plugin whose logo is missing or unreadable shows the initials tile,
@@ -124,7 +132,7 @@ def png_for(plugin) -> bytes | None:
     if name in _cache:
         return _cache[name]
 
-    result: bytes | None = None
+    result: tuple[bytes, str] | None = None
     if declared_by(plugin):
         try:
             result = _render(raw_bytes(plugin))
@@ -134,19 +142,30 @@ def png_for(plugin) -> bytes | None:
     return result
 
 
-def _render(data: bytes) -> bytes:
-    """Decode and write out again as PNG, at the size every other tile uses.
+def _render(data: bytes) -> tuple[bytes, str]:
+    """What will be served, and what it is: sanitised SVG, or a re-encoded PNG.
 
-    Imported here rather than at the top: `jobs.logos` reaches back into `plugins.http` for
-    its own fetching, and one decision about what counts as an image is worth more than
-    avoiding an import inside a function.
+    **An SVG is the preferred form for a plugin's mark** (#264). The threat model is not
+    the one a stranger's upload has: a plugin already runs arbitrary Python inside this
+    process, so an administrator who installed it has extended far more trust than a
+    picture could abuse, and a mark is authored as a vector — forcing it through a raster
+    round trip degrades it at the 24 pixels a list shows it at, for nothing.
+
+    **It still goes through the sanitiser**, and the reason is privacy rather than script.
+    This module exists so that a vendor's server never learns which instances run their
+    plugin. An SVG carrying `<image href="https://vendor.cdn/…">`, an `@import` or a remote
+    webfont puts that leak back, and it would arrive by accident far more often than by
+    malice: a designer's export is full of such references.
+
+    Imported from `core` rather than from `jobs`: this used to reach into the job-search
+    app through a function-level import to borrow its idea of a picture, which is the wrong
+    direction and one of the cycles #248 counts.
     """
-    from postulo.jobs.logos import UnusableLogo
-    from postulo.jobs.logos import process as fit
-
     try:
-        return fit(data).read()
-    except UnusableLogo as error:
+        if pictures.looks_like_svg(data):
+            return pictures.sanitise_svg(data), "image/svg+xml"
+        return pictures.as_stored(data, budget=MAX_STORED_BYTES), "image/png"
+    except pictures.UnusablePicture as error:
         raise Unusable(str(error)) from error
 
 

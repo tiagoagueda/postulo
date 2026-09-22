@@ -123,10 +123,18 @@ class CompanyForm(OwnerScopedModelForm):
             "browser. PNG, JPEG, GIF or WebP."
         ),
     )
-    logo_upload = forms.ImageField(
+    #: `FileField`, not `ImageField`: an `ImageField` verifies with Pillow, which cannot
+    #: read an SVG and so refused the format logos most often come in — with "that file
+    #: could not be read as an image", about a file that was perfectly valid (#264). What
+    #: an image is, is decided in `jobs.logos` for every route into it, not twice.
+    logo_upload = forms.FileField(
         label=_("Or upload one"),
         required=False,
-        help_text=_("Kept at 256 pixels square, re-encoded, with nothing else of the file."),
+        help_text=_(
+            "PNG, JPEG, GIF, WebP or SVG. It is re-encoded at its own size, with nothing "
+            "else the file carried; an SVG is kept as a vector and stripped of everything "
+            "but the drawing."
+        ),
     )
     remove_logo = forms.BooleanField(label=_("Remove the logo"), required=False)
 
@@ -218,10 +226,24 @@ class CompanyForm(OwnerScopedModelForm):
             del self.fields["remove_logo"]
 
     def clean_logo_upload(self):
-        """Refuse an oversized file before anything tries to decode it."""
+        """Refuse here whatever `logos.process` would refuse later, in the same words.
+
+        The field is a `FileField` since #264, so Pillow no longer vets it on the way past
+        — which is the point, because Pillow cannot read the format logos most often come
+        in and refused an SVG as "not an image". What an image is, is `jobs.logos`'
+        decision, and this asks it rather than keeping a second opinion.
+        """
         upload = self.cleaned_data.get("logo_upload")
-        if upload and upload.size > logos.MAX_BYTES:
+        if not upload:
+            return upload
+        if upload.size > logos.MAX_BYTES:
             raise forms.ValidationError(_("That file is larger than a logo should be."))
+        data = upload.read()
+        upload.seek(0)
+        try:
+            logos.process(data)
+        except logos.UnusableLogo as error:
+            raise forms.ValidationError(str(error)) from error
         return upload
 
     @property

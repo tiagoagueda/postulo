@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from functools import cached_property
+from pathlib import PurePosixPath
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -339,7 +340,11 @@ class CompanyLogoView(OwnedObjectMixin, View):
         company = get_object_or_404(self.get_queryset(), pk=pk)
         if not company.logo:
             raise Http404
-        response = serve_private_file(request, company.logo, download_name="logo.png")
+        # The extension follows what is stored, which is no longer always PNG (#264): a
+        # hardcoded name would make `serve_private_file` guess the wrong content type for
+        # an SVG and serve a vector as an octet-stream.
+        suffix = PurePosixPath(company.logo.name).suffix or ".png"
+        response = serve_private_file(request, company.logo, download_name=f"logo{suffix}")
         response["Cache-Control"] = "private, max-age=86400"
         return response
 

@@ -12,18 +12,23 @@ Everything else follows from that:
   on redirect — because the address came from a page or from typing, and a job tracker
   must not be a way to make a server visit a router's administration page;
 * the bytes are decoded and re-encoded rather than stored as they arrived, which drops
-  whatever metadata the file carried and caps its size;
-* **raster only** for now: PNG, JPEG, GIF and WebP. SVG is the format logos most often
-  come in and the one that needs care — it can carry scripts and references to other
-  files, and a direct visit to the file is not the ``<img>`` context where a browser
-  refuses to run them. Accepting SVG means a sanitiser, and that is its own step.
+  whatever metadata the file carried;
+* **SVG is kept as SVG, sanitised** (#264). It is the format a logo most often comes in,
+  and the one that needs care: it is a document rather than a picture, and a direct visit
+  to the stored file is not the ``<img>`` context where a browser refuses to run what it
+  carries. `core.pictures.sanitise_svg` is the allowlist, and `jobs:company_logo` is
+  hardened as well — the two are halves of one defence and neither is enough alone;
+* **a logo is bounded by its file size, not by its dimensions** (#264). It used to be
+  flattened onto a 256-pixel square, which was enough for every surface that exists today
+  and a ceiling on every surface nobody has built — a company header, a mark on a printed
+  report. The original bytes are not kept, so that ceiling would have been found years
+  later by a design that could not have what it needed.
 
 A company with no logo shows an initials tile, exactly as a person with no picture does.
 """
 
 from __future__ import annotations
 
-import io
 import json
 import logging
 import re
@@ -34,20 +39,25 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
-from PIL import Image, ImageOps, UnidentifiedImageError
 
+from postulo.core import pictures
 from postulo.plugins import fetching, http
 
 logger = logging.getLogger(__name__)
 
-#: The square a logo is brought to. Big enough for the company page, small enough to keep.
-LOGO_SIZE = 256
+#: Anything larger than this is not a logo, and is refused before it is decoded. Raised
+#: from two megabytes with #264: the output is no longer fixed at 256 pixels square, so the
+#: input no longer has to be small enough that it would survive being flattened to one.
+MAX_BYTES = 5 * 1024 * 1024
 
-#: Anything larger than this is not a logo, and is refused before it is decoded.
-MAX_BYTES = 2 * 1024 * 1024
+#: What is written down, after re-encoding. A flat wordmark at a thousand pixels is well
+#: under this, so the reduction in `encode_within` effectively never runs -- the budget is
+#: here to stop one file being unreasonable, not to decide how large a logo may be (#264).
+MAX_STORED_BYTES = 1024 * 1024
 
-#: Decoded images above this many pixels are refused: a decompression bomb, or a mistake.
-MAX_PIXELS = 40_000_000
+#: Re-exported so the rest of this module and its tests read one name for it. The guard
+#: itself is `core.pictures`': it bounds what decoding allocates, not what is stored.
+MAX_PIXELS = pictures.MAX_PIXELS
 
 ALLOWED_CONTENT_TYPES = frozenset(
     {
@@ -57,6 +67,7 @@ ALLOWED_CONTENT_TYPES = frozenset(
         "image/webp",
         "image/x-icon",
         "image/vnd.microsoft.icon",
+        "image/svg+xml",
     }
 )
 
@@ -68,33 +79,31 @@ class UnusableLogo(ValueError):
     """The bytes are not an image Postulo will keep, and the message says why."""
 
 
-def process(data: bytes) -> ContentFile:
-    """Decode, fit onto a transparent square, and re-encode as PNG.
+def process(data: bytes) -> tuple[ContentFile, str]:
+    """The bytes as Postulo will keep them, and the extension to keep them under.
 
-    ``contain`` rather than ``fit``: a wordmark is usually wide, and cropping it to a
-    square would cut the name in half. The padding is transparent, so the tile still
-    lines up with everything else.
+    An SVG is sanitised and stays an SVG — it is a vector, and flattening a vector to
+    pixels to store it would throw away the reason it is the better file. Anything else is
+    decoded and written out again as PNG, at its own size, within the budget.
+
+    **The square padding is not lost, it moved to CSS.** `{% company_logo %}` renders
+    `object-contain` inside a square box at every call site, so a wide wordmark letterboxes
+    in the browser exactly as it letterboxed in the file, and nothing in the layout changes
+    (#264).
     """
-    Image.MAX_IMAGE_PIXELS = MAX_PIXELS
+    if pictures.looks_like_svg(data):
+        return ContentFile(_svg(data)), "svg"
     try:
-        with Image.open(io.BytesIO(data)) as image:
-            if image.width * image.height > MAX_PIXELS:
-                raise UnusableLogo(str(_("That image is far larger than a logo needs to be.")))
-            image = image.convert("RGBA")
-            fitted = ImageOps.contain(image, (LOGO_SIZE, LOGO_SIZE), Image.Resampling.LANCZOS)
-            square = Image.new("RGBA", (LOGO_SIZE, LOGO_SIZE), (0, 0, 0, 0))
-            square.paste(
-                fitted,
-                ((LOGO_SIZE - fitted.width) // 2, (LOGO_SIZE - fitted.height) // 2),
-            )
-    except UnusableLogo:
-        raise
-    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError) as error:
-        raise UnusableLogo(str(_("That file could not be read as an image."))) from error
+        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES)), "png"
+    except pictures.UnusablePicture as error:
+        raise UnusableLogo(str(error)) from error
 
-    out = io.BytesIO()
-    square.save(out, format="PNG", optimize=True)
-    return ContentFile(out.getvalue())
+
+def _svg(data: bytes) -> bytes:
+    try:
+        return pictures.sanitise_svg(data)
+    except pictures.UnusablePicture as error:
+        raise UnusableLogo(str(error)) from error
 
 
 def download(url: str) -> bytes:
@@ -124,10 +133,6 @@ def download(url: str) -> bytes:
         )
     content_type = response.headers.get("Content-Type", "").split(";")[0].strip().lower()
     if content_type and content_type not in ALLOWED_CONTENT_TYPES:
-        if content_type == "image/svg+xml":
-            raise UnusableLogo(
-                str(_("That is an SVG, which Postulo does not keep yet. A PNG or JPEG works."))
-            )
         raise UnusableLogo(
             str(_("That address is %(type)s, not an image Postulo keeps.")) % {"type": content_type}
         )
@@ -147,7 +152,9 @@ def download(url: str) -> bytes:
 LOGO_FIELDS = ["logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
 
 
-def store(company, content: ContentFile, *, source: str, url: str = "") -> None:
+def store(
+    company, content: ContentFile, *, source: str, url: str = "", extension: str = "png"
+) -> None:
     """Put the image on the company, replacing whatever was there.
 
     The most recent action wins — a URL, the website, an upload — so there is no
@@ -160,7 +167,7 @@ def store(company, content: ContentFile, *, source: str, url: str = "") -> None:
     """
     if company.logo:
         company.logo.delete(save=False)
-    company.logo.save(f"logo-{company.pk}.png", content, save=False)
+    company.logo.save(f"logo-{company.pk}.{extension}", content, save=False)
     company.logo_source = source
     company.logo_source_url = url[:500]
     company.logo_fetched_at = timezone.now()
@@ -180,13 +187,15 @@ def clear(company) -> None:
 
 def from_url(company, url: str) -> None:
     """Fetch the address, keep the picture. Raises :class:`UnusableLogo` with the reason."""
-    store(company, process(download(url)), source="url", url=url)
+    content, extension = process(download(url))
+    store(company, content, source="url", url=url, extension=extension)
 
 
 def from_upload(company, data: bytes) -> None:
     if len(data) > MAX_BYTES:
         raise UnusableLogo(str(_("That file is larger than a logo should be.")))
-    store(company, process(data), source="upload")
+    content, extension = process(data)
+    store(company, content, source="upload", extension=extension)
 
 
 # ------------------------------------------------- finding one on their site
@@ -314,7 +323,8 @@ def find_on_website(company) -> str:
     problems = []
     for candidate in candidates[:6]:
         try:
-            store(company, process(download(candidate)), source="website", url=candidate)
+            content, extension = process(download(candidate))
+            store(company, content, source="website", url=candidate, extension=extension)
         except UnusableLogo as error:
             problems.append(str(error))
             continue
