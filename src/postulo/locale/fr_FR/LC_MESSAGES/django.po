@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s est votre code de confirmation pour %(instance)s. Personne ne vous le demandera."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr "%(column)s est filtrée"
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1534,8 +1539,7 @@ msgstr "A répondu %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Tous"
@@ -1838,8 +1842,8 @@ msgstr "Évaluation"
 msgid "Assessment or test"
 msgstr "Évaluation ou test"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "au moins"
@@ -1850,8 +1854,8 @@ msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Au moins une langue doit être proposée, sinon personne ne peut rien lire."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "au plus"
@@ -4143,7 +4147,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Rempli quand la lettre est envoyée avec une candidature."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filtrer"
@@ -4359,8 +4363,7 @@ msgstr "Enregistrement de ce que vous avez envoyé"
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "de"
@@ -5690,7 +5693,7 @@ msgstr "Permettre qu'une seule touche fasse quelque chose"
 msgid "Let this passkey sign me in on its own"
 msgstr "Autoriser cette clé d’accès à me connecter seule"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Laisser {column} se dimensionner"
@@ -6289,7 +6292,7 @@ msgid ""
 msgstr ""
 "Indiquer une adresse réserve l'invitation à cette personne. La laisser vide crée un lien que quiconque le détient peut utiliser une fois."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Affiner"
@@ -9323,7 +9326,7 @@ msgstr "Sélectionner %(what)s"
 msgid "Select all on this page"
 msgstr "Tout sélectionner sur cette page"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Sélectionné"
@@ -9938,12 +9941,12 @@ msgstr "Quelque chose s'est mal passé. Le journal du serveur en dit plus."
 msgid "Something worth knowing."
 msgstr "Quelque chose à savoir."
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Trier par %(column)s, du plus élevé au plus bas"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Trier par %(column)s, du plus bas au plus élevé"
@@ -10119,7 +10122,7 @@ msgstr ""
 msgid "Stop it working"
 msgstr "Le rendre inopérant"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Ne plus trier par %(column)s"
@@ -11811,8 +11814,7 @@ msgstr "TLS dès le premier octet"
 msgid "To"
 msgstr "Au"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "à"
@@ -13033,7 +13035,7 @@ msgstr "Pourquoi, si vous les écartez"
 msgid "widgets already offered"
 msgstr "widgets déjà proposés"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Largeur de {column}"
@@ -13542,7 +13544,7 @@ msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 "Les vôtres. Elles n'apparaissent jamais sur un document et ne vont nulle part ailleurs."
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column} : {width} pixels"

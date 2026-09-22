@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenščina\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s je vaša potrditvena koda za %(instance)s. Nihče vas zanjo ne bo prosil."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1537,8 +1542,7 @@ msgstr "Odgovorilo %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Katerikoli"
@@ -1832,8 +1836,8 @@ msgstr "Ocenjevanje"
 msgid "Assessment or test"
 msgstr "Ocenjevanje ali preizkus"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "najmanj"
@@ -1843,8 +1847,8 @@ msgstr "najmanj"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Ponujen mora biti vsaj en jezik, sicer nihče ne more ničesar prebrati."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "največ"
@@ -4080,7 +4084,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Izpolni se, ko se pismo pošlje s prijavo."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filtriraj"
@@ -4290,8 +4294,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "od"
@@ -5592,7 +5595,7 @@ msgstr "Naj ena sama tipka kaj naredi"
 msgid "Let this passkey sign me in on its own"
 msgstr "Naj me ta ključ prijavi sam"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Naj si stolpec {column} sam določi širino"
@@ -6193,7 +6196,7 @@ msgid ""
 msgstr ""
 "Navedba naslova omeji vabilo na to osebo. Če ostane prazno, se ustvari povezava, ki jo lahko vsak, ki jo ima, uporabi enkrat."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Zoži"
@@ -9202,7 +9205,7 @@ msgstr "Izberi %(what)s"
 msgid "Select all on this page"
 msgstr "Izberi vse na tej strani"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Izbrano"
@@ -9798,12 +9801,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Razvrsti po %(column)s, najvišje najprej"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Razvrsti po %(column)s, najnižje najprej"
@@ -9976,7 +9979,7 @@ msgstr "Še odprte, v pogovoru, ponudbe in kar ste poslali zadnji mesec."
 msgid "Stop it working"
 msgstr "Onemogoči jo"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Nehaj razvrščati po %(column)s"
@@ -11611,8 +11614,7 @@ msgstr "TLS od prvega bajta"
 msgid "To"
 msgstr "Do"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "do"
@@ -12759,7 +12761,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "gradniki, ki so že bili ponujeni"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Širina stolpca {column}"
@@ -13251,7 +13253,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} slikovnih pik"

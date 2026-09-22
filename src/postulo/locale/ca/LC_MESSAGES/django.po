@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 15:45+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: català\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s és el vostre codi de confirmació per a %(instance)s. Ningú us el demanarà."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1488,8 +1493,7 @@ msgstr "Ha respost %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Qualsevol"
@@ -1783,8 +1787,8 @@ msgstr "Avaluació"
 msgid "Assessment or test"
 msgstr "Avaluació o prova"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "com a mínim"
@@ -1794,8 +1798,8 @@ msgstr "com a mínim"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "S'ha d'oferir almenys un idioma, o ningú no podrà llegir res."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "com a màxim"
@@ -4032,7 +4036,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "S'omple quan la carta s'envia amb una candidatura."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filtra"
@@ -4243,8 +4247,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "de"
@@ -5547,7 +5550,7 @@ msgstr "Deixar que una sola tecla faci alguna cosa"
 msgid "Let this passkey sign me in on its own"
 msgstr "Deixa que aquesta clau d'accés m'identifiqui tota sola"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Deixa que {column} s’ajusti sola"
@@ -6144,7 +6147,7 @@ msgid ""
 msgstr ""
 "Indicar una adreça lliga la invitació a aquella persona. Deixar-la en blanc crea un enllaç que qui el tingui pot fer servir una vegada."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Filtra"
@@ -9121,7 +9124,7 @@ msgstr "Selecciona %(what)s"
 msgid "Select all on this page"
 msgstr "Selecciona-ho tot en aquesta pàgina"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Seleccionat"
@@ -9720,12 +9723,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Ordena per %(column)s, de major a menor"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Ordena per %(column)s, de menor a major"
@@ -9898,7 +9901,7 @@ msgstr "Encara vives, en converses, ofertes, i el que heu enviat l'últim mes."
 msgid "Stop it working"
 msgstr "Deixa'l sense efecte"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Deixa d’ordenar per %(column)s"
@@ -11528,8 +11531,7 @@ msgstr "TLS des del primer byte"
 msgid "To"
 msgstr "Fins a"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "fins a"
@@ -12681,7 +12683,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "widgets ja oferts"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Amplada de {column}"
@@ -13171,7 +13173,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} píxels"

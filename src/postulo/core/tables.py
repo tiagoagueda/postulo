@@ -126,6 +126,39 @@ class Header:
     def filter_label(self) -> str:
         return str(_("Filter by %(column)s") % {"column": str(self.column.label).lower()})
 
+    @property
+    def filtered(self) -> bool:
+        """Whether this column is narrowing the list right now.
+
+        Since #253 the filter is folded away until somebody opens it, and a filter nobody
+        can see is a filter they forget: this is what keeps the column's own header open and
+        marked, so "where did my companies go" has an answer on screen rather than in the
+        address bar.
+        """
+        return bool(self.value or self.value_from or self.value_to)
+
+    @property
+    def filtering_label(self) -> str:
+        """The name of the mark on a narrowed column, and only on a narrowed one.
+
+        A `<th>`'s text is the name every cell under it is announced with, so anything put
+        here is repeated down the whole column. That is worth paying when the column is
+        narrowed -- the list is not what it looks like, and saying so once per cell is the
+        cheap end of that -- and is not worth paying to announce a control that is simply
+        there, which the disclosure's own collapsed state already says.
+        """
+        return str(_("%(column)s is filtered") % {"column": str(self.column.label)})
+
+    @property
+    def sort_icon(self) -> str:
+        """The glyph for this column's sort state, now that the control is icon-only (#253).
+
+        Three states and three pictures. #136 made the unsorted state draw nothing, which
+        read well while the label beside it was the control; an icon-only button with nothing
+        to be is not a button anybody can find, so the neutral state has a glyph of its own.
+        """
+        return {"asc": "arrow-up", "desc": "arrow-down"}.get(self.state, "chevrons-up-down")
+
 
 @dataclass
 class ChooserRow:
@@ -378,7 +411,14 @@ class Table:
         return headers
 
     @property
-    def has_filter_row(self) -> bool:
+    def has_filters(self) -> bool:
+        """Whether any visible column narrows at all.
+
+        Called `has_filter_row` until #253, when the row it was named after stopped
+        existing: the filters live in the headers themselves now, one disclosure per column.
+        What the question is actually for is unchanged -- whether to draw the block a phone
+        reaches, which is still a block and still folded under one word.
+        """
         return any(header.column.filter for header in self.headers)
 
     # ---------------------------------------------------------------- settings

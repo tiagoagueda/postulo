@@ -1595,9 +1595,6 @@
     .md\:hidden {
       display: none;
     }
-    .md\:table-row {
-      display: table-row;
-    }
     .md\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
     }
@@ -3480,6 +3477,19 @@
   }
   .has-col-handle {
     padding-inline-end: calc(var(--spacing) * 8);
+  }
+  .col-filter {
+    min-width: 0px;
+  }
+  .col-filter > summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  .col-filter > summary::-webkit-details-marker {
+    display: none;
+  }
+  .col-filter[open] > summary .col-filter-chevron {
+    rotate: 180deg;
   }
   body[data-density="compact"] .card {
     padding: calc(var(--spacing) * 4);

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Cymraeg\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s yw eich cod cadarnhau ar gyfer %(instance)s. Ni fydd neb yn gofyn amdano."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1540,8 +1545,7 @@ msgstr "Atebodd %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Unrhyw un"
@@ -1836,8 +1840,8 @@ msgstr "Asesiad"
 msgid "Assessment or test"
 msgstr "Asesiad neu brawf"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "o leiaf"
@@ -1847,8 +1851,8 @@ msgstr "o leiaf"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Rhaid cynnig o leiaf un iaith, neu ni all neb ddarllen dim."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "ar y mwyaf"
@@ -4088,7 +4092,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Caiff ei llenwi pan anfonir y llythyr gyda chais."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Hidlo"
@@ -4299,8 +4303,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "o"
@@ -5606,7 +5609,7 @@ msgstr "Gadael i un fysell wneud rhywbeth"
 msgid "Let this passkey sign me in on its own"
 msgstr "Gadewch i'r allwedd fynediad hon fy mewngofnodi ar ei phen ei hun"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Gadewch i {column} bennu ei lled ei hun"
@@ -6207,7 +6210,7 @@ msgid ""
 msgstr ""
 "Mae enwi cyfeiriad yn cyfyngu'r gwahoddiad i'r person hwnnw. Os gedir yn wag, crëir dolen y gall unrhyw un sy'n ei dal ei defnyddio unwaith."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Hidlo"
@@ -9224,7 +9227,7 @@ msgstr "Dewis %(what)s"
 msgid "Select all on this page"
 msgstr "Dewis popeth ar y dudalen hon"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Wedi'i ddewis"
@@ -9824,12 +9827,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Trefnu yn ôl %(column)s, yr uchaf yn gyntaf"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Trefnu yn ôl %(column)s, yr isaf yn gyntaf"
@@ -10002,7 +10005,7 @@ msgstr "Yn dal yn fyw, mewn sgwrs, cynigion, a'r hyn a anfonoch y mis diwethaf."
 msgid "Stop it working"
 msgstr "Ei rhoi allan o rym"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Rhoi’r gorau i drefnu yn ôl %(column)s"
@@ -11646,8 +11649,7 @@ msgstr "TLS o'r beit cyntaf"
 msgid "To"
 msgstr "Hyd at"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "i"
@@ -12800,7 +12802,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "teclynnau a gynigiwyd eisoes"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Lled {column}"
@@ -13298,7 +13300,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} picsel"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s-ը ձեր հաստատման կոդն է %(instance)s-ի համար։ Ոչ ոք այն ձեզնից չի խնդրի։"
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1488,8 +1493,7 @@ msgstr "Պատասխանել է %(code)s։"
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Ցանկացած"
@@ -1785,8 +1789,8 @@ msgstr "Գնահատում"
 msgid "Assessment or test"
 msgstr "Գնահատում կամ թեստ"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "առնվազն"
@@ -1796,8 +1800,8 @@ msgstr "առնվազն"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Առնվազն մեկ լեզու պետք է առաջարկվի, այլապես ոչ ոք ոչինչ չի կարող կարդալ։"
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "առավելագույնը"
@@ -4034,7 +4038,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Լրացվում է, երբ նամակն ուղարկվում է դիմումի հետ։"
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Զտել"
@@ -4244,8 +4248,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "որտեղից"
@@ -5544,7 +5547,7 @@ msgstr "Թույլ տալ, որ մեկ ստեղնն ինչ-որ բան անի"
 msgid "Let this passkey sign me in on its own"
 msgstr "Թող այս անցաբանալին ինքնուրույն մուտք գործեցնի ինձ"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Թող {column} սյունակն ինքը որոշի իր լայնությունը"
@@ -6141,7 +6144,7 @@ msgid ""
 msgstr ""
 "Հասցե նշելը հրավերը կապում է այդ մարդու հետ։ Դատարկ թողնելով՝ ստեղծվում է հղում, որը դրան տիրապետող ցանկացած մեկը կարող է մեկ անգամ օգտագործել։"
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Զտել"
@@ -9121,7 +9124,7 @@ msgstr "Ընտրել %(what)s"
 msgid "Select all on this page"
 msgstr "Ընտրել այս էջի բոլորը"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Ընտրված"
@@ -9719,12 +9722,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Դասավորել ըստ %(column)s՝ ամենաբարձրը առաջինը"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Դասավորել ըստ %(column)s՝ ամենացածրը առաջինը"
@@ -9898,7 +9901,7 @@ msgstr ""
 msgid "Stop it working"
 msgstr "Դարձնել անգործուն"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Դադարեցնել դասավորումն ըստ %(column)s"
@@ -11526,8 +11529,7 @@ msgstr "TLS առաջին բայթից"
 msgid "To"
 msgstr "Մինչև"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "մինչև"
@@ -12677,7 +12679,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "արդեն առաջարկված վիջեթներ"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "{column} սյունակի լայնությունը"
@@ -13167,7 +13169,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}՝ {width} փիքսել"

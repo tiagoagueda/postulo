@@ -10,10 +10,51 @@
    A component rather than an include, so everything it needs is declared here at the top
    instead of being whatever the page happened to have in its context.
 {% endcomment %}
-{% comment %} The header of a configurable table: sort links, and beneath them the filter inputs.
-   Every input is associated with the filter form (`form=`) so the plain Apply button
-   works without scripts, and carries htmx attributes so typing narrows the table live.
-   Text inputs are preserved across swaps, so a keystroke in flight is never lost. {% endcomment %}
+{% comment %} The header of a configurable table: a label that opens that column's filter,
+   and an icon that sorts it (#253).
+
+   **The filter used to be a second row of inputs that was always there.** On *Companies*
+   that was fourteen boxes above the first company, permanently, and the thing they pushed
+   down was the table they belonged to. Now each column's filter is folded into its own
+   header and only the ones being used are on screen.
+
+   **It is a `<details>`, so there is no script in it.** The gesture the issue asks for --
+   click the header, it becomes an input -- is what a disclosure already does, in the
+   browser, with a keyboard, with none of Postulo's JavaScript loaded. Every input is still
+   a real control associated with the filter form by `form=`, so *Apply* still works with
+   scripts off; folding one away hides it, it does not disable it. That is the same rule the
+   resize handle and the select-all button follow: a script *adds* a control, it never
+   animates a dead one (#134, #136).
+
+   **The header click was the sort, so the sort moves to an icon.** A label cannot be two
+   controls. Of the two, sorting is the one that survives being a glyph -- three states, a
+   picture for each, `header.sort_icon` -- and filtering is the one that needs the whole
+   header as a target. The hint the arrow used to carry in `sr-only` text becomes the icon's
+   own name, so an icon-only control still says which way the next click sorts.
+
+   **A filter in force says so in its header**, and its disclosure comes back open: the
+   virtue of the old row was that every narrowing was visible at once, and folding things
+   away has to pay that back or somebody spends ten minutes wondering where their companies
+   went. `filtering_label` is only attached when the column *is* narrowed -- a `<th>`'s text
+   is read out with every cell beneath it, and that is a price worth paying to say the list
+   is not what it looks like, and not worth paying to announce a control that is just there.
+
+   **No preference for keeping them all open**, which the issue left open. An open filter
+   stays open, because a column that is narrowing is rendered open; so somebody filtering
+   five columns has five, and somebody reading a long list has none. A setting would be a
+   setting to make the interface do what it already does.
+
+   **On a phone, *Narrow* is still the way in, and this is no longer shut.** The old row
+   was hidden below `md` and `narrow.html` served instead, and the issue asks for that to be
+   left alone. The block is left alone -- it is still there, still folded under one word,
+   still the signposted path. The disclosures are not hidden with it, which is the one place
+   this departs from what #253 proposes. The reason the row was shut on a phone was that
+   fourteen boxes at once inside a table at 390 pixels are not a control anybody can use;
+   one box, opened on purpose, in a table that already scrolls sideways, is not that, and
+   turning a working control off for a width class wants a better reason than symmetry.
+   Both copies post under the same name and `Table.given` takes the first non-empty one, as
+   it has since #173, so a person who uses one and ignores the other narrows once.
+{% endcomment %}
 {% comment %} `data-col-settings` is where a width is saved, and its presence is what
    tells `app.js` there is anything to add a handle to. Without a script no handle exists:
    a width is a pointer gesture, and an inert control is worse than a missing one -- the
@@ -48,35 +89,45 @@
     {% endif %}
     {% for header in table.headers %}
       <th scope="col"
-          class="relative px-4 py-3 font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
+          class="relative px-4 py-3 align-top font-medium {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
           data-col="{{ header.key }}" data-col-label="{{ header.label }}"
           {% if header.width %}data-col-width="{{ header.width }}"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
-        {% if header.column.sortable %}
-          {% comment %} `tap-target` rather than the bare `inline-flex` this used to have:
-             the label is 12-pixel type on a 16-pixel line, and the filter control below it
-             is close enough that the spacing exception does not save it (#115). {% endcomment %}
-          {% comment %} The id is not decoration: htmx puts focus back after a swap only for an
-             element that has one, and this link swaps itself away. Without it the next Tab
-             after sorting started again at the skip link (#227). {% endcomment %}
-          <a id="sort-{{ header.key }}"
-             href="{% querystring sort=header.next_sort page=None %}"
-             hx-get="{% querystring sort=header.next_sort page=None %}"
-             hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-             class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
-            {{ header.label }}
-            {% if header.state == 'asc' %}
-              {% icon "arrow-up" class="size-3.5" %}
-            {% elif header.state == 'desc' %}
-              {% icon "arrow-down" class="size-3.5" %}
-            {% endif %}
-            {% comment %} Three states now, so the arrow no longer says the whole of what a
-               click does -- the third one takes the arrow away (#136). {% endcomment %}
-            <span class="sr-only">{{ header.hint }}</span>
-          </a>
-        {% else %}
-          {{ header.label }}
-        {% endif %}
+        <div class="flex items-start {% if header.column.numeric %}justify-end{% endif %} gap-1">
+          {% if header.column.filter %}
+            <details class="col-filter" data-col-filter {% if header.filtered %}open{% endif %}>
+              <summary class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100">
+                <span class="min-w-0 truncate">{{ header.label }}</span>
+                {% if header.filtered %}
+                  {% icon "filter" class="size-3.5 text-brand-600 dark:text-brand-400" label=header.filtering_label %}
+                {% else %}
+                  {% icon "chevron-down" class="col-filter-chevron size-3.5 text-ink-400" %}
+                {% endif %}
+              </summary>
+              <div class="mt-1.5 font-normal">
+                <c-table.filter :header="header" form_id="{{ form_id }}" table_id="{{ table_id }}" live />
+              </div>
+            </details>
+          {% else %}
+            <span class="tap-target">{{ header.label }}</span>
+          {% endif %}
+          {% if header.column.sortable %}
+            {% comment %} The id is not decoration: htmx puts focus back after a swap only for
+               an element that has one, and this control swaps itself away. Without it the
+               next Tab after sorting started again at the skip link (#227).
+
+               `tap-target` because #115 put that rule there for 12-pixel type, and an
+               icon-only control with no word beside it is the case it was written for.
+            {% endcomment %}
+            <a id="sort-{{ header.key }}"
+               href="{% querystring sort=header.next_sort page=None %}"
+               hx-get="{% querystring sort=header.next_sort page=None %}"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+               class="tap-target shrink-0 justify-center hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
+              {% icon header.sort_icon class="size-3.5" label=header.hint %}
+            </a>
+          {% endif %}
+        </div>
       </th>
     {% endfor %}
     {% if actions_label %}
@@ -85,68 +136,6 @@
       </th>
     {% endif %}
   </tr>
-  {% if table.has_filter_row %}
-    <tr class="hidden border-t border-ink-100 md:table-row dark:border-ink-800" data-filter-row>
-      {% if bulk_form_id %}<td class="px-2 py-1.5"></td>{% endif %}
-      {% for header in table.headers %}
-        <td class="px-2 py-1.5">
-          {% if header.column.filter == 'text' %}
-            <input type="search" id="{{ header.input_id }}" name="{{ header.column.name }}"
-                   value="{{ header.value }}" form="{{ form_id }}" hx-preserve
-                   aria-label="{{ header.filter_label }}" placeholder="{% translate 'Filter' %}"
-                   hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
-                   hx-trigger="input changed delay:300ms, search"
-                   hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                   class="field-input w-full min-w-24 px-2 py-1 text-xs">
-          {% elif header.column.filter == 'choice' %}
-            <select id="{{ header.input_id }}" name="{{ header.column.name }}" form="{{ form_id }}"
-                    aria-label="{{ header.filter_label }}"
-                    hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
-                    hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                    class="field-input w-full min-w-24 px-2 py-1 text-xs">
-              <option value="">{% translate "Any" %}</option>
-              {% for value, label in header.column.choices %}
-                <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
-              {% endfor %}
-            </select>
-          {% elif header.column.filter == 'number' %}
-            {% comment %} A least and a most, shaped like the date pair: "companies I have
-               applied to more than once" is the obvious question (#173). {% endcomment %}
-            <div class="flex flex-col gap-1">
-              <input type="number" id="{{ header.input_id }}-min" name="{{ header.column.name }}_min"
-                     value="{{ header.value_from }}" form="{{ form_id }}" inputmode="numeric" min="0"
-                     aria-label="{{ header.filter_label }}: {% translate 'at least' %}" placeholder="{% translate 'at least' %}"
-                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
-                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full min-w-20 px-2 py-1 text-xs">
-              <input type="number" id="{{ header.input_id }}-max" name="{{ header.column.name }}_max"
-                     value="{{ header.value_to }}" form="{{ form_id }}" inputmode="numeric" min="0"
-                     aria-label="{{ header.filter_label }}: {% translate 'at most' %}" placeholder="{% translate 'at most' %}"
-                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
-                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full min-w-20 px-2 py-1 text-xs">
-            </div>
-          {% elif header.column.filter == 'date' %}
-            <div class="flex flex-col gap-1">
-              <input type="date" id="{{ header.input_id }}-from" name="{{ header.column.name }}_from"
-                     value="{{ header.value_from }}" form="{{ form_id }}"
-                     aria-label="{{ header.filter_label }}: {% translate 'from' %}"
-                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
-                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full px-2 py-1 text-xs">
-              <input type="date" id="{{ header.input_id }}-to" name="{{ header.column.name }}_to"
-                     value="{{ header.value_to }}" form="{{ form_id }}"
-                     aria-label="{{ header.filter_label }}: {% translate 'to' %}"
-                     hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
-                     hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-                     class="field-input w-full px-2 py-1 text-xs">
-            </div>
-          {% endif %}
-        </td>
-      {% endfor %}
-      {% if actions_label %}<td class="px-2 py-1.5"></td>{% endif %}
-    </tr>
-  {% endif %}
 </thead>
 {% comment %} The sort in force travels with the filters, so narrowing never resets it. It lives
    inside the swapped region so it is always the one the server last used. {% endcomment %}

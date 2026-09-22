@@ -1,0 +1,93 @@
+{% load i18n %}
+<c-vars header form_id="" table_id="" suffix="" live=False labelled=False />
+{% comment %} One column's filter control, wherever it is drawn (#253).
+
+   `<c-table.filter :header="header" form_id="…" table_id="…" live />` in a header, and
+   `<c-table.filter :header="header" suffix="-narrow" />` in the block a phone reaches.
+
+   Four shapes, because a column narrows in one of four ways: a word, one of a fixed list, a
+   range of days, a range of numbers. They were written out twice -- once in `head.html` and
+   once in `narrow.html` -- and #253 would have made it three, which is the point at which
+   two copies stop being a duplication you can watch and start being one that drifts.
+
+   **`live` is what tells the two copies apart.** In a header the control carries htmx and
+   narrows the table as somebody types; in the phone block it does not, because that block
+   is a form with an *Apply* button under it and a request per keystroke on a phone is a
+   request per keystroke on a phone. Both belong to the same form through `form=`, both are
+   posted, and `Table.given` reads the first non-empty answer under a name -- so the copy
+   nobody typed in narrows nothing (#173).
+
+   `labelled` is the phone block saying it has drawn a visible `<label>` already, so the
+   word box and the list take their name from that rather than from an `aria-label` that
+   would quietly replace it. The pairs keep theirs either way: *at least* and *at most* have
+   to be told apart, and a legend is not what names an input.
+
+   `hx-preserve` on everything a person types into rather than on the text box alone. A
+   keystroke lands, three hundred milliseconds pass, the table swaps, and an input that was
+   not preserved is replaced under the cursor mid-word. That was true of the number boxes as
+   well as the text one; it only ever showed up on the text one because that is the one
+   people type more than two characters into.
+{% endcomment %}
+{% with id=header.input_id|add:suffix name=header.column.name %}
+  {% if header.column.filter == 'text' %}
+    <input type="search" id="{{ id }}" name="{{ name }}" value="{{ header.value }}"
+           {% if form_id %}form="{{ form_id }}"{% endif %}
+           {% if not labelled %}aria-label="{{ header.filter_label }}"{% endif %}
+           placeholder="{% translate 'Filter' %}"
+           {% if live %}hx-preserve
+             hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
+             hx-trigger="input changed delay:300ms, search"
+             hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+           class="field-input w-full min-w-24 px-2 py-1 text-xs">
+  {% elif header.column.filter == 'choice' %}
+    <select id="{{ id }}" name="{{ name }}"
+            {% if form_id %}form="{{ form_id }}"{% endif %}
+            {% if not labelled %}aria-label="{{ header.filter_label }}"{% endif %}
+            {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+              hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+            class="field-input w-full min-w-24 px-2 py-1 text-xs">
+      <option value="">{% translate "Any" %}</option>
+      {% for value, label in header.column.choices %}
+        <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  {% elif header.column.filter == 'number' %}
+    {% comment %} A least and a most, shaped like the date pair: "companies I have applied
+       to more than once" is the obvious question (#173). {% endcomment %}
+    <div class="flex flex-col gap-1">
+      <input type="number" id="{{ id }}-min" name="{{ name }}_min" value="{{ header.value_from }}"
+             {% if form_id %}form="{{ form_id }}"{% endif %} inputmode="numeric" min="0"
+             aria-label="{{ header.filter_label }}: {% translate 'at least' %}"
+             placeholder="{% translate 'at least' %}"
+             {% if live %}hx-preserve
+               hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
+               hx-trigger="input changed delay:300ms"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+             class="field-input w-full min-w-20 px-2 py-1 text-xs">
+      <input type="number" id="{{ id }}-max" name="{{ name }}_max" value="{{ header.value_to }}"
+             {% if form_id %}form="{{ form_id }}"{% endif %} inputmode="numeric" min="0"
+             aria-label="{{ header.filter_label }}: {% translate 'at most' %}"
+             placeholder="{% translate 'at most' %}"
+             {% if live %}hx-preserve
+               hx-get="{{ request.path }}" hx-include="#{{ form_id }}"
+               hx-trigger="input changed delay:300ms"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+             class="field-input w-full min-w-20 px-2 py-1 text-xs">
+    </div>
+  {% elif header.column.filter == 'date' %}
+    <div class="flex flex-col gap-1">
+      <input type="date" id="{{ id }}-from" name="{{ name }}_from" value="{{ header.value_from }}"
+             {% if form_id %}form="{{ form_id }}"{% endif %}
+             aria-label="{{ header.filter_label }}: {% translate 'from' %}"
+             {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+             class="field-input w-full px-2 py-1 text-xs">
+      <input type="date" id="{{ id }}-to" name="{{ name }}_to" value="{{ header.value_to }}"
+             {% if form_id %}form="{{ form_id }}"{% endif %}
+             aria-label="{{ header.filter_label }}: {% translate 'to' %}"
+             {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="change"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
+             class="field-input w-full px-2 py-1 text-xs">
+    </div>
+  {% endif %}
+{% endwith %}

@@ -602,6 +602,42 @@
     @apply pe-8;
   }
 
+  /* A column's own filter, folded into its header (#253).
+
+     The disclosure is the whole mechanism: the summary is the column's label, clicking it
+     opens that column's filter, and none of it is script. The browser's own triangle goes,
+     because the label is the control and a marker in front of it reads as a second one --
+     `list-style` for everyone and the WebKit pseudo-element for the engine that ignores it,
+     which is what the account menu already does.
+
+     `min-w-0` here and `truncate` on the label inside it: a `<th>` in a table that sizes its
+     own columns will happily widen to fit a label that never wraps, and the point of this
+     was to stop the header pushing the table about. The ellipsis goes on the label's own
+     span rather than on the summary, because the summary is a flex container and a bare
+     text node in one is an anonymous item that `text-overflow` cannot reach. The full label
+     is still the element's text, so nothing is lost to a screen reader.
+
+     The panel is `w-full` and not wider. A filter that grew past its column would overlap
+     the next header, and inside a horizontally scrolling box it cannot be a popover: the
+     box would clip it. Growing the header row is the honest option, and it only grows for
+     the columns somebody is actually using. */
+  .col-filter {
+    @apply min-w-0;
+  }
+
+  .col-filter > summary {
+    @apply cursor-pointer;
+    list-style: none;
+  }
+
+  .col-filter > summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .col-filter[open] > summary .col-filter-chevron {
+    @apply rotate-180;
+  }
+
   /*
    * Compact, for somebody who asked for more rows on a screen (#292).
    *

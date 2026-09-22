@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: čeština\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s je váš potvrzovací kód pro %(instance)s. Nikdo si o něj neřekne."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1503,8 +1508,7 @@ msgstr "Odpovědělo %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Jakýkoli"
@@ -1797,8 +1801,8 @@ msgstr "Hodnocení"
 msgid "Assessment or test"
 msgstr "Hodnocení nebo test"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "nejméně"
@@ -1808,8 +1812,8 @@ msgstr "nejméně"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Musí být nabízen alespoň jeden jazyk, jinak si nikdo nic nepřečte."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "nejvíce"
@@ -4045,7 +4049,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Vyplní se, když se dopis odešle se žádostí."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filtrovat"
@@ -4255,8 +4259,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "od"
@@ -5555,7 +5558,7 @@ msgstr "Nechat jedinou klávesu něco dělat"
 msgid "Let this passkey sign me in on its own"
 msgstr "Nechat tento přístupový klíč přihlásit mě samostatně"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Nechat sloupec {column} nastavit si šířku sám"
@@ -6153,7 +6156,7 @@ msgid ""
 msgstr ""
 "Uvedení adresy omezí pozvánku na danou osobu. Ponechání prázdného vytvoří odkaz, který může kdokoli, kdo ho má, použít jednou."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Filtrovat"
@@ -9141,7 +9144,7 @@ msgstr "Vybrat %(what)s"
 msgid "Select all on this page"
 msgstr "Vybrat vše na této stránce"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Vybráno"
@@ -9738,12 +9741,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Seřadit podle %(column)s, od nejvyššího"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Seřadit podle %(column)s, od nejnižšího"
@@ -9916,7 +9919,7 @@ msgstr "Stále živé, v jednání, nabídky a to, co jste poslali za poslední 
 msgid "Stop it working"
 msgstr "Zneplatnit ho"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Přestat řadit podle %(column)s"
@@ -11538,8 +11541,7 @@ msgstr "TLS od prvního bajtu"
 msgid "To"
 msgstr "Do"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "do"
@@ -12684,7 +12686,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "již nabídnuté widgety"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Šířka sloupce {column}"
@@ -13174,7 +13176,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} pixelů"

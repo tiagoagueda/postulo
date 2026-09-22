@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 16:18+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: Lëtzebuergesch\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s ass Äre Bestätegungscode fir %(instance)s. Keen wäert Iech dono froen."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1490,8 +1495,7 @@ msgstr "Huet %(code)s geäntwert."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Egal wéi"
@@ -1786,8 +1790,8 @@ msgstr "Bewäertung"
 msgid "Assessment or test"
 msgstr "Bewäertung oder Test"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "mindestens"
@@ -1797,8 +1801,8 @@ msgstr "mindestens"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Op mannst eng Sprooch muss ugebuede ginn, soss kann keen eppes liesen."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "héchstens"
@@ -4038,7 +4042,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Gëtt ausgefëllt, wann de Bréif mat enger Kandidatur geschéckt gëtt."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filteren"
@@ -4249,8 +4253,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "vun"
@@ -5552,7 +5555,7 @@ msgstr "Eng eenzeg Tast eppes maache loossen"
 msgid "Let this passkey sign me in on its own"
 msgstr "Loosst dëse Zougangsschlëssel mech eleng umellen"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Loosst {column} seng Breet selwer bestëmmen"
@@ -6149,7 +6152,7 @@ msgid ""
 msgstr ""
 "Eng Adress unzeginn, bënnt d'Invitatioun un déi Persoun. Wann et eidel bleift, entsteet e Link, deen jiddereen, deen en huet, eemol benotze kann."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Filteren"
@@ -9131,7 +9134,7 @@ msgstr "%(what)s auswielen"
 msgid "Select all on this page"
 msgstr "Alles op dëser Säit auswielen"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Ausgewielt"
@@ -9729,12 +9732,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "No %(column)s zortéieren, déi héchst fir d’éischt"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "No %(column)s zortéieren, déi niddregst fir d’éischt"
@@ -9908,7 +9911,7 @@ msgstr ""
 msgid "Stop it working"
 msgstr "Ausser Kraaft setzen"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Net méi no %(column)s zortéieren"
@@ -11544,8 +11547,7 @@ msgstr "TLS vum éischte Byte un"
 msgid "To"
 msgstr "Bis"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "bis"
@@ -12699,7 +12701,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "Widgeten, déi scho ugebuede goufen"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Breet vu {column}"
@@ -13190,7 +13192,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} Pixel"

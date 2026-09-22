@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: magyar\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s a megerősítő kódja a következőhöz: %(instance)s. Senki nem fogja kérni Öntől."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1485,8 +1490,7 @@ msgstr "Válasz: %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Bármelyik"
@@ -1780,8 +1784,8 @@ msgstr "Értékelés"
 msgid "Assessment or test"
 msgstr "Értékelés vagy teszt"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "legalább"
@@ -1792,8 +1796,8 @@ msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Legalább egy nyelvet kínálni kell, különben senki sem tud semmit elolvasni."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "legfeljebb"
@@ -4034,7 +4038,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Akkor töltődik ki, amikor a levelet egy jelentkezéssel együtt elküldik."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Szűrés"
@@ -4245,8 +4249,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "ettől"
@@ -5543,7 +5546,7 @@ msgstr "Egyetlen billentyű is csináljon valamit"
 msgid "Let this passkey sign me in on its own"
 msgstr "Ez a hozzáférési kulcs magában is jelentkeztessen be"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Hagyja, hogy a(z) {column} maga állítsa be a szélességét"
@@ -6140,7 +6143,7 @@ msgid ""
 msgstr ""
 "Cím megadásával a meghívó arra a személyre korlátozódik. Üresen hagyva olyan link jön létre, amelyet bárki, akinek megvan, egyszer felhasználhat."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Szűkítés"
@@ -9124,7 +9127,7 @@ msgstr "%(what)s kijelölése"
 msgid "Select all on this page"
 msgstr "Az oldal összes elemének kijelölése"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Kijelölve"
@@ -9722,12 +9725,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Rendezés %(column)s szerint, a legnagyobbal kezdve"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Rendezés %(column)s szerint, a legkisebbel kezdve"
@@ -9900,7 +9903,7 @@ msgstr "Még élő, tárgyalásban, ajánlatok, és amit az elmúlt hónapban k�
 msgid "Stop it working"
 msgstr "Tegye hatálytalanná"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Ne rendezzen %(column)s szerint"
@@ -11527,8 +11530,7 @@ msgstr "TLS az első bájttól"
 msgid "To"
 msgstr "Eddig"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "eddig"
@@ -12679,7 +12681,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "már felajánlott modulok"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "A(z) {column} szélessége"
@@ -13168,7 +13170,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} képpont"

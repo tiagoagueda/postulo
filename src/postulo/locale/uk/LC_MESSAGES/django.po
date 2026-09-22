@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 10:23+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: українська\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s — ваш код підтвердження для %(instance)s. Ніхто не проситиме його у вас."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1509,8 +1514,7 @@ msgstr "Відповів %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Будь-який"
@@ -1803,8 +1807,8 @@ msgstr "Оцінювання"
 msgid "Assessment or test"
 msgstr "Оцінювання або тест"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "не менше"
@@ -1814,8 +1818,8 @@ msgstr "не менше"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Має пропонуватися принаймні одна мова, інакше ніхто нічого не прочитає."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "не більше"
@@ -4051,7 +4055,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Заповнюється, коли лист надсилається разом із заявкою."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Фільтр"
@@ -4262,8 +4266,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "з"
@@ -5562,7 +5565,7 @@ msgstr "Хай одна клавіша щось робить"
 msgid "Let this passkey sign me in on its own"
 msgstr "Дозволити цьому ключу доступу входити самостійно"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Нехай стовпець {column} сам добере ширину"
@@ -6161,7 +6164,7 @@ msgid ""
 msgstr ""
 "Зазначення адреси прив’язує запрошення до цієї людини. Якщо лишити порожнім, створюється посилання, яким будь-хто, хто його має, може скористатися один раз."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Звузити"
@@ -9154,7 +9157,7 @@ msgstr "Вибрати %(what)s"
 msgid "Select all on this page"
 msgstr "Вибрати все на цій сторінці"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Вибрано"
@@ -9751,12 +9754,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Упорядкувати за %(column)s, від найбільшого"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Упорядкувати за %(column)s, від найменшого"
@@ -9930,7 +9933,7 @@ msgstr ""
 msgid "Stop it working"
 msgstr "Зробити його нечинним"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Припинити впорядкування за %(column)s"
@@ -11559,8 +11562,7 @@ msgstr "TLS від першого байта"
 msgid "To"
 msgstr "До"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "до"
@@ -12706,7 +12708,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "віджети, які вже пропонувалися"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Ширина стовпця {column}"
@@ -13197,7 +13199,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} пікселів"

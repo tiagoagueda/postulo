@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: suomi\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s on vahvistuskoodisi palveluun %(instance)s. Kukaan ei kysy sitä sinulta."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1482,8 +1487,7 @@ msgstr "Vastasi %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Kaikki"
@@ -1777,8 +1781,8 @@ msgstr "Arviointi"
 msgid "Assessment or test"
 msgstr "Arviointi tai testi"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "vähintään"
@@ -1788,8 +1792,8 @@ msgstr "vähintään"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Ainakin yhtä kieltä on tarjottava, tai kukaan ei voi lukea mitään."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "enintään"
@@ -4027,7 +4031,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Täytetään, kun kirje lähetetään hakemuksen mukana."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Suodata"
@@ -4237,8 +4241,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "alkaen"
@@ -5537,7 +5540,7 @@ msgstr "Anna yhden näppäimen tehdä jotakin"
 msgid "Let this passkey sign me in on its own"
 msgstr "Anna tämän avaimen kirjata minut sisään yksinään"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Anna sarakkeen {column} mitoittaa itsensä"
@@ -6134,7 +6137,7 @@ msgid ""
 msgstr ""
 "Osoitteen antaminen rajaa kutsun kyseiselle henkilölle. Tyhjäksi jättäminen luo linkin, jota kuka tahansa sen haltija voi käyttää kerran."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Rajaa"
@@ -9111,7 +9114,7 @@ msgstr "Valitse %(what)s"
 msgid "Select all on this page"
 msgstr "Valitse kaikki tältä sivulta"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Valittu"
@@ -9709,12 +9712,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Järjestä %(column)s mukaan, suurin ensin"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Järjestä %(column)s mukaan, pienin ensin"
@@ -9887,7 +9890,7 @@ msgstr "Yhä auki, keskusteluissa, tarjoukset ja mitä lähetit viime kuussa."
 msgid "Stop it working"
 msgstr "Tee siitä toimimaton"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Lopeta järjestäminen %(column)s mukaan"
@@ -11512,8 +11515,7 @@ msgstr "TLS ensimmäisestä tavusta"
 msgid "To"
 msgstr "Asti"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "asti"
@@ -12664,7 +12666,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "jo tarjotut osiot"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Sarakkeen {column} leveys"
@@ -13153,7 +13155,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} kuvapistettä"

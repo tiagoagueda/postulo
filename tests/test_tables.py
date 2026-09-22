@@ -192,6 +192,84 @@ def test_the_header_carries_live_filter_inputs_and_the_sort_in_force(client, use
     assert "hx-preserve" in body
 
 
+# --------------------------------------------- the filter lives in its own header (#253)
+
+
+def head_of(body: str) -> str:
+    return body.split("<thead")[1].split("</thead>")[0]
+
+
+def test_a_column_folds_its_filter_away_until_it_is_opened(client, user, search):
+    """The row of inputs that was always on screen is gone; each column carries its own.
+
+    A disclosure, not a script: the control is in the markup either way, so *Apply* narrows
+    the table with JavaScript switched off exactly as it did.
+    """
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list")).content.decode()
+
+    assert "data-filter-row" not in body, "the permanent second row is gone"
+    assert body.count("data-col-filter") == len(
+        [c for c in CompaniesTable.columns if c.filter and c.default]
+    )
+    assert 'id="filter-location"' in body, "folded away, not left out"
+    assert "<details" in body.split("<thead")[1].split("</thead>")[0]
+
+
+def test_a_column_that_is_narrowing_says_so_and_stays_open(client, user, search):
+    """Folding a filter away costs somebody the knowledge that it is there, and the header
+    has to pay that back -- otherwise the list is short and nothing on screen says why."""
+    client.force_login(user)
+
+    plain = head_of(client.get(reverse("jobs:company_list")).content.decode())
+    assert "Location is filtered" not in plain
+    assert "open>" not in plain
+
+    narrowed = head_of(
+        client.get(reverse("jobs:company_list"), {"location": "mexico"}).content.decode()
+    )
+    assert 'aria-label="Location is filtered"' in narrowed
+    assert "data-col-filter open" in narrowed
+    assert 'value="mexico"' in narrowed
+
+
+def test_the_sort_is_an_icon_now_and_still_says_what_it_will_do(client, user, search):
+    """The label became the filter, so sorting had to move. An icon-only control keeps the
+    id htmx hands focus back to, keeps its 24-pixel target, and keeps its name (#227, #115).
+    """
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list"), {"sort": "name"}).content.decode()
+
+    assert 'id="sort-name"' in body
+    assert 'aria-label="Sort by name, highest first"' in body
+    assert 'data-icon="arrow-up"' in body, "the state it is in"
+    assert 'data-icon="chevrons-up-down"' in body, "and a picture for the state that had none"
+    assert "tap-target shrink-0" in body
+
+
+def test_an_unsortable_column_draws_no_sort_control(client, user, search):
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list")).content.decode()
+
+    for column in CompaniesTable.columns:
+        if column.default and not column.sortable:
+            assert f'id="sort-{column.key}"' not in body
+
+
+def test_the_header_and_the_phone_block_draw_the_same_control(client, user, search):
+    """One component, two callers: the header narrows live, the phone block waits for
+    *Apply*, and the shapes cannot drift because there is only one of each."""
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list")).content.decode()
+
+    assert 'id="filter-applications-min"' in body and 'id="filter-applications-narrow-min"' in body
+    live = body.split('id="filter-location"')[1][:600]
+    quiet = body.split('id="filter-location-narrow"')[1][:600]
+    assert "hx-get" in live and "hx-get" not in quiet
+    assert 'aria-label="Filter by location"' in live
+    assert "aria-label" not in quiet, "the phone block draws a visible label instead"
+
+
 # ---------------------------------------------------------------------- columns
 
 

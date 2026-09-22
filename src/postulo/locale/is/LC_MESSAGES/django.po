@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: íslenska\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s er staðfestingarkóðinn þinn fyrir %(instance)s. Enginn mun biðja þig um hann."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1486,8 +1491,7 @@ msgstr "Svaraði %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Hvaða sem er"
@@ -1780,8 +1784,8 @@ msgstr "Mat"
 msgid "Assessment or test"
 msgstr "Mat eða próf"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "að minnsta kosti"
@@ -1792,8 +1796,8 @@ msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
 "Að minnsta kosti eitt tungumál verður að vera í boði, annars getur enginn lesið neitt."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "að hámarki"
@@ -4028,7 +4032,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Fyllt út þegar bréfið er sent með umsókn."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Sía"
@@ -4238,8 +4242,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "frá"
@@ -5540,7 +5543,7 @@ msgstr "Láta einn lykil gera eitthvað"
 msgid "Let this passkey sign me in on its own"
 msgstr "Leyfa þessum lykli að skrá mig inn einum og sér"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Láta {column} stilla sína eigin breidd"
@@ -6137,7 +6140,7 @@ msgid ""
 msgstr ""
 "Að nefna vistfang bindur boðið við þá manneskju. Sé það skilið eftir autt verður til tengill sem hver sem heldur á honum má nota einu sinni."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Sía"
@@ -9110,7 +9113,7 @@ msgstr "Velja %(what)s"
 msgid "Select all on this page"
 msgstr "Velja allt á þessari síðu"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Valið"
@@ -9708,12 +9711,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Raða eftir %(column)s, hæsta fyrst"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Raða eftir %(column)s, lægsta fyrst"
@@ -9886,7 +9889,7 @@ msgstr "Enn á lífi, í samtali, tilboð, og það sem þú sendir í síðasta
 msgid "Stop it working"
 msgstr "Gera hann óvirkan"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Hætta að raða eftir %(column)s"
@@ -11512,8 +11515,7 @@ msgstr "TLS frá fyrsta bæti"
 msgid "To"
 msgstr "Til"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "til"
@@ -12661,7 +12663,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "einingar sem þegar hafa verið boðnar"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Breidd {column}"
@@ -13153,7 +13155,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} mynddílar"

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-22 08:55+0000\n"
+"POT-Creation-Date: 2026-09-22 09:20+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -22,6 +22,11 @@ msgid ""
 "%(code)s is your confirmation code for %(instance)s. Nobody will ask you for it."
 msgstr ""
 "%(code)s este codul dumneavoastră de confirmare pentru %(instance)s. Nimeni nu vi-l va cere."
+
+#: src/postulo/core/tables.py:150
+#, python-format
+msgid "%(column)s is filtered"
+msgstr ""
 
 #: src/postulo/jobs/services.py:59
 #, python-format, draft
@@ -1513,8 +1518,7 @@ msgstr "A răspuns %(code)s."
 #: src/postulo/templates/applications/partials/filters.html:16
 #: src/postulo/templates/applications/partials/filters.html:25
 #: src/postulo/templates/applications/partials/filters.html:34
-#: src/postulo/templates/cotton/table/head.html:113
-#: src/postulo/templates/partials/table/narrow.html:27
+#: src/postulo/templates/cotton/table/filter.html:49
 #, draft
 msgid "Any"
 msgstr "Oricare"
@@ -1810,8 +1814,8 @@ msgstr "Evaluare"
 msgid "Assessment or test"
 msgstr "Evaluare sau test"
 
-#: src/postulo/templates/cotton/table/head.html:125
-#: src/postulo/templates/partials/table/narrow.html:51
+#: src/postulo/templates/cotton/table/filter.html:61
+#: src/postulo/templates/cotton/table/filter.html:62
 #, draft
 msgid "at least"
 msgstr "cel puțin"
@@ -1821,8 +1825,8 @@ msgstr "cel puțin"
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr "Cel puțin o limbă trebuie oferită, altfel nimeni nu poate citi nimic."
 
-#: src/postulo/templates/cotton/table/head.html:131
-#: src/postulo/templates/partials/table/narrow.html:55
+#: src/postulo/templates/cotton/table/filter.html:70
+#: src/postulo/templates/cotton/table/filter.html:71
 #, draft
 msgid "at most"
 msgstr "cel mult"
@@ -4061,7 +4065,7 @@ msgid "Filled in when the letter is sent with an application."
 msgstr "Se completează când scrisoarea este trimisă cu o candidatură."
 
 #: src/postulo/templates/applications/partials/filters.html:56
-#: src/postulo/templates/cotton/table/head.html:102
+#: src/postulo/templates/cotton/table/filter.html:36
 #, draft
 msgid "Filter"
 msgstr "Filtrează"
@@ -4273,8 +4277,7 @@ msgstr ""
 
 #: src/postulo/resume/models.py:74 src/postulo/resume/models.py:107
 #: src/postulo/resume/models.py:161
-#: src/postulo/templates/cotton/table/head.html:140
-#: src/postulo/templates/partials/table/narrow.html:38
+#: src/postulo/templates/cotton/table/filter.html:82
 #, draft
 msgid "from"
 msgstr "de la"
@@ -5576,7 +5579,7 @@ msgstr "Lasă o singură tastă să facă ceva"
 msgid "Let this passkey sign me in on its own"
 msgstr "Permiteți acestei chei de acces să mă autentifice singură"
 
-#: src/postulo/templates/cotton/table/head.html:39
+#: src/postulo/templates/cotton/table/head.html:79
 #, draft
 msgid "Let {column} size itself"
 msgstr "Lasă coloana {column} să-și aleagă lățimea"
@@ -6174,7 +6177,7 @@ msgid ""
 msgstr ""
 "Indicarea unei adrese restrânge invitația la acea persoană. Lăsată goală, creează un link pe care oricine îl deține îl poate folosi o dată."
 
-#: src/postulo/templates/partials/table/narrow.html:14
+#: src/postulo/templates/partials/table/narrow.html:17
 #, draft
 msgid "Narrow"
 msgstr "Îngust"
@@ -9174,7 +9177,7 @@ msgstr "Selectează %(what)s"
 msgid "Select all on this page"
 msgstr "Selectează tot pe această pagină"
 
-#: src/postulo/templates/cotton/table/head.html:49
+#: src/postulo/templates/cotton/table/head.html:89
 #, draft
 msgid "Selected"
 msgstr "Selectat"
@@ -9773,12 +9776,12 @@ msgstr ""
 msgid "Something worth knowing."
 msgstr ""
 
-#: src/postulo/core/tables.py:286
+#: src/postulo/core/tables.py:319
 #, python-format, draft
 msgid "Sort by %(column)s, highest first"
 msgstr "Sortează după %(column)s, de la cel mai mare"
 
-#: src/postulo/core/tables.py:288
+#: src/postulo/core/tables.py:321
 #, python-format, draft
 msgid "Sort by %(column)s, lowest first"
 msgstr "Sortează după %(column)s, de la cel mai mic"
@@ -9951,7 +9954,7 @@ msgstr "Încă active, în discuție, oferte și ce ați trimis în ultima lună
 msgid "Stop it working"
 msgstr "Scoate-l din uz"
 
-#: src/postulo/core/tables.py:283
+#: src/postulo/core/tables.py:316
 #, python-format, draft
 msgid "Stop sorting by %(column)s"
 msgstr "Nu mai sorta după %(column)s"
@@ -11586,8 +11589,7 @@ msgstr "TLS de la primul octet"
 msgid "To"
 msgstr "Până la"
 
-#: src/postulo/templates/cotton/table/head.html:146
-#: src/postulo/templates/partials/table/narrow.html:41
+#: src/postulo/templates/cotton/table/filter.html:88
 #, draft
 msgid "to"
 msgstr "până la"
@@ -12741,7 +12743,7 @@ msgstr ""
 msgid "widgets already offered"
 msgstr "widgeturi deja oferite"
 
-#: src/postulo/templates/cotton/table/head.html:37
+#: src/postulo/templates/cotton/table/head.html:77
 #, draft
 msgid "Width of {column}"
 msgstr "Lățimea coloanei {column}"
@@ -13234,7 +13236,7 @@ msgstr ""
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr ""
 
-#: src/postulo/templates/cotton/table/head.html:38
+#: src/postulo/templates/cotton/table/head.html:78
 #, draft
 msgid "{column}: {width} pixels"
 msgstr "{column}: {width} pixeli"
