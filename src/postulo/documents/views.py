@@ -2,15 +2,19 @@
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.contrib import messages
 from django.db import models, transaction
 from django.http import HttpRequest, HttpResponse
 from django.middleware.csp import get_nonce
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from django.views.decorators.clickjacking import xframe_options_sameorigin
+from django.views.decorators.csp import csp_override
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from postulo.applications.models import Application
@@ -204,8 +208,28 @@ def _nonce(request: HttpRequest) -> str | None:
     return str(nonce) if nonce is not None else None
 
 
+#: The one policy under which a preview may be framed by its own editing page (#293).
+#:
+#: A framed document is refused by *its own* headers, not by the page framing it: the
+#: instance-wide policy says `frame-ancestors 'none'` and `X-Frame-Options: DENY`, which is
+#: right for every page a person operates and wrong for the two documents that exist to be
+#: looked at from beside their controls. The override is the instance policy with that one
+#: directive turned to `'self'`, so the nonce the preview's `<style>` needs is still in it;
+#: the `X-Frame-Options` decorator below says the same thing in the older header for the
+#: browsers that still read it. Both are on the preview views alone.
+FRAMEABLE_BY_OURSELVES = {**settings.SECURE_CSP, "frame-ancestors": [CSP.SELF]}
+
+
+@method_decorator(csp_override(FRAMEABLE_BY_OURSELVES), name="dispatch")
+@method_decorator(xframe_options_sameorigin, name="dispatch")
 class CVPreviewView(OwnedObjectMixin, View):
-    """The CV as HTML, exactly as the PDF renderer will see it."""
+    """The CV as HTML, exactly as the PDF renderer will see it.
+
+    Framed on the CV's own page since #293, and still a page of its own: the frame fetches
+    this address, so the response, its policy header and the nonce on its `<style>` stay
+    together. A `srcdoc` frame would inherit the parent's policy and render unstyled, which
+    is the bug #232 fixed.
+    """
 
     def get_queryset(self):
         return CV.objects.for_user(self.request.user)
@@ -315,8 +339,13 @@ class CoverLetterDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     success_url = reverse_lazy("documents:letter_list")
 
 
+@method_decorator(csp_override(FRAMEABLE_BY_OURSELVES), name="dispatch")
+@method_decorator(xframe_options_sameorigin, name="dispatch")
 class CoverLetterPreviewView(OwnedObjectMixin, View):
     """Preview a letter, optionally as it would read for one application.
+
+    Framed on the letter's own page as the CV preview is (#293); the application chooser
+    beside the frame points the frame at the version for that application.
 
     The placeholders are marked here and nowhere else: this is the page somebody reads
     *before* deciding, so a gap should look like a gap rather than like a sentence with a

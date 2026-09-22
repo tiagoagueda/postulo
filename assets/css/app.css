@@ -602,6 +602,19 @@
     @apply inline-flex min-h-6 items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs;
   }
 
+  /* A document previewed beside its own controls (#293): the CV or letter, fetched
+     into a frame from the address that renders it exactly as the PDF renderer will.
+
+     An A4 page is not the column's shape, so the frame takes the paper's ratio and the
+     column's width, and the document inside it is scrolled rather than squeezed -- a
+     scale would need a per-page number, and the policy forbids the inline `style` that
+     would carry one (`style-src 'self'`). The border is what says "this is a document,
+     not the page" under forced colours, where the paper's white is discarded. */
+  .document-frame {
+    @apply block w-full rounded-lg border border-ink-200 bg-white dark:border-ink-700;
+    aspect-ratio: 210 / 297;
+  }
+
   .chip-new {
     @apply border-dashed border-brand-500 bg-transparent text-brand-700
       dark:border-brand-400 dark:text-brand-300;
@@ -1322,7 +1335,10 @@ html {
   [data-site-header],
   .skip-link,
   footer,
-  .page-alert {
+  .page-alert,
+  /* Printing the editing page must not print the framed document (#293): the document
+     has an export of its own, and a frame on paper is a box with the first page in it. */
+  .document-frame {
     display: none;
   }
 }

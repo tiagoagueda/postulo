@@ -48,6 +48,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A CV's preview is on its own page, beside the entries, redrawn after every change; a letter's likewise, and its application picker redraws it in place. (#293)
 - The calendar draws application deadlines and listing closing dates as whole days, the key along the top is also the filter, and the diary file carries both as all-day entries. A new notifier event says when a listing you are considering is close to its deadline — three days' warning unless you change it. (#238)
 - A reminder can be edited, deleted, and put off until tomorrow, next week or a time you choose, from its row and from the API (`PATCH` and `DELETE`). Putting one off moves it instead of making a second one. (#238)
 - A tag can take one of seven colours and one of twelve icons, drawn wherever the tag is — the board, the table, an application and the tags page — and the colour box that did nothing is a palette. **Colours you typed become the nearest one**, or grey. (#285)

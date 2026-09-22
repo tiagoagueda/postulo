@@ -3404,6 +3404,24 @@
     font-size: var(--text-xs);
     line-height: var(--tw-leading, var(--text-xs--line-height));
   }
+  .document-frame {
+    display: block;
+    width: 100%;
+    border-radius: var(--radius-lg);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-ink-200);
+    background-color: var(--color-white);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      border-color: var(--color-ink-700);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        border-color: var(--color-ink-700);
+      }
+    }
+    aspect-ratio: 210 / 297;
+  }
   .chip-new {
     --tw-border-style: dashed;
     border-style: dashed;
@@ -4427,7 +4445,7 @@ html {
   .scroll-x {
     overflow: visible;
   }
-  [data-site-header], .skip-link, footer, .page-alert {
+  [data-site-header], .skip-link, footer, .page-alert,  .document-frame {
     display: none;
   }
 }

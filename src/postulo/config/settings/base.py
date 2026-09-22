@@ -625,6 +625,13 @@ SECURE_CSP = {
     "manifest-src": [CSP.SELF],
     "object-src": [CSP.NONE],
     "form-action": [CSP.SELF],
+    # Two directives about frames, pointing opposite ways. `frame-ancestors` is who may put
+    # *Postulo* in a frame: nobody. `frame-src` is what a Postulo page may put in a frame
+    # of its own: since #293 the CV and letter previews, which are whole documents with
+    # their theme's stylesheet inlined and cannot be dropped into the editing page as a
+    # fragment. Same origin only; without this line frames fall back to `default-src`,
+    # which is `'none'`, and the browser refuses the frame silently.
+    "frame-src": [CSP.SELF],
     "frame-ancestors": [CSP.NONE],
     "base-uri": [CSP.SELF],
 }

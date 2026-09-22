@@ -226,3 +226,43 @@ def test_production_refuses_to_start_without_a_secret_key():
 
     assert finished.returncode != 0
     assert "POSTULO_SECRET_KEY must be set" in finished.stderr
+
+
+def test_a_page_may_frame_its_own_document_preview_and_nothing_else(client, person):
+    """Two directives about frames, pointing opposite ways (#293).
+
+    `frame-src 'self'` is what a Postulo page may put in a frame: the CV and letter previews,
+    which are whole documents and can only live beside their controls in one. Without it a
+    frame falls back to `default-src 'none'` and the browser refuses it silently -- a blank
+    box, and since #232 a red browser suite. `frame-ancestors 'none'` is who may put Postulo
+    in a frame, and stays: nobody.
+    """
+    client.force_login(person)
+    policy = client.get(reverse("core:home"))["Content-Security-Policy"]
+    assert "frame-src 'self'" in policy
+    assert "frame-ancestors 'none'" in policy
+
+
+def test_the_preview_itself_lets_its_own_origin_frame_it_and_no_other(client, person):
+    """A framed document is refused by *its* headers, not the framing page's. The instance
+    says `frame-ancestors 'none'` and `X-Frame-Options: DENY`; the two previews say `'self'`
+    and `SAMEORIGIN`, and every other page still says neither (#293)."""
+    from postulo.documents.models import CV, CoverLetter
+
+    cv = CV.objects.create(owner=person, name="Main")
+    letter = CoverLetter.objects.create(owner=person, name="To Aperture", body="Dear all")
+    client.force_login(person)
+
+    for name, pk in (("documents:cv_preview", cv.pk), ("documents:letter_preview", letter.pk)):
+        response = client.get(reverse(name, args=[pk]))
+        policy = response["Content-Security-Policy"]
+        assert "frame-ancestors 'self'" in policy, name
+        assert "frame-ancestors 'none'" not in policy, name
+        assert response["X-Frame-Options"] == "SAMEORIGIN", name
+        # The override is the whole instance policy with one directive changed, so the
+        # nonce the inlined stylesheet needs is still there.
+        assert "nonce-" in policy and "default-src 'none'" in policy, name
+
+    page = client.get(reverse("documents:cv_detail", args=[cv.pk]))
+    assert "frame-ancestors 'none'" in page["Content-Security-Policy"]
+    assert page["X-Frame-Options"] == "DENY"
