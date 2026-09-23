@@ -10,6 +10,9 @@ CI runs them on every push in their own job, with traces kept on failure.
 """
 
 import os
+import sqlite3
+import threading
+import weakref
 
 import pytest
 
@@ -24,6 +27,94 @@ pytest.importorskip("playwright", reason="the browser tests need the e2e depende
 
 EMAIL = "alex.morgan@example.org"
 PASSWORD = "correct-horse-battery-staple"  # a test account's password, not a secret
+
+# -------------------------------------------------------------------- live server cleanup
+# Every database wrapper this process creates, beside a weak reference to the thread that
+# created it. Held rather than looked up, because a wrapper a dead thread created is
+# exactly the object nobody can reach any more (#294).
+_WRAPPERS: dict[int, tuple[weakref.ref, object]] = {}
+
+
+def _register_every_wrapper() -> None:
+    from django.db.utils import ConnectionHandler
+
+    original = ConnectionHandler.create_connection
+
+    def create_connection(self, alias):
+        wrapper = original(self, alias)
+        _WRAPPERS[id(wrapper)] = (weakref.ref(threading.current_thread()), wrapper)
+        return wrapper
+
+    ConnectionHandler.create_connection = create_connection
+
+
+_register_every_wrapper()
+
+
+def _close_connections_left_behind() -> None:
+    """Close the database connections of threads that are no longer running (#294).
+
+    A connection still open in a wrapper whose thread has gone cannot be closed by that
+    thread's own clean-up, and the collector finalising it is what raises the
+    ResourceWarning the suite has been tripping over. Closing it here, from a thread
+    that is running, is the same close, done on time.
+    """
+    for ident, (thread, wrapper) in list(_WRAPPERS.items()):
+        if thread() is not None:
+            continue
+        connection = getattr(wrapper, "connection", None)
+        if connection is None:
+            _WRAPPERS.pop(ident, None)
+            continue
+        try:
+            connection.close()
+        except sqlite3.InterfaceError:
+            pass
+        wrapper.connection = None
+        _WRAPPERS.pop(ident, None)
+
+
+@pytest.fixture(autouse=True)
+def _orphaned_live_server_connections():
+    """No test leaves a database connection for the collector to find (#294).
+
+    The live server answers each request on its own thread, and a database wrapper lives
+    in storage a thread can only see from itself, so when such a thread goes away the
+    connection it opened cannot be closed and waits for the collector, which finalises
+    it with a ResourceWarning that pytest attributes to whichever test is running at the
+    moment. That is how the suite has been failing on an innocent test about one run in
+    two.
+
+    The connection is born while a request thread hosts an event loop. The Chromium PDF
+    backend drives Playwright's synchronous API from the request itself, and asgiref's
+    thread-critical storage switches a looping thread from thread-local to context
+    storage, so a `connections` read in that window starts a second, thread-private
+    connection the thread's own clean-up never sees.
+
+    After each test, the wrappers whose thread has gone are closed. The collector is
+    left nothing to find, and the ResourceWarning stays free to announce a genuinely
+    new leak.
+    """
+    yield
+    _close_connections_left_behind()
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """Sweep once more after the server stops, so a worker that dies while the last
+    response is still in flight leaves no connection behind either (#294). Every test
+    is over by then, so whatever is left in the registry can go."""
+    _close_connections_left_behind()
+    for ident, (_thread, wrapper) in list(_WRAPPERS.items()):
+        connection = getattr(wrapper, "connection", None)
+        if connection is None:
+            _WRAPPERS.pop(ident, None)
+            continue
+        try:
+            connection.close()
+        except sqlite3.InterfaceError:
+            pass
+        wrapper.connection = None
+        _WRAPPERS.pop(ident, None)
 
 
 @pytest.fixture(autouse=True)
