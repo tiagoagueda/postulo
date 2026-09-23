@@ -166,6 +166,95 @@ def test_cmap_with_no_answerable_subtable_cannot_say_yes():
     assert cmap_covers(b"\x00\x01\x00\x02", 0x41) is False, "a directory that is not there"
 
 
+def _mocked_probe_handles(table: bytes):
+    """The probe's native side, mocked: the map resolves one font, HarfBuzz hands its
+    ``cmap`` over as ``table``.
+
+    The first red streak of #74 taught the shape of this: the probe asked the raw FFI
+    object for the HarfBuzz functions, and every page that shows the scripts 500'd on
+    any machine whose font map answers the question. The mocks are the handles the
+    code must ask, and they run where WeasyPrint itself cannot be imported.
+    """
+    import cffi
+
+    ffi = cffi.FFI()
+    data = ffi.new("char[]", table)
+    unrefed = []
+
+    class Pango:
+        def pango_font_map_create_context(self, _font_map):
+            return "context"
+
+        def pango_language_from_string(self, tag):
+            assert tag == b"ara"
+            return "language"
+
+        def pango_context_set_language(self, context, language):
+            assert (context, language) == ("context", "language")
+
+        def pango_font_description_new(self):
+            return "description"
+
+        def pango_font_map_load_font(self, _font_map, context, description):
+            assert (context, description) == ("context", "description")
+            return "font"
+
+        def pango_font_description_free(self, description):
+            assert description == "description"
+
+        def pango_font_get_hb_font(self, font):
+            assert font == "font"
+            return "hb-font"
+
+    class Harfbuzz:
+        def hb_font_get_face(self, hb_font):
+            assert hb_font == "hb-font"
+            return "face"
+
+        def hb_tag_from_string(self, tag, length):
+            assert (tag, length) == (b"cmap", 4)
+            return tag
+
+        def hb_face_reference_table(self, face, tag):
+            assert (face, tag) == ("face", b"cmap")
+            return "blob"
+
+        def hb_blob_get_data(self, blob, length):
+            assert blob == "blob"
+            length[0] = len(table)
+            return data
+
+        def hb_blob_destroy(self, blob):
+            assert blob == "blob"
+
+    class GObject:
+        def g_object_unref(self, obj):
+            unrefed.append(obj)
+
+    return ffi, GObject(), Pango(), Harfbuzz(), unrefed
+
+
+def test_the_probe_reads_the_cmap_of_the_font_the_map_resolves():
+    """A cmap that maps the sample is the machine saying *I draw this* (#74)."""
+    from postulo.documents import fonts
+
+    ffi, gobject, pango, harfbuzz, unrefed = _mocked_probe_handles(_cmap12([(0x0600, 0x06FF, 5)]))
+    answer = fonts._script_drawable(ffi, "font-map", gobject, pango, harfbuzz, "ara", "\u0628")
+    assert answer is True
+    # The font the map loaded and the context are ours to unref; the interned
+    # PangoLanguage is Pango's, and it is left alone.
+    assert unrefed == ["font", "context"]
+
+
+def test_the_probe_says_no_where_the_cmap_does_not_map_the_sample():
+    """Named for the language but lacking the glyph is a document of boxes (#74)."""
+    from postulo.documents import fonts
+
+    ffi, gobject, pango, harfbuzz, _unrefed = _mocked_probe_handles(_cmap12([(0x1200, 0x137F, 10)]))
+    answer = fonts._script_drawable(ffi, "font-map", gobject, pango, harfbuzz, "ara", "\u0628")
+    assert answer is False
+
+
 def test_the_check_says_cannot_check_where_it_cannot_be_asked():
     """A machine without Pango answers ``None``, never a guess (#74)."""
     from postulo.documents import fonts

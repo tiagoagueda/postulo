@@ -160,7 +160,7 @@ def renderable_scripts() -> dict[str, bool] | None:
     if not _is_importable("weasyprint"):
         return None
     try:
-        from weasyprint.text.ffi import ffi, fontconfig, gobject, pango, pangoft2
+        from weasyprint.text.ffi import ffi, fontconfig, gobject, harfbuzz, pango, pangoft2
     except Exception:
         # Deliberately broad, the way ``pdf._is_importable`` is: a native library
         # missing is an OSError, a library present but broken is something else,
@@ -185,11 +185,15 @@ def renderable_scripts() -> dict[str, bool] | None:
             answer[script] = False
             continue
         language_tag, sample = probe
-        answer[script] = _script_drawable(ffi, font_map, gobject, pango, language_tag, sample)
+        answer[script] = _script_drawable(
+            ffi, font_map, gobject, pango, harfbuzz, language_tag, sample
+        )
     return answer
 
 
-def _script_drawable(ffi, font_map, gobject, pango, language_tag: str, sample: str) -> bool:
+def _script_drawable(
+    ffi, font_map, gobject, pango, harfbuzz, language_tag: str, sample: str
+) -> bool:
     """The font the map resolves for that language, and its cmap's word on the sample."""
     context = pango.pango_font_map_create_context(font_map)
     try:
@@ -205,18 +209,23 @@ def _script_drawable(ffi, font_map, gobject, pango, language_tag: str, sample: s
         if font == ffi.NULL:
             return False
         try:
-            face = ffi.hb_font_get_face(pango.pango_font_get_hb_font(font))
+            # The hb_ calls go to HarfBuzz's own handle, the way WeasyPrint's shaping does:
+            # its functions are a library of their own, and the FFI object itself has never
+            # carried them — asking it was the first red streak of #74.
+            face = harfbuzz.hb_font_get_face(pango.pango_font_get_hb_font(font))
             if face == ffi.NULL:
                 return False
-            blob = ffi.hb_face_reference_table(face, ffi.hb_tag_from_string(b"cmap", 4))
+            blob = harfbuzz.hb_face_reference_table(face, harfbuzz.hb_tag_from_string(b"cmap", 4))
             if blob == ffi.NULL:
                 return False
             try:
                 length = ffi.new("unsigned int *")
-                data = ffi.hb_blob_get_data(blob, length)
+                data = harfbuzz.hb_blob_get_data(blob, length)
+                if data == ffi.NULL:
+                    return False
                 return cmap_covers(bytes(ffi.buffer(data)[: length[0]]), ord(sample))
             finally:
-                ffi.hb_blob_destroy(blob)
+                harfbuzz.hb_blob_destroy(blob)
         finally:
             gobject.g_object_unref(font)
     finally:
