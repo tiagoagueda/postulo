@@ -14,7 +14,10 @@ laptop of whoever added the language rather than in somebody's hands.
 """
 
 import re
+import struct
 from pathlib import Path
+
+import pytest
 
 from postulo.core import languages
 
@@ -86,3 +89,116 @@ def test_the_dockerfile_reader_ignores_comments():
     text = DOCKERFILE.read_text(encoding="utf-8")
     assert "# tests/test_fonts.py holds this list" in text, "the comment moved; check this still"
     assert "fonts-noto-cjk" not in installed_font_packages()
+
+
+# --------------------------------------- the decision #74 made and the door it left
+
+
+def test_cjk_is_not_the_default_image():
+    """Doubling the image for a language almost none of the installations will use (#74)."""
+    assert "fonts-noto-cjk" not in installed_font_packages()
+
+
+def test_the_image_has_a_door_for_the_fonts_it_does_not_carry():
+    """The opt-in is an argument the runtime stage consumes, not a comment (#74)."""
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    assert 'ARG POSTULO_EXTRA_APT_PACKAGES=""' in text
+    body = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    assert "POSTULO_EXTRA_APT_PACKAGES" in body, "declared, but nothing installs it"
+    assert "apt-get install" in body
+
+
+# ------------------------------------------------- the runtime check, the half that
+# -------------------------------------------- can be asked of any machine, anywhere
+
+
+def _cmap12(ranges) -> bytes:
+    """A whole cmap table carrying one format-12 subtable with these (start, end, glyph)."""
+    body = struct.pack(">HHIII", 12, 0, 16 + 12 * len(ranges), 0, len(ranges))
+    body += b"".join(struct.pack(">III", *r) for r in ranges)
+    return struct.pack(">HH", 0, 1) + struct.pack(">HHI", 0, 4, 12) + body
+
+
+def _cmap4(start, end, delta, range_offset=0, glyph_array=b"") -> bytes:
+    """A whole cmap table carrying one format-4 subtable with one segment."""
+    body = struct.pack(">HHHHHHH", 4, 0, 0, 2, 2, 0, 0)
+    body += struct.pack(">H", end)
+    body += struct.pack(">H", 0)
+    body += struct.pack(">H", start)
+    body += struct.pack(">h", delta)
+    body += struct.pack(">H", range_offset)
+    body += glyph_array
+    return struct.pack(">HH", 0, 1) + struct.pack(">HHI", 3, 1, 12) + body
+
+
+def test_cmap_says_yes_for_a_character_in_a_mapped_range():
+    from postulo.documents.fonts import cmap_covers
+
+    assert cmap_covers(_cmap12([(0x0600, 0x06FF, 5)]), 0x0628) is True
+
+
+def test_cmap_says_no_when_the_range_maps_to_nothing():
+    """A range whose first glyph is zero is the font saying *not here* (#74)."""
+    from postulo.documents.fonts import cmap_covers
+
+    assert cmap_covers(_cmap12([(0x0600, 0x06FF, 0)]), 0x0628) is False
+    assert cmap_covers(_cmap12([(0x0600, 0x06FF, 0), (0x1200, 0x137F, 10)]), 0x1200) is True
+
+
+def test_cmap_reads_format_four_through_the_delta_and_the_glyph_array():
+    from postulo.documents.fonts import cmap_covers
+
+    assert cmap_covers(_cmap4(0x0600, 0x06FF, 5), 0x0628) is True
+    assert cmap_covers(_cmap4(0x0600, 0x06FF, -0x0600), 0x0600) is False
+
+    through_array = _cmap4(0x0600, 0x0601, 0, range_offset=2, glyph_array=struct.pack(">HH", 7, 0))
+    assert cmap_covers(through_array, 0x0600) is True
+    assert cmap_covers(through_array, 0x0601) is False
+
+
+def test_cmap_with_no_answerable_subtable_cannot_say_yes():
+    """Format 0 is Mac Roman: a table with only that is a table with no answer (#74)."""
+    from postulo.documents.fonts import cmap_covers
+
+    table = struct.pack(">HH", 0, 1) + struct.pack(">HHI", 1, 0, 12) + struct.pack(">H", 0)
+    assert cmap_covers(table, 0x0628) is False
+    assert cmap_covers(b"", 0x41) is False
+    assert cmap_covers(b"\x00\x01\x00\x02", 0x41) is False, "a directory that is not there"
+
+
+def test_the_check_says_cannot_check_where_it_cannot_be_asked():
+    """A machine without Pango answers ``None``, never a guess (#74)."""
+    from postulo.documents import fonts
+    from postulo.documents.pdf import _is_importable
+
+    if _is_importable("weasyprint"):
+        pytest.skip("this machine can be asked; the check is answered, not skipped")
+    assert fonts.renderable_scripts() is None
+
+
+def test_every_script_the_declaration_knows_the_check_can_probe():
+    """The two tables are two views of the same fact; they are held to each other (#74).
+
+    Latin is the one script with no probe by design: it is what every font the map can
+    resolve already draws, so the check never asks about it.
+    """
+    from postulo.core import languages
+    from postulo.documents import fonts
+
+    unprobed_offered = languages.scripts_offered() - set(fonts.PROBES)
+    assert not unprobed_offered, f"offered but the check cannot probe: {sorted(unprobed_offered)}"
+    unprobed_known = set(COVERAGE) - {"Latin"} - set(fonts.PROBES)
+    assert not unprobed_known, (
+        f"the declaration knows but the check cannot probe: {sorted(unprobed_known)}"
+    )
+
+
+def test_the_probe_of_a_script_is_a_character_of_that_script():
+    """A probe that is not in the script's block would pass for the wrong reason."""
+    import unicodedata
+
+    from postulo.documents import fonts
+
+    for script, (_tag, sample) in fonts.PROBES.items():
+        name = unicodedata.name(sample)
+        assert script.upper() in name or "CJK" in name, (script, sample, name)

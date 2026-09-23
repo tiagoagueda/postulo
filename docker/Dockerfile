@@ -159,9 +159,15 @@ ENV PYTHONUNBUFFERED=1 \
 # fonts-noto-core is for the scripts. DejaVu draws Latin, Greek and Cyrillic and stops
 # there, so an Amharic or Tigrinya CV rendered in this image came out a page of empty
 # boxes, and a box on somebody's CV is worse than English. Noto's core set covers
-# Arabic and Ethiopic (#70), and the Indic scripts and Hebrew that #71 will want; CJK
-# is a separate package and a separate decision when that phase arrives.
+# Arabic and Ethiopic (#70), and the Indic scripts and Hebrew that #71 will want. CJK
+# is a separate package and a deliberate absence: the image does not double in size for
+# a language almost none of the installations will use, and the door for it is
+# POSTULO_EXTRA_APT_PACKAGES below (#74).
 # tests/test_fonts.py holds this list to the languages Postulo actually offers.
+#
+# What the declaration does not say — whether the machine actually has the fonts —
+# `manage.py check_fonts` asks of the running instance, and *Server settings →
+# Overview* shows the answer (#74).
 #
 # `apt-get upgrade` before the install, and it is a decision rather than hygiene (#155).
 # Debian publishes a security update; the base image keeps what it was built with until
@@ -200,12 +206,23 @@ ENV PYTHONUNBUFFERED=1 \
 # One layer, with the second index refresh inside it: the new repository has to be read
 # before its package can be installed, and a `RUN` of its own would be served from cache
 # exactly when the source line above it had changed.
+# The door for packages the default image does not carry (#74). It takes any number of
+# apt packages, in whatever form apt accepts, and installs them into this stage only.
+# The build stage's POSTULO_EXTRA_PACKAGES is the pip door, and the two are separate
+# questions: a Python package a plugin needs is not a font a document needs. The one
+# decision it exists to hold is written above — CJK is opt-in, and this is how it is
+# opted in:
+#     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-cjk ...
+ARG POSTULO_EXTRA_APT_PACKAGES=""
 RUN apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \
         fonts-dejavu-core fonts-noto-core \
         ca-certificates curl \
+    && if [ -n "$POSTULO_EXTRA_APT_PACKAGES" ]; then \
+           apt-get install -y --no-install-recommends $POSTULO_EXTRA_APT_PACKAGES; \
+       fi \
     && install -d /usr/share/postgresql-common/pgdg \
     && curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
         https://www.postgresql.org/media/keys/ACCC4CF8.asc \

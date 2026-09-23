@@ -98,6 +98,26 @@ def test_the_overview_says_what_is_running(client, admin):
     assert "POSTULO_ADMIN_URL" not in html and "Django admin" not in html
 
 
+def test_the_overview_says_which_scripts_this_machine_draws(client, admin):
+    """The renderer's row has its pair: the question about the fonts, not the package (#74).
+
+    The two machines are both covered: one that can be asked lists its scripts, and one
+    that cannot be asked says so — *cannot be checked* must not read as *all of them*.
+    """
+    from postulo.documents import fonts
+
+    client.force_login(admin)
+    html = client.get(reverse("server:overview")).content.decode()
+    if fonts.renderable_scripts() is None:
+        assert 'data-fonts="unknown"' in html
+        assert "cannot be checked on this machine" in html
+    else:
+        assert 'data-fonts="listed"' in html
+        assert "check_fonts" in html, "the command-line pair, named beside the row"
+        for script in sorted(fonts.renderable_scripts()):
+            assert script in html
+
+
 def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(client, admin, user):
     """The one place inside the application that mentions support (#199).
 

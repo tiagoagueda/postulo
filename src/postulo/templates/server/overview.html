@@ -61,6 +61,27 @@
           <dt class="text-ink-500 dark:text-ink-400">{% translate "PDF renderer" %}</dt>
           <dd>{% if pdf_backend %}{{ pdf_backend }}{% else %}<span class="text-red-600 dark:text-red-400">{% translate "none usable" %}</span>{% endif %}</dd>
         </div>
+        {% comment %} The row above says who draws; this one says whether the drawing can
+           be read. Which of the scripts the offered languages need, this machine's
+           fonts draw — the question a render would have asked, asked now (#74).
+           `None` is a state of its own: a machine without WeasyPrint's libraries
+           cannot be asked, and "cannot be checked" must not read as "all of them". {% endcomment %}
+        <div class="flex justify-between gap-4" data-fonts="{% if font_scripts is None %}unknown{% else %}listed{% endif %}">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Fonts" %}</dt>
+          <dd class="min-w-0 text-end">
+            {% if font_scripts is None %}
+              <span class="text-ink-500 dark:text-ink-400">{% translate "cannot be checked on this machine" %}</span>
+              <span class="block text-xs text-ink-500 dark:text-ink-400">
+                {% translate "WeasyPrint's system libraries are absent, so the scripts it would draw are not known. Where they are present, this row lists them." %}
+              </span>
+            {% else %}
+              {% for script, drawable in font_scripts %}{% if not forloop.first %}, {% endif %}<span class="{% if not drawable %}text-red-600 dark:text-red-400{% endif %}">{{ script }}</span>{% endfor %}
+              <span class="block text-xs text-ink-500 dark:text-ink-400">
+                {% translate "manage.py check_fonts asks the same from the command line." %}
+              </span>
+            {% endif %}
+          </dd>
+        </div>
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "Queued tasks" %}</dt>
           <dd>{% if queued_tasks is not None %}{{ queued_tasks }}{% else %}—{% endif %}</dd>

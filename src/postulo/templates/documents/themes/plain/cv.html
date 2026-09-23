@@ -2,7 +2,12 @@
 
 {% block page_styles %}
       body {
-        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        /* The stack ends with the Noto families rather than the generic family, because
+           the generic one is how a theme *lands* on a fallback by accident (#74): what a
+           Greek, Cyrillic, Arabic or Ethiopic line resolves to is stated here, not left
+           to whatever the fontconfig on the drawing machine happens to reach first.
+           CJK is not named: it is an opt-in build, and the themes say so in #71's commit. */
+        font-family: "Helvetica Neue", Helvetica, Arial, "Noto Sans", "Noto Sans Ethiopic", "Noto Naskh Arabic", sans-serif;
         font-size: 10pt;
         line-height: 1.45;
       }

@@ -50,6 +50,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- `manage.py check_fonts` and *Server settings → Overview* say which of the scripts the offered languages need this instance can actually draw, and the document themes name their per-script fallbacks; the image's CJK is a build argument, not a default. (#74)
 - Start-up refuses a setting outside its vocabulary, a malformed rate or a bare `POSTULO_PUBLIC_URL`, with a message naming it. Every log line names its request, scheduler pass or errand, `X-Request-ID` is honoured and echoed, and `POSTULO_LOG_FORMAT=json` is there for a parsed console. (#233)
 - A built-in *Webhook* notifier posts every event as signed JSON to an address you give, delivered by the scheduler with backoff; three new events — a status change, an interview scheduled or moved, an offer recorded — are on for it and off for the notifiers that reach a person. (#240)
 - An offer can be recorded on an application — pay, variable pay, equity, benefits, where, holidays, start and answer-by dates — and every application at *Offer* is compared side by side, amounts brought to a year within a currency; the answer-by date is on the calendar with a reminder. (#237)

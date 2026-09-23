@@ -97,6 +97,21 @@ def _pdf_backend_name() -> str | None:
         return None
 
 
+def _font_scripts() -> list[tuple[str, bool]] | None:
+    """The offered scripts and whether this machine draws each.
+
+    ``None`` rather than an empty list when the question cannot be asked here:
+    *nothing to show* and *cannot be checked* are different things on this page,
+    and the page says which it is (#74).
+    """
+    from postulo.documents import fonts
+
+    answer = fonts.renderable_scripts()
+    if answer is None:
+        return None
+    return sorted(answer.items())
+
+
 def _queued_tasks() -> int | None:
     try:
         from django_tasks_db.models import DBTaskResult
@@ -125,6 +140,10 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "database_engine": connection.vendor,
                 "database_name": str(database.get("NAME", "")),
                 "pdf_backend": _pdf_backend_name(),
+                # The same question as the PDF renderer's, one level down: which of
+                # the scripts the offered languages need this machine's fonts draw.
+                # ``None`` says the machine cannot be asked (#74).
+                "font_scripts": _font_scripts(),
                 "media_root": media_root,
                 "media_files": media_files,
                 "media_bytes": media_bytes,
