@@ -220,5 +220,8 @@ def _script_drawable(ffi, font_map, gobject, pango, language_tag: str, sample: s
         finally:
             gobject.g_object_unref(font)
     finally:
-        gobject.g_object_unref(language)
+        # PangoLanguage is interned by Pango: pango_language_from_string hands out
+        # (transfer none) objects held in a process-lifetime table, so they must
+        # never be unref'd (doing so corrupts Pango and segfaults). The context is
+        # a caller-owned GObject and is unref'd, matching WeasyPrint.
         gobject.g_object_unref(context)
