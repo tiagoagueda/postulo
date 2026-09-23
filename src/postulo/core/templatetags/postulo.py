@@ -215,6 +215,30 @@ def company_identifier(company, column_key: str) -> str:
     return identifier.value
 
 
+def _tile(
+    css_class: str, shape: str, *, picture: str = "", colour: str = "", letters: str = ""
+) -> str:
+    """Basecoat's `avatar` (#291): a box that holds a picture, or initials on a colour.
+
+    One shape for a person, a company and a plugin, which were three copies of the same
+    inline-flex tile. The size classes go on the box and the text-size ones on the initials
+    inside it, because Basecoat sets a size of its own on the inner span and a utility on
+    that span is what overrides it. The picture is decorative and the initials are hidden
+    from assistive technology: each stands beside its name.
+    """
+    classes = css_class.split()
+    box = " ".join(c for c in classes if not c.startswith("text-"))
+    text = " ".join(c for c in classes if c.startswith("text-"))
+    if picture:
+        return mark_safe(  # noqa: S308
+            f'<span class="avatar {escape(box)} {shape}"><img src="{picture}" alt=""></span>'
+        )
+    return mark_safe(  # noqa: S308
+        f'<span class="avatar {escape(box)} {colour} {shape} font-semibold text-white" '
+        f'aria-hidden="true"><span class="{escape(text)}">{escape(letters)}</span></span>'
+    )
+
+
 @register.simple_tag
 def avatar(user, css_class: str = "size-7 text-xs") -> str:
     """An initials tile for ``user``, until a picture exists to show instead.
@@ -226,17 +250,10 @@ def avatar(user, css_class: str = "size-7 text-xs") -> str:
     picture = getattr(profile, "picture", None) if profile is not None else None
     if picture:
         url = reverse("accounts:avatar", args=[user.pk])
-        return mark_safe(  # noqa: S308
-            f'<img src="{url}?v={profile.picture_version}" alt="" '
-            f'class="{escape(css_class)} shrink-0 rounded-full object-cover">'
-        )
+        return _tile(css_class, "rounded-full", picture=f"{url}?v={profile.picture_version}")
     name = user.display_name or ""
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
-    return mark_safe(  # noqa: S308
-        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
-        'items-center justify-center rounded-full font-semibold text-white" '
-        f'aria-hidden="true">{escape(initials_for(user))}</span>'
-    )
+    return _tile(css_class, "rounded-full", colour=colour, letters=initials_for(user))
 
 
 @register.simple_tag
@@ -253,18 +270,11 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
     if getattr(company, "logo", None):
         url = reverse("jobs:company_logo", args=[company.pk])
         stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
-        return mark_safe(  # noqa: S308
-            f'<img src="{url}?v={stamp}" alt="" '
-            f'class="{escape(css_class)} shrink-0 rounded object-contain">'
-        )
+        return _tile(css_class, "rounded", picture=f"{url}?v={stamp}")
     name = (company.name or "").strip()
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     letters = "".join(word[0] for word in name.replace(".", " ").split()[:2]).upper() or "?"
-    return mark_safe(  # noqa: S308
-        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
-        'items-center justify-center rounded font-semibold text-white" '
-        f'aria-hidden="true">{escape(letters)}</span>'
-    )
+    return _tile(css_class, "rounded", colour=colour, letters=letters)
 
 
 @register.simple_tag
@@ -286,16 +296,10 @@ def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
 
     if logos.logo_for(plugin) is not None:
         url = reverse("connections:logo", args=[name])
-        return mark_safe(  # noqa: S308
-            f'<img src="{url}" alt="" class="{escape(css_class)} shrink-0 rounded object-contain">'
-        )
+        return _tile(css_class, "rounded", picture=url)
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     letters = "".join(word[0] for word in label.replace(".", " ").split()[:2]).upper() or "?"
-    return mark_safe(  # noqa: S308
-        f'<span class="{escape(css_class)} {colour} inline-flex shrink-0 select-none '
-        'items-center justify-center rounded font-semibold text-white" '
-        f'aria-hidden="true">{escape(letters)}</span>'
-    )
+    return _tile(css_class, "rounded", colour=colour, letters=letters)
 
 
 @register.simple_tag

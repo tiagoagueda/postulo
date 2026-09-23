@@ -367,6 +367,20 @@ def test_the_tag_still_draws_initials_for_a_user_without_a_profile():
     assert ">AM</span>" in rendered and "<img" not in rendered
 
 
+def test_the_tile_is_basecoats_avatar_with_the_sizes_where_the_stylesheet_reads_them():
+    """One tile for a person, a company and a plugin (#291): the box carries the size and the
+    initials inside it carry the text size, because Basecoat sizes the inner span itself
+    and a utility on that span is what overrides it."""
+    from postulo.core.templatetags.postulo import _tile
+
+    initials = _tile("size-7 text-xs", "rounded-full", colour="bg-brand-600", letters="AM")
+    assert initials.startswith('<span class="avatar size-7 bg-brand-600 rounded-full')
+    assert '<span class="text-xs">AM</span>' in initials and 'aria-hidden="true"' in initials
+
+    picture = _tile("size-24 text-3xl", "rounded", picture="/p.png?v=2")
+    assert picture == '<span class="avatar size-24 rounded"><img src="/p.png?v=2" alt=""></span>'
+
+
 def test_the_profile_page_is_no_longer_short_of_pixels():
     """The measurement #265 opens with, turned into a check.
 

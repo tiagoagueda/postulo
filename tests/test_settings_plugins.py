@@ -75,9 +75,11 @@ def test_every_row_carries_the_plugins_logo(client, user, third_party):
     for name in (third_party, PLUGIN):
         row = row_for(html, name)
         assert row, name
-        tile = re.search(r"<(img|span)[^>]*(select-none|object-contain)[^>]*>", row)
+        tile = re.search(
+            r'<span class="avatar[^"]*"[^>]*>(<img[^>]*>|<span[^>]*>[^<]*</span>)', row
+        )
         assert tile, f"{name}: no logo or initials tile in the row"
-        assert 'aria-hidden="true"' in tile.group(0) or 'alt=""' in tile.group(0), (
+        assert 'aria-hidden="true"' in tile.group(0) or 'alt=""' in tile.group(1), (
             "decorative: it stands beside the name"
         )
 

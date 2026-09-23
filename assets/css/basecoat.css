@@ -432,3 +432,18 @@
     @apply px-4 py-3 whitespace-normal;
   }
 }
+
+/* ----------------------------------------------------------------- avatar */
+
+/*
+ * The tile the template tags draw a person, a company and a plugin in (#291): a box that
+ * holds a picture, or two letters on a colour. Basecoat lays the picture over the whole
+ * box and cuts it to the box's corners; the one thing painted here is that it fits rather
+ * than fills, which is the same thing for a portrait already cut to a square and the
+ * right thing for a logo that is wider than it is tall.
+ */
+@layer components {
+  .avatar > img {
+    @apply object-contain;
+  }
+}
