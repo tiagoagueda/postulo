@@ -152,7 +152,14 @@ ENV PYTHONUNBUFFERED=1 \
     DJANGO_SETTINGS_MODULE=postulo.config.settings.prod \
     POSTULO_MEDIA_ROOT=/app/data/media \
     POSTULO_BACKUP_DIR=/app/data/backups \
+    POSTULO_GEOLOCATIONS_DIR=/app/data/geonames \
     POSTULO_STATIC_ROOT=/app/staticfiles
+
+# The city table the map places locations from is read from the data volume, not from
+# the source layer it would otherwise sit in: the running container never writes to its
+# own image, and a dataset written there would die with the layer an upgrade replaces.
+# The entrypoint fetches it on first start-up, and a fetch that fails is a map without
+# dots, not a refused start-up.
 
 # libpango and friends are WeasyPrint's; curl is for the health check.
 #

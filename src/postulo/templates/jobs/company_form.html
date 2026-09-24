@@ -21,6 +21,8 @@
         <c-field :field="form.website" />
         <c-field :field="form.careers_url" />
         <c-field :field="form.location" />
+        {% comment %} The place, said exactly, when the guess sat in the wrong one (#108). {% endcomment %}
+        <c-field :field="form.location_correction" />
 
         <fieldset class="mb-4" data-industries {% if form.industries.aria_describedby %}aria-describedby="{{ form.industries.aria_describedby }}"{% endif %}
                   {% include "partials/label_attrs.html" with field=form.industries new_field=form.new_industries %}>

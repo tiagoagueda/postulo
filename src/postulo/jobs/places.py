@@ -24,13 +24,19 @@ data supports — ``location`` is usually a city, and this table resolves exactl
 from __future__ import annotations
 
 import logging
+import os
 import unicodedata
 from functools import lru_cache
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+#: Where the tables are read from: beside the code by default, and on the data volume
+#: in the image, where `POSTULO_GEOLOCATIONS_DIR` points and the entrypoint writes them.
+#: The source layer the code sits in is not a place the running container writes to.
+DATA_DIR = Path(
+    os.environ.get("POSTULO_GEOLOCATIONS_DIR") or Path(__file__).resolve().parent / "data"
+)
 
 #: The table the cities come from, and the table the country names in it are read from.
 #: ``manage.py fetch_geonames`` writes both; ``data/GEONAMES-LICENCE.md`` says on whose

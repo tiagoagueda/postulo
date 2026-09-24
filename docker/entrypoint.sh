@@ -19,6 +19,16 @@ if [ "${POSTULO_SKIP_PLUGIN_SYNC:-}" != "1" ]; then
     python manage.py plugins sync || echo "Postulo: some plugins could not be restored"
 fi
 
+# The offline city table the map places company locations from: fetched once, into the
+# data volume where POSTULO_GEOLOCATIONS_DIR points, and kept there across upgrades.
+# A start-up without a network is a map without dots until one returns, and the map
+# page says the dataset is not there; the rest of Postulo does not care.
+if [ ! -f /app/data/geonames/geonames-cities1000.txt ]; then
+    mkdir -p /app/data/geonames
+    python manage.py fetch_geonames || \
+        echo "Postulo: the GeoNames city dataset could not be fetched; locations are not placed on the map until it is"
+fi
+
 # A quick sanity check on the configuration, so a misconfigured instance says so on
 # start-up rather than at the first request.
 python manage.py check --deploy --fail-level ERROR

@@ -147,3 +147,72 @@ def test_the_missing_dataset_is_said_plainly(client, user, monkeypatch):
     html = page(client, user).content.decode()
 
     assert "fetch_geonames" in html
+
+
+def edit(client, user, company, **fields):
+    client.force_login(user)
+    fields = {"name": company.name, "location": company.location, **fields}
+    return client.post(reverse("jobs:company_update", args=[company.pk]), fields)
+
+
+def test_a_wrong_guess_is_corrected_on_the_companys_form(client, user, monkeypatch, tmp_path):
+    """Somewhere to correct a wrong guess by hand: the company's own form, where the
+    correction is a place name and the record keeps it as a person's, not a guess (#108).
+    """
+    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON, BERLIN), encoding="utf-8")
+    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    response = edit(client, user, company, location_correction="Berlin")
+
+    assert response.status_code == 302
+    company.refresh_from_db()
+    assert company.location_resolved_by == "manual"
+    assert company.location_resolved_from == "Berlin"
+    assert (company.location_lat, company.location_lon) == (52.52437, 13.41053)
+
+    # The correction is a fact a person made, and the next save of the same location
+    # does not guess it away.
+    company.save()
+    company.refresh_from_db()
+    assert company.location_resolved_by == "manual"
+    assert company.location_resolved_from == "Berlin"
+
+
+def test_a_correction_the_table_cannot_place_is_refused(client, user, monkeypatch, tmp_path):
+    """A correction the table cannot place is refused in the form, and the guess stands
+    where it was: a correction that would leave the pin nowhere is not saved as a hole."""
+    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON), encoding="utf-8")
+    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    response = edit(client, user, company, location_correction="Nowhere")
+
+    assert response.status_code == 200, "the form comes back with the reason"
+    company.refresh_from_db()
+    assert company.location_resolved_by == "geonames"
+    assert company.location_resolved_from == "Lisbon"
+
+
+def test_taking_a_correction_off_guesses_again(client, user, monkeypatch, tmp_path):
+    """The form shows a correction where it is, and blank again means the location text
+    guesses (#108)."""
+    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON, BERLIN), encoding="utf-8")
+    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    edit(client, user, company, location_correction="Berlin")
+    company.refresh_from_db()
+    assert company.location_resolved_by == "manual"
+
+    client.force_login(user)
+    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+    assert "Or, exactly where" in html
+    assert "Berlin" in html, "the correction a person made is shown where it is"
+
+    response = edit(client, user, company, location_correction="")
+
+    assert response.status_code == 302
+    company.refresh_from_db()
+    assert company.location_resolved_by == "geonames"
+    assert (company.location_lat, company.location_lon) == (38.72509, -9.1498)

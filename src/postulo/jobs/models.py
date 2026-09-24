@@ -316,7 +316,13 @@ class Company(OwnedModel):
         return reverse("jobs:company_detail", args=[self.pk])
 
     def save(self, *args, **kwargs) -> None:
-        if self.location != self.location_resolved_from:
+        # A correction a person made is not a guess to be made again: the text it was
+        # made from is not this location's text, so the comparison below would not
+        # keep it either way.
+        if (
+            self.location_resolved_by != LocationSource.MANUAL
+            and self.location != self.location_resolved_from
+        ):
             self.apply_location_guess()
         super().save(*args, **kwargs)
 

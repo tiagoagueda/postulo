@@ -44,6 +44,15 @@ somebody can be found. Three consequences, and each is a rule rather than an int
 not going to post anything, so *valid* means well-formed enough to be used. An address can
 never become a recovery route by accident, because there is no flag on it that could.
 
+**The map knows the city and stops there.** A company's location is placed from an offline
+table of cities, and the coordinate it keeps is city level by design (#108): a search at
+street precision is a map of where the person will be at nine in the morning if any of it
+works out, sitting in the same database as the CV that carries the home address. City level
+is also all the data supports, which keeps the private answer and the accurate answer the
+same one. Nothing about a location is ever sent to a geocoding service to be placed, and
+the map is SVG the server itself writes, so a tile server never sees where somebody is
+applying.
+
 ## What is out of scope
 
 - The operator's own machine. Root on the host reads everything; that is true of any
