@@ -24,6 +24,10 @@ from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
 
+#: The classification is not committed (#266); without the file a title matches no
+#: code, and the assertions about the code would be about the absence instead.
+ESCO_DOWNLOADED = esco.data_file() is not None
+
 #: The least an intake form takes, minus the company the test under it is about.
 INTAKE = {"title": "Engineer", "status": Status.APPLIED, "priority": Priority.NORMAL}
 
@@ -113,6 +117,10 @@ def test_one_person_is_never_offered_anothers_records(user, other_user):
     assert recall.sources(user) == ["LinkedIn"]
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_a_form_with_nobody_attached_offers_nothing_of_theirs_rather_than_everything(user):
     """The safe way round, for a route that forgets to pass the person.
 
@@ -128,6 +136,10 @@ def test_a_form_with_nobody_attached_offers_nothing_of_theirs_rather_than_everyt
     assert datalists["title-suggestions"]
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_title_offers_the_classification_not_this_persons_records(user, other_user):
     """What the title offers is the ESCO unit groups, the same for everyone (#266)."""
     a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
@@ -141,6 +153,10 @@ def test_the_title_offers_the_classification_not_this_persons_records(user, othe
     assert all(esco.code_for(name) for name in mine)
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_title_list_is_read_in_the_language_read(user):
     with translation.override("fr"):
         offered = PostingIntakeForm(user=user).datalists["title-suggestions"]
@@ -167,6 +183,10 @@ def test_the_form_declares_a_list_for_each_of_the_four(user):
         assert attrs["autocomplete"] == "off"
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_field_component_draws_the_list_beside_the_box(user, client):
     """One place draws it, so intake, capture review and the listing form all have it."""
     a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
@@ -194,6 +214,10 @@ def test_the_listing_form_and_the_capture_review_get_it_too(user, client):
     assert '<option value="Aperture Science">' in listing
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_a_page_with_nothing_recorded_draws_no_empty_list(user, client):
     """An empty `<datalist>` is a control that does nothing, which is worse than none.
 

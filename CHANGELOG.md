@@ -47,6 +47,9 @@ All notable changes to Postulo are recorded here. The format follows
   paint, starting with the button. (#262)
 - Shared markup is a django-cotton component rather than an include with a `with` chain.
   (#263)
+- The ESCO classification is no longer committed: `manage.py fetch_esco` downloads the
+  revision it names into `src/postulo/jobs/data/`, and without the file Postulo runs on,
+  matching no titles to no codes. (#266)
 
 ### ✨ Added
 

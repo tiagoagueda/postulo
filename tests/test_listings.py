@@ -13,9 +13,14 @@ from postulo.applications.models import Application, Status
 from postulo.core import export as export_module
 from postulo.core.export import build_document, write_archive
 from postulo.core.importer import load
+from postulo.jobs import esco
 from postulo.jobs.models import Capture, Company, DiscardReason, JobPosting, ListingState
 
 pytestmark = pytest.mark.django_db
+
+#: The classification is not committed (#266); without the file a title matches no
+#: code, and the assertions about the code would be about the absence instead.
+ESCO_DOWNLOADED = esco.data_file() is not None
 
 
 @pytest.fixture
@@ -84,6 +89,10 @@ def test_the_queryset_filters_agree_with_the_derived_state(user, company):
     assert new.derived_state_label == "New"
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_title_earns_the_code_the_classification_gives_it(user, company):
     """The code follows the title, so the two cannot disagree (#266)."""
     posting = listing(user, company, title="Software developers")
@@ -94,6 +103,10 @@ def test_the_title_earns_the_code_the_classification_gives_it(user, company):
     assert plain.isco_code == "" and plain.isco_name == ""
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_a_title_in_the_language_read_is_read_in_it(user, company):
     with translation.override("fr"):
         posting = listing(user, company, title="Concepteurs de logiciels")
@@ -101,6 +114,10 @@ def test_a_title_in_the_language_read_is_read_in_it(user, company):
     assert posting.isco_code == "2512"
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_changing_the_title_moves_the_code_and_other_saves_carry_it(user, company):
     posting = listing(user, company, title="Software developers")
     assert posting.isco_code == "2512"
@@ -228,6 +245,10 @@ def test_the_listing_page_carries_the_decision_buttons(client, user, company):
     assert "The location" in html
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_code_the_title_matches_is_on_the_posting_page(user, client, company):
     """The detail page says which unit group the title matched in the classification."""
     item = listing(user, company, title="Software developers")
@@ -302,6 +323,10 @@ def test_the_selectivity_widget_reports_what_was_let_go(client, user, company):
 # -------------------------------------------------------------- export, import
 
 
+@pytest.mark.skipif(
+    not ESCO_DOWNLOADED,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     user, other_user, company
 ):

@@ -6,14 +6,20 @@ Engineer*, *Ingénieur logiciel* and *Engenheiro de software* are one job and th
 strings, and nothing in the code can tell. The fix is the same one NACE had for
 industries: a classification somebody else maintains and publishes translated, taken at
 the level where a name is still a job somebody recognises, kept as a seed and never a
-closed list, and shipped in the repository rather than fetched at runtime.
+closed list, and downloaded in place rather than fetched at runtime.
 """
 
 from __future__ import annotations
 
+import pytest
 from django.utils import translation
 
 from postulo.jobs import esco
+
+pytestmark = pytest.mark.skipif(
+    esco.data_file() is None,
+    reason="the ESCO classification is not downloaded; run 'manage.py fetch_esco'",
+)
 
 # --------------------------------------------------------------- what was vendored
 

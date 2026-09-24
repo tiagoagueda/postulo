@@ -1,11 +1,14 @@
-# Where `esco-1.2.1.json` came from, and on what terms
+# Where `esco-<revision>.json` came from, and on what terms
 
-**What it is.** The **ISCO-08** unit groups that structure the **ESCO** classification —
-the European Commission's classification of skills, competences, qualifications and
-occupations — and the ESCO occupations mapped to them, with the name of each in every
-language the classification is published in. (The counts and the language list are pinned
-by `tests/test_esco.py`, against the published shape of v1.2.1: 3,039 occupations, 436
-unit groups, 28 languages.)
+Postulo keeps a copy of the ESCO classification in `src/postulo/jobs/data/` as
+`esco-<revision>.json`: the **ISCO-08** unit groups that structure the **ESCO**
+classification — the European Commission's classification of skills, competences,
+qualifications and occupations — and the ESCO occupations mapped to them, with the name
+of each in every language the classification is published in. (The counts and the
+language list are pinned by `tests/test_esco.py`, against the published shape of v1.2.1:
+3,039 occupations, 436 unit groups, 28 languages.) It is not committed: a few megabytes
+of reference data is not a repository's job to carry, and `manage.py fetch_esco` is how
+it gets into `data/`.
 
 **Who publishes it.** The Directorate-General for Employment, Social Affairs and
 Inclusion of the European Commission maintains ESCO and publishes it, free of charge, in
@@ -29,12 +32,15 @@ and the occupations, not the skills and competences and qualifications that make
 rest of the classification — see `postulo/jobs/esco.py` for why the unit group is the
 level this uses. Nothing was translated, renamed, merged or added.
 
-**Keeping it current.** ESCO is versioned, and the revision is recorded inside the file
-rather than in a variable name. The harvest is a deliberate act, done once, from the
-official download page, and there is no step in this project that reaches for the
-internet for reference data — a build step that fetches from the internet is a build step
-that fails when somebody else's server does. To replace it: download the next version
-from the same page, reshape it the same way, bump `revision`, and check that every code
-a person's record holds still names a unit group — a code that has gone is a person's
+**How the file gets there, and how it is replaced.** The command asks the ESCO
+web-service API — the machine-facing access the ESCO services document, on the portal
+under *Use ESCO → Use ESCO Services (API)* — for every unit group and occupation in
+every language, checks the answer against the shape the tests pin, and writes
+`esco-<revision>.json` beside the code that reads it. The revision is recorded inside
+the file rather than in a variable name, so whatever `esco-*.json` is in `data/` is what
+runs. There is still no step in a request that reaches for the internet for reference
+data, and without the file Postulo runs on with no codes. To replace it: run the command
+with the next version, bump the tests to the revision they now hold, and delete the file
+being replaced — a code a person's record holds and the new revision has gone is a
 record that keeps its name and loses its code, which is the correct outcome and is what
 `esco.name_for` already does.

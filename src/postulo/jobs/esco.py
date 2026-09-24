@@ -28,13 +28,15 @@ nothing has no code, and that is not a lesser kind of job. The free text stays w
 is, everywhere, and the code follows the name rather than being set beside it, so there
 is one invariant and no way for the two to disagree.
 
-**It ships in the repository and is never fetched at runtime.** At this level the
+**It is downloaded in place, and never fetched at runtime.** At this level the
 classification is 3,475 concepts; the names in the 28 languages it is published in are a
-few megabytes, less than the catalogues this repository already carries. Postulo runs on
-a person's own hardware, sometimes none of it on any network, and a vocabulary that
-needs a fetch is not a vocabulary. The harvest is a deliberate act, done once and
-recorded in the issue, and there is no step in this project that reaches for the
-internet to ask what a word means.
+few megabytes, and a repository is not where reference data that size is kept. So
+``manage.py fetch_esco`` downloads it into ``data/`` once, at provisioning, and there is
+still no step in a request that reaches for the internet to ask what a word means.
+Without the file Postulo runs on: a title matches no code and the title box offers
+nothing, which is the same state as a title that matches nothing, and not a failure.
+The revision is recorded inside the file, so whatever ``esco-*.json`` is in the
+directory is what the loader reads.
 
 **The terms are EUPL 1.2**, as the ESCO services publish them; ``data/ESCO-LICENCE.md``
 says on whose terms, with the attribution and the changes, the way NACE's does.
@@ -43,21 +45,74 @@ says on whose terms, with the attribution and the changes, the way NACE's does.
 from __future__ import annotations
 
 import json
+import logging
 from functools import lru_cache
 from pathlib import Path
 
 from django.utils.translation import get_language
 
-DATA = Path(__file__).resolve().parent / "data" / "esco-1.2.1.json"
+logger = logging.getLogger(__name__)
+
+DATA_DIR = Path(__file__).resolve().parent / "data"
 
 #: The language a name is read in when ESCO publishes nothing in the reader's.
 FALLBACK = "en"
 
+#: What the classification looks like where it has not been downloaded: the same shape,
+#: nothing in it. A title matches no code and the title box offers nothing, which is the
+#: ordinary state of a title that matches nothing, and not an error.
+ABSENT = {
+    "revision": "",
+    "source": "https://esco.ec.europa.eu",
+    "publisher": (
+        "European Commission, Directorate-General for Employment, Social Affairs and Inclusion"
+    ),
+    "licence": "EUPL 1.2",
+    "languages": [],
+    "unit_groups": {},
+    "occupations": {},
+}
+
+#: Once is enough to say the file is not there; the absence is not an error to repeat.
+_warned = False
+
+
+def data_file() -> Path | None:
+    """The classification in the data directory, or None where it has not been downloaded.
+
+    One revision at a time: ``manage.py fetch_esco`` writes ``esco-<revision>.json``, and
+    a replacement is not finished until the old file is deleted, so two files are a state
+    to be reported, not a choice to be made.
+    """
+    files = sorted(DATA_DIR.glob("esco-*.json"))
+    if len(files) > 1:
+        names = ", ".join(file.name for file in files)
+        raise RuntimeError(
+            f"two ESCO classifications in {DATA_DIR} ({names}); delete the one being "
+            "replaced before starting Postulo"
+        )
+    return files[0] if files else None
+
 
 @lru_cache(maxsize=1)
 def classification() -> dict:
-    """The whole file: the revision, the languages, the unit groups, the occupations."""
-    return json.loads(DATA.read_text(encoding="utf-8"))
+    """The whole file: the revision, the languages, the unit groups, the occupations.
+
+    The empty document where the file has not been downloaded; ``manage.py fetch_esco``
+    is how it gets there.
+    """
+    path = data_file()
+    if path is None:
+        global _warned
+        if not _warned:
+            _warned = True
+            logger.warning(
+                "The ESCO classification has not been downloaded, so no title matches a "
+                "code and the title box offers no unit groups. Run 'manage.py fetch_esco' "
+                "to download it in place."
+            )
+        return ABSENT
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def revision() -> str:

@@ -105,6 +105,13 @@ jobs:
       - name: Compile the translations
         run: uv run python scripts/messages.py compile
 
+      - name: Download the ESCO classification
+        # Not committed: a few megabytes of reference data, and the fetch validates
+        # the file it writes, which is the check that it still shapes what the tests pin.
+        run: uv run manage.py fetch_esco --revision 1.2.1
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+
       - name: Test
         # Two processes, not `-n auto` (#233): the three legs of this matrix run at once on
         # one host, and `auto` gave each of them a worker per host core. Run 539 spent 59
