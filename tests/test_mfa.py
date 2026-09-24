@@ -1,5 +1,7 @@
 """Two-factor authentication: a code from an app after the password, and a way back."""
 
+import time
+
 import pytest
 from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
@@ -17,14 +19,18 @@ PASSWORD = "a-fairly-long-password-42"
 def current_code(secret: str) -> str:
     """The code an authenticator app would show now.
 
-    The middle of the tolerance window, not its first counter: the generator starts one
-    period *behind* the clock, and a code from there was accepted only because it sat on the
-    edge of what the server allows. When a thirty-second boundary rolled between making the
-    code and checking it, the edge fell outside the window and the sign-in was refused --
-    once in a while, on whichever CI job the clock caught.
+    The server accepts only the code for the counter the clock is on: the tolerance is
+    zero, so the window does not slide. A code made in the last moments of a
+    thirty-second period is one generation old by the time the period rolls over and the
+    server checks it, and the sign-in is refused. So when a roll is near, wait for it:
+    a pause of a few seconds at most, never a flake.
     """
-    counters = list(totp.yield_hotp_counters_from_time())
-    counter = counters[len(counters) // 2]
+    period = totp.app_settings.TOTP_PERIOD
+    now = time.time()
+    if now % period > period - 5:
+        time.sleep(period - now % period + 0.5)
+        now = time.time()
+    counter = int(now) // period
     return totp.format_hotp_value(totp.hotp_value(secret, counter))
 
 
