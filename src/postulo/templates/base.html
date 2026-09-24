@@ -149,20 +149,90 @@
                        placeholder="{% if keyboard_shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
                        class="w-32 py-1 text-sm transition-[width] focus:w-64">
               </form>
+              {% comment %} The + menu: what a person can start from anywhere (#282). A menu
+                 of actions, so `role="menu"` is the right one here -- unlike the account
+                 disclosure beside it, which is navigation. `<c-dropdown-menu>` is the
+                 component for it: a `<details>` the browser opens with no script, and the
+                 arrow keys `app.js` already adds to `.dropdown-menu`.
+
+                 *Listing* goes to the capture, because that is how a listing usually
+                 starts -- pasting the address of the posting -- and the by-hand entry is
+                 one click away from Listings. *Application* was not in the list the menu
+                 was asked for and is included on purpose, not by accident. *Reminder* is
+                 in for *event*: an event belongs to an application and has no route that
+                 makes one from nowhere, so the masthead offers the thing that is global
+                 and the thing somebody actually wants from a corner of the screen (#282).
+                 *Documents* is three rows under a heading rather than a submenu, because
+                 a submenu does not open with the scripts off. {% endcomment %}
+              <c-dropdown-menu label="{% translate 'New' %}">
+                <c-slot name="trigger">{% icon "plus" %}</c-slot>
+                <a href="{% url 'jobs:capture_create' %}" role="menuitem">
+                  {% icon "briefcase" %}{% translate "Listing" %}
+                </a>
+                <a href="{% url 'applications:create' %}" role="menuitem">
+                  {% icon "send" %}{% translate "Application" %}
+                </a>
+                <a href="{% url 'jobs:company_create' %}" role="menuitem">
+                  {% icon "building-2" %}{% translate "Company" %}
+                </a>
+                <a href="{% url 'applications:reminder_create' %}" role="menuitem">
+                  {% icon "bell" %}{% translate "Reminder" %}
+                </a>
+                <hr role="separator">
+                {% comment %} The three documents as an ARIA `group` inside the menu (#282):
+                   a `group` is what a menu may own for a labelled set of items, so the
+                   label is a name on the group rather than a heading. A heading would also
+                   sit in the document before every page's <h1>, and the masthead may not
+                   carry one. The items are still found by the menu's arrow-key walk, which
+                   queries `role="menuitem"` by descent. {% endcomment %}
+                <div role="group" aria-label="{% translate 'Documents' %}">
+                  <div
+                      class="px-3 pb-1 pt-2 text-xs font-medium text-ink-500 dark:text-ink-400">{% translate "Documents" %}</div>
+                  <a href="{% url 'documents:cv_create' %}" role="menuitem">
+                    {% icon "file-text" %}{% translate "CV" %}
+                  </a>
+                  <a href="{% url 'documents:letter_create' %}" role="menuitem">
+                    {% icon "mail" %}{% translate "Cover letter" %}
+                  </a>
+                  <a href="{% url 'documents:upload_create' %}" role="menuitem">
+                    {% icon "upload" %}{% translate "Upload a file" %}
+                  </a>
+                </div>
+              </c-dropdown-menu>
               {# The account menu: a disclosure the browser opens and closes itself, with #}
               {# the script only adding "close when the pointer goes elsewhere". #}
               {% comment %} Basecoat's popover for the box, and no `role="menu"`: this is
-                 navigation -- three links, a switch and sign-out -- and the pattern for that
-                 is a disclosure, where Tab moves between the rows. The people table's row
-                 actions are a menu of actions and are drawn as one (#262). {% endcomment %}
+                 navigation -- the person, three links, a switch and sign-out -- and the
+                 pattern for that is a disclosure, where Tab moves between the rows. The
+                 people table's row actions are a menu of actions and are drawn as one
+                 (#262).
+
+                 The trigger is the avatar and nothing else (#282): the name it used to
+                 carry is a row of the menu now, so the `aria-label` is the control's only
+                 name and stays. The chevron stays with it, because with the name gone it
+                 is the only thing saying "this opens something". `p-2` is not padding for
+                 looks: 28 pixels of avatar plus 8 on each side is the 44 a thumb wants,
+                 and the avatar itself stays the size every other place in the interface
+                 draws it. {% endcomment %}
               <details class="popover" data-menu>
-                <summary class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2"
+                <summary class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2 rounded-full p-2"
                          aria-label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
                   {% avatar user %}
-                  <span class="hidden sm:inline">{{ user.display_name }}</span>
                   {% icon "chevron-down" class="size-4 text-ink-400" %}
                 </summary>
                 <div data-popover data-align="end">
+                  {% comment %} Who is signed in, at the top of the menu whose trigger used
+                     to say it. The name on its own, with the email under it: *Signed in
+                     as* reads as a security statement and the quieter form is the
+                     decision, made once here rather than left to the template (#282). A
+                     label, not a destination -- *Your details* below is the link. {% endcomment %}
+                  <div class="flex items-center gap-2 px-3 py-2">
+                    {% avatar user %}
+                    <div class="min-w-0">
+                      <div class="truncate text-sm font-medium text-ink-900 dark:text-ink-50">{{ user.display_name }}</div>
+                      <div class="truncate text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
+                    </div>
+                  </div>
                   <a href="{% url 'accounts:profile' %}" class="menu-item">
                     {% icon "user" %}{% translate "Your details" %}
                   </a>

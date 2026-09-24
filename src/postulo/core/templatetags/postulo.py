@@ -243,8 +243,11 @@ def _tile(
 def avatar(user, css_class: str = "size-7 text-xs") -> str:
     """An initials tile for ``user``, until a picture exists to show instead.
 
-    Decorative: it always stands beside the person's name. The colour is a stable
-    function of the display name, so it is the same on every page and every device.
+    Decorative: the picture and the initials are both hidden from assistive
+    technology, and the caller provides the name -- the person's name beside it, or
+    the control's own ``aria-label`` where it stands alone as the masthead's account
+    button (#282). The colour is a stable function of the display name, so it is the
+    same on every page and every device.
     """
     profile = getattr(user, "profile", None) if getattr(user, "pk", None) else None
     picture = getattr(profile, "picture", None) if profile is not None else None

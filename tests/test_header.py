@@ -1,5 +1,6 @@
-"""The header: an account menu on the right, and nothing else there -- the theme switch is
-a row of that menu since #197."""
+"""The header: a + menu and an avatar-only account menu on the right. The name used to
+be in the account trigger and is a row of that menu since #282, and the theme switch
+is a row of that menu since #197."""
 
 import re
 
@@ -17,21 +18,42 @@ def header_of(response) -> str:
     return html[html.index("<header") : html.index("</header>")]
 
 
-def test_the_right_side_holds_the_account_menu_and_the_theme_switch(client, user):
+def test_the_right_side_holds_the_plus_menu_and_the_account_menu(client, user):
     client.force_login(user)
     header = header_of(client.get(reverse("core:home")))
     assert "details" in header and "data-menu" in header
-    assert user.display_name in header
     assert "Account menu, applicant" in header
     assert "Your details" in header
     assert "Settings" in header
     assert "Sign out" in header
     assert "data-theme-switch" in header
-    # Capture and Record have left the header.
-    assert reverse("jobs:capture_create") not in header
-    assert reverse("applications:create") not in header
-    # So has Export: it is a settings section of its own, beside deleting the account,
-    # and a menu with two ways to the same page teaches people to read neither.
+
+    # The profile button is the avatar and nothing else (#282): the name is a row of
+    # the menu now, and the summary's aria-label is the control's only name -- so the
+    # name is in the label and in nothing the trigger draws.
+    start = header.index('aria-label="Account menu, applicant"')
+    trigger = header[start : header.index("</summary>", start)]
+    visible = trigger[trigger.index(">") + 1 :]
+    assert user.display_name not in visible
+    panel = header[header.index("</summary>", start) : header.index("Your details")]
+    assert user.display_name in panel, "and it is in the menu, where it says who you are"
+    assert user.email in panel
+
+    # The + menu starts what a person starts (#282): a listing -- through the capture,
+    # which is how a listing usually starts -- an application, a company, a reminder,
+    # and the three documents. *Reminder* is in for *event*, which has no route that
+    # makes one from nowhere, and *Application* was not asked for and is there on
+    # purpose. The header's *Capture* and *Record* buttons left long ago; the + menu is
+    # what takes their place, as entries of a menu rather than as buttons.
+    assert reverse("jobs:capture_create") in header
+    assert reverse("applications:create") in header
+    assert reverse("jobs:company_create") in header
+    assert reverse("applications:reminder_create") in header
+    assert reverse("documents:cv_create") in header
+    assert reverse("documents:letter_create") in header
+    assert reverse("documents:upload_create") in header
+    # Export has stayed out: it is a settings section of its own, beside deleting the
+    # account, and a menu with two ways to the same page teaches people to read neither.
     assert reverse("core:export") not in header
 
 
