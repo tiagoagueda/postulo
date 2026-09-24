@@ -180,7 +180,7 @@ def test_the_kind_of_a_company_travels_and_an_older_archive_is_employers(populat
         owner=populated, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
     )
     _archive, document = read_archive(populated)
-    assert document["postulo"]["format"] == 17
+    assert document["postulo"]["format"] == 18
     kinds = {row["name"]: row["kind"] for row in document["companies"]}
     assert kinds == {"Black Mesa": "employer", "France Travail": "employment_service"}
 
@@ -451,7 +451,7 @@ def test_an_uploads_and_a_snapshots_language_survive_the_round_trip(user, other_
     sent.file.save("cv.pdf", ContentFile(b"%PDF-1.7 y"), save=True)
 
     document = export_module.build_document(user)
-    assert document["postulo"]["format"] == 17
+    assert document["postulo"]["format"] == 18
     assert document["documents"]["uploads"][0]["language"] == "de"
     assert document["documents"]["sent"][0]["language"] == "fr-fr"
 

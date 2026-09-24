@@ -279,4 +279,4 @@ def test_the_document_carries_the_section(user):
     document = build_document(user)
 
     assert "plugins" in document
-    assert document["postulo"]["format"] == 17
+    assert document["postulo"]["format"] == 18

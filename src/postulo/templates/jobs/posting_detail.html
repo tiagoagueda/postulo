@@ -70,6 +70,14 @@
     <aside>
       <div class="card mb-6">
         <dl class="space-y-3 text-sm">
+          {% if posting.isco_code %}
+            <div>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "ISCO-08" %}</dt>
+              <dd>
+                {{ posting.isco_code }}{% if posting.isco_name %} · {{ posting.isco_name }}{% endif %}
+              </dd>
+            </div>
+          {% endif %}
           {% if posting.salary_display %}
             <div>
               <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Salary" %}</dt>

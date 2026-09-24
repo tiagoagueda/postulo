@@ -93,6 +93,10 @@ All notable changes to Postulo are recorded here. The format follows
   plugin surface, and the contract is on the wiki. (#105)
 - The browser suite reads every page under WCAG's text-spacing override and at 200% zoom.
   (#278)
+- The title box offers the ESCO unit groups in the language read, on the intake form, the
+  listing form and the capture review; the posting keeps the ISCO-08 code its title
+  matches beside it, on its page, the API and the export (format 18). **Postings already
+  recorded have no code until their title is next saved.** (#266)
 
 ### 🐛 Fixed
 

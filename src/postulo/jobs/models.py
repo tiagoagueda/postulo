@@ -37,7 +37,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.identifiers import COMPANY, require, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
-from . import identifiers, industries
+from . import esco, identifiers, industries
 
 
 class Industry(OwnedModel):
@@ -806,6 +806,11 @@ class JobPosting(OwnedModel):
         Company, on_delete=models.CASCADE, related_name="postings", verbose_name=_("company")
     )
     title = models.CharField(_("title"), max_length=250)
+    #: The ISCO-08 unit group the title matches in the ESCO classification, or empty where
+    #: it matches nothing. It follows the title rather than being set beside it, so the two
+    #: cannot disagree; a posting that matches nothing has no code, and that is not a lesser
+    #: kind of job (#266).
+    isco_code = models.CharField(_("ISCO-08 code"), max_length=4, blank=True, editable=False)
     location = models.CharField(_("location"), max_length=200, blank=True)
     remote_type = models.CharField(
         _("working arrangement"), max_length=20, choices=RemoteType, blank=True
@@ -892,6 +897,14 @@ class JobPosting(OwnedModel):
         # Upper-cased rather than refused: "eur" is the code, typed the way people type.
         # The validator then has only one shape to judge (#224).
         self.salary_currency = (self.salary_currency or "").strip().upper()
+        update = kwargs.get("update_fields")
+        if update is None or "title" in update:
+            # The code follows the title, in the language being read (#266): derived
+            # whenever the title may be written, and carried along then, whatever else the
+            # save meant to write.
+            self.isco_code = esco.code_for(self.title)
+            if update is not None and "isco_code" not in update:
+                kwargs["update_fields"] = [*update, "isco_code"]
         return super().save(*args, **kwargs)
 
     def get_absolute_url(self) -> str:
@@ -904,6 +917,11 @@ class JobPosting(OwnedModel):
     @property
     def is_past_closing(self) -> bool:
         return self.closes_at is not None and self.closes_at < timezone.localdate()
+
+    @property
+    def isco_name(self) -> str:
+        """What the classification calls the code this posting carries, in the language read."""
+        return esco.name_for(self.isco_code)
 
     @property
     def has_applications(self) -> bool:

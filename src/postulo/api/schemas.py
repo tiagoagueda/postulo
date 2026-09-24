@@ -147,9 +147,13 @@ class CompanyRef(Schema):
 
 
 class ListingOut(Schema):
+    """A job posting with its company and state. `isco_code` is the ISCO-08 unit group the
+    title matches in the ESCO classification, empty where it matches nothing (#266)."""
+
     id: int
     company: CompanyRef
     title: str
+    isco_code: str = ""
     location: str = ""
     remote_type: str = ""
     employment_type: str = ""
@@ -500,6 +504,7 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
         "id": posting.pk,
         "company": company_ref(posting.company),
         "title": posting.title,
+        "isco_code": posting.isco_code,
         "location": posting.location,
         "remote_type": posting.remote_type,
         "employment_type": posting.employment_type,

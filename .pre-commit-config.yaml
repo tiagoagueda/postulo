@@ -7,6 +7,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        # The ESCO classification (#266) is a few megabytes on purpose: it ships in the
+        # repository and is read from it at runtime. The limit stays a guard for the rest.
+        exclude: ^src/postulo/jobs/data/esco-[^/]+\.json$
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml

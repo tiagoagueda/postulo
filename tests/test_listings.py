@@ -7,7 +7,7 @@ import zipfile
 
 import pytest
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 
 from postulo.applications.models import Application, Status
 from postulo.core import export as export_module
@@ -82,6 +82,36 @@ def test_the_queryset_filters_agree_with_the_derived_state(user, company):
     assert list(everything.in_state("discarded").values_list("title", flat=True)) == ["Binned"]
     assert list(everything.in_state("shortlisted").values_list("title", flat=True)) == ["Short"]
     assert new.derived_state_label == "New"
+
+
+def test_the_title_earns_the_code_the_classification_gives_it(user, company):
+    """The code follows the title, so the two cannot disagree (#266)."""
+    posting = listing(user, company, title="Software developers")
+    assert posting.isco_code == "2512"
+    assert posting.isco_name == "Software developers"
+
+    plain = listing(user, company, title="Fintech wizard")
+    assert plain.isco_code == "" and plain.isco_name == ""
+
+
+def test_a_title_in_the_language_read_is_read_in_it(user, company):
+    with translation.override("fr"):
+        posting = listing(user, company, title="Concepteurs de logiciels")
+
+    assert posting.isco_code == "2512"
+
+
+def test_changing_the_title_moves_the_code_and_other_saves_carry_it(user, company):
+    posting = listing(user, company, title="Software developers")
+    assert posting.isco_code == "2512"
+
+    posting.title = "Senior government officials"
+    posting.save()
+    assert JobPosting.objects.get(pk=posting.pk).isco_code == "1112"
+
+    # A save that does not write the title leaves the code as it is.
+    posting.shortlist()
+    assert JobPosting.objects.get(pk=posting.pk).isco_code == "1112"
 
 
 # ------------------------------------------------------------------- the pages
@@ -198,6 +228,19 @@ def test_the_listing_page_carries_the_decision_buttons(client, user, company):
     assert "The location" in html
 
 
+def test_the_code_the_title_matches_is_on_the_posting_page(user, client, company):
+    """The detail page says which unit group the title matched in the classification."""
+    item = listing(user, company, title="Software developers")
+    client.force_login(user)
+
+    html = client.get(item.get_absolute_url()).content.decode()
+    assert "ISCO-08" in html and "2512" in html
+
+    plain = listing(user, company, title="Fintech wizard")
+    html = client.get(plain.get_absolute_url()).content.decode()
+    assert "ISCO-08" not in html, "a title that matches nothing has no code to show"
+
+
 def test_recording_an_application_still_works_in_one_step(client, user):
     client.force_login(user)
     response = client.post(
@@ -262,16 +305,21 @@ def test_the_selectivity_widget_reports_what_was_let_go(client, user, company):
 def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     user, other_user, company
 ):
-    item = listing(user, company, title="Kept", closes_at=timezone.localdate())
+    item = listing(user, company, title="Software developers", closes_at=timezone.localdate())
     item.shortlist()
     Capture.objects.create(
-        owner=user, url="https://example.org/j/2", data={"title": "Kept"}, posting=item
+        owner=user,
+        url="https://example.org/j/2",
+        data={"title": "Software developers"},
+        posting=item,
     )
 
     document = build_document(user)
-    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 17
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 18
     exported = document["companies"][0]["postings"][0]
     assert exported["state"] == "shortlisted" and exported["decided_at"]
+    # The code the title matches travels beside it (#266), and the importer restores it.
+    assert exported["isco_code"] == "2512"
     assert document["captures"][0]["posting_id"] == item.pk
 
     archive_bytes = write_archive(user).getvalue()
@@ -279,6 +327,7 @@ def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     restored = JobPosting.objects.get(owner=other_user)
     assert restored.state == ListingState.SHORTLISTED
     assert restored.decided_at is not None
+    assert restored.isco_code == "2512"
     assert Capture.objects.get(owner=other_user).posting == restored
 
 

@@ -40,7 +40,15 @@ class ContactAdmin(admin.ModelAdmin):
 
 @admin.register(JobPosting)
 class JobPostingAdmin(admin.ModelAdmin):
-    list_display = ("title", "company", "location", "remote_type", "closed_at", "owner")
+    list_display = (
+        "title",
+        "isco_code",
+        "company",
+        "location",
+        "remote_type",
+        "closed_at",
+        "owner",
+    )
     list_filter = ("owner", "remote_type", "employment_type")
     search_fields = ("title", "location", "description")
     autocomplete_fields = ("company",)

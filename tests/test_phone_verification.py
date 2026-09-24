@@ -295,8 +295,9 @@ def test_the_format_version_moved(user):
     addresses on a profile and on a contact (#92); 13 added the departments inside a company
     and which one an application named (#138); 14 added the kind of a CV, which is what tells
     a portfolio from one (#133); 15 replaced the four single link columns on a profile and a
-    contact with a ``web_links`` list (#189).
+    contact with a ``web_links`` list (#189); 18 added the ISCO-08 code a posting's title
+    matches in the ESCO classification, beside the title itself (#266).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 17
+    assert export.FORMAT_VERSION == 18

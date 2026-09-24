@@ -15,10 +15,11 @@ from __future__ import annotations
 import pytest
 from django import forms
 from django.urls import reverse
+from django.utils import translation
 
 from postulo.applications.forms import ApplicationIntakeForm, PostingIntakeForm
 from postulo.applications.models import Application, Priority, Status
-from postulo.jobs import recall
+from postulo.jobs import esco, recall
 from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
@@ -112,21 +113,50 @@ def test_one_person_is_never_offered_anothers_records(user, other_user):
     assert recall.sources(user) == ["LinkedIn"]
 
 
-def test_a_form_with_nobody_attached_offers_nothing_rather_than_everything(user):
-    """The safe way round, for a route that forgets to pass the person."""
+def test_a_form_with_nobody_attached_offers_nothing_of_theirs_rather_than_everything(user):
+    """The safe way round, for a route that forgets to pass the person.
+
+    The title's list is the classification, not this person's records, so it is the one
+    thing an unattached form is still allowed to offer.
+    """
     a_posting(user)
 
-    assert PostingIntakeForm().datalists == {}
+    datalists = PostingIntakeForm().datalists
+    assert "company-suggestions" not in datalists
+    assert "location-suggestions" not in datalists
+    assert "source-suggestions" not in datalists
+    assert datalists["title-suggestions"]
+
+
+def test_the_title_offers_the_classification_not_this_persons_records(user, other_user):
+    """What the title offers is the ESCO unit groups, the same for everyone (#266)."""
+    a_posting(user, "Aperture Science", location="Cambridge", source="LinkedIn")
+
+    mine = PostingIntakeForm(user=user).datalists["title-suggestions"]
+    theirs = PostingIntakeForm(user=other_user).datalists["title-suggestions"]
+
+    assert mine == theirs, "the classification is not this person's records"
+    assert "Software developers" in mine, "the unit groups, in code order"
+    # Unit groups, not occupations: the level a report can say.
+    assert all(esco.code_for(name) for name in mine)
+
+
+def test_the_title_list_is_read_in_the_language_read(user):
+    with translation.override("fr"):
+        offered = PostingIntakeForm(user=user).datalists["title-suggestions"]
+
+    assert "Concepteurs de logiciels" in offered
 
 
 # ----------------------------------------------------------------- on the page itself
 
 
-def test_the_form_declares_a_list_for_each_of_the_three(user):
+def test_the_form_declares_a_list_for_each_of_the_four(user):
     form = PostingIntakeForm(user=user)
 
     for name, expected in (
         ("company_name", "company-suggestions"),
+        ("title", "title-suggestions"),
         ("location", "location-suggestions"),
         ("source", "source-suggestions"),
     ):
@@ -148,6 +178,9 @@ def test_the_field_component_draws_the_list_beside_the_box(user, client):
     assert '<option value="Aperture Science">' in page
     assert '<option value="Cambridge">' in page
     assert '<option value="LinkedIn">' in page
+    # The title's list is the classification, which belongs to no one and is always on.
+    assert '<datalist id="title-suggestions">' in page
+    assert '<option value="Software developers">' in page
 
 
 def test_the_listing_form_and_the_capture_review_get_it_too(user, client):
@@ -162,12 +195,19 @@ def test_the_listing_form_and_the_capture_review_get_it_too(user, client):
 
 
 def test_a_page_with_nothing_recorded_draws_no_empty_list(user, client):
-    """An empty `<datalist>` is a control that does nothing, which is worse than none."""
+    """An empty `<datalist>` is a control that does nothing, which is worse than none.
+
+    The title's list is the classification, which belongs to no one and is never empty, so
+    it is the one list a page with nothing recorded may still carry.
+    """
     client.force_login(user)
 
     page = client.get(reverse("applications:create")).content.decode()
 
-    assert "<datalist" not in page
+    assert '<datalist id="company-suggestions">' not in page
+    assert '<datalist id="location-suggestions">' not in page
+    assert '<datalist id="source-suggestions">' not in page
+    assert '<datalist id="title-suggestions">' in page
 
 
 def test_offering_never_becomes_requiring(user, client):

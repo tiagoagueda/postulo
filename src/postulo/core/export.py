@@ -42,8 +42,10 @@ from postulo import __version__
 #: kind (#189). 16 added ``kind`` on a company, which tells the employment service a
 #: person is registered with from an employer (#202), and ``show_career_order`` on the
 #: profile (#203). 17 added ``language`` on an upload and on a sent document, which each
-#: now record what they are in rather than having it guessed for them (#283).
-FORMAT_VERSION = 17
+#: now record what they are in rather than having it guessed for them (#283). 18 added
+#: ``isco_code`` on a posting, the ISCO-08 unit group its title matches in the ESCO
+#: classification beside the title itself (#266).
+FORMAT_VERSION = 18
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -118,6 +120,7 @@ WEB_LINK_FIELDS = ("kind", "label", "url", "is_primary")
 POSTING_FIELDS = (
     "id",
     "title",
+    "isco_code",
     "location",
     "remote_type",
     "employment_type",

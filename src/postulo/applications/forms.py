@@ -8,7 +8,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.models import Tag, TagColour, TagIcon
-from postulo.jobs import recall
+from postulo.jobs import esco, recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
 from postulo.jobs.models import (
     Contact,
@@ -76,7 +76,15 @@ class PostingIntakeForm(UserAwareForm):
         max_length=200,
         widget=forms.TextInput(attrs={"list": "company-suggestions", "autocomplete": "off"}),
     )
-    title = forms.CharField(label=_("Job title"), max_length=250)
+    title = forms.CharField(
+        label=_("Job title"),
+        max_length=250,
+        # The list it names is the ESCO unit groups from `datalists`, offered even without
+        # a user because it belongs to no one; the code the words match follows the posting
+        # it becomes and is not offered here (#266).
+        widget=forms.TextInput(attrs={"list": "title-suggestions", "autocomplete": "off"}),
+        help_text=POSTING_HELP["title"],
+    )
     url = forms.URLField(
         label=_("Posting URL"),
         max_length=500,
@@ -143,19 +151,23 @@ class PostingIntakeForm(UserAwareForm):
 
     @property
     def datalists(self) -> dict[str, list[str]]:
-        """What each `<datalist>` on this form offers: ``id -> values`` (#261).
+        """What each `<datalist>` on this form offers: ``id -> values`` (#261, #266).
 
         Read by `c-field`, which draws the list beside any widget carrying a ``list``
         attribute, so the three templates that render this form -- intake, capture review
         and the listing form -- get it without any of them knowing.
 
-        Built from *this person's* records and nobody else's. A form with no user attached
-        offers nothing rather than everything, which is the safe way round: every route
-        here passes one, and a route that forgets should suggest nothing rather than leak.
+        Companies, locations and sources are *this person's* records and nobody else's. A
+        form with no user attached offers nothing of theirs rather than everything, which
+        is the safe way round: every route here passes one, and a route that forgets should
+        suggest nothing rather than leak. The title's list is the ESCO classification,
+        which belongs to no one, so it is offered to everyone.
         """
+        lists = {"title-suggestions": esco.suggestions()}
         if self.user is None:
-            return {}
+            return lists
         return {
+            **lists,
             "company-suggestions": recall.companies(self.user),
             "location-suggestions": recall.locations(self.user),
             "source-suggestions": recall.sources(self.user),

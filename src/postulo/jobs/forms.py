@@ -13,7 +13,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, web_links
 
-from . import employment_services, identifiers, industries, logos, structure
+from . import employment_services, esco, identifiers, industries, logos, structure
 from .models import (
     Company,
     CompanyIdentifier,
@@ -32,6 +32,11 @@ from .models import (
 #: would be three things to keep true; the ones that drifted would be the ones on the form
 #: nobody looked at.
 POSTING_HELP = {
+    "title": _(
+        "As the posting words it. The ISCO-08 code the words match in the ESCO "
+        "classification follows the posting, in the language you read; a title that matches "
+        "nothing has no code, and that is not a lesser kind of job."
+    ),
     "location": _(
         "As the posting words it — a city, a region, a country. Free text: nothing is "
         "looked up anywhere."
@@ -609,6 +614,16 @@ class ContactForm(OwnerScopedModelForm):
 
 
 class JobPostingForm(OwnerScopedModelForm):
+    #: The title offers the ESCO unit groups as you type it, in the language read (#266).
+    #: `autocomplete="off"` keeps the browser's memory of the box off it, as on the intake
+    #: form; the code the words match follows the posting and is not offered here.
+    title = forms.CharField(
+        label=_("Job title"),
+        max_length=250,
+        widget=forms.TextInput(attrs={"list": "title-suggestions", "autocomplete": "off"}),
+        help_text=POSTING_HELP["title"],
+    )
+
     class Meta:
         model = JobPosting
         fields = (
@@ -649,3 +664,12 @@ class JobPostingForm(OwnerScopedModelForm):
         if low is not None and high is not None and low > high:
             self.add_error("salary_max", _("The upper figure cannot be below the lower one."))
         return cleaned
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """What the title's ``<datalist>`` offers: the ESCO unit groups, in the language read.
+
+        Classification, not records, so a form with no user attached offers the same thing
+        one with a user does — there is nobody else's data in it to keep apart (#266).
+        """
+        return {"title-suggestions": esco.suggestions()}
