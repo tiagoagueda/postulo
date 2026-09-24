@@ -217,6 +217,20 @@ class CompanyKind(models.TextChoices):
     EMPLOYMENT_SERVICE = "employment_service", _("Employment service")
 
 
+class LocationSource(models.TextChoices):
+    """Where a company's coordinates came from: a geocode is a guess, and the record says so (#108).
+
+    A match from the offline city dataset is a guess a person can correct; a correction
+    is a fact they made, and it outlives the next save of the same location. *Unplaced*
+    is the deliberate answer — "Remote" is not a place at all, and a company a person
+    removed from the map is not one the next save quietly puts back.
+    """
+
+    GUESSED = "geonames", _("Matched from the city dataset")
+    MANUAL = "manual", _("Set by the person recording it")
+    UNPLACED = "unplaced", _("Deliberately not placed")
+
+
 class Company(OwnedModel):
     """An employer, as recorded by one applicant -- or the employment service they are
     registered with, which has contacts, addresses and postings like an employer and is
@@ -253,6 +267,20 @@ class Company(OwnedModel):
         _("careers page"), blank=True, help_text=_("Where this company lists its openings.")
     )
     location = models.CharField(_("location"), max_length=200, blank=True)
+    #: Where the location points on the map, when an offline dataset places it (#108).
+    #: City level, deliberately: a search at street precision is a map of where the
+    #: person will be in the morning, and that is not a column to keep.
+    location_lat = models.FloatField(_("latitude"), null=True, blank=True, editable=False)
+    location_lon = models.FloatField(_("longitude"), null=True, blank=True, editable=False)
+    location_resolved_from = models.CharField(
+        _("location resolved from"), max_length=200, blank=True
+    )
+    location_resolved_at = models.DateTimeField(
+        _("location resolved"), null=True, blank=True, editable=False
+    )
+    location_resolved_by = models.CharField(
+        _("location resolved by"), max_length=20, choices=LocationSource, blank=True
+    )
     industries = models.ManyToManyField(
         Industry, blank=True, related_name="companies", verbose_name=_("industries")
     )
@@ -286,6 +314,37 @@ class Company(OwnedModel):
 
     def get_absolute_url(self) -> str:
         return reverse("jobs:company_detail", args=[self.pk])
+
+    def save(self, *args, **kwargs) -> None:
+        if self.location != self.location_resolved_from:
+            self.apply_location_guess()
+        super().save(*args, **kwargs)
+
+    def apply_location_guess(self) -> None:
+        """Put this location on the map from the offline dataset, or nowhere at all (#108).
+
+        Run when the location is saved and never in the background, the rule capture
+        already follows: the resolution is a guess made of a table this machine has,
+        and it happens the moment its row is written. A location that resolves to
+        nothing is not an error — it is a place the map does not draw, and the list
+        beside the map still says where the company is. A correction a person made for
+        this same text is not re-guessed, because it is not one the location would
+        produce: the record keeps the text the coordinates belong to, and the same
+        text produces no new guess.
+        """
+        from . import places
+
+        self.location_resolved_from = self.location
+        self.location_resolved_at = timezone.now()
+        answer = places.resolve(self.location)
+        if answer is None:
+            self.location_lat = None
+            self.location_lon = None
+            self.location_resolved_by = ""
+        else:
+            self.location_lat = answer["lat"]
+            self.location_lon = answer["lon"]
+            self.location_resolved_by = LocationSource.GUESSED
 
     @property
     def is_employment_service(self) -> bool:
