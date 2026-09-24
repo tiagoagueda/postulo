@@ -63,7 +63,7 @@ def dated(applicant):
 def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server, dated):
     """The row stays and its date changes. A reminder put off until next week is still
     outstanding and still this application's; what was wrong with it was the day."""
-    from django.utils import timezone
+    from django.utils import formats, timezone
 
     reminder = dated["reminder"]
     sign_in(page, live_server.url)
@@ -76,7 +76,10 @@ def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server
 
     next_week = timezone.localtime(timezone.now() + dt.timedelta(days=7))
     expect(block).to_contain_text("Chase them")
-    expect(block).to_contain_text(next_week.strftime("%d %b %Y"))
+    # The row writes the day the language writes it: a named format, never one written
+    # out (the rule in CONTRIBUTING). A hard-coded "%d" zero-pads the day the app's "j"
+    # does not, so this was green only on the days of the month that carry two digits.
+    expect(block).to_contain_text(formats.date_format(next_week, "DATE_FORMAT"))
     reminder.refresh_from_db()
     assert reminder.due_at > timezone.now() + dt.timedelta(days=6)
 
