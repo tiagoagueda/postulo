@@ -305,6 +305,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/new/",
         "/applications/tags/",
         "/jobs/companies/",
+        "/jobs/companies/map/",
         "/jobs/companies/new/",
         f"/jobs/companies/{c.pk}/",
         f"/jobs/companies/{c.pk}/edit/",
