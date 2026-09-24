@@ -1,18 +1,24 @@
 """Download the ESCO classification in place, where the loader reads it (#266).
 
 ``postulo/jobs/esco.py`` reads ``data/esco-<revision>.json``; this command is how that
-file gets there. It asks the ESCO web-service API — the access the ESCO services
-document for machines, on the ESCO portal under *Use ESCO → Use ESCO Services (API)* —
-for every ISCO-08 unit group and every occupation, in every language the classification
-is published in, and writes the file beside the code that reads it. The package files
-on the download page go through an e-mail consent a provisioning step cannot wait on,
-and this does not.
+file gets there. It asks the ESCO web-service API, the machine-facing access the ESCO
+services document at
+https://esco.ec.europa.eu/en/use-esco/use-esco-services-api/esco-web-service-api, for
+every ISCO-08 unit group and every occupation, in every language the classification is
+published in, and writes the file beside the code that reads it. The package files on
+the download page go through an e-mail consent a provisioning step cannot wait on, and
+this does not.
 
-A run is a deliberate harvest, the way the first one was: what is written is checked
+Two searches do the harvest, one per class: the concepts of the ISCO-08 concept scheme,
+of which the unit groups are the four-digit codes, and the class the API names
+``occupation``. Each concept's answer carries its preferred label in every language in
+the same object, so there is one pass, not one per language, and the paging is followed
+until the answer's total is in. The API names its versions with a ``v`` prefix and says
+nothing about which it served where none is asked, and its default is not the newest, so
+the revision is a required argument, recorded inside the file; a new revision is a
+re-run with the new ``--revision`` and the old file deleted. What is written is checked
 against the shape the tests pin before anything is replaced, and the command says what
-it found. The revision is recorded inside the file, so a new one is a re-run with
-``--revision``, the pinned tests bumped to the revision they now hold, and the old file
-deleted. Nothing in a request path calls this; it runs once, at provisioning.
+it found. Nothing in a request path calls this; it runs once, at provisioning.
 """
 
 from __future__ import annotations
@@ -20,7 +26,6 @@ from __future__ import annotations
 import json
 import os
 import re
-import time
 from collections import defaultdict
 
 import httpx
@@ -28,20 +33,25 @@ from django.core.management.base import BaseCommand, CommandError
 
 from postulo.jobs.esco import DATA_DIR, FALLBACK
 
-#: The ESCO web-service API, the machine-facing access the ESCO services document points
-#: to. If a run fails to fetch, this block is the first thing to check against the API's
-#: own documentation at https://api.esco.ec.europa.eu/doc.
-API_BASE = "https://api.esco.ec.europa.eu"
-CONCEPTS_PATH = "/resource/skos/concept"
+#: The ESCO web-service API. If a run fails to fetch, this block is the first thing to
+#: check against the API's own documentation, at https://ec.europa.eu/esco/api/doc/.
+API_BASE = "https://ec.europa.eu/esco/api"
+SEARCH_PATH = "/search"
 
-#: The ESCO model classes this harvest wants. A unit group's class is the one the model
-#: gives the ISCO-08 unit groups, and the alternative is tried only where the first is
-#: refused; a refusal is reported with the API's answer, which names its classes.
-OCCUPATION_TYPE = "http://data.europa.eu/esco/model#Occupation"
-UNIT_GROUP_TYPES = (
-    "http://data.europa.eu/esco/model#ISCO-08UnitGroup",
-    "http://data.europa.eu/esco/model#UnitGroup",
-)
+#: The concept scheme the ISCO-08 hierarchy is published in. The scheme carries the
+#: majors, the sub-majors and the unit groups together, and the unit groups are the
+#: four-digit codes, so the rest of the scheme is not a unit group and not a name.
+ISCO_SCHEME = "http://data.europa.eu/esco/concept-scheme/isco"
+
+#: The class the API knows for occupations, in the short name its ``type`` filter takes.
+OCCUPATION_TYPE = "occupation"
+
+#: One page of the harvest; a full classification answers in one of these, and the
+#: paging that follows is for the day it stops.
+PAGE_SIZE = 10000
+
+#: The language a concept's title is negotiated in; the preferred labels carry the rest.
+NEGOTIATED_LANGUAGE = "en"
 
 #: The 28 languages the classification is published in, the portal's own list, which the
 #: tests the file against also hold.
@@ -76,13 +86,11 @@ LANGUAGES = (
     "uk",
 )
 
-#: A minute is enough for one of the small responses this harvest makes; more than that
-#: is a server in trouble, not a classification.
 PUBLISHER = "European Commission, Directorate-General for Employment, Social Affairs and Inclusion"
 
-TIMEOUT = 30.0
-#: The courtesy pause between queries; the harvest is fifty-six of them.
-DELAY = 0.25
+#: A minute is enough for one of the pages this harvest makes, which are a few
+#: megabytes; more than that is a server in trouble, not a classification.
+TIMEOUT = 60.0
 
 
 class Command(BaseCommand):
@@ -91,13 +99,20 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument(
             "--revision",
-            help="which ESCO revision to download, e.g. 1.2.1; the API's newest where "
-            "omitted, where it says which on the response",
+            required=True,
+            help="which ESCO revision to download, e.g. 1.2.1; required, because the "
+            "API does not say which revision it served where none is asked, and its "
+            "default is not the newest",
         )
 
     def handle(self, *args, **options):
-        version = (options["revision"] or "").lstrip("vV")
-        extra = {"selectedVersion": version} if version else {}
+        version = (options["revision"] or "").strip().lstrip("vV")
+        if not version:
+            raise CommandError(
+                "--revision is required: the API does not say which revision it served "
+                "where none is asked, and its default is not the newest; "
+                "e.g. --revision 1.2.1"
+            )
         self.stdout.write(
             f"Downloading the ESCO classification in {len(LANGUAGES)} languages from {API_BASE} ..."
         )
@@ -109,21 +124,13 @@ class Command(BaseCommand):
                 "Accept": "application/json",
             },
         ) as client:
-            units, occupations, served = self._harvest(client, extra)
-        if not version:
-            if not served:
-                raise CommandError(
-                    "the API did not say which revision it served, so the file could "
-                    "not be named; run the command again with --revision, "
-                    "e.g. --revision 1.2.1"
-                )
-            version = served
+            units, occupations = self._harvest(client, f"v{version}")
         uncoded = sorted(i for i, e in occupations.items() if not e["code"])
         if uncoded:
             raise CommandError(
-                f"{len(uncoded)} of the occupations carried no ISCO-08 code in any "
-                f"language; the first is {uncoded[0]}. The API gives them in a shape "
-                "this command does not read yet; adjust occupation_code."
+                f"{len(uncoded)} of the occupations carried no ISCO-08 code; the first "
+                f"is {uncoded[0]}. The API gives them in a shape this command does not "
+                "read yet; adjust occupation_code."
             )
         document = self._document(units, occupations, version)
         self._validate(document)
@@ -146,44 +153,97 @@ class Command(BaseCommand):
                 )
             )
 
-    def _harvest(self, client, extra) -> tuple[dict, dict, str]:
+    def _harvest(self, client, selected_version) -> tuple[dict, dict]:
         """Every unit group and occupation, in every language, as identifier-to-entry.
 
-        Returns the unit groups, the occupations, and the revision the API said it
-        served, the last from the response where the revision was not pinned.
+        Two searches do it: the ISCO concept scheme, of which the unit groups are the
+        four-digit codes, and the occupation class. Each concept's answer carries its
+        preferred label in every language, so there is one pass, not one per language.
         """
         units: dict[str, dict] = {}
         occupations: dict[str, dict] = {}
-        served = ""
-        group_type = None
-        for language in LANGUAGES:
-            if group_type is None:
-                group_type, group_response = self._unit_group_type(client, extra, language)
-            else:
-                group_response = self._query(client, {"concepttype": group_type, **extra}, language)
-            for concept in self._concepts(group_response):
-                code = unit_group_code(concept)
-                name = label(concept, language)
-                if code and name:
-                    entry = units.setdefault(code, {"major": code[0], "names": {}})
-                    entry["names"][language] = name
-            response = self._query(client, {"concepttype": OCCUPATION_TYPE, **extra}, language)
-            for concept in self._concepts(response):
-                identifier = identifier_of(concept)
-                name = label(concept, language)
-                if not identifier or not name:
-                    continue
-                entry = occupations.setdefault(identifier, {"code": "", "names": {}})
-                if not entry["code"]:
-                    entry["code"] = occupation_code(concept)
-                entry["names"][language] = name
-            served = served or _revision_from_response(response)
-        return units, occupations, served
+        for concept in self._search(
+            client, {"isInScheme": ISCO_SCHEME, "selectedVersion": selected_version}
+        ):
+            code = unit_group_code(concept)
+            if not code:
+                continue
+            entry = units.setdefault(code, {"major": code[0], "names": {}})
+            self._labels(concept, entry["names"])
+        for concept in self._search(
+            client, {"type": OCCUPATION_TYPE, "selectedVersion": selected_version}
+        ):
+            identifier = identifier_of(concept)
+            if not identifier:
+                continue
+            entry = occupations.setdefault(identifier, {"code": "", "names": {}})
+            if not entry["code"]:
+                entry["code"] = occupation_code(concept)
+            self._labels(concept, entry["names"])
+        return units, occupations
 
-    def _query(self, client, params, language) -> httpx.Response:
+    def _labels(self, concept, names) -> None:
+        """The concept's preferred label in each of the classification's languages."""
+        labels = concept.get("preferredLabel")
+        if not isinstance(labels, dict):
+            return
+        for language in LANGUAGES:
+            value = labels.get(language)
+            if isinstance(value, str) and value and language not in names:
+                names[language] = value
+
+    def _search(self, client, params) -> list[dict]:
+        """Every concept a search returns, the pages followed until the total is in."""
+        concepts: list[dict] = []
+        seen: set[str] = set()
+        offset = 0
+        while True:
+            response = self._query(
+                client,
+                {
+                    **params,
+                    "full": "false",
+                    "language": NEGOTIATED_LANGUAGE,
+                    "limit": PAGE_SIZE,
+                    "offset": offset,
+                },
+            )
+            try:
+                payload = response.json()
+            except ValueError:
+                payload = None
+            if not isinstance(payload, dict):
+                raise CommandError(
+                    "the ESCO API's answer was not a search result: "
+                    f"{response.text.replace(chr(10), ' ')[:400]}"
+                )
+            embedded = payload.get("_embedded")
+            items = embedded.get("results") if isinstance(embedded, dict) else None
+            if not isinstance(items, list):
+                raise CommandError(
+                    "could not find the concepts in the API's answer: "
+                    f"{response.text.replace(chr(10), ' ')[:400]}"
+                )
+            total = payload.get("total")
+            if not isinstance(total, int):
+                raise CommandError(f"the API's answer carried no total: {response.text[:400]}")
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                key = identifier_of(item)
+                if key:
+                    if key in seen:
+                        continue
+                    seen.add(key)
+                concepts.append(item)
+            offset += len(items)
+            if not items or offset >= total:
+                break
+        return concepts
+
+    def _query(self, client, params) -> httpx.Response:
         """One query to the API, with the URL and the answer in the error where it fails."""
-        params = {**params, "lang": language}
-        url = API_BASE + CONCEPTS_PATH
+        url = API_BASE + SEARCH_PATH
         try:
             response = client.get(url, params=params)
         except httpx.HTTPError as exc:
@@ -198,41 +258,7 @@ class Command(BaseCommand):
                 f"the ESCO API answered {response.status_code} for {url} with "
                 f"{params}, answering:\n{shown}"
             )
-        time.sleep(DELAY)
         return response
-
-    def _unit_group_type(self, client, extra, language) -> tuple[str, httpx.Response]:
-        """The class the API accepts for the ISCO-08 unit groups, the first that answers.
-
-        Tried once and kept for the rest of the harvest; a refusal is reported with the
-        API's answer, which names the classes the API knows.
-        """
-        failures = []
-        for concept_type in UNIT_GROUP_TYPES:
-            try:
-                response = self._query(client, {"concepttype": concept_type, **extra}, language)
-            except CommandError as exc:
-                failures.append(f"{concept_type}:\n{exc}")
-                continue
-            return concept_type, response
-        shown = "\n".join(failures)
-        raise CommandError(f"the ESCO API accepted no class for the unit groups:\n{shown}")
-
-    def _concepts(self, response) -> list[dict]:
-        """The concepts out of the answer, whatever wrapper the API put them in."""
-        payload = response.json()
-        if isinstance(payload, list):
-            return payload
-        if isinstance(payload, dict):
-            for key in ("results", "concepts", "data", "items"):
-                value = payload.get(key)
-                if isinstance(value, list):
-                    return value
-            for value in payload.values():
-                if isinstance(value, list) and value and isinstance(value[0], dict):
-                    return value
-        shown = str(payload).replace("\n", " ")[:400]
-        raise CommandError(f"could not find the concepts in the API's answer: {shown}")
 
     def _document(self, units, occupations, version) -> dict:
         """The file, in the order and shape the tests read it."""
@@ -287,77 +313,33 @@ class Command(BaseCommand):
             raise CommandError(f"the download is not the shape the loader reads:\n{shown}")
 
 
-def _revision_from_response(response) -> str:
-    """The revision the API says it served, from the response headers, else the empty string."""
-    for key, value in response.headers.items():
-        if key.lower().endswith(("revision", "version")):
-            match = re.search(r"(\d+\.\d+(?:\.\d+)?)", value)
-            if match:
-                return match.group(1)
-    return ""
-
-
 def identifier_of(concept) -> str:
-    """The identifier a concept carries, in whatever shape the API gives it."""
-    for key in ("@id", "id"):
-        value = concept.get(key)
-        if isinstance(value, str) and value:
-            return value
-    return ""
-
-
-def label(concept, language) -> str:
-    """The name a concept carries in one language, in whatever shape the API gives it."""
-    for key in ("skos:prefLabel", "prefLabel", "label", "skos:altLabel"):
-        value = concept.get(key)
-        if isinstance(value, str) and value:
-            return value
-        if isinstance(value, dict):
-            candidate = value.get(language)
-            if isinstance(candidate, str) and candidate:
-                return candidate
-        if isinstance(value, list):
-            for item in value:
-                if isinstance(item, dict) and item.get("@language") == language:
-                    text = item.get("@value", item.get("value"))
-                    if isinstance(text, str) and text:
-                        return text
-    return ""
+    """The identifier a concept carries, the URI the API gives it."""
+    value = concept.get("uri")
+    return value if isinstance(value, str) and value else ""
 
 
 def unit_group_code(concept) -> str:
-    """The four-digit ISCO-08 code of a unit group, from the identifier or a notation."""
+    """The four-digit ISCO-08 code of a unit group, from its code or its identifier."""
+    value = concept.get("code")
+    if isinstance(value, str) and re.fullmatch(r"\d{4}", value):
+        return value
     tail = identifier_of(concept).rsplit("#", 1)[-1].rsplit("/", 1)[-1]
     if tail.startswith("C") and tail[1:].isdigit() and len(tail[1:]) == 4:
         return tail[1:]
-    for key in ("skos:notation", "notation", "code"):
-        value = concept.get(key)
-        if isinstance(value, str) and value.isdigit() and len(value) == 4:
-            return value
     return ""
 
 
 def occupation_code(concept) -> str:
-    """An occupation's own code, ``unit group.index``, or the unit group it sits under."""
-    for key in (
-        "skos:notation",
-        "notation",
-        "code",
-        "dataEsco:occupationCode",
-        "dataEsco:iscoCode",
-        "iscoCode",
-    ):
-        value = concept.get(key)
-        if isinstance(value, str) and re.fullmatch(r"\d{4}(\.\d+)?", value):
+    """An occupation's own code, the unit group with its place in the group's tree."""
+    values = [concept.get("code")]
+    codes = concept.get("codes")
+    if isinstance(codes, list):
+        values.extend((item or {}).get("value") for item in codes if isinstance(item, dict))
+    for value in values:
+        if isinstance(value, str) and re.fullmatch(r"\d{4}(\.\d+)*", value):
             return value
     tail = identifier_of(concept).rsplit("#", 1)[-1].rsplit("/", 1)[-1]
-    if re.fullmatch(r"\d{4}(\.\d+)?", tail):
+    if re.fullmatch(r"\d{4}(\.\d+)*", tail):
         return tail
-    for key in ("skos:broader", "broader"):
-        parent = concept.get(key)
-        for one in parent if isinstance(parent, list) else [parent]:
-            target = one if isinstance(one, str) else (one or {}).get("@id", "")
-            tail = target.rsplit("#", 1)[-1].rsplit("/", 1)[-1]
-            if tail.startswith("C") and tail[1:].isdigit() and len(tail[1:]) == 4:
-                return tail[1:]
     return ""
