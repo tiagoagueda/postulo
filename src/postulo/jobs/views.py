@@ -15,7 +15,14 @@ from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
+from django.views.generic import (
+    CreateView,
+    DeleteView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 
 from postulo.core import tables
 from postulo.core.cells import EditableCellView
@@ -132,6 +139,61 @@ class CompanyListView(OwnedObjectMixin, ListView):
         # page cannot keep (#134).
         context["bulk_industries"] = Industry.objects.for_user(self.request.user)
         context["group"] = self.request.GET.get("group", "").strip()
+        return context
+
+
+class CompanyMapView(LoginRequiredMixin, TemplateView):
+    """The places the person's companies are in, and the map that draws them (#108).
+
+    The list is the page and the map is beside it: a map is the classic
+    screen-reader failure, so every place, every company and every count is text
+    before any of it is drawn, and the page works with scripts off — the drawing
+    is an SVG the server writes, not a script that fetches tiles, and a tile
+    request would tell a tile server where somebody is applying.
+
+    A place is a company's location text as recorded; its dot, when one is
+    drawn, is the coordinate one of the companies there carries, and its size is
+    the number of companies at the place — the question the map answers is where
+    the search is spread, not where any single office sits.
+    """
+
+    template_name = "jobs/company_map.html"
+
+    def get_context_data(self, **kwargs) -> dict:
+        from . import places as places_data
+
+        context = super().get_context_data(**kwargs)
+        places: dict[str, dict] = {}
+        rows = (
+            Company.objects.for_user(self.request.user)
+            .filter(location__gt="")
+            .values_list("location", "name", "pk", "location_lat", "location_lon")
+            .order_by("location", "name")
+        )
+        for location, name, pk, lat, lon in rows:
+            entry = places.setdefault(
+                location,
+                {"label": location, "count": 0, "companies": [], "lat": None, "lon": None},
+            )
+            entry["count"] += 1
+            entry["companies"].append((name, reverse("jobs:company_detail", args=[pk])))
+            if entry["lat"] is None and lat is not None:
+                entry["lat"] = lat
+                entry["lon"] = lon
+        for entry in places.values():
+            # The equirectangular projection the outline is drawn in: a degree of
+            # longitude is a unit of the width, a degree of latitude one of the
+            # height, so the dot sits on the coast the data puts it on.
+            if entry["lat"] is not None:
+                entry["cx"] = entry["lon"] + 180.0
+                entry["cy"] = 90.0 - entry["lat"]
+                entry["radius"] = min(1.5 + 1.8 * entry["count"] ** 0.5, 9.0)
+            else:
+                entry["cx"] = entry["cy"] = entry["radius"] = None
+        context["places"] = sorted(
+            places.values(), key=lambda entry: (-entry["count"], entry["label"].casefold())
+        )
+        context["dataset_available"] = places_data.available()
         return context
 
 

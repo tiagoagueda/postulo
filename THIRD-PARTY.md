@@ -19,6 +19,7 @@ work with no notice beside it, or a work committed here and not listed, fails th
 | basecoat-css | compiled into `src/postulo/static/css/app.css` (the components named in `assets/css/app.css`) | [Ronan Berder](https://basecoatui.com) | MIT | The `/*! basecoat-css … */` banner in the stylesheet, and `basecoat.LICENSE.txt` beside it. |
 | htmx | `src/postulo/static/js/vendor/htmx.min.js` | [Big Sky Software](https://htmx.org) | 0BSD | `htmx.LICENSE.txt` beside it. 0BSD asks for no notice; it is carried all the same. |
 | @zxcvbn-ts | `src/postulo/static/js/vendor/zxcvbn/` (core and two dictionaries) | Dan Wheeler and Dropbox, Inc.; [@zxcvbn-ts](https://github.com/zxcvbn-ts/zxcvbn) | MIT | `LICENSE.txt` beside the three files; the three packages carry one identical text. |
+| Natural Earth world outline | `src/postulo/templates/jobs/map/world_outline.html` | [Natural Earth](https://www.naturalearthdata.com) | Public domain | `LICENCE.txt` beside it. A drawing of the 1:110m data, not a copy of it. |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | A mark, not a licensed work | `NOTICE.txt` beside them; see [TRADEMARKS.md](TRADEMARKS.md). |
 
 ## How they get here, and how they stay right
