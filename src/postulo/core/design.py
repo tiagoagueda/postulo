@@ -52,7 +52,7 @@ SCALES: tuple[Scale, ...] = (
     ),
     Scale(
         name=_("Brand"),
-        note=_("A deep indigo. Ten steps, of which the interface spends a handful."),
+        note=_("A deep blue. Ten steps, of which the interface spends a handful."),
         swatches=_scale("brand", BRAND_STEPS),
     ),
 )
