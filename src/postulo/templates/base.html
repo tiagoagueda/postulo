@@ -230,7 +230,12 @@
                     {% avatar user %}
                     <div class="min-w-0">
                       <div class="truncate text-sm font-medium text-ink-900 dark:text-ink-50">{{ user.display_name }}</div>
-                      <div class="truncate text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
+                      {% comment %} The address is a single unbreakable word in a menu 224
+                         pixels wide: truncate would ellipsize it under the text-spacing
+                         override (SC 1.4.12), and the full address is nowhere else on the
+                         page, so it wraps instead of being cut -- `break-words` keeps it
+                         one line when it fits and lets it break when it does not (#282). {% endcomment %}
+                      <div class="break-words text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
                     </div>
                   </div>
                   <a href="{% url 'accounts:profile' %}" class="menu-item">
