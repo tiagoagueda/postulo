@@ -604,8 +604,15 @@ class PersonIdentifierForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # A blank first choice, so an untouched extra row counts as unchanged and is
         # dropped rather than complaining that its value is missing.
-        self.fields["scheme"].choices = [("", "—"), *identifiers.choices()]
-        self.fields["scheme"].required = False
+        scheme = self.fields["scheme"]
+        choices = [("", "—"), *identifiers.choices()]
+        scheme.choices = choices
+        scheme.required = False
+        # Django picks the widget from the model field when it builds the form, and that
+        # field deliberately has no choices; the registry's schemes arrive only now, so the
+        # select that shows them has to come with them, choices in hand — the field here is
+        # a `CharField`, whose `choices` nothing reads from (#298).
+        scheme.widget = forms.Select(choices=choices)
         self.fields["value"].required = False
 
     def clean(self) -> dict:

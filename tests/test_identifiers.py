@@ -3,6 +3,7 @@
 import zipfile
 
 import pytest
+from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
@@ -230,6 +231,22 @@ def test_the_company_form_saves_identifiers_with_the_company(signed_in, user):
     assert "data-identifiers" in page.content.decode()
     assert "https://www.wikidata.org/wiki/Q4779874" in page.content.decode()
     assert "DUNS" in page.content.decode()
+
+
+def test_the_company_form_offers_a_select_scoped_to_companies(signed_in, user):
+    """The company's page draws the same row, and the select is scoped the other way.
+
+    A person's scheme has no business on a company; the text box the form used to render
+    let the mistake through anyway (#298).
+    """
+    from postulo.jobs.forms import CompanyIdentifierForm
+
+    assert isinstance(CompanyIdentifierForm().fields["scheme"].widget, forms.Select)
+    html = signed_in.get(reverse("jobs:company_create")).content.decode()
+    assert '<select name="identifiers-0-scheme"' in html
+    assert '<option value="wikidata">Wikidata</option>' in html
+    assert '<option value="other"' in html
+    assert '<option value="orcid"' not in html, "a person's scheme has no business here"
 
 
 def test_the_company_form_refuses_a_bad_or_borrowed_id(signed_in, user):

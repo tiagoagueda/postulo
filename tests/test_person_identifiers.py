@@ -8,6 +8,7 @@ fix, and why an application form for an academic post asks for it by name.
 from __future__ import annotations
 
 import pytest
+from django import forms
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 
@@ -130,6 +131,24 @@ def test_the_profile_page_offers_them(client, user):
     assert "data-identifiers" in html
     assert "ORCID" in html
     assert "0000-0002-1825-0097" in html, "the example, so nobody has to guess the shape"
+
+
+def test_the_kind_is_a_select_of_the_schemes_that_identify_people(client, user):
+    """The schemes come from the registry at render time, so a text box could never show them.
+
+    The model field deliberately has no choices, and Django picks the widget when it builds
+    the form; a `choices` assigned in `__init__` therefore has to bring the select with it
+    (#298), scoped to people.
+    """
+    from postulo.accounts.forms import PersonIdentifierForm
+
+    assert isinstance(PersonIdentifierForm().fields["scheme"].widget, forms.Select)
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+    assert '<select name="identifiers-0-scheme"' in html
+    assert '<option value="orcid">ORCID</option>' in html
+    assert '<option value="other"' in html
+    assert '<option value="lei"' not in html, "a company's scheme has no business here"
 
 
 def test_saving_one_from_the_page(client, user):
