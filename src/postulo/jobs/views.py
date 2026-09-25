@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
-from django.http import Http404, HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
@@ -29,6 +29,7 @@ from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
+    GdprNoticeMixin,
     OwnedObjectMixin,
     OwnerFormMixin,
     PhoneNumbersMixin,
@@ -277,6 +278,10 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         person = self.request.user
+        # The data-subject export beside each contact, while the feature offers it (#297).
+        from postulo.core import gdpr
+
+        context["gdpr_offered"] = gdpr.is_offered(person)
         # A hierarchy that silently keeps counting leaves is a hierarchy that changes
         # nothing, so the page asks which reading it is showing -- and defaults to the one
         # every figure in Postulo has always meant, this company alone (#138).
@@ -565,6 +570,7 @@ class ContactCreateView(
     OwnedObjectMixin,
     UserFormKwargsMixin,
     OwnerFormMixin,
+    GdprNoticeMixin,
     PhoneNumbersMixin,
     WebLinksMixin,
     CreateView,
@@ -604,7 +610,12 @@ class ContactCreateView(
 
 
 class ContactUpdateView(
-    OwnedObjectMixin, UserFormKwargsMixin, PhoneNumbersMixin, WebLinksMixin, UpdateView
+    OwnedObjectMixin,
+    UserFormKwargsMixin,
+    GdprNoticeMixin,
+    PhoneNumbersMixin,
+    WebLinksMixin,
+    UpdateView,
 ):
     model = Contact
     form_class = ContactForm
@@ -633,10 +644,47 @@ class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Contact
     template_name = "partials/confirm_delete.html"
 
+    def form_valid(self, form):
+        from postulo.core import gdpr
+
+        # A deletion that does not say what it removed is a guess about its own effect, so
+        # while the feature is offered the erasure carries the report and the person who
+        # deleted reads it; off, the plain delete is what Postulo has always done (#297).
+        if gdpr.is_offered(self.request.user):
+            messages.success(self.request, gdpr.erase_contact(self.object).summary())
+            return redirect(self.get_success_url())
+        return super().form_valid(form)
+
     def get_success_url(self) -> str:
         if self.object.company_id:
             return reverse("jobs:company_detail", args=[self.object.company_id])
         return reverse("jobs:company_list")
+
+
+class ContactExportView(OwnedObjectMixin, View):
+    """What the instance holds on one other person, as one document (#297).
+
+    The answer to "what do you have on me?", handed over as a download rather than a page,
+    because the point of a data-subject export is that it leaves the site with the person
+    who asked. One `JsonResponse` rather than the archive's zip: a contact holds no files
+    of its own, and a zip of one JSON entry would be ceremony.
+    """
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from postulo.core import gdpr
+
+        if not gdpr.is_offered(request.user):
+            raise Http404
+        contact = get_object_or_404(Contact.objects.for_user(request.user), pk=pk)
+        response = JsonResponse(
+            gdpr.contact_document(contact),
+            json_dumps_params={"ensure_ascii": False},
+            content_type="application/json",
+        )
+        response["Content-Disposition"] = (
+            f'attachment; filename="postulo-contact-{contact.pk}.json"'
+        )
+        return response
 
 
 # -------------------------------------------------------------------- postings

@@ -41,8 +41,17 @@ SECTIONS: tuple[SettingsSection, ...] = (
     SettingsSection(
         slug="capture", label=_("Capture"), url_name="server:capture", icon="search", order=60
     ),
+    # What the instance keeps on other people, and the duties that go with it (#297).
     SettingsSection(
-        slug="logs", label=_("Logs"), url_name="server:logs", icon="file-text", order=65
+        slug="data_protection",
+        label=_("Data protection"),
+        url_name="server:data_protection",
+        icon="shield",
+        order=65,
+        match=("server:record_of_processing",),
+    ),
+    SettingsSection(
+        slug="logs", label=_("Logs"), url_name="server:logs", icon="file-text", order=70
     ),
     SettingsSection(
         slug="defaults", label=_("Defaults"), url_name="server:defaults", icon="settings", order=70

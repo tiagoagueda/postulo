@@ -1,0 +1,10 @@
+{% load i18n %}
+{% comment %} The instance's privacy notice, where the site promises to keep something about
+   another person (#297). The view decides whether there is one to show: the operator's
+   words when the feature is offered, and nothing otherwise. {% endcomment %}
+{% if privacy_notice %}
+  <div class="alert-info mb-4 text-sm" data-privacy-notice role="note">
+    <p class="mb-1 font-medium">{% translate "What this instance keeps, and why" %}</p>
+    {{ privacy_notice|linebreaksbr }}
+  </div>
+{% endif %}

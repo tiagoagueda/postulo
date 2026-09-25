@@ -198,6 +198,22 @@ class DefaultsForm(forms.ModelForm):
         )
 
 
+class GdprForm(forms.ModelForm):
+    """The instance's data-protection policy: how long, and in whose words (#297)."""
+
+    class Meta:
+        model = SiteSettings
+        fields = ("retention_days", "privacy_notice")
+        widgets = {
+            "privacy_notice": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["retention_days"].required = False
+        self.fields["privacy_notice"].required = False
+
+
 class TestEmailForm(forms.Form):
     to = forms.EmailField(label=_("Send a test message to"))
 

@@ -40,6 +40,7 @@ from .server_forms import (
     CaptureForm,
     DefaultsForm,
     EmailForm,
+    GdprForm,
     OfferedLanguagesForm,
     SignInForm,
     TestEmailForm,
@@ -565,6 +566,48 @@ class DefaultsView(PolicyView):
         form.save()
         messages.success(request, _("Saved."))
         return redirect("server:defaults")
+
+
+class DataProtectionView(PolicyView):
+    """How long the instance keeps records about other people, and in whose words it says
+    so — with the dry run that shows what the policy would touch before anything is asked
+    to go (#297)."""
+
+    form_class = GdprForm
+    template_name = "server/data_protection.html"
+    section_title = _("Data protection")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault("dry_run", None)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        """The dry run is not a save: it asks the question and shows the answer, and a form
+        the administrator did not mean to submit must not be spent on the policy row."""
+        if "dry_run" not in request.POST:
+            return super().post(request, *args, **kwargs)
+
+        from . import gdpr
+
+        self.object = self.get_object()
+        self.form = self.get_form()
+        return self.render_to_response(self.get_context_data(dry_run=gdpr.retention_dry_run()))
+
+
+class RecordOfProcessingView(ServerSectionMixin, TemplateView):
+    """What the instance processes, why, and who receives it — drawn from the registry and
+    the connections at render time, not from a list kept beside them (#297)."""
+
+    template_name = "server/record_of_processing.html"
+    section_title = _("Data protection")
+
+    def get_context_data(self, **kwargs):
+        from . import gdpr
+
+        context = super().get_context_data(**kwargs)
+        context["record"] = gdpr.record_of_processing()
+        return context
 
 
 def _security_label(value: str) -> str:

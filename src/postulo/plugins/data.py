@@ -136,10 +136,21 @@ def _plugins_from(distribution: str) -> list:
 def export_sections(person) -> dict:
     """Every installed plugin's own data for one person, and what could not be carried.
 
-    A plugin that owns data says how to put it in an archive by answering `export_for`. One
-    that owns data and cannot answer is *named* rather than passed over: an archive that is
-    quietly incomplete is worse than one that says which part is missing, because the first
-    is discovered when somebody restores it and the second while they still have the original.
+    The account archive's half of this; the same discipline, asked about one person, is
+    what the data-subject export of a contact needs, and one loop rather than two is what
+    keeps the two from drifting apart (#297).
+    """
+    return export_sections_for(person)
+
+
+def export_sections_for(subject) -> dict:
+    """Every installed plugin's own data for one subject, and what could not be carried.
+
+    A plugin that owns data says how to put it in an archive by answering `export_for`.
+    One that owns data and cannot answer is *named* rather than passed over: an archive
+    that is quietly incomplete is worse than one that says which part is missing, because
+    the first is discovered when somebody restores it and the second while they still have
+    the original.
     """
     from .registry import GROUPS
     from .registry import plugins as registry_plugins
@@ -155,7 +166,7 @@ def export_sections(person) -> dict:
                 missing.extend(owned_labels(plugin))
                 continue
             try:
-                carried[plugin.name] = list(exporter(person) or [])
+                carried[plugin.name] = list(exporter(subject) or [])
             except Exception:  # pragma: no cover - a plugin must not break somebody's export
                 missing.extend(owned_labels(plugin))
     document = {"carried": carried}

@@ -35,6 +35,12 @@ urlpatterns = [
         views.PluginRepositoryView.as_view(),
         name="plugin_repository",
     ),
+    path("data-protection/", views.DataProtectionView.as_view(), name="data_protection"),
+    path(
+        "record-of-processing/",
+        views.RecordOfProcessingView.as_view(),
+        name="record_of_processing",
+    ),
     path("logs/", views.LogsView.as_view(), name="logs"),
     path("design/", views.DesignView.as_view(), name="design"),
     path("capture/", views.CaptureView.as_view(), name="capture"),

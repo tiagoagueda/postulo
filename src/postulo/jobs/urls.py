@@ -31,6 +31,7 @@ urlpatterns = [
     path("contacts/new/", views.ContactCreateView.as_view(), name="contact_create"),
     path("contacts/<int:pk>/edit/", views.ContactUpdateView.as_view(), name="contact_update"),
     path("contacts/<int:pk>/delete/", views.ContactDeleteView.as_view(), name="contact_delete"),
+    path("contacts/<int:pk>/export/", views.ContactExportView.as_view(), name="contact_export"),
     # Captures waiting for review now sit at the top of the listings page.
     path(
         "captures/",

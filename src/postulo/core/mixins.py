@@ -51,6 +51,26 @@ class ConfirmDeleteMixin:
         return context
 
 
+class GdprNoticeMixin:
+    """The instance's privacy notice on a page that promises to keep data about another
+    person (#297).
+
+    The words are the operator's and sit on the policy row; the page only decides to show
+    them. Nothing when the operator wrote nothing, and nothing when the feature is off,
+    because a notice beside a page the feature no longer offers would be a promise the
+    site is no longer keeping.
+    """
+
+    def get_context_data(self, **kwargs):
+        from postulo.core import gdpr
+
+        context = super().get_context_data(**kwargs)
+        context.setdefault(
+            "privacy_notice", gdpr.notice() if gdpr.is_offered(self.request.user) else ""
+        )
+        return context
+
+
 class StaffRequiredMixin(LoginRequiredMixin, UserPassesTestMixin):
     """Restrict a view to staff members.
 

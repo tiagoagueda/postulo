@@ -1002,6 +1002,29 @@ class SiteSettings(models.Model):
     #: route stops counting only after several in a row with nothing succeeding between.
     mail_failures = models.PositiveIntegerField(_("mail failures in a row"), default=0)
 
+    # --- data protection (#297) ------------------------------------------------------
+    #
+    # Both belong to the `gdpr` feature, and both are *policy* the way every column here is:
+    # a `None`/blank means never set from the interface, and the code's default applies.
+    #: How long records about other people are kept, in days. Blank means no limit, which
+    #: is what every instance has done until now — keeping is what a record is for. A limit
+    #: is never enforced silently: the dry run says what the policy would touch first, and
+    #: nothing on the site deletes for this reason without that report having been seen.
+    retention_days = models.PositiveIntegerField(
+        _("records about other people are kept for (days)"),
+        null=True,
+        blank=True,
+        help_text=_("Blank keeps them for as long as the instance exists."),
+    )
+    #: The instance's privacy text, shown wherever the site promises to keep something
+    #: about another person. Blank shows nothing: an instance with no notice to give does
+    #: not invent one, and the operator's words are not Postulo's to write.
+    privacy_notice = models.TextField(
+        _("privacy notice"),
+        blank=True,
+        help_text=_("Shown wherever the site keeps something about another person."),
+    )
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

@@ -1,0 +1,67 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  {% comment %} The record of processing (#297), Article 30's question: what does this
+     instance process, why, and who receives it. Both answers are drawn at render time —
+     every installed plugin is a purpose, every connection a recipient — because a list
+     written down beside them is a list that will be wrong by the next install.
+     The operator's legal bases are the operator's; this page says what the instance does,
+     not what the law makes of it. {% endcomment %}
+  <c-page-title>
+    {% translate "Record of processing" %}
+    <c-slot name="subtitle">
+    {% translate "What this instance processes, why, and who receives it. Drawn from the installed plugins and the connections, so it changes with them." %}
+    </c-slot>
+  </c-page-title>
+
+  <section class="mb-8">
+    <h2 class="mb-3 font-medium">{% translate "What is processed, and why" %}</h2>
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages." %}
+    </p>
+    <div class="card p-0">
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for purpose in record.purposes %}
+          <li class="px-4 py-3">
+            <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+              <span class="font-medium">{{ purpose.label }}</span>
+              <span class="tag tag-grey">{{ purpose.kind }}</span>
+            </div>
+            {% if purpose.description %}
+              <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{{ purpose.description }}</p>
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="mb-3 font-medium">{% translate "Who receives it" %}</h2>
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+      {% translate "Every connection on this instance: the kind of plugin, the plugin, and the configuration that names where it talks. Secrets are not on this page; they are stored encrypted and shown to nobody." %}
+    </p>
+    {% if record.recipients %}
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for recipient in record.recipients %}
+            <li class="px-4 py-3">
+              <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                <span class="font-medium">{{ recipient.plugin }}</span>
+                <span class="tag tag-grey">{{ recipient.kind }}</span>
+                {% if recipient.label %}<span class="text-sm text-ink-500 dark:text-ink-400">{{ recipient.label }}</span>{% endif %}
+                {% if not recipient.enabled %}<span class="tag tag-amber">{% translate "disabled" %}</span>{% endif %}
+              </div>
+              {% if recipient.config %}
+                <p class="mt-1 text-xs text-ink-500 dark:text-ink-400"><code>{{ recipient.config }}</code></p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <c-empty variant="quiet">{% translate "No connections. This instance talks to nothing outside itself, which is the shortest recipient list there is." %}</c-empty>
+    {% endif %}
+  </section>
+{% endblock %}

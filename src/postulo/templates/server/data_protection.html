@@ -1,0 +1,82 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  {% comment %} The data-protection policy (#297): how long records about other people are
+     kept, and the instance's own privacy text. The record of what the instance processes
+     at all is its own page, drawn from the registry rather than kept beside it.
+
+     The dry run is a button on this form rather than a second form: it asks a question and
+     shows the answer, and it must not save the fields beside it, which is what the view
+     checks for. {% endcomment %}
+  <c-page-title>
+    {% translate "Data protection" %}
+    <c-slot name="subtitle">
+    {% translate "How long this instance keeps records about other people, and in whose words it says so." %}
+    </c-slot>
+  </c-page-title>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-4">
+      <h2 class="mb-3 font-medium">{% translate "Retention" %}</h2>
+      <c-field :field="form.retention_days" />
+      <p class="text-xs text-ink-500 dark:text-ink-400">
+        {% translate "A limit is never enforced on its own: the dry run says what the policy would touch, and the erasures are performed one by one from a company's page. This button deletes nothing." %}
+      </p>
+      <button type="submit" name="dry_run" value="1" class="btn mt-2" data-variant="outline">
+        {% translate "Run the dry run" %}
+      </button>
+    </div>
+
+    <div class="card mb-6">
+      <h2 class="mb-3 font-medium">{% translate "The notice" %}</h2>
+      <c-field :field="form.privacy_notice" />
+      <p class="text-xs text-ink-500 dark:text-ink-400">
+        {% translate "Shown wherever the site promises to keep something about another person, such as the form that records a contact. Left blank, the site shows no notice, because the words are the operator's and not Postulo's to invent." %}
+      </p>
+    </div>
+
+    <button type="submit" class="btn">{% translate "Save" %}</button>
+  </form>
+
+  {% if dry_run %}
+    <section class="card mt-8" aria-labelledby="gdpr-dry-run-heading">
+      <h2 id="gdpr-dry-run-heading" class="mb-3 font-medium">{% translate "What the policy would touch" %}</h2>
+      {% if dry_run.cutoff %}
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate with days=dry_run.days cutoff=dry_run.cutoff trimmed %}
+            Records older than {{ cutoff }} ({{ days }} days). Nothing was removed; this is
+            the report a deletion would be made from.
+          {% endblocktranslate %}
+        </p>
+        {% if dry_run.contacts %}
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for contact in dry_run.contacts %}
+              <li class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm">
+                <span class="font-medium">{{ contact.name }}</span>
+                {% if contact.company %}<span class="text-ink-500 dark:text-ink-400">{{ contact.company }}</span>{% endif %}
+                <span class="text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with date=contact.created_at trimmed %}recorded {{ date}}{% endblocktranslate %}</span>
+                <span class="text-xs text-ink-500 dark:text-ink-400">
+                  {% blocktranslate with n=contact.would_remove.phone_numbers a=contact.would_remove.postal_addresses l=contact.would_remove.web_links apps=contact.would_remove.applications_unlinked trimmed %}
+                    {{ n }} telephone numbers, {{ a }} addresses, {{ l }} web links; {{ apps }} application kept
+                  {% endblocktranslate %}
+                </span>
+              </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <c-empty variant="quiet">{% translate "Nothing on the instance is older than the policy. There is nothing to do." %}</c-empty>
+        {% endif %}
+      {% else %}
+        <c-empty variant="quiet">{% translate "No retention limit is set, so there is no policy to run. Set one above and the dry run will say what it would touch." %}</c-empty>
+      {% endif %}
+    </section>
+  {% endif %}
+
+  <p class="mt-8 text-sm">
+    <a href="{% url 'server:record_of_processing' %}" class="text-brand-600 underline dark:text-brand-400">
+      {% translate "The record of what this instance processes, and who receives it." %}
+    </a>
+  </p>
+{% endblock %}

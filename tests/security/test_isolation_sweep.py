@@ -314,6 +314,7 @@ FACTORIES: dict[str, Callable] = {
     "jobs:company_logo_action": pk_of(company, action="find"),
     "jobs:company_update": pk_of(company),
     "jobs:contact_delete": pk_of(contact),
+    "jobs:contact_export": pk_of(contact),
     "jobs:contact_update": pk_of(contact),
     "jobs:industry_delete": pk_of(industry),
     "jobs:industry_update": pk_of(industry),

@@ -349,6 +349,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/server/plugins/",
         "/server/capture/",
         "/server/defaults/",
+        "/server/data-protection/",
+        "/server/record-of-processing/",
         # The gallery: every component on one page, which is the point of walking it
         # here -- a component seen only inside a feature is one axe never sees whole (#292).
         "/server/design/",

@@ -231,6 +231,10 @@
                   </div>
                   <a href="{% url 'jobs:contact_update' contact.pk %}"
                      class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
+                  {% if gdpr_offered %}
+                    <a href="{% url 'jobs:contact_export' contact.pk %}"
+                       class="btn" data-variant="ghost" data-size="xs">{% translate "Export" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
+                  {% endif %}
                 </div>
               </li>
             {% endfor %}
