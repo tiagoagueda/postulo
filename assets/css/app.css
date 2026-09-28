@@ -49,6 +49,11 @@
    region that reports a failed request keeps its own class further down: it is fixed to
    the viewport and wired to the script, and it borrows the look, not the component. */
 @import "basecoat-css/components/alert.css";
+/* The box almost everything sits in (#291). Basecoat's `card` brings a <header> with a
+   place for an action and a <footer> for what is done next; the box itself is painted in
+   `basecoat.css`, where it also stays a block rather than a flex column, because a card
+   here holds running content -- a form, three paragraphs -- and not a fixed stack. */
+@import "basecoat-css/components/card.css";
 /* The form family (#290): a row is `<div class="field">` holding an ordinary <label> and
    an ordinary control, and the structure is keyed on that shape rather than on a class per
    control. Eight files, none with a script, and the paint is in `basecoat.css` as ever.
@@ -678,17 +683,8 @@
    * Written as a descendant of `<body>` rather than as a variant on each rule, so a new
    * card or a new table is compact without being told to be.
    */
-  body[data-density="compact"] .card {
-    @apply p-4;
-  }
-
-  body[data-density="compact"] :is(th, td).px-4 {
-    padding-inline: calc(var(--spacing) * 3);
-  }
-
-  body[data-density="compact"] :is(th, td).py-3 {
-    padding-block: calc(var(--spacing) * 2);
-  }
+  /* The two rules themselves are in `basecoat.css`, beside the card and the table they
+     tighten, since both are Basecoat's classes now (#291). */
 
   /*
    * The masthead, once the page has scrolled under it (#292). Flat against the page while
@@ -709,9 +705,23 @@
     }
   }
 
-  .card {
-    @apply rounded-xl border border-ink-200 bg-white p-6 shadow-raised
-      dark:border-ink-800 dark:bg-ink-900;
+  /*
+   * The heading at the top of a section, and the sentence under it (#292): what
+   * `<c-section-title>` draws. It was `<h2 class="mb-3 font-medium">` forty times,
+   * `mb-4` nineteen, `mb-1` thirteen and `mb-2` eleven, the margin standing in for
+   * whether a sentence followed. Inside a card the same element is Basecoat's card
+   * header, painted to the same values in `basecoat.css`.
+   */
+  .section-title {
+    @apply mb-3 grid gap-1;
+  }
+
+  .section-title > :is(h2, h3) {
+    @apply leading-normal font-medium;
+  }
+
+  .section-title > p {
+    @apply text-sm text-ink-500 dark:text-ink-400;
   }
 
   /*

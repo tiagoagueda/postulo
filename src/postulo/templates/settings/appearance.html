@@ -61,10 +61,10 @@
       </fieldset>
     </div>
     <div class="card mb-6">
-      <h2 class="mb-1 font-medium">{% translate "Gone quiet" %}</h2>
-      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}
-      </p>
+      <c-section-title>
+        {% translate "Gone quiet" %}
+        <c-slot name="subtitle">{% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}</c-slot>
+      </c-section-title>
       <div class="flex items-end gap-3">
         <div class="w-32">
           <c-field :field="form.quiet_after_days" />
@@ -81,10 +81,10 @@
        warning this person wants -- and because somebody who came here to change one will
        have an opinion about the other (#238). {% endcomment %}
     <div class="card mb-6">
-      <h2 class="mb-1 font-medium">{% translate "Closing soon" %}</h2>
-      <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted." %}
-      </p>
+      <c-section-title>
+        {% translate "Closing soon" %}
+        <c-slot name="subtitle">{% translate "Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted." %}</c-slot>
+      </c-section-title>
       <div class="flex items-end gap-3">
         <div class="w-32">
           <c-field :field="form.closing_notice_days" />

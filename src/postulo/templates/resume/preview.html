@@ -17,7 +17,7 @@
 
     {% if experience %}
       <section class="mb-8">
-        <h2 class="mb-3 font-medium">{% translate "Experience" %}</h2>
+        <c-section-title>{% translate "Experience" %}</c-section-title>
         <div class="space-y-4">
           {% for item in experience %}
             <div class="card">
@@ -42,7 +42,7 @@
 
     {% if education %}
       <section class="mb-8">
-        <h2 class="mb-3 font-medium">{% translate "Education" %}</h2>
+        <c-section-title>{% translate "Education" %}</c-section-title>
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
             {% for item in education %}
@@ -58,7 +58,7 @@
 
     {% if projects %}
       <section class="mb-8">
-        <h2 class="mb-3 font-medium">{% translate "Projects" %}</h2>
+        <c-section-title>{% translate "Projects" %}</c-section-title>
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
             {% for item in projects %}
@@ -76,7 +76,7 @@
 
     {% if skill_groups %}
       <section class="mb-8">
-        <h2 class="mb-3 font-medium">{% translate "Skills" %}</h2>
+        <c-section-title>{% translate "Skills" %}</c-section-title>
         <div class="card space-y-2 text-sm">
           {% for group in skill_groups %}
             <p><strong>{{ group.name }}:</strong> {{ group.skill_names|join:", " }}</p>
@@ -89,7 +89,7 @@
       <div class="grid gap-6 sm:grid-cols-2">
         {% if certifications %}
           <section>
-            <h2 class="mb-3 font-medium">{% translate "Certifications" %}</h2>
+            <c-section-title>{% translate "Certifications" %}</c-section-title>
             <div class="card space-y-1 text-sm">
               {% for item in certifications %}<p>{{ item.name }}</p>{% endfor %}
             </div>
@@ -97,7 +97,7 @@
         {% endif %}
         {% if languages %}
           <section>
-            <h2 class="mb-3 font-medium">{% translate "Languages" %}</h2>
+            <c-section-title>{% translate "Languages" %}</c-section-title>
             <div class="card space-y-1 text-sm">
               {% for item in languages %}<p>{{ item }}</p>{% endfor %}
             </div>

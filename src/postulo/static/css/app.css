@@ -2500,6 +2500,43 @@
   .alert > footer {
     position: absolute;
   }
+  .card {
+    display: flex;
+    flex-direction: column;
+    > header {
+      container-type: inline-size;
+      container-name: card-header;
+      display: grid;
+      grid-auto-rows: min-content;
+      align-items: flex-start;
+      &:has(>[data-slot=card-action],>.card-action) {
+        grid-template-columns: 1fr auto;
+      }
+      &:has(>p) {
+        grid-template-rows: auto auto;
+      }
+    }
+    > header > :is(h2, h3, [data-title], .card-title) {
+      --tw-leading: 1;
+      line-height: 1;
+    }
+    > header > :is([data-slot='card-action'], .card-action) {
+      grid-column-start: 2;
+      grid-row: span 2 / span 2;
+      grid-row-start: 1;
+      align-self: flex-start;
+      justify-self: flex-end;
+    }
+    > header > menu.card-action {
+      margin: 0px;
+      list-style-type: none;
+      padding: 0px;
+    }
+    > footer {
+      display: flex;
+      align-items: center;
+    }
+  }
   .fieldset {
     display: flex;
     flex-direction: column;
@@ -3970,6 +4007,80 @@
       }
     }
   }
+  .card {
+    display: block;
+    border-radius: var(--radius-xl);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-ink-200);
+    background-color: var(--color-white);
+    padding: calc(var(--spacing) * 6);
+    --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, color-mix(in srgb, oklch(0.13 0.01 250) 5%, transparent));
+    @supports (color: color-mix(in lab, red, red)) {
+      --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, color-mix(in oklab, var(--color-ink-950) 5%, transparent));
+    }
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      border-color: var(--color-ink-800);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        border-color: var(--color-ink-800);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-900);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-900);
+      }
+    }
+  }
+  .card > header {
+    margin-bottom: calc(var(--spacing) * 3);
+    gap: var(--spacing);
+  }
+  .card > header > :is(h2, h3) {
+    --tw-leading: var(--leading-normal);
+    line-height: var(--leading-normal);
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+  }
+  .card > header > p {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-ink-500);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
+  .card > footer {
+    margin-top: calc(var(--spacing) * 4);
+    flex-wrap: wrap;
+    gap: calc(var(--spacing) * 3);
+  }
+  .card.empty {
+    display: flex;
+  }
+  .card.empty > header {
+    margin-bottom: 0px;
+  }
+  .card.empty > footer {
+    margin-top: calc(var(--spacing) * 5);
+  }
+  body[data-density="compact"] .card {
+    padding: calc(var(--spacing) * 4);
+  }
+  body[data-density="compact"] .table :is(th, td) {
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+  }
 }
 @layer base {
   :root:where([data-theme="dark"], [data-theme="dark"] *) {
@@ -4591,15 +4702,6 @@
   .col-filter[open] > summary .col-filter-chevron {
     rotate: 180deg;
   }
-  body[data-density="compact"] .card {
-    padding: calc(var(--spacing) * 4);
-  }
-  body[data-density="compact"] :is(th, td).px-4 {
-    padding-inline: calc(var(--spacing) * 3);
-  }
-  body[data-density="compact"] :is(th, td).py-3 {
-    padding-block: calc(var(--spacing) * 2);
-  }
   [data-site-header][data-scrolled] {
     box-shadow: var(--shadow-raised);
   }
@@ -4608,32 +4710,27 @@
       transition: box-shadow 150ms ease-out;
     }
   }
-  .card {
-    border-radius: var(--radius-xl);
-    border-style: var(--tw-border-style);
-    border-width: 1px;
-    border-color: var(--color-ink-200);
-    background-color: var(--color-white);
-    padding: calc(var(--spacing) * 6);
-    --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, color-mix(in srgb, oklch(0.13 0.01 250) 5%, transparent));
-    @supports (color: color-mix(in lab, red, red)) {
-      --tw-shadow: 0 1px 2px 0 var(--tw-shadow-color, color-mix(in oklab, var(--color-ink-950) 5%, transparent));
-    }
-    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  .section-title {
+    margin-bottom: calc(var(--spacing) * 3);
+    display: grid;
+    gap: var(--spacing);
+  }
+  .section-title > :is(h2, h3) {
+    --tw-leading: var(--leading-normal);
+    line-height: var(--leading-normal);
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+  }
+  .section-title > p {
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-ink-500);
     &:where([data-theme="dark"], [data-theme="dark"] *) {
-      border-color: var(--color-ink-800);
+      color: var(--color-ink-400);
     }
     @media (prefers-color-scheme: dark) {
       &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
-        border-color: var(--color-ink-800);
-      }
-    }
-    &:where([data-theme="dark"], [data-theme="dark"] *) {
-      background-color: var(--color-ink-900);
-    }
-    @media (prefers-color-scheme: dark) {
-      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
-        background-color: var(--color-ink-900);
+        color: var(--color-ink-400);
       }
     }
   }

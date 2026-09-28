@@ -17,7 +17,7 @@
     {% endif %}
 
     <div class="card mb-6">
-      <h2 class="mb-3 font-medium">{% translate "What will be deleted" %}</h2>
+      <c-section-title>{% translate "What will be deleted" %}</c-section-title>
       <dl class="grid grid-cols-2 gap-3 text-sm">
         <div class="flex justify-between"><dt>{% translate "Companies and contacts" %}</dt><dd class="tabular-nums">{{ counts.companies|default:0 }}</dd></div>
         <div class="flex justify-between"><dt>{% translate "Applications, with their timelines" %}</dt><dd class="tabular-nums">{{ counts.applications|default:0 }}</dd></div>
@@ -34,10 +34,10 @@
     </div>
 
     <div class="card mb-6">
-      <h2 class="mb-2 font-medium">{% translate "First, take everything with you" %}</h2>
-      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "One zip with every record and every file, which imports into a fresh account on any Postulo." %}
-      </p>
+      <c-section-title>
+        {% translate "First, take everything with you" %}
+        <c-slot name="subtitle">{% translate "One zip with every record and every file, which imports into a fresh account on any Postulo." %}</c-slot>
+      </c-section-title>
       {# The answer is the page that watches it being built, not the file: on the page #}
       {# that asks you to take a copy first, that is one click more and no waiting (#247). #}
       <form method="post" action="{% url 'core:export_download' %}">

@@ -1,0 +1,32 @@
+<c-vars id="" class="" />
+{% comment %} The heading at the top of a section, and the sentence under it (#292).
+
+   `<c-section-title>{% translate "Your name" %}</c-section-title>`
+
+   `<c-section-title id="section-name">
+      {% translate "Gone quiet" %}
+      <c-slot name="subtitle">{% translate "What counts as quiet, and for how long." %}</c-slot>
+    </c-section-title>`
+
+   It was written eleven ways: an `h2` classed `mb-3 font-medium` forty times, `mb-4`
+   nineteen, a bare `font-medium` sixteen, `mb-1` thirteen, `mb-2` eleven, and six more.
+   The margin was standing in for a fact -- whether a sentence followed -- so the same
+   heading changed its class when somebody added an explanation under it, and
+   `api/token_list.html` used two spellings on one page.
+
+   A <header> holding the heading and, when there is one, the sentence. As the first
+   child of a card it is Basecoat's card header (#291); anywhere else it is the same
+   thing with the same paint. The subtitle is a slot rather than an attribute so it can
+   hold a `blocktranslate`, which an attribute cannot.
+
+   `class` is for the distance from what came before: a heading that follows a list on
+   the same page says `class="mt-8"`. It is the one thing a call site may add.
+
+   **Not for a heading inside a row of its own.** Where a title shares a flex row with
+   the actions beside it, a wrapper with a margin of its own breaks the row, which is the
+   thing `<c-page-title>` learned first. Those keep a bare `<h2 class="font-medium">`.
+{% endcomment %}
+<header class="section-title{% if class %} {{ class }}{% endif %}">
+  <h2{% if id %} id="{{ id }}"{% endif %}>{{ slot }}</h2>
+  {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
+</header>

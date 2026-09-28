@@ -28,7 +28,7 @@
     {% endif %}
 
     <div class="card mb-8">
-      <h2 class="mb-4 font-medium">{% translate "New token" %}</h2>
+      <c-section-title>{% translate "New token" %}</c-section-title>
       <form method="post" action="{% url 'api:token_create' %}" novalidate>
         {% csrf_token %}
         <c-field :field="form.name" />
@@ -104,10 +104,10 @@
     {% endif %}
 
     <div class="card">
-      <h2 class="mb-3 font-medium">{% translate "Using a token" %}</h2>
-      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Send it as a bearer token. To check that one works, and see its scopes:" %}
-      </p>
+      <c-section-title>
+        {% translate "Using a token" %}
+        <c-slot name="subtitle">{% translate "Send it as a bearer token. To check that one works, and see its scopes:" %}</c-slot>
+      </c-section-title>
       <pre class="mb-4 scroll-x rounded bg-ink-100 p-3 text-xs dark:bg-ink-950" tabindex="0" role="group" aria-label="{% translate 'Example command' %}"><code>curl -H "Authorization: Bearer YOUR_TOKEN" \
   {{ api_root }}me</code></pre>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">

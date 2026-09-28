@@ -65,9 +65,7 @@
          dropped into a slot: a noun in a slot cannot agree with the words around it in every
          language, and the `|lower` that made "cv" of "CV" was English typography applied to
          German nouns and to an acronym (#168). `CVKind` has exactly these two. {% endcomment %}
-      <h2 class="mb-3 font-medium">
-        {% if cv.kind == "portfolio" %}{% translate "What is on this portfolio" %}{% else %}{% translate "What is on this CV" %}{% endif %}
-      </h2>
+      <c-section-title>{% if cv.kind == "portfolio" %}{% translate "What is on this portfolio" %}{% else %}{% translate "What is on this CV" %}{% endif %}</c-section-title>
       {% if items %}
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -123,7 +121,7 @@
       {% endif %}
 
       {% if renders %}
-        <h2 class="mt-8 mb-3 font-medium">{% translate "Versions you have sent" %}</h2>
+        <c-section-title class="mt-8">{% translate "Versions you have sent" %}</c-section-title>
         <div class="card p-0">
           <ul class="divide-y divide-ink-100 dark:divide-ink-800">
             {% for render in renders %}
@@ -167,7 +165,7 @@
          phone it sits under the entries and the entries are what somebody came for.
       {% endcomment %}
       <section class="card" aria-labelledby="cv-preview-heading">
-        <h2 id="cv-preview-heading" class="mb-1 font-medium">{% translate "As it will print" %}</h2>
+        <c-section-title id="cv-preview-heading">{% translate "As it will print" %}</c-section-title>
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
           {% translate "What is saved, redrawn after every change. Scroll inside it to read on." %}
         </p>
@@ -177,7 +175,7 @@
       </section>
 
       <div class="card">
-        <h2 class="mb-1 font-medium">{% translate "Add entries" %}</h2>
+        <c-section-title>{% translate "Add entries" %}</c-section-title>
         <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
           {% translate "Only entries not already on it are listed." %}
         </p>

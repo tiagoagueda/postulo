@@ -33,7 +33,7 @@
 
     {% if translatable %}
       <div class="card mb-6">
-        <h2 class="mb-3 font-medium">{% translate "Languages this entry speaks" %}</h2>
+        <c-section-title>{% translate "Languages this entry speaks" %}</c-section-title>
         {% if held %}
           <ul class="mb-4 divide-y divide-ink-200 dark:divide-ink-800">
             {% for code, name, fields in held %}
@@ -65,10 +65,10 @@
         {% csrf_token %}
         <input type="hidden" name="language" value="{{ language }}">
         <div class="card mb-6">
-          <h2 class="mb-1 font-medium"><bdi>{{ language_name }}</bdi></h2>
-          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-            {% translate "Leave a box empty and that line prints as it is written above it." %}
-          </p>
+          <c-section-title>
+            <bdi>{{ language_name }}</bdi>
+            <c-slot name="subtitle">{% translate "Leave a box empty and that line prints as it is written above it." %}</c-slot>
+          </c-section-title>
           {% for field, original in form.rows %}
             <div class="mb-4">
               {% if original %}

@@ -37,13 +37,13 @@
   {# ------------------------------------------------------------ installed #}
   {# --------------------------------------------------------- what is on #}
 
-  <h2 class="mb-3 font-medium">{% translate "What each plugin does, for everybody" %}</h2>
-  <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-    {% blocktranslate trimmed %}
+  <c-section-title>
+    {% translate "What each plugin does, for everybody" %}
+    <c-slot name="subtitle">{% blocktranslate trimmed %}
       The default for every account. One person's exceptions are on their row under People.
       Switching a plugin off stops it being used and deletes nothing.
-    {% endblocktranslate %}
-  </p>
+    {% endblocktranslate %}</c-slot>
+  </c-section-title>
   <form method="post" action="{% url 'server:plugin_policy' %}" class="card mb-8 p-0">
     {% csrf_token %}
     <ul>
@@ -116,7 +116,7 @@
 
   {# ---------------------------------------------------------- repositories #}
 
-  <h2 class="mb-3 font-medium">{% translate "Where plugins may come from" %}</h2>
+  <c-section-title>{% translate "Where plugins may come from" %}</c-section-title>
   <div class="card mb-8 p-0">
     <ul>
       {% for repository in repositories %}
@@ -197,7 +197,7 @@
     </form>
   </details>
 
-  <h2 class="mb-3 font-medium">{% translate "Installed on this instance" %}</h2>
+  <c-section-title>{% translate "Installed on this instance" %}</c-section-title>
   {% if installed %}
     <div class="card mb-8 p-0">
       <ul>
@@ -327,7 +327,7 @@
   {% endif %}
 
   {# --------------------------------------------------------------- upload #}
-  <h2 class="mb-3 font-medium">{% translate "Install a package" %}</h2>
+  <c-section-title>{% translate "Install a package" %}</c-section-title>
   {% if pending %}
     <div class="card mb-8">
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -378,7 +378,7 @@
   {% endif %}
 
   {# ------------------------------------------------------------ catalogue #}
-  <h2 class="mb-3 font-medium">{% translate "Catalogues" %}</h2>
+  <c-section-title>{% translate "Catalogues" %}</c-section-title>
   {% if catalogues_configured %}
     <div class="card mb-8 p-0">
       <div class="flex flex-wrap items-center gap-3 border-b border-ink-100 px-4 py-3 dark:border-ink-800">
@@ -450,7 +450,7 @@
   {% endif %}
 
   {# -------------------------------------------------------------- sources #}
-  <h2 class="mb-3 font-medium">{% translate "Capture sources this instance has" %}</h2>
+  <c-section-title>{% translate "Capture sources this instance has" %}</c-section-title>
   <c-scroll-box class="card p-0" label="{% translate 'Plugins' %}">
     <table class="table">
       <thead>

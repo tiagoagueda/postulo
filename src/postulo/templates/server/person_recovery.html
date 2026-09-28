@@ -48,13 +48,13 @@
       </button>
     </form>
 
-    <h2 class="mb-2 font-medium">{% translate "Links issued for this account" %}</h2>
-    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed %}
+    <c-section-title>
+      {% translate "Links issued for this account" %}
+      <c-slot name="subtitle">{% blocktranslate trimmed %}
         Kept after they are used or expire, because taking somebody's account back is not
         something to be able to do without a trace.
-      {% endblocktranslate %}
-    </p>
+      {% endblocktranslate %}</c-slot>
+    </c-section-title>
     {% if links %}
       <c-scroll-box label="{% translate 'Recovery' %}">
         <table class="table">

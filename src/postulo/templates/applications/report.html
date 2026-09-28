@@ -106,14 +106,14 @@
   {% comment %} Regularity is what the report is named for, so the cadence is the top of the
      page rather than a summary underneath the list. {% endcomment %}
   <section class="card mb-6" aria-labelledby="cadence-heading">
-    <h2 id="cadence-heading" class="mb-1 text-lg font-medium">{% translate "How regularly" %}</h2>
-    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-      {% blocktranslate count counter=report.total trimmed %}
+    <c-section-title id="cadence-heading">
+      {% translate "How regularly" %}
+      <c-slot name="subtitle">{% blocktranslate count counter=report.total trimmed %}
         One application sent in this period.
       {% plural %}
         {{ counter }} applications sent in this period.
-      {% endblocktranslate %}
-    </p>
+      {% endblocktranslate %}</c-slot>
+    </c-section-title>
 
     <dl class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
@@ -186,10 +186,10 @@
   </section>
 
   <section class="card mb-6" aria-labelledby="happened-heading">
-    <h2 id="happened-heading" class="mb-1 text-lg font-medium">{% translate "What came back" %}</h2>
-    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart." %}
-    </p>
+    <c-section-title id="happened-heading">
+      {% translate "What came back" %}
+      <c-slot name="subtitle">{% translate "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart." %}</c-slot>
+    </c-section-title>
     <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       <div>
         <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "First replies" %}</dt>

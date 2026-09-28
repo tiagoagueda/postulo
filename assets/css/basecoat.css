@@ -576,3 +576,78 @@
       dark:border-red-800 dark:bg-red-900/30 dark:text-red-100;
   }
 }
+
+/* ------------------------------------------------------------------- card */
+
+/*
+ * The box almost everything sits in (#291): two hundred and twenty-seven of them. The
+ * paint is what `.card` has always been -- the large radius, a border, the card ground,
+ * the raised plane -- moved here because the class is Basecoat's now.
+ *
+ * **It stays a block.** Basecoat makes a card a flex column, which suits a card that is
+ * a fixed stack of header, content and footer. A card here holds running content: a form,
+ * three paragraphs, a button after a sentence. As flex items those would stretch to the
+ * card's width -- a Save button a thousand pixels wide -- and their margins would stop
+ * collapsing, on every page at once. What is taken is what the structure is for: the
+ * <header>, with its place for an action beside the title, and the <footer>.
+ *
+ * The header is what `<c-section-title>` emits as a card's first child: the title at the
+ * weight a section heading has, the sentence under it quieter and smaller. Basecoat sets
+ * the title's line height to one, which cuts the descenders of a title that wraps; it is
+ * put back.
+ */
+@layer components {
+  .card {
+    @apply block rounded-xl border border-ink-200 bg-white p-6 shadow-raised
+      dark:border-ink-800 dark:bg-ink-900;
+  }
+
+  .card > header {
+    @apply mb-3 gap-1;
+  }
+
+  .card > header > :is(h2, h3) {
+    @apply leading-normal font-medium;
+  }
+
+  .card > header > p {
+    @apply text-sm text-ink-500 dark:text-ink-400;
+  }
+
+  .card > footer {
+    @apply mt-4 flex-wrap gap-3;
+  }
+
+  /* An empty state is a card as well, and is the one card that is a fixed stack: it
+     keeps Basecoat's centred column, and its header is the whole of it, with nothing
+     under it to keep a distance from. */
+  .card.empty {
+    @apply flex;
+  }
+
+  .card.empty > header {
+    @apply mb-0;
+  }
+
+  .card.empty > footer {
+    @apply mt-5;
+  }
+}
+
+/*
+ * Compact, for somebody who asked for more rows on a screen (#292): the room inside a
+ * card and inside a table's cells, and nothing that is a target. Written as descendants
+ * of <body>, so a new card or a new table is compact without being told to be. The cell
+ * rule used to look for the `px-4 py-3` every cell carried; the cells are bare since the
+ * table said `table` (#291), so it looks for the table instead.
+ */
+@layer components {
+  body[data-density="compact"] .card {
+    @apply p-4;
+  }
+
+  body[data-density="compact"] .table :is(th, td) {
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+  }
+}

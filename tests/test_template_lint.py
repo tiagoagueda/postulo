@@ -192,6 +192,40 @@ def test_nothing_else_names_a_retired_field_class_either():
         assert not RETIRED_FIELD.search(text), path.name
 
 
+#: A section heading written by hand, with the margin that stood for whether a sentence
+#: followed (#292). `<c-section-title>` is the one way; a heading that shares a row with
+#: its actions keeps a bare `font-medium`, which this does not match. With its id first
+#: or last, a size larger, or keeping a distance from what came before: all were written.
+HAND_HEADING = re.compile(
+    r'<h2(?: id="[^"]*")? class="(?:mt-\d+ )?mb-[1-4] (?:text-lg )?font-medium"'
+)
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_writes_a_section_heading_by_hand(path: Path):
+    if "allauth" in path.parts:
+        pytest.skip("allauth's elements are its own vocabulary, drawn once each")
+    text = path.read_text(encoding="utf-8")
+    found = [text.count("\n", 0, m.start()) + 1 for m in HAND_HEADING.finditer(text)]
+    assert not found, (
+        f"{path.name}: a section heading written by hand at line(s) {found}. Write "
+        "`<c-section-title>…</c-section-title>`, with the sentence under it in a "
+        '`<c-slot name="subtitle">`.'
+    )
+
+
+def test_the_heading_detector_knows_the_difference():
+    assert HAND_HEADING.search('<h2 class="mb-3 font-medium">Your name</h2>')
+    assert HAND_HEADING.search('<h2 id="cadence-heading" class="mb-1 text-lg font-medium">')
+    assert HAND_HEADING.search('<h2 class="mt-8 mb-3 font-medium">Notes</h2>')
+    # A heading that shares a row with its actions, and one that says something of its own.
+    assert not HAND_HEADING.search('<h2 class="font-medium">Documents</h2>')
+    assert not HAND_HEADING.search('<h2 class="mb-2 font-medium text-red-700 dark:text-red-400">')
+    assert not HAND_HEADING.search('<c-section-title id="section-name">')
+
+
 #: The header of a data table, as it was copied into thirteen templates before the table
 #: said `table` and the stylesheet drew it (#291).
 COPIED_HEADER = re.compile(r'<thead class="border-b border-ink-200')

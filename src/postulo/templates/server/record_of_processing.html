@@ -16,10 +16,10 @@
   </c-page-title>
 
   <section class="mb-8">
-    <h2 class="mb-3 font-medium">{% translate "What is processed, and why" %}</h2>
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages." %}
-    </p>
+    <c-section-title>
+      {% translate "What is processed, and why" %}
+      <c-slot name="subtitle">{% translate "Every plugin installed on this instance, in the words it gives about itself. What Postulo keeps before any plugin arrives — profiles, careers, companies, contacts, documents — is the instance itself, and it is on every one of these pages." %}</c-slot>
+    </c-section-title>
     <div class="card p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
         {% for purpose in record.purposes %}
@@ -38,10 +38,10 @@
   </section>
 
   <section>
-    <h2 class="mb-3 font-medium">{% translate "Who receives it" %}</h2>
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "Every connection on this instance: the kind of plugin, the plugin, and the configuration that names where it talks. Secrets are not on this page; they are stored encrypted and shown to nobody." %}
-    </p>
+    <c-section-title>
+      {% translate "Who receives it" %}
+      <c-slot name="subtitle">{% translate "Every connection on this instance: the kind of plugin, the plugin, and the configuration that names where it talks. Secrets are not on this page; they are stored encrypted and shown to nobody." %}</c-slot>
+    </c-section-title>
     {% if record.recipients %}
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">

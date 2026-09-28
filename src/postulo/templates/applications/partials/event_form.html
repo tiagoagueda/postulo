@@ -7,7 +7,7 @@
    band, because this card is not where the new entry goes.
 {% endcomment %}
 <div class="card mb-6" id="event-form">
-  <h2 class="mb-4 font-medium">{% translate "Add to the timeline" %}</h2>
+  <c-section-title>{% translate "Add to the timeline" %}</c-section-title>
   <form method="post" action="{% url 'applications:event_create' application.pk %}"
         hx-post="{% url 'applications:event_create' application.pk %}"
         hx-target="#event-form" hx-swap="outerHTML">

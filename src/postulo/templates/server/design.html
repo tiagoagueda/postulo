@@ -25,7 +25,7 @@
 
   <!-- ------------------------------------------------------------------- colour -->
   <section id="design-colour" class="mb-10" aria-labelledby="design-colour-heading">
-    <h2 id="design-colour-heading" class="mb-3 font-medium">{% translate "Colour" %}</h2>
+    <c-section-title id="design-colour-heading">{% translate "Colour" %}</c-section-title>
 
     {% for scale in scales %}
       <h3 class="mb-1 text-sm font-medium">{{ scale.name }}</h3>
@@ -60,7 +60,7 @@
 
   <!-- ----------------------------------------------------- rounding and depth -->
   <section id="design-tokens" class="mb-10" aria-labelledby="design-tokens-heading">
-    <h2 id="design-tokens-heading" class="mb-3 font-medium">{% translate "Rounding and depth" %}</h2>
+    <c-section-title id="design-tokens-heading">{% translate "Rounding and depth" %}</c-section-title>
     <div class="card mb-4">
       <h3 class="mb-1 text-sm font-medium">{% translate "Rounding" %}</h3>
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -94,7 +94,7 @@
 
   <!-- --------------------------------------------------------------------- type -->
   <section id="design-type" class="mb-10" aria-labelledby="design-type-heading">
-    <h2 id="design-type-heading" class="mb-3 font-medium">{% translate "Type" %}</h2>
+    <c-section-title id="design-type-heading">{% translate "Type" %}</c-section-title>
     <div class="card space-y-3">
       <p class="text-title font-semibold tracking-tight">{% translate "A page title" %}</p>
       <p class="font-medium">{% translate "A section heading" %}</p>
@@ -110,7 +110,7 @@
 
   <!-- ------------------------------------------------------------------ buttons -->
   <section id="design-buttons" class="mb-10" aria-labelledby="design-buttons-heading">
-    <h2 id="design-buttons-heading" class="mb-3 font-medium">{% translate "Buttons" %}</h2>
+    <c-section-title id="design-buttons-heading">{% translate "Buttons" %}</c-section-title>
     <div class="card space-y-4">
       <div>
         <h3 class="mb-2 text-sm font-medium">{% translate "Variants" %}</h3>
@@ -142,7 +142,7 @@
 
   <!-- ------------------------------------------------------------------- fields -->
   <section id="design-fields" class="mb-10" aria-labelledby="design-fields-heading">
-    <h2 id="design-fields-heading" class="mb-3 font-medium">{% translate "Fields" %}</h2>
+    <c-section-title id="design-fields-heading">{% translate "Fields" %}</c-section-title>
     {% comment %} Basecoat's form family (#290): a row is a `.field` with an ordinary label
        and an ordinary control, nothing carrying a class; `data-invalid` reddens the row; a
        checkbox lies the other way, box first; a flag beside a chooser is an `input-group`. {% endcomment %}
@@ -204,13 +204,17 @@
 
   <!-- ----------------------------------------------------------------- surfaces -->
   <section id="design-surfaces" class="mb-10" aria-labelledby="design-surfaces-heading">
-    <h2 id="design-surfaces-heading" class="mb-3 font-medium">{% translate "Surfaces" %}</h2>
+    <c-section-title id="design-surfaces-heading">{% translate "Surfaces" %}</c-section-title>
     <div class="grid gap-4 sm:grid-cols-2">
       <div class="card">
-        <h3 class="mb-1 font-medium">{% translate "A card" %}</h3>
-        <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% translate "What almost everything in Postulo sits in." %}
-        </p>
+        <c-section-title>
+          {% translate "A card" %}
+          <c-slot name="subtitle">{% translate "What almost everything in Postulo sits in." %}</c-slot>
+        </c-section-title>
+        <p class="text-sm">{% translate "A heading, the sentence under it, and then whatever the card is for." %}</p>
+        <footer>
+          <button type="button" class="btn" data-variant="outline" data-size="sm">{% translate "What is done next" %}</button>
+        </footer>
       </div>
       <div class="card">
         <h3 class="mb-1 font-medium">{% translate "A tile" %}</h3>
@@ -249,7 +253,7 @@
 
   <!-- ------------------------------------------------------------ chips and tags -->
   <section id="design-chips" class="mb-10" aria-labelledby="design-chips-heading">
-    <h2 id="design-chips-heading" class="mb-3 font-medium">{% translate "Chips and tags" %}</h2>
+    <c-section-title id="design-chips-heading">{% translate "Chips and tags" %}</c-section-title>
     <div class="card space-y-4">
       <div>
         <h3 class="mb-2 text-sm font-medium">{% translate "Chips" %}</h3>
@@ -277,15 +281,15 @@
 
   <!-- ------------------------------------------------------------------ density -->
   <section id="design-density" class="mb-10" aria-labelledby="design-density-heading">
-    <h2 id="design-density-heading" class="mb-3 font-medium">{% translate "How much room" %}</h2>
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed %}
+    <c-section-title id="design-density-heading">
+      {% translate "How much room" %}
+      <c-slot name="subtitle">{% blocktranslate trimmed %}
         Comfortable is the default. Compact tightens the room around cards and inside
         tables, and nothing else — a preference cannot cost a criterion, so what you can
         click stays the size it was. Choose it under Settings → Appearance; this page shows
         whichever you are reading it in.
-      {% endblocktranslate %}
-    </p>
+      {% endblocktranslate %}</c-slot>
+    </c-section-title>
     <div class="card">
       <p class="text-sm">
         {% if ui_density == "compact" %}
@@ -299,10 +303,10 @@
 
   <!-- ------------------------------------------------------------ nothing there -->
   <section id="design-empty" class="mb-10" aria-labelledby="design-empty-heading">
-    <h2 id="design-empty-heading" class="mb-3 font-medium">{% translate "Nothing there" %}</h2>
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "A list with nothing in it. There were sixteen of these written two ways; there is one now." %}
-    </p>
+    <c-section-title id="design-empty-heading">
+      {% translate "Nothing there" %}
+      <c-slot name="subtitle">{% translate "A list with nothing in it. There were sixteen of these written two ways; there is one now." %}</c-slot>
+    </c-section-title>
     <div class="grid gap-4 sm:grid-cols-2">
       <c-empty icon="circle-dashed" title="{% translate 'Nothing here yet' %}"
                action_url="#design-empty"
@@ -320,7 +324,7 @@
 
   <!-- ------------------------------------------------------------------- alerts -->
   <section id="design-alerts" class="mb-10" aria-labelledby="design-alerts-heading">
-    <h2 id="design-alerts-heading" class="mb-3 font-medium">{% translate "Alerts" %}</h2>
+    <c-section-title id="design-alerts-heading">{% translate "Alerts" %}</c-section-title>
     <div class="space-y-3">
       {% for variant, text in alerts %}
         <div class="alert" data-variant="{{ variant }}" role="status">{{ text }}</div>

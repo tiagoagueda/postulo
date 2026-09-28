@@ -39,7 +39,7 @@
       {% endif %}
 
       <div class="card mb-4" data-picture id="section-picture">
-        <h2 class="mb-4 font-medium">{% translate "Your picture" %}</h2>
+        <c-section-title>{% translate "Your picture" %}</c-section-title>
         <div class="flex flex-wrap items-start gap-6">
           <div class="shrink-0">
             {% avatar user "size-24 text-3xl" %}
@@ -79,7 +79,7 @@
       </div>
 
       <div class="card mb-4" id="section-name">
-        <h2 class="mb-4 font-medium">{% translate "Your name" %}</h2>
+        <c-section-title>{% translate "Your name" %}</c-section-title>
         <div class="grid gap-x-4 sm:grid-cols-2">
           <c-field :field="form.first_name" />
           <c-field :field="form.last_name" />
@@ -87,7 +87,7 @@
       </div>
 
       <div class="card mb-6" id="section-contact">
-        <h2 class="mb-4 font-medium">{% translate "Contact block" %}</h2>
+        <c-section-title>{% translate "Contact block" %}</c-section-title>
         <c-field :field="form.headline" />
         <div class="grid gap-x-4 sm:grid-cols-2">
           {% if form.phone %}<c-field :field="form.phone" />{% endif %}

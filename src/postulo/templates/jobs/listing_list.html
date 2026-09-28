@@ -75,13 +75,11 @@
 
   {% if pending_captures %}
     <section class="card mb-6 border-brand-200 dark:border-brand-800" aria-labelledby="captures-heading">
-      <h2 id="captures-heading" class="mb-3 font-medium">
-        {% blocktranslate count counter=pending_captures|length trimmed %}
+      <c-section-title id="captures-heading">{% blocktranslate count counter=pending_captures|length trimmed %}
           One capture waiting for review
         {% plural %}
           {{ counter }} captures waiting for review
-        {% endblocktranslate %}
-      </h2>
+        {% endblocktranslate %}</c-section-title>
       {% comment %} The checkboxes belong to this form by `form=`, so they can sit in the
          rows beside each row's own Discard form: a form inside a form is not HTML. Plain
          checkboxes and a button, so it works with no script at all (#179). {% endcomment %}

@@ -16,7 +16,7 @@
     </c-page-title>
 
     <div class="card mb-6">
-      <h2 class="mb-4 font-medium">{% translate "What is in it" %}</h2>
+      <c-section-title>{% translate "What is in it" %}</c-section-title>
       <dl class="grid grid-cols-2 gap-3 text-sm">
         <div class="flex justify-between"><dt>{% translate "Companies" %}</dt><dd class="tabular-nums">{{ counts.companies|default:0 }}</dd></div>
         <div class="flex justify-between"><dt>{% translate "Applications" %}</dt><dd class="tabular-nums">{{ counts.applications|default:0 }}</dd></div>
@@ -66,30 +66,30 @@
     </p>
 
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
-      <h2 class="mb-2 font-medium">{% translate "Bringing a spreadsheet in" %}</h2>
-      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Tracked your search in a spreadsheet, or in another tool that exports one? Upload the CSV, say which column is which, check the preview, and it becomes applications and listings here." %}
-      </p>
+      <c-section-title>
+        {% translate "Bringing a spreadsheet in" %}
+        <c-slot name="subtitle">{% translate "Tracked your search in a spreadsheet, or in another tool that exports one? Upload the CSV, say which column is which, check the preview, and it becomes applications and listings here." %}</c-slot>
+      </c-section-title>
       <a href="{% url 'core:import_csv' %}" class="btn" data-variant="outline">{% translate "Import from a spreadsheet" %}</a>
     </div>
 
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
-      <h2 class="mb-2 font-medium">{% translate "Putting it back" %}</h2>
-      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% blocktranslate trimmed %}
+      <c-section-title>
+        {% translate "Putting it back" %}
+        <c-slot name="subtitle">{% blocktranslate trimmed %}
           An archive can be imported into an empty account from the command line. It is
           not offered here because importing creates records rather than merging them,
           and that is a decision worth making deliberately rather than by clicking.
-        {% endblocktranslate %}
-      </p>
+        {% endblocktranslate %}</c-slot>
+      </c-section-title>
       <pre class="scroll-x rounded bg-ink-100 p-3 text-xs dark:bg-ink-950" tabindex="0" role="group" aria-label="{% translate 'Example command' %}"><code>uv run manage.py import_data you@example.org {{ filename }}</code></pre>
     </div>
 
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
-      <h2 class="mb-2 font-medium">{% translate "Leaving" %}</h2>
-      <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-        {% translate "You can delete your account yourself: every record, every file on the disk, tokens, connections, and the account. The export above is the safety net; take it first." %}
-      </p>
+      <c-section-title>
+        {% translate "Leaving" %}
+        <c-slot name="subtitle">{% translate "You can delete your account yourself: every record, every file on the disk, tokens, connections, and the account. The export above is the safety net; take it first." %}</c-slot>
+      </c-section-title>
       <a href="{% url 'accounts:delete' %}" class="btn" data-variant="destructive-ghost">{% translate "Delete my account" %}</a>
     </div>
   </div>

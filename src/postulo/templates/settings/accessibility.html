@@ -12,7 +12,7 @@
   <form method="post" novalidate>
     {% csrf_token %}
     <div class="card mb-6">
-      <h2 class="mb-1 font-medium">{% translate "Your career" %}</h2>
+      <c-section-title>{% translate "Your career" %}</c-section-title>
       {% comment %} The number, for somebody who cannot use the arrows (#203). A checkbox
          through `<c-field>` is the box, then the label beside it with the help under the
          label (#290) -- the help carries the id the checkbox's `aria-describedby` names
@@ -26,7 +26,7 @@
          level A and Postulo did not have: "d" on the capture review discarded a listing
          straight away, and somebody dictating to their computer presses every letter of the
          sentence (#227). Moved here from Appearance (#281). {% endcomment %}
-      <h2 class="mb-1 font-medium">{% translate "Keyboard shortcuts" %}</h2>
+      <c-section-title>{% translate "Keyboard shortcuts" %}</c-section-title>
       <c-field :field="form.keyboard_shortcuts" />
     </div>
 
@@ -35,7 +35,7 @@
          tint alone is 1.1:1 against the header. Off is not a hole: the weight stays, so the
          current page is still marked by something that is not colour, and forced colours
          underline it regardless (#289). {% endcomment %}
-      <h2 class="mb-1 font-medium">{% translate "Navigation" %}</h2>
+      <c-section-title>{% translate "Navigation" %}</c-section-title>
       <c-field :field="form.nav_underline" />
     </div>
 

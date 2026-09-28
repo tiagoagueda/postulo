@@ -159,8 +159,9 @@ def test_there_are_three_planes_and_each_has_a_border_as_well(client, staff_user
     assert "--shadow-raised:" in theme and "--shadow-floating:" in theme
 
     # The definition, not the first text that looks like it: compact overrides `.card`
-    # earlier in the file, and anchoring on `.card {` found that instead (#292).
-    definition = re.search(r"\n  \.card \{(.+?)\n  \}", CSS, re.S)
+    # too, and anchoring on `.card {` alone found that instead (#292). The rule is in the
+    # style pack since the card became Basecoat's (#291).
+    definition = re.search(r"\n  \.card \{(.+?)\n  \}", BASECOAT, re.S)
     assert definition, "the card rule has moved"
     assert "shadow-raised" in definition.group(1), "a card is the raised plane"
 

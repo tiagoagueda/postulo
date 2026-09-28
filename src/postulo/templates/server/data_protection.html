@@ -19,7 +19,7 @@
   <form method="post" novalidate>
     {% csrf_token %}
     <div class="card mb-4">
-      <h2 class="mb-3 font-medium">{% translate "Retention" %}</h2>
+      <c-section-title>{% translate "Retention" %}</c-section-title>
       <c-field :field="form.retention_days" />
       <p class="text-xs text-ink-500 dark:text-ink-400">
         {% translate "A limit is never enforced on its own: the dry run says what the policy would touch, and the erasures are performed one by one from a company's page. This button deletes nothing." %}
@@ -30,7 +30,7 @@
     </div>
 
     <div class="card mb-6">
-      <h2 class="mb-3 font-medium">{% translate "The notice" %}</h2>
+      <c-section-title>{% translate "The notice" %}</c-section-title>
       <c-field :field="form.privacy_notice" />
       <p class="text-xs text-ink-500 dark:text-ink-400">
         {% translate "Shown wherever the site promises to keep something about another person, such as the form that records a contact. Left blank, the site shows no notice, because the words are the operator's and not Postulo's to invent." %}
@@ -42,7 +42,7 @@
 
   {% if dry_run %}
     <section class="card mt-8" aria-labelledby="gdpr-dry-run-heading">
-      <h2 id="gdpr-dry-run-heading" class="mb-3 font-medium">{% translate "What the policy would touch" %}</h2>
+      <c-section-title id="gdpr-dry-run-heading">{% translate "What the policy would touch" %}</c-section-title>
       {% if dry_run.cutoff %}
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% blocktranslate with days=dry_run.days cutoff=dry_run.cutoff trimmed %}

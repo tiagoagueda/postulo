@@ -176,6 +176,9 @@ def test_the_style_pack_reaches_the_page():
     assert ".avatar {" in compiled and ".avatar > img" in compiled
     assert ".badge {" in compiled and '.badge[data-tone="amber"]' in compiled
     assert ".alert {" in compiled and '.alert[data-variant="error"]' in compiled
+    assert ".card {" in compiled and ".card > header" in compiled
+    # Compact reaches the cells through the table, since the cells carry no class (#291).
+    assert 'body[data-density="compact"] .table :is(th, td)' in compiled
 
 
 def test_the_parser_knows_a_definition_from_a_use():

@@ -102,6 +102,26 @@ def test_feedback_can_leave_the_help_to_the_caller():
     assert "helptext" not in without and 'id="id_name_error"' in without
 
 
+def test_a_section_title_is_a_header_with_the_heading_and_the_sentence():
+    """One way to write the heading at the top of a section (#292), and Basecoat's card
+    header when it is a card's first child (#291)."""
+    html = render(
+        '{% cotton section-title id="section-name" %}Your name'
+        "{% cotton:slot subtitle %}As it appears on a CV.{% endcotton:slot %}{% endcotton %}"
+    )
+
+    assert '<header class="section-title">' in html
+    assert '<h2 id="section-name">Your name</h2>' in html
+    assert "<p>As it appears on a CV.</p>" in html
+
+    bare = render("{% cotton section-title %}Your name{% endcotton %}")
+    assert "<h2>Your name</h2>" in bare and "<p>" not in bare
+
+    # The one thing a call site may add: the distance from what came before.
+    spaced = render('{% cotton section-title class="mt-8" %}Notes{% endcotton %}')
+    assert '<header class="section-title mt-8">' in spaced
+
+
 def test_no_template_includes_a_retired_partial():
     """The include and the component must not coexist, or the two drift apart."""
     retired = re.compile(r"""include\s+["']partials/(field|field_feedback|table/head)\.html""")
