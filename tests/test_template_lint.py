@@ -212,6 +212,12 @@ def test_no_template_copies_the_table_header(path: Path):
 #: three parts. `badge` with a `data-tone` or `data-variant="chip"` is the one now. The
 #: picker's own classes -- `tag-picker`, `tag-preview`, `tag-appearance` -- are not pills.
 RETIRED_PILLS = {
+    # The four alert classes, which were the box and the tone in one word (#291):
+    # `class="alert" data-variant="warning"` is the spelling now.
+    "alert-info",
+    "alert-success",
+    "alert-warning",
+    "alert-error",
     "tag",
     *(f"tag-{tone}" for tone in ("grey", "blue", "amber", "violet", "teal", "green", "rose")),
     "chip",
@@ -256,6 +262,9 @@ def test_the_pill_detector_knows_the_difference():
     assert retired_pills('chip.className = "chip chip-new";') == [(1, "chip"), (1, "chip-new")]
     assert retired_pills('<span class="badge tag-preview" data-tone="grey">') == []
     assert retired_pills('<span class="badge" data-variant="chip">') == []
+    assert retired_pills('<div class="alert-error mb-4" role="alert">') == [(1, "alert-error")]
+    assert retired_pills('<div class="alert mb-4" data-variant="error">') == []
+    assert retired_pills('<div class="page-alert">') == []
     assert retired_pills("{# the same chip the form draws #}") == []
 
 

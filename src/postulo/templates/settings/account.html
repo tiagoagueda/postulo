@@ -110,7 +110,7 @@
     </div>
 
     {% if not passkeys.usable %}
-      <p class="alert-warning mt-3 text-sm" role="note" data-passkeys-insecure>
+      <p class="alert mt-3 text-sm" data-variant="warning" role="note" data-passkeys-insecure>
         <span>
           {% blocktranslate trimmed %}
             Your browser will only make a passkey on a page served over HTTPS. This instance
@@ -129,7 +129,7 @@
     {% endif %}
 
     {% if passkeys.count and not passkeys.has_recovery_codes %}
-      <p class="alert-warning mt-3 text-sm" role="note" data-no-recovery-codes>
+      <p class="alert mt-3 text-sm" data-variant="warning" role="note" data-no-recovery-codes>
         <span>
           {% blocktranslate with url=recovery_codes_url trimmed %}
             You have no recovery codes. Lose the device holding your passkey and there is

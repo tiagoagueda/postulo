@@ -93,10 +93,10 @@ BUTTON_SIZES: tuple[tuple[str, str], ...] = (
 )
 
 ALERTS: tuple[tuple[str, str], ...] = (
-    ("alert-info", _("Something worth knowing.")),
-    ("alert-success", _("That worked.")),
-    ("alert-warning", _("Worth a second look before you go on.")),
-    ("alert-error", _("That did not work, and here is why.")),
+    ("info", _("Something worth knowing.")),
+    ("success", _("That worked.")),
+    ("warning", _("Worth a second look before you go on.")),
+    ("error", _("That did not work, and here is why.")),
 )
 
 

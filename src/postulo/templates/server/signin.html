@@ -38,7 +38,7 @@
       {% comment %} An operator deciding whether to turn single sign-on on is standing here.
          What it trusts belongs here too, not only in the wiki. {% endcomment %}
       {% if sso.link_by_email %}
-        <div class="alert-info mt-3 text-xs" data-sso-trust role="note">
+        <div class="alert mt-3 text-xs" data-variant="info" data-sso-trust role="note">
           <div>
             {% blocktranslate trimmed %}
               Somebody arriving through this provider is signed in as the account holding the
@@ -70,7 +70,7 @@
           {% if variable %}
             <div class="mb-4" data-pinned="{{ field.name }}">
               <p class="label">{{ field.label }}</p>
-              <p class="alert-info text-sm">
+              <p class="alert text-sm" data-variant="info">
                 <span>
                   {% blocktranslate trimmed %}
                     Set by the environment: <code>{{ variable }}</code>. Remove it from the

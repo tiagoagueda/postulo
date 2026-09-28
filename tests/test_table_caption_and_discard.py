@@ -81,4 +81,4 @@ def test_an_ordinary_message_is_still_escaped(client, user):
     html = engines["django"].get_template("partials/messages.html").render({"messages": shown})
     assert "&lt;b&gt;plain&lt;/b&gt;" in html
     assert "<b>marked</b>" in html
-    assert 'class="alert-info' in html
+    assert 'class="alert' in html and 'data-variant="info"' in html

@@ -536,3 +536,43 @@
     border: 1px solid CanvasText;
   }
 }
+
+/* ------------------------------------------------------------------ alert */
+
+/*
+ * Something the page has to say (#291). It was four classes -- `alert-info`,
+ * `alert-success`, `alert-warning`, `alert-error` -- each applying one utility that spelled
+ * the box, so the tone and the box were one word and a fifth tone would have been a fifth
+ * copy. Basecoat's `alert` is the box and `data-variant` is the tone; the paint is the
+ * four this project has always had, a tinted ground with a border a shade darker and text
+ * at 7:1 against it in both themes. No variant at all is `info`, the quietest.
+ *
+ * The tone is never the only thing said: every alert is a sentence, and the ones that
+ * matter to a screen reader carry `role="alert"` or `role="status"` in the markup.
+ */
+@layer components {
+  .alert {
+    @apply flex items-start gap-3 rounded-lg border px-4 py-3 text-sm;
+  }
+
+  .alert:not([data-variant]),
+  .alert[data-variant="info"] {
+    @apply border-brand-200 bg-brand-50 text-brand-900
+      dark:border-brand-800 dark:bg-brand-900/30 dark:text-brand-100;
+  }
+
+  .alert[data-variant="success"] {
+    @apply border-emerald-200 bg-emerald-50 text-emerald-900
+      dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-100;
+  }
+
+  .alert[data-variant="warning"] {
+    @apply border-amber-200 bg-amber-50 text-amber-900
+      dark:border-amber-800 dark:bg-amber-900/30 dark:text-amber-100;
+  }
+
+  .alert[data-variant="error"] {
+    @apply border-red-200 bg-red-50 text-red-900
+      dark:border-red-800 dark:bg-red-900/30 dark:text-red-100;
+  }
+}

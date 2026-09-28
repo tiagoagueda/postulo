@@ -24,7 +24,7 @@
          will go, with the gaps marked. Where there is not, nothing extra happens: a step
          everybody has to press through is read once and clicked past for ever (#235).
       {% endcomment %}
-      <div class="alert-warning mb-6">
+      <div class="alert mb-6" data-variant="warning">
         <p class="mb-2">
           {% blocktranslate trimmed with names=gaps|join:", " count counter=gaps|length %}
             Nothing fills in {{ names }}, so it goes out blank.
@@ -46,7 +46,7 @@
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
         {% for field in form %}

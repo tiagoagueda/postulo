@@ -3,7 +3,7 @@
    verification-code pages do this. The same shape `<c-field>` draws (#290): a `.field`
    holding the label and the control, or, for a checkbox, the box and then the label.
 {% endcomment %}
-{% if attrs.errors %}<div class="alert-error mb-4" role="alert"><div>{{ attrs.errors }}</div></div>{% endif %}
+{% if attrs.errors %}<div class="alert mb-4" data-variant="error" role="alert"><div>{{ attrs.errors }}</div></div>{% endif %}
 {% if attrs.type == "checkbox" or attrs.type == "radio" %}
   <div class="field mb-4" data-orientation="horizontal">
     <input type="{{ attrs.type }}"

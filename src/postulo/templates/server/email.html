@@ -54,7 +54,7 @@
   {% comment %} Recorded from what the last send actually did, never probed: this page
      would otherwise open an SMTP connection every time somebody looked at it (#152). {% endcomment %}
   {% if not mail_health.delivers %}
-    <div class="alert-warning mb-4 text-sm" role="note" data-mail-failing>
+    <div class="alert mb-4 text-sm" data-variant="warning" role="note" data-mail-failing>
       <div>
         {% blocktranslate trimmed with when=mail_health.last_error_at count counter=mail_health.failures %}
           The last message this instance tried to send failed, at {{ when }}.
@@ -95,7 +95,7 @@
      address before it exists (#103). Said where somebody is about to act on the lock being
      open, rather than discovered when the first sign-up fails. {% endcomment %}
   {% if signup_needs_mail %}
-    <div class="alert-warning mb-4 text-sm" role="note" data-signup-needs-mail>
+    <div class="alert mb-4 text-sm" data-variant="warning" role="note" data-signup-needs-mail>
       {% blocktranslate trimmed %}
         Mail may be switched off here, because somebody who is locked out has another way
         back in. Nobody could create a new account, though: a new account has to verify an
@@ -109,7 +109,7 @@
        package off, so an administrator planning a change finds out before they plan it.
        The rule is evaluated, not hardcoded: it opens by itself once another way back into
        an account exists (#103). {% endcomment %}
-    <div class="alert-info mb-4 text-sm" role="note" data-locked>
+    <div class="alert mb-4 text-sm" data-variant="info" role="note" data-locked>
       <div>{{ locked }}</div>
     </div>
   {% endif %}
@@ -119,7 +119,7 @@
        something would be the day the variable goes: the stored value takes over in silence,
        and mail starts going somewhere else without anybody having edited anything.
     {% endcomment %}
-    <div class="alert-warning mb-4 text-sm" role="note" data-shadowed>
+    <div class="alert mb-4 text-sm" data-variant="warning" role="note" data-shadowed>
       <div>
         {% blocktranslate trimmed count counter=shadowed|length %}
           One setting below is stored here and overridden by the environment. Remove that

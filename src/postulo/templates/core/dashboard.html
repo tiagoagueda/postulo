@@ -7,7 +7,7 @@
 
 {% block content %}
   {% if not user.first_name or not user.last_name %}
-    <div class="alert-warning mb-6" role="status">
+    <div class="alert mb-6" data-variant="warning" role="status">
       <p>
         {% url 'accounts:profile' as profile_url %}
         {% blocktranslate trimmed %}
@@ -19,7 +19,7 @@
   {% endif %}
 
   {% if new_widgets and not arranging %}
-    <div class="alert-info mb-6" role="status">
+    <div class="alert mb-6" data-variant="info" role="status">
       <p>
         {% url 'core:home' as home_url %}
         {% comment %} The names rather than a count: it says the same thing and tells you

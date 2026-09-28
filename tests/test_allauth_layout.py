@@ -98,7 +98,7 @@ def test_a_wrong_password_is_shown_as_an_error_and_announced(client, user):
         reverse("account_login"), {"login": user.username, "password": "not-the-password"}
     )
     html = response.content.decode()
-    assert "alert-error" in html
+    assert 'class="alert mb-4" data-variant="error"' in html
     assert 'role="alert"' in html
     assert "are not correct" in html
 

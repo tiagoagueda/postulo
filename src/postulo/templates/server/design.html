@@ -322,8 +322,8 @@
   <section id="design-alerts" class="mb-10" aria-labelledby="design-alerts-heading">
     <h2 id="design-alerts-heading" class="mb-3 font-medium">{% translate "Alerts" %}</h2>
     <div class="space-y-3">
-      {% for css_class, text in alerts %}
-        <div class="{{ css_class }}" role="status">{{ text }}</div>
+      {% for variant, text in alerts %}
+        <div class="alert" data-variant="{{ variant }}" role="status">{{ text }}</div>
       {% endfor %}
     </div>
   </section>

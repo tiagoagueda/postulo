@@ -39,7 +39,7 @@
        per visit hides a duplicate this way, and a company with two openings of one title
        looks the same. {% endcomment %}
     {% if known %}
-      <div class="alert-warning mb-6" role="status" data-known>
+      <div class="alert mb-6" data-variant="warning" role="status" data-known>
         {% for listing in known.listings %}
           <p>
             {% blocktranslate trimmed with when=listing.created_at|date:"DATE_FORMAT" %}
@@ -68,7 +68,7 @@
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
 
       <div class="card mb-4">

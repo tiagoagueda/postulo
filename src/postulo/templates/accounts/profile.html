@@ -35,7 +35,7 @@
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
 
       <div class="card mb-4" data-picture id="section-picture">
@@ -136,7 +136,7 @@
         </p>
         {{ identifiers.management_form }}
         {% if identifiers.non_form_errors %}
-          <div class="alert-error mb-3">{{ identifiers.non_form_errors }}</div>
+          <div class="alert mb-3" data-variant="error">{{ identifiers.non_form_errors }}</div>
         {% endif %}
         <ol class="space-y-3">
           {% for row in identifiers %}

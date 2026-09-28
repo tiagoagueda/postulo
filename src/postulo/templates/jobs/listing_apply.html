@@ -16,7 +16,7 @@
     </c-page-title>
 
     {% if listing.has_applications %}
-      <div class="alert-info mb-4">
+      <div class="alert mb-4" data-variant="info">
         {% translate "You have applied to this one before. Recording a second application is fine; both stay on the record." %}
       </div>
     {% endif %}
@@ -24,7 +24,7 @@
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
-        <div class="alert-error mb-4">{{ form.non_field_errors }}</div>
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
 
       <div class="card mb-6">
