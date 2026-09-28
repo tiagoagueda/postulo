@@ -115,36 +115,21 @@
       {% endblocktranslate %}</c-slot>
     </c-section-title>
 
-    <dl class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Sent" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.total }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "A week, on average" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.cadence.per_week|floatformat:1 }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Longest gap" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">
+    <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <c-stat label="{% translate 'Sent' %}">{{ report.total }}</c-stat>
+      <c-stat label="{% translate 'A week, on average' %}">{{ report.cadence.per_week|floatformat:1 }}</c-stat>
+      <c-stat label="{% translate 'Longest gap' %}">
           {% blocktranslate count counter=report.cadence.longest_gap trimmed %}
             {{ counter }} day
           {% plural %}
             {{ counter }} days
           {% endblocktranslate %}
-        </dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Weeks in a row, up to now" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.cadence.current_run }}</dd>
-      </div>
+      </c-stat>
+      <c-stat label="{% translate 'Weeks in a row, up to now' %}">{{ report.cadence.current_run }}</c-stat>
       {% if report.office %}
-        <div>
-          <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Through the employment service" %}</dt>
-          <dd class="text-2xl font-semibold tabular-nums">{{ report.through_service }}</dd>
-        </div>
+        <c-stat label="{% translate 'Through the employment service' %}">{{ report.through_service }}</c-stat>
       {% endif %}
-    </dl>
+    </div>
 
     <ul class="space-y-3">
       {% for week in report.cadence.weeks %}
@@ -190,24 +175,12 @@
       {% translate "What came back" %}
       <c-slot name="subtitle">{% translate "Counted by when it happened, so a reply in this period to an older application belongs here. That is a different question from what was sent, and the two are kept apart." %}</c-slot>
     </c-section-title>
-    <dl class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "First replies" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.replies }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Interviews attended" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.interviews }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Offers" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.offers }}</dd>
-      </div>
-      <div>
-        <dt class="text-sm text-ink-500 dark:text-ink-400">{% translate "Rejections" %}</dt>
-        <dd class="text-2xl font-semibold tabular-nums">{{ report.happened.rejections }}</dd>
-      </div>
-    </dl>
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <c-stat tone="blue" label="{% translate 'First replies' %}">{{ report.happened.replies }}</c-stat>
+      <c-stat tone="brand" label="{% translate 'Interviews attended' %}">{{ report.happened.interviews }}</c-stat>
+      <c-stat tone="green" label="{% translate 'Offers' %}">{{ report.happened.offers }}</c-stat>
+      <c-stat tone="rose" label="{% translate 'Rejections' %}">{{ report.happened.rejections }}</c-stat>
+    </div>
   </section>
 
   {% if report.sources or report.industries %}

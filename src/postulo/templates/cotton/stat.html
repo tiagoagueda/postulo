@@ -1,0 +1,29 @@
+<c-vars label="" tone="" href="" card=False />
+{% comment %} A figure, and what it counts (#292).
+
+   `<c-stat label="{% translate 'Offers' %}" tone="green">{{ report.happened.offers }}</c-stat>`
+
+   `<c-stat card href="…" label="{% translate 'Still live' %}">{{ open_count }}</c-stat>`
+
+   The figure is the slot, so it can be a filter chain or a `blocktranslate` with a plural;
+   the label is an attribute, a sentence fragment that never needs either. `card` makes
+   the figure a tile of its own, as on the dashboard, and a size larger; without it the
+   figure sits in a grid inside a card somebody else drew, as on the report. `href` makes
+   the tile a link to the list it counts.
+
+   `tone` is what the figure means, from the palette a badge takes its tone from: `green`
+   for an offer, `rose` for a rejection, `brand` for a conversation in progress, `blue`
+   for a reply. A figure that is only a count has none. The label says what the figure
+   is; the colour is a second signal and never the only one.
+{% endcomment %}
+{% if href %}
+  <a href="{{ href }}" class="stat card hover:border-brand-400"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+    <p class="stat-value">{{ slot }}</p>
+    <p class="stat-label">{{ label }}</p>
+  </a>
+{% else %}
+  <div class="stat{% if card %} card{% endif %}"{% if tone %} data-tone="{{ tone }}"{% endif %}>
+    <p class="stat-value">{{ slot }}</p>
+    <p class="stat-label">{{ label }}</p>
+  </div>
+{% endif %}

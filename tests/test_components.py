@@ -102,6 +102,21 @@ def test_feedback_can_leave_the_help_to_the_caller():
     assert "helptext" not in without and 'id="id_name_error"' in without
 
 
+def test_a_figure_is_the_number_and_what_it_counts():
+    """One way to draw a statistic (#292): the figure, its label, and a tone where the
+    figure means something. A tile of its own when it says `card`, a link when it has
+    somewhere to go."""
+    plain = render('{% cotton stat label="Sent" %}24{% endcotton %}')
+    assert '<div class="stat">' in plain and "data-tone" not in plain
+    assert '<p class="stat-value">24</p>' in plain and '<p class="stat-label">Sent</p>' in plain
+
+    toned = render('{% cotton stat label="Offers" tone="green" card %}2{% endcotton %}')
+    assert '<div class="stat card" data-tone="green">' in toned
+
+    linked = render('{% cotton stat label="Still live" href="/applications/" %}3{% endcotton %}')
+    assert '<a href="/applications/" class="stat card hover:border-brand-400">' in linked
+
+
 def test_a_section_title_is_a_header_with_the_heading_and_the_sentence():
     """One way to write the heading at the top of a section (#292), and Basecoat's card
     header when it is a card's first child (#291)."""

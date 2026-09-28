@@ -192,6 +192,24 @@ def test_nothing_else_names_a_retired_field_class_either():
         assert not RETIRED_FIELD.search(text), path.name
 
 
+#: A figure written by hand: the size, the weight and the lining figures, on a paragraph
+#: or a <dd> (#292). `<c-stat>` is the one way. Comments are not markup, and the page
+#: title's own comment quotes the string it replaced.
+HAND_FIGURE = re.compile(r"text-[23]xl font-semibold tabular-nums")
+COMMENT = re.compile(r"\{% comment %\}.*?\{% endcomment %\}", re.DOTALL)
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_writes_a_figure_by_hand(path: Path):
+    text = COMMENT.sub("", path.read_text(encoding="utf-8"))
+    assert not HAND_FIGURE.search(text), (
+        f"{path.name}: a figure written by hand. Write "
+        '`<c-stat label="…">{{ the figure }}</c-stat>`, with a `tone` if it means something.'
+    )
+
+
 #: A section heading written by hand, with the margin that stood for whether a sentence
 #: followed (#292). `<c-section-title>` is the one way; a heading that shares a row with
 #: its actions keeps a bare `font-medium`, which this does not match. With its id first

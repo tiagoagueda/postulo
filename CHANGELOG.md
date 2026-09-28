@@ -23,6 +23,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A figure is drawn one way on the dashboard, the report and the widgets, and the ones that mean something carry a colour: an offer green, a rejection rose, a conversation the brand. (#292)
 - A pill, an alert, a card, a table, a tile and an empty state are each drawn by one component on Basecoat's structure, and a section's heading by one of Postulo's own; the `tag`, `chip` and `alert-*` classes are gone. (#291)
 - Form rows are Basecoat's field family: a label, a box, help and errors in one structure, checkboxes and radios drawn by the stylesheet, and the flag choosers as input groups; the four `field-*` classes are gone. (#290)
 - CI runs the suite on every core with the browser group left out, measures coverage on one leg against a floor, pins uv, zizmor and pip-audit, and refuses a release or an image unless CI passed on the tagged commit; a monthly workflow proposes lock-file upgrades. (#233)

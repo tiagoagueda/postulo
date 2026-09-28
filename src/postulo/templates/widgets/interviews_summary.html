@@ -2,20 +2,11 @@
 <c-section-title>{{ widget.label }}</c-section-title>
 <div class="card" data-interviews>
   <div class="grid gap-4 sm:grid-cols-3">
-    <div>
-      <p class="text-2xl font-semibold tabular-nums">
-        {% if insights.median_days_to_interview is not None %}{{ insights.median_days_to_interview|floatformat:0 }}{% else %}—{% endif %}
-      </p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Median days to a first interview" %}</p>
-    </div>
-    <div>
-      <p class="text-2xl font-semibold tabular-nums">{{ insights.interviewed }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "Applications that reached one" %}</p>
-    </div>
-    <div>
-      <p class="text-2xl font-semibold tabular-nums">{{ insights.interviews_ahead }}</p>
-      <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "In the diary" %}</p>
-    </div>
+    <c-stat label="{% translate 'Median days to a first interview' %}">
+      {% if insights.median_days_to_interview is not None %}{{ insights.median_days_to_interview|floatformat:0 }}{% else %}—{% endif %}
+    </c-stat>
+    <c-stat tone="brand" label="{% translate 'Applications that reached one' %}">{{ insights.interviewed }}</c-stat>
+    <c-stat label="{% translate 'In the diary' %}">{{ insights.interviews_ahead }}</c-stat>
   </div>
   {% if insights.interview_kinds %}
     <ul class="mt-4 flex flex-wrap gap-2 text-xs">

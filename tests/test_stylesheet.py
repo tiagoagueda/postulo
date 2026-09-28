@@ -177,6 +177,11 @@ def test_the_style_pack_reaches_the_page():
     assert ".badge {" in compiled and '.badge[data-tone="amber"]' in compiled
     assert ".alert {" in compiled and '.alert[data-variant="error"]' in compiled
     assert ".card {" in compiled and ".card > header" in compiled
+    # A contained header has no intrinsic width, and the empty state's collapsed to one
+    # word a line; the containment Basecoat declares is switched off (#291).
+    header = compiled[compiled.index(".card > header {") :]
+    assert "container-type: normal" in header[: header.index("}")]
+    assert ".stat-value {" in compiled and '.stat[data-tone="green"]' in compiled
     # Compact reaches the cells through the table, since the cells carry no class (#291).
     assert 'body[data-density="compact"] .table :is(th, td)' in compiled
 

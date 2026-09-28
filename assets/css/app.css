@@ -725,6 +725,51 @@
   }
 
   /*
+   * A figure and what it counts (#292): what `<c-stat>` draws. It was written twenty
+   * times in two sizes and two markups -- nine <dt>/<dd> tiles on the report, and the
+   * dashboard's counters drawing the same idea again with two paragraphs.
+   *
+   * **This is where colour is spent.** Counted over the templates, nine colour decisions
+   * in ten were a shade of grey and every other colour was an alarm. A figure that means
+   * something takes the tone of what it means -- an offer is green wherever an offer is
+   * drawn, a rejection rose, a conversation the brand -- from the palette the badges
+   * use, at 4.5:1 against the card in both themes. The label beside it is what says
+   * what it is; the colour is a second signal and never the only one, and a
+   * high-contrast theme repaints it to the text colour and loses nothing.
+   */
+  .stat-value {
+    @apply text-2xl font-semibold tabular-nums;
+  }
+
+  .stat.card > .stat-value {
+    @apply text-3xl;
+  }
+
+  .stat-label {
+    @apply text-sm text-ink-500 dark:text-ink-400;
+  }
+
+  .stat[data-tone="brand"] > .stat-value {
+    @apply text-brand-700 dark:text-brand-300;
+  }
+
+  .stat[data-tone="blue"] > .stat-value {
+    @apply text-sky-700 dark:text-sky-300;
+  }
+
+  .stat[data-tone="green"] > .stat-value {
+    @apply text-emerald-700 dark:text-emerald-300;
+  }
+
+  .stat[data-tone="amber"] > .stat-value {
+    @apply text-amber-700 dark:text-amber-300;
+  }
+
+  .stat[data-tone="rose"] > .stat-value {
+    @apply text-rose-700 dark:text-rose-300;
+  }
+
+  /*
    * A box whose content is allowed to be wider than the page: a data table, the board's
    * columns. WCAG's Reflow criterion exempts content that needs two dimensions to mean
    * anything, provided it is the box that scrolls and not the page.

@@ -602,15 +602,23 @@
       dark:border-ink-800 dark:bg-ink-900;
   }
 
+  /* Basecoat makes the header a size container, for the container queries its packs use.
+     Nothing here asks one, and containment has a cost: a contained box has no intrinsic
+     width, so a header that is sized by its content -- in the empty state's centred
+     column, or in a card somebody has made a flex row -- collapses to nothing and its
+     sentence breaks after every word. */
   .card > header {
     @apply mb-3 gap-1;
+    container-type: normal;
   }
 
   .card > header > :is(h2, h3) {
     @apply leading-normal font-medium;
   }
 
-  .card > header > p {
+  /* Not the empty state's, whose header holds a title and a sentence as two paragraphs
+     and says what each looks like itself. */
+  .card:not(.empty) > header > p {
     @apply text-sm text-ink-500 dark:text-ink-400;
   }
 
