@@ -23,7 +23,7 @@
           {% url 'jobs:company_update' company.pk as form_url %}
           {% include "partials/table/cell.html" with object=company value=company.name editing=False message="" cell_url=cell_url form_url=form_url record_url=company.get_absolute_url %}
           {% if company.is_employment_service %}
-            <span class="chip py-0 text-xs"><span class="chip-text">{{ company.get_kind_display }}</span></span>
+            <span class="badge" data-tone="grey"><span>{{ company.get_kind_display }}</span></span>
           {% endif %}
         </span>
       </td>
@@ -43,9 +43,9 @@
           {% if held %}
             <span class="flex flex-wrap items-center gap-1">
               {% for industry in held|slice:":4" %}
-                <span class="chip py-0 text-xs"
+                <span class="badge" data-tone="grey"
                       {% if industry.code %}title="NACE {{ industry.code }}"{% endif %}>
-                  <span class="chip-text">{{ industry.name }}</span>
+                  <span>{{ industry.name }}</span>
                 </span>
               {% endfor %}
               {% if held|length > 4 %}

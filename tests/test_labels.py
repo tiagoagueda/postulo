@@ -164,10 +164,10 @@ def test_the_chip_is_a_target_of_the_size_the_guidelines_ask_for():
     """
     from pathlib import Path
 
-    css = Path("assets/css/app.css").read_text(encoding="utf-8")
-    chip = css.split(".chip-remove {")[1].split("}")[0]
+    css = Path("assets/css/basecoat.css").read_text(encoding="utf-8")
+    button = css.split('.btn[data-size="icon-xs"] {')[1].split("}")[0]
 
-    assert "h-6 w-6" in chip, "24 by 24"
+    assert "size-6" in button, "24 by 24: the chip's × is a `.btn` of that size (#291)"
 
 
 def test_nothing_names_a_side_of_the_page():
@@ -183,9 +183,10 @@ def test_nothing_names_a_side_of_the_page():
     import re
     from pathlib import Path
 
-    css = Path("assets/css/app.css").read_text(encoding="utf-8")
+    css = Path("assets/css/basecoat.css").read_text(encoding="utf-8")
     chips = "".join(
-        css.split(f".{name} {{")[1].split("}")[0] for name in ("chip", "chip-new", "chip-remove")
+        css.split(selector)[1].split("}")[0]
+        for selector in ('.badge[data-variant="chip"] {', ".badge > .btn {")
     )
 
     assert not re.search(r"\b(pl|pr|ml|mr)-", chips)

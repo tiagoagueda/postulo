@@ -29,7 +29,7 @@ def blocks(css: str, query: str) -> list[str]:
 
 def test_every_control_keeps_a_border_under_forced_colours():
     forced = "\n".join(blocks(CSS, "(forced-colors: active)"))
-    for selector in (".btn", ".menu-item", ".nav-link", ".chip-remove"):
+    for selector in (".btn", ".menu-item", ".nav-link", ".badge"):
         assert re.search(rf"{re.escape(selector)},?\s", forced), selector
     assert "border: 1px solid ButtonText" in forced
     assert "forced-color-adjust: none" in forced and "background-color: Highlight" in forced

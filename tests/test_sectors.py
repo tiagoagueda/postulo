@@ -50,7 +50,7 @@ def test_a_person_picks_from_the_classification_and_gets_a_label(client, user):
     assert industry.code == "07"
 
     html = client.get(reverse("jobs:company_list")).content.decode()
-    assert "chip" in row_for(html, company)
+    assert "badge" in row_for(html, company)
 
 
 def test_a_word_somebody_wrote_themselves_is_never_renamed(client, user):
@@ -74,7 +74,7 @@ def test_one_industry_is_one_label(client, user):
 
     row = row_for(client.get(reverse("jobs:company_list")).content.decode(), company)
 
-    assert row.count("chip-text") == 1
+    assert row.count('class="badge"') == 1
 
 
 def test_three_are_three(client, user):
@@ -98,7 +98,7 @@ def test_twelve_do_not_push_every_other_column_off_the_screen(client, user):
 
     row = row_for(client.get(reverse("jobs:company_list")).content.decode(), company)
 
-    assert row.count("chip-text") == 4, "four are shown"
+    assert row.count('class="badge"') == 4, "four are shown"
     assert "and 8 more" in row, "and the rest are counted"
 
 
@@ -108,7 +108,7 @@ def test_a_company_with_none_still_says_so(client, user):
 
     row = row_for(client.get(reverse("jobs:company_list")).content.decode(), company)
 
-    assert "chip" not in row
+    assert "badge" not in row
     assert "—" in row
 
 

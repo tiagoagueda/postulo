@@ -1321,15 +1321,18 @@
   function chipFor(box, name, isNew, remove) {
     var item = document.createElement("li");
     var chip = document.createElement("span");
-    chip.className = isNew ? "chip chip-new" : "chip";
+    chip.className = "badge";
+    chip.dataset.variant = "chip";
+    if (isNew) chip.dataset.new = "";
     var text = document.createElement("span");
-    text.className = "chip-text";
     text.textContent = isNew ? (box.dataset.labelsNewHint || "{label}").replace("{label}", name) : name;
     chip.appendChild(text);
 
     var button = document.createElement("button");
     button.type = "button";
-    button.className = "chip-remove";
+    button.className = "btn";
+    button.dataset.variant = "ghost";
+    button.dataset.size = "icon-xs";
     button.dataset.labelsChip = "";
     button.setAttribute(
       "aria-label",

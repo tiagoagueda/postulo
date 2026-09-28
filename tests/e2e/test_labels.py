@@ -42,7 +42,7 @@ def test_the_chosen_industries_arrive_as_labels(page: Page, live_server, applica
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/jobs/companies/{company.pk}/edit/")
 
-    chips = page.locator("[data-labels-chips] .chip")
+    chips = page.locator("[data-labels-chips] .badge")
 
     expect(chips).to_have_count(2)
     expect(chips.first).to_contain_text("Research")
@@ -58,7 +58,7 @@ def test_removing_a_label_unticks_the_box_it_was_a_picture_of(page: Page, live_s
 
     page.get_by_role("button", name="Remove Research").click()
 
-    expect(page.locator("[data-labels-chips] .chip")).to_have_count(1)
+    expect(page.locator("[data-labels-chips] .badge")).to_have_count(1)
     ticked = page.locator('input[name="industries"]:checked')
     expect(ticked).to_have_count(1)
 
@@ -82,7 +82,7 @@ def test_typing_an_existing_name_ticks_it(page: Page, live_server, applicant):
     field.fill("Gaming")
     field.press("Enter")
 
-    expect(page.locator("[data-labels-chips] .chip")).to_have_count(3)
+    expect(page.locator("[data-labels-chips] .badge")).to_have_count(3)
     expect(page.locator("[data-labels-live]")).to_have_text("Gaming added")
     # Ticked, not typed: it already existed, so nothing goes into the new-names field.
     expect(page.locator('input[name="new_industries"]')).to_have_value("")
@@ -100,7 +100,7 @@ def test_a_name_that_does_not_exist_yet_is_visibly_new(page: Page, live_server, 
     field.fill("Fintech")
     field.press("Enter")
 
-    fresh = page.locator("[data-labels-chips] .chip-new")
+    fresh = page.locator("[data-labels-chips] .badge[data-new]")
     expect(fresh).to_have_count(1)
     expect(fresh).to_contain_text("Fintech")
     expect(page.locator('input[name="new_industries"]')).to_have_value("Fintech")
@@ -129,7 +129,7 @@ def test_escape_abandons_what_was_typed(page: Page, live_server, applicant):
     field.press("Escape")
 
     expect(field).to_have_value("")
-    expect(page.locator("[data-labels-chips] .chip-new")).to_have_count(0)
+    expect(page.locator("[data-labels-chips] .badge[data-new]")).to_have_count(0)
 
 
 def test_backspace_does_not_delete_the_last_label(page: Page, live_server, applicant):
@@ -144,7 +144,7 @@ def test_backspace_does_not_delete_the_last_label(page: Page, live_server, appli
     field.click()
     field.press("Backspace")
 
-    expect(page.locator("[data-labels-chips] .chip")).to_have_count(2)
+    expect(page.locator("[data-labels-chips] .badge")).to_have_count(2)
 
 
 def test_the_arrows_walk_between_labels(page: Page, live_server, applicant):
@@ -195,5 +195,5 @@ def test_tags_get_the_same_control(page: Page, live_server, applicant):
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/applications/{application.pk}/edit/")
 
-    expect(page.locator("[data-labels-chips] .chip")).to_have_count(1)
+    expect(page.locator("[data-labels-chips] .badge")).to_have_count(1)
     expect(page.get_by_role("button", name="Remove Remote")).to_be_visible()

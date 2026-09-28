@@ -447,3 +447,92 @@
     @apply object-contain;
   }
 }
+
+/* ------------------------------------------------------------------ badge */
+
+/*
+ * One pill (#291). It was `tag` with seven tones for a label and a plugin's kind, `chip`
+ * for a token in a field, and the same nine utilities written inline for "Off" and a
+ * plugin's kind on the pages that had no partial to hand; a status had a tone map of its
+ * own and the log's level another. Basecoat's `badge` is the shape and this is the paint:
+ * the seven tones of the palette #285 gave applicants, each 4.5:1 against its own ground in
+ * both themes and 3:1 against the card, plus `brand` for the states in play; and
+ * `data-variant="chip"`, the token in a field, outlined and a size up so it reads as a
+ * thing that was chosen, with a `.btn` inside to take it off again -- 24 by 24, which is
+ * what SC 2.5.8 asks of the × in the corner of a pill, and pulled back into the pill's
+ * own end padding so a chip with a button is no wider than it needs to be.
+ *
+ * The word inside truncates rather than the pill wrapping: a pill is a word, and a label
+ * somebody wrote at length is cut with an ellipsis rather than folded into a paragraph.
+ * `whitespace-nowrap` is Basecoat's and is kept.
+ */
+@layer components {
+  .badge {
+    @apply gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .badge > span {
+    @apply truncate;
+  }
+
+  .badge[data-tone="grey"] {
+    @apply bg-ink-100 text-ink-600 dark:bg-ink-800 dark:text-ink-300;
+  }
+
+  .badge[data-tone="blue"] {
+    @apply bg-sky-100 text-sky-800 dark:bg-sky-950 dark:text-sky-200;
+  }
+
+  .badge[data-tone="amber"] {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200;
+  }
+
+  .badge[data-tone="violet"] {
+    @apply bg-violet-100 text-violet-800 dark:bg-violet-950 dark:text-violet-200;
+  }
+
+  .badge[data-tone="teal"] {
+    @apply bg-teal-100 text-teal-800 dark:bg-teal-950 dark:text-teal-200;
+  }
+
+  .badge[data-tone="green"] {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200;
+  }
+
+  .badge[data-tone="rose"] {
+    @apply bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-200;
+  }
+
+  /* Not one of the palette: the brand, for an application in play. */
+  .badge[data-tone="brand"] {
+    @apply bg-brand-100 text-brand-800 dark:bg-brand-900/40 dark:text-brand-200;
+  }
+
+  .badge[data-variant="chip"] {
+    @apply border border-ink-200 bg-ink-100 px-3 py-0.5 text-sm font-normal text-ink-900
+      dark:border-ink-700 dark:bg-ink-800 dark:text-ink-100;
+  }
+
+  /* A chip that is a new name, not yet saved: outlined rather than filled, so "this one
+     does not exist yet" is visible before anything is. */
+  .badge[data-variant="chip"][data-new] {
+    @apply border-dashed border-brand-500 bg-transparent text-brand-700
+      dark:border-brand-400 dark:text-brand-300;
+  }
+
+  .badge > .btn {
+    @apply -me-2.5 rounded-full text-base leading-none;
+  }
+}
+
+/* Forced colours: a badge is a word on a tinted ground, and the theme throws the tint away
+   -- so seven tones become one and the pill stops being a pill. The border brings the
+   shape back in a colour the theme keeps. The icon survives on its own: it is a stroke in
+   `currentColor`, which is repainted rather than dropped, so a tag that carries one is
+   still told apart from a tag that carries another (#285). The × on a chip is a `.btn`,
+   and has its border with the other buttons above. */
+@media (forced-colors: active) {
+  .badge {
+    border: 1px solid CanvasText;
+  }
+}

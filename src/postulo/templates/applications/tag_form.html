@@ -32,7 +32,7 @@
         {% translate "your tag" as unnamed %}
         <p class="mb-5 flex flex-wrap items-center gap-2 text-sm text-ink-500 dark:text-ink-400">
           {% translate "On a board it looks like this:" %}
-          <span class="tag tag-grey tag-preview">
+          <span class="badge tag-preview" data-tone="grey">
             {% for value, label in form.icon.field.choices %}
               {% if value %}{% icon value class="size-3" %}{% endif %}
             {% endfor %}
@@ -49,7 +49,7 @@
             {% for choice in form.colour %}
               <label>
                 {{ choice.tag }}
-                <span class="tag tag-{{ choice.data.value }}">{{ choice.choice_label }}</span>
+                <span class="badge" data-tone="{{ choice.data.value }}">{{ choice.choice_label }}</span>
               </label>
             {% endfor %}
           </div>

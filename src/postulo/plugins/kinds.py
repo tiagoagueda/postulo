@@ -33,16 +33,17 @@ LABELS: dict[str, str] = {
     "identifier": _("Identifiers"),
 }
 
-#: The tag class each kind wears, defined in `assets/css/app.css`.
+#: The badge tone each kind wears: `data-tone` on a `.badge`, painted in
+#: `assets/css/basecoat.css` from the same palette a tag chooses from (#291).
 TONES: dict[str, str] = {
-    "source": "tag-blue",
-    "notifier": "tag-amber",
-    "store": "tag-violet",
-    "sync": "tag-teal",
-    "importer": "tag-green",
-    "feature": "tag-rose",
-    "transport": "tag-teal",
-    "identifier": "tag-violet",
+    "source": "blue",
+    "notifier": "amber",
+    "store": "violet",
+    "sync": "teal",
+    "importer": "green",
+    "feature": "rose",
+    "transport": "teal",
+    "identifier": "violet",
 }
 
 
@@ -56,5 +57,5 @@ def label_for(kind: str) -> str:
 
 
 def tone_for(kind: str) -> str:
-    """The tag class for a kind, falling back to the neutral one."""
-    return TONES.get(kind, "tag-grey")
+    """The badge tone for a kind, falling back to the neutral one."""
+    return TONES.get(kind, "grey")

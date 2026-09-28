@@ -73,23 +73,17 @@ def test_it_shows_every_size_the_stylesheet_paints(client, staff_user):
     assert painted - declared == {"icon", "icon-sm", "icon-xs"}
 
 
-#: Classes that begin `tag-` and are not tones: the two that dress the picker on the tag
-#: form (#285). Named here rather than matched around, so that a third one has to be
-#: thought about instead of quietly slipping past the assertion below.
-NOT_TONES = {"picker", "preview"}
-
-
 def test_it_shows_the_whole_tag_palette(client, staff_user):
     """Every colour a tag can be, on one page, in both themes. Six of the seven were unspent
     until #285 gave applicants the palette; the gallery is still where they can be compared."""
-    painted = set(re.findall(r"\.tag-([a-z]+)\s*\{", CSS)) - NOT_TONES
+    painted = set(re.findall(r'\.badge\[data-tone="([a-z]+)"\]', BASECOAT))
 
-    assert set(design.TAGS) == painted
+    assert set(design.TAGS) == painted - {"brand"}, "the palette, plus the brand for a state"
 
     client.force_login(staff_user)
     html = client.get(reverse("server:design")).content.decode()
     for tag in design.TAGS:
-        assert f"tag-{tag}" in html
+        assert f'data-tone="{tag}"' in html
 
 
 def test_it_shows_both_colour_scales_whole(client, staff_user):

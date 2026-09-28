@@ -254,8 +254,11 @@
       <div>
         <h3 class="mb-2 text-sm font-medium">{% translate "Chips" %}</h3>
         <span class="flex flex-wrap items-center gap-1">
-          <span class="chip"><span class="chip-text">{% translate "A chip" %}</span></span>
-          <span class="chip py-0 text-xs"><span class="chip-text">{% translate "A small one" %}</span></span>
+          <span class="badge" data-variant="chip"><span>{% translate "A chip" %}</span>
+            <button type="button" class="btn" data-variant="ghost" data-size="icon-xs"
+                    aria-label="{% translate 'Remove' %}">&times;</button></span>
+          <span class="badge" data-variant="chip" data-new><span>{% translate "A new one" %}</span></span>
+          <span class="badge" data-tone="grey">{% translate "A small one" %}</span>
         </span>
       </div>
       <div>
@@ -265,7 +268,7 @@
         </p>
         <span class="flex flex-wrap items-center gap-1">
           {% for tag in tags %}
-            <span class="tag tag-{{ tag }}">{{ tag }}</span>
+            <span class="badge" data-tone="{{ tag }}">{{ tag }}</span>
           {% endfor %}
         </span>
       </div>

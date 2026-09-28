@@ -208,6 +208,57 @@ def test_no_template_copies_the_table_header(path: Path):
     )
 
 
+#: The two names a pill used to go by (#291): `tag` with its seven tones, `chip` with its
+#: three parts. `badge` with a `data-tone` or `data-variant="chip"` is the one now. The
+#: picker's own classes -- `tag-picker`, `tag-preview`, `tag-appearance` -- are not pills.
+RETIRED_PILLS = {
+    "tag",
+    *(f"tag-{tone}" for tone in ("grey", "blue", "amber", "violet", "teal", "green", "rose")),
+    "chip",
+    "chip-new",
+    "chip-text",
+    "chip-remove",
+}
+
+#: A class attribute in a template, or a `className` a script assigns. The words are looked
+#: for among the classes and nowhere else: "a chip" is still a word a comment may use, and
+#: `data-variant="chip"` is the new spelling, not the old one.
+CLASSES = re.compile(r"""class(?:Name)?\s*=\s*["']([^"']*)["']""")
+
+
+def retired_pills(text: str) -> list[tuple[int, str]]:
+    """Line number and class for every retired pill class among a text's class lists."""
+    found = []
+    for match in CLASSES.finditer(text):
+        line = text.count("\n", 0, match.start()) + 1
+        found += [(line, name) for name in match.group(1).split() if name in RETIRED_PILLS]
+    return found
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_names_a_retired_pill_class(path: Path):
+    found = retired_pills(path.read_text(encoding="utf-8"))
+    assert not found, (
+        f"{path.name}: a retired pill class at {found}. Write "
+        '`class="badge" data-tone="grey"`, or `data-variant="chip"` for a token in a field.'
+    )
+
+
+def test_the_script_names_no_retired_pill_class_either():
+    script = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "js" / "app.js"
+    assert not retired_pills(script.read_text(encoding="utf-8"))
+
+
+def test_the_pill_detector_knows_the_difference():
+    assert retired_pills('<span class="tag tag-grey">') == [(1, "tag"), (1, "tag-grey")]
+    assert retired_pills('chip.className = "chip chip-new";') == [(1, "chip"), (1, "chip-new")]
+    assert retired_pills('<span class="badge tag-preview" data-tone="grey">') == []
+    assert retired_pills('<span class="badge" data-variant="chip">') == []
+    assert retired_pills("{# the same chip the form draws #}") == []
+
+
 def test_the_field_detector_knows_the_difference():
     assert RETIRED_FIELD.search('class="field-input w-64"')
     assert RETIRED_FIELD.search('<legend class="field-label">')

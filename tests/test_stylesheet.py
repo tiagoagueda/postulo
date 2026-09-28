@@ -174,6 +174,7 @@ def test_the_style_pack_reaches_the_page():
     assert ".input-group {" in compiled
     assert ".table {" in compiled and ".table thead" in compiled
     assert ".avatar {" in compiled and ".avatar > img" in compiled
+    assert ".badge {" in compiled and '.badge[data-tone="amber"]' in compiled
 
 
 def test_the_parser_knows_a_definition_from_a_use():

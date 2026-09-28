@@ -22,7 +22,7 @@ def entries(html: str) -> dict[str, str]:
     """Every anchor the sidebar offers, with the count drawn beside it (or "")."""
     found = {}
     for match in re.finditer(r'data-section-link="([^"]+)"(.*?)</a>', html, re.S):
-        count = re.search(r"rounded-full[^>]*>(\d+)<", match.group(2))
+        count = re.search(r'class="badge[^>]*>(\d+)<', match.group(2))
         found[match.group(1)] = count.group(1) if count else ""
     return found
 

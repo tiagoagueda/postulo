@@ -43,7 +43,7 @@ def test_every_section_is_listed_in_order_with_its_count(client, user):
     hrefs = re.findall(r'href="(#section-[a-z-]+)"', nav)
     assert hrefs == [f"#section-{slug}" for slug in OVERVIEW_ORDER], "one anchor per section"
     counts = re.findall(
-        r'data-section-link="section-([a-z-]+)".*?<span class="ms-auto[^"]*">(\d+)</span>',
+        r'data-section-link="section-([a-z-]+)".*?<span class="badge ms-auto"[^>]*>(\d+)</span>',
         nav,
         re.S,
     )

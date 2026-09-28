@@ -206,16 +206,16 @@ class Tag(OwnedModel):
 
     @property
     def tone(self) -> str:
-        """The stylesheet class for this tag, whatever the column happens to hold.
+        """The badge's `data-tone` for this tag, whatever the column happens to hold.
 
         The migration maps the free text that was there before #285 onto the palette and
         leaves the rest grey, so in principle this never has anything to decide. It decides
         anyway: a row restored from an old export, or written by a fixture, draws as grey
-        rather than as a class name that does not exist -- which would draw as nothing, and
-        look like a bug in the stylesheet rather than in the data.
+        rather than as a tone that does not exist -- which would draw as nothing, and look
+        like a bug in the stylesheet rather than in the data.
         """
         known = {choice.value for choice in TagColour}
-        return f"tag-{self.colour if self.colour in known else TagColour.GREY.value}"
+        return self.colour if self.colour in known else TagColour.GREY.value
 
     @property
     def glyph(self) -> str:

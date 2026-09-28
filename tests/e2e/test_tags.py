@@ -78,8 +78,8 @@ def test_what_the_preview_showed_is_what_gets_saved(page: Page, live_server, app
     page.get_by_role("button", name="Save").click()
 
     expect(page).to_have_url(f"{live_server.url}/applications/tags/")
-    pill = page.locator(".tag", has_text="Dream job")
-    expect(pill).to_have_class("tag tag-amber")
+    pill = page.locator(".badge", has_text="Dream job")
+    expect(pill).to_have_attribute("data-tone", "amber")
     expect(pill.locator('[data-icon="star"]')).to_be_visible()
 
     tag.refresh_from_db()

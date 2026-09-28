@@ -30,6 +30,7 @@ from postulo.jobs.models import Company, JobPosting
 
 REPO = Path(__file__).resolve().parents[1]
 CSS = (REPO / "assets" / "css" / "app.css").read_text(encoding="utf-8")
+PACK = (REPO / "assets" / "css" / "basecoat.css").read_text(encoding="utf-8")
 ICON_LIST = REPO / "assets" / "icons.txt"
 
 pytestmark = pytest.mark.django_db
@@ -58,7 +59,7 @@ def application_for(user, tags):
 def test_every_colour_a_tag_may_take_is_painted(colour):
     """A choice with no rule behind it draws an unstyled pill, which reads as a bug in the
     stylesheet rather than a missing line in it. A tone is added in both places or neither."""
-    assert f".tag-{colour} {{" in CSS, f"no .tag-{colour} rule in app.css"
+    assert f'.badge[data-tone="{colour}"] {{' in PACK, f"no tone {colour} in basecoat.css"
 
 
 @pytest.mark.parametrize("icon", [i.value for i in TagIcon if i.value])
@@ -82,8 +83,8 @@ def test_every_icon_moves_the_preview_on_the_form(icon):
 
 def test_the_pill_keeps_a_shape_when_the_theme_throws_the_tint_away():
     """A high-contrast theme discards `background-color`, which is all seven tones (#277)."""
-    forced = CSS[CSS.index("Forced colours, beyond the fields") :]
-    assert re.search(r"\.tag \{\s*border: 1px solid CanvasText;", forced)
+    forced = PACK[PACK.index("Forced colours: a badge is a word") :]
+    assert re.search(r"\.badge \{\s*border: 1px solid CanvasText;", forced)
 
 
 def test_the_gallery_shows_the_colours_a_tag_can_actually_be():
@@ -122,13 +123,13 @@ def test_a_tag_holding_nonsense_draws_as_a_plain_one(user):
     """The second guard. The migration cleans the rows that exist; an archive written by a
     newer Postulo, or a fixture, can still hand this one a word it has never heard of."""
     tag = Tag(owner=user, name="Imported", colour="chartreuse", icon="unicorn")
-    assert tag.tone == "tag-grey"
+    assert tag.tone == "grey"
     assert tag.glyph == ""
 
 
 def test_a_tag_says_how_it_is_drawn(user):
     tag = Tag(owner=user, name="Dream job", colour=TagColour.AMBER, icon=TagIcon.STAR)
-    assert tag.tone == "tag-amber"
+    assert tag.tone == "amber"
     assert tag.glyph == "star"
 
 
@@ -158,7 +159,7 @@ def render_tag(tag) -> str:
 def test_the_component_draws_the_colour_the_icon_and_the_word(user):
     tag = Tag(owner=user, name="Dream job", colour=TagColour.AMBER, icon=TagIcon.STAR)
     html = render_tag(tag)
-    assert 'class="tag tag-amber"' in html
+    assert 'class="badge" data-tone="amber"' in html
     assert 'data-icon="star"' in html
     assert "<bdi>Dream job</bdi>" in html
 
@@ -174,7 +175,7 @@ def test_the_icon_is_never_the_only_thing_said(user):
 def test_a_tag_with_no_icon_draws_no_icon(user):
     html = render_tag(Tag(owner=user, name="Backup plan"))
     assert "<svg" not in html
-    assert 'class="tag tag-grey"' in html
+    assert 'class="badge" data-tone="grey"' in html
 
 
 # -------------------------------------------------- everywhere a tag is actually drawn
@@ -193,7 +194,7 @@ def test_the_colour_reaches_the_lists(client, user, query):
 
     html = client.get(reverse("applications:list"), query).content.decode()
 
-    assert "tag tag-amber" in html, "the board and the table drew a grey pill before #285"
+    assert 'data-tone="amber"' in html, "the board and the table drew a grey pill before #285"
     assert 'data-icon="star"' in html
 
 
@@ -203,10 +204,10 @@ def test_the_colour_reaches_the_application_and_the_tags_page(client, user):
     client.force_login(user)
 
     detail = client.get(application.get_absolute_url()).content.decode()
-    assert "tag tag-blue" in detail and 'data-icon="home"' in detail
+    assert 'data-tone="blue"' in detail and 'data-icon="home"' in detail
 
     listing = client.get(reverse("applications:tag_list")).content.decode()
-    assert "tag tag-blue" in listing and 'data-icon="home"' in listing
+    assert 'data-tone="blue"' in listing and 'data-icon="home"' in listing
 
 
 # ----------------------------------------------------------------------- choosing one
@@ -219,7 +220,9 @@ def test_the_form_offers_swatches_rather_than_two_lists_of_words(client, user):
     assert "<select" not in html, "a colour is not a word in a dropdown"
     assert html.count('type="radio"') == len(TagColour.choices) + len(TagIcon.choices)
     for colour in TagColour:
-        assert f'class="tag tag-{colour.value}"' in html, f"{colour.value} is not shown as itself"
+        assert f'class="badge" data-tone="{colour.value}"' in html, (
+            f"{colour.value} is not shown as itself"
+        )
     assert "tag-preview" in html
 
 
