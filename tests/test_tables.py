@@ -247,6 +247,47 @@ def test_the_sort_is_an_icon_now_and_still_says_what_it_will_do(client, user, se
     assert "tap-target shrink-0" in body
 
 
+def header_cell(body: str, key: str) -> str:
+    """One column's `<th>` out of the page, from its opening tag to its closing one."""
+    return head_of(body).split(f'data-col="{key}"')[1].split("</th>")[0]
+
+
+def row_classes(cell: str) -> list[str]:
+    """The classes of the flex row that holds a header's name and its sort."""
+    return cell.split('<div class="')[1].split('"')[0].split()
+
+
+def test_the_sort_sits_at_the_end_of_its_header_and_the_name_at_the_start(client, user, search):
+    """The icons of a row of headers line up down the end edge of their columns, rather
+    than following each name wherever it stops (#317). `justify-between` is the flex row's
+    own start and end, so it mirrors in Arabic without a word about sides; the name still
+    comes first in the markup, because the markup is the reading order."""
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list")).content.decode()
+
+    for key in ("name", "location"):
+        cell = header_cell(body, key)
+        classes = row_classes(cell)
+        assert "justify-between" in classes and "justify-end" not in classes, key
+        assert "items-start" in classes, "an icon beside the first line of a name that wraps"
+        assert cell.index("<summary") < cell.index(f'id="sort-{key}"'), "the name, then the sort"
+
+
+def test_a_numeric_header_keeps_its_name_at_the_end_beside_the_sort(client, user, search):
+    """A count's figures are set against the end of the cell, and its name goes with them:
+    the name at the start of a column whose numbers are at the end would label nothing
+    (#317)."""
+    client.force_login(user)
+    body = client.get(reverse("jobs:company_list")).content.decode()
+
+    for key in ("postings", "applications"):
+        cell = header_cell(body, key)
+        classes = row_classes(cell)
+        assert "justify-end" in classes and "justify-between" not in classes, key
+        assert "items-start" in classes
+        assert cell.index("<summary") < cell.index(f'id="sort-{key}"'), "the name, then the sort"
+
+
 def test_an_unsortable_column_draws_no_sort_control(client, user, search):
     client.force_login(user)
     body = client.get(reverse("jobs:company_list")).content.decode()

@@ -254,6 +254,18 @@ def test_the_stylesheet_pins_the_handle_to_the_end_edge():
     assert "focus-visible:outline" in handle, "and it is visible when it has focus"
 
 
+def test_the_room_for_the_handle_outranks_the_cell_padding():
+    """The handle is 24 wide and pinned to the end edge, where every sort now sits (#317).
+    Its room is a utility because a component class lost to `.table th`, one element more
+    specific, and the handle covered a third of each sort's target; the utilities layer
+    comes after the components, whatever the density."""
+    css = Path("assets/css/app.css").read_text(encoding="utf-8")
+
+    room = css.split("@utility has-col-handle {")[1].split("}")[0]
+    assert "pe-8" in room
+    assert ".has-col-handle {" not in css, "not a component class as well, losing the cascade"
+
+
 # ---------------------------------------------------------- what was already here
 
 

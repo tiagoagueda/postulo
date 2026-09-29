@@ -93,7 +93,19 @@
           data-col="{{ header.key }}" data-col-label="{{ header.label }}"
           {% if header.width %}data-col-width="{{ header.width }}"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
-        <div class="flex items-start {% if header.column.numeric %}justify-end{% endif %} gap-1">
+        {% comment %} The name at the start of the cell and the sort at its end (#317), so the
+           icons of a row of headers line up down the edge of their columns instead of
+           following each name wherever it happens to stop. A numeric column's figures are
+           set against the end of the cell so their digits line up, and its name goes there
+           too, beside the icon. `justify-between` and `justify-end` are the flex container's
+           own start and end, which is the right in English and the left in Arabic, and the
+           order in the markup is still the reading order: the name, then what sorts by it.
+
+           `items-start`, not centred: a name that wraps grows downwards, and an icon
+           centred on the whole of it would sit between the lines, belonging to neither. At
+           the top it stays beside the first line, which is where the eye starts the name.
+        {% endcomment %}
+        <div class="flex items-start {% if header.column.numeric %}justify-end{% else %}justify-between{% endif %} gap-1">
           {% if header.column.filter %}
             <details class="col-filter" data-col-filter {% if header.filtered %}open{% endif %}>
               <summary class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100">

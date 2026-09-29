@@ -471,6 +471,23 @@
     dark:text-ink-400 dark:hover:bg-ink-800 dark:hover:text-ink-100;
 }
 
+/*
+ * Room for a column's resize handle to be 24 wide without covering the header's own sort
+ * (#136). Added by the script at the same moment the handle is, so a page with no script
+ * keeps the padding it always had rather than reserving space for a control that is not
+ * there.
+ *
+ * A utility and not a component class, because it has to win. Since the table's paint
+ * became `.table th` (#291) that rule, one element more specific, set the padding back to
+ * 16 and the 24-pixel handle lay over the last 8 pixels of the header -- which, once the
+ * sort moved to the end of every header (#317), was a third of every sort's target. The
+ * compact density's cell padding is more specific again. The utilities layer comes after
+ * both, so this holds whatever the density, without a selector written to outbid them.
+ */
+@utility has-col-handle {
+  @apply pe-8;
+}
+
 @layer components {
   /* The buttons are in basecoat.css: Basecoat's `.btn`, painted there in this palette, with
      the two destructive shapes #227 settled on under `data-variant` (#262). */
@@ -622,12 +639,7 @@
       focus-visible:outline-brand-600;
   }
 
-  /* Room for the handle to be 24 wide without covering the header's own link. Added by the
-     script at the same moment the handle is, so a page with no script keeps the padding it
-     always had rather than reserving space for a control that is not there. */
-  .has-col-handle {
-    @apply pe-8;
-  }
+  /* The room the handle needs is `has-col-handle`, a utility above this layer: see there. */
 
   /* A column's own filter, folded into its header (#253).
 
