@@ -947,7 +947,7 @@
    * for the widest language the reflow walk is taken in, because without a script nothing
    * can measure what fits (#299). Where this runs it measures instead: the first items in
    * the person's order that fit beside the wordmark and the tools, and the rest under
-   * *More* -- so English at 1440 gets all seven where the count, written for Greek, gave
+   * *More* -- so English at 1440 gets all six where the count, written for Greek, gave
    * five, and a language wider than any the count was written for gets fewer rather than
    * a masthead on two lines.
    *

@@ -1,18 +1,20 @@
 {% load i18n postulo %}
-<c-vars reminder next_url="" target="" />
-{% comment %} What can be done to one reminder, wherever it is listed (#238).
+<c-vars reminder next_url="" target="" compact="" align="end" />
+{% comment %} What can be done to one reminder, wherever it is shown (#238, #316).
 
-   `<c-reminder-actions :reminder="reminder" next_url="…" />` on the reminders page, and
-   `target="#reminders"` on an application's, where the row swaps in place.
+   `<c-reminder-actions :reminder="reminder" next_url="…" />` on the calendar, and
+   `target="#reminders"` on an application's page, where the row swaps in place.
 
-   Until now a reminder could be made and it could be ticked off, and that was all. A due
+   Until #238 a reminder could be made and it could be ticked off, and that was all. A due
    time typed wrongly could only be ticked off and written again; a reminder that arrived at
    a bad moment could only be ticked off as though it had been dealt with. Both of those are
    the record being falsified to work around a missing button.
 
-   **Done stays outside the menu.** It is what happens to almost every reminder, and burying
-   the common action behind a trigger to make room for three rare ones is the trade the
-   wrong way round.
+   **Done stays outside the menu** where there is room for it. It is what happens to almost
+   every reminder, and burying the common action behind a trigger to make room for three
+   rare ones is the trade the wrong way round. `compact` is for where there is no room -- a
+   month's cell, a week's narrow column (#316) -- and there *Done* is the menu's first item
+   rather than a second control squeezing the reminder's own words.
 
    **Later is two items and a link, not a date control.** *Tomorrow* and *next week* are
    what somebody pressing *Later* nearly always means, and they need no typing. A date box
@@ -21,9 +23,14 @@
    opens the edit form, where there is room for a date *and* an hour and where the field has
    a label. The reminder moves and is announced again either way; `postpone_reminder` is the
    one place that decides that.
+
+   `next_url` travels with every action, the two links included, so that whatever was
+   pressed brings the person back to the page it was pressed on -- the calendar, on the day
+   and in the shape it was showing. `align` is the menu's own, for a menu that would open
+   off the edge of a grid.
 {% endcomment %}
 <div class="flex shrink-0 items-center gap-1">
-  {% if not reminder.is_done %}
+  {% if not reminder.is_done and not compact %}
     <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}"
           {% if target %}hx-post="{% url 'applications:reminder_complete' reminder.pk %}"
             hx-target="{{ target }}" hx-swap="outerHTML"{% endif %}>
@@ -35,8 +42,15 @@
   {% endif %}
   {% comment %} Named by its reminder, not "Actions" ten times over: a page of these is a
      list of controls that all say the same thing, which is what #227 is about. {% endcomment %}
-  <c-dropdown-menu label="{% blocktranslate trimmed with what=reminder.summary %}Actions for {{ what }}{% endblocktranslate %}">
+  <c-dropdown-menu label="{% blocktranslate trimmed with what=reminder.summary %}Actions for {{ what }}{% endblocktranslate %}" align="{{ align }}">
     <c-slot name="trigger">{% icon "ellipsis-vertical" %}</c-slot>
+    {% if not reminder.is_done and compact %}
+      <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}" role="none">
+        {% csrf_token %}
+        {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
+        <button type="submit" role="menuitem">{% icon "check" %}{% translate "Done" %}</button>
+      </form>
+    {% endif %}
     {% if not reminder.is_done %}
       <form method="post" action="{% url 'applications:reminder_later' reminder.pk %}" role="none"
             {% if target %}hx-post="{% url 'applications:reminder_later' reminder.pk %}"
@@ -51,11 +65,11 @@
         </button>
       </form>
     {% endif %}
-    <a href="{% url 'applications:reminder_update' reminder.pk %}" role="menuitem">
+    <a href="{% url 'applications:reminder_update' reminder.pk %}{% if next_url %}?next={{ next_url|urlencode:'' }}{% endif %}" role="menuitem">
       {% icon "pencil" %}{% translate "Edit, or choose another time" %}
     </a>
     <hr role="separator">
-    <a href="{% url 'applications:reminder_delete' reminder.pk %}" role="menuitem" data-variant="destructive">
+    <a href="{% url 'applications:reminder_delete' reminder.pk %}{% if next_url %}?next={{ next_url|urlencode:'' }}{% endif %}" role="menuitem" data-variant="destructive">
       {% icon "trash-2" %}{% translate "Delete" %}
     </a>
   </c-dropdown-menu>

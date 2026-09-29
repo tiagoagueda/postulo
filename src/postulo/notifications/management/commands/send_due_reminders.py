@@ -17,10 +17,10 @@ import time
 
 from django.core.management.base import BaseCommand
 from django.db import close_old_connections
-from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from postulo.applications import agenda
 from postulo.applications.models import Reminder
 from postulo.core import logs, scheduler
 from postulo.notifications.base import Notification, absolute_url
@@ -77,7 +77,9 @@ def announce_due_reminders() -> tuple[int, int]:
                 url = absolute_url(application.get_absolute_url())
             else:
                 body = ""
-                url = absolute_url(reverse("applications:reminder_list"))
+                # The reminders on the calendar, from whatever day the link is opened on:
+                # this one leads them until it is done (#316).
+                url = absolute_url(agenda.reminders_address())
             return Notification(
                 event="reminder_due",
                 title=reminder.summary,

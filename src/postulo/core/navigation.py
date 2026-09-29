@@ -101,8 +101,20 @@ ITEMS: tuple[NavItem, ...] = (
         ("jobs:company_detail",),
         icon="building-2",
     ),
-    NavItem("reminders", _("Reminders"), "applications:reminder_list", icon="bell"),
-    NavItem("calendar", _("Calendar"), "applications:calendar", icon="calendar"),
+    # *Reminders* was an item of its own until #316. A reminder is seen, made, changed and
+    # put off on the calendar now, so its form is the calendar's too; a person's stored
+    # order that still holds the old key reads without it (`known_keys`).
+    NavItem(
+        "calendar",
+        _("Calendar"),
+        "applications:calendar",
+        (
+            "applications:reminder_create",
+            "applications:reminder_update",
+            "applications:reminder_delete",
+        ),
+        icon="calendar",
+    ),
 )
 
 BY_KEY = {item.key: item for item in ITEMS}

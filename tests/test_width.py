@@ -32,7 +32,8 @@ WIDE = [
     "/applications/",
     "/applications/?view=board",
     "/applications/interviews/",
-    "/applications/reminders/",
+    # What was the reminders page: the calendar's agenda narrowed to them (#316).
+    "/applications/calendar/?view=agenda&kinds=reminder",
     "/applications/suggestions/",
     "/jobs/companies/",
     "/listings/",

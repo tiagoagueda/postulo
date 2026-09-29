@@ -17,13 +17,20 @@
 
    A deadline and a closing date are whole days, so no time is drawn: the hour an employer
    stops reading is not something anybody knows, and a midnight in front of the title would
-   be a fact Postulo invented.
+   be a fact Postulo invented. An event outside any day's list -- a reminder overdue from
+   before the agenda's first day, or further ahead than its last (#316) -- is `dated`, and
+   draws its day as well as its hour, the way the reminders page did.
+
+   A reminder about no application links to its own form, which has no page to return to
+   by itself, so the link says where it was followed from (`event.returns`).
 {% endcomment %}
 {% partialdef event %}
-  <a href="{{ event.url }}"
-     class="cal-event {{ event.tone }}{% if event.muted %} line-through{% endif %}"
+  <a href="{{ event.url }}{% if event.returns %}?next={{ request.get_full_path|urlencode:'' }}{% endif %}"
+     class="cal-event min-w-0 flex-1 {{ event.tone }}{% if event.muted %} line-through{% endif %}"
      data-event="{{ event.kind }}">
-    {% if not event.all_day %}
+    {% if dated %}
+      <span class="tabular-nums">{{ event.local_start|date:"DATETIME_FORMAT" }}</span>
+    {% elif not event.all_day %}
       <span class="shrink-0 tabular-nums">{{ event.local_start|date:"TIME_FORMAT" }}</span>
     {% endif %}
     {% comment %} Two lines rather than one cut with an ellipsis (#278): under the text-spacing
@@ -38,16 +45,62 @@
   </a>
 {% endpartialdef %}
 
+{% comment %} A row with room in it -- a day's list, the agenda (#316): the event, and beside a
+   reminder the actions the reminders page gave it, *Done* at hand and the rest in its menu,
+   which opens toward the start from the end of a row as wide as the page. Every action
+   brings the person back to this address: this shape, this day, these kinds. {% endcomment %}
+{% partialdef row %}
+  <li class="flex items-start gap-1">
+    {% partial event %}
+    {% if event.reminder %}
+      <c-reminder-actions :reminder="event.reminder" :next_url="request.get_full_path" />
+    {% endif %}
+  </li>
+{% endpartialdef %}
+
+{% comment %} Making a reminder for one day (#316): the form, with that day already in it, and
+   back here afterwards. Named for its day, not "New reminder" forty times over, which is a
+   page of controls that all say the same thing (#227). Where there is room it says so in
+   words, which begin its name; in a month's cell and a week's column it is the icon, and
+   the name is all the words there are. `on` is the day. {% endcomment %}
+{% partialdef new_on_day %}
+  {% blocktranslate trimmed with day=on|date:"MONTH_DAY_FORMAT" asvar name %}New reminder on {{ day }}{% endblocktranslate %}
+  <a href="{% url 'applications:reminder_create' %}?on={{ on|date:'Y-m-d' }}&amp;next={{ request.get_full_path|urlencode:'' }}"
+     class="btn shrink-0" data-variant="ghost" data-size="{% if worded %}xs{% else %}icon-xs{% endif %}"
+     aria-label="{{ name }}" data-new-reminder>
+    {% icon "plus" %}{% if worded %}{% translate "New reminder" %}{% endif %}
+  </a>
+{% endpartialdef %}
+
 {% partialdef listed %}
+  {% comment %} What an agenda showing reminders carries in front of its first day: every one
+     not yet done whose time has already come (#316). The reminders page listed these first,
+     and an agenda of thirty days from today would otherwise drop the one nobody dealt with
+     last week -- the reminder that most needs seeing. {% endcomment %}
+  {% if page.overdue %}
+    <section class="card mb-4 p-0" aria-labelledby="overdue" data-reminders="overdue">
+      <h2 id="overdue" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+        {% translate "Overdue" %}
+      </h2>
+      <ul class="space-y-1 px-3 py-3">
+        {% for event in page.overdue %}
+          {% with dated=True %}{% partial row %}{% endwith %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
   {% for day, events in page.listed %}
     <section class="card mb-4 p-0" aria-labelledby="day-{{ day|date:'Y-m-d' }}">
-      <h2 id="day-{{ day|date:'Y-m-d' }}" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
-        {{ day|date:"l" }} {{ day|date:"DATE_FORMAT" }}
-      </h2>
+      <div class="flex flex-wrap items-center justify-between gap-2 border-b border-ink-100 px-4 py-3 dark:border-ink-800">
+        <h2 id="day-{{ day|date:'Y-m-d' }}" class="font-medium">
+          {{ day|date:"l" }} {{ day|date:"DATE_FORMAT" }}
+        </h2>
+        {% with on=day worded=True %}{% partial new_on_day %}{% endwith %}
+      </div>
       {% if events %}
         <ul class="space-y-1 px-3 py-3">
           {% for event in events %}
-            <li>{% partial event %}</li>
+            {% partial row %}
           {% endfor %}
         </ul>
       {% else %}
@@ -57,6 +110,20 @@
   {% empty %}
     <c-empty icon="calendar">{% translate "Nothing in this period." %}</c-empty>
   {% endfor %}
+  {% comment %} And past its last: the reminders set for further ahead than thirty days, which
+     the reminders page showed however far off they were (#316). {% endcomment %}
+  {% if page.further %}
+    <section class="card mb-4 p-0" aria-labelledby="further" data-reminders="further">
+      <h2 id="further" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
+        {% translate "Further ahead" %}
+      </h2>
+      <ul class="space-y-1 px-3 py-3">
+        {% for event in page.further %}
+          {% with dated=True %}{% partial row %}{% endwith %}
+        {% endfor %}
+      </ul>
+    </section>
+  {% endif %}
 {% endpartialdef %}
 
 {% block content %}
@@ -64,17 +131,24 @@
     <div>
       <c-page-title>{% translate "Calendar" %}</c-page-title>
       <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page; a reminder from Reminders." %}
+        {% translate "Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder here, on any day." %}
       </p>
     </div>
     {% comment %} Four shapes of the same days: month first, and the agenda for a phone,
        where a month grid is thirty-one cells of nothing. Links, so each is an address. {% endcomment %}
-    <nav class="ms-auto flex flex-wrap items-center gap-1" aria-label="{% translate 'Calendar views' %}">
-      {% for view, label, url, current in page.switcher %}
-        <a href="{{ url }}" class="{% if current %}nav-link-active{% else %}nav-link{% endif %}"
-           {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
-      {% endfor %}
-    </nav>
+    <div class="ms-auto flex flex-wrap items-center gap-2">
+      <nav class="flex flex-wrap items-center gap-1" aria-label="{% translate 'Calendar views' %}">
+        {% for view, label, url, current in page.switcher %}
+          <a href="{{ url }}" class="{% if current %}nav-link-active{% else %}nav-link{% endif %}"
+             {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
+        {% endfor %}
+      </nav>
+      {% comment %} A reminder for no day in particular, which the form then asks for. Each
+         day has its own as well, with the day already in it (#316). {% endcomment %}
+      <a href="{% url 'applications:reminder_create' %}?next={{ request.get_full_path|urlencode:'' }}" class="btn">
+        {% icon "plus" %}{% translate "New reminder" %}
+      </a>
+    </div>
   </div>
 
   <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Period' %}">
@@ -119,9 +193,26 @@
     {% comment %} Seven columns and a row per week, drawn by the server (#204). The day
        number is a link to that day, big enough to hit; a cell shows two of its events
        and counts the rest, and the count opens the day. A day outside the month is
-       greyed, and today is marked in words as well as in colour. {% endcomment %}
-    <c-scroll-box class="card p-0" label="{% translate 'Calendar' %}">
-      <table class="table table-fixed" data-calendar="month">
+       greyed, and today is marked in words as well as in colour.
+
+       A cell has no room for a row of buttons beside a reminder, so its actions are all in
+       its menu, *Done* first (#316), and the menu opens away from the grid's nearer edge:
+       inside the box that scrolls, a menu hanging over the start of the table could not be
+       scrolled to. Beside the day's number, the day's own *New reminder*.
+
+       The box scrolls only below `lg`, where seven columns of at least seven rem do not fit.
+       From `lg` up they always do, and a box that scrolls sideways scrolls downwards too: a
+       menu opened in the last week would be cut off at the foot of the card, its *Done*
+       showing and the rest to be scrolled to inside it. With nothing to scroll, it opens
+       over whatever is below, as a menu does.
+
+       Seven columns of at least seven rem is what the grid always meant (`min-w-28` on each
+       day), and a fixed table layout ignores a cell's minimum: below `lg` the columns were
+       squeezed to forty pixels, which holds a day's number and nothing beside it. The
+       table's own minimum is what holds now, and the box scrolls instead, as it was put
+       there to. A phone's shape is the agenda. {% endcomment %}
+    <c-scroll-box class="card p-0 lg:overflow-visible" label="{% translate 'Calendar' %}">
+      <table class="table min-w-196 table-fixed" data-calendar="month">
         <caption class="sr-only">{{ page.title }}</caption>
         <thead>
           <tr>
@@ -136,15 +227,23 @@
               {% for day in week %}
                 <td class="h-28 min-w-28 align-top p-1{% if day.outside %} bg-ink-50 dark:bg-ink-900/40{% endif %}"
                     {% if day.today %}aria-current="date"{% endif %}>
-                  <a href="{{ day.url }}"
-                     class="mb-1 inline-flex size-7 items-center justify-center rounded-full text-xs tabular-nums {% if day.today %}bg-brand-600 font-semibold text-white{% elif day.outside %}text-ink-400 dark:text-ink-500{% else %}text-ink-700 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800{% endif %}">
-                    <span class="sr-only">{{ day.date|date:"MONTH_DAY_FORMAT" }}{% if day.today %}, {% translate "today" %}{% endif %}</span>
-                    <span aria-hidden="true">{{ day.date.day }}</span>
-                  </a>
+                  <div class="mb-1 flex items-center justify-between gap-1">
+                    <a href="{{ day.url }}"
+                       class="inline-flex size-7 items-center justify-center rounded-full text-xs tabular-nums {% if day.today %}bg-brand-600 font-semibold text-white{% elif day.outside %}text-ink-400 dark:text-ink-500{% else %}text-ink-700 hover:bg-ink-100 dark:text-ink-300 dark:hover:bg-ink-800{% endif %}">
+                      <span class="sr-only">{{ day.date|date:"MONTH_DAY_FORMAT" }}{% if day.today %}, {% translate "today" %}{% endif %}</span>
+                      <span aria-hidden="true">{{ day.date.day }}</span>
+                    </a>
+                    {% with on=day.date %}{% partial new_on_day %}{% endwith %}
+                  </div>
                   {% if day.events %}
                     <ul class="space-y-0.5">
                       {% for event in day.shown %}
-                        <li>{% with compact=True %}{% partial event %}{% endwith %}</li>
+                        <li class="flex items-start gap-0.5">
+                          {% with compact=True %}{% partial event %}{% endwith %}
+                          {% if event.reminder %}
+                            <c-reminder-actions :reminder="event.reminder" :next_url="request.get_full_path" compact align="{{ day.menu_align }}" />
+                          {% endif %}
+                        </li>
                       {% endfor %}
                       {% if day.more %}
                         <li>
@@ -167,16 +266,39 @@
       </table>
     </c-scroll-box>
   {% elif page.view == 'week' %}
+    {% comment %} A day a card: one under the other on a narrow screen, seven side by side from
+       `lg` up (#204).
+
+       A reminder's actions are drawn twice and exactly one of them is ever shown (#316). One
+       under the other, a card is as wide as the page and has room for the reminders page's
+       own row, *Done* beside a menu that opens toward the start. Side by side, a column is
+       too narrow for either: the actions are all in the menu, which opens away from the
+       nearer edge of the week, as in a month's cell. No one menu could do both -- whichever
+       way it opened, it would open off the screen in one of the two shapes -- and the one
+       not shown is `display: none`, so neither the keyboard nor a screen reader meets it. {% endcomment %}
     <div class="grid gap-3 lg:grid-cols-7" data-calendar="week">
       {% for day in page.days %}
         <section class="card p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
-          <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="mb-2 text-sm font-medium">
-            <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D" }} {{ day.date|date:"j" }}</a>
-          </h3>
+          <div class="mb-2 flex items-center justify-between gap-1">
+            <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="text-sm font-medium">
+              <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D" }} {{ day.date|date:"j" }}</a>
+            </h3>
+            {% with on=day.date %}{% partial new_on_day %}{% endwith %}
+          </div>
           {% if day.events %}
             <ul class="space-y-1">
               {% for event in day.events %}
-                <li>{% partial event %}</li>
+                <li class="flex items-start gap-1">
+                  {% partial event %}
+                  {% if event.reminder %}
+                    <div class="lg:hidden" data-actions="row">
+                      <c-reminder-actions :reminder="event.reminder" :next_url="request.get_full_path" />
+                    </div>
+                    <div class="hidden lg:block" data-actions="column">
+                      <c-reminder-actions :reminder="event.reminder" :next_url="request.get_full_path" compact align="{{ day.menu_align }}" />
+                    </div>
+                  {% endif %}
+                </li>
               {% endfor %}
             </ul>
           {% else %}

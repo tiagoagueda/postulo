@@ -49,6 +49,10 @@ def endpoints(world):
     return [
         (reverse("applications:status", args=[a.pk]), {"status": "acknowledged"}),
         (reverse("applications:reminder_complete", args=[world["reminder"].pk]), {}),
+        (
+            reverse("applications:reminder_later", args=[world["reminder"].pk]),
+            {"when": "tomorrow"},
+        ),
         (reverse("applications:quiet_action", args=[a.pk]), {"action": "follow_up"}),
         (
             reverse("applications:interview_outcome", args=[world["interview"].pk]),
@@ -76,6 +80,31 @@ def test_no_next_leaves_the_site(client, user, world):
         response = client.post(url, {**payload, "next": "//evil.example/"})
         if response.status_code == 302:
             assert not response["Location"].startswith("//"), url
+
+
+def test_the_reminder_forms_never_send_anybody_off_the_site(client, user, world):
+    """The calendar puts a `next` in the address of the reminder form and of the page that
+    confirms a delete, so each comes back to the day it was opened from (#316). An address
+    anybody can write: Save, Delete and Cancel all stay on this host whatever it says."""
+    from urllib.parse import quote
+
+    client.force_login(user)
+    reminder = world["reminder"]
+    create = reverse("applications:reminder_create")
+    update = reverse("applications:reminder_update", args=[reminder.pk])
+    delete = reverse("applications:reminder_delete", args=[reminder.pk])
+    for elsewhere in (ELSEWHERE, "//evil.example/"):
+        asked = f"?next={quote(elsewhere, safe='')}"
+        for page in (create, update, delete):
+            html = client.get(page + asked).content.decode()
+            assert f'href="{elsewhere}"' not in html, f"{page}: Cancel leaves the site"
+        made = client.post(create + asked, {"summary": "x", "due_at": "2030-01-01T09:00"})
+        changed = client.post(update + asked, {"summary": "y", "due_at": "2030-01-01T09:00"})
+        for response in (made, changed):
+            assert response.status_code == 302
+            assert not response["Location"].startswith(("http", "//")), response["Location"]
+    gone = client.post(delete + f"?next={quote(ELSEWHERE, safe='')}")
+    assert gone.status_code == 302 and not gone["Location"].startswith(("http", "//"))
 
 
 def test_an_on_site_next_is_honoured(client, user, world):

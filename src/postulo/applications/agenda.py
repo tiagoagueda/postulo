@@ -36,6 +36,16 @@ than a key and a filter bar that can disagree.
 **The person's days.** The middleware activates their time zone, and every boundary here
 is a local midnight made aware in it, so a reminder at half past eleven at night in
 Lisbon is on the day it was set for and not on the UTC day after.
+
+**Reminders live here** (#316). There was a page of them as well, and a reminder was seen
+in one place and dealt with in another. Now a reminder on the calendar carries what the
+list gave it -- done, later, edit, delete -- and the list is the agenda narrowed to them.
+That list showed every reminder not yet done, however late and however far ahead, soonest
+first, and an agenda of thirty days from today would lose both ends: the reminder from last
+week that nobody dealt with, which is the one that matters most, and the one set for three
+months out. So an agenda showing reminders opens with the ones **overdue** from before its
+first day and closes with the ones **further ahead** than its last, and together with the
+thirty days between they are the list, in the list's order.
 """
 
 from __future__ import annotations
@@ -135,6 +145,12 @@ class Event:
     #: A whole day rather than a moment: a deadline and a closing date are dates, and a time
     #: drawn beside them would be a midnight nobody chose (#238).
     all_day: bool = False
+    #: The reminder itself, for the actions the calendar draws beside it (#316). Nothing
+    #: else on the calendar is acted on from here, so nothing else carries its record.
+    reminder: Reminder | None = field(default=None, compare=False, repr=False)
+    #: Whether the link is to a form that should bring the person back to the page it was
+    #: followed from: a reminder about no application opens its own form, having no page.
+    returns: bool = False
 
     @property
     def day(self) -> dt.date:
@@ -204,28 +220,9 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
             )
         )
     reminders = (
-        Reminder.objects.for_user(user)
-        .select_related("application", "application__posting")
-        .filter(due_at__gte=lower, due_at__lt=upper)
-        if REMINDER in wanted
-        else ()
+        _reminders(user).filter(due_at__gte=lower, due_at__lt=upper) if REMINDER in wanted else ()
     )
-    for reminder in reminders:
-        application = reminder.application
-        events.append(
-            Event(
-                kind=REMINDER,
-                title=reminder.summary,
-                url=(
-                    application.get_absolute_url()
-                    if application is not None
-                    else reverse("applications:reminder_list")
-                ),
-                starts_at=reminder.due_at,
-                detail=application.posting.title if application is not None else "",
-                muted=reminder.is_done,
-            )
-        )
+    events += [reminder_event(reminder) for reminder in reminders]
     if DEADLINE in wanted:
         events += _deadlines(user, start, end)
     if CLOSING in wanted:
@@ -234,6 +231,68 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
         events += _answers(user, start, end)
     events.sort(key=lambda event: (event.starts_at, event.kind, event.title))
     return events
+
+
+def _reminders(user):
+    return Reminder.objects.for_user(user).select_related("application", "application__posting")
+
+
+def reminder_event(reminder: Reminder) -> Event:
+    """One reminder as the calendar draws it, carrying the record its actions need.
+
+    It links to its application, which is where it belongs; one about no application links
+    to its own form, which is the only page a reminder of its own has, and the form brings
+    the person back to the calendar they came from.
+    """
+    application = reminder.application
+    return Event(
+        kind=REMINDER,
+        title=reminder.summary,
+        url=(
+            application.get_absolute_url()
+            if application is not None
+            else reverse("applications:reminder_update", args=[reminder.pk])
+        ),
+        starts_at=reminder.due_at,
+        detail=application.posting.title if application is not None else "",
+        muted=reminder.is_done,
+        reminder=reminder,
+        returns=application is None,
+    )
+
+
+def overdue_reminders(user, before: dt.date, *, now: dt.datetime | None = None) -> list[Event]:
+    """Every reminder not yet done whose moment came before ``before`` and before now.
+
+    What an agenda carries in front of its first day (#316). Before now, as well, because
+    an agenda that starts next month is not a reason to call a reminder due next week
+    overdue: that one is on the page before, in its day, where it will be when it comes.
+    """
+    lower, _upper = _bounds(before, before)
+    cut = min(lower, now or timezone.now())
+    return [
+        reminder_event(reminder)
+        for reminder in _reminders(user).outstanding().filter(due_at__lt=cut).order_by("due_at")
+    ]
+
+
+def reminders_after(user, after: dt.date) -> list[Event]:
+    """Every reminder not yet done on ``after`` or later: what an agenda carries past its
+    last day, so a reminder set for three months out is not a page nobody turns to."""
+    _lower, upper = _bounds(after, after)
+    return [
+        reminder_event(reminder)
+        for reminder in _reminders(user).outstanding().filter(due_at__gte=upper).order_by("due_at")
+    ]
+
+
+def reminders_address() -> str:
+    """Where a person's reminders are: the agenda, narrowed to them (#316).
+
+    With no day in it, so an address kept in a notification or a bookmark opens on the day
+    it is opened rather than the day it was written, and what is overdue leads.
+    """
+    return f"{reverse('applications:calendar')}?view=agenda&kinds={REMINDER}"
 
 
 def _at_midnight(day: dt.date) -> dt.datetime:
@@ -340,6 +399,8 @@ class Day:
     events: list[Event] = field(default_factory=list)
     outside: bool = False
     today: bool = False
+    #: Which of the week's seven columns the day is drawn in, from 0.
+    column: int = 0
 
     @property
     def shown(self) -> list[Event]:
@@ -352,6 +413,17 @@ class Day:
     @property
     def url(self) -> str:
         return url_for("day", self.date)
+
+    @property
+    def menu_align(self) -> str:
+        """Which way a reminder's menu opens from this day's column (#316).
+
+        A menu is wider than a column. Opened toward the start from the first column it
+        would hang off the edge of the grid -- clipped by the month's scroll box, off the
+        screen in the week -- so the first three columns open theirs toward the end and
+        the rest toward the start. Logical sides, so a right-to-left grid mirrors it.
+        """
+        return "start" if self.column < 3 else "end"
 
 
 # ------------------------------------------------------------------------ shapes
@@ -394,8 +466,9 @@ def month_grid(day: dt.date, events: list[Event], *, today: dt.date) -> list[lis
             events=on.get(date, []),
             outside=date.month != day.month,
             today=date == today,
+            column=index % 7,
         )
-        for date in days_between(start, end)
+        for index, date in enumerate(days_between(start, end))
     ]
     return [days[index : index + 7] for index in range(0, len(days), 7)]
 
@@ -404,8 +477,8 @@ def week_days(day: dt.date, events: list[Event], *, today: dt.date) -> list[Day]
     start = week_start(day)
     on = by_day(events)
     return [
-        Day(date=date, events=on.get(date, []), today=date == today)
-        for date in days_between(start, start + dt.timedelta(days=7))
+        Day(date=date, events=on.get(date, []), today=date == today, column=index)
+        for index, date in enumerate(days_between(start, start + dt.timedelta(days=7)))
     ]
 
 
@@ -472,6 +545,11 @@ class Page:
     listed: list[tuple[dt.date, list[Event]]] = field(default_factory=list)
     #: Which kinds this page is showing. All four unless the address narrowed it (#238).
     kinds: frozenset[str] = field(default_factory=lambda: frozenset(ALL_KINDS))
+    #: The agenda's two ends, when it is showing reminders (#316): those not yet done from
+    #: before its first day, and those further ahead than its last. Empty for every other
+    #: shape, which draws its period and nothing else.
+    overdue: list[Event] = field(default_factory=list)
+    further: list[Event] = field(default_factory=list)
 
     @property
     def switcher(self) -> list[tuple[str, str, str, bool]]:
@@ -514,7 +592,7 @@ class Page:
 
     @property
     def empty(self) -> bool:
-        return not self.events
+        return not (self.events or self.overdue or self.further)
 
 
 VIEW_LABELS = {
@@ -583,6 +661,7 @@ def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=N
         )
     start, end = on, on + dt.timedelta(days=AGENDA_DAYS)
     events = events_between(user, start, end, kinds)
+    showing_reminders = REMINDER in kinds
     return Page(
         view="agenda",
         on=on,
@@ -596,6 +675,8 @@ def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=N
         events=events,
         listed=sorted(by_day(events).items()),
         kinds=kinds,
+        overdue=overdue_reminders(user, start) if showing_reminders else [],
+        further=reminders_after(user, end) if showing_reminders else [],
     )
 
 

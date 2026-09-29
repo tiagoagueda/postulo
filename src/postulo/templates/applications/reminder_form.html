@@ -9,6 +9,8 @@
 {% block content %}
   <div class="mx-auto max-w-md">
     <c-page-title>{% if object %}{% translate "Reminder" %}{% else %}{% translate "New reminder" %}{% endif %}</c-page-title>
+    {% comment %} No `action`: the form posts to its own address, query and all, so the `next`
+       a calendar put there (#316) is still there when the view decides where Save goes. {% endcomment %}
     <form method="post" novalidate>
       {% csrf_token %}
       <div class="card mb-6">
@@ -18,7 +20,9 @@
       </div>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>
-        <a href="{% url 'applications:reminder_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+        {% comment %} Back where the form was opened from, when that page said so, and otherwise
+           to the application or to the reminders: the view decides (#316). {% endcomment %}
+        <a href="{{ cancel_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
   </div>

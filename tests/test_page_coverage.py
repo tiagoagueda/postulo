@@ -105,6 +105,10 @@ EXCUSED: dict[str, str] = {
     "core:table_settings": "a POST that records which columns a table shows",
     "core:table_views": "a POST that keeps, forgets or defaults a saved view, from a visited page",
     "applications:board": "a redirect to Applications in its board shape, for bookmarks (#102)",
+    "applications:reminder_list": (
+        "a redirect to the calendar's agenda narrowed to reminders, for bookmarks; the agenda "
+        "is visited in that shape (#316)"
+    ),
     "server:email_consent": (
         "a POST that sends an administrator to the mail provider's consent screen; the "
         "button is on the Email page, which the suite visits"

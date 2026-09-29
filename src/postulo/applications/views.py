@@ -651,43 +651,89 @@ class EventCreateView(OwnedObjectMixin, View):
 # ------------------------------------------------------------------- reminders
 
 
-class ReminderListView(OwnedObjectMixin, ListView):
-    model = Reminder
-    template_name = "applications/reminder_list.html"
-    context_object_name = "reminders"
+class ReminderListView(RedirectView):
+    """The reminders page's old address. Reminders live in the calendar now (#316): the
+    list was everything not yet done, soonest first, and that is the agenda narrowed to
+    reminders, which opens with what is overdue. A bookmark still lands.
 
-    def get_queryset(self):
-        queryset = super().get_queryset().select_related("application", "application__posting")
-        if self.request.GET.get("show") != "all":
-            queryset = queryset.outstanding()
-        return queryset
+    Temporary rather than permanent while the calendar's shape is young: a browser keeps a
+    permanent redirect for good, and this address may yet mean something again.
+
+    What the address carried comes along, except `show`: the list hid what was done unless
+    asked, and the calendar always draws a done reminder, struck through on its day.
+    """
+
+    permanent = False
+
+    def get_redirect_url(self, *args, **kwargs) -> str:
+        query = self.request.GET.copy()
+        query.pop("show", None)
+        query["view"] = "agenda"
+        query["kinds"] = agenda.REMINDER
+        return f"{reverse('applications:calendar')}?{query.urlencode()}"
+
+
+#: The hour a reminder made for a day starts at, when the day is all that was chosen: the
+#: start of a working morning, rather than a midnight that would announce it in the night.
+REMINDER_HOUR = 9
+
+
+class ReminderFormMixin:
+    """Where the reminder form goes afterwards, and where *Cancel* goes: back to the page it
+    was opened from when that page said so (`next`), and otherwise to the application it is
+    about, or to the reminders on the calendar (#316)."""
+
+    def fallback_url(self) -> str:
+        reminder = getattr(self, "object", None)
+        application_id = getattr(reminder, "application_id", None) or self.asked_application()
+        if application_id:
+            return reverse("applications:detail", args=[application_id])
+        return agenda.reminders_address()
+
+    def asked_application(self):
+        return None
+
+    def get_success_url(self) -> str:
+        return safe_next(self.request, self.fallback_url())
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        context["showing_all"] = self.request.GET.get("show") == "all"
+        context["cancel_url"] = safe_next(self.request, self.fallback_url())
         return context
 
 
-class ReminderCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
+class ReminderCreateView(
+    ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView
+):
+    """A new reminder: from the calendar, where the day clicked is its day (#316), from an
+    application's page, where the application is its application, or from nowhere."""
+
     model = Reminder
     form_class = ReminderForm
     template_name = "applications/reminder_form.html"
-    success_url = reverse_lazy("applications:reminder_list")
 
-    def get_initial(self) -> dict:
-        initial = super().get_initial()
+    def asked_application(self):
         application_id = self.request.GET.get("application")
         if (
             application_id
             and Application.objects.for_user(self.request.user).filter(pk=application_id).exists()
         ):
-            initial["application"] = application_id
-        return initial
+            return application_id
+        return None
 
-    def get_success_url(self) -> str:
-        if self.object.application_id:
-            return reverse("applications:detail", args=[self.object.application_id])
-        return str(self.success_url)
+    def get_initial(self) -> dict:
+        initial = super().get_initial()
+        application_id = self.asked_application()
+        if application_id:
+            initial["application"] = application_id
+        # The day a calendar cell was for, read the way the calendar reads its own days: a
+        # date or nothing, so an address somebody typed wrongly opens an empty form rather
+        # than an error. Naive on purpose -- the field shows it as it is, in the person's
+        # own zone, which is the zone it is read back in.
+        day = agenda.day_from(self.request.GET.get("on", ""))
+        if day is not None:
+            initial["due_at"] = datetime(day.year, day.month, day.day, REMINDER_HOUR)
+        return initial
 
 
 class ReminderCompleteView(OwnedObjectMixin, View):
@@ -700,10 +746,10 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         messages.success(request, _("Marked as done."))
         if wants_a_detail_fragment(request) and reminder.application_id:
             return detail_fragments(request, reminder.application, target="reminders")
-        return redirect(safe_next(request, reverse("applications:reminder_list")))
+        return redirect(safe_next(request, agenda.reminders_address()))
 
 
-class ReminderUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
+class ReminderUpdateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     """Change what a reminder says or when it falls due (#238).
 
     There was no way to. A reminder could be made and it could be ticked off, so a due time
@@ -726,20 +772,14 @@ class ReminderUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         messages.success(self.request, _("Reminder updated."))
         return response
 
-    def get_success_url(self) -> str:
-        if self.object.application_id:
-            return reverse("applications:detail", args=[self.object.application_id])
-        return reverse("applications:reminder_list")
 
+class ReminderDeleteView(ReminderFormMixin, ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+    """Deleting a reminder, confirmed first. Back where it was asked from when that page
+    said so -- the calendar, on the day and in the shape it was showing (#316) -- and
+    otherwise to its application or to the reminders, and *Cancel* the same way."""
 
-class ReminderDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Reminder
     template_name = "partials/confirm_delete.html"
-
-    def get_success_url(self) -> str:
-        if self.object.application_id:
-            return reverse("applications:detail", args=[self.object.application_id])
-        return reverse("applications:reminder_list")
 
     def get_cancel_url(self) -> str:
         return self.get_success_url()
@@ -778,7 +818,7 @@ class ReminderLaterView(OwnedObjectMixin, View):
             )
         if wants_a_detail_fragment(request) and reminder.application_id:
             return detail_fragments(request, reminder.application, target="reminders")
-        return redirect(safe_next(request, reverse("applications:reminder_list")))
+        return redirect(safe_next(request, agenda.reminders_address()))
 
 
 def _a_named_day(raw: str | None):

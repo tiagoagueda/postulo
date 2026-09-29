@@ -131,7 +131,10 @@ def test_lists_show_nothing_belonging_to_anyone_else(client, user, their_data):
 
     assert len(client.get(reverse("applications:list")).context["applications"]) == 0
     assert len(client.get(reverse("jobs:company_list")).context["companies"]) == 0
-    assert len(client.get(reverse("applications:reminder_list")).context["reminders"]) == 0
+    # The reminders are the calendar's agenda narrowed to them (#316), overdue ones and all.
+    page = client.get(reverse("applications:calendar"), {"view": "agenda", "kinds": "reminder"})
+    reminders = page.context["page"]
+    assert not reminders.events and not reminders.overdue and not reminders.further
 
 
 def test_a_duplicate_company_name_is_refused_for_one_account_only(db, user, other_user):

@@ -305,6 +305,9 @@ def search_contacts(user, query: str, limit: int) -> Found:
 
 
 def search_reminders(user, query: str, limit: int) -> Found:
+    from django.utils import timezone
+
+    from postulo.applications import agenda
     from postulo.applications.models import Reminder
 
     rows = (
@@ -320,10 +323,12 @@ def search_reminders(user, query: str, limit: int) -> Found:
             id=reminder.pk,
             title=reminder.summary,
             subtitle=reminder.application.posting.title if reminder.application else "",
+            # A reminder about no application is found on its day, on the calendar, with its
+            # actions beside it -- where reminders are kept since #316.
             url=(
                 reminder.application.get_absolute_url()
                 if reminder.application
-                else reverse("applications:reminder_list")
+                else agenda.url_for("day", timezone.localdate(reminder.due_at))
             ),
             # A reminder is one line the person wrote, so a match is always a title match;
             # there is nothing else to rank against and no `ranked()` call above.
@@ -514,14 +519,22 @@ def search_career(user, query: str, limit: int) -> Found:
     return found
 
 
+def _reminders_address() -> str:
+    from postulo.applications import agenda
+
+    return agenda.reminders_address()
+
+
 #: Every group, in the order the page shows them: (kind, label, function, "more" URL name
-#: and whether that page takes the query as ``q``).
-GROUPS: tuple[tuple[str, str, Callable, str, bool], ...] = (
+#: -- or a function that gives the address, for a page that is a shape of another, like
+#: the reminders, which are the calendar's agenda narrowed to them (#316) -- and whether
+#: that page takes the query as ``q``).
+GROUPS: tuple[tuple[str, str, Callable, str | Callable[[], str], bool], ...] = (
     ("applications", _("Applications"), search_applications, "applications:list", True),
     ("listings", _("Listings"), search_listings, "listings:list", False),
     ("companies", _("Companies"), search_companies, "jobs:company_list", True),
     ("contacts", _("People"), search_contacts, "jobs:company_list", False),
-    ("reminders", _("Reminders"), search_reminders, "applications:reminder_list", False),
+    ("reminders", _("Reminders"), search_reminders, _reminders_address, False),
     ("sent", _("Text you sent"), search_sent, "documents:rendered_list", False),
     ("letters", _("Letters"), search_letters, "documents:letter_list", False),
     ("cvs", _("CVs"), search_cvs, "documents:cv_list", False),
@@ -544,7 +557,7 @@ def search(user, raw_query: str, *, limit: int = GROUP_LIMIT) -> list[Group]:
         found = function(user, query, limit)
         if not found.total:
             continue
-        more_url = reverse(more_name)
+        more_url = more_name() if callable(more_name) else reverse(more_name)
         if takes_query:
             more_url = f"{more_url}?q={query}"
         groups.append(

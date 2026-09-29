@@ -403,10 +403,11 @@ def test_tomorrow_and_next_week_keep_the_hour_they_were_set_for(user):
 
 
 def test_the_row_offers_later_edit_and_delete(client, user, application):
+    """On the calendar, where the reminders page's rows went (#316)."""
     reminder = a_reminder(user, application)
     client.force_login(user)
 
-    html = client.get(reverse("applications:reminder_list")).content.decode()
+    html = client.get(agenda.reminders_address()).content.decode()
 
     assert reverse("applications:reminder_later", args=[reminder.pk]) in html
     assert reverse("applications:reminder_update", args=[reminder.pk]) in html

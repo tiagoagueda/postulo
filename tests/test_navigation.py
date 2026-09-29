@@ -176,7 +176,6 @@ def test_the_placed_keys_come_first_and_the_rest_follow_in_the_default_order():
         "listings",
         "documents",
         "companies",
-        "reminders",
     ]
 
 
@@ -184,9 +183,8 @@ def test_an_item_nobody_has_placed_yet_is_drawn_after_the_placed_ones():
     """The property `navigation.py` exists for: an item added in a later release is in
     neither list, and appears -- at the end of somebody's own order, in its own place for
     everybody who never arranged anything. An order stored before *Calendar* existed is
-    exactly that."""
+    exactly that -- less *Reminders*, which went in #316."""
     before_calendar = [
-        "reminders",
         "companies",
         "documents",
         "applications",
@@ -218,9 +216,68 @@ def test_a_stored_list_is_believed_only_as_far_as_it_goes(garbage):
     navigation.dashboard_hidden(Stored(garbage, garbage))
 
 
+#: The order and the hidden list somebody could have saved before #316, when *Reminders* was
+#: an item of its own: placed third from last, and switched off as well.
+BEFORE_316 = [
+    "calendar",
+    "dashboard",
+    "listings",
+    "reminders",
+    "applications",
+    "documents",
+    "companies",
+]
+
+
+def test_an_order_stored_with_reminders_in_it_reads_without_it():
+    """*Reminders* left the navigation in #316. What somebody stored before still holds the
+    key, and nothing migrated it away: it is dropped where it is read, the rest keeps the
+    order it was given, and no item is lost or drawn twice."""
+    stored = Stored(BEFORE_316, ["reminders", "companies"])
+
+    assert navigation.order_of(stored) == [key for key in BEFORE_316 if key != "reminders"]
+    assert navigation.hidden_keys(stored) == {"companies"}
+    assert keys(navigation.visible_items(stored)) == [
+        "calendar",
+        "dashboard",
+        "listings",
+        "applications",
+        "documents",
+    ]
+    # Arrows still move what is left, and a list that is the usual one without the old key
+    # is the usual one, stored as nothing.
+    assert navigation.move(BEFORE_316, "calendar", "down")[:2] == ["dashboard", "calendar"]
+    old_default = [*navigation.DEFAULT_ORDER[:-1], "reminders", "calendar"]
+    assert navigation.to_store(old_default) == []
+
+
+def test_the_pages_draw_and_save_an_order_stored_with_reminders_in_it(client, user):
+    profile = user.profile
+    profile.nav_order = BEFORE_316
+    profile.hidden_nav_items = ["reminders"]
+    profile.save(update_fields=["nav_order", "hidden_nav_items"])
+    client.force_login(user)
+
+    home = client.get(reverse("core:home"))
+    assert home.status_code == 200
+    html = home.content.decode()
+    assert 'data-nav="reminders"' not in html
+    assert line_order(html) == [key for key in BEFORE_316 if key != "reminders"]
+
+    page = client.get(reverse("settings:appearance")).content.decode()
+    assert "reminders" not in re.findall(r'name="nav_order" value="([^"]+)"', page)
+
+    # Saving the page writes back what it drew, which no longer has the key in it.
+    arrange(client, "down:calendar", order=re.findall(r'name="nav_order" value="([^"]+)"', page))
+    profile.refresh_from_db()
+    assert "reminders" not in profile.nav_order
+    assert "reminders" not in profile.hidden_nav_items
+    assert profile.nav_order[:2] == ["dashboard", "calendar"]
+
+
 def test_a_move_is_one_place_and_the_ends_are_the_ends():
     default = list(navigation.DEFAULT_ORDER)
-    assert navigation.move(default, "calendar", "up")[-2:] == ["calendar", "reminders"]
+    assert navigation.move(default, "calendar", "up")[-2:] == ["calendar", "companies"]
     assert navigation.move(default, "dashboard", "down")[:2] == ["listings", "dashboard"]
     assert navigation.move(default, "dashboard", "up") == default
     assert navigation.move(default, "calendar", "down") == default
@@ -273,13 +330,13 @@ def test_an_arrow_moves_one_item_saves_the_order_and_says_where_it_went(client, 
     # Back on the arrow that was pressed, so pressing it again moves the item again.
     assert response.url == reverse("settings:appearance") + "#nav-up-calendar"
     user.profile.refresh_from_db()
-    assert user.profile.nav_order[-2:] == ["calendar", "reminders"]
+    assert user.profile.nav_order[-2:] == ["calendar", "companies"]
 
     page = client.get(response.url).content.decode()
-    assert "Calendar is now number 6 in the navigation." in page
+    assert "Calendar is now number 5 in the navigation." in page
     assert line_order(client.get(reverse("core:home")).content.decode())[-2:] == [
         "calendar",
-        "reminders",
+        "companies",
     ]
 
 
@@ -338,7 +395,7 @@ def test_a_post_without_the_order_keeps_the_one_stored(client, user):
     client.force_login(user)
     arrange(client, order=[])
     profile.refresh_from_db()
-    assert profile.nav_order[-2:] == ["calendar", "reminders"]
+    assert profile.nav_order[-2:] == ["calendar", "companies"]
 
 
 def test_back_to_the_usual_order(client, user):
@@ -366,10 +423,10 @@ def test_the_page_lists_every_item_in_the_persons_order_with_its_arrows(client, 
     # Hidden items too: switched off, an item keeps its place for when it comes back.
     assert re.findall(r'name="nav_order" value="([^"]+)"', page) == profile.nav_order
     first_up = re.search(r'<button[^>]*id="nav-up-calendar"[^>]*>', page).group(0)
-    last_down = re.search(r'<button[^>]*id="nav-down-reminders"[^>]*>', page).group(0)
+    last_down = re.search(r'<button[^>]*id="nav-down-companies"[^>]*>', page).group(0)
     assert "disabled" in first_up and "disabled" in last_down
     assert "disabled" not in re.search(r'<button[^>]*id="nav-down-calendar"[^>]*>', page).group(0)
-    assert 'aria-label="Move Calendar up"' in page and 'aria-label="Move Reminders down"' in page
+    assert 'aria-label="Move Calendar up"' in page and 'aria-label="Move Companies down"' in page
 
 
 def test_enter_in_a_number_box_presses_save_and_not_an_arrow(client, user):

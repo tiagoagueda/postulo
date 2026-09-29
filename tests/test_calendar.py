@@ -160,7 +160,9 @@ def test_a_cell_holds_two_and_counts_the_rest_and_the_day_opens_on_them(client, 
     client.force_login(user)
 
     html = client.get(reverse(CALENDAR), {"month": "2026-09"}).content.decode()
-    cell = html.split("8 September")[1].split("</td>")[0]
+    # From the day's name to the end of its cell: the name is said twice in it now, by the
+    # day's link and by its *New reminder* (#316).
+    cell = html[html.index("8 September") :].split("</td>")[0]
     assert cell.count("data-event=") == 2
     assert "and 2 more" in cell
     day_url = reverse(CALENDAR) + "?view=day&amp;on=2026-09-08"
@@ -213,9 +215,12 @@ def test_every_shape_is_an_address_the_switcher_offers(client, user):
 # ------------------------------------------------------------------ the navigation
 
 
-def test_calendar_sits_beside_reminders_in_the_navigation_and_can_be_hidden(client, user):
+def test_calendar_is_in_the_navigation_in_place_of_reminders_and_can_be_hidden(client, user):
+    """One entry for the dated things of a search: reminders are kept on the calendar and
+    have no item of their own since #316."""
     keys = [item.key for item in navigation.ITEMS]
-    assert keys.index("calendar") == keys.index("reminders") + 1
+    assert keys[-1] == "calendar"
+    assert "reminders" not in navigation.BY_KEY
     assert "calendar" in navigation.HIDEABLE
 
     client.force_login(user)

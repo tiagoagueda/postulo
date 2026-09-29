@@ -25,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Reminders are kept on the calendar: done, later, edit and delete in every view, a new one from any day, and the agenda narrowed to reminders, overdue ones first, replaces the *Reminders* page and its navigation entry; its old address leads there. (#316)
 - Postulo's modules import in one direction now, and a test keeps them so. (#248)
 - A table's sort icon sits at the end of its header, so a row of them lines up: on the right in English, on the left in Arabic, with a numeric column's name beside it. A column's resize handle no longer covers part of it. (#317)
 - The forms on *Your details* and every *Settings* page stop at the company form's width beside their sidebar, instead of running across a wide monitor; from 1536 pixels a contact's details sit beside its numbers and links, and the capture form beside its help. (#320)

@@ -456,12 +456,15 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/{a.pk}/edit/",
         f"/applications/{a.pk}/interviews/new/",
         "/applications/interviews/",
-        "/applications/reminders/",
         "/applications/reminders/new/",
+        # The form as a day on the calendar opens it, with that day in it (#316).
+        "/applications/reminders/new/?on=2026-10-03&next=/applications/calendar/",
         "/applications/calendar/",
         "/applications/calendar/?view=week",
         "/applications/calendar/?view=day",
         "/applications/calendar/?view=agenda",
+        # What the reminders page was: the agenda narrowed to them (#316).
+        "/applications/calendar/?view=agenda&kinds=reminder",
         "/applications/new/",
         "/applications/tags/",
         "/jobs/companies/",
