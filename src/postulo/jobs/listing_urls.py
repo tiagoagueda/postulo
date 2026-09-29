@@ -21,4 +21,6 @@ urlpatterns = [
     path("<int:pk>/discard/", views.ListingStateView.as_view(action="discard"), name="discard"),
     path("<int:pk>/restore/", views.ListingStateView.as_view(action="restore"), name="restore"),
     path("<int:pk>/apply/", views.ListingApplyView.as_view(), name="apply"),
+    # Adding to what arrived about it (#270). POST only, from the listing's own page.
+    path("<int:pk>/history/", views.ListingEventCreateView.as_view(), name="event_create"),
 ]

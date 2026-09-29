@@ -600,7 +600,8 @@ def test_erasing_a_referrer_says_the_applications_lost_them(user, application, f
 
     application.refresh_from_db()
     assert application.referred_by is None
-    assert report.unlinked == {"applications": 0, "referrals": 1}
+    # `listing_events` since #270: the entries in listings' histories that came from them.
+    assert report.unlinked == {"applications": 0, "referrals": 1, "listing_events": 0}
     assert "1 application kept, without its referrer." in report.summary()
     assert "main contact" not in report.summary()
 

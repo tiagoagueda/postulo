@@ -19,6 +19,7 @@ from ninja import Field, Schema
 from pydantic import AfterValidator
 
 from postulo.core.addresses import web_address
+from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
 
 #: An address that is going to be stored and later drawn as a link. The routers set these
 #: with ``setattr`` rather than through a form, so this annotation is where the check the
@@ -175,8 +176,87 @@ class ListingOut(Schema):
     updated_at: dt.datetime
 
 
+class ListingEventOut(Schema):
+    """One entry in a listing's history (#270). Every word in it may be a stranger's."""
+
+    id: int
+    listing_id: int
+    kind: str = Field(description="note, email_received, call, message, document, capture or other")
+    occurred_at: dt.datetime
+    summary: str = ""
+    body: str = ""
+    contact_id: int | None = Field(default=None, description="Who it came from, if recorded")
+    document_id: int | None = Field(
+        default=None, description="The uploaded file it points at, while that file exists"
+    )
+    capture_id: int | None = Field(
+        default=None, description="The capture it points at, for a capture entry"
+    )
+    external_id: str = Field(default="", description="What the source called the thing")
+    actor: str = ""
+    created_at: dt.datetime
+
+
 class ListingDetailOut(ListingOut):
     description: str = ""
+    #: What arrived about the listing, newest first (#270). An application's own timeline is
+    #: on the application; this is the half before and beside it.
+    events: list[ListingEventOut] = Field(default_factory=list)
+
+
+class ListingChoiceOut(Schema):
+    """A listing, briefly: enough to choose one to file something into, and no more (#270).
+
+    What a token holding only `listings:bind` reads. No description, no salary, no
+    applications: a mail client choosing where a message goes needs to recognise the job,
+    not to read the person's search.
+    """
+
+    id: int
+    title: str
+    company_name: str
+    location: str = ""
+    state: str
+    noted_at: dt.datetime
+    updated_at: dt.datetime
+
+
+class ListingEventIn(Schema):
+    """An entry for a listing's history: what arrived, or what was said (#270).
+
+    The text is foreign text and is held to a length (#218): a longer summary or body is
+    refused rather than cut, so a client learns to send less instead of losing the end.
+    """
+
+    kind: str = Field(
+        default="note",
+        description="note (the default), email_received, call, message, document or other",
+    )
+    summary: str = Field(
+        default="", max_length=SUMMARY_MAX_CHARS, description="The line the history shows"
+    )
+    body: str = Field(
+        default="",
+        max_length=BODY_MAX_CHARS,
+        description="The message, the email's text, or what was said. At most 40,000 characters.",
+    )
+    occurred_at: dt.datetime | None = Field(default=None, description="Now, if unset")
+    contact_id: int | None = Field(
+        default=None, description="Who it came from: one of your contacts"
+    )
+    document_id: int | None = Field(
+        default=None,
+        description="A file of yours it is about. Needed for a document entry.",
+    )
+    external_id: str = Field(
+        default="",
+        max_length=EXTERNAL_ID_MAX_CHARS,
+        description=(
+            "What the source calls the thing -- a message id, say. Sent again with the same "
+            "one for the same listing, the first entry is the answer (200) and nothing is "
+            "added."
+        ),
+    )
 
 
 class ListingIn(Schema):
@@ -571,8 +651,45 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
         "updated_at": posting.updated_at,
     }
     if detail:
+        from postulo.jobs.history import history_of
+
         data["description"] = posting.description
+        data["events"] = [listing_event_out(event) for event in history_of(posting)]
     return data
+
+
+def listing_event_out(event) -> dict:
+    """One entry in a listing's history (#270). What it points at is named only while it is
+    there and the listing's owner's, which is `ListingEvent.points_at`'s rule."""
+    document = event.bound_document
+    capture = event.bound_capture
+    return {
+        "id": event.pk,
+        "listing_id": event.posting_id,
+        "kind": event.kind,
+        "occurred_at": event.occurred_at,
+        "summary": event.summary,
+        "body": event.body,
+        "contact_id": event.contact_id,
+        "document_id": document.pk if document is not None else None,
+        "capture_id": capture.pk if capture is not None else None,
+        "external_id": event.external_id,
+        "actor": event.actor,
+        "created_at": event.created_at,
+    }
+
+
+def listing_choice_out(request, posting) -> dict:
+    """A listing, briefly, as `ListingChoiceOut` says (#270)."""
+    return {
+        "id": posting.pk,
+        "title": posting.title,
+        "company_name": posting.company.name,
+        "location": posting.location,
+        "state": posting.derived_state,
+        "noted_at": posting.noted_at,
+        "updated_at": posting.updated_at,
+    }
 
 
 def event_out(event) -> dict:

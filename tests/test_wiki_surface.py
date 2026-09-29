@@ -52,10 +52,14 @@ def api_calls() -> set[tuple[str, str, str]]:
                 if not callbacks:
                     inherited = router.auth if router.auth not in (None, NOT_SET) else api.auth
                     callbacks = inherited if isinstance(inherited, list | tuple) else [inherited]
-                scopes = [auth.scope for auth in callbacks if isinstance(auth, ScopedAuth)]
+                # A call more than one scope reaches is listed with every one of them,
+                # narrowest first: `listings:bind` or `write` (#270).
+                scopes = [auth.scopes for auth in callbacks if isinstance(auth, ScopedAuth)]
                 full = "/api/v1" + (prefix.rstrip("/") + "/" + path.lstrip("/")).rstrip("/")
                 full = re.sub(r"\{(int:)?pk\}", "{id}", full).replace("//", "/")
-                scope = f"`{scopes[0]}`" if scopes else "any live token"
+                scope = (
+                    " or ".join(f"`{name}`" for name in scopes[0]) if scopes else "any live token"
+                )
                 for method in operation.methods:
                     calls.add((method, full, scope))
     return calls

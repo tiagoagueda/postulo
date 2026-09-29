@@ -302,8 +302,9 @@ def test_the_format_version_moved(user):
     referred the person and the agency it went through on the application, and the people
     recorded at no company, who had been left out of the archive (#239); 21 added what a
     capture kept of the page it was read from (#256); 22 added the main navigation's order
-    and what was switched off in it, on the profile (#299).
+    and what was switched off in it, on the profile (#299); 23 added a listing's history
+    under its posting, each entry naming who it came from and what it points at (#270).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 22
+    assert export.FORMAT_VERSION == 23

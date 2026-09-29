@@ -41,6 +41,11 @@ nobody can keep is not a promise, so the missing half is here now: the notifier 
 the records a sync works on, the calls that write to a timeline, the details that hang off
 a contact, and the calendar text. It is a wider surface, deliberately, because the
 alternative was a narrow one that was routinely ignored.
+
+**A listing has a history now (#270)**, and one call writes to it: `record_listing_event`,
+for a plugin that sees a mail or a message about a job before anybody has applied. It is
+handed the listing, or an application whose listing it is, and takes the owner from that
+record; the plugin never says whose history it writes.
 """
 
 from __future__ import annotations
@@ -76,6 +81,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.web_links import save_only_link as save_web_link
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
+    from postulo.jobs.history import record_listing_event
     from postulo.jobs.models import Contact
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
     from postulo.resume.importing import Record
@@ -189,6 +195,7 @@ __all__ = [
     "primary_web_link",
     "public_only_client",
     "record_event",
+    "record_listing_event",
     "refuse_unreadable",
     "reschedule_interview",
     "safe_next",
@@ -243,6 +250,14 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "reschedule_interview": ("postulo.applications.services", "reschedule_interview"),
     "settle_interview": ("postulo.applications.services", "settle_interview"),
     "suggest": ("postulo.applications.suggestions", "suggest"),
+    # ------------------------------------------------ and the one way into a listing's
+    # history (#270). What arrives about a job before anybody applies -- a message, an
+    # email, a forwarded description -- goes on the listing, and the application's page
+    # reads it from there. The call takes a record the plugin already holds, a listing or
+    # an application whose listing it is, and the owner is that record's: a plugin never
+    # says whose history it writes, and a contact or a file it names that belongs to
+    # anybody else is refused. Given an `external_id` it is idempotent, as `suggest` is.
+    "record_listing_event": ("postulo.jobs.history", "record_listing_event"),
     # ------------------------------------------------ the details that hang off a contact
     # A number and a profile are not columns on a contact: they are rows of their own, one
     # of them primary, and an instance may allow several. A plugin writing one directly

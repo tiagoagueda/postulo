@@ -63,6 +63,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A listing has a history: a message, an email, a call, a note, a file from your documents, or the same advert captured again elsewhere, added on its page or from the capture's review. An application shows it first on its timeline, and it is in your export (format 23). (#270)
+- A token can hold `listings:bind`, which adds to a listing's history and lists listings to choose one, and nothing else: the scope for a mail client that files messages. Plugins get `record_listing_event`. (#270)
 - The Europass import reads the PDF europass.europa.eu gives you, through the CV attached inside it (the Candidate XML the platform has written since 2020), and a PDF it cannot read says why and what to upload instead. (#244)
 - A capture can keep the page it was read from: the source as it was parsed, and a rendering sent by the browser extension or drawn from the source. Off until an administrator allows it under *Server settings → Capture* and you switch it on under *Settings → Capture*; what is kept is in your export. (#256)
 - An application moved to *Rejected*, *Withdrawn* or *Ghosted* can say why — pay, location, not a match, filled internally, your own choice, or other with a note — then or afterwards; the stage it had reached is read from its timeline, and a widget, *Where and why applications end*, counts both. (#239)

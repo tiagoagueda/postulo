@@ -54,16 +54,21 @@
        for this title at this company, said where they decide -- saving anyway or discarding
        below are both theirs. The second kind is softer: a board that mints a fresh address
        per visit hides a duplicate this way, and a company with two openings of one title
-       looks the same. {% endcomment %}
+       looks the same. Beside each listing, a third answer (#270): add this capture to that
+       listing's history, which keeps the capture and makes no second listing. A column, so
+       each thing said is a line of its own rather than a row of narrow ones. {% endcomment %}
     {% if known %}
-      <div class="alert mb-6" data-variant="warning" role="status" data-known>
+      <div class="alert mb-6 flex-col" data-variant="warning" role="status" data-known>
         {% for listing in known.listings %}
-          <p>
-            {% blocktranslate trimmed with when=listing.created_at|date:"DATE_FORMAT" %}
-              This address is already in your listings, since {{ when }}.
-            {% endblocktranslate %}
-            <a href="{{ listing.get_absolute_url }}" class="underline">{{ listing.title }} — {{ listing.company.name }}</a>
-          </p>
+          <div>
+            <p>
+              {% blocktranslate trimmed with when=listing.created_at|date:"DATE_FORMAT" %}
+                This address is already in your listings, since {{ when }}.
+              {% endblocktranslate %}
+              <a href="{{ listing.get_absolute_url }}" class="underline" id="known-listing-{{ listing.pk }}">{{ listing.title }} — {{ listing.company.name }}</a>
+            </p>
+            {% include "jobs/partials/bind_capture.html" %}
+          </div>
         {% endfor %}
         {% for other in known.captures %}
           <p>
@@ -74,11 +79,19 @@
           </p>
         {% endfor %}
         {% for listing in known.similar %}
-          <p>
-            {% translate "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert." %}
-            <a href="{{ listing.get_absolute_url }}" class="underline">{{ listing.title }} — {{ listing.company.name }}</a>
-          </p>
+          <div>
+            <p>
+              {% translate "A listing with this title at this company exists; a board that mints a fresh address per visit may be showing you the same advert." %}
+              <a href="{{ listing.get_absolute_url }}" class="underline" id="known-listing-{{ listing.pk }}">{{ listing.title }} — {{ listing.company.name }}</a>
+            </p>
+            {% include "jobs/partials/bind_capture.html" %}
+          </div>
         {% endfor %}
+        {% if known.listings or known.similar %}
+          <p data-bind-explained>
+            {% translate "The same advert on another board is evidence about the job. Adding this capture to a listing's history keeps it, with any page it kept, and makes no second listing." %}
+          </p>
+        {% endif %}
       </div>
     {% endif %}
 

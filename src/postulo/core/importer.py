@@ -34,6 +34,7 @@ class ArchiveError(Exception):
 class ImportReport:
     companies: int = 0
     postings: int = 0
+    listing_events: int = 0
     applications: int = 0
     events: int = 0
     reminders: int = 0
@@ -494,6 +495,10 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     wants_referrer: dict[int, int] = {}
     wants_agency: dict[int, str] = {}
 
+    #: Each listing's history, as the file wrote it, held until the end: an entry may point
+    #: at a capture or an upload, and those are made last (#270).
+    listing_histories: list[tuple[JobPosting, list]] = []
+
     def restore_contact(entry: dict, company) -> None:
         """One person from the file, at ``company`` or at none."""
         old_id = entry.pop("id", None)
@@ -590,6 +595,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
 
         for posting_entry in posting_entries:
             application_entries = posting_entry.pop("applications", [])
+            # Format 23 (#270). Taken out before the row is made, as every nested list is;
+            # an archive written before it has no key and a listing with no history.
+            history_entries = posting_entry.pop("events", None) or []
             old_posting_id = posting_entry.pop("id", None)
             created_at = _dt(posting_entry.pop("created_at", None))
             for name in ("posted_at", "closes_at"):
@@ -609,6 +617,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             posting = JobPosting.objects.create(owner=user, company=company, **posting_entry)
             postings[old_posting_id] = posting
             report.postings += 1
+            if isinstance(history_entries, list) and history_entries:
+                listing_histories.append((posting, history_entries))
 
             for application_entry in application_entries:
                 event_entries = application_entry.pop("events", [])
@@ -871,8 +881,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         report.sent_documents += 1
 
     # ----------------------------------------------------------------- captures
+    captures: dict[int, Capture] = {}
     for capture_entry in document.get("captures", []):
-        capture_entry.pop("id", None)
+        old_capture_id = capture_entry.pop("id", None)
         capture_entry.pop("created_at", None)
         # Format 21 (#256). Taken out before the row is made, because what is left goes
         # straight to a model that has no such column; an archive written before it has
@@ -885,10 +896,94 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         capture = Capture.objects.create(
             owner=user, application=application, posting=posting, **capture_entry
         )
+        captures[old_capture_id] = capture
         if isinstance(kept, dict):
             report.captured_pages += _restore_kept_page(archive, capture, kept, report)
 
+    # ------------------------------------------------------ listings' histories
+    # Last, because an entry may point at a capture or an upload and both now exist (#270).
+    pointable = {"capture": captures, "uploadeddocument": uploads}
+    for posting, entries in listing_histories:
+        report.listing_events += _restore_listing_history(
+            posting, entries, contacts=contacts, pointable=pointable
+        )
+
     return report
+
+
+def _restore_listing_history(posting, entries: list, *, contacts: dict, pointable: dict) -> int:
+    """Put back one listing's history. Returns how many entries came back.
+
+    Rows are made directly, as the timeline's are, and the file is believed about nothing
+    it could get wrong: the words are held to the lengths `jobs.history` keeps, an unknown
+    kind is *other*, a contact or a thing pointed at that the file does not carry is left
+    out and the entry keeps its words -- which is what a deleted file leaves it with anyway
+    -- and a pointer of the wrong kind is dropped rather than trusted. A message id repeated
+    for one listing is one entry, as it would have been when it was bound.
+    """
+    from django.contrib.contenttypes.models import ContentType
+    from django.utils import timezone
+
+    from postulo.jobs.history import (
+        ACTOR_MAX_CHARS,
+        EXTERNAL_ID_MAX_CHARS,
+        SUMMARY_MAX_CHARS,
+        bounded,
+        one_line,
+    )
+    from postulo.jobs.models import ListingEvent, ListingEventKind
+
+    def an_id(value) -> int | None:
+        """An id as the file wrote it, or nothing: a list or a word is not a key to look up."""
+        return value if isinstance(value, int) and not isinstance(value, bool) else None
+
+    def a_moment(value):
+        try:
+            return _dt(value) if isinstance(value, str) else None
+        except ValueError:
+            return None
+
+    made = 0
+    seen: set[str] = set()
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        kind = str(entry.get("kind") or "")
+        if kind not in ListingEventKind.values:
+            kind = ListingEventKind.OTHER
+        # Looked up only by an id the entry actually gives: a record the file wrote with no
+        # id of its own is kept under `None`, and an entry naming nothing must not find it.
+        artefact_ref = an_id(entry.get("artefact_ref"))
+        artefact = (
+            pointable.get(str(entry.get("artefact_kind") or ""), {}).get(artefact_ref)
+            if artefact_ref is not None
+            else None
+        )
+        contact_ref = an_id(entry.get("contact_id"))
+        is_capture = artefact is not None and artefact._meta.label_lower == "jobs.capture"
+        if artefact is not None and is_capture != (kind == ListingEventKind.CAPTURE):
+            artefact = None
+        external_id = one_line(entry.get("external_id"))[:EXTERNAL_ID_MAX_CHARS]
+        if external_id:
+            if external_id in seen:
+                continue
+            seen.add(external_id)
+        ListingEvent.objects.create(
+            posting=posting,
+            kind=kind,
+            occurred_at=a_moment(entry.get("occurred_at")) or timezone.now(),
+            summary=one_line(entry.get("summary"))[:SUMMARY_MAX_CHARS],
+            body=bounded(entry.get("body")),
+            contact=contacts.get(contact_ref) if contact_ref is not None else None,
+            external_id=external_id,
+            actor=one_line(entry.get("actor"))[:ACTOR_MAX_CHARS],
+            artefact_type=(
+                ContentType.objects.get_for_model(artefact) if artefact is not None else None
+            ),
+            artefact_id=artefact.pk if artefact is not None else None,
+        )
+        made += 1
+    return made
 
 
 def _restore_kept_page(archive: zipfile.ZipFile, capture, kept: dict, report) -> int:

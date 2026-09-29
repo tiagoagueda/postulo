@@ -76,6 +76,26 @@ def test_read_does_not_write_and_write_does_not_download(client, user, search):
     assert response.status_code == 403 and "'documents:read'" in response.json()["detail"]
 
 
+def test_bind_files_into_a_listing_and_reads_nothing_of_the_search(client, user, search):
+    """A mail client's scope (#270): the brief list and one entry, and every read refused.
+
+    `tests/security/test_listing_history.py` walks the rest of the API with it; this is the
+    same promise stated where the other scopes' are.
+    """
+    binder = issue(user, "listings:bind")
+    listing = search["posting"]
+
+    choices = client.get("/api/v1/listings/choices", **binder)
+    made = post(client, f"/api/v1/listings/{listing.pk}/events", {"summary": "x"}, **binder)
+    reading = client.get("/api/v1/listings", **binder)
+
+    assert choices.status_code == 200 and choices.json()["count"] == 2
+    assert made.status_code == 201 and made.json()["actor"] == "API token Agent"
+    assert reading.status_code == 403 and "'read'" in reading.json()["detail"]
+    assert client.get("/api/v1/listings/choices", **issue(user, "read")).status_code == 200
+    assert client.get("/api/v1/listings/choices", **issue(user, "write")).status_code == 403
+
+
 def test_an_expired_token_is_a_stranger(client, user):
     bearer = issue(user, "read", expires_at=timezone.now() - dt.timedelta(minutes=1))
     assert client.get("/api/v1/applications", **bearer).status_code == 401

@@ -56,7 +56,7 @@
   </div>
 
   <div class="grid gap-6 lg:grid-cols-3">
-    <div class="lg:col-span-2">
+    <div class="min-w-0 lg:col-span-2">
       <c-section-title>{% translate "Description" %}</c-section-title>
       {% if posting.description %}
         <div class="card whitespace-pre-line text-sm">{{ posting.description }}</div>
@@ -65,6 +65,51 @@
           {% translate "Nothing saved. Postings vanish from the web; pasting the text keeps your copy." %}
         </c-empty>
       {% endif %}
+
+      {% comment %} What arrived about it (#270): a message, an email, a call, a file somebody
+         forwarded, the same advert on another board. The application's page reads the same
+         entries through its posting, first, once there is an application. {% endcomment %}
+      <div id="history" class="mt-8">
+        <c-section-title>
+          {% translate "History" %}
+          <c-slot name="subtitle">{% translate "What arrived about this listing, and what you noted. Once you apply, it heads the application's timeline." %}</c-slot>
+        </c-section-title>
+        {% if listing_events %}
+          <c-listing-history :events="listing_events" />
+        {% else %}
+          <c-empty variant="quiet">
+            {% translate "Nothing has arrived about this one yet." %}
+          </c-empty>
+        {% endif %}
+      </div>
+
+      {% comment %} The action names this card, so a mistake drawn again with its errors opens
+         here rather than at the top of the page, with or without a script. {% endcomment %}
+      <div class="card mt-6" id="history-form">
+        <c-section-title>
+          {% translate "Add to its history" %}
+          <c-slot name="subtitle">{% translate "A file goes under Files first; an entry points at it rather than keeping a copy." %}</c-slot>
+        </c-section-title>
+        <form method="post" action="{% url 'listings:event_create' posting.pk %}#history-form" novalidate>
+          {% csrf_token %}
+          {% if event_form.non_field_errors %}
+            <div class="alert mb-4" data-variant="error">{{ event_form.non_field_errors }}</div>
+          {% endif %}
+          <div class="grid gap-x-4 sm:grid-cols-2">
+            <c-field :field="event_form.kind" />
+            <c-field :field="event_form.occurred_at" />
+          </div>
+          <c-field :field="event_form.summary" />
+          <c-field :field="event_form.body" />
+          {% if "contact" in event_form.fields or "document" in event_form.fields %}
+            <div class="grid gap-x-4 sm:grid-cols-2">
+              {% if "contact" in event_form.fields %}<c-field :field="event_form.contact" />{% endif %}
+              {% if "document" in event_form.fields %}<c-field :field="event_form.document" />{% endif %}
+            </div>
+          {% endif %}
+          <button type="submit" class="btn" data-variant="outline">{% translate "Add entry" %}</button>
+        </form>
+      </div>
     </div>
 
     <aside>

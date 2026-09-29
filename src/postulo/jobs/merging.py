@@ -13,7 +13,9 @@ cannot come to differ except by the record having changed in between.
 postings, contacts, identifiers, departments, the logo, the companies that are part of it,
 the applications that went through it as an agency; for a person, their telephone numbers,
 addresses and links, the applications they are the contact for or referred the person to,
-and the interviews they sat in. Where a field holds one value and both records have one,
+the interviews they sat in, and the entries in listings' histories that came from them
+(#270). A listing's history moves with the listing, which is how it survives a merge of the
+company it is at. Where a field holds one value and both records have one,
 **the kept record's wins** -- it is the one somebody chose to keep -- and the other's is
 shown on the confirmation page and written into the note the merge leaves on the kept
 record, so it is still there to be read. Notes are text and are simply joined.
@@ -42,7 +44,7 @@ from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
 from . import identifiers
-from .models import Company, CompanyIdentifier, Contact, Department, JobPosting
+from .models import Company, CompanyIdentifier, Contact, Department, JobPosting, ListingEvent
 
 #: How many names a line of the plan prints before it says how many more there are.
 NAMES_SHOWN = 5
@@ -566,6 +568,15 @@ def plan_contacts(kept, other) -> Plan:
         _moved(_("Applications they are the main contact for"), main, str),
         _moved(_("Applications they referred you to"), referred, str),
         _moved(_("Interviews they were at"), interviews, str),
+        # What they sent or said about a listing (#270). The link is `SET_NULL`, which the
+        # check before the delete does not see as a loss, so it is moved by name here.
+        _moved(
+            _("Entries in listing histories that came from them"),
+            ListingEvent.objects.filter(posting__owner_id=owner, contact=other).select_related(
+                "posting"
+            ),
+            lambda row: row.summary or row.posting.title,
+        ),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_links:
@@ -654,6 +665,10 @@ def merge_contacts(kept, other) -> Plan:
     Application.objects.filter(owner_id=owner, pk__in=plan.touched).update(updated_at=now)
     Application.objects.filter(owner_id=owner, contact=other).update(contact=kept)
     Application.objects.filter(owner_id=owner, referred_by=other).update(referred_by=kept)
+    # Who an entry in a listing's history came from (#270). `SET_NULL` would otherwise
+    # clear it in silence when the other record goes, and the collector's question below
+    # does not count a cleared link as something lost.
+    ListingEvent.objects.filter(posting__owner_id=owner, contact=other).update(contact=kept)
 
     # An interview both were at has the kept person once, not twice.
     seats = Interview.contacts.through.objects

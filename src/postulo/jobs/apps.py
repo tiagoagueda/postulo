@@ -12,7 +12,8 @@ class JobsConfig(AppConfig):
         # Registers the table with the settings view.
         # Registers this app's dashboard widgets.
         # Registers the pieces of slow work this app sends off (#247).
-        # Connects the receiver that removes a kept page's files with its row (#256).
+        # Connects the receiver that removes a kept page's files with its row (#256), and
+        # the ones that unlink a listing's history from a capture or a file that goes (#270).
         from . import (
             signals,  # noqa: F401
             slow,  # noqa: F401

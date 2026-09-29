@@ -16,6 +16,11 @@ and a rendering is sent afterwards, as a file, to an address of its own. Both go
 ``captures`` and neither comes back out under any scope -- a token that can hand a page
 over cannot fetch one.
 
+A listing has a history (#270), and ``listings:bind`` is the scope for a client that only
+files things into one -- a mail client attaching the message somebody is reading. It
+records an entry and reads the brief list of listings needed to choose where, and reaches
+nothing else: ``write`` covers far more than a mail client should hold.
+
 The OpenAPI description is served at ``openapi.json`` under the API root, to a live token
 or a signed-in person and to nobody else (#230). There is no documentation page rendered
 here: its assets would have to come from a CDN the content security policy forbids, and the
@@ -115,8 +120,10 @@ api = Described(
     docs_decorator=for_readers_of_the_api,
     description=(
         "Scoped bearer tokens, made under Settings → API tokens. `captures` hands over a "
-        "posting; `read` reads everything the owner has; `write` records and changes "
-        "through the same services as the forms; `documents:read` downloads files."
+        "posting; `listings:bind` adds to a listing's history and lists the listings to "
+        "choose one from, and nothing else; `read` reads everything the owner has; `write` "
+        "records and changes through the same services as the forms; `documents:read` "
+        "downloads files."
     ),
 )
 

@@ -12,7 +12,8 @@ import re
 from datetime import timedelta
 
 from django.apps import apps
-from django.contrib.contenttypes.fields import GenericRelation
+from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import (
@@ -1281,3 +1282,190 @@ class CapturedPage(OwnedModel):
             RenderingKind.JPEG,
             RenderingKind.WEBP,
         )
+
+
+class ListingEventKind(models.TextChoices):
+    """What arrived about a listing, or was written down about it (#270).
+
+    The first four are the timeline's own words, with the same values and the same labels
+    as `applications.models.EventKind`, because they mean the same thing on either side of
+    applying: a note is a note, and an email received is one whether or not an application
+    exists yet. The rest are what a listing needs and an application never did -- a message
+    from the employment service, a document somebody forwarded, and the same advert read off
+    another board. `tests/test_listing_history.py` holds the shared four to the timeline's.
+
+    Written out rather than imported: `applications` depends on `jobs`, and a vocabulary
+    borrowed the other way would close the loop.
+    """
+
+    NOTE = "note", _("Note")
+    EMAIL_RECEIVED = "email_received", _("Email received")
+    CALL = "call", _("Call")
+    MESSAGE = "message", _("Message")
+    DOCUMENT = "document", _("Document")
+    CAPTURE = "capture", _("Capture")
+    OTHER = "other", _("Other")
+
+
+#: Kinds the record writes for itself. A capture entry is what binding a capture writes,
+#: pointing at that capture, and offering it to be typed would let the history name a
+#: capture that never happened.
+SYSTEM_LISTING_EVENT_KINDS = frozenset({ListingEventKind.CAPTURE})
+
+
+class ListingEventQuerySet(models.QuerySet):
+    def for_user(self, user) -> ListingEventQuerySet:
+        """Scope through the listing, as the timeline scopes through its application.
+
+        An entry carries no owner of its own, for the reason `ApplicationEvent` gives:
+        duplicating it would be a second source of truth that could drift out of step with
+        the listing it belongs to.
+        """
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(posting__owner=user)
+
+
+class ListingEvent(models.Model):
+    """One thing that arrived about a listing, or was written down about it (#270).
+
+    An application has had a timeline from the start; a listing had nothing, so everything
+    that arrives about a job before somebody applies for it -- the counsellor's message, a
+    description a contact forwarded, the board's reminder that it closes on Friday, the same
+    advert captured again from another board -- was kept somewhere else or lost. This is the
+    listing's history, append-only in the way the timeline is: nothing offers to change an
+    entry, because a history you can quietly rewrite is worth very little.
+
+    **A second log rather than a second parent for the first.** `ApplicationEvent` scopes
+    through `application__owner` and nothing else; giving it a listing as a second possible
+    parent would mean scoping through either, which is cheap to write and expensive to get
+    wrong. When a listing becomes an application nothing is carried over: the application's
+    page reads this history through its posting, first, and its own timeline after it. One
+    history in two parts, stored once, so nothing can drift.
+
+    **An entry may point at something stored where it belongs** -- a `Capture`, or a file in
+    the person's documents -- through a generic link with **no** reverse relation, for the
+    reason `documents.RenderedDocument.source` has none: a reverse relation would give a
+    cascade. Deleting or discarding a listing must not delete a job description that lives in
+    the documents; deleting that file leaves the entry standing with the words it had, and
+    `jobs.signals` clears the link. A note is the entry's own text, and goes with the
+    listing. This is not a file manager: a binding points, and stores nothing of its own.
+
+    **Bound text is foreign text** (#218). A message or an email body was written by a
+    stranger, so it is bounded on the way in (`jobs.history`), escaped on the page, never
+    interpreted, and reaches no spreadsheet and no calendar.
+    """
+
+    posting = models.ForeignKey(
+        JobPosting, on_delete=models.CASCADE, related_name="events", verbose_name=_("listing")
+    )
+    kind = models.CharField(
+        _("kind"), max_length=20, choices=ListingEventKind, default=ListingEventKind.NOTE
+    )
+    occurred_at = models.DateTimeField(_("happened on"), default=timezone.now, db_index=True)
+    summary = models.CharField(_("summary"), max_length=250, blank=True)
+    body = models.TextField(_("details"), blank=True)
+    #: Who it came from, where that is somebody the person has recorded: the counsellor, the
+    #: contact who forwarded the advert. `SET_NULL`, as an application's contact is -- the
+    #: person going must not take what they said with them -- and it is what puts the entry
+    #: in that person's own document under data protection (`core.gdpr`).
+    contact = models.ForeignKey(
+        Contact,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="listing_events",
+        verbose_name=_("from"),
+    )
+    #: What the entry points at, when it points at anything: a `Capture` or an
+    #: `UploadedDocument`, and only one of the listing's owner's (`jobs.history.ARTEFACTS`).
+    artefact_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=_("kind of thing it points at"),
+    )
+    artefact_id = models.PositiveBigIntegerField(null=True, blank=True)
+    artefact = GenericForeignKey("artefact_type", "artefact_id")
+    #: What the source calls the thing it bound: a message id, say. Given one, binding is
+    #: idempotent for that listing, which is what lets a mailbox be read every five minutes
+    #: without the same message landing in a history twice -- `suggest`'s rule.
+    external_id = models.CharField(_("identifier at the source"), max_length=250, blank=True)
+    #: Who wrote it when it was not the person at the keyboard: "API token Thunderbird", or
+    #: a plugin's name. Blank means the person themselves.
+    actor = models.CharField(_("recorded by"), max_length=120, blank=True)
+    created_at = models.DateTimeField(_("recorded on"), auto_now_add=True)
+
+    objects = ListingEventQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("listing entry")
+        verbose_name_plural = _("listing entries")
+        ordering = ("-occurred_at", "-pk")
+        indexes = [
+            # A listing's history, newest first, which both pages that draw it ask for.
+            models.Index(fields=("posting", "-occurred_at"), name="listing_event_latest"),
+            # Every entry pointing at one thing, which deleting that thing asks.
+            models.Index(fields=("artefact_type", "artefact_id"), name="listing_event_artefact"),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=("posting", "external_id"),
+                condition=~models.Q(external_id=""),
+                name="listing_event_once_per_source_id",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return self.summary or str(self.get_kind_display())
+
+    @property
+    def points_at(self):
+        """What the entry points at, when it is still there and still this owner's.
+
+        The link is checked when it is made, so this second look is for a row the database
+        was handed some other way: an entry never draws another person's record, whatever
+        its columns say.
+        """
+        found = self.artefact if self.artefact_type_id and self.artefact_id else None
+        if found is None or getattr(found, "owner_id", None) != self.posting.owner_id:
+            return None
+        return found
+
+    @property
+    def bound_capture(self) -> Capture | None:
+        """The capture this entry points at, for the page to link to its advert and page."""
+        found = self.points_at
+        return found if isinstance(found, Capture) else None
+
+    @property
+    def advert_address(self) -> str:
+        """Where the bound capture was read, when that is an address a browser should follow.
+
+        A capture's address was held to http and https on the way in (#218), and it is held
+        there again here, because this is drawn as a link and a stored `javascript:`
+        address is the one kind of text that acts when somebody follows it.
+        """
+        from postulo.core.addresses import page_address
+
+        capture = self.bound_capture
+        if capture is None:
+            return ""
+        try:
+            return page_address(capture.url)
+        except ValueError:
+            return ""
+
+    @property
+    def bound_document(self):
+        """The file in the person's documents this entry points at, or nothing.
+
+        Recognised by its label rather than by `isinstance`, because `documents` is not
+        this module's to import.
+        """
+        found = self.points_at
+        if found is not None and found._meta.label_lower == "documents.uploadeddocument":
+            return found
+        return None

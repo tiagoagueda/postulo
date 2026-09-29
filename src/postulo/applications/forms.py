@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import esco, recall
-from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
+from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
     Company,
     Contact,
@@ -416,7 +416,7 @@ class ApplicationForm(OwnerScopedModelForm):
         if referrers.exists():
             self.fields["referred_by"].queryset = referrers
             self.fields["referred_by"].empty_label = _("Nobody")
-            self.fields["referred_by"].label_from_instance = _who_and_where
+            self.fields["referred_by"].label_from_instance = who_and_where
         else:
             del self.fields["referred_by"]
 
@@ -433,17 +433,6 @@ class ApplicationForm(OwnerScopedModelForm):
             self.fields["through_agency"].empty_label = _("No agency")
         else:
             del self.fields["through_agency"]
-
-
-def _who_and_where(contact) -> str:
-    """A contact as a choice: the name, and the company beside it where there is one.
-
-    Two people called the same thing are otherwise two identical lines in a list, and
-    choosing between them would be a guess.
-    """
-    if contact.company_id:
-        return f"{contact.name} · {contact.company.name}"
-    return contact.name
 
 
 class StatusChangeForm(forms.Form):

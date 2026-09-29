@@ -253,6 +253,40 @@ class ListingStateView(OwnedObjectMixin, View):
         return _back_to(request, reverse("listings:list"))
 
 
+class ListingEventCreateView(OwnedObjectMixin, View):
+    """Add an entry to a listing's history, from the form on its own page (#270).
+
+    POST only, and through `record_listing_event` like every other door into the history.
+    A mistake in the form draws the listing's page again with the errors beside the fields,
+    rather than sending somebody back to an empty form with a sentence about what they lost.
+    """
+
+    def get_queryset(self):
+        return JobPosting.objects.for_user(self.request.user).select_related("company")
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from .forms import ListingEventForm
+        from .history import record_listing_event
+        from .views import listing_page_context
+
+        listing = get_object_or_404(self.get_queryset().with_application_count(), pk=pk)
+        form = ListingEventForm(request.POST, user=request.user)
+        if not form.is_valid():
+            context = listing_page_context(request, listing, event_form=form)
+            return render(request, "jobs/posting_detail.html", context)
+        record_listing_event(
+            listing,
+            kind=form.cleaned_data["kind"],
+            summary=form.cleaned_data["summary"],
+            body=form.cleaned_data["body"],
+            occurred_at=form.cleaned_data["occurred_at"],
+            contact=form.cleaned_data.get("contact"),
+            artefact=form.cleaned_data.get("document"),
+        )
+        messages.success(request, _("Added to the listing's history."))
+        return redirect(f"{listing.get_absolute_url()}#history")
+
+
 class ListingApplyView(OwnedObjectMixin, View):
     """The decision that matters: apply. Creates the application and leaves the listing."""
 

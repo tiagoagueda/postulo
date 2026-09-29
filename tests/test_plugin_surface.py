@@ -396,6 +396,73 @@ def test_the_surface_holds_what_a_sync_needs():
         assert getattr(api, name) is not None, name
 
 
+def test_the_surface_holds_the_one_call_into_a_listings_history():
+    """A listing has a history since #270, and a plugin that binds has one way into it.
+
+    One name, not a model and a manager: the rows are Postulo's, and the call is what keeps
+    the owner, the length of a stranger's text and the idempotency of a message id with
+    Postulo rather than with every plugin that files a mail.
+    """
+    from postulo.jobs.history import record_listing_event
+    from postulo.plugins import api
+
+    assert "record_listing_event" in api.__all__
+    assert api.record_listing_event is record_listing_event
+    with pytest.raises(AttributeError, match="not part of the plugin surface"):
+        api.ListingEvent  # noqa: B018
+
+
+@pytest.mark.django_db
+def test_a_plugin_binds_to_the_listing_of_a_record_it_holds_and_never_chooses_the_owner(
+    user, other_user
+):
+    """Handed an application -- a record a sync already walks -- the entry goes on its
+    listing, the owner is the listing's, and a contact of anybody else's is refused."""
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.history import NotBound
+    from postulo.jobs.models import Company, Contact, JobPosting
+    from postulo.plugins import api
+    from postulo.plugins.testing import listing_history
+
+    company = Company.objects.create(owner=user, name="Black Mesa")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Researcher")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+    stranger = Contact.objects.create(owner=other_user, name="Gordon")
+
+    entry, created = api.record_listing_event(
+        application,
+        kind=api.EventKind.EMAIL_RECEIVED,
+        summary="It closes on Friday",
+        body="A reminder from the board.",
+        actor="imap",
+        external_id="<closes-friday@board.example>",
+    )
+    again, created_again = api.record_listing_event(
+        application, summary="It closes on Friday", external_id="<closes-friday@board.example>"
+    )
+
+    assert created and not created_again and again.pk == entry.pk
+    assert entry.posting_id == posting.pk
+    assert listing_history(posting) == [
+        {
+            "kind": "email_received",
+            "summary": "It closes on Friday",
+            "body": "A reminder from the board.",
+            "occurred_at": entry.occurred_at,
+            "actor": "imap",
+            "external_id": "<closes-friday@board.example>",
+            "contact": "",
+            "points_at": "",
+        }
+    ]
+    assert listing_history(application) == listing_history(posting), "one history, read twice"
+    with pytest.raises(NotBound):
+        api.record_listing_event(posting, summary="From a stranger", contact=stranger)
+    with pytest.raises(TypeError):
+        api.record_listing_event(company, summary="Not a listing")
+    assert len(listing_history(posting)) == 1
+
+
 def test_the_surface_hands_over_the_same_object_the_core_uses():
     """A re-export that is a copy would be a second thing to keep current.
 

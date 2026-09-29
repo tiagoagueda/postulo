@@ -56,6 +56,13 @@ urlpatterns = [
         capture_views.CaptureDiscardSelectedView.as_view(),
         name="capture_discard_selected",
     ),
+    # A second capture of an advert already in the listings, added to that listing's
+    # history rather than made into another listing (#270). POST only, from the review.
+    path(
+        "captures/<int:pk>/bind/",
+        capture_views.CaptureBindView.as_view(),
+        name="capture_bind",
+    ),
     # What a capture kept of the page it was read from (#256). The source has two
     # addresses and neither answers it as a page: one shows it as text, one downloads it
     # as text.

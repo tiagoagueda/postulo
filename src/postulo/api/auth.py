@@ -66,33 +66,51 @@ class TokenAuth(HttpBearer):
 
 
 class ScopedAuth(HttpBearer):
-    """An active token holding one particular scope."""
+    """An active token holding one particular scope, or any one of several.
 
-    def __init__(self, scope: str) -> None:
+    Several where a narrow scope and a wide one both cover a call (#270): recording an entry
+    in a listing's history is what `listings:bind` is for, and `write` already records and
+    changes listings, so either will do. The first named is the narrowest, and it is the one
+    a refusal names -- the scope a client should ask for is the least that would work.
+    """
+
+    def __init__(self, scope: str, *others: str) -> None:
         super().__init__()
         self.scope = scope
+        self.scopes = (scope, *others)
 
     def authenticate(self, request, token: str):
         record = lookup(token)
         if record is None:
             return None
-        if not record.has_scope(self.scope):
+        if not any(record.has_scope(name) for name in self.scopes):
             # Typed, with the scope beside it: a client refused here has something to do
             # about it -- ask for a token carrying that scope -- and should not have to
-            # parse the sentence to learn which one it is (#296).
+            # parse the sentence to learn which one it is (#296). Where more than one would
+            # do, `scopes` lists them all, narrowest first.
+            if len(self.scopes) == 1:
+                raise problems.Refused(
+                    403,
+                    f"This token does not have the '{self.scope}' scope.",
+                    kind="insufficient-scope",
+                    scope=self.scope,
+                )
+            named = " or ".join(f"'{name}'" for name in self.scopes)
             raise problems.Refused(
                 403,
-                f"This token does not have the '{self.scope}' scope.",
+                f"This token has none of the scopes this call takes: {named}.",
                 kind="insufficient-scope",
                 scope=self.scope,
+                scopes=list(self.scopes),
             )
         _within_its_allowance(record)
         record.record_use()
         return record
 
 
-def scope(name: str) -> ScopedAuth:
-    return ScopedAuth(name)
+def scope(name: str, *others: str) -> ScopedAuth:
+    """The guard for a call: a token holding ``name``, or any of ``others``."""
+    return ScopedAuth(name, *others)
 
 
 def for_readers_of_the_api(view):

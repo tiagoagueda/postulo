@@ -136,6 +136,14 @@ EXCUSED: dict[str, str] = {
     "jobs:capture_discard_selected": (
         "a POST from the listings page's captures block, which is visited"
     ),
+    "jobs:capture_bind": (
+        "a POST that adds a capture to a listing's history; the buttons are on the review "
+        "page, which the suite visits with a listing it matches (#270)"
+    ),
+    "listings:event_create": (
+        "a POST that adds an entry to a listing's history; the form is on the listing's "
+        "page, which the suite visits, and a mistake draws that same page again (#270)"
+    ),
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",

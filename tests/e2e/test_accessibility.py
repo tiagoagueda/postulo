@@ -199,6 +199,33 @@ def furnished(applicant):
     # in, the source as text, and the buttons under each -- and the two settings pages
     # are walked with their switches on rather than locked.
     _keep_the_page_of(capture)
+    # What arrived about the listing before and beside its application (#270): a message
+    # from somebody recorded, a file somebody forwarded, and the same advert captured again
+    # from another board -- so both pages that draw a listing's history, the listing's own
+    # and the application's, are walked with every sort of entry on them. And a listing at
+    # the waiting capture's address, so its review screen offers to add it to a history.
+    from postulo.jobs.history import bind_capture, record_listing_event
+
+    record_listing_event(
+        posting,
+        kind="message",
+        summary="The counsellor sent the advert",
+        body="Worth a look.\nThey close on Friday.",
+        contact=company.contacts.first(),
+    )
+    record_listing_event(posting, kind="document", summary="The full description", artefact=upload)
+    bind_capture(
+        Capture.objects.create(
+            owner=applicant,
+            url="https://boards.example/test-engineer",
+            source_name="schema.org",
+            data={"title": "Test Engineer", "company_name": "Aperture Science"},
+        ),
+        posting,
+    )
+    JobPosting.objects.filter(owner=applicant, title="Undecided Role").update(
+        url="https://jobs.example.org/42"
+    )
     interview = application.interviews.first()
     # An offer with every field, so the comparison page and the card have something to
     # draw in both themes (#237).

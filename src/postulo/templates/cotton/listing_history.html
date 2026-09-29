@@ -1,0 +1,60 @@
+{% load i18n %}
+<c-vars events />
+{% comment %} A listing's history, newest first (#270): `<c-listing-history :events="listing_events" />`.
+
+   Drawn on two pages -- the listing's own, and an application's, which reads it through its
+   posting as the first part of one history -- which is why it is a component. The line,
+   the dot and the date are the timeline's, so the two parts read as one thing.
+
+   Every word in an entry may be a stranger's: an email's subject, a counsellor's message,
+   the title a board gave its advert. It is printed as text and nothing else -- escaped,
+   with its line breaks kept, never read as markup or turned into links (#218). The only
+   links are the ones Postulo makes: to a file in the person's documents, served through the
+   ownership check, and to a capture's advert and the page it kept. What an entry points at
+   is drawn only while it is there and the person's own (`ListingEvent.points_at`).
+{% endcomment %}
+<ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800" data-listing-history>
+  {% for event in events %}
+    <li class="mb-6 last:mb-0" data-listing-event="{{ event.kind }}">
+      <span class="absolute -start-1.5 mt-1.5 h-3 w-3 rounded-full bg-ink-300 dark:bg-ink-600"></span>
+      <div class="flex flex-wrap items-baseline gap-2">
+        <p class="font-medium wrap-anywhere">{{ event.summary|default:event.get_kind_display }}</p>
+        <span class="text-xs text-ink-400">{{ event.occurred_at|date:"DATETIME_FORMAT" }}</span>
+        {% if event.actor %}
+          <span class="text-xs text-ink-400" data-actor>
+            {% blocktranslate with actor=event.actor trimmed %}via {{ actor }}{% endblocktranslate %}
+          </span>
+        {% endif %}
+        <span class="badge" data-tone="grey">{{ event.get_kind_display }}</span>
+      </div>
+      {% if event.contact %}
+        <p class="mt-1 text-sm text-ink-600 dark:text-ink-300" data-from>
+          <span class="text-ink-500 dark:text-ink-400">{% translate "From" %}</span>
+          <bdi>{{ event.contact.name }}</bdi>
+        </p>
+      {% endif %}
+      {% if event.body %}
+        <p class="mt-1 whitespace-pre-line text-sm text-ink-600 wrap-anywhere dark:text-ink-300" data-body>{{ event.body }}</p>
+      {% endif %}
+      {% with capture=event.bound_capture document=event.bound_document %}
+        {% if capture %}
+          <p class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-sm" data-points-at="capture">
+            {% if event.advert_address %}
+              <a href="{{ event.advert_address }}" rel="noopener noreferrer external" target="_blank"
+                 class="text-brand-600 underline dark:text-brand-400">{% translate "Open the advert" %}</a>
+            {% endif %}
+            {% if capture.kept_page %}
+              <a href="{% url 'jobs:capture_page' capture.pk %}"
+                 class="text-brand-600 underline dark:text-brand-400">{% translate "The page as captured" %}</a>
+            {% endif %}
+          </p>
+        {% elif document %}
+          <p class="mt-1 text-sm" data-points-at="document">
+            <a href="{% url 'documents:upload_download' document.pk %}"
+               class="text-brand-600 underline wrap-anywhere dark:text-brand-400">{{ document.title }}</a>
+          </p>
+        {% endif %}
+      {% endwith %}
+    </li>
+  {% endfor %}
+</ol>

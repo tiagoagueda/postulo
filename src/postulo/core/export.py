@@ -54,8 +54,11 @@ from postulo import __version__
 #: was read from, as the names of two files in the media folder and what each is, or
 #: nothing where nothing was kept (#256). 22 added ``nav_order`` and ``hidden_nav_items``
 #: on the profile: the main navigation as the person arranged it, the order and what they
-#: switched off, which had never travelled with the account (#299).
-FORMAT_VERSION = 22
+#: switched off, which had never travelled with the account (#299). 23 added ``events`` on a
+#: posting: its history, each entry with who it came from as a contact's id in this file
+#: and what it points at as an ``artefact_kind`` and an ``artefact_ref`` -- a capture or an
+#: upload, by its id here (#270).
+FORMAT_VERSION = 23
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -201,6 +204,19 @@ EVENT_FIELDS = (
     # Why the application ended, on the entry that ended it (#239). Here rather than on
     # the application because here is where it is: the log is the account of what happened.
     "end_reason",
+    "actor",
+    "created_at",
+)
+#: One entry in a listing's history (#270). Who it came from is a contact's id in this file,
+#: as an application's contact is; what it points at is written beside it by kind and id.
+LISTING_EVENT_FIELDS = (
+    "id",
+    "kind",
+    "occurred_at",
+    "summary",
+    "body",
+    "contact_id",
+    "external_id",
     "actor",
     "created_at",
 )
@@ -498,6 +514,27 @@ def _kept_page(capture) -> dict | None:
     }
 
 
+def _listing_event(event) -> dict:
+    """One entry in a listing's history, and what it points at by kind and local id (#270).
+
+    What it points at is a capture or an upload, each of which the archive carries under
+    its own id; a kind and an id rather than a content type, which is this instance's row
+    number for a model and means nothing in the file -- the rule `_source_of` follows for a
+    sent document. An entry whose capture or file has gone points at nothing and keeps its
+    words, as it does here.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    pointed = event.artefact_type_id and event.artefact_id
+    return {
+        **_fields(event, LISTING_EVENT_FIELDS),
+        "artefact_kind": (
+            ContentType.objects.get_for_id(event.artefact_type_id).model if pointed else ""
+        ),
+        "artefact_ref": event.artefact_id if pointed else None,
+    }
+
+
 def counts(user) -> dict[str, int]:
     """How many of each kind of record an export would carry, without building one.
 
@@ -507,18 +544,21 @@ def counts(user) -> dict[str, int]:
     turned into JSON, so that eight numbers could be printed. On SQLite that was done while
     holding the write lock, which is #220 in a single page.
 
-    Nine `COUNT(*)` queries instead. They agree with the document's own counts because
+    Ten `COUNT(*)` queries instead. They agree with the document's own counts because
     everything here is filtered by owner exactly as the document's queries are, and
     `tests/test_export.py` holds the two together.
     """
     from postulo.applications.models import Application, Interview
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, CapturedPage, Company
+    from postulo.jobs.models import Capture, CapturedPage, Company, ListingEvent
 
     return {
         # The pages captures kept, which are files in the archive like any other (#256).
         "captured_pages": CapturedPage.objects.for_user(user).count(),
         "companies": Company.objects.for_user(user).count(),
+        # What arrived about each listing (#270): carried under its posting, and gone
+        # with the account like the rest.
+        "listing_events": ListingEvent.objects.for_user(user).count(),
         "applications": Application.objects.for_user(user).count(),
         "interviews": Interview.objects.for_user(user).count(),
         "cvs": CV.objects.for_user(user).count(),
@@ -589,6 +629,7 @@ def build_document(user) -> dict:
         "industries",
         "identifiers",
         "contacts",
+        "postings__events",
         "postings__applications__events",
         "postings__applications__reminders",
         "postings__applications__interviews__contacts",
@@ -620,6 +661,10 @@ def build_document(user) -> dict:
                 "postings": [
                     {
                         **_fields(posting, POSTING_FIELDS),
+                        # Its history (#270), under the listing it belongs to. The
+                        # applications below read it through their posting and carry no
+                        # copy of it, so it is written once, here.
+                        "events": [_listing_event(event) for event in posting.events.all()],
                         "applications": [
                             {
                                 **_fields(application, APPLICATION_FIELDS),
@@ -734,6 +779,11 @@ def build_document(user) -> dict:
     document["counts"] = {
         "captured_pages": sum(1 for capture in document["captures"] if capture["page"]),
         "companies": len(document["companies"]),
+        "listing_events": sum(
+            len(posting["events"])
+            for company in document["companies"]
+            for posting in company["postings"]
+        ),
         "applications": sum(
             len(posting["applications"])
             for company in document["companies"]

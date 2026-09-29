@@ -20,8 +20,18 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.models import OwnedModel
 
 #: What a token may do. A token holds any set of these; the capture API needs only the first.
+#:
+#: `listings:bind` is for a client that only attaches things (#270): a mail client filing
+#: the message somebody is reading into a listing's history. `write` covers applications,
+#: listings, notes, reminders and letters, which is far more than a mail client should hold;
+#: this records an entry in a listing's history, reads the list of listings to choose one
+#: from, and does nothing else.
 SCOPES = {
     "captures": _("Capture postings"),
+    "listings:bind": _(
+        "Add to a listing's history, and see the list of listings to choose one: for a mail "
+        "client that files messages"
+    ),
     "read": _("Read everything: applications, listings, companies, documents, insights"),
     "write": _("Record and change: applications, listings, notes, reminders, letters"),
     "documents:read": _("Download the files themselves"),

@@ -23,6 +23,7 @@ from .models import (
     Department,
     Industry,
     JobPosting,
+    ListingEvent,
     LocationSource,
 )
 
@@ -749,3 +750,116 @@ class JobPostingForm(OwnerScopedModelForm):
         one with a user does — there is nobody else's data in it to keep apart (#266).
         """
         return {"title-suggestions": esco.suggestions()}
+
+
+def who_and_where(contact) -> str:
+    """A contact as a choice: the name, and the company beside it where there is one.
+
+    Two people called the same thing are otherwise two identical lines in a list, and
+    choosing between them would be a guess. Here rather than beside the application form
+    that first needed it (#239), because a listing's history asks the same question (#270).
+    """
+    if contact.company_id:
+        return f"{contact.name} · {contact.company.name}"
+    return contact.name
+
+
+class ListingEventForm(OwnerScopedModelForm):
+    """Add an entry to a listing's history: what arrived about it, or what was said (#270).
+
+    What the timeline's own form asks -- the kind, when, a line, the details -- and two
+    questions it never needed: who it came from, and which of the person's files it is
+    about. Both are chosen from the person's own records, and each is offered only where
+    there is something to choose, because a picker of one empty option is a control asking
+    to be ignored. A capture is not offered as a kind: binding one writes its own entry, from
+    the review screen, pointing at the capture itself.
+
+    The details are held to the length `jobs.history` keeps, here as well as there, so a
+    pasted thread is refused with a sentence rather than cut without one.
+    """
+
+    #: The person's own files, set in `scope_querysets`, which reaches into `documents` when it
+    #: runs -- or the field is taken away there, where there are none to choose from.
+    document = forms.ModelChoiceField(
+        label=_("A file from your documents"),
+        queryset=None,
+        required=False,
+        help_text=_(
+            "It stays in your documents, where it is kept; the entry points at it, and "
+            "keeps its own words if the file is ever deleted."
+        ),
+    )
+
+    class Meta:
+        model = ListingEvent
+        fields = ("kind", "occurred_at", "summary", "body", "contact")
+        labels = {"contact": _("From")}
+        help_texts = {
+            "kind": _(
+                "What it was. Another capture of the same advert is added from the review "
+                "screen, so it is not offered here."
+            ),
+            "occurred_at": _("When it happened, which is not always when you write it down."),
+            "summary": _("The line the history shows."),
+            "body": _(
+                "Anything longer: the message itself, or what was said on the phone. It sits "
+                "under the line."
+            ),
+            "contact": _("Who it came from, if it is somebody you have recorded."),
+        }
+        widgets = {
+            "occurred_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
+            "body": forms.Textarea(attrs={"rows": 4}),
+        }
+
+    def scope_querysets(self) -> None:
+        from django.core.validators import MaxLengthValidator
+
+        from postulo.documents.models import UploadedDocument
+
+        from .history import BODY_MAX_CHARS
+        from .models import SYSTEM_LISTING_EVENT_KINDS, ListingEventKind
+
+        when = self.fields["occurred_at"]
+        when.input_formats = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d"]
+        when.initial = timezone.localtime()
+
+        body = self.fields["body"]
+        body.max_length = BODY_MAX_CHARS
+        body.validators.append(MaxLengthValidator(BODY_MAX_CHARS))
+        body.widget.attrs["maxlength"] = str(BODY_MAX_CHARS)
+
+        kinds = [
+            (value, label)
+            for value, label in ListingEventKind.choices
+            if value not in SYSTEM_LISTING_EVENT_KINDS
+        ]
+
+        contacts = Contact.objects.for_user(self.user).select_related("company")
+        if contacts.exists():
+            self.fields["contact"].queryset = contacts
+            self.fields["contact"].empty_label = _("Nobody you have recorded")
+            self.fields["contact"].label_from_instance = who_and_where
+        else:
+            del self.fields["contact"]
+
+        files = UploadedDocument.objects.for_user(self.user)
+        if files.exists():
+            self.fields["document"].queryset = files
+            self.fields["document"].empty_label = _("No file")
+        else:
+            # And no *document* kind either: an entry that says it is a file has to point
+            # at one, and there is none to point at yet.
+            del self.fields["document"]
+            kinds = [(value, label) for value, label in kinds if value != ListingEventKind.DOCUMENT]
+        self.fields["kind"].choices = kinds
+
+    def clean(self):
+        from .models import ListingEventKind
+
+        cleaned = super().clean()
+        if cleaned.get("kind") == ListingEventKind.DOCUMENT and not cleaned.get("document"):
+            self.add_error("document", _("Choose which of your files it is."))
+        return cleaned

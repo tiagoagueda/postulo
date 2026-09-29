@@ -11,9 +11,27 @@
    was pressed. Somebody reading the screen has no other way to learn that the thing they
    asked for happened; the alert region #226 renders speaks for failures, and this speaks
    for the ordinary case.
+
+   One history in two parts (#270). What arrived about the listing -- the advert captured
+   again, a message, a forwarded description -- is the listing's, read through the posting
+   rather than copied when the application was made, and it comes first; the application's
+   own timeline follows. Where the listing has no history the region is what it always was.
 {% endcomment %}
 <div id="timeline"{% if oob %} hx-swap-oob="true"{% endif %} aria-live="polite">
   <c-section-title>{% translate "What happened" %}</c-section-title>
+  {% if listing_events %}
+    <div class="mb-8" data-history-part="listing">
+      <div class="mb-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <h3 class="text-sm font-medium text-ink-600 dark:text-ink-300">{% translate "The listing" %}</h3>
+        <a href="{% url 'jobs:posting_detail' application.posting_id %}#history"
+           class="text-xs text-brand-600 underline dark:text-brand-400">{% translate "Add to it on the listing's page" %}</a>
+      </div>
+      <c-listing-history :events="listing_events" />
+    </div>
+    <h3 class="mb-3 text-sm font-medium text-ink-600 dark:text-ink-300" data-history-part="application">
+      {% translate "This application" %}
+    </h3>
+  {% endif %}
   {% if events %}
     <ol class="relative border-s border-ink-200 ps-6 dark:border-ink-800">
       {% for event in events %}
@@ -29,9 +47,7 @@
               </span>
             {% endif %}
             {% if event.kind != 'status_change' %}
-              <span class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 dark:bg-ink-800 dark:text-ink-300">
-                {{ event.get_kind_display }}
-              </span>
+              <span class="badge" data-tone="grey">{{ event.get_kind_display }}</span>
             {% endif %}
           </div>
           {% comment %} Why it ended, on the entry that ended it (#239). The reason is a

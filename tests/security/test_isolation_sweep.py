@@ -340,6 +340,9 @@ FACTORIES: dict[str, Callable] = {
     "jobs:capture_page_rendering": pk_of(kept_page),
     "jobs:capture_page_source": pk_of(kept_page),
     "jobs:capture_review": pk_of(capture),
+    # Adding somebody else's capture to a listing's history (#270). The listing it names
+    # is in the body; tests/security/test_listing_history.py asks for somebody else's there.
+    "jobs:capture_bind": pk_of(capture),
     "jobs:company_cell": pk_of(company, column="name"),
     "jobs:company_delete": pk_of(company),
     "jobs:company_detail": pk_of(company),
@@ -361,6 +364,7 @@ FACTORIES: dict[str, Callable] = {
     "listings:apply": pk_of(posting),
     "listings:cell": pk_of(posting, column="title"),
     "listings:discard": pk_of(posting),
+    "listings:event_create": pk_of(posting),
     "listings:restore": pk_of(posting),
     "listings:shortlist": pk_of(posting),
     # the career record
@@ -388,6 +392,8 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:interview_calendar": ("get", pk_of(interview), {}),
     "postulo-api:get_offer": ("get", pk_of(offer), {}),
     "postulo-api:get_listing": ("get", pk_of(posting), {}),
+    # An entry for somebody else's listing's history (#270).
+    "postulo-api:add_listing_event": ("post", pk_of(posting), {"summary": "x"}),
     "postulo-api:apply": ("post", pk_of(posting), {}),
     "postulo-api:discard": ("post", pk_of(posting), {}),
     "postulo-api:restore": ("post", pk_of(posting), {}),

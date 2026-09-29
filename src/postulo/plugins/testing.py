@@ -31,6 +31,12 @@ a dot is still a dependency.
 reach for it, and a new entry is a decision somebody makes on purpose. A stale entry is a
 failure too — see `unused_allowances` — because one nobody removed hides the next real
 dependency behind it.
+
+**And what a call wrote, read back (#270).** `record_listing_event` is on the surface and the
+rows it writes are not: the model is Postulo's to change. A plugin that binds things to a
+listing still has to see, in its own tests, what its call wrote -- `listing_history` is
+that, as plain values, so a plugin's test suite can assert on the outcome without depending
+on the table underneath it.
 """
 
 from __future__ import annotations
@@ -145,3 +151,38 @@ def assert_imports_only_the_surface(
         f"{package} no longer imports {stale}. Delete those entries from `allowed`: the "
         f"list is the map of what is left to do, and a stale entry hides the next one."
     )
+
+
+def listing_history(record) -> list[dict]:
+    """A listing's history as plain values, newest first, for a plugin's own tests (#270).
+
+    ``record`` is what `record_listing_event` takes: the listing, or an application whose
+    listing it is. Each entry is its ``kind``, ``summary``, ``body``, ``occurred_at``,
+    ``actor`` and ``external_id``; ``contact``, the name of whoever it came from or empty;
+    and ``points_at``, ``"capture"``, ``"document"`` or empty -- the same things the page
+    and the API say about it, and nothing a plugin could not have written itself.
+
+    Read, never written: a test that wants an entry makes one through the surface.
+    """
+    from postulo.jobs.history import history_of, listing_of
+
+    entries = []
+    for event in history_of(listing_of(record)):
+        points_at = ""
+        if event.bound_capture is not None:
+            points_at = "capture"
+        elif event.bound_document is not None:
+            points_at = "document"
+        entries.append(
+            {
+                "kind": event.kind,
+                "summary": event.summary,
+                "body": event.body,
+                "occurred_at": event.occurred_at,
+                "actor": event.actor,
+                "external_id": event.external_id,
+                "contact": event.contact.name if event.contact_id else "",
+                "points_at": points_at,
+            }
+        )
+    return entries

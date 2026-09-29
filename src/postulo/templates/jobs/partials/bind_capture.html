@@ -1,0 +1,22 @@
+{% load i18n %}
+{% comment %} The way to say the capture under review is the same advert as a listing it
+   matched (#270): add it to that listing's history instead of saving a second listing. A
+   form of its own per listing, outside the review form, so the two never nest. The button's
+   description is the link naming the listing just above it, `known-listing-<pk>`, because a
+   page offering two of these is two buttons with the same words. `listing` and `capture`
+   are the include's. {% endcomment %}
+<form method="post" action="{% url 'jobs:capture_bind' capture.pk %}"
+      class="mt-2 flex flex-wrap items-center gap-2" data-bind-capture>
+  {% csrf_token %}
+  <input type="hidden" name="listing" value="{{ listing.pk }}">
+  <button type="submit" class="btn" data-variant="outline" data-size="sm"
+          aria-describedby="known-listing-{{ listing.pk }}">
+    {% translate "Add this capture to its history" %}
+  </button>
+  {% if next_url %}
+    <button type="submit" name="next" value="1" class="btn" data-variant="ghost" data-size="sm"
+            aria-describedby="known-listing-{{ listing.pk }}">
+      {% translate "Add it, and next" %}
+    </button>
+  {% endif %}
+</form>

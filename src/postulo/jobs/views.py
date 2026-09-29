@@ -836,6 +836,36 @@ class ContactExportView(OwnedObjectMixin, View):
 # -------------------------------------------------------------------- postings
 
 
+def listing_page_context(request, posting, *, event_form=None) -> dict:
+    """What the listing's page draws beyond the listing: its history, and what it kept.
+
+    Written once for the two views that draw the page -- reading it, and adding to its
+    history with a mistake in the form, which draws it again with the errors (#270).
+    """
+    from .forms import ListingEventForm
+    from .history import history_of
+    from .models import CapturedPage
+
+    return {
+        "posting": posting,
+        "object": posting,
+        "discard_reasons": DiscardReason.choices,
+        # What was kept of the page this listing was captured from, if anything was
+        # (#256). Here as well as on the review screen, because this is where somebody
+        # looks once the advert has gone: the listing outlives the posting. A capture bound
+        # to it later is one of these too (#270).
+        "kept_pages": (
+            CapturedPage.objects.for_user(request.user)
+            .filter(capture__posting=posting)
+            .select_related("capture")
+        ),
+        # What arrived about it, newest first (#270): the same entries the application's
+        # page reads through its posting, once there is an application.
+        "listing_events": history_of(posting),
+        "event_form": event_form or ListingEventForm(user=request.user),
+    }
+
+
 class PostingDetailView(OwnedObjectMixin, DetailView):
     model = JobPosting
     template_name = "jobs/posting_detail.html"
@@ -845,18 +875,8 @@ class PostingDetailView(OwnedObjectMixin, DetailView):
         return super().get_queryset().select_related("company").with_application_count()
 
     def get_context_data(self, **kwargs):
-        from .models import CapturedPage
-
         context = super().get_context_data(**kwargs)
-        context["discard_reasons"] = DiscardReason.choices
-        # What was kept of the page this listing was captured from, if anything was
-        # (#256). Here as well as on the review screen, because this is where somebody
-        # looks once the advert has gone: the listing outlives the posting.
-        context["kept_pages"] = (
-            CapturedPage.objects.for_user(self.request.user)
-            .filter(capture__posting=self.object)
-            .select_related("capture")
-        )
+        context.update(listing_page_context(self.request, self.object))
         return context
 
 
@@ -900,20 +920,59 @@ class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         applications = self.object.applications.all()
         number = applications.count()
+        consequences = []
         if number:
-            context["consequences"] = [
+            consequences.append(
                 ngettext(
                     "%(count)d application, with its timeline",
                     "%(count)d applications, with their timelines",
                     number,
                 )
                 % {"count": number}
-            ]
+            )
+        # Its history goes with it; what the history pointed at does not (#270). A file
+        # somebody forwarded lives in their documents and a capture stays a capture, and
+        # saying so here is the difference between deleting a listing and deleting those.
+        entries = self.object.events.all()
+        if entries.exists():
+            consequences.append(
+                ngettext(
+                    "%(count)d entry in its history",
+                    "%(count)d entries in its history",
+                    entries.count(),
+                )
+                % {"count": entries.count()}
+            )
+        if consequences:
+            context["consequences"] = consequences
+        kept = []
         sent = RenderedDocument.objects.filter(application__in=applications).count()
         if sent:
-            context["kept"] = ngettext(
-                "The %(count)d document you sent is kept, and still says where it went.",
-                "The %(count)d documents you sent are kept, and still say where they went.",
-                sent,
-            ) % {"count": sent}
+            kept.append(
+                ngettext(
+                    "The %(count)d document you sent is kept, and still says where it went.",
+                    "The %(count)d documents you sent are kept, and still say where they went.",
+                    sent,
+                )
+                % {"count": sent}
+            )
+        pointed = (
+            entries.filter(artefact_id__isnull=False)
+            .order_by()
+            .values("artefact_type", "artefact_id")
+            .distinct()
+            .count()
+        )
+        if pointed:
+            kept.append(
+                ngettext(
+                    "The %(count)d file or capture its history points at is kept where it is.",
+                    "The %(count)d files and captures its history points at are kept where "
+                    "they are.",
+                    pointed,
+                )
+                % {"count": pointed}
+            )
+        if kept:
+            context["kept"] = " ".join(kept)
         return context

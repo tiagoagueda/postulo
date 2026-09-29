@@ -44,11 +44,14 @@ from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 #: What the document of one contact is, in the shape a program can read it back. Bumped the
 #: way the archive's format version is, when the shape changes in a way a reader notices.
+#: 2 added ``listing_events``: the entries in listings' histories that name the person as
+#: who they came from -- a message they sent, a call with them (#270).
 DOCUMENT_NAME = "postulo-contact"
-DOCUMENT_VERSION = 1
+DOCUMENT_VERSION = 2
 
 
 def is_offered(person=None) -> bool:
@@ -119,6 +122,31 @@ def _web_link_rows(contact) -> list[dict]:
     ]
 
 
+def _listing_event_rows(contact) -> list[dict]:
+    """Every entry in a listing's history that names this person as who it came from (#270).
+
+    What they said or sent is data about them as much as about the job, and this document
+    is the one that has to be complete. The listing is named by its title and company, the
+    way the entry reads on the page; nothing it points at is carried, because a capture or
+    a file is the account holder's record rather than something this person gave.
+    """
+    from postulo.jobs.models import ListingEvent
+
+    return [
+        {
+            "listing": event.posting.title,
+            "company": event.posting.company.name,
+            "kind": event.kind,
+            "occurred_at": event.occurred_at.isoformat() if event.occurred_at else "",
+            "summary": event.summary,
+            "body": event.body,
+        }
+        for event in ListingEvent.objects.filter(contact=contact).select_related(
+            "posting", "posting__company"
+        )
+    ]
+
+
 def contact_document(contact) -> dict:
     """Everything the instance holds on one other person, in one document.
 
@@ -138,6 +166,7 @@ def contact_document(contact) -> dict:
         "phone_numbers": _phone_rows(contact),
         "postal_addresses": _address_rows(contact),
         "web_links": _web_link_rows(contact),
+        "listing_events": _listing_event_rows(contact),
         "plugins": plugins,
     }
     if "not_carried" in plugins:
@@ -156,7 +185,8 @@ class ErasureReport:
 
     ``deleted`` is what stopped existing, by kind. ``unlinked`` is what survived but no
     longer points at the contact — an application keeps its history, it loses its main
-    contact, or whoever referred the person to it (#239). ``not_erased`` names the
+    contact, or whoever referred the person to it (#239); an entry in a listing's history
+    keeps its words and loses who it came from (#270). ``not_erased`` names the
     plugins that hold rows for this person and could not be asked: an erasure that leaves
     data it cannot see about is the same quiet incompleteness the export refuses, so it is
     said rather than discovered.
@@ -187,6 +217,17 @@ class ErasureReport:
             parts.append(
                 _("%(count)d application kept, without its referrer.")
                 % {"count": self.unlinked["referrals"]}
+            )
+        if self.unlinked.get("listing_events"):
+            # What they said stays in the listing's history, as the account holder's record
+            # of what arrived; who said it goes with them (#270).
+            parts.append(
+                ngettext(
+                    "%(count)d entry in a listing's history kept, without who it came from.",
+                    "%(count)d entries in listings' histories kept, without who they came from.",
+                    self.unlinked["listing_events"],
+                )
+                % {"count": self.unlinked["listing_events"]}
             )
         if self.not_erased:
             parts.append(
@@ -245,6 +286,7 @@ def erase_contact(contact) -> ErasureReport:
     is a deletion that cannot be undone and the report that said it happened is wrong.
     """
     from postulo.applications.models import Application
+    from postulo.jobs.models import ListingEvent
 
     with transaction.atomic():
         removed, not_erased = _erase_plugin_rows(contact)
@@ -259,6 +301,8 @@ def erase_contact(contact) -> ErasureReport:
             # The same person may have referred somebody to an application they were
             # never the contact for, and that link goes with them as well (#239).
             "referrals": Application.objects.filter(referred_by=contact).count(),
+            # And the entries in listings' histories that say they came from them (#270).
+            "listing_events": ListingEvent.objects.filter(contact=contact).count(),
         }
         name = contact.name
         contact.delete()

@@ -31,6 +31,7 @@ from postulo.core import tables
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
+from postulo.jobs.history import history_of
 from postulo.jobs.views import UserFormKwargsMixin
 
 from . import agenda, endings, ical, quiet, reports, suggestions
@@ -387,6 +388,9 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # is read from the same rows rather than asked for again (#239).
         context["events"] = list(self.object.events.all())
         context["ending"] = endings.read(self.object.status, endings.entries(context["events"]))
+        # What arrived about the listing, read through the posting rather than copied when
+        # the application was made (#270): the first part of one history, stored once.
+        context["listing_events"] = history_of(self.object.posting)
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
         context["offers"] = list(self.object.offers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
@@ -600,7 +604,14 @@ def detail_fragments(request, application, *, target: str, event_form=None):
     if target in ("status-card", "event-form"):
         html += render_to_string(
             "applications/partials/timeline.html",
-            {"events": application.events.all(), "oob": True},
+            {
+                "application": application,
+                "events": application.events.all(),
+                # Both parts of the history, or the swap would draw the timeline without
+                # the listing's half until the next full page (#270).
+                "listing_events": history_of(application.posting),
+                "oob": True,
+            },
             request=request,
         )
     return HttpResponse(html)

@@ -337,6 +337,54 @@ class CaptureReviewView(OwnedObjectMixin, View):
         return redirect(listing.get_absolute_url())
 
 
+class CaptureBindView(OwnedObjectMixin, View):
+    """Add a capture to the history of a listing it is the same advert as (#270).
+
+    The third answer on the review screen, beside saving it as a listing and discarding it.
+    `jobs.known` already said the advert had been seen -- at this address, or with this title
+    at this company -- and told rather than refused (#178); this is what telling was for. A
+    second listing for one job was one way to answer and throwing the capture away the
+    other, and the same advert on two boards is evidence about the job, so neither is right.
+
+    Both records are looked up among the person's own, so somebody else's capture and
+    somebody else's listing are each a 404, whichever of the two the request names.
+    """
+
+    def get_queryset(self):
+        return Capture.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from .history import AlreadyDecided, bind_capture
+        from .models import JobPosting
+
+        capture = get_object_or_404(self.get_queryset(), pk=pk)
+        try:
+            chosen = int(request.POST.get("listing", ""))
+        except ValueError:
+            chosen = 0
+        listing = get_object_or_404(
+            JobPosting.objects.for_user(request.user).select_related("company"), pk=chosen
+        )
+        try:
+            bind_capture(capture, listing)
+        except AlreadyDecided:
+            messages.info(request, _("That capture was already saved or discarded."))
+            return redirect(listing.get_absolute_url())
+        messages.success(
+            request,
+            format_html(
+                _("Added to the history of {listing}."),
+                listing=format_html(
+                    '<a href="{}" class="underline">{}</a>', listing.get_absolute_url(), listing
+                ),
+            ),
+            extra_tags="safe",
+        )
+        if request.POST.get("next"):
+            return after_deciding(request, capture)
+        return redirect(f"{listing.get_absolute_url()}#history")
+
+
 def discarded_link():
     """Where the discarded captures are, for the message that says so (#260).
 

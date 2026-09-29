@@ -1,4 +1,5 @@
-"""What happens to the files a capture kept when the row that names them goes (#256).
+"""What happens to the files a capture kept when the row that names them goes (#256), and to
+a listing's history when something it points at goes (#270).
 
 Django never removes a file when the row pointing at it is deleted, so a deletion that
 stopped at the database would leave a copy of somebody else's page on the disk with nothing
@@ -18,13 +19,39 @@ from __future__ import annotations
 
 import logging
 
+from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
-from .models import CapturedPage
+from .history import ARTEFACTS
+from .models import CapturedPage, ListingEvent
 
 logger = logging.getLogger(__name__)
+
+
+def forget_what_was_pointed_at(sender, instance, **kwargs) -> None:
+    """Deleting a capture or a file leaves the entries that pointed at it standing (#270).
+
+    An entry in a listing's history keeps the words it had -- the board, the title, what the
+    file was called -- and loses only the link, which is the `SET_NULL` a generic link has
+    no column to carry, written out as `documents.signals` writes it out for a render whose
+    source went. Cleared rather than left dangling: the columns would otherwise go on naming
+    an id another row could later take.
+    """
+    ListingEvent.objects.filter(
+        artefact_type=ContentType.objects.get_for_model(sender), artefact_id=instance.pk
+    ).update(artefact_type=None, artefact_id=None)
+
+
+# Connected by label, one receiver per kind of thing an entry may point at, so that a kind
+# added to `ARTEFACTS` is looked after from the day it is added.
+for _label in ARTEFACTS:
+    post_delete.connect(
+        forget_what_was_pointed_at,
+        sender=_label,
+        dispatch_uid=f"jobs.forget_listing_artefact.{_label}",
+    )
 
 
 @receiver(post_delete, sender=CapturedPage, dispatch_uid="jobs.remove_captured_page_files")
