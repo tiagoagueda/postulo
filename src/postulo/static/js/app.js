@@ -872,19 +872,158 @@
   // something has to clear it -- the sticky sidebars, the skip link, scroll-padding for
   // anchors -- and that the section observer below reads for its line. Set through the
   // CSSOM rather than a style attribute, which the content-security policy would drop.
+  //
+  // The main navigation is the same kind of problem at the other edge (#299): below `md` it
+  // is a bar fixed to the foot of the window, a line taller wherever a label wraps, and the
+  // page's bottom padding, `scroll-padding-bottom` and the failure alert all have to clear
+  // it. So its height goes into `--bottom-bar-height` the same way, and comes out again
+  // once the window is wide enough for the navigation to be a row in the masthead.
+  //
+  // A ResizeObserver as well as the window's resize: a label that wraps, a font that
+  // arrives late and a reader's own text-spacing stylesheet all change a height without the
+  // window changing at all. Writing the property moves nothing either element is sized by,
+  // so the observer cannot feed itself.
   var siteHeader = document.querySelector("[data-site-header]");
+  var mainNav = document.querySelector("[data-nav-main]");
   function measureHeader() {
+    var root = document.documentElement;
     if (siteHeader) {
-      document.documentElement.style.setProperty("--header-height", siteHeader.offsetHeight + "px");
+      root.style.setProperty("--header-height", siteHeader.offsetHeight + "px");
+    }
+    if (mainNav && window.getComputedStyle(mainNav).position === "fixed") {
+      root.style.setProperty("--bottom-bar-height", mainNav.offsetHeight + "px");
+    } else {
+      root.style.removeProperty("--bottom-bar-height");
     }
   }
   function headerHeight() {
     return siteHeader ? siteHeader.offsetHeight : 0;
   }
+
+  /* ------------------------------------------------ the row, fitted to its room
+   *
+   * How many items the masthead's row holds is decided in the stylesheet by breakpoint,
+   * for the widest language the reflow walk is taken in, because without a script nothing
+   * can measure what fits (#299). Where this runs it measures instead: the first items in
+   * the person's order that fit beside the wordmark and the tools, and the rest under
+   * *More* -- so English at 1440 gets all seven where the count, written for Greek, gave
+   * five, and a language wider than any the count was written for gets fewer rather than
+   * a masthead on two lines.
+   *
+   * It refines and never replaces. Every item is already in the line or under *More*
+   * before this runs, `data-fitted` is what lets its answer stand in for the count, and a
+   * script that fails half way leaves the count as the whole answer. Below `md` it takes
+   * its marks off again: the bar holds four, and that is not a question of room.
+   *
+   * Two measurements, because *More* has no width while it is hidden: everything in the
+   * line first, then the last item under *More* so that *More* is drawn. The search box
+   * counts at the width it opens to (`focus:w-48`, half as wide again as it rests), so
+   * that clicking into it never pushes the masthead onto a second line.
+   */
+  function lineItems() {
+    return Array.prototype.filter.call(mainNav.children, function (child) {
+      return child.tagName === "A";
+    });
+  }
+
+  function putUnderMore(key, under) {
+    Array.prototype.forEach.call(
+      mainNav.querySelectorAll('[data-nav="' + key + '"]'),
+      function (copy) {
+        copy.toggleAttribute("data-in-more", under);
+      }
+    );
+  }
+
+  function fitNavigation() {
+    if (!mainNav || !siteHeader) {
+      return;
+    }
+    var items = lineItems();
+    var more = mainNav.querySelector("[data-nav-more]");
+    var row = mainNav.parentElement;
+    var wordmark = row.firstElementChild;
+    var tools = mainNav.nextElementSibling;
+    if (window.getComputedStyle(mainNav).position === "fixed" || !more || !tools) {
+      mainNav.removeAttribute("data-fitted");
+      items.forEach(function (item) {
+        putUnderMore(item.dataset.nav, false);
+      });
+      return;
+    }
+    mainNav.setAttribute("data-fitted", "");
+    items.forEach(function (item) {
+      putUnderMore(item.dataset.nav, false);
+    });
+    var widths = items.map(function (item) {
+      return item.getBoundingClientRect().width;
+    });
+    if (items.length) {
+      putUnderMore(items[items.length - 1].dataset.nav, true);
+    }
+    var moreWidth = more.getBoundingClientRect().width;
+
+    var rowStyle = window.getComputedStyle(row);
+    var navGap = parseFloat(window.getComputedStyle(mainNav).columnGap) || 0;
+    var rowGap = parseFloat(rowStyle.columnGap) || 0;
+    var box = tools.querySelector("[data-search-shortcut]");
+    var opens = box && drawn(box) && document.activeElement !== box ? box.offsetWidth / 2 : 0;
+    var room =
+      row.clientWidth -
+      (parseFloat(rowStyle.paddingInlineStart) || 0) -
+      (parseFloat(rowStyle.paddingInlineEnd) || 0) -
+      wordmark.getBoundingClientRect().width -
+      tools.getBoundingClientRect().width -
+      opens -
+      2 * rowGap;
+
+    function lineWidth(count) {
+      var total = 0;
+      for (var i = 0; i < count; i++) {
+        total += widths[i] + (i ? navGap : 0);
+      }
+      return total;
+    }
+    var fits = items.length;
+    if (lineWidth(fits) > room) {
+      while (fits > 0 && lineWidth(fits) + (fits ? navGap : 0) + moreWidth > room) {
+        fits -= 1;
+      }
+    }
+    items.forEach(function (item, index) {
+      putUnderMore(item.dataset.nav, index >= fits);
+    });
+  }
+
+  var fitScheduled = false;
+  function scheduleFit() {
+    if (!fitScheduled) {
+      fitScheduled = true;
+      window.requestAnimationFrame(function () {
+        fitScheduled = false;
+        fitNavigation();
+      });
+    }
+  }
+
+  function measureChrome() {
+    measureHeader();
+    scheduleFit();
+  }
+
+  fitNavigation();
   measureHeader();
-  window.addEventListener("resize", measureHeader);
+  window.addEventListener("resize", measureChrome);
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(measureHeader);
+    document.fonts.ready.then(measureChrome);
+  }
+  if (window.ResizeObserver) {
+    var chromeWatcher = new window.ResizeObserver(measureChrome);
+    [siteHeader, mainNav].forEach(function (element) {
+      if (element) {
+        chromeWatcher.observe(element);
+      }
+    });
   }
 
   /*
@@ -911,6 +1050,15 @@
 
   // "/" jumps to the search box, as on most sites with one, unless the person is
   // already typing somewhere -- or has switched single-key shortcuts off.
+  //
+  // The masthead's box is there from `lg` up; below that the masthead has a link to the
+  // search page instead (#299), and the key follows it -- unless the page already has a
+  // box of its own on the screen, which is the search page itself. Whichever box is drawn
+  // first wins, so on a wide screen it is still the one in the masthead.
+  function drawn(element) {
+    return element.getClientRects().length > 0;
+  }
+
   document.addEventListener("keydown", function (event) {
     if (event.key !== "/" || event.ctrlKey || event.metaKey || event.altKey) {
       return;
@@ -918,11 +1066,20 @@
     if (!singleKeysAllowed() || keyboardIsBusy(event)) {
       return;
     }
-    var box = document.querySelector("[data-search-shortcut]");
+    var box = Array.prototype.filter.call(
+      document.querySelectorAll("[data-search-shortcut]"),
+      drawn
+    )[0];
     if (box) {
       event.preventDefault();
       box.focus();
       box.select();
+      return;
+    }
+    var link = document.querySelector("[data-search-link]");
+    if (link && drawn(link)) {
+      event.preventDefault();
+      link.click();
     }
   });
 

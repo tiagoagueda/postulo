@@ -52,8 +52,10 @@ from postulo import __version__
 #: no company, who had been left out of the archive because every contact in it was
 #: written under one (#239). 21 added ``page`` on a capture: what it kept of the page it
 #: was read from, as the names of two files in the media folder and what each is, or
-#: nothing where nothing was kept (#256).
-FORMAT_VERSION = 21
+#: nothing where nothing was kept (#256). 22 added ``nav_order`` and ``hidden_nav_items``
+#: on the profile: the main navigation as the person arranged it, the order and what they
+#: switched off, which had never travelled with the account (#299).
+FORMAT_VERSION = 22
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -89,6 +91,11 @@ PROFILE_FIELDS = (
     # new to somebody who has been reading their own dashboard for a year.
     "dashboard_widgets",
     "dashboard_known",
+    # The main navigation as it was arranged (#299): the keys placed, in order, and the ones
+    # switched off. Both are read back through `navigation.known_keys`, so an archive that
+    # names an item this instance does not have is passed over rather than trusted.
+    "nav_order",
+    "hidden_nav_items",
     "quiet_after_days",
     "use_gravatar",
     "show_career_order",

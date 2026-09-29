@@ -85,19 +85,24 @@
     {% block chrome %}
       {% comment %} The header floats: `sticky top-0`, so the wordmark, the navigation, the
          search and the account menu are there wherever the page has scrolled to (#195).
-         Its height is not a constant -- the row wraps on a narrow screen and in a language
-         with longer labels -- so `app.js` measures it into `--header-height` on the root,
+         Its height is not a constant -- an instance with a long name, or a row that does
+         not fit, wraps -- so `app.js` measures it into `--header-height` on the root,
          and everything that has to clear it (the sticky sidebars, the skip link, the
          anchors through `scroll-padding-top`, the section observer's line) reads that one
          value, with 3.5rem as the answer where scripts do not run. `z-30`: above the page
-         and its sticky sidebars, below the skip link's z-50. {% endcomment %}
+         and its sticky sidebars, below the skip link's z-50.
+
+         Below `md` the navigation inside it is a bar fixed to the foot of the window
+         (#299): out of the header's flow, so not in its height, and measured into
+         `--bottom-bar-height` instead. Fixed to the window *from inside the header*, so
+         nothing on the header may start a containing block of its own -- a `transform`,
+         a `filter`, a `backdrop-filter`, `contain` or `will-change` -- or the bar would be
+         fixed to the header and ride along at the top of the page. {% endcomment %}
       <header class="sticky top-0 z-30 border-b border-ink-200 bg-white dark:border-ink-800 dark:bg-ink-900"
               data-site-header>
-        {% comment %} `relative` so the narrow-screen navigation panel below can pin itself to
-           this row's two edges rather than to wherever the Menu button lands in it. {% endcomment %}
         {% comment %} No cap: the masthead spans the screen, so it never sits narrower than a
            table that has taken the width below it (#188). {% endcomment %}
-        <div class="relative flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
+        <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3">
           {% comment %}
             When the Dashboard link is hidden the wordmark takes the job over properly:
             the active style on the dashboard, and a name that says where it goes.
@@ -113,41 +118,26 @@
           </a>
 
           {% if user.is_authenticated %}
-            {% comment %} The navigation is a row of links at 768 pixels and up, and a
-               disclosure below that. Six links come to 635 pixels and a flex row does not
-               care about the viewport, so this one element made every page in Postulo
-               scroll sideways at 320 -- an AA failure under Reflow, on all of them, while
-               the accessibility suite passed because reflow is a question about a width
-               and axe is asked about a document (#113).
-
-               A <details>, like the account menu beside it: it opens and closes with no
-               script, and the script only adds "close when the pointer goes elsewhere".
-               Wrapping the row instead would have been one class, and would have put three
-               lines of navigation above every page on a phone. {% endcomment %}
-            <details class="md:hidden" data-menu>
-              {% comment %} No aria-label: the word beside the icon is the name, which is
-                 what a person saying "Menu" to a voice assistant expects to match. {% endcomment %}
-              <summary class="nav-link flex cursor-pointer list-none items-center gap-2">
-                {% icon "menu" class="size-4" %}{% translate "Menu" %}
-              </summary>
-              <nav class="absolute inset-x-4 top-full z-20 mt-2 rounded-xl border border-ink-200
-                          bg-white p-1 shadow-floating dark:border-ink-800 dark:bg-ink-900"
-                   aria-label="{% translate 'Main' %}">
-                {% include "partials/nav_links.html" with extra="block" %}
-              </nav>
-            </details>
-            <nav class="hidden items-center gap-1 md:flex" aria-label="{% translate 'Main' %}">
-              {% include "partials/nav_links.html" %}
-            </nav>
+            {% include "partials/nav_links.html" %}
 
             <div class="ms-auto flex items-center gap-1">
-              {# One box over everything. Small until it has focus; "/" jumps to it. #}
+              {% comment %} Search, in two shapes for two widths (#299). From `lg` up, one box
+                 over everything: small until it has focus, and "/" jumps to it. Below that
+                 the box would take the row's room, and on a phone there was no search at
+                 all -- so it is a link to the search page, which has a box of its own and
+                 works with scripts off. An icon standing alone, so it carries the name; 44
+                 pixels square, the target a thumb wants, like the account button beside
+                 it. The box grows by half rather than doubling: the row beside it is
+                 counted to fit with the box open, and every pixel the box takes when it
+                 opens is a pixel the row cannot have. {% endcomment %}
+              <a href="{% url 'core:search' %}" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
+                 data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</a>
               <form method="get" action="{% url 'core:search' %}" role="search"
-                    aria-label="{% translate 'Site search' %}" class="hidden md:block">
+                    aria-label="{% translate 'Site search' %}" class="hidden lg:block">
                 <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
                 <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
                        placeholder="{% if keyboard_shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
-                       class="w-32 py-1 text-sm transition-[width] focus:w-64">
+                       class="w-32 py-1 text-sm transition-[width] focus:w-48">
               </form>
               {% comment %} The + menu: what a person can start from anywhere (#282). A menu
                  of actions, so `role="menu"` is the right one here -- unlike the account

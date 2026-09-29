@@ -10,8 +10,9 @@
           aria-labelledby="search-q-label" class="mb-6 flex items-end gap-3">
       <div class="field flex-1">
         <label for="search-q" id="search-q-label">{% translate "Search everything" %}</label>
+        {# "/" comes here too where the masthead has a link rather than a box (#299). #}
         <input type="search" id="search-q" name="q" value="{{ query }}" class="w-full"
-               autofocus placeholder="{% translate 'A company, a role, a phrase from a letter, a name…' %}">
+               autofocus data-search-shortcut placeholder="{% translate 'A company, a role, a phrase from a letter, a name…' %}">
       </div>
       <button type="submit" class="btn">{% translate "Search" %}</button>
     </form>

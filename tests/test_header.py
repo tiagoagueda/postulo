@@ -78,6 +78,30 @@ def test_the_header_floats_and_everything_that_has_to_clear_it_reads_one_height(
     assert '"--header-height"' in script
 
 
+def test_the_bar_is_cleared_by_everything_that_has_to_clear_it():
+    """Below `md` the main navigation is a bar fixed to the foot of the window (#299). The
+    script measures it into `--bottom-bar-height`, and the page's own padding, the scroll
+    padding a focused link is placed by, and the failure alert all read that one value, with
+    the same fallback where no script runs -- the header's arrangement, at the other edge."""
+    import re
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    static = root / "src" / "postulo" / "static"
+    compiled = (static / "css" / "app.css").read_text(encoding="utf-8")
+    start = compiled.index("@media (width < 48rem) {\n  .nav-main {")
+    bar = compiled[start : compiled.index("\n}\n", start)]
+    assert "position: fixed" in bar and "bottom: 0px" in bar
+    fallback = "var(--bottom-bar-height, 4.5rem)"
+    assert re.search(r"body:has\(\.nav-main\) \{\s*padding-bottom: " + re.escape(fallback), bar)
+    assert "scroll-padding-bottom: calc(" + fallback + " + 1rem)" in bar
+    assert re.search(r"\.page-alert \{\s*bottom: calc\(" + re.escape(fallback), bar)
+
+    script = (static / "js" / "app.js").read_text(encoding="utf-8")
+    assert '"--bottom-bar-height"' in script and '"--header-height"' in script
+    assert "ResizeObserver" in script, "a label that wraps changes a height, not the window"
+
+
 def test_sign_out_stays_a_post(client, user):
     client.force_login(user)
     header = header_of(client.get(reverse("core:home")))

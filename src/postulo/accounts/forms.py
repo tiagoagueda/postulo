@@ -544,7 +544,17 @@ class CaptureKeepingForm(forms.ModelForm):
 
 
 class AppearanceForm(forms.ModelForm):
-    """Settings → Appearance: the theme, the navigation, and how the dashboard behaves."""
+    """Settings → Appearance: the theme, the navigation, and how the dashboard behaves.
+
+    The navigation is a list with a switch on each item and two arrows beside it (#299).
+    The arrows are submit buttons of this same form, the way the column chooser's are: a
+    move posts everything on the page, so a switch changed and not yet saved is saved with
+    it rather than lost, and none of it needs a script. The form reads three things the
+    fields do not declare -- ``nav_order``, every key in the order the page drew them;
+    ``nav_move``, at most one ``up:key`` or ``down:key``; and ``nav_reset`` -- because
+    all three are about the list as a whole, and a refusal on a hidden input would be an
+    error nobody could see.
+    """
 
     navigation = forms.MultipleChoiceField(
         label=_("Show in the navigation"),
@@ -555,6 +565,9 @@ class AppearanceForm(forms.ModelForm):
             "away. The Postulo wordmark always goes to the dashboard."
         ),
     )
+
+    #: The key that moved on this save and which way, for the view to say where it went.
+    moved: tuple[str, str] | None = None
 
     class Meta:
         model = Profile
@@ -584,24 +597,60 @@ class AppearanceForm(forms.ModelForm):
 
         from postulo.core import navigation
 
-        self.fields["navigation"].choices = navigation.choices()
-        hidden = set(self.instance.hidden_nav_items or []) if self.instance.pk else set()
+        # The switches in the person's order, which is the order the list is drawn in. A
+        # page that was refused comes back in the order it was posted in, so an
+        # arrangement nobody has saved yet is not taken away with the error.
+        self.nav_order = navigation.complete(self._posted("nav_order") or self._stored_order())
+        self.fields["navigation"].choices = [
+            (key, navigation.BY_KEY[key].label) for key in self.nav_order
+        ]
+        hidden = navigation.hidden_keys(self.instance) if self.instance.pk else set()
         self.initial.setdefault(
             "navigation", [key for key in navigation.HIDEABLE if key not in hidden]
         )
 
+    def _posted(self, name: str) -> list[str]:
+        if not self.is_bound or not hasattr(self.data, "getlist"):
+            return []
+        return self.data.getlist(name)
+
+    def _stored_order(self) -> list[str]:
+        from postulo.core import navigation
+
+        return navigation.order_of(self.instance) if self.instance.pk else []
+
+    @property
+    def nav_is_default(self) -> bool:
+        """Whether the list is in the default order, which is when *Back to the usual
+        order* has nothing to do and is not offered."""
+        from postulo.core import navigation
+
+        return not navigation.to_store(self.nav_order)
+
     def save(self, commit: bool = True) -> Profile:
-        """The form asks what to show; the profile records what to hide.
+        """The form asks what to show; the profile records what to hide, and the order.
 
         Storing the hidden ones rather than the shown ones is what makes a new item
         appear for everybody who has not decided about it, which is the behaviour a
-        person expects of an upgrade.
+        person expects of an upgrade. The order is stored the same way round: the keys
+        placed, and nothing at all for the default order (`navigation.to_store`).
         """
         from postulo.core import navigation
 
         profile = super().save(commit=False)
         shown = set(self.cleaned_data.get("navigation") or [])
         profile.hidden_nav_items = [key for key in navigation.HIDEABLE if key not in shown]
+
+        order = self.nav_order
+        if self._posted("nav_reset"):
+            order = list(navigation.DEFAULT_ORDER)
+        else:
+            direction, _sep, key = (self._posted("nav_move") or [""])[0].partition(":")
+            if navigation.can_move(order, key, direction):
+                order = navigation.move(order, key, direction)
+                self.moved = (key, direction)
+        self.nav_order = navigation.complete(order)
+        profile.nav_order = navigation.to_store(order)
         if commit:
             profile.save()
         return profile

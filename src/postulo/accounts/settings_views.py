@@ -66,6 +66,36 @@ class AppearanceView(ProfileSectionView):
     template_name = "settings/appearance.html"
     section_title = _("Appearance")
 
+    def form_valid(self, form):
+        """Saved, and when an arrow was pressed, where the item went (#299).
+
+        A move reloads the page, so it says the new place in words -- a move that happens
+        in silence is one somebody using a screen reader has to go looking for, which is
+        the dashboard's rule -- and the address carries a fragment that puts focus back on
+        the arrow that was pressed, so pressing it again moves the item again. At the end
+        of the list that arrow is disabled and cannot hold focus, and the item's row takes
+        it instead.
+        """
+        from postulo.core import navigation
+
+        self.object = form.save()
+        if not form.moved:
+            messages.success(self.request, self.saved_message)
+            return redirect(self.get_success_url())
+        key, direction = form.moved
+        order = form.nav_order
+        messages.success(
+            self.request,
+            _("%(name)s is now number %(place)s in the navigation.")
+            % {"name": navigation.BY_KEY[key].label, "place": order.index(key) + 1},
+        )
+        target = (
+            f"nav-{direction}-{key}"
+            if navigation.can_move(order, key, direction)
+            else f"nav-row-{key}"
+        )
+        return redirect(f"{self.request.path}#{target}")
+
 
 class AccessibilityView(ProfileSectionView):
     form_class = AccessibilityForm

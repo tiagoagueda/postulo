@@ -1,14 +1,52 @@
-{% load postulo %}
-{% comment %} The main navigation's links, written once and rendered twice: as a row in the
-   header on a wide screen, and stacked inside a disclosure on a narrow one. Only one of the
-   two is ever in the layout, so the duplicate never reaches the accessibility tree.
+{% load i18n postulo %}
+{% comment %} The main navigation (#299): one list, in the person's own order, drawn once, and
+   two shapes for it that the stylesheet chooses between by width -- `.nav-main` in
+   `assets/css/app.css` says how.
 
-   `extra` is whatever the caller needs on top of the link's own style -- `block` for the
-   stacked copy, so a link fills the panel rather than sitting at its text width. {% endcomment %}
-{% comment %} `aria-current="page"` on the section somebody is in (#274): the tint alone
-   said it, at 1.1:1, and said it to nobody using a screen reader. {% endcomment %}
-{% for item in nav_items %}
-  {% nav_active_names item.active_names as css %}
-  <a href="{% url item.url_name %}" class="{{ css }} {{ extra }}"
-     data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>{{ item.label }}</a>
-{% endfor %}
+   From `md` up it is the row in the masthead, an icon beside each label. It never wraps:
+   the first items in the person's order are in the row and the rest are under *More*, and
+   how many the row holds grows with the width. Without a script nothing can measure what
+   fits, so the count is decided by breakpoint, for the widest of the languages the reflow
+   walk is taken in; a script may refine it by measuring, never replace it.
+
+   Below `md` the same element is a bar fixed to the foot of the window: the first four
+   items and *More*, which opens the rest and the search. Nothing the account menu holds.
+   The bar is still this `<nav>`, so it keeps the name *Main* and its place in the
+   reading order, after the wordmark and before the search -- the order a keyboard or a
+   screen reader meets it in is the same at every width, and only where it is drawn
+   changes.
+
+   *More* is a disclosure that is navigation, so a `<details class="popover">` whose rows
+   are `menu-item` and deliberately not `role="menu"` -- the account menu's reasoning, in
+   `base.html`. It holds every item once more, and the stylesheet shows only the ones the line
+   does not, at whatever width it is; with the search, which only the bar needs. Only one
+   copy of an item is ever in the layout, so the duplicate never reaches the accessibility
+   tree.
+
+   `aria-current="page"` on the section somebody is in (#274), and the tint, the weight and
+   the underline besides it: the tint alone said it at 1.1:1, and to nobody using a screen
+   reader. {% endcomment %}
+<nav class="nav-main" aria-label="{% translate 'Main' %}" data-nav-main>
+  {% for item in nav_items %}
+    {% nav_active_names item.active_names as css %}
+    <a href="{% url item.url_name %}" class="{{ css }}"
+       data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>
+      {% icon item.icon %}<span>{{ item.label }}</span>
+    </a>
+  {% endfor %}
+  <details class="popover" data-menu data-nav-more>
+    <summary class="nav-link">{% icon "ellipsis" %}<span>{% translate "More" %}</span></summary>
+    <div data-popover data-align="end">
+      {% for item in nav_items %}
+        {% nav_active_names item.active_names as css %}
+        <a href="{% url item.url_name %}" class="menu-item"
+           data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>
+          {% icon item.icon %}{{ item.label }}
+        </a>
+      {% endfor %}
+      <a href="{% url 'core:search' %}" class="menu-item" data-nav-search>
+        {% icon "search" %}{% translate "Search" %}
+      </a>
+    </div>
+  </details>
+</nav>

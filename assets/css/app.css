@@ -798,8 +798,125 @@
      that is not colour, which is what SC 1.4.1 asks of the default and of this. Higher
      specificity rather than another layer, so the two rules are read together; forced
      colours puts the underline back further down, unlayered, where it beats both. */
-  body[data-nav-underline="off"] .nav-link-active {
+  body[data-nav-underline="off"] .nav-link-active,
+  body[data-nav-underline="off"] .menu-item[aria-current="page"] {
     text-decoration-line: none;
+  }
+
+  /* The page you are on, where it is a row of a menu rather than a link in a row: the
+     main navigation's *More* holds the items the line has no room for (#299), and the
+     current one is marked there by the same three cues as in the line. */
+  .menu-item[aria-current="page"] {
+    @apply bg-ink-100 font-semibold text-ink-900 underline decoration-2 underline-offset-4
+      dark:bg-ink-800 dark:text-ink-50;
+  }
+
+  /*
+   * The main navigation (#299): one `<nav>`, the person's items in their order, and two
+   * shapes for it. This is the row, from `md` up; the bar it becomes below `md` is further
+   * down, unlayered, because it has to beat `nav-link`, which is a utility.
+   *
+   * **The row never wraps.** It holds the first items in the person's order and puts the
+   * rest under *More*, and how many it holds is decided by width, because without a script
+   * nothing can measure what fits:
+   *
+   *   below md (the bar)   4
+   *   md, 768              2     the search is a link here, not a box
+   *   lg, 1024             3
+   *   xl, 1280             5
+   *   2xl, 1536            7     which is all of them today, and More goes
+   *
+   * The numbers are what fits in the widest of the languages the reflow walk is taken in
+   * -- Greek, whose *Dashboard* is two words and whose *More* is eleven letters, and
+   * German -- in DejaVu Sans, the widest of the fonts the suite and the Linux desktop
+   * draw in, with the search box open, and with the text-spacing override in English at
+   * 1280. Measured, not guessed, and deliberately short of full: a row that is one label
+   * over the edge does not scroll, it wraps the whole masthead onto a second line.
+   *
+   * Counted with `nth-of-type` rather than marked item by item, so the order is simply the
+   * order the page wrote them in. The line's own items are the `<a>` children of the nav;
+   * *More* holds a copy of every item, and shows the ones the line does not, so exactly one
+   * copy of each is in the layout at any width.
+   */
+  .nav-main {
+    @apply flex flex-nowrap items-center gap-1;
+  }
+
+  .nav-main > a,
+  .nav-main > [data-nav-more] > summary {
+    @apply flex items-center gap-1.5 whitespace-nowrap;
+  }
+
+  .nav-main > [data-nav-more] > summary {
+    @apply cursor-pointer;
+  }
+
+  @media (width < 48rem) {
+    .nav-main > a:nth-of-type(n + 5),
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 4) {
+      display: none;
+    }
+  }
+
+  /* The search is in the masthead from `md` up, as a link and then as a box, so *More*
+     carries it only in the bar. And *More* itself goes wherever the line holds everything. */
+  @media (width >= 48rem) {
+    .nav-main [data-nav-search] {
+      display: none;
+    }
+  }
+
+  @media (48rem <= width < 64rem) {
+    .nav-main > a:nth-of-type(n + 3),
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 2),
+    .nav-main:not(:has(> a:nth-of-type(3))) > [data-nav-more] {
+      display: none;
+    }
+  }
+
+  @media (64rem <= width < 80rem) {
+    .nav-main > a:nth-of-type(n + 4),
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 3),
+    .nav-main:not(:has(> a:nth-of-type(4))) > [data-nav-more] {
+      display: none;
+    }
+  }
+
+  @media (80rem <= width < 96rem) {
+    .nav-main > a:nth-of-type(n + 6),
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 5),
+    .nav-main:not(:has(> a:nth-of-type(6))) > [data-nav-more] {
+      display: none;
+    }
+  }
+
+  @media (width >= 96rem) {
+    .nav-main > a:nth-of-type(n + 8),
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 7),
+    .nav-main:not(:has(> a:nth-of-type(8))) > [data-nav-more] {
+      display: none;
+    }
+  }
+
+  /* Where a script has measured the row, its answer stands instead of the count: the
+     items marked `data-in-more` are under *More* and the rest are in the line. Only from
+     `md` up -- the bar's four are not a question of room -- and only while the mark is
+     there, so a script that never ran leaves the count above as the whole answer. */
+  @media (width >= 48rem) {
+    .nav-main[data-fitted] > a:not([data-in-more]),
+    .nav-main[data-fitted] [data-popover] > a[data-nav][data-in-more] {
+      display: flex;
+    }
+
+    .nav-main[data-fitted] > a[data-in-more],
+    .nav-main[data-fitted] [data-popover] > a[data-nav]:not([data-in-more]),
+    .nav-main[data-fitted]:not(:has(> a[data-in-more])) > [data-nav-more] {
+      display: none;
+    }
+
+    .nav-main[data-fitted]:has(> a[data-in-more]) > [data-nav-more] {
+      display: inline-flex;
+    }
   }
 
   /*
@@ -1164,6 +1281,159 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   scroll-padding-bottom: 6rem;
 }
 
+/*
+ * The main navigation below `md`: a bar fixed to the foot of the window (#299).
+ *
+ * The same `<nav>` as the row above, drawn another way: the first four items and *More*,
+ * each an icon over its label, in five equal slots -- except that no slot is narrower
+ * than the longest word in it, so a label wraps between its words (*Πίνακας ελέγχου*,
+ * *Tableau de bord*) and never inside one. Breaking inside the word was tried, and at 320
+ * it cut *Αγγελίες* and *Αιτήσεις* in two in order to give the width to a slot that did
+ * not need it. Where even the longest words do not fit side by side -- Estonian's
+ * *Kandideerimised* at 320 -- *More* goes to a second row rather than off the edge: the
+ * bar grows a line and nothing is cut, clipped or scrolled. Below 360 pixels the labels
+ * are a pixel smaller, which is what keeps Greek and German, in the widest of the fonts,
+ * on one row at 320. No slot is narrower than 44 pixels, the size a thumb wants.
+ *
+ * Unlayered, because each item is still a `nav-link` -- the tint, the weight and the
+ * underline that mark the current page come with it, and so does the preference that
+ * takes the underline off (#289) -- and `nav-link` is a utility, which a rule in a layer
+ * cannot beat. Nothing here sets `display`, so the counts above still decide what shows.
+ *
+ * **Nothing on a page may end up behind it.** The bar's height is measured into
+ * `--bottom-bar-height` by `app.js`, the way the header's is, and three things read it:
+ * the page's own bottom padding, so the last line of any page can be scrolled clear of
+ * it; `scroll-padding-bottom`, so a link focused near the foot of the window is scrolled
+ * above it rather than under it (SC 2.4.11); and the failure alert, which sits above the
+ * bar rather than over it. 4.5rem is the answer where no script measures: a bar of
+ * two-line labels, so the fallback errs towards room to spare.
+ *
+ * The bar lives inside the sticky header, so the header's `z-30` is its layer too: over
+ * the page and under the skip link and the alert. `env(safe-area-inset-bottom)` keeps it
+ * clear of a phone's home indicator where the browser reports one.
+ */
+@media (width < 48rem) {
+  .nav-main {
+    @apply fixed inset-x-0 bottom-0 flex-wrap items-stretch gap-0 border-t border-ink-200 bg-white
+      px-0.5 pt-1 dark:border-ink-800 dark:bg-ink-900;
+    padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+  }
+
+  /* Equal shares from nothing, each held at its own longest word by the automatic minimum
+     a flex item has -- which is why nothing here sets a `min-width` on the slot itself. */
+  .nav-main > a,
+  .nav-main > [data-nav-more] {
+    flex: 1 1 0;
+  }
+
+  .nav-main > a,
+  .nav-main > [data-nav-more] > summary {
+    @apply min-h-12 flex-col justify-center gap-0.5 px-px py-1 text-center text-xs
+      whitespace-normal;
+  }
+
+  /* The 44 pixels a thumb wants, on the label rather than on the slot: a floor under the
+     slot's own minimum rather than in place of it. A pixel of padding beside it and no
+     more -- enough that two labels each held at their longest word do not read as one
+     word, and at 320 every other pixel of a slot is a letter. */
+  .nav-main > a > span,
+  .nav-main > [data-nav-more] > summary > span {
+    min-inline-size: 2.75rem;
+  }
+
+  .nav-main > [data-nav-more] > summary {
+    @apply w-full;
+  }
+
+  .nav-main > a > svg,
+  .nav-main > [data-nav-more] > summary > svg {
+    @apply size-5;
+  }
+
+  /* *More* opens upwards from the bar, over the page, rather than down off the screen. */
+  .nav-main > [data-nav-more] > [data-popover] {
+    @apply top-auto bottom-full mt-0 mb-2;
+  }
+
+  body:has(.nav-main) {
+    padding-bottom: var(--bottom-bar-height, 4.5rem);
+  }
+
+  html:has(.nav-main) {
+    scroll-padding-bottom: calc(var(--bottom-bar-height, 4.5rem) + 1rem);
+  }
+
+  html:has(.nav-main):has(.page-alert > [role="alert"]:not(:empty)) {
+    scroll-padding-bottom: calc(var(--bottom-bar-height, 4.5rem) + 6rem);
+  }
+
+  body:has(.nav-main) .page-alert {
+    bottom: calc(var(--bottom-bar-height, 4.5rem) + 1rem);
+  }
+}
+
+@media (width < 22.5rem) {
+  .nav-main > a,
+  .nav-main > [data-nav-more] > summary {
+    font-size: 0.6875rem;
+  }
+}
+
+/*
+ * *More*, when the page you are on is one of the items under it (#299): shaded and in
+ * bolder type, so the line never leaves somebody with nothing saying where they are. Not
+ * underlined and not `aria-current` -- *More* is not the page; the item inside it is, and
+ * it carries both. Which items are under *More* depends on the width and, where a script
+ * has measured, on its answer, so this asks the same questions the counts above ask.
+ * Unlayered for the bar's reason: *More* is a `nav-link`.
+ */
+@media (width < 48rem) {
+  .nav-main > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 5))
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
+@media (48rem <= width < 64rem) {
+  .nav-main:not([data-fitted])
+    > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 3))
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
+@media (64rem <= width < 80rem) {
+  .nav-main:not([data-fitted])
+    > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 4))
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
+@media (80rem <= width < 96rem) {
+  .nav-main:not([data-fitted])
+    > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 6))
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
+@media (width >= 96rem) {
+  .nav-main:not([data-fitted])
+    > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 8))
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
+@media (width >= 48rem) {
+  .nav-main[data-fitted]
+    > [data-nav-more]:has(> [data-popover] > a[aria-current="page"][data-in-more])
+    > summary {
+    @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
+  }
+}
+
 /* Accessibility: the skip link is visible only when it has focus, and nothing moves for
    someone who asked their system for less motion. */
 @layer components {
@@ -1240,7 +1510,8 @@ html {
   /* The preference does not reach this far. A high-contrast theme discards the tint and
      flattens the weight, so the underline is the only one of the three cues left; turning
      it off here would leave the current page marked by nothing at all (#289). */
-  body[data-nav-underline="off"] .nav-link-active {
+  body[data-nav-underline="off"] .nav-link-active,
+  body[data-nav-underline="off"] .menu-item[aria-current="page"] {
     text-decoration-line: underline;
   }
 

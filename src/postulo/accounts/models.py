@@ -291,6 +291,14 @@ class Profile(models.Model):
     #: main navigation. Everything there is reachable another way, so hiding one takes
     #: nothing away; the row across the top is what runs out of room first.
     hidden_nav_items = models.JSONField(_("hidden navigation items"), default=list, blank=True)
+    #: The keys of the main navigation this person has placed, in their order (#299).
+    #:
+    #: Empty is the default order, which is what every profile had before there was a
+    #: choice, so nothing had to be migrated. What is kept is what was *placed*, the same
+    #: way round as `hidden_nav_items` and for the same reason: an item added in a later
+    #: release is in neither list, and is drawn after the placed ones rather than lost.
+    #: `postulo.core.navigation` reads and writes it.
+    nav_order = models.JSONField(_("navigation order"), default=list, blank=True)
     #: Whether an entry's form on Your career shows its order number. Off, because the
     #: arrows on the overview are the control; on for somebody who cannot use them or would
     #: rather type a number, which is why it lives under Appearance with the other

@@ -264,37 +264,71 @@ def test_no_page_scrolls_sideways_at_320_pixels(
     )
 
 
-def test_the_navigation_becomes_a_menu_and_still_works(live_server, page: Page, furnished):  # noqa: F811
-    """The header's row of links is a disclosure below 768 pixels, and has to work as one.
+@pytest.mark.parametrize("language", LANGUAGES)
+def test_the_navigation_becomes_a_bar_and_still_works(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+    language,
+):
+    """Below 768 pixels the main navigation is a bar fixed to the foot of the window, and it
+    has to work as one (#299).
 
-    Six links come to 635 pixels, so on a phone they are behind a button. That button is the
-    only way to reach most of the application at that width, which makes it worth a test of
-    its own: it opens from the keyboard, closes with Escape, lists the same places, and one
-    of them takes you there. Exactly one of the two navigations is in the layout at a time,
-    so the duplicate links never reach the accessibility tree.
+    Seven links do not fit a phone, which is why this test exists at all: until #299 they
+    were stacked behind a *Menu* disclosure (#113), and this pinned that answer. The answer
+    changed and the property did not. At 320 pixels, in every language the walk is taken in,
+    nothing scrolls sideways, and every destination is reachable: the first four in the bar,
+    the rest and the search under *More*, which opens from the keyboard, closes with Escape
+    and takes you where it says. Each item has two copies in the page -- the line's and
+    *More*'s -- and exactly one of them is ever drawn, so no destination reaches the
+    accessibility tree twice.
     """
+    from postulo.accounts.models import Profile
+    from postulo.core import navigation
+
     base = live_server.url
     sign_in(page, base)
+    Profile.objects.filter(user=furnished["applicant"]).update(language=language)
     page.goto(f"{base}/")
 
-    row = page.locator('header nav[class~="md:flex"]')
-    button = page.locator("header summary", has_text="Menu")
+    nav = page.locator("header [data-nav-main]")
+    more = nav.locator("[data-nav-more]")
+    position = "el => getComputedStyle(el).position"
 
     page.set_viewport_size({"width": 1280, "height": 900})
-    expect(row).to_be_visible()
-    expect(button).to_be_hidden()
+    expect(nav.locator('a[data-nav="dashboard"]').first).to_be_visible()
+    assert nav.evaluate(position) != "fixed", "on a wide screen it is the masthead's row"
 
     page.set_viewport_size({"width": NARROW, "height": 800})
-    expect(row).to_be_hidden()
-    expect(button).to_be_visible()
+    expect(nav).to_be_visible()
+    assert nav.evaluate(position) == "fixed"
+    box = nav.bounding_box()
+    assert abs(box["y"] + box["height"] - 800) <= 1, "the bar sits on the foot of the window"
 
-    button.focus()
+    result = page.evaluate(SCROLLS_SIDEWAYS)
+    assert not result["reached"], f"the page scrolls {result['reached']}px sideways at 320"
+
+    keys = list(navigation.DEFAULT_ORDER)
+    in_bar = [key for key in keys if nav.locator(f':scope > a[data-nav="{key}"]').is_visible()]
+    assert in_bar == keys[:4], in_bar
+
+    summary = more.locator("summary")
+    summary.focus()
     page.keyboard.press("Enter")
-    expect(page.locator("header details[data-menu][open]")).to_have_count(1)
+    expect(more).to_have_attribute("open", "")
     page.keyboard.press("Escape")
-    expect(page.locator("header details[data-menu][open]")).to_have_count(0)
+    expect(more).not_to_have_attribute("open", "")
+    expect(summary).to_be_focused()
 
     page.keyboard.press("Enter")
-    panel = page.locator("header details[data-menu][open] nav")
-    panel.get_by_role("link", name="Companies").click()
+    for key in keys:
+        copies = nav.locator(f'[data-nav="{key}"]')
+        drawn = [copies.nth(i).is_visible() for i in range(copies.count())]
+        assert drawn.count(True) == 1, f"{key}: {drawn.count(True)} copies drawn"
+    expect(more.locator("[data-nav-search]")).to_be_visible()
+    more.locator('[data-nav="companies"]').click()
     expect(page).to_have_url(f"{base}/jobs/companies/")
+
+    nav.locator("[data-nav-more] summary").click()
+    more.locator("[data-nav-search]").click()
+    expect(page).to_have_url(f"{base}/search/")
