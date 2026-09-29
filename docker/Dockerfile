@@ -221,7 +221,27 @@ ENV PYTHONUNBUFFERED=1 \
 # opted in:
 #     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-cjk ...
 ARG POSTULO_EXTRA_APT_PACKAGES=""
-RUN apt-get update \
+# What makes the upgrade run a second time (#300). A layer is served from the builder's
+# cache for as long as its text and the layer under it are the same, and neither changes
+# when Debian publishes an update. So on a builder that keeps its cache the line below ran
+# once, and every image after that was handed the packages of that day: the runs that found
+# this had been publishing OpenSSL, to both architectures, with its fix waiting in the
+# security archive, from a Dockerfile that said it drifted towards being patched.
+#
+# An argument declared in a stage is in the environment of every RUN after it, which makes
+# its value part of this layer's cache key: a value the builder has not seen, and the layer
+# runs. Whoever builds passes the moment they are building at. The workflows do, one moment
+# for a run and the same one to both of its builds, so the image that is scanned and the
+# image that is published asked Debian the same question; `scripts/scan-image.sh` and
+# `scripts/check-image.sh` do when they build. By hand:
+#     docker build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" ...
+#
+# Built without it the layer may be one the cache remembers, which is what `docker compose
+# build` does on a machine that has built before, and the line it prints says that instead
+# of claiming a date.
+ARG POSTULO_APT_REFRESH=""
+RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer was last built}" \
+    && apt-get update \
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \

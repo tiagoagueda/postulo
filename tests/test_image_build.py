@@ -302,6 +302,111 @@ def test_the_base_image_is_not_pinned_by_digest():
         )
 
 
+# --------------------------------------------- what makes the upgrade run a second time
+
+#: Everything in this repository that builds the image: two workflows and two scripts.
+IMAGE_WORKFLOWS = [
+    ROOT / ".forgejo" / "workflows" / name for name in ("dev-image.yml", "image.yml")
+]
+IMAGE_SCRIPTS = [ROOT / "scripts" / name for name in ("scan-image.sh", "check-image.sh")]
+
+#: `docker build`, `docker buildx build`, and the scripts' `$DOCKER build`.
+BUILDING = re.compile(r"(?:docker|\$DOCKER) (?:buildx )?build\b")
+
+
+def builds_in(text: str) -> list[str]:
+    """Every command that builds an image, one string each, continuations folded away."""
+    folded = text.replace("\\\n", " ")
+    return [
+        line.strip()
+        for line in folded.splitlines()
+        if BUILDING.search(line) and not line.lstrip().startswith("#")
+    ]
+
+
+def test_the_build_reader_finds_what_it_is_looking_for():
+    """A test that reads a file has to be shown failing, or it passes on an empty match."""
+    assert builds_in("docker build \\\n  -t x .") == ["docker build    -t x ."]
+    assert builds_in("  docker buildx build --push .") == ["docker buildx build --push ."]
+    assert builds_in("$DOCKER build -f a -t b c") == ["$DOCKER build -f a -t b c"]
+    assert builds_in("docker buildx create --use --name x") == [], "makes a builder, not an image"
+    assert builds_in("# docker build -t x .") == [], "a comment builds nothing"
+
+
+def test_the_layer_that_upgrades_can_be_told_to_run_again():
+    """#300: the upgrade ran once, and the builder's cache answered for it ever after.
+
+    A layer is served from cache for as long as its text and the layer under it are the
+    same, and neither changes when Debian publishes an update. Run 585 found OpenSSL in the
+    image with its fix waiting in the security archive; run 582 had published the same
+    packages to both architectures three days before, from the same cached layer.
+
+    An argument declared in a stage is in the environment of every `RUN` after it, so its
+    value is part of that layer's cache key. It has to be declared in the stage that ships
+    and above the layer, or it is in nobody's key.
+    """
+    runtime = "\n".join(
+        line for line in stages()["runtime"].splitlines() if not line.lstrip().startswith("#")
+    )
+
+    assert "ARG POSTULO_APT_REFRESH" in runtime, "nothing can make the apt layer run again"
+    declared = runtime.index("ARG POSTULO_APT_REFRESH")
+    layer = runtime.index("apt-get update")
+    assert declared < layer, "declared under the layer, the value is not in its cache key"
+    assert "COPY" not in runtime[declared:layer], (
+        "the layer it is for is the first thing after it: anything between them is rebuilt "
+        "for no reason, and says the argument is for something else"
+    )
+    assert "${POSTULO_APT_REFRESH:-" in runtime[declared:], (
+        "the build log has to say when Debian was asked, and that nobody said when"
+    )
+
+
+@pytest.mark.parametrize("path", [*IMAGE_WORKFLOWS, *IMAGE_SCRIPTS], ids=lambda p: p.name)
+def test_every_build_the_project_makes_asks_debian_again(path: Path):
+    """The argument does nothing unless the thing that builds passes it.
+
+    `--pull` beside it, for the same reason one layer down: the base image is where Python
+    itself arrives from, and a builder that prefers the copy it has keeps it.
+    """
+    builds = builds_in(path.read_text(encoding="utf-8"))
+
+    assert builds, f"{path.name} builds nothing: the file has changed, or the reader is wrong"
+    for build in builds:
+        assert "--build-arg POSTULO_APT_REFRESH=" in build, f"may be served from cache: {build}"
+        assert "--pull" in build, f"keeps whatever base image the builder has: {build}"
+
+
+@pytest.mark.parametrize("path", IMAGE_WORKFLOWS, ids=lambda p: p.name)
+def test_the_image_scanned_and_the_image_published_are_built_at_one_moment(path: Path):
+    """Two builders, a cache each: the daemon's is scanned, buildx's is pushed.
+
+    Refreshing one of them would leave a gate that passes on an image nobody pulls. Both
+    builds of a run are handed the same moment, read from the clock once: a number or a
+    date written into the workflow is a value the builder sees once and caches ever after.
+    """
+    import yaml
+
+    steps = yaml.safe_load(path.read_text(encoding="utf-8"))["jobs"]["image"]["steps"]
+    building = [step for step in steps if builds_in(step.get("run", ""))]
+    moment = next((step for step in steps if step.get("id") == "moment"), None)
+
+    assert len(building) == 2, "the build that is scanned and the build that is pushed"
+    assert moment is not None, "nothing works out the moment"
+    assert "$(date -u" in moment["run"], "the clock, so a run started again asks again"
+    assert steps.index(moment) < steps.index(building[0]), "worked out before it is used"
+    for step in building:
+        assert step.get("env", {}).get("ASKED") == "${{ steps.moment.outputs.asked }}", step
+        assert 'POSTULO_APT_REFRESH="$ASKED"' in step["run"], step["run"]
+
+
+@pytest.mark.parametrize("path", IMAGE_SCRIPTS, ids=lambda p: p.name)
+def test_a_script_that_builds_passes_the_moment_it_runs_at(path: Path):
+    """A person scanning by hand wants the image a build would make now."""
+    for build in builds_in(path.read_text(encoding="utf-8")):
+        assert 'POSTULO_APT_REFRESH="$(date -u' in build, build
+
+
 # ------------------------------------------------ what the finished image contains
 
 

@@ -98,27 +98,49 @@ jobs:
           echo "$REGISTRY_TOKEN" | docker login "$registry" \
             -u "$REGISTRY_USER" --password-stdin
 
+      # One moment for the run, handed to both builds below (#300). The Dockerfile takes it
+      # as POSTULO_APT_REFRESH, which is part of the cache key of the layer that takes
+      # Debian's updates: a value the builder has not seen, and the layer runs. Without it
+      # that layer was served from cache by both builders, and the image kept the packages
+      # of the day the layer was first built.
+      #
+      # The clock and not the run's number, so a run started again asks again.
+      - name: Note the moment Debian is asked
+        id: moment
+        run: echo "asked=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
       # Into this runner's daemon first, so there is something to scan before anything is
-      # published. The push below reuses the layers.
+      # published. `--pull`, so the base image is asked for as well, whatever this builder
+      # does by default.
       - name: Build the image this runner can scan
-        run: docker build -f docker/Dockerfile -t postulo:dev-scan .
+        env:
+          ASKED: ${{ steps.moment.outputs.asked }}
+        run: |
+          docker build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+            -f docker/Dockerfile -t postulo:dev-scan .
 
       # The same script a person runs and the same one `image.yml` calls, rather than a
       # third description of the same intent.
       - name: Scan it, with both scanners
         run: ./scripts/scan-image.sh postulo:dev-scan
 
-      # The scan above read the native build; this rebuilds for both architectures and
-      # pushes. buildx reuses the layers, so the arm64 half is the only new work.
+      # The scan above read the native build; this builds for both architectures and
+      # pushes. It is a second builder with a cache of its own -- the logs name it
+      # `postulo-dev`, a `docker-container` one, where the scan's is the daemon's -- so
+      # nothing here is handed the layers that were scanned. What makes the two images the
+      # same is being built from the same commit at the same moment, which is why this build
+      # is given the moment the first one was (#300).
       - name: Build for amd64 and arm64 and push
         id: push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
+          ASKED: ${{ steps.moment.outputs.asked }}
         run: |
           docker buildx create --use --name postulo-dev >/dev/null 2>&1 || docker buildx use postulo-dev
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
-          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
+          docker buildx build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+            --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
       # A failure here fails the run, deliberately: the image is already published, but a
       # prune that stopped working -- a token that lost its scope -- would otherwise be found
@@ -140,11 +162,13 @@ jobs:
       # did not complete is not a finding and must not read as one (#192).
       - name: Say what this is
         if: always()
+        env:
+          ASKED: ${{ steps.moment.outputs.asked }}
         run: |
           {
             echo '## Dev image'
             echo
-            echo "Built from \`${GITHUB_SHA}\` on \`${GITHUB_REF_NAME}\`."
+            echo "Built from \`${GITHUB_SHA}\` on \`${GITHUB_REF_NAME}\`, with Debian's packages as of \`${ASKED}\`."
             echo
             echo "**Scan:** $(cat .scan/verdict.txt 2>/dev/null || echo 'no verdict -- the scan script did not get as far as writing one')"
             echo

@@ -97,11 +97,23 @@ jobs:
           echo "$REGISTRY_TOKEN" | docker login "$registry" \
             -u "$REGISTRY_USER" --password-stdin
 
-      # Built for this runner only, into its daemon, so there is something to scan. The
-      # multi-architecture build below reuses the layers, so this costs a scan rather than
-      # a second build.
+      # One moment for the run, handed to both builds below (#300). The Dockerfile takes it
+      # as POSTULO_APT_REFRESH, which is part of the cache key of the layer that takes
+      # Debian's updates, so that layer runs in this build whatever the runner's cache
+      # remembers. A release above all: it is the image people keep.
+      - name: Note the moment Debian is asked
+        id: moment
+        run: echo "asked=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
+      # Built for this runner only, into its daemon, so there is something to scan.
+      # `--pull`, so the base image is asked for as well, whatever this builder does by
+      # default.
       - name: Build the image this runner can scan
-        run: docker build -f docker/Dockerfile -t postulo:scan .
+        env:
+          ASKED: ${{ steps.moment.outputs.asked }}
+        run: |
+          docker build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+            -f docker/Dockerfile -t postulo:scan .
 
       # The same script a person runs, rather than a second description of the same
       # intent that can drift from it. Both scanners, gated on findings with a fix
@@ -135,15 +147,20 @@ jobs:
             echo '</details>'
           } >> "$GITHUB_STEP_SUMMARY"
 
+      # A second builder with a cache of its own, so it is given the moment the scanned
+      # build was: the same commit at the same moment is what makes the image that is
+      # published the one that was scanned (#300).
       - name: Build for amd64 and arm64 and push
         id: push
         env:
           TAGS: ${{ steps.tags.outputs.tags }}
+          ASKED: ${{ steps.moment.outputs.asked }}
         run: |
           docker buildx create --use --name postulo-release >/dev/null 2>&1 || docker buildx use postulo-release
           tags=""
           for tag in $(echo "$TAGS" | tr ',' ' '); do tags="$tags -t $tag"; done
-          docker buildx build --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
+          docker buildx build --pull --build-arg POSTULO_APT_REFRESH="$ASKED" \
+            --platform linux/amd64,linux/arm64 -f docker/Dockerfile $tags --push .
 
       # The registry, asked the way `docker pull` asks it: each of the three tags must be
       # there, carry both architectures, and be one image. A green release says nothing

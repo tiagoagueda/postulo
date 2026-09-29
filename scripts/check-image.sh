@@ -22,7 +22,10 @@ cleanup() { $DOCKER rm -f "$NAME" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
 
 echo "Building $TAG"
-$DOCKER build -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
+# With the moment, so the layer that takes Debian's updates runs and this checks the image
+# a build would make now (#300).
+$DOCKER build --pull --build-arg POSTULO_APT_REFRESH="$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+    -f "$ROOT/docker/Dockerfile" -t "$TAG" "$ROOT"
 
 echo "Starting it"
 $DOCKER run -d --name "$NAME" -p 8000:8000 \

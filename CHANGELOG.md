@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The image takes Debian's security updates on every build the project makes; the layer that upgrades had been served from the builder's cache. **Building your own: add `--pull --build-arg POSTULO_APT_REFRESH="$(date -u +%FT%TZ)"`, or a cached build keeps its old packages.** (#300)
 - Invitation tokens are stored as fingerprints and the link is shown once, on the page that
   made it; links already sent keep working. (#232)
 - **Forwarding headers are believed only from this host unless you name your proxy.
