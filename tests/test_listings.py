@@ -340,7 +340,7 @@ def test_the_export_carries_listing_state_and_the_importer_reads_both_formats(
     )
 
     document = build_document(user)
-    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 23
+    assert document["postulo"]["format"] == export_module.FORMAT_VERSION == 24
     exported = document["companies"][0]["postings"][0]
     assert exported["state"] == "shortlisted" and exported["decided_at"]
     # The code the title matches travels beside it (#266), and the importer restores it.

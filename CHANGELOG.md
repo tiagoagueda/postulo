@@ -64,6 +64,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A skill keeps the ESCO skill its name is: the skill box offers the classification's names as you type, a CV in another language prints its name there where you wrote none, and the export carries it (format 24). **Skills already recorded are matched when next saved.** (#266)
 - A listing has a history: a message, an email, a call, a note, a file from your documents, or the same advert captured again elsewhere, added on its page or from the capture's review. An application shows it first on its timeline, and it is in your export (format 23). (#270)
 - A token can hold `listings:bind`, which adds to a listing's history and lists listings to choose one, and nothing else: the scope for a mail client that files messages. Plugins get `record_listing_event`. (#270)
 - The Europass import reads the PDF europass.europa.eu gives you, through the CV attached inside it (the Candidate XML the platform has written since 2020), and a PDF it cannot read says why and what to upload instead. (#244)

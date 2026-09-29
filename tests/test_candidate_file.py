@@ -362,7 +362,8 @@ def fingerprint() -> str:
 
 
 #: What each version of the candidate document looked like. A new shape is a new line.
-SHAPES = {1: "0941165cc7c21c64"}
+#: 2 added the ESCO skill a skill's name matches, written and never read back (#266).
+SHAPES = {1: "0941165cc7c21c64", 2: "fe525ea84b2b6f93"}
 
 
 def test_a_block_that_changes_shape_is_a_new_version_of_the_file():

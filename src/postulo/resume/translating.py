@@ -38,6 +38,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from postulo.jobs import esco
+
 #: What may be said differently in another language, by model, and what may not.
 #:
 #: Each exclusion is a name that belongs to somebody else. ``organisation`` and
@@ -276,6 +278,10 @@ class Translated:
         never on a CV in its own right, only through its group. Without this the interface
         would offer to translate a skill's name and then never print the translation, which
         is a worse promise than not offering it (#131).
+
+        Three answers, in this order: the person's own translation; the name the ESCO
+        classification gives the skill in this language, where the name is one of its
+        skills (`classified_names` says when); the name as it was written (#266).
         """
         entry = self.__dict__["entry"]
         skills = list(entry.skills.all())
@@ -283,7 +289,82 @@ class Translated:
         if not language:
             return [skill.name for skill in skills]
         found = overrides_by_entry(skills, language)
-        return [found.get(key_of(skill), {}).get("name", skill.name) for skill in skills]
+        classified = classified_names(skills, language, entry.owner)
+        return [
+            found.get(key_of(skill), {}).get("name") or classified.get(skill.pk) or skill.name
+            for skill in skills
+        ]
+
+
+def classified_names(skills, language: str, owner=None) -> dict[int, str]:
+    """What a CV in ``language`` may print for these skills, from the ESCO classification.
+
+    ``{skill id: name}``, for the skills whose name is one of the classification's and
+    which it names in that language. **Only ever a fallback**, and a narrow one, because
+    somebody reads the CV that comes out and did not write this line (#266):
+
+    - the person's own translation wins wherever there is one -- the caller asks for those
+      first, and a name from here is never printed over one;
+    - never in the language the career record is written in, where the name as it was
+      written is the answer, exactly as it is for everything else on the CV;
+    - never English standing in for a language the classification does not publish: a
+      CV in Turkish prints the name as written, not the classification's English;
+    - only for a name that *is* a skill's preferred name somewhere -- which is all that
+      `Skill.match` keeps -- so what is printed is the published name of the skill the
+      person named, never a guess at what they meant.
+
+    The first letter follows the person's own: *Project management* prints as *Gestion de
+    projets*, where the classification writes its names in lower case. Every name this
+    answers with is listed on the CV's page before the CV is exported
+    (`named_by_classification`), and on the skill's page in that language.
+    """
+    wanted = normalise(language)
+    skills = [skill for skill in skills if getattr(skill, "esco_uri", "")]
+    if not wanted or not skills:
+        return {}
+    owner = owner if owner is not None else skills[0].owner
+    if best_match(wanted, [record_language_of(owner)]):
+        return {}
+    named: dict[int, str] = {}
+    for skill in skills:
+        name = esco.skill_name(skill.esco_uri, wanted, strict=True)
+        if name:
+            named[skill.pk] = as_they_write_it(skill.name, name)
+    return named
+
+
+def as_they_write_it(own: str, classified: str) -> str:
+    """The classification's name, with a capital first letter where the person used one."""
+    own, classified = (own or "").strip(), classified or ""
+    if own[:1].isupper() and classified[:1].islower():
+        return classified[:1].upper() + classified[1:]
+    return classified
+
+
+def named_by_classification(cv) -> list[tuple[object, str]]:
+    """The skills this CV prints under the classification's name, and that name.
+
+    What the CV's page says before it is exported, as it says what fell back: a line the
+    person did not write is theirs to know about, and to replace with their own.
+    """
+    from postulo.documents.rendering import document_language
+
+    language = normalise(document_language(cv))
+    groups = [
+        item.item
+        for item in cv.included_items().order_by("order", "pk")
+        if item.content_type.model == "skillgroup"
+    ]
+    skills = [skill for group in groups if group is not None for skill in group.skills.all()]
+    classified = classified_names(skills, language, cv.owner)
+    if not classified:
+        return []
+    own = overrides_by_entry(skills, language)
+    return [
+        (skill, classified[skill.pk])
+        for skill in skills
+        if skill.pk in classified and not own.get(key_of(skill), {}).get("name")
+    ]
 
 
 def in_language(entry, language: str, overrides: dict[str, str] | None = None):

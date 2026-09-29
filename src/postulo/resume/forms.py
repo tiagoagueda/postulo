@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django import forms
 from django.db import models as django_models
+from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.forms import OwnerScopedModelForm
@@ -153,11 +154,35 @@ class SkillForm(ResumeItemForm):
     class Meta:
         model = Skill
         fields = ("name", "group", "order")
+        widgets = {
+            # A plain text box, which is what it is with scripts off: the name is matched
+            # against the ESCO skills when it is saved (#266). With them on, htmx asks for
+            # the classification's names that begin with what has been typed and puts them
+            # in the box's `<datalist>`, which `c-field` draws empty for it to fill: fourteen
+            # thousand names are too many to send with the page. The box's own value goes
+            # with the request, under its own name, and nothing else does.
+            "name": forms.TextInput(
+                attrs={
+                    "list": "skill-suggestions",
+                    "autocomplete": "off",
+                    "hx-get": reverse_lazy("resume:skill_suggestions"),
+                    "hx-trigger": "input changed delay:250ms",
+                    "hx-target": "#skill-suggestions",
+                    "hx-swap": "innerHTML",
+                    "hx-sync": "this:replace",
+                }
+            ),
+        }
         help_texts = {
+            "name": _(
+                "As a CV should print it. A name that is a skill in the ESCO classification is "
+                "recognised as that skill, and the box offers the classification's names as "
+                "you type; a skill that is in no classification is not a lesser kind of skill."
+            ),
             "group": _(
                 "How it is gathered on a CV, which prints each group as “Group: one, two, "
                 "three”. Groups are made on the career page."
-            )
+            ),
         }
 
     def scope_querysets(self) -> None:

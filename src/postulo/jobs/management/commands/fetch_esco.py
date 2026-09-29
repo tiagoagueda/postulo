@@ -1,24 +1,28 @@
 """Download the ESCO classification in place, where the loader reads it (#266).
 
-``postulo/jobs/esco.py`` reads ``data/esco-<revision>.json``; this command is how that
-file gets there. It asks the ESCO web-service API, the machine-facing access the ESCO
-services document at
+``postulo/jobs/esco.py`` reads ``data/esco-<revision>.json`` and
+``data/esco-skills-<revision>.zip``; this command is how the two files get there. It asks
+the ESCO web-service API, the machine-facing access the ESCO services document at
 https://esco.ec.europa.eu/en/use-esco/use-esco-services-api/esco-web-service-api, for
-every ISCO-08 unit group and every occupation, in every language the classification is
-published in, and writes the file beside the code that reads it. The package files on
-the download page go through an e-mail consent a provisioning step cannot wait on, and
-this does not.
+every ISCO-08 unit group, every occupation and every skill, in every language the
+classification is published in, and writes the files beside the code that reads them.
+The package files on the download page go through an e-mail consent a provisioning step
+cannot wait on, and this does not.
 
-Two searches do the harvest, one per class: the concepts of the ISCO-08 concept scheme,
-of which the unit groups are the four-digit codes, and the class the API names
-``occupation``. Each concept's answer carries its preferred label in every language in
-the same object, so there is one pass, not one per language, and the paging is followed
-until the answer's total is in. The API names its versions with a ``v`` prefix and says
+Three searches do the harvest, one per class: the concepts of the ISCO-08 concept scheme,
+of which the unit groups are the four-digit codes, the class the API names
+``occupation``, and the class it names ``skill``, which holds the knowledge concepts
+beside the skills and competences. Each concept's answer carries its preferred label in
+every language in the same object, so there is one pass, not one per language, and the
+paging is followed until the answer's total is in -- counted in pages, which is how the
+API reads ``offset``, and checked against that total, so an answer that stops short is
+refused rather than written. The API names its versions with a ``v`` prefix and says
 nothing about which it served where none is asked, and its default is not the newest, so
-the revision is a required argument, recorded inside the file; a new revision is a
-re-run with the new ``--revision`` and the old file deleted. What is written is checked
-against the shape the tests pin before anything is replaced, and the command says what
-it found. Nothing in a request path calls this; it runs once, at provisioning.
+the revision is a required argument, recorded inside each file; a new revision is a
+re-run with the new ``--revision`` and the old files deleted. What is written is checked
+against the shape the loader reads before anything is replaced, nothing is written until
+both halves are, and the command says what it found. Nothing in a request path calls
+this; it runs once, at provisioning.
 """
 
 from __future__ import annotations
@@ -26,11 +30,14 @@ from __future__ import annotations
 import json
 import os
 import re
+import zipfile
 from collections import defaultdict
+from pathlib import Path
 
 import httpx
 from django.core.management.base import BaseCommand, CommandError
 
+from postulo.jobs import esco
 from postulo.jobs.esco import DATA_DIR, FALLBACK
 
 #: The ESCO web-service API. If a run fails to fetch, this block is the first thing to
@@ -46,9 +53,19 @@ ISCO_SCHEME = "http://data.europa.eu/esco/concept-scheme/isco"
 #: The class the API knows for occupations, in the short name its ``type`` filter takes.
 OCCUPATION_TYPE = "occupation"
 
-#: One page of the harvest; a full classification answers in one of these, and the
-#: paging that follows is for the day it stops.
+#: The class it knows for skills, competences and knowledge, likewise.
+SKILL_TYPE = "skill"
+
+#: One page of the harvest. The occupations answer in one of these and the skills in two;
+#: the API reads ``offset`` as a number of pages of this size, not of concepts.
 PAGE_SIZE = 10000
+
+#: What the tail of a skill's identifier may be. Every one in v1.2.1 is a UUID; this is
+#: what a line of the file can safely hold, and a tail outside it is refused.
+SKILL_TAIL = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]*")
+
+#: Everything `str.splitlines` would end a line at, which a name in the file must not hold.
+LINE_BREAK = re.compile("[\n\r\x0b\x0c\x1c\x1d\x1e\x85  ]")
 
 #: The language a concept's title is negotiated in; the preferred labels carry the rest.
 NEGOTIATED_LANGUAGE = "en"
@@ -125,15 +142,23 @@ class Command(BaseCommand):
             },
         ) as client:
             units, occupations = self._harvest(client, f"v{version}")
-        uncoded = sorted(i for i, e in occupations.items() if not e["code"])
-        if uncoded:
-            raise CommandError(
-                f"{len(uncoded)} of the occupations carried no ISCO-08 code; the first "
-                f"is {uncoded[0]}. The API gives them in a shape this command does not "
-                "read yet; adjust occupation_code."
-            )
-        document = self._document(units, occupations, version)
-        self._validate(document)
+            uncoded = sorted(i for i, e in occupations.items() if not e["code"])
+            if uncoded:
+                raise CommandError(
+                    f"{len(uncoded)} of the occupations carried no ISCO-08 code; the first "
+                    f"is {uncoded[0]}. The API gives them in a shape this command does not "
+                    "read yet; adjust occupation_code."
+                )
+            document = self._document(units, occupations, version)
+            self._validate(document)
+            # The skills after the occupations are known to be good, so that a harvest that
+            # was going to be refused does not first wait on the larger half.
+            skills = self._harvest_skills(client, f"v{version}")
+        about, identifiers, names, tidied = self._skills_document(skills, version)
+        self._validate_skills(identifiers, names)
+
+        # Nothing is written until both halves are good, so a run that fails leaves the
+        # files it would have replaced exactly as they were.
         target = DATA_DIR / f"esco-{version}.json"
         temporary = target.with_name(target.name + ".tmp")
         payload = json.dumps(document, ensure_ascii=False, indent=2) + "\n"
@@ -144,11 +169,25 @@ class Command(BaseCommand):
             f"{len(document['occupations'])} occupations, revision "
             f"{document['revision']}."
         )
-        others = sorted(p.name for p in DATA_DIR.glob("esco-*.json") if p != target)
+        skills_target = DATA_DIR / f"esco-skills-{version}.zip"
+        size = write_skills(skills_target, about, identifiers, names)
+        self.stdout.write(
+            f"Wrote {skills_target}: {len(identifiers):,} skills in {len(names)} languages, "
+            f"{size / 1_000_000:.1f} MB."
+        )
+        if tidied:
+            self.stdout.write(
+                f"{tidied} of the names had a line break, or space at an end, taken out."
+            )
+        others = sorted(
+            p.name
+            for p in (*DATA_DIR.glob("esco-*.json"), *DATA_DIR.glob("esco-skills-*.zip"))
+            if p not in (target, skills_target)
+        )
         if others:
             self.stdout.write(
                 self.style.WARNING(
-                    f"Delete {', '.join(others)} once the new file is checked: the "
+                    f"Delete {', '.join(others)} once the new files are checked: the "
                     "loader reads one revision at a time."
                 )
             )
@@ -182,6 +221,32 @@ class Command(BaseCommand):
             self._labels(concept, entry["names"])
         return units, occupations
 
+    def _harvest_skills(self, client, selected_version) -> dict[str, dict[str, str]]:
+        """Every skill, as the tail of its identifier to its preferred name in each language.
+
+        The tail is what the file keeps, and `esco.SKILL_NAMESPACE` is the rest; a skill
+        whose identifier is anywhere else is refused rather than kept under a name the
+        loader would put back together wrongly.
+        """
+        skills: dict[str, dict[str, str]] = {}
+        elsewhere: list[str] = []
+        for concept in self._search(
+            client, {"type": SKILL_TYPE, "selectedVersion": selected_version}
+        ):
+            uri = identifier_of(concept)
+            if not uri:
+                continue
+            if not uri.startswith(esco.SKILL_NAMESPACE):
+                elsewhere.append(uri)
+                continue
+            self._labels(concept, skills.setdefault(uri[len(esco.SKILL_NAMESPACE) :], {}))
+        if elsewhere:
+            raise CommandError(
+                f"{len(elsewhere)} of the skills have an identifier outside "
+                f"{esco.SKILL_NAMESPACE}; the first is {elsewhere[0]}."
+            )
+        return skills
+
     def _labels(self, concept, names) -> None:
         """The concept's preferred label in each of the classification's languages."""
         labels = concept.get("preferredLabel")
@@ -193,10 +258,20 @@ class Command(BaseCommand):
                 names[language] = value
 
     def _search(self, client, params) -> list[dict]:
-        """Every concept a search returns, the pages followed until the total is in."""
+        """Every concept a search returns, the pages followed until the total is in.
+
+        **``offset`` is a page, not a concept.** Asked with ``limit=2``, ``offset=1`` answers
+        the third and fourth concepts, which is how the API's own ``next`` link counts too.
+        Counting concepts worked for as long as a class fitted one page -- the second
+        request asked for page ten thousand, was answered with nothing, and ended the loop
+        -- and would have kept the first ten thousand of the 13,939 skills without a word.
+        So the pages are counted as pages, and what arrived is held to the total the answer
+        gave: a harvest that stops short is refused rather than written.
+        """
         concepts: list[dict] = []
         seen: set[str] = set()
-        offset = 0
+        page = 0
+        total = 0
         while True:
             response = self._query(
                 client,
@@ -205,7 +280,7 @@ class Command(BaseCommand):
                     "full": "false",
                     "language": NEGOTIATED_LANGUAGE,
                     "limit": PAGE_SIZE,
-                    "offset": offset,
+                    "offset": page,
                 },
             )
             try:
@@ -236,9 +311,14 @@ class Command(BaseCommand):
                         continue
                     seen.add(key)
                 concepts.append(item)
-            offset += len(items)
-            if not items or offset >= total:
+            page += 1
+            if not items or len(concepts) >= total or page * PAGE_SIZE >= total:
                 break
+        if len(concepts) < total:
+            raise CommandError(
+                f"the ESCO API said {total} concepts answered {params} and gave "
+                f"{len(concepts)}; nothing was written"
+            )
         return concepts
 
     def _query(self, client, params) -> httpx.Response:
@@ -311,6 +391,80 @@ class Command(BaseCommand):
         if problems:
             shown = "\n".join(f"- {problem}" for problem in problems)
             raise CommandError(f"the download is not the shape the loader reads:\n{shown}")
+
+    def _skills_document(self, skills, version) -> tuple[dict, list[str], dict, int]:
+        """The skills file's parts: what it says about itself, the identifiers, the names.
+
+        The identifiers sorted, which is what the loader halves; each language's names in
+        the same order, one to a line, empty where the classification publishes none.
+
+        **Only the ends of a name are touched.** A line of the file is one name, so a line
+        break inside one becomes a space and the space around it is taken off -- a stray
+        no-break space after the last word, in v1.2.1, and nothing else. The no-break
+        spaces *inside* a name stay, because they are typography: Czech keeps a one-letter
+        preposition off the end of a line with one, and a CV printed in Czech should too.
+        Spacing is folded when names are compared, not when they are kept.
+        """
+        identifiers = sorted(skills)
+        names: dict[str, list[str]] = {}
+        tidied = 0
+        for language in sorted(LANGUAGES):
+            column = []
+            for identifier in identifiers:
+                raw = skills[identifier].get(language, "")
+                name = LINE_BREAK.sub(" ", raw).strip()
+                tidied += name != raw
+                column.append(name)
+            names[language] = column
+        about = {
+            "revision": f"ESCO v{version}",
+            "source": "https://esco.ec.europa.eu",
+            "publisher": PUBLISHER,
+            "licence": "EUPL 1.2",
+            "languages": sorted(LANGUAGES),
+            "skills": len(identifiers),
+        }
+        return about, identifiers, names, tidied
+
+    def _validate_skills(self, identifiers, names) -> None:
+        """What the loader assumes of the skills, checked before anything is written."""
+        problems = []
+        if not identifiers:
+            problems.append("no skills at all")
+        if any(not SKILL_TAIL.fullmatch(identifier) for identifier in identifiers):
+            problems.append("an identifier is not one a line of the file can hold")
+        if len(set(identifiers)) != len(identifiers):
+            problems.append("two skills share an identifier")
+        if any(not name for name in names.get(FALLBACK, [None])):
+            problems.append("a skill has no English name")
+        if any(len(column) != len(identifiers) for column in names.values()):
+            problems.append("a language has a name too many or too few")
+        if problems:
+            shown = "\n".join(f"- {problem}" for problem in problems)
+            raise CommandError(f"the skills are not the shape the loader reads:\n{shown}")
+
+
+def write_skills(target: Path, about: dict, identifiers: list[str], names: dict) -> int:
+    """Write the skills file `esco.py` reads, whole or not at all; its size in bytes.
+
+    A zip, so that one language's names can be read without the other twenty-seven, and
+    compressed, because names in twenty-eight languages are mostly letters it has seen.
+    Each member carries the same fixed date, so the same harvest is the same file.
+    """
+    temporary = target.with_name(target.name + ".tmp")
+
+    def put(archive, name: str, text: str) -> None:
+        member = zipfile.ZipInfo(name, date_time=(1980, 1, 1, 0, 0, 0))
+        member.compress_type = zipfile.ZIP_DEFLATED
+        archive.writestr(member, text.encode("utf-8"), compresslevel=9)
+
+    with zipfile.ZipFile(temporary, "w") as archive:
+        put(archive, esco.SKILLS_ABOUT, json.dumps(about, ensure_ascii=False, indent=2) + "\n")
+        put(archive, esco.SKILLS_IDENTIFIERS, "\n".join(identifiers))
+        for language, column in names.items():
+            put(archive, esco.SKILLS_NAMES.format(language=language), "\n".join(column))
+    os.replace(temporary, target)
+    return target.stat().st_size
 
 
 def identifier_of(concept) -> str:

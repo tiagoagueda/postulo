@@ -56,6 +56,29 @@
     </div>
   {% endif %}
 
+  {% if classified %}
+    {% comment %} A skill whose name is one of the ESCO classification's prints the name it
+       gives the skill in this CV's language, where the person has written none of their own
+       (#266). A line somebody did not write is said here, before the export, with the way to
+       write their own. {% endcomment %}
+    <div class="alert mb-6" data-variant="info" data-classified>
+      <p class="mb-2">
+        {% blocktranslate trimmed with tongue=document_language %}
+          These skills print the name the ESCO classification gives them in {{ tongue }}, because you have not written one of your own:
+        {% endblocktranslate %}
+      </p>
+      <ul class="ms-4 list-disc text-sm">
+        {% for skill, name in classified %}
+          <li>
+            <a class="underline"
+               href="{% url 'resume:item_languages' 'skill' skill.pk %}?language={{ classified_language|urlencode }}"><bdi>{{ skill.name }}</bdi></a>
+            <span class="text-ink-600 dark:text-ink-300">— <bdi>{{ name }}</bdi></span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
   {% comment %} `min-w-0` on the column: a grid track is sized by its content by default, so
      one long word inside it grows the track and takes the page with it -- which is how the
      *Add entries* card beside this one ended up off the screen (#167). {% endcomment %}

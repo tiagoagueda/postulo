@@ -524,6 +524,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/jobs/captures/new/",
         "/jobs/postings/new/",
         "/career/education/new/",
+        # The skill box, with the list htmx fills as somebody types beside it (#266).
+        "/career/skill/new/",
         "/career/preview/",
         "/career/import/",
         # One person's own record as a file: what is in it, the link to it, and the box

@@ -303,8 +303,9 @@ def test_the_format_version_moved(user):
     recorded at no company, who had been left out of the archive (#239); 21 added what a
     capture kept of the page it was read from (#256); 22 added the main navigation's order
     and what was switched off in it, on the profile (#299); 23 added a listing's history
-    under its posting, each entry naming who it came from and what it points at (#270).
+    under its posting, each entry naming who it came from and what it points at (#270); 24
+    added the ESCO skill a skill's name matches, beside the name itself (#266).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 23
+    assert export.FORMAT_VERSION == 24

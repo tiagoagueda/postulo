@@ -40,13 +40,26 @@
       </div>
     </form>
 
+    {% if esco_name %}
+      {% comment %} A skill whose name is one of the ESCO classification's says which, and
+         what follows from it, so that a CV in another language printing the classification's
+         name is never news (#266). {% endcomment %}
+      <p class="mt-6 text-sm text-ink-500 dark:text-ink-400" data-esco-skill>
+        {% blocktranslate trimmed with name=esco_name %}
+          The ESCO classification knows this skill as “{{ name }}”. Where you have not
+          written your own, a CV in another of the classification's languages prints the
+          name it gives the skill there.
+        {% endblocktranslate %}
+      </p>
+    {% endif %}
+
     {% if object and translatable %}
       <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
         {% if translated_into %}
           {% blocktranslate trimmed with names=translated_into|join:", " %}
             Also in {{ names }}
           {% endblocktranslate %}
-        {% else %}
+        {% elif not esco_name %}
           {% translate "This entry prints its original text on every CV." %}
         {% endif %}
         <a class="underline"

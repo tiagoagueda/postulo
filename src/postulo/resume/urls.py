@@ -16,6 +16,8 @@ urlpatterns = [
         views_candidate.CandidateDownloadView.as_view(),
         name="candidate_download",
     ),
+    # What the skill box offers as somebody types: names from the ESCO classification (#266).
+    path("skills/suggestions/", views.SkillSuggestionsView.as_view(), name="skill_suggestions"),
     path("links/check/", views.LinkCheckView.as_view(), name="link_check_all"),
     path("links/<int:pk>/check/", views.LinkCheckView.as_view(), name="link_check"),
     path("<slug:section>/new/", views.ResumeItemCreateView.as_view(), name="item_create"),

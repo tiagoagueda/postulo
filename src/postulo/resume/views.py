@@ -15,13 +15,15 @@ from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
-from postulo.core import languages
+from postulo.core import languages, throttle
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
+from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base, registry
 
@@ -106,6 +108,47 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
         return context
 
 
+class SkillSuggestionsView(LoginRequiredMixin, View):
+    """The ESCO skills whose names begin with what has been typed in the skill box (#266).
+
+    A fragment of `<option>` elements for the box's `<datalist>`, which htmx fills as
+    somebody types: fourteen thousand names are too many to send with the page, and a
+    prefix answered with a few of them is not. In the reader's language, then in the one
+    their career record is written in; the English names where the classification publishes
+    neither. With scripts off nothing asks, and the box is the plain text box it always was.
+
+    **Nothing here is anybody's.** The names are the classification's, and the one thing
+    read of the person is which languages to answer in. It still needs an account, because
+    everything on this instance does, and it is bounded per account by
+    `POSTULO_SUGGESTION_RATE`: a box that asks at every pause in typing is a way of making
+    the server search a list as fast as a script can ask. What was typed is cut to the
+    length a name may have and never goes anywhere but the search.
+    """
+
+    template_name = "resume/partials/skill_suggestions.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        try:
+            throttle.consume(
+                "skill-suggestions", request.user, throttle.rate_for("POSTULO_SUGGESTION_RATE")
+            )
+        except throttle.TooOften as too_often:
+            refusal = HttpResponse(str(too_often), status=429, content_type="text/plain")
+            refusal["Retry-After"] = str(too_often.retry_after)
+            return refusal
+        limit = Skill._meta.get_field("name").max_length
+        typed = (request.GET.get("name") or "")[:limit]
+        names = esco.skill_suggestions(
+            typed,
+            translation.get_language() or "",
+            translating.record_language_of(request.user),
+        )
+        response = render(request, self.template_name, {"names": names})
+        # What one person typed, answered for them: no cache between them and it.
+        response["Cache-Control"] = "private, no-store"
+        return response
+
+
 class ResumeItemTranslationsView(OwnedObjectMixin, View):
     """What one entry says in the other languages somebody writes CVs in.
 
@@ -152,6 +195,17 @@ class ResumeItemTranslationsView(OwnedObjectMixin, View):
             ],
             "form": form,
             "add_form": resume_forms.AddLanguageForm(exclude=stored),
+            # What a CV in this language prints for a skill where the box is left empty,
+            # where that is the classification's name rather than the name as written: the
+            # fallback is only ever one when the page says so (#266).
+            "classified": (
+                translating.classified_names([entry], language, entry.owner).get(entry.pk, "")
+                if language
+                else ""
+            ),
+            # Recognised by the classification this instance holds, which is the one that
+            # decides what prints; an identifier the file no longer has decides nothing.
+            "recognised": bool(getattr(entry, "esco_name", "")),
         }
 
     def get(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
@@ -235,6 +289,8 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         context["translated_into"] = [
             languages.NATIVE_NAMES.get(code, code) for code in translating.languages_of(self.object)
         ]
+        # Which ESCO skill the name was recognised as, said where the name is edited (#266).
+        context["esco_name"] = getattr(self.object, "esco_name", "")
         return context
 
     def form_valid(self, form):

@@ -42,7 +42,7 @@ class SkillGroupAdmin(OwnedAdmin):
 
 @admin.register(Skill)
 class SkillAdmin(OwnedAdmin):
-    list_display = ("name", "group", "owner")
+    list_display = ("name", "esco_uri", "group", "owner")
     search_fields = ("name",)
 
 

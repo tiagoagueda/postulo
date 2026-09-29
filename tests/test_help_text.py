@@ -66,7 +66,6 @@ EXCUSED = {
     "LinkForm.url": "where it goes",
     "PostingIntakeForm.company_name": "who the employer is",
     "ProjectForm.name": "what the project is called",
-    "SkillForm.name": "what the skill is called",
     "SkillGroupForm.name": "what the group is called",
     "StatusChangeForm.status": "the choices are the answer, and they are named",
     "StatusChangeForm.note": "what to write on the timeline about this change",

@@ -99,6 +99,100 @@ def _no_inherited_drafts():
     pdf.forget_drafts()
 
 
+#: A handful of ESCO skills in three languages, for the tests that need the skills file and
+#: must not need the real one (#266). Identifiers and names as v1.2.1 has them, bar the last
+#: three: a skill with no French name, and two that share a Portuguese one.
+ESCO_SKILLS = {
+    "21c5790c-0930-4d74-b3b0-84caf5af12ea": {
+        "en": "manage budgets",
+        "fr": "gérer les budgets",
+        "pt": "gerir orçamentos",
+    },
+    "598de5b0-5b58-4ea7-8058-a4bc4d18c742": {"en": "SQL", "fr": "SQL", "pt": "SQL"},
+    "7111b95d-0ce3-441a-9d92-4c75d05c4388": {
+        "en": "project management",
+        "fr": "gestion de projets",
+        "pt": "gestão de projetos",
+    },
+    "ccd0a1d9-afda-43d9-b901-96344886e14d": {
+        "en": "Python (computer programming)",
+        "fr": "Python (programmation informatique)",
+        "pt": "Python (programação informática)",
+    },
+    "e0000000-0000-4000-8000-000000000001": {
+        "en": "teamwork principles",
+        "fr": "",
+        "pt": "princípios do trabalho em equipa",
+    },
+    "e0000000-0000-4000-8000-000000000002": {
+        "en": "use spreadsheets software",
+        "fr": "utiliser un tableur",
+        "pt": "usar folhas de cálculo",
+    },
+    "e0000000-0000-4000-8000-000000000003": {
+        "en": "spreadsheet software",
+        "fr": "logiciel de tableur",
+        "pt": "usar folhas de cálculo",
+    },
+}
+
+
+def write_esco_skills(directory, skills=None, revision: str = "9.9.9"):
+    """Write a skills file into ``directory`` the way `fetch_esco` writes one."""
+    from postulo.jobs.management.commands import fetch_esco
+
+    skills = ESCO_SKILLS if skills is None else skills
+    identifiers = sorted(skills)
+    languages = sorted({language for names in skills.values() for language in names})
+    names = {
+        language: [skills[identifier].get(language, "") for identifier in identifiers]
+        for language in languages
+    }
+    about = {
+        "revision": f"ESCO v{revision}",
+        "source": "https://esco.ec.europa.eu",
+        "publisher": fetch_esco.PUBLISHER,
+        "licence": "EUPL 1.2",
+        "languages": languages,
+        "skills": len(identifiers),
+    }
+    target = directory / f"esco-skills-{revision}.zip"
+    fetch_esco.write_skills(target, about, identifiers, names)
+    return target
+
+
+@pytest.fixture
+def esco_skills(tmp_path, monkeypatch):
+    """The ESCO skills, as the small file above, where the loader looks for them.
+
+    Nothing else is in that directory, so the occupations are absent for the test, which is
+    the state they are in wherever they have not been downloaded. What the process held of
+    the classification is dropped either side.
+    """
+    from postulo.jobs import esco
+
+    directory = tmp_path / "esco"
+    directory.mkdir()
+    write_esco_skills(directory)
+    monkeypatch.setattr(esco, "DATA_DIR", directory)
+    esco.forget()
+    yield directory
+    esco.forget()
+
+
+@pytest.fixture
+def no_esco(tmp_path, monkeypatch):
+    """No ESCO files at all, as on an instance where nobody ran `fetch_esco`."""
+    from postulo.jobs import esco
+
+    directory = tmp_path / "no-esco"
+    directory.mkdir()
+    monkeypatch.setattr(esco, "DATA_DIR", directory)
+    esco.forget()
+    yield directory
+    esco.forget()
+
+
 class InstalledSource:
     """A capture source installed on the instance rather than shipped inside it.
 

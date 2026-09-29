@@ -16,9 +16,11 @@ from __future__ import annotations
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
+from postulo.jobs import esco
 
 from . import translating
 
@@ -137,6 +139,13 @@ class SkillGroup(ResumeItem):
 
 class Skill(ResumeItem):
     name = models.CharField(_("name"), max_length=100)
+    #: The ESCO skill the name is, as the classification's own identifier -- a URI, since a
+    #: skill has no code the way an occupation's unit group has -- or empty where the name
+    #: is none of them. It follows the name rather than being set beside it, so the two
+    #: cannot disagree, and a skill that matches nothing is not a lesser kind of skill
+    #: (#266). Never read from a form or a file: `save` works it out, and so does anything
+    #: that writes skills without calling it.
+    esco_uri = models.CharField(_("ESCO skill"), max_length=200, blank=True, editable=False)
     group = models.ForeignKey(
         SkillGroup,
         on_delete=models.CASCADE,
@@ -152,6 +161,37 @@ class Skill(ResumeItem):
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, *args, **kwargs):
+        update = kwargs.get("update_fields")
+        if update is None or "name" in update:
+            # Derived whenever the name may be written, and carried along then, whatever
+            # else the save meant to write -- the rule a posting's code follows.
+            self.match()
+            if update is not None and "esco_uri" not in update:
+                kwargs["update_fields"] = [*update, "esco_uri"]
+        return super().save(*args, **kwargs)
+
+    def match(self) -> str:
+        """Work out which ESCO skill the name is, keep it, and say it.
+
+        Tried in the language the career record is written in, then in the one its owner
+        is reading, then in English: the record's first, because that is the language the
+        name was written in, and the reader's because that is the language the skill box
+        offered names in.
+        """
+        languages = [translating.record_language_of(self.owner)] if self.owner_id else []
+        self.esco_uri = esco.skill_for(self.name, *languages, get_language() or "")
+        return self.esco_uri
+
+    @property
+    def esco_name(self) -> str:
+        """What the classification calls this skill, in the language being read.
+
+        The English name where the classification publishes none in that language: this is
+        for the person editing their record, who is being told what the name was taken for.
+        """
+        return esco.skill_name(self.esco_uri, strict=False) if self.esco_uri else ""
 
 
 class Project(ResumeItem):

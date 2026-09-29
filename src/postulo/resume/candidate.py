@@ -277,6 +277,10 @@ KINDS_BY_BLOCK = {kind.block: kind for kind in KINDS}
 #: this one knows: a link arrives unchecked, and *Check* is this instance's to press.
 NOT_READ: dict[str, tuple[str, ...]] = {
     "links": ("check_status", "check_detail", "checked_at"),
+    # Which ESCO skill a skill's name is follows the name, in the classification this
+    # instance holds; another instance's answer is not asked, and `_place` works it out
+    # again from the name (#266).
+    "skills": ("esco_uri",),
 }
 
 #: The rows that hang off the profile, and what is read of each. Taken from what the export
@@ -1343,6 +1347,9 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
         item.owner = user
         if kind.block == "skills":
             item.group = row.parent.target if row.parent is not None else None
+            # `bulk_create` below calls no `save`, which is where a skill works out which
+            # ESCO skill its name is; so it is asked here, from the name, as a save would.
+            item.match()
         place = len(sequence)
         if dated is not None:
             mine = ordering.newest_first_key(item, dated)

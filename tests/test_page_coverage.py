@@ -148,6 +148,11 @@ EXCUSED: dict[str, str] = {
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",
     "resume:item_move": "a POST that reorders one entry in the career record",
+    "resume:skill_suggestions": (
+        "the `<option>` elements the skill box asks for as somebody types, as a fragment "
+        "rather than a page. It has no layout of its own; the skill form it fills, "
+        "`/career/skill/new/`, is walked (#266)"
+    ),
     "resume:link_check": "a POST that asks whether one link still answers",
     "resume:link_check_all": "a POST that asks the same of every link",
     "server:plugin_action": "a POST that installs, removes or disables a plugin",

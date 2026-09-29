@@ -447,6 +447,11 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     for entry in document.get("resume", {}).get("skills", []):
         old_id = entry.pop("id", None)
         group_id = entry.pop("group_id", None)
+        # The ESCO skill follows the name and is worked out again from it when the skill is
+        # saved, in this instance's classification; what the file says it was is not asked
+        # (format 24, #266). Taken out rather than handed over and overwritten, so that
+        # nothing a file says ever reaches the column by way of the constructor.
+        entry.pop("esco_uri", None)
         group = resume_map["skill_groups"].get(group_id)
         created = resume.Skill.objects.create(owner=user, group=group, **entry)
         resume_map["skills"][old_id] = created

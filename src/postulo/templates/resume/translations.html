@@ -47,6 +47,13 @@
               </li>
             {% endfor %}
           </ul>
+        {% elif recognised %}
+          {% comment %} A skill the ESCO classification names does not print its original
+             everywhere: where the classification publishes a name in a CV's language, that is
+             what prints until there is one of the person's own (#266). {% endcomment %}
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+            {% translate "None of your own yet. A CV in another language prints the name the ESCO classification gives this skill there, and the name as you wrote it where the classification gives none." %}
+          </p>
         {% else %}
           <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
             {% translate "None yet. This entry prints its original text on every CV." %}
@@ -67,7 +74,9 @@
         <div class="card mb-6">
           <c-section-title>
             <bdi>{{ language_name }}</bdi>
-            <c-slot name="subtitle">{% translate "Leave a box empty and that line prints as it is written above it." %}</c-slot>
+            {% comment %} The fallback, marked as the classification's where it is the one an
+               empty box would print (#266). {% endcomment %}
+            <c-slot name="subtitle">{% if classified %}{% blocktranslate trimmed with name=classified %}Leave the box empty and a CV in this language prints the name the ESCO classification gives this skill: “{{ name }}”.{% endblocktranslate %}{% else %}{% translate "Leave a box empty and that line prints as it is written above it." %}{% endif %}</c-slot>
           </c-section-title>
           {% for field, original in form.rows %}
             <div class="mb-4">

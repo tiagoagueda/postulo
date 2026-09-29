@@ -57,8 +57,9 @@ from postulo import __version__
 #: switched off, which had never travelled with the account (#299). 23 added ``events`` on a
 #: posting: its history, each entry with who it came from as a contact's id in this file
 #: and what it points at as an ``artefact_kind`` and an ``artefact_ref`` -- a capture or an
-#: upload, by its id here (#270).
-FORMAT_VERSION = 23
+#: upload, by its id here (#270). 24 added ``esco_uri`` on a skill, the ESCO skill its
+#: name matches in the classification, beside the name itself (#266).
+FORMAT_VERSION = 24
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -74,7 +75,10 @@ FORMAT_VERSION = 23
 #: It is written under its own key, `candidate_format`, which is the marker: a document that
 #: has it is a candidate file, and the archive's importer, which looks for `format`, refuses
 #: one without being taught to.
-CANDIDATE_FORMAT = 1
+#:
+#: 2 added ``esco_uri`` on a skill (#266), which is written and never read back: it follows
+#: the name, and the importing side works it out again from the name it is given.
+CANDIDATE_FORMAT = 2
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -336,7 +340,9 @@ RESUME_FIELDS = {
         "order",
     ),
     "skill_groups": ("id", "name", "order"),
-    "skills": ("id", "name", "group_id", "order"),
+    # The ESCO skill the name matches, beside the name (#266): written for whoever reads the
+    # file, and never read back -- the importers work it out again from the name.
+    "skills": ("id", "name", "esco_uri", "group_id", "order"),
     "certifications": (
         "id",
         "name",

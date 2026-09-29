@@ -22,7 +22,10 @@
    `datalists` -- so a field that suggests what somebody has already recorded (#261) is one
    line in the form, and the three templates that render it need to know nothing. A form
    without that property, or without options for that id, draws no list and the box stays
-   an ordinary text box: offering is never requiring.
+   an ordinary text box: offering is never requiring. The one exception is a box that asks
+   for its own options as somebody types (`hx-get` on the widget, the skill box of #266):
+   its list is drawn empty for htmx to fill, and with scripts off stays empty, which leaves
+   the ordinary text box.
 
    `wrap-anywhere` because a widget may put text here that Postulo did not write and cannot
    hyphenate. A bound file field says "Currently: <file name>", and a file name has no spaces
@@ -52,6 +55,8 @@
             <datalist id="{{ list_id }}">
               {% for value in options %}<option value="{{ value }}">{% endfor %}
             </datalist>
+          {% elif field.field.widget.attrs|get_item:"hx-get" %}
+            <datalist id="{{ list_id }}"></datalist>
           {% endif %}
         {% endwith %}
       {% endif %}

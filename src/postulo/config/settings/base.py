@@ -438,6 +438,11 @@ POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
 # hour. Each is a real message or a real request at a press of a button, and the button
 # had no bound at all (#232).
 POSTULO_CONNECTION_TEST_RATE = env("POSTULO_CONNECTION_TEST_RATE", default="10/h")
+# What the skill box asks for as somebody types, per account (#266): names from the ESCO
+# classification beginning with what has been typed. A request at each pause in typing is a
+# handful a skill, so six hundred an hour is a long afternoon of writing a career down, and
+# a bound on a script asking the server to search a list as fast as it can.
+POSTULO_SUGGESTION_RATE = env("POSTULO_SUGGESTION_RATE", default="600/h")
 
 # ---------------------------------------------------------- internationalisation
 
