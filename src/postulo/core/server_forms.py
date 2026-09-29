@@ -195,16 +195,25 @@ class OfferedLanguagesForm(forms.ModelForm):
         The page used to draw `{{ option.tag }}` and a name, and no flag, while *Settings ->
         Language and time* showed one beside every language. The rows come from the same
         helper now, so the two lists look the same (#208); `option` is the checkbox itself.
-        """
-        from postulo.accounts.forms import language_row
-        from postulo.core.languages import translation_status
 
-        status = translation_status()
+        `progress` is what the bar under each name draws (#312): reviewed, draft and
+        untranslated, filling from the start of the page the administrator is reading.
+        """
+        from django.utils.translation import get_language
+
+        from postulo.accounts.forms import language_row
+        from postulo.core import languages
+
+        status = languages.translation_status()
+        rtl = languages.is_rtl(get_language() or "")
         names = dict(self.every)
         return [
             {
                 "option": option,
                 **language_row(option.data["value"], names[option.data["value"]], status=status),
+                "progress": languages.translation_progress(
+                    status.get(option.data["value"]), rtl=rtl
+                ),
             }
             for option in self["offered_languages"]
         ]

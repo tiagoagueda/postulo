@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-29 20:08+0000\n"
+"POT-Creation-Date: 2026-09-29 20:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -274,6 +274,30 @@ msgstr "%(field)s : %(problem)s"
 msgid "%(figure)s %(currency)s a year"
 msgstr "%(figure)s %(currency)s par an"
 
+#: src/postulo/templates/cotton/translation_bar.html:35
+#, python-format, draft
+msgctxt "translation progress"
+msgid "%(figure)s draft"
+msgid_plural "%(figure)s draft"
+msgstr[0] "%(figure)s en brouillon"
+msgstr[1] "%(figure)s en brouillon"
+
+#: src/postulo/templates/cotton/translation_bar.html:30
+#, python-format, draft
+msgctxt "translation progress"
+msgid "%(figure)s reviewed"
+msgid_plural "%(figure)s reviewed"
+msgstr[0] "%(figure)s relue"
+msgstr[1] "%(figure)s relues"
+
+#: src/postulo/templates/cotton/translation_bar.html:40
+#, python-format, draft
+msgctxt "translation progress"
+msgid "%(figure)s untranslated"
+msgid_plural "%(figure)s untranslated"
+msgstr[0] "%(figure)s non traduite"
+msgstr[1] "%(figure)s non traduites"
+
 #: src/postulo/applications/reports.py:109
 #, python-format, draft
 msgid "%(from)s to %(to)s"
@@ -490,7 +514,7 @@ msgstr "%(name)s est désactivé ; ses fichiers sont toujours là."
 msgid "%(name)s is switched on again."
 msgstr "%(name)s est réactivé."
 
-#: src/postulo/core/server_forms.py:222
+#: src/postulo/core/server_forms.py:231
 #, python-format, draft
 msgid ""
 "%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
@@ -578,12 +602,18 @@ msgstr "%(plugin)s n'a pas pu vérifier ces réglages : %(error)s"
 msgid "%(provider)s does not let an application send on its own."
 msgstr "%(provider)s ne permet pas à une application d’envoyer d’elle-même."
 
-#: src/postulo/core/server_forms.py:479
+#: src/postulo/core/server_forms.py:488
 #, python-format, draft
 msgid ""
 "%(provider)s does not let an application send on its own. Choose “Signed in once”."
 msgstr ""
 "%(provider)s ne permet pas à une application d’envoyer d’elle-même. Choisissez « Connexion faite une fois »."
+
+#: src/postulo/templates/cotton/translation_bar.html:46
+#, python-format, draft
+msgctxt "translation progress"
+msgid "%(reviewed)s, %(draft)s, %(untranslated)s"
+msgstr "%(reviewed)s, %(draft)s, %(untranslated)s"
 
 #: src/postulo/documents/rendering.py:572
 #: src/postulo/notifications/management/commands/send_due_reminders.py:73
@@ -747,7 +777,7 @@ msgstr "(s’ouvre dans un nouvel onglet)"
 msgid "(part)"
 msgstr "(partielle)"
 
-#: src/postulo/core/server_forms.py:428
+#: src/postulo/core/server_forms.py:437
 #, draft
 msgid ""
 "587 with STARTTLS, 465 with TLS, 25 with neither. It has to agree with the security chosen below."
@@ -1126,7 +1156,7 @@ msgid ""
 msgstr ""
 "Une clé d’accès est liée à l’adresse à laquelle vous l’avez créée, ici %(host)s. Atteindre cette instance sous un autre nom, ou la déplacer, n’emportera pas vos clés d’accès."
 
-#: src/postulo/core/server_forms.py:334
+#: src/postulo/core/server_forms.py:343
 #, draft
 msgid ""
 "A password is right for your own mail server, and for Gmail with an app password. Microsoft 365 stops accepting passwords for sending mail by default at the end of December 2026; after that it needs XOAUTH2."
@@ -2427,7 +2457,7 @@ msgstr "Évaluation ou test"
 msgid "at least"
 msgstr "au moins"
 
-#: src/postulo/core/server_forms.py:216
+#: src/postulo/core/server_forms.py:225
 #, draft
 msgid "At least one language has to be offered, or nobody can read anything."
 msgstr ""
@@ -3176,7 +3206,7 @@ msgstr "Effacé : cette entrée imprime son texte d’origine en %(language)s."
 msgid "client ID"
 msgstr "ID client"
 
-#: src/postulo/core/server_forms.py:355
+#: src/postulo/core/server_forms.py:364
 #, draft
 msgid "Client secret"
 msgstr "Secret client"
@@ -3485,7 +3515,7 @@ msgstr "Connexion enregistrée. Testez-la pour vérifier qu'elle fonctionne."
 msgid "connection security"
 msgstr "sécurité de la connexion"
 
-#: src/postulo/core/server_forms.py:309
+#: src/postulo/core/server_forms.py:318
 #, draft
 msgid "Connection security"
 msgstr "Sécurité de la connexion"
@@ -5349,7 +5379,7 @@ msgstr "Oublier %(name)s"
 msgid "Forget the grant"
 msgstr "Oublier l’autorisation"
 
-#: src/postulo/core/server_forms.py:324
+#: src/postulo/core/server_forms.py:333
 #, draft
 msgid "Forget the stored password"
 msgstr "Oublier le mot de passe enregistré"
@@ -5829,7 +5859,7 @@ msgstr "À quelle régularité"
 msgid "How the first rows will be read"
 msgstr "Comment les premières lignes seront lues"
 
-#: src/postulo/core/server_forms.py:346
+#: src/postulo/core/server_forms.py:355
 #, draft
 msgid "How the token is obtained"
 msgstr "Comment le jeton est obtenu"
@@ -5939,7 +5969,7 @@ msgstr "Se présente comme"
 msgid "identity provider"
 msgstr "fournisseur d’identité"
 
-#: src/postulo/core/server_forms.py:341
+#: src/postulo/core/server_forms.py:350
 #, draft
 msgid "Identity provider"
 msgstr "Fournisseur d’identité"
@@ -6820,7 +6850,7 @@ msgstr "langue"
 msgid "Language and time"
 msgstr "Langue et heure"
 
-#: src/postulo/core/server_forms.py:249
+#: src/postulo/core/server_forms.py:258
 #, draft
 msgid "Language for new accounts"
 msgstr "Langue des nouveaux comptes"
@@ -7003,7 +7033,7 @@ msgid "Leave a box empty and that line prints as it is written above it."
 msgstr ""
 "Laissez une case vide et cette ligne s’imprime telle qu’elle est écrite au-dessus."
 
-#: src/postulo/core/server_forms.py:321 src/postulo/core/server_forms.py:358
+#: src/postulo/core/server_forms.py:330 src/postulo/core/server_forms.py:367
 #, draft
 msgid "Leave blank to keep the one already stored."
 msgstr "Laissez vide pour conserver celui déjà enregistré."
@@ -7424,7 +7454,7 @@ msgstr "secrets OAuth de la messagerie"
 msgid "mail transport"
 msgstr "transport du courrier"
 
-#: src/postulo/core/server_forms.py:519
+#: src/postulo/core/server_forms.py:528
 #, draft
 msgid "Mail transport"
 msgstr "Transport du courrier"
@@ -7604,7 +7634,7 @@ msgstr "Fusionné."
 msgid "Message"
 msgstr "Message"
 
-#: src/postulo/core/server_forms.py:394
+#: src/postulo/core/server_forms.py:403
 #, draft
 msgid ""
 "Microsoft only: the directory the application is registered in. Leave blank for an application that accepts any directory."
@@ -8418,7 +8448,7 @@ msgstr "non défini"
 msgid "Not set here — the environment or the default applies"
 msgstr "Non défini ici — l'environnement ou la valeur par défaut s'applique"
 
-#: src/postulo/core/server_forms.py:386
+#: src/postulo/core/server_forms.py:395
 #, draft
 msgid "Not set — the environment decides"
 msgstr "Non défini — l'environnement décide"
@@ -8632,7 +8662,7 @@ msgstr "Rien n’est installé sur quoi une personne puisse avoir un avis."
 msgid "Nothing is saved until you have reviewed it."
 msgstr "Rien n'est enregistré avant que vous ayez vérifié."
 
-#: src/postulo/core/server_forms.py:326
+#: src/postulo/core/server_forms.py:335
 #, draft
 msgid "Nothing is sent to the server as a password until a new one is entered."
 msgstr ""
@@ -9232,7 +9262,7 @@ msgstr[1] ""
 msgid "One per line. A CV prints them as bullets."
 msgstr "Un par ligne. Un CV les imprime sous forme de puces."
 
-#: src/postulo/core/templatetags/postulo.py:560
+#: src/postulo/core/templatetags/postulo.py:572
 #, python-format, draft
 msgid "One row ticked."
 msgid_plural "%(count)s rows ticked."
@@ -9607,7 +9637,7 @@ msgstr "Clés d’accès"
 msgid "password"
 msgstr "mot de passe"
 
-#: src/postulo/core/server_forms.py:318
+#: src/postulo/core/server_forms.py:327
 #: src/postulo/templates/server/email.html:26
 #: src/postulo/templates/settings/account.html:78
 #, draft
@@ -11273,7 +11303,7 @@ msgstr "salaire jusqu'à"
 #: src/postulo/templates/server/capture.html:118
 #: src/postulo/templates/server/data_protection.html:41
 #: src/postulo/templates/server/defaults.html:54
-#: src/postulo/templates/server/defaults.html:95
+#: src/postulo/templates/server/defaults.html:103
 #: src/postulo/templates/server/email.html:224
 #: src/postulo/templates/server/person_plugins.html:105
 #: src/postulo/templates/server/person_username.html:24
@@ -11414,7 +11444,7 @@ msgstr "Rechercher  /"
 msgid "Search everything"
 msgstr "Tout rechercher"
 
-#: src/postulo/core/server_forms.py:436
+#: src/postulo/core/server_forms.py:445
 #, draft
 msgid "Seconds to wait for the server before giving up."
 msgstr "Nombre de secondes à attendre le serveur avant d'abandonner."
@@ -11488,7 +11518,7 @@ msgstr "Envoyer un vrai message"
 msgid "Send a test message"
 msgstr "Envoyer un message de test"
 
-#: src/postulo/core/server_forms.py:282
+#: src/postulo/core/server_forms.py:291
 #, draft
 msgid "Send a test message to"
 msgstr "Envoyer un message de test à"
@@ -11875,7 +11905,7 @@ msgstr "Méthodes de connexion"
 msgid "Signed in once, as the mailbox that sends"
 msgstr "Connexion faite une fois, en tant que la boîte qui envoie"
 
-#: src/postulo/core/server_forms.py:348
+#: src/postulo/core/server_forms.py:357
 #, draft
 msgid ""
 "Signed in once: somebody agrees on the provider's consent screen, as the mailbox that sends, and needs no administrator. The application sends on its own: Microsoft only, and needs a tenant administrator to grant the permission."
@@ -11895,7 +11925,7 @@ msgid ""
 msgstr ""
 "Connecté. Le fournisseur peut retirer cela à tout moment — si un mot de passe change, ou si le compte n’est pas utilisé pendant des mois — et l’envoi s’arrête alors. La page ci-dessus le signale dès qu’un envoi échoue."
 
-#: src/postulo/core/server_forms.py:332
+#: src/postulo/core/server_forms.py:341
 #, draft
 msgid "Signing in"
 msgstr "Connexion"
@@ -12276,7 +12306,7 @@ msgstr "début"
 msgid "starts %(day)s"
 msgstr "début le %(day)s"
 
-#: src/postulo/core/server_forms.py:311
+#: src/postulo/core/server_forms.py:320
 #, draft
 msgid ""
 "STARTTLS connects and then upgrades, which is what port 587 expects. TLS from the first byte is what port 465 expects. They are not interchangeable: point one at the other's port and each waits for the other to speak."
@@ -13163,7 +13193,7 @@ msgstr "L'adresse a répondu %(code)s."
 msgid "The address answered with nothing."
 msgstr "L'adresse a répondu sans rien."
 
-#: src/postulo/core/server_forms.py:437
+#: src/postulo/core/server_forms.py:446
 #, draft
 msgid ""
 "The address people see it came from. Many servers refuse to send as an address they do not host."
@@ -13175,7 +13205,7 @@ msgstr ""
 msgid "The application deadline, if stated."
 msgstr "La date limite de candidature, si elle est indiquée."
 
-#: src/postulo/core/server_forms.py:441
+#: src/postulo/core/server_forms.py:450
 #, draft
 msgid ""
 "The application registered with the provider. Not a secret: it is the secret beside it that is."
@@ -13942,7 +13972,7 @@ msgstr ""
 msgid "The server refused those credentials: %(detail)s"
 msgstr "Le serveur a refusé ces identifiants : %(detail)s"
 
-#: src/postulo/core/server_forms.py:427
+#: src/postulo/core/server_forms.py:436
 #, draft
 msgid "The server that accepts the mail — its name, not an address."
 msgstr "Le serveur qui accepte le courrier — son nom, pas une adresse."
@@ -14631,7 +14661,7 @@ msgstr "Fuseau horaire"
 msgid "time zone"
 msgstr "fuseau horaire"
 
-#: src/postulo/core/server_forms.py:258
+#: src/postulo/core/server_forms.py:267
 #, draft
 msgid "Time zone for new accounts"
 msgstr "Fuseau horaire des nouveaux comptes"
@@ -14882,6 +14912,13 @@ msgid "Uncheck to keep the entry on this variant but leave it off the page."
 msgstr ""
 "Décochez pour garder l'entrée sur cette variante sans la faire figurer sur la page."
 
+#: src/postulo/templates/server/defaults.html:78
+#, draft
+msgid ""
+"Under each language, how many of Postulo's strings a speaker has reviewed, how many are drafts nobody has read yet, and how many are not translated at all."
+msgstr ""
+"Sous chaque langue, combien de chaînes de Postulo un locuteur a relues, combien sont des brouillons que personne n’a encore lus, et combien ne sont pas traduites du tout."
+
 #: src/postulo/accounts/forms.py:465
 #, draft
 msgid "Underline the page you are on"
@@ -15092,7 +15129,7 @@ msgstr ""
 msgid "Using a token"
 msgstr "Utiliser un jeton"
 
-#: src/postulo/core/server_forms.py:432
+#: src/postulo/core/server_forms.py:441
 #, draft
 msgid ""
 "Usually the whole address. Leave it empty for a server that wants no sign-in — a relay on your own network, most often."
@@ -15352,7 +15389,7 @@ msgstr "Ce dont %(plugin)s a besoin"
 msgid "What a component asks for"
 msgstr "Ce qu'un composant demande"
 
-#: src/postulo/core/server_forms.py:252 src/postulo/core/server_forms.py:259
+#: src/postulo/core/server_forms.py:261 src/postulo/core/server_forms.py:268
 #, draft
 msgid "What a new account starts with. Each person can change theirs."
 msgstr ""
@@ -15385,7 +15422,7 @@ msgstr "Ce qui est revenu pendant cette période"
 msgid "what came of it"
 msgstr "ce qui en est sorti"
 
-#: src/postulo/core/server_forms.py:522
+#: src/postulo/core/server_forms.py:531
 #, draft
 msgid "What carries the mail off this machine."
 msgstr "Ce qui emporte le courrier hors de cette machine."
@@ -16099,7 +16136,7 @@ msgstr ""
 msgid "Who awarded it."
 msgstr "Qui l'a délivrée."
 
-#: src/postulo/core/server_forms.py:343
+#: src/postulo/core/server_forms.py:352
 #, draft
 msgid "Who issues the token. It decides which of the boxes below are wanted."
 msgstr ""

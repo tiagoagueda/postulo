@@ -288,14 +288,22 @@ def test_the_bar_is_not_stretched_out_of_shape_any_more():
     corner radius is scaled with everything else, and `rx="3"` renders as a wide shallow
     ellipse rather than a semicircle — which reads as a flattened, slightly pointed end,
     and the narrower the bar the more obvious it is.
+
+    So the rule is about the corner, not the stretch. The translation bar (#312) stretches
+    its viewBox on purpose -- it has three parts, which a `<progress>` cannot hold, and the
+    policy refuses a width written as a style -- and it may, because it draws square ends:
+    no `rx`, no `ry`, nothing round for the stretch to flatten.
     """
     templates = (Path(__file__).resolve().parents[1] / "src" / "postulo" / "templates").rglob(
         "*.html"
     )
     offenders = [
-        p.name for p in templates if 'preserveAspectRatio="none"' in p.read_text(encoding="utf-8")
+        p.name
+        for p in templates
+        if 'preserveAspectRatio="none"' in (text := p.read_text(encoding="utf-8"))
+        and re.search(r"\br[xy]=|<circle|<ellipse", text)
     ]
-    assert not offenders, f"a stretched viewBox is back in {offenders}"
+    assert not offenders, f"a rounded shape in a stretched viewBox is back in {offenders}"
 
 
 def test_the_bar_carries_a_name_and_the_stage_count_is_beside_it(client, user, company):

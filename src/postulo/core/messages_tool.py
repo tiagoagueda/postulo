@@ -772,16 +772,31 @@ def cmd_check() -> int:
 
 
 def stats_for(catalogue: Catalogue) -> dict[str, int]:
+    """How far along one catalogue is.
+
+    ``translated`` is every string with something written in each form, and ``drafts`` and
+    ``reviewed`` divide some of those between them: a draft is still flagged ``draft``, and
+    a reviewed string is flagged neither ``draft`` nor ``fuzzy``. A ``fuzzy`` one is left
+    out of both on purpose. It is not compiled, so nobody reads it, and nobody has settled
+    it either; counting it as reviewed, which ``translated - drafts`` did, would draw
+    somebody's unsettled doubt in the colour of a speaker's approval (#312). ``fuzzy``
+    counts every string so flagged, translated or not.
+    """
     total = len(catalogue.messages)
     translated = sum(1 for m in catalogue.messages.values() if m.translated)
     drafts = sum(1 for m in catalogue.messages.values() if m.translated and "draft" in m.flags)
     fuzzy = sum(1 for m in catalogue.messages.values() if "fuzzy" in m.flags)
+    reviewed = sum(
+        1
+        for m in catalogue.messages.values()
+        if m.translated and "draft" not in m.flags and "fuzzy" not in m.flags
+    )
     return {
         "total": total,
         "translated": translated,
         "drafts": drafts,
         "fuzzy": fuzzy,
-        "reviewed": translated - drafts,
+        "reviewed": reviewed,
         "percent": round(100 * translated / total) if total else 0,
     }
 

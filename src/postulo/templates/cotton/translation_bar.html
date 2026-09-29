@@ -1,0 +1,51 @@
+{% load i18n postulo %}
+<c-vars progress class="" />
+{% comment %} How far along a language's translation is: a bar, and the same thing in words (#312).
+
+   `<c-translation-bar :progress="row.progress" class="col-span-2 col-start-2" />`
+
+   `progress` is what `languages.translation_progress` makes of the language's line in
+   `status.json`, and every sum is done there: three counts that add up to the total, and
+   for each part with anything in it a width in whole percent and where it starts. This
+   file only draws. It draws nothing for nothing -- no line in the file, or a catalogue
+   with no strings -- and the row shows the name alone, as it does without the file.
+
+   An SVG and not a `<progress>`, because there are three parts and a `<progress>` holds
+   one value; and the widths are attributes in the drawing's own units, stretched to the
+   box, because `style-src 'self'` refuses `style="width: 42%"` (#291). For a page written
+   right to left the parts are already mirrored in Python, so the drawing carries its own
+   direction.
+
+   The bar is `aria-hidden`: the words under it say everything it does, in the reader's
+   plural forms, and nobody is made to hear it twice. Nor is colour the only thing telling
+   the parts apart: the words come in the order the parts are drawn, the card shows
+   between one part and the next, and under forced colours the three take three system
+   colours. `class` is where the caller puts it in its row.
+{% endcomment %}
+{% if progress %}
+  <span class="flex min-w-0 flex-col gap-1{% if class %} {{ class }}{% endif %}">
+    <svg class="translation-bar" viewBox="0 0 {{ progress.span }} 1" preserveAspectRatio="none" aria-hidden="true">
+      {% for segment in progress.segments %}<rect x="{{ segment.x }}" width="{{ segment.width }}" height="1" data-part="{{ segment.part }}"></rect>{% endfor %}
+    </svg>
+    {% blocktranslate count counter=progress.reviewed with figure=progress.reviewed|grouped context "translation progress" asvar reviewed trimmed %}
+      {{ figure }} reviewed
+    {% plural %}
+      {{ figure }} reviewed
+    {% endblocktranslate %}
+    {% blocktranslate count counter=progress.draft with figure=progress.draft|grouped context "translation progress" asvar draft trimmed %}
+      {{ figure }} draft
+    {% plural %}
+      {{ figure }} draft
+    {% endblocktranslate %}
+    {% blocktranslate count counter=progress.untranslated with figure=progress.untranslated|grouped context "translation progress" asvar untranslated trimmed %}
+      {{ figure }} untranslated
+    {% plural %}
+      {{ figure }} untranslated
+    {% endblocktranslate %}
+    <span class="text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate with reviewed=reviewed draft=draft untranslated=untranslated context "translation progress" trimmed %}
+        {{ reviewed }}, {{ draft }}, {{ untranslated }}
+      {% endblocktranslate %}
+    </span>
+  </span>
+{% endif %}

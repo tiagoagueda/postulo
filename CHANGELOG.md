@@ -132,6 +132,7 @@ All notable changes to Postulo are recorded here. The format follows
   listing form and the capture review; the posting keeps the ISCO-08 code its title
   matches beside it, on its page, the API and the export (format 18). **Postings already
   recorded have no code until their title is next saved.** (#266)
+- *Server settings → Defaults* draws a bar under each language, green for strings a speaker has reviewed, amber for drafts and grey for the untranslated, with the three counts in words beside it. (#312)
 
 ### 🐛 Fixed
 

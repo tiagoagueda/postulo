@@ -1206,6 +1206,41 @@ progress.funnel-bar::-moz-progress-bar {
   }
 }
 
+/* -------------------------------------------------------- translation bars */
+
+/*
+  How far along a language is, under its name on *Server settings -> Defaults* (#312):
+  reviewed, draft and untranslated, from the inline start, drawn by `<c-translation-bar>`.
+  An SVG whose parts carry their widths as attributes, stretched across the column by
+  `preserveAspectRatio="none"` -- which is why the ends are square: a radius stretched with
+  the drawing is the flattened ellipse the funnel bars above used to have.
+
+  Every part is 3:1 against the card and against the row's hover tint, in both themes, and
+  no two parts touch. Three colours and a background cannot all be 3:1 from one another --
+  that takes a range of 27 to 1, and black on white is 21 -- so the card shows between one
+  part and the next and each part is measured against it (`tests/test_contrast.py`). Green
+  for reviewed and amber for a draft, the hues of the language picker's symbols in the
+  shades that clear 3:1; the grey is the field boundary's, the lightest one the palette
+  holds at 3:1 (#274), so that what is missing is the quietest part of the bar.
+*/
+@layer components {
+  .translation-bar {
+    @apply block h-1.5 w-full;
+  }
+
+  .translation-bar > [data-part="reviewed"] {
+    @apply fill-emerald-600 dark:fill-emerald-400;
+  }
+
+  .translation-bar > [data-part="draft"] {
+    @apply fill-amber-700 dark:fill-amber-400;
+  }
+
+  .translation-bar > [data-part="untranslated"] {
+    @apply fill-input;
+  }
+}
+
 /* ------------------------------------------------------------ account menu */
 
 /* The summary is the trigger; the browser's disclosure triangle is not wanted on it. */
@@ -1553,6 +1588,24 @@ html {
   progress.funnel-bar::-moz-progress-bar {
     forced-color-adjust: none;
     background-color: Highlight;
+  }
+
+  /* The translation bar (#312) opts out as well and paints its three parts in three system
+     colours, so they still differ from one another and not only by the gap between them. */
+  .translation-bar {
+    forced-color-adjust: none;
+  }
+
+  .translation-bar > [data-part="reviewed"] {
+    fill: CanvasText;
+  }
+
+  .translation-bar > [data-part="draft"] {
+    fill: Highlight;
+  }
+
+  .translation-bar > [data-part="untranslated"] {
+    fill: GrayText;
   }
 }
 

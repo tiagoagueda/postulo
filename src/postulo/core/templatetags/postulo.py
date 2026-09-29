@@ -538,6 +538,18 @@ def percent(value) -> str:
     return gettext("%(share)s%%") % {"share": value}
 
 
+@register.filter
+def grouped(value) -> str:
+    """A whole number with its thousands grouped as the reader's language groups them.
+
+    1,873 in English, 1 873 in French and 1.873 in Portuguese. Django groups only when
+    ``USE_THOUSAND_SEPARATOR`` is on, which would regroup every number on every page -- a
+    year, a port, a postcode typed as digits -- so a count that is read as a quantity asks
+    for it here instead, as the salary and the money already do (#312).
+    """
+    return number_format(value, use_l10n=True, force_grouping=True)
+
+
 @register.simple_tag
 def ticked_counts(rows) -> str:
     """Every sentence the bulk bar can need, as JSON, indexed by how many rows are ticked.

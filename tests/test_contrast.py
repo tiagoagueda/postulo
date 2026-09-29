@@ -118,3 +118,75 @@ def test_forced_colours_underlines_it_whatever_the_preference_says():
 
 def test_more_contrast_is_answered():
     assert "@media (prefers-contrast: more)" in CSS
+
+
+# ------------------------------------------------------------ the translation bar
+
+
+COMPILED = (
+    Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "css" / "app.css"
+).read_text("utf-8")
+
+#: Tailwind's own palette as the compiled stylesheet carries it: `oklch(59.6% 0.145 163.225)`.
+PALETTE = re.compile(r"--color-([\w-]+):\s*oklch\(([\d.]+)%\s+([\d.]+)\s+([\d.]+)\)")
+
+
+def palette() -> dict[str, float]:
+    return {
+        match.group(1): luminance(
+            float(match.group(2)) / 100, float(match.group(3)), float(match.group(4))
+        )
+        for match in PALETTE.finditer(COMPILED)
+    }
+
+
+def bar_fills() -> dict[str, tuple[str, str]]:
+    """Each part of the bar and the colour it takes in the light theme and in the dark,
+    read from the rule that paints it rather than written down a second time here."""
+    fills = {}
+    for part in ("reviewed", "draft", "untranslated"):
+        start = CSS.index(f'.translation-bar > [data-part="{part}"] {{')
+        rule = CSS[start : CSS.index("}", start)]
+        light = re.search(r"(?<![:\w-])fill-([\w-]+)", rule).group(1)
+        dark = re.search(r"dark:fill-([\w-]+)", rule)
+        fills[part] = (light, dark.group(1) if dark else light)
+    return fills
+
+
+def test_every_part_of_the_translation_bar_clears_three_to_one_in_both_themes():
+    """SC 1.4.11, measured the way a contrast checker would (#312).
+
+    Against the card the bar sits on and against the tint of the row under the pointer.
+    Not against one another: three colours and a background cannot all be 3:1 apart, so
+    the parts never touch and the card between them is their neighbour.
+    """
+    from postulo.core import languages
+
+    light, dark = tokens()
+    colours = palette()
+    light, dark = {**colours, **light}, {**colours, **dark}
+    grounds = {
+        "light": {"card": 1.0, "row under the pointer": light["ink-100"]},
+        "dark": {"card": dark["card"], "row under the pointer": dark["ink-800"]},
+    }
+    fills = bar_fills()
+    assert fills["reviewed"][0].startswith("emerald") and fills["draft"][0].startswith("amber")
+    for part, (light_token, dark_token) in fills.items():
+        for theme, token, table in (("light", light_token, light), ("dark", dark_token, dark)):
+            for ground, value in grounds[theme].items():
+                ratio = contrast(table[token], value)
+                assert ratio >= 3, f"{part} ({token}) on the {ground}, {theme}: {ratio:.2f}"
+    assert languages.BAR_GAP >= 1, "the parts touch, so each would need 3:1 from the next"
+
+
+def test_the_translation_bar_is_painted_in_system_colours_when_forced():
+    """Three parts that still differ from one another under a high-contrast theme."""
+    forced = CSS[CSS.rindex("@media (forced-colors: active)") :]
+    assert ".translation-bar {\n    forced-color-adjust: none;" in forced
+    painted = {
+        part: re.search(
+            rf'\.translation-bar > \[data-part="{part}"\] \{{\s*fill: (\w+);', forced
+        ).group(1)
+        for part in ("reviewed", "draft", "untranslated")
+    }
+    assert len(set(painted.values())) == 3, painted

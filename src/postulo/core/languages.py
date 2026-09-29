@@ -27,6 +27,9 @@ Every irregularity above is handled here rather than special-cased at each call 
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+
 #: Language code → the ISO 3166-1 alpha-2 code of the country whose flag stands for it.
 #:
 #: The country, not the flag. What gets drawn is an SVG out of ``static/flags/``, picked by
@@ -370,6 +373,148 @@ def translation_status() -> dict[str, dict[str, int]]:
 
 
 _STATUS: dict[str, dict[str, int]] | None = None
+
+
+#: The parts of a translation bar, in the order they are drawn from the inline start (#312).
+PROGRESS_PARTS: tuple[str, ...] = ("reviewed", "draft", "untranslated")
+
+#: The space left between two parts of the bar, in the units the parts are measured in.
+#:
+#: Three colours and a background cannot each stand 3:1 from all the others: on white that
+#: takes a range of 27 to 1 and white to black is only 21. So the parts never touch. Each
+#: is 3:1 against the card, and the gap between two of them *is* the card, which is what
+#: SC 1.4.11 measures a part against; under forced colours it is what still tells one part
+#: from the next. Outside the hundred rather than taken from it, so a part of 1 % is drawn
+#: as 1 % and not as a sliver with a hole in it.
+BAR_GAP = 1
+
+
+@dataclass(frozen=True)
+class BarSegment:
+    """One part of the bar: what it counts, how wide it is, and where it starts."""
+
+    part: str
+    count: int
+    #: Whole percent of the hundred the parts share between them.
+    width: int
+    #: Where the part starts, in the bar's own units, measured from the left edge of the
+    #: drawing: already mirrored for a page written right to left.
+    x: int
+
+
+@dataclass(frozen=True)
+class TranslationProgress:
+    """How far along a language is, as three counts that add up to the whole (#312).
+
+    ``status.json`` counts what ``scripts/messages.py stats`` finds in the catalogues:
+    ``translated`` is every string with something written in each form, ``drafts`` those
+    of them still flagged ``draft``, and ``reviewed`` those of them flagged neither
+    ``draft`` nor ``fuzzy`` -- what a speaker has read and settled. A ``fuzzy`` string with
+    text in it is therefore translated and not reviewed, and lands with the drafts, which
+    is where it belongs: somebody wrote it and nobody has settled it. One with nothing
+    written is untranslated, like any other string with nothing written.
+    """
+
+    total: int
+    reviewed: int
+    draft: int
+    untranslated: int
+    #: The parts to draw, in `PROGRESS_PARTS` order and only those with something in them.
+    segments: tuple[BarSegment, ...]
+    #: The width of the whole drawing: the hundred plus a gap between each two parts.
+    span: int
+
+
+def whole_percents(counts: Sequence[int]) -> list[int]:
+    """Each count as a whole percentage of their sum, adding up to exactly 100.
+
+    The largest-remainder method: every share is rounded down, and the points that leaves
+    over go one each to the shares that rounding cost the most. Two rules sit on top of it,
+    because a bar is read at a glance and a glance believes what it sees:
+
+    * a count of nothing is 0, and is never drawn;
+    * a count of anything is at least 1, so a single string untranslated among two
+      thousand is a sliver rather than nothing at all.
+
+    With the sum held at 100, those two are what make the promises that matter: a bar
+    with anything untranslated never reads as 100 % done, and a bar with nothing
+    untranslated never reads as 99. A share raised to 1 is paid for by the share that
+    rounding down cost least, which is always one wider than 1.
+
+    Integer arithmetic throughout, so a remainder is compared exactly and not as a float
+    that is almost the same as its neighbour.
+    """
+    counts = [max(int(count), 0) for count in counts]
+    total = sum(counts)
+    if not total:
+        return [0] * len(counts)
+    widths = [100 * count // total for count in counts]
+    remainders = [100 * count % total for count in counts]
+    raised = {i for i, count in enumerate(counts) if count and not widths[i]}
+    for i in raised:
+        widths[i] = 1
+    leftover = 100 - sum(widths)
+    if leftover > 0:
+        eligible = [i for i, count in enumerate(counts) if count and i not in raised]
+        # Most cost by rounding first; a tie goes to the part drawn first.
+        for i in sorted(eligible, key=lambda i: (-remainders[i], i))[:leftover]:
+            widths[i] += 1
+    taken = [0] * len(counts)
+    while sum(widths) > 100:
+        spare = [i for i, width in enumerate(widths) if width > 1]
+        i = min(spare, key=lambda i: (taken[i], remainders[i], -widths[i], i))
+        widths[i] -= 1
+        taken[i] += 1
+    return widths
+
+
+def translation_progress(
+    row: Mapping[str, int] | None, *, rtl: bool = False
+) -> TranslationProgress | None:
+    """A language's line in ``status.json`` as a bar: three counts, three widths (#312).
+
+    Nothing where there is nothing to draw -- no line for the language, or a catalogue
+    with no strings in it -- and the caller shows the name alone, as it does without the
+    file. The counts are clamped into the total, so a hand-edited or half-written file
+    draws a bar that adds up rather than one that runs off its end.
+
+    ``rtl`` is the page's direction, not the language's: the bar fills from the inline
+    start of the page it sits on, like the words beside it.
+    """
+    if not row:
+        return None
+    total = max(int(row.get("total") or 0), 0)
+    if not total:
+        return None
+    translated = min(max(int(row.get("translated") or 0), 0), total)
+    reviewed = row.get("reviewed")
+    if reviewed is None:
+        # A file older than the `reviewed` count: everything translated and not a draft.
+        reviewed = translated - int(row.get("drafts") or 0)
+    reviewed = min(max(int(reviewed), 0), translated)
+    counts = (reviewed, translated - reviewed, total - translated)
+
+    segments: list[BarSegment] = []
+    start = 0
+    for part, count, width in zip(PROGRESS_PARTS, counts, whole_percents(counts), strict=True):
+        if not width:
+            continue
+        segments.append(BarSegment(part=part, count=count, width=width, x=start))
+        start += width + BAR_GAP
+    span = 100 + BAR_GAP * (len(segments) - 1)
+    if rtl:
+        segments = [
+            BarSegment(part=s.part, count=s.count, width=s.width, x=span - s.x - s.width)
+            for s in segments
+        ]
+    return TranslationProgress(
+        total=total,
+        reviewed=counts[0],
+        draft=counts[1],
+        untranslated=counts[2],
+        segments=tuple(segments),
+        span=span,
+    )
 
 
 #: Language subtags written right to left.

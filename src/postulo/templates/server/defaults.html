@@ -72,19 +72,27 @@
         {% translate "All of them are offered, and a language added in a later release will be too." %}
       </p>
     {% endif %}
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Under each language, how many of Postulo's strings a speaker has reviewed, how many
+        are drafts nobody has read yet, and how many are not translated at all.
+      {% endblocktranslate %}
+    </p>
     <c-field-feedback :field="languages_form.offered_languages" />
     {% comment %} The same row the locale picker draws: checkbox, flag, the name in its own
-       language, and how the translation was made, in that order and with the flag outside
-       the `lang` span (#208). The flag's box is there whether or not a flag is -- a language
-       with no single home has none -- so the names line up down the column. {% endcomment %}
+       language, in that order and with the flag outside the `lang` span (#208). The flag's
+       box is there whether or not a flag is -- a language with no single home has none --
+       so the names line up down the column. Under the flag and the name, how far along the
+       translation is, as a bar and in words (#312); that takes the place of the picker's
+       symbol, which said less and needed a legend this page did not have. {% endcomment %}
     <div class="grid gap-1 sm:grid-cols-2">
       {% for row in languages_form.rows %}
-        <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
-                      hover:bg-ink-100 dark:hover:bg-ink-800">
+        <label class="grid grid-cols-[auto_auto_minmax(0,1fr)] items-center gap-x-3 gap-y-1
+                      rounded-lg px-2 py-1.5 text-sm hover:bg-ink-100 dark:hover:bg-ink-800">
           {{ row.option.tag }}
           <span class="flex w-5 shrink-0 items-center">{% flag row.country %}</span>
           <span lang="{{ row.code }}">{{ row.name }}</span>
-          {% include "partials/translation_state.html" with state=row.state percent=row.percent %}
+          <c-translation-bar :progress="row.progress" class="col-span-2 col-start-2" />
         </label>
       {% endfor %}
     </div>

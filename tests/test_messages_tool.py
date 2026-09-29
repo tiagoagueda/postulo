@@ -214,9 +214,32 @@ def test_stats_count_drafts_apart_from_reviewed_work(tool):
         "translated": 3,
         "drafts": 1,
         "fuzzy": 1,
-        "reviewed": 2,
+        # B alone. D has text in it and is not a draft, but nobody has settled it and
+        # nobody reads it, so it is not reviewed either; it used to be counted as if it
+        # were (#312).
+        "reviewed": 1,
         "percent": 75,
     }
+
+
+def test_a_fuzzy_draft_is_counted_once(tool):
+    """Flagged both ways, it is a draft and it is fuzzy, and it is still not reviewed: the
+    parts the translation bar draws come out of these counts and must add up (#312)."""
+    catalogue = tool.Catalogue(
+        header={},
+        messages={
+            (None, "A"): tool.Message(msgid="A", msgstr=["a"], flags=["draft", "fuzzy"]),
+            (None, "B"): tool.Message(msgid="B", msgstr=[""], flags=["fuzzy"]),
+        },
+    )
+    stats = tool.stats_for(catalogue)
+
+    assert (stats["translated"], stats["drafts"], stats["fuzzy"], stats["reviewed"]) == (
+        1,
+        1,
+        2,
+        0,
+    )
 
 
 # ------------------------------------------- the tool in a plugin's repository (#187)
