@@ -35,6 +35,20 @@ CHOICES: dict[str, tuple[str, ...]] = {
 #: Where a request has to be reachable from: the two schemes a browser will follow.
 URL_SCHEMES = ("http", "https")
 
+#: What a capture may keep of its page, in bytes (#256). Each is compared with a
+#: `Content-Length` before a byte is read, so each has to be a number that comparison can be
+#: made against -- and one that leaves room for something. A cap of nothing would be a
+#: second, quieter way of switching keeping off, and the switch is where that is said.
+BYTE_CAPS = (
+    "POSTULO_CAPTURE_SOURCE_MAX_BYTES",
+    "POSTULO_CAPTURE_RENDERING_MAX_BYTES",
+    "POSTULO_CAPTURE_ACCOUNT_MAX_BYTES",
+)
+
+#: Settings that count days, where nought means *for ever* and less than nought means
+#: nothing at all.
+DAY_COUNTS = ("POSTULO_CAPTURE_PAGE_KEEP_DAYS",)
+
 
 def rate_settings() -> list[str]:
     """Every `POSTULO_*_RATE` the settings define, whichever module added it."""
@@ -76,6 +90,47 @@ def rates(app_configs=None, **kwargs) -> list[Error]:
                     f"{name} is {value!r}; a rate is written like 30/h, 5/m or 600/d, "
                     "and empty or 0 means no limit.",
                     id="postulo.E002",
+                )
+            )
+    return problems
+
+
+def _whole_number(value) -> bool:
+    """An integer, and not the boolean Python would also count as one."""
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+@register("postulo")
+def sizes(app_configs=None, **kwargs) -> list[Error]:
+    """A cap is a whole number of bytes, one or more; a count of days is nought or more.
+
+    These guard what a capture keeps of its page (#256). The cap is what an upload is
+    refused against before it is read, so a cap that is not a number is a comparison that
+    raises on the first upload, and a negative one refuses everything while the settings
+    page goes on saying that pages are kept.
+    """
+    problems = []
+    for name in BYTE_CAPS:
+        value = getattr(settings, name, 1)
+        if not _whole_number(value) or value < 1:
+            problems.append(
+                Error(
+                    f"{name} is {value!r}; it must be a whole number of bytes, 1 or more.",
+                    hint=(
+                        "To keep nothing, switch keeping off with POSTULO_CAPTURE_KEEP_SOURCE "
+                        "and POSTULO_CAPTURE_KEEP_RENDERING rather than with a cap."
+                    ),
+                    id="postulo.E004",
+                )
+            )
+    for name in DAY_COUNTS:
+        value = getattr(settings, name, 0)
+        if not _whole_number(value) or value < 0:
+            problems.append(
+                Error(
+                    f"{name} is {value!r}; it must be a whole number of days, and 0 means "
+                    "they are kept for as long as the capture is.",
+                    id="postulo.E005",
                 )
             )
     return problems

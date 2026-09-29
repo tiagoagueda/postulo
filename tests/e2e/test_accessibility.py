@@ -194,6 +194,11 @@ def furnished(applicant):
         source_name="schema.org",
         data={"title": "Research Engineer", "company_name": "Black Mesa"},
     )
+    # And what it kept of the page it was read from (#256): the source and a picture, so
+    # the page that shows them is walked with both on it -- the box the picture scrolls
+    # in, the source as text, and the buttons under each -- and the two settings pages
+    # are walked with their switches on rather than locked.
+    _keep_the_page_of(capture)
     interview = application.interviews.first()
     # An offer with every field, so the comparison page and the card have something to
     # draw in both themes (#237).
@@ -324,6 +329,43 @@ def sign_in(page: Page, base: str) -> None:
     expect(page).to_have_url(f"{base}/")
 
 
+#: A picture a browser will actually draw: one pixel, which the page stretches to the
+#: width of its column. What is being looked at is the box around it, not the picture.
+_ONE_PIXEL = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII="
+)
+
+
+def _keep_the_page_of(capture) -> None:
+    """Switch keeping on for the instance and the person, and keep a page beside a capture."""
+    import base64
+    import io
+
+    from postulo.core import site
+    from postulo.core.models import SiteSettings
+    from postulo.jobs import pages
+
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"capture_keep_source": True, "capture_keep_rendering": True}
+    )
+    site.forget_current()
+    profile = capture.owner.profile
+    profile.keep_page_source = True
+    profile.keep_page_rendering = True
+    profile.save(update_fields=["keep_page_source", "keep_page_rendering"])
+
+    picture = base64.b64decode(_ONE_PIXEL)
+    pages.keep_source(
+        capture,
+        "<!doctype html><html><head><title>Research Engineer</title></head>"
+        "<body><h1>Research Engineer</h1><p>Black Mesa is hiring.</p>"
+        "<script>document.title = 'never run'</script></body></html>",
+    )
+    pages.attach_rendering(
+        capture, io.BytesIO(picture), content_type="image/png", length=len(picture)
+    )
+
+
 def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) -> list[str]:
     """Every address the signed-in walk visits, given an application, a company, an account.
 
@@ -414,6 +456,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/?arrange=1",
         "/settings/language/",
         "/settings/account/",
+        # What a person's captures keep of the page they were read from (#256).
+        "/settings/capture/",
         "/settings/connections/",
         "/settings/plugins/",
         "/settings/connections/add/",
@@ -496,6 +540,11 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/offers/{offer.pk}/edit/",
         f"/applications/offers/{offer.pk}/delete/",
         f"/jobs/captures/{capture.pk}/review/",
+        # What the capture kept of its page, and the question asked before it is thrown
+        # away: fetched and never submitted, like every other confirmation here (#256).
+        f"/jobs/captures/{capture.pk}/page/",
+        f"/jobs/captures/{capture.pk}/page/forget/",
+        f"/jobs/captures/{capture.pk}/page/forget/?what=rendering",
         f"/jobs/companies/{c.pk}/delete/",
         # An application that ended, saying where it had got to and why, who referred the
         # person and through which agency (#239).

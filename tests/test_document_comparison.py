@@ -522,7 +522,9 @@ def test_the_words_travel_in_the_archive_and_an_older_one_has_none(user, other_u
     rendering.snapshot_cv(cv, backend=Drawing())
 
     document = export.build_document(user)
-    assert document["postulo"]["format"] == 19
+    # 19 is the format that added the words (#236); the number itself is pinned in
+    # test_phone_verification.py, where a change to it is written down.
+    assert document["postulo"]["format"] >= 19
     assert "Senior Engineer" in document["documents"]["sent"][0]["plain_text"]
 
     importer.load(other_user, zipfile.ZipFile(export.write_archive(user)))

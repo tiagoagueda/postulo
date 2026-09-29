@@ -1148,3 +1148,136 @@ class Capture(OwnedModel):
     @property
     def is_pending(self) -> bool:
         return self.status == CaptureStatus.PENDING
+
+    @property
+    def kept_page(self):
+        """What was kept of the page this was read from, or ``None`` (#256).
+
+        A reverse one-to-one raises where there is no row, and nearly every capture has
+        none -- keeping the page is off until an administrator and the person have both
+        said otherwise -- so the ordinary case is asked for here rather than caught at
+        every call site.
+        """
+        try:
+            return self.page
+        except CapturedPage.DoesNotExist:
+            return None
+
+
+def page_upload_to(instance, filename: str) -> str:
+    """Under the owner, like every other file: a stray path reaches only one person."""
+    return f"captures/{instance.owner_id}/{timezone.now():%Y/%m}/{filename}"
+
+
+class RenderingKind(models.TextChoices):
+    """What a rendering may be, and the whole of it (#256).
+
+    Four formats a browser draws without running anything that came inside them. **Not
+    HTML and not SVG**: both are documents, and a stranger's document drawn from this
+    instance is that stranger's code running as the person who opened it. The value is a
+    media type because that is what the file is answered with, and it is always one of
+    these -- never the header a client sent.
+    """
+
+    PNG = "image/png", _("PNG image")
+    JPEG = "image/jpeg", _("JPEG image")
+    WEBP = "image/webp", _("WebP image")
+    PDF = "application/pdf", _("PDF")
+
+
+class RenderedBy(models.TextChoices):
+    """Who drew the rendering, which is also what it can be taken as evidence of.
+
+    A picture taken in the person's browser is the page as they were seeing it: styled,
+    with its images, and with whatever the site showed them because they were signed in. A
+    rendering drawn here is the kept source laid out with scripts, the network and every
+    outside resource switched off -- the words of the page, and none of its looks.
+    """
+
+    CLIENT = "client", _("Sent with the capture, by the browser that was looking at the page")
+    INSTANCE = "instance", _("Drawn by this instance from the kept source")
+
+
+class CapturedPage(OwnedModel):
+    """What a capture kept of the page it was read from (#256).
+
+    Two things, both optional and each refusable on its own: the **source**, exactly as it
+    was parsed, and a **rendering** of the whole page. The parsed fields on a `Capture` are
+    a reading; this is what they were read from, kept for the day the advert is gone and
+    the reading is all that would otherwise be left of it.
+
+    A model of its own rather than columns on `Capture`. Almost no capture has one, the
+    review queue reads captures by the dozen and has no use for file columns, and what was
+    kept can be thrown away without touching the capture -- which is a deletion of this row
+    and of nothing else.
+
+    **The source is a stranger's markup and is never served as a page.** It is kept
+    gzipped under a name ending `.txt.gz`, so that nothing reading the media directory by
+    mistake would call it HTML, shown as text, and downloaded as ``text/plain``. The
+    rendering is an image or a PDF; its media type comes from `RenderingKind` and its bytes
+    were checked against that type before they were stored.
+
+    Files are removed with the row: `jobs.signals` does for these what #217 did for
+    documents.
+    """
+
+    capture = models.OneToOneField(
+        Capture,
+        on_delete=models.CASCADE,
+        related_name="page",
+        verbose_name=_("capture"),
+    )
+    source = models.FileField(_("source"), upload_to=page_upload_to, blank=True, max_length=255)
+    #: How long the source is as text, in bytes of UTF-8 -- what a download weighs.
+    source_size = models.PositiveIntegerField(_("size of the source"), default=0)
+    #: What it weighs on disk, gzipped: the number the account's allowance counts.
+    source_stored = models.PositiveIntegerField(_("size of the source on disk"), default=0)
+    #: SHA-256 of the text. A rendering drawn from the source months later is evidence of
+    #: what the page said only if the source is the one that was captured, and this is how
+    #: anybody can tell.
+    source_checksum = models.CharField(_("checksum of the source"), max_length=64, blank=True)
+
+    rendering = models.FileField(
+        _("rendering"), upload_to=page_upload_to, blank=True, max_length=255
+    )
+    rendering_type = models.CharField(
+        _("kind of rendering"), max_length=20, choices=RenderingKind, blank=True
+    )
+    rendering_size = models.PositiveIntegerField(_("size of the rendering"), default=0)
+    rendering_checksum = models.CharField(_("checksum of the rendering"), max_length=64, blank=True)
+    rendered_by = models.CharField(_("drawn by"), max_length=10, choices=RenderedBy, blank=True)
+
+    class Meta:
+        verbose_name = _("captured page")
+        verbose_name_plural = _("captured pages")
+        ordering = ("-created_at", "-pk")
+
+    def __str__(self) -> str:
+        return str(self.capture)
+
+    def get_absolute_url(self) -> str:
+        return reverse("jobs:capture_page", args=[self.capture_id])
+
+    @property
+    def has_source(self) -> bool:
+        return bool(self.source)
+
+    @property
+    def has_rendering(self) -> bool:
+        return bool(self.rendering)
+
+    @property
+    def weight(self) -> int:
+        """What this row's files weigh on disk, together."""
+        return (self.source_stored if self.source else 0) + (
+            self.rendering_size if self.rendering else 0
+        )
+
+    @property
+    def rendering_is_a_picture(self) -> bool:
+        """Whether a page can draw it in an ``<img>``; a PDF is opened instead."""
+        return self.rendering_type in (
+            RenderingKind.PNG,
+            RenderingKind.JPEG,
+            RenderingKind.WEBP,
+        )

@@ -548,6 +548,37 @@ POSTULO_PDF_BACKEND = env("POSTULO_PDF_BACKEND", default="auto")
 # requests their instance makes.
 POSTULO_CAPTURE_IGNORE_ROBOTS = env.bool("POSTULO_CAPTURE_IGNORE_ROBOTS", default=False)
 
+# Whether a capture may keep the page it was read from: the source as it was parsed, and a
+# rendering of the whole page (#256). Two switches because the two leak differently -- a
+# rendering is a picture of the page as somebody was seeing it, the source carries whatever
+# the page addressed to them -- and **both off**, because keeping a copy of somebody else's
+# page is a decision an operator should make on purpose. These are the instance's half:
+# a person switches each on for their own captures, under Settings -> Capture, and a no
+# here is final. Also settable from Server settings -> Capture, where a variable set here
+# is shown as pinned.
+POSTULO_CAPTURE_KEEP_SOURCE = env.bool("POSTULO_CAPTURE_KEEP_SOURCE", default=False)
+POSTULO_CAPTURE_KEEP_RENDERING = env.bool("POSTULO_CAPTURE_KEEP_RENDERING", default=False)
+# What one kept file may weigh, in bytes, checked before anything is read or stored. The
+# source is bounded by what capture reads anyway -- two megabytes fetched, a request body
+# of two and a half -- so its cap is the first of those; a rendering of a long advert is
+# larger than either, and ten megabytes holds a full-page picture at twice the pixel
+# density. The rendering's cap can be set from Server settings -> Capture as well.
+POSTULO_CAPTURE_SOURCE_MAX_BYTES = env.int("POSTULO_CAPTURE_SOURCE_MAX_BYTES", default=2_000_000)
+POSTULO_CAPTURE_RENDERING_MAX_BYTES = env.int(
+    "POSTULO_CAPTURE_RENDERING_MAX_BYTES", default=10 * 1024 * 1024
+)
+# What one account's kept pages may weigh together. The caps above bound a file; this is
+# what bounds the disk, because a token that can capture can send a rendering with every
+# capture, and the API's own rate would let that be gigabytes an hour. Past it captures are
+# still made and nothing more is kept until something kept has gone.
+POSTULO_CAPTURE_ACCOUNT_MAX_BYTES = env.int(
+    "POSTULO_CAPTURE_ACCOUNT_MAX_BYTES", default=1024 * 1024 * 1024
+)
+# How many days the page of a capture that never became a listing is kept -- one discarded,
+# or one still waiting for review. The capture itself stays; what goes is the copy of the
+# page. A capture that was saved keeps its page for as long as it exists. 0 keeps them all.
+POSTULO_CAPTURE_PAGE_KEEP_DAYS = env.int("POSTULO_CAPTURE_PAGE_KEEP_DAYS", default=30)
+
 # Connections: plugins that talk to another service on a person's behalf. Their secrets
 # are encrypted under a key derived from SECRET_KEY unless a dedicated one is given, so
 # that rotating Django's key does not silently lock every connection.

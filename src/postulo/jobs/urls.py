@@ -1,7 +1,7 @@
 from django.urls import path, reverse_lazy
 from django.views.generic import RedirectView
 
-from . import capture_views, views
+from . import capture_views, page_views, views
 
 app_name = "jobs"
 
@@ -55,6 +55,34 @@ urlpatterns = [
         "captures/discard/",
         capture_views.CaptureDiscardSelectedView.as_view(),
         name="capture_discard_selected",
+    ),
+    # What a capture kept of the page it was read from (#256). The source has two
+    # addresses and neither answers it as a page: one shows it as text, one downloads it
+    # as text.
+    path(
+        "captures/<int:pk>/page/",
+        page_views.CapturedPageView.as_view(),
+        name="capture_page",
+    ),
+    path(
+        "captures/<int:pk>/page/source/",
+        page_views.CapturedSourceView.as_view(),
+        name="capture_page_source",
+    ),
+    path(
+        "captures/<int:pk>/page/rendering/",
+        page_views.CapturedRenderingView.as_view(),
+        name="capture_page_rendering",
+    ),
+    path(
+        "captures/<int:pk>/page/draw/",
+        page_views.CapturedPageDrawView.as_view(),
+        name="capture_page_draw",
+    ),
+    path(
+        "captures/<int:pk>/page/forget/",
+        page_views.CapturedPageForgetView.as_view(),
+        name="capture_page_forget",
     ),
     path("postings/new/", views.PostingCreateView.as_view(), name="posting_create"),
     path("postings/<int:pk>/", views.PostingDetailView.as_view(), name="posting_detail"),

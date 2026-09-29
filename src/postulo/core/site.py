@@ -26,6 +26,10 @@ logger = logging.getLogger(__name__)
 ENV_OVERRIDES = {
     "registration_open": "POSTULO_REGISTRATION_OPEN",
     "capture_ignore_robots": "POSTULO_CAPTURE_IGNORE_ROBOTS",
+    # What a capture may keep of the page it was read from (#256).
+    "capture_keep_source": "POSTULO_CAPTURE_KEEP_SOURCE",
+    "capture_keep_rendering": "POSTULO_CAPTURE_KEEP_RENDERING",
+    "capture_rendering_max_mb": "POSTULO_CAPTURE_RENDERING_MAX_BYTES",
     "sso_is_second_factor": "POSTULO_OIDC_IS_SECOND_FACTOR",
     "default_time_zone": "POSTULO_TIME_ZONE",
     "email_host": "POSTULO_EMAIL_HOST",
@@ -152,6 +156,61 @@ def capture_ignore_robots() -> bool:
         return bool(settings.POSTULO_CAPTURE_IGNORE_ROBOTS)
     stored = current().capture_ignore_robots
     return bool(settings.POSTULO_CAPTURE_IGNORE_ROBOTS) if stored is None else stored
+
+
+def capture_keep_source() -> bool:
+    """Whether this instance lets a capture keep the source it was read from (#256).
+
+    The instance's half of the decision, and the half that is final: `jobs.pages` asks the
+    person as well, and their answer can only narrow this one.
+    """
+    if overridden_by("capture_keep_source"):
+        return bool(settings.POSTULO_CAPTURE_KEEP_SOURCE)
+    stored = current().capture_keep_source
+    return bool(settings.POSTULO_CAPTURE_KEEP_SOURCE) if stored is None else stored
+
+
+def capture_keep_rendering() -> bool:
+    """Whether this instance lets a capture keep a rendering of its page (#256)."""
+    if overridden_by("capture_keep_rendering"):
+        return bool(settings.POSTULO_CAPTURE_KEEP_RENDERING)
+    stored = current().capture_keep_rendering
+    return bool(settings.POSTULO_CAPTURE_KEEP_RENDERING) if stored is None else stored
+
+
+#: What the megabytes an administrator types are counted in. The binary one, because that
+#: is the one the pages print: `filesizeformat` calls 1024 × 1024 bytes a megabyte, and a
+#: cap typed as 10 that the page then reported as 9.5 would be a cap nobody could check.
+BYTES_IN_A_MEGABYTE = 1024 * 1024
+
+
+def capture_rendering_max_bytes() -> int:
+    """What one kept rendering may weigh, in bytes (#256).
+
+    Asked before an upload is read, so it is the number a `Content-Length` is compared
+    with. The environment answers where it speaks, then what an administrator typed, then
+    the setting's own default.
+    """
+    if not overridden_by("capture_rendering_max_mb"):
+        stored = current().capture_rendering_max_mb
+        if stored:
+            return int(stored) * BYTES_IN_A_MEGABYTE
+    return int(settings.POSTULO_CAPTURE_RENDERING_MAX_BYTES)
+
+
+def capture_source_max_bytes() -> int:
+    """What one kept source may weigh, in bytes. The environment's alone to say (#256)."""
+    return int(settings.POSTULO_CAPTURE_SOURCE_MAX_BYTES)
+
+
+def capture_account_max_bytes() -> int:
+    """What one account's kept pages may weigh together, in bytes (#256)."""
+    return int(settings.POSTULO_CAPTURE_ACCOUNT_MAX_BYTES)
+
+
+def capture_page_keep_days() -> int:
+    """Days the page of a capture that never became a listing is kept; 0 for always (#256)."""
+    return max(0, int(settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS))
 
 
 def sso_is_second_factor() -> bool:

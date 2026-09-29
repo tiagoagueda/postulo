@@ -15,6 +15,7 @@ from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages, phone_field, phone_numbers, phones, web_links
@@ -483,6 +484,63 @@ class AccessibilityForm(forms.ModelForm):
                 "because there the shading is discarded and the underline is not."
             ),
         }
+
+
+class CaptureKeepingForm(forms.ModelForm):
+    """Settings → Capture: whether this person's captures keep the page they came from (#256).
+
+    Two switches, because the two things leak differently: the source carries whatever the
+    page addressed to the person reading it, and a rendering is a picture of the page as
+    they were seeing it. Both off until somebody turns one on.
+
+    **A switch the instance has taken away is shown, locked, with the reason** -- never
+    hidden, for the reason the plugins page gives: a decision held over an account should
+    be visible from that account's own settings. It is also *refused*, which is the part
+    that matters: a locked box submits nothing, a form can be posted without a browser, and
+    either way what is stored for a locked switch stays exactly what it was. Django's
+    ``disabled`` does both halves -- it draws the attribute and ignores what arrives.
+    """
+
+    #: Said under a switch the instance has locked, before what the switch would do.
+    LOCKED = _("Switched off for this whole instance, by an administrator.")
+
+    class Meta:
+        model = Profile
+        fields = ("keep_page_source", "keep_page_rendering")
+        labels = {
+            "keep_page_source": _("Keep the source of the pages I capture"),
+            "keep_page_rendering": _("Keep a rendering of the pages I capture"),
+        }
+        help_texts = {
+            "keep_page_source": _(
+                "The page exactly as it was read, kept beside what was read from it, so "
+                "that you can check one against the other and a better parser can read "
+                "it again. It holds whatever the page addressed to you: your name if you "
+                "were signed in, and the tracking in its links. Kept as text, and never "
+                "shown as a page."
+            ),
+            "keep_page_rendering": _(
+                "A picture of the whole page. One sent by your browser extension shows "
+                "the page as you were seeing it, signed in or not. Where there is none, "
+                "one can be drawn here from the kept source, with scripts and the network "
+                "off: the words of the page, without its looks."
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        from postulo.jobs import pages
+
+        super().__init__(*args, **kwargs)
+        keeping = pages.keeping_for(self.instance.user)
+        allowed = {
+            "keep_page_source": keeping.allowed_source,
+            "keep_page_rendering": keeping.allowed_rendering,
+        }
+        self.locked = tuple(name for name, yes in allowed.items() if not yes)
+        for name in self.locked:
+            field = self.fields[name]
+            field.disabled = True
+            field.help_text = format_lazy("{} {}", self.LOCKED, field.help_text)
 
 
 class AppearanceForm(forms.ModelForm):

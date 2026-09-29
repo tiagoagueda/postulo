@@ -845,8 +845,18 @@ class PostingDetailView(OwnedObjectMixin, DetailView):
         return super().get_queryset().select_related("company").with_application_count()
 
     def get_context_data(self, **kwargs):
+        from .models import CapturedPage
+
         context = super().get_context_data(**kwargs)
         context["discard_reasons"] = DiscardReason.choices
+        # What was kept of the page this listing was captured from, if anything was
+        # (#256). Here as well as on the review screen, because this is where somebody
+        # looks once the advert has gone: the listing outlives the posting.
+        context["kept_pages"] = (
+            CapturedPage.objects.for_user(self.request.user)
+            .filter(capture__posting=self.object)
+            .select_related("capture")
+        )
         return context
 
 

@@ -10,5 +10,6 @@ urlpatterns = [
     path("accessibility/", views.AccessibilityView.as_view(), name="accessibility"),
     path("language/", views.LocaleView.as_view(), name="locale"),
     path("account/", views.AccountView.as_view(), name="account"),
+    path("capture/", views.CaptureView.as_view(), name="capture"),
     path("plugins/", views.PluginsView.as_view(), name="plugins"),
 ]

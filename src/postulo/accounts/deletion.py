@@ -62,11 +62,17 @@ def files_of(user) -> list[str]:
     """Every storage name the person's rows point at."""
     from postulo.accounts.models import Profile
     from postulo.documents.models import RenderedDocument, UploadedDocument
+    from postulo.jobs.models import CapturedPage
 
     names: list[str] = []
     for model in (UploadedDocument, RenderedDocument):
         for record in model.objects.for_user(user).exclude(file=""):
             names.append(record.file.name)
+    # What the person's captures kept of the pages they were read from (#256): copies of
+    # somebody else's page, which are the person's to take away and the instance's to
+    # stop holding.
+    for page in CapturedPage.objects.for_user(user):
+        names.extend(held.name for held in (page.source, page.rendering) if held)
     profile = Profile.objects.filter(user=user).first()
     if profile is not None:
         for picture in (profile.avatar, profile.gravatar_image):
@@ -78,7 +84,11 @@ def files_of(user) -> list[str]:
 def media_directories_of(user) -> list[Path]:
     """The per-person directories files were stored under, to prune once empty."""
     root = Path(settings.MEDIA_ROOT)
-    return [root / "documents" / str(user.pk), root / "avatars" / str(user.pk)]
+    return [
+        root / "documents" / str(user.pk),
+        root / "avatars" / str(user.pk),
+        root / "captures" / str(user.pk),
+    ]
 
 
 def delete_account(user) -> DeletionReport:

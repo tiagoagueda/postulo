@@ -79,6 +79,16 @@ BUILTIN: tuple[SettingsSection, ...] = (
             "mfa_reauthenticate",
         ),
     ),
+    # What a capture keeps of the page it was read from (#256). Beside the account rather
+    # than beside the plugins: it is a choice about what is kept about this person, which
+    # is what the pages either side of it are about.
+    SettingsSection(
+        slug="capture",
+        label=_("Capture"),
+        url_name="settings:capture",
+        icon="search",
+        order=32,
+    ),
     SettingsSection(
         slug="connections",
         label=_("Connections"),

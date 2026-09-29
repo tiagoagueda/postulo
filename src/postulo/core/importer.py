@@ -43,6 +43,7 @@ class ImportReport:
     cover_letters: int = 0
     uploads: int = 0
     sent_documents: int = 0
+    captured_pages: int = 0
     tags: int = 0
     skipped: list[str] = field(default_factory=list)
 
@@ -873,15 +874,74 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     for capture_entry in document.get("captures", []):
         capture_entry.pop("id", None)
         capture_entry.pop("created_at", None)
+        # Format 21 (#256). Taken out before the row is made, because what is left goes
+        # straight to a model that has no such column; an archive written before it has
+        # no key, and a capture that kept nothing has an empty one.
+        kept = capture_entry.pop("page", None)
         application = applications.get(capture_entry.pop("application_id", None))
         posting = postings.get(capture_entry.pop("posting_id", None))
         if posting is None and application is not None:
             posting = application.posting
-        Capture.objects.create(
+        capture = Capture.objects.create(
             owner=user, application=application, posting=posting, **capture_entry
         )
+        if isinstance(kept, dict):
+            report.captured_pages += _restore_kept_page(archive, capture, kept, report)
 
     return report
+
+
+def _restore_kept_page(archive: zipfile.ZipFile, capture, kept: dict, report) -> int:
+    """Put back what a capture kept of its page. One if anything came back, else nought.
+
+    Nothing the manifest says about the files is believed: `jobs.pages.restore` measures
+    and checks each one again, and names it afresh under the account importing it. What
+    the manifest is read for is where in the archive to look, and what kind of thing the
+    rendering is supposed to be.
+    """
+    from postulo.core import site
+    from postulo.jobs import pages
+
+    # Packed text is smaller than the text, except where it will not pack at all, and then
+    # it is larger by a few bytes a block: the cap and a little over covers both.
+    source = _extract_within(
+        archive, str(kept.get("source_file") or ""), site.capture_source_max_bytes() + 65_536
+    )
+    rendering = _extract_within(
+        archive, str(kept.get("rendering_file") or ""), site.capture_rendering_max_bytes()
+    )
+    if source is None and rendering is None:
+        return 0
+    page, left_out = pages.restore(
+        capture,
+        source=source,
+        rendering=rendering,
+        rendering_type=str(kept.get("rendering_type") or ""),
+        rendered_by=str(kept.get("rendered_by") or ""),
+    )
+    report.skipped.extend(f"Capture “{capture}”: {line}" for line in left_out)
+    return 1 if page is not None else 0
+
+
+def _extract_within(archive: zipfile.ZipFile, stored_name: str, limit: int) -> bytes | None:
+    """A file from the archive, unless it would unpack to more than ``limit`` bytes.
+
+    Asked of the archive's own directory before anything is unpacked: a zip entry says how
+    large it will be, and one that says more than the cap is not read to find out.
+    """
+    if not stored_name or not stored_name.startswith(MEDIA_PREFIX):
+        return None
+    try:
+        described = archive.getinfo(stored_name)
+    except KeyError:
+        return None
+    if described.file_size > limit:
+        return None
+    with archive.open(described) as handle:
+        # One byte past the limit, so a directory that understated a file is caught here
+        # rather than believed.
+        content = handle.read(limit + 1)
+    return None if len(content) > limit else content
 
 
 def _free_cv_name(user, name: str) -> str:

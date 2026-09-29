@@ -63,6 +63,11 @@ TITLES = {
     "insufficient-scope": "This token does not carry the scope this call needs",
     "idempotency-key-in-use": "Another request is still using this Idempotency-Key",
     "idempotency-key-reused": "This Idempotency-Key was used for a different request",
+    # What a capture keeps of its page (#256). Each is a refusal a client does something
+    # about: send something smaller, send another format, or stop sending.
+    "too-large": "What was sent is larger than this instance takes",
+    "unsupported-media-type": "What was sent is not a kind this call takes",
+    "not-kept": "This instance is not keeping that for this capture",
 }
 
 #: What `about:blank` says instead of a type's title: the status code's own phrase. Only
@@ -75,6 +80,9 @@ PHRASES = {
     404: "Not Found",
     405: "Method Not Allowed",
     409: "Conflict",
+    411: "Length Required",
+    413: "Content Too Large",
+    415: "Unsupported Media Type",
     422: "Unprocessable Content",
     429: "Too Many Requests",
 }
@@ -164,11 +172,39 @@ def install(api) -> None:
     and dressing a crash up as a problem document would hide it. `throttle.TooOften` has
     its own handler beside the API, because it sets a header as well as a body.
     """
+    from django.conf import settings
+    from django.core.exceptions import RequestDataTooBig
     from django.http import Http404
 
     @api.exception_handler(Http404)
     def _not_found(request, exc):
         return refuse(request, api, 404, str(exc) if str(exc) else "")
+
+    @api.exception_handler(RequestDataTooBig)
+    def _too_big(request, exc):
+        """A body Django would not read, said as a refusal rather than as a page (#256).
+
+        Django compares `Content-Length` with `DATA_UPLOAD_MAX_MEMORY_SIZE` before it
+        reads a byte, which is the right moment; what it answered with was its own 400, an
+        HTML page, to a client that had sent JSON and was waiting for JSON. A browser
+        extension sending the source of a long page is who meets this, and the number is
+        what it needs.
+        """
+        from django.template.defaultfilters import filesizeformat
+        from django.utils.translation import gettext as _
+
+        limit = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
+        return refuse(
+            request,
+            api,
+            413,
+            str(
+                _("The request is larger than %(limit)s, which is the most this call reads.")
+                % {"limit": filesizeformat(limit)}
+            ),
+            kind="too-large",
+            max_bytes=limit,
+        )
 
     @api.exception_handler(HttpError)
     def _http_error(request, exc: HttpError):

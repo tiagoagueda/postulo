@@ -133,6 +133,8 @@ def test_a_plugin_can_add_a_section(client, user):
             "accessibility",
             "locale",
             "account",
+            # What a capture keeps of its page (#256).
+            "capture",
             "connections",
             "plugins",
             "tokens",

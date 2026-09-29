@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Delete what was kept" %}{% endblock %}
+
+{% block content %}
+  {% comment %} Asked first, because a kept page is often the only copy there is: the
+     advert it was read from may be gone. What goes is said, and so is what stays -- the
+     capture, and whatever it became, are not touched by this (#256). {% endcomment %}
+  <div class="mx-auto max-w-md">
+    <div class="card">
+      <h1 class="mb-2 text-xl font-semibold">{% translate "Are you sure?" %}</h1>
+      <p class="mb-2 text-sm text-ink-600 dark:text-ink-300" data-forget="{{ what|default:'everything' }}">
+        {% if what == "rendering" %}
+          {% blocktranslate trimmed with title=capture %}
+            The rendering kept of the page that “{{ title }}” was read from will be deleted
+            permanently.
+          {% endblocktranslate %}
+        {% elif what == "source" %}
+          {% blocktranslate trimmed with title=capture %}
+            The source kept of the page that “{{ title }}” was read from will be deleted
+            permanently.
+          {% endblocktranslate %}
+        {% else %}
+          {% blocktranslate trimmed with title=capture %}
+            Everything kept of the page that “{{ title }}” was read from will be deleted
+            permanently.
+          {% endblocktranslate %}
+        {% endif %}
+      </p>
+      <p class="mb-2 text-sm text-ink-600 dark:text-ink-300">
+        {% translate "The capture stays as it is, and so does any listing it became." %}
+      </p>
+      <p class="mb-6 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "If the advert has gone from the web, this may be the only copy. It cannot be undone." %}
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+        <input type="hidden" name="what" value="{{ what }}">
+        <div class="flex items-center gap-3">
+          <button type="submit" class="btn" data-variant="destructive">
+            {% translate "Delete" %}
+          </button>
+          <a href="{% url 'jobs:capture_page' capture.pk %}" class="btn" data-variant="ghost">
+            {% translate "Cancel" %}
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}

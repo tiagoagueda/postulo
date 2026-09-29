@@ -107,7 +107,7 @@ def collect() -> list[Metric]:
 
     from postulo.applications.models import Application, Reminder, Suggestion, SuggestionStatus
     from postulo.documents.models import CopyStatus, DocumentCopy, RenderedDocument
-    from postulo.jobs.models import Capture, CaptureStatus, Company, JobPosting
+    from postulo.jobs.models import Capture, CapturedPage, CaptureStatus, Company, JobPosting
     from postulo.plugins import installing
     from postulo.plugins.models import Connection
 
@@ -165,6 +165,9 @@ def collect() -> list[Metric]:
                 ({"kind": "listings"}, JobPosting.objects.count()),
                 ({"kind": "companies"}, Company.objects.count()),
                 ({"kind": "documents"}, RenderedDocument.objects.count()),
+                # Copies of pages captures were read from (#256): what an operator agreed
+                # to hold when keeping them was switched on, and what grows if it was.
+                ({"kind": "captured_pages"}, CapturedPage.objects.count()),
             ],
         )
     )

@@ -121,6 +121,18 @@ EXCUSED: dict[str, str] = {
     "documents:rendered_archive": "a POST that files a sent document away",
     "documents:upload_archive": "a POST that files an uploaded document away",
     "jobs:capture_discard": "a POST that throws away a captured posting",
+    "jobs:capture_page_source": (
+        "the source a capture kept, arriving as a download of plain text: a "
+        "`Content-Disposition` and bytes, and deliberately never a page (#256)"
+    ),
+    "jobs:capture_page_rendering": (
+        "the rendering a capture kept: a picture or a PDF, served through a permission "
+        "check; the page that draws it is `jobs:capture_page`, which is visited (#256)"
+    ),
+    "jobs:capture_page_draw": (
+        "a POST that sends off the drawing of a kept source; the button is on the "
+        "capture's own page, which is visited (#256)"
+    ),
     "jobs:capture_discard_selected": (
         "a POST from the listings page's captures block, which is visited"
     ),

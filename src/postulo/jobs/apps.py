@@ -11,8 +11,10 @@ class JobsConfig(AppConfig):
     def ready(self) -> None:
         # Registers the table with the settings view.
         # Registers this app's dashboard widgets.
-        # Registers the two pieces of slow work this app sends off (#247).
+        # Registers the pieces of slow work this app sends off (#247).
+        # Connects the receiver that removes a kept page's files with its row (#256).
         from . import (
+            signals,  # noqa: F401
             slow,  # noqa: F401
             tables,  # noqa: F401
             widgets,  # noqa: F401

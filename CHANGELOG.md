@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The source a capture keeps is never served as a page: it is stored as text, shown escaped and downloaded as `text/plain`. Kept files are capped each and per account and refused before they are read, and an API request too large to read answers `413` as a problem document instead of an HTML `400`. (#256)
 - The image takes Debian's security updates on every build the project makes; the layer that upgrades had been served from the builder's cache. **Building your own: add `--pull --build-arg POSTULO_APT_REFRESH="$(date -u +%FT%TZ)"`, or a cached build keeps its old packages.** (#300)
 - Invitation tokens are stored as fingerprints and the link is shown once, on the page that
   made it; links already sent keep working. (#232)
@@ -60,6 +61,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A capture can keep the page it was read from: the source as it was parsed, and a rendering sent by the browser extension or drawn from the source. Off until an administrator allows it under *Server settings → Capture* and you switch it on under *Settings → Capture*; what is kept is in your export. (#256)
 - An application moved to *Rejected*, *Withdrawn* or *Ghosted* can say why — pay, location, not a match, filled internally, your own choice, or other with a note — then or afterwards; the stage it had reached is read from its timeline, and a widget, *Where and why applications end*, counts both. (#239)
 - An application can name who referred you and the agency it went through; the posting's company stays the employer, and *Where they came from* gains *By referrer* and *By agency*. Both are in the API, the report's spreadsheet and the archive (format 20), which now carries the people recorded at no company. (#239)
 - A company's or a contact's page says which of your other records look like the same one — the name without its legal form, the website, an identifier, an email address — and *Merge* shows what would move first, keeps what differs in the kept record's notes and writes on every timeline it touches. (#239)

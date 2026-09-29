@@ -501,7 +501,9 @@ def test_both_travel_in_the_archive_and_come_back(user, other_user, application,
 
     document = export.build_document(user)
 
-    assert document["postulo"]["format"] == export.FORMAT_VERSION == 20
+    # 20 is the format that added them (#239); the number itself is pinned in
+    # test_phone_verification.py, where a change to it is written down.
+    assert document["postulo"]["format"] == export.FORMAT_VERSION >= 20
     employer = next(c for c in document["companies"] if c["name"] == "Aperture Science")
     exported = employer["postings"][0]["applications"][0]
     assert exported["referred_by_id"] == friend.pk

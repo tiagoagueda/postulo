@@ -17,7 +17,7 @@ from django.core.management.base import BaseCommand
 
 from postulo.accounts.models import Profile
 from postulo.documents.models import RenderedDocument, UploadedDocument
-from postulo.jobs.models import Company
+from postulo.jobs.models import CapturedPage, Company
 
 
 def _referenced() -> set[str]:
@@ -29,6 +29,10 @@ def _referenced() -> set[str]:
         (Profile, "avatar"),
         (Profile, "gravatar_image"),
         (Company, "logo"),
+        # What a capture kept of its page (#256). Left out, every kept page would be
+        # listed as an orphan, and `--remove` would delete the lot.
+        (CapturedPage, "source"),
+        (CapturedPage, "rendering"),
     ):
         names |= {
             name

@@ -26,6 +26,7 @@ def test_the_defaults_pass():
     assert checks.choices() == []
     assert checks.rates() == []
     assert checks.public_url() == []
+    assert checks.sizes() == []
 
 
 @pytest.mark.parametrize(
@@ -99,6 +100,59 @@ def test_a_public_url_without_a_scheme_or_a_host_is_an_error(settings, value):
     problems = checks.public_url()
 
     assert ids(problems) == {"postulo.E003"}
+
+
+# ------------------------------------------------------ what a capture may keep (#256)
+
+
+def test_every_cap_on_a_kept_page_is_checked():
+    """The three a `Content-Length` is compared with, and the one that counts days."""
+    from django.conf import settings as configured
+
+    named = {
+        name
+        for name in dir(configured)
+        if name.startswith("POSTULO_CAPTURE_") and name.endswith(("_MAX_BYTES", "_KEEP_DAYS"))
+    }
+
+    assert named == set(checks.BYTE_CAPS) | set(checks.DAY_COUNTS)
+    assert len(named) == 4
+
+
+@pytest.mark.parametrize("name", checks.BYTE_CAPS)
+@pytest.mark.parametrize("value", [0, -1, "10 MB", None, 1.5, True])
+def test_a_cap_that_cannot_be_compared_against_is_an_error(settings, name, value):
+    """It is what an upload is refused against before it is read."""
+    setattr(settings, name, value)
+
+    problems = checks.sizes()
+
+    assert ids(problems) == {"postulo.E004"}
+    assert name in problems[0].msg and repr(value) in problems[0].msg
+    assert "POSTULO_CAPTURE_KEEP_SOURCE" in problems[0].hint, "and it says where off is said"
+
+
+@pytest.mark.parametrize("name", checks.BYTE_CAPS)
+@pytest.mark.parametrize("value", [1, 2_000_000, 10 * 1024 * 1024 * 1024])
+def test_a_cap_that_is_a_number_of_bytes_passes(settings, name, value):
+    setattr(settings, name, value)
+    assert checks.sizes() == []
+
+
+@pytest.mark.parametrize("value", [-1, "a month", None, 1.5])
+def test_a_count_of_days_that_is_not_one_is_an_error(settings, value):
+    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = value
+
+    problems = checks.sizes()
+
+    assert ids(problems) == {"postulo.E005"}
+    assert "POSTULO_CAPTURE_PAGE_KEEP_DAYS" in problems[0].msg
+
+
+@pytest.mark.parametrize("value", [0, 1, 30, 3650])
+def test_nought_days_means_for_ever_and_passes(settings, value):
+    settings.POSTULO_CAPTURE_PAGE_KEEP_DAYS = value
+    assert checks.sizes() == []
 
 
 # ------------------------------------------------------------- through manage.py

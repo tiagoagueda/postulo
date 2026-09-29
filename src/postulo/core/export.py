@@ -50,8 +50,10 @@ from postulo import __version__
 #: is why the application it ended did; ``referred_by_id`` and ``through_agency`` on an
 #: application; and a ``contacts`` list at the top of the file for the people recorded at
 #: no company, who had been left out of the archive because every contact in it was
-#: written under one (#239).
-FORMAT_VERSION = 20
+#: written under one (#239). 21 added ``page`` on a capture: what it kept of the page it
+#: was read from, as the names of two files in the media folder and what each is, or
+#: nothing where nothing was kept (#256).
+FORMAT_VERSION = 21
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -463,6 +465,32 @@ def _plugin_data(user) -> dict:
         return {"carried": {}, "not_carried": ["unknown"]}
 
 
+def _kept_page(capture) -> dict | None:
+    """What a capture kept of its page, as the archive names it; or nothing (#256).
+
+    **Names, sizes and checksums, and none of the page.** The source is a stranger's
+    markup, and the manifest is a document other programs read: so the manifest says where
+    the file is and what it should hash to, and the text itself travels as the file it
+    already is -- gzipped, under a name ending ``.txt.gz``, which nothing opens as a page.
+    Every value here is one Postulo made: the names are generated, the kind is one of four,
+    and who drew it is one of two.
+    """
+    page = capture.kept_page
+    if page is None:
+        return None
+    return {
+        "source_file": f"{MEDIA_PREFIX}{page.source.name}" if page.source else "",
+        "source_size": page.source_size if page.source else 0,
+        "source_checksum": page.source_checksum if page.source else "",
+        "rendering_file": f"{MEDIA_PREFIX}{page.rendering.name}" if page.rendering else "",
+        "rendering_type": page.rendering_type if page.rendering else "",
+        "rendering_size": page.rendering_size if page.rendering else 0,
+        "rendering_checksum": page.rendering_checksum if page.rendering else "",
+        "rendered_by": page.rendered_by if page.rendering else "",
+        "kept_at": _value(page.created_at),
+    }
+
+
 def counts(user) -> dict[str, int]:
     """How many of each kind of record an export would carry, without building one.
 
@@ -472,15 +500,17 @@ def counts(user) -> dict[str, int]:
     turned into JSON, so that eight numbers could be printed. On SQLite that was done while
     holding the write lock, which is #220 in a single page.
 
-    Eight `COUNT(*)` queries instead. They agree with the document's own counts because
+    Nine `COUNT(*)` queries instead. They agree with the document's own counts because
     everything here is filtered by owner exactly as the document's queries are, and
     `tests/test_export.py` holds the two together.
     """
     from postulo.applications.models import Application, Interview
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company
+    from postulo.jobs.models import Capture, CapturedPage, Company
 
     return {
+        # The pages captures kept, which are files in the archive like any other (#256).
+        "captured_pages": CapturedPage.objects.for_user(user).count(),
         "companies": Company.objects.for_user(user).count(),
         "applications": Application.objects.for_user(user).count(),
         "interviews": Interview.objects.for_user(user).count(),
@@ -689,11 +719,13 @@ def build_document(user) -> dict:
         {
             **_fields(capture, CAPTURE_FIELDS),
             "data": capture.data,
+            "page": _kept_page(capture),
         }
-        for capture in Capture.objects.for_user(user)
+        for capture in Capture.objects.for_user(user).select_related("page")
     ]
 
     document["counts"] = {
+        "captured_pages": sum(1 for capture in document["captures"] if capture["page"]),
         "companies": len(document["companies"]),
         "applications": sum(
             len(posting["applications"])
@@ -837,6 +869,13 @@ def _media_paths(document: dict) -> list[str]:
     for company in document.get("companies", []):
         if company.get("logo_file"):
             names.append(company["logo_file"][len(MEDIA_PREFIX) :])
+    # What captures kept of their pages (#256): the source as gzipped text, the rendering
+    # as the picture or PDF it is. Copied as they are -- nothing here unpacks the source.
+    for capture in document.get("captures", []):
+        page = capture.get("page") or {}
+        for key in ("source_file", "rendering_file"):
+            if page.get(key):
+                names.append(page[key][len(MEDIA_PREFIX) :])
     return names
 
 

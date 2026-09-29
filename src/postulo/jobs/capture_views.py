@@ -272,6 +272,8 @@ class CaptureReviewView(OwnedObjectMixin, View):
         return {
             "capture": capture,
             "form": form,
+            # What was kept of the page, to check the reading against (#256).
+            "kept_page": capture.kept_page,
             "known": self._known(capture),
             "next_url": following.get_absolute_url() if following else "",
             "queue_left": (

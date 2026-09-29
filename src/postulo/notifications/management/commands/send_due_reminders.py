@@ -170,6 +170,7 @@ class Command(BaseCommand):
         from postulo.core import errands, site
         from postulo.core.slow import reap_archives
         from postulo.documents.archiving import send_pending
+        from postulo.jobs import pages
         from postulo.jobs.closing import announce_closing_postings
         from postulo.notifications import webhooks
         from postulo.plugins import policy
@@ -197,6 +198,9 @@ class Command(BaseCommand):
             # account, and a week of errand rows nobody is watching any more. Reaped on the
             # pass that already exists rather than by a second timer.
             reaped = reap_archives() + errands.forget_old()
+            # The pages of captures that never became a listing, past the days the
+            # instance keeps them (#256). The captures stay; the copies of the pages go.
+            pages_gone = pages.expire_unconfirmed()
 
         when = f"{timezone.now():%Y-%m-%d %H:%M}"
         if stamped:
@@ -213,6 +217,8 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {hooks_sent} webhooks delivered, {hooks_failed} failed")
         if reaped:
             self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
+        if pages_gone:
+            self.stdout.write(f"{when} {pages_gone} kept pages of unconfirmed captures removed")
         if self.quiet_pass and not any(
             (
                 stamped,
@@ -224,6 +230,7 @@ class Command(BaseCommand):
                 hooks_failed,
                 syncs_ran,
                 reaped,
+                pages_gone,
             )
         ):
             self.stdout.write("Nothing due.")

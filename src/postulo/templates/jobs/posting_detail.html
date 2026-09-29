@@ -103,6 +103,19 @@
             {% translate "Original posting" %}
           </a>
         {% endif %}
+        {% comment %} What was kept of the page it was captured from (#256): the copy
+           that is still there when the address above is a 404. {% endcomment %}
+        {% for kept in kept_pages %}
+          <p class="mt-3 text-sm" data-kept-page>
+            <a href="{% url 'jobs:capture_page' kept.capture_id %}"
+               class="text-brand-600 underline dark:text-brand-400">{% translate "The page as captured" %}</a>
+            <span class="block text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed with when=kept.capture.created_at|date:"DATE_FORMAT" %}
+                Kept on {{ when }}.
+              {% endblocktranslate %}
+            </span>
+          </p>
+        {% endfor %}
       </div>
 
       <c-section-title>{% translate "Applications" %}</c-section-title>

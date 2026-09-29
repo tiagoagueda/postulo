@@ -115,3 +115,39 @@ def serve_private_file(
     # carries it without anybody having to remember (#264).
     response["Content-Security-Policy"] = FILE_POLICY
     return response
+
+
+#: What text a stranger wrote is answered as, and the whole of it. Never anything a name
+#: or a client suggested: the point of the function below is that this cannot vary.
+PLAIN_TEXT = "text/plain; charset=utf-8"
+
+
+def serve_private_text(request: HttpRequest, text: bytes, *, download_name: str) -> HttpResponse:
+    """Hand over text that somebody else wrote, as a download, and as nothing but text.
+
+    `serve_private_file` for the one kind of file that must never be drawn: the source of
+    a captured page is a stranger's markup, and answered as a page from this origin it
+    would be that stranger's code running as the person who opened it (#256, and #218
+    before it). So three things here are fixed rather than worked out:
+
+    * the media type is ``text/plain``, whatever the name ends in -- `serve_private_file`
+      guesses a type from the name, and a guess is exactly what this must not be;
+    * it is an **attachment**, so a browser saves it rather than showing it;
+    * ``nosniff`` stops a browser deciding for itself that text full of tags is a page,
+      and the file policy is a second answer to the same question if it ever did.
+
+    Takes the bytes rather than a file, and always answers them itself. What is kept is
+    gzipped, so there is no file on disk a web server could be handed that a browser
+    would read; and it is small, being capped where it was kept. Like its sibling it
+    performs **no** permission checking: the caller has established who is asking.
+    """
+    name = download_name if download_name.endswith(".txt") else f"{download_name}.txt"
+    response = HttpResponse(text, content_type=PLAIN_TEXT)
+    response["Content-Disposition"] = (
+        f'attachment; filename="{name.encode("ascii", "ignore").decode()}"; '
+        f"filename*=UTF-8''{quote(name)}"
+    )
+    response["Cache-Control"] = "private, max-age=0, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Content-Security-Policy"] = FILE_POLICY
+    return response

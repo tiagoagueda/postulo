@@ -875,6 +875,34 @@ class SiteSettings(models.Model):
         null=True,
         blank=True,
     )
+    #: Whether a capture may keep the page it was read from (#256). Two columns because the
+    #: two things leak differently and have to be refusable separately: the source carries
+    #: whatever the page addressed to the person who was reading it, and a rendering is a
+    #: picture of the page as they were seeing it.
+    #:
+    #: Nullable, and a ``None`` reads as *no*: keeping a copy of somebody else's page is a
+    #: decision to make on purpose. This is the instance's half of it. A person switches
+    #: each on for their own captures, and their switch can only narrow what is decided
+    #: here -- never widen it.
+    capture_keep_source = models.BooleanField(
+        _("keep the source of a captured page"),
+        null=True,
+        blank=True,
+    )
+    capture_keep_rendering = models.BooleanField(
+        _("keep a rendering of a captured page"),
+        null=True,
+        blank=True,
+    )
+    #: What one rendering may weigh, in megabytes. Blank means the setting's own number.
+    #: Megabytes here and bytes in the environment, because one is typed by a person and
+    #: the other is compared with a ``Content-Length``.
+    capture_rendering_max_mb = models.PositiveSmallIntegerField(
+        _("largest rendering kept, in megabytes"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1), MaxValueValidator(100)],
+    )
     sso_is_second_factor = models.BooleanField(
         _("single sign-on counts as the second factor"),
         null=True,

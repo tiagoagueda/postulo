@@ -11,6 +11,11 @@ Every read is owner-scoped exactly as the views are. Every write goes through th
 services as the forms, so the event log stays the single truth, and each entry written
 this way names the token that wrote it.
 
+A capture may keep the page it was read from (#256): the source is whatever was parsed,
+and a rendering is sent afterwards, as a file, to an address of its own. Both go in under
+``captures`` and neither comes back out under any scope -- a token that can hand a page
+over cannot fetch one.
+
 The OpenAPI description is served at ``openapi.json`` under the API root, to a live token
 or a signed-in person and to nobody else (#230). There is no documentation page rendered
 here: its assets would have to come from a CDN the content security policy forbids, and the
@@ -25,6 +30,7 @@ from decimal import Decimal
 from typing import Annotated
 from urllib.parse import urlsplit
 
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from ninja import Header, NinjaAPI, Query, Schema, Status
@@ -37,6 +43,7 @@ from pydantic import ValidationError as PydanticValidationError
 
 from postulo.core import errands, throttle
 from postulo.core.addresses import page_address
+from postulo.jobs import pages
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
 from postulo.plugins.base import CaptureError, JobPostingData
@@ -194,9 +201,39 @@ class BatchIn(Schema):
     position: int = Field(ge=1, description="This capture's place in it, from 1.")
 
 
+class KeepIn(Schema):
+    """What this one capture may keep of its page. It can narrow, and never widen (#256).
+
+    Whether pages are kept at all is decided on the instance and then by the person, and
+    nothing a request says can add to that. What a request can do is keep *less*, for one
+    capture: a page that addressed somebody by name, captured by somebody who would rather
+    it were not kept this time.
+
+    **The source only.** The source arrives in this request, as `html`, because it is what
+    is read; so this request is where not keeping it is said. A rendering arrives in a
+    request of its own afterwards, and not keeping one is not sending it -- a field here
+    saying so would be a promise the server has nothing to keep with.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    source: bool = Field(
+        default=True,
+        description="False: do not keep the source of this page, whatever the account keeps.",
+    )
+
+
 class CaptureIn(PageIn):
     """A posting somebody wants Postulo to look at."""
 
+    keep: KeepIn | None = Field(
+        default=None,
+        description=(
+            "Whether this capture may keep the source of its page. Left out, the account's "
+            "own choice applies. It can only narrow that choice: asking for what the "
+            "instance or the account has switched off keeps nothing."
+        ),
+    )
     batch: BatchIn | None = Field(
         default=None,
         description=(
@@ -260,6 +297,32 @@ class KnownOut(Schema):
     similar: list[KnownListingOut]
 
 
+class KeptOut(Schema):
+    """What a capture kept of the page it was read from, and what it would still take.
+
+    Read this before drawing a page: `accepts_rendering` says whether a rendering sent to
+    `rendering_url` would be taken, so a client does not go to the trouble of making one
+    that would be refused.
+    """
+
+    source: bool = Field(description="Whether the source, as it was parsed, is kept.")
+    rendering: bool = Field(description="Whether a rendering of the page is kept.")
+    rendering_type: str = Field(description="The media type of the kept rendering, or empty.")
+    accepts_rendering: bool = Field(
+        description="Whether a rendering sent to `rendering_url` now would be taken."
+    )
+    rendering_url: str = Field(description="Where a rendering is sent, with PUT.")
+    rendering_types: list[str] = Field(description="The media types a rendering may be.")
+    rendering_max_bytes: int = Field(description="The most a rendering may weigh.")
+    note: str = Field(
+        default="",
+        description=(
+            "Why something the account asked to have kept was not, in words for a "
+            "person. Empty when everything asked for was kept, or nothing was asked for."
+        ),
+    )
+
+
 class CaptureOut(Schema):
     id: int
     url: str
@@ -271,9 +334,35 @@ class CaptureOut(Schema):
     created_at: dt.datetime
     updated_at: dt.datetime
     review_url: str
+    page: KeptOut
 
 
-def _as_output(request, capture: Capture) -> dict:
+def _keeping(request, owner):
+    """What the owner keeps and how much room is left, counted once for the request.
+
+    A list of fifty captures asks this fifty times, and the answer is about the account
+    rather than about any one of them.
+    """
+    held = getattr(request, "_postulo_keeping", None)
+    if held is None or held[0] != owner.pk:
+        held = (owner.pk, pages.keeping_for(owner), pages.room_left(owner))
+        request._postulo_keeping = held
+    return held[1], held[2]
+
+
+def _kept(request, capture: Capture, *, keeping=None, note: str = "") -> dict:
+    """The `page` member: what was kept, what would still be taken, and where to send it."""
+    counted, room = _keeping(request, capture.owner)
+    return {
+        **pages.describe(capture, keeping or counted, room=room),
+        "rendering_url": request.build_absolute_uri(
+            reverse("postulo-api:attach_rendering", kwargs={"pk": capture.pk})
+        ),
+        "note": note,
+    }
+
+
+def _as_output(request, capture: Capture, *, keeping=None, note: str = "") -> dict:
     data = capture.data
     return {
         "id": capture.pk,
@@ -286,6 +375,7 @@ def _as_output(request, capture: Capture) -> dict:
         "created_at": capture.created_at,
         "updated_at": capture.updated_at,
         "review_url": request.build_absolute_uri(reverse("jobs:capture_review", args=[capture.pk])),
+        "page": _kept(request, capture, keeping=keeping, note=note),
     }
 
 
@@ -346,7 +436,7 @@ def create_capture(
 
 def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     """Read the page, keep the capture, tell the owner — the body of the call above."""
-    url, data, source = _read(payload, owner)
+    url, data, source, html = _read(payload, owner)
     if payload.data is not None:
         corrections = payload.data.model_dump(exclude_unset=True)
         try:
@@ -426,7 +516,18 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             base=request.build_absolute_uri("/"),
             at=capture.created_at.isoformat(),
         )
-    body = _as_output(request, capture)
+
+    # What was parsed, kept beside what it was read as, where the instance and the owner
+    # have both said so and the request has not asked for less (#256). After the capture
+    # and never instead of it: a source that is too large to keep, or an account with no
+    # room left, is a sentence in the answer beside a capture that was made. And last of
+    # the work, because a file is the one thing here a failed request cannot take back.
+    keeping = pages.keeping_for(owner)
+    if payload.keep is not None:
+        keeping = keeping.narrowed(source=payload.keep.source)
+    _page, note = pages.keep_source_quietly(capture, html, keeping)
+
+    body = _as_output(request, capture, keeping=keeping, note=note)
     # Kept before the answer goes out, so that a client which retries because it never saw
     # the answer is retrying against something already written down.
     answer.keep(201, body)
@@ -447,12 +548,16 @@ def preview_capture(request, payload: PageIn):
     correct it first: a browser extension's popup. Nothing is created and nobody is
     notified; the same page sent to ``POST /captures`` afterwards is read again.
     """
-    url, data, source = _read(payload, request.auth.owner)
+    url, data, source, _html = _read(payload, request.auth.owner)
     return {"url": url, "source": source.name, "data": data}
 
 
 def _read(payload: PageIn, owner):
-    """The page's address, what it was read as, and the source that read it; or a 422.
+    """The page's address, what it was read as, the source that read it, and the text
+    that was read; or a 422.
+
+    The text is handed back because it is what a capture may keep (#256): exactly what the
+    parser was given, whichever way it arrived.
 
     The capture limit is spent here, on the branch that fetches, so that it bounds the *act*
     of making this server dial an address somebody else chose rather than the door that act
@@ -483,7 +588,7 @@ def _read(payload: PageIn, owner):
     if result is None:
         raise HttpError(422, str(_("Nothing resembling a job posting was found there.")))
     data, source = result
-    return url, data, source
+    return url, data, source, html
 
 
 @api.get(
@@ -509,9 +614,108 @@ def list_captures(
     captures = (
         Capture.objects.for_user(token.owner)
         .filter(status=CaptureStatus.PENDING)
+        # Each row says what it kept of its page (#256), which is a row of its own.
+        .select_related("page")
         .order_by("-created_at", "-pk")
     )
     return changed_since(captures, updated_since)
+
+
+#: How the description of the call below says what it takes: the file itself as the body,
+#: under the media type it is. django-ninja describes a body it parsed, and this one is
+#: deliberately not parsed -- it is measured and then read a piece at a time.
+_A_RENDERING = {
+    "requestBody": {
+        "required": True,
+        "description": (
+            "The rendering itself, as the body of the request: not JSON, not a form. "
+            "`Content-Type` says which of the four kinds it is and `Content-Length` how "
+            "large, and both are checked before the body is read."
+        ),
+        "content": {
+            kind: {"schema": {"type": "string", "format": "binary"}}
+            for kind in pages.RenderingKind.values
+        },
+    },
+    "responses": {
+        status: {
+            "description": problems.PHRASES[status],
+            "content": {
+                problems.CONTENT_TYPE: {"schema": {"$ref": "#/components/schemas/Problem"}}
+            },
+        }
+        for status in (409, 411, 413, 415)
+    },
+}
+
+#: What each reason a rendering was not kept is answered with. The status is the one an
+#: HTTP client already understands; the problem type, where there is one, is what a client
+#: written for Postulo branches on.
+_REFUSALS: dict[str, tuple[int, str | None]] = {
+    "switched-off": (409, "not-kept"),
+    "decided": (409, "not-kept"),
+    "already-kept": (409, "not-kept"),
+    "no-room": (409, "not-kept"),
+    "too-large": (413, "too-large"),
+    "unsupported": (415, "unsupported-media-type"),
+    "no-length": (411, None),
+    "empty": (422, None),
+    "not-what-it-says": (422, None),
+}
+
+
+def _refused(refusal: pages.NotKept) -> HttpError:
+    """A rendering that was not kept, as the refusal a client can act on."""
+    status, kind = _REFUSALS.get(refusal.reason, (422, None))
+    if kind is None:
+        return HttpError(status, str(refusal))
+    extensions: dict = {"reason": refusal.reason}
+    if kind == "too-large":
+        extensions = {"max_bytes": refusal.limit}
+    elif kind == "unsupported-media-type":
+        extensions = {"accepted": list(pages.RenderingKind.values)}
+    return problems.Refused(status, str(refusal), kind=kind, **extensions)
+
+
+@api.put(
+    "/captures/{int:pk}/rendering",
+    response={200: CaptureOut, 201: CaptureOut},
+    auth=scope("captures"),
+    tags=["captures"],
+    url_name="attach_rendering",
+    summary="Send a rendering of the page a capture was read from",
+    openapi_extra=_A_RENDERING,
+)
+def attach_rendering(request, pk: int):
+    """Keep a picture of the whole page beside a capture that is waiting for review.
+
+    For the browser that was looking at the page, which is the only thing that can draw
+    it as it looked: a posting behind a sign-in, or behind bot protection, is a page this
+    server cannot see at all. The body is the file -- a PNG, JPEG or WebP image, or a PDF
+    -- and nothing else.
+
+    **It is measured before it is read.** `Content-Length` is compared with
+    `rendering_max_bytes` before a byte is taken, and the bytes are counted again as they
+    arrive. A rendering is taken once: the same bytes sent again get the same answer, and
+    different ones are refused, because what a capture kept is not replaced from outside.
+    Nothing here reads a rendering back; a token that can send one cannot fetch one.
+    """
+    capture = get_object_or_404(
+        Capture.objects.for_user(request.auth.owner).select_related("page"), pk=pk
+    )
+    held = capture.kept_page
+    already = held is not None and bool(held.rendering)
+    declared = request.META.get("CONTENT_LENGTH")
+    try:
+        pages.attach_rendering(
+            capture,
+            request,
+            content_type=request.content_type,
+            length=int(declared) if str(declared or "").isdigit() else None,
+        )
+    except pages.NotKept as refusal:
+        raise _refused(refusal) from refusal
+    return Status(200 if already else 201, _as_output(request, capture))
 
 
 @api.post(
@@ -576,3 +780,32 @@ api.add_router("/offers", offers.router)
 api.add_router("", documents.router)
 api.add_router("/insights", insights.router)
 api.add_router("/search", search.router)
+
+
+#: The calls whose request is not one transaction, by the name of their address.
+#:
+#: Every request is a transaction, and on SQLite a transaction takes the write lock when
+#: it begins (#206), so a request that waits on something slow holds that lock for every
+#: second of the wait while the other workers queue behind it. #220 took the slow pages out
+#: of theirs. Sending a rendering is the slow call here: megabytes read off a connection
+#: that may be a telephone's, a piece at a time, and none of that reading is a write. What
+#: it writes is one row, when the file is whole, in a statement of its own.
+OUTSIDE_A_TRANSACTION = frozenset({"attach_rendering"})
+
+
+def urls():
+    """The API's addresses, with the slow calls taken out of the request's transaction.
+
+    Django asks the *address's* own function whether its request is atomic. django-ninja
+    makes one such function for each address and none for an operation, so there is
+    nothing to decorate where the call is written; they are marked here instead, on the
+    very patterns that are handed to the resolver. `api.urls` builds its patterns afresh
+    each time it is read, which is why this returns the ones it marked.
+    """
+    from django.db import transaction
+
+    patterns, application, namespace = api.urls
+    for pattern in patterns:
+        if getattr(pattern, "name", None) in OUTSIDE_A_TRANSACTION:
+            transaction.non_atomic_requests(pattern.callback)
+    return patterns, application, namespace

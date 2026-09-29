@@ -342,6 +342,22 @@ class Profile(models.Model):
     #: Only consulted where the choice is theirs to make. An administrator may take it
     #: away, and `plugins.policy` decides that before this is looked at (#95).
     plugins_off = models.JSONField(_("plugins switched off"), default=list, blank=True)
+    #: Whether this person's captures keep the page they were read from: the source as it
+    #: was parsed, and a rendering of the whole page (#256). Two switches, because the two
+    #: leak differently, and both **off**: a copy of a page is kept because somebody asked
+    #: for one, never because nobody said no.
+    #:
+    #: Stored as what was switched *on*, the opposite way round from `plugins_off`, and for
+    #: the opposite reason: a plugin installed later should be available without anybody
+    #: opting in, and a copy of somebody else's page should not.
+    #:
+    #: Only half of the answer. An administrator decides whether the instance keeps pages
+    #: at all, and `jobs.pages` asks that first: a yes here can narrow what the instance
+    #: allows and never widen it.
+    keep_page_source = models.BooleanField(_("keep the source of a captured page"), default=False)
+    keep_page_rendering = models.BooleanField(
+        _("keep a rendering of a captured page"), default=False
+    )
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)

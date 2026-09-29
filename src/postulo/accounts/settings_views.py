@@ -18,7 +18,13 @@ from django.views.generic import RedirectView, TemplateView, UpdateView
 from postulo.core import site
 
 from . import addresses, passkeys, sso
-from .forms import AccessibilityForm, AccountForm, AppearanceForm, LocaleForm
+from .forms import (
+    AccessibilityForm,
+    AccountForm,
+    AppearanceForm,
+    CaptureKeepingForm,
+    LocaleForm,
+)
 from .models import Profile
 
 
@@ -71,6 +77,37 @@ class LocaleView(ProfileSectionView):
     form_class = LocaleForm
     template_name = "settings/locale.html"
     section_title = _("Language and time")
+
+
+class CaptureView(ProfileSectionView):
+    """Whether this person's captures keep the page they were read from (#256).
+
+    The person's half of a decision two people make. The instance's half is an
+    administrator's, under *Server settings → Capture*, and it is final: what is switched
+    off there is shown here locked, with the reason, and cannot be switched on from here.
+
+    The page also says what is being kept and what it weighs, because a switch that fills
+    a disk should be beside the number that says how full it is.
+    """
+
+    form_class = CaptureKeepingForm
+    template_name = "settings/capture.html"
+    section_title = _("Capture")
+
+    def get_context_data(self, **kwargs):
+        from postulo.jobs import pages, rendering
+
+        context = super().get_context_data(**kwargs)
+        context["keeping"] = pages.keeping_for(self.request.user)
+        context["kept"] = pages.kept_by(self.request.user)
+        context["limits"] = {
+            "source": site.capture_source_max_bytes(),
+            "rendering": site.capture_rendering_max_bytes(),
+            "account": site.capture_account_max_bytes(),
+            "days": site.capture_page_keep_days(),
+        }
+        context["no_renderer"] = rendering.why_not()
+        return context
 
 
 class AccountView(SettingsSectionMixin, UpdateView):

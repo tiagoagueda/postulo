@@ -74,6 +74,15 @@ class SignInForm(forms.ModelForm):
 
 
 class CaptureForm(forms.ModelForm):
+    """How capture behaves, and what it may keep of the page it read (#256).
+
+    **A pinned field is refused, not merely drawn read-only**, for the reason `EmailForm`
+    gives: a readonly input is still submitted by the browser, and a form can be posted
+    without a browser at all. Whatever arrives for a field the environment sets is dropped
+    before it can reach the row, so the stored value stays what it was -- shadowed, which is
+    the state the page says it is in.
+    """
+
     capture_ignore_robots = PolicyField(
         label=_("Ignore robots.txt when capturing"),
         help_text=_(
@@ -81,10 +90,65 @@ class CaptureForm(forms.ModelForm):
             "by default. Say yes only if you have decided that courtesy does not apply here."
         ),
     )
+    capture_keep_source = PolicyField(
+        label=_("Let a capture keep the source of its page"),
+        help_text=_(
+            "Yes: a person may have the page's source kept beside what was read from it, "
+            "exactly as it was parsed, so that a capture can be checked against it and read "
+            "again by a better parser. It is kept as text and never shown as a page. No, or "
+            "not set: nobody's captures keep it, whatever they have chosen."
+        ),
+    )
+    capture_keep_rendering = PolicyField(
+        label=_("Let a capture keep a rendering of its page"),
+        help_text=_(
+            "Yes: a person may have a picture of the whole page kept, sent by their browser "
+            "extension or drawn here from the kept source with scripts and the network off. "
+            "A picture taken in somebody's browser shows the page as they were seeing it, "
+            "signed in or not. No, or not set: nobody's captures keep one."
+        ),
+    )
 
     class Meta:
         model = SiteSettings
-        fields = ("capture_ignore_robots",)
+        fields = (
+            "capture_ignore_robots",
+            "capture_keep_source",
+            "capture_keep_rendering",
+            "capture_rendering_max_mb",
+        )
+        help_texts = {
+            "capture_rendering_max_mb": _(
+                "A rendering heavier than this is refused before it is read. Left empty, "
+                "the instance's own setting applies."
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["capture_rendering_max_mb"].required = False
+        self.pinned = {
+            field: variable for field in self.fields if (variable := site.overridden_by(field))
+        }
+        # The value in force, so a pinned field shows what the instance is doing rather
+        # than whatever happens to be stored under it.
+        effective = {
+            "capture_ignore_robots": site.capture_ignore_robots,
+            "capture_keep_source": site.capture_keep_source,
+            "capture_keep_rendering": site.capture_keep_rendering,
+            "capture_rendering_max_mb": lambda: (
+                site.capture_rendering_max_bytes() // site.BYTES_IN_A_MEGABYTE
+            ),
+        }
+        for field in self.pinned:
+            self.initial[field] = effective[field]()
+
+    def clean(self):
+        cleaned = super().clean()
+        for field in self.pinned:
+            cleaned.pop(field, None)
+            self.errors.pop(field, None)
+        return cleaned
 
 
 class OfferedLanguagesForm(forms.ModelForm):

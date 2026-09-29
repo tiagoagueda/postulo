@@ -5,7 +5,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 
-from postulo.api.api import api
+from postulo.api.api import urls as api_urls
 
 urlpatterns = [
     path("", include("postulo.core.urls")),
@@ -24,8 +24,10 @@ urlpatterns = [
     path("career/", include("postulo.resume.urls")),
     path("documents/", include("postulo.documents.urls")),
     path("capture-tokens/", include("postulo.api.urls")),
-    # The capture API. Deliberately the only machine-readable surface Postulo has.
-    path("api/v1/", api.urls),
+    # The capture API. Deliberately the only machine-readable surface Postulo has. Its
+    # addresses come through `urls()`, which takes the slow calls out of the request's
+    # transaction (#256).
+    path("api/v1/", api_urls()),
 ]
 
 # Only when an operator asked for it. Empty is the default, and an admin that is not mounted

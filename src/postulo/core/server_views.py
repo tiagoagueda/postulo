@@ -513,12 +513,27 @@ class LogsView(ServerSectionMixin, TemplateView):
 
 
 class CaptureView(PolicyView):
+    """How capture fetches, and what it may keep of the page it read (#256).
+
+    The keeping half is the instance's side of a decision two people make: what is
+    switched off here is off for everybody, and what is switched on is each person's to
+    switch on for their own captures. The page says what is in force, what the caps are,
+    and how much is being held -- a switch that fills a disk belongs beside the number
+    that says how full it is.
+    """
+
     form_class = CaptureForm
     template_name = "server/capture.html"
     section_title = _("Capture")
-    pinned_fields = ("capture_ignore_robots",)
+    pinned_fields = (
+        "capture_ignore_robots",
+        "capture_keep_source",
+        "capture_keep_rendering",
+        "capture_rendering_max_mb",
+    )
 
     def get_context_data(self, **kwargs):
+        from postulo.jobs import pages, rendering
         from postulo.plugins import fetching
 
         context = super().get_context_data(**kwargs)
@@ -529,6 +544,19 @@ class CaptureView(PolicyView):
             "max_redirects": fetching.MAX_REDIRECTS,
             "user_agent": fetching.USER_AGENT,
         }
+        context["keeping"] = {
+            "source": site.capture_keep_source(),
+            "rendering": site.capture_keep_rendering(),
+            "source_max": site.capture_source_max_bytes(),
+            "rendering_max": site.capture_rendering_max_bytes(),
+            "account_max": site.capture_account_max_bytes(),
+            "days": site.capture_page_keep_days(),
+        }
+        context["kept"] = pages.everything_kept()
+        context["no_renderer"] = rendering.why_not()
+        # Whether anything on the form is this page's to change. Every field pinned is a
+        # form with nothing to save, and a button that saves nothing is a lie.
+        context["editable"] = len(context["pinned"]) < len(self.pinned_fields)
         return context
 
 

@@ -1,0 +1,71 @@
+{% extends "settings/base.html" %}
+{% load i18n %}
+
+{% block content %}
+  {% comment %} Whether this person's captures keep the page they were read from (#256).
+     Their half of a decision two people make: an administrator decides whether the
+     instance keeps pages at all, and that decision is final. A switch the instance has
+     taken away is drawn locked with the reason in its help, never hidden -- a decision
+     held over an account should be visible from the account's own settings. {% endcomment %}
+  <c-page-title>
+    {% translate "Capture" %}
+    <c-slot name="subtitle">
+    {% translate "Whether your captures keep the page they were read from. Nothing is kept until you ask for it." %}
+    </c-slot>
+  </c-page-title>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      <c-section-title>
+        {% translate "What your captures keep" %}
+        <c-slot name="subtitle">{% translate "A capture reads a page and keeps what it understood. The page itself is the evidence: when the advert is gone, what was kept of it is all there is to check the reading against." %}</c-slot>
+      </c-section-title>
+      <c-field :field="form.keep_page_source" />
+      <c-field :field="form.keep_page_rendering" />
+      {% if no_renderer and keeping.allowed_rendering %}
+        <p class="text-xs text-ink-500 dark:text-ink-400" data-no-renderer>{{ no_renderer }}</p>
+      {% endif %}
+    </div>
+    <button type="submit" class="btn">{% translate "Save" %}</button>
+  </form>
+
+  <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+    {% translate "This applies to the captures made from now on. What has been kept stays until you delete it, from the capture's own page; what was not kept cannot be fetched back." %}
+  </p>
+
+  <section class="card mt-8" aria-labelledby="kept-heading" data-kept-pages="{{ kept.pages }}">
+    <c-section-title id="kept-heading">{% translate "What is being kept" %}</c-section-title>
+    <p class="mb-3 text-sm">
+      {% blocktranslate trimmed count counter=kept.pages with weight=kept.bytes|filesizeformat room=limits.account|filesizeformat %}
+        One page, weighing {{ weight }} of the {{ room }} this instance keeps for one account.
+      {% plural %}
+        {{ counter }} pages, weighing {{ weight }} of the {{ room }} this instance keeps for one account.
+      {% endblocktranslate %}
+    </p>
+    <dl class="space-y-2 text-sm">
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Largest source kept" %}</dt>
+        <dd>{{ limits.source|filesizeformat }}</dd>
+      </div>
+      <div class="flex justify-between gap-4">
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Largest rendering kept" %}</dt>
+        <dd>{{ limits.rendering|filesizeformat }}</dd>
+      </div>
+    </dl>
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+      {% if limits.days %}
+        {% blocktranslate trimmed count counter=limits.days %}
+          The page of a capture that never became a listing is deleted a day after it was
+          captured. A capture that was saved keeps its page for as long as it exists.
+        {% plural %}
+          The page of a capture that never became a listing is deleted {{ counter }} days
+          after it was captured. A capture that was saved keeps its page for as long as it
+          exists.
+        {% endblocktranslate %}
+      {% else %}
+        {% translate "Pages are kept until you delete them." %}
+      {% endif %}
+    </p>
+  </section>
+{% endblock %}

@@ -27,9 +27,26 @@
     </p>
 
     {% if capture.url %}
-      <p class="mb-6 truncate text-sm">
+      <p class="{% if kept_page %}mb-2{% else %}mb-6{% endif %} truncate text-sm">
         <a href="{{ capture.url }}" rel="noopener noreferrer external" target="_blank"
            class="text-brand-600 underline dark:text-brand-400">{{ capture.url }}</a>
+      </p>
+    {% endif %}
+
+    {% comment %} What is being checked against, when the tab it came from is closed
+       (#256): the page as it was kept. Said only where something was; a person who keeps
+       no pages is not told forty times in a row that nothing was kept. {% endcomment %}
+    {% if kept_page %}
+      <p class="mb-6 text-sm text-ink-500 dark:text-ink-400" data-kept-page>
+        {% if kept_page.source and kept_page.rendering %}
+          {% translate "The page this was read from was kept: its source, and a rendering of it." %}
+        {% elif kept_page.source %}
+          {% translate "The source of the page this was read from was kept." %}
+        {% else %}
+          {% translate "A rendering of the page this was read from was kept." %}
+        {% endif %}
+        <a href="{% url 'jobs:capture_page' capture.pk %}"
+           class="text-brand-600 underline dark:text-brand-400">{% translate "Check the reading against it" %}</a>
       </p>
     {% endif %}
 

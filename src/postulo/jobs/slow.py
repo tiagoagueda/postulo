@@ -35,6 +35,16 @@ def fetch_a_capture(errand) -> dict:
     supplied = errand.payload.get("html", "")
 
     if supplied:
+        # A pasted page is carried here in the errand's own row, which is kept for a week
+        # so that the page watching it has something to read. That made the queue a place
+        # where a page's source was kept whatever anybody had decided about keeping
+        # sources, so it is taken out of the row as soon as it has been read (#256): what
+        # is kept of a page is what `pages` keeps, and nothing else.
+        from postulo.core.models import Errand
+
+        Errand.objects.filter(pk=errand.pk).update(payload={**errand.payload, "html": ""})
+
+    if supplied:
         # Nothing is fetched: the page came from a browser that was already allowed to see
         # it. Still an errand, because the parse is work somebody asked for, and because one
         # path through this is easier to trust than two.
@@ -65,9 +75,49 @@ def fetch_a_capture(errand) -> dict:
             origin="web",
             data=data.model_dump(mode="json"),
         )
+
+    # What was parsed, kept beside what it was read as, where the instance and the person
+    # have both said so (#256). After the capture and never instead of it: whatever goes
+    # wrong here is a sentence on the page, and the capture is already made.
+    from . import pages
+
+    _kept, note = pages.keep_source_quietly(capture, page_html)
+    message = str(_("Read it. Check what was found before it becomes a listing."))
     return {
-        "message": str(_("Read it. Check what was found before it becomes a listing.")),
+        "message": f"{message} {note}".strip(),
         "url": reverse("jobs:capture_review", args=[capture.pk]),
+        "capture_id": capture.pk,
+    }
+
+
+@handler("page_rendering", working=_("Drawing the page"))
+def draw_a_page(errand) -> dict:
+    """Draw a capture's kept source as a PDF, with nothing of it allowed to run (#256).
+
+    Slow for the reason a CV is: it is a renderer, started for one document. It is asked
+    for with a button rather than done at every capture, because what it draws is the kept
+    source and nothing else -- so it is the same whenever it is drawn, and nobody waits for
+    one they did not want.
+    """
+    from django.urls import reverse
+
+    from . import pages
+    from .models import Capture
+
+    capture = Capture.objects.filter(
+        pk=errand.payload.get("capture_id"), owner=errand.owner
+    ).first()
+    if capture is None:
+        raise Refused(_("That capture is no longer here."))
+    try:
+        pages.draw_rendering(capture)
+    except pages.NotKept as refusal:
+        # An explanation, as a refused fetch is: the renderer is not installed, the page
+        # took too long, the account has no room left.
+        raise Refused(str(refusal)) from refusal
+    return {
+        "message": str(_("Drawn from the kept source, with scripts and the network off.")),
+        "url": reverse("jobs:capture_page", args=[capture.pk]),
         "capture_id": capture.pk,
     }
 

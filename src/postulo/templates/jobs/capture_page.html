@@ -1,0 +1,197 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "The page as captured" %}{% endblock %}
+
+{% block content %}
+  {% comment %} What a capture kept of the page it was read from (#256): the evidence,
+     beside the reading. Two things, each kept or not on its own.
+
+     **Nothing on this page draws the source.** It is a stranger's markup, so it is text
+     here -- inside a <pre>, escaped by the template like any other text a stranger wrote --
+     and text in the download. There is no frame on this page and no address in Postulo
+     that answers the source as a page; the rendering beside it is a picture or a PDF.
+  {% endcomment %}
+  <div class="mx-auto max-w-3xl" data-captured-page>
+    <p class="mb-2 text-sm text-ink-500 dark:text-ink-400">
+      {% if capture.is_pending %}
+        <a href="{% url 'jobs:capture_review' capture.pk %}" class="underline">{% translate "Back to reviewing this capture" %}</a>
+      {% elif capture.posting %}
+        <a href="{{ capture.posting.get_absolute_url }}" class="underline">{% translate "Back to the listing this capture became" %}</a>
+      {% else %}
+        <a href="{% url 'listings:list' %}" class="underline">{% translate "Back to your listings" %}</a>
+      {% endif %}
+    </p>
+    <c-page-title>
+      {% translate "The page as captured" %}
+      <c-slot name="subtitle">
+      {% translate "What this capture kept of the page it was read from, beside what was read from it." %}
+      </c-slot>
+    </c-page-title>
+
+    <div class="card mb-6">
+      <dl class="space-y-2 text-sm">
+        <div class="flex flex-wrap justify-between gap-x-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Title, as it was read" %}</dt>
+          <dd><bdi>{{ capture }}</bdi></dd>
+        </div>
+        {% if capture.url %}
+          <div class="flex flex-wrap justify-between gap-x-4">
+            <dt class="text-ink-500 dark:text-ink-400">{% translate "Read from" %}</dt>
+            <dd class="min-w-0 break-all">
+              <a href="{{ capture.url }}" rel="noopener noreferrer external" target="_blank"
+                 class="text-brand-600 underline dark:text-brand-400">{{ capture.url }}</a>
+            </dd>
+          </div>
+        {% endif %}
+        <div class="flex flex-wrap justify-between gap-x-4">
+          <dt class="text-ink-500 dark:text-ink-400">{% translate "Captured" %}</dt>
+          <dd>{{ capture.created_at|date:"DATETIME_FORMAT" }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    {% if not page %}
+      {% comment %} Nothing kept, and why -- which of the two people who have to say yes
+         has not. A page that only said "nothing" would leave somebody looking for a fault.
+      {% endcomment %}
+      <c-empty icon="circle-dashed" title="{% translate 'Nothing was kept of this page' %}"
+               action_url="{% url 'settings:capture' %}"
+               action_label="{% translate 'What your captures keep' %}"
+               action_variant="outline">
+        {% if not keeping.allowed_source and not keeping.allowed_rendering %}
+          {% translate "This instance does not keep the pages captures are read from. An administrator decides that." %}
+        {% elif not keeping.anything %}
+          {% translate "Your captures do not keep the page they are read from. Switching it on applies to the captures made afterwards." %}
+        {% else %}
+          {% translate "It was captured before keeping was switched on, or what was kept has since been deleted." %}
+        {% endif %}
+      </c-empty>
+    {% else %}
+      <section class="mb-8" aria-labelledby="rendering-heading">
+        <c-section-title id="rendering-heading">{% translate "The rendering" %}</c-section-title>
+        {% if page.rendering %}
+          <div class="card mb-3">
+            {% if page.rendering_is_a_picture %}
+              {% comment %} A picture of a whole page is as tall as the page was. It
+                 scrolls inside a box of its own rather than being the length of this one;
+                 the box is a stop in the tab order so the arrow keys can scroll it, and
+                 named so a screen reader says what was reached (#275). {% endcomment %}
+              <div class="mb-3 max-h-96 overflow-y-auto rounded border border-ink-200 dark:border-ink-800"
+                   tabindex="0" role="group"
+                   aria-label="{% translate 'The rendering, in a box that scrolls' %}">
+                <img src="{% url 'jobs:capture_page_rendering' capture.pk %}"
+                     alt="{% blocktranslate trimmed with title=capture %}A picture of the page that “{{ title }}” was read from{% endblocktranslate %}"
+                     class="block h-auto w-full" loading="lazy" data-rendering>
+              </div>
+            {% endif %}
+            <dl class="space-y-2 text-sm">
+              <div class="flex flex-wrap justify-between gap-x-4">
+                <dt class="text-ink-500 dark:text-ink-400">{% translate "Kind" %}</dt>
+                <dd>{{ page.get_rendering_type_display }}, {{ page.rendering_size|filesizeformat }}</dd>
+              </div>
+              <div class="flex flex-wrap justify-between gap-x-4">
+                <dt class="text-ink-500 dark:text-ink-400">{% translate "Drawn by" %}</dt>
+                <dd data-rendered-by="{{ page.rendered_by }}">{{ page.get_rendered_by_display }}</dd>
+              </div>
+            </dl>
+            <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
+              {% if page.rendered_by == "instance" %}
+                {% translate "Drawn with scripts, the network and everything outside the source switched off, so it holds the words of the page and none of its looks." %}
+              {% else %}
+                {% translate "A picture taken in a browser shows the page as it was being seen there, signed in or not." %}
+              {% endif %}
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <a href="{% url 'jobs:capture_page_rendering' capture.pk %}" class="btn" data-variant="outline">
+              {% if page.rendering_is_a_picture %}
+                {% translate "Open the picture on its own" %}
+              {% else %}
+                {% translate "Download the PDF" %}
+              {% endif %}
+            </a>
+            <a href="{% url 'jobs:capture_page_forget' capture.pk %}?what=rendering"
+               class="btn" data-variant="destructive-ghost">{% translate "Delete the rendering" %}</a>
+          </div>
+        {% else %}
+          <c-empty variant="quiet">{% translate "No rendering was kept." %}</c-empty>
+          {% if can_draw %}
+            <form method="post" action="{% url 'jobs:capture_page_draw' capture.pk %}" class="mt-3">
+              {% csrf_token %}
+              <button type="submit" class="btn" data-variant="outline">
+                {% translate "Draw it from the source" %}
+              </button>
+              <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+                {% translate "Drawn here, with scripts, the network and everything outside the source switched off: the words of the page, without its looks. It is the same whenever it is drawn." %}
+              </p>
+            </form>
+          {% elif no_renderer %}
+            <p class="mt-3 text-xs text-ink-500 dark:text-ink-400" data-no-renderer>{{ no_renderer }}</p>
+          {% endif %}
+        {% endif %}
+      </section>
+
+      <section class="mb-8" aria-labelledby="source-heading">
+        <c-section-title id="source-heading">{% translate "The source" %}</c-section-title>
+        {% if page.source %}
+          <div class="card mb-3">
+            <p class="mb-3 text-sm text-ink-600 dark:text-ink-300">
+              {% translate "Exactly what was parsed. It is somebody else's markup, so it is shown and downloaded as text and never drawn as a page." %}
+            </p>
+            <dl class="space-y-2 text-sm">
+              <div class="flex flex-wrap justify-between gap-x-4">
+                <dt class="text-ink-500 dark:text-ink-400">{% translate "Size" %}</dt>
+                <dd>{{ page.source_size|filesizeformat }}</dd>
+              </div>
+              <div class="flex flex-wrap justify-between gap-x-4">
+                <dt class="text-ink-500 dark:text-ink-400">{% translate "Checksum (SHA-256)" %}</dt>
+                <dd class="min-w-0"><code class="text-xs">{{ page.source_checksum }}</code></dd>
+              </div>
+            </dl>
+            {% if source_unreadable %}
+              <div class="alert mt-3 text-sm" data-variant="warning" role="status" data-source-unreadable>
+                {% translate "The kept file could not be read back. It may have gone from the disk." %}
+              </div>
+            {% else %}
+              {% comment %} Closed until asked for: a page of somebody else's markup is
+                 not what anybody came to read first. `dir="ltr"` because markup runs one
+                 way whatever language the page around it is in, and `translate="no"` so a
+                 browser does not rewrite the evidence. {% endcomment %}
+              <details class="mt-3">
+                <summary class="cursor-pointer text-sm font-medium">{% translate "Show it as text" %}</summary>
+                <pre class="mt-2 max-h-96 overflow-y-auto whitespace-pre-wrap break-all rounded bg-ink-100 p-3 text-xs dark:bg-ink-950"
+                     tabindex="0" role="group" dir="ltr" translate="no"
+                     aria-label="{% translate 'The source, as text' %}"
+                     data-source>{{ excerpt }}</pre>
+                {% if excerpt_is_cut %}
+                  <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-source-cut>
+                    {% translate "This is the beginning. The whole of it is in the download." %}
+                  </p>
+                {% endif %}
+              </details>
+            {% endif %}
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            {% if not source_unreadable %}
+              <a href="{% url 'jobs:capture_page_source' capture.pk %}" class="btn" data-variant="outline">
+                {% translate "Download it as text" %}
+              </a>
+            {% endif %}
+            <a href="{% url 'jobs:capture_page_forget' capture.pk %}?what=source"
+               class="btn" data-variant="destructive-ghost">{% translate "Delete the source" %}</a>
+          </div>
+        {% else %}
+          <c-empty variant="quiet">{% translate "No source was kept." %}</c-empty>
+        {% endif %}
+      </section>
+
+      {% if page.source and page.rendering %}
+        <p>
+          <a href="{% url 'jobs:capture_page_forget' capture.pk %}"
+             class="btn" data-variant="destructive-ghost">{% translate "Delete everything kept of this page" %}</a>
+        </p>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}

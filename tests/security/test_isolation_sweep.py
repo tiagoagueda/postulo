@@ -164,6 +164,26 @@ def capture(owner):
     )
 
 
+def kept_page(owner):
+    """Somebody else's capture, with the page it was read from kept beside it (#256).
+
+    With real files behind it, so that a 404 is the lookup refusing and not a file that
+    was never there. The rows are made directly: whether the other person had switched
+    keeping on is not what is being asked.
+    """
+    from postulo.jobs.models import CapturedPage
+
+    theirs = capture(owner)
+    CapturedPage.objects.create(
+        owner=owner,
+        capture=theirs,
+        source=ContentFile(b"\x1f\x8b theirs", name="theirs.txt.gz"),
+        rendering=ContentFile(b"\x89PNG\r\n\x1a\n theirs", name="theirs.png"),
+        rendering_type="image/png",
+    )
+    return theirs
+
+
 def cv(owner):
     from postulo.documents.models import CV
 
@@ -312,6 +332,13 @@ FACTORIES: dict[str, Callable] = {
     "documents:upload_update": pk_of(upload),
     # jobs
     "jobs:capture_discard": pk_of(capture),
+    # What a capture kept of its page (#256): the page that shows it, the two files, and
+    # the two things that can be done to them.
+    "jobs:capture_page": pk_of(kept_page),
+    "jobs:capture_page_draw": pk_of(kept_page),
+    "jobs:capture_page_forget": pk_of(kept_page),
+    "jobs:capture_page_rendering": pk_of(kept_page),
+    "jobs:capture_page_source": pk_of(kept_page),
     "jobs:capture_review": pk_of(capture),
     "jobs:company_cell": pk_of(company, column="name"),
     "jobs:company_delete": pk_of(company),
@@ -369,6 +396,9 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:change_reminder": ("patch", pk_of(reminder), {"summary": "x"}),
     "postulo-api:delete_reminder": ("delete", pk_of(reminder), {}),
     "postulo-api:document_download": ("get", pk_of(upload, source="upload"), {}),
+    # Sending a rendering for somebody else's capture (#256). The lookup comes before
+    # anything about the upload is looked at, so what the body is does not matter here.
+    "postulo-api:attach_rendering": ("put", pk_of(kept_page), {}),
 }
 
 #: Somebody else's framework: allauth's pages are keyed by its own records and its own
