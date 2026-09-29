@@ -19,6 +19,7 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages, phone_field, phone_numbers, phones, web_links
+from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
 
 from . import avatars, identifiers
 from .models import Invite, PersonIdentifier, Profile
@@ -692,7 +693,7 @@ class AppearanceForm(forms.ModelForm):
         return value
 
 
-class PersonIdentifierForm(forms.ModelForm):
+class PersonIdentifierForm(IdentifierRow, forms.ModelForm):
     """One row: a scheme, the value, and a name for it when the scheme is Other."""
 
     class Meta:
@@ -718,8 +719,9 @@ class PersonIdentifierForm(forms.ModelForm):
         # Django picks the widget from the model field when it builds the form, and that
         # field deliberately has no choices; the registry's schemes arrive only now, so the
         # select that shows them has to come with them, choices in hand — the field here is
-        # a `CharField`, whose `choices` nothing reads from (#298).
-        scheme.widget = forms.Select(choices=choices)
+        # a `CharField`, whose `choices` nothing reads from (#298). Its formset switches
+        # off the kinds the other rows hold (#307).
+        scheme.widget = SchemeSelect(choices=choices)
         self.fields["value"].required = False
 
     def clean(self) -> dict:
@@ -741,12 +743,11 @@ class PersonIdentifierForm(forms.ModelForm):
         return data
 
 
-class BasePersonIdentifierFormSet(forms.BaseInlineFormSet):
+class BasePersonIdentifierFormSet(OneOfEachKind, forms.BaseInlineFormSet):
     """The rows together: one of each kind, and nothing listed twice."""
 
     def clean(self) -> None:
         super().clean()
-        seen_schemes: set[str] = set()
         seen_values: set[tuple[str, str]] = set()
         for form in self.forms:
             if not form.is_valid() or not form.has_changed() or form.cleaned_data.get("DELETE"):
@@ -755,10 +756,6 @@ class BasePersonIdentifierFormSet(forms.BaseInlineFormSet):
             value = form.instance.value  # normalised by the model's clean()
             if not scheme or not value:
                 continue
-            if scheme != identifiers.OTHER:
-                if scheme in seen_schemes:
-                    form.add_error("scheme", _("This kind of identifier is already listed."))
-                seen_schemes.add(scheme)
             if (scheme, value) in seen_values:
                 form.add_error("value", _("This identifier is already listed."))
             seen_values.add((scheme, value))

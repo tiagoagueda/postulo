@@ -302,6 +302,45 @@
     image.src = url;
   });
 
+  // One identifier of each kind (#307). The server switches off, in each row's choice of
+  // kind, the kinds the other rows hold -- never the row's own, never Other -- so with this
+  // script blocked the rows are right as drawn. This keeps them right while somebody
+  // changes a row's kind or ticks *Remove*, which gives the kind back, by running the same
+  // rule as `OneOfEachKind` in `core/identifiers.py` over the whole block again.
+  function holdKinds(block) {
+    var rows = Array.prototype.map.call(
+      block.querySelectorAll("select[name$='-scheme']"),
+      function (select) {
+        var line = select.closest("li");
+        var remove = line && line.querySelector("input[name$='-DELETE']");
+        var kind = remove && remove.checked ? "" : select.value;
+        return { select: select, kind: kind === "other" ? "" : kind };
+      }
+    );
+    rows.forEach(function (row) {
+      var taken = {};
+      rows.forEach(function (other) {
+        if (other !== row && other.kind) {
+          taken[other.kind] = true;
+        }
+      });
+      Array.prototype.forEach.call(row.select.options, function (option) {
+        option.disabled = option.value !== row.select.value && taken[option.value] === true;
+      });
+    });
+  }
+
+  onContentReady(function () {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-identifiers]"), holdKinds);
+  });
+
+  document.addEventListener("change", function (event) {
+    var block = event.target.closest && event.target.closest("[data-identifiers]");
+    if (block) {
+      holdKinds(block);
+    }
+  });
+
   // Dragging a card between board columns. No library and no new endpoint: on drop the
   // card's own status menu is set and its form submitted, so the server path is exactly
   // the one the menu already uses and the timeline entry is written the same way.

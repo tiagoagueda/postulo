@@ -27,10 +27,11 @@ links, and that is the whole of what it may do.
 from __future__ import annotations
 
 import re
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
 
+from django import forms
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.deconstruct import deconstructible
@@ -41,6 +42,10 @@ from django.utils.translation import gettext_lazy as _
 PERSON = "person"
 COMPANY = "company"
 SUBJECTS = (PERSON, COMPANY)
+
+#: The one kind a person or a company may hold more than once: a free slot with a name of
+#: its own. The constraints on both identifier tables make the same exception.
+OTHER = "other"
 
 
 @dataclass(frozen=True)
@@ -241,3 +246,134 @@ def require(key: str, subject: str) -> None:
     mean every route in and not only the two that run `full_clean`.
     """
     Identifies(subject)(key)
+
+
+# ------------------------------------------------------------------ the rows on a form
+#
+# One identifier of each kind, Other excepted. Both tables have always held the rule, but the
+# rows on *Your details* and on a company's form offered every kind on every row, and a
+# second ORCID was found out only on saving -- on a company in words that did not say which
+# kind, on a person in the constraint's own name. The rule is offered now as well as
+# enforced, from here, for both forms (#307).
+
+
+def _removing(row) -> bool:
+    """Whether a row has *Remove* ticked, as posted or as drawn."""
+    return "DELETE" in row.fields and bool(row["DELETE"].value())
+
+
+def _set_to(row) -> str:
+    """The kind a row is set to, as posted or as drawn; empty while none is chosen."""
+    return row["scheme"].value() or ""
+
+
+class SchemeSelect(forms.Select):
+    """The choice of kind, with the kinds the other rows hold switched off (#307).
+
+    ``<option disabled>`` needs no script, and a screen reader announces it as unavailable,
+    so nothing more is said. The row's own kind is never switched off -- a row keeps what it
+    has, even beside a duplicate about to be refused, or it could not be posted back -- and
+    neither is Other, which may repeat.
+    """
+
+    def __init__(self, attrs=None, choices=()):
+        super().__init__(attrs, choices)
+        #: Asked when the select is drawn, for the kinds the other rows hold. The formset the
+        #: row sits in answers; a row on its own has no neighbours.
+        self.taken: Callable[[], Iterable[str]] = lambda: ()
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        off = set(self.taken()) - set(context["widget"]["value"]) - {OTHER}
+        for _group, options, _index in context["widget"]["optgroups"]:
+            for option in options:
+                if option["value"] in off:
+                    option["attrs"]["disabled"] = True
+        return context
+
+
+class OneOfEachKind:
+    """Formset mixin for identifier rows: one of each kind, offered and enforced (#307).
+
+    Worked out from the rows as they stand, posted or drawn from the table, because the
+    formset is the only thing that sees all of them.
+
+    - **Offered.** Each row's choice switches off the kinds the other rows hold. A row
+      marked for removal holds nothing, so its kind is free for the others.
+    - **Enforced.** A duplicate is still refused, because two new rows typed in one go can
+      pick the same kind, and a page with its script is not the only way in. The refusal
+      names the kind and sits on the row that lost it. A row keeping the kind it was saved
+      with has first claim, and so does every saved row on the kind it was saved with while
+      it is being changed, because the table holds that kind until the row is written;
+      between rows taking a kind anew, the first keeps it.
+    - **Written in an order that works.** Rows marked for removal go first, so the kind one
+      of them gives up can be taken by another row in the same save.
+
+    The rows' form carries `IdentifierRow`, which is where the refusal is asked for.
+    """
+
+    def add_fields(self, form, index):
+        super().add_fields(form, index)
+        form.fields["scheme"].widget.taken = lambda: self.held(besides=form)
+        form.one_of_each_kind = self
+
+    def held(self, besides=None) -> set[str]:
+        """The kinds the rows hold, apart from ``besides``'s; never Other."""
+        kinds = {_set_to(row) for row in self.forms if row is not besides and not _removing(row)}
+        return kinds - {"", OTHER}
+
+    def refuse_taken(self, row, key: str) -> None:
+        """Raise `ValidationError` if another row has first claim on ``key``."""
+        if key == OTHER or key == row.initial.get("scheme") or _removing(row):
+            return
+        ahead = True
+        for other in self.forms:
+            if other is row:
+                ahead = False
+            elif not _removing(other) and (
+                other.initial.get("scheme") == key or (ahead and _set_to(other) == key)
+            ):
+                raise ValidationError(
+                    _("%(scheme)s is already listed on another row."),
+                    code="taken",
+                    params={"scheme": label_for(key)},
+                )
+
+    def save(self, commit=True):
+        # Django writes the saved rows in the order they are listed, removing or changing
+        # each in turn, so a row taking the kind of one removed further down would reach
+        # the table while that kind was still in it. Removed first, they are passed over
+        # afterwards the way Django passes over any row already gone.
+        if commit:
+            for row in self.deleted_forms:
+                if row.instance.pk is not None:
+                    self.delete_existing(row.instance)
+        return super().save(commit=commit)
+
+
+class IdentifierRow:
+    """Form mixin for one row of a `OneOfEachKind` formset (#307).
+
+    The table's one-of-each-kind constraint, checked from one row, sees only the table,
+    where a row about to be removed is still sitting, so it would refuse the kind that the
+    removal frees -- and on a person it said so in the constraint's own name. The formset
+    sees every row, so a row in one swaps that check for the formset's, which names the
+    kind. Everything else the table promises is still checked here, and a row outside a
+    formset is checked exactly as Django would check it.
+    """
+
+    def validate_constraints(self):
+        rows = getattr(self, "one_of_each_kind", None)
+        scheme = self.cleaned_data.get("scheme")
+        if rows is None or not scheme or scheme == OTHER:
+            return super().validate_constraints()
+        exclude = self._get_validation_exclusions()
+        try:
+            self.instance.validate_constraints(exclude=exclude | {"scheme"})
+        except ValidationError as error:
+            self._update_errors(error)
+        if "scheme" not in exclude:
+            try:
+                rows.refuse_taken(self, scheme)
+            except ValidationError as error:
+                self.add_error("scheme", error)

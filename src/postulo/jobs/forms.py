@@ -13,6 +13,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, web_links
+from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
 
 from . import employment_services, esco, identifiers, industries, logos, structure
 from .models import (
@@ -422,7 +423,7 @@ class CompanyForm(OwnerScopedModelForm):
         return name
 
 
-class CompanyIdentifierForm(forms.ModelForm):
+class CompanyIdentifierForm(IdentifierRow, forms.ModelForm):
     """One row of the identifiers block: a scheme, the value, and a name when it is Other."""
 
     class Meta:
@@ -443,8 +444,9 @@ class CompanyIdentifierForm(forms.ModelForm):
         # Django picks the widget from the model field when it builds the form, and that
         # field deliberately has no choices; the registry's schemes arrive only now, so the
         # select that shows them has to come with them, choices in hand — the field here is
-        # a `CharField`, whose `choices` nothing reads from (#298).
-        scheme.widget = forms.Select(choices=choices)
+        # a `CharField`, whose `choices` nothing reads from (#298). Its formset switches
+        # off the kinds the other rows hold (#307).
+        scheme.widget = SchemeSelect(choices=choices)
         self.fields["value"].required = False
 
     def clean(self) -> dict:
@@ -466,12 +468,11 @@ class CompanyIdentifierForm(forms.ModelForm):
         return data
 
 
-class BaseCompanyIdentifierFormSet(forms.BaseInlineFormSet):
-    """The rows together: no scheme twice, no value twice, and the owner filled in."""
+class BaseCompanyIdentifierFormSet(OneOfEachKind, forms.BaseInlineFormSet):
+    """The rows together: one of each kind, no value twice, and the owner filled in."""
 
     def clean(self) -> None:
         super().clean()
-        seen_schemes: set[str] = set()
         seen_values: set[tuple[str, str]] = set()
         for form in self.forms:
             if not form.is_valid() or not form.has_changed() or form.cleaned_data.get("DELETE"):
@@ -480,10 +481,6 @@ class BaseCompanyIdentifierFormSet(forms.BaseInlineFormSet):
             value = form.instance.value  # normalised by the model's clean()
             if not scheme or not value:
                 continue
-            if scheme != identifiers.OTHER:
-                if scheme in seen_schemes:
-                    form.add_error("scheme", _("This kind of identifier is already listed."))
-                seen_schemes.add(scheme)
             # Case-blind, like the constraint underneath it (#211): "AB-12" and "ab-12" are
             # one identifier, and the form has to say so before the database refuses it.
             if (scheme, value.casefold()) in seen_values:
