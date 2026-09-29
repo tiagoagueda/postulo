@@ -240,14 +240,14 @@ def statuses(*pairs):
 
 
 GREEN = statuses(
-    ("CI / test (3.12) (push)", "success"),
-    ("CI / test (3.13) (push)", "success"),
-    ("CI / test (3.14) (push)", "success"),
-    ("CI / browser (push)", "success"),
-    ("CI / security (push)", "success"),
+    ("CI / Unit tests (Python 3.12) (push)", "success"),
+    ("CI / Unit tests (Python 3.13) (push)", "success"),
+    ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
+    ("CI / Browser tests (Chromium) (push)", "success"),
+    ("CI / Security audit (push)", "success"),
     # A registry timeout on the dev image says nothing about the code, and the combined
     # state above is "failure" because of it; the gate reads the jobs, not the state.
-    ("Dev image / image (push)", "failure"),
+    ("Dev image / Dev image: build, scan, push (push)", "failure"),
 )
 
 
@@ -279,31 +279,34 @@ def test_one_red_leg_is_named(monkeypatch):
     asking(
         monkeypatch,
         statuses(
-            ("CI / test (3.12) (push)", "success"),
-            ("CI / test (3.14) (push)", "failure"),
-            ("CI / browser (push)", "success"),
+            ("CI / Unit tests (Python 3.12) (push)", "success"),
+            ("CI / Unit tests and coverage (Python 3.14) (push)", "failure"),
+            ("CI / Browser tests (Chromium) (push)", "success"),
         ),
     )
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
-    assert problems == ["CI / test (3.14) (push): failure"]
+    assert problems == ["CI / Unit tests and coverage (Python 3.14) (push): failure"]
 
 
 def test_a_leg_still_running_is_not_a_pass(monkeypatch):
     asking(
         monkeypatch,
-        statuses(("CI / test (3.14) (push)", "pending"), ("CI / browser (push)", "success")),
+        statuses(
+            ("CI / Unit tests and coverage (Python 3.14) (push)", "pending"),
+            ("CI / Browser tests (Chromium) (push)", "success"),
+        ),
     )
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
-    assert problems == ["CI / test (3.14) (push): pending"]
+    assert problems == ["CI / Unit tests and coverage (Python 3.14) (push): pending"]
 
 
 def test_no_ci_at_all_is_refused_rather_than_waved_through(monkeypatch):
     """A tag on a commit CI never saw has no red job; that is not the same as green."""
-    asking(monkeypatch, statuses(("Dev image / image (push)", "success")))
+    asking(monkeypatch, statuses(("Dev image / Dev image: build, scan, push (push)", "success")))
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
@@ -328,7 +331,7 @@ def test_the_check_command_asks_only_when_told_to(monkeypatch, capsys):
 
 
 def test_the_check_command_fails_in_words_when_ci_did_not_pass(monkeypatch, capsys):
-    asking(monkeypatch, statuses(("CI / test (3.14) (push)", "failure")))
+    asking(monkeypatch, statuses(("CI / Unit tests and coverage (Python 3.14) (push)", "failure")))
     version = "v" + tools.pyproject_version()
     monkeypatch.setenv("FORGEJO_URL", "https://f")
     monkeypatch.setenv("FORGEJO_REPOSITORY", "o/r")
@@ -337,4 +340,7 @@ def test_the_check_command_fails_in_words_when_ci_did_not_pass(monkeypatch, caps
     assert tools.main(["check", version, "--ci"]) != 0
 
     said = capsys.readouterr().err
-    assert "CI has not passed" in said and "CI / test (3.14) (push): failure" in said
+    assert (
+        "CI has not passed" in said
+        and "CI / Unit tests and coverage (Python 3.14) (push): failure" in said
+    )

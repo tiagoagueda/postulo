@@ -52,6 +52,7 @@ concurrency:
 
 jobs:
   image:
+    name: "Dev image: build, scan, push"
     # Belt and braces beside the trigger. A branch filter is one edit away from being wider
     # than somebody meant, and this says the same thing a second time where it is read.
     if: github.ref_name == 'main'

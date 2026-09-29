@@ -37,6 +37,8 @@ env:
 
 jobs:
   test:
+    # Named for what it checks (#319). The 3.14 leg is the one that measures coverage.
+    name: "${{ matrix.python-version == '3.14' && 'Unit tests and coverage' || 'Unit tests' }} (Python ${{ matrix.python-version }})"
     runs-on: ubuntu-latest
     container:
       # Debian with Node and git already present. uv brings its own Python, so nothing
@@ -143,6 +145,7 @@ jobs:
           POSTULO_STATIC_ROOT: /tmp/postulo-static
 
   postgres:
+    name: Database tests on PostgreSQL
     # The other engine Postulo offers, against a real server (#219).
     #
     # The job above runs on in-memory SQLite, which is what makes it fast, and it meant
@@ -258,6 +261,7 @@ jobs:
           POSTULO_STATIC_ROOT: /tmp/postulo-static
 
   security:
+    name: Security audit
     # Postulo holds people's CVs and employment histories, and one of its stated
     # commitments is to keep them as secure as it knows how. Part of that is noticing a
     # vulnerability disclosed in a dependency without anyone having to remember to look:
@@ -321,6 +325,7 @@ jobs:
           --min-severity medium .forgejo/workflows/*.yml
 
   styles:
+    name: Stylesheet, icons and scripts current
     # The compiled stylesheet is committed so that the application runs without Node.
     # That only works if it is kept in step with its source.
     runs-on: ubuntu-latest
@@ -360,6 +365,7 @@ jobs:
             || (echo "::error::static/brand disagrees with assets/brand/postulo.png. Run 'uv run python scripts/brand.py' and commit the result." && git status --porcelain -- src/postulo/static/brand && exit 1)
 
   browser:
+    name: Browser tests (Chromium)
     # The critical path in a real browser: sign in, capture, review, board, send, export.
     # One Python version is enough; the matrix above covers the interpreter, this covers
     # the pages joining up. Traces and screenshots of a failure are kept as artifacts.

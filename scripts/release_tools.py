@@ -112,8 +112,11 @@ def changelog_section(version: str, root: Path = ROOT) -> str:
 #: image job fails on a registry timeout often enough that "failure" there says nothing
 #: about the code (#233).
 REQUIRED_JOBS = (
-    ("a test leg", re.compile(r"^CI / test \(")),
-    ("the browser", re.compile(r"^CI / browser ")),
+    # By the names the jobs carry since #319, which say what each checks: "Unit tests
+    # (Python 3.12)", "Unit tests and coverage (Python 3.14)", "Browser tests (Chromium)".
+    # A prefix, so a Python added to the matrix is required without an edit here.
+    ("a test leg", re.compile(r"^CI / Unit tests")),
+    ("the browser", re.compile(r"^CI / Browser tests")),
 )
 
 
