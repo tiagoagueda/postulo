@@ -276,21 +276,68 @@ def test_isolation_would_run_every_context_processor_once_per_component(db, sett
     assert rendered_with(True) == 7, "the page's pass plus one per component, nested ones too"
 
 
-def test_a_dropdown_menu_is_a_disclosure_that_says_it_is_a_menu():
-    """Basecoat's dropdown menu on a `<details>` (#262): the browser opens it with no
-    script, the trigger and the menu share the name, and the items are the caller's."""
+ONE_MENU = (
+    '{% cotton dropdown-menu label="Actions for Jo" %}'
+    "{% cotton:slot trigger %}...{% endcotton:slot %}"
+    '<a href="/x" role="menuitem">Edit</a>'
+    "{% endcotton %}"
+)
+
+
+def test_a_dropdown_menu_is_a_popover_that_says_it_is_a_menu():
+    """Basecoat's dropdown menu on the browser's popover (#262, #310): the trigger is a
+    `<button popovertarget>` naming the panel, so the browser opens it with no script and
+    draws it in the top layer, where the box a table scrolls in cannot cut it off. The
+    trigger and the menu share the name, and the items are the caller's."""
+    html = render(ONE_MENU)
+
+    panel = re.search(r'<div popover id="([^"]+)" data-popover data-align="end">', html)
+    assert panel, html
+    assert '<div class="dropdown-menu" data-menu>' in html
+    # `type="button"`, because a submit button inside a form does not open a popover at all.
+    assert (
+        f'<button type="button" popovertarget="{panel.group(1)}" class="btn cursor-pointer" '
+        'data-variant="ghost" data-size="icon-xs" aria-haspopup="menu" '
+        'aria-label="Actions for Jo">...</button>'
+    ) in html
+    assert '<div role="menu" aria-label="Actions for Jo">' in html
+    assert '<a href="/x" role="menuitem">Edit</a>' in html
+    assert "<details" not in html and "<summary" not in html
+
+
+def test_every_menu_on_a_page_opens_its_own_panel():
+    """The trigger finds its panel by id, so two menus sharing one would open each other's
+    panel -- the header's and a row's, say. Random rather than counted: a fragment htmx
+    swaps in is another request, and a counter would start again at one (#310)."""
+    html = render(ONE_MENU * 5)
+    panels = re.findall(r'<div popover id="([^"]+)"', html)
+    targets = re.findall(r'popovertarget="([^"]+)"', html)
+
+    assert len(panels) == 5 and len(set(panels)) == 5, panels
+    assert targets == panels, "each trigger names the panel beside it"
+
+    again = re.findall(r'<div popover id="([^"]+)"', render(ONE_MENU * 5))
+    assert not set(again) & set(panels), "and the next request takes none of them again"
+
+
+def test_a_navigation_dropdown_is_a_disclosure_of_links_rather_than_a_menu():
+    """The account menu and *More* are navigation (#262): the same popover, with no
+    `role="menu"` and no `aria-haspopup="menu"`, so a screen reader is not promised arrow
+    keys the rows do not answer to. Any other attribute goes on the root (#310)."""
     html = render(
-        '{% cotton dropdown-menu label="Actions for Jo" %}'
-        "{% cotton:slot trigger %}...{% endcotton:slot %}"
-        '<a href="/x" role="menuitem">Edit</a>'
+        '{% cotton dropdown-menu kind="navigation" label="More" data-nav-more '
+        'trigger_class="nav-link" trigger_variant="" trigger_size="" %}'
+        "{% cotton:slot trigger %}More{% endcotton:slot %}"
+        '<a href="/y" class="menu-item">Companies</a>'
         "{% endcotton %}"
     )
 
-    assert '<details class="dropdown-menu" data-menu>' in html
+    panel = re.search(r'<div popover id="([^"]+)" data-popover data-align="end">', html)
+    assert panel, html
+    assert '<div class="dropdown-menu" data-menu data-nav-more>' in html
     assert (
-        '<summary class="btn cursor-pointer" data-variant="ghost" data-size="icon-xs" '
-        'aria-label="Actions for Jo">...</summary>'
+        f'<button type="button" popovertarget="{panel.group(1)}" class="nav-link" '
+        'aria-label="More">More</button>'
     ) in html
-    assert '<div data-popover data-align="end">' in html
-    assert '<div role="menu" aria-label="Actions for Jo">' in html
-    assert '<a href="/x" role="menuitem">Edit</a>' in html
+    assert 'role="menu"' not in html and "aria-haspopup" not in html
+    assert '<a href="/y" class="menu-item">Companies</a>' in html

@@ -130,8 +130,10 @@ Two things keep one honest:
 
 - **Row actions are a menu**, not a row of buttons. Four buttons with their labels spelled
   out made one column of *Server settings → People* 335 pixels wide — larger than the email
-  column, and holding no information at all. Use the `<details data-menu>` disclosure the
-  account menu uses; the existing script already closes it when the pointer goes elsewhere.
+  column, and holding no information at all. Use `<c-dropdown-menu>`, the component every
+  menu is drawn with: a popover, which the browser opens and closes with no script and
+  draws in the top layer, where the box the table scrolls in cannot cut off the last row's
+  menu (#310).
 - **`table-cards`** turns each row into a card below the `md` breakpoint, where columns have
   nowhere to go. Give every cell a `data-label` naming its column, except the one that is
   the card's heading.

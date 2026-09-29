@@ -1241,6 +1241,9 @@
   .has-col-handle {
     padding-inline-end: calc(var(--spacing) * 8);
   }
+  .pe-0 {
+    padding-inline-end: 0px;
+  }
   .pe-3 {
     padding-inline-end: calc(var(--spacing) * 3);
   }
@@ -5109,13 +5112,13 @@
     align-items: center;
     gap: var(--spacing);
   }
-  .nav-main > a, .nav-main > [data-nav-more] > summary {
+  .nav-main > a, .nav-main > [data-nav-more] > button {
     display: flex;
     align-items: center;
     gap: calc(var(--spacing) * 1.5);
     white-space: nowrap;
   }
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     cursor: pointer;
   }
   @media (width < 48rem) {
@@ -5307,6 +5310,13 @@
       top: calc(var(--spacing) * 2);
       padding-block: 0px;
     }
+    .table-cards td[data-avatar], .table-cards td[data-avatar] + td {
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .table-cards td[data-avatar] {
+      margin-inline-end: calc(var(--spacing) * 2);
+    }
   }
   @media (width >= 40rem) {
     .name-if-other-row {
@@ -5465,6 +5475,29 @@ progress.funnel-bar::-moz-progress-bar {
     fill: var(--color-input);
   }
 }
+[data-popover][popover] {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding-inline: 0;
+  max-block-size: calc(100dvh - 1rem);
+  transition: none;
+}
+@supports (position-area: block-end span-inline-start) and (position-try-fallbacks: flip-block) {
+  [data-popover][popover] {
+    inset: auto;
+    margin: 0.25rem 0;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks: flip-block, --menu-scrolls, --menu-scrolls flip-block;
+  }
+  [data-popover][popover][data-align="start"] {
+    position-area: block-end span-inline-end;
+  }
+  @position-try --menu-scrolls {
+    max-block-size: calc(100% - 0.5rem);
+    min-block-size: 10rem;
+  }
+}
 details[data-menu] > summary {
   list-style: none;
 }
@@ -5589,7 +5622,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   .nav-main > a, .nav-main > [data-nav-more] {
     flex: 1 1 0;
   }
-  .nav-main > a, .nav-main > [data-nav-more] > summary {
+  .nav-main > a, .nav-main > [data-nav-more] > button {
     min-height: calc(var(--spacing) * 12);
     flex-direction: column;
     justify-content: center;
@@ -5601,21 +5634,15 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
     line-height: var(--tw-leading, var(--text-xs--line-height));
     white-space: normal;
   }
-  .nav-main > a > span, .nav-main > [data-nav-more] > summary > span {
+  .nav-main > a > span, .nav-main > [data-nav-more] > button > span {
     min-inline-size: 2.75rem;
   }
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     width: 100%;
   }
-  .nav-main > a > svg, .nav-main > [data-nav-more] > summary > svg {
+  .nav-main > a > svg, .nav-main > [data-nav-more] > button > svg {
     width: calc(var(--spacing) * 5);
     height: calc(var(--spacing) * 5);
-  }
-  .nav-main > [data-nav-more] > [data-popover] {
-    top: auto;
-    bottom: 100%;
-    margin-top: 0px;
-    margin-bottom: calc(var(--spacing) * 2);
   }
   body:has(.nav-main) {
     padding-bottom: var(--bottom-bar-height, 4.5rem);
@@ -5631,12 +5658,12 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (width < 22.5rem) {
-  .nav-main > a, .nav-main > [data-nav-more] > summary {
+  .nav-main > a, .nav-main > [data-nav-more] > button {
     font-size: 0.6875rem;
   }
 }
 @media (width < 48rem) {
-  .nav-main > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 5)) > summary {
+  .nav-main > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 5)) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -5660,7 +5687,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (48rem <= width < 64rem) {
-  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 3)) > summary {
+  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 3)) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -5684,7 +5711,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (64rem <= width < 80rem) {
-  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 4)) > summary {
+  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 4)) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -5708,7 +5735,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (80rem <= width < 96rem) {
-  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 6)) > summary {
+  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 6)) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -5732,7 +5759,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (width >= 96rem) {
-  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 8)) > summary {
+  .nav-main:not([data-fitted]) > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 8)) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);
@@ -5756,7 +5783,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 }
 @media (width >= 48rem) {
-  .nav-main[data-fitted] > [data-nav-more]:has(> [data-popover] > a[aria-current="page"][data-in-more]) > summary {
+  .nav-main[data-fitted] > [data-nav-more]:has(> [data-popover] > a[aria-current="page"][data-in-more]) > button {
     background-color: var(--color-ink-100);
     --tw-font-weight: var(--font-weight-semibold);
     font-weight: var(--font-weight-semibold);

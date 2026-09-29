@@ -261,7 +261,7 @@ def line_order(html: str) -> list[str]:
     """The keys the masthead's line draws, in order: the `<a>` children of the nav, not the
     copies under *More*."""
     nav = html[html.index('<nav class="nav-main"') :]
-    line = nav[: nav.index("<details")]
+    line = nav[: nav.index("data-nav-more")]
     return re.findall(r'data-nav="([^"]+)"', line)
 
 
@@ -450,10 +450,12 @@ def test_the_navigation_is_one_list_with_more_and_the_search(client, user):
     assert html.count('aria-label="Main"') == 1
 
     nav = html[html.index('<nav class="nav-main"') : html.index("</nav>")]
-    more = nav[nav.index("<details") :]
-    # More is navigation, so a disclosure of rows and not a menu of actions (#262).
-    assert 'class="popover" data-menu data-nav-more' in more
-    assert 'role="menu"' not in more
+    more = nav[nav.rindex("<div", 0, nav.index("data-nav-more")) :]
+    # More is navigation, so a disclosure of rows and not a menu of actions (#262) -- the
+    # menus' popover, of the navigation kind (#310).
+    assert more.startswith('<div class="dropdown-menu" data-menu data-nav-more>')
+    assert "popovertarget=" in more and "<div popover " in more
+    assert 'role="menu"' not in more and "aria-haspopup" not in more
     # Every item has a copy under More, and More carries the search, which a phone had none of.
     assert re.findall(r'data-nav="([^"]+)"', more) == list(navigation.DEFAULT_ORDER)
     assert f'href="{reverse("core:search")}"' in more

@@ -855,11 +855,11 @@
   }
 
   .nav-main > a,
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     @apply flex items-center gap-1.5 whitespace-nowrap;
   }
 
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     @apply cursor-pointer;
   }
 
@@ -1073,6 +1073,17 @@
     .table-cards td[data-actions] {
       @apply absolute end-2 top-2 py-0;
     }
+
+    /* A picture heads the card, on one line with the cell after it -- the card's heading,
+       which it pictures (#310). */
+    .table-cards td[data-avatar],
+    .table-cards td[data-avatar] + td {
+      @apply inline-block align-middle;
+    }
+
+    .table-cards td[data-avatar] {
+      @apply me-2;
+    }
   }
 
   /*
@@ -1241,9 +1252,65 @@ progress.funnel-bar::-moz-progress-bar {
   }
 }
 
-/* ------------------------------------------------------------ account menu */
+/* ------------------------------------------------------------------ menus */
 
-/* The summary is the trigger; the browser's disclosure triangle is not wanted on it. */
+/*
+ * A menu's panel is a popover (#310). `<c-dropdown-menu>` draws it with `popover` and its
+ * trigger with `popovertarget`, so the panel lives in the top layer, where no box that
+ * scrolls or clips can cut it off -- which is why it moved: a row's menu at the foot of
+ * *Server settings → People* was cut in half by its table's scroll box.
+ *
+ * The top layer puts it nowhere in particular. Basecoat's `[data-popover]` places the box
+ * under its parent with `top: 100%`, which from the top layer means under the window, so
+ * that is undone here and the browser's own answer for a popover put back: fixed, and
+ * centred in the window. That is where a panel stays only when nothing better can run --
+ * no anchor positioning and no script -- and over the page, whole, beats cut off.
+ *
+ * Where the browser has anchor positioning, the panel is tied to its trigger: a
+ * `popovertarget` makes the trigger the panel's anchor without a name, which would have had
+ * to be written inline. Below it, its inline end on the trigger's inline end, and turned
+ * over when there is no room below -- the row at the foot of a table, *More* in the bar at
+ * the foot of a phone. When it fits on neither side, the first side with room for ten rem
+ * of it, where it scrolls inside itself: a window zoomed to 400% is about two hundred
+ * pixels tall. Where it does not, `app.js` asks the same question with `CSS.supports` and
+ * places the panel from the trigger's box by the same rules.
+ *
+ * Unlayered, so that it beats Basecoat's placement, which is layered and more specific.
+ * No transition: a panel that glides into place is motion nobody asked for.
+ */
+[data-popover][popover] {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding-inline: 0;
+  max-block-size: calc(100dvh - 1rem);
+  transition: none;
+}
+
+@supports (position-area: block-end span-inline-start) and (position-try-fallbacks: flip-block) {
+  [data-popover][popover] {
+    inset: auto;
+    margin: 0.25rem 0;
+    position-area: block-end span-inline-start;
+    position-try-fallbacks:
+      flip-block,
+      --menu-scrolls,
+      --menu-scrolls flip-block;
+  }
+
+  [data-popover][popover][data-align="start"] {
+    position-area: block-end span-inline-end;
+  }
+
+  @position-try --menu-scrolls {
+    max-block-size: calc(100% - 0.5rem);
+    min-block-size: 10rem;
+  }
+}
+
+/* The disclosures that are not menus -- the column chooser, the saved views, the language
+   picker -- are still `<details data-menu>`, and a summary is their trigger; the browser's
+   disclosure triangle is not wanted on it. */
 details[data-menu] > summary {
   list-style: none;
 }
@@ -1374,7 +1441,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
   }
 
   .nav-main > a,
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     @apply min-h-12 flex-col justify-center gap-0.5 px-px py-1 text-center text-xs
       whitespace-normal;
   }
@@ -1384,23 +1451,21 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
      more -- enough that two labels each held at their longest word do not read as one
      word, and at 320 every other pixel of a slot is a letter. */
   .nav-main > a > span,
-  .nav-main > [data-nav-more] > summary > span {
+  .nav-main > [data-nav-more] > button > span {
     min-inline-size: 2.75rem;
   }
 
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     @apply w-full;
   }
 
   .nav-main > a > svg,
-  .nav-main > [data-nav-more] > summary > svg {
+  .nav-main > [data-nav-more] > button > svg {
     @apply size-5;
   }
 
-  /* *More* opens upwards from the bar, over the page, rather than down off the screen. */
-  .nav-main > [data-nav-more] > [data-popover] {
-    @apply top-auto bottom-full mt-0 mb-2;
-  }
+  /* *More* opens upwards from the bar, over the page, because there is no room below it:
+     the menus' own rule (see *menus* below) turns it over, and needs nothing from here. */
 
   body:has(.nav-main) {
     padding-bottom: var(--bottom-bar-height, 4.5rem);
@@ -1421,7 +1486,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 
 @media (width < 22.5rem) {
   .nav-main > a,
-  .nav-main > [data-nav-more] > summary {
+  .nav-main > [data-nav-more] > button {
     font-size: 0.6875rem;
   }
 }
@@ -1436,7 +1501,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
  */
 @media (width < 48rem) {
   .nav-main > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 5))
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }
@@ -1444,7 +1509,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 @media (48rem <= width < 64rem) {
   .nav-main:not([data-fitted])
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 3))
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }
@@ -1452,7 +1517,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 @media (64rem <= width < 80rem) {
   .nav-main:not([data-fitted])
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 4))
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }
@@ -1460,7 +1525,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 @media (80rem <= width < 96rem) {
   .nav-main:not([data-fitted])
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 6))
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }
@@ -1468,7 +1533,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 @media (width >= 96rem) {
   .nav-main:not([data-fitted])
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"]:nth-of-type(n + 8))
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }
@@ -1476,7 +1541,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
 @media (width >= 48rem) {
   .nav-main[data-fitted]
     > [data-nav-more]:has(> [data-popover] > a[aria-current="page"][data-in-more])
-    > summary {
+    > button {
     @apply bg-ink-100 font-semibold text-ink-900 dark:bg-ink-800 dark:text-ink-50;
   }
 }

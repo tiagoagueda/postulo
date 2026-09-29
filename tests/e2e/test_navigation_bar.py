@@ -40,8 +40,8 @@ PHONE = {"width": 390, "height": 740}
 #: the laptop the rest of the suite uses, and a desktop.
 ROW_WIDTHS = (768, 1024, 1280, 1440)
 
-#: What the bar's slots are: its four items and the summary of *More*.
-SLOTS = "header [data-nav-main] > a:visible, header [data-nav-main] > [data-nav-more] > summary"
+#: What the bar's slots are: its four items and the trigger of *More*.
+SLOTS = "header [data-nav-main] > a:visible, header [data-nav-main] > [data-nav-more] > button"
 
 #: Every label in the bar that does not fit its slot: wider than its own box, or out past
 #: the slot's edges. A label wraps between its words and never inside one, so a slot is at
@@ -49,7 +49,7 @@ SLOTS = "header [data-nav-main] > a:visible, header [data-nav-main] > [data-nav-
 LABELS_THAT_SPILL = """() => {
   const out = [];
   const labels = document.querySelectorAll(
-    '[data-nav-main] > a > span, [data-nav-main] > [data-nav-more] > summary > span');
+    '[data-nav-main] > a > span, [data-nav-main] > [data-nav-more] > button > span');
   for (const label of labels) {
     if (!label.getClientRects().length) continue;
     const slot = label.parentElement.getBoundingClientRect();
@@ -224,8 +224,8 @@ def test_the_page_you_are_on_is_marked_by_more_than_colour(live_server, page: Pa
 
     page.goto(f"{base}/jobs/companies/")
     more = page.locator("header [data-nav-more]")
-    assert more.locator("summary").evaluate(cues)["weight"] >= 600, "More holds the page"
-    more.locator("summary").click()
+    assert more.locator(":scope > button").evaluate(cues)["weight"] >= 600, "More holds the page"
+    more.locator(":scope > button").click()
     inside = more.locator('[data-nav="companies"]')
     expect(inside).to_have_attribute("aria-current", "page")
     marked = inside.evaluate(cues)
@@ -247,7 +247,7 @@ def test_the_bar_has_no_violations(live_server, page: Page, axe_source, furnishe
         found = violations_on(page, axe_source)
         if found:
             failures.append(describe(f"{path} at {PHONE['width']} ({scheme})", found))
-        page.locator("header [data-nav-more] summary").click()
+        page.locator("header [data-nav-more] > button").click()
         found = violations_on(page, axe_source)
         if found:
             failures.append(describe(f"{path} with More open ({scheme})", found))
@@ -255,9 +255,9 @@ def test_the_bar_has_no_violations(live_server, page: Page, axe_source, furnishe
 
 
 def test_more_opens_with_scripts_off(live_server, browser: Browser, furnished):  # noqa: F811
-    """A `<details>`: the browser opens it, so it opens for everybody. And with nothing to
-    measure the bar, the page's padding falls back to the stylesheet's answer, which is
-    never less than the bar."""
+    """A popover since #310, and a `<details>` before it: either way the browser opens it,
+    so it opens for everybody. And with nothing to measure the bar, the page's padding falls
+    back to the stylesheet's answer, which is never less than the bar."""
     base = live_server.url
     context = browser.new_context(java_script_enabled=False, viewport=PHONE)
     page = context.new_page()
@@ -265,8 +265,8 @@ def test_more_opens_with_scripts_off(live_server, browser: Browser, furnished): 
         sign_in(page, base)
         page.goto(f"{base}/career/")
         more = page.locator("header [data-nav-more]")
-        more.locator("summary").click()
-        expect(more).to_have_attribute("open", "")
+        more.locator(":scope > button").click()
+        expect(more.locator(":scope > [popover]")).to_be_visible()
         expect(more.locator('[data-nav="companies"]')).to_be_visible()
         expect(more.locator("[data-nav-search]")).to_be_visible()
 

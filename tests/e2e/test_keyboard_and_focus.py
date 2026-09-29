@@ -93,12 +93,15 @@ def test_focus_stays_on_the_theme_switch(page: Page, live_server, applicant):
     """It lives in the account menu, and losing focus there closes the menu around it."""
     sign_in(page, live_server.url)
 
-    page.locator("details[data-menu] summary").last.click()
+    page.get_by_label("Account menu", exact=False).click()
     button = page.locator("#theme-switch-button")
     with page.expect_response(lambda r: "/theme/" in r.url and r.request.method == "POST"):
         button.click()
 
     assert focused_id(page) == "theme-switch-button"
+    # And the menu is still open around it: a popover closes on Escape or a click outside,
+    # never because what had focus inside it was replaced (#310).
+    expect(button).to_be_visible()
 
 
 def test_a_field_shows_its_focus_in_forced_colours(page: Page, live_server, applicant):

@@ -21,7 +21,9 @@ def header_of(response) -> str:
 def test_the_right_side_holds_the_plus_menu_and_the_account_menu(client, user):
     client.force_login(user)
     header = header_of(client.get(reverse("core:home")))
-    assert "details" in header and "data-menu" in header
+    # Both are `<c-dropdown-menu>`: a trigger and a popover each (#310).
+    assert header.count("popovertarget=") >= 2 and "data-menu" in header
+    assert "<details" not in header, "no menu in the masthead is a <details> any more"
     assert "Account menu, applicant" in header
     assert "Your details" in header
     assert "Settings" in header
@@ -29,13 +31,13 @@ def test_the_right_side_holds_the_plus_menu_and_the_account_menu(client, user):
     assert "data-theme-switch" in header
 
     # The profile button is the avatar and nothing else (#282): the name is a row of
-    # the menu now, and the summary's aria-label is the control's only name -- so the
+    # the menu now, and the trigger's aria-label is the control's only name -- so the
     # name is in the label and in nothing the trigger draws.
     start = header.index('aria-label="Account menu, applicant"')
-    trigger = header[start : header.index("</summary>", start)]
+    trigger = header[start : header.index("</button>", start)]
     visible = trigger[trigger.index(">") + 1 :]
     assert user.display_name not in visible
-    panel = header[header.index("</summary>", start) : header.index("Your details")]
+    panel = header[header.index("</button>", start) : header.index("Your details")]
     assert user.display_name in panel, "and it is in the menu, where it says who you are"
     assert user.email in panel
 

@@ -125,3 +125,31 @@ def test_a_latin_name_keeps_its_own_direction(live_server, page: Page, right_to_
 
     expect(page.get_by_text("Aperture Science").first).to_be_visible()
     assert page.locator("html").get_attribute("dir") == "rtl"
+
+
+@pytest.mark.parametrize("placed_by", ["anchor", "script"])
+def test_a_menu_opens_from_its_triggers_reading_end(
+    live_server, page: Page, right_to_left, placed_by
+):
+    """A menu's panel is lined up with the inline end of its trigger (#310), which under
+    `rtl` is the trigger's left edge, and it runs on towards the reading start -- rightwards
+    -- rather than off the window's left edge. The stylesheet says it in logical terms and
+    the script, where there is no anchor positioning, reads the direction."""
+    from .test_people_menu import NO_ANCHORS
+
+    if placed_by == "script":
+        page.context.add_init_script(NO_ANCHORS)
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/")
+
+    trigger = page.get_by_label("Account menu", exact=False)
+    trigger.click()
+    panel = page.locator("header [data-menu]:has([aria-label^='Account menu']) > [popover]")
+    expect(panel).to_be_visible()
+    box = panel.bounding_box()
+    from_ = trigger.bounding_box()
+
+    assert abs(box["x"] - from_["x"]) <= 1, "its inline end, which is its left, on the trigger's"
+    assert box["x"] + box["width"] <= page.viewport_size["width"], "and it stays in the window"
+    assert 0 <= box["y"] - (from_["y"] + from_["height"]) <= 8, "below the trigger"

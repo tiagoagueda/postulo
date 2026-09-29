@@ -1,5 +1,7 @@
 """Server settings: the instance, for administrators, with the environment still winning."""
 
+import re
+
 import pytest
 from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
@@ -169,7 +171,8 @@ def test_the_row_actions_are_one_menu_rather_than_four_buttons(client, admin, us
     client.force_login(admin)
     html = client.get(reverse("server:people")).content.decode()
 
-    assert html.count("<details") >= 2, "one menu per person"
+    # A popover each (#310), which the table's scroll box cannot cut off.
+    assert html.count('<div role="menu" aria-label="Actions for ') == 2, "one menu per person"
     assert f"Actions for {user.username}" in html, "the menu has to say whose it is"
 
     for action in (
@@ -204,12 +207,57 @@ def test_every_cell_keeps_its_meaning_when_the_table_becomes_cards(client, admin
     assert "table-cards" in html
     for role in ('role="table"', 'role="rowgroup"', 'role="row"', 'role="columnheader"'):
         assert role in html, role
-    assert html.count('role="cell"') >= 12, "two people, six columns each"
+    assert html.count('role="cell"') >= 14, "two people, seven columns each"
 
     for label in ("Name", "Email", "Last sign-in", "Role"):
         assert f'data-label="{label}"' in html, label
     # The username is the card's heading and introduces itself.
     assert 'data-label="Username"' not in html
+
+
+def test_each_person_has_a_picture_that_says_nothing(client, admin, user):
+    """The first column is the person's tile, the one the header draws (#310). It is
+    decorative -- the username beside it names the row -- so the initials are hidden from a
+    screen reader and a picture has an empty `alt`; the column's header, which axe asks for,
+    is for a screen reader alone. On a phone the tile heads the card, with the username."""
+    Profile.objects.filter(user=user).update(avatar="avatars/2/picture.jpg")
+    client.force_login(admin)
+    html = client.get(reverse("server:people")).content.decode()
+
+    head = html[html.index("<thead") : html.index("</thead>")]
+    headers = re.findall(r'<th\b[^>]*role="columnheader"[^>]*>(.*?)</th>', head, flags=re.S)
+    assert headers[0] == '<span class="sr-only">Picture</span>', headers
+    assert headers[1] == "Username", "and the username is the column after it"
+
+    for person in (admin, user):
+        row = html.split(f'data-person="{person.username}"', 1)[1].split("</tr>", 1)[0]
+        cells = re.findall(r"<td\b[^>]*>(.*?)</td>", row, flags=re.S)
+        assert re.match(r"<td\b[^>]*\bdata-avatar>", row[row.index("<td") :]), row[:200]
+        assert 'class="avatar ' in cells[0], "the tile, first"
+        assert person.username in cells[1], "the username, beside it"
+        if person == user:
+            assert re.search(r'<img src="[^"]+" alt="">', cells[0]), "a picture says nothing"
+        else:
+            assert 'aria-hidden="true"' in cells[0], "and neither do the initials"
+        assert "data-label" not in row.split("</td>", 1)[0], "nothing to introduce on a card"
+
+
+def test_the_pictures_cost_one_query_however_many_people_there_are(
+    client, admin, django_assert_max_num_queries
+):
+    """The tile reads the profile, so the list fetches the profiles with the people rather
+    than one at a time as each row is drawn (#310)."""
+    client.force_login(admin)
+    client.get(reverse("server:people"))  # the session and the caches, settled
+    for number in range(3):
+        User.objects.create_user(email=f"p{number}@example.org", username=f"person-{number}")
+    with django_assert_max_num_queries(40) as few:
+        client.get(reverse("server:people"))
+    for number in range(3, 23):
+        User.objects.create_user(email=f"p{number}@example.org", username=f"person-{number}")
+    with django_assert_max_num_queries(40) as many:
+        client.get(reverse("server:people"))
+    assert len(many.captured_queries) == len(few.captured_queries)
 
 
 def test_the_last_administrator_cannot_be_removed_or_deactivated(client, admin):

@@ -4,6 +4,7 @@ import functools
 import json
 import posixpath
 import re
+import secrets
 import zlib
 from pathlib import Path
 
@@ -270,6 +271,19 @@ def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
     letters = "".join(word[0] for word in label.replace(".", " ").split()[:2]).upper() or "?"
     return _tile(css_class, "rounded", colour=colour, letters=letters)
+
+
+@register.simple_tag
+def unique_id(prefix: str) -> str:
+    """An id for an element that another element points at, unique on whatever page it lands.
+
+    Random rather than counted (#310). A counter starts again with every request, and a
+    fragment htmx swaps into a page is a second request: its first menu and the header's
+    first menu would both be `menu-1`, and `popovertarget` opens whichever of the two comes
+    first in the document. Forty-eight random bits make a clash on one page a practical
+    impossibility, and nothing has to know what else is on the page.
+    """
+    return f"{prefix}-{secrets.token_hex(6)}"
 
 
 @register.simple_tag

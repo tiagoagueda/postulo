@@ -71,7 +71,7 @@ def test_putting_a_reminder_off_moves_it_where_it_stands(page: Page, live_server
     block = page.locator("#reminders")
     expect(block).to_contain_text("Chase them")
 
-    block.locator("summary").click()
+    block.locator("button[popovertarget]").click()
     block.get_by_role("menuitem", name="Put off until next week").click()
 
     next_week = timezone.localtime(timezone.now() + dt.timedelta(days=7))
@@ -88,7 +88,7 @@ def test_the_menu_leads_to_editing_and_to_deleting(page: Page, live_server, date
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/applications/reminders/")
 
-    page.locator("#main summary").first.click()
+    page.locator("#main button[popovertarget]").first.click()
     page.get_by_role("menuitem", name="Edit, or choose another time").click()
 
     expect(page).to_have_url(

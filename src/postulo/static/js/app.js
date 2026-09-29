@@ -786,9 +786,11 @@
     suggestion.textContent = wanted ? " · " + advice : "";
   });
 
-  // The account menu is a <details> element, which opens and closes itself and is
-  // keyboard-operable without help. What it does not do is close when the pointer goes
-  // elsewhere or Escape is pressed, so that part is added here.
+  // The panels that are not menus -- the column chooser, the saved views, the language
+  // picker -- are <details> elements, which open and close themselves and are
+  // keyboard-operable without help. What they do not do is close when the pointer goes
+  // elsewhere or Escape is pressed, so that part is added here. A menu is a popover, which
+  // does both by itself (#310).
   function closeMenus(except) {
     document.querySelectorAll("details[data-menu][open]").forEach(function (menu) {
       if (menu !== except) {
@@ -1204,13 +1206,35 @@
     }
   });
 
-  // A menu's items answer to the arrow keys, as a menu is expected to (#262). The
-  // disclosure already opens on Enter and Space and closes on Escape (above). This adds
-  // ArrowDown and ArrowUp on the summary, which open it onto the first or the last item,
+  /* ------------------------------------------------------------------------ menus
+   *
+   * `<c-dropdown-menu>` is a `<button popovertarget>` and a `popover` panel (#310). The
+   * browser opens it on a click, on Enter and on Space, closes it on Escape and on a click
+   * anywhere else, gives focus back to the trigger when it closes from inside, and draws
+   * it in the top layer, where nothing that scrolls can cut it off. What is added here is
+   * what the platform leaves to the page: the arrow keys, and -- where the browser has no
+   * anchor positioning -- putting the panel beside its trigger.
+   */
+  var popovers = typeof HTMLElement !== "undefined" && HTMLElement.prototype.hasOwnProperty("popover");
+
+  function menuPanel(menu) {
+    return menu.querySelector(":scope > [popover]");
+  }
+
+  function panelIsOpen(panel) {
+    return popovers && panel.matches(":popover-open");
+  }
+
+  // A menu's items answer to the arrow keys, as a menu is expected to (#262). This adds
+  // ArrowDown and ArrowUp on the trigger, which open it onto the first or the last item,
   // and ArrowDown, ArrowUp, Home and End inside it, which move between the items and wrap.
   // The items are links and buttons, so Enter and Space act on them with no help. Only a
-  // menu of actions -- `.dropdown-menu`, which carries `role="menu"` -- gets this; the
-  // account disclosure is navigation, where Tab is the right key.
+  // menu of actions -- the kind whose panel holds `role="menu"` -- gets this; the account
+  // menu and *More* are navigation, where Tab is the right key.
+  //
+  // Opened by pressing its own trigger rather than by `showPopover()`: a panel opened by
+  // its `popovertarget` has that trigger for its anchor, and one opened from a script has
+  // no anchor at all, so the stylesheet could not put it anywhere near the row.
   function menuItems(menu) {
     return Array.prototype.slice
       .call(menu.querySelectorAll('[role="menuitem"]'))
@@ -1223,33 +1247,203 @@
     if (["ArrowDown", "ArrowUp", "Home", "End"].indexOf(event.key) === -1) {
       return;
     }
-    if (event.altKey || event.ctrlKey || event.metaKey || event.isComposing) {
+    if (event.altKey || event.ctrlKey || event.metaKey || event.isComposing || !popovers) {
       return;
     }
-    var menu = event.target.closest("details[data-menu].dropdown-menu");
-    if (!menu) {
+    var menu = event.target.closest(".dropdown-menu[data-menu]");
+    var panel = menu && menuPanel(menu);
+    if (!panel || !panel.querySelector('[role="menu"]')) {
       return;
     }
-    var items = menuItems(menu);
+    var items = menuItems(panel);
     if (!items.length) {
       return;
     }
     event.preventDefault();
+    var open = panelIsOpen(panel);
     var current = items.indexOf(event.target);
     var next;
-    if (event.key === "Home" || (event.key === "ArrowDown" && (current === -1 || !menu.open))) {
+    if (event.key === "Home" || (event.key === "ArrowDown" && (current === -1 || !open))) {
       next = 0;
-    } else if (event.key === "End" || (event.key === "ArrowUp" && (current === -1 || !menu.open))) {
+    } else if (event.key === "End" || (event.key === "ArrowUp" && (current === -1 || !open))) {
       next = items.length - 1;
     } else if (event.key === "ArrowDown") {
       next = (current + 1) % items.length;
     } else {
       next = (current - 1 + items.length) % items.length;
     }
-    closeMenus(menu);
-    menu.open = true;
+    if (!open) {
+      var trigger = menu.querySelector(":scope > [popovertarget]");
+      if (trigger) {
+        trigger.click();
+      }
+    }
     items[next].focus();
   });
+
+  /* ------------------------------------------------ a panel beside its trigger, by hand
+   *
+   * The stylesheet ties a menu's panel to its trigger with anchor positioning (#310).
+   * Where the browser has none, the panel would stay where the browser puts a popover --
+   * centred in the window -- so this places it by the stylesheet's rules instead: below
+   * the trigger with its inline end on the trigger's inline end, above when there is no
+   * room below, and when it fits on neither side, the first side with room for ten rem of
+   * it, scrolling inside itself. It asks the question the stylesheet's `@supports` asks, so
+   * exactly one of the two places any panel -- and where the answer was yes but the panel
+   * the browser drew is not beside its trigger, it takes over from then on.
+   *
+   * The box can be measured only once it is drawn, and `toggle` comes after the drawing,
+   * so `beforetoggle` puts it below the trigger first -- which needs only the trigger's box
+   * -- and `toggle` turns it over or narrows it if it has to. A panel that is open follows
+   * its trigger when anything scrolls or the window changes size, as an anchored one does.
+   */
+  var anchored =
+    typeof CSS !== "undefined" &&
+    typeof CSS.supports === "function" &&
+    CSS.supports("position-area: block-end span-inline-start") &&
+    CSS.supports("position-try-fallbacks: flip-block");
+
+  var PANEL_GAP = 4; // the stylesheet's 0.25rem between trigger and panel
+  var PANEL_EDGE = 8; // how near the window's edge a panel may come
+  var PANEL_ROOM = 160; // 10rem: the least of a panel worth drawing, if it has to scroll
+
+  function panelTrigger(panel) {
+    return panel.id
+      ? document.querySelector('[popovertarget="' + CSS.escape(panel.id) + '"]')
+      : null;
+  }
+
+  function placePanel(panel) {
+    var trigger = panelTrigger(panel);
+    if (!trigger) {
+      return;
+    }
+    var box = trigger.getBoundingClientRect();
+    var width = document.documentElement.clientWidth;
+    var height = document.documentElement.clientHeight;
+    var style = panel.style;
+    style.setProperty("position-area", "none");
+    style.setProperty("position-try-fallbacks", "none");
+    style.margin = "0";
+    style.maxHeight = "";
+
+    // Zero while it is not drawn yet, which reads as "fits below".
+    var tall = panel.offsetHeight;
+    var below = height - box.bottom - PANEL_GAP - PANEL_EDGE;
+    var above = box.top - PANEL_GAP - PANEL_EDGE;
+    var up = false;
+    if (tall > below) {
+      if (tall <= above) {
+        up = true;
+      } else if (below >= PANEL_ROOM) {
+        style.maxHeight = below + "px";
+      } else if (above >= PANEL_ROOM) {
+        up = true;
+        style.maxHeight = above + "px";
+      }
+    }
+    if (up) {
+      style.top = "auto";
+      style.bottom = height - box.top + PANEL_GAP + "px";
+    } else {
+      style.top = box.bottom + PANEL_GAP + "px";
+      style.bottom = "auto";
+    }
+
+    var wide = panel.offsetWidth;
+    var rtl = window.getComputedStyle(panel).direction === "rtl";
+    if (!wide) {
+      // Not drawn yet: the inline end on the trigger's, which needs no width.
+      style.left = rtl ? box.left + "px" : "auto";
+      style.right = rtl ? "auto" : width - box.right + "px";
+      return;
+    }
+    var left = rtl ? box.left : box.right - wide;
+    left = Math.max(PANEL_EDGE, Math.min(left, width - wide - PANEL_EDGE));
+    style.left = left + "px";
+    style.right = "auto";
+  }
+
+  function isMenuPanel(node) {
+    return node && node.nodeType === 1 && node.matches("[data-popover][popover]");
+  }
+
+  function placeOpenPanels(event) {
+    var source = event && event.target;
+    document.querySelectorAll("[data-popover][popover]").forEach(function (panel) {
+      // Scrolling the panel's own list moves nothing it is placed by.
+      if (panelIsOpen(panel) && !(source && source.nodeType === 1 && panel.contains(source))) {
+        placePanel(panel);
+      }
+    });
+  }
+
+  var placingByHand = false;
+
+  function placeByHand() {
+    if (placingByHand) {
+      return;
+    }
+    placingByHand = true;
+    document.addEventListener(
+      "beforetoggle",
+      function (event) {
+        if (event.newState === "open" && isMenuPanel(event.target)) {
+          placePanel(event.target);
+        }
+      },
+      true
+    );
+    document.addEventListener(
+      "toggle",
+      function (event) {
+        if (event.newState === "open" && isMenuPanel(event.target)) {
+          placePanel(event.target);
+        }
+      },
+      true
+    );
+    document.addEventListener("scroll", placeOpenPanels, { capture: true, passive: true });
+    window.addEventListener("resize", placeOpenPanels);
+  }
+
+  // Whether a panel the browser placed sits against its trigger. A trigger with no box --
+  // *More* while the line holds every item -- has nothing to sit against and proves nothing.
+  function besideItsTrigger(panel) {
+    var trigger = panelTrigger(panel);
+    if (!trigger) {
+      return true;
+    }
+    var from = trigger.getBoundingClientRect();
+    if (!from.width && !from.height) {
+      return true;
+    }
+    var box = panel.getBoundingClientRect();
+    var near = 2 * PANEL_GAP;
+    return Math.abs(box.top - from.bottom) <= near || Math.abs(from.top - box.bottom) <= near;
+  }
+
+  if (popovers && !anchored) {
+    placeByHand();
+  } else if (popovers) {
+    // `CSS.supports` vouches for anchor positioning; it cannot vouch for the browser taking a
+    // `popovertarget` for the panel's anchor, which is the half the stylesheet relies on. So
+    // each time a menu opens, look: a panel that is not beside its trigger is placed by hand,
+    // and so is every one after it.
+    document.addEventListener(
+      "toggle",
+      function (event) {
+        if (placingByHand || event.newState !== "open" || !isMenuPanel(event.target)) {
+          return;
+        }
+        if (!besideItsTrigger(event.target)) {
+          placeByHand();
+          placePanel(event.target);
+        }
+      },
+      true
+    );
+  }
 
   // The language picker, which is a disclosure rather than a <select> because an <option>
   // cannot hold a flag, a language-marked name and a symbol at once (#119).

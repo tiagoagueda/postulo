@@ -18,15 +18,21 @@
      with it -- on a wide screen the roles are what these elements already are (#91).
 
      The row's actions were four buttons spelled out in words, 335 pixels of a table that
-     had 728 to live in and needed 967. They are a menu now: the same disclosure the
-     account menu in the header uses, so it opens on a keyboard without help and the script
-     only adds "close when the pointer goes elsewhere".
+     had 728 to live in and needed 967. They are a menu now, `<c-dropdown-menu>`: a popover,
+     so it opens on a keyboard without help, and the top layer, so the scroll box around
+     the table cannot cut off the menu of its last row (#310).
+
+     Each row starts with the person's picture -- the tile the header draws, at the size it
+     draws it -- and on a phone the picture heads the card, beside the username. It is
+     decorative: the username beside it names the row, so the column's header is for a
+     screen reader only and the tile says nothing (#310).
   {% endcomment %}
   <c-scroll-box class="card p-0" label="{% translate 'People' %}">
     <table class="table table-cards" role="table">
       <thead
              role="rowgroup">
         <tr role="row">
+          <th class="pe-0" role="columnheader"><span class="sr-only">{% translate "Picture" %}</span></th>
           <th role="columnheader">{% translate "Username" %}</th>
           <th role="columnheader">{% translate "Name" %}</th>
           <th role="columnheader">{% translate "Email" %}</th>
@@ -38,6 +44,7 @@
       <tbody role="rowgroup">
         {% for person in people %}
           <tr data-person="{{ person.username }}" role="row" {% if not person.is_active %}class="text-ink-400"{% endif %}>
+            <td class="pe-0" role="cell" data-avatar>{% avatar person %}</td>
             {% comment %} The username needs no label: it is the card's heading. {% endcomment %}
             <td class="font-medium" role="cell">{{ person.username }}</td>
             <td role="cell" data-label="{% translate 'Name' %}">{{ person.get_full_name|default:"—" }}</td>

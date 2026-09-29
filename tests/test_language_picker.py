@@ -36,7 +36,7 @@ def between(html: str, start: str, end: str) -> str:
 
 
 def picker(html: str) -> str:
-    """The disclosure itself. The page has other `<details>` — the header menu is one."""
+    """The disclosure itself. The page may have other `<details>` — a column filter is one."""
     return "data-language-picker" + between(html, "data-language-picker", "</details>")
 
 
@@ -51,7 +51,7 @@ def test_the_languages_are_behind_one_control_rather_than_a_wall_of_rows(page):
 
     assert "data-language-picker" in page, "there is one control"
     assert "<summary" in picker(page), "and it opens"
-    assert "data-menu" in opening, "sharing the disclosure the account menu uses"
+    assert "data-menu" in opening, "closing, like the column chooser, when the pointer leaves"
 
 
 def test_it_opens_and_submits_with_no_script_at_all(page):

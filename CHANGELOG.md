@@ -137,6 +137,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A row's menu on *Server settings → People* is no longer cut off inside the table: every menu opens over the page, beside its trigger, and upwards where there is no room below. Each person there has their picture too. (#310)
 - The "Name, if Other" box appears only when the kind is Other, and a name given another
   kind is blanked on save. (#284)
 - Every third-party work in the tree carries its notice, htmx is pinned and synced like the

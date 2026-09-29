@@ -198,7 +198,8 @@ class PeopleView(ServerSectionMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         User = get_user_model()
         people = User.objects.order_by("username")
-        context["people"] = people
+        # Each row draws its person's picture, which lives on the profile (#310).
+        context["people"] = people.select_related("profile")
         context["administrators"] = people.filter(is_staff=True, is_active=True).count()
         return context
 

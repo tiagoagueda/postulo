@@ -16,9 +16,9 @@
    screen reader meets it in is the same at every width, and only where it is drawn
    changes.
 
-   *More* is a disclosure that is navigation, so a `<details class="popover">` whose rows
-   are `menu-item` and deliberately not `role="menu"` -- the account menu's reasoning, in
-   `base.html`. It holds every item once more, and the stylesheet shows only the ones the line
+   *More* is a disclosure that is navigation, so `<c-dropdown-menu kind="navigation">`: a
+   popover whose rows are `menu-item` and deliberately not `role="menu"` -- the account
+   menu's reasoning, in `base.html` (#310). It holds every item once more, and the stylesheet shows only the ones the line
    does not, at whatever width it is; with the search, which only the bar needs. Only one
    copy of an item is ever in the layout, so the duplicate never reaches the accessibility
    tree.
@@ -34,19 +34,18 @@
       {% icon item.icon %}<span>{{ item.label }}</span>
     </a>
   {% endfor %}
-  <details class="popover" data-menu data-nav-more>
-    <summary class="nav-link">{% icon "ellipsis" %}<span>{% translate "More" %}</span></summary>
-    <div data-popover data-align="end">
-      {% for item in nav_items %}
-        {% nav_active_names item.active_names as css %}
-        <a href="{% url item.url_name %}" class="menu-item"
-           data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>
-          {% icon item.icon %}{{ item.label }}
-        </a>
-      {% endfor %}
-      <a href="{% url 'core:search' %}" class="menu-item" data-nav-search>
-        {% icon "search" %}{% translate "Search" %}
+  <c-dropdown-menu kind="navigation" label="{% translate 'More' %}" trigger_class="nav-link"
+                   trigger_variant="" trigger_size="" data-nav-more>
+    <c-slot name="trigger">{% icon "ellipsis" %}<span>{% translate "More" %}</span></c-slot>
+    {% for item in nav_items %}
+      {% nav_active_names item.active_names as css %}
+      <a href="{% url item.url_name %}" class="menu-item"
+         data-nav="{{ item.key }}"{% if css == 'nav-link-active' %} aria-current="page"{% endif %}>
+        {% icon item.icon %}{{ item.label }}
       </a>
-    </div>
-  </details>
+    {% endfor %}
+    <a href="{% url 'core:search' %}" class="menu-item" data-nav-search>
+      {% icon "search" %}{% translate "Search" %}
+    </a>
+  </c-dropdown-menu>
 </nav>

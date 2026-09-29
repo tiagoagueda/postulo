@@ -57,7 +57,23 @@ EXEMPT: dict[str, str] = {}
 #: repeated, so the first few cover the markup; opening all of them would only be slower.
 MENUS_PER_PAGE = 3
 
+#: Everything the walk opens: the menus, which are `<c-dropdown-menu>` popovers (#310), and
+#: the disclosures that hold forms -- the column chooser and the saved views among them.
+MENUS = "details[data-menu], div[data-menu]"
+
+#: Opens, or closes, the ``i``-th of them the way a person would: a popover through its own
+#: trigger, so it is anchored to it, and a disclosure by its ``open``.
+TOGGLE = """([i, open]) => {
+  const menu = document.querySelectorAll('__MENUS__')[i];
+  if (menu.tagName === 'DETAILS') { menu.open = open; return; }
+  const panel = menu.querySelector(':scope > [popover]');
+  if (panel.matches(':popover-open') !== open) {
+    menu.querySelector(':scope > [popovertarget]').click();
+  }
+}""".replace("__MENUS__", MENUS)
+
 COLLECT = """() => {
+  const MENUS = '__MENUS__';
   const CLICKABLE = [
     'a[href]', 'button', 'input:not([type=hidden])', 'select', 'textarea', 'summary',
     '[tabindex]:not([tabindex="-1"])',
@@ -93,10 +109,13 @@ COLLECT = """() => {
     // the menus one at a time and measures them then.
     if (el.closest('details:not([open])') && !el.closest('summary')) continue;
     // Which open menu it is in, if any: an open panel lies over the page, and while it
-    // is open the page beneath it is not what anybody is aiming at.
-    const menus = [...document.querySelectorAll('details[data-menu]')];
-    const inMenu = el.closest('details[data-menu][open]');
-    const menu = inMenu && !el.closest('summary') ? menus.indexOf(inMenu) : -1;
+    // is open the page beneath it is not what anybody is aiming at. A menu is a popover
+    // since #310; the disclosures that are not menus are still <details>.
+    const menus = [...document.querySelectorAll(MENUS)];
+    const inMenu = el.closest(
+      'details[data-menu][open], div[data-menu]:has(> [popover]:popover-open)');
+    const trigger = el.closest('summary, [popovertarget]');
+    const menu = inMenu && !trigger ? menus.indexOf(inMenu) : -1;
     // A scroll box is a keyboard stop, not something a pointer aims at (#275): it is in
     // the tab order so the arrow keys can scroll it, and it surrounds every link in its
     // table, which is not the same as sitting beside one.
@@ -122,7 +141,7 @@ COLLECT = """() => {
     });
   }
   return out;
-}"""
+}""".replace("__MENUS__", MENUS)
 
 
 @dataclass(frozen=True)
@@ -205,6 +224,7 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
         things=furnished,
     )
     found: dict[str, str] = {}
+    masthead_measured = False
     for path in paths:
         page.goto(f"{base}{path}")
         if "reauthenticate" in page.url:
@@ -215,19 +235,25 @@ def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furn
         for failure in too_small(page):
             found.setdefault(failure, path)
 
-        # A closed <details> has no boxes to measure, and the column chooser -- which is
-        # what #115 was about -- lives inside one. Open them one at a time: two menus open
-        # at once is not a state anybody reaches, and their boxes would overlap.
-        menus = page.locator("details[data-menu]")
-        for index in range(min(menus.count(), MENUS_PER_PAGE)):
-            page.evaluate(
-                "i => { document.querySelectorAll('details[data-menu]')[i].open = true }", index
-            )
+        # A closed menu has no boxes to measure, and the column chooser -- which is what
+        # #115 was about -- lives inside one. Open them one at a time: two menus open at
+        # once is not a state anybody reaches, and their boxes would overlap. The
+        # masthead's menus are the same on every page, so they are measured on the first
+        # one, and the count is spent on the page's own.
+        in_masthead = page.evaluate(
+            f"() => [...document.querySelectorAll('{MENUS}')]"
+            ".map((menu) => !!menu.closest('[data-site-header]'))"
+        )
+        mine = [index for index, masthead in enumerate(in_masthead) if not masthead]
+        wanted = mine[:MENUS_PER_PAGE]
+        if not masthead_measured:
+            wanted = [index for index, masthead in enumerate(in_masthead) if masthead] + wanted
+            masthead_measured = True
+        for index in wanted:
+            page.evaluate(TOGGLE, [index, True])
             for failure in too_small(page, menu=index):
                 found.setdefault(failure, f"{path} (menu {index + 1})")
-            page.evaluate(
-                "i => { document.querySelectorAll('details[data-menu]')[i].open = false }", index
-            )
+            page.evaluate(TOGGLE, [index, False])
 
     report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(found.items()))
     assert not found, (

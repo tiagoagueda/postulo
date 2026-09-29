@@ -197,14 +197,21 @@ def test_the_skip_link_and_the_menus_are_anchored_logically():
 
     The account menu is Basecoat's popover now (#262): it names its edge as
     `data-align="end"`, and what matters is that the stylesheet turns that into a logical
-    inset and never a physical one.
+    inset and never a physical one. Since #310 every menu is `<c-dropdown-menu>`, whose
+    panel is in the top layer and tied to its trigger by an area named in logical terms --
+    below it, and spanning towards the start from its end.
     """
     base = (TEMPLATES / "base.html").read_text(encoding="utf-8")
+    menu = (TEMPLATES / "cotton" / "dropdown_menu.html").read_text(encoding="utf-8")
     columns = (TEMPLATES / "partials" / "table" / "columns.html").read_text(encoding="utf-8")
     compiled = (TEMPLATES.parent / "static" / "css" / "app.css").read_text(encoding="utf-8")
 
-    assert 'data-popover data-align="end"' in base and "right-0" not in base
+    assert "<c-dropdown-menu" in base and "right-0" not in base
+    assert 'align="end"' in menu and 'data-popover data-align="{{ align }}"' in menu
     assert re.search(r"&\[data-align='end'\]\s*\{\s*inset-inline-end", compiled)
+    assert "position-area: block-end span-inline-start;" in compiled
+    assert "position-area: block-end span-inline-end;" in compiled, "and data-align=start"
+    assert not re.search(r"position-area:[^;]*\b(?:left|right|top|bottom)\b", compiled)
     assert "end-0" in columns and "right-0" not in columns
 
 

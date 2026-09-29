@@ -312,13 +312,14 @@ def test_the_navigation_becomes_a_bar_and_still_works(
     in_bar = [key for key in keys if nav.locator(f':scope > a[data-nav="{key}"]').is_visible()]
     assert in_bar == keys[:4], in_bar
 
-    summary = more.locator("summary")
-    summary.focus()
+    trigger = more.locator(":scope > button")
+    panel = more.locator(":scope > [popover]")
+    trigger.focus()
     page.keyboard.press("Enter")
-    expect(more).to_have_attribute("open", "")
+    expect(panel).to_be_visible()
     page.keyboard.press("Escape")
-    expect(more).not_to_have_attribute("open", "")
-    expect(summary).to_be_focused()
+    expect(panel).to_be_hidden()
+    expect(trigger).to_be_focused()
 
     page.keyboard.press("Enter")
     for key in keys:
@@ -329,6 +330,6 @@ def test_the_navigation_becomes_a_bar_and_still_works(
     more.locator('[data-nav="companies"]').click()
     expect(page).to_have_url(f"{base}/jobs/companies/")
 
-    nav.locator("[data-nav-more] summary").click()
+    nav.locator("[data-nav-more] > button").click()
     more.locator("[data-nav-search]").click()
     expect(page).to_have_url(f"{base}/search/")

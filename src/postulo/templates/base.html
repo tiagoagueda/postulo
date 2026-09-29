@@ -142,7 +142,7 @@
               {% comment %} The + menu: what a person can start from anywhere (#282). A menu
                  of actions, so `role="menu"` is the right one here -- unlike the account
                  disclosure beside it, which is navigation. `<c-dropdown-menu>` is the
-                 component for it: a `<details>` the browser opens with no script, and the
+                 component for it: a popover the browser opens with no script, and the
                  arrow keys `app.js` already adds to `.dropdown-menu`.
 
                  *Listing* goes to the capture, because that is how a listing usually
@@ -189,13 +189,12 @@
                   </a>
                 </div>
               </c-dropdown-menu>
-              {# The account menu: a disclosure the browser opens and closes itself, with #}
-              {# the script only adding "close when the pointer goes elsewhere". #}
-              {% comment %} Basecoat's popover for the box, and no `role="menu"`: this is
-                 navigation -- the person, three links, a switch and sign-out -- and the
-                 pattern for that is a disclosure, where Tab moves between the rows. The
-                 people table's row actions are a menu of actions and are drawn as one
-                 (#262).
+              {# The account menu: a popover the browser opens and closes itself. #}
+              {% comment %} The same component as the + menu beside it (#310), of the other
+                 kind: no `role="menu"`, because this is navigation -- the person, three
+                 links, a switch and sign-out -- and the pattern for that is a disclosure,
+                 where Tab moves between the rows. The people table's row actions are a
+                 menu of actions and are drawn as one (#262).
 
                  The trigger is the avatar and nothing else (#282): the name it used to
                  carry is a row of the menu now, so the `aria-label` is the control's only
@@ -204,56 +203,55 @@
                  looks: 28 pixels of avatar plus 8 on each side is the 44 a thumb wants,
                  and the avatar itself stays the size every other place in the interface
                  draws it. {% endcomment %}
-              <details class="popover" data-menu>
-                <summary class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2 rounded-full p-2"
-                         aria-label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
+              <c-dropdown-menu kind="navigation" trigger_variant="" trigger_size=""
+                               trigger_class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2 rounded-full p-2"
+                               label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
+                <c-slot name="trigger">
                   {% avatar user %}
                   {% icon "chevron-down" class="size-4 text-ink-400" %}
-                </summary>
-                <div data-popover data-align="end">
-                  {% comment %} Who is signed in, at the top of the menu whose trigger used
-                     to say it. The name on its own, with the email under it: *Signed in
-                     as* reads as a security statement and the quieter form is the
-                     decision, made once here rather than left to the template (#282). A
-                     label, not a destination -- *Your details* below is the link. {% endcomment %}
-                  <div class="flex items-center gap-2 px-3 py-2">
-                    {% avatar user %}
-                    <div class="min-w-0">
-                      <div class="truncate text-sm font-medium text-ink-900 dark:text-ink-50">{{ user.display_name }}</div>
-                      {% comment %} The address is a single unbreakable word in a menu 224
-                         pixels wide: truncate would ellipsize it under the text-spacing
-                         override (SC 1.4.12), and the full address is nowhere else on the
-                         page, so it wraps instead of being cut -- `break-words` keeps it
-                         one line when it fits and lets it break when it does not (#282). {% endcomment %}
-                      <div class="break-words text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
-                    </div>
+                </c-slot>
+                {% comment %} Who is signed in, at the top of the menu whose trigger used
+                   to say it. The name on its own, with the email under it: *Signed in
+                   as* reads as a security statement and the quieter form is the
+                   decision, made once here rather than left to the template (#282). A
+                   label, not a destination -- *Your details* below is the link. {% endcomment %}
+                <div class="flex items-center gap-2 px-3 py-2">
+                  {% avatar user %}
+                  <div class="min-w-0">
+                    <div class="truncate text-sm font-medium text-ink-900 dark:text-ink-50">{{ user.display_name }}</div>
+                    {% comment %} The address is a single unbreakable word in a menu 224
+                       pixels wide: truncate would ellipsize it under the text-spacing
+                       override (SC 1.4.12), and the full address is nowhere else on the
+                       page, so it wraps instead of being cut -- `break-words` keeps it
+                       one line when it fits and lets it break when it does not (#282). {% endcomment %}
+                    <div class="break-words text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
                   </div>
-                  <a href="{% url 'accounts:profile' %}" class="menu-item">
-                    {% icon "user" %}{% translate "Your details" %}
-                  </a>
-                  <a href="{% url 'settings:index' %}" class="menu-item">
-                    {% icon "settings" %}{% translate "Settings" %}
-                  </a>
-                  {% if user.is_staff %}
-                    <a href="{% url 'server:index' %}" class="menu-item">
-                      {% icon "shield" %}{% translate "Server settings" %}
-                    </a>
-                  {% endif %}
-                  <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
-                  {% comment %} The theme switch, as a row of the menu it belongs to: a
-                     preference of the person whose menu this is, and the corner then holds
-                     one control -- the account -- rather than a sun beside it (#197). The
-                     same form, posting the same way; the script finds it by its attribute
-                     wherever it sits. {% endcomment %}
-                  {% include "core/partials/theme_switch.html" with as_menu_item=True %}
-                  <form method="post" action="{% url 'account_logout' %}">
-                    {% csrf_token %}
-                    <button type="submit" class="menu-item">
-                      {% icon "log-out" %}{% translate "Sign out" %}
-                    </button>
-                  </form>
                 </div>
-              </details>
+                <a href="{% url 'accounts:profile' %}" class="menu-item">
+                  {% icon "user" %}{% translate "Your details" %}
+                </a>
+                <a href="{% url 'settings:index' %}" class="menu-item">
+                  {% icon "settings" %}{% translate "Settings" %}
+                </a>
+                {% if user.is_staff %}
+                  <a href="{% url 'server:index' %}" class="menu-item">
+                    {% icon "shield" %}{% translate "Server settings" %}
+                  </a>
+                {% endif %}
+                <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
+                {% comment %} The theme switch, as a row of the menu it belongs to: a
+                   preference of the person whose menu this is, and the corner then holds
+                   one control -- the account -- rather than a sun beside it (#197). The
+                   same form, posting the same way; the script finds it by its attribute
+                   wherever it sits. {% endcomment %}
+                {% include "core/partials/theme_switch.html" with as_menu_item=True %}
+                <form method="post" action="{% url 'account_logout' %}">
+                  {% csrf_token %}
+                  <button type="submit" class="menu-item">
+                    {% icon "log-out" %}{% translate "Sign out" %}
+                  </button>
+                </form>
+              </c-dropdown-menu>
             </div>
           {% else %}
             <div class="ms-auto flex flex-wrap items-center gap-2">

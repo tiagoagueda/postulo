@@ -166,4 +166,4 @@ def test_the_critical_path(live_server, page: Page, applicant) -> None:
     page.get_by_label("Account menu", exact=False).click()
     page.get_by_role("button", name="Sign out").click()
     expect(page.get_by_role("banner").get_by_role("link", name="Sign in")).to_be_visible()
-    expect(page.locator("details[data-menu]")).to_have_count(0)
+    expect(page.locator("[data-menu]")).to_have_count(0)
