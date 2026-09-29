@@ -304,10 +304,12 @@ def test_the_unit_after_the_number_agrees_with_it(messages, client, user):
     from postulo.accounts.models import Profile
 
     client.force_login(user)
+    # The word alone in its paragraph, however deep the template indents it (#320 wrapped
+    # the page in a measure and moved it two spaces).
     Profile.objects.filter(user=user).update(quiet_after_days=1)
-    assert ">\n          day\n        </p>" in _appearance(client)
+    assert re.search(r">\s*day\s*</p>", _appearance(client))
     Profile.objects.filter(user=user).update(quiet_after_days=14)
-    assert ">\n          days\n        </p>" in _appearance(client)
+    assert re.search(r">\s*days\s*</p>", _appearance(client))
 
 
 def _appearance(client) -> str:

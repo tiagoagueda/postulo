@@ -2,9 +2,11 @@
 {% load i18n %}
 
 {% block title %}{% translate "Capture a posting" %}{% endblock %}
+{# Two columns on a wide screen: this page empties `main_width` and takes the whole screen (#320). #}
+{% block main_width %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-2xl">
+  <div class="max-w-2xl">
     <c-page-title>
       {% translate "Capture a posting" %}
       <c-slot name="subtitle">
@@ -39,8 +41,16 @@
         <p>{% translate "Press “Read the page” again to capture it anyway." %}</p>
       </div>
     {% endif %}
+  </div>
 
-    <form method="post" novalidate>
+  {% comment %} The form in one column and what it does beside it, from `2xl`; one under the
+     other below it, which is how it always read (#320). The company form's arrangement
+     (#210): `max-w-2xl` on each column at the start edge and `flex-1` sharing the row out, so
+     each is the 672 pixels the page was, at 1536 and at 2560 alike. The rule beside the help
+     moves from its top to its start edge when it stops being under the form. Source order
+     is the reading order in both layouts: the form, its button, then the help. {% endcomment %}
+  <div class="2xl:flex 2xl:items-start 2xl:gap-6">
+    <form method="post" novalidate class="max-w-2xl 2xl:flex-1">
       {% csrf_token %}
       {% if known %}<input type="hidden" name="anyway" value="1">{% endif %}
       <div class="card mb-4">
@@ -68,7 +78,7 @@
       </div>
     </form>
 
-    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
+    <div class="mt-10 max-w-2xl border-t border-ink-200 pt-6 dark:border-ink-800 2xl:mt-0 2xl:flex-1 2xl:border-t-0 2xl:border-s 2xl:ps-6 2xl:pt-0" data-capture-help>
       <c-section-title>{% translate "How this works" %}</c-section-title>
       <ul class="mb-4 list-disc space-y-1 ps-5 text-sm text-ink-600 dark:text-ink-300">
         <li>{% translate "One page is fetched — the one you pasted. Postulo never crawls." %}</li>

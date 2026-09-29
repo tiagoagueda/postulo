@@ -2,98 +2,100 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <div class="mb-6 flex flex-wrap items-start gap-4">
-    <div>
-      <c-page-title>{% translate "Connections" %}</c-page-title>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Where the plugins that act for you find their services, and how they sign in. Secrets are stored encrypted and never shown again." %}
-      </p>
-    </div>
-    {% if plugins_available %}
-      <a href="{% url 'connections:pick' %}" class="btn ms-auto">{% translate "Add a connection" %}</a>
-    {% endif %}
-  </div>
-
-  {% if rows %}
-    <div class="card p-0">
-      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-        {% for row in rows %}
-          {% comment %} `grow basis-48` rather than `flex-1`: the row already wrapped, but
-             `flex-1` is `flex: 1 1 0%`, so the words claimed no width of their own and were
-             squeezed to twelve pixels in Greek before anything wrapped (#167). {% endcomment %}
-          <li class="flex flex-wrap items-center gap-3 px-4 py-3" data-connection="{{ row.connection.pk }}">
-            <div class="min-w-0 grow basis-48">
-              <p class="font-medium">
-                {{ row.connection.label }}
-                {% if not row.connection.enabled %}
-                  <span class="ms-2 badge" data-tone="grey">{% translate "Off" %}</span>
-                {% endif %}
-              </p>
-              <p class="text-xs text-ink-500 dark:text-ink-400">
-                {{ row.kind_label }} ·
-                {% if row.plugin %}{{ row.plugin.label }}{% else %}<span class="text-red-600 dark:text-red-400">{% translate "plugin not installed" %}</span>{% endif %}
-                {% if row.connection.last_error %}
-                  · <span class="text-red-600 dark:text-red-400"><bdi>{{ row.connection.last_error|truncatechars:80 }}</bdi></span>
-                {% elif row.connection.last_ok_at %}
-                  · {% blocktranslate with when=row.connection.last_ok_at|date:"DATETIME_FORMAT" trimmed %}worked {{ when }}{% endblocktranslate %}
-                {% else %}
-                  · {% translate "not tested yet" %}
-                {% endif %}
-              </p>
-              {% if row.summary %}
-                <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ row.summary }}</p>
-              {% endif %}
-              {% if row.is_sync and row.connection.last_summary %}
-                <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                  {% blocktranslate with when=row.connection.synced_at|date:"DATETIME_FORMAT" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
-                </p>
-              {% endif %}
-            </div>
-            <div class="flex items-center gap-1">
-              {% if row.plugin %}
-                <form method="post" action="{% url 'connections:test' row.connection.pk %}">
-                  {% csrf_token %}
-                  <button type="submit" class="btn" data-variant="outline" data-size="xs">{% translate "Test" %}</button>
-                </form>
-                {% if row.is_sync %}
-                  <form method="post" action="{% url 'connections:sync_now' row.connection.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Sync now" %}</button>
-                  </form>
-                {% endif %}
-                {% if row.is_store %}
-                  <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">
-                    {% csrf_token %}
-                    <button type="submit" class="btn" data-variant="ghost" data-size="xs"
-                            title="{% translate 'Queue every document you already have for this store.' %}">{% translate "Send everything" %}</button>
-                  </form>
-                {% endif %}
-                <a href="{% url 'connections:edit' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
-              {% endif %}
-              <a href="{% url 'connections:delete' row.connection.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
-            </div>
-          </li>
-        {% endfor %}
-      </ul>
-    </div>
-  {% else %}
-    <div class="card py-10 text-center">
-      {% if plugins_available %}
-        <p class="mb-1 font-medium">{% translate "No connections yet" %}</p>
-        <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate count counter=plugins_available|length trimmed %}
-            One installed plugin can be connected.
-          {% plural %}
-            {{ counter }} installed plugins can be connected.
-          {% endblocktranslate %}
-        </p>
-        <a href="{% url 'connections:pick' %}" class="btn">{% translate "Add a connection" %}</a>
-      {% else %}
-        <p class="mb-1 font-medium">{% translate "Nothing to connect to" %}</p>
+  <div class="max-w-2xl">
+    <div class="mb-6 flex flex-wrap items-start gap-4">
+      <div>
+        <c-page-title>{% translate "Connections" %}</c-page-title>
         <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% translate "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one." %}
+          {% translate "Where the plugins that act for you find their services, and how they sign in. Secrets are stored encrypted and never shown again." %}
         </p>
+      </div>
+      {% if plugins_available %}
+        <a href="{% url 'connections:pick' %}" class="btn ms-auto">{% translate "Add a connection" %}</a>
       {% endif %}
     </div>
-  {% endif %}
+
+    {% if rows %}
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for row in rows %}
+            {% comment %} `grow basis-48` rather than `flex-1`: the row already wrapped, but
+               `flex-1` is `flex: 1 1 0%`, so the words claimed no width of their own and were
+               squeezed to twelve pixels in Greek before anything wrapped (#167). {% endcomment %}
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3" data-connection="{{ row.connection.pk }}">
+              <div class="min-w-0 grow basis-48">
+                <p class="font-medium">
+                  {{ row.connection.label }}
+                  {% if not row.connection.enabled %}
+                    <span class="ms-2 badge" data-tone="grey">{% translate "Off" %}</span>
+                  {% endif %}
+                </p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {{ row.kind_label }} ·
+                  {% if row.plugin %}{{ row.plugin.label }}{% else %}<span class="text-red-600 dark:text-red-400">{% translate "plugin not installed" %}</span>{% endif %}
+                  {% if row.connection.last_error %}
+                    · <span class="text-red-600 dark:text-red-400"><bdi>{{ row.connection.last_error|truncatechars:80 }}</bdi></span>
+                  {% elif row.connection.last_ok_at %}
+                    · {% blocktranslate with when=row.connection.last_ok_at|date:"DATETIME_FORMAT" trimmed %}worked {{ when }}{% endblocktranslate %}
+                  {% else %}
+                    · {% translate "not tested yet" %}
+                  {% endif %}
+                </p>
+                {% if row.summary %}
+                  <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ row.summary }}</p>
+                {% endif %}
+                {% if row.is_sync and row.connection.last_summary %}
+                  <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                    {% blocktranslate with when=row.connection.synced_at|date:"DATETIME_FORMAT" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}
+                  </p>
+                {% endif %}
+              </div>
+              <div class="flex items-center gap-1">
+                {% if row.plugin %}
+                  <form method="post" action="{% url 'connections:test' row.connection.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn" data-variant="outline" data-size="xs">{% translate "Test" %}</button>
+                  </form>
+                  {% if row.is_sync %}
+                    <form method="post" action="{% url 'connections:sync_now' row.connection.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Sync now" %}</button>
+                    </form>
+                  {% endif %}
+                  {% if row.is_store %}
+                    <form method="post" action="{% url 'connections:backfill' row.connection.pk %}">
+                      {% csrf_token %}
+                      <button type="submit" class="btn" data-variant="ghost" data-size="xs"
+                              title="{% translate 'Queue every document you already have for this store.' %}">{% translate "Send everything" %}</button>
+                    </form>
+                  {% endif %}
+                  <a href="{% url 'connections:edit' row.connection.pk %}" class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
+                {% endif %}
+                <a href="{% url 'connections:delete' row.connection.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">{% translate "Remove" %}<span class="sr-only">: <bdi>{{ row.connection.label }}</bdi></span></a>
+              </div>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% else %}
+      <div class="card py-10 text-center">
+        {% if plugins_available %}
+          <p class="mb-1 font-medium">{% translate "No connections yet" %}</p>
+          <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate count counter=plugins_available|length trimmed %}
+              One installed plugin can be connected.
+            {% plural %}
+              {{ counter }} installed plugins can be connected.
+            {% endblocktranslate %}
+          </p>
+          <a href="{% url 'connections:pick' %}" class="btn">{% translate "Add a connection" %}</a>
+        {% else %}
+          <p class="mb-1 font-medium">{% translate "Nothing to connect to" %}</p>
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% translate "No installed plugin needs a connection. Notifiers, document stores and synchronisation plugins appear here once the operator installs one." %}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

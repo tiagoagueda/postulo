@@ -19,6 +19,12 @@
       {% settings_sidebar %}
     </aside>
     <div class="min-w-0 flex-1">
+      {% comment %} The frame takes the screen and each page keeps its own measure:
+         `max-w-2xl` on a wrapper at the start edge, as Export, Import and the cards allauth
+         draws always did and every other page here does since #320, so a text box is 622
+         pixels however wide the monitor. Not here, because the import's mapping is two
+         tables of a spreadsheet's own columns and takes the width (#273), and a plugin's
+         own section is drawn by its plugin. {% endcomment %}
       {# `panel` sits between the sidebar and the page, so a base that wants to put a card #}
       {# round allauth's content has somewhere to do it without taking the sidebar away. #}
       {% block panel %}{# A frame with a sidebar: it empties `main_width` and takes the whole screen (#198). #}

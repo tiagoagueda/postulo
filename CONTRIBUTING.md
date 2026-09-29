@@ -121,9 +121,9 @@ Do not replace a native select with a custom listbox to make room for pictures.
 
 ## Tables
 
-A table wider than the card it sits in scrolls sideways, and the settings area gives its
-card about 730 pixels however wide the window is — so a table that does not fit scrolls on
-a desktop, not only on a phone. Measure before assuming otherwise:
+A table wider than the card it sits in scrolls sideways, and a card under *Settings* stops
+at 672 pixels (`max-w-2xl`) at any desktop width (#320) — so a table that does not fit
+scrolls on a desktop, not only on a phone. Measure before assuming otherwise:
 `card.scrollWidth - card.clientWidth` in the browser, at 1440 as well as at 390.
 
 Two things keep one honest:

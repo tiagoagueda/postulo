@@ -743,6 +743,37 @@ def test_the_company_form_in_two_columns_has_no_violations(
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_contact_and_capture_forms_in_two_columns_have_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """The same for the two forms that followed the company form (#320): a contact's
+    details beside its numbers and links, and the capture form beside what it does. Each
+    is two columns only in a wide window, which the walk never opens."""
+    page.emulate_media(color_scheme=scheme)
+    page.set_viewport_size({"width": 2560, "height": 1200})
+    base = live_server.url
+    sign_in(page, base)
+    pairs = {
+        "/jobs/contacts/new/": ("main form .card", "main form [data-contact-rows]"),
+        f"/jobs/contacts/{furnished['contact'].pk}/edit/": (
+            "main form .card",
+            "main form [data-contact-rows]",
+        ),
+        "/jobs/captures/new/": ("main form[method=post]", "main [data-capture-help]"),
+    }
+    failures = []
+    for path, (first, second) in pairs.items():
+        page.goto(f"{base}{path}")
+        one = page.locator(first).first.bounding_box()
+        other = page.locator(second).bounding_box()
+        assert one["y"] == other["y"], f"{path} is not in two columns at 2560"
+        found = violations_on(page, axe_source)
+        if found:
+            failures.append(describe(f"{path} at 2560 ({scheme})", found))
+    assert not failures, "\n\n".join(failures)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_europass_review_page_has_no_violations(
     live_server, page: Page, axe_source, applicant, scheme
 ):

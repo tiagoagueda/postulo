@@ -2,133 +2,135 @@
 {% load i18n postulo %}
 
 {% block content %}
-  <c-page-title>
-    {% translate "Appearance" %}
-    <c-slot name="subtitle">
-    {% translate "The switch at the top right cycles through the same three; this is the explicit version." %}
-    </c-slot>
-  </c-page-title>
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% translate "Appearance" %}
+      <c-slot name="subtitle">
+      {% translate "The switch at the top right cycles through the same three; this is the explicit version." %}
+      </c-slot>
+    </c-page-title>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% comment %} The form's default button, first so that it is the one Enter presses in the
-       two number boxes below (#299). The navigation's arrows are submit buttons of this form
-       and come before *Save*; without this, Enter would press the first of them, which is
-       disabled on the first row and so submits nothing at all. Drawn for the browser alone:
-       out of the tab order, hidden from assistive technology, clipped to nothing. {% endcomment %}
-    <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">{% translate "Save" %}</button>
-    <div class="card mb-6">
-      <fieldset{% if form.theme.aria_describedby %} aria-describedby="{{ form.theme.aria_describedby }}"{% endif %}>
-        <legend class="label mb-3">{{ form.theme.label }}</legend>
-        <div class="space-y-2">
-          {% for choice in form.theme|widgets_classed:"input" %}
-            <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-              {{ choice.tag }}
-              <span>{{ choice.choice_label }}</span>
-            </label>
-          {% endfor %}
-        </div>
-        <div class="field"><c-field-feedback :field="form.theme" /></div>
-      </fieldset>
-    </div>
-    <div class="card mb-6">
-      {% comment %} How much room the interface leaves (#292). Beside the theme because it
-         is the same kind of choice -- what the interface looks like to you -- and because
-         somebody who wants more rows on a screen comes looking here. {% endcomment %}
-      <fieldset{% if form.density.aria_describedby %} aria-describedby="{{ form.density.aria_describedby }}"{% endif %}>
-        <legend class="label mb-1">{{ form.density.label }}</legend>
-        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.density.auto_id }}_helptext">{{ form.density.help_text }}</p>
-        <div class="space-y-2">
-          {% for choice in form.density|widgets_classed:"input" %}
-            <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
-              {{ choice.tag }}
-              <span>{{ choice.choice_label }}</span>
-            </label>
-          {% endfor %}
-        </div>
-        <div class="field"><c-field-feedback :field="form.density" errors-only /></div>
-      </fieldset>
-    </div>
-    <div class="card mb-6">
-      <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
-        <legend class="label mb-1">{{ form.navigation.label }}</legend>
-        {% comment %} The help sits above the choices here rather than under them, so it keeps its
-           own place and takes the id the fieldset points at (#114). {% endcomment %}
-        <p class="mb-1 text-sm text-ink-500 dark:text-ink-400" id="{{ form.navigation.auto_id }}_helptext">{{ form.navigation.help_text }}</p>
-        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{% translate "The arrows put them in your order, and the order decides what stays in reach: the row across the top holds as many as there is room for, the bar at the foot of a phone's screen the first four, and the rest are under More." %}</p>
-        {% comment %} One list in the order the navigation draws, hidden items included, so an
-           item keeps its place while it is switched off (#299). Each row carries its key
-           as `nav_order`, which is how the form knows the order it drew; the arrows post the
-           whole form, like the column chooser's, so a switch changed and not saved yet is
-           saved with the move. An arrow that cannot act is disabled rather than absent, so
-           the pair keeps its shape. The ids are what the redirect after a move lands on:
-           the arrow that was pressed, or the row when that arrow has run out of list. The
-           list keeps a measure so the arrows stay beside the names they move. {% endcomment %}
-        <ol class="max-w-md space-y-1">
-          {% for choice in form.navigation|widgets_classed:"input" %}
-            {% with key=choice.data.value %}
-              <li class="flex items-center gap-2 rounded-lg" id="nav-row-{{ key }}" tabindex="-1">
-                <input type="hidden" name="nav_order" value="{{ key }}">
-                <label class="flex min-w-0 flex-1 items-center gap-3 py-1 text-sm text-ink-800 dark:text-ink-200">
-                  {{ choice.tag }}
-                  <span>{{ choice.choice_label }}</span>
-                </label>
-                <button type="submit" name="nav_move" value="up:{{ key }}" id="nav-up-{{ key }}"
-                        class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.first %} disabled{% endif %}
-                        aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} up{% endblocktranslate %}">
-                  {% icon "chevron-up" %}
-                </button>
-                <button type="submit" name="nav_move" value="down:{{ key }}" id="nav-down-{{ key }}"
-                        class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.last %} disabled{% endif %}
-                        aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} down{% endblocktranslate %}">
-                  {% icon "chevron-down" %}
-                </button>
-              </li>
-            {% endwith %}
-          {% endfor %}
-        </ol>
-        {% if not form.nav_is_default %}
-          <button type="submit" name="nav_reset" value="1" class="btn mt-3" data-variant="ghost" data-size="sm">
-            {% translate "Back to the usual order" %}
-          </button>
-        {% endif %}
-        <div class="field"><c-field-feedback :field="form.navigation" errors-only /></div>
-      </fieldset>
-    </div>
-    <div class="card mb-6">
-      <c-section-title>
-        {% translate "Gone quiet" %}
-        <c-slot name="subtitle">{% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}</c-slot>
-      </c-section-title>
-      <div class="flex items-end gap-3">
-        <div class="w-32">
-          <c-field :field="form.quiet_after_days" />
-        </div>
-        {% comment %} The unit agrees with the number in the box beside it. "days" on its own
-           has no singular to offer at 1 and no second plural to offer at 2 for the
-           languages that have one (#225). {% endcomment %}
-        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate count counter=form.quiet_days trimmed %}day{% plural %}days{% endblocktranslate %}
-        </p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% comment %} The form's default button, first so that it is the one Enter presses in the
+         two number boxes below (#299). The navigation's arrows are submit buttons of this form
+         and come before *Save*; without this, Enter would press the first of them, which is
+         disabled on the first row and so submits nothing at all. Drawn for the browser alone:
+         out of the tab order, hidden from assistive technology, clipped to nothing. {% endcomment %}
+      <button type="submit" class="sr-only" tabindex="-1" aria-hidden="true">{% translate "Save" %}</button>
+      <div class="card mb-6">
+        <fieldset{% if form.theme.aria_describedby %} aria-describedby="{{ form.theme.aria_describedby }}"{% endif %}>
+          <legend class="label mb-3">{{ form.theme.label }}</legend>
+          <div class="space-y-2">
+            {% for choice in form.theme|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.theme" /></div>
+        </fieldset>
       </div>
-    </div>
-    {% comment %} Beside *Gone quiet* because it is the same kind of choice -- how much
-       warning this person wants -- and because somebody who came here to change one will
-       have an opinion about the other (#238). {% endcomment %}
-    <div class="card mb-6">
-      <c-section-title>
-        {% translate "Closing soon" %}
-        <c-slot name="subtitle">{% translate "Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted." %}</c-slot>
-      </c-section-title>
-      <div class="flex items-end gap-3">
-        <div class="w-32">
-          <c-field :field="form.closing_notice_days" />
-        </div>
-        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate count counter=form.closing_days trimmed %}day{% plural %}days{% endblocktranslate %}
-        </p>
+      <div class="card mb-6">
+        {% comment %} How much room the interface leaves (#292). Beside the theme because it
+           is the same kind of choice -- what the interface looks like to you -- and because
+           somebody who wants more rows on a screen comes looking here. {% endcomment %}
+        <fieldset{% if form.density.aria_describedby %} aria-describedby="{{ form.density.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.density.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.density.auto_id }}_helptext">{{ form.density.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.density|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.density" errors-only /></div>
+        </fieldset>
       </div>
-    </div>
-    <button type="submit" class="btn">{% translate "Save" %}</button>
-  </form>
+      <div class="card mb-6">
+        <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.navigation.label }}</legend>
+          {% comment %} The help sits above the choices here rather than under them, so it keeps its
+             own place and takes the id the fieldset points at (#114). {% endcomment %}
+          <p class="mb-1 text-sm text-ink-500 dark:text-ink-400" id="{{ form.navigation.auto_id }}_helptext">{{ form.navigation.help_text }}</p>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{% translate "The arrows put them in your order, and the order decides what stays in reach: the row across the top holds as many as there is room for, the bar at the foot of a phone's screen the first four, and the rest are under More." %}</p>
+          {% comment %} One list in the order the navigation draws, hidden items included, so an
+             item keeps its place while it is switched off (#299). Each row carries its key
+             as `nav_order`, which is how the form knows the order it drew; the arrows post the
+             whole form, like the column chooser's, so a switch changed and not saved yet is
+             saved with the move. An arrow that cannot act is disabled rather than absent, so
+             the pair keeps its shape. The ids are what the redirect after a move lands on:
+             the arrow that was pressed, or the row when that arrow has run out of list. The
+             list keeps a measure so the arrows stay beside the names they move. {% endcomment %}
+          <ol class="max-w-md space-y-1">
+            {% for choice in form.navigation|widgets_classed:"input" %}
+              {% with key=choice.data.value %}
+                <li class="flex items-center gap-2 rounded-lg" id="nav-row-{{ key }}" tabindex="-1">
+                  <input type="hidden" name="nav_order" value="{{ key }}">
+                  <label class="flex min-w-0 flex-1 items-center gap-3 py-1 text-sm text-ink-800 dark:text-ink-200">
+                    {{ choice.tag }}
+                    <span>{{ choice.choice_label }}</span>
+                  </label>
+                  <button type="submit" name="nav_move" value="up:{{ key }}" id="nav-up-{{ key }}"
+                          class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.first %} disabled{% endif %}
+                          aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} up{% endblocktranslate %}">
+                    {% icon "chevron-up" %}
+                  </button>
+                  <button type="submit" name="nav_move" value="down:{{ key }}" id="nav-down-{{ key }}"
+                          class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.last %} disabled{% endif %}
+                          aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} down{% endblocktranslate %}">
+                    {% icon "chevron-down" %}
+                  </button>
+                </li>
+              {% endwith %}
+            {% endfor %}
+          </ol>
+          {% if not form.nav_is_default %}
+            <button type="submit" name="nav_reset" value="1" class="btn mt-3" data-variant="ghost" data-size="sm">
+              {% translate "Back to the usual order" %}
+            </button>
+          {% endif %}
+          <div class="field"><c-field-feedback :field="form.navigation" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
+        <c-section-title>
+          {% translate "Gone quiet" %}
+          <c-slot name="subtitle">{% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}</c-slot>
+        </c-section-title>
+        <div class="flex items-end gap-3">
+          <div class="w-32">
+            <c-field :field="form.quiet_after_days" />
+          </div>
+          {% comment %} The unit agrees with the number in the box beside it. "days" on its own
+             has no singular to offer at 1 and no second plural to offer at 2 for the
+             languages that have one (#225). {% endcomment %}
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate count counter=form.quiet_days trimmed %}day{% plural %}days{% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+      {% comment %} Beside *Gone quiet* because it is the same kind of choice -- how much
+         warning this person wants -- and because somebody who came here to change one will
+         have an opinion about the other (#238). {% endcomment %}
+      <div class="card mb-6">
+        <c-section-title>
+          {% translate "Closing soon" %}
+          <c-slot name="subtitle">{% translate "Any notifier you have switched on says when a listing you have not decided about is close to its deadline. A listing you have applied to or discarded is never counted." %}</c-slot>
+        </c-section-title>
+        <div class="flex items-end gap-3">
+          <div class="w-32">
+            <c-field :field="form.closing_notice_days" />
+          </div>
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate count counter=form.closing_days trimmed %}day{% plural %}days{% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </form>
+  </div>
 {% endblock %}

@@ -7,18 +7,20 @@
 
 {% block content %}
   <div>
-    <c-page-title>
-      {% translate "Your details" %}
-      <c-slot name="subtitle">
-      {% url 'settings:index' as settings_url %}
-      {% blocktranslate trimmed %}
-        What Postulo knows about you as a candidate: the name, picture and contact block
-        your CVs print, and the numbers, addresses, links and identifiers behind them. How
-        Postulo behaves for you — theme, language, your account — is under
-        <a href="{{ settings_url }}" class="underline">Settings</a>.
-      {% endblocktranslate %}
-      </c-slot>
-    </c-page-title>
+    <div class="max-w-2xl">
+      <c-page-title>
+        {% translate "Your details" %}
+        <c-slot name="subtitle">
+        {% url 'settings:index' as settings_url %}
+        {% blocktranslate trimmed %}
+          What Postulo knows about you as a candidate: the name, picture and contact block
+          your CVs print, and the numbers, addresses, links and identifiers behind them. How
+          Postulo behaves for you — theme, language, your account — is under
+          <a href="{{ settings_url }}" class="underline">Settings</a>.
+        {% endblocktranslate %}
+        </c-slot>
+      </c-page-title>
+    </div>
 
   {% comment %} One record in several parts down one page, so it is navigated rather than
      traversed: the sidebar Settings and Your career use, with the parts as anchors and a
@@ -31,7 +33,11 @@
       </p>
       {% sidebar section_nav _("Parts of your details") %}
     </aside>
-    <div class="min-w-0 flex-1">
+    {% comment %} The column beside the sidebar stops at `max-w-2xl`, at its start edge, as
+       every card inside Settings does (#320): the frame takes the screen (#198) and the
+       measure is on the parts, so a text box is 622 pixels on any monitor rather than the
+       2,214 it was at 2560. {% endcomment %}
+    <div class="min-w-0 max-w-2xl flex-1">
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}

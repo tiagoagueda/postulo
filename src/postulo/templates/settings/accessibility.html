@@ -2,58 +2,60 @@
 {% load i18n %}
 
 {% block content %}
-  <c-page-title>
-    {% translate "Accessibility" %}
-    <c-slot name="subtitle">
-    {% translate "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that." %}
-    </c-slot>
-  </c-page-title>
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% translate "Accessibility" %}
+      <c-slot name="subtitle">
+      {% translate "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that." %}
+      </c-slot>
+    </c-page-title>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    <div class="card mb-6">
-      <c-section-title>{% translate "Your career" %}</c-section-title>
-      {% comment %} The number, for somebody who cannot use the arrows (#203). A checkbox
-         through `<c-field>` is the box, then the label beside it with the help under the
-         label (#290) -- the help carries the id the checkbox's `aria-describedby` names
-         (#207), and it is outside the label, so the name says what the box is and the
-         description says why. Moved here from Appearance (#281). {% endcomment %}
-      <c-field :field="form.show_career_order" />
-    </div>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="card mb-6">
+        <c-section-title>{% translate "Your career" %}</c-section-title>
+        {% comment %} The number, for somebody who cannot use the arrows (#203). A checkbox
+           through `<c-field>` is the box, then the label beside it with the help under the
+           label (#290) -- the help carries the id the checkbox's `aria-describedby` names
+           (#207), and it is outside the label, so the name says what the box is and the
+           description says why. Moved here from Appearance (#281). {% endcomment %}
+        <c-field :field="form.show_career_order" />
+      </div>
 
-    <div class="card mb-6">
-      {% comment %} The way out of the single-key shortcuts, which WCAG 2.1.4 asks for at
-         level A and Postulo did not have: "d" on the capture review discarded a listing
-         straight away, and somebody dictating to their computer presses every letter of the
-         sentence (#227). Moved here from Appearance (#281). {% endcomment %}
-      <c-section-title>{% translate "Keyboard shortcuts" %}</c-section-title>
-      <c-field :field="form.keyboard_shortcuts" />
-    </div>
+      <div class="card mb-6">
+        {% comment %} The way out of the single-key shortcuts, which WCAG 2.1.4 asks for at
+           level A and Postulo did not have: "d" on the capture review discarded a listing
+           straight away, and somebody dictating to their computer presses every letter of the
+           sentence (#227). Moved here from Appearance (#281). {% endcomment %}
+        <c-section-title>{% translate "Keyboard shortcuts" %}</c-section-title>
+        <c-field :field="form.keyboard_shortcuts" />
+      </div>
 
-    <div class="card mb-6">
-      {% comment %} The underline on the current navigation link, which #274 added because the
-         tint alone is 1.1:1 against the header. Off is not a hole: the weight stays, so the
-         current page is still marked by something that is not colour, and forced colours
-         underline it regardless (#289). {% endcomment %}
-      <c-section-title>{% translate "Navigation" %}</c-section-title>
-      <c-field :field="form.nav_underline" />
-    </div>
+      <div class="card mb-6">
+        {% comment %} The underline on the current navigation link, which #274 added because the
+           tint alone is 1.1:1 against the header. Off is not a hole: the weight stays, so the
+           current page is still marked by something that is not colour, and forced colours
+           underline it regardless (#289). {% endcomment %}
+        <c-section-title>{% translate "Navigation" %}</c-section-title>
+        <c-field :field="form.nav_underline" />
+      </div>
 
-    <button type="submit" class="btn">{% translate "Save" %}</button>
-  </form>
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </form>
 
-  {% comment %} The conformance target, and where to say when something does not work: the
-     page somebody lands on when the interface does not work for them should say what it is
-     checked against and where to tell us, which is worth more than any one toggle (#281).
-     Reduced motion, more contrast and forced colours are read from the operating system,
-     which is the setting the person already made once for everything. {% endcomment %}
-  <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
-    {% blocktranslate trimmed with guide="https://source.tiagoagueda.com/postulo/postulo/wiki/Accessibility" %}
-      Postulo is checked against WCAG 2.2 at level AA, in both themes, at 320 pixels and
-      under Windows High Contrast; reduced motion and more contrast follow your system's
-      own setting. What is checked, what is known not to work yet, and how to tell us when
-      something does not work for you is on the
-      <a href="{{ guide }}" class="underline" rel="noopener noreferrer external" target="_blank">Accessibility page<span class="sr-only"> (opens in a new tab)</span></a>.
-    {% endblocktranslate %}
-  </p>
+    {% comment %} The conformance target, and where to say when something does not work: the
+       page somebody lands on when the interface does not work for them should say what it is
+       checked against and where to tell us, which is worth more than any one toggle (#281).
+       Reduced motion, more contrast and forced colours are read from the operating system,
+       which is the setting the person already made once for everything. {% endcomment %}
+    <p class="mt-6 text-xs text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed with guide="https://source.tiagoagueda.com/postulo/postulo/wiki/Accessibility" %}
+        Postulo is checked against WCAG 2.2 at level AA, in both themes, at 320 pixels and
+        under Windows High Contrast; reduced motion and more contrast follow your system's
+        own setting. What is checked, what is known not to work yet, and how to tell us when
+        something does not work for you is on the
+        <a href="{{ guide }}" class="underline" rel="noopener noreferrer external" target="_blank">Accessibility page<span class="sr-only"> (opens in a new tab)</span></a>.
+      {% endblocktranslate %}
+    </p>
+  </div>
 {% endblock %}

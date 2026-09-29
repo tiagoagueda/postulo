@@ -2,97 +2,99 @@
 {% load i18n %}
 
 {% block content %}
-  <c-page-title>
-    {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
-    <c-slot name="subtitle">
-    {{ kind_label }} · <bdi>{{ plugin.label }}</bdi> <code class="text-xs">{{ plugin.version }}</code>
-    </c-slot>
-  </c-page-title>
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% if connection %}{{ connection.label }}{% else %}{% blocktranslate with plugin=plugin.label trimmed %}Connect {{ plugin }}{% endblocktranslate %}{% endif %}
+      <c-slot name="subtitle">
+      {{ kind_label }} · <bdi>{{ plugin.label }}</bdi> <code class="text-xs">{{ plugin.version }}</code>
+      </c-slot>
+    </c-page-title>
 
-  <form method="post" novalidate>
-    {% csrf_token %}
-    {% if form.non_field_errors %}
-      <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
-    {% endif %}
-
-    <div class="card mb-4">
-      <c-field :field="form.label" />
-      <c-field :field="form.enabled" />
-    </div>
-
-    <div class="card mb-6"{{ plugin_attributes }}>
-      <c-section-title>{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</c-section-title>
-      {% comment %} A checkbox comes out as a horizontal field, box first, and everything
-         else as a column; the component knows which (#290). {% endcomment %}
-      {% for field in form.plugin_fields %}
-        <c-field :field="field" />
-      {% endfor %}
-    </div>
-
-    <div class="flex items-center gap-3">
-      <button type="submit" class="btn">{% translate "Save" %}</button>
-      <a href="{% url 'connections:list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
-    </div>
-  </form>
-
-  {% comment %} A connection that authenticates by consent rather than by password (#150).
-     Its own form, outside the one above, because agreeing is a round trip through somebody
-     else's website and not a field to fill in -- and because it has to be saved first, so
-     there is a connection for the provider to send the person back to. {% endcomment %}
-  {% if consent %}
-    <div class="card mt-6" data-consent>
-      <c-section-title>
-        {% blocktranslate with provider=consent.provider|default:plugin.label trimmed %}
-          Agreeing with {{ provider }}
-        {% endblocktranslate %}
-        <c-slot name="subtitle">{% blocktranslate trimmed %}
-          This one does not take a password. You agree at the provider's own site, and it
-          hands Postulo a token it can renew. You can withdraw that agreement there at any
-          time, and Postulo cannot do it for you.
-        {% endblocktranslate %}</c-slot>
-      </c-section-title>
-
-      {% comment %} Shown rather than described. An operator registering this by hand needs
-         the exact string, and building one from a template is where it goes wrong. {% endcomment %}
-      <div class="mb-4">
-        <p class="label">{% translate "Register this address with the provider" %}</p>
-        <p class="break-all font-mono text-sm" data-consent-callback>{{ consent_callback }}</p>
-        <p class="text-xs text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed %}
-            Exactly as it appears, including the scheme and any port. If this instance moves,
-            register the new one before anybody tries to connect again.
-          {% endblocktranslate %}
-        </p>
-      </div>
-
-      <div class="mb-4">
-        <p class="label">{% translate "What is being asked for" %}</p>
-        <ul class="list-disc space-y-1 ps-5 text-sm text-ink-500 dark:text-ink-400">
-          {% for scope in consent.scopes %}<li><code class="text-xs">{{ scope }}</code></li>{% endfor %}
-        </ul>
-      </div>
-
-      {% if connection %}
-        <form method="post" action="{% url 'connections:consent' connection.pk %}"
-              class="flex flex-wrap items-center gap-3">
-          {% csrf_token %}
-          {% if consent_given %}
-            <p class="w-full text-sm" data-consent-given>
-              {% translate "Somebody has agreed to this. Test it to be sure it still stands." %}
-            </p>
-            <button type="submit" class="btn" data-variant="outline">{% translate "Agree again" %}</button>
-            <button type="submit" name="forget" value="1" class="btn" data-variant="destructive-ghost">
-              {% translate "Forget the token" %}
-            </button>
-          {% else %}
-            <button type="submit" class="btn">{% translate "Agree at the provider" %}</button>
-          {% endif %}
-        </form>
-      {% else %}
-        <p class="text-sm text-ink-500 dark:text-ink-400">
-          {% translate "Save this first, then come back and agree." %}
-        </p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
-    </div>
-  {% endif %}
+
+      <div class="card mb-4">
+        <c-field :field="form.label" />
+        <c-field :field="form.enabled" />
+      </div>
+
+      <div class="card mb-6"{{ plugin_attributes }}>
+        <c-section-title>{% blocktranslate with plugin=plugin.label trimmed %}What {{ plugin }} needs{% endblocktranslate %}</c-section-title>
+        {% comment %} A checkbox comes out as a horizontal field, box first, and everything
+           else as a column; the component knows which (#290). {% endcomment %}
+        {% for field in form.plugin_fields %}
+          <c-field :field="field" />
+        {% endfor %}
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn">{% translate "Save" %}</button>
+        <a href="{% url 'connections:list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+
+    {% comment %} A connection that authenticates by consent rather than by password (#150).
+       Its own form, outside the one above, because agreeing is a round trip through somebody
+       else's website and not a field to fill in -- and because it has to be saved first, so
+       there is a connection for the provider to send the person back to. {% endcomment %}
+    {% if consent %}
+      <div class="card mt-6" data-consent>
+        <c-section-title>
+          {% blocktranslate with provider=consent.provider|default:plugin.label trimmed %}
+            Agreeing with {{ provider }}
+          {% endblocktranslate %}
+          <c-slot name="subtitle">{% blocktranslate trimmed %}
+            This one does not take a password. You agree at the provider's own site, and it
+            hands Postulo a token it can renew. You can withdraw that agreement there at any
+            time, and Postulo cannot do it for you.
+          {% endblocktranslate %}</c-slot>
+        </c-section-title>
+
+        {% comment %} Shown rather than described. An operator registering this by hand needs
+           the exact string, and building one from a template is where it goes wrong. {% endcomment %}
+        <div class="mb-4">
+          <p class="label">{% translate "Register this address with the provider" %}</p>
+          <p class="break-all font-mono text-sm" data-consent-callback>{{ consent_callback }}</p>
+          <p class="text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Exactly as it appears, including the scheme and any port. If this instance moves,
+              register the new one before anybody tries to connect again.
+            {% endblocktranslate %}
+          </p>
+        </div>
+
+        <div class="mb-4">
+          <p class="label">{% translate "What is being asked for" %}</p>
+          <ul class="list-disc space-y-1 ps-5 text-sm text-ink-500 dark:text-ink-400">
+            {% for scope in consent.scopes %}<li><code class="text-xs">{{ scope }}</code></li>{% endfor %}
+          </ul>
+        </div>
+
+        {% if connection %}
+          <form method="post" action="{% url 'connections:consent' connection.pk %}"
+                class="flex flex-wrap items-center gap-3">
+            {% csrf_token %}
+            {% if consent_given %}
+              <p class="w-full text-sm" data-consent-given>
+                {% translate "Somebody has agreed to this. Test it to be sure it still stands." %}
+              </p>
+              <button type="submit" class="btn" data-variant="outline">{% translate "Agree again" %}</button>
+              <button type="submit" name="forget" value="1" class="btn" data-variant="destructive-ghost">
+                {% translate "Forget the token" %}
+              </button>
+            {% else %}
+              <button type="submit" class="btn">{% translate "Agree at the provider" %}</button>
+            {% endif %}
+          </form>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% translate "Save this first, then come back and agree." %}
+          </p>
+        {% endif %}
+      </div>
+    {% endif %}
+  </div>
 {% endblock %}

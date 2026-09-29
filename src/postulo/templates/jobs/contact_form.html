@@ -2,10 +2,12 @@
 {% load i18n %}
 
 {% block title %}{% translate "Contact" %}{% endblock %}
+{# Two columns on a wide screen: this page empties `main_width` and takes the whole screen (#320). #}
+{% block main_width %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-2xl">
-    <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Contact" %}</h1>
+  <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Contact" %}</h1>
+  <div class="max-w-2xl">
     {% include "partials/privacy_notice.html" %}
     {% comment %} Somebody recorded twice (#239): the same name, or the same address, on
        another of this person's contacts. Said on this page because it is the only one a
@@ -13,12 +15,23 @@
        with before they have been written down. It tells and never refuses: the form
        below saves whatever it is given. {% endcomment %}
     <c-duplicates :candidates="duplicates" />
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
-      {% endif %}
-      <div class="card mb-6">
+  </div>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert mb-4 max-w-2xl" data-variant="error">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% comment %} The details in one column and the rows -- telephone numbers while that
+       feature is on, one card of links per kind switched on -- in the other, from `2xl`;
+       one under the other below it, which is how it always read (#320). The company form's
+       arrangement (#210): `max-w-2xl` on each column at the start edge, `flex-1` sharing the
+       row out, so each is 672 pixels at 1536 and at 2560 alike, with what is left over at
+       the end. Every feature off, there are no rows and no second column, and the details
+       keep their measure alone. Source order is the reading order in both layouts, and a
+       flex row follows the direction of the text, so the details lead in Arabic too.
+    {% endcomment %}
+    <div class="2xl:flex 2xl:items-start 2xl:gap-6">
+      <div class="card mb-6 max-w-2xl 2xl:flex-1">
         {% for field in form %}
           <c-field :field="field" />
         {% endfor %}
@@ -36,23 +49,30 @@
         {% for block, count in links_kept_back %}
           <p class="text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back_contact }}</p>
         {% endfor %}
-      </div>
-      {% if form.department_suggestions %}
-        <datalist id="department-suggestions">
-          {% for name in form.department_suggestions %}<option value="{{ name }}"></option>{% endfor %}
-        </datalist>
-      {% endif %}
-      {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
-      {% include "partials/web_links.html" %}
-      <div class="flex flex-wrap items-center gap-3">
-        <button type="submit" class="btn">{% translate "Save" %}</button>
-        <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
-        {% comment %} Offered whether or not anything was noticed: the person knows who
-           is who, and the comparison only knows names and addresses (#239). {% endcomment %}
-        {% if merge_url %}
-          <a href="{{ merge_url }}" class="btn ms-auto" data-variant="ghost">{% translate "Merge with another contact" %}</a>
+        {% if form.department_suggestions %}
+          <datalist id="department-suggestions">
+            {% for name in form.department_suggestions %}<option value="{{ name }}"></option>{% endfor %}
+          </datalist>
         {% endif %}
       </div>
-    </form>
-  </div>
+      {% if numbers or links %}
+        <div class="max-w-2xl 2xl:flex-1" data-contact-rows>
+          {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
+          {% include "partials/web_links.html" %}
+        </div>
+      {% endif %}
+    </div>
+    {% comment %} *Save* after both columns. The row keeps the measure, so *Merge* sits at
+       the end of one column's width in either layout -- under the details, which say who
+       this is -- rather than across the monitor from the button beside it (#320). Offered
+       whether or not anything was noticed: the person knows who is who, and the
+       comparison only knows names and addresses (#239). {% endcomment %}
+    <div class="flex max-w-2xl flex-wrap items-center gap-3">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      {% if merge_url %}
+        <a href="{{ merge_url }}" class="btn ms-auto" data-variant="ghost">{% translate "Merge with another contact" %}</a>
+      {% endif %}
+    </div>
+  </form>
 {% endblock %}
