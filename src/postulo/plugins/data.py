@@ -92,7 +92,7 @@ def refuse_removing(distribution: str) -> str:
     sentence because "there is data" is not something anybody can act on and "four telephone
     numbers" is.
     """
-    from .installing import canonicalise
+    from .record import canonicalise
 
     for plugin in _plugins_from(distribution):
         held = rows_held_by(plugin)
@@ -113,7 +113,7 @@ def refuse_removing(distribution: str) -> str:
 
 def _plugins_from(distribution: str) -> list:
     """Every installed plugin that came from this package."""
-    from .installing import canonicalise, packages_by_distribution
+    from .record import canonicalise, packages_by_distribution
     from .registry import GROUPS
     from .registry import plugins as registry_plugins
 

@@ -26,7 +26,7 @@ from typing import ClassVar
 import pytest
 from django.test import override_settings
 
-from postulo.core import channels, phone_numbers
+from postulo.core import channels
 from postulo.core.models import PhoneNumber, SiteSettings
 from postulo.notifications import text, transport
 from postulo.plugins import base, registry
@@ -322,4 +322,4 @@ def test_a_number_on_a_contact_does_not_count(user):
         registry.plugins("transport", refresh=True)
 
         assert "text" not in transport.recovery_routes()
-        assert phone_numbers.accounts_without_a_recovery_number() == 1
+        assert transport.accounts_without_a_recovery_number() == 1

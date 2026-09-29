@@ -21,12 +21,12 @@ from django.utils.translation import gettext_lazy as _
 
 from . import phones
 
-# MailSecurity is not a model -- it is how TLS gets onto an SMTP session, and it lives
-# beside the code that opens one (#149). MailAuth and MailGrant are how that session proves
-# who it is, and live beside the mechanism (#151). Imported here because a field's choices
-# need them.
-from .mail import MailSecurity
-from .mail_auth import MailAuth, MailGrant
+# MailSecurity is not a model -- it is how TLS gets onto an SMTP session (#149) -- and
+# MailAuth and MailGrant are how that session proves who it is (#151). Imported here because
+# a field's choices need them, from a module that holds nothing else: the code that opens a
+# session and fetches its token reads this module's rows, so it cannot be what these import
+# (#248).
+from .mail_choices import MailAuth, MailGrant, MailSecurity
 
 
 class TimeStampedModel(models.Model):
@@ -1074,9 +1074,10 @@ class SiteSettings(models.Model):
         self.pk = 1
         super().save(*args, **kwargs)
         # The row is memoised for the request that is reading it (#231); saving it is the
-        # one thing that makes that memo wrong, so it is the one place that clears it.
-        # Imported here rather than at the top: `site` imports this module.
-        from .site import forget_current
+        # one thing that makes that memo wrong, so it is the one place that clears it. The
+        # memo lives in `core.memo`, below this module, rather than in `site`, which reads
+        # this row and so could not also be what saving it calls (#248).
+        from .memo import forget_current
 
         forget_current()
 

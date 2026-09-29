@@ -4,6 +4,10 @@ from django.conf import settings
 from django.http import HttpRequest
 from django.utils.translation import gettext as _
 
+# The running version is asked by pages and by the update check alike, so it lives with the
+# check (#248). Read here for the footer, and still handed out here to the health endpoint.
+from .updates import installed_version
+
 #: What one press of the header switch moves to. Light, dark, then back to the system.
 NEXT_THEME = {"light": "dark", "dark": "system", "system": "light"}
 
@@ -120,20 +124,3 @@ def release_notes_url() -> str:
     from postulo import __version__
 
     return RELEASE_NOTES_URL.format(version=__version__)
-
-
-def installed_version() -> str:
-    """The version of the package that is actually running.
-
-    From the installed distribution's metadata when there is one — which is what a
-    wheel or an image carries — and from the package itself otherwise, so a source
-    checkout says the same thing.
-    """
-    from importlib.metadata import PackageNotFoundError, version
-
-    try:
-        return version("postulo")
-    except PackageNotFoundError:  # pragma: no cover - a checkout without an install
-        from postulo import __version__
-
-        return __version__

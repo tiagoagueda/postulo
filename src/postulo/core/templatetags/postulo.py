@@ -9,7 +9,6 @@ from pathlib import Path
 
 from django import template
 from django.forms import BoundField, Select, TextInput
-from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.formats import number_format
 from django.utils.html import escape, format_html
@@ -17,22 +16,17 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext, ngettext
 from django.utils.translation import gettext_lazy as _
 
+# The flag lookup lives in `core.flags`, below the forms that ask it directly (#248). This
+# library registers it as the `flag_url` tag, and hands `FLAG_DIR` on to the flag tests.
+from postulo.core.flags import FLAG_DIR, flag_url  # noqa: F401 - re-exported: FLAG_DIR
+
 register = template.Library()
+register.simple_tag(flag_url)
 
 #: Where `npm run sync:icons` puts the Lucide icons listed in assets/icons.txt.
 ICON_DIR = Path(__file__).resolve().parents[2] / "static" / "icons"
 
-#: Where `npm run sync:flags` puts the flag-icons flags listed in assets/flags.txt.
-FLAG_DIR = Path(__file__).resolve().parents[2] / "static" / "flags"
-
 _ICON_NAME = re.compile(r"[a-z0-9-]+")
-
-#: An ISO 3166-1 country, or a 3166-2 subdivision of one: `pt`, or `es-ct` for
-#: Catalonia. The second form exists because a language can be at home in a place
-#: that is not a state, and Postulo would rather draw that place's own flag than
-#: the flag of the state it sits in, which already stands for another language.
-_COUNTRY = re.compile(r"[A-Za-z]{2}(?:-[A-Za-z]{2,3})?")
-
 
 #: The opening ``<svg ...>`` tag, whatever it is spread over. A negated class matches
 #: newlines, which is what makes this work on Lucide's multi-line files.
@@ -93,33 +87,6 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
     for key, value in attrs.items():
         rendered.append(f'{escape(key.replace("_", "-"))}="{escape(value)}"')
     return mark_safe(source.replace("<svg", "<svg " + " ".join(rendered), 1))  # noqa: S308
-
-
-@functools.cache
-def _have_flag(country: str) -> bool:
-    """Whether ``static/flags/`` holds this country. Cached: the telephone field asks 241
-    times a page and the answer changes only when somebody runs ``npm run sync:flags``.
-
-    The name is checked against the pattern first, so nothing a form field carries can be
-    turned into a path.
-    """
-    return bool(_COUNTRY.fullmatch(country)) and (FLAG_DIR / f"{country}.svg").is_file()
-
-
-@register.simple_tag
-def flag_url(country: str) -> str:
-    """The static URL of a country's flag, or ``""`` where there is no such flag.
-
-    Empty is a real answer and every caller must handle it: a language with no uncontested
-    home gets no flag at all, and a telephone field with nothing chosen yet shows none.
-
-    The file is checked for before ``static()`` is asked for a name, because under the
-    manifest storage production uses, asking for a file that was never collected raises
-    rather than returning a dead link — right of it, and not something an unrecognised
-    country code arriving in a form should be able to trigger.
-    """
-    country = (country or "").strip().lower()
-    return static(f"flags/{country}.svg") if _have_flag(country) else ""
 
 
 @register.simple_tag

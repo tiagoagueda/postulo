@@ -25,7 +25,7 @@ import pytest
 from django.core.management import call_command
 from django.core.management.base import CommandError
 
-from postulo.plugins import installing
+from postulo.plugins import installing, provenance
 from postulo.plugins.installing import InstallError
 
 pytestmark = pytest.mark.django_db
@@ -229,7 +229,7 @@ def test_the_snapshot_is_not_mistaken_for_something_installed(tmp_path, plugins_
 
     assert installing.previous_dir().is_dir(), "it is there"
     assert installing.distributions_in(plugins_dir) == {"postulo-example": "2.0"}
-    names = [row["name"] for row in installing.status()]
+    names = [row["name"] for row in provenance.status()]
     assert names.count("postulo-example") == 1, "once, not once per copy of it on the volume"
     assert not [name for name in names if name.startswith(".")], "and the snapshot is not one"
 

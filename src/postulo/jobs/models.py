@@ -158,7 +158,10 @@ class CompanyQuerySet(OwnedQuerySet):
                 output_field=IntegerField(),
             )
 
-        from postulo.applications.models import Application, ApplicationEvent
+        # By label rather than by import, as `tab_counts` below does: applications sit above
+        # listings, and a listing's model importing theirs was a cycle (#248).
+        Application = apps.get_model("applications", "Application")
+        ApplicationEvent = apps.get_model("applications", "ApplicationEvent")
 
         annotations = {
             # `Coalesce` because a company nothing points at has no subquery row at all, and

@@ -258,7 +258,7 @@ def _from_the_wheel(plugin) -> dict:
     the plugins record's stamp, so the plugins that *do* come from a wheel pay for it once.
     """
     try:
-        from .installing import canonicalise, packages_by_distribution, read_record
+        from .record import canonicalise, packages_by_distribution, read_record
 
         top_level = type(plugin).__module__.split(".")[0]
         if top_level == "postulo":

@@ -532,7 +532,7 @@ def fingerprint_of_a_fresh_token() -> str:
     needs one to exist, an import -- because the alternative, a blank that the unique
     constraint would refuse on the second row, is a worse surprise.
     """
-    from .recovery import fingerprint
+    from .tokens import fingerprint
 
     return fingerprint(generate_invite_token())
 
@@ -608,7 +608,7 @@ class Invite(models.Model):
         The caller shows the token once and forgets it. Nothing else ever has it: not the
         row, not a log line, not the list of invitations.
         """
-        from .recovery import fingerprint
+        from .tokens import fingerprint
 
         token = generate_invite_token()
         invite = cls.objects.create(
@@ -619,7 +619,7 @@ class Invite(models.Model):
     @classmethod
     def find(cls, token: str) -> Invite | None:
         """The invitation this token opens, valid or not, or nothing."""
-        from .recovery import fingerprint
+        from .tokens import fingerprint
 
         if not token:
             return None

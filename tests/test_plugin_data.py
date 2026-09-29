@@ -85,7 +85,7 @@ def installed_from(plugin_class, distribution: str = DISTRIBUTION):
     # installed distribution is cached on the plugins record's stamp now, because it was
     # four and a half seconds of the administrator's plugins page (#231).
     with mock.patch(
-        "postulo.plugins.installing.packages_by_distribution",
+        "postulo.plugins.record.packages_by_distribution",
         return_value={module: [distribution]},
     ):
         try:

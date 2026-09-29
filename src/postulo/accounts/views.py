@@ -500,10 +500,10 @@ class SignInView(AllauthLoginView):
     """
 
     def get_context_data(self, **kwargs) -> dict:
-        from postulo.core import site
+        from postulo.notifications import transport
 
         context = super().get_context_data(**kwargs)
-        context["LOGIN_BY_CODE_ENABLED"] = site.email_sign_in()
+        context["LOGIN_BY_CODE_ENABLED"] = transport.email_sign_in()
         return context
 
 
@@ -518,8 +518,8 @@ class RequestLoginCodeView(View):
     def dispatch(self, request: HttpRequest, *args, **kwargs) -> HttpResponse:
         from allauth.account.views import request_login_code
 
-        from postulo.core import site
+        from postulo.notifications import transport
 
-        if not site.email_sign_in():
+        if not transport.email_sign_in():
             raise Http404("Signing in by email is not offered here.")
         return request_login_code(request, *args, **kwargs)

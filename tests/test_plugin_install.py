@@ -25,7 +25,7 @@ from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.urls import reverse
 
-from postulo.plugins import catalogue, installing
+from postulo.plugins import catalogue, installing, provenance
 from postulo.plugins.installing import InstallError
 
 pytestmark = pytest.mark.django_db
@@ -1061,13 +1061,13 @@ def test_what_a_release_declared_is_recorded_and_asked_again_on_the_page(
     entry = catalogue.install("postulo-example", by="ana")
     assert entry.requires_postulo == ">=0.2"
 
-    rows = {row["name"]: row for row in installing.status()}
+    rows = {row["name"]: row for row in provenance.status()}
     assert rows["postulo-example"]["compatible"] is True
 
     # The core moved on and left it behind: what the record says is what the page asks.
     entry.requires_postulo = "<0.1"
     installing.write_record([entry])
-    rows = {row["name"]: row for row in installing.status()}
+    rows = {row["name"]: row for row in provenance.status()}
     assert rows["postulo-example"]["compatible"] is False
 
     client.force_login(admin)
@@ -1078,5 +1078,5 @@ def test_what_a_release_declared_is_recorded_and_asked_again_on_the_page(
 def test_an_upload_declares_nothing_and_is_never_marked(tmp_path, plugins_dir, installer):
     entry = installing.install_wheel(a_wheel(tmp_path), by="ana")
     assert entry.requires_postulo == ""
-    rows = {row["name"]: row for row in installing.status()}
+    rows = {row["name"]: row for row in provenance.status()}
     assert rows["postulo-example"]["compatible"] is True

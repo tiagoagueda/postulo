@@ -12,8 +12,11 @@ import smtplib
 import ssl
 
 from django.core.mail.backends.smtp import EmailBackend
-from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
+
+# The choice itself lives with the other mail choices, below the models that store it
+# (#248); it is handed out here too, because this is where a reader looks for it.
+from .mail_choices import MailSecurity
 
 #: Split out only because it does not fit on a line inside the branch that raises it.
 NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port that does.")
@@ -21,19 +24,6 @@ NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port 
 #: The port each kind of connection is conventionally offered on. Used only to explain a
 #: failure -- never to refuse one, because a relay on a port of its own is ordinary.
 CONVENTIONAL_PORTS = {"none": (25,), "starttls": (587, 25), "ssl": (465,)}
-
-
-class MailSecurity(TextChoices):
-    """How TLS gets onto an SMTP session. Two ways, and they are not interchangeable.
-
-    STARTTLS connects in the clear and asks the server to upgrade the socket; implicit TLS
-    hands over a certificate before a byte of SMTP is spoken. Point one at the other's port
-    and nothing happens until the timeout, because each is waiting for the other to speak.
-    """
-
-    NONE = "none", _("None")
-    STARTTLS = "starttls", _("STARTTLS, after connecting")
-    SSL = "ssl", _("TLS from the first byte")
 
 
 #: The port each kind of connection is normally offered on. A suggestion, filled in when

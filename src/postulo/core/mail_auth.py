@@ -31,39 +31,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
-
-class MailAuth(TextChoices):
-    """How a mail server is told who is connecting.
-
-    Blank keeps the meaning it has in every other column on the Email page: not set from the
-    interface, so the environment answers -- and the environment's default is a password,
-    which is what every existing instance uses.
-    """
-
-    PASSWORD = "password", _("A password, or an app password")
-    XOAUTH2 = "xoauth2", _("XOAUTH2, with a token from the provider")
-
-
-class MailGrant(TextChoices):
-    """Which OAuth grant fetches the token, which is a question about who is consenting.
-
-    **Signed in once** is an ordinary authorization-code grant: an operator agrees on a
-    consent screen, as the mailbox that will be sending, and the refresh token is kept. It
-    needs no administrator of anything and works at both providers.
-
-    **The application sends on its own** is the client-credentials grant, which suits a
-    server better -- nobody's session is involved and nothing expires because a person left.
-    It needs a tenant administrator, an application registration and a permission scoped to
-    one mailbox, which is Microsoft's route. Google's equivalent is a service account with
-    domain-wide delegation, a different grant again and one not every operator can create, so
-    it is not offered rather than offered and broken.
-    """
-
-    MAILBOX = "mailbox", _("Signed in once, as the mailbox that sends")
-    APPLICATION = "application", _("The application sends on its own")
+# The choices live with the other mail choices, below the models that store them (#248);
+# they are handed out here too, because this is where a reader looks for them.
+from .mail_choices import (  # noqa: F401 - re-exported: the Email page and the SMTP plugin
+    MailAuth,
+    MailGrant,
+)
 
 
 @dataclass(frozen=True)

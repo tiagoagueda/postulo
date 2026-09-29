@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.models import OwnedModel
 from postulo.jobs import esco
 
-from . import translating
+from . import translatable
 
 
 def split_highlights(text: str) -> list[str]:
@@ -180,7 +180,7 @@ class Skill(ResumeItem):
         name was written in, and the reader's because that is the language the skill box
         offered names in.
         """
-        languages = [translating.record_language_of(self.owner)] if self.owner_id else []
+        languages = [translatable.record_language_of(self.owner)] if self.owner_id else []
         self.esco_uri = esco.skill_for(self.name, *languages, get_language() or "")
         return self.esco_uri
 
@@ -345,12 +345,12 @@ class Translation(OwnedModel):
     does not exist, a language that is not a language, and two spellings of the same key.
 
     So: a generic link, exactly as `CVItem` and `PostalAddress` already use, with the field
-    name checked against `translating.TRANSLATABLE` when it is set. The constraint is what
+    name checked against `translatable.TRANSLATABLE` when it is set. The constraint is what
     a JSON map could not have — one text per field per language per entry, in the database
     rather than in whoever wrote the last save (#131).
 
     **Blank is withdrawal, not emptiness.** A translation somebody cleared renders as the
-    original, so `translating.stored_for` drops blank rows. The row is left alone rather
+    original, so `translatable.stored_for` drops blank rows. The row is left alone rather
     than deleted, because the alternative is a form that silently removes what it was given.
     """
 
@@ -361,7 +361,7 @@ class Translation(OwnedModel):
     entry = GenericForeignKey("content_type", "object_id")
 
     language = models.CharField(_("language"), max_length=10)
-    field = models.CharField(_("field"), max_length=translating.MAX_FIELD_LENGTH)
+    field = models.CharField(_("field"), max_length=translatable.MAX_FIELD_LENGTH)
     text = models.TextField(_("text"), blank=True)
 
     class Meta:

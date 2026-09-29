@@ -28,13 +28,11 @@ untouched — not a session.
 
 from __future__ import annotations
 
-import hashlib
-import secrets
-
 from django.utils.translation import gettext as _
 
-#: 32 bytes, so guessing is not a strategy. Long enough that the URL is obviously a secret.
-TOKEN_BYTES = 32
+# The token and its fingerprint live below the models that store one (#248). Handed out here
+# as well, under the names this module has always given them.
+from .tokens import TOKEN_BYTES, fingerprint, new_token  # noqa: F401 - re-exported: tests
 
 
 class Unusable(Exception):
@@ -43,20 +41,6 @@ class Unusable(Exception):
     One exception for all four, deliberately. Telling somebody holding a bad link *which*
     kind of bad it is tells them whether it ever existed, and a link is a whole account.
     """
-
-
-def new_token() -> str:
-    return secrets.token_urlsafe(TOKEN_BYTES)
-
-
-def fingerprint(token: str) -> str:
-    """What is stored. A link only ever needs checking, so nothing keeps the token itself.
-
-    Unsalted SHA-256 rather than a password hash, and that is the right choice here: the
-    input is 32 random bytes, so there is no dictionary to run and nothing for a salt to
-    frustrate. A slow hash would only slow the person using their own link.
-    """
-    return hashlib.sha256(token.encode()).hexdigest()
 
 
 def issue(person, *, by):

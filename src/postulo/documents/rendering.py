@@ -15,7 +15,14 @@ from django.utils.translation import gettext_lazy as _
 
 from . import formats as file_formats
 from . import themes
-from .models import CV, CoverLetter, CVKind, RenderedDocument
+from .models import (
+    CV,
+    CoverLetter,
+    CVKind,
+    RenderedDocument,
+    document_direction,
+    document_language,
+)
 from .pdf import html_to_pdf
 
 #: Only these placeholders are substituted, and only these.
@@ -65,39 +72,6 @@ def document_title(document) -> str:
     if holder and kind:
         return gettext("%(name)s — %(kind)s") % {"name": holder, "kind": kind}
     return holder or kind or getattr(document, "name", "")
-
-
-def document_language(document) -> str:
-    """The language tag a rendered document declares, best answer first.
-
-    What the document itself says, then what its owner reads Postulo in, then the
-    instance default. British English is the last resort rather than the assumption: the
-    letter that goes out is the one a recruiter's screen reader may read aloud, and
-    declaring the wrong language there makes it unintelligible rather than merely
-    untidy — hyphenation and justification follow the same declaration.
-    """
-    from postulo.core import site
-
-    own = (getattr(document, "language", "") or "").strip()
-    if own:
-        return own
-    profile = getattr(getattr(document, "owner", None), "profile", None)
-    from_profile = (getattr(profile, "language", "") or "").strip()
-    if from_profile:
-        return from_profile
-    return site.default_language() or "en-GB"
-
-
-def document_direction(document) -> str:
-    """``"rtl"`` or ``"ltr"`` for a rendered document, from the language it declares.
-
-    Not from whoever is looking at it. A person reading Postulo in Arabic may write a CV in
-    English, and the PDF that goes out has to be laid out for the language it is written in
-    — WeasyPrint hyphenates, justifies and orders the lines by this and by nothing else.
-    """
-    from postulo.core import languages
-
-    return languages.direction(document_language(document))
 
 
 @dataclass

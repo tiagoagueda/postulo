@@ -241,7 +241,7 @@ class LanguageSelect(forms.Select):
             option["attrs"]["lang"] = code
             if self.flagged:
                 from postulo.core import languages
-                from postulo.core.templatetags.postulo import flag_url
+                from postulo.core.flags import flag_url
 
                 option["attrs"]["data-flag"] = flag_url(languages.flag_country(code))
         return option

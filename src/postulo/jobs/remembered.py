@@ -299,7 +299,7 @@ def before_the_source_goes(page) -> None:
     The review reads the page from the kept source where there is one, so nothing else was
     kept beside it; thrown away first, the source would take the lesson with it.
     """
-    from . import pages
+    from . import kept
 
     capture = page.capture
     try:
@@ -308,7 +308,7 @@ def before_the_source_goes(page) -> None:
             return
         if not host_of(capture.url):
             return
-        learning["places"] = registry.page_places(capture.url, pages.read_source(page))
+        learning["places"] = registry.page_places(capture.url, kept.read_source(page))
         capture.learning = learning
         with transaction.atomic():
             capture.save(update_fields=["learning"])
@@ -318,13 +318,13 @@ def before_the_source_goes(page) -> None:
 
 def _records(capture) -> list:
     """The places of the page a capture was read from: from its kept source, else as kept."""
-    from . import pages
+    from . import kept
 
     page = capture.kept_page
     if page is not None and page.source:
         try:
-            html = pages.read_source(page)
-        except (pages.Unreadable, OSError):
+            html = kept.read_source(page)
+        except (kept.Unreadable, OSError):
             html = ""
         if html:
             return registry.page_places(capture.url, html)

@@ -13,7 +13,7 @@ from pathlib import Path
 
 from django.core.management.base import BaseCommand, CommandError
 
-from postulo.plugins import catalogue, installing
+from postulo.plugins import catalogue, installing, provenance
 
 
 class Command(BaseCommand):
@@ -52,7 +52,7 @@ class Command(BaseCommand):
     # ------------------------------------------------------------------ list
 
     def _list(self, options) -> None:
-        rows = installing.status()
+        rows = provenance.status()
         for row in rows:
             state = []
             if row["disabled"]:

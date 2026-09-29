@@ -224,7 +224,7 @@ def test_a_nominated_number_covers_that_account(user):
     phone_numbers.set_recovery(row, owner=user)
 
     with a_gateway():
-        assert phone_numbers.accounts_without_a_recovery_number() == 0
+        assert transport.accounts_without_a_recovery_number() == 0
         assert "text" in transport.recovery_routes()
 
 
@@ -234,7 +234,7 @@ def test_a_confirmed_number_nobody_nominated_covers_nothing(user):
     confirmed(user)
 
     with a_gateway():
-        assert phone_numbers.accounts_without_a_recovery_number() == 1
+        assert transport.accounts_without_a_recovery_number() == 1
         assert "text" not in transport.recovery_routes()
 
 

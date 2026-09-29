@@ -40,11 +40,12 @@ from html.parser import HTMLParser
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
-from .reader import (
+from postulo.plugins.api import Record
+
+from .common import (
     _ORDER,
     CEFR,
     CEFR_PARTS,
-    Record,
     _all,
     _find,
     _local,

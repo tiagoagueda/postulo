@@ -38,7 +38,6 @@ import hashlib
 import logging
 import secrets
 import tempfile
-import zlib
 from dataclasses import dataclass
 
 from django.core.files.base import ContentFile, File
@@ -50,6 +49,12 @@ from django.utils.translation import gettext as _
 
 from postulo.core import site
 
+from .kept import (  # noqa: F401 - re-exported: the page views and the tests read them here
+    Unreadable,
+    read_source,
+    read_source_bytes,
+    unpack,
+)
 from .models import Capture, CapturedPage, CaptureStatus, RenderedBy, RenderingKind
 
 logger = logging.getLogger(__name__)
@@ -421,39 +426,6 @@ def keep_source_quietly(
         except Exception:  # pragma: no cover - the answer is already a sentence
             logger.warning("Could not re-read capture %s", capture.pk, exc_info=True)
         return None, str(_("The source of the page could not be kept."))
-
-
-class Unreadable(Exception):
-    """A kept source is not gzip, or unpacks to more than it is allowed to be."""
-
-
-def unpack(packed: bytes, limit: int) -> bytes:
-    """Gunzip at most ``limit`` bytes, and refuse rather than truncate.
-
-    Bounded because what is on disk is not always what this module wrote: an archive can be
-    imported, a volume restored, and a few kilobytes of gzip can unpack to gigabytes. One
-    byte past the limit is :class:`Unreadable`, not a shortened file pretending to be whole.
-    """
-    unpacker = zlib.decompressobj(wbits=zlib.MAX_WBITS | 16)  # 16: expect a gzip header
-    try:
-        unpacked = unpacker.decompress(packed, limit + 1)
-    except zlib.error as error:
-        raise Unreadable("not a gzip file") from error
-    if len(unpacked) > limit:
-        raise Unreadable(f"more than {limit} bytes")
-    return unpacked
-
-
-def read_source_bytes(page: CapturedPage) -> bytes:
-    """The kept source as the bytes that were kept, never more than the instance's cap."""
-    with page.source.open("rb") as handle:
-        packed = handle.read()
-    return unpack(packed, site.capture_source_max_bytes())
-
-
-def read_source(page: CapturedPage) -> str:
-    """The kept source as text: what the parser was handed."""
-    return read_source_bytes(page).decode("utf-8", errors="replace")
 
 
 def excerpt_of(page: CapturedPage) -> tuple[str, bool]:

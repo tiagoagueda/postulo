@@ -151,7 +151,7 @@ class CountrySelect(forms.Select):
     """
 
     def create_option(self, name, value, *args, **kwargs):
-        from postulo.core.templatetags.postulo import flag_url
+        from postulo.core.flags import flag_url
 
         option = super().create_option(name, value, *args, **kwargs)
         code = str(value or "")

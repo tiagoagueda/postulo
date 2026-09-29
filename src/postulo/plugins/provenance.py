@@ -29,7 +29,7 @@ both of those from quietly coming undone (#94).
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
 
 from django.utils.translation import gettext_lazy as _
 
@@ -162,3 +162,69 @@ def of_record(entry, *, digests: dict[str, str] | None = None) -> Provenance:
             return Provenance(kind=kind, repository=repository)
 
     return Provenance(kind=UPLOADED)
+
+
+# ------------------------------------------------------------ the page's list
+
+
+def status() -> list[dict]:
+    """Everything this instance can do, and where each part of it came from.
+
+    The record *and the built-ins*, because until #94 this page listed what an
+    administrator had installed and not what the instance could actually do -- so somebody
+    asking "can this instance read a posting off a page" was looking in the wrong place.
+    The two built-in sources never pass through here; they are Python classes in the image.
+
+    Provenance is derived rather than stored: an upload is checked against what the enabled
+    repositories currently sign, so a file that matches one is named as theirs however it
+    arrived. The checksums are fetched once for the whole list rather than once per row.
+
+    Here rather than in `installing`, which it used to be part of: every row is a question
+    about provenance, and `installing` asking this module while this module asks the
+    catalogue, which imports `installing`, was a loop (#248). The built-ins are still found
+    by `installing`, whose log line says so when one will not describe itself.
+    """
+    from . import installing, registry
+    from .record import Installed, read_record
+
+    rows = []
+    for plugin_class in installing._every_builtin(registry):
+        mark = of_builtin(plugin_class)
+        # The same keys an installed row has, filled in with what is true of a built-in:
+        # no checksum, nobody installed it, no date. One shape means every reader of this
+        # list -- the page, the command, a future one -- works on both kinds (#94).
+        rows.append(
+            {
+                **asdict(Installed(name=getattr(plugin_class, "name", ""), version="")),
+                "version": str(getattr(plugin_class, "version", "") or ""),
+                "origin": "internal",
+                "present": True,
+                "compatible": True,
+                "removable": mark.removable,
+                "provenance": mark.kind,
+                "provenance_label": mark.label,
+                "provenance_explanation": mark.explanation,
+                "repository": "",
+                "summary": str(getattr(plugin_class, "description", "") or ""),
+            }
+        )
+
+    entries = read_record()
+    digests = signed_digests() if entries else {}
+    for entry in entries:
+        mark = of_record(entry, digests=digests)
+        rows.append(
+            {
+                **asdict(entry),
+                "present": installing._is_present(entry.name),
+                # Asked again on every page, not only at install: a core upgrade is what
+                # changes the answer, and the page is where it should show (#186).
+                "compatible": installing.compatible(entry.requires_postulo),
+                "removable": mark.removable,
+                "provenance": mark.kind,
+                "provenance_label": mark.label,
+                "provenance_explanation": mark.explanation,
+                "repository": mark.repository,
+            }
+        )
+    return rows

@@ -42,7 +42,7 @@ import re
 import zipfile
 from xml.sax.saxutils import escape, quoteattr
 
-from .formats import BULLETS, HEADING, Outline
+from .outline import BULLETS, HEADING, Outline
 
 CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 

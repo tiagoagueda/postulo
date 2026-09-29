@@ -39,8 +39,13 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from asgiref.local import Local
 from django.utils.translation import gettext_lazy as _
+
+from postulo.core import memo
+
+# The forgetting lives with the memo, which a policy row can import when it is saved; it is
+# handed out here too -- the middleware and the scheduler call it here (#248).
+from postulo.core.memo import forget_decisions
 
 #: Kinds a person may hold an opinion about. A transport is deliberately not one of them.
 GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature")
@@ -138,29 +143,15 @@ def is_ungoverned(plugin_name: str) -> bool:
     )
 
 
-#: One request's answers, keyed on the record's stamp so that installing or removing a
-#: plugin throws them away by itself (#231). `decide` reads the record from disk and asks the
-#: policy table, and a company's page asks it six times -- once per mark it draws -- for six
-#: identical answers. Cleared at every request boundary and whenever a policy row is written.
-_memo = Local()
-
-
-def forget_decisions() -> None:
-    """Drop this thread's memoised decisions. See `_memo`."""
-    try:
-        del _memo.answers
-    except AttributeError:
-        pass
-
-
 def _answers() -> dict:
+    """This request's answers, in `memo.decisions` (#231)."""
     from .installing import record_stamp
 
     stamp = record_stamp()
-    held = getattr(_memo, "answers", None)
+    held = getattr(memo.decisions, "answers", None)
     if held is None or held[0] != stamp:
         held = (stamp, {})
-        _memo.answers = held
+        memo.decisions.answers = held
     return held[1]
 
 
@@ -274,13 +265,13 @@ def overview(person, *, internal: bool = False) -> list[dict]:
     decided for this person, or for everybody, stays on the page whatever was asked, so a
     decision held over an account never hides behind a check mark.
     """
-    from . import base, installing, kinds
+    from . import base, kinds, provenance
     from .registry import plugins
 
     # Where each plugin came from, read once for the whole page rather than per row: the
     # answer for an installed one involves the record and the repositories' checksums, and
     # asking eight times would ask eight times (#184).
-    marks = {row["name"]: row for row in installing.status()}
+    marks = {row["name"]: row for row in provenance.status()}
 
     rows = []
     for kind in GOVERNED_KINDS:
@@ -327,3 +318,26 @@ def plugins_for(person, kind: str) -> list:
     if kind not in GOVERNED_KINDS:
         return plugins(kind)
     return [item for item in plugins(kind) if decide(item.name, person).on]
+
+
+def connected_plugins(person=None) -> list:
+    """Every installed plugin a person can connect to, whatever its kind.
+
+    A built-in that needs nothing from anyone — the local document store — says so with
+    ``needs_connection = False`` and is left off the list: there is no form to draw.
+
+    Given a person, what an administrator has decided for them applies (#95). Without one
+    this is every installed plugin, which is what an administration page wants.
+
+    Here rather than in the registry because it asks this module when it is given a person:
+    the registry is what everything below the models reads, and it reached up into the policy
+    through an import moved inside the function (#248).
+    """
+    from . import registry
+    from .base import CONNECTED_KINDS
+
+    found: list = []
+    for kind in CONNECTED_KINDS:
+        of_kind = plugins_for(person, kind) if person is not None else registry.plugins(kind)
+        found.extend(p for p in of_kind if getattr(p, "needs_connection", True))
+    return found

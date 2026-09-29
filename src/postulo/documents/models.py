@@ -35,6 +35,11 @@ from postulo.core.models import OwnedModel
 
 from . import kinds, themes
 
+# The stored values of Postulo's own kinds live with the registry that describes them, which
+# no longer has to import this module to find them (#248). Handed out here as well, because
+# this is where the archive and the tests -- a plugin's own among them -- find them.
+from .kinds import DocumentKind
+
 
 def upload_to_documents(instance, filename: str) -> str:
     """Store files under the owner, so a stray path can only ever reach one person.
@@ -78,6 +83,43 @@ def renders_of(draft):
     ).order_by("-rendered_at", "pk")
 
 
+def document_language(document) -> str:
+    """The language tag a rendered document declares, best answer first.
+
+    What the document itself says, then what its owner reads Postulo in, then the
+    instance default. British English is the last resort rather than the assumption: the
+    letter that goes out is the one a recruiter's screen reader may read aloud, and
+    declaring the wrong language there makes it unintelligible rather than merely
+    untidy — hyphenation and justification follow the same declaration.
+
+    Beside the models rather than in `rendering`, because a document asks it of itself
+    (`effective_language`) and the models importing the renderer was a cycle (#248).
+    `rendering` still hands it out.
+    """
+    from postulo.core import site
+
+    own = (getattr(document, "language", "") or "").strip()
+    if own:
+        return own
+    profile = getattr(getattr(document, "owner", None), "profile", None)
+    from_profile = (getattr(profile, "language", "") or "").strip()
+    if from_profile:
+        return from_profile
+    return site.default_language() or "en-GB"
+
+
+def document_direction(document) -> str:
+    """``"rtl"`` or ``"ltr"`` for a rendered document, from the language it declares.
+
+    Not from whoever is looking at it. A person reading Postulo in Arabic may write a CV in
+    English, and the PDF that goes out has to be laid out for the language it is written in
+    — WeasyPrint hyphenates, justifies and orders the lines by this and by nothing else.
+    """
+    from postulo.core import languages
+
+    return languages.direction(document_language(document))
+
+
 class HasALanguage:
     """What every document can be asked: which language it is in, and its name.
 
@@ -89,10 +131,10 @@ class HasALanguage:
     def language_name(self) -> str:
         """The language's own name for itself, or nothing where none is known."""
         from postulo.core import languages
-        from postulo.resume import translating
+        from postulo.resume import translatable
 
         code = self.effective_language
-        return languages.NATIVE_NAMES.get(translating.normalise(code), "") if code else ""
+        return languages.NATIVE_NAMES.get(translatable.normalise(code), "") if code else ""
 
 
 class DeclaresALanguage(HasALanguage):
@@ -110,8 +152,6 @@ class DeclaresALanguage(HasALanguage):
         """Cached, because a card asks for the language and then for its name, and the
         last step of the fallback reads the instance's settings row -- which is not cached
         itself (#231), so asking three times a card is three reads a card (#280)."""
-        from .rendering import document_language
-
         return document_language(self)
 
 
@@ -420,18 +460,6 @@ class CoverLetter(DeclaresALanguage, OwnedModel):
         if self.kind == LetterKind.MOTIVATION:
             return DocumentKind.MOTIVATION_LETTER
         return DocumentKind.COVER_LETTER
-
-
-class DocumentKind(models.TextChoices):
-    CV = "cv", _("CV")
-    COVER_LETTER = "cover_letter", _("Cover letter")
-    MOTIVATION_LETTER = "motivation_letter", _("Motivation letter")
-    CERTIFICATE = "certificate", _("Certificate")
-    PORTFOLIO = "portfolio", _("Portfolio")
-    #: A job-search report, frozen at the moment somebody downloads it (#162).
-    REPORT = "report", _("Report")
-    REFERENCE = "reference", _("Reference")
-    OTHER = "other", _("Other")
 
 
 class UploadedDocument(RecordsALanguage, OwnedModel):

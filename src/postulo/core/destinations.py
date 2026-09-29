@@ -33,6 +33,7 @@ import ipaddress
 import smtplib
 import socket
 
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 type Address = ipaddress.IPv4Address | ipaddress.IPv6Address
@@ -85,10 +86,12 @@ def approve(host: str, *, allow_private: bool) -> Address:
 
 
 def private_allowed() -> bool:
-    """The operator's one decision, reused rather than reinvented."""
-    from postulo.plugins.http import private_destinations_allowed
+    """The operator's one decision, ``POSTULO_CONNECTIONS_ALLOW_PRIVATE``, read in one place.
 
-    return private_destinations_allowed()
+    Here rather than in `plugins.http`, which asks this module in turn: the plugin client and
+    the mail check are two guards and one switch, and the switch belongs below both (#248).
+    """
+    return bool(getattr(settings, "POSTULO_CONNECTIONS_ALLOW_PRIVATE", False))
 
 
 # ------------------------------------------------- dialling an address, proving a name

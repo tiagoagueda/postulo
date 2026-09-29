@@ -188,6 +188,19 @@ postulo/
 └── tests/                    # incl. tests/security/ and the browser suite tests/e2e/
 ```
 
+**Which way an import points.** Every module sits in one of six layers, bottom first:
+*foundation* (what the settings import, and the small leaves every layer may use),
+*contract* (what a plugin is, how one is found, and the guard every outbound request goes
+through), *records* (the models and what their fields are built from), *governance*
+(installing, trusting and switching plugins), *features* (every app's services and forms,
+and any module the table does not name), and *interface* (views, URLs, the admin, template tags, commands, migrations and
+the API). A module imports its own layer or one below it, never one above, and no two modules
+import each other -- counting the imports written inside functions, which is where a cycle
+used to hide -- except three pairs written down with the reason each stays (#248).
+`tests/test_import_layers.py` holds the table and fails on an upward import or a new cycle,
+and `tests/test_imports_alone.py` imports every module first, in an interpreter that has
+loaded nothing of Postulo's.
+
 **What is not in this tree.** The documentation is a repository of its own, the wiki
 (`postulo.wiki`, since #169): installing, configuration, hardening, every feature page,
 and *Writing a plugin*. So are the official plugins that live outside the box --

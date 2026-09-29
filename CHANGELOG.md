@@ -25,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Postulo's modules import in one direction now, and a test keeps them so. (#248)
 - A table's sort icon sits at the end of its header, so a row of them lines up: on the right in English, on the left in Arabic, with a numeric column's name beside it. A column's resize handle no longer covers part of it. (#317)
 - The forms on *Your details* and every *Settings* page stop at the company form's width beside their sidebar, instead of running across a wide monitor; from 1536 pixels a contact's details sit beside its numbers and links, and the capture form beside its help. (#320)
 - A page with no structured data is read further: its OpenGraph and Twitter card properties, a title line split into job, employer and place where the page vouches for each, and a salary and closing date in the page's own language. What nothing vouches for stays empty. (#267)

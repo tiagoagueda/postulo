@@ -10,7 +10,7 @@ import json
 import pytest
 
 from postulo.jobs.models import Capture, CaptureStatus
-from postulo.plugins import fetching
+from postulo.plugins import fetching, public_addresses
 from postulo.plugins.base import JobPostingData
 from postulo.plugins.builtin import PageMetadataSource, SchemaOrgSource
 from postulo.plugins.builtin.htmlutil import extract_jsonld, extract_meta, html_to_text
@@ -230,7 +230,7 @@ def resolves_to(monkeypatch):
 
     def _install(address: str):
         monkeypatch.setattr(
-            fetching.socket,
+            public_addresses.socket,
             "getaddrinfo",
             lambda *args, **kwargs: [(None, None, None, "", (address, 0))],
         )
@@ -325,7 +325,7 @@ def test_only_http_and_https_are_fetched(url):
 def test_a_hostname_resolving_to_both_public_and_private_is_refused(monkeypatch):
     """Answering with one of each would otherwise be a way in."""
     monkeypatch.setattr(
-        fetching.socket,
+        public_addresses.socket,
         "getaddrinfo",
         lambda *a, **k: [
             (None, None, None, "", ("93.184.216.34", 0)),
@@ -339,9 +339,9 @@ def test_a_hostname_resolving_to_both_public_and_private_is_refused(monkeypatch)
 
 def test_a_hostname_that_does_not_resolve_is_refused(monkeypatch):
     def explode(*args, **kwargs):
-        raise fetching.socket.gaierror("no such host")
+        raise public_addresses.socket.gaierror("no such host")
 
-    monkeypatch.setattr(fetching.socket, "getaddrinfo", explode)
+    monkeypatch.setattr(public_addresses.socket, "getaddrinfo", explode)
 
     with pytest.raises(fetching.UnsafeURL, match="could not be resolved"):
         fetching.validate_public_url("https://nowhere.example.org/")

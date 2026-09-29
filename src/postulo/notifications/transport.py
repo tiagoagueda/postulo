@@ -109,6 +109,25 @@ def configuration(transport) -> dict:
     return {**(row.transport_config or {}), **row.transport_secrets}
 
 
+def email_sign_in() -> bool:
+    """Whether this instance offers signing in with a code sent by email.
+
+    Two conditions, and the second is the one #152 exists for: an administrator has said yes,
+    **and** mail is actually getting through. Offering it on an instance whose relay is broken
+    is a sign-in page promising something it cannot do, to somebody who may have no other way
+    in — which is the worst moment to be optimistic.
+
+    Here rather than in `core.site`, beside the other policy questions, because the second
+    condition is this module's: `site` sits under the models, and asking which transport is
+    selected from there was an import pointing back up (#248).
+    """
+    from postulo.core import site
+
+    if not site.current().email_sign_in:
+        return False
+    return selected() is not None and site.mail_delivers()
+
+
 class PluggableBackend(BaseEmailBackend):
     """The one backend named in ``MAILERS``. It carries nothing and chooses at send time.
 
@@ -258,9 +277,7 @@ def _text_reaches_everybody(without: str = "") -> bool:
     carrier = selected(base.TEXT)
     if carrier is None or carrier.name == without:
         return False
-    from postulo.core import phone_numbers
-
-    return not phone_numbers.accounts_without_a_recovery_number()
+    return not accounts_without_a_recovery_number()
 
 
 def recovery_routes(*, without: str = "") -> list[str]:
@@ -303,6 +320,33 @@ def accounts_needing_email() -> int:
             ).values_list("owner_id", flat=True)
         )
     return get_user_model().objects.filter(is_active=True).exclude(pk__in=covered).count()
+
+
+def accounts_without_a_recovery_number() -> int:
+    """Active accounts that a text message could not get back into.
+
+    Counted rather than assumed, exactly as the passkey count is: on every instance today
+    this is every account, because nothing can confirm a number yet, and the day that stops
+    being true it stops being true here without anything else changing.
+
+    Beside `accounts_needing_email`, its near twin, because the interlock is the one thing
+    that asks it: in `core.phone_numbers` it closed a loop through the channels back into
+    this module (#248).
+    """
+    from django.contrib.auth import get_user_model
+    from django.contrib.contenttypes.models import ContentType
+    from django.utils import timezone
+
+    from postulo.accounts.models import Profile
+    from postulo.core.models import PhoneNumber
+
+    fresh_enough = timezone.now() - PhoneNumber.VERIFICATION_LASTS
+    with_one = PhoneNumber.objects.filter(
+        content_type=ContentType.objects.get_for_model(Profile),
+        is_recovery=True,
+        verified_at__gte=fresh_enough,
+    ).values_list("owner_id", flat=True)
+    return get_user_model().objects.filter(is_active=True).exclude(pk__in=with_one).count()
 
 
 def refuse_switching_off(name: str) -> str:

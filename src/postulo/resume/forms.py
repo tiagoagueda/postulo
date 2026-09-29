@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.forms import OwnerScopedModelForm
 
-from . import translating
+from . import translatable
 from .models import (
     Certification,
     Education,
@@ -230,7 +230,7 @@ class LinkForm(ResumeItemForm):
 class TranslationForm(forms.Form):
     """What one entry says in one other language.
 
-    Built from `translating.TRANSLATABLE` rather than declared, so the decision about which
+    Built from `translatable.TRANSLATABLE` rather than declared, so the decision about which
     fields may be said differently lives in one place and this screen cannot quietly offer a
     field that decision left out (#131).
 
@@ -244,7 +244,7 @@ class TranslationForm(forms.Form):
         self.entry = entry
         self.language = language
         self.originals: dict[str, str] = {}
-        for name in translating.fields_for(entry):
+        for name in translatable.fields_for(entry):
             model_field = entry._meta.get_field(name)
             long = isinstance(model_field, django_models.TextField)
             self.fields[name] = forms.CharField(
@@ -266,7 +266,7 @@ class TranslationForm(forms.Form):
     def save(self) -> int:
         """Write what was typed, and blank what was cleared. Returns how many say something.
 
-        A cleared box leaves an empty row rather than deleting it: `translating.stored_for`
+        A cleared box leaves an empty row rather than deleting it: `translatable.stored_for`
         already reads blank as withdrawn, and a form that deletes rows on save is a form
         that loses somebody's work to a mis-click on a field they never opened.
         """
@@ -299,11 +299,11 @@ class AddLanguageForm(forms.Form):
         from postulo.accounts.forms import LanguageSelect
         from postulo.core import languages
 
-        taken = {translating.normalise(code) for code in exclude}
+        taken = {translatable.normalise(code) for code in exclude}
         choices = [
             (code, name)
             for code, name in languages.LANGUAGES
-            if translating.normalise(code) not in taken
+            if translatable.normalise(code) not in taken
         ]
         self.fields["language"].choices = choices
         self.fields["language"].widget = LanguageSelect(choices=choices)

@@ -94,7 +94,7 @@ def _protocol_for(kind: str):
 def _disabled() -> set[str]:
     """Plugins an administrator has switched off. They stay installed and do not load."""
     try:
-        from .installing import disabled_names
+        from .record import disabled_names
 
         return disabled_names()
     except Exception:  # pragma: no cover - a broken record must not take capture down
@@ -103,7 +103,7 @@ def _disabled() -> set[str]:
 
 
 def _distribution_of(entry_point) -> str:
-    from .installing import canonicalise
+    from .record import canonicalise
 
     distribution = getattr(entry_point, "dist", None)
     name = getattr(distribution, "name", "") if distribution is not None else ""
@@ -257,7 +257,7 @@ def catch_up() -> bool:
     """
     global _stamp
 
-    from .installing import activate, record_stamp
+    from .record import activate, record_stamp
 
     now = record_stamp()
     if now == _stamp:
@@ -323,24 +323,6 @@ def find_any(name: str):
         if found is not None:
             return found
     return None
-
-
-def connected_plugins(person=None) -> list:
-    """Every installed plugin a person can connect to, whatever its kind.
-
-    A built-in that needs nothing from anyone — the local document store — says so with
-    ``needs_connection = False`` and is left off the list: there is no form to draw.
-
-    Given a person, what an administrator has decided for them applies (#95). Without one
-    this is every installed plugin, which is what an administration page wants.
-    """
-    from .policy import plugins_for
-
-    found: list = []
-    for kind in CONNECTED_KINDS:
-        of_kind = plugins_for(person, kind) if person is not None else plugins(kind)
-        found.extend(p for p in of_kind if getattr(p, "needs_connection", True))
-    return found
 
 
 def available_sources(*, refresh: bool = False) -> list[SourcePlugin]:

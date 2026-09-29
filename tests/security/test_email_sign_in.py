@@ -20,8 +20,8 @@ import pytest
 from django.test import override_settings
 from django.urls import reverse
 
-from postulo.core import site
 from postulo.core.models import SiteSettings
+from postulo.notifications import transport
 
 pytestmark = pytest.mark.django_db
 
@@ -58,7 +58,7 @@ def give_an_authenticator(account):
 
 
 def test_it_is_off_until_an_administrator_says_otherwise(db):
-    assert site.email_sign_in() is False
+    assert transport.email_sign_in() is False
 
 
 def test_the_door_is_shut_while_it_is_off(client, db):
@@ -66,7 +66,7 @@ def test_the_door_is_shut_while_it_is_off(client, db):
 
 
 def test_saying_yes_opens_it(client, offering):
-    assert site.email_sign_in() is True
+    assert transport.email_sign_in() is True
     assert client.get(reverse("account_request_login_code")).status_code == 200
 
 
@@ -74,16 +74,14 @@ def test_broken_mail_shuts_it_again(client, offering):
     """#152's whole point, arriving where it matters most."""
     SiteSettings.objects.filter(pk=1).update(mail_failures=SiteSettings.MAIL_FAILURES_BEFORE_BROKEN)
 
-    assert site.email_sign_in() is False
+    assert transport.email_sign_in() is False
     assert client.get(reverse("account_request_login_code")).status_code == 404
 
 
 def test_no_transport_shuts_it_too(client, offering, monkeypatch):
-    from postulo.notifications import transport
-
     monkeypatch.setattr(transport, "selected", lambda *a, **k: None)
 
-    assert site.email_sign_in() is False
+    assert transport.email_sign_in() is False
 
 
 def test_the_sign_in_page_does_not_advertise_what_it_will_not_do(client, db):

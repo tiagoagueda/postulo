@@ -179,6 +179,8 @@ class AccountView(SettingsSectionMixin, UpdateView):
     def get_context_data(self, **kwargs):
         from allauth.mfa.adapter import get_adapter as get_mfa_adapter
 
+        from postulo.notifications import transport
+
         context = super().get_context_data(**kwargs)
         context["addresses"] = self.request.user.emailaddress_set.order_by("-primary", "email")
         context["email_url"] = reverse("account_email")
@@ -189,7 +191,7 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["password_url"] = reverse("account_change_password")
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
         # A fourth way in, on a page that already explains three (#153).
-        context["email_sign_in"] = site.email_sign_in()
+        context["email_sign_in"] = transport.email_sign_in()
         context["mfa_url"] = reverse("mfa_index")
         context["passkeys"] = passkeys.summary(self.request.user, self.request)
         context["sso_is_second_factor"] = site.sso_is_second_factor()

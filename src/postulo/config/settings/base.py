@@ -231,8 +231,8 @@ ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 # Signing in with a code sent to the primary address (#153). This is on so that allauth
 # registers the route -- it reads this at import to build its URLs -- and *whether the
 # instance offers it* is an administrator's decision read at request time, from the database
-# and from whether mail is actually delivering. `postulo.core.site.email_sign_in` is the
-# answer that matters; this constant only decides that the door exists.
+# and from whether mail is actually delivering. `postulo.notifications.transport.email_sign_in`
+# is the answer that matters; this constant only decides that the door exists.
 #
 # A code and not a link, deliberately, and the reason is not theoretical. A link is a bearer
 # credential that works from anywhere, and corporate mail scanners *follow links* -- Defender,

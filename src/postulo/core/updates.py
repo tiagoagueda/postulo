@@ -103,11 +103,31 @@ def due() -> bool:
     return checked_at is None or timezone.now() - checked_at >= EVERY
 
 
+def installed_version() -> str:
+    """The version of the package that is actually running.
+
+    From the installed distribution's metadata when there is one — which is what a
+    wheel or an image carries — and from the package itself otherwise, so a source
+    checkout says the same thing.
+
+    Here, beside the check that compares it with the newest release, rather than in the
+    context processor that prints it in the footer: this module is asked by pages and by the
+    scheduler, and reaching up into a context processor for the number was an import
+    pointing the wrong way (#248). The context processor still hands it out.
+    """
+    from importlib.metadata import PackageNotFoundError, version
+
+    try:
+        return version("postulo")
+    except PackageNotFoundError:  # pragma: no cover - a checkout without an install
+        from postulo import __version__
+
+        return __version__
+
+
 def status() -> dict:
     """What a page may show: the last stored answer against the running version. Reads
     the cache and nothing else."""
-    from postulo.core.context_processors import installed_version
-
     current = installed_version()
     stored = cache.get(CACHE_KEY) or {}
     latest = stored.get("latest", "")

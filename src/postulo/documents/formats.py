@@ -29,62 +29,21 @@ from dataclasses import dataclass
 
 from django.utils.translation import gettext_lazy as _
 
+# What an outline is made of lives in `outline`, which `docx` reads without reaching the
+# registry below (#248). Handed out here too, where the renderer and the views look for it.
+from .outline import (  # noqa: F401 - re-exported: rendering, views
+    BULLET,
+    BULLETS,
+    HEADING,
+    PARAGRAPH,
+    Block,
+    Outline,
+    bullets,
+    heading,
+    paragraph,
+)
+
 logger = logging.getLogger(__name__)
-
-#: The three things an outline is made of.
-HEADING = "heading"
-PARAGRAPH = "paragraph"
-BULLETS = "bullets"
-
-#: What a bullet is written with in plain text. A hyphen rather than a typographic bullet:
-#: this is the text that gets pasted into somebody else's form, and a form that mangles
-#: anything mangles what is not ASCII first.
-BULLET = "- "
-
-
-@dataclass(frozen=True)
-class Block:
-    """One piece of a document: a heading, a paragraph, or a list."""
-
-    kind: str
-    text: str = ""
-    #: 1 for the document's own name, 2 for a section, 3 for an entry inside one. The same
-    #: three levels the themes draw as `<h1>`, `<h2>` and `<h3>`, so a Word file has the
-    #: outline the PDF's tag tree has.
-    level: int = 0
-    items: tuple[str, ...] = ()
-    #: Whether this stands apart from what is above it, where nothing else says so. A
-    #: heading below the first always does; a paragraph does when it opens a new part of
-    #: the page, as the summary does under the contact details.
-    apart: bool = False
-
-
-def heading(text: str, level: int) -> Block:
-    return Block(kind=HEADING, text=text, level=level)
-
-
-def paragraph(text: str, *, apart: bool = False) -> Block:
-    return Block(kind=PARAGRAPH, text=text, apart=apart)
-
-
-def bullets(items) -> Block:
-    return Block(kind=BULLETS, items=tuple(items))
-
-
-@dataclass(frozen=True)
-class Outline:
-    """A document as its words: what every format is handed.
-
-    ``title`` is what a viewer shows for the file and what it is called on the way out;
-    ``author`` is empty where the person left their name off the document, because a name
-    taken off the page was not meant to stay in the file's properties.
-    """
-
-    title: str
-    language: str
-    direction: str = "ltr"
-    author: str = ""
-    blocks: tuple[Block, ...] = ()
 
 
 def as_text(outline: Outline) -> str:

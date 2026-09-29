@@ -71,7 +71,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         settle_interview,
     )
     from postulo.applications.suggestions import suggest
-    from postulo.core.csv_import import CURRENCY_CODES
+    from postulo.core.currencies import CURRENCY_CODES
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
@@ -285,7 +285,7 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # the spreadsheet importer reads salaries with, one list rather than two -- and is this
     # part of a title a place, which the offline city table the map uses answers, or answers
     # with ``None`` where it does not know or has not been downloaded.
-    "CURRENCY_CODES": ("postulo.core.csv_import", "CURRENCY_CODES"),
+    "CURRENCY_CODES": ("postulo.core.currencies", "CURRENCY_CODES"),
     "place_of": ("postulo.jobs.places", "resolve"),
 }
 

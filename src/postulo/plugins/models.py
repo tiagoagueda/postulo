@@ -166,9 +166,10 @@ class PluginPolicy(models.Model):
         `policy.decide` is memoised for the request, keyed on the plugins record's stamp --
         which moves when a plugin is installed or switched off, and does not move when a row
         here changes. So writing one of these rows is the other thing that makes an answer
-        wrong, and it says so itself rather than leaving every caller to remember.
+        wrong, and it says so itself rather than leaving every caller to remember. The memo
+        lives in `core.memo`, below this module, since `policy` reads these rows (#248).
         """
-        from .policy import forget_decisions
+        from postulo.core.memo import forget_decisions
 
         forget_decisions()
 

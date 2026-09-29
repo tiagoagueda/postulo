@@ -300,17 +300,15 @@ def _address(prefix: str, path: str) -> str:
     return _CONVERTER.sub(r"{\1}", full)
 
 
-def _statuses(api, router, path: str, operation) -> list[int]:
+def _statuses(api, router, path: str, operation, scoped: type) -> list[int]:
     """Which refusals *this* call can actually make.
 
     Declared per call rather than a blanket five, because a description that says a
     collection may answer 404 is a description that lies: a client generated from it writes
     a branch that never runs, and the one that does run is the one nobody wrote.
     """
-    from .auth import ScopedAuth
-
     statuses = set(ALWAYS)
-    if any(isinstance(auth, ScopedAuth) for auth in _guards(api, router, operation)):
+    if any(isinstance(auth, scoped) for auth in _guards(api, router, operation)):
         statuses.add(403)  # a live token that does not carry this call's scope
     if "{" in path:
         statuses.add(404)  # an address naming a record, which may be nobody's or gone
@@ -322,7 +320,7 @@ def _statuses(api, router, path: str, operation) -> list[int]:
     return sorted(statuses)
 
 
-def describe(api, schema: dict) -> dict:
+def describe(api, schema: dict, *, scoped: type) -> dict:
     """Put the problem documents into the OpenAPI description, for every call at once.
 
     django-ninja describes what a call answers *with*; what it refuses with was nowhere, so
@@ -330,6 +328,10 @@ def describe(api, schema: dict) -> dict:
     likelier to meet first. Written here from the routers rather than as a `responses=` on
     each of the sixty-odd operations, for the reason `install` gives: the call added
     tomorrow is described without anybody remembering to describe it.
+
+    ``scoped`` is the guard whose tokens carry scopes, so a call behind it may answer 403.
+    Handed in by the API that uses it rather than imported: `auth` refuses through this
+    module, and this module reaching back for the guard was a pair of imports (#248).
     """
     schema.setdefault("components", {}).setdefault("schemas", {})["Problem"] = Problem.json_schema()
     reference = {
@@ -347,7 +349,7 @@ def describe(api, schema: dict) -> dict:
                     if entry is None:
                         continue
                     answers = entry.setdefault("responses", {})
-                    for status in _statuses(api, router, full, operation):
+                    for status in _statuses(api, router, full, operation, scoped):
                         # Keyed by the integer, which is how django-ninja keys the success
                         # it already described; the two spellings would be two entries for
                         # one status once this is serialised.

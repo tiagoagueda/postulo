@@ -1,9 +1,11 @@
 """Connections: a plugin's configuration and secrets, held per person, tested for real."""
 
+import ipaddress
+
 import pytest
 from django.urls import reverse
 
-from postulo.plugins import http, registry, secrets
+from postulo.plugins import http, policy, registry, secrets
 from postulo.plugins.base import FieldSpec
 from postulo.plugins.base import TestResult as Outcome  # not a test class, despite the name
 from postulo.plugins.models import Connection
@@ -103,10 +105,10 @@ def test_the_registry_knows_kinds_and_finds_plugins_by_name():
     assert "echo" in names and "email" in names, "the test plugin beside the built-in one"
     assert registry.find_plugin("notifier", "echo").label == "Echo"
     assert registry.find_plugin("notifier", "nope") is None
-    assert "echo" in [plugin.name for plugin in registry.connected_plugins()]
+    assert "echo" in [plugin.name for plugin in policy.connected_plugins()]
     # The local store is built in, in shape only: it needs no connection and is not offered.
     assert [plugin.name for plugin in registry.plugins("store")] == ["local"]
-    assert "local" not in [plugin.name for plugin in registry.connected_plugins()]
+    assert "local" not in [plugin.name for plugin in policy.connected_plugins()]
     with pytest.raises(ValueError, match="Unknown plugin kind"):
         registry.plugins("weather")
     # Sources are untouched by the generalisation.
@@ -377,15 +379,15 @@ def test_the_client_checks_every_request_it_makes(settings, monkeypatch):
             return httpx.Response(302, headers={"Location": "http://127.0.0.1/admin"})
         return httpx.Response(200, text="ok")
 
-    from postulo.plugins import fetching
+    from postulo.plugins import public_addresses
 
     monkeypatch.setattr(
-        fetching,
+        public_addresses,
         "_addresses_for",
         lambda host: (
-            [fetching.ipaddress.ip_address("93.184.216.34")]
+            [ipaddress.ip_address("93.184.216.34")]
             if host == "public.example.org"
-            else [fetching.ipaddress.ip_address("127.0.0.1")]
+            else [ipaddress.ip_address("127.0.0.1")]
         ),
     )
     with http.client(transport=httpx.MockTransport(handler)) as session:

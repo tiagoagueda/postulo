@@ -26,8 +26,6 @@ is not worth an argument.
 
 from __future__ import annotations
 
-import ipaddress
-import socket
 from dataclasses import dataclass
 from urllib.parse import urlparse, urlunparse
 from urllib.robotparser import RobotFileParser
@@ -37,17 +35,21 @@ from django.utils.translation import gettext as _
 
 from .base import CaptureError
 
-USER_AGENT = "Postulo (+https://source.tiagoagueda.com/postulo/postulo)"
+# The address check lives below both this module and `http`, which each need it (#248). The
+# names are handed out here too, because this is where the capture code, the links on a CV and
+# the server's own page have always found them.
+from .public_addresses import (  # noqa: F401 - re-exported: resume.links, server_views, tests
+    USER_AGENT,
+    UnsafeURL,
+    public_addresses_for,
+    validate_public_url,
+)
 
 #: Generous for an advert, mean for anything that is not one.
 MAX_BYTES = 2_000_000
 TIMEOUT_SECONDS = 10.0
 MAX_REDIRECTS = 3
 ROBOTS_TIMEOUT_SECONDS = 5.0
-
-
-class UnsafeURL(CaptureError):
-    """The URL points somewhere Postulo will not go."""
 
 
 class RobotsDisallowed(CaptureError):
@@ -93,52 +95,6 @@ def _describe_failure(status: int) -> str:
             % {"status": status}
         )
     return str(_("That page returned %(status)s.") % {"status": status})
-
-
-def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
-    try:
-        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
-    except socket.gaierror as exc:
-        raise UnsafeURL(_("That hostname could not be resolved.")) from exc
-    return [ipaddress.ip_address(info[4][0]) for info in infos]
-
-
-def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
-    """Every address ``url``'s host answers with, once they have all been approved.
-
-    Every resolved address is checked, not just the first: a hostname answering with one
-    public and one private address would otherwise be a way through.
-
-    The list comes back rather than being thrown away because the caller has to *connect*
-    to one of these. Resolving again at connection time is the gap this closes: a name
-    with a one-second lifetime is free to answer with a public address for the check and
-    a private one a moment later, and the check would have passed on an address nobody
-    ever contacted.
-    """
-    parts = urlparse(url.strip())
-
-    if parts.scheme not in {"http", "https"}:
-        raise UnsafeURL(_("Only http and https addresses can be captured."))
-    if not parts.hostname:
-        raise UnsafeURL(_("That does not look like a complete web address."))
-
-    addresses = _addresses_for(parts.hostname)
-    if not addresses:
-        raise UnsafeURL(_("That hostname could not be resolved."))
-    if not all(address.is_global for address in addresses):
-        raise UnsafeURL(
-            _(
-                "That address is on a private or local network, and Postulo will not "
-                "fetch it. Paste the posting text in by hand instead."
-            )
-        )
-    return addresses
-
-
-def validate_public_url(url: str) -> str:
-    """Check a URL is one Postulo is willing to fetch, and return it normalised."""
-    public_addresses_for(url)
-    return urlunparse(urlparse(url.strip()))
 
 
 def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
@@ -198,9 +154,8 @@ def _read_capped(response: httpx.Response) -> str:
 
 def fetch_page(url: str) -> FetchedPage:
     """Fetch one page, following redirects by hand so each hop can be checked."""
-    # Imported here: http builds on this module, so importing it at the top would be a
-    # cycle. What it provides is the client that pins each request to an address that
-    # passed the check, rather than resolving the name a second time to connect.
+    # What `http` provides is the client that pins each request to an address that passed
+    # the check, rather than resolving the name a second time to connect.
     from . import http
 
     current = validate_public_url(url)

@@ -55,7 +55,7 @@ from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
 
 from . import idempotency, problems
-from .auth import TokenAuth, for_readers_of_the_api, scope
+from .auth import ScopedAuth, TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
 from .paging import UPDATED_SINCE, Page, changed_since
 from .routers import (
@@ -106,7 +106,9 @@ class Described(NinjaAPI):
     """
 
     def get_openapi_schema(self, *args, **kwargs):
-        return problems.describe(self, super().get_openapi_schema(*args, **kwargs))
+        return problems.describe(
+            self, super().get_openapi_schema(*args, **kwargs), scoped=ScopedAuth
+        )
 
 
 api = Described(

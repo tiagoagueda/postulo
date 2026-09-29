@@ -27,7 +27,8 @@ from . import logos, registry
 from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
-from .registry import connected_plugins, find_plugin
+from .policy import connected_plugins
+from .registry import find_plugin
 from .secrets import SecretsUnreadable
 
 logger = logging.getLogger(__name__)

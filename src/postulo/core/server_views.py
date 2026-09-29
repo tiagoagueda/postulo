@@ -939,7 +939,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
     section_title = _("Plugins")
 
     def get_context_data(self, **kwargs):
-        from postulo.plugins import catalogue, installing
+        from postulo.plugins import catalogue, installing, provenance
         from postulo.plugins.registry import ENTRY_POINT_GROUP, available_sources
 
         context = super().get_context_data(**kwargs)
@@ -957,7 +957,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
             for source in available_sources()
         ]
         context["entry_point_group"] = ENTRY_POINT_GROUP
-        context["installed"] = installing.status()
+        context["installed"] = provenance.status()
         context["plugins_dir"] = str(installing.plugins_dir())
         context["catalogues_configured"] = sorted(catalogue.configured())
         context["repositories"] = _repositories()

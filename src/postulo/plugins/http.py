@@ -15,9 +15,8 @@ onto the router's administration page.
 from __future__ import annotations
 
 import httpx
-from django.conf import settings
 
-from .fetching import USER_AGENT, UnsafeURL, public_addresses_for, validate_public_url
+from .public_addresses import USER_AGENT, UnsafeURL, public_addresses_for, validate_public_url
 
 DEFAULT_TIMEOUT = 10.0
 MAX_REDIRECTS = 3
@@ -28,7 +27,10 @@ class DestinationRefused(Exception):
 
 
 def private_destinations_allowed() -> bool:
-    return bool(getattr(settings, "POSTULO_CONNECTIONS_ALLOW_PRIVATE", False))
+    """The operator's switch, as `core.destinations` reads it for every guard (#248)."""
+    from postulo.core import destinations
+
+    return destinations.private_allowed()
 
 
 def check_destination(url: str) -> None:

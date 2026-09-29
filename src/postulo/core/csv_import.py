@@ -29,6 +29,10 @@ from django.utils.translation import gettext_lazy as _
 
 from . import spreadsheets
 
+# One list of currencies, below the models, which the plugin surface hands out too (#248).
+# Read here and still handed out here, where the importer's tests have always found it.
+from .currencies import CURRENCY_CODES
+
 #: Files above this are refused: a spreadsheet of one job search is kilobytes.
 MAX_BYTES = 2 * 1024 * 1024
 MAX_ROWS = 5000
@@ -632,15 +636,6 @@ CURRENCY_SYMBOLS = {
     "Kč": "CZK",
     "Ft": "HUF",
 }
-
-#: Codes recognised without a symbol. Not all of ISO 4217: a three-letter word in a salary
-#: column is more often an abbreviation than a currency, and guessing wrong writes somebody
-#: else's money into the record. These are the ones a job advert actually carries.
-CURRENCY_CODES = frozenset(
-    """EUR USD GBP CHF SEK NOK DKK PLN CZK HUF RON BGN HRK ISK JPY CNY INR AUD CAD NZD
-    SGD HKD ZAR BRL MXN ARS CLP COP TRY ILS AED SAR KRW THB MYR IDR PHP VND UAH RSD
-    MAD TND EGP NGN KES GHS""".split()
-)
 
 #: How a period is written, in the languages Postulo is used in. Longest first, because
 #: "/month" has to be tried before "/mo" and "per annum" before "pa".

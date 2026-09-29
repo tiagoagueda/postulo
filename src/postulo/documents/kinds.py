@@ -42,9 +42,28 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 
+from django.db.models import TextChoices
 from django.utils.translation import gettext_lazy as _
 
 logger = logging.getLogger(__name__)
+
+
+class DocumentKind(TextChoices):
+    """The values Postulo's own kinds are stored as. What is said about each is below.
+
+    Here rather than beside the models whose columns hold them, so that the registry can
+    describe them without importing the models that read the registry (#248).
+    """
+
+    CV = "cv", _("CV")
+    COVER_LETTER = "cover_letter", _("Cover letter")
+    MOTIVATION_LETTER = "motivation_letter", _("Motivation letter")
+    CERTIFICATE = "certificate", _("Certificate")
+    PORTFOLIO = "portfolio", _("Portfolio")
+    #: A job-search report, frozen at the moment somebody downloads it (#162).
+    REPORT = "report", _("Report")
+    REFERENCE = "reference", _("Reference")
+    OTHER = "other", _("Other")
 
 
 @dataclass(frozen=True)
@@ -132,7 +151,6 @@ def register_the_ones_postulo_has() -> None:
     time is a registry that is empty in whichever test imported the module first.
     """
     from . import themes
-    from .models import DocumentKind
 
     described = (
         Kind(DocumentKind.CV, _("CV"), authored=True, theme_kind=themes.Kind.CV),
