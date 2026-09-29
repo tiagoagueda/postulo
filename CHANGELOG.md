@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- PyJWT 2.15.1 and django-allauth 65.19.5, for CVE-2026-102274. oauthlib's CVE-2026-49265 is a timing leak on an OAuth2 provider's token endpoint, which Postulo never runs; allauth still requires oauthlib 3, so the audit ignores that one advisory by name until it can be taken, and a test fails the day it can. (#323)
 - The source a capture keeps is never served as a page: it is stored as text, shown escaped and downloaded as `text/plain`. Kept files are capped each and per account and refused before they are read, and an API request too large to read answers `413` as a problem document instead of an HTML `400`. (#256)
 - The image takes Debian's security updates on every build the project makes; the layer that upgrades had been served from the builder's cache. **Building your own: add `--pull --build-arg POSTULO_APT_REFRESH="$(date -u +%FT%TZ)"`, or a cached build keeps its old packages.** (#300)
 - Invitation tokens are stored as fingerprints and the link is shown once, on the page that

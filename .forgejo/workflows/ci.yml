@@ -292,10 +292,19 @@ jobs:
         # it stopped at the project. Exporting the lock without the project audits exactly
         # what will be installed and keeps `--strict`, so a dependency that becomes
         # unauditable still fails the build, which is the whole point of it.
+        #
+        # One advisory is ignored by name, and only while the lock file cannot take its
+        # fix (#323). CVE-2026-49265 is a timing leak in the PKCE check of oauthlib's
+        # OAuth2 token endpoint, the provider's side; Postulo is only ever the client
+        # (allauth's OpenID Connect sign-in), never installs `allauth.idp`, and imports
+        # nothing from oauthlib. The fix is oauthlib 4, which no django-allauth release
+        # accepts yet (`oauthlib<4`). `tests/test_security_audit.py` fails the day the
+        # lock holds oauthlib 4, so this flag goes then and cannot outlive its reason.
         run: |
           uv export --no-emit-project --all-groups --format requirements-txt --no-hashes \
             > /tmp/locked-requirements.txt
           uv run --with pip-audit==2.10.1 pip-audit --strict --progress-spinner off \
+            --ignore-vuln CVE-2026-49265 \
             -r /tmp/locked-requirements.txt
 
       - name: Audit the asset build's Node dependencies
