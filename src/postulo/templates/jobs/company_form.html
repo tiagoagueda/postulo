@@ -2,16 +2,33 @@
 {% load i18n postulo %}
 
 {% block title %}{% translate "Company" %}{% endblock %}
+{# Two columns on a wide screen: this page empties `main_width` and takes the whole screen (#210). #}
+{% block main_width %}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-2xl">
-    <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Company" %}</h1>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
-      {% endif %}
-      <div class="card mb-6">
+  <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Company" %}</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert mb-4 max-w-2xl" data-variant="error">{{ form.non_field_errors }}</div>
+    {% endif %}
+    {% comment %} The form's two parts side by side on a wide screen, the details and the
+       identifiers, and one under the other below it, which is how it always read (#210).
+
+       The page has no cap and each part keeps the measure it had: `max-w-2xl` on the card,
+       at the start edge, as the cards allauth draws inside Settings keep theirs, so a text
+       box or the notes never stretch to the width of a monitor. `flex-1` shares the row
+       out and the cap stops each card at 672 pixels, so on a wide screen the pair is two
+       columns of today's width, with what is left over at the end.
+
+       `2xl` because it is the first breakpoint at which two columns of 672 pixels fit:
+       they need 672 + 24 + 672 inside the page's two 16-pixel gutters, which is a window of
+       1400 pixels, and a little more where a scrollbar takes room beside the page. At `xl`,
+       1280, each would be 612. Source order is the reading order in both layouts, and a
+       flex row follows the direction of the text, so the details sit at the reading edge
+       in Arabic too; *Save* comes after both. {% endcomment %}
+    <div class="2xl:flex 2xl:items-start 2xl:gap-6">
+      <div class="card mb-6 max-w-2xl 2xl:flex-1">
         <c-field :field="form.name" />
         {% comment %} Employer, or the public employment service this person is registered
            with; and the services Postulo knows by country, so that one is picked rather
@@ -56,7 +73,7 @@
         <c-field :field="form.notes" />
       </div>
 
-      <fieldset class="card mb-6" data-identifiers>
+      <fieldset class="card mb-6 max-w-2xl 2xl:flex-1" data-identifiers>
         <legend class="label px-1">{% translate "Identifiers" %}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Public ids for this employer, so it can be matched wherever it turns up. Paste a whole address if that is what you have; Postulo keeps the id." %}
@@ -81,10 +98,10 @@
         </details>
         <p class="text-xs text-ink-500 dark:text-ink-400">{% translate "Save the company to add another identifier." %}</p>
       </fieldset>
-      <div class="flex items-center gap-3">
-        <button type="submit" class="btn">{% translate "Save" %}</button>
-        <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
-      </div>
-    </form>
-  </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+    </div>
+  </form>
 {% endblock %}

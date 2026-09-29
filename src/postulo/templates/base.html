@@ -265,13 +265,22 @@
     {% endblock %}
 
     {% comment %} `main_width` is the page's measure: 80rem -- 1280 pixels -- unless the page
-       says otherwise. A form, a detail page or a paragraph keeps it, because a wide page is
-       not a wide paragraph; a table, the board, the dashboard or a list empties the block
-       and takes the screen, which is what they were being denied on any monitor wider than
-       a laptop's (#188). So does a page framed by a sidebar -- Your details, Settings,
-       Server settings -- because the frame is a grid even when the page inside it is a
-       form: the sidebar wants its column and the page wants the rest, and a cap on the pair
-       starved both (#198). {% endcomment %}
+       says otherwise. A table, the board, the dashboard or a list empties the block and
+       takes the screen, which is what they were being denied on any monitor wider than a
+       laptop's (#188). So does a page framed by a sidebar -- Your details, Settings, Server
+       settings -- because the frame is a grid even when the page inside it is a form: the
+       sidebar wants its column and the page wants the rest, and a cap on the pair starved
+       both (#198). And so does a form that sets its parts side by side on a wide screen,
+       the company form's details and identifiers from `2xl` (#210).
+
+       So the line is not what a page holds but where its measure lives. A page that sets
+       its parts side by side, each with a width of its own -- a table in its scroll box, a
+       card that stops at `max-w-2xl` at the start edge, as the company form's do and the
+       cards allauth draws inside Settings -- takes the screen. A page whose measure is the
+       page's -- a form in one column, a detail page, a paragraph -- keeps this cap,
+       because a wide page is not a wide paragraph. The forms on Your details and most of
+       Settings keep no measure of their own yet, and their boxes run the width of the
+       frame. {% endcomment %}
     <main id="main" tabindex="-1" class="mx-auto {% block main_width %}max-w-7xl{% endblock %} px-4 py-8 outline-none">
       {% include "partials/messages.html" %}
       {# `main` exists so that an area such as Settings can wrap `content` in a layout of #}

@@ -707,6 +707,29 @@ def test_every_signed_in_page_has_no_violations(
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_company_form_in_two_columns_has_no_violations(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """The walk above runs at the default window, 1280 pixels, where the company form is one
+    column. From `2xl` it is two, the details beside the identifiers (#210), and that state
+    exists only in a wide window, so it is looked at in one."""
+    page.emulate_media(color_scheme=scheme)
+    page.set_viewport_size({"width": 2560, "height": 1200})
+    base = live_server.url
+    sign_in(page, base)
+    failures = []
+    for path in ("/jobs/companies/new/", f"/jobs/companies/{furnished['company'].pk}/edit/"):
+        page.goto(f"{base}{path}")
+        details = page.locator("main form .card").first.bounding_box()
+        identifiers = page.locator("main form [data-identifiers]").bounding_box()
+        assert details["y"] == identifiers["y"], f"{path} is not in two columns at 2560"
+        found = violations_on(page, axe_source)
+        if found:
+            failures.append(describe(f"{path} at 2560 ({scheme})", found))
+    assert not failures, "\n\n".join(failures)
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_europass_review_page_has_no_violations(
     live_server, page: Page, axe_source, applicant, scheme
 ):

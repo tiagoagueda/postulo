@@ -25,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The company form uses the whole page: from 1536 pixels wide its details and its identifiers sit side by side, each as wide as the form was, and below that one under the other. (#210)
 - Every CI job is named for what it checks (*Unit tests (Python 3.12)*, *Browser tests (Chromium)*, *Release image: build, scan, push*), so a failed one says what failed; the release gate follows the new names. (#319)
 - The main navigation follows your own order, set with arrows under *Settings → Appearance*; each item has an icon, and what the row has no room for is under *More*. **On a phone it is a bar at the foot of the screen**, and search is reachable there and from the masthead. (#299)
 - *Download draft PDF* on a CV or a letter hands back the PDF and files nothing; *Export

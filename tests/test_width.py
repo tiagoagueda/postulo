@@ -3,8 +3,10 @@
 Every page used to sit in a 1280-pixel column -- `max-w-7xl` on `<main>` -- so on a wide
 monitor a table with ten chosen columns scrolled inside a box with grey on both sides.
 `<main>` takes its width from the page now: a grid empties the `main_width` block, and
-everything else keeps the measure it had. This checks the split from the rendered markup;
-`tests/e2e/test_width.py` checks what a browser makes of it at 2560 pixels.
+everything else keeps the measure it had. So does a page whose parts sit side by side and
+keep a measure each, like the company form's two cards (#210). This checks the split from
+the rendered markup; `tests/e2e/test_width.py` checks what a browser makes of it at 2560
+pixels.
 """
 
 from __future__ import annotations
@@ -44,6 +46,8 @@ WIDE = [
     "/applications/report/",
     "/applications/tags/",
     "/jobs/industries/",
+    # A form in two columns on a wide screen, whose cards keep the measure instead (#210).
+    "/jobs/companies/new/",
 ]
 
 #: A form, a detail page, an area with a layout of its own: a wide page is not a wide
@@ -74,6 +78,31 @@ def test_a_grid_takes_the_whole_screen(client, user, path):
 def test_everything_else_keeps_its_measure(client, user, path):
     client.force_login(user)
     assert "max-w-7xl" in main_classes(client, path), f"{path} lost its measure"
+
+
+#: The company form's two parts, each a card with the measure on it (#210).
+COMPANY_CARDS = re.compile(r'<(?:div|fieldset) class="card mb-6 max-w-2xl 2xl:flex-1"')
+
+
+def test_the_company_form_takes_the_screen_and_its_cards_keep_the_measure(client, user):
+    """New and edit are the same form: the page is uncapped, nothing wraps the form in a
+    capped column, and each of its two cards stops at `max-w-2xl` -- the details, then the
+    identifiers, in that order, with nothing reordering them for the eye alone (#210)."""
+    from postulo.jobs.models import Company
+
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    client.force_login(user)
+    for path in ("/jobs/companies/new/", f"/jobs/companies/{company.pk}/edit/"):
+        html = client.get(path).content.decode()
+        main = MAIN.search(html)
+        assert "max-w-" not in main.group(1), f"{path} is still capped"
+        inside = html[main.end() : html.index("</main>", main.end())]
+        assert "mx-auto" not in inside, f"{path} centres a capped column again"
+        cards = COMPANY_CARDS.findall(inside)
+        assert len(cards) == 2, f"{path}: {cards}"
+        assert inside.index("data-identifiers") > inside.index('name="name"'), path
+        assert inside.index('type="submit"') > inside.index("data-identifiers"), path
+        assert not re.search(r"\border-", inside), f"{path} reorders something visually"
 
 
 def test_an_application_s_documents_take_the_screen(client, furnished):  # noqa: F811
