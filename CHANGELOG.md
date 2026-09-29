@@ -24,6 +24,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- *Download draft PDF* on a CV or a letter hands back the PDF and files nothing; *Export
+  PDF* on an unchanged CV hands back the version already filed. **A store is now sent only
+  what went with an application, and reports: what it already holds stays, and copies
+  still waiting for an export are withdrawn.** (#236)
 - A figure is drawn one way on the dashboard, the report and the widgets, and the ones that mean something carry a colour: an offer green, a rejection rose, a conversation the brand. (#292)
 - A pill, an alert, a card, a table, a tile and an empty state are each drawn by one component on Basecoat's structure, and a section's heading by one of Postulo's own; the `tag`, `chip` and `alert-*` classes are gone. (#291)
 - Form rows are Basecoat's field family: a label, a box, help and errors in one structure, checkboxes and radios drawn by the stylesheet, and the flag choosers as input groups; the four `field-*` classes are gone. (#290)
@@ -56,6 +60,13 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Two versions of a CV or a letter can be compared line by line, from the document's page
+  and from an application's documents; a sent CV keeps its words beside its markup, in the
+  export too (format 19). **A CV frozen before this kept none, and the page says so.**
+  (#236)
+- A CV can be copied as plain text from a page that needs no script, and downloaded as
+  `.txt` or as a Word `.docx`, written with no new dependency. Formats are a registry, so
+  another is added the same way; none of them is filed as sent. (#236)
 - Your details and your career can be taken out as one readable JSON file and put back, here or on another Postulo: the page shows what it found and what adding it would do, adds what is new and leaves what you already have exactly as it was. The picture is left out. (#181)
 - `manage.py check_fonts` and *Server settings → Overview* say which of the scripts the offered languages need this instance can actually draw, and the document themes name their per-script fallbacks; the image's CJK is a build argument, not a default. (#74)
 - Start-up refuses a setting outside its vocabulary, a malformed rate or a bare `POSTULO_PUBLIC_URL`, with a message naming it. Every log line names its request, scheduler pass or errand, `X-Request-ID` is honoured and echoed, and `POSTULO_LOG_FORMAT=json` is there for a parsed console. (#233)

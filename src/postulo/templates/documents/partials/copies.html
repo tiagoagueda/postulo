@@ -6,6 +6,11 @@
 
   The status is the catalogue's label as written, not lowercased here: `|lower` is English
   typography applied to every language, and a German label lowercased is misspelt (#168).
+
+  A PDF exported on its own is kept here and sent to no store (#236), so it is offered no
+  button -- one that could only ever answer "nothing to send" is worse than none -- and
+  says why instead, to the people who have a store and would otherwise go looking for it
+  there. Copies it was given before that rule are still listed: they are where they are.
 {% endcomment %}
 {% if document.archive_copies %}
   <ul class="mt-1 space-y-0.5 text-xs">
@@ -17,9 +22,15 @@
   </ul>
 {% endif %}
 {% if has_stores and send_url %}
-  <form method="post" action="{{ send_url }}" class="mt-1">
-    {% csrf_token %}
-    <input type="hidden" name="next" value="{{ request.get_full_path }}">
-    <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Send to stores now" %}</button>
-  </form>
+  {% if document.goes_to_stores %}
+    <form method="post" action="{{ send_url }}" class="mt-1">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Send to stores now" %}</button>
+    </form>
+  {% else %}
+    <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Kept here only: a store is sent what went with an application." %}
+    </p>
+  {% endif %}
 {% endif %}

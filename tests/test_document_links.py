@@ -31,12 +31,13 @@ from postulo.documents.models import (
 pytestmark = pytest.mark.django_db
 
 
-def a_render(user, source=None) -> RenderedDocument:
+def a_render(user, source=None, *, sent_to: str = "") -> RenderedDocument:
     return RenderedDocument.objects.create(
         owner=user,
         title="Sent",
         kind=DocumentKind.CV,
         source=source,
+        sent_to=sent_to,
         file=ContentFile(b"%PDF-1.7 sent", name="sent.pdf"),
     )
 
@@ -155,7 +156,8 @@ def test_a_document_is_copied_once_per_connection(user):
     )
     # Creating the render already offers it to every connected store, so the first copy is
     # the signal's rather than this test's — which is the behaviour worth colliding with.
-    render = a_render(user)
+    # One that was sent to somebody: a PDF exported on its own is offered to none (#236).
+    render = a_render(user, sent_to="Research Engineer at Black Mesa")
     assert DocumentCopy.objects.filter(connection=connection).count() == 1
 
     with pytest.raises(IntegrityError), transaction.atomic():

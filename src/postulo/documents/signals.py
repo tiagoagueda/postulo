@@ -1,8 +1,10 @@
 """What happens to a document when something around it changes.
 
-A new document is offered to every external store its owner has connected, and a render
-forgets the thing that made it when that thing is deleted -- which is the `SET_NULL` a
-column used to carry, written out because a generic link has no `on_delete` (#130).
+A new document is offered to every external store its owner has connected -- except a PDF
+exported on its own, which went to nobody and stays here (#236; the rule is
+`archiving.schedule_copies`'s) -- and a render forgets the thing that made it when that
+thing is deleted, which is the `SET_NULL` a column used to carry, written out because a
+generic link has no `on_delete` (#130).
 
 Nothing observed a file being created until now except the code creating it. A signal is
 the right observer here because documents are created from several places — recording

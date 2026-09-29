@@ -24,8 +24,14 @@
       <div class="card mb-8 p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for document in rendered %}
-            <li class="flex items-center gap-3 px-4 py-3">
-              <div class="min-w-0 flex-1">
+            {% comment %} The row wraps, now that it may hold two buttons: beside a title
+               they are wider than a phone, and the words keep ten rem first (#167). What
+               changed since the version before is the question this page is where somebody
+               asks -- "is this the CV I sent them, or the one from before I rewrote it?" --
+               so the comparison is linked from here, where there is an earlier version of
+               the same CV or letter to compare with (#236). {% endcomment %}
+            <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
+              <div class="min-w-0 grow basis-40">
                 <p class="font-medium">{{ document.title }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ document.rendered_at|date:"DATETIME_FORMAT" }} · {{ document.checksum|slice:":12" }}
@@ -33,8 +39,14 @@
                 {% url 'documents:rendered_archive' document.pk as send_url %}
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </div>
-              <a href="{% url 'documents:rendered_download' document.pk %}"
-                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
+              <div class="flex flex-wrap items-center gap-1">
+                {% if document.has_earlier %}
+                  <a href="{% url 'documents:rendered_compare' document.pk %}"
+                     class="btn" data-variant="ghost" data-size="xs">{% translate "Compare with previous" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
+                {% endif %}
+                <a href="{% url 'documents:rendered_download' document.pk %}"
+                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
+              </div>
             </li>
           {% endfor %}
         </ul>

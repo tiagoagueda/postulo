@@ -36,7 +36,7 @@ class RenderedDocumentAdmin(admin.ModelAdmin):
     list_display = ("title", "kind", "application", "rendered_at", "owner")
     list_filter = ("owner", "kind")
     search_fields = ("title",)
-    readonly_fields = ("checksum", "source_text")
+    readonly_fields = ("checksum", "source_text", "plain_text")
 
 
 @admin.register(DocumentCopy)

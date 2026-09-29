@@ -44,8 +44,10 @@ from postulo import __version__
 #: profile (#203). 17 added ``language`` on an upload and on a sent document, which each
 #: now record what they are in rather than having it guessed for them (#283). 18 added
 #: ``isco_code`` on a posting, the ISCO-08 unit group its title matches in the ESCO
-#: classification beside the title itself (#266).
-FORMAT_VERSION = 18
+#: classification beside the title itself (#266). 19 added ``plain_text`` on a sent
+#: document: the words of a CV without the page they were set in, which is what two
+#: versions are compared by (#236).
+FORMAT_VERSION = 19
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -644,6 +646,11 @@ def build_document(user) -> dict:
             **_source_of(sent),
             "file": f"{MEDIA_PREFIX}{sent.file.name}" if sent.file else "",
             "source_text": sent.source_text,
+            # Format 19 (#236). Empty for a letter, whose `source_text` is its words
+            # already, and for a CV frozen before its words were kept; an archive written
+            # before this has no key, and restores with the field blank, which is the
+            # same answer.
+            "plain_text": sent.plain_text,
             "copies": _copies(sent),
         }
         for sent in RenderedDocument.objects.for_user(user).select_related("source_type")

@@ -13,6 +13,11 @@ urlpatterns = [
     path("cvs/<int:pk>/entries/add/", views.CVAddItemsView.as_view(), name="cv_add_items"),
     path("cvs/<int:pk>/preview/", views.CVPreviewView.as_view(), name="cv_preview"),
     path("cvs/<int:pk>/export/", views.CVExportView.as_view(), name="cv_export"),
+    # What a CV can leave as without being filed as sent (#236): a draft of the PDF, its
+    # words on a page to copy them from, and a file in whichever format the registry holds.
+    path("cvs/<int:pk>/draft/", views.CVDraftView.as_view(), name="cv_draft"),
+    path("cvs/<int:pk>/text/", views.CVTextView.as_view(), name="cv_text"),
+    path("cvs/<int:pk>/as/<slug:format>/", views.CVDownloadView.as_view(), name="cv_download"),
     path("cv-entries/<int:pk>/edit/", views.CVItemUpdateView.as_view(), name="cv_item_update"),
     path("cv-entries/<int:pk>/delete/", views.CVItemDeleteView.as_view(), name="cv_item_delete"),
     path(
@@ -28,6 +33,7 @@ urlpatterns = [
     path(
         "letters/<int:pk>/preview/", views.CoverLetterPreviewView.as_view(), name="letter_preview"
     ),
+    path("letters/<int:pk>/draft/", views.CoverLetterDraftView.as_view(), name="letter_draft"),
     path("files/", views.UploadListView.as_view(), name="upload_list"),
     path("files/new/", views.UploadCreateView.as_view(), name="upload_create"),
     path("files/<int:pk>/edit/", views.UploadUpdateView.as_view(), name="upload_update"),
@@ -47,6 +53,7 @@ urlpatterns = [
         name="rendered_archive",
     ),
     path("sent/<int:pk>/download/", views.RenderedDownloadView.as_view(), name="rendered_download"),
+    path("sent/<int:pk>/compare/", views.RenderedCompareView.as_view(), name="rendered_compare"),
     path("applications/<int:pk>/send/", views.SendDocumentsView.as_view(), name="send"),
     path(
         "applications/<int:pk>/documents/",

@@ -42,6 +42,14 @@
                 title="{% blocktranslate trimmed with name=letter.name %}Preview of {{ name }}{% endblocktranslate %}"
                 class="document-frame" loading="lazy" data-document-preview></iframe>
       </section>
+
+      {% comment %} The view had been handing this page its versions since the link became
+         generic (#130) and nothing drew them; with two of them to compare they are worth
+         drawing, the way the CV's page does (#236). {% endcomment %}
+      {% if renders %}
+        <c-section-title class="mt-8">{% translate "Versions you have sent" %}</c-section-title>
+        <c-sent-versions :renders="renders" />
+      {% endif %}
     </div>
 
     <aside class="space-y-6">
@@ -72,12 +80,25 @@
               {% endfor %}
             </select>
             <button type="submit" class="btn w-full" data-variant="outline">{% translate "Read it below" %}</button>
+            {% comment %} The same choice, as the PDF it would be (#236). A second button on
+               the one form rather than a second chooser: `formaction` sends what is chosen
+               to the draft's address and `formtarget` takes the answer out of the frame, so
+               the browser is handed a file and the page stays where it is. Plain HTML, as
+               the button above it is. {% endcomment %}
+            <button type="submit" class="btn w-full" data-variant="outline"
+                    formaction="{% url 'documents:letter_draft' letter.pk %}"
+                    formtarget="_self">{% translate "Download draft PDF" %}</button>
           </form>
         {% else %}
           <p class="text-sm text-ink-500 dark:text-ink-400">
             {% translate "Once you have an application, you can read this letter as it will reach them." %}
           </p>
+          <a href="{% url 'documents:letter_draft' letter.pk %}"
+             class="btn mt-3 w-full" data-variant="outline">{% translate "Download draft PDF" %}</a>
         {% endif %}
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "A draft is kept nowhere, and marks whatever it has nothing to fill in. A letter is filed when you record what you sent with an application." %}
+        </p>
       </div>
 
       <div class="card">

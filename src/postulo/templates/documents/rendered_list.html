@@ -24,7 +24,8 @@
             <th>{% translate "Document" %}</th>
             <th>{% translate "Sent with" %}</th>
             <th>{% translate "When" %}</th>
-            <th></th>
+            {# Named, as every column's header is: an empty one is a column nobody can ask about. #}
+            <th><span class="sr-only">{% translate "Actions" %}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -41,10 +42,17 @@
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </td>
               <td>
+                {% comment %} Three answers, where there were two. An application that was
+                   deleted leaves the words written down on the day it was sent (#217), and
+                   until #236 this column read them as "exported on its own" -- which is now
+                   a claim with a consequence, because an export is what stays out of the
+                   stores. {% endcomment %}
                 {% if document.application %}
                   <a href="{{ document.application.get_absolute_url }}" class="hover:underline">
                     {{ document.application.posting.title }}
                   </a>
+                {% elif document.sent_to %}
+                  <bdi>{{ document.sent_to }}</bdi>
                 {% else %}
                   <span class="text-ink-400">{% translate "Exported on its own" %}</span>
                 {% endif %}
@@ -54,7 +62,7 @@
               </td>
               <td class="text-end">
                 <a href="{% url 'documents:rendered_download' document.pk %}"
-                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
+                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
               </td>
             </tr>
           {% endfor %}

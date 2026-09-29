@@ -13,8 +13,9 @@ from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from . import formats as file_formats
 from . import themes
-from .models import CV, CoverLetter, RenderedDocument
+from .models import CV, CoverLetter, CVKind, RenderedDocument
 from .pdf import html_to_pdf
 
 #: Only these placeholders are substituted, and only these.
@@ -261,6 +262,160 @@ def render_cv_html(cv: CV, *, nonce=None) -> str:
         )
 
 
+# ------------------------------------------------------- a CV as its words (#236)
+
+#: What goes between two details on one line: the character the themes write between the
+#: contact details, so the text and the PDF say the same line.
+BETWEEN = " · "
+
+
+def _joined(separator: str, *parts) -> str:
+    """The parts that say something, with ``separator`` between them."""
+    return separator.join(str(part).strip() for part in parts if str(part or "").strip())
+
+
+def _period(item, *, years_only: bool = False) -> str:
+    """When an entry ran, as the themes print it: "March 2021 – present", or the years.
+
+    Called inside the language override, so the month is the document's and so is the word
+    for *present* -- the same string the themes translate, asked for by the same name.
+    """
+    start = getattr(item, "start_date", None)
+    end = getattr(item, "end_date", None)
+    if years_only:
+        return "–".join(str(day.year) for day in (start, end) if day)
+    first = formats.date_format(start, "YEAR_MONTH_FORMAT") if start else ""
+    last = formats.date_format(end, "YEAR_MONTH_FORMAT") if end else ""
+    if start and not end:
+        last = gettext("present")
+    return _joined(" – ", first, last)
+
+
+def _entry_blocks(section: Section, entry: Entry) -> list:
+    """One experience, qualification or project, as a CV sets it: a heading and what is
+    under it."""
+    item = entry.item
+    if section.kind == "experience":
+        title, under = item.role, _joined(BETWEEN, item.organisation, item.location)
+    elif section.kind == "education":
+        title, under = item.qualification, _joined(BETWEEN, item.institution, item.location)
+    else:
+        title, under = item.name, getattr(item, "role", "")
+    blocks = [file_formats.heading(title, 3)]
+    for line in (under, _period(item), getattr(item, "summary", "")):
+        if str(line or "").strip():
+            blocks.append(file_formats.paragraph(line))
+    if entry.highlight_lines:
+        blocks.append(file_formats.bullets(entry.highlight_lines))
+    return blocks
+
+
+def _piece_blocks(entry: Entry) -> list:
+    """One project, as a portfolio sets it: the work, the case for it, and where to see it."""
+    item = entry.item
+    blocks = [file_formats.heading(item.name, 3)]
+    for line in (_period(item), item.role, item.summary):
+        if str(line or "").strip():
+            blocks.append(file_formats.paragraph(line))
+    if entry.highlight_lines:
+        blocks.append(file_formats.bullets(entry.highlight_lines))
+    if item.url:
+        blocks.append(file_formats.paragraph(item.url))
+    return blocks
+
+
+def _section_blocks(section: Section, *, as_portfolio: bool) -> list:
+    """What one section says, in the shape the themes give its kind.
+
+    The same branches `base_cv.html` and `base_portfolio.html` take, and they are kept in
+    step on purpose: this text stands beside a PDF as the record of what it claimed, and a
+    text that printed a grade the page left out would be a record of something nobody sent.
+    A portfolio sets the career as context -- a line an entry, the years and no highlights
+    -- and so does its text.
+    """
+    entries = [entry for entry in section.items if entry.item is not None]
+    if section.kind == "skillgroup":
+        lines = [f"{one.item.name}: {', '.join(one.item.skill_names)}" for one in entries]
+    elif section.kind == "languageskill":
+        # A level nobody stated prints nothing, as it does on the page (#235).
+        lines = [
+            _joined(
+                " — ",
+                one.item.name,
+                one.item.get_proficiency_display() if one.item.proficiency else "",
+            )
+            for one in entries
+        ]
+    elif section.kind == "link":
+        lines = [
+            _joined(BETWEEN, _joined(" — ", one.item.title, one.item.description), one.item.url)
+            for one in entries
+        ]
+    elif section.kind == "certification":
+        lines = [
+            _joined(
+                BETWEEN,
+                _joined(", ", one.item.name, one.item.issuer),
+                one.item.issued_on.year if one.item.issued_on else "",
+            )
+            for one in entries
+        ]
+    elif as_portfolio and section.kind == "project":
+        return [block for one in entries for block in _piece_blocks(one)]
+    elif as_portfolio:
+        lines = [
+            _joined(
+                BETWEEN,
+                one.item.role if section.kind == "experience" else one.item.qualification,
+                one.item.organisation if section.kind == "experience" else one.item.institution,
+                _period(one.item, years_only=True),
+            )
+            for one in entries
+        ]
+    else:
+        return [block for one in entries for block in _entry_blocks(section, one)]
+    return [file_formats.bullets(lines)]
+
+
+def cv_outline(cv: CV) -> file_formats.Outline:
+    """A CV variant as its words: what plain text, Word and a comparison are made of.
+
+    Built from `build_sections`, in the document's own language, for the reason
+    `render_cv_html` gives -- and with the contact block left off where the person left it
+    off, the author's name with it.
+    """
+    language = document_language(cv)
+    with translation.override(language):
+        contact = contact_details(cv.owner) if cv.show_contact_details else None
+        blocks = []
+        if contact:
+            blocks.append(file_formats.heading(contact["name"], 1))
+            if cv.headline or contact["headline"]:
+                blocks.append(file_formats.paragraph(cv.headline or contact["headline"]))
+            if contact["details"]:
+                blocks.append(file_formats.paragraph(BETWEEN.join(contact["details"])))
+        elif cv.headline:
+            blocks.append(file_formats.heading(cv.headline, 1))
+        if cv.summary.strip():
+            blocks.append(file_formats.paragraph(cv.summary, apart=True))
+        as_portfolio = cv.kind == CVKind.PORTFOLIO
+        for section in build_sections(cv):
+            blocks.append(file_formats.heading(section.label, 2))
+            blocks.extend(_section_blocks(section, as_portfolio=as_portfolio))
+        return file_formats.Outline(
+            title=document_title(cv),
+            language=language,
+            direction=document_direction(cv),
+            author=contact["name"] if contact else "",
+            blocks=tuple(blocks),
+        )
+
+
+def cv_text(cv: CV) -> str:
+    """A CV variant as plain text: to paste into a form, and to keep beside a snapshot."""
+    return file_formats.as_text(cv_outline(cv))
+
+
 def fill_placeholders(text: str, values: dict[str, str], *, mark_empty: bool = False) -> str:
     """Substitute ``{{ name }}`` placeholders from ``values``.
 
@@ -420,14 +575,80 @@ def sent_to(application) -> str:
     }
 
 
+def draft_name(document) -> str:
+    """What a draft is called on the way out: the document's title, and that it is a draft.
+
+    In the document's language, as its title is, so the name is one language rather than
+    two. The word is there because the file is the only thing that leaves: nothing in
+    Postulo will ever say this PDF was a try, so the PDF says it itself (#236).
+    """
+    with translation.override(document_language(document)):
+        return gettext("%(title)s (draft)") % {"title": document_title(document)}
+
+
+def exported_on_its_own(cv: CV):
+    """The PDFs made from this CV that went with no application, newest first."""
+    return cv.renders.filter(owner=cv.owner, application__isnull=True, sent_to="")
+
+
+def already_exported(cv: CV, *, html: str = "", checksum: str = "") -> RenderedDocument | None:
+    """The export of this CV that is already filed, where a new one would be its twin.
+
+    Asked twice, because there are two ways of being the same document and neither covers
+    the other (#236).
+
+    **By what it was drawn from, before anything is drawn.** An unchanged CV renders to the
+    same markup, so the question can be answered without a renderer -- which is the press
+    somebody makes twice. It has to be asked this way as well as the other, because the
+    other cannot see it on every backend: Chromium writes the minute it printed into each
+    PDF, so two renders of one page never share a checksum there.
+
+    **By what was drawn, afterwards.** The checksum has been computed for every render
+    since #133 and compared with nothing. Two files with the same one are the same file,
+    whatever differed in the markup on the way to it.
+
+    Either way the one handed back has to still *be* that file. A record whose PDF has gone
+    from disk, or no longer matches the checksum taken of it, is not an answer to somebody
+    asking for their CV, so it is passed over and the press draws a new one.
+    """
+    if not html and not checksum:
+        return None
+    filed = exported_on_its_own(cv)
+    if html:
+        filed = filed.filter(source_text=html)
+    if checksum:
+        filed = filed.filter(checksum=checksum)
+    for document in filed:
+        if document.file_is_as_rendered():
+            return document
+    return None
+
+
 def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     """Freeze a CV as a PDF, exactly as it stands now.
 
     This is the record of what an employer received. It is never regenerated: months
     later, when someone asks about a line on your CV, you need the version they read.
+
+    **An export with no application is filed once per version** (#236). Pressing *Export
+    PDF* twice on a CV nobody has touched used to file two records of the same document;
+    the second press is handed the first one now, marked `already_filed` so that whoever
+    asked can say so. A render that goes with an application is always its own record,
+    however like the last one it is: two employers sent the same CV were sent two things.
     """
     html = render_cv_html(cv)
+    if application is None:
+        filed = already_exported(cv, html=html)
+        if filed is not None:
+            filed.already_filed = True
+            return filed
     content = html_to_pdf(html, backend=backend)
+    checksum = RenderedDocument.checksum_for(content)
+    if application is None:
+        filed = already_exported(cv, checksum=checksum)
+        if filed is not None:
+            filed.already_filed = True
+            return filed
     # Named for whoever opens it, not for the shelf it was filed on (#223). The variant's
     # name is the person's own filing — "Backend, English" — and the model's help text says
     # so; it was going into the PDF's `/Title`, which a viewer shows in its title bar and a
@@ -450,7 +671,10 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         application=application,
         sent_to=sent_to(application),
         source_text=html,
-        checksum=RenderedDocument.checksum_for(content),
+        # The same words with the setting taken off, kept for reading and comparing: two
+        # versions of the markup differ in every line when only the theme changed (#236).
+        plain_text=cv_text(cv),
+        checksum=checksum,
     )
     _file_and_save(document, f"{slugify(title) or 'cv'}.pdf", content)
     return document

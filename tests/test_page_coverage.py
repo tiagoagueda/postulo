@@ -37,6 +37,18 @@ EXCUSED: dict[str, str] = {
     "core:export_download": "a zip archive arriving as a download",
     "core:import_csv_template": "a spreadsheet arriving as a download",
     "documents:cv_export": "a rendered PDF arriving as a download",
+    "documents:cv_draft": (
+        "a draft of a CV's PDF arriving as a download: bytes and a `Content-Disposition`, "
+        "filed nowhere. The button is on the CV's page, which the suite visits (#236)"
+    ),
+    "documents:letter_draft": (
+        "a draft of a letter's PDF arriving as a download; the button is on the letter's "
+        "page, which the suite visits (#236)"
+    ),
+    "documents:cv_download": (
+        "a CV as a text file or a Word file arriving as a download; the links are on the "
+        "CV's page, and the text itself is on `documents:cv_text`, both visited (#236)"
+    ),
     "documents:upload_download": "an uploaded file arriving as a download",
     "documents:rendered_download": "a rendered document arriving as a download",
     "applications:insights": (

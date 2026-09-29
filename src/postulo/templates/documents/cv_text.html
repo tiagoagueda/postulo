@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate trimmed with name=cv.name %}{{ name }} as plain text{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <c-page-title>
+      {% translate "As plain text" %}
+      <c-slot name="subtitle">
+      {% blocktranslate trimmed with name=cv.name %}
+        What “{{ name }}” says, without the layout: for a form that wants the text pasted
+        in. Select all of it and copy.
+      {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% if text %}
+      {% comment %} *Copy as plain text*, with the scripts off (#236). Copying to the
+         clipboard needs a script, so the page is built from what is left when there is
+         none: the text, in a box that can be selected from end to end and cannot be typed
+         into. `app.js` adds a *Copy* button beside anything marked `data-copy-source`
+         where the clipboard is there to be written to (#276), and adds nothing where it
+         is not -- the box is the feature and the button is a convenience, never the other
+         way round.
+
+         A `<textarea readonly>` rather than a `<pre>`: it is a control, so it is in the
+         tab order, *Select all* inside it selects the CV and not the page around it, and
+         a screen reader announces a read-only text field with its label. `lang` and `dir`
+         are the document's, which may not be the reader's: a French CV read by somebody
+         browsing in English is still French, and an Arabic one still starts at the right.
+         No form around it, so there is nothing for the unsaved-work guard to watch.
+
+         The help is above the box rather than under it, which is where the script puts its
+         button: label, what the box is, the box, *Copy*.
+      {% endcomment %}
+      <div class="card">
+        <div class="field wrap-anywhere">
+          <label for="cv-plain-text">{% translate "The text of this document" %}</label>
+          <p id="cv-plain-text-help">
+            {% translate "Nothing here can be changed: it is built from the entries on the document, in the language it declares." %}
+          </p>
+          <textarea id="cv-plain-text" readonly rows="24"
+                    {% if language %}lang="{{ language }}"{% endif %} dir="{{ direction }}"
+                    aria-describedby="cv-plain-text-help"
+                    data-copy-source data-copy-label="{% translate 'Copy' %}"
+                    data-copied-label="{% translate 'Copied' %}">{{ text }}</textarea>
+        </div>
+      </div>
+    {% else %}
+      <c-empty variant="quiet">
+        {% translate "There is nothing on this document yet, so there is no text to copy." %}
+      </c-empty>
+    {% endif %}
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <a href="{{ cv.get_absolute_url }}" class="btn" data-variant="outline">{% translate "Back to the document" %}</a>
+      {% if text and text_format %}
+        <a href="{% url 'documents:cv_download' cv.pk text_format.key %}"
+           class="btn" data-variant="ghost">{% blocktranslate trimmed with extension=text_format.extension %}Download .{{ extension }}{% endblocktranslate %}</a>
+      {% endif %}
+    </div>
+  </div>
+{% endblock %}

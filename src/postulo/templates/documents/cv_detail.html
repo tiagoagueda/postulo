@@ -122,26 +122,7 @@
 
       {% if renders %}
         <c-section-title class="mt-8">{% translate "Versions you have sent" %}</c-section-title>
-        <div class="card p-0">
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for render in renders %}
-              <li class="flex items-center gap-3 px-4 py-3">
-                <div class="min-w-0 flex-1">
-                  <p class="text-sm">{{ render.rendered_at|date:"DATETIME_FORMAT" }}</p>
-                  {% if render.application %}
-                    <p class="text-xs text-ink-500 dark:text-ink-400">
-                      <a href="{{ render.application.get_absolute_url }}" class="hover:underline">
-                        {{ render.application.posting.title }}
-                      </a>
-                    </p>
-                  {% endif %}
-                </div>
-                <a href="{% url 'documents:rendered_download' render.pk %}"
-                   class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ render.application.posting.title }}</bdi></span></a>
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
+        <c-sent-versions :renders="renders" />
       {% endif %}
     </div>
 
@@ -172,6 +153,41 @@
         <iframe src="{% url 'documents:cv_preview' cv.pk %}"
                 title="{% blocktranslate trimmed with name=cv.name %}Preview of {{ name }}{% endblocktranslate %}"
                 class="document-frame" loading="lazy" data-document-preview></iframe>
+        {% comment %} What the frame cannot show is where the pages break, and the only way
+           to see that used to be *Export PDF* -- which files a version under the heading
+           beside this one and queued it for every store, once a try. A draft is the same
+           PDF and no record: a link, because it changes nothing, and it says so under
+           itself because the two buttons are otherwise one word apart (#236). {% endcomment %}
+        <a href="{% url 'documents:cv_draft' cv.pk %}"
+           class="btn mt-3 w-full" data-variant="outline">{% translate "Download draft PDF" %}</a>
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version." %}
+        </p>
+      </section>
+
+      {% comment %} The same entries with the setting taken off, for a portal that wants a
+         Word file or a box to paste into (#236). The list is the registry's, so a format a
+         plugin brings is a row here without this page being edited. *Copy as plain text* is
+         a page rather than a button: copying needs a script, and the page is what is left
+         when there is none -- the text in a box, to select and copy by hand. {% endcomment %}
+      <section class="card" aria-labelledby="cv-formats-heading">
+        <c-section-title id="cv-formats-heading">
+          {% translate "In other formats" %}
+          <c-slot name="subtitle">{% translate "The same entries without the layout, in this document's language. None of these is filed as a version you sent." %}</c-slot>
+        </c-section-title>
+        <a href="{% url 'documents:cv_text' cv.pk %}"
+           class="btn w-full" data-variant="outline">{% translate "Copy as plain text" %}</a>
+        {% if formats %}
+          <ul class="mt-3 space-y-2 text-sm">
+            {% for format in formats %}
+              <li class="flex flex-wrap items-center gap-2">
+                <span class="min-w-0 grow basis-24">{{ format.label }}</span>
+                <a href="{% url 'documents:cv_download' cv.pk format.key %}"
+                   class="btn" data-variant="outline" data-size="sm">{% blocktranslate trimmed with extension=format.extension %}Download .{{ extension }}{% endblocktranslate %}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
       </section>
 
       <div class="card">

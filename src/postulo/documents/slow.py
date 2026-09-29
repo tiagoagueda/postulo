@@ -10,6 +10,10 @@ it.
 somebody handed over; a second attempt made on the person's behalf would file a second one.
 A failure here says why, and the button is still there.
 
+**A draft is not here at all** (#236). *Download draft PDF* is a GET that hands the bytes
+back and files nothing, for the reason the report's is (`applications/slow.py`): the draft
+cache is in the web process, and the answer has to be a file download anyway.
+
 **What a person has to see is already kept.** Whatever these draw is in *Sent documents*
 before the errand finishes, so the answer to *where is it if I closed the tab* is the answer
 it always was.
@@ -38,8 +42,14 @@ def render_a_cv(errand) -> dict:
         document = snapshot_cv(cv)
     except PDFBackendUnavailable as unavailable:
         raise Refused(str(unavailable)) from unavailable
+    # The same CV exported twice is one version, and saying "created" of a PDF that was
+    # filed last week would be the page telling somebody something that did not happen.
+    if getattr(document, "already_filed", False):
+        message = _("Nothing on it has changed, so this is the PDF already filed.")
+    else:
+        message = _("PDF created.")
     return {
-        "message": str(_("PDF created.")),
+        "message": str(message),
         "url": reverse("documents:rendered_download", args=[document.pk]),
     }
 

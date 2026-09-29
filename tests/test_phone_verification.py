@@ -296,8 +296,10 @@ def test_the_format_version_moved(user):
     and which one an application named (#138); 14 added the kind of a CV, which is what tells
     a portfolio from one (#133); 15 replaced the four single link columns on a profile and a
     contact with a ``web_links`` list (#189); 18 added the ISCO-08 code a posting's title
-    matches in the ESCO classification, beside the title itself (#266).
+    matches in the ESCO classification, beside the title itself (#266); 19 added the words
+    of a sent CV without the page they were set in, which is what two versions are compared
+    by (#236).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 18
+    assert export.FORMAT_VERSION == 19

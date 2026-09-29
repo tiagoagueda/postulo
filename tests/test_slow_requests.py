@@ -37,6 +37,9 @@ SLOW = [
     ("jobs:capture_create", ()),
     ("jobs:company_logo_action", (1, "refresh")),
     ("documents:cv_export", (1,)),
+    # A draft draws in the request, as the report's does, and writes nothing at all (#236).
+    ("documents:cv_draft", (1,)),
+    ("documents:letter_draft", (1,)),
     ("documents:send", (1,)),
     ("applications:report_pdf", ()),
     ("core:export_download", ()),

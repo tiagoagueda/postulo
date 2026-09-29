@@ -215,7 +215,9 @@ def test_a_new_document_is_queued_for_every_store_that_wants_its_kind(user):
     assert copies[0].owner == user and copies[0].store == "shelf"
     assert ShelfStore.received == [], "nothing is sent inside the request"
 
-    render = a_render(user)
+    # With an application: a CV exported on its own is kept here and queued for nobody
+    # since #236, which `test_a_pdf_exported_on_its_own_is_queued_for_no_store` holds.
+    render = a_render(user, application=an_application(user))
     assert copies_of(render).count() == 2, "both stores take a CV"
 
     # Scheduling again changes nothing.
@@ -447,7 +449,7 @@ def test_send_now_without_a_store_explains(client, user):
 
 def test_send_everything_queues_what_existed_before_the_store(client, user, other_user):
     an_upload(user)
-    a_render(user)
+    a_render(user, application=an_application(user))
     an_upload(other_user)
     connection = a_store(user, kind_certificate=False)
     assert DocumentCopy.objects.count() == 0
@@ -481,7 +483,7 @@ def test_copies_are_private_to_their_owner(client, user, other_user):
 def test_references_travel_in_the_export_and_survive_an_import(user, other_user):
     a_store(user)
     upload = an_upload(user)
-    render = a_render(user)
+    render = a_render(user, application=an_application(user))
     an_upload(user, title="Pending one", kind=DocumentKind.OTHER)
     ShelfStore.decline_kinds = {"other"}
     send_pending()

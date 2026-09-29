@@ -1,0 +1,51 @@
+{% load i18n %}
+<c-vars renders />
+{% comment %} The PDFs made from one CV or one letter, newest first (#236).
+
+   `<c-sent-versions :renders="renders" />`, under whatever heading the page gives it.
+
+   A CV's page drew this and a letter's did not, though its view had been handing it the
+   list all along; with a comparison to link to it is on both, which makes it a component
+   rather than a second copy.
+
+   Each row says where that version went: the application while it is still there, the
+   words that were written down on the day once it is not (#217), and that it went nowhere
+   when it was exported on its own. *Compare with previous* is offered where there is a
+   previous one -- `has_earlier`, which `documents.views.newest_versions` sets -- so the
+   oldest version has no link to a page with nothing on it.
+
+   Every link is named by its version and not only by what it does. Ten rows of *Download*
+   and ten of *Compare with previous* are twenty controls saying two things (#227), so each
+   carries its date, for a screen reader, after the words everybody sees.
+
+   The row wraps: two buttons beside a date are wider than a phone in most languages, and
+   the words keep ten rem before the buttons go under them (#167).
+{% endcomment %}
+<div class="card p-0">
+  <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+    {% for render in renders %}
+      <li class="flex flex-wrap items-center gap-x-3 gap-y-1 px-4 py-3">
+        <div class="min-w-0 grow basis-40">
+          <p class="text-sm">{{ render.rendered_at|date:"DATETIME_FORMAT" }}</p>
+          <p class="text-xs text-ink-500 dark:text-ink-400">
+            {% if render.application %}
+              <a href="{{ render.application.get_absolute_url }}" class="hover:underline"><bdi>{{ render.application.posting.title }}</bdi></a>
+            {% elif render.sent_to %}
+              <bdi>{{ render.sent_to }}</bdi>
+            {% else %}
+              {% translate "Exported on its own" %}
+            {% endif %}
+          </p>
+        </div>
+        <div class="flex flex-wrap items-center gap-1">
+          {% if render.has_earlier %}
+            <a href="{% url 'documents:rendered_compare' render.pk %}"
+               class="btn" data-variant="ghost" data-size="xs">{% translate "Compare with previous" %}<span class="sr-only">: {{ render.rendered_at|date:"DATETIME_FORMAT" }}</span></a>
+          {% endif %}
+          <a href="{% url 'documents:rendered_download' render.pk %}"
+             class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: {{ render.rendered_at|date:"DATETIME_FORMAT" }}</span></a>
+        </div>
+      </li>
+    {% endfor %}
+  </ul>
+</div>

@@ -512,6 +512,9 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: kinds" has to mean if it is to survive a fourth (#133).
     archive_origin = "upload"
     download_url_name = "documents:upload_download"
+    #: A file somebody put here is a file they meant to keep, so a store is always offered
+    #: it. See `RenderedDocument.goes_to_stores` for the one that is not always (#236).
+    goes_to_stores = True
 
     def save(self, *args, **kwargs):
         """Write the checksum the first time the bytes are here, and never again.
@@ -649,6 +652,20 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     language = models.CharField(_("language"), max_length=10, blank=True, editable=False)
 
     source_text = models.TextField(_("text as sent"), blank=True)
+    #: The words of a CV without their setting, kept beside the markup they were set in.
+    #:
+    #: `source_text` is what the PDF was drawn from, and for a CV that is a whole themed
+    #: page: every rule of the stylesheet, then the markup, then the words. It is the right
+    #: thing to keep -- it is what was rendered -- and the wrong thing to read, because two
+    #: versions that differ by one job title differ by one line in four hundred, and a
+    #: change of theme differs in all of them while saying nothing new. This is the text a
+    #: person compares and a portal is handed (#236).
+    #:
+    #: **Blank for a letter**, whose `source_text` already is its words and would only be
+    #: said twice, **and blank for a CV frozen before this existed**. That one is not
+    #: backfilled: the text would have to be built from the CV as it stands today, which is
+    #: exactly what a snapshot exists not to be. `text_to_compare` is what a reader asks.
+    plain_text = models.TextField(_("text without its layout"), blank=True, editable=False)
     checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
     rendered_at = models.DateTimeField(_("rendered on"), default=timezone.now)
 
@@ -696,6 +713,86 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     @staticmethod
     def checksum_for(content: bytes) -> str:
         return hashlib.sha256(content).hexdigest()
+
+    @property
+    def went_with_an_application(self) -> bool:
+        """Whether this was sent to somebody, rather than exported on its own (#236).
+
+        The link or the words. `application` is cleared when the application is deleted
+        (#217) and `sent_to` is what is left saying where the document went, so a PDF an
+        employer received does not turn into an export because somebody tidied up.
+        """
+        return bool(self.application_id or self.sent_to)
+
+    @property
+    def goes_to_stores(self) -> bool:
+        """Whether the stores its owner has connected are given a copy (#236).
+
+        Every *Export PDF* used to be copied to every store, and the only way to see where a
+        page breaks was to export -- so a Paperless filled with the tries. What a store is
+        for is what was handed over: a render that went with an application is one, and one
+        exported on its own stays here, where it can still be downloaded.
+
+        **A report is the exception, because it never goes with an application.** It is
+        handed to an employment office, at a deliberate press, and #162 decided that a store
+        is given it; asking it for an application would switch that off by accident, and
+        leave every store connection with a *Report* switch that does nothing.
+        """
+        return self.went_with_an_application or self.kind == DocumentKind.REPORT
+
+    def file_is_as_rendered(self) -> bool:
+        """Whether the bytes on disk are still the ones the checksum was taken of.
+
+        What the checksum is for, and until #236 nothing asked: a record whose file has
+        gone, or has been changed underneath it, is not one to hand back in place of a new
+        render. Read in chunks, for the reason `UploadedDocument.save` gives.
+        """
+        if not self.file or not self.checksum:
+            return False
+        digest = hashlib.sha256()
+        try:
+            with self.file.open("rb") as handle:
+                for chunk in iter(lambda: handle.read(65536), b""):
+                    digest.update(chunk)
+        except (OSError, ValueError):
+            return False
+        return digest.hexdigest() == self.checksum
+
+    @property
+    def text_to_compare(self) -> str:
+        """This document's words as plain text, or nothing where none were kept (#236).
+
+        A CV keeps them in `plain_text`. A letter's `source_text` is its words already, and
+        the registry is what says a kind is a letter, so one a plugin brings is read the
+        same way. Anything else -- a CV frozen before its text was kept, a report -- answers
+        with nothing, and the page says so rather than comparing markup.
+        """
+        if self.plain_text:
+            return self.plain_text
+        if kinds.theme_kind_for(self.kind) == themes.Kind.LETTER:
+            return self.source_text
+        return ""
+
+    def previous(self):
+        """The render of the same source that came before this one, or nothing.
+
+        *The same source* is the generic link, so it is a question only while the source is
+        still there: deleting a CV clears the link on every PDF made from it
+        (`signals.py`), and what is left has nothing to be compared with.
+        """
+        if not self.source_type_id or not self.source_id:
+            return None
+        return (
+            RenderedDocument.objects.filter(
+                owner_id=self.owner_id, source_type_id=self.source_type_id, source_id=self.source_id
+            )
+            .filter(
+                models.Q(rendered_at__lt=self.rendered_at)
+                | models.Q(rendered_at=self.rendered_at, pk__lt=self.pk)
+            )
+            .order_by("-rendered_at", "-pk")
+            .first()
+        )
 
 
 class CopyStatus(models.TextChoices):

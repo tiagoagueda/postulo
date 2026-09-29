@@ -151,6 +151,37 @@ def furnished(applicant):
         title="Reference",
         file=ContentFile(b"a reference", name="reference.txt"),
     )
+    # The same CV sent twice with a rewrite in between, so that the comparison has lines of
+    # all three kinds on it -- added, removed, and what did not change -- and so that the
+    # CV's page and the application's documents each have a version with one before it,
+    # which is the state their *Compare with previous* link exists in (#236). Written
+    # straight to the table: what is being looked at is the pages, not the renderer.
+    from postulo.documents.models import RenderedDocument
+
+    sent_as = "Test Engineer at Aperture Science"
+    words = (
+        "Alex Morgan\nDjango developer\n\nExperience\n\n{role}\nWeyland-Yutani · Lisbon\n"
+        "January 2019 – present\nKept the services up.\n- Cut deploy time.\n{last}"
+    )
+    render = None
+    for days_ago, role, last in (
+        (14, "Backend engineer", "- Wrote the runbooks."),
+        (1, "Senior backend engineer", "- Ran the on-call rota."),
+    ):
+        render = RenderedDocument(
+            owner=applicant,
+            title="Alex Morgan — CV",
+            kind="cv",
+            source=cv,
+            application=application,
+            sent_to=sent_as,
+            language="en-gb",
+            source_text="<html></html>",
+            plain_text=words.format(role=role, last=last),
+            checksum=f"{days_ago:064d}",
+            rendered_at=timezone.now() - dt.timedelta(days=days_ago),
+        )
+        render.file.save("alex-morgan-cv.pdf", ContentFile(b"%PDF-1.7 sent"), save=True)
     # Coloured and with an icon, so that axe reads a tag as it is drawn rather than as
     # the grey default -- the tones are where a contrast failure would hide (#285).
     tag = Tag.objects.create(
@@ -230,6 +261,8 @@ def furnished(applicant):
         "cv_item": cv.items.first(),
         "letter": letter,
         "upload": upload,
+        # The later of the two versions: the one with something to be compared with.
+        "render": render,
         "tag": tag,
         "capture": capture,
         "interview": interview,
@@ -270,6 +303,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     cv_item = it.get("cv_item", a)
     letter = it.get("letter", a)
     upload = it.get("upload", a)
+    render = it.get("render", a)
     tag = it.get("tag", a)
     capture = it.get("capture", a)
     contact = it.get("contact", a)
@@ -391,6 +425,11 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/documents/cvs/{cv.pk}/",
         f"/documents/cvs/{cv.pk}/edit/",
         f"/documents/cvs/{cv.pk}/preview/",
+        # *Copy as plain text*, which is a page so that it works with no script, and what
+        # changed between two versions of one document (#236). The drafts and the files
+        # beside them are downloads, and a download has no page to look at.
+        f"/documents/cvs/{cv.pk}/text/",
+        f"/documents/sent/{render.pk}/compare/",
         f"/documents/cvs/{cv.pk}/delete/",
         f"/documents/cv-entries/{cv_item.pk}/edit/",
         f"/documents/cv-entries/{cv_item.pk}/delete/",
@@ -792,6 +831,7 @@ def walked_url_names() -> frozenset[str]:
                     "cv_item",
                     "letter",
                     "upload",
+                    "render",
                     "tag",
                     "capture",
                     "contact",

@@ -1,0 +1,45 @@
+{% load i18n %}
+{% comment %}
+  One line of a comparison between two versions of a document (#236). Expects `change`
+  ("added", "removed", or anything else for a line that is in both) and `text`; `language`
+  where the words are a document's rather than the page's; and `key` for the two lines of
+  the key, whose words are the page's own and are neither inserted nor deleted.
+
+  A fragment of one page, drawn from two places on it, so an include rather than a
+  component. It is written with utilities and adds nothing to the stylesheet: everything a
+  line needs is a class Tailwind already has.
+
+  **Nothing is said by colour alone.** A line that was added carries a plus and a solid
+  edge; one that was removed a minus and a broken edge; and each has its word in front of
+  it for a screen reader. The tint is the fourth thing saying so, not the first. That is
+  also why a line in both versions has *no* edge rather than a transparent one: forced
+  colours paint a transparent border in the system's ink, and every line on the page would
+  then wear the same mark. It is padded by the edge's width instead, so the words line up.
+
+  `<ins>` and `<del>` are what the lines are, and a browser underlines one and strikes the
+  other through. Both are taken off: a CV somebody is reading to find out what they claimed
+  is not easier to read with a line through it, and the edge already says it.
+
+  `wrap-anywhere` because a line may be an address with no space in it, and the line is as
+  wide as the screen. `<bdi>` because what somebody typed may run the other way, and `lang`
+  because it may not be in the language the page is: a French CV compared by somebody
+  browsing in English is read out as French.
+{% endcomment %}
+{% if change == "added" %}
+  <li class="flex items-baseline gap-2 border-s-4 border-solid border-emerald-700 bg-emerald-50 py-1.5 ps-3 pe-3 text-emerald-950 wrap-anywhere dark:border-emerald-400 dark:bg-emerald-950 dark:text-emerald-100"
+      data-change="added">
+    <span class="w-4 shrink-0 text-center font-mono font-semibold" aria-hidden="true">+</span>
+    {% if key %}<span>{{ text }}</span>{% else %}<ins class="no-underline"><span class="sr-only">{% translate "Added:" %} </span><bdi{% if language %} lang="{{ language }}"{% endif %}>{{ text }}</bdi></ins>{% endif %}
+  </li>
+{% elif change == "removed" %}
+  <li class="flex items-baseline gap-2 border-s-4 border-dashed border-red-700 bg-red-50 py-1.5 ps-3 pe-3 text-red-950 wrap-anywhere dark:border-red-400 dark:bg-red-950 dark:text-red-100"
+      data-change="removed">
+    <span class="w-4 shrink-0 text-center font-mono font-semibold" aria-hidden="true">−</span>
+    {% if key %}<span>{{ text }}</span>{% else %}<del class="no-underline"><span class="sr-only">{% translate "Removed:" %} </span><bdi{% if language %} lang="{{ language }}"{% endif %}>{{ text }}</bdi></del>{% endif %}
+  </li>
+{% else %}
+  <li class="flex items-baseline gap-2 py-1.5 ps-4 pe-3 wrap-anywhere">
+    <span class="w-4 shrink-0" aria-hidden="true"></span>
+    <bdi{% if language %} lang="{{ language }}"{% endif %}>{{ text }}</bdi>
+  </li>
+{% endif %}

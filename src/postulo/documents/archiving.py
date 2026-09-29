@@ -2,7 +2,8 @@
 
 Nothing here runs inside a request except when a person presses *Send now*. A new
 document gets one pending :class:`~postulo.documents.models.DocumentCopy` per store
-connection that wants its kind; the scheduler's next pass sends what is pending, retries
+connection that wants its kind -- unless it is a PDF exported on its own, which was sent to
+nobody and is kept here only (#236); the scheduler's next pass sends what is pending, retries
 what failed with a growing wait, and gives up after a few attempts until someone asks
 again. Each copy shows its own state on the document — *archived*, *waiting*, *failed:
 …*, *not accepted* — so that a copy that never arrived is a thing a person can see rather
@@ -63,7 +64,15 @@ def schedule_copies(document, *, connections=None) -> list[DocumentCopy]:
     Idempotent: a copy that already exists for a connection is left as it is, whatever
     its state, so calling this twice — on creation and again from a backfill — never
     sends anything twice.
+
+    **Nothing is queued for a document that stays here** (#236). A PDF exported on its own
+    is somebody looking at their CV, and a store is for what was handed over; the document
+    says which it is (`RenderedDocument.goes_to_stores`). The rule is here rather than in
+    the signal because this is the one door: creation, *Send everything* and *Send now* all
+    come through it, and a rule kept at one of them is a rule the other two break.
     """
+    if not getattr(document, "goes_to_stores", True):
+        return []
     if connections is None:
         connections = store_connections(document.owner)
     created: list[DocumentCopy] = []

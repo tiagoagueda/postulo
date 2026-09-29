@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% blocktranslate trimmed with title=document.title %}What changed in {{ title }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <c-page-title>
+      {% translate "What changed" %}
+      <c-slot name="subtitle">
+      {% blocktranslate trimmed with title=document.title %}
+        “{{ title }}”, against the version sent before it.
+      {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% comment %} Which two, before what differs between them: a comparison that does not
+       say what it is comparing is a list of lines. Each version says when it was frozen
+       and where it went -- the application while that is still there, the words written
+       down on the day once it is not (#217) -- and can be downloaded from here, because
+       the answer to "what changed" is often "let me look at the PDF". {% endcomment %}
+    <div class="mb-6 grid gap-4 sm:grid-cols-2">
+      <section class="card" aria-labelledby="this-version">
+        <c-section-title id="this-version">{% translate "This version" %}</c-section-title>
+        <p class="text-sm">{{ document.rendered_at|date:"DATETIME_FORMAT" }}</p>
+        <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
+          {% if document.application %}
+            <a href="{{ document.application.get_absolute_url }}" class="underline"><bdi>{{ document.sent_to|default:document.application.posting.title }}</bdi></a>
+          {% elif document.sent_to %}
+            <bdi>{{ document.sent_to }}</bdi>
+          {% else %}
+            {% translate "Exported on its own" %}
+          {% endif %}
+        </p>
+        {% comment %} Named by its own word and its section's heading, in that order, so
+           the two *Download*s on this page are two names (#227) and what is read out still
+           begins with what is printed on the button. {% endcomment %}
+        <a href="{% url 'documents:rendered_download' document.pk %}" id="download-this-version"
+           aria-labelledby="download-this-version this-version"
+           class="btn" data-variant="outline" data-size="sm">{% translate "Download" %}</a>
+      </section>
+
+      {% if earlier %}
+        <section class="card" aria-labelledby="earlier-version">
+          <c-section-title id="earlier-version">{% translate "The version before it" %}</c-section-title>
+          <p class="text-sm">{{ earlier.rendered_at|date:"DATETIME_FORMAT" }}</p>
+          <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">
+            {% if earlier.application %}
+              <a href="{{ earlier.application.get_absolute_url }}" class="underline"><bdi>{{ earlier.sent_to|default:earlier.application.posting.title }}</bdi></a>
+            {% elif earlier.sent_to %}
+              <bdi>{{ earlier.sent_to }}</bdi>
+            {% else %}
+              {% translate "Exported on its own" %}
+            {% endif %}
+          </p>
+          <a href="{% url 'documents:rendered_download' earlier.pk %}" id="download-earlier-version"
+             aria-labelledby="download-earlier-version earlier-version"
+             class="btn" data-variant="outline" data-size="sm">{% translate "Download" %}</a>
+        </section>
+      {% endif %}
+    </div>
+
+    {% if not earlier %}
+      <c-empty variant="quiet">
+        {% translate "Nothing was sent from the same document before this, so there is nothing to compare it with." %}
+      </c-empty>
+    {% elif not comparison %}
+      {% comment %} Said, rather than worked around. What is kept of a CV frozen before
+         #236 is its markup -- the theme's whole stylesheet, then the page -- and comparing
+         that would report a change of theme as four hundred changed lines and a changed
+         job title as one of them. {% endcomment %}
+      <c-empty variant="quiet">
+        {% translate "One of these was frozen before Postulo kept the words of a document beside its PDF, so they cannot be compared line by line. Both can still be downloaded." %}
+      </c-empty>
+    {% elif not comparison.differs %}
+      <c-empty variant="quiet">
+        {% translate "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout." %}
+      </c-empty>
+    {% else %}
+      <section aria-labelledby="changes-heading">
+        {% comment %} How much changed, before what: two counts, each a sentence of its own
+           because each has its own plural. {% endcomment %}
+        <c-section-title id="changes-heading">
+          {% translate "Line by line" %}
+          <c-slot name="subtitle">
+            {% blocktranslate trimmed count counter=comparison.added %}
+              {{ counter }} line added
+            {% plural %}
+              {{ counter }} lines added
+            {% endblocktranslate %}
+            ·
+            {% blocktranslate trimmed count counter=comparison.removed %}
+              {{ counter }} line removed
+            {% plural %}
+              {{ counter }} lines removed
+            {% endblocktranslate %}
+          </c-slot>
+        </c-section-title>
+
+        {% comment %} The key. A plus and a minus are what the two kinds of line carry
+           where everybody can see them, and the key says what each means in words, once,
+           in the same dress as the lines themselves -- it is the same partial. Under
+           forced colours the tints are thrown away, and the sign and the edge are left. {% endcomment %}
+        {% translate "In this version, and not in the one before" as added_means %}
+        {% translate "In the one before, and not in this version" as removed_means %}
+        <ul class="card mb-4 overflow-hidden p-0 text-sm" aria-label="{% translate 'What the signs mean' %}">
+          {% include "documents/partials/comparison_line.html" with change="added" text=added_means key=True %}
+          {% include "documents/partials/comparison_line.html" with change="removed" text=removed_means key=True %}
+        </ul>
+
+        {% comment %} A list a passage, so a screen reader says how many lines each holds
+           and moves through them one at a time. A line that was removed is in the
+           language the earlier version declared, which need not be this one's: the same
+           CV may have been sent in French last month and in English today.
+           `overflow-hidden` is for the card's corners, which a tinted first line would
+           otherwise square off. {% endcomment %}
+        {% for passage in comparison.passages %}
+          {% if passage.skipped %}
+            <p class="my-2 ps-4 text-xs text-ink-500 dark:text-ink-400">
+              {% blocktranslate trimmed count counter=passage.skipped %}
+                {{ counter }} line the same
+              {% plural %}
+                {{ counter }} lines the same
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+          <ul class="card overflow-hidden p-0 text-sm">
+            {% for line in passage.lines %}
+              {% if line.change == "removed" %}
+                {% include "documents/partials/comparison_line.html" with change=line.change text=line.text language=earlier.language %}
+              {% else %}
+                {% include "documents/partials/comparison_line.html" with change=line.change text=line.text language=document.language %}
+              {% endif %}
+            {% endfor %}
+          </ul>
+        {% endfor %}
+        {% if comparison.skipped_after %}
+          <p class="my-2 ps-4 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed count counter=comparison.skipped_after %}
+              {{ counter }} line the same
+            {% plural %}
+              {{ counter }} lines the same
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+      </section>
+    {% endif %}
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      {% if source_url %}
+        <a href="{{ source_url }}" class="btn" data-variant="outline">{% translate "Back to the document" %}</a>
+      {% endif %}
+      <a href="{% url 'documents:rendered_list' %}" class="btn" data-variant="ghost">{% translate "Sent documents" %}</a>
+    </div>
+  </div>
+{% endblock %}
