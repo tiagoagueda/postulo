@@ -232,6 +232,17 @@ class ApplicationDetailsIn(Schema):
         ),
     )
     tags: list[str] = Field(default_factory=list, description="Tag names; unknown ones are made.")
+    referred_by_id: int | None = Field(
+        default=None,
+        description="The contact who referred you: one of your own, at any company or none.",
+    )
+    through_agency_id: int | None = Field(
+        default=None,
+        description=(
+            "The recruitment agency it went through: one of your own companies. The "
+            "listing's company stays the employer."
+        ),
+    )
 
     def application_data(self) -> dict:
         from postulo.applications.services import moment_for
@@ -257,6 +268,13 @@ class EventOut(Schema):
     body: str = ""
     from_status: str = ""
     to_status: str = ""
+    end_reason: str = Field(
+        default="",
+        description=(
+            "Why the application ended, on the entry that ended it: pay, location, "
+            "not_a_match, filled_internally, my_choice or other. Empty on every other entry."
+        ),
+    )
     actor: str = ""
 
 
@@ -330,6 +348,25 @@ class ApplicationOut(Schema):
     deadline: dt.date | None = None
     closed_at: dt.datetime | None = None
     contact_id: int | None = None
+    referred_by_id: int | None = None
+    through_agency_id: int | None = None
+    #: How it ended, read from the timeline and stored nowhere else (#239). All three are
+    #: empty while the application is live, and on one that was accepted.
+    end_reason: str = Field(
+        default="",
+        description=(
+            "Why it ended, for an application that is rejected, withdrawn or ghosted: the "
+            "latest reason on its timeline since it ended. Empty where none was given."
+        ),
+    )
+    end_note: str = Field(default="", description="What was written beside the ending.")
+    last_stage: str = Field(
+        default="",
+        description=(
+            "The status it had reached when it ended, read from the timeline. Empty where "
+            "the timeline does not say."
+        ),
+    )
     tags: list[str]
     next_interview_at: dt.datetime | None = None
     created_at: dt.datetime
@@ -374,6 +411,14 @@ class ApplicationDetailOut(ApplicationOut):
 class StatusIn(Schema):
     status: str
     note: str = ""
+    end_reason: str = Field(
+        default="",
+        description=(
+            "Why it ended, with rejected, withdrawn or ghosted: pay, location, not_a_match, "
+            "filled_internally, my_choice or other. Sent with the status the application "
+            "already has, it is a reason learnt afterwards and is added to the timeline."
+        ),
+    )
 
 
 class EventIn(Schema):
@@ -530,8 +575,26 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
     return data
 
 
+def event_out(event) -> dict:
+    """One timeline entry. Written once, because a list and a single call both answer it."""
+    return {
+        "id": event.pk,
+        "kind": event.kind,
+        "occurred_at": event.occurred_at,
+        "summary": event.summary,
+        "body": event.body,
+        "from_status": event.from_status,
+        "to_status": event.to_status,
+        "end_reason": event.end_reason,
+        "actor": event.actor,
+    }
+
+
 def application_out(request, application, *, detail: bool = False) -> dict:
     posting = application.posting
+    # Read from the timeline the caller loaded beside the row -- `with_status_log` for a
+    # list, the whole of it for one application -- so a page of fifty asks once (#239).
+    ending = application.ending
     data = {
         "id": application.pk,
         "listing": {
@@ -546,6 +609,11 @@ def application_out(request, application, *, detail: bool = False) -> dict:
         "deadline": application.deadline,
         "closed_at": application.closed_at,
         "contact_id": application.contact_id,
+        "referred_by_id": application.referred_by_id,
+        "through_agency_id": application.through_agency_id,
+        "end_reason": ending.reason if ending else "",
+        "end_note": ending.note if ending else "",
+        "last_stage": ending.last_stage if ending else "",
         "tags": [tag.name for tag in application.tags.all()],
         "next_interview_at": getattr(application, "next_interview_at", None),
         "created_at": application.created_at,
@@ -553,19 +621,7 @@ def application_out(request, application, *, detail: bool = False) -> dict:
         "web_url": request.build_absolute_uri(application.get_absolute_url()),
     }
     if detail:
-        data["events"] = [
-            {
-                "id": event.pk,
-                "kind": event.kind,
-                "occurred_at": event.occurred_at,
-                "summary": event.summary,
-                "body": event.body,
-                "from_status": event.from_status,
-                "to_status": event.to_status,
-                "actor": event.actor,
-            }
-            for event in application.events.all()
-        ]
+        data["events"] = [event_out(event) for event in application.events.all()]
         data["reminders"] = [reminder_out(r) for r in application.reminders.all()]
         data["interviews"] = [interview_out(request, i) for i in application.interviews.all()]
         data["offers"] = [offer_out(request, o) for o in application.offers.all()]

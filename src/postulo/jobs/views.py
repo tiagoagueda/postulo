@@ -10,7 +10,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
@@ -37,7 +37,7 @@ from postulo.core.mixins import (
 )
 from postulo.core.redirects import safe_next
 
-from . import identifiers, logos
+from . import duplicates, identifiers, logos, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import Company, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
@@ -310,6 +310,15 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # a kind that is off stay unlisted, exactly as the numbers do (#189).
         context["several_links"] = web_links.offered_kinds(person)
         context["structure_on"] = structure.structure_allowed(person)
+        # Worked out as the page is drawn, from the record as it is now (#239): which of
+        # this person's other companies look like this one, and which of the people here
+        # look like somebody recorded elsewhere. Told, and nothing done about it.
+        merge_url = reverse("jobs:company_merge", args=[self.object.pk])
+        context["duplicates"] = [
+            (candidate, f"{merge_url}?with={candidate.record.pk}")
+            for candidate in duplicates.for_company(self.object)
+        ]
+        context["people_alike"] = duplicates.contacts_with_any(person, context["contacts"])
         return context
 
 
@@ -456,6 +465,109 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
             "logo", request.user, subject=company, company_id=company.pk, action=action
         )
         return redirect("core:errand", pk=errand.pk)
+
+
+class MergeView(LoginRequiredMixin, View):
+    """Two records of one thing made into one, behind a page that says what will move (#239).
+
+    One address and two states of it. Bare, it asks *which one is the same as this?* --
+    the records `jobs.duplicates` noticed first, then a list of all the others, because
+    the person knows things the comparison does not. With ``?with=`` it is the
+    confirmation: what moves, what the kept record takes, where the two differ and what
+    becomes of the difference. Both are a GET and change nothing.
+
+    **The merge is a POST from the confirmation and from nowhere else.** A link cannot
+    merge anything: a page that was only opened, a bookmark, a crawler following addresses
+    must never be able to delete a record.
+
+    **Both records are looked up among the person's own**, the one in the address and the
+    one in the query alike, so somebody else's is a 404 and never a 403 -- and never a
+    merge of one person's company into another's.
+
+    The record in the address is the one that is kept. *Keep the other instead* is the
+    same page with the two exchanged, which is a link and needs no script.
+    """
+
+    model = None
+    template_name = "jobs/merge.html"
+    #: `company` or `contact`: which words the page uses, and which address it is at.
+    kind = ""
+    url_name = ""
+
+    def records(self):
+        return self.model.objects.for_user(self.request.user)
+
+    def plan(self, kept, other):
+        raise NotImplementedError
+
+    def merge(self, kept, other):
+        raise NotImplementedError
+
+    def alike(self, kept) -> list:
+        raise NotImplementedError
+
+    def after(self, kept) -> str:
+        """Where the page leads once it is done, and where *Cancel* goes."""
+        raise NotImplementedError
+
+    def address(self, kept, other=None) -> str:
+        url = reverse(self.url_name, args=[kept.pk])
+        return f"{url}?with={other.pk}" if other is not None else url
+
+    def other_or_404(self, kept, raw):
+        """The record named beside the kept one: another of this person's, or a 404."""
+        try:
+            pk = int(raw)
+        except (TypeError, ValueError):
+            raise Http404 from None
+        return get_object_or_404(self.records().exclude(pk=kept.pk), pk=pk)
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        kept = get_object_or_404(self.records(), pk=pk)
+        context = {"kind": self.kind, "kept": kept, "cancel_url": self.after(kept)}
+        named = request.GET.get("with", "")
+        if named:
+            other = self.other_or_404(kept, named)
+            context["other"] = other
+            context["plan"] = self.plan(kept, other)
+            context["swap_url"] = self.address(other, kept)
+        else:
+            context["candidates"] = [
+                (candidate, self.address(kept, candidate.record)) for candidate in self.alike(kept)
+            ]
+            context["choices"] = self.records().exclude(pk=kept.pk)
+            context["merge_url"] = self.address(kept)
+        return render(request, self.template_name, context)
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        kept = get_object_or_404(self.records(), pk=pk)
+        other = self.other_or_404(kept, request.POST.get("with", ""))
+        try:
+            plan = self.merge(kept, other)
+        except merging.CannotMerge as refusal:
+            # Undone whole by the time it is caught. The sentence is the merge's own.
+            messages.error(request, refusal.why)
+            return redirect(self.address(kept, other))
+        messages.success(request, merging.done(plan))
+        return redirect(self.after(kept))
+
+
+class CompanyMergeView(MergeView):
+    model = Company
+    kind = "company"
+    url_name = "jobs:company_merge"
+
+    def plan(self, kept, other):
+        return merging.plan_companies(kept, other)
+
+    def merge(self, kept, other):
+        return merging.merge_companies(kept, other)
+
+    def alike(self, kept) -> list:
+        return duplicates.for_company(kept)
+
+    def after(self, kept) -> str:
+        return kept.get_absolute_url()
 
 
 class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
@@ -621,6 +733,18 @@ class ContactUpdateView(
     form_class = ContactForm
     template_name = "jobs/contact_form.html"
 
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        # The one page a person has, so this is where it is said that they look like
+        # somebody recorded twice (#239). Worked out as the page is drawn; told, not done.
+        merge_url = reverse("jobs:contact_merge", args=[self.object.pk])
+        context["merge_url"] = merge_url
+        context["duplicates"] = [
+            (candidate, f"{merge_url}?with={candidate.record.pk}")
+            for candidate in duplicates.for_contact(self.object)
+        ]
+        return context
+
     def get_success_url(self) -> str:
         if self.object.company_id:
             return reverse("jobs:company_detail", args=[self.object.company_id])
@@ -638,6 +762,28 @@ class ContactUpdateView(
             self.save_phone_numbers(numbers, self.object)
             self.save_web_links(links, self.object)
         return response
+
+
+class ContactMergeView(MergeView):
+    model = Contact
+    kind = "contact"
+    url_name = "jobs:contact_merge"
+
+    def records(self):
+        return super().records().select_related("company", "department")
+
+    def plan(self, kept, other):
+        return merging.plan_contacts(kept, other)
+
+    def merge(self, kept, other):
+        return merging.merge_contacts(kept, other)
+
+    def alike(self, kept) -> list:
+        return duplicates.for_contact(kept)
+
+    def after(self, kept) -> str:
+        # A person has no page but the one they are edited on.
+        return reverse("jobs:contact_update", args=[kept.pk])
 
 
 class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):

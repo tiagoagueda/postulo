@@ -485,6 +485,37 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     #: findable once that company and its departments exist (#138).
     wants_department: dict[int, tuple[str, str]] = {}
 
+    #: Who referred the person, as the contact's id in the file, and the agency it went
+    #: through, by name. Both applied once every company and every contact in the file
+    #: exists: a referrer is as often at another company as at this one, and an agency is
+    #: another company by definition, so either may come later in the file than the
+    #: application that names it (#239).
+    wants_referrer: dict[int, int] = {}
+    wants_agency: dict[int, str] = {}
+
+    def restore_contact(entry: dict, company) -> None:
+        """One person from the file, at ``company`` or at none."""
+        old_id = entry.pop("id", None)
+        numbers = _phone_rows(entry)
+        contact_addresses = _address_rows(entry)
+        contact_links = _link_rows(entry)
+        department_name = (entry.pop("department", "") or "").strip()[:120]
+        contact = Contact.objects.create(owner=user, company=company, **entry)
+        if department_name and company is not None:
+            department, _made = Department.objects.get_or_create(
+                owner=user, company=company, name=department_name
+            )
+            contact.department = department
+            contact.save(update_fields=["department"])
+        _restore_phone_numbers(contact, user, numbers)
+        _restore_postal_addresses(contact, user, contact_addresses)
+        _restore_web_links(contact, user, contact_links)
+        contacts[old_id] = contact
+
+    # The people recorded at no company, which format 20 is the first to carry (#239).
+    for contact_entry in document.get("contacts", []):
+        restore_contact(contact_entry, None)
+
     for company_entry in document.get("companies", []):
         contact_entries = company_entry.pop("contacts", [])
         posting_entries = company_entry.pop("postings", [])
@@ -554,22 +585,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 continue
 
         for contact_entry in contact_entries:
-            old_id = contact_entry.pop("id", None)
-            numbers = _phone_rows(contact_entry)
-            contact_addresses = _address_rows(contact_entry)
-            contact_links = _link_rows(contact_entry)
-            department_name = (contact_entry.pop("department", "") or "").strip()[:120]
-            contact = Contact.objects.create(owner=user, company=company, **contact_entry)
-            if department_name:
-                department, _made = Department.objects.get_or_create(
-                    owner=user, company=company, name=department_name
-                )
-                contact.department = department
-                contact.save(update_fields=["department"])
-            _restore_phone_numbers(contact, user, numbers)
-            _restore_postal_addresses(contact, user, contact_addresses)
-            _restore_web_links(contact, user, contact_links)
-            contacts[old_id] = contact
+            restore_contact(contact_entry, company)
 
         for posting_entry in posting_entries:
             application_entries = posting_entry.pop("applications", [])
@@ -609,6 +625,14 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                     (application_entry.pop("department_company", "") or "").strip(),
                     (application_entry.pop("department", "") or "").strip(),
                 )
+                # Format 20 (#239). An archive from before it names neither, and both
+                # keys are taken out either way: what is left goes straight to the model.
+                referrer_id = application_entry.pop("referred_by_id", None)
+                if referrer_id is not None:
+                    wants_referrer[old_id] = referrer_id
+                agency_name = (application_entry.pop("through_agency", "") or "").strip()
+                if agency_name:
+                    wants_agency[old_id] = agency_name
 
                 application_entry["applied_at"] = _dt(application_entry.get("applied_at"))
                 application_entry["closed_at"] = _dt(application_entry.get("closed_at"))
@@ -719,6 +743,27 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         )
         if department is not None:
             Application.objects.filter(pk=application.pk).update(department=department)
+
+    # Who referred the person and the agency it went through, now that everybody and every
+    # company in the file exists. One the file names and does not hold is left empty
+    # rather than guessed at, as a department is (#239).
+    for old_application_id, old_contact_id in wants_referrer.items():
+        application = applications.get(old_application_id)
+        referrer = contacts.get(old_contact_id)
+        if application is not None and referrer is not None:
+            Application.objects.filter(pk=application.pk).update(referred_by=referrer)
+    if wants_agency:
+        agencies = {
+            company.name.casefold(): company
+            for company in Company.objects.for_user(user).filter(
+                name__in=set(wants_agency.values())
+            )
+        }
+        for old_application_id, name in wants_agency.items():
+            application = applications.get(old_application_id)
+            agency = agencies.get(name.casefold())
+            if application is not None and agency is not None:
+                Application.objects.filter(pk=application.pk).update(through_agency=agency)
 
     # ---------------------------------------------------------------- documents
     documents = document.get("documents", {})

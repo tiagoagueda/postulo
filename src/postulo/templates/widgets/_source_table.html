@@ -1,0 +1,42 @@
+{% load i18n postulo %}
+{% comment %} One more reading of where applications came from (#239): the same six columns
+   as the table of sources above it, over ``rows``, with ``first`` naming the first column
+   and ``label`` naming the box for whoever reaches it from the keyboard. Included by
+   `widgets/sources.html` once per breakdown, so the two cannot come to differ.
+{% endcomment %}
+<c-scroll-box class="card p-0" label="{{ label }}">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">{{ first }}</th>
+        <th scope="col">{% translate "Sent" %}</th>
+        <th scope="col">{% translate "Replied" %}</th>
+        <th scope="col">{% translate "Interviews" %}</th>
+        <th scope="col">{% translate "Offers" %}</th>
+        <th scope="col">{% translate "Quiet" %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in rows %}
+        <tr>
+          <td><bdi>{{ row.name }}</bdi></td>
+          <td class="tabular-nums">{{ row.applied }}</td>
+          <td class="tabular-nums">
+            {{ row.responded }}
+            {% if row.response_rate is not None %}
+              <span class="text-xs text-ink-400">({{ row.response_rate|floatformat:0|percent }})</span>
+            {% endif %}
+          </td>
+          <td class="tabular-nums">{{ row.interviewed }}</td>
+          <td class="tabular-nums">{{ row.offers }}</td>
+          <td class="tabular-nums">
+            {{ row.quiet }}
+            {% if row.quiet %}
+              <span class="text-xs text-ink-400">({{ row.quiet_rate|floatformat:0|percent }})</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</c-scroll-box>

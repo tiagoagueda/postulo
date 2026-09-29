@@ -33,7 +33,7 @@ from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 
-from . import agenda, ical, quiet, reports, suggestions
+from . import agenda, endings, ical, quiet, reports, suggestions
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
@@ -46,6 +46,7 @@ from .forms import (
 )
 from .models import (
     BOARD_STATUSES,
+    END_STATUSES,
     SETTLED_OUTCOMES,
     Application,
     EventKind,
@@ -369,6 +370,9 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
                 "contact",
                 "department",
                 "department__company",
+                "referred_by",
+                "referred_by__company",
+                "through_agency",
             )
         )
 
@@ -379,7 +383,10 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # One answer about one person, decided here rather than asked of each block.
         context["structure_on"] = structure.structure_allowed(self.request.user)
         context["group"] = structure.group_of(self.object.posting.company, self.request.user)
-        context["events"] = self.object.events.all()
+        # Read once and used twice: the timeline draws them, and how the application ended
+        # is read from the same rows rather than asked for again (#239).
+        context["events"] = list(self.object.events.all())
+        context["ending"] = endings.read(self.object.status, endings.entries(context["events"]))
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
         context["offers"] = list(self.object.offers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
@@ -515,11 +522,29 @@ class ApplicationStatusView(OwnedObjectMixin, View):
         application = get_object_or_404(self.get_queryset(), pk=pk)
         form = StatusChangeForm(request.POST)
         if form.is_valid():
+            status = form.cleaned_data["status"]
+            reason = form.cleaned_data.get("end_reason", "")
+            if reason and status not in END_STATUSES:
+                # Told rather than refused, and rather than dropped without a word: the
+                # box is on the form whatever the status, so a reason chosen beside
+                # *Interviewing* is a slip, and the move is still what was asked for (#239).
+                reason = ""
+                messages.info(
+                    request,
+                    _(
+                        "The reason was not kept: only an application that was rejected, "
+                        "withdrawn or ghosted has one."
+                    ),
+                )
             changed = change_status(
-                application, form.cleaned_data["status"], note=form.cleaned_data.get("note", "")
+                application, status, note=form.cleaned_data.get("note", ""), end_reason=reason
             )
             if changed is not None:
-                messages.success(request, _("Status updated."))
+                # From a status to itself is a reason given for where it already stood.
+                only_why = changed.from_status == changed.to_status
+                messages.success(
+                    request, _("Reason recorded.") if only_why else _("Status updated.")
+                )
         else:
             messages.error(request, _("That is not a status Postulo recognises."))
 
@@ -565,6 +590,9 @@ def detail_fragments(request, application, *, target: str, event_form=None):
     context = {
         "application": application,
         "status_form": StatusChangeForm(initial={"status": application.status}),
+        # Asked afresh, for the reason the rest of this is: the card says how the
+        # application ended, and the entry that says so was written a moment ago (#239).
+        "ending": endings.of(application, afresh=True),
         "event_form": event_form if event_form is not None else EventForm(),
         "reminders": application.reminders.filter(done_at__isnull=True),
     }

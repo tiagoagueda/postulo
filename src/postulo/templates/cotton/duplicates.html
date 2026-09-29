@@ -1,0 +1,57 @@
+{% load i18n %}
+<c-vars candidates />
+{% comment %} The records that look like the same one as the record on this page (#239).
+
+   `<c-duplicates :candidates="duplicates" />`, where each candidate comes with the address
+   of the page that would merge it: `[(candidate, url), …]`, as `jobs.duplicates` finds
+   them and the view pairs them. Nothing at all is drawn where there are none.
+
+   A component because three pages say it -- a company's, a contact's, and the page that
+   merges either -- and a notice worded three ways is three notices.
+
+   **It tells and never refuses**, which is why it is a note in the page rather than an
+   error on a form: *Acme Ltd* and *Acme GmbH* may be two companies, and only the person
+   recording them knows. Each line says why the two look alike, in words and not only by
+   sitting in a coloured box, and the only thing it offers leads to a page that shows what
+   a merge would move before anything moves.
+
+   Under each name is what tells it from another of the same name, which
+   `<c-told-apart>` draws for a person and for a company alike.
+
+   An alert is a row, and this one holds a heading, a sentence and a list, so it says
+   `flex-col` and lets its children take the width. The heading is bare rather than a
+   `<c-section-title>`: that one paints the sentence under it grey, which is measured
+   against a card's ground and not against an alert's tint, and what is said here is the
+   alert's own words at the alert's own contrast.
+{% endcomment %}
+{% if candidates %}
+  <section class="alert mb-6 flex-col items-stretch" data-variant="info"
+           aria-labelledby="possible-duplicates" data-possible-duplicates>
+    <h2 id="possible-duplicates" class="font-medium">{% translate "Possible duplicates" %}</h2>
+    <p>
+      {% translate "These look like the same one, and may not be. Nothing is merged unless you say so, and you are shown what would move first." %}
+    </p>
+    <ul class="space-y-3">
+      {% for candidate, url in candidates %}
+        <li class="flex flex-wrap items-start gap-3" data-candidate="{{ candidate.record.pk }}">
+          <div class="min-w-0 grow basis-48">
+            <p class="font-medium">
+              {% if candidate.record.get_absolute_url %}
+                <a href="{{ candidate.record.get_absolute_url }}" class="underline"><bdi>{{ candidate.record.name }}</bdi></a>
+              {% else %}
+                <bdi>{{ candidate.record.name }}</bdi>
+              {% endif %}
+            </p>
+            <c-told-apart :record="candidate.record" />
+            <ul class="mt-1 list-disc space-y-1 ps-5 text-xs">
+              {% for reason in candidate.reasons %}<li>{{ reason }}</li>{% endfor %}
+            </ul>
+          </div>
+          <a href="{{ url }}" class="btn" data-variant="outline" data-size="sm">
+            {% translate "Merge" %}<span class="sr-only">: <bdi>{{ candidate.record.name }}</bdi></span>
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endif %}

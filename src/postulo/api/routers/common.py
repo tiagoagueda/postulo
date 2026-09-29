@@ -35,6 +35,31 @@ def identifiers_or_422(company, items, *, replace: bool = False) -> None:
         raise HttpError(422, "; ".join(exc.messages)) from exc
 
 
+def referrer_and_agency_or_422(request, payload) -> dict:
+    """Who referred the caller and through which agency, as rows of the caller's own (#239).
+
+    The payload names them by id, and an id is only a number until somebody has checked
+    whose it is: the contact and the company are looked up among the caller's own, exactly
+    as the form offers only the owner's. **One answer for somebody else's record and for
+    one that does not exist**, so the refusal confirms nothing about what another account
+    holds.
+    """
+    from postulo.jobs.models import Company, Contact
+
+    found = {}
+    if payload.referred_by_id is not None:
+        contact = owned(request, Contact.objects).filter(pk=payload.referred_by_id).first()
+        if contact is None:
+            raise HttpError(422, "'referred_by_id' is not one of your contacts.")
+        found["referred_by"] = contact
+    if payload.through_agency_id is not None:
+        agency = owned(request, Company.objects).filter(pk=payload.through_agency_id).first()
+        if agency is None:
+            raise HttpError(422, "'through_agency_id' is not one of your companies.")
+        found["through_agency"] = agency
+    return found
+
+
 def priority_or_422(value: int) -> int:
     from postulo.applications.models import Priority
 

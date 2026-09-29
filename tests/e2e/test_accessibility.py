@@ -245,11 +245,54 @@ def furnished(applicant):
         finished_at=timezone.now(),
     )
 
+    # A second record of the same company and of the same person, so the notice that says
+    # so is on the pages it is drawn on and the page that merges them has something to
+    # show: what moves, what the kept record takes, and where the two differ (#239).
+    from postulo.jobs.models import CompanyIdentifier, Department
+
+    duplicate = Company.objects.create(
+        owner=applicant,
+        name="Aperture Science Ltd",
+        location="Cleveland",
+        website="https://aperture.example",
+        notes="The one from the fair.",
+    )
+    CompanyIdentifier.objects.create(
+        owner=applicant, company=duplicate, scheme="wikidata", value="Q95"
+    )
+    Department.objects.create(owner=applicant, company=duplicate, name="Testing")
+    twin = Contact.objects.create(
+        owner=applicant,
+        company=duplicate,
+        name="Cave Johnson",
+        role="Founder",
+        email="cave@aperture.example",
+    )
+    # And an application that ended, with where it had got to and why, that somebody
+    # referred the person to and that went through an agency: the state in which its page
+    # says all four, and the two widgets that count them have something to count (#239).
+    agency = Company.objects.create(owner=applicant, name="Hays")
+    ended = Application.objects.create(
+        owner=applicant,
+        posting=JobPosting.objects.create(
+            owner=applicant, company=duplicate, title="Enrichment Centre Supervisor"
+        ),
+        status=Status.DRAFT,
+        referred_by=twin,
+        through_agency=agency,
+    )
+    change_status(ended, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=20))
+    change_status(ended, Status.INTERVIEWING, occurred_at=timezone.now() - dt.timedelta(days=9))
+    change_status(ended, Status.REJECTED, note="Under the range they advertised.", end_reason="pay")
+
     applicant.is_staff = True
     applicant.is_superuser = True
     applicant.save()
     return {
         "application": application,
+        "ended": ended,
+        "duplicate": duplicate,
+        "twin": twin,
         "errand": errand,
         "company": company,
         "applicant": applicant,
@@ -314,6 +357,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     offer = it.get("offer", a)
     connection = it.get("connection", a)
     errand = it.get("errand", a)
+    ended = it.get("ended", a)
+    duplicate = it.get("duplicate", c)
+    twin = it.get("twin", contact)
     return [
         "/",
         "/listings/",
@@ -451,6 +497,17 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         f"/applications/offers/{offer.pk}/delete/",
         f"/jobs/captures/{capture.pk}/review/",
         f"/jobs/companies/{c.pk}/delete/",
+        # An application that ended, saying where it had got to and why, who referred the
+        # person and through which agency (#239).
+        f"/applications/{ended.pk}/",
+        f"/applications/{ended.pk}/edit/",
+        # Merging two records of one company, and of one person: the page that asks which
+        # one, and the page that says what would move. Fetched and never submitted, like
+        # every confirmation on this walk (#239).
+        f"/jobs/companies/{c.pk}/merge/",
+        f"/jobs/companies/{c.pk}/merge/?with={duplicate.pk}",
+        f"/jobs/contacts/{contact.pk}/merge/",
+        f"/jobs/contacts/{contact.pk}/merge/?with={twin.pk}",
         f"/jobs/contacts/{contact.pk}/edit/",
         f"/jobs/contacts/{contact.pk}/delete/",
         f"/jobs/industries/{industry.pk}/edit/",

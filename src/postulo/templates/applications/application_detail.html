@@ -117,6 +117,32 @@
               <dd>{{ application.contact.name }}{% if application.contact.role %} — {{ application.contact.role }}{% endif %}</dd>
             </div>
           {% endif %}
+          {% comment %} Who put the person forward, and the agency it went through (#239).
+             The company at the top of the page is the employer and stays the employer:
+             these two say how the application reached it, not where it was sent. {% endcomment %}
+          {% if application.referred_by %}
+            <div data-referred-by>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Referred by" %}</dt>
+              <dd>
+                <bdi>{{ application.referred_by.name }}</bdi>
+                {% if application.referred_by.company %}
+                  <span class="text-xs text-ink-500 dark:text-ink-400">
+                    <bdi>{{ application.referred_by.company.name }}</bdi>
+                  </span>
+                {% endif %}
+              </dd>
+            </div>
+          {% endif %}
+          {% if application.through_agency %}
+            <div data-through-agency>
+              <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Through agency" %}</dt>
+              <dd>
+                <a href="{{ application.through_agency.get_absolute_url }}" class="hover:underline">
+                  <bdi>{{ application.through_agency.name }}</bdi>
+                </a>
+              </dd>
+            </div>
+          {% endif %}
         </dl>
 
         <div class="mt-4 flex flex-wrap gap-3 text-sm">

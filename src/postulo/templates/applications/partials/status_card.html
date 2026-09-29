@@ -13,9 +13,37 @@
    A status change writes a timeline entry, so the answer carries the timeline as well,
    out of band. Two regions from one request rather than two requests, and the eye is
    already on the second one.
+
+   How it ended sits in this card rather than beside the posting (#239), because this is
+   the region a status change swaps: written anywhere else it would go on saying what was
+   true before the button was pressed. Both lines are read from the timeline -- the stage
+   is never typed, and the reason is the one on the entry that ended it.
+
+   The reason is on the form whatever the status, with its help under the row: showing it
+   only beside the three statuses that are endings needs a script, and this form has to
+   work without one. The help is a child of the form so its id is the one the select
+   already names in `aria-describedby`.
 {% endcomment %}
 <div class="card mb-6" id="status-card">
   <c-section-title>{% translate "Move it along" %}</c-section-title>
+  {% if ending %}
+    <dl class="mb-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2" data-ending>
+      <div>
+        <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Last stage reached" %}</dt>
+        <dd data-last-stage>{% if ending.last_stage %}{{ ending.last_stage_label }}{% else %}{% translate "Not recorded" %}{% endif %}</dd>
+      </div>
+      <div>
+        <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Why it ended" %}</dt>
+        <dd data-end-reason>{% if ending.reason %}{{ ending.reason_label }}{% else %}{% translate "Not recorded" %}{% endif %}</dd>
+      </div>
+      {% if ending.note %}
+        <div class="sm:col-span-2">
+          <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Note" %}</dt>
+          <dd class="whitespace-pre-line" data-end-note>{{ ending.note }}</dd>
+        </div>
+      {% endif %}
+    </dl>
+  {% endif %}
   <form method="post" action="{% url 'applications:status' application.pk %}"
         hx-post="{% url 'applications:status' application.pk %}"
         hx-target="#status-card" hx-swap="outerHTML"
@@ -25,10 +53,16 @@
       <label for="id_status">{% translate "Status" %}</label>
       {{ status_form.status }}
     </div>
+    <div class="field w-auto">
+      <label for="{{ status_form.end_reason.id_for_label }}">{{ status_form.end_reason.label }}</label>
+      {{ status_form.end_reason }}
+    </div>
     <div class="field min-w-64 flex-1">
       <label for="id_note">{% translate "Note (optional)" %}</label>
       {{ status_form.note }}
     </div>
     <button type="submit" class="btn">{% translate "Record" %}</button>
+    <p id="{{ status_form.end_reason.auto_id }}_helptext"
+       class="basis-full text-xs text-ink-500 dark:text-ink-400">{{ status_form.end_reason.help_text }}</p>
   </form>
 </div>

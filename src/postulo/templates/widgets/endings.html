@@ -1,0 +1,86 @@
+{% load i18n %}
+{% comment %} Where applications ended, and why (#239).
+
+   Two tables, because they are two questions and the numbers are small: crossing every
+   stage with every reason would be a grid of noughts with four figures in it. Each line
+   says how many ended there and how -- turned down, walked away from, or never answered --
+   since a stage where everything is rejected and one where everything goes silent are
+   not the same problem.
+
+   Both are read from the timeline. The stage is what each application was moved from when
+   it ended and is never typed; the reason is the one on the entry that ended it. Most
+   endings come with no reason, so the second table says how many of them it is about.
+{% endcomment %}
+<c-section-title>{{ widget.label }}</c-section-title>
+{% if insights.endings.total %}
+  <div class="grid gap-6 lg:grid-cols-2 [&>*]:min-w-0" data-endings>
+    <div>
+      <c-scroll-box class="card p-0" label="{% translate 'Where they ended' %}">
+        <table class="table" data-endings-where>
+          <thead>
+            <tr>
+              <th scope="col">{% translate "Last stage reached" %}</th>
+              <th scope="col">{% translate "Ended" %}</th>
+              <th scope="col">{% translate "Rejected" %}</th>
+              <th scope="col">{% translate "Withdrawn" %}</th>
+              <th scope="col">{% translate "Ghosted" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in insights.endings.stages %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td class="tabular-nums">{{ row.total }}</td>
+                <td class="tabular-nums">{{ row.rejected }}</td>
+                <td class="tabular-nums">{{ row.withdrawn }}</td>
+                <td class="tabular-nums">{{ row.ghosted }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </c-scroll-box>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+        {% translate "The stage is read from each timeline: where the application stood when it ended." %}
+      </p>
+    </div>
+    <div>
+      <c-scroll-box class="card p-0" label="{% translate 'Why they ended' %}">
+        <table class="table" data-endings-why>
+          <thead>
+            <tr>
+              <th scope="col">{% translate "Why it ended" %}</th>
+              <th scope="col">{% translate "Ended" %}</th>
+              <th scope="col">{% translate "Rejected" %}</th>
+              <th scope="col">{% translate "Withdrawn" %}</th>
+              <th scope="col">{% translate "Ghosted" %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for row in insights.endings.reasons %}
+              <tr>
+                <td>{{ row.label }}</td>
+                <td class="tabular-nums">{{ row.total }}</td>
+                <td class="tabular-nums">{{ row.rejected }}</td>
+                <td class="tabular-nums">{{ row.withdrawn }}</td>
+                <td class="tabular-nums">{{ row.ghosted }}</td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </c-scroll-box>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-endings-explained>
+        {% blocktranslate count counter=insights.endings.total with explained=insights.endings.explained trimmed %}
+          {{ explained }} of {{ counter }} ending has a reason recorded. One can be added
+          afterwards, from the application's own page.
+        {% plural %}
+          {{ explained }} of {{ counter }} endings have a reason recorded. One can be added
+          afterwards, from the application's own page.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+{% else %}
+  <c-empty variant="quiet">
+    {% translate "Nothing has ended yet: no application is rejected, withdrawn or ghosted." %}
+  </c-empty>
+{% endif %}

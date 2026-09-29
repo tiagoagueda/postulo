@@ -298,8 +298,10 @@ def test_the_format_version_moved(user):
     contact with a ``web_links`` list (#189); 18 added the ISCO-08 code a posting's title
     matches in the ESCO classification, beside the title itself (#266); 19 added the words
     of a sent CV without the page they were set in, which is what two versions are compared
-    by (#236).
+    by (#236); 20 added why an application ended on the timeline entry that ended it, who
+    referred the person and the agency it went through on the application, and the people
+    recorded at no company, who had been left out of the archive (#239).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 19
+    assert export.FORMAT_VERSION == 20

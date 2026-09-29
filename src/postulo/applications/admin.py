@@ -6,7 +6,7 @@ from .models import Application, ApplicationEvent, Interview, Reminder, Suggesti
 class EventInline(admin.TabularInline):
     model = ApplicationEvent
     extra = 0
-    fields = ("occurred_at", "kind", "summary", "from_status", "to_status")
+    fields = ("occurred_at", "kind", "summary", "from_status", "to_status", "end_reason")
     ordering = ("-occurred_at",)
 
 
@@ -15,7 +15,9 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_display = ("__str__", "status", "priority", "applied_at", "owner")
     list_filter = ("owner", "status", "priority", "channel")
     search_fields = ("posting__title", "posting__company__name")
-    autocomplete_fields = ("posting", "contact")
+    # Looked up by typing rather than drawn as a list of every contact and every company
+    # on the instance, which is what a plain select of either would be (#239).
+    autocomplete_fields = ("posting", "contact", "referred_by", "through_agency")
     filter_horizontal = ("tags",)
     inlines = (EventInline,)
 

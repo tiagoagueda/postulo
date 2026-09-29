@@ -18,17 +18,20 @@ import hashlib
 import statistics
 from dataclasses import dataclass, field
 
-from django.db.models import Count, Min, Q
+from django.db.models import Count, F, Min, Q
 from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import JobPosting, ListingState
 
+from . import endings
 from .models import (
+    BOARD_STATUSES,
     QUIET_STATUSES,
     Application,
     ApplicationEvent,
+    EndReason,
     EventKind,
     Interview,
     InterviewOutcome,
@@ -91,6 +94,37 @@ class SourceRow:
 
 
 @dataclass
+class EndingRow:
+    """One line of *Where and why applications end*: a stage or a reason, and how many
+    ended there, told apart by how -- turned down, walked away from, or never answered."""
+
+    #: The stage or the reason, as stored; empty for the line that gathers the unrecorded.
+    key: str
+    label: str
+    rejected: int = 0
+    withdrawn: int = 0
+    ghosted: int = 0
+
+    @property
+    def total(self) -> int:
+        return self.rejected + self.withdrawn + self.ghosted
+
+
+@dataclass
+class Endings:
+    """Where applications ended and why, read from the timeline (#239)."""
+
+    total: int = 0
+    #: By the stage each had reached when it ended, in the order of the board.
+    stages: list[EndingRow] = field(default_factory=list)
+    #: By the reason given, commonest first, with the ones nobody gave a reason for last.
+    reasons: list[EndingRow] = field(default_factory=list)
+    #: How many of them carry a reason at all. Most endings come with none, and a table
+    #: of reasons that did not say so would read as if it covered every one.
+    explained: int = 0
+
+
+@dataclass
 class Insights:
     total: int = 0
     applied: int = 0
@@ -111,6 +145,13 @@ class Insights:
     interviews_ahead: int = 0
     interview_kinds: list[tuple[str, int]] = field(default_factory=list)
     sources: list[SourceRow] = field(default_factory=list)
+    #: The same figures by who referred the person and by the agency it went through
+    #: (#239). Only the applications that name one: most name neither, and a line for
+    #: those would be the table above it, printed again.
+    by_referrer: list[SourceRow] = field(default_factory=list)
+    by_agency: list[SourceRow] = field(default_factory=list)
+    #: Where applications ended, and why (#239).
+    endings: Endings = field(default_factory=Endings)
     #: The same figures by the company's industries. A company in three fields counts in
     #: all three, which is the honest reading.
     industries: list[SourceRow] = field(default_factory=list)
@@ -173,6 +214,9 @@ def _first_reply_days(applications) -> dict[int, int]:
             application_id__in=applied_at,
             to_status__in=list(RESPONSE_STATUSES),
         )
+        # An entry from a status to itself is a reason given afterwards (#239), dated
+        # when somebody typed it. It is not the day anybody replied.
+        .exclude(from_status=F("to_status"))
         .values("application_id")
         .annotate(first=Min("occurred_at"))
     )
@@ -243,6 +287,13 @@ def _first_interview_days(applications) -> dict[int, int]:
     return days
 
 
+#: What the cached figures are shaped like. The cache is a table and outlives an upgrade,
+#: so figures kept by one release are read by the next -- and when `Insights` gains a field
+#: they would arrive without it. Counted into the fingerprint, so a release that changes
+#: the shape asks for keys no earlier one wrote. 2 added the endings and the two
+#: breakdowns of the sources (#239).
+SHAPE = 2
+
 #: How long a set of figures may sit in the cache at most. The fingerprint below is what
 #: actually decides whether they are still true; this is only so that a key for a state
 #: nobody will ever be in again does not live in the table for ever.
@@ -250,26 +301,40 @@ INSIGHTS_TTL = 60 * 60 * 24
 
 
 def fingerprint(user) -> str:
-    """What the figures depend on, in three small aggregates (#231).
+    """What the figures depend on, in five small aggregates (#231).
 
     Everything `build` reads is an application, a timeline entry or a listing of this
-    person's. So: how many of each there are, the newest change to one, and the newest entry
-    written. Any of those moving means the figures may have moved; none of them moving means
-    they cannot have.
+    person's, and the names it prints are a company's or a contact's. So: how many of each
+    there are, the newest change to one, and the newest entry written. Any of those moving
+    means the figures may have moved; none of them moving means they cannot have.
 
-    Three indexed aggregates against loading every application, every industry and every
+    Five indexed aggregates against loading every application, every industry and every
     status event a search has ever produced, which is what `build` does and what the
     dashboard did on every view. Counting *and* stamping, because a deletion moves the count
     and leaves the newest `updated_at` exactly where it was.
+
+    Companies and contacts joined the other three with #239: the figures by referrer and
+    by agency print their names, and somebody renamed -- or merged into somebody else --
+    has to be renamed here as well.
     """
     from django.db.models import Max
+    from django.utils import translation
+
+    from postulo.jobs.models import Company, Contact
 
     applications = Application.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     events = ApplicationEvent.objects.filter(application__owner=user).aggregate(
         n=Count("pk"), at=Max("pk")
     )
     listings = JobPosting.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    companies = Company.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    contacts = Contact.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     parts = (
+        SHAPE,
+        # The figures carry words -- the name of a stage, of a reason, *Not recorded* --
+        # written in the language they were worked out in, so somebody who changes the
+        # language they read in has to be given figures worked out again.
+        translation.get_language(),
         getattr(user, "pk", 0),
         applications["n"],
         applications["at"],
@@ -277,6 +342,10 @@ def fingerprint(user) -> str:
         events["at"],
         listings["n"],
         listings["at"],
+        companies["n"],
+        companies["at"],
+        contacts["n"],
+        contacts["at"],
         # The threshold is a preference rather than a record, and `quiet_now` is computed
         # from it. Somebody changing it from 21 days to 14 changes the figures without
         # touching anything the three aggregates above can see.
@@ -319,7 +388,13 @@ def build(user) -> Insights:
     """
     applications = list(
         Application.objects.for_user(user)
-        .select_related("posting", "posting__company")
+        .select_related(
+            "posting",
+            "posting__company",
+            "referred_by",
+            "referred_by__company",
+            "through_agency",
+        )
         .prefetch_related("posting__company__industries")
     )
     insights = Insights(total=len(applications))
@@ -408,11 +483,8 @@ def build(user) -> Insights:
             by_company[name] = by_company.get(name, 0) + 1
     insights.quiet_by_company = sorted(by_company.items(), key=lambda item: (-item[1], item[0]))
 
-    # --------------------------------------------------------------- sources
-    rows: dict[str, SourceRow] = {}
-    for application in ever_applied:
-        name = (application.posting.source or "").strip() or str(_("Not recorded"))
-        row = rows.setdefault(name, SourceRow(name=name))
+    def count(row: SourceRow, application) -> None:
+        """One application, added to one line of a table of sources."""
         row.applied += 1
         statuses = reached[application.pk]
         if statuses & RESPONSE_STATUSES:
@@ -423,7 +495,34 @@ def build(user) -> Insights:
             row.offers += 1
         if application.pk in quiet_ids:
             row.quiet += 1
-    insights.sources = sorted(rows.values(), key=lambda row: (-row.applied, row.name))
+
+    def by_size(rows) -> list[SourceRow]:
+        return sorted(rows, key=lambda row: (-row.applied, row.name))
+
+    # --------------------------------------------------------------- sources
+    rows: dict[str, SourceRow] = {}
+    for application in ever_applied:
+        name = (application.posting.source or "").strip() or str(_("Not recorded"))
+        count(rows.setdefault(name, SourceRow(name=name)), application)
+    insights.sources = by_size(rows.values())
+
+    # ------------------------------------------------- by referrer and by agency
+    # Keyed on the record rather than on its name, so two people called the same thing are
+    # two lines; the company beside a referrer's name is what tells them apart (#239).
+    by_referrer: dict[int, SourceRow] = {}
+    by_agency: dict[int, SourceRow] = {}
+    for application in ever_applied:
+        referrer = application.referred_by
+        if referrer is not None:
+            name = referrer.name
+            if referrer.company_id:
+                name = f"{name} · {referrer.company.name}"
+            count(by_referrer.setdefault(referrer.pk, SourceRow(name=name)), application)
+        agency = application.through_agency
+        if agency is not None:
+            count(by_agency.setdefault(agency.pk, SourceRow(name=agency.name)), application)
+    insights.by_referrer = by_size(by_referrer.values())
+    insights.by_agency = by_size(by_agency.values())
 
     # ------------------------------------------------------------- industries
     by_industry: dict[str, SourceRow] = {}
@@ -431,19 +530,12 @@ def build(user) -> Insights:
         names = [i.name for i in application.posting.company.industries.all()] or [
             str(_("Not recorded"))
         ]
-        statuses = reached[application.pk]
         for name in names:
-            row = by_industry.setdefault(name, SourceRow(name=name))
-            row.applied += 1
-            if statuses & RESPONSE_STATUSES:
-                row.responded += 1
-            if statuses & {Status.INTERVIEWING, Status.SCREENING, Status.ASSESSMENT}:
-                row.interviewed += 1
-            if Status.OFFER in statuses:
-                row.offers += 1
-            if application.pk in quiet_ids:
-                row.quiet += 1
-    insights.industries = sorted(by_industry.values(), key=lambda row: (-row.applied, row.name))
+            count(by_industry.setdefault(name, SourceRow(name=name)), application)
+    insights.industries = by_size(by_industry.values())
+
+    # ---------------------------------------------------------------- endings
+    insights.endings = _endings(applications)
 
     # ----------------------------------------------------------- over time
     per_month = (
@@ -459,6 +551,61 @@ def build(user) -> Insights:
     ]
 
     return insights
+
+
+#: The order the stages of an ending are listed in: the board's, then *Accepted*, which an
+#: application can be withdrawn from and which is on no board.
+STAGE_ORDER = (*BOARD_STATUSES, Status.ACCEPTED)
+
+
+def _endings(applications) -> Endings:
+    """Where the applications that ended had got to, and why they ended (#239).
+
+    Both are read from the timeline: `endings.for_applications` is one query for every
+    application that ended, and the rest is counting. A stage or a reason nothing ended at
+    is left out rather than listed at nought, because a job search produces small numbers
+    and a table of mostly zeros hides the three that are not.
+    """
+    found = endings.for_applications(applications)
+    summary = Endings(total=len(found))
+    if not found:
+        return summary
+
+    stage_labels = dict(Status.choices)
+    reason_labels = dict(EndReason.choices)
+    unrecorded = str(_("Not recorded"))
+    stages: dict[str, EndingRow] = {}
+    reasons: dict[str, EndingRow] = {}
+
+    for ending in found.values():
+        stage = stages.setdefault(
+            ending.last_stage,
+            EndingRow(
+                key=ending.last_stage,
+                label=str(stage_labels.get(ending.last_stage, ending.last_stage)) or unrecorded,
+            ),
+        )
+        reason = reasons.setdefault(
+            ending.reason,
+            EndingRow(
+                key=ending.reason,
+                label=str(reason_labels.get(ending.reason, ending.reason)) or unrecorded,
+            ),
+        )
+        for row in (stage, reason):
+            # `ending.status` is one of the three by construction: `endings.read` answers
+            # for nothing else, and the three are the row's three counters.
+            setattr(row, ending.status, getattr(row, ending.status) + 1)
+        if ending.reason:
+            summary.explained += 1
+
+    order = {status: index for index, status in enumerate(STAGE_ORDER)}
+    # The unrecorded line goes last in both: what is not known, after what is.
+    summary.stages = sorted(
+        stages.values(), key=lambda row: (not row.key, order.get(row.key, len(order)), row.label)
+    )
+    summary.reasons = sorted(reasons.values(), key=lambda row: (not row.key, -row.total, row.label))
+    return summary
 
 
 def applications_needing_a_nudge(user, *, after_days: int = 14) -> list[Application]:

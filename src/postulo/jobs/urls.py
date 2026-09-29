@@ -24,6 +24,7 @@ urlpatterns = [
         name="company_logo_action",
     ),
     path("companies/<int:pk>/delete/", views.CompanyDeleteView.as_view(), name="company_delete"),
+    path("companies/<int:pk>/merge/", views.CompanyMergeView.as_view(), name="company_merge"),
     path("industries/", views.IndustryListView.as_view(), name="industry_list"),
     path("industries/new/", views.IndustryCreateView.as_view(), name="industry_create"),
     path("industries/<int:pk>/edit/", views.IndustryUpdateView.as_view(), name="industry_update"),
@@ -32,6 +33,7 @@ urlpatterns = [
     path("contacts/<int:pk>/edit/", views.ContactUpdateView.as_view(), name="contact_update"),
     path("contacts/<int:pk>/delete/", views.ContactDeleteView.as_view(), name="contact_delete"),
     path("contacts/<int:pk>/export/", views.ContactExportView.as_view(), name="contact_export"),
+    path("contacts/<int:pk>/merge/", views.ContactMergeView.as_view(), name="contact_merge"),
     # Captures waiting for review now sit at the top of the listings page.
     path(
         "captures/",

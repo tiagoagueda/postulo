@@ -56,10 +56,19 @@
           <button type="submit" class="btn" data-variant="ghost">{% translate "Refresh logo" %}</button>
         </form>
       {% endif %}
+      {% comment %} Always offered, not only beside a notice (#239): the comparison finds
+         *Acme* and *Acme Ltd*, and somebody who knows that *Google* and *Alphabet* are
+         the same employer to them knows something it cannot. {% endcomment %}
+      <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="ghost">{% translate "Merge" %}</a>
       <a href="{% url 'jobs:company_delete' company.pk %}"
          class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
     </div>
   </div>
+
+  {% comment %} Which of this person's other companies look like this one, and why (#239).
+     Worked out as the page is drawn and told, never refused: the two may be two. The
+     component draws nothing where there are none. {% endcomment %}
+  <c-duplicates :candidates="duplicates" />
 
   {% if company.identifiers.all %}
     <dl class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm" data-identifiers>
@@ -228,6 +237,17 @@
                         </p>
                       {% endif %}
                     {% endfor %}
+                    {% comment %} Somebody else in the record has this name or this address
+                       (#239). Said here because a person has no page of their own to say
+                       it on; the link is to the page that shows who, and what a merge
+                       would move. A line of its own so that it wraps rather than squeezes
+                       the name beside it. {% endcomment %}
+                    {% if contact.pk in people_alike %}
+                      <p class="mt-1 text-xs" data-person-alike>
+                        <a href="{% url 'jobs:contact_merge' contact.pk %}"
+                           class="inline-block py-1 text-brand-600 underline dark:text-brand-400">{% translate "Possible duplicate" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>
+                      </p>
+                    {% endif %}
                   </div>
                   <a href="{% url 'jobs:contact_update' contact.pk %}"
                      class="btn" data-variant="ghost" data-size="xs">{% translate "Edit" %}<span class="sr-only">: <bdi>{{ contact.name }}</bdi></span></a>

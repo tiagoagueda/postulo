@@ -221,6 +221,21 @@ register(
 
 register(
     Widget(
+        key="endings",
+        label=_("Where and why applications end"),
+        blurb=_(
+            "The stage each application had reached when it was rejected, withdrawn or "
+            "ghosted, and the reason where one was given."
+        ),
+        template="widgets/endings.html",
+        context=_insight,
+        width="full",
+        group=RECORD,
+    )
+)
+
+register(
+    Widget(
         key="durations",
         label=_("How long they take"),
         blurb=_("Days to a first reply and to a first interview: fastest, median, slowest."),
@@ -247,6 +262,8 @@ register(
     Widget(
         key="sources",
         label=_("Where they came from"),
+        # The sentence is as it was: the two tables #239 added sit under the first and need
+        # no announcing, and rewording it would untranslate it in every language at once.
         blurb=_("Applications, replies and offers per company, with the ones gone quiet."),
         template="widgets/sources.html",
         context=_insight,

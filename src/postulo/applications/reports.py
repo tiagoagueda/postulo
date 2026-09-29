@@ -31,12 +31,13 @@ import datetime as dt
 from dataclasses import dataclass, field
 from itertools import pairwise
 
-from django.db.models import Min
+from django.db.models import F, Min
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.models import Company, CompanyKind
 
+from . import endings
 from .analytics import RESPONSE_STATUSES, interviews_held
 from .models import (
     Application,
@@ -346,6 +347,13 @@ class Evidence:
     status: str
     last_activity_on: dt.date | None
     pk: int = 0
+    #: How it got there and how it ended (#239). In the spreadsheet and not on the page or
+    #: the document: the page is what an employment office is handed, and who referred
+    #: somebody is the person's own business and another person's name.
+    agency: str = ""
+    referrer: str = ""
+    last_stage: str = ""
+    end_reason: str = ""
 
 
 @dataclass
@@ -411,6 +419,9 @@ def _first_reaching(user, statuses, period: Period) -> int:
     lower, upper = period.bounds()
     return (
         ApplicationEvent.objects.filter(application__owner=user, to_status__in=list(statuses))
+        # An entry from a status to itself is a reason given afterwards (#239): nothing
+        # arrived anywhere on the day it was typed.
+        .exclude(from_status=F("to_status"))
         .values("application_id")
         .annotate(first_at=Min("occurred_at"))
         .filter(first_at__range=(lower, upper))
@@ -428,11 +439,13 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
     inside = list(
         Application.objects.for_user(user)
         .filter(applied_at__range=period.bounds())
-        .select_related("posting", "posting__company")
+        .select_related("posting", "posting__company", "referred_by", "through_agency")
         .prefetch_related("posting__company__industries")
         .with_activity()
         .order_by("applied_at")
     )
+    # One query for every application in the period that ended, read from the timeline.
+    ended = endings.for_applications(inside)
 
     labels = dict(Application._meta.get_field("status").choices)
     evidence = [
@@ -449,6 +462,10 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
                 else None
             ),
             pk=application.pk,
+            agency=application.through_agency.name if application.through_agency_id else "",
+            referrer=application.referred_by.name if application.referred_by_id else "",
+            last_stage=ended[application.pk].last_stage_label if application.pk in ended else "",
+            end_reason=ended[application.pk].reason_label if application.pk in ended else "",
         )
         for application in inside
     ]
@@ -530,6 +547,12 @@ CSV_HEADERS: tuple = (
     _("Address"),
     _("Status"),
     _("Last activity"),
+    # After the seven that were always there, so a sheet that reads them by position
+    # still does (#239).
+    _("Through agency"),
+    _("Referred by"),
+    _("Last stage reached"),
+    _("Why it ended"),
 )
 
 
@@ -556,6 +579,10 @@ def as_csv(report: Report) -> str:
                     row.url,
                     row.status,
                     row.last_activity_on.isoformat() if row.last_activity_on else "",
+                    row.agency,
+                    row.referrer,
+                    row.last_stage,
+                    row.end_reason,
                 ]
             )
         )

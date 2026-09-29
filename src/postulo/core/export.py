@@ -46,8 +46,12 @@ from postulo import __version__
 #: ``isco_code`` on a posting, the ISCO-08 unit group its title matches in the ESCO
 #: classification beside the title itself (#266). 19 added ``plain_text`` on a sent
 #: document: the words of a CV without the page they were set in, which is what two
-#: versions are compared by (#236).
-FORMAT_VERSION = 19
+#: versions are compared by (#236). 20 added ``end_reason`` on a timeline entry, which
+#: is why the application it ended did; ``referred_by_id`` and ``through_agency`` on an
+#: application; and a ``contacts`` list at the top of the file for the people recorded at
+#: no company, who had been left out of the archive because every contact in it was
+#: written under one (#239).
+FORMAT_VERSION = 20
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -172,6 +176,9 @@ APPLICATION_FIELDS = (
     "deadline",
     "closed_at",
     "contact_id",
+    # Who referred the person, as a contact's id in this file (#239). The agency beside it
+    # is written by name in the assembly below, as a company's parent is.
+    "referred_by_id",
     "created_at",
 )
 EVENT_FIELDS = (
@@ -182,6 +189,9 @@ EVENT_FIELDS = (
     "body",
     "from_status",
     "to_status",
+    # Why the application ended, on the entry that ended it (#239). Here rather than on
+    # the application because here is where it is: the log is the account of what happened.
+    "end_reason",
     "actor",
     "created_at",
 )
@@ -433,6 +443,17 @@ def _resume_block(user) -> dict:
     return block
 
 
+def _contact(contact) -> dict:
+    """One person, with everything recorded about how to reach them."""
+    return {
+        **_fields(contact, CONTACT_FIELDS),
+        "department": contact.department.name if contact.department_id else "",
+        "phone_numbers": _phone_numbers(contact),
+        "postal_addresses": _postal_addresses(contact),
+        "web_links": _web_links(contact),
+    }
+
+
 def _plugin_data(user) -> dict:
     from postulo.plugins import data
 
@@ -476,7 +497,7 @@ def build_document(user) -> dict:
     from postulo.accounts.models import Profile
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company
+    from postulo.jobs.models import Capture, Company, Contact
 
     # Read afresh rather than through the instance cached on the user, which may be stale.
     profile = Profile.objects.filter(user=user).first()
@@ -514,6 +535,13 @@ def build_document(user) -> dict:
         # The career, built by the function the candidate document calls too, so there is
         # one spelling of it and not two to keep in step (#181).
         "resume": _resume_block(user),
+        # The people recorded at no company (#239). Every contact in the file used to be
+        # written under its company, so somebody at none -- a friend, a former colleague,
+        # exactly who refers people -- was in the account and not in the archive.
+        "contacts": [
+            _contact(contact)
+            for contact in Contact.objects.for_user(user).filter(company__isnull=True)
+        ],
         "companies": [],
         "documents": {},
         "captures": [],
@@ -528,6 +556,7 @@ def build_document(user) -> dict:
         "postings__applications__reminders",
         "postings__applications__interviews__contacts",
         "postings__applications__department__company",
+        "postings__applications__through_agency",
         "postings__applications__sent_links",
         "departments",
     )
@@ -550,16 +579,7 @@ def build_document(user) -> dict:
                     {"scheme": i.scheme, "value": i.value, "label": i.label}
                     for i in company.identifiers.all()
                 ],
-                "contacts": [
-                    {
-                        **_fields(contact, CONTACT_FIELDS),
-                        "department": contact.department.name if contact.department_id else "",
-                        "phone_numbers": _phone_numbers(contact),
-                        "postal_addresses": _postal_addresses(contact),
-                        "web_links": _web_links(contact),
-                    }
-                    for contact in company.contacts.all()
-                ],
+                "contacts": [_contact(contact) for contact in company.contacts.all()],
                 "postings": [
                     {
                         **_fields(posting, POSTING_FIELDS),
@@ -577,6 +597,15 @@ def build_document(user) -> dict:
                                 "department_company": (
                                     application.department.company.name
                                     if application.department_id
+                                    else ""
+                                ),
+                                # The agency it went through, by name for the reason the
+                                # parent of a company is: an id means nothing in another
+                                # instance, and a name is what the importer can match
+                                # against the companies it has just made (#239).
+                                "through_agency": (
+                                    application.through_agency.name
+                                    if application.through_agency_id
                                     else ""
                                 ),
                                 "tags": [tag.slug for tag in application.tags.all()],

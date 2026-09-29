@@ -41,6 +41,7 @@ import dataclasses
 import datetime as dt
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -155,9 +156,10 @@ class ErasureReport:
 
     ``deleted`` is what stopped existing, by kind. ``unlinked`` is what survived but no
     longer points at the contact — an application keeps its history, it loses its main
-    contact. ``not_erased`` names the plugins that hold rows for this person and could not
-    be asked: an erasure that leaves data it cannot see about is the same quiet
-    incompleteness the export refuses, so it is said rather than discovered.
+    contact, or whoever referred the person to it (#239). ``not_erased`` names the
+    plugins that hold rows for this person and could not be asked: an erasure that leaves
+    data it cannot see about is the same quiet incompleteness the export refuses, so it is
+    said rather than discovered.
     """
 
     name: str
@@ -176,10 +178,15 @@ class ErasureReport:
         parts = []
         if gone:
             parts.append(_("%(name)s is gone, with %(what)s.") % {"name": self.name, "what": gone})
-        if any(self.unlinked.values()):
+        if self.unlinked.get("applications"):
             parts.append(
                 _("%(count)d application kept, without its main contact.")
-                % {"count": sum(self.unlinked.values())}
+                % {"count": self.unlinked["applications"]}
+            )
+        if self.unlinked.get("referrals"):
+            parts.append(
+                _("%(count)d application kept, without its referrer.")
+                % {"count": self.unlinked["referrals"]}
             )
         if self.not_erased:
             parts.append(
@@ -247,7 +254,12 @@ def erase_contact(contact) -> ErasureReport:
             "web_links": contact.web_links.count(),
             "plugin_rows": removed,
         }
-        unlinked = {"applications": Application.objects.filter(contact=contact).count()}
+        unlinked = {
+            "applications": Application.objects.filter(contact=contact).count(),
+            # The same person may have referred somebody to an application they were
+            # never the contact for, and that link goes with them as well (#239).
+            "referrals": Application.objects.filter(referred_by=contact).count(),
+        }
         name = contact.name
         contact.delete()
 
@@ -300,7 +312,11 @@ def retention_dry_run() -> dict:
                     "phone_numbers": contact.phone_numbers.count(),
                     "postal_addresses": contact.postal_addresses.count(),
                     "web_links": contact.web_links.count(),
-                    "applications_unlinked": Application.objects.filter(contact=contact).count(),
+                    # Every application that names them, as its contact or as who
+                    # referred the person: each is kept, and each loses the name (#239).
+                    "applications_unlinked": Application.objects.filter(
+                        Q(contact=contact) | Q(referred_by=contact)
+                    ).count(),
                 },
             }
         )

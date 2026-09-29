@@ -34,6 +34,16 @@
               </span>
             {% endif %}
           </div>
+          {% comment %} Why it ended, on the entry that ended it (#239). The reason is a
+             column of the entry and is printed in the language being read; the note that
+             goes with it is the entry's own text, under it as it always was. {% endcomment %}
+          {% if event.end_reason %}
+            <p class="mt-1 text-sm text-ink-600 dark:text-ink-300" data-end-reason>
+              {% blocktranslate with reason=event.get_end_reason_display trimmed %}
+                Why: {{ reason }}
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
           {% if event.body %}
             <p class="mt-1 whitespace-pre-line text-sm text-ink-600 dark:text-ink-300">{{ event.body }}</p>
           {% endif %}

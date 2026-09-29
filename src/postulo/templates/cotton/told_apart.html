@@ -1,0 +1,23 @@
+<c-vars record class="" />
+{% comment %} What tells one record from another of the same name (#239).
+
+   `<c-told-apart :record="contact" class="text-ink-500 dark:text-ink-400" />`
+
+   Two people called the same thing, or two companies, are two identical lines wherever
+   they are listed by name, and the pages that offer to merge them list them by name. So
+   under the name goes what differs: for a person what they do, where they work and their
+   address; for a company where it is. Each is drawn where the record has it, which is
+   what lets one component serve both -- a company has no role and a person no location --
+   and nothing at all is drawn for a record that has none of them.
+
+   `class` is for the colour. On a card it is the quiet grey a second line has; inside an
+   alert it is left to the alert, whose text is measured against the alert's own tint.
+{% endcomment %}
+{% if record.role or record.company or record.email or record.location %}
+  <span class="block text-xs wrap-anywhere{% if class %} {{ class }}{% endif %}" data-told-apart>
+    {% if record.role %}<bdi>{{ record.role }}</bdi>{% endif %}
+    {% if record.company %}{% if record.role %} · {% endif %}<bdi>{{ record.company.name }}</bdi>{% endif %}
+    {% if record.email %}{% if record.role or record.company %} · {% endif %}<bdi>{{ record.email }}</bdi>{% endif %}
+    {% if record.location %}{% if record.role or record.company or record.email %} · {% endif %}<bdi>{{ record.location }}</bdi>{% endif %}
+  </span>
+{% endif %}

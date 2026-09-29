@@ -50,6 +50,30 @@
       {% for name, count in insights.quiet_by_company %}{% if not forloop.first %}, {% endif %}{{ name }}{% if count > 1 %} ({{ count }}){% endif %}{% endfor %}.
     </p>
   {% endif %}
+  {% comment %} The same figures by who referred the person and by the agency it went
+     through (#239). Each is drawn only where an application names one: most name neither,
+     and a table of one line saying so would be the table above, printed again. {% endcomment %}
+  {% if insights.by_referrer %}
+    <h3 class="mt-6 mb-3 text-sm font-medium">{% translate "By referrer" %}</h3>
+    <div data-by-referrer>
+      {% translate "Referred by" as first %}
+      {% translate "By referrer" as label %}
+      {% include "widgets/_source_table.html" with rows=insights.by_referrer first=first label=label %}
+    </div>
+  {% endif %}
+  {% if insights.by_agency %}
+    <h3 class="mt-6 mb-3 text-sm font-medium">{% translate "By agency" %}</h3>
+    <div data-by-agency>
+      {% translate "Agency" as first %}
+      {% translate "By agency" as label %}
+      {% include "widgets/_source_table.html" with rows=insights.by_agency first=first label=label %}
+    </div>
+  {% endif %}
+  {% if insights.by_referrer or insights.by_agency %}
+    <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer." %}
+    </p>
+  {% endif %}
 {% else %}
   <c-empty variant="quiet">
     {% translate "Nothing recorded yet." %}

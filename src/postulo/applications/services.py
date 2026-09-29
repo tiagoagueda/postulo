@@ -20,11 +20,13 @@ from postulo.notifications import slow
 
 from .models import (
     BOARD_STATUSES,
+    END_STATUSES,
     OPEN_STATUSES,
     SENT_STATUSES,
     SETTLED_OUTCOMES,
     Application,
     ApplicationEvent,
+    EndReason,
     EventKind,
     Interview,
     InterviewKind,
@@ -45,6 +47,7 @@ def record_event(
     from_status: str = "",
     to_status: str = "",
     actor: str = "",
+    end_reason: str = "",
 ) -> ApplicationEvent:
     """Append one entry to an application's timeline.
 
@@ -60,6 +63,7 @@ def record_event(
         from_status=from_status,
         to_status=to_status,
         actor=actor,
+        end_reason=end_reason,
     )
 
 
@@ -89,11 +93,18 @@ def change_status(
     occurred_at=None,
     actor: str = "",
     mark_applied: bool = True,
+    end_reason: str = "",
 ) -> ApplicationEvent | None:
     """Move an application to ``new_status`` and record why.
 
     Returns the event, or ``None`` if the status was already that value — re-saving a
     form should not litter the timeline with entries saying nothing changed.
+
+    ``end_reason`` is why it ended, for a move to *Rejected*, *Withdrawn* or *Ghosted*
+    (#239). It is written on the entry, so the log says why beside saying that; with any
+    other status it is a mistake in the caller and raises. Given for the status the
+    application already stands at, it is a reason learnt afterwards -- which is when most
+    of them are learnt -- and is appended as an entry of its own: see `_say_why`.
 
     Two timestamps are maintained as a side effect, because deriving them from the log
     on every read would be needless work:
@@ -126,12 +137,23 @@ def change_status(
     On SQLite this changes nothing and costs one `SELECT`: writes are serialised there
     anyway. It is PostgreSQL, where they are not, that this is for.
     """
+    if end_reason and new_status not in END_STATUSES:
+        raise ValueError(
+            f"{new_status!r} is not an ending; a reason goes with {sorted(END_STATUSES)}."
+        )
+    if end_reason and end_reason not in EndReason.values:
+        raise ValueError(f"{end_reason!r} is not a reason; one of {sorted(EndReason.values)}.")
+
     # The caller's object is still the one mutated and returned -- it is what they will go
     # on to use -- but what it is moving *from* comes from the locked row.
     locked = Application.objects.select_for_update().filter(pk=application.pk).first()
     previous = locked.status if locked is not None else application.status
     application.status = previous
     if previous == new_status:
+        if end_reason:
+            return _say_why(
+                application, end_reason, note=note, occurred_at=occurred_at, actor=actor
+            )
         return None
 
     application.status = new_status
@@ -166,6 +188,7 @@ def change_status(
         from_status=previous,
         to_status=new_status,
         actor=actor,
+        end_reason=end_reason,
     )
     # For a machine that asked: a person's own notifiers keep this off (#240).
     slow.tell(
@@ -183,6 +206,40 @@ def change_status(
         actor=actor,
     )
     return entry
+
+
+def _say_why(
+    application: Application, reason: str, *, note: str, occurred_at, actor: str
+) -> ApplicationEvent | None:
+    """Write down why an application ended, after it has (#239).
+
+    A rejection arrives first and its reason later, in a call a week on or not at all, so
+    the reason has to be sayable once the status already stands. **It is appended, never
+    written into the entry that ended it**: a timeline somebody can quietly rewrite is
+    worth very little, and that holds for the person's own second thoughts as much as for
+    anybody else's. The entry moves the application from its status to the same status,
+    which is exactly what happened, and the latest reason on the run is the one that
+    stands.
+
+    Saying again what the timeline already says writes nothing, for the reason
+    `change_status` gives: a form re-sent should not leave an entry saying nothing changed.
+    """
+    from . import endings
+
+    standing = endings.of(application, afresh=True)
+    if standing is not None and standing.reason == reason and note in ("", standing.note):
+        return None
+    return record_event(
+        application,
+        kind=EventKind.STATUS_CHANGE,
+        summary=str(Status(application.status).label),
+        body=note,
+        occurred_at=occurred_at,
+        from_status=application.status,
+        to_status=application.status,
+        actor=actor,
+        end_reason=reason,
+    )
 
 
 @transaction.atomic

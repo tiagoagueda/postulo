@@ -71,7 +71,7 @@ def test_recording_a_status_does_not_take_the_reader_back_to_the_top(
         "document.addEventListener('htmx:beforeRequest',"
         " () => { window.__scrollAtRequest = window.scrollY; })"
     )
-    page.locator("#status-card select").select_option("interviewing")
+    page.locator("#status-card select[name=status]").select_option("interviewing")
 
     page.locator("#status-card").get_by_role("button", name="Record").click()
     expect(page.locator("#timeline")).to_contain_text("Interviewing")
@@ -79,6 +79,28 @@ def test_recording_a_status_does_not_take_the_reader_back_to_the_top(
     sent = page.evaluate("window.__scrollAtRequest")
     assert sent is not None, "no htmx request went out, so the form did a page load"
     assert page.evaluate("window.scrollY") == sent, "the swap moved the page"
+
+
+def test_an_ending_and_its_reason_come_back_in_the_swapped_card(
+    page: Page, live_server, application
+):
+    """The card is the region a status change swaps, which is why how an application ended
+    is drawn in it (#239): anywhere else it would go on saying what was true before the
+    button was pressed. The stage is read from the timeline, the reason from the entry."""
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}{application.get_absolute_url()}")
+    card = page.locator("#status-card")
+    expect(card.locator("[data-ending]")).to_have_count(0)
+
+    card.locator("select[name=status]").select_option("rejected")
+    card.get_by_label("Why it ended").select_option("pay")
+    card.get_by_role("button", name="Record").click()
+
+    expect(page.locator("#timeline")).to_contain_text("Why: The pay")
+    expect(card.locator("[data-end-reason]")).to_have_text("The pay")
+    expect(card.locator("[data-last-stage]")).to_have_text("Applied")
+    # And the form under it is empty again, ready for the next thing to record.
+    expect(card.get_by_label("Why it ended")).to_have_value("")
 
 
 def test_a_page_load_would_have_moved_it(page: Page, live_server, application):
@@ -90,7 +112,7 @@ def test_a_page_load_would_have_moved_it(page: Page, live_server, application):
     page.context.add_init_script("window.htmx = undefined;")
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}{application.get_absolute_url()}")
-    page.locator("#status-card select").select_option("interviewing")
+    page.locator("#status-card select[name=status]").select_option("interviewing")
     page.mouse.wheel(0, 400)
     page.wait_for_timeout(100)
     scrolled = page.evaluate("window.scrollY")
@@ -163,7 +185,7 @@ def test_with_no_script_the_page_still_works(page: Page, live_server, applicatio
     context.add_init_script("window.htmx = undefined;")
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}{application.get_absolute_url()}")
-    page.locator("#status-card select").select_option("offer")
+    page.locator("#status-card select[name=status]").select_option("offer")
 
     page.locator("#status-card").get_by_role("button", name="Record").click()
 

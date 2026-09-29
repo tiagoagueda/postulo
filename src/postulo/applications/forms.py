@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from django import forms
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -11,6 +12,7 @@ from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import esco, recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm
 from postulo.jobs.models import (
+    Company,
     Contact,
     EmploymentType,
     JobPosting,
@@ -23,6 +25,7 @@ from .models import (
     Application,
     ApplicationEvent,
     Channel,
+    EndReason,
     EventKind,
     Interview,
     Offer,
@@ -46,6 +49,14 @@ APPLICATION_HELP = {
     ),
     "tags": _("Your own words for grouping applications. New ones go in the box below."),
     "contact": _("The person at the company this went through, where there was one."),
+    "referred_by": _(
+        "Whoever put you forward, from the people you have recorded — at this company, at "
+        "another, or at none. The figures count what each referrer led to."
+    ),
+    "through_agency": _(
+        "The recruitment agency it went through, from the companies you have recorded. "
+        "The company on the posting stays the employer."
+    ),
 }
 
 
@@ -320,7 +331,17 @@ class ApplicationForm(OwnerScopedModelForm):
 
     class Meta:
         model = Application
-        fields = ("status", "channel", "priority", "deadline", "department", "contact", "tags")
+        fields = (
+            "status",
+            "channel",
+            "priority",
+            "deadline",
+            "department",
+            "contact",
+            "referred_by",
+            "through_agency",
+            "tags",
+        )
         widgets = {"deadline": forms.DateInput(attrs={"type": "date"})}
         help_texts = APPLICATION_HELP
 
@@ -354,9 +375,16 @@ class ApplicationForm(OwnerScopedModelForm):
         self.fields["tags"].queryset = Tag.objects.for_user(self.user)
         contacts = Contact.objects.for_user(self.user).select_related("company")
         if self.instance.pk:
-            # The contacts worth offering are the ones at this company.
-            contacts = contacts.filter(company=self.instance.posting.company_id)
+            # The contacts worth offering are the ones at this company -- and the one the
+            # application already names, wherever they are now. Somebody who has moved
+            # company, or been merged into a record of themselves at another (#239), would
+            # otherwise be missing from the list, and saving the form for any other reason
+            # would clear them without a word.
+            contacts = contacts.filter(
+                Q(company=self.instance.posting.company_id) | Q(pk=self.instance.contact_id)
+            )
         self.fields["contact"].queryset = contacts
+        self._scope_referrer_and_agency()
 
         # Which part of the employer this was aimed at (#138). Offered only where the
         # feature is on *and* there is something to choose: a picker of one empty option is
@@ -370,11 +398,71 @@ class ApplicationForm(OwnerScopedModelForm):
             self.fields["department"].queryset = departments
             self.fields["department"].empty_label = _("The employer as a whole")
 
+    def _scope_referrer_and_agency(self) -> None:
+        """Who referred the person and through which agency, from their own records (#239).
+
+        **Every contact, not only the ones at this company**, which is the difference from
+        the main contact above: a referrer is as often a friend somewhere else as somebody
+        here. The agency is any company but the employer, because the posting's company
+        stays the employer and an application that went through its own employer went
+        through nobody.
+
+        Each is offered only where there is somebody to choose, for the reason the
+        department gives: a picker of one empty option is a control asking to be ignored.
+        Not offered is not cleared -- a name already on the row stays on it, because a
+        field a form does not have is a column the form does not write.
+        """
+        referrers = Contact.objects.for_user(self.user).select_related("company")
+        if referrers.exists():
+            self.fields["referred_by"].queryset = referrers
+            self.fields["referred_by"].empty_label = _("Nobody")
+            self.fields["referred_by"].label_from_instance = _who_and_where
+        else:
+            del self.fields["referred_by"]
+
+        agencies = Company.objects.for_user(self.user)
+        if self.instance.pk:
+            # Unless the employer is what the row already says -- two companies merged
+            # into one can leave it so -- in which case it is offered, for the reason the
+            # contact above is: what is not on the list is cleared by the next save.
+            employer = self.instance.posting.company_id
+            if self.instance.through_agency_id != employer:
+                agencies = agencies.exclude(pk=employer)
+        if agencies.exists():
+            self.fields["through_agency"].queryset = agencies
+            self.fields["through_agency"].empty_label = _("No agency")
+        else:
+            del self.fields["through_agency"]
+
+
+def _who_and_where(contact) -> str:
+    """A contact as a choice: the name, and the company beside it where there is one.
+
+    Two people called the same thing are otherwise two identical lines in a list, and
+    choosing between them would be a guess.
+    """
+    if contact.company_id:
+        return f"{contact.name} · {contact.company.name}"
+    return contact.name
+
 
 class StatusChangeForm(forms.Form):
     """The quick status action used from the board and the detail page."""
 
     status = forms.ChoiceField(label=_("Status"), choices=Status.choices)
+    #: Why it ended (#239). Always on the form rather than shown when the status asks for
+    #: it: showing and hiding needs a script, and the form has to work without one. It is
+    #: kept only with the three statuses that are endings, and the view says so when it
+    #: drops one.
+    end_reason = forms.ChoiceField(
+        label=_("Why it ended"),
+        choices=[("", "—"), *EndReason.choices],
+        required=False,
+        help_text=_(
+            "Only for Rejected, Withdrawn and Ghosted, and never required. A reason you "
+            "learn later can be added then: choose the same status again, and the reason."
+        ),
+    )
     note = forms.CharField(
         label=_("Note"), required=False, widget=forms.Textarea(attrs={"rows": 2})
     )

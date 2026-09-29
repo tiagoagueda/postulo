@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% if kind == "company" %}{% translate "Merge companies" %}{% else %}{% translate "Merge contacts" %}{% endif %}{% endblock %}
+
+{% block content %}
+  {% comment %} Two records of one company, or of one person, made into one (#239).
+
+     One address in two states, both a GET that changes nothing. Bare, it asks which
+     record is the same as this one. With `?with=` it is the confirmation, and says what a
+     merge would do before it does any of it: what moves, what the kept record takes, where
+     the two differ and what becomes of the difference. The merge is the form at the foot
+     of the confirmation and nothing else -- a link cannot delete a record.
+
+     The two names are in a list of their own rather than inside the sentences about them:
+     a name is what somebody typed, and wants a `bdi` around it, and a sentence a
+     translator is handed wants no markup in it.
+  {% endcomment %}
+  <div class="mx-auto max-w-2xl">
+    <c-page-title>
+      {% if kind == "company" %}{% translate "Merge companies" %}{% else %}{% translate "Merge contacts" %}{% endif %}
+      <c-slot name="subtitle">
+        {% translate "Two records of the same one, made into one. Nothing moves until you have seen what would." %}
+      </c-slot>
+    </c-page-title>
+
+    <div class="card mb-6">
+      <dl class="space-y-3 text-sm" data-merge-pair>
+        <div>
+          <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Kept" %}</dt>
+          <dd data-kept>
+            <span class="font-medium"><bdi>{{ kept.name }}</bdi></span>
+            <c-told-apart :record="kept" class="text-ink-500 dark:text-ink-400" />
+          </dd>
+        </div>
+        {% if other %}
+          <div>
+            <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Merged into it, and then deleted" %}</dt>
+            <dd data-other>
+              <span class="font-medium"><bdi>{{ other.name }}</bdi></span>
+              <c-told-apart :record="other" class="text-ink-500 dark:text-ink-400" />
+            </dd>
+          </div>
+        {% endif %}
+      </dl>
+      {% if other %}
+        <p class="mt-4 text-sm">
+          <a href="{{ swap_url }}" class="text-brand-600 underline dark:text-brand-400" data-swap>
+            {% translate "Keep the other one instead" %}
+          </a>
+        </p>
+      {% endif %}
+    </div>
+
+    {% if plan %}
+      <div class="card mb-6" data-merge-moves>
+        <c-section-title>{% translate "What moves" %}</c-section-title>
+        {% if plan.moves %}
+          <dl class="space-y-3 text-sm">
+            {% for move in plan.moves %}
+              <div>
+                <dt class="font-medium">{{ move.label }} <span class="tabular-nums">({{ move.count }})</span></dt>
+                {% comment %} The first few by name, and an ellipsis where there are more:
+                   the number beside the heading is the whole of them. {% endcomment %}
+                <dd class="wrap-anywhere text-ink-600 dark:text-ink-300">
+                  {% for name in move.names %}<bdi>{{ name }}</bdi>{% if not forloop.last %} · {% endif %}{% endfor %}{% if move.more %} · …{% endif %}
+                </dd>
+              </div>
+            {% endfor %}
+          </dl>
+        {% else %}
+          <p class="text-sm text-ink-500 dark:text-ink-400">
+            {% translate "It holds nothing that needs moving." %}
+          </p>
+        {% endif %}
+      </div>
+
+      {% if plan.fills %}
+        <div class="card mb-6" data-merge-fills>
+          <c-section-title>
+            {% translate "What the kept record takes" %}
+            <c-slot name="subtitle">{% translate "It has nothing of its own in these, so the other's is used." %}</c-slot>
+          </c-section-title>
+          <dl class="space-y-3 text-sm">
+            {% for fill in plan.fills %}
+              <div>
+                <dt class="text-xs text-ink-500 dark:text-ink-400">{{ fill.label }}</dt>
+                <dd class="wrap-anywhere"><bdi>{{ fill.value }}</bdi></dd>
+              </div>
+            {% endfor %}
+          </dl>
+        </div>
+      {% endif %}
+
+      {% comment %} A list and not a table. What differs is as often an address as a
+         word, and three columns of addresses on a phone are a box that scrolls sideways;
+         two lines under the name of the field wrap where they stand. It also keeps this
+         a page with a measure: a table takes the whole screen (#188), and a
+         confirmation is not a thing to read across one. {% endcomment %}
+      {% if plan.differences %}
+        <div class="card mb-6" data-merge-differences>
+          <c-section-title>
+            {% translate "Where the two differ" %}
+            <c-slot name="subtitle">{% translate "What the kept record says stays as it is. What the other says is written into the kept record's notes, so it can still be read." %}</c-slot>
+          </c-section-title>
+          <ul class="space-y-4 text-sm">
+            {% for difference in plan.differences %}
+              <li>
+                <p class="font-medium">{{ difference.label }}</p>
+                <dl class="mt-1 grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                  <div>
+                    <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Stays" %}</dt>
+                    <dd class="wrap-anywhere">{% if difference.kept %}<bdi>{{ difference.kept }}</bdi>{% else %}—{% endif %}</dd>
+                  </div>
+                  <div>
+                    <dt class="text-xs text-ink-500 dark:text-ink-400">{% translate "Goes into the notes" %}</dt>
+                    <dd class="wrap-anywhere"><bdi>{{ difference.other }}</bdi></dd>
+                  </div>
+                </dl>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      {% if plan.left_behind %}
+        <div class="card mb-6" data-merge-left-behind>
+          <c-section-title>{% translate "What does not move" %}</c-section-title>
+          <ul class="list-disc space-y-1 ps-5 text-sm">
+            {% for line in plan.left_behind %}<li>{{ line }}</li>{% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
+      <div class="card mb-6" data-merge-written>
+        <c-section-title>{% translate "What is written down" %}</c-section-title>
+        <ul class="list-disc space-y-1 ps-5 text-sm">
+          <li>{% translate "The kept record's notes say what was merged into it and when, followed by the other's own notes." %}</li>
+          <li data-merge-applications>
+            {% if plan.applications %}
+              {% blocktranslate count counter=plan.applications trimmed %}
+                {{ counter }} application gets a line on its timeline saying that this happened.
+              {% plural %}
+                {{ counter }} applications get a line on their timelines saying that this happened.
+              {% endblocktranslate %}
+            {% else %}
+              {% translate "No application is touched, so no timeline changes." %}
+            {% endif %}
+          </li>
+        </ul>
+      </div>
+
+      <form method="post" action="{{ request.path }}">
+        {% csrf_token %}
+        <input type="hidden" name="with" value="{{ other.pk }}">
+        <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "The other record is deleted once everything has moved, and this cannot be undone." %}
+        </p>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="submit" class="btn" data-variant="destructive">{% translate "Merge" %}</button>
+          <a href="{{ cancel_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+        </div>
+      </form>
+    {% else %}
+      <c-duplicates :candidates="candidates" />
+
+      {% if choices %}
+        <form method="get" action="{{ merge_url }}" class="card">
+          <div class="field mb-4">
+            <label for="merge-with">{% translate "Merge with" %}</label>
+            <select id="merge-with" name="with" required aria-describedby="merge-with-help">
+              {% for choice in choices %}
+                <option value="{{ choice.pk }}">{{ choice.name }}{% if choice.company %} · {{ choice.company.name }}{% endif %}</option>
+              {% endfor %}
+            </select>
+            <p id="merge-with-help">
+              {% translate "The one chosen here is merged into the one above. The next page shows what would move, and nothing moves before it." %}
+            </p>
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <button type="submit" class="btn">{% translate "See what would move" %}</button>
+            <a href="{{ cancel_url }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+          </div>
+        </form>
+      {% else %}
+        <c-empty variant="quiet">
+          {% translate "There is nothing else to merge it with." %}
+        </c-empty>
+      {% endif %}
+    {% endif %}
+  </div>
+{% endblock %}

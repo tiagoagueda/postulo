@@ -4,9 +4,17 @@ import datetime as dt
 
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
+from ninja.errors import HttpError
 from ninja.pagination import paginate
 
-from postulo.applications.models import SYSTEM_EVENT_KINDS, Application, Channel, EventKind
+from postulo.applications.models import (
+    END_STATUSES,
+    SYSTEM_EVENT_KINDS,
+    Application,
+    Channel,
+    EndReason,
+    EventKind,
+)
 from postulo.applications.models import Status as ApplicationStatus
 from postulo.applications.quiet import threshold_for
 from postulo.applications.services import (
@@ -26,8 +34,16 @@ from ..schemas import (
     EventOut,
     StatusIn,
     application_out,
+    event_out,
 )
-from .common import choice_or_422, owned, owned_or_404, priority_or_422, tags_named
+from .common import (
+    choice_or_422,
+    owned,
+    owned_or_404,
+    priority_or_422,
+    referrer_and_agency_or_422,
+    tags_named,
+)
 
 router = Router(tags=["applications"], auth=scope("read"))
 
@@ -46,7 +62,13 @@ def list_applications(
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    applications = owned(request, Application.objects).with_display_data().order_by("-created_at")
+    applications = (
+        owned(request, Application.objects)
+        .with_display_data()
+        # How each ended is read from its timeline, loaded once for the page (#239).
+        .with_status_log()
+        .order_by("-created_at")
+    )
     if quiet:
         applications = applications.quiet(threshold_for(request.auth.owner))
     if status:
@@ -69,12 +91,14 @@ def record_application(request, payload: ApplicationIn):
     choice_or_422(payload.status, ApplicationStatus, field="status")
     choice_or_422(payload.channel, Channel, field="channel", allow_blank=True)
     priority_or_422(payload.priority)
+    # Looked up before anything is made, so a refusal leaves no company behind it.
+    named = referrer_and_agency_or_422(request, payload)
     company = get_or_create_company(owner, payload.company_name, wikidata=payload.company_wikidata)
     application = create_application(
         owner,
         company=company,
         posting_data=payload.posting_data(),
-        application_data=payload.application_data(),
+        application_data={**payload.application_data(), **named},
         actor=actor_of(request),
     )
     application.tags.set(tags_named(owner, payload.tags))
@@ -107,9 +131,26 @@ def get_application(request, pk: int):
     summary="Move an application to another status",
 )
 def set_status(request, pk: int, payload: StatusIn):
+    """Move it, and say why it ended where it did (#239).
+
+    A reason sent with a status that is not an ending is refused rather than dropped: a
+    form shows the box whatever the status and forgives a slip, but a client that sends
+    one chose to, and an answer of 200 would tell it the reason had been kept.
+    """
     application = _detail(request, pk)
     choice_or_422(payload.status, ApplicationStatus, field="status")
-    change_status(application, payload.status, note=payload.note, actor=actor_of(request))
+    choice_or_422(payload.end_reason, EndReason, field="end_reason", allow_blank=True)
+    if payload.end_reason and payload.status not in END_STATUSES:
+        raise HttpError(
+            422, f"'end_reason' goes with one of {sorted(END_STATUSES)}; got {payload.status!r}."
+        )
+    change_status(
+        application,
+        payload.status,
+        note=payload.note,
+        actor=actor_of(request),
+        end_reason=payload.end_reason,
+    )
     return application_out(request, _detail(request, pk), detail=True)
 
 
@@ -123,8 +164,6 @@ def add_event(request, pk: int, payload: EventIn):
     application = _detail(request, pk)
     kind = choice_or_422(payload.kind, EventKind, field="kind")
     if kind in SYSTEM_EVENT_KINDS:
-        from ninja.errors import HttpError
-
         raise HttpError(
             422, _("Use the status or interviews endpoints; the timeline records those itself.")
         )
@@ -136,16 +175,4 @@ def add_event(request, pk: int, payload: EventIn):
         occurred_at=payload.occurred_at,
         actor=actor_of(request),
     )
-    return Status(
-        201,
-        {
-            "id": event.pk,
-            "kind": event.kind,
-            "occurred_at": event.occurred_at,
-            "summary": event.summary,
-            "body": event.body,
-            "from_status": event.from_status,
-            "to_status": event.to_status,
-            "actor": event.actor,
-        },
-    )
+    return Status(201, event_out(event))

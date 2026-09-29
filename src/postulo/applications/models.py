@@ -124,6 +124,31 @@ BOARD_STATUSES = (
     Status.OFFER,
 )
 
+#: The statuses an application *ends* at without having been won (#239). *Accepted* is
+#: settled too, and is not here: nobody asks why an application that was accepted ended.
+END_STATUSES = frozenset({Status.REJECTED, Status.WITHDRAWN, Status.GHOSTED})
+
+
+class EndReason(models.TextChoices):
+    """Why an application ended, where somebody knows (#239).
+
+    Listings have kept a reason for being discarded since they existed; a rejection and a
+    withdrawal had none, so the funnel could say where applications stop and never why.
+    Six, deliberately few: a list long enough to be exact is a list nobody picks from, and
+    *Other* with the note beside it takes whatever the five do not.
+
+    The reason is a column of the **timeline entry** that ended the application, not of the
+    application. An application can end, reopen and end again, for a different reason each
+    time, and a field on the row would keep only the last and say nothing of when.
+    """
+
+    PAY = "pay", _("The pay")
+    LOCATION = "location", _("The location")
+    NOT_A_MATCH = "not_a_match", _("Not a match")
+    FILLED_INTERNALLY = "filled_internally", _("Filled internally")
+    MY_CHOICE = "my_choice", _("My own choice")
+    OTHER = "other", _("Other")
+
 
 class Channel(models.TextChoices):
     COMPANY_SITE = "company_site", _("Company website")
@@ -265,6 +290,16 @@ class ApplicationQuerySet(models.QuerySet):
             )
         )
 
+    def with_status_log(self) -> ApplicationQuerySet:
+        """Load each application's status entries beside it, in one query for the page.
+
+        How an application ended is read from its timeline (#239), and a list that asked
+        each row for its own would ask once per row. Kept under a name of its own rather
+        than as ``events``, so a caller that wants the whole timeline still gets all of it.
+        """
+        entries = ApplicationEvent.objects.exclude(to_status="")
+        return self.prefetch_related(models.Prefetch("events", entries, to_attr="status_log"))
+
     def with_next_interview(self, at=None) -> ApplicationQuerySet:
         """Annotate ``next_interview_at``: the start of the soonest interview still ahead.
 
@@ -337,6 +372,32 @@ class Application(OwnedModel):
         verbose_name=_("department"),
         help_text=_("Which part of the employer this was for, if you know."),
     )
+    #: Who put the person forward (#239). *Referral* has been a channel since the
+    #: beginning and nothing recorded who, so a search could say that referrals work and
+    #: never whose did. Any of the owner's contacts -- a referrer is as often a friend at
+    #: another company, or at none, as somebody at this one. `SET_NULL` for the reason the
+    #: main contact is: the person going must not take the attempt with them.
+    referred_by = models.ForeignKey(
+        Contact,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="referrals",
+        verbose_name=_("referred by"),
+    )
+    #: The recruitment agency it went through, where one did (#239). **The posting's
+    #: company stays the employer**: an agency is deliberately not a kind of company
+    #: (`jobs.CompanyKind`), because its listings are applied to like anybody's, and this
+    #: is how a search run mostly through two agencies can be compared by agency without
+    #: the employer ever becoming one.
+    through_agency = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="placements",
+        verbose_name=_("through agency"),
+    )
     tags = models.ManyToManyField(
         Tag, blank=True, related_name="applications", verbose_name=_("tags")
     )
@@ -401,6 +462,17 @@ class Application(OwnedModel):
     @property
     def is_open(self) -> bool:
         return self.status in OPEN_STATUSES
+
+    @property
+    def ending(self):
+        """How this ended -- where it had got to, and why -- or nothing while it has not.
+
+        Read from the timeline every time and stored nowhere (#239): the log is the truth,
+        and a column kept beside it would be a second account of the same thing.
+        """
+        from . import endings
+
+        return endings.of(self)
 
     @property
     def company(self):
@@ -480,6 +552,11 @@ class ApplicationEvent(models.Model):
 
     from_status = models.CharField(_("from status"), max_length=20, choices=Status, blank=True)
     to_status = models.CharField(_("to status"), max_length=20, choices=Status, blank=True)
+    #: Why the application ended, on the entry that says it did (#239). Empty on every
+    #: other entry, and on an ending nobody gave a reason for -- which is most of them,
+    #: because an employer that says why is the exception. The note that goes with *Other*
+    #: is this entry's own ``body``.
+    end_reason = models.CharField(_("why it ended"), max_length=20, choices=EndReason, blank=True)
 
     #: Who wrote it when it was not the person at the keyboard: "API token laptop-agent".
     #: Blank means the person themselves, which is nearly always.

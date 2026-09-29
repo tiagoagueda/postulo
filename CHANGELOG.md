@@ -60,6 +60,9 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An application moved to *Rejected*, *Withdrawn* or *Ghosted* can say why — pay, location, not a match, filled internally, your own choice, or other with a note — then or afterwards; the stage it had reached is read from its timeline, and a widget, *Where and why applications end*, counts both. (#239)
+- An application can name who referred you and the agency it went through; the posting's company stays the employer, and *Where they came from* gains *By referrer* and *By agency*. Both are in the API, the report's spreadsheet and the archive (format 20), which now carries the people recorded at no company. (#239)
+- A company's or a contact's page says which of your other records look like the same one — the name without its legal form, the website, an identifier, an email address — and *Merge* shows what would move first, keeps what differs in the kept record's notes and writes on every timeline it touches. (#239)
 - Two versions of a CV or a letter can be compared line by line, from the document's page
   and from an application's documents; a sent CV keeps its words beside its markup, in the
   export too (format 19). **A CV frozen before this kept none, and the page says so.**

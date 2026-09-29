@@ -23,7 +23,14 @@ from ..schemas import (
     application_out,
     listing_out,
 )
-from .common import choice_or_422, owned, owned_or_404, priority_or_422, tags_named
+from .common import (
+    choice_or_422,
+    owned,
+    owned_or_404,
+    priority_or_422,
+    referrer_and_agency_or_422,
+    tags_named,
+)
 
 router = Router(tags=["listings"], auth=scope("read"))
 
@@ -88,7 +95,10 @@ def apply(request, pk: int, payload: ApplicationDetailsIn):
     choice_or_422(payload.status, ApplicationStatus, field="status")
     choice_or_422(payload.channel, Channel, field="channel", allow_blank=True)
     priority_or_422(payload.priority)
-    application = apply_to_listing(listing, payload.application_data(), actor=actor_of(request))
+    named = referrer_and_agency_or_422(request, payload)
+    application = apply_to_listing(
+        listing, {**payload.application_data(), **named}, actor=actor_of(request)
+    )
     application.tags.set(tags_named(request.auth.owner, payload.tags))
     from postulo.applications.models import Application
 

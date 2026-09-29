@@ -7,6 +7,12 @@
   <div class="mx-auto max-w-2xl">
     <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Contact" %}</h1>
     {% include "partials/privacy_notice.html" %}
+    {% comment %} Somebody recorded twice (#239): the same name, or the same address, on
+       another of this person's contacts. Said on this page because it is the only one a
+       contact has, and only for one that exists -- there is nothing to compare a person
+       with before they have been written down. It tells and never refuses: the form
+       below saves whatever it is given. {% endcomment %}
+    <c-duplicates :candidates="duplicates" />
     <form method="post" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
@@ -38,9 +44,14 @@
       {% endif %}
       {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
       {% include "partials/web_links.html" %}
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>
         <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+        {% comment %} Offered whether or not anything was noticed: the person knows who
+           is who, and the comparison only knows names and addresses (#239). {% endcomment %}
+        {% if merge_url %}
+          <a href="{{ merge_url }}" class="btn ms-auto" data-variant="ghost">{% translate "Merge with another contact" %}</a>
+        {% endif %}
       </div>
     </form>
   </div>
