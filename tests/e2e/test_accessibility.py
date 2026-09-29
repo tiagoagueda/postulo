@@ -188,11 +188,22 @@ def furnished(applicant):
         owner=applicant, name="Remote", slug="remote", colour="violet", icon="home"
     )
     # A capture waiting for review, which is the state its page exists for.
+    # Its employer read where the person's own corrections showed it on this site before, and
+    # the place that did it remembered: so the review screen is walked with its mark on a
+    # field and the line above the form, and Settings -> Capture with a site listed (#267).
     capture = Capture.objects.create(
         owner=applicant,
         url="https://jobs.example.org/42",
         source_name="schema.org",
         data={"title": "Research Engineer", "company_name": "Black Mesa"},
+        learning={
+            "hints": [{"field": "company_name", "place": {"id": "employer"}, "outcome": "used"}]
+        },
+    )
+    from postulo.jobs.models import FieldHint
+
+    FieldHint.objects.create(
+        owner=applicant, host="jobs.example.org", field="company_name", place={"id": "employer"}
     )
     # And what it kept of the page it was read from (#256): the source and a picture, so
     # the page that shows them is walked with both on it -- the box the picture scrolls

@@ -559,3 +559,26 @@ def extract_meta(html: str) -> dict[str, str]:
     titles = find(root, "title")
     title = text_of(titles[0]) if titles else ""
     return {"title": title, **meta}
+
+
+def page_language(html: str) -> str:
+    """The language a page says it is written in, exactly as it says it; "" if it does not.
+
+    Its ``<html lang>`` first, which is where HTML asks for it; then an ``og:locale`` or a
+    ``Content-Language`` it declares, whichever comes first. What comes back is a stranger's
+    text and is checked by whoever uses it (`patterns.tag_of`).
+    """
+    return language_of(parse_html(html))
+
+
+def language_of(root: Element) -> str:
+    """`page_language`, for a page already parsed."""
+    for element in find(root, "html"):
+        declared = (element.get("lang") or element.get("xml:lang")).strip()
+        if declared:
+            return declared
+    for tag in find(root, "meta"):
+        key = (tag.get("property") or tag.get("name") or tag.get("http-equiv")).strip().lower()
+        if key in {"og:locale", "content-language", "language"} and tag.get("content").strip():
+            return tag.get("content").strip()
+    return ""

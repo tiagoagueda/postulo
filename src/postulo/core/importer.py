@@ -45,6 +45,7 @@ class ImportReport:
     uploads: int = 0
     sent_documents: int = 0
     captured_pages: int = 0
+    remembered_places: int = 0
     tags: int = 0
     skipped: list[str] = field(default_factory=list)
 
@@ -913,6 +914,13 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             posting, entries, contacts=contacts, pointable=pointable
         )
 
+    # ------------------------------------------------------ remembered places
+    # Format 25 (#267); an archive written before it has none, which is where every account
+    # started. Each row is checked rather than believed, exactly as a place read back from
+    # the database is: a file somebody hands over can say anything.
+    for row in document.get("remembered_places") or []:
+        report.remembered_places += _restore_remembered_place(user, row, report)
+
     return report
 
 
@@ -989,6 +997,38 @@ def _restore_listing_history(posting, entries: list, *, contacts: dict, pointabl
         )
         made += 1
     return made
+
+
+def _restore_remembered_place(user, row, report) -> int:
+    """Put back one remembered place, if it is one. One if it came back, else nought."""
+    from postulo.jobs.models import FieldHint, HintField
+    from postulo.jobs.remembered import host_of
+    from postulo.plugins.registry import clean_place
+
+    if not isinstance(row, dict):
+        report.skipped.append("A remembered place: not one")
+        return 0
+    raw_host = row.get("host")
+    host = host_of(f"https://{raw_host}/") if isinstance(raw_host, str) else ""
+    field = row.get("field")
+    place = clean_place(row.get("place"))
+    misses = row.get("misses")
+    misses = misses if isinstance(misses, int) and not isinstance(misses, bool) else 0
+    if not host or host != raw_host or field not in HintField.values or place is None:
+        report.skipped.append(f"A remembered place for {str(raw_host)[:60]!r}: not one")
+        return 0
+    # One place per site and field. An account that already has one -- an import forced
+    # into an account in use -- keeps its own: an import creates and never merges.
+    _hint, created = FieldHint.objects.get_or_create(
+        owner=user,
+        host=host,
+        field=field,
+        defaults={
+            "place": place,
+            "misses": min(max(misses, 0), FieldHint.DROPPED_AFTER - 1),
+        },
+    )
+    return int(created)
 
 
 def _restore_kept_page(archive: zipfile.ZipFile, capture, kept: dict, report) -> int:

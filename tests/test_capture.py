@@ -136,6 +136,7 @@ def test_an_unrecognised_employment_type_is_left_empty_rather_than_guessed():
 
 
 def test_the_fallback_uses_what_the_page_says_about_itself():
+    """The site's own name is the employer here, and is taken out of the title (#267)."""
     page = (
         "<html><head><title>Junior Dev - Black Mesa</title>"
         '<meta property="og:site_name" content="Black Mesa"></head>'
@@ -144,7 +145,7 @@ def test_the_fallback_uses_what_the_page_says_about_itself():
 
     data = PageMetadataSource().parse("https://example.org/j/1", page)
 
-    assert data.title == "Junior Dev - Black Mesa"
+    assert data.title == "Junior Dev"
     assert data.company_name == "Black Mesa"
     assert "We need someone." in data.description
     assert "var x" not in data.description, "script contents are not part of an advert"

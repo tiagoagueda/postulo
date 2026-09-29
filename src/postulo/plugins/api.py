@@ -71,6 +71,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
         settle_interview,
     )
     from postulo.applications.suggestions import suggest
+    from postulo.core.csv_import import CURRENCY_CODES
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
@@ -83,6 +84,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.documents.themes import Theme
     from postulo.jobs.history import record_listing_event
     from postulo.jobs.models import Contact
+    from postulo.jobs.places import resolve as place_of
     from postulo.notifications.base import EVENTS, Notification, NotifierPlugin
     from postulo.resume.importing import Record
 
@@ -138,6 +140,7 @@ from .base import (
 
 __all__ = [
     "ACCESS_TOKEN",
+    "CURRENCY_CODES",
     "EVENTS",
     "MAIL",
     "MAX_IMPORT_BYTES",
@@ -191,6 +194,7 @@ __all__ = [
     "manifest_of",
     "medium_of",
     "phone_number_is_taken",
+    "place_of",
     "primary_phone_number",
     "primary_web_link",
     "public_only_client",
@@ -275,6 +279,14 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # event. `alarm=True` adds the interview's reminder as a VALARM.
     "calendar_status": ("postulo.applications.ical", "calendar_status"),
     "event_lines": ("postulo.applications.ical", "event_lines"),
+    # ------------------------------------------------------- what a page is read against
+    # A source reading a page with no structured data has two questions only Postulo can
+    # answer (#267): is this three-letter word a currency a job advert carries -- the list
+    # the spreadsheet importer reads salaries with, one list rather than two -- and is this
+    # part of a title a place, which the offline city table the map uses answers, or answers
+    # with ``None`` where it does not know or has not been downloaded.
+    "CURRENCY_CODES": ("postulo.core.csv_import", "CURRENCY_CODES"),
+    "place_of": ("postulo.jobs.places", "resolve"),
 }
 
 

@@ -304,8 +304,9 @@ def test_the_format_version_moved(user):
     capture kept of the page it was read from (#256); 22 added the main navigation's order
     and what was switched off in it, on the profile (#299); 23 added a listing's history
     under its posting, each entry naming who it came from and what it points at (#270); 24
-    added the ESCO skill a skill's name matches, beside the name itself (#266).
+    added the ESCO skill a skill's name matches, beside the name itself (#266); 25 added the
+    places a person's corrections showed a field to be on a site (#267).
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 24
+    assert export.FORMAT_VERSION == 25

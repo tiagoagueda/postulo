@@ -719,6 +719,12 @@ def forget(page: CapturedPage, *, source: bool = True, rendering: bool = True) -
     """
     keeps_source = bool(page.source) and not source
     keeps_rendering = bool(page.rendering) and not rendering
+    if source and page.source:
+        # A capture still waiting would have read its review's lesson from this source;
+        # what that takes is kept on the capture instead, and none of the page's text (#267).
+        from . import remembered
+
+        remembered.before_the_source_goes(page)
     if not keeps_source and not keeps_rendering:
         capture = page.capture
         page.delete()

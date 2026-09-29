@@ -48,12 +48,11 @@ from pydantic import ValidationError as PydanticValidationError
 
 from postulo.core import errands, throttle
 from postulo.core.addresses import page_address
-from postulo.jobs import pages
+from postulo.jobs import pages, remembered
 from postulo.jobs.known import known
 from postulo.jobs.models import Capture, CaptureStatus
 from postulo.plugins.base import CaptureError, JobPostingData
 from postulo.plugins.fetching import fetch_page
-from postulo.plugins.registry import parse_page
 
 from . import idempotency, problems
 from .auth import TokenAuth, for_readers_of_the_api, scope
@@ -262,6 +261,14 @@ class PreviewOut(Schema):
     url: str
     source: str
     data: JobPostingData
+    hinted: list[str] = Field(
+        default_factory=list,
+        description=(
+            "The fields of `data` that were read where the owner's own corrections showed "
+            "them to be on this site before, rather than from what the page states about "
+            "itself. Worth showing as such: a remembered place is a better guess, not a fact."
+        ),
+    )
 
 
 class KnownQueryIn(Schema):
@@ -443,7 +450,8 @@ def create_capture(
 
 def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     """Read the page, keep the capture, tell the owner — the body of the call above."""
-    url, data, source, html = _read(payload, owner)
+    url, data, source, html, handed = _read(payload, owner)
+    read = data
     if payload.data is not None:
         corrections = payload.data.model_dump(exclude_unset=True)
         try:
@@ -533,6 +541,12 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     if payload.keep is not None:
         keeping = keeping.narrowed(source=payload.keep.source)
     _page, note = pages.keep_source_quietly(capture, html, keeping)
+    # What its review will learn from, and what the corrections sent with it teach now:
+    # the same act as correcting a field on the review screen, only earlier (#267).
+    if payload.data is not None:
+        remembered.after_capture(capture, handed, html, read=read, corrected=data)
+    else:
+        remembered.after_capture(capture, handed, html)
 
     body = _as_output(request, capture, keeping=keeping, note=note)
     # Kept before the answer goes out, so that a client which retries because it never saw
@@ -555,16 +569,24 @@ def preview_capture(request, payload: PageIn):
     correct it first: a browser extension's popup. Nothing is created and nobody is
     notified; the same page sent to ``POST /captures`` afterwards is read again.
     """
-    url, data, source, _html = _read(payload, request.auth.owner)
-    return {"url": url, "source": source.name, "data": data}
+    url, data, source, _html, handed = _read(payload, request.auth.owner)
+    # Read with the owner's remembered places, as the capture will be, and scored by
+    # nobody: a preview is not a review, and nothing was decided (#267).
+    return {
+        "url": url,
+        "source": source.name,
+        "data": data,
+        "hinted": remembered.filled_by(handed, data.model_dump()),
+    }
 
 
 def _read(payload: PageIn, owner):
-    """The page's address, what it was read as, the source that read it, and the text
-    that was read; or a 422.
+    """The page's address, what it was read as, the source that read it, the text that was
+    read, and the owner's remembered places it was read with; or a 422.
 
     The text is handed back because it is what a capture may keep (#256): exactly what the
-    parser was given, whichever way it arrived.
+    parser was given, whichever way it arrived. The places, because the capture keeps which
+    of them filled what, for its review to mark and to score (#267).
 
     The capture limit is spent here, on the branch that fetches, so that it bounds the *act*
     of making this server dial an address somebody else chose rather than the door that act
@@ -591,11 +613,11 @@ def _read(payload: PageIn, owner):
     except CaptureError as exc:
         raise HttpError(422, str(exc)) from exc
 
-    result = parse_page(url, html)
+    result = remembered.read_page(owner, url, html)
     if result is None:
         raise HttpError(422, str(_("Nothing resembling a job posting was found there.")))
-    data, source = result
-    return url, data, source, html
+    data, source, handed = result
+    return url, data, source, html, handed
 
 
 @api.get(
@@ -623,6 +645,8 @@ def list_captures(
         .filter(status=CaptureStatus.PENDING)
         # Each row says what it kept of its page (#256), which is a row of its own.
         .select_related("page")
+        # And not what its review will learn from (#267), which nothing here answers with.
+        .defer("learning")
         .order_by("-created_at", "-pk")
     )
     return changed_since(captures, updated_since)

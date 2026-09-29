@@ -348,21 +348,83 @@ def available_sources(*, refresh: bool = False) -> list[SourcePlugin]:
     return plugins("source", refresh=refresh)
 
 
-def parse_page(url: str, html: str) -> tuple[JobPostingData, SourcePlugin] | None:
+def reads_hints(source) -> bool:
+    """Whether a source is handed a person's remembered places (#267).
+
+    Postulo's own three and nothing else -- not a third party's source, and not a subclass
+    of one of the three that somebody else wrote. A remembered place is where one person's
+    corrections showed a field to be on a site they use, and it is theirs: another source
+    does not need it to read a page and is not given it.
+    """
+    return type(source) in BUILTIN_SOURCES
+
+
+def parse_page(url: str, html: str, *, hints=()) -> tuple[JobPostingData, SourcePlugin] | None:
     """Ask each source in turn, and take the first answer.
 
     A source that raises is skipped rather than allowed to fail the capture. Parsing
     somebody else's markup is exactly the kind of work that throws unexpectedly, and the
     next source along may well cope.
+
+    ``hints`` are the owner's remembered places for this page's site, as
+    :class:`~postulo.plugins.base.RememberedPlace`; the source that answers sets each one's
+    ``outcome``, and `jobs.remembered` keeps the score.
     """
+    hints = list(hints)
     for source in available_sources():
         try:
             if not source.can_handle(url):
                 continue
-            parsed = source.parse(url, html)
+            if hints and reads_hints(source):
+                parsed = source.parse(url, html, hints=hints)
+            else:
+                parsed = source.parse(url, html)
         except Exception:
             logger.exception("Capture source %r failed on %s", source.name, url)
             continue
         if parsed is not None:
             return parsed, source
     return None
+
+
+# -------------------------------------------------------- remembered places (#267)
+#
+# What a page is read with is the built-in sources' business, and so is what a place on a
+# page is. Postulo keeps the rows, and asks these three questions of the part that reads.
+
+
+def page_places(url: str, html: str) -> list[dict]:
+    """The places on a page a correction could be remembered at, and what each held.
+
+    What the review screen learns from where the page itself was not kept: bounded, and
+    holding digests and readings rather than the page's text.
+    """
+    from .builtin import hints
+
+    try:
+        return hints.places(url, html)
+    except Exception:
+        # Learning is a courtesy to the next capture; a page that defeats it costs nothing.
+        logger.exception("Could not list the places on %s", url)
+        return []
+
+
+def learned_place(places: list, field: str, value) -> dict | None:
+    """The most stable of ``places`` that held ``value`` for ``field``, or ``None``."""
+    from .builtin import hints
+
+    return hints.learn(places, field, value)
+
+
+def clean_place(place) -> dict | None:
+    """A place read back from storage or an archive, in the shape a source reads, or ``None``."""
+    from .builtin import hints
+
+    return hints.clean(place)
+
+
+def hint_fields() -> dict[str, tuple[str, ...]]:
+    """What a place can be remembered for, and the posting fields each one fills."""
+    from .builtin import hints
+
+    return dict(hints.FIELDS)

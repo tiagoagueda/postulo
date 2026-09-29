@@ -50,6 +50,22 @@
       </p>
     {% endif %}
 
+    {% comment %} Said before the fields are, and at each of them in its help (#267): which values
+       were read where the person's own corrections showed them on this site before, rather
+       than from what the page states. In words, never by colour alone -- a remembered place
+       is a better guess and not a fact, and a wrong one has to look like one. {% endcomment %}
+    {% if remembered %}
+      <div class="alert mb-6" data-variant="info" data-remembered>
+        <p>
+          {% blocktranslate trimmed with fields=remembered|join:", " %}
+            Read where your own corrections showed them on this site before: {{ fields }}.
+            Each is marked below; check them as you would anything else.
+          {% endblocktranslate %}
+          <a href="{% url 'settings:capture' %}#remembered" class="underline">{% translate "What is remembered, and forgetting it" %}</a>
+        </p>
+      </div>
+    {% endif %}
+
     {% comment %} Told, not refused (#178): what the person already holds for this address, or
        for this title at this company, said where they decide -- saving anyway or discarding
        below are both theirs. The second kind is softer: a board that mints a fresh address

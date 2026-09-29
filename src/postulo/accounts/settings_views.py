@@ -13,6 +13,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo.core import site
@@ -125,11 +126,13 @@ class CaptureView(ProfileSectionView):
     section_title = _("Capture")
 
     def get_context_data(self, **kwargs):
-        from postulo.jobs import pages, rendering
+        from postulo.jobs import pages, remembered, rendering
 
         context = super().get_context_data(**kwargs)
         context["keeping"] = pages.keeping_for(self.request.user)
         context["kept"] = pages.kept_by(self.request.user)
+        # What this person's corrections taught, by site, with a way to forget it (#267).
+        context["remembered_sites"] = remembered.sites(self.request.user)
         context["limits"] = {
             "source": site.capture_source_max_bytes(),
             "rendering": site.capture_rendering_max_bytes(),
@@ -138,6 +141,29 @@ class CaptureView(ProfileSectionView):
         }
         context["no_renderer"] = rendering.why_not()
         return context
+
+
+class ForgetRememberedPlacesView(LoginRequiredMixin, View):
+    """Forget the places this person's corrections taught about one site (#267).
+
+    A POST from *Settings → Capture*, naming the site in the body. Only the requester's own
+    rows are looked at, so a site somebody else has places for is, from here, a site with
+    nothing to forget -- the same answer as one nobody has.
+    """
+
+    def post(self, request):
+        from postulo.jobs import remembered
+
+        host = (request.POST.get("host") or "").strip().lower()[:253]
+        if remembered.forget(request.user, host):
+            messages.success(
+                request,
+                _("Forgotten. Your next capture from %(host)s is read as if for the first time.")
+                % {"host": host},
+            )
+        else:
+            messages.info(request, _("Nothing was remembered for that site."))
+        return redirect(reverse("settings:capture") + "#remembered")
 
 
 class AccountView(SettingsSectionMixin, UpdateView):

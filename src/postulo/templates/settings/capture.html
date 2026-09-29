@@ -68,4 +68,39 @@
       {% endif %}
     </p>
   </section>
+
+  {% comment %} What the person's own corrections taught, by site, and the way to forget it
+     (#267). Here rather than on a capture's page: a place belongs to a site and not to one
+     capture, and this is the page about what capturing keeps about this person. One small
+     button per row, not a menu -- it is the only thing a row can do. The label names the
+     site, so a screen reader in a list of "Forget" buttons knows which. {% endcomment %}
+  <section class="card mt-8" id="remembered" aria-labelledby="remembered-heading" data-remembered-sites="{{ remembered_sites|length }}">
+    <c-section-title id="remembered-heading">
+      {% translate "Places remembered from your corrections" %}
+      <c-slot name="subtitle">{% translate "When you correct a field on review and the value you typed is on the page, where it was is remembered for that site, and your next capture from it is read there first. Yours alone, and in your export. A place that is wrong twice in a row is forgotten by itself." %}</c-slot>
+    </c-section-title>
+    {% if remembered_sites %}
+      <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+        {% for site in remembered_sites %}
+          <li class="flex flex-wrap items-center gap-3 py-3" data-remembered-site="{{ site.host }}">
+            <div class="min-w-0 flex-1">
+              <p class="wrap-anywhere font-medium"><bdi>{{ site.host }}</bdi></p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">{{ site.fields|join:", " }}</p>
+            </div>
+            <form method="post" action="{% url 'settings:capture_forget' %}">
+              {% csrf_token %}
+              <input type="hidden" name="host" value="{{ site.host }}">
+              {% blocktranslate asvar forget_label trimmed with host=site.host %}
+                Forget what is remembered for {{ host }}
+              {% endblocktranslate %}
+              <button type="submit" class="btn" data-variant="destructive-ghost" data-size="xs"
+                      aria-label="{{ forget_label }}">{% translate "Forget" %}</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <c-empty variant="row">{% translate "Nothing yet. A place is remembered when you correct a field on review and the value you typed is on the page." %}</c-empty>
+    {% endif %}
+  </section>
 {% endblock %}

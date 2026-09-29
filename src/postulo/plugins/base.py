@@ -116,6 +116,27 @@ class SourcePlugin(Protocol):
         ...
 
 
+@dataclass
+class RememberedPlace:
+    """One place a person's own corrections showed a field to be, on one site (#267).
+
+    What a capture hands a source: the row itself is `jobs.FieldHint`, and this is the part
+    of it a page is read with. Handed to Postulo's own sources only, never to a third
+    party's (`registry.reads_hints`): a remembered place is that person's data.
+
+    The source that reads it sets ``outcome`` -- "used" where the place filled its field,
+    "missed" where the field was open and the place found nothing, and "" where a source
+    above had already stated the field and the place was never asked. Postulo keeps the
+    score once the person has said, on review, whether it was right.
+
+    Deliberately not on the plugin surface: nothing outside Postulo is handed one.
+    """
+
+    field: str
+    place: dict
+    outcome: str = ""
+
+
 class CaptureError(Exception):
     """Raised when a page cannot be fetched or cannot be understood."""
 

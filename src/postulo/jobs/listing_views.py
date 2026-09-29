@@ -128,9 +128,12 @@ class ListingListView(OwnedObjectMixin, ListView):
         # no rows is worse than the sentence that used to be here; an empty *Discarded* tab
         # belonging to somebody with forty listings is not that, and keeps them (#160).
         context["has_listings"] = counts["all"] > 0
-        context["pending_captures"] = Capture.objects.for_user(self.request.user).filter(
-            status=CaptureStatus.PENDING
-        )[:20]
+        # Without what each one's review will learn from (#267), which is for its review.
+        context["pending_captures"] = (
+            Capture.objects.for_user(self.request.user)
+            .filter(status=CaptureStatus.PENDING)
+            .defer("learning")[:20]
+        )
         context["discard_reasons"] = DiscardReason.choices
         context["table"] = self.table
         context["page_sizes"] = tables.PAGE_SIZES

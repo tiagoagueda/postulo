@@ -144,6 +144,10 @@ EXCUSED: dict[str, str] = {
         "a POST that adds an entry to a listing's history; the form is on the listing's "
         "page, which the suite visits, and a mistake draws that same page again (#270)"
     ),
+    "settings:capture_forget": (
+        "a POST that forgets the places remembered for one site; the button is on "
+        "Settings → Capture, which is visited with a site listed (#267)"
+    ),
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",

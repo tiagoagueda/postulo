@@ -20,6 +20,7 @@ from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
@@ -28,6 +29,7 @@ from postulo.core import errands, throttle
 from postulo.core.mixins import OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
 
+from . import remembered
 from .known import known
 from .models import Capture, CaptureStatus
 
@@ -136,7 +138,7 @@ class CaptureListView(OwnedObjectMixin, ListView):
     paginate_by = 50
 
     def get_queryset(self):
-        queryset = super().get_queryset().select_related("application")
+        queryset = super().get_queryset().select_related("application").defer("learning")
         if self.request.GET.get("show") != "all":
             queryset = queryset.filter(status=CaptureStatus.PENDING)
         return queryset
@@ -176,6 +178,14 @@ def after_deciding(request: HttpRequest, decided: Capture) -> HttpResponse:
 #: sources stopped reporting a currency with no amount behind it (#176); the form still
 #: needs something in a select, and this is what makes that visibly a default (#179).
 NOT_ON_THE_PAGE = _("Not on the page — a default. Kept only beside an amount.")
+
+#: Said beside a value read where the person's own corrections showed it to be on this site
+#: before (#267). In words, at the field, because a remembered place is a better guess and
+#: not a fact -- and a wrong one that looked like any other value would be a trap.
+REMEMBERED = _(
+    "Read where your own corrections showed it on this site before, not from what the "
+    "page states. Check it."
+)
 
 
 @functools.cache
@@ -256,7 +266,8 @@ class CaptureReviewView(OwnedObjectMixin, View):
         )
 
     def _form(self, request: HttpRequest, capture: Capture, data=None):
-        """The form, with the values the page never stated marked as defaults."""
+        """The form, with the values the page never stated marked as defaults, and the
+        values a remembered place filled marked as that (#267)."""
         form = review_form_class()(data, initial=self._initial(capture), user=request.user)
         read = capture.posting_data
         for name, stated in (
@@ -265,7 +276,28 @@ class CaptureReviewView(OwnedObjectMixin, View):
         ):
             if not stated:
                 form.fields[name].help_text = NOT_ON_THE_PAGE
+        for name in remembered.marked(capture):
+            if name in form.fields:
+                field = form.fields[name]
+                field.help_text = (
+                    format_lazy("{} {}", REMEMBERED, field.help_text)
+                    if field.help_text
+                    else REMEMBERED
+                )
         return form
+
+    @staticmethod
+    def _remembered(capture: Capture, form) -> list[str]:
+        """The names of the fields a remembered place filled, the pay once, for the line
+        above the form that says so before the fields do."""
+        names: list[str] = []
+        for name in remembered.marked(capture):
+            if name not in form.fields:
+                continue
+            label = _("Salary") if name.startswith("salary_") else form.fields[name].label
+            if label not in names:
+                names.append(label)
+        return names
 
     def _context(self, request: HttpRequest, capture: Capture, form) -> dict:
         following = next_pending(request.user, after=capture)
@@ -274,6 +306,8 @@ class CaptureReviewView(OwnedObjectMixin, View):
             "form": form,
             # What was kept of the page, to check the reading against (#256).
             "kept_page": capture.kept_page,
+            # Which fields came from a place the person's corrections showed before (#267).
+            "remembered": self._remembered(capture, form),
             "known": self._known(capture),
             "next_url": following.get_absolute_url() if following else "",
             "queue_left": (
@@ -305,6 +339,13 @@ class CaptureReviewView(OwnedObjectMixin, View):
         # on to the next capture rather than to what this one became (#179).
         onwards = bool(request.POST.get("next"))
 
+        # What the person changed teaches where this site keeps it, and what they kept or
+        # changed says whether the places it was read with were right (#267). Never in the
+        # listing's way: a failure there is logged and costs only the lesson.
+        remembered.at_review(
+            capture,
+            {**form.posting_data, "company_name": form.cleaned_data["company_name"]},
+        )
         company = get_or_create_company(request.user, form.cleaned_data["company_name"])
         listing = create_listing(request.user, company=company, posting_data=form.posting_data)
         capture.status = CaptureStatus.ACCEPTED
@@ -324,13 +365,15 @@ class CaptureReviewView(OwnedObjectMixin, View):
                 applied_at=moment_for(form.cleaned_data.get("applied_on")),
             )
             capture.application = application
-            capture.save(update_fields=["status", "posting", "application", "updated_at"])
+            capture.save(
+                update_fields=["status", "posting", "application", "learning", "updated_at"]
+            )
             messages.success(request, _("Application recorded from the capture."))
             if onwards:
                 return after_deciding(request, capture)
             return redirect(application.get_absolute_url())
 
-        capture.save(update_fields=["status", "posting", "updated_at"])
+        capture.save(update_fields=["status", "posting", "learning", "updated_at"])
         messages.success(request, _("Saved to your listings. Decide about it when you are ready."))
         if onwards:
             return after_deciding(request, capture)
@@ -404,7 +447,9 @@ class CaptureDiscardView(OwnedObjectMixin, View):
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         capture = get_object_or_404(self.get_queryset(), pk=pk)
         capture.status = CaptureStatus.DISCARDED
-        capture.save(update_fields=["status", "updated_at"])
+        # A discarded capture teaches nothing, and keeps nothing to learn from (#267).
+        capture.learning = {}
+        capture.save(update_fields=["status", "learning", "updated_at"])
         messages.success(
             request,
             format_html(_("Capture discarded. It is in {link}."), link=discarded_link()),
@@ -432,7 +477,7 @@ class CaptureDiscardSelectedView(OwnedObjectMixin, View):
         count = (
             self.get_queryset()
             .filter(pk__in=chosen, status=CaptureStatus.PENDING)
-            .update(status=CaptureStatus.DISCARDED, updated_at=timezone.now())
+            .update(status=CaptureStatus.DISCARDED, learning={}, updated_at=timezone.now())
         )
         if count:
             messages.success(

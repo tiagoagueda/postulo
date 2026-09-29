@@ -11,5 +11,10 @@ urlpatterns = [
     path("language/", views.LocaleView.as_view(), name="locale"),
     path("account/", views.AccountView.as_view(), name="account"),
     path("capture/", views.CaptureView.as_view(), name="capture"),
+    path(
+        "capture/remembered/forget/",
+        views.ForgetRememberedPlacesView.as_view(),
+        name="capture_forget",
+    ),
     path("plugins/", views.PluginsView.as_view(), name="plugins"),
 ]

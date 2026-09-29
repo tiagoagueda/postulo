@@ -25,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A page with no structured data is read further: its OpenGraph and Twitter card properties, a title line split into job, employer and place where the page vouches for each, and a salary and closing date in the page's own language. What nothing vouches for stays empty. (#267)
 - The company form uses the whole page: from 1536 pixels wide its details and its identifiers sit side by side, each as wide as the form was, and below that one under the other. (#210)
 - Every CI job is named for what it checks (*Unit tests (Python 3.12)*, *Browser tests (Chromium)*, *Release image: build, scan, push*), so a failed one says what failed; the release gate follows the new names. (#319)
 - The main navigation follows your own order, set with arrows under *Settings → Appearance*; each item has an icon, and what the row has no room for is under *More*. **On a phone it is a bar at the foot of the screen**, and search is reachable there and from the masthead. (#299)
@@ -65,6 +66,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A correction on the review screen is remembered where the page showed it, for that site and for you alone: your next capture from it is read there first, each such field says so, a place wrong twice in a row is dropped, and *Settings → Capture* lists and forgets them. (#267)
 - A skill keeps the ESCO skill its name is: the skill box offers the classification's names as you type, a CV in another language prints its name there where you wrote none, and the export carries it (format 24). **Skills already recorded are matched when next saved.** (#266)
 - A listing has a history: a message, an email, a call, a note, a file from your documents, or the same advert captured again elsewhere, added on its page or from the capture's review. An application shows it first on its timeline, and it is in your export (format 23). (#270)
 - A token can hold `listings:bind`, which adds to a listing's history and lists listings to choose one, and nothing else: the scope for a mail client that files messages. Plugins get `record_listing_event`. (#270)

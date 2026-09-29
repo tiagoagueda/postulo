@@ -58,8 +58,10 @@ from postulo import __version__
 #: posting: its history, each entry with who it came from as a contact's id in this file
 #: and what it points at as an ``artefact_kind`` and an ``artefact_ref`` -- a capture or an
 #: upload, by its id here (#270). 24 added ``esco_uri`` on a skill, the ESCO skill its
-#: name matches in the classification, beside the name itself (#266).
-FORMAT_VERSION = 24
+#: name matches in the classification, beside the name itself (#266). 25 added
+#: ``remembered_places`` at the top of the file: where the person's own corrections showed
+#: a field to be on a site, and how many reviews in a row each place has been wrong (#267).
+FORMAT_VERSION = 25
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -556,11 +558,13 @@ def counts(user) -> dict[str, int]:
     """
     from postulo.applications.models import Application, Interview
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, CapturedPage, Company, ListingEvent
+    from postulo.jobs.models import Capture, CapturedPage, Company, FieldHint, ListingEvent
 
     return {
         # The pages captures kept, which are files in the archive like any other (#256).
         "captured_pages": CapturedPage.objects.for_user(user).count(),
+        # Where the person's corrections showed a field to be, per site (#267).
+        "remembered_places": FieldHint.objects.for_user(user).count(),
         "companies": Company.objects.for_user(user).count(),
         # What arrived about each listing (#270): carried under its posting, and gone
         # with the account like the rest.
@@ -580,7 +584,7 @@ def build_document(user) -> dict:
     from postulo.accounts.models import Profile
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company, Contact
+    from postulo.jobs.models import Capture, Company, Contact, FieldHint
 
     # Read afresh rather than through the instance cached on the user, which may be stale.
     profile = Profile.objects.filter(user=user).first()
@@ -782,8 +786,17 @@ def build_document(user) -> dict:
         for capture in Capture.objects.for_user(user).select_related("page")
     ]
 
+    # Format 25 (#267). The places the person's own corrections taught, per site: theirs, so
+    # in their archive. A place is how a page names an element -- an id, a class, the words
+    # of a label, a heading's position -- and never the value that was found there.
+    document["remembered_places"] = [
+        {"host": hint.host, "field": hint.field, "place": hint.place, "misses": hint.misses}
+        for hint in FieldHint.objects.for_user(user).order_by("host", "field")
+    ]
+
     document["counts"] = {
         "captured_pages": sum(1 for capture in document["captures"] if capture["page"]),
+        "remembered_places": len(document["remembered_places"]),
         "companies": len(document["companies"]),
         "listing_events": sum(
             len(posting["events"])

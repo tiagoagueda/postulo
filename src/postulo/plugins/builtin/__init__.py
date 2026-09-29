@@ -23,17 +23,29 @@ Three, tried in order.
     the same way round.
 
 ``page-metadata``
-    When there is no structured data, take the title the page declares and the readable
-    text, and let the person capturing fix the rest. Deliberately unambitious: it saves
-    typing, and it never pretends to know more than it does.
+    When there is no structured data, take what the page declares about itself and the
+    readable text, and let the person capturing fix the rest. Deliberately unambitious: it
+    saves typing, and it never pretends to know more than it does. It reads the OpenGraph
+    and Twitter card properties as well as ``<title>``, splits a declared title into the
+    job, the employer and the place only where something on the page vouches for each part
+    (`titles`), and finds a salary and a closing date written after the words the page's own
+    language uses for them (`patterns`).
 
-Neither invents a value. A field that cannot be determined is left empty for somebody to
-fill in on the review screen.
+Between the standards and the page's metadata sit **the places a person's own corrections
+showed a field to be** on that site (`hints`, #267): below the recipes and schema.org, which
+are the site's own statements, and above the metadata, which is the floor. Postulo hands
+them to these three sources and to nobody else's (`registry.reads_hints`); each field is
+filled from the first tier that states it, and Postulo keeps the score of which places
+helped once the person has reviewed the capture (`jobs.remembered`).
 
-The browser extension reads the same two, over a real DOM
+None of them invents a value. A field that cannot be determined is left empty for somebody
+to fill in on the review screen.
+
+The browser extension reads the same pages over a real DOM
 (``postulo-chromium/src/lib/parse.js``), so that a page read in somebody's browser is the
 page read here when it is sent. The two are meant to be walked side by side; changing one
-without the other is how they drift.
+without the other is how they drift -- and `titles` and `patterns` are not in the extension
+yet, which is an issue in its own repository.
 """
 
 from __future__ import annotations
@@ -47,6 +59,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import JobPostingData, declares, shipped
 
+from . import hints as remembered
+from . import patterns, titles
 from .boards import recipe_for
 from .htmlutil import (
     body_of,
@@ -56,12 +70,34 @@ from .htmlutil import (
     extract_rdfa,
     heading_title,
     main_text,
+    page_language,
     parse_html,
     strip_tags,
 )
 from .vocabulary import EMPLOYMENT_TYPES, SALARY_PERIODS, employment_type  # noqa: F401
 
 logger = logging.getLogger(__name__)
+
+
+def _stated(data: JobPostingData) -> dict:
+    """The fields a tier actually stated, without the empties and the address."""
+    return {
+        field: value
+        for field, value in data.model_dump(exclude={"url", "source"}).items()
+        if value not in (None, "", [])
+    }
+
+
+def _with_hints(data: JobPostingData | None, url: str, html: str, hints) -> JobPostingData | None:
+    """What a person's remembered places add to what a tier above them stated (#267).
+
+    Only a field the tier left empty is asked about, so a site's own statement is never
+    overruled by a place that happened to hold something else.
+    """
+    if data is None or not hints:
+        return data
+    stated = remembered.fill(url, html, hints, _stated(data))
+    return JobPostingData(**stated, url=data.url, source=data.source)
 
 
 def _first(value):
@@ -316,14 +352,17 @@ class SchemaOrgSource:
     def can_handle(self, url: str) -> bool:
         return urlparse(url).scheme in {"http", "https"}
 
-    def parse(self, url: str, html: str) -> JobPostingData | None:
+    def parse(self, url: str, html: str, hints=None) -> JobPostingData | None:
+        """``hints``, a person's remembered places, fill only what the posting left empty."""
         posting = _best_posting(extract_jsonld(html), url)
         if posting is not None:
-            return _from_posting(posting, url, description_is_html=True)
+            read = _from_posting(posting, url, description_is_html=True)
+            return _with_hints(read, url, html, hints)
 
         posting = _best_posting([*extract_microdata(html), *extract_rdfa(html)], url)
         if posting is not None:
-            return _from_posting(posting, url, description_is_html=False)
+            read = _from_posting(posting, url, description_is_html=False)
+            return _with_hints(read, url, html, hints)
         return None
 
 
@@ -368,7 +407,9 @@ class BoardSource:
     def can_handle(self, url: str) -> bool:
         return urlparse(url).scheme in {"http", "https"} and recipe_for(url) is not None
 
-    def parse(self, url: str, html: str) -> JobPostingData | None:
+    def parse(self, url: str, html: str, hints=None) -> JobPostingData | None:
+        """``hints``, a person's remembered places, fill what the recipe and the page's
+        standards left empty, before what the page says about itself does."""
         board = recipe_for(url)
         if board is None:
             return None
@@ -385,25 +426,73 @@ class BoardSource:
             # that has moved, or a board that redesigned. Let the standards have it.
             return None
 
-        # Whatever the recipe did not state, taken from the page's own standards.
-        for source_class in (SchemaOrgSource, PageMetadataSource):
-            if len(stated) >= len(RECIPE_FIELDS):
-                break
-            try:
-                fallback = source_class().parse(url, html)
-            except Exception:
-                # The recipe already has a title, so the capture survives this. Logged
-                # rather than silenced: a standard source throwing is worth looking at.
-                logger.warning("Filling gaps with %s failed on %s", source_class.__name__, url)
-                continue
-            if fallback is None:
-                continue
-            for field in RECIPE_FIELDS - set(stated):
-                value = getattr(fallback, field)
-                if value not in (None, "", []):
-                    stated[field] = value
-
+        # Whatever the recipe did not state: the page's own standards first, then the
+        # person's remembered places, then what the page says about itself.
+        stated = self._fill_from(SchemaOrgSource, url, html, stated)
+        stated = remembered.fill(url, html, hints, stated)
+        stated = self._fill_from(PageMetadataSource, url, html, stated)
         return JobPostingData(**stated, url=url, source=urlparse(url).netloc)
+
+    @staticmethod
+    def _fill_from(source_class, url: str, html: str, stated: dict) -> dict:
+        """The fields nothing above has stated, from one of the standard sources."""
+        if len(stated) >= len(RECIPE_FIELDS):
+            return stated
+        try:
+            fallback = source_class().parse(url, html)
+        except Exception:
+            # The recipe already has a title, so the capture survives this. Logged rather
+            # than silenced: a standard source throwing is worth looking at.
+            logger.warning("Filling gaps with %s failed on %s", source_class.__name__, url)
+            return stated
+        if fallback is None:
+            return stated
+        for field in RECIPE_FIELDS - set(stated):
+            value = getattr(fallback, field)
+            if value not in (None, "", []):
+                stated[field] = value
+        return stated
+
+
+def _is_place(text: str) -> bool:
+    """Whether Postulo's table of cities knows ``text`` as a place (`jobs/places.py`)."""
+    from postulo.plugins.api import place_of
+
+    return place_of(text) is not None
+
+
+def _card_lines(meta: dict[str, str]) -> list[str]:
+    """A Twitter card's label-and-value pairs, as the lines a reader would have seen.
+
+    ``twitter:label1`` "Salary" and ``twitter:data1`` "£45,000" say what a line of the page
+    would, and are read by the same words in the same language, or not at all.
+    """
+    lines = []
+    for number in range(1, 5):
+        label = meta.get(f"twitter:label{number}", "").strip()
+        value = meta.get(f"twitter:data{number}", "").strip()
+        if label and value:
+            lines.append(f"{label}: {value}")
+    return lines
+
+
+def _declared_place(meta: dict[str, str]) -> str:
+    """The place OpenGraph's own location properties state, on a page that uses them."""
+    parts = [meta.get(key, "").strip() for key in ("og:locality", "og:region", "og:country-name")]
+    return ", ".join(part for part in parts if part)
+
+
+def _description(text: str, meta: dict[str, str]) -> str:
+    """The page's readable text, or what it declares about itself where that says more.
+
+    A page drawn by a script arrives as a shell -- "Loading…", "Please enable JavaScript"
+    -- with its advert only in the description it declares for a link to show.
+    """
+    declared = max(
+        (meta.get(key, "").strip() for key in ("og:description", "twitter:description")),
+        key=len,
+    )
+    return declared if len(declared) > len(text) else text
 
 
 @declares(
@@ -419,32 +508,65 @@ class BoardSource:
     )
 )
 class PageMetadataSource:
-    """The fallback: a title, whatever the page says about itself, and its text."""
+    """The fallback: whatever the page says about itself, and its text.
+
+    Below a person's remembered places, which are asked first; a place that finds nothing
+    leaves its field to what the page says about itself.
+    """
 
     def can_handle(self, url: str) -> bool:
         return urlparse(url).scheme in {"http", "https"}
 
-    def parse(self, url: str, html: str) -> JobPostingData | None:
-        meta = extract_meta(html)
-        # The page's own heading first, then what it declares for a link to read. Both are
-        # the page talking about itself; the heading is the one written for a person.
-        title = (
-            heading_title(html)
-            or meta.get("og:title")
-            or meta.get("twitter:title")
-            or meta.get("title")
-            or ""
-        )
-        if not title.strip():
+    def parse(self, url: str, html: str, hints=None) -> JobPostingData | None:
+        from_hints = remembered.fill(url, html, hints, {})
+        read = self._read(url, html)
+        # Each group a remembered place filled is the place's, whole; the rest is the page's.
+        stated = {**read, **from_hints}
+        if not str(stated.get("title") or "").strip():
             return None
+        return JobPostingData(**stated, url=url, source=urlparse(url).netloc)
 
-        return JobPostingData(
-            title=title[:500],
-            company_name=(meta.get("og:site_name") or "")[:500],
-            description=main_text(html),
-            url=url,
-            source=urlparse(url).netloc,
+    def _read(self, url: str, html: str) -> dict:
+        """What the page says about itself, field by field, before any remembered place."""
+        meta = extract_meta(html)
+        site_name = (meta.get("og:site_name") or "").strip()
+        # The page's own heading first, then what it declares for a link to read, in the
+        # order they are trusted. All of it is the page talking about itself; the heading is
+        # the one written for a person, and a declared line is split only where something
+        # else on the page vouches for a part.
+        read = titles.read(
+            declared=[
+                meta.get("og:title", ""),
+                meta.get("twitter:title", ""),
+                meta.get("title", ""),
+            ],
+            heading=heading_title(html),
+            site_name=site_name,
+            host=urlparse(url).hostname or "",
+            is_place=_is_place,
         )
+
+        text = main_text(html)
+        # The pay and the closing date, in the page's own language, from its text and from
+        # the pairs a Twitter card may carry. The advert's text rather than the whole page:
+        # a sidebar of other adverts carries other adverts' salaries.
+        language = patterns.tag_of(page_language(html))
+        stated = "\n".join([text, *_card_lines(meta)])
+        low, high, currency, period = patterns.salary(stated, language)
+
+        return {
+            "title": read.title[:500],
+            # Who is hiring, where the title says so; else what the site calls itself, which
+            # is the employer on its own careers site and the board on a board.
+            "company_name": (read.company or site_name)[:500],
+            "location": (read.place or _declared_place(meta))[:500],
+            "description": _description(text, meta),
+            "salary_min": low,
+            "salary_max": high,
+            "salary_currency": currency,
+            "salary_period": period,
+            "closes_at": patterns.closing_date(stated, language),
+        }
 
 
 #: Tried in order, after any plugin a third party has registered.

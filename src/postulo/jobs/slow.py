@@ -27,8 +27,8 @@ def fetch_a_capture(errand) -> dict:
 
     from postulo.plugins.base import CaptureError
     from postulo.plugins.fetching import fetch_page
-    from postulo.plugins.registry import parse_page
 
+    from . import remembered
     from .models import Capture
 
     url = errand.payload.get("url", "")
@@ -59,11 +59,13 @@ def fetch_a_capture(errand) -> dict:
             raise Refused(str(exc)) from exc
         page_url, page_html = fetched.url, fetched.html
 
-    result = parse_page(page_url, page_html)
+    # Read with the places the owner's own corrections showed on this site, where there are
+    # any (#267): below the site's own statements, above what the page says about itself.
+    result = remembered.read_page(errand.owner, page_url, page_html)
     if result is None:
         raise Refused(_("Nothing resembling a job posting was found on that page."))
 
-    data, source = result
+    data, source, handed = result
     # A transaction of a single statement, as it was in the view: nothing slow is inside
     # it, which is the rule #220 set for every writer on the SQLite file.
     with transaction.atomic():
@@ -82,6 +84,9 @@ def fetch_a_capture(errand) -> dict:
     from . import pages
 
     _kept, note = pages.keep_source_quietly(capture, page_html)
+    # And what its review will learn from: which remembered places filled what, and -- only
+    # where the source was not just kept -- the page's places, as digests (#267).
+    remembered.after_capture(capture, handed, page_html)
     message = str(_("Read it. Check what was found before it becomes a listing."))
     return {
         "message": f"{message} {note}".strip(),

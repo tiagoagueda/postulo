@@ -310,7 +310,7 @@ def test_the_archive_is_written_as_it_was(somebody):
     The format's number is pinned where a change to it is written down
     (`test_phone_verification.py::test_the_format_version_moved`); what this holds is that
     moving the builders out of `build_document` left every block where it was. `contacts`
-    arrived with #239, after the move.
+    arrived with #239, after the move, and `remembered_places` with #267.
     """
     document = export.build_document(somebody)
 
@@ -325,6 +325,7 @@ def test_the_archive_is_written_as_it_was(somebody):
         "companies",
         "documents",
         "captures",
+        "remembered_places",
         "counts",
     ]
     assert list(document["account"]) == [

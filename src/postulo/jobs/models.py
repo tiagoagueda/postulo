@@ -1121,6 +1121,13 @@ class Capture(OwnedModel):
         related_name="captures",
         verbose_name=_("application"),
     )
+    #: What the review of this capture learns from, and nothing once it is decided (#267):
+    #: which of the owner's remembered places filled which field, and -- only where the
+    #: page's source was not kept (`CapturedPage`) -- the bounded list of the page's places
+    #: and digests `jobs.remembered` recognises a correction in. Never the page's text.
+    learning = models.JSONField(
+        _("what the review learns from"), default=dict, blank=True, editable=False
+    )
 
     class Meta:
         verbose_name = _("capture")
@@ -1469,3 +1476,64 @@ class ListingEvent(models.Model):
         if found is not None and found._meta.label_lower == "documents.uploadeddocument":
             return found
         return None
+
+
+class HintField(models.TextChoices):
+    """What a place on a page can be remembered for (#267).
+
+    The fields the review screen shows and a page can be read for. The pay is one: a place
+    that holds it holds the figures, the currency and the period together. Not the working
+    arrangement, which has no vocabulary to read a place's words against, and not the date
+    of posting, which the review screen does not ask about.
+    """
+
+    TITLE = "title", _("Job title")
+    COMPANY = "company_name", _("Company")
+    LOCATION = "location", _("Location")
+    EMPLOYMENT_TYPE = "employment_type", _("Employment type")
+    SALARY = "salary", _("Salary")
+    CLOSES_AT = "closes_at", _("Closing date")
+    DESCRIPTION = "description", _("Description")
+
+
+class FieldHint(OwnedModel):
+    """Where one person's own corrections showed one field to be, on one site (#267).
+
+    Learned on review: somebody corrected a field, and the value they typed was on the page
+    the capture was read from, at a place that survives a small change to the page -- an
+    id, a label, a heading under the page's main landmark (`plugins.builtin.hints`). The
+    next capture from the same site reads that place before what the page says about
+    itself, and the review screen says which fields came from one.
+
+    **One person's, never shared.** Scoped by owner like everything else, in their archive,
+    and gone with their account. There is no registry of places and nothing reported
+    anywhere: a place is learned from one person's corrections and used for their captures.
+
+    **It decays.** ``misses`` counts the reviews in a row at which the place was wrong --
+    the person changed what it found, or typed a value it had not found -- and a place that
+    reaches `DROPPED_AFTER` is deleted: a site redesign costs one poor capture rather than a
+    wrong answer for ever.
+    """
+
+    #: How many reviews in a row a place may be wrong before it is forgotten.
+    DROPPED_AFTER = 2
+
+    host = models.CharField(_("site"), max_length=253)
+    field = models.CharField(_("field"), max_length=20, choices=HintField)
+    #: The shape `plugins.builtin.hints.clean` accepts, and only that: checked on the way in
+    #: and again whenever it is read.
+    place = models.JSONField(_("place on the page"), default=dict)
+    misses = models.PositiveSmallIntegerField(_("wrong in a row"), default=0)
+
+    class Meta:
+        verbose_name = _("remembered place")
+        verbose_name_plural = _("remembered places")
+        ordering = ("host", "field")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "host", "field"), name="one_place_per_field_per_site"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.host}: {self.get_field_display()}"
