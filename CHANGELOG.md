@@ -61,6 +61,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The ESCO classification is no longer committed: `manage.py fetch_esco` downloads the
   revision it names into `src/postulo/jobs/data/`, and without the file Postulo runs on,
   matching no titles to no codes. (#266)
+- The foot of every page names this instance and links its source, the help and, set by `POSTULO_LEGAL_NOTICE_URL`, your legal notice; `POSTULO_SOURCE_URL` points the source at your own code. The version is shown only to people signed in. (#212)
 
 ### ✨ Added
 

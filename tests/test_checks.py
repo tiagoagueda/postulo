@@ -27,6 +27,7 @@ def test_the_defaults_pass():
     assert checks.rates() == []
     assert checks.public_url() == []
     assert checks.sizes() == []
+    assert checks.footer_links() == []
 
 
 @pytest.mark.parametrize(
@@ -100,6 +101,63 @@ def test_a_public_url_without_a_scheme_or_a_host_is_an_error(settings, value):
     problems = checks.public_url()
 
     assert ids(problems) == {"postulo.E003"}
+
+
+# ------------------------------------------------------- the footer's addresses (#212)
+
+
+def test_the_source_is_the_upstream_repository_as_shipped():
+    from django.conf import settings as configured
+
+    assert configured.POSTULO_SOURCE_URL == "https://source.tiagoagueda.com/postulo/postulo"
+    assert configured.POSTULO_LEGAL_NOTICE_URL == ""
+    assert checks.footer_links() == []
+
+
+@pytest.mark.parametrize(
+    "value", ["https://git.example.org/acme/postulo", "http://git.lan:3000/me/postulo"]
+)
+def test_a_source_a_browser_can_follow_passes(settings, value):
+    settings.POSTULO_SOURCE_URL = value
+    assert checks.footer_links() == []
+
+
+@pytest.mark.parametrize(
+    "value",
+    ["", "git.example.org/acme/postulo", "git@git.example.org:acme/postulo.git", "https://"],
+)
+def test_a_source_that_is_not_an_address_is_an_error(settings, value):
+    """Empty too: the link is the AGPL's offer of source, and an offer pointing nowhere is
+    not one. Unsetting the variable is how the upstream default is taken."""
+    settings.POSTULO_SOURCE_URL = value
+
+    problems = checks.footer_links()
+
+    assert ids(problems) == {"postulo.E006"}
+    assert "POSTULO_SOURCE_URL" in problems[0].msg and repr(value) in problems[0].msg
+
+
+@pytest.mark.parametrize("value", ["", "https://example.org/impressum", "http://example.org/"])
+def test_an_absent_or_followable_legal_notice_passes(settings, value):
+    settings.POSTULO_LEGAL_NOTICE_URL = value
+    assert checks.footer_links() == []
+
+
+@pytest.mark.parametrize("value", ["example.org/impressum", "mailto:legal@example.org", "https://"])
+def test_a_legal_notice_that_is_not_an_address_is_an_error(settings, value):
+    settings.POSTULO_LEGAL_NOTICE_URL = value
+
+    problems = checks.footer_links()
+
+    assert ids(problems) == {"postulo.E007"}
+    assert "POSTULO_LEGAL_NOTICE_URL" in problems[0].msg
+
+
+def test_manage_py_check_stops_on_a_source_that_is_not_an_address(settings):
+    settings.POSTULO_SOURCE_URL = "git.example.org/acme/postulo"
+
+    with pytest.raises(SystemCheckError, match=r"postulo\.E006"):
+        call_command("check", "--tag", "postulo")
 
 
 # ------------------------------------------------------ what a capture may keep (#256)

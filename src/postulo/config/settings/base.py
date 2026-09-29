@@ -529,6 +529,21 @@ POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / 
 # are bare paths. Where a request exists, the link is built from it instead.
 POSTULO_PUBLIC_URL = env("POSTULO_PUBLIC_URL", default="").rstrip("/")
 
+# Where this instance's code can be had, linked as *Source code* at the foot of every page
+# (#212). The AGPL entitles the people using a *modified* Postulo run as a service to its
+# source, and the footer is where that offer is made -- so it points at wherever the
+# operator's code lives, and at the upstream repository for an instance that changed
+# nothing. Checked at start-up: an address a browser can follow, or the instance refuses.
+POSTULO_SOURCE_URL = env(
+    "POSTULO_SOURCE_URL", default="https://source.tiagoagueda.com/postulo/postulo"
+).strip()
+
+# The operator's legal notice -- an imprint, a contact page -- which some countries require
+# of a site (Germany's Impressum is the usual example). Linked at the foot of every page
+# when set, and nowhere when not: who runs an instance is a fact nobody but the operator
+# can state, so it is never guessed. Checked at start-up like the one above.
+POSTULO_LEGAL_NOTICE_URL = env("POSTULO_LEGAL_NOTICE_URL", default="").strip()
+
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.
 # nginx: an `internal` location, e.g. "/protected-media/".

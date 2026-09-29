@@ -136,14 +136,21 @@ def sizes(app_configs=None, **kwargs) -> list[Error]:
     return problems
 
 
+def _followable(value) -> bool:
+    """A scheme a browser follows and a host to follow it to."""
+    if not isinstance(value, str):
+        return False
+    parts = urlsplit(value)
+    return parts.scheme in URL_SCHEMES and bool(parts.netloc)
+
+
 @register("postulo")
 def public_url(app_configs=None, **kwargs) -> list[Error]:
     """`POSTULO_PUBLIC_URL`, when set, is an address a message can carry: a scheme and a host."""
     value = getattr(settings, "POSTULO_PUBLIC_URL", "")
     if not value:
         return []
-    parts = urlsplit(value)
-    if parts.scheme not in URL_SCHEMES or not parts.netloc:
+    if not _followable(value):
         return [
             Error(
                 f"POSTULO_PUBLIC_URL is {value!r}; it must start with https:// or http:// "
@@ -153,3 +160,40 @@ def public_url(app_configs=None, **kwargs) -> list[Error]:
             )
         ]
     return []
+
+
+@register("postulo")
+def footer_links(app_configs=None, **kwargs) -> list[Error]:
+    """The two addresses the foot of every page links to, when they are the operator's (#212).
+
+    `POSTULO_SOURCE_URL` always has a value -- the upstream repository unless the operator
+    names their own -- because it is the offer of source the AGPL asks of a modified Postulo
+    run as a service, and an offer pointing nowhere is not one. So an empty value is refused
+    as well as a malformed one: unsetting it is how the default is taken.
+    `POSTULO_LEGAL_NOTICE_URL` is optional, and absent means no link at all.
+    """
+    problems = []
+    source = getattr(settings, "POSTULO_SOURCE_URL", "")
+    if not _followable(source):
+        problems.append(
+            Error(
+                f"POSTULO_SOURCE_URL is {source!r}; it must start with https:// or http:// "
+                "and name where this instance's code can be had, such as "
+                "https://git.example.org/you/postulo.",
+                hint="Unset it to point at the upstream repository, for an instance that "
+                "changed nothing.",
+                id="postulo.E006",
+            )
+        )
+    notice = getattr(settings, "POSTULO_LEGAL_NOTICE_URL", "")
+    if notice and not _followable(notice):
+        problems.append(
+            Error(
+                f"POSTULO_LEGAL_NOTICE_URL is {notice!r}; it must start with https:// or "
+                "http:// and name the page with your legal notice, such as "
+                "https://example.org/imprint.",
+                hint="Unset it to show no legal notice.",
+                id="postulo.E007",
+            )
+        )
+    return problems

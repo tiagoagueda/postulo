@@ -288,13 +288,73 @@
       {% block main %}{% block content %}{% endblock %}{% endblock %}
     </main>
 
-    <footer class="flex flex-wrap gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
-      <span>
-        {% blocktranslate trimmed %}
-          Postulo — your job search, on your server.
-        {% endblocktranslate %}
-      </span>
-      <span data-version>Postulo {{ postulo_version }}</span>
+    {% comment %} The foot of every page, allauth's included (#212): this instance first, then
+       what it runs on, where its code is, where the help is, and who answers for it. Small
+       and muted on purpose -- one line on a wide screen, two on a phone -- and never a
+       request for money, which is asked in the README and on Server settings -> Overview
+       and nowhere else (#172).
+
+       The instance says its own name, and its tagline when it has one; Postulo's slogan is
+       for an instance nobody has named. Both are typed text in any script, so each is a
+       `<bdi>` and neither is translated.
+
+       The version is for people signed in. It is the first thing a stranger would want in
+       order to know which advisories apply, and a stranger has no other use for it; *Powered
+       by Postulo* is said to everybody. Not a secret -- `/healthz` still says it, to a
+       monitor -- but no longer on every page a crawler reads. It links to that release's
+       notes: the release it says it is, since nothing a build records says which commit it
+       came from.
+
+       *Source code* is the offer of source the AGPL asks of a modified Postulo run as a
+       service, pointing wherever `POSTULO_SOURCE_URL` says the operator's code lives. The
+       legal notice is the operator's to give, and is absent until they do. Every address
+       leaves the instance, so each is marked `external` and opens beside the page; nothing
+       here is fetched, so the policy has nothing to allow.
+
+       `py-1` on each item, so a link at this size is 24 pixels tall -- the target size a
+       pointer wants -- without leaning on the space around it. {% endcomment %}
+    <footer class="flex flex-wrap items-center justify-between gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
+      <p class="py-1">
+        {% if instance_tagline %}
+          <bdi>{{ instance_name }}</bdi> — <bdi>{{ instance_tagline }}</bdi>
+        {% elif instance_named %}
+          <bdi>{{ instance_name }}</bdi>
+        {% else %}
+          {% blocktranslate trimmed %}
+            Postulo — your job search, on your server.
+          {% endblocktranslate %}
+        {% endif %}
+      </p>
+      <nav aria-label="{% translate 'About this instance' %}">
+        <ul class="flex flex-wrap gap-x-4">
+          <li>
+            {% if user.is_authenticated %}
+              <a href="{{ postulo_release_url }}" rel="noopener noreferrer external" target="_blank"
+                 class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+                 data-version>{% blocktranslate trimmed with version=postulo_version %}Powered by Postulo {{ version }}{% endblocktranslate %}</a>
+            {% else %}
+              <span class="inline-block py-1">{% translate "Powered by Postulo" %}</span>
+            {% endif %}
+          </li>
+          <li>
+            <a href="{{ postulo_source_url }}" rel="noopener noreferrer external" target="_blank"
+               class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+               data-source>{% translate "Source code" %}</a>
+          </li>
+          <li>
+            <a href="{{ postulo_help_url }}" rel="noopener noreferrer external" target="_blank"
+               class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+               data-help>{% translate "Help" %}</a>
+          </li>
+          {% if postulo_legal_notice_url %}
+            <li>
+              <a href="{{ postulo_legal_notice_url }}" rel="noopener noreferrer external" target="_blank"
+                 class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+                 data-legal-notice>{% translate "Legal notice" %}</a>
+            </li>
+          {% endif %}
+        </ul>
+      </nav>
     </footer>
     {# Scripts a page needs and the rest do not; always from Postulo's own origin. #}
     {% block scripts %}{% endblock %}
