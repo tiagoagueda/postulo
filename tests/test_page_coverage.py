@@ -71,6 +71,11 @@ EXCUSED: dict[str, str] = {
         "the contact's data as one JSON document arriving as a download: a "
         "`Content-Disposition` and bytes, with nothing to check for accessibility (#297)"
     ),
+    "resume:candidate_download": (
+        "one person's own record as one JSON document arriving as a download: a "
+        "`Content-Disposition` and bytes, with nothing to check for accessibility. The "
+        "page that links to it, `resume:candidate_file`, is walked (#181)"
+    ),
     "listings:cell": (
         "one cell of the listings table, as a fragment rather than a page. The same "
         "machinery and the same excuse as `jobs:company_cell` below (#160)"

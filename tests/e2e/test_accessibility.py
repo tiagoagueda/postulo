@@ -375,6 +375,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/career/education/new/",
         "/career/preview/",
         "/career/import/",
+        # One person's own record as a file: what is in it, the link to it, and the box
+        # that reads one back (#181). The half that comes after a file has a test below.
+        "/career/file/",
         "/server/logs/",
         "/accounts/invitations/new/",
         f"/server/people/{me.pk}/recovery/",
@@ -552,6 +555,108 @@ def test_the_europass_review_page_has_no_violations(
     expect(page.get_by_role("heading", name="What is in the file")).to_be_visible()
     found = violations_on(page, axe_source)
     assert not found, describe(f"/career/import/ review ({scheme})", found)
+
+
+def a_candidate_file(path: Path) -> Path:
+    """A file with one of everything the review can say about a row, written to ``path``.
+
+    Read into `furnished`'s account, which holds a name and one role: that role is *already
+    in your record*, the one beside it *will be added*, the name is *kept*, a role with no
+    title *cannot be added*, and a second copy of the new one is *in the file twice*.
+    """
+    import json
+
+    from postulo.core import export
+
+    new = {
+        "id": 2,
+        "organisation": "Aperture Science",
+        "role": "Test subject",
+        "start_date": "2016-05-01",
+        "end_date": "2018-12-31",
+    }
+    document = {
+        "postulo": {
+            "candidate_format": export.CANDIDATE_FORMAT,
+            "version": "0.5.0",
+            "exported_at": "2026-09-28T10:00:00+00:00",
+        },
+        "account": {
+            "first_name": "Alexandra",
+            "profile": {
+                "headline": "Backend engineer",
+                "phone_numbers": [{"kind": "mobile", "number": "+351912345678"}],
+                "postal_addresses": [
+                    {"kind": "home", "street": "Rua do Exemplo 1", "country": "PT"}
+                ],
+                "web_links": [{"kind": "website", "url": "https://alex.example.org"}],
+            },
+            "identifiers": [{"scheme": "orcid", "value": "0000-0002-1825-0097"}],
+        },
+        "resume": {
+            "experience": [
+                {
+                    "id": 1,
+                    "organisation": "Weyland-Yutani",
+                    "role": "Backend engineer",
+                    "start_date": "2019-01-01",
+                    "summary": "Something else.",
+                },
+                new,
+                {**new, "id": 3},
+                {"id": 4, "organisation": "Black Mesa", "start_date": "soon"},
+            ],
+            "skill_groups": [{"id": 1, "name": "Languages"}],
+            "skills": [{"id": 1, "name": "Python", "group_id": 1}],
+            "languages": [{"id": 1, "name": "português", "proficiency": "native"}],
+            "translations": [
+                {
+                    "section": "experience",
+                    "ref": 2,
+                    "language": "fr-fr",
+                    "field": "role",
+                    "text": "Sujet de test",
+                }
+            ],
+        },
+        "companies": [],
+    }
+    path.write_text(json.dumps(document), encoding="utf-8")
+    return path
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_candidate_file_review_has_no_violations(
+    live_server, page: Page, axe_source, furnished, tmp_path, scheme
+):
+    """The half of the page a GET cannot reach, as the Europass review is (#181).
+
+    It is the half with the content: a table for every part of the file, a row for each
+    thing in it, and beside each what adding the file would do. Read with one of every
+    outcome on it, because a colour or a weight that says which is which is what axe is
+    there to look at.
+    """
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+
+    page.goto(f"{base}/career/file/")
+    page.locator("input[type=file]").set_input_files(
+        str(a_candidate_file(tmp_path / "candidate.json"))
+    )
+    page.get_by_role("button", name="Read the file").click()
+
+    expect(page.get_by_role("heading", name="What is in the file")).to_be_visible()
+    for words in (
+        "Will be added",
+        "Already in your record",
+        "Yours is kept",
+        "In the file twice",
+        "Cannot be added",
+    ):
+        expect(page.get_by_text(words).first).to_be_visible()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"/career/file/ review ({scheme})", found)
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])

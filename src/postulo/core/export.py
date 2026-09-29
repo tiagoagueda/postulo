@@ -47,6 +47,22 @@ from postulo import __version__
 #: classification beside the title itself (#266).
 FORMAT_VERSION = 18
 
+#: The version of the *candidate* document: one person's own record and nothing else (#181).
+#:
+#: A number of its own rather than `FORMAT_VERSION`, because it is a different document with
+#: a different reader, and the two change for different reasons: eighteen revisions of the
+#: whole-account archive were mostly about postings, applications and documents, none of
+#: which this carries. What it does carry is **the same blocks, built by the same code** --
+#: `_profile_block`, `_identifier_rows` and `_resume_block` below -- so there is one spelling
+#: of a person's career and not two to keep in step. Bump this when any of those blocks
+#: changes shape; `tests/test_candidate_file.py` holds a fingerprint of them and fails until
+#: somebody has decided.
+#:
+#: It is written under its own key, `candidate_format`, which is the marker: a document that
+#: has it is a candidate file, and the archive's importer, which looks for `format`, refuses
+#: one without being taught to.
+CANDIDATE_FORMAT = 1
+
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
 
@@ -69,6 +85,11 @@ PROFILE_FIELDS = (
     "use_gravatar",
     "show_career_order",
 )
+#: What the candidate document takes from the profile: what a CV prints, and the language
+#: the career is written in, which its translations are translations *from*. Everything
+#: else in `PROFILE_FIELDS` is how Postulo behaves for one account on one instance -- a
+#: theme, a dashboard, a time zone -- and is not the candidate's to carry anywhere (#181).
+CANDIDATE_PROFILE_FIELDS = ("headline", "location", "record_language")
 #: Which block of the archive a career entry's translations point into, by model name.
 #: The same map the importer reads the other way round, kept here because this is where the
 #: block names are decided (#131).
@@ -239,6 +260,9 @@ CAPTURE_FIELDS = (
     "created_at",
 )
 
+#: The career, block by block: what each is called in the file and what is written for each
+#: entry. Read by both documents -- the whole account's and the candidate's -- and by the
+#: candidate file's reader, so that a field added here is a field all three know about.
 RESUME_FIELDS = {
     "experience": (
         "id",
@@ -286,6 +310,29 @@ RESUME_FIELDS = {
         "order",
     ),
     "languages": ("id", "name", "proficiency", "order"),
+    "links": (
+        "id",
+        "title",
+        "url",
+        "kind",
+        "description",
+        "order",
+        "check_status",
+        "check_detail",
+        "checked_at",
+    ),
+}
+#: Which model each of those blocks is read from, by name: `postulo.resume.models` cannot
+#: be imported while this module is, and a name is all the builder needs.
+RESUME_MODELS = {
+    "experience": "Experience",
+    "education": "Education",
+    "projects": "Project",
+    "skill_groups": "SkillGroup",
+    "skills": "Skill",
+    "certifications": "Certification",
+    "languages": "LanguageSkill",
+    "links": "Link",
 }
 
 
@@ -325,6 +372,63 @@ def _postal_addresses(holder) -> list[dict]:
 def _web_links(holder) -> list[dict]:
     """Every link this holder has, of every kind. Same rule as the numbers above."""
     return [_fields(row, WEB_LINK_FIELDS) for row in holder.web_links.all()]
+
+
+def _profile_block(profile, names: tuple[str, ...] = PROFILE_FIELDS) -> dict:
+    """The profile and the rows that hang off it, or nothing for an account without one.
+
+    ``names`` is which of the profile's own columns to write. The whole-account archive
+    writes all of them; the candidate document writes the three that are about the person
+    rather than about the account (#181). The numbers, the addresses and the links are the
+    same rows in both.
+    """
+    if not profile:
+        return {}
+    return {
+        **_fields(profile, names),
+        "phone_numbers": _phone_numbers(profile),
+        "postal_addresses": _postal_addresses(profile),
+        "web_links": _web_links(profile),
+    }
+
+
+def _identifier_rows(profile) -> list[dict]:
+    """An ORCID is one of the few things in here that means the same to somebody else's
+    software, so it travels with the rest."""
+    if not profile:
+        return []
+    return [
+        {"scheme": row.scheme, "value": row.value, "label": row.label}
+        for row in profile.identifiers.all()
+    ]
+
+
+def _resume_block(user) -> dict:
+    """The career record: every entry of every kind, and what they say in other languages."""
+    from postulo.resume import models as resume
+
+    block: dict[str, Any] = {
+        key: [
+            _fields(item, names)
+            for item in getattr(resume, RESUME_MODELS[key]).objects.for_user(user)
+        ]
+        for key, names in RESUME_FIELDS.items()
+    }
+    # What those entries say in other languages. A section name and a local id rather than a
+    # content type: a content type is this instance's row number for a model and means
+    # nothing in the file, whereas "experience #3" is resolvable anywhere (#131).
+    block["translations"] = [
+        {
+            "section": TRANSLATION_SECTIONS[row.content_type.model],
+            "ref": row.object_id,
+            "language": row.language,
+            "field": row.field,
+            "text": row.text,
+        }
+        for row in resume.Translation.objects.for_user(user).select_related("content_type")
+        if row.content_type.model in TRANSLATION_SECTIONS and row.text.strip()
+    ]
+    return block
 
 
 def _plugin_data(user) -> dict:
@@ -371,7 +475,6 @@ def build_document(user) -> dict:
     from postulo.core.models import Tag
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, Company
-    from postulo.resume import models as resume
 
     # Read afresh rather than through the instance cached on the user, which may be stale.
     profile = Profile.objects.filter(user=user).first()
@@ -398,85 +501,21 @@ def build_document(user) -> dict:
             "email": user.email,
             "first_name": user.first_name,
             "last_name": user.last_name,
-            "profile": (
-                {
-                    **_fields(profile, PROFILE_FIELDS),
-                    "phone_numbers": _phone_numbers(profile),
-                    "postal_addresses": _postal_addresses(profile),
-                    "web_links": _web_links(profile),
-                }
-                if profile
-                else {}
-            ),
-            # An ORCID is one of the few things in here that means the same to somebody
-            # else's software, so it travels with the rest.
-            "identifiers": (
-                [
-                    {"scheme": row.scheme, "value": row.value, "label": row.label}
-                    for row in profile.identifiers.all()
-                ]
-                if profile
-                else []
-            ),
+            "profile": _profile_block(profile),
+            "identifiers": _identifier_rows(profile),
             # The uploaded picture travels with the files; a Gravatar copy is refetched.
             "avatar_file": (
                 f"{MEDIA_PREFIX}{profile.avatar.name}" if profile and profile.avatar else ""
             ),
         },
         "tags": [_fields(tag, TAG_FIELDS) for tag in Tag.objects.for_user(user)],
-        "resume": {},
+        # The career, built by the function the candidate document calls too, so there is
+        # one spelling of it and not two to keep in step (#181).
+        "resume": _resume_block(user),
         "companies": [],
         "documents": {},
         "captures": [],
     }
-
-    # ------------------------------------------------------------------ career
-    resume_sections = {
-        "experience": (
-            resume.Experience,
-            ("id", "organisation", "role", "location", "start_date", "end_date", "summary",
-             "highlights", "order"),
-        ),
-        "education": (
-            resume.Education,
-            ("id", "institution", "qualification", "field_of_study", "location", "start_date",
-             "end_date", "grade", "highlights", "order"),
-        ),
-        "projects": (
-            resume.Project,
-            ("id", "name", "role", "url", "start_date", "end_date", "summary", "highlights",
-             "order"),
-        ),
-        "skill_groups": (resume.SkillGroup, ("id", "name", "order")),
-        "skills": (resume.Skill, ("id", "name", "group_id", "order")),
-        "certifications": (
-            resume.Certification,
-            ("id", "name", "issuer", "issued_on", "expires_on", "credential_url", "order"),
-        ),
-        "languages": (resume.LanguageSkill, ("id", "name", "proficiency", "order")),
-        "links": (
-            resume.Link,
-            ("id", "title", "url", "kind", "description", "order", "check_status",
-             "check_detail", "checked_at"),
-        ),
-    }  # fmt: skip
-    for key, (model, names) in resume_sections.items():
-        document["resume"][key] = [_fields(item, names) for item in model.objects.for_user(user)]
-
-    # What those entries say in other languages. A section name and a local id rather than a
-    # content type: a content type is this instance's row number for a model and means
-    # nothing in the file, whereas "experience #3" is resolvable anywhere (#131).
-    document["resume"]["translations"] = [
-        {
-            "section": TRANSLATION_SECTIONS[row.content_type.model],
-            "ref": row.object_id,
-            "language": row.language,
-            "field": row.field,
-            "text": row.text,
-        }
-        for row in resume.Translation.objects.for_user(user).select_related("content_type")
-        if row.content_type.model in TRANSLATION_SECTIONS and row.text.strip()
-    ]
 
     # --------------------------------------------------- companies and the rest
     companies = Company.objects.for_user(user).prefetch_related(
@@ -638,6 +677,82 @@ def build_document(user) -> dict:
         "captures": len(document["captures"]),
     }
     return document
+
+
+def build_candidate_document(user) -> dict:
+    """One person's own record and nothing else, as a document of its own (#181).
+
+    The whole-account archive is all or nothing: somebody who wants to carry their career to
+    another Postulo, keep it in a repository or hand it to a script had to take every
+    application they ever made with it. The career is the part that is *theirs* and
+    portable; the applications are a record of one job hunt.
+
+    **The same blocks, from the same builders.** `account.profile`, `account.identifiers`
+    and `resume` are what `build_document` writes, produced by the functions it calls, so a
+    reader of one reads the other's and a field added to either is added to both.
+
+    **What is left out, and why.** The picture, because JSON cannot carry one and a zip
+    would stop the file being something a person can open in a text editor -- which is most
+    of the point. The address the account signs in with and its username, because they are
+    the account's and another instance has its own. And everything in `PROFILE_FIELDS` that
+    says how Postulo behaves rather than who somebody is.
+    """
+    from postulo.accounts.models import Profile
+
+    # Read afresh rather than through the instance cached on the user, which may be stale.
+    profile = Profile.objects.filter(user=user).first()
+    return {
+        "postulo": {
+            "candidate_format": CANDIDATE_FORMAT,
+            "version": __version__,
+            "exported_at": timezone.now().isoformat(),
+            "note": (
+                "One person's own record as Postulo holds it: their details and their "
+                "career, and nothing about where they applied. The picture is not in "
+                "it. Identifiers are local to this file and exist so the parts can be "
+                "reconnected; they are not meaningful anywhere else."
+            ),
+        },
+        "account": {
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "profile": _profile_block(profile, CANDIDATE_PROFILE_FIELDS),
+            "identifiers": _identifier_rows(profile),
+        },
+        "resume": _resume_block(user),
+    }
+
+
+def candidate_counts(user) -> dict[str, int]:
+    """How many of each kind of row the candidate document would carry, without building it.
+
+    The same bargain `counts` strikes for the archive (#220): the page that offers the file
+    says what is in it, and says so by counting.
+    """
+    from postulo.accounts.models import Profile
+    from postulo.resume import models as resume
+
+    found = {
+        key: getattr(resume, name).objects.for_user(user).count()
+        for key, name in RESUME_MODELS.items()
+    }
+    # Only the ones that say something, which is what the document writes: a translation
+    # somebody cleared is a row that prints the original (#131).
+    found["translations"] = (
+        resume.Translation.objects.for_user(user)
+        .filter(content_type__model__in=list(TRANSLATION_SECTIONS), text__regex=r"\S")
+        .count()
+    )
+    profile = Profile.objects.filter(user=user).first()
+    for key in ("phone_numbers", "postal_addresses", "web_links", "identifiers"):
+        found[key] = getattr(profile, key).count() if profile else 0
+    return found
+
+
+def candidate_filename(user) -> str:
+    stamp = timezone.localdate().isoformat()
+    local_part = user.email.split("@")[0]
+    return f"postulo-candidate-{local_part}-{stamp}.json"
 
 
 def _source_of(sent) -> dict:

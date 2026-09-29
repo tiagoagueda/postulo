@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_candidate
 
 app_name = "resume"
 
@@ -8,6 +8,14 @@ urlpatterns = [
     path("", views.ResumeOverviewView.as_view(), name="overview"),
     path("preview/", views.ResumePreviewView.as_view(), name="preview"),
     path("import/", views.EuropassImportView.as_view(), name="europass_import"),
+    # One person's own record as a file (#181). Neither address names a record: what is
+    # downloaded and what is added to are the account of whoever is signed in.
+    path("file/", views_candidate.CandidateFileView.as_view(), name="candidate_file"),
+    path(
+        "file/download/",
+        views_candidate.CandidateDownloadView.as_view(),
+        name="candidate_download",
+    ),
     path("links/check/", views.LinkCheckView.as_view(), name="link_check_all"),
     path("links/<int:pk>/check/", views.LinkCheckView.as_view(), name="link_check"),
     path("<slug:section>/new/", views.ResumeItemCreateView.as_view(), name="item_create"),

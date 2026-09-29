@@ -65,6 +65,19 @@
       {% endblocktranslate %}
     </p>
 
+    {% comment %} The part of an account that is the person rather than the job search, on
+       its own: a file that can be read back, here or elsewhere (#181). {% endcomment %}
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800" data-candidate-file>
+      <c-section-title>
+        {% translate "Your record as a file" %}
+        <c-slot name="subtitle">{% blocktranslate trimmed %}
+          Your details and your career in one JSON file: to keep, to read, or to hand to
+          another Postulo. Nothing about where you applied is in it.
+        {% endblocktranslate %}</c-slot>
+      </c-section-title>
+      <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="outline">{% translate "Export or import your record" %}</a>
+    </div>
+
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
       <c-section-title>
         {% translate "Bringing a spreadsheet in" %}

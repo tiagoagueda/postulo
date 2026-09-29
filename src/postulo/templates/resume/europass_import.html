@@ -43,6 +43,15 @@
           </p>
         </div>
       </div>
+
+      {% comment %} Somebody holding a file Postulo wrote arrives here, because this is
+         where *Import* leads; the page that reads theirs is the other one (#181). {% endcomment %}
+      <div class="mt-6 flex flex-wrap items-center gap-3">
+        <p class="text-sm text-ink-500 dark:text-ink-400">
+          {% translate "A file that Postulo itself wrote is read on a page of its own." %}
+        </p>
+        <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="ghost">{% translate "Your record as a file" %}</a>
+      </div>
     {% else %}
       <div class="card mb-6" data-europass-found>
         <c-section-title>{% translate "What is in the file" %}</c-section-title>
