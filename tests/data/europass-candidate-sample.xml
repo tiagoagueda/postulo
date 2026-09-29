@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  NOT a download from a real Europass account. This is the European Commission's own
+  sample of the Europass CV format, "CandidateSample1 (based on
+  EURES_Conformant_mandatory_v1.3)", published on the Europass interoperability page for
+  testing and downloaded on 2026-09-29 from
+  https://europass.europa.eu/system/files/2020-07/CandidateSample1%28based%20on%20EURES_Conformant_mandatory_v1.3%29_0.xml
+  (the same file is in the schema zip ECV_DLV_20200714_4.0.1.zip, under "XML Samples").
+  The person in it, the supplier's contact and every number are the sample's own
+  placeholders. It validates against the Candidate.xsd of that zip.
+
+  What follows is the Commission's file unchanged except for whitespace at the ends of
+  lines, which this repository's hooks strip; the original's SHA-256 is
+  24674c0e7507fc838c0794b619d5590b5f486f284ac280049ba348a8ab1347b4.
+  © European Union. The Europass site allows its information to be used with the source
+  acknowledged, which this comment is.
+-->
+<!-- BR-CV-02: Only One Candidate (CV) per XML document instance is allowed.
+	BR-COM-01: If not otherwise specified, “EN” (English) is used as the default language.
+	BR-COM-02: If the master is not mentioned, it will take the first instance of the CV.
+	BR-COM-56: The attributes “majorVersionID” and “minorVersionID” are mandatory.
+	BR-COM-57: Compulsory use of the version 3.2 of HR-OS (“majorVersionID” is 3 and “minorVersionID” is 2). -->
+<Candidate xmlns="http://www.europass.eu/1.0"
+	xmlns:hr="http://www.hr-xml.org/3"
+	xmlns:eures="http://www.europass_eures.eu/1.0"
+	xmlns:oa="http://www.openapplications.org/oagis/9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.europass.eu/1.0 Candidate.xsd"
+	majorVersionID="3"
+	minorVersionID="2">
+	<!-- /ID (level 1): This only identifies a document within the Candidate’s supplier organisation. -->
+	<!-- Information: The Document ID identifier must be a UUID and it must be provided by the first sender of the document. -->
+	<hr:DocumentID schemeID="Test-0001" schemeName="DocumentIdentifier" schemeAgencyID="EURES" schemeAgencyName="EURES" schemeVersionID="1.3" validFrom="2015-12-10">DOC-1828217</hr:DocumentID>
+
+	<!--	/Supplier (level 1): Information about the supplier of the candidate details. This can be the candidate through the EURES Portal, or a third party.	-->
+	<CandidateSupplier>
+		<!--  Information: The /PositionOpening /PartyID must be an UUID provided by the sender system. -->
+		<hr:PartyID schemeID="TestParty-01" schemeAgencyID="EURES" schemeAgencyName="EURES" schemeVersionID="1.0" validFrom="2015-12-10">Supplier01</hr:PartyID>
+		<!-- The name of the company supplying the candidate. -->
+		<hr:PartyName>Supplier01</hr:PartyName>
+		<!-- Contact person of the company supplying the candidate. -->
+		<PersonContact>
+			<PersonName>
+				<oa:GivenName>Johan</oa:GivenName>
+				<hr:FamilyName>Garcia</hr:FamilyName>
+			</PersonName>
+			<Communication>
+				<!-- BR-CV-30: At least one of the following sub-elements (either Address or URI or DialNumber) must be provided.
+					BR-CV-31: If URI element is provided, ChannelCode element must contain either "Email" or "Web". -->
+				<ChannelCode>Email</ChannelCode>
+				<oa:URI>fake@no-reply.com</oa:URI>
+			</Communication>
+		</PersonContact>
+		<!-- As more than one supplier can be provided, this set of enumerations indicates the identifiers’ order of arrival.
+			BR-CV-08: The HR-Open Standards Code List “PrecedenceEnumType” must be used to codify the /Candidate /Supplier /Precedence. -->
+		<hr:PrecedenceCode>1</hr:PrecedenceCode>
+	</CandidateSupplier>
+
+	<!-- /Person (level 1): Personal details of the person seeking a job, such as the name, age, gender, and so on. -->
+	<CandidatePerson>
+		<!-- /Person /Name (level 2): A detailed set of data about the names of the person’s names. -->
+		<PersonName>
+			<!-- A people given name or first name. -->
+			<oa:GivenName>John</oa:GivenName>
+			<!-- This is an inherited name or one representing a family relationship. -->
+			<hr:FamilyName>Smith</hr:FamilyName>
+		</PersonName>
+
+		<!-- /Person /Communication (level 2): A person’s contact information.
+			BR-COM-10: If the Communication element is filled in, at least one of its sub elements should be filled in too. -->
+		<Communication>
+			<!-- The communication channel used to contact a person or an organisation.
+				BR-COM-13: The Open HR-Open Standards Code List “ChannelCodeEnumType” must be used to codify the /ChannelCode element. -->
+			<ChannelCode>Telephone</ChannelCode>
+			<!-- /Choice (level 3) -->
+			<CountryDialing>34</CountryDialing>
+			<oa:AreaDialing>93</oa:AreaDialing>
+			<oa:DialNumber>554446776</oa:DialNumber>
+		</Communication>
+		<Communication>
+			<Address>
+				<!-- BR-COM-12: Compulsory use of the “Countries.gc” list defined by EURES. This is based on ISO 3166-1 Alpha-2, which includes all countries of the world. -->
+				<CountryCode>BE</CountryCode>
+			</Address>
+		</Communication>
+
+		<!-- Code specifying the country where the Candidate usually lives.
+			BR-COM-12: Compulsory use of the “Countries.gc” list defined by EURES. This is based on ISO 3166-1 Alpha-2, which includes all countries of the world. -->
+		<ResidencyCountryCode>BE</ResidencyCountryCode>
+		<!-- Code specifying the candidate’s nationality.
+			BR-COM-12: Compulsory use of the “Countries.gc” list defined by EURES. This is based on ISO 3166-1 Alpha-2, which includes all countries of the world.
+			BR-COM-43: Multiple entries of this code list are allowed. -->
+		<NationalityCode>FR</NationalityCode>
+		<NationalityCode>CA</NationalityCode>
+		<!-- The person’s date of birth.
+			BR-COM-06: Compulsory Date Format is: YYYY-MM-DD, YYYY-MM, YYYY or YYYY-MM-DDThh:mm:ss. -->
+		<hr:BirthDate>1967-08-13</hr:BirthDate>
+		<!-- Code indicating the candidate’s gender.
+			BR-CV-10: Compulsory use of HR-Open Standards “GenderEnumType” to specify a Person’s Gender. -->
+		<GenderCode>Male</GenderCode>
+		<!-- The candidate’s primary or preferred language or languages.
+			BR-COM-11: Compulsory use of the “EURES_LanguageCodes.gc” list defined by EURES. This is based on ISO-639-1:2002 Alpha-2, which includes all world languages.
+			BR-COM-43: Multiple entries of this code list are allowed. -->
+		<PrimaryLanguageCode>fr</PrimaryLanguageCode>
+	</CandidatePerson>
+
+	<!-- /Profile (level 1): A structured set of candidate characteristics. More than one profile is allowed, in order to provide different information in each profile. Thus the need for cardinality 1..n. -->
+	<CandidateProfile languageCode="en">
+		<!-- /Profile /Education History (level 2): A collection of information documenting a person’s education. -->
+		<EducationHistory>
+			<EducationOrganizationAttendance>
+				<!-- The official or legal name by which to refer to an organisation. -->
+				<hr:OrganizationName>UFR Amiens</hr:OrganizationName>
+				<!-- A code classifying the level of educational organisation.
+					BR-COM-15: Compulsory use of the “EURES_ISCEDEducationLevel.gc” list defined by EURES. This is based on ISCED-2011 (UNESCO). Or “EURES_EQFEducationLevel.gc”, list defined by EURES and based on EQF (EU).
+					BR-COM-44: One value for each code list is allowed.
+					BR-COM-55: Compulsory use of the attributes “listVersionID”, “listName” and “listURI”. -->
+				<hr:ProgramName>test</hr:ProgramName>
+				<EducationLevelCode listName="EURES_EQF" listURI="http://ec.europa.eu/esco/ConceptScheme/EQF2012/ConceptScheme" listVersionID="2008/C11/01">EQF-5</EducationLevelCode>
+				<!-- Free form options for representing attendance period data. -->
+				<AttendancePeriod>
+					<!-- BR-COM-16:  At least one of its sub-elements must be informed. -->
+					<StartDate>
+						<hr:FormattedDateTime>2005-09</hr:FormattedDateTime>
+					</StartDate>
+					<!-- BR-COM-16:  At least one of its sub-elements must be informed. -->
+					<EndDate>
+						<hr:FormattedDateTime>2010-07</hr:FormattedDateTime>
+					</EndDate>
+				</AttendancePeriod>
+			</EducationOrganizationAttendance>
+		</EducationHistory>
+	</CandidateProfile>
+</Candidate>

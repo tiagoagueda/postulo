@@ -460,9 +460,24 @@ PERSON_LABELS = {
     "orcid": _("ORCID"),
 }
 
+#: Which Europass format was read, in words. The PDF is named because it is the file a
+#: person chose: saying only "XML" about it would describe a file they never saw (#244).
 SOURCE_LABELS = {
-    "xml": _("Read as Europass XML, the format the CV editor produced."),
-    "json": _("Read as Europass JSON, the format europass.europa.eu exports."),
+    "candidate": _("Read as Europass XML, the format europass.europa.eu has written since 2020."),
+    "pdf-candidate": _(
+        "Read from the Europass XML attached to the PDF, the format europass.europa.eu has "
+        "written since 2020."
+    ),
+    "xml": _(
+        "Read as Europass XML in the older format, the one the Europass editor wrote until 2020."
+    ),
+    "pdf-xml": _(
+        "Read from the Europass XML attached to the PDF, in the older format the Europass "
+        "editor wrote until 2020."
+    ),
+    "json": _(
+        "Read as Europass JSON, the older format as the Europass web service wrote it until 2020."
+    ),
 }
 
 LEVEL_LABELS = {

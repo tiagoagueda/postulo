@@ -1,8 +1,9 @@
 """Import a Europass career record from the command line.
 
-The same reader the page uses, for an operator with a shell and a file. Either format —
-the XML or the JSON — and the file itself decides which. It says what it found before it
-writes anything, and ``--dry-run`` stops there.
+The same reader the page uses, for an operator with a shell and a file. Any Europass
+format — the PDF europass.europa.eu gives you, the XML attached to it, or the older XML
+and JSON — and the file itself decides which. It says what it found before it writes
+anything, and ``--dry-run`` stops there.
 """
 
 from __future__ import annotations
@@ -18,10 +19,10 @@ from postulo.resume import importing
 
 
 class Command(BaseCommand):
-    help = "Import a career record from a Europass XML file."
+    help = "Import a career record from a Europass file: PDF, XML or JSON."
 
     def add_arguments(self, parser):
-        parser.add_argument("path", help="the Europass file to read, XML or JSON")
+        parser.add_argument("path", help="the Europass file to read: PDF, XML or JSON")
         parser.add_argument(
             "--user",
             required=True,

@@ -1,10 +1,13 @@
-"""Reading a Europass CV: what the file says, what gets written, and what is refused.
+"""Reading a Europass CV in the format of the editor before 2020: what the file says, what
+gets written, and what is refused.
 
 Two fixtures, one career. ``tests/data/europass.xml`` is the legacy format's real shape —
 nested ``WorkExperience``, dates as attributes, CEFR split five ways, prose under each
-skill heading — and ``tests/data/europass.json`` is the same person as the current platform
-exports them. They describe the same career on purpose: a test insists the two readers
-produce the same record, which is what keeps the mapping in one place instead of two.
+skill heading — and ``tests/data/europass.json`` is the same person in that format's JSON,
+as Cedefop's web service wrote it. They describe the same career on purpose: a test insists
+the two readers produce the same record, which is what keeps the mapping in one place
+instead of two. The format europass.europa.eu has written since 2020, and the PDF it comes
+in, are ``test_europass_candidate.py`` (#244).
 """
 
 import datetime as dt
@@ -169,8 +172,10 @@ def test_xml_that_does_not_parse_says_so():
 
 
 def test_xml_that_is_not_europass_says_so():
-    with pytest.raises(europass.EuropassError, match="LearnerInfo"):
+    """And names both XML formats it does read, since the first byte cannot tell them apart."""
+    with pytest.raises(europass.EuropassError, match="not a Europass CV") as refused:
         europass.read(b"<html><body>Hello</body></html>")
+    assert "Candidate" in str(refused.value) and "SkillsPassport" in str(refused.value)
 
 
 def test_an_empty_file_says_so():

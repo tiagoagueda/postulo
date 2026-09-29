@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  NOT a download from a real Europass account, and nobody's CV. Written by hand for
+  Postulo's tests on 2026-09-29 (#244), strictly from the European Commission's published
+  schema for the Europass CV: "Europass XML schema definition v4.0.1"
+  (https://europass.europa.eu/system/files/2020-07/ECV_DLV_20200714_4.0.1.zip, whose
+  Candidate.xsd reads "Europass2 1.0.1, 02 June 2020") and the "EUROPASS2 CV XML Schema
+  Documentation" v3.0.0
+  (https://europass.europa.eu/system/files/2020-08/ECV_Schema_Documentation_v3.0.0_20200602.pdf),
+  both fetched that day. It validates against that Candidate.xsd, and every element in it
+  is one the schema defines, in the order it defines.
+
+  It is the same invented person as europass.xml and europass.json, so that a test can
+  insist the three formats read one career. Where this format says things differently it
+  does so here too: a language is a code from the official list (as that list writes it,
+  a Publications Office URI), a country is a code, and a job's description is HTML escaped
+  inside the XML, which the documentation allows for its long texts.
+
+  What europass.europa.eu actually puts in the PDF it hands out is described in #244, and
+  is NOT this in every detail: real exports are reported to carry elements the schema does
+  not define. The one real verification is a download, which is a person's to make.
+-->
+<Candidate xmlns="http://www.europass.eu/1.0"
+    xmlns:hr="http://www.hr-xml.org/3"
+    xmlns:eures="http://www.europass_eures.eu/1.0"
+    xmlns:oa="http://www.openapplications.org/oagis/9"
+    majorVersionID="3"
+    minorVersionID="2">
+  <hr:DocumentID schemeName="DocumentIdentifier">3f0c9d2e-6a41-4c55-9d0e-7b2f1e8a4c10</hr:DocumentID>
+  <CandidateSupplier>
+    <hr:PartyID schemeName="PartyID">3f0c9d2e-6a41-4c55-9d0e-7b2f1e8a4c11</hr:PartyID>
+    <hr:PartyName>Alex Morgan</hr:PartyName>
+    <PersonContact>
+      <PersonName>
+        <oa:GivenName>Alex</oa:GivenName>
+        <hr:FamilyName>Morgan</hr:FamilyName>
+      </PersonName>
+      <Communication>
+        <ChannelCode>Email</ChannelCode>
+        <oa:URI>alex@example.org</oa:URI>
+      </Communication>
+    </PersonContact>
+    <hr:PrecedenceCode>1</hr:PrecedenceCode>
+  </CandidateSupplier>
+  <CandidatePerson>
+    <PersonName>
+      <oa:GivenName>Alex</oa:GivenName>
+      <hr:FamilyName>Morgan</hr:FamilyName>
+    </PersonName>
+    <Communication>
+      <ChannelCode>Email</ChannelCode>
+      <oa:URI>alex@example.org</oa:URI>
+    </Communication>
+    <Communication>
+      <ChannelCode>MobileTelephone</ChannelCode>
+      <UseCode>Personal</UseCode>
+      <CountryDialing>351</CountryDialing>
+      <oa:DialNumber>912345678</oa:DialNumber>
+    </Communication>
+    <Communication>
+      <ChannelCode>Web</ChannelCode>
+      <oa:URI>https://alex.example.org</oa:URI>
+    </Communication>
+    <Communication>
+      <ChannelCode>Web</ChannelCode>
+      <oa:URI>https://orcid.org/0000-0002-1825-0097</oa:URI>
+    </Communication>
+    <Communication>
+      <Address>
+        <oa:AddressLine>Rua do Exemplo 1</oa:AddressLine>
+        <oa:CityName>Lisboa</oa:CityName>
+        <CountryCode>PT</CountryCode>
+        <oa:PostalCode>1000-001</oa:PostalCode>
+      </Address>
+    </Communication>
+    <PrimaryLanguageCode>http://publications.europa.eu/resource/authority/language/POR</PrimaryLanguageCode>
+  </CandidatePerson>
+  <CandidateProfile languageCode="en">
+    <CandidatePositionPreferences>
+      <eures:JobCategory>
+        <hr:JobCategoryCode>2512</hr:JobCategoryCode>
+      </eures:JobCategory>
+      <oa:Description>Backend engineer</oa:Description>
+    </CandidatePositionPreferences>
+    <EmploymentHistory>
+      <EmployerHistory>
+        <hr:OrganizationName>Aperture Science</hr:OrganizationName>
+        <PositionHistory>
+          <PositionTitle typeCode="FREETEXT">Senior Engineer</PositionTitle>
+          <eures:EmploymentPeriod>
+            <eures:StartDate>
+              <hr:FormattedDateTime>2019-03-01</hr:FormattedDateTime>
+            </eures:StartDate>
+            <eures:EndDate>
+              <hr:FormattedDateTime>2023-06-30</hr:FormattedDateTime>
+            </eures:EndDate>
+            <hr:CurrentIndicator>false</hr:CurrentIndicator>
+          </eures:EmploymentPeriod>
+          <oa:Description>&lt;p&gt;Built the thing. Kept it running.&lt;/p&gt;</oa:Description>
+          <City>Cambridge</City>
+          <Country>GB</Country>
+        </PositionHistory>
+      </EmployerHistory>
+      <EmployerHistory>
+        <hr:OrganizationName>Black Mesa</hr:OrganizationName>
+        <PositionHistory>
+          <PositionTitle typeCode="FREETEXT">Principal Engineer</PositionTitle>
+          <eures:EmploymentPeriod>
+            <eures:StartDate>
+              <hr:FormattedDateTime>2023-07</hr:FormattedDateTime>
+            </eures:StartDate>
+            <hr:CurrentIndicator>true</hr:CurrentIndicator>
+          </eures:EmploymentPeriod>
+          <oa:Description>Still building things.</oa:Description>
+        </PositionHistory>
+      </EmployerHistory>
+    </EmploymentHistory>
+    <EducationHistory>
+      <EducationOrganizationAttendance>
+        <hr:OrganizationName>Universidade de Lisboa</hr:OrganizationName>
+        <OrganizationContact>
+          <Communication>
+            <Address>
+              <oa:CityName>Lisboa</oa:CityName>
+              <CountryCode>PT</CountryCode>
+            </Address>
+          </Communication>
+        </OrganizationContact>
+        <hr:ProgramName>MSc Computer Science</hr:ProgramName>
+        <EducationLevelCode listName="EURES_EQF" listURI="http://ec.europa.eu/esco/ConceptScheme/EQF2012/ConceptScheme" listVersionID="2008/C11/01">EQF-7</EducationLevelCode>
+        <AttendancePeriod>
+          <StartDate>
+            <hr:FormattedDateTime>2014-09</hr:FormattedDateTime>
+          </StartDate>
+          <EndDate>
+            <hr:FormattedDateTime>2018-07</hr:FormattedDateTime>
+          </EndDate>
+        </AttendancePeriod>
+        <EducationDegree>
+          <hr:DegreeName>Master of Science</hr:DegreeName>
+          <OccupationalSkillsCovered>Distributed systems.</OccupationalSkillsCovered>
+        </EducationDegree>
+      </EducationOrganizationAttendance>
+    </EducationHistory>
+    <PersonQualifications>
+      <PersonCompetency>
+        <CompetencyID>http://publications.europa.eu/resource/authority/language/ENG</CompetencyID>
+        <hr:TaxonomyID>language</hr:TaxonomyID>
+        <eures:CompetencyDimension>
+          <hr:CompetencyDimensionTypeCode>CEF-Understanding-Listening</hr:CompetencyDimensionTypeCode>
+          <eures:Score><hr:ScoreText>C2</hr:ScoreText></eures:Score>
+        </eures:CompetencyDimension>
+        <eures:CompetencyDimension>
+          <hr:CompetencyDimensionTypeCode>CEF-Understanding-Reading</hr:CompetencyDimensionTypeCode>
+          <eures:Score><hr:ScoreText>C2</hr:ScoreText></eures:Score>
+        </eures:CompetencyDimension>
+        <eures:CompetencyDimension>
+          <hr:CompetencyDimensionTypeCode>CEF-Speaking-Interaction</hr:CompetencyDimensionTypeCode>
+          <eures:Score><hr:ScoreText>C1</hr:ScoreText></eures:Score>
+        </eures:CompetencyDimension>
+        <eures:CompetencyDimension>
+          <hr:CompetencyDimensionTypeCode>CEF-Speaking-Production</hr:CompetencyDimensionTypeCode>
+          <eures:Score><hr:ScoreText>C1</hr:ScoreText></eures:Score>
+        </eures:CompetencyDimension>
+        <eures:CompetencyDimension>
+          <hr:CompetencyDimensionTypeCode>CEF-Writing-Production</hr:CompetencyDimensionTypeCode>
+          <eures:Score><hr:ScoreText>B2</hr:ScoreText></eures:Score>
+        </eures:CompetencyDimension>
+      </PersonCompetency>
+    </PersonQualifications>
+    <Projects>
+      <Project>
+        <Title>Open source</Title>
+        <Description>Maintainer of a thing.</Description>
+      </Project>
+    </Projects>
+    <OrganisationalSkills>
+      <OrganisationalSkill>
+        <Title>Mentoring</Title>
+      </OrganisationalSkill>
+      <OrganisationalSkill>
+        <Title>Planning</Title>
+      </OrganisationalSkill>
+    </OrganisationalSkills>
+    <DigitalSkills>
+      <DigitalSkillsGroup>
+        <DigitalSkill>Python</DigitalSkill>
+        <DigitalSkill>PostgreSQL</DigitalSkill>
+        <DigitalSkill>Docker</DigitalSkill>
+      </DigitalSkillsGroup>
+    </DigitalSkills>
+  </CandidateProfile>
+</Candidate>

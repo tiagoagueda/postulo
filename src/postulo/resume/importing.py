@@ -26,8 +26,8 @@ from postulo.core import phone_numbers, web_links
 class Record:
     """A career record, in Postulo's terms rather than Europass's.
 
-    The intermediate shape both readers produce. Everything downstream works on this, so
-    the JSON reader is a second front door and not a second mapping.
+    The intermediate shape every reader produces. Everything downstream works on this, so
+    another format is another front door and not another mapping.
     """
 
     #: Personal details, to fill blanks on the profile and never to overwrite.
@@ -37,7 +37,9 @@ class Record:
     languages: list[dict] = field(default_factory=list)
     skill_groups: list[dict] = field(default_factory=list)
     projects: list[dict] = field(default_factory=list)
-    #: Which of the two formats this came out of: ``"xml"`` or ``"json"``.
+    #: Which format this came out of, as the importer names it. Europass says ``"candidate"``
+    #: for the XML europass.europa.eu writes, ``"xml"`` and ``"json"`` for the format of the
+    #: editor before it, and puts ``"pdf-"`` in front of the one it found attached to a PDF.
     source: str = ""
     #: The language the file says it was written in, as it wrote it. Every Europass export
     #: carries one and Postulo read none of them, so a career typed in Portuguese arrived

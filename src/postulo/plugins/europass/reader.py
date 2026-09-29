@@ -5,29 +5,38 @@ already has a Europass CV. Typing that career record into Postulo a second time 
 the work Postulo exists to remove, and the format is published, stable and free of licence
 questions.
 
-**Two formats, one mapping.** Europass has been written down two ways:
+**Three formats, one record.** Europass has been written down three ways, and this module
+used to believe the wrong one was current (#244):
 
-* the **XML** — ``SkillsPassport``, from the 2004 CV editor and from every export before
-  the platform moved on. Nobody is producing it any more, and importing it is about
+* the **Candidate XML** -- what europass.europa.eu has written since the platform moved in
+  July 2020: an HR Open Standards ``Candidate`` in ``http://www.europass.eu/1.0``. The
+  editor's only download is a PDF with this attached to it, so that is the file a person
+  is most likely to arrive with. ``candidate.py`` reads it and ``pdf.py`` reaches it;
+* the **SkillsPassport XML** -- Cedefop's editor, 2004 to 2020, downloaded as XML or
+  attached to a PDF in the same way. Nothing produces it any more; importing it is about
   rescuing what people already have on their disks;
-* the **JSON** — what europass.europa.eu exports today, and so the one a person is most
-  likely to arrive with.
+* the **SkillsPassport JSON** -- the same format as Cedefop's REST API wrote it. It was
+  never a download of either editor, and it was not what europass.europa.eu exports, which
+  is what this paragraph said until the claim was checked.
 
-They describe the same career in the same words, so they share everything after the parse:
-:func:`read` sniffs which it has been handed and fills in a
+They describe the same career, so they share everything after the parse: :func:`read`
+works out which it has been handed and fills in a
 :class:`~postulo.resume.importing.Record`, and the review, the writing and the refusal to
-overwrite all work on that. A second copy of the mapping would be a second place for the two
-to drift apart.
+overwrite all work on that. A second copy of the mapping would be a second place for them
+to drift apart; the Candidate reader follows the Commission's own crosswalk from the old
+format so that a career arrives the same way from either.
 
 The record is **Postulo's** shape rather than Europass's, which is why it is Postulo's to
 define: this package reads a file into it, and the next importer somebody writes reads a
 different file into the same one (#129).
 
-**Namespaces are ignored.** Europass XML has been through several namespaces
-(``urn:europass:xml:2.0``, ``http://europass.cedefop.europa.eu/Europass``, others), and a
-file that a person has on their disk may carry any of them. Matching on the local tag name
-reads all of them; matching on the namespace reads whichever one was current when this was
-written and then quietly stops working.
+**Which XML is decided by its root.** The first byte cannot tell two XML formats apart, so
+:func:`read_xml` looks at the root element: a ``Candidate`` in a Europass namespace is the
+current format, and a ``SkillsPassport`` or ``LearnerInfo`` is the old one. The old format's
+namespace is ignored -- it has been through several (``urn:europass:xml:2.0``,
+``http://europass.cedefop.europa.eu/Europass``, others), and a file on somebody's disk may
+carry any of them. The new one's is not: a ``Candidate`` is an HR Open Standards noun that
+other systems write too, and only Europass's is read as a Europass CV.
 
 **Parsed defensively.** It is a file from somewhere else:
 
@@ -41,6 +50,8 @@ written and then quietly stops working.
 * **no key is assumed to be present, and no value is assumed to have the type it should**.
   A file that is half right imports the half that is right and says what it skipped, which
   is more use to somebody than refusing the lot;
+* **what a PDF carries is a second file**, and goes through every one of these guards
+  again, after it has been unpacked under a cap of its own;
 * nothing is fetched. No schema is resolved, no network is touched.
 
 **Nothing is written by reading**, and that is the whole line between this package and
@@ -63,6 +74,8 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts import identifiers
 from postulo.plugins.api import MAX_IMPORT_BYTES, ImportRefused, Record, refuse_unreadable
+
+from . import pdf
 
 #: Kept as a name because the interface and the tests use it, but the number belongs to
 #: the importer kind now: every importer gets the same cap, not just this one.
@@ -216,16 +229,28 @@ def _project_from(title: str, description: str) -> dict | None:
 
 
 def read(data: bytes) -> Record:
-    """Read a Europass file, in whichever of the two formats it is.
+    """Read a Europass file, in whichever of its formats it is.
 
     A person has *a Europass file*; they should not have to know which one it is, so the
-    first character decides and the record says which was found.
+    file decides -- a PDF by its header, XML and JSON by their first character, and which
+    XML by its root -- and the record says which was found.
     """
     # Empty, oversized and DOCTYPE are the importer kind's refusals now rather than this
     # module's. An importer is handed a file somebody uploaded, and that is a threat every
     # importer faces rather than one Europass happened to think about.
     refuse_unreadable(data)
 
+    if pdf.is_pdf(data):
+        return read_pdf(data)
+    return _read_document(data)
+
+
+def _read_document(data: bytes) -> Record:
+    """XML or JSON: what a file can be, and what a PDF's attachment can be.
+
+    Never a PDF. A PDF attached to a PDF is not a Europass CV, and reading one would make
+    the attachment's guards the only thing standing between a nest of them and the server.
+    """
     head = data.lstrip(b"\xef\xbb\xbf").lstrip()
     if head.startswith(b"<"):
         return read_xml(data)
@@ -233,9 +258,83 @@ def read(data: bytes) -> Record:
         return read_json(data)
     raise EuropassError(
         _(
-            "That is not a Europass file. Postulo reads the XML the CV editor produced and "
-            "the JSON europass.europa.eu exports; this is neither."
+            "That is not a Europass file. Postulo reads the PDF europass.europa.eu gives you, "
+            "the XML attached to it, and the older Europass XML and JSON; this is none of "
+            "them."
         )
+    )
+
+
+# -------------------------------------------------------------------- the PDF
+
+#: What to say when a PDF's attachment cannot be reached, by the reason `pdf` gives.
+#: Each says what happened and what to upload instead.
+PDF_REFUSALS = {
+    pdf.ENCRYPTED: _(
+        "That PDF is encrypted, so the Europass CV attached to it cannot be read. Download "
+        "the CV again from europass.europa.eu and upload that file as it is."
+    ),
+    pdf.FILTER: _(
+        "The file attached to that PDF is packed in a way Postulo does not read "
+        "(%(filter)s). Download the CV again from europass.europa.eu and upload that file "
+        "as it is."
+    ),
+    pdf.DAMAGED: _(
+        "The file attached to that PDF is damaged and could not be unpacked. Download the "
+        "CV again from europass.europa.eu and upload that file as it is."
+    ),
+    pdf.TOO_LARGE: _(
+        "The file attached to that PDF unpacks to more than %(limit)s MB, so it was not read."
+    ),
+}
+
+
+def read_pdf(data: bytes) -> Record:
+    """Read the Europass CV a PDF carries attached. Raises :class:`EuropassError` with why.
+
+    What comes out of the PDF is a second file and is treated as one: it goes through
+    ``refuse_unreadable`` -- the size cap, the refusal of a DOCTYPE -- and then through the
+    same readers an upload does.
+    """
+    try:
+        found = pdf.attachments(data, limit=MAX_BYTES)
+    except pdf.Refused as error:
+        raise EuropassError(
+            PDF_REFUSALS[error.reason]
+            % {"filter": error.detail, "limit": MAX_BYTES // (1024 * 1024)}
+        ) from error
+
+    if not found:
+        raise EuropassError(
+            _(
+                "That PDF has nothing attached to it, so there is no Europass CV inside it to "
+                "read. The PDF europass.europa.eu gives you carries the CV as an attached "
+                "file, and a PDF printed or saved again by another program loses it: download "
+                "the CV again from europass.europa.eu and upload that file as it is."
+            )
+        )
+    attached = next((one for one in found if _is_europass_xml(one)), None)
+    if attached is None:
+        raise EuropassError(
+            _(
+                "That PDF has files attached to it, and none of them is a Europass CV. Upload "
+                "the PDF europass.europa.eu gives you, as it is."
+            )
+        )
+
+    refuse_unreadable(attached)
+    record = _read_document(attached)
+    record.source = f"pdf-{record.source}"
+    return record
+
+
+def _is_europass_xml(data: bytes) -> bool:
+    """Whether an attachment is a Europass CV, by what it says before anything parses it."""
+    head = data.lstrip(b"\xef\xbb\xbf").lstrip()
+    if not head.startswith(b"<"):
+        return False
+    return (b"Candidate" in data and b"www.europass.eu/" in data) or (
+        b"SkillsPassport" in data or b"LearnerInfo" in data
     )
 
 
@@ -303,11 +402,15 @@ def _levels(level) -> dict[str, str]:
 
 
 def read_xml(data: bytes) -> Record:
-    """Read the Europass XML. Raises :class:`EuropassError` with the reason.
+    """Read Europass XML, in either format. Raises :class:`EuropassError` with the reason.
 
     A DOCTYPE has already been refused by ``refuse_unreadable``, which is what makes
     ``fromstring`` below safe to call. The reasoning lives with the refusal, in
     ``plugins/base.py``.
+
+    Which format is decided by the root element, because both are XML: a ``Candidate`` in
+    a Europass namespace is what europass.europa.eu writes today, and anything carrying a
+    ``LearnerInfo`` is the format of the editor before it.
     """
     try:
         root = ElementTree.fromstring(data)  # noqa: S314 - no DOCTYPE, and nothing is fetched
@@ -316,12 +419,23 @@ def read_xml(data: bytes) -> Record:
             _("That file is not readable XML: %(reason)s") % {"reason": error}
         ) from error
 
-    learner = _find(root, "LearnerInfo")
+    # Imported here rather than at the top: it reads with this module's helpers, so it
+    # imports this module, and this module is the one a caller imports first.
+    from . import candidate
+
+    if candidate.is_candidate(root):
+        return candidate.read(root)
+
+    learner = None if _local(root.tag) == "Candidate" else _find(root, "LearnerInfo")
     if learner is None and _local(root.tag) == "LearnerInfo":
         learner = root
     if learner is None:
         raise EuropassError(
-            _("That does not look like a Europass file: it has no LearnerInfo section.")
+            _(
+                "That XML is not a Europass CV. Postulo reads the XML europass.europa.eu "
+                "writes (a Candidate) and that of the Europass editor before it (a "
+                "SkillsPassport); this is neither."
+            )
         )
 
     # On the wrapper, not on LearnerInfo -- and a file handed over as a bare LearnerInfo has

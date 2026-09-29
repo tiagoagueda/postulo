@@ -101,7 +101,10 @@ def test_europass_errors_are_the_kind_s_errors():
         (b"<SkillsPassport><Learner", True),
         (b"<html><body>Hello</body></html>", False),
         (b'{"basics": {"name": "Alex"}}', False),
-        (b"%PDF-1.7", False),
+        # Any PDF: the one kind Postulo reads is Europass's, and Europass can say why it
+        # could not read one where "nothing here reads that" says nothing useful (#244).
+        (b"%PDF-1.7", True),
+        (b"PK\x03\x04 a word processor's file", False),
         (b"", False),
     ],
 )
@@ -171,9 +174,21 @@ def test_a_file_nothing_can_read_says_so(client, user):
     client.force_login(user)
     url = reverse("resume:europass_import")
 
-    response = client.post(url, {"file": _upload("holiday.pdf", b"%PDF-1.7 not a CV")}, follow=True)
+    response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
     assert b"Nothing installed here reads that file" in response.content
+    assert response.context["found"] is None
+
+
+def test_a_pdf_is_for_europass_to_explain(client, user):
+    """Not "nothing reads that": the reason, and what to upload instead (#244)."""
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    response = client.post(url, {"file": _upload("holiday.pdf", b"%PDF-1.7 not a CV")}, follow=True)
+
+    assert b"Nothing installed here reads that file" not in response.content
+    assert b"nothing attached" in response.content
     assert response.context["found"] is None
 
 
@@ -193,6 +208,10 @@ def _upload(name: str, data: bytes):
     from django.core.files.uploadedfile import SimpleUploadedFile
 
     return SimpleUploadedFile(name, data, content_type="application/octet-stream")
+
+
+#: What a CV made in a word processor starts with: a zip. Nothing installed reads one.
+WORD_FILE = b"PK\x03\x04 a CV made in a word processor"
 
 
 # ------------------------------------------------------------- third parties (#105)
@@ -307,6 +326,6 @@ def test_the_refusal_names_what_is_installed(client, user, installed):
     client.force_login(user)
     url = reverse("resume:europass_import")
 
-    response = client.post(url, {"file": _upload("holiday.pdf", b"%PDF-1.7 not a CV")}, follow=True)
+    response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
     assert b"What is installed reads: HR-XML, Europass." in response.content

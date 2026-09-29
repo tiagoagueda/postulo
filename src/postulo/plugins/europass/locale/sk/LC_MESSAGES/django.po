@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-25 17:24+0000\n"
+"POT-Creation-Date: 2026-09-29 13:07+0000\n"
 "PO-Revision-Date: 2026-09-09 18:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: slovenčina\n"
@@ -16,88 +16,139 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: postulo scripts/messages.py\n"
 
-#: src/postulo/plugins/europass/reader.py:636
+#: src/postulo/plugins/europass/reader.py:750
 #, python-format, draft
 msgid "%(what)s was in the file but could not be read."
 msgstr "%(what)s bolo v súbore, ale nepodarilo sa to prečítať."
 
-#: src/postulo/plugins/europass/reader.py:753
+#: src/postulo/plugins/europass/reader.py:867
 #, draft
 msgid "Achievements"
 msgstr "Úspechy"
 
-#: src/postulo/plugins/europass/reader.py:90
+#: src/postulo/plugins/europass/candidate.py:123
+#: src/postulo/plugins/europass/reader.py:103
 #, draft
 msgid "Communication"
 msgstr "Komunikačné"
 
-#: src/postulo/plugins/europass/reader.py:88
+#: src/postulo/plugins/europass/candidate.py:131
+#: src/postulo/plugins/europass/reader.py:101
 #, draft
 msgid "Digital"
 msgstr "Digitálne"
 
-#: src/postulo/plugins/europass/reader.py:698
+#: src/postulo/plugins/europass/reader.py:812
 #, draft
 msgid "Education"
 msgstr "Vzdelanie"
 
-#: src/postulo/plugins/europass/reader.py:91
+#: src/postulo/plugins/europass/candidate.py:132
+#: src/postulo/plugins/europass/reader.py:104
 #, draft
 msgid "Job-related"
 msgstr "Odborné"
 
-#: src/postulo/plugins/europass/reader.py:89
+#: src/postulo/plugins/europass/candidate.py:128
+msgid "Management and leadership"
+msgstr ""
+
+#: src/postulo/plugins/europass/candidate.py:119
+#: src/postulo/plugins/europass/reader.py:102
 #, draft
 msgid "Organisational"
 msgstr "Organizačné"
 
-#: src/postulo/plugins/europass/reader.py:92
+#: src/postulo/plugins/europass/reader.py:105
 #, draft
 msgid "Other"
 msgstr "Ostatné"
 
-#: src/postulo/plugins/europass/reader.py:324
-#: src/postulo/plugins/europass/reader.py:612
+#: src/postulo/plugins/europass/candidate.py:637
+#, python-format
+msgid ""
+"Some sections of the file have nowhere to go in Postulo yet and were not read: %(sections)s."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:726
 #, draft
 msgid "That does not look like a Europass file: it has no LearnerInfo section."
 msgstr "Toto nevyzerá ako súbor Europass: nemá sekciu LearnerInfo."
 
-#: src/postulo/plugins/europass/reader.py:596
+#: src/postulo/plugins/europass/reader.py:710
 #, python-format, draft
 msgid "That file is not readable JSON: %(reason)s"
 msgstr "Tento súbor nie je čitateľný JSON: %(reason)s"
 
-#: src/postulo/plugins/europass/reader.py:316
+#: src/postulo/plugins/europass/reader.py:419
 #, python-format, draft
 msgid "That file is not readable XML: %(reason)s"
 msgstr "Tento súbor nie je čitateľné XML: %(reason)s"
 
-#: src/postulo/plugins/europass/reader.py:593
+#: src/postulo/plugins/europass/reader.py:707
 #, draft
 msgid "That file is not UTF-8, so it is not a Europass export."
 msgstr "Tento súbor nie je v UTF-8, takže to nie je export z Europassu."
 
-#: src/postulo/plugins/europass/reader.py:601
+#: src/postulo/plugins/europass/reader.py:715
 #, python-format, draft
 msgid "That file nests more than %(limit)s levels deep, so it was not read."
 msgstr ""
 "Tento súbor je vnorený hlbšie než %(limit)s úrovní, preto nebol prečítaný."
 
-#: src/postulo/plugins/europass/reader.py:235
-#, draft
+#: src/postulo/plugins/europass/reader.py:260
 msgid ""
-"That is not a Europass file. Postulo reads the XML the CV editor produced and the JSON europass.europa.eu exports; this is neither."
+"That is not a Europass file. Postulo reads the PDF europass.europa.eu gives you, the XML attached to it, and the older Europass XML and JSON; this is none of them."
 msgstr ""
-"Toto nie je súbor Europass. Postulo číta XML, ktoré vytváral editor životopisu, a JSON, ktorý exportuje europass.europa.eu; toto nie je ani jedno."
 
-#: src/postulo/plugins/europass/__init__.py:33
-#, draft
+#: src/postulo/plugins/europass/reader.py:319
 msgid ""
-"The European CV format: the XML the Europass editor produces and the JSON europass.europa.eu exports."
+"That PDF has files attached to it, and none of them is a Europass CV. Upload the PDF europass.europa.eu gives you, as it is."
 msgstr ""
-"Európsky formát životopisu: XML, ktoré vytvára editor Europass, a JSON, ktorý exportuje europass.europa.eu."
 
-#: src/postulo/plugins/europass/reader.py:675
+#: src/postulo/plugins/europass/reader.py:309
+msgid ""
+"That PDF has nothing attached to it, so there is no Europass CV inside it to read. The PDF europass.europa.eu gives you carries the CV as an attached file, and a PDF printed or saved again by another program loses it: download the CV again from europass.europa.eu and upload that file as it is."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:273
+msgid ""
+"That PDF is encrypted, so the Europass CV attached to it cannot be read. Download the CV again from europass.europa.eu and upload that file as it is."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:434
+msgid ""
+"That XML is not a Europass CV. Postulo reads the XML europass.europa.eu writes (a Candidate) and that of the Europass editor before it (a SkillsPassport); this is neither."
+msgstr ""
+
+#: src/postulo/plugins/europass/__init__.py:40
+msgid ""
+"The European CV format: the PDF europass.europa.eu gives you and the XML attached to it, and the older XML and JSON of the Europass service before it."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:282
+msgid ""
+"The file attached to that PDF is damaged and could not be unpacked. Download the CV again from europass.europa.eu and upload that file as it is."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:277
+#, python-format
+msgid ""
+"The file attached to that PDF is packed in a way Postulo does not read (%(filter)s). Download the CV again from europass.europa.eu and upload that file as it is."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:286
+#, python-format
+msgid ""
+"The file attached to that PDF unpacks to more than %(limit)s MB, so it was not read."
+msgstr ""
+
+#: src/postulo/plugins/europass/candidate.py:185
+msgid ""
+"The file holds this career in more than one language, and only the first was read."
+msgstr ""
+
+#: src/postulo/plugins/europass/reader.py:789
 #, draft
 msgid "Work experience"
 msgstr "Pracovné skúsenosti"
