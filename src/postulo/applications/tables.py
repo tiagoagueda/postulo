@@ -19,6 +19,7 @@ class ApplicationsTable(Table):
     SHAPE_LABELS: ClassVar[dict[str, str]] = {"table": _("Table"), "board": _("Board")}
     extra_params = ("q", "status", "state", "tag", "quiet")
     noun = (_("application"), _("applications"))
+    search_label = _("Search applications")
     columns = (
         Column(
             "role",

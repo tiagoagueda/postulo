@@ -5,6 +5,9 @@
 
 {% block title %}{% translate "Companies" %}{% endblock %}
 
+{# The masthead's box narrows this table (#313). #}
+{% block site_search %}<c-site-search :table="table" form_id="company-filters" table_id="companies-table" :shortcuts="keyboard_shortcuts" />{% endblock %}
+
 {% partialdef count %}
   <p id="companies-count" class="text-sm text-ink-500 dark:text-ink-400"
      aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>
@@ -74,14 +77,16 @@
     </div>
   </div>
 
+  {% comment %} The search is the masthead's box now (#313), which this form includes and which
+     includes this form, so a search and a filter narrow together whichever moved last. With
+     scripts off the box is not in this form, so the search in force rides along hidden. And
+     both, with every column filter, take turns on this form (`hx-sync`), the newer request
+     replacing the one in flight: a slow answer never lands over a newer one. {% endcomment %}
   <form method="get" id="company-filters" class="mb-6 flex flex-wrap items-end gap-3"
         hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
+        hx-include="[data-table-search]" hx-sync="this:replace"
         hx-target="#companies-table" hx-swap="outerHTML" hx-push-url="true">
-    <div class="field w-auto">
-      <label for="company-q">{% translate "Search" %}</label>
-      <input type="search" id="company-q" name="q" value="{{ search }}"
-             placeholder="{% translate 'Name, location or industry' %}" class="w-72">
-    </div>
+    <noscript><input type="hidden" name="q" value="{{ search }}"></noscript>
     <button type="submit" class="btn" data-variant="outline">{% translate "Apply" %}</button>
     {% if table.filters_active %}
       <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>

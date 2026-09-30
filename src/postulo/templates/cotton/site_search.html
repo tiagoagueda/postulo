@@ -1,0 +1,106 @@
+{% load i18n postulo %}
+<c-vars table="" form_id="" table_id="" shortcuts=False />
+{% comment %} The masthead's search: one box, which searches everything or narrows the table the
+   page is showing (#313).
+
+   `<c-site-search :shortcuts="keyboard_shortcuts" />` is the search over everything, and is
+   what `base.html` draws on every page. A page with a table to narrow says so by filling
+   the `site_search` block with the table, the id of its filter form and the id of the
+   element its swaps replace: `<c-site-search :table="table" form_id="company-filters"
+   table_id="companies-table" :shortcuts="keyboard_shortcuts" />`. That is the one place a
+   page says it; nothing else in the masthead asks.
+
+   **Everything.** From `lg` up, one box, small until it has focus, and "/" jumps to it.
+   Below that the box would take the row's room, and on a phone there was no search at all
+   -- so it is a link to the search page, which has a box of its own and works with scripts
+   off. An icon standing alone, so it carries the name; 44 pixels square, the target a thumb
+   wants, like the account button beside it. The box grows by half rather than doubling:
+   the row beside it is counted to fit with the box open, and every pixel the box takes
+   when it opens is a pixel the row cannot have (#299).
+
+   **This table.** *Companies* had two boxes on one screen, the masthead's, which searched
+   everything, and the page's, which narrowed the table; the page's is gone and the
+   masthead's does its job. It is that table's `q`: the same parameter, the same live
+   narrowing -- htmx, the same target, the page's filter form included so the other filters
+   and the sort ride along, back to the first page -- and the same address pushed. Its name
+   and its placeholder say which table.
+
+   **Room.** The row beside it is counted, breakpoint by breakpoint, to fit beside the box
+   over everything *open*, 192 pixels, in Greek and in DejaVu Sans -- and with scripts off
+   the count is the whole answer. The box and its two buttons are inside those 192 pixels
+   at rest -- 186: a box of 128, two buttons of 28 and the group's border -- so they grow on
+   focus only where the script that fits the row has run and counted the growth
+   (`.nav-main[data-fitted]` in the stylesheet). Neither button says `data-align`, which is
+   Basecoat's way of putting an addon at one end of the group: they already follow the box
+   in the markup, and the four pixels of margin it gives each were the eight that put the
+   masthead on two lines in English at 1280 under the text-spacing override with scripts
+   off, the one setting the counts promise by name. The placeholder is the name without the
+   "/" the box over everything shows: at this width the key would be the first thing cut
+   off, and `aria-keyshortcuts` says it instead. Where even the name does not fit -- most of
+   them, at rest -- it ends in an ellipsis (`text-ellipsis`), so that it reads as cut short
+   and not as a word nobody has heard of; the box's name, which is the whole of it, is on
+   the label.
+
+   Two submit buttons, and choosing between them needs no script. The first narrows the
+   table: it is the form's default button, so Enter is the table's search. The second,
+   *Search everything*, sends the same words to the search page by `formaction`. With
+   scripts off the form is a plain GET whose `action` is this page, and it carries the rest
+   of the page's question in a `<noscript>` (`Table.search_keeps`), since the page's filter
+   form, which the box used to sit in, is not this form. With scripts on, typing narrows as
+   it did, and Enter asks htmx rather than reloading the page, because htmx cancels the click
+   on a submit button it has been given a request for.
+
+   **The newest question wins** (`hx-sync`). The box is outside the page's filter form, so
+   htmx no longer queues the two behind each other as it did when one held the other: a
+   slow answer to the box could land after a newer answer to the form, and leave the address
+   and the count saying one thing over a table saying another. So the box, its button, the
+   filter form and every column filter take turns on one element, the filter form, and a
+   new request replaces the one in flight. Each of them sends every control's value, so the
+   newest request is always the whole of the question as it stands.
+
+   **On a phone the mode goes with it.** Below `lg` the icon that is a link above becomes
+   the button that opens the same form, in a panel under the masthead: a popover, which the
+   browser opens and closes with no script, closes on Escape and gives focus back to its
+   button. From `lg` up the same element is drawn in the row, open, and is not a popover in
+   anything but name -- the stylesheet undoes what the browser does to one. One form and one
+   box at every width, so there is one search landmark on the page and one input named `q`.
+
+   Not `autofocus` in the panel, which would take the focus on every page load wherever the
+   box is drawn in the row: `app.js` puts the focus in the box when the panel opens. {% endcomment %}
+{% if table %}
+  <button type="button" popovertarget="site-search-panel" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
+          data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</button>
+  <div popover id="site-search-panel" class="site-search" data-site-search>
+    <form method="get" action="{{ request.path }}" role="search" aria-label="{{ table.search_label }}">
+      <label for="site-search" class="sr-only">{{ table.search_label }}</label>
+      <div class="input-group">
+        <input type="search" id="site-search" name="q" value="{{ table.search }}"
+               placeholder="{{ table.search_label }}"{% if shortcuts %} aria-keyshortcuts="/"{% endif %}
+               data-search-shortcut data-table-search
+               hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
+               hx-sync="#{{ form_id }}:replace"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+               class="h-auto self-stretch px-2.5 text-sm text-ellipsis lg:w-32 lg:py-1 lg:transition-[width]">
+        <button type="submit" class="btn size-11 lg:size-7" data-variant="ghost" data-size="icon"
+                aria-label="{{ table.search_label }}" title="{{ table.search_label }}" data-search-here
+                hx-get="{{ request.path }}" hx-include="#site-search, #{{ form_id }}"
+                hx-sync="#{{ form_id }}:replace"
+                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true">{% icon "search" class="size-4" %}</button>
+        <button type="submit" formaction="{% url 'core:search' %}" class="btn size-11 lg:size-7" data-variant="ghost" data-size="icon"
+                aria-label="{% translate 'Search everything' %}" title="{% translate 'Search everything' %}"
+                data-search-everything>{% icon "globe" class="size-4" %}</button>
+      </div>
+      <noscript>{% for name, value in table.search_keeps %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}</noscript>
+    </form>
+  </div>
+{% else %}
+  <a href="{% url 'core:search' %}" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
+     data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</a>
+  <form method="get" action="{% url 'core:search' %}" role="search"
+        aria-label="{% translate 'Site search' %}" class="hidden lg:block">
+    <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
+    <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
+           placeholder="{% if shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
+           class="w-32 py-1 text-sm transition-[width] focus:w-48">
+  </form>
+{% endif %}

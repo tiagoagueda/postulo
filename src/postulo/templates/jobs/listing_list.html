@@ -5,6 +5,11 @@
 
 {% block title %}{% translate "Listings" %}{% endblock %}
 
+{% comment %} The masthead's box narrows this table (#313) -- once there is a table: at no
+   listings at all the page wears none of its table chrome (#160), and the box stays the
+   search over everything. {% endcomment %}
+{% block site_search %}{% if has_listings %}<c-site-search :table="table" form_id="listing-filters" table_id="listings-table" :shortcuts="keyboard_shortcuts" />{% else %}{{ block.super }}{% endif %}{% endblock %}
+
 {% partialdef count %}
   <p id="listings-count" class="text-sm text-ink-500 dark:text-ink-400"
      aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>
@@ -137,9 +142,15 @@
   </nav>
 
   {% if has_listings %}
+    {% comment %} The search is the masthead's box (#313), which this form includes and which
+       includes this form; with scripts off the search in force rides along hidden. Both,
+       with every column filter, take turns on this form (`hx-sync`), the newer request
+       replacing the one in flight. {% endcomment %}
     <form method="get" id="listing-filters" class="mb-6 flex flex-wrap items-end gap-3"
           hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
+          hx-include="[data-table-search]" hx-sync="this:replace"
           hx-target="#listings-table" hx-swap="outerHTML" hx-push-url="true">
+      <noscript><input type="hidden" name="q" value="{{ table.search }}"></noscript>
       {% comment %} Which tab is open travels with the filters, so narrowing inside
          *Discarded* stays inside it rather than falling back to *To decide*. Left out on the
          usual tab, for the reason the tab links are: it would make every page look narrowed.

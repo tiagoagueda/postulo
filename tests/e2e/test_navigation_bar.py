@@ -119,6 +119,84 @@ def test_the_row_never_wraps(live_server, page: Page, browser: Browser, furnishe
         scriptless.close()
 
 
+#: What the script that fits the row has made of it, once it has had the frames to run in:
+#: how many items are in the line, and whether *More* is drawn in the bolder weight it has
+#: while it holds the page you are on.
+THE_FIT = """() => new Promise((done) => {
+  const read = () => {
+    const nav = document.querySelector('[data-nav-main]');
+    const more = nav.querySelector('[data-nav-more] > button');
+    done({
+      line: [...nav.children].filter((c) => c.tagName === 'A' && c.getClientRects().length).length,
+      bold: more.getClientRects().length > 0 && Number(getComputedStyle(more).fontWeight) >= 600,
+    });
+  };
+  requestAnimationFrame(() => requestAnimationFrame(() => requestAnimationFrame(read)));
+})"""
+
+
+def test_the_row_is_fitted_to_more_in_the_weight_it_is_drawn_in(live_server, page: Page, furnished):  # noqa: F811
+    """*More* is drawn in bolder type while the page you are on is one of the items under it,
+    and bolder is wider. The script that fits the row measured *More* in the lighter weight
+    only, so wherever the current page went under *More* the row was short by the
+    difference -- ten pixels in Greek under the text-spacing override -- and focusing the
+    search box, which grows into the room the fit sets aside for it, put the masthead on two
+    lines (#313).
+
+    The row is tightest at the first width at which the fit lets one more item into the
+    line, and where that is depends on the font. So the window is walked from `lg` to `2xl`
+    to find those widths, and each is then opened afresh, a pixel on: the fit has between
+    one pixel and four to spare there if it measured *More* as it is drawn, and less than
+    nothing if it measured it lighter.
+
+    In a font whose two weights are the same width there is nothing to mismeasure, and this
+    passes either way: Segoe UI is one, DejaVu Sans, which CI draws in, is not.
+
+    Not under `prefers-reduced-motion`, which would be the quick way to have the box at its
+    focused width at once: the stylesheet then gives every element a transition of a
+    hundredth of a millisecond, and a weight that has only just changed still reads as the
+    old one, so the fit measures *More* in whatever weight it had before -- which hides the
+    very thing being measured. The box is waited for instead."""
+    base = live_server.url
+    set_language(furnished, "el")
+    sign_in(page, base)
+    page.set_viewport_size({"width": 1024, "height": 800})
+    page.goto(f"{base}/jobs/companies/")
+    page.evaluate(ADOPT, TEXT_SPACING)
+    page.wait_for_timeout(100)
+    started = page.evaluate(THE_FIT)["line"]
+
+    first: dict[int, int] = {}
+    for width in range(1024, 1537, 3):
+        page.set_viewport_size({"width": width, "height": 800})
+        fit = page.evaluate(THE_FIT)
+        if fit["bold"]:
+            first.setdefault(fit["line"], width)
+    # The count the walk started with was not let in at any width it saw, so it is not one.
+    tightest = {count: width for count, width in first.items() if count != started}
+    assert tightest, f"the walk never saw another item join the line under More: {first}"
+
+    for count, width in sorted(tightest.items()):
+        page.set_viewport_size({"width": width + 1, "height": 800})
+        page.goto(f"{base}/jobs/companies/")
+        page.evaluate(ADOPT, TEXT_SPACING)
+        page.wait_for_timeout(100)
+        fit = page.evaluate(THE_FIT)
+        assert fit == {"line": count, "bold": True}, (width, fit)
+        box = page.locator("#site-search")
+        rests = box.bounding_box()["width"]
+        box.focus()
+        # Half as wide again, which is what the fit counted; the growth is a transition.
+        page.wait_for_function(
+            "rests => document.querySelector('#site-search').getBoundingClientRect().width"
+            " >= rests * 1.5 - 0.01",
+            arg=rests,
+        )
+        line = row_is_one_line(page)
+        where = f"{count} items and More at {width + 1}px"
+        assert line["spread"] <= 2, f"focusing the search box wraps the masthead, {where}: {line}"
+
+
 def test_nothing_on_a_page_ends_up_behind_the_bar(live_server, page: Page, furnished):  # noqa: F811
     base = live_server.url
     sign_in(page, base)

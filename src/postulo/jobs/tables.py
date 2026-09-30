@@ -23,6 +23,7 @@ class CompaniesTable(Table):
     #: rather than by a lookup, because "everything in this group" is a walk and not a join.
     extra_params = ("q", "group")
     noun = (_("company"), _("companies"))
+    search_label = _("Search companies")
     columns = (
         # The one column here that can be changed where it sits, and the one worth
         # choosing first: it has a real refusal to place -- two companies of one name
@@ -173,9 +174,11 @@ class ListingsTable(Table):
     #: Soonest deadline first, which is the order a page for deciding wants: the ones
     #: with no closing date follow, because `ordering` puts nulls last everywhere.
     default_sort = "closes"
-    #: The state tabs above the table, which narrow the list without being a column.
-    extra_params = ("state",)
+    #: The state tabs above the table, which narrow the list without being a column, and
+    #: the masthead's search box, which narrows it by role, company and place (#313).
+    extra_params = ("state", "q")
     noun = (_("listing"), _("listings"))
+    search_label = _("Search listings")
     columns = (
         # The role, which opens the posting; the pencil beside it renames where it sits,
         # exactly as a company's name does (#135, #252).

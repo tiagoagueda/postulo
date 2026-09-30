@@ -182,6 +182,33 @@
     }
   });
 
+  /*
+   * An answer for the address already shown is not a new place in the history (#313).
+   *
+   * Two elements ask for the same thing when Enter is pressed in a table's search box: the
+   * box itself, three hundred milliseconds after the last letter, and the button Enter
+   * presses. Each answer pushed its address, the same address twice, and Back then had to
+   * be pressed twice to leave a search made once. The same was true of Enter in any filter
+   * of a form that also narrows as you type. So a push to the address the window already
+   * shows becomes a replace: the table is still redrawn from the newer answer, and the
+   * history holds each question once.
+   *
+   * The second request is still sent. Refusing it here would mean deciding, before it
+   * goes, that the table on screen is already its answer -- true only because htmx happens
+   * to cancel the request in flight before it asks -- and a wrong guess leaves the box
+   * saying one thing over a table showing another, which is the worse fault by far.
+   */
+  document.addEventListener("htmx:beforeHistoryUpdate", function (event) {
+    var update = (event.detail || {}).history;
+    if (
+      update &&
+      update.type === "push" &&
+      update.path === window.location.pathname + window.location.search
+    ) {
+      update.type = "replace";
+    }
+  });
+
   /* ------------------------------------------- a control that saves when it is finished
    *
    * Controls marked `data-autosubmit` save as soon as they change. Used by the board, where
@@ -956,10 +983,17 @@
    * script that fails half way leaves the count as the whole answer. Below `md` it takes
    * its marks off again: the bar holds four, and that is not a question of room.
    *
-   * Two measurements, because *More* has no width while it is hidden: everything in the
-   * line first, then the last item under *More* so that *More* is drawn. The search box
-   * counts at the width it opens to (`focus:w-48`, half as wide again as it rests), so
-   * that clicking into it never pushes the masthead onto a second line.
+   * Three measurements, because *More* has no width while it is hidden, and two widths
+   * while it is not: everything in the line first, then *More* with an item under it so
+   * that it is drawn -- once holding some other item, and once holding the page you are
+   * on, because that is when it is drawn in bolder type (the stylesheet's rule for *More*
+   * over the current page), and bolder is wider: ten pixels in Greek under the text-spacing
+   * override. Measured only the first way, the row was short by those ten pixels wherever
+   * the current page went under *More*, and focusing the search box put the masthead on
+   * two lines (#313). Each count of items is tried against *More* in the weight it would
+   * have at that count. The search box counts at the width it opens to (`focus:w-48`, half
+   * as wide again as it rests), so that clicking into it never pushes the masthead onto a
+   * second line.
    */
   function lineItems() {
     return Array.prototype.filter.call(mainNav.children, function (child) {
@@ -999,10 +1033,27 @@
     var widths = items.map(function (item) {
       return item.getBoundingClientRect().width;
     });
-    if (items.length) {
-      putUnderMore(items[items.length - 1].dataset.nav, true);
+    var current = -1;
+    items.forEach(function (item, index) {
+      if (item.getAttribute("aria-current") === "page") {
+        current = index;
+      }
+    });
+    function moreHolding(index) {
+      putUnderMore(items[index].dataset.nav, true);
+      var width = more.getBoundingClientRect().width;
+      putUnderMore(items[index].dataset.nav, false);
+      return width;
     }
-    var moreWidth = more.getBoundingClientRect().width;
+    var last = items.length - 1;
+    var other = current === last ? last - 1 : last;
+    var moreBold = current >= 0 ? moreHolding(current) : 0;
+    var morePlain = other >= 0 ? moreHolding(other) : moreBold;
+    // With `count` items in the line, the page you are on is under *More* if it comes
+    // after them.
+    function moreWidth(count) {
+      return current >= count ? moreBold : morePlain;
+    }
 
     var rowStyle = window.getComputedStyle(row);
     var navGap = parseFloat(window.getComputedStyle(mainNav).columnGap) || 0;
@@ -1027,7 +1078,7 @@
     }
     var fits = items.length;
     if (lineWidth(fits) > room) {
-      while (fits > 0 && lineWidth(fits) + (fits ? navGap : 0) + moreWidth > room) {
+      while (fits > 0 && lineWidth(fits) + (fits ? navGap : 0) + moreWidth(fits) > room) {
         fits -= 1;
       }
     }
@@ -1095,7 +1146,9 @@
   // The masthead's box is there from `lg` up; below that the masthead has a link to the
   // search page instead (#299), and the key follows it -- unless the page already has a
   // box of its own on the screen, which is the search page itself. Whichever box is drawn
-  // first wins, so on a wide screen it is still the one in the masthead.
+  // first wins, so on a wide screen it is still the one in the masthead. Where the box
+  // narrows the page's table (#313), what is below `lg` is the button that opens it, and
+  // clicking that opens the panel, which puts the focus in the box (below).
   function drawn(element) {
     return element.getClientRects().length > 0;
   }
@@ -1123,6 +1176,76 @@
       link.click();
     }
   });
+
+  /*
+   * The masthead's search panel, below `lg` on a page whose table the box narrows (#313).
+   * Opening it is asking to type, so the box takes the focus -- here, and not by
+   * `autofocus`, which would take it on every page load wherever the box is drawn in the
+   * row. Without a script the panel opens all the same and the box is the next stop for
+   * Tab, which is where the browser puts a popover's contents.
+   *
+   * And it is closed when the window grows past `lg` while it is open: from there the same
+   * element is drawn in the row, and one left open in the top layer would be drawn twice
+   * over in the wrong place.
+   *
+   * **It closes when the focus goes anywhere else** (SC 2.4.11, Focus Not Obscured). The
+   * browser closes a popover on Escape and on a click outside it, and not when Tab leaves
+   * it; and this one is a bar across the window, in the top layer, over whatever the page
+   * scrolls under the masthead -- which is where the browser puts a link it scrolls into
+   * view. Tab on from the box, into the table, and the header of the table, its sort links
+   * and every few rows had the focus where nobody could see it, behind the bar. A search
+   * bar nobody is typing in has no reason to be open, so it goes as the focus leaves. Its
+   * own button is not "anywhere else": Shift+Tab from the box lands on it, it is in the
+   * masthead and never under the bar, and pressing it is how the bar is closed by hand.
+   *
+   * `focusin`, not `focusout`: by then the focus is on the new element, so closing the
+   * panel has no focus of its own to hand back to the button and takes none away. Focus
+   * that leaves the window altogether raises no `focusin` here, and the bar stays as it
+   * was for when the window is come back to.
+   *
+   * Without a script the bar stays open, and the stylesheet keeps the focus clear of it
+   * instead: more `scroll-padding-top` while it is open, and the page moved down by its
+   * height (`app.css`, beside the panel's own rule).
+   */
+  document.addEventListener(
+    "toggle",
+    function (event) {
+      var panel = event.target;
+      if (event.newState !== "open" || !panel.matches || !panel.matches("[data-site-search]")) {
+        return;
+      }
+      var box = panel.querySelector("[data-search-shortcut]");
+      if (box) {
+        box.focus();
+      }
+    },
+    true
+  );
+
+  document.addEventListener("focusin", function (event) {
+    var panel = document.querySelector("[data-site-search]");
+    if (!panel || !panel.hidePopover || !panel.matches(":popover-open")) {
+      return;
+    }
+    var target = event.target;
+    if (panel.contains(target)) {
+      return;
+    }
+    if (target.getAttribute && target.getAttribute("popovertarget") === panel.id) {
+      return;
+    }
+    panel.hidePopover();
+  });
+
+  var wideSearch = window.matchMedia ? window.matchMedia("(min-width: 64rem)") : null;
+  if (wideSearch && wideSearch.addEventListener) {
+    wideSearch.addEventListener("change", function (query) {
+      var panel = document.querySelector("[data-site-search]");
+      if (query.matches && panel && panel.hidePopover && panel.matches(":popover-open")) {
+        panel.hidePopover();
+      }
+    });
+  }
 
   /*
    * Bulk selection (#134). Two additions to a form that already works without any of this:

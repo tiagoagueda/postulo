@@ -625,9 +625,6 @@
   .w-56 {
     width: calc(var(--spacing) * 56);
   }
-  .w-64 {
-    width: calc(var(--spacing) * 64);
-  }
   .w-72 {
     width: calc(var(--spacing) * 72);
   }
@@ -867,6 +864,9 @@
   }
   :where(.divide-ink-200 > :not(:last-child)) {
     border-color: var(--color-ink-200);
+  }
+  .self-stretch {
+    align-self: stretch;
   }
   .truncate {
     overflow: hidden;
@@ -1193,6 +1193,9 @@
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
+  .px-2\.5 {
+    padding-inline: calc(var(--spacing) * 2.5);
+  }
   .px-3 {
     padding-inline: calc(var(--spacing) * 3);
   }
@@ -1364,6 +1367,9 @@
   }
   .break-all {
     word-break: break-all;
+  }
+  .text-ellipsis {
+    text-overflow: ellipsis;
   }
   .whitespace-nowrap {
     white-space: nowrap;
@@ -1642,6 +1648,13 @@
     .lg\:hidden {
       display: none;
     }
+    .lg\:size-7 {
+      width: calc(var(--spacing) * 7);
+      height: calc(var(--spacing) * 7);
+    }
+    .lg\:w-32 {
+      width: calc(var(--spacing) * 32);
+    }
     .lg\:w-56 {
       width: calc(var(--spacing) * 56);
     }
@@ -1674,6 +1687,14 @@
     }
     .lg\:overflow-visible {
       overflow: visible;
+    }
+    .lg\:py-1 {
+      padding-block: var(--spacing);
+    }
+    .lg\:transition-\[width\] {
+      transition-property: width;
+      transition-timing-function: var(--tw-ease, var(--default-transition-timing-function));
+      transition-duration: var(--tw-duration, var(--default-transition-duration));
     }
   }
   @media (width >= 96rem) {
@@ -5541,6 +5562,76 @@ progress.funnel-bar::-moz-progress-bar {
   @position-try --menu-scrolls {
     max-block-size: calc(100% - 0.5rem);
     min-block-size: 10rem;
+  }
+}
+.site-search[popover] {
+  position: fixed;
+  inset-inline: 0px;
+  bottom: auto;
+  margin: 0px;
+  height: auto;
+  width: auto;
+  max-width: none;
+  overflow: visible;
+  border-style: var(--tw-border-style);
+  border-width: 0px;
+  border-bottom-style: var(--tw-border-style);
+  border-bottom-width: 1px;
+  border-color: var(--color-ink-200);
+  background-color: var(--color-white);
+  padding-inline: calc(var(--spacing) * 4);
+  padding-block: calc(var(--spacing) * 3);
+  color: inherit;
+  --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, color-mix(in srgb, oklch(0.13 0.01 250) 10%, transparent)), 0 4px 6px -4px var(--tw-shadow-color, color-mix(in srgb, oklch(0.13 0.01 250) 10%, transparent));
+  @supports (color: color-mix(in lab, red, red)) {
+    --tw-shadow: 0 10px 15px -3px var(--tw-shadow-color, color-mix(in oklab, var(--color-ink-950) 10%, transparent)), 0 4px 6px -4px var(--tw-shadow-color, color-mix(in oklab, var(--color-ink-950) 10%, transparent));
+  }
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    border-color: var(--color-ink-800);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      border-color: var(--color-ink-800);
+    }
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background-color: var(--color-ink-900);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background-color: var(--color-ink-900);
+    }
+  }
+  top: var(--header-height, 4.25rem);
+}
+@media (width < 64rem) {
+  html:has(.site-search:popover-open) {
+    --search-bar-height: 4.5rem;
+    scroll-padding-top: calc(var(--header-height, 4.25rem) + var(--search-bar-height) + 1rem);
+  }
+  html:has(.site-search:popover-open) .skip-link:focus {
+    top: calc(var(--header-height, 4.25rem) + var(--search-bar-height) + 1rem);
+  }
+}
+@media (width < 64rem) and (scripting: none) {
+  html:has(.site-search:popover-open) main {
+    margin-top: var(--search-bar-height);
+  }
+}
+@media (width >= 64rem) {
+  .site-search[popover] {
+    position: static;
+    display: block;
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+    background-color: transparent;
+    padding: 0px;
+    --tw-shadow: 0 0 #0000;
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  }
+  .nav-main[data-fitted] + div .site-search [data-table-search]:focus {
+    width: calc(var(--spacing) * 48);
   }
 }
 details[data-menu] > summary {

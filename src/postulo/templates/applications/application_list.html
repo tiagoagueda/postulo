@@ -5,6 +5,9 @@
 
 {% block title %}{% translate "Applications" %}{% endblock %}
 
+{# The masthead's box narrows these applications, in either shape (#313). #}
+{% block site_search %}<c-site-search :table="table" form_id="application-filters" table_id="applications-table" :shortcuts="keyboard_shortcuts" />{% endblock %}
+
 {% partialdef count %}
   <p id="applications-count" class="text-sm text-ink-500 dark:text-ink-400"
      aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>

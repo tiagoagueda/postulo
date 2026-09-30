@@ -1,14 +1,17 @@
 {% load i18n %}
 {% comment %} Shared by the board and the table. Given a `table_id`, the table's version narrows
-   live as you type; the board's stays a plain form. {% endcomment %}
+   live as you type; the board's stays a plain form.
+
+   The search is the masthead's box (#313), which this form includes and which includes this
+   form, so a search and a filter narrow together whichever moved last. With scripts off the
+   box is not in this form, so the search in force rides along hidden. And both take turns
+   on this form (`hx-sync`), the newer request replacing the one in flight, so a slow answer
+   to one never lands over a newer answer to the other. {% endcomment %}
 <form method="get" {% if form_id %}id="{{ form_id }}"{% endif %} class="mb-6 flex flex-wrap items-end gap-3"
       {% if table_id %}hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
+      hx-include="[data-table-search]" hx-sync="this:replace"
       hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}>
-  <div class="field w-auto">
-    <label for="filter-q">{% translate "Search" %}</label>
-    <input type="search" id="filter-q" name="q" value="{{ search }}"
-           placeholder="{% translate 'Title, company or location' %}" class="w-64">
-  </div>
+  <noscript><input type="hidden" name="q" value="{{ search }}"></noscript>
   <div class="field w-auto">
     <label for="filter-status">{% translate "Status" %}</label>
     <select id="filter-status" name="status" class="w-44">

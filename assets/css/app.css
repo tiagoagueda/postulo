@@ -1353,6 +1353,88 @@ progress.funnel-bar::-moz-progress-bar {
   }
 }
 
+/*
+ * The masthead's search where it narrows the page's table (#313): one form, drawn two ways,
+ * so that the page has one box and one search landmark at every width.
+ *
+ * Below `lg` it is a popover the magnifier opens -- the browser opens and closes it with no
+ * script -- drawn as a bar the width of the window, fixed under the masthead, whose height
+ * `app.js` measures; 4.25rem is the masthead of a phone or a tablet where nothing measured
+ * it. A panel tied to the magnifier like a menu's was the other shape, and at 320 pixels
+ * there is not a box and two buttons' worth of room on either side of it.
+ *
+ * From `lg` up the same element sits in the row, open, the way the box over everything does,
+ * and this undoes everything the browser does to a popover: the `display: none` while it is
+ * closed, the fixed place in the middle of the window, the border, the padding and the
+ * ground. `overflow-visible` at both widths, where the browser's is `auto`: the ring of the
+ * focused box and the outline of a focused button are drawn outside their boxes, and a
+ * popover that scrolled would cut them off. Unlayered, like the menus above, and author
+ * rules beat the browser's whatever their layer.
+ */
+.site-search[popover] {
+  @apply fixed inset-x-0 bottom-auto m-0 h-auto w-auto max-w-none overflow-visible border-0
+    border-b border-ink-200 bg-white px-4 py-3 text-inherit shadow-floating dark:border-ink-800
+    dark:bg-ink-900;
+  top: var(--header-height, 4.25rem);
+}
+
+/*
+ * **Nothing that has the focus may be behind the bar** (SC 2.4.11). It is in the top layer,
+ * over the band of the page just under the masthead, and that band is exactly where the
+ * browser puts whatever it scrolls into view: the root's `scroll-padding-top` clears the
+ * masthead and nothing else. Tab on from the open box into the table and the table's own
+ * header, its sort links and every few rows took the focus behind the bar.
+ *
+ * `app.js` closes the bar as the focus leaves it, which is the whole answer where scripts
+ * run. Where they do not, the browser keeps a popover open until Escape or a click
+ * elsewhere, so while it is open:
+ *
+ * - the root's scroll padding grows by the bar's height, and anything the browser scrolls
+ *   to lands under the bar rather than behind it;
+ * - the skip link, which is fixed where the bar is, moves below it;
+ * - and the page itself moves down by the bar's height (`scripting: none`), because
+ *   scroll padding cannot help what is already at the top of a page that has not been
+ *   scrolled: at 800 pixels the buttons beside the page's title sat behind the bar with
+ *   nowhere further up to scroll to.
+ *
+ * 4.5rem is the bar: its padding of 1.5rem, the 2.75rem of the box and its buttons, and
+ * three pixels of border, which a quarter of a rem covers at any text size a browser
+ * allows. What is left without a script is a browser with popovers and without
+ * `scripting` in its media queries (Chromium 114 to 119), where the top of an unscrolled
+ * page can still be behind the bar; and anything the person scrolls there by hand, which
+ * is true of the masthead too.
+ */
+@media (width < 64rem) {
+  html:has(.site-search:popover-open) {
+    --search-bar-height: 4.5rem;
+    scroll-padding-top: calc(var(--header-height, 4.25rem) + var(--search-bar-height) + 1rem);
+  }
+
+  html:has(.site-search:popover-open) .skip-link:focus {
+    top: calc(var(--header-height, 4.25rem) + var(--search-bar-height) + 1rem);
+  }
+}
+
+@media (width < 64rem) and (scripting: none) {
+  html:has(.site-search:popover-open) main {
+    margin-top: var(--search-bar-height);
+  }
+}
+
+@media (width >= 64rem) {
+  .site-search[popover] {
+    @apply static block border-0 bg-transparent p-0 shadow-none;
+  }
+
+  /* The box grows by half on focus, as the one over everything does -- but only where the
+     script that fits the row to its room has run, because it counts the growth before it
+     happens. With scripts off the row is counted by breakpoint, for the box and its two
+     buttons at rest, and a box that grew would push the masthead onto a second line. */
+  .nav-main[data-fitted] + div .site-search [data-table-search]:focus {
+    @apply w-48;
+  }
+}
+
 /* The disclosures that are not menus -- the column chooser, the saved views, the language
    picker -- are still `<details data-menu>`, and a summary is their trigger; the browser's
    disclosure triangle is not wanted on it. */

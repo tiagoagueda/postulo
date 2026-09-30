@@ -32,6 +32,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- On *Companies*, *Applications* and *Listings* the masthead's search box narrows the table, with a button beside it to search everything instead; the page's own box is gone, and *Listings* can now be searched. On a phone the magnifier opens the same box. (#313)
 - Python 3.12.4 is the oldest Python Postulo runs on: the 3.12 releases before it call some reserved address ranges public. **Installed without a container: check `python --version` before upgrading.** (#321)
 - Reminders are kept on the calendar: done, later, edit and delete in every view, a new one from any day, and the agenda narrowed to reminders, overdue ones first, replaces the *Reminders* page and its navigation entry; its old address leads there. (#316)
 - Postulo's modules import in one direction now, and a test keeps them so. (#248)

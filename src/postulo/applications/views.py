@@ -31,6 +31,7 @@ from postulo.core import tables
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
+from postulo.core.search import clean_query
 from postulo.jobs.history import history_of
 from postulo.jobs.views import UserFormKwargsMixin
 
@@ -85,7 +86,9 @@ class ApplicationFilterMixin:
     def filter_queryset(self, queryset):
         params = self.request.GET
 
-        search = params.get("q", "").strip()
+        # Through `clean_query`, which keeps two hundred characters: a longer pattern is
+        # one SQLite refuses with an error, and an address can hold anything (#313).
+        search = clean_query(params.get("q", ""))
         if search:
             queryset = queryset.filter(
                 Q(posting__title__icontains=search)

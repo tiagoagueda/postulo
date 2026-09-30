@@ -121,24 +121,10 @@
             {% include "partials/nav_links.html" %}
 
             <div class="ms-auto flex items-center gap-1">
-              {% comment %} Search, in two shapes for two widths (#299). From `lg` up, one box
-                 over everything: small until it has focus, and "/" jumps to it. Below that
-                 the box would take the row's room, and on a phone there was no search at
-                 all -- so it is a link to the search page, which has a box of its own and
-                 works with scripts off. An icon standing alone, so it carries the name; 44
-                 pixels square, the target a thumb wants, like the account button beside
-                 it. The box grows by half rather than doubling: the row beside it is
-                 counted to fit with the box open, and every pixel the box takes when it
-                 opens is a pixel the row cannot have. {% endcomment %}
-              <a href="{% url 'core:search' %}" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
-                 data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</a>
-              <form method="get" action="{% url 'core:search' %}" role="search"
-                    aria-label="{% translate 'Site search' %}" class="hidden lg:block">
-                <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
-                <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
-                       placeholder="{% if keyboard_shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
-                       class="w-32 py-1 text-sm transition-[width] focus:w-48">
-              </form>
+              {% comment %} Search, in two shapes for two widths (#299) and two modes (#313):
+                 everything, or the table the page is showing, which a page with one asks
+                 for by filling this block. `cotton/site_search.html` says how. {% endcomment %}
+              {% block site_search %}<c-site-search :shortcuts="keyboard_shortcuts" />{% endblock %}
               {% comment %} The + menu: what a person can start from anywhere (#282). A menu
                  of actions, so `role="menu"` is the right one here -- unlike the account
                  disclosure beside it, which is navigation. `<c-dropdown-menu>` is the

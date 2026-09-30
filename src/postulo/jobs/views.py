@@ -36,6 +36,7 @@ from postulo.core.mixins import (
     WebLinksMixin,
 )
 from postulo.core.redirects import safe_next
+from postulo.core.search import clean_query
 
 from . import duplicates, identifiers, logos, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
@@ -92,7 +93,11 @@ class CompanyListView(OwnedObjectMixin, ListView):
             .select_related("parent")
             .prefetch_related("industries", "identifiers")
         )
-        search = self.request.GET.get("q", "").strip()
+        # Through `clean_query`, as the search over everything reads its own: the words
+        # with their spaces tidied, and no more than two hundred characters of them. An
+        # address is not a form, anything can be typed into it, and SQLite refuses a
+        # pattern of sixty thousand characters with an error, which was a 500 (#313).
+        search = clean_query(self.request.GET.get("q", ""))
         if search:
             queryset = queryset.filter(
                 Q(name__icontains=search)

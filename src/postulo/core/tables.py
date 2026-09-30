@@ -254,6 +254,11 @@ class Table:
     #: is a table or a board of the same rows under the same filters (#102). Empty for a
     #: page that is a table and nothing else.
     shapes: tuple[str, ...] = ()
+    #: What the masthead's search box is called on this table's page, where the box narrows
+    #: the table by `q` instead of searching everything (#313): *Search companies*. Its name
+    #: and its placeholder both. The page says it wants that by filling `base.html`'s
+    #: `site_search` block; this is only the words.
+    search_label: str = ""
 
     def __init__(self, request, settings: dict | None = None):
         self.request = request
@@ -603,6 +608,34 @@ class Table:
             elif column.filter:
                 names.append(column.name)
         return any(self.given(name) for name in names)
+
+    @property
+    def search(self) -> str:
+        """What the table's search box holds: `q`, as the views that narrow by it read it."""
+        return self.params.get("q", "")
+
+    @property
+    def search_keeps(self) -> list[tuple[str, str]]:
+        """The rest of the question, for a search typed in the masthead with scripts off.
+
+        The box lives in the masthead, outside the page's filter form, so pressing Enter in
+        it without a script submits the masthead's form and nothing else. Without these, a
+        search typed over a filtered, sorted table would throw the filters and the sort away,
+        which the page's own box -- inside the filter form -- never did (#313). So that form
+        carries every other parameter the page was asked with, except the page number (a
+        new search starts at the first page) and the saved view's name (the question is no
+        longer the one saved). Empty values are left out; they narrow nothing.
+
+        With scripts on none of this is sent: the template puts it in a `<noscript>`, and
+        htmx includes the page's filter form instead, as it always did for the page's box.
+        """
+        return [
+            (name, value)
+            for name, values in self.params.lists()
+            if name not in ("q", "page", SAVED)
+            for value in values
+            if value.strip()
+        ]
 
     @property
     def clear_url(self) -> str:
