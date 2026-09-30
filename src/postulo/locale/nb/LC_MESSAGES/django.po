@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 12:38+0000\n"
+"POT-Creation-Date: 2026-10-01 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 12:52+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: norsk bokmål\n"
@@ -293,12 +293,12 @@ msgstr[1] ""
 msgid "%(from)s to %(to)s"
 msgstr "%(from)s til %(to)s"
 
-#: src/postulo/core/destinations.py:58 src/postulo/core/destinations.py:71
+#: src/postulo/core/destinations.py:160 src/postulo/core/destinations.py:173
 #, python-format, draft
 msgid "%(host)s could not be looked up."
 msgstr "%(host)s kunne ikke slås opp."
 
-#: src/postulo/core/destinations.py:78
+#: src/postulo/core/destinations.py:180
 #, python-format, draft
 msgid ""
 "%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
@@ -1800,6 +1800,10 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr "En «annet»-identifikator trenger et navn."
 
+#: src/postulo/core/addresses.py:68
+msgid "An address cannot contain a line break or any other control character."
+msgstr ""
+
 #: src/postulo/resume/candidate.py:896
 msgid "An address that could not be read"
 msgstr ""
@@ -1877,7 +1881,7 @@ msgid ""
 msgstr ""
 "En ORCID, eller en annen offentlig id som sier hvilken forsker du er. Et navn er ikke en identitet — to personer deler ett, én person publiserer under tre — og et søknadsskjema til en akademisk stilling ber om dette ved navn. Lim inn hele adressen hvis det er det du har; Postulo tar vare på id-en."
 
-#: src/postulo/plugins/fetching.py:203
+#: src/postulo/plugins/fetching.py:297
 #, draft
 msgid "an unknown file type"
 msgstr "en ukjent filtype"
@@ -3452,7 +3456,7 @@ msgstr "Kopier den nå. Den vises ikke igjen."
 msgid "Core"
 msgstr "Kjerne"
 
-#: src/postulo/jobs/logos.py:126
+#: src/postulo/jobs/logos.py:183
 #, python-format, draft
 msgid "Could not be fetched: %(error)s"
 msgstr "Kunne ikke hentes: %(error)s"
@@ -3461,7 +3465,7 @@ msgstr "Kunne ikke hentes: %(error)s"
 msgid "could not check"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:311
+#: src/postulo/jobs/logos.py:375
 #, python-format, draft
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Kunne ikke lese %(site)s: %(error)s"
@@ -7786,7 +7790,7 @@ msgstr ""
 msgid "no role"
 msgstr "ingen stilling"
 
-#: src/postulo/core/destinations.py:54 src/postulo/core/mail.py:102
+#: src/postulo/core/destinations.py:153 src/postulo/core/mail.py:102
 #, draft
 msgid "No server to connect to."
 msgstr "Ingen server å koble til."
@@ -8285,7 +8289,7 @@ msgstr "Ingenting passer de filtrene"
 msgid "Nothing matches “%(term)s”"
 msgstr "Ingenting passer «%(term)s»"
 
-#: src/postulo/jobs/logos.py:333
+#: src/postulo/jobs/logos.py:397
 #, python-format, draft
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "Ingenting på %(host)s kunne brukes som logo."
@@ -8899,7 +8903,7 @@ msgstr ""
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
-#: src/postulo/core/addresses.py:56 src/postulo/plugins/public_addresses.py:54
+#: src/postulo/core/addresses.py:70 src/postulo/plugins/public_addresses.py:67
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Bare http- og https-adresser kan fanges."
@@ -12203,24 +12207,24 @@ msgstr ""
 msgid "Text you sent"
 msgstr "Tekst du sendte"
 
-#: src/postulo/jobs/logos.py:137
+#: src/postulo/jobs/logos.py:197
 #, python-format, draft
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Den adressen er %(type)s, ikke et bilde Postulo tar vare på."
 
-#: src/postulo/plugins/public_addresses.py:63
+#: src/postulo/plugins/public_addresses.py:76
 #, draft
 msgid ""
 "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
 msgstr ""
 "Den adressen er på et privat eller lokalt nett, og Postulo henter den ikke. Lim inn annonseteksten for hånd i stedet."
 
-#: src/postulo/plugins/fetching.py:208
+#: src/postulo/plugins/fetching.py:307
 #, draft
 msgid "That address redirected too many times."
 msgstr "Den adressen videresendte for mange ganger."
 
-#: src/postulo/plugins/fetching.py:202
+#: src/postulo/plugins/fetching.py:296
 #, python-format, draft
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Den adressen svarte med %(kind)s i stedet for en nettside."
@@ -12294,7 +12298,8 @@ msgid ""
 msgstr ""
 "Det ser ikke ut som en %(scheme)s-identifikator (for eksempel %(example)s)."
 
-#: src/postulo/core/addresses.py:40 src/postulo/plugins/public_addresses.py:56
+#: src/postulo/core/addresses.py:45 src/postulo/plugins/public_addresses.py:64
+#: src/postulo/plugins/public_addresses.py:69
 #, draft
 msgid "That does not look like a complete web address."
 msgstr "Det ser ikke ut som en fullstendig nettadresse."
@@ -12342,8 +12347,8 @@ msgid "That file is larger than %(limit)s MB."
 msgstr "Den filen er større enn %(limit)s MB."
 
 #: src/postulo/core/pictures.py:298 src/postulo/core/pictures.py:314
-#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:140
-#: src/postulo/jobs/logos.py:196
+#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:165
+#: src/postulo/jobs/logos.py:255
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Den filen er større enn en logo bør være."
@@ -12353,13 +12358,24 @@ msgstr "Den filen er større enn en logo bør være."
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Den filen er over %(limit)s MB. En CV er ikke så stor."
 
+#: src/postulo/jobs/logos.py:168
+#, python-format
+msgid "That file took longer than %(seconds)s seconds to arrive."
+msgstr ""
+
 #: src/postulo/resume/views.py:465 src/postulo/resume/views_candidate.py:122
 #, draft
 msgid "That file was read, and there was nothing in it to import."
 msgstr "Den filen ble lest, og det var ingenting i den å importere."
 
-#: src/postulo/plugins/public_addresses.py:35
-#: src/postulo/plugins/public_addresses.py:60
+#: src/postulo/jobs/logos.py:174
+#, python-format
+msgid ""
+"That file was sent with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/plugins/public_addresses.py:42
+#: src/postulo/plugins/public_addresses.py:73
 #, draft
 msgid "That hostname could not be resolved."
 msgstr "Det vertsnavnet kunne ikke slås opp."
@@ -12516,20 +12532,32 @@ msgstr ""
 msgid "That package is no longer waiting; upload it again."
 msgstr "Den pakken venter ikke lenger; last den opp på nytt."
 
-#: src/postulo/plugins/fetching.py:184
+#: src/postulo/plugins/fetching.py:179
 #, python-format, draft
 msgid "That page could not be fetched: %(reason)s"
 msgstr "Den siden kunne ikke hentes: %(reason)s"
 
-#: src/postulo/plugins/fetching.py:147
+#: src/postulo/plugins/fetching.py:203
 #, python-format, draft
 msgid "That page is larger than %(limit)s MB, so it was not read."
 msgstr "Den siden er større enn %(limit)s MB, så den ble ikke lest."
 
-#: src/postulo/plugins/fetching.py:97
+#: src/postulo/plugins/fetching.py:111
 #, python-format, draft
 msgid "That page returned %(status)s."
 msgstr "Den siden svarte %(status)s."
+
+#: src/postulo/plugins/fetching.py:172
+#, python-format
+msgid ""
+"That page took longer than %(seconds)s seconds to arrive, so it was not read."
+msgstr ""
+
+#: src/postulo/plugins/fetching.py:210
+#, python-format
+msgid ""
+"That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
+msgstr ""
 
 #: src/postulo/accounts/forms.py:575
 #, draft
@@ -12604,12 +12632,12 @@ msgstr "Temaet %(theme)s setter ikke denne typen dokument."
 msgid "The /logs endpoint is on and has no token."
 msgstr "/logs-endepunktet er på og har ikke noe token."
 
-#: src/postulo/jobs/logos.py:132 src/postulo/resume/links.py:83
+#: src/postulo/jobs/logos.py:192 src/postulo/resume/links.py:83
 #, python-format, draft
 msgid "The address answered %(code)s."
 msgstr "Adressen svarte %(code)s."
 
-#: src/postulo/jobs/logos.py:142
+#: src/postulo/jobs/logos.py:201
 #, draft
 msgid "The address answered with nothing."
 msgstr "Adressen svarte med ingenting."
@@ -13307,22 +13335,22 @@ msgstr "Serveren avviste den legitimasjonen: %(detail)s"
 msgid "The server that accepts the mail — its name, not an address."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:91
+#: src/postulo/plugins/fetching.py:105
 #, draft
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr "Nettstedet ba oss senke farten (429). Prøv igjen om noen minutter."
 
-#: src/postulo/plugins/fetching.py:94
+#: src/postulo/plugins/fetching.py:108
 #, python-format, draft
 msgid "The site is having trouble (%(status)s). That is their end, not yours."
 msgstr "Nettstedet har problemer (%(status)s). Det er i deres ende, ikke din."
 
-#: src/postulo/plugins/fetching.py:190
+#: src/postulo/plugins/fetching.py:281
 #, draft
 msgid "The site redirected without saying where to."
 msgstr "Nettstedet videresendte uten å si hvor."
 
-#: src/postulo/plugins/fetching.py:80
+#: src/postulo/plugins/fetching.py:94
 #, python-format, draft
 msgid ""
 "The site refused the request (%(status)s). Large sites often sit behind bot protection that turns away anything that is not a browser, even when the page is perfectly visible to you. Paste the page source in below instead."
@@ -13510,7 +13538,7 @@ msgstr ""
 msgid "There is no repository by that name."
 msgstr "Det finnes ikke noe depot med det navnet."
 
-#: src/postulo/plugins/fetching.py:89
+#: src/postulo/plugins/fetching.py:103
 #, draft
 msgid "There is nothing at that address (404). Check the link."
 msgstr "Det er ingenting på den adressen (404). Sjekk lenken."
@@ -13661,7 +13689,7 @@ msgstr ""
 msgid "This capture has been reviewed, and what it kept is no longer added to."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:306
+#: src/postulo/jobs/logos.py:370
 #, draft
 msgid "This company has no website recorded."
 msgstr "Dette selskapet har ikke noe nettsted ført opp."
@@ -13827,7 +13855,7 @@ msgstr ""
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:173
+#: src/postulo/plugins/fetching.py:265
 #, draft
 msgid ""
 "This site's robots.txt asks automated clients not to fetch that page. Copy the posting text in by hand instead."
@@ -14274,7 +14302,7 @@ msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr ""
 "Lastet opp. Ingenting her har signert filen, så ingenting går god for den."
 
-#: src/postulo/accounts/validators.py:22
+#: src/postulo/accounts/validators.py:24
 #, draft
 msgid ""
 "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."

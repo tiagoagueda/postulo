@@ -187,7 +187,7 @@ for the full instructions, including installing without a container.
 
 ## Development
 
-Requires Python 3.12+ and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.12.4 or newer and [uv](https://docs.astral.sh/uv/).
 
 ```sh
 uv sync                      # install dependencies

@@ -127,6 +127,47 @@ def read_manifest(archive: zipfile.ZipFile) -> dict:
     return document
 
 
+def _wanted_username(account: dict, user) -> tuple[str, str]:
+    """The username the archive asks for, held to the rules signing up holds one to.
+
+    Two things come back: the name to take if nobody has it, and -- where the archive asks
+    for one this instance does not accept -- a line for the report saying so. Both are
+    empty where it asks for none, or for the one this account already has: an account's own
+    name is not judged again, whatever it is.
+
+    The check is allauth's own `clean_username`, the one the sign-up and account pages call,
+    so there is one set of rules (#321): an archive is a file anybody can edit, and the
+    operator running the command that reads it is no reason to let through a name every
+    page turns away. But the name is the one thing in an archive the account can do without,
+    so a name that fails is left alone, as a taken one always was, and the rest is restored.
+    ``createsuperuser`` never sees the list of reserved names, so an ``admin`` is in
+    archives Postulo wrote itself, and refusing those whole would cost a person their backup
+    over the one field they can retype.
+
+    Refused outright only where there is no name to keep: an account that has none of its
+    own cannot be left with the archive's, and is not left without one silently.
+    """
+    from allauth.account.adapter import get_adapter
+
+    wanted = str(account.get("username") or "").strip().casefold()
+    if not wanted or wanted == user.username:
+        return "", ""
+    try:
+        get_adapter().clean_username(wanted, shallow=True)
+    except ValidationError as error:
+        reason = " ".join(str(message) for message in error.messages)
+        # `!r`, and cut short: the name is whatever the file says, line breaks included, and
+        # this line is printed.
+        if not user.username:
+            raise ArchiveError(
+                f"The archive asks for the username {wanted[:60]!r}, which this instance does "
+                f"not accept: {reason} This account has no username of its own to keep "
+                f"instead. Change the name in {MANIFEST_NAME}, or remove it."
+            ) from error
+        return "", f"The username {wanted[:60]!r}: {reason} The account keeps “{user.username}”."
+    return wanted, ""
+
+
 def account_is_empty(user) -> bool:
     from postulo.applications.models import Application
     from postulo.documents.models import CV
@@ -342,19 +383,23 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             "--force if a duplicate is genuinely what you want."
         )
 
+    account = document.get("account") or {}
+    # Asked before anything is written, so a refusal leaves nothing to roll back.
+    wanted, not_taken = _wanted_username(account, user)
+
     report = ImportReport()
+    if not_taken:
+        report.skipped.append(not_taken)
     from django.contrib.contenttypes.models import ContentType
 
     # ------------------------------------------------------------------ profile
-    account = document.get("account") or {}
     if account.get("first_name") or account.get("last_name"):
         user.first_name = account.get("first_name") or user.first_name
         user.last_name = account.get("last_name") or user.last_name
         user.save(update_fields=["first_name", "last_name"])
     # The username travels too, but the account importing already has one, and taking
     # somebody else's on this instance is out of the question: keep it when it is free.
-    wanted = (account.get("username") or "").strip().casefold()
-    if wanted and wanted != user.username:
+    if wanted:
         taken = type(user)._default_manager.exclude(pk=user.pk).filter(username=wanted)
         if not taken.exists():
             user.username = wanted

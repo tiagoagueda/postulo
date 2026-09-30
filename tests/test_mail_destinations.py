@@ -118,6 +118,17 @@ def test_an_empty_host_says_so_rather_than_resolving_it():
         destinations.addresses_for("")
 
 
+@pytest.mark.parametrize("host", ["a..b", "x" * 64 + ".example.org", ".example.org"])
+def test_a_name_the_resolver_cannot_encode_could_not_be_looked_up(host):
+    """An empty label, or one over 63 characters, raises `UnicodeError` in the resolver
+    before any lookup: not a `gaierror`, and until #321 a traceback where the mail guard
+    wanted a refusal."""
+    with pytest.raises(destinations.Unresolvable):
+        destinations.addresses_for(host)
+    with pytest.raises(destinations.Unresolvable):
+        destinations.approve(host, allow_private=False)
+
+
 # ----------------------------------------------------------------- nothing gets dialled
 
 

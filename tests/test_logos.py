@@ -516,3 +516,22 @@ def test_an_upload_that_is_not_a_picture_says_so_at_the_form(user):
 
     assert not form.is_valid()
     assert "could not be read as an image" in str(form.errors["logo_upload"])
+
+
+def test_an_icons_sizes_are_read_in_time_that_follows_their_length():
+    """`sizes` is the page's to write. Read without a look-behind, a run of digits with no
+    `x` after it was tried again from every digit in it: 40,000 of them took fifteen seconds
+    and a page may be two megabytes, so *Find logo* on a hostile site held a worker for
+    hours (#321)."""
+    import time
+
+    assert logos._largest("16x16 32X32 180x180") == 180
+    assert logos._largest("any") == 0
+    assert logos._largest("") == 0
+    assert logos._largest(None) == 0
+
+    started = time.perf_counter()
+    assert logos._largest("1" * 400_000) == 0
+    assert logos._largest("1" * 400_000 + "x16") == 0, "no size is 400,000 digits long"
+    assert logos._largest("7" * 200_000 + " 48x48") == 48
+    assert time.perf_counter() - started < 2.0

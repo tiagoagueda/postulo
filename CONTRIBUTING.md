@@ -6,7 +6,7 @@ read-only mirror, so please open issues and pull requests on Forgejo.
 
 ## Getting set up
 
-Requires Python 3.12 or newer and [uv](https://docs.astral.sh/uv/).
+Requires Python 3.12.4 or newer and [uv](https://docs.astral.sh/uv/).
 
 ```sh
 uv sync

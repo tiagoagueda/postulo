@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 12:38+0000\n"
+"POT-Creation-Date: 2026-10-01 13:23+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: română\n"
@@ -320,12 +320,12 @@ msgstr[2] ""
 msgid "%(from)s to %(to)s"
 msgstr "%(from)s – %(to)s"
 
-#: src/postulo/core/destinations.py:58 src/postulo/core/destinations.py:71
+#: src/postulo/core/destinations.py:160 src/postulo/core/destinations.py:173
 #, python-format, draft
 msgid "%(host)s could not be looked up."
 msgstr "%(host)s nu a putut fi găsit."
 
-#: src/postulo/core/destinations.py:78
+#: src/postulo/core/destinations.py:180
 #, python-format, draft
 msgid ""
 "%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
@@ -1840,6 +1840,10 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr "Un identificator „altul” are nevoie de un nume."
 
+#: src/postulo/core/addresses.py:68
+msgid "An address cannot contain a line break or any other control character."
+msgstr ""
+
 #: src/postulo/resume/candidate.py:896
 msgid "An address that could not be read"
 msgstr ""
@@ -1917,7 +1921,7 @@ msgid ""
 msgstr ""
 "Un ORCID sau alt identificator public care spune ce cercetător sunteți. Un nume nu este o identitate — două persoane împart unul, o persoană publică sub trei — iar un formular pentru un post academic cere exact acest lucru. Lipiți adresa întreagă dacă asta aveți; Postulo păstrează identificatorul."
 
-#: src/postulo/plugins/fetching.py:203
+#: src/postulo/plugins/fetching.py:297
 #, draft
 msgid "an unknown file type"
 msgstr "un tip de fișier necunoscut"
@@ -3497,7 +3501,7 @@ msgstr "Copiați-l acum. Nu mai este afișat."
 msgid "Core"
 msgstr "Nucleu"
 
-#: src/postulo/jobs/logos.py:126
+#: src/postulo/jobs/logos.py:183
 #, python-format, draft
 msgid "Could not be fetched: %(error)s"
 msgstr "Nu a putut fi obținut: %(error)s"
@@ -3506,7 +3510,7 @@ msgstr "Nu a putut fi obținut: %(error)s"
 msgid "could not check"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:311
+#: src/postulo/jobs/logos.py:375
 #, python-format, draft
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Nu a putut fi citit %(site)s: %(error)s"
@@ -7842,7 +7846,7 @@ msgstr ""
 msgid "no role"
 msgstr "fără post"
 
-#: src/postulo/core/destinations.py:54 src/postulo/core/mail.py:102
+#: src/postulo/core/destinations.py:153 src/postulo/core/mail.py:102
 #, draft
 msgid "No server to connect to."
 msgstr "Niciun server la care să se conecteze."
@@ -8343,7 +8347,7 @@ msgstr "Nimic nu corespunde acestor filtre"
 msgid "Nothing matches “%(term)s”"
 msgstr "Nimic nu se potrivește cu „%(term)s”"
 
-#: src/postulo/jobs/logos.py:333
+#: src/postulo/jobs/logos.py:397
 #, python-format, draft
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "Nimic pe %(host)s nu putea servi drept siglă."
@@ -8979,7 +8983,7 @@ msgstr ""
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
-#: src/postulo/core/addresses.py:56 src/postulo/plugins/public_addresses.py:54
+#: src/postulo/core/addresses.py:70 src/postulo/plugins/public_addresses.py:67
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Doar adresele http și https pot fi captate."
@@ -12290,24 +12294,24 @@ msgstr ""
 msgid "Text you sent"
 msgstr "Textul pe care l-ai trimis"
 
-#: src/postulo/jobs/logos.py:137
+#: src/postulo/jobs/logos.py:197
 #, python-format, draft
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Acea adresă este %(type)s, nu o imagine pe care Postulo o păstrează."
 
-#: src/postulo/plugins/public_addresses.py:63
+#: src/postulo/plugins/public_addresses.py:76
 #, draft
 msgid ""
 "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
 msgstr ""
 "Adresa aceea este într-o rețea privată sau locală, iar Postulo nu o va prelua. Lipește în schimb textul anunțului manual."
 
-#: src/postulo/plugins/fetching.py:208
+#: src/postulo/plugins/fetching.py:307
 #, draft
 msgid "That address redirected too many times."
 msgstr "Adresa aceea a redirecționat de prea multe ori."
 
-#: src/postulo/plugins/fetching.py:202
+#: src/postulo/plugins/fetching.py:296
 #, python-format, draft
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Adresa aceea a returnat %(kind)s în loc de o pagină web."
@@ -12380,7 +12384,8 @@ msgid ""
 "That does not look like a %(scheme)s identifier (for example %(example)s)."
 msgstr "Asta nu arată ca un identificator %(scheme)s (de exemplu %(example)s)."
 
-#: src/postulo/core/addresses.py:40 src/postulo/plugins/public_addresses.py:56
+#: src/postulo/core/addresses.py:45 src/postulo/plugins/public_addresses.py:64
+#: src/postulo/plugins/public_addresses.py:69
 #, draft
 msgid "That does not look like a complete web address."
 msgstr "Asta nu arată ca o adresă web completă."
@@ -12428,8 +12433,8 @@ msgid "That file is larger than %(limit)s MB."
 msgstr "Fișierul acela este mai mare de %(limit)s MB."
 
 #: src/postulo/core/pictures.py:298 src/postulo/core/pictures.py:314
-#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:140
-#: src/postulo/jobs/logos.py:196
+#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:165
+#: src/postulo/jobs/logos.py:255
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Acest fișier este mai mare decât ar trebui să fie o siglă."
@@ -12439,13 +12444,24 @@ msgstr "Acest fișier este mai mare decât ar trebui să fie o siglă."
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Fișierul depășește %(limit)s MB. Un CV nu este atât de mare."
 
+#: src/postulo/jobs/logos.py:168
+#, python-format
+msgid "That file took longer than %(seconds)s seconds to arrive."
+msgstr ""
+
 #: src/postulo/resume/views.py:465 src/postulo/resume/views_candidate.py:122
 #, draft
 msgid "That file was read, and there was nothing in it to import."
 msgstr "Fișierul a fost citit și nu era nimic de importat în el."
 
-#: src/postulo/plugins/public_addresses.py:35
-#: src/postulo/plugins/public_addresses.py:60
+#: src/postulo/jobs/logos.py:174
+#, python-format
+msgid ""
+"That file was sent with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/plugins/public_addresses.py:42
+#: src/postulo/plugins/public_addresses.py:73
 #, draft
 msgid "That hostname could not be resolved."
 msgstr "Numele acela de gazdă nu a putut fi rezolvat."
@@ -12602,20 +12618,32 @@ msgstr ""
 msgid "That package is no longer waiting; upload it again."
 msgstr "Pachetul acela nu mai așteaptă; încărcați-l din nou."
 
-#: src/postulo/plugins/fetching.py:184
+#: src/postulo/plugins/fetching.py:179
 #, python-format, draft
 msgid "That page could not be fetched: %(reason)s"
 msgstr "Pagina aceea nu a putut fi preluată: %(reason)s"
 
-#: src/postulo/plugins/fetching.py:147
+#: src/postulo/plugins/fetching.py:203
 #, python-format, draft
 msgid "That page is larger than %(limit)s MB, so it was not read."
 msgstr "Pagina aceea este mai mare de %(limit)s MB, așa că nu a fost citită."
 
-#: src/postulo/plugins/fetching.py:97
+#: src/postulo/plugins/fetching.py:111
 #, python-format, draft
 msgid "That page returned %(status)s."
 msgstr "Pagina aceea a returnat %(status)s."
+
+#: src/postulo/plugins/fetching.py:172
+#, python-format
+msgid ""
+"That page took longer than %(seconds)s seconds to arrive, so it was not read."
+msgstr ""
+
+#: src/postulo/plugins/fetching.py:210
+#, python-format
+msgid ""
+"That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
+msgstr ""
 
 #: src/postulo/accounts/forms.py:575
 #, draft
@@ -12693,12 +12721,12 @@ msgstr "Tema %(theme)s nu tehnoredactează acest tip de document."
 msgid "The /logs endpoint is on and has no token."
 msgstr "Punctul final /logs este activat și nu are token."
 
-#: src/postulo/jobs/logos.py:132 src/postulo/resume/links.py:83
+#: src/postulo/jobs/logos.py:192 src/postulo/resume/links.py:83
 #, python-format, draft
 msgid "The address answered %(code)s."
 msgstr "Adresa a răspuns %(code)s."
 
-#: src/postulo/jobs/logos.py:142
+#: src/postulo/jobs/logos.py:201
 #, draft
 msgid "The address answered with nothing."
 msgstr "Adresa a răspuns fără nimic."
@@ -13401,23 +13429,23 @@ msgstr "Serverul a refuzat acele credențiale: %(detail)s"
 msgid "The server that accepts the mail — its name, not an address."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:91
+#: src/postulo/plugins/fetching.py:105
 #, draft
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr ""
 "Site-ul ne-a cerut să încetinim (429). Încearcă din nou în câteva minute."
 
-#: src/postulo/plugins/fetching.py:94
+#: src/postulo/plugins/fetching.py:108
 #, python-format, draft
 msgid "The site is having trouble (%(status)s). That is their end, not yours."
 msgstr "Site-ul are probleme (%(status)s). Este de partea lor, nu a ta."
 
-#: src/postulo/plugins/fetching.py:190
+#: src/postulo/plugins/fetching.py:281
 #, draft
 msgid "The site redirected without saying where to."
 msgstr "Site-ul a redirecționat fără să spună unde."
 
-#: src/postulo/plugins/fetching.py:80
+#: src/postulo/plugins/fetching.py:94
 #, python-format, draft
 msgid ""
 "The site refused the request (%(status)s). Large sites often sit behind bot protection that turns away anything that is not a browser, even when the page is perfectly visible to you. Paste the page source in below instead."
@@ -13606,7 +13634,7 @@ msgstr ""
 msgid "There is no repository by that name."
 msgstr "Nu există niciun depozit cu acest nume."
 
-#: src/postulo/plugins/fetching.py:89
+#: src/postulo/plugins/fetching.py:103
 #, draft
 msgid "There is nothing at that address (404). Check the link."
 msgstr "Nu este nimic la adresa aceea (404). Verifică linkul."
@@ -13759,7 +13787,7 @@ msgstr ""
 msgid "This capture has been reviewed, and what it kept is no longer added to."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:306
+#: src/postulo/jobs/logos.py:370
 #, draft
 msgid "This company has no website recorded."
 msgstr "Această companie nu are un sit înregistrat."
@@ -13927,7 +13955,7 @@ msgstr ""
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:173
+#: src/postulo/plugins/fetching.py:265
 #, draft
 msgid ""
 "This site's robots.txt asks automated clients not to fetch that page. Copy the posting text in by hand instead."
@@ -14375,7 +14403,7 @@ msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr ""
 "Încărcat. Nimic de aici nu a semnat acest fișier, deci nimic nu garantează pentru el."
 
-#: src/postulo/accounts/validators.py:22
+#: src/postulo/accounts/validators.py:24
 #, draft
 msgid ""
 "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."

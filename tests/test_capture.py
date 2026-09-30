@@ -7,6 +7,7 @@ else's website is a test that fails for reasons which have nothing to do with Po
 
 import json
 
+import httpx
 import pytest
 
 from postulo.jobs.models import Capture, CaptureStatus
@@ -347,44 +348,58 @@ def test_a_hostname_that_does_not_resolve_is_refused(monkeypatch):
         fetching.validate_public_url("https://nowhere.example.org/")
 
 
+def test_a_name_that_stops_resolving_after_the_check_is_still_a_capture_refusal(monkeypatch, db):
+    """`fetch_page` looks the name up to validate the address, and the client's hook looks it
+    up again to pin the connection. When the second answer is a failure the hook refuses with
+    `DestinationRefused`, which is not a `CaptureError`: the API answered 500 and the errand
+    logged a traceback, for a refusal that already had its sentence (#607)."""
+    answers = iter([[(None, None, None, "", ("93.184.216.34", 0))]])
+
+    def getaddrinfo(*args, **kwargs):
+        for answer in answers:
+            return answer
+        raise public_addresses.socket.gaierror("no such host")
+
+    monkeypatch.setattr(public_addresses.socket, "getaddrinfo", getaddrinfo)
+    monkeypatch.setattr(fetching, "robots_allow", lambda url, client=None: True)
+
+    with pytest.raises(fetching.UnsafeURL, match="could not be resolved"):
+        fetching.fetch_page("https://example.org/job")
+
+
+def robots_client(handler):
+    """A client answering from ``handler``: robots.txt is streamed and capped like a page (#321)."""
+    return httpx.Client(transport=httpx.MockTransport(handler))
+
+
 @pytest.mark.django_db
 def test_robots_can_be_honoured_and_can_be_overridden(settings, monkeypatch):
-    class Response:
-        status_code = 200
-        text = "User-agent: *\nDisallow: /jobs/"
-
-    class Client:
-        def get(self, *args, **kwargs):
-            return Response()
+    def answer(request):
+        return httpx.Response(200, text="User-agent: *\nDisallow: /jobs/")
 
     settings.POSTULO_CAPTURE_IGNORE_ROBOTS = False
-    assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is False
-    assert fetching.robots_allow("https://example.org/about", client=Client()) is True
+    with robots_client(answer) as client:
+        assert fetching.robots_allow("https://example.org/jobs/1", client=client) is False
+        assert fetching.robots_allow("https://example.org/about", client=client) is True
 
     settings.POSTULO_CAPTURE_IGNORE_ROBOTS = True
-    assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is True
+    with robots_client(answer) as client:
+        assert fetching.robots_allow("https://example.org/jobs/1", client=client) is True
 
 
 @pytest.mark.django_db
 def test_a_site_without_robots_txt_is_treated_as_allowing_everything():
-    class Missing:
-        status_code = 404
-        text = ""
-
-    class Client:
-        def get(self, *args, **kwargs):
-            return Missing()
-
-    assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is True
+    with robots_client(lambda request: httpx.Response(404)) as client:
+        assert fetching.robots_allow("https://example.org/jobs/1", client=client) is True
 
 
 @pytest.mark.django_db
 def test_an_unreachable_robots_txt_does_not_block_the_capture():
-    class Client:
-        def get(self, *args, **kwargs):
-            raise OSError("connection refused")
+    def refuse(request):
+        raise httpx.ConnectError("connection refused", request=request)
 
-    assert fetching.robots_allow("https://example.org/jobs/1", client=Client()) is True
+    with robots_client(refuse) as client:
+        assert fetching.robots_allow("https://example.org/jobs/1", client=client) is True
 
 
 # --------------------------------------------------------------- text handling

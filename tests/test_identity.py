@@ -2,6 +2,7 @@
 
 import importlib
 import io
+import json
 import zipfile
 
 import pytest
@@ -14,9 +15,9 @@ from django.core.exceptions import ValidationError
 from django.urls import reverse
 
 from postulo.accounts.models import Invite, unique_username
-from postulo.accounts.validators import slug_from_email
+from postulo.accounts.validators import slug_from_email, username_validator
 from postulo.core.export import build_document, write_archive
-from postulo.core.importer import load
+from postulo.core.importer import ArchiveError, load
 
 pytestmark = pytest.mark.django_db
 
@@ -87,11 +88,21 @@ def test_usernames_are_one_spelling_per_person():
     assert User.objects.get(pk=user.pk).username == "alex.m"
 
 
-@pytest.mark.parametrize("bad", ["ab", "-abc", "abc-", "a b", "Alex", "a..", "a" * 33, "é"])
+@pytest.mark.parametrize(
+    "bad", ["ab", "-abc", "abc-", "a b", "Alex", "a..", "a" * 33, "é", "bob\n", "bob\nforged"]
+)
 def test_the_username_rules(bad):
     user = User(email="x@example.org", username=bad, first_name="A", last_name="B")
     with pytest.raises(ValidationError):
         user.full_clean(exclude=["password"])
+
+
+def test_a_final_line_break_is_not_part_of_a_valid_username():
+    """``$`` matches before a final line break as well as at the end, so "bob\\n" passed
+    the pattern until #321. Every web path strips first; the pattern no longer relies on it."""
+    with pytest.raises(ValidationError):
+        username_validator("bob\n")
+    username_validator("bob")
 
 
 def test_a_superuser_can_be_created_the_way_createsuperuser_does_it():
@@ -289,3 +300,119 @@ def test_export_carries_the_username_and_import_takes_it_only_when_free(user, ot
     load(third, zipfile.ZipFile(io.BytesIO(archive_bytes)))
     third.refresh_from_db()
     assert third.username == "alex.morgan"
+
+
+def archive_asking_for(user, wanted) -> zipfile.ZipFile:
+    """``user``'s archive, edited by hand to ask for the username ``wanted``."""
+    document = build_document(user)
+    document["account"]["username"] = wanted
+    document["account"]["first_name"] = "Alex"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    return zipfile.ZipFile(io.BytesIO(buffer.getvalue()))
+
+
+@pytest.mark.parametrize(
+    "wanted,reason",
+    [
+        ("bob\nforged", "Use 3 to 32 lowercase letters"),
+        ("ab", "Use 3 to 32 lowercase letters"),
+        ("Admin", "can not be used"),
+    ],
+)
+def test_an_archive_asking_for_a_username_the_rules_refuse_keeps_the_accounts_own(
+    user, other_user, wanted, reason
+):
+    """The same rules as signing up: the pattern and the reserved names, run by the same
+    code (#321).
+
+    An archive is a file anybody can edit, and it used to set the name with nothing more
+    than ``strip().casefold()``. A name the rules refuse is not taken -- and the rest of the
+    archive is restored all the same, with a line in the report saying which name was left
+    and why, because the name is the one thing in it the account can do without.
+    """
+    before = other_user.username
+
+    report = load(other_user, archive_asking_for(user, wanted))
+
+    other_user.refresh_from_db()
+    assert other_user.username == before
+    assert other_user.first_name == "Alex", "the rest of the archive was restored"
+    (line,) = [line for line in report.skipped if "username" in line]
+    assert reason in line, "it says why"
+    assert before in line, "and which name the account keeps"
+    assert "\n" not in line, "on one line, whatever the archive held"
+
+
+def test_a_username_with_a_line_break_in_it_is_never_stored(user, other_user):
+    """``"bob\\n"`` passed the pattern while it ended in ``$``. Its ends are trimmed before
+    anything judges it, as every page trims them, so what is stored is the name without."""
+    load(other_user, archive_asking_for(user, "bob\n"))
+
+    other_user.refresh_from_db()
+    assert other_user.username == "bob"
+    username_validator(other_user.username)
+
+
+def test_an_admin_made_by_createsuperuser_restores_its_own_archive():
+    """``createsuperuser`` never sees the reserved names, so the first account of many an
+    instance is called ``admin``. Its own name is not judged again when its own archive comes
+    back, on this instance or on the next one it is called ``admin`` on."""
+    admin = User.objects.create_superuser(
+        username="admin", email="admin@example.org", password=PASSWORD
+    )
+    archive = archive_asking_for(admin, "admin")
+
+    report = load(admin, archive)
+
+    admin.refresh_from_db()
+    assert admin.username == "admin"
+    assert admin.first_name == "Alex", "the archive was restored"
+    assert not [line for line in report.skipped if "username" in line], "nothing to say"
+
+
+def test_an_archive_from_an_admin_account_restores_into_an_account_with_another_name(other_user):
+    """The same archive, restored into an account that signed up on the web -- where the
+    reserved names mean it cannot be called ``admin``. It was refused whole; the name is left
+    alone instead, as a taken one is, and the report says so (#321)."""
+    admin = User.objects.create_superuser(
+        username="admin",
+        email="admin@example.org",
+        first_name="Ada",
+        last_name="Min",
+        password=PASSWORD,
+    )
+    archive = write_archive(admin).getvalue()
+    admin.delete()
+    before = other_user.username
+
+    report = load(other_user, zipfile.ZipFile(io.BytesIO(archive)))
+
+    other_user.refresh_from_db()
+    assert other_user.username == before
+    assert other_user.first_name == "Ada", "the rest of the archive was restored"
+    assert [line for line in report.skipped if "'admin'" in line and before in line], (
+        "the report says which name was left, and which was kept"
+    )
+
+
+def test_an_account_with_no_username_is_not_left_with_one_the_rules_refuse(user):
+    """The one refusal left: an account from before usernames existed has none to keep, so
+    an archive asking for a name the rules refuse is turned away whole, before anything is
+    written, with what is wrong and where to change it. A name they accept is taken."""
+    nameless = User.objects.create(email="old.timer@example.org", username="", password="x")
+
+    with pytest.raises(ArchiveError, match="username") as refusal:
+        load(nameless, archive_asking_for(user, "bob\nforged"))
+
+    assert "Use 3 to 32 lowercase letters" in str(refusal.value)
+    assert "postulo.json" in str(refusal.value), "it says where to change it"
+    assert "\n" not in str(refusal.value)
+    nameless.refresh_from_db()
+    assert nameless.username == ""
+    assert nameless.first_name == "", "nothing else was written either"
+
+    load(nameless, archive_asking_for(user, "old.timer"))
+    nameless.refresh_from_db()
+    assert nameless.username == "old.timer"

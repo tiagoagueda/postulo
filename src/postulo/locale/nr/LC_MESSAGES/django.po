@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 12:38+0000\n"
+"POT-Creation-Date: 2026-10-01 13:23+0000\n"
 "PO-Revision-Date: 2026-09-06 21:17+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: isiNdebele\n"
@@ -288,12 +288,12 @@ msgstr[1] ""
 msgid "%(from)s to %(to)s"
 msgstr ""
 
-#: src/postulo/core/destinations.py:58 src/postulo/core/destinations.py:71
+#: src/postulo/core/destinations.py:160 src/postulo/core/destinations.py:173
 #, python-format
 msgid "%(host)s could not be looked up."
 msgstr ""
 
-#: src/postulo/core/destinations.py:78
+#: src/postulo/core/destinations.py:180
 #, python-format
 msgid ""
 "%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
@@ -1641,6 +1641,10 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr ""
 
+#: src/postulo/core/addresses.py:68
+msgid "An address cannot contain a line break or any other control character."
+msgstr ""
+
 #: src/postulo/resume/candidate.py:896
 msgid "An address that could not be read"
 msgstr ""
@@ -1708,7 +1712,7 @@ msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:203
+#: src/postulo/plugins/fetching.py:297
 msgid "an unknown file type"
 msgstr ""
 
@@ -3079,7 +3083,7 @@ msgstr ""
 msgid "Core"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:126
+#: src/postulo/jobs/logos.py:183
 #, python-format
 msgid "Could not be fetched: %(error)s"
 msgstr ""
@@ -3088,7 +3092,7 @@ msgstr ""
 msgid "could not check"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:311
+#: src/postulo/jobs/logos.py:375
 #, python-format
 msgid "Could not read %(site)s: %(error)s"
 msgstr ""
@@ -6772,7 +6776,7 @@ msgstr ""
 msgid "no role"
 msgstr ""
 
-#: src/postulo/core/destinations.py:54 src/postulo/core/mail.py:102
+#: src/postulo/core/destinations.py:153 src/postulo/core/mail.py:102
 msgid "No server to connect to."
 msgstr ""
 
@@ -7196,7 +7200,7 @@ msgstr ""
 msgid "Nothing matches “%(term)s”"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:333
+#: src/postulo/jobs/logos.py:397
 #, python-format
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr ""
@@ -7727,7 +7731,7 @@ msgstr ""
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
-#: src/postulo/core/addresses.py:56 src/postulo/plugins/public_addresses.py:54
+#: src/postulo/core/addresses.py:70 src/postulo/plugins/public_addresses.py:67
 msgid "Only http and https addresses can be captured."
 msgstr ""
 
@@ -10544,21 +10548,21 @@ msgstr ""
 msgid "Text you sent"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:137
+#: src/postulo/jobs/logos.py:197
 #, python-format
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr ""
 
-#: src/postulo/plugins/public_addresses.py:63
+#: src/postulo/plugins/public_addresses.py:76
 msgid ""
 "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:208
+#: src/postulo/plugins/fetching.py:307
 msgid "That address redirected too many times."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:202
+#: src/postulo/plugins/fetching.py:296
 #, python-format
 msgid "That address returned %(kind)s rather than a web page."
 msgstr ""
@@ -10624,7 +10628,8 @@ msgid ""
 "That does not look like a %(scheme)s identifier (for example %(example)s)."
 msgstr ""
 
-#: src/postulo/core/addresses.py:40 src/postulo/plugins/public_addresses.py:56
+#: src/postulo/core/addresses.py:45 src/postulo/plugins/public_addresses.py:64
+#: src/postulo/plugins/public_addresses.py:69
 msgid "That does not look like a complete web address."
 msgstr ""
 
@@ -10666,8 +10671,8 @@ msgid "That file is larger than %(limit)s MB."
 msgstr ""
 
 #: src/postulo/core/pictures.py:298 src/postulo/core/pictures.py:314
-#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:140
-#: src/postulo/jobs/logos.py:196
+#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:165
+#: src/postulo/jobs/logos.py:255
 msgid "That file is larger than a logo should be."
 msgstr ""
 
@@ -10676,12 +10681,23 @@ msgstr ""
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr ""
 
+#: src/postulo/jobs/logos.py:168
+#, python-format
+msgid "That file took longer than %(seconds)s seconds to arrive."
+msgstr ""
+
 #: src/postulo/resume/views.py:465 src/postulo/resume/views_candidate.py:122
 msgid "That file was read, and there was nothing in it to import."
 msgstr ""
 
-#: src/postulo/plugins/public_addresses.py:35
-#: src/postulo/plugins/public_addresses.py:60
+#: src/postulo/jobs/logos.py:174
+#, python-format
+msgid ""
+"That file was sent with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/plugins/public_addresses.py:42
+#: src/postulo/plugins/public_addresses.py:73
 msgid "That hostname could not be resolved."
 msgstr ""
 
@@ -10815,19 +10831,31 @@ msgstr ""
 msgid "That package is no longer waiting; upload it again."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:184
+#: src/postulo/plugins/fetching.py:179
 #, python-format
 msgid "That page could not be fetched: %(reason)s"
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:147
+#: src/postulo/plugins/fetching.py:203
 #, python-format
 msgid "That page is larger than %(limit)s MB, so it was not read."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:97
+#: src/postulo/plugins/fetching.py:111
 #, python-format
 msgid "That page returned %(status)s."
+msgstr ""
+
+#: src/postulo/plugins/fetching.py:172
+#, python-format
+msgid ""
+"That page took longer than %(seconds)s seconds to arrive, so it was not read."
+msgstr ""
+
+#: src/postulo/plugins/fetching.py:210
+#, python-format
+msgid ""
+"That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr ""
 
 #: src/postulo/accounts/forms.py:575
@@ -10895,12 +10923,12 @@ msgstr ""
 msgid "The /logs endpoint is on and has no token."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:132 src/postulo/resume/links.py:83
+#: src/postulo/jobs/logos.py:192 src/postulo/resume/links.py:83
 #, python-format
 msgid "The address answered %(code)s."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:142
+#: src/postulo/jobs/logos.py:201
 msgid "The address answered with nothing."
 msgstr ""
 
@@ -11524,20 +11552,20 @@ msgstr ""
 msgid "The server that accepts the mail — its name, not an address."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:91
+#: src/postulo/plugins/fetching.py:105
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:94
+#: src/postulo/plugins/fetching.py:108
 #, python-format
 msgid "The site is having trouble (%(status)s). That is their end, not yours."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:190
+#: src/postulo/plugins/fetching.py:281
 msgid "The site redirected without saying where to."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:80
+#: src/postulo/plugins/fetching.py:94
 #, python-format
 msgid ""
 "The site refused the request (%(status)s). Large sites often sit behind bot protection that turns away anything that is not a browser, even when the page is perfectly visible to you. Paste the page source in below instead."
@@ -11705,7 +11733,7 @@ msgstr ""
 msgid "There is no repository by that name."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:89
+#: src/postulo/plugins/fetching.py:103
 msgid "There is nothing at that address (404). Check the link."
 msgstr ""
 
@@ -11842,7 +11870,7 @@ msgstr ""
 msgid "This capture has been reviewed, and what it kept is no longer added to."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:306
+#: src/postulo/jobs/logos.py:370
 msgid "This company has no website recorded."
 msgstr ""
 
@@ -11983,7 +12011,7 @@ msgstr ""
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:173
+#: src/postulo/plugins/fetching.py:265
 msgid ""
 "This site's robots.txt asks automated clients not to fetch that page. Copy the posting text in by hand instead."
 msgstr ""
@@ -12357,7 +12385,7 @@ msgstr ""
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr ""
 
-#: src/postulo/accounts/validators.py:22
+#: src/postulo/accounts/validators.py:24
 msgid ""
 "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr ""

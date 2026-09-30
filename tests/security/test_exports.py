@@ -8,6 +8,9 @@ in all three the receiving program reads some of it as instructions rather than 
 
 These are the boundary tests: the value goes in where it really arrives, and the file that
 comes out is read the way the other program would read it.
+
+A fourth reader since #321: the console log, where a line break in an address made a line
+of its own.
 """
 
 from __future__ import annotations
@@ -210,7 +213,82 @@ def test_a_capture_cannot_be_filed_against_a_javascript_address(client, user):
     assert "http" in json.dumps(response.json()), "and it says what is allowed"
 
 
-def test_a_source_cannot_hand_back_a_javascript_address(user):
+# ------------------------------------------------ an address, and the console log (#321)
+
+#: The address the review of #249 sent: when a source failed on it, the console log gained a
+#: second line, well formed, saying whatever the sender liked.
+FORGING = "https://x.example/a\n2026-09-29 12:00:00,000 WARNING postulo.core.server_views: FORGED"
+
+
+@pytest.mark.parametrize("path", ["/api/v1/captures", "/api/v1/captures/preview"])
+def test_a_capture_address_holding_a_line_break_is_refused(client, user, path):
+    """The web form drops line breaks; the API took the value as it came."""
+    from postulo.jobs.models import Capture
+
+    response = post(
+        client,
+        path,
+        {"url": FORGING, "html": "<html><body><h1>A role</h1></body></html>"},
+        **issue(user, "captures"),
+    )
+
+    assert response.status_code == 422
+    assert response["Content-Type"] == "application/problem+json"
+    assert "control character" in json.dumps(response.json()), "and it says why"
+    assert not Capture.objects.exists()
+
+
+@pytest.mark.parametrize("control", ["\n", "\r", "\t", "\x00", "\x1b[31m", "\x7f", "\x85", "\x9b"])
+def test_no_control_character_is_part_of_a_page_address(control):
+    """C0, DEL and C1, wherever they sit once the ends are trimmed."""
+    from postulo.core.addresses import page_address
+
+    with pytest.raises(ValueError, match="control character"):
+        page_address(f"https://example.org/jobs{control}1")
+
+
+def test_an_address_pasted_with_a_line_break_at_its_end_is_still_one():
+    """What trimming removes was never part of the address, and a paste often ends in one."""
+    from postulo.core.addresses import page_address
+
+    assert page_address("https://example.org/jobs/1\n") == "https://example.org/jobs/1"
+
+
+def test_an_address_is_logged_on_one_line_whatever_it_holds(monkeypatch, caplog):
+    """`%r`, not `%s`, at every place the capture path writes an address it was handed.
+
+    The refusal above is the gate; this is what holds if something reaches the log without
+    passing it -- a plugin, an address kept from before -- because `repr` writes a line break
+    as the two characters it takes to spell one.
+    """
+    from postulo.plugins import registry
+    from postulo.plugins.builtin import BoardSource, hints
+
+    class Breaks:
+        name = "breaks"
+
+        def can_handle(self, url):
+            return True
+
+        def parse(self, url, html):
+            raise ValueError("nothing here")
+
+    def broken(*args, **kwargs):
+        raise ValueError("nothing here")
+
+    monkeypatch.setattr(registry, "available_sources", lambda **kwargs: [Breaks()])
+    monkeypatch.setattr(hints, "places", broken)
+
+    with caplog.at_level("WARNING"):
+        registry.parse_page(FORGING, "<html></html>")
+        registry.page_places(FORGING, "<html></html>")
+        BoardSource._fill_from(Breaks, FORGING, "<html></html>", {})
+
+    messages = [record.getMessage() for record in caplog.records]
+    assert len(messages) == 3, messages
+    for message in messages:
+        assert "\n" not in message, message
+        assert "\\n2026-09-29" in message, "the address is there, spelled out"
     """A plugin is third-party code; the schema every source's output passes is the gate."""
     from postulo.plugins.base import JobPostingData
 

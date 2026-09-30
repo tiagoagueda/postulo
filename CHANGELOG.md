@@ -24,9 +24,15 @@ All notable changes to Postulo are recorded here. The format follows
 - The content security policy applies in every settings module and the browser suite fails
   on a violation; CV and letter previews, which it had been refusing to style, carry a
   nonce. (#232)
+- A capture address sent to the API holding a line break or another control character is refused with a `422`, and addresses are logged quoted, so one can no longer write a forged line into the console log. (#321)
+- The public-only address check judges the IPv4 address inside an IPv6 one (NAT64, 6to4, Teredo, mapped) and refuses site-local `fec0::/10` and the rest of the reserved `::/8`. **On a host with NAT64, `64:ff9b::a9fe:a9fe` reached the cloud metadata service.** (#321)
+- A page, its `robots.txt` and a logo are read as they stream in and stop at their size limit, and the whole download, headers included, is over within 30, 10 and 20 seconds; only gzip and deflate are unpacked. A hostile site could make a worker hold as much as it liked, for as long as it liked. (#321)
+- `import_data` takes an archive's username only when it passes the username rules and is not reserved; otherwise the account keeps its own and the report says so. A username ending in a line break no longer passes the pattern. (#321)
+- *Find logo* reads an icon's `sizes` in time that follows its length: a company's website with an over-long one could hold a worker for hours. (#321)
 
 ### 🔧 Changed
 
+- Python 3.12.4 is the oldest Python Postulo runs on: the 3.12 releases before it call some reserved address ranges public. **Installed without a container: check `python --version` before upgrading.** (#321)
 - Reminders are kept on the calendar: done, later, edit and delete in every view, a new one from any day, and the agenda narrowed to reminders, overdue ones first, replaces the *Reminders* page and its navigation entry; its old address leads there. (#316)
 - Postulo's modules import in one direction now, and a test keeps them so. (#248)
 - A table's sort icon sits at the end of its header, so a row of them lines up: on the right in English, on the left in Arabic, with a numeric column's name beside it. A column's resize handle no longer covers part of it. (#317)
@@ -142,6 +148,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A capture is refused with its reason when the site redirects to something that is not an address, or its name stops resolving between two lookups; the API answered `500` and the page said only that something went wrong. A page naming a character set that is not one is read as UTF-8. (#607)
 - A row's menu on *Server settings → People* is no longer cut off inside the table: every menu opens over the page, beside its trigger, and upwards where there is no room below. Each person there has their picture too. (#310)
 - The "Name, if Other" box appears only when the kind is Other, and a name given another
   kind is blanked on save. (#284)

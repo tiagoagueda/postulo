@@ -35,6 +35,7 @@ import re
 from html.parser import HTMLParser
 from urllib.parse import urljoin, urlsplit
 
+import httpx
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
@@ -73,6 +74,13 @@ ALLOWED_CONTENT_TYPES = frozenset(
 
 #: How long a fetch may take. A logo is not worth waiting on.
 TIMEOUT = 8.0
+
+#: How long a whole download may take, redirects included, where `TIMEOUT` is each wait for
+#: the network and a server dribbling a byte every few seconds never trips it (#321). Twenty
+#: seconds reads the whole of `MAX_BYTES` at 260 KB/s, and a logo is usually tens of
+#: kilobytes. Every wait inside it is cut to what is left (`http.until`), so a download is
+#: over by then, the name lookups aside.
+DOWNLOAD_SECONDS = 20.0
 
 
 class UnusableLogo(ValueError):
@@ -115,18 +123,70 @@ def download(url: str) -> bytes:
     portfolio address, and it is what stops a hostile site redirecting this fetch onto the
     network the server sits in (#215). The client checks every hop and connects to the
     address it checked, so there is no separate check to make first.
+
+    Redirects are followed here rather than by httpx, which reads each redirect's body whole
+    before following it; every hop is still a request of its own, so the client's hook still
+    checks each one. The image is streamed and read only as far as `MAX_BYTES`, within
+    `DOWNLOAD_SECONDS` (#321).
     """
+    deadline = http.deadline_in(DOWNLOAD_SECONDS)
+    current = url
     try:
-        with http.public_only_client(timeout=TIMEOUT) as client:
-            response = client.get(url)
+        with (
+            http.public_only_client(
+                timeout=TIMEOUT,
+                follow_redirects=False,
+                headers={"Accept-Encoding": http.ACCEPT_ENCODING},
+            ) as client,
+            http.until(deadline),
+        ):
+            for _hop in range(http.MAX_REDIRECTS + 1):
+                if http.past(deadline):
+                    raise http.BodyTooSlow("The redirects used up the time for the download.")
+                try:
+                    with client.stream("GET", current) as response:
+                        if response.is_redirect:
+                            # Joined to the address asked for: the request's own was pinned
+                            # to a number, and the next hop is asked for by name.
+                            current = urljoin(current, response.headers["Location"])
+                            continue
+                        return _image(response, deadline)
+                except httpx.TimeoutException as error:
+                    if http.past(deadline):
+                        # A wait `http.until` cut short before the body began.
+                        raise http.BodyTooSlow("The time ran out before the body.") from error
+                    raise
+            raise httpx.TooManyRedirects("Exceeded maximum allowed redirects.")
+    except UnusableLogo:
+        raise
     except http.DestinationRefused as error:
         raise UnusableLogo(str(error)) from error
+    except http.BodyTooLarge as error:
+        raise UnusableLogo(str(_("That file is larger than a logo should be."))) from error
+    except http.BodyTooSlow as error:
+        raise UnusableLogo(
+            str(_("That file took longer than %(seconds)s seconds to arrive."))
+            % {"seconds": int(DOWNLOAD_SECONDS)}
+        ) from error
+    except http.BodyInAnotherCoding as error:
+        raise UnusableLogo(
+            str(
+                _(
+                    "That file was sent with the content encoding “%(coding)s”, which "
+                    "Postulo does not unpack."
+                )
+            )
+            % {"coding": error.coding[:40]}
+        ) from error
     except Exception as error:
         raise UnusableLogo(
             str(_("Could not be fetched: %(error)s"))
             % {"error": f"{type(error).__name__}: {error}"}
         ) from error
 
+
+def _image(response, deadline: float) -> bytes:
+    """The body of the answer that is not a redirect, if it is an image worth decoding."""
     if response.status_code != 200:
         raise UnusableLogo(
             str(_("The address answered %(code)s.")) % {"code": response.status_code}
@@ -136,11 +196,10 @@ def download(url: str) -> bytes:
         raise UnusableLogo(
             str(_("That address is %(type)s, not an image Postulo keeps.")) % {"type": content_type}
         )
-    if len(response.content) > MAX_BYTES:
-        raise UnusableLogo(str(_("That file is larger than a logo should be.")))
-    if not response.content:
+    content = http.read_body(response, limit=MAX_BYTES, deadline=deadline)
+    if not content:
         raise UnusableLogo(str(_("The address answered with nothing.")))
-    return response.content
+    return content
 
 
 # ------------------------------------------------------------------ storing
@@ -257,7 +316,12 @@ class _LogoLinks(HTMLParser):
 
 
 def _largest(sizes: str) -> int:
-    numbers = [int(match) for match in re.findall(r"(\d+)x\d+", sizes or "", re.IGNORECASE)]
+    # A number is read from where its digits begin. Without the look-behind, a run of
+    # digits with no `x` after it is tried again from every digit in it: 40,000 of them in
+    # a page's `sizes` took fifteen seconds, and a page may be two megabytes (#321).
+    numbers = [
+        int(match) for match in re.findall(r"(?<!\d)(\d{1,5})x\d+", sizes or "", re.IGNORECASE)
+    ]
     return max(numbers, default=0)
 
 
@@ -315,7 +379,7 @@ def find_on_website(company) -> str:
     try:
         parser.feed(page.html)
     except Exception:  # pragma: no cover - a broken page is not an error worth showing
-        logger.exception("Could not read the markup of %s", website)
+        logger.exception("Could not read the markup of %r", website)
     base = page.url or website
     candidates = [urljoin(base, href) for href in parser.candidates()]
     candidates.append(urljoin(base, "/favicon.ico"))

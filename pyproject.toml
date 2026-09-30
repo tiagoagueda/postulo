@@ -3,7 +3,7 @@ name = "postulo"
 version = "0.3.0"
 description = "Self-hosted job application manager, from the applicant's side of the table."
 readme = "README.md"
-requires-python = ">=3.12"
+requires-python = ">=3.12.4"
 license = "AGPL-3.0-or-later"
 authors = [{ name = "Tiago Agueda" }]
 keywords = ["django", "self-hosted", "job-search", "job-applications", "cv", "resume"]
@@ -28,8 +28,15 @@ dependencies = [
     "whitenoise>=6.12",
     # Fetching a posting the user pasted. Chosen over requests for its explicit timeouts
     # and for letting redirects be followed by hand, which capture needs in order to
-    # revalidate every hop.
-    "httpx>=0.28",
+    # revalidate every hop. Held to one minor: `plugins/http.py` reaches the client's own
+    # transports by httpx's private names to hold a download to a deadline (#321), and a
+    # client that had renamed them would run with no deadline and say nothing. Raising
+    # the ceiling is a deliberate act that runs `tests/security/test_outbound.py`.
+    "httpx>=0.28,<0.29",
+    # What httpx 0.28 connects with, and already installs. Named because `plugins/http.py`
+    # wraps its network backend to hold a download to a deadline (#321), so it is imported
+    # by name and is no longer only somebody else's dependency.
+    "httpcore>=1.0,<2",
     # The default PDF renderer. A small Python dependency, but it loads Pango through
     # the system linker: see the [chromium] extra for machines where that is awkward.
     "weasyprint>=70",

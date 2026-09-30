@@ -362,7 +362,7 @@ def parse_page(url: str, html: str, *, hints=()) -> tuple[JobPostingData, Source
             else:
                 parsed = source.parse(url, html)
         except Exception:
-            logger.exception("Capture source %r failed on %s", source.name, url)
+            logger.exception("Capture source %r failed on %r", source.name, url)
             continue
         if parsed is not None:
             return parsed, source
@@ -387,7 +387,7 @@ def page_places(url: str, html: str) -> list[dict]:
         return hints.places(url, html)
     except Exception:
         # Learning is a courtesy to the next capture; a page that defeats it costs nothing.
-        logger.exception("Could not list the places on %s", url)
+        logger.exception("Could not list the places on %r", url)
         return []
 
 

@@ -443,7 +443,7 @@ class BoardSource:
         except Exception:
             # The recipe already has a title, so the capture survives this. Logged rather
             # than silenced: a standard source throwing is worth looking at.
-            logger.warning("Filling gaps with %s failed on %s", source_class.__name__, url)
+            logger.warning("Filling gaps with %s failed on %r", source_class.__name__, url)
             return stated
         if fallback is None:
             return stated

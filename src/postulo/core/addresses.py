@@ -10,6 +10,7 @@ with ``setattr`` and never called ``full_clean``, so it did not (#218).
 
 from __future__ import annotations
 
+import re
 from urllib.parse import urlparse
 
 from django.core.exceptions import ValidationError
@@ -23,6 +24,10 @@ WEB_SCHEMES = ("http", "https")
 #: The same grammar `URLField` applies, so the API refuses exactly what the page refuses
 #: rather than keeping something the form would have sent back.
 _complete = URLValidator(schemes=list(WEB_SCHEMES))
+
+#: C0 controls, DEL and C1 controls. None belongs in an address, and a line break is how a
+#: value becomes a second, forged line wherever the address is written to a log (#321).
+_CONTROL = re.compile(r"[\x00-\x1f\x7f-\x9f]")
 
 
 def web_address(raw: str) -> str:
@@ -47,12 +52,21 @@ def page_address(raw: str) -> str:
     The scheme is checked and the rest is not, deliberately. This is the address a page
     was *read at* -- an internal board on a host with no dot in its name is a real one,
     and losing a whole capture over the shape of a hostname would cost more than it saves.
-    The scheme is the whole of the danger anyway: it is what decides whether a browser
-    following the link fetches a document or runs a script.
+    The scheme is the whole of the danger to a browser: it is what decides whether following
+    the link fetches a document or runs a script.
+
+    A control character is refused too, wherever it sits once the ends are trimmed. The web
+    form never passes one on, but the API took the value as it came, and an address holding a
+    line break wrote a line of its own into the console log when a source failed on it
+    (#321). An address with a line break in it is not an address.
     """
     value = (raw or "").strip()
     if not value:
         return value
+    if _CONTROL.search(value):
+        raise ValueError(
+            str(_("An address cannot contain a line break or any other control character."))
+        )
     refusal = _("Only http and https addresses can be captured.")
     try:
         scheme = urlparse(value).scheme.lower()

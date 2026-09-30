@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 12:38+0000\n"
+"POT-Creation-Date: 2026-10-01 13:23+0000\n"
 "PO-Revision-Date: 2026-09-08 14:30+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: հայերեն\n"
@@ -293,12 +293,12 @@ msgstr[1] ""
 msgid "%(from)s to %(to)s"
 msgstr "%(from)s – %(to)s"
 
-#: src/postulo/core/destinations.py:58 src/postulo/core/destinations.py:71
+#: src/postulo/core/destinations.py:160 src/postulo/core/destinations.py:173
 #, python-format, draft
 msgid "%(host)s could not be looked up."
 msgstr "%(host)s-ը հնարավոր չեղավ գտնել։"
 
-#: src/postulo/core/destinations.py:78
+#: src/postulo/core/destinations.py:180
 #, python-format, draft
 msgid ""
 "%(host)s is on a private or local network. Postulo only connects to one when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
@@ -1803,6 +1803,10 @@ msgstr ""
 msgid "An 'other' identifier needs a name."
 msgstr "«Այլ» նույնացուցիչին անուն է պետք։"
 
+#: src/postulo/core/addresses.py:68
+msgid "An address cannot contain a line break or any other control character."
+msgstr ""
+
 #: src/postulo/resume/candidate.py:896
 msgid "An address that could not be read"
 msgstr ""
@@ -1880,7 +1884,7 @@ msgid ""
 msgstr ""
 "ORCID կամ այլ հանրային նույնացուցիչ, որն ասում է, թե որ հետազոտողն եք։ Անունը ինքնություն չէ — երկուսը կիսում են մեկը, մեկ մարդ հրապարակում է երեքի տակ — և ակադեմիական պաշտոնի դիմումի ձևը դա ուղղակիորեն հարցնում է։ Տեղադրեք ամբողջ հասցեն, եթե դա ունեք. Postulo-ն պահում է նույնացուցիչը։"
 
-#: src/postulo/plugins/fetching.py:203
+#: src/postulo/plugins/fetching.py:297
 #, draft
 msgid "an unknown file type"
 msgstr "անհայտ ֆայլի տեսակ"
@@ -3459,7 +3463,7 @@ msgstr "Պատճենեք հիմա։ Այն կրկին չի ցուցադրվի։"
 msgid "Core"
 msgstr "Միջուկ"
 
-#: src/postulo/jobs/logos.py:126
+#: src/postulo/jobs/logos.py:183
 #, python-format, draft
 msgid "Could not be fetched: %(error)s"
 msgstr "Չհաջողվեց բերել՝ %(error)s"
@@ -3468,7 +3472,7 @@ msgstr "Չհաջողվեց բերել՝ %(error)s"
 msgid "could not check"
 msgstr ""
 
-#: src/postulo/jobs/logos.py:311
+#: src/postulo/jobs/logos.py:375
 #, python-format, draft
 msgid "Could not read %(site)s: %(error)s"
 msgstr "Չհաջողվեց կարդալ %(site)s՝ %(error)s"
@@ -7794,7 +7798,7 @@ msgstr ""
 msgid "no role"
 msgstr "պաշտոն չկա"
 
-#: src/postulo/core/destinations.py:54 src/postulo/core/mail.py:102
+#: src/postulo/core/destinations.py:153 src/postulo/core/mail.py:102
 #, draft
 msgid "No server to connect to."
 msgstr "Միանալու սերվեր չկա։"
@@ -8291,7 +8295,7 @@ msgstr "Ոչինչ չի համապատասխանում այդ զտիչներին
 msgid "Nothing matches “%(term)s”"
 msgstr "Ոչինչ չի համապատասխանում «%(term)s»-ին"
 
-#: src/postulo/jobs/logos.py:333
+#: src/postulo/jobs/logos.py:397
 #, python-format, draft
 msgid "Nothing on %(host)s could be used as a logo."
 msgstr "%(host)s-ի վրա ոչինչ չէր կարող լոգո լինել։"
@@ -8908,7 +8912,7 @@ msgstr ""
 msgid "Only for “Other”: what to call it on a CV."
 msgstr ""
 
-#: src/postulo/core/addresses.py:56 src/postulo/plugins/public_addresses.py:54
+#: src/postulo/core/addresses.py:70 src/postulo/plugins/public_addresses.py:67
 #, draft
 msgid "Only http and https addresses can be captured."
 msgstr "Կարելի է որսալ միայն http և https հասցեներ։"
@@ -12218,24 +12222,24 @@ msgstr ""
 msgid "Text you sent"
 msgstr "Տեքստը, որ ուղարկեցիք"
 
-#: src/postulo/jobs/logos.py:137
+#: src/postulo/jobs/logos.py:197
 #, python-format, draft
 msgid "That address is %(type)s, not an image Postulo keeps."
 msgstr "Այդ հասցեն %(type)s է, ոչ թե նկար, որ Postulo-ն պահում է։"
 
-#: src/postulo/plugins/public_addresses.py:63
+#: src/postulo/plugins/public_addresses.py:76
 #, draft
 msgid ""
 "That address is on a private or local network, and Postulo will not fetch it. Paste the posting text in by hand instead."
 msgstr ""
 "Այդ հասցեն մասնավոր կամ տեղական ցանցում է, և Postulo-ն այն չի բերի։ Փոխարենը ձեռքով տեղադրեք հայտարարության տեքստը։"
 
-#: src/postulo/plugins/fetching.py:208
+#: src/postulo/plugins/fetching.py:307
 #, draft
 msgid "That address redirected too many times."
 msgstr "Այդ հասցեն չափազանց շատ անգամ վերահղեց։"
 
-#: src/postulo/plugins/fetching.py:202
+#: src/postulo/plugins/fetching.py:296
 #, python-format, draft
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Այդ հասցեն վեբ էջի փոխարեն վերադարձրեց %(kind)s։"
@@ -12307,7 +12311,8 @@ msgid ""
 "That does not look like a %(scheme)s identifier (for example %(example)s)."
 msgstr "Սա %(scheme)s նույնացուցիչի նման չէ (օրինակ՝ %(example)s)։"
 
-#: src/postulo/core/addresses.py:40 src/postulo/plugins/public_addresses.py:56
+#: src/postulo/core/addresses.py:45 src/postulo/plugins/public_addresses.py:64
+#: src/postulo/plugins/public_addresses.py:69
 #, draft
 msgid "That does not look like a complete web address."
 msgstr "Սա ամբողջական վեբ հասցեի նման չէ։"
@@ -12355,8 +12360,8 @@ msgid "That file is larger than %(limit)s MB."
 msgstr "Այդ ֆայլն ավելի մեծ է, քան %(limit)s MB։"
 
 #: src/postulo/core/pictures.py:298 src/postulo/core/pictures.py:314
-#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:140
-#: src/postulo/jobs/logos.py:196
+#: src/postulo/jobs/forms.py:271 src/postulo/jobs/logos.py:165
+#: src/postulo/jobs/logos.py:255
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Այդ ֆայլն ավելի մեծ է, քան լոգոն պետք է լինի։"
@@ -12366,13 +12371,24 @@ msgstr "Այդ ֆայլն ավելի մեծ է, քան լոգոն պետք է լ
 msgid "That file is over %(limit)s MB. A CV is not that big."
 msgstr "Այդ ֆայլը %(limit)s MB-ից ավելի է։ CV-ն այդքան մեծ չի լինում։"
 
+#: src/postulo/jobs/logos.py:168
+#, python-format
+msgid "That file took longer than %(seconds)s seconds to arrive."
+msgstr ""
+
 #: src/postulo/resume/views.py:465 src/postulo/resume/views_candidate.py:122
 #, draft
 msgid "That file was read, and there was nothing in it to import."
 msgstr "Այդ ֆայլը կարդացվեց, և նրա մեջ ներմուծելու բան չկար։"
 
-#: src/postulo/plugins/public_addresses.py:35
-#: src/postulo/plugins/public_addresses.py:60
+#: src/postulo/jobs/logos.py:174
+#, python-format
+msgid ""
+"That file was sent with the content encoding “%(coding)s”, which Postulo does not unpack."
+msgstr ""
+
+#: src/postulo/plugins/public_addresses.py:42
+#: src/postulo/plugins/public_addresses.py:73
 #, draft
 msgid "That hostname could not be resolved."
 msgstr "Այդ հոսթի անունը չհաջողվեց լուծել։"
@@ -12529,20 +12545,32 @@ msgstr ""
 msgid "That package is no longer waiting; upload it again."
 msgstr "Այդ փաթեթն այլևս չի սպասում. կրկին վերբեռնեք այն։"
 
-#: src/postulo/plugins/fetching.py:184
+#: src/postulo/plugins/fetching.py:179
 #, python-format, draft
 msgid "That page could not be fetched: %(reason)s"
 msgstr "Այդ էջը չհաջողվեց բերել՝ %(reason)s"
 
-#: src/postulo/plugins/fetching.py:147
+#: src/postulo/plugins/fetching.py:203
 #, python-format, draft
 msgid "That page is larger than %(limit)s MB, so it was not read."
 msgstr "Այդ էջն ավելի մեծ է, քան %(limit)s MB, ուստի չկարդացվեց։"
 
-#: src/postulo/plugins/fetching.py:97
+#: src/postulo/plugins/fetching.py:111
 #, python-format, draft
 msgid "That page returned %(status)s."
 msgstr "Այդ էջը վերադարձրեց %(status)s։"
+
+#: src/postulo/plugins/fetching.py:172
+#, python-format
+msgid ""
+"That page took longer than %(seconds)s seconds to arrive, so it was not read."
+msgstr ""
+
+#: src/postulo/plugins/fetching.py:210
+#, python-format
+msgid ""
+"That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
+msgstr ""
 
 #: src/postulo/accounts/forms.py:575
 #, draft
@@ -12617,12 +12645,12 @@ msgstr "%(theme)s թեման չի շարում այս տեսակի փաստաթ�
 msgid "The /logs endpoint is on and has no token."
 msgstr "/logs վերջնակետը միացված է և թոքեն չունի։"
 
-#: src/postulo/jobs/logos.py:132 src/postulo/resume/links.py:83
+#: src/postulo/jobs/logos.py:192 src/postulo/resume/links.py:83
 #, python-format, draft
 msgid "The address answered %(code)s."
 msgstr "Հասցեն պատասխանեց %(code)s։"
 
-#: src/postulo/jobs/logos.py:142
+#: src/postulo/jobs/logos.py:201
 #, draft
 msgid "The address answered with nothing."
 msgstr "Հասցեն ոչնչով պատասխանեց։"
@@ -13324,22 +13352,22 @@ msgstr "Սերվերը մերժեց այդ հավատարմագրերը՝ %(deta
 msgid "The server that accepts the mail — its name, not an address."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:91
+#: src/postulo/plugins/fetching.py:105
 #, draft
 msgid "The site asked us to slow down (429). Try again in a few minutes."
 msgstr "Կայքը մեզ խնդրեց դանդաղեցնել (429)։ Փորձեք նորից մի քանի րոպեից։"
 
-#: src/postulo/plugins/fetching.py:94
+#: src/postulo/plugins/fetching.py:108
 #, python-format, draft
 msgid "The site is having trouble (%(status)s). That is their end, not yours."
 msgstr "Կայքը խնդիրներ ունի (%(status)s)։ Դա նրանց կողմում է, ոչ ձեր։"
 
-#: src/postulo/plugins/fetching.py:190
+#: src/postulo/plugins/fetching.py:281
 #, draft
 msgid "The site redirected without saying where to."
 msgstr "Կայքը վերահղեց՝ չասելով ուր։"
 
-#: src/postulo/plugins/fetching.py:80
+#: src/postulo/plugins/fetching.py:94
 #, python-format, draft
 msgid ""
 "The site refused the request (%(status)s). Large sites often sit behind bot protection that turns away anything that is not a browser, even when the page is perfectly visible to you. Paste the page source in below instead."
@@ -13527,7 +13555,7 @@ msgstr ""
 msgid "There is no repository by that name."
 msgstr "Այդ անունով պահոց չկա։"
 
-#: src/postulo/plugins/fetching.py:89
+#: src/postulo/plugins/fetching.py:103
 #, draft
 msgid "There is nothing at that address (404). Check the link."
 msgstr "Այդ հասցեում ոչինչ չկա (404)։ Ստուգեք հղումը։"
@@ -13678,7 +13706,7 @@ msgstr ""
 msgid "This capture has been reviewed, and what it kept is no longer added to."
 msgstr ""
 
-#: src/postulo/jobs/logos.py:306
+#: src/postulo/jobs/logos.py:370
 #, draft
 msgid "This company has no website recorded."
 msgstr "Այս ընկերության համար կայք գրանցված չէ։"
@@ -13846,7 +13874,7 @@ msgstr ""
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr ""
 
-#: src/postulo/plugins/fetching.py:173
+#: src/postulo/plugins/fetching.py:265
 #, draft
 msgid ""
 "This site's robots.txt asks automated clients not to fetch that page. Copy the posting text in by hand instead."
@@ -14292,7 +14320,7 @@ msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr ""
 "Վերբեռնված։ Այստեղ ոչինչ չի ստորագրել այս ֆայլը, ուստի ոչինչ չի երաշխավորում այն։"
 
-#: src/postulo/accounts/validators.py:22
+#: src/postulo/accounts/validators.py:24
 #, draft
 msgid ""
 "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
