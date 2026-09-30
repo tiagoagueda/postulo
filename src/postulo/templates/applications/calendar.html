@@ -26,7 +26,7 @@
 {% endcomment %}
 {% partialdef event %}
   <a href="{{ event.url }}{% if event.returns %}?next={{ request.get_full_path|urlencode:'' }}{% endif %}"
-     class="cal-event min-w-0 flex-1 {{ event.tone }}{% if event.muted %} line-through{% endif %}"
+     class="cal-event min-w-0 flex-1 max-lg:basis-40 {{ event.tone }}{% if event.muted %} line-through{% endif %}"
      data-event="{{ event.kind }}">
     {% if dated %}
       <span class="tabular-nums">{{ event.local_start|date:"DATETIME_FORMAT" }}</span>
@@ -48,9 +48,15 @@
 {% comment %} A row with room in it -- a day's list, the agenda (#316): the event, and beside a
    reminder the actions the reminders page gave it, *Done* at hand and the rest in its menu,
    which opens toward the start from the end of a row as wide as the page. Every action
-   brings the person back to this address: this shape, this day, these kinds. {% endcomment %}
+   brings the person back to this address: this shape, this day, these kinds.
+
+   The row wraps, and below `lg` the event asks for 10rem before the actions may sit beside
+   it (`max-lg:basis-40`): at 320 pixels a long *Done* in Greek, drawn in a wide font, left
+   the title a 41-pixel column with "certificate" spilling out of it. Where the row is too
+   narrow for both, the actions go under the title instead. A basis only matters where a
+   row can wrap, so the month's cells, which do not, are unchanged. {% endcomment %}
 {% partialdef row %}
-  <li class="flex items-start gap-1">
+  <li class="flex flex-wrap items-start gap-1">
     {% partial event %}
     {% if event.reminder %}
       <c-reminder-actions :reminder="event.reminder" :next_url="request.get_full_path" />
@@ -288,7 +294,7 @@
           {% if day.events %}
             <ul class="space-y-1">
               {% for event in day.events %}
-                <li class="flex items-start gap-1">
+                <li class="flex flex-wrap items-start gap-1">
                   {% partial event %}
                   {% if event.reminder %}
                     <div class="lg:hidden" data-actions="row">
