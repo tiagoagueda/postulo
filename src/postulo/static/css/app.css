@@ -1557,6 +1557,24 @@
     .sm\:w-64 {
       width: calc(var(--spacing) * 64);
     }
+    .sm\:w-auto {
+      width: auto;
+    }
+    .sm\:max-w-full {
+      max-width: 100%;
+    }
+    .sm\:min-w-36 {
+      min-width: calc(var(--spacing) * 36);
+    }
+    .sm\:min-w-auto {
+      min-width: auto;
+    }
+    .sm\:flex-\[1_1_19rem\] {
+      flex: 1 1 19rem;
+    }
+    .sm\:basis-36 {
+      flex-basis: calc(var(--spacing) * 36);
+    }
     .sm\:grid-cols-2 {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
@@ -5351,6 +5369,19 @@
   }
   .name-if-other-row:has(select option[value="other"]:checked) [data-name-if-other], .name-if-other-row[data-has-name] [data-name-if-other], .name-if-other-row-short:has(select option[value="other"]:checked) [data-name-if-other], .name-if-other-row-short[data-has-name] [data-name-if-other] {
     display: block;
+  }
+  [data-if-other]:not([data-has-name]):not(:has(select option[value="other"]:checked)) [data-name-if-other] {
+    display: none;
+  }
+  @media (width >= 40rem) {
+    [data-fields-in-line] label[for] {
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+    [data-fields-in-line] label[for] ~ :is(p, [role="alert"]), [data-fields-in-line] [data-if-other] [data-name-if-other] > input[type="text"] {
+      width: 0px;
+      min-width: 100%;
+    }
   }
   .tap-target {
     display: inline-flex;

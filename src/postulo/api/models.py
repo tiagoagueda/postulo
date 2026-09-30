@@ -26,6 +26,10 @@ from postulo.core.models import OwnedModel
 #: listings, notes, reminders and letters, which is far more than a mail client should hold;
 #: this records an entry in a listing's history, reads the list of listings to choose one
 #: from, and does nothing else.
+#:
+#: A label is the whole of what somebody reads before ticking the box, so it names
+#: everything the scope reaches: `write` gained the person's own name and details with
+#: `PATCH /profile` (#309), and says so.
 SCOPES = {
     "captures": _("Capture postings"),
     "listings:bind": _(
@@ -33,7 +37,9 @@ SCOPES = {
         "client that files messages"
     ),
     "read": _("Read everything: applications, listings, companies, documents, insights"),
-    "write": _("Record and change: applications, listings, notes, reminders, letters"),
+    "write": _(
+        "Record and change: applications, listings, notes, reminders, letters, your details"
+    ),
     "documents:read": _("Download the files themselves"),
 }
 

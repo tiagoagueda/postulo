@@ -61,7 +61,9 @@ from postulo import __version__
 #: name matches in the classification, beside the name itself (#266). 25 added
 #: ``remembered_places`` at the top of the file: where the person's own corrections showed
 #: a field to be on a site, and how many reviews in a row each place has been wrong (#267).
-FORMAT_VERSION = 25
+#: 26 added ``form_of_address`` and ``pronouns`` on the profile, each the text somebody
+#: chose or typed; an archive without them restores both blank (#309).
+FORMAT_VERSION = 26
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -79,8 +81,10 @@ FORMAT_VERSION = 25
 #: one without being taught to.
 #:
 #: 2 added ``esco_uri`` on a skill (#266), which is written and never read back: it follows
-#: the name, and the importing side works it out again from the name it is given.
-CANDIDATE_FORMAT = 2
+#: the name, and the importing side works it out again from the name it is given. 3 added
+#: ``form_of_address`` and ``pronouns`` on the profile, read back as the other details are:
+#: filled where blank, kept where not (#309).
+CANDIDATE_FORMAT = 3
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -88,7 +92,12 @@ MEDIA_PREFIX = "media/"
 # What is written for each kind of record. Declared here so the assembly below reads as
 # the shape of the document rather than as a wall of field names.
 PROFILE_FIELDS = (
+    # Before the name, and apart from it (#309): stored as the text, so they travel as it.
+    "form_of_address",
+    "pronouns",
     "headline",
+    # As typed. A blank is a blank here, not the address's town and country: that is worked
+    # out when it is printed, and writing it in would pin it to today's primary address.
     "location",
     "language",
     "record_language",
@@ -113,7 +122,14 @@ PROFILE_FIELDS = (
 #: the career is written in, which its translations are translations *from*. Everything
 #: else in `PROFILE_FIELDS` is how Postulo behaves for one account on one instance -- a
 #: theme, a dashboard, a time zone -- and is not the candidate's to carry anywhere (#181).
-CANDIDATE_PROFILE_FIELDS = ("headline", "location", "record_language")
+#: The form of address and the pronouns go with the name they belong beside (#309).
+CANDIDATE_PROFILE_FIELDS = (
+    "form_of_address",
+    "pronouns",
+    "headline",
+    "location",
+    "record_language",
+)
 #: Which block of the archive a career entry's translations point into, by model name.
 #: The same map the importer reads the other way round, kept here because this is where the
 #: block names are decided (#131).
@@ -423,7 +439,7 @@ def _profile_block(profile, names: tuple[str, ...] = PROFILE_FIELDS) -> dict:
     """The profile and the rows that hang off it, or nothing for an account without one.
 
     ``names`` is which of the profile's own columns to write. The whole-account archive
-    writes all of them; the candidate document writes the three that are about the person
+    writes all of them; the candidate document writes the ones that are about the person
     rather than about the account (#181). The numbers, the addresses and the links are the
     same rows in both.
     """

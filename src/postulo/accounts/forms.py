@@ -18,11 +18,11 @@ from django.contrib.auth import get_user_model
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import languages, phone_field, phone_numbers, phones, web_links
+from postulo.core import languages, phone_field, phone_numbers, phones, postal, web_links
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
 
-from . import avatars, identifiers
-from .models import Invite, PersonIdentifier, Profile
+from . import addressing, avatars, identifiers
+from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
 
 
 def with_strength_meter(form: forms.Form) -> None:
@@ -293,12 +293,70 @@ class SocialSignupForm(AllauthSocialSignupForm):
         return user
 
 
+#: The id of the sentence under *Your name* that describes both menus (#309).
+ADDRESSING_HELP_ID = "name-addressing-help"
+
+
+class DescribedByTheSentenceBelow(forms.BoundField):
+    """A menu of *Your name*, described by the one sentence under the card (#309).
+
+    Django writes ``aria-describedby`` from a field's own help and error, and leaves it
+    alone once a widget names something else -- so a menu that named the shared sentence
+    stopped naming its own error, which was then on the page and tied to nothing. This is
+    the same list Django would build, with the sentence where the help would be.
+    """
+
+    @property
+    def aria_describedby(self):
+        described_by = [ADDRESSING_HELP_ID]
+        if self.auto_id and self.errors:
+            described_by.append(f"{self.auto_id}_error")
+        return " ".join(described_by)
+
+
+class ListedSelect(forms.Select):
+    """A choice from a list written in one language, with *Other…* for anything else (#309).
+
+    The options that come from the list carry that language's ``lang``, for the reason
+    `LanguageSelect` gives: *Mme* in a menu drawn in English is French, and a screen reader
+    should say it as French (WCAG 3.1.2). They carry its ``dir`` too: on a page drawn right
+    to left, *Sr.* and *M.* are otherwise laid out as right-to-left text and their full stop
+    is drawn at the wrong end. The empty choice and *Other…* are the interface's own words
+    and carry nothing.
+
+    A value that is none of those is one a bound form was sent from another list (see
+    `ProfileForm._offer`). Nothing says which language it is in, so it claims none, and
+    its direction is left to its own letters.
+    """
+
+    def __init__(self, attrs=None, choices=(), *, listed=(), language: str = ""):
+        super().__init__(attrs, choices)
+        self.listed = tuple(listed)
+        self.language = language
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        if value in self.listed:
+            if self.language:
+                option["attrs"]["lang"] = self.language
+                option["attrs"]["dir"] = languages.direction(self.language)
+        elif value not in ("", addressing.OTHER):
+            option["attrs"]["dir"] = "auto"
+        return option
+
+
 class ProfileForm(forms.ModelForm):
     """Your details: the name and the contact block, which is what documents print.
 
     The name lives on the user model but belongs on this page: it is the name that will
     be printed at the top of a CV, and nobody thinks of it as an account setting. How
     Postulo behaves for the person — theme, language, username, addresses — is Settings.
+
+    The form of address and the pronouns are each two controls writing one column (#309):
+    a menu of what is in use in the career record's language, and a box for *Other*. The
+    box is drawn for every one of them and shown by the stylesheet while *Other…* is
+    chosen, so it works the same with scripts off; `clean` decides which of the two is the
+    answer, and the menu wins unless it says *Other…*.
     """
 
     # `autocomplete` names what the field is for (SC 1.3.5, #276): a browser can fill it and
@@ -313,6 +371,37 @@ class ProfileForm(forms.ModelForm):
         label=_("Last name"),
         max_length=150,
         widget=forms.TextInput(attrs={"autocomplete": "family-name"}),
+    )
+    # The menus take whatever they are sent rather than only their own options: what they
+    # hold is text, stored as it is, and a menu drawn in another language before the career
+    # record's changed is still a true answer. The model's own length is the bound.
+    #
+    # The boxes are `dir="auto"`: what is typed in them is an abbreviation in whichever
+    # language the person writes their name in, and on a page drawn right to left "Prof. Dr."
+    # is otherwise laid out as right-to-left text, its last full stop first.
+    form_of_address = forms.CharField(
+        label=_("Form of address"),
+        required=False,
+        widget=ListedSelect(attrs={"autocomplete": "honorific-prefix"}),
+        bound_field_class=DescribedByTheSentenceBelow,
+    )
+    form_of_address_other = forms.CharField(
+        label=_("Other form of address"),
+        required=False,
+        max_length=ADDRESSING_MAX_LENGTH,
+        widget=forms.TextInput(attrs={"autocomplete": "honorific-prefix", "dir": "auto"}),
+    )
+    pronouns = forms.CharField(
+        label=_("Pronouns"),
+        required=False,
+        widget=ListedSelect(),
+        bound_field_class=DescribedByTheSentenceBelow,
+    )
+    pronouns_other = forms.CharField(
+        label=_("Other pronouns"),
+        required=False,
+        max_length=ADDRESSING_MAX_LENGTH,
+        widget=forms.TextInput(attrs={"dir": "auto"}),
     )
     # A plain FileField, not an ImageField: the size and type are checked before anything
     # is decoded, and the decoding is done once, by the same code that stores the result.
@@ -338,6 +427,8 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = (
+            "form_of_address",
+            "pronouns",
             "headline",
             "location",
             "record_language",
@@ -345,6 +436,13 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        # The career record's language decides the lists, falling back to the interface's:
+        # the name is written in the language the record is (#309).
+        language = addressing.language_of(self.instance)
+        written_in = addressing.written_in(language)
+        self._offer("form_of_address", addressing.forms_of_address(language), written_in)
+        self._offer("pronouns", addressing.pronouns(language), written_in)
+        self._explain_location()
         # The same menu the interface language uses, so an option is written in the language
         # it names. Blank is a real answer here rather than an omission: most people have
         # one career in one language and never think about this again (#131).
@@ -383,6 +481,91 @@ class ProfileForm(forms.ModelForm):
             self.fields["use_gravatar"].initial = self.instance.use_gravatar
             if not self.instance.avatar:
                 del self.fields["remove_picture"]
+
+    def _offer(self, name: str, listed: tuple[str, ...], written_in: str) -> None:
+        """Fill one menu with its language's list, and start it where the stored text is.
+
+        Text that is in the list is chosen in the menu. Text that is not -- typed as Other,
+        or from a list in another language -- chooses *Other…* and is in the box beside it,
+        which the stylesheet then shows. Blank chooses the empty entry: nothing is assumed.
+
+        Both menus are described by the one sentence under the card, which says what each
+        is and that neither is printed yet: a help text under each, in a column this narrow,
+        would say it twice in a worse place. `DescribedByTheSentenceBelow` names it.
+
+        **A page that comes back keeps what it was sent.** The menu takes text from a list
+        it no longer shows, so a page drawn in French and posted after the record became
+        English may send *Mme*. Saved, that is simply the answer. Drawn again because
+        something else on the page was wrong, it used to match no option: the browser
+        showed *Not stated*, and the next save cleared a choice nobody had touched. So a
+        posted value this list does not have is offered once more, as itself, for as long
+        as the form is bound.
+        """
+        widget = self.fields[name].widget
+        widget.listed = listed
+        widget.language = written_in
+        sent = (self.data.get(self.add_prefix(name)) or "").strip() if self.is_bound else ""
+        kept = [(sent, sent)] if sent and sent != addressing.OTHER and sent not in listed else []
+        widget.choices = [
+            ("", _("Not stated")),
+            *((text, text) for text in listed),
+            *kept,
+            (addressing.OTHER, _("Other…")),
+        ]
+        stored = (getattr(self.instance, name, "") or "").strip()
+        if stored and stored not in listed:
+            self.initial[name] = addressing.OTHER
+            self.initial[f"{name}_other"] = stored
+
+    def _explain_location(self) -> None:
+        """Say what a blank location prints, and show it as the box's placeholder (#309).
+
+        Worked out from the primary postal address as it stands now, through the same
+        `location_line` a CV prints from, so what the page says is what the CV will say.
+        """
+        field = self.fields["location"]
+        derived = postal.location_line(self.instance) if self.instance.pk else ""
+        if derived:
+            field.widget.attrs["placeholder"] = derived
+            field.help_text = _(
+                "Left blank, your CVs print “%(place)s”: the town and country of your primary "
+                "postal address, never the street. Type here to print something else."
+            ) % {"place": derived}
+        else:
+            field.help_text = _(
+                "City and country, as it should appear on a CV. Left blank, the town and "
+                "country of your primary postal address are printed, once you have one."
+            )
+
+    def clean(self):
+        """The menu's answer, or the box's when the menu says *Other…*.
+
+        A box typed in and then left behind by choosing something from the menu is not an
+        answer, and is dropped: hidden text is never what gets saved, the rule #284 made for
+        the name beside a kind.
+
+        The same goes for what is wrong with it. A box the menu has not chosen is not the
+        answer, so its errors are not errors: they were drawn inside a box the stylesheet
+        hides, refusing the page for text that was never going to be saved, with nothing
+        on screen to say why. And a box that is the answer says one thing at a time: text
+        that is too long is not also missing.
+
+        The message names the list rather than where it is: on a phone the menu is above
+        the box, not beside it (WCAG 1.3.3).
+        """
+        cleaned = super().clean()
+        for name in ("form_of_address", "pronouns"):
+            box = f"{name}_other"
+            chosen = (cleaned.get(name) or "").strip()
+            if chosen == addressing.OTHER:
+                typed = (cleaned.get(box) or "").strip()
+                if not typed and not self.has_error(box):
+                    self.add_error(box, _("Type it here, or choose one from the list."))
+                chosen = typed
+            else:
+                self._errors.pop(box, None)
+            cleaned[name] = chosen
+        return cleaned
 
     def clean_picture(self):
         upload = self.cleaned_data.get("picture")

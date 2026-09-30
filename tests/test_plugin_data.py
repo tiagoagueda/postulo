@@ -274,9 +274,9 @@ def test_a_plugin_that_raises_while_exporting_is_named_rather_than_fatal(user):
 
 
 def test_the_document_carries_the_section(user):
-    from postulo.core.export import build_document
+    from postulo.core.export import FORMAT_VERSION, build_document
 
     document = build_document(user)
 
     assert "plugins" in document
-    assert document["postulo"]["format"] == 25
+    assert document["postulo"]["format"] == FORMAT_VERSION

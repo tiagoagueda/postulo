@@ -66,6 +66,7 @@ from .routers import (
     interviews,
     listings,
     offers,
+    profile,
     reminders,
     search,
 )
@@ -123,8 +124,10 @@ api = Described(
         "Scoped bearer tokens, made under Settings → API tokens. `captures` hands over a "
         "posting; `listings:bind` adds to a listing's history and lists the listings to "
         "choose one from, and nothing else; `read` reads everything the owner has; `write` "
-        "records and changes through the same services as the forms; `documents:read` "
-        "downloads files."
+        "records and changes through the same services as the forms, the owner's own "
+        "details (`/profile`) among them; `documents:read` downloads files. A `PATCH` "
+        "answers with the record as it stands after the change, so a token holding `write` "
+        "sees what it changes, without holding `read`."
     ),
 )
 
@@ -813,6 +816,7 @@ api.add_router("/offers", offers.router)
 api.add_router("", documents.router)
 api.add_router("/insights", insights.router)
 api.add_router("/search", search.router)
+api.add_router("/profile", profile.router)
 
 
 #: The calls whose request is not one transaction, by the name of their address.

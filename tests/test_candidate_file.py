@@ -292,6 +292,8 @@ def test_what_belongs_to_the_account_stays_with_the_account(somebody):
 
     assert set(document["account"]) == {"first_name", "last_name", "profile", "identifiers"}
     assert set(document["account"]["profile"]) == {
+        "form_of_address",
+        "pronouns",
         "headline",
         "location",
         "record_language",
@@ -363,8 +365,9 @@ def fingerprint() -> str:
 
 
 #: What each version of the candidate document looked like. A new shape is a new line.
-#: 2 added the ESCO skill a skill's name matches, written and never read back (#266).
-SHAPES = {1: "0941165cc7c21c64", 2: "fe525ea84b2b6f93"}
+#: 2 added the ESCO skill a skill's name matches, written and never read back (#266). 3
+#: added the form of address and the pronouns beside the name (#309).
+SHAPES = {1: "0941165cc7c21c64", 2: "fe525ea84b2b6f93", 3: "c1fc71fec061fadc"}
 
 
 def test_a_block_that_changes_shape_is_a_new_version_of_the_file():

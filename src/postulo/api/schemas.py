@@ -16,9 +16,11 @@ from typing import Annotated
 
 from django.urls import reverse
 from ninja import Field, Schema
-from pydantic import AfterValidator
+from pydantic import AfterValidator, BeforeValidator
 
+from postulo.accounts.models import Profile, User
 from postulo.core.addresses import web_address
+from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
 
 #: An address that is going to be stored and later drawn as a link. The routers set these
@@ -615,6 +617,139 @@ class TokenOut(Schema):
     scopes: list[str]
     expires_at: dt.datetime | None = None
     last_used_at: dt.datetime | None = None
+
+
+# -------------------------------------------------------------------- profile
+
+
+def _longest(model, name: str) -> int:
+    return model._meta.get_field(name).max_length
+
+
+#: The profile's own bounds, read from the columns rather than written out a second time, so
+#: the API refuses with a 422 what the database would have refused less politely.
+_NAME = _longest(User, "first_name")
+_HEADLINE = _longest(Profile, "headline")
+_LOCATION = _longest(Profile, "location")
+_ADDRESSING = _longest(Profile, "form_of_address")
+
+
+class ProfileOut(Schema):
+    """Your details: the name and the contact block a CV prints (#309)."""
+
+    first_name: str
+    last_name: str
+    form_of_address: str = Field(
+        default="",
+        description=(
+            "Written before the name (Mr, Mme, Eng.ª), as the text itself; blank when not "
+            "given. Not printed on any document yet."
+        ),
+    )
+    pronouns: str = Field(
+        default="",
+        description=(
+            "How to refer to the person (she/her, iel), as the text itself; blank when not "
+            "given. Not printed on any document yet."
+        ),
+    )
+    headline: str = ""
+    location: str = Field(
+        default="",
+        description=(
+            "As typed, and stored. Blank means the town and country of the primary postal "
+            "address; `printed_location` is what that comes to."
+        ),
+    )
+    printed_location: str = Field(
+        default="",
+        description=(
+            "Read-only: what a CV prints as where you are. `location` when it says "
+            "anything, otherwise the town and country of the primary postal address, "
+            "otherwise nothing. Never the street."
+        ),
+    )
+    record_language: str = Field(
+        default="",
+        description="The language the career record is written in; blank is the interface's",
+    )
+    updated_at: dt.datetime
+
+
+def _stripped(value):
+    return value.strip() if isinstance(value, str) else value
+
+
+def _without_nul(value: str) -> str:
+    if "\x00" in value:
+        raise ValueError("Null characters are not allowed.")
+    return value
+
+
+def _line(longest: int):
+    """One line of text about a person, on the terms *Your details* takes it.
+
+    The page strips what was typed and then measures it, and refuses a NUL character; this
+    does the same in the same order, so the two doors agree about what a value is. Before
+    it, a location of 120 characters after a space was saved by the page and refused here,
+    and a NUL was refused by the page and stored here -- where PostgreSQL, which cannot
+    hold one in text, would have answered with a 500 instead of a 422 naming the field.
+
+    **The length is written first, and that is not a matter of taste.** Each annotation
+    wraps the ones before it, so at run time the strip is still the first thing to happen.
+    But a length written after the strip is laid over the strip rather than given to the
+    string, and a string with no bound of its own is passed through unread: half a
+    surrogate pair, which pydantic otherwise refuses, then reaches the database and comes
+    back as a 500. Written first, the bound is the string's own, and the string is read.
+    """
+    return Annotated[
+        str,
+        Field(max_length=longest),
+        BeforeValidator(_stripped),
+        AfterValidator(_without_nul),
+    ]
+
+
+_NameLine = _line(_NAME)
+_AddressingLine = _line(_ADDRESSING)
+_HeadlineLine = _line(_HEADLINE)
+_LocationLine = _line(_LOCATION)
+
+
+class ProfilePatch(Schema):
+    """What may be changed. A field left out is left alone; `printed_location` is read-only
+    and ignored if sent. Each is stripped of the space around it before it is measured."""
+
+    first_name: _NameLine | None = None
+    last_name: _NameLine | None = None
+    form_of_address: _AddressingLine | None = Field(
+        default=None,
+        description="Any text, including one no list offers; empty clears it",
+    )
+    pronouns: _AddressingLine | None = Field(
+        default=None,
+        description="Any text, including one no list offers; empty clears it",
+    )
+    headline: _HeadlineLine | None = None
+    location: _LocationLine | None = Field(
+        default=None,
+        description="Empty goes back to the primary postal address's town and country",
+    )
+
+
+def profile_out(profile) -> dict:
+    user = profile.user
+    return {
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "form_of_address": profile.form_of_address,
+        "pronouns": profile.pronouns,
+        "headline": profile.headline,
+        "location": profile.location,
+        "printed_location": printed_location(profile),
+        "record_language": profile.record_language,
+        "updated_at": profile.updated_at,
+    }
 
 
 # ------------------------------------------------------------------- helpers

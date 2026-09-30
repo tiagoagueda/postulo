@@ -20,6 +20,7 @@ from django.urls import reverse
 
 from postulo.accounts import identifiers
 from postulo.accounts.models import PersonIdentifier
+from postulo.core import postal
 from postulo.plugins import base
 from postulo.plugins.europass import reader as europass
 from postulo.resume import importing
@@ -219,8 +220,11 @@ def test_an_import_never_overwrites_what_is_already_there(user):
     assert user.first_name == "Alexandra"
     assert profile.headline == "Staff engineer, mostly Python"
     # A blank is not an opinion, so the blank ones were filled.
-    assert profile.location == "Lisboa, Portugal"
     assert user.last_name == "Morgan"
+    # Except the location, where a blank is an answer since #309: the file brought an
+    # address, and a blank location prints that address's town and country.
+    assert profile.location == ""
+    assert postal.printed_location(profile) == "Lisboa, Portugal"
 
 
 def test_a_heading_that_already_exists_is_used_rather_than_repeated(user):

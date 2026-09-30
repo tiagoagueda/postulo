@@ -80,6 +80,11 @@ class Report:
         return sum(self.added.values())
 
 
+def _is_an_address(parts: dict) -> bool:
+    """Whether what a file said about where somebody lives is enough to keep as an address."""
+    return any((parts.get(key) or "").strip() for key in ("street", "postcode", "municipality"))
+
+
 def _write_address(profile, owner, parts: dict) -> bool:
     """Put a read address on a profile that has none. Returns whether anything was written.
 
@@ -90,7 +95,7 @@ def _write_address(profile, owner, parts: dict) -> bool:
     from postulo.core import postal
     from postulo.core.models import PostalAddress
 
-    if not any((parts.get(key) or "").strip() for key in ("street", "postcode", "municipality")):
+    if not _is_an_address(parts):
         return False
     if postal.for_holder(profile).exists():
         return False
@@ -115,6 +120,7 @@ def apply(owner, record: Record) -> Report:
     themselves beat a form they filled in years ago.
     """
     from postulo.accounts.models import PersonIdentifier
+    from postulo.core import postal
 
     from .models import Education, Experience, LanguageSkill, Project, Skill, SkillGroup
 
@@ -125,7 +131,18 @@ def apply(owner, record: Record) -> Report:
     # is about the career record, not about the person (#235).
     if profile is not None and (record.person or record.locale.strip()):
         changed = []
+        # A blank location is an answer since #309: it prints the town and country of the
+        # primary address, and follows that address when it changes. So the location is
+        # left blank wherever an address will say it -- one the profile already has, or the
+        # one this same file is about to give it below. Filling it pinned the location to
+        # text the person never typed, which printed less than the blank would have
+        # ("Lisboa" where the address gives "Lisboa, Portugal") and stayed behind when the
+        # address moved. Only a file with a place and no address still writes one.
+        address = record.person.get("address") or {}
+        an_address_says_where = postal.primary_for(profile) is not None or _is_an_address(address)
         for field_name in ("headline", "location"):
+            if field_name == "location" and an_address_says_where:
+                continue
             value = record.person.get(field_name)
             if value and not getattr(profile, field_name, ""):
                 setattr(profile, field_name, value[:200])
@@ -165,7 +182,7 @@ def apply(owner, record: Record) -> Report:
         # carries a street and a postcode and Postulo kept only the town and the country.
         # Same rule as everything else here -- written only where there is nothing, so an
         # import never overwrites an address somebody typed themselves.
-        wrote_address = _write_address(profile, owner, record.person.get("address") or {})
+        wrote_address = _write_address(profile, owner, address)
         report.profile_filled = [
             *changed,
             *(["website"] if wrote_site else []),

@@ -84,7 +84,7 @@ def location_line(holder) -> str:
     country, partly because the street is irrelevant to the reader and partly because a
     precise address invites them to draw conclusions about somebody from where they live.
     `Profile.location` stays somebody's own overridable line; this is only what it starts
-    from (#92).
+    from (#92), and `printed_location` below is where the two meet (#309).
     """
     from postulo.core import phones
 
@@ -93,6 +93,21 @@ def location_line(holder) -> str:
         return ""
     parts = [address.municipality.strip(), phones.country_name(address.country)]
     return ", ".join(part for part in parts if part)
+
+
+def printed_location(profile) -> str:
+    """Where somebody is, as a document prints it: what they typed, else `location_line`.
+
+    The one rule every reader of `Profile.location` goes through (#309) -- the CV's header,
+    the letter's sender block, their previews, the API's `printed_location` -- so that no
+    two of them can disagree about a blank. **The blank is what is stored**: the line is
+    worked out here each time, so a new primary address moves it without the profile being
+    saved again, and a typed location always wins. Nothing at all when there is neither.
+    """
+    if profile is None:
+        return ""
+    typed = (getattr(profile, "location", "") or "").strip()
+    return typed or location_line(profile)
 
 
 # ------------------------------------------------------ what a country expects (#147)

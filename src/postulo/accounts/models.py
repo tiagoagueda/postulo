@@ -26,6 +26,10 @@ from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
 
 INVITE_TOKEN_BYTES = 32
+#: How long a form of address or a set of pronouns may be (#309): well beyond anything
+#: `accounts.addressing` lists, with room for a string of them ("Prof. Dr. Eng.ª") or a set
+#: of pronouns written out, and bounded because it is a column.
+ADDRESSING_MAX_LENGTH = 40
 DEFAULT_INVITE_VALIDITY = timedelta(days=14)
 
 
@@ -250,6 +254,16 @@ class Profile(models.Model):
         verbose_name=_("user"),
     )
 
+    #: What is written before the name -- Mr, Mme, *Eng.ª* -- and how to refer to the person
+    #: -- she/her, *iel* -- as two answers, because they are two questions (#309). Each is
+    #: the text itself rather than a key into `accounts.addressing`'s lists, so it survives
+    #: a change of language and an *Other* is just text. Optional, never worked out from
+    #: anything, and nothing is assumed while blank. Neither is printed anywhere yet: a CV
+    #: will say whether it prints them when it chooses which of these details it carries.
+    form_of_address = models.CharField(
+        _("form of address"), max_length=ADDRESSING_MAX_LENGTH, blank=True
+    )
+    pronouns = models.CharField(_("pronouns"), max_length=ADDRESSING_MAX_LENGTH, blank=True)
     headline = models.CharField(
         _("headline"),
         max_length=200,
@@ -267,6 +281,11 @@ class Profile(models.Model):
     #: And for the addresses on the web -- social profiles, repositories, websites -- which
     #: were three single columns here until #189 and are rows of one table now.
     web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
+    #: What was typed, and only that. Blank means the town and country of the primary
+    #: postal address, worked out whenever it is printed rather than copied in here, so a
+    #: new primary address moves it without this being saved again (#309). Everything that
+    #: prints or shows where somebody is asks `core.postal.printed_location`, which is that
+    #: rule written once.
     location = models.CharField(
         _("location"),
         max_length=120,

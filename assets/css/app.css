@@ -1142,6 +1142,51 @@
     display: block;
   }
 
+  /*
+   * The same rule for anything that is not one of those rows (#309): a group marked
+   * `data-if-other` hides its `[data-name-if-other]` box unless its select has Other chosen
+   * or it already holds something (`data-has-name`). No grid track to go with it, so a row
+   * of any shape can adopt it -- the form of address and the pronouns on *Your details* are
+   * the first. Written as the rule that *hides*, the opposite way round from the rows
+   * above, so that a browser that cannot read `:has()` drops it and simply shows the box:
+   * always there is the safe way to be wrong.
+   */
+  [data-if-other]:not([data-has-name]):not(:has(select option[value="other"]:checked))
+    [data-name-if-other] {
+    display: none;
+  }
+
+  /*
+   * Fields beside one another on a line that wraps, each as wide as what is in it (#309):
+   * the form of address, the name and the pronouns of *Your name*. Two things follow from
+   * a field taking its width from its content, both from 640 pixels up, where they stop
+   * being a column:
+   *
+   * A label stays on one line. Then every label on a line is the same height, and with
+   * the line aligned to its start every control begins at the same height too, whatever
+   * is written under any of them. Aligned to the end instead, an error under one box
+   * lifted that box above the menu it belongs to.
+   *
+   * What is under the control -- help, an error -- and the box for Other take the field's
+   * width and never give it one: `width: 0` is what they ask for and `min-width: 100%`
+   * what they get, so a sentence wraps inside the field instead of stretching it to the
+   * sentence's length. A select is left out on purpose: its width is its longest option,
+   * which is the point.
+   *
+   * Keyed on the elements a field holds and never on its class, which is Basecoat's to
+   * define (`tests/test_stylesheet.py`). The box's selector is as long as it is to
+   * outweigh Basecoat's own rule for a text box in a field, which sets `min-width: 0`
+   * with a specificity of (0,3,3).
+   */
+  [data-fields-in-line] label[for] {
+    @apply sm:flex-nowrap sm:whitespace-nowrap;
+  }
+
+  [data-fields-in-line] label[for] ~ :is(p, [role="alert"]),
+  [data-fields-in-line] [data-if-other] [data-name-if-other] > input[type="text"] {
+    @apply sm:w-0 sm:min-w-full;
+  }
+
   .tap-target {
     @apply inline-flex min-h-6 min-w-6 items-center;
   }

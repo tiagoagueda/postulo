@@ -153,8 +153,11 @@ def contact_details(owner) -> dict:
     somebody should ring, not for a list. Whether *Several telephone numbers* is on for
     this person makes no difference here — the document has always shown one, and the
     primary is what "one" means now.
+
+    The location is what was typed, or the town and country of the primary postal address
+    when nothing was (#309): `postal.printed_location`, which every reader asks.
     """
-    from postulo.core import phone_numbers, web_links
+    from postulo.core import phone_numbers, postal, web_links
 
     profile = getattr(owner, "profile", None)
     primary = phone_numbers.primary_for(profile) if profile is not None else None
@@ -172,7 +175,7 @@ def contact_details(owner) -> dict:
         "email": owner.email,
         "headline": getattr(profile, "headline", ""),
         "phone": primary.number if primary else "",
-        "location": getattr(profile, "location", ""),
+        "location": postal.printed_location(profile),
         "website": link(web_links.Kind.WEBSITE),
         "linkedin_url": link(web_links.Kind.SOCIAL),
         "source_repo_url": link(web_links.Kind.REPOSITORY),

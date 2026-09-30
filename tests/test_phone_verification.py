@@ -305,8 +305,12 @@ def test_the_format_version_moved(user):
     and what was switched off in it, on the profile (#299); 23 added a listing's history
     under its posting, each entry naming who it came from and what it points at (#270); 24
     added the ESCO skill a skill's name matches, beside the name itself (#266); 25 added the
-    places a person's corrections showed a field to be on a site (#267).
+    places a person's corrections showed a field to be on a site (#267); 26 added the form
+    of address and the pronouns on the profile (#309).
+
+    At least rather than exactly: two branches each adding to the archive take a number
+    each, and whichever lands second renumbers.
     """
     from postulo.core import export
 
-    assert export.FORMAT_VERSION == 25
+    assert export.FORMAT_VERSION >= 26

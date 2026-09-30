@@ -86,10 +86,61 @@
 
       <div class="card mb-4" id="section-name">
         <c-section-title>{% translate "Your name" %}</c-section-title>
-        <div class="grid gap-x-4 sm:grid-cols-2">
-          <c-field :field="form.first_name" />
-          <c-field :field="form.last_name" />
+        {% comment %} In reading order: the form of address, which is written before a name,
+           the name, and the pronouns, which are written apart from it (#309). One line
+           where there is room, and wrapping where there is not, so on a phone each is a
+           line of its own. Each menu has a box for Other after it, which the stylesheet
+           shows only while Other is chosen (`data-if-other`, the rule #284 made for a
+           kind's name): with scripts off exactly as with them on.
+
+           No width is written on a menu: it is as wide as its longest option, so "Not
+           stated" is whole in every language rather than cut at 128 pixels. The two names
+           are one item of the line, so what wraps is a part and never half a name.
+           `data-fields-in-line` (app.css) keeps each label to one line from 640 pixels up
+           and stops an error from widening its field, and the lines are `items-start`:
+           with labels all one line tall, every control on a line starts at the same
+           height whatever is written under any of them. {% endcomment %}
+        <div class="flex flex-wrap items-start gap-x-4" data-fields-in-line>
+          <div class="flex w-full flex-wrap items-start gap-x-4 sm:w-auto sm:max-w-full" data-if-other data-form-of-address>
+            <div class="field mb-4 w-full sm:w-auto sm:max-w-full"{% if form.form_of_address.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.form_of_address.id_for_label }}">{{ form.form_of_address.label }}</label>
+              {{ form.form_of_address }}
+              <c-field-feedback :field="form.form_of_address" />
+            </div>
+            <div class="field mb-4 w-full sm:w-auto sm:min-w-36 sm:max-w-full" data-name-if-other{% if form.form_of_address_other.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.form_of_address_other.id_for_label }}">{{ form.form_of_address_other.label }}</label>
+              {{ form.form_of_address_other }}
+              <c-field-feedback :field="form.form_of_address_other" />
+            </div>
+          </div>
+          <div class="flex w-full flex-wrap items-start gap-x-4 sm:w-auto sm:flex-[1_1_19rem]" data-names>
+            <div class="min-w-0 flex-1 basis-full sm:min-w-auto sm:basis-36"><c-field :field="form.first_name" /></div>
+            <div class="min-w-0 flex-1 basis-full sm:min-w-auto sm:basis-36"><c-field :field="form.last_name" /></div>
+          </div>
+          <div class="flex w-full flex-wrap items-start gap-x-4 sm:w-auto sm:max-w-full" data-if-other data-pronouns>
+            <div class="field mb-4 w-full sm:w-auto sm:max-w-full"{% if form.pronouns.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.pronouns.id_for_label }}">{{ form.pronouns.label }}</label>
+              {{ form.pronouns }}
+              <c-field-feedback :field="form.pronouns" />
+            </div>
+            <div class="field mb-4 w-full sm:w-auto sm:min-w-36 sm:max-w-full" data-name-if-other{% if form.pronouns_other.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.pronouns_other.id_for_label }}">{{ form.pronouns_other.label }}</label>
+              {{ form.pronouns_other }}
+              <c-field-feedback :field="form.pronouns_other" />
+            </div>
+          </div>
         </div>
+        {% comment %} The id is `ADDRESSING_HELP_ID` in accounts/forms.py: both menus are
+           described by this sentence. {% endcomment %}
+        <p class="text-sm text-ink-500 dark:text-ink-400" id="name-addressing-help">
+          {% blocktranslate trimmed %}
+            A form of address is written before your name, and your pronouns say how to
+            refer to you. Both are optional, and nothing is assumed when they are blank. The
+            lists are the ones in use in the language of your career record; choose
+            <em>Other…</em> to write your own. Neither is printed on your CVs or letters for
+            now.
+          {% endblocktranslate %}
+        </p>
       </div>
 
       <div class="card mb-6" id="section-contact">

@@ -297,7 +297,7 @@ CONTACT_BLOCKS: dict[str, tuple[str, ...]] = {
 }
 IDENTIFIER_FIELDS = ("scheme", "value", "label")
 TRANSLATION_FIELDS = ("section", "ref", "language", "field", "text")
-#: The two that live on the account and the three that live on the profile.
+#: The two that live on the account and the ones that live on the profile.
 NAME_FIELDS = ("first_name", "last_name")
 DETAIL_FIELDS = (*NAME_FIELDS, *export.CANDIDATE_PROFILE_FIELDS)
 
