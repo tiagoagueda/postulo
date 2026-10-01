@@ -805,6 +805,13 @@ LOGGING = {
         # as replace it. Measured on a real export, not guessed at.
         "fontTools": {"level": "WARNING"},
         "weasyprint": {"level": "WARNING"},
+        # httpx reports every request at INFO with the whole address in it, and those
+        # addresses are other people's: the posting somebody captured, a path on their own
+        # server, a webhook receiver whose address is the only secret it has. Staff read
+        # this log and a collector is handed it, so the line is never written (#548).
+        # httpcore says as much at DEBUG.
+        "httpx": {"level": "WARNING"},
+        "httpcore": {"level": "WARNING"},
     },
     "root": {
         "handlers": ["console", "file"] if POSTULO_LOG_DIR else ["console"],

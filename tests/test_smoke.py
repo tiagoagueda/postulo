@@ -84,3 +84,13 @@ def test_the_pdf_renderer_does_not_bury_the_log(settings, noisy):
     has ever run. A log that is 99% font internals is not a log.
     """
     assert settings.LOGGING["loggers"][noisy]["level"] == "WARNING"
+
+
+@pytest.mark.parametrize("telling", ["httpx", "httpcore"])
+def test_the_http_client_does_not_write_addresses_into_the_log(settings, telling):
+    """httpx logs each request's full address at INFO, and httpcore more at DEBUG (#548).
+
+    Held at WARNING whatever `POSTULO_LOG_LEVEL` says: turning the level down to chase a
+    fault must not start recording where everybody's webhooks point.
+    """
+    assert settings.LOGGING["loggers"][telling]["level"] == "WARNING"

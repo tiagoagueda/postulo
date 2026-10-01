@@ -267,3 +267,36 @@ def test_what_a_logger_writes_is_readable_from_the_page(client, admin_user, sett
 
     assert "the store refused it" in html
     assert "paperless" in html, "and the extra it carried"
+
+
+# ------------------------------------------------- what the log must not hold
+
+
+def test_an_outbound_request_leaves_no_address_in_the_log(caplog, monkeypatch, settings):
+    """httpx reports every request at INFO, with the whole address in it (#548).
+
+    Those addresses are other people's: the posting somebody captured, a path on their own
+    server, a webhook receiver whose address is the only secret it has. Staff read this log
+    from Server settings and a collector is handed it, so the line must never be written.
+    """
+    import ipaddress
+
+    import httpx
+
+    from postulo.plugins import http
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    monkeypatch.setattr(
+        http, "public_addresses_for", lambda url: [ipaddress.ip_address("93.184.216.34")]
+    )
+    transport = httpx.MockTransport(lambda request: httpx.Response(200))
+
+    with caplog.at_level(logging.INFO), http.client(transport=transport) as client:
+        client.post("https://ha.example/api/webhook/SECRETID?x=1")
+
+    told = [
+        record.getMessage()
+        for record in caplog.records
+        if record.levelno <= logging.INFO and "SECRETID" in record.getMessage()
+    ]
+    assert told == [], "the path of an outbound request reached the log"
