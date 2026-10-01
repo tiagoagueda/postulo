@@ -183,6 +183,37 @@
           </select>
         </div>
       </div>
+      {% comment %} Two controls in one group (#304): a country and a number. The group has a
+         name, each control inside it has its own, and it wraps where there is no room.
+
+         Drawn as a telephone row draws it (`.phone-row`, #213): what it is first, then the
+         value. On a wide screen the kind sits on one line with the group; choose *Other*
+         and the name appears beside the kind and the group takes the line under them,
+         with no script. {% endcomment %}
+      <div class="phone-row grid gap-3 sm:items-start" data-if-other>
+        <div class="field">
+          <label for="design-phone-kind">{% translate "Kind" %}</label>
+          <select id="design-phone-kind">
+            <option value="mobile">{% translate "Mobile" %}</option>
+            <option value="other">{% translate "Other" %}</option>
+          </select>
+        </div>
+        <div class="field" data-name-if-other>
+          <label for="design-phone-name">{% translate "Name" %}</label>
+          <input type="text" id="design-phone-name">
+        </div>
+        <div class="field" data-phone-line>
+          <label for="design-phone">{% translate "A country and a number in one group" %}</label>
+          <div class="input-group" role="group" aria-label="{% translate 'Telephone number' %}" data-phone-field>
+            <span data-phone-flag>{% flag "PT" %}</span>
+            <select id="design-phone-country" aria-label="{% translate 'Country the number is in' %}" data-phone-country>
+              <option value="PT" data-flag="{% flag_url 'PT' %}">+351 Portugal</option>
+              <option value="FR" data-flag="{% flag_url 'FR' %}">+33 France</option>
+            </select>
+            <input type="text" id="design-phone" value="912 345 678" inputmode="tel">
+          </div>
+        </div>
+      </div>
       <div class="field" data-orientation="horizontal">
         <input type="checkbox" id="design-checkbox" checked>
         <section>

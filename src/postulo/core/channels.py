@@ -13,14 +13,14 @@ So: one protocol, three answers to it, and a place to ask.
 address, does this parse as E.164. *Plausible* — is this dialling range assigned, does this
 domain have an MX record. *Real* — does anybody answer.
 
-`plausible` is refused, deliberately and again. `phones.py` refused it because it needs the
-numbering plan of every country, a multi-megabyte library and a constant stream of updates,
-and the argument it gave was that Postulo is never going to dial anything. Half of that
-argument expires the moment a number is a channel Postulo sends a code to — but only half.
-The cost is unchanged, and the thing that actually proves a number is *sending to it and
-being told the code back*, which is the `real` depth and is free. A library that says a range
-is assigned would sit between a value somebody typed and a check that settles the question
-anyway. Refusing it here is a decision rather than an inheritance.
+`plausible` is not what a channel checks, and that is a decision rather than an inheritance.
+`phones.py` used to refuse it as well, because it needs the numbering plan of every country;
+it carries the plans now (#304), and a number somebody types is read against its country's
+before it is stored. That is the field's check, made once, where the number arrives. A
+channel is asked a different question -- may a code be sent here, and did it come back -- and
+the thing that proves a number is *sending to it and being told the code back*, which is the
+`real` depth. A second reading of the plan here would sit between a value already read and a
+check that settles the question anyway.
 
 **Validated but not confirmable is a legitimate answer, not a missing feature.** A postal
 address can only be proved by posting something to it. Some services do that; this one is not
@@ -55,7 +55,7 @@ from django.utils.translation import gettext_lazy as _
 #: The shape is right: it parses, it has the parts an address or a number has.
 SYNTACTIC = "syntactic"
 #: The value refers to something that exists: an assigned range, a domain with an MX
-#: record. Postulo does not do this; see the module docstring for why, twice.
+#: record. No channel checks this; see the module docstring for where it is checked.
 PLAUSIBLE = "plausible"
 #: Somebody answered. This is what a confirmation establishes, and nothing else does.
 REAL = "real"
@@ -232,11 +232,12 @@ class TelephoneChannel:
     dialling code that is assigned to somewhere, and holds between four and fifteen digits
     because E.164 says fifteen and nothing real is shorter than four.
 
-    **A number that fails this is still kept.** `phones.py` means what it says — refusing to
-    save an unparseable number would be the worst possible outcome, because the number a
-    recruiter dictated badly is still the only number anybody has. This reports; whether a
-    caller refuses is the caller's business, and the one caller that will refuse is the one
-    asking whether this number may be a way back into an account (#142).
+    **A number that fails this may still be one that is kept.** What a field refuses is
+    `phones.check`'s to say (#304): a number its country's plan calls impossible. A number
+    the plan cannot place -- one with no country in front, a short number, words -- is kept
+    as it was typed, and fails here. This reports; whether a caller refuses is the caller's
+    business, and the one caller that will refuse is the one asking whether this number may
+    be a way back into an account (#142).
     """
 
     name = TELEPHONE

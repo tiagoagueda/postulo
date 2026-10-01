@@ -806,7 +806,16 @@ class _Planner:
 
     def _numbers(self) -> Section:
         section = Section("phone_numbers", gettext_lazy("Telephone numbers"))
-        mine = {self._number_key(row.number) for row in self._mine("phone_numbers")}
+        # What the account holds, by the key a file's row is compared on -- and by the key
+        # of the same number as the file will carry it. A row here may be spelt as the plan
+        # would not spell it (`+330612345678`, from an import before #304), and the file's
+        # row is read through `combine`, which corrects the spelling. Compared only as it
+        # is stored, the account's own number came back as one to add.
+        mine = {
+            self._number_key(spelling)
+            for row in self._mine("phone_numbers")
+            for spelling in (row.number, phones.combine(row.number, ""))
+        }
         seen: set[str] = set()
         for entry in self.held.get("phone_numbers") or []:
             if not isinstance(entry, dict):
@@ -821,6 +830,9 @@ class _Planner:
                 continue
             # What the field on the page would have stored, with no country chosen beside
             # it: the international form where the number has one, and as typed otherwise.
+            # The page would go on to refuse a number its country's plan calls impossible
+            # (#304); a file is not refused for one. It is added as the file has it, the
+            # row here says what the plan made of it, and *Your details* marks it.
             instance.number = phones.combine(form.cleaned_data["number"], "")
             row = Row(
                 label=phones.readable(instance.number),
@@ -836,6 +848,9 @@ class _Planner:
                 row.outcome = REPEATED
             else:
                 self._somebody_elses(row)
+                verdict = phones.kept(instance.number)
+                if row.outcome == ADD and not verdict.fine:
+                    row.notes.append(verdict.message)
             seen.add(key)
             section.rows.append(row)
         return section

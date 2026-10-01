@@ -29,6 +29,10 @@ pytestmark = pytest.mark.e2e
 
 MOBILE = "+351912345678"
 DESK = "+351211111111"
+#: The same two as the document prints them, grouped the way Portugal writes a number
+#: (#304). The chooser on the CV's page names a row by the stored form above.
+MOBILE_PRINTED = "+351 912 345 678"
+DESK_PRINTED = "+351 21 111 1111"
 LINKEDIN = "https://www.linkedin.com/in/alex-morgan"
 MASTODON = "https://mastodon.example/@alex"
 SITE = "https://alex.example"
@@ -93,7 +97,7 @@ def choose_and_save(page: Page, base: str, cv) -> None:
     """The whole choice, by the controls a person has: no address typed, no value set."""
     page.goto(f"{base}/documents/cvs/{cv.pk}/")
     preview = page.frame_locator("iframe[data-document-preview]").locator("body")
-    expect(preview).to_contain_text(MOBILE)
+    expect(preview).to_contain_text(MOBILE_PRINTED)
     expect(preview).to_contain_text(LINKEDIN)
 
     page.get_by_role("link", name="Settings", exact=True).click()
@@ -134,12 +138,12 @@ def choose_and_save(page: Page, base: str, cv) -> None:
     # Saving lands on the CV's own page, and the frame there is the document as chosen.
     expect(page).to_have_url(f"{base}/documents/cvs/{cv.pk}/")
     preview = page.frame_locator("iframe[data-document-preview]").locator("body")
-    expect(preview).to_contain_text(DESK)
+    expect(preview).to_contain_text(DESK_PRINTED)
     expect(preview).to_contain_text(MASTODON)
     expect(preview).to_contain_text("Alex Morgan (they/them)")
     expect(preview).to_contain_text(f"ORCID {ORCID}")
     text = preview.inner_text()
-    for gone in (MOBILE, LINKEDIN, SITE, "R-1234"):
+    for gone in (MOBILE_PRINTED, MOBILE, LINKEDIN, SITE, "R-1234"):
         assert gone not in text, gone
     # Left alone, so they follow the profile as they did.
     assert "Lisboa, Portugal" in text and "alex.morgan@example.org" in text

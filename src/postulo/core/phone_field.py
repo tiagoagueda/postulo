@@ -2,25 +2,58 @@
 
 Two controls, one value. The country is not stored: a number kept as ``+33612345678``
 already says which country it belongs to, and a second column holding ``FR`` would be a
-second place for the same fact to be wrong. It is read back from the dialling code when
-the field is next shown.
+second place for the same fact to be wrong. It is read back from the number when the field
+is next shown.
 
 The country defaults to the one the person's own language suggests, which is right far
 more often than any other guess and costs one click when it is not.
+
+**The field is where a number is checked** (#304), so that the rows on a page, the one box
+that stands in for them and anything else built on it all refuse the same numbers in the
+same words. What it refuses and what it keeps is `phones.check`'s to say. What is the
+field's own is the rule about a number that is already stored: it comes back exactly as
+it is kept unless somebody changed it, unchecked and unrewritten, and is checked the
+moment they do. The widget draws the mark such a number wears until then.
 """
 
 from __future__ import annotations
 
 from django import forms
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
 from . import phones
 
+#: What every telephone field says under itself: the rows, and the one box that stands in
+#: for them on *Your details* and on a contact. One sentence in one place, because it was
+#: three, in two wordings, and all of them went on saying that a number starting with a
+#: plus is taken "as it is" after #304 made that untrue: it is read against its country's
+#: plan like any other, and what the plus changes is that the chooser is not asked.
+HELP = _(
+    "Kept in the international form, so it can be dialled from anywhere. A number that "
+    "starts with + says its own country, and the chooser beside it is ignored."
+)
+
 
 class PhoneWidget(forms.MultiWidget):
-    """A country beside a box for the rest of the number."""
+    """A country beside a box for the rest of the number, drawn as one group."""
 
     template_name = "partials/phone_widget.html"
+
+    #: A `MultiWidget` says it is a fieldset, and Django then leaves `aria-describedby` for
+    #: a `<fieldset>` it expects somebody to draw. Nothing draws one: the visible label
+    #: points at the number box, so the box is what the help and the errors describe, and
+    #: saying so here is what makes Django work the attribute out (#416).
+    use_fieldset = False
+
+    #: The number the field already holds, where it holds one: `PhoneField` hands it over.
+    #: The mark under the group is about this value and is drawn only while the group still
+    #: shows it.
+    stored = ""
+
+    #: Whether the form this sits on has a notes box, which is where a refusal sends an
+    #: extension or the words beside a number. `PhoneField` hands it over.
+    has_notes = False
 
     def __init__(self, attrs=None, default_country: str = ""):
         self.default_country = default_country
@@ -51,17 +84,60 @@ class PhoneWidget(forms.MultiWidget):
         )
 
     def get_context(self, name, value, attrs):
-        """Hand the template the chosen country, so the flag beside the select is drawn
-        on the server.
+        """Hand the template the chosen country, what describes the box, and the mark.
 
-        The script keeps it in step afterwards, but it must be right before any script
-        runs and right when none does: with JavaScript off the field still shows the flag
-        of the country it loaded with, which is the true answer until the form is saved.
+        The country is for the flag, which is drawn on the server: the script keeps it in
+        step afterwards, but it must be right before any script runs and right when none
+        does. With JavaScript off the field still shows the flag of the country it loaded
+        with, which is the true answer until the form is saved.
+
+        `aria-describedby` and `aria-invalid` are what Django worked out for the field as a
+        whole. They belong on the box, which is the control the visible label points at,
+        and the template used to write neither (#416): somebody whose number was refused
+        landed on a box that said neither that it was wrong nor why.
         """
         context = super().get_context(name, value, attrs)
-        parts = value if isinstance(value, list) else self.decompress(value)
-        context["widget"]["country"] = (parts[0] if parts else "") or ""
+        widget = context["widget"]
+        parts = list(value) if isinstance(value, (list, tuple)) else self.decompress(value)
+        widget["country"] = (parts[0] if parts else "") or ""
+
+        described = [widget["attrs"].get("aria-describedby", "")]
+        mark = self.mark(parts)
+        if mark is not None and widget["attrs"].get("id"):
+            widget["mark"] = mark
+            widget["mark_says"] = self.said(mark)
+            widget["mark_id"] = f"{widget['attrs']['id']}_kept"
+            described.append(widget["mark_id"])
+        widget["described_by"] = " ".join(part for part in described if part)
+        widget["invalid"] = widget["attrs"].get("aria-invalid", "")
         return context
+
+    def mark(self, parts) -> phones.Verdict | None:
+        """What to say under the group about the number already stored, if anything.
+
+        Only while the group still shows that number. Once somebody has typed another, the
+        mark is about a number that is no longer in the box, and what they typed is answered
+        by the field's own errors.
+        """
+        if not self.stored or list(parts) != self.decompress(self.stored):
+            return None
+        verdict = phones.kept(self.stored)
+        return None if verdict.fine else verdict
+
+    def said(self, mark: phones.Verdict):
+        """The mark's sentence, with the number it gives kept to its own direction.
+
+        One sentence holds a telephone number: the spelling that can be dialled, of a
+        number stored another way. A number is written left to right in every language,
+        and inside a right-to-left sentence its groups are otherwise laid out last group
+        first, so it is isolated in markup. The sentence itself is text and is escaped.
+        """
+        sentence = mark.sentence(notes=self.has_notes)
+        number = phones.readable(mark.dialled) if mark.dialled else ""
+        if not number or number not in sentence:
+            return sentence
+        before, _number, after = sentence.partition(number)
+        return format_html('{}<bdi dir="ltr">{}</bdi>{}', before, number, after)
 
     def id_for_label(self, id_):
         """Point the visible label at the number box.
@@ -75,17 +151,15 @@ class PhoneWidget(forms.MultiWidget):
     def decompress(self, value):
         """Split a stored number back into the country and the rest.
 
-        A number that was never in international form has no country to show, so the
-        chooser falls back to the person's own and the number is shown exactly as it was
-        stored. Nothing is silently rewritten on the way to the screen.
+        `phones.split` promises that typing the two back gives the stored number exactly,
+        which is what lets the field tell an untouched number from a changed one. A value
+        that was never in international form has no country to show, and the chooser is
+        left empty for it: nothing is rewritten on the way to the screen, and nothing is
+        suggested about a number nobody said the country of.
         """
         if not value:
             return [self.default_country, ""]
-        found = phones.country_of(value)
-        if found is None:
-            return [self.default_country, value]
-        rest = value.lstrip("+")[len(found.dialling) :]
-        return [found.code, rest]
+        return list(phones.split(value))
 
 
 class PhoneField(forms.MultiValueField):
@@ -93,8 +167,9 @@ class PhoneField(forms.MultiValueField):
 
     widget = PhoneWidget
 
-    def __init__(self, *, default_country: str = "", **kwargs):
+    def __init__(self, *, default_country: str = "", has_notes: bool = False, **kwargs):
         kwargs.setdefault("require_all_fields", False)
+        kwargs.setdefault("help_text", HELP)
         fields = (
             forms.ChoiceField(
                 choices=[("", "")] + [(row[0], row[0]) for row in phones.COUNTRIES],
@@ -103,10 +178,48 @@ class PhoneField(forms.MultiValueField):
             forms.CharField(max_length=40, required=False, strip=True),
         )
         super().__init__(fields=fields, **kwargs)
+        self.has_notes = has_notes
         self.widget.default_country = default_country
+        self.widget.has_notes = has_notes
+        # Whatever `initial` was passed in was set before the widget existed.
+        self.initial = self.initial
+
+    @property
+    def initial(self):
+        return self._initial
+
+    @initial.setter
+    def initial(self, value) -> None:
+        """The number already stored, which the widget needs as well as the field.
+
+        A form says what a field starts with by setting this, and for a telephone field
+        that value is the stored number: the one that must come back untouched, and the
+        one the mark under the group is about. Setting it in one place keeps the two from
+        ever being told different things.
+        """
+        self._initial = value
+        widget = getattr(self, "widget", None)
+        if isinstance(widget, PhoneWidget):
+            widget.stored = value if isinstance(value, str) else ""
+
+    def clean(self, value):
+        """The stored number exactly as it is kept, unless somebody changed it.
+
+        A number recorded before the numbering plans were asked (#304) may be one they call
+        impossible, or one that was never given a country. Saving the page it sits on is
+        not a decision about it: it is neither refused nor rewritten, and the page marks
+        it. Changing it is, and from then on it is checked like any other.
+        """
+        stored = self.initial if isinstance(self.initial, str) else ""
+        if stored and not self.has_changed(stored, value):
+            return stored
+        return super().clean(value)
 
     def compress(self, values) -> str:
         if not values:
             return ""
         country, number = [*values, "", ""][:2]
+        verdict = phones.check(number or "", country or "")
+        if verdict.impossible:
+            raise forms.ValidationError(verdict.sentence(notes=self.has_notes), code=verdict.reason)
         return phones.combine(number or "", country or "")

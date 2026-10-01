@@ -163,10 +163,15 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     difference to the default — the document has always shown one, and the primary is what
     "one" means.
 
+    It is printed grouped the way its own country writes it (#304), from the stored
+    international form: `+33 6 12 34 56 78`, not thirteen characters in a row.
+
     The location is what was typed, or the town and country of the primary postal address
     when nothing was (#309): `postal.printed_location`, which every reader asks, and only
     ever that line.
     """
+    from postulo.core import phones
+
     from . import printing
 
     profile = getattr(owner, "profile", None)
@@ -175,7 +180,7 @@ def contact_details(owner, cv: CV | None = None) -> dict:
         "name": owner.get_full_name() or owner.display_name,
         "email": printed.email,
         "headline": getattr(profile, "headline", ""),
-        "phone": printed.phone,
+        "phone": phones.readable(printed.phone),
         "location": printed.location,
         # One link of each kind, under the names the themes have always read -- a theme
         # somebody wrote against the three columns keeps working (#189).

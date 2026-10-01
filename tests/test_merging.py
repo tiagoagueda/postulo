@@ -863,7 +863,7 @@ def test_the_contacts_page_shows_what_would_move(client, user, cave, twin):
     moves = page[page.index("data-merge-moves") : page.index("data-merge-fills")]
     for line in (
         "Telephone numbers",
-        "+351912345678",
+        "+351 912 345 678",
         "Postal addresses",
         "Lisboa",
         "Web links",

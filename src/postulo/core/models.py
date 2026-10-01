@@ -283,10 +283,11 @@ class PhoneNumber(OwnedModel):
     is no way to enforce the rule without saying so, which is why the message says it in
     those words instead of pretending the collision was something else.
 
-    Only a number that reached international form takes part. A number nobody could parse
-    is kept exactly as typed — ``phones.py`` means that — and has no comparable form, so
-    it sits outside the constraint rather than colliding with the first number that shares
-    its digits.
+    Only a number that reached international form takes part. A number the numbering
+    plans cannot place -- a short number, words, a national number from before a country
+    was asked for -- is kept exactly as typed (``phones.py``, #304) and has no comparable
+    form, so it sits outside the constraint rather than colliding with the first number
+    that shares its digits.
     """
 
     class Kind(models.TextChoices):
@@ -500,9 +501,10 @@ class PostalAddress(OwnedModel):
 
     **Valid cannot mean verified.** Deciding whether an address exists needs a per-country
     reference database or a paid lookup service -- a network dependency, a cost, and a
-    stream of updates. `phones.py` refuses the equivalent for telephone numbers and says
-    why: Postulo has no use for the answer, because it is not going to dial anything. Nor is
-    it going to post anything. Valid here means well-formed enough to be used.
+    stream of updates. Telephone numbers have the equivalent in one small library, the
+    numbering plans, and `phones.py` reads them (#304); nothing of that size holds the
+    world's streets, and Postulo is not going to post anything. Valid here means
+    well-formed enough to be used.
 
     That is still true now that a form refuses some of what is typed (#306), and it is why
     so little is refused. Where the *Address rules by country* plugin knows a country, the

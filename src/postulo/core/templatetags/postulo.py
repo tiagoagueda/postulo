@@ -292,6 +292,10 @@ def phone_link(number: str) -> str:
 
     Half of these calls happen on a phone, where a number that is only text has to be
     copied out by hand. The `tel:` form is the digits; the visible form is grouped.
+
+    Written left to right whatever the page is (#304). Each group of digits is a number to
+    the bidirectional algorithm, and a right-to-left line lays numbers out from the right:
+    `+33 6 98 76 54 32` drew as `32 54 76 98 6 33+` in Arabic and Hebrew.
     """
     from postulo.core import phones
 
@@ -302,7 +306,7 @@ def phone_link(number: str) -> str:
     if not dialled:
         return escape(number)
     return format_html(
-        '<a href="tel:{}" class="text-brand-600 underline dark:text-brand-400">{}</a>',
+        '<a href="tel:{}" dir="ltr" class="text-brand-600 underline dark:text-brand-400">{}</a>',
         dialled,
         phones.readable(number),
     )

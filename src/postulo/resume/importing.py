@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext as _
 
 from postulo.accounts import identifiers
-from postulo.core import languages, phone_numbers, web_links
+from postulo.core import languages, phone_numbers, phones, web_links
 
 
 @dataclass
@@ -167,7 +167,14 @@ def apply(owner, record: Record) -> Report:
         # filled in only where there is nothing there, so an import never overwrites what
         # somebody typed. A number this instance already holds is left alone rather than
         # failing the whole import over one field of a CV.
-        number = (record.person.get("phone") or "").strip()[:40]
+        #
+        # Read against its country's numbering plan on the way in (#304), as the field on
+        # the page reads one: a file that wrote the national form after the dialling code
+        # -- `+44` and then `07911 123456` -- is kept as the number that can be dialled,
+        # and Italy's zero stays where Italy puts it. A number the plan calls impossible is
+        # not a reason to refuse a CV: it is kept as the file has it, and *Your details*
+        # marks it.
+        number = phones.combine((record.person.get("phone") or "").strip(), "")[:40]
         wrote_number = False
         if (
             number

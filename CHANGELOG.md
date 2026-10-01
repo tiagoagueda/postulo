@@ -37,6 +37,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A telephone number is checked against its country's numbering plan: an impossible one is refused, saying why, an unplaceable one kept with a warning, and all are grouped their country's way. **API: a contact's national number needs `+` or the new `phone_country`, else 422, and comes back in international form.** (#304)
 - A postal address answers to its country before it is kept: a postcode in a form it never uses, or a required part left empty, is refused beside it; postcode spacing is put right; a town and a country alone are kept. Rows read kind first, in country order. **Addresses already kept stay, marked, until changed.** (#306)
 - The filters above the *Applications* table are in its column headers: status, outcome and *Gone quiet* under *Status*, the tag under *Tags* or *Role*; with that column hidden they are under *Narrow*. Addresses and saved views mean what they did, and the board keeps its form. (#314)
 - A social profile or a code repository is on a service (LinkedIn, Mastodon, GitHub, a Forgejo instance) or *Other*: chosen first in its row, with an icon, and the address is checked against it. *Name* is asked only for *Other*. The archive and the API carry the service, and a plugin can add more. (#305)
@@ -163,6 +164,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The telephone box tells a screen reader that its number was refused and why, and is described by its help: it carries the `aria-invalid` and `aria-describedby` every other field has. (#416)
 - On *Your details*, the box for the state of a postal address reads *Bundesstaat* in German and *Πολιτεία* in Greek, not the word for a status, and so in 28 more languages: the address rules' own translation of *State* is the one drawn. (#651)
 - On *Your details*, changing one postal address into another that is removed or changed in the same save no longer answers with a server error, and an address one of your contacts already holds is refused on its row, with the reason, instead of by the database. (#458)
 - With *Address rules by country* switched off for you, or for everybody, the address rows on *Your details* keep their neutral names and say nothing about a country; the switch had no effect on that page. (#635)

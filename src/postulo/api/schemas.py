@@ -19,6 +19,7 @@ from ninja import Field, Schema
 from pydantic import AfterValidator, BeforeValidator
 
 from postulo.accounts.models import Profile, User
+from postulo.core import phones
 from postulo.core.addresses import web_address
 from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
@@ -98,10 +99,26 @@ class CompanyOut(Schema):
     updated_at: dt.datetime
 
 
+def _a_country(value: str) -> str:
+    """An ISO 3166-1 alpha-2 code the telephone table knows, in capitals; or nothing."""
+    code = (value or "").strip().upper()
+    if code and code not in phones.BY_CODE:
+        raise ValueError(f"{value!r} is not an ISO 3166-1 alpha-2 country code")
+    return code
+
+
+#: The country a national telephone number is in (#304).
+PhoneCountry = Annotated[str, AfterValidator(_a_country)]
+
+
 class PhoneNumberOut(Schema):
     kind: str = ""
     label: str = ""
+    #: As it is stored: the international form, digits and nothing else, where it has one.
     number: str
+    #: The same number grouped the way its own country writes it, for showing to somebody
+    #: (#304). Read-only: it is drawn from `number` and is never what a client sends.
+    formatted: str = ""
     is_primary: bool = False
 
 
@@ -204,7 +221,30 @@ class ContactIn(Schema):
     name: str = Field(max_length=200)
     role: str = Field(default="", max_length=200)
     email: str = Field(default="", max_length=254)
-    phone: str = Field(default="", max_length=40)
+    #: Checked against its country's numbering plan (#304), as the field on the page is.
+    phone: str = Field(
+        default="",
+        max_length=40,
+        description=(
+            "The contact's telephone number: in the international form, starting with `+`, "
+            "or the way it is written in its own country with that country in "
+            "`phone_country`. It is checked against the country's numbering plan. A number "
+            "that cannot exist there is a 422 saying why, and so is a national number sent "
+            "with neither a `+` nor `phone_country`. An accepted number is stored, and "
+            "returned, in the international form (`+33612345678`), not as it was sent; one "
+            "of a country's short numbers has no such form and is kept as it was sent."
+        ),
+    )
+    #: The chooser beside the box, for a client: which country a national number is in.
+    phone_country: PhoneCountry = Field(
+        default="",
+        max_length=2,
+        description=(
+            "The country `phone` is in, as an ISO 3166-1 alpha-2 code (`FR`), for a number "
+            "written the national way. Ignored when `phone` starts with `+` or `00`, which "
+            "say their own country. A code that is not a country is a 422."
+        ),
+    )
     #: Saved as the contact's primary social profile (#189), and drawn as a link on the
     #: company's page, so it is checked like every other address that is (#218).
     linkedin_url: WebAddress = Field(default="", max_length=500)
@@ -1143,6 +1183,7 @@ def contact_out(contact) -> dict:
                 "kind": row.kind,
                 "label": row.label,
                 "number": row.number,
+                "formatted": phones.readable(row.number),
                 "is_primary": row.is_primary,
             }
             for row in contact.phone_numbers.all()

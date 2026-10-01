@@ -46,7 +46,7 @@
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
         {% endif %}
         <p class="details">
-          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span>{{ part }}</span>{% endfor %}
+          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span{% if part == contact.phone %} dir="ltr"{% endif %}>{{ part }}</span>{% endfor %}
         </p>
       </header>
     {% elif cv.headline %}

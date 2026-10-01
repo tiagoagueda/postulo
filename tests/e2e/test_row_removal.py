@@ -127,7 +127,7 @@ def test_a_row_goes_by_keyboard_alone_and_focus_moves_to_the_next_row(
     block = page.locator("#section-phones")
     expect(block.locator("[data-removed-said]")).to_have_text(removed("+351 912 345 671"))
     third = block.locator("li:not([hidden])").nth(1)
-    expect(third.locator("input[name$='-number_1']")).to_have_value("912345672")
+    expect(third.locator("input[name$='-number_1']")).to_have_value("912 345 672")
     first_control = third.locator("input:not([type=hidden]), select").first
     expect(first_control).to_be_focused()
     count = page.locator('[data-section-link="section-phones"] .badge')
@@ -169,7 +169,7 @@ def test_removing_the_primary_moves_the_star(page: Page, live_server, details):
 
     expect(bin_for(page, "+351 912 345 670")).to_have_count(0)
     heir = page.locator("#section-phones li:not([hidden])").first
-    expect(heir.locator("input[name$='-number_1']")).to_have_value("912345671")
+    expect(heir.locator("input[name$='-number_1']")).to_have_value("912 345 671")
     expect(heir.locator("input[name='phone_numbers-primary']")).to_be_checked()
 
 

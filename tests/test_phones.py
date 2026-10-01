@@ -101,7 +101,8 @@ def test_the_trunk_prefix_goes_and_nothing_else_does():
 
 
 def test_something_unparseable_is_kept_exactly_as_it_was_typed():
-    """Refusing to save a number nobody can parse would be the worst outcome available."""
+    """What nobody can read is still the only thing anybody has, so it is kept (#304 kept
+    this half of the old rule and gave the other half to the numbering plans)."""
     assert phones.combine("ask reception", "PT") == "ask reception"
     assert phones.combine("06 12 34 56 78", "") == "06 12 34 56 78", "no country chosen"
     assert phones.combine("", "PT") == ""
@@ -124,8 +125,8 @@ def test_a_longer_dialling_code_wins_over_a_shorter_one():
 
 
 def test_a_number_is_shown_grouped_and_dialled_as_digits():
-    assert phones.readable("+33612345678") == "+33 612 345 678"
-    assert phones.as_dialled("+33 612 345 678") == "+33612345678"
+    assert phones.readable("+33612345678") == "+33 6 12 34 56 78", "in pairs, as France writes it"
+    assert phones.as_dialled("+33 6 12 34 56 78") == "+33612345678"
     assert phones.readable("ask reception") == "ask reception", "left alone"
 
 
@@ -185,7 +186,7 @@ def test_the_form_shows_a_stored_number_split_back_into_its_parts(client, user):
     html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
 
     assert re.search(r'<option value="FR"[^>]* selected>', html)
-    assert 'value="612345678"' in html
+    assert 'value="6 12 34 56 78"' in html, "grouped as France groups it, after the +33 beside it"
 
 
 def test_the_country_starts_at_the_one_the_person_reads_postulo_in(client, user):
@@ -212,7 +213,7 @@ def test_a_number_is_shown_as_something_a_phone_can_ring(client, user):
     html = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
 
     assert 'href="tel:+33612345678"' in html
-    assert "+33 612 345 678" in html, "grouped, so it can be read aloud"
+    assert "+33 6 12 34 56 78" in html, "grouped, so it can be read aloud"
 
 
 def test_the_visible_label_points_at_the_number(client, user):

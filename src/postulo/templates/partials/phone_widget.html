@@ -1,40 +1,66 @@
 {% load i18n postulo %}{% comment %}
-  The country and the number, side by side. The country chooser has a name of its own
-  because a bare select in a two-part control is announced as nothing at all; the visible
-  label belongs to the field as a whole and cannot serve both.
-{% endcomment %}
-{% comment %} The select must be allowed to shrink below the width of its longest option,
-   or it takes the whole row and leaves the number box a few pixels wide -- which is both
-   unusable and a WCAG 2.2 target-size failure. `min-w-0` is what permits that; the browser
-   then clips the closed select's text, which is why the dialling code comes first.
+  The country and the number as one control: Basecoat's `input-group` holding the flag, the
+  country chooser and the box (#304). They were two boxes side by side, the chooser in a
+  group with its flag and the number in a box of its own, which read as two fields and was
+  announced as two. One group with a name is one thing to a screen reader, and inside it
+  each control still says what it is: the chooser carries a name of its own, because a
+  bare select in a two-part control is announced as nothing at all, and the visible label
+  belongs to the box, which is the control somebody is looking for.
 {% endcomment %}
 {% comment %} The flag sits beside the select rather than inside it: an <option> holds text
    and nothing else, in every browser, so no image can go in the list itself (#88). Out
    here it is arguably more use than it was in there -- visible without opening anything.
-   The two are one control, Basecoat's `input-group` (#290): the group carries the box and
-   the select inside it has none of its own, which is what an `absolute` flag over a select
-   padded to make room for it used to fake. The space is reserved whether or not a flag is
-   showing, so choosing a country moves nothing on the page.
+   The space is reserved whether or not a flag is showing, so choosing a country moves
+   nothing on the page. It comes first in the markup, which is where it is drawn, so it
+   needs no `data-align` to be put there.
 
    Each option carries its own flag's URL. That is around 11 KB of repeated attribute per
    field, which gzip takes to about two, and it is the only correct way: static files are
    served under a content hash, so there is no pattern a script could build a URL from.
 {% endcomment %}
-<div class="flex gap-2">
-  <div class="input-group w-40 shrink-0">
-    <span data-align="start" data-phone-flag>{% flag widget.country %}</span>
-    {% with widget=widget.subwidgets.0 %}
-      <select name="{{ widget.name }}" id="{{ widget.attrs.id }}" class="min-w-0"
-              aria-label="{% translate 'Country the number is in' %}" data-phone-country>
-        {% for group, options, index in widget.optgroups %}
-          {% for option in options %}<option value="{{ option.value|stringformat:'s' }}" data-flag="{% flag_url option.value %}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
-        {% endfor %}
-      </select>
-    {% endwith %}
-  </div>
-  {% with widget=widget.subwidgets.1 %}
-    <input type="text" name="{{ widget.name }}" id="{{ widget.attrs.id }}"
-           value="{{ widget.value|default_if_none:'' }}"
-           class="min-w-0 flex-1" inputmode="tel" autocomplete="tel">
+{% comment %} The group wraps (`[data-phone-field]` in the stylesheet). With room, the
+   chooser and the box share a line and the box takes what is left; without it -- a phone,
+   or a row squeezed beside something -- the box drops to a line of its own inside the same
+   border and the chooser fills the first. That is the reason the rows give for the number
+   having a line to itself, made true at any width: a chooser of fixed width beside a box
+   left the box a few pixels wide, which is unusable and a WCAG 2.2 2.5.8 failure.
+{% endcomment %}
+{% comment %} The box is written left to right in every language (`[data-phone-field]` in
+   the stylesheet). Its direction used to be the page's, and in Arabic a stored
+   `+33612345678` drew as `78 56 34 12 6`: each group a number of its own, laid out from the
+   right. The text keeps to the side the page's other boxes start at.
+{% endcomment %}
+{% comment %} What Django worked out for the field as a whole -- which paragraphs describe
+   it, and whether it is invalid -- goes on the box (#416). The template used to write a
+   name and an id on each control and drop the rest, so a refused number was announced as
+   neither wrong nor explained. The mark under the group describes the box too.
+{% endcomment %}
+<div class="input-group" role="group" aria-label="{% translate 'Telephone number' %}" data-phone-field>
+  <span data-phone-flag>{% flag widget.country %}</span>
+  {% with select=widget.subwidgets.0 %}
+    <select name="{{ select.name }}" id="{{ select.attrs.id }}"
+            aria-label="{% translate 'Country the number is in' %}" data-phone-country>
+      {% for group, options, index in select.optgroups %}
+        {% for option in options %}<option value="{{ option.value|stringformat:'s' }}" data-flag="{% flag_url option.value %}"{% if option.selected %} selected{% endif %}>{{ option.label }}</option>{% endfor %}
+      {% endfor %}
+    </select>
+  {% endwith %}
+  {% with box=widget.subwidgets.1 %}
+    <input type="text" name="{{ box.name }}" id="{{ box.attrs.id }}"
+           value="{{ box.value|default_if_none:'' }}"
+           inputmode="tel" autocomplete="tel"{% if widget.described_by %} aria-describedby="{{ widget.described_by }}"{% endif %}{% if widget.invalid %} aria-invalid="{{ widget.invalid }}"{% endif %}>
   {% endwith %}
 </div>
+{% comment %} The number already stored, where the numbering plan has something to say about
+   it. It is not an error: the number was kept before it could be checked, or is one the
+   plan cannot place, or is written with digits the plan would not use, and it stays as it
+   is until somebody changes it. Amber and a word, because the tone is never the only thing
+   said. The sentence comes from the widget, which keeps a number inside it to its own
+   direction. {% endcomment %}
+{% if widget.mark %}
+  <p id="{{ widget.mark_id }}" data-phone-mark="{{ widget.mark.state }}">
+    <span class="badge" data-tone="amber">{% if widget.mark.impossible %}{% translate "Not a possible number" %}{% elif widget.mark.miswritten %}{% translate "Not as it is dialled" %}{% else %}{% translate "Not checked" %}{% endif %}</span>
+    {{ widget.mark_says }}
+    {% if widget.mark.impossible %}{% translate "It is left as it is until you change it." %}{% endif %}
+  </p>
+{% endif %}

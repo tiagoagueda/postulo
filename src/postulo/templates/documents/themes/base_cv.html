@@ -29,6 +29,13 @@
   side of its letter. Isolated, each is read by itself and the brackets stay the line's.
   Only on a line that prints a form of address or pronouns: the name alone is written as
   it always was, so a CV that prints neither is the same bytes it was.
+
+  **The telephone number is written left to right, whatever the document is** (#304). It
+  is printed in groups, each group is a number to the bidirectional algorithm, and a
+  right-to-left line lays numbers out from the right: `+33 6 12 34 56 78` on an Arabic CV
+  read `78 56 34 12 6 33+`. Its span says its direction, which isolates it; the letter and
+  the portfolio do the same. In markup only: the plain text and the Word file carry the
+  number as it is, with no invisible character put round it.
 {% endcomment %}
 <html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
   <head>
@@ -66,7 +73,7 @@
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
         {% endif %}
         <p class="details">
-          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span>{{ part }}</span>{% endfor %}
+          {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span{% if part == contact.phone %} dir="ltr"{% endif %}>{{ part }}</span>{% endfor %}
         </p>
       </header>
     {% elif cv.headline %}

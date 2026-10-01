@@ -52,6 +52,13 @@ dependencies = [
     # external entity, the billion-laughs expansion. The allowlist walk is ours; this is
     # the part that has to hold before the walk begins.
     "defusedxml>=0.7",
+    # Every country's numbering plan (#304): which numbers can exist, where a trunk prefix
+    # is and is not part of the number, and how each country groups its digits. Google's
+    # libphonenumber metadata as pure Python, in the build without the geocoding, carrier
+    # and time-zone tables, which nothing here asks for. Apache-2.0. Only `core/phones.py`
+    # imports it. Held to the major: the metadata changes every few weeks and wants taking,
+    # the functions have not changed in years.
+    "phonenumberslite>=9.0,<10",
 ]
 
 [project.optional-dependencies]

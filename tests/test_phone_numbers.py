@@ -77,7 +77,7 @@ def test_the_number_is_kept_in_the_form_that_can_be_compared(contact, user):
 
 
 def test_a_number_nobody_could_parse_is_kept_and_compared_with_nothing(contact, user):
-    """`phones.py` means it: refusing to store an unparseable number is the worst outcome."""
+    """What the numbering plans cannot place is kept as it was typed (`phones.py`)."""
     row = add(contact, user, "ask reception")
     assert row.number == "ask reception"
     assert row.normalised == "", "so it takes part in no comparison at all"
@@ -211,13 +211,13 @@ def test_saving_the_one_box_leaves_the_hidden_numbers_alone(client, user, contac
             "email": "",
             "notes": "",
             "phone_0": "PT",
-            "phone_1": "+351999999999",
+            "phone_1": "+351933333333",
         },
     )
 
     hidden.refresh_from_db()
     assert hidden.number == "+351211111111", "untouched"
-    assert phone_numbers.primary_for(contact).number == "+351999999999", "the primary moved"
+    assert phone_numbers.primary_for(contact).number == "+351933333333", "the primary moved"
 
 
 # ------------------------------------------------------------------- everything else
@@ -237,7 +237,7 @@ def test_a_document_prints_the_primary_and_not_a_list(user):
     add(profile, user, "+351912345678", primary=True)
     add(profile, user, "+351211111111")
 
-    assert contact_details(user)["phone"] == "+351912345678"
+    assert contact_details(user)["phone"] == "+351 912 345 678", "grouped as Portugal writes it"
 
 
 def test_an_export_carries_every_number_even_the_hidden_ones(user, contact):

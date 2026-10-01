@@ -500,10 +500,6 @@ class ProfileForm(forms.ModelForm):
                 default_country=phones.default_country(
                     getattr(self.instance, "language", "") or settings.LANGUAGE_CODE
                 ),
-                help_text=_(
-                    "Kept in the international form, so it can be dialled from anywhere. A "
-                    "number that already starts with + is taken as it is."
-                ),
             )
         # And one box per kind of link whose feature is off, on the same terms (#189).
         web_links.add_single_boxes(self, getattr(self.instance, "user", None), holder=self.instance)

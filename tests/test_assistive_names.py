@@ -128,3 +128,35 @@ def test_a_relative_date_carries_the_absolute_one(client, user):
     client.force_login(user)
     html = client.get(reverse("applications:list") + "?view=board").content.decode()
     assert re.search(r'<time class="text-xs text-ink-400" datetime="\d{4}-\d\d-\d\d">', html)
+
+
+def test_the_telephone_box_says_it_is_wrong_and_what_describes_it(client, user):
+    """The telephone field wrote its two controls by hand and dropped what Django had worked
+    out for the field: a refused number landed on a box that announced neither that it was
+    invalid nor why, and was not described by its help either (#416). Drawn through
+    `<c-field>`, as the one box is while *Several telephone numbers* is off, the box names
+    the help and the error, and both are on the page under those ids."""
+    from postulo.plugins.models import PluginPolicy
+    from postulo.plugins.phone_numbers import PHONE_NUMBERS
+
+    PluginPolicy.objects.create(
+        plugin=PHONE_NUMBERS, person=user, state=PluginPolicy.State.FORCED_OFF
+    )
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {"first_name": "Alex", "last_name": "Morgan", "phone_0": "FR", "phone_1": "06 12"},
+    )
+
+    html = response.content.decode()
+    box = re.search(r'<input[^>]*name="phone_1"[^>]*>', html).group(0)
+    assert 'aria-invalid="true"' in box
+    described = re.search(r'aria-describedby="([^"]*)"', box).group(1).split()
+    assert described == ["id_phone_helptext", "id_phone_error"]
+    for name in described:
+        assert f'id="{name}"' in html, f"the box points at {name}, which is not on the page"
+    chooser = re.search(r'<select[^>]*name="phone_0"[^>]*>', html).group(0)
+    assert 'aria-label="Country the number is in"' in chooser, "the chooser keeps its own name"
+    label = re.search(r'<label for="([^"]*)">\s*Phone', html).group(1)
+    assert label == "id_phone_1", "and the visible label is the box's"

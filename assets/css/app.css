@@ -1114,8 +1114,9 @@
    * is hidden, and its grid track with it so the value takes the space, unless the row's
    * select has Other chosen -- `:has()` follows the select live, so choosing Other reveals
    * the box with no script -- or the row already holds a name (`data-has-name`), which is
-   * never hidden. Two shapes: kind, value, name, actions on the identifier rows; kind, name,
-   * actions on the telephone and postal rows.
+   * never hidden. This is the identifier rows' shape: kind, value, name, actions. The
+   * telephone, link and postal rows each have a layout of their own now and take the same
+   * rule from `data-if-other`, below (#304, #305, #306).
    */
   .name-if-other-row {
     @apply sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_auto];
@@ -1126,25 +1127,47 @@
     @apply sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)_minmax(0,10rem)_auto];
   }
 
-  .name-if-other-row-short {
-    @apply sm:grid-cols-[minmax(0,10rem)_auto];
-  }
-
-  .name-if-other-row-short:has(select option[value="other"]:checked),
-  .name-if-other-row-short[data-has-name] {
-    @apply sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)_auto];
-  }
-
-  .name-if-other-row [data-name-if-other],
-  .name-if-other-row-short [data-name-if-other] {
+  .name-if-other-row [data-name-if-other] {
     display: none;
   }
 
   .name-if-other-row:has(select option[value="other"]:checked) [data-name-if-other],
-  .name-if-other-row[data-has-name] [data-name-if-other],
-  .name-if-other-row-short:has(select option[value="other"]:checked) [data-name-if-other],
-  .name-if-other-row-short[data-has-name] [data-name-if-other] {
+  .name-if-other-row[data-has-name] [data-name-if-other] {
     display: block;
+  }
+
+  /*
+   * A telephone row (#213, #304): the kind, the name the kind *Other* asks for, and the
+   * country and the number as one group. Two columns from 640 pixels: the kind's, and
+   * what is left.
+   *
+   * The group takes both columns, a line of its own under the kind and the name -- except
+   * from 768 pixels in a row that shows no name, where it sits in the second column,
+   * beside the kind: "on a wide screen, the kind sits on one line with the value". 768 and
+   * not 640, because the kind's column and a group wide enough to keep its chooser and
+   * its box on one line are 516 pixels between them, and a row is not that wide before.
+   * With the name shown the three would want 688 pixels of a card that has 596, so that
+   * row keeps the group underneath at every width.
+   *
+   * Which row shows a name is the select's to say, as it is for the name box below: the
+   * exception is the rule with `:has()` in it, so a browser that cannot read it keeps the
+   * group on a line of its own, which is the arrangement that is right for every row.
+   *
+   * Below 640 pixels it is one column, and the column is told it may be narrower than
+   * what is in it: a select is as wide as its longest option whenever a track asks, and
+   * in a language whose kinds are long words the row was wider than a phone.
+   */
+  .phone-row {
+    @apply grid-cols-[minmax(0,1fr)] sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)];
+  }
+
+  .phone-row > [data-phone-line] {
+    @apply sm:col-span-full;
+  }
+
+  .phone-row:not([data-has-name]):not(:has(select option[value="other"]:checked))
+    > [data-phone-line] {
+    @apply md:col-auto;
   }
 
   /*

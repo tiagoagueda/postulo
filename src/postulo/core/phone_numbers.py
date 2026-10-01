@@ -307,16 +307,13 @@ class PhoneNumberForm(forms.ModelForm):
         model = PhoneNumber
         fields = ("kind", "label", "number")
 
-    def __init__(self, *args, default_country: str = "", **kwargs):
+    def __init__(self, *args, default_country: str = "", has_notes: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["number"] = phone_field.PhoneField(
             label=_("Phone"),
             required=False,
             default_country=default_country,
-            help_text=_(
-                "Kept in the international form, so it can be dialled from anywhere. A "
-                "number that already starts with + is taken as it is."
-            ),
+            has_notes=has_notes,
         )
         if self.instance and self.instance.pk:
             self.fields["number"].initial = self.instance.number
@@ -476,7 +473,10 @@ def formset_for(
         data=data,
         instance=holder,
         prefix=prefix,
-        form_kwargs={"default_country": default_country},
+        # A refusal that leaves something out of the number says where it can go
+        # instead, and only a holder with a notes box has anywhere: a contact, and not
+        # *Your details*.
+        form_kwargs={"default_country": default_country, "has_notes": hasattr(holder, "notes")},
     )
     formset.asked_by = asked_by
     # Read by the template, so the choice appears the day an operator installs a gateway

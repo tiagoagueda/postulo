@@ -111,7 +111,7 @@ def patch_company(request, pk: int, payload: CompanyPatch):
 def add_contact(request, pk: int, payload: ContactIn):
     from django.core.exceptions import ValidationError
 
-    from postulo.core import phone_numbers, web_links
+    from postulo.core import phone_numbers, phones, web_links
 
     company = _detail(request, pk)
     fields = payload.dict()
@@ -135,6 +135,18 @@ def add_contact(request, pk: int, payload: ContactIn):
     # it. A client sending a number somebody here already has is told so rather than
     # silently given a contact without one.
     number = (fields.pop("phone", "") or "").strip()
+    # Checked against its country's numbering plan as the field on the page checks it
+    # (#304), and for the same reason: a number that cannot exist is refused with why,
+    # and one the plan cannot place is kept as it came. The country is the number's own,
+    # where it starts with `+`, and `phone_country` otherwise: the chooser beside the box,
+    # for a client that holds a national number and knows where it is. With neither, a
+    # national number is refused in the words the page uses. A contact has notes, so a
+    # refusal that leaves something out says where it can go.
+    country = fields.pop("phone_country", "")
+    verdict = phones.check(number, country)
+    if verdict.impossible:
+        raise HttpError(422, verdict.sentence(notes=True))
+    number = phones.combine(number, country)
     if number and phone_numbers.taken_elsewhere(number):
         # The API is the surface a sweep would actually use, so it is bounded exactly as
         # the form is -- one limit, keyed on the account rather than on the token (#142).

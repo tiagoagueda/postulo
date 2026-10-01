@@ -35,7 +35,7 @@ from django.urls import reverse
 from postulo.accounts.models import PersonIdentifier
 from postulo.api.models import ApiToken
 from postulo.core import export as export_module
-from postulo.core import importer, phone_numbers, postal, web_links
+from postulo.core import importer, phone_numbers, phones, postal, web_links
 from postulo.core.models import PhoneNumber, PostalAddress, WebLink
 from postulo.documents import formats, printing, rendering
 from postulo.documents.forms import CVForm
@@ -46,6 +46,10 @@ pytestmark = pytest.mark.django_db
 
 MOBILE = "+351912345678"
 DESK = "+351211111111"
+#: The same two as a document prints them: grouped the way Portugal writes a number (#304).
+#: A chooser on the CV's page, the API and the archive carry the stored form above.
+MOBILE_PRINTED = "+351 912 345 678"
+DESK_PRINTED = "+351 21 111 1111"
 LINKEDIN = "https://www.linkedin.com/in/alex-morgan"
 MASTODON = "https://mastodon.example/@alex"
 FORGE = "https://codeberg.org/alex"
@@ -165,7 +169,10 @@ def handed(monkeypatch, cv) -> dict:
 def contact_details_before_308(owner) -> dict:
     """`rendering.contact_details` as it stood at the commit before this one, word for
     word. Kept here so that "nothing changes for a CV nobody opens the choice on" is
-    checked against what was printed rather than against what is printed now."""
+    checked against what was printed rather than against what is printed now.
+
+    One word is not as it was: the number is grouped the way its country writes it, which
+    is #304's change to every document and not this one's."""
     profile = getattr(owner, "profile", None)
     primary = phone_numbers.primary_for(profile) if profile is not None else None
     links = web_links.primaries_for(profile) if profile is not None else {}
@@ -179,7 +186,7 @@ def contact_details_before_308(owner) -> dict:
         "name": owner.get_full_name() or owner.display_name,
         "email": owner.email,
         "headline": getattr(profile, "headline", ""),
-        "phone": primary.number if primary else "",
+        "phone": phones.readable(primary.number) if primary else "",
         "location": postal.printed_location(profile),
         "website": link(web_links.Kind.WEBSITE),
         "linkedin_url": link(web_links.Kind.SOCIAL),
@@ -239,7 +246,7 @@ def test_a_cv_nobody_opened_the_choice_on_is_the_document_it_was_byte_for_byte(
     assert rendering.render_cv_html(cv).encode() == html.encode()
     # The text is drawn through `name_line`, which the old block does not carry.
     assert text.splitlines()[0] == "Alex Morgan"
-    assert MOBILE in html and LINKEDIN in html and FORGE in html and SITE in html
+    assert MOBILE_PRINTED in html and LINKEDIN in html and FORGE in html and SITE in html
     assert f"ORCID {ORCID}" in html and "Lisboa, Portugal" in html
     assert "Dr" not in html.split("</style>")[1] and "they/them" not in html
     assert "pronouns" not in html, "not even the rule for them is written"
@@ -278,7 +285,7 @@ def test_a_letter_prints_what_it_printed(person, monkeypatch):
         rendering, "contact_details", lambda owner, cv=None: contact_details_before_308(owner)
     )
     assert rendering.render_letter_html(letter) == html
-    assert MOBILE in html and "Lisboa, Portugal" in html
+    assert MOBILE_PRINTED in html and "Lisboa, Portugal" in html
     assert "they/them" not in html and ">Dr " not in html
 
 
@@ -309,7 +316,7 @@ def test_two_cvs_print_different_numbers_and_links_and_a_third_prints_none(perso
     bare.save()
 
     first = handed(monkeypatch, academic)
-    assert first["phone"] == DESK
+    assert first["phone"] == DESK_PRINTED
     assert first["email"] == "alex@work.example"
     assert first["linkedin_url"] == MASTODON
     assert first["source_repo_url"] == OTHER_FORGE
@@ -317,7 +324,7 @@ def test_two_cvs_print_different_numbers_and_links_and_a_third_prints_none(perso
     assert [row.value for row in first["identifiers"]] == [ORCID]
     assert first["details"] == [
         "alex@work.example",
-        DESK,
+        DESK_PRINTED,
         f"ORCID {ORCID}",
         "Lisboa, Portugal",
         SITE,
@@ -326,7 +333,7 @@ def test_two_cvs_print_different_numbers_and_links_and_a_third_prints_none(perso
     ]
 
     second = handed(monkeypatch, industry)
-    assert second["phone"] == MOBILE and second["email"] == person.email
+    assert second["phone"] == MOBILE_PRINTED and second["email"] == person.email
     assert second["linkedin_url"] == LINKEDIN and second["source_repo_url"] == FORGE
     assert [row.value for row in second["identifiers"]] == [ORCID, "R-1234"]
     assert first["phone"] != second["phone"] and first["linkedin_url"] != second["linkedin_url"]
@@ -339,11 +346,22 @@ def test_two_cvs_print_different_numbers_and_links_and_a_third_prints_none(perso
 
     # And on the page each is drawn from what it was handed, and nothing else.
     html = rendering.render_cv_html(academic)
-    assert DESK in html and MOBILE not in html
+    assert DESK_PRINTED in html and MOBILE_PRINTED not in html
     assert MASTODON in html and LINKEDIN not in html
     assert "R-1234" not in html
     html = rendering.render_cv_html(bare)
-    for printed in (MOBILE, DESK, person.email, LINKEDIN, FORGE, SITE, ORCID, "Lisboa"):
+    for printed in (
+        MOBILE_PRINTED,
+        DESK_PRINTED,
+        MOBILE,
+        DESK,
+        person.email,
+        LINKEDIN,
+        FORGE,
+        SITE,
+        ORCID,
+        "Lisboa",
+    ):
         assert printed not in html, printed
     assert "Alex Morgan" in html
 
@@ -357,38 +375,48 @@ def test_every_renderer_is_handed_the_same_chosen_details(person, client, kind):
         social=link(person, MASTODON),
         website=None,
     )
-    assert DESK in rendering.render_cv_html(cv)
+    assert DESK_PRINTED in rendering.render_cv_html(cv)
 
     client.force_login(person)
     preview = client.get(reverse("documents:cv_preview", args=[cv.pk])).content.decode()
-    assert DESK in preview and MOBILE not in preview
+    assert DESK_PRINTED in preview and MOBILE_PRINTED not in preview
     assert MASTODON in preview and SITE not in preview
 
     text = rendering.cv_text(cv)
-    assert DESK in text and MOBILE not in text and MASTODON in text and SITE not in text
+    assert (
+        DESK_PRINTED in text
+        and MOBILE_PRINTED not in text
+        and MASTODON in text
+        and SITE not in text
+    )
 
     outline = rendering.cv_outline(cv)
     written = formats.get("txt").write(outline).decode()
-    assert DESK in written and MOBILE not in written
+    assert DESK_PRINTED in written and MOBILE_PRINTED not in written
     # A Word file is a zip of markup: the same words, read out of its one document.
     with zipfile.ZipFile(io.BytesIO(formats.get("docx").write(outline))) as word:
         body = word.read("word/document.xml").decode()
-    assert DESK in body and MOBILE not in body and MASTODON in body and SITE not in body
+    assert (
+        DESK_PRINTED in body
+        and MOBILE_PRINTED not in body
+        and MASTODON in body
+        and SITE not in body
+    )
 
 
 def test_the_default_follows_the_profile_and_a_choice_pins_a_row(person):
     following = a_cv(person, "Following")
     pinned = pin(a_cv(person, "Pinned"), phone=number(person, MOBILE))
-    assert rendering.contact_details(person, following)["phone"] == MOBILE
-    assert rendering.contact_details(person, pinned)["phone"] == MOBILE
+    assert rendering.contact_details(person, following)["phone"] == MOBILE_PRINTED
+    assert rendering.contact_details(person, pinned)["phone"] == MOBILE_PRINTED
 
     # A new primary number, and neither CV is opened.
     phone_numbers.set_primary(number(person, DESK))
     web_links.set_primary(link(person, MASTODON))
 
-    assert rendering.contact_details(person, following)["phone"] == DESK
+    assert rendering.contact_details(person, following)["phone"] == DESK_PRINTED
     assert rendering.contact_details(person, following)["linkedin_url"] == MASTODON
-    assert rendering.contact_details(person, pinned)["phone"] == MOBILE, "the pin stays"
+    assert rendering.contact_details(person, pinned)["phone"] == MOBILE_PRINTED, "the pin stays"
 
 
 def test_an_identifier_added_later_is_printed_by_default_and_not_by_a_chosen_set(person):
@@ -425,7 +453,16 @@ def test_the_one_switch_still_prints_none_of_it(person, monkeypatch):
     assert handed(monkeypatch, cv) is None
     # The page itself: the file's title names its holder whatever this says, as it did.
     page = rendering.render_cv_html(cv).split("</head>")[1]
-    for printed in ("Alex Morgan", DESK, MOBILE, person.email, "they/them", "Dr"):
+    for printed in (
+        "Alex Morgan",
+        DESK_PRINTED,
+        MOBILE_PRINTED,
+        DESK,
+        MOBILE,
+        person.email,
+        "they/them",
+        "Dr",
+    ):
         assert printed not in page
     assert "Alex Morgan" not in rendering.cv_text(cv)
 
@@ -517,7 +554,10 @@ def test_a_chosen_row_deleted_from_the_profile_prints_nothing_of_its_kind(person
     the other one off the page."""
     row = GONE[key](person)
     cv = pin(a_cv(person), **{key: row})
-    assert rendering.contact_details(person, cv)[PRINTED_AS[key]] == printing.value_of(row, key)
+    printed = printing.value_of(row, key)
+    if key == "phone":
+        printed = phones.readable(printed)  # a document groups a number (#304)
+    assert rendering.contact_details(person, cv)[PRINTED_AS[key]] == printed
 
     row.delete()
     cv.refresh_from_db()
@@ -570,7 +610,7 @@ def test_a_row_that_is_no_longer_offered_is_a_row_that_has_gone(person):
 
     PluginPolicy.objects.all().delete()
     policy.forget_decisions()
-    assert rendering.contact_details(person, cv)["phone"] == DESK
+    assert rendering.contact_details(person, cv)["phone"] == DESK_PRINTED
 
 
 def test_an_address_nobody_confirmed_is_not_offered_and_one_unconfirmed_later_is_not_printed(
@@ -607,7 +647,7 @@ def test_changing_a_choice_after_sending_leaves_the_sent_version_alone(person):
     sent = rendering.snapshot_cv(cv, backend=backend)
     kept = (sent.source_text, sent.plain_text, sent.checksum, sent.file.read())
     sent.file.close()
-    assert MOBILE in sent.source_text and MOBILE in sent.plain_text
+    assert MOBILE_PRINTED in sent.source_text and MOBILE_PRINTED in sent.plain_text
 
     again = rendering.snapshot_cv(cv, backend=backend)
     assert again.pk == sent.pk and again.already_filed
@@ -622,11 +662,11 @@ def test_changing_a_choice_after_sending_leaves_the_sent_version_alone(person):
     with sent.file.open("rb") as handle:
         assert handle.read() == kept[3]
     assert sent.file_is_as_rendered()
-    assert DESK not in sent.source_text and "they/them" not in sent.plain_text
+    assert DESK_PRINTED not in sent.source_text and "they/them" not in sent.plain_text
 
     changed = rendering.snapshot_cv(cv, backend=backend)
     assert changed.pk != sent.pk and not getattr(changed, "already_filed", False)
-    assert DESK in changed.source_text and MOBILE not in changed.source_text
+    assert DESK_PRINTED in changed.source_text and MOBILE_PRINTED not in changed.source_text
     assert LINKEDIN not in changed.source_text and "(they/them)" in changed.plain_text
     assert cv.renders.count() == 2
 
@@ -742,7 +782,7 @@ def test_saving_the_page_stores_each_choice_and_the_preview_follows(person, clie
     assert (cv.show_location, cv.show_form_of_address, cv.show_pronouns) == (False, False, True)
 
     preview = client.get(reverse("documents:cv_preview", args=[cv.pk])).content.decode()
-    assert DESK in preview and MOBILE not in preview and person.email not in preview
+    assert DESK_PRINTED in preview and MOBILE_PRINTED not in preview and person.email not in preview
     assert "(<bdi>they/them</bdi>)" in preview
     assert "Lisboa" not in preview and "R-1234" not in preview
 
@@ -824,7 +864,7 @@ def test_a_save_that_touches_nothing_keeps_a_pin_on_a_number_that_is_kept_back(p
 
     PluginPolicy.objects.all().delete()
     policy.forget_decisions()
-    assert rendering.contact_details(person, CV.objects.get(pk=cv.pk))["phone"] == DESK
+    assert rendering.contact_details(person, CV.objects.get(pk=cv.pk))["phone"] == DESK_PRINTED
 
     # A deliberate change of the menu is a change, kept back or not.
     PluginPolicy.objects.create(
@@ -973,7 +1013,7 @@ def test_an_import_points_each_choice_at_the_rows_it_has_just_made(person, other
     assert (cv.show_location, cv.show_pronouns, cv.show_form_of_address) == (False, True, False)
 
     details = rendering.contact_details(other_user, cv)
-    assert details["phone"] == DESK and details["linkedin_url"] == MASTODON
+    assert details["phone"] == DESK_PRINTED and details["linkedin_url"] == MASTODON
     assert details["website"] == "" and details["source_repo_url"] == FORGE
     assert [row.value for row in details["identifiers"]] == [ORCID]
     assert details["pronouns"] == "they/them" and details["location"] == ""
@@ -990,7 +1030,7 @@ def test_an_older_archive_imports_with_every_choice_at_its_default(person, other
     round_trip(person, other_user, edit=as_the_format_before)
     cv = CV.objects.get(owner=other_user, name="Academic")
     assert printing.is_default(cv)
-    assert rendering.contact_details(other_user, cv)["phone"] == MOBILE
+    assert rendering.contact_details(other_user, cv)["phone"] == MOBILE_PRINTED
 
 
 def test_a_reference_that_cannot_be_resolved_falls_back_to_the_default(person, other_user):
@@ -1023,7 +1063,7 @@ def test_a_reference_that_cannot_be_resolved_falls_back_to_the_default(person, o
     # The number, the address, the identifiers, and the answer that is not one of the three.
     assert len(said) == 4 and all("Academic" in line for line in said)
     assert [line for line in report.skipped if "(pronouns)" in line and "yes or no" in line]
-    assert rendering.contact_details(other_user, cv)["phone"] == MOBILE
+    assert rendering.contact_details(other_user, cv)["phone"] == MOBILE_PRINTED
 
 
 #: Left out of the entry altogether, which no JSON value can say.

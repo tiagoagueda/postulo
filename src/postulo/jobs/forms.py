@@ -616,10 +616,8 @@ class ContactForm(OwnerScopedModelForm):
                 label=_("Phone"),
                 required=False,
                 default_country=phones.default_country(_language_of(self.user)),
-                help_text=_(
-                    "Kept in the international form, so you can still ring it from another "
-                    "country. A number that already starts with + is taken as it is."
-                ),
+                # A contact has notes, which is where an extension goes.
+                has_notes=True,
             )
             if self.instance and self.instance.pk:
                 primary = phone_numbers.primary_for(self.instance)

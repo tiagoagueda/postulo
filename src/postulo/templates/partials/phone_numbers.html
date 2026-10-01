@@ -15,8 +15,12 @@
    keeps its *Remove* box, and a ticked one goes when the page is saved. On either page a
    row the table no longer holds -- posted from a copy of the page that is out of date -- is
    drawn as that key too.
+
+   `min-w-0` on the fieldset: a fieldset is never narrower than the narrowest its content
+   can be, which no other box insists on, and the country and the number in one group
+   (#304) are together a little wider than a phone leaves. Let shrink, the group wraps.
 {% endcomment %}
-<fieldset class="card mb-6" data-phone-numbers id="section-phones">
+<fieldset class="card mb-6 min-w-0" data-phone-numbers id="section-phones">
   <legend class="label px-1">{% translate "Telephone numbers" %}</legend>
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
@@ -33,76 +37,90 @@
       {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
       <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
         {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
-        {% comment %} The number on its own line, and the rest under it. Squeezed into a
-           column beside two others, the country chooser (10rem, fixed) leaves the number box
-           a few pixels wide -- unusable, and a WCAG 2.2 2.5.8 target-size failure that axe
-           catches. The number is the subject of the row anyway.
+        {% comment %} What it is first, then the number (#213): the kind, the name the kind
+           *Other* asks for, then the country and the number as one group, then what is
+           done with the row. The markup is in that order, which is the reading order and
+           the tab order.
+
+           The name box only when the kind is *Other*, following the select without a
+           script (`data-if-other`, #309), and kept whatever the kind while it holds
+           something (#284). Its help and its error are inside it, so they go with it.
+
+           **On a wide screen the kind sits on one line with the number** (`.phone-row` in
+           the stylesheet): the kind in its column and the group in what is left, which is
+           what #213 asks of a row. A row that shows its name -- *Other*, or a name it
+           already holds -- has the kind and the name on that line and the group on the
+           next, at every width: the three together are wider than the card is. The
+           stylesheet follows the select, as the name box does, so it is the same with
+           scripts off. Below that width the group has a line to itself. Squeezed into a
+           column beside two others, the country chooser left the number box a few pixels
+           wide -- unusable, and a WCAG 2.2 2.5.8 target-size failure that axe catches.
         {% endcomment %}
-        <div class="field mb-3">
-          <label for="{{ row.number.id_for_label }}">{% translate "Phone" %}</label>
-          {{ row.number }}
-        </div>
-        {% comment %} The name box only when the kind is Other, following the select without a
-           script; kept whatever the kind while it holds something (#284). {% endcomment %}
-        <div class="name-if-other-row-short grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
-          <div class="field">
+        <div class="phone-row mb-3 grid gap-3 sm:items-start" data-if-other{% if row.label.value %} data-has-name{% endif %}>
+          <div class="field"{% if row.kind.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.kind.id_for_label }}">{% translate "Kind" %}</label>
             {{ row.kind }}
+            <c-field-feedback :field="row.kind" />
           </div>
-          <div class="field" data-name-if-other>
+          <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
             {{ row.label }}
+            <c-field-feedback :field="row.label" />
           </div>
-          {% comment %} Two controls side by side, each its own hit area with room around
-             it: WCAG 2.2 2.5.8 wants 24 by 24, and a radio touching a checkbox is one
-             target partially obscuring another. The padding is what makes the label the
-             target rather than the input inside it.
-          {% endcomment %}
-          <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
-            {% if remove_at_once %}
-              <c-primary-choice name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
-            {% else %}
-              <label class="inline-flex items-center gap-2 py-1.5">
-                <input type="radio" class="input" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
-                       {% if row.instance.is_primary %}checked{% endif %}>
-                <span>{% translate "Primary" %}</span>
-              </label>
-            {% endif %}
-            {% comment %} Kept apart from Primary on purpose: the primary is what a
-               document prints and a recruiter dials, so tying the two together would mean
-               changing the number on a CV silently changed a way into the account (#144).
-               Offered only where the instance could confirm a number at all, because a
-               control nobody can use beside a promise nobody can keep is worse than no
-               control (#143). {% endcomment %}
-            {% if numbers.recovery_can_be_chosen %}
-              <label class="inline-flex items-center gap-2 py-1.5" data-recovery-choice>
-                <input type="radio" class="input" name="{{ numbers.prefix }}-recovery" value="{{ row.prefix }}"
-                       {% if row.instance.is_recovery %}checked{% endif %}
-                       {% if not row.instance.is_verified %}disabled{% endif %}>
-                <span>
-                  {% if row.instance.is_verified %}
-                    {% translate "Gets me back in" %}
-                  {% else %}
-                    {% translate "Gets me back in — needs confirming first" %}
-                  {% endif %}
-                </span>
-              </label>
-            {% endif %}
-            {% if remove_at_once %}
-              {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
-            {% elif row.instance.pk %}
-              <label class="inline-flex items-center gap-2 py-1.5">
-                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
-              </label>
-            {% endif %}
+          <div class="field" data-phone-line{% if row.number.errors %} data-invalid="true"{% endif %}>
+            <label for="{{ row.number.id_for_label }}">{% translate "Phone" %}</label>
+            {{ row.number }}
+            <c-field-feedback :field="row.number" />
           </div>
         </div>
-        <div class="field">
-          {% for field in row.visible_fields %}
-            <c-field-feedback :field="field" />
-          {% endfor %}
-          {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
+        {% comment %} Two controls side by side, each its own hit area with room around
+           it: WCAG 2.2 2.5.8 wants 24 by 24, and a radio touching a checkbox is one
+           target partially obscuring another. The padding is what makes the label the
+           target rather than the input inside it.
+        {% endcomment %}
+        <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 text-sm">
+          {% if remove_at_once %}
+            <c-primary-choice name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+          {% else %}
+            <label class="inline-flex items-center gap-2 py-1.5">
+              <input type="radio" class="input" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
+                     {% if row.instance.is_primary %}checked{% endif %}>
+              <span>{% translate "Primary" %}</span>
+            </label>
+          {% endif %}
+          {% comment %} Kept apart from Primary on purpose: the primary is what a
+             document prints and a recruiter dials, so tying the two together would mean
+             changing the number on a CV silently changed a way into the account (#144).
+             Offered only where the instance could confirm a number at all, because a
+             control nobody can use beside a promise nobody can keep is worse than no
+             control (#143). {% endcomment %}
+          {% if numbers.recovery_can_be_chosen %}
+            <label class="inline-flex items-center gap-2 py-1.5" data-recovery-choice>
+              <input type="radio" class="input" name="{{ numbers.prefix }}-recovery" value="{{ row.prefix }}"
+                     {% if row.instance.is_recovery %}checked{% endif %}
+                     {% if not row.instance.is_verified %}disabled{% endif %}>
+              <span>
+                {% if row.instance.is_verified %}
+                  {% translate "Gets me back in" %}
+                {% else %}
+                  {% translate "Gets me back in — needs confirming first" %}
+                {% endif %}
+              </span>
+            </label>
+          {% endif %}
+          {% if remove_at_once %}
+            {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+          {% elif row.instance.pk %}
+            <label class="inline-flex items-center gap-2 py-1.5">
+              {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+            </label>
+          {% endif %}
         </div>
+        {% if row.non_field_errors %}
+          <div class="field mt-3" data-invalid="true">
+            {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
+          </div>
+        {% endif %}
       </li>
       {% endif %}
     {% endfor %}

@@ -95,9 +95,15 @@ def test_a_row_that_already_holds_a_name_keeps_its_box(client, user):
 
 
 def test_the_short_rows_are_marked_too(client, user):
+    """The telephone, link and postal rows each have a layout of their own (#304, #305,
+    #306), and each says the same thing to the stylesheet: `data-if-other` on the row and
+    `data-name-if-other` on the box."""
     client.force_login(user)
     html = client.get(reverse("accounts:profile")).content.decode()
-    assert "name-if-other-row-short" in html and "data-name-if-other" in html
+    for row in (r'class="phone-row[^"]*"', r'class="address-line[^"]*"', r"data-link-row"):
+        assert re.search(row + r"[^>]*\sdata-if-other", html), row
+    assert "data-name-if-other" in html
+    assert "name-if-other-row-short" not in html, "the shape nothing draws any more"
 
 
 def test_the_stylesheet_follows_the_select():

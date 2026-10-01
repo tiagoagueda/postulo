@@ -43,6 +43,8 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
+from postulo.core import phones
+
 from . import identifiers
 from .models import Company, CompanyIdentifier, Contact, Department, JobPosting, ListingEvent
 
@@ -538,7 +540,11 @@ def plan_contacts(kept, other) -> Plan:
     moving_links, _already = _link_moves(kept, other)
 
     lines = [
-        _moved(_("Telephone numbers"), other.phone_numbers.all(), lambda row: row.number),
+        _moved(
+            _("Telephone numbers"),
+            other.phone_numbers.all(),
+            lambda row: phones.readable(row.number),
+        ),
         _moved(_("Postal addresses"), other.postal_addresses.all(), lambda row: row.one_line()),
         _moved(_("Applications they are the main contact for"), main, str),
         _moved(_("Applications they referred you to"), referred, str),
