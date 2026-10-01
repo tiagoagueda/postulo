@@ -28,6 +28,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
+from .formsets import RowsAlreadyGone
 from .models import PostalAddress
 
 
@@ -62,19 +63,25 @@ def make_primary(address: PostalAddress) -> None:
 
 
 @transaction.atomic
-def ensure_one_primary(holder) -> None:
+def ensure_one_primary(holder) -> PostalAddress | None:
     """After a removal, make sure something is primary if anything is left.
 
     A holder with addresses and no primary is a holder whose letter has no address on it,
     and that state is reachable by deleting the primary one. The oldest remaining takes it,
-    which is the same rule the ordering already implies.
+    which is the same rule the ordering already implies. The primary afterwards comes back,
+    or nothing when no address is left: a row taken off *Your details* at once says which
+    row the flag moved to (#303).
     """
     addresses = for_holder(holder)
-    if not addresses.exists() or addresses.filter(is_primary=True).exists():
-        return
+    current = addresses.filter(is_primary=True).first()
+    if current is not None:
+        return current
     first = addresses.order_by("created_at", "pk").first()
+    if first is None:
+        return None
     first.is_primary = True
     first.save(update_fields=["is_primary", "updated_at"])
+    return first
 
 
 def location_line(holder) -> str:
@@ -257,12 +264,15 @@ class PostalAddressForm(forms.ModelForm):
         return {part: label_for(part, country) for part in ("postcode", "municipality", "region")}
 
 
-class BasePostalAddressFormSet(BaseGenericInlineFormSet):
+class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
     """The rows together: nothing listed twice **by this person**.
 
     Only by this person. Addresses are not unique across the instance and must not be: two
     people at one address is a household, and refusing the second would also disclose that
     somebody else on this server lives there (#92).
+
+    A row the page still carries and the table no longer holds has already been removed
+    (`RowsAlreadyGone`).
     """
 
     def clean(self) -> None:

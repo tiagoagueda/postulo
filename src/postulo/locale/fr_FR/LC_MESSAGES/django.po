@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 14:20+0000\n"
+"POT-Creation-Date: 2026-10-01 14:42+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -641,7 +641,7 @@ msgstr "%(role)s : pas de date de début, donc non ajouté."
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s n’identifie pas ce genre de chose."
 
-#: src/postulo/core/identifiers.py:337
+#: src/postulo/core/identifiers.py:343
 #, python-format, draft
 msgid "%(scheme)s is already listed on another row."
 msgstr "%(scheme)s figure déjà sur une autre ligne."
@@ -747,6 +747,16 @@ msgstr "%(url)s est bien plus gros qu'un catalogue ne devrait l'être."
 msgid "%(value)s is not a currency code. Use three letters, like EUR."
 msgstr ""
 "%(value)s n’est pas un code de devise. Utilisez trois lettres, comme EUR."
+
+#: src/postulo/accounts/removals.py:149
+#, python-format, draft
+msgid "%(what)s had already been removed."
+msgstr "Vous aviez déjà retiré %(what)s."
+
+#: src/postulo/accounts/removals.py:139
+#, python-format, draft
+msgid "%(what)s removed."
+msgstr "Vous avez retiré %(what)s."
 
 #: src/postulo/notifications/slow.py:163
 #, python-format
@@ -951,6 +961,13 @@ msgstr ""
 msgid "A company, a role, a phrase from a letter, a name…"
 msgstr "Une entreprise, un poste, une phrase d'une lettre, un nom…"
 
+#: src/postulo/templates/server/design.html:363
+#, draft
+msgid ""
+"A confirmation asks one question and says what answering it does. Here, nothing."
+msgstr ""
+"Une confirmation pose une seule question et dit ce que fait la réponse. Ici, rien."
+
 #: src/postulo/templates/core/import_csv.html:16
 #, draft
 msgid "A CSV file"
@@ -1075,7 +1092,7 @@ msgstr ""
 msgid "A link with no address"
 msgstr "Un lien sans adresse"
 
-#: src/postulo/core/web_links.py:67
+#: src/postulo/core/web_links.py:68
 #, draft
 msgid ""
 "A LinkedIn, a Mastodon, a Bluesky — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
@@ -1105,7 +1122,7 @@ msgstr "Une annonce que vous envisagez arrive à sa date limite"
 msgid "A longer answer"
 msgstr "Une réponse plus longue"
 
-#: src/postulo/templates/partials/phone_numbers.html:15
+#: src/postulo/templates/partials/phone_numbers.html:22
 #, draft
 msgid ""
 "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
@@ -1136,7 +1153,7 @@ msgid ""
 msgstr ""
 "Un numéro doit être confirmé avant de pouvoir vous faire revenir. Personne n'a répondu sur celui-ci."
 
-#: src/postulo/templates/partials/phone_numbers.html:100
+#: src/postulo/templates/partials/phone_numbers.html:116
 #, draft
 msgid ""
 "A number is kept once on this instance. If one is already recorded here, saving says so rather than taking it from whoever has it."
@@ -1192,7 +1209,7 @@ msgid ""
 msgstr ""
 "Une personne, une entreprise ou un plugin, en initiales sur une couleur tant qu'il n'y a pas d'image."
 
-#: src/postulo/core/web_links.py:109
+#: src/postulo/core/web_links.py:110
 #, draft
 msgid ""
 "A personal site, a blog, a portfolio — as many as are worth showing, with one of them marked as the one to show. Documents print that one."
@@ -1204,7 +1221,7 @@ msgstr ""
 msgid "A picture of the page that “%(title)s” was read from"
 msgstr "Une image de la page d’où « %(title)s » a été lue"
 
-#: src/postulo/accounts/forms.py:716
+#: src/postulo/accounts/forms.py:717
 #, draft
 msgid ""
 "A picture of the whole page. One sent by your browser extension shows the page as you were seeing it, signed in or not. Where there is none, one can be drawn here from the kept source, with scripts and the network off: the words of the page, without its looks."
@@ -1267,14 +1284,14 @@ msgid ""
 msgstr ""
 "Une annonce que vous avez repérée. L'entreprise et l'intitulé suffisent pour commencer ; le reste peut venir plus tard."
 
-#: src/postulo/core/web_links.py:88
+#: src/postulo/core/web_links.py:89
 #, draft
 msgid ""
 "A profile on a forge, or one project worth showing — as many as are worth listing, with one of them marked as the one to show. Documents print that one."
 msgstr ""
 "Un profil sur une forge, ou un projet qui mérite d'être montré — autant qu'il en vaut la peine, l'un d'eux marqué comme celui à montrer. Les documents impriment celui-là."
 
-#: src/postulo/core/web_links.py:93
+#: src/postulo/core/web_links.py:94
 #, draft
 msgid "A profile on GitHub, Forgejo, GitLab or similar."
 msgstr "Un profil sur GitHub, Forgejo, GitLab ou similaire."
@@ -1290,6 +1307,13 @@ msgstr ""
 #, draft
 msgid "A quarter"
 msgstr "Un trimestre"
+
+#: src/postulo/templates/server/design.html:358
+#, draft
+msgid ""
+"A question over the page, answered before anything is done. This one asks about nothing, and neither answer changes anything."
+msgstr ""
+"Une question par-dessus la page, à laquelle on répond avant que rien ne soit fait. Celle-ci ne porte sur rien, et aucune des deux réponses ne change quoi que ce soit."
 
 #: src/postulo/templates/server/logs.html:133
 #, draft
@@ -1770,8 +1794,8 @@ msgstr ""
 "Ajouter un fichier ne fait qu'ajouter. Ce que vous avez déjà reste exactement tel quel et n'est pas ajouté une seconde fois : le même fichier deux fois revient donc au même qu'une seule. Rien dans votre dossier n'est modifié ni supprimé."
 
 #: src/postulo/applications/reports.py:547 src/postulo/jobs/tables.py:293
-#: src/postulo/templates/partials/postal_addresses.html:29
-#: src/postulo/templates/partials/web_links.html:28
+#: src/postulo/templates/partials/postal_addresses.html:34
+#: src/postulo/templates/partials/web_links.html:32
 #, draft
 msgid "Address"
 msgstr "Adresse"
@@ -1890,7 +1914,7 @@ msgstr "Déjà dans votre dossier"
 msgid "Already sent —"
 msgstr "Déjà envoyée —"
 
-#: src/postulo/templates/accounts/profile.html:232
+#: src/postulo/templates/accounts/profile.html:261
 #, draft
 msgid "Also happens by itself when your primary address changes."
 msgstr "Se fait aussi tout seul quand votre adresse principale change."
@@ -1994,7 +2018,7 @@ msgid "An older version of the same thing, kept but no longer offered."
 msgstr ""
 "Une version antérieure du même document, conservée mais qui n'est plus proposée."
 
-#: src/postulo/templates/accounts/profile.html:193
+#: src/postulo/templates/accounts/profile.html:196
 #, draft
 msgid ""
 "An ORCID, or another public id that says which researcher you are. A name is not an identity — two people share one, one person publishes under three — and an application form for an academic post asks for this by name. Paste a whole address if that is what you have; Postulo keeps the id."
@@ -2125,6 +2149,12 @@ msgstr ""
 #: src/postulo/applications/forms.py:672
 msgid "Anything else worth remembering about it: who made it, what was said."
 msgstr "Tout ce qui mérite d’être retenu : qui l’a faite, ce qui a été dit."
+
+#: src/postulo/templates/accounts/profile.html:248
+#, draft
+msgid "Anything else you have changed on this page and not saved is lost."
+msgstr ""
+"Tout ce que vous avez modifié d'autre sur cette page sans l'enregistrer est perdu."
 
 #: src/postulo/applications/forms.py:473
 #, draft
@@ -2511,7 +2541,7 @@ msgstr "Disponible — la personne choisit"
 msgid "Available; you have not changed it."
 msgstr "Disponible ; vous n’avez rien changé."
 
-#: src/postulo/accounts/forms.py:220
+#: src/postulo/accounts/forms.py:221
 #, draft
 msgid "Awaiting review by a speaker"
 msgstr "En attente de relecture par un locuteur"
@@ -2787,7 +2817,7 @@ msgid "Callback to register with it"
 msgstr "URL de rappel à déclarer auprès du fournisseur"
 
 #: src/postulo/templates/accounts/invite_form.html:26
-#: src/postulo/templates/accounts/profile.html:223
+#: src/postulo/templates/accounts/profile.html:227
 #: src/postulo/templates/applications/application_form.html:32
 #: src/postulo/templates/applications/application_intake.html:77
 #: src/postulo/templates/applications/interview_form.html:70
@@ -2796,6 +2826,7 @@ msgstr "URL de rappel à déclarer auprès du fournisseur"
 #: src/postulo/templates/applications/tag_form.html:85
 #: src/postulo/templates/connections/confirm_delete.html:19
 #: src/postulo/templates/connections/form.html:36
+#: src/postulo/templates/cotton/dialog.html:49
 #: src/postulo/templates/documents/cv_form.html:21
 #: src/postulo/templates/documents/cv_item_form.html:27
 #: src/postulo/templates/documents/letter_form.html:29
@@ -3167,7 +3198,7 @@ msgid ""
 msgstr ""
 "Choisissez le PDF que vous avez téléchargé depuis europass.europa.eu, tel quel : le CV y est joint, et c'est ce que Postulo lit. Les anciens fichiers Europass se lisent aussi : le XML et le PDF de l'éditeur d'avant 2020, et le JSON de son service web. Postulo détermine lui-même lequel c'est, vous montre ce qu'il contient et n'écrit rien tant que vous ne l'avez pas dit."
 
-#: src/postulo/accounts/forms.py:923 src/postulo/jobs/forms.py:455
+#: src/postulo/accounts/forms.py:924 src/postulo/jobs/forms.py:455
 #, draft
 msgid "Choose what kind of identifier this is."
 msgstr "Indiquez de quel type d'identifiant il s'agit."
@@ -3187,7 +3218,7 @@ msgstr "Choisissez duquel de vos fichiers il s'agit."
 msgid "City and country, as it should appear on a CV."
 msgstr "Ville et pays, tels qu'ils doivent figurer sur un CV."
 
-#: src/postulo/accounts/forms.py:545
+#: src/postulo/accounts/forms.py:546
 #, draft
 msgid ""
 "City and country, as it should appear on a CV. Left blank, the town and country of your primary postal address are printed, once you have one."
@@ -3298,12 +3329,12 @@ msgstr "Code"
 msgid "Code (GitHub, GitLab…)"
 msgstr "Code (GitHub, GitLab…)"
 
-#: src/postulo/core/web_links.py:87
+#: src/postulo/core/web_links.py:88
 #, draft
 msgid "Code repositories"
 msgstr "Dépôts de code"
 
-#: src/postulo/core/models.py:650 src/postulo/core/web_links.py:92
+#: src/postulo/core/models.py:650 src/postulo/core/web_links.py:93
 #, draft
 msgid "Code repository"
 msgstr "Dépôt de code"
@@ -3338,7 +3369,7 @@ msgstr "Colonnes enregistrées."
 msgid "Comfortable"
 msgstr "Confortable"
 
-#: src/postulo/accounts/forms.py:779
+#: src/postulo/accounts/forms.py:780
 #, draft
 msgid ""
 "Comfortable is the default and the roomier of the two. Compact tightens the space around cards and inside tables so that more fits on a screen; nothing you can click or tap gets smaller."
@@ -3557,7 +3588,7 @@ msgstr "Connexions"
 msgid "connections"
 msgstr "connexions"
 
-#: src/postulo/accounts/forms.py:771
+#: src/postulo/accounts/forms.py:772
 #, draft
 msgid "Consider an application quiet after"
 msgstr "Considérer une candidature comme silencieuse après"
@@ -3588,7 +3619,7 @@ msgstr "Contact"
 msgid "Contact added."
 msgstr "Contact ajouté."
 
-#: src/postulo/accounts/views.py:127
+#: src/postulo/accounts/views.py:148
 #: src/postulo/templates/accounts/profile.html:151
 #, draft
 msgid "Contact block"
@@ -3692,13 +3723,13 @@ msgid ""
 msgstr ""
 "Compté à partir de la chronologie, donc les entretiens enregistrés avant l'existence de l'agenda sont inclus."
 
-#: src/postulo/core/models.py:544 src/postulo/core/postal.py:214
+#: src/postulo/core/models.py:544 src/postulo/core/postal.py:221
 #, draft
 msgid "country"
 msgstr "pays"
 
 #: src/postulo/core/phone_field.py:37
-#: src/postulo/templates/partials/postal_addresses.html:54
+#: src/postulo/templates/partials/postal_addresses.html:59
 #, draft
 msgid "Country"
 msgstr "Pays"
@@ -4223,6 +4254,11 @@ msgstr "détail"
 msgid "details"
 msgstr "détails"
 
+#: src/postulo/core/design.py:139 src/postulo/templates/server/design.html:357
+#, draft
+msgid "Dialogs"
+msgstr "Boîtes de dialogue"
+
 #: src/postulo/resume/models.py:287
 #, draft
 msgid "Did not answer"
@@ -4618,7 +4654,7 @@ msgstr "adresse e-mail"
 msgid "Email address"
 msgstr "Adresse e-mail"
 
-#: src/postulo/accounts/forms.py:1121
+#: src/postulo/accounts/forms.py:1126
 #, draft
 msgid "Email address (optional)"
 msgstr "Adresse e-mail (facultatif)"
@@ -4796,7 +4832,7 @@ msgid ""
 msgstr ""
 "Toutes les connexions de cette instance : le type de plugin, le plugin, et la configuration qui dit à qui il s'adresse. Les secrets ne figurent pas sur cette page ; ils sont stockés chiffrés et ne sont montrés à personne."
 
-#: src/postulo/accounts/forms.py:1088
+#: src/postulo/accounts/forms.py:1093
 #, draft
 msgid "Every date and time on these pages is shown in it."
 msgstr "Toutes les dates et heures de ces pages s'affichent dans ce fuseau."
@@ -4883,7 +4919,7 @@ msgid ""
 msgstr ""
 "Tout disparaît, d'un coup, et personne ne pourra le restaurer. Faites d'abord votre export."
 
-#: src/postulo/accounts/forms.py:757
+#: src/postulo/accounts/forms.py:758
 #, draft
 msgid ""
 "Everything here is reachable another way, so leaving one out takes nothing away. The Postulo wordmark always goes to the dashboard."
@@ -5043,7 +5079,7 @@ msgstr "archives d'export"
 msgid "Export everything"
 msgstr "Tout exporter"
 
-#: src/postulo/templates/accounts/profile.html:248
+#: src/postulo/templates/accounts/profile.html:277
 #: src/postulo/templates/core/export.html:83
 #, draft
 msgid "Export or import your record"
@@ -5105,7 +5141,7 @@ msgstr "Fax"
 msgid "Feature"
 msgstr "Fonctionnalité"
 
-#: src/postulo/templates/accounts/profile.html:230
+#: src/postulo/templates/accounts/profile.html:259
 #, draft
 msgid "Fetch my Gravatar again"
 msgstr "Récupérer à nouveau mon Gravatar"
@@ -5264,8 +5300,8 @@ msgstr "empreinte"
 msgid "finished at"
 msgstr "terminée à"
 
-#: src/postulo/accounts/forms.py:100 src/postulo/accounts/forms.py:283
-#: src/postulo/accounts/forms.py:376
+#: src/postulo/accounts/forms.py:101 src/postulo/accounts/forms.py:284
+#: src/postulo/accounts/forms.py:377
 #, draft
 msgid "First name"
 msgstr "Prénom"
@@ -5376,7 +5412,7 @@ msgstr ""
 msgid "For you, not for the employer: “Backend, English”."
 msgstr "Pour vous, pas pour l'employeur : « Backend, anglais »."
 
-#: src/postulo/accounts/forms.py:74
+#: src/postulo/accounts/forms.py:75
 #, draft
 msgid "For you, so you can tell one from another later: “work laptop”, “phone”."
 msgstr ""
@@ -5426,7 +5462,7 @@ msgid ""
 msgstr ""
 "Oublié. Votre prochaine capture sur %(host)s sera lue comme si c’était la première fois."
 
-#: src/postulo/accounts/forms.py:393
+#: src/postulo/accounts/forms.py:394
 #, draft
 msgid "Form of address"
 msgstr "Civilité"
@@ -5571,12 +5607,12 @@ msgstr "Jeu vidéo"
 msgid "Get"
 msgstr "Obtenir"
 
-#: src/postulo/templates/partials/phone_numbers.html:76
+#: src/postulo/templates/partials/phone_numbers.html:88
 #, draft
 msgid "Gets me back in"
 msgstr "Me fait revenir"
 
-#: src/postulo/templates/partials/phone_numbers.html:78
+#: src/postulo/templates/partials/phone_numbers.html:90
 #, draft
 msgid "Gets me back in — needs confirming first"
 msgstr "Me fait revenir — à confirmer d'abord"
@@ -5670,7 +5706,7 @@ msgstr "Gravatar vérifié le"
 msgid "Gravatar copy"
 msgstr "Copie du Gravatar"
 
-#: src/postulo/accounts/views.py:201 src/postulo/accounts/views.py:241
+#: src/postulo/accounts/views.py:222 src/postulo/accounts/views.py:330
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar est injoignable pour le moment. Réessayez plus tard."
@@ -5681,7 +5717,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar n'avait pas d'image pour votre adresse à la dernière vérification, le %(when)s."
 
-#: src/postulo/accounts/views.py:197 src/postulo/accounts/views.py:240
+#: src/postulo/accounts/views.py:218 src/postulo/accounts/views.py:329
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
@@ -5801,7 +5837,7 @@ msgstr "Historique"
 msgid "Home"
 msgstr "Domicile"
 
-#: src/postulo/templates/partials/postal_addresses.html:15
+#: src/postulo/templates/partials/postal_addresses.html:19
 #, draft
 msgid ""
 "Home, work, wherever post reaches you — with one of them marked as the one to use. A form or a formal letter carries that one."
@@ -5876,7 +5912,7 @@ msgstr "Combien de semaines"
 msgid "How much room"
 msgstr "Quelle place"
 
-#: src/postulo/accounts/forms.py:773
+#: src/postulo/accounts/forms.py:774
 #, draft
 msgid "How much room to leave"
 msgstr "Quelle place laisser"
@@ -5975,7 +6011,7 @@ msgstr "requêtes idempotentes"
 msgid "identifier"
 msgstr "identifiant"
 
-#: src/postulo/templates/cotton/identifier_row.html:24
+#: src/postulo/templates/cotton/identifier_row.html:28
 #, draft
 msgid "Identifier"
 msgstr "Identifiant"
@@ -5990,10 +6026,10 @@ msgstr "identifiant à la source"
 msgid "identifiers"
 msgstr "identifiants"
 
-#: src/postulo/accounts/views.py:150 src/postulo/jobs/merging.py:364
+#: src/postulo/accounts/views.py:171 src/postulo/jobs/merging.py:364
 #: src/postulo/plugins/kinds.py:33 src/postulo/resume/candidate.py:977
 #: src/postulo/resume/views_candidate.py:48
-#: src/postulo/templates/accounts/profile.html:191
+#: src/postulo/templates/accounts/profile.html:194
 #: src/postulo/templates/jobs/company_form.html:80
 #, draft
 msgid "Identifiers"
@@ -6428,7 +6464,7 @@ msgid ""
 msgstr ""
 "Sur invitation uniquement : le formulaire d'inscription n'est pas proposé. Invitez des personnes depuis la section Personnes."
 
-#: src/postulo/accounts/views.py:295
+#: src/postulo/accounts/views.py:384
 #, draft
 msgid "Invitation revoked."
 msgstr "Invitation révoquée."
@@ -6484,6 +6520,13 @@ msgstr ""
 #, draft
 msgid "It cannot end before it starts."
 msgstr "Il ne peut pas se terminer avant d'avoir commencé."
+
+#: src/postulo/templates/accounts/profile.html:242
+#, draft
+msgid ""
+"It comes off your details now, without waiting for Save, and cannot be put back."
+msgstr ""
+"Le retrait se fait tout de suite, sans attendre « Enregistrer », et ne peut pas être annulé."
 
 #: src/postulo/plugins/installing.py:722
 #, draft
@@ -6686,7 +6729,7 @@ msgstr "Garder"
 msgid "keep a rendering of a captured page"
 msgstr "conserver un rendu d’une page capturée"
 
-#: src/postulo/accounts/forms.py:706
+#: src/postulo/accounts/forms.py:707
 #, draft
 msgid "Keep a rendering of the pages I capture"
 msgstr "Conserver un rendu des pages que je capture"
@@ -6701,7 +6744,7 @@ msgstr "Conserver plutôt l'autre"
 msgid "keep the source of a captured page"
 msgstr "conserver le code source d’une page capturée"
 
-#: src/postulo/accounts/forms.py:705
+#: src/postulo/accounts/forms.py:706
 #, draft
 msgid "Keep the source of the pages I capture"
 msgstr "Conserver le code source des pages que je capture"
@@ -6753,7 +6796,7 @@ msgid ""
 msgstr ""
 "Conservé dans %(file)s et alterné selon la taille, il ne peut donc pas remplir le disque. Tout ce qui est ici va aussi vers la console, où <code>docker logs</code> le lit."
 
-#: src/postulo/accounts/forms.py:478 src/postulo/core/phone_numbers.py:282
+#: src/postulo/accounts/forms.py:479 src/postulo/core/phone_numbers.py:310
 #, draft
 msgid ""
 "Kept in the international form, so it can be dialled from anywhere. A number that already starts with + is taken as it is."
@@ -6823,10 +6866,10 @@ msgstr "type"
 
 #: src/postulo/jobs/tables.py:94
 #: src/postulo/templates/applications/report.html:57
-#: src/postulo/templates/cotton/identifier_row.html:20
+#: src/postulo/templates/cotton/identifier_row.html:24
 #: src/postulo/templates/jobs/capture_page.html:93
-#: src/postulo/templates/partials/phone_numbers.html:43
-#: src/postulo/templates/partials/postal_addresses.html:69
+#: src/postulo/templates/partials/phone_numbers.html:51
+#: src/postulo/templates/partials/postal_addresses.html:74
 #, draft
 msgid "Kind"
 msgstr "Type"
@@ -6870,7 +6913,7 @@ msgstr "Types de lettres"
 msgid "label"
 msgstr "libellé"
 
-#: src/postulo/accounts/forms.py:1075 src/postulo/resume/forms.py:295
+#: src/postulo/accounts/forms.py:1080 src/postulo/resume/forms.py:295
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
@@ -6998,8 +7041,8 @@ msgstr "vérifié le"
 msgid "last error"
 msgstr "dernière erreur"
 
-#: src/postulo/accounts/forms.py:105 src/postulo/accounts/forms.py:288
-#: src/postulo/accounts/forms.py:381
+#: src/postulo/accounts/forms.py:106 src/postulo/accounts/forms.py:289
+#: src/postulo/accounts/forms.py:382
 #, draft
 msgid "Last name"
 msgstr "Nom"
@@ -7111,14 +7154,14 @@ msgstr "Départ"
 msgid "Left blank, it lasts an hour."
 msgstr "Laissé vide, il dure une heure."
 
-#: src/postulo/templates/partials/web_links.html:59
+#: src/postulo/templates/partials/web_links.html:70
 #, draft
 msgid ""
 "Left blank, the name is the address's host. Postulo never opens a link on its own — not to check it, not for a picture."
 msgstr ""
 "Laissé vide, le nom est l'hôte de l'adresse. Postulo n'ouvre jamais un lien de lui-même — ni pour le vérifier, ni pour une image."
 
-#: src/postulo/accounts/forms.py:540
+#: src/postulo/accounts/forms.py:541
 #, python-format, draft
 msgid ""
 "Left blank, your CVs print “%(place)s”: the town and country of your primary postal address, never the street. Type here to print something else."
@@ -7152,12 +7195,12 @@ msgstr "Permettre à une capture de conserver un rendu de sa page"
 msgid "Let a capture keep the source of its page"
 msgstr "Permettre à une capture de conserver le code source de sa page"
 
-#: src/postulo/accounts/forms.py:658
+#: src/postulo/accounts/forms.py:659
 #, draft
 msgid "Let a single key do something"
 msgstr "Permettre qu'une seule touche fasse quelque chose"
 
-#: src/postulo/accounts/forms.py:79
+#: src/postulo/accounts/forms.py:80
 #, draft
 msgid "Let this passkey sign me in on its own"
 msgstr "Autoriser cette clé d’accès à me connecter seule"
@@ -7842,10 +7885,10 @@ msgid "name"
 msgstr "nom"
 
 #: src/postulo/api/forms.py:21 src/postulo/jobs/tables.py:36
-#: src/postulo/templates/cotton/identifier_row.html:28
-#: src/postulo/templates/partials/phone_numbers.html:47
-#: src/postulo/templates/partials/postal_addresses.html:73
-#: src/postulo/templates/partials/web_links.html:33
+#: src/postulo/templates/cotton/identifier_row.html:32
+#: src/postulo/templates/partials/phone_numbers.html:55
+#: src/postulo/templates/partials/postal_addresses.html:78
+#: src/postulo/templates/partials/web_links.html:37
 #: src/postulo/templates/server/design.html:249
 #: src/postulo/templates/server/people.html:38
 #: src/postulo/templates/server/people.html:52
@@ -8515,7 +8558,7 @@ msgstr ""
 msgid "Not shown · %(name)s"
 msgstr "Non affiché · %(name)s"
 
-#: src/postulo/accounts/forms.py:520 src/postulo/resume/models.py:239
+#: src/postulo/accounts/forms.py:521 src/postulo/resume/models.py:239
 #, draft
 msgid "Not stated"
 msgstr "Non précisé"
@@ -8542,7 +8585,7 @@ msgstr "note"
 msgid "Note"
 msgstr "Note"
 
-#: src/postulo/accounts/forms.py:1122
+#: src/postulo/accounts/forms.py:1127
 #: src/postulo/templates/applications/partials/status_card.html:61
 #, draft
 msgid "Note (optional)"
@@ -9123,7 +9166,7 @@ msgstr ""
 msgid "On the calendar, with a reminder the day before."
 msgstr "Au calendrier, avec un rappel la veille."
 
-#: src/postulo/accounts/forms.py:667
+#: src/postulo/accounts/forms.py:668
 #, draft
 msgid ""
 "On the capture review, “d” discards and moves on and “j” skips; “/” jumps to the search box anywhere. Turn this off if you dictate to your computer, or if a key pressed by accident does more than you meant. Shortcuts that need Ctrl go on working either way."
@@ -9146,7 +9189,7 @@ msgstr "Sur cette page"
 msgid "On — and they may not switch it off"
 msgstr "Activé — et elle ne peut pas le désactiver"
 
-#: src/postulo/accounts/forms.py:80
+#: src/postulo/accounts/forms.py:81
 #, draft
 msgid ""
 "On, it replaces the password entirely and your device asks for a fingerprint, your face or a PIN instead. Off, it is only a second step after the password, and it will not appear on the sign-in page."
@@ -9381,7 +9424,7 @@ msgid ""
 msgstr ""
 "Uniquement pour Refusée, Retirée et Sans réponse, et jamais obligatoire. Une raison apprise plus tard s'ajoute à ce moment-là : choisissez de nouveau le même statut, et la raison."
 
-#: src/postulo/accounts/forms.py:898
+#: src/postulo/accounts/forms.py:899
 #, draft
 msgid "Only for “Other”: what to call it on a CV."
 msgstr "Uniquement pour « Autre » : le nom à lui donner sur un CV."
@@ -9443,6 +9486,11 @@ msgstr "Ouvrir à part"
 #, draft
 msgid "Open the advert"
 msgstr "Ouvrir l'annonce"
+
+#: src/postulo/templates/server/design.html:360
+#, draft
+msgid "Open the dialog"
+msgstr "Ouvrir la boîte de dialogue"
 
 #: src/postulo/templates/jobs/capture_page.html:112
 #, draft
@@ -9532,7 +9580,7 @@ msgstr "Annonce d'origine"
 msgid "Other"
 msgstr "Autre"
 
-#: src/postulo/accounts/forms.py:399
+#: src/postulo/accounts/forms.py:400
 #, draft
 msgid "Other form of address"
 msgstr "Autre civilité"
@@ -9553,12 +9601,12 @@ msgstr "Autres langues"
 msgid "Other periods"
 msgstr "Autres périodes"
 
-#: src/postulo/accounts/forms.py:411
+#: src/postulo/accounts/forms.py:412
 #, draft
 msgid "Other pronouns"
 msgstr "Autres pronoms"
 
-#: src/postulo/accounts/forms.py:523
+#: src/postulo/accounts/forms.py:524
 #, draft
 msgid "Other…"
 msgstr "Autre…"
@@ -9677,7 +9725,7 @@ msgstr "Fait partie de cette entreprise"
 msgid "Part time"
 msgstr "Temps partiel"
 
-#: src/postulo/accounts/forms.py:222
+#: src/postulo/accounts/forms.py:223
 #, draft
 msgid "Partly translated"
 msgstr "Partiellement traduit"
@@ -9840,9 +9888,9 @@ msgstr "Site personnel"
 msgid "Pharmaceuticals"
 msgstr "Pharmacie"
 
-#: src/postulo/accounts/forms.py:473 src/postulo/core/phone_numbers.py:279
+#: src/postulo/accounts/forms.py:474 src/postulo/core/phone_numbers.py:307
 #: src/postulo/jobs/forms.py:616
-#: src/postulo/templates/partials/phone_numbers.html:35
+#: src/postulo/templates/partials/phone_numbers.html:43
 #, draft
 msgid "Phone"
 msgstr "Téléphone"
@@ -10022,7 +10070,7 @@ msgid ""
 msgstr ""
 "PNG, JPEG, GIF, WebP ou SVG. Le fichier est ré-encodé à sa propre taille, sans rien d'autre de ce qu'il contenait ; un SVG reste vectoriel et n'en garde que le dessin."
 
-#: src/postulo/accounts/forms.py:421
+#: src/postulo/accounts/forms.py:422
 #, draft
 msgid ""
 "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of anything the file knew about where it was taken."
@@ -10096,9 +10144,9 @@ msgstr "adresse postale"
 msgid "postal addresses"
 msgstr "adresses postales"
 
-#: src/postulo/accounts/views.py:145 src/postulo/jobs/merging.py:567
+#: src/postulo/accounts/views.py:166 src/postulo/jobs/merging.py:567
 #: src/postulo/resume/candidate.py:871 src/postulo/resume/views_candidate.py:46
-#: src/postulo/templates/partials/postal_addresses.html:13
+#: src/postulo/templates/partials/postal_addresses.html:17
 #, draft
 msgid "Postal addresses"
 msgstr "Adresses postales"
@@ -10201,7 +10249,7 @@ msgid ""
 msgstr ""
 "Postulo récupère une page qu'une personne a demandée, et respecte le robots.txt d'un site par défaut. Dites oui seulement si vous avez décidé que cette courtoisie ne s'applique pas ici."
 
-#: src/postulo/accounts/forms.py:430
+#: src/postulo/accounts/forms.py:431
 #, draft
 msgid ""
 "Postulo fetches the picture for your primary address from gravatar.com once, keeps a copy, and shows that. Nothing is fetched while pages are viewed. Untick it and the copy is deleted."
@@ -10258,7 +10306,7 @@ msgid ""
 msgstr ""
 "Postulo n'en conserve qu'un condensé et ne peut pas le réafficher. Si vous le perdez, créez-en un autre."
 
-#: src/postulo/accounts/forms.py:897
+#: src/postulo/accounts/forms.py:898
 #, draft
 msgid "Postulo tidies it into the register's own spelling and checks the shape."
 msgstr "Postulo le met à l'écriture propre au registre et en vérifie la forme."
@@ -10341,9 +10389,11 @@ msgid "Previous"
 msgstr "Précédent"
 
 #: src/postulo/core/design.py:82
-#: src/postulo/templates/partials/phone_numbers.html:60
-#: src/postulo/templates/partials/postal_addresses.html:84
-#: src/postulo/templates/partials/web_links.html:40
+#: src/postulo/templates/cotton/primary_choice.html:14
+#: src/postulo/templates/cotton/primary_choice.html:17
+#: src/postulo/templates/partials/phone_numbers.html:71
+#: src/postulo/templates/partials/postal_addresses.html:93
+#: src/postulo/templates/partials/web_links.html:48
 #: src/postulo/templates/server/design.html:138
 #: src/postulo/templates/settings/account.html:61
 #, draft
@@ -10450,7 +10500,7 @@ msgid ""
 msgstr ""
 "Les métriques Prometheus sont servies sur <code>/metrics</code>, derrière le jeton de POSTULO_METRICS_TOKEN. Elles ne contiennent que des décomptes — combien de candidatures existent, pas celles de qui — et rien qui nomme une personne, une entreprise ou une candidature."
 
-#: src/postulo/accounts/forms.py:405
+#: src/postulo/accounts/forms.py:406
 #, draft
 msgid "Pronouns"
 msgstr "Pronoms"
@@ -11052,19 +11102,31 @@ msgstr "À distance"
 msgid "remote address"
 msgstr "adresse distante"
 
+#: src/postulo/templates/accounts/profile.html:251
 #: src/postulo/templates/connections/confirm_delete.html:18
 #: src/postulo/templates/connections/list.html:75
-#: src/postulo/templates/cotton/identifier_row.html:33
+#: src/postulo/templates/cotton/identifier_row.html:39
 #: src/postulo/templates/documents/cv_detail.html:140
-#: src/postulo/templates/partials/phone_numbers.html:85
-#: src/postulo/templates/partials/postal_addresses.html:88
-#: src/postulo/templates/partials/web_links.html:44
+#: src/postulo/templates/partials/phone_numbers.html:99
+#: src/postulo/templates/partials/postal_addresses.html:97
+#: src/postulo/templates/partials/web_links.html:52
 #: src/postulo/templates/server/design.html:277
+#: src/postulo/templates/server/design.html:365
 #: src/postulo/templates/server/plugins.html:169
 #: src/postulo/templates/server/plugins.html:314
 #, draft
 msgid "Remove"
 msgstr "Retirer"
+
+#: src/postulo/templates/cotton/remove_button.html:15
+#, python-format, draft
+msgid "Remove %(what)s"
+msgstr "Retirer %(what)s"
+
+#: src/postulo/templates/accounts/profile.html:240
+#, python-format, draft
+msgid "Remove <bdi>%(what)s</bdi>?"
+msgstr "Retirer <bdi>%(what)s</bdi> ?"
 
 #: src/postulo/templates/server/people.html:87
 #, draft
@@ -11076,7 +11138,7 @@ msgstr "Retirer le rôle d'administrateur"
 msgid "Remove the logo"
 msgstr "Retirer le logo"
 
-#: src/postulo/accounts/forms.py:426
+#: src/postulo/accounts/forms.py:427
 #, draft
 msgid "Remove the uploaded picture"
 msgstr "Supprimer la photo envoyée"
@@ -11085,6 +11147,11 @@ msgstr "Supprimer la photo envoyée"
 #, draft
 msgid "Remove this connection?"
 msgstr "Supprimer cette connexion ?"
+
+#: src/postulo/templates/server/design.html:362
+#, draft
+msgid "Remove this example?"
+msgstr "Retirer cet exemple ?"
 
 #: src/postulo/templates/partials/label_attrs.html:12
 #, draft
@@ -11203,7 +11270,7 @@ msgstr "Vérifier"
 msgid "Review the capture"
 msgstr "Vérifier la capture"
 
-#: src/postulo/accounts/forms.py:214
+#: src/postulo/accounts/forms.py:215
 #, draft
 msgid "Reviewed by a speaker"
 msgstr "Relu par un locuteur"
@@ -11355,7 +11422,7 @@ msgstr "Salaire jusqu'à"
 msgid "salary to"
 msgstr "salaire jusqu'à"
 
-#: src/postulo/templates/accounts/profile.html:222
+#: src/postulo/templates/accounts/profile.html:226
 #: src/postulo/templates/applications/application_form.html:31
 #: src/postulo/templates/applications/application_intake.html:76
 #: src/postulo/templates/applications/interview_form.html:68
@@ -11408,7 +11475,7 @@ msgstr "Enregistrez l'entreprise pour ajouter un autre identifiant."
 msgid "Save this first, then come back and agree."
 msgstr "Enregistrez ceci d'abord, puis revenez consentir."
 
-#: src/postulo/templates/accounts/profile.html:218
+#: src/postulo/templates/accounts/profile.html:222
 #, draft
 msgid "Save to add another identifier."
 msgstr "Enregistrez pour ajouter un autre identifiant."
@@ -11437,18 +11504,18 @@ msgstr "Enregistrée dans vos offres. Décidez quand vous serez prêt."
 msgid "Saved."
 msgstr "Enregistré."
 
-#: src/postulo/core/postal.py:232
+#: src/postulo/core/postal.py:239
 #, draft
 msgid "Say what this address is."
 msgstr "Dites ce qu'est cette adresse."
 
-#: src/postulo/accounts/forms.py:933 src/postulo/jobs/forms.py:465
+#: src/postulo/accounts/forms.py:934 src/postulo/jobs/forms.py:465
 #: src/postulo/jobs/models.py:547
 #, draft
 msgid "Say what this identifier is."
 msgstr "Dites ce qu’est cet identifiant."
 
-#: src/postulo/core/phone_numbers.py:294
+#: src/postulo/core/phone_numbers.py:322
 #, draft
 msgid "Say what this number is."
 msgstr "Dites ce qu'est ce numéro."
@@ -11878,7 +11945,7 @@ msgstr "Tout afficher"
 msgid "Show everything"
 msgstr "Tout afficher"
 
-#: src/postulo/accounts/forms.py:754
+#: src/postulo/accounts/forms.py:755
 #, draft
 msgid "Show in the navigation"
 msgstr "Afficher dans la navigation"
@@ -11898,7 +11965,7 @@ msgstr "Afficher aussi les passés"
 msgid "show the order number on career entries"
 msgstr "afficher le numéro d'ordre sur les entrées de carrière"
 
-#: src/postulo/accounts/forms.py:657
+#: src/postulo/accounts/forms.py:658
 #, draft
 msgid "Show the order number on each career entry"
 msgstr "Afficher le numéro d'ordre sur chaque entrée de carrière"
@@ -12174,12 +12241,12 @@ msgstr "Reporter"
 msgid "Snoozed for two weeks."
 msgstr "Reportée de deux semaines."
 
-#: src/postulo/core/models.py:649 src/postulo/core/web_links.py:71
+#: src/postulo/core/models.py:649 src/postulo/core/web_links.py:72
 #, draft
 msgid "Social profile"
 msgstr "Profil social"
 
-#: src/postulo/core/web_links.py:66
+#: src/postulo/core/web_links.py:67
 #, draft
 msgid "Social profiles"
 msgstr "Profils sociaux"
@@ -12190,28 +12257,28 @@ msgstr "Profils sociaux"
 msgid "Software"
 msgstr "Logiciel"
 
-#: src/postulo/core/web_links.py:94
+#: src/postulo/core/web_links.py:95
 #, draft
 msgid ""
 "Some code repositories are kept and not shown, because <em>Several code repositories</em> is switched off. They come back untouched if it is switched on."
 msgstr ""
 "Certains dépôts de code sont conservés sans être affichés, parce que <em>Plusieurs dépôts de code</em> est désactivé. Ils reviennent intacts si c'est réactivé."
 
-#: src/postulo/core/web_links.py:98
+#: src/postulo/core/web_links.py:99
 #, draft
 msgid ""
 "Some code repositories are kept for this contact and not shown, because <em>Several code repositories</em> is switched off."
 msgstr ""
 "Certains dépôts de code sont conservés pour ce contact sans être affichés, parce que <em>Plusieurs dépôts de code</em> est désactivé."
 
-#: src/postulo/core/web_links.py:73
+#: src/postulo/core/web_links.py:74
 #, draft
 msgid ""
 "Some social profiles are kept and not shown, because <em>Several social profiles</em> is switched off. They come back untouched if it is switched on."
 msgstr ""
 "Certains profils sociaux sont conservés sans être affichés, parce que <em>Plusieurs profils sociaux</em> est désactivé. Ils reviennent intacts si c'est réactivé."
 
-#: src/postulo/core/web_links.py:77
+#: src/postulo/core/web_links.py:78
 #, draft
 msgid ""
 "Some social profiles are kept for this contact and not shown, because <em>Several social profiles</em> is switched off."
@@ -12223,14 +12290,14 @@ msgstr ""
 msgid "Some telephone numbers were not added. %(why)s"
 msgstr "Certains numéros de téléphone n'ont pas été ajoutés. %(why)s"
 
-#: src/postulo/core/web_links.py:115
+#: src/postulo/core/web_links.py:116
 #, draft
 msgid ""
 "Some websites are kept and not shown, because <em>Several websites</em> is switched off. They come back untouched if it is switched on."
 msgstr ""
 "Certains sites web sont conservés sans être affichés, parce que <em>Plusieurs sites web</em> est désactivé. Ils reviennent intacts si c'est réactivé."
 
-#: src/postulo/core/web_links.py:119
+#: src/postulo/core/web_links.py:120
 #, draft
 msgid ""
 "Some websites are kept for this contact and not shown, because <em>Several websites</em> is switched off."
@@ -12456,7 +12523,7 @@ msgstr "Statut de %(title)s chez %(company)s"
 msgid "Status updated."
 msgstr "Statut mis à jour."
 
-#: src/postulo/accounts/forms.py:53
+#: src/postulo/accounts/forms.py:54
 #, draft
 msgid "Stay signed in on this device"
 msgstr "Rester connecté sur cet appareil"
@@ -12605,7 +12672,7 @@ msgstr "Standard"
 msgid "Switched off for people above, not removed."
 msgstr "Désactivé pour les personnes ci-dessus, pas supprimé."
 
-#: src/postulo/accounts/forms.py:699
+#: src/postulo/accounts/forms.py:700
 #, draft
 msgid "Switched off for this whole instance, by an administrator."
 msgstr "Désactivé pour toute cette instance, par un administrateur."
@@ -12767,9 +12834,9 @@ msgstr "numéro de téléphone"
 msgid "telephone numbers"
 msgstr "numéros de téléphone"
 
-#: src/postulo/accounts/views.py:140 src/postulo/jobs/merging.py:566
+#: src/postulo/accounts/views.py:161 src/postulo/jobs/merging.py:566
 #: src/postulo/resume/candidate.py:802 src/postulo/resume/views_candidate.py:45
-#: src/postulo/templates/partials/phone_numbers.html:13
+#: src/postulo/templates/partials/phone_numbers.html:20
 #, draft
 msgid "Telephone numbers"
 msgstr "Numéros de téléphone"
@@ -13041,7 +13108,7 @@ msgstr "Cette image ne peut pas être réduite assez pour être conservée."
 msgid "That image is far larger than it needs to be."
 msgstr "Cette image est bien plus grande qu'il n'est nécessaire."
 
-#: src/postulo/accounts/views.py:291
+#: src/postulo/accounts/views.py:380
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Cette invitation a déjà été acceptée et ne peut pas être révoquée."
@@ -13124,7 +13191,7 @@ msgstr "Postulo ne sait pas faire cela sur plusieurs à la fois."
 msgid "That is not something this page does."
 msgstr "Ce n'est pas ce que fait cette page."
 
-#: src/postulo/accounts/views.py:397
+#: src/postulo/accounts/views.py:486
 #, draft
 msgid "That is not the address on this account."
 msgstr "Ce n'est pas l'adresse de ce compte."
@@ -13174,12 +13241,12 @@ msgid ""
 msgstr ""
 "Ce numéro n'a aucun pays devant lui, il ne peut donc être composé de nulle part ailleurs. Choisissez le pays, ou écrivez-le en commençant par +."
 
-#: src/postulo/core/phone_numbers.py:378
+#: src/postulo/core/phone_numbers.py:408
 #, draft
 msgid "That number has to be confirmed before it can get you back in."
 msgstr "Ce numéro doit être confirmé avant de pouvoir vous faire revenir."
 
-#: src/postulo/core/phone_numbers.py:33
+#: src/postulo/core/phone_numbers.py:34
 #, draft
 msgid ""
 "That number is already recorded on this instance. Telephone numbers are kept unique across every account here, so it may belong to somebody else's records."
@@ -13220,7 +13287,7 @@ msgid ""
 msgstr ""
 "Cette page a été envoyée avec l'encodage de contenu « %(coding)s », que Postulo ne décompresse pas, elle n'a donc pas été lue."
 
-#: src/postulo/accounts/forms.py:585
+#: src/postulo/accounts/forms.py:586
 #, draft
 msgid "That picture is over 5 MB. A smaller one, please."
 msgstr "Cette image dépasse 5 Mo. Une plus petite, s'il vous plaît."
@@ -13330,7 +13397,7 @@ msgstr ""
 msgid "The application sends on its own"
 msgstr "L’application envoie d’elle-même"
 
-#: src/postulo/accounts/forms.py:662
+#: src/postulo/accounts/forms.py:663
 #, draft
 msgid ""
 "The arrows on Your career move an entry past its neighbour. If you cannot use them, or would rather type a number, each entry's form shows its place as a number: lower first."
@@ -13629,7 +13696,7 @@ msgid ""
 msgstr ""
 "La clé de « %(name)s » a été remplacée. Cette clé est la seule chose entre son index et du code exécuté ici : assurez-vous qu’elle vient d’une source de confiance."
 
-#: src/postulo/accounts/forms.py:460
+#: src/postulo/accounts/forms.py:461
 #, draft
 msgid "The language you read Postulo in"
 msgstr "La langue dans laquelle vous lisez Postulo"
@@ -13678,7 +13745,7 @@ msgid ""
 msgstr ""
 "La ligne sous votre nom. Laissée vide, c'est celle de votre profil qui s'imprime."
 
-#: src/postulo/accounts/forms.py:673
+#: src/postulo/accounts/forms.py:674
 #, draft
 msgid ""
 "The link for the page you are on is underlined as well as shaded and set in bolder type. Turn the underline off for a quieter header: the weight and the shade stay, so the page you are on is never marked by colour alone. A high-contrast theme underlines it whatever you choose here, because there the shading is discarded and the underline is not."
@@ -13746,12 +13813,17 @@ msgid ""
 "The next interviews in the diary, and any that passed without an outcome."
 msgstr "Les prochains entretiens prévus, et ceux passés sans résultat noté."
 
+#: src/postulo/templates/accounts/profile.html:247
+#, draft
+msgid "The next one in the list becomes the primary."
+msgstr "L'élément suivant de la liste devient le principal."
+
 #: src/postulo/templates/server/data_protection.html:36
 #, draft
 msgid "The notice"
 msgstr "L'avis"
 
-#: src/postulo/templates/partials/phone_numbers.html:107
+#: src/postulo/templates/partials/phone_numbers.html:123
 #, draft
 msgid ""
 "The number that gets you back in is separate from the one your documents print, so changing what a recruiter dials does not change how you prove it is you. It has to be confirmed first, and switching off several telephone numbers never takes it away."
@@ -13814,7 +13886,7 @@ msgstr "La page telle que capturée"
 msgid "The page could not be drawn."
 msgstr "La page n’a pas pu être dessinée."
 
-#: src/postulo/accounts/forms.py:709
+#: src/postulo/accounts/forms.py:710
 #, draft
 msgid ""
 "The page exactly as it was read, kept beside what was read from it, so that you can check one against the other and a better parser can read it again. It holds whatever the page addressed to you: your name if you were signed in, and the tracking in its links. Kept as text, and never shown as a page."
@@ -14446,7 +14518,7 @@ msgstr ""
 msgid "This address is already in your listings, since %(when)s."
 msgstr "Cette adresse est déjà dans vos annonces, depuis le %(when)s."
 
-#: src/postulo/core/postal.py:278 src/postulo/core/web_links.py:323
+#: src/postulo/core/postal.py:288 src/postulo/core/web_links.py:345
 #, draft
 msgid "This address is already listed."
 msgstr "Cette adresse est déjà listée."
@@ -14513,7 +14585,7 @@ msgstr ""
 msgid "This Idempotency-Key was already used for a different capture."
 msgstr "Cette clé Idempotency-Key a déjà servi pour une autre capture."
 
-#: src/postulo/accounts/forms.py:953 src/postulo/jobs/forms.py:487
+#: src/postulo/accounts/forms.py:958 src/postulo/jobs/forms.py:487
 #: src/postulo/jobs/models.py:536
 #, draft
 msgid "This identifier is already listed."
@@ -14574,7 +14646,7 @@ msgstr ""
 msgid "this instance is up to date"
 msgstr "cette instance est à jour"
 
-#: src/postulo/accounts/views.py:319
+#: src/postulo/accounts/views.py:408
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Cette invitation est pour %(email)s. Inscrivez-vous avec cette adresse."
@@ -14629,10 +14701,17 @@ msgstr ""
 msgid "This kind of identifier is already listed."
 msgstr "Ce type d'identifiant est déjà dans la liste."
 
-#: src/postulo/core/phone_numbers.py:324
+#: src/postulo/core/phone_numbers.py:356
 #, draft
 msgid "This number is already listed."
 msgstr "Ce numéro figure déjà dans la liste."
+
+#: src/postulo/accounts/removals.py:155
+#, draft
+msgid ""
+"This number is how you get back into your account, so it cannot be removed. Choose another number to get you back in first."
+msgstr ""
+"Ce numéro est celui qui vous fait revenir dans votre compte : il ne peut donc pas être retiré. Choisissez d'abord un autre numéro pour vous faire revenir."
 
 #: src/postulo/templates/connections/form.html:51
 #, draft
@@ -14763,7 +14842,7 @@ msgstr ""
 msgid "tier"
 msgstr "niveau"
 
-#: src/postulo/accounts/forms.py:1085
+#: src/postulo/accounts/forms.py:1090
 #, draft
 msgid "Time zone"
 msgstr "Fuseau horaire"
@@ -14945,7 +15024,7 @@ msgstr "De confiance :"
 msgid "Try fewer words, or a different spelling."
 msgstr "Essayez moins de mots, ou une autre orthographe."
 
-#: src/postulo/accounts/views.py:233
+#: src/postulo/accounts/views.py:322
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Activez d'abord « Utiliser mon Gravatar »."
@@ -14983,7 +15062,7 @@ msgstr "Typographie"
 msgid "Type at least two characters."
 msgstr "Saisissez au moins deux caractères."
 
-#: src/postulo/accounts/forms.py:573
+#: src/postulo/accounts/forms.py:574
 #, draft
 msgid "Type it here, or choose one from the list."
 msgstr "Écrivez-le ici, ou choisissez dans la liste."
@@ -14993,7 +15072,7 @@ msgstr "Écrivez-le ici, ou choisissez dans la liste."
 msgid "Type it in instead"
 msgstr "Le saisir à la place"
 
-#: src/postulo/accounts/forms.py:925 src/postulo/jobs/forms.py:457
+#: src/postulo/accounts/forms.py:926 src/postulo/jobs/forms.py:457
 #, draft
 msgid "Type the identifier."
 msgstr "Saisissez l'identifiant."
@@ -15031,7 +15110,7 @@ msgid ""
 msgstr ""
 "Sous chaque langue, combien de chaînes de Postulo un locuteur a relues, combien sont des brouillons que personne n’a encore lus, et combien ne sont pas traduites du tout."
 
-#: src/postulo/accounts/forms.py:659
+#: src/postulo/accounts/forms.py:660
 #, draft
 msgid "Underline the page you are on"
 msgstr "Souligner la page où vous êtes"
@@ -15054,7 +15133,7 @@ msgid "Unknown PDF backend %(name)r. Choose from: auto, weasyprint, chromium."
 msgstr ""
 "Moteur PDF inconnu %(name)r. Choisissez parmi : auto, weasyprint, chromium."
 
-#: src/postulo/templates/partials/postal_addresses.html:116
+#: src/postulo/templates/partials/postal_addresses.html:128
 #, draft
 msgid ""
 "Unlike a telephone number, an address is not kept once on this instance — people share a home. You cannot list the same one twice yourself."
@@ -15096,7 +15175,7 @@ msgstr "mis à jour par"
 msgid "Upload a file"
 msgstr "Envoyer un fichier"
 
-#: src/postulo/accounts/forms.py:419
+#: src/postulo/accounts/forms.py:420
 #, draft
 msgid "Upload a picture"
 msgstr "Envoyer une photo"
@@ -15141,12 +15220,12 @@ msgid ""
 msgstr ""
 "Utilisez 3 à 32 lettres minuscules, chiffres, points, tirets bas ou tirets, en commençant et en finissant par une lettre ou un chiffre."
 
-#: src/postulo/accounts/forms.py:588
+#: src/postulo/accounts/forms.py:589
 #, draft
 msgid "Use a PNG, JPEG, WebP or GIF."
 msgstr "Utilisez un PNG, JPEG, WebP ou GIF."
 
-#: src/postulo/accounts/forms.py:428
+#: src/postulo/accounts/forms.py:429
 #, draft
 msgid "Use my Gravatar"
 msgstr "Utiliser mon Gravatar"
@@ -15156,7 +15235,7 @@ msgstr "Utiliser mon Gravatar"
 msgid "use my Gravatar"
 msgstr "utiliser mon Gravatar"
 
-#: src/postulo/accounts/forms.py:212 src/postulo/accounts/forms.py:267
+#: src/postulo/accounts/forms.py:213 src/postulo/accounts/forms.py:268
 #, draft
 msgid "Use the instance default"
 msgstr "Utiliser la valeur par défaut de l'instance"
@@ -15208,7 +15287,7 @@ msgstr ""
 msgid "user"
 msgstr "utilisateur"
 
-#: src/postulo/accounts/forms.py:1098
+#: src/postulo/accounts/forms.py:1103
 #: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/server/people.html:37
 #, draft
@@ -15220,7 +15299,7 @@ msgstr "Nom d'utilisateur"
 msgid "username"
 msgstr "nom d'utilisateur"
 
-#: src/postulo/accounts/forms.py:51
+#: src/postulo/accounts/forms.py:52
 #, draft
 msgid "Username or email"
 msgstr "Nom d’utilisateur ou e-mail"
@@ -15379,7 +15458,7 @@ msgstr "En attente d'envoi"
 msgid "Waiting to be used"
 msgstr "En attente d'utilisation"
 
-#: src/postulo/accounts/forms.py:772
+#: src/postulo/accounts/forms.py:773
 msgid "Warn me before a listing closes by"
 msgstr "Me prévenir avant la clôture d’une annonce de"
 
@@ -15441,7 +15520,7 @@ msgstr "livraison de webhook"
 msgid "WebP image"
 msgstr "Image WebP"
 
-#: src/postulo/core/models.py:651 src/postulo/core/web_links.py:113
+#: src/postulo/core/models.py:651 src/postulo/core/web_links.py:114
 #: src/postulo/jobs/tables.py:109
 #: src/postulo/templates/jobs/company_detail.html:98
 #, draft
@@ -15453,7 +15532,7 @@ msgstr "Site web"
 msgid "website"
 msgstr "site web"
 
-#: src/postulo/core/web_links.py:108
+#: src/postulo/core/web_links.py:109
 #, draft
 msgid "Websites"
 msgstr "Sites web"
@@ -15578,7 +15657,7 @@ msgstr ""
 msgid "What each plugin does, for everybody"
 msgstr "Ce que fait chaque module, pour tout le monde"
 
-#: src/postulo/templates/accounts/profile.html:210
+#: src/postulo/templates/accounts/profile.html:214
 #: src/postulo/templates/jobs/company_form.html:94
 #, draft
 msgid "What goes where"
@@ -15709,7 +15788,7 @@ msgstr "Ce qui est déplacé"
 msgid "What needs doing"
 msgstr "Ce qu'il y a à faire"
 
-#: src/postulo/accounts/forms.py:1079
+#: src/postulo/accounts/forms.py:1084
 #, draft
 msgid ""
 "What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
@@ -15853,7 +15932,7 @@ msgid ""
 msgstr ""
 "Ce que cette instance traite, pourquoi, et qui le reçoit. Tiré des plugins installés et des connexions, il change donc avec eux."
 
-#: src/postulo/accounts/forms.py:73
+#: src/postulo/accounts/forms.py:74
 #, draft
 msgid "What to call it"
 msgstr "Comment l’appeler"
@@ -15912,7 +15991,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Ce que vous avez repéré sans encore trancher, et ce qui se clôt cette semaine."
 
-#: src/postulo/accounts/forms.py:1101
+#: src/postulo/accounts/forms.py:1106
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -16031,7 +16110,7 @@ msgstr "Où on peut le voir. Un CV l'imprime à côté du nom."
 msgid "Where plugins may come from"
 msgstr "D’où les plugins peuvent venir"
 
-#: src/postulo/accounts/forms.py:122
+#: src/postulo/accounts/forms.py:123
 #, draft
 msgid ""
 "Where Postulo writes to you, and what a CV prints if you let it show contact details."
@@ -16205,7 +16284,7 @@ msgid ""
 msgstr ""
 "La langue dans laquelle cette variante est écrite. Laissez vide pour suivre votre profil."
 
-#: src/postulo/accounts/forms.py:463
+#: src/postulo/accounts/forms.py:464
 #, draft
 msgid ""
 "Which language your experience, education and projects are typed in. A CV in another language shows what you have translated, and says what it could not."
@@ -16238,7 +16317,7 @@ msgstr "Quelle période"
 msgid "Which plugin should this connection be for?"
 msgstr "Pour quel plugin cette connexion est-elle destinée ?"
 
-#: src/postulo/accounts/forms.py:896
+#: src/postulo/accounts/forms.py:897
 #, draft
 msgid "Which register the number belongs to. What goes where, above, says."
 msgstr ""
@@ -16570,7 +16649,7 @@ msgid ""
 msgstr ""
 "Vous avez déjà cette adresse pour quelqu'un avec qui vous êtes en relation, et une adresse ne figure qu'une fois."
 
-#: src/postulo/accounts/views.py:312
+#: src/postulo/accounts/views.py:401
 #, draft
 msgid "You are already signed in."
 msgstr "Vous êtes déjà connecté."
@@ -16604,7 +16683,7 @@ msgstr ""
 msgid "You can leave this page. The work carries on without you."
 msgstr "Vous pouvez quitter cette page : le travail continue sans vous."
 
-#: src/postulo/accounts/forms.py:117
+#: src/postulo/accounts/forms.py:118
 #, draft
 msgid ""
 "You can sign in with this or with your address. Nobody else sees it — Postulo shows people your name."
@@ -16628,7 +16707,7 @@ msgid ""
 msgstr ""
 "Vous avez déjà postulé à celle-ci. Enregistrer une seconde candidature est possible ; les deux restent au dossier."
 
-#: src/postulo/core/phone_numbers.py:143
+#: src/postulo/core/phone_numbers.py:144
 #, python-format, draft
 msgid ""
 "You have been told about a lot of numbers already recorded here. That answer is available again in %(minutes)d minutes."
@@ -16695,7 +16774,7 @@ msgid ""
 msgstr ""
 "Vous vous connecterez ensuite comme d'habitude, et donnerez votre deuxième facteur si vous en avez un. Ce lien change le mot de passe et rien d'autre."
 
-#: src/postulo/accounts/views.py:406
+#: src/postulo/accounts/views.py:495
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Votre compte et tout ce qu'il contenait ont été supprimés."
@@ -16753,7 +16832,7 @@ msgid ""
 msgstr ""
 "Votre parcours est rédigé en %(original)s. Ce que vous écrivez ici est ce qu’un CV dans une autre langue imprime à la place."
 
-#: src/postulo/templates/partials/postal_addresses.html:122
+#: src/postulo/templates/partials/postal_addresses.html:134
 #, draft
 msgid ""
 "Your CV header shows a town and a country and never a street, whatever is here."
@@ -16772,7 +16851,7 @@ msgstr "Vos CV"
 msgid "Your dashboard is empty"
 msgstr "Votre tableau de bord est vide"
 
-#: src/postulo/accounts/views.py:384 src/postulo/core/settings_sections.py:123
+#: src/postulo/accounts/views.py:473 src/postulo/core/settings_sections.py:123
 #: src/postulo/core/views_import.py:14 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -16799,7 +16878,7 @@ msgstr "Votre date limite"
 msgid "Your details"
 msgstr "Vos coordonnées"
 
-#: src/postulo/templates/accounts/profile.html:243
+#: src/postulo/templates/accounts/profile.html:272
 #: src/postulo/templates/core/export.html:78
 #: src/postulo/templates/resume/candidate_file.html:11
 #, draft
@@ -16808,12 +16887,12 @@ msgid ""
 msgstr ""
 "Vos coordonnées et votre carrière dans un seul fichier JSON : à conserver, à lire ou à confier à un autre Postulo. Rien sur les endroits où vous avez postulé n'y figure."
 
-#: src/postulo/accounts/views.py:192
+#: src/postulo/accounts/views.py:213
 #, draft
 msgid "Your details have been saved."
 msgstr "Vos coordonnées ont été enregistrées."
 
-#: src/postulo/accounts/views.py:239
+#: src/postulo/accounts/views.py:328
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Votre Gravatar a été récupéré à nouveau."
@@ -16833,7 +16912,7 @@ msgstr "Votre recherche d’emploi en %(period)s"
 msgid "Your job search, on your server."
 msgstr "Votre recherche d’emploi, sur votre serveur."
 
-#: src/postulo/core/web_links.py:72
+#: src/postulo/core/web_links.py:73
 #, draft
 msgid "Your LinkedIn, or wherever a recruiter should look you up."
 msgstr "Votre LinkedIn, ou là où un recruteur devrait vous chercher."
@@ -16845,7 +16924,7 @@ msgid ""
 msgstr ""
 "Votre liste est vide. Saisissez les premiers ci-dessous ; les suggestions ne sont qu'un point de départ."
 
-#: src/postulo/accounts/views.py:126
+#: src/postulo/accounts/views.py:147
 #: src/postulo/templates/accounts/profile.html:90
 #, draft
 msgid "Your name"
@@ -16871,7 +16950,7 @@ msgstr "Votre nom, e-mail et lieu, tirés de votre profil."
 msgid "Your own name"
 msgstr "Votre propre nom"
 
-#: src/postulo/core/web_links.py:114
+#: src/postulo/core/web_links.py:115
 #, draft
 msgid "Your own site, if you have one."
 msgstr "Votre propre site, si vous en avez un."
@@ -16882,12 +16961,12 @@ msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr ""
 "Vos propres mots pour regrouper les candidatures. Les nouvelles se saisissent dans le champ ci-dessous."
 
-#: src/postulo/accounts/views.py:483
+#: src/postulo/accounts/views.py:572
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Votre mot de passe est défini. Connectez-vous avec."
 
-#: src/postulo/accounts/views.py:125
+#: src/postulo/accounts/views.py:146
 #: src/postulo/templates/accounts/profile.html:50
 #, draft
 msgid "Your picture"
@@ -16900,7 +16979,7 @@ msgid ""
 msgstr ""
 "Votre photo est laissée de côté. Un fichier JSON ne peut pas en contenir, et la laisser de côté fait que ce fichier reste lisible dans un éditeur de texte."
 
-#: src/postulo/templates/accounts/profile.html:242
+#: src/postulo/templates/accounts/profile.html:271
 #: src/postulo/templates/core/export.html:77
 #: src/postulo/templates/resume/candidate_file.html:4
 #: src/postulo/templates/resume/candidate_file.html:9

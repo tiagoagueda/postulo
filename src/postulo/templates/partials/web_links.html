@@ -7,6 +7,9 @@
    outside the formset's prefixes, so the browser enforces "exactly one" before anything is
    posted. The radio's value is the row's form prefix and not its primary key, because
    somebody adding their first two links is choosing between rows that do not have keys yet.
+
+   `remove_at_once` is *Your details* (#303), as in `phone_numbers.html`: a star, a bin, a
+   dialog, and the row gone there and then. The contact form keeps the *Remove* box.
 {% endcomment %}
 {% for block in links %}
   <fieldset class="card mb-6" data-web-links="{{ block.kind }}" id="section-links-{{ block.kind }}">
@@ -18,6 +21,7 @@
     {% endif %}
     <ol class="space-y-3">
       {% for row in block %}
+        {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
         <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
           {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
           {% comment %} The address on its own line, because it is the subject of the row
@@ -32,16 +36,21 @@
               <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
               {{ row.label }}
             </div>
-            <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
-              <label class="inline-flex items-center gap-2 py-1.5">
-                <input type="radio" class="input" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
-                       {% if row.instance.is_primary %}checked{% endif %}>
-                <span>{% translate "Primary" %}</span>
-              </label>
-              {% if row.instance.pk %}
+            <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+              {% if remove_at_once %}
+                <c-primary-choice name="{{ block.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+                {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+              {% else %}
                 <label class="inline-flex items-center gap-2 py-1.5">
-                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+                  <input type="radio" class="input" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
+                         {% if row.instance.is_primary %}checked{% endif %}>
+                  <span>{% translate "Primary" %}</span>
                 </label>
+                {% if row.instance.pk %}
+                  <label class="inline-flex items-center gap-2 py-1.5">
+                    {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+                  </label>
+                {% endif %}
               {% endif %}
             </div>
           </div>
@@ -52,8 +61,10 @@
             {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
           </div>
         </li>
+        {% endif %}
       {% endfor %}
     </ol>
+    {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
     <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
         Left blank, the name is the address's host. Postulo never opens a link on its own —

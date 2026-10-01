@@ -258,7 +258,13 @@ def require(key: str, subject: str) -> None:
 
 
 def _removing(row) -> bool:
-    """Whether a row has *Remove* ticked, as posted or as drawn."""
+    """Whether a row has *Remove* ticked, as posted or as drawn, or has gone already.
+
+    A row posted from a copy of the page that is out of date, whose key is no longer in
+    the table, holds no kind either (`core.formsets.RowsAlreadyGone`).
+    """
+    if getattr(row, "already_gone", False):
+        return True
     return "DELETE" in row.fields and bool(row["DELETE"].value())
 
 

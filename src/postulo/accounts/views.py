@@ -13,6 +13,7 @@ from django.http import (
     HttpResponse,
     HttpResponseBadRequest,
     HttpResponseRedirect,
+    JsonResponse,
 )
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
@@ -26,7 +27,7 @@ from postulo.core.files import serve_private_file
 from postulo.core.mixins import StaffRequiredMixin, WebLinksMixin
 from postulo.core.redirects import safe_next
 
-from . import avatars, deletion
+from . import avatars, deletion, removals
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
 from .models import Invite, Profile, Theme
@@ -99,8 +100,28 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         context.setdefault("addresses", self.get_addresses())
         context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.schemes().values()
+        context["removals"] = self._removals(context)
         context["section_nav"] = self._section_nav(context)
         return context
+
+    @staticmethod
+    def _removals(context: dict) -> list:
+        """Every saved row the page offers to take off at once, each marked on its form (#303).
+
+        In the order the blocks are drawn. The rows carry their `Removal` for the bin they
+        show; the list is what draws the dialogs after the form.
+        """
+        found = []
+        numbers = context.get("numbers")
+        if numbers is not None:
+            found += removals.offer(removals.NUMBER, numbers)
+        for block in context.get("links") or []:
+            found += removals.offer(removals.LINK, block)
+        if context.get("addresses") is not None:
+            found += removals.offer(removals.ADDRESS, context["addresses"])
+        if context.get("identifiers") is not None:
+            found += removals.offer(removals.IDENTIFIER, context["identifiers"])
+        return found
 
     @staticmethod
     def _section_nav(context: dict) -> list[dict]:
@@ -131,23 +152,23 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
                 entry(
                     f"section-links-{block.kind}",
                     block.block.legend,
-                    block.initial_form_count(),
+                    removals.saved_count(block),
                 )
             )
         numbers = context.get("numbers")
         if numbers is not None:
             entries.append(
-                entry("section-phones", _("Telephone numbers"), numbers.initial_form_count())
+                entry("section-phones", _("Telephone numbers"), removals.saved_count(numbers))
             )
         addresses = context.get("addresses")
         if addresses is not None:
             entries.append(
-                entry("section-addresses", _("Postal addresses"), addresses.initial_form_count())
+                entry("section-addresses", _("Postal addresses"), removals.saved_count(addresses))
             )
         identifiers = context.get("identifiers")
         if identifiers is not None:
             entries.append(
-                entry("section-identifiers", _("Identifiers"), identifiers.initial_form_count())
+                entry("section-identifiers", _("Identifiers"), removals.saved_count(identifiers))
             )
         return entries
 
@@ -201,6 +222,74 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
                 self.request, _("Gravatar could not be reached just now. Try again later.")
             )
         return response
+
+
+class RemoveRowView(LoginRequiredMixin, View):
+    """Take one saved row off *Your details* at once, after its dialog asked (#303).
+
+    One class for the four kinds of row, each at its own address (`kind` is set in the URL
+    table), and by a POST only: nothing is removed by following a link. The row is looked up
+    among the profile's own, so anybody else's -- and a contact's, which this account owns
+    but which is on another page -- is a 404, as is a row whose block a feature has switched
+    off. The number that gets its owner back in is refused, with the reason.
+
+    With htmx the answer is for `app.js`, which takes the row out of the page and leaves
+    everything typed elsewhere where it is: what was said, which row is primary now and how
+    many are left. Without it the page is drawn again at the row's block, with the same
+    sentence as a message -- and anything typed and not saved is lost, which the dialog says
+    when scripts are off. A refusal is drawn at the top of the page instead, where its
+    reason is: sent to the block, the message would be a screen above what is in view, and
+    the block unchanged, as though the button had done nothing.
+
+    A GET removes nothing and leads back to the row's block. It is where somebody lands who
+    confirmed after their session had ended and signed in again -- the sign-in page sends
+    them on to the address they were refused at -- and a page with nothing on it is no
+    answer to that. The row is looked up first all the same, so the address says no more
+    about somebody else's row to a GET than to a POST.
+    """
+
+    kind: removals.Kind | None = None
+
+    def _row(self, request: HttpRequest, pk: int):
+        row = get_object_or_404(removals.rows(self.kind, request.user), pk=pk)
+        if not removals.offered(self.kind, request.user, row):
+            raise Http404
+        return row
+
+    def _block(self, row) -> str:
+        return f"{reverse('accounts:profile')}#{removals.anchor(self.kind, row)}"
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        return redirect(self._block(self._row(request, pk)))
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from django.db import transaction
+
+        row = self._row(request, pk)
+        back = self._block(row)
+
+        refused = removals.refusal(self.kind, row)
+        if refused:
+            if request.htmx:
+                return JsonResponse({"removed": False, "said": refused})
+            messages.error(request, refused)
+            return redirect("accounts:profile")
+
+        said = str(removals.said(removals.words(self.kind, row)))
+        with transaction.atomic():
+            row.delete()
+            primary = removals.hand_on(self.kind, row, request.user.profile)
+        if request.htmx:
+            return JsonResponse(
+                {
+                    "removed": True,
+                    "said": said,
+                    "primary": primary.pk if primary is not None else None,
+                    "count": removals.left(self.kind, row, request.user),
+                }
+            )
+        messages.success(request, said)
+        return redirect(back)
 
 
 class AvatarView(LoginRequiredMixin, View):

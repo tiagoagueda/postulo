@@ -114,6 +114,24 @@ EXCUSED: dict[str, str] = {
         "button is on the Email page, which the suite visits"
     ),
     "accounts:avatar_refresh": "a POST that fetches the picture again",
+    # One row off *Your details* at once, from its dialog (#303). The page and the dialog
+    # are walked, open, by tests/e2e/test_row_removal.py.
+    "accounts:remove_number": (
+        "a POST from a row's dialog on Your details, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else"
+    ),
+    "accounts:remove_link": (
+        "a POST from a row's dialog on Your details, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else"
+    ),
+    "accounts:remove_address": (
+        "a POST from a row's dialog on Your details, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else"
+    ),
+    "accounts:remove_identifier": (
+        "a POST from a row's dialog on Your details, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else"
+    ),
     "accounts:theme": "a POST from the theme switch in the header",
     "accounts:invite_revoke": "a POST that withdraws an invitation",
     "applications:status": "a POST from the board and from the application page",

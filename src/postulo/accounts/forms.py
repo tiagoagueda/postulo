@@ -19,6 +19,7 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages, phone_field, phone_numbers, phones, postal, web_links
+from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
 
 from . import addressing, avatars, identifiers
@@ -936,8 +937,12 @@ class PersonIdentifierForm(IdentifierRow, forms.ModelForm):
         return data
 
 
-class BasePersonIdentifierFormSet(OneOfEachKind, forms.BaseInlineFormSet):
-    """The rows together: one of each kind, and nothing listed twice."""
+class BasePersonIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInlineFormSet):
+    """The rows together: one of each kind, and nothing listed twice.
+
+    A row the page still carries and the table no longer holds has already been removed
+    (`RowsAlreadyGone`), and holds no kind.
+    """
 
     def clean(self) -> None:
         super().clean()

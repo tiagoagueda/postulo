@@ -341,3 +341,75 @@ def test_a_navigation_dropdown_is_a_disclosure_of_links_rather_than_a_menu():
     ) in html
     assert 'role="menu"' not in html and "aria-haspopup" not in html
     assert '<a href="/y" class="menu-item">Companies</a>' in html
+
+
+ONE_DIALOG = (
+    '{% cotton dialog id="ask" action="/remove/1/" data-remove-row %}'
+    "{% cotton:slot title %}Remove <bdi>Jo</bdi>?{% endcotton:slot %}"
+    "{% cotton:slot description %}It goes at once.{% endcotton:slot %}"
+    '{% cotton:slot footer %}<button type="submit">Remove</button>{% endcotton:slot %}'
+    "{% endcotton %}"
+)
+
+
+def test_a_dialog_is_a_popover_named_by_its_heading_and_described_by_its_sentence():
+    """Basecoat's alert dialog on the browser's own `<dialog>` and popover (#303): a
+    `popovertarget` opens it with no script, and `app.js` opens the same one as a modal.
+    The heading and the sentence are slots, so a typed value can sit in a `<bdi>`, and they
+    are the dialog's name and description. Any other attribute goes on the dialog."""
+    html = render(ONE_DIALOG)
+
+    assert (
+        '<dialog popover id="ask" class="alert-dialog" role="alertdialog" '
+        'aria-labelledby="ask-title" aria-describedby="ask-description" data-dialog '
+        "data-remove-row>"
+    ) in html
+    assert '<h2 id="ask-title">Remove <bdi>Jo</bdi>?</h2>' in html
+    assert '<p id="ask-description">It goes at once.</p>' in html
+    assert '<form method="post" action="/remove/1/">' in html
+    assert "hx-post" not in html and "data-dialog-said" not in html
+
+
+def test_cancel_comes_first_changes_nothing_and_has_the_focus():
+    """*Cancel* is drawn by the component, before the caller's answer, so Tab reaches the
+    answer that changes nothing first; it closes a popover by itself, and it is where focus
+    lands when the dialog opens."""
+    html = render(ONE_DIALOG)
+
+    cancel = re.search(r"<button[^>]*data-dialog-close[^>]*>Cancel</button>", html)
+    assert cancel, html
+    assert 'type="button"' in cancel.group(0), "a submit here would answer the question"
+    assert 'popovertarget="ask" popovertargetaction="hide"' in cancel.group(0)
+    assert "autofocus" in cancel.group(0)
+    assert html.index("Cancel</button>") < html.index("Remove</button>")
+
+
+def test_a_live_dialog_is_sent_by_htmx_and_has_somewhere_to_say_no():
+    """Where the page's script writes a refusal or a failed request: behind a modal the
+    page is inert, so the alert at its foot is neither seen nor heard. It is the
+    vocabulary's alert, in the error tone, still announced as one, and drawn with nothing
+    in it -- `:empty` is what hides it, so not even a space."""
+    html = render(ONE_DIALOG.replace('action="/remove/1/"', 'action="/remove/1/" live'))
+
+    assert (
+        '<form method="post" action="/remove/1/" hx-post="/remove/1/" hx-swap="none" '
+        'hx-sync="this:drop">'
+    ) in html
+    assert (
+        '<p role="alert" class="alert empty:hidden" data-variant="error" data-dialog-said></p>'
+    ) in html
+
+
+def test_a_dialog_without_an_action_holds_no_form():
+    """The gallery's, and any dialog whose buttons do not post."""
+    html = render(
+        '{% cotton dialog id="look" tone="plain" %}'
+        "{% cotton:slot title %}Look{% endcotton:slot %}"
+        "{% endcotton %}"
+    )
+
+    assert (
+        '<dialog popover id="look" class="dialog" aria-labelledby="look-title" data-dialog>' in html
+    )
+    assert "<form" not in html and 'role="alertdialog"' not in html
+    assert "aria-describedby" not in html, "no sentence, so nothing to point at"

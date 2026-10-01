@@ -25,6 +25,7 @@ from postulo.plugins.repositories import REPOSITORIES
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
+from .formsets import RowsAlreadyGone
 from .models import WebLink
 
 Kind = WebLink.Kind
@@ -207,6 +208,23 @@ def set_primary(link: WebLink) -> None:
 
 
 @transaction.atomic
+def ensure_one_primary(holder, kind: str) -> WebLink | None:
+    """The holder keeps the primary of this kind it has; failing that, its first becomes it.
+
+    What saving the rows does when nobody said which one is the primary, and what taking a
+    row off *Your details* at once does afterwards (#303) -- one rule for both, so they
+    cannot disagree about who inherits it. A holder with links and no primary shows none at
+    all once the kind's feature is switched off again. The primary afterwards comes back,
+    or nothing when no link of the kind is left.
+    """
+    mine = holder.web_links.filter(kind=kind)
+    wanted = mine.filter(is_primary=True).first() or mine.first()
+    if wanted is not None:
+        set_primary(wanted)
+    return wanted
+
+
+@transaction.atomic
 def save_only_link(holder, owner, kind: str, typed: str) -> WebLink | None:
     """Write the one address a person typed while the kind's feature is switched off.
 
@@ -299,8 +317,12 @@ class WebLinkForm(forms.ModelForm):
         self.fields["url"].assume_scheme = "https"
 
 
-class BaseWebLinkFormSet(generic_forms.BaseGenericInlineFormSet):
-    """The rows of one kind together: nothing listed twice for this holder."""
+class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet):
+    """The rows of one kind together: nothing listed twice for this holder.
+
+    A row the page still carries and the table no longer holds has already been removed
+    (`RowsAlreadyGone`).
+    """
 
     #: Set by `formset_for`. Every row saved through this formset is of this kind.
     kind: str = ""
@@ -343,14 +365,12 @@ class BaseWebLinkFormSet(generic_forms.BaseGenericInlineFormSet):
             if form.prefix == chosen and form.instance.pk and not form.cleaned_data.get("DELETE"):
                 wanted = form.instance
                 break
-        if wanted is None:
-            # Nobody said, so the holder keeps the primary it had; failing that, the first
-            # row becomes it, because a holder with links and no primary shows none at
-            # all once the feature is switched off again.
-            mine = self.instance.web_links.filter(kind=self.kind)
-            wanted = mine.filter(is_primary=True).first() or mine.first()
         if wanted is not None:
             set_primary(wanted)
+        else:
+            # Nobody said, so the holder keeps the primary it had; failing that, the first
+            # row becomes it.
+            ensure_one_primary(self.instance, self.kind)
         return saved
 
 

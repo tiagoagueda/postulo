@@ -32,6 +32,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- On *Your details*, *Primary* is a star and *Remove* a bin that asks in a dialog and takes the number, link, address or identifier off at once, without *Save* and without losing what is typed elsewhere. The number that gets you back in cannot be removed, and a copy of the page open in another tab still saves. (#303)
 - On *Companies*, *Applications* and *Listings* the masthead's search box narrows the table, with a button beside it to search everything instead; the page's own box is gone, and *Listings* can now be searched. On a phone the magnifier opens the same box. (#313)
 - Python 3.12.4 is the oldest Python Postulo runs on: the 3.12 releases before it call some reserved address ranges public. **Installed without a container: check `python --version` before upgrading.** (#321)
 - Reminders are kept on the calendar: done, later, edit and delete in every view, a new one from any day, and the agenda narrowed to reminders, overdue ones first, replaces the *Reminders* page and its navigation entry; its old address leads there. (#316)

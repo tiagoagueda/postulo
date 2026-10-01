@@ -342,4 +342,23 @@
       {% endfor %}
     </div>
   </section>
+
+  <!-- ------------------------------------------------------------------ dialogs -->
+  {% comment %} `<c-dialog>` (#303), with no action, so its body is not a form and neither
+     answer does anything. The button opens it as a popover with scripts off and as a modal
+     with them on, exactly as a row's bin does on *Your details*. {% endcomment %}
+  <section id="design-dialogs" class="mb-10" aria-labelledby="design-dialogs-heading">
+    <c-section-title id="design-dialogs-heading">
+      {% translate "Dialogs" %}
+      <c-slot name="subtitle">{% translate "A question over the page, answered before anything is done. This one asks about nothing, and neither answer changes anything." %}</c-slot>
+    </c-section-title>
+    <button type="button" class="btn" data-variant="outline" popovertarget="design-dialog" aria-haspopup="dialog">{% translate "Open the dialog" %}</button>
+    <c-dialog id="design-dialog">
+      <c-slot name="title">{% translate "Remove this example?" %}</c-slot>
+      <c-slot name="description">{% translate "A confirmation asks one question and says what answering it does. Here, nothing." %}</c-slot>
+      <c-slot name="footer">
+        <button type="button" class="btn" data-variant="destructive" popovertarget="design-dialog" popovertargetaction="hide">{% translate "Remove" %}</button>
+      </c-slot>
+    </c-dialog>
+  </section>
 {% endblock %}

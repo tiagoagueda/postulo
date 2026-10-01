@@ -1,0 +1,15 @@
+{% load i18n postulo %}
+<c-vars removal />
+{% comment %} *Remove*, as a bin in the destructive tone, opening the row's dialog (#303):
+   `<c-remove-button :removal="row.removal" />`, with the `Removal` that
+   `accounts/removals.py` put on the row.
+
+   An icon alone, so its name is the words and the row's value -- "Remove +351 912 345 678"
+   -- rather than "Remove" eleven times down one page. `type="button"`, because it sits inside
+   the page's form and a submit button there would save the page instead of asking anything;
+   `popovertarget` opens the dialog wherever it is drawn, which is after the form. The
+   24-pixel square is `icon-xs`. {% endcomment %}
+<button type="button" class="btn" data-variant="destructive-ghost" data-size="icon-xs"
+        popovertarget="{{ removal.dialog }}" aria-haspopup="dialog"
+        aria-label="{% blocktranslate trimmed with what=removal.value %}Remove {{ what }}{% endblocktranslate %}"
+        data-remove-trigger>{% icon "trash-2" class="size-4" %}</button>

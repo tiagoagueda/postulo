@@ -165,6 +165,11 @@
   );
 
   document.addEventListener("htmx:responseError", function (event) {
+    // A row's dialog told that the row has gone already is not a failure: it is taken off
+    // this copy of the page as well, further down (#303).
+    if (rowAlreadyGone(event)) {
+      return;
+    }
     var xhr = (event.detail || {}).xhr;
     sayFailure(failureWords("alertFailed").replace("{status}", String((xhr && xhr.status) || 0)));
   });
@@ -332,8 +337,9 @@
   // One identifier of each kind (#307). The server switches off, in each row's choice of
   // kind, the kinds the other rows hold -- never the row's own, never Other -- so with this
   // script blocked the rows are right as drawn. This keeps them right while somebody
-  // changes a row's kind or ticks *Remove*, which gives the kind back, by running the same
-  // rule as `OneOfEachKind` in `core/identifiers.py` over the whole block again.
+  // changes a row's kind, ticks *Remove* on a company's form, or takes a row off *Your
+  // details* at once (#303) -- the last two give the kind back -- by running the same rule
+  // as `OneOfEachKind` in `core/identifiers.py` over the whole block again.
   function holdKinds(block) {
     var rows = Array.prototype.map.call(
       block.querySelectorAll("select[name$='-scheme']"),
@@ -1606,6 +1612,318 @@
       true
     );
   }
+
+  /* ---------------------------------------------------------------------- dialogs
+   *
+   * `<c-dialog>` is a `<dialog popover>`, and the button that opens it a `<button
+   * popovertarget>` (#303). With no script the browser opens it as a popover: over the page,
+   * closed on Escape, on a click outside and on *Cancel*, and not modal. Here the same button
+   * opens it with `showModal()` instead, so the rest of the page is inert and focus cannot
+   * wander out of the question while it is being asked. Cancelling the click is what stops
+   * the popover opening as well: a button's `popovertarget` is its activation behaviour,
+   * which a cancelled click does not run.
+   *
+   * *Cancel* hides a popover by its own `popovertargetaction="hide"`, and a modal dialog is
+   * not a popover, so it is closed here. Escape closes a modal dialog by itself. Either way
+   * focus goes back to the button that opened it, which the browser does on its own; it is
+   * done here too, for the one that does not, unless the button has gone with its row.
+   */
+  function dialogOf(button) {
+    var id = button.getAttribute("popovertarget");
+    var dialog = id ? document.getElementById(id) : null;
+    return dialog && dialog.tagName === "DIALOG" && dialog.hasAttribute("data-dialog") ? dialog : null;
+  }
+
+  var dialogOpener = {};
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("button[popovertarget]") : null;
+    var dialog = button && dialogOf(button);
+    if (!dialog || typeof dialog.showModal !== "function") {
+      return;
+    }
+    if (button.getAttribute("popovertargetaction") === "hide") {
+      if (dialog.open) {
+        event.preventDefault();
+        dialog.close();
+      }
+      return;
+    }
+    if (dialog.open || (popovers && dialog.matches(":popover-open"))) {
+      return;
+    }
+    event.preventDefault();
+    dialogOpener[dialog.id] = button;
+    dialog.showModal();
+  });
+
+  document.addEventListener(
+    "close",
+    function (event) {
+      var dialog = event.target;
+      if (!dialog || dialog.tagName !== "DIALOG" || !dialog.hasAttribute("data-dialog")) {
+        return;
+      }
+      var opener = dialogOpener[dialog.id];
+      delete dialogOpener[dialog.id];
+      var said = dialog.querySelector("[data-dialog-said]");
+      if (said) {
+        said.textContent = "";
+      }
+      var lost = !document.activeElement || document.activeElement === document.body;
+      if (opener && opener.isConnected && (lost || dialog.contains(document.activeElement))) {
+        opener.focus();
+      }
+    },
+    true
+  );
+
+  /* ------------------------------------------------ a row off *Your details*, at once
+   *
+   * A row's dialog is a form of its own, posting to that row's address (#303). htmx sends it,
+   * and the answer is JSON for this: whether the row went, the sentence to say, which row of
+   * the block is primary now, and how many the block has left. Nothing else on the page is
+   * touched -- whatever was typed into the other rows, or anywhere else, is still there, and
+   * still asks before the page is left (#258), because the page is never left.
+   *
+   * **The row leaves its key behind.** The page is one formset per block, and its management
+   * form counted this row when the page was drawn; a row that simply vanished would be a gap
+   * the next *Save* fails on. So the row's hidden fields stay, in a hidden list item, with
+   * its removal ticked -- which is how Django passes over a row that has already gone -- and
+   * a page drawn again after a refused save draws the same thing back.
+   *
+   * **Focus goes on, not away.** The bin that was pressed went with its row, so focus goes
+   * to the next row that can be removed, to its first control; where there is none, to the
+   * block's own heading. The count beside the block in the sidebar is the new one, the star
+   * moves to the row that inherited *Primary* -- and so does the sentence in its dialog that
+   * says removing it hands the primary on -- and an identifier's kind is free for the other
+   * rows again.
+   *
+   * **Then the block says what went**, in its polite live region, and only then: focus has
+   * moved first, and the sentence is written a moment later, once. A screen reader that
+   * drops what it is saying when focus moves would otherwise cut the sentence short, and
+   * one written twice is read twice.
+   *
+   * **A row that had gone already goes from this copy too.** A second tab, or the page the
+   * Back button brings back, still draws a row taken off somewhere else, and its address
+   * answers 404: there is no such row. That is the outcome the person asked for, not a
+   * failure, so the row is taken off here as well and the block says it had already been
+   * removed -- the dialog carries that sentence, written by the server with the rest. The
+   * answer names no primary and no count, so the star stays where this copy has it and the
+   * sidebar counts the bins that are left.
+   */
+  // How long after focus has moved the block says what went.
+  var SAID_AFTER = 100;
+
+  function removalAnswer(xhr) {
+    try {
+      return JSON.parse((xhr && xhr.responseText) || "{}");
+    } catch (error) {
+      return {};
+    }
+  }
+
+  function firstControl(row) {
+    return row.querySelector("input:not([type=hidden]), select, textarea, button, a[href]");
+  }
+
+  function landingAfter(row, block) {
+    var next = row.nextElementSibling;
+    while (next && (next.hidden || !next.querySelector("[data-remove-trigger]"))) {
+      next = next.nextElementSibling;
+    }
+    if (next) {
+      return firstControl(next);
+    }
+    var heading = block.querySelector("legend");
+    if (heading) {
+      heading.setAttribute("tabindex", "-1");
+    }
+    return heading;
+  }
+
+  function leaveTheKey(row) {
+    var ghost = document.createElement("li");
+    ghost.hidden = true;
+    ghost.setAttribute("data-removed", "");
+    var key = null;
+    Array.prototype.forEach.call(row.querySelectorAll("input[type=hidden]"), function (field) {
+      if (/-id$/.test(field.name)) {
+        key = field;
+      }
+      ghost.appendChild(field);
+    });
+    if (key) {
+      var removal = document.createElement("input");
+      removal.type = "hidden";
+      removal.name = key.name.replace(/-id$/, "-DELETE");
+      removal.value = "on";
+      ghost.appendChild(removal);
+    }
+    row.replaceWith(ghost);
+  }
+
+  // The saved row's key, as the formset's hidden field carries it; nothing for a new row.
+  function rowKey(row) {
+    var found = "";
+    Array.prototype.some.call(row.querySelectorAll("input[type=hidden]"), function (field) {
+      if (/-id$/.test(field.name)) {
+        found = field.value;
+        return true;
+      }
+      return false;
+    });
+    return found;
+  }
+
+  function rowsLeft(block) {
+    return Array.prototype.slice.call(block.querySelectorAll("li:not([hidden])"));
+  }
+
+  // Only where the star went with its row. A star somebody moved and has not saved yet is
+  // what they typed, and stays where they put it.
+  function markPrimary(block, pk) {
+    if (pk === null || pk === undefined) {
+      return;
+    }
+    if (block.querySelector("li:not([hidden]) input[type=radio][name$='-primary']:checked")) {
+      return;
+    }
+    rowsLeft(block).some(function (row) {
+      if (rowKey(row) !== String(pk)) {
+        return false;
+      }
+      var star = row.querySelector("input[type=radio][name$='-primary']");
+      if (star) {
+        star.checked = true;
+      }
+      return true;
+    });
+  }
+
+  // Each dialog of a block with a primary holds the sentence "the next one becomes the
+  // primary", hidden on every row but the one it is true of. That was settled when the page
+  // was drawn, and a row gone since may have changed it: the primary the server kept is the
+  // row whose removal hands it on, and only while another row is left to take it.
+  function sayWhoHandsOn(block, pk, count) {
+    var kept = pk === null || pk === undefined ? "" : String(pk);
+    rowsLeft(block).forEach(function (row) {
+      var trigger = row.querySelector("[data-remove-trigger]");
+      var dialog = trigger && dialogOf(trigger);
+      var sentence = dialog && dialog.querySelector("[data-hands-on]");
+      if (sentence) {
+        sentence.hidden = !(kept && rowKey(row) === kept && count > 1);
+      }
+    });
+  }
+
+  // A request that failed is said inside the dialog as well as at the foot of the page:
+  // behind a modal the page is inert, so the foot's alert can be neither seen nor heard.
+  function sayInTheDialog(event, words) {
+    var source = (event.detail || {}).elt;
+    var dialog = source && source.closest ? source.closest("dialog[data-dialog]") : null;
+    var said = dialog && dialog.querySelector("[data-dialog-said]");
+    if (said) {
+      said.textContent = words;
+    }
+  }
+
+  // The dialog of a row whose address has just answered that there is no such row.
+  function rowAlreadyGone(event) {
+    var detail = event.detail || {};
+    var form = detail.elt;
+    var dialog = form && form.closest ? form.closest("dialog[data-remove-row]") : null;
+    return dialog && detail.xhr && detail.xhr.status === 404 ? dialog : null;
+  }
+
+  function sayRemoved(block, words) {
+    var region = block.querySelector("[data-removed-said]");
+    if (region) {
+      window.setTimeout(function () {
+        region.textContent = words || "";
+      }, SAID_AFTER);
+    }
+  }
+
+  document.addEventListener("htmx:responseError", function (event) {
+    if (rowAlreadyGone(event)) {
+      return;
+    }
+    var xhr = (event.detail || {}).xhr;
+    sayInTheDialog(
+      event,
+      failureWords("alertFailed").replace("{status}", String((xhr && xhr.status) || 0))
+    );
+  });
+
+  ["htmx:sendError", "htmx:timeout"].forEach(function (name) {
+    document.addEventListener(name, function (event) {
+      sayInTheDialog(event, failureWords("alertOffline"));
+    });
+  });
+
+  document.addEventListener("htmx:afterRequest", function (event) {
+    var detail = event.detail || {};
+    var form = detail.elt;
+    var dialog = form && form.closest ? form.closest("dialog[data-remove-row]") : null;
+    if (!dialog) {
+      return;
+    }
+    var answer;
+    if (detail.successful) {
+      answer = removalAnswer(detail.xhr);
+      if (!answer.removed) {
+        var said = dialog.querySelector("[data-dialog-said]");
+        if (said) {
+          said.textContent = answer.said || "";
+        }
+        return;
+      }
+    } else if (rowAlreadyGone(event)) {
+      answer = { said: dialog.getAttribute("data-gone-said") || "" };
+      sayFailure("");
+    } else {
+      return;
+    }
+    var trigger = document.querySelector(
+      '[data-remove-trigger][popovertarget="' + CSS.escape(dialog.id) + '"]'
+    );
+    var row = trigger ? trigger.closest("li") : null;
+    var block = row ? row.closest("fieldset") : null;
+    delete dialogOpener[dialog.id];
+    if (dialog.open) {
+      dialog.close();
+    } else if (popovers && dialog.matches(":popover-open")) {
+      dialog.hidePopover();
+    }
+    dialog.remove();
+    if (!row || !block) {
+      return;
+    }
+    var landing = landingAfter(row, block);
+    leaveTheKey(row);
+    var left =
+      answer.count !== undefined
+        ? answer.count
+        : block.querySelectorAll("li:not([hidden]) [data-remove-trigger]").length;
+    if (answer.primary !== undefined) {
+      markPrimary(block, answer.primary);
+      sayWhoHandsOn(block, answer.primary, left);
+    }
+    if (block.matches("[data-identifiers]")) {
+      holdKinds(block);
+    }
+    var count = block.id
+      ? document.querySelector('[data-section-link="' + CSS.escape(block.id) + '"] .badge')
+      : null;
+    if (count) {
+      count.textContent = String(left);
+    }
+    if (landing) {
+      landing.focus();
+    }
+    sayRemoved(block, answer.said);
+  });
 
   // The language picker, which is a disclosure rather than a <select> because an <option>
   // cannot hold a flag, a language-marked name and a symbol at once (#119).

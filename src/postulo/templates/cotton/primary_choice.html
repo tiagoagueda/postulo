@@ -1,0 +1,17 @@
+{% load i18n postulo %}
+<c-vars name value checked="" />
+{% comment %} *Primary*, as a star (#303): `<c-primary-choice name="…-primary" value="{{ row.prefix }}"
+   :checked="row.instance.is_primary" />`.
+
+   Still the radio it always was. The rows of a block share one name, so the browser allows
+   exactly one to be chosen before anything is posted, and the value is the row's form prefix,
+   because a row being added has no key yet. The radio and the word are there for the
+   keyboard and the screen reader and hidden from sight; what is seen is a star, filled on the
+   chosen row and an outline on every other, so the two differ in shape and not only in
+   colour, and still do in forced colours. The label is the 24-pixel target, and its `title`
+   says the word to a pointer that rests on it. {% endcomment %}
+<label class="primary-choice" title="{% translate 'Primary' %}">
+  <input type="radio" class="sr-only" name="{{ name }}" value="{{ value }}"{% if checked %} checked{% endif %}>
+  {% icon "star" class="size-5" %}
+  <span class="sr-only">{% translate "Primary" %}</span>
+</label>

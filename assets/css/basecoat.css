@@ -201,6 +201,76 @@
   }
 }
 
+/* ------------------------------------------------------------------ dialog */
+
+/*
+ * A question over the page (#303): `<c-dialog>`. Basecoat's structure centres the dialog's
+ * one child in the window, keys the header, the body and the footer on the elements, and
+ * shows the lot while the `<dialog>` is `[open]` -- a modal a script opened -- or
+ * `:popover-open`, which is how it opens with no script. The box is painted here the way a
+ * menu's panel is: the popover's ground, a border, the floating plane, the card's rounding
+ * and padding. Its measure is 32rem, or the window less a gutter on each side where the
+ * window is narrower, and it scrolls inside itself when a zoomed window is shorter than it.
+ * Its words break anywhere: the heading holds something a person typed -- a host, an
+ * identifier -- which may be one word wider than a phone, and a box that scrolls down
+ * scrolls across too, so the end of the question would be out of sight behind a scroll bar.
+ *
+ * Two of Basecoat's choices are undone. It fades the box in and scales it up from 95%,
+ * which is motion nobody asked for -- the answer the menus got (#310). And on a phone it
+ * stacks the footer in reverse, the answer above *Cancel*, so that what is read first and
+ * what Tab reaches first were not the same button; the footer is a row that wraps, in the
+ * order written, at its inline end.
+ */
+@layer components {
+  .dialog,
+  .alert-dialog {
+    transition: none;
+  }
+
+  .dialog::backdrop,
+  .alert-dialog::backdrop {
+    transition: none;
+  }
+
+  /* The page is dimmed only where it is out of reach. Behind a modal it is inert, and the
+     scrim says so. A popover -- the same dialog with no script -- leaves the page live: a
+     click on it closes the dialog and lands on whatever was under the pointer, so a scrim
+     there would dim a link that still works. */
+  .dialog:modal::backdrop,
+  .alert-dialog:modal::backdrop {
+    @apply bg-ink-950/50;
+  }
+
+  .dialog > *,
+  .alert-dialog > * {
+    @apply w-[calc(100%-2rem)] max-w-lg gap-4 overflow-y-auto rounded-xl border border-border
+      bg-popover p-6 wrap-anywhere text-popover-foreground shadow-floating;
+    transition: none;
+  }
+
+  .dialog > * > header,
+  .alert-dialog > * > header {
+    @apply gap-2;
+  }
+
+  .dialog > * > header > h2,
+  .alert-dialog > * > header > h2 {
+    /* Said again here: every heading is `break-word` (#165), which does not let the grid
+       it sits in shrink, and this one is a grid item holding a typed value. */
+    @apply text-lg leading-snug font-semibold wrap-anywhere;
+  }
+
+  .dialog > * > header > p,
+  .alert-dialog > * > header > p {
+    @apply text-sm text-ink-600 dark:text-ink-300;
+  }
+
+  .dialog > * > footer,
+  .alert-dialog > * > footer {
+    @apply flex-row flex-wrap justify-end gap-2;
+  }
+}
+
 /* ------------------------------------------------------------ the form family */
 
 /*

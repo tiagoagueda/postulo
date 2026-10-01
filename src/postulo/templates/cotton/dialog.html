@@ -1,0 +1,52 @@
+{% load i18n %}
+<c-vars id action="" live="" tone="alert" />
+{% comment %} A question over the page, answered before anything is done: Basecoat's alert
+   dialog, on the browser's own `<dialog>` and popover (#303).
+
+   `<c-dialog id="…" action="{% url … %}">` with `title` and `description` slots, and the
+   buttons that answer it in a `footer` slot; the component draws *Cancel* before them. Its
+   accessible name is the heading and its description the sentence, through
+   `aria-labelledby` and `aria-describedby`, so both are slots: a value somebody typed goes
+   in a `<bdi>`, which an attribute cannot hold. Anything more goes in the body, between the
+   two. `tone="alert"`, the default, is a confirmation (`alertdialog`); `tone="plain"` is a
+   dialog that holds something to do rather than a question.
+
+   **Without a script it is a popover.** The button that opens it is a `<button
+   popovertarget>` naming it, which the browser opens with no script at all, as it opens a
+   menu (#310): drawn in the top layer, over everything, closed on Escape, on a click
+   outside it and on *Cancel* -- a `popovertargetaction="hide"` -- and focus is handed to
+   *Cancel*, the answer that changes nothing, by `autofocus`. It is not modal: the page
+   behind it can still be reached with Tab. **With a script it is modal.** `app.js` opens
+   the same button's dialog with `showModal()` instead, so the page behind is inert and
+   focus stays inside until it closes, and goes back to the button when it does. The
+   Invoker Commands API (`commandfor` and `command="show-modal"`) would give the modal
+   half with no script, and is not used yet: where a browser has it, it wins over
+   `popovertarget`, so the browser the suite drives would never draw the popover every
+   browser without it falls back to.
+
+   `action` makes the body a `<form method="post">` to that address, carrying the token,
+   whose buttons in `footer` submit it; nested forms do not exist, so a dialog with an
+   action is drawn outside any other form and its button can sit inside one, since
+   `popovertarget` finds it by id. `live` sends that form with htmx and leaves the answer
+   to the page's own script, which is what *Your details* does to take a row off without
+   reloading what else was typed there; the alert that script writes a refusal or a failed
+   request into is drawn only then -- the vocabulary's own, in the error tone, and with no
+   box at all while it is empty. Without `action` the body is a `<div>`, for a dialog whose
+   buttons do not post -- the gallery's.
+
+   Any other attribute goes on the `<dialog>`, which is how a removal carries
+   `data-remove-row`. {% endcomment %}
+<dialog popover id="{{ id }}" class="{% if tone == 'alert' %}alert-dialog{% else %}dialog{% endif %}"{% if tone == "alert" %} role="alertdialog"{% endif %} aria-labelledby="{{ id }}-title"{% if description %} aria-describedby="{{ id }}-description"{% endif %} data-dialog{% if attrs.attrs_dict %} {{ attrs }}{% endif %}>
+  {% if action %}<form method="post" action="{{ action }}"{% if live %} hx-post="{{ action }}" hx-swap="none" hx-sync="this:drop"{% endif %}>{% csrf_token %}{% else %}<div>{% endif %}
+    <header>
+      <h2 id="{{ id }}-title">{{ title }}</h2>
+      {% if description %}<p id="{{ id }}-description">{{ description }}</p>{% endif %}
+    </header>
+    {% if slot.strip %}<section>{{ slot }}</section>{% endif %}
+    {% if action and live %}<p role="alert" class="alert empty:hidden" data-variant="error" data-dialog-said></p>{% endif %}
+    <footer>
+      <button type="button" class="btn" data-variant="outline" popovertarget="{{ id }}" popovertargetaction="hide" data-dialog-close autofocus>{% translate "Cancel" %}</button>
+      {{ footer }}
+    </footer>
+  {% if action %}</form>{% else %}</div>{% endif %}
+</dialog>

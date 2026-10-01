@@ -67,6 +67,11 @@
 @import "basecoat-css/components/checkbox.css";
 @import "basecoat-css/components/radio.css";
 @import "basecoat-css/components/input-group.css";
+/* A question over the page (#303): `<c-dialog>`, a `<dialog>` that a `popovertarget` opens
+   with no script and `app.js` opens as a modal where one runs. The structure centres the
+   box and keys the header, the body and the footer on the elements; the paint, and the
+   motion it would add, are decided in `basecoat.css`. */
+@import "basecoat-css/components/dialog.css";
 @import "./basecoat.css";
 
 /* Templates and Python live outside this directory, so point Tailwind at them. */
@@ -1191,6 +1196,32 @@
     @apply inline-flex min-h-6 min-w-6 items-center;
   }
 
+  /*
+   * *Primary*, drawn as a star (#303). Still a radio -- the rows of a block share one name,
+   * so the browser enforces exactly one before anything is posted -- kept for the keyboard
+   * and the screen reader, and hidden from sight inside the label that is its 24-pixel
+   * target. The word is the label's own text, hidden too. What changes is the drawing:
+   * the chosen row's star is filled and every other one is an outline, so the difference is
+   * a shape and not only a colour, and the ring the radio would have shown is drawn round
+   * the label when the radio has focus.
+   */
+  .primary-choice {
+    @apply relative inline-flex size-6 shrink-0 cursor-pointer items-center justify-center
+      rounded-md text-ink-500 hover:text-amber-700 dark:text-ink-400 dark:hover:text-amber-300;
+  }
+
+  .primary-choice:has(input:checked) {
+    @apply text-amber-600 dark:text-amber-400;
+  }
+
+  .primary-choice:has(input:checked) svg {
+    fill: currentColor;
+  }
+
+  .primary-choice:has(input:focus-visible) {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+
   /* An entry in a menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-ink-700
@@ -1756,6 +1787,23 @@ html {
 
   .col-handle {
     border-inline-end: 1px solid ButtonText;
+  }
+
+  /* The *Primary* star (#303) in the system's own colours: every one an outline in
+     `ButtonText`, the chosen one filled in `Highlight`, so the shape still says which row
+     it is when the amber is gone -- and the focus ring round its label, as on a field. */
+  .primary-choice svg {
+    stroke: ButtonText;
+  }
+
+  .primary-choice:has(input:checked) svg {
+    fill: Highlight;
+    stroke: Highlight;
+  }
+
+  .primary-choice:has(input:focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 
   /* The bar opts out of the repaint as a whole and paints itself in the system's own

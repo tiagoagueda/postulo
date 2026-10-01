@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import removals, views
 
 app_name = "accounts"
 
@@ -11,6 +11,28 @@ urlpatterns = [
     path("login/", views.SignInView.as_view(), name="login"),
     path("login/code/", views.RequestLoginCodeView.as_view(), name="login_code"),
     path("profile/", views.ProfileView.as_view(), name="profile"),
+    # One row off *Your details* at once, each kind at its own address (#303). By a POST
+    # only; a GET leads back to the row's block.
+    path(
+        "profile/numbers/<int:pk>/remove/",
+        views.RemoveRowView.as_view(kind=removals.NUMBER),
+        name="remove_number",
+    ),
+    path(
+        "profile/links/<int:pk>/remove/",
+        views.RemoveRowView.as_view(kind=removals.LINK),
+        name="remove_link",
+    ),
+    path(
+        "profile/addresses/<int:pk>/remove/",
+        views.RemoveRowView.as_view(kind=removals.ADDRESS),
+        name="remove_address",
+    ),
+    path(
+        "profile/identifiers/<int:pk>/remove/",
+        views.RemoveRowView.as_view(kind=removals.IDENTIFIER),
+        name="remove_identifier",
+    ),
     path("theme/", views.ThemeView.as_view(), name="theme"),
     path("avatar/<int:pk>/", views.AvatarView.as_view(), name="avatar"),
     path("avatar/refresh/", views.GravatarRefreshView.as_view(), name="avatar_refresh"),

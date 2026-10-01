@@ -1,0 +1,10 @@
+{% comment %} A row that has already gone, sent back after a save that was refused (#303).
+
+   Taken off by its dialog, or removed from another copy of the page while this one was
+   open. The row is gone from the table, but the page's formset still counts it: its
+   management form was drawn before the removal. So the row's key and its removal are
+   drawn again, hidden -- what the script leaves in a row's place -- and the next save
+   passes over it, as the formset passes over any row already gone
+   (`core.formsets.RowsAlreadyGone`). Drawn as a normal row it would be boxes with a key
+   nothing answers to, and no bin to take them off with. {% endcomment %}
+<li hidden data-removed>{% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}<input type="hidden" name="{{ row.DELETE.html_name }}" value="on"></li>

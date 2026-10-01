@@ -8,6 +8,13 @@
 
    The radio's value is the row's form prefix and not its primary key, because somebody
    adding their first two numbers is choosing between rows that do not have keys yet.
+
+   `remove_at_once` is *Your details* (#303): *Primary* is a star and *Remove* a bin that
+   asks in a dialog and takes the row off there and then, and a row it took off comes back
+   after a refused save as the hidden key it left. Without it -- the contact form -- the row
+   keeps its *Remove* box, and a ticked one goes when the page is saved. On either page a
+   row the table no longer holds -- posted from a copy of the page that is out of date -- is
+   drawn as that key too.
 {% endcomment %}
 <fieldset class="card mb-6" data-phone-numbers id="section-phones">
   <legend class="label px-1">{% translate "Telephone numbers" %}</legend>
@@ -23,6 +30,7 @@
   {% endif %}
   <ol class="space-y-3">
     {% for row in numbers %}
+      {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
       <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
         {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
         {% comment %} The number on its own line, and the rest under it. Squeezed into a
@@ -50,12 +58,16 @@
              target partially obscuring another. The padding is what makes the label the
              target rather than the input inside it.
           {% endcomment %}
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
-            <label class="inline-flex items-center gap-2 py-1.5">
-              <input type="radio" class="input" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
-                     {% if row.instance.is_primary %}checked{% endif %}>
-              <span>{% translate "Primary" %}</span>
-            </label>
+          <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+            {% if remove_at_once %}
+              <c-primary-choice name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+            {% else %}
+              <label class="inline-flex items-center gap-2 py-1.5">
+                <input type="radio" class="input" name="{{ numbers.prefix }}-primary" value="{{ row.prefix }}"
+                       {% if row.instance.is_primary %}checked{% endif %}>
+                <span>{% translate "Primary" %}</span>
+              </label>
+            {% endif %}
             {% comment %} Kept apart from Primary on purpose: the primary is what a
                document prints and a recruiter dials, so tying the two together would mean
                changing the number on a CV silently changed a way into the account (#144).
@@ -76,7 +88,9 @@
                 </span>
               </label>
             {% endif %}
-            {% if row.instance.pk %}
+            {% if remove_at_once %}
+              {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+            {% elif row.instance.pk %}
               <label class="inline-flex items-center gap-2 py-1.5">
                 {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
               </label>
@@ -90,8 +104,10 @@
           {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
         </div>
       </li>
+      {% endif %}
     {% endfor %}
   </ol>
+  {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
       A number is kept once on this instance. If one is already recorded here, saving says

@@ -260,6 +260,35 @@ def token(owner):
     return ApiToken.issue(owner, "Their agent")[0]
 
 
+def number(owner):
+    """A telephone number on somebody else's *Your details* (#303)."""
+    from postulo.core.models import PhoneNumber
+
+    return PhoneNumber.objects.create(owner=owner, holder=owner.profile, number="+351912345678")
+
+
+def web_link(owner):
+    from postulo.core.models import WebLink
+
+    return WebLink.objects.create(
+        owner=owner, holder=owner.profile, kind=WebLink.Kind.SOCIAL, url="https://example.org"
+    )
+
+
+def postal_address(owner):
+    from postulo.core.models import PostalAddress
+
+    return PostalAddress.objects.create(
+        owner=owner, holder=owner.profile, street="Their street 1", country="PT"
+    )
+
+
+def person_identifier(owner):
+    from postulo.accounts.models import PersonIdentifier
+
+    return PersonIdentifier.objects.create(profile=owner.profile, scheme="wikidata", value="Q95")
+
+
 def pk_of(make: Callable, **extra) -> Callable:
     return lambda owner: {"pk": make(owner).pk, **extra}
 
@@ -269,6 +298,11 @@ def pk_of(make: Callable, **extra) -> Callable:
 FACTORIES: dict[str, Callable] = {
     # accounts: a picture is somebody's own, or an administrator's to see
     "accounts:avatar": lambda owner: {"pk": owner.pk},
+    # a row taken off *Your details* at once, one address per kind of row (#303)
+    "accounts:remove_number": pk_of(number),
+    "accounts:remove_link": pk_of(web_link),
+    "accounts:remove_address": pk_of(postal_address),
+    "accounts:remove_identifier": pk_of(person_identifier),
     "api:token_revoke": pk_of(token),
     # applications
     "applications:delete": pk_of(application),

@@ -3,7 +3,8 @@
 The server switches off, in each row's choice of kind, the kinds the other rows hold; that
 half is covered by `tests/test_one_of_each_kind.py` and is the whole behaviour with scripts
 off. The script only keeps it true while somebody changes a row, which takes a browser:
-`change` on a native select and on a checkbox, and the `disabled` property of an option.
+`change` on a native select, a row taken off at once from its dialog (#303), and the
+`disabled` property of an option.
 """
 
 from __future__ import annotations
@@ -47,7 +48,10 @@ def test_changing_a_rows_kind_moves_what_the_other_rows_offer(page: Page, live_s
     expect(saved.locator("option[value=wikidata]")).to_be_disabled()
     expect(new.locator("option[value=wikidata]")).to_be_enabled()
 
-    # Removing the saved row gives its kind back; Other was never taken at all.
-    page.locator("input[name=identifiers-0-DELETE]").check()
+    # Removing the saved row -- at once, from its dialog, since #303 -- gives its kind back;
+    # Other was never taken at all.
+    page.get_by_role("button", name="Remove Wikidata Q95", exact=True).click()
+    page.get_by_role("alertdialog").get_by_role("button", name="Remove", exact=True).click()
+    expect(saved).to_have_count(0)
     expect(new.locator("option[value=linkedin]")).to_be_enabled()
     expect(new.locator("option[value=other]")).to_be_enabled()

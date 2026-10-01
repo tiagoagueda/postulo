@@ -8,6 +8,10 @@
    Each part is called what its own country calls it, in the language the reader is using:
    the label follows the country chosen on the row and the words follow the catalogue, and
    both vary at once (#147). A country Postulo has no rules for gets the neutral words.
+
+   `remove_at_once` is *Your details* (#303), as in `phone_numbers.html`: a star, a bin, a
+   dialog, and the row gone there and then. It is the only page these rows are on, and the
+   switch is kept so that a second page drawing them decides for itself.
 {% endcomment %}
 <fieldset class="card mb-6" data-postal-addresses id="section-addresses">
   <legend class="label px-1">{% translate "Postal addresses" %}</legend>
@@ -23,6 +27,7 @@
   {% endif %}
   <ol class="space-y-3">
     {% for row in addresses %}
+      {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
       <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
         {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
         <div class="field mb-3">
@@ -73,16 +78,21 @@
           {% comment %} Each its own hit area with room around it: WCAG 2.2 2.5.8 wants 24
              by 24, and a radio touching a checkbox is one target partially obscuring
              another. The padding is what makes the label the target. {% endcomment %}
-          <div class="flex flex-wrap items-center gap-x-6 gap-y-1 pb-1 text-sm">
-            <label class="inline-flex items-center gap-2 py-1.5">
-              <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
-                     {% if row.instance.is_primary %}checked{% endif %}>
-              <span>{% translate "Primary" %}</span>
-            </label>
-            {% if row.instance.pk %}
+          <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+            {% if remove_at_once %}
+              <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+              {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+            {% else %}
               <label class="inline-flex items-center gap-2 py-1.5">
-                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+                <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
+                       {% if row.instance.is_primary %}checked{% endif %}>
+                <span>{% translate "Primary" %}</span>
               </label>
+              {% if row.instance.pk %}
+                <label class="inline-flex items-center gap-2 py-1.5">
+                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+                </label>
+              {% endif %}
             {% endif %}
           </div>
         </div>
@@ -100,8 +110,10 @@
           <p class="mt-1 text-xs text-amber-700 dark:text-amber-300" data-country-note>{{ note }}</p>
         {% endfor %}
       </li>
+      {% endif %}
     {% endfor %}
   </ol>
+  {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
   {% comment %} Said because the opposite is what people expect from the telephone numbers
      beside it: a number is unique across the instance and an address is not. Two people at
      one address is a household, and refusing the second would also disclose that somebody

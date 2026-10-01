@@ -177,9 +177,11 @@
         {% endfor %}
       </div>
 
-      {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
-      {% include "partials/web_links.html" %}
-      {% include "partials/postal_addresses.html" %}
+      {% comment %} Each saved row comes off at once, from a dialog, rather than with a box
+         ticked and the page saved (#303); the dialogs are after the form. {% endcomment %}
+      {% if numbers %}{% include "partials/phone_numbers.html" with remove_at_once=True %}{% endif %}
+      {% include "partials/web_links.html" with remove_at_once=True %}
+      {% include "partials/postal_addresses.html" with remove_at_once=True %}
 
       <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="label px-1">{% translate "Identifiers" %}</legend>
@@ -197,9 +199,10 @@
         {% endif %}
         <ol class="space-y-3">
           {% for row in identifiers %}
-            <c-identifier-row :row="row" />
+            {% if row.already_gone or row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}<c-identifier-row :row="row" remove_at_once />{% endif %}
           {% endfor %}
         </ol>
+        {% include "partials/removed_said.html" %}
         <details class="mt-3 text-sm">
           <summary class="cursor-pointer text-ink-600 dark:text-ink-400">{% translate "What goes where" %}</summary>
           <dl class="mt-2 grid gap-1 sm:grid-cols-[minmax(0,14rem)_1fr]">
@@ -217,6 +220,29 @@
         <a href="{% url 'core:home' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
       </div>
     </form>
+
+    {% comment %} One dialog per saved row, each a form of its own posting to that row's
+       address (#303). Out here because a form cannot hold another: the bin in the row names
+       its dialog by id, and a dialog is drawn over the page wherever it sits. Each
+       carries the sentence for a row that turns out to have gone already -- this copy
+       of the page being out of date -- which `app.js` says when the address answers
+       that there is no such row. {% endcomment %}
+    {% for removal in removals %}
+      <c-dialog id="{{ removal.dialog }}" action="{{ removal.action }}" live data-remove-row data-gone-said="{{ removal.already_gone }}">
+        <c-slot name="title">{% blocktranslate trimmed with what=removal.value %}Remove <bdi>{{ what }}</bdi>?{% endblocktranslate %}</c-slot>
+        <c-slot name="description">
+          {% translate "It comes off your details now, without waiting for Save, and cannot be put back." %}
+          {% comment %} Drawn for every row of a block that has a primary, and hidden on
+             all but the one it is true of: a row taken off without a reload changes which
+             that is, and `app.js` moves the sentence with it. {% endcomment %}
+          {% if removal.kind.has_primary %}<span data-hands-on{% if not removal.hands_on %} hidden{% endif %}>{% translate "The next one in the list becomes the primary." %}</span>{% endif %}
+          <noscript>{% translate "Anything else you have changed on this page and not saved is lost." %}</noscript>
+        </c-slot>
+        <c-slot name="footer">
+          <button type="submit" class="btn" data-variant="destructive">{% translate "Remove" %}</button>
+        </c-slot>
+      </c-dialog>
+    {% endfor %}
 
     {% if profile.use_gravatar %}
       <form method="post" action="{% url 'accounts:avatar_refresh' %}" class="mt-4">

@@ -22,6 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 from . import phone_field, phones
+from .formsets import RowsAlreadyGone
 from .models import PhoneNumber
 
 #: What somebody is told when the number they typed is already recorded here.
@@ -232,6 +233,33 @@ def set_primary(number: PhoneNumber) -> None:
 
 
 @transaction.atomic
+def ensure_one_primary(holder) -> PhoneNumber | None:
+    """The holder keeps the primary it has; failing that, its first number becomes it.
+
+    What saving the rows does when nobody said which one is the primary, and what taking a
+    row off *Your details* at once does afterwards (#303) -- one rule in one place, so the
+    two ways of losing the primary cannot disagree about who inherits it. A holder with
+    numbers and no primary shows none at all once the feature is switched off again. The
+    primary afterwards comes back, or nothing when no number is left.
+    """
+    wanted = holder.phone_numbers.filter(is_primary=True).first() or holder.phone_numbers.first()
+    if wanted is not None:
+        set_primary(wanted)
+    return wanted
+
+
+def gets_back_in(number: PhoneNumber) -> bool:
+    """Whether this row is, today, its owner's way back into their account (#143, #144).
+
+    Chosen, confirmed recently enough to mean something, and on an instance that can reach
+    a number at all. Such a row is not taken off by a removal: the person chooses another
+    first, on the page that offers the choice. A chosen number on an instance whose gateway
+    has gone is no route, and nothing on the page could choose another, so it may go.
+    """
+    return number.is_recovery and number.is_verified and can_be_chosen_here()
+
+
+@transaction.atomic
 def save_only_number(holder, owner, typed: str) -> PhoneNumber | None:
     """Write the one number a person typed while the feature is switched off.
 
@@ -299,8 +327,12 @@ class PhoneNumberForm(forms.ModelForm):
         return data
 
 
-class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
-    """The rows together: nothing listed twice, here or anywhere else on the instance."""
+class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet):
+    """The rows together: nothing listed twice, here or anywhere else on the instance.
+
+    A row the page still carries and the table no longer holds has already been removed
+    (`RowsAlreadyGone`).
+    """
 
     #: Who is answering, for the collision limit. Set by `formset_for`; `None` where a
     #: formset is built directly, in which case the limit has nobody to charge and the
@@ -342,14 +374,12 @@ class BasePhoneNumberFormSet(generic_forms.BaseGenericInlineFormSet):
             if form.prefix == chosen and form.instance.pk and not form.cleaned_data.get("DELETE"):
                 wanted = form.instance
                 break
-        if wanted is None:
-            # Nobody said, so the holder keeps the primary it had; failing that, the first
-            # row becomes it, because a holder with numbers and no primary shows none at
-            # all once the feature is switched off again.
-            existing = self.instance.phone_numbers.filter(is_primary=True).first()
-            wanted = existing or self.instance.phone_numbers.first()
         if wanted is not None:
             set_primary(wanted)
+        else:
+            # Nobody said, so the holder keeps the primary it had; failing that, the first
+            # row becomes it.
+            ensure_one_primary(self.instance)
         self._settle_the_recovery_number()
         return saved
 
