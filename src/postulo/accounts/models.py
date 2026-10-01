@@ -660,8 +660,18 @@ class Invite(models.Model):
             return False
         return True
 
-    def accept(self, user) -> None:
-        """Mark the invitation as spent by ``user``."""
-        self.accepted_at = timezone.now()
-        self.accepted_by = user
-        self.save(update_fields=["accepted_at", "accepted_by"])
+    def accept(self, user) -> bool:
+        """Spend the invitation for ``user``, and say whether that happened.
+
+        One statement, which changes the row only while it is unspent and unexpired. Two
+        requests can each hold a copy that looks unspent; saving the copy let the later one
+        write its own account over the first one's, and both accounts existed (#544). Here
+        the database decides, and the copy that lost is left saying what it said before.
+        """
+        now = timezone.now()
+        spent = Invite.objects.filter(
+            pk=self.pk, accepted_at__isnull=True, expires_at__gt=now
+        ).update(accepted_at=now, accepted_by=user)
+        if spent:
+            self.accepted_at, self.accepted_by = now, user
+        return bool(spent)

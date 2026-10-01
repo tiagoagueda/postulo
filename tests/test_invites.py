@@ -9,6 +9,7 @@ import re
 from datetime import timedelta
 
 import pytest
+from django.db import connection
 from django.urls import reverse
 from django.utils import timezone
 
@@ -210,6 +211,161 @@ def test_an_invitation_for_one_address_cannot_be_used_by_another(client, db, sta
     assert "only be used with the address it was sent to" in response.content.decode()
     bound.refresh_from_db()
     assert not bound.is_accepted
+
+
+# ------------------------------------------------------------------ spent once
+
+
+def test_an_invitation_is_spent_once_however_many_copies_are_held(invite, user, other_user):
+    """Two requests each read it unspent; only one of them gets to spend it (#544).
+
+    Spending used to be an unconditional save, so the later of two overlapping sign-ups
+    wrote its own account over the first one's and both accounts existed.
+    """
+    one, another = Invite.objects.get(pk=invite.pk), Invite.objects.get(pk=invite.pk)
+
+    assert one.accept(user) is True
+    assert another.accept(other_user) is False
+
+    invite.refresh_from_db()
+    assert invite.accepted_by == user
+    assert another.accepted_by is None, "the copy that lost does not pretend otherwise"
+    assert not another.is_accepted
+
+
+def test_an_expired_invitation_cannot_be_spent(db, staff_user, user):
+    expired = Invite.objects.create(
+        created_by=staff_user, expires_at=timezone.now() - timedelta(seconds=1)
+    )
+
+    assert expired.accept(user) is False
+    expired.refresh_from_db()
+    assert expired.accepted_by is None
+
+
+@pytest.fixture
+def a_sign_up_that_read_it_before_it_was_spent(invite, user, monkeypatch):
+    """What the second of two overlapping requests holds: a copy that still looks unspent."""
+    stale = Invite.objects.get(pk=invite.pk)
+    Invite.objects.get(pk=invite.pk).accept(user)
+    for module in ("adapter", "signals"):
+        monkeypatch.setattr(
+            f"postulo.accounts.{module}.pending_invite", lambda request, **how: stale
+        )
+    return stale
+
+
+@pytest.fixture
+def a_transaction_for_each_request(monkeypatch):
+    """As an instance runs. The test settings replace the database and leave this off."""
+    from django.db import connections
+
+    monkeypatch.setitem(connections.settings["default"], "ATOMIC_REQUESTS", True)
+
+
+def test_a_sign_up_that_lost_the_race_gets_no_account(
+    client,
+    invite,
+    user,
+    a_sign_up_that_read_it_before_it_was_spent,
+    a_transaction_for_each_request,
+    settings,
+    django_user_model,
+):
+    settings.POSTULO_REGISTRATION_OPEN = False
+
+    response = client.post(
+        reverse("account_signup"),
+        {
+            "first_name": "Second",
+            "last_name": "Comer",
+            "username": "secondcomer",
+            "email": "second@example.org",
+            "password1": "a-fairly-long-password-42",
+            "password2": "a-fairly-long-password-42",
+        },
+    )
+
+    assert response.status_code == 403
+    assert not django_user_model.objects.filter(username="secondcomer").exists(), (
+        "the account made before the invitation turned out to be spent is rolled back"
+    )
+    invite.refresh_from_db()
+    assert invite.accepted_by == user, "and the list still names who really used it"
+
+
+def test_a_spent_invitation_stops_nobody_when_registration_is_open(
+    client, invite, user, a_sign_up_that_read_it_before_it_was_spent, settings, django_user_model
+):
+    """The invitation was not what let them in, so losing it is not a reason to refuse."""
+    settings.POSTULO_REGISTRATION_OPEN = True
+
+    response = client.post(
+        reverse("account_signup"),
+        {
+            "first_name": "Second",
+            "last_name": "Comer",
+            "username": "secondcomer",
+            "email": "second@example.org",
+            "password1": "a-fairly-long-password-42",
+            "password2": "a-fairly-long-password-42",
+        },
+    )
+
+    assert response.status_code == 302
+    assert django_user_model.objects.filter(username="secondcomer").exists()
+    invite.refresh_from_db()
+    assert invite.accepted_by == user
+
+
+@pytest.mark.skipif(
+    connection.vendor != "postgresql",
+    reason="only PostgreSQL lets two requests read the same invitation at once",
+)
+@pytest.mark.django_db(transaction=True)
+def test_a_second_sign_up_waits_for_the_first_and_then_finds_it_spent(django_user_model):
+    """The row lock, on the one database where requests really overlap.
+
+    SQLite takes its write lock when the request begins, so two sign-ups there are already
+    one after the other and `select_for_update` is not even sent. On PostgreSQL each
+    request reads what was committed, and without the lock both read the invitation unspent.
+    """
+    import threading
+    from types import SimpleNamespace
+
+    from django.db import transaction
+
+    from postulo.accounts.adapter import pending_invite
+
+    operator = django_user_model.objects.create_user(
+        email="operator@example.org", password="not-a-real-password", is_staff=True
+    )
+    newcomer = django_user_model.objects.create_user(
+        email="newcomer@example.org", password="not-a-real-password"
+    )
+    invite, _token = Invite.issue(created_by=operator)
+    request = SimpleNamespace(session={INVITE_SESSION_KEY: invite.token_fingerprint})
+    holding, found = threading.Event(), []
+
+    def the_second_sign_up():
+        holding.wait(10)
+        try:
+            with transaction.atomic():
+                found.append(pending_invite(request, lock=True))
+        finally:
+            connection.close()
+
+    second = threading.Thread(target=the_second_sign_up)
+    second.start()
+    with transaction.atomic():
+        first = pending_invite(request, lock=True)
+        holding.set()
+        second.join(timeout=1)
+        assert second.is_alive(), "the second read the invitation while the first held it"
+        assert first.accept(newcomer) is True
+    second.join(timeout=10)
+
+    assert found == [None], "having waited, the second finds the invitation spent"
 
 
 # ------------------------------------------------------------------- management

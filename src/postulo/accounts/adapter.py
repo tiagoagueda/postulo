@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from allauth.account.adapter import DefaultAccountAdapter
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
 
@@ -16,12 +17,23 @@ from .models import Invite
 INVITE_SESSION_KEY = "postulo_invite"
 
 
-def pending_invite(request: HttpRequest) -> Invite | None:
-    """Return the still-valid invitation held in this session, if any."""
+def pending_invite(request: HttpRequest, *, lock: bool = False) -> Invite | None:
+    """Return the still-valid invitation held in this session, if any.
+
+    With ``lock``, the row is held until the request's transaction ends, so a second
+    sign-up through the same invitation waits here and then reads it as spent (#544). On
+    PostgreSQL two requests otherwise both read it unspent, and both go on to make an
+    account. SQLite has no such lock and needs none: its requests already take turns.
+    """
     held = request.session.get(INVITE_SESSION_KEY)
     if not held:
         return None
-    invite = Invite.objects.filter(token_fingerprint=held).first()
+    invites = Invite.objects.filter(token_fingerprint=held)
+    # Only inside a transaction, which a request is. Outside one there is nothing for the
+    # lock to last until, and a database that has the lock refuses to take it.
+    if lock and transaction.get_connection().in_atomic_block:
+        invites = invites.select_for_update()
+    invite = invites.first()
     return invite if invite and invite.is_valid() else None
 
 
@@ -100,7 +112,9 @@ class AccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         if site.signup_open_now():
             return True
-        return pending_invite(request) is not None
+        # A POST is the sign-up itself, and it holds the invitation while it uses it.
+        # Showing the form is only a look.
+        return pending_invite(request, lock=request.method == "POST") is not None
 
     def clean_email(self, email: str) -> str:
         """Enforce an invitation that names a specific address.

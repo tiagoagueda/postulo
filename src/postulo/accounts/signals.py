@@ -5,6 +5,7 @@ from __future__ import annotations
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_changed, user_signed_up
 from django.conf import settings
+from django.core.exceptions import PermissionDenied
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -69,12 +70,22 @@ def consume_invite(request, user, **kwargs) -> None:
     following its link is proof of holding the mailbox — the same proof a verification
     link would give. So the address is recorded as verified here, before allauth decides
     whether to send one, and the invited person is not asked to prove it twice.
+
+    An invitation is one account. If it turns out to be spent already, by a sign-up that
+    overlapped this one, and nothing else opened the door, this account is refused: the
+    request is one transaction, so raising here takes the new account back out (#544).
     """
+    from postulo.core import site
+
     invite = pending_invite(request)
     if invite is not None:
-        invite.accept(user)
-        if invite.email and invite.email.casefold() == (user.email or "").casefold():
-            EmailAddress.objects.filter(user=user, email__iexact=user.email).update(verified=True)
+        if invite.accept(user):
+            if invite.email and invite.email.casefold() == (user.email or "").casefold():
+                EmailAddress.objects.filter(user=user, email__iexact=user.email).update(
+                    verified=True
+                )
+        elif not site.signup_open_now():
+            raise PermissionDenied("This invitation has already been used.")
     request.session.pop(INVITE_SESSION_KEY, None)
 
 

@@ -230,9 +230,11 @@ jobs:
         # The language columns are here because of what they were: SQLite never held a
         # ten-character column to ten characters, and a migration that rewrites rows and
         # then changes their column is the kind of thing only this engine refuses (#337).
+        # Invitations are here for the row lock: two sign-ups can only read one
+        # invitation at the same moment on this engine, so only here can one wait (#544).
         run: >-
           uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
-          tests/test_language_storage.py
+          tests/test_language_storage.py tests/test_invites.py
         env:
           POSTULO_TEST_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo
 
