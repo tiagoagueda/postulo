@@ -39,6 +39,19 @@ def two_companies(applicant):
     Company.objects.create(owner=applicant, name="Black Mesa", location="New Mexico")
 
 
+def settled(page: Page) -> None:
+    """Wait until the table htmx swapped in has been wired.
+
+    htmx attaches what it swapped in when the swap *settles*, twenty milliseconds after it
+    lands, and marks the new elements `htmx-settling` until then. A control that was
+    replaced by the swap -- a list, a date, a tick box; a text box is kept, not replaced --
+    hears nothing in that window. A hand is never that quick and a test is, one run in
+    three (#161), so a test that uses a replaced control twice waits here in between."""
+    page.wait_for_function(
+        "() => !document.querySelector('.htmx-request, .htmx-swapping, .htmx-settling')"
+    )
+
+
 def test_the_filter_is_not_on_screen_until_the_header_is_clicked(
     page: Page, live_server, applicant
 ):
@@ -158,6 +171,7 @@ def test_choosing_any_in_a_header_list_leaves_it_open_with_the_focus_in_it(
     choice.select_option("employment_service")
     expect(rows).to_have_count(1)
     expect(choice).to_be_focused()
+    settled(page)
 
     choice.select_option("")
     expect(rows).to_have_count(2)
@@ -178,6 +192,148 @@ def test_sorting_is_an_icon_and_keeps_the_focus_it_swapped_away(page: Page, live
 
     expect(page.locator("#companies-table tbody tr").first).to_contain_text("Black Mesa")
     expect(page.locator("#sort-name")).to_be_focused()
+
+
+# ---------------------------- what is not a control still travels with the filters (#647)
+
+
+def names_shown(page: Page) -> list[str]:
+    return page.locator("#companies-table tbody tr [data-cell-value]").all_inner_texts()
+
+
+def test_a_search_that_matches_nothing_keeps_the_sort(page: Page, live_server, applicant):
+    """The sort in force is a hidden field in the table's header, and the header was drawn
+    only when there were rows: a search that matched nothing took it off the page, and the
+    search typed after it was sent with no sort. The header is drawn over no rows now, so
+    the sort survives the empty answer and comes back with the rows."""
+    two_companies(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/?sort=-name")
+    rows = page.locator("#companies-table tbody tr")
+    expect(rows).to_have_count(2)
+    assert names_shown(page) == ["Black Mesa", "Aperture Science"]
+    box = page.locator("#site-search")
+
+    box.fill("zzzz")
+    expect(page.locator("#companies-table")).to_contain_text("Nothing matches these filters")
+    expect(rows).to_have_count(0)
+    expect(page.locator("#companies-table thead")).to_be_visible()
+    expect(page.locator("#sort-name")).to_be_visible()
+    expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+
+    box.fill("a")
+    expect(rows).to_have_count(2)
+    expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+    assert names_shown(page) == ["Black Mesa", "Aperture Science"]
+
+
+def test_a_filter_that_matches_nothing_can_be_loosened_where_it_is(
+    page: Page, live_server, applicant
+):
+    """The same header holds the filter that emptied the table. It used to go with the rows,
+    which left *Clear* as the only way out; it stays, open, and what is typed into it next
+    brings the rows back in the order they were in."""
+    two_companies(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/?sort=-name")
+    rows = page.locator("#companies-table tbody tr")
+
+    page.locator('[data-col="location"] summary').click()
+    page.locator("#filter-location").fill("zzzz")
+    expect(page.locator("#companies-table")).to_contain_text("Nothing matches these filters")
+    expect(page.locator("#filter-location")).to_be_visible()
+    expect(page.locator("#filter-location")).to_be_focused()
+
+    page.locator("#filter-location").fill("e")
+    expect(rows).to_have_count(2)
+    expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+    assert names_shown(page) == ["Black Mesa", "Aperture Science"]
+
+
+def test_with_scripts_off_an_empty_answer_keeps_the_sort(browser: Browser, live_server, applicant):
+    """Without a script the masthead's box always carried the whole address. The filter
+    form did not: *Apply* over an empty answer posted a form whose sort had gone with the
+    header."""
+    two_companies(applicant)
+    context = browser.new_context(java_script_enabled=False)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?sort=-name&location=zzzz")
+        expect(page.locator("#companies-table")).to_contain_text("Nothing matches these filters")
+        expect(page.locator("#companies-table tbody tr")).to_have_count(0)
+
+        expect(page.locator("#filter-location")).to_be_visible()
+        page.locator("#filter-location").fill("e")
+        page.get_by_role("button", name="Apply").click()
+
+        expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+        expect(page.locator("#companies-table tbody tr")).to_have_count(2)
+        assert names_shown(page) == ["Black Mesa", "Aperture Science"]
+    finally:
+        context.close()
+
+
+def a_group_and_a_stranger(applicant) -> None:
+    from postulo.jobs.models import Company
+
+    top = Company.objects.create(owner=applicant, name="Alphabet", location="California")
+    Company.objects.create(owner=applicant, name="Google", location="Dublin", parent=top)
+    Company.objects.create(owner=applicant, name="Black Mesa", location="New Mexico")
+
+
+def test_a_live_filter_keeps_the_table_to_its_group(page: Page, live_server, applicant):
+    """`?group=` is a link's doing and no control held it, so the first live filter, sort or
+    search asked for the table without it. The filter form carries it now."""
+    a_group_and_a_stranger(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/?group=Alphabet")
+    rows = page.locator("#companies-table tbody tr")
+    expect(rows).to_have_count(2)
+
+    page.locator('[data-col="location"] summary').click()
+    page.locator("#filter-location").fill("dublin")
+    expect(rows).to_have_count(1)
+    expect(page).to_have_url(re.compile(r"[?&]group=Alphabet(&|$)"))
+
+    # Loosened again, it is the group that comes back and not every company.
+    page.locator("#filter-location").fill("")
+    expect(rows).to_have_count(2)
+    expect(page).to_have_url(re.compile(r"[?&]group=Alphabet(&|$)"))
+    expect(page.locator("#companies-table")).not_to_contain_text("Black Mesa")
+
+    # A search and a sort keep it too.
+    page.locator("#site-search").fill("o")
+    expect(page).to_have_url(re.compile(r"[?&]q=o(&|$)"))
+    expect(page).to_have_url(re.compile(r"[?&]group=Alphabet(&|$)"))
+    page.locator("#sort-name").click()
+    # The table is in name order already, so the click asks for the other direction. The
+    # address said `sort=name` before the click as well: waiting for that waited for nothing.
+    expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+    expect(page).to_have_url(re.compile(r"[?&]group=Alphabet(&|$)"))
+    expect(page.locator("#companies-table")).not_to_contain_text("Black Mesa")
+
+
+def test_with_scripts_off_apply_keeps_the_table_to_its_group(
+    browser: Browser, live_server, applicant
+):
+    a_group_and_a_stranger(applicant)
+    context = browser.new_context(java_script_enabled=False)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?group=Alphabet")
+        expect(page.locator("#companies-table tbody tr")).to_have_count(2)
+
+        page.locator('[data-col="location"] summary').click()
+        page.locator("#filter-location").fill("dublin")
+        page.get_by_role("button", name="Apply").click()
+
+        expect(page).to_have_url(re.compile(r"[?&]group=Alphabet(&|$)"))
+        expect(page).to_have_url(re.compile(r"[?&]location=dublin(&|$)"))
+        expect(page.locator("#companies-table tbody tr")).to_have_count(1)
+    finally:
+        context.close()
 
 
 def test_the_filter_opens_and_applies_with_no_script_at_all(

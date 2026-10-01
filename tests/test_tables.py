@@ -150,6 +150,65 @@ def test_a_narrowing_that_matches_nothing_says_so_and_offers_a_way_out(client, u
     assert "Nothing here yet" in empty.content.decode()
 
 
+#: Each table page, the id of its filter form, the column filter that matches nothing here,
+#: and a sort that is not the table's own.
+NOTHING_MATCHES = {
+    "applications:list": ("application-filters", "company", "role"),
+    "jobs:company_list": ("company-filters", "name", "-name"),
+    "listings:list": ("listing-filters", "title", "-title"),
+}
+
+
+@pytest.mark.parametrize("url_name", NOTHING_MATCHES)
+def test_a_table_with_nothing_matching_still_draws_its_header(client, user, search, url_name):
+    """The header holds the sort in force and every column's filter, and it was drawn only
+    when there were rows: a narrowing that left none took both off the page, the next
+    request was sent without them, and the sort was forgotten (#647). Nothing matching is a
+    header over no rows now, with the sentence beneath it, so the sort and the filter that
+    emptied the table are still there to be sent, and still there to be loosened."""
+    form_id, column, sort = NOTHING_MATCHES[url_name]
+    client.force_login(user)
+    query = {column: "zzzz", "sort": sort, "state": "all"}
+
+    for extra in ({}, HTMX):
+        body = client.get(reverse(url_name), query, **extra).content.decode()
+        assert "Nothing matches these filters" in body
+        assert f'name="sort" value="{sort}" form="{form_id}"' in body, "the sort is still sent"
+        cell = header_cell(body, column)
+        assert 'value="zzzz"' in cell and f'form="{form_id}"' in cell, "and so is the filter"
+        assert "data-col-filter open" in cell, "which is on screen, where it can be loosened"
+        assert f'id="sort-{column}"' in cell
+        assert "<tr id=" not in body.split("<tbody")[1].split("</tbody>")[0], "over no rows"
+        assert "data-bulk-form" not in body and 'aria-label="Pagination"' not in body
+
+
+def test_somebody_with_no_listings_at_all_gets_the_sentence_and_no_header(client, user):
+    """The listings page wears none of its table chrome until there is a listing (#160), so
+    there is no filter form for a header's controls to belong to."""
+    client.force_login(user)
+    body = client.get(reverse("listings:list"), {"state": "discarded"}).content.decode()
+    assert "Nothing matches these filters" in body
+    assert "<thead" not in body and 'id="listing-filters"' not in body
+
+
+def test_the_group_travels_with_the_companies_filters(client, user, search):
+    """`?group=` keeps the table to one ownership tree, and no control held it: a live
+    filter, a sort or a search asked for the table without it and the grouped view was gone
+    (#647). The filter form carries it, as it carries the shape and the tab elsewhere."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    def carried(query: dict) -> list[str]:
+        body = client.get(url, query).content.decode()
+        form = body.split('id="company-filters"')[1].split("</form>")[0]
+        return [line.strip() for line in form.splitlines() if 'name="group"' in line]
+
+    assert carried({"group": "Aperture Science"}) == [
+        '<input type="hidden" name="group" value="Aperture Science">'
+    ]
+    assert carried({}) == [] and carried({"group": "  "}) == []
+
+
 def test_the_companies_table_narrows_from_its_headers(client, user, search):
     client.force_login(user)
     response = client.get(reverse("jobs:company_list"), {"location": "mexico"})

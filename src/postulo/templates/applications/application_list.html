@@ -28,18 +28,19 @@
    filters swap, so narrowing the list works the same whichever is showing. {% endcomment %}
 {% partialdef table %}
   <div id="applications-table" data-shape="{{ shape }}">
-    {% comment %} The phone's copy of the column filters is a form of its own, drawn with
-       the table so that it shows the question as it was last answered (#622). The board
-       has no columns to narrow by. {% endcomment %}
-    {% if shape != 'board' %}
-      {% if applications or table.filters_active %}
-        {% translate "Filter" as filter_word %}
-        {% include "partials/table/narrow.html" with submit_label=filter_word %}
-      {% endif %}
-    {% endif %}
     {% if shape == 'board' %}
       {% include "applications/partials/board.html" %}
-    {% elif applications %}
+    {% elif applications or table.filters_active %}
+      {% comment %} The header is drawn whenever there is a table to narrow, with rows or
+         without (#647): it holds the sort in force and every column's filter, and a table
+         that drew neither when nothing matched forgot both. So nothing matching is a
+         header over no rows, and the sentence beneath it.
+
+         The phone's copy of the column filters is a form of its own, drawn with the table
+         so that it shows the question as it was last answered (#622). The board has no
+         columns to narrow by. {% endcomment %}
+      {% translate "Filter" as filter_word %}
+      {% include "partials/table/narrow.html" with submit_label=filter_word %}
       <c-scroll-box class="card p-0" label="{% translate 'Applications' %}">
         <table class="table">
           <c-table.head :table="table" table_id="applications-table" form_id="application-filters" bulk_form_id="applications-bulk" />
@@ -50,16 +51,20 @@
           </tbody>
         </table>
       </c-scroll-box>
-      {% include "partials/table/pagination.html" with table_id="applications-table" %}
-      {% if bulk_tags %}
-        {% url 'applications:bulk' as bulk_url %}
-        {% include "partials/table/bulk.html" with bulk_form_id="applications-bulk" bulk_action_url=bulk_url bulk_fields="applications/partials/bulk_fields.html" %}
+      {% if applications %}
+        {% include "partials/table/pagination.html" with table_id="applications-table" %}
+        {% if bulk_tags %}
+          {% url 'applications:bulk' as bulk_url %}
+          {% include "partials/table/bulk.html" with bulk_form_id="applications-bulk" bulk_action_url=bulk_url bulk_fields="applications/partials/bulk_fields.html" %}
+        {% endif %}
+      {% else %}
+        <div class="mt-4">
+          <c-empty icon="filter" title="{% translate 'Nothing matches these filters' %}"
+                   action_url="{{ table.clear_url }}"
+                   action_label="{% translate 'Clear filters' %}"
+                   action_variant="outline">{% translate "Loosen one of them, or start again." %}</c-empty>
+        </div>
       {% endif %}
-    {% elif table.filters_active %}
-      <c-empty icon="filter" title="{% translate 'Nothing matches these filters' %}"
-               action_url="{{ table.clear_url }}"
-               action_label="{% translate 'Clear filters' %}"
-               action_variant="outline">{% translate "Loosen one of them, or start again." %}</c-empty>
     {% else %}
       <c-empty icon="circle-dashed" title="{% translate 'Nothing here yet' %}"
                action_url="{% url 'applications:create' %}"

@@ -161,6 +161,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A table whose filters match nothing keeps its header, so the sort and the filters are still there to change and are not forgotten by the next search; and narrowing *Companies* while it is kept to one group (`?group=`) no longer drops the group. (#647)
 - A table opened with a filter already in its address (a saved view, a bookmark, Back) can have that filter changed or cleared from its column header again; it stayed stuck until *Clear*. On a phone, *Narrow* now has its own button and applies when pressed, not as you type. (#622)
 - Emptying a column's filter in a table header, or choosing *Any* there, no longer folds the filter shut around the box you are in: it stays open with the focus in it, so the next word typed narrows the table again. (#626)
 - A telephone number or a link removed from one row and added to another is saved in one go: the new row was refused, the number in the words meant for somebody else's and at the cost of a rationed answer. Two rows exchanging their values are each told it is already listed: two links answered with a server error. (#461)

@@ -24,13 +24,27 @@
   </p>
 {% endpartialdef %}
 
+{% partialdef nothing_matches %}
+  <c-empty icon="filter" title="{% translate 'Nothing matches these filters' %}"
+           action_url="{{ table.clear_url }}"
+           action_label="{% translate 'Clear filters' %}"
+           action_variant="outline">{% translate "Loosen one of them, or start again." %}</c-empty>
+{% endpartialdef %}
+
 {% partialdef table %}
   <div id="listings-table">
     {% comment %} The phone's copy of the filters is a form of its own, drawn with the table
        so that it shows the question as it was last answered (#622). Once there is a
        listing, like the rest of the page's table chrome (#160). {% endcomment %}
     {% if has_listings %}{% include "partials/table/narrow.html" %}{% endif %}
-    {% if listings %}
+    {% comment %} The header is drawn whenever there is a table to narrow, with rows or
+       without (#647): it holds the sort in force and every column's filter, and a table
+       that drew neither when nothing matched forgot both. So nothing matching is a header
+       over no rows, and the sentence beneath it. Not for somebody with no listings at all,
+       whose page wears none of its table chrome (#160): there is no filter form for a
+       header's controls to belong to, and the sentence alone is the answer, as it was.
+    {% endcomment %}
+    {% if listings or table.filters_active and has_listings %}
       <c-scroll-box class="card p-0" label="{% translate 'Listings' %}">
         <table class="table">
           <c-table.head :table="table" table_id="listings-table" form_id="listing-filters"
@@ -42,14 +56,15 @@
           </tbody>
         </table>
       </c-scroll-box>
-      {% include "partials/table/pagination.html" with table_id="listings-table" %}
-      {% url 'listings:bulk' as bulk_url %}
-      {% include "partials/table/bulk.html" with bulk_form_id="listings-bulk" bulk_action_url=bulk_url bulk_fields="jobs/partials/listing_bulk_fields.html" %}
+      {% if listings %}
+        {% include "partials/table/pagination.html" with table_id="listings-table" %}
+        {% url 'listings:bulk' as bulk_url %}
+        {% include "partials/table/bulk.html" with bulk_form_id="listings-bulk" bulk_action_url=bulk_url bulk_fields="jobs/partials/listing_bulk_fields.html" %}
+      {% else %}
+        <div class="mt-4">{% partial nothing_matches %}</div>
+      {% endif %}
     {% elif table.filters_active %}
-      <c-empty icon="filter" title="{% translate 'Nothing matches these filters' %}"
-               action_url="{{ table.clear_url }}"
-               action_label="{% translate 'Clear filters' %}"
-               action_variant="outline">{% translate "Loosen one of them, or start again." %}</c-empty>
+      {% partial nothing_matches %}
     {% else %}
       <c-empty icon="circle-dashed" title="{% translate 'Nothing to decide' %}"
                action_url="{% url 'listings:create' %}"
