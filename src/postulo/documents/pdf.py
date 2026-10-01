@@ -30,7 +30,10 @@ import functools
 import hashlib
 import importlib
 import logging
-import threading
+import os
+import subprocess
+import sys
+import time
 from collections import OrderedDict
 from pathlib import Path
 from typing import Protocol
@@ -116,10 +119,47 @@ def _is_importable(module: str) -> bool:
     return True
 
 
-#: Whether a Chromium to launch has been seen. Only a yes is remembered: a browser does not
-#: go away under a running worker, and one installed a minute ago should count without a
-#: restart, which is the very thing the hint tells somebody to go and do.
+#: Whether a Chromium to launch has been seen. Only a yes is kept for good: a browser does
+#: not go away under a running worker, and one installed a minute ago should count without
+#: a restart, which is the very thing the hint tells somebody to go and do.
 _chromium_found = False
+
+#: When a no may next be asked about again. Asking costs a second, and a page that names
+#: the renderer is not worth a second on every load of it.
+_chromium_asked_again_at = 0.0
+ASK_AGAIN_AFTER = 60.0
+
+#: What Playwright is asked, in an interpreter of its own.
+_WHERE_IS_CHROMIUM = (
+    "from playwright.sync_api import sync_playwright\n"
+    "with sync_playwright() as playwright:\n"
+    "    print(playwright.chromium.executable_path)\n"
+)
+
+
+def _chromium_executable() -> str:
+    """Where Playwright keeps the Chromium it would launch, or ``""`` if it cannot say.
+
+    Playwright is the only thing that knows, so it is asked, and in a process of its own.
+    Its synchronous interface cannot be started on a thread that is already running it --
+    which is where the browser suite asks from -- and started on a thread made for the
+    purpose it leaves that thread's event loop to be torn down with tasks still pending,
+    which `asyncio` reports at ERROR. A check for a renderer must not be what writes
+    errors into the log.
+    """
+    try:
+        asked = subprocess.run(  # noqa: S603 - this interpreter, and a script written here
+            [sys.executable, "-c", _WHERE_IS_CHROMIUM],
+            capture_output=True,
+            encoding="utf-8",
+            errors="replace",
+            env={**os.environ, "PYTHONIOENCODING": "utf-8"},
+            timeout=30,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return ""
+    return asked.stdout.strip() if asked.returncode == 0 else ""
 
 
 def _chromium_is_installed() -> bool:
@@ -129,34 +169,16 @@ def _chromium_is_installed() -> bool:
     chromium`` -- and an import says nothing about the second. With only the first done
     this backend counted as usable, `auto` chose it, Server settings named it as the
     renderer, and every document failed (#514).
-
-    Playwright is the only thing that knows where its browser is kept, so it is asked. On
-    a thread of its own, because its synchronous interface refuses to start on a thread
-    that is already running one -- which is where the browser suite asks from.
     """
-    global _chromium_found
+    global _chromium_found, _chromium_asked_again_at
     if _chromium_found:
         return True
-    if not _is_importable("playwright"):
+    if not _is_importable("playwright") or time.monotonic() < _chromium_asked_again_at:
         return False
-
-    seen: list[bool] = []
-
-    def look() -> None:
-        try:
-            from playwright.sync_api import sync_playwright
-
-            with sync_playwright() as playwright:
-                seen.append(Path(playwright.chromium.executable_path).is_file())
-        except Exception:
-            # No driver, no path, a sandbox that will not start one: none of them is a
-            # renderer.
-            seen.append(False)
-
-    asking = threading.Thread(target=look, name="postulo-chromium-probe")
-    asking.start()
-    asking.join()
-    _chromium_found = bool(seen and seen[0])
+    where = _chromium_executable()
+    _chromium_found = bool(where) and Path(where).is_file()
+    if not _chromium_found:
+        _chromium_asked_again_at = time.monotonic() + ASK_AGAIN_AFTER
     return _chromium_found
 
 

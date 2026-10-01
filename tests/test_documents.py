@@ -578,6 +578,8 @@ def fake_playwright(monkeypatch, *, browser: bool = True) -> dict:
 
     import playwright.sync_api
 
+    from postulo.documents import pdf
+
     record: dict = {"asked": {}, "launched": 0, "browsers_closed": 0, "pages": 0, "pages_closed": 0}
 
     class Page:
@@ -626,6 +628,11 @@ def fake_playwright(monkeypatch, *, browser: bool = True) -> dict:
             return False
 
     monkeypatch.setattr(playwright.sync_api, "sync_playwright", Playwright)
+    # Where the browser is gets asked in another process, which no stand-in here reaches;
+    # so the answer is stood in for as well, and nothing remembered from an earlier test.
+    monkeypatch.setattr(pdf, "_chromium_executable", lambda: Chromium.executable_path)
+    monkeypatch.setattr(pdf, "_chromium_found", False)
+    monkeypatch.setattr(pdf, "_chromium_asked_again_at", 0.0)
     return record
 
 
@@ -699,10 +706,8 @@ def test_a_run_that_cannot_start_its_browser_says_so_before_the_first_document(m
 def test_playwright_with_no_browser_to_launch_is_not_a_usable_backend(monkeypatch, settings):
     """So `auto` falls through to the message that explains both, instead of choosing a
     renderer that fails on every document."""
-    from postulo.documents import pdf
 
     fake_playwright(monkeypatch, browser=False)
-    monkeypatch.setattr(pdf, "_chromium_found", False)
     monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
     settings.POSTULO_PDF_BACKEND = "auto"
 
@@ -716,21 +721,56 @@ def test_playwright_with_no_browser_to_launch_is_not_a_usable_backend(monkeypatc
 
 
 def test_playwright_with_its_browser_is_a_usable_backend(monkeypatch):
-    from postulo.documents import pdf
 
     fake_playwright(monkeypatch)
-    monkeypatch.setattr(pdf, "_chromium_found", False)
 
     assert ChromiumBackend().is_available() is True
+
+
+def test_a_missing_browser_is_not_asked_about_on_every_page(monkeypatch):
+    """Asking starts an interpreter. A yes is kept; a no is believed for a minute, and then
+    asked about again, so a browser installed meanwhile counts without a restart."""
+    import sys
+
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+    asked = []
+    monkeypatch.setattr(pdf, "_chromium_executable", lambda: asked.append(1) or "")
+
+    assert ChromiumBackend().is_available() is False
+    assert ChromiumBackend().is_available() is False
+    assert len(asked) == 1
+
+    monkeypatch.setattr(pdf, "_chromium_asked_again_at", 0.0)
+    monkeypatch.setattr(pdf, "_chromium_executable", lambda: asked.append(1) or sys.executable)
+
+    assert ChromiumBackend().is_available() is True
+    assert ChromiumBackend().is_available() is True
+    assert len(asked) == 2, "and a yes is not asked about again at all"
+
+
+def test_playwright_is_asked_where_its_browser_is_without_being_started_here(monkeypatch):
+    """The real question, in a process of its own: an absolute path, or nothing."""
+    from pathlib import Path
+
+    from postulo.documents import pdf
+
+    pytest.importorskip("playwright")
+    monkeypatch.setattr(pdf, "_chromium_found", False)
+    monkeypatch.setattr(pdf, "_chromium_asked_again_at", 0.0)
+
+    where = pdf._chromium_executable()
+
+    assert where == "" or Path(where).is_absolute()
+    assert ChromiumBackend().is_available() is (bool(where) and Path(where).is_file())
 
 
 def test_server_settings_does_not_name_a_renderer_that_cannot_start(monkeypatch, settings):
     """The operator's own status page said `chromium` while every render failed."""
     from postulo.core import server_views
-    from postulo.documents import pdf
 
     fake_playwright(monkeypatch, browser=False)
-    monkeypatch.setattr(pdf, "_chromium_found", False)
     monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
     settings.POSTULO_PDF_BACKEND = "auto"
 
