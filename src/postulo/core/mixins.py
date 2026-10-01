@@ -140,12 +140,12 @@ class WebLinksMixin:
         return any(formset.is_bound and not formset.is_valid() for formset in formsets)
 
     def save_web_links(self, formsets: list, holder) -> None:
+        """Bind each block to the holder and write it. A new row takes its kind and its
+        owner from its formset, which asks the holder (`core.formsets.owner_of`)."""
         for formset in formsets:
             if not formset.is_bound:
                 continue
             formset.instance = holder
-            for form in formset.forms:
-                form.instance.owner = holder.owner if hasattr(holder, "owner") else holder.user
             formset.save()
 
     def get_context_data(self, **kwargs) -> dict:
@@ -201,13 +201,12 @@ class PhoneNumbersMixin:
         """Bind the rows to the holder and write them.
 
         The holder is passed in rather than read back, because on a create view the object
-        did not exist when the formset was built.
+        did not exist when the formset was built. A new row takes its owner from the
+        formset, which asks the holder (`core.formsets.owner_of`).
         """
         if formset is None or not formset.is_bound:
             return
         formset.instance = holder
-        for form in formset.forms:
-            form.instance.owner = holder.owner if hasattr(holder, "owner") else holder.user
         formset.save()
 
     def get_context_data(self, **kwargs) -> dict:

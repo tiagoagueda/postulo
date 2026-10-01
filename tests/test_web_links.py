@@ -482,3 +482,23 @@ def test_a_contact_can_be_created_with_its_links_in_one_go(client, user):
     contact = Contact.objects.get(owner=user, name="Caroline")
     assert web_links.primary_for(contact, WEBSITE).url == "https://caroline.example"
     assert contact.web_links.get().owner == user
+
+
+@pytest.mark.parametrize("held_by", ["profile", "contact"])
+def test_the_rows_give_a_new_link_its_owner_themselves(user, contact, held_by):
+    """A page that binds the rows to a holder and saves them has done all it needs to
+    (#454): the owner is the account behind the holder, set where the row is made, as the
+    kind is. The pages used to set it on every row from a loop of their own, and the page
+    that had no such loop for its numbers and addresses could not add one."""
+    holder = user.profile if held_by == "profile" else contact
+    formset = web_links.formset_for(
+        holder,
+        WEBSITE,
+        data=rows("websites", {"label": "", "url": "https://alex.example"}),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    link = holder.web_links.get()
+    assert (link.owner, link.kind, link.is_primary) == (user, WEBSITE, True)

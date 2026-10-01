@@ -246,3 +246,84 @@ def test_the_page_says_an_address_is_not_unique_here(client, user):
     html = client.get(reverse("accounts:profile")).content.decode()
 
     assert "people share a home" in html
+
+
+# ----------------------------------------------- an address typed into the empty row (#454)
+
+
+def address_rows(*streets, prefix="addresses"):
+    """The POST the block of address rows sends when every row is a new one."""
+    data = {
+        f"{prefix}-TOTAL_FORMS": str(len(streets)),
+        f"{prefix}-INITIAL_FORMS": "0",
+        f"{prefix}-MIN_NUM_FORMS": "0",
+        f"{prefix}-MAX_NUM_FORMS": "1000",
+    }
+    for index, street in enumerate(streets):
+        data.update(
+            {
+                f"{prefix}-{index}-kind": "",
+                f"{prefix}-{index}-label": "",
+                f"{prefix}-{index}-street": street,
+                f"{prefix}-{index}-postcode": "1000-001",
+                f"{prefix}-{index}-municipality": "Lisboa",
+                f"{prefix}-{index}-region": "",
+                f"{prefix}-{index}-country": "PT",
+            }
+        )
+    return data
+
+
+def test_your_details_saves_an_address_typed_into_the_empty_row(client, user):
+    """Nobody could record their own address: the row was saved with no owner, the insert
+    failed on `owner_id`, and the page answered 500 with everything else typed on it lost."""
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "Alex",
+            "last_name": "Morgan",
+            "headline": "Saved with the address",
+            "location": "",
+            **address_rows("Rua do Exemplo 1"),
+        },
+    )
+
+    assert response.status_code == 302
+    address = PostalAddress.objects.get()
+    assert address.owner == user and address.holder == user.profile
+    assert (address.street, address.municipality, address.country) == (
+        "Rua do Exemplo 1",
+        "Lisboa",
+        "PT",
+    )
+    assert address.is_primary, "the first address is the one to use"
+    user.profile.refresh_from_db()
+    assert user.profile.headline == "Saved with the address"
+
+
+def test_the_rows_give_a_new_address_its_owner_themselves(user):
+    """Bound to a holder and saved, with nobody having set an owner: the rows set it, from
+    the account behind the holder, so no caller can forget."""
+    formset = postal.formset_for(user.profile, data=address_rows("Rua A 1", "Rua B 2"))
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    assert [row.owner for row in postal.for_holder(user.profile)] == [user, user]
+
+
+def test_a_contacts_address_belongs_to_the_account_that_keeps_the_contact(user):
+    """A contact can hold addresses -- an archive brings them -- and the owner is then the
+    contact's, which is the rule the telephone and link rows follow."""
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    someone = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    formset = postal.formset_for(someone, data=address_rows("Rua do Contacto 3"))
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    assert postal.for_holder(someone).get().owner == user

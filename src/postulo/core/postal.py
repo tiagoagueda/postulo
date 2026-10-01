@@ -28,7 +28,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
-from .formsets import RowsAlreadyGone
+from .formsets import RowsAlreadyGone, owner_of
 from .models import PostalAddress
 
 
@@ -287,6 +287,12 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
             if comparable in seen:
                 form.add_error(None, _("This address is already listed."))
             seen.add(comparable)
+
+    def save_new(self, form, commit=True):
+        # Whose the row is, set where the row is made, so that no page saving these rows
+        # has to remember to (#454).
+        form.instance.owner = owner_of(self.instance)
+        return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):
         """Save the rows, then settle which of them is the primary.

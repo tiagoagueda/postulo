@@ -151,6 +151,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- On *Your details*, a telephone number or a postal address typed into the empty row is saved: the page answered with a server error instead, and lost everything else typed on it. (#454)
 - *Server settings → Defaults* shows every language ticked while nothing has been narrowed, as the page says, and saving it that way still stores nothing; a partly translated language keeps its region in the list, "français (France)". (#322)
 - A refused language list on *Server settings → Defaults* no longer blanks the name, language and time zone above it, so saving that card afterwards cannot wipe the stored defaults. (#494)
 - Going Back to *Companies*, *Applications* or *Listings* after narrowing or sorting the table could show the table alone, with no title, masthead or styles. Those pages now say that an htmx request gets a different answer, so the browser's cache no longer hands back the fragment. (#646)

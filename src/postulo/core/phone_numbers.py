@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 from . import phone_field, phones
-from .formsets import RowsAlreadyGone
+from .formsets import RowsAlreadyGone, owner_of
 from .models import PhoneNumber
 
 #: What somebody is told when the number they typed is already recorded here.
@@ -357,6 +357,12 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
             seen.add(normalised)
             if taken_elsewhere(typed, exclude_pk=form.instance.pk):
                 form.add_error("number", collision_message(self.asked_by))
+
+    def save_new(self, form, commit=True):
+        # Whose the row is, set where the row is made, so that no page saving these rows
+        # has to remember to (#454).
+        form.instance.owner = owner_of(self.instance)
+        return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):
         """Save the rows, then settle which of them is the primary.

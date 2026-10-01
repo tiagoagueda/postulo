@@ -279,3 +279,112 @@ def test_one_persons_numbers_are_never_another_persons(user, other_user, contact
     add(contact, user, "+351912345678", primary=True)
     assert not PhoneNumber.objects.for_user(other_user).exists()
     assert PhoneNumber.objects.for_user(user).count() == 1
+
+
+# ------------------------------------------------ a number typed into the empty row (#454)
+
+
+def number_rows(*numbers, prefix="phone_numbers"):
+    """The POST the block of telephone rows sends when every row is a new one."""
+    data = {
+        f"{prefix}-TOTAL_FORMS": str(len(numbers)),
+        f"{prefix}-INITIAL_FORMS": "0",
+        f"{prefix}-MIN_NUM_FORMS": "0",
+        f"{prefix}-MAX_NUM_FORMS": "1000",
+    }
+    for index, number in enumerate(numbers):
+        data[f"{prefix}-{index}-kind"] = ""
+        data[f"{prefix}-{index}-label"] = ""
+        data[f"{prefix}-{index}-number_0"] = "PT"
+        data[f"{prefix}-{index}-number_1"] = number
+    return data
+
+
+def test_your_details_saves_a_number_typed_into_the_empty_row(client, user):
+    """The row a person adds has to be given its owner by somebody. *Your details* bound the
+    rows to the profile and saved them, the formset set no owner, and the insert failed on
+    `owner_id`: a 500, with the name and the headline typed on the same page lost to the
+    transaction."""
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "Alex",
+            "last_name": "Morgan",
+            "headline": "Saved with the number",
+            "location": "",
+            **number_rows("912345678"),
+        },
+    )
+
+    assert response.status_code == 302
+    number = PhoneNumber.objects.get()
+    assert number.owner == user and number.holder == user.profile
+    assert number.number == "+351912345678"
+    assert number.is_primary, "the first number is the one to use"
+    user.profile.refresh_from_db()
+    assert user.profile.headline == "Saved with the number"
+
+
+@pytest.mark.parametrize("held_by", ["profile", "contact"])
+def test_the_rows_give_a_new_number_its_owner_themselves(user, contact, held_by):
+    """Whoever saves the rows: a view that binds them to a holder and calls `save()` has
+    done all it needs to. The owner is the account behind the holder -- the profile's
+    user, the contact's owner -- and is set where the row is made, so no caller can forget
+    it."""
+    holder = user.profile if held_by == "profile" else contact
+    formset = phone_numbers.formset_for(holder, data=number_rows("912345678", "211111111"))
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    assert [row.owner for row in holder.phone_numbers.all()] == [user, user]
+    assert PhoneNumber.objects.for_user(user).count() == 2
+
+
+def test_a_contacts_form_saves_a_number_typed_into_the_empty_row(client, user, contact):
+    """The contact form went through a loop in its view's mixin that set the owner on every
+    row before saving; the rows do it now, and the page saves as it did."""
+    client.force_login(user)
+
+    response = client.post(
+        reverse("jobs:contact_update", args=[contact.pk]),
+        {
+            "name": "Cave Johnson",
+            "role": "",
+            "company": contact.company_id,
+            "email": "",
+            "notes": "",
+            **number_rows("912345678"),
+        },
+    )
+
+    assert response.status_code == 302
+    number = contact.phone_numbers.get()
+    assert number.owner == user and number.is_primary
+
+
+def test_a_new_contact_is_saved_with_the_number_typed_beside_it(client, user, contact):
+    """A contact that does not exist yet when its rows are built: they are bound to it once
+    it is saved, and the owner is read from it then."""
+    from postulo.jobs.models import Contact
+
+    client.force_login(user)
+
+    response = client.post(
+        reverse("jobs:contact_create"),
+        {
+            "name": "Caroline",
+            "role": "",
+            "company": contact.company_id,
+            "email": "",
+            "notes": "",
+            **number_rows("912345679"),
+        },
+    )
+
+    assert response.status_code == 302
+    caroline = Contact.objects.get(name="Caroline")
+    number = caroline.phone_numbers.get()
+    assert number.owner == user and number.number == "+351912345679"

@@ -998,3 +998,34 @@ def test_the_words_and_the_address_are_one_source(user):
 
     assert offered.dialog == f"remove-number-{number.pk}"
     assert offered.action == reverse("accounts:remove_number", args=[number.pk])
+
+
+# ------------------------------------------------- taken off, and another put in its place
+
+
+@pytest.mark.parametrize("name", ["remove_number", "remove_address"])
+def test_a_row_goes_at_once_and_its_replacement_is_typed_and_saved(client, user, name):
+    """Take a number off, type its replacement into the empty row, save. Removing used to
+    wait for *Save*, so when adding a number or an address crashed the page (#454) the
+    transaction put the old row back; a row that goes at once stays gone, and until #454 was
+    fixed the page could then add nothing in its place."""
+    gone, kept = two_rows(user, name)
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+    assert json.loads(remove(client, name, gone, **HTMX).content)["removed"] is True
+
+    posted = after_the_script_took_off(html, gone)
+    posted.update(first_name="Alex", last_name="Morgan")
+    if name == "remove_number":
+        posted.update({"phone_numbers-2-number_0": "PT", "phone_numbers-2-number_1": "912345670"})
+    else:
+        posted.update({"addresses-2-street": "Rua A 1", "addresses-2-country": "PT"})
+    response = client.post(reverse("accounts:profile"), posted)
+
+    assert response.status_code == 302, alerts_in(response)
+    kind = getattr(removals, name.removeprefix("remove_").upper())
+    held = list(removals.rows(kind, user))
+    assert len(held) == 2 and held[0] == kept, "the row that stayed, and the one typed"
+    assert held[1].owner == user and held[1].pk != gone.pk
+    kept.refresh_from_db()
+    assert kept.is_primary, "the row that inherited the primary keeps it"

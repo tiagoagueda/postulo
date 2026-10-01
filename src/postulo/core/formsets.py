@@ -1,6 +1,30 @@
-"""What a block of rows does with a copy of the page that is out of date."""
+"""What the blocks of rows on a page have in common, whatever the rows hold.
+
+Telephone numbers, links, postal addresses and identifiers are each a formset of their own,
+bound to a holder -- a profile, a contact -- and saved with the page they are drawn on. Two
+things are true of them and were being remembered, or forgotten, one page at a time: whose a
+new row is, and what to make of a row the page still carries after it has gone.
+"""
 
 from __future__ import annotations
+
+
+def owner_of(holder):
+    """The account a holder's rows belong to: a contact's owner, a profile's user.
+
+    A number, a link and an address are owned records, and `owner` is in none of their
+    forms: nobody types whose a number is. So it is set before the insert, and by the rows
+    themselves -- each formset's `save_new` asks this of the holder it is bound to -- so that
+    a page which binds the rows to a holder and calls `save()` has done all it needs to. It
+    used to be each page's job. The contact form did it in a loop over the forms; *Your
+    details* did it for its links and for nothing else, so adding a number or an address
+    there failed on `owner_id` and took the whole page with it (#454).
+
+    The two holders there are name their account differently, and that is the whole of the
+    rule. It is asked as the row is saved rather than when the formset is built: a page that
+    creates its holder builds the rows first and binds them once the holder exists.
+    """
+    return holder.owner if hasattr(holder, "owner") else holder.user
 
 
 class RowsAlreadyGone:

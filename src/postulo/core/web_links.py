@@ -25,7 +25,7 @@ from postulo.plugins.repositories import REPOSITORIES
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
-from .formsets import RowsAlreadyGone
+from .formsets import RowsAlreadyGone, owner_of
 from .models import WebLink
 
 Kind = WebLink.Kind
@@ -346,7 +346,10 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
             seen.add(typed)
 
     def save_new(self, form, commit=True):
+        # What the row is and whose it is, set where the row is made, so that no page
+        # saving these rows has to remember to (#454).
         form.instance.kind = self.kind
+        form.instance.owner = owner_of(self.instance)
         return super().save_new(form, commit=commit)
 
     def save(self, commit: bool = True):
