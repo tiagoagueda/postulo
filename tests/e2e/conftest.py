@@ -7,9 +7,17 @@ they need a browser installed. Run them with::
     uv run pytest -m e2e
 
 CI runs them on every push in their own job, with traces kept on failure.
+
+CI draws in DejaVu Sans, which is wider than the font a desktop draws in, so a row that
+fits here can spill there. To draw every page as CI does, name the font::
+
+    POSTULO_E2E_FONT="DejaVu Sans" uv run pytest -m e2e
+
+The font has to be installed; `_drawn_in_the_font_asked_for` below says how it is applied.
 """
 
 import os
+import re
 import sqlite3
 import threading
 import weakref
@@ -115,6 +123,60 @@ def pytest_sessionfinish(session, exitstatus):
             pass
         wrapper.connection = None
         _WRAPPERS.pop(ident, None)
+
+
+# ------------------------------------------------------------------- the font CI draws in
+#: The application's stylesheet, whatever its name carries after `app`.
+_STYLESHEET = re.compile(r"/static/css/app[^/]*\.css")
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _drawn_in_the_font_asked_for():
+    """With ``POSTULO_E2E_FONT`` set, every page of every test is drawn in that font.
+
+    The interface uses the reader's own system font, so the suite measures whatever the
+    machine it runs on draws in: Segoe UI on a Windows desktop, DejaVu Sans in CI, which is
+    wider. A title squeezed to 41 pixels on the calendar (#316), a footer on two rows (#212)
+    and an address cut short on *Server settings → Capture* (#320) each passed here and
+    failed there. ``POSTULO_E2E_FONT="DejaVu Sans"`` draws this run the way CI draws it.
+
+    The font is put on by the live server: it serves the application's own stylesheet with
+    two rules after it, everything in the font and `code` in its ``Mono`` face. A stylesheet
+    from the application's own address is what the content security policy allows, so the
+    policy stays on; it reaches a page whose scripts are off and a context a test opened for
+    itself; and the browser is left alone. It is not done by intercepting the request in the
+    browser, because that turns the browser's cache off, and the tests that press *Back*
+    are about what the cache brings back.
+    """
+    font = os.environ.get("POSTULO_E2E_FONT", "").strip()
+    if not font:
+        yield
+        return
+
+    from django.contrib.staticfiles import handlers
+    from django.http import HttpResponse
+
+    mono = f'"{font} Mono", "{font}"'
+    rules = (
+        f'\n*, ::before, ::after {{ font-family: "{font}" !important; }}'
+        f"\ncode, code *, kbd, samp, pre, pre * {{ font-family: {mono} !important; }}\n"
+    ).encode()
+    served = handlers.serve
+
+    def in_the_font(request, path, **kwargs):
+        response = served(request, path, **kwargs)
+        if response.status_code != 200 or not _STYLESHEET.search(request.path):
+            return response
+        body = b"".join(response.streaming_content) if response.streaming else response.content
+        response.close()
+        answer = HttpResponse(body + rules, content_type=response["Content-Type"])
+        if "Last-Modified" in response:
+            answer["Last-Modified"] = response["Last-Modified"]
+        return answer
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(handlers, "serve", in_the_font)
+        yield
 
 
 @pytest.fixture(autouse=True)

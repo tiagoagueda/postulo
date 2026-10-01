@@ -26,8 +26,8 @@
     {% if sso.enabled %}
       <dl class="space-y-1">
         <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Provider" %}</dt><dd>{{ sso.name }}</dd></div>
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd class="truncate"><code class="text-xs">{{ sso.server_url }}</code></dd></div>
-        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Callback to register with it" %}</dt><dd class="truncate"><code class="text-xs">{{ sso.callback_url }}</code></dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Server" %}</dt><dd class="min-w-0 text-end"><code class="text-xs">{{ sso.server_url }}</code></dd></div>
+        <div class="flex justify-between gap-4"><dt class="text-ink-500 dark:text-ink-400">{% translate "Callback to register with it" %}</dt><dd class="min-w-0 text-end"><code class="text-xs">{{ sso.callback_url }}</code></dd></div>
         <div class="flex justify-between gap-4">
           <dt class="text-ink-500 dark:text-ink-400">{% translate "May create accounts" %}</dt>
           <dd>{% if sso.auto_signup %}{% translate "yes — the identity provider is the invitation" %}{% else %}{% translate "no — existing accounts only" %}{% endif %}</dd>

@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import re
 from html.parser import HTMLParser
+from pathlib import Path
 
 import pytest
 
@@ -329,6 +330,31 @@ def test_a_server_settings_form_keeps_the_measure(client, furnished, somebody_el
     found = unmeasured(html)
     assert not found.missing, f"{path}: no measure on {found.missing}"
     assert not found.centred, f"{path}: centred, not at the start edge: {found.centred}"
+
+
+def test_a_page_that_keeps_the_measure_cuts_no_value_short():
+    """`truncate` ends a value in an ellipsis and never lets it wrap. In a column of 672
+    pixels that is a value nobody can read: under the text-spacing override, in the font CI
+    draws in, the address on *Capture* needed 494 pixels of the 457 it had, and the browser
+    job said so only after the page had been capped (#320). A value on a measured page
+    wraps -- `min-w-0` on the `dd`, and `code` breaks anywhere (#113), as on Overview. Read
+    from the templates, because the two on *Sign-in* are drawn only once single sign-on is
+    configured."""
+    templates = Path(__file__).resolve().parent.parent / "src/postulo/templates/server"
+    measured = [
+        template
+        for template in sorted(templates.glob("*.html"))
+        if "{% block measure %}max-w-2xl{% endblock %}" in template.read_text(encoding="utf-8")
+    ]
+    assert len(measured) >= 9, [template.name for template in measured]
+    cut = [
+        f"{template.name}: {match.group(0)}"
+        for template in measured
+        for match in re.finditer(
+            r'class="[^"]*(?<![\w-])truncate(?![\w-])[^"]*"', template.read_text(encoding="utf-8")
+        )
+    ]
+    assert not cut, cut
 
 
 @pytest.mark.parametrize("path", SERVER_WIDE)
