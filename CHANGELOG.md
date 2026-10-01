@@ -161,6 +161,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Emptying a column's filter in a table header, or choosing *Any* there, no longer folds the filter shut around the box you are in: it stays open with the focus in it, so the next word typed narrows the table again. (#626)
 - A telephone number or a link removed from one row and added to another is saved in one go: the new row was refused, the number in the words meant for somebody else's and at the cost of a rationed answer. Two rows exchanging their values are each told it is already listed: two links answered with a server error. (#461)
 - The same address listed under two kinds of link, a GitHub profile as a code repository and as a website, is saved as two links on *Your details* and on a contact: the page answered with a server error and lost everything typed on it. An address is still listed once under each kind. (#457)
 - The Chromium PDF renderer counts as usable only when its browser is installed, not the `playwright` package alone, and one that cannot start says how to install it instead of answering a draft with an error page. (#514)

@@ -43,6 +43,11 @@ class PageOrFragmentMixin:
     person's default view is not sent to an htmx request either, so it too is the header's
     doing.
 
+    `HX-Trigger` is named with them (#626). The fragment is not the same for every control
+    that asks for it: the column whose own filter asked is drawn with that filter open,
+    whatever it holds (`Table.asked_by`), so the answer to one control is not the answer to
+    another at the same address.
+
     The choice and the header are made in one place, so that a view cannot make the first
     without sending the second. First among a view's bases, so that the header is on what
     the bases after it answer as well, the redirect to the sign-in page among them.
@@ -56,7 +61,7 @@ class PageOrFragmentMixin:
 
     def dispatch(self, request, *args, **kwargs):
         response = super().dispatch(request, *args, **kwargs)
-        patch_vary_headers(response, ("HX-Request", "HX-History-Restore-Request"))
+        patch_vary_headers(response, ("HX-Request", "HX-History-Restore-Request", "HX-Trigger"))
         return response
 
 

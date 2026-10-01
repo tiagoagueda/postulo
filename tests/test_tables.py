@@ -325,6 +325,36 @@ def test_a_column_that_is_narrowing_says_so_and_stays_open(client, user, search)
     assert 'value="mexico"' in narrowed
 
 
+def test_the_filter_that_asked_comes_back_open_whatever_it_holds(client, user, search):
+    """Emptying a header's box, or choosing *Any*, leaves a column that narrows nothing; the
+    table that came back drew that header shut around the control being used, and the focus
+    fell to the top of the document (#626). htmx names the control that asked, and its
+    column is drawn open. Nothing else is: a page load, another column's control and a sort
+    all leave an empty filter folded."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    def cell(**headers) -> str:
+        body = client.get(url, {"name": "", "location": ""}, **HTMX, **headers).content.decode()
+        return header_cell(body, "name")
+
+    assert "data-col-filter open" in cell(HTTP_HX_TRIGGER="filter-name")
+    assert "is filtered" not in cell(HTTP_HX_TRIGGER="filter-name"), "open, and not marked"
+    assert "data-col-filter open" not in cell()
+    assert "data-col-filter open" not in cell(HTTP_HX_TRIGGER="filter-location")
+    assert "data-col-filter open" not in cell(HTTP_HX_TRIGGER="sort-name")
+    assert "data-col-filter open" not in cell(HTTP_HX_TRIGGER="filter-name-narrow")
+
+    # Either box of a pair is the column's.
+    for asked in ("filter-applications-min", "filter-applications-max"):
+        body = client.get(url, **HTMX, HTTP_HX_TRIGGER=asked).content.decode()
+        assert "data-col-filter open" in header_cell(body, "applications"), asked
+        assert "data-col-filter open" not in header_cell(body, "name"), asked
+
+    # The answer depends on who asked, and says so to a cache (#646).
+    assert "hx-trigger" in varies_on(client.get(url, **HTMX, HTTP_HX_TRIGGER="filter-name"))
+
+
 def test_the_sort_is_an_icon_now_and_still_says_what_it_will_do(client, user, search):
     """The label became the filter, so sorting had to move. An icon-only control keeps the
     id htmx hands focus back to, keeps its 24-pixel target, and keeps its name (#227, #115).

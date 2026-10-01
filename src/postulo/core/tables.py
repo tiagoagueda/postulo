@@ -132,6 +132,9 @@ class Header:
     hint: str = ""
     #: How wide this person likes the column, or 0 for *let it size itself* (#136).
     width: int = 0
+    #: Whether one of this column's own filter controls asked for the table being drawn
+    #: (#626): see `open`.
+    asked: bool = False
 
     @property
     def key(self) -> str:
@@ -159,6 +162,27 @@ class Header:
         address bar.
         """
         return bool(self.value or self.value_from or self.value_to)
+
+    @property
+    def input_ids(self) -> tuple[str, ...]:
+        """The ids of this column's filter controls in the header: one, or a pair."""
+        kind = self.column.filter
+        if kind == "date":
+            return (f"{self.input_id}-from", f"{self.input_id}-to")
+        if kind == "number":
+            return (f"{self.input_id}-min", f"{self.input_id}-max")
+        return (self.input_id,) if kind else ()
+
+    @property
+    def open(self) -> bool:
+        """Whether the column's filter is drawn unfolded: narrowing, or being used (#626).
+
+        A filter in force comes back open. So does the one whose control asked for this
+        table, whatever it holds now: somebody who empties a box to try another word, or
+        chooses *Any*, is still using it, and a header drawn shut around the control they
+        are in takes the control off the screen and the focus with it.
+        """
+        return self.filtered or self.asked
 
     @property
     def filtering_label(self) -> str:
@@ -654,8 +678,19 @@ class Table:
 
     # ---------------------------------------------------------------- template
 
+    @property
+    def asked_by(self) -> str:
+        """The id of the control that asked for this table, where htmx says which (#626).
+
+        htmx names the element that made a request in `HX-Trigger`. Only a live control
+        sends it, so a page load, a bookmark and scripts off all answer nothing here, and
+        every header is drawn as its filters alone say.
+        """
+        return self.request.headers.get("HX-Trigger", "")
+
     @cached_property
     def headers(self) -> list[Header]:
+        asked_by = self.asked_by
         headers = []
         for column in self.visible:
             header = Header(
@@ -673,6 +708,7 @@ class Table:
             elif column.filter == "number":
                 header.value_from = self.given(f"{column.name}_min")
                 header.value_to = self.given(f"{column.name}_max")
+            header.asked = bool(asked_by) and asked_by in header.input_ids
             headers.append(header)
         return headers
 

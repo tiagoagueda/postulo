@@ -14,6 +14,7 @@ JavaScript off and use the thing.
 from __future__ import annotations
 
 import re
+from urllib.parse import parse_qs, urlsplit
 
 import pytest
 from playwright.sync_api import Browser, Page, expect
@@ -81,6 +82,89 @@ def test_a_narrowed_column_comes_back_open_on_a_fresh_page(page: Page, live_serv
     expect(page.locator("#filter-location")).to_be_visible()
     expect(page.locator("#filter-location")).to_have_value("mexico")
     expect(page.locator('[data-col="name"] #filter-name')).to_be_hidden()
+
+
+def test_emptying_a_header_filter_leaves_it_open_with_the_focus_in_it(
+    page: Page, live_server, applicant
+):
+    """Clearing a filter to try another value is the ordinary way to use one. The header
+    was drawn open only while its column narrowed, so the table that answered an emptied
+    box folded the header shut around it: the box left the screen, the focus went to the
+    document, and the next letters went nowhere (#626). The column whose control asked is
+    drawn open, so the box stays where it is and what is typed next narrows again.
+
+    That it is the server that draws it open is read off the answer itself, the markup htmx
+    was sent for the emptied box, and not only off the page: a script may come to open a
+    header as well, and the page alone could not then say which of the two had."""
+    two_companies(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/")
+    rows = page.locator("#companies-table tbody tr")
+    disclosure = page.locator('[data-col="name"] [data-col-filter]')
+    box = page.locator("#filter-name")
+
+    def for_the_emptied_box(response) -> bool:
+        asked = parse_qs(urlsplit(response.url).query, keep_blank_values=True)
+        return (
+            urlsplit(response.url).path == "/jobs/companies/"
+            and response.request.headers.get("hx-trigger") == "filter-name"
+            and set(asked.get("name", ["?"])) == {""}
+        )
+
+    page.locator('[data-col="name"] summary').click()
+    box.press_sequentially("ap")
+    expect(rows).to_have_count(1)
+    expect(page.get_by_label("Name is filtered")).to_be_visible()
+
+    with page.expect_response(for_the_emptied_box) as answer:
+        box.press("Backspace")
+        box.press("Backspace")
+    drawn = answer.value.text().split('data-col="name"')[1].split("</th>")[0]
+    assert "data-col-filter open" in drawn, "the answer draws the header that asked open"
+    assert "is filtered" not in drawn, "open, and narrowing nothing"
+    expect(rows).to_have_count(2)
+    expect(disclosure).to_have_attribute("open", "")
+    expect(box).to_be_visible()
+    expect(box).to_be_focused()
+    expect(page.get_by_label("Name is filtered")).to_have_count(0)
+
+    # The keys that follow go into the box, and the table follows them.
+    page.keyboard.type("black")
+    expect(rows).to_have_count(1)
+    expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+    expect(box).to_be_focused()
+
+
+def test_choosing_any_in_a_header_list_leaves_it_open_with_the_focus_in_it(
+    page: Page, live_server, applicant
+):
+    """The same for a list, which is not kept across the swap as a box is: htmx puts the
+    focus back on the list that replaced it, by its id, and can only do that if the header
+    it is in was drawn open (#626)."""
+    from postulo.core import tables
+    from postulo.jobs.models import Company
+
+    two_companies(applicant)
+    Company.objects.filter(owner=applicant, name="Black Mesa").update(kind="employment_service")
+    tables.save_settings(applicant, "companies", {"columns": ["name", "kind", "location"]})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/")
+    rows = page.locator("#companies-table tbody tr")
+    disclosure = page.locator('[data-col="kind"] [data-col-filter]')
+    choice = page.locator("#filter-kind")
+
+    page.locator('[data-col="kind"] summary').click()
+    choice.focus()  # where a hand or a key would have put it; `select_option` does not
+    choice.select_option("employment_service")
+    expect(rows).to_have_count(1)
+    expect(choice).to_be_focused()
+
+    choice.select_option("")
+    expect(rows).to_have_count(2)
+    expect(disclosure).to_have_attribute("open", "")
+    expect(choice).to_be_visible()
+    expect(choice).to_be_focused()
+    expect(choice).to_have_value("")
 
 
 def test_sorting_is_an_icon_and_keeps_the_focus_it_swapped_away(page: Page, live_server, applicant):

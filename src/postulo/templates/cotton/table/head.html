@@ -39,6 +39,12 @@
    is read out with every cell beneath it, and that is a price worth paying to say the list
    is not what it looks like, and not worth paying to announce a control that is just there.
 
+   **So does the one being used** (#626). Emptying a box to try another word, or choosing
+   *Any*, leaves a column that narrows nothing, and the table that came back drew its header
+   shut around the control the person was in: the box went off the screen and the focus to
+   the top of the document. The table knows which control asked for it (`HX-Trigger`), and
+   draws that column's filter open whatever it holds (`Header.open`).
+
    **No preference for keeping them all open**, which the issue left open. An open filter
    stays open, because a column that is narrowing is rendered open; so somebody filtering
    five columns has five, and somebody reading a long list has none. A setting would be a
@@ -107,7 +113,7 @@
         {% endcomment %}
         <div class="flex items-start {% if header.column.numeric %}justify-end{% else %}justify-between{% endif %} gap-1">
           {% if header.column.filter %}
-            <details class="col-filter" data-col-filter {% if header.filtered %}open{% endif %}>
+            <details class="col-filter" data-col-filter {% if header.open %}open{% endif %}>
               <summary class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100">
                 <span class="min-w-0 truncate">{{ header.label }}</span>
                 {% if header.filtered %}
