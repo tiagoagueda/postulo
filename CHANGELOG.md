@@ -162,6 +162,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- An API refusal's `detail` is a translated sentence every time, in the language of the account that owns the token and not the client's, and carries `request_id`, the id in `X-Request-ID` and in the log. What a call writes, such as an interview's reminder, is worded and timed for its owner too. (#393)
 - Erasing a contact no longer ends in an error page when a plugin's eraser fails. It is refused, with nothing removed, while a plugin holds rows about the person that it cannot remove; and a plugin that fails during an export, a merge or an erasure is logged. (#371)
 - `/logs?since=` answers with the oldest records after that time, so a collector that asks again carries on from where it stopped; it used to hand over the newest `limit` and skip the rest for good. `since` is compared as a time whatever its offset, and one that is not a time is a `400`. (#475)
 - The kept log keeps what `POSTULO_LOG_BACKUPS` promises. Every process rotated `postulo.log` on its own, so one rotation became several and most of the history was lost; they now rotate one at a time, and rotations are read in order past the ninth. (#379)

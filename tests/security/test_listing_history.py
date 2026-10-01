@@ -185,7 +185,7 @@ def test_a_token_without_either_scope_is_told_which_would_do(client, user, listi
     assert body["type"].endswith("#insufficient-scope")
     assert body["scope"] == "listings:bind", "the narrowest that would do"
     assert body["scopes"] == ["listings:bind", "write"]
-    assert "'listings:bind' or 'write'" in body["detail"]
+    assert "'listings:bind', 'write'" in body["detail"], "a list, with no English between"
 
 
 def test_a_single_scope_refusal_is_as_it_was(client, user):

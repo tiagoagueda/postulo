@@ -86,8 +86,10 @@ LEVELS = ("DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL")
 REQUEST_ID_HEADER = "X-Request-ID"
 
 #: What an id from outside may look like. Anything else is replaced rather than cleaned:
-#: a log line is one place a newline from a stranger must never land.
-ACCEPTABLE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,200}$")
+#: a log line is one place a newline from a stranger must never land. Matched whole:
+#: `$` also matches before a final newline, and the id is echoed in a header and, since
+#: #393, in the body of a refusal.
+ACCEPTABLE_ID = re.compile(r"[A-Za-z0-9._:-]{1,200}")
 
 _current: contextvars.ContextVar[str] = contextvars.ContextVar("postulo_request_id", default="")
 
@@ -104,7 +106,7 @@ def new_request_id(prefix: str = "") -> str:
 
 
 def acceptable(identifier: str) -> bool:
-    return bool(identifier) and ACCEPTABLE_ID.match(identifier) is not None
+    return bool(identifier) and ACCEPTABLE_ID.fullmatch(identifier) is not None
 
 
 @contextmanager

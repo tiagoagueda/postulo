@@ -42,13 +42,23 @@ class NotOffered(ValueError):
     not there, or an answer that is not one of the three.
 
     ``field`` is which part of the answer is refused -- ``choice``, ``id`` or ``ids`` -- so
-    that the API can name it. The words are for a client and are not translated, as the
-    rest of the API's refusals are not.
+    that the API can name it. The words are a whole sentence with a place for that name,
+    translated like every other refusal the API makes (#393): a fragment to be glued
+    after a path reads wrongly in most of the languages Postulo speaks.
     """
 
-    def __init__(self, field: str, message: str):
-        super().__init__(message)
+    def __init__(self, field: str, sentence, **values):
+        super().__init__(field)
         self.field = field
+        self._sentence = sentence
+        self._values = values
+
+    def sentence(self, named: str) -> str:
+        """The refusal, with ``named`` as what the field is called where it was sent."""
+        return str(self._sentence % {"field": named, **self._values})
+
+    def __str__(self) -> str:
+        return self.sentence(repr(self.field))
 
 
 @dataclass(frozen=True)
@@ -91,7 +101,7 @@ DETAILS: tuple[Detail, ...] = (
             "The telephone number chosen for this CV is no longer in your details, so it "
             "prints none."
         ),
-        not_yours="is not one of your telephone numbers.",
+        not_yours=_("%(field)s is not one of your telephone numbers."),
     ),
     Detail(
         key="email",
@@ -102,7 +112,7 @@ DETAILS: tuple[Detail, ...] = (
             "The email address chosen for this CV is no longer one of your confirmed "
             "addresses, so it prints none."
         ),
-        not_yours="is not one of your confirmed email addresses.",
+        not_yours=_("%(field)s is not one of your confirmed email addresses."),
     ),
     Detail(
         key="social",
@@ -112,7 +122,7 @@ DETAILS: tuple[Detail, ...] = (
         gone=_(
             "The social profile chosen for this CV is no longer in your details, so it prints none."
         ),
-        not_yours="is not one of your social profiles.",
+        not_yours=_("%(field)s is not one of your social profiles."),
         link_kind="social",
     ),
     Detail(
@@ -124,7 +134,7 @@ DETAILS: tuple[Detail, ...] = (
             "The code repository chosen for this CV is no longer in your details, so it "
             "prints none."
         ),
-        not_yours="is not one of your code repositories.",
+        not_yours=_("%(field)s is not one of your code repositories."),
         link_kind="repository",
     ),
     Detail(
@@ -133,7 +143,7 @@ DETAILS: tuple[Detail, ...] = (
         follow=_("Your primary website"),
         none=_("No website"),
         gone=_("The website chosen for this CV is no longer in your details, so it prints none."),
-        not_yours="is not one of your websites.",
+        not_yours=_("%(field)s is not one of your websites."),
         link_kind="website",
     ),
 )
@@ -389,7 +399,12 @@ def is_default(cv: CV) -> bool:
 
 def _answer(raw) -> str:
     if raw not in Prints.values:
-        raise NotOffered("choice", f"must be one of {sorted(Prints.values)}; got {raw!r}.")
+        raise NotOffered(
+            "choice",
+            _("%(field)s must be one of %(choices)s; got %(value)s."),
+            choices=sorted(Prints.values),
+            value=repr(raw),
+        )
     return raw
 
 
@@ -408,7 +423,9 @@ def choose(cv: CV, key: str, answer: str, row_id: int | None = None, *, owner=No
     answer = _answer(answer)
     if answer != Prints.CHOSEN:
         if row_id is not None:
-            raise NotOffered("id", "goes with 'chosen' and with nothing else.")
+            raise NotOffered(
+                "id", _("%(field)s goes with %(choice)s and with nothing else."), choice="'chosen'"
+            )
         setattr(cv, detail.choice_field, answer)
         setattr(cv, detail.pin_field, None)
         return
@@ -431,13 +448,15 @@ def choose_identifiers(cv: CV, answer: str, row_ids=(), *, owner=None) -> list:
     wanted = list(dict.fromkeys(row_ids or ()))
     if answer != Prints.CHOSEN:
         if wanted:
-            raise NotOffered("ids", "go with 'chosen' and with nothing else.")
+            raise NotOffered(
+                "ids", _("%(field)s goes with %(choice)s and with nothing else."), choice="'chosen'"
+            )
         cv.identifiers_choice = answer
         return []
     owner = owner if owner is not None else cv.owner
     mine = {row.pk: row for row in offered(owner, "identifiers")}
     if any(row_id not in mine for row_id in wanted):
-        raise NotOffered("ids", "names an identifier that is not one of yours.")
+        raise NotOffered("ids", _("%(field)s names an identifier that is not one of yours."))
     cv.identifiers_choice = Prints.CHOSEN
     return [mine[row_id] for row_id in wanted]
 

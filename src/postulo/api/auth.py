@@ -9,9 +9,10 @@ names the scope, because the person who made the token needs to know which box t
 from __future__ import annotations
 
 from django.http import JsonResponse
+from django.utils.translation import gettext as _
 from ninja.security import HttpBearer
 
-from postulo.core import throttle
+from postulo.core import preferences, throttle
 
 from . import problems
 from .models import ApiToken
@@ -43,13 +44,31 @@ def lookup(raw: str) -> ApiToken | None:
         return None
     record = (
         ApiToken.objects.active()
-        .select_related("owner")
+        .select_related("owner", "owner__profile")
         .filter(token_hash=ApiToken.hash_token(raw))
         .first()
     )
     if record is None or not record.owner.is_active:
         return None
     return record
+
+
+def _in_their_own_words(request, record: ApiToken) -> None:
+    """From here on, this request is in the language and time zone of the token's owner.
+
+    A call made with a token signs nobody in, so `UserPreferencesMiddleware` saw nobody and
+    the request was running in whatever its ``Accept-Language`` named: English for a script
+    that sends none, the browser's for an extension. Neither is a choice anybody made about
+    Postulo. So a refusal's sentence, which the wiki says is in the account's language, was
+    in the client's; and what a call writes down -- an interview's line on the timeline, the
+    reminder that names its time -- was worded for the tool and timed for the instance.
+
+    Called as soon as the token is known and before anything can refuse, so that the scope
+    refusal and the spent allowance are said the same way as everything after them. An
+    owner who has set no language, or one the instance no longer offers, leaves the
+    request's own standing, which is the rule a signed-in page follows (#393).
+    """
+    preferences.apply(getattr(record.owner, "profile", None), request)
 
 
 class TokenAuth(HttpBearer):
@@ -59,6 +78,7 @@ class TokenAuth(HttpBearer):
         record = lookup(token)
         if record is None:
             return None
+        _in_their_own_words(request, record)
         _within_its_allowance(record)
         record.record_use()
         # Nothing here logs the caller in: a token can never be mistaken for a session.
@@ -83,6 +103,7 @@ class ScopedAuth(HttpBearer):
         record = lookup(token)
         if record is None:
             return None
+        _in_their_own_words(request, record)
         if not any(record.has_scope(name) for name in self.scopes):
             # Typed, with the scope beside it: a client refused here has something to do
             # about it -- ask for a token carrying that scope -- and should not have to
@@ -91,14 +112,18 @@ class ScopedAuth(HttpBearer):
             if len(self.scopes) == 1:
                 raise problems.Refused(
                     403,
-                    f"This token does not have the '{self.scope}' scope.",
+                    _("This token does not have the %(scope)s scope.")
+                    % {"scope": repr(self.scope)},
                     kind="insufficient-scope",
                     scope=self.scope,
                 )
-            named = " or ".join(f"'{name}'" for name in self.scopes)
+            # A list, not a phrase: an "or" between the names was English inside a
+            # sentence that is now translated.
+            named = ", ".join(repr(name) for name in self.scopes)
             raise problems.Refused(
                 403,
-                f"This token has none of the scopes this call takes: {named}.",
+                _("This token has none of the scopes this call takes: %(scopes)s.")
+                % {"scopes": named},
                 kind="insufficient-scope",
                 scope=self.scope,
                 scopes=list(self.scopes),
@@ -141,7 +166,7 @@ def for_readers_of_the_api(view):
         # API's runs over it -- which is exactly how it would drift out of shape, so
         # `tests/test_api.py` compares it against a refusal from a real call (#296).
         return JsonResponse(
-            problems.document(request, 401, "Unauthorized"),
+            problems.document(request, 401, problems.no_token()),
             status=401,
             content_type=problems.CONTENT_TYPE,
         )

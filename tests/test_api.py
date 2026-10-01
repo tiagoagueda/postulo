@@ -379,12 +379,14 @@ def test_the_schema_answers_a_token_or_a_person_and_nobody_else(client, user):
     Any live token will do, whatever its scopes: the schema describes calls a token may not
     make, and refusing to say what a call is called is not what the scopes are for.
     """
-    anonymous = client.get("/api/v1/openapi.json")
+    # Two refusals are two requests; compared, they are given the same id (#393).
+    same = {"X-Request-ID": "one-and-the-same"}
+    anonymous = client.get("/api/v1/openapi.json", headers=same)
     assert anonymous.status_code == 401
     # The same refusal as everything else -- compared against a real one rather than
     # written out here, because this view is guarded by hand and nothing else would notice
     # it drifting out of the shape the API answers with (#296).
-    elsewhere = client.get("/api/v1/applications")
+    elsewhere = client.get("/api/v1/applications", headers=same)
     assert elsewhere.status_code == 401
     assert anonymous.json() == {**elsewhere.json(), "instance": "/api/v1/openapi.json"}
     assert anonymous["Content-Type"] == elsewhere["Content-Type"] == "application/problem+json"

@@ -22,17 +22,27 @@ a client does something *different* — wait and retry, ask for another scope, r
 errors — and those are worth naming.
 
 **``title`` is not translated, and ``detail`` is.** They are for different readers. ``detail``
-says what is wrong with this request and a person debugging reads it, so it goes through
-``gettext`` like every other message here. ``title`` is a label for the *type* — the RFC says
+says what is wrong with this request and a person reads it -- a browser extension shows it
+as it comes -- so it goes through ``gettext``, every one of them (#393): a whole sentence,
+with the wire's own names for a field or a value put into it untranslated, because those
+are what the reader has to go and change. ``title`` is a label for the *type* — the RFC says
 it SHOULD be the same for every occurrence — so a client that switches on it must not have
-it move with ``Accept-Language``. A reader who wants that branch has ``type``, and ``title``
+it move with the language. A reader who wants that branch has ``type``, and ``title``
 stays beside it.
 
-**``instance`` names the address that refused, not the occurrence.** The RFC asks for a URI
-identifying the specific occurrence, and doing that honestly needs a request id minted here
-and written to the log, so that quoting it leads somewhere. Nothing in Postulo mints one.
-An id nobody can look up is worse than the path, which at least says where; when request
-ids arrive, this is the line that changes.
+**The language is the account's.** A call made with a token is answered in the language of
+whoever owns the token (`auth._in_their_own_words`), whatever ``Accept-Language`` the client
+sent: a script sends none and an extension sends the browser's, and neither is a choice
+anybody made about Postulo. Only where there is no owner to ask -- a 401, or an owner who
+has chosen no language -- does the request's own stand.
+
+**``instance`` names the address that refused, and ``request_id`` the occurrence.** The RFC
+asks for something identifying the specific occurrence, and doing that honestly needs an id
+that is also written to the log, so that quoting it leads somewhere. Every request has one
+since #233, in ``X-Request-ID`` and on every line it logs; a person reporting a refusal
+copies the body and rarely the headers, so the body carries it as well. As a member of its
+own and not in place of the path: ``instance`` is read as an address by whatever reads it
+today, and where a refusal came from is still worth saying.
 """
 
 from __future__ import annotations
@@ -41,8 +51,9 @@ import re
 from typing import Any
 
 from django.http import HttpRequest, HttpResponse
+from django.utils.translation import gettext as _
 from ninja import Schema
-from ninja.errors import HttpError, ValidationError
+from ninja.errors import AuthenticationError, HttpError, ValidationError
 from pydantic import ConfigDict
 
 #: What the RFC calls a problem document, and what this API answers a refusal with.
@@ -112,6 +123,8 @@ class Problem(Schema):
     status: int
     detail: str = ""
     instance: str = ""
+    #: The id of the request that was refused: `X-Request-ID`, and what its log lines carry.
+    request_id: str = ""
 
 
 class Refused(HttpError):
@@ -132,16 +145,27 @@ class Refused(HttpError):
 def document(
     request: HttpRequest, status: int, detail: str = "", *, kind: str | None = None, **extensions
 ) -> dict:
-    """The body of a refusal: the five members, then whatever the type adds."""
+    """The body of a refusal: the five members, the request's id, then whatever the type adds."""
     return {
         "type": uri(kind),
         "title": title_of(kind, status),
         "status": status,
         "detail": detail,
-        # The address that refused. See the note at the top about what this is not.
+        # The address that refused, and which request it was. See the note at the top.
         "instance": request.path,
+        "request_id": getattr(request, "request_id", ""),
         **extensions,
     }
+
+
+def no_token() -> str:
+    """What a call without a live token is told, and nothing more than that.
+
+    One sentence for a token that is missing, wrong, expired or revoked: which of them it
+    was is not something to confirm. django-ninja's own word for it is the status phrase,
+    "Unauthorized", which is the title already and says nothing a person can act on.
+    """
+    return str(_("This call needs a valid token."))
 
 
 def refuse(request, api, status: int, detail: str = "", *, kind=None, **extensions):
@@ -178,7 +202,10 @@ def install(api) -> None:
 
     @api.exception_handler(Http404)
     def _not_found(request, exc):
-        return refuse(request, api, 404, str(exc) if str(exc) else "")
+        # Not Django's own sentence, which names the model class it looked in ("No
+        # Application matches the given query.") and is worded for a developer. And the
+        # same words whether the thing is somebody else's or was never there.
+        return refuse(request, api, 404, str(_("Nothing of yours is at this address.")))
 
     @api.exception_handler(RequestDataTooBig)
     def _too_big(request, exc):
@@ -191,7 +218,6 @@ def install(api) -> None:
         what it needs.
         """
         from django.template.defaultfilters import filesizeformat
-        from django.utils.translation import gettext as _
 
         limit = settings.DATA_UPLOAD_MAX_MEMORY_SIZE
         return refuse(
@@ -213,7 +239,7 @@ def install(api) -> None:
             request,
             api,
             exc.status_code,
-            str(exc),
+            no_token() if isinstance(exc, AuthenticationError) else str(exc),
             kind=getattr(exc, "kind", None),
             **extensions,
         )
@@ -246,8 +272,8 @@ def _validation_sentence(errors: list[dict]) -> str:
 
     The fields rather than the reasons: a caller that wants the reasons has `errors`, and a
     sentence that tried to carry several of them would be a worse version of the list it
-    sits beside. Untranslated, like the field names it quotes -- those are the wire's
-    spelling, and a message that translated half of itself would be harder to act on.
+    sits beside. The sentence is translated like every other; the field names in it are
+    the wire's spelling and are put in as they are (#393).
     """
     fields = []
     for error in errors:
@@ -255,10 +281,13 @@ def _validation_sentence(errors: list[dict]) -> str:
         if location:
             fields.append(".".join(location))
     if not fields:
-        return "The request was not in the shape this call takes."
+        return str(_("The request was not in the shape this call takes."))
     unique = list(dict.fromkeys(fields))
     named = ", ".join(unique[:5]) + (", …" if len(unique) > 5 else "")
-    return f"Refused: {named}. See `errors` for what is wrong with each."
+    return str(
+        _("Refused: %(fields)s. See %(member)s for what is wrong with each.")
+        % {"fields": named, "member": "`errors`"}
+    )
 
 
 #: What every call can refuse with, whatever it is: no live token, and the allowance spent.

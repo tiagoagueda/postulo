@@ -3,6 +3,7 @@
 import datetime as dt
 
 from django.db import transaction
+from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -186,7 +187,7 @@ def patch_cv(request, pk: int, payload: CVPatch):
     except printing.NotOffered as refused:
         # Nothing has been saved: the answers were being put on an instance, and one that
         # is refused takes the others in the same call with it.
-        raise HttpError(422, f"'prints.{kind}.{refused.field}' {refused}") from refused
+        raise HttpError(422, refused.sentence(f"'prints.{kind}.{refused.field}'")) from refused
     for name, column in printing.SWITCHES.items():
         if name in answers:
             setattr(cv, column, answers[name])
@@ -249,7 +250,11 @@ def list_documents(
     name the table as well as the id, and that is a shape of its own.
     """
     if source not in (None, "upload", "rendered"):
-        raise HttpError(422, "'source' must be upload or rendered.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s.")
+            % {"field": "'source'", "choices": ["upload", "rendered"]},
+        )
     rows = []
     if source in (None, "upload"):
         rows += [
@@ -285,4 +290,4 @@ def download_document(request, source: str, pk: int):
         return serve_private_file(
             request, document.file, download_name=document.download_name, as_attachment=True
         )
-    raise HttpError(404, "No such kind of document.")
+    raise HttpError(404, _("No such kind of document."))

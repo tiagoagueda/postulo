@@ -117,7 +117,7 @@ def test_an_id_the_caller_sent_comes_back_when_it_looks_like_one(client):
 
 @pytest.mark.parametrize(
     "given",
-    ["has space", "x" * 201, "quote'd", "semi;colon", "<b>", "tab\there"],
+    ["has space", "x" * 201, "quote'd", "semi;colon", "<b>", "tab\there", "ends-in-a-newline\n"],
 )
 def test_an_id_that_does_not_look_like_one_is_replaced_not_cleaned(client, given):
     """A log line is one place a stranger's newline or markup must not land."""

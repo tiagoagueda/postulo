@@ -3,6 +3,7 @@
 import datetime as dt
 
 from django.http import HttpResponse
+from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -56,7 +57,11 @@ def list_interviews(
     elif state == "all":
         interviews = interviews.order_by("starts_at")
     else:
-        raise HttpError(422, "'state' must be upcoming, scheduled, past or all.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s.")
+            % {"field": "'state'", "choices": ["upcoming", "scheduled", "past", "all"]},
+        )
     if application:
         interviews = interviews.filter(application_id=application)
     if since:
@@ -102,7 +107,11 @@ def _contacts(request, application: Application, ids: list[int]) -> list[Contact
         owned(request, Contact.objects).filter(pk__in=ids, company=application.posting.company_id)
     )
     if len(people) != len(set(ids)):
-        raise HttpError(422, "'contact_ids' must all be people at the application's company.")
+        raise HttpError(
+            422,
+            _("%(field)s must all be people at the application's company.")
+            % {"field": "'contact_ids'"},
+        )
     return people
 
 
@@ -110,10 +119,14 @@ def _contacts(request, application: Application, ids: list[int]) -> list[Contact
 def add_interview(request, payload: InterviewIn):
     application = owned(request, Application.objects).filter(pk=payload.application_id).first()
     if application is None:
-        raise HttpError(404, "No such application.")
+        raise HttpError(404, _("No such application."))
     choice_or_422(payload.kind, InterviewKind, field="kind")
     if payload.ends_at is not None and payload.ends_at <= payload.starts_at:
-        raise HttpError(422, "'ends_at' must be after 'starts_at'.")
+        raise HttpError(
+            422,
+            _("%(later)s must be after %(earlier)s.")
+            % {"later": "'ends_at'", "earlier": "'starts_at'"},
+        )
     interview = schedule_interview(
         application,
         kind=payload.kind,
@@ -144,7 +157,11 @@ def change_interview(request, pk: int, payload: InterviewPatch):
         interview.ends_at if starts_at == interview.starts_at else starts_at + interview.duration
     )
     if ends_at <= starts_at:
-        raise HttpError(422, "'ends_at' must be after 'starts_at'.")
+        raise HttpError(
+            422,
+            _("%(later)s must be after %(earlier)s.")
+            % {"later": "'ends_at'", "earlier": "'starts_at'"},
+        )
     for name, value in data.items():
         setattr(interview, name, value)
     interview.save()
@@ -163,6 +180,10 @@ def change_interview(request, pk: int, payload: InterviewPatch):
 def record_outcome(request, pk: int, payload: InterviewOutcomeIn):
     interview = owned_or_404(request, _queryset(request), pk)
     if payload.outcome not in SETTLED_OUTCOMES:
-        raise HttpError(422, f"'outcome' must be one of {sorted(SETTLED_OUTCOMES)}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s.")
+            % {"field": "'outcome'", "choices": sorted(SETTLED_OUTCOMES)},
+        )
     settle_interview(interview, payload.outcome, note=payload.note, actor=actor_of(request))
     return interview_out(request, owned_or_404(request, _queryset(request), pk))

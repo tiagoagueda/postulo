@@ -142,7 +142,13 @@ def set_status(request, pk: int, payload: StatusIn):
     choice_or_422(payload.end_reason, EndReason, field="end_reason", allow_blank=True)
     if payload.end_reason and payload.status not in END_STATUSES:
         raise HttpError(
-            422, f"'end_reason' goes with one of {sorted(END_STATUSES)}; got {payload.status!r}."
+            422,
+            _("%(field)s goes with one of %(statuses)s; got %(status)s.")
+            % {
+                "field": "'end_reason'",
+                "statuses": sorted(END_STATUSES),
+                "status": repr(payload.status),
+            },
         )
     change_status(
         application,

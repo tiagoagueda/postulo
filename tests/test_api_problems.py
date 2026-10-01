@@ -8,14 +8,17 @@ without a token, rather than listing the ones somebody thought of.
 
 from __future__ import annotations
 
+import datetime as dt
 import json
+import re
 
 import pytest
 from django.utils import timezone
 
 from postulo.api import problems
 from postulo.api.models import ApiToken
-from postulo.applications.models import Application, Status
+from postulo.applications.models import Application, Reminder, Status
+from postulo.core.models import SiteSettings
 from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
@@ -59,6 +62,8 @@ def assert_is_a_problem(response, status: int):
     assert body["status"] == status, "the status is repeated in the body, as the RFC asks"
     assert isinstance(body["detail"], str), "RFC 9457 §3.1.4: detail is a string"
     assert body["instance"].startswith("/api/v1/")
+    # The id that finds this refusal's lines in the log, in the part a person copies (#393).
+    assert body["request_id"] and body["request_id"] == response["X-Request-ID"]
     return body
 
 
@@ -96,8 +101,9 @@ def test_the_schema_is_refused_in_the_same_shape_as_a_call(client):
     It is the one refusal in the API that no handler of the API's runs over, which is
     exactly how it would drift out of shape.
     """
-    schema = client.get("/api/v1/openapi.json")
-    call = client.get("/api/v1/applications")
+    same = {"X-Request-ID": "one-and-the-same"}
+    schema = client.get("/api/v1/openapi.json", headers=same)
+    call = client.get("/api/v1/applications", headers=same)
 
     assert_is_a_problem(schema, 401)
     assert schema.json() == {**call.json(), "instance": "/api/v1/openapi.json"}
@@ -280,7 +286,8 @@ def test_an_unnamed_refusal_falls_back_to_the_status_codes_own_phrase():
 
 
 def test_the_title_does_not_move_with_the_language(client, user):
-    """`title` labels the type; `detail` is what a person reads. Only one is translated.
+    """`title` labels the type; `detail` is what a person reads. Only one is translated,
+    and that one is.
 
     RFC 9457 §3.1.2 says `title` SHOULD be the same for every occurrence of a type. A
     client that switched on it would otherwise break for a reader whose Postulo is in
@@ -289,18 +296,198 @@ def test_the_title_does_not_move_with_the_language(client, user):
     user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
 
-    body = client.get(
+    response = client.get(
         "/api/v1/applications", **issue(user, "captures"), HTTP_ACCEPT_LANGUAGE="pt-PT"
-    ).json()
+    )
+    body = response.json()
 
     assert body["title"] == problems.TITLES["insufficient-scope"]
+    assert body["detail"] != NO_READ_SCOPE and "'read'" in body["detail"]
+    assert response["Content-Language"] == "pt-PT"
 
 
 def test_a_token_that_expired_is_refused_like_one_that_never_existed(client, user):
     """The shape does not leak which it was; #230's promise, kept in the new envelope."""
     expired = issue(user, "read", expires_at=timezone.now() - __import__("datetime").timedelta(1))
 
-    gone = client.get("/api/v1/applications", **expired)
-    never = client.get("/api/v1/applications", HTTP_AUTHORIZATION="Bearer nonsense")
+    # Given one id, since the id of the request is all that would tell two requests apart.
+    same = {"X-Request-ID": "one-and-the-same"}
+    gone = client.get("/api/v1/applications", **expired, headers=same)
+    never = client.get("/api/v1/applications", HTTP_AUTHORIZATION="Bearer nonsense", headers=same)
 
     assert assert_is_a_problem(gone, 401) == assert_is_a_problem(never, 401)
+
+
+# ---------------------------------------------- whose language, and which request (#393)
+#
+# The docstring and the wiki said `detail` is translated into the account's language. About
+# one refusal in five went through gettext at all, and none was in the account's language on
+# a call made with a token: the token's owner is not signed in, so nothing ever looked at
+# their profile and the client's `Accept-Language` stood.
+
+NO_READ_SCOPE = "This token does not have the 'read' scope."
+NO_WRITE_SCOPE = "This token does not have the 'write' scope."
+ENDS_BEFORE_IT_STARTS = "'ends_at' must be after 'starts_at'."
+
+
+def speaking(user, language: str, time_zone: str = "") -> None:
+    user.profile.language = language
+    user.profile.time_zone = time_zone
+    user.profile.save(update_fields=["language", "time_zone"])
+
+
+def an_interview(application, **changes) -> dict:
+    starts = (timezone.now() + dt.timedelta(days=3)).replace(
+        hour=9, minute=0, second=0, microsecond=0, tzinfo=dt.UTC
+    )
+    return {
+        "application_id": application.pk,
+        "kind": "panel",
+        "starts_at": starts.isoformat(),
+        **changes,
+    }
+
+
+def backwards(application) -> dict:
+    """An interview that ends an hour before it starts."""
+    payload = an_interview(application)
+    starts = dt.datetime.fromisoformat(payload["starts_at"])
+    return {**payload, "ends_at": (starts - dt.timedelta(hours=1)).isoformat()}
+
+
+def test_the_words_have_not_changed_for_somebody_who_reads_english(client, user, application):
+    """Translating a sentence must not have reworded it where it was already read."""
+    assert (
+        client.get("/api/v1/applications", **issue(user, "captures")).json()["detail"]
+        == NO_READ_SCOPE
+    )
+    refused = post(client, "/api/v1/interviews", backwards(application), **issue(user, "write"))
+    assert assert_is_a_problem(refused, 422)["detail"] == ENDS_BEFORE_IT_STARTS
+
+
+def test_a_router_s_refusals_are_translated(client, user, application):
+    """Two that were English literals, asked for in French by an account that set no
+    language of its own: which line refused must not decide what language the answer is in."""
+    french = {"HTTP_ACCEPT_LANGUAGE": "fr"}
+
+    scope = client.get("/api/v1/interviews", **issue(user, "captures"), **french)
+    dates = post(
+        client, "/api/v1/interviews", backwards(application), **issue(user, "write"), **french
+    )
+
+    assert assert_is_a_problem(scope, 403)["detail"] != NO_READ_SCOPE
+    said = assert_is_a_problem(dates, 422)["detail"]
+    assert said != ENDS_BEFORE_IT_STARTS
+    assert "'ends_at'" in said and "'starts_at'" in said, "the wire's own names are not translated"
+
+
+def test_the_sentence_about_a_refused_body_is_translated_too(client, user):
+    response = post(
+        client,
+        "/api/v1/captures",
+        {"url": "not-a-url"},
+        **issue(user, "captures"),
+        HTTP_ACCEPT_LANGUAGE="fr",
+    )
+    said = assert_is_a_problem(response, 422)["detail"]
+
+    assert "url" in said and "`errors`" in said
+    assert not said.startswith("Refused:")
+
+
+def test_a_refusal_is_in_the_language_of_whoever_owns_the_token(
+    client, user, other_user, application, settings
+):
+    """The account's, whatever the client asked for: a script sends no `Accept-Language`
+    and a browser extension sends the browser's, and neither is a choice anybody made about
+    Postulo. A 403, a 422 and a 429, which are refused at three different depths."""
+    speaking(user, "pt-PT")
+    german = {"HTTP_ACCEPT_LANGUAGE": "de"}
+
+    scope = client.get("/api/v1/applications", **issue(user, "captures"), **german)
+    dates = post(
+        client, "/api/v1/interviews", backwards(application), **issue(user, "write"), **german
+    )
+
+    assert assert_is_a_problem(scope, 403)["detail"] != NO_READ_SCOPE
+    assert assert_is_a_problem(dates, 422)["detail"] != ENDS_BEFORE_IT_STARTS
+    assert scope["Content-Language"] == dates["Content-Language"] == "pt-PT"
+
+    # The allowance is counted before the call is made, by the guard itself.
+    settings.POSTULO_API_RATE = "1/m"
+    theirs, in_english = issue(user), issue(other_user)
+    for headers in (theirs, in_english):
+        assert client.get("/api/v1/me", **headers).status_code == 200
+    spent = client.get("/api/v1/me", **theirs, **german)
+    spent_in_english = client.get("/api/v1/me", **in_english)
+
+    def without_numbers(text: str) -> str:
+        return re.sub(r"\d+", "N", text)
+
+    assert spent["Content-Language"] == "pt-PT"
+    assert without_numbers(assert_is_a_problem(spent, 429)["detail"]) != without_numbers(
+        assert_is_a_problem(spent_in_english, 429)["detail"]
+    )
+
+
+def test_a_call_with_no_token_is_answered_in_the_request_s_language(client):
+    """There is no owner to ask, so what the client asked for stands."""
+    in_french = client.get("/api/v1/applications", HTTP_ACCEPT_LANGUAGE="fr")
+    in_english = client.get("/api/v1/applications")
+
+    assert assert_is_a_problem(in_french, 401)["detail"] != in_english.json()["detail"]
+    assert in_english.json()["detail"], "and it is a sentence, not a status phrase"
+    assert in_english.json()["detail"] != "Unauthorized"
+
+
+def test_something_that_is_not_there_is_said_without_naming_a_model(client, user):
+    """Django's own sentence was passed through: "No Application matches the given query."."""
+    said = client.get("/api/v1/applications/999999", **issue(user)).json()["detail"]
+
+    assert said and "Application" not in said and "query" not in said
+
+
+def test_a_language_the_instance_withdrew_is_not_applied(client, user):
+    """The same rule a signed-in page follows: stored, kept, and not used while withdrawn."""
+    speaking(user, "fr-FR")
+    SiteSettings.objects.filter(pk=SiteSettings.get().pk).update(offered_languages=["de"])
+
+    response = client.get("/api/v1/applications", **issue(user, "captures"))
+
+    assert response.json()["detail"] == NO_READ_SCOPE
+
+
+def test_an_interview_booked_with_a_token_is_worded_for_its_owner(client, user, application):
+    """What a call writes down is written the way its refusals are said.
+
+    The reminder's sentence carries the time. Booked through a token it was worded in the
+    client's `Accept-Language` and in the instance's time zone, for a person who reads
+    Portuguese in Tokyo.
+    """
+    speaking(user, "pt-PT", "Asia/Tokyo")
+
+    response = post(
+        client,
+        "/api/v1/interviews",
+        an_interview(application),
+        **issue(user, "write"),
+        HTTP_ACCEPT_LANGUAGE="de",
+    )
+    assert response.status_code == 201, response.content
+
+    summary = Reminder.objects.get(pk=response.json()["reminder_id"]).summary
+    assert "18:00" in summary and "09:00" not in summary, "nine in the morning UTC, in Tokyo"
+    assert not summary.startswith("Interview tomorrow"), "and in their language"
+
+
+def test_a_refusal_names_the_request_it_was(client, user):
+    """`X-Request-ID` is a header, and a person reporting a refusal copies the body."""
+    minted = client.get("/api/v1/applications/999999", **issue(user))
+    supplied = client.get(
+        "/api/v1/applications/999999", **issue(user), headers={"X-Request-ID": "trace-41"}
+    )
+
+    body = assert_is_a_problem(minted, 404)
+    assert len(body["request_id"]) == 32
+    assert body["instance"] == "/api/v1/applications/999999", "the address is still the address"
+    assert assert_is_a_problem(supplied, 404)["request_id"] == "trace-41"

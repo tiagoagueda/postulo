@@ -1,6 +1,7 @@
 """Small helpers the routers share."""
 
 from django.shortcuts import get_object_or_404
+from django.utils.translation import gettext as _
 from ninja.errors import HttpError
 
 from postulo.core.models import Tag
@@ -19,7 +20,11 @@ def choice_or_422(value: str, choices, *, field: str, allow_blank: bool = False)
     if allow_blank and value == "":
         return value
     if value not in choices.values:
-        raise HttpError(422, f"{field!r} must be one of {sorted(choices.values)}; got {value!r}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s; got %(value)s.")
+            % {"field": repr(field), "choices": sorted(choices.values), "value": repr(value)},
+        )
     return value
 
 
@@ -50,12 +55,17 @@ def referrer_and_agency_or_422(request, payload) -> dict:
     if payload.referred_by_id is not None:
         contact = owned(request, Contact.objects).filter(pk=payload.referred_by_id).first()
         if contact is None:
-            raise HttpError(422, "'referred_by_id' is not one of your contacts.")
+            raise HttpError(
+                422, _("%(field)s is not one of your contacts.") % {"field": "'referred_by_id'"}
+            )
         found["referred_by"] = contact
     if payload.through_agency_id is not None:
         agency = owned(request, Company.objects).filter(pk=payload.through_agency_id).first()
         if agency is None:
-            raise HttpError(422, "'through_agency_id' is not one of your companies.")
+            raise HttpError(
+                422,
+                _("%(field)s is not one of your companies.") % {"field": "'through_agency_id'"},
+            )
         found["through_agency"] = agency
     return found
 
@@ -64,7 +74,11 @@ def priority_or_422(value: int) -> int:
     from postulo.applications.models import Priority
 
     if value not in Priority.values:
-        raise HttpError(422, f"'priority' must be one of {sorted(Priority.values)}; got {value!r}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s; got %(value)s.")
+            % {"field": "'priority'", "choices": sorted(Priority.values), "value": repr(value)},
+        )
     return value
 
 

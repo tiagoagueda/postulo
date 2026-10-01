@@ -2,6 +2,7 @@
 
 import datetime as dt
 
+from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -41,7 +42,7 @@ def add_reminder(request, payload: ReminderIn):
     if payload.application_id is not None:
         application = owned(request, Application.objects).filter(pk=payload.application_id).first()
         if application is None:
-            raise HttpError(404, "No such application.")
+            raise HttpError(404, _("No such application."))
     reminder = Reminder.objects.create(
         owner=owner, application=application, summary=payload.summary, due_at=payload.due_at
     )
@@ -78,7 +79,7 @@ def change_reminder(request, pk: int, payload: ReminderPatch):
                 owned(request, Application.objects).filter(pk=data["application_id"]).first()
             )
             if application is None:
-                raise HttpError(404, "No such application.")
+                raise HttpError(404, _("No such application."))
         reminder.application = application
     if data.get("summary") is not None:
         reminder.summary = data["summary"]

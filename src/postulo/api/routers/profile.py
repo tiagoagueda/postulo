@@ -9,6 +9,7 @@ address's town and country, worked out whenever it is printed. ``printed_locatio
 answer, read-only, from the same function the CV's header asks.
 """
 
+from django.utils.translation import gettext as _
 from ninja import Router
 from ninja.errors import HttpError
 
@@ -48,7 +49,7 @@ def patch_profile(request, payload: ProfilePatch):
     }
     for name in ("first_name", "last_name"):
         if name in data and not data[name]:
-            raise HttpError(422, f"{name!r} may not be empty.")
+            raise HttpError(422, _("%(field)s may not be empty.") % {"field": repr(name)})
     profile = _mine(request)
     user = profile.user
     names = [name for name in ("first_name", "last_name") if name in data]

@@ -507,9 +507,10 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
     # account has and each one is a network timeout; a batch of forty from the extension
     # waited on all of them, forty times, before the fortieth was acknowledged. The words
     # are still written at delivery, in the owner's language, which is why the errand
-    # carries the pieces and not a sentence: pre-wording it here would use whatever
-    # `Accept-Language` the extension sent -- the language of the browser that found the
-    # posting, not a choice anybody made about Postulo (#223).
+    # carries the pieces and not a sentence: pre-wording it here would tie them to this
+    # request, which is in the owner's language only when they have chosen one (#393) and
+    # otherwise in whatever `Accept-Language` the extension sent -- the language of the
+    # browser that found the posting, not a choice anybody made about Postulo (#223).
     if batch is None:
         errands.send(
             "notify",

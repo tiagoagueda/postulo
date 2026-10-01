@@ -7,7 +7,6 @@ container's own health check.
 from __future__ import annotations
 
 import ipaddress
-import zoneinfo
 from urllib.parse import urlsplit
 
 from django.conf import settings
@@ -15,9 +14,8 @@ from django.http import HttpResponse
 from django.middleware.locale import LocaleMiddleware as DjangoLocaleMiddleware
 from django.shortcuts import resolve_url
 from django.urls import NoReverseMatch, reverse
-from django.utils import timezone
 
-from postulo.core import languages, logs
+from postulo.core import languages, logs, preferences
 
 #: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
 #: completeness; nothing in Postulo answers with either.
@@ -203,59 +201,15 @@ class UserPreferencesMiddleware:
         # it draws and which reads a file and a table to answer (#231).
         policy.forget_decisions()
 
-        profile = self._profile(request)
-
-        # The person's own zone, else the instance default an administrator may have set,
-        # else what the environment says (which deactivate() falls back to).
-        tz_name = (getattr(profile, "time_zone", "") if profile else "") or self._instance_zone()
-        try:
-            timezone.activate(zoneinfo.ZoneInfo(tz_name))
-        except (zoneinfo.ZoneInfoNotFoundError, ValueError):
-            # A profile holding a time zone this machine does not know should not take
-            # the whole request down; fall back to the instance default.
-            timezone.deactivate()
-
-        # A language an administrator has stopped offering is not applied, and the stored
-        # value is left exactly where it is: withdrawing a language must not silently
-        # rewrite a hundred people's settings, because it may be offered again tomorrow.
-        # Asked about the language it will be drawn in, which is Postulo's own nearest: a
-        # profile holding `sr` from before the list said which script reads `sr-Cyrl`, and
-        # that is the one an instance offers or does not (#337).
-        language = languages.catalogue(getattr(profile, "language", "") if profile else "")
-        if language and not self._offered(language):
-            language = ""
-        if language:
-            languages.activate(language)
-            request.LANGUAGE_CODE = languages.current()
+        # One rule for whose preferences these are, shared with a call made by API token,
+        # which learns who it is for only once the token has been read (#393).
+        preferences.apply(self._profile(request), request)
 
         return self.get_response(request)
 
-    @staticmethod
-    def _offered(code: str) -> bool:
-        from . import site
-
-        try:
-            return site.offers(code)
-        except Exception:  # pragma: no cover - a broken settings row must not blank a page
-            return True
-
-    @staticmethod
-    def _instance_zone() -> str:
-        """The instance default, or the environment's if the database cannot be asked.
-
-        Reading it is a query, and this middleware runs in front of `/healthz` -- whose
-        answer only matters on the day the database is the thing that is broken. Letting the
-        query take the request down turns the 503 that probe exists to return into a 500,
-        which reports "the application is down" where it should report "the database is".
-        """
-        from django.conf import settings
-
-        from . import site
-
-        try:
-            return site.default_time_zone()
-        except Exception:
-            return settings.TIME_ZONE
+    #: Kept under their old names for what reads them from here.
+    _offered = staticmethod(preferences.offered)
+    _instance_zone = staticmethod(preferences.instance_zone)
 
     @staticmethod
     def _profile(request):

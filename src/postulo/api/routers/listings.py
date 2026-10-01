@@ -9,6 +9,7 @@ calls and nothing else.
 import datetime as dt
 
 from django.db.models import Q
+from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -83,7 +84,11 @@ def list_listings(
     elif state in LISTING_FILTERS:
         listings = listings.in_state(state)
     elif state != "all":
-        raise HttpError(422, f"'state' must be undecided, all or one of {list(LISTING_FILTERS)}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s.")
+            % {"field": "'state'", "choices": ["undecided", "all", *LISTING_FILTERS]},
+        )
     if company:
         listings = listings.filter(company_id=company)
     return changed_since(listings.order_by("-noted_at", "-pk"), updated_since, after_id)
@@ -120,7 +125,11 @@ def list_listing_choices(
     elif state in LISTING_FILTERS:
         listings = listings.in_state(state)
     else:
-        raise HttpError(422, f"'state' must be all, undecided or one of {list(LISTING_FILTERS)}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s.")
+            % {"field": "'state'", "choices": ["all", "undecided", *LISTING_FILTERS]},
+        )
     words = q.strip()
     if words:
         listings = listings.filter(Q(title__icontains=words) | Q(company__name__icontains=words))
@@ -147,19 +156,31 @@ def add_listing_event(request, pk: int, payload: ListingEventIn):
         value for value in ListingEventKind.values if value not in SYSTEM_LISTING_EVENT_KINDS
     ]
     if payload.kind not in allowed:
-        raise HttpError(422, f"'kind' must be one of {sorted(allowed)}; got {payload.kind!r}.")
+        raise HttpError(
+            422,
+            _("%(field)s must be one of %(choices)s; got %(value)s.")
+            % {"field": "'kind'", "choices": sorted(allowed), "value": repr(payload.kind)},
+        )
     contact = None
     if payload.contact_id is not None:
         contact = owned(request, Contact.objects).filter(pk=payload.contact_id).first()
         if contact is None:
-            raise HttpError(422, "'contact_id' is not one of your contacts.")
+            raise HttpError(
+                422, _("%(field)s is not one of your contacts.") % {"field": "'contact_id'"}
+            )
     document = None
     if payload.document_id is not None:
         document = owned(request, UploadedDocument.objects).filter(pk=payload.document_id).first()
         if document is None:
-            raise HttpError(422, "'document_id' is not one of your files.")
+            raise HttpError(
+                422, _("%(field)s is not one of your files.") % {"field": "'document_id'"}
+            )
     if payload.kind == ListingEventKind.DOCUMENT and document is None:
-        raise HttpError(422, "A 'document' entry names the file: send 'document_id'.")
+        raise HttpError(
+            422,
+            _("A %(kind)s entry names the file: send %(field)s.")
+            % {"kind": "'document'", "field": "'document_id'"},
+        )
     event, created = record_listing_event(
         listing,
         kind=payload.kind,

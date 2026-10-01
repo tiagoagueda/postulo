@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-01 23:56+0000\n"
+"POT-Creation-Date: 2026-10-01 23:57+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -271,6 +271,88 @@ msgstr[0] ""
 msgstr[1] ""
 "Raison renseignée pour %(explained)s des %(counter)s candidatures terminées. Elle peut être ajoutée après coup, depuis la page de la candidature."
 
+#: src/postulo/documents/printing.py:427 src/postulo/documents/printing.py:452
+#, python-format, draft
+msgid "%(field)s goes with %(choice)s and with nothing else."
+msgstr "%(field)s va avec %(choice)s et avec rien d'autre."
+
+#: src/postulo/api/routers/applications.py:146
+#, python-format, draft
+msgid "%(field)s goes with one of %(statuses)s; got %(status)s."
+msgstr "%(field)s va avec l'un de %(statuses)s ; reçu %(status)s."
+
+#: src/postulo/documents/printing.py:137
+#, python-format, draft
+msgid "%(field)s is not one of your code repositories."
+msgstr "%(field)s n'est pas l'un de vos dépôts de code."
+
+#: src/postulo/api/routers/common.py:67
+#, python-format, draft
+msgid "%(field)s is not one of your companies."
+msgstr "%(field)s n'est pas l'une de vos entreprises."
+
+#: src/postulo/documents/printing.py:115
+#, python-format, draft
+msgid "%(field)s is not one of your confirmed email addresses."
+msgstr "%(field)s n'est pas l'une de vos adresses e-mail confirmées."
+
+#: src/postulo/api/routers/common.py:59 src/postulo/api/routers/listings.py:169
+#, python-format, draft
+msgid "%(field)s is not one of your contacts."
+msgstr "%(field)s n'est pas l'un de vos contacts."
+
+#: src/postulo/api/routers/listings.py:176
+#, python-format, draft
+msgid "%(field)s is not one of your files."
+msgstr "%(field)s n'est pas l'un de vos fichiers."
+
+#: src/postulo/documents/printing.py:125
+#, python-format, draft
+msgid "%(field)s is not one of your social profiles."
+msgstr "%(field)s n'est pas l'un de vos profils sociaux."
+
+#: src/postulo/documents/printing.py:104
+#, python-format, draft
+msgid "%(field)s is not one of your telephone numbers."
+msgstr "%(field)s n'est pas l'un de vos numéros de téléphone."
+
+#: src/postulo/documents/printing.py:146
+#, python-format, draft
+msgid "%(field)s is not one of your websites."
+msgstr "%(field)s n'est pas l'un de vos sites web."
+
+#: src/postulo/api/routers/profile.py:52
+#, python-format, draft
+msgid "%(field)s may not be empty."
+msgstr "%(field)s ne peut pas être vide."
+
+#: src/postulo/api/routers/interviews.py:112
+#, python-format, draft
+msgid "%(field)s must all be people at the application's company."
+msgstr ""
+"%(field)s ne doit désigner que des personnes de l'entreprise de la candidature."
+
+#: src/postulo/api/routers/documents.py:255
+#: src/postulo/api/routers/interviews.py:62
+#: src/postulo/api/routers/interviews.py:185
+#: src/postulo/api/routers/listings.py:89
+#: src/postulo/api/routers/listings.py:130
+#, python-format, draft
+msgid "%(field)s must be one of %(choices)s."
+msgstr "%(field)s doit être l'une des valeurs %(choices)s."
+
+#: src/postulo/api/routers/common.py:25 src/postulo/api/routers/common.py:79
+#: src/postulo/api/routers/listings.py:161
+#: src/postulo/documents/printing.py:404
+#, python-format, draft
+msgid "%(field)s must be one of %(choices)s; got %(value)s."
+msgstr "%(field)s doit être l'une des valeurs %(choices)s ; reçu %(value)s."
+
+#: src/postulo/documents/printing.py:459
+#, python-format, draft
+msgid "%(field)s names an identifier that is not one of yours."
+msgstr "%(field)s désigne un identifiant qui n'est pas l'un des vôtres."
+
 #: src/postulo/resume/candidate.py:581
 #, python-format, draft
 msgid "%(field)s: %(problem)s"
@@ -375,6 +457,12 @@ msgstr ""
 #, python-format, draft
 msgid "%(language)s: %(fields)s"
 msgstr "%(language)s : %(fields)s"
+
+#: src/postulo/api/routers/interviews.py:127
+#: src/postulo/api/routers/interviews.py:162
+#, python-format, draft
+msgid "%(later)s must be after %(earlier)s."
+msgstr "%(later)s doit être après %(earlier)s."
 
 #: src/postulo/jobs/models.py:1060
 #, python-format, draft
@@ -842,6 +930,11 @@ msgstr ""
 "\n"
 "{{ name }}\n"
 "{{ date }}"
+
+#: src/postulo/api/routers/listings.py:181
+#, python-format, draft
+msgid "A %(kind)s entry names the file: send %(field)s."
+msgstr "Une entrée %(kind)s désigne le fichier : envoyez %(field)s."
 
 #: src/postulo/core/models.py:688
 #, draft
@@ -3395,7 +3488,7 @@ msgid "Code repositories"
 msgstr "Dépôts de code"
 
 #: src/postulo/core/models.py:672 src/postulo/core/web_links.py:105
-#: src/postulo/documents/printing.py:120
+#: src/postulo/documents/printing.py:130
 #, draft
 msgid "Code repository"
 msgstr "Dépôt de code"
@@ -4724,7 +4817,7 @@ msgstr "E-mail"
 msgid "email address"
 msgstr "adresse e-mail"
 
-#: src/postulo/core/channels.py:201 src/postulo/documents/printing.py:98
+#: src/postulo/core/channels.py:201 src/postulo/documents/printing.py:108
 #, draft
 msgid "Email address"
 msgstr "Adresse e-mail"
@@ -8216,7 +8309,7 @@ msgstr "Aucun catalogue ne référence %(name)s %(version)s."
 msgid "No catalogue lists %(name)s."
 msgstr "Aucun catalogue ne référence %(name)s."
 
-#: src/postulo/documents/printing.py:122
+#: src/postulo/documents/printing.py:132
 #, draft
 msgid "No code repository"
 msgstr "Aucun dépôt de code"
@@ -8256,7 +8349,7 @@ msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
 "Aucun dépôt de documents n'est connecté. Ajoutez-en un dans Réglages → Connexions."
 
-#: src/postulo/documents/printing.py:100
+#: src/postulo/documents/printing.py:110
 #, draft
 msgid "No email address"
 msgstr "Aucune adresse e-mail"
@@ -8395,7 +8488,7 @@ msgstr "Aucun serveur auquel se connecter."
 msgid "No skills in this group yet"
 msgstr "Pas encore de compétence dans ce groupe"
 
-#: src/postulo/documents/printing.py:111
+#: src/postulo/documents/printing.py:121
 #, draft
 msgid "No social profile"
 msgstr "Aucun profil social"
@@ -8410,6 +8503,18 @@ msgstr "Le code source de cette page n’a pas été conservé."
 msgid "No source was kept."
 msgstr "Aucun code source n’a été conservé."
 
+#: src/postulo/api/routers/interviews.py:122
+#: src/postulo/api/routers/reminders.py:45
+#: src/postulo/api/routers/reminders.py:82
+#, draft
+msgid "No such application."
+msgstr "Cette candidature n'existe pas."
+
+#: src/postulo/api/routers/documents.py:293
+#, draft
+msgid "No such kind of document."
+msgstr "Ce type de document n'existe pas."
+
 #: src/postulo/templates/applications/suggestion_list.html:127
 #, draft
 msgid "No suggestions yet"
@@ -8420,7 +8525,7 @@ msgstr "Aucune proposition pour l'instant"
 msgid "No tags yet."
 msgstr "Pas encore d'étiquette."
 
-#: src/postulo/documents/printing.py:89
+#: src/postulo/documents/printing.py:99
 #, draft
 msgid "No telephone number"
 msgstr "Aucun numéro de téléphone"
@@ -8435,7 +8540,7 @@ msgstr "Aucun thème nommé « %(theme)s » n’est installé."
 msgid "No theme is installed that can set this document."
 msgstr "Aucun thème installé ne peut mettre en page ce document."
 
-#: src/postulo/documents/printing.py:134
+#: src/postulo/documents/printing.py:144
 #, draft
 msgid "No website"
 msgstr "Aucun site web"
@@ -8926,6 +9031,11 @@ msgstr "Rien ne correspond à ces filtres"
 msgid "Nothing matches “%(term)s”"
 msgstr "Rien ne correspond à « %(term)s »"
 
+#: src/postulo/api/problems.py:208
+#, draft
+msgid "Nothing of yours is at this address."
+msgstr "Rien qui vous appartienne ne se trouve à cette adresse."
+
 #: src/postulo/jobs/logos.py:397
 #, python-format, draft
 msgid "Nothing on %(host)s could be used as a logo."
@@ -8993,7 +9103,7 @@ msgstr "Rien d'enregistré pour l'instant."
 msgid "Nothing resembling a job posting was found on that page."
 msgstr "Rien qui ressemble à une offre d'emploi n'a été trouvé sur cette page."
 
-#: src/postulo/api/api.py:626
+#: src/postulo/api/api.py:627
 #, draft
 msgid "Nothing resembling a job posting was found there."
 msgstr "Rien qui ressemble à une offre d'emploi n'a été trouvé là."
@@ -11146,6 +11256,11 @@ msgstr "Recommandé par"
 msgid "Refresh logo"
 msgstr "Récupérer le logo à nouveau"
 
+#: src/postulo/api/problems.py:288
+#, python-format, draft
+msgid "Refused: %(fields)s. See %(member)s for what is wrong with each."
+msgstr "Refusé : %(fields)s. Voir %(member)s pour ce qui ne va pas dans chacun."
+
 #: src/postulo/core/models.py:544
 #, draft
 msgid "region"
@@ -12425,7 +12540,7 @@ msgid "Snoozed for two weeks."
 msgstr "Reportée de deux semaines."
 
 #: src/postulo/core/models.py:671 src/postulo/core/web_links.py:84
-#: src/postulo/documents/printing.py:109
+#: src/postulo/documents/printing.py:119
 #, draft
 msgid "Social profile"
 msgstr "Profil social"
@@ -13015,7 +13130,7 @@ msgstr "Télécommunications"
 msgid "telephone"
 msgstr "téléphone"
 
-#: src/postulo/core/channels.py:243 src/postulo/documents/printing.py:87
+#: src/postulo/core/channels.py:243 src/postulo/documents/printing.py:97
 #, draft
 msgid "Telephone number"
 msgstr "Numéro de téléphone"
@@ -13688,7 +13803,7 @@ msgid ""
 msgstr ""
 "Le secret client est défini par <code>%(variable)s</code> dans l’environnement ; modifiez-le là. Il n’est jamais affiché ici."
 
-#: src/postulo/documents/printing.py:123
+#: src/postulo/documents/printing.py:133
 #, draft
 msgid ""
 "The code repository chosen for this CV is no longer in your details, so it prints none."
@@ -13767,7 +13882,7 @@ msgid "The earlier version this supersedes. The old file is kept."
 msgstr ""
 "La version antérieure que celle-ci remplace. L'ancien fichier est conservé."
 
-#: src/postulo/documents/printing.py:101
+#: src/postulo/documents/printing.py:111
 #, draft
 msgid ""
 "The email address chosen for this CV is no longer one of your confirmed addresses, so it prints none."
@@ -14314,10 +14429,15 @@ msgstr "Le rendu, dans un cadre qui défile"
 msgid "The request did not say how large the rendering is."
 msgstr "La requête n’a pas dit quelle taille fait le rendu."
 
-#: src/postulo/api/problems.py:202
+#: src/postulo/api/problems.py:228
 #, python-format, draft
 msgid "The request is larger than %(limit)s, which is the most this call reads."
 msgstr "La requête dépasse %(limit)s, le maximum que cet appel lit."
+
+#: src/postulo/api/problems.py:284
+#, draft
+msgid "The request was not in the shape this call takes."
+msgstr "La requête n'avait pas la forme que cet appel accepte."
 
 #: src/postulo/templates/resume/europass_import.html:164
 #, draft
@@ -14460,7 +14580,7 @@ msgstr "Le robots.txt du site est respecté."
 msgid "The smallest size, for a label beside something."
 msgstr "La plus petite taille, pour une étiquette à côté de quelque chose."
 
-#: src/postulo/documents/printing.py:112
+#: src/postulo/documents/printing.py:122
 #, draft
 msgid ""
 "The social profile chosen for this CV is no longer in your details, so it prints none."
@@ -14560,7 +14680,7 @@ msgid ""
 msgstr ""
 "L'équipe dont ils font partie, si vous la connaissez. Un nom nouveau rejoint la liste de l'entreprise."
 
-#: src/postulo/documents/printing.py:90
+#: src/postulo/documents/printing.py:100
 #, draft
 msgid ""
 "The telephone number chosen for this CV is no longer in your details, so it prints none."
@@ -14599,7 +14719,7 @@ msgstr "Le chiffre supérieur ne peut pas être inférieur au chiffre inférieur
 msgid "The version before it"
 msgstr "La version précédente"
 
-#: src/postulo/documents/printing.py:135
+#: src/postulo/documents/printing.py:145
 #, draft
 msgid ""
 "The website chosen for this CV is no longer in your details, so it prints none."
@@ -14834,6 +14954,11 @@ msgid ""
 msgstr ""
 "Ce bouton applique les filtres situés au-dessus de lui. Les filtres des en-têtes du tableau ont leur propre bouton : appliquez les uns avant de modifier les autres."
 
+#: src/postulo/api/problems.py:168
+#, draft
+msgid "This call needs a valid token."
+msgstr "Cet appel exige un jeton valide."
+
 #: src/postulo/templates/partials/confirm_delete.html:33
 #, draft
 msgid "This cannot be undone."
@@ -15044,6 +15169,16 @@ msgid ""
 "This site's robots.txt asks automated clients not to fetch that page. Copy the posting text in by hand instead."
 msgstr ""
 "Le robots.txt de ce site demande aux clients automatisés de ne pas récupérer cette page. Copiez plutôt le texte de l'annonce à la main."
+
+#: src/postulo/api/auth.py:115
+#, python-format, draft
+msgid "This token does not have the %(scope)s scope."
+msgstr "Ce jeton n'a pas la portée %(scope)s."
+
+#: src/postulo/api/auth.py:125
+#, python-format, draft
+msgid "This token has none of the scopes this call takes: %(scopes)s."
+msgstr "Ce jeton n'a aucune des portées que cet appel accepte : %(scopes)s."
 
 #: src/postulo/templates/documents/rendered_compare.html:25
 #, draft
@@ -15527,7 +15662,7 @@ msgstr "utiliser mon Gravatar"
 msgid "Use the instance default"
 msgstr "Utiliser la valeur par défaut de l'instance"
 
-#: src/postulo/api/routers/applications.py:168
+#: src/postulo/api/routers/applications.py:174
 #, draft
 msgid ""
 "Use the status or interviews endpoints; the timeline records those itself."
@@ -15808,7 +15943,7 @@ msgid "WebP image"
 msgstr "Image WebP"
 
 #: src/postulo/core/models.py:673 src/postulo/core/web_links.py:126
-#: src/postulo/documents/printing.py:132 src/postulo/jobs/tables.py:109
+#: src/postulo/documents/printing.py:142 src/postulo/jobs/tables.py:109
 #: src/postulo/templates/jobs/company_detail.html:98
 #, draft
 msgid "Website"
@@ -17093,7 +17228,7 @@ msgid ""
 msgstr ""
 "Votre compte n'a pas encore de nom complet. Chaque document en part : <a href=\"%(profile_url)s\" class=\"font-medium underline\">ajoutez votre nom</a>."
 
-#: src/postulo/documents/printing.py:99
+#: src/postulo/documents/printing.py:109
 #, draft
 msgid "Your account's address"
 msgstr "L'adresse de votre compte"
@@ -17301,22 +17436,22 @@ msgid ""
 msgstr ""
 "Votre photo est laissée de côté. Un fichier JSON ne peut pas en contenir, et la laisser de côté fait que ce fichier reste lisible dans un éditeur de texte."
 
-#: src/postulo/documents/printing.py:121
+#: src/postulo/documents/printing.py:131
 #, draft
 msgid "Your primary code repository"
 msgstr "Votre dépôt de code principal"
 
-#: src/postulo/documents/printing.py:88
+#: src/postulo/documents/printing.py:98
 #, draft
 msgid "Your primary number"
 msgstr "Votre numéro principal"
 
-#: src/postulo/documents/printing.py:110
+#: src/postulo/documents/printing.py:120
 #, draft
 msgid "Your primary social profile"
 msgstr "Votre profil social principal"
 
-#: src/postulo/documents/printing.py:133
+#: src/postulo/documents/printing.py:143
 #, draft
 msgid "Your primary website"
 msgstr "Votre site web principal"
