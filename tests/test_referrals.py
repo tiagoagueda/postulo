@@ -377,7 +377,12 @@ def test_the_schema_describes_both(client, user):
 # -------------------------------------------------------------------- the figures
 
 
-def sent(user, employer, title, *, referrer=None, agency=None, then=()) -> Application:
+def sent(
+    user, employer, title, *, referrer=None, agency=None, then=(), ago=dt.timedelta(days=5)
+) -> Application:
+    """An application sent `ago`. The monthly report reads the month it was sent in, so a
+    test of this month's report sends it now: five days back is last month for the first
+    five days of every month, which is how two of these failed on the 1st of October."""
     posting = JobPosting.objects.create(owner=user, company=employer, title=title)
     application = Application.objects.create(
         owner=user,
@@ -386,7 +391,7 @@ def sent(user, employer, title, *, referrer=None, agency=None, then=()) -> Appli
         referred_by=referrer,
         through_agency=agency,
     )
-    change_status(application, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=5))
+    change_status(application, Status.APPLIED, occurred_at=timezone.now() - ago)
     for status in then:
         change_status(application, status)
     return application
@@ -554,9 +559,18 @@ def test_the_people_at_no_company_are_in_the_archive_with_how_to_reach_them(user
 
 
 def test_the_spreadsheet_gains_four_columns_after_the_seven(user, employer, friend, agency):
-    ended = sent(user, employer, "Ended", referrer=friend, agency=agency, then=("interviewing",))
+    this_month = dt.timedelta(0)
+    ended = sent(
+        user,
+        employer,
+        "Ended",
+        referrer=friend,
+        agency=agency,
+        then=("interviewing",),
+        ago=this_month,
+    )
     change_status(ended, Status.REJECTED, end_reason="pay")
-    sent(user, employer, "Live")
+    sent(user, employer, "Live", ago=this_month)
     today = timezone.localdate()
 
     text = reports.as_csv(reports.build(user, reports.month_period(today.year, today.month)))
@@ -582,7 +596,7 @@ def test_the_report_page_does_not_hand_a_referrers_name_to_an_office(
 ):
     """The page and the document are what an employment office is given. Who referred
     somebody is another person's name and the applicant's own business."""
-    sent(user, employer, "Role", referrer=friend)
+    sent(user, employer, "Role", referrer=friend, ago=dt.timedelta(0))
     client.force_login(user)
 
     page = client.get(reverse("applications:report")).content.decode()
