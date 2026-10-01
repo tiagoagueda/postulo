@@ -43,6 +43,10 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    # For allauth, whose passkey list loads these tags to say when a key was last used.
+    # Without it that page cannot be compiled, and it is the only place a passkey can be
+    # renamed or removed (#424). No models, no migrations.
+    "django.contrib.humanize",
     # Not for anything it renders on its own: adding it puts the built-in widget templates
     # on the project's template engine, which FORM_RENDERER below then uses. Without it,
     # widgets are rendered by a separate engine that cannot see src/postulo/templates.

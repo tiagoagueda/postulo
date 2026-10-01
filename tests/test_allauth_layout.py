@@ -78,6 +78,122 @@ def test_the_settings_pages_allauth_renders_keep_the_sidebar(client, user):
         assert reverse("settings:appearance") in html, f"{path} lost the settings sidebar"
 
 
+# ------------------------------------------- the pages behind Settings → Account
+
+#: Every allauth page *Settings → Account* leads to, by its name. The two that take a
+#: passkey are the ones its *Manage* page links to.
+MANAGE_PAGES = [
+    "mfa_index",
+    "mfa_list_webauthn",
+    "mfa_add_webauthn",
+    "mfa_view_recovery_codes",
+    "mfa_generate_recovery_codes",
+    "mfa_deactivate_totp",
+]
+PER_PASSKEY_PAGES = ["mfa_edit_webauthn", "mfa_remove_webauthn"]
+
+
+def what_a_browser_hands_back() -> dict:
+    """A registration as allauth stores one, for a passkey that signs in on its own.
+
+    Made whole and not as a bare row. The list reads the name and whether the key is a
+    passkey, and the *Add* page reads the key itself out of every passkey already there, to
+    tell the browser not to register the same one twice. A row with an empty `data`, which
+    other tests make only to be counted, is one neither page can draw.
+    """
+    import hashlib
+    import json
+
+    from cryptography.hazmat.primitives.asymmetric import ec
+    from fido2.cose import ES256
+    from fido2.utils import websafe_encode
+    from fido2.webauthn import AttestationObject, AttestedCredentialData, AuthenticatorData
+
+    identifier = b"a-passkey-made-for-a-test"
+    key = ES256.from_cryptography_key(ec.generate_private_key(ec.SECP256R1()).public_key())
+    flags = AuthenticatorData.FLAG.UP | AuthenticatorData.FLAG.UV | AuthenticatorData.FLAG.AT
+    seen = AuthenticatorData.create(
+        hashlib.sha256(b"testserver").digest(),
+        flags,
+        0,
+        AttestedCredentialData.create(bytes(16), identifier, key),
+    )
+    asked = {"type": "webauthn.create", "challenge": "Y2hhbGxlbmdl", "origin": "http://testserver"}
+    return {
+        "id": websafe_encode(identifier),
+        "rawId": websafe_encode(identifier),
+        "type": "public-key",
+        "response": {
+            "clientDataJSON": websafe_encode(json.dumps(asked).encode()),
+            "attestationObject": websafe_encode(bytes(AttestationObject.create("none", seen, {}))),
+        },
+        "clientExtensionResults": {"credProps": {"rk": True}},
+    }
+
+
+@pytest.fixture
+def passkey(client, user):
+    """Somebody who signed in a moment ago and has a passkey, an app and recovery codes.
+
+    Through the form and not `force_login`: these pages ask for a recent sign-in, and a
+    redirect to *reauthenticate*, followed to its 200, would pass for the page itself. The
+    factors are added afterwards, or the form would stop to ask for one of them.
+    """
+    from allauth.account.models import EmailAddress
+    from allauth.mfa.recovery_codes.internal.auth import RecoveryCodes
+    from allauth.mfa.totp.internal.auth import TOTP
+    from allauth.mfa.webauthn.internal.auth import WebAuthn
+
+    EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
+    signed_in = client.post(
+        reverse("account_login"), {"login": user.email, "password": "not-a-real-password"}
+    )
+    assert signed_in.status_code == 302, "the sign-in this fixture stands on"
+
+    made = WebAuthn.add(user, "The laptop", what_a_browser_hands_back()).instance
+    TOTP.activate(user, "JBSWY3DPEHPK3PXP")
+    RecoveryCodes.activate(user)
+    return made
+
+
+def test_the_passkey_list_opens_for_somebody_who_has_one(client, passkey):
+    """*Manage* was a server error for everyone with a passkey (#424).
+
+    allauth's list loads Django's `humanize` tags, which were not installed, so the one
+    page a passkey can be renamed or removed from could not be compiled.
+    """
+    response = client.get(reverse("mfa_list_webauthn"))
+
+    assert response.status_code == 200
+    assert "The laptop" in response.content.decode()
+
+
+@pytest.mark.parametrize("name", MANAGE_PAGES + PER_PASSKEY_PAGES)
+def test_every_page_behind_settings_account_renders(client, passkey, name):
+    """For somebody who has each kind of factor, so no branch of a template goes unread.
+
+    A tag library allauth starts loading in a later release then fails here, and not for
+    the person who pressed the button.
+    """
+    args = [passkey.pk] if name in PER_PASSKEY_PAGES else []
+
+    response = client.get(reverse(name, args=args))
+
+    assert response.status_code == 200, f"{name} led to {response.get('Location')}"
+    assert CARD in response.content.decode(), f"{name} is not wrapped by its Postulo base"
+
+
+def test_removing_a_passkey_ends_on_the_list(client, passkey):
+    """It redirects to the list, so a removal that worked used to end on the error too."""
+    from allauth.mfa.models import Authenticator
+
+    response = client.post(reverse("mfa_remove_webauthn", args=[passkey.pk]), follow=True)
+
+    assert response.status_code == 200
+    assert response.request["PATH_INFO"] == reverse("mfa_list_webauthn")
+    assert not Authenticator.objects.filter(pk=passkey.pk).exists()
+
+
 # ------------------------------------------------------------------- the form
 
 

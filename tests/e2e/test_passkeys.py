@@ -127,6 +127,20 @@ def test_a_passkey_can_be_added_and_then_signs_somebody_in(
     page.get_by_role("button", name="Sign in with a passkey").click()
     expect(page).to_have_url(f"{base}/")
 
+    # --- and it can be taken off again, on the only page that can do it. *Manage* was a
+    # server error for everybody who had a passkey, and nothing here had ever pressed it
+    # (#424): a passkey on a lost device could not be revoked.
+    page.goto(f"{base}/settings/account/")
+    page.locator("[data-passkeys]").get_by_role("link", name="Manage").click()
+    expect(page.locator("table")).to_contain_text("The laptop")
+    page.get_by_role("link", name="Remove").click()
+    page.get_by_role("button", name="Remove").click()
+    expect(page).to_have_url(f"{base}/accounts/2fa/webauthn/")
+    expect(page.get_by_text("No security keys have been added.")).to_be_visible()
+    assert not Authenticator.objects.filter(
+        user=applicant, type=Authenticator.Type.WEBAUTHN
+    ).exists(), "the passkey is still there after being removed"
+
     assert not violations, f"the policy blocked something: {violations}"
 
 
