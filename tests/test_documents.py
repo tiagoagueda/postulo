@@ -562,14 +562,20 @@ def test_neither_argument_that_built_its_own_fetcher_is_passed():
     assert not {"stylesheets", "xmp_metadata"} & set(pdf.WEASYPRINT_PDF_OPTIONS)
 
 
-def fake_playwright(monkeypatch) -> dict:
+def fake_playwright(monkeypatch, *, browser: bool = True) -> dict:
     """Stand in for Playwright, and count what it was asked to start.
 
     Returns the record: what `page.pdf` was asked for, how many browsers were launched and
     how many of them were closed, and the same for pages. Counting the launches is the point
     of #220 -- starting Chromium is most of what rendering costs, and the bug was that a
     *Send* of two documents started it twice.
+
+    ``browser=False`` is Playwright after ``uv sync --extra chromium`` and before
+    ``playwright install chromium``: the package imports, and there is nothing to launch.
     """
+    import sys
+    from pathlib import Path
+
     import playwright.sync_api
 
     record: dict = {"asked": {}, "launched": 0, "browsers_closed": 0, "pages": 0, "pages_closed": 0}
@@ -597,7 +603,16 @@ def fake_playwright(monkeypatch) -> dict:
             record["browsers_closed"] += 1
 
     class Chromium:
+        #: Where the browser is: a file that exists, or a place where nothing does.
+        executable_path = (
+            sys.executable if browser else str(Path(sys.executable).parent / "no-chromium-here")
+        )
+
         def launch(self):
+            if not browser:
+                raise playwright.sync_api.Error(
+                    f"BrowserType.launch: Executable doesn't exist at {self.executable_path}"
+                )
             record["launched"] += 1
             return Browser()
 
@@ -651,6 +666,89 @@ def test_a_backend_asked_for_one_document_still_starts_and_stops_its_own(monkeyp
 
     assert record["launched"] == 1
     assert record["browsers_closed"] == 1
+
+
+def test_chromium_without_its_browser_says_how_to_get_one(monkeypatch):
+    """The package and the browser are two install steps, and only the first was checked.
+
+    With the second one missing the launch raised Playwright's own error, which is a plain
+    `Exception` and which nothing that draws a document catches: a draft answered 500, an
+    export ended in "Something went wrong", and neither said the one thing that would fix
+    it (#514).
+    """
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+
+    with pytest.raises(PDFBackendUnavailable, match="playwright install chromium"):
+        pdf.ChromiumBackend().render("<html></html>")
+
+
+def test_a_run_that_cannot_start_its_browser_says_so_before_the_first_document(monkeypatch):
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+
+    with (
+        pytest.raises(PDFBackendUnavailable, match="playwright install chromium"),
+        pdf.pdf_session(pdf.ChromiumBackend()),
+    ):
+        pytest.fail("the session opened with nothing to launch")
+
+
+def test_playwright_with_no_browser_to_launch_is_not_a_usable_backend(monkeypatch, settings):
+    """So `auto` falls through to the message that explains both, instead of choosing a
+    renderer that fails on every document."""
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+    monkeypatch.setattr(pdf, "_chromium_found", False)
+    monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
+    settings.POSTULO_PDF_BACKEND = "auto"
+
+    assert ChromiumBackend().is_available() is False
+    with pytest.raises(PDFBackendUnavailable, match="No PDF backend is usable"):
+        get_pdf_backend()
+
+    settings.POSTULO_PDF_BACKEND = "chromium"
+    with pytest.raises(PDFBackendUnavailable, match="playwright install chromium"):
+        get_pdf_backend()
+
+
+def test_playwright_with_its_browser_is_a_usable_backend(monkeypatch):
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch)
+    monkeypatch.setattr(pdf, "_chromium_found", False)
+
+    assert ChromiumBackend().is_available() is True
+
+
+def test_server_settings_does_not_name_a_renderer_that_cannot_start(monkeypatch, settings):
+    """The operator's own status page said `chromium` while every render failed."""
+    from postulo.core import server_views
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+    monkeypatch.setattr(pdf, "_chromium_found", False)
+    monkeypatch.setattr(WeasyPrintBackend, "is_available", lambda self: False)
+    settings.POSTULO_PDF_BACKEND = "auto"
+
+    assert server_views._pdf_backend_name() is None
+
+
+def test_a_browser_that_will_not_start_is_a_sentence_on_the_cvs_page(client, user, cv, monkeypatch):
+    """Not an error page: the draft goes back to the CV with the hint that fixes it."""
+    from postulo.documents import pdf
+
+    fake_playwright(monkeypatch, browser=False)
+    monkeypatch.setattr(pdf, "get_pdf_backend", lambda name=None: pdf.ChromiumBackend())
+    client.force_login(user)
+
+    response = client.get(reverse("documents:cv_draft", args=[cv.pk]), follow=True)
+
+    assert response.redirect_chain[-1][0] == cv.get_absolute_url()
+    assert "playwright install chromium" in response.content.decode()
 
 
 def test_a_backend_written_without_a_session_is_still_a_renderer(fake_backend):

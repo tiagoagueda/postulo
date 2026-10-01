@@ -98,8 +98,9 @@ def test_what_a_document_embeds_still_draws():
 def _chromium_launches() -> bool:
     """Whether a browser can actually be started, not only whether Playwright is installed.
 
-    CI's test job installs Playwright with the development groups and no browser, so
-    `is_available` says yes and the launch would fail.
+    CI's test job installs Playwright with the development groups and no browser. Since
+    #514 `is_available` says no there; a browser that is installed and still will not
+    start, in a sandbox that refuses one, is what the launch below is left to find.
     """
     if not ChromiumBackend().is_available():
         return False

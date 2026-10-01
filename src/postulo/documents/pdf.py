@@ -29,11 +29,16 @@ import contextlib
 import functools
 import hashlib
 import importlib
+import logging
+import threading
 from collections import OrderedDict
+from pathlib import Path
 from typing import Protocol
 
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+
+logger = logging.getLogger(__name__)
 
 #: A4 with margins wide enough that nothing is lost to a printer's unprintable edge.
 PAGE_FORMAT = "A4"
@@ -111,6 +116,58 @@ def _is_importable(module: str) -> bool:
     return True
 
 
+#: Whether a Chromium to launch has been seen. Only a yes is remembered: a browser does not
+#: go away under a running worker, and one installed a minute ago should count without a
+#: restart, which is the very thing the hint tells somebody to go and do.
+_chromium_found = False
+
+
+def _chromium_is_installed() -> bool:
+    """Whether Playwright has a browser to launch, and not only the package that launches it.
+
+    They are two install steps -- ``uv sync --extra chromium``, then ``playwright install
+    chromium`` -- and an import says nothing about the second. With only the first done
+    this backend counted as usable, `auto` chose it, Server settings named it as the
+    renderer, and every document failed (#514).
+
+    Playwright is the only thing that knows where its browser is kept, so it is asked. On
+    a thread of its own, because its synchronous interface refuses to start on a thread
+    that is already running one -- which is where the browser suite asks from.
+    """
+    global _chromium_found
+    if _chromium_found:
+        return True
+    if not _is_importable("playwright"):
+        return False
+
+    seen: list[bool] = []
+
+    def look() -> None:
+        try:
+            from playwright.sync_api import sync_playwright
+
+            with sync_playwright() as playwright:
+                seen.append(Path(playwright.chromium.executable_path).is_file())
+        except Exception:
+            # No driver, no path, a sandbox that will not start one: none of them is a
+            # renderer.
+            seen.append(False)
+
+    asking = threading.Thread(target=look, name="postulo-chromium-probe")
+    asking.start()
+    asking.join()
+    _chromium_found = bool(seen and seen[0])
+    return _chromium_found
+
+
+def _not_usable(backend) -> str:
+    """The sentence for a backend that was named, or chosen, and cannot draw."""
+    return str(
+        _("The %(name)s PDF backend is configured but not usable. %(hint)s")
+        % {"name": backend.name, "hint": backend.install_hint}
+    )
+
+
 class PDFBackend(Protocol):
     name: str
     install_hint: str
@@ -182,14 +239,23 @@ class ChromiumBackend:
         self._browser = browser
 
     def is_available(self) -> bool:
-        return _is_importable("playwright")
+        return _chromium_is_installed()
 
     @contextlib.contextmanager
     def session(self):
-        from playwright.sync_api import sync_playwright
+        from playwright.sync_api import Error, sync_playwright
 
         with sync_playwright() as playwright:
-            browser = playwright.chromium.launch()
+            try:
+                browser = playwright.chromium.launch()
+            except Error as refused:
+                # Playwright's own error is a plain exception, and nothing that draws a
+                # document catches one: a draft answered 500 and an export ended in
+                # "Something went wrong". Said as what it is, a renderer that cannot be
+                # used, every caller already has a sentence for it (#514). The reason
+                # Playwright gave goes to the log, where the hint may not be the answer.
+                logger.warning("Chromium could not be launched: %s", refused)
+                raise PDFBackendUnavailable(_not_usable(self)) from refused
             try:
                 yield ChromiumBackend(browser)
             finally:
@@ -247,12 +313,7 @@ def get_pdf_backend(name: str | None = None) -> PDFBackend:
             backend = backend_class()
             if backend.name == requested:
                 if not backend.is_available():
-                    raise PDFBackendUnavailable(
-                        str(
-                            _("The %(name)s PDF backend is configured but not usable. %(hint)s")
-                            % {"name": backend.name, "hint": backend.install_hint}
-                        )
-                    )
+                    raise PDFBackendUnavailable(_not_usable(backend))
                 return backend
         raise PDFBackendUnavailable(
             str(
