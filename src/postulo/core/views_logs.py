@@ -19,12 +19,18 @@ somebody's records because a variable was forgotten.
 
 **Answered once, not streamed.** A collector polls. A streaming response would hold a
 worker open for as long as the collector cared to keep it, and there are three of them.
+
+**In pages, from the oldest.** With ``since`` the answer is the oldest records after that
+moment, so a collector that asks again with the last ``time`` it received carries on from
+where it stopped, and a burst larger than one answer is handed over whole (#475).
 """
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 import logging
+import re
 
 from django.conf import settings
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
@@ -36,6 +42,11 @@ logger = logging.getLogger(__name__)
 #: How many records one request may ask for. A collector polls; it does not need the lot.
 MAX_LIMIT = 1000
 DEFAULT_LIMIT = 200
+
+#: An offset whose ``+`` arrived as a space. A collector that pastes the ``time`` it was
+#: given into the address without encoding it sends exactly this, and it can be nothing
+#: else: a space between a date and a time is followed by more than hours and minutes.
+_LOST_PLUS = re.compile(r" (\d\d:\d\d)$")
 
 
 def enabled() -> bool:
@@ -61,6 +72,23 @@ def _authorised(request: HttpRequest) -> bool:
     if scheme.lower() != "bearer" or not presented:
         return False
     return hmac.compare_digest(presented.strip(), expected)
+
+
+def _moment(written: str) -> dt.datetime:
+    """The instant ``since`` names; a time with no offset is UTC. ``ValueError`` if none.
+
+    Compared as times and not as text: the records are written with ``+00:00``, and a
+    collector that sent the same instant as ``+02:00`` was answered with the wrong records,
+    or with none, and a ``200`` either way.
+    """
+    try:
+        when = dt.datetime.fromisoformat(written)
+    except ValueError:
+        repaired = _LOST_PLUS.sub(r"+\1", written)
+        if repaired == written:
+            raise
+        when = dt.datetime.fromisoformat(repaired)
+    return when if when.tzinfo else when.replace(tzinfo=dt.UTC)
 
 
 def collect(request: HttpRequest) -> HttpResponse:
@@ -99,13 +127,27 @@ def collect(request: HttpRequest) -> HttpResponse:
     except ValueError:
         limit = DEFAULT_LIMIT
     limit = max(limit, 1)
+    level = request.GET.get("level", "")
     since = request.GET.get("since", "").strip()
 
-    records = logs.read(limit=limit, level=request.GET.get("level", ""))
     if since:
-        # The collector says what it has already seen, so it is handed only what it has
-        # not. String comparison is enough: the times are ISO-8601 with a fixed shape.
-        records = [record for record in records if record.time > since]
+        try:
+            moment = _moment(since)
+        except ValueError:
+            # Not a default, as a bad `limit` is: guessing would hand over the wrong
+            # records and the collector would file them as the right ones.
+            return JsonResponse(
+                {
+                    "detail": "`since` is not a time. Write it as ISO 8601, for example "
+                    "2026-09-10T08:00:00+00:00."
+                },
+                status=400,
+            )
+        # The collector says what it has already seen and is handed the oldest of what it
+        # has not, so that asking again carries on from there (#475).
+        records = logs.after(moment, limit=limit, level=level)
+    else:
+        records = logs.read(limit=limit, level=level)[::-1]
 
     # Oldest first, which is the order a collector wants to append them in.
     body = "".join(
@@ -121,7 +163,7 @@ def collect(request: HttpRequest) -> HttpResponse:
             default=str,
         )
         + "\n"
-        for record in reversed(records)
+        for record in records
     )
     response = HttpResponse(body, content_type="application/x-ndjson; charset=utf-8")
     response["Cache-Control"] = "no-store"

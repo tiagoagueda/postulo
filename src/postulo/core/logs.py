@@ -34,8 +34,9 @@ import logging.handlers
 import os
 import re
 import uuid
+from collections import deque
 from collections.abc import Iterator
-from contextlib import contextmanager
+from contextlib import closing, contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -343,18 +344,22 @@ def _parse(line: str) -> Record | None:
     )
 
 
-def _lines_newest_first(limit: int) -> Iterator[str]:
+def _lines_newest_first(limit: int | None = None) -> Iterator[str]:
     """Read backwards from the end, so a large file costs what the page shows.
 
     Reading the whole thing to take the last hundred lines would work and would also mean
     an instance that has been running for a year cannot open its own log page.
+
+    ``limit`` is how many lines at most; with none, every line that is kept, for a reader
+    that stops by itself once it has gone back far enough (`after`).
     """
+    left: float = float("inf") if limit is None else limit
     for path in files():
         try:
             size = path.stat().st_size
             with path.open("rb") as handle:
                 block, buffer, position = 65536, b"", size
-                while position > 0 and limit > 0:
+                while position > 0 and left > 0:
                     step = min(block, position)
                     position -= step
                     handle.seek(position)
@@ -365,15 +370,15 @@ def _lines_newest_first(limit: int) -> Iterator[str]:
                         if not raw.strip():
                             continue
                         yield raw.decode("utf-8", "replace")
-                        limit -= 1
-                        if limit <= 0:
+                        left -= 1
+                        if left <= 0:
                             return
-                if limit > 0 and buffer.strip():
+                if left > 0 and buffer.strip():
                     yield buffer.decode("utf-8", "replace")
-                    limit -= 1
+                    left -= 1
         except OSError:
             continue
-        if limit <= 0:
+        if left <= 0:
             return
 
 
@@ -397,6 +402,71 @@ def read(*, limit: int = 200, level: str = "", logger: str = "", search: str = "
         if len(found) >= limit:
             break
     return found
+
+
+#: How far behind the moment it was given `after` goes on looking. Several processes write
+#: the one file, and a record is stamped before it is written, so the file is nearly in
+#: the order of its times and not strictly: a line stamped a little earlier can sit after
+#: one stamped later.
+OUT_OF_ORDER = dt.timedelta(seconds=1)
+
+
+def _instant(when: dt.datetime) -> dt.datetime:
+    """A time with no offset is read as UTC, which is what the formatter writes."""
+    return when if when.tzinfo else when.replace(tzinfo=dt.UTC)
+
+
+def after(since: dt.datetime, *, limit: int = 200, level: str = "") -> list[Record]:
+    """The oldest ``limit`` records later than ``since``, oldest first: a page of the log.
+
+    For a reader that carries on from where it stopped. `read` hands back the newest
+    records, and filtering those by time afterwards served a collector the *end* of
+    whatever had happened since it last asked: with more than ``limit`` new records the
+    older ones were skipped, the collector moved its mark past them, and they were never
+    served. A burst is when a log matters and it was the start of the burst that went
+    missing (#475).
+
+    So this goes back as far as ``since`` however many lines that is, and keeps the oldest.
+    Asking again with the last ``time`` received gets the next page, and a short page is
+    the end.
+
+    **A page never ends inside a millisecond.** Times are written to the millisecond and
+    two records often share one. The reader asks for what is *later* than the last time it
+    holds, so a page that stopped between two such records would lose the second; the ones
+    sharing the page's last time are handed over with it, and a page may be longer than
+    ``limit`` by that many.
+
+    A line with no time in it, which is one something else wrote into the file, belongs
+    to no moment and is left out. And one case no mark made of a time can cover: a record
+    stamped earlier than one already served and written after that reader asked.
+    """
+    wanted = LEVELS[LEVELS.index(level) :] if level in LEVELS else ()
+    since = _instant(since)
+    try:
+        floor = since - OUT_OF_ORDER
+    except OverflowError:  # the first year there is: nothing is older than that anyway
+        floor = since
+
+    # Read newest first, so the newest is on the left and what falls off that end when the
+    # page is full is what the reader will be given next time.
+    page: deque[tuple[dt.datetime, Record]] = deque()
+    twins: list[Record] = []
+    with closing(_lines_newest_first()) as lines:
+        for line in lines:
+            record = _parse(line)
+            when = record.when if record else None
+            if record is None or when is None:
+                continue
+            when = _instant(when)
+            if when <= floor:
+                break
+            if when <= since or (wanted and record.level not in wanted):
+                continue
+            page.append((when, record))
+            if len(page) > limit:
+                dropped_at, dropped = page.popleft()
+                twins = [*twins, dropped] if dropped_at == page[0][0] else []
+    return [record for _when, record in reversed(page)] + twins[::-1]
 
 
 def loggers(sample: int = 2000) -> list[str]:

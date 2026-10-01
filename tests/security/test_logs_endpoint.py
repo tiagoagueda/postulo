@@ -8,6 +8,7 @@ this endpoint is off, and when it is on it is behind a token, and it is in
 
 from __future__ import annotations
 
+import datetime as dt
 import json
 
 import pytest
@@ -164,6 +165,182 @@ def test_the_answer_is_never_cached(client, kept, settings):
     response = fetch(client, TOKEN)
     assert "no-store" in response["Cache-Control"]
     assert response["X-Content-Type-Options"] == "nosniff"
+
+
+# ------------------------------------------------ a collector that pages (#475)
+#
+# `since` is how a collector asks only for what it has not seen. The view took the newest
+# `limit` records and filtered by time afterwards, so when more than `limit` had been
+# written since the last poll the collector was handed the newest of them, moved its mark
+# past the rest, and never saw how the incident started.
+
+BURST = dt.datetime(2026, 9, 7, 8, 0, 0, tzinfo=dt.UTC)
+
+
+@pytest.fixture
+def collecting(kept, settings):
+    """The endpoint on, with its token."""
+    settings.POSTULO_LOGS_ENDPOINT_ENABLED = True
+    settings.POSTULO_LOGS_TOKEN = TOKEN
+    return kept
+
+
+def stamp(when: dt.datetime) -> str:
+    """A time as the formatter writes one."""
+    return when.isoformat(timespec="milliseconds")
+
+
+def keep(directory, lines: list[tuple[dt.datetime, str, str]], name: str = "postulo.log") -> None:
+    """Replace a file of the log with these ``(time, level, message)`` lines, in this order."""
+    (directory / name).write_text(
+        "".join(
+            json.dumps(
+                {"time": stamp(when), "level": level, "logger": "postulo.plugins", "message": said}
+            )
+            + "\n"
+            for when, level, said in lines
+        ),
+        encoding="utf-8",
+    )
+
+
+def a_burst(count: int, first: int = 0) -> list[tuple[dt.datetime, str, str]]:
+    return [
+        (BURST + dt.timedelta(seconds=number), "ERROR", f"line {number}")
+        for number in range(first, first + count)
+    ]
+
+
+def said(response) -> list[str]:
+    return [record["message"] for record in records(response)]
+
+
+def test_a_burst_is_handed_over_from_its_start(client, collecting):
+    """Five hundred records since the last poll: the first two hundred, not the last."""
+    keep(collecting, a_burst(500))
+
+    first = fetch(client, TOKEN, since="2026-09-07T00:00:00+00:00")
+    assert said(first) == [f"line {number}" for number in range(200)]
+
+    second = fetch(client, TOKEN, since=records(first)[-1]["time"])
+    assert said(second) == [f"line {number}" for number in range(200, 400)]
+
+    third = fetch(client, TOKEN, since=records(second)[-1]["time"])
+    assert said(third) == [f"line {number}" for number in range(400, 500)], "a short page: the end"
+
+    assert said(fetch(client, TOKEN, since=records(third)[-1]["time"])) == []
+
+
+def test_a_page_carries_on_across_a_rotation(client, collecting):
+    keep(collecting, a_burst(250), name="postulo.log.1")
+    keep(collecting, a_burst(250, first=250))
+
+    first = fetch(client, TOKEN, since="2026-09-07T00:00:00+00:00")
+    second = fetch(client, TOKEN, since=records(first)[-1]["time"])
+
+    assert said(first) == [f"line {number}" for number in range(200)]
+    assert said(second) == [f"line {number}" for number in range(200, 400)]
+
+
+def test_since_is_an_instant_however_its_offset_is_written(client, collecting):
+    """Half past twelve at +02:00 is half past ten: compared as text it selected nothing."""
+    response = fetch(client, TOKEN, since="2026-09-06T12:30:00.000+02:00")
+
+    assert said(response) == ["a delivery to Aperture failed"]
+
+
+def test_a_time_with_no_offset_is_utc(client, collecting):
+    response = fetch(client, TOKEN, since="2026-09-06T10:30:00")
+
+    assert said(response) == ["a delivery to Aperture failed"]
+
+
+def test_a_time_pasted_into_the_address_as_it_was_given_still_works(client, collecting):
+    """The `time` of a record, put into the query unencoded: its `+` arrives as a space."""
+    response = client.get(
+        reverse("core:logs_endpoint") + "?since=2026-09-06T10:30:00.000+00:00",
+        HTTP_AUTHORIZATION=f"Bearer {TOKEN}",
+    )
+
+    assert response.status_code == 200
+    assert said(response) == ["a delivery to Aperture failed"]
+
+
+@pytest.mark.parametrize("nonsense", ["yesterday", "2026-13-45", "10:30 02:00"])
+def test_something_that_is_not_a_time_is_refused_not_guessed_at(client, collecting, nonsense):
+    """It used to select the wrong records and answer 200, which a collector files as right."""
+    response = fetch(client, TOKEN, since=nonsense)
+
+    assert response.status_code == 400
+    assert "since" in response.json()["detail"]
+    assert b"a delivery" not in response.content
+
+
+def test_the_earliest_time_there_is_means_everything(client, collecting):
+    response = fetch(client, TOKEN, since="0001-01-01")
+
+    assert response.status_code == 200
+    assert said(response) == ["a capture", "a delivery to Aperture failed"]
+
+
+def test_a_page_never_ends_between_two_records_of_the_same_millisecond(client, collecting):
+    """The collector asks for what is later than its last time, so the twin would be lost."""
+    later = BURST + dt.timedelta(milliseconds=7)
+    keep(
+        collecting,
+        [
+            (BURST, "INFO", "before"),
+            (later, "INFO", "one of three"),
+            (later, "INFO", "two of three"),
+            (later, "INFO", "three of three"),
+            (later + dt.timedelta(seconds=1), "INFO", "after"),
+        ],
+    )
+
+    first = fetch(client, TOKEN, since="2026-09-07T00:00:00+00:00", limit=2)
+    second = fetch(client, TOKEN, since=records(first)[-1]["time"], limit=2)
+
+    assert said(first) == ["before", "one of three", "two of three", "three of three"]
+    assert said(second) == ["after"]
+
+
+def test_a_level_and_a_time_together_give_the_oldest_that_match(client, collecting):
+    keep(
+        collecting,
+        [
+            (
+                BURST + dt.timedelta(seconds=number),
+                "ERROR" if number % 2 else "INFO",
+                f"line {number}",
+            )
+            for number in range(40)
+        ],
+    )
+
+    response = fetch(client, TOKEN, since="2026-09-07T00:00:00+00:00", level="ERROR", limit=5)
+
+    assert said(response) == ["line 1", "line 3", "line 5", "line 7", "line 9"]
+
+
+def test_a_record_written_a_little_out_of_order_is_not_what_ends_the_search(client, collecting):
+    """Several processes write the one file, so it is nearly in time order and not strictly.
+
+    The second line was stamped before the first and written after it. A search that
+    stopped at the first record no later than `since` would stop there and miss the line
+    above it.
+    """
+    keep(
+        collecting,
+        [
+            (BURST + dt.timedelta(milliseconds=500), "INFO", "written first"),
+            (BURST + dt.timedelta(milliseconds=200), "INFO", "stamped earlier, written second"),
+            (BURST + dt.timedelta(seconds=1), "INFO", "written last"),
+        ],
+    )
+
+    response = fetch(client, TOKEN, since=stamp(BURST + dt.timedelta(milliseconds=300)))
+
+    assert said(response) == ["written first", "written last"]
 
 
 # ------------------------------------------------------ what the page says
