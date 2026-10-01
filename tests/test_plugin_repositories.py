@@ -148,6 +148,44 @@ def test_an_unpinned_row_still_switches(client, admin):
     assert not row.enabled
 
 
+def a_repository_row(client, name: str) -> str:
+    import re
+
+    html = client.get(reverse("server:plugins")).content.decode()
+    return re.search(rf'<li[^>]*data-repository="{name}".*?</li>', html, re.S).group(0)
+
+
+def test_a_repository_that_is_off_says_disabled(client, admin):
+    """The pill read *Off* (#311). The word is the one a plugin's switch is labelled with,
+    negated, and the pill is the vocabulary's own."""
+    PluginRepository.objects.create(
+        name="mine", url="https://example.org/i.json", public_key=a_key(), enabled=False
+    )
+    client.force_login(admin)
+
+    row = a_repository_row(client, "mine")
+
+    assert '<span class="ms-1 badge" data-tone="grey">Disabled</span>' in row
+    assert ">Off<" not in row
+    assert "Switch on" in row, "the button is the act, and still says what pressing it does"
+
+
+def test_a_repository_the_environment_sets_wears_the_caution_pill(client, admin, settings):
+    """It was nine utilities written out, the one pill #291 missed; it is a `badge` now, in
+    amber, the palette's caution: this row is not this page's to change (#311)."""
+    PluginRepository.objects.create(
+        name="mine", url="https://example.org/row.json", public_key=a_key()
+    )
+    settings.POSTULO_PLUGIN_CATALOGUES = f"mine|https://example.org/env.json|{a_key()}"
+    client.force_login(admin)
+
+    row = a_repository_row(client, "mine")
+
+    assert '<span class="ms-1 badge" data-tone="amber">set in the environment</span>' in row
+    assert "rounded-full" not in row and "bg-amber-100" not in row
+    assert "Disabled" not in row, "pinned is not off"
+
+
 # ------------------------------------------------------------------- the key
 
 

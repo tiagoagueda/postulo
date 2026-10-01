@@ -77,13 +77,14 @@
              to decide -- a transport, an identifier registry -- shows its switch fixed on
              and disabled, pointing at the reason: a disabled switch is not an action that
              will not happen, it is a state in the same vocabulary as every row above it.
-             `row:` is the marker the save reads, since an unticked box submits nothing. {% endcomment %}
+             `row:` is the marker the save reads, since an unticked box submits nothing.
+             The label names what is switched and the switch says whether it is (#311). {% endcomment %}
           <div class="flex w-full shrink-0 flex-col gap-2 sm:w-64" data-controls="{{ row.name }}">
             <label class="tap-target inline-flex items-center gap-3">
               <input type="checkbox" role="switch" class="input" name="on:{{ row.name }}"
                      {% if row.on %}checked{% endif %}
                      {% if row.held %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
-              <span class="text-sm">{% translate "On" %}<span class="sr-only">: {{ row.label }}</span></span>
+              <span class="text-sm">{% translate "Enabled" %}<span class="sr-only">: {{ row.label }}</span></span>
             </label>
             {% if row.held %}
               <p class="text-xs text-ink-500 dark:text-ink-400" id="why-{{ row.name }}">{{ row.why }}</p>
@@ -126,10 +127,11 @@
               {{ repository.name }}
               <span class="ms-1 badge" data-tone="grey">{{ repository.label }}</span>
               {% if not repository.enabled %}
-                <span class="ms-1 badge" data-tone="grey">{% translate "Off" %}</span>
+                <span class="ms-1 badge" data-tone="grey">{% translate "Disabled" %}</span>
               {% endif %}
+              {# Amber is the palette's caution, as a warning is in the log: this row is not this page's to change. #}
               {% if repository.pinned %}
-                <span class="ms-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "set in the environment" %}</span>
+                <span class="ms-1 badge" data-tone="amber">{% translate "set in the environment" %}</span>
               {% endif %}
             </p>
             <p class="text-xs text-ink-500 dark:text-ink-400">
@@ -211,16 +213,16 @@
               <p class="font-medium">
                 {{ plugin.name }} <span class="text-ink-500 dark:text-ink-400">{{ plugin.version }}</span>
                 {% if plugin.disabled %}
-                  <span class="ms-2 badge" data-tone="grey">{% translate "Off" %}</span>
+                  <span class="ms-2 badge" data-tone="grey">{% translate "Disabled" %}</span>
                 {% endif %}
                 {% if not plugin.present %}
-                  <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200">{% translate "not loaded" %}</span>
+                  <span class="ms-2 badge" data-tone="amber">{% translate "not loaded" %}</span>
                 {% endif %}
                 {% comment %} Said here and not only in a log: a core upgrade is what makes
                    a plugin stop fitting, and the page is where an administrator looks for
                    why something stopped working (#186). {% endcomment %}
                 {% if not plugin.compatible %}
-                  <span class="ms-2 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800 dark:bg-amber-900 dark:text-amber-200" data-needs-postulo>
+                  <span class="ms-2 badge" data-tone="amber" data-needs-postulo>
                     {% blocktranslate trimmed with wanted=plugin.requires_postulo %}
                       for Postulo {{ wanted }}
                     {% endblocktranslate %}

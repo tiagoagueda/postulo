@@ -308,6 +308,37 @@ def test_each_row_is_a_switch_and_a_choice_not_a_menu(client, admin):
     assert "Each person may change it" in row
 
 
+def the_switch_of(html: str, plugin: str) -> tuple[str, str]:
+    """A row's switch and the words beside it, as the label that holds both."""
+    row = re.search(rf'<li[^>]*data-policy="{re.escape(plugin)}".*?</li>', html, re.S).group(0)
+    label = re.search(r"<label[^>]*>\s*(<input[^>]*role=\"switch\"[^>]*>)(.*?)</label>", row, re.S)
+    return label.group(1), label.group(2)
+
+
+def test_the_switch_is_labelled_enabled_and_its_state_says_whether_it_is(client, admin, user):
+    """A label names what a switch switches and the switch shows the state. It read *On*,
+    beside a switch that might be off (#311); the same word now stands beside both states,
+    for everybody and on one person's page."""
+    client.force_login(admin)
+    pages = (reverse("server:plugins"), reverse("server:person_plugins", args=[user.pk]))
+
+    for url in pages:
+        switch, words = the_switch_of(client.get(url).content.decode(), PLUGIN)
+        assert "checked" in switch, url
+        assert '<span class="text-sm">Enabled<span class="sr-only">: ' in words, url
+
+    # Off for everybody, and off for this person: each page draws its own decision.
+    for person in (None, user):
+        PluginPolicy.objects.create(
+            plugin=PLUGIN, person=person, state=PluginPolicy.State.FORCED_OFF
+        )
+    for url in pages:
+        switch, words = the_switch_of(client.get(url).content.decode(), PLUGIN)
+        assert "checked" not in switch, url
+        assert '<span class="text-sm">Enabled<span class="sr-only">: ' in words, url
+        assert "Disabled" not in words and ">On<" not in words, "the box says it, not a word"
+
+
 def test_a_row_that_is_nobodys_to_decide_shows_a_fixed_switch(client, admin):
     """A transport is instance plumbing: off would mean an account nobody can recover
     (#104). It was left off the page; it is on it now, switched on and disabled, with the

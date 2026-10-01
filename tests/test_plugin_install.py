@@ -1073,6 +1073,28 @@ def test_what_a_release_declared_is_recorded_and_asked_again_on_the_page(
     client.force_login(admin)
     html = client.get(reverse("server:plugins")).content.decode()
     assert "for Postulo &lt;0.1" in html and "data-needs-postulo" in html
+    # A caution, in the pill the vocabulary has for one rather than nine utilities (#311).
+    assert '<span class="ms-2 badge" data-tone="amber" data-needs-postulo>' in html
+
+
+def test_an_installed_plugin_that_is_off_says_disabled(
+    tmp_path, plugins_dir, installer, client, admin
+):
+    """The pill beside its name read *Off* (#311); the button beside it is still the act."""
+    installing.install_wheel(a_wheel(tmp_path), by="ana")
+    client.force_login(admin)
+
+    def row() -> str:
+        html = client.get(reverse("server:plugins")).content.decode()
+        return html.split('data-plugin="postulo-example"')[1].split("</li>")[0]
+
+    assert "Disabled" not in row() and "Switch off" in row()
+
+    installing.set_disabled("postulo-example", True)
+
+    assert '<span class="ms-2 badge" data-tone="grey">Disabled</span>' in row()
+    assert ">Off<" not in row() and "Switch on" in row()
+    assert "rounded-full" not in row(), "whatever else it says, it says in a badge"
 
 
 def test_an_upload_declares_nothing_and_is_never_marked(tmp_path, plugins_dir, installer):

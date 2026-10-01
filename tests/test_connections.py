@@ -243,6 +243,23 @@ def test_removing_a_connection_takes_its_secrets_with_it(client, user):
     assert not Connection.objects.filter(pk=connection.pk).exists()
 
 
+def test_a_connection_that_is_off_says_disabled(client, user):
+    """Its form's box is labelled *Enabled*; the list said *Off* about the same thing (#311)."""
+    a_connection(user, enabled=False)
+    a_connection(user, label="The other one")
+    client.force_login(user)
+
+    html = client.get(reverse("connections:list")).content.decode()
+    off, on = (
+        html.split(f">\n                  {label}")[1].split("</p>")[0]
+        for label in ("My echo", "The other one")
+    )
+
+    assert '<span class="ms-2 badge" data-tone="grey">Disabled</span>' in off
+    assert "badge" not in on
+    assert ">Off<" not in html
+
+
 def test_connections_are_private_to_their_owner(client, user, other_user):
     connection = a_connection(user)
     client.force_login(other_user)

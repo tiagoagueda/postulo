@@ -157,6 +157,22 @@ def test_the_checkbox_carries_the_class_that_colours_it(client, user, third_part
     assert "state-glow" in row
 
 
+def test_a_shipped_plugin_says_enabled_or_disabled_beside_its_name(client, user, admin):
+    """It has no box to show its state with, so a word does; the word was *on* or *off*,
+    and is the one the administrator's switch is labelled with (#311)."""
+    client.force_login(user)
+
+    row = row_for(client.get(reverse(URL) + "?internal=1").content.decode(), PLUGIN)
+    assert '<span class="ms-1 text-xs font-normal">enabled</span>' in row
+
+    PluginPolicy.objects.create(
+        plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_OFF, decided_by=admin
+    )
+    row = row_for(client.get(reverse(URL) + "?internal=1").content.decode(), PLUGIN)
+    assert '<span class="ms-1 text-xs font-normal">disabled</span>' in row
+    assert ">on<" not in row and ">off<" not in row
+
+
 # ------------------------------------------- what an administrator decided
 
 

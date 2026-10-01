@@ -309,7 +309,40 @@ def test_the_script_names_no_retired_pill_class_either():
     assert not retired_pills(script.read_text(encoding="utf-8"))
 
 
+#: What a pill is made of when it is written out instead of named: fully rounded, with the
+#: badge's own padding. #291 looked for the retired *names* and so missed the three on
+#: *Server settings -> Plugins* that never had one -- `rounded-full bg-amber-100 px-2
+#: py-0.5 text-xs ...` (#311). A dot, an avatar or a switch is rounded and has no such
+#: padding; a `badge` gets both from the stylesheet and says neither.
+PILL_BY_HAND = {"rounded-full", "px-2", "py-0.5"}
+
+
+def pills_by_hand(text: str) -> list[int]:
+    """Line numbers of class lists that spell a pill out."""
+    return [
+        text.count("\n", 0, match.start()) + 1
+        for match in CLASSES.finditer(text)
+        if PILL_BY_HAND <= set(match.group(1).split())
+    ]
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_writes_a_pill_by_hand(path: Path):
+    found = pills_by_hand(path.read_text(encoding="utf-8"))
+    assert not found, (
+        f"{path.name}: a pill written out at line {found}. Write "
+        '`class="badge" data-tone="amber"`, with the tone that says what it means.'
+    )
+
+
 def test_the_pill_detector_knows_the_difference():
+    by_hand = '<span class="ms-1 rounded-full bg-amber-100 px-2 py-0.5 text-xs text-amber-800">'
+    assert pills_by_hand(by_hand) == [1]
+    assert pills_by_hand('<span class="ms-1 badge" data-tone="amber">') == []
+    assert pills_by_hand('<span class="size-2 rounded-full bg-emerald-500">') == []
+    assert pills_by_hand('<button class="rounded-md px-2 py-0.5 text-xs">') == []
     assert retired_pills('<span class="tag tag-grey">') == [(1, "tag"), (1, "tag-grey")]
     assert retired_pills('chip.className = "chip chip-new";') == [(1, "chip"), (1, "chip-new")]
     assert retired_pills('<span class="badge tag-preview" data-tone="grey">') == []
