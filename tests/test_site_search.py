@@ -446,7 +446,7 @@ def test_listings_search_is_one_persons(client, rows, other_user):
 
 
 @pytest.mark.parametrize(
-    "url_name", ["core:home", "core:search", "applications:reminder_list", "jobs:industry_list"]
+    "url_name", ["core:home", "core:search", "applications:calendar", "jobs:industry_list"]
 )
 def test_a_page_without_a_table_to_narrow_keeps_the_search_over_everything(client, rows, url_name):
     client.force_login(rows)
