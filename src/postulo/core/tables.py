@@ -28,7 +28,7 @@ whole of the risk and where the tests are.
 from __future__ import annotations
 
 import datetime as dt
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import cached_property
 
@@ -115,26 +115,131 @@ class Column:
         return bool(self.sort)
 
 
+@dataclass(frozen=True)
+class ExtraFilter:
+    """A question a table narrows by that is not one column's own value (#314).
+
+    *Status*, *Outcome*, *Tag* and *Gone quiet* on the applications table. Each is a query
+    parameter the page's view reads, and each had a control in a form above the table. A
+    column's header is where a table is narrowed since #253, so the control moves into the
+    header of the column that shows what it asks about -- and since a column can be taken
+    off the table, it names more than one in order of preference and goes to the first that
+    is showing. With none of them showing it is still reachable, in the *Narrow* block
+    (`Table.loose_controls`).
+
+    **The table draws it and does not apply it.** What the parameter means is the view's
+    to say: the board narrows by the same four and has no headers, so the narrowing stays
+    where both shapes share it. This is where the control goes and what it offers.
+    """
+
+    #: The query parameter, and what the control's id is made from: ``filter-<name>``.
+    name: str
+    #: What the control is called wherever it needs a name of its own.
+    label: str
+    #: ``choice`` for a list, ``flag`` for a yes or a no -- a tick box that sends ``1``.
+    kind: str = "choice"
+    #: What a list offers, as (value, label) pairs. A table whose choices depend on who is
+    #: asking -- a person's own tags -- answers `Table.choices_for` instead.
+    choices: tuple = ()
+    #: The columns whose header may hold it, the first one showing being the one that does.
+    columns: tuple[str, ...] = ()
+
+
+@dataclass
+class Control:
+    """One filter control as a template draws it: in a header, or under *Narrow* (#314).
+
+    A column's own filter and a question the table carries for it (`ExtraFilter`) are the
+    same thing to whoever draws them: a kind, a name to post under, an id, a label and a
+    value. One shape for both is what lets one component, `<c-table.filter>`, draw every
+    filter there is, and lets a header hold more than one.
+    """
+
+    #: ``text``, ``choice``, ``flag``, ``date`` or ``number``.
+    kind: str
+    #: The query parameter. A date posts ``<name>_from`` and ``<name>_to``, a number
+    #: ``<name>_min`` and ``<name>_max``.
+    name: str
+    #: What its id is made from: ``filter-<key>``.
+    key: str
+    #: What it is called: the column's name for a column's own filter, the question's
+    #: for one it carries.
+    label: str
+    choices: tuple = ()
+    value: str = ""
+    value_from: str = ""
+    value_to: str = ""
+    #: Whether a header writes its label above it. A column's own filter sits under the
+    #: column's name and needs no other; *Outcome* in the status column's header does, or it
+    #: is a second unnamed list under the first.
+    titled: bool = False
+    #: Whether no header holds it: a question none of whose columns is showing, or the
+    #: filter in force of a column that is not. The *Narrow* block is where it is reached,
+    #: at every width.
+    loose: bool = False
+
+    @property
+    def input_id(self) -> str:
+        return f"filter-{self.key}"
+
+    @property
+    def filter_label(self) -> str:
+        return str(_("Filter by %(column)s") % {"column": str(self.label).lower()})
+
+    @property
+    def given(self) -> tuple[tuple[str, str], ...]:
+        """What it posts, as (name, value) pairs: one, or a pair for a range."""
+        if self.kind == "date":
+            return (
+                (f"{self.name}_from", self.value_from),
+                (f"{self.name}_to", self.value_to),
+            )
+        if self.kind == "number":
+            return (
+                (f"{self.name}_min", self.value_from),
+                (f"{self.name}_max", self.value_to),
+            )
+        return ((self.name, self.value),)
+
+    @property
+    def names(self) -> tuple[str, ...]:
+        return tuple(name for name, _value in self.given)
+
+    @property
+    def input_ids(self) -> tuple[str, ...]:
+        """The ids of its inputs in a header: one, or a pair."""
+        if self.kind == "date":
+            return (f"{self.input_id}-from", f"{self.input_id}-to")
+        if self.kind == "number":
+            return (f"{self.input_id}-min", f"{self.input_id}-max")
+        return (self.input_id,)
+
+    @property
+    def active(self) -> bool:
+        """Whether it is narrowing the list right now."""
+        return bool(self.value or self.value_from or self.value_to)
+
+
 @dataclass
 class Header:
-    """A visible column as the template sees it: its sort state and its filter's value."""
+    """A visible column as the template sees it: its sort state and the filters it holds."""
 
     column: Column
     state: str = ""  # "asc", "desc" or ""
     #: What the header links to next. ``None`` clears the sort, which is the third state:
     #: there was no way to undo a sort except by editing the address (#136).
     next_sort: str | None = ""
-    value: str = ""
-    value_from: str = ""
-    value_to: str = ""
     #: What clicking the header would do, in words. The arrow says it to somebody who can
     #: see it; this says it to everybody else.
     hint: str = ""
     #: How wide this person likes the column, or 0 for *let it size itself* (#136).
     width: int = 0
-    #: Whether one of this column's own filter controls asked for the table being drawn
+    #: Whether one of this header's filter controls asked for the table being drawn
     #: (#626): see `open`.
     asked: bool = False
+    #: The filters this header holds: the column's own first, then the questions the table
+    #: put here (#314). Empty for a column that narrows nothing.
+    controls: list[Control] = field(default_factory=list)
 
     @property
     def key(self) -> str:
@@ -145,37 +250,24 @@ class Header:
         return str(self.column.label)
 
     @property
-    def input_id(self) -> str:
-        return f"filter-{self.column.key}"
-
-    @property
-    def filter_label(self) -> str:
-        return str(_("Filter by %(column)s") % {"column": str(self.column.label).lower()})
-
-    @property
     def filtered(self) -> bool:
-        """Whether this column is narrowing the list right now.
+        """Whether anything in this header is narrowing the list right now.
 
         Since #253 the filter is folded away until somebody opens it, and a filter nobody
         can see is a filter they forget: this is what keeps the column's own header open and
         marked, so "where did my companies go" has an answer on screen rather than in the
         address bar.
         """
-        return bool(self.value or self.value_from or self.value_to)
+        return any(control.active for control in self.controls)
 
     @property
     def input_ids(self) -> tuple[str, ...]:
-        """The ids of this column's filter controls in the header: one, or a pair."""
-        kind = self.column.filter
-        if kind == "date":
-            return (f"{self.input_id}-from", f"{self.input_id}-to")
-        if kind == "number":
-            return (f"{self.input_id}-min", f"{self.input_id}-max")
-        return (self.input_id,) if kind else ()
+        """The ids of every filter input in this header."""
+        return tuple(ident for control in self.controls for ident in control.input_ids)
 
     @property
     def open(self) -> bool:
-        """Whether the column's filter is drawn unfolded: narrowing, or being used (#626).
+        """Whether the header's filters are drawn unfolded: narrowing, or being used (#626).
 
         A filter in force comes back open. So does the one whose control asked for this
         table, whatever it holds now: somebody who empties a box to try another word, or
@@ -195,6 +287,22 @@ class Header:
         there, which the disclosure's own collapsed state already says.
         """
         return str(_("%(column)s is filtered") % {"column": str(self.column.label)})
+
+    @property
+    def cell_label(self) -> str:
+        """What the header cell itself is called: the column's name, and that it is
+        filtered while it is.
+
+        Said outright, as the cell's `aria-label`, because the cell's text stopped being
+        that when the filters moved into it (#314). A cell with no name of its own takes
+        one from everything inside it, and an open header holds its controls and what they
+        are set to: every cell of the status column was announced under "Status Status is
+        filtered Applied Outcome Still live Gone quiet Sort by status, lowest first". The
+        name is the column's again. Whether it is narrowed is kept, for the reason
+        `filtering_label` gives; what it is narrowed by is the controls' to say, and each
+        of them still has its own name.
+        """
+        return self.filtering_label if self.filtered else self.label
 
     @property
     def sort_icon(self) -> str:
@@ -269,9 +377,13 @@ class Table:
     columns: tuple[Column, ...] = ()
     #: The sort applied when the request names none, with ``-`` for descending.
     default_sort: str = ""
-    #: Query parameters outside the columns that also narrow the list (a search box, a
-    #: status select). They count as filters for the empty state and the *Clear* link.
+    #: Query parameters outside the columns that also narrow the list and have no control
+    #: this table draws (the masthead's search box, a tab). They count as filters for the
+    #: empty state and the *Clear* link.
     extra_params: tuple[str, ...] = ()
+    #: The questions outside the columns that the table does draw a control for, in one of
+    #: its headers (#314). They count as filters too, and a saved view may hold them.
+    extra_filters: tuple[ExtraFilter, ...] = ()
     #: What a row is called, for the live count: ("application", "applications").
     noun: tuple[str, str] = ("row", "rows")
     #: The shapes the page can take, the first being the usual one: the applications page
@@ -383,14 +495,20 @@ class Table:
     @classmethod
     def known_params(cls) -> set[str]:
         """Every query parameter this table reads: what a saved view may legitimately hold."""
-        names = {"sort", "page", SAVED, *cls.extra_params}
+        return {"sort", "page", SAVED, *cls.filter_names()}
+
+    @classmethod
+    def filter_names(cls) -> list[str]:
+        """Every query parameter that narrows this table: the ones with no control here,
+        the questions a header carries, and each column's own."""
+        names = [*cls.extra_params, *(extra.name for extra in cls.extra_filters)]
         for column in cls.columns:
             if column.filter == "date":
-                names |= {f"{column.name}_from", f"{column.name}_to"}
+                names += [f"{column.name}_from", f"{column.name}_to"]
             elif column.filter == "number":
-                names |= {f"{column.name}_min", f"{column.name}_max"}
+                names += [f"{column.name}_min", f"{column.name}_max"]
             elif column.filter:
-                names.add(column.name)
+                names.append(column.name)
         return names
 
     def view_gaps(self, view: View) -> tuple[list[str], list[str]]:
@@ -628,15 +746,7 @@ class Table:
     @property
     def filters_active(self) -> bool:
         """Whether anything in the request narrows the list."""
-        names = list(self.extra_params)
-        for column in self.columns:
-            if column.filter == "date":
-                names += [f"{column.name}_from", f"{column.name}_to"]
-            elif column.filter == "number":
-                names += [f"{column.name}_min", f"{column.name}_max"]
-            elif column.filter:
-                names.append(column.name)
-        return any(self.given(name) for name in names)
+        return any(self.given(name) for name in self.filter_names())
 
     @property
     def search(self) -> str:
@@ -669,16 +779,7 @@ class Table:
     @property
     def narrow_names(self) -> set[str]:
         """The names the *Narrow* block's own controls post: one per filter it draws."""
-        names: set[str] = set()
-        for header in self.headers:
-            name, kind = header.column.name, header.column.filter
-            if kind == "date":
-                names |= {f"{name}_from", f"{name}_to"}
-            elif kind == "number":
-                names |= {f"{name}_min", f"{name}_max"}
-            elif kind:
-                names.add(name)
-        return names
+        return {name for control in self.narrow_controls for name in control.names}
 
     @property
     def narrow_keeps(self) -> list[tuple[str, str]]:
@@ -728,9 +829,100 @@ class Table:
         """
         return self.request.headers.get("HX-Trigger", "")
 
+    def choices_for(self, extra: ExtraFilter) -> tuple:
+        """What a list among `extra_filters` offers, as (value, label) pairs.
+
+        The declared choices, unless the table knows better: a subclass answers here for a
+        list that depends on who is asking. Nothing to offer means the control is not drawn.
+        """
+        return extra.choices
+
+    def _own_control(self, column: Column) -> Control | None:
+        """A column's own filter with the value the address gives it, or nothing."""
+        if not column.filter:
+            return None
+        control = Control(
+            kind=column.filter,
+            name=column.name,
+            key=column.key,
+            label=str(column.label),
+            choices=column.choices,
+        )
+        if column.filter == "date":
+            control.value_from = self.given(f"{column.name}_from")
+            control.value_to = self.given(f"{column.name}_to")
+        elif column.filter == "number":
+            control.value_from = self.given(f"{column.name}_min")
+            control.value_to = self.given(f"{column.name}_max")
+        else:
+            control.value = self.given(column.name)
+        return control
+
+    def _extra_control(self, extra: ExtraFilter) -> Control | None:
+        """One of `extra_filters` with its value, or nothing for a list with no choices.
+
+        The value is read as the view that narrows by it reads it -- the parameter itself,
+        not the first copy that is not empty -- so the control cannot say one thing while
+        the table does another.
+        """
+        choices = self.choices_for(extra) if extra.kind == "choice" else ()
+        if extra.kind == "choice" and not choices:
+            return None
+        return Control(
+            kind=extra.kind,
+            name=extra.name,
+            key=extra.name,
+            label=str(extra.label),
+            choices=tuple(choices),
+            value=self.params.get(extra.name, "").strip(),
+        )
+
+    @cached_property
+    def _placed(self) -> tuple[dict[str, list[Control]], list[Control]]:
+        """Where every filter is drawn: by the key of the header that holds it, and the
+        ones no header holds.
+
+        A column's own filter goes in its own header. A question the table carries goes to
+        the first of its columns that is showing. What is left is loose: a question none of
+        whose columns is showing, which still has to be reachable, and the filter *in force*
+        of a column that is not showing, which has to be seen and be clearable -- before,
+        it narrowed the table with nothing on the page to say so, and was dropped by the
+        next request. An unused filter of a hidden column is not offered: showing the
+        column is how it is asked for.
+        """
+        held: dict[str, list[Control]] = {column.key: [] for column in self.visible}
+        loose: list[Control] = []
+        hidden: list[Control] = []
+        for column in self.columns:
+            control = self._own_control(column)
+            if control is None:
+                continue
+            if column.key in held:
+                held[column.key].append(control)
+            elif control.active:
+                control.loose = True
+                hidden.append(control)
+        for extra in self.extra_filters:
+            control = self._extra_control(extra)
+            if control is None:
+                continue
+            home = next((key for key in extra.columns if key in held), None)
+            if home is None:
+                control.loose = True
+                loose.append(control)
+                continue
+            # A tick box carries its word beside it. A list needs its name written above it
+            # unless it is the column's own word: *Status* under *Status* says nothing.
+            control.titled = control.kind != "flag" and control.label != str(
+                self.by_key[home].label
+            )
+            held[home].append(control)
+        return held, loose + hidden
+
     @cached_property
     def headers(self) -> list[Header]:
         asked_by = self.asked_by
+        held, _loose = self._placed
         headers = []
         for column in self.visible:
             header = Header(
@@ -739,29 +931,84 @@ class Table:
                 next_sort=self.next_sort(column),
                 hint=self.sort_hint(column),
                 width=self.width_of(column),
+                controls=held[column.key],
             )
-            if column.filter in ("text", "choice"):
-                header.value = self.given(column.name)
-            elif column.filter == "date":
-                header.value_from = self.given(f"{column.name}_from")
-                header.value_to = self.given(f"{column.name}_to")
-            elif column.filter == "number":
-                header.value_from = self.given(f"{column.name}_min")
-                header.value_to = self.given(f"{column.name}_max")
             header.asked = bool(asked_by) and asked_by in header.input_ids
             headers.append(header)
         return headers
 
     @property
+    def loose_controls(self) -> list[Control]:
+        """The filters no header holds (#314): see `_placed`. The *Narrow* block draws them
+        at every width, since it is the only place they are."""
+        return self._placed[1]
+
+    @property
+    def loose_active(self) -> bool:
+        """Whether a filter no header holds is narrowing the list: the *Narrow* block comes
+        back open then, as a narrowed column's header does."""
+        return any(control.active for control in self.loose_controls)
+
+    @property
+    def loose_kept(self) -> list[tuple[str, str]]:
+        """What the loose filters hold, for the page's filter form to carry hidden.
+
+        Their controls belong to the *Narrow* block's form (#622), so a header's control,
+        which sends the page's form, would send the question without them.
+        """
+        return [
+            (name, value)
+            for control in self.loose_controls
+            for name, value in control.given
+            if value
+        ]
+
+    @property
+    def narrow_controls(self) -> list[Control]:
+        """Every filter there is a control for, in the order the *Narrow* block draws them:
+        the headers' in the columns' order, then the ones no header holds."""
+        return [
+            *(control for header in self.headers for control in header.controls),
+            *self.loose_controls,
+        ]
+
+    @property
+    def narrow_marks(self) -> list[tuple[int, str]]:
+        """How many of the *Narrow* block's fields are narrowing the list, for the mark on
+        the word that opens it: (how many, where the block holds that many).
+
+        On a phone the block is folded, and the headers that would say a filter is in
+        force are a sideways scroll away inside the table: `?status=applied&tag=remote`
+        showed a short list with nothing on the screen to say why (#314). The word carries
+        the mark a narrowed column carries, and a count. For a filter a header holds the
+        block stays folded: it holds every filter there, and opening it over the table
+        for one of them would put the table off the screen instead. (One no header holds
+        still opens it, `loose_active`: the block is the only place that one is.)
+
+        The block holds different fields at different widths, so the count is of the
+        fields it shows where it is read: every filter below `md` (``"phone"``), and from
+        `md` up only the ones no header holds (``"desktop"``), since the rest are in their
+        headers there and marked there. One entry with nowhere named when the two agree,
+        and none at all while nothing narrows.
+        """
+        everywhere = sum(control.active for control in self.narrow_controls)
+        loose = sum(control.active for control in self.loose_controls)
+        if not everywhere:
+            return []
+        if loose == everywhere:
+            return [(everywhere, "")]
+        return [(everywhere, "phone"), *([(loose, "desktop")] if loose else [])]
+
+    @property
     def has_filters(self) -> bool:
-        """Whether any visible column narrows at all.
+        """Whether the table has any filter to draw.
 
         Called `has_filter_row` until #253, when the row it was named after stopped
         existing: the filters live in the headers themselves now, one disclosure per column.
         What the question is actually for is unchanged -- whether to draw the block a phone
         reaches, which is still a block and still folded under one word.
         """
-        return any(header.column.filter for header in self.headers)
+        return bool(self.narrow_controls)
 
     # ---------------------------------------------------------------- settings
 
@@ -853,6 +1100,22 @@ def register(table: type[Table]) -> type[Table]:
     """Make a table known to the settings view. Used as a class decorator."""
     if not table.name:
         raise ValueError(f"{table.__name__} needs a name to be registered.")
+    # A question a header carries shares the header's markup with the column's own filter,
+    # so it may not take a column's parameter or the id made from a column's key, and the
+    # columns it names have to be ones the table has (#314).
+    keys = {column.key for column in table.columns}
+    taken = {column.key for column in table.columns if column.filter}
+    taken |= {column.name for column in table.columns if column.filter}
+    taken |= {"sort", "page", SAVED, *table.extra_params}
+    for extra in table.extra_filters:
+        if extra.name in taken:
+            raise ValueError(f"{table.__name__}: the filter {extra.name!r} is already taken.")
+        if extra.kind not in ("choice", "flag"):
+            raise ValueError(f"{table.__name__}: {extra.name!r} is neither a list nor a flag.")
+        unknown = [key for key in extra.columns if key not in keys]
+        if unknown:
+            raise ValueError(f"{table.__name__}: {extra.name!r} names no column {unknown}.")
+        taken.add(extra.name)
     TABLES[table.name] = table
     return table
 

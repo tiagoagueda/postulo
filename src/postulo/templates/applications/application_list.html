@@ -36,14 +36,18 @@
          that drew neither when nothing matched forgot both. So nothing matching is a
          header over no rows, and the sentence beneath it.
 
-         The phone's copy of the column filters is a form of its own, drawn with the table
-         so that it shows the question as it was last answered (#622). The board has no
-         columns to narrow by. {% endcomment %}
+         The phone's copy of the filters is a form of its own, drawn with the table so that
+         it shows the question as it was last answered (#622). It is also where a filter
+         whose column is not showing is reached, at any width (#314).
+
+         There is no form above this table (#314), so the button that sends the filters
+         with scripts off is in the headers, and says *Filter*, as the form's did.
+      {% endcomment %}
       {% translate "Filter" as filter_word %}
       {% include "partials/table/narrow.html" with submit_label=filter_word %}
       <c-scroll-box class="card p-0" label="{% translate 'Applications' %}">
         <table class="table">
-          <c-table.head :table="table" table_id="applications-table" form_id="application-filters" bulk_form_id="applications-bulk" />
+          <c-table.head :table="table" table_id="applications-table" form_id="application-filters" bulk_form_id="applications-bulk" submit_label="{{ filter_word }}" />
           <tbody>
             {% for application in applications %}
               {% include "applications/partials/application_row.html" with columns=table.visible bulk_form_id="applications-bulk" %}
@@ -110,7 +114,36 @@
     </div>
   </div>
 
-  {% include "applications/partials/filters.html" with form_id="application-filters" table_id="applications-table" %}
+  {% comment %} The filters (#314). The table's are in its column headers -- the status, the
+     outcome and *Gone quiet* in the status column's, the tag in the tags column's or the
+     role's -- so in that shape nothing is drawn here. The board has no headers and keeps the
+     form the two shapes used to share.
+
+     In the table's shape the form is still on the page, with nothing to see in it, because
+     it is what the headers' controls belong to (`form=`), what the masthead's box includes,
+     and the one element every live control takes its turn on (`hx-sync`). It holds what no
+     control does: the search in force, for a submit with scripts off, and a shape asked for
+     by address. Its `submit` is the header's *Filter* button, with scripts off; htmx is
+     given it too, so that a submit some other way narrows the table as the controls do
+     rather than loading the page.
+
+     Outside what the live filters swap, so the element they take turns on is never replaced
+     under a request in flight. {% endcomment %}
+  {% if shape == 'board' %}
+    {% include "applications/partials/board_filters.html" with form_id="application-filters" table_id="applications-table" %}
+  {% else %}
+    <form method="get" id="application-filters"
+          hx-get="{{ request.path }}" hx-trigger="submit"
+          hx-include="[data-table-search]" hx-sync="this:replace"
+          hx-target="#applications-table" hx-swap="outerHTML" hx-push-url="true">
+      <noscript><input type="hidden" name="q" value="{{ search }}"></noscript>
+      {% if shape_param %}
+        {% comment %} A page opened in a shape by address keeps that shape when a live filter
+           swaps what is below (#102). {% endcomment %}
+        <input type="hidden" name="view" value="{{ shape_param }}">
+      {% endif %}
+    </form>
+  {% endif %}
 
   {% partial table %}
 {% endblock %}

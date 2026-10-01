@@ -81,7 +81,7 @@ def test_typing_in_a_header_narrows_the_table_and_marks_the_column(
 
     expect(rows).to_have_count(1)
     expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
-    expect(page.get_by_label("Location is filtered")).to_be_visible()
+    expect(page.get_by_role("img", name="Location is filtered")).to_be_visible()
     expect(page.locator("#filter-location")).to_be_visible()
 
 
@@ -127,7 +127,7 @@ def test_emptying_a_header_filter_leaves_it_open_with_the_focus_in_it(
     page.locator('[data-col="name"] summary').click()
     box.press_sequentially("ap")
     expect(rows).to_have_count(1)
-    expect(page.get_by_label("Name is filtered")).to_be_visible()
+    expect(page.get_by_role("img", name="Name is filtered")).to_be_visible()
 
     with page.expect_response(for_the_emptied_box) as answer:
         box.press("Backspace")
@@ -140,6 +140,7 @@ def test_emptying_a_header_filter_leaves_it_open_with_the_focus_in_it(
     expect(box).to_be_visible()
     expect(box).to_be_focused()
     expect(page.get_by_label("Name is filtered")).to_have_count(0)
+    expect(page.locator('thead [data-col="name"]')).to_have_attribute("aria-label", "Name")
 
     # The keys that follow go into the box, and the table follows them.
     page.keyboard.type("black")
@@ -359,7 +360,7 @@ def test_the_filter_opens_and_applies_with_no_script_at_all(
 
         expect(page).to_have_url(re.compile(r"location=mexico"))
         expect(page.locator("#companies-table tbody tr")).to_have_count(1)
-        expect(page.get_by_label("Location is filtered")).to_be_visible()
+        expect(page.get_by_role("img", name="Location is filtered")).to_be_visible()
     finally:
         context.close()
 
@@ -698,5 +699,40 @@ def test_with_scripts_off_on_a_phone_enter_in_a_headers_box_still_sends_the_page
         expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
         expect(page.locator("#companies-table")).to_contain_text("Aperture Science")
         assert times_in_the_address(page, "location") == 1, page.url
+    finally:
+        context.close()
+
+
+def test_with_scripts_off_on_a_phone_a_headers_list_has_a_button_to_send_it(
+    browser: Browser, live_server, applicant
+):
+    """Enter sends a box and does nothing for a list. With the page's own *Apply* not drawn
+    on a phone, a list in a header would be a control with nothing to send it, so there a
+    header's panel ends in a small *Apply* of its own (#314). It is the phone's: from the
+    width the page's form is drawn at, that form's button is the one, as it was."""
+    two_companies(applicant)
+    a_list_among_the_columns(applicant)
+    context = browser.new_context(java_script_enabled=False, viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?kind=employer&sort=-name")
+        rows = page.locator("#companies-table tbody tr")
+        expect(rows).to_have_count(1)
+        expect(page.locator("#companies-table")).to_contain_text("Aperture Science")
+
+        in_the_header = page.locator('thead [data-col="kind"]').get_by_role("button", name="Apply")
+        page.locator("#filter-kind").select_option("employment_service")
+        in_the_header.click()
+
+        expect(page).to_have_url(re.compile(r"[?&]kind=employment_service(&|$)"))
+        expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+        expect(rows).to_have_count(1)
+        expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+        assert times_in_the_address(page, "kind") == 1, page.url
+
+        page.set_viewport_size({"width": 1280, "height": 900})
+        expect(in_the_header).to_have_count(0)
+        expect(page.locator("#company-filters").get_by_role("button", name="Apply")).to_be_visible()
     finally:
         context.close()

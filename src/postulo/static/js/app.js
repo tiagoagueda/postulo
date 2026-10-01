@@ -38,6 +38,74 @@
     document.addEventListener("htmx:afterSwap", ready);
   }
 
+  /* ---------------------------------- what a swap brought in answers from the moment it lands
+   *
+   * htmx wires what it swapped in when the swap *settles*, twenty milliseconds after the new
+   * markup is on the page. For those twenty milliseconds a control that was replaced -- a
+   * list, a tick box, a date in a table's header -- is on the screen with the focus in it,
+   * and hears nothing: a change made then is kept by the control and never sent, so the
+   * list says one status over a table narrowed by another. A hand choosing with the mouse
+   * is never that quick. A key held down in a list is, on a server that answers between two
+   * repeats of it, and the last repeat is the one that is lost (#314).
+   *
+   * Wiring is idempotent -- htmx skips what it has already initialised, which is what the
+   * cell editor's Escape relies on below (#161) -- so this does at once what the settle
+   * would have done, and the settle finds nothing left to do.
+   */
+  document.addEventListener("htmx:afterSwap", function (event) {
+    if (window.htmx && event.target && event.target.nodeType === 1) {
+      window.htmx.process(event.target);
+    }
+  });
+
+  /* --------------------------------- a header's filter that was opened stays open in a swap
+   *
+   * A column's filter is a disclosure in its header, and the header is redrawn with the
+   * table every time a filter narrows it. The server draws open the ones that are narrowing
+   * and the one whose control asked (#626) -- which is the one with the focus in it, and the
+   * reason that part is the server's: htmx puts the focus back as the markup lands, and a
+   * control inside a closed disclosure cannot take it.
+   *
+   * It cannot know about the others. Somebody who opens *Status* and *Role* to set both, and
+   * chooses a status, had the role's filter fold shut before they reached it (#314): since
+   * the filters above the applications table moved into its headers, narrowing by two
+   * things is opening two headers. So what was open in the table being replaced is open in
+   * the one that replaces it. Nothing is closed by this: a header the server drew open
+   * stays open.
+   */
+  var openColumnFilters = [];
+
+  document.addEventListener("htmx:beforeSwap", function (event) {
+    var target = event.detail && event.detail.target;
+    openColumnFilters = [];
+    if (!target || !target.querySelectorAll) {
+      return;
+    }
+    Array.prototype.forEach.call(
+      target.querySelectorAll("th[data-col] [data-col-filter][open]"),
+      function (disclosure) {
+        openColumnFilters.push(disclosure.closest("th[data-col]").getAttribute("data-col"));
+      }
+    );
+  });
+
+  document.addEventListener("htmx:afterSwap", function () {
+    var keys = openColumnFilters;
+    openColumnFilters = [];
+    Array.prototype.forEach.call(document.querySelectorAll("th[data-col]"), function (cell) {
+      var disclosure = cell.querySelector("[data-col-filter]");
+      if (disclosure && keys.indexOf(cell.getAttribute("data-col")) !== -1) {
+        disclosure.open = true;
+      }
+    });
+  });
+
+  // An answer that was not swapped in -- a failure, a 204 -- leaves the table as it was, and
+  // what was noted for it must not be applied to some later swap.
+  document.addEventListener("htmx:afterRequest", function () {
+    openColumnFilters = [];
+  });
+
   // Every form on a page carries the same token, so which one is found does not matter;
   // a page with no form at all has none to find, and the caller's request is refused,
   // which is the correct end for a request that cannot prove where it came from.

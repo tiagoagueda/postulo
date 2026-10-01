@@ -1,14 +1,20 @@
 {% load i18n %}
-<c-vars header form_id="" table_id="" suffix="" live=False labelled=False />
-{% comment %} One column's filter control, wherever it is drawn (#253).
+<c-vars control form_id="" table_id="" suffix="" live=False labelled=False />
+{% comment %} One filter control, wherever it is drawn (#253).
 
-   `<c-table.filter :header="header" form_id="…" table_id="…" live />` in a header, and
-   `<c-table.filter :header="header" suffix="-narrow" />` in the block a phone reaches.
+   `<c-table.filter :control="control" form_id="…" table_id="…" live />` in a header, and
+   `<c-table.filter :control="control" suffix="-narrow" />` in the block a phone reaches.
 
-   Four shapes, because a column narrows in one of four ways: a word, one of a fixed list, a
-   range of days, a range of numbers. They were written out twice -- once in `head.html` and
-   once in `narrow.html` -- and #253 would have made it three, which is the point at which
-   two copies stop being a duplication you can watch and start being one that drifts.
+   Five shapes, because a table narrows in one of five ways: a word, one of a fixed list, a
+   yes or a no, a range of days, a range of numbers. They were written out twice -- once in
+   `head.html` and once in `narrow.html` -- and #253 would have made it three, which is the
+   point at which two copies stop being a duplication you can watch and start being one
+   that drifts.
+
+   **It draws a `Control`, not a column** (#314). A header may hold more than its column's
+   own filter -- the status column's holds the status, the outcome and *Gone quiet* -- and
+   a column's filter and a question the table put in its header are the same thing to draw:
+   a kind, a name, an id, a value (`core/tables.py`).
 
    **`live` is what tells the two copies apart.** In a header the control carries htmx and
    narrows the table as somebody types; in the phone block it does not, because that block
@@ -19,16 +25,27 @@
    posted together under one name, and the copy the page was loaded with overrode the one
    being typed in.
 
-   `labelled` is the phone block saying it has drawn a visible `<label>` already, so the
-   word box and the list take their name from that rather than from an `aria-label` that
-   would quietly replace it. The pairs keep theirs either way: *at least* and *at most* have
-   to be told apart, and a legend is not what names an input.
+   `labelled` is the caller saying it has drawn a visible `<label>` already, so the word
+   box and the list take their name from that rather than from an `aria-label` that would
+   quietly replace it. The pairs keep theirs either way: *at least* and *at most* have to be
+   told apart, and a legend is not what names an input. The tick box draws its own label
+   round itself, its word beside it, wherever it is: a box with no word is not a control.
 
    `hx-preserve` on everything a person types into rather than on the text box alone. A
    keystroke lands, three hundred milliseconds pass, the table swaps, and an input that was
    not preserved is replaced under the cursor mid-word. That was true of the number boxes as
    well as the text one; it only ever showed up on the text one because that is the one
-   people type more than two characters into.
+   people type more than two characters into. The list, the dates and the tick box are
+   replaced, and htmx puts the focus back on the one that replaced them, by its id.
+
+   **A list in a header is never narrower than its widest choice** (`min-w-max`, #314). A
+   list shows the choice it holds, and a header's is as wide as its column, which a table
+   squeezes to fit the screen: at 1024 pixels with every header open, in the font CI draws
+   in, the status list had under ninety pixels for "Zur Kenntnis genommen", which wants 148.
+   A box may be squeezed, since what is typed in it scrolls; a list cut short is a filter
+   in force that cannot be read. So the list holds its column open and the table scrolls
+   inside its own box, as it may. Under *Narrow* the list is as wide as the block and keeps
+   the floor it had: one that could not shrink would push a long tag off a phone's screen.
 
    `[data-table-search]` beside the form in `hx-include` is the masthead's box, where it
    narrows this table (#313): it sits outside the filter form, so a request that included
@@ -44,45 +61,57 @@
    page links are left out on purpose: their address was written with the last answer, so
    one of them replacing a newer request would put the older question back.
 {% endcomment %}
-{% with id=header.input_id|add:suffix name=header.column.name %}
-  {% if header.column.filter == 'text' %}
-    <input type="search" id="{{ id }}" name="{{ name }}" value="{{ header.value }}"
+{% with id=control.input_id|add:suffix name=control.name %}
+  {% if control.kind == 'text' %}
+    <input type="search" id="{{ id }}" name="{{ name }}" value="{{ control.value }}"
            {% if form_id %}form="{{ form_id }}"{% endif %}
-           {% if not labelled %}aria-label="{{ header.filter_label }}"{% endif %}
+           {% if not labelled %}aria-label="{{ control.filter_label }}"{% endif %}
            placeholder="{% translate 'Filter' %}"
            {% if live %}hx-preserve
              hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace"
              hx-trigger="input changed delay:300ms, search"
              hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
            class="w-full min-w-24 px-2 py-1 text-xs">
-  {% elif header.column.filter == 'choice' %}
+  {% elif control.kind == 'choice' %}
     <select id="{{ id }}" name="{{ name }}"
             {% if form_id %}form="{{ form_id }}"{% endif %}
-            {% if not labelled %}aria-label="{{ header.filter_label }}"{% endif %}
+            {% if not labelled %}aria-label="{{ control.filter_label }}"{% endif %}
             {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
-            class="w-full min-w-24 px-2 py-1 text-xs">
+            class="w-full {% if live %}min-w-max{% else %}min-w-24{% endif %} px-2 py-1 text-xs">
       <option value="">{% translate "Any" %}</option>
-      {% for value, label in header.column.choices %}
-        <option value="{{ value }}" {% if value == header.value %}selected{% endif %}>{{ label }}</option>
+      {% for value, label in control.choices %}
+        <option value="{{ value }}" {% if value == control.value %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
-  {% elif header.column.filter == 'number' %}
+  {% elif control.kind == 'flag' %}
+    {% comment %} A yes or a no (#314): ticked sends `1`, and not ticked sends nothing, which
+       is how *Gone quiet* was always asked. `tap-target` for the 24 pixels SC 2.5.8 asks
+       for: a tick box with its word beside it is the shape that keeps failing it (#167).
+    {% endcomment %}
+    <label class="tap-target gap-2 {% if live %}self-start text-xs{% else %}text-sm{% endif %}">
+      <input type="checkbox" class="input shrink-0" id="{{ id }}" name="{{ name }}" value="1" {% if control.value %}checked{% endif %}
+             {% if form_id %}form="{{ form_id }}"{% endif %}
+             {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}>
+      {{ control.label }}
+    </label>
+  {% elif control.kind == 'number' %}
     {% comment %} A least and a most, shaped like the date pair: "companies I have applied
        to more than once" is the obvious question (#173). {% endcomment %}
     <div class="flex flex-col gap-1">
-      <input type="number" id="{{ id }}-min" name="{{ name }}_min" value="{{ header.value_from }}"
+      <input type="number" id="{{ id }}-min" name="{{ name }}_min" value="{{ control.value_from }}"
              {% if form_id %}form="{{ form_id }}"{% endif %} inputmode="numeric" min="0"
-             aria-label="{{ header.filter_label }}: {% translate 'at least' %}"
+             aria-label="{{ control.filter_label }}: {% translate 'at least' %}"
              placeholder="{% translate 'at least' %}"
              {% if live %}hx-preserve
                hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace"
                hx-trigger="input changed delay:300ms"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
              class="w-full min-w-20 px-2 py-1 text-xs">
-      <input type="number" id="{{ id }}-max" name="{{ name }}_max" value="{{ header.value_to }}"
+      <input type="number" id="{{ id }}-max" name="{{ name }}_max" value="{{ control.value_to }}"
              {% if form_id %}form="{{ form_id }}"{% endif %} inputmode="numeric" min="0"
-             aria-label="{{ header.filter_label }}: {% translate 'at most' %}"
+             aria-label="{{ control.filter_label }}: {% translate 'at most' %}"
              placeholder="{% translate 'at most' %}"
              {% if live %}hx-preserve
                hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace"
@@ -90,17 +119,17 @@
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
              class="w-full min-w-20 px-2 py-1 text-xs">
     </div>
-  {% elif header.column.filter == 'date' %}
+  {% elif control.kind == 'date' %}
     <div class="flex flex-col gap-1">
-      <input type="date" id="{{ id }}-from" name="{{ name }}_from" value="{{ header.value_from }}"
+      <input type="date" id="{{ id }}-from" name="{{ name }}_from" value="{{ control.value_from }}"
              {% if form_id %}form="{{ form_id }}"{% endif %}
-             aria-label="{{ header.filter_label }}: {% translate 'from' %}"
+             aria-label="{{ control.filter_label }}: {% translate 'from' %}"
              {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
              class="w-full px-2 py-1 text-xs">
-      <input type="date" id="{{ id }}-to" name="{{ name }}_to" value="{{ header.value_to }}"
+      <input type="date" id="{{ id }}-to" name="{{ name }}_to" value="{{ control.value_to }}"
              {% if form_id %}form="{{ form_id }}"{% endif %}
-             aria-label="{{ header.filter_label }}: {% translate 'to' %}"
+             aria-label="{{ control.filter_label }}: {% translate 'to' %}"
              {% if live %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}, [data-table-search]" hx-sync="#{{ form_id }}:replace" hx-trigger="change"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
              class="w-full px-2 py-1 text-xs">

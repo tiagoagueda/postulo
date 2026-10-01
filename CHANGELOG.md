@@ -37,6 +37,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The filters above the *Applications* table are in its column headers: status, outcome and *Gone quiet* under *Status*, the tag under *Tags* or *Role*; with that column hidden they are under *Narrow*. Addresses and saved views mean what they did, and the board keeps its form. (#314)
 - A social profile or a code repository is on a service (LinkedIn, Mastodon, GitHub, a Forgejo instance) or *Other*: chosen first in its row, with an icon, and the address is checked against it. *Name* is asked only for *Other*. The archive and the API carry the service, and a plugin can add more. (#305)
 - Language codes are BCP 47 tags in canonical form wherever Postulo writes one: `pt-BR` and `en-GB`, not `pt-br`, and Serbian is `sr-Cyrl`. **If you read them from the API, a webhook, a store plugin or an archive, compare without regard to case or expect the new spelling.** Export format 28. (#337)
 - On *Your details*, *Primary* is a star and *Remove* a bin that asks in a dialog and takes the number, link, address or identifier off at once, without *Save* and without losing what is typed elsewhere. The number that gets you back in cannot be removed, and a copy of the page open in another tab still saves. (#303)

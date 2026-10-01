@@ -1,11 +1,16 @@
 {% load i18n postulo %}
-<c-vars table table_id form_id bulk_form_id="" actions_label="" />
+<c-vars table table_id form_id bulk_form_id="" actions_label="" submit_label="" />
 {% comment %} `<c-table.head :table="table" table_id="…" form_id="…" bulk_form_id="…" />` (#263).
    The table it draws, the id of the element the swaps replace, the filter form every input
    is associated with, the id that -- only where a bulk form exists -- puts a selection
    column first, and the name of a trailing column of per-row controls, for a page that has
    some (#160). That last column is not in `table.columns` on purpose: a person choosing
    columns cannot be allowed to hide the buttons that decide about a row.
+
+   `submit_label` is for a page with no filter form of its own above the table (#314): the
+   word on the button that applies the filters with scripts off, which then has to be in
+   the header because there is nowhere else for it. A page that gives none has that button
+   in the form above its table, from `md` up. See *The button* below.
 
    A component rather than an include, so everything it needs is declared here at the top
    instead of being whatever the page happened to have in its context.
@@ -35,9 +40,16 @@
    **A filter in force says so in its header**, and its disclosure comes back open: the
    virtue of the old row was that every narrowing was visible at once, and folding things
    away has to pay that back or somebody spends ten minutes wondering where their companies
-   went. `filtering_label` is only attached when the column *is* narrowed -- a `<th>`'s text
+   went. `filtering_label` is only attached when the column *is* narrowed -- a `<th>`'s name
    is read out with every cell beneath it, and that is a price worth paying to say the list
    is not what it looks like, and not worth paying to announce a control that is just there.
+
+   **The cell is named outright** (`aria-label`, `Header.cell_label`): the column's name,
+   and that it is filtered while it is. Left to its contents, the cell was called by
+   everything in it, and since #314 an open header holds lists, a tick box and what they
+   are set to -- so every cell of the status column was announced under the status, the
+   outcome, *Gone quiet* and the sort's hint together. The controls are still in the cell
+   and still have their own names; they have only stopped being the column's.
 
    **So does the one being used** (#626). Emptying a box to try another word, or choosing
    *Any*, leaves a column that narrows nothing, and the table that came back drew its header
@@ -45,10 +57,39 @@
    the top of the document. The table knows which control asked for it (`HX-Trigger`), and
    draws that column's filter open whatever it holds (`Header.open`).
 
+   **A header holds whatever filters belong to its column, and that can be more than one**
+   (#314). The status column's holds the status, the outcome and *Gone quiet*; the role's
+   holds its own box and, while the tags are drawn under the role, the tag. `header.controls`
+   is the list, the column's own first, and each is drawn by `<c-table.filter>`. The first
+   sits under the column's name and takes its name from it; one that asks something else
+   has its word written above it (`control.titled`), or two lists in a row are two lists
+   nobody can tell apart. What no header holds, because the column it belongs to is not
+   showing, is in the *Narrow* block at every width (`Table.loose_controls`), and the
+   page's filter form carries its value from here, hidden, so that a header's control sends
+   the whole question.
+
+   **The button.** With scripts on every control narrows as it changes and there is nothing
+   to press. With scripts off something has to send the form. On *Companies* and *Listings*
+   that is the *Apply* above the table; *Applications* has no form above its table, so each
+   header's panel ends in a small button, written inside a `<noscript>` so that it exists
+   only where it is needed. One per panel and not one for the row: it is under the control
+   just changed, the next thing Tab reaches, and every one of them sends the same form, so
+   it does not matter which is pressed. Any of them is also what makes Enter in a header's
+   box send the form, which a form with several fields and no button does not do.
+
+   Below `md` the form above the table on *Companies* and *Listings* is not drawn: *Narrow*
+   is where a phone filters, and a second *Apply* above it sent everything but what was
+   entered under it (#622). The headers are still usable there, so with scripts off their
+   panels end in the same small button on those two pages as well, `md:hidden`, saying
+   *Apply* as the form's does. Without it a list in a header would be a control with
+   nothing to send it; a box had Enter, which presses the form's button drawn or not.
+
    **No preference for keeping them all open**, which the issue left open. An open filter
    stays open, because a column that is narrowing is rendered open; so somebody filtering
    five columns has five, and somebody reading a long list has none. A setting would be a
-   setting to make the interface do what it already does.
+   setting to make the interface do what it already does. One somebody opened and has not
+   used yet is the script's to keep open when another header's control swaps the table
+   (`app.js`, #314); a page load folds it, which is what a page load is.
 
    **On a phone, *Narrow* is still the way in, and this is no longer shut.** The old row
    was hidden below `md` and `narrow.html` served instead, and the issue asks for that to be
@@ -94,8 +135,8 @@
       </th>
     {% endif %}
     {% for header in table.headers %}
-      <th scope="col"
-          class="relative align-top {% if header.column.numeric %}text-end{% endif %} {{ header.column.css }}"
+      <th scope="col" aria-label="{{ header.cell_label }}"
+          class="relative align-top {% if header.column.numeric %}text-end{% else %}text-start{% endif %} {{ header.column.css }}"
           data-col="{{ header.key }}" data-col-label="{{ header.label }}"
           {% if header.width %}data-col-width="{{ header.width }}"{% endif %}
           {% if header.state == 'asc' %}aria-sort="ascending"{% elif header.state == 'desc' %}aria-sort="descending"{% endif %}>
@@ -107,12 +148,17 @@
            own start and end, which is the right in English and the left in Arabic, and the
            order in the markup is still the reading order: the name, then what sorts by it.
 
+           `text-start` on the cell for the same reason (#314): a header cell is centred by
+           the browser unless told otherwise, which nobody saw while a name was all a cell
+           held. With its filter open the cell is wider than the name, and the name moved
+           to the middle of it, over a list and a label that did the same.
+
            `items-start`, not centred: a name that wraps grows downwards, and an icon
            centred on the whole of it would sit between the lines, belonging to neither. At
            the top it stays beside the first line, which is where the eye starts the name.
         {% endcomment %}
         <div class="flex items-start {% if header.column.numeric %}justify-end{% else %}justify-between{% endif %} gap-1">
-          {% if header.column.filter %}
+          {% if header.controls %}
             <details class="col-filter" data-col-filter {% if header.open %}open{% endif %}>
               <summary class="tap-target gap-1 hover:text-ink-900 dark:hover:text-ink-100">
                 <span class="min-w-0 truncate">{{ header.label }}</span>
@@ -122,8 +168,22 @@
                   {% icon "chevron-down" class="col-filter-chevron size-3.5 text-ink-400" %}
                 {% endif %}
               </summary>
-              <div class="mt-1.5 font-normal">
-                <c-table.filter :header="header" form_id="{{ form_id }}" table_id="{{ table_id }}" live />
+              <div class="mt-1.5 flex flex-col gap-1.5 font-normal">
+                {% for control in header.controls %}
+                  {% if control.titled %}
+                    <div class="flex flex-col gap-0.5">
+                      <label for="{{ control.input_id }}" class="text-xs">{{ control.label }}</label>
+                      <c-table.filter :control="control" form_id="{{ form_id }}" table_id="{{ table_id }}" live labelled />
+                    </div>
+                  {% else %}
+                    <c-table.filter :control="control" form_id="{{ form_id }}" table_id="{{ table_id }}" live />
+                  {% endif %}
+                {% endfor %}
+                {% if submit_label %}
+                  <noscript><button type="submit" form="{{ form_id }}" class="btn" data-variant="outline" data-size="xs">{{ submit_label }}</button></noscript>
+                {% else %}
+                  <noscript><button type="submit" form="{{ form_id }}" class="btn md:hidden" data-variant="outline" data-size="xs">{% translate "Apply" %}</button></noscript>
+                {% endif %}
               </div>
             </details>
           {% else %}
@@ -156,5 +216,11 @@
   </tr>
 </thead>
 {% comment %} The sort in force travels with the filters, so narrowing never resets it. It lives
-   inside the swapped region so it is always the one the server last used. {% endcomment %}
+   inside the swapped region so it is always the one the server last used. So does whatever
+   a filter with no header holds (#314): its control is the *Narrow* block's, which is
+   another form, and a header's control would otherwise send the question without it.
+{% endcomment %}
 <input type="hidden" name="sort" value="{{ table.sort }}" form="{{ form_id }}">
+{% for name, value in table.loose_kept %}
+  <input type="hidden" name="{{ name }}" value="{{ value }}" form="{{ form_id }}">
+{% endfor %}

@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n postulo %}
 {% comment %} The filters, reachable on a phone. Below `md` the table's own headers are a
    sideways scroll away and their disclosures are cramped by the column they sit in, so the
    same filters are drawn again here, in one column, under one word. Above `md` this block
@@ -24,33 +24,85 @@
    button is under the fields (#253). Pressing it loads the page, with scripts on as with
    them off, so the headers and this block come back agreeing.
 
+   **The filters no header holds are here at every width** (#314). A filter lives in the
+   header of its column, and a column can be taken off the table: the status column's
+   header holds the status, the outcome and *Gone quiet*, and somebody who has hidden that
+   column still has to be able to ask for them. So this block is the one place every filter
+   can be reached whatever the columns are. Where such a filter exists the block is shown
+   above `md` as well, holding those alone -- the rest are in their headers there, and are
+   `md:hidden` here -- and it comes back open while one of them is narrowing the table, as
+   a narrowed column's header does, so a filter in use is never off the screen.
+
+   **The word says when it is narrowing** (#314). Folded, on a phone, the block was the only
+   sign of the filters on the screen and said nothing about them: the headers that carry the
+   mark are a sideways scroll away inside the table. So the word carries the same mark and
+   how many of the fields under it are in force -- *Narrow · 2* -- with the count in words
+   for a screen reader, which is told nothing by a funnel and a figure. It stays folded for
+   those: it holds every filter there, and open it would stand between the heading and the
+   table. The count is of the fields the block shows at the width it is read at
+   (`Table.narrow_marks`), so from `md` up it counts only the filters no header holds.
+
+   **With scripts off there are two forms and two kinds of button**, this one's and the
+   one a header's panel ends in (or, on a page with a form above its table, that form's),
+   and each sends its own fields with what the address holds for the other's. Neither can
+   send what was changed in the other and not yet applied: a control belongs to one form.
+   A script makes that not matter -- the headers narrow as they change, and what is entered
+   here outlives the swap -- so the page says it where there is none, in a `<noscript>`
+   under this button, which is the one whose reach is not obvious from where it sits.
+
    `submit_label` is what the button says where the page's own says something other than
    *Apply*.
 {% endcomment %}
 {% if table.has_filters %}
-  <form method="get" action="{{ request.path }}" class="mb-4 md:hidden" data-narrow-form>
+  <form method="get" action="{{ request.path }}" class="mb-4{% if not table.loose_controls %} md:hidden{% endif %}" data-narrow-form>
     {% for name, value in table.narrow_keeps %}
       <input type="hidden" name="{{ name }}" value="{{ value }}">
     {% endfor %}
-    <details data-narrow>
-      <summary class="btn cursor-pointer list-none" data-variant="outline">{% translate "Narrow" %}</summary>
-      <div class="mt-3 grid gap-3">
-        {% for header in table.headers %}
-          {% if header.column.filter == 'text' or header.column.filter == 'choice' %}
-            <div class="field">
-              <label for="{{ header.input_id }}-narrow">{{ header.label }}</label>
-              <c-table.filter :header="header" suffix="-narrow" labelled />
+    <details data-narrow {% if table.loose_active %}open{% endif %}>
+      <summary class="btn cursor-pointer list-none" data-variant="outline">
+        {% translate "Narrow" %}
+        {% for count, where in table.narrow_marks %}
+          <span class="{% if where == 'phone' %}inline-flex md:hidden{% elif where == 'desktop' %}hidden md:inline-flex{% else %}inline-flex{% endif %} items-center gap-1" data-narrow-count="{{ count }}">
+            <span aria-hidden="true">·</span>
+            {% icon "filter" class="size-3.5 text-brand-600 dark:text-brand-400" %}
+            <span aria-hidden="true">{{ count }}</span>
+            <span class="sr-only">{% blocktranslate trimmed count counter=count %}
+              {{ counter }} filter in use
+            {% plural %}
+              {{ counter }} filters in use
+            {% endblocktranslate %}</span>
+          </span>
+        {% endfor %}
+      </summary>
+      <div class="mt-3 grid gap-3 md:flex md:flex-wrap md:items-end">
+        {% for control in table.narrow_controls %}
+          {% if control.kind == 'text' or control.kind == 'choice' %}
+            <div class="field md:w-auto{% if not control.loose %} md:hidden{% endif %}">
+              <label for="{{ control.input_id }}-narrow">{{ control.label }}</label>
+              <c-table.filter :control="control" suffix="-narrow" labelled />
             </div>
-          {% elif header.column.filter %}
-            <fieldset>
-              <legend class="label">{{ header.label }}</legend>
-              <c-table.filter :header="header" suffix="-narrow" />
+          {% elif control.kind == 'flag' %}
+            <div{% if not control.loose %} class="md:hidden"{% endif %}>
+              <c-table.filter :control="control" suffix="-narrow" />
+            </div>
+          {% else %}
+            <fieldset{% if not control.loose %} class="md:hidden"{% endif %}>
+              <legend class="label">{{ control.label }}</legend>
+              <c-table.filter :control="control" suffix="-narrow" />
             </fieldset>
           {% endif %}
         {% endfor %}
         <div>
           <button type="submit" class="btn" data-variant="outline">{% if submit_label %}{{ submit_label }}{% else %}{% translate "Apply" %}{% endif %}</button>
         </div>
+        <noscript class="md:basis-full">
+          <p class="max-w-prose text-xs text-ink-500 dark:text-ink-400" data-narrow-reach>
+            {% blocktranslate trimmed %}
+              This button applies the filters above it. The filters in the table's headers
+              have a button of their own: apply one set before changing the other.
+            {% endblocktranslate %}
+          </p>
+        </noscript>
       </div>
     </details>
   </form>

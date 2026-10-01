@@ -1,16 +1,21 @@
 {% load i18n %}
-{% comment %} Shared by the board and the table. Given a `table_id`, the table's version narrows
-   live as you type; the board's stays a plain form.
+{% comment %} The board's filters (#314). The table narrows from its column headers; a board
+   has none, so the four questions the two shapes share -- status, outcome, tag, gone quiet
+   -- stay a form above it, as they were when one form served both (#102). #315 gives the
+   status to the board's own columns.
+
+   It is the page's filter form in this shape, under the id the masthead's box includes and
+   takes turns on, and it narrows live as its controls change.
 
    The search is the masthead's box (#313), which this form includes and which includes this
    form, so a search and a filter narrow together whichever moved last. With scripts off the
    box is not in this form, so the search in force rides along hidden. And both take turns
    on this form (`hx-sync`), the newer request replacing the one in flight, so a slow answer
    to one never lands over a newer answer to the other. {% endcomment %}
-<form method="get" {% if form_id %}id="{{ form_id }}"{% endif %} class="mb-6 flex flex-wrap items-end gap-3"
-      {% if table_id %}hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
+<form method="get" id="{{ form_id }}" class="mb-6 flex flex-wrap items-end gap-3"
+      hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
       hx-include="[data-table-search]" hx-sync="this:replace"
-      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}>
+      hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true">
   <noscript><input type="hidden" name="q" value="{{ search }}"></noscript>
   <div class="field w-auto">
     <label for="filter-status">{% translate "Status" %}</label>
@@ -53,11 +58,7 @@
     {% translate "Gone quiet" %}
   </label>
   <button type="submit" class="btn" data-variant="outline">{% translate "Filter" %}</button>
-  {% if table %}
-    {% if table.filters_active %}
-      <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
-    {% endif %}
-  {% elif search or selected_status or selected_tag or selected_state or selected_quiet %}
-    <a href="{{ request.path }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
+  {% if table.filters_active %}
+    <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
   {% endif %}
 </form>

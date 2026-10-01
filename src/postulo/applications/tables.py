@@ -4,7 +4,8 @@ from typing import ClassVar
 
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core.tables import Column, Table, register
+from postulo.core.models import Tag
+from postulo.core.tables import Column, ExtraFilter, Table, register
 
 from .models import Channel, Priority, Status
 
@@ -17,7 +18,28 @@ class ApplicationsTable(Table):
     #: A table or a board of the same rows (#102); the board is drawn by the same view.
     shapes = ("table", "board")
     SHAPE_LABELS: ClassVar[dict[str, str]] = {"table": _("Table"), "board": _("Board")}
-    extra_params = ("q", "status", "state", "tag", "quiet")
+    #: The masthead's box (#313). The other four are `extra_filters`, below.
+    extra_params = ("q",)
+    #: The four questions that were a form above the table, and are a form above the board
+    #: still (#314). Each sits in the header of the column that shows what it asks about,
+    #: in this order within a header; the view narrows by them in both shapes
+    #: (`ApplicationFilterMixin`), so nothing about what they mean is said here.
+    #:
+    #: *Gone quiet* goes with the status because no column shows it: it is a fact about a
+    #: live application, as its status and its outcome are. *Tag* goes to the tags column,
+    #: and, while that column is off, as it is until somebody adds it, to the role, under
+    #: which the tags are drawn then.
+    extra_filters = (
+        ExtraFilter("status", _("Status"), choices=tuple(Status.choices), columns=("status",)),
+        ExtraFilter(
+            "state",
+            _("Outcome"),
+            choices=(("open", _("Still live")), ("closed", _("Settled"))),
+            columns=("status",),
+        ),
+        ExtraFilter("quiet", _("Gone quiet"), kind="flag", columns=("status",)),
+        ExtraFilter("tag", _("Tag"), columns=("tags", "role")),
+    )
     noun = (_("application"), _("applications"))
     search_label = _("Search applications")
     columns = (
@@ -45,8 +67,8 @@ class ApplicationsTable(Table):
             lookups=("posting__location",),
             default=True,
         ),
-        # Status and tags narrow from the form above the table, which the board shares;
-        # a second control for the same question would only confuse.
+        # The status has no filter of its own kind: its header holds the status, the outcome
+        # and *Gone quiet*, which the view narrows by for the board as well (`extra_filters`).
         Column("status", _("Status"), sort=("status",), default=True),
         Column(
             "applied",
@@ -109,6 +131,12 @@ class ApplicationsTable(Table):
         Column("created", _("Recorded"), sort=("created_at",), newest_first=True),
     )
 
-
-#: Offered by the status filter above the table.
-STATUSES = Status.choices
+    def choices_for(self, extra: ExtraFilter) -> tuple:
+        """A person's own tags for *Tag*, by slug, which is what the address holds. Somebody
+        with no tags is offered no list, as the form above the table offered none."""
+        if extra.name != "tag":
+            return super().choices_for(extra)
+        user = getattr(self.request, "user", None)
+        if user is None or not user.is_authenticated:
+            return ()
+        return tuple(Tag.objects.for_user(user).values_list("slug", "name"))

@@ -221,6 +221,11 @@ def test_every_live_control_of_a_table_takes_its_turn_on_the_filter_form(client,
     live = [i for i in found.inputs if i.get("form") == form_id and "hx-get" in i]
     assert live, "the column filters are drawn"
     assert {i["hx-sync"] for i in live} == {f"#{form_id}:replace"}, live
+    if page == "applications":
+        # The status, the outcome and *Gone quiet* were controls written in the form, which
+        # asked for them; each is a header's control now and asks for itself (#314). The tag
+        # is the fourth, for somebody who has one: `tests/test_application_filters.py`.
+        assert {"status", "state", "quiet"} <= {i["name"] for i in live}, live
 
     links = [a for a in found.links if a.get("hx-target") == f"#{table_id}"]
     assert links, "the sort links are drawn"

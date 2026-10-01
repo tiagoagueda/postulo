@@ -658,6 +658,9 @@
   .max-w-md {
     max-width: var(--container-md);
   }
+  .max-w-prose {
+    max-width: 65ch;
+  }
   .max-w-xl {
     max-width: var(--container-xl);
   }
@@ -681,6 +684,9 @@
   }
   .min-w-196 {
     min-width: calc(var(--spacing) * 196);
+  }
+  .min-w-max {
+    min-width: max-content;
   }
   .flex-1 {
     flex: 1;
@@ -867,6 +873,9 @@
   }
   :where(.divide-ink-200 > :not(:last-child)) {
     border-color: var(--color-ink-200);
+  }
+  .self-start {
+    align-self: flex-start;
   }
   .self-stretch {
     align-self: stretch;
@@ -1627,11 +1636,29 @@
     }
   }
   @media (width >= 48rem) {
+    .md\:flex {
+      display: flex;
+    }
     .md\:hidden {
       display: none;
     }
+    .md\:inline-flex {
+      display: inline-flex;
+    }
+    .md\:w-auto {
+      width: auto;
+    }
+    .md\:basis-full {
+      flex-basis: 100%;
+    }
     .md\:grid-cols-3 {
       grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .md\:flex-wrap {
+      flex-wrap: wrap;
+    }
+    .md\:items-end {
+      align-items: flex-end;
     }
   }
   @media (width >= 64rem) {

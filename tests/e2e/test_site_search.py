@@ -219,11 +219,12 @@ def held(monkeypatch):
 def test_a_slow_answer_to_the_box_never_lands_over_a_newer_one_from_the_form(
     page: Page, live_server, tables, held
 ):
-    """Type a search, and while its answer is still on its way choose a status. The form's
+    """Type a search, and while its answer is still on its way choose a status. The status's
     answer is the newer question -- it carries the search too -- and the box's, when it
     comes, must not be drawn over it or put its address back. Before the box and the form
     took turns on one element, it was: the address and the count said *aperture, any
-    status* over a table that said nothing matched."""
+    status* over a table that said nothing matched. The status was a control of the form
+    then; it is a control of its column's header now (#314), and takes the same turn."""
     from postulo.applications.views import ApplicationListView
 
     held.only(
@@ -233,6 +234,9 @@ def test_a_slow_answer_to_the_box_never_lands_over_a_newer_one_from_the_form(
     base = live_server.url
     sign_in(page, base)
     page.goto(f"{base}/applications/")
+    # The status is in its column's header since #314, a control that asks for itself and
+    # takes its turn on the same form.
+    page.locator('[data-col="status"] summary').click()
     box = page.locator("#site-search")
     box.fill("aperture")
     assert held.arrived.wait(10), "the box's request never reached the server"
@@ -289,9 +293,9 @@ def test_a_slow_answer_to_a_column_filter_never_lands_over_a_newer_one_from_the_
 def test_a_status_chosen_with_a_search_typed_narrows_both_and_returns_to_page_one(
     page: Page, live_server, tables
 ):
-    """The filter form includes the box, so a status chosen after a search narrows by both;
-    and it starts again at the first page, because the second page of one question is not
-    a place in the answer to another."""
+    """A header's control sends the filter form and the box, so a status chosen after a
+    search narrows by both; and it starts again at the first page, because the second page
+    of one question is not a place in the answer to another."""
     from postulo.applications.models import Application, Status
     from postulo.core import tables as core_tables
     from postulo.jobs.models import Company, JobPosting
@@ -317,6 +321,7 @@ def test_a_status_chosen_with_a_search_typed_narrows_both_and_returns_to_page_on
     expect(page).to_have_url(re.compile(r"[?&]page=2(&|$)"))
     expect(rows).to_have_count(6)
 
+    page.locator('[data-col="status"] summary').click()
     page.locator("#filter-status").select_option("applied")
     expect(page.locator("#applications-count")).to_contain_text("28 ")
     expect(page).to_have_url(re.compile(r"[?&]q=aperture(&|$)"))
