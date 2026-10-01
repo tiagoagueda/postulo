@@ -2536,6 +2536,129 @@
     }
   });
 
+  /* ------------------------------------ what was entered under *Narrow* outlives a swap
+   *
+   * The *Narrow* block is a form of its own, and nothing in it is sent until its button is
+   * pressed. It is drawn with the table, so that it holds the question as the server last
+   * answered it (#622) -- which also means it is replaced whenever anything live swaps the
+   * table: the masthead's box, a header's control, a sort, a page link. The block that
+   * came back was the server's, folded and holding the answer's values, so whatever had
+   * been typed or chosen in it and not yet applied was thrown away and the block shut over
+   * it. Somebody on a phone who set a role and a tag under *Narrow* and then typed in the
+   * search box had to start again.
+   *
+   * So what the block holds that the server did not draw it with is noted as the swap
+   * begins and put back in the block that replaces it: whether it was open, each field
+   * that had been changed, and the focus with its caret if it was in one of them -- an
+   * answer can land while somebody is typing there. Only what was changed: every other
+   * field takes the answer's value, which is the reason the block is drawn with the table.
+   * And a changed field is left to the answer where the answer itself moved that filter,
+   * because its other copy, in the column's header, was used since: that is the later word.
+   *
+   * Nothing is sent by this and nothing is closed. The block still applies when its button
+   * is pressed, and one the server drew open stays open.
+   */
+  var narrowKept = null;
+
+  // What the server drew a field with, in the terms `autosubmitState` says what it holds.
+  function drawnWith(field) {
+    if (field.type === "checkbox" || field.type === "radio") {
+      return field.defaultChecked ? "on" : "off";
+    }
+    if (field.tagName !== "SELECT") {
+      return field.defaultValue;
+    }
+    var chosen = Array.prototype.filter.call(field.options, function (option) {
+      return option.defaultSelected;
+    })[0];
+    return (chosen || field.options[0] || { value: "" }).value;
+  }
+
+  function caretOf(field) {
+    // A date and a number have no caret to ask for, and some engines throw on the asking.
+    try {
+      return { start: field.selectionStart, end: field.selectionEnd };
+    } catch (error) {
+      return { start: null, end: null };
+    }
+  }
+
+  document.addEventListener("htmx:beforeSwap", function (event) {
+    var target = event.detail && event.detail.target;
+    var block = target && target.querySelector ? target.querySelector("[data-narrow]") : null;
+    narrowKept = null;
+    if (!block) {
+      return;
+    }
+    var changed = [];
+    Array.prototype.forEach.call(block.querySelectorAll("input, select"), function (field) {
+      var drawn = drawnWith(field);
+      var holds = autosubmitState(field);
+      if (field.id && field.type !== "hidden" && holds !== drawn) {
+        changed.push({ id: field.id, drawn: drawn, holds: holds });
+      }
+    });
+    var active = document.activeElement;
+    var focused = active && active.id && block.contains(active) ? caretOf(active) : null;
+    if (focused) {
+      focused.id = active.id;
+    }
+    narrowKept = { open: block.open, changed: changed, focused: focused };
+  });
+
+  document.addEventListener("htmx:afterSwap", function () {
+    var kept = narrowKept;
+    var block = document.querySelector("[data-narrow]");
+    narrowKept = null;
+    if (!kept || !block) {
+      return;
+    }
+    function fieldOf(id) {
+      var field = document.getElementById(id);
+      return field && block.contains(field) ? field : null;
+    }
+    if (kept.open) {
+      block.open = true;
+    }
+    kept.changed.forEach(function (was) {
+      var field = fieldOf(was.id);
+      if (!field || drawnWith(field) !== was.drawn) {
+        return;
+      }
+      if (field.type === "checkbox" || field.type === "radio") {
+        field.checked = was.holds === "on";
+      } else {
+        // A list that no longer offers what was chosen keeps what the answer drew.
+        field.value = was.holds;
+        if (field.value !== was.holds) {
+          field.value = was.drawn;
+        }
+      }
+    });
+    // htmx puts the focus back as the markup lands, before this runs: into a block the
+    // server drew folded it could not, and a value put back just now took the caret to
+    // the end of it.
+    var field = kept.focused && fieldOf(kept.focused.id);
+    if (field) {
+      if (document.activeElement !== field) {
+        field.focus({ preventScroll: true });
+      }
+      if (kept.focused.start !== null && field.setSelectionRange) {
+        try {
+          field.setSelectionRange(kept.focused.start, kept.focused.end);
+        } catch (error) {
+          // Not a field with a caret.
+        }
+      }
+    }
+  });
+
+  // An answer that was not swapped in leaves the block as it was, and what was noted for
+  // it must not be put into the answer to some later request.
+  document.addEventListener("htmx:afterRequest", function () {
+    narrowKept = null;
+  });
+
   /* ------------------------------------------------------- a page's own sections
    *
    * The career page is seven sections down one scroll, and its sidebar lists them as

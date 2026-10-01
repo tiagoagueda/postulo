@@ -12,10 +12,12 @@
 
    **`live` is what tells the two copies apart.** In a header the control carries htmx and
    narrows the table as somebody types; in the phone block it does not, because that block
-   is a form with an *Apply* button under it and a request per keystroke on a phone is a
-   request per keystroke on a phone. Both belong to the same form through `form=`, both are
-   posted, and `Table.given` reads the first non-empty answer under a name -- so the copy
-   nobody typed in narrows nothing (#173).
+   is a form with a button under it and a request per keystroke on a phone is a request per
+   keystroke on a phone. **And each copy belongs to a form of its own** (#622): the header's
+   to the page's filter form, through `form=`, and the phone block's to the form it is
+   written in, which is why that caller passes no `form_id`. In one form the two were
+   posted together under one name, and the copy the page was loaded with overrode the one
+   being typed in.
 
    `labelled` is the phone block saying it has drawn a visible `<label>` already, so the
    word box and the list take their name from that rather than from an `aria-label` that

@@ -1,34 +1,57 @@
 {% load i18n %}
 {% comment %} The filters, reachable on a phone. Below `md` the table's own headers are a
    sideways scroll away and their disclosures are cramped by the column they sit in, so the
-   same filters are drawn again here, in one column, under one word, inside the filter form
-   the page already has. Above `md` this block is hidden and the headers are the control.
+   same filters are drawn again here, in one column, under one word. Above `md` this block
+   is hidden and the headers are the control. Shared by every table that draws a header, so
+   there is one of these and not one per page (#173).
 
-   Both copies belong to the form and both are posted, so the table reads the first
-   non-empty answer under a name and the empty twin narrows nothing (`Table.given`). Shared
-   by every table that draws a header, so there is one of these and not one per page (#173).
+   **A form of its own, with its own button** (#622). It used to sit inside the page's
+   filter form, so every filter was posted twice under one name, and the table read the
+   first copy that was not empty on the understanding that the copy nobody typed in was.
+   It was not, once a page had been loaded with a filter in its address: this copy still
+   held that value and came first, so the header's box could no longer change or clear it,
+   and nothing but *Clear* got out. Two copies cannot share a form. This one's fields
+   belong to this form and the headers' to the page's, each form sends a name once, and
+   each carries the rest of the question hidden: here, whatever the page was asked with
+   that these fields do not hold (`Table.narrow_keeps`) -- the sort, the search, a tab.
 
-   The controls themselves are `<c-table.filter>`, the same component the headers use, with
-   `live` off -- a request per keystroke is not what anybody wants on a phone, and *Apply* is
-   under the block (#253).
+   **Drawn with the table**, inside what a live filter swaps, so that it shows the question
+   as the server last answered it; outside it, it kept the values the page was loaded with.
+   What was entered here and not yet applied is put back after a swap by `app.js`.
+
+   **Not live.** The controls are `<c-table.filter>`, the same component the headers use,
+   with `live` off: a request per keystroke is not what anybody wants on a phone, and the
+   button is under the fields (#253). Pressing it loads the page, with scripts on as with
+   them off, so the headers and this block come back agreeing.
+
+   `submit_label` is what the button says where the page's own says something other than
+   *Apply*.
 {% endcomment %}
 {% if table.has_filters %}
-  <details class="w-full md:hidden" data-narrow>
-    <summary class="btn cursor-pointer list-none" data-variant="outline">{% translate "Narrow" %}</summary>
-    <div class="mt-3 grid gap-3">
-      {% for header in table.headers %}
-        {% if header.column.filter == 'text' or header.column.filter == 'choice' %}
-          <div class="field">
-            <label for="{{ header.input_id }}-narrow">{{ header.label }}</label>
-            <c-table.filter :header="header" suffix="-narrow" labelled />
-          </div>
-        {% elif header.column.filter %}
-          <fieldset>
-            <legend class="label">{{ header.label }}</legend>
-            <c-table.filter :header="header" suffix="-narrow" />
-          </fieldset>
-        {% endif %}
-      {% endfor %}
-    </div>
-  </details>
+  <form method="get" action="{{ request.path }}" class="mb-4 md:hidden" data-narrow-form>
+    {% for name, value in table.narrow_keeps %}
+      <input type="hidden" name="{{ name }}" value="{{ value }}">
+    {% endfor %}
+    <details data-narrow>
+      <summary class="btn cursor-pointer list-none" data-variant="outline">{% translate "Narrow" %}</summary>
+      <div class="mt-3 grid gap-3">
+        {% for header in table.headers %}
+          {% if header.column.filter == 'text' or header.column.filter == 'choice' %}
+            <div class="field">
+              <label for="{{ header.input_id }}-narrow">{{ header.label }}</label>
+              <c-table.filter :header="header" suffix="-narrow" labelled />
+            </div>
+          {% elif header.column.filter %}
+            <fieldset>
+              <legend class="label">{{ header.label }}</legend>
+              <c-table.filter :header="header" suffix="-narrow" />
+            </fieldset>
+          {% endif %}
+        {% endfor %}
+        <div>
+          <button type="submit" class="btn" data-variant="outline">{% if submit_label %}{{ submit_label }}{% else %}{% translate "Apply" %}{% endif %}</button>
+        </div>
+      </div>
+    </details>
+  </form>
 {% endif %}

@@ -28,6 +28,15 @@
    filters swap, so narrowing the list works the same whichever is showing. {% endcomment %}
 {% partialdef table %}
   <div id="applications-table" data-shape="{{ shape }}">
+    {% comment %} The phone's copy of the column filters is a form of its own, drawn with
+       the table so that it shows the question as it was last answered (#622). The board
+       has no columns to narrow by. {% endcomment %}
+    {% if shape != 'board' %}
+      {% if applications or table.filters_active %}
+        {% translate "Filter" as filter_word %}
+        {% include "partials/table/narrow.html" with submit_label=filter_word %}
+      {% endif %}
+    {% endif %}
     {% if shape == 'board' %}
       {% include "applications/partials/board.html" %}
     {% elif applications %}

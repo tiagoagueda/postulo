@@ -26,6 +26,10 @@
 
 {% partialdef table %}
   <div id="listings-table">
+    {% comment %} The phone's copy of the filters is a form of its own, drawn with the table
+       so that it shows the question as it was last answered (#622). Once there is a
+       listing, like the rest of the page's table chrome (#160). {% endcomment %}
+    {% if has_listings %}{% include "partials/table/narrow.html" %}{% endif %}
     {% if listings %}
       <c-scroll-box class="card p-0" label="{% translate 'Listings' %}">
         <table class="table">
@@ -142,11 +146,11 @@
   </nav>
 
   {% if has_listings %}
-    {% comment %} The search is the masthead's box (#313), which this form includes and which
-       includes this form; with scripts off the search in force rides along hidden. Both,
-       with every column filter, take turns on this form (`hx-sync`), the newer request
-       replacing the one in flight. {% endcomment %}
-    <form method="get" id="listing-filters" class="mb-6 flex flex-wrap items-end gap-3"
+    {% comment %} The search is the masthead's box (#313): it and this form include each other,
+       and with scripts off the search in force rides along hidden. Every live control takes
+       its turn on this form (`hx-sync`). `max-md:hidden`, because a phone filters under
+       *Narrow*, whose own button is then the one *Apply* on the page (#622). {% endcomment %}
+    <form method="get" id="listing-filters" class="mb-6 flex flex-wrap items-end gap-3 max-md:hidden"
           hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
           hx-include="[data-table-search]" hx-sync="this:replace"
           hx-target="#listings-table" hx-swap="outerHTML" hx-push-url="true">
@@ -162,7 +166,6 @@
       {% if table.filters_active %}
         <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
       {% endif %}
-      {% include "partials/table/narrow.html" %}
     </form>
   {% endif %}
 

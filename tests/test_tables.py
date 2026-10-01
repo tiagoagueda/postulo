@@ -657,7 +657,9 @@ def test_the_text_columns_sort_and_an_identifier_sorts_and_narrows(client, user,
 
 
 def test_the_first_non_empty_answer_under_a_name_wins(client, user, search):
-    """The header row and the phone block both post the same name; the typed one counts."""
+    """A page posts each filter once now (#622), but the addresses written before it did --
+    bookmarks, saved views -- hold every filter twice, one of them empty, and still open as
+    they did."""
     client.force_login(user)
     url = reverse("jobs:company_list")
 
@@ -671,7 +673,130 @@ def test_a_phone_can_reach_every_filter(client, user, search):
     for url in (reverse("jobs:company_list"), reverse("applications:list")):
         html = client.get(url).content.decode()
         assert "data-narrow" in html
-        assert 'class="w-full md:hidden"' in html, "folded away where the header row shows"
+        assert 'class="mb-4 md:hidden" data-narrow-form' in html, (
+            "folded away where the header row shows"
+        )
     companies = client.get(reverse("jobs:company_list")).content.decode()
     assert 'id="filter-location-narrow"' in companies
     assert 'name="applications_min"' in companies and 'name="applications_max"' in companies
+
+
+# ------------------------------------------------- one control for one name (#622)
+
+#: Each table page, its filter form, the element its swaps replace, and an address that
+#: holds a filter of every kind the page's default columns have, a sort and a search.
+POSTED_ONCE = {
+    "jobs:company_list": (
+        "company-filters",
+        "companies-table",
+        {"name": "aperture", "applications_min": "1", "sort": "-name", "q": "a"},
+    ),
+    "listings:list": (
+        "listing-filters",
+        "listings-table",
+        {"title": "engineer", "company": "aperture", "sort": "-title", "state": "all"},
+    ),
+    "applications:list": (
+        "application-filters",
+        "applications-table",
+        {"company": "aperture", "applied_from": "2020-01-01", "sort": "role", "status": "applied"},
+    ),
+}
+
+
+#: What the tests call the *Narrow* block's form, which has no id of its own.
+NARROW = "the Narrow form"
+
+
+def form_of(control: dict) -> str:
+    """Which form a control is posted with: the one it names with `form=`, or the one it is
+    written in -- by its id, or as `NARROW` for the phone block's, which has none."""
+    if control.get("form"):
+        return control["form"]
+    written_in = control["_form"] or {}
+    return NARROW if "data-narrow-form" in written_in else written_in.get("id", "")
+
+
+def posted_by(found, form: str) -> list[str]:
+    """The names a form posts, one per control, whatever is in a `<noscript>` included:
+    that is posted too, with scripts off."""
+    return [c["name"] for c in found.inputs if c.get("name") and form_of(c) == form]
+
+
+@pytest.mark.parametrize("url_name", POSTED_ONCE)
+def test_each_filter_name_is_posted_by_one_control_only(client, user, search, url_name):
+    """Every column filter is drawn twice, in its header and in the block a phone reaches,
+    and both copies used to belong to the page's one filter form. So a form held two
+    controls of one name, and once the page had been loaded with a filter the copy nobody
+    was typing in still held it and was read first: the header's box could not change or
+    clear its own filter (#622). The two copies belong to two forms, and neither form posts
+    a name twice -- with a filter in the address, which is when it mattered."""
+    from tests.test_site_search import controls
+
+    form_id, table_id, query = POSTED_ONCE[url_name]
+    column = next(iter(query))
+    client.force_login(user)
+    for extra in ({}, HTMX):
+        body = client.get(reverse(url_name), query, **extra).content.decode()
+        found = controls(body)
+
+        for form in (form_id, NARROW):
+            posted = posted_by(found, form)
+            assert posted.count(column) == 1, (form, posted)
+            doubled = sorted({name for name in posted if posted.count(name) > 1})
+            assert not doubled, f"{form} posts a name twice: {doubled}"
+
+        # The phone's copies are its own form's: not live, and applied by its own button.
+        narrow = next(f for f in found.forms if "data-narrow-form" in f)
+        held = [i for i in found.inputs if form_of(i) == NARROW]
+        assert all(i["_form"] is narrow for i in held), "written in it, naming no other form"
+        assert not any("hx-get" in i for i in held), "none is live"
+        assert narrow["method"] == "get" and narrow["action"] == reverse(url_name)
+        assert not any(name.startswith("hx-") for name in narrow), "a page load, not a swap"
+        submits = [b for b in found.buttons if b["_form"] is narrow and b.get("type") == "submit"]
+        assert len(submits) == 1 and "form" not in submits[0]
+
+        # It carries the rest of the question hidden, and holds the address's own values.
+        fields = {i["name"]: i.get("value") for i in held if i.get("type") != "hidden"}
+        kept = {i["name"]: i["value"] for i in held if i.get("type") == "hidden"}
+        assert kept == {name: value for name, value in query.items() if name not in fields}
+        assert fields[column] == query[column]
+
+        # And it is drawn with the table, so a swap brings it back with the answer's values.
+        assert body.index(f'id="{table_id}"') < body.index("data-narrow-form")
+
+
+def test_the_narrow_form_leaves_out_the_page_and_the_saved_view(rf, user):
+    """A new question starts at the first page, and is no longer the one a view was kept
+    as; an empty value narrows nothing and is not carried either."""
+    request = rf.get(
+        "/",
+        {"name": "x", "sort": "-name", "q": "a", "page": "3", "saved": "mine", "group": ""},
+    )
+    table = CompaniesTable(request, {})
+    assert "name" in table.narrow_names and "applications_min" in table.narrow_names
+    assert sorted(table.narrow_keeps) == [("q", "a"), ("sort", "-name")]
+
+
+@pytest.mark.parametrize(
+    ("url_name", "form_id"),
+    [("jobs:company_list", "company-filters"), ("listings:list", "listing-filters")],
+)
+def test_the_pages_own_apply_is_not_drawn_where_narrow_is(client, user, search, url_name, form_id):
+    """Below `md` the filters are under *Narrow*, which has a button of its own under its
+    fields. The page's filter form drew an *Apply* above the block as well, so a phone had
+    two, and the upper one sent the form that holds nothing entered under *Narrow* (#622).
+    The two take the width in turns: the page's form is drawn from `md` up and the block
+    below it, and the form is still on the page for the headers' controls to belong to."""
+    from tests.test_site_search import controls
+
+    client.force_login(user)
+    found = controls(client.get(reverse(url_name), {"state": "all"}).content.decode())
+    form = next(f for f in found.forms if f.get("id") == form_id)
+    narrow = next(f for f in found.forms if "data-narrow-form" in f)
+
+    assert "max-md:hidden" in form["class"].split()
+    assert "md:hidden" in narrow["class"].split()
+    (button,) = [b for b in found.buttons if b["_form"] is form]
+    assert button["type"] == "submit", "still the form's, for Enter in a header's box"
+    assert any(form_of(i) == form_id and "hx-get" in i for i in found.inputs)

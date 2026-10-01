@@ -206,3 +206,341 @@ def test_the_filter_opens_and_applies_with_no_script_at_all(
         expect(page.get_by_label("Location is filtered")).to_be_visible()
     finally:
         context.close()
+
+
+# ------------------------------------------- a filter the page was loaded with (#622)
+
+PHONE = {"width": 390, "height": 740}
+
+
+def times_in_the_address(page: Page, name: str) -> int:
+    return len(re.findall(rf"[?&]{name}=", page.url))
+
+
+def test_a_filter_the_page_was_loaded_with_can_be_cleared_and_changed_from_its_header(
+    page: Page, live_server, applicant
+):
+    """A saved view, a bookmark, a reload after filtering, Back: each loads the page with a
+    filter in its address, and the header box for it then did nothing. The copy of the
+    filter in the phone block sat in the same form, still held the value the page came
+    with, and was read first -- so clearing the box, or typing another name, left the table
+    as it was, and only *Clear* got out. Each copy has its own form now."""
+    two_companies(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/?name=aperture")
+    rows = page.locator("#companies-table tbody tr")
+    expect(rows).to_have_count(1)
+    box = page.locator("#filter-name")
+    expect(box).to_have_value("aperture")
+
+    box.fill("")
+    expect(rows).to_have_count(2)
+    expect(page).not_to_have_url(re.compile(r"name=aperture"))
+
+    box.fill("black")
+    expect(rows).to_have_count(1)
+    expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+    expect(page).to_have_url(re.compile(r"[?&]name=black(&|$)"))
+    assert times_in_the_address(page, "name") == 1, f"posted twice: {page.url}"
+    expect(box).to_be_focused()
+
+
+def test_with_scripts_off_a_filter_the_page_was_loaded_with_can_be_changed(
+    browser: Browser, live_server, applicant
+):
+    """*Apply* posted both copies in the same order, so it was as stuck without a script."""
+    two_companies(applicant)
+    context = browser.new_context(java_script_enabled=False)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?name=aperture")
+        rows = page.locator("#companies-table tbody tr")
+        expect(rows).to_have_count(1)
+
+        page.locator("#filter-name").fill("black")
+        page.get_by_role("button", name="Apply", exact=True).click()
+        expect(rows).to_have_count(1)
+        expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+        assert times_in_the_address(page, "name") == 1, page.url
+
+        page.locator("#filter-name").fill("")
+        page.get_by_role("button", name="Apply", exact=True).click()
+        expect(rows).to_have_count(2)
+    finally:
+        context.close()
+
+
+@pytest.mark.parametrize("scripts", [True, False], ids=["scripts on", "scripts off"])
+def test_on_a_phone_narrow_changes_a_filter_the_page_was_loaded_with(
+    browser: Browser, live_server, applicant, scripts
+):
+    """The other way round, on a phone: a field changed under *Narrow* was overridden by the
+    header's copy when that one was filled as the page loaded. *Narrow* is a form of its
+    own with a button of its own, holding the question as it stands and carrying the sort,
+    so what it sends is its own fields and the rest of the address, once each."""
+    two_companies(applicant)
+    context = browser.new_context(java_script_enabled=scripts, viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?name=aperture&sort=-name")
+        rows = page.locator("#companies-table tbody tr")
+        expect(rows).to_have_count(1)
+
+        page.locator("[data-narrow] summary").click()
+        field = page.locator("#filter-name-narrow")
+        expect(field).to_have_value("aperture")
+        field.fill("mesa")
+        page.locator("[data-narrow-form]").get_by_role("button", name="Apply").click()
+
+        expect(rows).to_have_count(1)
+        expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+        expect(page).to_have_url(re.compile(r"[?&]name=mesa(&|$)"))
+        expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+        assert times_in_the_address(page, "name") == 1, page.url
+        # Both copies came back holding the answer's value.
+        expect(page.locator("#filter-name")).to_have_value("mesa")
+        page.locator("[data-narrow] summary").click()
+        expect(page.locator("#filter-name-narrow")).to_have_value("mesa")
+
+        page.locator("#filter-name-narrow").fill("")
+        page.locator("[data-narrow-form]").get_by_role("button", name="Apply").click()
+        expect(rows).to_have_count(2)
+        expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+    finally:
+        context.close()
+
+
+def test_narrow_holds_what_a_header_last_asked(browser: Browser, live_server, applicant):
+    """The block is drawn with the table, so a filter typed into a header is what its copy
+    under *Narrow* holds afterwards. Outside the swap it kept the values the page was loaded
+    with, and would have put them back."""
+    two_companies(applicant)
+    context = browser.new_context(viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?name=aperture")
+        expect(page.locator("#companies-table tbody tr")).to_have_count(1)
+
+        page.locator("#filter-name").fill("mesa")
+        expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+        page.locator("[data-narrow] summary").click()
+        expect(page.locator("#filter-name-narrow")).to_have_value("mesa")
+    finally:
+        context.close()
+
+
+# ------------------- what is entered under Narrow, and the one button that sends it (#622)
+
+
+def a_list_among_the_columns(applicant) -> None:
+    """*Kind* is a list, and is off until somebody adds it: with it on, the block holds a
+    box and a list, the two shapes a field is put back in."""
+    from postulo.core import tables
+    from postulo.jobs.models import Company
+
+    Company.objects.filter(owner=applicant, name="Black Mesa").update(kind="employment_service")
+    tables.save_settings(applicant, "companies", {"columns": ["name", "kind", "location"]})
+
+
+def test_what_is_entered_under_narrow_outlives_a_live_swap(
+    browser: Browser, live_server, applicant
+):
+    """The block is drawn with the table, so anything live that swaps the table replaces it:
+    a name typed and a kind chosen under *Narrow*, and then a search typed in the masthead,
+    came back as a folded block holding neither. What was entered and not yet applied is
+    put back in the block that replaces it, still open, and its own button then sends it
+    with the search the swap answered."""
+    two_companies(applicant)
+    a_list_among_the_columns(applicant)
+    context = browser.new_context(viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?sort=-name")
+        rows = page.locator("#companies-table tbody tr")
+        expect(rows).to_have_count(2)
+
+        page.locator("[data-narrow] > summary").click()
+        page.locator("#filter-name-narrow").fill("mesa")
+        page.locator("#filter-kind-narrow").select_option("employment_service")
+
+        # The address is pushed in the turn the table is swapped in, so once it says the
+        # search, the block on the page is the one the answer brought.
+        page.locator("[data-search-link]").click()
+        page.locator("#site-search").fill("a")
+        expect(page).to_have_url(re.compile(r"[?&]q=a(&|$)"))
+
+        # Nothing under Narrow was sent, and nothing under it was lost.
+        expect(rows).to_have_count(2)
+        assert "mesa" not in page.url and "employment_service" not in page.url, page.url
+        expect(page.locator("[data-narrow]")).to_have_attribute("open", "")
+        expect(page.locator("#filter-name-narrow")).to_have_value("mesa")
+        expect(page.locator("#filter-kind-narrow")).to_have_value("employment_service")
+        # A field nobody touched holds the answer's value, as it did.
+        expect(page.locator("#filter-location-narrow")).to_have_value("")
+
+        page.keyboard.press("Escape")
+        page.locator("[data-narrow-form]").get_by_role("button", name="Apply").click()
+        expect(rows).to_have_count(1)
+        expect(page.locator("#companies-table")).to_contain_text("Black Mesa")
+        for kept in ("name=mesa", "kind=employment_service", "q=a", "sort=-name"):
+            expect(page).to_have_url(re.compile(rf"[?&]{kept}(&|$)"))
+    finally:
+        context.close()
+
+
+def test_narrow_takes_the_answer_for_a_filter_its_header_has_changed_since(
+    browser: Browser, live_server, applicant
+):
+    """Only what the swap did not itself answer is put back. A name typed under *Narrow*
+    and then another typed into the *Name* header is one filter asked twice, and the
+    header's is the later word: the block holds what the table is narrowed by."""
+    two_companies(applicant)
+    context = browser.new_context(viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?name=a")
+        page.locator("[data-narrow] > summary").click()
+        page.locator("#filter-name-narrow").fill("aperture")
+        page.locator("#filter-location-narrow").fill("cam")
+
+        page.locator("#filter-name").fill("mesa")
+        expect(page).to_have_url(re.compile(r"[?&]name=mesa(&|$)"))
+
+        expect(page.locator("[data-narrow]")).to_have_attribute("open", "")
+        expect(page.locator("#filter-name-narrow")).to_have_value("mesa")
+        expect(page.locator("#filter-location-narrow")).to_have_value("cam")
+    finally:
+        context.close()
+
+
+def test_an_answer_that_lands_while_narrow_is_typed_in_leaves_the_hand_where_it_was(
+    browser: Browser, live_server, applicant
+):
+    """A search is answered three hundred milliseconds after its last letter and however
+    long the server takes after that, which is time enough to have opened *Narrow* and be
+    typing in it. The answer replaces the field under the hand: the letters, the focus and
+    the caret are all put back, so the next key goes where the last one did."""
+    two_companies(applicant)
+    context = browser.new_context(viewport=PHONE)
+    page = context.new_page()
+    held: list = []
+
+    def hold_the_search(route) -> None:
+        if route.request.headers.get("hx-trigger") == "site-search" and not held:
+            held.append(route)
+        else:
+            route.continue_()
+
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/")
+        page.route(re.compile(r"/jobs/companies/[?]"), hold_the_search)
+
+        page.locator("[data-search-link]").click()
+        page.locator("#site-search").fill("a")
+        page.wait_for_function("() => document.querySelector('#site-search.htmx-request')")
+        page.locator("[data-narrow] > summary").click()
+        field = page.locator("#filter-name-narrow")
+        field.click()
+        field.press_sequentially("mesa")
+        field.press("ArrowLeft")
+        assert held, "the search's request was sent, and is held"
+
+        held[0].continue_()
+        expect(page).to_have_url(re.compile(r"[?&]q=a(&|$)"))
+
+        expect(field).to_be_visible()
+        expect(field).to_be_focused()
+        expect(field).to_have_value("mesa")
+        assert field.evaluate("el => [el.selectionStart, el.selectionEnd]") == [3, 3]
+        page.keyboard.type("s")
+        expect(field).to_have_value("messa")
+    finally:
+        context.close()
+
+
+def two_listings(applicant) -> None:
+    from postulo.jobs.models import Company, JobPosting
+
+    for name, title in (("Aperture Science", "Test Engineer"), ("Black Mesa", "Researcher")):
+        company = Company.objects.get(owner=applicant, name=name)
+        JobPosting.objects.create(owner=applicant, company=company, title=title)
+
+
+#: A table page with a filter form of its own above its table: its address, the element
+#: its rows are in, the filter of its first column, what to type there, and the row left.
+ONE_BUTTON = {
+    "companies": ("/jobs/companies/", "#companies-table", "name", "mesa", "Black Mesa"),
+    "listings": ("/listings/", "#listings-table", "title", "engineer", "Test Engineer"),
+}
+
+
+@pytest.mark.parametrize("scripts", [True, False], ids=["scripts on", "scripts off"])
+@pytest.mark.parametrize("where", ONE_BUTTON)
+def test_on_a_phone_one_button_applies_the_filters_and_it_is_under_them(
+    browser: Browser, live_server, applicant, where, scripts
+):
+    """*Narrow* is where a phone filters, and its button is under its fields. The page's
+    filter form had an *Apply* of its own above the block: two buttons with one word on
+    them, and the upper one sent the page's form, which holds nothing entered under
+    *Narrow*, so it answered with every row and a block folded over what had been typed.
+    Below the width the headers take over at, the page's form draws nothing."""
+    path, table, name, typed, shown = ONE_BUTTON[where]
+    two_companies(applicant)
+    two_listings(applicant)
+    context = browser.new_context(java_script_enabled=scripts, viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}{path}")
+        rows = page.locator(f"{table} tbody tr")
+        expect(rows).to_have_count(2)
+
+        page.locator("[data-narrow] > summary").click()
+        field = page.locator(f"#filter-{name}-narrow")
+        field.fill(typed)
+
+        buttons = page.get_by_role("button", name="Apply", exact=True)
+        expect(buttons).to_have_count(1)
+        expect(
+            page.locator("[data-narrow-form]").get_by_role("button", name="Apply")
+        ).to_be_visible()
+        assert buttons.bounding_box()["y"] > field.bounding_box()["y"], "under what it sends"
+
+        buttons.click()
+        expect(page).to_have_url(re.compile(rf"[?&]{name}={typed}(&|$)"))
+        expect(rows).to_have_count(1)
+        expect(page.locator(table)).to_contain_text(shown)
+    finally:
+        context.close()
+
+
+def test_with_scripts_off_on_a_phone_enter_in_a_headers_box_still_sends_the_pages_form(
+    browser: Browser, live_server, applicant
+):
+    """The page's form is not drawn on a phone, and it is still the form the headers'
+    controls belong to. A header in force is drawn open inside the table, and Enter in its
+    box sends that form as it did: the button a browser presses for Enter is the form's
+    first, drawn or not."""
+    two_companies(applicant)
+    context = browser.new_context(java_script_enabled=False, viewport=PHONE)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/jobs/companies/?location=mexico&sort=-name")
+        expect(page.locator("#companies-table tbody tr")).to_have_count(1)
+
+        page.locator("#filter-location").fill("cambridge")
+        page.locator("#filter-location").press("Enter")
+
+        expect(page).to_have_url(re.compile(r"[?&]location=cambridge(&|$)"))
+        expect(page).to_have_url(re.compile(r"[?&]sort=-name(&|$)"))
+        expect(page.locator("#companies-table")).to_contain_text("Aperture Science")
+        assert times_in_the_address(page, "location") == 1, page.url
+    finally:
+        context.close()

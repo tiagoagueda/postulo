@@ -580,9 +580,14 @@ class Table:
     def given(self, name: str) -> str:
         """The value of one filter: the first non-empty answer under that name.
 
-        The same input is drawn twice -- in the header row, and in the block a phone can
-        reach, which the header row is hidden on -- and both belong to the form, so both
-        are posted. Whichever was typed in is the answer; the empty twin is not (#173).
+        A filter is drawn twice -- in its column's header, and in the *Narrow* block a
+        phone reaches -- and until #622 both copies belonged to one form and were posted
+        together, under one name, on the understanding that the copy nobody typed in was
+        empty. It was not, once a page had been loaded with a filter: the *Narrow* copy
+        still held that value and came first, so the header's box could not change it.
+        Each copy belongs to a form of its own now and a name is posted once. The first
+        non-empty answer is still what is read, because the addresses written before
+        then -- bookmarks, saved views -- carry every filter twice, one of them empty.
         """
         return next((value.strip() for value in self.params.getlist(name) if value.strip()), "")
 
@@ -657,6 +662,41 @@ class Table:
             (name, value)
             for name, values in self.params.lists()
             if name not in ("q", "page", SAVED)
+            for value in values
+            if value.strip()
+        ]
+
+    @property
+    def narrow_names(self) -> set[str]:
+        """The names the *Narrow* block's own controls post: one per filter it draws."""
+        names: set[str] = set()
+        for header in self.headers:
+            name, kind = header.column.name, header.column.filter
+            if kind == "date":
+                names |= {f"{name}_from", f"{name}_to"}
+            elif kind == "number":
+                names |= {f"{name}_min", f"{name}_max"}
+            elif kind:
+                names.add(name)
+        return names
+
+    @property
+    def narrow_keeps(self) -> list[tuple[str, str]]:
+        """The rest of the question, for the *Narrow* block's form (#622).
+
+        The block is a form of its own: its fields are second copies of the headers', and
+        two copies in one form post one name twice. So it carries, hidden, everything the
+        page was asked with that it has no field for -- the sort, the search, a tab, a
+        shape -- or pressing its button would narrow by its fields and forget the rest.
+        Not the page number, which a new question starts again from, nor a saved view's
+        name, which the question no longer is; and nothing empty, which narrows nothing.
+        The same rule as `search_keeps`, for the same reason.
+        """
+        own = self.narrow_names
+        return [
+            (name, value)
+            for name, values in self.params.lists()
+            if name not in own and name not in NOT_SAVED
             for value in values
             if value.strip()
         ]

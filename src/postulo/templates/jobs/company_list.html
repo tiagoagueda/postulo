@@ -24,6 +24,9 @@
 
 {% partialdef table %}
   <div id="companies-table">
+    {% comment %} The phone's copy of the filters is a form of its own, drawn with the table
+       so that it shows the question as it was last answered (#622). {% endcomment %}
+    {% if companies or table.filters_active %}{% include "partials/table/narrow.html" %}{% endif %}
     {% if companies %}
       <c-scroll-box class="card p-0" label="{% translate 'Companies' %}">
         <table class="table">
@@ -77,12 +80,12 @@
     </div>
   </div>
 
-  {% comment %} The search is the masthead's box now (#313), which this form includes and which
-     includes this form, so a search and a filter narrow together whichever moved last. With
-     scripts off the box is not in this form, so the search in force rides along hidden. And
-     both, with every column filter, take turns on this form (`hx-sync`), the newer request
-     replacing the one in flight: a slow answer never lands over a newer one. {% endcomment %}
-  <form method="get" id="company-filters" class="mb-6 flex flex-wrap items-end gap-3"
+  {% comment %} The search is the masthead's box (#313): it and this form include each other, so a
+     search and a filter narrow together, and with scripts off the search in force rides along
+     hidden. Every live control takes its turn on this form (`hx-sync`), the newest replacing the
+     one in flight. `max-md:hidden`, because a phone filters under *Narrow*, which has its own
+     button: this form's *Apply* above it was a second one that left its fields out (#622). {% endcomment %}
+  <form method="get" id="company-filters" class="mb-6 flex flex-wrap items-end gap-3 max-md:hidden"
         hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
         hx-include="[data-table-search]" hx-sync="this:replace"
         hx-target="#companies-table" hx-swap="outerHTML" hx-push-url="true">
@@ -91,7 +94,6 @@
     {% if table.filters_active %}
       <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
     {% endif %}
-    {% include "partials/table/narrow.html" %}
   </form>
 
   {% partial table %}
