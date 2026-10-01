@@ -36,12 +36,14 @@ from .base import (
     FEATURE_GROUP,
     IDENTIFIER_GROUP,
     IMPORTER_GROUP,
+    LINK_SERVICE_GROUP,
     TRANSPORT_GROUP,
     ConnectedPlugin,
     FeaturePlugin,
     IdentifierPlugin,
     ImporterPlugin,
     JobPostingData,
+    LinkServicePlugin,
     SourcePlugin,
     TransportPlugin,
 )
@@ -66,12 +68,15 @@ ENTRY_POINT_GROUP = "postulo.sources"
 #: empty group is how that is *enforced* rather than merely intended: `_load_third_party`
 #: returns nothing for one, so no package outside this process can contribute a scheme
 #: until there is a contract worth promising (#109).
+#: A **link-service** plugin is the same shape with its group open: a registry of the
+#: services a web link can be on, which a package installed beside Postulo may add to (#305).
 GROUPS = {
     "source": ENTRY_POINT_GROUP,
     "importer": IMPORTER_GROUP,
     "transport": TRANSPORT_GROUP,
     "feature": FEATURE_GROUP,
     "identifier": IDENTIFIER_GROUP,
+    "link-service": LINK_SERVICE_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -88,6 +93,7 @@ def _protocol_for(kind: str):
         "transport": TransportPlugin,
         "feature": FeaturePlugin,
         "identifier": IdentifierPlugin,
+        "link-service": LinkServicePlugin,
     }.get(kind, ConnectedPlugin)
 
 

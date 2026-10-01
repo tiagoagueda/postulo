@@ -334,6 +334,120 @@
     image.src = url;
   });
 
+  // The icon beside a web link's choice of service, and the service chosen from the
+  // address (#305).
+  //
+  // The icon is an inline SVG, so unlike a flag there is no address to point an image at.
+  // The server draws every icon the choice can show and hides all but the one that goes
+  // with the saved service; this shows the one named by the chosen option's `data-icon`.
+  // With the script blocked the row is right as it loaded, and the name box still follows
+  // the select, because that is the stylesheet's doing (`data-if-other`).
+  function showServiceIcon(select) {
+    var holder = select.parentNode.querySelector("[data-service-icons]");
+    if (!holder) {
+      return;
+    }
+    var option = select.options[select.selectedIndex];
+    var wanted = option ? option.getAttribute("data-icon") : "";
+    Array.prototype.forEach.call(
+      holder.querySelectorAll("[data-service-icon]"),
+      function (drawn) {
+        drawn.hidden = drawn.getAttribute("data-service-icon") !== wanted;
+      }
+    );
+  }
+
+  // The host of what is in an address box, read as the server will read it: with no
+  // scheme typed, https is assumed.
+  function hostOfAddress(typed) {
+    var address = (typed || "").trim();
+    if (!address) {
+      return "";
+    }
+    try {
+      var whole = /^[a-z][a-z0-9+.-]*:\/\//i.test(address) ? address : "https://" + address;
+      return new URL(whole).hostname.toLowerCase();
+    } catch (error) {
+      return "";
+    }
+  }
+
+  // The service whose own host an address is on -- the host itself or a subdomain of it,
+  // the rule `Service.hosted` follows in `core/link_services.py` -- or nothing.
+  function serviceOfAddress(select, typed) {
+    var host = hostOfAddress(typed);
+    var found = "";
+    if (!host) {
+      return found;
+    }
+    Array.prototype.some.call(select.options, function (option) {
+      var mine = (option.getAttribute("data-hosts") || "").split(" ").some(function (known) {
+        return known && (host === known || host.slice(-known.length - 1) === "." + known);
+      });
+      if (mine) {
+        found = option.value;
+      }
+      return mine;
+    });
+    return found;
+  }
+
+  document.addEventListener("change", function (event) {
+    var select = event.target.closest && event.target.closest("[data-service-select]");
+    if (select) {
+      // Chosen by hand, so the address stops choosing for this row.
+      delete select.dataset.serviceGuessed;
+      showServiceIcon(select);
+    }
+  });
+
+  // An address pasted or typed into a row where no service was chosen picks the service
+  // whose host it is on, at once, so nobody chooses LinkedIn and then pastes a LinkedIn
+  // address. Saving does the same for a row left unchosen, so this is the convenience and
+  // not the rule. Only a row being added has "nothing chosen" to start from; a choice made
+  // by hand is never changed, and one this made follows the address while it is typed.
+  document.addEventListener("input", function (event) {
+    var box = event.target;
+    var row = box.closest && box.closest("[data-link-row]");
+    if (!row || box.type !== "url") {
+      return;
+    }
+    var select = row.querySelector("[data-service-select]");
+    if (!select || (select.value !== "" && !select.dataset.serviceGuessed)) {
+      return;
+    }
+    var guessed = serviceOfAddress(select, box.value);
+    select.value = guessed;
+    if (guessed) {
+      select.dataset.serviceGuessed = "1";
+    } else {
+      delete select.dataset.serviceGuessed;
+    }
+    showServiceIcon(select);
+  });
+
+  // What this chose is shown and never posted. It reads the host alone, where saving reads
+  // the host and the shape, so LinkedIn's front page, a single video and a page of
+  // settings were each chosen for here and then refused as a choice somebody had made --
+  // while saving alone, with this script blocked, files them under Other, by the rule that
+  // guessing is never how an address comes to be refused. A row still carrying this
+  // script's choice goes as it would have without it: with nothing chosen, for saving to
+  // decide. The select is put back rather than the posted value changed, so that the page
+  // Back returns to holds what was sent; the mark stays, so the address goes on choosing
+  // if the page is still here.
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form || !form.querySelectorAll) {
+      return;
+    }
+    Array.prototype.forEach.call(
+      form.querySelectorAll("[data-service-select][data-service-guessed]"),
+      function (select) {
+        select.value = "";
+      }
+    );
+  });
+
   // One identifier of each kind (#307). The server switches off, in each row's choice of
   // kind, the kinds the other rows hold -- never the row's own, never Other -- so with this
   // script blocked the rows are right as drawn. This keeps them right while somebody

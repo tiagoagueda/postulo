@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_nineteen_of_them_across_eight_kinds():
+def test_there_are_twenty_of_them_across_nine_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -159,12 +159,16 @@ def test_there_are_nineteen_of_them_across_eight_kinds():
     `identifiers` governs nothing at all, which is why its kind is ungoverned: it is a
     vocabulary rather than a behaviour, and *off* would leave every stored identifier without
     a label, a link or a check (#109).
+
+    `link-services` is the other vocabulary, and a kind of its own: the services a web link
+    can be on, which a package installed beside Postulo may add to (#305).
     """
     found = {
         manifest_of(plugin_class()).name
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
+    assert len(registry.builtins()) == 9, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -185,6 +189,7 @@ def test_there_are_nineteen_of_them_across_eight_kinds():
         "repositories",
         "websites",
         "identifiers",
+        "link-services",
         "gdpr",
     }
 

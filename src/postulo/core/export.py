@@ -70,8 +70,11 @@ from postulo import __version__
 #: printed before there was one (#308). 28 writes every language code as a BCP 47 tag in
 #: its canonical form -- ``pt-BR`` where an archive used to say ``pt-br`` -- and Serbian as
 #: ``sr-Cyrl``, which is what the list calls it now. No field moved: an older archive is
-#: read as it was written, and its codes are respelt on the way in (#337).
-FORMAT_VERSION = 28
+#: read as it was written, and its codes are respelt on the way in (#337). 29 added
+#: ``service`` on a web link, the key of the service the address is on, blank for
+#: *Other*; an archive without it has each link's service worked out from its address,
+#: and a key this instance does not know restores as *Other* (#305).
+FORMAT_VERSION = 29
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -91,8 +94,11 @@ FORMAT_VERSION = 28
 #: 2 added ``esco_uri`` on a skill (#266), which is written and never read back: it follows
 #: the name, and the importing side works it out again from the name it is given. 3 added
 #: ``form_of_address`` and ``pronouns`` on the profile, read back as the other details are:
-#: filled where blank, kept where not (#309).
-CANDIDATE_FORMAT = 3
+#: filled where blank, kept where not (#309). 4 added ``service`` on a web link (#305),
+#: read back as a claim: kept where the importing side offers that service and the address
+#: is one of its addresses, *Other* otherwise, and worked out from the address's host in a
+#: file that says nothing.
+CANDIDATE_FORMAT = 4
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -184,8 +190,9 @@ POSTAL_ADDRESS_FIELDS = (
     "is_primary",
 )
 #: What one address on the web is, in the file: every link a holder has, of every kind, in
-#: order, with the primary of each kind marked -- not the primaries alone (#189).
-WEB_LINK_FIELDS = ("kind", "label", "url", "is_primary")
+#: order, with the primary of each kind marked -- not the primaries alone (#189). The
+#: service is the key of the one the address is on, and blank for *Other* (#305).
+WEB_LINK_FIELDS = ("kind", "service", "label", "url", "is_primary")
 POSTING_FIELDS = (
     "id",
     "title",

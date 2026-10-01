@@ -16,6 +16,7 @@ class PluginsConfig(AppConfig):
         """
         from .identifiers import Identifiers
         from .installing import activate
+        from .link_services import LinkServices
         from .registry import (
             load_everything,
             register_builtin,
@@ -27,6 +28,8 @@ class PluginsConfig(AppConfig):
         # The registry of identifier schemes, registered before the catalogues are swept so
         # its own labels come from its own locale/ like every other plugin's (#109).
         register_builtin("identifier", Identifiers)
+        # And the registry of the services a web link can be on, for the same reason (#305).
+        register_builtin("link-service", LinkServices)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

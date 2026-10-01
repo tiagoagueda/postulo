@@ -12,7 +12,7 @@ from is a fact nobody should read as a rating, and `server/plugins.html` has sai
 code whatever this says"*. A green *Official* badge would undo that sentence.
 
 Colour is never the only carrier: every tag says its own word, and the word is what a screen
-reader announces. The palette repeats across the eight kinds on purpose — eight hues told
+reader announces. The palette repeats across the kinds on purpose — eight or nine hues told
 apart at a glance is more than any palette honestly gives, so kinds that are rarely seen
 together share one and lean on the word.
 """
@@ -31,6 +31,7 @@ LABELS: dict[str, str] = {
     "feature": _("Feature"),
     "transport": _("Transport"),
     "identifier": _("Identifiers"),
+    "link-service": _("Link services"),
 }
 
 #: The badge tone each kind wears: `data-tone` on a `.badge`, painted in
@@ -44,6 +45,7 @@ TONES: dict[str, str] = {
     "feature": "rose",
     "transport": "teal",
     "identifier": "violet",
+    "link-service": "blue",
 }
 
 

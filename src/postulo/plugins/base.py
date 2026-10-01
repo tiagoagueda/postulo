@@ -469,6 +469,44 @@ class IdentifierPlugin(Protocol):
     schemes: tuple
 
 
+# ---------------------------------------------------------------- link services
+
+#: Where a package that knows more services a web link can be on registers itself (#305).
+#:
+#: Open, where the identifier group is not, and the difference is what is being promised.
+#: A scheme tidies, checks digits and builds links, and its contract is not written yet. A
+#: service is a host, a pattern and a name: `LinkService` on the plugin surface is the
+#: whole of it, and there is always *Other* for an address no list knows -- so a registry
+#: somebody else wrote can add to what is offered and can refuse nothing that was accepted
+#: without it.
+LINK_SERVICE_GROUP = "postulo.link_services"
+
+
+@runtime_checkable
+class LinkServicePlugin(Protocol):
+    """A registry of the services a web link can be on.
+
+    The shape of an identifier plugin, for the same reason: it is not asked to *do*
+    anything. It answers "what does this key mean" -- a name, the kind of link, the hosts,
+    what an address there looks like, an icon -- for the social profiles, code repositories
+    and websites of a person and of their contacts.
+
+    **A service owns no rows.** ``core.WebLink`` is a core model, migrated by core, and a
+    row whose service no installed plugin knows any more reads as *Other* and keeps its
+    key, so removing a plugin loses nothing.
+
+    **It must not reach the network.** A service says what an address looks like; whether
+    the address answers is not asked, by Postulo or by a plugin.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"link-service"``.
+    kind: str
+    #: The services it contributes, each a `LinkService` from the plugin surface.
+    services: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

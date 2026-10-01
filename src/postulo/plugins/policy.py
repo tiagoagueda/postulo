@@ -58,7 +58,11 @@ GOVERNED_KINDS = ("source", "notifier", "store", "sync", "importer", "feature")
 #: is not a behaviour at all. Every other kind answers "is this on for this person"; this one
 #: answers "what does this key mean", and off would leave every stored identifier without a
 #: label, a link or a check -- which is not what off means anywhere else here (#109).
-UNGOVERNED_KINDS = ("transport", "identifier")
+#:
+#: A **link-service** plugin is the other registry, of the services a web link can be on,
+#: and is here for the identifier's reason: no person holds an opinion about what
+#: ``linkedin`` means (#305).
+UNGOVERNED_KINDS = ("transport", "identifier", "link-service")
 
 
 @dataclass(frozen=True)

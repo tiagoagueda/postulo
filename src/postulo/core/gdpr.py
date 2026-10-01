@@ -114,6 +114,7 @@ def _web_link_rows(contact) -> list[dict]:
     return [
         {
             "kind": row.kind,
+            "service": row.service,
             "label": row.label,
             "url": row.url,
             "primary": row.is_primary,

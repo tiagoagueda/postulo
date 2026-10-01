@@ -948,6 +948,11 @@ class _Planner:
                 continue
             data, wrong = self._posted(entry, ("kind", "label", "url"))
             kind = data.pop("kind", "")
+            # The service the file names is a claim (#305): believed where this instance
+            # offers it and the address is one of its addresses, *Other* where it says
+            # anything else, and where it says nothing the address says. So the form is
+            # handed a choice it can only accept, and no link is refused over its service.
+            data["service"] = links.chosen_in_a_file(entry, kind, data.get("url", ""))
             shown = data.get("url", "").strip()[:80] or _("A link with no address")
             if kind not in links.KINDS:
                 note = _problem(

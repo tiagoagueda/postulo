@@ -370,19 +370,27 @@ def test_an_export_carries_every_link_even_the_hidden_ones(user, contact):
     assert exported == [
         {
             "kind": "social",
+            "service": "",
             "label": "",
             "url": "https://www.linkedin.com/in/cave",
             "is_primary": True,
         },
         {
             "kind": "social",
+            "service": "",
             "label": "Mastodon",
             "url": "https://mastodon.example/@cave",
             "is_primary": False,
         },
     ]
     assert document["account"]["profile"]["web_links"] == [
-        {"kind": "website", "label": "", "url": "https://alex.example", "is_primary": True}
+        {
+            "kind": "website",
+            "service": "",
+            "label": "",
+            "url": "https://alex.example",
+            "is_primary": True,
+        }
     ]
     assert "linkedin_url" not in document["companies"][0]["contacts"][0]
     assert "website" not in document["account"]["profile"]
@@ -431,6 +439,8 @@ def test_the_api_keeps_the_linkedin_address_where_it_was(client, user, contact):
     assert body["web_links"] == [
         {
             "kind": "social",
+            # Read from the address, since the one field has no way to say (#305).
+            "service": "linkedin",
             "label": "",
             "url": "https://www.linkedin.com/in/caroline",
             "is_primary": True,

@@ -366,8 +366,15 @@ def fingerprint() -> str:
 
 #: What each version of the candidate document looked like. A new shape is a new line.
 #: 2 added the ESCO skill a skill's name matches, written and never read back (#266). 3
-#: added the form of address and the pronouns beside the name (#309).
-SHAPES = {1: "0941165cc7c21c64", 2: "fe525ea84b2b6f93", 3: "c1fc71fec061fadc"}
+#: added the form of address and the pronouns beside the name (#309). 4 added the service
+#: a web link is on, read back where the importing side knows it and worked out from the
+#: address in a file that does not say (#305).
+SHAPES = {
+    1: "0941165cc7c21c64",
+    2: "fe525ea84b2b6f93",
+    3: "c1fc71fec061fadc",
+    4: "bcb06c758a353ad3",
+}
 
 
 def test_a_block_that_changes_shape_is_a_new_version_of_the_file():
@@ -1130,7 +1137,10 @@ def test_links_are_sorted_by_what_they_are(somebody):
         "Web links",
     ]
     added = somebody.profile.web_links.get(kind="repository")
-    assert added.label == "Codeberg"
+    # The address says which service it is on (#305), and a name that said only that is
+    # the service's to say now: the row is Codeberg's, and is still shown as Codeberg.
+    assert (added.service, added.label) == ("codeberg", "")
+    assert added.display == "Codeberg alex"
     assert added.is_primary, "the first of its kind, so the one to show"
 
 

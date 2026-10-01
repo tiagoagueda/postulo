@@ -29,6 +29,42 @@ from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_
 #: 422 naming the field rather than kept for a template to render (#218).
 WebAddress = Annotated[str, AfterValidator(web_address)]
 
+
+def _stripped(value):
+    return value.strip() if isinstance(value, str) else value
+
+
+def _without_nul(value: str) -> str:
+    if "\x00" in value:
+        raise ValueError("Null characters are not allowed.")
+    return value
+
+
+def _line(longest: int):
+    """One line of text, on the terms a page takes it: a person's name on *Your details*,
+    what a link is called on a row.
+
+    The page strips what was typed and then measures it, and refuses a NUL character; this
+    does the same in the same order, so the two doors agree about what a value is. Before
+    it, a location of 120 characters after a space was saved by the page and refused here,
+    and a NUL was refused by the page and stored here -- where PostgreSQL, which cannot
+    hold one in text, would have answered with a 500 instead of a 422 naming the field.
+
+    **The length is written first, and that is not a matter of taste.** Each annotation
+    wraps the ones before it, so at run time the strip is still the first thing to happen.
+    But a length written after the strip is laid over the strip rather than given to the
+    string, and a string with no bound of its own is passed through unread: half a
+    surrogate pair, which pydantic otherwise refuses, then reaches the database and comes
+    back as a 500. Written first, the bound is the string's own, and the string is read.
+    """
+    return Annotated[
+        str,
+        Field(max_length=longest),
+        BeforeValidator(_stripped),
+        AfterValidator(_without_nul),
+    ]
+
+
 # ------------------------------------------------------------------ companies
 
 
@@ -70,10 +106,44 @@ class PhoneNumberOut(Schema):
 
 
 class WebLinkOut(Schema):
-    kind: str
-    label: str = ""
+    kind: str = Field(description="social, repository or website")
+    service: str = Field(
+        default="",
+        description=(
+            "The service the address is on, by its key: linkedin, mastodon, github and "
+            "the others this instance knows. Blank is Other (#305)."
+        ),
+    )
+    label: str = Field(default="", description="What the link is called, for Other")
     url: str
     is_primary: bool = False
+
+
+#: What a link is called under *Other*: as long as ``WebLink.label``, and read as the row
+#: on the page reads it. A plain string of that length kept a NUL, which PostgreSQL cannot.
+_LinkNameLine = _line(60)
+
+#: How many links one contact is handed with. The number a candidate file may hold of them
+#: (``resume.candidate.MAX_CONTACT_ROWS``): each is checked against a pattern and written
+#: in the request that brings it, and a list with no end is a request with none.
+MAX_WEB_LINKS = 20
+
+
+class WebLinkIn(Schema):
+    kind: str = Field(description="social, repository or website")
+    url: WebAddress = Field(min_length=1, max_length=500)
+    service: str = Field(
+        default="",
+        max_length=40,
+        description=(
+            "A service's key, and the address then has to be one of that service's; "
+            "'other' for any address; blank to have it worked out from the address's host."
+        ),
+    )
+    label: _LinkNameLine = Field(default="", description="What to call it, for 'other'")
+    is_primary: bool = Field(
+        default=False, description="The one of its kind to show. The first of a kind otherwise."
+    )
 
 
 class ContactOut(Schema):
@@ -138,6 +208,16 @@ class ContactIn(Schema):
     #: Saved as the contact's primary social profile (#189), and drawn as a link on the
     #: company's page, so it is checked like every other address that is (#218).
     linkedin_url: WebAddress = Field(default="", max_length=500)
+    #: The contact's links of every kind, each on a service or on none (#305). The single
+    #: address above is still taken, as a social profile, beside whatever is listed here.
+    web_links: list[WebLinkIn] = Field(
+        default_factory=list,
+        max_length=MAX_WEB_LINKS,
+        description=(
+            "Social profiles, code repositories and websites, each with its service. "
+            "Twenty at most."
+        ),
+    )
     notes: str = ""
 
 
@@ -811,40 +891,6 @@ class ProfileOut(Schema):
     updated_at: dt.datetime
 
 
-def _stripped(value):
-    return value.strip() if isinstance(value, str) else value
-
-
-def _without_nul(value: str) -> str:
-    if "\x00" in value:
-        raise ValueError("Null characters are not allowed.")
-    return value
-
-
-def _line(longest: int):
-    """One line of text about a person, on the terms *Your details* takes it.
-
-    The page strips what was typed and then measures it, and refuses a NUL character; this
-    does the same in the same order, so the two doors agree about what a value is. Before
-    it, a location of 120 characters after a space was saved by the page and refused here,
-    and a NUL was refused by the page and stored here -- where PostgreSQL, which cannot
-    hold one in text, would have answered with a 500 instead of a 422 naming the field.
-
-    **The length is written first, and that is not a matter of taste.** Each annotation
-    wraps the ones before it, so at run time the strip is still the first thing to happen.
-    But a length written after the strip is laid over the strip rather than given to the
-    string, and a string with no bound of its own is passed through unread: half a
-    surrogate pair, which pydantic otherwise refuses, then reaches the database and comes
-    back as a 500. Written first, the bound is the string's own, and the string is read.
-    """
-    return Annotated[
-        str,
-        Field(max_length=longest),
-        BeforeValidator(_stripped),
-        AfterValidator(_without_nul),
-    ]
-
-
 _NameLine = _line(_NAME)
 _AddressingLine = _line(_ADDRESSING)
 _HeadlineLine = _line(_HEADLINE)
@@ -1103,7 +1149,13 @@ def contact_out(contact) -> dict:
         ],
         "linkedin_url": _primary_link(contact, "social"),
         "web_links": [
-            {"kind": row.kind, "label": row.label, "url": row.url, "is_primary": row.is_primary}
+            {
+                "kind": row.kind,
+                "service": row.service,
+                "label": row.label,
+                "url": row.url,
+                "is_primary": row.is_primary,
+            }
             for row in contact.web_links.all()
         ],
         "notes": contact.notes,

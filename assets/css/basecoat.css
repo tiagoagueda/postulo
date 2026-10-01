@@ -330,6 +330,17 @@
   .input-group > select {
     @apply appearance-auto;
   }
+
+  /* A web link's choice of service (#305) says so again, with its own attribute, because in
+     a group the line above does not win: Basecoat strips a group's control with
+     `:is(input, textarea, select, [data-control])`, which weighs as much as its heaviest
+     argument and so outweighs `.input-group > select`. A country or a language beside its
+     flag has therefore been drawn without a chevron since #290, and is left as it is here:
+     putting it back changes three controls this issue is not about. The service is the
+     first thing in its row and has to read as a choice, not as a box to type in. */
+  .input-group > select[data-service-select] {
+    @apply appearance-auto;
+  }
 }
 
 /*

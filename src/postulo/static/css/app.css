@@ -685,6 +685,9 @@
   .flex-1 {
     flex: 1;
   }
+  .flex-none {
+    flex: none;
+  }
   .shrink {
     flex-shrink: 1;
   }
@@ -1560,6 +1563,9 @@
     .sm\:col-span-2 {
       grid-column: span 2 / span 2;
     }
+    .sm\:w-36 {
+      width: calc(var(--spacing) * 36);
+    }
     .sm\:w-64 {
       width: calc(var(--spacing) * 64);
     }
@@ -1575,8 +1581,14 @@
     .sm\:min-w-auto {
       min-width: auto;
     }
+    .sm\:flex-1 {
+      flex: 1;
+    }
     .sm\:flex-\[1_1_19rem\] {
       flex: 1 1 19rem;
+    }
+    .sm\:flex-none {
+      flex: none;
     }
     .sm\:basis-36 {
       flex-basis: calc(var(--spacing) * 36);
@@ -1598,9 +1610,6 @@
     }
     .sm\:grid-cols-\[10rem_1fr\] {
       grid-template-columns: 10rem 1fr;
-    }
-    .sm\:grid-cols-\[minmax\(0\,1fr\)_auto\] {
-      grid-template-columns: minmax(0,1fr) auto;
     }
     .sm\:grid-cols-\[minmax\(0\,9rem\)_minmax\(0\,1fr\)\] {
       grid-template-columns: minmax(0,9rem) minmax(0,1fr);
@@ -3823,6 +3832,9 @@
     }
   }
   .field > select, select.select, .input-group > select {
+    appearance: auto;
+  }
+  .input-group > select[data-service-select] {
     appearance: auto;
   }
   .field > input[type="checkbox"]:not([role="switch"]), .input[type="checkbox"]:not([role="switch"]) {

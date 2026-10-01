@@ -116,6 +116,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.site",
             "postulo.core.identifiers",
             "postulo.plugins.identifiers*",
+            # What a web link's service is, which the model reads to name a row (#305). The
+            # table Postulo ships is a feature like any other: nothing below imports it.
+            "postulo.core.link_services",
             "postulo.accounts.identifiers",
             "postulo.jobs.identifiers",
             "postulo.documents.kinds",

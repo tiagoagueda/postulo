@@ -37,6 +37,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A social profile or a code repository is on a service (LinkedIn, Mastodon, GitHub, a Forgejo instance) or *Other*: chosen first in its row, with an icon, and the address is checked against it. *Name* is asked only for *Other*. The archive and the API carry the service, and a plugin can add more. (#305)
 - Language codes are BCP 47 tags in canonical form wherever Postulo writes one: `pt-BR` and `en-GB`, not `pt-br`, and Serbian is `sr-Cyrl`. **If you read them from the API, a webhook, a store plugin or an archive, compare without regard to case or expect the new spelling.** Export format 28. (#337)
 - On *Your details*, *Primary* is a star and *Remove* a bin that asks in a dialog and takes the number, link, address or identifier off at once, without *Save* and without losing what is typed elsewhere. The number that gets you back in cannot be removed, and a copy of the page open in another tab still saves. (#303)
 - On *Companies*, *Applications* and *Listings* the masthead's search box narrows the table, with a button beside it to search everything instead; the page's own box is gone, and *Listings* can now be searched. On a phone the magnifier opens the same box. (#313)

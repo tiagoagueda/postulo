@@ -109,13 +109,27 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     summary="Add a contact at a company",
 )
 def add_contact(request, pk: int, payload: ContactIn):
+    from django.core.exceptions import ValidationError
+
     from postulo.core import phone_numbers, web_links
 
     company = _detail(request, pk)
     fields = payload.dict()
     # One LinkedIn address in the payload, as there has always been, written to the row
-    # that is the contact's primary social profile now (#189).
+    # that is the contact's primary social profile now (#189). It is read as an address
+    # with no service chosen, so its host says which it is and nothing is refused: the
+    # field has always taken whatever profile a client had (#305).
     linkedin = (fields.pop("linkedin_url", "") or "").strip()
+    links = list(fields.pop("web_links", None) or [])
+    if linkedin and not any(row["url"].strip() == linkedin for row in links):
+        leads = not any(row["kind"] == web_links.Kind.SOCIAL and row["is_primary"] for row in links)
+        links.insert(0, {"kind": web_links.Kind.SOCIAL, "url": linkedin, "is_primary": leads})
+    # Checked before anything is written: a link filed under a service has to be one of
+    # that service's addresses, and a refusal leaves no contact behind it.
+    try:
+        links = web_links.checked_rows(links)
+    except ValidationError as exc:
+        raise HttpError(422, "; ".join(exc.messages)) from exc
     # One number in the payload, as there has always been, written to the row that holds
     # it. A client sending a number somebody here already has is told so rather than
     # silently given a contact without one.
@@ -127,6 +141,5 @@ def add_contact(request, pk: int, payload: ContactIn):
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)
-    if linkedin:
-        web_links.save_only_link(contact, request.auth.owner, web_links.Kind.SOCIAL, linkedin)
+    web_links.add_links(contact, request.auth.owner, links)
     return Status(201, contact_out(contact))

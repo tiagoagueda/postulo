@@ -295,7 +295,15 @@ def _restore_web_links(holder, owner, rows: list[dict]) -> None:
     Unique per holder, so nothing here can collide with anybody else's; a repeated address
     within one import is dropped, and the first row of each kind to claim the primary
     keeps it.
+
+    **The service** (#305). Format 29 writes one on every link, blank for *Other*, and it is
+    kept where this instance knows it and the address is one of its addresses; a key it
+    does not know -- a plugin the other instance had -- restores as *Other*, which loses
+    nothing but the word. An archive from before then says nothing, and each link is read
+    as an address pasted with no service chosen: the host says which, where it says
+    anything. No row is refused either way (`web_links.chosen_in_a_file`).
     """
+    from postulo.core import link_services, web_links
     from postulo.core.models import WebLink
 
     primary_taken: set[str] = set()
@@ -309,11 +317,14 @@ def _restore_web_links(holder, owner, rows: list[dict]) -> None:
         is_primary = bool(row.get("is_primary")) and kind not in primary_taken
         if is_primary:
             primary_taken.add(kind)
+        chosen = web_links.chosen_in_a_file(row, kind, url)
+        service, label = link_services.settle(kind, chosen, url, str(row.get("label") or "")[:60])
         WebLink.objects.create(
             owner=owner,
             holder=holder,
             kind=kind,
-            label=(row.get("label") or "")[:60],
+            service=service,
+            label=label,
             url=url,
             is_primary=is_primary,
         )

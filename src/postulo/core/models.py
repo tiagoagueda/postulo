@@ -624,11 +624,24 @@ class WebLink(OwnedModel):
     :class:`PhoneNumber` gives, and the same holders -- a profile and a contact -- with the
     same cascade written on the relation (#189).
 
-    **The kind is the sort of thing, never the host.** *Social profile* rather than
-    LinkedIn, *Code repository* rather than GitHub: a list of brand names ages every time
-    somebody's Forgejo instance or the next network appears, and ``resume.LinkKind`` set
-    the precedent of describing the sort. The host is what the ``label`` is for, when
-    somebody wants to name it, and what is shown when they do not.
+    **The kind is the sort of thing, and the service is where it is.** *Social profile*
+    and *Code repository* are kinds, and they are choices on the model because there are
+    three of them and there will be three. LinkedIn and GitHub are services, and this
+    docstring used to say there would never be such a field: *the kind is the sort of
+    thing, never the host*, because a list of brand names ages every time somebody's
+    Forgejo instance or the next network appears. What changed is where the list lives,
+    not that argument (#305). ``service`` is a short key into a registry that plugins
+    supply (``core.link_services``), so the list is no model's choices and no migration's:
+    a service is added by a release or by a package installed beside Postulo, and a key
+    nothing knows any more reads as *Other* instead of failing.
+
+    **Blank is Other, and Other keeps the old freedom.** A row with no service is exactly
+    what every row was before there were services: any web address, a ``label`` when
+    somebody wants to name it, and the host shown when they do not. Under a named service
+    the address has to be one of that service's and the name is not asked for -- the
+    service and the handle are the name. The model stores what it is given; the check
+    belongs to whoever takes an address in (``core.web_links.WebLinkForm``, the API), so
+    that nothing already stored is ever refused in retrospect.
 
     **One primary per kind, per holder.** The primary is the row a CV header prints and
     the row that stays offered when the kind's feature is switched off -- so "off" is
@@ -656,11 +669,15 @@ class WebLink(OwnedModel):
     holder = GenericForeignKey("content_type", "object_id")
 
     kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices)
+    #: Not ``choices``: they would freeze a list of brands into every migration that
+    #: touches the field, and a service a plugin adds could never be one. As long as
+    #: `core.link_services.MAX_KEY_LENGTH`, written out because a migration reads it.
+    service = models.CharField(_("service"), max_length=40, blank=True)
     label = models.CharField(
         _("name"),
         max_length=60,
         blank=True,
-        help_text=_("LinkedIn, Codeberg, a blog — what to call it. Left blank, the host is shown."),
+        help_text=_("A blog, a portfolio — what to call it. Left blank, the host is shown."),
     )
     url = models.URLField(_("address"), max_length=500)
     is_primary = models.BooleanField(_("primary"), default=False)
@@ -700,12 +717,35 @@ class WebLink(OwnedModel):
 
     @property
     def display(self) -> str:
-        """What to print for it: the name somebody gave it, or failing that the host."""
-        return self.label or self.host or self.url
+        """What to print for it: the name somebody gave it; failing that its service and
+        its handle there, "GitHub alex/thing"; and failing that the host."""
+        from postulo.core import link_services
+
+        return (
+            self.label
+            or link_services.display(self.service, self.kind, self.url)
+            or self.host
+            or self.url
+        )
 
     @property
     def kind_label(self) -> str:
         return str(self.get_kind_display())
+
+    @property
+    def service_label(self) -> str:
+        """The service's name in words; *Other* for a row with none, or with one that no
+        installed plugin knows any more."""
+        from postulo.core import link_services
+
+        return link_services.label_for(self.service, self.kind)
+
+    @property
+    def icon(self) -> str:
+        """The Lucide icon the row draws: its service's, or the globe for *Other*."""
+        from postulo.core import link_services
+
+        return link_services.icon_for(self.service, self.kind)
 
 
 class ErrandState(models.TextChoices):

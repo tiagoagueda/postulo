@@ -46,6 +46,10 @@ alternative was a narrow one that was routinely ignored.
 for a plugin that sees a mail or a message about a job before anybody has applied. It is
 handed the listing, or an application whose listing it is, and takes the owner from that
 record; the plugin never says whose history it writes.
+
+**A web link is on a service now (#305)**, and the list of services is a registry a plugin
+may add to: `LinkService` is one entry, `LinkServicePlugin` what holds them, and
+`link_service_of` the read a plugin makes of a link it was handed.
 """
 
 from __future__ import annotations
@@ -76,6 +80,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.languages import matches as language_matches
     from postulo.core.languages import tag as language_tag
     from postulo.core.languages import well_formed as is_language_tag
+    from postulo.core.link_services import Service as LinkService
+    from postulo.core.link_services import find as link_service_of
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
@@ -123,6 +129,7 @@ from .base import (
     # ---------------------------------------------------- reading a file safely
     ImportRefused,
     JobPostingData,
+    LinkServicePlugin,
     Manifest,
     OutboxPlugin,
     SourcePlugin,
@@ -167,6 +174,8 @@ __all__ = [
     "InterviewOutcome",
     "JobPostingData",
     "LinkKind",
+    "LinkService",
+    "LinkServicePlugin",
     "Manifest",
     "Notification",
     "NotifierPlugin",
@@ -199,6 +208,7 @@ __all__ = [
     "language_match",
     "language_matches",
     "language_tag",
+    "link_service_of",
     "manifest_of",
     "medium_of",
     "phone_number_is_taken",
@@ -281,6 +291,15 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "primary_web_link": ("postulo.core.web_links", "primary_for"),
     "save_phone_number": ("postulo.core.phone_numbers", "save_only_number"),
     "save_web_link": ("postulo.core.web_links", "save_only_link"),
+    # ------------------------------------------------- the service a web link is on (#305)
+    # LinkedIn, a Mastodon server, somebody's Forgejo: a link's `service` is a key into a
+    # registry, and a `link-service` plugin adds entries to it. `LinkService` is one entry
+    # -- a key, a name, the kind of link, the hosts, the pattern an address's path has
+    # there, an icon and an example -- and holds no model, so a plugin builds its table at
+    # import. `link_service_of` reads one back by key, or `None` for *Other* and for a key
+    # nothing installed knows.
+    "LinkService": ("postulo.core.link_services", "Service"),
+    "link_service_of": ("postulo.core.link_services", "find"),
     # ------------------------------------------------------------------- calendar text
     # RFC 5545 for one interview, written the way Postulo's own feed writes it, so an event
     # pushed to somebody's calendar by a plugin and one they subscribed to are the same

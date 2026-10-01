@@ -10,6 +10,13 @@ Three features over one table (#189). *Social profiles*, *repositories* and *web
 three separate decisions an administrator may take differently, so each kind has its own
 plugin and its own block on the page, and this module is where a kind is matched to the
 plugin that governs it. Nothing outside it needs to know which is which.
+
+**A link is on a service** (#305): LinkedIn, a Mastodon server, somebody's Forgejo, or
+*Other*. What a service is and which exist is `core.link_services`, a registry plugins
+supply; what this module does with it is the row -- the choice, the name that is asked
+for only under *Other*, and the check that an address filed under a service is one of that
+service's addresses. The check is made where an address is taken in and never on a row
+as it is stored, so nothing is refused in retrospect.
 """
 
 from __future__ import annotations
@@ -18,6 +25,7 @@ from dataclasses import dataclass
 
 from django import forms
 from django.contrib.contenttypes import forms as generic_forms
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
@@ -25,10 +33,14 @@ from postulo.plugins.repositories import REPOSITORIES
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
+from . import link_services
 from .formsets import RowsAlreadyGone, owner_of
 from .models import WebLink
 
 Kind = WebLink.Kind
+
+#: What a row posts for *Other*, and what the stylesheet looks for to show the name box.
+OTHER = link_services.OTHER
 
 
 @dataclass(frozen=True)
@@ -235,6 +247,10 @@ def save_only_link(holder, owner, kind: str, typed: str) -> WebLink | None:
     a side effect of a switch. Nothing is promoted in its place -- a hidden link appearing
     as the visible one, because somebody emptied a field, would be the surprise this whole
     module exists to avoid.
+
+    **One box has no choice of service**, so the address says it (#305): a new address is
+    read as one pasted with nothing chosen, and takes the service whose host it is on, or
+    *Other*. That can refuse nothing. An address left as it was keeps what it had.
     """
     typed = (typed or "").strip()
     primary = primary_for(holder, kind)
@@ -255,9 +271,112 @@ def save_only_link(holder, owner, kind: str, typed: str) -> WebLink | None:
             return hidden
     if primary is None:
         primary = WebLink(owner=owner, holder=holder, kind=kind, is_primary=True)
+    if primary.url != typed:
+        primary.service, primary.label = link_services.settle(kind, "", typed, primary.label)
     primary.url = typed
     primary.save()
     return primary
+
+
+# ------------------------------------------------------- links taken in without a page
+
+
+def chosen_in_a_file(row, kind: str, url: str) -> str:
+    """What a file's word for a link's service comes to, as the choice a row would post.
+
+    A file is a claim: written by this instance last year, by another with plugins this
+    one has not, or by hand (#305). So what it says is believed only as far as this
+    instance can check it, and none of the three answers can refuse a link:
+
+    - it says **nothing** -- a file from before links had services -- and the answer is
+      nothing chosen, so the address says which service it is on;
+    - it names **a service this kind offers here, and the address is one of its
+      addresses**, and that is the service;
+    - it says **anything else** -- blank, which is how *Other* is written; a key this
+      instance does not know; a service the address is not on -- and the link is *Other*,
+      which loses nothing but the word.
+    """
+    if not isinstance(row, dict) or "service" not in row:
+        return ""
+    said = row.get("service")
+    named = link_services.find(said, kind) if isinstance(said, str) else None
+    if named is not None and named.accepts((url or "").strip()):
+        return named.key
+    return OTHER
+
+
+def checked_rows(rows) -> list[dict]:
+    """Links handed over from outside a page -- the API -- each checked as a row is (#305).
+
+    A row is a ``kind`` and a ``url``, and may say a ``service``, a ``label`` and whether
+    it ``is_primary``. The service follows the rule the page does (`link_services.settle`):
+    a named one has to be one the kind offers and the address one of its addresses,
+    ``other`` takes any address, and none at all lets the address say. What comes back is
+    what `add_links` writes; the first thing wrong is a `ValidationError` that names the
+    address it is about, and nothing has been written.
+    """
+    found: list[dict] = []
+    seen: set[str] = set()
+    for row in rows:
+        kind = str(row.get("kind") or "")
+        url = str(row.get("url") or "").strip()
+        if kind not in KINDS:
+            raise ValidationError(
+                _("“%(kind)s” is not one of the kinds of link.") % {"kind": kind[:40]},
+                code="kind",
+            )
+        if not url:
+            raise ValidationError(_("A link needs an address."), code="url")
+        if url in seen:
+            listed = _("This address is already listed.")
+            raise ValidationError(f"{url}: {listed}", code="duplicate")
+        seen.add(url)
+        try:
+            service, label = link_services.settle(
+                kind, str(row.get("service") or ""), url, str(row.get("label") or "")
+            )
+        except ValidationError as error:
+            raise ValidationError(f"{url}: {error.messages[0]}", code=error.code) from error
+        found.append(
+            {
+                "kind": kind,
+                "service": service,
+                "label": label[:60],
+                "url": url,
+                "is_primary": bool(row.get("is_primary")),
+            }
+        )
+    return found
+
+
+@transaction.atomic
+def add_links(holder, owner, rows: list[dict]) -> list[WebLink]:
+    """Write the rows `checked_rows` passed, and settle the primary of each kind.
+
+    The first row of a kind to ask for the primary gets it; where none asks, the holder
+    keeps the primary it had, and failing that its first link of the kind becomes it --
+    the rule the rows on the page follow.
+    """
+    made: list[WebLink] = []
+    wanted: dict[str, WebLink] = {}
+    for row in rows:
+        link = WebLink.objects.create(
+            owner=owner,
+            holder=holder,
+            kind=row["kind"],
+            service=row["service"],
+            label=row["label"],
+            url=row["url"],
+        )
+        made.append(link)
+        if row["is_primary"]:
+            wanted.setdefault(link.kind, link)
+    for kind in dict.fromkeys(link.kind for link in made):
+        if kind in wanted:
+            set_primary(wanted[kind])
+        else:
+            ensure_one_primary(holder, kind)
+    return made
 
 
 # ------------------------------------------------------------- the one box on a form
@@ -299,22 +418,137 @@ def save_single_boxes(form: forms.Form, holder, owner) -> None:
 # --------------------------------------------------------------- the rows on a page
 
 
+class ServiceSelect(forms.Select):
+    """The choice of service, each option saying its icon and its hosts (#305).
+
+    An ``<option>`` holds words and nothing else, so the chosen service's icon is drawn
+    beside the closed select, by the server, and ``app.js`` keeps it in step from
+    ``data-icon``. ``data-hosts`` is what lets the same script show a service the moment
+    an address is pasted into a row where none was chosen. Shown, and not posted: the host
+    is all the script reads, so the row goes with nothing chosen and saving decides, by
+    the host and the shape, as it does with the script blocked.
+    """
+
+    def __init__(self, attrs=None, choices=()):
+        super().__init__(attrs, choices)
+        #: The attributes each option carries, by the option's value. The form fills it.
+        self.facts: dict[str, dict[str, str]] = {}
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        option["attrs"].update(self.facts.get(str(value), {}))
+        return option
+
+
 class WebLinkForm(forms.ModelForm):
-    """One row: the address, and what to call it.
+    """One row: the service it is on, what to call it under *Other*, and the address.
 
     ``kind`` is not here because the formset is of one kind, and ``is_primary`` is not
     here for the reason the telephone rows give: the template renders one radio per row
     under a single name outside the formset's prefixes, so the browser enforces *exactly
     one* before anything is posted, and the formset reads the answer below.
+
+    **The service is a choice of three sorts** (#305): one of the services the kind
+    offers; *Other*, posted as ``other`` and stored as nothing; and, on a row being added,
+    nothing chosen at all, which is where a new row starts. Saved like that, the address
+    says which service it is (`link_services.settle`). A stored row has no such state:
+    posted without a choice -- by a script, by a copy of the page from before there was
+    one -- it keeps what it has.
+
+    **A kind with no services has no choice to draw**, and the field is not on its form:
+    a select holding *Other* alone would be a control that offers nothing. Websites are
+    that kind as Postulo ships, and every row of theirs is *Other*.
+
+    **Checked when it changes, and not otherwise.** A row saved again with its address
+    and its service as they were is not checked against a pattern that may have changed
+    since: nothing stored is refused in retrospect.
     """
+
+    service = forms.ChoiceField(label=_("Service"), required=False, widget=ServiceSelect)
 
     class Meta:
         model = WebLink
-        fields = ("label", "url")
+        fields = ("service", "label", "url")
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, kind: str = "", **kwargs):
         super().__init__(*args, **kwargs)
+        #: The kind of link the row is. The formset says; a row on its own carries it.
+        self.link_kind = kind or self.instance.kind
         self.fields["url"].assume_scheme = "https"
+        # Said once under the block rather than under every row, where it would stand
+        # beneath a box that is only drawn for *Other*.
+        self.fields["label"].help_text = ""
+        offered = link_services.services_for(self.link_kind)
+        if not offered:
+            del self.fields["service"]
+            return
+        stored = bool(self.instance.pk)
+        choices = [(key, service.label) for key, service in offered.items()]
+        choices.append((OTHER, _("Other")))
+        if not stored:
+            choices.insert(0, ("", "—"))
+        field = self.fields["service"]
+        field.choices = choices
+        field.widget.attrs["data-service-select"] = ""
+        field.widget.facts = {
+            "": {"data-icon": link_services.OTHER_ICON},
+            OTHER: {"data-icon": link_services.OTHER_ICON},
+            **{
+                key: {"data-icon": service.icon_name, "data-hosts": " ".join(service.hosts)}
+                for key, service in offered.items()
+            },
+        }
+        if stored:
+            # A row with no service is *Other*, and so is one whose service no installed
+            # plugin knows any more; that one keeps its key unless somebody chooses.
+            known = self.instance.service in offered
+            self.initial["service"] = self.instance.service if known else OTHER
+
+    @property
+    def service_icons(self) -> list[dict]:
+        """Every icon the row's choice can draw, and which of them is drawn now.
+
+        All of them are on the page, hidden but for the chosen service's, because the
+        script that follows the select has nowhere to fetch one from: it shows the one
+        that is already there.
+        """
+        if "service" not in self.fields:
+            return []
+        facts = self.fields["service"].widget.facts
+        chosen = facts.get(self["service"].value() or "", {}).get("data-icon")
+        names = dict.fromkeys(fact["data-icon"] for fact in facts.values())
+        return [{"name": name, "shown": name == chosen} for name in names]
+
+    def clean(self):
+        data = super().clean()
+        url = data.get("url")
+        if not url or self.has_error("service"):
+            return data
+        kind = self.link_kind
+        stored = bool(self.instance.pk)
+        kept = self.instance.service if stored else ""
+        known = link_services.find(kept, kind) is not None
+        # What a stored row is drawn with, and so what it posts back when nobody chooses.
+        as_drawn = kept if known else OTHER
+        chosen = data.get("service") or (as_drawn if stored else "")
+        forgotten = bool(kept) and not known
+        if stored and chosen == as_drawn and (forgotten or "url" not in self.changed_data):
+            # As it was: an address and a service nobody touched are not checked again,
+            # and a service nothing knows any more is kept for the day it comes back. A
+            # name left on a row whose service says it already goes, as it does for a
+            # telephone number or an identifier (#284).
+            data["service"] = kept
+            data["label"] = "" if known else data.get("label", "")
+            return data
+        try:
+            data["service"], data["label"] = link_services.settle(
+                kind, chosen, url, data.get("label", "")
+            )
+        except ValidationError as error:
+            # Beside the address when the address is what is wrong with it.
+            beside = "service" if error.code == "service" and "service" in self.fields else "url"
+            self.add_error(beside, error)
+        return data
 
 
 class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet):
@@ -387,8 +621,12 @@ def formset_for(holder, kind: str, *, data=None, prefix: str | None = None):
         extra=1,
         can_delete=True,
     )
-    formset = factory(data=data, instance=holder, prefix=prefix or block.prefix)
+    formset = factory(
+        data=data, instance=holder, prefix=prefix or block.prefix, form_kwargs={"kind": kind}
+    )
     formset.kind = kind
+    # Whether a row has a service to choose: the template draws the select only then.
+    formset.has_services = bool(link_services.services_for(kind))
     # Read by the template: the legend, the sentence under it, the kept-back note.
     formset.block = block
     # The holder's rows of every kind come back from the relation; only this kind's belong

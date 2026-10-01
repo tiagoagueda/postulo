@@ -120,6 +120,10 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "will put `Scheme` on the surface the day a third-party registry is a promise"
         ),
     },
+    # The other registry, and the one that needs nothing written down: `LinkService` is on
+    # the surface, because a package installed beside Postulo may add services of its own
+    # (#305). The table Postulo ships is written the way that package would write it.
+    "link_services": {},
     "builtin": {},
     "phone_numbers": {},
     "email_addresses": {},
@@ -262,6 +266,9 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     assert reaching("postulo.plugins.phone_numbers") == {SURFACE}
     for package in ("social_profiles", "repositories", "websites"):
         assert reaching(f"postulo.plugins.{package}") == {SURFACE}, package
+    # And a third: a registry of link services is a table, built from one name on the
+    # surface (#305).
+    assert reaching("postulo.plugins.link_services") == {SURFACE}
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():
@@ -461,6 +468,39 @@ def test_a_plugin_binds_to_the_listing_of_a_record_it_holds_and_never_chooses_th
     with pytest.raises(TypeError):
         api.record_listing_event(company, summary="Not a listing")
     assert len(listing_history(posting)) == 1
+
+
+def test_the_surface_holds_what_a_registry_of_link_services_needs():
+    """One entry, what holds the entries, and the read of one by its key (#305).
+
+    `LinkService` is the whole contract: a plugin that adds a service imports it and nothing
+    else of Postulo's, and it holds no model, so a table of them is built when the plugin is
+    imported. It is the registry's own class and not a copy, or a service a plugin made
+    would not be one the registry recognised.
+    """
+    import re
+
+    from postulo.core import link_services
+    from postulo.plugins import api, base
+
+    for name in ("LinkService", "LinkServicePlugin", "link_service_of"):
+        assert name in api.__all__, name
+    assert api.LinkService is link_services.Service
+    assert api.LinkServicePlugin is base.LinkServicePlugin
+    assert api.link_service_of is link_services.find
+
+    made = api.LinkService(
+        "elsewhere",
+        "Elsewhere",
+        api.LinkKind.SOCIAL,
+        re.compile(r"/u/(?P<handle>[^/]+)/?"),
+        hosts=["Elsewhere.Example."],
+    )
+    assert (made.kind, made.hosts) == ("social", ("elsewhere.example",)), "read as plain values"
+    assert made.accepts("https://www.elsewhere.example/u/alex")
+    assert made.handle("https://elsewhere.example/u/alex/") == "alex"
+    assert api.link_service_of("linkedin").label == "LinkedIn"
+    assert api.link_service_of("") is None, "Other is not a service"
 
 
 def test_the_surface_hands_over_the_same_object_the_core_uses():

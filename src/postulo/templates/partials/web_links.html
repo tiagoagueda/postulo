@@ -24,19 +24,42 @@
         {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
         <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
           {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
-          {% comment %} The address on its own line, because it is the subject of the row
-             and the long thing in it; the name and the controls share the line under.
+          {% comment %} What it is first, then the address (#213, #305): the service, the
+             name where the service is Other, the address, and the star and the bin. One
+             line from `sm` up, wrapping where a line is too short for it, and a column
+             below that; the order written is the order read either way.
+
+             The name box follows the select with no script: `data-if-other` (app.css)
+             hides it unless Other is chosen or it already holds something. A kind with no
+             services -- websites -- has no select, and its name box is always there.
+
+             No width is written on the select: it is as wide as its longest option, so a
+             service's name is whole in every language. The name is a fixed width and the
+             address takes what is left: it is the longest thing in the row, and two rows
+             of one shape then line up whether or not each has a bin. The icon is the chosen
+             service's, drawn by the server, so the row is right without a script; every
+             icon the choice can draw is here, hidden, and `app.js` shows the one that
+             goes with the choice, as it does the flag beside a country (#88).
           {% endcomment %}
-          <div class="field mb-3">
-            <label for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
-            {{ row.url }}
-          </div>
-          <div class="grid gap-3 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-end">
-            <div class="field">
+          <div class="flex flex-wrap items-end gap-3" data-link-row{% if block.has_services %} data-if-other{% if row.label.value %} data-has-name{% endif %}{% endif %}>
+            {% if block.has_services %}
+              <div class="field w-full sm:w-auto sm:max-w-full sm:flex-none">
+                <label for="{{ row.service.id_for_label }}">{% translate "Service" %}</label>
+                <div class="input-group">
+                  <span data-align="start" data-service-icons>{% for drawn in row.service_icons %}<span data-service-icon="{{ drawn.name }}"{% if not drawn.shown %} hidden{% endif %}>{% icon drawn.name %}</span>{% endfor %}</span>
+                  {{ row.service }}
+                </div>
+              </div>
+            {% endif %}
+            <div class="field w-full sm:w-36 sm:flex-none"{% if block.has_services %} data-name-if-other{% endif %}>
               <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
               {{ row.label }}
             </div>
-            <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+            <div class="field w-full sm:w-auto sm:min-w-36 sm:flex-1">
+              <label for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
+              {{ row.url }}
+            </div>
+            <div class="flex flex-none flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
               {% if remove_at_once %}
                 <c-primary-choice name="{{ block.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
                 {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
@@ -66,10 +89,19 @@
     </ol>
     {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
     <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
-      {% blocktranslate trimmed %}
-        Left blank, the name is the address's host. Postulo never opens a link on its own —
-        not to check it, not for a picture.
-      {% endblocktranslate %}
+      {% if block.has_services %}
+        {% blocktranslate trimmed %}
+          Paste an address without choosing a service and saving chooses it, where the
+          address is on one Postulo knows. “Other” takes any address, and a name: left
+          blank, the name is the address's host. Postulo never opens a link on its own —
+          not to check it, not for a picture.
+        {% endblocktranslate %}
+      {% else %}
+        {% blocktranslate trimmed %}
+          Left blank, the name is the address's host. Postulo never opens a link on its own —
+          not to check it, not for a picture.
+        {% endblocktranslate %}
+      {% endif %}
     </p>
   </fieldset>
 {% endfor %}
