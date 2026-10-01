@@ -13,7 +13,20 @@
       </p>
       {% server_sidebar %}
     </aside>
-    <div class="min-w-0 flex-1">
+    {% comment %} The frame takes the screen and each page says whether it keeps a measure:
+       a page that is a form fills the `measure` block with `max-w-2xl`, one line, and this
+       column stops at 672 pixels at the start edge, beside the sidebar, so a text box is
+       622 however wide the monitor -- the measure Your details and Settings keep (#320).
+       Here on the column rather than on a wrapper in each page, because here the frame
+       can: no page under Server settings is drawn by anything but its own template.
+       Never `mx-auto`: the measure sits where reading starts, not in the middle.
+
+       A page that leaves the block empty takes the width, and should be one that wants
+       it: a table (People, Logs), a grid (Overview, Design), or rows that set a
+       description beside its controls (Plugins, and one person's plugins), which the
+       measure would leave 320 pixels for the description. A form inside such a page keeps
+       the measure on its own card, as the two on Plugins do. {% endcomment %}
+    <div class="min-w-0 flex-1 {% block measure %}{% endblock %}">
       {# A frame with a sidebar: it empties `main_width` and takes the whole screen (#198). #}
 {% block main_width %}{% endblock %}
 

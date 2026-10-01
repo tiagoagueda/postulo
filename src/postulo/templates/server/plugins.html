@@ -177,7 +177,7 @@
      never consults a catalogue -- and saying so here is the difference between "off" and
      what an administrator would otherwise assume it meant.
   {% endcomment %}
-  <details class="card mb-8">
+  <details class="card mb-8 max-w-2xl">
     <summary class="cursor-pointer font-medium">{% translate "Add a repository" %}</summary>
     <p class="mt-2 mb-4 text-sm text-ink-500 dark:text-ink-400">
       {% blocktranslate trimmed %}
@@ -361,7 +361,7 @@
       </form>
     </div>
   {% else %}
-    <form method="post" action="{% url 'server:plugin_action' %}" enctype="multipart/form-data" class="card mb-8">
+    <form method="post" action="{% url 'server:plugin_action' %}" enctype="multipart/form-data" class="card mb-8 max-w-2xl">
       {% csrf_token %}
       <input type="hidden" name="action" value="upload">
       <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">

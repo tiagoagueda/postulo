@@ -265,10 +265,10 @@
        page, a paragraph -- keeps this cap, because a wide page is not a wide paragraph.
        Inside a frame the measure is the page's own: Your details and every page of
        Settings stop at `max-w-2xl` at the start edge of the column beside the sidebar,
-       except the import's mapping, whose tables take the width (#320). The forms under
-       Server settings keep none yet, and their boxes run the width of the frame. The
-       listing form keeps this cap: two of its 768-pixel columns need a window of 1592,
-       which no breakpoint names. {% endcomment %}
+       except the import's mapping, whose tables take the width (#320). A form under
+       Server settings asks its frame for that measure in one line, and a table or a list
+       there does not (`server/base.html`). The listing form keeps this cap: two of its
+       768-pixel columns need a window of 1592, which no breakpoint names. {% endcomment %}
     <main id="main" tabindex="-1" class="mx-auto {% block main_width %}max-w-7xl{% endblock %} px-4 py-8 outline-none">
       {% include "partials/messages.html" %}
       {# `main` exists so that an area such as Settings can wrap `content` in a layout of #}

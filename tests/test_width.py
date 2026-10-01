@@ -6,8 +6,10 @@ monitor a table with ten chosen columns scrolled inside a box with grey on both 
 everything else keeps the measure it had. So does a page whose parts sit side by side and
 keep a measure each, like the company form's two cards (#210), a contact's details beside
 its rows and the capture form beside its help (#320). Inside a frame with a sidebar the
-measure is the page's own, on its parts (#320). This checks the split from the rendered
-markup; `tests/e2e/test_width.py` checks what a browser makes of it at 2560 pixels.
+measure is the page's own, on its parts (#320): Your details and Settings wrap theirs, and
+a form under Server settings asks the frame for it in one line. This checks the split from
+the rendered markup; `tests/e2e/test_width.py` checks what a browser makes of it at 2560
+pixels.
 """
 
 from __future__ import annotations
@@ -128,6 +130,10 @@ class Unmeasured(HTMLParser):
     A stack of the open elements' classes, so "around it" is the element's own ancestors
     and not whatever came before it in the source. `mx-auto` is collected too: the measure
     sits at the start edge, as the company form's cards do, not in the middle (#210).
+
+    `boxes` is the text boxes among them, on their own: a page that takes the width for
+    its lists -- *Server settings -> Plugins* -- has cards with no measure on purpose, and
+    still may not have a box somebody types into without one.
     """
 
     def __init__(self) -> None:
@@ -135,6 +141,7 @@ class Unmeasured(HTMLParser):
         self.stack: list[tuple[str, list[str]]] = []
         self.inside = False
         self.missing: list[str] = []
+        self.boxes: list[str] = []
         self.centred: list[str] = []
 
     def handle_starttag(self, tag, attrs):
@@ -153,9 +160,10 @@ class Unmeasured(HTMLParser):
                 is_a_measure(name) for _, held in [*self.stack, (tag, classes)] for name in held
             )
             if not measured:
-                self.missing.append(
-                    f"<{tag} class={' '.join(classes)!r} name={attributes.get('name')!r}>"
-                )
+                what = f"<{tag} class={' '.join(classes)!r} name={attributes.get('name')!r}>"
+                self.missing.append(what)
+                if is_box:
+                    self.boxes.append(what)
         if "mx-auto" in classes:
             self.centred.append(f"<{tag} class={' '.join(classes)!r}>")
         if tag not in VOID:
@@ -244,10 +252,115 @@ def test_the_detector_knows_a_measured_card_from_one_that_is_not():
     assert not unmeasured(page + "</main>").missing
     loose = page + '<div class="card"><input type="text" name="b"><input type="hidden" name="c">'
     assert len(unmeasured(loose + "</div></main>").missing) == 2  # the card and one box
+    assert len(unmeasured(loose + "</div></main>").boxes) == 1  # and the box, on its own
+    # A card with the measure on itself inside a column with none, as on the Plugins page.
+    own = '<main><div class="flex-1 "><ul class="card"></ul><form class="card max-w-2xl">'
+    found = unmeasured(own + '<input type="file" name="d"></form></div></main>')
+    assert len(found.missing) == 1 and not found.boxes
     assert unmeasured('<main><div class="mx-auto max-w-2xl"></div></main>').centred
     for frame in [*sorted(NOT_A_MEASURE), "max-w-screen-2xl"]:
         wide = f'<main><div class="{frame}"><div class="card"></div></div></main>'
         assert unmeasured(wide).missing, frame
+
+
+# ------------------------------------------------------------ Server settings (#320)
+
+#: The pages of Server settings that keep the measure: every one that is a form, and the
+#: record of processing, whose rows are a name over a paragraph. Each says so with one
+#: line, the `measure` block `server/base.html` puts on the column beside the sidebar.
+#: `{pk}` is somebody else's account, so the delete page draws its form and not a refusal.
+SERVER_MEASURED = [
+    "/server/sign-in/",
+    "/server/email/",
+    "/server/capture/",
+    "/server/defaults/",
+    "/server/data-protection/",
+    "/server/record-of-processing/",
+    "/server/people/{pk}/username/",
+    "/server/people/{pk}/delete/",
+    "/server/people/{pk}/recovery/",
+]
+
+#: And the ones that take the width, because the measure would cost them something: a
+#: table (People, Logs), a grid of cards (Overview, the gallery), and rows that set a
+#: description beside its controls (Plugins, and one person's plugins), where 672 pixels
+#: leave the description 320.
+SERVER_WIDE = [
+    "/server/overview/",
+    "/server/people/",
+    "/server/people/{pk}/plugins/",
+    "/server/plugins/",
+    "/server/logs/",
+    "/server/design/",
+]
+
+#: The column beside the sidebar, with whatever the page put in the `measure` block.
+SERVER_COLUMN = re.compile(r'</aside>\s*<div class="min-w-0 flex-1 ([^"]*)">')
+
+
+@pytest.fixture
+def somebody_else(db, django_user_model):
+    return django_user_model.objects.create_user(
+        email="somebody.else@example.org", username="somebody-else", password="x"
+    )
+
+
+def a_server_page(client, administrator, path: str, person) -> tuple[str, str]:
+    """The page and what its column says about a measure, with the frame left uncapped."""
+    client.force_login(administrator)
+    path = path.format(pk=person.pk)
+    response = client.get(path)
+    assert response.status_code == 200, f"{path} answered {response.status_code}"
+    html = response.content.decode()
+    assert "max-w-" not in MAIN.search(html).group(1), f"{path}: the frame is capped"
+    column = SERVER_COLUMN.search(html)
+    assert column, f"{path}: no column beside the sidebar"
+    return html, column.group(1)
+
+
+@pytest.mark.parametrize("path", SERVER_MEASURED)
+def test_a_server_settings_form_keeps_the_measure(client, furnished, somebody_else, path):  # noqa: F811
+    """Sign-in, Email, Capture, Defaults and Data protection drew their boxes 2,214 pixels
+    wide at 2560, and the three pages about one person centred a column of their own in
+    that width. Each now stops at `max-w-2xl` at the start edge of the column beside the
+    sidebar, with one line in its template and nothing of its own to centre (#320)."""
+    html, measure = a_server_page(client, furnished["applicant"], path, somebody_else)
+    assert measure == "max-w-2xl", f"{path}: the column says {measure!r}"
+    found = unmeasured(html)
+    assert not found.missing, f"{path}: no measure on {found.missing}"
+    assert not found.centred, f"{path}: centred, not at the start edge: {found.centred}"
+
+
+@pytest.mark.parametrize("path", SERVER_WIDE)
+def test_a_server_settings_table_or_list_takes_the_width(client, furnished, somebody_else, path):  # noqa: F811
+    """No measure on the column -- and no `mx-auto` in its place."""
+    html, measure = a_server_page(client, furnished["applicant"], path, somebody_else)
+    assert measure == "", f"{path}: the column says {measure!r}"
+    assert not unmeasured(html).centred, path
+
+
+def test_the_forms_on_the_plugins_page_keep_the_measure_on_their_own_card(client, furnished):  # noqa: F811
+    """Its lists take the width; *Add a repository* and the upload are forms, and their
+    boxes ran 2,214 pixels with the rest. The measure is on those two cards (#320)."""
+    me = furnished["applicant"]
+    html, _measure = a_server_page(client, me, "/server/plugins/", me)
+    found = unmeasured(html)
+    assert not found.boxes, f"no measure on {found.boxes}"
+    assert found.missing, "the lists keep the width"
+    assert '<details class="card mb-8 max-w-2xl">' in html
+    assert re.search(r'<form [^>]*enctype="multipart/form-data" class="card mb-8 max-w-2xl">', html)
+
+
+def test_every_section_of_server_settings_has_said_which_it_is():
+    """A new section is a table or a form, and somebody decides which: it joins one list."""
+    from django.urls import reverse
+
+    from postulo.core.server_sections import SECTIONS
+
+    decided = {*SERVER_MEASURED, *SERVER_WIDE}
+    assert not set(SERVER_MEASURED) & set(SERVER_WIDE)
+    for section in SECTIONS:
+        assert reverse(section.url_name) in decided, f"{section.slug} is in neither list"
 
 
 def a_contact_page(client, contact=None) -> str:

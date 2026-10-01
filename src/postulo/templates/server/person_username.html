@@ -1,29 +1,29 @@
 {% extends "server/base.html" %}
 {% load i18n %}
 
+{% block measure %}max-w-2xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
 {% block content %}
-  <div class="mx-auto max-w-md">
-    <c-page-title>
-      {% translate "Change username" %}
-      <c-slot name="subtitle">
-      {% blocktranslate trimmed with name=person.get_full_name|default:person.email current=person.username %}
-        {{ name }} signs in as <strong>{{ current }}</strong>. The new username must be free
-        on this instance; capitals do not make it different.
-      {% endblocktranslate %}
-      </c-slot>
-    </c-page-title>
-    <form method="post" novalidate>
-      {% csrf_token %}
-      {% if form.non_field_errors %}
-        <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
-      {% endif %}
-      <div class="card mb-6">
-        <c-field :field="form.username" />
-      </div>
-      <div class="flex items-center gap-3">
-        <button type="submit" class="btn">{% translate "Save" %}</button>
-        <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
-      </div>
-    </form>
-  </div>
+  <c-page-title>
+    {% translate "Change username" %}
+    <c-slot name="subtitle">
+    {% blocktranslate trimmed with name=person.get_full_name|default:person.email current=person.username %}
+      {{ name }} signs in as <strong>{{ current }}</strong>. The new username must be free
+      on this instance; capitals do not make it different.
+    {% endblocktranslate %}
+    </c-slot>
+  </c-page-title>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="card mb-6">
+      <c-field :field="form.username" />
+    </div>
+    <div class="flex items-center gap-3">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+      <a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+    </div>
+  </form>
 {% endblock %}

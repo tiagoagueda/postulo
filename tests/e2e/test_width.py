@@ -8,7 +8,9 @@ templates checks which pages empty the cap; this checks what the browser does wi
 The company form takes the screen too, as two columns from `2xl`, with the measure kept on
 its cards rather than on the page (#210): the tests after it say where the line falls
 and that it mirrors right to left. A contact's form and the capture form follow it, and
-Your details and Settings keep the same measure beside their sidebar (#320).
+Your details and Settings keep the same measure beside their sidebar (#320). So do the forms
+under Server settings, on the column the frame gives them, while its tables and lists keep
+the width.
 """
 
 from __future__ import annotations
@@ -207,7 +209,14 @@ def test_the_measure_beside_the_sidebar_mirrors_right_to_left(
     profile.save(update_fields=["language"])
     page.set_viewport_size({"width": WIDE, "height": 1200})
     sign_in(page, live_server.url)
-    for path in ("/accounts/profile/", "/settings/language/", "/settings/account/"):
+    for path in (
+        "/accounts/profile/",
+        "/settings/language/",
+        "/settings/account/",
+        # And two under Server settings, where the measure is on the frame's own column.
+        "/server/sign-in/",
+        "/server/defaults/",
+    ):
         page.goto(f"{live_server.url}{path}")
         assert page.locator("html").get_attribute("dir") == "rtl"
         parts = page.evaluate(PARTS)
@@ -217,6 +226,101 @@ def test_the_measure_beside_the_sidebar_mirrors_right_to_left(
         assert end < parts["sidebar"]["x"], f"{path}: a card under the sidebar"
         assert end > WIDE / 2, f"{path}: the cards sit at the left-hand end"
         assert all(card["width"] <= MEASURE for card in parts["cards"]), path
+
+
+# ----------------------------------------------------------- Server settings (#320)
+
+#: The pages of Server settings that keep the measure: every one that is a form, and the
+#: record of processing, whose rows are a name over a paragraph. Sign-in, Email, Capture,
+#: Defaults and Data protection drew their boxes 2,214 pixels wide at 2560; the three
+#: about one person centred a column of their own in that width. `{pk}` is somebody else's
+#: account, so the delete page draws its form and not a refusal.
+SERVER_FORMS = (
+    "/server/sign-in/",
+    "/server/email/",
+    "/server/capture/",
+    "/server/defaults/",
+    "/server/data-protection/",
+    "/server/record-of-processing/",
+    "/server/people/{pk}/username/",
+    "/server/people/{pk}/delete/",
+    "/server/people/{pk}/recovery/",
+)
+
+#: The column beside the sidebar, which is what a Server settings page puts its measure on.
+COLUMN = r"""() => {
+  const r = document.querySelector('main aside + div').getBoundingClientRect();
+  return {x: r.x, right: r.right, width: r.width};
+}"""
+
+
+@pytest.fixture
+def somebody_else(db):
+    from django.contrib.auth import get_user_model
+
+    return get_user_model().objects.create_user(
+        email="somebody.else@example.org", username="somebody-else", password="x"
+    )
+
+
+def test_the_server_settings_forms_keep_the_measure_on_a_wide_screen(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+    somebody_else,
+):
+    """At 2560 the column is the company form's 672 pixels and starts beside the sidebar,
+    not in the middle of what is left; every card is in it and no box is as wide as it."""
+    page.set_viewport_size({"width": WIDE, "height": 1200})
+    sign_in(page, live_server.url)
+    for path in SERVER_FORMS:
+        path = path.format(pk=somebody_else.pk)
+        page.goto(f"{live_server.url}{path}")
+        assert width_of(page, "main") == WIDE, f"{path}: the frame is capped"
+        parts = page.evaluate(PARTS)
+        column = page.evaluate(COLUMN)
+        assert column["width"] == MEASURE, f"{path}: the column is {column['width']} wide"
+        gap = column["x"] - parts["sidebar"]["right"]
+        assert 0 < gap < 100, f"{path}: the column starts {gap} pixels from the sidebar"
+        for card in parts["cards"]:
+            assert card["width"] <= MEASURE, f"{path}: a card {card['width']} wide"
+            assert round(card["x"]) == round(column["x"]), f"{path}: a card off the start edge"
+        for box in parts["boxes"]:
+            assert box["width"] < MEASURE, f"{path}: {box['name']} is {box['width']} wide"
+
+
+def test_the_server_settings_tables_and_lists_keep_the_width(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """A table, a grid of cards and rows that set a description beside its controls take
+    the screen, as they did. On Plugins the two forms among the lists keep the measure on
+    their own card, so no box somebody types into follows the lists across the monitor."""
+    page.set_viewport_size({"width": WIDE, "height": 1200})
+    sign_in(page, live_server.url)
+    me = furnished["applicant"]
+    for path in (
+        "/server/overview/",
+        "/server/people/",
+        f"/server/people/{me.pk}/plugins/",
+        "/server/logs/",
+        "/server/plugins/",
+    ):
+        page.goto(f"{live_server.url}{path}")
+        column = page.evaluate(COLUMN)
+        assert column["width"] > 2000, f"{path}: the column is {column['width']} wide"
+
+    # Still on Plugins. Open *Add a repository*, so its boxes are drawn and not only laid out.
+    page.locator("main details.card > summary").click()
+    parts = page.evaluate(PARTS)
+    assert max(card["width"] for card in parts["cards"]) > 2000, "the lists lost the width"
+    assert len(parts["boxes"]) >= 4, "the repository's three boxes and the package"
+    for box in parts["boxes"]:
+        assert box["width"] < MEASURE, f"{box['name']} is {box['width']} wide"
+    for form in ("main details.card", 'main form.card[enctype="multipart/form-data"]'):
+        assert width_of(page, form) == MEASURE, f"{form} lost its measure"
+        assert round(page.locator(form).bounding_box()["x"]) == round(column["x"]), form
 
 
 # ------------------------------------------------------- a contact's form (#320)
@@ -388,7 +492,12 @@ def test_the_listing_form_keeps_its_one_column(live_server, page: Page, furnishe
     assert {round(card["width"]) for card in cards} == {768}
 
 
-def test_nothing_changed_here_scrolls_sideways_on_a_phone(live_server, page: Page, furnished):  # noqa: F811
+def test_nothing_changed_here_scrolls_sideways_on_a_phone(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+    somebody_else,
+):
     """At 320 every page #320 touched is one column that fits."""
     sign_in(page, live_server.url)
     page.set_viewport_size({"width": 320, "height": 800})
@@ -398,6 +507,8 @@ def test_nothing_changed_here_scrolls_sideways_on_a_phone(live_server, page: Pag
         "/jobs/contacts/new/",
         f"/jobs/contacts/{contact.pk}/edit/",
         "/jobs/captures/new/",
+        *(path.format(pk=somebody_else.pk) for path in SERVER_FORMS),
+        "/server/plugins/",
     ):
         page.goto(f"{live_server.url}{path}")
         result = page.evaluate(SCROLLS_SIDEWAYS)
