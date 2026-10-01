@@ -2,11 +2,13 @@
 
 import datetime as dt
 
+from django.db import transaction
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
 
 from postulo.core.files import serve_private_file
+from postulo.documents import printing
 from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
 
 from ..auth import scope
@@ -14,6 +16,7 @@ from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from ..schemas import (
     CVDetailOut,
     CVOut,
+    CVPatch,
     DocumentOut,
     LetterDetailOut,
     LetterIn,
@@ -25,7 +28,58 @@ from .common import owned, owned_or_404
 router = Router(tags=["documents"], auth=scope("read"))
 
 
-def _cv_out(cv: CV, *, detail: bool = False) -> dict:
+def _rows_out(owner, key: str) -> list[dict]:
+    """The caller's own rows of one kind, as a CV may be told to print them."""
+    return [
+        {
+            "id": row.pk,
+            "label": printing.name_of(row, key),
+            "value": row.value if key == "identifiers" else printing.value_of(row, key),
+        }
+        for row in printing.offered(owner, key)
+    ]
+
+
+def _prints_out(cv: CV, *, offered: bool = True) -> dict:
+    """Which of its owner's details a CV prints (#308): each answer, what it comes to as
+    things stand, and the rows that may be chosen instead -- which are the owner's own, so
+    a client learns here every id it is allowed to send back.
+
+    **`offered` is reading, and is left out for a caller that may not read.** It is every
+    number, confirmed address, link and identifier in the caller's details, whether this CV
+    prints it or not: what `read` is for, and nothing a change to a CV changed. The answer
+    to a `PATCH` is otherwise the CV as it stands, so without this a token holding `write`
+    alone -- refused `GET /cvs/{id}` and `GET /profile` -- was handed all of it by sending
+    a `PATCH` with nothing in it. Left out rather than sent empty, because an empty list
+    says the person has no such rows, and that is a different statement.
+    """
+    printed = printing.resolve(cv.owner, cv)
+    data: dict = {}
+    for detail in printing.DETAILS:
+        row = printing.pinned(cv, detail)
+        data[detail.key] = {
+            "choice": getattr(cv, detail.choice_field),
+            # Only an id that is still the owner's to print. One that has gone is said as
+            # nothing, with `chosen` beside it, which is how the page says it too.
+            "id": row.pk if row is not None else None,
+            "printed": getattr(printed, detail.key),
+        }
+        if offered:
+            data[detail.key]["offered"] = _rows_out(cv.owner, detail.key)
+    mine = {row.pk for row in printing.offered(cv.owner, "identifiers")}
+    data["identifiers"] = {
+        "choice": cv.identifiers_choice,
+        "ids": [pk for pk in cv.pinned_identifiers.values_list("pk", flat=True) if pk in mine],
+        "printed": [f"{row.display_label} {row.value}" for row in printed.identifiers],
+    }
+    if offered:
+        data["identifiers"]["offered"] = _rows_out(cv.owner, "identifiers")
+    for name, column in printing.SWITCHES.items():
+        data[name] = getattr(cv, column)
+    return data
+
+
+def _cv_out(cv: CV, *, detail: bool = False, offered: bool = True) -> dict:
     data = {
         "id": cv.pk,
         "name": cv.name,
@@ -45,6 +99,8 @@ def _cv_out(cv: CV, *, detail: bool = False) -> dict:
             }
             for item in cv.items.select_related("content_type").order_by("order")
         ]
+        data["show_contact_details"] = cv.show_contact_details
+        data["prints"] = _prints_out(cv, offered=offered)
     return data
 
 
@@ -76,6 +132,74 @@ def list_cvs(
 @router.get("/cvs/{int:pk}", response=CVDetailOut, summary="One CV, with what it includes")
 def get_cv(request, pk: int):
     return _cv_out(owned_or_404(request, CV.objects, pk), detail=True)
+
+
+@router.patch(
+    "/cvs/{int:pk}",
+    response=CVDetailOut,
+    auth=scope("write"),
+    summary="Change what a CV prints about you",
+    # What makes a key that was not set a key that is not sent: `offered`, for a caller
+    # that may not read (`_prints_out`). Everything else in the answer is set every time.
+    exclude_unset=True,
+)
+def patch_cv(request, pk: int, payload: CVPatch):
+    """Choose which of your details one CV prints (#308).
+
+    `show_contact_details` is the master switch; `prints` holds an answer per kind of
+    detail, and a kind left out is left alone. An answer is `default` (follow your details:
+    the primary number, the account's address, the primary link of the kind, every
+    identifier), `none`, or `chosen` with the `id` of a row -- `ids` for the identifiers.
+
+    **A row has to be one of yours**: one of the ids the CV's `prints.<kind>.offered`
+    lists. Any other id is a 422, in the same words whether the row is somebody else's or
+    does not exist, and nothing is stored. So is an id sent beside `default` or `none`.
+
+    Nothing already sent changes: a version is a file, and the choice is read when the
+    next one is drawn. Answers with the CV as it now stands, as every `PATCH` here does.
+
+    **`offered` is in the answer only for a token that also holds `read`.** It lists every
+    number, confirmed address, link and identifier in your details, which is reading them
+    and not seeing what was changed; a token holding `write` alone gets each kind's
+    `choice`, `id` (or `ids`) and `printed`, and no `offered`. It may still pin a row whose
+    id it was given.
+    """
+    cv = owned_or_404(request, CV.objects, pk)
+    sent = payload.dict(exclude_unset=True)
+    answers = {
+        name: value for name, value in (sent.get("prints") or {}).items() if value is not None
+    }
+    changed: list[str] = []
+    rows = None
+    kind = ""
+    try:
+        for detail in printing.DETAILS:
+            if detail.key in answers:
+                kind, answer = detail.key, answers[detail.key]
+                printing.choose(cv, kind, answer["choice"], answer.get("id"))
+                changed += [detail.choice_field, detail.pin_field]
+        if "identifiers" in answers:
+            kind, answer = "identifiers", answers["identifiers"]
+            rows = printing.choose_identifiers(cv, answer["choice"], answer.get("ids") or [])
+            changed.append("identifiers_choice")
+    except printing.NotOffered as refused:
+        # Nothing has been saved: the answers were being put on an instance, and one that
+        # is refused takes the others in the same call with it.
+        raise HttpError(422, f"'prints.{kind}.{refused.field}' {refused}") from refused
+    for name, column in printing.SWITCHES.items():
+        if name in answers:
+            setattr(cv, column, answers[name])
+            changed.append(column)
+    if sent.get("show_contact_details") is not None:
+        cv.show_contact_details = sent["show_contact_details"]
+        changed.append("show_contact_details")
+    # The answer and the set it names are one change: both, or neither.
+    with transaction.atomic():
+        if changed:
+            cv.save(update_fields=[*changed, "updated_at"])
+        if rows is not None:
+            cv.pinned_identifiers.set(rows)
+    return _cv_out(cv, detail=True, offered=request.auth.has_scope("read"))
 
 
 @router.get("/letters", response=list[LetterOut], summary="List cover letters")

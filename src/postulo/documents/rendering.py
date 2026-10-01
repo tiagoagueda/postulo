@@ -146,42 +146,44 @@ def build_sections(cv: CV) -> list[Section]:
     return list(sections.values())
 
 
-def contact_details(owner) -> dict:
+def contact_details(owner, cv: CV | None = None) -> dict:
     """The contact block, taken from the profile rather than retyped per CV.
 
-    One number is printed, and it is the primary one: a CV header has room for the number
-    somebody should ring, not for a list. Whether *Several telephone numbers* is on for
-    this person makes no difference here — the document has always shown one, and the
-    primary is what "one" means now.
+    **Which of the profile's details, the CV says** (#308): `printing.resolve` reads its
+    answers and this is the only place they reach a document, so every renderer -- a theme,
+    the preview, the plain text, the Word file -- is handed the same ones. With no CV, or a
+    CV nobody has opened the choice on, they are what was always printed: the account's
+    address, the primary number, the primary link of each kind, every identifier and the
+    location. A letter's sender block calls this with no CV and prints what it always has.
+
+    One number is printed: a CV header has room for the number somebody should ring, not
+    for a list. Whether *Several telephone numbers* is on for this person makes no
+    difference to the default — the document has always shown one, and the primary is what
+    "one" means.
 
     The location is what was typed, or the town and country of the primary postal address
-    when nothing was (#309): `postal.printed_location`, which every reader asks.
+    when nothing was (#309): `postal.printed_location`, which every reader asks, and only
+    ever that line.
     """
-    from postulo.core import phone_numbers, postal, web_links
+    from . import printing
 
     profile = getattr(owner, "profile", None)
-    primary = phone_numbers.primary_for(profile) if profile is not None else None
-    # One link of each kind, the primary, under the names the themes have always read --
-    # a theme somebody wrote against the three columns keeps working (#189).
-    links = web_links.primaries_for(profile) if profile is not None else {}
-
-    def link(kind: str) -> str:
-        row = links.get(kind)
-        return row.url if row else ""
-
-    identifiers = list(profile.identifiers.all()) if profile is not None else []
+    printed = printing.resolve(owner, cv)
     details = {
         "name": owner.get_full_name() or owner.display_name,
-        "email": owner.email,
+        "email": printed.email,
         "headline": getattr(profile, "headline", ""),
-        "phone": primary.number if primary else "",
-        "location": postal.printed_location(profile),
-        "website": link(web_links.Kind.WEBSITE),
-        "linkedin_url": link(web_links.Kind.SOCIAL),
-        "source_repo_url": link(web_links.Kind.REPOSITORY),
+        "phone": printed.phone,
+        "location": printed.location,
+        # One link of each kind, under the names the themes have always read -- a theme
+        # somebody wrote against the three columns keeps working (#189).
+        "website": printed.website,
+        "linkedin_url": printed.social,
+        "source_repo_url": printed.repository,
         # Beside the website and the LinkedIn address, which is where a reader looks.
-        "identifiers": identifiers,
+        "identifiers": printed.identifiers,
     }
+    identifiers = printed.identifiers
     # The same details again as an ordered list, so a theme can put a *real character*
     # between them. They were separated by a CSS `::after`, and generated content is not in
     # the text a PDF hands back: an applicant tracking system, `pdftotext` or a screen
@@ -205,7 +207,30 @@ def contact_details(owner) -> dict:
     details["brief_details"] = [
         part for part in (details["email"], details["phone"], details["location"]) if part
     ]
+    # What is written beside the name, each only where the CV says so (#308): the form of
+    # address before it and the pronouns after. Keys of their own rather than folded into
+    # `name`, which a theme prints as the heading and the file's properties carry as the
+    # author -- "Dr" is how somebody is addressed, not who wrote the document.
+    details["form_of_address"] = printed.form_of_address
+    details["pronouns"] = printed.pronouns
+    # The same line as one string, for a renderer with no markup to set it in: the
+    # brackets are characters here for the reason the separator above is one.
+    details["name_line"] = _joined(
+        " ",
+        printed.form_of_address,
+        details["name"],
+        f"({printed.pronouns})" if printed.pronouns else "",
+    )
     return details
+
+
+def cv_contact(cv: CV) -> dict | None:
+    """The contact block this CV prints, or nothing where its master switch is off.
+
+    `show_contact_details` is asked first and alone decides whether there is a block at
+    all; which details are in it is the CV's choice, read by `contact_details`.
+    """
+    return contact_details(cv.owner, cv) if cv.show_contact_details else None
 
 
 def render_cv_html(cv: CV, *, nonce=None) -> str:
@@ -230,7 +255,7 @@ def render_cv_html(cv: CV, *, nonce=None) -> str:
             {
                 "cv": cv,
                 "sections": build_sections(cv),
-                "contact": contact_details(cv.owner) if cv.show_contact_details else None,
+                "contact": cv_contact(cv),
                 "document_language": document_language(cv),
                 "document_direction": document_direction(cv),
                 "document_title": document_title(cv),
@@ -363,10 +388,12 @@ def cv_outline(cv: CV) -> file_formats.Outline:
     """
     language = document_language(cv)
     with translation.override(language):
-        contact = contact_details(cv.owner) if cv.show_contact_details else None
+        contact = cv_contact(cv)
         blocks = []
         if contact:
-            blocks.append(file_formats.heading(contact["name"], 1))
+            # The name as the page sets it: alone, unless this CV prints a form of address
+            # before it or the pronouns after (#308).
+            blocks.append(file_formats.heading(contact["name_line"], 1))
             if cv.headline or contact["headline"]:
                 blocks.append(file_formats.paragraph(cv.headline or contact["headline"]))
             if contact["details"]:

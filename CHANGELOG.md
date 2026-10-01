@@ -83,7 +83,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
-- *Your name* takes a form of address and pronouns, from your career record's language or typed as *Other*; neither is printed yet. **A blank location now prints the town and country of your primary address on CVs and letters; type a location to print that instead.** The API gains `/profile`; export format 26. (#309)
+- A CV chooses which of your details it prints: which number, email address, link of each kind and identifiers, the location or not, and your form of address and pronouns if you say so. Nothing changes until you choose; a chosen detail you delete prints none. The API gains `PATCH /cvs/{id}`; export format 27. (#308)
+- *Your name* takes a form of address and pronouns, from your career record's language or typed as *Other*, printed only if a CV says so (#308). **A blank location prints the town and country of your primary address on CVs and letters; type one to print that instead.** The API gains `/profile`; export format 26. (#309)
 - A correction on the review screen is remembered where the page showed it, for that site and for you alone: your next capture from it is read there first, each such field says so, a place wrong twice in a row is dropped, and *Settings → Capture* lists and forgets them. (#267)
 - A skill keeps the ESCO skill its name is: the skill box offers the classification's names as you type, a CV in another language prints its name there where you wrote none, and the export carries it (format 24). **Skills already recorded are matched when next saved.** (#266)
 - A listing has a history: a message, an email, a call, a note, a file from your documents, or the same advert captured again elsewhere, added on its page or from the capture's review. An application shows it first on its timeline, and it is in your export (format 23). (#270)

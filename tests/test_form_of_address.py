@@ -3,7 +3,7 @@
 Two fields, because they are two questions: a form of address is written before a name,
 and pronouns say how to refer to somebody. Each is offered from a list in the language the
 career record is written in, with a box for anything else, and is stored as the text
-itself. Neither is printed anywhere yet.
+itself. Neither is printed anywhere unless a CV says so, which is #308's.
 
 And the location: blank means the town and country of the primary postal address, worked
 out whenever it is printed, through one function every reader asks.
@@ -250,9 +250,10 @@ def test_the_form_of_address_says_what_it_is_for(client, user):
     )
 
 
-def test_the_page_says_neither_is_printed_yet(client, user):
-    html = page(client, user)
-    assert "Neither is printed on your CVs or letters for now." in html
+def test_the_page_says_neither_is_printed_unless_a_cv_says_so(client, user):
+    """#308 made it a CV's own choice, and the sentence under the menus says where."""
+    html = " ".join(page(client, user).split())
+    assert "Neither is printed anywhere unless a CV's own settings say so." in html
 
 
 def test_both_menus_are_described_by_the_sentence_that_explains_them(client, user):
@@ -449,11 +450,13 @@ def test_a_menus_own_error_is_in_its_description(client, user):
     assert 'aria-describedby="name-addressing-help"' in other
 
 
-# -------------------------------------------------------------------- not printed yet
+# ------------------------------------------------------ not printed unless a CV says so
 
 
-def test_neither_is_printed_on_a_cv_yet(user):
-    """#308 lets a CV choose to print them. Until then, nothing does."""
+def test_neither_is_printed_on_a_cv_that_has_not_said_so(user):
+    """#308 lets a CV choose to print them, and a CV starts with both off: one nobody has
+    opened the choice on prints neither. What one that has said so prints is
+    `tests/test_cv_prints.py`."""
     named(user, form_of_address="Dr.ª", pronouns="elu/delu")
     cv = CV.objects.create(owner=user, name="Main")
     html = render_cv_html(cv)

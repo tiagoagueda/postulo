@@ -56,6 +56,22 @@
     </div>
   {% endif %}
 
+  {% if gone %}
+    {% comment %} A number, an address or a link this CV had chosen has been deleted from
+       *Your details*. It prints none of that kind -- never another in its place, because
+       a CV prints only what somebody chose for it -- and says so here, before the export,
+       with the way to choose again (#308). One box inside the alert, because an alert
+       sets its children side by side and these are sentences one under another. {% endcomment %}
+    <div class="alert mb-6" data-variant="warning" data-cv-gone>
+      <div class="min-w-0">
+        {% for detail in gone %}<p>{{ detail.gone }}</p>{% endfor %}
+        <p class="mt-2">
+          <a class="underline" href="{% url 'documents:cv_update' cv.pk %}">{% translate "Choose what it prints instead" %}</a>
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
   {% if classified %}
     {% comment %} A skill whose name is one of the ESCO classification's prints the name it
        gives the skill in this CV's language, where the person has written none of their own

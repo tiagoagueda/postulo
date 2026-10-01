@@ -258,8 +258,9 @@ class Profile(models.Model):
     #: -- she/her, *iel* -- as two answers, because they are two questions (#309). Each is
     #: the text itself rather than a key into `accounts.addressing`'s lists, so it survives
     #: a change of language and an *Other* is just text. Optional, never worked out from
-    #: anything, and nothing is assumed while blank. Neither is printed anywhere yet: a CV
-    #: will say whether it prints them when it chooses which of these details it carries.
+    #: anything, and nothing is assumed while blank. Neither is printed anywhere unless a
+    #: CV says so: each CV chooses which of these details it carries, and both of these
+    #: start off (#308, `documents.printing`).
     form_of_address = models.CharField(
         _("form of address"), max_length=ADDRESSING_MAX_LENGTH, blank=True
     )

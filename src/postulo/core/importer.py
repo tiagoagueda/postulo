@@ -23,7 +23,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from .export import MANIFEST_NAME, MEDIA_PREFIX
+from .export import CV_FIELDS, MANIFEST_NAME, MEDIA_PREFIX
 
 
 class ArchiveError(Exception):
@@ -354,6 +354,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         Reminder,
     )
     from postulo.core.models import Tag, TagIcon, nearest_tone
+    from postulo.documents import printing
     from postulo.documents.models import (
         CV,
         CoverLetter,
@@ -425,12 +426,15 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             continue
         # get_or_create rather than create: importing an archive twice should not raise
         # on the one-per-scheme constraint.
-        PersonIdentifier.objects.get_or_create(
-            profile=profile,
-            scheme=scheme,
-            value=value,
-            defaults={"label": row.get("label") or ""},
-        )
+        label = row.get("label") or ""
+        found = {"profile": profile, "scheme": scheme, "value": value}
+        if scheme == identifiers.OTHER:
+            # *Other* is the one scheme somebody may hold several of, and two of them can
+            # share a value under two names. Found by scheme and value alone, the second
+            # was taken for the first and never made -- and a CV that had chosen it then
+            # printed the other one (#308).
+            found["label"] = label
+        PersonIdentifier.objects.get_or_create(**found, defaults={"label": label})
 
     avatar_file = account.get("avatar_file") or ""
     if profile and avatar_file:
@@ -850,9 +854,47 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         # this held and the honest reading of an unknown one (#133).
         if cv_entry.get("kind") not in {value for value, _label in CVKind.choices}:
             cv_entry.pop("kind", None)
+        # Which of the person's details the CV prints (#308). Taken out before
+        # the row is made, and read below by what each row says.
+        prints = cv_entry.pop("prints", None)
+        # **Only what an archive is defined to carry reaches the model.** Everything left
+        # in the entry used to be handed to `create` as it stood, and a CV now has columns
+        # that point at rows: a file naming one by id -- `pinned_phone_id` -- would have
+        # had somebody else's row stored on this person's CV. A choice travels in
+        # `prints`, by content, and is looked up among the owner's own rows; a column
+        # named any other way is left out and said to have been.
+        not_carried = sorted(set(cv_entry) - set(CV_FIELDS))
+        for name in not_carried:
+            cv_entry.pop(name)
         cv = CV.objects.create(owner=user, **cv_entry)
         cvs[old_id] = cv
         report.cvs += 1
+        if not_carried:
+            # `repr`, cut short, and no more than ten of them: a key's name is whatever the
+            # file says, as long as the file likes and line breaks included, and the report
+            # is printed for the operator to read -- as the username is (#321).
+            named = ", ".join(repr(name[:40]) for name in not_carried[:10])
+            if len(not_carried) > 10:
+                named += f" and {len(not_carried) - 10} more"
+            report.skipped.append(
+                f"CV {cv.name}: {named}: not something an archive carries, and left out"
+            )
+        # A row the file names that this account does not have -- a number another account
+        # here already holds, an address that is not one of this account's confirmed ones
+        # -- leaves that kind at its default, which follows the profile. So does an answer
+        # that cannot be read at all, and it is said in the same words: what a file holds
+        # there is not something to stop an import over, and not something to pass over.
+        for kind in printing.restore(cv, prints):
+            if kind in printing.SWITCHES:
+                report.skipped.append(
+                    f"CV {cv.name}: whether it prints this ({kind}) is not said as a yes "
+                    "or no, so it is left as a new CV has it"
+                )
+                continue
+            report.skipped.append(
+                f"CV {cv.name}: what it had chosen to print ({kind}) is not among your "
+                "details here, so it follows your details instead"
+            )
 
         for item in entries:
             section = content_types.get(item.get("kind", ""))

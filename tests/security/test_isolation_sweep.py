@@ -419,6 +419,8 @@ API: dict[str, tuple[str, Callable, dict]] = {
     "postulo-api:add_event": ("post", pk_of(application), {"summary": "x"}),
     "postulo-api:set_status": ("post", pk_of(application), {"status": "applied"}),
     "postulo-api:get_cv": ("get", pk_of(cv), {}),
+    # Telling somebody else's CV what to print (#308).
+    "postulo-api:patch_cv": ("patch", pk_of(cv), {"show_contact_details": False}),
     "postulo-api:get_letter": ("get", pk_of(letter), {}),
     "postulo-api:get_interview": ("get", pk_of(interview), {}),
     "postulo-api:change_interview": ("patch", pk_of(interview), {"notes": "x"}),

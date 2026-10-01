@@ -554,8 +554,129 @@ class CVItemOut(Schema):
     included: bool
 
 
+class CVRowOut(Schema):
+    """One of the owner's own rows a CV may be told to print (#308)."""
+
+    id: int
+    label: str = Field(
+        description=(
+            "As *Your details* names it: a number with its kind, an address with the name "
+            "it was given, an identifier with its scheme"
+        )
+    )
+    value: str = Field(description="What a document prints for it")
+
+
+class CVPrintsOneOut(Schema):
+    """A kind a CV prints at most one of: a number, an address, a link of one kind."""
+
+    choice: str = Field(
+        description=(
+            "`default` follows your details (the primary, or the account's address); "
+            "`chosen` pins the row named by `id`; `none` prints none of this kind"
+        )
+    )
+    id: int | None = Field(
+        default=None,
+        description=(
+            "The row pinned while `choice` is `chosen`. Null with `chosen` means the row "
+            "has since been deleted from your details, or is kept back and not offered "
+            "at present: the CV prints none of this kind"
+        ),
+    )
+    printed: str = Field(default="", description="What the CV prints as things stand; empty: none")
+    offered: list[CVRowOut] = Field(
+        default_factory=list,
+        description=(
+            "Your own rows of this kind, any of which may be pinned. Left out of the "
+            "answer to a `PATCH` made with a token that does not hold `read`"
+        ),
+    )
+
+
+class CVPrintsIdentifiersOut(Schema):
+    choice: str = Field(
+        description=(
+            "`default` prints every identifier, including one added later; `chosen` "
+            "prints exactly the rows in `ids`; `none` prints none"
+        )
+    )
+    ids: list[int] = Field(default_factory=list)
+    printed: list[str] = Field(default_factory=list)
+    offered: list[CVRowOut] = Field(
+        default_factory=list,
+        description=(
+            "Your own identifiers, any of which may be pinned. Left out of the answer to "
+            "a `PATCH` made with a token that does not hold `read`"
+        ),
+    )
+
+
+class CVPrintsOut(Schema):
+    """Which of the owner's details a CV prints (#308). Read when the document is drawn, so
+    a version already sent is not changed by changing any of it."""
+
+    phone: CVPrintsOneOut
+    email: CVPrintsOneOut
+    social: CVPrintsOneOut
+    repository: CVPrintsOneOut
+    website: CVPrintsOneOut
+    identifiers: CVPrintsIdentifiersOut
+    location: bool = Field(
+        description="Whether the location is printed: the profile's `printed_location`"
+    )
+    form_of_address: bool = Field(description="Whether it is printed before the name")
+    pronouns: bool = Field(description="Whether they are printed after the name")
+
+
 class CVDetailOut(CVOut):
     items: list[CVItemOut]
+    show_contact_details: bool = Field(
+        description="The master switch: false prints no name and none of `prints`"
+    )
+    prints: CVPrintsOut
+
+
+class CVPrintsOneIn(Schema):
+    choice: str = Field(description="default, chosen or none")
+    id: int | None = Field(
+        default=None,
+        description=(
+            "With `chosen`: one of the ids `offered` lists, which `GET /cvs/{id}` gives. "
+            "Left out otherwise"
+        ),
+    )
+
+
+class CVPrintsIdentifiersIn(Schema):
+    choice: str = Field(description="default, chosen or none")
+    ids: list[int] = Field(
+        default_factory=list,
+        max_length=200,
+        description="With `chosen`: ids `offered` lists. Left out otherwise",
+    )
+
+
+class CVPrintsIn(Schema):
+    """A kind left out is left alone."""
+
+    phone: CVPrintsOneIn | None = None
+    email: CVPrintsOneIn | None = None
+    social: CVPrintsOneIn | None = None
+    repository: CVPrintsOneIn | None = None
+    website: CVPrintsOneIn | None = None
+    identifiers: CVPrintsIdentifiersIn | None = None
+    location: bool | None = None
+    form_of_address: bool | None = None
+    pronouns: bool | None = None
+
+
+class CVPatch(Schema):
+    """What may be changed about a CV through the API: what it prints of its owner's
+    details. A field left out is left alone."""
+
+    show_contact_details: bool | None = None
+    prints: CVPrintsIn | None = None
 
 
 class LetterOut(Schema):
@@ -643,14 +764,14 @@ class ProfileOut(Schema):
         default="",
         description=(
             "Written before the name (Mr, Mme, Eng.ª), as the text itself; blank when not "
-            "given. Not printed on any document yet."
+            "given. Printed only on a CV whose `prints.form_of_address` is true."
         ),
     )
     pronouns: str = Field(
         default="",
         description=(
             "How to refer to the person (she/her, iel), as the text itself; blank when not "
-            "given. Not printed on any document yet."
+            "given. Printed only on a CV whose `prints.pronouns` is true."
         ),
     )
     headline: str = ""

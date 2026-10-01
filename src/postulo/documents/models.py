@@ -197,6 +197,57 @@ class CVKind(models.TextChoices):
 CV_THEMES = {CVKind.CV: "plain", CVKind.PORTFOLIO: "plain"}
 
 
+class Prints(models.TextChoices):
+    """How one CV chooses the detail it prints of one kind (#308).
+
+    Three answers, and the first is what every CV did before there was a question.
+
+    **Default follows the profile.** The primary number, the account's address, the primary
+    link of a kind, every identifier: whatever *Your details* says today, read again at
+    every render, so a new primary number is printed without the CV being opened.
+
+    **Chosen pins a row**, which then stays whatever becomes primary. A pinned row that is
+    deleted from the profile -- or is no longer offered, because its feature was switched
+    off -- is replaced by nothing: the kind prints none until somebody chooses again. Not
+    by the primary, because a CV must never print a detail nobody chose for it, and the
+    person who pinned a work number may have done so to keep the other one off the page.
+
+    **None prints none of that kind**, including one recorded later.
+    """
+
+    DEFAULT = "default", _("Follow your details")
+    CHOSEN = "chosen", _("Chosen for this CV")
+    NONE = "none", _("None")
+
+
+def prints_field(verbose_name) -> models.CharField:
+    """The column one kind's answer lives in. See `Prints`."""
+    return models.CharField(verbose_name, max_length=10, choices=Prints, default=Prints.DEFAULT)
+
+
+def pinned_row(to: str, verbose_name) -> models.ForeignKey:
+    """The row a CV pins when its answer is `Prints.CHOSEN`.
+
+    `SET_NULL`, and the answer stays *chosen*: that pair -- chosen, and nothing to point at
+    -- is how the CV knows a row was deleted from under it, so its page can say so and its
+    next render prints none of that kind. No reverse name, because nothing asks a telephone
+    number which CVs print it.
+
+    **A column is not a permission.** Whose row this is gets checked where it is written
+    (the form, the API, the importer) and again where it is read: `printing.resolve` looks
+    the row up among the owner's own, so an id that reached this column some other way
+    still prints nothing.
+    """
+    return models.ForeignKey(
+        to,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="+",
+        verbose_name=verbose_name,
+    )
+
+
 class CV(DeclaresALanguage, OwnedModel):
     """A named selection of your career, aimed at a particular kind of role."""
 
@@ -219,11 +270,61 @@ class CV(DeclaresALanguage, OwnedModel):
             "Which language this variant is written in. Leave blank to follow your profile."
         ),
     )
+    #: The master switch, as it has always been: off prints no name and none of what is
+    #: chosen below, whatever those say.
     show_contact_details = models.BooleanField(
         _("include contact details"),
         default=True,
-        help_text=_("Your name, email and location, taken from your profile."),
+        help_text=_(
+            "Your name and the details chosen below, taken from your details. Unticked, "
+            "this CV prints none of them."
+        ),
     )
+
+    # --- which of the owner's details this CV prints (#308) ----------------------------
+    #
+    # One answer per kind of detail the contact block can carry, each a `Prints` and, for
+    # *chosen*, the row it pins. Every default is what a CV printed before the question
+    # existed, so a CV nobody opens the choice on is drawn exactly as it was. They are read
+    # when the document is drawn -- `printing.resolve`, from `rendering.contact_details` --
+    # and nowhere else, which is what freezes them with a PDF: a `RenderedDocument` keeps
+    # the file and the text, and nothing here reaches either afterwards.
+    phone_choice = prints_field(_("telephone number printed"))
+    pinned_phone = pinned_row("core.PhoneNumber", _("telephone number chosen"))
+    email_choice = prints_field(_("email address printed"))
+    #: allauth's row, because that is where an account's addresses are (#145). Only a
+    #: confirmed one is ever offered or printed: an address nobody has answered at may be a
+    #: typing mistake or somebody else's, and a CV is where an employer replies to.
+    pinned_email = pinned_row("account.EmailAddress", _("email address chosen"))
+    social_choice = prints_field(_("social profile printed"))
+    pinned_social = pinned_row("core.WebLink", _("social profile chosen"))
+    repository_choice = prints_field(_("code repository printed"))
+    pinned_repository = pinned_row("core.WebLink", _("code repository chosen"))
+    website_choice = prints_field(_("website printed"))
+    pinned_website = pinned_row("core.WebLink", _("website chosen"))
+    #: Any number of them, so the pin is a set. The default is every identifier, including
+    #: one added later; *chosen* is exactly the ticked ones, and one deleted from the
+    #: profile leaves the set by itself.
+    identifiers_choice = prints_field(_("identifiers printed"))
+    pinned_identifiers = models.ManyToManyField(
+        "accounts.PersonIdentifier",
+        blank=True,
+        related_name="+",
+        verbose_name=_("identifiers chosen"),
+    )
+    #: Only ever the line `core.postal.printed_location` gives: what was typed, or the
+    #: primary address's town and country. Never a street (#92, #309).
+    show_location = models.BooleanField(
+        _("print where you are"),
+        default=True,
+        help_text=_("The town and country from your details, never a street."),
+    )
+    #: Off, both of them: #309 put the two on the profile on the promise that neither is
+    #: printed until a CV says so, and this is where one does.
+    show_form_of_address = models.BooleanField(
+        _("print your form of address before your name"), default=False
+    )
+    show_pronouns = models.BooleanField(_("print your pronouns after your name"), default=False)
 
     class Meta:
         verbose_name = _("CV")

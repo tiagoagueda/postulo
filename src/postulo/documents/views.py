@@ -27,7 +27,7 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
-from . import comparing, formats, rendering, themes
+from . import comparing, formats, printing, rendering, themes
 from . import pdf as renderers
 from .forms import (
     AddCVItemsForm,
@@ -176,6 +176,10 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # The same answer the card and the header draw, asked once of the document
         # itself rather than computed a second way here (#280).
         context["document_language"] = self.object.language_name
+        # A detail this CV had chosen that is no longer in the profile: it prints none of
+        # that kind, and that is said beside the preview, before the export (#308). Only
+        # while the contact block is printed at all.
+        context["gone"] = printing.gone(self.object) if self.object.show_contact_details else ()
         return context
 
 

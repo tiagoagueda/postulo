@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "CV" %}{% endblock %}
 
@@ -12,10 +12,97 @@
         <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
-        {% for field in form %}
+        {% for field in form.settings_fields %}
           <c-field :field="field" />
         {% endfor %}
       </div>
+
+      {% comment %} Which of the person's details this CV prints (#308), in a card of its
+         own because it is a different question from how the document is set: the first
+         card is about the page, this one about its owner.
+
+         The master switch is the first thing in it and always in view, where it has always
+         been. The choosers are behind a disclosure -- a `<details>`, so it opens with no
+         script -- and it is shut while every answer is the one a CV starts with, which is
+         what it printed before there was a choice: somebody who never opens it changes
+         nothing and reads one sentence saying what that is. It is drawn open as soon as
+         anything in it was chosen, has gone or was refused, so what is not the default is
+         never out of sight. A control inside a shut disclosure is still posted, so saving
+         with it shut keeps every answer as it was.
+
+         Native selects for now; #301 is where they become Basecoat's. Each names its rows
+         the way *Your details* does, and its first choice follows the profile rather than
+         pinning a row. {% endcomment %}
+      <section class="card mb-6" aria-labelledby="cv-prints-heading" data-cv-prints>
+        <c-section-title id="cv-prints-heading">
+          {% translate "What this CV prints about you" %}
+          <c-slot name="subtitle">
+            {% url 'accounts:profile' as details_url %}
+            {% blocktranslate trimmed %}
+              Your name, and under it what is chosen here from
+              <a href="{{ details_url }}" class="underline">Your details</a>, read again
+              every time the document is drawn. Until you choose, that is your primary
+              number, your account's address, the primary link of each kind, every
+              identifier and where you are.
+            {% endblocktranslate %}
+          </c-slot>
+        </c-section-title>
+        <c-field :field="form.show_contact_details" />
+        {% if form.gone %}
+          {% comment %} A row this CV had chosen is no longer in the profile. It prints
+             none of that kind, never another in its place, and says so here; the chooser
+             below opens on *none*, so saving makes that the answer -- unless the row is
+             only kept back, where a *none* nobody chose leaves the choice as it is
+             (`CVForm.clean`). One box inside the alert, because an alert sets its
+             children side by side. {% endcomment %}
+          <div class="alert mb-4" data-variant="warning" data-cv-gone>
+            <div class="min-w-0">
+              {% for detail in form.gone %}<p>{{ detail.gone }}</p>{% endfor %}
+            </div>
+          </div>
+        {% endif %}
+        <details{% if form.choice_is_open %} open{% endif %} data-cv-choices>
+          <summary class="cursor-pointer py-1 font-medium">{% translate "Choose which details" %}</summary>
+          <p class="mt-2 mb-4 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              The first choice in each list follows your details: mark another number as
+              primary there and this CV prints it. One you choose here stays, whatever
+              becomes primary. If you later delete it from your details, this CV prints
+              none of that kind until you choose again, and never another in its place.
+              What you have already sent does not change.
+            {% endblocktranslate %}
+          </p>
+          {% for field in form.chooser_fields %}
+            <c-field :field="field" />
+          {% endfor %}
+          {% comment %} The list of identifiers belongs to one answer of the menu above it,
+             so the stylesheet shows it only while that answer is chosen (`data-if-chosen`,
+             app.css), following the select with `:has()` and no script. Ticks in a list
+             that is not showing are posted and ignored. {% endcomment %}
+          <div data-if-chosen>
+            <c-field :field="form.prints_identifiers" />
+            {% if form.identifier_rows.field.choices %}
+              <fieldset class="mb-4" data-shown-if-chosen
+                        {% if form.identifier_rows.aria_describedby %}aria-describedby="{{ form.identifier_rows.aria_describedby }}"{% endif %}>
+                <legend class="label">{{ form.identifier_rows.label }}</legend>
+                <div class="field"{% if form.identifier_rows.errors %} data-invalid="true"{% endif %}>
+                  <div class="mb-2 flex flex-col gap-y-1 text-sm">
+                    {% for checkbox in form.identifier_rows|widgets_classed:"input" %}
+                      <label class="flex items-center gap-1.5 py-0.5">
+                        {{ checkbox.tag }} <span class="min-w-0 wrap-anywhere"><bdi>{{ checkbox.choice_label }}</bdi></span>
+                      </label>
+                    {% endfor %}
+                  </div>
+                  <c-field-feedback :field="form.identifier_rows" />
+                </div>
+              </fieldset>
+            {% endif %}
+          </div>
+          <c-field :field="form.show_location" />
+          <c-field :field="form.show_form_of_address" />
+          <c-field :field="form.show_pronouns" />
+        </details>
+      </section>
       <div class="flex items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>
         <a href="{% url 'documents:cv_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>

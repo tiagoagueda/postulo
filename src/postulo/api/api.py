@@ -125,9 +125,12 @@ api = Described(
         "posting; `listings:bind` adds to a listing's history and lists the listings to "
         "choose one from, and nothing else; `read` reads everything the owner has; `write` "
         "records and changes through the same services as the forms, the owner's own "
-        "details (`/profile`) among them; `documents:read` downloads files. A `PATCH` "
+        "details (`/profile`) among them, and which of them a CV prints (`/cvs/{id}`); "
+        "`documents:read` downloads files. A `PATCH` "
         "answers with the record as it stands after the change, so a token holding `write` "
-        "sees what it changes, without holding `read`."
+        "sees what it changes, without holding `read`. What it did not change it is not "
+        "shown: the rows of the owner's details a CV may be told to print (`offered`) are "
+        "in the answer to `PATCH /cvs/{id}` only for a token that holds `read` as well."
     ),
 )
 

@@ -14,6 +14,21 @@
 
   The title and the author go to the file's properties: WeasyPrint reads them out of the
   document, so this is the only place they can be said.
+
+  **The name's line carries what this CV chose to print beside the name** (#308): the form
+  of address before it, in the name's own type, because it is read as part of the name;
+  the pronouns after it, in brackets and in small print. Each is there only where the CV
+  says so. The space and the brackets are characters for the reason the separator is one,
+  and the author in the file's properties stays the bare name: "Dr" is how somebody is
+  addressed, not who wrote the document.
+
+  **Each of the three is in a `<bdi>` of its own.** They are three things somebody typed,
+  and any of them may be in another script than the one beside it or than the document:
+  left to the line, the full stop of "Dr." before an Arabic name is drawn on the far side
+  of it (".Dr"), and that of an Arabic form of address before a Latin name on the wrong
+  side of its letter. Isolated, each is read by itself and the brackets stay the line's.
+  Only on a line that prints a form of address or pronouns: the name alone is written as
+  it always was, so a CV that prints neither is the same bytes it was.
 {% endcomment %}
 <html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
   <head>
@@ -29,14 +44,24 @@
     {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}
     {% comment %} The nonce is there on the preview page, where a browser's content security
        policy would otherwise refuse the inlined stylesheet; the PDF renderer is given none
-       and the attribute is left out (#232). {% endcomment %}
-    <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}</style>
+       and the attribute is left out (#232).
+
+       The rule for the pronouns is this base's and not each theme's, and it is written
+       only into a document that prints them (#308): a theme supplies a stylesheet and
+       extends this, so one somebody else wrote sets them as small print without having
+       heard of them, and a CV that prints none is the document it was before, byte for
+       byte. A theme that wants them otherwise overrides the block. {% endcomment %}
+    <style{% if csp_nonce %} nonce="{{ csp_nonce }}"{% endif %}>{% block page_styles %}{% endblock %}{% if contact.pronouns %}{% block pronouns_styles %}
+      /* Beside the name, in the contact line's own small print. What a theme gives the
+         name itself -- its weight, small capitals, its letter-spacing -- stays on the name. */
+      .pronouns { color: #4a4f5a; font-size: 8.5pt; font-weight: normal; font-variant: normal; letter-spacing: normal; }
+{% endblock %}{% endif %}</style>
   </head>
   <body>
 
     {% if contact %}
       <header class="contact">
-        <h1>{{ contact.name }}</h1>
+        <h1>{% if contact.form_of_address or contact.pronouns %}{% if contact.form_of_address %}<bdi class="form-of-address">{{ contact.form_of_address }}</bdi> {% endif %}<bdi>{{ contact.name }}</bdi>{% if contact.pronouns %} <span class="pronouns">(<bdi>{{ contact.pronouns }}</bdi>)</span>{% endif %}{% else %}{{ contact.name }}{% endif %}</h1>
         {% if cv.headline or contact.headline %}
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
         {% endif %}

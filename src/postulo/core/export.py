@@ -62,8 +62,13 @@ from postulo import __version__
 #: ``remembered_places`` at the top of the file: where the person's own corrections showed
 #: a field to be on a site, and how many reviews in a row each place has been wrong (#267).
 #: 26 added ``form_of_address`` and ``pronouns`` on the profile, each the text somebody
-#: chose or typed; an archive without them restores both blank (#309).
-FORMAT_VERSION = 26
+#: chose or typed; an archive without them restores both blank (#309). 27 added ``prints``
+#: on a CV: which of the profile's details it prints, kind by kind, with a chosen row named
+#: by what it says -- a number, an address, a scheme and its value, and for an identifier of
+#: the scheme *other* its name as well -- because the profile's rows carry no id in this
+#: file; an archive without it restores every choice at its default, which is what every CV
+#: printed before there was one (#308).
+FORMAT_VERSION = 27
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -599,6 +604,7 @@ def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
     from postulo.core.models import Tag
+    from postulo.documents import printing
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, Company, Contact, FieldHint
 
@@ -750,6 +756,10 @@ def build_document(user) -> dict:
     document["documents"]["cvs"] = [
         {
             **_fields(cv, CV_FIELDS),
+            # Since #308: which of the profile's details this CV prints. Written as
+            # what it prints rather than as its columns, and a chosen row by what it says,
+            # so it can be found again among the rows an import has just made.
+            "prints": printing.as_archived(cv),
             "entries": [
                 {
                     "kind": item.content_type.model,

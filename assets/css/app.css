@@ -1162,6 +1162,18 @@
   }
 
   /*
+   * And the same again for a list that belongs to one answer of a menu (#308): a group
+   * marked `data-if-chosen` hides its `[data-shown-if-chosen]` part unless its select's
+   * answer is `chosen` -- the identifiers a CV prints, which are a list to tick only while
+   * the menu above them says "only the ones ticked". The rule that hides, for the reason
+   * above: a browser that cannot read `:has()` shows the list, and ticks in a list that
+   * is not showing are posted and ignored, so nothing depends on it being hidden.
+   */
+  [data-if-chosen]:not(:has(select option[value="chosen"]:checked)) [data-shown-if-chosen] {
+    display: none;
+  }
+
+  /*
    * Fields beside one another on a line that wraps, each as wide as what is in it (#309):
    * the form of address, the name and the pronouns of *Your name*. Two things follow from
    * a field taking its width from its content, both from 640 pixels up, where they stop

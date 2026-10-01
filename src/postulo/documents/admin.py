@@ -15,6 +15,18 @@ class CVAdmin(admin.ModelAdmin):
     list_filter = ("owner", "theme")
     search_fields = ("name", "headline")
     inlines = (CVItemInline,)
+    #: The rows a CV pins (#308), as ids rather than as menus: a menu here would be every
+    #: telephone number, link, address and identifier on the instance, drawn on one page.
+    #: What is typed is still only a pointer -- a render looks the row up among the CV's
+    #: owner's own, and prints nothing for one that is not.
+    raw_id_fields = (
+        "pinned_phone",
+        "pinned_email",
+        "pinned_social",
+        "pinned_repository",
+        "pinned_website",
+        "pinned_identifiers",
+    )
 
 
 @admin.register(CoverLetter)

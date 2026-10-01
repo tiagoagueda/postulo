@@ -4,8 +4,10 @@ from __future__ import annotations
 
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import postal
 from postulo.jobs.forms import OwnerScopedModelForm
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
@@ -19,6 +21,7 @@ from .models import (
     CVItem,
     CVKind,
     LetterKind,
+    Prints,
     UploadedDocument,
 )
 
@@ -93,7 +96,41 @@ class ThemeChoiceMixin:
             self.initial["theme"] = themes.DEFAULT
 
 
+#: What is under each chooser: what the CV prints of that kind as things stand, which is
+#: what gives *your primary number* a meaning somebody can check. One sentence for every
+#: kind, with the value in a slot of its own -- a number or an address is not a word, so
+#: nothing has to agree with it.
+PRINTED_NOW = _("Printed as things stand: {value}.")
+NONE_PRINTED_NOW = _("As things stand, none is printed.")
+#: Where the profile has nothing of the kind at all: not a choice that prints nothing, but
+#: nothing to choose from, and the sentence says which.
+GIVES_NONE = _("Your details give none yet, so nothing is printed until they do.")
+#: Under the email chooser, only for an account that has an address nobody has confirmed.
+WAITS_TO_BE_CONFIRMED = _("An address of yours is offered here once it has been confirmed.")
+
+
+def _typed(value: str):
+    """Something a person typed, set inline in a sentence Postulo wrote."""
+    return format_html("<bdi>{}</bdi>", value)
+
+
 class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
+    """A CV's settings, and which of its owner's details it prints (#308).
+
+    The choosers are built for whoever the form is for and offer that person's own rows
+    and nothing else: `printing.offered` is the list, so a value that is not on it -- a
+    row of somebody else's, a row that has gone -- is not a valid choice and is refused
+    before anything is stored. A chooser left out of what was posted leaves its answer as
+    it is, so a client that has never heard of them changes nothing.
+
+    A chooser whose chosen row is not offered at present opens on *none*, which is what the
+    CV prints, and posting that *none* back is not an answer: see `clean`.
+    """
+
+    #: The document itself, which is the first card; the rest is what it prints about
+    #: its owner, which is the second.
+    SETTINGS = ("name", "kind", "headline", "summary", "theme", "language")
+
     class Meta:
         model = CV
         fields = (
@@ -104,6 +141,9 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "theme",
             "language",
             "show_contact_details",
+            "show_location",
+            "show_form_of_address",
+            "show_pronouns",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -116,6 +156,193 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             ),
             "theme": _("How it is set on the page. Change it later without touching a word."),
         }
+
+    def scope_querysets(self) -> None:
+        """Build the choosers from this person's own rows, and say what each prints now."""
+        from . import printing
+
+        owner = self.user
+        saved = self.instance if self.instance.pk else None
+        printed = printing.resolve(owner, saved) if owner is not None else printing.Printed()
+        for detail in printing.DETAILS:
+            rows = printing.offered(owner, detail.key) if owner is not None else []
+            value = getattr(printed, detail.key)
+            if value:
+                help_text = format_html(str(PRINTED_NOW), value=_typed(value))
+            elif rows or detail.key == "email":
+                help_text = NONE_PRINTED_NOW
+            else:
+                help_text = GIVES_NONE
+            if detail.key == "email" and printing.has_unconfirmed_addresses(owner):
+                # An address the account holds and the menu does not list: said, so that
+                # its absence reads as a rule rather than as a fault.
+                help_text = format_html("{} {}", help_text, WAITS_TO_BE_CONFIRMED)
+            self.fields[f"prints_{detail.key}"] = forms.ChoiceField(
+                label=detail.label,
+                required=False,
+                choices=[
+                    (Prints.DEFAULT.value, detail.follow),
+                    *((str(row.pk), printing.name_of(row, detail.key)) for row in rows),
+                    (Prints.NONE.value, detail.none),
+                ],
+                help_text=help_text,
+            )
+            self.initial[f"prints_{detail.key}"] = self._answer_of(detail)
+
+        identifiers = printing.offered(owner, "identifiers") if owner is not None else []
+        answers = [(Prints.DEFAULT.value, _("Every identifier, and any you add later"))]
+        if identifiers:
+            # Only where there is something to tick: with none, the list below is not
+            # drawn, and a choice that leads nowhere is not offered.
+            answers.append((Prints.CHOSEN.value, _("Only the ones ticked below")))
+        answers.append((Prints.NONE.value, _("No identifiers")))
+        self.fields["prints_identifiers"] = forms.ChoiceField(
+            label=_("Identifiers"),
+            required=False,
+            choices=answers,
+            help_text=(
+                _("An ORCID or another public id, as your details list them.")
+                if identifiers
+                else GIVES_NONE
+            ),
+        )
+        self.fields["identifier_rows"] = forms.MultipleChoiceField(
+            label=_("Identifiers to print"),
+            required=False,
+            choices=[(str(row.pk), printing.name_of(row, "identifiers")) for row in identifiers],
+            widget=forms.CheckboxSelectMultiple,
+            help_text=_("One you add to your details later is not printed until you tick it here."),
+        )
+        chosen = saved is not None and saved.identifiers_choice == Prints.CHOSEN
+        ticked = (
+            [str(pk) for pk in saved.pinned_identifiers.values_list("pk", flat=True)]
+            if chosen
+            else []
+        )
+        self.initial["identifier_rows"] = ticked
+        self.initial["prints_identifiers"] = (
+            saved.identifiers_choice if saved is not None else Prints.DEFAULT.value
+        )
+        if chosen and not identifiers:
+            # Every one it had chosen has gone, and so has the choice that named them:
+            # the menu shows what that comes to.
+            self.initial["prints_identifiers"] = Prints.NONE.value
+
+        profile = getattr(owner, "profile", None)
+        where = postal.printed_location(profile)
+        self.fields["show_location"].help_text = (
+            format_html(
+                str(_("The line your details give, never a street. As things stand: {value}.")),
+                value=_typed(where),
+            )
+            if where
+            else _("The line your details give, never a street. They give none yet.")
+        )
+        for name in ("form_of_address", "pronouns"):
+            said = (getattr(profile, name, "") or "").strip()
+            self.fields[f"show_{name}"].help_text = (
+                format_html(str(_("As things stand: {value}.")), value=_typed(said))
+                if said
+                else GIVES_NONE
+            )
+        #: The kinds whose chosen row is no longer there, for the page to say so.
+        self.gone = printing.gone(saved)
+
+    @property
+    def settings_fields(self) -> list:
+        """The first card's fields. Asked for when the page is drawn rather than kept from
+        here, because the theme's field is replaced after this form's own `__init__`."""
+        return [self[name] for name in self.SETTINGS if name in self.fields]
+
+    @property
+    def chooser_fields(self) -> list:
+        """The choosers that print one of a kind, in the order the contact line has them."""
+        from . import printing
+
+        return [self[f"prints_{detail.key}"] for detail in printing.DETAILS]
+
+    def _answer_of(self, detail) -> str:
+        """What a chooser opens on: the saved answer, as one of the values it offers.
+
+        A chosen row that is not there to print opens on *none*, because that is what the
+        CV prints. For one that was deleted, saving the form then makes it the answer; for
+        one that is only kept back, it does not (`clean`).
+        """
+        from . import printing
+
+        if not self.instance.pk:
+            return Prints.DEFAULT.value
+        answer = getattr(self.instance, detail.choice_field)
+        if answer != Prints.CHOSEN:
+            return answer
+        row = printing.pinned(self.instance, detail)
+        return str(row.pk) if row is not None else Prints.NONE.value
+
+    @property
+    def choice_is_open(self) -> bool:
+        """Whether the choosers are drawn open: when something in them was chosen, has gone
+        or was refused. Closed, the card says what a CV prints until somebody chooses."""
+        from . import printing
+
+        names = [field.name for field in self.chooser_fields]
+        names += ["prints_identifiers", "identifier_rows", *printing.SWITCHES.values()]
+        if any(self[name].errors for name in names):
+            return True
+        if not self.instance.pk:
+            return False
+        return bool(self.gone) or not printing.is_default(self.instance)
+
+    def clean(self):
+        """Put each chooser's answer on the CV, through the one door that accepts a row.
+
+        Here rather than in `save`, so that a row deleted between the page being drawn and
+        the form being posted is an error under its chooser and not a failure afterwards.
+
+        **A menu nobody touched does not unpin a row that is kept back.** The row a CV
+        chose may be there and not offered -- a second number while *Several telephone
+        numbers* is off, an address that is no longer confirmed -- and its menu then opens
+        on *none*, because the row cannot be listed and *none* is what the CV prints. Read
+        as an answer, that *none* made every save of this page, for a new name or a new
+        theme, delete a pin that was promised to print again once the row is offered again.
+        So *none* posted for such a kind is what the page was drawn with, and the kind is
+        left alone; any other value is somebody choosing, and is stored. A row that was
+        deleted is not coming back, and there *none* is the answer.
+        """
+        from . import printing
+
+        cleaned = super().clean()
+        owner = self.user if self.user is not None else getattr(self.instance, "owner", None)
+        saved = self.instance if self.instance.pk else None
+        for detail in printing.DETAILS:
+            name = f"prints_{detail.key}"
+            raw = cleaned.get(name)
+            if not raw:
+                continue
+            if raw == Prints.NONE and saved is not None and printing.is_kept_back(saved, detail):
+                continue
+            try:
+                if raw in (Prints.DEFAULT, Prints.NONE):
+                    printing.choose(self.instance, detail.key, raw, owner=owner)
+                else:
+                    printing.choose(self.instance, detail.key, Prints.CHOSEN, int(raw), owner=owner)
+            except (printing.NotOffered, ValueError):
+                self.add_error(name, _("Choose one of the rows in your details."))
+        self._pinned_identifiers = None
+        raw = cleaned.get("prints_identifiers")
+        if raw:
+            ticked = (cleaned.get("identifier_rows") or []) if raw == Prints.CHOSEN else []
+            try:
+                self._pinned_identifiers = printing.choose_identifiers(
+                    self.instance, raw, [int(pk) for pk in ticked], owner=owner
+                )
+            except (printing.NotOffered, ValueError):
+                self.add_error("identifier_rows", _("Choose one of the rows in your details."))
+        return cleaned
+
+    def _save_m2m(self) -> None:
+        super()._save_m2m()
+        if getattr(self, "_pinned_identifiers", None) is not None:
+            self.instance.pinned_identifiers.set(self._pinned_identifiers)
 
     @property
     def theme_kind(self) -> str:
