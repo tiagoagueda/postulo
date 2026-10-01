@@ -102,10 +102,10 @@ def page(client, user) -> str:
 @pytest.mark.parametrize(
     ("language", "forms", "pronouns"),
     [
-        ("en-gb", "Mx", "they/them"),
-        ("fr-fr", "Mme", "iel"),
-        ("pt-pt", "Eng.ª", "elu/delu"),
-        ("pt-br", "Sra.", "elu/delu"),
+        ("en-GB", "Mx", "they/them"),
+        ("fr-FR", "Mme", "iel"),
+        ("pt-PT", "Eng.ª", "elu/delu"),
+        ("pt-BR", "Sra.", "elu/delu"),
     ],
 )
 def test_each_language_has_its_own_list(language, forms, pronouns):
@@ -117,22 +117,22 @@ def test_each_language_has_its_own_list(language, forms, pronouns):
 def test_english_keeps_the_full_stop_on_a_word_cut_at_its_end():
     """The rule the list cites (*New Hart's Rules*): a contraction, which keeps the word's
     last letter, drops the stop -- Mr, Dr -- and a word cut off at its end keeps it."""
-    english = addressing.forms_of_address("en-gb")
+    english = addressing.forms_of_address("en-GB")
     assert "Prof." in english and "Prof" not in english
     assert {"Mr", "Mrs", "Ms", "Mx", "Dr"} <= set(english), "the contractions have none"
 
 
 def test_the_lists_are_not_one_list_translated():
-    assert "Eng.ª" not in addressing.forms_of_address("pt-br"), "Portuguese, not Brazilian"
-    assert "Sr.ª" in addressing.forms_of_address("pt-pt")
-    assert "Sra." in addressing.forms_of_address("pt-br")
-    assert "Me" not in addressing.forms_of_address("en-gb")
+    assert "Eng.ª" not in addressing.forms_of_address("pt-BR"), "Portuguese, not Brazilian"
+    assert "Sr.ª" in addressing.forms_of_address("pt-PT")
+    assert "Sra." in addressing.forms_of_address("pt-BR")
+    assert "Me" not in addressing.forms_of_address("en-GB")
 
 
 def test_a_language_with_no_list_offers_none_and_a_variant_takes_its_familys():
     assert addressing.forms_of_address("de") == () and addressing.pronouns("de") == ()
-    assert addressing.forms_of_address("pt-ao") == addressing.forms_of_address("pt-pt")
-    assert addressing.written_in("pt-ao") == "pt-pt"
+    assert addressing.forms_of_address("pt-ao") == addressing.forms_of_address("pt-PT")
+    assert addressing.written_in("pt-ao") == "pt-PT"
     assert addressing.written_in("de") == ""
 
 
@@ -152,7 +152,7 @@ def test_both_start_blank_and_nothing_is_assumed(client, user):
 
 def test_the_list_follows_the_language_of_the_career_record(client, user):
     """Not the interface's, when the record says: the name is written beside the record."""
-    named(user, record_language="fr-fr")
+    named(user, record_language="fr-FR")
     html = page(client, user)
     assert options(html, "form_of_address") == ["", "M.", "Mme", "Dr", "Pr", "Me", "other"]
     assert options(html, "pronouns") == ["", "elle", "il", "iel", "other"]
@@ -163,10 +163,10 @@ def test_the_list_follows_the_language_of_the_career_record(client, user):
 
 def test_the_interface_language_when_the_record_says_nothing(user):
     named(user)
-    with translation.override("pt-br"):
+    with translation.override("pt-BR"):
         form = ProfileForm(instance=user.profile)
         assert "Sra." in [value for value, _label in form.fields["form_of_address"].widget.choices]
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         form = ProfileForm(instance=user.profile)
         assert "Mx" in [value for value, _label in form.fields["form_of_address"].widget.choices]
 
@@ -179,7 +179,7 @@ def test_a_language_with_no_list_offers_only_other(client, user):
 
 
 def test_a_stored_value_in_the_list_is_chosen_in_the_menu(client, user):
-    named(user, form_of_address="Dr", pronouns="they/them", record_language="en-gb")
+    named(user, form_of_address="Dr", pronouns="they/them", record_language="en-GB")
     html = page(client, user)
     assert chosen(html, "form_of_address") == "Dr" and chosen(html, "pronouns") == "they/them"
     assert box(html, "form_of_address_other") == "" and box(html, "pronouns_other") == ""
@@ -188,7 +188,7 @@ def test_a_stored_value_in_the_list_is_chosen_in_the_menu(client, user):
 def test_a_stored_value_not_in_the_list_shows_as_other_with_its_text(client, user):
     """Typed as Other, or chosen from another language's list before the record changed
     language: either way it is the answer, shown where it can be read and changed."""
-    named(user, form_of_address="Eng.ª", pronouns="xe/xem", record_language="en-gb")
+    named(user, form_of_address="Eng.ª", pronouns="xe/xem", record_language="en-GB")
     html = page(client, user)
     assert chosen(html, "form_of_address") == "other"
     assert box(html, "form_of_address_other") == "Eng.ª"
@@ -198,7 +198,7 @@ def test_a_stored_value_not_in_the_list_shows_as_other_with_its_text(client, use
 
 def test_a_prof_stored_before_the_list_gained_its_full_stop_still_shows(client, user):
     """What is stored is the text, so a list being corrected loses nobody's answer."""
-    named(user, form_of_address="Prof", record_language="en-gb")
+    named(user, form_of_address="Prof", record_language="en-GB")
     html = page(client, user)
     assert chosen(html, "form_of_address") == "other"
     assert box(html, "form_of_address_other") == "Prof"
@@ -208,11 +208,11 @@ def test_what_is_listed_and_what_is_typed_keep_their_own_direction(client, user)
     """On a page drawn right to left, *Sr.* and *Prof. Dr.* are otherwise laid out as
     right-to-left text, and the full stop is drawn at the wrong end. The listed options
     say which way their language is written; the boxes take it from what is typed."""
-    named(user, language="ar", record_language="pt-pt", form_of_address="Prof.")
+    named(user, language="ar", record_language="pt-PT", form_of_address="Prof.")
     html = page(client, user)
     assert '<html lang="ar" dir="rtl"' in html
-    for text in addressing.forms_of_address("pt-pt") + addressing.pronouns("pt-pt"):
-        assert f'<option value="{text}" lang="pt-pt" dir="ltr"' in html.replace(" selected", ""), (
+    for text in addressing.forms_of_address("pt-PT") + addressing.pronouns("pt-PT"):
+        assert f'<option value="{text}" lang="pt-PT" dir="ltr"' in html.replace(" selected", ""), (
             text
         )
     for words in ("", "other"):
@@ -269,11 +269,11 @@ def test_both_menus_are_described_by_the_sentence_that_explains_them(client, use
 
 
 def test_a_choice_from_the_list_is_stored_as_its_text(client, user):
-    named(user, record_language="pt-pt")
+    named(user, record_language="pt-PT")
     client.force_login(user)
     response = client.post(
         reverse("accounts:profile"),
-        posted(user, form_of_address="Eng.ª", pronouns="ela/dela", record_language="pt-pt"),
+        posted(user, form_of_address="Eng.ª", pronouns="ela/dela", record_language="pt-PT"),
     )
     assert response.status_code == 302
     user.profile.refresh_from_db()
@@ -325,7 +325,7 @@ def test_the_empty_choice_clears_it(user):
 def test_a_menu_takes_text_from_a_list_it_no_longer_shows(user):
     """The career record's language changed between drawing the page and posting it: the
     answer is still an answer, because what is stored is the text."""
-    named(user, record_language="en-gb")
+    named(user, record_language="en-GB")
     form = ProfileForm(posted(user, form_of_address="Mme"), instance=user.profile)
     assert form.is_valid(), form.errors
     assert form.save().form_of_address == "Mme"
@@ -377,7 +377,7 @@ def test_the_empty_other_message_names_the_list_and_not_where_it_is(user):
     assert form.errors["pronouns_other"] == ["Type it here, or choose one from the list."]
 
 
-@pytest.mark.parametrize("language", ["fr-fr", "pt-pt", "pt-br"])
+@pytest.mark.parametrize("language", ["fr-FR", "pt-PT", "pt-BR"])
 def test_its_translations_name_no_position_and_agree_with_either_menu(language):
     """One sentence serves a feminine noun (*forma de tratamento*) and a masculine plural
     (*pronomes*), so the Portuguese says neither *um* nor *uma*; and none says *beside*."""
@@ -395,11 +395,11 @@ def test_a_page_that_comes_back_keeps_a_choice_from_a_list_it_no_longer_shows(cl
     """Drawn in French with *Mme* chosen; the record becomes English in another tab; the
     first tab is posted with something else wrong. The menu drawn back used to have no
     *Mme* to select, so the browser showed *Not stated* and the next save cleared it."""
-    named(user, record_language="en-gb", form_of_address="Mme")
+    named(user, record_language="en-GB", form_of_address="Mme")
     client.force_login(user)
     response = client.post(
         reverse("accounts:profile"),
-        posted(user, last_name="", form_of_address="Mme", record_language="en-gb"),
+        posted(user, last_name="", form_of_address="Mme", record_language="en-GB"),
     )
     assert response.status_code == 200, "the page comes back, because the last name is missing"
     html = response.content.decode()
@@ -411,14 +411,14 @@ def test_a_page_that_comes_back_keeps_a_choice_from_a_list_it_no_longer_shows(cl
     # Sent again as drawn, it is saved.
     client.post(
         reverse("accounts:profile"),
-        posted(user, form_of_address=chosen(html, "form_of_address"), record_language="en-gb"),
+        posted(user, form_of_address=chosen(html, "form_of_address"), record_language="en-GB"),
     )
     user.profile.refresh_from_db()
     assert user.profile.form_of_address == "Mme"
 
 
 def test_a_page_that_comes_back_offers_nothing_extra_for_an_ordinary_choice(client, user):
-    named(user, record_language="en-gb")
+    named(user, record_language="en-GB")
     client.force_login(user)
     for sent in ("Dr", "other", ""):
         html = client.post(
@@ -427,7 +427,7 @@ def test_a_page_that_comes_back_offers_nothing_extra_for_an_ordinary_choice(clie
         ).content.decode()
         assert options(html, "form_of_address") == [
             "",
-            *addressing.forms_of_address("en-gb"),
+            *addressing.forms_of_address("en-GB"),
             "other",
         ]
         assert chosen(html, "form_of_address") == sent

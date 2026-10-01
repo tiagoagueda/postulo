@@ -2,9 +2,10 @@
 
 import pytest
 from django.urls import reverse
-from django.utils import timezone, translation
+from django.utils import timezone
 
 from postulo.accounts.models import Profile, Theme
+from postulo.core import languages
 
 # --------------------------------------------------------------------- profiles
 
@@ -99,13 +100,14 @@ def test_an_unknown_time_zone_falls_back_instead_of_failing(client, user, settin
 
 
 def test_a_profile_language_is_activated_for_the_request(client, user):
-    user.profile.language = "fr-fr"
+    user.profile.language = "fr-FR"
     user.profile.save()
     client.force_login(user)
 
     client.get(reverse("core:home"))
 
-    assert translation.get_language() == "fr-fr"
+    # Asked of Postulo and not of Django, which answers the same tag in lower case (#337).
+    assert languages.current() == "fr-FR"
 
 
 def test_an_anonymous_request_does_not_inherit_the_previous_visitors_time_zone(

@@ -205,7 +205,7 @@ def test_british_english_keeps_the_clock_the_interface_was_written_on():
     The one locale Postulo corrects, and it corrects it in its own format module rather than
     by writing ``H:i`` into ninety templates again.
     """
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         assert formats.get_format("TIME_FORMAT") == "H:i"
         assert formats.get_format("DATETIME_FORMAT") == "j M Y, H:i"
         assert formats.get_format("DATE_FORMAT") == "j M Y", "Django's own, left alone"
@@ -228,10 +228,10 @@ def test_the_filter_writes_the_date_the_way_the_reader_s_language_does():
 
     when = dt.datetime(2026, 9, 16, 14, 30, tzinfo=dt.UTC)
     written = {}
-    for code in ("en-gb", "hu", "lt"):
+    for code in ("en-GB", "hu", "lt"):
         with translation.override(code):
             written[code] = Template('{{ d|date:"DATE_FORMAT" }}').render(Context({"d": when}))
-    assert written["en-gb"] == "16 Sep 2026"
+    assert written["en-GB"] == "16 Sep 2026"
     assert written["hu"].startswith("2026.") and written["hu"].endswith("16."), written["hu"]
     assert written["lt"].startswith("2026 m."), written["lt"]
 

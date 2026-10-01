@@ -67,8 +67,11 @@ from postulo import __version__
 #: by what it says -- a number, an address, a scheme and its value, and for an identifier of
 #: the scheme *other* its name as well -- because the profile's rows carry no id in this
 #: file; an archive without it restores every choice at its default, which is what every CV
-#: printed before there was one (#308).
-FORMAT_VERSION = 27
+#: printed before there was one (#308). 28 writes every language code as a BCP 47 tag in
+#: its canonical form -- ``pt-BR`` where an archive used to say ``pt-br`` -- and Serbian as
+#: ``sr-Cyrl``, which is what the list calls it now. No field moved: an older archive is
+#: read as it was written, and its codes are respelt on the way in (#337).
+FORMAT_VERSION = 28
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:

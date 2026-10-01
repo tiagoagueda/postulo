@@ -37,12 +37,15 @@ class Command(BaseCommand):
             )
             return
 
-        missing = [script for script, drawable in answer.items() if not drawable]
+        missing = [
+            languages.script_name(script) for script, drawable in answer.items() if not drawable
+        ]
         for script in offered:
+            name = languages.script_name(script)
             if answer.get(script):
-                self.stdout.write(self.style.SUCCESS(f"draws      {script}"))
+                self.stdout.write(self.style.SUCCESS(f"draws      {name}"))
             else:
-                self.stdout.write(self.style.ERROR(f"cannot draw  {script}"))
+                self.stdout.write(self.style.ERROR(f"cannot draw  {name}"))
         if missing:
             raise CommandError(
                 f"{' and '.join(missing)} would come out as boxes. On Debian or "

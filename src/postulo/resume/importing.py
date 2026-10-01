@@ -19,7 +19,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext as _
 
 from postulo.accounts import identifiers
-from postulo.core import phone_numbers, web_links
+from postulo.core import languages, phone_numbers, web_links
 
 
 @dataclass
@@ -149,8 +149,11 @@ def apply(owner, record: Record) -> Report:
                 changed.append(field_name)
         # What language the career itself is written in, which the file has always said and
         # nothing here read. Same rule as every other field: only where it is blank (#235).
-        if record.locale.strip() and not profile.record_language:
-            profile.record_language = record.locale.strip()[:10]
+        # Held to the shape of a tag here as well as by whichever importer read it: a
+        # plugin fills this, and what is not a language is left out rather than cut to
+        # fit a column (#337).
+        if languages.well_formed(record.locale) and not profile.record_language:
+            profile.record_language = languages.tag(record.locale)
             changed.append("record_language")
         # The website is a row of its own now (#189), filled on the same terms as the
         # number below: only where there is nothing, so an import never overwrites what

@@ -70,7 +70,7 @@ def test_it_arrives_translated_rather_than_being_translated_here():
     that maintains them, and not one of them a gettext string in this project.
     """
     assert len(industries.languages()) == 24
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         assert (
             industries.name_for("62")
             == "Consultoria, programação informática e atividades relacionadas"
@@ -80,9 +80,9 @@ def test_it_arrives_translated_rather_than_being_translated_here():
 
 
 def test_a_variant_reads_the_language_it_is_a_variant_of():
-    with translation.override("pt-br"):
+    with translation.override("pt-BR"):
         assert industries.name_for("01").startswith("Produção")
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         assert industries.name_for("01").startswith("Crop and animal")
 
 
@@ -135,7 +135,7 @@ def test_the_code_follows_the_name(user):
 
 
 def test_a_division_name_typed_in_the_readers_language_finds_its_code(user):
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         industry = Industry.named(user, ["Silvicultura e exploração florestal"])[0]
 
     assert industry.code == "02"
@@ -143,7 +143,7 @@ def test_a_division_name_typed_in_the_readers_language_finds_its_code(user):
 
 def test_an_english_name_pasted_into_another_language_still_finds_its_code():
     """Somebody reading Postulo in French may paste a division name out of a form."""
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         assert industries.code_for("Mining of metal ores") == "07"
 
 
@@ -166,7 +166,7 @@ def test_a_name_in_both_vocabularies_is_offered_once():
 
 
 def test_the_suggestions_are_in_the_readers_language(user):
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         offered = industries.suggestions()
 
     assert "Silvicultura e exploração florestal" in offered

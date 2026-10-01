@@ -72,6 +72,10 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     )
     from postulo.applications.suggestions import suggest
     from postulo.core.currencies import CURRENCY_CODES
+    from postulo.core.languages import match as language_match
+    from postulo.core.languages import matches as language_matches
+    from postulo.core.languages import tag as language_tag
+    from postulo.core.languages import well_formed as is_language_tag
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
@@ -190,7 +194,11 @@ __all__ = [
     "description_of",
     "event_lines",
     "get_or_create_company",
+    "is_language_tag",
     "label_of",
+    "language_match",
+    "language_matches",
+    "language_tag",
     "manifest_of",
     "medium_of",
     "phone_number_is_taken",
@@ -287,6 +295,15 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # with ``None`` where it does not know or has not been downloaded.
     "CURRENCY_CODES": ("postulo.core.currencies", "CURRENCY_CODES"),
     "place_of": ("postulo.jobs.places", "resolve"),
+    # ------------------------------------------------------------- what a language is
+    # A BCP 47 tag in its canonical form, `pt-BR`, and never anything else (#337). A plugin
+    # meets a code wherever the outside does -- a page's `lang`, a file's locale, a
+    # mailbox's header -- and these are Postulo's own writer, its check of the shape, and
+    # its comparison, so that a plugin does not grow a fifth way of lower-casing one.
+    "is_language_tag": ("postulo.core.languages", "well_formed"),
+    "language_match": ("postulo.core.languages", "match"),
+    "language_matches": ("postulo.core.languages", "matches"),
+    "language_tag": ("postulo.core.languages", "tag"),
 }
 
 

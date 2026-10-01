@@ -7,11 +7,12 @@ from urllib.parse import urlsplit
 
 from django.conf import settings
 from django.http import HttpResponse
+from django.middleware.locale import LocaleMiddleware as DjangoLocaleMiddleware
 from django.shortcuts import resolve_url
 from django.urls import NoReverseMatch, reverse
-from django.utils import timezone, translation
+from django.utils import timezone
 
-from postulo.core import logs
+from postulo.core import languages, logs
 
 #: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
 #: completeness; nothing in Postulo answers with either.
@@ -91,6 +92,30 @@ class HtmxLoginRedirectMiddleware:
         return paths
 
 
+class LocaleMiddleware(DjangoLocaleMiddleware):
+    """Django's own, saying which language it chose the way Postulo writes one (#337).
+
+    Django answers in lower case, ``pt-br``, and puts that on the request and in the
+    ``Content-Language`` header. A tag compares the same in any case, so nothing was
+    wrong with it: it was the one place left where Postulo wrote a code another way.
+
+    A subclass rather than two lines in `UserPreferencesMiddleware`, because this is the
+    layer that writes the header. A redirect or a refusal answered by anything between
+    the two passes through here and never through that one.
+    """
+
+    def process_request(self, request):
+        super().process_request(request)
+        request.LANGUAGE_CODE = languages.current()
+
+    def process_response(self, request, response):
+        response = super().process_response(request, response)
+        declared = response.headers.get("Content-Language")
+        if declared:
+            response.headers["Content-Language"] = languages.tag(declared)
+        return response
+
+
 class UserPreferencesMiddleware:
     """Activate the signed-in person's time zone and language for the request.
 
@@ -135,12 +160,15 @@ class UserPreferencesMiddleware:
         # A language an administrator has stopped offering is not applied, and the stored
         # value is left exactly where it is: withdrawing a language must not silently
         # rewrite a hundred people's settings, because it may be offered again tomorrow.
-        language = getattr(profile, "language", "") if profile else ""
+        # Asked about the language it will be drawn in, which is Postulo's own nearest: a
+        # profile holding `sr` from before the list said which script reads `sr-Cyrl`, and
+        # that is the one an instance offers or does not (#337).
+        language = languages.catalogue(getattr(profile, "language", "") if profile else "")
         if language and not self._offered(language):
             language = ""
         if language:
-            translation.activate(language)
-            request.LANGUAGE_CODE = translation.get_language()
+            languages.activate(language)
+            request.LANGUAGE_CODE = languages.current()
 
         return self.get_response(request)
 

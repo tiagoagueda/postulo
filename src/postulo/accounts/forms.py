@@ -18,7 +18,15 @@ from django.contrib.auth import get_user_model
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import languages, phone_field, phone_numbers, phones, postal, web_links
+from postulo.core import (
+    language_field,
+    languages,
+    phone_field,
+    phone_numbers,
+    phones,
+    postal,
+    web_links,
+)
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
 
@@ -166,7 +174,7 @@ def language_choices() -> list[tuple[str, str]]:
 
     A language that is only partly translated says so beside its name, and one nobody has
     reviewed says that, so nobody is surprised by English in the gaps or by an odd turn of
-    phrase. Unreviewed does not mean machine-made: `pt-br` was seeded from `pt-pt` and
+    phrase. Unreviewed does not mean machine-made: `pt-BR` was seeded from `pt-PT` and
     adapted, which is a different provenance and the same warning.
     Each language is named in itself, which is the only way somebody who cannot read the
     current one will recognise theirs. That is also what makes the ``lang`` attribute
@@ -177,9 +185,7 @@ def language_choices() -> list[tuple[str, str]]:
     option holds the name and nothing else, and can therefore be marked as being in that
     language, while the words about it stay in the language they are actually written in.
     """
-    from postulo.core.languages import translation_status
-
-    status = translation_status()
+    status = languages.translation_status()
     reviewed: list[tuple[str, str]] = []
     drafted: list[tuple[str, str]] = []
     partial: list[tuple[str, str]] = []
@@ -191,7 +197,7 @@ def language_choices() -> list[tuple[str, str]]:
             # deleted and nobody's stored choice is rewritten; the language is simply not
             # on the list until it is offered again.
             continue
-        row = status.get(code)
+        row = languages.status_of(code, status)
         if row is not None and row.get("total", 0) and not row.get("translated", 0):
             # A language whose catalogue nobody has started is not offered. Postulo adds
             # the languages of a phase before their translations exist (#70), and offering
@@ -222,6 +228,21 @@ def language_choices() -> list[tuple[str, str]]:
     if partial:
         choices.append((_("Partly translated"), partial))
     return choices
+
+
+def with_what_is_held(choices: list, held) -> list:
+    """A language menu's choices, with what the field already holds where that is none of them.
+
+    A document's language and a career record's are free: they take any language tag, and
+    hold `pt-AO` from a file or a language this instance has stopped offering. A menu that
+    did not list what the field held showed its first choice instead, and saving the form
+    wrote that over it without anybody having touched the menu (#337). So it is listed, as
+    itself: nothing here knows a name for it.
+    """
+    held = languages.tag(held)
+    if not held or languages.find(held, [code for code, _name in choices]):
+        return choices
+    return [*choices, (held, held)]
 
 
 class LanguageSelect(forms.Select):
@@ -458,7 +479,10 @@ class ProfileForm(forms.ModelForm):
         # it names. Blank is a real answer here rather than an omission: most people have
         # one career in one language and never think about this again (#131).
         self.fields["record_language"].widget = LanguageSelect(
-            choices=[("", _("The language you read Postulo in")), *languages.LANGUAGES]
+            choices=with_what_is_held(
+                [("", _("The language you read Postulo in")), *languages.LANGUAGES],
+                self["record_language"].value(),
+            )
         )
         self.fields["record_language"].required = False
         self.fields["record_language"].help_text = _(
@@ -1033,7 +1057,7 @@ class LocaleForm(forms.ModelForm):
         """One row: what it is called, whose flag stands for it, and how it was made."""
         from postulo.core import languages
 
-        row = status.get(code) or {}
+        row = languages.status_of(code, status) or {}
         percent = row.get("percent") if row.get("total") else None
         if percent is not None and percent < 95:
             state = "partial"
@@ -1055,7 +1079,7 @@ class LocaleForm(forms.ModelForm):
                 str(name).removesuffix(_percent_suffix(percent)) if state == "partial" else name
             ),
             "country": languages.flag_country(code),
-            "selected": code == current,
+            "selected": languages.same(code, current),
             "state": state,
             "percent": percent,
         }
@@ -1076,7 +1100,7 @@ class LocaleForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Both are rebuilt here rather than taken from the model, so the sentences on
         # `Meta.help_texts` would be thrown away with the fields; they are set here (#205).
-        self.fields["language"] = forms.ChoiceField(
+        self.fields["language"] = language_field.LanguageChoiceField(
             label=_("Language"),
             choices=language_choices,
             required=False,

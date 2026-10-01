@@ -218,18 +218,21 @@ def offered_languages() -> list[str]:
     """The codes this instance offers, or an empty list meaning every one it speaks.
 
     A stored code that Postulo no longer has a catalogue for is passed over rather than
-    breaking the picker, the same way a widget key that no longer exists is.
+    breaking the picker, the same way a widget key that no longer exists is. Each is
+    answered as the list spells it, whatever the row holds.
     """
     from . import languages
 
     stored = current().offered_languages or []
-    return [code for code in stored if code in languages.NATIVE_NAMES]
+    return [found for code in stored if (found := languages.find(code))]
 
 
 def offers(code: str) -> bool:
     """Whether this instance offers a language. Nothing stored means it offers them all."""
+    from . import languages
+
     chosen = offered_languages()
-    return not chosen or code in chosen
+    return not chosen or bool(languages.find(code, chosen))
 
 
 def mail_delivers() -> bool:

@@ -72,7 +72,7 @@ def cv(person):
         name="Backend EN",
         headline="Backend engineer",
         summary="Ten years of keeping services up.\nMostly in Python.",
-        language="en-gb",
+        language="en-GB",
     )
     put_on(
         variant,
@@ -270,16 +270,16 @@ def test_the_text_is_in_the_documents_language_not_the_readers(cv, person):
 
     experience = Experience.objects.get(owner=person)
     Translation.objects.create(
-        owner=person, entry=experience, language="fr-fr", field="role", text="Ingénieur principal"
+        owner=person, entry=experience, language="fr-FR", field="role", text="Ingénieur principal"
     )
-    cv.language = "fr-fr"
+    cv.language = "fr-FR"
     cv.save(update_fields=["language"])
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         outline = rendering.cv_outline(cv)
     text = formats.as_text(outline)
 
-    assert outline.language == "fr-fr"
+    assert outline.language == "fr-FR"
     assert "mars 2021" in text and "March 2021" not in text
     assert "Ingénieur principal" in text and "Senior Engineer" not in text
     assert "Aperture Science" in text, "an employer's name is nobody's to translate"
@@ -361,7 +361,7 @@ def test_copy_as_plain_text_is_a_page_with_the_text_in_a_box(client, person, cv)
     attributes, held = box.groups()
     assert " readonly" in attributes, "and cannot be typed into"
     assert 'id="cv-plain-text"' in attributes and '<label for="cv-plain-text">' in page
-    assert 'lang="en-gb"' in attributes and 'dir="ltr"' in attributes
+    assert 'lang="en-GB"' in attributes and 'dir="ltr"' in attributes
     assert "Senior Engineer" in held and "- Mentored three engineers." in held
 
 
@@ -563,7 +563,7 @@ def test_a_line_break_inside_a_paragraph_is_a_break(cv):
 
 
 def test_the_file_says_whose_it_is_and_what_language_it_is_in(cv):
-    cv.language = "pt-pt"
+    cv.language = "pt-PT"
     cv.save(update_fields=["language"])
     parts = parts_of(docx.write(rendering.cv_outline(cv)))
 
@@ -649,7 +649,11 @@ def test_the_same_cv_is_the_same_file_byte_for_byte(cv):
     ],
 )
 def test_a_language_is_written_the_way_word_writes_one(code, tag):
-    assert docx.language_tag(code) == tag
+    """Word is not always indifferent to case, which is why this export wrote the
+    canonical form before anything else did. It is Postulo's one writer now (#337)."""
+    from postulo.core import languages
+
+    assert languages.tag(code) == tag
 
 
 def test_the_word_file_downloads_as_one(client, person, cv):

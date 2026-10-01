@@ -47,7 +47,7 @@ def test_and_in_the_language_the_reader_is_using(compiled_catalogues=None):
     """The half that makes this awkward: the key comes from the address, the words from the
     catalogue. A Portuguese reader entering a United States address wants *Estado*.
     """
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         chosen = str(postal_rules.label_for("region", "US"))
 
     # Whether a catalogue is compiled in this test run is not this test's business; what is,

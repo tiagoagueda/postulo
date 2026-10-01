@@ -23,21 +23,22 @@ from postulo.core import languages
 
 DOCKERFILE = Path(__file__).resolve().parents[1] / "docker" / "Dockerfile"
 
-#: Which Debian font package covers which script. Deliberately short: adding a script
+#: Which Debian font package covers which script, by its ISO 15924 code, which is how a
+#: language tag and `languages.SCRIPTS` name one (#337). Deliberately short: adding a script
 #: means deciding which package draws it, which is a decision worth making explicitly.
 COVERAGE: dict[str, tuple[str, ...]] = {
-    "Latin": ("fonts-dejavu-core", "fonts-noto-core"),
-    "Greek": ("fonts-dejavu-core", "fonts-noto-core"),
-    "Cyrillic": ("fonts-dejavu-core", "fonts-noto-core"),
-    "Arabic": ("fonts-noto-core",),
-    "Ethiopic": ("fonts-noto-core",),
-    "Hebrew": ("fonts-noto-core",),
-    "Devanagari": ("fonts-noto-core",),
+    "Latn": ("fonts-dejavu-core", "fonts-noto-core"),
+    "Grek": ("fonts-dejavu-core", "fonts-noto-core"),
+    "Cyrl": ("fonts-dejavu-core", "fonts-noto-core"),
+    "Arab": ("fonts-noto-core",),
+    "Ethi": ("fonts-noto-core",),
+    "Hebr": ("fonts-noto-core",),
+    "Deva": ("fonts-noto-core",),
     "Thai": ("fonts-noto-core",),
     # CJK is its own package and its own size; #71 decides when it arrives.
-    "Han": ("fonts-noto-cjk",),
-    "Hiragana": ("fonts-noto-cjk",),
-    "Hangul": ("fonts-noto-cjk",),
+    "Hani": ("fonts-noto-cjk",),
+    "Hira": ("fonts-noto-cjk",),
+    "Hang": ("fonts-noto-cjk",),
 }
 
 
@@ -71,7 +72,7 @@ def test_every_non_latin_language_declares_its_script():
     from postulo.core.languages import LANGUAGES, SCRIPTS
 
     # The ones known to be written in something other than the Latin alphabet.
-    not_latin = {"ar", "am", "ti", "bg", "el"}
+    not_latin = {"ar", "am", "ti", "bg", "el", "mk", "uk"}
     offered = {code for code, _name in LANGUAGES}
     for code in not_latin & offered:
         assert code in SCRIPTS, f"{code} is not written in Latin and says nothing about it"
@@ -79,9 +80,9 @@ def test_every_non_latin_language_declares_its_script():
 
 def test_the_scripts_offered_are_the_ones_the_languages_need():
     offered = languages.scripts_offered()
-    assert {"Arabic", "Ethiopic", "Greek", "Cyrillic"} <= offered
+    assert {"Arab", "Ethi", "Grek", "Cyrl"} <= offered
     # Nothing from a later phase has crept in without its fonts being decided.
-    assert "Han" not in offered and "Devanagari" not in offered
+    assert "Hani" not in offered and "Deva" not in offered
 
 
 def test_the_dockerfile_reader_ignores_comments():
@@ -276,7 +277,7 @@ def test_every_script_the_declaration_knows_the_check_can_probe():
 
     unprobed_offered = languages.scripts_offered() - set(fonts.PROBES)
     assert not unprobed_offered, f"offered but the check cannot probe: {sorted(unprobed_offered)}"
-    unprobed_known = set(COVERAGE) - {"Latin"} - set(fonts.PROBES)
+    unprobed_known = set(COVERAGE) - {"Latn"} - set(fonts.PROBES)
     assert not unprobed_known, (
         f"the declaration knows but the check cannot probe: {sorted(unprobed_known)}"
     )
@@ -290,4 +291,6 @@ def test_the_probe_of_a_script_is_a_character_of_that_script():
 
     for script, (_tag, sample) in fonts.PROBES.items():
         name = unicodedata.name(sample)
-        assert script.upper() in name or "CJK" in name, (script, sample, name)
+        written = languages.script_name(script)
+        assert script in languages.SCRIPT_NAMES, f"{script} has no name to say it with"
+        assert written.upper() in name or "CJK" in name, (script, sample, name)

@@ -92,7 +92,7 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
 
 @register.simple_tag
 def language_flag(code: str, css_class: str = "flag", **attrs: str) -> str:
-    """The flag that stands for a language: ``{% language_flag "pt-pt" %}``.
+    """The flag that stands for a language: ``{% language_flag "pt-PT" %}``.
 
     ``flag`` takes a country; this takes a language code and asks `languages.flag_country`
     whose flag stands for it, which is nothing for a language with no single home -- and

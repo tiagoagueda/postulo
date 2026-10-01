@@ -728,9 +728,9 @@ def test_the_figures_are_worked_out_again_in_another_language(user, company):
 
     an_application(user, company, Status.APPLIED)
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         english = analytics.fingerprint(user)
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         french = analytics.fingerprint(user)
 
     assert english != french

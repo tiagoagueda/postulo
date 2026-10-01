@@ -175,7 +175,7 @@ def furnished(applicant):
             source=cv,
             application=application,
             sent_to=sent_as,
-            language="en-gb",
+            language="en-GB",
             source_text="<html></html>",
             plain_text=words.format(role=role, last=last),
             checksum=f"{days_ago:064d}",
@@ -624,7 +624,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
                 f"/career/experience/{entry.pk}/delete/",
                 # Both halves: the list of languages, and the form for one of them.
                 f"/career/experience/{entry.pk}/languages/",
-                f"/career/experience/{entry.pk}/languages/?language=fr-fr",
+                f"/career/experience/{entry.pk}/languages/?language=fr-FR",
             ]
             if entry is not None
             else []
@@ -855,7 +855,7 @@ def a_candidate_file(path: Path) -> Path:
                 {
                     "section": "experience",
                     "ref": 2,
-                    "language": "fr-fr",
+                    "language": "fr-FR",
                     "field": "role",
                     "text": "Sujet de test",
                 }

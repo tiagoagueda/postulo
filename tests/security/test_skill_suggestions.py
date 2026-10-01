@@ -61,9 +61,9 @@ def test_what_was_typed_is_bounded(esco_skills, user, client):
 
 def test_the_languages_answered_in_are_the_askers_own(esco_skills, user, other_user, client):
     """Somebody else's record being in Portuguese is not a reason to answer in it."""
-    other_user.profile.record_language = "pt-pt"
+    other_user.profile.record_language = "pt-PT"
     other_user.profile.save()
-    user.profile.record_language = "en-gb"
+    user.profile.record_language = "en-GB"
     user.profile.save()
     client.force_login(user)
 

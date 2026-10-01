@@ -139,24 +139,24 @@ def test_only_the_percentage_comes_out_of_a_name_with_a_region(client, user, mon
     from postulo.accounts.forms import language_choices, language_row
     from postulo.core import languages
 
-    status = {"fr-fr": {"total": 100, "translated": 40, "drafts": 40, "percent": 40}}
+    status = {"fr-FR": {"total": 100, "translated": 40, "drafts": 40, "percent": 40}}
     monkeypatch.setattr(languages, "translation_status", lambda: status)
     client.force_login(user)
 
     html = client.get(reverse("settings:locale")).content.decode()
 
-    assert '<span lang="fr-fr">français (France)</span>' in html, "the name, whole"
+    assert '<span lang="fr-FR">français (France)</span>' in html, "the name, whole"
     assert "40%" in html, "and the figure beside it"
     assert "français (France) (40%)" not in html
 
     # A dropdown still carries the figure in the option: it has nowhere else to put it.
     partly = dict(language_choices()[-1][1])
-    assert partly["fr-fr"] == "français (France) (40%)"
+    assert partly["fr-FR"] == "français (France) (40%)"
     # Both callers of the row: the name as the choices decorate it, and the bare one.
-    assert language_row("fr-fr", partly["fr-fr"], status=status)["name"] == "français (France)"
-    assert language_row("fr-fr", "français (France)", status=status)["name"] == "français (France)"
+    assert language_row("fr-FR", partly["fr-FR"], status=status)["name"] == "français (France)"
+    assert language_row("fr-FR", "français (France)", status=status)["name"] == "français (France)"
     # A bracket the code did not append is not the code's to remove.
-    assert language_row("fr-fr", "français (7%)", status=status)["name"] == "français (7%)"
+    assert language_row("fr-FR", "français (7%)", status=status)["name"] == "français (7%)"
 
 
 # ---------------------------------------------- the symbol is never alone
@@ -197,7 +197,7 @@ def test_the_legend_is_on_the_page_and_not_only_in_a_tooltip(page):
 
 
 def test_the_words_do_not_say_machine_translation(page):
-    """`pt-br` was seeded from `pt-pt` and adapted by hand, which is not machine
+    """`pt-BR` was seeded from `pt-PT` and adapted by hand, which is not machine
     translation. What is true of every language in that group is that no speaker has read
     it, and that is the thing to say.
 

@@ -133,13 +133,13 @@ CURRENCY_WORDS = {"euro": "EUR", "euros": "EUR"}
 #: What "$" alone is, where the page says which country it is written for. Anywhere else it
 #: is one of twenty currencies, and it is not read.
 DOLLAR_REGIONS = {
-    "us": "USD",
-    "ca": "CAD",
-    "au": "AUD",
-    "nz": "NZD",
-    "sg": "SGD",
-    "hk": "HKD",
-    "mx": "MXN",
+    "US": "USD",
+    "CA": "CAD",
+    "AU": "AUD",
+    "NZ": "NZD",
+    "SG": "SGD",
+    "HK": "HKD",
+    "MX": "MXN",
 }
 
 #: A figure as money is written: grouped in threes by a dot, a comma, an apostrophe or a
@@ -161,7 +161,7 @@ LARGEST = Decimal(10) ** 9
 
 #: English is written both ways round: 03/04/2026 is April in London and March in New York.
 #: A page that says only "en" settles nothing, so only these places are read day first.
-DAY_FIRST_ENGLISH = frozenset({"gb", "ie", "au", "nz", "in"})
+DAY_FIRST_ENGLISH = frozenset({"GB", "IE", "AU", "NZ", "IN"})
 
 # ------------------------------------------------------------------ the reading
 
@@ -174,21 +174,23 @@ REACH_WITHOUT = 12
 #: How far past a figure its period is looked for, on the same line.
 PERIOD_REACH = 30
 
-#: A language tag as pages write it: "pt", "pt-PT", "pt_BR", "en-US".
-TAG = re.compile(r"[a-z]{2,3}(?:-[a-z0-9]{2,8})*")
-
 
 def tag_of(raw: str) -> str:
-    """A page's declared language, tidied to ``pt-br``; "" where it is not a language tag."""
-    tag = (raw or "").strip().lower().replace("_", "-").split(",")[0].strip()
-    return tag if len(tag) <= 35 and TAG.fullmatch(tag) else ""
+    """A page's declared language as Postulo writes one, ``pt-BR``; "" where it is not a tag.
+
+    Pages write "pt", "pt-PT", "pt_BR" and "en-US,en;q=0.9"; the first of a list is taken.
+    """
+    from postulo.plugins.api import is_language_tag, language_tag
+
+    declared = (raw or "").split(",")[0]
+    return language_tag(declared) if is_language_tag(declared) else ""
 
 
 def region_of(tag: str) -> str:
-    """The country a tag names, where it names one: ``us`` in ``en-us``."""
+    """The country a tag names, where it names one: ``US`` in ``en-US``."""
     for subtag in tag.split("-")[1:]:
         if (len(subtag) == 2 and subtag.isalpha()) or (len(subtag) == 3 and subtag.isdigit()):
-            return subtag
+            return subtag.upper()
     return ""
 
 
@@ -199,13 +201,9 @@ def spoken(tag: str) -> tuple[str, ...]:
     text, and each language a translation is asked for stays in memory for the life of the
     process.
     """
-    if not tag:
-        return ()
-    primary = tag.split("-")[0]
-    codes = [code for code, _name in settings.LANGUAGES]
-    exact = [code for code in codes if code == tag]
-    near = [code for code in codes if code.split("-")[0] == primary and code != tag]
-    return tuple(exact + near)
+    from postulo.plugins.api import language_matches
+
+    return language_matches(tag, [code for code, _name in settings.LANGUAGES])
 
 
 def _languages(tag: str) -> tuple[str, ...]:
@@ -321,7 +319,7 @@ def order(tag: str) -> str:
     settle it."""
     if tag.split("-")[0] == "en":
         region = region_of(tag)
-        if region == "us":
+        if region == "US":
             return "mdy"
         return "dmy" if region in DAY_FIRST_ENGLISH else ""
     codes = spoken(tag)

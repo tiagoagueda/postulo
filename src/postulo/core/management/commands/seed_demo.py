@@ -762,7 +762,7 @@ class Command(BaseCommand):
                 owner=user,
                 content_type=ContentType.objects.get_for_model(Experience),
                 object_id=experiences[0].pk,
-                language="fr-fr",
+                language="fr-FR",
                 field=field,
                 text=text,
             )

@@ -129,7 +129,7 @@ def test_a_name_that_is_no_skill_has_no_identifier(esco_skills):
 
 def test_a_name_is_tried_in_each_language_given_and_then_in_english(esco_skills):
     assert esco.skill_for("gestão de projetos", "pt") == PROJECTS
-    assert esco.skill_for("gestão de projetos", "fr", "pt-br") == PROJECTS
+    assert esco.skill_for("gestão de projetos", "fr", "pt-BR") == PROJECTS
     assert esco.skill_for("manage budgets", "pt") == BUDGETS, "English last, always"
     assert esco.skill_for("gestion de projets", "pt") == "", "French was not asked"
 
@@ -141,8 +141,8 @@ def test_a_name_two_skills_share_is_neither_of_them(esco_skills):
 
 
 def test_what_the_classification_calls_a_skill(esco_skills):
-    assert esco.skill_name(PROJECTS, "fr-fr") == "gestion de projets"
-    assert esco.skill_name(PROJECTS, "pt-br") == "gestão de projetos"
+    assert esco.skill_name(PROJECTS, "fr-FR") == "gestion de projets"
+    assert esco.skill_name(PROJECTS, "pt-BR") == "gestão de projetos"
     # Strict is for a document: no English standing in for a language.
     assert esco.skill_name(TEAMWORK, "fr") == ""
     assert esco.skill_name(PROJECTS, "tr") == ""
@@ -215,14 +215,14 @@ def test_a_save_that_does_not_write_the_name_does_not_ask(esco_skills, user):
 
 
 def test_the_record_language_is_asked_before_the_readers(esco_skills, user):
-    record_in(user, "pt-pt")
+    record_in(user, "pt-PT")
     with translation.override("fr"):
         skill = Skill.objects.create(owner=user, name="gestão de projetos")
     assert skill.esco_uri == PROJECTS
 
 
 def test_a_name_offered_in_the_readers_language_is_recognised(esco_skills, user):
-    record_in(user, "en-gb")
+    record_in(user, "en-GB")
     with translation.override("fr"):
         skill = Skill.objects.create(owner=user, name="gérer les budgets")
     assert skill.esco_uri == BUDGETS
@@ -249,7 +249,7 @@ def test_a_skill_imported_from_europass_is_matched_too(esco_skills, user):
 @pytest.fixture
 def skills_on_a_cv(esco_skills, user):
     """A record in English and a CV in French holding one group of four skills."""
-    record_in(user, "en-gb")
+    record_in(user, "en-GB")
     group = SkillGroup.objects.create(owner=user, name="Work")
     made = {
         name: Skill.objects.create(owner=user, group=group, name=name, order=index)
@@ -257,7 +257,7 @@ def skills_on_a_cv(esco_skills, user):
             ("Project management", "manage budgets", "teamwork principles", "Juggling")
         )
     }
-    cv = CV.objects.create(owner=user, name="Paris", language="fr-fr")
+    cv = CV.objects.create(owner=user, name="Paris", language="fr-FR")
     CVItem.objects.create(
         owner=user,
         cv=cv,
@@ -296,7 +296,7 @@ def test_a_translation_of_the_persons_own_always_wins(skills_on_a_cv):
         owner=cv.owner,
         content_type=ContentType.objects.get_for_model(Skill),
         object_id=made["Project management"].pk,
-        language="fr-fr",
+        language="fr-FR",
         field="name",
         text="Pilotage de projets",
     )
@@ -345,7 +345,7 @@ def test_the_cv_page_says_which_names_are_the_classifications_before_it_is_expor
     assert "data-classified" in html
     assert "Gestion de projets" in html and "gérer les budgets" in html
     languages = reverse("resume:item_languages", args=["skill", made["manage budgets"].pk])
-    assert f"{languages}?language=fr-fr" in html
+    assert f"{languages}?language=fr-FR" in html
     assert "teamwork principles" not in html.split("data-classified", 1)[1].split("</div>")[0]
 
 
@@ -354,7 +354,7 @@ def test_the_skills_page_in_that_language_says_what_an_empty_box_prints(skills_o
     client.force_login(cv.owner)
     url = reverse("resume:item_languages", args=["skill", made["Project management"].pk])
 
-    french = client.get(f"{url}?language=fr-fr").content.decode()
+    french = client.get(f"{url}?language=fr-FR").content.decode()
     english = client.get(f"{url}?language=en-us").content.decode()
 
     assert "Gestion de projets" in french and "ESCO" in french
@@ -405,8 +405,8 @@ def test_the_box_answers_a_prefix_with_names(esco_skills, user, client):
 
 
 def test_the_box_answers_in_the_readers_language_and_the_records(esco_skills, user, client):
-    record_in(user, "pt-pt")
-    user.profile.language = "fr-fr"
+    record_in(user, "pt-PT")
+    user.profile.language = "fr-FR"
     user.profile.save()
     client.force_login(user)
 
@@ -477,7 +477,7 @@ def test_an_archive_from_before_the_identifier_restores_with_it_worked_out(
 def test_the_candidate_file_carries_it_and_its_reader_works_it_out_again(
     esco_skills, user, other_user
 ):
-    record_in(user, "en-gb")
+    record_in(user, "en-GB")
     Skill.objects.create(owner=user, name="Project management")
     Skill.objects.create(owner=user, name="Juggling")
     document = export.build_candidate_document(user)

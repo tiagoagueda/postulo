@@ -45,7 +45,7 @@ def offered_codes() -> set[str]:
 
 def test_nothing_stored_offers_everything(settings_row):
     assert site.offered_languages() == []
-    assert site.offers("de") and site.offers("pt-pt")
+    assert site.offers("de") and site.offers("pt-PT")
     assert len(offered_codes()) > 30
 
 
@@ -58,10 +58,10 @@ def test_a_language_added_later_is_offered_by_itself(settings_row):
 
 
 def test_narrowing_removes_the_rest_from_the_picker(settings_row):
-    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de", "pt-pt"])
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de", "pt-PT"])
 
-    assert offered_codes() == {"de", "pt-pt"}
-    assert not site.offers("fr-fr")
+    assert offered_codes() == {"de", "pt-PT"}
+    assert not site.offers("fr-FR")
 
 
 def test_a_stored_code_postulo_no_longer_speaks_is_passed_over(settings_row):
@@ -87,35 +87,35 @@ def test_an_administrator_is_not_exempt(client, django_user_model, settings_row)
 
 
 def test_a_withdrawn_language_leaves_the_persons_choice_alone(user, settings_row):
-    user.profile.language = "fr-fr"
+    user.profile.language = "fr-FR"
     user.profile.save(update_fields=["language"])
     SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de"])
 
     user.profile.refresh_from_db()
-    assert user.profile.language == "fr-fr", "stored, so offering it again restores it"
+    assert user.profile.language == "fr-FR", "stored, so offering it again restores it"
 
 
 def test_a_withdrawn_language_is_not_applied_to_the_page(client, user, settings_row):
     from postulo.core.middleware import UserPreferencesMiddleware
 
-    user.profile.language = "fr-fr"
+    user.profile.language = "fr-FR"
     user.profile.save(update_fields=["language"])
     SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de"])
 
-    assert not site.offers("fr-fr")
-    assert UserPreferencesMiddleware._offered("fr-fr") is False
+    assert not site.offers("fr-FR")
+    assert UserPreferencesMiddleware._offered("fr-FR") is False
     assert UserPreferencesMiddleware._offered("de") is True
 
 
 def test_offering_it_again_brings_the_person_back(user, settings_row):
-    user.profile.language = "fr-fr"
+    user.profile.language = "fr-FR"
     user.profile.save(update_fields=["language"])
     SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de"])
     SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=[])
 
     user.profile.refresh_from_db()
-    assert user.profile.language == "fr-fr"
-    assert site.offers("fr-fr")
+    assert user.profile.language == "fr-FR"
+    assert site.offers("fr-FR")
 
 
 # --------------------------------------------------------------- what it refuses
@@ -129,7 +129,7 @@ def test_offering_nothing_is_refused(settings_row):
 
 
 def test_the_default_language_cannot_stop_being_offered(settings_row):
-    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="pt-pt")
+    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="pt-PT")
     form = OfferedLanguagesForm(data={"offered_languages": ["de"]}, instance=site.current())
 
     assert not form.is_valid()
@@ -145,10 +145,10 @@ def test_ticking_everything_is_stored_as_nothing(settings_row):
 
 
 def test_a_narrowed_list_is_stored_as_itself(settings_row):
-    form = OfferedLanguagesForm(data={"offered_languages": ["de", "pt-pt"]}, instance=settings_row)
+    form = OfferedLanguagesForm(data={"offered_languages": ["de", "pt-PT"]}, instance=settings_row)
 
     assert form.is_valid(), form.errors
-    assert sorted(form.cleaned_data["offered_languages"]) == ["de", "pt-pt"]
+    assert sorted(form.cleaned_data["offered_languages"]) == ["de", "pt-PT"]
 
 
 # ------------------------------------------------------------------- the page
@@ -166,10 +166,10 @@ def test_the_page_offers_the_list_and_saves_it(client, django_user_model, settin
 
     client.post(
         reverse("server:defaults"),
-        {"offered_languages": ["de", "pt-pt"], "offered_languages_submit": "1"},
+        {"offered_languages": ["de", "pt-PT"], "offered_languages_submit": "1"},
     )
 
-    assert sorted(site.offered_languages()) == ["de", "pt-pt"]
+    assert sorted(site.offered_languages()) == ["de", "pt-PT"]
 
 
 def test_saving_the_other_form_does_not_disturb_the_list(client, django_user_model, settings_row):
@@ -262,12 +262,12 @@ def test_saving_the_page_as_shown_keeps_offering_everything(client, administrato
 
 
 def test_a_narrowed_list_ticks_its_own_and_no_others(client, administrator, settings_row):
-    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de", "pt-pt"])
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de", "pt-PT"])
 
     html = client.get(reverse("server:defaults")).content.decode()
     _codes, ticked = boxes(html)
 
-    assert ticked == {"de", "pt-pt"}
+    assert ticked == {"de", "pt-PT"}
     assert "All of them are offered" not in html
 
 
@@ -286,7 +286,7 @@ def test_only_codes_postulo_no_longer_speaks_is_everything(client, administrator
 
 def test_a_refused_list_comes_back_as_it_was_sent(client, administrator, settings_row):
     """What was posted is what is shown beside the error, not every box ticked over it."""
-    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="pt-pt")
+    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="pt-PT")
 
     response = client.post(
         reverse("server:defaults"),
@@ -311,14 +311,14 @@ def test_a_partly_translated_regional_language_keeps_its_region(client, administ
     monkeypatch.setattr(
         languages,
         "translation_status",
-        lambda: {"fr-fr": {"total": 100, "translated": 40, "drafts": 40, "percent": 40}},
+        lambda: {"fr-FR": {"total": 100, "translated": 40, "drafts": 40, "percent": 40}},
     )
 
     html = client.get(reverse("server:defaults")).content.decode()
     row = next(
         row
         for row in re.findall(r"<label[^>]*>(.*?)</label>", html, re.S)
-        if 'value="fr-fr"' in row
+        if 'value="fr-FR"' in row
     )
 
-    assert '<span lang="fr-fr">français (France)</span>' in row
+    assert '<span lang="fr-FR">français (France)</span>' in row

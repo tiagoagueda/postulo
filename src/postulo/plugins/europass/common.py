@@ -17,6 +17,7 @@ import re
 from django.core.exceptions import ValidationError
 
 from postulo.accounts import identifiers
+from postulo.plugins.api import is_language_tag, language_tag
 
 #: CEFR levels as Europass writes them, mapped onto Postulo's own.
 CEFR = {"A1": "a1", "A2": "a2", "B1": "b1", "B2": "b2", "C1": "c1", "C2": "c2"}
@@ -25,11 +26,6 @@ CEFR = {"A1": "a1", "A2": "a2", "B1": "b1", "B2": "b2", "C1": "c1", "C2": "c2"}
 CEFR_PARTS = ("Listening", "Reading", "SpokenInteraction", "SpokenProduction", "Writing")
 
 _ORDER = list(CEFR.values())
-
-#: What a `locale` has to look like before it is believed: a language, optionally a script
-#: or a region. A file from somewhere else can put anything in that attribute, and this one
-#: ends up in a column and in a language negotiation, so it is matched rather than trusted.
-LOCALE_PATTERN = re.compile(r"^[A-Za-z]{2,3}(?:[-_][A-Za-z0-9]{2,8}){0,2}$")
 
 
 # ------------------------------------------------------- shared by both formats
@@ -96,18 +92,16 @@ def _orcid_from(addresses: list[str]) -> str:
 
 
 def _locale(value) -> str:
-    """The language a file says it is in, normalised the way Postulo writes one.
+    """The language a file says it is in, written the way Postulo writes one.
 
     Europass puts it on the wrapper -- ``locale="pt"`` on the XML, ``"Locale": "pt"`` in the
     JSON -- and it is the only statement anywhere in the file about what language the career
-    itself is written in. Anything that is not a language tag is dropped rather than stored.
+    itself is written in. Anything that is not a language tag is dropped rather than stored:
+    a file from somewhere else can put anything in that attribute, and this one ends up in
+    a column and in a language negotiation, so its shape is checked rather than trusted.
     """
-    text = str(value or "").strip().replace("_", "-")
-    if not LOCALE_PATTERN.match(text):
-        return ""
-    # Lower case throughout, which is how Django writes a language code and therefore what
-    # `record_language` holds and what `translating.normalise` compares.
-    return text.lower()
+    text = str(value or "")
+    return language_tag(text) if is_language_tag(text) else ""
 
 
 def _project_from(title: str, description: str) -> dict | None:

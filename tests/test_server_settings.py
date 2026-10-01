@@ -116,8 +116,10 @@ def test_the_overview_says_which_scripts_this_machine_draws(client, admin):
     else:
         assert 'data-fonts="listed"' in html
         assert "check_fonts" in html, "the command-line pair, named beside the row"
+        from postulo.core import languages
+
         for script in sorted(fonts.renderable_scripts()):
-            assert script in html
+            assert languages.script_name(script) in html, "in words, not by its code"
 
 
 def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(client, admin, user):
@@ -372,7 +374,7 @@ def test_defaults_name_the_instance_and_seed_new_accounts(client, admin):
         {
             "instance_name": "Jobs at Home",
             "tagline": "Where the search lives.",
-            "default_language": "pt-pt",
+            "default_language": "pt-PT",
             "default_time_zone": "Europe/Lisbon",
         },
     )
@@ -385,7 +387,7 @@ def test_defaults_name_the_instance_and_seed_new_accounts(client, admin):
 
     newcomer = User.objects.create_user(email="new@example.org", password=PASSWORD)
     profile = Profile.objects.get(user=newcomer)
-    assert profile.language == "pt-pt" and profile.time_zone == "Europe/Lisbon"
+    assert profile.language == "pt-PT" and profile.time_zone == "Europe/Lisbon"
     assert site.default_time_zone() == "Europe/Lisbon"
 
 
@@ -399,7 +401,7 @@ def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admi
     """
     row = SiteSettings.get()
     row.instance_name = "Jobs at Home"
-    row.default_language = "pt-pt"
+    row.default_language = "pt-PT"
     row.default_time_zone = "Europe/Lisbon"
     row.save()
     client.force_login(admin)
@@ -419,7 +421,7 @@ def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admi
     assert 'value="Jobs at Home"' in name_input(html)
     assert "aria-invalid" not in name_input(html), "nobody edited the name"
     assert re.search(r'<option value="Europe/Lisbon"[^>]*\bselected\b', html)
-    assert re.search(r'<option value="pt-pt"[^>]*\bselected\b', html)
+    assert re.search(r'<option value="pt-PT"[^>]*\bselected\b', html)
     assert "This field is required" not in html
 
     # Nothing ticked at all is the other way to be refused, and it behaves the same.
@@ -431,7 +433,7 @@ def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admi
 
     row.refresh_from_db()
     assert row.instance_name == "Jobs at Home"
-    assert row.default_language == "pt-pt" and row.default_time_zone == "Europe/Lisbon"
+    assert row.default_language == "pt-PT" and row.default_time_zone == "Europe/Lisbon"
     assert row.offered_languages == []
 
 

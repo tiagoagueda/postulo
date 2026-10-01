@@ -48,8 +48,9 @@ import json
 from functools import lru_cache
 from pathlib import Path
 
-from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
+
+from postulo.core import languages as tags
 
 DATA = Path(__file__).resolve().parent / "data" / "nace-2.1.json"
 
@@ -119,15 +120,10 @@ def languages() -> list[str]:
 def _reading(language: str = "") -> str:
     """Which of the classification's languages to read, for whoever is reading Postulo.
 
-    ``pt-br`` takes the Portuguese names and ``en-gb`` the English ones: the base language
+    ``pt-BR`` takes the Portuguese names and ``en-GB`` the English ones: the base language
     is what a classification is published in, and a variant of it is the same words.
     """
-    code = (language or get_language() or FALLBACK).lower().replace("_", "-")
-    known = set(languages())
-    if code in known:
-        return code
-    base = code.partition("-")[0]
-    return base if base in known else FALLBACK
+    return tags.match(language or tags.current(), languages()) or FALLBACK
 
 
 def divisions(language: str = "") -> list[tuple[str, str]]:

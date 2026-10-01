@@ -232,11 +232,13 @@ def test_a_figure_is_read_however_it_is_grouped(written, value):
 @pytest.mark.parametrize(
     "tag,written",
     [
-        ("pt-pt", "dmy"),
+        ("pt-PT", "dmy"),
         ("pt", "dmy"),
         ("fr", "dmy"),
         ("de", "dmy"),
-        ("en-gb", "dmy"),
+        ("en-GB", "dmy"),
+        ("en-US", "mdy"),
+        # However the page spelt it: a tag says the same thing in any case.
         ("en-us", "mdy"),
         ("en", ""),
         ("", ""),
@@ -248,9 +250,10 @@ def test_the_order_a_date_is_written_in_comes_from_the_page_s_language(tag, writ
 
 def test_a_page_s_language_tag_is_a_stranger_s_text():
     """Only one of Postulo's own languages is ever asked for a translation."""
-    assert patterns.tag_of("pt_PT") == "pt-pt"
-    assert patterns.tag_of("en-US,en;q=0.9") == "en-us"
+    assert patterns.tag_of("pt_PT") == "pt-PT"
+    assert patterns.tag_of("en-US,en;q=0.9") == "en-US"
+    assert patterns.tag_of("pt-br") == "pt-BR", "written as Postulo writes one (#337)"
     assert patterns.tag_of("<script>") == ""
     assert patterns.tag_of("x" * 60) == ""
-    assert patterns.spoken("pt-zz") == ("pt-pt", "pt-br")
+    assert patterns.spoken("pt-zz") == ("pt-PT", "pt-BR")
     assert patterns.spoken("xx-evil") == ()

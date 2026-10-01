@@ -46,7 +46,7 @@ def test_the_languages_written_right_to_left(code):
     assert languages.direction(code) == "rtl"
 
 
-@pytest.mark.parametrize("code", ["en-gb", "pt-pt", "el", "mt", "ga", "hu", "bg"])
+@pytest.mark.parametrize("code", ["en-GB", "pt-PT", "el", "mt", "ga", "hu", "bg"])
 def test_everything_postulo_speaks_today_is_left_to_right(code):
     assert not languages.is_rtl(code)
     assert languages.direction(code) == "ltr"
@@ -57,6 +57,30 @@ def test_a_region_does_not_change_the_direction():
     assert languages.is_rtl("ar-EG")
     assert languages.is_rtl("ar_SA")
     assert not languages.is_rtl("en-AE")
+
+
+@pytest.mark.parametrize(
+    ("code", "written"),
+    [
+        # Kurdish is written in two scripts, and the language alone says the Arabic one.
+        ("ku", "rtl"),
+        ("ku-Arab", "rtl"),
+        ("ku-Latn", "ltr"),
+        ("ku_latn_TR", "ltr"),
+        # And the other way: a language read left to right, in a script that is not.
+        ("az", "ltr"),
+        ("az-Arab", "rtl"),
+        ("az-arab-IR", "rtl"),
+        ("ar-Latn", "ltr"),
+        ("he-Hebr", "rtl"),
+        ("sr-Cyrl", "ltr"),
+        ("dv-Thaa", "rtl"),
+    ],
+)
+def test_a_script_that_is_stated_decides_the_direction(code, written):
+    """A tag may say its script, and then that is what is read: `ku-Latn` used to be
+    drawn right to left because Kurdish, with nothing said, is (#337)."""
+    assert languages.direction(code) == written
 
 
 def test_a_language_nobody_has_heard_of_gets_a_direction_anyway():
@@ -84,7 +108,7 @@ def test_the_page_declares_the_direction_of_the_language_it_is_in(client, user):
 
 
 def test_a_left_to_right_language_still_says_so(client, user):
-    reading_right_to_left(user, code="pt-pt")
+    reading_right_to_left(user, code="pt-PT")
     client.force_login(user)
 
     html = client.get(reverse("core:home")).content.decode()
@@ -113,7 +137,7 @@ def test_a_document_is_laid_out_for_the_language_it_is_written_in(user):
     from postulo.documents.rendering import document_direction, render_cv_html
 
     reading_right_to_left(user)
-    cv = CV.objects.create(owner=user, name="Main", language="en-gb")
+    cv = CV.objects.create(owner=user, name="Main", language="en-GB")
 
     assert document_direction(cv) == "ltr"
     assert 'dir="ltr"' in render_cv_html(cv)

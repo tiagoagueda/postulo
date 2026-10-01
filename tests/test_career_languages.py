@@ -4,7 +4,7 @@
 
 At the document level that was already true — a CV declares its language and the PDF is laid
 out for it. One level down it was not: the career record held one text per field, so a CV
-declaring ``fr-fr`` printed English job titles, and the honest way to keep a CV in two
+declaring ``fr-FR`` printed English job titles, and the honest way to keep a CV in two
 languages was to keep two careers.
 
 Three things are worth holding to here, and they pull in different directions. A second
@@ -88,17 +88,17 @@ def test_a_credential_is_the_awarding_bodys_wording_and_is_left_alone():
 def test_a_field_nothing_may_translate_is_dropped_even_if_a_row_exists(user):
     """`TRANSLATABLE` can lose a field; a row nobody can edit should not still print."""
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
     Translation.objects.create(
         owner=user,
         content_type=Translation.objects.first().content_type,
         object_id=experience.pk,
-        language="fr-fr",
+        language="fr-FR",
         field="organisation",
         text="Société Weyland",
     )
 
-    overrides = translating.overrides_for(experience, "fr-fr")
+    overrides = translating.overrides_for(experience, "fr-FR")
 
     assert overrides == {"role": "Ingénieur"}
 
@@ -108,9 +108,9 @@ def test_a_field_nothing_may_translate_is_dropped_even_if_a_row_exists(user):
 
 def test_an_entry_reads_in_the_language_asked_for(user):
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur back-end", location="Lisbonne")
+    translate(experience, "fr-FR", role="Ingénieur back-end", location="Lisbonne")
 
-    french = translating.in_language(experience, "fr-fr")
+    french = translating.in_language(experience, "fr-FR")
 
     assert french.role == "Ingénieur back-end"
     assert french.location == "Lisbonne"
@@ -121,14 +121,14 @@ def test_an_entry_reads_in_the_language_asked_for(user):
 def test_untranslated_highlights_are_the_originals_and_translated_ones_are_not(user):
     experience = an_experience(user)
 
-    assert translating.in_language(experience, "fr-fr").highlight_lines == [
+    assert translating.in_language(experience, "fr-FR").highlight_lines == [
         "Cut deploy time.",
         "Ran the on-call rota.",
     ]
 
-    translate(experience, "fr-fr", highlights="Déploiement plus rapide.\nAstreinte tenue.")
+    translate(experience, "fr-FR", highlights="Déploiement plus rapide.\nAstreinte tenue.")
 
-    assert translating.in_language(experience, "fr-fr").highlight_lines == [
+    assert translating.in_language(experience, "fr-FR").highlight_lines == [
         "Déploiement plus rapide.",
         "Astreinte tenue.",
     ]
@@ -137,29 +137,29 @@ def test_untranslated_highlights_are_the_originals_and_translated_ones_are_not(u
 def test_a_translation_somebody_cleared_prints_the_original(user):
     """Blank is withdrawal, not emptiness."""
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="   ")
+    translate(experience, "fr-FR", role="   ")
 
-    assert translating.in_language(experience, "fr-fr").role == "Backend engineer"
+    assert translating.in_language(experience, "fr-FR").role == "Backend engineer"
 
 
 def test_a_variant_of_the_same_language_is_close_enough(user):
     """A Brazilian reader given European Portuguese has read the entry; given English, not."""
     experience = an_experience(user)
-    translate(experience, "pt-pt", role="Engenheiro de backend")
+    translate(experience, "pt-PT", role="Engenheiro de backend")
 
-    assert translating.in_language(experience, "pt-br").role == "Engenheiro de backend"
+    assert translating.in_language(experience, "pt-BR").role == "Engenheiro de backend"
     assert translating.in_language(experience, "de").role == "Backend engineer"
 
 
 def test_correcting_the_master_copy_corrects_every_language(user):
     """The whole reason this is a translation rather than a second career."""
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
 
     experience.end_date = "2024-06-30"
     experience.save()
 
-    french = translating.in_language(experience, "fr-fr")
+    french = translating.in_language(experience, "fr-FR")
     assert str(french.end_date) == "2024-06-30"
 
 
@@ -168,8 +168,8 @@ def test_correcting_the_master_copy_corrects_every_language(user):
 
 def test_a_cv_in_french_prints_the_french_entry(user):
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur back-end")
-    cv = a_cv_with(user, experience, language="fr-fr")
+    translate(experience, "fr-FR", role="Ingénieur back-end")
+    cv = a_cv_with(user, experience, language="fr-FR")
 
     html = render_cv_html(cv)
 
@@ -190,8 +190,8 @@ def test_the_language_a_cv_declares_is_the_one_it_reads_in(user):
     declaration of another language is the mismatch this exists to remove.
     """
     experience = an_experience(user)
-    translate(experience, "pt-pt", role="Engenheiro")
-    user.profile.language = "pt-pt"
+    translate(experience, "pt-PT", role="Engenheiro")
+    user.profile.language = "pt-PT"
     user.profile.save()
 
     cv = a_cv_with(user, experience, language="")
@@ -202,8 +202,8 @@ def test_the_language_a_cv_declares_is_the_one_it_reads_in(user):
 def test_this_cvs_own_highlights_beat_a_translation(user):
     """Somebody who wrote highlights for this CV wrote them for the CV in front of them."""
     experience = an_experience(user)
-    translate(experience, "fr-fr", highlights="Traduit.")
-    cv = a_cv_with(user, experience, language="fr-fr")
+    translate(experience, "fr-FR", highlights="Traduit.")
+    cv = a_cv_with(user, experience, language="fr-FR")
     cv.items.update(override_highlights="Écrit pour ce CV.")
 
     lines = build_sections(cv)[0].items[0].highlight_lines
@@ -215,10 +215,10 @@ def test_a_page_of_entries_costs_one_query_for_their_translations(user, django_a
     """A generic link has no join to follow, so the batch lookup is what answers for it."""
     entries = [an_experience(user, role=f"Engineer {index}") for index in range(5)]
     for entry in entries:
-        translate(entry, "fr-fr", role="Ingénieur")
+        translate(entry, "fr-FR", role="Ingénieur")
 
     with django_assert_num_queries(1):
-        translating.overrides_by_entry(entries, "fr-fr")
+        translating.overrides_by_entry(entries, "fr-FR")
 
 
 def test_a_skill_group_prints_its_skills_in_the_cvs_language(user):
@@ -230,11 +230,11 @@ def test_a_skill_group_prints_its_skills_in_the_cvs_language(user):
     from postulo.resume.models import Skill
 
     group = SkillGroup.objects.create(owner=user, name="Skills")
-    translate(group, "fr-fr", name="Compétences")
+    translate(group, "fr-FR", name="Compétences")
     people = Skill.objects.create(owner=user, group=group, name="Team management")
     Skill.objects.create(owner=user, group=group, name="Python")
-    translate(people, "fr-fr", name="Gestion d’équipe")
-    cv = a_cv_with(user, group, language="fr-fr")
+    translate(people, "fr-FR", name="Gestion d’équipe")
+    cv = a_cv_with(user, group, language="fr-FR")
 
     html = render_cv_html(cv)
 
@@ -248,9 +248,9 @@ def test_a_skill_group_prints_its_skills_in_the_cvs_language(user):
 
 def test_a_cv_says_which_entries_have_nothing_in_its_language(user, client):
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
     other = an_experience(user, role="Platform engineer", organisation="Aperture")
-    cv = a_cv_with(user, experience, language="fr-fr")
+    cv = a_cv_with(user, experience, language="fr-FR")
     from django.contrib.contenttypes.models import ContentType
 
     CVItem.objects.create(
@@ -273,9 +273,9 @@ def test_a_cv_says_which_entries_have_nothing_in_its_language(user, client):
 
 def test_nothing_is_reported_when_the_cv_is_in_the_language_the_record_is_written_in(user):
     """Otherwise the warning names every entry on the page and is read once, then never."""
-    user.profile.record_language = "en-gb"
+    user.profile.record_language = "en-GB"
     user.profile.save()
-    cv = a_cv_with(user, an_experience(user), language="en-gb")
+    cv = a_cv_with(user, an_experience(user), language="en-GB")
 
     assert translating.fallen_back(cv) == []
 
@@ -284,16 +284,16 @@ def test_a_field_with_nothing_in_it_did_not_fall_back_on_anything(user):
     """Listing an empty summary would bury the two fields that did."""
     experience = an_experience(user, summary="", highlights="")
 
-    missing = translating.fields_that_fell_back(experience, "fr-fr")
+    missing = translating.fields_that_fell_back(experience, "fr-FR")
 
     assert set(missing) == {"role", "location"}
 
 
 def test_the_record_language_falls_back_to_the_one_postulo_is_read_in(user):
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save()
 
-    assert translating.record_language_of(user) == "pt-pt"
+    assert translating.record_language_of(user) == "pt-PT"
 
 
 # ------------------------------------------------------------------- editing them
@@ -304,7 +304,7 @@ def test_the_screen_offers_exactly_the_fields_that_may_be_translated(user, clien
     client.force_login(user)
 
     html = client.get(
-        reverse("resume:item_languages", args=["experience", experience.pk]) + "?language=fr-fr"
+        reverse("resume:item_languages", args=["experience", experience.pk]) + "?language=fr-FR"
     ).content.decode()
 
     assert 'name="role"' in html
@@ -318,24 +318,24 @@ def test_saving_a_translation_writes_it(user, client):
 
     client.post(
         reverse("resume:item_languages", args=["experience", experience.pk]),
-        {"language": "fr-fr", "role": "Ingénieur", "location": "", "summary": "", "highlights": ""},
+        {"language": "fr-FR", "role": "Ingénieur", "location": "", "summary": "", "highlights": ""},
     )
 
-    assert translating.in_language(experience, "fr-fr").role == "Ingénieur"
+    assert translating.in_language(experience, "fr-FR").role == "Ingénieur"
 
 
 def test_clearing_a_box_leaves_the_row_and_prints_the_original(user, client):
     """A form that deletes rows on save loses work to a mis-click on a field nobody opened."""
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
     client.force_login(user)
 
     client.post(
         reverse("resume:item_languages", args=["experience", experience.pk]),
-        {"language": "fr-fr", "role": "", "location": "", "summary": "", "highlights": ""},
+        {"language": "fr-FR", "role": "", "location": "", "summary": "", "highlights": ""},
     )
 
-    assert translating.in_language(experience, "fr-fr").role == "Backend engineer"
+    assert translating.in_language(experience, "fr-FR").role == "Backend engineer"
     assert Translation.objects.filter(object_id=experience.pk, field="role").exists()
 
 
@@ -365,14 +365,14 @@ def test_one_text_per_field_per_language_is_the_databases_rule(user):
     from django.db import IntegrityError, transaction
 
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
 
     with pytest.raises(IntegrityError), transaction.atomic():
         Translation.objects.create(
             owner=user,
             content_type=ContentType.objects.get_for_model(Experience),
             object_id=experience.pk,
-            language="fr-fr",
+            language="fr-FR",
             field="role",
             text="Autre",
         )
@@ -380,7 +380,7 @@ def test_one_text_per_field_per_language_is_the_databases_rule(user):
 
 def test_deleting_an_entry_takes_its_translations(user):
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur")
+    translate(experience, "fr-FR", role="Ingénieur")
 
     experience.delete()
 
@@ -409,10 +409,10 @@ def test_translations_travel_in_the_archive_and_come_back(user, other_user):
     from postulo.core import export, importer
 
     group = SkillGroup.objects.create(owner=user, name="Languages")
-    translate(group, "fr-fr", name="Langues")
+    translate(group, "fr-FR", name="Langues")
     experience = an_experience(user)
-    translate(experience, "fr-fr", role="Ingénieur back-end")
-    user.profile.record_language = "en-gb"
+    translate(experience, "fr-FR", role="Ingénieur back-end")
+    user.profile.record_language = "en-GB"
     user.profile.save()
 
     document = export.build_document(user)
@@ -421,19 +421,19 @@ def test_translations_travel_in_the_archive_and_come_back(user, other_user):
     assert {
         "section": "experience",
         "ref": experience.pk,
-        "language": "fr-fr",
+        "language": "fr-FR",
         "field": "role",
         "text": "Ingénieur back-end",
     } in rows
     assert any(row["section"] == "skill_groups" for row in rows)
-    assert document["account"]["profile"]["record_language"] == "en-gb"
+    assert document["account"]["profile"]["record_language"] == "en-GB"
 
     importer.load(other_user, an_archive(document))
 
     restored = Experience.objects.for_user(other_user).get()
-    assert translating.in_language(restored, "fr-fr").role == "Ingénieur back-end"
+    assert translating.in_language(restored, "fr-FR").role == "Ingénieur back-end"
     other_user.profile.refresh_from_db()
-    assert other_user.profile.record_language == "en-gb"
+    assert other_user.profile.record_language == "en-GB"
 
 
 def test_an_archive_written_before_this_still_restores(user, other_user):

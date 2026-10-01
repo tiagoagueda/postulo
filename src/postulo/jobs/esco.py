@@ -77,7 +77,7 @@ from functools import lru_cache
 from itertools import pairwise
 from pathlib import Path
 
-from django.utils.translation import get_language
+from postulo.core import languages as tags
 
 logger = logging.getLogger(__name__)
 
@@ -156,17 +156,12 @@ def languages() -> list[str]:
 def _reading(language: str = "") -> str:
     """Which of the classification's languages to read, for whoever is reading Postulo.
 
-    ``pt-br`` takes the Portuguese names and ``en-gb`` the English ones: the base language
+    ``pt-BR`` takes the Portuguese names and ``en-GB`` the English ones: the base language
     is what a classification is published in, and a variant of it is the same words. A
     language ESCO does not publish reads the English names, rather than a translation
     this project would have to keep itself.
     """
-    code = (language or get_language() or FALLBACK).lower().replace("_", "-")
-    known = set(languages())
-    if code in known:
-        return code
-    base = code.partition("-")[0]
-    return base if base in known else FALLBACK
+    return tags.match(language or tags.current(), languages()) or FALLBACK
 
 
 def unit_groups(language: str = "") -> list[tuple[str, str]]:
@@ -370,17 +365,12 @@ def _skill_identifiers() -> tuple[str, ...]:
 def _skill_language(code: str) -> str:
     """Which of the skills' languages ``code`` reads, or empty where it reads none.
 
-    ``pt-br`` reads the Portuguese names and ``en-gb`` the English ones, as for occupations.
+    ``pt-BR`` reads the Portuguese names and ``en-GB`` the English ones, as for occupations.
     Unlike `_reading` there is no English here for a language the classification does not
     publish: a caller that wants English asks for it, because English standing in for a
     language is one thing in a suggestion and another on a CV.
     """
-    code = (code or "").strip().lower().replace("_", "-")
-    known = set(skills_about()["languages"])
-    if code in known:
-        return code
-    base = code.partition("-")[0]
-    return base if base in known else ""
+    return tags.match(code, skills_about()["languages"])
 
 
 @lru_cache(maxsize=SKILL_LANGUAGES_HELD)
@@ -474,7 +464,7 @@ def skill_name(uri: str, language: str = "", *, strict: bool = True) -> str:
     position = _skill_position(uri)
     if position is None:
         return ""
-    reading = _skill_language(language or get_language() or FALLBACK)
+    reading = _skill_language(language or tags.current())
     names = _skill_names(reading) if reading else ()
     name = names[position] if position < len(names) else ""
     if not name and not strict:
@@ -496,7 +486,7 @@ def skill_suggestions(typed: str, *languages: str, limit: int = SUGGESTED_SKILLS
     if len(prefix) < SHORTEST_PREFIX or not skills_available():
         return []
     readings: list[str] = []
-    for index, code in enumerate(languages or (get_language() or FALLBACK,)):
+    for index, code in enumerate(languages or (tags.current(),)):
         reading = _skill_language(code) or (FALLBACK if index == 0 else "")
         if reading and reading not in readings:
             readings.append(reading)

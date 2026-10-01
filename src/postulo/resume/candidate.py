@@ -64,7 +64,16 @@ from django.utils.translation import gettext_lazy
 
 from postulo.accounts.forms import PersonIdentifierForm
 from postulo.accounts.models import PersonIdentifier, Profile
-from postulo.core import addresses, export, languages, phone_numbers, phones, postal, throttle
+from postulo.core import (
+    addresses,
+    export,
+    language_field,
+    languages,
+    phone_numbers,
+    phones,
+    postal,
+    throttle,
+)
 from postulo.core import web_links as links
 from postulo.core.models import PhoneNumber, PostalAddress, WebLink
 
@@ -96,10 +105,6 @@ BATCH = 200
 #: and the same file has to read the same way whoever opens it.
 ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
-#: What a language has to look like before it is believed: the same rule the Europass
-#: reader holds a locale to, applied after the code has been written Django's way.
-LANGUAGE_TAG = re.compile(r"^[a-z]{2,3}(?:-[a-z0-9]{2,8}){0,2}$")
-MAX_LANGUAGE_LENGTH = 10
 
 #: An `order` is a small whole number. Anything else in that place says nothing.
 MAX_ORDER = 2**31 - 1
@@ -560,7 +565,7 @@ def _said(value) -> str:
 
 def _said_of(translation) -> tuple:
     """What one translation is a translation of: the entry, the language and the field."""
-    language = translating.normalise(translation.language)
+    language = languages.tag(translation.language)
     return (translation.content_type_id, translation.object_id, language, translation.field)
 
 
@@ -764,7 +769,7 @@ class _Planner:
                 continue
             if not value:
                 continue
-            shown = languages.NATIVE_NAMES.get(value, value) if name.endswith("language") else value
+            shown = languages.native_name(value, value) if name.endswith("language") else value
             holder = self.user if name in NAME_FIELDS else self.profile
             mine = str(getattr(holder, name, "") or "")
             if not mine.strip():
@@ -777,13 +782,14 @@ class _Planner:
 
     @staticmethod
     def _language(value: str) -> str:
-        """A language code written Django's way, or a `ValidationError` saying it is not one."""
-        code = translating.normalise(value)
-        if len(code) > MAX_LANGUAGE_LENGTH or not LANGUAGE_TAG.match(code):
-            raise ValidationError(
-                _("“%(code)s” is not a language code, like en-gb or pt-pt.") % {"code": value[:20]}
-            )
-        return code
+        """A language code as Postulo writes one, or a `ValidationError` saying it is not one.
+
+        In any case and with either separator, as a file from elsewhere may write it: what
+        it is held to is the shape of a tag, the rule the Europass reader holds a locale to.
+        """
+        if not languages.well_formed(value):
+            raise language_field.refusal(value)
+        return languages.tag(value)
 
     # ---------------------------------------------------- numbers, addresses and links
 
@@ -1223,7 +1229,7 @@ class _Planner:
                 section.rows.append(row)
             row.texts.append((field_name, text))
             row.sub = _("%(language)s: %(fields)s") % {
-                "language": languages.NATIVE_NAMES.get(language, language),
+                "language": languages.native_name(language, language),
                 "fields": ", ".join(
                     translating.field_label(kind.model, name) for name, _text in row.texts
                 ),

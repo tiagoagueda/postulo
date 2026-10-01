@@ -105,12 +105,15 @@ def _font_scripts() -> list[tuple[str, bool]] | None:
     *nothing to show* and *cannot be checked* are different things on this page,
     and the page says which it is (#74).
     """
+    from postulo.core import languages
     from postulo.documents import fonts
 
     answer = fonts.renderable_scripts()
     if answer is None:
         return None
-    return sorted(answer.items())
+    # In words: the check answers by a script's code, which is what a language tag says
+    # one with, and the page is read by a person.
+    return sorted((languages.script_name(script), drawable) for script, drawable in answer.items())
 
 
 def _queued_tasks() -> int | None:

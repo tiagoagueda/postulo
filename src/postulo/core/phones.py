@@ -29,6 +29,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from . import languages
+
 #: (ISO 3166-1 alpha-2, dialling code, English name).
 #:
 #: The names are English because this is a list somebody scans for their own country, and
@@ -289,7 +291,7 @@ _BY_DIALLING = sorted(COUNTRIES, key=lambda row: (-len(row[1]), row[0]))
 #: somebody reading Postulo in it. A guess, and only a starting value: the field is a
 #: choice, and being wrong costs one click.
 FROM_LANGUAGE: dict[str, str] = {
-    "en-gb": "GB",
+    "en-GB": "GB",
     "bg": "BG",
     "cs": "CZ",
     "da": "DK",
@@ -298,7 +300,7 @@ FROM_LANGUAGE: dict[str, str] = {
     "es": "ES",
     "et": "EE",
     "fi": "FI",
-    "fr-fr": "FR",
+    "fr-FR": "FR",
     "ga": "IE",
     "hr": "HR",
     "hu": "HU",
@@ -308,8 +310,8 @@ FROM_LANGUAGE: dict[str, str] = {
     "mt": "MT",
     "nl": "NL",
     "pl": "PL",
-    "pt-pt": "PT",
-    "pt-br": "BR",
+    "pt-PT": "PT",
+    "pt-BR": "BR",
     "ro": "RO",
     "sk": "SK",
     "sl": "SI",
@@ -355,7 +357,7 @@ def country_choices() -> list[tuple[str, str]]:
 
 def default_country(language: str = "") -> str:
     """Which country to offer first, given what somebody reads Postulo in."""
-    return FROM_LANGUAGE.get((language or "").lower(), "")
+    return FROM_LANGUAGE.get(languages.find(language, FROM_LANGUAGE), "")
 
 
 def combine(number: str, country: str) -> str:

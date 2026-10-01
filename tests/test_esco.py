@@ -71,7 +71,7 @@ def test_it_arrives_translated_rather_than_being_translated_here():
     assert len(esco.languages()) == 28
     with translation.override("fr"):
         assert esco.name_for("2511") == "Analystes de systèmes"
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         assert esco.name_for("2511") == "Analistas de sistemas"
 
 
@@ -86,8 +86,8 @@ def test_a_language_esco_does_not_publish_gets_the_english_name():
 
 def test_a_variant_reads_the_language_it_is_a_variant_of():
     first = esco.unit_groups()[0][0]
-    assert esco.name_for(first, "pt-br") == esco.name_for(first, "pt")
-    assert esco.name_for(first, "en-gb") == esco.name_for(first, "en")
+    assert esco.name_for(first, "pt-BR") == esco.name_for(first, "pt")
+    assert esco.name_for(first, "en-GB") == esco.name_for(first, "en")
 
 
 def test_nothing_in_the_classification_is_a_string_this_project_translates():

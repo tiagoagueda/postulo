@@ -21,6 +21,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.identifiers import PERSON, require, scheme_field
+from postulo.core.language_field import LanguageField
 
 from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
@@ -293,18 +294,16 @@ class Profile(models.Model):
         blank=True,
         help_text=_("City and country, as it should appear on a CV."),
     )
-    language = models.CharField(_("language"), max_length=10, blank=True)
+    language = LanguageField(_("language"), blank=True)
     #: Which language the career record itself is written in -- the job titles, the
     #: summaries, the highlights -- as opposed to `language`, which is the interface. The
     #: two are often different: somebody reading Postulo in English may have typed their
-    #: career in Portuguese, and a CV declaring `pt-pt` then needs no translations at all.
+    #: career in Portuguese, and a CV declaring `pt-PT` then needs no translations at all.
     #:
     #: Blank means "the same as the interface", which is the right guess and never a claim.
     #: What it is actually for is knowing when *not* to warn: without it, every entry on a
     #: CV in the record's own language would be reported as having fallen back (#131).
-    record_language = models.CharField(
-        _("language of your career record"), max_length=10, blank=True
-    )
+    record_language = LanguageField(_("language of your career record"), blank=True)
     time_zone = models.CharField(_("time zone"), max_length=64, blank=True)
     theme = models.CharField(_("theme"), max_length=10, choices=Theme, default=Theme.SYSTEM)
     #: Keys from postulo.core.navigation that this person has chosen not to see in the

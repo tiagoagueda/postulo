@@ -88,7 +88,7 @@ def somebody(user):
     profile = user.profile
     profile.headline = "Backend engineer"
     profile.location = "Lisboa, Portugal"
-    profile.record_language = "en-gb"
+    profile.record_language = "en-GB"
     # What the file must not carry: how Postulo behaves for this account.
     profile.theme = "dark"
     profile.time_zone = "Europe/Lisbon"
@@ -162,8 +162,8 @@ def somebody(user):
     )
     LanguageSkill.objects.create(owner=user, name="português", proficiency="native")
 
-    translate(current, "fr-fr", role="Ingénieur principal", summary="A maintenu les services.")
-    translate(skill, "fr-fr", name="Go (langage)")
+    translate(current, "fr-FR", role="Ingénieur principal", summary="A maintenu les services.")
+    translate(skill, "fr-FR", name="Go (langage)")
     return user
 
 
@@ -541,7 +541,7 @@ def test_everything_arrives_in_an_account_that_had_nothing(somebody, other_user)
     assert (other_user.first_name, other_user.last_name) == ("Alex", "Morgan")
     assert profile.headline == "Backend engineer"
     assert profile.location == "Lisboa, Portugal"
-    assert profile.record_language == "en-gb"
+    assert profile.record_language == "en-GB"
 
 
 def test_what_arrives_is_what_left(somebody, other_user):
@@ -866,7 +866,7 @@ def test_an_id_in_the_file_is_never_an_id_in_the_database(somebody):
                 {
                     "section": "experience",
                     "ref": mine.pk,
-                    "language": "fr-fr",
+                    "language": "fr-FR",
                     "field": "role",
                     "text": "Développeur",
                 }
@@ -892,7 +892,7 @@ def test_an_id_that_names_two_entries_names_neither(user):
                 {
                     "section": "experience",
                     "ref": 1,
-                    "language": "fr-fr",
+                    "language": "fr-FR",
                     "field": "role",
                     "text": "Développeur",
                 }
@@ -1003,7 +1003,7 @@ def test_a_blank_is_filled_and_an_answer_is_kept(user):
     assert (user.first_name, user.last_name) == ("Alexandra", "Morgan")
     assert profile.headline == "Staff engineer, mostly Python"
     assert profile.location == "Lisboa, Portugal"
-    assert profile.record_language == "pt-pt", "written the way Postulo writes a language"
+    assert profile.record_language == "pt-PT", "written the way Postulo writes a language"
 
 
 def test_a_detail_that_says_what_yours_says_is_already_there(somebody):
@@ -1197,7 +1197,7 @@ def test_a_file_cannot_give_somebody_two_of_a_kind_either(user):
 # ------------------------------------------------------------------------- translations
 
 
-def fr(section: str, ref: int, name: str, text: str, language: str = "fr-fr") -> dict:
+def fr(section: str, ref: int, name: str, text: str, language: str = "fr-FR") -> dict:
     return {"section": section, "ref": ref, "language": language, "field": name, "text": text}
 
 
@@ -1220,7 +1220,7 @@ def test_an_entry_already_there_gains_what_it_did_not_say(somebody):
                 fr("experience", 1, "role", "Ingénieur principal"),
                 fr("experience", 1, "summary", "Autre chose."),
                 fr("experience", 1, "location", "Lisbonne"),
-                fr("experience", 1, "location", "Lisboa", language="pt-pt"),
+                fr("experience", 1, "location", "Lisboa", language="pt-PT"),
             ],
         }
     )
@@ -1237,10 +1237,10 @@ def test_an_entry_already_there_gains_what_it_did_not_say(somebody):
     entry = Experience.objects.for_user(somebody).get(organisation="Aperture Science")
     said = {(row.language, row.field): row.text for row in entry.translations.all()}
     assert said == {
-        ("fr-fr", "role"): "Ingénieur principal",
-        ("fr-fr", "summary"): "A maintenu les services.",
-        ("fr-fr", "location"): "Lisbonne",
-        ("pt-pt", "location"): "Lisboa",
+        ("fr-FR", "role"): "Ingénieur principal",
+        ("fr-FR", "summary"): "A maintenu les services.",
+        ("fr-FR", "location"): "Lisbonne",
+        ("pt-PT", "location"): "Lisboa",
     }
 
 

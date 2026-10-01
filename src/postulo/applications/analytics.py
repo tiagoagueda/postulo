@@ -318,8 +318,8 @@ def fingerprint(user) -> str:
     has to be renamed here as well.
     """
     from django.db.models import Max
-    from django.utils import translation
 
+    from postulo.core import languages
     from postulo.jobs.models import Company, Contact
 
     applications = Application.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
@@ -334,7 +334,7 @@ def fingerprint(user) -> str:
         # The figures carry words -- the name of a stage, of a reason, *Not recorded* --
         # written in the language they were worked out in, so somebody who changes the
         # language they read in has to be given figures worked out again.
-        translation.get_language(),
+        languages.current(),
         getattr(user, "pk", 0),
         applications["n"],
         applications["at"],

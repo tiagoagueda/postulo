@@ -86,11 +86,11 @@ def test_a_density_nobody_offers_is_refused(client, user):
 def test_language_and_time_are_saved(client, user):
     client.force_login(user)
     response = client.post(
-        reverse("settings:locale"), {"language": "pt-pt", "time_zone": "Europe/Lisbon"}
+        reverse("settings:locale"), {"language": "pt-PT", "time_zone": "Europe/Lisbon"}
     )
     assert response.status_code == 302
     profile = Profile.objects.get(user=user)
-    assert profile.language == "pt-pt"
+    assert profile.language == "pt-PT"
     assert profile.time_zone == "Europe/Lisbon"
 
     response = client.post(reverse("settings:locale"), {"language": "", "time_zone": "Mars/Base"})

@@ -543,7 +543,11 @@ class CVOut(Schema):
     headline: str = ""
     summary: str = ""
     theme: str
-    language: str = ""
+    language: str = Field(
+        default="",
+        description="The language it is written in, as a BCP 47 tag in its canonical form "
+        "(`pt-BR`); blank follows the profile",
+    )
     item_count: int
     updated_at: dt.datetime
 
@@ -686,8 +690,13 @@ class LetterOut(Schema):
     is_template: bool
     theme: str
     #: As `CVOut` has carried all along; the field has been on the model since the
-    #: beginning and only the schema had forgotten it (#283).
-    language: str = ""
+    #: beginning and only the schema had forgotten it (#283). The schema remembered and
+    #: the answer did not: nothing filled it, so every letter said blank until #337.
+    language: str = Field(
+        default="",
+        description="The language it is written in, as a BCP 47 tag in its canonical form "
+        "(`pt-BR`); blank follows the profile",
+    )
     created_at: dt.datetime
     updated_at: dt.datetime
 
@@ -710,7 +719,11 @@ class DocumentOut(Schema):
     title: str
     #: Empty means nobody has said, for an upload, or that the snapshot predates the
     #: column, for a render (#283). Never a guess.
-    language: str = ""
+    language: str = Field(
+        default="",
+        description="The language it is in, as a BCP 47 tag in its canonical form (`pt-BR`); "
+        "blank where nobody has said",
+    )
     application_id: int | None = None
     created_at: dt.datetime
     updated_at: dt.datetime
@@ -792,7 +805,8 @@ class ProfileOut(Schema):
     )
     record_language: str = Field(
         default="",
-        description="The language the career record is written in; blank is the interface's",
+        description="The language the career record is written in, as a BCP 47 tag in its "
+        "canonical form (`pt-BR`); blank is the interface's",
     )
     updated_at: dt.datetime
 

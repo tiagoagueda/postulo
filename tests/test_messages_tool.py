@@ -84,10 +84,10 @@ def test_a_catalogue_survives_the_round_trip(tool):
     )
     context = tool.Message(msgid="May", context="month name", msgstr=["mai"])
     catalogue = tool.Catalogue(
-        header=tool.header_for("fr-fr", {}),
+        header=tool.header_for("fr-FR", {}),
         messages={m.key: m for m in (message, plural, context)},
     )
-    text = tool.dump(catalogue, "fr-fr")
+    text = tool.dump(catalogue, "fr-FR")
     again = tool.parse(text)
     assert again.header["Plural-Forms"] == "nplurals=2; plural=(n > 1);"
     back = again.messages[message.key]
@@ -154,7 +154,7 @@ def test_placeholder_problems_are_named(tool):
             (None, "Fine %(x)s"): tool.Message(msgid="Fine %(x)s", msgstr=["Bien %(x)s"]),
         },
     )
-    problems = tool.problems_in(catalogue, "fr-fr")
+    problems = tool.problems_in(catalogue, "fr-FR")
     assert len(problems) == 1 and "Hi %(name)s" in problems[0]
     assert any(p.endswith("has 3") for p in tool.problems_in(catalogue, "pl"))
 
@@ -176,12 +176,12 @@ def test_a_form_that_also_counts_twenty_one_cannot_spell_out_one(tool):
             },
         )
 
-    assert tool.counts_beyond_one("fr-fr") == (False, True), "0 and 1, then everything else"
+    assert tool.counts_beyond_one("fr-FR") == (False, True), "0 and 1, then everything else"
     assert tool.counts_beyond_one("bs") == (True, True, True), "the first form counts 21"
     assert tool.counts_beyond_one("sl") == (True, True, True, True), "and Slovene's 101"
 
     french = catalogue("Une ligne cochée.", "%(count)s lignes cochées.")
-    assert tool.problems_in(french, "fr-fr") == []
+    assert tool.problems_in(french, "fr-FR") == []
 
     spelt_out = catalogue(
         "Jedan red označen.", "%(count)s reda označena.", "%(count)s redova označeno."

@@ -46,13 +46,13 @@ def test_email_uniqueness_is_enforced(user, db):
         get_user_model().objects.create_user(email=user.email, password="x")
 
 
-@pytest.mark.parametrize("code", ["en-gb", "fr-fr", "pt-pt"])
+@pytest.mark.parametrize("code", ["en-GB", "fr-FR", "pt-PT"])
 def test_configured_languages_are_available(code, settings):
     assert code in dict(settings.LANGUAGES)
 
 
 def test_british_english_is_the_source_language(settings):
-    assert settings.LANGUAGE_CODE == "en-gb"
+    assert settings.LANGUAGE_CODE == "en-GB"
 
 
 def test_a_fresh_install_can_open_its_database(tmp_path, monkeypatch):

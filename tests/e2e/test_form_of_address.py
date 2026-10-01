@@ -114,7 +114,7 @@ def test_your_details_with_both_boxes_open_has_no_violations(
     assert not found, describe(f"/accounts/profile/ with Other open ({scheme})", found)
 
 
-@pytest.mark.parametrize("language", ["en-gb", "pt-pt"])
+@pytest.mark.parametrize("language", ["en-GB", "pt-PT"])
 def test_your_name_reflows_at_320_pixels(live_server, page: Page, applicant, language):
     """Each part on a line of its own on a phone, both boxes open, nothing across."""
     _with_both_boxes_and_a_derived_location(applicant)
@@ -151,7 +151,7 @@ MENUS = """() => {
 }"""
 
 
-@pytest.mark.parametrize("language", ["en-gb", "de", "el"])
+@pytest.mark.parametrize("language", ["en-GB", "de", "el"])
 def test_a_menu_is_as_wide_as_what_it_says(live_server, page: Page, applicant, language):
     """A menu had 128 pixels from 640 up, about 81 of them for words, and every profile
     starts on "Not stated": *Nicht angegeben* was drawn as *Nicht angeg*, and so on in 28 of
@@ -187,7 +187,7 @@ CONTROLS = """() => {
 }"""
 
 
-@pytest.mark.parametrize("language", ["en-gb", "pt-pt"])
+@pytest.mark.parametrize("language", ["en-GB", "pt-PT"])
 def test_an_error_under_one_box_leaves_its_line_in_line(
     live_server, page: Page, applicant, language
 ):
@@ -236,7 +236,7 @@ def test_a_full_stop_stays_at_the_end_on_a_page_drawn_right_to_left(
     language is written, and the box takes its direction from what is typed in it."""
     profile = applicant.profile
     profile.language = "ar"
-    profile.record_language = "pt-pt"
+    profile.record_language = "pt-PT"
     profile.form_of_address = "Prof."
     profile.pronouns = "Prof. Dr."
     profile.save()

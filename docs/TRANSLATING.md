@@ -1,8 +1,36 @@
 # Translating Postulo
 
-Postulo's source language is **British English (`en-gb`)**. Every other language is a
+Postulo's source language is **British English (`en-GB`)**. Every other language is a
 translation of it, kept as a `.po` catalogue under `src/postulo/locale/<locale>/LC_MESSAGES/`
 and compiled to the `.mo` Django reads at build time.
+
+## What a language code is
+
+A language is named by a **BCP 47 tag in its canonical form**: `pt-BR`, `en-GB`, `sr-Cyrl`,
+`de`. The language in lower case, a script with a capital, a region in capitals, joined by
+hyphens. Tags compare without regard to case, so Postulo takes a code in however a file, a
+page or an address writes it, and writes it one way: `pt-BR`, never `pt-br`, in everything it
+stores, sends and shows (#337).
+
+**A catalogue's directory is not a tag.** It is the gettext name of the locale, made from
+the tag by the tool: `pt-BR` is kept in `pt_BR/` and `sr-Cyrl` in `sr_Cyrl/`, and the
+`Language:` header of the file says the same. The underscore is gettext's. It is a
+directory's name and that header, and nothing else; nobody types one.
+
+**A tag says its script only where the language is written in more than one.** Serbian
+is, and the catalogue here is the Cyrillic one, so it is `sr-Cyrl`. Bulgarian is not, so it
+is `bg` and never `bg-Cyrl`. The registry decides which: Postulo's list is held by a test
+to a copy of the [IANA language subtag registry](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry)
+kept in `tests/data`, which is the registry without its descriptions. To take a newer one:
+
+```sh
+curl -s https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry \
+  | grep -vE '^(Description|Added|Comments):|^  ' > tests/data/language-subtag-registry
+```
+
+Only the list is held to the registry. What somebody declares about a document, or a file
+says about a career, is held to the shape of a tag and no more: it may be in a language
+Postulo has never heard of.
 
 ## Which languages, and when
 
@@ -51,10 +79,10 @@ so a screen reader says each name in its own language.
 
 ## A variant of a language already spoken
 
-`pt-br` is the first case of two regions of one language both being offered, and it was
+`pt-BR` is the first case of two regions of one language both being offered, and it was
 added a particular way that the next one should copy.
 
-**Seed from the sibling, do not translate again.** Every string in `pt-pt` had already been
+**Seed from the sibling, do not translate again.** Every string in `pt-PT` had already been
 translated once by somebody thinking about this application; what a variant wants is that
 work adapted, not a second independent pass from English. Each seeded entry carries the
 `draft` flag, and there it means something precise: *this came from the other catalogue and
@@ -204,14 +232,19 @@ help rather than fight that.
 ## Adding a new language
 
 1. Add the code and the language's own name for itself to `NATIVE_NAMES` in
-   `src/postulo/core/languages.py`, and its gettext plural rule to `PLURAL_FORMS`.
+   `src/postulo/core/languages.py`, and its gettext plural rule to `PLURAL_FORMS`. The code
+   is a BCP 47 tag in its canonical form, as above; `tests/test_language_registry.py` fails
+   on one the registry does not hold.
 2. Add the place whose flag belongs beside it to `FLAG_COUNTRIES` in the same file — an
    ISO 3166-1 country, or a 3166-2 subdivision where the language is at home somewhere that
    is not a state. Choose it deliberately rather than deriving it from the code, because a
    language is not a country: Spanish is not only Spain and Arabic is not one flag. **Leave
    it out where there is no honest answer**; the picker copes with a blank. Then add the
    code to `assets/flags.txt` and run `npm run sync:flags`.
-3. **If the language is read right to left**, add its subtag to `RTL` in the same file.
+3. **If the language is not written in the Latin alphabet**, add the ISO 15924 code of its
+   script to `SCRIPTS` in the same file, which is what decides the fonts the image has to
+   carry: the registry test fails until it is there, and `tests/test_fonts.py` until a
+   font package is recorded for it. **If it is read right to left**, add its subtag to `RTL`.
    That one list is what both the interface and a rendered document read, so a language
    added there is laid out correctly everywhere at once. The interface layout itself needs
    no work — that was done in #67 and is held by a lint and a browser suite that visits the

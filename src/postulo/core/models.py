@@ -20,6 +20,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from . import phones
+from .language_field import LanguageField
 
 # MailSecurity is not a model -- it is how TLS gets onto an SMTP session (#149) -- and
 # MailAuth and MailGrant are how that session proves who it is (#151). Imported here because
@@ -930,7 +931,7 @@ class SiteSettings(models.Model):
         blank=True,
         help_text=_("Offered only while this instance's mail is actually getting through."),
     )
-    default_language = models.CharField(_("default language"), max_length=10, blank=True)
+    default_language = LanguageField(_("default language"), blank=True)
     #: Which languages this instance offers, as a list of codes. **Empty means all of
     #: them**, and that is not the same as a list naming every one: an instance whose
     #: operator has never opened this setting keeps offering everything, including a

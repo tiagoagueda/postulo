@@ -48,6 +48,7 @@ from postulo.core.languages import (
     NATIVE_NAMES,
     PLURAL_FORMS,
     SOURCE,
+    find,
     nplurals,
 )
 
@@ -531,6 +532,14 @@ def _unquote(chunk: str) -> str:
 def po_path(code: str, subject: CatalogueSet | None = None) -> Path:
     from django.utils.translation import to_locale
 
+    # `to_locale` finds the directory for either spelling, which is how a gate keyed by
+    # codes shrinks without failing: `fr-fr` names a catalogue here and is in no list a
+    # test filters by. So the other spelling is refused, loudly (#337).
+    listed = find(code)
+    if listed and listed != code:
+        raise ValueError(
+            f"{code!r} is written {listed!r}: a language code is a BCP 47 tag in its canonical form"
+        )
     subject = subject or core_set()
     return subject.locale / to_locale(code) / "LC_MESSAGES" / "django.po"
 

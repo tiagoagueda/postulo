@@ -446,18 +446,18 @@ def test_an_uploads_and_a_snapshots_language_survive_the_round_trip(user, other_
     )
     upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
     sent = RenderedDocument(
-        owner=user, title="CV", kind=DocumentKind.CV, language="fr-fr", checksum="abc"
+        owner=user, title="CV", kind=DocumentKind.CV, language="fr-FR", checksum="abc"
     )
     sent.file.save("cv.pdf", ContentFile(b"%PDF-1.7 y"), save=True)
 
     document = export_module.build_document(user)
     assert document["postulo"]["format"] >= 17, "the language arrived with format 17"
     assert document["documents"]["uploads"][0]["language"] == "de"
-    assert document["documents"]["sent"][0]["language"] == "fr-fr"
+    assert document["documents"]["sent"][0]["language"] == "fr-FR"
 
     importer.load(other_user, zipfile.ZipFile(export_module.write_archive(user)))
     assert UploadedDocument.objects.for_user(other_user).get().language == "de"
-    assert RenderedDocument.objects.for_user(other_user).get().language == "fr-fr"
+    assert RenderedDocument.objects.for_user(other_user).get().language == "fr-FR"
 
     # The same archive as format 16 wrote it: no language anywhere.
     UploadedDocument.objects.for_user(other_user).delete()

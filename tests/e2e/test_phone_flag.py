@@ -84,7 +84,7 @@ def test_the_flag_appears_and_follows_the_country(page: Page, live_server, appli
 def test_the_server_draws_the_flag_before_any_script_runs(page: Page, live_server, applicant):
     """With JavaScript blocked the field is still right about the country it loaded with,
     which is the true answer until the form is saved."""
-    applicant.profile.language = "pt-pt"
+    applicant.profile.language = "pt-PT"
     applicant.profile.save(update_fields=["language"])
 
     sign_in(page, live_server.url)

@@ -92,7 +92,8 @@ MIDDLEWARE = [
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
+    # Django's own, saying the language it chose the way Postulo writes one (#337).
+    "postulo.core.middleware.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -447,7 +448,8 @@ POSTULO_SUGGESTION_RATE = env("POSTULO_SUGGESTION_RATE", default="600/h")
 # ---------------------------------------------------------- internationalisation
 
 # British English is the source language; every other locale is a translation of it.
-LANGUAGE_CODE = "en-gb"
+# Written as every code is, in its canonical form (#337). Django accepts either case.
+LANGUAGE_CODE = languages.SOURCE
 
 # Every official language of the European Union, each under its own name; the list and
 # the plural rules live in postulo.core.languages so the catalogue tooling can read them

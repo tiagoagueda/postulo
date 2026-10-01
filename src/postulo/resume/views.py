@@ -15,7 +15,6 @@ from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
-from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
@@ -92,7 +91,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
         # Keyed by the entry itself rather than by its content type and id: a template can
         # say `map|get_item:item` and cannot say `map|get_item:(ct, pk)`.
         context["languages_by_entry"] = {
-            entry: [languages.NATIVE_NAMES.get(code, code) for code in codes]
+            entry: [languages.native_name(code, code) for code in codes]
             for entry in everything
             if (codes := spoken.get(translating.key_of(entry)))
         }
@@ -140,7 +139,7 @@ class SkillSuggestionsView(LoginRequiredMixin, View):
         typed = (request.GET.get("name") or "")[:limit]
         names = esco.skill_suggestions(
             typed,
-            translation.get_language() or "",
+            languages.current(),
             translating.record_language_of(request.user),
         )
         response = render(request, self.template_name, {"names": names})
@@ -172,7 +171,14 @@ class ResumeItemTranslationsView(OwnedObjectMixin, View):
         return get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
 
     def chosen_language(self, request) -> str:
-        return translating.normalise(request.GET.get("language") or request.POST.get("language"))
+        """The language being translated into, as Postulo writes one, or nothing.
+
+        From the address or the form, and so from anybody: what is not shaped like a
+        language tag is no language, the page is drawn without a form, and nothing is
+        saved under it. It used to be lower-cased and believed (#620).
+        """
+        asked = request.GET.get("language") or request.POST.get("language")
+        return languages.tag(asked) if languages.well_formed(asked) else ""
 
     def context(self, entry, language: str, form=None) -> dict:
         stored = translating.stored_for(entry)
@@ -180,15 +186,13 @@ class ResumeItemTranslationsView(OwnedObjectMixin, View):
             "section": self.section,
             "entry": entry,
             "language": language,
-            "language_name": languages.NATIVE_NAMES.get(language, language),
-            "record_language": languages.NATIVE_NAMES.get(
-                translating.record_language_of(entry.owner), ""
-            ),
+            "language_name": languages.native_name(language, language),
+            "record_language": languages.native_name(translating.record_language_of(entry.owner)),
             "translatable": translating.fields_for(entry),
             "held": [
                 (
                     code,
-                    languages.NATIVE_NAMES.get(code, code),
+                    languages.native_name(code, code),
                     [translating.field_label(entry, name) for name in sorted(fields)],
                 )
                 for code, fields in sorted(stored.items())
@@ -231,11 +235,10 @@ class ResumeItemTranslationsView(OwnedObjectMixin, View):
         kept = form.save()
         messages.success(
             request,
-            _("Saved in %(language)s.")
-            % {"language": languages.NATIVE_NAMES.get(language, language)}
+            _("Saved in %(language)s.") % {"language": languages.native_name(language, language)}
             if kept
             else _("Cleared: this entry prints its original text in %(language)s.")
-            % {"language": languages.NATIVE_NAMES.get(language, language)},
+            % {"language": languages.native_name(language, language)},
         )
         return redirect(
             f"{reverse('resume:item_languages', args=[self.section.slug, entry.pk])}"
@@ -287,7 +290,7 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         context["translatable"] = bool(translating.fields_for(self.object))
         context["translated_into"] = [
-            languages.NATIVE_NAMES.get(code, code) for code in translating.languages_of(self.object)
+            languages.native_name(code, code) for code in translating.languages_of(self.object)
         ]
         # Which ESCO skill the name was recognised as, said where the name is edited (#266).
         context["esco_name"] = getattr(self.object, "esco_name", "")
@@ -570,9 +573,7 @@ def _for_display(held: dict) -> dict:
         }
         for row in held.get("languages", [])
     ]
-    shown["locale"] = languages.NATIVE_NAMES.get(
-        translating.normalise(held.get("locale", "")), held.get("locale", "")
-    )
+    shown["locale"] = languages.native_name(held.get("locale", ""), held.get("locale", ""))
     return shown
 
 

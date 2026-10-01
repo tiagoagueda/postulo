@@ -196,9 +196,9 @@ def test_a_letter_declares_the_language_it_is_written_in(user):
     from postulo.documents.rendering import render_letter_html
 
     letter = CoverLetter.objects.create(
-        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-pt"
+        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-PT"
     )
-    assert 'lang="pt-pt"' in render_letter_html(letter)
+    assert 'lang="pt-PT"' in render_letter_html(letter)
 
 
 def test_a_document_with_no_language_of_its_own_follows_the_profile(user):
@@ -206,14 +206,14 @@ def test_a_document_with_no_language_of_its_own_follows_the_profile(user):
     from postulo.documents.models import CV, CoverLetter
     from postulo.documents.rendering import render_cv_html, render_letter_html
 
-    user.profile.language = "fr-fr"
+    user.profile.language = "fr-FR"
     user.profile.save(update_fields=["language"])
 
     letter = CoverLetter.objects.create(owner=user, name="Lettre", body="Bonjour,")
-    assert 'lang="fr-fr"' in render_letter_html(letter)
+    assert 'lang="fr-FR"' in render_letter_html(letter)
 
     cv = CV.objects.create(owner=user, name="Ingénieur")
-    assert 'lang="fr-fr"' in render_cv_html(cv)
+    assert 'lang="fr-FR"' in render_cv_html(cv)
 
 
 def test_what_the_document_says_beats_what_the_profile_says(user):
@@ -221,13 +221,13 @@ def test_what_the_document_says_beats_what_the_profile_says(user):
     from postulo.documents.models import CoverLetter
     from postulo.documents.rendering import render_letter_html
 
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
 
     letter = CoverLetter.objects.create(
-        owner=user, name="To the lab", body="Dear Professor,", language="en-gb"
+        owner=user, name="To the lab", body="Dear Professor,", language="en-GB"
     )
-    assert 'lang="en-gb"' in render_letter_html(letter)
+    assert 'lang="en-GB"' in render_letter_html(letter)
 
 
 def test_the_language_is_chosen_from_the_list_rather_than_typed(client, user):
@@ -244,11 +244,11 @@ def test_a_letters_language_travels_in_the_export(user):
     from postulo.documents.models import CoverLetter
 
     CoverLetter.objects.create(
-        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-pt"
+        owner=user, name="Para o instituto", body="Boa tarde,", language="pt-PT"
     )
     document = export.build_document(user)
     letters = document["documents"]["cover_letters"]
-    assert letters and letters[0]["language"] == "pt-pt"
+    assert letters and letters[0]["language"] == "pt-PT"
 
 
 # ------------------------------------------------------------------ letters

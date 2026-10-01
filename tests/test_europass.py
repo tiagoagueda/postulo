@@ -638,7 +638,7 @@ def test_the_language_of_the_record_comes_from_the_file(user):
     importing.apply(user, europass.read(NO_LEVELS))
 
     user.profile.refresh_from_db()
-    assert user.profile.record_language == "pt-pt"
+    assert user.profile.record_language == "pt-PT"
 
 
 def test_a_language_of_the_record_already_chosen_is_left_alone(user):

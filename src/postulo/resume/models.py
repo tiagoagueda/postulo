@@ -16,9 +16,10 @@ from __future__ import annotations
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
-from django.utils.translation import get_language
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import languages
+from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 from postulo.jobs import esco
 
@@ -180,8 +181,8 @@ class Skill(ResumeItem):
         name was written in, and the reader's because that is the language the skill box
         offered names in.
         """
-        languages = [translatable.record_language_of(self.owner)] if self.owner_id else []
-        self.esco_uri = esco.skill_for(self.name, *languages, get_language() or "")
+        record = [translatable.record_language_of(self.owner)] if self.owner_id else []
+        self.esco_uri = esco.skill_for(self.name, *record, languages.current())
         return self.esco_uri
 
     @property
@@ -360,7 +361,7 @@ class Translation(OwnedModel):
     object_id = models.PositiveIntegerField()
     entry = GenericForeignKey("content_type", "object_id")
 
-    language = models.CharField(_("language"), max_length=10)
+    language = LanguageField(_("language"))
     field = models.CharField(_("field"), max_length=translatable.MAX_FIELD_LENGTH)
     text = models.TextField(_("text"), blank=True)
 

@@ -1,7 +1,7 @@
 """Which parts of a career entry may be said in another language, and how one is chosen.
 
 The rules `translating` works by, and nothing that works: which fields are translatable
-(`TRANSLATABLE`), how a language code is compared with another, and what an entry already
+(`TRANSLATABLE`), and what an entry already
 says in one. The models declare their `Translation` column with these, the forms offer a box
 per field with them, and a document asks the language of its record with them -- so they sit
 below all three. They were the top of `translating`, which reads the documents a CV renders
@@ -10,6 +10,8 @@ into, so the models and forms that needed only the rules closed a loop through i
 """
 
 from __future__ import annotations
+
+from postulo.core import languages
 
 #: What may be said differently in another language, by model, and what may not.
 #:
@@ -52,33 +54,12 @@ def may_translate(subject, field: str) -> bool:
 
 
 # ------------------------------------------------------------------ matching a language
-
-
-def normalise(code: str) -> str:
-    return (code or "").strip().lower().replace("_", "-")
-
-
-def base(code: str) -> str:
-    return normalise(code).partition("-")[0]
-
-
-def best_match(wanted: str, available) -> str:
-    """The stored language closest to ``wanted``, or empty if none is close enough.
-
-    Exact first, then the same base language — ``pt-br`` takes ``pt-pt`` rather than
-    printing English, because a Brazilian reader given European Portuguese has read the
-    entry, and one given English has not. Never the other way round from a base to an
-    unrelated variant: ``pt`` matching ``pt-pt`` is the same language, ``fr`` matching
-    ``fr-ca`` is too, and that is as far as this goes.
-    """
-    wanted = normalise(wanted)
-    if not wanted:
-        return ""
-    available = [normalise(one) for one in available]
-    if wanted in available:
-        return wanted
-    family = base(wanted)
-    return next((one for one in available if base(one) == family), "")
+#
+# How one code is written and compared with another is `postulo.core.languages`' to say,
+# for a career entry as for everything else (#337). The rule this module used to hold is
+# the last step of `languages.match`: ``pt-BR`` takes ``pt-PT`` rather than printing
+# English, because a Brazilian reader given European Portuguese has read the entry, and
+# one given English has not. Never another language.
 
 
 # --------------------------------------------------------- what an entry says, in a language
@@ -96,7 +77,7 @@ def _gather(rows, allowed: set[str]) -> dict[str, dict[str, str]]:
     for row in rows:
         if row.field not in allowed or not row.text.strip():
             continue
-        found.setdefault(normalise(row.language), {})[row.field] = row.text
+        found.setdefault(languages.tag(row.language), {})[row.field] = row.text
     return found
 
 
@@ -112,7 +93,7 @@ def stored_for(entry) -> dict[str, dict[str, str]]:
 def overrides_for(entry, language: str) -> dict[str, str]:
     """What this entry says in ``language``, for the fields it says anything in."""
     stored = stored_for(entry)
-    matched = best_match(language, stored)
+    matched = languages.match(language, stored)
     return dict(stored.get(matched, {})) if matched else {}
 
 
@@ -136,5 +117,5 @@ def record_language_of(user) -> str:
         settings.LANGUAGE_CODE,
     ):
         if (candidate or "").strip():
-            return normalise(candidate)
+            return languages.tag(candidate)
     return ""

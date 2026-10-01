@@ -27,7 +27,8 @@ Every irregularity above is handled here rather than special-cased at each call 
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+import re
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 
 #: Language code → the ISO 3166-1 alpha-2 code of the country whose flag stands for it.
@@ -42,7 +43,7 @@ from dataclasses import dataclass
 #: contained the flag pairs and Microsoft has said it does not intend to add them, so this
 #: was never going to age out.
 #:
-#: A regional variant carries its own country: `pt-br` is Brazil and not Portugal, which is
+#: A regional variant carries its own country: `pt-BR` is Brazil and not Portugal, which is
 #: the first case in Postulo of two regions of one language both being offered.
 #:
 #: Written out deliberately rather than derived from the code, because a language is not a
@@ -64,7 +65,7 @@ from dataclasses import dataclass
 #: ``ss``, ``st``, ``sw``, ``ti``, ``tn``, ``yo``. No flag beats a wrong flag, a wrong flag
 #: about somebody's language is not a small wrong, and every caller copes with nothing.
 FLAG_COUNTRIES: dict[str, str] = {
-    "en-gb": "GB",
+    "en-GB": "GB",
     "af": "ZA",
     "ak": "GH",
     "am": "ET",
@@ -81,7 +82,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "et": "EE",
     "eu": "ES-PV",
     "fi": "FI",
-    "fr-fr": "FR",
+    "fr-FR": "FR",
     "ga": "IE",
     "gl": "ES-GA",
     "hr": "HR",
@@ -102,8 +103,8 @@ FLAG_COUNTRIES: dict[str, str] = {
     "nr": "ZA",
     "ny": "MW",
     "pl": "PL",
-    "pt-pt": "PT",
-    "pt-br": "BR",
+    "pt-PT": "PT",
+    "pt-BR": "BR",
     "ro": "RO",
     "rw": "RW",
     "sk": "SK",
@@ -111,7 +112,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "sn": "ZW",
     "so": "SO",
     "sq": "AL",
-    "sr": "RS",
+    "sr-Cyrl": "RS",
     "sv": "SE",
     "tr": "TR",
     "ts": "ZA",
@@ -130,13 +131,13 @@ def flag_country(code: str) -> str:
     the Union already brings languages with no single home, and they are left blank rather
     than given somebody's best guess.
     """
-    return FLAG_COUNTRIES.get(code, "")
+    return FLAG_COUNTRIES.get(find(code, FLAG_COUNTRIES), "")
 
 
-#: Language code as Django writes it → the language's own name for itself.
+#: Language tag → the language's own name for itself.
 #: The order is the order of the picker: alphabetical by code, source language first.
 NATIVE_NAMES: dict[str, str] = {
-    "en-gb": "English (United Kingdom)",
+    "en-GB": "English (United Kingdom)",
     "af": "Afrikaans",
     "ak": "Akan",
     "am": "አማርኛ",
@@ -156,7 +157,7 @@ NATIVE_NAMES: dict[str, str] = {
     "eu": "euskara",
     "ff": "Pulaar",
     "fi": "suomi",
-    "fr-fr": "français (France)",
+    "fr-FR": "français (France)",
     "ga": "Gaeilge",
     "gl": "galego",
     "ha": "Hausa",
@@ -181,8 +182,8 @@ NATIVE_NAMES: dict[str, str] = {
     "ny": "Chichewa",
     "om": "Afaan Oromoo",
     "pl": "polski",
-    "pt-pt": "português (Portugal)",
-    "pt-br": "português (Brasil)",
+    "pt-PT": "português (Portugal)",
+    "pt-BR": "português (Brasil)",
     "ro": "română",
     "rw": "Ikinyarwanda",
     "sk": "slovenčina",
@@ -190,7 +191,10 @@ NATIVE_NAMES: dict[str, str] = {
     "sn": "chiShona",
     "so": "Soomaali",
     "sq": "shqip",
-    "sr": "српски",
+    #: Serbian is written in two scripts, and this catalogue is the Cyrillic one. The
+    #: registry suppresses no script for `sr`, so the tag says which (#337); a Latin
+    #: catalogue, the day there is one, is `sr-Latn`.
+    "sr-Cyrl": "српски",
     "ss": "siSwati",
     "st": "Sesotho",
     "sv": "svenska",
@@ -211,7 +215,263 @@ NATIVE_NAMES: dict[str, str] = {
 LANGUAGES: list[tuple[str, str]] = list(NATIVE_NAMES.items())
 
 #: The source language: catalogues translate from it, and it has none of its own.
-SOURCE = "en-gb"
+SOURCE = "en-GB"
+
+
+# ------------------------------------------------------------------ what a code is
+#
+# A BCP 47 tag (RFC 5646), written in its canonical form: `pt-BR`, `sr-Cyrl`, `de` (#337).
+# Tags compare without regard to case, so `pt-br` was never wrong to a machine. It was a
+# second spelling, and Postulo had three: Django's lower case in what it stored and sent,
+# Word's in one export, and gettext's `pt_BR` in the directories. The last is forced and is
+# not a tag at all. Everything else is written by `tag` and compared by `find` and `match`,
+# here and nowhere else.
+
+#: How long a tag may be. RFC 5646 section 4.4.1 advises room for thirty-five characters,
+#: which holds `ca-ES-valencia` and everything else anybody is likely to write.
+MAX_LENGTH = 35
+
+#: What a tag has to look like to be one: RFC 5646's ``langtag``, with a primary subtag of
+#: two or three letters, which is every language the registry holds. The grammar also allows
+#: one of five to eight letters, reserved and never used, and allowing it here would let
+#: ``english`` through.
+#:
+#: The shape and nothing more. Whether ``xx-YY`` names anything is the registry's to say,
+#: and only Postulo's own list is held to that (`tests/test_language_registry.py`): a
+#: document may be in a language Postulo has never heard of.
+#:
+#: ASCII, because ``[a-z]`` ignoring case otherwise takes the long s and the Kelvin sign,
+#: which fold to ``s`` and ``k`` and are neither.
+_SHAPE = re.compile(
+    r"(?P<language>[a-z]{2,3})(?:-[a-z]{3}){0,3}"
+    r"(?:-(?P<script>[a-z]{4}))?"
+    r"(?:-(?P<region>[a-z]{2}|[0-9]{3}))?"
+    r"(?:-(?:[a-z0-9]{5,8}|[0-9][a-z0-9]{3}))*"
+    r"(?:-[0-9a-wy-z](?:-[a-z0-9]{2,8})+)*"
+    r"(?:-x(?:-[a-z0-9]{1,8})+)?",
+    re.ASCII | re.IGNORECASE,
+)
+
+
+def _text(code) -> str:
+    """What was given, as text with hyphens: gettext's ``pt_BR`` is read, and never written."""
+    return code.strip().replace("_", "-") if isinstance(code, str) else ""
+
+
+def _parsed(code) -> re.Match | None:
+    text = _text(code)
+    return _SHAPE.fullmatch(text) if len(text) <= MAX_LENGTH else None
+
+
+def well_formed(code) -> bool:
+    """Whether this is shaped like a language tag, in any case and with either separator.
+
+    What a value taken in from outside is held to -- a form, a file, an address -- before it
+    is stored. Nothing, and anything that is not text, is not one.
+    """
+    return _parsed(code) is not None
+
+
+def tag(code) -> str:
+    """A language code in its canonical form: ``pt-BR``, ``sr-Cyrl``, ``zh-Hant-TW``, ``de``.
+
+    RFC 5646 section 2.1.1: lower case throughout, except a subtag of two letters, written
+    in upper case, and one of four, with a capital first -- unless it is the first subtag or
+    comes after a singleton, where neither is a region or a script any more. So the rule is
+    about where a subtag stands and how long it is, and ``zh-yue`` keeps its three letters
+    lower.
+
+    Never refuses. This is called where a value is read as well as where one is taken in,
+    so what is not a tag comes back as it was given, without the space around it, and
+    `well_formed` is what decides whether to believe it. Nothing comes back as nothing.
+    """
+    if not isinstance(code, str):
+        return ""
+    if not well_formed(code):
+        return code.strip()
+    first, *rest = _text(code).split("-")
+    written = [first.lower()]
+    after_singleton = False
+    for subtag in rest:
+        after_singleton = after_singleton or len(subtag) == 1
+        if not after_singleton and len(subtag) == 4 and subtag.isalpha():
+            written.append(subtag.title())
+        elif not after_singleton and len(subtag) == 2 and subtag.isalpha():
+            written.append(subtag.upper())
+        else:
+            written.append(subtag.lower())
+    return "-".join(written)
+
+
+def primary(code) -> str:
+    """The language itself, without script or region: ``pt`` of ``pt-BR``."""
+    return _text(code).split("-", 1)[0].lower()
+
+
+def script_of(code) -> str:
+    """The script a tag is written in, as its ISO 15924 code: ``Cyrl`` of ``sr-Cyrl``.
+
+    The one the tag names, else the one its language is ordinarily written in, which for
+    everything absent from `SCRIPTS` is Latin.
+    """
+    found = _parsed(code)
+    if found is not None and found["script"]:
+        return found["script"].title()
+    language = primary(code)
+    return SCRIPTS.get(language, "Latn") if language else ""
+
+
+def region_of(code) -> str:
+    """The country or area a tag names, where it names one: ``BR`` of ``pt-BR``."""
+    found = _parsed(code)
+    return (found["region"] or "").upper() if found is not None else ""
+
+
+#: A language the registry files under a macrolanguage → that macrolanguage.
+#:
+#: Only where two names for one thing meet in Postulo. The catalogue is Bokmål, ``nb``;
+#: ESCO publishes its Norwegian under ``no``, Europass writes ``nor``, and a page says
+#: ``lang="no"``. Compared as strings those never met, and a Norwegian reader was given the
+#: English occupation names.
+MACROLANGUAGE: dict[str, str] = {
+    "nb": "no",
+    "nn": "no",
+}
+
+
+def _folded(code) -> str:
+    """A code as it is compared: case and separator are not part of what it says."""
+    return _text(code).lower()
+
+
+def find(code, among: Iterable[str] | None = None) -> str:
+    """The one of ``among`` that is this code however it is spelt, as spelt there; else "".
+
+    ``among`` is Postulo's own list where it is not given. The answer is always a member of
+    what was searched, which is what lets it be used as a key into it.
+    """
+    wanted = _folded(code)
+    if not wanted:
+        return ""
+    for one in NATIVE_NAMES if among is None else among:
+        if _folded(one) == wanted:
+            return one
+    return ""
+
+
+def _shortened(folded: str) -> Iterator[str]:
+    """A tag, then the same with its last subtag taken off, and so on (RFC 4647, 3.4)."""
+    while folded:
+        yield folded
+        folded = folded.rpartition("-")[0]
+        # A single letter left at the end introduced what was just taken off.
+        while "-" in folded and len(folded.rpartition("-")[2]) == 1:
+            folded = folded.rpartition("-")[0]
+
+
+def _renamed(folded: str) -> list[str]:
+    """The same tag under the other names the registry knows its language by."""
+    language, hyphen, rest = folded.partition("-")
+    others = [MACROLANGUAGE[language]] if language in MACROLANGUAGE else []
+    others += [member for member, macro in MACROLANGUAGE.items() if macro == language]
+    return [other + hyphen + rest for other in others]
+
+
+def matches(wanted, available: Iterable[str] | None = None) -> tuple[str, ...]:
+    """Every one of ``available`` that ``wanted`` names, the closest first, as spelt there.
+
+    Exactly, whatever the case. Then what was asked for, shortened from the end: ``pt-BR``
+    takes ``pt``. Then the same under the language's other name, which is how ``nb`` and
+    ``no`` meet. Then the rest of the family: ``pt-BR`` takes ``pt-PT`` rather than nothing,
+    because a Brazilian reader given European Portuguese has read the entry, and one given
+    English has not. Never another language.
+    """
+    folded = _folded(wanted)
+    if not folded:
+        return ()
+    pool = list(NATIVE_NAMES if available is None else available)
+    keys = [_folded(one) for one in pool]
+    candidates = list(_shortened(folded))
+    for other in _renamed(folded):
+        candidates.extend(_shortened(other))
+    order: list[int] = []
+    for candidate in candidates:
+        order.extend(i for i, key in enumerate(keys) if key == candidate and i not in order)
+    family = primary(folded)
+    order.extend(i for i, key in enumerate(keys) if primary(key) == family and i not in order)
+    return tuple(pool[i] for i in order)
+
+
+def match(wanted, available: Iterable[str] | None = None) -> str:
+    """The closest of ``available`` to ``wanted``, as spelt there, or "" if none is close.
+
+    See `matches` for what close means. ``available`` is Postulo's own list where it is not
+    given.
+    """
+    found = matches(wanted, available)
+    return found[0] if found else ""
+
+
+def same(one, other) -> bool:
+    """Whether two codes are the same tag, however each is spelt. Nothing is the same as nothing."""
+    return _folded(one) == _folded(other)
+
+
+def native_name(code, default: str = "") -> str:
+    """What a language on Postulo's list calls itself, or ``default`` for one that is not on it."""
+    return NATIVE_NAMES.get(find(code), default)
+
+
+# ------------------------------------------------------- the language of the moment
+#
+# Django answers `get_language()` in lower case once a translation is active and with
+# `LANGUAGE_CODE` as it is written when none is, so the same call says `pt-br` or `en-GB`
+# depending on what happened earlier in the request. Nothing else in Postulo asks it. And it
+# is told a language through these, because a stored code need not be one Postulo has a
+# catalogue for: `pt-AO` is somebody's CV, `sr` an older record, `no` a file from elsewhere.
+
+
+def current() -> str:
+    """The language this request, or this block, is being drawn in, as Postulo writes it.
+
+    Never empty: with nothing active it is the instance's own language.
+    """
+    from django.conf import settings
+    from django.utils.translation import get_language
+
+    active = get_language() or settings.LANGUAGE_CODE
+    return find(active) or tag(active)
+
+
+def catalogue(code) -> str:
+    """The language to draw something in when it is declared to be in ``code``.
+
+    Postulo's own nearest: a letter in ``pt-AO`` takes the Portuguese catalogue, where
+    activating ``pt-AO`` itself finds none and prints English headings over a Portuguese
+    letter. A language Postulo does not speak is still handed on as it is, since Django's
+    own month names and formats may know it. What is not a tag at all is nothing.
+    """
+    return match(code) or (tag(code) if well_formed(code) else "")
+
+
+def activate(code) -> None:
+    """Draw the rest of this request in ``code``, or leave it as it is where that is nothing."""
+    from django.utils import translation
+
+    language = catalogue(code)
+    if language:
+        translation.activate(language)
+
+
+def override(code):
+    """A block drawn in ``code``, as `django.utils.translation.override` and through `catalogue`.
+
+    Nothing leaves the language as it is, which is what Django does with an empty string.
+    """
+    from django.utils import translation
+
+    return translation.override(catalogue(code))
+
 
 _TWO = "nplurals=2; plural=(n != 1);"
 
@@ -254,7 +514,7 @@ PLURAL_FORMS: dict[str, str] = {
     "eu": _TWO,
     "ff": _TWO,
     "fi": _TWO,
-    "fr-fr": "nplurals=2; plural=(n > 1);",
+    "fr-FR": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),
     "gl": _TWO,
     "ha": _TWO,
@@ -298,12 +558,12 @@ PLURAL_FORMS: dict[str, str] = {
     "pl": (
         "nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
     ),
-    "pt-pt": _TWO,
+    "pt-PT": _TWO,
     #: Not `_TWO`. Brazilian Portuguese treats zero as plural — *0 candidaturas*,
     #: where European Portuguese says *0 candidatura* — so the rule is `n > 1` and not
     #: `n != 1`. Copying the European line without looking would make every count on
     #: every page ungrammatical for the language's largest population.
-    "pt-br": "nplurals=2; plural=(n > 1);",
+    "pt-BR": "nplurals=2; plural=(n > 1);",
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
     "rw": _TWO,
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
@@ -311,7 +571,7 @@ PLURAL_FORMS: dict[str, str] = {
     "sn": "nplurals=1; plural=0;",
     "so": _TWO,
     "sq": _TWO,
-    "sr": (
+    "sr-Cyrl": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
     ),
@@ -340,14 +600,23 @@ PLURAL_FORMS: dict[str, str] = {
 }
 
 
+def plural_forms(code: str) -> str | None:
+    """The ``Plural-Forms`` line of a language's catalogue, or None for one with no rule here."""
+    return PLURAL_FORMS.get(find(code, PLURAL_FORMS))
+
+
 def nplurals(code: str) -> int:
     """How many plural forms a language's catalogue carries."""
-    forms = PLURAL_FORMS.get(code, _TWO)
+    forms = plural_forms(code) or _TWO
     return int(forms.split("nplurals=", 1)[1].split(";", 1)[0])
 
 
 def locale_dir_name(code: str) -> str:
-    """``fr-fr`` → ``fr_FR``, ``de`` → ``de``: the directory Django looks in."""
+    """``fr-FR`` → ``fr_FR``, ``de`` → ``de``: the directory Django looks in.
+
+    A gettext locale name and not a language tag: the underscore is gettext's, and this
+    is the only place one is made from the other.
+    """
     from django.utils.translation import to_locale
 
     return to_locale(code)
@@ -373,6 +642,16 @@ def translation_status() -> dict[str, dict[str, int]]:
 
 
 _STATUS: dict[str, dict[str, int]] | None = None
+
+
+def status_of(code, status: Mapping[str, dict[str, int]] | None = None) -> dict[str, int] | None:
+    """One language's row of the status, however the code and the file each spell it.
+
+    ``status`` is `translation_status()` where it is not given; a caller that has already
+    read it hands it over rather than asking for it once a row.
+    """
+    status = translation_status() if status is None else status
+    return status.get(find(code, status))
 
 
 #: The parts of a translation bar, in the order they are drawn from the inline start (#312).
@@ -525,9 +804,9 @@ def translation_progress(
 #: both the interface and a rendered document read is one place to add a language to, and
 #: one answer when they are asked the same question.
 #:
-#: Matched on the primary subtag, so ``ar-eg`` is as right to left as ``ar``. Direction is a
+#: Matched on the primary subtag, so ``ar-EG`` is as right to left as ``ar``. Direction is a
 #: property of the script rather than of the region, and no region of Arabic is written the
-#: other way.
+#: other way. Where a tag says its script, that is what is read instead: see `is_rtl`.
 RTL: frozenset[str] = frozenset(
     {
         "ar",  # Arabic
@@ -550,9 +829,35 @@ RTL: frozenset[str] = frozenset(
 )
 
 
+#: The scripts written right to left, by their ISO 15924 code, which is the subtag a tag
+#: states one with.
+RTL_SCRIPTS: frozenset[str] = frozenset(
+    {
+        "Adlm",  # Adlam
+        "Arab",  # Arabic
+        "Hebr",  # Hebrew
+        "Mand",  # Mandaic
+        "Nkoo",  # N'Ko
+        "Rohg",  # Hanifi Rohingya
+        "Samr",  # Samaritan
+        "Syrc",  # Syriac
+        "Thaa",  # Thaana
+    }
+)
+
+
 def is_rtl(code: str) -> bool:
-    """Whether a language tag names a language written right to left."""
-    return (code or "").strip().lower().replace("_", "-").split("-", 1)[0] in RTL
+    """Whether a language tag names something written right to left.
+
+    By the script it states, where it states one: ``ku-Latn`` is Kurdish in the Latin
+    alphabet and reads left to right, ``az-Arab`` is Azerbaijani in the Arabic one and does
+    not. Read from the language alone, the first was drawn backwards (#337). A tag that
+    says nothing about its script is read by its language, as it always was.
+    """
+    found = _parsed(code)
+    if found is not None and found["script"]:
+        return found["script"].title() in RTL_SCRIPTS
+    return primary(code) in RTL
 
 
 def direction(code: str) -> str:
@@ -571,15 +876,54 @@ def direction(code: str) -> str:
 #: rendering machine cannot draw comes out as a row of empty boxes, and a box on somebody's
 #: CV is worse than English — so ``tests/test_fonts.py`` reads this and insists the
 #: container image installs a font package that covers every script Postulo offers.
+#:
+#: Named by its ISO 15924 code, ``Cyrl`` and not *Cyrillic*, because that is what a tag
+#: says a script with: ``sr-Cyrl`` states its own, and `script_of` answers for both in one
+#: vocabulary. This is the script the registry says goes without saying for the language
+#: (its ``Suppress-Script``), and `tests/test_language_registry.py` holds each to that.
 SCRIPTS: dict[str, str] = {
-    "am": "Ethiopic",
-    "ar": "Arabic",
-    "bg": "Cyrillic",
-    "el": "Greek",
-    "ti": "Ethiopic",
+    "am": "Ethi",
+    "ar": "Arab",
+    "bg": "Cyrl",
+    "el": "Grek",
+    "mk": "Cyrl",
+    "ti": "Ethi",
+    "uk": "Cyrl",
+}
+
+#: A script's code → what it is called, for the two places that say it to a person: the
+#: server overview and ``manage.py check_fonts``. In English, as those two always were.
+SCRIPT_NAMES: dict[str, str] = {
+    "Arab": "Arabic",
+    "Beng": "Bengali",
+    "Cyrl": "Cyrillic",
+    "Deva": "Devanagari",
+    "Ethi": "Ethiopic",
+    "Grek": "Greek",
+    "Gujr": "Gujarati",
+    "Guru": "Gurmukhi",
+    "Hang": "Hangul",
+    "Hani": "Han",
+    "Hebr": "Hebrew",
+    "Hira": "Hiragana",
+    "Kana": "Katakana",
+    "Khmr": "Khmer",
+    "Laoo": "Lao",
+    "Latn": "Latin",
+    "Mymr": "Myanmar",
+    "Sinh": "Sinhala",
+    "Taml": "Tamil",
+    "Telu": "Telugu",
+    "Tfng": "Tifinagh",
+    "Thai": "Thai",
 }
 
 
+def script_name(script: str) -> str:
+    """What a script is called in words, or its code where nobody has written a name for it."""
+    return SCRIPT_NAMES.get(script, script)
+
+
 def scripts_offered() -> set[str]:
-    """Every non-Latin script among the languages Postulo currently offers."""
-    return {SCRIPTS[code] for code, _name in LANGUAGES if code in SCRIPTS}
+    """Every script but Latin among the languages Postulo currently offers, by its code."""
+    return {script_of(code) for code, _name in LANGUAGES} - {"Latn"}

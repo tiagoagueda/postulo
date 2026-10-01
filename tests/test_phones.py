@@ -189,7 +189,7 @@ def test_the_form_shows_a_stored_number_split_back_into_its_parts(client, user):
 
 
 def test_the_country_starts_at_the_one_the_person_reads_postulo_in(client, user):
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     client.force_login(user)
 

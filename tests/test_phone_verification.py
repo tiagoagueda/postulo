@@ -306,7 +306,9 @@ def test_the_format_version_moved(user):
     under its posting, each entry naming who it came from and what it points at (#270); 24
     added the ESCO skill a skill's name matches, beside the name itself (#266); 25 added the
     places a person's corrections showed a field to be on a site (#267); 26 added the form
-    of address and the pronouns on the profile (#309).
+    of address and the pronouns on the profile (#309); 27 added which of the profile's
+    details a CV prints (#308); 28 writes every language code as a BCP 47 tag in its
+    canonical form, and moved no field (#337).
 
     At least rather than exactly: two branches each adding to the archive take a number
     each, and whichever lands second renumbers.

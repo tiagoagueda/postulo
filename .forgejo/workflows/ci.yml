@@ -227,7 +227,12 @@ jobs:
       - name: Run the database-facing tests against PostgreSQL
         # POSTULO_TEST_DATABASE_URL is the only thing that moves the suite off in-memory
         # SQLite; everything else about the test settings stays as it is.
-        run: uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
+        # The language columns are here because of what they were: SQLite never held a
+        # ten-character column to ten characters, and a migration that rewrites rows and
+        # then changes their column is the kind of thing only this engine refuses (#337).
+        run: >-
+          uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
+          tests/test_language_storage.py
         env:
           POSTULO_TEST_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo
 

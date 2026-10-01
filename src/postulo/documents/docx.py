@@ -42,6 +42,8 @@ import re
 import zipfile
 from xml.sax.saxutils import escape, quoteattr
 
+from postulo.core import languages
+
 from .outline import BULLETS, HEADING, Outline
 
 CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -124,26 +126,6 @@ def clean(text: str) -> str:
     return UNWRITABLE.sub("", text or "").replace("\t", " ")
 
 
-def language_tag(code: str) -> str:
-    """A language code the way Word writes one: ``pt-PT``, ``zh-Hans``, ``de``.
-
-    Postulo keeps them lower-cased (`pt-pt`), which is what Django does; BCP 47 is
-    case-insensitive and Word is not always, so the conventional casing is restored.
-    """
-    parts = [part for part in clean(code).strip().replace("_", "-").split("-") if part]
-    if not parts:
-        return ""
-    tag = [parts[0].lower()]
-    for part in parts[1:]:
-        if len(part) == 4 and part.isalpha():
-            tag.append(part.title())
-        elif len(part) in (2, 3):
-            tag.append(part.upper())
-        else:
-            tag.append(part.lower())
-    return "-".join(tag)
-
-
 def _run(text: str, *, rtl: bool) -> str:
     """One run of text. A line break inside it is a break, not the end of the paragraph."""
     lines = clean(text).replace("\r\n", "\n").replace("\r", "\n").split("\n")
@@ -204,7 +186,7 @@ def _styles(outline: Outline) -> str:
     spell-checks by and what a screen reader pronounces by, so a French CV declaring
     nothing is read with whatever the reader's own Word happens to assume.
     """
-    tag = language_tag(outline.language)
+    tag = languages.tag(clean(outline.language))
     language = ""
     if tag:
         # A right-to-left script is a *complex script* to Word, and has a language of its
@@ -250,7 +232,7 @@ def _properties(outline: Outline) -> str:
     fields = [f"<dc:title>{escape(clean(outline.title))}</dc:title>"]
     if outline.author:
         fields.append(f"<dc:creator>{escape(clean(outline.author))}</dc:creator>")
-    tag = language_tag(outline.language)
+    tag = languages.tag(clean(outline.language))
     if tag:
         fields.append(f"<dc:language>{escape(tag)}</dc:language>")
     return (

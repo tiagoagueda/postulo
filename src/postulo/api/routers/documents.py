@@ -111,6 +111,7 @@ def _letter_out(letter: CoverLetter, *, detail: bool = False) -> dict:
         "subject": letter.subject,
         "is_template": letter.is_template,
         "theme": letter.theme,
+        "language": letter.language,
         "created_at": letter.created_at,
         "updated_at": letter.updated_at,
     }

@@ -299,11 +299,9 @@ class AddLanguageForm(forms.Form):
         from postulo.accounts.forms import LanguageSelect
         from postulo.core import languages
 
-        taken = {translatable.normalise(code) for code in exclude}
+        taken = list(exclude)
         choices = [
-            (code, name)
-            for code, name in languages.LANGUAGES
-            if translatable.normalise(code) not in taken
+            (code, name) for code, name in languages.LANGUAGES if not languages.find(code, taken)
         ]
         self.fields["language"].choices = choices
         self.fields["language"].widget = LanguageSelect(choices=choices)

@@ -327,18 +327,18 @@ def test_the_page_carries_no_style_of_its_own(client, user, two_versions):
 
 def test_a_line_is_read_out_in_the_language_its_version_declared(client, user, cv, experience):
     """The same CV sent in French last month and in English today."""
-    cv.language = "fr-fr"
+    cv.language = "fr-FR"
     cv.save(update_fields=["language"])
     rendering.snapshot_cv(cv, backend=Drawing())
-    cv.language = "en-gb"
+    cv.language = "en-GB"
     cv.save(update_fields=["language"])
     later = rendering.snapshot_cv(cv, backend=Drawing())
     client.force_login(user)
 
     page = compare_page(client, later)
 
-    assert re.search(r'<del[^>]*>.*?<bdi lang="fr-fr">mars 2021 – ', page, re.S)
-    assert re.search(r'<ins[^>]*>.*?<bdi lang="en-gb">March 2021 – ', page, re.S)
+    assert re.search(r'<del[^>]*>.*?<bdi lang="fr-FR">mars 2021 – ', page, re.S)
+    assert re.search(r'<ins[^>]*>.*?<bdi lang="en-GB">March 2021 – ', page, re.S)
 
 
 def test_the_page_names_the_two_it_is_comparing(client, user, two_versions):

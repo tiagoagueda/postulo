@@ -312,7 +312,7 @@ def test_whose_a_row_is_is_never_the_files_to_say(user, other_user):
                 {
                     "section": "experience",
                     "ref": 1,
-                    "language": "fr-fr",
+                    "language": "fr-FR",
                     "field": "role",
                     "text": "Développeur",
                     **somebody_else,
@@ -348,7 +348,7 @@ def test_an_id_in_the_file_reaches_nobodys_record(user, other_user):
                 {
                     "section": "experience",
                     "ref": role.pk,
-                    "language": "fr-fr",
+                    "language": "fr-FR",
                     "field": "role",
                     "text": "Le leur",
                 }

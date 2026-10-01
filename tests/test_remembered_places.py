@@ -138,7 +138,7 @@ def test_a_name_a_framework_generated_is_not_a_place(name, expected):
 def test_a_remembered_place_survives_a_redesign(field, place, expected):
     root = parse_html(page("notice-redesigned"))
 
-    assert hints.read(hints.locate(root, place), field, "pt-pt") == expected
+    assert hints.read(hints.locate(root, place), field, "pt-PT") == expected
 
 
 def test_a_value_held_twice_by_one_kind_of_place_is_learned_at_the_next_kind():

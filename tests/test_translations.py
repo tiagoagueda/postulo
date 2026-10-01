@@ -54,11 +54,11 @@ EUROPEAN_UNION = (
     "da",
     "de",
     "el",
-    "en-gb",
+    "en-GB",
     "es",
     "et",
     "fi",
-    "fr-fr",
+    "fr-FR",
     "ga",
     "hr",
     "hu",
@@ -68,7 +68,7 @@ EUROPEAN_UNION = (
     "mt",
     "nl",
     "pl",
-    "pt-pt",
+    "pt-PT",
     "ro",
     "sk",
     "sl",
@@ -138,8 +138,8 @@ def test_the_settings_offer_every_eu_language():
     for code in EUROPEAN_UNION:
         assert code in codes
     assert codes == languages.NATIVE_NAMES, "the settings offer exactly what the table holds"
-    assert codes["pt-br"] == "português (Brasil)"
-    assert codes["pt-pt"] == "português (Portugal)", "each variant named by its own country"
+    assert codes["pt-BR"] == "português (Brasil)"
+    assert codes["pt-PT"] == "português (Portugal)", "each variant named by its own country"
     assert all(name == languages.NATIVE_NAMES[code] for code, name in settings.LANGUAGES), (
         "each language under its own name"
     )
@@ -300,7 +300,7 @@ def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
     other tests use is the running instance's LOCALE_PATHS in the running instance's
     order, so this asks the question the way a reader asks it.
     """
-    catalogue = catalogues[name, "pt-pt"]
+    catalogue = catalogues[name, "pt-PT"]
     english, message = next(iter(catalogue.messages.items()))[1].msgid, None
     for candidate in catalogue.messages.values():
         if candidate.translated and candidate.plural is None:
@@ -308,9 +308,9 @@ def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
             break
     assert message is not None, f"{name}: nothing translated to ask about"
 
-    with translation.override("pt-pt"):
+    with translation.override("pt-PT"):
         assert translation.gettext(english) == message.msgstr[0]
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         assert translation.gettext(english) == english
 
 
@@ -370,18 +370,18 @@ def test_the_picker_groups_languages_by_how_well_translated_they_are(client, use
         "_STATUS",
         {
             "de": {"total": 10, "translated": 10, "drafts": 10, "percent": 100},
-            "fr-fr": {"total": 10, "translated": 10, "drafts": 0, "percent": 100},
+            "fr-FR": {"total": 10, "translated": 10, "drafts": 0, "percent": 100},
             "pl": {"total": 10, "translated": 4, "drafts": 4, "percent": 40},
         },
     )
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         groups = {str(label): dict(entries) for label, entries in forms.language_choices()[1:]}
 
     # Not "machine translation": pt-BR is seeded from pt-PT and adapted, which is a
     # different provenance and the same warning. What every language here has in common
     # is that nobody has read it yet.
     assert groups["Awaiting review by a speaker"]["de"] == "Deutsch"
-    assert groups["Reviewed by a speaker"]["fr-fr"] == "français (France)"
+    assert groups["Reviewed by a speaker"]["fr-FR"] == "français (France)"
     assert groups["Reviewed by a speaker"]["sv"] == "svenska", "no status known: the name alone"
     # A bare percentage carries no language of its own, so it may stay beside the name.
     assert groups["Partly translated"]["pl"] == "polski (40%)"
@@ -479,7 +479,7 @@ def test_a_documents_language_menu_says_the_same(client, user):
     field = html[
         html.index('name="language"') : html.index("</select>", html.index('name="language"'))
     ]
-    assert 'lang="pt-pt"' in field or 'lang="de"' in field
+    assert 'lang="pt-PT"' in field or 'lang="de"' in field
     for option in re.findall(r'<option value="([^"]+)"[^>]*>', field):
         assert f'lang="{option}"' in field
 

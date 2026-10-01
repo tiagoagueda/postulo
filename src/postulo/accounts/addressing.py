@@ -15,7 +15,7 @@ nobody has written one for yet, and better than offering somebody another langua
 conventions.
 
 **What is stored is the text itself**, never a key into these lists: a profile keeps
-"Dr.ª" rather than "pt-pt:3". So it survives the career record changing language, a list
+"Dr.ª" rather than "pt-PT:3". So it survives the career record changing language, a list
 here being revised, and an *Other* is just text like any other value.
 
 Which list is offered follows the language of the career record, since that is the
@@ -44,10 +44,7 @@ Sources, so a list can be argued with rather than guessed at:
 
 from __future__ import annotations
 
-from django.conf import settings
-from django.utils import translation
-
-from postulo.resume.translatable import best_match
+from postulo.core import languages
 
 #: The value the *Other…* choice posts. The same word the rows of #284 use for their kind,
 #: so the stylesheet's rule that shows a box only while Other is chosen reads both.
@@ -58,16 +55,16 @@ OTHER = "other"
 FORMS_OF_ADDRESS: dict[str, tuple[str, ...]] = {
     "en": ("Mr", "Mrs", "Miss", "Ms", "Mx", "Dr", "Prof."),
     "fr": ("M.", "Mme", "Dr", "Pr", "Me"),
-    "pt-pt": ("Sr.", "Sr.ª", "Dr.", "Dr.ª", "Eng.", "Eng.ª", "Prof.", "Prof.ª"),
-    "pt-br": ("Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Prof.ª"),
+    "pt-PT": ("Sr.", "Sr.ª", "Dr.", "Dr.ª", "Eng.", "Eng.ª", "Prof.", "Prof.ª"),
+    "pt-BR": ("Sr.", "Sra.", "Dr.", "Dra.", "Prof.", "Prof.ª"),
 }
 
 #: Pronouns, by language, as a speaker of it would write the set they use.
 PRONOUNS: dict[str, tuple[str, ...]] = {
     "en": ("she/her", "he/him", "they/them"),
     "fr": ("elle", "il", "iel"),
-    "pt-pt": ("ela/dela", "ele/dele", "elu/delu"),
-    "pt-br": ("ela/dela", "ele/dele", "elu/delu"),
+    "pt-PT": ("ela/dela", "ele/dele", "elu/delu"),
+    "pt-BR": ("ela/dela", "ele/dele", "elu/delu"),
 }
 
 
@@ -77,21 +74,17 @@ def language_of(profile) -> str:
     The interface's is the one this request is being drawn in, which is the profile's
     choice where it made one and the negotiated one where it did not.
     """
-    return (
-        (getattr(profile, "record_language", "") or "").strip()
-        or translation.get_language()
-        or settings.LANGUAGE_CODE
-    )
+    return (getattr(profile, "record_language", "") or "").strip() or languages.current()
 
 
 def _in(table: dict[str, tuple[str, ...]], language: str) -> tuple[str, ...]:
     """The list for ``language``: its own, else its family's, else none.
 
-    ``en-gb`` takes English's and a Portuguese not listed takes European Portuguese's, the
+    ``en-GB`` takes English's and a Portuguese not listed takes European Portuguese's, the
     first of the family here -- the norm the Portuguese-speaking countries of Africa write
     to. Never a different language's.
     """
-    found = best_match(language, table)
+    found = languages.match(language, table)
     return table.get(found, ()) if found else ()
 
 
@@ -109,4 +102,4 @@ def written_in(language: str) -> str:
     What an option's ``lang`` says, so a screen reader reading English pronounces *Mme* as
     French (WCAG 3.1.2, Language of Parts).
     """
-    return best_match(language, list(dict.fromkeys([*FORMS_OF_ADDRESS, *PRONOUNS])))
+    return languages.match(language, list(dict.fromkeys([*FORMS_OF_ADDRESS, *PRONOUNS])))

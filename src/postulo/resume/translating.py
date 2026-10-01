@@ -5,8 +5,8 @@
 At the document level this was already true: `CV.language` and `CoverLetter.language` each
 declare what the document is written in, and `document_direction()` lays the page out for
 that rather than for whoever is reading Postulo. One level down it was not. The career
-record held one text per field per entry, so a CV declaring ``fr-fr`` printed exactly the
-same English job titles as one declaring ``en-gb``, and the honest way to keep a CV in two
+record held one text per field per entry, so a CV declaring ``fr-FR`` printed exactly the
+same English job titles as one declaring ``en-GB``, and the honest way to keep a CV in two
 languages was to keep two careers — a second set of entries, typed again, drifting apart
 from the first the moment a date changed (#131).
 
@@ -39,6 +39,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from postulo.core import languages
 from postulo.jobs import esco
 
 # The rules live in `translatable`, below the models and the forms that declare and offer
@@ -48,11 +49,8 @@ from .translatable import (  # noqa: F401 - re-exported: views, candidate, rende
     TRANSLATABLE,
     _gather,
     _model_name,
-    base,
-    best_match,
     fields_for,
     may_translate,
-    normalise,
     overrides_for,
     record_language_of,
     stored_for,
@@ -79,7 +77,7 @@ def overrides_by_entry(entries, language: str) -> dict[tuple[int, int], dict[str
 
     from .models import Translation
 
-    wanted = normalise(language)
+    wanted = languages.tag(language)
     entries = [entry for entry in entries if entry is not None and entry.pk]
     if not wanted or not entries:
         return {}
@@ -102,7 +100,7 @@ def overrides_by_entry(entries, language: str) -> dict[tuple[int, int], dict[str
     found: dict[tuple[int, int], dict[str, str]] = {}
     for key, group in rows.items():
         stored = _gather(group, allowed.get(key[0], set()))
-        matched = best_match(wanted, stored)
+        matched = languages.match(wanted, stored)
         if matched:
             found[key] = dict(stored[matched])
     return found
@@ -234,12 +232,12 @@ def classified_names(skills, language: str, owner=None) -> dict[int, str]:
     answers with is listed on the CV's page before the CV is exported
     (`named_by_classification`), and on the skill's page in that language.
     """
-    wanted = normalise(language)
+    wanted = languages.tag(language)
     skills = [skill for skill in skills if getattr(skill, "esco_uri", "")]
     if not wanted or not skills:
         return {}
     owner = owner if owner is not None else skills[0].owner
-    if best_match(wanted, [record_language_of(owner)]):
+    if languages.match(wanted, [record_language_of(owner)]):
         return {}
     named: dict[int, str] = {}
     for skill in skills:
@@ -265,7 +263,7 @@ def named_by_classification(cv) -> list[tuple[object, str]]:
     """
     from postulo.documents.models import document_language
 
-    language = normalise(document_language(cv))
+    language = document_language(cv)
     groups = [
         item.item
         for item in cv.included_items().order_by("order", "pk")
@@ -361,8 +359,8 @@ def fallen_back(cv) -> list[FellBack]:
     """
     from postulo.documents.models import document_language
 
-    language = normalise(document_language(cv))
-    if not language or best_match(language, [record_language_of(cv.owner)]):
+    language = document_language(cv)
+    if not language or languages.match(language, [record_language_of(cv.owner)]):
         return []
 
     entries = [item.item for item in cv.included_items().order_by("order", "pk")]

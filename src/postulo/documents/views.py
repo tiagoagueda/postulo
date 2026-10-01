@@ -170,9 +170,7 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # And which skills print the ESCO classification's name for them rather than one the
         # person wrote, said in the same place for the same reason (#266).
         context["classified"] = translating.named_by_classification(self.object)
-        context["classified_language"] = translating.normalise(
-            rendering.document_language(self.object)
-        )
+        context["classified_language"] = rendering.document_language(self.object)
         # The same answer the card and the header draw, asked once of the document
         # itself rather than computed a second way here (#280).
         context["document_language"] = self.object.language_name

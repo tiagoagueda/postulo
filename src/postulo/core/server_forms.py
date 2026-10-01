@@ -6,6 +6,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from . import site
+from .language_field import LanguageChoiceField, LanguagesChoiceField
 from .models import SiteSettings
 
 #: A nullable boolean as three words, so "never set from here" stays a real state.
@@ -164,7 +165,7 @@ class OfferedLanguagesForm(forms.ModelForm):
         model = SiteSettings
         fields = ("offered_languages",)
 
-    offered_languages = forms.MultipleChoiceField(
+    offered_languages = LanguagesChoiceField(
         label=_("Languages this instance offers"),
         required=False,
         # `input` is what asks the stylesheet to draw the box (#290); the rows are laid out
@@ -193,7 +194,9 @@ class OfferedLanguagesForm(forms.ModelForm):
         # What counts as stored is what `site.offered_languages()` counts: a code Postulo
         # no longer speaks is passed over. Saved as shown, it is stored as nothing again.
         stored = [
-            code for code in self.instance.offered_languages or [] if code in languages.NATIVE_NAMES
+            found
+            for code in self.instance.offered_languages or []
+            if (found := languages.find(code))
         ]
         self.initial["offered_languages"] = stored or [code for code, _n in self.every]
 
@@ -207,20 +210,18 @@ class OfferedLanguagesForm(forms.ModelForm):
         `progress` is what the bar under each name draws (#312): reviewed, draft and
         untranslated, filling from the start of the page the administrator is reading.
         """
-        from django.utils.translation import get_language
-
         from postulo.accounts.forms import language_row
         from postulo.core import languages
 
         status = languages.translation_status()
-        rtl = languages.is_rtl(get_language() or "")
+        rtl = languages.is_rtl(languages.current())
         names = dict(self.every)
         return [
             {
                 "option": option,
                 **language_row(option.data["value"], names[option.data["value"]], status=status),
                 "progress": languages.translation_progress(
-                    status.get(option.data["value"]), rtl=rtl
+                    languages.status_of(option.data["value"], status), rtl=rtl
                 ),
             }
             for option in self["offered_languages"]
@@ -233,8 +234,10 @@ class OfferedLanguagesForm(forms.ModelForm):
                 _("At least one language has to be offered, or nobody can read anything.")
             )
 
+        from postulo.core import languages
+
         default = (self.instance.default_language or "").strip()
-        if default and default not in chosen:
+        if default and not languages.find(default, chosen):
             raise forms.ValidationError(
                 _(
                     "%(name)s is what a new account starts in, so it cannot stop being "
@@ -250,7 +253,7 @@ class OfferedLanguagesForm(forms.ModelForm):
     def _name_of(code: str) -> str:
         from postulo.core import languages
 
-        return languages.NATIVE_NAMES.get(code, code)
+        return languages.native_name(code, code)
 
 
 class DefaultsForm(forms.ModelForm):
@@ -262,7 +265,7 @@ class DefaultsForm(forms.ModelForm):
         from postulo.accounts.forms import LanguageSelect, language_choices, time_zone_choices
 
         super().__init__(*args, **kwargs)
-        self.fields["default_language"] = forms.ChoiceField(
+        self.fields["default_language"] = LanguageChoiceField(
             label=_("Language for new accounts"),
             choices=language_choices,
             required=False,

@@ -168,6 +168,59 @@ def _wanted_username(account: dict, user) -> tuple[str, str]:
     return wanted, ""
 
 
+#: What the list called a language before format 28, where it calls it something else now.
+#: Serbian said nothing about its script until the list said which one the catalogue is in.
+RENAMED_SINCE_27 = {"sr": "sr-Cyrl"}
+
+
+def _languages_as_written(document: dict, report: ImportReport) -> None:
+    """Every language code in the archive, written the way Postulo writes one (#337).
+
+    An archive written before format 28 says `pt-br`, and one edited by hand says anything.
+    The columns put a code in its canonical form by themselves; what they cannot know is
+    which archive a bare `sr` came from, and that is settled here: from an older one it is
+    the Serbian the list offered, which is `sr-Cyrl` now. From a newer one it is what
+    somebody declared, and stays.
+
+    What is not shaped like a language at all is left blank and named in the report, as
+    a username this instance does not accept is: the rest of the archive is restored.
+    """
+    from . import languages
+
+    try:
+        older = int((document.get("postulo") or {}).get("format")) < 28
+    except (TypeError, ValueError):
+        older = True
+
+    def written(holder, key: str, what: str) -> None:
+        value = holder.get(key) if isinstance(holder, dict) else None
+        if not value:
+            return
+        if not languages.well_formed(value):
+            holder[key] = ""
+            # `!r`, and cut short: it is whatever the file says, and this line is printed.
+            report.skipped.append(
+                f"{what}: {str(value)[:40]!r} is not a language code, and was left blank"
+            )
+            return
+        code = languages.tag(value)
+        holder[key] = RENAMED_SINCE_27.get(code, code) if older else code
+
+    profile = (document.get("account") or {}).get("profile")
+    written(profile, "language", "The language you read Postulo in")
+    written(profile, "record_language", "The language of your career record")
+    for row in (document.get("resume") or {}).get("translations") or []:
+        section = row.get("section") if isinstance(row, dict) else ""
+        written(row, "language", f"The language of a translation of {str(section)[:40]}")
+    documents = document.get("documents") or {}
+    for kind in ("cvs", "cover_letters", "uploads", "sent"):
+        for entry in documents.get(kind) or []:
+            name = (
+                (entry.get("name") or entry.get("title") or "") if isinstance(entry, dict) else ""
+            )
+            written(entry, "language", f"The language of “{str(name)[:60]}”")
+
+
 def account_is_empty(user) -> bool:
     from postulo.applications.models import Application
     from postulo.documents.models import CV
@@ -391,6 +444,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     report = ImportReport()
     if not_taken:
         report.skipped.append(not_taken)
+    _languages_as_written(document, report)
     from django.contrib.contenttypes.models import ContentType
 
     # ------------------------------------------------------------------ profile
@@ -513,7 +567,9 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     for row in document.get("resume", {}).get("translations", []):
         target = resume_map.get(row.get("section", ""), {}).get(row.get("ref"))
         text = (row.get("text") or "").strip()
-        if target is None or not text:
+        # A translation into nothing is one whose language the archive did not name, or
+        # named as something that is not a language; that was said in the report above.
+        if target is None or not text or not row.get("language"):
             if target is None:
                 report.skipped.append(
                     f"Translation of {row.get('section')}#{row.get('ref')}: no such record"

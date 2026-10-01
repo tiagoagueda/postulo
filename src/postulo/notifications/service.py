@@ -5,8 +5,7 @@ from __future__ import annotations
 import logging
 from collections.abc import Callable
 
-from django.utils import translation
-
+from postulo.core import languages
 from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 
@@ -27,7 +26,7 @@ def language_for(user) -> str:
 
     profile = getattr(user, "profile", None)
     chosen = (getattr(profile, "language", "") or "").strip()
-    return chosen or site.default_language() or "en-GB"
+    return chosen or site.default_language() or languages.SOURCE
 
 
 def notify(user, notification: Notification | Callable[[], Notification]) -> int:
@@ -47,12 +46,14 @@ def notify(user, notification: Notification | Callable[[], Notification]) -> int
     always did (#223).
     """
     language = language_for(user)
-    with translation.override(language):
+    with languages.override(language):
         message = notification() if callable(notification) else notification
         # Stamped here rather than by every sender: this is the one place that knows whose
         # language the words came out in, and a notifier rendering around them needs it
         # (#229).
-        return _deliver(user, message.but(language=language))
+        # The language the words did come out in, as Postulo writes it: a profile holding
+        # `pt-AO` is read the Portuguese catalogue, and that is what the words are (#337).
+        return _deliver(user, message.but(language=languages.current()))
 
 
 def _deliver(user, notification: Notification) -> int:

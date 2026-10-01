@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import struct
 
-#: Script → the probe the renderer's own matching would answer for it.
+#: Script, by its ISO 15924 code → the probe the renderer's own matching would answer for it.
 #:
 #: The first member is the language fontconfig matches by — ISO 639-3, the code its
 #: per-font language sets are computed in — and it is a language Postulo offers in
@@ -37,27 +37,27 @@ import struct
 #: before #71's languages arrive, so the phase that brings them cannot quietly ship
 #: a document nobody can read, the way the African phase once did.
 PROBES: dict[str, tuple[str, str]] = {
-    "Arabic": ("ara", "\u0628"),
-    "Bengali": ("ben", "\u0985"),
-    "Cyrillic": ("bul", "\u0414"),
-    "Devanagari": ("hin", "\u0905"),
-    "Ethiopic": ("amh", "\u1200"),
-    "Greek": ("ell", "\u0395"),
-    "Gujarati": ("guj", "\u0a85"),
-    "Gurmukhi": ("pan", "\u0a05"),
-    "Hangul": ("kor", "\ud55c"),
-    "Han": ("zho", "\u4e2d"),
-    "Hebrew": ("heb", "\u05d1"),
-    "Hiragana": ("jpn", "\u3042"),
-    "Katakana": ("jpn", "\u30ab"),
-    "Khmer": ("khm", "\u1780"),
-    "Lao": ("lao", "\u0e81"),
-    "Myanmar": ("mya", "\u1000"),
-    "Sinhala": ("sin", "\u0d85"),
-    "Tamil": ("tam", "\u0b85"),
-    "Telugu": ("tel", "\u0c05"),
+    "Arab": ("ara", "\u0628"),
+    "Beng": ("ben", "\u0985"),
+    "Cyrl": ("bul", "\u0414"),
+    "Deva": ("hin", "\u0905"),
+    "Ethi": ("amh", "\u1200"),
+    "Grek": ("ell", "\u0395"),
+    "Gujr": ("guj", "\u0a85"),
+    "Guru": ("pan", "\u0a05"),
+    "Hang": ("kor", "\ud55c"),
+    "Hani": ("zho", "\u4e2d"),
+    "Hebr": ("heb", "\u05d1"),
+    "Hira": ("jpn", "\u3042"),
+    "Kana": ("jpn", "\u30ab"),
+    "Khmr": ("khm", "\u1780"),
+    "Laoo": ("lao", "\u0e81"),
+    "Mymr": ("mya", "\u1000"),
+    "Sinh": ("sin", "\u0d85"),
+    "Taml": ("tam", "\u0b85"),
+    "Telu": ("tel", "\u0c05"),
     "Thai": ("tha", "\u0e01"),
-    "Tifinagh": ("tfr", "\u2d30"),
+    "Tfng": ("tfr", "\u2d30"),
 }
 
 

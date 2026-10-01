@@ -19,6 +19,7 @@ import pytest
 from django.utils import formats, timezone, translation
 
 from postulo.applications.models import Application, Reminder, Status
+from postulo.core import languages
 from postulo.documents import rendering
 from postulo.documents.models import CV, CoverLetter, DocumentKind, UploadedDocument
 from postulo.documents.stores import metadata_for
@@ -31,7 +32,7 @@ pytestmark = pytest.mark.django_db
 
 @pytest.fixture
 def french_cv(user):
-    return CV.objects.create(owner=user, name="Backend, English", language="fr-fr")
+    return CV.objects.create(owner=user, name="Backend, English", language="fr-FR")
 
 
 def active_language_seen_by(monkeypatch, target: str) -> list[str]:
@@ -40,7 +41,7 @@ def active_language_seen_by(monkeypatch, target: str) -> list[str]:
     real = rendering.render_to_string
 
     def watching(*args, **kwargs):
-        seen.append(translation.get_language() or "")
+        seen.append(languages.current())
         return real(*args, **kwargs)
 
     monkeypatch.setattr(rendering, "render_to_string", watching)
@@ -53,49 +54,49 @@ def active_language_seen_by(monkeypatch, target: str) -> list[str]:
 def test_a_cv_is_rendered_in_its_own_language_not_the_reader_s(user, french_cv, monkeypatch):
     seen = active_language_seen_by(monkeypatch, "cv")
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         rendering.render_cv_html(french_cv)
 
-    assert seen == ["fr-fr"], "the CV says French, so the page around it is French"
+    assert seen == ["fr-FR"], "the CV says French, so the page around it is French"
 
 
 def test_a_letter_is_rendered_in_its_own_language(user, monkeypatch):
     letter = CoverLetter.objects.create(
-        owner=user, name="Standard", subject="Bonjour", body="{{ date }}", language="fr-fr"
+        owner=user, name="Standard", subject="Bonjour", body="{{ date }}", language="fr-FR"
     )
     seen = active_language_seen_by(monkeypatch, "letter")
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         rendering.render_letter_html(letter)
 
-    assert seen == ["fr-fr"]
+    assert seen == ["fr-FR"]
 
 
 def test_the_date_placeholder_follows_the_letter_and_not_the_c_locale(user):
     """It was built with `strftime("%B")`, which names the month in English whatever is set."""
     letter = CoverLetter.objects.create(
-        owner=user, name="Standard", subject="x", body="{{ date }}", language="fr-fr"
+        owner=user, name="Standard", subject="x", body="{{ date }}", language="fr-FR"
     )
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         text = rendering.letter_text(letter)
 
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         expected = formats.date_format(timezone.localdate(), "j F Y")
 
     assert text.endswith(expected), "the date is written the way the letter's language writes it"
 
 
 def test_a_document_with_no_language_of_its_own_follows_its_owner(user, monkeypatch):
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     cv = CV.objects.create(owner=user, name="Sem nome")
     seen = active_language_seen_by(monkeypatch, "cv")
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         rendering.render_cv_html(cv)
 
-    assert seen == ["pt-pt"]
+    assert seen == ["pt-PT"]
 
 
 # ------------------------------------------------------ what the employer's viewer shows
@@ -120,18 +121,18 @@ def test_a_cv_with_nobody_named_keeps_something_to_show(user, french_cv):
 
 
 def test_a_render_is_filed_under_the_document_s_language(user, french_cv):
-    user.profile.language = "en-gb"
+    user.profile.language = "en-GB"
     user.profile.save(update_fields=["language"])
     document = rendering.snapshot_cv(french_cv, backend=_FakeBackend())
 
-    assert metadata_for(document).language == "fr-fr", "the CV is French whoever owns it"
+    assert metadata_for(document).language == "fr-FR", "the CV is French whoever owns it"
 
 
 def test_an_upload_is_filed_under_what_somebody_said_and_never_a_guess(user):
     """It used to follow the person, which is how a German certificate uploaded by
     somebody reading Postulo in Portuguese was handed to a store as Portuguese. Postulo
     has never read the file; nothing is the honest answer until somebody says (#283)."""
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     upload = UploadedDocument(owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE)
     upload.file.save("diploma.pdf", _a_file(), save=False)
@@ -148,14 +149,14 @@ def test_a_snapshot_keeps_the_language_it_was_frozen_with(user, french_cv):
     """The record of what an employer received cannot be rewritten by a later edit. The
     language used to be read off the source whenever a store asked (#283)."""
     document = rendering.snapshot_cv(french_cv, backend=_FakeBackend())
-    assert document.language == "fr-fr"
+    assert document.language == "fr-FR"
 
-    french_cv.language = "en-gb"
+    french_cv.language = "en-GB"
     french_cv.save(update_fields=["language"])
     document.refresh_from_db()
 
-    assert document.language == "fr-fr", "what was sent was French, and still is"
-    assert metadata_for(document).language == "fr-fr"
+    assert document.language == "fr-FR", "what was sent was French, and still is"
+    assert metadata_for(document).language == "fr-FR"
 
 
 def test_a_snapshot_whose_source_is_gone_still_says_what_it_was(user, french_cv):
@@ -167,32 +168,32 @@ def test_a_snapshot_whose_source_is_gone_still_says_what_it_was(user, french_cv)
     document.refresh_from_db()
 
     assert document.source is None
-    assert document.language == "fr-fr" and metadata_for(document).language == "fr-fr"
+    assert document.language == "fr-FR" and metadata_for(document).language == "fr-FR"
 
 
 # ------------------------------------------------------------------ the message
 
 
 def test_a_notification_is_worded_in_the_language_the_reader_chose(user, monkeypatch):
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     seen = []
 
     def building() -> Notification:
-        seen.append(translation.get_language() or "")
+        seen.append(languages.current())
         return Notification(event="reminder_due", title="x", body="", url="/")
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         notify(user, building)
 
-    assert seen == ["pt-pt"], "built in their language, not in the sender's"
+    assert seen == ["pt-PT"], "built in their language, not in the sender's"
 
 
 def test_a_reminder_from_the_scheduler_speaks_to_the_person_it_is_for(user, monkeypatch):
     """The scheduler has no request at all, so this used to be the instance default."""
     from postulo.notifications.management.commands import send_due_reminders
 
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     company = Company.objects.create(owner=user, name="Aperture Science")
     posting = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
@@ -207,17 +208,17 @@ def test_a_reminder_from_the_scheduler_speaks_to_the_person_it_is_for(user, monk
     from postulo.notifications import service
 
     def watching(user, notification):
-        seen.append(translation.get_language() or "")
+        seen.append(languages.current())
         return 0
 
     # Below `notify`, so the real override is exercised and the message really is built
     # inside it -- stubbing `notify` itself would have tested nothing but the stub.
     monkeypatch.setattr(service, "_deliver", watching)
 
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         send_due_reminders.announce_due_reminders()
 
-    assert seen == ["pt-pt"], "worded for the person it is addressed to"
+    assert seen == ["pt-PT"], "worded for the person it is addressed to"
 
 
 def test_the_language_of_a_person_who_has_chosen_nothing_is_the_instance_default(user):

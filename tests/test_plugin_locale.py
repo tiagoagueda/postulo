@@ -87,9 +87,9 @@ def test_a_plugins_locale_directory_is_read_once_registered(plugin_package, sett
     assert plugin_locale.register_plugin_locale("echoplug") is False, "once is enough"
     assert str(plugin_package / "locale") in settings.LOCALE_PATHS
 
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         assert translation.gettext("Echo it back") == "Renvoyer en écho"
-    with translation.override("en-gb"):
+    with translation.override("en-GB"):
         assert translation.gettext("Echo it back") == "Echo it back"
 
 
@@ -105,7 +105,7 @@ def test_the_registry_registers_the_locale_of_every_plugin_it_loads(
     names = [plugin.name for plugin in registry.plugins("notifier", refresh=True)]
     assert "echoplug" in names
     assert str(plugin_package / "locale") in settings.LOCALE_PATHS
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         plugin = registry.find_plugin("notifier", "echoplug")
         assert str(plugin.label) == "Renvoyer en écho"
     registry._cache.clear()
@@ -133,7 +133,7 @@ def test_postulos_own_translation_wins_a_string_a_plugin_also_translates(tmp_pat
     assert plugin_locale.register_locale_dir(tmp_path / "plugin") is True
 
     assert settings.LOCALE_PATHS[0] == str(tmp_path / "core"), "appended, never prepended"
-    with translation.override("fr-fr"):
+    with translation.override("fr-FR"):
         assert translation.gettext("Whose name") == "Le nom de Postulo"
     plugin_locale._registered.remove(str((tmp_path / "plugin").resolve()))
     trans_real._translations = {}

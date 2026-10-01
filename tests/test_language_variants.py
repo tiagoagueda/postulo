@@ -1,6 +1,6 @@
 """Two regions of one language, both offered.
 
-Postulo already carried `en-gb`, `fr-fr` and `pt-pt` — a language plus a region. Brazilian
+Postulo already carried `en-GB`, `fr-FR` and `pt-PT` — a language plus a region. Brazilian
 Portuguese is the first case where **two regions of the same language** are offered at once,
 and whatever is done here is the pattern for `es-419`, `de-AT` and the rest.
 
@@ -21,8 +21,8 @@ from postulo.core import languages, phones
 
 pytestmark = pytest.mark.django_db
 
-VARIANT = "pt-br"
-SIBLING = "pt-pt"
+VARIANT = "pt-BR"
+SIBLING = "pt-PT"
 REPO = Path(__file__).resolve().parents[1]
 
 
@@ -153,7 +153,7 @@ def test_the_picker_offers_both_and_says_neither_is_reviewed(client, user):
 
     html = client.get(reverse("settings:locale")).content.decode()
 
-    assert 'value="pt-br"' in html and 'value="pt-pt"' in html
+    assert 'value="pt-BR"' in html and 'value="pt-PT"' in html
     assert "português (Brasil)" in html
 
 

@@ -31,6 +31,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 
 from . import kinds, themes
@@ -95,17 +96,18 @@ def document_language(document) -> str:
     Beside the models rather than in `rendering`, because a document asks it of itself
     (`effective_language`) and the models importing the renderer was a cycle (#248).
     `rendering` still hands it out.
-    """
-    from postulo.core import site
 
-    own = (getattr(document, "language", "") or "").strip()
-    if own:
-        return own
+    Written as a tag is written, and only where it is one (#337): what is not a language
+    tag declares nothing, and the next answer is taken rather than printed into a ``lang``
+    that no reader can use.
+    """
+    from postulo.core import languages, site
+
     profile = getattr(getattr(document, "owner", None), "profile", None)
-    from_profile = (getattr(profile, "language", "") or "").strip()
-    if from_profile:
-        return from_profile
-    return site.default_language() or "en-GB"
+    for declared in (getattr(document, "language", ""), getattr(profile, "language", "")):
+        if languages.well_formed(declared):
+            return languages.tag(declared)
+    return languages.tag(site.default_language()) or languages.SOURCE
 
 
 def document_direction(document) -> str:
@@ -131,10 +133,8 @@ class HasALanguage:
     def language_name(self) -> str:
         """The language's own name for itself, or nothing where none is known."""
         from postulo.core import languages
-        from postulo.resume import translatable
 
-        code = self.effective_language
-        return languages.NATIVE_NAMES.get(translatable.normalise(code), "") if code else ""
+        return languages.native_name(self.effective_language)
 
 
 class DeclaresALanguage(HasALanguage):
@@ -262,9 +262,8 @@ class CV(DeclaresALanguage, OwnedModel):
         _("summary"), blank=True, help_text=_("The opening paragraph, if you use one.")
     )
     theme = theme_field(themes.Kind.CV)
-    language = models.CharField(
+    language = LanguageField(
         _("language"),
-        max_length=10,
         blank=True,
         help_text=_(
             "Which language this variant is written in. Leave blank to follow your profile."
@@ -525,9 +524,8 @@ class CoverLetter(DeclaresALanguage, OwnedModel):
     #: What the body is written in. A letter to a Portuguese employer is written in
     #: Portuguese, and the PDF has to say so: a screen reader reading it out is often the
     #: recruiter's, and hyphenation and justification follow the declaration too.
-    language = models.CharField(
+    language = LanguageField(
         _("language"),
-        max_length=10,
         blank=True,
         help_text=_(
             "Which language this letter is written in. Leave blank to follow your profile."
@@ -596,9 +594,8 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: has never read: guessing from the reader's own interface language is how a store
     #: came to be told a German certificate was English. Asked for on the form, left
     #: blank until somebody answers, and shown as unsaid rather than as nothing.
-    language = models.CharField(
+    language = LanguageField(
         _("language"),
-        max_length=10,
         blank=True,
         help_text=_(
             "Which language this file is in. Postulo cannot read it, so nothing is "
@@ -778,7 +775,7 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     #: -- and either way the language of what the employer actually received would change
     #: or vanish under a record whose whole purpose is that it cannot. Not editable, like
     #: everything else about a frozen document.
-    language = models.CharField(_("language"), max_length=10, blank=True, editable=False)
+    language = LanguageField(_("language"), blank=True, editable=False)
 
     source_text = models.TextField(_("text as sent"), blank=True)
     #: The words of a CV without their setting, kept beside the markup they were set in.

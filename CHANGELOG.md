@@ -32,6 +32,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Language codes are BCP 47 tags in canonical form wherever Postulo writes one: `pt-BR` and `en-GB`, not `pt-br`, and Serbian is `sr-Cyrl`. **If you read them from the API, a webhook, a store plugin or an archive, compare without regard to case or expect the new spelling.** Export format 28. (#337)
 - On *Your details*, *Primary* is a star and *Remove* a bin that asks in a dialog and takes the number, link, address or identifier off at once, without *Save* and without losing what is typed elsewhere. The number that gets you back in cannot be removed, and a copy of the page open in another tab still saves. (#303)
 - On *Companies*, *Applications* and *Listings* the masthead's search box narrows the table, with a button beside it to search everything instead; the page's own box is gone, and *Listings* can now be searched. On a phone the magnifier opens the same box. (#313)
 - Python 3.12.4 is the oldest Python Postulo runs on: the 3.12 releases before it call some reserved address ranges public. **Installed without a container: check `python --version` before upgrading.** (#321)
@@ -153,6 +154,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A Norwegian reader is given the occupation and skill names ESCO publishes in Norwegian, where the English ones were shown; and a language menu keeps a language it does not list, where saving a CV or a letter wrote blank over it. (#337)
+- *Your career → Other languages* saves a translation under a language and nothing else: a mistyped address used to store it under whatever was typed, and answered with a server error on PostgreSQL. (#620)
 - On *Your details*, a telephone number or a postal address typed into the empty row is saved: the page answered with a server error instead, and lost everything else typed on it. (#454)
 - *Server settings → Defaults* shows every language ticked while nothing has been narrowed, as the page says, and saving it that way still stores nothing; a partly translated language keeps its region in the list, "français (France)". (#322)
 - A refused language list on *Server settings → Defaults* no longer blanks the name, language and time zone above it, so saving that card afterwards cannot wipe the stored defaults. (#494)

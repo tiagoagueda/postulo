@@ -35,8 +35,6 @@ def theme_switch(choice: str) -> dict:
 
 def ui(request: HttpRequest) -> dict:
     """Interface-wide values: the resolved theme, the direction, the navigation, the policy."""
-    from django.utils.translation import get_language
-
     from . import languages, navigation
 
     theme = ""
@@ -67,10 +65,14 @@ def ui(request: HttpRequest) -> dict:
     name = site.instance_name()
     return {
         "ui_theme": theme,
+        # As Postulo writes it, over Django's answer of the same name, which is in lower
+        # case: this processor runs after Django's own, so this is the one a page sees
+        # (#337).
+        "LANGUAGE_CODE": languages.current(),
         # Postulo's own answer rather than Django's LANGUAGE_BIDI, so that the interface
         # and a rendered document agree and a language Django has never heard of still
         # gets a direction (#43 goes well past the set Django ships with).
-        "text_direction": languages.direction(get_language() or ""),
+        "text_direction": languages.direction(languages.current()),
         "theme_switch": theme_switch(choice),
         # Read by `app.js` off <body>, and by the pages that document a key so that they do
         # not promise one that is switched off.

@@ -8,10 +8,12 @@ from dataclasses import dataclass, field
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.template.loader import render_to_string
-from django.utils import formats, timezone, translation
+from django.utils import formats, timezone
 from django.utils.text import slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
+
+from postulo.core import languages
 
 from . import formats as file_formats
 from . import themes
@@ -129,7 +131,7 @@ def build_sections(cv: CV) -> list[Section]:
     # The language the PDF will declare, not the field: a CV that names none still says
     # something in its `lang`, and text in one language under a declaration of another is
     # the mismatch this whole feature exists to remove.
-    language = translating.normalise(document_language(cv))
+    language = document_language(cv)
     cv_items = list(cv.included_items().order_by("order", "pk"))
     entries = [cv_item.item for cv_item in cv_items]
     overrides = translating.overrides_by_entry(entries, language)
@@ -249,7 +251,7 @@ def render_cv_html(cv: CV, *, nonce=None) -> str:
     "Experience" over "Mar 2021 – present" — a document that is half one language and half
     another, sent to an employer who reads one of them.
     """
-    with translation.override(document_language(cv)):
+    with languages.override(document_language(cv)):
         return render_to_string(
             themes.template_for(cv.theme, cv.theme_kind),
             {
@@ -387,7 +389,7 @@ def cv_outline(cv: CV) -> file_formats.Outline:
     off, the author's name with it.
     """
     language = document_language(cv)
-    with translation.override(language):
+    with languages.override(language):
         contact = cv_contact(cv)
         blocks = []
         if contact:
@@ -497,7 +499,7 @@ def render_letter_html(
     `{{ date }}` was written in one language under a heading printed in another was the
     plainest version of this: two dates, two languages, one page.
     """
-    with translation.override(document_language(letter)):
+    with languages.override(document_language(letter)):
         values = letter_values(letter, application)
         return render_to_string(
             themes.template_for(letter.theme, themes.Kind.LETTER),
@@ -520,7 +522,7 @@ def letter_text(letter: CoverLetter, application=None, *, mark_empty: bool = Fal
 
     The same words as the PDF, so it is filled in the letter's language too (#223).
     """
-    with translation.override(document_language(letter)):
+    with languages.override(document_language(letter)):
         values = letter_values(letter, application)
         subject = fill_placeholders(letter.subject, values, mark_empty=mark_empty)
         body = fill_placeholders(letter.body, values, mark_empty=mark_empty)
@@ -586,7 +588,7 @@ def draft_name(document) -> str:
     two. The word is there because the file is the only thing that leaves: nothing in
     Postulo will ever say this PDF was a try, so the PDF says it itself (#236).
     """
-    with translation.override(document_language(document)):
+    with languages.override(document_language(document)):
         return gettext("%(title)s (draft)") % {"title": document_title(document)}
 
 
@@ -658,7 +660,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     # so; it was going into the PDF's `/Title`, which a viewer shows in its title bar and a
     # screen reader announces, and into the file name attached to portals and emails.
     language = document_language(cv)
-    with translation.override(language):
+    with languages.override(language):
         title = document_title(cv)
 
     document = RenderedDocument(
@@ -711,7 +713,7 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
         kind=DocumentKind.REPORT,
         # A report has no source document; the language it is in is the one it was just
         # rendered in, which is the request's (#283).
-        language=translation.get_language() or "",
+        language=languages.current(),
         source_text=html,
         checksum=RenderedDocument.checksum_for(content),
     )
@@ -725,7 +727,7 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
     content = html_to_pdf(html, backend=backend)
     # The recipient's name, not the person's own filing name for this draft (#223).
     language = document_language(letter)
-    with translation.override(language):
+    with languages.override(language):
         title = document_title(letter)
 
     document = RenderedDocument(

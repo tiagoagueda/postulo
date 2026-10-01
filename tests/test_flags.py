@@ -171,7 +171,7 @@ def test_the_telephone_field_shows_the_chosen_country_without_a_script(client, u
     field still shows the flag of the country it loaded with, which is the true answer
     until the form is saved.
     """
-    user.profile.language = "pt-pt"
+    user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     client.force_login(user)
 
@@ -331,7 +331,7 @@ def test_the_default_language_shows_the_chosen_flag_without_a_script(client, adm
     from postulo.core.models import SiteSettings
 
     row = SiteSettings.get()
-    row.default_language = "pt-pt"
+    row.default_language = "pt-PT"
     row.save()
     client.force_login(administrator)
 
@@ -348,7 +348,7 @@ def test_the_default_language_shows_the_chosen_flag_without_a_script(client, adm
     for code, attrs in options:
         assert f'lang="{code}"' in attrs, code
         assert "data-flag=" in attrs, code
-    assert 'value="pt-pt"' in select.group(1) and "/flags/pt" in select.group(1)
+    assert 'value="pt-PT"' in select.group(1) and "/flags/pt" in select.group(1)
     labels = re.findall(r"<option [^>]*>([^<]*)</option>", select.group(1))
     assert not any(ch in label for label in labels for ch in "\U0001f1e6\U0001f1ff")
 
@@ -366,7 +366,7 @@ def a_cv(user, **fields):
 def test_a_cv_says_which_language_it_is_in(client, user):
     """A flag beside the kind, and the *language's* own name as its words -- never the
     country's, because the flag stands alone on a card with no name beside it."""
-    a_cv(user, language="pt-pt")
+    a_cv(user, language="pt-PT")
     client.force_login(user)
 
     html = client.get(reverse("documents:cv_list")).content.decode()
@@ -411,7 +411,7 @@ def test_a_blank_language_follows_the_profile_and_is_drawn_the_same(client, user
 def test_a_letter_says_it_too(client, user):
     from postulo.documents.models import CoverLetter
 
-    CoverLetter.objects.create(owner=user, name="Speculative", body="Dear team", language="fr-fr")
+    CoverLetter.objects.create(owner=user, name="Speculative", body="Dear team", language="fr-FR")
     client.force_login(user)
 
     html = client.get(reverse("documents:letter_list")).content.decode()
@@ -429,7 +429,7 @@ def _queries_for(client, url) -> int:
 
 
 @pytest.mark.django_db
-@pytest.mark.parametrize("declared,profile", [("pt-pt", ""), ("", "de")])
+@pytest.mark.parametrize("declared,profile", [("pt-PT", ""), ("", "de")])
 def test_asking_every_card_its_language_costs_no_query_of_its_own(client, user, declared, profile):
     """Whether the language is the document's own or inherited, the page asks the same
     number of questions of the database however many cards are on it: the resolution is

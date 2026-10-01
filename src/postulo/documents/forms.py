@@ -42,11 +42,17 @@ def language_choices() -> list[tuple[str, str]]:
     return [("", _("Follow your profile")), *languages.LANGUAGES]
 
 
-def language_widget() -> forms.Select:
-    """The same menu the profile uses, so an option says which language it is in."""
-    from postulo.accounts.forms import LanguageSelect
+def language_widget(held="", choices: list | None = None) -> forms.Select:
+    """The same menu the profile uses, so an option says which language it is in.
 
-    return LanguageSelect(choices=language_choices())
+    ``held`` is what the document already declares, which stays on the menu where it is
+    none of the instance's own: the field is free text, and a menu that could not show
+    `pt-AO` saved *Follow your profile* over it (#337).
+    """
+    from postulo.accounts.forms import LanguageSelect, with_what_is_held
+
+    choices = language_choices() if choices is None else choices
+    return LanguageSelect(choices=with_what_is_held(choices, held))
 
 
 class LanguageChoiceMixin:
@@ -56,7 +62,7 @@ class LanguageChoiceMixin:
         super().__init__(*args, **kwargs)
         field = self.fields.get("language")
         if field is not None:
-            field.widget = language_widget()
+            field.widget = language_widget(self["language"].value())
             field.required = False
 
 
@@ -479,11 +485,11 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         # *nobody has said*, not "follow your profile", because this is a file Postulo has
         # never read (#283). The model field stays free text, as it is everywhere else, so
         # a language an instance has since stopped offering still saves.
-        from postulo.accounts.forms import LanguageSelect
-
         language = self.fields.get("language")
         if language is not None:
-            language.widget = LanguageSelect(choices=[("", _("Not said")), *language_choices()[1:]])
+            language.widget = language_widget(
+                self["language"].value(), [("", _("Not said")), *language_choices()[1:]]
+            )
             language.required = False
 
         queryset = UploadedDocument.objects.for_user(self.user)

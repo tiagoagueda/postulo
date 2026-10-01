@@ -290,7 +290,7 @@ def test_the_title_does_not_move_with_the_language(client, user):
     user.profile.save(update_fields=["language"])
 
     body = client.get(
-        "/api/v1/applications", **issue(user, "captures"), HTTP_ACCEPT_LANGUAGE="pt-pt"
+        "/api/v1/applications", **issue(user, "captures"), HTTP_ACCEPT_LANGUAGE="pt-PT"
     ).json()
 
     assert body["title"] == problems.TITLES["insufficient-scope"]

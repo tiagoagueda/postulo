@@ -243,7 +243,7 @@ def test_the_bar_follows_the_direction_of_the_page(administrator, monkeypatch):
 
 @pytest.mark.parametrize(
     ("language", "expected"),
-    [("en-gb", "1,873"), ("de", "1.873")],
+    [("en-GB", "1,873"), ("de", "1.873")],
 )
 def test_a_count_is_grouped_as_the_reader_groups_it(language, expected):
     """A comma in English and a full stop in German, from the same filter."""
