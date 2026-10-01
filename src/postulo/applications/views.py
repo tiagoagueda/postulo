@@ -28,7 +28,12 @@ from django.views.generic import (
 )
 
 from postulo.core import tables
-from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
+from postulo.core.mixins import (
+    ConfirmDeleteMixin,
+    OwnedObjectMixin,
+    OwnerFormMixin,
+    PageOrFragmentMixin,
+)
 from postulo.core.models import Tag
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query
@@ -127,7 +132,7 @@ class ApplicationFilterMixin:
         }
 
 
-class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
+class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilterMixin, ListView):
     """Applications, in one of two shapes: the table, or the board (#102).
 
     Both answer "which of my applications am I looking at?", so they were always one set
@@ -208,12 +213,6 @@ class ApplicationListView(OwnedObjectMixin, ApplicationFilterMixin, ListView):
                 queryset.with_quiet_flag(quiet.threshold_for(self.request.user))
             ).filter(status__in=list(BOARD_STATUSES))
         return self.table.apply(self.filter_queryset(queryset.with_table_data()))
-
-    def get_template_names(self) -> list[str]:
-        # An htmx request wants the table alone; the back button's restore wants the page.
-        if self.request.htmx and not self.request.htmx.history_restore_request:
-            return [f"{self.template_name}#htmx"]
-        return [self.template_name]
 
     def shape_url(self, shape: str) -> str:
         """This page, with these filters, in ``shape``."""

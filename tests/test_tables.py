@@ -182,6 +182,98 @@ def test_an_htmx_request_receives_the_table_and_a_plain_request_the_page(client,
     assert "<html" in restored, "the back button wants the whole page"
 
 
+#: The pages that answer an htmx request with their table alone, at the page's own address.
+PAGES_THAT_ARE_ALSO_FRAGMENTS = ("applications:list", "jobs:company_list", "listings:list")
+
+#: What chooses between the two answers: the header htmx sends with every request, and the
+#: one it adds when it wants a whole page back for the history.
+CHOSEN_BY = {"hx-request", "hx-history-restore-request"}
+
+
+def varies_on(response) -> set[str]:
+    return {name.strip().lower() for name in response.get("Vary", "").split(",")}
+
+
+@pytest.mark.parametrize("url_name", PAGES_THAT_ARE_ALSO_FRAGMENTS)
+def test_a_page_that_is_also_a_fragment_says_what_chose_between_them(
+    client, user, search, url_name
+):
+    """One address, two answers, chosen by a request header -- and no word of it to a cache.
+    The browser kept the fragment under the page's address, and Back, which asks the cache
+    for that address as a document, was handed a table with no title, no masthead and no
+    stylesheet (#646). Both answers name the headers in `Vary`."""
+    client.force_login(user)
+    url = reverse(url_name)
+
+    page = client.get(url, {"sort": "-company", "state": "all"})
+    assert "<html" in page.content.decode()
+    assert CHOSEN_BY <= varies_on(page), page.get("Vary")
+
+    fragment = client.get(url, {"sort": "-company", "state": "all"}, **HTMX)
+    assert "<html" not in fragment.content.decode()
+    assert CHOSEN_BY <= varies_on(fragment), fragment.get("Vary")
+
+    restored = client.get(url, {"state": "all"}, **HTMX, HTTP_HX_HISTORY_RESTORE_REQUEST="true")
+    assert "<html" in restored.content.decode()
+    assert CHOSEN_BY <= varies_on(restored), restored.get("Vary")
+
+    # What the answer already depended on is still said.
+    assert "cookie" in varies_on(page) and "cookie" in varies_on(fragment)
+
+
+@pytest.mark.parametrize("url_name", PAGES_THAT_ARE_ALSO_FRAGMENTS)
+def test_the_redirects_of_such_a_page_say_it_too(client, user, search, url_name):
+    """A bare address opens as the person's default view, by a redirect an htmx request is
+    not sent; and nobody signed in is sent to sign in, which the middleware turns into
+    another answer for htmx. Both are the header's doing as much as the template is."""
+    from postulo.jobs.tables import ListingsTable
+
+    table = {
+        "applications:list": ApplicationsTable,
+        "jobs:company_list": CompaniesTable,
+        "listings:list": ListingsTable,
+    }[url_name]
+    saved = table.save_view({}, "Mine", "q=aperture", [])
+    tables.save_settings(user, table.name, table.make_default(saved, "mine"))
+
+    signed_out = client.get(reverse(url_name))
+    assert signed_out.status_code == 302
+    assert CHOSEN_BY <= varies_on(signed_out), signed_out.get("Vary")
+
+    client.force_login(user)
+    opened = client.get(reverse(url_name))
+    assert opened.status_code == 302 and "q=aperture" in opened["Location"]
+    assert CHOSEN_BY <= varies_on(opened), opened.get("Vary")
+    assert client.get(reverse(url_name), **HTMX).status_code == 200
+
+
+def test_no_view_chooses_the_fragment_without_saying_so():
+    """The choice and the header are made together, in `PageOrFragmentMixin`. A view that
+    wrote the choice out for itself would be one more address with two answers and no
+    `Vary`, so the template name that makes the choice appears in that one place."""
+    from pathlib import Path
+
+    from django.contrib.auth.mixins import LoginRequiredMixin
+
+    import postulo
+    from postulo.applications.views import ApplicationListView
+    from postulo.core.mixins import PageOrFragmentMixin
+    from postulo.jobs.listing_views import ListingListView
+    from postulo.jobs.views import CompanyListView
+
+    source = Path(postulo.__file__).parent
+    choosing = sorted(
+        path.relative_to(source).as_posix()
+        for path in source.rglob("*.py")
+        if "#htmx" in path.read_text(encoding="utf-8")
+    )
+    assert choosing == ["core/mixins.py"], choosing
+
+    for view in (ApplicationListView, CompanyListView, ListingListView):
+        order = view.__mro__
+        assert order.index(PageOrFragmentMixin) < order.index(LoginRequiredMixin), view
+
+
 def test_the_header_carries_live_filter_inputs_and_the_sort_in_force(client, user, search):
     client.force_login(user)
     body = client.get(reverse("applications:list"), {"sort": "-applied"}).content.decode()

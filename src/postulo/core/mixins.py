@@ -2,6 +2,7 @@
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.db.models import QuerySet
+from django.utils.cache import patch_vary_headers
 
 
 class OwnedObjectMixin(LoginRequiredMixin):
@@ -23,6 +24,40 @@ class OwnerFormMixin:
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
+
+
+class PageOrFragmentMixin:
+    """One address answered as a page, or as the part of the page that changes, and saying so.
+
+    A table page answers an htmx request with its table alone -- the partial its template
+    names `htmx` -- at the page's own address. That is what lets a filter, a sort or a search
+    be put in the address bar as it is applied. So one address has two answers, and which is
+    sent depends on a header of the request.
+
+    A cache has to be told that, and was not (#646). The browser's own cache kept the
+    fragment under the page's address, and when Back asked it for that address as a document
+    it handed the fragment over: a table with no title, no masthead and no stylesheet. So
+    every answer of such a view names, in `Vary`, the headers the choice reads:
+    `HX-Request`, and `HX-History-Restore-Request`, with which htmx asks for a whole page it
+    has no copy of. Every answer, not only the two shapes of the page: the redirect to a
+    person's default view is not sent to an htmx request either, so it too is the header's
+    doing.
+
+    The choice and the header are made in one place, so that a view cannot make the first
+    without sending the second. First among a view's bases, so that the header is on what
+    the bases after it answer as well, the redirect to the sign-in page among them.
+    """
+
+    def get_template_names(self) -> list[str]:
+        # An htmx request wants the part alone; the back button's restore wants the page.
+        if self.request.htmx and not self.request.htmx.history_restore_request:
+            return [f"{self.template_name}#htmx"]
+        return [self.template_name]
+
+    def dispatch(self, request, *args, **kwargs):
+        response = super().dispatch(request, *args, **kwargs)
+        patch_vary_headers(response, ("HX-Request", "HX-History-Restore-Request"))
+        return response
 
 
 class ConfirmDeleteMixin:

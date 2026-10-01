@@ -32,6 +32,7 @@ from postulo.core.mixins import (
     GdprNoticeMixin,
     OwnedObjectMixin,
     OwnerFormMixin,
+    PageOrFragmentMixin,
     PhoneNumbersMixin,
     WebLinksMixin,
 )
@@ -56,7 +57,7 @@ class UserFormKwargsMixin:
 # ------------------------------------------------------------------- companies
 
 
-class CompanyListView(OwnedObjectMixin, ListView):
+class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
     """The table of employers: sortable, narrowable, and laid out as the person likes."""
 
     model = Company
@@ -129,11 +130,6 @@ class CompanyListView(OwnedObjectMixin, ListView):
         for top in tops.select_related("parent"):
             members.update(member.pk for member in top.group_members())
         return queryset.filter(pk__in=members)
-
-    def get_template_names(self) -> list[str]:
-        if self.request.htmx and not self.request.htmx.history_restore_request:
-            return [f"{self.template_name}#htmx"]
-        return [self.template_name]
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)

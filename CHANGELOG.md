@@ -149,6 +149,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Going Back to *Companies*, *Applications* or *Listings* after narrowing or sorting the table could show the table alone, with no title, masthead or styles. Those pages now say that an htmx request gets a different answer, so the browser's cache no longer hands back the fragment. (#646)
 - A capture is refused with its reason when the site redirects to something that is not an address, or its name stops resolving between two lookups; the API answered `500` and the page said only that something went wrong. A page naming a character set that is not one is read as UTF-8. (#607)
 - A row's menu on *Server settings → People* is no longer cut off inside the table: every menu opens over the page, beside its trigger, and upwards where there is no room below. Each person there has their picture too. (#310)
 - The "Name, if Other" box appears only when the kind is Other, and a name given another

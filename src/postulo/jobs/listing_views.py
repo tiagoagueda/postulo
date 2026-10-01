@@ -22,7 +22,7 @@ from django.views.generic import ListView
 
 from postulo.core import tables
 from postulo.core.cells import EditableCellView
-from postulo.core.mixins import OwnedObjectMixin
+from postulo.core.mixins import OwnedObjectMixin, PageOrFragmentMixin
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query
 
@@ -40,7 +40,7 @@ FILTER_LABELS = {
 }
 
 
-class ListingListView(OwnedObjectMixin, ListView):
+class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
     """The triage table: many rows, looked at once, mostly discarded (#160).
 
     The page drew its own rows until now, so it had none of what `core/tables.py` gives a
@@ -114,11 +114,6 @@ class ListingListView(OwnedObjectMixin, ListView):
                 | Q(location__icontains=search)
             )
         return self.table.apply(queryset)
-
-    def get_template_names(self) -> list[str]:
-        if self.request.htmx and not self.request.htmx.history_restore_request:
-            return [f"{self.template_name}#htmx"]
-        return [self.template_name]
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
