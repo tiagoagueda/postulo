@@ -1174,6 +1174,70 @@
   }
 
   /*
+   * One line of a postal address (#306): the parts a country writes on one line, side by
+   * side from 640 pixels up and one under another below it, where nothing sits beside a
+   * long part. The line is a grid whose columns share it out, and a part is three things
+   * down -- its label, its box, and what is said about it -- so from 640 up each part is a
+   * subgrid of the line's three rows. That is what keeps the boxes of a line level: a label
+   * that wraps in a narrow column (*Postcode (CEP)* in Portuguese, any label under a
+   * text-spacing override) makes the label row taller for the whole line, and an error
+   * under one box makes the last row taller, and no box moves relative to its neighbours.
+   * A flex row can align either the tops or the bottoms, and each of those is wrong for one
+   * of the two.
+   *
+   * The postcode is the one short part: `data-narrow` says which place on the line it has,
+   * counted from one, so its column is 10rem whichever end a country writes it at -- before
+   * the town in Lisbon, after the state in Washington. Every other column is an equal
+   * share. The line that says what the address is leads with a menu (`data-narrow="menu"`),
+   * and a menu is as wide as its longest option, in any language and any font, as the menus
+   * of *Your name* are (#309): at a fixed 10rem "- Select an option -" was cut short.
+   *
+   * A browser without subgrid lays each part out as its own column of three, which is the
+   * same line with the tops level.
+   */
+  .address-line {
+    @apply grid gap-3;
+  }
+
+  @media (width >= 40rem) {
+    .address-line {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(3, auto);
+      row-gap: 0;
+    }
+
+    .address-line[data-narrow="menu"] {
+      grid-template-columns: fit-content(50%);
+    }
+
+    .address-line[data-narrow="1"] {
+      grid-template-columns: minmax(0, 10rem);
+    }
+
+    .address-line[data-narrow="2"] {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+    }
+
+    .address-line[data-narrow="3"] {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 10rem);
+    }
+
+    .address-line > * {
+      grid-row: 1 / span 3;
+      align-self: start;
+    }
+
+    @supports (grid-template-rows: subgrid) {
+      .address-line > * {
+        display: grid;
+        grid-template-rows: subgrid;
+        align-self: stretch;
+      }
+    }
+  }
+
+  /*
    * Fields beside one another on a line that wraps, each as wide as what is in it (#309):
    * the form of address, the name and the pronouns of *Your name*. Two things follow from
    * a field taking its width from its content, both from 640 pixels up, where they stop

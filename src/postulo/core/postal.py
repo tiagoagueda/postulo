@@ -17,6 +17,8 @@ Nothing here has a `verified_at`, and no address is ever a way back into an acco
 
 from __future__ import annotations
 
+from dataclasses import dataclass
+from types import SimpleNamespace
 from typing import ClassVar
 
 from django import forms
@@ -144,11 +146,82 @@ def label_for(part: str, country: str, *, person=None):
 
 def warnings_for(address, *, person=None) -> list:
     """What looks unusual about an address for its country. Never enough to refuse a save."""
+    return [sentence for _part, sentence in notes_for(address, person=person)]
+
+
+def notes_for(address, *, person=None) -> list[tuple[str, object]]:
+    """The same, each with the part it is about, so a page can leave out what it has
+    already said about that part as an error."""
     from postulo.plugins import postal_rules
 
     if person is not None and not rules_apply(person):
         return []
-    return postal_rules.warnings_for(address)
+    return postal_rules.notes_for(address)
+
+
+def refusals_for(address, *, person=None) -> list[tuple[str, object]]:
+    """What an address's own country rules out about it: the part, and what is expected.
+
+    A postcode in a form the country never uses, and a part every address there carries
+    left empty (#306). Nothing for a country the plugin has no rules for, and nothing for a
+    person the rules are switched off for. ``address`` is anything with the five parts as
+    attributes: a row as it is kept, or what was typed, before it is one.
+
+    The empty part is asked of an address only. A town and a country with no street and no
+    postcode are a place, which is what `location_line` prints on a CV, and nothing is
+    required of one (`place_for`).
+    """
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return []
+    return postal_rules.refusals_for(address)
+
+
+def place_for(address, *, person=None) -> list[tuple[str, object]]:
+    """What a whole address in that country also carries, where this one is a place: a town
+    or a region with its country, and no street and no postcode.
+
+    Notes, each with its part, and never a refusal: somebody who keeps no street in Postulo
+    on purpose is not asked for one. Nothing for a whole address, for a country the plugin
+    has no rules for, and while the rules are switched off.
+    """
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return []
+    return postal_rules.place_for(address)
+
+
+def canonical_postcode(postcode: str, country: str, *, person=None) -> str:
+    """The postcode the way its country writes it, where it is plainly one of theirs.
+
+    Case, spaces, hyphens and full stops: ``1000100`` is Portugal's ``1000-100``. As typed
+    where it is not, where the country has no rules, and where the rules are off.
+    """
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return (postcode or "").strip()
+    return postal_rules.canonical(postcode, country)
+
+
+def lines_for(country: str, *, person=None) -> tuple[tuple[str, ...], ...]:
+    """The parts of an address as the lines a form draws, in the country's own order."""
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        country = ""
+    return postal_rules.lines_for(country)
+
+
+def help_for(person=None):
+    """What to say under the rows about what is refused, or nothing while the rules are off."""
+    from postulo.plugins import postal_rules
+
+    if person is not None and not rules_apply(person):
+        return ""
+    return postal_rules.HELP
 
 
 def render(address, *, person=None) -> list[str]:
@@ -182,6 +255,24 @@ class CountrySelect(forms.Select):
         return option
 
 
+@dataclass(frozen=True)
+class Part:
+    """One part of an address as a row draws it: its box, and what its country calls it."""
+
+    name: str
+    field: forms.BoundField
+    label: object
+
+
+@dataclass(frozen=True)
+class Line:
+    """The parts a country writes on one line, and which of them is the postcode."""
+
+    parts: list[Part]
+    #: The postcode's place on the line, counted from one, or nothing where it is not on it.
+    narrow: int = 0
+
+
 class PostalAddressForm(forms.ModelForm):
     """One row: what kind of address it is, and its parts.
 
@@ -199,17 +290,51 @@ class PostalAddressForm(forms.ModelForm):
     nothing is said about its country. The switch used to be consulted by the helpers and
     by no page, because the form never said who was asking (#635). Nobody, where a form is
     built with no page behind it, and the rules then apply.
+
+    **A row answers to its country before it is kept (#306).** What the country's own
+    format rules out -- a postcode in a form it never uses, a part every address there
+    carries left empty -- is an error beside that part, and a postcode that is plainly the
+    country's own is written the country's way. Two things are left alone. A row already
+    kept whose address has not changed is not asked again, so an address from before any of
+    this, or from a file, never refuses a page it merely sits on; it is drawn marked
+    (`kept_as_it_was`) and answers the next time it is changed. And ``refuses=False`` is a
+    reader of files: the candidate file reads each address through this form and imports
+    what it finds, marked, rather than refusing a file for it.
+
+    **Two rows are not addresses, and neither is refused.** A town and a country with no
+    street and no postcode are a place: kept, never marked, with a note under the row
+    saying what a whole address there also carries (`a_place`). And a row being added with
+    nothing typed in any of its boxes is an empty row whatever its menus show
+    (`has_changed`): the country a new row starts on is the chooser's doing and not the
+    person's, so such a row is not saved and nothing is said about it.
     """
 
     class Meta:
         model = PostalAddress
         fields = ("kind", "label", "street", "postcode", "municipality", "region", "country")
 
-    def __init__(self, *args, default_country: str = "", person=None, **kwargs):
+    #: The five parts that are the address. The kind and its name are about it, not of it.
+    PARTS = ("street", "postcode", "municipality", "region", "country")
+    #: The four of them somebody types. The country is chosen, and a new row starts on one.
+    TYPED = ("street", "postcode", "municipality", "region")
+
+    def __init__(
+        self, *args, default_country: str = "", person=None, refuses: bool = True, **kwargs
+    ):
         super().__init__(*args, **kwargs)
         from postulo.core import phones
 
         self.person = person
+        self.refuses = refuses
+        # The row as it is kept, read before anything posted is copied onto the instance:
+        # what "changed" is measured against, and what the mark is about.
+        self._kept = (
+            SimpleNamespace(**{part: getattr(self.instance, part) for part in self.PARTS})
+            if self.instance.pk
+            else None
+        )
+        self._kept_comparable = self.instance.comparable_form() if self.instance.pk else ""
+        self._asked = False
         # Two rows, because a street address is two lines in plenty of places and one box
         # of one line quietly asks somebody to leave the second out. `autocomplete` names
         # each part's purpose (SC 1.3.5, #276): these are the person's own addresses, and a
@@ -236,8 +361,24 @@ class PostalAddressForm(forms.ModelForm):
         )
         if not self.instance.pk and default_country:
             self.fields["country"].initial = default_country
-        for name in ("street", "postcode", "municipality", "region"):
+        for name in self.TYPED:
             self.fields[name].required = False
+
+    def has_changed(self) -> bool:
+        """Whether there is a row here to keep, for a row being added.
+
+        A row with nothing typed in any of its four boxes is an empty row, in every
+        country. Django asks whether anything differs from what the row was drawn with, and
+        a country or a kind chosen on a row nobody wrote in does: that row was then checked
+        as an address -- four errors under a row holding only *United States* -- or, for a
+        country with no rules, saved holding only its country. A row already kept is
+        Django's to answer for: one that holds only a country is left alone.
+        """
+        if self.is_bound and self._kept is None:
+            typed = (self.data.get(self.add_prefix(name)) or "" for name in self.TYPED)
+            if not any(value.strip() for value in typed):
+                return False
+        return super().has_changed()
 
     def clean(self):
         data = super().clean()
@@ -247,7 +388,44 @@ class PostalAddressForm(forms.ModelForm):
         else:
             # Blanked with the kind that made it meaningless (#284).
             data["label"] = ""
+        if self.refuses and self._address_changed(data):
+            self._answer_to_its_country(data)
         return data
+
+    def _address_changed(self, data: dict) -> bool:
+        """Whether what was posted is a different address from the one the row keeps.
+
+        Always, for a row being added. For a kept one the question is the model's own, its
+        comparable form, and not Django's `changed_data`: a browser posts a two-line street
+        with its own line endings, which `changed_data` calls a change in a row nobody
+        touched, and a kind or a name is no part of the address at all.
+        """
+        if self._kept is None:
+            return True
+        typed = PostalAddress(**{part: data.get(part) or "" for part in self.PARTS})
+        return typed.comparable_form() != self._kept_comparable
+
+    def _answer_to_its_country(self, data: dict) -> None:
+        """Write the postcode the country's way, and refuse what its format rules out.
+
+        Here rather than in `_post_clean`, where the notes are, because the postcode that
+        is kept has to be the one written the country's way, and it is the cleaned data that
+        is copied onto the instance.
+
+        A part its own field has already refused -- too long, or holding a character no
+        text may -- is not in the cleaned data, and is not empty either: it is said once,
+        by the field, and not a second time as a part left out.
+        """
+        self._asked = True
+        country = (data.get("country") or "").strip().upper()
+        if "postcode" in data:
+            data["postcode"] = canonical_postcode(
+                data.get("postcode") or "", country, person=self.person
+            )
+        typed = SimpleNamespace(**{part: data.get(part) or "" for part in self.PARTS})
+        for part, sentence in refusals_for(typed, person=self.person):
+            if part not in self.errors:
+                self.add_error(part, sentence)
 
     #: What this row's own country would usually expect. Filled by `_post_clean`.
     country_notes: ClassVar[list] = []
@@ -255,25 +433,89 @@ class PostalAddressForm(forms.ModelForm):
     def _post_clean(self):
         """Notes rather than errors, and after the instance carries what was typed.
 
-        Deliberately not `add_error`: an address that fits no rule is still where somebody
-        lives, and refusing it would be the application telling them who it was written for.
-        `clean()` is too early — a ModelForm copies the cleaned data onto the instance here,
-        so asking before this point asks about the row as it was loaded (#147).
+        What is only *usually* so is never `add_error`: an address that fits no rule is
+        still where somebody lives. `clean()` is too early — a ModelForm copies the cleaned
+        data onto the instance here, so asking before this point asks about the row as it
+        was loaded (#147). A part is not remarked on where it has already been spoken of:
+        by its error, by the mark on a row that was left alone, or by what is said under a
+        row that is a place.
         """
         super()._post_clean()
-        self.country_notes = (
-            warnings_for(self.instance, person=self.person) if self.instance else []
-        )
+        said = set(self.errors) | {part for part, _sentence in self._left_alone()}
+        said |= {part for part, _sentence in place_for(self._shown(), person=self.person)}
+        self.country_notes = [
+            sentence
+            for part, sentence in notes_for(self.instance, person=self.person)
+            if part not in said
+        ]
+
+    def _left_alone(self) -> list[tuple[str, object]]:
+        """What the row's country would refuse about the address as it is kept, where the
+        row has not been asked: each part, and the sentence."""
+        if self._kept is None or self._asked or not self.refuses:
+            return []
+        return refusals_for(self._kept, person=self.person)
+
+    @property
+    def kept_as_it_was(self) -> list:
+        """What the row's country would refuse about the address **as it is kept**.
+
+        The mark a template draws on a row that is left alone: an address kept before
+        addresses answered to their country, or brought by an archive, a candidate file or
+        a Europass file, none of which refuses a file for an address. Empty for a row being
+        added, for one whose address was changed in this submission -- that one has
+        answered, with its errors beside its parts -- and while the rules are off.
+        """
+        return [sentence for _part, sentence in self._left_alone()]
+
+    def _shown(self) -> SimpleNamespace:
+        """The five parts as the row's boxes show them: what was posted, or what is kept."""
+        return SimpleNamespace(**{part: str(self[part].value() or "") for part in self.PARTS})
+
+    @property
+    def a_place(self) -> list:
+        """What a whole address in the row's country also carries, where the row is a place.
+
+        A town or a region with its country, and no street and no postcode: *Lisboa,
+        Portugal*, which is what a CV shows and all that somebody who keeps no street here
+        on purpose types. The row is kept as it is and is never marked -- it is not an
+        address that fails, it is a shorter thing, allowed -- and these are the sentences a
+        template draws under it, so that somebody who did mean a whole address knows what
+        one has in that country. Empty for a whole address, for the empty row a page ends
+        with, for a country with no rules, and while the rules are off.
+        """
+        return [sentence for _part, sentence in place_for(self._shown(), person=self.person)]
+
+    def _country_shown(self) -> str:
+        """The country the row's select shows: what was posted, what is kept, or the one a
+        new row starts on."""
+        return str(self["country"].value() or "").strip().upper()
 
     def labels_for_country(self) -> dict:
         """What to call each part, for the country currently chosen on this row."""
-        country = (self.data.get(self.add_prefix("country")) if self.is_bound else None) or (
-            self.initial.get("country") or getattr(self.instance, "country", "")
-        )
+        country = self._country_shown()
         return {
             part: label_for(part, country, person=self.person)
             for part in ("postcode", "municipality", "region")
         }
+
+    def lines(self) -> list[Line]:
+        """The parts as the lines the row draws, in the order its country writes them.
+
+        Each part with its box and with what its country calls it. The postcode is the one
+        short part, and a line says where it sits so the stylesheet can keep its column
+        narrow whichever end of the line a country writes it at.
+        """
+        country = self._country_shown()
+        found = []
+        for names in lines_for(country, person=self.person):
+            parts = [
+                Part(name, self[name], label_for(name, country, person=self.person))
+                for name in names
+            ]
+            narrow = names.index("postcode") + 1 if "postcode" in names else 0
+            found.append(Line(parts, narrow))
+        return found
 
 
 class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
@@ -422,4 +664,7 @@ def formset_for(
         form_kwargs={"default_country": default_country, "person": person},
     )
     formset.person = person
+    # Read by the template: what is refused and how forgiving a postcode is, said once under
+    # the rows, and not at all while the rules are off for this person (#306).
+    formset.rules_help = help_for(person)
     return formset

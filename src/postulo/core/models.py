@@ -502,8 +502,25 @@ class PostalAddress(OwnedModel):
     reference database or a paid lookup service -- a network dependency, a cost, and a
     stream of updates. `phones.py` refuses the equivalent for telephone numbers and says
     why: Postulo has no use for the answer, because it is not going to dial anything. Nor is
-    it going to post anything. Valid here means well-formed enough to be used, and an
-    address somebody types oddly is saved exactly as typed.
+    it going to post anything. Valid here means well-formed enough to be used.
+
+    That is still true now that a form refuses some of what is typed (#306), and it is why
+    so little is refused. Where the *Address rules by country* plugin knows a country, the
+    rows on *Your details* will not keep a postcode in a form that country never uses
+    (Portugal's is `NNNN-NNN`), nor an address with a part every address there carries left
+    empty; a postcode that is the country's own but for its spaces, hyphens and capitals is
+    written the country's way. Both are things the country's format rules out, read from
+    its postal operator's own guide, and a person is told which part and what is expected.
+    A street is required nowhere, and a town and a country with no street and no postcode
+    are a place and not an address: kept as it is, which is all a CV prints.
+    **A format check is not a verification.** An address that passes it may not exist, a
+    town may not go with its postcode, and nothing here will ever know: that would take the
+    reference database this deliberately does not have. So nothing is marked verified, the
+    model itself refuses nothing -- an archive, a candidate file and a Europass file write
+    what they hold, and a row kept from before is left as it is until somebody changes
+    it -- a country the plugin has no rules for is free-form, and with the plugin switched
+    off every country is. Outside those two refusals an address somebody types oddly is
+    saved exactly as typed.
 
     **The parts, not the format.** These five are what every format agrees on; where the
     postcode goes and whether a region is named at all differ by country, so the parts are

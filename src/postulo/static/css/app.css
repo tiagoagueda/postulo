@@ -1625,9 +1625,6 @@
     .sm\:grid-cols-\[10rem_1fr\] {
       grid-template-columns: 10rem 1fr;
     }
-    .sm\:grid-cols-\[minmax\(0\,9rem\)_minmax\(0\,1fr\)\] {
-      grid-template-columns: minmax(0,9rem) minmax(0,1fr);
-    }
     .sm\:grid-cols-\[minmax\(0\,14rem\)_1fr\] {
       grid-template-columns: minmax(0,14rem) 1fr;
     }
@@ -5706,7 +5703,40 @@
   [data-if-chosen]:not(:has(select option[value="chosen"]:checked)) [data-shown-if-chosen] {
     display: none;
   }
+  .address-line {
+    display: grid;
+    gap: calc(var(--spacing) * 3);
+  }
   @media (width >= 40rem) {
+    .address-line {
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(0, 1fr);
+      grid-template-rows: repeat(3, auto);
+      row-gap: 0;
+    }
+    .address-line[data-narrow="menu"] {
+      grid-template-columns: fit-content(50%);
+    }
+    .address-line[data-narrow="1"] {
+      grid-template-columns: minmax(0, 10rem);
+    }
+    .address-line[data-narrow="2"] {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 10rem);
+    }
+    .address-line[data-narrow="3"] {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 10rem);
+    }
+    .address-line > * {
+      grid-row: 1 / span 3;
+      align-self: start;
+    }
+    @supports (grid-template-rows: subgrid) {
+      .address-line > * {
+        display: grid;
+        grid-template-rows: subgrid;
+        align-self: stretch;
+      }
+    }
     [data-fields-in-line] label[for] {
       flex-wrap: nowrap;
       white-space: nowrap;

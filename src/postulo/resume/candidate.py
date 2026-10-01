@@ -896,7 +896,11 @@ class _Planner:
             # codes in capitals.
             data["country"] = data.get("country", "").strip().upper()
             instance = PostalAddress(owner=self.user)
-            form = postal.PostalAddressForm(data=data, instance=instance, person=self.user)
+            # A file is never refused for an address (#306): what its country would rule out
+            # on *Your details* is imported as it is, and said below.
+            form = postal.PostalAddressForm(
+                data=data, instance=instance, person=self.user, refuses=False
+            )
             if wrong or not form.is_valid():
                 label = " ".join(data.get("street", "").split())[:60]
                 label = label or _("An address that could not be read")
@@ -916,6 +920,13 @@ class _Planner:
                 # an address that fits no rule is still where somebody lives (#147).
                 notes=[str(note) for note in postal.warnings_for(instance, person=self.user)],
             )
+            if postal.refusals_for(instance, person=self.user):
+                row.notes.append(
+                    _(
+                        "Typed on Your details it would be refused. It is imported as it "
+                        "is, and marked there until you change it."
+                    )
+                )
             held = mine.get(key)
             if held is not None and (held.content_type_id, held.object_id) == here:
                 row.outcome, row.notes = PRESENT, []

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-09-25 17:24+0000\n"
+"POT-Creation-Date: 2026-10-02 00:24+0000\n"
 "PO-Revision-Date: 2026-09-09 21:02+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: eesti\n"
@@ -16,114 +16,200 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: postulo scripts/messages.py\n"
 
-#: src/postulo/plugins/postal_rules/__init__.py:141
+#: src/postulo/plugins/postal_rules/__init__.py:314
 #, python-format, draft
 msgid "A %(name)s in %(country)s usually looks like %(example)s."
 msgstr "%(name)s riigis %(country)s näeb tavaliselt välja nii: %(example)s."
 
-#: src/postulo/plugins/postal_rules/__init__.py:72
+#: src/postulo/plugins/postal_rules/__init__.py:176
+#, python-format
+msgid "A postcode (CAP) in this country is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:177
+#, python-format
+msgid "A postcode (CEP) in this country is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:175
+#, python-format
+msgid "A postcode (PLZ) in this country is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:172
+#, python-format
+msgid "A postcode in this country is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:173
+#, python-format
+msgid "A ZIP code is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:96
 #, draft
 msgid "Address"
 msgstr "Aadress"
 
-#: src/postulo/plugins/postal_rules/__init__.py:83
+#: src/postulo/plugins/postal_rules/__init__.py:107
 #, draft
 msgid "Address rules by country"
 msgstr "Aadressireeglid riigiti"
 
-#: src/postulo/plugins/postal_rules/__init__.py:56
+#: src/postulo/plugins/postal_rules/__init__.py:146
+msgid "An address in this country needs a post town."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:150
+#, python-format
+msgid ""
+"An address in this country needs a postcode (CAP), written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:151
+#, python-format
+msgid ""
+"An address in this country needs a postcode (CEP), written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:149
+#, python-format
+msgid ""
+"An address in this country needs a postcode (PLZ), written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:147
+#, python-format
+msgid "An address in this country needs a postcode, written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:153
+msgid "An address in this country needs a province."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:152
+msgid "An address in this country needs a state."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:145
+msgid "An address in this country needs a town or city."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:148
+#, python-format
+msgid "An address in this country needs a ZIP code, written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:158
+msgid "An address in this country needs this part."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:164
+msgid ""
+"An address in this country usually gives a street and number, or else the place where post is delivered there."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:174
+#, python-format
+msgid "An Eircode is written like %(example)s."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:80
 #, draft
 msgid "Canton"
 msgstr "Kanton"
 
-#: src/postulo/plugins/postal_rules/__init__.py:76
+#: src/postulo/plugins/postal_rules/__init__.py:100
 #, draft
 msgid "Country"
 msgstr "Riik"
 
-#: src/postulo/plugins/postal_rules/__init__.py:53
+#: src/postulo/plugins/postal_rules/__init__.py:77
 #, draft
 msgid "County"
 msgstr "Krahvkond"
 
-#: src/postulo/plugins/postal_rules/__init__.py:54
+#: src/postulo/plugins/postal_rules/__init__.py:78
 #, draft
 msgid "District"
 msgstr "Ringkond"
 
-#: src/postulo/plugins/postal_rules/__init__.py:61
+#: src/postulo/plugins/postal_rules/__init__.py:85
 #, draft
 msgid "Eircode"
 msgstr "Eircode"
 
-#: src/postulo/plugins/postal_rules/__init__.py:85
-#, draft
+#: src/postulo/plugins/postal_rules/__init__.py:109
 msgid ""
-"Name each part of an address the way its own country does — State, Distrito, Prefecture — and say when something usually expected is missing. Nothing is ever refused: an address that does not fit the rules is saved exactly as typed, because plenty of real addresses do not fit any rule. Switched off, every address is free-form with neutral labels."
+"Name each part of an address the way its own country does — State, Distrito, Prefecture — draw the parts in that country's order, and check an address against its country before it is kept: a postcode in a form the country never uses is refused, and so is an address that leaves empty a part every address there has, with the reason beside it. A town and a country alone, with no street and no postcode, are kept as a place. Spaces, hyphens and capitals in a postcode are put right. Nothing checks that an address exists, addresses already kept stay as they are until they are changed, and a country with no rules is free-form. Switched off, every address is free-form with neutral labels."
 msgstr ""
-"Nimeta aadressi iga osa nii, nagu selle oma riik seda nimetab — State, Distrito, Prefecture — ja ütle, kui midagi tavaliselt oodatavat puudub. Midagi ei lükata kunagi tagasi: aadress, mis reeglitesse ei sobi, salvestatakse täpselt nii, nagu see sisestati, sest paljud päris aadressid ei sobi ühessegi reeglisse. Välja lülitatuna on iga aadress vaba, neutraalsete siltidega."
 
-#: src/postulo/plugins/postal_rules/__init__.py:57
+#: src/postulo/plugins/postal_rules/__init__.py:81
 #, draft
 msgid "Oblast"
 msgstr "Oblast"
 
-#: src/postulo/plugins/postal_rules/__init__.py:134
+#: src/postulo/plugins/postal_rules/__init__.py:301
 #, python-format, draft
 msgid "Post to %(country)s usually needs a %(part)s."
 msgstr "Post riiki %(country)s vajab tavaliselt %(part)s."
 
-#: src/postulo/plugins/postal_rules/__init__.py:67
+#: src/postulo/plugins/postal_rules/__init__.py:91
 #, draft
 msgid "Post town"
 msgstr "Postilinn"
 
-#: src/postulo/plugins/postal_rules/__init__.py:59
+#: src/postulo/plugins/postal_rules/__init__.py:83
 #, draft
 msgid "Postcode"
 msgstr "Sihtnumber"
 
-#: src/postulo/plugins/postal_rules/__init__.py:63
+#: src/postulo/plugins/postal_rules/__init__.py:87
 #, draft
 msgid "Postcode (CAP)"
 msgstr "Sihtnumber (CAP)"
 
-#: src/postulo/plugins/postal_rules/__init__.py:64
+#: src/postulo/plugins/postal_rules/__init__.py:88
 #, draft
 msgid "Postcode (CEP)"
 msgstr "Sihtnumber (CEP)"
 
-#: src/postulo/plugins/postal_rules/__init__.py:62
+#: src/postulo/plugins/postal_rules/__init__.py:86
 #, draft
 msgid "Postcode (PLZ)"
 msgstr "Sihtnumber (PLZ)"
 
-#: src/postulo/plugins/postal_rules/__init__.py:55
+#: src/postulo/plugins/postal_rules/__init__.py:79
 #, draft
 msgid "Prefecture"
 msgstr "Prefektuur"
 
-#: src/postulo/plugins/postal_rules/__init__.py:52
+#: src/postulo/plugins/postal_rules/__init__.py:76
 #, draft
 msgid "Province"
 msgstr "Provints"
 
-#: src/postulo/plugins/postal_rules/__init__.py:50
+#: src/postulo/plugins/postal_rules/__init__.py:74
 #, draft
 msgid "Region"
 msgstr "Piirkond"
 
-#: src/postulo/plugins/postal_rules/__init__.py:51
+#: src/postulo/plugins/postal_rules/__init__.py:75
 #, draft
 msgid "State"
 msgstr "Osariik"
 
-#: src/postulo/plugins/postal_rules/__init__.py:66
+#: src/postulo/plugins/postal_rules/__init__.py:90
 #, draft
 msgid "Town or city"
 msgstr "Linn"
 
-#: src/postulo/plugins/postal_rules/__init__.py:60
+#: src/postulo/plugins/postal_rules/__init__.py:131
+msgid ""
+"Where Postulo knows a country's addresses, a postcode has to be in the form that country uses, and an address with a street or a postcode cannot leave empty the parts every address there has. A town and a country alone are kept as a place. Spaces, hyphens and capital letters in a postcode are put right as you save: 1000100 is kept as 1000-100. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
+msgstr ""
+
+#: src/postulo/plugins/postal_rules/__init__.py:84
 #, draft
 msgid "ZIP code"
 msgstr "ZIP-kood"

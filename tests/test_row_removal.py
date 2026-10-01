@@ -1019,7 +1019,15 @@ def test_a_row_goes_at_once_and_its_replacement_is_typed_and_saved(client, user,
     if name == "remove_number":
         posted.update({"phone_numbers-2-number_0": "PT", "phone_numbers-2-number_1": "912345670"})
     else:
-        posted.update({"addresses-2-street": "Rua A 1", "addresses-2-country": "PT"})
+        # A whole address: Portugal's cannot be kept without a postcode and a town (#306).
+        posted.update(
+            {
+                "addresses-2-street": "Rua A 1",
+                "addresses-2-postcode": "1000-001",
+                "addresses-2-municipality": "Lisboa",
+                "addresses-2-country": "PT",
+            }
+        )
     response = client.post(reverse("accounts:profile"), posted)
 
     assert response.status_code == 302, alerts_in(response)

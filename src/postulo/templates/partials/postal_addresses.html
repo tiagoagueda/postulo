@@ -5,13 +5,24 @@
    outside the formset's prefixes, so the browser enforces "exactly one" before anything is
    posted — the same argument the telephone numbers make, for the same invariant.
 
-   Each part is called what its own country calls it, in the language the reader is using:
-   the label follows the country chosen on the row and the words follow the catalogue, and
-   both vary at once (#147). A country Postulo has no rules for gets the neutral words.
+   A row reads in the order somebody decides it (#306, as #213 describes for a telephone
+   number): what the address is -- its kind, and a name only while the kind is Other --
+   then the address, then the controls that act on the row. Source order is the reading
+   order; below `sm` every box is a line of its own.
+
+   The address's parts are drawn in the order its own country writes them, each called what
+   that country calls it, in the language the reader is using: the order and the names
+   follow the country on the row and the words follow the catalogue (#147). A country
+   Postulo has no rules for gets the neutral words and the order they were always in, and
+   so does every country while the rules are switched off for the reader.
+
+   What a part's country refuses is said beside that part, in the part's own `.field`, with
+   the id its box already names in `aria-describedby`.
 
    `remove_at_once` is *Your details* (#303), as in `phone_numbers.html`: a star, a bin, a
    dialog, and the row gone there and then. It is the only page these rows are on, and the
-   switch is kept so that a second page drawing them decides for itself.
+   switch is kept so that a second page drawing them decides for itself: without it a row
+   keeps its *Primary* and *Remove* boxes, and a ticked one goes when the page is saved.
 {% endcomment %}
 <fieldset class="card mb-6" data-postal-addresses id="section-addresses">
   <legend class="label px-1">{% translate "Postal addresses" %}</legend>
@@ -28,92 +39,121 @@
   <ol class="space-y-3">
     {% for row in addresses %}
       {% if row.already_gone or remove_at_once and row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}
-      <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
+      <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800" data-address-row>
         {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
-        <div class="field mb-3">
-          <label for="{{ row.street.id_for_label }}">{% translate "Address" %}</label>
-          {{ row.street }}
-        </div>
-        {% comment %} Each part is called what its own country calls it — State, Distrito,
-           Prefecture — in the language the reader is using. The label follows the country
-           on the row, not the interface language, and both vary at once (#147).
-        {% endcomment %}
-        {% with names=row.labels_for_country %}
-        <div class="mb-3 grid gap-3 sm:grid-cols-[minmax(0,9rem)_minmax(0,1fr)]">
-          <div class="field">
-            <label for="{{ row.postcode.id_for_label }}">{{ names.postcode }}</label>
-            {{ row.postcode }}
-          </div>
-          <div class="field">
-            <label for="{{ row.municipality.id_for_label }}">{{ names.municipality }}</label>
-            {{ row.municipality }}
-          </div>
-        </div>
-        <div class="mb-3 grid gap-3 sm:grid-cols-2">
-          <div class="field">
-            <label for="{{ row.region.id_for_label }}">{{ names.region }}</label>
-            {{ row.region }}
-          </div>
-          <div class="field">
-            <label for="{{ row.country.id_for_label }}">{% translate "Country" %}</label>
-            {% comment %} The chosen country's flag over the closed select, drawn by the server
-               and kept in step by the script, exactly as beside a telephone number (#88, #214).
-               The space is reserved whether or not a flag shows, so choosing moves nothing. {% endcomment %}
-            <div class="input-group">
-              <span data-align="start" data-flag-holder>{% flag row.country.value %}</span>
-              {{ row.country }}
+        {% comment %} An address kept before addresses answered to their country, or brought
+           by a file, which its country would refuse if it were typed today (#306). It is
+           left as it is: saving the page does not ask it again, and it answers the next
+           time it is changed. A word and a sentence, so the tone is never the only thing
+           saying it; not `role="alert"`, because nothing has been refused. {% endcomment %}
+        {% with kept=row.kept_as_it_was %}
+          {% if kept %}
+            <div class="alert mb-3 flex-col items-start gap-1" data-variant="warning" data-kept-as-it-was>
+              <p>
+                <span class="badge" data-tone="amber">{% translate "Kept as it was" %}</span>
+                {% blocktranslate trimmed %}
+                  This address does not fit what its country expects. It stays as it is,
+                  and is checked the next time you change it.
+                {% endblocktranslate %}
+              </p>
+              <ul class="list-disc ps-5">
+                {% for sentence in kept %}<li>{{ sentence }}</li>{% endfor %}
+              </ul>
             </div>
-          </div>
-        </div>
-        {% comment %} The name box only when the kind is Other, as on the other rows (#284). {% endcomment %}
-        <div class="name-if-other-row-short grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
-          <div class="field">
+          {% endif %}
+        {% endwith %}
+        {% comment %} What it is, first. The name box only while the kind is Other, which the
+           stylesheet follows as the select changes, so it is there with scripts off the
+           moment Other is chosen; kept whatever the kind while it holds something (#284,
+           `data-if-other` in app.css). {% endcomment %}
+        <div class="address-line mb-3" data-narrow="menu" data-if-other{% if row.label.value %} data-has-name{% endif %}>
+          <div class="field"{% if row.kind.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.kind.id_for_label }}">{% translate "Kind" %}</label>
             {{ row.kind }}
+            {% if row.kind.errors %}<div class="field"><c-field-feedback :field="row.kind" /></div>{% endif %}
           </div>
-          <div class="field" data-name-if-other>
+          <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
             {{ row.label }}
-          </div>
-          {% comment %} Each its own hit area with room around it: WCAG 2.2 2.5.8 wants 24
-             by 24, and a radio touching a checkbox is one target partially obscuring
-             another. The padding is what makes the label the target. {% endcomment %}
-          <div class="flex flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
-            {% if remove_at_once %}
-              <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
-              {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
-            {% else %}
-              <label class="inline-flex items-center gap-2 py-1.5">
-                <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
-                       {% if row.instance.is_primary %}checked{% endif %}>
-                <span>{% translate "Primary" %}</span>
-              </label>
-              {% if row.instance.pk %}
-                <label class="inline-flex items-center gap-2 py-1.5">
-                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
-                </label>
-              {% endif %}
-            {% endif %}
+            <div class="field"><c-field-feedback :field="row.label" /></div>
           </div>
         </div>
-        {% endwith %}
-        <div class="field">
-          {% for field in row.visible_fields %}
-            <c-field-feedback :field="field" />
-          {% endfor %}
-          {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
-        </div>
-        {% comment %} Notes, never errors. An address that fits no rule is still where
-           somebody lives, and the table is likelier to be wrong than they are (#147).
-        {% endcomment %}
-        {% for note in row.country_notes %}
-          <p class="mt-1 text-xs text-amber-700 dark:text-amber-300" data-country-note>{{ note }}</p>
+        {% comment %} Then the address, a line for each line its country writes. The
+           country's own select keeps its flag beside it, drawn by the server and kept in
+           step by the script, exactly as beside a telephone number (#88, #214); the space
+           is reserved whether or not a flag shows, so choosing moves nothing. {% endcomment %}
+        {% for line in row.lines %}
+          <div class="address-line mb-3"{% if line.narrow %} data-narrow="{{ line.narrow }}"{% endif %}>
+            {% for part in line.parts %}
+              <div class="field" data-part="{{ part.name }}"{% if part.field.errors %} data-invalid="true"{% endif %}>
+                <label for="{{ part.field.id_for_label }}">{{ part.label }}</label>
+                {% if part.name == "country" %}
+                  <div class="input-group">
+                    <span data-align="start" data-flag-holder>{% flag part.field.value %}</span>
+                    {{ part.field }}
+                  </div>
+                {% else %}
+                  {{ part.field }}
+                {% endif %}
+                {% if part.field.errors %}<div class="field"><c-field-feedback :field="part.field" /></div>{% endif %}
+              </div>
+            {% endfor %}
+          </div>
         {% endfor %}
+        {% for error in row.non_field_errors %}<div class="field mb-3"><div role="alert"><p>{{ error }}</p></div></div>{% endfor %}
+        {% comment %} A town and a country with no street and no postcode: a place, which is
+           what a CV shows and all that somebody who keeps no street here on purpose types.
+           It is kept as it is and never marked -- nothing about it fails -- and this says
+           what a whole address in that country also carries, for somebody who meant one
+           (#306). Quiet, in the colour of the sentences under the rows. {% endcomment %}
+        {% with place=row.a_place %}
+          {% if place %}
+            <div class="mb-3 text-xs text-ink-500 dark:text-ink-400" data-place-note>
+              <p>{% translate "A place rather than a whole address, and kept as it is. For post to reach it:" %}</p>
+              <ul class="list-disc ps-5">
+                {% for sentence in place %}<li>{{ sentence }}</li>{% endfor %}
+              </ul>
+            </div>
+          {% endif %}
+        {% endwith %}
+        {% comment %} Notes, never errors: what is only usually so. An address that fits no
+           rule is still where somebody lives, and the table is likelier to be wrong than
+           they are (#147). {% endcomment %}
+        {% for note in row.country_notes %}
+          <p class="mb-1 text-xs text-amber-700 dark:text-amber-300" data-country-note>{{ note }}</p>
+        {% endfor %}
+        {% comment %} Last, what acts on the row. Each its own hit area with room around it:
+           WCAG 2.2 2.5.8 wants 24 by 24, and a radio touching a checkbox is one target
+           partially obscuring another. The padding is what makes the label the target.
+        {% endcomment %}
+        <div class="flex flex-wrap items-center justify-end {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 text-sm" data-row-actions>
+          {% if remove_at_once %}
+            <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+            {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+          {% else %}
+            <label class="inline-flex items-center gap-2 py-1.5">
+              <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
+                     {% if row.instance.is_primary %}checked{% endif %}>
+              <span>{% translate "Primary" %}</span>
+            </label>
+            {% if row.instance.pk %}
+              <label class="inline-flex items-center gap-2 py-1.5">
+                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+              </label>
+            {% endif %}
+          {% endif %}
+        </div>
       </li>
       {% endif %}
     {% endfor %}
   </ol>
   {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
+  {% comment %} What is refused and how forgiving a postcode is, in the plugin's own words:
+     nothing while *Address rules by country* is off for the reader, when none of it is
+     true (#306, #635). {% endcomment %}
+  {% if addresses.rules_help %}
+    <p class="mt-3 text-xs text-ink-500 dark:text-ink-400" data-rules-help>{{ addresses.rules_help }}</p>
+  {% endif %}
   {% comment %} Said because the opposite is what people expect from the telephone numbers
      beside it: a number is unique across the instance and an address is not. Two people at
      one address is a household, and refusing the second would also disclose that somebody
