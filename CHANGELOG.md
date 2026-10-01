@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Failed sign-ins are counted per account: its username and each of its addresses used to have five guesses apiece, and so did each host name the instance answers to. (#489)
 - Django's admin has no login of its own and sends you through Postulo's sign-in: its form opened the whole instance on a password alone, whatever second factor the account had. **If you set `POSTULO_ADMIN_URL`, nothing to do: you are asked for your code on the way in.** (#367)
 - urllib3 2.8.0, for CVE-2026-97689 (a hostile server could make a chunked response grow without bound in memory) and CVE-2026-97687 (an HTTPS proxy could take the target's TLS settings); and virtualenv 21.14.2, a development tool, for four advisories of its own. (#324)
 - PyJWT 2.15.1 and django-allauth 65.19.5, for CVE-2026-102274. oauthlib's CVE-2026-49265 is a timing leak on an OAuth2 provider's token endpoint, which Postulo never runs; allauth still requires oauthlib 3, so the audit ignores that one advisory by name until it can be taken, and a test fails the day it can. (#323)

@@ -212,3 +212,99 @@ def test_no_limit_of_the_admins_own_is_left_to_drift(with_an_admin):
 
     assert "admin_login" not in app_settings.RATE_LIMITS
     assert app_settings.RATE_LIMITS.get("login_failed")
+
+
+# ------------------------------------------------------ one count per account
+
+#: Five ways of naming one account at the sign-in, and any of them signs `root` in.
+SPELLINGS = ["root", "Root", "ROOT", "root@example.org", "ROOT@EXAMPLE.ORG"]
+
+
+def guess(client, login: str, password: str, address: str):
+    """One attempt at the sign-in the admin now leads to, from an address of its own."""
+    return client.post(
+        reverse("account_login"), {"login": login, "password": password}, REMOTE_ADDR=address
+    )
+
+
+@pytest.mark.parametrize("login", SPELLINGS)
+def test_every_spelling_is_the_same_account(client, administrator, login):
+    """What makes the next test worth having: each of these reaches `root`."""
+    response = guess(client, login, PASSWORD, "198.51.100.1")
+
+    assert response.status_code == 302
+    assert response["Location"] == reverse("mfa_authenticate"), "the password was accepted"
+
+
+def test_guesses_at_one_account_are_counted_together_however_it_is_named(
+    client, administrator, user
+):
+    """Five guesses for an account, not five for each way of naming it (#489).
+
+    The admin's own form counted each spelling of a username apart, capitals included,
+    and the address apart again. That form is gone (#367), and the sign-in it leads to
+    already ignored capitals; but the username and each address still had a count each,
+    so somebody guessing from many addresses had five tries per name and not per account.
+    """
+    for number, login in enumerate(SPELLINGS):
+        answer = guess(client, login, "not-the-password", f"198.51.100.{number + 1}")
+        assert "are not correct" in answer.content.decode(), login
+
+    sixth = guess(client, "rOOt", PASSWORD, "198.51.100.99")
+
+    assert "Too many failed login attempts" in sixth.content.decode()
+    assert who_is_signed_in(client) is None, "the sixth is refused even when it is right"
+    # And it is that account's count: the next person signs in from the same address.
+    assert guess(client, user.email, "not-a-real-password", "198.51.100.99").status_code == 302
+
+
+def test_guesses_at_a_name_nobody_has_are_still_counted(client, db):
+    """No account to count against, so the name itself is counted, without its capitals."""
+    for number in range(5):
+        answer = guess(client, "nobody-here", "not-the-password", f"198.51.100.{number + 1}")
+        assert "are not correct" in answer.content.decode()
+
+    sixth = guess(client, "Nobody-Here", "not-the-password", "198.51.100.99")
+
+    assert "Too many failed login attempts" in sixth.content.decode()
+
+
+def test_nothing_somebody_types_lands_on_an_accounts_count(client, administrator):
+    """The count is kept under the account's number, which is not a name anybody has.
+
+    Typing that key as a name must not spend the account's five guesses for it.
+    """
+    for number in range(5):
+        guess(client, f"account:{administrator.pk}", "anything", f"198.51.100.{number + 1}")
+
+    response = guess(client, "root", PASSWORD, "198.51.100.99")
+
+    assert response["Location"] == reverse("mfa_authenticate"), "root is not locked out"
+
+
+def test_a_password_reset_clears_the_count_that_was_kept(rf, administrator):
+    """allauth clears it by the address the reset went to, which has to be the same key."""
+    from allauth.account.adapter import get_adapter
+
+    adapter, request = get_adapter(), rf.get("/")
+
+    by_address = adapter._get_login_attempts_cache_key(request, email="ROOT@example.org")
+    by_name = adapter._get_login_attempts_cache_key(request, username="Root")
+
+    assert by_address == by_name == f"account:{administrator.pk}"
+
+
+def test_the_count_does_not_start_again_under_another_host_name(client, administrator, settings):
+    """allauth keys the count on the host the request named, and an instance may have two."""
+    settings.ALLOWED_HOSTS = ["testserver", "postulo.example.org"]
+    for number, login in enumerate(SPELLINGS):
+        guess(client, login, "not-the-password", f"198.51.100.{number + 1}")
+
+    sixth = client.post(
+        reverse("account_login"),
+        {"login": "root", "password": PASSWORD},
+        REMOTE_ADDR="198.51.100.99",
+        HTTP_HOST="postulo.example.org",
+    )
+
+    assert "Too many failed login attempts" in sixth.content.decode()

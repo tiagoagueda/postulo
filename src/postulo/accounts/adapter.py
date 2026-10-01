@@ -25,12 +25,62 @@ def pending_invite(request: HttpRequest) -> Invite | None:
     return invite if invite and invite.is_valid() else None
 
 
+def account_named(login: str) -> int | None:
+    """The account a sign-in under this name is checked against, or nothing.
+
+    An address before a username, which is the order allauth tries them in. An address
+    counts whether or not it has been confirmed and whether it is a row of allauth's or
+    only the one on the account, because allauth checks the password against all of those.
+    """
+    from allauth.account.models import EmailAddress
+    from django.contrib.auth import get_user_model
+
+    login = login.strip()
+    if not login:
+        return None
+    people = get_user_model().objects
+    return (
+        EmailAddress.objects.filter(email__iexact=login)
+        .order_by("-verified", "pk")
+        .values_list("user_id", flat=True)
+        .first()
+        or people.filter(email__iexact=login).values_list("pk", flat=True).first()
+        or people.filter(username__iexact=login).values_list("pk", flat=True).first()
+    )
+
+
 class AccountAdapter(DefaultAccountAdapter):
     """Close registration unless the operator opened it or an invitation was followed.
 
     An instance holding one person's employment history has no reason to accept
     strangers by default, so the answer is no unless something says otherwise.
     """
+
+    def _get_login_attempts_cache_key(self, request: HttpRequest, **credentials) -> str:
+        """Count failed sign-ins against the account, however it was named (#489).
+
+        allauth counts them against what was typed, in lower case. Capitals are therefore
+        counted together already, but a username and each of an account's addresses are
+        different things to type, and each had five guesses of its own. Somebody guessing
+        from many addresses, which is who this limit is for, had five per name.
+
+        So the name is resolved to its account first, and the count is the account's. A
+        name nobody has is counted under the name, without its capitals. The two kinds of
+        key start differently, so nothing somebody types can land on an account's count.
+        The same key is what a password reset clears, and it arrives here by the same road.
+
+        allauth also puts the host the request named in front. An instance is one site
+        whatever name it is reached by, and a second name was a second set of counts.
+
+        The method is allauth's and its name says it is private. If a release renames it
+        this stops being called, and `tests/security/test_admin_exposure.py` fails on the
+        sixth guess.
+        """
+        named = (credentials.get("email") or credentials.get("username") or "").strip()
+        account = account_named(named)
+        if account is None:
+            return f"name:{named.casefold()}"
+        return f"account:{account}"
 
     def get_login_stages(self) -> list[str]:
         """allauth's steps after a sign-in, with Postulo's own second-factor rule.
