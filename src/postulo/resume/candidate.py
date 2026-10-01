@@ -896,7 +896,7 @@ class _Planner:
             # codes in capitals.
             data["country"] = data.get("country", "").strip().upper()
             instance = PostalAddress(owner=self.user)
-            form = postal.PostalAddressForm(data=data, instance=instance)
+            form = postal.PostalAddressForm(data=data, instance=instance, person=self.user)
             if wrong or not form.is_valid():
                 label = " ".join(data.get("street", "").split())[:60]
                 label = label or _("An address that could not be read")

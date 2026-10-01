@@ -193,16 +193,23 @@ class PostalAddressForm(forms.ModelForm):
     The labels here are the neutral ones. What a region is *called* depends on the address's
     country rather than on the reader's language — *State*, *Distrito*, *Prefecture* — and
     saying it properly is #147's job.
+
+    ``person`` is whose page this is, and it is who the policy is asked about: with *Address
+    rules by country* switched off for them, the row's parts keep their neutral names and
+    nothing is said about its country. The switch used to be consulted by the helpers and
+    by no page, because the form never said who was asking (#635). Nobody, where a form is
+    built with no page behind it, and the rules then apply.
     """
 
     class Meta:
         model = PostalAddress
         fields = ("kind", "label", "street", "postcode", "municipality", "region", "country")
 
-    def __init__(self, *args, default_country: str = "", **kwargs):
+    def __init__(self, *args, default_country: str = "", person=None, **kwargs):
         super().__init__(*args, **kwargs)
         from postulo.core import phones
 
+        self.person = person
         # Two rows, because a street address is two lines in plenty of places and one box
         # of one line quietly asks somebody to leave the second out. `autocomplete` names
         # each part's purpose (SC 1.3.5, #276): these are the person's own addresses, and a
@@ -254,14 +261,19 @@ class PostalAddressForm(forms.ModelForm):
         so asking before this point asks about the row as it was loaded (#147).
         """
         super()._post_clean()
-        self.country_notes = warnings_for(self.instance) if self.instance else []
+        self.country_notes = (
+            warnings_for(self.instance, person=self.person) if self.instance else []
+        )
 
     def labels_for_country(self) -> dict:
         """What to call each part, for the country currently chosen on this row."""
         country = (self.data.get(self.add_prefix("country")) if self.is_bound else None) or (
             self.initial.get("country") or getattr(self.instance, "country", "")
         )
-        return {part: label_for(part, country) for part in ("postcode", "municipality", "region")}
+        return {
+            part: label_for(part, country, person=self.person)
+            for part in ("postcode", "municipality", "region")
+        }
 
 
 class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
@@ -316,8 +328,18 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
         return saved
 
 
-def formset_for(holder, *, default_country: str = "", data=None, prefix: str = "addresses"):
-    """The rows for one holder, ready to render or to save."""
+def formset_for(
+    holder, *, default_country: str = "", data=None, prefix: str = "addresses", person=None
+):
+    """The rows for one holder, ready to render or to save.
+
+    ``person`` is who the policy is asked about, for *Address rules by country* (#635).
+    Left out, it is the account behind the holder -- a profile's user, a contact's owner --
+    which is the only account that ever sees these rows, so a page that forgets to say who
+    is asking still honours the switch.
+    """
+    if person is None and holder is not None and holder.pk:
+        person = owner_of(holder)
     factory = generic_inlineformset_factory(
         PostalAddress,
         form=PostalAddressForm,
@@ -329,5 +351,5 @@ def formset_for(holder, *, default_country: str = "", data=None, prefix: str = "
         data=data,
         instance=holder,
         prefix=prefix,
-        form_kwargs={"default_country": default_country},
+        form_kwargs={"default_country": default_country, "person": person},
     )

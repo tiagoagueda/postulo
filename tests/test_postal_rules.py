@@ -213,11 +213,97 @@ def test_a_country_with_no_rules_prints_in_the_order_it_was_entered():
 # ---------------------------------------------------------------- switched off
 
 
-def test_off_is_the_same_path_a_country_with_no_rules_takes(user, monkeypatch):
-    """Rather than a second path nobody has seen. Off means neutral labels, no notes, and
-    the order it was entered in — which is exactly what an unknown country already gets.
+def switch_off(person) -> None:
+    """An administrator's decision: a built-in is theirs to switch, not the person's (#200)."""
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.create(
+        plugin=postal_rules.POSTAL_RULES, person=person, state=PluginPolicy.State.FORCED_OFF
+    )
+
+
+def a_united_states_row_sent_back(client, user):
+    """*Your details* posted with a United States address that has no state and no ZIP code,
+    and a kind of Other with no name, so that the page comes back and the row can be read.
     """
-    monkeypatch.setattr(postal, "rules_apply", lambda person: False)
+    from django.urls import reverse
+
+    client.force_login(user)
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "Alex",
+            "last_name": "Morgan",
+            "addresses-TOTAL_FORMS": "1",
+            "addresses-INITIAL_FORMS": "0",
+            "addresses-MIN_NUM_FORMS": "0",
+            "addresses-MAX_NUM_FORMS": "1000",
+            "addresses-0-kind": "other",
+            "addresses-0-label": "",
+            "addresses-0-street": "1600 Pennsylvania Avenue NW",
+            "addresses-0-postcode": "",
+            "addresses-0-municipality": "Washington",
+            "addresses-0-region": "",
+            "addresses-0-country": "US",
+        },
+    )
+    assert response.status_code == 200, "the row has no name for its kind, so the page is back"
+    return response.context["addresses"].forms[0], response.content.decode()
+
+
+def test_off_is_the_same_path_a_country_with_no_rules_takes(client, user):
+    """Rather than a second path nobody has seen: off means neutral names and nothing said,
+    which is what an unknown country already gets -- **on the page**, which is where it was
+    not true. The helpers honoured the switch and the form never told them who was asking,
+    so a person with the rules switched off still read *State* and *ZIP code* (#635).
+    """
+    switch_off(user)
+
+    row, html = a_united_states_row_sent_back(client, user)
+
+    names = {part: str(label) for part, label in row.labels_for_country().items()}
+    assert names == {"postcode": "Postcode", "municipality": "Town or city", "region": "Region"}
+    assert row.country_notes == []
+    assert "ZIP code" not in html and ">State<" not in html
+    assert "data-country-note" not in html
+
+
+def test_on_the_same_row_is_named_and_spoken_about_as_its_country_does(client, user):
+    """The control for the test above: nothing but the switch differs."""
+    row, html = a_united_states_row_sent_back(client, user)
+
+    names = {part: str(label) for part, label in row.labels_for_country().items()}
+    assert names == {"postcode": "ZIP code", "municipality": "Town or city", "region": "State"}
+    assert "ZIP code" in html and ">State<" in html
+
+
+def test_the_switch_reaches_a_stored_row_as_the_page_is_drawn(client, user):
+    """Not only a row sent back: the page as it is first read."""
+    from django.urls import reverse
+
+    PostalAddress.objects.create(
+        owner=user, holder=user.profile, country="US", street="1 Main Street", is_primary=True
+    )
+    switch_off(user)
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    assert "ZIP code" not in html and ">State<" not in html
+
+
+def test_the_rows_ask_about_the_account_behind_the_holder_when_nobody_says(user):
+    """A page that builds the rows and forgets to say who is asking still honours the
+    switch: the only account that ever sees a holder's rows is the one it belongs to."""
+    switch_off(user)
+
+    formset = postal.formset_for(user.profile)
+
+    assert formset.forms[0].person == user
+
+
+def test_the_helpers_honour_the_switch_for_whoever_is_named(user):
+    switch_off(user)
     one = address(country="US", street="1600 Pennsylvania Avenue NW", municipality="Washington")
 
     assert postal.warnings_for(one, person=user) == []
