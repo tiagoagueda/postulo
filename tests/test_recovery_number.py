@@ -290,6 +290,89 @@ def test_it_appears_the_day_a_gateway_is_installed(client, user):
         assert phone_numbers.can_be_chosen_here()
 
 
+def a_contact_with_a_number(user):
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    PhoneNumber.objects.create(owner=user, holder=contact, number="+351211111111", is_primary=True)
+    return contact
+
+
+def test_a_contacts_rows_never_offer_the_choice(client, user):
+    """With a text gateway installed a contact's rows drew *Gets me back in — needs
+    confirming first*, disabled: a promise about a number that can never be a way into
+    anybody's account (#650). The star and the box to remove it are what a contact's row
+    has. *Your details* is as it was."""
+    confirmed(user)
+    contact = a_contact_with_a_number(user)
+    client.force_login(user)
+    url = reverse("jobs:contact_update", args=[contact.pk])
+
+    assert "data-recovery-choice" not in client.get(url).content.decode()
+    with a_gateway():
+        theirs = client.get(url).content.decode()
+        mine = client.get(reverse("accounts:profile")).content.decode()
+
+    block = theirs[theirs.index('id="section-phones"') :]
+    block = block[: block.index("</fieldset>")]
+    assert 'name="phone_numbers-0-number_1"' in block, "the rows are there"
+    assert "data-recovery-choice" not in theirs
+    assert "Gets me back in" not in theirs and "gets you back in" not in theirs
+    assert 'name="phone_numbers-primary"' in block and "phone_numbers-0-DELETE" in block
+    assert "data-recovery-choice" in mine and "Gets me back in" in mine
+
+
+def test_the_choice_is_offered_for_a_persons_own_numbers_and_no_others(user, other_user):
+    contact = a_contact_with_a_number(user)
+
+    with a_gateway():
+        assert phone_numbers.offers_the_recovery_choice(user.profile, user)
+        assert phone_numbers.formset_for(user.profile, asked_by=user).recovery_can_be_chosen
+        for holder, person in (
+            (contact, user),
+            (contact, None),
+            (user.profile, None),
+            (user.profile, other_user),
+        ):
+            assert not phone_numbers.offers_the_recovery_choice(holder, person)
+            formset = phone_numbers.formset_for(holder, asked_by=person)
+            assert not formset.recovery_can_be_chosen
+    assert not phone_numbers.offers_the_recovery_choice(user.profile, user), "no gateway"
+
+
+def test_saving_a_contact_leaves_the_way_back_in_alone(client, user):
+    """A block that never offered the choice has no answer to read, and must not take
+    the missing one for "none"."""
+    row = confirmed(user, is_primary=True)
+    contact = a_contact_with_a_number(user)
+    client.force_login(user)
+
+    with a_gateway():
+        phone_numbers.set_recovery(row, owner=user)
+        formset = phone_numbers.formset_for(
+            contact,
+            asked_by=user,
+            data={
+                "phone_numbers-TOTAL_FORMS": "1",
+                "phone_numbers-INITIAL_FORMS": "1",
+                "phone_numbers-MIN_NUM_FORMS": "0",
+                "phone_numbers-MAX_NUM_FORMS": "1000",
+                "phone_numbers-primary": "phone_numbers-0",
+                "phone_numbers-0-id": str(contact.phone_numbers.get().pk),
+                "phone_numbers-0-kind": "work",
+                "phone_numbers-0-label": "",
+                "phone_numbers-0-number_0": "PT",
+                "phone_numbers-0-number_1": "21 111 1111",
+            },
+        )
+        assert formset.is_valid(), formset.errors
+        formset.save()
+
+        assert contact.phone_numbers.get().kind == "work"
+        assert phone_numbers.recovery_number(user) == row
+
+
 # --------------------------------------------------------------- the archive
 
 

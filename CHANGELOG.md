@@ -164,6 +164,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A contact's telephone rows no longer offer *Gets me back in* when a text gateway is installed: the choice belongs to your own numbers on *Your details*. (#650)
 - Saving *Your details* or a contact untouched no longer stores an empty telephone row where the country chooser starts on a country. An empty row saved before this is on the page, and can be removed there. (#649)
 - The telephone box tells a screen reader that its number was refused and why, and is described by its help: it carries the `aria-invalid` and `aria-describedby` every other field has. (#416)
 - On *Your details*, the box for the state of a postal address reads *Bundesstaat* in German and *Πολιτεία* in Greek, not the word for a status, and so in 28 more languages: the address rules' own translation of *State* is the one drawn. (#651)

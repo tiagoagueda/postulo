@@ -203,6 +203,27 @@ def can_be_chosen_here() -> bool:
     return channels.confirmable(channels.TelephoneChannel())
 
 
+def is_their_own(holder, person) -> bool:
+    """Whether these are a person's own numbers: the holder is that person's profile.
+
+    The same line `mine` draws, asked of a holder. A contact is a holder this account owns
+    and never one it is, so a contact's number can never be a way back into an account.
+    """
+    profile = getattr(person, "profile", None)
+    return profile is not None and profile.pk is not None and holder == profile
+
+
+def offers_the_recovery_choice(holder, person) -> bool:
+    """Whether a block of rows offers *Gets me back in*: on an instance that can confirm a
+    number, and only for the person's own numbers.
+
+    It was offered wherever the rows were drawn (#650). With a text gateway installed a
+    contact's rows carried the radio, disabled, saying the number "needs confirming
+    first": a promise about a number that could never be confirmed as anybody's way in.
+    """
+    return is_their_own(holder, person) and can_be_chosen_here()
+
+
 @transaction.atomic
 def set_recovery(number: PhoneNumber | None, *, owner) -> None:
     """Make this the account's way back in, and the only one.
@@ -427,8 +448,12 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
 
         Nothing is chosen by default, and an empty answer clears it rather than falling back
         to something — a route somebody did not ask for is not one they will remember having.
+
+        Only for a block that offered the choice (#650). A contact's rows never do, and a
+        block that did not ask has no answer to read: taking the missing one for "none"
+        would be clearing a route from a page that never showed it.
         """
-        if not can_be_chosen_here():
+        if not offers_the_recovery_choice(self.instance, self.asked_by):
             return
         named = (self.data.get(f"{self.prefix}-recovery") or "").strip()
         wanted = None
@@ -480,6 +505,7 @@ def formset_for(
     )
     formset.asked_by = asked_by
     # Read by the template, so the choice appears the day an operator installs a gateway
-    # and never before it (#144).
-    formset.recovery_can_be_chosen = can_be_chosen_here()
+    # and never before it (#144) -- and beside a person's own numbers only, never beside a
+    # contact's (#650).
+    formset.recovery_can_be_chosen = offers_the_recovery_choice(holder, asked_by)
     return formset
