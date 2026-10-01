@@ -422,7 +422,7 @@ def test_tokens_are_made_with_scopes_and_expiry_from_settings(client, user):
         reverse("api:token_create"),
         {"name": "Agent", "scopes": ["read", "write"], "expires": "30"},
     )
-    assert response.status_code == 302
+    assert response.status_code == 200, "the list, drawn by the response that made the token"
     token = ApiToken.objects.get(owner=user)
     assert token.scopes == ["read", "write"]
     assert token.expires_at is not None

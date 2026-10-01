@@ -550,13 +550,66 @@ def test_another_accounts_token_is_not_listed(client, user, other_user):
 
 def test_a_token_is_shown_once_and_then_never_again(client, user):
     client.force_login(user)
+
+    made = client.post(reverse("api:token_create"), {"name": "Laptop", "scopes": ["captures"]})
+    afterwards = client.get(reverse("api:token_list"))
+
+    assert made.status_code == 200, "on the response that made it, with no redirect between"
+    secret = made.context["new_token"]
+    assert secret and secret in made.content.decode()
+    assert "no-store" in made["Cache-Control"], "a page holding a secret is not for a cache"
+    assert afterwards.context["new_token"] is None, "and is not recoverable afterwards"
+    assert secret not in afterwards.content.decode()
+
+
+def test_a_new_tokens_secret_never_reaches_the_session_table(client, user, monkeypatch):
+    """A copy of the database is not a set of working credentials (#441).
+
+    The secret used to wait in the session for the page after the redirect, and sessions
+    are rows: signed, not encrypted, and copied by every backup. If that page was never
+    drawn, a closed tab being enough, the token stayed there for as long as the row did.
+    """
+    from django.contrib.sessions.models import Session
+
+    issued = []
+    issue = ApiToken.issue
+
+    def remembered(*args, **kwargs):
+        issued.append(issue(*args, **kwargs))
+        return issued[-1]
+
+    monkeypatch.setattr(ApiToken, "issue", remembered)
+    client.force_login(user)
+
     client.post(reverse("api:token_create"), {"name": "Laptop", "scopes": ["captures"]})
 
-    first = client.get(reverse("api:token_list"))
-    second = client.get(reverse("api:token_list"))
+    (_token, secret) = issued[0]
+    assert Session.objects.exists(), "the session this test reads"
+    for row in Session.objects.all():
+        assert secret not in str(row.get_decoded())
 
-    assert first.context["new_token"], "the secret is shown immediately after creation"
-    assert second.context["new_token"] is None, "and is not recoverable afterwards"
+
+def test_a_secret_left_in_a_session_by_an_older_version_is_removed(client, user):
+    """Upgrading makes the promise true for the rows already there, not only for new ones."""
+    import importlib
+
+    from django.apps import apps
+    from django.contrib.sessions.models import Session
+
+    migration = importlib.import_module(
+        "postulo.api.migrations.0004_forget_secrets_left_in_sessions"
+    )
+    client.force_login(user)
+    session = client.session
+    session["postulo_new_capture_token"] = "postulo_a-secret-nobody-was-shown"
+    session.save()
+    untouched = client.session.session_key
+
+    migration.forget_secrets_left_in_sessions(apps, None)
+
+    kept = Session.objects.get(session_key=untouched).get_decoded()
+    assert "postulo_new_capture_token" not in kept
+    assert kept["_auth_user_id"] == str(user.pk), "and whoever it belongs to stays signed in"
 
 
 def test_pasting_the_page_source_skips_fetching_entirely(client, user, monkeypatch):

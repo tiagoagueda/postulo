@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A new API token's secret is shown by the response that made it and stored nowhere: it used to wait in the session table, where a backup kept it if the next page was never drawn. Upgrading removes any left there. (#441)
 - Failed sign-ins are counted per account: its username and each of its addresses used to have five guesses apiece, and so did each host name the instance answers to. (#489)
 - Django's admin has no login of its own and sends you through Postulo's sign-in: its form opened the whole instance on a password alone, whatever second factor the account had. **If you set `POSTULO_ADMIN_URL`, nothing to do: you are asked for your code on the way in.** (#367)
 - urllib3 2.8.0, for CVE-2026-97689 (a hostile server could make a chunked response grow without bound in memory) and CVE-2026-97687 (an HTTPS proxy could take the target's TLS settings); and virtualenv 21.14.2, a development tool, for four advisories of its own. (#324)
