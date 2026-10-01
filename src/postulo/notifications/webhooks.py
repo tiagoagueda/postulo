@@ -126,6 +126,9 @@ def deliver(row) -> bool:
         # hostname can come to point somewhere private later.
         plugin.check_destination(url)
     except DestinationRefused as refused:
+        # Said on the connection as well as the row: the row is given up on for good,
+        # and the connection is the only place a person looks (#574).
+        connection.record_test(False, str(refused))
         return fail(str(refused), final=True)
     try:
         response = plugin.post(url, secret, row.body, event=row.event, delivery=str(row.pk))

@@ -32,10 +32,15 @@ def language_for(user) -> str:
 def notify(user, notification: Notification | Callable[[], Notification]) -> int:
     """Send ``notification`` through each of ``user``'s notifier connections that wants it.
 
-    Delivery is synchronous: a notifier sends one message and either it goes or it does
-    not, and the connection remembers which. A failing notifier never fails the caller —
-    a capture is still captured, a reminder still due — it is logged and shown on the
-    connection instead. Returns how many connections took the message.
+    A notifier sends one message and either it goes or it does not, and the connection
+    remembers which. A failing notifier never fails the caller — a capture is still
+    captured, a reminder still due — it is logged and shown on the connection instead.
+    Returns how many connections took the message.
+
+    One notifier does not send at all: the webhook queues a row and the scheduler
+    delivers it. It says so with ``delivers_later``, and then taking the message leaves
+    the connection as it was, because the pass that delivers is the one that knows how
+    it went (#574).
 
     All of it happens in the recipient's language, and the notification says which one it
     came out in by the time a notifier sees it. A `Notification` carries words that are
@@ -89,6 +94,10 @@ def _deliver(user, notification: Notification) -> int:
             )
             connection.record_test(False, f"{type(error).__name__}: {error}")
             continue
-        connection.record_test(True)
+        # A notifier that only queued has delivered nothing yet. Calling the connection
+        # working here wiped whatever the delivery pass had written on it, so a receiver
+        # that answered 404 read as working again the moment anything else happened (#574).
+        if not getattr(plugin, "delivers_later", False):
+            connection.record_test(True)
         delivered += 1
     return delivered

@@ -117,6 +117,15 @@ class NotifierPlugin(ConnectedPlugin, Protocol):
 
     ``config`` is the connection's configuration and secrets together; ``user`` is the
     person the message is for, so a notifier can fall back to their address or name.
+
+    Two things a notifier may also say about itself. Both are read by name and neither
+    is part of this protocol, so a notifier that says neither is still one:
+
+    - ``event_defaults``, which events are on for a connection that has not said (see
+      `default_for`);
+    - ``delivers_later = True``, when ``send`` only queues the message for something
+      else to deliver. A ``send`` that returns is then not recorded as a delivery, and
+      whatever does deliver writes the outcome with ``connection.record_test`` (#574).
     """
 
     def send(self, notification: Notification, config: dict, user) -> None: ...

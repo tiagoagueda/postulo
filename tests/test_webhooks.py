@@ -255,6 +255,65 @@ def test_a_private_destination_is_refused_at_delivery_too(user, settings):
     assert row.status == DeliveryStatus.GIVEN_UP
 
 
+# ------------------------------------------- what the connection says about it
+
+
+def test_the_webhook_says_it_delivers_later_and_the_mail_does_not():
+    assert WebhookNotifier.delivers_later is True
+    assert not getattr(EmailNotifier, "delivers_later", False)
+
+
+def test_queueing_an_event_is_not_recorded_as_a_delivery(user):
+    """`send` writes a row. Nothing has reached the receiver, so nothing has worked yet."""
+    connection = webhook_connection(user)
+
+    taken = notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+
+    connection.refresh_from_db()
+    assert taken == 1, "the event was taken all the same"
+    assert connection.last_ok_at is None and connection.last_error == ""
+
+
+def test_a_failing_webhook_still_says_so_after_the_next_event_is_queued(user):
+    """The delivery pass is the only one that knows how a delivery went (#574).
+
+    `notify` treated any `send` that returned as a delivery and marked the connection as
+    working, which for a notifier that only queues wiped what the pass had written. A
+    receiver answering 404 all day read "worked" on Connections whenever anything else
+    had happened since, and that page is the only place a person learns their automation
+    has stopped hearing from Postulo.
+    """
+    connection = webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "post", lambda *a, **k: Answer(404)),
+    ):
+        webhooks.send_pending()
+    connection.refresh_from_db()
+    assert "404" in connection.last_error
+
+    notify(user, Notification(event="reminder_due", title="y", key="r:2"))
+
+    connection.refresh_from_db()
+    assert "404" in connection.last_error, "queueing another event is not a delivery"
+    assert connection.last_ok_at is None
+
+
+def test_a_destination_refused_at_delivery_is_said_on_the_connection(user, settings):
+    """The row was given up on and the connection never said why, or that anything had."""
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    connection = webhook_connection(user, url="http://10.0.0.5/hook")
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+
+    with mock.patch.object(webhook, "post"):
+        webhooks.send_pending()
+
+    connection.refresh_from_db()
+    assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" in connection.last_error
+    assert connection.last_error == WebhookDelivery.objects.get().last_error
+
+
 def test_nobody_elses_webhook_hears_a_thing(user, other_user):
     webhook_connection(other_user)
     notify(user, Notification(event="reminder_due", title="Mine", key="r:1"))

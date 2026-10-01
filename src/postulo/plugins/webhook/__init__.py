@@ -146,6 +146,9 @@ class WebhookNotifier:
         "interview_scheduled": True,
         "offer_recorded": True,
     }
+    #: `send` queues and the scheduler delivers, so a `send` that returned says nothing
+    #: about the receiver. The delivery pass writes the outcome on the connection (#574).
+    delivers_later: ClassVar[bool] = True
 
     def config_fields(self, user=None) -> list[FieldSpec]:
         return [
