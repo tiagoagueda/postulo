@@ -1149,3 +1149,96 @@ def test_no_row_borrows_google():
 
     assert "libaddressinput" in text, "and the reasoning is written down"
     assert "not the answer" in text or "does not depend" in text or "ruled out" in text
+
+
+# ------------------------------------------- the plugin's words are the plugin's own (#651)
+
+#: What says a label is a part of an address and not the same English word elsewhere.
+A_PART = "part of a postal address"
+
+
+def the_region_label_of_a_united_states_row(client, user, language: str) -> str:
+    """*Your details* as somebody reading in that language is given it, and the label over
+    the box for the state of an address in the United States."""
+    from django.urls import reverse
+
+    user.profile.language = language
+    user.profile.save(update_fields=["language"])
+    PostalAddress.objects.create(
+        owner=user,
+        holder=user.profile,
+        country="US",
+        street="1600 Pennsylvania Avenue NW",
+        postcode="20500",
+        municipality="Washington",
+        region="DC",
+        is_primary=True,
+    )
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+    return re.search(r'<label for="id_addresses-0-region">([^<]*)</label>', html).group(1)
+
+
+@pytest.mark.parametrize(
+    ("language", "state", "status"),
+    [
+        ("de", "Bundesstaat", "Zustand"),
+        ("el", "Πολιτεία", "Κατάσταση"),
+        ("nl", "Staat", "Toestand"),
+    ],
+)
+def test_the_state_of_an_address_is_not_the_word_for_a_status(
+    client, user, language, state, status
+):
+    """The plugin's label was the msgid `State` with no context, core has the same msgid
+    for a status, and core's catalogue answers first for a message both define (#127). So
+    the box read *Zustand*, a condition, and the plugin's *Bundesstaat* was never reached.
+    With a context it is a message of its own."""
+    assert the_region_label_of_a_united_states_row(client, user, language) == state
+
+    with translation.override(language):
+        assert str(postal_rules.label_for("region", "US")) == state
+        assert translation.gettext("State") == status, "and core's word still means a status"
+
+
+def test_no_message_of_the_address_plugin_is_one_of_cores():
+    """Core's catalogue wins a message two catalogues share, so one the plugin shares is one
+    the plugin's translators never decide: *State*, *Address* and *Country* were. A message
+    with a context is the plugin's own; a new label that is also an English word of core's
+    fails here until it has one."""
+    from pathlib import Path
+
+    from postulo.core import messages_tool
+
+    messages_tool.use(Path(__file__).resolve().parents[1])
+    sets = {subject.name: subject for subject in messages_tool.catalogue_sets()}
+
+    def keys(name: str) -> set:
+        path = messages_tool.po_path("fr-FR", sets[name])
+        return set(messages_tool.parse(path.read_text(encoding="utf-8")).messages)
+
+    ours = keys("plugins/postal_rules")
+    assert (A_PART, "State") in ours, "the catalogue was read"
+    assert not ours & keys("postulo")
+
+
+def test_no_language_lost_its_word_when_the_labels_gained_a_context():
+    """The translations were carried to the entries with the context, not written again: a
+    language that has the plugin's other names of a region has these three."""
+    from pathlib import Path
+
+    from postulo.core import messages_tool
+
+    messages_tool.use(Path(__file__).resolve().parents[1])
+    subject = {s.name: s for s in messages_tool.catalogue_sets()}["plugins/postal_rules"]
+    translated = 0
+    for code in messages_tool.translated_languages():
+        path = messages_tool.po_path(code, subject)
+        messages = messages_tool.parse(path.read_text(encoding="utf-8")).messages
+        if not any(messages[(None, "Province")].msgstr):
+            continue
+        translated += 1
+        for msgid in ("State", "Address", "Country"):
+            assert any(messages[(A_PART, msgid)].msgstr), f"{code} lost its {msgid}"
+            assert (None, msgid) not in messages, f"{code} still has {msgid} with no context"
+    assert translated > 30, "the languages that have the plugin's words were found"

@@ -56,6 +56,7 @@ state nobody has seen.
 from __future__ import annotations
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext_lazy
 
 from postulo.plugins.api import declares, shipped
 
@@ -69,10 +70,19 @@ POSTAL_RULES = "postal-rules"
 #:
 #: Some of these stay as they are in every language, because they are names rather than
 #: descriptions: an Eircode is an Eircode in Lisbon, and a CAP is a CAP in Dublin.
+#:
+#: **A label that is also an English word of core's carries a context** (#651), written out
+#: at each call because the catalogue tool reads the source and takes a context only from a
+#: literal. Core's catalogue answers first for a message two catalogues define, so that a
+#: plugin cannot reword Postulo's interface (#127); which also means a plugin's translation
+#: of a message core has is never reached. *State* is a status in core, so the box for the
+#: state of an address in the United States read *Zustand* in German, and this catalogue's
+#: *Bundesstaat* was never drawn. With a context it is a message of this plugin's own. A
+#: test holds every message here to that: none may be one of core's.
 LABELS = {
     # what a region is called
     "region": _("Region"),
-    "state": _("State"),
+    "state": pgettext_lazy("part of a postal address", "State"),
     "province": _("Province"),
     "county": _("County"),
     "district": _("District"),
@@ -91,13 +101,14 @@ LABELS = {
     "post_town": _("Post town"),
 }
 
-#: The label a part has when its country says nothing about it.
+#: The label a part has when its country says nothing about it. *Address* is a web address
+#: in core and *Country* a telephone number's, so both carry the context too (#651).
 NEUTRAL = {
-    "street": _("Address"),
+    "street": pgettext_lazy("part of a postal address", "Address"),
     "postcode": "postcode",
     "municipality": "municipality",
     "region": "region",
-    "country": _("Country"),
+    "country": pgettext_lazy("part of a postal address", "Country"),
 }
 
 
