@@ -798,7 +798,14 @@ class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         # while the feature is offered the erasure carries the report and the person who
         # deleted reads it; off, the plain delete is what Postulo has always done (#297).
         if gdpr.is_offered(self.request.user):
-            messages.success(self.request, gdpr.erase_contact(self.object).summary())
+            try:
+                report = gdpr.erase_contact(self.object)
+            except gdpr.ErasureRefused as refused:
+                # A plugin holds rows about them that it could not remove, so nothing
+                # was. Back to the person, who is still there, with the reason (#371).
+                messages.error(self.request, str(refused))
+                return redirect(reverse("jobs:contact_update", args=[self.object.pk]))
+            messages.success(self.request, report.summary())
             return redirect(self.get_success_url())
         return super().form_valid(form)
 

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import logging
 import zipfile
 from io import BytesIO
 from typing import Any
@@ -23,6 +24,8 @@ from django.db import transaction
 from django.utils import timezone
 
 from postulo import __version__
+
+logger = logging.getLogger(__name__)
 
 #: Bumped when the shape changes in a way an importer must notice. 2 added the listing
 #: state and dates on postings and the listing a capture became; 3 added interviews under
@@ -524,6 +527,9 @@ def _plugin_data(user) -> dict:
     try:
         return data.export_sections(user)
     except Exception:  # pragma: no cover - an archive is worth more than a tidy section
+        # Each plugin is already asked inside its own guard; this is for the walk itself
+        # failing, and it is said rather than only marked in the archive (#371).
+        logger.exception("The plugins' section of the archive could not be built")
         return {"carried": {}, "not_carried": ["unknown"]}
 
 

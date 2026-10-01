@@ -24,6 +24,10 @@ row and merely stops offering these pages. Erasure is an act a person takes abou
 contact, and a deletion that does not say what it removed is a guess about its own effect, so
 the report carries the counts.
 
+**And it is all or nothing.** While a plugin holds rows about the person and cannot remove
+them, the erasure is refused and removes nothing (`ErasureRefused`): a report that says
+somebody is gone while rows about them remain is the one thing it must never say (#371).
+
 **Retention is a policy and a dry run, never a janitor.** The setting says how long records
 about other people are kept; the dry run says what the policy would touch. Nothing here
 deletes on a schedule, because a deletion nobody watched happen is the failure the dry run
@@ -187,20 +191,18 @@ class ErasureReport:
     ``deleted`` is what stopped existing, by kind. ``unlinked`` is what survived but no
     longer points at the contact — an application keeps its history, it loses its main
     contact, or whoever referred the person to it (#239); an entry in a listing's history
-    keeps its words and loses who it came from (#270). ``not_erased`` names the
-    plugins that hold rows for this person and could not be asked: an erasure that leaves
-    data it cannot see about is the same quiet incompleteness the export refuses, so it is
-    said rather than discovered.
+    keeps its words and loses who it came from (#270).
+
+    There is no list of what could not be reached. An erasure that would leave rows about
+    the person with a plugin does not happen at all, and is an `ErasureRefused` (#371).
     """
 
     name: str
     deleted: dict[str, int]
     unlinked: dict[str, int]
-    not_erased: list[str]
 
     def summary(self) -> str:
-        """The sentence shown to whoever did it: what went, what stayed, and what was left
-        that could not be reached."""
+        """The sentence shown to whoever did it: what went, and what stayed without them."""
         gone = ", ".join(
             _("%(count)d %(kind)s") % {"count": count, "kind": _kinds(kind)}
             for kind, count in self.deleted.items()
@@ -230,11 +232,6 @@ class ErasureReport:
                 )
                 % {"count": self.unlinked["listing_events"]}
             )
-        if self.not_erased:
-            parts.append(
-                _("These still hold rows Postulo could not reach: %(plugins)s.")
-                % {"plugins": ", ".join(self.not_erased)}
-            )
         return " ".join(parts) or _("Nothing was left to remove.")
 
 
@@ -248,33 +245,33 @@ def _kinds(key: str) -> str:
     }.get(key, key)
 
 
-def _erase_plugin_rows(contact) -> tuple[int, list[str]]:
-    """Ask each plugin that owns rows to erase this person's, and count what went.
+class ErasureRefused(Exception):
+    """An erasure that did not happen, and the plugins it would have left rows with.
 
-    A plugin that owns rows but does not answer `erase_for` — or answers with an error —
-    is named in the returned list and its rows stay: deleting the contact underneath it
-    would leave rows pointing at nothing, the failure the export's `not_carried` and the
-    uninstall refusal both exist to prevent.
+    Raised when a plugin that owns rows about the person cannot remove them: it has no
+    `erase_for` and holds something (or cannot say whether it does), or its `erase_for`
+    failed. **Nothing has been removed** when this is raised, including what another plugin
+    did remove before the failure, which is undone with the rest.
+
+    The other answer was to delete the contact anyway and name what was left. That keeps a
+    faulty plugin from standing between a person and their erasure, and it also produces
+    the report this module exists to prevent: "is gone", about somebody a plugin still
+    holds rows on, pointing at a contact that is no longer there to erase again. A refusal
+    names the plugin while the contact still exists, and the log carries the traceback.
+
+    ``str()`` is the sentence for whoever asked.
     """
-    from postulo.plugins import data as plugin_data
-    from postulo.plugins.registry import GROUPS
-    from postulo.plugins.registry import plugins as registry_plugins
 
-    removed = 0
-    not_erased: list[str] = []
-    for kind in GROUPS:
-        for plugin in registry_plugins(kind):
-            if not plugin_data.owned_labels(plugin):
-                continue
-            eraser = getattr(plugin, "erase_for", None)
-            if eraser is None:
-                not_erased.append(str(plugin.label))
-                continue
-            try:
-                removed += int(eraser(contact) or 0)
-            except Exception:
-                not_erased.append(str(plugin.label))
-    return removed, not_erased
+    def __init__(self, name: str, plugins: list[str]) -> None:
+        self.name = name
+        self.plugins = list(plugins)
+        super().__init__(
+            _(
+                "Nothing was removed. %(name)s cannot be erased while these hold rows about "
+                "them that could not be removed: %(plugins)s."
+            )
+            % {"name": name, "plugins": ", ".join(self.plugins)}
+        )
 
 
 def erase_contact(contact) -> ErasureReport:
@@ -285,12 +282,20 @@ def erase_contact(contact) -> ErasureReport:
     each count is taken before the delete that spends it, and the plugins are asked before
     anything goes, in the same transaction, because a row erased while its contact survives
     is a deletion that cannot be undone and the report that said it happened is wrong.
+
+    Raises `ErasureRefused`, having removed nothing, while a plugin holds rows about the
+    person that it could not remove.
     """
     from postulo.applications.models import Application
     from postulo.jobs.models import ListingEvent
+    from postulo.plugins import data as plugin_data
 
     with transaction.atomic():
-        removed, not_erased = _erase_plugin_rows(contact)
+        removed, unable = plugin_data.erase_rows_for(contact)
+        if unable:
+            # Raised inside the block, so that what the other plugins did remove comes back
+            # with it: this block is a savepoint of the request's own transaction.
+            raise ErasureRefused(contact.name, unable)
         deleted = {
             "phone_numbers": contact.phone_numbers.count(),
             "postal_addresses": contact.postal_addresses.count(),
@@ -308,7 +313,7 @@ def erase_contact(contact) -> ErasureReport:
         name = contact.name
         contact.delete()
 
-    return ErasureReport(name=name, deleted=deleted, unlinked=unlinked, not_erased=not_erased)
+    return ErasureReport(name=name, deleted=deleted, unlinked=unlinked)
 
 
 # --------------------------------------------------------------------- the retention

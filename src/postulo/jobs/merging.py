@@ -520,32 +520,6 @@ def _link_moves(kept, other) -> tuple[list, list]:
     return moving, already
 
 
-def _held_by_plugins(contact) -> list[str]:
-    """The plugins that hold rows of their own about this person, by name.
-
-    Asked the way the archive asks (`export_for`): a plugin that owns a table says what it
-    holds about somebody. One that owns a table and cannot say is named as well, because
-    *nothing* and *cannot tell* are different answers and only the first is reassuring.
-    """
-    from postulo.plugins import data
-    from postulo.plugins.registry import GROUPS
-    from postulo.plugins.registry import plugins as installed
-
-    found: list[str] = []
-    for kind in GROUPS:
-        for plugin in installed(kind):
-            if not data.owned_labels(plugin):
-                continue
-            exporter = getattr(plugin, "export_for", None)
-            try:
-                holds = exporter is None or bool(list(exporter(contact) or []))
-            except Exception:
-                holds = True
-            if holds:
-                found.append(str(getattr(plugin, "label", plugin.name)))
-    return sorted(set(found))
-
-
 def plan_contacts(kept, other) -> Plan:
     """What merging the person ``other`` into ``kept`` would do."""
     from postulo.applications.models import Application, Interview
@@ -612,7 +586,11 @@ def plan_contacts(kept, other) -> Plan:
             Difference(_label(Contact, "department"), kept.department.name, theirs)
         )
 
-    for plugin in _held_by_plugins(other):
+    # A plugin that owns a table says what it holds about somebody, as it does for the
+    # archive, and the one walk over those plugins is the archive's (#371).
+    from postulo.plugins import data as plugin_data
+
+    for plugin in plugin_data.holds_rows_for(other):
         plan.left_behind.append(
             _("What %(plugin)s holds about them, which Postulo cannot move.") % {"plugin": plugin}
         )

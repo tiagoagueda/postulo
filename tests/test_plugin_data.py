@@ -22,6 +22,7 @@ inventing an app that would exist only for a test.
 from __future__ import annotations
 
 import contextlib
+import logging
 from unittest import mock
 
 import pytest
@@ -271,6 +272,87 @@ def test_a_plugin_that_raises_while_exporting_is_named_rather_than_fatal(user):
         section = data.export_sections(user)
 
     assert section["not_carried"] == ["core.Tag"]
+
+
+# -------------------------------------------- a plugin that fails is heard, everywhere
+#
+# Three places ask a plugin about the rows it owns: the archive, the merge and the erasure.
+# Each had its own copy of the loop and each swallowed a failure without a word, although
+# the threat model says a plugin that raises is logged and skipped (#371).
+
+
+class Failing(Tagger):
+    name = "failing"
+    label = "Failing"
+
+    def export_for(self, subject):
+        raise RuntimeError("its table is not there")
+
+    def erase_for(self, subject):
+        raise RuntimeError("its table is not there")
+
+
+def test_a_plugin_that_fails_is_logged_wherever_it_is_asked(user, caplog):
+    from postulo.jobs import merging
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    kept = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    other = Contact.objects.create(owner=user, company=company, name="C. Johnson")
+
+    with installed_from(Failing), caplog.at_level(logging.ERROR, logger="postulo.plugins.data"):
+        section = data.export_sections(user)
+        plan = merging.plan_contacts(kept, other)
+        removed, could_not = data.erase_rows_for(other)
+
+    # The answers stay the careful ones they were.
+    assert section["not_carried"] == ["core.Tag"]
+    assert plan.left_behind == ["What Failing holds about them, which Postulo cannot move."]
+    assert (removed, could_not) == (0, ["Failing"])
+    # And each time the operator is told which plugin, asked what, about whom.
+    said = [record for record in caplog.records if record.name == "postulo.plugins.data"]
+    assert [record.levelname for record in said] == ["ERROR", "ERROR", "ERROR"]
+    assert all(record.exc_info for record in said)
+    assert all("'failing'" in record.getMessage() for record in said)
+    assert ["export_for" in record.getMessage() for record in said] == [True, True, False]
+    assert "erase_for" in said[2].getMessage()
+    assert f"jobs.Contact {other.pk}" in said[2].getMessage()
+
+
+def test_a_plugin_whose_write_fails_does_not_take_the_export_down_with_it(user):
+    """Each plugin is asked inside a savepoint: what it broke is undone, and only that."""
+
+    class Breaking(Tagger):
+        name = "breaking"
+
+        def export_for(self, subject):
+            # No owner: refused by the database, inside the ORM's own write.
+            Tag(name="nobody's").save()
+            return []
+
+    Tag.objects.create(owner=user, name="one")
+
+    with installed_from(Breaking):
+        section = data.export_sections(user)
+
+    assert section["not_carried"] == ["core.Tag"]
+    assert Tag.objects.count() == 1, "and the transaction around it can still be used"
+
+
+def test_there_is_one_loop_over_the_plugins_that_own_data():
+    """Three copies had drifted already: each named a plugin its own way."""
+    import pathlib
+
+    import postulo
+
+    source = pathlib.Path(postulo.__file__).parent
+    asking = sorted(
+        path.relative_to(source).as_posix()
+        for path in source.rglob("*.py")
+        if "owned_labels(plugin)" in path.read_text(encoding="utf-8")
+    )
+
+    assert asking == ["plugins/data.py"]
 
 
 def test_the_document_carries_the_section(user):

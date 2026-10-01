@@ -635,15 +635,37 @@ class MyPlugin:
     #: Django labels. Postulo counts these before letting the package go.
     owns_models = ("my_plugin.Thing",)
 
-    def export_for(self, person) -> list[dict]:
-        """This person's rows, for their archive. See below."""
-        return [{"what": row.what} for row in Thing.objects.filter(owner=person)]
+    def export_for(self, subject) -> list[dict]:
+        """What you hold about this subject, for their archive. See below."""
+        return [{"what": row.what} for row in Thing.objects.filter(owner=subject)]
+
+    def erase_for(self, contact) -> int:
+        """Remove what you hold about this contact, and say how many rows went."""
+        removed, _by_model = Thing.objects.filter(about=contact).delete()
+        return removed
 ```
 
 **`export_for` is not optional in spirit.** A plugin that owns a person's data and cannot put
 it in their archive gets its models *named* in that archive under `not_carried`, because an
 archive that is quietly incomplete is discovered when somebody restores it, and one that says
 which part is missing is discovered while they still have the original. Write the method.
+
+**It is asked about two kinds of subject.** The account holder, for their archive; and one of
+their contacts, for the document of what the instance holds on that person and before two
+contacts are merged. Answer an empty list for a subject you hold nothing about: a plugin that
+cannot say is treated as one that holds something.
+
+**`erase_for` is what lets a person be erased.** Where the data-protection feature is on,
+deleting a contact asks every plugin that owns rows to remove its rows about them and to
+return how many went. A plugin that holds rows about the contact and has no `erase_for`, or
+whose `erase_for` raises, stops the erasure: nothing is removed, not even what another plugin
+had already removed, and whoever asked is told which plugin is in the way. A report must not
+say somebody is gone while rows about them remain. Write this method too.
+
+**Each call runs in a savepoint of its own, and a failure is logged with its traceback.** An
+exception out of your query undoes your own work and nothing else, and the request around it
+carries on with the careful answer in your place: not carried, holds something, could not
+erase. The log is where you find out which it was.
 
 **A plugin that owns a table, or pages, has to be built into the image.** Django needs the app
 in `INSTALLED_APPS` to see the model at all, and `INSTALLED_APPS` is fixed when the process

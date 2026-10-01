@@ -7,6 +7,7 @@ drawn from the registry at read time; the notice is the operator's words or noth
 
 import datetime as dt
 import json
+import logging
 
 import pytest
 from django.contrib.auth import get_user_model
@@ -16,10 +17,12 @@ from django.utils import timezone
 
 from postulo.applications.models import Application
 from postulo.core import gdpr
-from postulo.core.models import SiteSettings, WebLink
+from postulo.core.models import SiteSettings, Tag, WebLink
 from postulo.jobs.models import Company, Contact, JobPosting
 from postulo.plugins.gdpr import GDPR
 from postulo.plugins.models import Connection, PluginPolicy
+
+from .test_plugin_data import Tagger, installed_from
 
 pytestmark = pytest.mark.django_db
 
@@ -123,6 +126,138 @@ def test_erasure_says_when_it_left_nothing(user):
 
     assert not Contact.objects.filter(pk=contact.pk).exists()
     assert report.summary() == "Nothing was left to remove."
+
+
+# ------------------------------------------------ a plugin that holds rows about them
+#
+# No plugin Postulo ships owns a table, so all of this is for the ones that will. The
+# stand-ins claim `core.Tag`, as `test_plugin_data.py` does and for its reasons.
+
+
+class Erasing(Tagger):
+    """A plugin that says what it holds about somebody and can remove it."""
+
+    name = "erasing"
+    label = "Erasing"
+
+    def export_for(self, subject) -> list[dict]:
+        return [{"name": row.name} for row in Tag.objects.filter(owner=subject.owner)]
+
+    def erase_for(self, subject) -> int:
+        removed, _by_model = Tag.objects.filter(owner=subject.owner).delete()
+        return removed
+
+
+class Holding(Tagger):
+    """One that can say what it holds and was never taught to remove it."""
+
+    name = "holding"
+    label = "Holding"
+
+    def export_for(self, subject) -> list[dict]:
+        return [{"name": row.name} for row in Tag.objects.filter(owner=subject.owner)]
+
+
+class Breaking(Tagger):
+    """One whose eraser fails in the middle of a write, the way a real one would.
+
+    A row with no owner: refused by the database at once, inside the ORM's own write, which
+    is what leaves the surrounding transaction unusable unless somebody gave the plugin a
+    savepoint.
+    """
+
+    name = "breaking"
+    label = "Breaking"
+
+    def export_for(self, subject) -> list[dict]:
+        return [{"name": "something"}]
+
+    def erase_for(self, subject) -> int:
+        Tag(name="nobody's").save()
+        return 0
+
+
+def test_an_eraser_that_fails_refuses_the_erasure_and_leaves_a_trace(user, caplog):
+    """It used to end in a 500 with nothing in the log (#371).
+
+    The failure was swallowed, the transaction it had broken was not, and the next query
+    raised `TransactionManagementError`: the first plugin whose eraser failed this way made
+    every contact impossible to delete, with no trace of why.
+    """
+    contact = make_contact(user, make_company(user))
+    link = add_link(contact, user)
+
+    with (
+        installed_from(Breaking),
+        caplog.at_level(logging.ERROR, logger="postulo.plugins.data"),
+        pytest.raises(gdpr.ErasureRefused) as refused,
+    ):
+        gdpr.erase_contact(contact)
+
+    assert refused.value.plugins == ["Breaking"]
+    assert "Breaking" in str(refused.value) and contact.name in str(refused.value)
+    # Asking the database anything at all is the test that the transaction survived.
+    assert Contact.objects.filter(pk=contact.pk).exists(), "nothing was removed"
+    assert WebLink.objects.filter(pk=link.pk).exists()
+    (said,) = [record for record in caplog.records if record.name == "postulo.plugins.data"]
+    assert said.exc_info, "with the traceback its author needs"
+    assert "'breaking'" in said.getMessage() and "erase_for" in said.getMessage()
+    assert f"jobs.Contact {contact.pk}" in said.getMessage()
+
+
+def test_what_another_plugin_erased_comes_back_with_a_refusal(user):
+    """Nothing is removed means nothing: not the rows a plugin that did its part removed."""
+    Tag.objects.create(owner=user, name="held by the one that works")
+    contact = make_contact(user)
+
+    with installed_from(Erasing), installed_from(Breaking), pytest.raises(gdpr.ErasureRefused):
+        gdpr.erase_contact(contact)
+
+    assert Tag.objects.filter(owner=user).count() == 1
+    assert Contact.objects.filter(pk=contact.pk).exists()
+
+
+def test_a_plugin_that_cannot_erase_what_it_holds_refuses_the_erasure(user):
+    """A report must not say a person is gone while a plugin still holds rows about them."""
+    Tag.objects.create(owner=user, name="about them")
+    contact = make_contact(user)
+
+    with installed_from(Holding):
+        with pytest.raises(gdpr.ErasureRefused) as refused:
+            gdpr.erase_contact(contact)
+        assert refused.value.plugins == ["Holding"]
+        assert Contact.objects.filter(pk=contact.pk).exists()
+
+        # And it holds the erasure up only while there is something to hold it up for.
+        Tag.objects.filter(owner=user).delete()
+        gdpr.erase_contact(contact)
+
+    assert not Contact.objects.filter(pk=contact.pk).exists()
+
+
+def test_a_plugin_that_cannot_say_what_it_holds_refuses_it_too(user):
+    """Nothing and cannot tell are different answers, and only the first lets a person go."""
+    contact = make_contact(user)
+
+    with installed_from(Tagger), pytest.raises(gdpr.ErasureRefused) as refused:
+        gdpr.erase_contact(contact)
+
+    assert refused.value.plugins == ["Tagger"]
+    assert Contact.objects.filter(pk=contact.pk).exists()
+
+
+def test_what_a_plugin_erased_is_counted_in_the_report(user):
+    Tag.objects.create(owner=user, name="one")
+    Tag.objects.create(owner=user, name="two")
+    contact = make_contact(user)
+
+    with installed_from(Erasing):
+        report = gdpr.erase_contact(contact)
+
+    assert report.deleted["plugin_rows"] == 2
+    assert "2 plugin rows" in report.summary()
+    assert not Tag.objects.filter(owner=user).exists()
+    assert not Contact.objects.filter(pk=contact.pk).exists()
 
 
 def test_switching_the_feature_off_deletes_nothing(user):
@@ -288,6 +423,21 @@ def test_deleting_a_contact_says_what_went(client, user):
     messages = " ".join(str(m) for m in get_messages(response.wsgi_request))
     assert "is gone" in messages
     assert "application kept, without its main contact" in messages
+
+
+def test_a_refused_erasure_is_a_message_on_the_contact_and_not_an_error_page(client, user):
+    contact = make_contact(user, make_company(user))
+    client.force_login(user)
+
+    with installed_from(Breaking):
+        response = client.post(reverse("jobs:contact_delete", args=[contact.pk]))
+
+    assert response.status_code == 302
+    assert response["Location"] == reverse("jobs:contact_update", args=[contact.pk])
+    assert Contact.objects.filter(pk=contact.pk).exists()
+    (refusal,) = get_messages(response.wsgi_request)
+    assert refusal.level_tag == "error"
+    assert "Breaking" in str(refusal) and "Nothing was removed" in str(refusal)
 
 
 def test_deleting_without_the_feature_is_the_plain_delete(client, user):
