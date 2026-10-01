@@ -35,8 +35,8 @@ ASGI_APPLICATION = "postulo.config.asgi.application"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 INSTALLED_APPS = [
-    # Not `django.contrib.admin`: this installs the same app with a site whose login is
-    # rate-limited. See postulo.core.admin_site.
+    # Not `django.contrib.admin`: this installs the same app with a site that has no login
+    # of its own, and sends people through Postulo's. See postulo.core.admin_site.
     "postulo.core.admin_site.PostuloAdminConfig",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -385,15 +385,13 @@ POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
 #
 # Set it to a path of your own to turn it on. The trailing slash is added if you leave it
 # off, because forgetting it produced a URL nobody could reach and no error saying why.
+#
+# It has no login of its own (#367). Whoever is not signed in is sent to Postulo's sign-in,
+# so allauth's limits, the second factor and the confirmed address all apply to it, and
+# there is no second set of limits here to keep in step with allauth's.
 POSTULO_ADMIN_URL = env("POSTULO_ADMIN_URL", default="").strip().lstrip("/")
 if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
     POSTULO_ADMIN_URL += "/"
-
-# allauth's limits are good ones and Postulo inherits them, but they cover allauth's views.
-# The admin has a login of its own, which had nothing limiting it. Same numbers as a failed
-# sign-in, through the same limiter and the same cache, so there is one scheme rather than
-# two that can drift.
-ACCOUNT_RATE_LIMITS = {"admin_login": "10/m/ip,5/300s/key"}
 
 # ------------------------------------------------------------------ rate limits
 

@@ -1,4 +1,4 @@
-"""Django's admin, mounted only when asked for and rate-limited when it is (#116).
+"""Django's admin, mounted only when asked for (#116) and with no login of its own (#367).
 
 Postulo has its own *Server settings* — people, sign-in policy, plugins, email, logs,
 defaults — so the admin is a developer's convenience rather than something the application
@@ -12,44 +12,64 @@ Two things follow, and only the second one lives here.
 and ``config/urls.py`` adds nothing when it is. Choosing to run the admin and choosing where
 it lives are then the same decision, made once, on purpose.
 
-**When it is mounted, its login is throttled.** allauth's rate limits are good ones and
-Postulo inherits them, but they apply to allauth's views. ``django.contrib.admin`` has a
-login view of its own and nothing was limiting it — so the one credential form on the
-instance with no attempt limiting was the one that reaches every table directly. The limit
-below is allauth's own, through allauth's own limiter and cache, so there are not two
-schemes to keep in step: ``ACCOUNT_RATE_LIMITS["admin_login"]`` is where it is configured
-and it defaults to the same ``10/m/ip, 5/300s/key`` as a failed sign-in.
+**When it is mounted, nobody signs in to it.** ``django.contrib.admin`` has a login view of
+its own, which checks a username and a password and makes the same session the rest of
+Postulo uses. allauth is never involved, so nothing asked for the code from an authenticator
+app, nothing asked whether the address had been confirmed, and an administrator with a
+second factor was one password away from every table. Counting the attempts, which is what
+this module did first, limits the guessing and does nothing about a password that is right.
+
+So the login here is a signpost. Whoever is not signed in is sent to Postulo's sign-in,
+which has every stage and every limit already, and comes back afterwards.
 """
 
 from __future__ import annotations
 
-from allauth.core import ratelimit
 from django.contrib.admin.apps import AdminConfig
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth import REDIRECT_FIELD_NAME
+from django.contrib.auth.decorators import login_not_required
+from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.cache import never_cache
 
 
-class ThrottledAdminSite(AdminSite):
-    """The admin, with its login held to the same limits as Postulo's own."""
+class PostuloAdminSite(AdminSite):
+    """The admin, reached through Postulo's own sign-in and no other way."""
 
+    @method_decorator(never_cache)
+    @login_not_required
     def login(self, request, extra_context=None):
-        # Only a POST is an attempt; allauth's limiter ignores GET for the same reason, so
-        # loading the form as often as you like costs nothing and guessing does.
-        if request.method == "POST":
-            refusal = ratelimit.consume_or_429(
-                request,
-                action="admin_login",
-                # The username being guessed against, so a thousand attempts on one account
-                # are counted together however many addresses they come from. Truncated
-                # because the key goes into a cache key and the field is not length-checked
-                # until the form validates, which is after this.
-                key=(request.POST.get("username") or "")[:150],
-            )
-            if refusal is not None:
-                return refusal
-        return super().login(request, extra_context)
+        """Send the visitor where they can sign in, or on to where they were going.
+
+        Django's view is never called, and not merely wrapped. allauth ships a decorator
+        for wrapping it, which lets the view run for somebody already signed in as staff;
+        and the view reads a POST from them, so an administrator holding a colleague's
+        password would still become that colleague with no second factor asked for.
+        """
+        # Here and not at the top: this module is an app config's, read while the apps are
+        # still loading, and the auth views bring the user model in with them.
+        from django.contrib.auth.views import redirect_to_login
+
+        wanted = request.POST.get(REDIRECT_FIELD_NAME) or request.GET.get(REDIRECT_FIELD_NAME)
+        if not wanted or not url_has_allowed_host_and_scheme(
+            wanted, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+        ):
+            wanted = reverse("admin:index", current_app=self.name)
+
+        if self.has_permission(request):
+            return HttpResponseRedirect(wanted)
+        if request.user.is_authenticated:
+            # Signed in, and not staff. Django shows them its form to sign in as somebody
+            # else; there is no form here, and signing in again would change nothing.
+            raise PermissionDenied
+        return redirect_to_login(wanted, reverse("account_login"))
 
 
 class PostuloAdminConfig(AdminConfig):
     """Replaces ``django.contrib.admin`` in ``INSTALLED_APPS`` to install the site above."""
 
-    default_site = "postulo.core.admin_site.ThrottledAdminSite"
+    default_site = "postulo.core.admin_site.PostuloAdminSite"
