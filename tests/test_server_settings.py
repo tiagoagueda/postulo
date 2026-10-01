@@ -389,6 +389,52 @@ def test_defaults_name_the_instance_and_seed_new_accounts(client, admin):
     assert site.default_time_zone() == "Europe/Lisbon"
 
 
+def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admin):
+    """Two forms on one page: an error in the lower one is not an error in the upper.
+
+    The upper form was rebuilt from the languages POST, which carries none of its fields,
+    and from no row: the name came back empty and marked in error, the language and the
+    time zone blank -- and typing the name again and saving that card stored the blanks
+    over defaults nobody had touched (#494).
+    """
+    row = SiteSettings.get()
+    row.instance_name = "Jobs at Home"
+    row.default_language = "pt-pt"
+    row.default_time_zone = "Europe/Lisbon"
+    row.save()
+    client.force_login(admin)
+
+    def name_input(html: str) -> str:
+        return re.search(r'<input[^>]*name="instance_name"[^>]*>', html).group(0)
+
+    # The instance default is not among them, so the list is refused.
+    response = client.post(
+        reverse("server:defaults"),
+        {"offered_languages": ["de"], "offered_languages_submit": "1"},
+    )
+    html = response.content.decode()
+
+    assert response.status_code == 200
+    assert "cannot stop being offered" in html, "the refusal is on the page"
+    assert 'value="Jobs at Home"' in name_input(html)
+    assert "aria-invalid" not in name_input(html), "nobody edited the name"
+    assert re.search(r'<option value="Europe/Lisbon"[^>]*\bselected\b', html)
+    assert re.search(r'<option value="pt-pt"[^>]*\bselected\b', html)
+    assert "This field is required" not in html
+
+    # Nothing ticked at all is the other way to be refused, and it behaves the same.
+    response = client.post(reverse("server:defaults"), {"offered_languages_submit": "1"})
+    html = response.content.decode()
+    assert "At least one language" in html
+    assert 'value="Jobs at Home"' in name_input(html)
+    assert "aria-invalid" not in name_input(html)
+
+    row.refresh_from_db()
+    assert row.instance_name == "Jobs at Home"
+    assert row.default_language == "pt-pt" and row.default_time_zone == "Europe/Lisbon"
+    assert row.offered_languages == []
+
+
 def test_the_instance_default_time_zone_applies_to_a_profile_without_one(client, user):
     from django.utils import timezone
 

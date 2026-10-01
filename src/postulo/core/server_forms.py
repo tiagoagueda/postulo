@@ -186,8 +186,16 @@ class OfferedLanguagesForm(forms.ModelForm):
             if code != languages.SOURCE
         ]
         self.fields["offered_languages"].choices = self.every
-        stored = list(self.instance.offered_languages or [])
-        self.fields["offered_languages"].initial = stored or [code for code, _n in self.every]
+        # Nothing stored means everything is offered, so that is what the page shows: every
+        # box ticked. On `self.initial`, because a model form fills that from the row and
+        # it is read before the field's own `initial` -- the row's empty list used to win,
+        # and the page said "all of them are offered" over thirty-nine empty boxes (#322).
+        # What counts as stored is what `site.offered_languages()` counts: a code Postulo
+        # no longer speaks is passed over. Saved as shown, it is stored as nothing again.
+        stored = [
+            code for code in self.instance.offered_languages or [] if code in languages.NATIVE_NAMES
+        ]
+        self.initial["offered_languages"] = stored or [code for code, _n in self.every]
 
     def rows(self) -> list[dict]:
         """Each checkbox with the flag and the translation state the locale picker shows.

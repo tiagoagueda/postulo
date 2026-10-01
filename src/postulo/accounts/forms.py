@@ -150,6 +150,16 @@ class ResetPasswordKeyForm(AllauthResetPasswordKeyForm):
         with_strength_meter(self)
 
 
+def _percent_suffix(percent) -> str:
+    """What `language_choices` puts after a partly translated language's name.
+
+    Written once, so the rows that show the figure apart from the name take off exactly
+    this and nothing else. They used to cut the name at its first " (", and a name with a
+    region in brackets lost the region too: "français (France)" became "français" (#322).
+    """
+    return f" ({percent}%)"
+
+
 def language_choices() -> list[tuple[str, str]]:
     """Languages this instance offers, plus an option to follow the browser.
 
@@ -193,7 +203,7 @@ def language_choices() -> list[tuple[str, str]]:
         elif row.get("percent", 0) < 95:
             # A bare percentage carries no language of its own, so it can stay beside the
             # name without putting English inside an option marked as something else.
-            partial.append((code, f"{name} ({row['percent']}%)"))
+            partial.append((code, f"{name}{_percent_suffix(row['percent'])}"))
         elif row.get("drafts", 0):
             drafted.append((code, name))
         else:
@@ -1033,7 +1043,12 @@ class LocaleForm(forms.ModelForm):
             # somewhere to show it. Here it does not have to: the name goes inside the span
             # marked as being in that language, and the figure sits outside it in the
             # interface language, where it belongs (#119).
-            "name": str(name).partition(" (")[0] if state == "partial" else name,
+            # Only what was appended comes off: a region in brackets is part of the name,
+            # and a name that arrives without the figure -- the list on *Server settings
+            # -> Defaults* passes the bare one -- is left exactly as it is (#322).
+            "name": (
+                str(name).removesuffix(_percent_suffix(percent)) if state == "partial" else name
+            ),
             "country": languages.flag_country(code),
             "selected": code == current,
             "state": state,

@@ -8,6 +8,8 @@ tomorrow and a hundred silently rewritten profiles cannot be put back.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.urls import reverse
 
@@ -190,3 +192,133 @@ def test_saving_the_other_form_does_not_disturb_the_list(client, django_user_mod
 
     assert site.offered_languages() == ["de"]
     assert site.instance_name() == "Somewhere"
+
+
+# ---------------------------------------------- nothing stored, on the page (#322)
+
+
+def boxes(html: str) -> tuple[set[str], set[str]]:
+    """The language boxes on the page: every code, and the codes that are ticked."""
+    inputs = re.findall(r'<input[^>]*name="offered_languages"[^>]*>', html)
+    codes = {re.search(r'value="([^"]+)"', box).group(1) for box in inputs}
+    ticked = {re.search(r'value="([^"]+)"', box).group(1) for box in inputs if " checked" in box}
+    return codes, ticked
+
+
+@pytest.fixture
+def administrator(client, django_user_model):
+    admin = django_user_model.objects.create_user(
+        email="admin@example.org", username="admin", password="x", is_staff=True
+    )
+    client.force_login(admin)
+    return admin
+
+
+def test_a_fresh_instance_shows_every_language_ticked(client, administrator):
+    """The page says all of them are offered, so every box says it too.
+
+    No row is stored at all here. The form's initial value came from the record, an empty
+    list, and that overrode the field's own "all of them": thirty-nine empty boxes under a
+    sentence saying every language is offered (#322).
+    """
+    assert not SiteSettings.objects.exists()
+
+    html = client.get(reverse("server:defaults")).content.decode()
+    codes, ticked = boxes(html)
+
+    assert "All of them are offered" in html
+    assert len(codes) > 30
+    assert ticked == codes
+
+
+def test_a_saved_row_with_nothing_narrowed_shows_every_language_ticked(
+    client, administrator, settings_row
+):
+    """The same once *Defaults* has been saved: an empty list is the setting, not its absence."""
+    codes, ticked = boxes(client.get(reverse("server:defaults")).content.decode())
+
+    assert codes and ticked == codes
+
+
+def test_saving_the_page_as_shown_keeps_offering_everything(client, administrator, settings_row):
+    """Unchanged in, unchanged out: still nothing stored, so a later language is offered too.
+
+    A list naming today's languages would look the same on this page and freeze the set on
+    the day somebody pressed Save.
+    """
+    before = offered_codes()
+    _codes, ticked = boxes(client.get(reverse("server:defaults")).content.decode())
+
+    response = client.post(
+        reverse("server:defaults"),
+        {"offered_languages": sorted(ticked), "offered_languages_submit": "1"},
+    )
+
+    assert response.status_code == 302
+    assert SiteSettings.get().offered_languages == []
+    assert site.offered_languages() == []
+    assert site.offers("a-language-postulo-does-not-have-yet")
+    assert offered_codes() == before
+
+
+def test_a_narrowed_list_ticks_its_own_and_no_others(client, administrator, settings_row):
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de", "pt-pt"])
+
+    html = client.get(reverse("server:defaults")).content.decode()
+    _codes, ticked = boxes(html)
+
+    assert ticked == {"de", "pt-pt"}
+    assert "All of them are offered" not in html
+
+
+def test_only_codes_postulo_no_longer_speaks_is_everything(client, administrator, settings_row):
+    """`site.offered_languages()` passes such a code over and so offers everything; the
+    boxes follow what is in force, not what happens to be written in the row."""
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["not-a-language"])
+
+    html = client.get(reverse("server:defaults")).content.decode()
+    codes, ticked = boxes(html)
+
+    assert site.offered_languages() == []
+    assert "All of them are offered" in html
+    assert ticked == codes
+
+
+def test_a_refused_list_comes_back_as_it_was_sent(client, administrator, settings_row):
+    """What was posted is what is shown beside the error, not every box ticked over it."""
+    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="pt-pt")
+
+    response = client.post(
+        reverse("server:defaults"),
+        {"offered_languages": ["de"], "offered_languages_submit": "1"},
+    )
+    _codes, ticked = boxes(response.content.decode())
+
+    assert response.status_code == 200
+    assert ticked == {"de"}
+    assert site.offered_languages() == []
+
+
+# ------------------------------------ a region in brackets is part of the name (#322)
+
+
+def test_a_partly_translated_regional_language_keeps_its_region(client, administrator, monkeypatch):
+    """The row's name was cut at its first " (" to take off a percentage this list never
+    appended, and took the region with it: "français" where the page means "français
+    (France)", and nothing to tell it from "français (Canada)" the day that is added."""
+    from postulo.core import languages
+
+    monkeypatch.setattr(
+        languages,
+        "translation_status",
+        lambda: {"fr-fr": {"total": 100, "translated": 40, "drafts": 40, "percent": 40}},
+    )
+
+    html = client.get(reverse("server:defaults")).content.decode()
+    row = next(
+        row
+        for row in re.findall(r"<label[^>]*>(.*?)</label>", html, re.S)
+        if 'value="fr-fr"' in row
+    )
+
+    assert '<span lang="fr-fr">français (France)</span>' in row

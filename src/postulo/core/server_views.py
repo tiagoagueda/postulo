@@ -590,8 +590,16 @@ class DefaultsView(PolicyView):
 
         form = self.languages_form(data=request.POST)
         if not form.is_valid():
-            self.object = None
-            return self.render_to_response(self.get_context_data(languages_form=form))
+            # The form above is drawn from the stored row, unbound. Left to build itself
+            # it would be bound to this POST, which carries none of its fields: the name
+            # came back empty and in error, the language and the time zone blank, and
+            # saving that card next stored the blanks (#494).
+            self.object = self.get_object()
+            return self.render_to_response(
+                self.get_context_data(
+                    form=self.get_form_class()(instance=self.object), languages_form=form
+                )
+            )
         form.save()
         messages.success(request, _("Saved."))
         return redirect("server:defaults")
