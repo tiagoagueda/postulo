@@ -162,6 +162,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- On *Your details*, changing one postal address into another that is removed or changed in the same save no longer answers with a server error, and an address one of your contacts already holds is refused on its row, with the reason, instead of by the database. (#458)
 - With *Address rules by country* switched off for you, or for everybody, the address rows on *Your details* keep their neutral names and say nothing about a country; the switch had no effect on that page. (#635)
 - An API refusal's `detail` is a translated sentence every time, in the language of the account that owns the token and not the client's, and carries `request_id`, the id in `X-Request-ID` and in the log. What a call writes, such as an interview's reminder, is worded and timed for its owner too. (#393)
 - Erasing a contact no longer ends in an error page when a plugin's eraser fails. It is refused, with nothing removed, while a plugin holds rows about the person that it cannot remove; and a plugin that fails during an export, a merge or an erasure is logged. (#371)

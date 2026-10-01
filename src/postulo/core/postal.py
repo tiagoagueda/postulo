@@ -285,10 +285,44 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
 
     A row the page still carries and the table no longer holds has already been removed
     (`RowsAlreadyGone`).
+
+    **The constraint is per owner and the page is per holder**, and the rows used to be
+    compared only with one another, so two ordinary edits got past the form and were
+    answered by the database with a 500 (#458). Somebody moving house changed their first
+    address into their second and removed the second: the first row's UPDATE ran while the
+    second still existed. And an address typed on *Your details* that a contact of theirs
+    already held met nothing in the form to say so. So the form now answers for everything
+    the constraint will ask -- what the account lists anywhere outside these rows -- and
+    the rows are written in an order in which none is in another's way.
     """
+
+    #: Whose rows these are while there is no holder to ask. Set by `formset_for`.
+    person = None
+
+    def _listed_elsewhere(self) -> set[str]:
+        """What this account already lists that is not one of the rows on this page.
+
+        Another holder's -- a contact's, which an archive brings -- and this holder's own
+        where the page does not carry it: a row added from a second tab since this copy
+        was drawn. The rows the page does carry are left out whole, kept and removed
+        alike, because what they will hold after the save is what was posted, and that is
+        compared below.
+        """
+        holder = self.instance
+        owner = owner_of(holder) if holder is not None and holder.pk else self.person
+        if owner is None:
+            return set()
+        here = [form.instance.pk for form in self.initial_forms if form.instance.pk]
+        return set(
+            PostalAddress.objects.filter(owner=owner)
+            .exclude(comparable="")
+            .exclude(pk__in=here)
+            .values_list("comparable", flat=True)
+        )
 
     def clean(self) -> None:
         super().clean()
+        elsewhere = self._listed_elsewhere()
         seen: set[str] = set()
         for form in self.forms:
             if not form.is_valid() or form.cleaned_data.get("DELETE"):
@@ -296,7 +330,7 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
             comparable = form.instance.comparable_form()
             if not comparable:
                 continue
-            if comparable in seen:
+            if comparable in seen or comparable in elsewhere:
                 form.add_error(None, _("This address is already listed."))
             seen.add(comparable)
 
@@ -306,11 +340,45 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
         form.instance.owner = owner_of(self.instance)
         return super().save_new(form, commit=commit)
 
+    def save_existing_objects(self, commit=True):
+        """The rows already kept: the removals first, then the changes.
+
+        Django writes them in the order of the page, and the address somebody changes a
+        row *into* may be one a later row still holds: the row being removed in the same
+        save, or a row being changed into something else. `clean()` has already agreed
+        that no two rows end up alike, so the collision is only ever with a value that is
+        on its way out, and it is taken out of the way first: the removed rows are
+        deleted, and every row about to change gives up its comparable form, which an
+        empty one never collides on. Each then takes its new one as it is saved (#458).
+        """
+        if not commit:
+            return super().save_existing_objects(commit=commit)
+        removing = self.deleted_forms
+        gone = []
+        for form in self.initial_forms:
+            row = form.instance
+            if row.pk is not None and form in removing:
+                gone.append(row)
+                self.delete_existing(row, commit=True)
+        changing = [
+            form.instance.pk
+            for form in self.initial_forms
+            if form.instance.pk is not None and form not in removing and form.has_changed()
+        ]
+        if changing:
+            PostalAddress.objects.filter(pk__in=changing).update(comparable="")
+        saved = super().save_existing_objects(commit=True)
+        # Django passes over a row with no key, which is what a deleted one is by now.
+        self.deleted_objects = gone + self.deleted_objects
+        return saved
+
+    @transaction.atomic
     def save(self, commit: bool = True):
         """Save the rows, then settle which of them is the primary.
 
         The radio names a form prefix rather than a primary key, because a row being added
-        for the first time has no key yet.
+        for the first time has no key yet. In one transaction, so that a row which gave up
+        its comparable form to let another past never keeps the empty one.
         """
         saved = super().save(commit=commit)
         if not commit:
@@ -347,9 +415,11 @@ def formset_for(
         extra=1,
         can_delete=True,
     )
-    return factory(
+    formset = factory(
         data=data,
         instance=holder,
         prefix=prefix,
         form_kwargs={"default_country": default_country, "person": person},
     )
+    formset.person = person
+    return formset

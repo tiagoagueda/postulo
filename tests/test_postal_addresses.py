@@ -327,3 +327,177 @@ def test_a_contacts_address_belongs_to_the_account_that_keeps_the_contact(user):
     formset.save()
 
     assert postal.for_holder(someone).get().owner == user
+
+
+# ------------------------------------- what the account already lists, and the order (#458)
+
+
+def kept_rows(*rows, prefix="addresses"):
+    """The POST for rows the page was drawn with, each a dict of what its boxes hold.
+
+    ``id`` is the saved row the form stands for and ``DELETE`` its *Remove* box; a dict with
+    no ``id`` is a row being added, and those come last, as the page draws them.
+    """
+    saved = [row for row in rows if row.get("id")]
+    assert rows[: len(saved)] == tuple(saved), "the saved rows first, as on the page"
+    data = {
+        f"{prefix}-TOTAL_FORMS": str(len(rows)),
+        f"{prefix}-INITIAL_FORMS": str(len(saved)),
+        f"{prefix}-MIN_NUM_FORMS": "0",
+        f"{prefix}-MAX_NUM_FORMS": "1000",
+    }
+    for index, row in enumerate(rows):
+        parts = {
+            "kind": "",
+            "label": "",
+            "street": "",
+            "postcode": "1000-001",
+            "municipality": "Lisboa",
+            "region": "",
+            "country": "PT",
+        }
+        parts.update(row)
+        for name, value in parts.items():
+            data[f"{prefix}-{index}-{name}"] = str(value)
+    return data
+
+
+def your_details(**rows) -> dict:
+    return {"first_name": "Alex", "last_name": "Morgan", "location": "", **rows}
+
+
+def test_moving_into_an_address_being_removed_in_the_same_save(client, user):
+    """Somebody moves to their second address: the first row is changed into it and the
+    second removed, in one save. The first row's UPDATE ran while the second still existed,
+    and the constraint answered with a 500 and took the rest of the page with it."""
+    home = an_address(user, street="Rua A 1", is_primary=True)
+    second = an_address(user, street="Rua B 2")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        your_details(
+            **kept_rows(
+                {"id": home.pk, "street": "Rua B 2"},
+                {"id": second.pk, "street": "Rua B 2", "DELETE": "on"},
+            )
+        ),
+    )
+
+    assert response.status_code == 302
+    assert [row.street for row in postal.for_holder(user.profile)] == ["Rua B 2"]
+    assert postal.for_holder(user.profile).get().pk == home.pk, "the row kept is the one changed"
+
+
+def test_two_rows_may_change_places_in_one_save(client, user):
+    """The same collision by another road: each row changed into what the other held."""
+    first = an_address(user, street="Rua A 1", is_primary=True)
+    second = an_address(user, street="Rua B 2")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        your_details(
+            **kept_rows(
+                {"id": first.pk, "street": "Rua B 2"},
+                {"id": second.pk, "street": "Rua A 1"},
+            )
+        ),
+    )
+
+    assert response.status_code == 302
+    first.refresh_from_db()
+    second.refresh_from_db()
+    assert (first.street, second.street) == ("Rua B 2", "Rua A 1")
+    assert first.comparable and second.comparable, "each took its comparable form back"
+
+
+def test_a_row_changed_into_what_another_is_changing_out_of(client, user):
+    first = an_address(user, street="Rua A 1", is_primary=True)
+    second = an_address(user, street="Rua B 2")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        your_details(
+            **kept_rows(
+                {"id": first.pk, "street": "Rua B 2"},
+                {"id": second.pk, "street": "Rua C 3"},
+            )
+        ),
+    )
+
+    assert response.status_code == 302
+    streets = sorted(row.street for row in postal.for_holder(user.profile))
+    assert streets == ["Rua B 2", "Rua C 3"]
+
+
+def test_an_address_a_contact_already_holds_is_said_and_not_a_crash(client, user):
+    """The constraint is per owner and not per holder, and a contact can hold addresses --
+    an archive brings them. The form compared the page's rows only with one another, so
+    this was left for the database to refuse."""
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    someone = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    an_address(user, holder=someone)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"), your_details(**address_rows("Rua do Exemplo 1"))
+    )
+
+    assert response.status_code == 200
+    assert "This address is already listed." in response.content.decode()
+    assert not postal.for_holder(user.profile).exists()
+
+
+def test_somebody_elses_contact_holding_it_is_nobodys_business(client, user, other_user):
+    """Per owner still: another account's contact at the same address refuses nothing and
+    discloses nothing (#92)."""
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=other_user, name="Aperture")
+    someone = Contact.objects.create(owner=other_user, company=company, name="Cave Johnson")
+    an_address(other_user, holder=someone)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"), your_details(**address_rows("Rua do Exemplo 1"))
+    )
+
+    assert response.status_code == 302
+    assert postal.for_holder(user.profile).count() == 1
+
+
+def test_a_row_added_from_another_tab_is_said_too(user):
+    """A copy of the page drawn before a row was added elsewhere does not carry that row,
+    so nothing on it stands for it; typing the same address is still a repeat."""
+    kept = an_address(user, street="Rua A 1", is_primary=True)
+    an_address(user, street="Rua B 2")  # added since this copy of the page was drawn
+
+    formset = postal.formset_for(
+        user.profile,
+        data=kept_rows({"id": kept.pk, "street": "Rua A 1"}, {"street": "Rua B 2"}),
+    )
+
+    assert not formset.is_valid()
+    assert "This address is already listed." in str(formset.forms[1].non_field_errors())
+
+
+def test_removing_a_row_and_typing_it_again_in_one_save(user):
+    """The rows being removed are left out of the comparison, and the removal is written
+    first, so the same address typed into the empty row is not a repeat."""
+    kept = an_address(user, street="Rua A 1", is_primary=True)
+    was = kept.pk
+
+    formset = postal.formset_for(
+        user.profile,
+        data=kept_rows({"id": was, "street": "Rua A 1", "DELETE": "on"}, {"street": "Rua A 1"}),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+    assert [row.street for row in postal.for_holder(user.profile)] == ["Rua A 1"]
+    assert postal.for_holder(user.profile).get().pk != was
+    assert len(formset.deleted_objects) == 1, "and the save still says what went"
