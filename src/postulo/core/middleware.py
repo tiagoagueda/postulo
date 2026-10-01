@@ -1,7 +1,12 @@
-"""Request-scoped preferences for the signed-in person, and the answer htmx understands."""
+"""Request-scoped preferences for the signed-in person, and the answer htmx understands.
+
+Also the request's id, and the one request answered before the host list is read: the
+container's own health check.
+"""
 
 from __future__ import annotations
 
+import ipaddress
 import zoneinfo
 from urllib.parse import urlsplit
 
@@ -17,6 +22,59 @@ from postulo.core import languages, logs
 #: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
 #: completeness; nothing in Postulo answers with either.
 REDIRECTS = frozenset({301, 302, 303, 307, 308})
+
+#: Where the health check is mounted, without the script prefix `path_info` never carries.
+HEALTH_CHECK_PATH = "/healthz"
+
+
+class HealthProbeMiddleware:
+    """Answer the container's own health check before the host list is consulted (#580).
+
+    The image's ``HEALTHCHECK`` asks ``http://127.0.0.1:8000/healthz``, so it arrives as
+    ``Host: 127.0.0.1:8000``. ``CommonMiddleware`` refuses a host that is not in
+    ``ALLOWED_HOSTS`` before any view runs, and an operator who set
+    ``POSTULO_ALLOWED_HOSTS`` to their own name -- which is what the install pages say to
+    do -- got a 400 on every probe: a container serving pages was marked unhealthy, and
+    the scheduler and worker, which wait for a healthy one, never started.
+
+    So that one request is answered here, directly in front of the host check. **Only
+    that one**: a read of the health check's own address, from a loopback peer, that no
+    proxy passed on. A proxy on the same host is a loopback peer as well, and what it
+    carries is the world's, so a request that came with a forwarding header takes the
+    ordinary path and needs an allowed host like everything else.
+
+    Not any earlier in the chain. ``SecurityMiddleware`` must still be what decides
+    whether plain HTTP is let through (``SECURE_REDIRECT_EXEMPT``, #82), and answering
+    ahead of it would make that exemption untestable.
+
+    The alternative was to always admit ``localhost`` and have the probe send it as its
+    host. That widens the host list for every page in order to fix one address, and
+    ``ALLOWED_HOSTS`` exists because pages build links from the host they were asked by.
+    The health check builds nothing from it.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if self._is_the_probe(request):
+            from . import views
+
+            return views.healthz(request)
+        return self.get_response(request)
+
+    @staticmethod
+    def _is_the_probe(request) -> bool:
+        if request.method not in ("GET", "HEAD") or request.path_info != HEALTH_CHECK_PATH:
+            return False
+        # `TrustedProxyMiddleware` leaves this behind whenever a trusted peer sent a
+        # forwarding header, including one it could make nothing of.
+        if "POSTULO_PROXY_ADDR" in request.META:
+            return False
+        try:
+            return ipaddress.ip_address(request.META.get("REMOTE_ADDR", "")).is_loopback
+        except ValueError:
+            return False
 
 
 class HtmxLoginRedirectMiddleware:

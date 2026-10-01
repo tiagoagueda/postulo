@@ -160,6 +160,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The container's own health check is answered whatever `POSTULO_ALLOWED_HOSTS` holds. With only the public host named it was refused with a `400`, so a working container was reported unhealthy and the scheduler and worker never started. (#580)
 - *Settings → Account → Passkeys → Manage* opens: it answered with a server error for everybody who had a passkey, so one could not be renamed or removed. (#424)
 - A Norwegian reader is given the occupation and skill names ESCO publishes in Norwegian, where the English ones were shown; and a language menu keeps a language it does not list, where saving a CV or a letter wrote blank over it. (#337)
 - *Your career → Other languages* saves a translation under a language and nothing else: a mistyped address used to store it under whatever was typed, and answered with a server error on PostgreSQL. (#620)

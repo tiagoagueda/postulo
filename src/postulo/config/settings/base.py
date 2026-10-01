@@ -98,6 +98,10 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     # Django's own, saying the language it chose the way Postulo writes one (#337).
     "postulo.core.middleware.LocaleMiddleware",
+    # Directly in front of the host check, which is the one thing it is here to step
+    # round: the container's own health check asks by `127.0.0.1`, whatever names the
+    # operator put in POSTULO_ALLOWED_HOSTS (#580).
+    "postulo.core.middleware.HealthProbeMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
