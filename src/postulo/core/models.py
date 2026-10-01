@@ -652,11 +652,19 @@ class WebLink(OwnedModel):
     answers. The only thing worse than a job tracker that fetches nothing is one quietly
     making requests nobody asked for.
 
-    **Unique per holder, not across the instance.** A number belongs to one person; a
-    website does not. Two contacts at one company share its site, two people on a family
-    instance share a blog, and refusing the second would disclose in refusing it that
-    somebody else here has the same address. The same address listed twice for one holder
-    is a mistake worth catching, and that is all the constraint says.
+    **Unique per holder and kind, not across the instance.** A number belongs to one
+    person; a website does not. Two contacts at one company share its site, two people on
+    a family instance share a blog, and refusing the second would disclose in refusing it
+    that somebody else here has the same address. The same address listed twice in one
+    block is a mistake worth catching, and that is all the constraint says.
+
+    **Once under each kind**, because one address can honestly be two things: a GitHub
+    profile is where somebody's code is and, for many people, the only site they have. The
+    constraint used to say once per holder whatever the kind, while every check in front
+    of it looked at one kind at a time -- the three blocks are three formsets, and the
+    boxes shown while a feature is off are saved one by one -- so the same address under
+    two kinds passed every check and then broke the constraint, taking the page with it
+    (#457).
     """
 
     class Kind(models.TextChoices):
@@ -693,8 +701,8 @@ class WebLink(OwnedModel):
                 name="one_primary_web_link_per_holder_and_kind",
             ),
             models.UniqueConstraint(
-                fields=("content_type", "object_id", "url"),
-                name="web_link_unique_per_holder",
+                fields=("content_type", "object_id", "kind", "url"),
+                name="web_link_unique_per_holder_and_kind",
             ),
         ]
         indexes = [models.Index(fields=("content_type", "object_id"))]

@@ -938,8 +938,10 @@ class _Planner:
             block.kind: Section("web_links", block.legend, link_kind=block.kind)
             for block in links.BLOCKS
         }
-        mine = {_same_address(row.url) for row in self._mine("web_links")}
-        seen: set[str] = set()
+        # An address is listed once under each kind, so the same one may be a repository
+        # and a website both (#457): what is already here is asked per kind.
+        mine = {(row.kind, _same_address(row.url)) for row in self._mine("web_links")}
+        seen: set[tuple[str, str]] = set()
         # Where a row goes that does not say which of the three it is.
         unsorted = Section("web_links", capfirst(str(WebLink._meta.verbose_name_plural)))
         for entry in self.held.get("web_links") or []:
@@ -973,7 +975,7 @@ class _Planner:
                 instance=instance,
                 wants_primary=entry.get("is_primary") is True,
             )
-            key = _same_address(instance.url)
+            key = (kind, _same_address(instance.url))
             if key in mine:
                 row.outcome = PRESENT
             elif key in seen:

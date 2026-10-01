@@ -121,8 +121,9 @@ def add_contact(request, pk: int, payload: ContactIn):
     # field has always taken whatever profile a client had (#305).
     linkedin = (fields.pop("linkedin_url", "") or "").strip()
     links = list(fields.pop("web_links", None) or [])
-    if linkedin and not any(row["url"].strip() == linkedin for row in links):
-        leads = not any(row["kind"] == web_links.Kind.SOCIAL and row["is_primary"] for row in links)
+    social = [row for row in links if row["kind"] == web_links.Kind.SOCIAL]
+    if linkedin and not any(row["url"].strip() == linkedin for row in social):
+        leads = not any(row["is_primary"] for row in social)
         links.insert(0, {"kind": web_links.Kind.SOCIAL, "url": linkedin, "is_primary": leads})
     # Checked before anything is written: a link filed under a service has to be one of
     # that service's addresses, and a refusal leaves no contact behind it.

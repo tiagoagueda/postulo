@@ -511,11 +511,12 @@ def merge_companies(kept, other) -> Plan:
 
 def _link_moves(kept, other) -> tuple[list, list]:
     """The other person's links: the ones that move, and the ones the kept one already
-    lists at the same address, which a holder may not list twice."""
-    ours = {row.url for row in kept.web_links.all()}
+    lists at the same address under the same kind, which a holder may not list twice. The
+    same address under another kind is another link, and moves (#457)."""
+    ours = {(row.kind, row.url) for row in kept.web_links.all()}
     moving, already = [], []
     for row in other.web_links.all():
-        (already if row.url in ours else moving).append(row)
+        (already if (row.kind, row.url) in ours else moving).append(row)
     return moving, already
 
 

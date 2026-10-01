@@ -316,7 +316,8 @@ def checked_rows(rows) -> list[dict]:
     address it is about, and nothing has been written.
     """
     found: list[dict] = []
-    seen: set[str] = set()
+    # Once under each kind: one address may be a repository and a website both (#457).
+    seen: set[tuple[str, str]] = set()
     for row in rows:
         kind = str(row.get("kind") or "")
         url = str(row.get("url") or "").strip()
@@ -327,10 +328,10 @@ def checked_rows(rows) -> list[dict]:
             )
         if not url:
             raise ValidationError(_("A link needs an address."), code="url")
-        if url in seen:
+        if (kind, url) in seen:
             listed = _("This address is already listed.")
             raise ValidationError(f"{url}: {listed}", code="duplicate")
-        seen.add(url)
+        seen.add((kind, url))
         try:
             service, label = link_services.settle(
                 kind, str(row.get("service") or ""), url, str(row.get("label") or "")
@@ -552,7 +553,13 @@ class WebLinkForm(forms.ModelForm):
 
 
 class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet):
-    """The rows of one kind together: nothing listed twice for this holder.
+    """The rows of one kind together: nothing listed twice in this block.
+
+    Twice in *this* block, and not twice for the holder. The three blocks are three
+    formsets, and none sees what another is adding in the same save, so a rule about the
+    holder's every link could only be checked against the table -- where an address being
+    added under two kinds at once is in neither yet. The table holds the rule this can
+    keep: once under each kind (#457).
 
     A row the page still carries and the table no longer holds has already been removed
     (`RowsAlreadyGone`).
@@ -566,7 +573,7 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
         holder = self.instance
         already: set[str] = set()
         if holder is not None and holder.pk:
-            already = set(holder.web_links.values_list("url", flat=True))
+            already = set(holder.web_links.filter(kind=self.kind).values_list("url", flat=True))
         seen: set[str] = set()
         for form in self.forms:
             if not form.is_valid() or form.cleaned_data.get("DELETE"):

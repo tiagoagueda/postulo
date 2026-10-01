@@ -116,13 +116,18 @@ def test_making_one_primary_takes_it_off_the_other_of_its_kind(contact, user):
     assert site.is_primary, "a different kind, so a different question"
 
 
-def test_an_address_is_listed_once_per_holder_and_freely_between_holders(contact, user, other_user):
+def test_an_address_is_listed_once_per_kind_and_freely_between_holders(contact, user, other_user):
+    """Once in a block, which is the mistake worth catching. Under another kind it is
+    another link: one address can be where somebody's code is and their only site (#457)."""
     from postulo.jobs.models import Company, Contact
 
     add(contact, user, "https://aperture.example", kind=WEBSITE, primary=True)
     with pytest.raises(IntegrityError):
         with transaction.atomic():
-            add(contact, user, "https://aperture.example", kind=SOCIAL)
+            add(contact, user, "https://aperture.example", kind=WEBSITE)
+    add(contact, user, "https://aperture.example", kind=SOCIAL)
+    assert contact.web_links.filter(url="https://aperture.example").count() == 2
+    contact.web_links.filter(kind=SOCIAL).delete()
 
     colleague = Contact.objects.create(owner=user, company=contact.company, name="Caroline")
     add(colleague, user, "https://aperture.example", kind=WEBSITE, primary=True)
@@ -245,6 +250,136 @@ def test_the_same_address_twice_in_one_post_is_refused(client, user):
     assert response.status_code == 200, "the form came back rather than saving"
     assert "already listed" in response.content.decode()
     assert not user.profile.web_links.exists()
+
+
+@pytest.mark.parametrize("several", [True, False], ids=["three blocks", "three boxes"])
+def test_the_same_address_under_two_kinds_is_saved_as_two_links(client, user, several):
+    """A GitHub profile is a code repository and, for many people, their website.
+
+    The constraint said once per holder whatever the kind, while each block and each box
+    checked its own kind alone, so this passed every check and then raised `IntegrityError`:
+    a 500, with everything else typed on the page lost (#457). With the three features
+    off it is the two single boxes that hold the same address, saved one by one.
+    """
+    if not several:
+        switch_off(user)
+    client.force_login(user)
+    address = "https://github.com/alex"
+    if several:
+        posted = {
+            **rows("repositories", {"label": "", "url": address}),
+            **rows("websites", {"label": "", "url": address}),
+        }
+    else:
+        posted = {"social_profile": "", "repository": address, "website": address}
+
+    response = client.post(reverse("accounts:profile"), {**PROFILE_POST, **posted})
+
+    assert response.status_code == 302, response.content.decode()[:500]
+    saved = {(row.kind, row.url, row.is_primary) for row in user.profile.web_links.all()}
+    assert saved == {("repository", address, True), ("website", address, True)}
+
+
+def test_one_box_and_one_block_may_hold_the_same_address(client, user):
+    """The mixed case: one kind's feature off, so a box, beside a kind that is a block."""
+    switch_off(user, WEBSITES)
+    client.force_login(user)
+    address = "https://github.com/alex"
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            **PROFILE_POST,
+            "website": address,
+            **rows("repositories", {"label": "", "url": address}),
+        },
+    )
+
+    assert response.status_code == 302, response.content.decode()[:500]
+    assert {row.kind for row in user.profile.web_links.filter(url=address)} == {
+        "repository",
+        "website",
+    }
+
+
+def test_a_contact_takes_the_same_address_under_two_kinds_too(client, user, contact):
+    client.force_login(user)
+    address = "https://cave.example"
+
+    response = client.post(
+        reverse("jobs:contact_update", args=[contact.pk]),
+        contact_post(
+            contact,
+            **rows("social_profiles", {"label": "Site", "service": "other", "url": address}),
+            **rows("websites", {"label": "", "url": address}),
+        ),
+    )
+
+    assert response.status_code == 302, response.content.decode()[:500]
+    assert contact.web_links.filter(url=address).count() == 2
+
+
+def test_an_address_already_listed_under_another_kind_is_not_a_duplicate(client, user):
+    """What the block compares with is its own kind's rows, as the table does."""
+    add(user.profile, user, "https://github.com/alex", kind=REPOSITORY, primary=True)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"),
+        {**PROFILE_POST, **rows("websites", {"label": "", "url": "https://github.com/alex"})},
+    )
+
+    assert response.status_code == 302, response.content.decode()[:500]
+    assert user.profile.web_links.count() == 2
+
+
+def test_an_archive_a_merge_and_the_api_keep_one_address_under_two_kinds(client, user, contact):
+    """Everything else that compared addresses compared them across kinds as well, and
+    would have dropped the second link on the way in, or left it behind in a merge."""
+    from postulo.api.models import ApiToken
+    from postulo.core.importer import _restore_web_links
+    from postulo.jobs.merging import merge_contacts
+    from postulo.jobs.models import Contact
+
+    address = "https://cave.example"
+    _restore_web_links(
+        contact,
+        user,
+        [
+            {"kind": "social", "service": "", "url": address, "is_primary": True},
+            {"kind": "website", "service": "", "url": address, "is_primary": True},
+            {"kind": "website", "service": "", "url": address},
+        ],
+    )
+    assert sorted(contact.web_links.values_list("kind", flat=True)) == ["social", "website"]
+
+    twin = Contact.objects.create(owner=user, company=contact.company, name="C. Johnson")
+    add(twin, user, address, kind=REPOSITORY)
+    add(twin, user, address, kind=WEBSITE)
+    merge_contacts(contact, twin)
+    assert sorted(contact.web_links.values_list("kind", flat=True)) == [
+        "repository",
+        "social",
+        "website",
+    ], "the repository moved; the website was already listed and went with its holder"
+
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("write", "read"))
+    response = client.post(
+        f"/api/v1/companies/{contact.company_id}/contacts",
+        data=json.dumps(
+            {
+                "name": "Caroline",
+                "web_links": [
+                    {"kind": "repository", "url": "https://github.com/caroline"},
+                    {"kind": "website", "url": "https://github.com/caroline"},
+                ],
+            }
+        ),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {raw}",
+    )
+    assert response.status_code == 201, response.content
+    assert [row["kind"] for row in response.json()["web_links"]] == ["repository", "website"]
 
 
 def test_the_profile_page_offers_one_box_per_kind_while_the_features_are_off(client, user):

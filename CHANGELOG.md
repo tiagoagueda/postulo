@@ -161,6 +161,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The same address listed under two kinds of link, a GitHub profile as a code repository and as a website, is saved as two links on *Your details* and on a contact: the page answered with a server error and lost everything typed on it. An address is still listed once under each kind. (#457)
 - The Chromium PDF renderer counts as usable only when its browser is installed, not the `playwright` package alone, and one that cannot start says how to install it instead of answering a draft with an error page. (#514)
 - A webhook connection says how its last delivery went: a receiver answering `404` no longer reads as working once another event is queued, and an address refused at delivery is said on the connection. (#574)
 - The container's own health check is answered whatever `POSTULO_ALLOWED_HOSTS` holds. With only the public host named it was refused with a `400`, so a working container was reported unhealthy and the scheduler and worker never started. (#580)

@@ -292,9 +292,9 @@ def _link_rows(entry: dict) -> list[dict]:
 def _restore_web_links(holder, owner, rows: list[dict]) -> None:
     """Recreate a holder's links.
 
-    Unique per holder, so nothing here can collide with anybody else's; a repeated address
-    within one import is dropped, and the first row of each kind to claim the primary
-    keeps it.
+    Unique per holder and kind, so nothing here can collide with anybody else's; an address
+    repeated under one kind within one import is dropped, and the first row of each kind to
+    claim the primary keeps it. The same address under two kinds is two links (#457).
 
     **The service** (#305). Format 29 writes one on every link, blank for *Other*, and it is
     kept where this instance knows it and the address is one of its addresses; a key it
@@ -307,13 +307,13 @@ def _restore_web_links(holder, owner, rows: list[dict]) -> None:
     from postulo.core.models import WebLink
 
     primary_taken: set[str] = set()
-    seen: set[str] = set()
+    seen: set[tuple[str, str]] = set()
     for row in rows:
         url = (row.get("url") or "").strip()[:500]
-        if url in seen:
-            continue
-        seen.add(url)
         kind = row.get("kind")
+        if (kind, url) in seen:
+            continue
+        seen.add((kind, url))
         is_primary = bool(row.get("is_primary")) and kind not in primary_taken
         if is_primary:
             primary_taken.add(kind)
