@@ -450,6 +450,102 @@ def test_a_contacts_one_box_saved_untouched_leaves_its_number(client, user, cont
     assert as_kept() == before
 
 
+# ------------------------------------------------- a row nobody typed a number into
+
+
+def test_a_chooser_showing_its_default_beside_an_empty_box_is_not_a_change():
+    """The blank row of a block posts the country its chooser started on and no number.
+    With nothing stored, Django compared that with two empty strings, found the country
+    different, and called the row changed (#649)."""
+    blank = phone_field.PhoneField(required=False, default_country="GB")
+
+    assert not blank.has_changed(None, ["GB", ""])
+    assert not blank.has_changed("", ["GB", ""])
+    assert not blank.has_changed(None, ["GB", "   "])
+    assert not blank.has_changed(None, ["FR", ""]), "a country beside an empty box is no number"
+    assert not phone_field.PhoneField(required=False).has_changed(None, ["", ""])
+
+    assert blank.has_changed(None, ["GB", "07911 123456"]), "a number typed is a change"
+    assert blank.has_changed(FRENCH, ["FR", ""]), "and so is one emptied"
+    assert blank.has_changed(FRENCH, ["PT", "6 12 34 56 78"])
+    assert blank.has_changed(FRENCH, ["FR", "6 12 34 56 79"])
+    assert not blank.has_changed(FRENCH, ["FR", "6 12 34 56 78"]), "as it was drawn"
+
+
+def test_a_block_of_rows_does_not_save_the_row_nobody_filled_in(user):
+    untouched = {"kind": "", "label": "", "number_0": "GB", "number_1": ""}
+    formset = phone_numbers.formset_for(
+        user.profile, default_country="GB", data=rows(untouched), asked_by=user
+    )
+
+    assert formset.is_valid()
+    assert not formset.forms[0].has_changed()
+    formset.save()
+    assert not PhoneNumber.objects.exists()
+
+
+@pytest.mark.parametrize("language", ["en-GB", "fr-FR", "pt-PT", "pt-BR", "uk"])
+def test_your_details_saved_untouched_stores_no_empty_row(client, user, language):
+    """In a language whose chooser starts on a country, pressing *Save* on a page nobody
+    touched created a telephone row with an empty number -- and, for an account with no
+    number, made it the primary. Posted as a browser posts the page it was given."""
+    a_person_with_a_name(user, language)
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+    data = as_a_browser_would(html, "phone_numbers-TOTAL_FORMS")
+    starts_on = data["phone_numbers-0-number_0"]
+    assert starts_on == ([""] if language == "uk" else [phones.default_country(language)])
+    response = client.post(reverse("accounts:profile"), data)
+
+    assert response.status_code == 302, refused(response)
+    assert not PhoneNumber.objects.exists()
+
+
+def test_a_contact_saved_untouched_stores_no_empty_row(client, user, contact):
+    a_person_with_a_name(user)
+    client.force_login(user)
+    url = reverse("jobs:contact_update", args=[contact.pk])
+
+    html = client.get(url).content.decode()
+    data = as_a_browser_would(html, "phone_numbers-TOTAL_FORMS")
+    assert data["phone_numbers-0-number_0"] == ["GB"], "the chooser starts on a country"
+    response = client.post(url, data)
+
+    assert response.status_code == 302, refused(response)
+    assert not PhoneNumber.objects.exists()
+
+
+def test_saving_untouched_adds_no_row_beside_the_ones_held(client, user):
+    """The table after is the table before: every row as it was, and no other."""
+    a_person_with_a_name(user)
+    store(user.profile, user, SHAPES)
+    before = as_kept()
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+    response = client.post(
+        reverse("accounts:profile"), as_a_browser_would(html, "phone_numbers-TOTAL_FORMS")
+    )
+
+    assert response.status_code == 302, refused(response)
+    assert as_kept() == before
+
+
+def test_a_number_typed_into_the_blank_row_is_still_saved(client, user):
+    a_person_with_a_name(user)
+    client.force_login(user)
+    html = client.get(reverse("accounts:profile")).content.decode()
+    data = as_a_browser_would(html, "phone_numbers-TOTAL_FORMS")
+
+    data["phone_numbers-0-number_1"] = ["07911 123456"]
+    response = client.post(reverse("accounts:profile"), data)
+
+    assert response.status_code == 302, refused(response)
+    row = PhoneNumber.objects.get()
+    assert row.number == "+447911123456" and row.is_primary
+
+
 # -------------------------------------------- stored, and not spelt the way it is dialled
 
 

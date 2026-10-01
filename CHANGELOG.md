@@ -164,6 +164,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Saving *Your details* or a contact untouched no longer stores an empty telephone row where the country chooser starts on a country. An empty row saved before this is on the page, and can be removed there. (#649)
 - The telephone box tells a screen reader that its number was refused and why, and is described by its help: it carries the `aria-invalid` and `aria-describedby` every other field has. (#416)
 - On *Your details*, the box for the state of a postal address reads *Bundesstaat* in German and *Πολιτεία* in Greek, not the word for a status, and so in 28 more languages: the address rules' own translation of *State* is the one drawn. (#651)
 - On *Your details*, changing one postal address into another that is removed or changed in the same save no longer answers with a server error, and an address one of your contacts already holds is refused on its row, with the reason, instead of by the database. (#458)

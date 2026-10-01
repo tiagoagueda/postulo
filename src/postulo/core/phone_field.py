@@ -202,6 +202,26 @@ class PhoneField(forms.MultiValueField):
         if isinstance(widget, PhoneWidget):
             widget.stored = value if isinstance(value, str) else ""
 
+    def has_changed(self, initial, data):
+        """Whether somebody changed the number. A chooser showing its default is not that.
+
+        A field with nothing stored starts from `None`, and Django then compares what was
+        posted, part by part, with two empty strings. The chooser of an empty row is not
+        empty: it starts on the country the reader's language suggests and is posted that
+        way by a row nobody touched. So the blank row at the foot of every block had
+        "changed", the formset saved it, and *Your details* gained a telephone row with no
+        number in it each time the page was saved in a language that suggests a country
+        (#649). In one that suggests none -- Ukrainian -- it never happened.
+
+        Nothing stored and nothing typed is no change, whatever the chooser is on: a
+        country beside an empty box is not a number. Otherwise nothing stored is compared
+        as the widget draws nothing stored, with the chooser on its default.
+        """
+        typed = data[1] if isinstance(data, (list, tuple)) and len(data) > 1 else ""
+        if not initial and not (typed or "").strip():
+            return False
+        return super().has_changed("" if initial is None else initial, data)
+
     def clean(self, value):
         """The stored number exactly as it is kept, unless somebody changed it.
 
