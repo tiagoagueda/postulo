@@ -10,6 +10,11 @@ So records are kept as well as printed. The console handler is untouched, becaus
 away to add a page would be a poor trade. Beside it, a rotating file under the data volume,
 capped by size and count so it cannot fill a disk.
 
+**One file, written by every process.** Three gunicorn workers, the scheduler, the worker and
+each `manage.py` the entrypoint runs all append to the same ``postulo.log``, so the handler
+is `SharedRotatingFileHandler`: the standard one rotates on its own word, and one rotation
+then became one per process (#379).
+
 **One JSON object per line**, not a formatted sentence. A page can then filter by level and
 by logger without parsing prose, the extras a record carried survive, and there is
 something a collector can be handed as-is.
@@ -25,6 +30,7 @@ import contextvars
 import datetime as dt
 import json
 import logging
+import logging.handlers
 import os
 import re
 import uuid
@@ -34,6 +40,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from django.conf import settings
+
+try:
+    import fcntl
+except ImportError:  # Windows, where Postulo is one process and there is no flock to take
+    fcntl = None  # type: ignore[assignment]
 
 #: Fields ``logging`` puts on every record. Anything else was added by the caller and is
 #: worth keeping, which is most of the reason for writing JSON rather than a sentence.
@@ -167,6 +178,99 @@ class JSONFormatter(logging.Formatter):
         return json.dumps(payload, ensure_ascii=False, default=str)
 
 
+# ------------------------------------------------------------------- writing
+
+#: Beside the log, and held only for the moment of a rotation.
+LOCK_SUFFIX = ".lock"
+
+
+class SharedRotatingFileHandler(logging.handlers.RotatingFileHandler):
+    """A size-rotated file that several processes write, rotated by one of them at a time.
+
+    Every Postulo process logs to the same ``postulo.log``. The standard handler decides to
+    rotate from the file *it* holds open and renames without asking anybody, which the
+    logging cookbook says is not supported across processes, and this is why. Worker A
+    rotates. B and C still hold the file A renamed, find it full at their next record, and
+    rotate again, each in turn: the oldest generations fall off the end, the few lines A
+    wrote into its new file become ``.1`` and then ``.2``, and A carries on writing into a
+    file that is already a rotation. One real rotation left one full generation where
+    ``POSTULO_LOG_BACKUPS`` promised three (#379).
+
+    Two things put that right, and neither needs a process to know what the others are:
+
+    - **Look at the file that is there.** Before judging its size, the handler lets go of
+      its stream if the file at the path is no longer the one it holds, so what it measures
+      is the live file and not a rotation somebody else made.
+    - **Rotate one at a time.** The renaming happens under an exclusive lock on a file
+      beside the log, and under it the handler looks again: a process that waited behind
+      another's rotation finds the path already changed and has nothing left to do.
+
+    The lock is never waited for. A log call must not block on another process, and if the
+    lock is taken a rotation is under way, so the record is written to the stream in hand.
+    At worst it lands in the file that has just become ``.1``, a few milliseconds out of
+    place and kept.
+
+    Neither of the tidier designs works here. A file per role still has gunicorn's three
+    workers on one file. A single process that does all the rotating has to be one that is
+    always running, and the scheduler is an optional profile.
+
+    Where there is no ``flock`` -- Windows, which is a developer's machine and one process --
+    or the lock file cannot be made, this is the standard handler and nothing else.
+    """
+
+    def shouldRollover(self, record: logging.LogRecord) -> bool:
+        if fcntl is not None and self.stream is not None and self._moved():
+            self._let_go()
+        return bool(super().shouldRollover(record))
+
+    def doRollover(self) -> None:
+        if fcntl is None:
+            super().doRollover()
+            return
+        try:
+            lock = os.open(self.baseFilename + LOCK_SUFFIX, os.O_RDONLY | os.O_CREAT, 0o644)
+        except OSError:
+            # A directory that will not take one more file. Rotating unguarded is what
+            # happened before, and is better than a log that stops rotating at all.
+            super().doRollover()
+            return
+        try:
+            try:
+                fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            except BlockingIOError:
+                return
+            except OSError:
+                # A filesystem with no locks to give. As above.
+                pass
+            if self.stream is not None and self._moved():
+                # Rotated by somebody else between looking and locking.
+                self._let_go()
+                return
+            super().doRollover()
+        finally:
+            # Opened for this one rotation and closed after it, which is also what gives
+            # the lock back. A descriptor kept open would be inherited across a fork, and
+            # a lock shared with one's own children excludes nobody.
+            os.close(lock)
+
+    def _moved(self) -> bool:
+        """Whether the file at the path is no longer the one this handler holds open."""
+        try:
+            there = os.stat(self.baseFilename)
+            here = os.fstat(self.stream.fileno())
+        except OSError:
+            return True
+        return (there.st_dev, there.st_ino) != (here.st_dev, here.st_ino)
+
+    def _let_go(self) -> None:
+        """Close the stream; the next write opens whatever is at the path now."""
+        stream, self.stream = self.stream, None
+        try:
+            stream.flush()
+        finally:
+            stream.close()
+
+
 # ------------------------------------------------------------------- reading
 
 
@@ -203,7 +307,16 @@ def files() -> list[Path]:
     path = log_path()
     if path is None or not path.parent.is_dir():
         return []
-    rotations = sorted(path.parent.glob(f"{path.name}.*"), key=lambda p: p.name)
+    prefix = f"{path.name}."
+    numbered = []
+    for candidate in path.parent.glob(f"{prefix}*"):
+        number = candidate.name[len(prefix) :]
+        # Only what the handler writes, `.1`, `.2` and so on, and in that order: by name
+        # `.10` came before `.2`. The handler's lock file sits beside them, and so may
+        # anything an operator left there (#379).
+        if number.isascii() and number.isdigit():
+            numbered.append((int(number), candidate))
+    rotations = [candidate for _number, candidate in sorted(numbered)]
     return [p for p in [path, *rotations] if p.is_file()]
 
 

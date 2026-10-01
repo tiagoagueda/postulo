@@ -790,7 +790,9 @@ LOGGING = {
         **(
             {
                 "file": {
-                    "class": "logging.handlers.RotatingFileHandler",
+                    # Not the standard one: every process writes this file, and each
+                    # rotating it on its own word lost most of what was kept (#379).
+                    "class": "postulo.core.logs.SharedRotatingFileHandler",
                     "filename": str(Path(POSTULO_LOG_DIR) / "postulo.log"),
                     "maxBytes": POSTULO_LOG_MAX_BYTES,
                     "backupCount": POSTULO_LOG_BACKUPS,

@@ -249,10 +249,8 @@ def test_the_section_is_in_the_server_settings_sidebar(client, admin_user):
 
 def test_what_a_logger_writes_is_readable_from_the_page(client, admin_user, settings, tmp_path):
     """End to end: the handler the settings configure, through the file, onto the page."""
-    from logging.handlers import RotatingFileHandler
-
     settings.POSTULO_LOG_DIR = str(tmp_path)
-    handler = RotatingFileHandler(tmp_path / "postulo.log", encoding="utf-8")
+    handler = logs.SharedRotatingFileHandler(tmp_path / "postulo.log", encoding="utf-8")
     handler.setFormatter(logs.JSONFormatter())
     logger = logging.getLogger("postulo.tests.wiring")
     logger.addHandler(handler)
@@ -267,6 +265,262 @@ def test_what_a_logger_writes_is_readable_from_the_page(client, admin_user, sett
 
     assert "the store refused it" in html
     assert "paperless" in html, "and the extra it carried"
+
+
+# ------------------------------------------- one file, written by every process
+#
+# Three gunicorn workers, the scheduler, the worker and each `manage.py` the entrypoint
+# runs all append to the same `postulo.log`. The standard handler rotates on its own word,
+# so one rotation became one per process and most of what was kept fell off the end (#379).
+
+#: Where a file somebody still holds open can be renamed, and there is a lock to take.
+needs_flock = pytest.mark.skipif(
+    logs.fcntl is None, reason="no flock here, and an open file cannot be renamed"
+)
+
+A_MOMENT = 1_790_000_000.0
+
+
+class Loud(logs.SharedRotatingFileHandler):
+    """The handler, except that what goes wrong inside it fails the test.
+
+    `logging` swallows an exception raised while writing a record and prints it instead,
+    which is right for an application and would let every test here pass on a traceback.
+    """
+
+    def handleError(self, record):
+        raise
+
+
+def a_handler(path, *, limit: int = 2000, backups: int = 500) -> Loud:
+    handler = Loud(path, maxBytes=limit, backupCount=backups, encoding="utf-8", delay=True)
+    handler.setFormatter(logs.JSONFormatter())
+    return handler
+
+
+def say(handler, message: str, *, at: float = A_MOMENT) -> None:
+    record = logging.LogRecord(
+        "postulo.tests.shared", logging.INFO, __file__, 1, message, None, None
+    )
+    record.created = at
+    handler.emit(record)
+
+
+class NothingToWaitFor:
+    """A lock nobody else holds, for a machine with no `fcntl` of its own."""
+
+    LOCK_EX, LOCK_NB = 2, 4
+
+    @staticmethod
+    def flock(descriptor, how):
+        return None
+
+
+class SomebodyIsRotating(NothingToWaitFor):
+    @staticmethod
+    def flock(descriptor, how):
+        raise BlockingIOError(11, "Resource temporarily unavailable")
+
+
+def test_rotations_are_read_in_the_order_they_were_made(log_dir):
+    """By name, `.10` came before `.2`: from ten backups on, yesterday was read before today."""
+    write(log_dir, a_record(message="current"))
+    for number in range(1, 12):
+        (log_dir / f"postulo.log.{number}").write_text(
+            json.dumps(a_record(message=f"rotation {number}")) + "\n", encoding="utf-8"
+        )
+    # Neither is a rotation: the handler's own lock, and something an operator left.
+    (log_dir / "postulo.log.lock").write_text("", encoding="utf-8")
+    (log_dir / "postulo.log.bak").write_text("not a record\n", encoding="utf-8")
+
+    names = [path.name for path in logs.files()]
+    said = [record.message for record in logs.read(limit=100)]
+
+    assert names == ["postulo.log", *[f"postulo.log.{number}" for number in range(1, 12)]]
+    assert said == ["current", *[f"rotation {number}" for number in range(1, 12)]]
+
+
+def test_the_kept_log_is_written_by_the_handler_that_shares_it(settings):
+    """No process may size-rotate, on its own word, a file that another one writes."""
+    configured = settings.LOGGING["handlers"]["file"]["class"]
+    # By the file it writes: pytest hangs a file handler of its own on the root logger.
+    writing = [
+        handler
+        for handler in logging.getLogger().handlers
+        if getattr(handler, "baseFilename", "").endswith("postulo.log")
+    ]
+
+    assert configured == "postulo.core.logs.SharedRotatingFileHandler"
+    assert writing, "nothing on the root logger writes the kept log"
+    assert all(isinstance(handler, logs.SharedRotatingFileHandler) for handler in writing)
+
+
+def test_one_process_still_rotates_and_keeps_everything(log_dir, monkeypatch):
+    monkeypatch.setattr(logs, "fcntl", NothingToWaitFor)
+    handler = a_handler(log_dir / "postulo.log")
+    try:
+        for number in range(120):
+            say(handler, f"line {number:04d}", at=A_MOMENT + number)
+    finally:
+        handler.close()
+
+    assert (log_dir / "postulo.log.1").is_file(), "nothing was rotated at all"
+    assert [record.message for record in logs.read(limit=1000)] == [
+        f"line {number:04d}" for number in reversed(range(120))
+    ]
+
+
+def test_a_rotation_already_under_way_is_not_waited_for(log_dir, monkeypatch):
+    """A log call must not block on another process. The record is written where it is."""
+    monkeypatch.setattr(logs, "fcntl", SomebodyIsRotating)
+    handler = a_handler(log_dir / "postulo.log", limit=500)
+    try:
+        for number in range(40):
+            say(handler, f"line {number:04d}")
+    finally:
+        handler.close()
+
+    assert not (log_dir / "postulo.log.1").exists(), "it rotated without the lock"
+    assert len(logs.read(limit=1000)) == 40
+
+
+def test_a_lock_that_cannot_be_made_does_not_stop_the_log(log_dir, monkeypatch):
+    """A directory that will not take one more file still gets its records, and rotates."""
+    import os
+
+    really_open = os.open
+
+    def refusing(path, *args, **kwargs):
+        if str(path).endswith(logs.LOCK_SUFFIX):
+            raise PermissionError(13, "Permission denied", str(path))
+        return really_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(logs, "fcntl", NothingToWaitFor)
+    monkeypatch.setattr(logs.os, "open", refusing)
+    handler = a_handler(log_dir / "postulo.log", limit=500)
+    try:
+        for number in range(40):
+            say(handler, f"line {number:04d}", at=A_MOMENT + number)
+    finally:
+        handler.close()
+
+    assert (log_dir / "postulo.log.1").is_file()
+    assert len(logs.read(limit=1000)) == 40
+
+
+@needs_flock
+def test_two_processes_writing_one_file_lose_nothing(log_dir):
+    """Two handlers stand in for two processes, writing turn about past the limit.
+
+    With the standard handler the second one found the file it still held full, rotated
+    again, and pushed out a rotation holding the few lines the first had just written.
+    """
+    one, two = a_handler(log_dir / "postulo.log"), a_handler(log_dir / "postulo.log")
+    try:
+        for number in range(400):
+            say(one if number % 2 else two, f"line {number:04d}", at=A_MOMENT + number)
+    finally:
+        one.close()
+        two.close()
+
+    rotations = logs.files()[1:]
+    assert len(rotations) > 5
+    assert all(path.stat().st_size > 1000 for path in rotations), "a rotation went out half empty"
+    assert [record.message for record in logs.read(limit=10_000)] == [
+        f"line {number:04d}" for number in reversed(range(400))
+    ], "every record, once, and still in the order it was written"
+
+
+@needs_flock
+def test_a_process_that_arrives_after_the_rotation_does_not_rotate_again(log_dir):
+    one, two = (
+        a_handler(log_dir / "postulo.log", limit=500),
+        a_handler(log_dir / "postulo.log", limit=500),
+    )
+    try:
+        say(two, "two holds the file open")
+        while not (log_dir / "postulo.log.1").exists():
+            say(one, "one fills it and rotates")
+
+        two.doRollover()
+        say(two, "written after it")
+    finally:
+        one.close()
+        two.close()
+
+    assert not (log_dir / "postulo.log.2").exists(), "one rotation became two"
+    assert "written after it" in (log_dir / "postulo.log").read_text(encoding="utf-8")
+
+
+@needs_flock
+def test_a_lock_somebody_holds_is_respected(log_dir):
+    import os
+
+    holding = os.open(log_dir / f"postulo.log{logs.LOCK_SUFFIX}", os.O_RDONLY | os.O_CREAT, 0o644)
+    logs.fcntl.flock(holding, logs.fcntl.LOCK_EX | logs.fcntl.LOCK_NB)
+    handler = a_handler(log_dir / "postulo.log", limit=500)
+    try:
+        for number in range(40):
+            say(handler, f"line {number:04d}")
+    finally:
+        handler.close()
+        os.close(holding)
+
+    assert not (log_dir / "postulo.log.1").exists()
+    assert len(logs.read(limit=1000)) == 40
+
+
+WRITER = """
+import logging, sys, time
+from pathlib import Path
+from postulo.core import logs
+
+path, name, go = Path(sys.argv[1]), sys.argv[2], Path(sys.argv[3])
+handler = logs.SharedRotatingFileHandler(
+    path, maxBytes=4000, backupCount=1000, encoding="utf-8", delay=True
+)
+handler.setFormatter(logs.JSONFormatter())
+logger = logging.getLogger("postulo.tests.processes")
+logger.propagate = False
+logger.setLevel(logging.INFO)
+logger.addHandler(handler)
+while not go.exists():
+    time.sleep(0.01)
+for number in range(300):
+    logger.info("%s line %04d", name, number)
+handler.close()
+"""
+
+
+@needs_flock
+def test_real_processes_writing_one_file_lose_nothing(log_dir, tmp_path_factory):
+    """The same, with processes that are processes. Only what must hold whatever the
+    scheduler does is asserted: every record is kept once, and no rotation was pushed out
+    by a process that had not noticed the last one."""
+    import subprocess
+    import sys
+
+    go = tmp_path_factory.mktemp("start") / "go"
+    writers = [
+        subprocess.Popen(  # noqa: S603 - this interpreter, and a script written here
+            [sys.executable, "-c", WRITER, str(log_dir / "postulo.log"), name, str(go)],
+            stderr=subprocess.PIPE,
+        )
+        for name in ("web-1", "web-2", "web-3", "scheduler")
+    ]
+    go.write_text("", encoding="utf-8")
+    complaints = [writer.communicate(timeout=120)[1].decode() for writer in writers]
+
+    assert [writer.returncode for writer in writers] == [0, 0, 0, 0], complaints
+    assert not any("Logging error" in complaint for complaint in complaints), complaints
+    said = sorted(record.message for record in logs.read(limit=10_000))
+    assert said == sorted(
+        f"{name} line {number:04d}"
+        for name in ("web-1", "web-2", "web-3", "scheduler")
+        for number in range(300)
+    )
+    rotations = logs.files()[1:]
+    assert all(path.stat().st_size > 2000 for path in rotations), "a rotation went out half empty"
 
 
 # ------------------------------------------------- what the log must not hold
