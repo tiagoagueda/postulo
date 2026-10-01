@@ -388,3 +388,183 @@ def test_a_new_contact_is_saved_with_the_number_typed_beside_it(client, user, co
     caroline = Contact.objects.get(name="Caroline")
     number = caroline.phone_numbers.get()
     assert number.owner == user and number.number == "+351912345679"
+
+
+# ------------------------------------------------ taken off one row, and put on another
+
+
+def stored_number_rows(*entries, prefix="phone_numbers"):
+    """The POST of a block whose first rows are stored ones. Each entry is the row's key or
+    nothing, its kind, its number, and whether *Remove* is ticked."""
+    data = {
+        f"{prefix}-TOTAL_FORMS": str(len(entries)),
+        f"{prefix}-INITIAL_FORMS": str(sum(1 for key, *_rest in entries if key)),
+        f"{prefix}-MIN_NUM_FORMS": "0",
+        f"{prefix}-MAX_NUM_FORMS": "1000",
+    }
+    for index, (key, kind, number, remove) in enumerate(entries):
+        if key:
+            data[f"{prefix}-{index}-id"] = str(key)
+        data[f"{prefix}-{index}-kind"] = kind
+        data[f"{prefix}-{index}-label"] = ""
+        data[f"{prefix}-{index}-number_0"] = "PT"
+        data[f"{prefix}-{index}-number_1"] = number
+        if remove:
+            data[f"{prefix}-{index}-DELETE"] = "on"
+    return data
+
+
+@pytest.fixture
+def answers_spent(monkeypatch):
+    """Every time the account is told a number is already here, which is rationed (#142)."""
+    spent = []
+    monkeypatch.setattr(phone_numbers, "collision_noticed", spent.append)
+    return spent
+
+
+def test_a_number_taken_off_one_row_can_go_on_another_in_the_same_save(
+    user, contact, answers_spent
+):
+    """Recorded as *Work* and really a mobile: remove the one row and add the other, in one
+    save.
+
+    The block asked whether anybody on the instance held the number and excluded only the
+    row asking, so the row being removed answered for it. The new row was refused in the
+    sentence meant for somebody else's number -- "it may belong to somebody else's
+    records", about a number whose only holder was the row beside it -- and each refusal
+    spent one of the answers kept back from somebody sweeping a numbering range (#461)."""
+    work = add(contact, user, "+351912345678", kind="work", primary=True)
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows(
+            (work.pk, "work", "+351912345678", True),
+            (None, "mobile", "+351912345678", False),
+        ),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    (only,) = contact.phone_numbers.all()
+    assert (only.kind, only.number, only.is_primary) == ("mobile", "+351912345678", True)
+    assert only.pk != work.pk
+    assert answers_spent == [], "nothing was said about anybody else's records"
+
+
+def test_a_stored_number_row_can_take_the_number_of_one_removed_further_down(
+    user, contact, answers_spent
+):
+    """The removal is written first, or the row above it would reach the table while the
+    number was still in it and the instance-wide rule would refuse the save."""
+    first = add(contact, user, "+351211111111", kind="work", primary=True)
+    second = add(contact, user, "+351912345678", kind="mobile")
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows(
+            (first.pk, "work", "+351912345678", False),
+            (second.pk, "mobile", "+351912345678", True),
+        ),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    (only,) = contact.phone_numbers.all()
+    assert (only.pk, only.number, only.is_primary) == (first.pk, "+351912345678", True)
+    assert answers_spent == []
+
+
+def test_a_number_somebody_else_holds_is_still_refused_and_still_counted(
+    user, other_user, contact, answers_spent
+):
+    """Only a row this save removes gives its number up. Another account's row does not,
+    whatever is ticked here, and the answer about it is the rationed one."""
+    add(other_user.profile, other_user, "+351912345678")
+    mine = add(contact, user, "+351211111111", primary=True)
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows(
+            (mine.pk, "", "+351211111111", True),
+            (None, "", "+351912345678", False),
+        ),
+    )
+
+    assert not formset.is_valid()
+    assert answers_spent == [user]
+    assert phone_numbers.taken_elsewhere("+351912345678", exclude_pks=[mine.pk])
+
+
+# -------------------------------------------- a number another of the holder's rows holds
+
+
+def test_two_rows_exchanging_their_numbers_are_told_so_in_the_blocks_own_words(
+    user, contact, answers_spent
+):
+    """Each row was asked about as if the number might be anybody's, found on the row
+    beside it, and refused in the sentence meant for another account's number -- "it may
+    belong to somebody else's records" -- at the cost of two of the answers the account
+    is rationed (#142). The number is this holder's own, on a row that is staying: it is
+    already listed, and saying so asks nothing."""
+    first = add(contact, user, "+351211111111", kind="work", primary=True)
+    second = add(contact, user, "+351912345678", kind="mobile")
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows(
+            (first.pk, "work", "+351912345678", False),
+            (second.pk, "mobile", "+351211111111", False),
+        ),
+    )
+
+    assert not formset.is_valid()
+    assert [row["number"] for row in formset.errors] == [
+        ["This number is already listed."],
+        ["This number is already listed."],
+    ]
+    assert answers_spent == [], "nothing was asked about anybody else's records"
+    first.refresh_from_db()
+    second.refresh_from_db()
+    assert (first.number, second.number) == ("+351211111111", "+351912345678")
+
+
+def test_a_number_typed_into_a_second_row_is_already_listed_and_no_more(
+    user, contact, answers_spent
+):
+    """It was told twice: already listed, and then that it may be somebody else's, which
+    spent an answer on a number whose holder was the row above."""
+    first = add(contact, user, "+351912345678", kind="work", primary=True)
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows(
+            (first.pk, "work", "+351912345678", False),
+            (None, "mobile", "+351 912 345 678", False),
+        ),
+    )
+
+    assert not formset.is_valid()
+    assert [row.get("number") for row in formset.errors] == [
+        None,
+        ["This number is already listed."],
+    ]
+    assert answers_spent == []
+
+
+def test_a_copy_of_the_page_from_before_a_number_was_added_is_told_the_same(
+    user, contact, answers_spent
+):
+    """The row that holds it is not on this copy of the page, and is still the holder's."""
+    first = add(contact, user, "+351211111111", kind="work", primary=True)
+    add(contact, user, "+351912345678", kind="mobile")
+    formset = phone_numbers.formset_for(
+        contact,
+        asked_by=user,
+        data=stored_number_rows((first.pk, "work", "+351912345678", False)),
+    )
+
+    assert not formset.is_valid()
+    assert [row["number"] for row in formset.errors] == [["This number is already listed."]]
+    assert answers_spent == []

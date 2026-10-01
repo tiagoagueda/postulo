@@ -22,7 +22,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 from . import phone_field, phones
-from .formsets import RowsAlreadyGone, owner_of
+from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
 from .models import PhoneNumber
 
 #: What somebody is told when the number they typed is already recorded here.
@@ -121,12 +121,16 @@ def can_get_back_in(person) -> bool:
     return recovery_number(person) is not None
 
 
-def taken_elsewhere(number: str, *, exclude_pk: int | None = None) -> bool:
+def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=()) -> bool:
     """Whether some other row on this instance already holds this number.
 
     Only a number that reached international form can be compared at all; one that did not
     is kept as typed and takes part in nothing, which is the rule ``phones.py`` sets and
     this follows rather than reinvents.
+
+    ``exclude_pk`` is the row being edited, which holds its own number. ``exclude_pks`` are
+    rows the same save is removing: they will not hold anything once it is done, so a
+    number moved from one of them to another row is not somebody else's (#461).
     """
     normalised = phones.normalise(number)
     if not normalised:
@@ -134,6 +138,8 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None) -> bool:
     rows = PhoneNumber.objects.filter(normalised=normalised)
     if exclude_pk is not None:
         rows = rows.exclude(pk=exclude_pk)
+    if exclude_pks:
+        rows = rows.exclude(pk__in=list(exclude_pks))
     return rows.exists()
 
 
@@ -341,6 +347,22 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
 
     def clean(self) -> None:
         super().clean()
+        # The rows this save removes hold nothing once it is done. Compared with, they
+        # refused a number moved from a removed row to a new one in the words meant for
+        # somebody else's number -- which it was not -- and spent one of the account's
+        # answers on saying so (#461).
+        going = leaving(self)
+        # What this holder's rows hold and will go on holding, by row. A number one of
+        # them holds is this holder's own and is *already listed*, which is the block's
+        # sentence and asks nothing: put to the instance instead, two rows exchanging
+        # their numbers were each told it "may belong to somebody else's records", and a
+        # number typed into a second row was told so as well as that it was listed, each
+        # at the cost of one of the account's answers (#142).
+        holder = self.instance
+        held: dict = {}
+        if holder is not None and holder.pk:
+            staying = holder.phone_numbers.exclude(pk__in=going)
+            held = dict(staying.values_list("pk", "normalised"))
         seen: set[str] = set()
         for form in self.forms:
             if not form.is_valid() or form.cleaned_data.get("DELETE"):
@@ -352,10 +374,15 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
             if not normalised:
                 # Unparseable, so incomparable, so it collides with nothing. Kept as typed.
                 continue
-            if normalised in seen:
+            here = any(
+                number == normalised for key, number in held.items() if key != form.instance.pk
+            )
+            if normalised in seen or here:
                 form.add_error("number", _("This number is already listed."))
+                seen.add(normalised)
+                continue
             seen.add(normalised)
-            if taken_elsewhere(typed, exclude_pk=form.instance.pk):
+            if taken_elsewhere(typed, exclude_pk=form.instance.pk, exclude_pks=going):
                 form.add_error("number", collision_message(self.asked_by))
 
     def save_new(self, form, commit=True):
@@ -370,7 +397,12 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
         The radio names a form prefix rather than a primary key, because a row being added
         for the first time has no key yet and somebody adding their first two numbers has
         to be able to say which is which.
+
+        The rows marked for removal go first, so the number one of them gives up can be
+        taken by another row in the same save (#461).
         """
+        if commit:
+            remove_first(self)
         saved = super().save(commit=commit)
         if not commit:
             return saved

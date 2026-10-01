@@ -647,3 +647,173 @@ def test_the_rows_give_a_new_link_its_owner_themselves(user, contact, held_by):
 
     link = holder.web_links.get()
     assert (link.owner, link.kind, link.is_primary) == (user, WEBSITE, True)
+
+
+# ------------------------------------------------ taken off one row, and put on another
+
+
+def stored_rows(prefix, *entries):
+    """The POST of a block whose first rows are stored ones: each entry is a row's fields,
+    with its ``id`` where it is a stored row."""
+    data = rows(prefix, *entries)
+    data[f"{prefix}-INITIAL_FORMS"] = str(sum(1 for entry in entries if entry.get("id")))
+    return data
+
+
+def test_an_address_taken_off_one_row_can_go_on_another_in_the_same_save(user, contact):
+    """Filed under the wrong row: tick *Remove* there and add it here, in one save.
+
+    The block compared what was typed with every stored address, the one being removed
+    included, and said "This address is already listed." about an address that would not
+    be -- so it took two saves to do one thing (#461)."""
+    old = add(contact, user, "https://cave.example", kind=WEBSITE, label="Old", primary=True)
+    formset = web_links.formset_for(
+        contact,
+        WEBSITE,
+        data=stored_rows(
+            "websites",
+            {"id": old.pk, "label": "Old", "url": "https://cave.example", "DELETE": "on"},
+            {"label": "New", "url": "https://cave.example"},
+        ),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    (only,) = contact.web_links.all()
+    assert (only.label, only.url, only.is_primary) == ("New", "https://cave.example", True)
+    assert only.pk != old.pk
+
+
+def test_a_stored_row_can_take_the_address_of_one_removed_further_down(user, contact):
+    """The removal is written first. Django writes the stored rows in the order they are
+    listed, so this one would have reached the table while the address was still in it,
+    and the table's own rule would have refused a save the block had called valid."""
+    first = add(contact, user, "https://old.cave.example", kind=WEBSITE, primary=True)
+    second = add(contact, user, "https://cave.example", kind=WEBSITE)
+    formset = web_links.formset_for(
+        contact,
+        WEBSITE,
+        data=stored_rows(
+            "websites",
+            {"id": first.pk, "label": "", "url": "https://cave.example"},
+            {"id": second.pk, "label": "", "url": "https://cave.example", "DELETE": "on"},
+        ),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+
+    (only,) = contact.web_links.all()
+    assert (only.pk, only.url, only.is_primary) == (first.pk, "https://cave.example", True)
+
+
+def test_an_address_still_listed_is_still_refused(user, contact):
+    """Only a row being removed gives its address up: one that stays keeps it."""
+    first = add(contact, user, "https://cave.example", kind=WEBSITE, primary=True)
+    second = add(contact, user, "https://blog.cave.example", kind=WEBSITE)
+    formset = web_links.formset_for(
+        contact,
+        WEBSITE,
+        data=stored_rows(
+            "websites",
+            {"id": first.pk, "label": "", "url": "https://cave.example"},
+            {"id": second.pk, "label": "", "url": "https://blog.cave.example", "DELETE": "on"},
+            {"label": "", "url": "https://cave.example"},
+        ),
+    )
+
+    assert not formset.is_valid()
+    assert "already listed" in str(formset.errors)
+
+
+# ------------------------------------------------ two rows that would hold one address
+#
+# A row was compared with "what it held before", read off its instance -- and by the time a
+# block is cleaned a ModelForm has written the typed address onto the instance, so a stored
+# row was compared with itself and never refused. Whatever put a stored row's address on
+# another stored row was called valid and then broke the table's rule: a 500, with
+# everything typed on the page lost.
+
+#: What is stored, row by row, and what each row is posted holding; a row posted as nothing
+#: is left out of the page, as on a copy drawn before it was added. Then how many rows are
+#: told their address is already listed.
+ONE_ADDRESS_ON_TWO_ROWS = {
+    "an exchange": (
+        ("https://a.example", "https://b.example"),
+        ("https://b.example", "https://a.example"),
+        2,
+    ),
+    "three passing theirs round": (
+        ("https://a.example", "https://b.example", "https://c.example"),
+        ("https://b.example", "https://c.example", "https://a.example"),
+        3,
+    ),
+    "a copy of the page from before a row was added": (
+        ("https://a.example", "https://b.example"),
+        ("https://b.example", None),
+        1,
+    ),
+    "an address another row is only now giving up": (
+        ("https://a.example", "https://b.example"),
+        ("https://b.example", "https://c.example"),
+        1,
+    ),
+}
+
+
+@pytest.mark.parametrize("held_by", ["profile", "contact"])
+@pytest.mark.parametrize("case", ONE_ADDRESS_ON_TWO_ROWS)
+def test_a_stored_row_given_another_stored_rows_address_is_refused_on_its_row(
+    client, user, contact, held_by, case
+):
+    """Refused in the block's own words, on the row, with nothing written: what a row is
+    compared with is what the holder's *other* rows hold in the table and will go on
+    holding. Two rows cannot exchange in one save -- the table would hold an address twice
+    for a moment -- and a row cannot take an address another row gives up by changing,
+    because Django writes the rows in order and the first would arrive too soon."""
+    stored, posted, refusals = ONE_ADDRESS_ON_TWO_ROWS[case]
+    holder = user.profile if held_by == "profile" else contact
+    kept = [
+        add(holder, user, url, kind=WEBSITE, primary=index == 0) for index, url in enumerate(stored)
+    ]
+    block = stored_rows(
+        "websites",
+        *(
+            {"id": row.pk, "label": "", "url": url}
+            for row, url in zip(kept, posted, strict=True)
+            if url is not None
+        ),
+    )
+    client.force_login(user)
+
+    if held_by == "profile":
+        response = client.post(reverse("accounts:profile"), {**PROFILE_POST, **block})
+    else:
+        response = client.post(
+            reverse("jobs:contact_update", args=[contact.pk]), contact_post(contact, **block)
+        )
+
+    assert response.status_code == 200, "the page came back, and not a server error"
+    assert response.content.decode().count("This address is already listed.") == refusals
+    assert [holder.web_links.get(pk=row.pk).url for row in kept] == list(stored), (
+        "nothing was written"
+    )
+
+
+def test_a_row_saved_as_it_was_beside_a_new_one_is_not_its_own_duplicate(user, contact):
+    """The other side of comparing with the table: a row's own address is its own."""
+    first = add(contact, user, "https://cave.example", kind=WEBSITE, primary=True)
+    formset = web_links.formset_for(
+        contact,
+        WEBSITE,
+        data=stored_rows(
+            "websites",
+            {"id": first.pk, "label": "Cave", "url": "https://cave.example"},
+            {"label": "", "url": "https://blog.cave.example"},
+        ),
+    )
+
+    assert formset.is_valid(), formset.errors
+    formset.save()
+    assert contact.web_links.count() == 2

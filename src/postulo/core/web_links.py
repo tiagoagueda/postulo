@@ -34,7 +34,7 @@ from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
 from . import link_services
-from .formsets import RowsAlreadyGone, owner_of
+from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
 from .models import WebLink
 
 Kind = WebLink.Kind
@@ -571,9 +571,13 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
     def clean(self) -> None:
         super().clean()
         holder = self.instance
-        already: set[str] = set()
+        held: dict[int, str] = {}
         if holder is not None and holder.pk:
-            already = set(holder.web_links.filter(kind=self.kind).values_list("url", flat=True))
+            # What will still be listed once this is saved, by the row that lists it: a row
+            # being removed in the same save holds nothing, so its address is free for
+            # another row to take (#461).
+            staying = holder.web_links.filter(kind=self.kind).exclude(pk__in=leaving(self))
+            held = dict(staying.values_list("pk", "url"))
         seen: set[str] = set()
         for form in self.forms:
             if not form.is_valid() or form.cleaned_data.get("DELETE"):
@@ -581,8 +585,18 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
             typed = (form.cleaned_data.get("url") or "").strip()
             if not typed:
                 continue
-            was = form.instance.url if form.instance.pk else ""
-            if typed in seen or (typed in already and typed != was):
+            # Compared with what the holder's *other* rows hold in the table, and never
+            # with what this row's instance says it held: a ModelForm has written the
+            # typed address onto the instance by now, so that was the row compared with
+            # itself, and a stored row was refused nothing. Two rows exchanging their
+            # addresses, three passing theirs round, and a copy of the page from before a
+            # row was added each passed, and broke the table's rule on the way in.
+            #
+            # A row that stays holds its address until it is written, and the rows are
+            # written in order, so an exchange cannot be made in one save and is refused
+            # here; so is an address another row gives up only by changing.
+            elsewhere = any(url == typed for key, url in held.items() if key != form.instance.pk)
+            if typed in seen or elsewhere:
                 form.add_error("url", _("This address is already listed."))
             seen.add(typed)
 
@@ -599,7 +613,12 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
         The radio names a form prefix rather than a primary key, because a row being added
         for the first time has no key yet and somebody adding their first two links has to
         be able to say which is which.
+
+        The rows marked for removal go first, so the address one of them gives up can be
+        taken by another row in the same save (#461).
         """
+        if commit:
+            remove_first(self)
         saved = super().save(commit=commit)
         if not commit:
             return saved

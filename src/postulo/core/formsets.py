@@ -27,6 +27,42 @@ def owner_of(holder):
     return holder.owner if hasattr(holder, "owner") else holder.user
 
 
+def leaving(formset) -> set:
+    """The keys of the stored rows this submission removes.
+
+    What a block compares a typed value with is the rows that will still be there once it
+    is saved. A row with *Remove* ticked will not be, and comparing with it refused the
+    one thing a person does in a single save when they have filed a value under the wrong
+    row: take it off there and add it here (#461).
+
+    Asked from a formset's ``clean``, once every row has been cleaned.
+    """
+    return {
+        form.instance.pk
+        for form in formset.initial_forms
+        if form.instance.pk is not None
+        and hasattr(form, "cleaned_data")
+        and formset._should_delete_form(form)
+    }
+
+
+def remove_first(formset) -> None:
+    """Take the rows marked for removal out of the table before any other row is written.
+
+    Django writes the saved rows in the order they are listed, removing or changing each in
+    turn, so a row taking the value of one removed further down would reach the table while
+    that value was still in it, and a uniqueness rule would refuse a save the block had
+    just called valid (#461). Removed here first, they are passed over afterwards the way
+    Django passes over any row that has no key -- the order `OneOfEachKind` already writes
+    identifiers in, for the same reason (#307).
+
+    Called at the top of a formset's ``save``, when it is committing.
+    """
+    for form in formset.deleted_forms:
+        if form.instance.pk is not None:
+            formset.delete_existing(form.instance)
+
+
 class RowsAlreadyGone:
     """Formset mixin: a saved row that is no longer in the table has already been removed.
 
