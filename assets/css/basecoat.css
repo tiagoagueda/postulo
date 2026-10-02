@@ -278,6 +278,81 @@
   }
 }
 
+/* ------------------------------------------------------------------ drawer */
+
+/*
+ * A panel at the edge of the window, holding something to read (#302): `<c-drawer>`.
+ * Basecoat's structure makes the `<dialog>` fill the window, transparent, and its one child
+ * the panel: a column with a header, a body that scrolls and a footer. It places the panel
+ * by `data-side`, and its four sides are `left`, `right`, `top` and `bottom`.
+ *
+ * **The side here is `inline-end`**, which Basecoat does not have and so does not place:
+ * the whole height of the window, against its inline end, by a logical inset. That is the
+ * right in English and the left in Arabic, with no rule of its own for either.
+ *
+ * Twenty-four rem wide, or the window less a gutter where the window is narrower, so on a
+ * phone a strip of the page still shows beside it and a press there closes it. The body
+ * scrolls inside the panel when the window is shorter than the text, which at 400% zoom it
+ * is; its words break anywhere, because one long word must not make it scroll sideways.
+ * The header is a row: the heading, and *Close* at its end.
+ *
+ * Painted like a dialog and a menu's panel: the popover's ground, a border on the side
+ * that faces the page, the floating plane. The page behind is dimmed, because a drawer is
+ * only ever a modal and the page behind a modal is out of reach.
+ *
+ * **Nothing moves.** Basecoat slides the panel in over half a second and fades the page
+ * behind it, and its script holds the dialog open while it slides back out. All of that is
+ * taken off, the answer the menus and the dialog got (#310, #303): it is there or it is
+ * not.
+ */
+@layer components {
+  .drawer,
+  .drawer::backdrop,
+  .drawer > * {
+    transition: none;
+  }
+
+  .drawer:modal::backdrop {
+    @apply bg-ink-950/50;
+  }
+
+  .drawer > * {
+    @apply gap-4 border-border bg-popover p-6 wrap-anywhere text-popover-foreground
+      shadow-floating;
+    will-change: auto;
+  }
+
+  .drawer[data-side="inline-end"] > * {
+    @apply inset-y-0 end-0 max-w-sm border-s;
+    inline-size: calc(100% - 2rem);
+  }
+
+  .drawer > * > header {
+    @apply flex-row items-start justify-between gap-3;
+  }
+
+  .drawer > * > header > h2 {
+    @apply text-lg leading-snug font-semibold wrap-anywhere;
+  }
+
+  .drawer > * > section:focus-visible {
+    @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
+  }
+}
+
+/* Forced colours: the panel's edge and the focus on its body in the system's own colours,
+   which a high-contrast theme keeps where it throws a ground and a shadow away. */
+@media (forced-colors: active) {
+  .drawer > * {
+    border: 1px solid CanvasText;
+  }
+
+  .drawer > * > section:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+}
+
 /* ------------------------------------------------------------ the form family */
 
 /*
@@ -1023,6 +1098,13 @@
 
   .card > header > :is(h2, h3) {
     @apply leading-normal font-medium;
+  }
+
+  /* A card's question mark (#302) on the middle of its title's first line: Basecoat sets a
+     card's title `leading-none`, a line of 1em, and the mark is 1.5rem high. `app.css`
+     says why the mark's `em` is the title's. */
+  .card > header > [data-help-mark] {
+    margin-block-start: calc((1em - 1.5rem) / 2);
   }
 
   /* Not the empty state's, whose header holds a title and a sentence as two paragraphs

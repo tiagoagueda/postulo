@@ -152,6 +152,14 @@
         <input type="text" id="design-text" value="{% translate 'What somebody typed' %}">
         <p>{% translate "Help under a field says what it is for." %}</p>
       </div>
+      {% comment %} The same help as a tooltip (#302): `data-tooltip` on the paragraph the
+         box names in `aria-describedby`, which is what `<c-field tip>` draws. Shown while
+         the field is hovered or has the focus; under the box with scripts off. {% endcomment %}
+      <div class="field">
+        <label for="design-tip">{% translate "A field whose help is a tooltip" %}</label>
+        <input type="text" id="design-tip" aria-describedby="design-tip-help">
+        <p id="design-tip-help" data-tooltip>{% translate "What a field is for, shown while the field is hovered or has the focus. A format the field requires stays under it instead." %}</p>
+      </div>
       <div class="field">
         <label for="design-select">{% translate "A choice" %}</label>
         <select id="design-select">
@@ -465,5 +473,22 @@
         <button type="button" class="btn" data-variant="destructive" popovertarget="design-dialog" popovertargetaction="hide">{% translate "Remove" %}</button>
       </c-slot>
     </c-dialog>
+  </section>
+
+  <!-- --------------------------------------------------------------------- help -->
+  {% comment %} A card's question mark and its drawer (#302): `<c-section-title help="…">`,
+     which draws `<c-help-mark>`. A topic is a real one or nothing, so this card borrows
+     the help of *Your picture*: one sentence on hover and on focus, the topic in a drawer
+     when pressed, and a link to the topic's own page with scripts off. The question mark
+     is named for this card (`subject`), as every question mark is named for its own. {% endcomment %}
+  <section id="design-help" class="mb-10" aria-labelledby="design-help-heading">
+    <c-section-title id="design-help-heading">
+      {% translate "Help" %}
+      <c-slot name="subtitle">{% translate "A card whose help belongs to the card has a question mark in its corner: one sentence when it is rested on, and the card's help in a drawer when it is pressed." %}</c-slot>
+    </c-section-title>
+    <div class="card max-w-2xl" id="design-help-card">
+      <c-section-title help="your-picture" anchor="design-help-card" subject="{% translate 'A card with a question mark' %}">{% translate "A card with a question mark" %}</c-section-title>
+      <p class="text-sm text-ink-600 dark:text-ink-300">{% translate "This one borrows the help of Your picture, from Your details." %}</p>
+    </div>
   </section>
 {% endblock %}

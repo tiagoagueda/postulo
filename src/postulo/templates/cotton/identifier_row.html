@@ -1,5 +1,5 @@
 {% load i18n postulo %}
-<c-vars row remove_at_once="" />
+<c-vars row remove_at_once="" tip="" />
 {% comment %} One identifier: what kind, the value, and -- when the kind is Other -- a name
    for it. The same row on a company's form and on *Your details*, which used to be two
    byte-identical copies (#284).
@@ -16,6 +16,10 @@
    somehow carries a name with another kind -- every row written before this could -- keeps
    the box, because hiding a value makes it invisible and unremovable; the form blanks such
    a name on save, so the row cleans itself up the next time it is touched.
+
+   `tip` is *Your details* too (#302): what each box is for is that box's tooltip, shown
+   while the box is hovered or has the focus, where the company's form keeps the three
+   sentences under the row. A row that has been refused keeps them in sight.
 {% endcomment %}
 <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
   {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
@@ -66,7 +70,7 @@
   </div>
   <div class="field">
     {% for field in row.visible_fields %}
-      <c-field-feedback :field="field" />
+      <c-field-feedback :field="field" :tip="tip" />
     {% endfor %}
     {% for error in row.non_field_errors %}<div role="alert"><p>{{ error }}</p></div>{% endfor %}
   </div>

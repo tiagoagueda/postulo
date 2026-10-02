@@ -102,9 +102,31 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         context.setdefault("addresses", self.get_addresses())
         context["numbers_kept_back"] = phone_numbers.kept_back(self.object, self.request.user)
         context["identifier_schemes"] = person_identifiers.schemes().values()
+        context["identifiers_pasted"] = person_identifiers.pasted_whole()
         context["removals"] = self._removals(context)
         context["section_nav"] = self._section_nav(context)
+        context["refused"] = self._refused(context)
+        context["tips"] = not context["refused"]
         return context
+
+    @staticmethod
+    def _refused(context: dict) -> bool:
+        """Whether anything on the page was refused: the form, or any block of rows (#302).
+
+        Decided for the page and not for one form, because a refusal on one row is under
+        the next row's help, and a tooltip lies over what is near its field whatever form
+        that belongs to. While it is so, no help on the page is a tooltip: `tips` is what
+        the fields take, and every card's one sentence is under its title, question
+        mark or not -- that is when the help is wanted, and nothing may lie over a refusal.
+        """
+        form = context.get("form")
+        if form is not None and form.is_bound and not form.is_valid():
+            return True
+        blocks = [context.get("identifiers"), context.get("numbers"), context.get("addresses")]
+        blocks += list(context.get("links") or [])
+        return any(
+            block is not None and block.is_bound and not block.is_valid() for block in blocks
+        )
 
     @staticmethod
     def _removals(context: dict) -> list:

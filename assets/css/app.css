@@ -79,6 +79,13 @@
    nothing until the script runs. The server draws a native `<select>`, which is the
    control with scripts off, and `app.js` builds this beside it and drives it. */
 @import "basecoat-css/components/select.css";
+/* A panel that comes in from the edge and holds something to read (#302): `<c-drawer>`, a
+   `<dialog>` that `app.js` opens as a modal from a link to the page holding the same text.
+   The structure fills the window with the dialog and keys the header, the body and the
+   footer on the elements. It knows four sides, each a physical one; the inline end, which
+   is the side this project uses, is placed in `basecoat.css` with the paint, and the
+   motion the structure adds is taken off there. Its script is not taken. */
+@import "basecoat-css/components/drawer.css";
 @import "./basecoat.css";
 
 /* Templates and Python live outside this directory, so point Tailwind at them. */
@@ -384,6 +391,18 @@
   [dir="rtl"] [data-icon="move-right"],
   [dir="rtl"] [data-icon="undo"],
   [dir="rtl"] [data-icon="redo"] {
+    transform: scaleX(-1);
+  }
+
+  /*
+   * A question mark follows the script and not the direction (#302). The Arabic script
+   * writes it the other way round -- ؟ -- and Hebrew, which is read the same way, writes
+   * it as Latin does. Which script the page's language is written in is
+   * `core/languages.py`'s to know, so the server marks a card's question mark
+   * `data-turned` where it is the Arabic script, and this turns the icon by that mark:
+   * no list of languages here to fall out of step with that one.
+   */
+  [data-help-mark][data-turned] > [data-icon="circle-question-mark"] {
     transform: scaleX(-1);
   }
 
@@ -746,6 +765,61 @@
 
   .section-title > p {
     @apply text-sm text-ink-500 dark:text-ink-400;
+  }
+
+  /*
+   * A card's question mark (#302): what `<c-help-mark>` draws, in the card's top corner at
+   * the inline end. Two shapes, because a card has one of two heads.
+   *
+   * Under `<c-section-title>` it is in the header, which becomes two columns: the heading,
+   * and the sentence under it where scripts are off, in the first; the question mark in
+   * the second, at the top. A long heading wraps in its own column and never runs under
+   * the mark.
+   *
+   * A card that is a `<fieldset>` has a `<legend>` and no header: the name sits on the
+   * card's top border at the start. The question mark sits on the same border at the end,
+   * the card's ground behind it so the border stops for it as it does for the legend. A
+   * fieldset's padding box begins under its legend, so the mark is put back up by half the
+   * legend's line and half its own height (WHATWG's rendering of a fieldset; the same in
+   * every engine). Nothing inside the card is ever under it.
+   *
+   * The sentence is a `data-tooltip`: where a script runs it is the mark's tooltip, and
+   * these rules are what it is before that, and with scripts off -- the paragraph under the
+   * card's title that it used to be.
+   */
+  .section-title:has(> [data-help-mark]) {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: calc(var(--spacing) * 2);
+  }
+
+  /* On the middle of the title's first line, wherever the title wraps (review of #302): the
+     mark is 1.5rem high and the title's line 1.5em -- 1em in a card, which `basecoat.css`
+     says beside the card's title. The mark takes the header's font size, which is the
+     title's -- its own text is for a screen reader only -- so its `em` is the title's. */
+  .section-title > [data-help-mark] {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: start;
+    justify-self: end;
+    font-size: inherit;
+    margin-block-start: calc((1.5em - 1.5rem) / 2);
+  }
+
+  .section-title:has(> [data-help-mark]) > :is(h2, h3, p) {
+    grid-column: 1;
+  }
+
+  fieldset:has(> [data-help-mark]) {
+    position: relative;
+  }
+
+  fieldset > [data-help-mark][data-variant] {
+    @apply absolute end-4 bg-card;
+    inset-block-start: calc(-0.625rem - var(--spacing) * 3);
+  }
+
+  fieldset > [data-help-summary]:not([popover]) {
+    @apply mb-3 text-sm text-ink-500 dark:text-ink-400;
   }
 
   /*
@@ -1491,6 +1565,84 @@ progress.funnel-bar::-moz-progress-bar {
   @position-try --menu-scrolls {
     max-block-size: calc(100% - 0.5rem);
     min-block-size: 10rem;
+  }
+}
+
+/* --------------------------------------------------------------- tooltips */
+
+/*
+ * A sentence shown while what it describes is hovered or has the focus (#302): what a field
+ * is for, and a card's one sentence on its question mark.
+ *
+ * It is an element in the page and not Basecoat's `[data-tooltip="…"]`, which draws an
+ * attribute's text in a `::before`: one line, cut short, on hover only, hidden on focus,
+ * and not reliably read by a screen reader. The server draws the sentence as an ordinary
+ * paragraph -- under its field, or under its card's title -- with `data-tooltip` and the id
+ * its control names in `aria-describedby`. That is all there is with scripts off. Where a
+ * script runs, `app.js` makes the paragraph a popover (`popover="manual"`) and shows it
+ * while the field is hovered or has the focus; these rules are what it looks like then.
+ * The paragraph is still the control's description either way.
+ *
+ * **The look is Basecoat's tooltip**: the page's own ink as the ground and its ground as
+ * the ink, small type, a small rounding. Twenty rem at most, or the window less a gutter,
+ * and the words wrap, and break anywhere where one word is wider than that; nothing is cut
+ * short and nothing has a height, so it grows with larger text and with wider spacing
+ * (SC 1.4.12). The border is transparent until a high-contrast theme throws the ground
+ * away, and is then what says where the box is.
+ *
+ * **Where it goes is `app.js`'s**, by one rule: only where there is a clear place for it,
+ * wholly in the window that can be seen and over nothing that must not be hidden -- its
+ * own field, a refusal, a mark or a note under a row, a card's question mark, the focused
+ * control -- and, where there is none, back under its field as the paragraph it was. It is
+ * in the top layer, so no card, dialog or scroll box can cut it off, and `absolute`, so it
+ * scrolls with the page as its field does; the script sets where. Not CSS anchor
+ * positioning: the rule is about where the box is, and a box tied to an anchor is moved
+ * when the browser next draws, not when it is measured.
+ *
+ * **The strip** (`::after`) lies over the gap between the tooltip and its field, on the
+ * side the field is (`data-tooltip-side`), and is as wide as the two together (the script
+ * says how far it reaches past the tooltip's edges). It is part of the tooltip to the
+ * pointer, so a hand moving from the field onto the tooltip, at any speed and from any end
+ * of a wide box, never leaves both (SC 1.4.13, hoverable). Eight pixels: the script's gap
+ * of six, the tooltip's border, and one more, which lies on the field and changes nothing.
+ *
+ * Unlayered, like the menus above: these have to beat the browser's own rules for a popover
+ * and the paint a paragraph has inside a field. No transition: nothing moves.
+ */
+[data-tooltip][popover] {
+  @apply rounded-md border border-transparent bg-foreground px-3 py-1.5 text-start text-xs
+    font-normal wrap-anywhere text-background shadow-floating;
+  position: absolute;
+  inset: auto;
+  margin: 0;
+  inline-size: max-content;
+  max-inline-size: min(20rem, calc(100vw - 2rem));
+  overflow: visible;
+}
+
+[data-tooltip][popover][data-tooltip-side]::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: var(--tooltip-bridge-start, 0);
+  inset-inline-end: var(--tooltip-bridge-end, 0);
+  block-size: 8px;
+}
+
+[data-tooltip][popover][data-tooltip-side="above"]::after {
+  inset-block-start: 100%;
+}
+
+[data-tooltip][popover][data-tooltip-side="below"]::after {
+  inset-block-end: 100%;
+}
+
+/* The system's own colours, and a border that is one: a high-contrast theme repaints the
+   ground to `Canvas`, and the box would otherwise be words lying loose over the page. */
+@media (forced-colors: active) {
+  [data-tooltip][popover] {
+    border-color: CanvasText;
+    background-color: Canvas;
+    color: CanvasText;
   }
 }
 

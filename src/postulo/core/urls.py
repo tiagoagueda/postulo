@@ -4,6 +4,7 @@ from . import (
     views,
     views_errands,
     views_export,
+    views_help,
     views_import,
     views_logs,
     views_metrics,
@@ -21,6 +22,9 @@ urlpatterns = [
     path("logs", views_logs.collect, name="logs_endpoint"),
     path("metrics", views_metrics.scrape, name="metrics"),
     path("search/", views_search.search_page, name="search"),
+    # A card's help as a page of its own: where its question mark leads with scripts off,
+    # and what a script opens in a drawer instead (#302).
+    path("help/<slug:slug>/", views_help.topic_page, name="help_topic"),
     path("export/", views_export.export_overview, name="export"),
     path("export/download/", views_export.export_download, name="export_download"),
     path(

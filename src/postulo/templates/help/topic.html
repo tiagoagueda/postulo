@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load i18n postulo %}
+
+{% comment %} A card's help as a page of its own (#302): where the card's question mark
+   leads with scripts off, and where a script opens a drawer instead. The same template
+   draws both -- `help_body` -- so the page and the drawer cannot say different things. The
+   way back is a link to the card the question was asked from, on the page the topic's
+   cards are on, and nowhere else (`views_help`). {% endcomment %}
+{% block title %}{% blocktranslate trimmed with subject=topic.title %}Help: {{ subject }}{% endblocktranslate %}{% endblock %}
+
+{% block content %}
+  <article class="max-w-2xl" data-help-topic="{{ topic.slug }}">
+    <c-page-title>
+      {% blocktranslate trimmed with subject=topic.title %}Help: {{ subject }}{% endblocktranslate %}
+      <c-slot name="subtitle">{{ topic.summary }}</c-slot>
+    </c-page-title>
+    <div class="space-y-3 text-sm leading-relaxed" data-help-text>
+      {% help_body topic %}
+    </div>
+    <p class="mt-8">
+      <a href="{{ back }}" class="btn" data-variant="outline" data-help-back>
+        {% icon "arrow-left" %}
+        {{ topic.back }}
+      </a>
+    </p>
+  </article>
+{% endblock %}

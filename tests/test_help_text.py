@@ -89,11 +89,12 @@ EXCUSED = {
     "ProfileForm.first_name": "a person's own name",
     "ProfileForm.last_name": "a person's own name",
     "ProfileForm.remove_picture": "a tick box whose label is the sentence",
-    # One sentence under *Your name* describes both menus, and each menu names it in its
+    # The one sentence of *Your name* describes both menus, and each menu names it in its
     # `aria-describedby`; a box only appears once Other is chosen beside the menu (#309).
-    "ProfileForm.form_of_address": "described by the sentence under the card",
+    # It is the card's sentence, and the tooltip of both where a script runs (#302).
+    "ProfileForm.form_of_address": "described by the card's one sentence",
     "ProfileForm.form_of_address_other": "the menu's Other, described with it",
-    "ProfileForm.pronouns": "described by the sentence under the card",
+    "ProfileForm.pronouns": "described by the card's one sentence",
     "ProfileForm.pronouns_other": "the menu's Other, described with it",
     "LoginForm.remember": "a tick box whose label is the sentence",
     "AppearanceForm.theme": "three named choices, shown as they will look",

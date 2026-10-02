@@ -586,6 +586,16 @@ def rows_of(html: str) -> list[dict]:
     return page.rows
 
 
+def what_the_rows_say(html: str) -> str:
+    """The page without its cards' help drawers (#302).
+
+    The help of *Postal addresses* names the mark and says when a kept address is checked,
+    so those words are on every copy of the page, in a drawer nobody has opened. What is
+    asked about a row is asked of the rows.
+    """
+    return re.sub(r"<dialog\b[^>]*data-help-drawer.*?</dialog>", "", html, flags=re.S)
+
+
 def switch_off(person) -> None:
     """*Address rules by country* off for one person, as an administrator switches it."""
     from postulo.plugins.models import PluginPolicy
@@ -742,7 +752,7 @@ def test_a_kept_address_that_would_be_refused_is_marked_and_says_why(client, use
     kept_before(user)
     client.force_login(user)
 
-    html = client.get(reverse("accounts:profile")).content.decode()
+    html = what_the_rows_say(client.get(reverse("accounts:profile")).content.decode())
 
     [row, _empty] = rows_of(html)
     assert "data-kept-as-it-was" in row["marks"]
@@ -757,7 +767,7 @@ def test_a_kept_address_that_fits_is_not_marked(client, user):
     an_address(user, is_primary=True)
     client.force_login(user)
 
-    html = client.get(reverse("accounts:profile")).content.decode()
+    html = what_the_rows_say(client.get(reverse("accounts:profile")).content.decode())
 
     assert "data-kept-as-it-was" not in html and "Kept as it was" not in html
 
@@ -865,7 +875,7 @@ def test_switched_off_nothing_is_marked_and_nothing_is_said_about_checking(clien
     switch_off(user)
     client.force_login(user)
 
-    html = client.get(reverse("accounts:profile")).content.decode()
+    html = what_the_rows_say(client.get(reverse("accounts:profile")).content.decode())
 
     assert "data-kept-as-it-was" not in html and "Kept as it was" not in html
     assert "data-rules-help" not in html
@@ -1199,7 +1209,7 @@ def test_a_place_is_never_marked_and_is_told_what_a_whole_address_also_carries(c
     row = an_address(user, street="", postcode="", is_primary=True)
     client.force_login(user)
 
-    html = client.get(reverse("accounts:profile")).content.decode()
+    html = what_the_rows_say(client.get(reverse("accounts:profile")).content.decode())
 
     assert "data-kept-as-it-was" not in html and "Kept as it was" not in html
     assert html.count("data-place-note") == 1, "under the place, and not under the empty row"

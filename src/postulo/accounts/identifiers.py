@@ -26,6 +26,7 @@ reason ORCID has one.
 from __future__ import annotations
 
 from django.core.exceptions import ValidationError
+from django.utils.text import get_text_list
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import identifiers as registry
@@ -86,6 +87,17 @@ def clean(scheme_key: str, raw: str) -> str:
     value = normalise(scheme_key, raw)
     validate(scheme_key, value)
     return value
+
+
+def pasted_whole() -> str:
+    """The registers whose address can be pasted whole, as the reader's language writes a
+    list: "ORCID, Wikidata or LinkedIn" (#302).
+
+    The schemes that lift an identifier out of an address on their own host, read from the
+    registry, so what *Your details* says may be pasted is what is lifted: a sentence that
+    said "paste the whole address" of every kind was untrue of a ResearcherID.
+    """
+    return get_text_list([str(scheme.label) for scheme in schemes().values() if scheme.url_paths])
 
 
 def url_for(scheme_key: str, value: str) -> str:

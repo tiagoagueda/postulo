@@ -28,9 +28,13 @@ from __future__ import annotations
 
 import hashlib
 import logging
+from decimal import ROUND_DOWN, Decimal
 
 from django.core.files.base import ContentFile
 from django.utils import timezone
+from django.utils.formats import number_format
+from django.utils.text import get_text_list
+from django.utils.translation import gettext as _
 
 from postulo.core import pictures
 from postulo.plugins import http
@@ -55,7 +59,16 @@ MAX_STORED_BYTES = 1024 * 1024
 #: decoding allocates, not what is kept.
 MAX_PIXELS = pictures.MAX_PIXELS
 
-ALLOWED_CONTENT_TYPES = frozenset({"image/png", "image/jpeg", "image/webp", "image/gif"})
+#: What a picture may be, and what each kind of file is called on the page. The kind is
+#: the one the image library reads from the file's own bytes, never the one an upload says
+#: it is, and the names are what the field, the card's help and the refusals say (#302):
+#: what is accepted and what is said to be accepted are one table.
+ALLOWED_TYPES = {
+    "image/png": "PNG",
+    "image/jpeg": "JPEG",
+    "image/webp": "WebP",
+    "image/gif": "GIF",
+}
 
 GRAVATAR_ENDPOINT = "https://gravatar.com/avatar/"
 
@@ -64,18 +77,63 @@ class UnusableImage(ValueError):
     """The bytes are not an image Postulo will keep."""
 
 
+def _as_written(count: int, unit: int) -> str:
+    """A limit in a larger unit, written as the number it is: "5", and "2.5" where it is
+    not a whole one, in the reader's own way of writing a decimal.
+
+    Never rounded up, because the sentence is a promise: cut to two places, a limit of
+    2.861 megabytes is said as 2.86, and a file of 2.86 is accepted.
+    """
+    value = (Decimal(count) / unit).quantize(Decimal("0.01"), rounding=ROUND_DOWN).normalize()
+    if value == value.to_integral_value():
+        return str(int(value))
+    return number_format(value, use_l10n=True)
+
+
+def limits() -> dict:
+    """What an uploaded picture may be, for the sentences that say so (#302).
+
+    Read from the constants the form and the decoder enforce, so the field's help, the
+    card's and the refusals cannot promise a format or a size that is then refused. The
+    formats are joined the way the reader's language joins a list, in Django's own words.
+    Read when a sentence is drawn, so it is in the language that sentence is in.
+    """
+    return {
+        "formats": get_text_list(list(ALLOWED_TYPES.values())),
+        "megabytes": _as_written(MAX_UPLOAD_BYTES, 1024 * 1024),
+        "megapixels": _as_written(MAX_PIXELS, 1_000_000),
+    }
+
+
+def wrong_kind() -> str:
+    """The refusal for a file that is not one of the kinds `ALLOWED_TYPES` names."""
+    return _("That is not a kind of picture Postulo keeps. Use %(formats)s.") % limits()
+
+
+def too_large() -> str:
+    """The refusal for a file over `MAX_UPLOAD_BYTES`."""
+    return _("That picture is over %(megabytes)s MB. A smaller one, please.") % limits()
+
+
 def process(data: bytes) -> ContentFile:
     """Decode, straighten, crop to a square and re-encode as PNG, at the size it came in.
 
     Re-encoding is the point, not a side effect: it is what strips EXIF and anything else
     the file carried, including where the photograph was taken. A file that will not decode,
-    or would decode to something enormous, is refused.
+    or would decode to something enormous, is refused; so is one whose bytes are not one of
+    the kinds `ALLOWED_TYPES` names, whatever it said it was (#302).
 
     Cropped square but **not resized to a constant** (#265): the shorter edge decides the
     square, and the byte budget decides whether anything has to be reduced at all.
     """
     try:
-        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES, square=True))
+        return ContentFile(
+            pictures.as_stored(
+                data, budget=MAX_STORED_BYTES, square=True, kinds=frozenset(ALLOWED_TYPES)
+            )
+        )
+    except pictures.WrongKind as error:
+        raise UnusableImage(wrong_kind()) from error
     except pictures.UnusablePicture as error:
         raise UnusableImage(str(error)) from error
 

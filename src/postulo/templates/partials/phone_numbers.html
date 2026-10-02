@@ -19,15 +19,23 @@
    `min-w-0` on the fieldset: a fieldset is never narrower than the narrowest its content
    can be, which no other box insists on, and the country and the number in one group
    (#304) are together a little wider than a phone leaves. Let shrink, the group wraps.
+
+   `card_help` is *Your details* as well (#302): the card has a question mark, whose one
+   sentence is the one under the legend and whose drawer holds what the two paragraphs
+   under the rows say. `tips` makes what a row's boxes are for each box's tooltip -- but
+   not on the row a new number is typed into, whose sentence says what a + does and has
+   to be read before a national number with no country is refused. `refused` keeps the
+   card's sentence under the legend. Without them -- the contact form -- all of that
+   stays in sight, as it was, and the template draws exactly what it drew before #302:
+   each switch is written on the line of what it follows, so it leaves no line behind.
+   The sentence under the legend is the topic's own summary, one string for both.
 {% endcomment %}
 <fieldset class="card mb-6 min-w-0" data-phone-numbers id="section-phones">
-  <legend class="label px-1">{% translate "Telephone numbers" %}</legend>
+  <legend class="label px-1">{% translate "Telephone numbers" %}</legend>{% help_topic "telephone-numbers" as about %}{% if card_help %}
+  <c-help-mark :topic="about.slug" anchor="section-phones" :in_sight="refused" />{% else %}
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-    {% blocktranslate trimmed %}
-      A mobile, a desk line, a switchboard — as many as are worth keeping, with one of
-      them marked as the one to use. Documents print that one.
-    {% endblocktranslate %}
-  </p>
+    {{ about.summary }}
+  </p>{% endif %}
   {{ numbers.management_form }}
   {% if numbers.non_form_errors %}
     <div class="alert mb-3" data-variant="error">{{ numbers.non_form_errors }}</div>
@@ -65,12 +73,12 @@
           <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
             {{ row.label }}
-            <c-field-feedback :field="row.label" />
+            <c-field-feedback :field="row.label" :tip="tips" />
           </div>
           <div class="field" data-phone-line{% if row.number.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.number.id_for_label }}">{% translate "Phone" %}</label>
             {{ row.number }}
-            <c-field-feedback :field="row.number" />
+            {% if row.instance.pk %}<c-field-feedback :field="row.number" :tip="tips" />{% else %}<c-field-feedback :field="row.number" />{% endif %}
           </div>
         </div>
         {% comment %} Two controls side by side, each its own hit area with room around
@@ -126,7 +134,7 @@
       {% endif %}
     {% endfor %}
   </ol>
-  {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
+  {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}{% if not card_help %}
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
       A number is kept once on this instance. If one is already recorded here, saving says
@@ -141,5 +149,5 @@
         be confirmed first, and switching off several telephone numbers never takes it away.
       {% endblocktranslate %}
     </p>
-  {% endif %}
+  {% endif %}{% endif %}
 </fieldset>

@@ -1,4 +1,4 @@
-<c-vars field errors_only=False />
+<c-vars field errors_only=False tip="" />
 {% comment %} A field's help text and its errors, carrying the ids the input already claims.
 
    `<c-field-feedback :field="form.tags" />`, and `errors-only` for a caller that has already
@@ -24,9 +24,21 @@
    readers do not announce an alert that was already in the document when it arrived, but
    these forms come back through a swap, and an error inserted into a live page is exactly
    what the role is for.
+
+   **`tip` makes the help a tooltip (#302).** The paragraph is the same paragraph, with the
+   same id, still named in the control's `aria-describedby`, so a screen reader reads it
+   with the field exactly as before; it carries `data-tooltip`, and `app.js` shows it while
+   the field is hovered or has the focus instead of leaving it under the box. With scripts
+   off it is under the box, as it always was. For a sentence that says what a field is
+   *for*. A format the field requires, or an instruction, takes no `tip` and stays in
+   sight: it has to be there before the mistake (WCAG 3.3.2). A page passes `tip` only
+   while nothing on it has been refused (`tips` in the view of *Your details*): a refusal
+   on one row lies near the next row's help. And as a floor, a form that has errors keeps
+   its help in sight whatever `tip` says. Where the script finds no clear place for a
+   tooltip, the paragraph goes back to being this one, under the field.
 {% endcomment %}
 {% if field.help_text and not errors_only %}
-  <p{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% endif %}>{{ field.help_text }}</p>
+  <p{% if field.auto_id %} id="{{ field.auto_id }}_helptext"{% if tip and not field.form.errors %} data-tooltip{% endif %}{% endif %}>{{ field.help_text }}</p>
 {% endif %}
 {% if field.errors %}
   <div{% if field.auto_id %} id="{{ field.auto_id }}_error"{% endif %} role="alert">

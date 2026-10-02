@@ -1,0 +1,46 @@
+{% load i18n postulo %}
+<c-vars topic subject="" summary="" anchor="" tip="" no_drawer="" in_sight="" />
+{% comment %} A card's question mark: one sentence when it is rested on or focused, and the
+   card's full help when it is pressed (#302).
+
+   `<c-help-mark topic="telephone-numbers" anchor="section-phones" />`, as a direct child of
+   the card, after its `<legend>`; a card headed by `<c-section-title>` says
+   `<c-section-title help="…">` instead, which draws this inside the header. `topic` is one
+   of `core/help.py`'s. It draws three things:
+
+   - **the question mark**, a link to the topic's own page, named "Help: " and the card's
+     name. With scripts off that is all it is, and it opens the page **in a new tab**, and
+     says so in its name: the card is a form, and following a link away from it would lose
+     whatever had been typed and not saved. `anchor` is the card's id, sent along as
+     `next` so that the page's way back lands on the card, for somebody who opened the
+     page some other way. Where `app.js` takes the link over to open the drawer, it takes
+     off the `target` and the words that say "new tab", because neither is true any more;
+   - **the one sentence**, which the link names in `aria-describedby`, so a screen reader
+     reads it with the link either way. It is a `data-tooltip`: `app.js` makes it the
+     link's tooltip, and with scripts off it is the sentence under the card's title, where
+     it always was. `in_sight` leaves it there with scripts on too: the page says so while
+     something on it has been refused (`refused`, in the view);
+   - **the drawer**, which the link opens in place of being followed where a script runs
+     (`data-opens-dialog`). `no_drawer` leaves it out, for a page where several question
+     marks share a topic and the page draws `<c-help-drawer>` once.
+
+   `subject` names the card where it is not the topic's own title, and `summary` is the
+   card's own sentence where the topic's would not do: the three cards of links share a
+   topic, and each has its own name and its own sentence. `tip` is the sentence's id where
+   something else on the page already names it -- the two menus of *Your name* are
+   described by that card's sentence -- and is made up otherwise.
+
+   `data-turned` is the server saying the page's language writes a question mark turned
+   round, as the Arabic script does (`question_mark_turned`); the stylesheet turns the
+   icon by it.
+
+   A card with nothing more to say than its one sentence gets no question mark: a control
+   that opens what the tooltip already said is a control that does nothing. {% endcomment %}
+{% help_topic topic as about %}
+{% unique_id "help-tip" as made %}
+{% question_mark_turned as turned %}
+<a href="{% url 'core:help_topic' about.slug %}{% if anchor %}?next={{ request.path|urlencode:'' }}%23{{ anchor|urlencode:'' }}{% endif %}"
+   target="_blank" rel="noopener" class="btn" data-variant="ghost" data-size="icon-xs" data-help-mark{% if turned %} data-turned{% endif %}
+   data-opens-dialog="help-{{ about.slug }}" aria-describedby="{{ tip|default:made }}">{% icon "circle-question-mark" class="size-4" %}<span class="sr-only">{% blocktranslate trimmed with subject=subject|default:about.title %}Help: {{ subject }}{% endblocktranslate %}</span><span class="sr-only" data-new-tab> {% translate "(opens in a new tab)" %}</span></a>
+<p id="{{ tip|default:made }}"{% if not in_sight %} data-tooltip{% endif %} data-help-summary>{{ summary|default:about.summary }}</p>
+{% if not no_drawer %}<c-help-drawer :topic="about.slug" />{% endif %}

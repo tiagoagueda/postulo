@@ -10,11 +10,30 @@
 
    `remove_at_once` is *Your details* (#303), as in `phone_numbers.html`: a star, a bin, a
    dialog, and the row gone there and then. The contact form keeps the *Remove* box.
+
+   `card_help` is *Your details* as well (#302): each card has a question mark, named by
+   the card and showing the card's own sentence, and they open one drawer, because the
+   cards work the same way and their help is one topic. It is drawn once, after the cards.
+   What the paragraph under the rows says is in it, but for what it says about what to
+   type, which stays in sight under the legend, once per card: on a card with a choice of
+   service, that an address pasted with none chosen chooses its own; on one without, that
+   a name may be left blank. `refused` keeps the card's sentence under the legend. Without
+   `card_help` -- the contact form -- the sentence and the paragraph stay in sight, as they
+   were, and the template draws what it drew before #302: each switch is written on the
+   line of what it follows.
 {% endcomment %}
 {% for block in links %}
   <fieldset class="card mb-6" data-web-links="{{ block.kind }}" id="section-links-{{ block.kind }}">
-    <legend class="label px-1">{{ block.block.legend }}</legend>
-    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ block.block.intro }}</p>
+    <legend class="label px-1">{{ block.block.legend }}</legend>{% if card_help %}
+    <c-help-mark topic="links" :subject="block.block.legend" :summary="block.block.intro" anchor="section-links-{{ block.kind }}" no_drawer :in_sight="refused" />
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" data-links-how>
+      {% if block.has_services %}
+        {% translate "Paste an address without choosing a service, and saving chooses it where the address is on one Postulo knows." %}
+      {% else %}
+        {% translate "Left blank, the name is the address's host." %}
+      {% endif %}
+    </p>{% else %}
+    <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">{{ block.block.intro }}</p>{% endif %}
     {{ block.management_form }}
     {% if block.non_form_errors %}
       <div class="alert mb-3" data-variant="error">{{ block.non_form_errors }}</div>
@@ -88,7 +107,7 @@
         {% endif %}
       {% endfor %}
     </ol>
-    {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}
+    {% if remove_at_once %}{% include "partials/removed_said.html" %}{% endif %}{% if not card_help %}
     <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
       {% if block.has_services %}
         {% blocktranslate trimmed %}
@@ -103,6 +122,7 @@
           not to check it, not for a picture.
         {% endblocktranslate %}
       {% endif %}
-    </p>
+    </p>{% endif %}
   </fieldset>
-{% endfor %}
+{% endfor %}{% if card_help and links %}
+<c-help-drawer topic="links" />{% endif %}

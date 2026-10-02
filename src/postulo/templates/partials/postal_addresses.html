@@ -23,15 +23,21 @@
    dialog, and the row gone there and then. It is the only page these rows are on, and the
    switch is kept so that a second page drawing them decides for itself: without it a row
    keeps its *Primary* and *Remove* boxes, and a ticked one goes when the page is saved.
+
+   `card_help` is *Your details* too (#302), on the same terms: the card has a question
+   mark, whose one sentence is the one under the legend and whose drawer holds what the two
+   paragraphs under the rows say; `tips` makes what the name box is for its tooltip, and
+   `refused` keeps the card's sentence under the legend. What a country's rules refuse
+   stays under the rows either way: it says what may be typed, and it is the plugin's
+   sentence, there only while the plugin acts for the reader. Each switch is written on
+   the line of what it follows, so that without them the rows are drawn as before #302.
 {% endcomment %}
 <fieldset class="card mb-6" data-postal-addresses id="section-addresses">
-  <legend class="label px-1">{% translate "Postal addresses" %}</legend>
+  <legend class="label px-1">{% translate "Postal addresses" %}</legend>{% help_topic "postal-addresses" as about %}{% if card_help %}
+  <c-help-mark :topic="about.slug" anchor="section-addresses" :in_sight="refused" />{% else %}
   <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-    {% blocktranslate trimmed %}
-      Home, work, wherever post reaches you — with one of them marked as the one to use.
-      A form or a formal letter carries that one.
-    {% endblocktranslate %}
-  </p>
+    {{ about.summary }}
+  </p>{% endif %}
   {{ addresses.management_form }}
   {% if addresses.non_form_errors %}
     <div class="alert mb-3" data-variant="error">{{ addresses.non_form_errors }}</div>
@@ -75,7 +81,7 @@
           <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
             <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
             {{ row.label }}
-            <div class="field"><c-field-feedback :field="row.label" /></div>
+            <div class="field"><c-field-feedback :field="row.label" :tip="tips" /></div>
           </div>
         </div>
         {% comment %} Then the address, a line for each line its country writes. The
@@ -159,7 +165,7 @@
   {% comment %} Said because the opposite is what people expect from the telephone numbers
      beside it: a number is unique across the instance and an address is not. Two people at
      one address is a household, and refusing the second would also disclose that somebody
-     else here lives there (#92). {% endcomment %}
+     else here lives there (#92). {% endcomment %}{% if not card_help %}
   <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
     {% blocktranslate trimmed %}
       Unlike a telephone number, an address is not kept once on this instance — people
@@ -170,5 +176,5 @@
     {% blocktranslate trimmed %}
       Your CV header shows a town and a country and never a street, whatever is here.
     {% endblocktranslate %}
-  </p>
+  </p>{% endif %}
 </fieldset>

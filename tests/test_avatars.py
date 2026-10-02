@@ -172,7 +172,15 @@ def test_the_form_refuses_what_it_should(client, user):
     response = profile_page(client, user, picture=wrong_type)
     assert response.status_code == 200 and "PNG, JPEG, WebP or GIF" in response.content.decode()
 
-    corrupt = SimpleUploadedFile("x.png", b"not really png bytes", content_type="image/png")
+    # What a file is decides, not what it says it is (#302): text sent as a PNG is no
+    # picture at all, and gets the formats' sentence; a PNG cut short is a PNG that
+    # cannot be read.
+    not_a_picture = SimpleUploadedFile("x.png", b"not really png bytes", content_type="image/png")
+    response = profile_page(client, user, picture=not_a_picture)
+    assert response.status_code == 200
+    assert "That is not a kind of picture Postulo keeps." in response.content.decode()
+
+    corrupt = SimpleUploadedFile("x.png", picture_bytes(fmt="PNG")[:60], content_type="image/png")
     response = profile_page(client, user, picture=corrupt)
     assert response.status_code == 200 and "could not be read" in response.content.decode()
     assert not Profile.objects.get(user=user).avatar

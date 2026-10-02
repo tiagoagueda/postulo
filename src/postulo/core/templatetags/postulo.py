@@ -306,6 +306,54 @@ def unique_id(prefix: str) -> str:
 
 
 @register.simple_tag
+def help_topic(slug: str):
+    """The help topic called ``slug``: ``{% help_topic "your-picture" as about %}`` (#302).
+
+    A name that is not a topic is a mistake in the template, and says so where it is drawn
+    rather than drawing a question mark that leads nowhere.
+    """
+    from postulo.core import help as help_topics
+
+    try:
+        return help_topics.topic(slug)
+    except KeyError:
+        raise template.TemplateSyntaxError(
+            f"No help topic named {slug!r}. The topics are listed in postulo/core/help.py."
+        ) from None
+
+
+@register.simple_tag
+def question_mark_turned() -> bool:
+    """Whether the page's language writes a question mark turned round (#302).
+
+    The Arabic script does -- ؟ -- and that is a property of the script, not of the
+    direction: Hebrew is read right to left too and writes it as Latin does. So it is asked
+    of the script `core.languages` knows the page's language to be written in, which is
+    the one list of that there is, and the stylesheet turns the help icon where a template
+    says so.
+    """
+    from postulo.core import languages
+
+    return languages.script_of(languages.current()) == "Arab"
+
+
+@register.simple_tag(takes_context=True)
+def help_body(context, topic) -> str:
+    """A topic's help itself: ``{% help_body about %}`` (#302).
+
+    The drawer on the card and the page at the topic's own address both draw it through
+    here, with the same template and the same variables, so the two cannot disagree.
+
+    Drawn in the context it is called from, as an ``{% include %}`` is, and not as a new
+    page: a card's help is nine drawers on *Your details*, and a fresh request context for
+    each would run every context processor nine times more.
+    """
+    template_ = context.template.engine.get_template(topic.template)
+    with context.push(topic.variables()):
+        return template_.render(context)
+
+
+@register.simple_tag
 def phone_link(number: str) -> str:
     """A stored number, spaced to be read aloud and linked so a phone can dial it.
 

@@ -413,3 +413,171 @@ def test_a_dialog_without_an_action_holds_no_form():
     )
     assert "<form" not in html and 'role="alertdialog"' not in html
     assert "aria-describedby" not in html, "no sentence, so nothing to point at"
+
+
+# ------------------------------------------------------ help where it is asked (#302)
+
+
+def test_a_fields_help_can_be_a_tooltip_and_is_the_same_paragraph():
+    """`tip` marks the help for the script and changes nothing else: the same paragraph,
+    the same id, still what the control is described by. With scripts off it is the help
+    under the box. A tick box takes no tip, and a form that was refused keeps its help in
+    sight."""
+    plain = render('{% cotton field :field="form.name" / %}', form=NameForm())
+    tipped = render('{% cotton field :field="form.name" tip / %}', form=NameForm())
+
+    assert '<p id="id_name_helptext" data-tooltip>As it appears on your passport.</p>' in tipped
+    assert tipped.replace(" data-tooltip", "") == plain
+    assert 'aria-describedby="id_name_helptext"' in tipped
+
+    box = render('{% cotton field :field="form.agreed" tip / %}', form=NameForm())
+    assert '<p id="id_agreed_helptext">Tick to agree.</p>' in box
+
+    refused = render('{% cotton field :field="form.name" tip / %}', form=NameForm(data={}))
+    assert '<p id="id_name_helptext">As it appears on your passport.</p>' in refused
+    assert 'id="id_name_error"' in refused
+
+
+def test_a_section_title_can_carry_its_cards_question_mark():
+    """`help` names a topic: the heading, then a link to the topic's page that is described
+    by the topic's one sentence, the sentence itself, and the drawer the link opens where a
+    script runs. `anchor` goes along as the way back, and `tip` is the sentence's id where
+    something else on the page names it."""
+    html = render(
+        '{% cotton section-title help="your-name" anchor="section-name" tip="the-sentence" %}'
+        "Your name{% endcotton %}",
+        request=RequestFactory().get("/accounts/profile/"),
+    )
+
+    heading = html.index("<h2>Your name</h2>")
+    mark = re.search(r"<a\b[^>]*data-help-mark[^>]*>", html)
+    assert mark and heading < mark.start()
+    assert 'href="/help/your-name/?next=%2Faccounts%2Fprofile%2F%23section-name"' in mark.group(0)
+    assert 'class="btn" data-variant="ghost" data-size="icon-xs"' in mark.group(0)
+    assert 'data-opens-dialog="help-your-name"' in mark.group(0)
+    assert 'aria-describedby="the-sentence"' in mark.group(0)
+    assert 'data-icon="circle-question-mark"' in html
+    assert re.search(
+        r'<p id="the-sentence" data-tooltip data-help-summary>A form of address is written', html
+    )
+    assert html.count('<dialog id="help-your-name"') == 1
+
+    without = render("{% cotton section-title %}Your name{% endcotton %}")
+    assert "data-help-mark" not in without and "<dialog" not in without
+
+
+def test_a_question_mark_opens_its_page_in_a_new_tab_and_says_so():
+    """With scripts off the question mark is a link away from a form, so it opens the help
+    in a new tab, and its name says so: what was typed on the card is never left behind
+    (#302). The name is the link's own text, so that `app.js`, taking the link over for
+    the drawer, can take the words about a new tab off with the `target`."""
+    html = render(
+        '{% cotton help-mark topic="telephone-numbers" anchor="section-phones" / %}',
+        request=RequestFactory().get("/accounts/profile/"),
+    )
+
+    mark = re.search(r"<a\b[^>]*data-help-mark[^>]*>(.*?)</a>", html, re.S)
+    assert 'target="_blank"' in mark.group(0) and 'rel="noopener"' in mark.group(0)
+    assert "aria-label" not in mark.group(0), "the name is the link's text"
+    named = re.sub(r"<svg.*?</svg>", "", mark.group(1), flags=re.S)
+    assert named == (
+        '<span class="sr-only">Help: Telephone numbers</span>'
+        '<span class="sr-only" data-new-tab> (opens in a new tab)</span>'
+    )
+
+
+def test_a_question_marks_sentence_stays_in_sight_when_the_page_says_so():
+    """`in_sight` is the page saying something on it was refused (#302): the card's
+    sentence is then the paragraph under its title with scripts on too, and is still what
+    the question mark is described by."""
+    request = RequestFactory().get("/accounts/profile/")
+    html = render(
+        '{% cotton section-title help="your-name" tip="the-sentence" :in_sight="True" %}'
+        "Your name{% endcotton %}",
+        request=request,
+    )
+
+    assert '<p id="the-sentence" data-help-summary>' in html
+    assert "data-tooltip" not in html
+    assert 'aria-describedby="the-sentence"' in html
+
+
+def test_a_section_title_without_help_is_drawn_as_it_was():
+    """A heading that asks for no help draws what it drew before #302, byte for byte: the
+    switch for the question mark leaves no line behind it on the forty pages that never
+    pass `help`."""
+    plain = render("{% cotton section-title %}Your name{% endcotton %}")
+    with_subtitle = render(
+        "{% cotton section-title %}Your name"
+        "{% cotton:slot subtitle %}Two lines.{% endcotton:slot %}{% endcotton %}"
+    )
+
+    assert plain.strip() == '<header class="section-title">\n  <h2>Your name</h2>\n  \n</header>'
+    assert with_subtitle.strip() == (
+        '<header class="section-title">\n  <h2>Your name</h2>\n  <p>Two lines.</p>\n</header>'
+    )
+
+
+@pytest.mark.parametrize(
+    ("language", "turned"), [("ar", True), ("en-GB", False), ("he", False), ("fr-FR", False)]
+)
+def test_the_question_mark_turns_where_the_script_writes_it_turned(language, turned):
+    """The Arabic script writes a question mark turned round and Hebrew does not, though
+    both are read right to left (#302). Which script a language is written in is
+    `core.languages`' to say, so the server marks the question mark and the stylesheet
+    turns it by that mark: no second list of languages in the stylesheet."""
+    from django.utils import translation
+
+    with translation.override(language):
+        html = render(
+            '{% cotton help-mark topic="links" no_drawer / %}',
+            request=RequestFactory().get("/accounts/profile/"),
+        )
+    mark = re.search(r"<a\b[^>]*data-help-mark[^>]*>", html).group(0)
+
+    assert ("data-turned" in mark) is turned
+    css = (TEMPLATES.parents[2] / "assets" / "css" / "app.css").read_text("utf-8")
+    assert "[data-help-mark][data-turned]" in css
+    assert '[data-icon="circle-question-mark"]:is(' not in css
+
+
+def test_a_question_mark_can_leave_its_drawer_to_the_page():
+    """Where several cards share a topic, each says `no_drawer` and the page draws the one
+    drawer; a card says which card it is and shows its own sentence."""
+    request = RequestFactory().get("/accounts/profile/")
+    html = render(
+        '{% cotton help-mark topic="links" subject="Websites" summary="A blog." no_drawer / %}',
+        request=request,
+    )
+
+    assert '<span class="sr-only">Help: Websites</span>' in html and 'href="/help/links/"' in html
+    assert re.search(r'<p id="help-tip-[0-9a-f]+" data-tooltip data-help-summary>A blog.</p>', html)
+    assert "<dialog" not in html
+
+    drawer = render('{% cotton help-drawer topic="links" / %}', request=request)
+    assert '<dialog id="help-links" class="drawer" data-side="inline-end"' in drawer
+    assert 'data-help-drawer="links"' in drawer
+
+
+def test_a_drawer_is_a_dialog_at_the_inline_end_named_by_its_heading():
+    """Basecoat's drawer on the browser's own `<dialog>` (#302): no `popover`, because only
+    a script ever opens it -- what opens it is a link to a page holding the same thing --
+    and at the inline end, which is a side Basecoat does not have and no side by name. The
+    heading names it, *Close* is a button that submits nothing, and the body can take the
+    focus so that the keyboard can scroll it."""
+    html = render(
+        '{% cotton drawer id="about" data-about="x" %}'
+        "{% cotton:slot title %}About <bdi>this</bdi>{% endcotton:slot %}"
+        "<p>Words.</p>{% endcotton %}"
+    )
+
+    assert (
+        '<dialog id="about" class="drawer" data-side="inline-end" aria-labelledby="about-title" '
+        'data-dialog data-drawer data-about="x">'
+    ) in html
+    assert "popover" not in html
+    assert '<h2 id="about-title">About <bdi>this</bdi></h2>' in html
+    close = re.search(r"<button[^>]*data-drawer-close[^>]*>", html).group(0)
+    assert 'type="button"' in close and 'aria-label="Close"' in close
+    assert 'class="btn shrink-0"' in close, "Close keeps its 24 pixels beside a long heading"
+    assert '<section tabindex="0" aria-labelledby="about-title"><p>Words.</p></section>' in html

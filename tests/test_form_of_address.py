@@ -251,13 +251,17 @@ def test_the_form_of_address_says_what_it_is_for(client, user):
 
 
 def test_the_page_says_neither_is_printed_unless_a_cv_says_so(client, user):
-    """#308 made it a CV's own choice, and the sentence under the menus says where."""
+    """#308 made it a CV's own choice, and the card's help says where: it was the last
+    sentence of the paragraph under the menus, and is in the card's drawer since #302."""
     html = " ".join(page(client, user).split())
-    assert "Neither is printed anywhere unless a CV's own settings say so." in html
+    drawer = html[html.index('<dialog id="help-your-name"') :]
+    drawer = drawer[: drawer.index("</dialog>")]
+    assert "Neither is printed anywhere unless a CV says so" in drawer
+    assert "one for the pronouns under its own <em>Settings</em>. Letters print neither." in drawer
 
 
 def test_both_menus_are_described_by_the_sentence_that_explains_them(client, user):
-    """One sentence under the card, named by each menu, and there to be named."""
+    """The card's one sentence, named by each menu, and there to be named."""
     html = page(client, user)
     for name in ("form_of_address", "pronouns"):
         tag = re.search(rf'<select name="{name}"[^>]*>', html).group(0)

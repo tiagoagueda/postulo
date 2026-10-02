@@ -143,6 +143,7 @@ SECTIONS: tuple[Section, ...] = (
     Section("density", _("How much room")),
     Section("empty", _("Nothing there")),
     Section("dialogs", _("Dialogs")),
+    Section("help", _("Help")),
 )
 
 

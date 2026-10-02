@@ -361,12 +361,14 @@ class SocialSignupForm(AllauthSocialSignupForm):
         return user
 
 
-#: The id of the sentence under *Your name* that describes both menus (#309).
+#: The id of the sentence of *Your name* that describes both menus (#309). It is the card's
+#: one sentence: under the title with scripts off, and otherwise the tooltip of the two
+#: menus and of the card's question mark (#302).
 ADDRESSING_HELP_ID = "name-addressing-help"
 
 
-class DescribedByTheSentenceBelow(forms.BoundField):
-    """A menu of *Your name*, described by the one sentence under the card (#309).
+class DescribedByTheCardsSentence(forms.BoundField):
+    """A menu of *Your name*, described by the card's one sentence (#309).
 
     Django writes ``aria-describedby`` from a field's own help and error, and leaves it
     alone once a widget names something else -- so a menu that named the shared sentence
@@ -451,7 +453,7 @@ class ProfileForm(forms.ModelForm):
         label=_("Form of address"),
         required=False,
         widget=ListedSelect(attrs={"autocomplete": "honorific-prefix"}),
-        bound_field_class=DescribedByTheSentenceBelow,
+        bound_field_class=DescribedByTheCardsSentence,
     )
     form_of_address_other = forms.CharField(
         label=_("Other form of address"),
@@ -463,7 +465,7 @@ class ProfileForm(forms.ModelForm):
         label=_("Pronouns"),
         required=False,
         widget=ListedSelect(),
-        bound_field_class=DescribedByTheSentenceBelow,
+        bound_field_class=DescribedByTheCardsSentence,
     )
     pronouns_other = forms.CharField(
         label=_("Other pronouns"),
@@ -473,14 +475,9 @@ class ProfileForm(forms.ModelForm):
     )
     # A plain FileField, not an ImageField: the size and type are checked before anything
     # is decoded, and the decoding is done once, by the same code that stores the result.
-    picture = forms.FileField(
-        label=_("Upload a picture"),
-        required=False,
-        help_text=_(
-            "PNG, JPEG, WebP or GIF up to 5 MB. It is cut to a square and stripped of "
-            "anything the file knew about where it was taken."
-        ),
-    )
+    # Its help is what a file has to be, which stays under the box (#302), and is written
+    # in `__init__` from the limits `clean_picture` enforces.
+    picture = forms.FileField(label=_("Upload a picture"), required=False)
     remove_picture = forms.BooleanField(label=_("Remove the uploaded picture"), required=False)
     use_gravatar = forms.BooleanField(
         label=_("Use my Gravatar"),
@@ -511,6 +508,18 @@ class ProfileForm(forms.ModelForm):
         self._offer("form_of_address", addressing.forms_of_address(language), written_in)
         self._offer("pronouns", addressing.pronouns(language), written_in)
         self._explain_location()
+        # The formats and the size are the ones `clean_picture` refuses by (#302): read from
+        # `avatars`, so the sentence under the box cannot promise what the form turns away.
+        self.fields["picture"].help_text = (
+            _("%(formats)s, up to %(megabytes)s MB.") % avatars.limits()
+        )
+        # Said before anything asks for the bound field: `self["record_language"]` below is
+        # kept by the form, and a sentence given to the field after that was never drawn.
+        self.fields["record_language"].required = False
+        self.fields["record_language"].help_text = _(
+            "Which language your experience, education and projects are typed in. A CV in "
+            "another language shows what you have translated, and says what it could not."
+        )
         # The same menu the interface language uses, so an option is written in the language
         # it names. Blank is a real answer here rather than an omission: most people have
         # one career in one language and never think about this again (#131).
@@ -519,11 +528,6 @@ class ProfileForm(forms.ModelForm):
                 [("", _("The language you read Postulo in")), *languages.LANGUAGES],
                 self["record_language"].value(),
             )
-        )
-        self.fields["record_language"].required = False
-        self.fields["record_language"].help_text = _(
-            "Which language your experience, education and projects are typed in. A CV in "
-            "another language shows what you have translated, and says what it could not."
         )
         # One box while *Several telephone numbers* is switched off, and none at all
         # while it is on: the rows are a formset of their own, and two controls writing
@@ -556,9 +560,10 @@ class ProfileForm(forms.ModelForm):
         or from a list in another language -- chooses *Other…* and is in the box beside it,
         which the stylesheet then shows. Blank chooses the empty entry: nothing is assumed.
 
-        Both menus are described by the one sentence under the card, which says what each
-        is and that neither is printed yet: a help text under each, in a column this narrow,
-        would say it twice in a worse place. `DescribedByTheSentenceBelow` names it.
+        Both menus are described by the card's one sentence, which says what each is: a
+        help text under each, in a column this narrow, would say it twice in a worse place.
+        `DescribedByTheCardsSentence` names it. The rest -- where the lists come from, and
+        that neither is printed unless a CV says so -- is the card's help (#302).
 
         **A page that comes back keeps what it was sent.** The menu takes text from a list
         it no longer shows, so a page drawn in French and posted after the record became
@@ -592,6 +597,9 @@ class ProfileForm(forms.ModelForm):
         """
         field = self.fields["location"]
         derived = postal.location_line(self.instance) if self.instance.pk else ""
+        # Read by the page (#302): with a line to show in grey, the sentence explains it and
+        # is the box's tooltip; with none, it says what to type and stays in sight.
+        self.location_derived = derived
         if derived:
             field.widget.attrs["placeholder"] = derived
             field.help_text = _(
@@ -635,14 +643,14 @@ class ProfileForm(forms.ModelForm):
         return cleaned
 
     def clean_picture(self):
+        """The size first, then what the file is: what the image library reads from its
+        bytes, and not what the upload says it is (#302). Both refusals are worded from
+        `avatars.limits()`, as the sentence under the box and the card's help are."""
         upload = self.cleaned_data.get("picture")
         if not upload:
             return upload
         if upload.size > avatars.MAX_UPLOAD_BYTES:
-            raise forms.ValidationError(_("That picture is over 5 MB. A smaller one, please."))
-        content_type = getattr(upload, "content_type", "") or ""
-        if content_type not in avatars.ALLOWED_CONTENT_TYPES:
-            raise forms.ValidationError(_("Use a PNG, JPEG, WebP or GIF."))
+            raise forms.ValidationError(avatars.too_large())
         try:
             self._processed_picture = avatars.process(upload.read())
         except avatars.UnusableImage as exc:
@@ -950,7 +958,10 @@ class PersonIdentifierForm(IdentifierRow, forms.ModelForm):
         model = PersonIdentifier
         fields = ("scheme", "value", "label")
         help_texts = {
-            "scheme": _("Which register the number belongs to. What goes where, above, says."),
+            "scheme": _(
+                "Which register the identifier belongs to. “What goes where” shows what "
+                "each one looks like."
+            ),
             "value": _("Postulo tidies it into the register's own spelling and checks the shape."),
             "label": _("Only for “Other”: what to call it on a CV."),
         }

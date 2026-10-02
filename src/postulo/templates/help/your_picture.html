@@ -1,0 +1,43 @@
+{% load i18n %}
+{% comment %} The help of *Your picture* (#302), drawn by the card's drawer and by the page
+   at /help/your-picture/. `formats`, `megabytes` and `megapixels` come from
+   `accounts.avatars.limits()`: what the form and the decoder refuse by, never written out
+   here, so this cannot promise a file that is then turned away. {% endcomment %}
+<p>
+  {% blocktranslate trimmed %}
+    Your picture is shown at the top of every page, where it is the button that opens
+    your menu, and to the administrators of this instance in their list of people. No CV
+    and no letter prints it. Until you give Postulo a picture, it shows your initials.
+  {% endblocktranslate %}
+</p>
+<p data-picture-limits>
+  {% blocktranslate trimmed %}
+    A picture you upload has to be {{ formats }}, of no more than {{ megabytes }} MB and
+    no more than {{ megapixels }} megapixels. What the file is decides, not what it is
+    called. Anything else is refused, with the reason, and the picture you had stays.
+  {% endblocktranslate %}
+</p>
+<p>
+  {% blocktranslate trimmed %}
+    What you upload is cut to a square around its middle and written out again as a new
+    file. That drops everything the file carried besides the picture, including where a
+    photograph was taken.
+  {% endblocktranslate %}
+</p>
+<p>
+  {% blocktranslate trimmed %}
+    Tick <em>Use my Gravatar</em> and save, and Postulo asks gravatar.com once for the
+    picture kept there for your primary email address. Gravatar is sent a hash of the
+    address, not the address. Postulo keeps a copy and shows that, so nothing is fetched
+    while pages are viewed. It asks again when your primary address changes, or when you
+    press <em>Fetch my Gravatar again</em>. Untick the box and save, and the copy is
+    deleted.
+  {% endblocktranslate %}
+</p>
+<p>
+  {% blocktranslate trimmed %}
+    A picture you uploaded is shown rather than your Gravatar, and your Gravatar rather
+    than your initials. <em>Remove the uploaded picture</em> is offered once there is one:
+    tick it and save, and the file is deleted.
+  {% endblocktranslate %}
+</p>

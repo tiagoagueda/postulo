@@ -203,6 +203,81 @@ loose word. So a table using it must carry `role="table"`, `role="rowgroup"`, `r
 the elements already are and change nothing; on a narrow one they are the only thing holding
 the meaning together. `server/people.html` is the worked example.
 
+## Help
+
+Help goes where the question is asked (#302), and there are three places for it. *Your
+details* is the worked example. A page takes this shape when somebody gives it to it; until
+then its help stays under its fields, as it was.
+
+- **What a field is *for* is a tooltip.** `<c-field :field="form.headline" :tip="tips" />`,
+  or `tip` on `<c-field-feedback>` in a row written by hand. It is the field's `help_text`,
+  drawn as the same paragraph with the same id, still named in the control's
+  `aria-describedby`, so a screen reader reads it with the field exactly as before. `app.js`
+  shows it while the field is hovered or has the focus, and Escape puts it away. With
+  scripts off it is under the field.
+- **A format or an instruction stays in sight**, with no `tip`: the form a date takes, the
+  files an upload accepts, which addresses can be pasted whole, what to type in a box that
+  has nothing to go on yet, the row a new telephone number is typed into. It has to be
+  there before the mistake (WCAG 3.3.2), and a tooltip is out of sight for everybody who
+  does not think to look for one. The same goes for the sentence of a tick box, a radio or
+  a switch, which says what ticking does: a tap does not give one the focus in every
+  browser, so a phone would show it after the tick or never, and `<c-field>` takes no `tip`
+  on one. A help text that says both is split: the format stays the field's help and the
+  rest goes to the card's.
+- **Help that belongs to a card, and not to one of its fields, is behind a question mark.**
+  `<c-section-title help="telephone-numbers" anchor="section-phones">`, or in a card that
+  is a `<fieldset>`, `<c-help-mark topic="…" anchor="…" />` after its `<legend>`. Resting
+  on the question mark, or focusing it, shows one sentence; pressing it, or Space on it,
+  opens the card's help in a drawer. With scripts off the sentence is under the card's
+  title and the question mark is a link that opens `/help/<topic>/` **in a new tab**, and
+  says so in its name: the card is a form, and leaving it would lose what was typed. That
+  page holds the same help and leads back to the card. **A card with nothing more to say
+  than its one sentence gets no question mark**: a control that opens what the tooltip
+  already said does nothing. Give that card a `subtitle` and leave it there.
+
+**A page that has been refused has no tooltips.** The view says so for the whole page --
+`refused`, true when the form or any block of rows on it is invalid, and `tips`, its
+opposite, which is what the fields take -- and every question mark's sentence is then under
+its card's title (`:in_sight="refused"`). A refusal on one row is under the next row's
+help, and a card's sentence is the tooltip of fields far from the refusal, so asking each
+form about itself is not enough. `<c-field-feedback>` still keeps the help of a form that
+has errors in sight, whatever it is told.
+
+**A tooltip is shown only where there is a clear place for it**, and `app.js` decides that
+by measuring: wholly in the window that can be seen (under the floating masthead, above a
+phone's bar at the foot), and not over its own field, a refusal or an alert, a mark or a
+note under a row, a card's question mark, or the control that has the focus. Where there is
+none it goes back to being the paragraph under its field. So a page needs nothing more than
+the `tip`; but a new kind of thing that must never be covered -- a new mark under a row --
+goes into `TIP_KEEPS_CLEAR_OF` in `app.js`, and into the rule the browser tests ask
+(`BY_THE_RULE` in `tests/e2e/test_help.py`).
+
+Never use Basecoat's `data-tooltip="…"` attribute: it is a `::before`, shown on hover only
+and hidden on focus, and a screen reader does not reliably read it.
+
+**To add a help topic:**
+
+1. Write it as a template under `templates/help/`: a few short paragraphs, each one
+   `{% blocktranslate trimmed %}`, for the person filling the card in. Say what the card is
+   for, what each control does, what is refused and why, and what happens to what is there
+   already. No heading: the drawer and the page supply it. **Every sentence has to be
+   true**, so read the code that makes it so, or try it: a sentence that was nearly right
+   is how *Your details* came to promise that a form printed your street.
+2. Add a `Topic` to `core/help.py` with its address, the card's name, the one sentence and
+   the template. **A number or a list the code decides is read from the code**, through
+   the topic's `context`, and never written into the text: the help of *Your picture* gets
+   its file types and its limits from `accounts/avatars.py`, where an upload is refused by
+   them, and the help of *Identifiers* gets the registers whose address can be pasted from
+   the registry. No counts in the prose ("three cards"), no defaults ("off to begin with"),
+   no list of kinds that a plugin can add to.
+3. Put the question mark on the card, and translate the new strings as drafts.
+4. Where a wiki page says the same thing, give it a line pointing at the topic: the topic
+   is what a person filling the card in reads, in their own language, and the wiki is
+   where it is explained at length.
+
+The text is never fetched from the wiki and never bundled from it. The drawer and the page
+draw the same template through one tag, and `tests/test_help_topics.py` holds them to it.
+
 ## What will not be merged
 
 **Anything that puts a feature behind payment.** Postulo will never have a paid tier, a

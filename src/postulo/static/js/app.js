@@ -2381,17 +2381,27 @@
     true
   );
 
-  /* ------------------------------------------- a link that opens a dialog instead (#311)
+  /* ------------------------------------------------ a link that opens a dialog instead
    *
-   * A dialog that holds something to do, rather than a question, has a page behind it: the
-   * same form at an address of its own, which is what works with no script at all. So what
-   * opens it is a link to that page, `<a href="…" data-opens-dialog="id">`, and here the
-   * link opens the dialog it names in place of being followed -- modal, like every other,
-   * with focus given back to the link when it closes. A click that asks for a new tab or a
-   * new window is left to do that, and so is a link whose dialog is not on the page.
+   * A dialog that holds something to read or to do, rather than a question, has a page
+   * behind it: the same thing at an address of its own, which is what works with no script
+   * at all. So what opens it is a link to that page, `<a href="…" data-opens-dialog="id">`,
+   * and here the link opens the dialog it names in place of being followed -- modal, like
+   * every other, with focus given back to the link when it closes. A click that asks for a
+   * new tab or a new window is left to do that, and so is a link whose dialog is not on
+   * the page. A card's question mark is one (#302).
    *
    * `aria-haspopup` is added here and not written in the template: without this script the
    * link is a link, and saying it opens a dialog would be untrue.
+   *
+   * **Taken over, it is a button** (#302): it opens something on this page, and that is
+   * what a button does. So it is said to be one, and it answers to Space as a button does
+   * -- on the key's release, the press not scrolling the page, a key held down pressing it
+   * once -- where a link would have scrolled the page and opened nothing. And what the
+   * server wrote for the link it was is taken off where it is no longer true: a link that
+   * leaves a form opens its page in a new tab, so that nothing typed is lost, and says so
+   * in words marked `data-new-tab`; opening the dialog here leaves nothing, so the `target`
+   * and those words go.
    */
   function dialogOfLink(link) {
     var dialog = document.getElementById(link.getAttribute("data-opens-dialog") || "");
@@ -2403,6 +2413,11 @@
       var dialog = dialogOfLink(link);
       if (dialog && typeof dialog.showModal === "function") {
         link.setAttribute("aria-haspopup", "dialog");
+        link.setAttribute("role", "button");
+        link.removeAttribute("target");
+        Array.prototype.forEach.call(link.querySelectorAll("[data-new-tab]"), function (words) {
+          words.remove();
+        });
       }
     });
   });
@@ -2428,6 +2443,34 @@
     // A box inside it that names a line was drawn while the dialog was shut, where a box
     // has no size and cannot be scrolled: it is put on its line now that it has one.
     placeCarets(dialog);
+  });
+
+  var spacePressed = null;
+
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== " " || event.altKey || event.ctrlKey || event.metaKey) {
+      return;
+    }
+    var link = event.target.closest ? event.target.closest('a[data-opens-dialog][role="button"]') : null;
+    if (!link) {
+      return;
+    }
+    event.preventDefault();
+    if (!event.repeat) {
+      spacePressed = link;
+    }
+  });
+
+  document.addEventListener("keyup", function (event) {
+    if (event.key !== " ") {
+      return;
+    }
+    var link = spacePressed;
+    spacePressed = null;
+    if (link && link === event.target) {
+      event.preventDefault();
+      link.click();
+    }
   });
 
   /* ------------------------------------------- the caret, on the line that is wrong (#311)
@@ -3728,6 +3771,660 @@
     // Onto the option the box had found, too: now somebody has moved to it.
     state.moved = true;
   });
+
+  /* ---------------------------------------------------------------------- drawers
+   *
+   * `<c-drawer>` is a `<dialog>` a link opens, above, and so only ever a modal (#302). The
+   * browser closes a modal dialog on Escape and hands the focus back; what is left to the
+   * page is its *Close* button and a press outside the panel. The dialog fills the window
+   * and the panel is its one child, so a press outside the panel is a press on the dialog
+   * itself -- and it has to have started there too: a selection dragged out of the text
+   * and let go over the page is not a press on the page.
+   */
+  var pressedOn = null;
+
+  document.addEventListener(
+    "pointerdown",
+    function (event) {
+      pressedOn = event.target;
+    },
+    true
+  );
+
+  document.addEventListener("click", function (event) {
+    var target = event.target;
+    if (!target || !target.closest) {
+      return;
+    }
+    var close = target.closest("[data-drawer-close]");
+    var drawer = close
+      ? close.closest("dialog[data-drawer]")
+      : target.matches("dialog[data-drawer]") && pressedOn === target
+        ? target
+        : null;
+    if (drawer && drawer.open) {
+      drawer.close();
+    }
+  });
+
+  /* ---------------------------------------------------------------------- tooltips
+   *
+   * A sentence that says what a field is for is drawn by the server as an ordinary
+   * paragraph under the field, carrying `data-tooltip` and the id the control names in
+   * `aria-describedby` (#302). With no script that is where it stays. Here it becomes a
+   * tooltip: a popover, hidden until the field is hovered or has the focus, and still the
+   * control's description either way, so a screen reader reads it with the field exactly
+   * as before. A card's one sentence is the same thing on the card's question mark.
+   *
+   * **What shows one.** The pointer resting on the field -- its label, its control, or
+   * the tooltip itself -- and the focus being anywhere in the field. A field is the
+   * nearest `.field` that holds something described by a tooltip; a control outside one,
+   * like a question mark, is its own. Focus shows it at once; the pointer after a moment,
+   * so that crossing a form does not light every sentence on the way. Once shown it stays
+   * while the pointer is on the field, on the tooltip, or on the strip between them (the
+   * tooltip's `::after`, as wide as the two together), so there is no gap to cross at
+   * any speed; and for half a second after the pointer has left all three, so that a hand
+   * that slips off an edge, or takes the long way round to a corner, loses nothing. A
+   * touch does not hover: touching a control gives it the focus, and that shows it.
+   *
+   * **What takes it away** (SC 1.4.13): the pointer and the focus both having gone, or
+   * Escape. Escape puts away the tooltips that are showing. Where one of them is the
+   * focused field's, the key is the tooltip's and nobody else's -- the focus stays, a
+   * dialog the field is in stays open, and a second Escape is the dialog's. A tooltip
+   * shown only for a pointer resting somewhere is put away by the same Escape, which then
+   * goes on to whatever has the focus: somebody typing in the search with the pointer
+   * parked on a field is not looking at that field's tooltip. One put away stays away
+   * until the pointer or the focus that showed it has left and come back. A press that
+   * opens a modal dialog takes away the one the pointer was resting on: it is behind the
+   * dialog now.
+   *
+   * **Where it goes: only where there is a clear place for it.** A place is clear when the
+   * tooltip, put there and measured,
+   *
+   * - is wholly inside the window that can be seen: under the masthead that floats at the
+   *   top and the search bar under it, above the bar at the foot of a phone's window, and
+   *   inside the part of the page a zoomed or keyboard-shortened window shows;
+   * - is not over any part of its own field -- the label, the control, a mark or an error
+   *   under it -- nor, for a card's sentence, over the question mark it is shown for;
+   * - and is not over anything that must never be hidden: a refusal or an alert, a mark
+   *   or a note under a row (*Not checked*, *Kept as it was*, a place's note), a card's
+   *   question mark, a select's list that is open (#301), or the control that has the
+   *   focus (`TIP_KEEPS_CLEAR_OF`).
+   *
+   * **A field whose list is open shows no tooltip.** The list is what is being read then,
+   * and it opens over the place the field's tooltip would take. So opening a select's list
+   * puts its field's tooltip away at once, and none comes back for that field while the
+   * list is open, whether for the focus or for the pointer resting on the list. Once the
+   * list has closed, the usual rule holds again: the focus is back on the select's button,
+   * so its sentence shows -- unless Escape had put it away before.
+   *
+   * The places are tried in order: above the field from its start edge, above from its
+   * end edge, above it anywhere along the window, then the same three below; a question
+   * mark is in its card's corner at the inline end, so its sentence tries the end edge
+   * first. Where all that is in the way of a place is a question mark, or a side of the
+   * window, the tooltip stops short of it -- moved along the line as little as it can be,
+   * and narrowed to the room that is left, never below ten rem -- and is asked again.
+   * **Where no place is clear, the help is not a tooltip**: it goes back to being
+   * the paragraph under the field that the server drew, where it was before #302 and is
+   * with scripts off, and it stays there until the window changes width -- a sentence
+   * that came and went with the focus would move the page twice at every stop, in the
+   * windows that have least room to spare, and the room it is looking for is the room it
+   * takes. A window too short to hold a field and its tooltip gets the help under every
+   * field it visits, and no popover at all. A field scrolled out of sight hides its
+   * tooltip until it is back.
+   *
+   * It is placed here, in every browser, in the page's own co-ordinates: it scrolls with
+   * the page as its field does, and is asked again whenever anything scrolls or the window
+   * changes. Not with CSS anchor positioning: the rule is about where the tooltip *is*,
+   * and a box the browser ties to an anchor is moved when the browser next draws, not
+   * when it is measured, so a place checked in the same breath as a scroll would be the
+   * place it had before. Where a browser has no popover at all nothing here runs, and the
+   * sentences stay under their fields.
+   */
+  var TIP_SHOWN_AFTER = 300; // how long the pointer rests on a field before its sentence shows
+  var TIP_KEPT_FOR = 500; // how long it stays once the pointer has left field, strip and tooltip
+  var TIP_GAP = 6; // between a field and its tooltip; the stylesheet's strip spans it
+  var TIP_EDGE = 8; // how near the window's edge a tooltip placed along it may come
+  var TIP_NARROWEST = 160; // 10rem: the narrowest a tooltip is made, to stop short of something
+
+  // What a tooltip may never lie over, besides its own field and the focused control.
+  var TIP_KEEPS_CLEAR_OF =
+    '[role="alert"], .alert, .errorlist, [data-phone-mark], [data-kept-as-it-was], ' +
+    "[data-place-note], [data-country-note], [data-help-mark], [data-select-panel]:popover-open";
+
+  // A field's sentence starts at the field's start edge; a question mark's at its end.
+  var TIP_PLACES = ["above-start", "above-end", "above", "below-start", "below-end", "below"];
+  var MARK_PLACES = ["above-end", "above-start", "above", "below-end", "below-start", "below"];
+
+  // Where the focus is and where the pointer is, each as the field and its tooltips, or
+  // nothing; where the pointer is about to be, once it has rested there; and what is to
+  // be shown, each tooltip with the field it is shown for, placed in the next frame.
+  var tipFocus = null;
+  var tipHover = null;
+  var tipHoverNext = null;
+  var tipHoverTimer = 0;
+  var tipWanted = [];
+  var tipFrame = 0;
+  var tipWidth = window.innerWidth;
+
+  function isTip(node) {
+    return !!node && node.nodeType === 1 && node.matches("[data-tooltip][popover]");
+  }
+
+  function tipsOf(control) {
+    return (control.getAttribute("aria-describedby") || "")
+      .split(/\s+/)
+      .map(function (id) {
+        return id ? document.getElementById(id) : null;
+      })
+      .filter(isTip);
+  }
+
+  function tipsIn(box) {
+    var found = [];
+    Array.prototype.forEach.call(box.querySelectorAll("[aria-describedby]"), function (control) {
+      tipsOf(control).forEach(function (tip) {
+        if (found.indexOf(tip) === -1) {
+          found.push(tip);
+        }
+      });
+    });
+    return found;
+  }
+
+  // The field a node is in and the tooltips that describe it, or nothing.
+  function tipPlace(node) {
+    if (!node || !node.closest) {
+      return null;
+    }
+    var box = node.closest(".field");
+    while (box) {
+      var inside = tipsIn(box);
+      if (inside.length) {
+        return { anchor: box, tips: inside, spent: false };
+      }
+      box = box.parentElement ? box.parentElement.closest(".field") : null;
+    }
+    var described = node.closest("[aria-describedby]");
+    var own = described ? tipsOf(described) : [];
+    return own.length ? { anchor: described, tips: own, spent: false } : null;
+  }
+
+  function samePlace(one, other) {
+    return (!one && !other) || (!!one && !!other && one.anchor === other.anchor);
+  }
+
+  // A select's list while it is being asked to open, before the browser has opened it:
+  // its field's tooltip goes then, before the list is drawn.
+  var tipListOpening = null;
+
+  // Whether a list of a select in this field is open, or opening.
+  function listIsOpenIn(anchor) {
+    return Array.prototype.some.call(document.querySelectorAll("[data-select-panel]"), function (panel) {
+      if (panel !== tipListOpening && !panel.matches(":popover-open")) {
+        return false;
+      }
+      var select = selectOfPart.get(panel);
+      return anchor.contains(panel) || (!!select && (select === anchor || anchor.contains(select)));
+    });
+  }
+
+  function tipIsOpen(tip) {
+    return tip.isConnected && isTip(tip) && tip.matches(":popover-open");
+  }
+
+  function behindAModal(node) {
+    var modal = document.querySelector("dialog:modal");
+    return !!modal && !modal.contains(node);
+  }
+
+  function overlap(one, other) {
+    return (
+      one.left < other.right - 1 &&
+      other.left < one.right - 1 &&
+      one.top < other.bottom - 1 &&
+      other.top < one.bottom - 1
+    );
+  }
+
+  // The part of the window a tooltip can be seen in, in the window's co-ordinates.
+  function tipWindow() {
+    var root = document.documentElement;
+    var seen = { left: 0, top: 0, right: root.clientWidth, bottom: root.clientHeight };
+    var viewport = window.visualViewport;
+    if (viewport) {
+      seen.left = Math.max(seen.left, viewport.offsetLeft);
+      seen.top = Math.max(seen.top, viewport.offsetTop);
+      seen.right = Math.min(seen.right, viewport.offsetLeft + viewport.width);
+      seen.bottom = Math.min(seen.bottom, viewport.offsetTop + viewport.height);
+    }
+    if (siteHeader) {
+      seen.top = Math.max(seen.top, siteHeader.getBoundingClientRect().bottom);
+    }
+    var bar = document.querySelector(".site-search:popover-open");
+    if (bar && window.getComputedStyle(bar).position === "fixed") {
+      seen.top = Math.max(seen.top, bar.getBoundingClientRect().bottom);
+    }
+    if (mainNav && window.getComputedStyle(mainNav).position === "fixed") {
+      seen.bottom = Math.min(seen.bottom, mainNav.getBoundingClientRect().top);
+    }
+    return seen;
+  }
+
+  // Everything a tooltip for this field may not lie over, as boxes, the question marks
+  // apart: a place in the way of nothing but a mark can be narrowed to stop short of it.
+  function tipObstacles(anchor) {
+    var found = { boxes: [], marks: [] };
+    var take = function (node) {
+      if (!node || node === anchor || anchor.contains(node) || node.contains(anchor)) {
+        return;
+      }
+      var box = node.getBoundingClientRect();
+      if (box.width || box.height) {
+        (node.matches("[data-help-mark]") ? found.marks : found.boxes).push(box);
+      }
+    };
+    Array.prototype.forEach.call(document.querySelectorAll(TIP_KEEPS_CLEAR_OF), take);
+    if (document.activeElement && document.activeElement !== document.body) {
+      take(document.activeElement);
+    }
+    return found;
+  }
+
+  // What is in the way of a tooltip at `box`: nothing (`null`); `true` for what no moving
+  // along the line can cure -- the window's top or foot, its own field, a refusal, a mark
+  // under a row, the focused control; or else the question marks it would lie over, an
+  // empty list where all it does is run past a side of the window.
+  function inTheWay(box, anchor, seen, obstacles) {
+    if (box.top < seen.top - 1 || box.bottom > seen.bottom + 1) {
+      return true;
+    }
+    if (overlap(box, anchor.getBoundingClientRect())) {
+      return true;
+    }
+    for (var i = 0; i < obstacles.boxes.length; i += 1) {
+      if (overlap(box, obstacles.boxes[i])) {
+        return true;
+      }
+    }
+    var marks = obstacles.marks.filter(function (mark) {
+      return overlap(box, mark);
+    });
+    var sideways = box.left < seen.left - 1 || box.right > seen.right + 1;
+    return marks.length || sideways ? marks : null;
+  }
+
+  // The same place, short of the question marks in the way and inside the window's sides:
+  // the band of the line between them. A tooltip put at one of its field's edges keeps
+  // that edge and is narrowed to the band, where that leaves a tooltip worth reading; else
+  // it is narrowed to the whole band and moved along it as little as it can be. Nothing
+  // where even the band is narrower than that.
+  function withinTheBand(tip, place, box, marks, from, seen) {
+    var bandLeft = seen.left + TIP_EDGE;
+    var bandRight = seen.right - TIP_EDGE;
+    var middle = (from.left + from.right) / 2;
+    marks.forEach(function (mark) {
+      if ((mark.left + mark.right) / 2 > middle) {
+        bandRight = Math.min(bandRight, mark.left - TIP_GAP);
+      } else {
+        bandLeft = Math.max(bandLeft, mark.right + TIP_GAP);
+      }
+    });
+    if (bandRight - bandLeft < TIP_NARROWEST) {
+      return null;
+    }
+    var along = place !== "above" && place !== "below";
+    var atRight = along && Math.abs(box.right - from.right) < 1;
+    var atLeft = along && !atRight;
+    var edge = atLeft ? Math.max(box.left, bandLeft) : Math.min(box.right, bandRight);
+    var fromEdge = atLeft ? bandRight - edge : edge - bandLeft;
+    var keep = along && fromEdge >= TIP_NARROWEST;
+    var room = Math.floor(keep ? fromEdge : bandRight - bandLeft);
+    var wide = box.right - box.left;
+    if (wide > room) {
+      tip.style.maxInlineSize = room + "px";
+      wide = tip.offsetWidth;
+    }
+    var tall = tip.offsetHeight;
+    var left;
+    if (keep) {
+      left = atLeft ? edge : edge - wide;
+    } else if (along) {
+      left = atLeft ? box.left : box.right - wide;
+    } else {
+      left = (box.left + box.right) / 2 - wide / 2;
+    }
+    left = Math.round(Math.max(bandLeft, Math.min(left, bandRight - wide)));
+    var top = Math.round(
+      place.indexOf("above") === 0 ? from.top - TIP_GAP - tall : from.bottom + TIP_GAP
+    );
+    return { left: left, top: top, right: left + wide, bottom: top + tall };
+  }
+
+  // Where a tooltip of this size would be, put at one of the places, in the window's
+  // co-ordinates.
+  function tipBoxAt(place, from, wide, tall, seen, rtl) {
+    var top = place.indexOf("above") === 0 ? from.top - TIP_GAP - tall : from.bottom + TIP_GAP;
+    var left;
+    if (place === "above" || place === "below") {
+      left = from.left + (from.width - wide) / 2;
+      left = Math.max(seen.left + TIP_EDGE, Math.min(left, seen.right - TIP_EDGE - wide));
+    } else if (/-start$/.test(place) !== rtl) {
+      left = from.left;
+    } else {
+      left = from.right - wide;
+    }
+    left = Math.round(left);
+    top = Math.round(top);
+    return { left: left, top: top, right: left + wide, bottom: top + tall };
+  }
+
+  // Put it there: where it is drawn, which side its field is on, and the strip over the
+  // gap between them, as wide as the two together. Through the CSSOM, which the content
+  // security policy allows.
+  function putTip(tip, box, origin, place, from, rtl) {
+    var style = tip.style;
+    style.left = box.left - origin.left + "px";
+    style.top = box.top - origin.top + "px";
+    tip.setAttribute("data-tooltip-side", place.indexOf("above") === 0 ? "above" : "below");
+    var edge = tip.clientLeft;
+    var outLeft = Math.max(0, box.left - from.left) + edge;
+    var outRight = Math.max(0, from.right - box.right) + edge;
+    style.setProperty("--tooltip-bridge-start", -(rtl ? outRight : outLeft) + "px");
+    style.setProperty("--tooltip-bridge-end", -(rtl ? outLeft : outRight) + "px");
+  }
+
+  // No clear place: the help goes back to being the paragraph under its field.
+  function tipUnder(tip) {
+    if (tipIsOpen(tip)) {
+      tip.hidePopover();
+    }
+    tip.removeAttribute("popover");
+    tip.removeAttribute("role");
+    tip.removeAttribute("data-tooltip-side");
+    tip.style.cssText = "";
+    tip.tooltipFor = null;
+    tip.setAttribute("data-tooltip-in-flow", "");
+  }
+
+  function placeTip(tip, anchor) {
+    if (!isTip(tip) || !tip.isConnected || !anchor.isConnected) {
+      return;
+    }
+    if (listIsOpenIn(anchor)) {
+      if (tipIsOpen(tip)) {
+        tip.hidePopover();
+      }
+      return;
+    }
+    var seen = tipWindow();
+    var from = anchor.getBoundingClientRect();
+    if (!overlap(from, seen)) {
+      // Out of sight, and so is what it would say: shown again when the field is back.
+      if (tipIsOpen(tip)) {
+        tip.hidePopover();
+      }
+      return;
+    }
+    if (!tipIsOpen(tip)) {
+      tip.showPopover();
+    }
+    tip.tooltipFor = anchor;
+    var style = tip.style;
+    style.maxInlineSize = "";
+    style.left = "0px";
+    style.top = "0px";
+    var origin = tip.getBoundingClientRect();
+    var rtl = window.getComputedStyle(anchor).direction === "rtl";
+    var places = anchor.hasAttribute("data-help-mark") ? MARK_PLACES : TIP_PLACES;
+    var obstacles = tipObstacles(anchor);
+    for (var i = 0; i < places.length; i += 1) {
+      var place = places[i];
+      style.maxInlineSize = "";
+      var box = tipBoxAt(place, from, tip.offsetWidth, tip.offsetHeight, seen, rtl);
+      var blocked = inTheWay(box, anchor, seen, obstacles);
+      if (blocked && blocked !== true) {
+        // Only question marks, or the window's sides, in the way: stop short of them.
+        var moved = withinTheBand(tip, place, box, blocked, from, seen);
+        if (moved) {
+          box = moved;
+          blocked = inTheWay(box, anchor, seen, obstacles);
+        }
+      }
+      if (!blocked) {
+        putTip(tip, box, origin, place, from, rtl);
+        return;
+      }
+    }
+    style.maxInlineSize = "";
+    tipUnder(tip);
+  }
+
+  function placeTips() {
+    tipFrame = 0;
+    tipWanted.forEach(function (pair) {
+      placeTip(pair.tip, pair.anchor);
+    });
+  }
+
+  function placeTipsSoon() {
+    if (!tipFrame && tipWanted.length) {
+      tipFrame = window.requestAnimationFrame(placeTips);
+    }
+  }
+
+  // Every tooltip that should be showing, each with the field it is shown for: the
+  // pointer's place first, so that a sentence two fields share goes to the one pointed
+  // at. What should not be showing goes at once; what should is placed in the next frame,
+  // after the browser has scrolled a field that took the focus into view.
+  function drawTips() {
+    var wanted = [];
+    [tipHover, tipFocus].forEach(function (place) {
+      if (!place || place.spent || behindAModal(place.anchor) || listIsOpenIn(place.anchor)) {
+        return;
+      }
+      place.tips.forEach(function (tip) {
+        var already = wanted.some(function (pair) {
+          return pair.tip === tip;
+        });
+        if (!already && isTip(tip)) {
+          wanted.push({ tip: tip, anchor: place.anchor });
+        }
+      });
+    });
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-tooltip][popover]:popover-open"),
+      function (tip) {
+        var kept = wanted.some(function (pair) {
+          return pair.tip === tip;
+        });
+        if (!kept) {
+          tip.hidePopover();
+        }
+      }
+    );
+    tipWanted = wanted;
+    placeTipsSoon();
+  }
+
+  function readyTooltips() {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-tooltip][id]:not([popover]):not([data-tooltip-in-flow])"),
+      function (tip) {
+        // Only a sentence something is described by: one nothing names would be put out
+        // of sight with nothing left to show it, and is better left where it is.
+        if (document.querySelector('[aria-describedby~="' + CSS.escape(tip.id) + '"]')) {
+          tip.setAttribute("popover", "manual");
+          tip.setAttribute("role", "tooltip");
+        }
+      }
+    );
+    // A field that had the focus before this ran -- an `autofocus`, or a swap that put
+    // the focus back -- has had no event to say so.
+    // And its tooltips are asked for afresh, since a sentence under a field may have become
+    // one again.
+    var focused = tipPlace(document.activeElement);
+    if (focused && samePlace(focused, tipFocus)) {
+      focused.spent = tipFocus.spent;
+    }
+    tipFocus = focused;
+    drawTips();
+  }
+
+  function hoverSettles() {
+    tipHoverTimer = 0;
+    if (!samePlace(tipHoverNext, tipHover)) {
+      tipHover = tipHoverNext;
+      drawTips();
+    }
+  }
+
+  function hoverMoves(place) {
+    if (samePlace(place, tipHoverNext)) {
+      return;
+    }
+    tipHoverNext = samePlace(place, tipHover) ? tipHover : place;
+    window.clearTimeout(tipHoverTimer);
+    tipHoverTimer = window.setTimeout(hoverSettles, place ? TIP_SHOWN_AFTER : TIP_KEPT_FOR);
+  }
+
+  if (popovers) {
+    onContentReady(readyTooltips);
+
+    document.addEventListener("focusin", function (event) {
+      var place = tipPlace(event.target);
+      if (!samePlace(place, tipFocus)) {
+        tipFocus = place;
+        drawTips();
+      }
+    });
+
+    document.addEventListener("focusout", function (event) {
+      // Where the focus is going, which is nowhere when it leaves the window. Within one
+      // field -- from a country to its number -- nothing changes and nothing blinks.
+      var place = tipPlace(event.relatedTarget);
+      if (!samePlace(place, tipFocus)) {
+        tipFocus = place;
+        drawTips();
+      }
+    });
+
+    document.addEventListener("pointerover", function (event) {
+      if (event.pointerType === "touch") {
+        return;
+      }
+      var target = event.target;
+      var onTip = target && target.closest ? target.closest("[data-tooltip][popover]") : null;
+      if (onTip) {
+        // Resting on the tooltip, or on the strip between it and its field, keeps it:
+        // it is part of what it describes.
+        if (tipHover && tipHover.tips.indexOf(onTip) !== -1) {
+          hoverMoves(tipHover);
+        }
+        return;
+      }
+      hoverMoves(tipPlace(target));
+    });
+
+    document.addEventListener("pointerout", function (event) {
+      if (event.pointerType !== "touch" && !event.relatedTarget) {
+        hoverMoves(null);
+      }
+    });
+
+    // A press that opened a modal dialog: the tooltip the pointer was resting on is
+    // behind it now, and nobody is looking at it.
+    document.addEventListener("click", function () {
+      if ((tipHover || tipHoverNext) && document.querySelector("dialog:modal")) {
+        var behind = [tipHover, tipHoverNext].some(function (place) {
+          return place && behindAModal(place.anchor);
+        });
+        if (behind) {
+          window.clearTimeout(tipHoverTimer);
+          tipHover = null;
+          tipHoverNext = null;
+          drawTips();
+        }
+      }
+    });
+
+    document.addEventListener(
+      "keydown",
+      function (event) {
+        if (event.key !== "Escape" || event.isComposing) {
+          return;
+        }
+        var showing = function (place) {
+          return !!place && !place.spent && place.tips.some(tipIsOpen);
+        };
+        var focused = showing(tipFocus);
+        if (!focused && !showing(tipHover)) {
+          return;
+        }
+        if (focused) {
+          // The focused field's tooltip: Escape is its and nobody else's this once -- not
+          // the dialog's the field is in, not the cell's being edited. The capture phase is
+          // what lets it say so.
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        [tipFocus, tipHover].forEach(function (place) {
+          if (place) {
+            place.spent = true;
+          }
+        });
+        drawTips();
+      },
+      true
+    );
+
+    // A select's list opening or closing (#301): its field's tooltip goes at once, or may
+    // come back; and every other tooltip showing is asked again, to keep clear of the list.
+    document.addEventListener(
+      "beforetoggle",
+      function (event) {
+        if (!event.target.matches || !event.target.matches("[data-select-panel]")) {
+          return;
+        }
+        if (event.newState === "open") {
+          // The list is not open yet, and is the moment this event is over.
+          tipListOpening = event.target;
+          drawTips();
+          tipListOpening = null;
+        }
+      },
+      true
+    );
+    document.addEventListener(
+      "toggle",
+      function (event) {
+        if (!event.target.matches || !event.target.matches("[data-select-panel]")) {
+          return;
+        }
+        drawTips();
+      },
+      true
+    );
+
+    document.addEventListener("scroll", placeTipsSoon, { capture: true, passive: true });
+    window.addEventListener("resize", function () {
+      // A window of another width is another page to find places on: the help that went
+      // back under its field is a tooltip again, until it finds no place at this width
+      // either. A change of height alone -- a phone's address bar going -- is not.
+      if (window.innerWidth !== tipWidth) {
+        tipWidth = window.innerWidth;
+        Array.prototype.forEach.call(document.querySelectorAll("[data-tooltip-in-flow]"), function (tip) {
+          tip.removeAttribute("data-tooltip-in-flow");
+        });
+        readyTooltips();
+      }
+      placeTipsSoon();
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener("resize", placeTipsSoon);
+      window.visualViewport.addEventListener("scroll", placeTipsSoon);
+    }
+  }
 
   /* ------------------------------------------------ a row off *Your details*, at once
    *

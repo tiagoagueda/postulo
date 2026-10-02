@@ -1,4 +1,4 @@
-<c-vars id="" class="" />
+<c-vars id="" class="" help="" anchor="" tip="" subject="" in_sight="" />
 {% comment %} The heading at the top of a section, and the sentence under it (#292).
 
    `<c-section-title>{% translate "Your name" %}</c-section-title>`
@@ -25,8 +25,21 @@
    **Not for a heading inside a row of its own.** Where a title shares a flex row with
    the actions beside it, a wrapper with a margin of its own breaks the row, which is the
    thing `<c-page-title>` learned first. Those keep a bare `<h2 class="font-medium">`.
+
+   `help` is a help topic (#302): `<c-section-title help="your-picture"
+   anchor="section-picture">` draws the card's question mark at the inline end of the
+   heading, with the topic's one sentence as its tooltip and the topic in a drawer --
+   `<c-help-mark>`, which says what `anchor` and `tip` are. The sentence is drawn where a
+   subtitle would be, and is one with scripts off, so a heading with `help` has no
+   `subtitle` of its own. `subject` names the question mark where the heading is not the
+   topic's own title (the gallery's card), and `in_sight` keeps the sentence under the
+   heading with scripts on too, while something on the page has been refused.
+
+   The switch for the question mark is written on the heading's own line, so that a
+   heading without `help` draws exactly what it drew before #302, byte for byte.
 {% endcomment %}
 <header class="section-title{% if class %} {{ class }}{% endif %}">
-  <h2{% if id %} id="{{ id }}"{% endif %}>{{ slot }}</h2>
+  <h2{% if id %} id="{{ id }}"{% endif %}>{{ slot }}</h2>{% if help %}
+  <c-help-mark :topic="help" :anchor="anchor" :tip="tip" :subject="subject" :in_sight="in_sight" />{% endif %}
   {% if subtitle %}<p>{{ subtitle }}</p>{% endif %}
 </header>

@@ -1,5 +1,5 @@
 {% load postulo %}
-<c-vars field />
+<c-vars field tip="" />
 {% comment %} A form field the way Postulo draws one: label, widget, then help and errors.
 
    `<c-field :field="form.company_name" />` -- a component rather than an include (#263).
@@ -32,6 +32,10 @@
    in it -- the storage path it used to show was 252 unbreakable pixels against the 238 a
    320-pixel screen leaves, in every language, which is what ran the upload form off a phone
    (#167). The path is gone (#191); a long name still cannot break.
+
+   `tip` makes the help a tooltip (#302): `<c-field :field="form.headline" tip />`, for a
+   sentence that says what the field is for. `<c-field-feedback>` says what that means. A
+   tick box takes no `tip`: its sentence says what ticking does, and stays beside it.
 {% endcomment %}
 {% if field.field.widget.input_type == "checkbox" and not field.field.widget.choices %}
   <div class="field mb-4 wrap-anywhere" data-orientation="horizontal"{% if field.errors %} data-invalid="true"{% endif %}>
@@ -61,6 +65,6 @@
         {% endwith %}
       {% endif %}
     {% endwith %}
-    <c-field-feedback :field="field" />
+    <c-field-feedback :field="field" :tip="tip" />
   </div>
 {% endif %}

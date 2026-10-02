@@ -1,0 +1,45 @@
+{% load i18n postulo %}
+<c-vars id />
+{% comment %} A panel that comes in from the inline end and holds something to read:
+   Basecoat's drawer, on the browser's own `<dialog>` (#302).
+
+   `<c-drawer id="…">` with the heading in a `title` slot and what it holds as its content.
+   The heading is its accessible name, through `aria-labelledby`; the component draws a
+   *Close* button beside it, which is where the focus starts. Any other attribute goes on
+   the `<dialog>`.
+
+   **It is opened by a link, and only where a script runs.** What a drawer holds has a page
+   of its own, so what opens it is a link to that page carrying `data-opens-dialog` with
+   this id: with scripts off the link is followed, and with them on `app.js` opens the
+   drawer in its place, with `showModal()`. So it is modal: the page behind is inert and
+   dimmed, the focus stays inside, Escape closes it -- the browser does that for a modal
+   dialog -- and so do *Close* and a press anywhere outside the panel; the focus then goes
+   back to the link. A press outside closes it because a drawer asks nothing: there is no
+   answer to lose. It has no `popover` and no `popovertarget`, unlike `<c-dialog>`: with
+   scripts off nothing ever opens it, and it is drawn nowhere.
+
+   Modal, and not a panel lying beside a page that still works: a press outside has to
+   close it, so it could not be read while typing in the page anyway, and a panel left
+   open over a page narrower than about 1400 pixels would lie over the fields somebody had
+   tabbed to (WCAG 2.2 2.4.11).
+
+   **At the inline end**: on the right in English and on the left in Arabic, by a logical
+   inset, with nothing naming a side. Basecoat's `drawer.css` knows `left`, `right`, `top`
+   and `bottom`; `inline-end` is a side it does not have, placed in `basecoat.css` with the
+   paint. Its script is not taken: it delays the close for an animation this project does
+   not have, and closes on Escape and on a press outside, which the browser and three lines
+   of `app.js` do.
+
+   The body scrolls inside the panel where the window is shorter than the text -- at 400%
+   zoom it is -- and takes the focus so that the arrow keys can scroll it. *Close* does not
+   shrink: beside a heading that wraps it would otherwise be squeezed below the 24 pixels a
+   target needs, and was, at 320 under wider text spacing. {% endcomment %}
+<dialog id="{{ id }}" class="drawer" data-side="inline-end" aria-labelledby="{{ id }}-title" data-dialog data-drawer{% if attrs.attrs_dict %} {{ attrs }}{% endif %}>
+  <div>
+    <header>
+      <h2 id="{{ id }}-title">{{ title }}</h2>
+      <button type="button" class="btn shrink-0" data-variant="ghost" data-size="icon-xs" aria-label="{% translate 'Close' %}" data-drawer-close>{% icon "x" class="size-4" %}</button>
+    </header>
+    <section tabindex="0" aria-labelledby="{{ id }}-title">{{ slot }}</section>
+  </div>
+</dialog>

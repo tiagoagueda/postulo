@@ -1,0 +1,19 @@
+{% load i18n postulo %}
+<c-vars topic />
+{% comment %} The drawer that holds one help topic (#302): `<c-help-drawer topic="links" />`.
+
+   `<c-help-mark>` draws it beside its question mark, so a page writes this tag itself only
+   where several question marks open one topic and say `no_drawer`: the three cards of
+   links on *Your details*, which share their help. The id is the topic's, `help-<slug>`,
+   which is what a question mark's `data-opens-dialog` names; one topic is drawn once on a
+   page.
+
+   The heading and the text are the ones the page at the topic's own address draws, through
+   the same `help_body`. {% endcomment %}
+{% help_topic topic as about %}
+<c-drawer id="help-{{ about.slug }}" data-help-drawer="{{ about.slug }}">
+  <c-slot name="title">{% blocktranslate trimmed with subject=about.title %}Help: {{ subject }}{% endblocktranslate %}</c-slot>
+  <div class="space-y-3 text-sm leading-relaxed" data-help-text>
+    {% help_body about %}
+  </div>
+</c-drawer>

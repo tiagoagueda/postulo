@@ -59,6 +59,13 @@ def open_plugins(page: Page, base: str) -> None:
         page.goto(f"{base}/server/plugins/")
 
 
+def opener_of(page: Page):
+    """The registry's *Settings*. With a script it opens a dialog on this page, and so it is
+    a button (#302) -- still an `<a>` with the page's address, for a click that asks for a
+    new tab. Without one it is a link to that page."""
+    return page.get_by_role("button", name=OPENER)
+
+
 def offered_on_your_details(page: Page, base: str) -> list[str]:
     page.goto(f"{base}/accounts/profile/")
     return page.locator("select[name='identifiers-0-scheme'] option").all_inner_texts()
@@ -75,12 +82,14 @@ def test_with_a_script_the_registrys_settings_are_a_dialog(
     base = live_server.url
     page.emulate_media(color_scheme=scheme)
     open_plugins(page, base)
-    opener = page.get_by_role("link", name=OPENER)
+    opener = opener_of(page)
     dialog = page.get_by_role("dialog", name="Identifiers of your own")
     drawn = page.locator("#settings-identifiers > *")
     box = dialog.get_by_label(BOX)
 
-    # A link to the page, which says it opens a dialog only where a script makes it true.
+    # A button that opens a dialog, which it says only where a script makes it true, and
+    # still a link to the page underneath: no link of that name is left beside it.
+    expect(page.get_by_role("link", name=OPENER)).to_have_count(0)
     expect(opener).to_have_attribute("href", "/server/plugins/identifiers/")
     expect(opener).to_have_attribute("aria-haspopup", "dialog")
     expect(drawn).to_be_hidden()
@@ -93,7 +102,7 @@ def test_with_a_script_the_registrys_settings_are_a_dialog(
     # The box is what the dialog was opened for, so it has the focus, not *Cancel*.
     expect(box).to_be_focused()
 
-    # Escape closes it and gives focus back to the link; what was typed is still there.
+    # Escape closes it and gives focus back to the button; what was typed is still there.
     box.fill("[")
     page.keyboard.press("Escape")
     expect(drawn).to_be_hidden()
@@ -134,9 +143,13 @@ def test_with_a_script_the_registrys_settings_are_a_dialog(
 def test_a_click_that_asks_for_a_new_tab_is_left_to_open_the_page(
     page: Page, live_server, administrator
 ):
-    """The dialog is in place of following the link, and only of following it here."""
+    """The dialog is in place of following the link, and only of following it here: called
+    a button since #302, it is still a link to the page, and a click with Ctrl or Cmd held
+    is left to the browser."""
     open_plugins(page, live_server.url)
-    opener = page.get_by_role("link", name=OPENER)
+    opener = opener_of(page)
+    expect(opener).to_have_attribute("role", "button")
+    expect(opener).to_have_attribute("href", "/server/plugins/identifiers/")
 
     with page.context.expect_page() as opened:
         opener.click(modifiers=["ControlOrMeta"])
@@ -150,7 +163,7 @@ def test_the_dialog_fits_a_phone(page: Page, live_server, administrator):
     where it has not: nothing scrolls the page sideways at 320 pixels."""
     open_plugins(page, live_server.url)
     page.set_viewport_size({"width": 320, "height": 700})
-    page.get_by_role("link", name=OPENER).click()
+    opener_of(page).click()
     drawn = page.locator("#settings-identifiers > *")
     expect(drawn).to_be_visible()
 
@@ -258,7 +271,7 @@ def test_after_a_refusal_the_sentence_the_line_and_save_are_within_reach(
     page.set_viewport_size({"width": width, "height": height})
     open_plugins(page, base)
     if where == "dialog":
-        page.get_by_role("link", name=OPENER).click()
+        opener_of(page).click()
         root = page.locator("#settings-identifiers")
         save = root.get_by_role("button", name="Save", exact=True)
         behind = page.evaluate("() => Math.round(window.scrollY)")
@@ -347,7 +360,7 @@ def test_the_text_as_it_is_kept_says_what_is_wrong_with_it_when_the_dialog_opens
     row.save()
     open_plugins(page, live_server.url)
 
-    page.get_by_role("link", name=OPENER).click()
+    opener_of(page).click()
     dialog = page.get_by_role("dialog", name="Identifiers of your own")
     said = dialog.locator("#id_identifier_schemes_error")
     expect(said).to_contain_text("This is wrong in the text as it is kept.")

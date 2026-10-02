@@ -62,26 +62,55 @@ class UnusablePicture(ValueError):
     """The bytes are not a picture Postulo will keep. The message is for the person."""
 
 
+class WrongKind(UnusablePicture):
+    """The bytes are a kind of file the caller does not keep, or no kind the image library
+    knows. The caller says which kinds it keeps, so the caller words the refusal."""
+
+
+#: Kinds of file the image library names apart that are, to everybody who has one, the
+#: kind named here. A phone's portrait or burst photograph is a JPEG with more pictures
+#: after the first, which Pillow calls MPO; somebody who keeps JPEGs keeps those (#302).
+SAME_KIND_AS = {"MPO": "JPEG"}
+
+
+def content_type_of(image: Image.Image) -> str:
+    """What an opened image is, as a content type: ``image/png``. Read from the file's own
+    bytes, never from its name or from what an upload said it was."""
+    kind = image.format or ""
+    return Image.MIME.get(SAME_KIND_AS.get(kind, kind), "")
+
+
 # ------------------------------------------------------------------------ raster
 
 
-def decode(data: bytes, *, max_pixels: int = MAX_PIXELS) -> Image.Image:
+def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Image:
     """The bytes as an image, or a refusal saying why.
 
     The dimensions are checked against ``max_pixels`` before anything is converted, and
     Pillow's own guard is set to the same number: the header is read first, so an image
     that claims to be enormous is refused without the pixels ever being allocated.
+
+    ``kinds`` is the content types the caller keeps, where it keeps only some. The kind is
+    what the image library reads from the bytes (#302): a BMP sent as ``image/png`` is a
+    BMP, and is refused with `WrongKind`, and so is a file the library recognises as no
+    picture at all -- an SVG, a PDF, text -- since that is not one of the kinds either.
     """
     Image.MAX_IMAGE_PIXELS = max_pixels
     try:
         image = Image.open(io.BytesIO(data))
+        if kinds is not None and content_type_of(image) not in kinds:
+            raise WrongKind(str(_("That file could not be read as an image.")))
         if image.width * image.height > max_pixels:
             raise UnusablePicture(str(_("That image is far larger than it needs to be.")))
         image.load()
         return image
     except UnusablePicture:
         raise
-    except (UnidentifiedImageError, Image.DecompressionBombError, OSError, ValueError) as error:
+    except UnidentifiedImageError as error:
+        if kinds is not None:
+            raise WrongKind(str(_("That file could not be read as an image."))) from error
+        raise UnusablePicture(str(_("That file could not be read as an image."))) from error
+    except (Image.DecompressionBombError, OSError, ValueError) as error:
         raise UnusablePicture(str(_("That file could not be read as an image."))) from error
 
 
@@ -112,7 +141,9 @@ def encode_within(image: Image.Image, *, budget: int = DEFAULT_BUDGET) -> bytes:
         )
 
 
-def as_stored(data: bytes, *, budget: int = DEFAULT_BUDGET, square: bool = False) -> bytes:
+def as_stored(
+    data: bytes, *, budget: int = DEFAULT_BUDGET, square: bool = False, kinds=None
+) -> bytes:
     """Decode, drop everything the file carried, and write it out again within the budget.
 
     Re-encoding is the point rather than a side effect: it is what removes the metadata a
@@ -121,8 +152,10 @@ def as_stored(data: bytes, *, budget: int = DEFAULT_BUDGET, square: bool = False
     ``square`` crops to the shorter edge before encoding. That is right for a face, which
     belongs cropped to the tile it sits in, and wrong for a wordmark, which would be cut in
     half; the two call sites differ on purpose and should not be reconciled (#265).
+
+    ``kinds`` is passed to `decode`: the content types the caller keeps, or every kind.
     """
-    with decode(data) as opened:
+    with decode(data, kinds=kinds) as opened:
         image = ImageOps.exif_transpose(opened) or opened
         image = image.convert("RGBA")
         if square:

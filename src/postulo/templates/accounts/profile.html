@@ -44,8 +44,18 @@
         <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
 
+      {% comment %} Help where the question is asked (#302). Each card has a question mark
+         in its corner: one sentence when it is rested on or focused, and the card's full
+         help in a drawer when it is pressed -- or, with scripts off, on a page of its
+         own. A sentence that says what a field is for is that field's tooltip (`tip`);
+         a format a field requires stays under it, and so does an instruction and a tick
+         box's sentence, which says what ticking does.
+
+         `tips` and `refused` are the view's: while anything on the page has been refused,
+         no help on it is a tooltip and every card's sentence is under its title, because
+         that is when it is wanted and nothing may lie over a refusal. {% endcomment %}
       <div class="card mb-4" data-picture id="section-picture">
-        <c-section-title>{% translate "Your picture" %}</c-section-title>
+        <c-section-title help="your-picture" anchor="section-picture" :in_sight="refused">{% translate "Your picture" %}</c-section-title>
         <div class="flex flex-wrap items-start gap-6">
           <div class="shrink-0">
             {% avatar user "size-24 text-3xl" %}
@@ -84,8 +94,12 @@
         </div>
       </div>
 
+      {% comment %} The card's one sentence is also what describes its two menus: its id is
+         `ADDRESSING_HELP_ID` in accounts/forms.py, which both name (#309). It was a
+         paragraph of five sentences under the fields; the other four are the card's
+         help now (#302). {% endcomment %}
       <div class="card mb-4" id="section-name">
-        <c-section-title>{% translate "Your name" %}</c-section-title>
+        <c-section-title help="your-name" anchor="section-name" tip="name-addressing-help" :in_sight="refused">{% translate "Your name" %}</c-section-title>
         {% comment %} In reading order: the form of address, which is written before a name,
            the name, and the pronouns, which are written apart from it (#309). One line
            where there is room, and wrapping where there is not, so on a phone each is a
@@ -130,25 +144,19 @@
             </div>
           </div>
         </div>
-        {% comment %} The id is `ADDRESSING_HELP_ID` in accounts/forms.py: both menus are
-           described by this sentence. {% endcomment %}
-        <p class="text-sm text-ink-500 dark:text-ink-400" id="name-addressing-help">
-          {% blocktranslate trimmed %}
-            A form of address is written before your name, and your pronouns say how to
-            refer to you. Both are optional, and nothing is assumed when they are blank. The
-            lists are the ones in use in the language of your career record; choose
-            <em>Other…</em> to write your own. Neither is printed anywhere unless a CV's
-            own settings say so.
-          {% endblocktranslate %}
-        </p>
       </div>
 
       <div class="card mb-6" id="section-contact">
-        <c-section-title>{% translate "Contact block" %}</c-section-title>
-        <c-field :field="form.headline" />
+        <c-section-title help="contact-block" anchor="section-contact" :in_sight="refused">{% translate "Contact block" %}</c-section-title>
+        <c-field :field="form.headline" :tip="tips" />
+        {% comment %} Two instructions stay in sight (#302). The single telephone box is
+           where a new number is typed, and a national number with no country is refused:
+           what a + does has to be read before that. And *Location* with no postal address
+           to derive a line from says what to type; once there is one, the line is in the
+           box in grey and the sentence only explains it. {% endcomment %}
         <div class="grid gap-x-4 sm:grid-cols-2">
           {% if form.phone %}<c-field :field="form.phone" />{% endif %}
-          <c-field :field="form.location" />
+          {% if form.location_derived %}<c-field :field="form.location" :tip="tips" />{% else %}<c-field :field="form.location" />{% endif %}
         </div>
         {% if numbers_kept_back %}
           {% comment %} Said out loud, because a person who cannot see their four numbers
@@ -165,12 +173,12 @@
             {% endblocktranslate %}
           </p>
         {% endif %}
-        <c-field :field="form.record_language" />
+        <c-field :field="form.record_language" :tip="tips" />
         {% comment %} One box per kind of link whose feature is off; the kinds that are on
            are blocks of rows below, and a box and a block writing one primary row would be
            two answers to one question (#189). {% endcomment %}
         {% for field in form.link_boxes %}
-          <c-field :field="field" />
+          <c-field :field="field" :tip="tips" />
         {% endfor %}
         {% for block, count in links_kept_back %}
           <p class="text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back }}</p>
@@ -179,18 +187,24 @@
 
       {% comment %} Each saved row comes off at once, from a dialog, rather than with a box
          ticked and the page saved (#303); the dialogs are after the form. {% endcomment %}
-      {% if numbers %}{% include "partials/phone_numbers.html" with remove_at_once=True %}{% endif %}
-      {% include "partials/web_links.html" with remove_at_once=True %}
-      {% include "partials/postal_addresses.html" with remove_at_once=True %}
+      {% comment %} `card_help` is this page's (#302): each of these cards has its question
+         mark and the paragraphs under its rows are in its help; `tips` makes what a row's
+         fields are for a tooltip, and `refused` keeps the card's sentence in sight. On a
+         contact's form the same partials keep their help in sight. {% endcomment %}
+      {% if numbers %}{% include "partials/phone_numbers.html" with remove_at_once=True card_help=True tips=tips refused=refused %}{% endif %}
+      {% include "partials/web_links.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
+      {% include "partials/postal_addresses.html" with remove_at_once=True card_help=True tips=tips refused=refused %}
 
       <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="label px-1">{% translate "Identifiers" %}</legend>
-        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed %}
-            An ORCID, or another public id that says which researcher you are. A name is
-            not an identity — two people share one, one person publishes under three — and
-            an application form for an academic post asks for this by name. Paste a whole
-            address if that is what you have; Postulo keeps the id.
+        <c-help-mark topic="identifiers" anchor="section-identifiers" :in_sight="refused" />
+        {% comment %} What may be typed stays in sight (#302): it is an instruction, and
+           the rest of what this paragraph used to say is the card's help. Which registers'
+           addresses can be pasted is the registry's to say (`pasted_whole`): only some
+           lift an identifier out of an address. {% endcomment %}
+        <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" data-identifiers-how>
+          {% blocktranslate trimmed with kinds=identifiers_pasted %}
+            An address on {{ kinds }} can be pasted whole: Postulo keeps the identifier.
           {% endblocktranslate %}
         </p>
         {{ identifiers.management_form }}
@@ -199,7 +213,7 @@
         {% endif %}
         <ol class="space-y-3">
           {% for row in identifiers %}
-            {% if row.already_gone or row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}<c-identifier-row :row="row" remove_at_once />{% endif %}
+            {% if row.already_gone or row.DELETE.value %}{% include "partials/removed_row.html" %}{% else %}<c-identifier-row :row="row" remove_at_once :tip="tips" />{% endif %}
           {% endfor %}
         </ol>
         {% include "partials/removed_said.html" %}

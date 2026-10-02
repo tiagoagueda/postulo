@@ -491,6 +491,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/career/preview/",
         "/search/?q=engineer",
         "/accounts/profile/",
+        # A card's help as a page of its own: where its question mark leads with scripts
+        # off (#302). One topic stands for the seven; they are one template.
+        "/help/telephone-numbers/",
         "/accounts/invitations/",
         "/accounts/2fa/",
         "/settings/",
