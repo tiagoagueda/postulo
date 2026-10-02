@@ -41,6 +41,7 @@ from .server_forms import (
     DefaultsForm,
     EmailForm,
     GdprForm,
+    IdentifierSchemesForm,
     OfferedLanguagesForm,
     SignInForm,
     TestEmailForm,
@@ -975,10 +976,75 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["repositories"] = _repositories()
         context["repository_form"] = kwargs.get("repository_form") or PluginRepositoryForm()
         context["policy_rows"] = _policy_rows()
+        # The identifier registry's settings, in the dialog its row opens (#311). The same
+        # form `IdentifierSchemesView` draws as a page, which is where the row's link goes
+        # when no script runs and where the dialog posts.
+        context["identifier_schemes_form"] = IdentifierSchemesForm.showing(site.current()).focused()
 
         context["pending"] = self.request.session.get("plugin_pending")
         context["listings"] = self.request.session.get("plugin_listings", [])
         return context
+
+
+class IdentifierSchemesView(PolicyView):
+    """The identifier schemes this instance defines for itself: the registry's settings (#311).
+
+    One form, one box of JSON, drawn in two places. On *Plugins* it is in a dialog, which
+    the registry's row opens where a script runs. Here it is a page, which is where that
+    row's link leads where none does, and the address the dialog posts to.
+
+    So this answers two kinds of request. A page's: the form again with what is wrong, or
+    a redirect to *Plugins* with a message. The dialog's, sent by htmx: the fields alone
+    with what is wrong, put where the dialog's fields are, so the dialog stays open over
+    what was typed; or the address of *Plugins* for the browser to go to, which reloads
+    the page behind the dialog and shows the message.
+
+    Asked for, it draws what is kept and says what is wrong with it where anything is
+    (`IdentifierSchemesForm.showing`): a scheme the registry is leaving out is named here,
+    with its line, and not only in the log.
+
+    **Asked and posted to, and nothing else.** An `UpdateView` takes a PUT for a POST, and
+    a PUT carries no form: it read as an empty box and emptied the definitions. This page
+    answers a GET and a POST, and 405 to the rest.
+
+    Administrators only, as every page of *Server settings* is (`StaffRequiredMixin`).
+    """
+
+    form_class = IdentifierSchemesForm
+    template_name = "server/identifier_schemes.html"
+    section_title = _("Plugins")
+    http_method_names = ("get", "head", "post", "options")
+
+    def get_form(self, form_class=None):
+        if self.request.method == "POST":
+            return super().get_form(form_class)
+        return IdentifierSchemesForm.showing(self.object)
+
+    def get_success_url(self) -> str:
+        return reverse("server:plugins")
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        logger.warning(
+            "The instance's own identifier schemes were changed by %s", self.request.user.username
+        )
+        if self.request.htmx:
+            return HttpResponse(status=204, headers={"HX-Redirect": self.get_success_url()})
+        return response
+
+    def form_invalid(self, form):
+        if not self.request.htmx:
+            return super().form_invalid(form)
+        response = render(
+            self.request, f"{self.template_name}#fields", self.get_context_data(form=form)
+        )
+        # The dialog's form swaps nothing by default, which is right for the other answer:
+        # an address to go to. This one is the fields, to be put where the fields are, and
+        # the dialog names that element as its target. Not `HX-Retarget`: the element marked
+        # busy while the request runs is the target as the request knew it, and one named
+        # only in the answer would leave the form dimmed and announced as loading for ever.
+        response.headers["HX-Reswap"] = "outerHTML"
+        return response
 
 
 def _repositories() -> list[dict]:
@@ -1114,9 +1180,25 @@ def _policy_rows(person=None) -> list[dict]:
                 "why": policy.decide(plugin.name, person).explain(),
                 "decided_by": None,
                 "decided_at": None,
+                # A plugin Postulo ships may have a page of settings among these ones, and
+                # names it; the instance's page draws a button for it on this row (#311).
+                "settings_url": _settings_url(plugin) if person is None else "",
             }
         )
     return rows
+
+
+def _settings_url(plugin) -> str:
+    """Where a shipped plugin's own settings are, if it has a page of them here."""
+    from django.urls import NoReverseMatch
+
+    name = getattr(plugin, "settings_url_name", "")
+    if not name:
+        return ""
+    try:
+        return reverse(name)
+    except NoReverseMatch:
+        return ""
 
 
 def _save_policies(request: HttpRequest, person=None) -> int:

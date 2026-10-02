@@ -1620,6 +1620,9 @@
     .sm\:grid-cols-5 {
       grid-template-columns: repeat(5, minmax(0, 1fr));
     }
+    .sm\:grid-cols-\[7rem_1fr\] {
+      grid-template-columns: 7rem 1fr;
+    }
     .sm\:grid-cols-\[8rem_1fr\] {
       grid-template-columns: 8rem 1fr;
     }
@@ -3771,6 +3774,9 @@
     box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
     transition: none;
   }
+  .dialog[data-size="wide"] > * {
+    max-width: var(--container-3xl);
+  }
   .dialog > * > header, .alert-dialog > * > header {
     gap: calc(var(--spacing) * 2);
   }
@@ -3863,6 +3869,16 @@
         color: var(--color-red-400);
       }
     }
+  }
+  .field > textarea[data-code] {
+    field-sizing: fixed;
+    height: clamp(8rem, 45svh, 28rem);
+    resize: vertical;
+    overflow: auto;
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    white-space: pre;
   }
   .field > select, select.select, .input-group > select {
     appearance: auto;

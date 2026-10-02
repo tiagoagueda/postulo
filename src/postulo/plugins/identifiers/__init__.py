@@ -33,14 +33,23 @@ this process can register a scheme. That is not shyness about the idea — a plu
 national company register is the obvious next thing, since ``register`` is one generic
 scheme for SIRET, NIF, Companies House, KvK and Handelsregister alike — but a third-party
 contract is a promise about breakage, and this one is not written yet.
+
+**An instance can add schemes without a plugin (#311).** An administrator writes them in
+JSON on *Server settings → Plugins*, and `custom` reads that text. This plugin still owns
+no row: the text is on Postulo's policy row, and Postulo hands it to `Identifiers.defined`
+whenever it wants to know what the text comes to. What a pattern may be -- a small language
+that reads a value once, and not a regular expression -- is `patterns`.
 """
 
 from __future__ import annotations
+
+from collections.abc import Iterable
 
 from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import declares, shipped
 
+from . import custom
 from .schemes import SCHEMES
 
 #: The identifier this plugin is known by. Not a policy key -- nothing decides about it.
@@ -66,3 +75,18 @@ class Identifiers:
     #: Every scheme this plugin contributes. `core.identifiers.registry` merges these across
     #: whatever identifier plugins are installed, first registration keeping the key.
     schemes = tuple(SCHEMES.values())
+
+    #: The page of *Server settings* this plugin's own settings are on, by its URL name:
+    #: where an administrator defines the instance's schemes. The Plugins page draws a
+    #: button for it on this plugin's row (#311).
+    settings_url_name = "server:identifier_schemes"
+
+    def defined(self, text: str, *, taken: Iterable[str] = ()):
+        """What an instance's own definitions come to: a `core.identifiers.Reading`.
+
+        ``text`` is the JSON as it is kept, handed over by Postulo, and ``taken`` the keys
+        that are not the instance's to define. Asked when the text is saved, for what is
+        wrong with it, and when it is used, for the schemes in it -- the same reading both
+        times, so nothing is used that the page would have refused.
+        """
+        return custom.read(text, taken=taken)

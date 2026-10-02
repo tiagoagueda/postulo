@@ -35,7 +35,7 @@ from django.utils.formats import number_format
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core.identifiers import COMPANY, require, scheme_field
+from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
 from . import esco, identifiers, industries
@@ -184,7 +184,8 @@ class CompanyQuerySet(OwnedQuerySet):
                 .values("occurred_at")[:1]
             ),
         }
-        for key in identifiers.schemes():
+        # The columns the table has: Postulo's own schemes, as `tables.py` lists them.
+        for key in identifiers.shipped():
             if key == identifiers.OTHER:
                 continue
             annotations[f"id_{key}"] = Subquery(
@@ -479,19 +480,24 @@ class Company(OwnedModel):
         return found.company if found else None
 
 
-class CompanyIdentifier(OwnedModel):
+class CompanyIdentifier(KeepsItsScheme, OwnedModel):
     """One external id for a company: a Wikidata item, a LEI, a register number, a slug.
 
     Unique twice over: a company has one value per scheme (except *other*, which is a
     labelled free slot), and one account cannot give two companies the same identifier —
     that would be two records of one employer, which is what identifiers exist to prevent.
+
+    A scheme that does not identify an organisation is refused when a row is saved
+    (`KeepsItsScheme.save`), as `accounts.models.PersonIdentifier` refuses a company's.
     """
+
+    SUBJECT = COMPANY
 
     company = models.ForeignKey(
         Company, on_delete=models.CASCADE, related_name="identifiers", verbose_name=_("company")
     )
     scheme = scheme_field(COMPANY)
-    value = models.CharField(_("identifier"), max_length=100)
+    value = models.CharField(_("identifier"), max_length=MAX_VALUE_LENGTH)
     label = models.CharField(
         _("name"),
         max_length=60,
@@ -541,18 +547,22 @@ class CompanyIdentifier(OwnedModel):
         return f"{self.scheme_label}: {self.value}"
 
     def clean(self) -> None:
-        self.value = identifiers.clean(self.scheme, self.value)
+        if self.is_as_stored():
+            # Left alone: the scheme and the value the table holds. A stored row is not
+            # refused by being looked at, whatever its scheme says today; it answers the
+            # day either is changed, and the page marks it until then (#311).
+            pass
+        elif self.keeps_an_undefined_scheme():
+            # Kept under a scheme nobody defines any more: there is no shape left to hold
+            # the value to, and the row stays what it was (#311).
+            self.value = (self.value or "").strip()
+        else:
+            self.value = identifiers.clean(self.scheme, self.value)
         self.label = (self.label or "").strip()
         if self.scheme == identifiers.OTHER and not self.label:
             raise ValidationError({"label": _("Say what this identifier is.")})
         if self.scheme != identifiers.OTHER:
             self.label = ""
-
-    def save(self, *args, **kwargs):
-        """Refuse a scheme that does not identify an organisation. See
-        `accounts.models.PersonIdentifier.save`."""
-        require(self.scheme, COMPANY)
-        return super().save(*args, **kwargs)
 
     @property
     def scheme_label(self) -> str:
@@ -562,7 +572,8 @@ class CompanyIdentifier(OwnedModel):
 
     @property
     def url(self) -> str:
-        return identifiers.url_for(self.scheme, self.value)
+        """Where the identifier leads; nowhere for a value its scheme refuses today (#311)."""
+        return self.link_for(identifiers.url_for(self.scheme, self.value))
 
 
 class Department(OwnedModel):

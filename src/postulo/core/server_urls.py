@@ -26,6 +26,11 @@ urlpatterns = [
     path("plugins/action/", views.PluginActionView.as_view(), name="plugin_action"),
     path("plugins/policy/", views.PluginPolicyView.as_view(), name="plugin_policy"),
     path(
+        "plugins/identifiers/",
+        views.IdentifierSchemesView.as_view(),
+        name="identifier_schemes",
+    ),
+    path(
         "people/<int:pk>/plugins/",
         views.PersonPluginsView.as_view(),
         name="person_plugins",

@@ -57,6 +57,24 @@ class ImportReport:
         ]
 
 
+def _kept_as_other(key: str, value: str, subject: str, whose: str = "") -> str:
+    """The report's line for an identifier that was restored as *Other* (#311).
+
+    `!r`, and cut short: both are whatever the file says, and this line is printed.
+    """
+    from . import identifiers
+
+    why = (
+        "this instance has no such kind"
+        if identifiers.find(key, subject) is None
+        else "its kind does not accept that value on this instance"
+    )
+    return (
+        f"{whose + ': ' if whose else ''}Identifier {key[:40]!r} {value[:60]!r}: {why}, "
+        "so it is kept as Other, named by its key"
+    )
+
+
 def _source_of(entry: dict, cvs: dict, letters: dict):
     """What made a sent document, in whichever shape the archive has it.
 
@@ -417,6 +435,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         Offer,
         Reminder,
     )
+    from postulo.core import identifiers as scheme_registry
     from postulo.core.models import Tag, TagIcon, nearest_tone
     from postulo.documents import printing
     from postulo.documents.models import (
@@ -490,8 +509,20 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         if not profile or not scheme or not value:
             continue
         # get_or_create rather than create: importing an archive twice should not raise
-        # on the one-per-scheme constraint.
-        label = row.get("label") or ""
+        # on the one-per-scheme constraint. A scheme the other instance defined for itself
+        # and this one does not have is restored as *Other*, named by its key, and so is a
+        # value the scheme here refuses: nothing is dropped, nothing is stored under a
+        # scheme it does not fit, and the report says which (#311).
+        named = scheme
+        scheme, label = scheme_registry.as_restored(
+            named, row.get("label") or "", scheme_registry.PERSON, value=value
+        )
+        if scheme != named:
+            report.skipped.append(_kept_as_other(named, value, scheme_registry.PERSON))
+        else:
+            # As typing it here would have written it: the scheme's own spelling.
+            known = scheme_registry.find(scheme, scheme_registry.PERSON)
+            value = known.normalise(value) if known is not None else value
         found = {"profile": profile, "scheme": scheme, "value": value}
         if scheme == identifiers.OTHER:
             # *Other* is the one scheme somebody may hold several of, and two of them can
@@ -702,14 +733,30 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         for department_name in department_names:
             Department.objects.get_or_create(owner=user, company=company, name=department_name)
         for entry in identifier_entries:
-            try:
-                set_identifiers(
-                    company,
-                    [(entry.get("scheme", ""), entry.get("value", ""), entry.get("label", ""))],
+            # A scheme only the other instance defined comes back as *Other*, named by
+            # its key, as a person's does, and so does a value the scheme here refuses
+            # (#311). It used to be dropped, with nothing said.
+            named, value = entry.get("scheme", ""), entry.get("value", "")
+            if not named or not value:
+                # Nothing to restore, as for a person's: an entry with no kind or no value.
+                continue
+            scheme, label = scheme_registry.as_restored(
+                named, entry.get("label", ""), scheme_registry.COMPANY, value=value
+            )
+            if scheme != named:
+                report.skipped.append(
+                    _kept_as_other(named, value, scheme_registry.COMPANY, company.name)
                 )
-            except ValidationError:
-                # Malformed in the file, or already on another company here: the record
-                # is still worth having, the id is not worth refusing it over.
+            try:
+                set_identifiers(company, [(scheme, value, label)])
+            except ValidationError as refused:
+                # Already on another company here, or with no name to go by: the record
+                # is still worth having, the id is not worth refusing it over. Said, all
+                # the same: what a file held and the account does not is never silent.
+                report.skipped.append(
+                    f"{company.name}: identifier {str(named)[:40]!r} {str(value)[:60]!r} "
+                    f"was left out: {' '.join(refused.messages)[:200]}"
+                )
                 continue
 
         for contact_entry in contact_entries:

@@ -13,7 +13,7 @@ from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, web_links
-from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect
+from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
 from . import employment_services, esco, identifiers, industries, logos, structure
 from .models import (
@@ -438,7 +438,9 @@ class CompanyIdentifierForm(IdentifierRow, forms.ModelForm):
         # A blank first choice, so an untouched extra row counts as unchanged and is
         # dropped rather than complaining that its value is missing.
         scheme = self.fields["scheme"]
-        choices = [("", "—"), *identifiers.choices()]
+        # The registry's kinds, and this row's own where it is stored under a scheme the
+        # instance has since deleted: it keeps the key, or the page could not be saved (#311).
+        choices = offering([("", "—"), *identifiers.choices()], self.instance)
         scheme.choices = choices
         scheme.required = False
         # Django picks the widget from the model field when it builds the form, and that

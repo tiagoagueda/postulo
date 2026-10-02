@@ -248,6 +248,13 @@
     transition: none;
   }
 
+  /* A dialog that holds a box of code, `data-size="wide"` (#311): 48rem where the window
+     has it, because a line of JSON cut at 32rem is a line read in two halves. Still the
+     window less a gutter where the window is narrower, by the width above. */
+  .dialog[data-size="wide"] > * {
+    @apply max-w-3xl;
+  }
+
   .dialog > * > header,
   .alert-dialog > * > header {
     @apply gap-2;
@@ -320,6 +327,20 @@
 
   .field [role="alert"] p {
     @apply text-xs font-medium text-red-600 dark:text-red-400;
+  }
+
+  /* A box of code is not a box of prose (#311): `<textarea data-code>`. Basecoat's
+     textarea grows with what is typed into it (`field-sizing: content`) and never scrolls,
+     which is right for a note and wrong for a hundred lines of JSON: the box became as
+     tall as its text, so the sentence that refused the text, the caret on the line it
+     named and *Save* were two screens further down, and a script that scrolled the box to
+     that line scrolled nothing, because the box had nowhere to scroll. So a box of code
+     has a height of its own -- under half the window, never more than 28rem -- and
+     scrolls inside itself, both ways, with its lines unbroken; whoever wants it taller
+     drags its corner. One width of letter, a size smaller, because a column is counted. */
+  .field > textarea[data-code] {
+    @apply h-[clamp(8rem,45svh,28rem)] resize-y field-sizing-fixed overflow-auto font-mono
+      text-xs whitespace-pre;
   }
 
   /* Basecoat takes the native chevron off a select and its packs draw one back as a

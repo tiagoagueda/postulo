@@ -119,7 +119,9 @@ class CompaniesTable(Table):
         Column("notes", _("Notes"), filter="text", lookups=("notes",)),
         # One optional column per identifier scheme, hidden until asked for. Each is an
         # annotation of the same name on the queryset (`with_table_data`), so it sorts and
-        # narrows like a column of the company's own (#173).
+        # narrows like a column of the company's own (#173). The schemes Postulo ships:
+        # this list is settled when the module is imported, before a row can be read, so
+        # one an instance defined for itself has no column (#311).
         *(
             Column(
                 f"id_{key}",
@@ -128,7 +130,7 @@ class CompaniesTable(Table):
                 filter="text",
                 lookups=(f"id_{key}",),
             )
-            for key, scheme in identifiers.schemes().items()
+            for key, scheme in identifiers.shipped().items()
             if key != identifiers.OTHER
         ),
         # Moments rather than days, so the date pair narrows by the day they fall on.

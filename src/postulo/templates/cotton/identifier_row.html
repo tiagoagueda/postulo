@@ -19,6 +19,28 @@
 {% endcomment %}
 <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
   {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
+  {% comment %} An identifier kept before its kind's pattern was changed, which the kind
+     would refuse if it were typed today (#311). It is left as it is, as a telephone number
+     and an address are (#304, #306): saving the page does not ask it again, and it answers
+     the next time it is changed. A word and a sentence, so the tone is never the only
+     thing saying it; not `role="alert"`, because nothing has been refused. The word has
+     a context of its own: an address is feminine in French and an identifier is not. {% endcomment %}
+  {% with kept=row.kept_as_it_was %}
+    {% if kept %}
+      <div class="alert mb-3 flex-col items-start gap-1" data-variant="warning" data-kept-as-it-was>
+        <p>
+          <span class="badge" data-tone="amber">{% translate "Kept as it was" context "an identifier" %}</span>
+          {% blocktranslate trimmed %}
+            This identifier does not fit what its kind expects now. It stays as it is, and
+            is checked the next time you change it.
+          {% endblocktranslate %}
+        </p>
+        <ul class="list-disc ps-5">
+          {% for sentence in kept %}<li>{{ sentence }}</li>{% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+  {% endwith %}
   <div class="name-if-other-row grid gap-3 sm:items-end"{% if row.label.value %} data-has-name{% endif %}>
     <div class="field">
       <label for="{{ row.scheme.id_for_label }}">{% translate "Kind" %}</label>

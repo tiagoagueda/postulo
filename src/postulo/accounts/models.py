@@ -20,7 +20,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core.identifiers import PERSON, require, scheme_field
+from postulo.core.identifiers import MAX_VALUE_LENGTH, PERSON, KeepsItsScheme, scheme_field
 from postulo.core.language_field import LanguageField
 
 from . import identifiers
@@ -154,7 +154,7 @@ def upload_to_avatars(instance, filename: str) -> str:
     return f"avatars/{instance.user_id}/{filename}"
 
 
-class PersonIdentifier(models.Model):
+class PersonIdentifier(KeepsItsScheme, models.Model):
     """One external identifier for the person whose account this is.
 
     A name is not an identity. Two researchers share one, one researcher publishes under
@@ -165,7 +165,13 @@ class PersonIdentifier(models.Model):
     Attached to the profile rather than to a CV, because it is a fact about the person and
     not about one variant of their career record. Which CVs show it is a separate choice,
     made the same way the rest of the contact block is.
+
+    A scheme that does not identify a person is refused when a row is saved, by every route
+    in (`KeepsItsScheme.save`). A row already stored under a scheme this instance defined
+    and has since deleted is the one thing let through, and it is kept as it is (#311).
     """
+
+    SUBJECT = PERSON
 
     profile = models.ForeignKey(
         "accounts.Profile",
@@ -174,7 +180,7 @@ class PersonIdentifier(models.Model):
         verbose_name=_("profile"),
     )
     scheme = scheme_field(PERSON)
-    value = models.CharField(_("identifier"), max_length=100)
+    value = models.CharField(_("identifier"), max_length=MAX_VALUE_LENGTH)
     label = models.CharField(
         _("name"),
         max_length=60,
@@ -197,25 +203,21 @@ class PersonIdentifier(models.Model):
     def __str__(self) -> str:
         return f"{self.scheme_label}: {self.value}"
 
-    def save(self, *args, **kwargs):
-        """Refuse a scheme that does not identify a person, by every route in.
-
-        `full_clean` catches it for a form and an import; this catches it for
-        ``objects.create`` and for anything a plugin writes directly. *No valid company
-        identifier is shown on the user data* was the ask, and a guarantee that holds only
-        where somebody remembered to validate is not one (#109).
-        """
-        require(self.scheme, PERSON)
-        return super().save(*args, **kwargs)
-
     def clean(self) -> None:
         """Tidy and check the value here, so nothing stores a half-typed identifier.
 
         On the model rather than only on the form, because an import or a plugin writing
-        one should get the same answer as somebody typing it into a page.
+        one should get the same answer as somebody typing it into a page. Two rows are left
+        as they are (#311): one whose scheme and value are what the table holds, which is
+        not refused by being looked at whatever its scheme says today, and one kept under
+        a scheme nobody defines any more, which has no shape left to be held to.
         """
         super().clean()
-        if self.scheme and self.value:
+        if self.is_as_stored():
+            pass
+        elif self.keeps_an_undefined_scheme():
+            self.value = (self.value or "").strip()
+        elif self.scheme and self.value:
             self.value = identifiers.clean(self.scheme, self.value)
 
     @property
@@ -224,7 +226,8 @@ class PersonIdentifier(models.Model):
 
     @property
     def url(self) -> str:
-        return identifiers.url_for(self.scheme, self.value)
+        """Where the identifier leads; nowhere for a value its scheme refuses today (#311)."""
+        return self.link_for(identifiers.url_for(self.scheme, self.value))
 
     @property
     def display_label(self) -> str:

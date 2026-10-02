@@ -117,7 +117,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "`Scheme`, and the two subject names. This is the one plugin whose whole content "
             "*is* a core type: it contributes vocabulary rather than behaviour, and the shape "
             "of that vocabulary has to be Postulo's or the tables could not read it. #109 "
-            "will put `Scheme` on the surface the day a third-party registry is a promise"
+            "will put `Scheme` on the surface the day a third-party registry is a promise. "
+            "Since #311 also what a scheme an instance defines for itself is built from: "
+            "the `Reading` it hands back, the bounds on a key and a value, a label in "
+            "several languages and the check of a link, each of them the meaning of a "
+            "field of `Scheme` and so kept beside it"
         ),
     },
     # The other registry, and the one that needs nothing written down: `LinkService` is on

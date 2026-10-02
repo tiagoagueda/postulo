@@ -512,6 +512,9 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/server/sign-in/",
         "/server/email/",
         "/server/plugins/",
+        # The identifier registry's settings as a page: what its dialog on Plugins falls
+        # back to with scripts off, a box of JSON and what a scheme can say (#311).
+        "/server/plugins/identifiers/",
         "/server/capture/",
         "/server/defaults/",
         "/server/data-protection/",

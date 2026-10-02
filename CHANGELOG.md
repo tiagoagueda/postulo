@@ -94,6 +94,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An administrator adds an instance's own kinds of identifier, in JSON, from *Server settings → Plugins*: a key, a name per language, a pattern that is not a regular expression, a link. Offered beside Postulo's. Removing one deletes no identifier and changing its pattern refuses none: it is kept as it was, marked. (#311)
 - A CV chooses which of your details it prints: which number, email address, link of each kind and identifiers, the location or not, and your form of address and pronouns if you say so. Nothing changes until you choose; a chosen detail you delete prints none. The API gains `PATCH /cvs/{id}`; export format 27. (#308)
 - *Your name* takes a form of address and pronouns, from your career record's language or typed as *Other*, printed only if a CV says so (#308). **A blank location prints the town and country of your primary address on CVs and letters; type one to print that instead.** The API gains `/profile`; export format 26. (#309)
 - A correction on the review screen is remembered where the page showed it, for that site and for you alone: your next capture from it is read there first, each such field says so, a place wrong twice in a row is dropped, and *Settings → Capture* lists and forgets them. (#267)

@@ -117,12 +117,15 @@ def test_a_university_can_record_its_isni(user):
 
 
 def test_a_researcher_can_record_their_wikidata_item(user):
-    row = PersonIdentifier.objects.create(
+    """Typed, which is a row not yet stored: one already in the table is left as it is by
+    being looked at (#311), so this is checked the way a form checks it, before it is kept."""
+    row = PersonIdentifier(
         profile=user.profile, scheme="wikidata", value="https://www.wikidata.org/wiki/Q42"
     )
     row.full_clean()
+    row.save()
 
-    assert row.value == "Q42"
+    assert PersonIdentifier.objects.get(pk=row.pk).value == "Q42"
 
 
 def test_a_linkedin_profile_and_a_company_page_are_different_addresses(user):

@@ -234,6 +234,42 @@ def test_a_backup_restores_onto_an_empty_instance(tmp_path, settings):
     assert cv.read_bytes() == b"%PDF-1.4 fake"
 
 
+def test_the_instances_own_identifier_schemes_come_back_and_are_held_to_the_rules(tmp_path):
+    """The schemes an instance defines for itself are a column of its policy row (#311), so
+    the backup carries them with everything else and a restore puts them back. What comes
+    back is read as the page reads it: an archive is not a way past the rules on patterns,
+    and a scheme the page would have refused defines nothing after a restore either."""
+    from postulo.core import identifiers, site
+    from postulo.core.models import SiteSettings
+    from postulo.jobs.models import CompanyIdentifier
+
+    siren = {"key": "siren", "label": "SIREN", "subjects": ["company"], "pattern": "\\d{9}"}
+    slow = {"key": "slow", "label": "Slow", "subjects": ["person"], "pattern": "(a+)+"}
+    text = json.dumps([siren, slow], indent=2)
+    user = a_search()
+    # Written past the page, which would have refused the second scheme.
+    row = SiteSettings.get()
+    row.identifier_schemes = text
+    row.save()
+    CompanyIdentifier.objects.create(
+        owner=user, company=Company.objects.get(), scheme="siren", value="552081317"
+    )
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+
+    User.objects.all().delete()
+    SiteSettings.objects.all().delete()
+    site.forget_current()
+    assert identifiers.find("siren") is None
+
+    restore_backup(archive)
+    site.forget_current()  # a restore is a process of its own; what it read before is gone
+
+    assert SiteSettings.objects.get().identifier_schemes == text
+    assert identifiers.find("siren") is not None
+    assert identifiers.find("slow") is None, "refused by the page, and so by the registry"
+    assert CompanyIdentifier.objects.get().scheme_label == "SIREN"
+
+
 def test_restore_refuses_an_instance_that_is_not_empty_unless_forced(tmp_path, settings):
     a_search()
     archive = write_backup(tmp_path / "instance.tar.gz").path

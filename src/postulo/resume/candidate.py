@@ -1027,6 +1027,11 @@ class _Planner:
             data, wrong = self._posted(entry, IDENTIFIER_FIELDS)
             if not any(value.strip() for value in data.values()) and not wrong:
                 continue
+            # A kind this instance does not have, or has with another shape, is added as
+            # *Other*, named by its key, which is what an archive's is restored as: the
+            # file is another instance's, and its kinds are that instance's (#311). It
+            # used to be refused, which an archive never did.
+            as_other = self._as_other(data) if not wrong else ""
             instance = PersonIdentifier(profile=self._holder())
             form = PersonIdentifierForm(data=data, instance=instance)
             if wrong or not form.is_valid():
@@ -1041,6 +1046,8 @@ class _Planner:
                 )
                 continue
             row = Row(instance.display_label, ADD, sub=instance.value, instance=instance)
+            if as_other:
+                row.notes.append(as_other)
             key = (instance.scheme, instance.value)
             if key in mine:
                 row.outcome = PRESENT
@@ -1059,6 +1066,29 @@ class _Planner:
             seen.add(key)
             section.rows.append(row)
         return section
+
+    @staticmethod
+    def _as_other(data: dict) -> str:
+        """Turn an identifier this instance cannot hold as its kind into an *Other*, in
+        place, and answer with the sentence that says so; nothing where it can."""
+        from postulo.core import identifiers as registry
+
+        key, value = data.get("scheme", "").strip(), data.get("value", "").strip()
+        scheme, label = registry.as_restored(
+            key, data.get("label", ""), registry.PERSON, value=value
+        )
+        if scheme == key:
+            return ""
+        known = registry.find(key, registry.PERSON)
+        data.update(scheme=scheme, label=label)
+        if known is None:
+            return _(
+                "This instance has no kind of identifier called “%(key)s”, so it is added "
+                "as Other, named “%(name)s”."
+            ) % {"key": key[:40], "name": label}
+        return _(
+            "This is not a value %(kind)s accepts here, so it is added as Other, named “%(name)s”."
+        ) % {"kind": known.label, "name": label}
 
     # ---------------------------------------------------------------------- the career
 

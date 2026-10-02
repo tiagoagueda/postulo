@@ -69,9 +69,22 @@ def _line(longest: int):
 # ------------------------------------------------------------------ companies
 
 
+#: The schemes a company's identifier can be under, for both descriptions below. Not an
+#: enumeration, deliberately: an instance may define schemes of its own (#311), and a list
+#: frozen into the description of the API would call their keys invalid.
+_COMPANY_SCHEMES = (
+    "wikidata, isni, linkedin, lei, register, crunchbase, opencorporates, other; or the key "
+    "of a scheme this instance defines for itself, which an administrator adds under Server "
+    "settings and which is taken and checked as one of these is"
+)
+
+
 class IdentifierOut(Schema):
     scheme: str = Field(
-        description="wikidata, lei, register, linkedin, crunchbase, opencorporates, other"
+        description=(
+            f"{_COMPANY_SCHEMES}. A scheme the instance has since deleted keeps its key "
+            "here, with no url"
+        )
     )
     value: str
     label: str = Field(default="", description="What the identifier is, for scheme 'other'")
@@ -79,8 +92,16 @@ class IdentifierOut(Schema):
 
 
 class IdentifierIn(Schema):
-    scheme: str = Field(max_length=20)
-    value: str = Field(max_length=200, description="A pasted address is accepted; the id is kept")
+    scheme: str = Field(max_length=20, description=_COMPANY_SCHEMES)
+    value: str = Field(
+        max_length=200,
+        description=(
+            "For one of Postulo's own schemes a pasted address is accepted, and the id is "
+            "kept. A scheme the instance defines for itself takes the value alone: it has "
+            "a pattern and no address to lift a value out of. An identifier sent back "
+            "exactly as it was listed is kept as it is, whatever its scheme says now"
+        ),
+    )
     label: str = Field(default="", max_length=60)
 
 

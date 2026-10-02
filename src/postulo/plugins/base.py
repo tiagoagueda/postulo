@@ -459,6 +459,12 @@ class IdentifierPlugin(Protocol):
     **It must not reach the network.** A scheme validates what somebody typed and knows
     where it links; asking somebody else whether the identifier exists is a deliberate act
     for another day, and a plugin is not the loophole for it.
+
+    **One of them may read the schemes an instance defines for itself** (#311), by having a
+    ``defined(text, *, taken)`` that answers with a `postulo.core.identifiers.Reading`: the
+    schemes in the text and what is wrong with the rest. Postulo keeps the text, on its
+    policy row, and hands it over; the plugin holds no row for it. Not part of the protocol
+    below, because a registry need not have one: the one Postulo ships does.
     """
 
     #: The identifier the registry keys on.

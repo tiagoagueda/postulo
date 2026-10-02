@@ -76,14 +76,7 @@ def validate(scheme_key: str, value: str) -> None:
     scheme = scheme_for(scheme_key)
     if scheme is None:
         raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    if not scheme.pattern.match(value):
-        raise ValidationError(
-            _("That does not look like a %(scheme)s identifier (for example %(example)s)."),
-            code="format",
-            params={"scheme": scheme.label, "example": scheme.example},
-        )
-    if scheme.checksum is not None and not scheme.checksum(value):
-        raise ValidationError(scheme.checksum_message, code="checksum")
+    registry.refuse_malformed(scheme, value)
 
 
 def clean(scheme_key: str, raw: str) -> str:

@@ -1860,6 +1860,129 @@
     true
   );
 
+  /* ------------------------------------------- a link that opens a dialog instead (#311)
+   *
+   * A dialog that holds something to do, rather than a question, has a page behind it: the
+   * same form at an address of its own, which is what works with no script at all. So what
+   * opens it is a link to that page, `<a href="…" data-opens-dialog="id">`, and here the
+   * link opens the dialog it names in place of being followed -- modal, like every other,
+   * with focus given back to the link when it closes. A click that asks for a new tab or a
+   * new window is left to do that, and so is a link whose dialog is not on the page.
+   *
+   * `aria-haspopup` is added here and not written in the template: without this script the
+   * link is a link, and saying it opens a dialog would be untrue.
+   */
+  function dialogOfLink(link) {
+    var dialog = document.getElementById(link.getAttribute("data-opens-dialog") || "");
+    return dialog && dialog.tagName === "DIALOG" && dialog.hasAttribute("data-dialog") ? dialog : null;
+  }
+
+  onContentReady(function () {
+    Array.prototype.forEach.call(document.querySelectorAll("a[data-opens-dialog]"), function (link) {
+      var dialog = dialogOfLink(link);
+      if (dialog && typeof dialog.showModal === "function") {
+        link.setAttribute("aria-haspopup", "dialog");
+      }
+    });
+  });
+
+  document.addEventListener("click", function (event) {
+    var link = event.target.closest ? event.target.closest("a[data-opens-dialog]") : null;
+    if (!link || event.defaultPrevented || event.button !== 0) {
+      return;
+    }
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    var dialog = dialogOfLink(link);
+    if (!dialog || typeof dialog.showModal !== "function") {
+      return;
+    }
+    event.preventDefault();
+    if (dialog.open) {
+      return;
+    }
+    dialogOpener[dialog.id] = link;
+    dialog.showModal();
+    // A box inside it that names a line was drawn while the dialog was shut, where a box
+    // has no size and cannot be scrolled: it is put on its line now that it has one.
+    placeCarets(dialog);
+  });
+
+  /* ------------------------------------------- the caret, on the line that is wrong (#311)
+   *
+   * A box of code that was refused says which line each problem is on, and a `<textarea>`
+   * has no line numbers to count by. So the server names the first problem's line on the
+   * box, `data-caret-line` and where it knows it `data-caret-column`, and this puts the
+   * caret there and brings that line into view **inside the box** -- a box of code has a
+   * height of its own and scrolls within it (`textarea[data-code]`), which is what makes
+   * there be anything to scroll. Once for each time the box is drawn: it comes back with
+   * the page, or in a swap, and where somebody has moved the caret since is theirs.
+   *
+   * Then what was said is brought into view. The sentences stand above the box, in the
+   * region the box is described by; after a refusal they are what has to be read first,
+   * and a page that came back scrolled to the box, or a dialog scrolled to its foot, would
+   * have them just out of sight. Only where the box asks for the focus, which is where
+   * something was refused: a page that is merely opened is not scrolled anywhere.
+   *
+   * A box that is not drawn -- inside a dialog nobody has opened -- is left for the moment
+   * its dialog opens. Without this script the box still has the focus after a refusal, the
+   * sentences are still above it, and each still says its line.
+   */
+  function placeCaret(box) {
+    if (box.hasAttribute("data-caret-placed") || !box.getClientRects().length) {
+      return;
+    }
+    box.setAttribute("data-caret-placed", "");
+    var line = parseInt(box.getAttribute("data-caret-line"), 10) || 1;
+    var column = parseInt(box.getAttribute("data-caret-column"), 10) || 1;
+    var lines = box.value.split("\n");
+    var index = 0;
+    for (var before = 0; before < line - 1 && before < lines.length; before += 1) {
+      index += lines[before].length + 1;
+    }
+    index += Math.min(column - 1, (lines[line - 1] || "").length);
+    index = Math.min(index, box.value.length);
+    var refused = box.hasAttribute("autofocus");
+    if (refused) {
+      // Not scrolled to by the browser: where the page stands is decided below.
+      box.focus({ preventScroll: true });
+    }
+    box.setSelectionRange(index, index);
+    var style = window.getComputedStyle(box);
+    var height = parseFloat(style.lineHeight) || 16;
+    // A line or two above it left in view, so that what led to the mistake can be read.
+    box.scrollTop = Math.max(0, (line - 3) * height);
+    // And across, for a line longer than the box is wide: one width of letter, so a
+    // column is a distance. Half a box of what comes before it is left in view.
+    var across = (column - 1) * (parseFloat(style.fontSize) || 12) * 0.6;
+    box.scrollLeft = across > box.clientWidth * 0.75 ? across - box.clientWidth / 2 : 0;
+    if (!refused) {
+      return;
+    }
+    var said = null;
+    (box.getAttribute("aria-describedby") || "").split(/\s+/).forEach(function (id) {
+      var described = id ? document.getElementById(id) : null;
+      if (described && described.getAttribute("role") === "alert") {
+        said = described;
+      }
+    });
+    // The box first and then the sentences, each only as far as it takes: where both fit
+    // both are seen, and where they do not the sentences win, which is the order to read.
+    box.scrollIntoView({ block: "nearest", inline: "nearest" });
+    if (said) {
+      said.scrollIntoView({ block: "nearest", inline: "nearest" });
+    }
+  }
+
+  function placeCarets(within) {
+    Array.prototype.forEach.call(within.querySelectorAll("textarea[data-caret-line]"), placeCaret);
+  }
+
+  onContentReady(function () {
+    placeCarets(document);
+  });
+
   /* ------------------------------------------------ a row off *Your details*, at once
    *
    * A row's dialog is a form of its own, posting to that row's address (#303). htmx sends it,

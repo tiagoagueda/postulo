@@ -88,6 +88,14 @@
             </label>
             {% if row.held %}
               <p class="text-xs text-ink-500 dark:text-ink-400" id="why-{{ row.name }}">{{ row.why }}</p>
+              {% comment %} A plugin with settings of its own among these pages (#311). A
+                 link to the page they are on, which is the whole of it with scripts off;
+                 where a script runs, `app.js` opens the dialog the link names instead,
+                 drawn after this form because a form cannot hold another. {% endcomment %}
+              {% if row.settings_url %}
+                <a href="{{ row.settings_url }}" class="btn self-start" data-variant="outline" data-size="sm"
+                   data-opens-dialog="settings-{{ row.name }}">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></a>
+              {% endif %}
             {% else %}
               <input type="hidden" name="row:{{ row.name }}" value="1">
               <label class="tap-target inline-flex items-center gap-3">
@@ -114,6 +122,23 @@
       </div>
     {% endif %}
   </form>
+
+  {% comment %} The identifier registry's settings, in the dialog its row opens (#311): the
+     schemes this instance defines for itself, as JSON. `plain`, because it holds something
+     to do rather than a question, and `wide`, because what it holds is code. It posts to
+     the page the row's link leads to; `live` sends that with htmx, and a text that is
+     refused comes back as the fields alone, put where these are, so the dialog stays open
+     over what was typed. `hx-target` says where: written on the dialog, which its form
+     inherits, so that what is marked busy while the request runs is the very element the
+     answer replaces. With scripts off nothing opens this and the link is followed. {% endcomment %}
+  <c-dialog id="settings-identifiers" tone="plain" action="{% url 'server:identifier_schemes' %}" live data-size="wide" hx-target="#identifier-schemes-fields">
+    <c-slot name="title">{% translate "Identifiers of your own" %}</c-slot>
+    <c-slot name="description">{% translate "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON." %}</c-slot>
+    <c-identifier-schemes :form="identifier_schemes_form" />
+    <c-slot name="footer">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </c-slot>
+  </c-dialog>
 
   {# ---------------------------------------------------------- repositories #}
 

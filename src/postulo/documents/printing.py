@@ -33,6 +33,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts.identifiers import OTHER
+from postulo.core.identifiers import PERSON, as_restored, find
 
 from .models import CV, Prints
 
@@ -512,7 +513,22 @@ def _matches(row, key: str, named: dict) -> bool:
     if key == "email":
         return bool(said("email")) and row.email.casefold() == said("email").casefold()
     if key == "identifiers":
-        if not said("value") or (row.scheme, row.value) != (said("scheme"), said("value")):
+        scheme, name = as_restored(said("scheme"), subject=PERSON, value=said("value"))
+        if scheme != said("scheme"):
+            # A scheme only the other instance defined, or a value the scheme here
+            # refuses: the import made the row *Other*, named by the key, and that is the
+            # row this names (#311).
+            return bool(said("value")) and (row.scheme, row.label, row.value) == (
+                scheme,
+                name,
+                said("value"),
+            )
+        if not said("value") or row.scheme != said("scheme"):
+            return False
+        # As the file wrote it, or as the import wrote it down: in the scheme's own
+        # spelling here, where that is another one.
+        known = find(row.scheme, PERSON)
+        if row.value not in {said("value"), known.normalise(said("value")) if known else ""}:
             return False
         # An archive written before the name was carried has none, and matches as it did.
         # Compared as it is stored: the import keeps a name as the file gives it.

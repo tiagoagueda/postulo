@@ -10,6 +10,20 @@ from . import identifiers
 from .models import Company, CompanyIdentifier
 
 
+def _kept_as_it_is(company: Company, scheme: str, raw: str) -> str | None:
+    """The value of a row ``company`` already holds under this scheme, where ``raw`` is that
+    very value; nothing otherwise.
+
+    A stored row is not refused by being looked at (#311): one sent back as it was listed
+    is the row the company has, whatever its scheme says today -- a scheme the instance has
+    since deleted, or one whose pattern was changed under the value.
+    """
+    if not isinstance(scheme, str) or not isinstance(raw, str):
+        return None
+    held = company.identifiers.filter(scheme=scheme, value=raw.strip()).first()
+    return held.value if held is not None else None
+
+
 @transaction.atomic
 def set_identifiers(
     company: Company, items: list[tuple[str, str, str]], *, replace: bool = False
@@ -25,11 +39,17 @@ def set_identifiers(
     errors: list[str] = []
     seen: set[tuple[str, str]] = set()
     for scheme, raw, label in items:
-        try:
-            value = identifiers.clean(scheme, raw)
-        except ValidationError as exc:
-            errors.extend(exc.messages)
-            continue
+        # An identifier the company already carries, sent back as it is, is kept as it is
+        # (#311): a client that sends back the list it was given must not be refused over
+        # a row whose scheme was deleted or changed since, and with ``replace`` must not
+        # lose it. Anything else is held to the scheme of today.
+        value = _kept_as_it_is(company, scheme, raw)
+        if value is None:
+            try:
+                value = identifiers.clean(scheme, raw)
+            except ValidationError as exc:
+                errors.extend(exc.messages)
+                continue
         label = (label or "").strip() if scheme == identifiers.OTHER else ""
         if scheme == identifiers.OTHER and not label:
             errors.append(_("An 'other' identifier needs a name."))

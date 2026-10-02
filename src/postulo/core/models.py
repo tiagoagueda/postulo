@@ -1121,6 +1121,19 @@ class SiteSettings(models.Model):
         help_text=_("Shown wherever the site keeps something about another person."),
     )
 
+    # --- the identifier schemes this instance defines for itself (#311) ---------------
+    #
+    #: JSON, exactly as an administrator typed it on *Server settings → Plugins*: a list of
+    #: schemes beyond the ones Postulo ships. Text and not a JSON column, because it is
+    #: shown again to be edited and an error in it is reported by the line it is on; a
+    #: column that parsed it would hand back somebody else's layout. Blank means none.
+    #:
+    #: Nothing reads this column but `core.identifiers`, which hands it to the registry
+    #: plugin and keeps only the schemes that pass every rule the page applies -- so what is
+    #: stored here is never trusted for having been stored, and a row restored from a
+    #: backup is held to the same rules as one that was typed.
+    identifier_schemes = models.TextField(_("identifier schemes of its own"), blank=True)
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

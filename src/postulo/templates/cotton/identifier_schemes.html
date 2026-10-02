@@ -1,0 +1,104 @@
+{% load i18n %}
+<c-vars form />
+{% comment %} The identifier schemes an instance defines for itself: the box of JSON, and
+   what a scheme can say (#311). `<c-identifier-schemes :form="form" />`, with the
+   `IdentifierSchemesForm`.
+
+   A component because it is drawn on two pages: inside the dialog on *Plugins*, and on the
+   page of its own that the dialog falls back to with scripts off. It is also what the
+   dialog is sent back when the text is refused, which is why the whole of it sits in one
+   element with an id: that element is what the answer replaces, so the dialog stays open
+   over what was typed, with the sentences that say what is wrong and the line each is on.
+
+   **What is wrong is said above the box, not under it.** The row is written out for that
+   and not drawn by `<c-field>`, which puts a field's errors after its control. The box
+   holds a hundred lines; under it, the sentence that refused them was the last thing on
+   the page, and the only change anybody saw was a label gone red. Above it, the sentences
+   are the first thing read after the label, and the box they are about is the next. They
+   keep the id Django's `aria-describedby` names and the `role="alert"` a swap is announced
+   by, so they are tied to the box as every field's errors are.
+
+   The same region says what is wrong with the text **as it is kept**, when the page is
+   asked for and nothing has been posted (`IdentifierSchemesForm.showing`): a sentence
+   that says so comes first, because nothing was refused and the reader has typed nothing.
+
+   The box is a box of code (`data-code`): a height of its own, scrolling inside itself.
+   The list under it is the whole reference, folded away: what each name means, and one
+   scheme written out. The names and the example are code, set left to right in any
+   language.
+
+   It keeps a measure of its own, 48rem, which is the wide dialog's: a box somebody types
+   into never runs the width of whatever it was put in (#320). {% endcomment %}
+<div id="identifier-schemes-fields" class="max-w-3xl">
+  {% with field=form.identifier_schemes %}
+    <div class="field mb-4 wrap-anywhere"{% if field.errors %} data-invalid="true"{% endif %}>
+      <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+      {% if field.errors %}
+        <div id="{{ field.auto_id }}_error" role="alert"{% if form.about_what_is_kept %} data-about-what-is-kept{% endif %}>
+          {% if form.about_what_is_kept %}
+            <p>{% translate "This is wrong in the text as it is kept. Until it is put right and saved, a scheme named here is not in use, and a text that cannot be read at all defines none." %}</p>
+          {% endif %}
+          {% for error in field.errors %}<p>{{ error }}</p>{% endfor %}
+        </div>
+      {% endif %}
+      {{ field }}
+      <p id="{{ field.auto_id }}_helptext">{{ field.help_text }}</p>
+    </div>
+  {% endwith %}
+  <details class="mb-2 text-sm">
+    <summary class="cursor-pointer text-ink-600 dark:text-ink-400">{% translate "What a scheme can say" %}</summary>
+    <dl class="mt-2 grid gap-x-4 gap-y-2 sm:grid-cols-[7rem_1fr]">
+      <dt><code dir="ltr">key</code></dt>
+      <dd>{% translate "What a row stores: lower-case letters, digits and hyphens. Never a key of one of Postulo's own schemes, which are added to and never changed." %}</dd>
+      <dt><code dir="ltr">label</code></dt>
+      <dd>{% translate "Its name, in double quotes, or one name for each language, as in the example. A reader is shown the one closest to their language." %}</dd>
+      <dt><code dir="ltr">subjects</code></dt>
+      <dd>{% translate "What it identifies: “person”, “company” or both. It is offered on Your details, on a company's form, or on both." %}</dd>
+      <dt><code dir="ltr">pattern</code></dt>
+      <dd>
+        {% blocktranslate trimmed %}
+          What a value looks like, from its first character to its last. A character
+          stands for itself. A class is one character out of several: <code dir="ltr">[A-Z]</code>,
+          <code dir="ltr">[0-9a-f]</code>, <code dir="ltr">[^ ]</code> for anything but a
+          space, <code dir="ltr">\d</code> for a digit, <code dir="ltr">\w</code> for a
+          letter, a digit or an underscore. A count follows what it counts:
+          <code dir="ltr">{4}</code>, <code dir="ltr">{2,5}</code>, or
+          <code dir="ltr">?</code> for one or none. Alternatives are separated by
+          <code dir="ltr">|</code>, and a fixed separator sits in round brackets:
+          <code dir="ltr">( - )?</code>.
+        {% endblocktranslate %}
+        {% blocktranslate trimmed %}
+          It is not a regular expression: nothing repeats without a limit, and where one
+          part ends and the next begins must never be in doubt. In JSON a backslash is
+          written twice, <code dir="ltr">\\d</code>.
+        {% endblocktranslate %}
+      </dd>
+      <dt><code dir="ltr">link</code></dt>
+      <dd>{% blocktranslate trimmed %}Where a value leads: an http or https address with <code dir="ltr">{value}</code> where the identifier goes, after the host. <code dir="ltr">person_link</code> is the address for a person, where that is another one.{% endblocktranslate %}</dd>
+      <dt><code dir="ltr">example</code></dt>
+      <dd>{% translate "A value the scheme accepts. It is shown where the kinds are listed, and in the sentence that refuses a value of another shape." %}</dd>
+      <dt><code dir="ltr">upper</code>, <code dir="ltr">lower</code></dt>
+      <dd>{% blocktranslate trimmed %}<code dir="ltr">true</code> to put what was typed into capitals, or into small letters, before it is checked.{% endblocktranslate %}</dd>
+      <dt><code dir="ltr">checksum</code></dt>
+      <dd>{% blocktranslate trimmed %}<code dir="ltr">iso7064-mod11-2</code>, which an ORCID ends in, or <code dir="ltr">iso7064-mod97-10</code>, which a legal-entity identifier ends in. No other can be named.{% endblocktranslate %}</dd>
+    </dl>
+    <p class="mt-3 mb-1 text-ink-600 dark:text-ink-400">{% translate "One scheme, written out:" %}</p>
+    {# Wider than a phone and never wrapped: a scroll box, which the keyboard can reach. #}
+    <c-scroll-box label="{% translate 'An example scheme' %}" class="rounded-md border border-ink-200 dark:border-ink-800">
+<pre dir="ltr" class="p-3 text-xs"><code>[
+  {
+    "key": "staff-number",
+    "label": {"en-GB": "Staff number", "pt-PT": "Número de funcionário"},
+    "subjects": ["person"],
+    "pattern": "[A-Z]{2}-\\d{6}",
+    "example": "AB-123456",
+    "upper": true,
+    "link": "https://intranet.example.org/staff/{value}"
+  }
+]</code></pre>
+    </c-scroll-box>
+    <p class="mt-3 text-ink-600 dark:text-ink-400">
+      {% translate "Taking a scheme out deletes no identifier. The ones recorded under it are kept and shown under its key, with no link, and are what they were again once the scheme is back. Changing a scheme's pattern refuses none either: an identifier that no longer fits is kept as it was, marked where it is shown, and checked when it is next changed." %}
+    </p>
+  </details>
+</div>

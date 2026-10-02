@@ -36,7 +36,13 @@ SECTIONS: tuple[SettingsSection, ...] = (
         match=("server:email_test",),
     ),
     SettingsSection(
-        slug="plugins", label=_("Plugins"), url_name="server:plugins", icon="link", order=50
+        slug="plugins",
+        label=_("Plugins"),
+        url_name="server:plugins",
+        icon="link",
+        order=50,
+        # The identifier registry's settings are a page of this section (#311).
+        match=("server:identifier_schemes",),
     ),
     SettingsSection(
         slug="capture", label=_("Capture"), url_name="server:capture", icon="search", order=60

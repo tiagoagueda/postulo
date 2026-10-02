@@ -39,3 +39,9 @@ class CoreConfig(AppConfig):
         from . import channels
 
         channels.register_the_ones_that_exist()
+
+        # The identifier schemes this instance defines for itself are kept on the policy
+        # row, and the registry is told so here: it cannot import the row's module (#311).
+        from . import identifiers, site
+
+        identifiers.kept_on(site.current)

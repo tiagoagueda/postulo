@@ -277,6 +277,8 @@ SERVER_MEASURED = [
     "/server/defaults/",
     "/server/data-protection/",
     "/server/record-of-processing/",
+    # The identifier registry's settings as a page: one box of JSON (#311).
+    "/server/plugins/identifiers/",
     "/server/people/{pk}/username/",
     "/server/people/{pk}/delete/",
     "/server/people/{pk}/recovery/",

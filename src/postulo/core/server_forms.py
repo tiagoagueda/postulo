@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
-from . import site
+from . import identifiers, site
 from .language_field import LanguageChoiceField, LanguagesChoiceField
 from .models import SiteSettings
 
@@ -296,6 +297,126 @@ class GdprForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["retention_days"].required = False
         self.fields["privacy_notice"].required = False
+
+
+class IdentifierSchemesForm(forms.ModelForm):
+    """The identifier schemes this instance defines for itself, as JSON in one box (#311).
+
+    The text is checked when it is saved, by the registry plugin that will read it
+    (`core.identifiers.read_definitions`), and saved only when nothing is wrong with it.
+    What is wrong is said one sentence a problem, each naming the line it is on and the
+    scheme it is in; the box keeps what was typed, takes the focus, and carries the first
+    problem's line for the script to put the caret on, since a box of JSON has no line
+    numbers to count by.
+
+    The text is kept as it was typed, down to its layout: it is shown again to be edited.
+    Only the line breaks are made one kind, so that a line number means the same thing to
+    the server, the box and whoever reads the sentence.
+
+    **What is kept is read too, before anything is typed** (`showing`). A text can be on
+    the policy row that the page would refuse today: a row restored from a backup, a key
+    Postulo has since started to ship, a rule that has been tightened. The registry leaves
+    the schemes that break a rule out and uses the rest, which is right and was silent --
+    the page showed the text as though all of it were in force. It is drawn now as a
+    refused save is, with the same sentences and their lines, and one more that says these
+    are in what is kept.
+    """
+
+    #: How many problems are spelt out before the rest are only counted.
+    SHOWN = 10
+
+    #: Whether the problems the form carries are in the text as it is kept, and not in one
+    #: somebody has just tried to save. The template says so in a sentence of its own.
+    about_what_is_kept = False
+
+    identifier_schemes = forms.CharField(
+        label=_("Schemes of this instance, in JSON"),
+        required=False,
+        # As typed: leading blank lines are lines, and the problems are numbered by line.
+        strip=False,
+        help_text=_(
+            "A list of schemes, checked when you save. Leave the box empty to define none. "
+            "What a scheme can say is listed under the box."
+        ),
+        widget=forms.Textarea(
+            attrs={
+                # A box of code: a height of its own, and it scrolls inside itself, so the
+                # line a problem is on can be brought into view (`textarea[data-code]`).
+                "data-code": "",
+                "spellcheck": "false",
+                "autocomplete": "off",
+                "autocapitalize": "off",
+                "dir": "ltr",
+            }
+        ),
+    )
+
+    class Meta:
+        model = SiteSettings
+        fields = ("identifier_schemes",)
+
+    @classmethod
+    def showing(cls, row) -> IdentifierSchemesForm:
+        """The form over what the policy row keeps, saying what is wrong with it where
+        anything is: the page as it is first drawn, and the dialog before it is opened.
+
+        Bound to the kept text where that text has problems, so that they are drawn by the
+        one road a refused save's are -- the sentences, the line for the caret, the box
+        marked invalid and described by them. It does not ask for the focus: nothing was
+        refused, and somebody who only opened the page has not been sent anywhere.
+        """
+        text = row.identifier_schemes or ""
+        if not text.strip() or not identifiers.reading_of(text).problems:
+            return cls(instance=row)
+        form = cls(data={"identifier_schemes": text}, instance=row)
+        form.about_what_is_kept = True
+        form.is_valid()
+        return form
+
+    def focused(self) -> IdentifierSchemesForm:
+        """The same form with its box asking for the focus: for the dialog, where the box
+        is what the dialog was opened for, and after a refusal, where it is what to fix."""
+        self.fields["identifier_schemes"].widget.attrs["autofocus"] = True
+        return self
+
+    def clean_identifier_schemes(self) -> str:
+        if self.add_prefix("identifier_schemes") not in self.data:
+            # Not an empty box, which a browser sends as an empty text: no box at all. A
+            # request that left it out used to read as "define none" and emptied the
+            # definitions, which is not what somebody who sent nothing asked for.
+            raise forms.ValidationError(
+                _(
+                    "The schemes were not sent with this request, so nothing was changed. "
+                    "To define none, empty the box and save."
+                )
+            )
+        text = self.cleaned_data.get("identifier_schemes") or ""
+        # A byte-order mark is what some editors put before the first character of a file,
+        # and it is not part of the list.
+        text = text.lstrip("\N{BYTE ORDER MARK}").replace("\r\n", "\n").replace("\r", "\n")
+        if not text.strip():
+            return ""
+        problems = identifiers.reading_of(text).problems
+        if not problems:
+            return text
+        attrs = self.fields["identifier_schemes"].widget.attrs
+        attrs["data-caret-line"] = problems[0].line
+        if problems[0].column:
+            attrs["data-caret-column"] = problems[0].column
+        if not self.about_what_is_kept:
+            self.focused()
+        said = [str(problem) for problem in problems[: self.SHOWN]]
+        more = len(problems) - len(said)
+        if more:
+            said.append(
+                ngettext(
+                    "And %(more)d more problem further down.",
+                    "And %(more)d more problems further down.",
+                    more,
+                )
+                % {"more": more}
+            )
+        raise forms.ValidationError(said)
 
 
 class TestEmailForm(forms.Form):

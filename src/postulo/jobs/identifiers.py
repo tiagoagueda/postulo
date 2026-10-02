@@ -44,6 +44,16 @@ def schemes() -> dict:
     return registry.schemes_for(COMPANY)
 
 
+def shipped() -> dict:
+    """The schemes Postulo itself ships for an organisation, with no row read.
+
+    What the companies table is built from. Its columns are settled when the module is
+    imported, before there is a database to ask, so a scheme an instance defined for itself
+    is offered on a company's form and has no column there (#311).
+    """
+    return {key: scheme for key, scheme in registry.shipped().items() if scheme.identifies(COMPANY)}
+
+
 def choices() -> tuple[tuple[str, object], ...]:
     return tuple((key, scheme.label) for key, scheme in schemes().items())
 
@@ -77,14 +87,7 @@ def validate(scheme_key: str, value: str) -> None:
     scheme = scheme_for(scheme_key)
     if scheme is None:
         raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    if not scheme.pattern.match(value):
-        raise ValidationError(
-            _("That does not look like a %(scheme)s identifier (for example %(example)s)."),
-            code="format",
-            params={"scheme": scheme.label, "example": scheme.example},
-        )
-    if scheme.checksum is not None and not scheme.checksum(value):
-        raise ValidationError(scheme.checksum_message, code="checksum")
+    registry.refuse_malformed(scheme, value)
 
 
 def clean(scheme_key: str, raw: str) -> str:

@@ -21,6 +21,18 @@ from django.db import migrations, models
 
 
 def fold_and_report(apps, schema_editor) -> None:
+    from postulo.core.identifiers import shipped_only
+
+    # Postulo's own rules and no others. A scheme an instance defines for itself is kept on
+    # the policy row, in a column added by a later migration of another app: asked for
+    # here, on an instance coming from before both, it is a query for a column that does
+    # not exist yet, which on PostgreSQL ends the transaction this migration runs in. Such a
+    # scheme folds nothing this step is about, and its rows are left as they are (#311).
+    with shipped_only():
+        _fold_and_report(apps)
+
+
+def _fold_and_report(apps) -> None:
     from django.core.exceptions import ValidationError
 
     from postulo.jobs import identifiers as rules

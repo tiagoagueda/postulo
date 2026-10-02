@@ -1145,7 +1145,12 @@ def test_links_are_sorted_by_what_they_are(somebody):
 
 
 def test_an_identifier_somebody_has_is_theirs(somebody):
-    """One of each kind per person, and the one they have is the one they keep."""
+    """One of each kind per person, and the one they have is the one they keep.
+
+    The third is an ORCID whose check digit is wrong. It used to be refused; a value its
+    kind does not accept here is added as *Other*, named by the kind, as an archive's is
+    (#311): a file is not refused an identifier, and the row says what was done with it.
+    """
     data = a_file(
         account={
             "identifiers": [
@@ -1165,12 +1170,19 @@ def test_an_identifier_somebody_has_is_theirs(somebody):
     assert outcomes(plan, "identifiers") == [
         candidate.PRESENT,
         candidate.KEPT,
-        candidate.REFUSED,
+        candidate.ADD,
         candidate.REFUSED,
         candidate.ADD,
     ]
-    held = {row.scheme: row.value for row in somebody.profile.identifiers.all()}
-    assert held == {"orcid": "0000-0002-1825-0097", "wikidata": "Q42"}
+    assert rows(plan, "identifiers")[2].notes == [
+        "This is not a value ORCID accepts here, so it is added as Other, named “orcid”."
+    ]
+    held = {(row.scheme, row.label): row.value for row in somebody.profile.identifiers.all()}
+    assert held == {
+        ("orcid", ""): "0000-0002-1825-0097",
+        ("wikidata", ""): "Q42",
+        ("other", "orcid"): "0000-0002-1825-0098",
+    }
 
 
 def test_a_file_cannot_give_somebody_two_of_a_kind_either(user):

@@ -1,0 +1,31 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block measure %}max-w-2xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
+{% comment %} What the dialog on *Plugins* is sent back when the text it posted is refused:
+   the box and its reference, with the sentences that say what is wrong. The view answers
+   an htmx request with this alone, and names the element it replaces. Not drawn here. {% endcomment %}
+{% partialdef fields %}<c-identifier-schemes :form="form" />{% endpartialdef %}
+
+{% block content %}
+  {% comment %} The identifier registry's settings as a page (#311). *Plugins* opens them in
+     a dialog where a script runs; this is where the same link leads where none does, and
+     where a refused text is shown when the dialog was not what posted it. One form, one
+     box, and *Save* goes back to *Plugins* with a message. {% endcomment %}
+  <c-page-title>
+    {% translate "Identifiers of your own" %}
+    <c-slot name="subtitle">
+    {% translate "The kinds of identifier this instance adds to the ones Postulo ships, for a person, for a company or for both: a staff number, a register Postulo has no scheme for. Written in JSON." %}
+    </c-slot>
+  </c-page-title>
+
+  <form method="post" novalidate class="card">
+    {% csrf_token %}
+    <c-identifier-schemes :form="form" />
+    <div class="mt-4 flex items-center gap-3">
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+      <a href="{% url 'server:plugins' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+{% endblock %}
