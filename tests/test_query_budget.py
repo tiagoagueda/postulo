@@ -93,6 +93,7 @@ def cost(client, url, params=None, **extra) -> int:
 PAGES = [
     ("the applications table", "applications:list", {"view": "table"}),
     ("the board", "applications:list", {"view": "board"}),
+    ("the board, folded", "applications:list", {"view": "board", "status": "applied"}),
     ("the companies table", "jobs:company_list", {}),
     ("the listings page", "listings:list", {}),
     ("the dashboard", "core:home", {}),

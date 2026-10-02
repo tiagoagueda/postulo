@@ -22,7 +22,8 @@ means. What it cannot say is whether a person can use any of it. These do:
   scripts off the page says which button applies what;
 * **a header** is called by its column's name, shows the whole of the choice its lists
   hold, and keeps its name at the start of the cell;
-* **the board** keeps its form, and it works as it did, with scripts on and off;
+* **the board** keeps its form, less the status, which its columns fold to (#315), and
+  it works as it did, with scripts on and off;
 * **axe**, in both themes, with header filters open, with *Narrow* open, and on the board.
 
 Every count of rows is the queryset's, never a number written here.
@@ -1249,9 +1250,11 @@ def test_a_columns_name_stays_at_the_start_of_its_cell_when_its_filter_opens(
 
 @pytest.mark.parametrize("scripts", [True, False], ids=["scripts on", "scripts off"])
 def test_the_boards_filters_still_work(browser: Browser, live_server, search, scripts):
-    """The board has no headers, so it keeps the form: status, outcome, tag and gone quiet,
-    each narrowing the cards to what the queryset gives of what is still live, live with a
-    script and by its *Filter* button without one."""
+    """The board has no headers, so it keeps the form: outcome, tag and gone quiet, each
+    narrowing the cards to what the queryset gives of what is still live, live with a
+    script and by its *Filter* button without one. The status is not in the form (#315):
+    a column's heading folds the board to it, the cards on the screen are then that
+    column's, and the form goes on narrowing them (`tests/e2e/test_board_fold.py`)."""
     person = search["applicant"]
     base = live_server.url
     context = browser.new_context(java_script_enabled=scripts, viewport=WIDE)
@@ -1265,28 +1268,40 @@ def test_the_boards_filters_still_work(browser: Browser, live_server, search, sc
         )
         assert cards_shown(page) == on_the_board(person, **wanted)
         expect(page).to_have_url(re.compile(r"[?&]view=board(&|$)"))
+        if scripts:
+            settled(page)
 
     try:
         sign_in(page, base)
         page.goto(f"{base}/applications/?view=board")
         assert cards_shown(page) == on_the_board(person)
         form = page.locator("#application-filters")
-        for label in ("Status", "Outcome", "Tag", "Gone quiet"):
+        for label in ("Outcome", "Tag", "Gone quiet"):
             expect(form.get_by_label(label, exact=True)).to_be_visible()
+        expect(form.get_by_label("Status", exact=True)).to_have_count(0)
         expect(form.get_by_role("button", name="Filter")).to_be_visible()
         expect(page.locator("[data-narrow-form]")).to_have_count(0)
         expect(page.locator("thead")).to_have_count(0)
 
-        form.get_by_label("Status", exact=True).select_option("applied")
-        then(status="applied")
+        # The status, from its column's heading; the form then narrows what is folded.
+        page.locator("#board-fold-applied").click()
+        expect(page).to_have_url(re.compile(r"[?&]status=applied(&|$)"))
+        if scripts:
+            settled(page)
         form.get_by_label("Tag", exact=True).select_option("remote")
         then(status="applied", tag="remote")
         form.get_by_label("Gone quiet", exact=True).check()
         then(status="applied", tag="remote", quiet="1")
+        assert times_in_the_address(page, "status") == 1, page.url
         form.get_by_label("Gone quiet", exact=True).uncheck()
         form.get_by_label("Tag", exact=True).select_option("")
-        form.get_by_label("Status", exact=True).select_option("")
-        then()
+        then(status="applied")
+        page.locator("#board-unfold").click()
+        expect(page).not_to_have_url(re.compile(r"[?&]status=[^&]"))
+        expect(page.locator(f"{TABLE} [data-card]")).to_have_count(len(on_the_board(person)))
+        assert cards_shown(page) == on_the_board(person)
+        if scripts:
+            settled(page)
 
         # What is settled is said, not shown: the board is for what is still live.
         form.get_by_label("Outcome", exact=True).select_option("closed")

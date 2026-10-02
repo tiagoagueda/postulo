@@ -1,8 +1,13 @@
 {% load i18n %}
 {% comment %} The board's filters (#314). The table narrows from its column headers; a board
-   has none, so the four questions the two shapes share -- status, outcome, tag, gone quiet
-   -- stay a form above it, as they were when one form served both (#102). #315 gives the
-   status to the board's own columns.
+   has none, so three of the questions the two shapes share -- outcome, tag, gone quiet --
+   stay a form above it, as they were when one form served both (#102).
+
+   The status is not among them (#315): the board's columns are the statuses, and a
+   column's heading folds the board to it, which is what choosing a status here did. The
+   address still says `status=`, and this form still sends it: the board draws the status
+   in force as a hidden field of this form (`board.html`), inside what a live filter swaps,
+   so it is always the one the board was last drawn with.
 
    It is the page's filter form in this shape, under the id the masthead's box includes and
    takes turns on, and it narrows live as its controls change.
@@ -17,15 +22,6 @@
       hx-include="[data-table-search]" hx-sync="this:replace"
       hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true">
   <noscript><input type="hidden" name="q" value="{{ search }}"></noscript>
-  <div class="field w-auto">
-    <label for="filter-status">{% translate "Status" %}</label>
-    <select id="filter-status" name="status" class="w-44">
-      <option value="">{% translate "Any" %}</option>
-      {% for value, label in statuses %}
-        <option value="{{ value }}" {% if value == selected_status %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </div>
   <div class="field w-auto">
     <label for="filter-state">{% translate "Outcome" %}</label>
     <select id="filter-state" name="state" class="w-36">

@@ -450,6 +450,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/",
         "/applications/?company=aperture&sort=applied",
         "/applications/?view=board",
+        # Folded to one column, the others strips (#315).
+        "/applications/?view=board&status=applied",
         "/applications/report/",
         "/applications/report/?period=weeks&weeks=8",
         f"/applications/{a.pk}/",

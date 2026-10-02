@@ -4,7 +4,7 @@
 shared. The table narrows from its headers (#253), so the four moved there: the status, the
 outcome and *Gone quiet* into the status column's header, the tag into the tags column's --
 or the role's, while the tags are drawn under the role. The board has no headers and keeps
-the form.
+the form, less the status since #315: its columns fold to one instead.
 
 What is held here:
 
@@ -21,7 +21,7 @@ What is held here:
 * **the three faults of the neighbours** are not repeated for these four: a name is posted
   once (#622), the header whose control asked comes back open (#626), and a table with
   nothing in it still carries them (#647);
-* **the board's form** is the four controls it had;
+* **the board's form** is the controls it had, less the status (#315);
 * **what a header says is what the view did**: a control reads its parameter as the view
   reads it, the header cell is called by the column's name and not by everything in it,
   and its text starts at the start of the cell;
@@ -823,10 +823,13 @@ def test_a_table_with_nothing_in_it_still_carries_the_four(client, user, search)
 # ------------------------------------------------------------------------- the board
 
 
-def test_the_board_keeps_the_form_with_the_four_it_uses(client, user, search):
-    """The board has no headers, so the form the two shapes shared is the board's: the same
-    four controls, under the id the masthead's box includes and takes turns on, narrowing
-    live, with a button for scripts off and *Clear* while anything narrows."""
+def test_the_board_keeps_the_form_with_the_three_it_uses(client, user, search):
+    """The board has no headers, so the form the two shapes shared is the board's: the
+    outcome, the tag and *Gone quiet*, under the id the masthead's box includes and takes
+    turns on, narrowing live, with a button for scripts off and *Clear* while anything
+    narrows. The status is not one of its controls any more (#315): the board's columns
+    fold to it, and the form sends the one in force from a hidden field the board draws
+    (`tests/test_board_fold.py`)."""
     body = page(client, user, "view=board&status=applied&tag=remote&quiet=1&state=open")
     found = controls(body)
     form = next(f for f in found.forms if f.get("id") == FORM)
@@ -835,15 +838,16 @@ def test_the_board_keeps_the_form_with_the_four_it_uses(client, user, search):
     assert form["hx-include"] == "[data-table-search]" and form["hx-sync"] == "this:replace"
 
     written = [c for c in found.inputs if c["_form"] is form]
-    assert [c["name"] for c in written] == ["q", "status", "state", "tag", "view", "quiet"]
+    assert [c["name"] for c in written] == ["q", "state", "tag", "view", "quiet"]
     by_name = {c["name"]: c for c in written}
     assert by_name["view"]["type"] == "hidden" and by_name["view"]["value"] == "board"
     assert by_name["quiet"]["type"] == "checkbox" and "checked" in by_name["quiet"]
     assert not any("form" in c or "hx-get" in c for c in written), "the form asks, not they"
+    assert posted_by(found, FORM).count("status") == 1, "and it still sends the status"
     panel = body.split(f'id="{FORM}"')[1].split("</form>")[0]
-    assert 'value="applied" selected' in panel and 'value="open" selected' in panel
-    assert 'value="remote" selected' in panel
-    for label in ("Status", "Outcome", "Tag", "Gone quiet"):
+    assert 'value="open" selected' in panel and 'value="remote" selected' in panel
+    assert "Status" not in panel and 'value="applied"' not in panel
+    for label in ("Outcome", "Tag", "Gone quiet"):
         assert label in panel
     (button,) = [b for b in found.buttons if b["_form"] is form]
     assert button["type"] == "submit" and ">Filter</button>" in panel

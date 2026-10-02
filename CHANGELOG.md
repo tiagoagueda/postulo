@@ -38,6 +38,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- On the *Applications* board a column's heading folds the board to that column, the others becoming strips that keep their name and count; *All columns* undoes it. This replaces the board's status filter, and `?status=` still says which. The board also scrolls sideways while a card is dragged near its edge. (#315)
 - A telephone number is checked against its country's numbering plan: an impossible one is refused, saying why, an unplaceable one kept with a warning, and all are grouped their country's way. **API: a contact's national number needs `+` or the new `phone_country`, else 422, and comes back in international form.** (#304)
 - A postal address answers to its country before it is kept: a postcode in a form it never uses, or a required part left empty, is refused beside it; postcode spacing is put right; a town and a country alone are kept. Rows read kind first, in country order. **Addresses already kept stay, marked, until changed.** (#306)
 - The filters above the *Applications* table are in its column headers: status, outcome and *Gone quiet* under *Status*, the tag under *Tags* or *Role*; with that column hidden they are under *Narrow*. Addresses and saved views mean what they did, and the board keeps its form. (#314)

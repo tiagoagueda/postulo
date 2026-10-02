@@ -568,6 +568,11 @@
   // are held to further down this file. The board's template had been setting it since the
   // board was written, so with this script blocked every card carried a grab cursor and an
   // affordance that did nothing (#227).
+  //
+  // What a card is dropped on is its column's whole section, `data-board-section`, and not
+  // only the list of cards in it (#315): a folded column is a strip whose list is hidden,
+  // and it is still a column a card can be moved to. The card goes into that hidden list
+  // and off the screen, and the strip's count says it arrived.
   var dragging = null;
 
   function readyBoardCards() {
@@ -583,29 +588,267 @@
   onContentReady(readyBoardCards);
 
   function columnOf(node) {
-    return node && node.closest ? node.closest("[data-board-column]") : null;
+    return node && node.closest ? node.closest("[data-board-section]") : null;
   }
 
+  function cardsOf(column) {
+    return column ? column.querySelector("[data-board-column]") : null;
+  }
+
+  // An open column tints its list of cards, as it always did. A strip has no list on the
+  // screen to tint, so the strip itself is.
   function highlight(column, on) {
-    if (!column) {
+    var cards = cardsOf(column);
+    if (!cards) {
       return;
     }
-    column.classList.toggle("bg-ink-100", on);
-    column.classList.toggle("dark:bg-ink-800", on);
+    [column, cards].forEach(function (part) {
+      var tinted = on && part === (cards.hidden ? column : cards);
+      part.classList.toggle("bg-ink-100", tinted);
+      part.classList.toggle("dark:bg-ink-800", tinted);
+    });
   }
 
-  function recount(column) {
-    if (!column) {
+  // By one more or one fewer, and not by counting the cards: a strip's are not on the page,
+  // and its count is the server's. The count is also said in words, for a screen reader,
+  // and those are the server's too: until the page comes back with them, the figure stands
+  // in their place, which is less than a sentence and not untrue.
+  function recount(column, by) {
+    var counter = column && column.querySelector("[data-column-count]");
+    if (counter) {
+      var held = parseInt(counter.textContent, 10) || 0;
+      var now = String(Math.max(0, held + by));
+      counter.textContent = now;
+      var words = column.querySelector("[data-column-count-words]");
+      if (words) {
+        words.textContent = now;
+      }
+    }
+    var cards = cardsOf(column);
+    var empty = cards && cards.querySelector("[data-empty]");
+    if (empty) {
+      empty.hidden = cards.querySelectorAll("[data-card]").length > 0;
+    }
+  }
+
+  // The page's filter form, which the board names: the question as it now stands.
+  function boardFilters() {
+    var box = document.querySelector("[data-board][data-board-filters]");
+    return box ? document.getElementById(box.getAttribute("data-board-filters")) : null;
+  }
+
+  // Whether the board on the screen was drawn for *Gone quiet*: the address is what it was
+  // drawn for, and the server reads the last of a parameter given twice.
+  function drawnQuiet() {
+    var asked = new URLSearchParams(window.location.search).getAll("quiet");
+    return asked.length > 0 && asked[asked.length - 1].trim() !== "";
+  }
+
+  // One application fewer under the page's title, in the sentence the server wrote for
+  // that (`application_list.html`): this file has no words of its own. Once.
+  function oneFewerOnThePage() {
+    var words = document.querySelector("#applications-count [data-count-words][data-one-fewer]");
+    if (words) {
+      words.textContent = words.getAttribute("data-one-fewer");
+      words.removeAttribute("data-one-fewer");
+    }
+  }
+
+  /* ------------------------ the board scrolls while a card is held near its edge (#315)
+   *
+   * A column off the screen could be dropped on only by letting go, scrolling and starting
+   * again. While a card is being dragged, the board's scroll box scrolls towards whichever
+   * of its two side edges the pointer is near, faster the nearer it is, up to where the
+   * browser's own scrolling takes over.
+   *
+   * **Only while a card is held.** A board that moved whenever the pointer passed near its
+   * edge would move under somebody reading it. It stops the moment the card is dropped,
+   * the drag is abandoned (Escape ends a drag, and the browser says so with `dragend`), or
+   * the pointer leaves the window -- and, because a browser reports a drag only through
+   * `dragover`, when none has come for longer than a browser ever leaves between two.
+   *
+   * **Never for somebody who asked for less motion.** The board then scrolls by hand, and
+   * a card still moves by its menu, which is the way that works everywhere.
+   *
+   * **A browser may scroll a box under a drag by itself**, and this makes room for that
+   * and does not add to it. Chromium does, within twenty pixels of the edge, the faster
+   * the nearer -- nothing at twenty, about 150 pixels a second at eighteen, 530 at twelve,
+   * 1,000 at four -- and whatever the person's preference about motion: that is the
+   * browser's, on every page, and is left alone. Both at once were twice this file's
+   * fastest, eight pixels from the edge. So the speed here rises from the far side of the
+   * band to its fastest where the browser's band begins, and falls from there to nothing
+   * half way into it, about as fast as the browser's rises: together they stay near the
+   * fastest until the browser is scrolling alone. Past the edge the browser does nothing,
+   * and this scrolls at its fastest.
+   *
+   * A browser with no band of its own is left with ten pixels along the edge in which the
+   * board does not scroll, and ten more in which it slows. That is accepted: the other way
+   * round is a board that bolts in the browser most people use.
+   *
+   * **The band is a fifth of the box at most.** Seventy-two pixels at either side of a
+   * narrow box would be most of it, and a card picked up near its end would scroll at once.
+   *
+   * The edges are the box's as drawn, and `scrollLeft` moves the way its sign says in
+   * either direction of writing, so a right-to-left board needs nothing of its own.
+   */
+  var EDGE = 72; // pixels from an edge within which the board scrolls, at the most
+  var EDGE_SHARE = 5; // and never more than one part in this many of the box's width
+  var BROWSERS = 20; // pixels from an edge within which a browser scrolls the box itself
+  var FASTEST = 700; // pixels a second, where the browser's band begins and past the edge
+  var SLOWEST = 0.15; // of that, at the far side of the band
+  var SILENCE = 700; // milliseconds without a `dragover` after which the drag has gone
+  var lessMotion = window.matchMedia ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+  var edgeScroll = null;
+
+  function stopEdgeScroll() {
+    if (edgeScroll && edgeScroll.frame) {
+      window.cancelAnimationFrame(edgeScroll.frame);
+    }
+    edgeScroll = null;
+  }
+
+  // Pixels a second, signed the way `scrollLeft` moves: nothing unless the pointer is level
+  // with the box and within the band along one of its side edges, or beyond that edge.
+  function edgeSpeed(box, x, y) {
+    var around = box.getBoundingClientRect();
+    if (y < around.top || y > around.bottom) {
+      return 0;
+    }
+    var before = x - around.left;
+    var after = around.right - x;
+    var near = Math.min(before, after);
+    var band = Math.min(EDGE, around.width / EDGE_SHARE);
+    if (near >= band) {
+      return 0;
+    }
+    var pace = 1; // past the edge, where no browser scrolls the box
+    if (near >= BROWSERS) {
+      // From the far side of the band up to where the browser's begins.
+      pace = SLOWEST + (1 - SLOWEST) * (1 - (near - BROWSERS) / Math.max(band - BROWSERS, 1));
+    } else if (near >= 0) {
+      // Inside the browser's: down to nothing by the middle of it.
+      pace = Math.max(0, (2 * near) / BROWSERS - 1);
+    }
+    return (before < after ? -1 : 1) * FASTEST * pace;
+  }
+
+  function stepEdgeScroll(now) {
+    if (!edgeScroll) {
       return;
     }
-    var section = column.closest("section");
-    var counter = section && section.querySelector("[data-column-count]");
-    if (counter) {
-      counter.textContent = String(column.querySelectorAll("[data-card]").length);
+    if (!dragging || now - edgeScroll.seen > SILENCE) {
+      stopEdgeScroll();
+      return;
     }
-    var empty = column.querySelector("[data-empty]");
-    if (empty) {
-      empty.hidden = column.querySelectorAll("[data-card]").length > 0;
+    // By the time that passed, so a slow machine scrolls as far in a second as a fast one;
+    // but a frame that was held up is not a reason to jump, and no step counts for more
+    // than a tenth of a second.
+    var elapsed = Math.min(Math.max(now - edgeScroll.last, 0), 100);
+    edgeScroll.last = now;
+    edgeScroll.box.scrollLeft += (edgeScroll.speed * elapsed) / 1000;
+    edgeScroll.frame = window.requestAnimationFrame(stepEdgeScroll);
+  }
+
+  function followTheEdge(event) {
+    var box = document.querySelector("[data-board]");
+    var speed =
+      dragging && box && !(lessMotion && lessMotion.matches)
+        ? edgeSpeed(box, event.clientX, event.clientY)
+        : 0;
+    if (!speed) {
+      stopEdgeScroll();
+      return;
+    }
+    var now = window.performance.now();
+    if (!edgeScroll) {
+      edgeScroll = { last: now, frame: 0 };
+      edgeScroll.frame = window.requestAnimationFrame(stepEdgeScroll);
+    }
+    edgeScroll.box = box;
+    edgeScroll.speed = speed;
+    edgeScroll.seen = now;
+  }
+
+  /* ------------------------------------- a card that is held is not swapped away (#315)
+   *
+   * The board is replaced whenever something live asks for it: a filter, the masthead's
+   * box, a column's heading. A filter chosen a moment before a card was picked up can
+   * answer while it is held, and the answer would take the card out from under the
+   * pointer: the drag ends on an element that is no longer on the page, and the drop does
+   * nothing. So while a card is held nothing is asked for the board and no answer is put
+   * in it -- a column does not fold either -- and once the card is let go without being
+   * moved, the board is asked for again, as the filters now stand. A card that was moved
+   * needs no asking: its form loads the page. But the address that form goes back to was
+   * written with the board, before the question that was refused, so it is written again
+   * from the filter form as it stands (`theQuestionAsItStands`): a filter chosen a moment
+   * before a card was moved was otherwise lost without a word.
+   */
+  var boardOwed = false;
+
+  // The address the page's live controls would ask for now: the filter form's fields, the
+  // status in force among them, and the masthead's box, which the form includes. Empty
+  // values and all, as htmx sends them, so that it is never the bare address, which a
+  // default view answers in place of the board.
+  function theQuestionAsItStands(filters) {
+    var asked = new URLSearchParams(new FormData(filters));
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-table-search]"),
+      function (box) {
+        if (box.name && box.form !== filters) {
+          asked.set(box.name, box.value);
+        }
+      }
+    );
+    return window.location.pathname + "?" + asked.toString();
+  }
+
+  // Whether what a request is for, or what a swap put in, has a board in it.
+  function hasABoard(node) {
+    return Boolean(
+      node &&
+      node.nodeType === 1 &&
+      (node.matches("[data-board]") || node.querySelector("[data-board]"))
+    );
+  }
+
+  function holdsTheBoard(node) {
+    return Boolean(dragging) && hasABoard(node);
+  }
+
+  document.addEventListener("htmx:confirm", function (event) {
+    if (holdsTheBoard((event.detail || {}).target)) {
+      event.preventDefault();
+      boardOwed = true;
+    }
+  });
+
+  document.addEventListener("htmx:beforeSwap", function (event) {
+    if (holdsTheBoard((event.detail || {}).target)) {
+      event.detail.shouldSwap = false;
+      boardOwed = true;
+    }
+  });
+
+  function endDrag() {
+    var held = dragging;
+    var owed = boardOwed && held && !held.moved;
+    stopEdgeScroll();
+    dragging = null;
+    boardOwed = false;
+    if (held) {
+      held.card.classList.remove("opacity-50");
+    }
+    Array.prototype.forEach.call(
+      document.querySelectorAll("[data-board-section]"),
+      function (column) {
+        highlight(column, false);
+      }
+    );
+    // Asking the page's filter form is asking for the board as the filters, the search and
+    // the fold now stand.
+    var filters = boardFilters();
+    if (owed && filters && window.htmx) {
+      window.htmx.trigger(filters, "submit");
     }
   }
 
@@ -614,7 +857,7 @@
     if (!card) {
       return;
     }
-    dragging = { card: card, from: columnOf(card) };
+    dragging = { card: card, from: columnOf(card), moved: false };
     card.classList.add("opacity-50");
     if (event.dataTransfer) {
       event.dataTransfer.effectAllowed = "move";
@@ -623,14 +866,23 @@
     }
   });
 
-  document.addEventListener("dragend", function () {
-    if (dragging) {
-      dragging.card.classList.remove("opacity-50");
+  document.addEventListener("dragend", endDrag);
+
+  // A browser ends a drag on Escape by itself and says so with `dragend`. This is the same
+  // end for one that hands the key to the page instead.
+  document.addEventListener("keydown", function (event) {
+    if (dragging && event.key === "Escape") {
+      endDrag();
     }
-    document.querySelectorAll("[data-board-column]").forEach(function (column) {
-      highlight(column, false);
-    });
-    dragging = null;
+  });
+
+  // A browser hands the page no mouse event while something is dragged. So a `mousemove`
+  // with a card still counted as held is a drag whose `dragend` never came, and a card
+  // held for ever would be a board that is never drawn again.
+  document.addEventListener("mousemove", function () {
+    if (dragging) {
+      endDrag();
+    }
   });
 
   /* `dragenter` as well as `dragover`, and both cancelled. The specification makes an
@@ -639,14 +891,23 @@
    * `--browser chromium`, so it agreed with the one browser that forgives the omission
    * (#174). */
   document.addEventListener("dragenter", function (event) {
-    if (dragging && columnOf(event.target)) {
+    if (!dragging) {
+      return;
+    }
+    // Where the pointer is now, said before the first `dragover` over what it entered.
+    followTheEdge(event);
+    if (columnOf(event.target)) {
       event.preventDefault();
     }
   });
 
   document.addEventListener("dragover", function (event) {
+    if (!dragging) {
+      return;
+    }
+    followTheEdge(event);
     var column = columnOf(event.target);
-    if (!dragging || !column) {
+    if (!column) {
       return;
     }
     event.preventDefault();
@@ -657,6 +918,10 @@
   });
 
   document.addEventListener("dragleave", function (event) {
+    // Out of the window altogether: nothing is being left *for*.
+    if (dragging && !event.relatedTarget) {
+      stopEdgeScroll();
+    }
     var column = columnOf(event.target);
     if (column && !column.contains(event.relatedTarget)) {
       highlight(column, false);
@@ -664,6 +929,7 @@
   });
 
   document.addEventListener("drop", function (event) {
+    stopEdgeScroll();
     var column = columnOf(event.target);
     if (!dragging || !column) {
       return;
@@ -672,7 +938,8 @@
     highlight(column, false);
     var card = dragging.card;
     var from = dragging.from;
-    var status = column.dataset.boardColumn;
+    var cards = cardsOf(column);
+    var status = cards && cards.dataset.boardColumn;
     if (!status || column === from) {
       return;
     }
@@ -682,13 +949,267 @@
     }
     // Optimistic: the card moves now, and the form that was already there does the
     // saving. If the server refuses, the page it sends back is the truth.
-    column.appendChild(card);
+    //
+    // The counts say what that page will say. A move is something happening, so under
+    // *Gone quiet* the card is quiet no longer: it leaves the board, and the column it
+    // went to gains nothing. And a card that leaves what the address asks for -- that, or
+    // out of the open column of a folded board into a strip -- is one fewer under the
+    // page's title as well as in its column.
+    var quiet = drawnQuiet();
+    var folded = Boolean(document.querySelector("[data-board-strip]"));
+    cards.appendChild(card);
     card.dataset.status = status;
-    recount(from);
-    recount(column);
+    recount(from, -1);
+    if (quiet) {
+      card.hidden = true;
+    } else {
+      recount(column, 1);
+    }
+    if (quiet || folded) {
+      oneFewerOnThePage();
+    }
     select.value = status;
     if (select.form) {
+      var filters = boardFilters();
+      var back = select.form.elements.namedItem("next");
+      if (boardOwed && filters && back) {
+        back.value = theQuestionAsItStands(filters);
+      }
+      dragging.moved = true;
       select.form.requestSubmit();
+    }
+  });
+
+  /* ------------------------------------ a move leaves the board where it was (#315)
+   *
+   * A move loads the page, and a page that loads is a board at its start: a card dropped
+   * on a column that was reached by scrolling came back with that column off the screen
+   * again. How far the box was scrolled is kept across that one load -- in the tab's own
+   * storage, with the address the form goes back to, and not in the address, which is the
+   * question and nothing else -- and put back once, on the page that address draws.
+   * However the move was made: a card's menu moves it from a column scrolled to as well.
+   */
+  var BOARD_PLACE = "postulo.board.place";
+
+  function tabStorage() {
+    try {
+      return window.sessionStorage;
+    } catch (refused) {
+      return null;
+    }
+  }
+
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    var box = form && form.closest ? form.closest("[data-board]") : null;
+    var back = box && form.elements.namedItem("next");
+    var storage = tabStorage();
+    if (!back || !storage) {
+      return;
+    }
+    try {
+      storage.setItem(BOARD_PLACE, JSON.stringify({ at: back.value, left: box.scrollLeft }));
+    } catch (full) {
+      // No room, or no leave: the board comes back at its start, as it used to.
+    }
+  });
+
+  // True when the board was put back where a move left it.
+  function backWhereItWas() {
+    var box = document.querySelector("[data-board]");
+    var storage = tabStorage();
+    if (!box || !storage) {
+      return false;
+    }
+    var kept = null;
+    try {
+      kept = JSON.parse(storage.getItem(BOARD_PLACE) || "null");
+      storage.removeItem(BOARD_PLACE);
+    } catch (unreadable) {
+      return false;
+    }
+    if (!kept || kept.at !== window.location.pathname + window.location.search || !kept.left) {
+      return false;
+    }
+    box.scrollLeft = kept.left;
+    return true;
+  }
+
+  /* --------------------------------------- a column's heading folds the board (#315)
+   *
+   * The heading of a column is a link to the board folded to it, and htmx makes the link
+   * fold the board in place (`board.html`). Five things are left for this file.
+   *
+   * **It is called a button while it folds in place.** A link goes somewhere; this changes
+   * what is on the page and says whether its column is open. So where htmx is running it is
+   * given the role, and Space presses it as Enter does -- once, however long it is held: a
+   * key held down repeats, and each repeat was a press, folding and unfolding by turns.
+   * Without a script it is the link the server drew, and goes to the address that draws
+   * the same thing.
+   *
+   * **A click with a modifier is the browser's.** Ctrl, Meta or Shift and a click on a
+   * link asks for it in a new tab or window, and it is still a link: htmx would have
+   * folded the board where it was and opened nothing. The click is kept from htmx, and
+   * the browser does what it does with a link. (A middle click never reaches htmx.)
+   *
+   * **The focus is on it when it is pressed.** htmx puts the focus back, after the swap, on
+   * the element with the id the focused one had. Not every browser focuses a link that is
+   * clicked, and one that does not would leave the focus on the page's body.
+   *
+   * **The fold that was pressed is the status the filter form sends.** The status in force
+   * is a hidden field of that form, drawn with the board, so until the answer is drawn it
+   * is the old one: a filter chosen while a fold was on its way asked for the old status
+   * and, being the newer request, took the fold back. As the fold is sent the field is
+   * given the status it asks for -- made, if the board had none, inside what the swap
+   * replaces -- or taken away, for a fold that opens every column. It is written when
+   * htmx is about to send and not at the click, so a fold that is refused, while a card
+   * is held, leaves the form's question alone.
+   *
+   * **The open column is brought into the scroll box.** Folded, the open column sits among
+   * the strips in the order of the statuses, and on a narrow screen the last of them is off
+   * the edge. The box is scrolled sideways, at once, until the column is in it: when the
+   * page arrives folded, and after a swap that brought a new board, which is a new box at
+   * its start again. Not after a swap of anything else on the page -- the theme switch is
+   * one -- which would take the board out of the hands of somebody who had scrolled it;
+   * and not on the page a move loads, where the board is put back where it was.
+   */
+  function foldControl(node) {
+    return node && node.closest ? node.closest("[data-board-fold]") : null;
+  }
+
+  document.addEventListener(
+    "click",
+    function (event) {
+      if (foldControl(event.target) && (event.ctrlKey || event.metaKey || event.shiftKey)) {
+        // Before it reaches the control, where htmx listens. Not cancelled: the browser
+        // is to follow the link, its own way.
+        event.stopPropagation();
+      }
+    },
+    true
+  );
+
+  function statusInForce(filters) {
+    return document.querySelector('input[type="hidden"][name="status"][form="' + filters.id + '"]');
+  }
+
+  // The filter form's status: `status`, in a field inside `within`, or no field for none.
+  function setStatusInForce(filters, within, status) {
+    var field = statusInForce(filters);
+    if (!status) {
+      if (field) {
+        field.remove();
+      }
+      return;
+    }
+    if (!field) {
+      field = document.createElement("input");
+      field.type = "hidden";
+      field.name = "status";
+      field.setAttribute("form", filters.id);
+      within.insertBefore(field, within.firstChild);
+    }
+    field.value = status;
+  }
+
+  // While a pressed fold has not been drawn: the status the board on the screen was drawn
+  // with. Put back if a request for the board fails, the fold's or a filter's after it,
+  // since the board is then still that one, and the form's status is to be the drawn one
+  // whenever nothing is on its way. A request replaced by a newer one has not failed: the
+  // newer one took the pressed status with it. Forgotten when a board is drawn.
+  var drawnStatus = null;
+
+  document.addEventListener("htmx:configRequest", function (event) {
+    var detail = event.detail || {};
+    var filters = boardFilters();
+    if (!foldControl(detail.elt) || !filters || !detail.target || !detail.formData) {
+      return;
+    }
+    if (!drawnStatus) {
+      var field = statusInForce(filters);
+      drawnStatus = { was: field ? field.value : "" };
+    }
+    setStatusInForce(filters, detail.target, detail.formData.get("status") || "");
+  });
+
+  ["htmx:responseError", "htmx:sendError", "htmx:timeout"].forEach(function (failure) {
+    document.addEventListener(failure, function (event) {
+      var within = (event.detail || {}).target;
+      var filters = boardFilters();
+      if (drawnStatus && filters && hasABoard(within)) {
+        setStatusInForce(filters, within, drawnStatus.was);
+        drawnStatus = null;
+      }
+    });
+  });
+
+  function showTheOpenColumn() {
+    var box = document.querySelector("[data-board]");
+    var open = box && box.querySelector("[data-board-section]:not([data-board-strip])");
+    if (!open || !box.querySelector("[data-board-strip]")) {
+      return;
+    }
+    // Its far edge, then its near one: a column wider than the box shows where it starts.
+    var forwards = window.getComputedStyle(box).direction !== "rtl";
+    [!forwards, forwards].forEach(function (leftEdge) {
+      var around = box.getBoundingClientRect();
+      var column = open.getBoundingClientRect();
+      if (leftEdge && column.left < around.left) {
+        box.scrollLeft -= around.left - column.left;
+      } else if (!leftEdge && column.right > around.right) {
+        box.scrollLeft += column.right - around.right;
+      }
+    });
+  }
+
+  function readyBoardFolds(event) {
+    if (window.htmx) {
+      Array.prototype.forEach.call(
+        document.querySelectorAll("[data-board-fold]"),
+        function (control) {
+          control.setAttribute("role", "button");
+        }
+      );
+    }
+    if (!event || event.type !== "htmx:afterSwap") {
+      // The page arriving: where a move left the board, or with its open column in sight.
+      if (!backWhereItWas()) {
+        showTheOpenColumn();
+      }
+      return;
+    }
+    // A swap: only one that brought a board with it. htmx says so on what it put in.
+    if (hasABoard(event.target)) {
+      drawnStatus = null;
+      showTheOpenColumn();
+    }
+  }
+
+  onContentReady(readyBoardFolds);
+
+  document.addEventListener("click", function (event) {
+    var control = foldControl(event.target);
+    if (control && document.activeElement !== control) {
+      control.focus({ preventScroll: true });
+    }
+  });
+
+  document.addEventListener("keydown", function (event) {
+    var control = foldControl(event.target);
+    if (
+      control &&
+      control.getAttribute("role") === "button" &&
+      (event.key === " " || event.key === "Spacebar") &&
+      !event.ctrlKey &&
+      !event.metaKey &&
+      !event.altKey
+    ) {
+      // Space scrolls the page from a link; from a button it presses it. A repeat of a key
+      // held down is kept from scrolling too, and is not another press.
+      event.preventDefault();
+      if (!event.repeat) {
+        control.click();
+      }
     }
   });
 

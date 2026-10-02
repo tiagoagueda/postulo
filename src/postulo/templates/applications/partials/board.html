@@ -1,11 +1,17 @@
-{% load i18n %}
+{% load i18n postulo %}
 {% comment %} The board shape of the Applications page (#102): the same applications, the same
    filters, arranged by status. Only open statuses get a column -- rejections and
    withdrawals belong in the table and the figures, not taking up space on a board meant
    to show what is still live -- so a filter that matches settled applications is said
    rather than shown as an empty board, with the table a link away carrying the filter.
+
+   It is said of none as well, where the board is folded to a status that has no column
+   (#315): *Withdrawn*, for somebody who never withdrew, drew seven strips and not a word
+   of why. And a status that is no status at all -- an address can ask for anything -- is
+   said to be none, with the name of the control that puts the columns back, which is the
+   next thing on the page.
 {% endcomment %}
-{% if off_board %}
+{% if off_board_said %}
   <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" role="status" data-off-board="{{ off_board }}">
     {% comment %} One sentence, link and full stop inside it. It used to end at the semicolon,
        with "see them in the table" translated separately and the full stop written in the
@@ -19,6 +25,13 @@
       {{ counter }} settled applications match these filters. The board shows only what is still
       live; <a href="{{ url }}" class="text-brand-600 underline dark:text-brand-400">see them in
       the table</a>.
+    {% endblocktranslate %}
+  </p>
+{% elif no_such_status %}
+  <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" role="status" data-no-such-status>
+    {% blocktranslate trimmed %}
+      This address asks for a status that Postulo does not have, so no column is open.
+      <em>All columns</em> opens them again.
     {% endblocktranslate %}
   </p>
 {% endif %}
@@ -35,23 +48,127 @@
   {% endblocktranslate %}
 </p>
 
-<c-scroll-box class="flex gap-4 pb-4" label="{% translate 'Board' %}" data-board>
+{% comment %} The columns fold to one (#315). `?status=` in the address is the fold: that
+   column open, every other a strip that still says its name and its count. The server
+   draws it, so a plain link folds the board with scripts off, and Back, a reload, a
+   bookmark and a saved view all open it folded.
+
+   **A column's heading is the control**: a link to the board folded to that column, and,
+   on the one a folded board has open, to the board with every column open. It says
+   whether its column is open (`aria-expanded`, with `aria-controls` naming the column's
+   list of cards) and is named for what pressing it does, the status first, which is the
+   word on the screen. A strip's heading is the same control, for its own column. The
+   heading itself says its own name, the status: left to its contents it would be called
+   by the control's, and a list of the page's headings would be a list of instructions.
+
+   **With a script it folds in place**, by the machinery every live control of this page
+   uses (#313): it asks for this page with the filter form and the masthead's box, takes
+   its turn on that form, and the answer replaces the board and is put in the address. So
+   a fold is the question as it stands, never an address written with an older answer. The
+   status it names is its own (`hx-vals`, which is put in place of the form's); the way
+   back sends everything but the status (`hx-params`). Each control has an id, which is
+   how htmx puts the focus back on the one that was pressed, in the column it opened.
+   `app.js` calls each a button while it folds in place, so Space presses it as Enter does.
+
+   **The status in force is a hidden field of the filter form**, drawn here, inside what a
+   swap replaces: a tag chosen above a folded board keeps it folded, and the field is
+   always the status this board was drawn with. It was a list in that form until #315.
+
+   ***All columns* is the one way back**, drawn before the columns whenever a status is in
+   the address, so it is reached before any strip and is always in the same place. It goes
+   when the board unfolds, and says where the focus is to land then: the heading of the
+   column that was open.
+
+   **A strip is still a column**: `data-board-section` is what a dragged card is dropped
+   on, the strip included, and its list of cards is on the page, empty and hidden, for
+   the card to be put in. {% endcomment %}
+{% if folded %}
+  <input type="hidden" name="status" value="{{ selected_status }}" form="application-filters">
+  <p class="mb-3">
+    <a id="board-unfold" href="{{ unfold_url }}" class="btn" data-variant="outline" data-size="sm"
+       data-board-fold data-focus-after="#board-fold-{{ unfold_lands }}"
+       hx-get="{{ request.path }}" hx-include="#application-filters, [data-table-search]"
+       hx-params="not status" hx-sync="#application-filters:replace"
+       hx-target="#applications-table" hx-swap="outerHTML" hx-push-url="true">
+      {% icon "unfold-horizontal" %}
+      {% translate "All columns" %}
+    </a>
+  </p>
+{% endif %}
+
+<c-scroll-box class="flex pb-4 {% if folded %}gap-2{% else %}gap-4{% endif %}" label="{% translate 'Board' %}" data-board data-board-filters="application-filters">
   {% for column in columns %}
-    <section class="w-72 shrink-0">
-      <div class="mb-2 flex items-baseline justify-between px-1">
-        <h2 class="text-sm font-medium">{{ column.label }}</h2>
-        <span class="text-xs text-ink-400 tabular-nums" data-column-count>{{ column.applications|length }}</span>
+    {% comment %} A strip is as wide as one line of text and the room round it, and as tall
+       as its name is long: the name is written down it, so no language's word for a
+       status is cut or wrapped, and nothing has to be measured. The link is the strip's
+       whole width, and its `::after` the strip's whole height, so the pointer has the strip
+       to aim at and not only the word.
+
+       **The focus ring is drawn inside the control** (`-outline-offset-2`), and the control
+       has the room for it. The board is a box that scrolls sideways, and such a box clips
+       what is drawn past its edge on every side: the usual ring, two pixels outside the
+       control, lost its top on every heading and its start side on the first strip.
+
+       **The control is described by its column's count**, and what describes it is words:
+       the figure is what is seen, and beside it, for a screen reader, the page's own
+       sentence for a count. Tabbing through the strips said each name and never how many
+       cards it holds; and a bare "3" read after a heading is a number of nothing. `app.js`
+       steps the figure when a card is dropped, and has no words of its own: it writes the
+       figure in their place until the page comes back with them. {% endcomment %}
+    <section class="shrink-0 {% if column.open %}w-72{% else %}relative rounded-lg border border-ink-200 pb-2 dark:border-ink-800{% endif %}"
+             data-board-section="{{ column.status }}"{% if not column.open %} data-board-strip{% endif %}>
+      <div class="flex {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
+        <h2 class="text-sm font-medium" aria-label="{{ column.label }}">
+          <a id="board-fold-{{ column.status }}" href="{{ column.url }}"
+             class="-outline-offset-2 hover:underline {% if column.open %}tap-target -ms-1 gap-1 rounded px-1{% else %}flex justify-center rounded-md px-2.5 pt-2 pb-1 after:absolute after:inset-0{% endif %}"
+             data-board-fold aria-expanded="{{ column.open|yesno:'true,false' }}"
+             aria-controls="board-cards-{{ column.status }}"
+             aria-describedby="board-count-{{ column.status }}"
+             {% if column.unfolds %}
+               aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show all columns{% endblocktranslate %}"
+               hx-params="not status"
+             {% else %}
+               aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show only this column{% endblocktranslate %}"
+               hx-vals='{"status": "{{ column.status }}"}'
+             {% endif %}
+             hx-get="{{ request.path }}" hx-include="#application-filters, [data-table-search]"
+             hx-sync="#application-filters:replace"
+             hx-target="#applications-table" hx-swap="outerHTML" hx-push-url="true">
+            {% if column.unfolds %}
+              {{ column.label }}
+              {% icon "unfold-horizontal" class="size-3.5 text-ink-400" %}
+            {% elif column.open %}
+              {{ column.label }}
+              {% icon "fold-horizontal" class="size-3.5 text-ink-400" %}
+            {% else %}
+              <span class="[writing-mode:vertical-rl]">{{ column.label }}</span>
+            {% endif %}
+          </a>
+        </h2>
+        <span class="text-xs text-ink-400 tabular-nums">
+          <span data-column-count aria-hidden="true">{{ column.count }}</span>
+          <span class="sr-only" id="board-count-{{ column.status }}" data-column-count-words>
+            {% blocktranslate trimmed count total=column.count %}
+              {{ total }} application
+            {% plural %}
+              {{ total }} applications
+            {% endblocktranslate %}
+          </span>
+        </span>
       </div>
-      <div class="flex min-h-24 flex-col gap-2 rounded-lg transition-colors"
+      <div id="board-cards-{{ column.status }}"
+           class="flex min-h-24 flex-col gap-2 rounded-lg transition-colors"
            data-board-column="{{ column.status }}"
-           data-column-label="{{ column.label }}">
+           data-column-label="{{ column.label }}"{% if not column.open %} hidden{% endif %}>
         {% for application in column.applications %}
           {% include "applications/partials/application_card.html" %}
         {% empty %}
-          <p class="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs
-                    text-ink-400 dark:border-ink-800" data-empty>
-            {% translate "Empty" %}
-          </p>
+          {% if column.open %}
+            <p class="rounded-lg border border-dashed border-ink-200 px-3 py-6 text-center text-xs
+                      text-ink-400 dark:border-ink-800" data-empty>
+              {% translate "Empty" %}
+            </p>
+          {% endif %}
         {% endfor %}
       </div>
     </section>

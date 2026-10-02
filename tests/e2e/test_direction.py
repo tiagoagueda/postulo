@@ -29,6 +29,7 @@ PAGES = (
     "/",
     "/applications/",
     "/applications/?view=board",
+    "/applications/?view=board&status=applied",
     "/jobs/companies/",
     "/documents/cvs/",
     "/career/",

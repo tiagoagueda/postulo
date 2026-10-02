@@ -8,14 +8,29 @@
 {# The masthead's box narrows these applications, in either shape (#313). #}
 {% block site_search %}<c-site-search :table="table" form_id="application-filters" table_id="applications-table" :shortcuts="keyboard_shortcuts" />{% endblock %}
 
+{% comment %} On the board the count also holds what it says with one application fewer
+   (#315). A card dragged out of what the address asks for -- into a strip of a folded
+   board, or anywhere under *Gone quiet*, which a move ends -- is one fewer on the page
+   before the page comes back, and `app.js`, which has no words of its own, puts this
+   sentence in place of the one drawn. Through `force_escape`, since what `asvar` keeps is
+   marked safe and a translation may hold a quotation mark. {% endcomment %}
 {% partialdef count %}
   <p id="applications-count" class="text-sm text-ink-500 dark:text-ink-400"
      aria-live="polite" aria-atomic="true"{% if oob %} hx-swap-oob="true"{% endif %}>
-    {% blocktranslate trimmed count total=total %}
-      {{ total }} application
-    {% plural %}
-      {{ total }} applications
-    {% endblocktranslate %}
+    {% if shape == 'board' and total %}
+      {% blocktranslate trimmed count total=total|add:"-1" asvar one_fewer %}
+        {{ total }} application
+      {% plural %}
+        {{ total }} applications
+      {% endblocktranslate %}
+    {% endif %}
+    <span data-count-words{% if one_fewer %} data-one-fewer="{{ one_fewer|force_escape }}"{% endif %}>
+      {% blocktranslate trimmed count total=total %}
+        {{ total }} application
+      {% plural %}
+        {{ total }} applications
+      {% endblocktranslate %}
+    </span>
     {% if table.filters_active %}
       · <a href="{{ table.clear_url }}" class="text-brand-600 underline dark:text-brand-400">{% translate "Clear filters" %}</a>
     {% endif %}
@@ -117,7 +132,8 @@
   {% comment %} The filters (#314). The table's are in its column headers -- the status, the
      outcome and *Gone quiet* in the status column's, the tag in the tags column's or the
      role's -- so in that shape nothing is drawn here. The board has no headers and keeps the
-     form the two shapes used to share.
+     form the two shapes used to share, less the status: its columns fold to one instead
+     (#315), and the status in force is a hidden field the board draws for this form.
 
      In the table's shape the form is still on the page, with nothing to see in it, because
      it is what the headers' controls belong to (`form=`), what the masthead's box includes,
