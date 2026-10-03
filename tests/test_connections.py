@@ -6,7 +6,7 @@ import pytest
 from django.urls import reverse
 
 from postulo.plugins import http, policy, registry, secrets
-from postulo.plugins.base import FieldSpec
+from postulo.plugins.base import CONNECTED_KINDS, FieldSpec
 from postulo.plugins.base import TestResult as Outcome  # not a test class, despite the name
 from postulo.plugins.models import Connection
 
@@ -203,6 +203,25 @@ def test_the_form_is_drawn_from_the_plugin_and_secrets_are_never_echoed(client, 
     )
     connection.refresh_from_db()
     assert connection.secrets == {"token": "new"} and connection.enabled is False
+
+
+def _connected_plugins():
+    return [
+        (kind, plugin_class.name)
+        for kind, classes in registry.builtins().items()
+        if kind in CONNECTED_KINDS
+        for plugin_class in classes
+    ]
+
+
+@pytest.mark.parametrize(("kind", "name"), _connected_plugins())
+def test_every_connected_plugins_create_form_renders(client, user, kind, name):
+    """Help text may be lazy, and one built-in's was, so its form answered 500 (#359)."""
+    client.force_login(user)
+    url = reverse("connections:create", args=[kind, name])
+
+    assert client.get(url).status_code == 200
+    assert client.post(url, {}).status_code == 200, "the form again, with its errors"
 
 
 def test_the_form_insists_on_what_the_plugin_requires(client, user):

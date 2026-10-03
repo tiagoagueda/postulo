@@ -122,7 +122,7 @@ def form_field_for(spec: FieldSpec, *, has_value: bool = False) -> forms.Field:
         return forms.CharField(
             widget=widget,
             label=spec.label,
-            help_text=" ".join(part for part in (spec.help, hint) if part),
+            help_text=" ".join(str(part) for part in (spec.help, hint) if part),
             required=spec.required and not has_value,
             max_length=20_000 if spec.type == "textarea" else 2000,
         )
