@@ -4923,7 +4923,23 @@
       (box.dataset.labelsRemove || "Remove {label}").replace("{label}", name)
     );
     button.textContent = "\u00d7";
-    button.addEventListener("click", remove);
+    button.addEventListener("click", function () {
+      // The chips are drawn again, so this button is about to be destroyed. If it held
+      // focus, hand it to the chip now in its place, else the one before, else the input;
+      // a removal by pointer leaves focus where it was (#519).
+      var buttons = Array.prototype.slice.call(box.querySelectorAll("[data-labels-chip]"));
+      var index = buttons.indexOf(button);
+      var held = document.activeElement === button;
+      remove();
+      if (!held) {
+        return;
+      }
+      var left = box.querySelectorAll("[data-labels-chip]");
+      var next = left[index] || left[index - 1] || box.querySelector("[data-labels-input]");
+      if (next) {
+        next.focus();
+      }
+    });
     chip.appendChild(button);
     item.appendChild(chip);
     return item;

@@ -63,6 +63,25 @@ def test_removing_a_label_unticks_the_box_it_was_a_picture_of(page: Page, live_s
     expect(ticked).to_have_count(1)
 
 
+def test_removing_a_label_with_the_keyboard_keeps_focus_in_the_control(
+    page: Page, live_server, applicant
+):
+    """The button that was pressed is destroyed with the chips; focus must not fall away (#519)."""
+    company = a_company_with_industries(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/{company.pk}/edit/")
+
+    page.get_by_role("button", name="Remove Research").focus()
+    page.keyboard.press("Enter")
+
+    expect(page.get_by_role("button", name="Remove Software")).to_be_focused()
+
+    page.keyboard.press("Enter")
+
+    expect(page.locator("[data-labels-chips] .badge")).to_have_count(0)
+    expect(page.locator("[data-labels-input]")).to_be_focused()
+
+
 def test_a_removal_is_announced(page: Page, live_server, applicant):
     company = a_company_with_industries(applicant)
     sign_in(page, live_server.url)
