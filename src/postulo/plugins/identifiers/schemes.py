@@ -32,7 +32,7 @@ import re
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.identifiers import COMPANY, PERSON, Scheme
-from postulo.core.phones import COUNTRIES
+from postulo.plugins.api import COUNTRY_CODES
 
 BOTH = frozenset({PERSON, COMPANY})
 ONLY_PERSON = frozenset({PERSON})
@@ -96,7 +96,7 @@ def _country_then_number(value: str) -> str:
 
 
 #: Greece writes EL and Kosovo XK in registers and VAT numbers; neither is the table's code.
-_REGISTER_COUNTRIES = frozenset(code for code, _dial, _name in COUNTRIES) | {"EL", "XK"}
+_REGISTER_COUNTRIES = COUNTRY_CODES | {"EL", "XK"}
 
 
 def starts_with_a_country(value: str) -> bool:

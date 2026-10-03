@@ -78,6 +78,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.currencies import CURRENCY_CODES
     from postulo.core.languages import match as language_match
     from postulo.core.languages import matches as language_matches
+    from postulo.core.languages import override as language_override
     from postulo.core.languages import tag as language_tag
     from postulo.core.languages import well_formed as is_language_tag
     from postulo.core.link_services import Service as LinkService
@@ -86,6 +87,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
     from postulo.core.phone_numbers import taken_elsewhere as phone_number_is_taken
+    from postulo.core.phones import COUNTRY_CODES
     from postulo.core.redirects import safe_next
     from postulo.core.web_links import Kind as LinkKind
     from postulo.core.web_links import primary_for as primary_web_link
@@ -151,6 +153,7 @@ from .base import (
 
 __all__ = [
     "ACCESS_TOKEN",
+    "COUNTRY_CODES",
     "CURRENCY_CODES",
     "EVENTS",
     "MAIL",
@@ -207,6 +210,7 @@ __all__ = [
     "label_of",
     "language_match",
     "language_matches",
+    "language_override",
     "language_tag",
     "link_service_of",
     "manifest_of",
@@ -312,6 +316,7 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # the spreadsheet importer reads salaries with, one list rather than two -- and is this
     # part of a title a place, which the offline city table the map uses answers, or answers
     # with ``None`` where it does not know or has not been downloaded.
+    "COUNTRY_CODES": ("postulo.core.phones", "COUNTRY_CODES"),
     "CURRENCY_CODES": ("postulo.core.currencies", "CURRENCY_CODES"),
     "place_of": ("postulo.jobs.places", "resolve"),
     # ------------------------------------------------------------- what a language is
@@ -322,6 +327,7 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "is_language_tag": ("postulo.core.languages", "well_formed"),
     "language_match": ("postulo.core.languages", "match"),
     "language_matches": ("postulo.core.languages", "matches"),
+    "language_override": ("postulo.core.languages", "override"),
     "language_tag": ("postulo.core.languages", "tag"),
 }
 

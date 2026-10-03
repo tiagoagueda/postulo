@@ -16,10 +16,9 @@ import re
 import textwrap
 
 from django.core.exceptions import ValidationError
-from django.utils import translation
 
 from postulo.accounts import identifiers
-from postulo.plugins.api import is_language_tag, language_match, language_tag
+from postulo.plugins.api import is_language_tag, language_match, language_override, language_tag
 
 #: CEFR levels as Europass writes them, mapped onto Postulo's own.
 CEFR = {"A1": "a1", "A2": "a2", "B1": "b1", "B2": "b2", "C1": "c1", "C2": "c2"}
@@ -137,7 +136,7 @@ def _heading(label, locale: str) -> str:
     language = language_match(locale) if locale else ""
     if not language:
         return str(label)
-    with translation.override(language):
+    with language_override(language):
         return str(label)
 
 

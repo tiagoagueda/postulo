@@ -332,6 +332,10 @@ COUNTRIES: tuple[tuple[str, str, str], ...] = (
 
 BY_CODE: dict[str, tuple[str, str, str]] = {row[0]: row for row in COUNTRIES}
 
+#: The ISO 3166-1 alpha-2 codes of the table above, for a plugin that has to tell a country's code
+#: from two other letters (a register number's prefix, #636).
+COUNTRY_CODES: frozenset[str] = frozenset(BY_CODE)
+
 #: Longest dialling code first, so "1" never wins over "1" being part of nothing and
 #: "35" never shadows "351".
 _BY_DIALLING = sorted(COUNTRIES, key=lambda row: (-len(row[1]), row[0]))
