@@ -24,7 +24,7 @@ def drop_orphans(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("documents", "0013_a_language_is_a_tag"),
+        ("documents", "0014_type_labels"),
         ("resume", "0008_a_language_is_a_tag"),
         ("contenttypes", "0002_remove_content_type_name"),
     ]
