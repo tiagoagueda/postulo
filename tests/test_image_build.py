@@ -697,3 +697,14 @@ def test_the_runtime_image_ships_the_constraints_a_plugin_is_installed_against()
     assert "COPY --from=build /app/constraints.txt" in runtime
     install = [line for line in build.replace("\\n", " ").splitlines() if "uv pip install" in line]
     assert install and all("--constraint /app/constraints.txt" in line for line in install)
+
+
+def test_the_classification_is_read_from_the_data_volume():
+    """#411: `fetch_esco` runs as `postulo`, who cannot write into the root-owned source."""
+    text = DOCKERFILE.read_text(encoding="utf-8")
+    match = re.search(r"POSTULO_ESCO_DIR=(?P<path>/\S+)", text)
+    assert match, "the image does not say where the ESCO classification lives"
+    assert match["path"].startswith("/app/data/"), match["path"]
+    assert any("mkdir -p" in line and match["path"] in line for line in text.splitlines()), (
+        "the directory is not created"
+    )

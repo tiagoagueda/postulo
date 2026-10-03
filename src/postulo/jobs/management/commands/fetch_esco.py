@@ -159,6 +159,7 @@ class Command(BaseCommand):
 
         # Nothing is written until both halves are good, so a run that fails leaves the
         # files it would have replaced exactly as they were.
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
         target = DATA_DIR / f"esco-{version}.json"
         temporary = target.with_name(target.name + ".tmp")
         payload = json.dumps(document, ensure_ascii=False, indent=2) + "\n"

@@ -178,6 +178,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- In the Docker image the ESCO classification lives on the data volume (`POSTULO_ESCO_DIR`, `/app/data/esco`): `fetch_esco` used to fail with a permission error writing into the image, and a file forced in with `-u root` was lost at the next upgrade and never seen by the worker. (#411)
 - Removing a tag or industry chip with the keyboard keeps focus in the control instead of dropping it to the top of the page. (#519)
 - Server settings → Plugins lists the own-mail outbox, so an administrator can switch off people sending mail through servers they type, as the code and the refusal always said. (#608)
 - *Check it answers* on a link whose host refuses `HEAD` no longer downloads the whole file behind it into memory to read the status: the second request is streamed and closed unread. (#619)

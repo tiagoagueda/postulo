@@ -8,6 +8,7 @@ anything is replaced, and the way a refusal is reported with the API's own answe
 
 from __future__ import annotations
 
+import importlib
 import io
 import json
 import zipfile
@@ -404,3 +405,13 @@ def test_the_skills_the_command_writes_are_ones_the_loader_reads(data_dir, harve
     assert esco.skill_name(uri, "fr") == "gestion de projets"
     assert esco.skill_for("gestion de projets", "fr") == uri, "spacing is folded to compare"
     assert esco.skill_suggestions("ma", "en") == ["manage budgets"]
+
+
+def test_the_directory_can_be_moved_to_the_data_volume(monkeypatch, tmp_path):
+    """#411: the image's source layer is root's, and the command runs as `postulo`."""
+    monkeypatch.setenv("POSTULO_ESCO_DIR", str(tmp_path))
+    try:
+        assert importlib.reload(esco).DATA_DIR == tmp_path
+    finally:
+        monkeypatch.undo()
+        importlib.reload(esco)

@@ -70,6 +70,7 @@ from __future__ import annotations
 import bisect
 import json
 import logging
+import os
 import unicodedata
 import zipfile
 from array import array
@@ -81,7 +82,11 @@ from postulo.core import languages as tags
 
 logger = logging.getLogger(__name__)
 
-DATA_DIR = Path(__file__).resolve().parent / "data"
+#: Where the classification is read from and `manage.py fetch_esco` writes it: beside the
+#: code by default, and on the data volume in the image, where `POSTULO_ESCO_DIR` points.
+#: The source layer the code sits in belongs to root there, and a file written into it
+#: would die with the layer an upgrade replaces.
+DATA_DIR = Path(os.environ.get("POSTULO_ESCO_DIR") or Path(__file__).resolve().parent / "data")
 
 #: The language a name is read in when ESCO publishes nothing in the reader's.
 FALLBACK = "en"

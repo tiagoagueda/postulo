@@ -157,6 +157,7 @@ ENV PYTHONUNBUFFERED=1 \
     POSTULO_MEDIA_ROOT=/app/data/media \
     POSTULO_BACKUP_DIR=/app/data/backups \
     POSTULO_GEOLOCATIONS_DIR=/app/data/geonames \
+    POSTULO_ESCO_DIR=/app/data/esco \
     POSTULO_STATIC_ROOT=/app/staticfiles
 
 # The city table the map places locations from is read from the data volume, not from
@@ -164,6 +165,9 @@ ENV PYTHONUNBUFFERED=1 \
 # own image, and a dataset written there would die with the layer an upgrade replaces.
 # The entrypoint fetches it on first start-up, and a fetch that fails is a map without
 # dots, not a refused start-up.
+# The ESCO classification is read from the volume for the same reason: `fetch_esco` runs
+# as `postulo`, which cannot write into the source layer, and the worker and the scheduler
+# share the volume and so see what the web container fetched.
 
 # libpango and friends are WeasyPrint's; curl is for the health check.
 #
@@ -327,7 +331,7 @@ RUN rm -rf /usr/local/lib/python3.14/site-packages/pip \
 COPY docker/entrypoint.sh /usr/local/bin/postulo-entrypoint
 RUN chmod +x /usr/local/bin/postulo-entrypoint \
     && useradd --system --create-home --uid 1000 postulo \
-    && mkdir -p /app/data/media /app/data/backups /app/data/plugins \
+    && mkdir -p /app/data/media /app/data/backups /app/data/plugins /app/data/esco \
     && chown -R postulo:postulo /app/data
 
 # Nothing here needs root, and the data directory is the only thing it writes to.
