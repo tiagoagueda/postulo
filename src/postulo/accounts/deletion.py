@@ -59,26 +59,23 @@ def is_last_administrator(user) -> bool:
 
 
 def files_of(user) -> list[str]:
-    """Every storage name the person's rows point at."""
-    from postulo.accounts.models import Profile
-    from postulo.documents.models import RenderedDocument, UploadedDocument
-    from postulo.jobs.models import CapturedPage
+    """Every storage name the person's rows point at.
+
+    Read from the models rather than from a list: every file field of every model whose rows
+    are the person's, so a model that gains one is covered the day it is added (#355). That
+    includes what a capture kept of a page (#256), the export archive and the company
+    logos, none of which a hand-written list remembered.
+    """
+    from postulo.core import media
 
     names: list[str] = []
-    for model in (UploadedDocument, RenderedDocument):
-        for record in model.objects.for_user(user).exclude(file=""):
-            names.append(record.file.name)
-    # What the person's captures kept of the pages they were read from (#256): copies of
-    # somebody else's page, which are the person's to take away and the instance's to
-    # stop holding.
-    for page in CapturedPage.objects.for_user(user):
-        names.extend(held.name for held in (page.source, page.rendering) if held)
-    profile = Profile.objects.filter(user=user).first()
-    if profile is not None:
-        for picture in (profile.avatar, profile.gravatar_image):
-            if picture:
-                names.append(picture.name)
-    return names
+    for model, column in media.file_fields():
+        owner = media.owner_lookup(model)
+        if owner is None:
+            continue
+        rows = model._base_manager.filter(**{owner: user}).exclude(**{column.name: ""})
+        names.extend(rows.values_list(column.name, flat=True))
+    return [name for name in names if name]
 
 
 def media_directories_of(user) -> list[Path]:
@@ -88,6 +85,8 @@ def media_directories_of(user) -> list[Path]:
         root / "documents" / str(user.pk),
         root / "avatars" / str(user.pk),
         root / "captures" / str(user.pk),
+        root / "exports" / str(user.pk),
+        root / "logos" / str(user.pk),
     ]
 
 

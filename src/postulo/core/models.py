@@ -881,20 +881,6 @@ class ExportArchive(OwnedModel):
 
         return self.expires_at <= when.now()
 
-    def delete(self, *args, **kwargs):
-        """Take the bytes with the row.
-
-        Django leaves the file behind on purpose -- a row deleted in a transaction that then
-        rolls back would otherwise have taken a file with it -- but an export exists only to
-        be downloaded once, and the whole point of the expiry is that nothing is left on
-        disk. Deleted after the row, and a file already gone is not an error.
-        """
-        stored = self.file
-        result = super().delete(*args, **kwargs)
-        if stored:
-            stored.delete(save=False)
-        return result
-
 
 class SiteSettings(models.Model):
     """Instance policy an administrator may change from the interface. One row.

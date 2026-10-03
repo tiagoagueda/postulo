@@ -1,23 +1,24 @@
 """Deleting an account: every row, every file, and never the last administrator."""
 
+import datetime as dt
 from pathlib import Path
 
 import pytest
 from allauth.account.models import EmailAddress
 from django.apps import apps
-from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.core.management.base import CommandError
 from django.urls import reverse
+from django.utils import timezone
 
 from postulo.accounts import deletion
 from postulo.accounts.models import Invite, Profile
 from postulo.api.models import ApiToken
 from postulo.applications.models import Application, Reminder, Status
 from postulo.applications.services import change_status
-from postulo.core.models import OwnedModel
+from postulo.core.models import ExportArchive, OwnedModel
 from postulo.documents.models import CV, RenderedDocument, UploadedDocument
 from postulo.jobs.models import Company, Contact, JobPosting
 from postulo.plugins.models import Connection
@@ -38,6 +39,14 @@ def owned_models() -> list[type]:
 def fill(user) -> dict[str, Path]:
     """A little of everything, with real files, so a deletion has something to miss."""
     company = Company.objects.create(owner=user, name=f"Aperture {user.pk}")
+    company.logo.save(f"logo-{company.pk}.png", ContentFile(b"\x89PNG logo"), save=True)
+    export = ExportArchive.objects.create(
+        owner=user,
+        file=ContentFile(b"PK the whole job search", name="export.zip"),
+        filename="export.zip",
+        size=23,
+        expires_at=timezone.now() + dt.timedelta(hours=24),
+    )
     Contact.objects.create(owner=user, company=company, name="Cave")
     posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
     application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
@@ -69,10 +78,13 @@ def fill(user) -> dict[str, Path]:
         "upload": Path(upload.file.path),
         "sent": Path(sent.file.path),
         "avatar": Path(profile.avatar.path),
+        "logo": Path(company.logo.path),
+        "export": Path(export.file.path),
     }
 
 
-def test_deleting_removes_every_owned_row_and_every_file(user, other_user):
+def test_deleting_removes_every_owned_row_and_every_file(user, other_user, settings, tmp_path):
+    settings.MEDIA_ROOT = str(tmp_path)
     mine = fill(user)
     theirs = fill(other_user)
     for path in {**mine, **theirs}.values():
@@ -97,12 +109,14 @@ def test_deleting_removes_every_owned_row_and_every_file(user, other_user):
     for path in mine.values():
         assert not path.exists(), f"{path} was left on disk"
     root = Path(settings.MEDIA_ROOT)
-    assert not (root / "documents" / str(user.pk)).exists()
-    assert not (root / "avatars" / str(user.pk)).exists()
+    # Whatever the directory is called: no file of theirs under any `<prefix>/<pk>/`, which
+    # is how an export archive and the logos were missed (#355).
+    for prefix in root.iterdir():
+        assert not (prefix / str(user.pk)).exists(), f"{prefix.name}/{user.pk} was left behind"
     for path in theirs.values():
         assert path.is_file(), "nobody else's files move"
 
-    assert report.files_removed == 3 and report.files_missing == 0
+    assert report.files_removed == 5 and report.files_missing == 0
     assert report.rows["pending invitations revoked"] == 1
     assert any("files removed" in line for line in report.as_lines())
 
@@ -294,3 +308,17 @@ def test_the_page_counts_what_goes_rather_than_building_an_export_of_it(client, 
 
     assert response.status_code == 200
     assert "data-delete-account" in response.content.decode()
+
+
+def test_every_model_that_keeps_a_file_is_one_account_deletion_reads():
+    """A model that gains a file field must be found by the walk, and be somebody's."""
+    from django.db import models
+
+    from postulo.core import media
+
+    found = {(model, field.name) for model, field in media.file_fields()}
+    for model in apps.get_models():
+        for field in model._meta.get_fields():
+            if isinstance(field, models.FileField):
+                assert (model, field.name) in found, f"{model.__name__}.{field.name} is not read"
+                assert media.owner_lookup(model), f"{model.__name__} files belong to nobody"

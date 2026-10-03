@@ -169,7 +169,7 @@ def test_an_expired_archive_says_so_rather_than_handing_over_nothing(client, use
     assert client.get(reverse("core:export_archive", args=[archive.pk])).status_code == 404
 
 
-def test_the_reaper_takes_the_bytes_with_the_row(client, user):
+def test_the_reaper_takes_the_bytes_with_the_row(client, user, django_capture_on_commit_callbacks):
     """One per export, each the size of a whole job search: leaving them is not an option."""
     from django.core.files.storage import default_storage
 
@@ -186,10 +186,28 @@ def test_the_reaper_takes_the_bytes_with_the_row(client, user):
     ExportArchive.objects.filter(pk=archive.pk).update(
         expires_at=timezone.now() - dt.timedelta(minutes=1)
     )
-    assert reap_archives() == 1
+    with django_capture_on_commit_callbacks(execute=True):
+        assert reap_archives() == 1
 
     assert not ExportArchive.objects.filter(pk=archive.pk).exists()
     assert not default_storage.exists(path), "the file goes with the row"
+
+
+def test_deleting_archives_by_queryset_takes_their_files_too(
+    client, user, django_capture_on_commit_callbacks
+):
+    """No `delete()` of the model runs for a queryset, a cascade or the admin (#355)."""
+    from django.core.files.storage import default_storage
+
+    client.force_login(user)
+    client.post(reverse("core:export_download"))
+    path = ExportArchive.objects.for_user(user).get().file.name
+    assert default_storage.exists(path)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        ExportArchive.objects.for_user(user).delete()
+
+    assert not default_storage.exists(path)
 
 
 # ------------------------------------------------------------------ the report

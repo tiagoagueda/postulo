@@ -214,6 +214,30 @@ def test_a_file_another_row_still_points_at_is_left_alone(user, django_capture_o
     assert not path.exists()
 
 
+def test_prune_media_leaves_a_live_export_alone(user, tmp_path, settings, capsys):
+    import datetime as dt
+
+    from django.utils import timezone
+
+    from postulo.core.models import ExportArchive
+
+    settings.MEDIA_ROOT = str(tmp_path)
+    archive = ExportArchive.objects.create(
+        owner=user,
+        file=ContentFile(b"PK the whole job search", name="export.zip"),
+        filename="export.zip",
+        size=23,
+        expires_at=timezone.now() + dt.timedelta(hours=24),
+    )
+    stored = Path(archive.file.path)
+
+    call_command("prune_media", "--remove")
+
+    listed = capsys.readouterr().out
+    assert "export.zip" not in listed, "a live export is not an orphan"
+    assert stored.is_file()
+
+
 def test_prune_media_lists_orphans_and_removes_them_when_told(user, tmp_path, settings, capsys):
     settings.MEDIA_ROOT = str(tmp_path)
     upload = an_upload(user)

@@ -15,28 +15,23 @@ from pathlib import Path
 from django.conf import settings
 from django.core.management.base import BaseCommand
 
-from postulo.accounts.models import Profile
-from postulo.documents.models import RenderedDocument, UploadedDocument
-from postulo.jobs.models import CapturedPage, Company
+from postulo.core import media
 
 
 def _referenced() -> set[str]:
-    """Every file name a row points at, as stored — the media root's own relative paths."""
+    """Every file name a row points at, as stored — the media root's own relative paths.
+
+    Read from the models, so a model that gains a file field is covered on the day it is
+    added: a list kept by hand listed every export archive as an orphan (#355), and every
+    kept page before that (#256), and `--remove` would have deleted the lot.
+    """
     names: set[str] = set()
-    for model, field in (
-        (UploadedDocument, "file"),
-        (RenderedDocument, "file"),
-        (Profile, "avatar"),
-        (Profile, "gravatar_image"),
-        (Company, "logo"),
-        # What a capture kept of its page (#256). Left out, every kept page would be
-        # listed as an orphan, and `--remove` would delete the lot.
-        (CapturedPage, "source"),
-        (CapturedPage, "rendering"),
-    ):
+    for model, field in media.file_fields():
         names |= {
             name
-            for name in model.objects.exclude(**{f"{field}": ""}).values_list(field, flat=True)
+            for name in model._base_manager.exclude(**{field.name: ""}).values_list(
+                field.name, flat=True
+            )
             if name
         }
     return names

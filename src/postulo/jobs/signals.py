@@ -25,7 +25,7 @@ from django.db.models.signals import post_delete
 from django.dispatch import receiver
 
 from .history import ARTEFACTS
-from .models import CapturedPage, ListingEvent
+from .models import CapturedPage, Company, ListingEvent
 
 logger = logging.getLogger(__name__)
 
@@ -80,5 +80,29 @@ def remove_the_files_from_disk(sender, instance, **kwargs) -> None:
                 storage.delete(name)
             except OSError:  # pragma: no cover - a file already gone is what was wanted
                 logger.warning("Could not remove %s from storage", name, exc_info=True)
+
+    transaction.on_commit(remove)
+
+
+@receiver(post_delete, sender=Company, dispatch_uid="jobs.remove_company_logo")
+def remove_the_logo_from_disk(sender, instance, **kwargs) -> None:
+    """Deleting a company deletes its logo, however the company goes (#355).
+
+    The same arrangement as a kept page's files: after the commit, and only where no other
+    company uses the name. That check is what a merge needs, since it hands the other
+    company's logo to the kept one before it deletes the other.
+    """
+    stored = instance.logo
+    if not stored or not stored.name:
+        return
+    storage, name = stored.storage, stored.name
+
+    def remove() -> None:
+        if Company.objects.filter(logo=name).exists():
+            return
+        try:
+            storage.delete(name)
+        except OSError:  # pragma: no cover - a file already gone is what was wanted
+            logger.warning("Could not remove %s from storage", name, exc_info=True)
 
     transaction.on_commit(remove)

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Deleting an account or a company removes its export archives and logos from the disk, and `prune_media` no longer lists a live export as an orphan: the files are found by walking every model's file fields, and an archive's bytes go with its row however the row is deleted. (#355)
 - Server settings → Data protection no longer names other accounts' contacts or shows their connections' labels and configuration: staff see counts, per plugin and kind for the record of processing. (#369)
 - A number filter given a value like `1e1000000` is ignored instead of holding a server worker for half a minute. (#499)
 - A plugin switched off for a person, by an administrator or by themselves, no longer runs for them: notifiers, queued webhooks, stores, syncs, sources and importers ask the policy where they run, the create address of an unavailable one is a 404, and what was waiting resumes when the decision is reversed. (#362)

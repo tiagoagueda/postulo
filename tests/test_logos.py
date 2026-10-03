@@ -649,3 +649,29 @@ def test_finding_a_logo_for_a_company_deleted_meanwhile_is_refused(company, monk
     )
     with pytest.raises(Refused):
         slow.find_a_logo(errand)
+
+
+def test_deleting_a_company_takes_its_logo_and_a_merge_keeps_the_kept_ones(
+    client, user, company, django_capture_on_commit_callbacks
+):
+    from django.core.files.base import ContentFile
+    from django.core.files.storage import default_storage
+
+    from postulo.jobs import merging
+
+    company.logo.save("logo.png", ContentFile(an_image()), save=True)
+    name = company.logo.name
+    client.force_login(user)
+    with django_capture_on_commit_callbacks(execute=True):
+        assert client.post(reverse("jobs:company_delete", args=[company.pk])).status_code == 302
+    assert not default_storage.exists(name), "the logo goes with the company"
+
+    kept = Company.objects.create(owner=user, name="Aperture")
+    other = Company.objects.create(owner=user, name="Aperture Science")
+    other.logo.save("logo.png", ContentFile(an_image()), save=True)
+    handed_over = other.logo.name
+    with django_capture_on_commit_callbacks(execute=True):
+        merging.merge_companies(kept, other)
+    kept.refresh_from_db()
+    assert kept.logo.name == handed_over
+    assert default_storage.exists(handed_over), "the logo the kept company now uses stays"
