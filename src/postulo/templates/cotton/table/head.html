@@ -201,6 +201,7 @@
                href="{% querystring sort=header.next_sort page=None %}"
                hx-get="{% querystring sort=header.next_sort page=None %}"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+               hx-sync="#{{ form_id }}:drop"
                class="tap-target shrink-0 justify-center hover:text-ink-900 dark:hover:text-ink-100 {% if header.state %}text-ink-900 dark:text-ink-100{% endif %}">
               {% icon header.sort_icon class="size-3.5" label=header.hint %}
             </a>

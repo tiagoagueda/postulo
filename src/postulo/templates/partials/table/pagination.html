@@ -14,6 +14,7 @@
          href="{% querystring page=page_obj.previous_page_number %}"
          hx-get="{% querystring page=page_obj.previous_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
+         hx-sync="#{{ form_id }}:drop"
          class="btn" data-variant="outline">{% translate "Previous" %}</a>
     {% endif %}
     <span class="text-ink-500 dark:text-ink-400">
@@ -26,6 +27,7 @@
          href="{% querystring page=page_obj.next_page_number %}"
          hx-get="{% querystring page=page_obj.next_page_number %}"
          hx-target="#{{ table_id }}" hx-swap="outerHTML show:top" hx-push-url="true"
+         hx-sync="#{{ form_id }}:drop"
          class="btn" data-variant="outline">{% translate "Next" %}</a>
     {% endif %}
   </nav>

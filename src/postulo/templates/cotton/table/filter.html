@@ -59,7 +59,10 @@
    the address, however old the question it answered. Every one of them sends the whole
    form and the box, so the newest request is the question as it stands. The sort and the
    page links are left out on purpose: their address was written with the last answer, so
-   one of them replacing a newer request would put the older question back.
+   one of them replacing a newer request would put the older question back. They are on the
+   form's turn all the same, with `drop` (#648): a newer filter replaces a sort or a page
+   still in flight, which was the older question, and a click that comes while a filter is
+   in flight is ignored rather than drawn over it.
 {% endcomment %}
 {% with id=control.input_id|add:suffix name=control.name %}
   {% if control.kind == 'text' %}

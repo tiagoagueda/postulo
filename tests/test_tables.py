@@ -12,7 +12,7 @@ from postulo.applications.models import Application, Priority, Reminder, Status
 from postulo.applications.services import change_status, record_event
 from postulo.applications.tables import ApplicationsTable
 from postulo.core import tables
-from postulo.jobs.models import Company, Contact, JobPosting
+from postulo.jobs.models import Company, Contact, Industry, JobPosting
 from postulo.jobs.tables import CompaniesTable
 
 pytestmark = pytest.mark.django_db
@@ -702,6 +702,22 @@ def test_the_name_filter_ignores_the_case_of_accented_letters(client, user):
 
     assert names(client.get(url, {"name": "école"})) == ["École Polytechnique"]
     assert names(client.get(url, {"name": "ŠKODA"})) == ["Škoda"]
+
+
+def test_no_row_names_a_bulk_form_that_is_not_on_the_page(client, user, search):
+    """With no industries there is no bulk form, so the rows' tick boxes belong to nothing
+    (#648)."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    page = client.get(url).content.decode()
+    assert 'id="companies-bulk"' not in page
+    assert 'form="companies-bulk"' not in page
+
+    Industry.named(user, ["Research"])
+    page = client.get(url).content.decode()
+    assert 'id="companies-bulk"' in page
+    assert 'form="companies-bulk"' in page
 
 
 def test_the_dates_narrow_by_the_day_they_fall_on(client, user, search):

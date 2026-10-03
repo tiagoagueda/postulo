@@ -35,17 +35,21 @@
     {% if companies or table.filters_active %}
       {% include "partials/table/narrow.html" %}
       <c-scroll-box class="card p-0" label="{% translate 'Companies' %}">
+        {% comment %} The rows' tick boxes belong to the bulk form by `form=`, so they are drawn
+           only where that form is: with no industries to apply there is none (#648). {% endcomment %}
+        {% with bulk_id=bulk_industries|yesno:"companies-bulk," %}
         <table class="table">
-          <c-table.head :table="table" table_id="companies-table" form_id="company-filters" bulk_form_id="companies-bulk" />
+          <c-table.head :table="table" table_id="companies-table" form_id="company-filters" bulk_form_id="{{ bulk_id }}" />
           <tbody>
             {% for company in companies %}
-              {% include "jobs/partials/company_row.html" with columns=table.visible bulk_form_id="companies-bulk" %}
+              {% include "jobs/partials/company_row.html" with columns=table.visible bulk_form_id=bulk_id %}
             {% endfor %}
           </tbody>
         </table>
+        {% endwith %}
       </c-scroll-box>
       {% if companies %}
-        {% include "partials/table/pagination.html" with table_id="companies-table" %}
+        {% include "partials/table/pagination.html" with table_id="companies-table" form_id="company-filters" %}
         {% if bulk_industries %}
           {% url 'jobs:company_bulk' as bulk_url %}
           {% include "partials/table/bulk.html" with bulk_form_id="companies-bulk" bulk_action_url=bulk_url bulk_fields="jobs/partials/bulk_fields.html" %}

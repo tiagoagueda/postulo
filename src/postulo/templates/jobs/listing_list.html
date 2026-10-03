@@ -57,7 +57,7 @@
         </table>
       </c-scroll-box>
       {% if listings %}
-        {% include "partials/table/pagination.html" with table_id="listings-table" %}
+        {% include "partials/table/pagination.html" with table_id="listings-table" form_id="listing-filters" %}
         {% url 'listings:bulk' as bulk_url %}
         {% include "partials/table/bulk.html" with bulk_form_id="listings-bulk" bulk_action_url=bulk_url bulk_fields="jobs/partials/listing_bulk_fields.html" %}
       {% else %}

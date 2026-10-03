@@ -23,7 +23,7 @@ from django.urls import reverse
 
 from postulo.accounts.models import Profile
 from postulo.core import tables
-from postulo.jobs.models import Company
+from postulo.jobs.models import Company, Industry
 from postulo.jobs.tables import CompaniesTable
 
 pytestmark = pytest.mark.django_db
@@ -274,6 +274,8 @@ def test_the_two_that_arrived_with_their_prerequisites_are_here(client, user):
     that losing one is a failure rather than a quiet absence.
     """
     Company.objects.create(owner=user, name="Aperture Science")
+    # The bulk bar offers industries to add, so with none there is no bar and no ticks (#648).
+    Industry.named(user, ["Research"])
     client.force_login(user)
 
     html = client.get(reverse(LIST)).content.decode()
