@@ -680,3 +680,20 @@ def test_the_audit_reads_every_extra_the_image_installs():
         assert wanted <= set(re.findall(r"--extra (\w+)", line)), (
             f"the audit reads fewer extras than the image installs: {line}"
         )
+
+
+# ---------------------------------------- the constraints an image built on top can use (#542)
+
+
+def test_the_runtime_image_ships_the_constraints_a_plugin_is_installed_against():
+    """Without the file, `FROM` Postulo's image and `uv pip install` is unconstrained.
+
+    The wiki promises that a plugin cannot move anything Postulo pins; only an image that
+    carries the pins can keep that promise for a plugin added on top of it.
+    """
+    build, runtime = stages()["build"], stages()["runtime"]
+
+    assert "--output-file /app/constraints.txt" in build.replace("\\n", " ")
+    assert "COPY --from=build /app/constraints.txt" in runtime
+    install = [line for line in build.replace("\\n", " ").splitlines() if "uv pip install" in line]
+    assert install and all("--constraint /app/constraints.txt" in line for line in install)

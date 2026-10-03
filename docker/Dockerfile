@@ -116,14 +116,18 @@ RUN python scripts/messages.py compile \
 # it leaves out is simply unconstrained: with `postgres` missing, a plugin that happened to
 # depend on psycopg could pull in a different version from the one the environment already
 # had, which is exactly what a constraint file exists to prevent (#219).
+#
+# The file is written whether or not anything is baked in, and the runtime stage keeps it as
+# /app/constraints.txt, so an image built on top of this one can install a plugin against
+# the same pins (#542).
+RUN uv export --locked --no-dev --extra server --extra postgres --no-hashes \
+        --no-emit-project --output-file /app/constraints.txt
 ARG POSTULO_EXTRA_PACKAGES=""
 RUN if [ -n "$POSTULO_EXTRA_PACKAGES" ]; then \
         apt-get update \
         && apt-get upgrade -y \
         && apt-get install -y --no-install-recommends git \
-        && uv export --locked --no-dev --extra server --extra postgres --no-hashes \
-            --no-emit-project --output-file /tmp/constraints.txt \
-        && uv pip install --no-cache --constraint /tmp/constraints.txt $POSTULO_EXTRA_PACKAGES \
+        && uv pip install --no-cache --constraint /app/constraints.txt $POSTULO_EXTRA_PACKAGES \
         && rm -rf /var/lib/apt/lists/*; \
     fi
 
@@ -264,6 +268,7 @@ WORKDIR /app
 # What runs, and nothing that built it: the environment, the source with its compiled
 # catalogues, and the entry point. No lock, no uv cache, no `.po`, no build scripts.
 COPY --from=build /app/.venv ./.venv
+COPY --from=build /app/constraints.txt ./constraints.txt
 COPY --from=build /app/src ./src
 COPY manage.py ./
 COPY --from=styles /build/src/postulo/static/css/app.css ./src/postulo/static/css/app.css
