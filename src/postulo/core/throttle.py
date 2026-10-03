@@ -99,6 +99,12 @@ def _now() -> float:
     return time.time()
 
 
+def _key(action: str, who: object, rate: Rate) -> str:
+    identity = getattr(who, "pk", None) or str(who)
+    window = int(_now()) // rate.seconds
+    return f"postulo:rate:{action}:{identity}:{window}"
+
+
 def consume(action: str, who: object, rate: Rate) -> None:
     """Count one use of ``action`` by ``who``, or raise :class:`TooOften`.
 
@@ -107,9 +113,7 @@ def consume(action: str, who: object, rate: Rate) -> None:
     """
     if not rate:
         return
-    identity = getattr(who, "pk", None) or str(who)
-    window = int(_now()) // rate.seconds
-    key = f"postulo:rate:{action}:{identity}:{window}"
+    key = _key(action, who, rate)
 
     # `add` only sets when the key is absent, so the first request of a window creates it
     # and the rest increment. `incr` raises when the key expired between the two, which is
@@ -146,6 +150,32 @@ def capture(user) -> None:
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))
+
+
+#: How many wrong tokens one address may present to `/logs` or `/metrics` in an hour. A
+#: collector holding the right token never spends any of it (#472).
+REFUSED = Rate(10, 3600)
+
+
+def _caller(request) -> str:
+    return request.META.get("REMOTE_ADDR") or "unknown"
+
+
+def barred(name: str, request) -> None:
+    """Raise :class:`TooOften` for an address that has spent its wrong-token allowance.
+
+    Asked before the token is read, so that an address which has been guessing is refused
+    whatever it presents for the rest of the window, a lucky guess included.
+    """
+    used = cache.get(_key(f"endpoint-refused:{name}", _caller(request), REFUSED), 0)
+    if used > REFUSED.times:
+        elapsed = int(_now()) % REFUSED.seconds
+        raise TooOften(REFUSED, retry_after=max(1, REFUSED.seconds - elapsed))
+
+
+def refused(name: str, request) -> None:
+    """Count a wrong token against the address that presented it, or raise."""
+    consume(f"endpoint-refused:{name}", _caller(request), REFUSED)
 
 
 def endpoint(name: str, request) -> None:

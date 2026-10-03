@@ -18,7 +18,7 @@ from __future__ import annotations
 from urllib.parse import urlsplit
 
 from django.conf import settings
-from django.core.checks import Error, register
+from django.core.checks import Error, Warning, register
 
 from postulo.core import throttle
 
@@ -160,6 +160,29 @@ def public_url(app_configs=None, **kwargs) -> list[Error]:
             )
         ]
     return []
+
+
+#: Shorter than this is a word somebody chose, and the endpoints it guards are open to
+#: anybody who can reach the instance. `openssl rand -hex 32` makes one that is not.
+MIN_TOKEN_LENGTH = 24
+
+
+@register("postulo")
+def endpoint_tokens(app_configs=None, **kwargs) -> list[Warning]:
+    """A `/logs` or `/metrics` token short enough to be guessed (#472)."""
+    problems = []
+    for name in ("POSTULO_LOGS_TOKEN", "POSTULO_METRICS_TOKEN"):
+        value = str(getattr(settings, name, "") or "")
+        if value and len(value) < MIN_TOKEN_LENGTH:
+            problems.append(
+                Warning(
+                    f"{name} is {len(value)} characters; a token chosen by hand can be guessed.",
+                    hint="Make one with `openssl rand -hex 32` and use at least "
+                    f"{MIN_TOKEN_LENGTH} characters.",
+                    id="postulo.W001",
+                )
+            )
+    return problems
 
 
 @register("postulo")

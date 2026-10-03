@@ -38,12 +38,20 @@ def scrape(request: HttpRequest) -> HttpResponse:
     if not metrics.enabled():
         raise Http404
 
-    if not _authorised(request):
-        response = HttpResponse(
-            "A bearer token is required.\n", status=401, content_type="text/plain"
-        )
-        response["WWW-Authenticate"] = 'Bearer realm="postulo-metrics"'
-        return response
+    # Wrong tokens are counted per address; see `views_logs.collect` (#472).
+    try:
+        throttle.barred("metrics", request)
+        if not _authorised(request):
+            throttle.refused("metrics", request)
+            response = HttpResponse(
+                "A bearer token is required.\n", status=401, content_type="text/plain"
+            )
+            response["WWW-Authenticate"] = 'Bearer realm="postulo-metrics"'
+            return response
+    except throttle.TooOften as too_often:
+        refusal = HttpResponse(f"{too_often}\n", status=429, content_type="text/plain")
+        refusal["Retry-After"] = str(too_often.retry_after)
+        return refusal
 
     # Token-guarded and, until now, unbounded. Keyed on the caller's address rather
     # than an account, because a shared token is what authorises this and there is no

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Wrong tokens presented to /logs and /metrics are counted per address and shut it out after ten an hour; a token shorter than 24 characters is warned about. (#472)
 - Behind nginx or Apache an SVG is still sent by Postulo, so its sandbox policy always reaches the browser; the wiki shows the headers the proxy must add for the rest. (#415)
 - The capture API's "known" answer no longer carries a held listing's company, address or state, and the scope's label says it can ask. (#536)
 - Restoring a backup refuses member names that a Windows path would read as leaving the media or plugins directory. (#478)

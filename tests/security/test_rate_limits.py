@@ -385,14 +385,32 @@ def test_the_log_endpoint_is_bounded_too(client):
 @override_settings(
     POSTULO_METRICS_ENABLED=True, POSTULO_METRICS_TOKEN="a-token", POSTULO_ENDPOINT_RATE="1/h"
 )
-def test_a_wrong_token_is_still_refused_before_anything_is_counted(client):
-    """The limit protects the work, and there is no work to protect behind a bad token."""
+def test_a_few_wrong_tokens_do_not_spend_the_collectors_allowance(client):
+    """The collector's allowance is for the work; wrong tokens have a budget of their own."""
     for _ in range(5):
         assert client.get(reverse("core:metrics")).status_code == 401
 
     allowed = client.get(reverse("core:metrics"), headers={"Authorization": "Bearer a-token"})
 
     assert allowed.status_code == 200
+
+
+@pytest.mark.parametrize("name", ["core:metrics", "core:logs_endpoint"])
+def test_guessing_a_token_ends_in_429_whatever_is_presented_next(client, settings, name):
+    """Wrong tokens are counted per address, so a short token cannot be walked to (#472)."""
+    settings.POSTULO_METRICS_ENABLED = True
+    settings.POSTULO_METRICS_TOKEN = "a-token"
+    settings.POSTULO_LOGS_ENDPOINT_ENABLED = True
+    settings.POSTULO_LOGS_TOKEN = "a-token"
+    cache.clear()
+
+    for _ in range(throttle.REFUSED.times):
+        assert client.get(reverse(name)).status_code == 401
+
+    wrong = client.get(reverse(name), headers={"Authorization": "Bearer nope"})
+    assert wrong.status_code == 429 and int(wrong["Retry-After"]) > 0
+    right = client.get(reverse(name), headers={"Authorization": "Bearer a-token"})
+    assert right.status_code == 429, "the window is spent for this address, a lucky guess too"
 
 
 # ------------------------------------------------------------------- the defaults

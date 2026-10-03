@@ -226,3 +226,21 @@ def test_manage_py_check_stops_on_one(settings):
 
 def test_manage_py_check_passes_as_configured():
     call_command("check", "--tag", "postulo")
+
+
+# ------------------------------------------------------------- endpoint tokens
+
+
+def test_a_short_endpoint_token_is_a_warning(settings):
+    settings.POSTULO_LOGS_TOKEN = "short"
+    settings.POSTULO_METRICS_TOKEN = "a" * 32
+
+    problems = checks.endpoint_tokens()
+
+    assert ids(problems) == {"postulo.W001"} and "POSTULO_LOGS_TOKEN" in problems[0].msg
+
+
+def test_no_token_and_a_long_one_are_fine(settings):
+    settings.POSTULO_LOGS_TOKEN = ""
+    settings.POSTULO_METRICS_TOKEN = "b" * 32
+    assert checks.endpoint_tokens() == []

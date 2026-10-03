@@ -107,10 +107,20 @@ def collect(request: HttpRequest) -> HttpResponse:
             {"detail": "This endpoint is enabled but has no token configured."}, status=503
         )
 
-    if not _authorised(request):
-        response = JsonResponse({"detail": "A bearer token is required."}, status=401)
-        response["WWW-Authenticate"] = 'Bearer realm="postulo-logs"'
-        return response
+    # Wrong tokens are counted per address, and an address that has spent its allowance of
+    # them is refused whatever it presents next: the token is whatever the operator typed
+    # (#472).
+    try:
+        throttle.barred("logs", request)
+        if not _authorised(request):
+            throttle.refused("logs", request)
+            response = JsonResponse({"detail": "A bearer token is required."}, status=401)
+            response["WWW-Authenticate"] = 'Bearer realm="postulo-logs"'
+            return response
+    except throttle.TooOften as too_often:
+        refusal = JsonResponse({"detail": str(too_often)}, status=429)
+        refusal["Retry-After"] = str(too_often.retry_after)
+        return refusal
 
     # Token-guarded and, until now, unbounded. Keyed on the caller's address rather
     # than an account, because a shared token is what authorises this and there is no
