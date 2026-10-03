@@ -232,7 +232,7 @@ def _word(word: str) -> str:
     spacing, "p.a." with its dots."""
     body = re.escape(_straight(word).lstrip("/").strip()).replace(r"\ ", r"\s+")
     if word.startswith("/"):
-        return rf"\s*/\s*{body}(?![^\W\d_])"
+        return rf"\s{{0,2}}/\s{{0,2}}{body}(?![^\W\d_])"
     return rf"(?<![^\W\d_]){body}(?![^\W\d_])"
 
 
@@ -267,12 +267,33 @@ def _runs_on(filler: str) -> bool:
     return len(filler) <= REACH_WITHOUT
 
 
+#: How much of what stands before a figure can name its period: a word or two, never the line.
+LABEL_REACH = 40
+
+
+def _labelling(before: str) -> str:
+    """The tail of ``before`` that can label the figure after it, for ``_period`` (#420).
+
+    Not the line: "Daily standups. Salary: 40,000" is not paid by the day. What is kept is
+    the last word when only spaces separate it from the end, so "Monthly salary" and "Gross
+    annual salary" keep their period, and nothing at or before a sentence stop or a
+    separator such as a bar. Bounded, so a long run of spaces costs nothing.
+    """
+    tail = before[-LABEL_REACH:]
+    stop = max(tail.rfind(mark) for mark in (".", "!", "?", ";", "|", "\n", "•"))
+    tail = tail[stop + 1 :]
+    word = re.search(r"[^\W\d_]+[\s:]{0,3}$", tail)
+    return word.group(0) if word else ""
+
+
 def _after(labels: tuple[str, ...], text: str):
-    """Each ``(label, what follows it)`` in ``text``: the label's line up to its end, and
-    the stretch after it where the value it labels has to start."""
+    """Each ``(label, what follows it)`` in ``text``: the label's own words with the word
+    before them (``_labelling``), and the stretch after it where the value it labels has to
+    start."""
     for hit in _pattern_for(labels).finditer(text):
         line = text.rfind("\n", 0, hit.start()) + 1
-        yield text[line : hit.end()], text[hit.end() : hit.end() + WINDOW]
+        before = _labelling(text[line : hit.start()])
+        yield f"{before}{text[hit.start() : hit.end()]}", text[hit.end() : hit.end() + WINDOW]
 
 
 # ------------------------------------------------------------------ dates
@@ -555,7 +576,7 @@ def pay_in(text: str, tag: str = "") -> tuple[Decimal | None, Decimal | None, st
     before = text[: match.start()]
     if high is None and _pattern_for(words("up_to", tag)).search(before):
         low, high = None, low
-    return low, high, currency, _period(text[match.end() :], before, tag)
+    return low, high, currency, _period(text[match.end() :], _labelling(before), tag)
 
 
 def salary(text: str, tag: str = "") -> tuple[Decimal | None, Decimal | None, str, str]:

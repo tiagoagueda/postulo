@@ -257,3 +257,32 @@ def test_a_page_s_language_tag_is_a_stranger_s_text():
     assert patterns.tag_of("x" * 60) == ""
     assert patterns.spoken("pt-zz") == ("pt-PT", "pt-BR")
     assert patterns.spoken("xx-evil") == ()
+
+
+@pytest.mark.parametrize(
+    "written,period",
+    [
+        ("You get a monthly travel allowance and a salary of €40,000.", ""),
+        ("Hourly paid overtime on top of a salary of €40,000.", ""),
+        ("Daily standups. Salary: €40,000", ""),
+        ("Monthly team lunches | Salary €3,500", ""),
+        ("Monthly salary: €3,500", "month"),
+        ("Gross annual salary: €40,000", "year"),
+        ("Salary (monthly): €3,500", "month"),
+        ("Salary: €40,000 per month", "month"),
+    ],
+)
+def test_a_period_is_the_one_the_figure_s_label_states_not_one_earlier_on_the_line(written, period):
+    """#420: the whole line before the label was searched, so a "daily" anywhere won."""
+    assert patterns.salary(written, "en")[3] == period
+
+
+def test_a_long_run_of_unicode_spaces_does_not_make_the_search_quadratic():
+    """#420: 50,000 no-break spaces took minutes; the label is bounded now."""
+    import time
+
+    started = time.perf_counter()
+    found = patterns.salary("Benefits" + "\xa0" * 50_000 + "Salary: €40,000", "en")
+    assert found == (40000, None, "EUR", "")
+    assert patterns.pay_in("\xa0" * 50_000 + "€40,000", "en")[3] == ""
+    assert time.perf_counter() - started < 2

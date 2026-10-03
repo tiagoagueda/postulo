@@ -243,6 +243,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- Reading a pay period from a page no longer takes a "daily", "monthly" or "hourly" earlier in the paragraph for the salary's own period, and a long run of non-ASCII spaces no longer makes the search take minutes (#420)
 - An instance holding the same identifier in two cases (Wikidata `Q95` beside `q95`, or two *Other* values differing only in case) can now migrate past the identifier-case migration instead of stopping at an IntegrityError (#570)
 - Both compose files now name the `:0.3` image, and `release_tools.py check` refuses a tag whose compose files name another minor, so an install no longer runs the previous release (#403)
 - The PostgreSQL compose file gains the `worker` service the SQLite one has, and `.env.example` names the right file for each, so starting the worker no longer swaps an instance onto an empty SQLite database (#581)
