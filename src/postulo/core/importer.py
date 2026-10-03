@@ -866,6 +866,23 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         _restore_web_links(contact, user, contact_links, report)
         contacts[old_id] = contact
 
+    # The reminders about no application, which format 30 is the first to carry (#334).
+    for reminder_entry in document.get("reminders") or []:
+        due_at = _dt(reminder_entry.get("due_at"))
+        if due_at is None:
+            report.skipped.append(
+                "A reminder about no application: it has no date, and was left out"
+            )
+            continue
+        Reminder.objects.create(
+            owner=user,
+            application=None,
+            summary=reminder_entry.get("summary", ""),
+            due_at=due_at,
+            done_at=_dt(reminder_entry.get("done_at")),
+        )
+        report.reminders += 1
+
     # The people recorded at no company, which format 20 is the first to carry (#239).
     for contact_entry in document.get("contacts", []):
         restore_contact(contact_entry, None)

@@ -82,7 +82,10 @@ logger = logging.getLogger(__name__)
 #: ``closing_notice_days`` -- and made the importer restore a field the file names whatever
 #: its value, so a switch set off and a dashboard cleared come back as they were (#464). An
 #: archive without them restores each at its default.
-FORMAT_VERSION = 30
+#: 31 added ``reminders`` at the top of the file: the reminders about no application,
+#: which used to travel only inside the application they were about and so were in no
+#: archive (#334).
+FORMAT_VERSION = 31
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -634,6 +637,7 @@ def counts(user) -> dict[str, int]:
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
+    from postulo.applications.models import Reminder
     from postulo.core.models import Tag
     from postulo.documents import printing
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
@@ -681,6 +685,13 @@ def build_document(user) -> dict:
         "contacts": [
             _contact(contact)
             for contact in Contact.objects.for_user(user).filter(company__isnull=True)
+        ],
+        # The reminders about no application (#334). Every other reminder is written under
+        # the application it is about, so one about none was in the account and not in
+        # the archive.
+        "reminders": [
+            _fields(reminder, REMINDER_FIELDS)
+            for reminder in Reminder.objects.for_user(user).filter(application__isnull=True)
         ],
         "companies": [],
         "documents": {},

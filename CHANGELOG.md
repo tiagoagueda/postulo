@@ -427,6 +427,7 @@ A document copy the scheduler is already sending is no longer sent a second time
   real now. (#250)
 - The image workflow asks the registry for the tags it pushed and attaches the bill of
   materials to the release. (#251)
+- *Export my data* and *Import* carry the reminders that are about no application, which were left out of the archive (format 30). Older archives still import. (#334)
 
 ## [0.3.0] — 2026-09-16
 

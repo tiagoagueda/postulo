@@ -309,7 +309,7 @@ def test_the_format_version_moved(user):
     of address and the pronouns on the profile (#309); 27 added which of the profile's
     details a CV prints (#308); 28 writes every language code as a BCP 47 tag in its
     canonical form, and moved no field (#337); 29 added the service a web
-    link is on (#305).
+    link is on (#305); 30 added the reminders about no application (#334).
 
     At least rather than exactly: two branches each adding to the archive take a number
     each, and whichever lands second renumbers.

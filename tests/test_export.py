@@ -585,3 +585,33 @@ def test_a_preference_the_file_gets_wrong_is_not_believed(user):
     assert user.profile.closing_notice_days == 3
     assert user.profile.keyboard_shortcuts is True
     assert user.profile.plugins_off == []
+
+
+def test_a_reminder_about_no_application_comes_back_about_none(populated, other_user):
+    """It used to travel only inside an application, so one about none was in no archive (#334)."""
+    Reminder.objects.create(
+        owner=populated, application=None, summary="Renew passport", due_at=timezone.now()
+    )
+    archive, document = read_archive(populated)
+    assert [row["summary"] for row in document["reminders"]] == ["Renew passport"]
+
+    report = importer.load(other_user, archive)
+
+    assert report.reminders == 2
+    mine = Reminder.objects.for_user(other_user)
+    assert mine.get(summary="Chase").application_id is not None
+    assert mine.get(summary="Renew passport").application_id is None
+
+
+def test_an_archive_from_before_reminders_about_none_still_imports(populated, other_user):
+    _archive, document = read_archive(populated)
+    document.pop("reminders")
+    document["postulo"]["format"] = 25
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as older:
+        older.writestr(export_module.MANIFEST_NAME, json.dumps(document))
+
+    report = importer.load(other_user, zipfile.ZipFile(buffer))
+
+    assert report.reminders == 1
+    assert Reminder.objects.for_user(other_user).get().summary == "Chase"
