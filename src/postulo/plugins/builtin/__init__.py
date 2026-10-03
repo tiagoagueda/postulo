@@ -68,6 +68,7 @@ from .htmlutil import (
     extract_meta,
     extract_microdata,
     extract_rdfa,
+    flatten,
     heading_title,
     main_text,
     page_language,
@@ -364,7 +365,8 @@ class SchemaOrgSource:
             read = _from_posting(posting, url, description_is_html=True)
             return _with_hints(read, url, html, hints)
 
-        posting = _best_posting([*extract_microdata(html), *extract_rdfa(html)], url)
+        # A posting held inside another item is found as it is in JSON-LD (#589).
+        posting = _best_posting(flatten([*extract_microdata(html), *extract_rdfa(html)]), url)
         if posting is not None:
             read = _from_posting(posting, url, description_is_html=False)
             return _with_hints(read, url, html, hints)

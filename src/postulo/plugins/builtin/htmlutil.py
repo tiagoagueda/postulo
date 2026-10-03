@@ -455,23 +455,26 @@ def strip_tags(value: str) -> str:
 # ----------------------------------------------------------------- JSON-LD
 
 
-def _flatten(node) -> list[dict]:
+def flatten(node) -> list[dict]:
     """Walk the shapes JSON-LD is allowed to take, and yield the objects inside.
 
     A document may be one object, a list of them, or an ``@graph`` holding either, and real
     sites use all three. A board that publishes several postings on one page wraps them in
     an ``ItemList`` or hangs them off ``mainEntity``, so those are followed too: the posting
-    being looked at is often inside one, and picking it back out is the source's job.
+    being looked at is often inside one, and picking it back out is the source's job. A page
+    that wraps its advert in a page-level item (a ``WebPage`` with the posting as its
+    ``mainEntity``, ``hasPart`` or ``about``) is followed the same way, whichever spelling
+    wrote it (#589).
     """
     found: list[dict] = []
     if isinstance(node, list):
         for item in node:
-            found.extend(_flatten(item))
+            found.extend(flatten(item))
     elif isinstance(node, dict):
         found.append(node)
-        for key in ("@graph", "itemListElement", "mainEntity", "item"):
+        for key in ("@graph", "itemListElement", "mainEntity", "item", "hasPart", "about"):
             if node.get(key) is not None:
-                found.extend(_flatten(node[key]))
+                found.extend(flatten(node[key]))
     return found
 
 
@@ -487,7 +490,7 @@ def extract_jsonld(html: str) -> list[dict]:
             continue
         raw = "".join(child for child in script.children if isinstance(child, str))
         try:
-            objects.extend(_flatten(json.loads(raw)))
+            objects.extend(flatten(json.loads(raw)))
         except (ValueError, TypeError):
             continue
     return objects
@@ -560,12 +563,17 @@ def _read_item(element: Element, scope_of, type_of, props_of) -> dict:
     return item
 
 
-def _outermost(root: Element, opens) -> list[Element]:
-    """Only the outermost items: a nested one is read as part of the item that holds it."""
+def _top_level(root: Element, opens, names) -> list[Element]:
+    """The items a page states on its own, as the microdata specification counts them: one
+    that is nobody's property, wherever it sits (#589). A theme that wraps the whole page in
+    a ``WebPage`` item must not hide the posting inside it; an item that *is* a property is
+    read as part of the item holding it, and so is not read twice.
+    """
     return [
         element
         for element in root.iter()
-        if opens(element) and not any(opens(parent) for parent in element.ancestors())
+        if opens(element)
+        and (not names(element) or not any(opens(parent) for parent in element.ancestors()))
     ]
 
 
@@ -583,7 +591,9 @@ def extract_microdata(html: str) -> list[dict]:
             lambda node: node.get("itemtype"),
             lambda node: node.get("itemprop").split(),
         )
-        for element in _outermost(root, lambda node: node.has("itemscope"))
+        for element in _top_level(
+            root, lambda node: node.has("itemscope"), lambda node: node.get("itemprop").split()
+        )
         if element.has("itemtype")
     ]
 
@@ -604,7 +614,9 @@ def extract_rdfa(html: str) -> list[dict]:
             lambda node: node.get("typeof"),
             lambda node: [name.split(":")[-1] for name in node.get("property").split()],
         )
-        for element in _outermost(root, lambda node: node.has("typeof"))
+        for element in _top_level(
+            root, lambda node: node.has("typeof"), lambda node: node.get("property").split()
+        )
     ]
 
 
