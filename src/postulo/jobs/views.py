@@ -36,6 +36,7 @@ from postulo.core.mixins import (
     PhoneNumbersMixin,
     WebLinksMixin,
 )
+from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query
 
@@ -710,7 +711,7 @@ class ContactCreateView(
 
     def get_initial(self) -> dict:
         initial = super().get_initial()
-        company_id = self.request.GET.get("company")
+        company_id = as_pk(self.request.GET.get("company"))
         if (
             company_id
             and Company.objects.for_user(self.request.user).filter(pk=company_id).exists()
@@ -921,7 +922,7 @@ class PostingCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, C
 
     def get_initial(self) -> dict:
         initial = super().get_initial()
-        company_id = self.request.GET.get("company")
+        company_id = as_pk(self.request.GET.get("company"))
         if (
             company_id
             and Company.objects.for_user(self.request.user).filter(pk=company_id).exists()

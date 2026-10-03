@@ -36,6 +36,7 @@ from postulo.core.mixins import (
     PageOrFragmentMixin,
 )
 from postulo.core.models import Tag
+from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query
 from postulo.jobs.history import history_of
@@ -412,7 +413,7 @@ class ApplicationBulkView(LoginRequiredMixin, View):
         """
         from postulo.core import bulk
 
-        tag = Tag.objects.for_user(request.user).filter(pk=_as_int(request.POST.get("tag"))).first()
+        tag = Tag.objects.for_user(request.user).filter(pk=as_pk(request.POST.get("tag"))).first()
         if tag is None:
             return 0
         return bulk.link_all(list(rows), "tags", tag)
@@ -436,13 +437,6 @@ class ApplicationBulkView(LoginRequiredMixin, View):
         from postulo.core.redirects import safe_next
 
         return safe_next(request, reverse("applications:list"))
-
-
-def _as_int(raw) -> int:
-    try:
-        return int(raw)
-    except (TypeError, ValueError):
-        return 0
 
 
 class ApplicationBoardView(RedirectView):
@@ -852,7 +846,7 @@ class ReminderCreateView(
     template_name = "applications/reminder_form.html"
 
     def asked_application(self):
-        application_id = self.request.GET.get("application")
+        application_id = as_pk(self.request.GET.get("application"))
         if (
             application_id
             and Application.objects.for_user(self.request.user).filter(pk=application_id).exists()
@@ -1438,6 +1432,7 @@ class SuggestionActionView(OwnedObjectMixin, View):
         application = suggestion.application
         chosen = request.POST.get("application")
         if chosen:
+            chosen = as_pk(chosen)
             application = get_object_or_404(Application.objects.for_user(request.user), pk=chosen)
         if application is None:
             messages.error(request, _("Choose which application this is about first."))

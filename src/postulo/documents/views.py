@@ -23,6 +23,7 @@ from django.views.generic import CreateView, DeleteView, DetailView, ListView, U
 from postulo.applications.models import Application
 from postulo.core.files import FILE_POLICY, serve_private_file
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
+from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
@@ -48,14 +49,6 @@ logger = logging.getLogger(__name__)
 
 #: How many of a document's versions its own page lists.
 VERSIONS_SHOWN = 10
-
-
-def _as_pk(value) -> int | None:
-    """A primary key out of something typed into a URL, or nothing at all."""
-    try:
-        return int(value)
-    except (TypeError, ValueError):
-        return None
 
 
 def handed_over(content: bytes, *, content_type: str, name: str) -> HttpResponse:
@@ -543,7 +536,7 @@ def chosen_application(request: HttpRequest):
     already draws when none is chosen (#235). Somebody else's application is no
     application either, and fills in nothing.
     """
-    application_id = _as_pk(request.GET.get("application"))
+    application_id = as_pk(request.GET.get("application"))
     if application_id is None:
         return None
     return (

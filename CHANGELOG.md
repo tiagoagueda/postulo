@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A non-numeric `?application=` or `?company=` on the new reminder, contact and posting pages is ignored, and accepting a suggestion with a non-numeric application answers 404, instead of a server error. (#409)
 - `/logs` and `/metrics` answer 401, not 500, when the bearer token holds a non-ASCII character. (#372)
 - Choosing a NACE division with a comma in its name from the *Other industries* suggestions adds that division, with its code, instead of splitting it into made-up industries. (#531)
 - *Your career*: a skill saved without a group is no longer lost from every page. The form now requires a group, *Add a skill* under a group opens it with that group chosen, and skills already without one are listed in their own block. (#617)
