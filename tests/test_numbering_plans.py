@@ -382,7 +382,9 @@ def test_the_help_and_the_error_reach_the_number_box(user):
     """#416, at the level of the rows: `tests/test_assistive_names.py` holds the field."""
     holder = user.profile
     formset = phone_numbers.formset_for(
-        holder, data=rows({"kind": "", "label": "", "number_0": "FR", "number_1": "06 12"})
+        holder,
+        asked_by=user,
+        data=rows({"kind": "", "label": "", "number_0": "FR", "number_1": "06 12"}),
     )
 
     assert not formset.is_valid()
@@ -393,7 +395,11 @@ def test_the_help_and_the_error_reach_the_number_box(user):
 
 
 def test_the_group_is_one_control_with_a_name_and_the_flag_inside_it(user):
-    html = str(phone_numbers.formset_for(user.profile, default_country="PT").forms[0]["number"])
+    html = str(
+        phone_numbers.formset_for(user.profile, default_country="PT", asked_by=user).forms[0][
+            "number"
+        ]
+    )
 
     group = re.search(r'<div class="input-group"[^>]*>', html).group(0)
     assert 'role="group"' in group and 'aria-label="Telephone number"' in group

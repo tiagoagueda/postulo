@@ -169,6 +169,53 @@ ASKED_TOO_OFTEN = ngettext_lazy(
 )
 
 
+def _too_often_sentence(too_often) -> str:
+    return str(ASKED_TOO_OFTEN % {"minutes": max(1, round(too_often.retry_after / 60))})
+
+
+def ensure_allowance(person) -> None:
+    """Raise :class:`throttle.TooOften` once this account has been told as often as it may.
+
+    Asked *before* a number is looked up and without using anything, so that a spent
+    allowance refuses a number held by somebody else and a free one in the same words:
+    the refusal itself would otherwise still be the answer (#374).
+    """
+    from . import throttle
+
+    rate = throttle.rate_for("POSTULO_NUMBER_RATE")
+    wait = throttle.spent("number-collision", person, rate)
+    if wait:
+        raise throttle.TooOften(rate, retry_after=wait)
+
+
+def refusal(person, number: str, *, exclude_pk: int | None = None, exclude_pks=()) -> str:
+    """The sentence a new or changed number is refused with, or nothing when it may be kept.
+
+    A number held elsewhere is refused with the collision sentence, which spends one of the
+    account's answers. Once they are spent every number that is new or changed is refused
+    with ``ASKED_TOO_OFTEN``, held or not. A number the row already holds is not new, and
+    one that cannot be compared (``phones.normalise`` gives nothing) collides with nothing
+    and tells nothing, so neither is asked about.
+    """
+    from . import throttle
+
+    normalised = phones.normalise(number)
+    if not normalised:
+        return ""
+    if (
+        exclude_pk is not None
+        and PhoneNumber.objects.filter(pk=exclude_pk, normalised=normalised).exists()
+    ):
+        return ""
+    try:
+        ensure_allowance(person)
+    except throttle.TooOften as too_often:
+        return _too_often_sentence(too_often)
+    if taken_elsewhere(number, exclude_pk=exclude_pk, exclude_pks=exclude_pks):
+        return collision_message(person)
+    return ""
+
+
 def collision_message(person) -> str:
     """The sentence for a number that is already here, while this account may still have it.
 
@@ -186,7 +233,7 @@ def collision_message(person) -> str:
     try:
         collision_noticed(person)
     except throttle.TooOften as too_often:
-        return str(ASKED_TOO_OFTEN % {"minutes": max(1, round(too_often.retry_after / 60))})
+        return _too_often_sentence(too_often)
     return str(ALREADY_IN_USE)
 
 
@@ -376,9 +423,9 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
     (`RowsAlreadyGone`).
     """
 
-    #: Who is answering, for the collision limit. Set by `formset_for`; `None` where a
-    #: formset is built directly, in which case the limit has nobody to charge and the
-    #: honest sentence is given.
+    #: Who is answering, for the collision limit. Set by `formset_for`, which requires it:
+    #: the allowance is one account's, and a formset with nobody to charge would spend a
+    #: shared one (#374).
     asked_by = None
 
     def clean(self) -> None:
@@ -418,8 +465,9 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
                 seen.add(normalised)
                 continue
             seen.add(normalised)
-            if taken_elsewhere(typed, exclude_pk=form.instance.pk, exclude_pks=going):
-                form.add_error("number", collision_message(self.asked_by))
+            refused = refusal(self.asked_by, typed, exclude_pk=form.instance.pk, exclude_pks=going)
+            if refused:
+                form.add_error("number", refused)
 
     def save_new(self, form, commit=True):
         # Whose the row is, set where the row is made, so that no page saving these rows
@@ -497,7 +545,7 @@ def formset_for(
     default_country: str = "",
     data=None,
     prefix: str = "phone_numbers",
-    asked_by=None,
+    asked_by,
 ):
     """The rows for one holder, ready to render or to save.
 

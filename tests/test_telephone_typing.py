@@ -1039,7 +1039,7 @@ def test_every_telephone_field_says_the_same_true_thing_under_itself(client, use
     said = str(phone_field.HELP)
     assert "starts with + says its own country, and the chooser beside it is ignored" in said
 
-    row = phone_numbers.formset_for(user.profile).forms[0]
+    row = phone_numbers.formset_for(user.profile, asked_by=user).forms[0]
     assert str(row.fields["number"].help_text) == said
     PluginPolicy.objects.create(
         plugin=PHONE_NUMBERS, person=user, state=PluginPolicy.State.FORCED_OFF

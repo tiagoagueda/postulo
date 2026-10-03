@@ -192,6 +192,7 @@ class PhoneNumbersMixin:
         kwargs = {
             "holder": holder,
             "prefix": self.phone_numbers_prefix,
+            "asked_by": self.request.user,
             "default_country": phones.default_country(getattr(profile, "language", "")),
         }
         posted = f"{self.phone_numbers_prefix}-TOTAL_FORMS" in self.request.POST

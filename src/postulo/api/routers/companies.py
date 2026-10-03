@@ -154,10 +154,14 @@ def add_contact(request, pk: int, payload: ContactIn):
     if verdict.impossible:
         raise HttpError(422, verdict.sentence(notes=True))
     number = phones.combine(number, country)
-    if number and phone_numbers.taken_elsewhere(number):
+    if phones.normalise(number):
         # The API is the surface a sweep would actually use, so it is bounded exactly as
         # the form is -- one limit, keyed on the account rather than on the token (#142).
-        raise HttpError(422, phone_numbers.collision_message(request.auth.owner))
+        # Once it is spent every number is answered alike, with the 429 and its
+        # `Retry-After`, held or not (#374).
+        phone_numbers.ensure_allowance(request.auth.owner)
+        if phone_numbers.taken_elsewhere(number):
+            raise HttpError(422, phone_numbers.collision_message(request.auth.owner))
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)

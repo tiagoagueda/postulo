@@ -136,6 +136,21 @@ def consume(action: str, who: object, rate: Rate) -> None:
         raise TooOften(rate, retry_after=max(1, rate.seconds - elapsed))
 
 
+def spent(action: str, who: object, rate: Rate) -> int:
+    """Seconds until ``who`` may use ``action`` again, or 0 while the allowance is not spent.
+
+    Asked without using anything: for an answer that is only given while there is
+    allowance left, so a caller can refuse before it looks at what the answer would be.
+    ``consume`` is what counts.
+    """
+    if not rate:
+        return 0
+    if cache.get(_key(action, who, rate), 0) < rate.times:
+        return 0
+    elapsed = int(_now()) % rate.seconds
+    return max(1, rate.seconds - elapsed)
+
+
 def rate_for(name: str) -> Rate:
     """The configured rate for one surface, by the name of its setting."""
     return parse(getattr(settings, name, ""))

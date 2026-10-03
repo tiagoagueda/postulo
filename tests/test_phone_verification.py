@@ -317,3 +317,80 @@ def test_the_format_version_moved(user):
     from postulo.core import export
 
     assert export.FORMAT_VERSION >= 27
+
+
+# ----------------------------------------------- a spent allowance answers every number alike
+
+
+def _held_by_somebody_else(django_user_model, digits="+351912345678"):
+    other = django_user_model.objects.create_user(
+        email="holder@example.org", username="holder", password="a-long-enough-password-42"
+    )
+    number_for(other.profile, other, digits)
+
+
+def _rows(*numbers):
+    data = {
+        "phone_numbers-TOTAL_FORMS": str(len(numbers)),
+        "phone_numbers-INITIAL_FORMS": "0",
+        "phone_numbers-MIN_NUM_FORMS": "0",
+        "phone_numbers-MAX_NUM_FORMS": "1000",
+    }
+    for index, number in enumerate(numbers):
+        data[f"phone_numbers-{index}-kind"] = ""
+        data[f"phone_numbers-{index}-label"] = ""
+        data[f"phone_numbers-{index}-number_0"] = ""
+        data[f"phone_numbers-{index}-number_1"] = number
+    return data
+
+
+@override_settings(POSTULO_NUMBER_RATE="1/h")
+def test_a_spent_allowance_refuses_a_taken_number_and_a_free_one_alike(user, django_user_model):
+    """Refusing only the held one is the answer: with the allowance spent, the sentence
+    changed and the verdict did not (#374)."""
+    _held_by_somebody_else(django_user_model)
+    free = phone_numbers.formset_for(user.profile, data=_rows("+351912345679"), asked_by=user)
+    assert free.is_valid(), "while there is allowance, a free number is accepted"
+    assert "already recorded" in phone_numbers.collision_message(user)
+
+    again = phone_numbers.formset_for(
+        user.profile, data=_rows("+351912345678", "+351912345679"), asked_by=user
+    )
+
+    assert not again.is_valid()
+    sentences = [list(form.errors["number"]) for form in again.forms]
+    assert sentences[0] == sentences[1]
+    assert "available again" in sentences[0][0]
+
+
+@override_settings(POSTULO_NUMBER_RATE="1/h")
+def test_the_contact_pages_charge_the_account_that_asked(
+    client, user, other_user, django_user_model
+):
+    """Nobody's collisions spend anybody else's allowance: the contact views once built their
+    formset without saying who was asking, and the allowance was one shared bucket (#374)."""
+    from django.urls import reverse
+
+    from postulo.jobs.models import Company
+
+    _held_by_somebody_else(django_user_model)
+    sentences = []
+    for person in (user, other_user):
+        company = Company.objects.create(owner=person, name="Aperture")
+        client.force_login(person)
+        response = client.post(
+            reverse("jobs:contact_create"),
+            {
+                "name": "Cave Johnson",
+                "role": "",
+                "company": company.pk,
+                "email": "",
+                "notes": "",
+                **_rows("+351912345678"),
+            },
+        )
+        assert response.status_code == 200
+        sentences.append(response.content.decode())
+
+    assert all("already recorded on this instance" in page for page in sentences)
+    assert not any("available again" in page for page in sentences)

@@ -334,7 +334,9 @@ def test_the_rows_give_a_new_number_its_owner_themselves(user, contact, held_by)
     user, the contact's owner -- and is set where the row is made, so no caller can forget
     it."""
     holder = user.profile if held_by == "profile" else contact
-    formset = phone_numbers.formset_for(holder, data=number_rows("912345678", "211111111"))
+    formset = phone_numbers.formset_for(
+        holder, data=number_rows("912345678", "211111111"), asked_by=user
+    )
 
     assert formset.is_valid(), formset.errors
     formset.save()

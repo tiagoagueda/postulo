@@ -665,10 +665,11 @@ class ProfileForm(forms.ModelForm):
     def clean_phone(self) -> str:
         typed = (self.cleaned_data.get("phone") or "").strip()
         primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None
-        if typed and phone_numbers.taken_elsewhere(
-            typed, exclude_pk=primary.pk if primary else None
-        ):
-            raise forms.ValidationError(phone_numbers.collision_message(self.instance.user))
+        refused = phone_numbers.refusal(
+            self.instance.user, typed, exclude_pk=primary.pk if primary else None
+        )
+        if refused:
+            raise forms.ValidationError(refused)
         return typed
 
     def save(self, commit: bool = True) -> Profile:
