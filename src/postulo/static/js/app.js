@@ -1386,10 +1386,29 @@
     }
   });
 
+  // Asking can cancel a submit that was already marked as sent (#518): the person answers
+  // *Stay*, and no `pageshow` comes to lift the mark, so the button they pressed would stay
+  // dead. Their next pointer or key press is proof that they stayed -- if they left, no
+  // further input reaches this page -- and it lifts the marks again, before the click it
+  // belongs to is handled.
+  var askedToStay = false;
+
+  function releaseAfterStaying() {
+    if (!askedToStay) {
+      return;
+    }
+    askedToStay = false;
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-submitted]"), releaseForm);
+  }
+
+  document.addEventListener("pointerdown", releaseAfterStaying, true);
+  document.addEventListener("keydown", releaseAfterStaying, true);
+
   window.addEventListener("beforeunload", function (event) {
     if (!anythingDirty()) {
       return;
     }
+    askedToStay = true;
     // Both spellings: `preventDefault` is what the standard says now, `returnValue` is
     // what older engines act on, and a browser that wants neither ignores both.
     event.preventDefault();

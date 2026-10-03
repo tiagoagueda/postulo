@@ -150,3 +150,32 @@ def test_skipping_with_a_key_asks_too(page: Page, live_server, captures):
     asked = asked_before_leaving(page, lambda: page.keyboard.press("j"))
 
     assert asked
+
+
+def test_answering_stay_leaves_the_discard_button_working(page: Page, live_server, captures):
+    """The double-submit guard marks the form, and the question can cancel that very send.
+
+    Answering *Stay* brings no `pageshow`, so the mark used to stay on: the button still
+    looked pressable and did nothing for the rest of the visit (#518).
+    """
+    from postulo.jobs.models import CaptureStatus
+
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/captures/{captures[-1].pk}/review/")
+    page.locator("input[name=company_name]").fill("Aperture Science")
+    button = page.get_by_role("button", name="Discard this capture", exact=True)
+
+    page.once("dialog", lambda dialog: dialog.dismiss())
+    button.click()
+    page.wait_for_timeout(300)
+    captures[-1].refresh_from_db()
+    assert captures[-1].status == CaptureStatus.PENDING
+
+    page.once("dialog", lambda dialog: dialog.accept())
+    # The key, not a click: Playwright will not press a button the guard has marked
+    # `aria-disabled`, and a pointer press only lifts the mark, it does not also click.
+    button.focus()
+    page.keyboard.press("Enter")
+    page.wait_for_timeout(1500)
+    captures[-1].refresh_from_db()
+    assert captures[-1].status == CaptureStatus.DISCARDED
