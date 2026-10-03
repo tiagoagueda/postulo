@@ -21,6 +21,8 @@ from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import preferences
+
 from .base import FieldSpec, SyncReport
 from .models import Connection
 from .policy import allows
@@ -86,6 +88,11 @@ def sync_connection(connection: Connection) -> SyncReport:
     is in the cache, which is a table of the same database, so a caller inside a
     transaction would not make it visible to anyone else until it ended; *Sync now* is
     therefore not atomic.
+
+    Run as its owner, in their language and time zone, whoever started it: *Sync now* is
+    inside their request and the scheduler is not, and what the run writes -- a timeline
+    entry, a reminder naming an hour, a note, the report kept on the connection -- must not
+    depend on which one it was (#335).
     """
     key = lease_key(connection)
     if not cache.add(key, timezone.now().isoformat(), LEASE_SECONDS):
@@ -94,7 +101,8 @@ def sync_connection(connection: Connection) -> SyncReport:
             already_running=True,
         )
     try:
-        return _run_connection(connection)
+        with preferences.as_person(connection.owner):
+            return _run_connection(connection)
     finally:
         cache.delete(key)
 

@@ -397,3 +397,93 @@ def test_the_sync_now_flash_is_worded_in_the_requests_language(client, user, mon
         headers={"Accept-Language": "de"},
     )
     assert "[de] 1 pushed" in response.content.decode()
+
+
+# ------------------------------------------------- as the person it is for (#335)
+
+
+class MovingSync(MirrorSync):
+    """A calendar sync that moves an interview and words a note, as the DAV plugin does."""
+
+    name = "mover"
+    label = "Mover"
+    interview_id: ClassVar[int] = 0
+    moved_to: ClassVar[dt.datetime | None] = None
+
+    def sync(self, connection, config):
+        from django.utils.translation import gettext
+
+        from postulo.applications.models import Interview
+        from postulo.applications.services import reschedule_interview
+
+        interview = Interview.objects.get(pk=MovingSync.interview_id)
+        end = MovingSync.moved_to + dt.timedelta(hours=1)
+        reschedule_interview(interview, starts_at=MovingSync.moved_to, ends_at=end)
+        report = SyncReport()
+        report.notes.append(gettext("Recorded what you sent."))
+        return report
+
+
+@pytest.fixture
+def an_owner_far_from_the_server(user, settings):
+    """A French reader in New York, on a server in Paris, with an interview to be moved."""
+    from postulo.applications.models import Application, Status
+    from postulo.applications.services import schedule_interview
+    from postulo.jobs.models import JobPosting
+
+    settings.TIME_ZONE = "Europe/Paris"
+    user.profile.language = "fr-FR"
+    user.profile.time_zone = "America/New_York"
+    user.profile.save()
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+    interview = schedule_interview(
+        application, kind="video", starts_at=timezone.now() + dt.timedelta(days=30)
+    )
+    MovingSync.interview_id = interview.pk
+    MovingSync.moved_to = dt.datetime(2027, 1, 12, 14, 0, tzinfo=dt.UTC)
+    registry.register_builtin("sync", MovingSync)
+    yield interview
+    registry.unregister_builtin("sync", MovingSync)
+
+
+def moving_connection(user):
+    connection = a_sync(user)
+    connection.plugin = "mover"
+    connection.save()
+    return connection
+
+
+def what_the_run_wrote(interview, connection):
+    from django.utils import translation
+
+    interview.refresh_from_db()
+    connection.refresh_from_db()
+    with translation.override("fr-FR"):
+        note = translation.gettext("Recorded what you sent.")
+    # 14:00 UTC is 09:00 in New York and 15:00 in Paris.
+    assert "09:00" in interview.reminder.summary and "15:00" not in interview.reminder.summary
+    assert note != "Recorded what you sent.", "the catalogue has it"
+    assert note in connection.last_summary
+
+
+def test_a_scheduled_sync_runs_in_its_owners_language_and_zone(user, an_owner_far_from_the_server):
+    from django.utils import translation
+
+    connection = moving_connection(user)
+    translation.activate("en-gb")
+    timezone.deactivate()
+
+    syncing.run_syncs()
+
+    what_the_run_wrote(an_owner_far_from_the_server, connection)
+
+
+def test_sync_now_writes_the_same_text_as_the_scheduler(client, user, an_owner_far_from_the_server):
+    connection = moving_connection(user)
+    client.force_login(user)
+
+    client.post(reverse("connections:sync_now", args=[connection.pk]))
+
+    what_the_run_wrote(an_owner_far_from_the_server, connection)

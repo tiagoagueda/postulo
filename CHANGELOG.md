@@ -256,6 +256,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+A scheduled sync now runs in its owner's language and time zone, like *Sync now*, so the reminders, timeline entries, notes and report it writes name the owner's hour and read in their language. (#335)
 With a background worker, slow work (reports, frozen letters, exports, captures) is done in its owner's language and time zone instead of the server's, so a report covers the period the page showed and a letter carries the owner's date. (#383)
 A webhook now receives a reminder that was moved and fell due again, a listing whose closing date moved, and an application that went quiet again, instead of dropping them as repeats; a long quiet or closing list no longer overflows the key column on PostgreSQL. (#413)
 Status, interview and offer notifications are sent after the change is committed, so a notifier's network call no longer holds the database write lock, and a change that is rolled back is no longer announced. (#578)
