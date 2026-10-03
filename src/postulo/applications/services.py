@@ -48,6 +48,7 @@ def record_event(
     to_status: str = "",
     actor: str = "",
     end_reason: str = "",
+    interview: Interview | None = None,
 ) -> ApplicationEvent:
     """Append one entry to an application's timeline.
 
@@ -67,6 +68,7 @@ def record_event(
         to_status=to_status,
         actor=actor,
         end_reason=end_reason,
+        interview=interview,
     )
 
 
@@ -537,6 +539,7 @@ def settle_interview(
             body=note,
             occurred_at=interview.starts_at,
             actor=actor,
+            interview=interview,
         )
         _catch_up(application, interview.kind, occurred_at=interview.starts_at, actor=actor)
     elif outcome == InterviewOutcome.CANCELLED:
@@ -549,15 +552,17 @@ def settle_interview(
             ),
             body=note,
             actor=actor,
+            interview=interview,
         )
     else:
         record_event(
             application,
-            kind=EventKind.INTERVIEW,
+            kind=EventKind.INTERVIEW_NO_SHOW,
             summary=str(_no_show_sentence(interview.kind, kind)),
             body=note,
             occurred_at=interview.starts_at,
             actor=actor,
+            interview=interview,
         )
 
     reminder = interview.reminder

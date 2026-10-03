@@ -257,6 +257,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- *Interviews attended* (Insights and the employment-office report) no longer counts a no-show, nor a held interview that was moved or settled again; a no-show is its own kind of timeline entry. (#448)
 - Editing an interview no longer drops a contact who has since moved company: they stay on the form, with their company beside the name, until you untick them. (#443)
 - API: a refused `POST`/`PATCH` of a company or `PATCH` of an interview (bad identifier, contact from another company) no longer keeps the changes it made before the refusal. (#435)
 - API: a time sent without an offset (`starts_at`, `due_at`, `occurred_at`, `updated_since`) is a 422 naming the field instead of a 500 or a reminder moved into the server's zone; `/me` now says the owner's `time_zone`. (#567)

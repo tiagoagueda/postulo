@@ -28,6 +28,7 @@ from postulo.applications.services import (
     record_event,
     reschedule_interview,
     schedule_interview,
+    settle_interview,
 )
 from postulo.core import csv_import
 from postulo.jobs.models import Company, JobPosting, SalaryPeriod
@@ -305,3 +306,71 @@ def test_the_salary_column_sorts_within_a_currency_by_the_year(user, company):
     assert list(ordered) == ["Hourly", "Yearly", "Pounds"], (
         "an hourly rate is not below every annual one, and currencies do not mix"
     )
+
+
+# ------------------------------------------ 4. what settling wrote is one interview (#448)
+
+
+def held_interview(user, company):
+    application = sent(user, company, days_ago=20)
+    interview = schedule_interview(
+        application,
+        kind=InterviewKind.VIDEO,
+        starts_at=(timezone.now() - dt.timedelta(days=2)).replace(
+            minute=0, second=0, microsecond=0
+        ),
+        remind=False,
+    )
+    assert interview.outcome == InterviewOutcome.DONE
+    return interview
+
+
+def interviews_counted(user) -> tuple[int, int, int]:
+    from postulo.applications import reports
+
+    today = timezone.localdate()
+    period = reports.Period(today - dt.timedelta(days=60), today)
+    insights = analytics.build(user)
+    return (
+        analytics.interviews_held(user),
+        reports.build(user, period).happened.interviews,
+        insights.interviewed,
+    )
+
+
+def test_a_no_show_is_not_an_interview_attended(user, company):
+    application = sent(user, company, days_ago=20)
+    interview = schedule_interview(
+        application,
+        kind=InterviewKind.VIDEO,
+        starts_at=timezone.now() + dt.timedelta(days=2),
+        remind=False,
+    )
+    settle_interview(interview, InterviewOutcome.NO_SHOW)
+
+    assert application.events.filter(kind=EventKind.INTERVIEW_NO_SHOW, interview=interview).exists()
+    assert not application.events.filter(kind=EventKind.INTERVIEW).exists()
+    assert interviews_counted(user) == (0, 0, 0)
+
+
+def test_moving_a_held_interview_does_not_count_it_twice(user, company):
+    interview = held_interview(user, company)
+    assert interviews_counted(user) == (1, 1, 1)
+
+    later = interview.starts_at + dt.timedelta(hours=1)
+    reschedule_interview(interview, starts_at=later, ends_at=later + dt.timedelta(hours=1))
+
+    assert interviews_counted(user) == (1, 1, 1)
+
+
+def test_settling_a_held_interview_again_replaces_it_in_the_count(user, company):
+    interview = held_interview(user, company)
+
+    settle_interview(interview, InterviewOutcome.NO_SHOW)
+    assert interviews_counted(user) == (0, 0, 0)
+
+    settle_interview(interview, InterviewOutcome.CANCELLED)
+    assert interviews_counted(user) == (0, 0, 0)
+
+    settle_interview(interview, InterviewOutcome.DONE)
+    assert interviews_counted(user) == (1, 1, 1)

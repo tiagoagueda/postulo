@@ -1065,14 +1065,18 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                         ]
                     )
 
+                tied_events: list[tuple[ApplicationEvent, int]] = []
                 for event_entry in event_entries:
                     event_entry.pop("id", None)
                     event_entry.pop("created_at", None)
+                    tied_to = event_entry.pop("interview_id", None)
                     event_entry["occurred_at"] = _dt(event_entry.get("occurred_at"))
-                    ApplicationEvent.objects.create(
+                    event = ApplicationEvent.objects.create(
                         application=application,
                         **_carried(event_entry, EVENT_FIELDS, report, "A timeline event"),
                     )
+                    if tied_to is not None:
+                        tied_events.append((event, tied_to))
                     report.events += 1
 
                 reminders: dict[int, Reminder] = {}
@@ -1087,8 +1091,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     )
                     report.reminders += 1
 
+                imported_interviews: dict[int, Interview] = {}
                 for interview_entry in interview_entries:
-                    interview_entry.pop("id", None)
+                    old_interview_id = interview_entry.pop("id", None)
                     interview_entry.pop("created_at", None)
                     contact_ids = interview_entry.pop("contact_ids", [])
                     reminder_id = interview_entry.pop("reminder_id", None)
@@ -1117,7 +1122,12 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                         **_carried(interview_entry, INTERVIEW_FIELDS, report, "An interview"),
                     )
                     interview.contacts.set([contacts[i] for i in contact_ids if i in contacts])
+                    imported_interviews[old_interview_id] = interview
                     report.interviews += 1
+                for event, tied_to in tied_events:
+                    if tied_to in imported_interviews:
+                        event.interview = imported_interviews[tied_to]
+                        event.save(update_fields=["interview"])
                 for offer_entry in offer_entries:
                     offer_entry.pop("id", None)
                     offer_entry.pop("created_at", None)

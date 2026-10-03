@@ -88,7 +88,9 @@ logger = logging.getLogger(__name__)
 #: 32 added ``sent_upload_ids`` on an application, the files it went out with, and
 #: ``sent_to`` on a sent document, the words saying where it went; an archive without them
 #: restores both empty, as they were (#469).
-FORMAT_VERSION = 32
+#: 33 added ``interview_id`` on an event: the interview settling wrote it for, by its id in
+#: this file; an archive without it restores every entry untied (#448).
+FORMAT_VERSION = 33
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -265,6 +267,8 @@ EVENT_FIELDS = (
     # Why the application ended, on the entry that ended it (#239). Here rather than on
     # the application because here is where it is: the log is the account of what happened.
     "end_reason",
+    # The interview settling wrote it for, by its id in this file (#448).
+    "interview_id",
     "actor",
     "created_at",
 )

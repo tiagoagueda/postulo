@@ -243,9 +243,15 @@ def interviews_held(user, *, start=None, end=None) -> int:
     one when it belongs to the same application and is dated to the same moment, which is
     exactly what settling writes -- it takes `occurred_at` from the interview's own start.
     Scheduling writes an *interview scheduled* entry, a different kind, not counted here.
+
+    An entry settling wrote is tied to its interview, and is counted through the diary row
+    alone (#448): moving the interview or settling it again changes the count once, and
+    the entry keeps what was written. Nobody showing up is an entry of its own kind.
     """
     diary = Interview.objects.for_user(user).filter(outcome=InterviewOutcome.DONE)
-    entries = ApplicationEvent.objects.for_user(user).filter(kind=EventKind.INTERVIEW)
+    entries = ApplicationEvent.objects.for_user(user).filter(
+        kind=EventKind.INTERVIEW, interview__isnull=True
+    )
     if start is not None:
         diary = diary.filter(starts_at__date__gte=start)
         entries = entries.filter(occurred_at__date__gte=start)
@@ -265,7 +271,8 @@ def _first_interview_days(applications) -> dict[int, int]:
     """Days from applying to the first interview, per application.
 
     Read from the log: an interview recorded by hand years ago and one settled through
-    the diary both leave an *interview* entry dated when it happened.
+    the diary both leave an *interview* entry dated when it happened. One tied to an
+    interview that has since been settled some other way does not count (#448).
     """
     applied_at = {
         application.pk: application.applied_at
@@ -276,6 +283,7 @@ def _first_interview_days(applications) -> dict[int, int]:
         return {}
     first_interview = (
         ApplicationEvent.objects.filter(application_id__in=applied_at, kind=EventKind.INTERVIEW)
+        .filter(Q(interview__isnull=True) | Q(interview__outcome=InterviewOutcome.DONE))
         .values("application_id")
         .annotate(first=Min("occurred_at"))
     )

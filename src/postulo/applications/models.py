@@ -531,6 +531,7 @@ class EventKind(models.TextChoices):
     INTERVIEW = "interview", _("Interview")
     INTERVIEW_SCHEDULED = "interview_scheduled", _("Interview scheduled")
     INTERVIEW_CANCELLED = "interview_cancelled", _("Interview cancelled")
+    INTERVIEW_NO_SHOW = "interview_no_show", _("Interview no-show")
     ASSESSMENT = "assessment", _("Assessment or test")
     OFFER = "offer", _("Offer received")
     REJECTION = "rejection", _("Rejection received")
@@ -541,7 +542,12 @@ class EventKind(models.TextChoices):
 #: Kinds the record writes for itself. Offering them to be typed would let the log
 #: contradict the field or the interview they describe.
 SYSTEM_EVENT_KINDS = frozenset(
-    {EventKind.STATUS_CHANGE, EventKind.INTERVIEW_SCHEDULED, EventKind.INTERVIEW_CANCELLED}
+    {
+        EventKind.STATUS_CHANGE,
+        EventKind.INTERVIEW_SCHEDULED,
+        EventKind.INTERVIEW_CANCELLED,
+        EventKind.INTERVIEW_NO_SHOW,
+    }
 )
 
 
@@ -580,6 +586,18 @@ class ApplicationEvent(models.Model):
     #: because an employer that says why is the exception. The note that goes with *Other*
     #: is this entry's own ``body``.
     end_reason = models.CharField(_("why it ended"), max_length=20, choices=EndReason, blank=True)
+    #: The interview this entry was written for, when settling one wrote it (#448). What the
+    #: counters go by instead of the moment: an interview that is moved or settled again
+    #: keeps what was logged, and is still one interview. Cleared if the interview is
+    #: deleted, so the entry stays in the log.
+    interview = models.ForeignKey(
+        "applications.Interview",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="events",
+        verbose_name=_("interview"),
+    )
 
     #: Who wrote it when it was not the person at the keyboard: "API token laptop-agent".
     #: Blank means the person themselves, which is nearly always.

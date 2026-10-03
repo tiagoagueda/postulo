@@ -167,10 +167,10 @@ def test_cancelling_records_it_and_settles_the_reminder(application):
     assert not Interview.objects.for_user(application.owner).upcoming().exists()
 
 
-def test_a_no_show_is_an_interview_entry_that_moves_nothing(application):
+def test_a_no_show_is_an_entry_of_its_own_kind_that_moves_nothing(application):
     interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(1))
     settle_interview(interview, InterviewOutcome.NO_SHOW)
-    entry = application.events.get(kind=EventKind.INTERVIEW)
+    entry = application.events.get(kind=EventKind.INTERVIEW_NO_SHOW)
     assert entry.summary == "Nobody showed up for the video call"
     application.refresh_from_db()
     assert application.status == Status.APPLIED
