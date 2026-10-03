@@ -260,6 +260,7 @@ Fixed
 Fixed
 - Fixed
 - A tag or an industry is its name, not an ASCII slug: `C#` and `C++` are two tags, names in Greek, Cyrillic or Japanese are kept, a renamed tag answers to its new name, and none of these is a 500 on the forms, the API, the spreadsheet import or an archive. Upgrading re-derives the slugs and merges industries left with one name. (#356)
+- The open list of every select is drawn in the colours of its box, in the light and the dark theme, including the column filters, the board's status and the country in a group. (#655)
 - The dashboard's kept figures follow reminders, interviews, the clock and the time zone, so *Quiet*, *In the diary*, the interview kinds and the months no longer disagree with the widgets beside them. (#396)
 - A page is never drawn in a language the instance does not offer or nobody has begun translating: a person with no language of their own, or whose language was withdrawn, reads the instance default, and a visitor the browser's language only where it is offered. (#398)
 - The language picker and the bars in *Server settings* no longer show languages as complete that are not: the progress file is refreshed, and CI now fails when it is stale. (#495)

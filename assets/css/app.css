@@ -487,6 +487,23 @@
   }
 }
 
+/*
+ * The open list of every select is the colour of the box it opens from (#655). Basecoat
+ * paints a list only for a select inside `.field` and for `select.select`, in the system's
+ * `Canvas`, which is the browser's near-black in the dark theme and not the box's ink-950;
+ * every other select -- a table's column filter, a board card's status, the country in a
+ * group -- left its list to the platform. One rule for all of them, in `utilities` so that
+ * Basecoat's own, in `components`, does not win where it reaches. A group's select is
+ * transparent over the group and says its text colour for itself, so its list does not
+ * inherit that. Forced colours keep the system pair.
+ */
+@layer utilities {
+  select option,
+  select optgroup {
+    @apply bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-100;
+  }
+}
+
 /* --------------------------------------------------------- component layer */
 
 /*
@@ -2128,6 +2145,14 @@ html {
  * both background colours, which the theme repaints to `Canvas`; the bars opt their value
  * out of the repaint and take `Highlight`, with a `CanvasText` border round the track, so
  * the funnel and the report's cadence keep their chart as well as their numbers. */
+@media (forced-colors: active) {
+  select option,
+  select optgroup {
+    background-color: Canvas;
+    color: CanvasText;
+  }
+}
+
 @media (forced-colors: active) {
   .menu-item,
   .nav-link,

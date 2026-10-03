@@ -190,3 +190,18 @@ def test_the_translation_bar_is_painted_in_system_colours_when_forced():
         for part in ("reviewed", "draft", "untranslated")
     }
     assert len(set(painted.values())) == 3, painted
+
+
+# ----------------------------------------------------------------- a select's list
+
+
+def test_a_selects_list_is_painted_from_the_tokens_of_its_box_and_clears_four_and_a_half():
+    """The open list of every select is the colour of the box it opens from (#655)."""
+    rule = CSS[CSS.index("select option,") : CSS.index("}", CSS.index("select option,"))]
+    assert "bg-white text-ink-900 dark:bg-ink-950 dark:text-ink-100" in rule
+    box = CSS[CSS.index("input:where(") : CSS.index("}", CSS.index("input:where("))]
+    assert "bg-white" in box and "dark:bg-ink-950" in box, "the same ground as the closed box"
+
+    light, dark = tokens()
+    assert contrast(light["ink-900"], 1.0) >= 4.5, "light: ink on white"
+    assert contrast(dark["ink-100"], dark["ink-950"]) >= 4.5, "dark: ink on its near-black"
