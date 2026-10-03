@@ -90,6 +90,7 @@ from .common import (
     _split_skills,
     _text,
 )
+from .markup import _plain
 
 #: Kept as a name because the interface and the tests use it, but the number belongs to
 #: the importer kind now: every importer gets the same cap, not just this one.
@@ -401,7 +402,7 @@ def _read_experience(learner, record: Record) -> None:
                 "location": location,
                 "start_date": _date(period, "From") if period is not None else None,
                 "end_date": _date(period, "To") if period is not None else None,
-                "summary": _text(entry, "Activities"),
+                "summary": _plain(_text(entry, "Activities", keep_lines=True)),
             }
         )
 
@@ -433,7 +434,7 @@ def _read_education(learner, record: Record) -> None:
                 "start_date": _date(period, "From") if period is not None else None,
                 "end_date": _date(period, "To") if period is not None else None,
                 "grade": _text(entry, "Level", "Label"),
-                "highlights": _text(entry, "Activities"),
+                "highlights": _plain(_text(entry, "Activities", keep_lines=True)),
             }
         )
 
@@ -467,7 +468,7 @@ def _read_skills(learner, record: Record) -> None:
         prose = _text(block, "Description", "Label", keep_lines=True) or _text(
             block, "Description", keep_lines=True
         )
-        lines = _split_skills(prose)
+        lines = _split_skills(_plain(prose))
         if lines:
             # `str()` now rather than a lazy string: what is read is held in the session
             # between the review page and the confirmation, and a session is JSON.
@@ -482,7 +483,10 @@ def _read_achievements(learner, record: Record) -> None:
     for entry in entries:
         project = _project_from(
             _text(entry, "Title", "Label") or _text(entry, "Title"),
-            _text(entry, "Description", "Label") or _text(entry, "Description"),
+            _plain(
+                _text(entry, "Description", "Label", keep_lines=True)
+                or _text(entry, "Description", keep_lines=True)
+            ),
         )
         if project:
             record.projects.append(project)
@@ -684,7 +688,7 @@ def _read_json_experience(learner: dict, record: Record) -> None:
                 "location": _json_place(employer),
                 "start_date": _json_date(period, "From"),
                 "end_date": _json_date(period, "To"),
-                "summary": _json_text(entry, "Activities"),
+                "summary": _plain(_json_text(entry, "Activities", keep_lines=True)),
             }
         )
 
@@ -708,7 +712,7 @@ def _read_json_education(learner: dict, record: Record) -> None:
                 "start_date": _json_date(period, "From"),
                 "end_date": _json_date(period, "To"),
                 "grade": _json_text(entry, "Level"),
-                "highlights": _json_text(entry, "Activities"),
+                "highlights": _plain(_json_text(entry, "Activities", keep_lines=True)),
             }
         )
 
@@ -747,7 +751,7 @@ def _read_json_skills(learner: dict, record: Record) -> None:
         block = _obj(skills.get(heading))
         if block is None:
             continue
-        lines = _split_skills(_json_text(block, "Description", keep_lines=True))
+        lines = _split_skills(_plain(_json_text(block, "Description", keep_lines=True)))
         if lines:
             record.skill_groups.append({"name": _heading(label, record.locale), "skills": lines})
 
@@ -757,7 +761,9 @@ def _read_json_achievements(learner: dict, record: Record) -> None:
     if not _readable(record, block, _("Achievements")):
         return
     for entry in _rows(block):
-        project = _project_from(_json_text(entry, "Title"), _json_text(entry, "Description"))
+        project = _project_from(
+            _json_text(entry, "Title"), _plain(_json_text(entry, "Description", keep_lines=True))
+        )
         if project:
             record.projects.append(project)
 

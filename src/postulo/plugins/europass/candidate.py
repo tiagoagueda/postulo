@@ -35,7 +35,6 @@ name to put beside it without guessing one.
 from __future__ import annotations
 
 import re
-from html.parser import HTMLParser
 
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
@@ -59,6 +58,7 @@ from .common import (
     _split_skills,
     _text,
 )
+from .markup import _plain
 
 #: The namespace a Europass Candidate is in, less its version. Matched as a prefix, so the
 #: next version reads too; a ``Candidate`` from anywhere else is not a Europass CV.
@@ -212,56 +212,6 @@ def _raw(element, *names: str) -> str:
         return ""
     found = _find(element, *names) if names else element
     return (found.text or "") if found is not None else ""
-
-
-class _Words(HTMLParser):
-    """The words in a fragment of HTML, with its paragraphs and list items kept apart."""
-
-    BREAKS = frozenset(
-        {"br", "p", "div", "li", "ul", "ol", "tr", "h1", "h2", "h3", "h4", "h5", "h6"}
-    )
-    SILENT = frozenset({"script", "style"})
-
-    def __init__(self):
-        super().__init__(convert_charrefs=True)
-        self.parts: list[str] = []
-        self.silent = 0
-
-    def handle_starttag(self, tag, attrs):
-        if tag in self.SILENT:
-            self.silent += 1
-        elif tag in self.BREAKS:
-            self.parts.append("\n")
-
-    def handle_endtag(self, tag):
-        if tag in self.SILENT:
-            self.silent = max(0, self.silent - 1)
-        elif tag in self.BREAKS:
-            self.parts.append("\n")
-
-    def handle_data(self, data):
-        if not self.silent:
-            self.parts.append(data)
-
-
-def _plain(value: str) -> str:
-    """Text the editor wrote as HTML, as lines of text.
-
-    The long fields -- a job's description, what a course covered -- hold HTML, escaped
-    inside the XML, and a career record holds plain text: markup kept as it came would
-    print on a CV as angle brackets. Paragraphs and list items stay on lines of their own;
-    the markup goes. It is read by the standard library's tokenizer, which runs nothing and
-    fetches nothing.
-    """
-    if not value:
-        return ""
-    if "<" in value:
-        words = _Words()
-        words.feed(value)
-        words.close()
-        value = "".join(words.parts)
-    lines = (" ".join(line.split()) for line in value.splitlines())
-    return "\n".join(line for line in lines if line)
 
 
 def _date(period, which: str):

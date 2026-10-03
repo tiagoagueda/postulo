@@ -133,6 +133,64 @@ def test_skills_are_split_on_both_semicolons_and_lines():
     assert groups["Organisational"] == ["Mentoring", "Planning"]
 
 
+MARKUP = (
+    "<p>Evaluation of support measures<br />and young people</p>"
+    "<ul><li>Mentoring</li><li>Planning</li></ul>"
+)
+LIST = "<ul><li>Mentoring</li><li>Planning</li></ul>"
+
+
+def _assert_plain(record):
+    """What the editor wrote as HTML arrives as lines, and a listed block as one skill each."""
+    assert record.experience[0]["summary"] == (
+        "Evaluation of support measures\nand young people\nMentoring\nPlanning"
+    )
+    assert record.education[0]["highlights"] == record.experience[0]["summary"]
+    assert record.projects[0]["summary"] == record.experience[0]["summary"]
+    groups = {group["name"]: group["skills"] for group in record.skill_groups}
+    assert groups["Organisational"] == ["Mentoring", "Planning"]
+    assert groups["Communication"] == ["Mentoring", "Planning"]
+    for text in (
+        record.experience[0]["summary"],
+        record.education[0]["highlights"],
+        record.projects[0]["summary"],
+        *(skill for group in groups.values() for skill in group),
+    ):
+        assert "<" not in text and ">" not in text
+
+
+def test_the_xml_reader_turns_the_editors_markup_into_lines():
+    """Cedefop's editor wrote escaped HTML into these fields, as the Candidate one does (#563)."""
+    escaped = MARKUP.replace("<", "&lt;").replace(">", "&gt;")
+    listed = LIST.replace("<", "&lt;").replace(">", "&gt;")
+    data = (
+        FIXTURE.read_text(encoding="utf-8")
+        .replace("Built the thing. Kept it running.", escaped)
+        .replace("Distributed systems.", escaped)
+        .replace("Maintainer of a thing.", escaped)
+        .replace("<Label>Mentoring\nPlanning</Label>", f"<Label>{listed}</Label>")
+        .replace(
+            "</Organisational>",
+            f"</Organisational><Communication><Description><Label>{listed}</Label>"
+            "</Description></Communication>",
+        )
+    )
+
+    _assert_plain(europass.read(data.encode()))
+
+
+def test_the_json_reader_turns_the_editors_markup_into_lines():
+    document = json.loads(JSON_FIXTURE.read_text(encoding="utf-8"))
+    learner = document["SkillsPassport"]["LearnerInfo"]
+    learner["WorkExperience"][0]["Activities"] = MARKUP
+    learner["Education"][0]["Activities"] = MARKUP
+    learner["Achievement"][0]["Description"] = MARKUP
+    learner["Skills"]["Organisational"] = {"Description": LIST}
+    learner["Skills"]["Communication"] = {"Description": LIST}
+
+    _assert_plain(europass.read(json.dumps(document).encode()))
+
+
 def test_a_namespace_nobody_has_seen_still_reads():
     """Europass has been through several. Matching the namespace reads exactly one."""
     data = FIXTURE.read_bytes().replace(
