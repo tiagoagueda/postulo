@@ -576,6 +576,25 @@ def test_a_section_with_nowhere_to_go_is_named_rather_than_dropped():
     ]
 
 
+def test_a_skill_heading_follows_the_language_of_the_file_not_the_interface(monkeypatch):
+    from django.utils import translation
+    from django.utils.functional import lazy
+
+    label = lazy(lambda: translation.get_language(), str)()
+    monkeypatch.setattr(candidate, "DIGITAL", label)
+    monkeypatch.setattr(candidate, "JOB_RELATED", label)
+    monkeypatch.setattr(candidate, "SKILL_SECTIONS", (("Others", "Other", label),))
+    data = CANDIDATE.read_bytes().replace(b'languageCode="en"', b'languageCode="pt"')
+    data = data.replace(b"<DigitalSkillsGroup>", b"<DigitalSkillsGroup><Title></Title>", 1)
+
+    with translation.override("en"):
+        record = europass.read(data)
+
+    names = [group["name"] for group in record.skill_groups]
+    assert names
+    assert set(names) == {"pt-pt"}
+
+
 def test_a_career_in_two_languages_reads_the_first_and_says_so():
     data = CANDIDATE.read_bytes().replace(
         b"</Candidate>",

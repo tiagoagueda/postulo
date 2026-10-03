@@ -48,6 +48,7 @@ from .common import (
     CEFR_PARTS,
     _all,
     _find,
+    _heading,
     _local,
     _locale,
     _lowest,
@@ -573,7 +574,7 @@ def _read_skills(profile, record: Record) -> None:
             ]
             if skills:
                 # A group the person titled keeps its title: it is their heading.
-                name = _text(group, "Title") or str(DIGITAL)
+                name = _text(group, "Title") or _heading(DIGITAL, record.locale)
                 record.skill_groups.append({"name": name, "skills": skills[:40]})
 
     for section, item, label in SKILL_SECTIONS:
@@ -585,7 +586,9 @@ def _read_skills(profile, record: Record) -> None:
             title = _text(entry, "Title")
             skills.extend([title] if title else _split_skills(_plain(_raw(entry, "Description"))))
         if skills:
-            record.skill_groups.append({"name": str(label), "skills": skills[:40]})
+            record.skill_groups.append(
+                {"name": _heading(label, record.locale), "skills": skills[:40]}
+            )
 
     # The crosswalk puts the old job-related skills here: prose in the summary, and any
     # competency that is not a language.
@@ -599,7 +602,9 @@ def _read_skills(profile, record: Record) -> None:
             if name:
                 skills.append(name)
         if skills:
-            record.skill_groups.append({"name": str(JOB_RELATED), "skills": skills[:40]})
+            record.skill_groups.append(
+                {"name": _heading(JOB_RELATED, record.locale), "skills": skills[:40]}
+            )
 
 
 def _read_projects(profile, record: Record) -> None:

@@ -15,9 +15,10 @@ import datetime as dt
 import re
 
 from django.core.exceptions import ValidationError
+from django.utils import translation
 
 from postulo.accounts import identifiers
-from postulo.plugins.api import is_language_tag, language_tag
+from postulo.plugins.api import is_language_tag, language_match, language_tag
 
 #: CEFR levels as Europass writes them, mapped onto Postulo's own.
 CEFR = {"A1": "a1", "A2": "a2", "B1": "b1", "B2": "b2", "C1": "c1", "C2": "c2"}
@@ -102,6 +103,21 @@ def _locale(value) -> str:
     """
     text = str(value or "")
     return language_tag(text) if is_language_tag(text) else ""
+
+
+def _heading(label, locale: str) -> str:
+    """A heading the plugin writes onto a CV, in the language the file says the CV is in.
+
+    It is a heading on somebody's CV, so it follows the record and not the person's interface:
+    a Portuguese file read from an English page still gets Portuguese headings, and the other
+    way round. The language is the one Postulo offers that is closest to the file's, and the
+    active one when the file states none or none is close.
+    """
+    language = language_match(locale) if locale else ""
+    if not language:
+        return str(label)
+    with translation.override(language):
+        return str(label)
 
 
 def _project_from(title: str, description: str) -> dict | None:

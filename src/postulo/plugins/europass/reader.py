@@ -76,6 +76,7 @@ from .common import (
     CEFR_PARTS,
     _all,
     _find,
+    _heading,
     _local,
     _locale,
     _lowest,
@@ -465,7 +466,9 @@ def _read_skills(learner, record: Record) -> None:
         if lines:
             # `str()` now rather than a lazy string: what is read is held in the session
             # between the review page and the confirmation, and a session is JSON.
-            record.skill_groups.append({"name": str(label), "skills": lines[:40]})
+            record.skill_groups.append(
+                {"name": _heading(label, record.locale), "skills": lines[:40]}
+            )
 
 
 def _read_achievements(learner, record: Record) -> None:
@@ -735,7 +738,9 @@ def _read_json_skills(learner: dict, record: Record) -> None:
             continue
         lines = _split_skills(_json_text(block, "Description", keep_lines=True))
         if lines:
-            record.skill_groups.append({"name": str(label), "skills": lines[:40]})
+            record.skill_groups.append(
+                {"name": _heading(label, record.locale), "skills": lines[:40]}
+            )
 
 
 def _read_json_achievements(learner: dict, record: Record) -> None:

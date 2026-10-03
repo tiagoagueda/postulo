@@ -683,6 +683,45 @@ def test_a_skill_heading_is_written_in_the_language_being_read():
     assert type(record.skill_groups[0]["name"]) is str
 
 
+def _headings_that_name_their_language(monkeypatch):
+    """Swap the labels for ones that answer with the language they are resolved in.
+
+    The .mo files are built at packaging time and the suite runs without them, so the
+    Portuguese words cannot be asserted; which language was active when the heading was
+    resolved can.
+    """
+    from django.utils import translation
+    from django.utils.functional import lazy
+
+    label = lazy(lambda: translation.get_language(), str)()
+    monkeypatch.setattr(europass, "SKILL_HEADINGS", (("JobRelated", label),))
+
+
+def test_a_skill_heading_follows_the_language_of_the_file_not_the_interface(monkeypatch):
+    from django.utils import translation
+
+    _headings_that_name_their_language(monkeypatch)
+    data = NO_LEVELS.replace(b'locale="pt-PT"', b'locale="pt"')
+
+    with translation.override("en"):
+        record = europass.read(data)
+
+    assert record.skill_groups[0]["name"] == "pt-pt"
+
+
+def test_a_skill_heading_is_in_the_active_language_when_the_file_states_none(monkeypatch):
+    from django.utils import translation
+
+    _headings_that_name_their_language(monkeypatch)
+    data = NO_LEVELS.replace(b' locale="pt-PT"', b"")
+
+    with translation.override("fr-FR"):
+        record = europass.read(data)
+
+    assert record.locale == ""
+    assert record.skill_groups[0]["name"] == "fr-fr"
+
+
 def test_the_review_page_says_that_no_level_will_be_claimed(client, user):
     client.force_login(user)
     url = reverse("resume:europass_import")
