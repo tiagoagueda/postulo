@@ -262,12 +262,53 @@ def _is_europass_xml(data: bytes) -> bool:
 # -------------------------------------------------------------------- the XML
 
 
+def _gregorian(value):
+    """A month or a day as the schema types them (``xs:gMonth``, ``xs:gDay``).
+
+    Those are written with leading hyphens -- ``--08`` and ``---01`` -- which is what
+    Cedefop's own example has, and ``int()`` reads neither (#632). Older files wrote plain
+    numbers, which have none to strip.
+    """
+    return value.lstrip("-") if isinstance(value, str) else value
+
+
 def _date(period, which: str) -> dt.date | None:
     """A Europass date, which carries year, month and day as attributes."""
     node = _find(period, which)
     if node is None:
         return None
-    return _make_date(node.get("year"), node.get("month"), node.get("day"))
+    return _make_date(node.get("year"), _gregorian(node.get("month")), _gregorian(node.get("day")))
+
+
+def _entries(parent, name: str) -> list:
+    """The entries of a list in either of the shapes the old format was written in.
+
+    The schema wraps each list -- ``WorkExperienceList`` holding ``WorkExperience`` -- and
+    that is what Cedefop's editor wrote (#632). The reader was written to a file that
+    nested a same-named element instead, or put the entries straight under the parent, or
+    had a single entry with no inner element at all; all of those are still read.
+    """
+    found: list = []
+    wrapper = _find(parent, f"{name}List")
+    if wrapper is not None:
+        found = _all(wrapper, name)
+    if found:
+        return found
+    for node in _all(parent, name):
+        found.extend(_all(node, name) or [node])
+    return found
+
+
+def _unread(record: Record, entries: list, added: int, what) -> None:
+    """A note where a section was in the file and nothing of it could be read.
+
+    As the JSON reader says it: silence would read as a short record, and an unknown shape
+    is exactly what a person rescuing an old file cannot see for themselves.
+    """
+    if entries and not added:
+        record.skipped.append(
+            str(_("%(what)s was in the file but could not be read.") % {"what": what})
+        )
 
 
 def _levels(level) -> dict[str, str]:
@@ -345,8 +386,9 @@ def _read_person(learner, record: Record) -> None:
     contact = _find(identification, "ContactInfo")
     if contact is not None:
         person["email"] = _text(contact, "Email", "Contact")
-        person["phone"] = _text(contact, "Telephone", "Contact")
-        websites = [_text(site, "Contact") for site in _all(contact, "Website")]
+        phones = _entries(contact, "Telephone")
+        person["phone"] = next(filter(None, (_text(tel, "Contact") for tel in phones)), "")
+        websites = [_text(site, "Contact") for site in _entries(contact, "Website")]
         websites = [site for site in websites if site]
         person["website"] = next(iter(websites), "")
         person["orcid"] = _orcid_from(websites)
@@ -375,12 +417,8 @@ def _read_person(learner, record: Record) -> None:
 
 
 def _read_experience(learner, record: Record) -> None:
-    block = _find(learner, "WorkExperience")
-    if block is None:
-        return
-    # Europass nests one WorkExperience inside another; a file with a single entry
-    # sometimes has only the outer one.
-    entries = _all(block, "WorkExperience") or [block]
+    entries = _entries(learner, "WorkExperience")
+    before = len(record.experience)
     for entry in entries:
         period = _find(entry, "Period")
         employer = _find(entry, "Employer")
@@ -405,13 +443,12 @@ def _read_experience(learner, record: Record) -> None:
                 "summary": _plain(_text(entry, "Activities", keep_lines=True)),
             }
         )
+    _unread(record, entries, len(record.experience) - before, _("Work experience"))
 
 
 def _read_education(learner, record: Record) -> None:
-    block = _find(learner, "Education")
-    if block is None:
-        return
-    entries = _all(block, "Education") or [block]
+    entries = _entries(learner, "Education")
+    before = len(record.education)
     for entry in entries:
         period = _find(entry, "Period")
         organisation = _find(entry, "Organisation")
@@ -437,6 +474,7 @@ def _read_education(learner, record: Record) -> None:
                 "highlights": _plain(_text(entry, "Activities", keep_lines=True)),
             }
         )
+    _unread(record, entries, len(record.education) - before, _("Education"))
 
 
 def _read_skills(learner, record: Record) -> None:
@@ -446,11 +484,14 @@ def _read_skills(learner, record: Record) -> None:
 
     linguistic = _find(skills, "Linguistic")
     if linguistic is not None:
-        for mother in _all(linguistic, "MotherTongue"):
+        mothers = _entries(linguistic, "MotherTongue")
+        foreigners = _entries(linguistic, "ForeignLanguage")
+        before = len(record.languages)
+        for mother in mothers:
             name = _text(mother, "Description", "Label")
             if name:
                 record.languages.append({"name": name, "proficiency": "native", "levels": {}})
-        for foreign in _all(linguistic, "ForeignLanguage"):
+        for foreign in foreigners:
             name = _text(foreign, "Description", "Label")
             if not name:
                 continue
@@ -458,6 +499,7 @@ def _read_skills(learner, record: Record) -> None:
             record.languages.append(
                 {"name": name, "proficiency": _lowest(levels), "levels": levels}
             )
+        _unread(record, [*mothers, *foreigners], len(record.languages) - before, _("Languages"))
 
     # Europass keeps these as free prose under a handful of headings. Each heading becomes
     # a skill group and each line becomes a skill, which is as close as the two shapes get.
@@ -476,10 +518,8 @@ def _read_skills(learner, record: Record) -> None:
 
 
 def _read_achievements(learner, record: Record) -> None:
-    block = _find(learner, "Achievement")
-    if block is None:
-        return
-    entries = _all(block, "Achievement") or [block]
+    entries = _entries(learner, "Achievement")
+    before = len(record.projects)
     for entry in entries:
         project = _project_from(
             _text(entry, "Title", "Label") or _text(entry, "Title"),
@@ -490,6 +530,7 @@ def _read_achievements(learner, record: Record) -> None:
         )
         if project:
             record.projects.append(project)
+    _unread(record, entries, len(record.projects) - before, _("Achievements"))
 
 
 # ------------------------------------------------------------------- the JSON

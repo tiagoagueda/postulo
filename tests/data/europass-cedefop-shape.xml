@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Written by hand for Postulo, in the shape Cedefop's published XML schema (SkillsPassport
+  v3.x) gives a CV and its own example, europass-cv-example-v3.3.0.xml in the
+  europass/rest-examples-java repository, is described as having: each list wrapped in a
+  *List element (WorkExperienceList, EducationList, AchievementList, MotherTongueList,
+  ForeignLanguageList, TelephoneList, WebsiteList), a month written as xs:gMonth
+  (hyphen, hyphen, then the number) and a day as xs:gDay (three hyphens). The people,
+  the employers and the prose are made up. It is NOT a cut-down copy of that example: it was written without the example
+  to hand, so it holds the structure the schema describes and nothing else of the file's.
+  Replace it with a real export if somebody has one to give (#632).
+-->
+<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass" locale="en">
+  <LearnerInfo>
+    <Identification>
+      <PersonName><FirstName>Sam</FirstName><Surname>Rivera</Surname></PersonName>
+      <ContactInfo>
+        <Address><Contact><AddressLine>1 Example Street</AddressLine><PostalCode>1000</PostalCode><Municipality>Brussels</Municipality><Country><Code>BE</Code><Label>Belgium</Label></Country></Contact></Address>
+        <Email><Contact>sam@example.org</Contact></Email>
+        <TelephoneList>
+          <Telephone><Contact>+3225551234</Contact><Use><Code>mobile</Code><Label>Mobile</Label></Use></Telephone>
+        </TelephoneList>
+        <WebsiteList>
+          <Website><Contact>https://sam.example.org</Contact><Use><Code>personal</Code><Label>Personal</Label></Use></Website>
+        </WebsiteList>
+      </ContactInfo>
+    </Identification>
+    <Headline><Type><Code>job_applied_for</Code><Label>Applied for</Label></Type><Description><Label>Policy officer</Label></Description></Headline>
+    <WorkExperienceList>
+      <WorkExperience>
+        <Period><From year="2016" month="--08" day="---01"/><To year="2020" month="--12" day="---31"/></Period>
+        <Position><Label>Independent consultant</Label></Position>
+        <Activities>Evaluation of support measures&lt;br /&gt;and young people</Activities>
+        <Employer><Name>Example Consulting</Name><ContactInfo><Address><Contact><Municipality>Brussels</Municipality><Country><Code>BE</Code><Label>Belgium</Label></Country></Contact></Address></ContactInfo></Employer>
+      </WorkExperience>
+      <WorkExperience>
+        <Period><From year="2020" month="--09" day="---14"/><Current>true</Current></Period>
+        <Position><Label>Policy officer</Label></Position>
+        <Employer><Name>Example Agency</Name></Employer>
+      </WorkExperience>
+    </WorkExperienceList>
+    <EducationList>
+      <Education>
+        <Period><From year="2010" month="--09"/><To year="2014" month="--06"/></Period>
+        <Title>Master in Public Policy</Title>
+        <Organisation><Name>Example University</Name></Organisation>
+      </Education>
+    </EducationList>
+    <Skills>
+      <Linguistic>
+        <MotherTongueList>
+          <MotherTongue><Description><Code>fr</Code><Label>French</Label></Description></MotherTongue>
+        </MotherTongueList>
+        <ForeignLanguageList>
+          <ForeignLanguage>
+            <Description><Code>en</Code><Label>English</Label></Description>
+            <ProficiencyLevel><Listening>C1</Listening><Reading>C1</Reading><SpokenInteraction>B2</SpokenInteraction><SpokenProduction>B2</SpokenProduction><Writing>B2</Writing></ProficiencyLevel>
+          </ForeignLanguage>
+        </ForeignLanguageList>
+      </Linguistic>
+      <Communication><Description>Good communication skills</Description></Communication>
+    </Skills>
+    <AchievementList>
+      <Achievement>
+        <Title><Label>Publications</Label></Title>
+        <Description>Two articles on youth employment.</Description>
+      </Achievement>
+    </AchievementList>
+  </LearnerInfo>
+</SkillsPassport>

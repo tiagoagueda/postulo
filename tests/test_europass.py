@@ -40,6 +40,7 @@ pytestmark = pytest.mark.django_db
 
 FIXTURE = Path(__file__).parent / "data" / "europass.xml"
 JSON_FIXTURE = Path(__file__).parent / "data" / "europass.json"
+CEDEFOP_FIXTURE = Path(__file__).parent / "data" / "europass-cedefop-shape.xml"
 
 MINIMAL = b"""<?xml version="1.0"?>
 <SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass">
@@ -57,7 +58,7 @@ MINIMAL = b"""<?xml version="1.0"?>
 # ----------------------------------------------------------------- the reader
 
 
-def test_it_reads_the_shape_a_real_export_has():
+def test_it_reads_the_nested_shape_the_reader_was_first_written_to():
     record = europass.read(FIXTURE.read_bytes())
 
     assert record.counts() == {
@@ -71,6 +72,44 @@ def test_it_reads_the_shape_a_real_export_has():
     assert record.person["email"] == "alex@example.org"
     assert record.person["headline"] == "Backend engineer"
     assert record.person["location"] == "Lisboa, Portugal"
+
+
+def test_it_reads_the_shape_the_schema_gives_a_cv(user):
+    """`*List` wrappers and months written as xs:gMonth, which read as nothing before (#632)."""
+    record = europass.read(CEDEFOP_FIXTURE.read_bytes())
+
+    assert record.counts() == {
+        "experience": 2,
+        "education": 1,
+        "languages": 2,
+        "skills": 1,
+        "projects": 1,
+    }
+    assert record.person["phone"] == "+3225551234"
+    assert record.person["website"] == "https://sam.example.org"
+    first, second = record.experience
+    assert first["role"] == "Independent consultant"
+    assert first["start_date"] == dt.date(2016, 8, 1)
+    assert first["end_date"] == dt.date(2020, 12, 31)
+    assert second["start_date"] == dt.date(2020, 9, 14)
+    assert record.education[0]["start_date"] == dt.date(2010, 9, 1)
+    assert record.skipped == []
+    # And it is written, where an entry with no start date would have been left out.
+    importing.apply(user, record)
+    assert Experience.objects.filter(owner=user).count() == 2
+
+
+def test_a_list_that_holds_nothing_readable_is_named_rather_than_dropped():
+    data = (
+        b'<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass"><LearnerInfo>'
+        b"<WorkExperienceList><WorkExperience><Odd/></WorkExperience></WorkExperienceList>"
+        b"</LearnerInfo></SkillsPassport>"
+    )
+
+    record = europass.read(data)
+
+    assert record.experience == []
+    assert record.skipped == ["Work experience was in the file but could not be read."]
 
 
 def test_a_single_entry_file_has_no_inner_element():
