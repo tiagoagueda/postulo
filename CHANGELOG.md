@@ -256,6 +256,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- Stopping the background worker (a restart or upgrade) now ends it after the task it is running instead of taking more work until it is killed, and an errand still unfinished after a day is marked failed, so its page stops saying the work carries on. (#474)
 - A slow sort or page answer no longer lands over a newer filter's on Companies, Listings and Applications, and tick boxes are drawn only when there is a bulk bar for them. (#648)
 - Keeping a view, the Columns menu and the Table / Board switch now use the filtered table on screen, not the address the page loaded with. (#623)
 - A career hit in search now opens the career page at its section instead of at the top. (#707)

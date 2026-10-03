@@ -72,6 +72,11 @@ class Command(BaseCommand):
             )
             worker.configure_signals()
             worker.run()
+            # A stop asked for while a task ran is upstream's `running = False`, and the
+            # task has now finished. Building another worker would forget it, and the
+            # container would be killed mid-way through the next task (#474).
+            if not worker.running:
+                return
             # Last, and only on a pass that finished, for the reason the scheduler's is
             # last: the heartbeat answers "is it still going round", and a pass that died
             # half way did not go round.

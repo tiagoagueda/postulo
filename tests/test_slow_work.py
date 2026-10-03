@@ -252,3 +252,36 @@ def test_an_event_this_version_does_not_know_is_not_delivered_blank(user, monkey
 
     assert errand.state == ErrandState.DONE
     assert told == [], "silence beats an empty message"
+
+
+def test_a_stop_asked_for_during_a_task_ends_the_worker_after_it(user):
+    """The loop around upstream's worker used to forget a SIGTERM and start another pass (#474)."""
+    import signal
+
+    from django.core.management import call_command
+
+    from postulo.core.tasks import perform_errand
+
+    saved = {n: signal.getsignal(n) for n in (signal.SIGINT, signal.SIGTERM)}
+
+    ran: list[int] = []
+
+    @errands.handler("test_stop", working="Stopping…")
+    def run(errand) -> dict:
+        ran.append(errand.pk)
+        signal.raise_signal(signal.SIGTERM)
+        return {}
+
+    try:
+        first = Errand.objects.create(owner=user, kind="test_stop")
+        second = Errand.objects.create(owner=user, kind="test_stop")
+        perform_errand.enqueue(first.pk)
+        perform_errand.enqueue(second.pk)
+
+        call_command("work", "--every", "0.1")
+    finally:
+        errands.HANDLERS.pop("test_stop", None)
+        for number, handler in saved.items():
+            signal.signal(number, handler)
+
+    assert ran == [first.pk], "it stopped after the task it was running"

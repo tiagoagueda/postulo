@@ -180,6 +180,24 @@ def working_label(kind: str) -> str:
     return str(work.working) if work else str(_("Working"))
 
 
+def fail_interrupted(*, hours: int = 24) -> int:
+    """Say so on errands that were never finished, so their page stops promising (#474).
+
+    A worker killed mid-task (a restart past its grace period, the kernel's out-of-memory
+    killer during a render) leaves its errand *working* for ever, and the page of the person
+    who asked goes on saying the work carries on without them. Past a generous deadline it
+    does not, and the errand says what happened.
+    """
+    cutoff = timezone.now() - timedelta(hours=hours)
+    return Errand.objects.filter(
+        state__in=(ErrandState.WAITING, ErrandState.WORKING), created_at__lt=cutoff
+    ).update(
+        state=ErrandState.FAILED,
+        error=str(_("The work was interrupted before it finished. Please try again.")),
+        finished_at=timezone.now(),
+    )
+
+
 def forget_old(*, days: int = 7) -> int:
     """Drop errands nobody is watching any more. Called by the scheduler.
 

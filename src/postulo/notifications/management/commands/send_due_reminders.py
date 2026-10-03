@@ -201,6 +201,7 @@ class Command(BaseCommand):
             # The two things #247 leaves lying about: an export archive holding a whole
             # account, and a week of errand rows nobody is watching any more. Reaped on the
             # pass that already exists rather than by a second timer.
+            errands.fail_interrupted()
             reaped = reap_archives() + errands.forget_old() + inbox.forget_old()
             # The pages of captures that never became a listing, past the days the
             # instance keeps them (#256). The captures stay; the copies of the pages go.

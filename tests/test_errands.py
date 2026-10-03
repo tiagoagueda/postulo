@@ -264,6 +264,23 @@ def test_finished_errands_are_forgotten_after_a_week(a_kind, user):
     assert Errand.objects.filter(pk=recent.pk).exists()
 
 
+def test_an_errand_the_worker_never_finished_is_failed_with_a_sentence(a_kind, user):
+    stuck = errands.send("test_kind", user)
+    Errand.objects.filter(pk=stuck.pk).update(
+        state=ErrandState.WORKING, created_at=timezone.now() - dt.timedelta(days=2)
+    )
+    busy = errands.send("test_kind", user)
+    Errand.objects.filter(pk=busy.pk).update(state=ErrandState.WORKING)
+
+    errands.fail_interrupted()
+
+    stuck.refresh_from_db()
+    busy.refresh_from_db()
+    assert stuck.state == ErrandState.FAILED and stuck.is_finished
+    assert "interrupted" in stuck.error
+    assert busy.state == ErrandState.WORKING, "work that is still within its deadline is left"
+
+
 def test_a_subject_deleted_while_it_waited_leaves_the_errand_behind(a_kind, user, settings):
     """What happened still happened, and the page asking about it deserves an answer."""
     from postulo.jobs.models import Company
