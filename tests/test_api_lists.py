@@ -290,6 +290,33 @@ def test_a_capture_list_can_be_caught_up_on_too(client, user):
     assert body["items"][0]["updated_at"]
 
 
+def test_a_run_of_pending_captures_saved_in_one_moment_can_be_walked(client, user):
+    """The capture queue takes `after_id` like every other list (#439).
+
+    Every capture shares one `updated_at`, so a timestamp alone hands the first page back
+    for ever; with the id as the second half of the cursor the walk reaches all of them.
+    """
+    bearer = issue(user, "captures")
+    for number in range(7):
+        Capture.objects.create(owner=user, url=f"https://example.org/j/{number}")
+    same = timezone.now() - dt.timedelta(minutes=1)
+    Capture.objects.filter(owner=user).update(updated_at=same)
+
+    seen = []
+    at, last = same.isoformat(), None
+    for _page in range(10):
+        asked = f"/api/v1/captures?updated_since={cursor(at)}&limit=3"
+        if last is not None:
+            asked += f"&after_id={last}"
+        fresh = client.get(asked, **bearer).json()["items"]
+        if not fresh:
+            break
+        seen += [c["id"] for c in fresh]
+        at, last = fresh[-1]["updated_at"], fresh[-1]["id"]
+
+    assert len(seen) == 7 == len(set(seen))
+
+
 def test_a_run_of_rows_saved_in_one_moment_can_still_be_walked(client, user, applications):
     """The fault #245 is about, made on purpose rather than waited for.
 

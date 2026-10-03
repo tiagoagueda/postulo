@@ -57,7 +57,7 @@ from postulo.plugins.fetching import fetch_page
 from . import idempotency, problems
 from .auth import ScopedAuth, TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
-from .paging import UPDATED_SINCE, Page, changed_since
+from .paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
 from .routers import (
     applications,
     companies,
@@ -646,6 +646,7 @@ def _read(payload: PageIn, owner):
 def list_captures(
     request,
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    after_id: int | None = Query(None, description=AFTER_ID),
 ):
     """What is still waiting to be reviewed, newest first.
 
@@ -664,7 +665,7 @@ def list_captures(
         .defer("learning")
         .order_by("-created_at", "-pk")
     )
-    return changed_since(captures, updated_since)
+    return changed_since(captures, updated_since, after_id)
 
 
 #: How the description of the call below says what it takes: the file itself as the body,

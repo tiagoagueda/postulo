@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- `GET /api/v1/captures` takes `after_id`, so a client can catch up past a run of captures sharing one `updated_at`. (#439)
 - The API refuses blank names for companies, listings, applications, contacts, reminders and letters, and renaming a company onto another's name is a 422, not a 500 or a duplicate. (#438)
 - Each letter's language is pinned in the API by a test, and the schemas no longer default it to an empty string. (#437)
 - `PATCH /api/v1/interviews/{id}` no longer answers 500 when `starts_at`, `location` or `notes` is `null`; `null` means unchanged, as on the other patch calls. (#436)
