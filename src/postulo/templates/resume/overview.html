@@ -152,7 +152,7 @@
                              class="rounded bg-ink-100 px-2 py-0.5 text-xs hover:bg-ink-200
                                     dark:bg-ink-800 dark:hover:bg-ink-700">{{ skill.name }}</a>
                         {% endfor %}
-                        <a href="{% url 'resume:item_create' 'skill' %}"
+                        <a href="{% url 'resume:item_create' 'skill' %}?group={{ item.pk }}"
                            class="text-xs text-brand-600 underline dark:text-brand-400">
                           {% translate "Add a skill" %}
                         </a>
@@ -170,6 +170,21 @@
                 {% translate "Add the first one." %}
               </a>
             </c-empty>
+          {% endif %}
+          {% if section.spec.slug == 'skill-group' and ungrouped_skills %}
+            <div class="mt-3 rounded-lg border border-ink-200 p-4 dark:border-ink-800">
+              <h3 class="text-sm font-medium">{% translate "Skills without a group" %}</h3>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {% translate "A CV prints a skill under its group. Open one to choose it." %}
+              </p>
+              <div class="mt-2 flex flex-wrap items-center gap-2">
+                {% for skill in ungrouped_skills %}
+                  <a href="{% url 'resume:item_update' 'skill' skill.pk %}"
+                     class="rounded bg-ink-100 px-2 py-0.5 text-xs hover:bg-ink-200
+                            dark:bg-ink-800 dark:hover:bg-ink-700">{{ skill.name }}</a>
+                {% endfor %}
+              </div>
+            </div>
           {% endif %}
         </section>
       {% endfor %}

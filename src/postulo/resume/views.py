@@ -84,6 +84,9 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             for section in context["sections"]
         ]
         context["skills"] = Skill.objects.for_user(user).select_related("group")
+        # Skills with no group: saved before a group was required, or read from a file that
+        # names none. They are drawn in a block of their own so that none is out of sight (#617).
+        context["ungrouped_skills"] = Skill.objects.for_user(user).filter(group__isnull=True)
         # One query for the whole page rather than one per entry: a generic link has no
         # join to follow, so the batch lookup is what answers for it (#131).
         everything = [item for section in context["sections"] for item in section["items"]]
@@ -272,6 +275,14 @@ class SectionFormMixin(UserFormKwargsMixin):
 class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, CreateView):
     def get_queryset(self):
         return self.section.model.objects.for_user(self.request.user)
+
+    def get_initial(self) -> dict:
+        initial = super().get_initial()
+        # *Add a skill* under a group opens the form with that group chosen (#617); a number
+        # that is not one of the person's groups is not among the choices and so selects none.
+        if self.section.slug == "skill" and self.request.GET.get("group", "").isdecimal():
+            initial["group"] = self.request.GET["group"]
+        return initial
 
     def form_valid(self, form):
         messages.success(self.request, _("Added."))

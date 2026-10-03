@@ -425,8 +425,12 @@ def test_the_box_is_answered_with_nothing_where_there_is_nothing(no_esco, user, 
 
 def test_a_skill_saved_from_the_form_is_matched(esco_skills, user, client):
     client.force_login(user)
+    group = SkillGroup.objects.create(owner=user, name="Management")
 
-    client.post(reverse("resume:item_create", args=["skill"]), {"name": "project management"})
+    client.post(
+        reverse("resume:item_create", args=["skill"]),
+        {"name": "project management", "group": group.pk},
+    )
 
     assert Skill.objects.for_user(user).get().esco_uri == PROJECTS
 

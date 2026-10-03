@@ -187,6 +187,9 @@ class SkillForm(ResumeItemForm):
 
     def scope_querysets(self) -> None:
         self.fields["group"].queryset = SkillGroup.objects.for_user(self.user)
+        # Every page draws a skill through its group, so one saved without is shown nowhere
+        # (#617).
+        self.fields["group"].required = True
 
 
 class CertificationForm(ResumeItemForm):

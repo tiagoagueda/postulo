@@ -26,8 +26,9 @@ def sign_in(page: Page, base: str) -> None:
 
 
 def test_the_box_is_offered_names_as_it_is_typed(live_server, page: Page, applicant, esco_skills):
-    from postulo.resume.models import Skill
+    from postulo.resume.models import Skill, SkillGroup
 
+    SkillGroup.objects.create(owner=applicant, name="Management")
     base = live_server.url
     sign_in(page, base)
     page.goto(f"{base}/career/skill/new/")
@@ -39,6 +40,7 @@ def test_the_box_is_offered_names_as_it_is_typed(live_server, page: Page, applic
     expect(options.first).to_have_attribute("value", "project management")
 
     box.fill("project management")
+    page.locator("select[name=group]").select_option(label="Management")
     page.get_by_role("button", name="Save", exact=True).click()
     page.wait_for_url(f"{base}/career/")
     assert (
@@ -51,8 +53,9 @@ def test_the_box_is_offered_names_as_it_is_typed(live_server, page: Page, applic
 def test_with_scripts_off_it_is_a_text_box_and_the_name_is_matched_on_save(
     live_server, browser, applicant, esco_skills
 ):
-    from postulo.resume.models import Skill
+    from postulo.resume.models import Skill, SkillGroup
 
+    SkillGroup.objects.create(owner=applicant, name="Management")
     context = browser.new_context(java_script_enabled=False)
     page = context.new_page()
     try:
@@ -62,6 +65,7 @@ def test_with_scripts_off_it_is_a_text_box_and_the_name_is_matched_on_save(
         expect(page.locator("#skill-suggestions option")).to_have_count(0)
 
         page.locator("input[name=name]").fill("Project management")
+        page.locator("select[name=group]").select_option(label="Management")
         page.get_by_role("button", name="Save", exact=True).click()
         page.wait_for_url(f"{base}/career/")
     finally:

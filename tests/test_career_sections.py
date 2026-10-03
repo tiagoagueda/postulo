@@ -83,3 +83,30 @@ def test_the_label_over_the_list_is_the_hook_and_keeps_its_text(client, user):
     label = re.search(r"<p[^>]*data-section-label[^>]*>(.*?)</p>", html, re.S)
     assert label and label.group(1).strip() == "On this page"
     assert "aria-live" not in label.group(0), "the list's aria-current already says where you are"
+
+
+def test_a_skill_needs_a_group_and_the_add_link_chooses_one(client, user):
+    from postulo.resume.models import Skill, SkillGroup
+
+    client.force_login(user)
+    group = SkillGroup.objects.create(owner=user, name="Languages")
+    url = reverse("resume:item_create", args=["skill"])
+
+    refused = client.post(url, {"name": "Python"})
+    assert refused.status_code == 200
+    assert not Skill.objects.filter(owner=user).exists()
+
+    opened = client.get(f"{url}?group={group.pk}")
+    assert opened.context["form"].initial["group"] == str(group.pk)
+    assert f'value="{group.pk}" selected' in opened.content.decode()
+
+    page = client.get(reverse("resume:overview")).content.decode()
+    assert f"{url}?group={group.pk}" in page
+
+
+def test_a_skill_with_no_group_is_still_on_the_overview(client, user):
+    from postulo.resume.models import Skill
+
+    client.force_login(user)
+    Skill.objects.create(owner=user, name="Orphaned skill", group=None)
+    assert "Orphaned skill" in client.get(reverse("resume:overview")).content.decode()
