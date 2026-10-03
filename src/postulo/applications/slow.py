@@ -31,8 +31,9 @@ def render_a_report(errand) -> dict:
     from . import reports
 
     period = reports.period_from(errand.payload.get("query") or {})
-    # The worker has no request to have chosen a language, so it reads the person's own: the
-    # report is drawn in what they read Postulo in, as the draft the GET serves is (#568).
+    # The worker has no request to have chosen a language, so `errands.perform` has put the
+    # person's own in force: the report is drawn in what they read Postulo in, as the draft
+    # the GET serves is (#568, #383).
     profile = getattr(errand.owner, "profile", None)
     with languages.override(getattr(profile, "language", "")):
         report = reports.build(errand.owner, period)

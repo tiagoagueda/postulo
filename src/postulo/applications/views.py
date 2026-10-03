@@ -1357,7 +1357,13 @@ class ReportPDFView(LoginRequiredMixin, View):
         # press sends the work off and lands on the page that watches it (#247). What the
         # press *means* has not changed: it files the report under Sent documents, where
         # the finished errand points.
-        errand = errands.send("report_pdf", request.user, query=dict(request.GET.items()))
+        errand = errands.send(
+            "report_pdf",
+            request.user,
+            # The period as it is resolved here, in this person's zone: neither the worker's
+            # zone nor a queue that crosses midnight gets to choose it (#383).
+            query=reports.as_query(reports.period_from(request.GET)),
+        )
         return redirect("core:errand", pk=errand.pk)
 
 

@@ -41,7 +41,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core import logs
 
-from . import memo
+from . import memo, preferences
 from .models import Errand, ErrandState
 
 logger = logging.getLogger(__name__)
@@ -128,15 +128,25 @@ def perform(errand_id: int) -> None:
     read the row once in its life. It renders CVs and files the frozen copy of a sent
     document, and it went on printing the name an identifier scheme had when the worker
     started, after an administrator had changed it, into copies that are kept (#311). An
-    errand is this loop's request, and begins the way one does.
+    errand is this loop's request, and begins the way one does -- and is done as the person
+    whose it is, in their language and their time zone (#383).
     """
     # What `site.forget_current` and `policy.forget_decisions` are, where they live.
     memo.forget_current()
     memo.forget_decisions()
 
-    errand = Errand.objects.filter(pk=errand_id).first()
+    errand = Errand.objects.filter(pk=errand_id).select_related("owner").first()
     if errand is None or errand.is_finished:
         return
+    # In the owner's language and time zone, as the request that asked would have been. With
+    # a worker there is no request, so it was the server's: a report covered the server's
+    # month, a frozen letter carried the server's date and every sentence kept was in
+    # `LANGUAGE_CODE` (#383). One path for the inline errand and the queued one.
+    with preferences.as_person(errand.owner):
+        _run(errand)
+
+
+def _run(errand: Errand) -> None:
     work = HANDLERS.get(errand.kind)
     if work is None:
         # A kind that no longer exists: an errand queued by a version that had it, run by a

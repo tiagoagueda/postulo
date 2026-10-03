@@ -285,3 +285,95 @@ def test_a_stop_asked_for_during_a_task_ends_the_worker_after_it(user):
             signal.signal(number, handler)
 
     assert ran == [first.pk], "it stopped after the task it was running"
+
+
+def test_a_report_filed_by_the_worker_covers_the_owners_period_in_their_language(
+    user, settings, monkeypatch
+):
+    """At 22:30 on 30 September in New York it is already October in Paris (#383)."""
+    from unittest import mock
+
+    from django.utils import translation
+
+    from postulo.applications.models import Application, Status
+    from postulo.applications.services import change_status
+    from postulo.documents.models import RenderedDocument
+    from postulo.jobs.models import JobPosting
+
+    monkeypatch.setattr(
+        "postulo.documents.rendering.html_to_pdf", lambda html, backend=None: b"%PDF-1.7 fake"
+    )
+    settings.TIME_ZONE = "Europe/Paris"
+    user.profile.language = "fr-FR"
+    user.profile.time_zone = "America/New_York"
+    user.profile.save()
+    moment = dt.datetime(2026, 10, 1, 2, 30, tzinfo=dt.UTC)
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
+    change_status(application, Status.APPLIED, occurred_at=moment)
+    Application.objects.filter(pk=application.pk).update(applied_at=moment)
+
+    translation.activate("en-gb")
+    timezone.deactivate()
+    errand = Errand.objects.create(owner=user, kind="report_pdf", payload={"query": {}})
+    with mock.patch("django.utils.timezone.now", return_value=moment):
+        errands.perform(errand.pk)
+
+    errand.refresh_from_db()
+    assert errand.state == "done", errand.error
+    filed = RenderedDocument.objects.for_user(user).get()
+    assert "septembre 2026" in filed.title
+    assert "Test Engineer" in filed.source_text, "the application is in the month the page shows"
+
+
+def test_a_letter_frozen_by_the_worker_carries_the_owners_date_and_language(
+    user, settings, monkeypatch
+):
+    """At 22:30 on 30 September in New York it is already October in Paris (#383)."""
+    from unittest import mock
+
+    from django.utils import translation
+
+    from postulo.applications.models import Application, EventKind, Status
+    from postulo.documents.models import CoverLetter, RenderedDocument
+    from postulo.jobs.models import JobPosting
+
+    class Drawn:
+        name = "fake"
+        install_hint = ""
+
+        def is_available(self):
+            return True
+
+        def render(self, html):
+            return b"%PDF-1.7 fake"
+
+    monkeypatch.setattr("postulo.documents.pdf.get_pdf_backend", lambda name=None: Drawn())
+    settings.TIME_ZONE = "Europe/Paris"
+    user.profile.language = "fr-FR"
+    user.profile.time_zone = "America/New_York"
+    user.profile.save()
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
+    letter = CoverLetter.objects.create(owner=user, name="Cover", body="Written on {{ date }}.")
+
+    translation.activate("en-gb")
+    timezone.deactivate()
+    errand = Errand.objects.create(
+        owner=user,
+        kind="sent_documents",
+        payload={"application_id": application.pk, "letter_id": letter.pk},
+    )
+    moment = dt.datetime(2026, 10, 1, 2, 30, tzinfo=dt.UTC)
+    with mock.patch("django.utils.timezone.now", return_value=moment):
+        errands.perform(errand.pk)
+
+    errand.refresh_from_db()
+    assert errand.state == "done", errand.error
+    filed = RenderedDocument.objects.for_user(user).get()
+    assert "30 septembre 2026" in filed.source_text and "1 octobre" not in filed.source_text
+    assert filed.sent_to == "Test Engineer chez Aperture Science"
+    event = application.events.get(kind=EventKind.NOTE)
+    assert event.summary == "Documents envoyés"

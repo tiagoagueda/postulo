@@ -111,6 +111,67 @@ def test_each_errand_reads_the_instance_settings_afresh(user):
     assert seen == [True, False]
 
 
+def test_an_errand_is_done_in_its_owners_language_and_zone(user, settings):
+    """With a worker there is no request to have chosen either (#383)."""
+    from django.utils import translation
+    from django.utils.translation import gettext
+
+    settings.TIME_ZONE = "Europe/Paris"
+    user.profile.language = "fr-FR"
+    user.profile.time_zone = "America/New_York"
+    user.profile.save()
+    seen: dict = {}
+
+    @errands.handler("test_owner", working="Doing it as them…")
+    def run(errand) -> dict:
+        seen["zone"] = timezone.get_current_timezone_name()
+        seen["language"] = translation.get_language()
+        if errand.payload.get("refuse"):
+            raise errands.Refused(translation.gettext_lazy("Postulo no longer does that."))
+        return {"message": gettext("Recorded what you sent.")}
+
+    try:
+        translation.activate("en-gb")
+        timezone.deactivate()
+        done = Errand.objects.create(owner=user, kind="test_owner")
+        refused = Errand.objects.create(owner=user, kind="test_owner", payload={"refuse": True})
+        errands.perform(done.pk)
+        errands.perform(refused.pk)
+    finally:
+        errands.HANDLERS.pop("test_owner", None)
+
+    with translation.override("fr-FR"):
+        recorded, no_longer = (
+            gettext("Recorded what you sent."),
+            gettext("Postulo no longer does that."),
+        )
+    assert recorded != "Recorded what you sent.", "the catalogue has it"
+    done.refresh_from_db()
+    refused.refresh_from_db()
+    assert seen["zone"] == "America/New_York" and seen["language"].lower() == "fr-fr"
+    assert done.message == recorded
+    assert refused.error == no_longer
+
+
+def test_without_a_zone_of_their_own_an_errand_uses_the_instance_default(user, settings):
+    settings.TIME_ZONE = "Europe/Paris"
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_time_zone": "Asia/Tokyo"})
+    seen: list[str] = []
+
+    @errands.handler("test_zone", working="Doing it…")
+    def run(errand) -> dict:
+        seen.append(timezone.get_current_timezone_name())
+        return {}
+
+    try:
+        errand = Errand.objects.create(owner=user, kind="test_zone")
+        errands.perform(errand.pk)
+    finally:
+        errands.HANDLERS.pop("test_zone", None)
+
+    assert seen == ["Asia/Tokyo"]
+
+
 def test_an_unknown_kind_is_refused_at_the_door(user):
     with pytest.raises(KeyError):
         errands.send("no_such_kind", user)

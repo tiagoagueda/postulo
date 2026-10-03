@@ -10,6 +10,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from postulo.core import languages
+from postulo.core.preferences import language_for
 from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 from postulo.plugins.policy import allows
@@ -17,21 +18,6 @@ from postulo.plugins.policy import allows
 from .base import Notification, wants
 
 logger = logging.getLogger(__name__)
-
-
-def language_for(user) -> str:
-    """The language this person reads Postulo in, or the instance default.
-
-    Not the language of whatever request happens to be in flight. A reminder announced by
-    the scheduler has no request at all, and one announced by a capture arriving through
-    the API has the `Accept-Language` of whichever tool sent it — neither of which has
-    anything to do with the person the message is for (#223).
-    """
-    from postulo.core import site
-
-    profile = getattr(user, "profile", None)
-    chosen = (getattr(profile, "language", "") or "").strip()
-    return chosen or site.default_language() or languages.SOURCE
 
 
 def zone_for(user) -> zoneinfo.ZoneInfo:

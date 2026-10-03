@@ -15,6 +15,7 @@ So the rule lives here, once, and both of them call it.
 from __future__ import annotations
 
 import zoneinfo
+from contextlib import contextmanager
 
 from django.utils import timezone
 
@@ -82,3 +83,39 @@ def instance_zone() -> str:
         return site.default_time_zone()
     except Exception:
         return settings.TIME_ZONE
+
+
+def language_for(user) -> str:
+    """The language this person reads Postulo in, or the instance default.
+
+    Not the language of whatever request happens to be in flight. A reminder announced by
+    the scheduler has no request at all, and one announced by a capture arriving through
+    the API has the `Accept-Language` of whichever tool sent it -- neither of which has
+    anything to do with the person the message is for (#223).
+    """
+    from . import site
+
+    profile = getattr(user, "profile", None)
+    chosen = (getattr(profile, "language", "") or "").strip()
+    return chosen or site.default_language() or languages.SOURCE
+
+
+@contextmanager
+def as_person(user):
+    """Do something outside a request the way it would be done in this person's own.
+
+    Their language and their time zone, as `apply` puts them in force for a page: the
+    profile's, else the instance default an administrator chose, else the environment's. For
+    whatever is done on somebody's behalf with no request in front of it -- a queued errand,
+    a scheduled sync -- so that what it words and which day it names do not depend on how the
+    operator deployed the instance (#383, #335). Restored afterwards.
+    """
+    profile = getattr(user, "profile", None)
+    tz_name = (getattr(profile, "time_zone", "") or "") or instance_zone()
+    try:
+        zone = zoneinfo.ZoneInfo(tz_name)
+    except (zoneinfo.ZoneInfoNotFoundError, ValueError):
+        # An unknown name falls back rather than raising, as it does for a page.
+        zone = None
+    with timezone.override(zone), languages.override(language_for(user)):
+        yield
