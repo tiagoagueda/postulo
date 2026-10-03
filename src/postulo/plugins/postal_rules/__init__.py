@@ -42,10 +42,8 @@ same box.
 gives in English, and no catalogue can repair the article and the case in a language where
 they depend on the noun. Nor is the country named, because Postulo knows its name in English
 only and the reader may be reading in another language: the sentence sits in the row,
-beside the part, with the country the row shows. The two notes in `notes_for` are older and
-do both of those things; that is #642, and it is left to it -- but for the empty street,
-which had a sentence of its own while three countries refused it and keeps it as a note
-(`STREET`).
+beside the part, with the country the row shows. The notes in `notes_for` are written the
+same way (`USUALLY`, `LOOKS`, #642); the empty street has a sentence of its own (`STREET`).
 
 **Switched off, everything falls back to what a country with no row already gets**: nothing
 refused, no notes, neutral labels, and the parts in the order they were entered. That is the
@@ -189,6 +187,45 @@ WRITTEN = {
 }
 
 
+#: What post usually needs, one whole sentence for each thing a part can be called, as the
+#: refusals are (#642): a label is never pasted into a sentence, because the article, the
+#: case and the capital letter depend on the noun and no catalogue can repair them. Nor is
+#: the country named, which Postulo knows in English only. The key is the label key the row
+#: gives the part, or the part's own name where it gives none.
+USUALLY = {
+    "municipality": _("Post to this country usually needs a town or city."),
+    "post_town": _("Post to this country usually needs a post town."),
+    "postcode": _("Post to this country usually needs a postcode."),
+    "zip": _("Post to this country usually needs a ZIP code."),
+    "plz": _("Post to this country usually needs a postcode (PLZ)."),
+    "cap": _("Post to this country usually needs a postcode (CAP)."),
+    "cep": _("Post to this country usually needs a postcode (CEP)."),
+    "state": _("Post to this country usually needs a state."),
+    "province": _("Post to this country usually needs a province."),
+    "prefecture": _("Post to this country usually needs a prefecture."),
+    "county": _("Post to this country usually needs a county."),
+    "canton": _("Post to this country usually needs a canton."),
+    "district": _("Post to this country usually needs a district."),
+    "oblast": _("Post to this country usually needs an oblast."),
+    "region": _("Post to this country usually needs a region."),
+}
+
+#: For a part a later row expects and nobody wrote a sentence for. A test holds the table to
+#: `USUALLY`, so this is what a gap says rather than what any row says today.
+USUALLY_THIS = _("Post to this country usually needs this part.")
+
+#: What a postcode usually looks like, one whole sentence for each thing a postcode is
+#: called, said when it is not in the country's form but nothing is refused.
+LOOKS = {
+    "postcode": _("A postcode in this country usually looks like %(example)s."),
+    "zip": _("A ZIP code usually looks like %(example)s."),
+    "eircode": _("An Eircode usually looks like %(example)s."),
+    "plz": _("A postcode (PLZ) in this country usually looks like %(example)s."),
+    "cap": _("A postcode (CAP) in this country usually looks like %(example)s."),
+    "cep": _("A postcode (CEP) in this country usually looks like %(example)s."),
+}
+
+
 def label_for(part: str, country: str):
     """What to call one part of an address from ``country``, in the reader's language."""
     if part == "street" or part == "country":
@@ -286,6 +323,11 @@ def place_for(address) -> list[tuple[str, object]]:
     return street + _missing(rule, parts)
 
 
+def _noted(part: str, country: str):
+    """The sentence for an expected part left empty."""
+    return USUALLY.get(rule_for(country).calls.get(part, part), USUALLY_THIS)
+
+
 def notes_for(address) -> list[tuple[str, object]]:
     """What looks unusual about this address for its country: the part, and a sentence.
 
@@ -306,30 +348,12 @@ def notes_for(address) -> list[tuple[str, object]]:
         if part == "street":
             found.append((part, STREET))
             continue
-        found.append(
-            (
-                part,
-                _("Post to %(country)s usually needs a %(part)s.")
-                % {
-                    "country": _country_name(country),
-                    "part": _lower(label_for(part, country)),
-                },
-            )
-        )
+        found.append((part, _noted(part, country)))
 
     postcode = parts["postcode"]
     if postcode and rule.postcode and written(postcode, country) is None:
-        found.append(
-            (
-                "postcode",
-                _("A %(name)s in %(country)s usually looks like %(example)s.")
-                % {
-                    "name": _lower(label_for("postcode", country)),
-                    "country": _country_name(country),
-                    "example": rule.postcode_example,
-                },
-            )
-        )
+        sentence = LOOKS.get(rule.calls.get("postcode", "postcode"), LOOKS["postcode"])
+        found.append(("postcode", sentence % {"example": rule.postcode_example}))
     return found
 
 
@@ -366,18 +390,15 @@ def _country_name(code: str) -> str:
     return phones.country_name(code) if len(code) == 2 else code
 
 
-def _lower(label) -> str:
-    """A label mid-sentence. Kept as it is where the word is a name rather than a noun."""
-    text = str(label)
-    return text if text.isupper() or " (" in text or text in {"Eircode"} else text.lower()
-
-
 __all__ = [
     "HELP",
     "LABELS",
+    "LOOKS",
     "NEEDS",
     "POSTAL_RULES",
     "STREET",
+    "USUALLY",
+    "USUALLY_THIS",
     "WRITTEN",
     "PostalRulesFeature",
     "Rule",

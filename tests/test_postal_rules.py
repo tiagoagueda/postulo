@@ -1242,3 +1242,41 @@ def test_no_language_lost_its_word_when_the_labels_gained_a_context():
             assert any(messages[(A_PART, msgid)].msgstr), f"{code} lost its {msgid}"
             assert (None, msgid) not in messages, f"{code} still has {msgid} with no context"
     assert translated > 30, "the languages that have the plugin's words were found"
+
+
+# ----------------------------------------- the notes are whole sentences too (#642)
+
+
+def test_a_note_never_puts_a_label_after_an_article_in_english():
+    germany = address(country="DE", postcode="12345", municipality="Berlin")
+    said = [str(sentence) for sentence in postal_rules.warnings_for(germany)]
+    assert said, "no street line is still worth a note"
+    assert all("a address" not in sentence for sentence in said), said
+
+    ireland = address(
+        country="IE", street="1 Example Street", municipality="Dublin", postcode="XYZ"
+    )
+    said = [str(sentence) for sentence in postal_rules.warnings_for(ireland)]
+    assert said == ["An Eircode usually looks like D02 AF30."]
+
+
+def test_every_part_a_country_expects_has_a_sentence_of_its_own():
+    for code, rule in rules.RULES.items():
+        for part in rule.expects:
+            if part != "street":
+                key = rule.calls.get(part, part)
+                assert key in postal_rules.USUALLY, f"{code} expects its {key}"
+        if rule.postcode:
+            assert rule.calls.get("postcode", "postcode") in postal_rules.LOOKS, code
+
+
+def test_no_message_of_the_plugin_puts_a_label_in_a_sentence():
+    from pathlib import Path
+
+    assert not hasattr(postal_rules, "_lower")
+    for sentence in (*postal_rules.USUALLY.values(), *postal_rules.LOOKS.values()):
+        slots = set(re.findall(r"%\((\w+)\)s", str(sentence)))
+        assert slots <= {"example"}, sentence
+    source = (Path(postal_rules.__file__)).read_text(encoding="utf-8")
+    assert not re.search(r"\b[Aa]n? %\((part|name|country)\)s", source)
+    assert "%(country)s" not in source
