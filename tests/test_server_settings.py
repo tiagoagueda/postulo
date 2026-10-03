@@ -51,6 +51,23 @@ def test_every_section_is_for_administrators_only(client, user, url_name):
     assert client.get(reverse(url_name)).status_code == 403
 
 
+@pytest.mark.parametrize("url_name", ["server:overview", "settings:index"])
+def test_the_sidebar_stays_in_view_and_never_runs_past_the_window(client, admin, url_name):
+    """Sticky under the masthead from `lg` up, capped at the window's height (#699)."""
+    client.force_login(admin)
+    html = client.get(reverse(url_name), follow=True).content.decode()
+    aside = re.search(r"<aside[^>]*data-sidebar-frame[^>]*>", html)
+
+    assert aside, "the frame's sidebar is drawn"
+    for wanted in (
+        "lg:sticky",
+        "lg:top-[calc(var(--header-height,3.5rem)+1rem)]",
+        "lg:max-h-[calc(100dvh-var(--header-height,3.5rem)-2rem)]",
+        "lg:overflow-y-auto",
+    ):
+        assert wanted in aside.group(0), wanted
+
+
 def test_the_status_never_says_whether_an_account_exists(client, user, other_user, admin):
     """The staff check runs before the account is looked up (#373)."""
     present = reverse("server:person_plugins", kwargs={"pk": other_user.pk})

@@ -7,7 +7,7 @@
 {# fill `content` — allauth's email and password pages among them — land inside it. #}
 {% block main %}
   <div class="lg:flex lg:items-start lg:gap-10">
-    <aside class="mb-6 lg:mb-0 lg:w-56 lg:shrink-0">
+    <aside class="mb-6 lg:sticky lg:top-[calc(var(--header-height,3.5rem)+1rem)] lg:mb-0 lg:max-h-[calc(100dvh-var(--header-height,3.5rem)-2rem)] lg:w-56 lg:shrink-0 lg:overflow-y-auto lg:p-1" data-sidebar-frame>
       {% comment %} A label over the sidebar, not the page's heading. It was an `h1`, which
          made about twenty pages announce "Settings" to anybody jumping to the first
          heading, and pushed each page's own title down to an `h2` level with its sections
