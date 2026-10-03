@@ -125,6 +125,25 @@ def test_a_cv_selects_from_the_master_record_rather_than_copying_it(cv, experien
     assert "Principal Engineer" in render_cv_html(cv), "a CV must follow the master record"
 
 
+def test_deleting_a_career_entry_takes_its_place_on_every_cv(client, user, cv, experience):
+    client.force_login(user)
+
+    response = client.post(reverse("resume:item_delete", args=["experience", experience.pk]))
+
+    assert response.status_code == 302
+    assert not cv.items.exists(), "a CV entry must not outlive the entry it points at"
+    assert client.get(reverse("documents:cv_detail", args=[cv.pk])).status_code == 200
+
+
+def test_a_cv_entry_whose_target_is_gone_prints_and_is_left_off(cv, experience):
+    # Deleted behind the relation's back, the way rows were left before it cascaded.
+    Experience.objects.filter(pk=experience.pk)._raw_delete(Experience.objects.db)
+    entry = cv.items.get()
+
+    assert isinstance(str(entry), str)
+    assert build_sections(cv) == []
+
+
 def test_an_entry_can_be_tailored_for_one_cv_without_touching_the_original(cv, experience, user):
     item = cv.items.get()
     item.override_highlights = "Rewritten for this particular employer."

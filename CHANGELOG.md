@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Deleting a job or any other entry from *Your career* now takes its place on every CV with it, instead of leaving a row that made the CV, its entry pages and the API answer 500; rows already left behind are removed on upgrade. (#381)
 - A CV with *include contact details* off no longer carries the holder's name in its PDF title, its file name, the draft's name or the DOCX title: it is titled by its kind alone. (#512)
 - Resizing a column, applying *Columns* or pressing *Reset* no longer deletes your saved views, and resizing under an applied view no longer overwrites your own columns. (#503)
 - Answering *Stay* to the unsaved-work question no longer leaves the button you pressed dead: *Discard this capture* or *Sign out* works again on your next key or click. (#518)

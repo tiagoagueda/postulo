@@ -413,7 +413,7 @@ class CVItem(OwnedModel):
         indexes = [models.Index(fields=("content_type", "object_id"))]
 
     def __str__(self) -> str:
-        return str(self.item) if self.item else _("Missing entry")
+        return str(self.item) if self.item else str(_("Missing entry"))
 
     @property
     def highlight_lines(self) -> list[str]:

@@ -52,6 +52,10 @@ class ResumeItem(OwnedModel):
     #: is sometimes vacuous beats seven declarations with one missing.
     translations = GenericRelation("resume.Translation")
 
+    #: The places this entry is on a CV. Deleting the entry takes them: a CV entry pointing at
+    #: nothing cannot be printed, and the person could not reach it to remove it (#381).
+    cv_entries = GenericRelation("documents.CVItem")
+
     class Meta:
         abstract = True
         # Insertion order breaks ties, so a list typed top to bottom stays that way.

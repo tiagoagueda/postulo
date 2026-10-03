@@ -136,7 +136,12 @@ def build_sections(cv: CV) -> list[Section]:
     # something in its `lang`, and text in one language under a declaration of another is
     # the mismatch this whole feature exists to remove.
     language = document_language(cv)
-    cv_items = list(cv.included_items().order_by("order", "pk"))
+    # An entry whose career record is gone is left out, as the text formats already do (#381).
+    cv_items = [
+        cv_item
+        for cv_item in cv.included_items().order_by("order", "pk")
+        if cv_item.item is not None
+    ]
     entries = [cv_item.item for cv_item in cv_items]
     overrides = translating.overrides_by_entry(entries, language)
 
@@ -145,7 +150,7 @@ def build_sections(cv: CV) -> list[Section]:
         kind = cv_item.content_type.model
         if kind not in sections:
             sections[kind] = Section(kind=kind, label=str(SECTION_LABELS.get(kind, kind)))
-        found = overrides.get(translating.key_of(entry)) if entry is not None else None
+        found = overrides.get(translating.key_of(entry))
         sections[kind].items.append(
             Entry(cv_item=cv_item, item=translating.in_language(entry, language, found or {}))
         )
