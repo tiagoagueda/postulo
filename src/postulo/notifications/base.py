@@ -13,6 +13,7 @@ capture arriving from outside, an employer falling silent.
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 from collections.abc import Mapping
 from dataclasses import dataclass, field, replace
 from types import MappingProxyType
@@ -55,6 +56,17 @@ def default_for(event: str, plugin=None) -> bool:
     return event not in ABOUT_WHAT_YOU_DID
 
 
+def announcement_key(prefix: str, *parts) -> str:
+    """A key for one announcement of many things: the prefix and a digest of what it says.
+
+    The same parts give the same key, so a retry is one message; a part that changed gives
+    another, so an announcement made again on purpose is not taken for a retry. Never longer
+    than a stored key may be, however many things the message names (#413).
+    """
+    digest = hashlib.sha256("".join(str(part) for part in parts).encode()).hexdigest()[:40]
+    return f"{prefix}:{digest}"
+
+
 @dataclass(frozen=True)
 class Notification:
     """One message, independent of how it travels.
@@ -73,10 +85,13 @@ class Notification:
 
     #: What this message *is*, stable across the sends that carry it. A notifier that
     #: retries, or two passes that reach the same conclusion, use it to deliver once:
-    #: ``reminder:41`` is the same message however many times it is announced, whereas
-    #: ``title`` is translated at the moment of sending and differs between two recipients
-    #: of the same event. Empty means the sender is claiming no identity, so nothing may be
-    #: deduplicated on it -- never fall back to the words.
+    #: ``reminder:41:2026-10-03T09:00`` is the same message however many times it is
+    #: announced, whereas ``title`` is translated at the moment of sending and differs
+    #: between two recipients of the same event. It names one *announcement*, not one object:
+    #: an object announced again on purpose (a reminder moved, a deadline extended) gets a
+    #: new key, and one that lists many objects carries a digest, so it stays short (#413).
+    #: Empty means the sender is claiming no identity, so nothing may be deduplicated on it
+    #: -- never fall back to the words.
     key: str = ""
 
     #: The language the words above are already in, as a Postulo code (``pt-PT``). Set by

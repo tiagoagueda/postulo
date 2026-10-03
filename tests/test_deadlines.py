@@ -331,6 +331,45 @@ def test_moving_the_closing_date_is_news(user, company):
     assert closing.announce_closing_postings()[0] == 1
 
 
+def test_a_date_that_moves_is_announced_again_to_a_webhook(user, company):
+    """The webhook refuses a key it has seen, so the key has to change with the date (#413)."""
+    from postulo.notifications.models import WebhookDelivery
+    from tests.test_webhooks import webhook_connection
+
+    webhook_connection(user)
+    today = timezone.localdate()
+    posting = JobPosting.objects.create(
+        owner=user, company=company, title="Portal Researcher", closes_at=today + dt.timedelta(1)
+    )
+    closing.announce_closing_postings()
+    posting.closes_at = today + dt.timedelta(days=2)
+    posting.save(update_fields=["closes_at"])
+    closing.announce_closing_postings()
+
+    assert WebhookDelivery.objects.count() == 2
+
+
+def test_the_key_of_a_long_list_still_fits_its_column(user, company):
+    from types import SimpleNamespace
+
+    from postulo.notifications.models import WebhookDelivery
+
+    today = timezone.localdate()
+    rows = [
+        SimpleNamespace(
+            pk=1000 + index,
+            title=f"Role {index}",
+            company=company,
+            closes_at=today + dt.timedelta(days=1),
+        )
+        for index in range(100)
+    ]
+
+    message = closing._announcement(rows, today)
+
+    assert len(message.key) <= WebhookDelivery._meta.get_field("key").max_length
+
+
 def test_the_notice_follows_the_person(user, company):
     from postulo.accounts.models import Profile
 
@@ -389,7 +428,7 @@ def test_the_announcement_names_the_listings(user, company):
 
     assert message.event == "posting_closing"
     assert "Portal Researcher" in message.body
-    assert message.key == f"posting_closing:{rows[0].pk}"
+    assert message.key.startswith("posting_closing:")
     assert message.data["posting_ids"] == [rows[0].pk]
 
 

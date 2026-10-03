@@ -146,7 +146,7 @@ def test_a_reminder_falling_due_is_the_same_message_however_often_it_is_announce
         announce_due_reminders()
 
     assert len(seen) == 2, "announced twice, because the stamp was cleared between passes"
-    assert seen[0].key == seen[1].key == f"reminder:{reminder.pk}"
+    assert seen[0].key == seen[1].key == f"reminder:{reminder.pk}:{reminder.due_at.isoformat()}"
     assert seen[0].occurred_at == reminder.due_at, "when it fell due, not when it was sent"
     assert seen[0].data["reminder_id"] == reminder.pk
     assert seen[0].data["application_id"] == application.pk

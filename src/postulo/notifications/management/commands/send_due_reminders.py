@@ -88,8 +88,9 @@ def announce_due_reminders() -> tuple[int, int]:
                 body=body,
                 url=url,
                 # One reminder falls due once, however many notifiers carry it and however
-                # many times one of them retries (#229).
-                key=f"reminder:{reminder.pk}",
+                # many times one of them retries (#229). Falling due *again* at a new time
+                # is another announcement (#413).
+                key=f"reminder:{reminder.pk}:{reminder.due_at.isoformat()}",
                 occurred_at=reminder.due_at,
                 data={
                     "reminder_id": reminder.pk,

@@ -338,6 +338,46 @@ def test_a_silence_is_announced_once_and_again_after_it_is_broken(user, company,
     assert "1 application has gone quiet" in mail.outbox[-1].subject
 
 
+def test_a_silence_broken_and_resumed_reaches_a_webhook_twice(user, company):
+    """The webhook refuses a key it has seen, so each silence needs a key of its own (#413)."""
+    from postulo.notifications.models import WebhookDelivery
+    from tests.test_webhooks import webhook_connection
+
+    webhook_connection(user)
+    application = sent(user, company, days_ago=60)
+
+    quiet.announce_quiet_applications(at=timezone.now() - dt.timedelta(days=30))
+    record_event(
+        application,
+        kind=EventKind.EMAIL_RECEIVED,
+        summary="Reply",
+        occurred_at=timezone.now() - dt.timedelta(days=22),
+    )
+    quiet.announce_quiet_applications()
+
+    assert WebhookDelivery.objects.count() == 2
+
+
+def test_the_key_of_a_long_list_still_fits_its_column(company):
+    from types import SimpleNamespace
+
+    from postulo.notifications.models import WebhookDelivery
+
+    now = timezone.now()
+    rows = [
+        SimpleNamespace(
+            pk=1000 + index,
+            posting=SimpleNamespace(title=f"Role {index}", company=company),
+            last_activity_at=now - dt.timedelta(days=30),
+        )
+        for index in range(100)
+    ]
+
+    message = quiet._announcement(rows, now)
+
+    assert len(message.key) <= WebhookDelivery._meta.get_field("key").max_length
+
+
 def test_the_switch_on_the_connection_is_respected_and_the_stamp_still_set(user, company):
     email_connection(user, event_went_quiet=False)
     sent(user, company, days_ago=30)

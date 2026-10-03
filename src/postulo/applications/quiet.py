@@ -27,6 +27,7 @@ from postulo.notifications.base import (
     Notification,
     absolute_url,
     announcement_body,
+    announcement_key,
     owner_of,
 )
 from postulo.notifications.service import notify
@@ -137,9 +138,10 @@ def _announcement(applications: list[Application], now) -> Notification:
         % {"count": count},
         body=announcement_body(lines, count),
         url=absolute_url(reverse("applications:list") + "?quiet=1"),
-        # One announcement per person per pass, named by the applications it is about, so
-        # a notifier that retries does not say it twice (#229).
-        key="went_quiet:" + ",".join(str(row.pk) for row in applications),
+        # One announcement per person per pass, named by the applications it is about and
+        # the stamp this pass wrote, so a notifier that retries does not say it twice (#229)
+        # and one that went quiet again is not mistaken for one that was said (#413).
+        key=announcement_key("went_quiet", now.isoformat(), *(row.pk for row in applications)),
         occurred_at=now,
         data={"application_ids": [row.pk for row in applications], "count": count},
     )

@@ -25,6 +25,7 @@ from postulo.plugins.api import DestinationRefused, Notification
 from postulo.plugins.policy import allows, refused_connections
 from postulo.plugins.secrets import SecretsUnreadable
 
+from .base import announcement_key
 from .models import DeliveryStatus, WebhookDelivery
 
 logger = logging.getLogger(__name__)
@@ -61,16 +62,19 @@ def enqueue_for(user, url: str, notification: Notification) -> list[WebhookDeliv
 
 def enqueue(connection, notification: Notification) -> WebhookDelivery | None:
     """A delivery row for this connection, unless its key has one already."""
-    if (
-        notification.key
-        and WebhookDelivery.objects.filter(connection=connection, key=notification.key).exists()
-    ):
+    key = notification.key
+    limit = WebhookDelivery._meta.get_field("key").max_length
+    if len(key) > limit:
+        # A later announcer must not be able to overflow the column, which PostgreSQL
+        # enforces and SQLite does not (#413). Hashed whole, so it still names one thing.
+        key = announcement_key(key[: limit - 50], key)
+    if key and WebhookDelivery.objects.filter(connection=connection, key=key).exists():
         return None
     return WebhookDelivery.objects.create(
         owner=connection.owner,
         connection=connection,
         event=notification.event,
-        key=notification.key,
+        key=key,
         body=plugin.encode(plugin.payload_for(notification)),
         next_attempt_at=timezone.now(),
     )

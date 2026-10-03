@@ -600,3 +600,34 @@ def test_nothing_is_announced_before_the_change_is_committed(
     assert len(callbacks) == 1
     callbacks[0]()
     assert WebhookDelivery.objects.count() == 1
+
+
+def test_a_reminder_moved_and_due_again_is_delivered_again(user):
+    """The key is the announcement, not the reminder, so *Later* is not swallowed (#413)."""
+    from postulo.applications.models import Reminder
+    from postulo.applications.services import postpone_reminder
+    from postulo.notifications.management.commands.send_due_reminders import (
+        announce_due_reminders,
+    )
+
+    webhook_connection(user)
+    reminder = Reminder.objects.create(
+        owner=user, summary="Chase them", due_at=timezone.now() - dt.timedelta(hours=2)
+    )
+    announce_due_reminders()
+    postpone_reminder(reminder, timezone.now() - dt.timedelta(hours=1))
+    announce_due_reminders()
+
+    assert WebhookDelivery.objects.count() == 2
+
+
+def test_a_key_longer_than_its_column_is_shortened_and_still_means_one_delivery(user):
+    connection = webhook_connection(user)
+    limit = WebhookDelivery._meta.get_field("key").max_length
+    long_key = "went_quiet:" + ",".join(str(number) for number in range(1000, 1200))
+    notification = Notification(event="went_quiet", title="x", key=long_key)
+
+    first = webhooks.enqueue(connection, notification)
+
+    assert first is not None and len(first.key) <= limit
+    assert webhooks.enqueue(connection, notification) is None

@@ -33,6 +33,7 @@ from postulo.notifications.base import (
     Notification,
     absolute_url,
     announcement_body,
+    announcement_key,
     owner_of,
 )
 from postulo.notifications.service import notify, zone_for
@@ -148,9 +149,12 @@ def _announcement(postings: list[JobPosting], today: dt.date) -> Notification:
         % {"count": count},
         body=announcement_body(lines, count),
         url=absolute_url(reverse("listings:list")),
-        # One message per person per pass, named by the listings it is about, so a notifier
-        # that retries does not say it twice (#229).
-        key="posting_closing:" + ",".join(str(row.pk) for row in postings),
+        # One message per person per pass, named by the listings and the dates it is about,
+        # so a notifier that retries does not say it twice (#229) and a date that moved is
+        # said again (#413).
+        key=announcement_key(
+            "posting_closing", *(f"{row.pk}@{row.closes_at.isoformat()}" for row in postings)
+        ),
         occurred_at=timezone.now(),
         data={
             "posting_ids": [row.pk for row in postings],

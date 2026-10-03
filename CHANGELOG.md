@@ -256,6 +256,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+A webhook now receives a reminder that was moved and fell due again, a listing whose closing date moved, and an application that went quiet again, instead of dropping them as repeats; a long quiet or closing list no longer overflows the key column on PostgreSQL. (#413)
 Status, interview and offer notifications are sent after the change is committed, so a notifier's network call no longer holds the database write lock, and a change that is rolled back is no longer announced. (#578)
 A webhook whose stored secret can no longer be decrypted (a rotated key, a restored backup) is given up on with the reason on its connection, instead of ending every scheduler pass that reaches it. (#573)
 A document copy the scheduler is already sending is no longer sent a second time when *Send now* is pressed: the claim is kept apart from the retry time. (#509)
