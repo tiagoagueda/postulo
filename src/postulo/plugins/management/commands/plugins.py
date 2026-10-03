@@ -127,15 +127,22 @@ class Command(BaseCommand):
         imported cleanly and then turned out to be the wrong version -- which no check at
         install time could have caught, because nothing about the wheel says so.
         """
-        before = {entry.name: entry.version for entry in installing.read_record()}
+        record = installing.read_record()
+        before = {entry.name: entry.version for entry in record}
+        was_off = {entry.name: entry.disabled for entry in record}
         try:
             entries = installing.roll_back()
         except installing.InstallError as error:
             raise CommandError(str(error)) from error
         after = {entry.name: entry.version for entry in entries}
+        now_off = {entry.name: entry.disabled for entry in entries}
         for name in sorted(set(before) | set(after)):
             was, now = before.get(name), after.get(name)
             if was == now:
+                if was_off.get(name) != now_off.get(name):
+                    self.stdout.write(
+                        f"{name} is now {'disabled' if now_off[name] else 'enabled'}."
+                    )
                 continue
             if now is None:
                 self.stdout.write(f"Removed {name} {was}.")

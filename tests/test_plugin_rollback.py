@@ -246,6 +246,40 @@ def test_the_command_can_go_back_and_says_what_moved(tmp_path, plugins_dir, inst
         call_command("plugins", "rollback")
 
 
+def test_rolling_back_does_not_switch_back_on_what_was_switched_off_since(
+    tmp_path, plugins_dir, installer
+):
+    """The snapshot's record is from before the install, and holds none of what was decided
+    since: switching a plugin off for a security reason must outlast undoing another (#600)."""
+    installing.install_wheel(a_wheel(tmp_path, name="postulo-example"))
+    installing.install_wheel(a_wheel(tmp_path, name="postulo-other"))
+    installing.set_disabled("postulo-example", True)
+
+    installing.roll_back()
+
+    assert installing.installed("postulo-other") is None
+    assert installing.installed("postulo-example").disabled is True
+    assert "postulo-example" in installing.disabled_names()
+
+
+def test_the_command_names_a_plugin_whose_disabled_state_changed(plugins_dir, capsys, monkeypatch):
+    """A change of state is reported when there is one, whatever caused it."""
+    monkeypatch.setattr(
+        installing,
+        "read_record",
+        lambda: [installing.Installed(name="postulo-example", version="1.0")],
+    )
+    monkeypatch.setattr(
+        installing,
+        "roll_back",
+        lambda: [installing.Installed(name="postulo-example", version="1.0", disabled=True)],
+    )
+
+    call_command("plugins", "rollback")
+
+    assert "postulo-example is now disabled." in capsys.readouterr().out
+
+
 # --------------------------------------------------- what a removal takes with it
 
 

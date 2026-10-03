@@ -668,12 +668,26 @@ def roll_back() -> list[Installed]:
     cleanly and then does the wrong thing, which no check here could have caught. The
     snapshot is spent afterwards: there is one, and rolling back twice would be rolling
     back to a state nobody kept.
+
+    Only the plugins' files and versions go back. Which of them are switched off is kept
+    as it is now, and a plugin removed since the install comes back (its files are in the
+    snapshot) -- the command says so (#600).
     """
     if not can_roll_back():
         raise InstallError(
             str(_("There is nothing to go back to: no plugin has been installed since."))
         )
+    now = {canonicalise(entry.name): entry for entry in read_record()}
     restore_snapshot()
+    # The snapshot's record is as it was before the install, so it also holds every
+    # decision made since: a plugin switched off after the install would be switched on
+    # again by it. The files go back; what the administrator decided about a plugin that is
+    # still here stays decided (#600).
+    restored = read_record()
+    for entry in restored:
+        if (current := now.get(canonicalise(entry.name))) is not None:
+            entry.disabled = current.disabled
+    write_record(restored)
     shutil.rmtree(previous_dir(), ignore_errors=True)
     _tidy_snapshots()
     activate()
