@@ -155,7 +155,12 @@ def test_a_click_that_asks_for_a_new_tab_is_left_to_open_the_page(
         opener.click(modifiers=["ControlOrMeta"])
 
     expect(page.locator("#settings-identifiers > *")).to_be_hidden()
-    expect(opened.value).to_have_url(f"{live_server.url}/server/plugins/identifiers/")
+    # The tab is opened by the browser and loads on its own clock: under CI's load its
+    # first navigation took longer than `expect`'s five seconds once (run 663), so it is
+    # waited for before its address is read.
+    tab = opened.value
+    tab.wait_for_load_state("domcontentloaded", timeout=30_000)
+    expect(tab).to_have_url(f"{live_server.url}/server/plugins/identifiers/", timeout=15_000)
 
 
 def test_the_dialog_fits_a_phone(page: Page, live_server, administrator):
