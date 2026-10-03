@@ -8,7 +8,7 @@ that every contributor and every build can run it.
     uv run python scripts/messages.py extract          # refresh every .po from the source
     uv run python scripts/messages.py extract --check  # fail if a .po is out of date
     uv run python scripts/messages.py compile          # write the .mo files Django loads
-    uv run python scripts/messages.py stats [--write]  # how far along each language is
+    uv run python scripts/messages.py stats [--write|--check]  # how far along each language is
     uv run python scripts/messages.py check            # placeholders and plural forms agree
 
 **A plugin repository runs the same four commands against itself** as ``postulo-messages``,
@@ -906,7 +906,11 @@ def _as_the_reader_sees_it(catalogues: list[Catalogue]) -> Catalogue:
     return Catalogue(header={}, messages=merged)
 
 
-def cmd_stats(write: bool) -> int:
+def _status_text(report: dict[str, dict[str, int]]) -> str:
+    return json.dumps(report, indent=2, ensure_ascii=False) + "\n"
+
+
+def build_report() -> dict[str, dict[str, int]]:
     """How far along each language is, counting every set.
 
     Summed rather than reported per set, because the figure is shown to somebody choosing
@@ -923,6 +927,12 @@ def cmd_stats(write: bool) -> int:
         if not found:
             continue
         report[code] = stats_for(_as_the_reader_sees_it(found))
+    return report
+
+
+def cmd_stats(write: bool, check: bool = False) -> int:
+    """Print the report; --write stores it, --check fails if the stored one is stale (#495)."""
+    report = build_report()
     width = max((len(NATIVE_NAMES[c]) for c in report), default=10)
     for code, row in report.items():
         state = f"{row['percent']:3d} %"
@@ -932,11 +942,15 @@ def cmd_stats(write: bool) -> int:
             state += f"  ({row['fuzzy']} fuzzy)"
         counts = f"{row['translated']:4}/{row['total']:<4}"
         print(f"{code:6} {NATIVE_NAMES[code]:{width}}  {counts} {state}")
+    status = project().locale / "status.json"
+    if check:
+        stored = status.read_text(encoding="utf-8") if status.exists() else None
+        if stored != _status_text(report):
+            print("locale/status.json is out of date: run `stats --write`", file=sys.stderr)
+            return 1
     if write:
-        (project().locale / "status.json").write_text(
-            json.dumps(report, indent=2, ensure_ascii=False) + "\n", encoding="utf-8", newline="\n"
-        )
-        print(f"written to {(project().locale / 'status.json').relative_to(project().root)}")
+        status.write_text(_status_text(report), encoding="utf-8", newline="\n")
+        print(f"written to {status.relative_to(project().root)}")
     return 0
 
 
@@ -958,6 +972,9 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("check", help="placeholders and plural forms agree")
     stats = sub.add_parser("stats", help="how far along each language is")
     stats.add_argument("--write", action="store_true", help="also write locale/status.json")
+    stats.add_argument(
+        "--check", action="store_true", help="fail if locale/status.json is out of date"
+    )
     args = parser.parse_args(argv)
     project()
     if args.command == "extract":
@@ -966,4 +983,4 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_compile()
     if args.command == "check":
         return cmd_check()
-    return cmd_stats(args.write)
+    return cmd_stats(args.write, args.check)

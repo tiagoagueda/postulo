@@ -406,3 +406,10 @@ def test_a_plugin_without_a_url_or_licence_claims_neither(tool, plugin_repo):
     assert "AGPL" not in comments
     assert tool.cmd_extract(check=False) == 0
     assert tool.cmd_extract(check=True) == 0
+
+
+def test_the_committed_status_report_is_what_the_catalogues_give(tool):
+    # The picker and *Defaults* read locale/status.json and nothing else, so a file nobody
+    # refreshed shows languages as complete that are not (#495). CI runs `stats --check`.
+    stored = (tool.project().locale / "status.json").read_text(encoding="utf-8")
+    assert stored == tool._status_text(tool.build_report()), "run `stats --write`"

@@ -158,7 +158,7 @@ uv run python scripts/messages.py extract          # refresh every catalogue fro
 uv run python scripts/messages.py extract --check  # fail if a catalogue is out of date (CI)
 uv run python scripts/messages.py check            # placeholders and plural forms agree (CI)
 uv run python scripts/messages.py compile          # write the .mo files Django loads
-uv run python scripts/messages.py stats [--write]  # progress; --write refreshes status.json
+uv run python scripts/messages.py stats [--write|--check]  # progress; --write refreshes status.json, --check (CI) fails if stale
 ```
 
 `extract` keeps every existing translation and its flags, adds a slot for each new string
