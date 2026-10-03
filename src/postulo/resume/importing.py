@@ -22,6 +22,8 @@ from django.utils.translation import gettext as _
 from postulo.accounts import identifiers
 from postulo.core import languages, phone_numbers, phones, web_links
 
+from . import ordering
+
 
 @dataclass
 class Record:
@@ -299,6 +301,10 @@ def apply(owner, record: Record) -> Report:
             owner.save(update_fields=[field_name])
             report.profile_filled.append(field_name)
 
+    # Each section is placed as an entry typed by hand would be (#203, #618): by its date
+    # where it has one, last where it has not, and dense numbers after. The rows are built
+    # here and written once per section by `ordering.place_many`, which calls no `save`.
+    experience = []
     for entry in record.experience:
         if not entry.get("start_date"):
             # Experience needs a start; without one there is nothing to order it by. Said
@@ -311,42 +317,53 @@ def apply(owner, record: Record) -> Report:
                 )
             )
             continue
-        Experience.objects.create(
-            owner=owner,
-            role=entry["role"][:200],
-            organisation=entry["organisation"][:200],
-            location=entry["location"][:200],
-            start_date=entry["start_date"],
-            end_date=entry["end_date"],
-            summary=entry["summary"],
+        experience.append(
+            Experience(
+                owner=owner,
+                role=entry["role"][:200],
+                organisation=entry["organisation"][:200],
+                location=entry["location"][:200],
+                start_date=entry["start_date"],
+                end_date=entry["end_date"],
+                summary=entry["summary"],
+            )
         )
-        report.added["experience"] = report.added.get("experience", 0) + 1
+    ordering.place_many(Experience, owner, experience)
+    if experience:
+        report.added["experience"] = len(experience)
 
+    education = []
     for entry in record.education:
-        Education.objects.create(
-            owner=owner,
-            qualification=entry["qualification"][:200],
-            institution=entry["institution"][:200],
-            location=entry["location"][:200],
-            start_date=entry["start_date"],
-            end_date=entry["end_date"],
-            grade=entry["grade"][:100],
-            highlights=entry["highlights"],
+        education.append(
+            Education(
+                owner=owner,
+                qualification=entry["qualification"][:200],
+                institution=entry["institution"][:200],
+                location=entry["location"][:200],
+                start_date=entry["start_date"],
+                end_date=entry["end_date"],
+                grade=entry["grade"][:100],
+                highlights=entry["highlights"],
+            )
         )
-        report.added["education"] = report.added.get("education", 0) + 1
+    ordering.place_many(Education, owner, education)
+    if education:
+        report.added["education"] = len(education)
 
+    spoken = []
     for entry in record.languages:
         # A level the file did not state is left unset rather than guessed at. `or "b1"`
         # meant that anybody whose Europass CV listed a language without CEFR levels -- which
         # is most of them, because the editor never made the five boxes compulsory -- ended
         # up claiming B1 in it, on a CV, without ever having said so (#235).
-        LanguageSkill.objects.create(
-            owner=owner,
-            name=entry["name"][:100],
-            proficiency=entry["proficiency"],
+        spoken.append(
+            LanguageSkill(owner=owner, name=entry["name"][:100], proficiency=entry["proficiency"])
         )
-        report.added["languages"] = report.added.get("languages", 0) + 1
+    ordering.place_many(LanguageSkill, owner, spoken)
+    if spoken:
+        report.added["languages"] = len(spoken)
 
+    skills = []
     for group in record.skill_groups:
         group_name = group["name"][:100]
         # A heading somebody already has is reused. Two "Languages" headings on one CV is
@@ -354,16 +371,25 @@ def apply(owner, record: Record) -> Report:
         # still only ever adding.
         made = SkillGroup.objects.filter(owner=owner, name=group_name).first()
         if made is None:
-            made = SkillGroup.objects.create(owner=owner, name=group_name)
+            made = SkillGroup(owner=owner, name=group_name)
+            ordering.place_many(SkillGroup, owner, [made])
             report.added["skill_groups"] = report.added.get("skill_groups", 0) + 1
         for name in group["skills"]:
-            Skill.objects.create(owner=owner, group=made, name=name[:100])
-            report.added["skills"] = report.added.get("skills", 0) + 1
+            skill = Skill(owner=owner, group=made, name=name[:100])
+            # `bulk_create` calls no `save`, which is where a skill works out which ESCO
+            # skill its name is.
+            skill.match()
+            skills.append(skill)
+    ordering.place_many(Skill, owner, skills)
+    if skills:
+        report.added["skills"] = len(skills)
 
-    for entry in record.projects:
-        Project.objects.create(
-            owner=owner, name=entry["name"][:200], summary=entry.get("summary", "")
-        )
-        report.added["projects"] = report.added.get("projects", 0) + 1
+    projects = [
+        Project(owner=owner, name=entry["name"][:200], summary=entry.get("summary", ""))
+        for entry in record.projects
+    ]
+    ordering.place_many(Project, owner, projects)
+    if projects:
+        report.added["projects"] = len(projects)
 
     return report

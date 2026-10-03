@@ -97,7 +97,7 @@ MAX_TRANSLATIONS = 2000
 #: of asking that about a great many numbers at once (#142).
 MAX_CONTACT_ROWS = 20
 #: How many rows go to the database in one statement.
-BATCH = 200
+BATCH = ordering.BATCH
 
 #: A date as the file writes one, which is how `date.isoformat()` does. Matched rather than
 #: handed to a form, whose date field also reads whatever the reader's language writes --
@@ -1414,42 +1414,17 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
     entry typed by hand would land (#203): by its date where the section has one, last
     where it has not, and the person's to move from there.
     """
-    standing = list(kind.model.objects.for_user(user).order_by("order", "pk"))
-    dated = ordering.DATE_FIELDS.get(kind.model.__name__) if standing else None
-    sequence = list(standing)
+    items = []
     for row in sorted(rows, key=lambda row: (row.order is None, row.order or 0, row.position)):
         item = row.instance
         item.owner = user
         if kind.block == "skills":
             item.group = row.parent.target if row.parent is not None else None
-            # `bulk_create` below calls no `save`, which is where a skill works out which
-            # ESCO skill its name is; so it is asked here, from the name, as a save would.
+            # `bulk_create` calls no `save`, which is where a skill works out which ESCO
+            # skill its name is; so it is asked here, from the name, as a save would.
             item.match()
-        place = len(sequence)
-        if dated is not None:
-            mine = ordering.newest_first_key(item, dated)
-            for index, other in enumerate(sequence):
-                if ordering.newest_first_key(other, dated) < mine:
-                    place = index
-                    break
-        sequence.insert(place, item)
-
-    # Dense numbers in the order just settled, as `ordering.renumber` leaves them, written
-    # in two statements rather than one for each entry: what is new, and the places of
-    # what was there and has moved. A file may hold a few hundred entries of a kind, and
-    # a request that asked the database about each would hold it for as long as somebody
-    # else's file cared to make it.
-    now = timezone.now()
-    added, moved = [], []
-    for place, item in enumerate(sequence):
-        if item.pk is None:
-            item.order = place
-            added.append(item)
-        elif item.order != place:
-            item.order, item.updated_at = place, now
-            moved.append(item)
-    kind.model.objects.bulk_create(added, batch_size=BATCH)
-    kind.model.objects.bulk_update(moved, ["order", "updated_at"], batch_size=BATCH)
+        items.append(item)
+    ordering.place_many(kind.model, user, items)
 
 
 def _translate(user, rows: list[Row]) -> None:

@@ -173,6 +173,43 @@ def test_a_new_undated_entry_goes_last(client, user):
     assert Link.objects.get(title="Blog").order == 1
 
 
+def test_a_europass_import_places_what_it_adds_as_an_entry_typed_by_hand_would_land(user):
+    """Every imported row used to keep order 0 and land under the first entry (#618)."""
+    from postulo.resume import importing
+    from postulo.resume.models import Project
+
+    ordering.renumber(
+        [
+            job(user, "r2024", dt.date(2024, 1, 1)),
+            job(user, "r2020", dt.date(2020, 1, 1)),
+            job(user, "r2016", dt.date(2016, 1, 1)),
+        ]
+    )
+    Project.objects.create(owner=user, name="Old project", order=0)
+    record = importing.Record(
+        experience=[
+            {
+                "role": role,
+                "organisation": "Initech",
+                "location": "",
+                "start_date": start,
+                "end_date": None,
+                "summary": "",
+            }
+            for role, start in (("r2022", dt.date(2022, 1, 1)), ("r2010", dt.date(2010, 1, 1)))
+        ],
+        projects=[{"name": "New one", "summary": ""}, {"name": "Newer one", "summary": ""}],
+    )
+
+    importing.apply(user, record)
+
+    assert roles(user) == ["r2024", "r2022", "r2020", "r2016", "r2010"]
+    assert [e.order for e in Experience.objects.for_user(user)] == [0, 1, 2, 3, 4]
+    projects = Project.objects.for_user(user)
+    assert [p.name for p in projects] == ["Old project", "New one", "Newer one"]
+    assert [p.order for p in projects] == [0, 1, 2]
+
+
 def test_a_date_edited_later_moves_nothing(client, user):
     ordering.renumber(
         [job(user, "Top", dt.date(2022, 1, 1)), job(user, "Below", dt.date(2018, 1, 1))]
