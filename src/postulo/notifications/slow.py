@@ -23,6 +23,7 @@ from __future__ import annotations
 import datetime as dt
 from collections.abc import Callable
 
+from django.db import transaction
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext as _
@@ -151,8 +152,13 @@ def tell(event: str, owner, *, subject=None, **payload) -> None:
 
     if not anybody_wants(owner, event):
         return
-    errands.send(
-        "notify", owner, subject=subject, event=event, at=timezone.now().isoformat(), **payload
+    at = timezone.now().isoformat()
+    # After the commit, and only if there is one. Every caller is inside a transaction, and
+    # without a worker the errand runs on the spot: a notifier's network call would hold the
+    # write lock, and a change rolled back afterwards would already have been announced
+    # (#578). Outside a transaction `on_commit` runs it at once.
+    transaction.on_commit(
+        lambda: errands.send("notify", owner, subject=subject, event=event, at=at, **payload)
     )
 
 

@@ -344,7 +344,9 @@ def test_nobody_elses_webhook_hears_a_thing(user, other_user):
 # ----------------------------------------------------------- what you did
 
 
-def test_a_status_change_reaches_a_webhook_and_not_the_mail(user, settings):
+def test_a_status_change_reaches_a_webhook_and_not_the_mail(
+    user, settings, django_capture_on_commit_callbacks
+):
     settings.POSTULO_BACKGROUND_WORK = False
     from allauth.account.models import EmailAddress
 
@@ -362,7 +364,8 @@ def test_a_status_change_reaches_a_webhook_and_not_the_mail(user, settings):
 
     from django.core import mail
 
-    change_status(application, Status.INTERVIEWING)
+    with django_capture_on_commit_callbacks(execute=True):
+        change_status(application, Status.INTERVIEWING)
 
     row = WebhookDelivery.objects.get()
     payload = json.loads(row.body)
@@ -383,15 +386,18 @@ def test_no_webhook_means_no_errand_per_click(user, settings):
     assert not Errand.objects.filter(kind="notify").exists()
 
 
-def test_an_interview_and_an_offer_reach_a_webhook(user, settings):
+def test_an_interview_and_an_offer_reach_a_webhook(
+    user, settings, django_capture_on_commit_callbacks
+):
     settings.POSTULO_BACKGROUND_WORK = False
     webhook_connection(user)
     application = an_application(user)
 
-    interview = schedule_interview(
-        application, kind="video", starts_at=timezone.now() + dt.timedelta(days=2)
-    )
-    record_offer(application, base_amount=Decimal("65000"), currency="EUR")
+    with django_capture_on_commit_callbacks(execute=True):
+        interview = schedule_interview(
+            application, kind="video", starts_at=timezone.now() + dt.timedelta(days=2)
+        )
+        record_offer(application, base_amount=Decimal("65000"), currency="EUR")
 
     events = sorted(WebhookDelivery.objects.values_list("event", flat=True))
     assert "interview_scheduled" in events and "offer_recorded" in events
@@ -566,3 +572,31 @@ def test_a_row_that_raises_does_not_stop_the_rows_behind_it(user):
 
     with mock.patch.object(webhooks, "deliver", side_effect=[RuntimeError("boom"), True]):
         assert webhooks.send_pending() == (1, 1)
+
+
+def test_nothing_is_announced_before_the_change_is_committed(
+    user, settings, django_capture_on_commit_callbacks
+):
+    """A notifier is not called under the write lock, nor for a change rolled back (#578)."""
+    from django.db import transaction
+
+    settings.POSTULO_BACKGROUND_WORK = False
+    webhook_connection(user)
+    application = an_application(user)
+
+    with django_capture_on_commit_callbacks(execute=True) as callbacks:
+        try:
+            with transaction.atomic():
+                change_status(application, Status.INTERVIEWING)
+                raise RuntimeError("a later row of the import failed")
+        except RuntimeError:
+            pass
+    assert callbacks == [] and not WebhookDelivery.objects.exists(), "rolled back, so unsaid"
+
+    with django_capture_on_commit_callbacks(execute=False) as callbacks:
+        with transaction.atomic():
+            change_status(application, Status.INTERVIEWING)
+        assert not WebhookDelivery.objects.exists(), "not while the transaction is open"
+    assert len(callbacks) == 1
+    callbacks[0]()
+    assert WebhookDelivery.objects.count() == 1
