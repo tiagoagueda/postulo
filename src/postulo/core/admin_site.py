@@ -6,7 +6,15 @@ needs. On a self-hosted instance it is mostly a second, less careful way into th
 and it used to sit at ``/admin/`` on every instance whose operator had not read one line of
 the settings file.
 
-Two things follow, and only the second one lives here.
+**It holds the instance, not the people on it (#368).** Accounts, invitations and the
+metadata of API tokens are registered; nobody's applications, documents, contacts or career
+record are, and ``tests/security/test_admin_exposure.py`` fails on a model that is. A
+registration with no owner rule showed every member's job search to whoever held the
+``is_superuser`` flag, and edits made there skipped ``change_status`` and the event log.
+Appointing an administrator from *People* no longer sets that flag; it stays with the
+operator's own account.
+
+Two more things follow, and only the second one lives here.
 
 **It is not mounted unless an operator says so.** ``POSTULO_ADMIN_URL`` is empty by default
 and ``config/urls.py`` adds nothing when it is. Choosing to run the admin and choosing where

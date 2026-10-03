@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Appointing an administrator no longer makes them a superuser, and Django's admin lists no person's records. **Administrators appointed before keep the flag; clear it with `manage.py shell` (see the wiki's *Accounts and invitations*).** (#368)
 - The image carries `/app/constraints.txt`, so a plugin installed on top of it cannot move anything Postulo pins; the wiki's examples use it. (#542)
 - Wrong tokens presented to /logs and /metrics are counted per address and shut it out after ten an hour; a token shorter than 24 characters is warned about. (#472)
 - Behind nginx or Apache an SVG is still sent by Postulo, so its sandbox policy always reaches the browser; the wiki shows the headers the proxy must add for the rest. (#415)

@@ -390,6 +390,11 @@ POSTULO_REGISTRATION_OPEN = env.bool("POSTULO_REGISTRATION_OPEN", default=False)
 # Set it to a path of your own to turn it on. The trailing slash is added if you leave it
 # off, because forgetting it produced a URL nobody could reach and no error saying why.
 #
+# It holds accounts, invitations and API-token metadata and nobody's records (#368), and
+# appointing an administrator from Server settings → People does not make them a superuser:
+# that flag belongs to the account `createsuperuser` made, or the first one. A superuser
+# reaches every account there, passwords and flags included.
+#
 # It has no login of its own (#367). Whoever is not signed in is sent to Postulo's sign-in,
 # so allauth's limits, the second factor and the confirmed address all apply to it, and
 # there is no second set of limits here to keep in step with allauth's.

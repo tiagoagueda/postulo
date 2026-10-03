@@ -1,4 +1,5 @@
-"""Django's admin: off unless asked for (#116), and with no login of its own (#367).
+"""Django's admin: off unless asked for (#116), with no login of its own (#367), and with
+nobody's records in it (#368).
 
 Found on the public test instance rather than read out of the source. `/admin/` answered
 with Django's own username-and-password form, on the open internet, because
@@ -12,6 +13,13 @@ password made a full session for somebody whose account has an authenticator app
 is gone. The admin sends whoever is not signed in to Postulo's sign-in, which has the code,
 the proven address and the limits already.
 
+What it holds was the third finding (#368). Every user-owned model was registered with
+nothing narrowing it to one owner, and appointing an administrator from *People* set
+`is_superuser`, so a co-administrator read and edited every member's job search there, with
+edits that skipped `change_status` and the event log. The registrations are gone and the
+flag is no longer handed out; the last section walks every model rather than the ones
+somebody remembered.
+
 Mounting is decided when the URLconf is imported, so the tests that need an admin reload it
 under `override_settings` rather than pretending.
 """
@@ -21,6 +29,8 @@ from __future__ import annotations
 import pytest
 from allauth.account.models import EmailAddress
 from allauth.mfa.totp.internal.auth import TOTP
+from django.apps import apps
+from django.contrib import admin
 from django.test import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, reverse
 
@@ -308,3 +318,98 @@ def test_the_count_does_not_start_again_under_another_host_name(client, administ
     )
 
     assert "Too many failed login attempts" in sixth.content.decode()
+
+
+# ------------------------------------------------------ nobody's records in it (#368)
+
+#: The one owned model the admin keeps, and why: revoking a leaked token is the operator's
+#: job. Its admin shows metadata and offers no form that could mint one.
+KEPT = {"api.ApiToken"}
+
+
+def an_application(owner):
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=owner, name="Aperture Ltd")
+    posting = JobPosting.objects.create(owner=owner, company=company, title="Test Subject")
+    return Application.objects.create(owner=owner, posting=posting, status=Status.APPLIED)
+
+
+def records_of_people():
+    """Every model whose rows belong to somebody, or hang off a row that does."""
+    from postulo.applications.models import ApplicationEvent
+    from postulo.core.models import OwnedModel
+    from postulo.jobs.models import ListingEvent
+
+    for model in apps.get_models():
+        if issubclass(model, OwnedModel) or model in (ApplicationEvent, ListingEvent):
+            yield model
+
+
+def test_no_model_holding_a_persons_records_is_in_the_admin():
+    """The walk the finding asked for: by what a model is, so a new one is caught too."""
+    shown = [
+        model._meta.label
+        for model in records_of_people()
+        if admin.site.is_registered(model) and model._meta.label not in KEPT
+    ]
+
+    assert shown == [], "registered with nothing narrowing it to one owner"
+
+
+def test_the_one_kept_registration_can_neither_mint_nor_reword_a_token(rf, superuser):
+    from postulo.api.models import ApiToken
+
+    model_admin = admin.site._registry[ApiToken]
+    request = rf.get("/")
+    request.user = superuser
+
+    assert not model_admin.has_add_permission(request)
+    assert not model_admin.has_change_permission(request)
+    assert model_admin.has_view_permission(request), "to see whose it is"
+
+
+def test_an_appointed_administrator_is_offered_nothing_in_the_admin(
+    client, with_an_admin, user, other_user
+):
+    """The finding as a walk: appoint through People, then try to read a stranger's rows."""
+    from django.contrib.auth import get_user_model
+
+    boss = get_user_model().objects.create_user(
+        email="boss@example.org", username="boss", password=PASSWORD, is_staff=True
+    )
+    application = an_application(other_user)
+    client.force_login(boss)
+
+    client.post(reverse("server:person_admin", args=[user.pk]))
+    user.refresh_from_db()
+    assert user.is_staff and not user.is_superuser
+
+    client.force_login(user)
+    index = client.get(f"/{CHOSEN}")
+    assert index.status_code == 200
+    assert not index.context["app_list"], "an empty index, with no model on it"
+    for path in (
+        "applications/application/",
+        f"applications/application/{application.pk}/change/",
+        "accounts/user/",
+    ):
+        assert client.get(f"/{CHOSEN}{path}").status_code in (403, 404), path
+
+
+def test_even_a_superuser_gets_no_page_listing_somebody_elses_applications(
+    client, with_an_admin, superuser, other_user
+):
+    application = an_application(other_user)
+    client.force_login(superuser)
+
+    for path in (
+        "applications/application/",
+        f"applications/application/?owner__id__exact={other_user.pk}",
+        f"applications/application/{application.pk}/change/",
+        "documents/cv/",
+        "jobs/jobposting/",
+    ):
+        assert client.get(f"/{CHOSEN}{path}").status_code == 404, path
+    assert application.posting.title not in client.get(f"/{CHOSEN}").content.decode()

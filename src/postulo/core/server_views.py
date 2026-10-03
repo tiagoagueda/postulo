@@ -229,9 +229,11 @@ class PersonAdminView(StaffRequiredMixin, View):
                     request, _("%(name)s is no longer an administrator.") % {"name": person}
                 )
         else:
+            # Staff only (#368). Nothing in Postulo reads `is_superuser`, and in a mounted
+            # admin it opens every table. That flag belongs to the operator's own account:
+            # the first one, or `createsuperuser` at the console.
             person.is_staff = True
-            person.is_superuser = True
-            person.save(update_fields=["is_staff", "is_superuser"])
+            person.save(update_fields=["is_staff"])
             messages.success(request, _("%(name)s is now an administrator.") % {"name": person})
         return redirect("server:people")
 
