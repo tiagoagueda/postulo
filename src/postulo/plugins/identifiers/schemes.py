@@ -98,7 +98,7 @@ def orcid_checks_out(value: str) -> bool:
     An ORCID that fails its own checksum is a typo, every time. Checking it here is why
     Postulo never has to ask orcid.org whether an identifier is real.
     """
-    digits = value.replace("-", "")
+    digits = re.sub(r"[^0-9X]", "", value)
     total = 0
     for char in digits[:-1]:
         total = (total + int(char)) * 2
@@ -177,6 +177,11 @@ SCHEMES: dict[str, Scheme] = {
             example="0000 0001 2281 955X",
             upper=True,
             tidy=_regroup(16, " "),
+            checksum=orcid_checks_out,
+            checksum_message=_(
+                "That ISNI's last character does not match the rest, so one of them is a typo."
+            ),
+            compact_link=True,
         ),
         Scheme(
             WIKIDATA,

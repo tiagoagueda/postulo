@@ -137,6 +137,10 @@ class Scheme:
     #: a slash, a question mark, an ``@`` -- must stay inside the part of the address the
     #: template put it in, and never choose the host or the page (#311).
     quoted: bool = False
+    #: Whether the link is built from the value with its spaces and hyphens taken out: an
+    #: ISNI is shown in groups of four, and its address is the sixteen characters run
+    #: together.
+    compact_link: bool = False
     #: The longest value the pattern is ever run on; nothing, for a pattern that was
     #: reviewed with the code. An instance's own carries `MAX_VALUE_LENGTH`.
     max_length: int = 0
@@ -160,6 +164,8 @@ class Scheme:
         template = self.person_link if (subject == PERSON and self.person_link) else self.link
         if not template:
             return ""
+        if self.compact_link:
+            value = re.sub(r"[\s-]", "", value)
         if self.quoted:
             written = quote(value, safe="")
             if _steps_out(template, written):

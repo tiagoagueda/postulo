@@ -107,13 +107,13 @@ def test_a_university_can_record_its_isni(user):
     """
     company = Company.objects.create(owner=user, name="Universidade de Lisboa")
 
-    row = CompanyIdentifier(owner=user, company=company, scheme="isni", value="0000000122819550")
+    row = CompanyIdentifier(owner=user, company=company, scheme="isni", value="000000012281955X")
     row.full_clean()
     row.save()
 
     row.refresh_from_db()
-    assert row.value == "0000 0001 2281 9550"
-    assert row.url == "https://isni.org/isni/0000 0001 2281 9550"
+    assert row.value == "0000 0001 2281 955X"
+    assert row.url == "https://isni.org/isni/000000012281955X"
 
 
 def test_a_researcher_can_record_their_wikidata_item(user):
@@ -167,7 +167,7 @@ def test_other_is_available_to_both_and_always_was():
         ("orcid", "https://orcid.org/0000-0002-1825-0097", "0000-0002-1825-0097"),
         ("orcid", "0000000218250097", "0000-0002-1825-0097"),
         ("scopus", "Author ID 7004212771", "7004212771"),
-        ("isni", "0000000122819550", "0000 0001 2281 9550"),
+        ("isni", "000000012281955X", "0000 0001 2281 955X"),
     ],
 )
 def test_a_persons_value_is_still_tidied_the_way_it_was(key, typed, expected):
@@ -313,3 +313,20 @@ def test_the_two_views_hold_no_validation_of_their_own():
     for module in (person_schemes, company_schemes):
         code = inspect.getsource(module).split('"""', 2)[2]
         assert "raise ValidationError" not in code, module.__name__
+
+
+def test_an_isni_with_a_wrong_check_character_is_refused_and_its_link_has_no_space(user):
+    """ISNI's last character is ORCID's ISO 7064 check, and its address is run together (#637)."""
+    company = Company.objects.create(owner=user, name="Universidade de Lisboa")
+    for typed in ("0000 0001 2281 9551", "0000 0001 2281 9559", "0000 0001 2182 955X"):
+        row = CompanyIdentifier(owner=user, company=company, scheme="isni", value=typed)
+        with pytest.raises(ValidationError):
+            row.full_clean()
+
+    person = PersonIdentifier(profile=user.profile, scheme="isni", value="0000 0001 2281 9551")
+    with pytest.raises(ValidationError):
+        person.full_clean()
+
+    scheme = person_schemes.schemes()["isni"]
+    assert person_schemes.clean("isni", scheme.example) == scheme.example
+    assert scheme.url_for(scheme.example) == "https://isni.org/isni/000000012281955X"
