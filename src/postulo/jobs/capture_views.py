@@ -179,6 +179,18 @@ def after_deciding(request: HttpRequest, decided: Capture) -> HttpResponse:
     return redirect(following.get_absolute_url())
 
 
+ALREADY_DECIDED = _("That capture was already saved or discarded.")
+
+
+def became_url(capture: Capture) -> str:
+    """Where a decided capture went: its application, its listing, or the list it left."""
+    if capture.application_id:
+        return capture.application.get_absolute_url()
+    if capture.posting_id:
+        return capture.posting.get_absolute_url()
+    return reverse("listings:list")
+
+
 #: Said beside a value the page did not state, so a default never reads as a reading. The
 #: sources stopped reporting a currency with no amount behind it (#176); the form still
 #: needs something in a select, and this is what makes that visibly a default (#179).
@@ -325,10 +337,23 @@ class CaptureReviewView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         capture = get_object_or_404(self.get_queryset(), pk=pk)
+        if not capture.is_pending:
+            # Saved or discarded already: what it became, and no form to save it again (#336).
+            return render(request, "jobs/capture_decided.html", {"capture": capture})
         form = self._form(request, capture)
         return render(request, self.template_name, self._context(request, capture, form))
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        # Decided under a lock, as binding is (#336): a form sent twice, or from a stale link,
+        # finds the capture no longer waiting and is sent to what it became.
+        with transaction.atomic():
+            capture = get_object_or_404(self.get_queryset().select_for_update(), pk=pk)
+            if not capture.is_pending:
+                messages.info(request, ALREADY_DECIDED)
+                return redirect(became_url(capture))
+            return self._decide(request, capture)
+
+    def _decide(self, request: HttpRequest, capture: Capture) -> HttpResponse:
         from postulo.applications.models import Priority, Status
         from postulo.applications.services import (
             apply_to_listing,
@@ -336,7 +361,6 @@ class CaptureReviewView(OwnedObjectMixin, View):
             get_or_create_company,
         )
 
-        capture = get_object_or_404(self.get_queryset(), pk=pk)
         form = self._form(request, capture, request.POST)
         if not form.is_valid():
             return render(request, self.template_name, self._context(request, capture, form))
@@ -416,7 +440,7 @@ class CaptureBindView(OwnedObjectMixin, View):
         try:
             bind_capture(capture, listing)
         except AlreadyDecided:
-            messages.info(request, _("That capture was already saved or discarded."))
+            messages.info(request, ALREADY_DECIDED)
             return redirect(listing.get_absolute_url())
         messages.success(
             request,
@@ -450,7 +474,15 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         return Capture.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        capture = get_object_or_404(self.get_queryset(), pk=pk)
+        with transaction.atomic():
+            capture = get_object_or_404(self.get_queryset().select_for_update(), pk=pk)
+            if not capture.is_pending:
+                # A saved capture stays saved (#336).
+                messages.info(request, ALREADY_DECIDED)
+                return redirect(became_url(capture))
+            return self._discard(request, capture)
+
+    def _discard(self, request: HttpRequest, capture: Capture) -> HttpResponse:
         capture.status = CaptureStatus.DISCARDED
         # A discarded capture teaches nothing, and keeps nothing to learn from (#267).
         capture.learning = {}

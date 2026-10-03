@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Review the capture" %}{% endblock %}
+
+{% block content %}
+  {% comment %} A capture that was saved or discarded is not reviewed again (#336): what it
+     became is said here, with no form to save it a second time. {% endcomment %}
+  <div class="mx-auto max-w-3xl" data-capture-decided>
+    <h1 class="mb-4 text-title font-semibold tracking-tight">{% translate "Review the capture" %}</h1>
+    <div class="alert mb-6" data-variant="info" role="status">
+      <p>
+        {% if capture.application %}
+          {% translate "This capture was already saved, and became an application." %}
+          <a href="{{ capture.application.get_absolute_url }}" class="underline">{{ capture.application }}</a>
+        {% elif capture.posting %}
+          {% translate "This capture was already saved, and became a listing." %}
+          <a href="{{ capture.posting.get_absolute_url }}" class="underline">{{ capture.posting }}</a>
+        {% else %}
+          {% translate "This capture was discarded." %}
+        {% endif %}
+      </p>
+    </div>
+    <p class="text-sm"><a href="{% url 'listings:list' %}" class="underline">{% translate "Back to your listings" %}</a></p>
+  </div>
+{% endblock %}

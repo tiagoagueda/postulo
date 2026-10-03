@@ -176,3 +176,46 @@ def test_a_currency_the_page_did_not_state_is_marked_as_a_default(client, user):
 
     form = client.get(reverse("jobs:capture_review", args=[stated.pk])).context["form"]
     assert form.fields["salary_currency"].help_text != NOT_ON_THE_PAGE, "read off the page"
+
+
+# ---------------------------------------------------- a decided capture stays decided (#336)
+
+
+def test_the_review_form_sent_twice_saves_once(client, user, queue):
+    from postulo.applications.models import Application
+    from postulo.jobs.models import JobPosting
+
+    one = queue[0]
+    client.force_login(user)
+    url = reverse("jobs:capture_review", args=[one.pk])
+    body = {**DECISION, "title": "First", "already_applied": "on"}
+    client.post(url, body)
+    again = client.post(url, body, follow=True)
+    assert JobPosting.objects.filter(owner=user).count() == 1
+    assert Application.objects.filter(owner=user).count() == 1
+    assert "already saved or discarded" in again.content.decode()
+    assert again.redirect_chain[-1][0] == Application.objects.get().get_absolute_url()
+
+
+def test_a_saved_capture_cannot_be_discarded(client, user, queue):
+    one = queue[0]
+    client.force_login(user)
+    client.post(reverse("jobs:capture_review", args=[one.pk]), {**DECISION, "title": "First"})
+    client.post(reverse("jobs:capture_discard", args=[one.pk]))
+    one.refresh_from_db()
+    assert one.status == CaptureStatus.ACCEPTED
+    assert one.posting_id
+
+
+def test_the_review_page_of_a_decided_capture_shows_what_it_became(client, user, queue):
+    one, two, _third = queue
+    client.force_login(user)
+    client.post(reverse("jobs:capture_review", args=[one.pk]), {**DECISION, "title": "First"})
+    client.post(reverse("jobs:capture_discard", args=[two.pk]))
+    one.refresh_from_db()
+    saved = client.get(reverse("jobs:capture_review", args=[one.pk]))
+    assert saved.templates[0].name == "jobs/capture_decided.html"
+    assert one.posting.get_absolute_url() in saved.content.decode()
+    assert "<form" not in saved.content.decode().split("data-capture-decided")[1]
+    gone = client.get(reverse("jobs:capture_review", args=[two.pk])).content.decode()
+    assert "was discarded" in gone
