@@ -192,7 +192,7 @@ def test_a_repository_the_environment_sets_wears_the_caution_pill(client, admin,
 def test_a_key_that_is_not_a_key_is_refused(client, admin):
     client.force_login(admin)
 
-    client.post(
+    response = client.post(
         reverse("server:plugin_repository"),
         {
             "action": "add",
@@ -204,6 +204,10 @@ def test_a_key_that_is_not_a_key_is_refused(client, admin):
     )
 
     assert not PluginRepository.objects.filter(name="wrong").exists()
+    # The page again, with the form's own message, not a bare 405 (#491).
+    assert response.status_code == 200
+    assert response.context["repository_form"].errors["public_key"]
+    assert "not base64 at all" in response.content.decode()
 
 
 def test_a_replaced_key_is_said_out_loud(client, admin, caplog):

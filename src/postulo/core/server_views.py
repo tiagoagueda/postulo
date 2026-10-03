@@ -1371,7 +1371,11 @@ class PluginRepositoryView(StaffRequiredMixin, View):
 
     def _save(self, request: HttpRequest, form) -> HttpResponse:
         if not form.is_valid():
-            return PluginsView.as_view()(request, repository_form=form)
+            # `PluginsView` has no `post`, so dispatching the POST to it answered 405 with
+            # an empty body (#491): draw the page with the bound form, which says what was wrong.
+            view = PluginsView()
+            view.setup(request)
+            return view.get(request, repository_form=form)
         changed_key = form.key_changed
         row = form.save()
         if changed_key:
