@@ -514,3 +514,30 @@ def test_a_conflict_with_another_plugins_pin_does_not_blame_postulo(tmp_path, pl
     said = str(raised.value)
     assert "postulo-other has 1.0" in said
     assert "Postulo has" not in said
+
+
+def test_a_copy_of_a_package_postulo_provides_does_not_unpin_it(tmp_path, plugins_dir):
+    """`--target` lays a copy of everything a plugin needs in the plugins directory, Postulo's
+    own packages included. That copy used to count as the plugin's, so its next upgrade could
+    move Postulo's package, and every other plugin's refusal blamed the plugin (#598)."""
+    from importlib.metadata import version
+
+    ours = version("httpx")
+    pretend_dependency(plugins_dir, "httpx", ours)
+    installing.write_record(
+        [installing.Installed(name="plug-a", version="1.0", dependencies=[f"httpx=={ours}"])]
+    )
+
+    assert f"httpx=={ours}" in installing.constraints(exclude="plug-a")
+    assert installing.pin_owners(exclude="plug-a")["httpx"] == ""
+
+    upgrade = installing.PackageInfo(
+        name="plug-a", version="1.1", requires=["httpx==0.1.0"], entry_points=[], filename=""
+    )
+    problems = installing.conflicts_with_core(upgrade)
+    assert problems == [f"httpx: needs 0.1.0, and Postulo has {ours}."]
+
+    other = installing.PackageInfo(
+        name="plug-b", version="1.0", requires=["httpx==0.1.0"], entry_points=[], filename=""
+    )
+    assert installing.conflicts_with_core(other) == [f"httpx: needs 0.1.0, and Postulo has {ours}."]

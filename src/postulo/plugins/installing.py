@@ -288,29 +288,44 @@ def pin_owners(exclude: str = "") -> dict[str, str]:
     in the constraint file while 2.0 was being installed over it.
     """
     skip = canonicalise(exclude) if exclude else ""
-    owners: dict[str, str] = {}
-    for distribution in metadata.distributions():
-        name = distribution.metadata["Name"]
-        if name and distribution.version:
-            owners[canonicalise(name)] = ""
+    owners: dict[str, str] = dict.fromkeys(_core_versions(), "")
 
-    mine: set[str] = set()
     for entry in read_record():
         canonical = canonicalise(entry.name)
+        if canonical == skip:
+            continue
         pinned = [f"{entry.name}=={entry.version}", *entry.dependencies]
         for pin in pinned:
             package = canonicalise(pin.partition("==")[0])
-            if canonical == skip:
-                mine.add(package)
-            else:
+            # A copy of one of Postulo's own packages that the installer laid down in the
+            # plugins directory is still Postulo's pin, not the plugin's (#598).
+            if owners.get(package) != "" or package == canonical:
                 owners[package] = entry.name
-
-    # A package this plugin brought and nobody else claims is this plugin's to move.
-    for package in mine:
-        if owners.get(package) == "":
-            owners.pop(package, None)
     owners.pop(skip, None)
     return owners
+
+
+def _core_versions() -> dict[str, str]:
+    """``{name: version}`` of what Postulo itself runs on: every distribution that is not
+    in the plugins directory.
+
+    `--target` lays a copy of every package a plugin needs in the plugins directory,
+    including ones Postulo already has, so telling the two apart is by where each lives
+    (#598).
+    """
+    directory = plugins_dir().resolve()
+    found: dict[str, str] = {}
+    for distribution in metadata.distributions():
+        name = distribution.metadata["Name"]
+        if not (name and distribution.version):
+            continue
+        try:
+            if Path(str(distribution.locate_file(""))).resolve() == directory:
+                continue
+        except OSError:  # pragma: no cover - a distribution that cannot say where it is
+            pass
+        found.setdefault(canonicalise(name), distribution.version)
+    return found
 
 
 def constraints(exclude: str = "") -> list[str]:
@@ -322,11 +337,9 @@ def constraints(exclude: str = "") -> list[str]:
     the two breaks first.
     """
     owners = pin_owners(exclude)
-    versions: dict[str, str] = {}
-    for distribution in metadata.distributions():
-        name = distribution.metadata["Name"]
-        if name and distribution.version and canonicalise(name) in owners:
-            versions[canonicalise(name)] = distribution.version
+    versions: dict[str, str] = {
+        name: version for name, version in _core_versions().items() if name in owners
+    }
     for entry in read_record():
         if entry.name and owners.get(canonicalise(entry.name)) == entry.name:
             versions[canonicalise(entry.name)] = entry.version
