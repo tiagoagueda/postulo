@@ -86,7 +86,9 @@ def installer(monkeypatch, plugins_dir):
         with zipfile.ZipFile(wheel) as archive:
             names = archive.namelist()
             archive.extractall(target)
-        for dist_info in Path(target).glob("*.dist-info"):
+        # Only the wheel's own dist-info: another plugin's keeps the files it listed.
+        for folder in {name.split("/")[0] for name in names if ".dist-info/" in name}:
+            dist_info = Path(target) / folder
             (dist_info / "RECORD").write_text(
                 "\n".join(f"{member},," for member in names if not member.endswith("RECORD"))
                 + "\n",
@@ -313,6 +315,79 @@ def test_a_dependency_another_plugin_uses_is_kept(tmp_path, plugins_dir, install
 
     installing.remove("postulo-other")
     assert not (plugins_dir / "leftpad").exists(), "and now nothing is"
+
+
+@pytest.fixture
+def dependency_installer(monkeypatch, plugins_dir, installer):
+    """The fake installer, extended: it also lays down every dependency a wheel declares,
+    unless it is already there, as `--target` does."""
+    unpack = installing.run_install
+
+    def fake(target: Path, wheel: Path, constraint_file: Path) -> str:
+        said = unpack(target, wheel, constraint_file)
+        with zipfile.ZipFile(wheel) as archive:
+            for member in archive.namelist():
+                if member.endswith("/METADATA"):
+                    text = archive.read(member).decode()
+        for line in text.splitlines():
+            if line.startswith("Requires-Dist: "):
+                name = line.removeprefix("Requires-Dist: ").split("==")[0]
+                if not list(plugins_dir.glob(f"{name}-*.dist-info")):
+                    pretend_dependency(plugins_dir, name, "2.0")
+        return said
+
+    monkeypatch.setattr(installing, "run_install", fake)
+
+
+def test_both_plugins_list_a_dependency_they_share(tmp_path, plugins_dir, dependency_installer):
+    """The second plugin finds `shared` already there; it is still what it needs (#597)."""
+    installing.install_wheel(a_wheel(tmp_path, name="postulo-a", requires=("shared==2.0",)))
+    installing.install_wheel(a_wheel(tmp_path, name="postulo-b", requires=("shared==2.0",)))
+
+    assert installing.installed("postulo-a").dependencies == ["shared==2.0"]
+    assert installing.installed("postulo-b").dependencies == ["shared==2.0"]
+
+    installing.remove("postulo-a")
+    assert (plugins_dir / "shared").exists(), "postulo-b is still using it"
+    installing.remove("postulo-b")
+    assert not (plugins_dir / "shared").exists()
+
+
+def test_the_closure_follows_requirements_of_requirements_and_skips_other_markers(
+    tmp_path, plugins_dir
+):
+    pretend_dependency(plugins_dir, "middle")
+    pretend_dependency(plugins_dir, "bottom")
+    pretend_dependency(plugins_dir, "extra-only")
+    for name, wants in (
+        ("top", ["middle", "extra-only; extra == 'more'", "nothere"]),
+        ("middle", ["bottom"]),
+    ):
+        pretend_dependency(plugins_dir, name)
+        meta = plugins_dir / f"{name}-1.0.dist-info" / "METADATA"
+        meta.write_text(
+            meta.read_text(encoding="utf-8") + "".join(f"Requires-Dist: {w}\n" for w in wants),
+            encoding="utf-8",
+        )
+
+    assert installing.dependency_closure(plugins_dir, "top") == ["bottom==1.0", "middle==1.0"]
+
+
+def test_an_upgrade_and_a_reinstall_keep_the_dependency_list(
+    tmp_path, plugins_dir, dependency_installer
+):
+    installing.install_wheel(
+        a_wheel(tmp_path, name="postulo-a", version="1.0", requires=("shared==2.0",))
+    )
+    installing.install_wheel(
+        a_wheel(tmp_path, name="postulo-a", version="1.1", requires=("shared==2.0",))
+    )
+    assert installing.installed("postulo-a").dependencies == ["shared==2.0"]
+
+    installing.install_wheel(
+        a_wheel(tmp_path, name="postulo-a", version="1.1", requires=("shared==2.0",))
+    )
+    assert installing.installed("postulo-a").dependencies == ["shared==2.0"]
 
 
 def test_what_is_shared_is_worked_out_from_the_record(plugins_dir):

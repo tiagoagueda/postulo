@@ -249,6 +249,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- Removing a plugin no longer deletes a package another plugin still needs, and an upgrade or reinstall keeps the plugin's dependency list, because each plugin now records its whole dependency tree. (#597)
 - `plugins rollback` no longer switches back on a plugin that was switched off after the install it undoes, and says when a plugin's disabled state changes. (#600)
 - The plugins record is written to a scratch file and moved into place under a lock, and a record that cannot be parsed keeps the plugins that were switched off switched off instead of loading them all again. (#382)
 - Importing a Europass file now spends your allowance of answers about numbers already recorded here, as the forms do: a number held by somebody else is reported in the import's skipped list, and once the allowance is spent a free number is not written either and the report says so. (#615)

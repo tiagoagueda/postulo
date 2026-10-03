@@ -508,6 +508,48 @@ def distributions_in(directory: Path) -> dict[str, str]:
     return found
 
 
+def dependency_closure(directory: Path, name: str) -> list[str]:
+    """Everything ``name`` needs that sits in ``directory``, as ``name==version``, sorted.
+
+    Walked from the plugin's own ``Requires-Dist`` through the ``.dist-info`` directories
+    beside it, markers evaluated, so it is the plugin's whole dependency tree and not what
+    changed in the directory during one install: a package that was already there because
+    another plugin needed it is still this plugin's dependency, and an upgrade that moves
+    nothing still lists everything (#597). A requirement with no ``.dist-info`` in the
+    directory is Postulo's own and is not recorded.
+    """
+    from packaging.requirements import InvalidRequirement, Requirement
+
+    versions = distributions_in(directory)
+    infos = {}
+    for dist_info in directory.glob("*.dist-info"):
+        stem = dist_info.name[: -len(".dist-info")]
+        infos[canonicalise(stem.rpartition("-")[0])] = dist_info
+    start = canonicalise(name)
+    seen: set[str] = set()
+    queue = [start]
+    while queue:
+        current = queue.pop()
+        dist_info = infos.get(current)
+        if dist_info is None or not (dist_info / "METADATA").is_file():
+            continue
+        headers = Parser().parsestr(
+            (dist_info / "METADATA").read_text(encoding="utf-8", errors="replace")
+        )
+        for line in headers.get_all("Requires-Dist") or []:
+            try:
+                requirement = Requirement(line)
+            except InvalidRequirement:
+                continue
+            if requirement.marker is not None and not requirement.marker.evaluate({"extra": ""}):
+                continue
+            needed = canonicalise(requirement.name)
+            if needed in versions and needed not in seen and needed != start:
+                seen.add(needed)
+                queue.append(needed)
+    return sorted(f"{package}=={versions[package]}" for package in seen)
+
+
 def run_install(target: Path, wheel: Path, constraint_file: Path) -> str:
     """Install one wheel into ``target``. Returns whatever the installer said."""
     command = [
@@ -786,7 +828,6 @@ def install_wheel(
 
     target = plugins_dir()
     target.mkdir(parents=True, exist_ok=True)
-    before = distributions_in(target)
     # Kept before anything is written, because what this is protecting against is an
     # upgrade: `--target --upgrade` writes over the working version, and until #246 there
     # was nothing to go back to once it had.
@@ -817,14 +858,10 @@ def install_wheel(
             % {"name": info.name, "why": " ".join(broken)}
         )
 
-    # What the installer actually brought, as opposed to what the wheel asked for. The
-    # two differ: a requirement of a requirement never appears in the wheel's metadata.
-    after = distributions_in(target)
-    arrived = sorted(
-        f"{name}=={version}"
-        for name, version in after.items()
-        if canonicalise(name) != canonicalise(info.name) and before.get(name) != version
-    )
+    # The plugin's whole dependency tree as it is on the volume now, not the difference from
+    # before: what a plugin needs does not stop being its own because another plugin put
+    # it there first (#597).
+    arrived = dependency_closure(target, info.name)
 
     entry = Installed(
         name=info.name,

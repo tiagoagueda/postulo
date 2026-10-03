@@ -1016,6 +1016,8 @@ def test_the_record_keeps_what_actually_arrived_not_what_was_asked_for(
             made = Path(target) / f"{name}-{version}.dist-info"
             made.mkdir(parents=True, exist_ok=True)
             (made / "RECORD").write_text("", encoding="utf-8")
+            needs = "Requires-Dist: a-transitive-thing\n" if name == "something_useful" else ""
+            (made / "METADATA").write_text(f"Name: {name}\n{needs}\n", encoding="utf-8")
         return "installed"
 
     monkeypatch.setattr(installing, "run_install", fake)
@@ -1052,10 +1054,11 @@ def test_what_came_with_a_plugin_is_shown_beside_it(
         made = Path(target) / "something_useful-2.4.dist-info"
         made.mkdir(parents=True, exist_ok=True)
         (made / "RECORD").write_text("", encoding="utf-8")
+        (made / "METADATA").write_text("Name: something-useful\n\n", encoding="utf-8")
         return "installed"
 
     monkeypatch.setattr(installing, "run_install", fake)
-    installing.install_wheel(a_wheel(tmp_path))
+    installing.install_wheel(a_wheel(tmp_path, requires=("something-useful",)))
 
     client.force_login(admin)
     html = client.get(reverse("server:plugins")).content.decode()
