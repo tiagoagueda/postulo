@@ -324,7 +324,7 @@ def checked_rows(rows) -> list[dict]:
         url = str(row.get("url") or "").strip()
         if kind not in KINDS:
             raise ValidationError(
-                _("“%(kind)s” is not one of the kinds of link.") % {"kind": kind[:40]},
+                _("“%(kind)s” is not one of the types of link.") % {"kind": kind[:40]},
                 code="kind",
             )
         if not url:

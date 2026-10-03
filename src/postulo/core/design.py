@@ -133,7 +133,7 @@ CHOICE_ICONS: tuple[str, ...] = ("smartphone", "briefcase", "home", "phone")
 SECTIONS: tuple[Section, ...] = (
     Section("colour", _("Colour")),
     Section("tokens", _("Rounding and depth")),
-    Section("type", _("Type")),
+    Section("type", _("Typography")),
     Section("buttons", _("Buttons")),
     Section("fields", _("Fields")),
     Section("choices", _("Choices")),

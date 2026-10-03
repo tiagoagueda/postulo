@@ -302,12 +302,12 @@ class PhoneNumber(OwnedModel):
     object_id = models.PositiveBigIntegerField()
     holder = GenericForeignKey("content_type", "object_id")
 
-    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices, blank=True)
+    kind = models.CharField(_("type"), max_length=20, choices=Kind.choices, blank=True)
     label = models.CharField(
         _("name, if Other"),
         max_length=60,
         blank=True,
-        help_text=_("Your name for it, when none of the kinds above fits."),
+        help_text=_("Your name for it, when none of the types above fits."),
     )
     number = models.CharField(_("phone"), max_length=40)
     #: The comparable form, or empty where there is none. Written by ``save``, never by a
@@ -545,12 +545,12 @@ class PostalAddress(OwnedModel):
     object_id = models.PositiveBigIntegerField()
     holder = GenericForeignKey("content_type", "object_id")
 
-    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices, blank=True)
+    kind = models.CharField(_("type"), max_length=20, choices=Kind.choices, blank=True)
     label = models.CharField(
         _("name, if Other"),
         max_length=60,
         blank=True,
-        help_text=_("Your name for it, when none of the kinds above fits."),
+        help_text=_("Your name for it, when none of the types above fits."),
     )
     #: The street and whatever goes with it -- a number, a floor, a door, a second line.
     #: One field rather than three, because how many lines a street address takes is one of
@@ -695,7 +695,7 @@ class WebLink(OwnedModel):
     object_id = models.PositiveBigIntegerField()
     holder = GenericForeignKey("content_type", "object_id")
 
-    kind = models.CharField(_("kind"), max_length=20, choices=Kind.choices)
+    kind = models.CharField(_("type"), max_length=20, choices=Kind.choices)
     #: Not ``choices``: they would freeze a list of brands into every migration that
     #: touches the field, and a service a plugin adds could never be one. As long as
     #: `core.link_services.MAX_KEY_LENGTH`, written out because a migration reads it.
@@ -808,7 +808,7 @@ class Errand(OwnedModel):
     and the page that asks about it deserves an answer rather than a 404.
     """
 
-    kind = models.CharField(_("kind"), max_length=40)
+    kind = models.CharField(_("type"), max_length=40)
     state = models.CharField(
         _("state"), max_length=10, choices=ErrandState, default=ErrandState.WAITING
     )

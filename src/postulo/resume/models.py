@@ -303,7 +303,7 @@ class Link(ResumeItem):
 
     title = models.CharField(_("title"), max_length=200)
     url = models.URLField(_("address"), max_length=500)
-    kind = models.CharField(_("kind"), max_length=20, choices=LinkKind, default=LinkKind.PORTFOLIO)
+    kind = models.CharField(_("type"), max_length=20, choices=LinkKind, default=LinkKind.PORTFOLIO)
     description = models.CharField(
         _("description"),
         max_length=250,
@@ -356,7 +356,7 @@ class Translation(OwnedModel):
     """
 
     content_type = models.ForeignKey(
-        ContentType, on_delete=models.CASCADE, related_name="+", verbose_name=_("kind of entry")
+        ContentType, on_delete=models.CASCADE, related_name="+", verbose_name=_("type of entry")
     )
     object_id = models.PositiveIntegerField()
     entry = GenericForeignKey("content_type", "object_id")

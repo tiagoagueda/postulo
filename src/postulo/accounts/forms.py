@@ -990,7 +990,7 @@ class PersonIdentifierForm(IdentifierRow, forms.ModelForm):
     def clean(self) -> dict:
         data = super().clean()
         if not data.get("scheme") and (data.get("value") or data.get("label")):
-            self.add_error("scheme", _("Choose what kind of identifier this is."))
+            self.add_error("scheme", _("Choose the type of identifier."))
         if data.get("scheme") and not data.get("value"):
             self.add_error("value", _("Type the identifier."))
         # The name means something only for Other, and the display side has always read

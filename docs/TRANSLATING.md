@@ -189,9 +189,18 @@ beside the translation and knows the plural forms. Either way:
 3. Open a pull request. A reviewer who speaks the language is ideal; one who can read a
    diff and run the checks is enough.
 
-## One distinction worth care: kinds of letter
+## The word for a classification: Type
 
-Postulo has four kinds of letter, and two of them are a trap for translators. In French
+In the interface, what a person picks from a list to say what sort of thing something is is
+called its **Type**: *Type* of company, of letter, of entry, of document. `kind` stays in the
+code, the API, the archive and the plugin contract, and never reaches a person. A translator
+should use the ordinary word for *type* in their language (French *type*, Portuguese *tipo*)
+and not *genre*, *sort* or *género*, which belong to other things; *Typography* is the design
+page's heading and is a different word.
+
+## One distinction worth care: types of letter
+
+Postulo has four types of letter, and two of them are a trap for translators. In French
 and Portuguese, *lettre de motivation* and *carta de motivação* are the everyday words for
 what English calls a **cover letter** — one page, addressed, about one posting. Postulo's
 **motivation letter** is a different document: longer, sectioned, about the person and

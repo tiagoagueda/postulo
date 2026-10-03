@@ -252,7 +252,7 @@ def test_a_theme_that_cannot_set_the_document_is_a_sentence_too(client, user, cv
         themes.forget("letters-only")
 
     assert response.redirect_chain[-1][0] == cv.get_absolute_url()
-    assert "does not set this kind of document" in response.content.decode()
+    assert "does not set this type of document" in response.content.decode()
 
 
 def test_a_draft_of_a_letter_reads_for_the_application_it_is_given(

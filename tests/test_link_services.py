@@ -1190,9 +1190,9 @@ def test_the_api_reads_and_writes_a_link_with_its_service(client, user, contact)
         ),
         (
             {"kind": "social", "service": "github", "url": "https://github.com/c"},
-            "not a service this kind of link can be on",
+            "not a service this type of link can be on",
         ),
-        ({"kind": "podcast", "url": "https://example.org/c"}, "not one of the kinds of link"),
+        ({"kind": "podcast", "url": "https://example.org/c"}, "not one of the types of link"),
     ],
 )
 def test_the_api_refuses_a_link_that_is_not_its_services_and_writes_nothing(

@@ -250,7 +250,7 @@ class Company(OwnedModel):
     #: A column with a default, so the migration invents nothing: every company recorded
     #: before there were kinds is an employer, which is what it was recorded as.
     kind = models.CharField(
-        _("kind"), max_length=20, choices=CompanyKind, default=CompanyKind.EMPLOYER
+        _("type"), max_length=20, choices=CompanyKind, default=CompanyKind.EMPLOYER
     )
     #: The company this one belongs to, if any. A tree rather than a graph — at most one
     #: parent — because that is what an ownership structure is and it keeps every question
@@ -519,7 +519,7 @@ class CompanyIdentifier(KeepsItsScheme, OwnedModel):
                 fields=("company", "scheme"),
                 condition=~models.Q(scheme=identifiers.OTHER),
                 name="one_identifier_per_scheme_per_company",
-                violation_error_message=_("This kind of identifier is already listed."),
+                violation_error_message=_("This type of identifier is already listed."),
             ),
             # **Compared without regard to case** (#211). Every named scheme folds its own
             # value -- Wikidata to upper, LinkedIn to lower -- so for those this changes
@@ -1268,7 +1268,7 @@ class CapturedPage(OwnedModel):
         _("rendering"), upload_to=page_upload_to, blank=True, max_length=255
     )
     rendering_type = models.CharField(
-        _("kind of rendering"), max_length=20, choices=RenderingKind, blank=True
+        _("type of rendering"), max_length=20, choices=RenderingKind, blank=True
     )
     rendering_size = models.PositiveIntegerField(_("size of the rendering"), default=0)
     rendering_checksum = models.CharField(_("checksum of the rendering"), max_length=64, blank=True)
@@ -1386,7 +1386,7 @@ class ListingEvent(models.Model):
         JobPosting, on_delete=models.CASCADE, related_name="events", verbose_name=_("listing")
     )
     kind = models.CharField(
-        _("kind"), max_length=20, choices=ListingEventKind, default=ListingEventKind.NOTE
+        _("type"), max_length=20, choices=ListingEventKind, default=ListingEventKind.NOTE
     )
     occurred_at = models.DateTimeField(_("happened on"), default=timezone.now, db_index=True)
     summary = models.CharField(_("summary"), max_length=250, blank=True)
@@ -1411,7 +1411,7 @@ class ListingEvent(models.Model):
         null=True,
         blank=True,
         related_name="+",
-        verbose_name=_("kind of thing it points at"),
+        verbose_name=_("type of thing it points at"),
     )
     artefact_id = models.PositiveBigIntegerField(null=True, blank=True)
     artefact = GenericForeignKey("artefact_type", "artefact_id")

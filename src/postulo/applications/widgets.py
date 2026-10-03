@@ -250,7 +250,7 @@ register(
     Widget(
         key="interviews_summary",
         label=_("Interviews"),
-        blurb=_("How many applications reached one, how many were held, and of what kind."),
+        blurb=_("How many applications reached one, how many were held, and of what type."),
         template="widgets/interviews_summary.html",
         context=_insight,
         width="half",

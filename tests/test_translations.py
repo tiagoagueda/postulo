@@ -579,3 +579,25 @@ def test_the_company_delete_page_counts_in_the_readers_language(
     with translation.override(code):
         expected = translation.ngettext("%(count)d posting", "%(count)d postings", 2) % {"count": 2}
     assert expected in page
+
+
+# ------------------------------------------------------- the word for a classification (#705)
+
+
+def test_the_interface_says_type_and_never_kind_on_its_own():
+    """`kind` is the name in code; a person sees *Type*, and *Typography* is another word."""
+    from postulo.core import messages_tool
+
+    messages_tool.use(Path(__file__).resolve().parents[1])
+    core = messages_tool.core_set()
+    for code in ("fr-FR", "pt-PT", "pt-BR"):
+        catalogue = messages_tool.parse(messages_tool.po_path(code, core).read_text("utf-8"))
+        ids = {key[1] for key in catalogue.messages}
+        assert not ids & {"Kind", "kind"}, f"{code} still has a standalone Kind label"
+        assert {"Type", "type", "Typography", "Period"} <= ids
+    french = messages_tool.parse(messages_tool.po_path("fr-FR", core).read_text("utf-8"))
+    portuguese = messages_tool.parse(messages_tool.po_path("pt-PT", core).read_text("utf-8"))
+    assert french.messages[(None, "Type")].msgstr == ["Type"]
+    assert french.messages[(None, "Typography")].msgstr == ["Typographie"]
+    assert portuguese.messages[(None, "Type")].msgstr == ["Tipo"]
+    assert portuguese.messages[(None, "Typography")].msgstr == ["Tipografia"]

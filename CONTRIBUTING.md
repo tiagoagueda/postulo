@@ -171,8 +171,8 @@ In a browser test, a select is still a select: `select.select_option("work")` an
 value*, and the button follows. What a person sees and does goes through
 `tests/e2e/selects.py`: `button_of(select)` for the button (its box is where the select
 was; the select itself is one pixel), `open_list`, `options_of`, `choose`. A label names
-both the select and its button, so `get_by_label("Kind")` alone finds two things:
-ask for `get_by_role("combobox", name="Kind")`, which is the button, or narrow the label
+both the select and its button, so `get_by_label("Type")` alone finds two things:
+ask for `get_by_role("combobox", name="Type")`, which is the button, or narrow the label
 to the select with `.and_(page.locator("select"))`.
 
 ## Tables

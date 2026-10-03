@@ -18,7 +18,7 @@
     </a>
   </div>
 
-  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Kinds of letter' %}">
+  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Types of letter' %}">
     <a href="{% url 'documents:letter_list' %}"
        class="btn" data-variant="{% if not current_kind %}outline{% else %}ghost{% endif %}" data-size="sm"
        {% if not current_kind %}aria-current="page"{% endif %}>{% translate "All" %}</a>
@@ -55,7 +55,7 @@
   {% else %}
     <c-empty icon="circle-dashed">
       {% if current_kind %}
-        {% translate "No letters of this kind yet." %}
+        {% translate "No letters of this type yet." %}
       {% else %}
         {% translate "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview." %}
       {% endif %}

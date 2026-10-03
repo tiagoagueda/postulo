@@ -91,7 +91,7 @@ class CompaniesTable(Table):
         # the table can be narrowed to either.
         Column(
             "kind",
-            _("Kind"),
+            _("Type"),
             sort=("kind",),
             filter="choice",
             lookups=("kind",),

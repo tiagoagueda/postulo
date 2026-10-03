@@ -170,7 +170,7 @@ def test_rendering_a_pair_the_picker_would_not_offer_says_so(user):
     with pytest.raises(themes.CannotRender) as raised:
         themes.template_for("lettery", themes.Kind.CV)
 
-    assert "does not set this kind" in str(raised.value)
+    assert "does not set this type" in str(raised.value)
 
 
 def test_a_theme_a_removed_plugin_left_behind_still_exports(user):

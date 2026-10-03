@@ -51,7 +51,7 @@
       <legend class="mb-3 font-medium">{% translate "Which period" %}</legend>
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div class="field">
-          <label for="report-period">{% translate "Kind" %}</label>
+          <label for="report-period">{% translate "Period" %}</label>
           <select name="period" id="report-period">
             <option value="month" {% if kind == 'month' %}selected{% endif %}>{% translate "A month" %}</option>
             <option value="quarter" {% if kind == 'quarter' %}selected{% endif %}>{% translate "A quarter" %}</option>
@@ -187,7 +187,7 @@
     <div class="mb-6 grid gap-6 lg:grid-cols-2">
       {% translate "Where they were found" as found_heading %}
       {% include "applications/partials/report_tally.html" with rows=report.sources total=report.total heading=found_heading %}
-      {% translate "What kind of employer" as kind_heading %}
+      {% translate "What type of employer" as kind_heading %}
       {% translate "A company in several fields counts in each of them, so these can add up to more than everything." as kind_note %}
       {% include "applications/partials/report_tally.html" with rows=report.industries total=report.total heading=kind_heading note=kind_note %}
     </div>

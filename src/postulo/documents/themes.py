@@ -226,7 +226,7 @@ def template_for(name: str, kind: str) -> str:
         raise CannotRender(str(_("No theme is installed that can set this document.")))
     if not theme.sets(kind):
         raise CannotRender(
-            str(_("The %(theme)s theme does not set this kind of document."))
+            str(_("The %(theme)s theme does not set this type of document."))
             % {"theme": theme.label}
         )
     return theme.templates[kind]
@@ -254,7 +254,7 @@ class SetsThisKind:
             )
         if not theme.sets(self.kind):
             raise ValidationError(
-                _("The %(theme)s theme does not set this kind of document."),
+                _("The %(theme)s theme does not set this type of document."),
                 code="wrong_kind",
                 params={"theme": theme.label},
             )

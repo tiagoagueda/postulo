@@ -568,7 +568,7 @@ class ApplicationEvent(models.Model):
     application = models.ForeignKey(
         Application, on_delete=models.CASCADE, related_name="events", verbose_name=_("application")
     )
-    kind = models.CharField(_("kind"), max_length=20, choices=EventKind, default=EventKind.NOTE)
+    kind = models.CharField(_("type"), max_length=20, choices=EventKind, default=EventKind.NOTE)
     occurred_at = models.DateTimeField(_("happened on"), default=timezone.now, db_index=True)
     summary = models.CharField(_("summary"), max_length=250, blank=True)
     body = models.TextField(_("details"), blank=True)
@@ -732,7 +732,7 @@ class Interview(OwnedModel):
         verbose_name=_("application"),
     )
     kind = models.CharField(
-        _("kind"), max_length=20, choices=InterviewKind, default=InterviewKind.VIDEO
+        _("type"), max_length=20, choices=InterviewKind, default=InterviewKind.VIDEO
     )
     starts_at = models.DateTimeField(_("starts"), db_index=True)
     ends_at = models.DateTimeField(_("ends"))
@@ -864,7 +864,7 @@ class Suggestion(OwnedModel):
     source = models.CharField(_("suggested by"), max_length=60)
     external_id = models.CharField(_("identifier at the source"), max_length=250, blank=True)
 
-    kind = models.CharField(_("kind"), max_length=20, choices=EventKind, default=EventKind.NOTE)
+    kind = models.CharField(_("type"), max_length=20, choices=EventKind, default=EventKind.NOTE)
     summary = models.CharField(_("what it says"), max_length=250)
     body = models.TextField(_("detail"), blank=True)
     occurred_at = models.DateTimeField(_("happened"), default=timezone.now)

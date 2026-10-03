@@ -372,7 +372,7 @@ def settle(kind: str, chosen: str, url: str, label: str = "") -> tuple[str, str]
     service = find(chosen, kind)
     if service is None:
         raise ValidationError(
-            _("That is not a service this kind of link can be on."), code="service"
+            _("That is not a service this type of link can be on."), code="service"
         )
     if not service.accepts(url):
         raise ValidationError(refusal(service), code="address")

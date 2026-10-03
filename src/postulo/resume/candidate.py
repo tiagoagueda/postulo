@@ -985,7 +985,7 @@ class _Planner:
             if kind not in links.KINDS:
                 note = _problem(
                     WebLink._meta.get_field("kind").verbose_name,
-                    _("“%(kind)s” is not one of the kinds of link.") % {"kind": kind[:40]},
+                    _("“%(kind)s” is not one of the types of link.") % {"kind": kind[:40]},
                 )
                 unsorted.rows.append(Row(shown, REFUSED, notes=[note]))
                 continue
@@ -1055,11 +1055,11 @@ class _Planner:
                 row.outcome = REPEATED
             elif instance.scheme in taken:
                 row.outcome = KEPT
-                row.notes.append(_("You already have another of this kind."))
+                row.notes.append(_("You already have another of this type."))
             elif instance.scheme in claimed:
                 row.outcome = REFUSED
                 row.notes.append(
-                    _("The file has another of this kind, and a person has one of each.")
+                    _("The file has another of this type, and a person has one of each.")
                 )
             elif instance.scheme != schemes.OTHER:
                 claimed.add(instance.scheme)

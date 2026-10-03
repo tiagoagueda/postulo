@@ -290,4 +290,4 @@ def download_document(request, source: str, pk: int):
         return serve_private_file(
             request, document.file, download_name=document.download_name, as_attachment=True
         )
-    raise HttpError(404, _("No such kind of document."))
+    raise HttpError(404, _("No such type of document."))

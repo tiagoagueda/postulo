@@ -255,7 +255,7 @@ class CV(DeclaresALanguage, OwnedModel):
         _("name"), max_length=120, help_text=_("For you, not for the employer: “Backend, English”.")
     )
     kind = models.CharField(
-        _("kind"), max_length=20, choices=CVKind, default=CVKind.CV, db_index=True
+        _("type"), max_length=20, choices=CVKind, default=CVKind.CV, db_index=True
     )
     headline = models.CharField(_("headline"), max_length=200, blank=True)
     summary = models.TextField(
@@ -509,7 +509,7 @@ class CoverLetter(DeclaresALanguage, OwnedModel):
 
     name = models.CharField(_("name"), max_length=120)
     kind = models.CharField(
-        _("kind"), max_length=20, choices=LetterKind, default=LetterKind.COVER, db_index=True
+        _("type"), max_length=20, choices=LetterKind, default=LetterKind.COVER, db_index=True
     )
     subject = models.CharField(_("subject"), max_length=250, blank=True)
     body = models.TextField(
@@ -576,7 +576,7 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: database column is stored, exported and read by the API, and is not a thing to
     #: compute (#133).
     kind = models.CharField(
-        _("kind"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
+        _("type"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
     )
     file = models.FileField(
         _("file"),
@@ -715,7 +715,7 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     title = models.CharField(_("title"), max_length=250)
     #: From the registry, as an upload's is, and for the same reason (#133).
     kind = models.CharField(
-        _("kind"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
+        _("type"), max_length=20, choices=kinds.choices, default=DocumentKind.CV
     )
     file = models.FileField(_("file"), upload_to=upload_to_documents)
 
@@ -762,7 +762,7 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
         null=True,
         blank=True,
         related_name="+",
-        verbose_name=_("kind of source"),
+        verbose_name=_("type of source"),
     )
     source_id = models.PositiveBigIntegerField(null=True, blank=True)
     source = GenericForeignKey("source_type", "source_id")
@@ -954,7 +954,7 @@ class DocumentCopy(OwnedModel):
     document_type = models.ForeignKey(
         ContentType,
         on_delete=models.CASCADE,
-        verbose_name=_("kind of document"),
+        verbose_name=_("type of document"),
         related_name="+",
     )
     document_id = models.PositiveBigIntegerField()

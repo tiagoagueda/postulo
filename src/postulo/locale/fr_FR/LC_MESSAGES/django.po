@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-03 18:05+0000\n"
+"POT-Creation-Date: 2026-10-03 18:32+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -3691,15 +3691,15 @@ msgid ""
 msgstr ""
 "Choisissez le PDF que vous avez téléchargé depuis europass.europa.eu, tel quel : le CV y est joint, et c'est ce que Postulo lit. Les anciens fichiers Europass se lisent aussi : le XML et le PDF de l'éditeur d'avant 2020, et le JSON de son service web. Postulo détermine lui-même lequel c'est, vous montre ce qu'il contient et n'écrit rien tant que vous ne l'avez pas dit."
 
+#: src/postulo/accounts/forms.py:993 src/postulo/jobs/forms.py:457
+#, draft
+msgid "Choose the type of identifier."
+msgstr "Indiquez de quel type d'identifiant il s'agit."
+
 #: src/postulo/templates/documents/cv_detail.html:72
 #, draft
 msgid "Choose what it prints instead"
 msgstr "Choisir ce qu'il imprime à la place"
-
-#: src/postulo/accounts/forms.py:993 src/postulo/jobs/forms.py:457
-#, draft
-msgid "Choose what kind of identifier this is."
-msgstr "Indiquez de quel type d'identifiant il s'agit."
 
 #: src/postulo/applications/views.py:1443
 #, draft
@@ -6477,7 +6477,7 @@ msgstr ""
 
 #: src/postulo/applications/widgets.py:253
 #, draft
-msgid "How many applications reached one, how many were held, and of what kind."
+msgid "How many applications reached one, how many were held, and of what type."
 msgstr ""
 "Combien de candidatures ont mené à un entretien, combien ont eu lieu et de quel type."
 
@@ -7495,65 +7495,6 @@ msgid ""
 "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr ""
 "Touches : <kbd class=\"kbd\">d</kbd> écarte et passe à la suivante, <kbd class=\"kbd\">j</kbd> saute à la suivante, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Entrée</kbd> enregistre et passe à la suivante — tant que rien n'est en cours de saisie."
-
-#: src/postulo/applications/models.py:571
-#: src/postulo/applications/models.py:735
-#: src/postulo/applications/models.py:867 src/postulo/core/models.py:305
-#: src/postulo/core/models.py:548 src/postulo/core/models.py:698
-#: src/postulo/core/models.py:811 src/postulo/documents/models.py:258
-#: src/postulo/documents/models.py:512 src/postulo/documents/models.py:579
-#: src/postulo/documents/models.py:718 src/postulo/jobs/models.py:253
-#: src/postulo/jobs/models.py:1389 src/postulo/plugins/models.py:192
-#: src/postulo/resume/models.py:306
-#, draft
-msgid "kind"
-msgstr "type"
-
-#: src/postulo/jobs/tables.py:94
-#: src/postulo/templates/applications/report.html:57
-#: src/postulo/templates/cotton/identifier_row.html:51
-#: src/postulo/templates/jobs/capture_page.html:93
-#: src/postulo/templates/partials/phone_numbers.html:70
-#: src/postulo/templates/partials/postal_addresses.html:79
-#: src/postulo/templates/server/design.html:208
-#: src/postulo/templates/server/design.html:313
-#, draft
-msgid "Kind"
-msgstr "Type"
-
-#: src/postulo/documents/models.py:957
-#, draft
-msgid "kind of document"
-msgstr "type de document"
-
-#: src/postulo/resume/models.py:359
-#, draft
-msgid "kind of entry"
-msgstr "type d’entrée"
-
-#: src/postulo/jobs/models.py:1271
-#, draft
-msgid "kind of rendering"
-msgstr "type de rendu"
-
-#: src/postulo/documents/models.py:765
-#, draft
-msgid "kind of source"
-msgstr "type de source"
-
-#: src/postulo/jobs/models.py:1414
-#, draft
-msgid "kind of thing it points at"
-msgstr "type de ce vers quoi elle renvoie"
-
-#: src/postulo/templates/applications/calendar.html:186
-msgid "Kinds of entry"
-msgstr "Types d’entrée"
-
-#: src/postulo/templates/documents/letter_list.html:21
-#, draft
-msgid "Kinds of letter"
-msgstr "Types de lettres"
 
 #: src/postulo/documents/models.py:950 src/postulo/plugins/models.py:196
 #, draft
@@ -8877,7 +8818,7 @@ msgstr "Pas encore d'invitation."
 
 #: src/postulo/templates/documents/letter_list.html:58
 #, draft
-msgid "No letters of this kind yet."
+msgid "No letters of this type yet."
 msgstr "Aucune lettre de ce type pour l'instant."
 
 #: src/postulo/templates/documents/letter_list.html:60
@@ -8974,7 +8915,7 @@ msgstr "Cette candidature n'existe pas."
 
 #: src/postulo/api/routers/documents.py:293
 #, draft
-msgid "No such kind of document."
+msgid "No such type of document."
 msgstr "Ce type de document n'existe pas."
 
 #: src/postulo/templates/applications/suggestion_list.html:127
@@ -10646,6 +10587,7 @@ msgstr "Par an"
 
 #: src/postulo/applications/forms.py:156
 #: src/postulo/templates/applications/calendar.html:168
+#: src/postulo/templates/applications/report.html:57
 #, draft
 msgid "Period"
 msgstr "Période"
@@ -13309,7 +13251,7 @@ msgstr "Date de début"
 
 #: src/postulo/templates/documents/letter_form.html:8
 #, draft
-msgid "Start from a kind"
+msgid "Start from a type"
 msgstr "Partir d'un type"
 
 #: src/postulo/templates/documents/letter_form.html:9
@@ -14109,7 +14051,7 @@ msgstr ""
 
 #: src/postulo/core/link_services.py:375
 #, draft
-msgid "That is not a service this kind of link can be on."
+msgid "That is not a service this type of link can be on."
 msgstr "Ce n'est pas un service sur lequel ce type de lien peut se trouver."
 
 #: src/postulo/applications/views.py:673
@@ -14356,7 +14298,7 @@ msgstr "Le plugin %(plugin)s n'est pas installé."
 
 #: src/postulo/documents/themes.py:229 src/postulo/documents/themes.py:257
 #, python-format, draft
-msgid "The %(theme)s theme does not set this kind of document."
+msgid "The %(theme)s theme does not set this type of document."
 msgstr "Le thème %(theme)s ne met pas en page ce type de document."
 
 #: src/postulo/templates/server/logs.html:191
@@ -14614,7 +14556,7 @@ msgstr "Le fichier contient aussi %(names)s, que cette page ne lit pas."
 
 #: src/postulo/resume/candidate.py:1062
 #, draft
-msgid "The file has another of this kind, and a person has one of each."
+msgid "The file has another of this type, and a person has one of each."
 msgstr ""
 "Le fichier en contient un autre de ce type, et une personne en a un de chaque."
 
@@ -15874,11 +15816,6 @@ msgid ""
 msgstr ""
 "C'est votre propre compte. Un lien que vous créez pour vous-même n'est pas un moyen de revenir : il a fallu vous connecter pour le créer. Si vous êtes la seule administration ici, c'est une clé d'accès ou une deuxième administration qui vous couvre."
 
-#: src/postulo/jobs/models.py:522
-#, draft
-msgid "This kind of identifier is already listed."
-msgstr "Ce type d'identifiant est déjà dans la liste."
-
 #: src/postulo/core/phone_numbers.py:413
 #, draft
 msgid "This number is already listed."
@@ -15950,6 +15887,11 @@ msgstr "Ce jeton n'a pas la portée %(scope)s."
 #, python-format, draft
 msgid "This token has none of the scopes this call takes: %(scopes)s."
 msgstr "Ce jeton n'a aucune des portées que cet appel accepte : %(scopes)s."
+
+#: src/postulo/jobs/models.py:522
+#, draft
+msgid "This type of identifier is already listed."
+msgstr "Ce type d'identifiant est déjà dans la liste."
 
 #: src/postulo/templates/documents/rendered_compare.html:25
 #, draft
@@ -16252,10 +16194,29 @@ msgstr ""
 msgid "Two-factor authentication"
 msgstr "Authentification à deux facteurs"
 
-#: src/postulo/core/design.py:136 src/postulo/templates/server/design.html:99
+#: src/postulo/applications/models.py:571
+#: src/postulo/applications/models.py:735
+#: src/postulo/applications/models.py:867 src/postulo/core/models.py:305
+#: src/postulo/core/models.py:548 src/postulo/core/models.py:698
+#: src/postulo/core/models.py:811 src/postulo/documents/models.py:258
+#: src/postulo/documents/models.py:512 src/postulo/documents/models.py:579
+#: src/postulo/documents/models.py:718 src/postulo/jobs/models.py:253
+#: src/postulo/jobs/models.py:1389 src/postulo/plugins/models.py:192
+#: src/postulo/resume/models.py:306
+#, draft
+msgid "type"
+msgstr "type"
+
+#: src/postulo/jobs/tables.py:94
+#: src/postulo/templates/cotton/identifier_row.html:51
+#: src/postulo/templates/jobs/capture_page.html:93
+#: src/postulo/templates/partials/phone_numbers.html:70
+#: src/postulo/templates/partials/postal_addresses.html:79
+#: src/postulo/templates/server/design.html:208
+#: src/postulo/templates/server/design.html:313
 #, draft
 msgid "Type"
-msgstr "Typographie"
+msgstr "Type"
 
 #: src/postulo/templates/core/search.html:21
 #, draft
@@ -16271,6 +16232,31 @@ msgstr "Écrivez-le ici, ou choisissez dans la liste."
 #, draft
 msgid "Type it in instead"
 msgstr "Le saisir à la place"
+
+#: src/postulo/documents/models.py:957
+#, draft
+msgid "type of document"
+msgstr "type de document"
+
+#: src/postulo/resume/models.py:359
+#, draft
+msgid "type of entry"
+msgstr "type d’entrée"
+
+#: src/postulo/jobs/models.py:1271
+#, draft
+msgid "type of rendering"
+msgstr "type de rendu"
+
+#: src/postulo/documents/models.py:765
+#, draft
+msgid "type of source"
+msgstr "type de source"
+
+#: src/postulo/jobs/models.py:1414
+#, draft
+msgid "type of thing it points at"
+msgstr "type de ce vers quoi elle renvoie"
 
 #: src/postulo/accounts/forms.py:995 src/postulo/jobs/forms.py:459
 #, draft
@@ -16298,6 +16284,20 @@ msgid ""
 "Typed on Your details it would be refused. It is imported as it is, and marked there until you change it."
 msgstr ""
 "Saisie sur la page Vos coordonnées, elle serait refusée. Elle est importée telle quelle et y reste signalée jusqu'à ce que vous la modifiiez."
+
+#: src/postulo/templates/applications/calendar.html:186
+msgid "Types of entry"
+msgstr "Types d’entrée"
+
+#: src/postulo/templates/documents/letter_list.html:21
+#, draft
+msgid "Types of letter"
+msgstr "Types de lettres"
+
+#: src/postulo/core/design.py:136 src/postulo/templates/server/design.html:99
+#, draft
+msgid "Typography"
+msgstr "Typographie"
 
 #: src/postulo/plugins/models.py:109
 #, draft
@@ -17031,11 +17031,6 @@ msgid ""
 msgstr ""
 "Ce que c'était. Une autre capture de la même annonce s'ajoute depuis l'écran de vérification ; elle n'est donc pas proposée ici."
 
-#: src/postulo/templates/applications/report.html:197
-#, draft
-msgid "What kind of employer"
-msgstr "Quel type d’employeur"
-
 #: src/postulo/templates/jobs/merge.html:58
 #, draft
 msgid "What moves"
@@ -17220,6 +17215,11 @@ msgstr "Quoi faire, en une phrase."
 #, draft
 msgid "What to do. It is what the reminder says when it falls due."
 msgstr "Ce qu'il y a à faire. C'est ce que dit le rappel le moment venu."
+
+#: src/postulo/templates/applications/report.html:197
+#, draft
+msgid "What type of employer"
+msgstr "Quel type d’employeur"
 
 #: src/postulo/core/models.py:817
 #, draft
@@ -17949,7 +17949,7 @@ msgstr "Vous avez déjà une étiquette de ce nom."
 
 #: src/postulo/resume/candidate.py:1058
 #, draft
-msgid "You already have another of this kind."
+msgid "You already have another of this type."
 msgstr "Vous en avez déjà un autre de ce type."
 
 #: src/postulo/jobs/forms.py:557
@@ -18286,7 +18286,7 @@ msgstr ""
 
 #: src/postulo/core/models.py:310 src/postulo/core/models.py:553
 #, draft
-msgid "Your name for it, when none of the kinds above fits."
+msgid "Your name for it, when none of the types above fits."
 msgstr "Le nom que vous lui donnez, quand aucun des types ci-dessus ne convient."
 
 #: src/postulo/plugins/models.py:198
@@ -18479,7 +18479,7 @@ msgstr "« %(code)s » n'est pas un code de langue, comme %(first)s ou %(second)
 
 #: src/postulo/core/web_links.py:327 src/postulo/resume/candidate.py:988
 #, python-format, draft
-msgid "“%(kind)s” is not one of the kinds of link."
+msgid "“%(kind)s” is not one of the types of link."
 msgstr "« %(kind)s » n'est pas l'un des types de lien."
 
 #: src/postulo/templates/partials/table/views.html:18

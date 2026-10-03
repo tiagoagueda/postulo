@@ -1211,7 +1211,7 @@ def test_a_file_cannot_give_somebody_two_of_a_kind_either(user):
         candidate.ADD,
         candidate.REFUSED,
     ]
-    assert "has another of this kind" in rows(plan, "identifiers")[2].notes[0]
+    assert "has another of this type" in rows(plan, "identifiers")[2].notes[0]
     held = sorted((row.scheme, row.value) for row in user.profile.identifiers.all())
     assert held == [("orcid", "0000-0002-1825-0097"), ("other", "A-1"), ("other", "B-2")]
 

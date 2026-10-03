@@ -189,7 +189,7 @@ class ConnectionQuerySet(models.QuerySet):
 
 class Connection(OwnedModel):
     kind = models.CharField(
-        _("kind"), max_length=20, choices=[(kind, kind) for kind in CONNECTED_KINDS]
+        _("type"), max_length=20, choices=[(kind, kind) for kind in CONNECTED_KINDS]
     )
     plugin = models.CharField(_("plugin"), max_length=60)
     label = models.CharField(
