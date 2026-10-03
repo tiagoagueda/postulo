@@ -150,7 +150,9 @@ def add_interview(request, payload: InterviewIn):
 )
 def change_interview(request, pk: int, payload: InterviewPatch):
     interview = owned_or_404(request, _queryset(request), pk)
-    data = payload.dict(exclude_unset=True)
+    data = {
+        name: value for name, value in payload.dict(exclude_unset=True).items() if value is not None
+    }
     if "kind" in data:
         choice_or_422(data["kind"], InterviewKind, field="kind")
     contact_ids = data.pop("contact_ids", None)

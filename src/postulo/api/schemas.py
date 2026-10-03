@@ -548,6 +548,8 @@ class InterviewIn(Schema):
 
 
 class InterviewPatch(Schema):
+    """Only the fields sent change; a `null` means "leave it", as on every other patch."""
+
     kind: str | None = None
     starts_at: dt.datetime | None = None
     ends_at: dt.datetime | None = None

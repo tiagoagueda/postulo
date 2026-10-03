@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- `PATCH /api/v1/interviews/{id}` no longer answers 500 when `starts_at`, `location` or `notes` is `null`; `null` means unchanged, as on the other patch calls. (#436)
 - A capture's `Idempotency-Key` longer than 200 characters is refused with a 422 instead of a 500 on PostgreSQL. (#433)
 - The OpenAPI description lists the refusals a call raises itself: 413 on every call with a body, 409 on `POST /captures`, 404 on `POST /interviews` and `POST /reminders`. (#431)
 - An unknown API address, a non-numeric id and a method an address does not take are answered as problem documents (401 without a token, 404 with one, 405 with `Allow`), not HTML. (#430)

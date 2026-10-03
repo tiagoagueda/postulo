@@ -721,6 +721,31 @@ def test_the_api_schedules_reads_moves_and_settles_interviews(client, user, appl
     assert held.actor == "API token Agent"
 
 
+@pytest.mark.parametrize(
+    "field", ["kind", "starts_at", "ends_at", "location", "contact_ids", "notes"]
+)
+def test_a_null_in_an_interview_patch_means_unchanged(client, user, application, recruiter, field):
+    interview = schedule_interview(
+        application,
+        kind=InterviewKind.VIDEO,
+        starts_at=in_days(3),
+        location="Room 4",
+        notes="Bring a laptop.",
+        contacts=[recruiter],
+    )
+    before = client.get(f"/api/v1/interviews/{interview.pk}", **bearer(user, "read")).json()
+    response = client.patch(
+        f"/api/v1/interviews/{interview.pk}",
+        data=json.dumps({field: None}),
+        content_type="application/json",
+        **bearer(user, "write"),
+    )
+    assert response.status_code == 200, response.content
+    after = response.json()
+    assert after.pop("updated_at") and before.pop("updated_at")
+    assert after == before
+
+
 def test_the_api_refuses_what_it_should(client, user, other_user, application, company):
     writer = bearer(user, "write")
     stranger = Contact.objects.create(
