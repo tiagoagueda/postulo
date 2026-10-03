@@ -118,6 +118,20 @@ def test_the_country_is_read_back_from_the_number():
     assert phones.country_of("06 12 34 56 78") is None
 
 
+def test_a_shared_dialling_code_is_read_as_the_country_it_is_chiefly_for():
+    """Not the first country in the alphabet: that showed Antigua beside every +1 number
+    and Western Sahara beside every Moroccan one (#459)."""
+    assert phones.country_of("+12125551234").code == "US"
+    assert phones.country_of("+14165551234").code == "CA"
+    assert phones.country_of("+358401234567").code == "FI"
+    assert phones.country_of("+74951234567").code == "RU"
+    assert phones.country_of("+212612345678").code == "MA"
+
+
+def test_an_italian_landline_keeps_its_leading_zero():
+    assert phones.combine("06 6982 1234", "IT") == "+390669821234"
+
+
 def test_a_longer_dialling_code_wins_over_a_shorter_one():
     """+351 is Portugal, not +35 followed by something."""
     assert phones.country_of("+351912345678").code == "PT"
