@@ -40,6 +40,11 @@ class CoreConfig(AppConfig):
 
         channels.register_the_ones_that_exist()
 
+        # SQLite's LIKE folds the case of ASCII letters only (#505).
+        from . import sqlite_like
+
+        sqlite_like.connect()
+
         # The identifier schemes this instance defines for itself are kept on the policy
         # row, and the registry is told so here: it cannot import the row's module (#311).
         from . import identifiers, site

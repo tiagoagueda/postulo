@@ -693,6 +693,17 @@ def test_a_huge_exponent_in_a_number_filter_narrows_nothing_and_answers_fast(cli
     assert names(client.get(url, {"applications_min": "2"})) == ["Aperture Science"]
 
 
+def test_the_name_filter_ignores_the_case_of_accented_letters(client, user):
+    """On SQLite `icontains` folded A-Z only, so "école" found nothing (#505)."""
+    for name in ("École Polytechnique", "Škoda", "Black Mesa"):
+        Company.objects.create(owner=user, name=name)
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    assert names(client.get(url, {"name": "école"})) == ["École Polytechnique"]
+    assert names(client.get(url, {"name": "ŠKODA"})) == ["Škoda"]
+
+
 def test_the_dates_narrow_by_the_day_they_fall_on(client, user, search):
     client.force_login(user)
     url = reverse("jobs:company_list")

@@ -107,6 +107,21 @@ def test_everything_is_searched_and_grouped_and_nothing_of_anyone_elses(user, wo
     assert groups["career"].hits[0].title == "Portal technician · Black Mesa"
 
 
+def test_the_case_of_accented_and_non_latin_letters_is_folded_on_sqlite(user):
+    """SQLite's own LIKE folds A-Z only: "école" missed "École" (#505)."""
+    for name in ("École Polytechnique", "Škoda", "Αθηναϊκή Εταιρεία"):
+        Company.objects.create(owner=user, name=name)
+
+    for query, name in (
+        ("école", "École Polytechnique"),
+        ("škoda", "Škoda"),
+        ("αθηναϊκή", "Αθηναϊκή Εταιρεία"),
+        ("ÉCOLE", "École Polytechnique"),
+    ):
+        groups = kinds(searching.search(user, query))
+        assert [hit.title for hit in groups["companies"].hits] == [name], query
+
+
 def test_the_text_you_sent_says_where_it_went(user, world):
     groups = kinds(searching.search(user, "calibration"))
     hit = groups["sent"].hits[0]
