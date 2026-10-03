@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-03 22:52+0000\n"
+"POT-Creation-Date: 2026-10-03 23:38+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -778,15 +778,25 @@ msgstr "%(role)s chez %(company)s — %(days)s jours"
 msgid "%(role)s: no start date, so it was not added."
 msgstr "%(role)s : pas de date de début, donc non ajouté."
 
-#: src/postulo/core/identifiers.py:649
+#: src/postulo/core/identifiers.py:701
 #, python-format, draft
 msgid "%(scheme)s does not identify this kind of thing."
 msgstr "%(scheme)s n’identifie pas ce genre de chose."
 
-#: src/postulo/core/identifiers.py:974
+#: src/postulo/core/identifiers.py:1026
 #, python-format, draft
 msgid "%(scheme)s is already listed on another row."
 msgstr "%(scheme)s figure déjà sur une autre ligne."
+
+#: src/postulo/core/identifiers.py:607
+#, python-format, draft
+msgid "%(scheme)s: that is not the usual form (for example %(example)s)."
+msgstr "%(scheme)s : ce n’est pas la forme habituelle (par exemple %(example)s)."
+
+#: src/postulo/core/identifiers.py:612
+#, python-format, draft
+msgid "%(scheme)s: that is not the usual form."
+msgstr "%(scheme)s : ce n’est pas la forme habituelle."
 
 #: src/postulo/documents/views.py:715
 #, python-format, draft
@@ -1356,24 +1366,24 @@ msgid "A line when a plugin thinks something happened and is waiting for you."
 msgstr ""
 "Une ligne quand un plugin pense qu'il s'est passé quelque chose et vous attend."
 
-#: src/postulo/core/identifiers.py:547
+#: src/postulo/core/identifiers.py:565
 #, draft
 msgid ""
 "A link cannot hold a curly bracket other than {value}, a backslash, or a line break."
 msgstr ""
 "Un lien ne peut contenir ni accolade autre que {value}, ni barre oblique inversée, ni saut de ligne."
 
-#: src/postulo/core/identifiers.py:542
+#: src/postulo/core/identifiers.py:560
 #, draft
 msgid "A link holds {value}, which is where the identifier goes."
 msgstr "Un lien contient {value}, à l’endroit où va l’identifiant."
 
-#: src/postulo/core/identifiers.py:532
+#: src/postulo/core/identifiers.py:550
 #, python-format, draft
 msgid "A link is %(most)d characters long at most."
 msgstr "Un lien compte %(most)d caractères au plus."
 
-#: src/postulo/core/identifiers.py:534
+#: src/postulo/core/identifiers.py:552
 #, draft
 msgid "A link is a complete web address that begins with http:// or https://."
 msgstr ""
@@ -12319,12 +12329,12 @@ msgstr "Planifié"
 msgid "Scheduled only"
 msgstr "Planifiés seulement"
 
-#: src/postulo/core/identifiers.py:669
+#: src/postulo/core/identifiers.py:721
 #, draft
 msgid "scheme"
 msgstr "système"
 
-#: src/postulo/core/identifiers.py:377
+#: src/postulo/core/identifiers.py:395
 #, python-format, draft
 msgid ""
 "Scheme “%(key)s”: its name, its example or one of its links holds something that is not text and could not be drawn on a page, so the scheme is left out."
@@ -13861,18 +13871,6 @@ msgstr "Ça n'a pas marché, et voici pourquoi."
 #, draft
 msgid "That did not work."
 msgstr "Ça n'a pas marché."
-
-#: src/postulo/core/identifiers.py:589
-#, python-format, draft
-msgid ""
-"That does not look like a %(scheme)s identifier (for example %(example)s)."
-msgstr ""
-"Cela ne ressemble pas à un identifiant %(scheme)s (par exemple %(example)s)."
-
-#: src/postulo/core/identifiers.py:594
-#, python-format, draft
-msgid "That does not look like a %(scheme)s identifier."
-msgstr "Cela ne ressemble pas à un identifiant %(scheme)s."
 
 #: src/postulo/core/addresses.py:45 src/postulo/plugins/public_addresses.py:64
 #: src/postulo/plugins/public_addresses.py:69
@@ -16333,9 +16331,8 @@ msgstr "Souligner la page où vous êtes"
 msgid "underline the page you are on"
 msgstr "souligner la page où vous êtes"
 
-#: src/postulo/accounts/identifiers.py:79
-#: src/postulo/accounts/identifiers.py:86 src/postulo/core/identifiers.py:646
-#: src/postulo/jobs/identifiers.py:89 src/postulo/jobs/identifiers.py:96
+#: src/postulo/core/identifiers.py:635 src/postulo/core/identifiers.py:642
+#: src/postulo/core/identifiers.py:698
 #, draft
 msgid "Unknown identifier scheme."
 msgstr "Système d'identifiant inconnu."
@@ -18448,7 +18445,7 @@ msgstr "{label} retirée"
 msgid "{label} — new"
 msgstr "{label} — nouvelle"
 
-#: src/postulo/core/identifiers.py:562
+#: src/postulo/core/identifiers.py:580
 #, draft
 msgid ""
 "{value} goes after the host: in the path, after a question mark or after a hash sign."
