@@ -104,11 +104,20 @@ class Element:
         return name in self.attrs
 
     def iter(self):
-        """Every element beneath this one, in document order."""
-        for child in self.children:
-            if isinstance(child, Element):
-                yield child
-                yield from child.iter()
+        """Every element beneath this one, in document order.
+
+        Walked with a stack of its own: a page can nest as deep as it likes, and a recursive
+        generator raises ``RecursionError`` somewhere past a thousand levels (#587).
+        """
+        stack = [iter(self.children)]
+        while stack:
+            for child in stack[-1]:
+                if isinstance(child, Element):
+                    yield child
+                    stack.append(iter(child.children))
+                    break
+            else:
+                stack.pop()
 
     def ancestors(self):
         node = self.parent
@@ -120,12 +129,46 @@ class Element:
         return f"<{self.tag} {self.attrs}>"
 
 
+#: HTML lets a page leave out these end tags, and a browser closes the element when the next
+#: one starts. Each entry: the tags a start tag closes, found by looking up the open elements
+#: until one of the boundary tags, which an element is never closed across (#587).
+_IMPLIED_END: dict[str, tuple[frozenset[str], frozenset[str]]] = {
+    "li": (frozenset({"li"}), frozenset({"ul", "ol", "menu"})),
+    "dt": (frozenset({"dt", "dd"}), frozenset({"dl"})),
+    "dd": (frozenset({"dt", "dd"}), frozenset({"dl"})),
+    "td": (frozenset({"td", "th"}), frozenset({"tr", "table"})),
+    "th": (frozenset({"td", "th"}), frozenset({"tr", "table"})),
+    "tr": (frozenset({"tr", "td", "th"}), frozenset({"table", "thead", "tbody", "tfoot"})),
+    "thead": (frozenset({"tr", "td", "th", "thead", "tbody", "tfoot"}), frozenset({"table"})),
+    "tbody": (frozenset({"tr", "td", "th", "thead", "tbody", "tfoot"}), frozenset({"table"})),
+    "tfoot": (frozenset({"tr", "td", "th", "thead", "tbody", "tfoot"}), frozenset({"table"})),
+    "option": (frozenset({"option"}), frozenset({"select", "datalist", "optgroup"})),
+    "optgroup": (frozenset({"option", "optgroup"}), frozenset({"select", "datalist"})),
+}  # fmt: skip
+
+#: A start tag of these closes an open ``<p>``, which cannot hold them.
+_CLOSES_P = frozenset(
+    {
+        "address", "article", "aside", "blockquote", "details", "dialog", "div", "dl",
+        "fieldset", "figcaption", "figure", "footer", "form", "h1", "h2", "h3", "h4", "h5",
+        "h6", "header", "hgroup", "hr", "main", "menu", "nav", "ol", "p", "pre", "section",
+        "table", "ul", "li", "dt", "dd",
+    }
+)  # fmt: skip
+
+#: What an open ``<p>`` is looked for beneath: a table cell or a button holds its own.
+_P_SCOPE = frozenset({"table", "td", "th", "caption", "button", "object", "template", "select"})
+
+
 class _TreeBuilder(HTMLParser):
     """Assemble the tag stream into a tree, forgiving the things real pages do.
 
     An end tag with nothing open to match it is dropped, and one that matches something
     further up closes everything between -- which is what a browser does, and what makes an
-    unclosed ``<p>`` cost a paragraph break rather than the rest of the page.
+    unclosed ``<p>`` cost a paragraph break rather than the rest of the page. A start tag
+    that implies the end of the one before (``<li>`` after an ``<li>``, a ``<dd>`` after a
+    ``<dt>``, a cell after a cell) closes it, as a browser does, so a list written without
+    its end tags is a row of siblings and not a chain as deep as the list is long (#587).
     """
 
     def __init__(self) -> None:
@@ -137,7 +180,27 @@ class _TreeBuilder(HTMLParser):
     def _here(self) -> Element:
         return self._open[-1]
 
+    def _close_up_to(self, closing: frozenset[str], boundary: frozenset[str]) -> None:
+        """Close the outermost open element named in ``closing``, and what is in it, unless a
+        boundary is in the way: ``<tr>`` ends the row before it and the cell it was in."""
+        found = 0
+        for index in range(len(self._open) - 1, 0, -1):
+            name = self._open[index].tag
+            if name in boundary:
+                break
+            if name in closing:
+                found = index
+        if found:
+            del self._open[found:]
+
+    def _imply_end_tags(self, tag: str) -> None:
+        if tag in _IMPLIED_END:
+            self._close_up_to(*_IMPLIED_END[tag])
+        if tag in _CLOSES_P:
+            self._close_up_to(frozenset({"p"}), _P_SCOPE)
+
     def handle_starttag(self, tag: str, attrs) -> None:
+        self._imply_end_tags(tag)
         element = Element(
             tag,
             {name.lower(): (value or "") for name, value in attrs},
@@ -220,8 +283,12 @@ def text_of(node: Element, drop=None) -> str:
     """
     parts: list[str] = []
 
-    def walk(parent: Element) -> None:
-        for child in parent.children:
+    # A stack of the children being read, and for each whether a break follows it: an
+    # explicit one, so that no page is deep enough to exhaust the recursion limit (#587).
+    stack = [iter(node.children)]
+    breaks = [False]
+    while stack:
+        for child in stack[-1]:
             if isinstance(child, str):
                 parts.append(child)
                 continue
@@ -230,11 +297,13 @@ def text_of(node: Element, drop=None) -> str:
             block = child.tag in BLOCK_TAGS
             if block:
                 parts.append("\n")
-            walk(child)
-            if block and child.tag not in VOID_BLOCK_TAGS:
+            stack.append(iter(child.children))
+            breaks.append(block and child.tag not in VOID_BLOCK_TAGS)
+            break
+        else:
+            stack.pop()
+            if breaks.pop():
                 parts.append("\n")
-
-    walk(node)
     text = "".join(parts)
     text = re.sub(r"[ \t\r\f\v]+", " ", text)
     text = re.sub(r" *\n *", "\n", text)
@@ -278,15 +347,8 @@ FARM_TAGS = frozenset({"section", "div", "ul", "ol", "aside", "nav"})
 def _text_length(node: Element) -> int:
     """How much text is under a node, whitespace collapsed."""
     parts: list[str] = []
-
-    def walk(parent: Element) -> None:
-        for child in parent.children:
-            if isinstance(child, str):
-                parts.append(child)
-            else:
-                walk(child)
-
-    walk(node)
+    for child in [node, *node.iter()]:
+        parts.extend(part for part in child.children if isinstance(part, str))
     return len(re.sub(r"\s+", " ", "".join(parts)).strip())
 
 
@@ -473,8 +535,9 @@ def _read_item(element: Element, scope_of, type_of, props_of) -> dict:
         else:
             item[name] = value
 
-    def walk(parent: Element) -> None:
-        for child in parent.children:
+    stack = [iter(element.children)]
+    while stack:
+        for child in stack[-1]:
             if not isinstance(child, Element):
                 continue
             names = props_of(child)
@@ -490,9 +553,10 @@ def _read_item(element: Element, scope_of, type_of, props_of) -> dict:
                     add(name, value)
             # Descend unless the child began its own item, which has just read itself.
             if not nested:
-                walk(child)
-
-    walk(element)
+                stack.append(iter(child.children))
+                break
+        else:
+            stack.pop()
     return item
 
 

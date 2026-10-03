@@ -171,13 +171,16 @@ def kind_of(place: dict) -> str:
 def _elements(root: Element):
     """Every element that can hold something a reader sees, in document order."""
 
-    def walk(parent: Element):
-        for child in parent.children:
+    # Walked with a stack of its own: no page is deep enough to exhaust the recursion limit.
+    stack = [iter(root.children)]
+    while stack:
+        for child in stack[-1]:
             if isinstance(child, Element) and child.tag not in IGNORED_CONTENT_TAGS:
                 yield child
-                yield from walk(child)
-
-    yield from walk(root)
+                stack.append(iter(child.children))
+                break
+        else:
+            stack.pop()
 
 
 def _next_element(element: Element) -> Element | None:

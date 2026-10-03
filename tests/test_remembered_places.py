@@ -266,3 +266,11 @@ def test_a_source_somebody_else_wrote_is_never_handed_a_person_s_places(monkeypa
     assert handed == [None], "called, and not given the places"
     assert result is not None and result[0].location == "Porto"
     assert remembered[0].outcome == "used"
+
+
+def test_the_label_place_survives_omitted_end_tags():
+    html = "<html><body><h1>Role</h1><dl><dt>Local<dd>Lisboa</dl></body></html>"
+    assert any(
+        place["place"].get("label") == "local"
+        for place in hints.places("https://e.example/1", html)
+    )
