@@ -56,18 +56,21 @@
           {% endblocktranslate %}
         </p>
         {% if dry_run.contacts %}
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for contact in dry_run.contacts %}
-              <li class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm">
-                <span class="font-medium">{{ contact.name }}</span>
-                {% if contact.company %}<span class="text-ink-500 dark:text-ink-400">{{ contact.company }}</span>{% endif %}
-                <span class="text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with date=contact.created_at|date:"DATE_FORMAT" trimmed %}recorded {{ date}}{% endblocktranslate %}</span>
-                <span class="text-xs text-ink-500 dark:text-ink-400">
-                  {{ contact.would_remove_line }}
-                </span>
-              </li>
-            {% endfor %}
-          </ul>
+          <p class="text-sm">
+            {% blocktranslate count n=dry_run.contacts with a=dry_run.accounts trimmed %}
+              {{ n }} contact in {{ a }} account is past the line.
+            {% plural %}
+              {{ n }} contacts in {{ a }} accounts are past the line.
+            {% endblocktranslate %}
+          </p>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate with n=dry_run.would_remove.phone_numbers a=dry_run.would_remove.postal_addresses l=dry_run.would_remove.web_links apps=dry_run.would_remove.applications_unlinked trimmed %}
+              An erasure would remove {{ n }} telephone numbers, {{ a }} addresses and {{ l }} web links; {{ apps }} applications would be kept without the name.
+            {% endblocktranslate %}
+          </p>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% translate "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page." %}
+          </p>
         {% else %}
           <c-empty variant="quiet">{% translate "Nothing on the instance is older than the policy. There is nothing to do." %}</c-empty>
         {% endif %}

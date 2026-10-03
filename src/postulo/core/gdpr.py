@@ -45,7 +45,7 @@ import dataclasses
 import datetime as dt
 
 from django.db import transaction
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
@@ -356,15 +356,18 @@ def retention_cutoff(days: int | None = None) -> dt.date | None:
 
 
 def retention_dry_run(days: int | None = None) -> dict:
-    """What the retention policy would touch. Deletes nothing — that is the whole point.
+    """What the retention policy would touch, in counts. Deletes nothing — that is the whole point.
 
     With `days` it is asked of that limit instead of the stored one, so the preview can
     answer for the number on screen before it is saved (#483).
 
     A dry run that removed a row to check whether it could would be a deletion with an
-    apology, so the question is asked of the query set alone: who is older than the line,
-    and what would go with them. The operator reads the report and performs the erasures
-    one by one, which is the difference between a policy and a janitor.
+    apology, so the question is asked of the query set alone: how many contacts are older
+    than the line, and what would go with them. **It names nobody.** The page is for the
+    staff, and who an account is talking to at which company is that account's job search,
+    which administrators are promised never to see (#369): the report is a count of
+    contacts, of the accounts that hold them, and of what an erasure would remove. The
+    erasure itself is a person's act on their own contact's page.
     """
     from postulo.applications.models import Application
     from postulo.jobs.models import Contact
@@ -372,32 +375,26 @@ def retention_dry_run(days: int | None = None) -> dict:
     days = days or retention_days()
     cutoff = retention_cutoff(days)
     if cutoff is None:
-        return {"days": None, "cutoff": None, "contacts": []}
+        return {"days": None, "cutoff": None, "contacts": 0, "accounts": 0, "would_remove": {}}
 
     older_than = timezone.make_aware(dt.datetime.combine(cutoff, dt.time.min))
-    rows = []
-    for contact in Contact.objects.filter(created_at__lt=older_than).select_related("company"):
-        would_remove = {
-            "phone_numbers": contact.phone_numbers.count(),
-            "postal_addresses": contact.postal_addresses.count(),
-            "web_links": contact.web_links.count(),
-            # Every application that names them, as its contact or as who
-            # referred the person: each is kept, and each loses the name (#239).
+    contacts = Contact.objects.filter(created_at__lt=older_than)
+    return {
+        "days": days,
+        "cutoff": cutoff,
+        "contacts": contacts.count(),
+        "accounts": contacts.values("owner").distinct().count(),
+        "would_remove": {
+            "phone_numbers": sum(c.phone_numbers.count() for c in contacts),
+            "postal_addresses": sum(c.postal_addresses.count() for c in contacts),
+            "web_links": sum(c.web_links.count() for c in contacts),
+            # Every application that names them, as its contact or as who referred the
+            # person: each is kept, and each loses the name (#239).
             "applications_unlinked": Application.objects.filter(
-                Q(contact=contact) | Q(referred_by=contact)
+                Q(contact__in=contacts) | Q(referred_by__in=contacts)
             ).count(),
-        }
-        rows.append(
-            {
-                "id": contact.pk,
-                "name": contact.name,
-                "company": contact.company.name if contact.company_id else "",
-                "created_at": timezone.localdate(contact.created_at),
-                "would_remove": would_remove,
-                "would_remove_line": would_remove_line(would_remove),
-            }
-        )
-    return {"days": days, "cutoff": cutoff, "contacts": rows}
+        },
+    }
 
 
 def would_remove_line(would_remove: dict) -> str:
@@ -425,9 +422,11 @@ def record_of_processing() -> dict:
     """What the instance processes, why, and who receives it — drawn at read time.
 
     Every installed plugin is a purpose: what it is, and the one line it says it does.
-    Every connection is a recipient: the kind of plugin, the plugin, and the configuration
-    that names where it talks. Neither list is written down anywhere to be kept in sync,
-    which is the difference between a record that can lie and one that is a mirror.
+    Every connection is a recipient, counted by plugin and kind: the label and the
+    configuration of a connection are its owner's (a mail server and a login name), and an
+    administrator is promised never to read them (#369). Neither list is written down
+    anywhere to be kept in sync, which is the difference between a record that can lie and
+    one that is a mirror.
     """
     from postulo.plugins import registry
     from postulo.plugins.api import description_of, label_of
@@ -444,14 +443,10 @@ def record_of_processing() -> dict:
         for plugin in registry.plugins(kind)
     ]
     recipients = [
-        {
-            "kind": connection.kind,
-            "plugin": connection.plugin,
-            "label": connection.label,
-            "config": connection.config,
-            "enabled": connection.enabled,
-        }
-        for connection in Connection.objects.all().order_by("kind", "plugin")
+        {"kind": row["kind"], "plugin": row["plugin"], "connections": row["n"]}
+        for row in Connection.objects.values("kind", "plugin")
+        .annotate(n=Count("pk"))
+        .order_by("kind", "plugin")
     ]
     return {"purposes": purposes, "recipients": recipients}
 

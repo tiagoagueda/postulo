@@ -315,10 +315,12 @@ def test_switching_the_feature_off_deletes_nothing(user):
 def test_a_retention_without_a_limit_touches_nothing(user):
     make_contact(user)
 
-    assert gdpr.retention_dry_run() == {"days": None, "cutoff": None, "contacts": []}
+    report = gdpr.retention_dry_run()
+    assert report["cutoff"] is None
+    assert report["contacts"] == 0
 
 
-def test_the_dry_run_lists_only_what_is_older_than_the_line(user):
+def test_the_dry_run_counts_only_what_is_older_than_the_line(user):
     settings = SiteSettings.get()
     settings.retention_days = 30
     settings.save()
@@ -332,10 +334,10 @@ def test_the_dry_run_lists_only_what_is_older_than_the_line(user):
     report = gdpr.retention_dry_run()
 
     assert report["days"] == 30
-    assert [row["name"] for row in report["contacts"]] == ["An old contact"]
-    row = report["contacts"][0]
-    assert row["company"] == company.name
-    assert row["would_remove"]["web_links"] == 1
+    assert report["contacts"] == 1
+    assert report["accounts"] == 1
+    assert report["would_remove"]["web_links"] == 1
+    assert "An old contact" not in str(report), "the report names nobody (#369)"
     assert Contact.objects.filter(pk=old.pk).exists(), "the dry run deletes nothing"
 
 
@@ -349,7 +351,7 @@ def test_the_dry_run_counts_what_the_erasures_would_keep(user):
     make_application(user, company, old)
     Contact.objects.filter(pk=old.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
 
-    row = gdpr.retention_dry_run()["contacts"][0]
+    row = gdpr.retention_dry_run()
 
     assert row["would_remove"]["applications_unlinked"] == 1, (
         "the application is kept, the way an erasure keeps it; the report says so"
@@ -381,13 +383,13 @@ def test_the_record_is_drawn_from_the_registry_and_the_connections(user):
     assert GDPR in names, "the gdpr plugin is a purpose, like every installed one"
     assert record["recipients"] == []
 
-    connection = Connection.objects.create(
-        owner=user, kind="store", plugin="a-plugin", label="The outbox"
-    )
+    Connection.objects.create(owner=user, kind="store", plugin="a-plugin", label="The outbox")
+    Connection.objects.create(owner=user, kind="store", plugin="a-plugin", label="The inbox")
     recipients = gdpr.record_of_processing()["recipients"]
     assert [row["plugin"] for row in recipients] == ["a-plugin"]
     assert recipients[0]["kind"] == "store"
-    assert recipients[0]["label"] == connection.label
+    assert recipients[0]["connections"] == 2
+    assert "label" not in recipients[0], "a connection's label is its owner's (#369)"
 
 
 # ----------------------------------------------------------------------- the notice
@@ -539,7 +541,8 @@ def test_the_dry_run_shows_what_would_be_touched_and_saves_nothing(client, admin
 
     assert response.status_code == 200
     html = response.content.decode()
-    assert "An old contact" in html
+    assert "An old contact" not in html
+    assert "1 contact in 1 account is past the line." in html
     assert "Nothing was removed" in html
     assert "0 telephone numbers" in html and "0 applications kept" in html
     assert "(1 day)" in html
@@ -558,7 +561,8 @@ def test_the_dry_run_answers_for_the_number_typed_not_the_one_saved(client, admi
     )
 
     html = response.content.decode()
-    assert "A forty-five day contact" in html
+    assert "1 contact in 1 account is past the line." in html
+    assert "A forty-five day contact" not in html, "staff are told a count, never a name (#369)"
     assert "No retention limit is set" not in html
     assert SiteSettings.get().retention_days is None, "the dry run saves nothing"
 
@@ -566,7 +570,9 @@ def test_the_dry_run_answers_for_the_number_typed_not_the_one_saved(client, admi
     html = client.post(
         reverse("server:data_protection"), {"retention_days": "30", "dry_run": "1"}
     ).content.decode()
-    assert "A forty-five day contact" in html, "the typed 30 wins over the stored 90"
+    assert "1 contact in 1 account is past the line." in html, (
+        "the typed 30 wins over the stored 90"
+    )
 
     html = client.post(
         reverse("server:data_protection"), {"retention_days": "-5", "dry_run": "1"}
@@ -583,7 +589,34 @@ def test_the_record_page_is_drawn_at_render_time(client, admin, user):
     Connection.objects.create(owner=user, kind="store", plugin="a-plugin", label="The outbox")
     html = client.get(reverse("server:record_of_processing")).content.decode()
     assert "a-plugin" in html
-    assert "The outbox" in html
+    assert "1 connection" in html
+    assert "The outbox" not in html
+
+
+def test_staff_never_see_what_another_account_keeps_here(client, admin, user):
+    settings = SiteSettings.get()
+    settings.retention_days = 30
+    settings.save()
+    old = make_contact(user, make_company(user, name="Wayne Enterprises"), name="Secret Person")
+    Contact.objects.filter(pk=old.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
+    Connection.objects.create(
+        owner=user,
+        kind="store",
+        plugin="a-plugin",
+        label="Private mailbox",
+        config={"username": "someone-private"},
+    )
+    client.force_login(admin)
+
+    pages = [
+        client.post(reverse("server:data_protection"), {"retention_days": "30", "dry_run": "1"}),
+        client.get(reverse("server:record_of_processing")),
+    ]
+
+    for response in pages:
+        html = response.content.decode()
+        for private in ("Secret Person", "Wayne Enterprises", "Private mailbox", "someone-private"):
+            assert private not in html
 
 
 def test_everyone_but_the_administrator_is_kept_from_the_pages(client, user):

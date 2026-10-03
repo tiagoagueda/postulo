@@ -629,6 +629,6 @@ def test_the_dry_run_counts_an_application_a_referrer_would_leave(user, applicat
     Application.objects.filter(pk=application.pk).update(referred_by=friend)
     Contact.objects.filter(pk=friend.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
 
-    [row] = gdpr.retention_dry_run()["contacts"]
+    row = gdpr.retention_dry_run()
 
     assert row["would_remove"]["applications_unlinked"] == 1

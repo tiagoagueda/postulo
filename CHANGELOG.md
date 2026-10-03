@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Server settings → Data protection no longer names other accounts' contacts or shows their connections' labels and configuration: staff see counts, per plugin and kind for the record of processing. (#369)
 - A number filter given a value like `1e1000000` is ignored instead of holding a server worker for half a minute. (#499)
 - A plugin switched off for a person, by an administrator or by themselves, no longer runs for them: notifiers, queued webhooks, stores, syncs, sources and importers ask the policy where they run, the create address of an unavailable one is a 404, and what was waiting resumes when the decision is reversed. (#362)
 - *Your own email* now starts on STARTTLS and refuses to sign in with a password or token when no encryption is chosen. (#360)

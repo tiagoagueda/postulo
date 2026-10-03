@@ -42,7 +42,7 @@
   <section>
     <c-section-title>
       {% translate "Who receives it" %}
-      <c-slot name="subtitle">{% translate "Every connection on this instance: the kind of plugin, the plugin, and the configuration that names where it talks. Secrets are not on this page; they are stored encrypted and shown to nobody." %}</c-slot>
+      <c-slot name="subtitle">{% translate "Every kind of connection on this instance, by plugin, with how many there are. What each one is called and where it talks belongs to its owner, and is not on this page; secrets are stored encrypted and shown to nobody." %}</c-slot>
     </c-section-title>
     {% if record.recipients %}
       <div class="card p-0">
@@ -52,12 +52,8 @@
               <div class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                 <span class="font-medium">{{ recipient.plugin }}</span>
                 <span class="badge" data-tone="grey">{{ recipient.kind }}</span>
-                {% if recipient.label %}<span class="text-sm text-ink-500 dark:text-ink-400">{{ recipient.label }}</span>{% endif %}
-                {% if not recipient.enabled %}<span class="badge" data-tone="amber">{% translate "disabled" %}</span>{% endif %}
+                <span class="text-sm text-ink-500 dark:text-ink-400">{% blocktranslate count n=recipient.connections trimmed %}{{ n }} connection{% plural %}{{ n }} connections{% endblocktranslate %}</span>
               </div>
-              {% if recipient.config %}
-                <p class="mt-1 text-xs text-ink-500 dark:text-ink-400"><code>{{ recipient.config }}</code></p>
-              {% endif %}
             </li>
           {% endfor %}
         </ul>
