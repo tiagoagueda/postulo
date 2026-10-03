@@ -73,6 +73,31 @@ def test_the_words_the_script_needs_come_from_the_catalogue(client, user):
     assert "{label}" in html, "the name goes inside the sentence, not beside it"
 
 
+def test_the_tags_list_is_named_by_a_label_with_no_script(client, user):
+    """A span labels nothing: with scripts off the list was announced by its help alone (#625)."""
+    import re
+
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
+    client.force_login(user)
+
+    for url in (
+        reverse("applications:update", args=[application.pk]),
+        reverse("applications:create"),
+    ):
+        html = client.get(url).content.decode()
+        select = re.search(r"<select[^>]*name=\"tags\"[^>]*>", html).group(0)
+        field_id = re.search(r'id="([^"]+)"', select).group(1)
+        label = re.search(rf'<label[^>]*for="{field_id}"[^>]*>', html)
+        assert label, url
+        # The script points its chips at this id, so it stays.
+        assert 'id="labels-tags-heading"' in label.group(0)
+
+
 # ----------------------------------------------------- a name that does not exist yet
 
 

@@ -4,7 +4,7 @@
   script. Two forms show tags; this is written once so they cannot drift (#139).
 {% endcomment %}
 <div class="mb-4" {% include "partials/label_attrs.html" with field=form.tags new_field=form.new_tags %}>
-  <span class="label" id="labels-{{ form.tags.html_name }}-heading">{{ form.tags.label }}</span>
+  <label for="{{ form.tags.id_for_label }}" class="label" id="labels-{{ form.tags.html_name }}-heading">{{ form.tags.label }}</label>
   <div class="field" data-labels-existing>
     {{ form.tags }}
     <c-field-feedback :field="form.tags" />
