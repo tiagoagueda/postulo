@@ -526,3 +526,53 @@ def test_a_listing_currency_is_checked_and_stored_in_capitals(client, user, sear
     )
     assert made.status_code == 201
     assert JobPosting.objects.get(pk=made.json()["id"]).salary_currency == "EUR"
+
+
+def test_a_time_without_an_offset_is_refused_naming_the_field(client, user, search):
+    """A naive time was a 500 on interviews and a shifted reminder elsewhere (#567)."""
+    bearer = issue(user, "write", "read")
+    application_id = search["application"].pk
+    naive = "2026-11-02T10:00:00"
+
+    response = post(
+        client,
+        "/api/v1/interviews",
+        {"application_id": application_id, "kind": "video", "starts_at": naive},
+        **bearer,
+    )
+    assert response.status_code == 422
+    assert response["Content-Type"].startswith("application/problem+json")
+    assert "starts_at" in response.content.decode()
+
+    made = post(
+        client,
+        "/api/v1/interviews",
+        {
+            "application_id": application_id,
+            "kind": "video",
+            "starts_at": "2026-11-02T10:00:00Z",
+        },
+        **bearer,
+    )
+    assert made.status_code == 201
+    response = patch(
+        client, f"/api/v1/interviews/{made.json()['id']}", {"starts_at": naive}, **bearer
+    )
+    assert response.status_code == 422 and "starts_at" in response.content.decode()
+
+    response = post(
+        client,
+        "/api/v1/reminders",
+        {"application_id": application_id, "summary": "Chase", "due_at": naive},
+        **bearer,
+    )
+    assert response.status_code == 422 and "due_at" in response.content.decode()
+    assert not Reminder.objects.filter(summary="Chase").exists()
+
+    assert client.get("/api/v1/applications?updated_since=" + naive, **bearer).status_code == 422
+
+
+def test_me_says_the_owners_time_zone(client, user):
+    user.profile.time_zone = "America/New_York"
+    user.profile.save()
+    assert client.get("/api/v1/me", **issue(user)).json()["time_zone"] == "America/New_York"

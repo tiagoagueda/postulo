@@ -1,11 +1,10 @@
 """Reminders: the nudges a person set for themselves."""
 
-import datetime as dt
-
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications.models import Application, Reminder
 from postulo.applications.services import postpone_reminder
@@ -25,7 +24,7 @@ def list_reminders(
     request,
     due: bool = Query(False, description="Only outstanding reminders whose time has come"),
     outstanding: bool = Query(False, description="Only reminders not yet done"),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     reminders = owned(request, Reminder.objects).order_by("due_at", "pk")

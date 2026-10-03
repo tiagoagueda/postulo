@@ -1,12 +1,11 @@
 """Companies and the people at them."""
 
-import datetime as dt
-
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications.services import get_or_create_company
 from postulo.jobs import identifiers
@@ -34,7 +33,7 @@ router = Router(tags=["companies"], auth=scope("read"))
 def list_companies(
     request,
     q: str | None = Query(None, description="Name, location or industry"),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     companies = (

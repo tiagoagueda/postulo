@@ -17,7 +17,7 @@ from typing import Annotated
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from ninja import Field, Schema
-from pydantic import AfterValidator, BeforeValidator
+from pydantic import AfterValidator, AwareDatetime, BeforeValidator
 
 from postulo.accounts.models import Profile, User
 from postulo.core import phones
@@ -404,7 +404,7 @@ class ListingEventIn(Schema):
         max_length=BODY_MAX_CHARS,
         description="The message, the email's text, or what was said. At most 40,000 characters.",
     )
-    occurred_at: dt.datetime | None = Field(default=None, description="Now, if unset")
+    occurred_at: AwareDatetime | None = Field(default=None, description="Now, if unset")
     contact_id: int | None = Field(
         default=None, description="Who it came from: one of your contacts"
     )
@@ -558,8 +558,8 @@ class InterviewOut(Schema):
 class InterviewIn(Schema):
     application_id: int
     kind: str = "video"
-    starts_at: dt.datetime
-    ends_at: dt.datetime | None = Field(
+    starts_at: AwareDatetime
+    ends_at: AwareDatetime | None = Field(
         default=None, description="An hour after the start if unset"
     )
     location: str = Field(default="", max_length=500)
@@ -572,8 +572,8 @@ class InterviewPatch(Schema):
     """Only the fields sent change; a `null` means "leave it", as on every other patch."""
 
     kind: str | None = None
-    starts_at: dt.datetime | None = None
-    ends_at: dt.datetime | None = None
+    starts_at: AwareDatetime | None = None
+    ends_at: AwareDatetime | None = None
     location: str | None = Field(default=None, max_length=500)
     contact_ids: list[int] | None = None
     notes: str | None = None
@@ -671,13 +671,13 @@ class EventIn(Schema):
     kind: str = "note"
     summary: str = Field(default="", max_length=250)
     body: str = ""
-    occurred_at: dt.datetime | None = None
+    occurred_at: AwareDatetime | None = None
 
 
 class ReminderIn(Schema):
     application_id: int | None = None
     summary: _required(250)
-    due_at: dt.datetime
+    due_at: AwareDatetime
 
 
 class ReminderPatch(Schema):
@@ -695,7 +695,7 @@ class ReminderPatch(Schema):
 
     application_id: int | None = None
     summary: _required(250) | None = None
-    due_at: dt.datetime | None = None
+    due_at: AwareDatetime | None = None
 
 
 # ------------------------------------------------------------------ documents
@@ -912,6 +912,9 @@ class TokenOut(Schema):
     name: str
     owner: str
     scopes: list[str]
+    time_zone: str = Field(
+        description="The owner's zone, so a client can build the offset a time must carry"
+    )
     expires_at: dt.datetime | None = None
     last_used_at: dt.datetime | None = None
 

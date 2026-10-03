@@ -1,12 +1,11 @@
 """CVs, letters and files. Files themselves travel only under ``documents:read``."""
 
-import datetime as dt
-
 from django.db import transaction
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.core.files import serve_private_file
 from postulo.documents import printing
@@ -125,7 +124,7 @@ def _letter_out(letter: CoverLetter, *, detail: bool = False) -> dict:
 @paginate(Page, row=lambda request, cv: _cv_out(cv))
 def list_cvs(
     request,
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     return changed_since(owned(request, CV.objects).order_by("name", "pk"), updated_since, after_id)
@@ -208,7 +207,7 @@ def patch_cv(request, pk: int, payload: CVPatch):
 @paginate(Page, row=lambda request, letter: _letter_out(letter))
 def list_letters(
     request,
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     return changed_since(
@@ -234,7 +233,7 @@ def draft_letter(request, payload: LetterIn):
 def list_documents(
     request,
     source: str | None = Query(None, description="upload or rendered; both by default"),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
 ):
     """Uploads and snapshots in one list.
 

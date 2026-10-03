@@ -6,13 +6,12 @@ the brief list of listings such a client needs to choose one. That scope reaches
 calls and nothing else.
 """
 
-import datetime as dt
-
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications.models import Channel
 from postulo.applications.models import Status as ApplicationStatus
@@ -75,7 +74,7 @@ def list_listings(
         description="undecided (default), new, shortlisted, discarded, applied, closed or all",
     ),
     company: int | None = Query(None),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     listings = _queryset(request)
@@ -108,7 +107,7 @@ def list_listing_choices(
         "all",
         description="all (default), undecided, new, shortlisted, discarded, applied or closed",
     ),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     """The person's listings, as little of each as recognising it takes (#270).

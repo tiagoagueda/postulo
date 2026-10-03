@@ -6,6 +6,7 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications.models import (
     END_STATUSES,
@@ -59,7 +60,7 @@ def list_applications(
     quiet: bool = Query(
         False, description="Only applications that have gone quiet by the owner's threshold"
     ),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     applications = (

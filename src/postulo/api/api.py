@@ -43,10 +43,10 @@ from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 from ninja.renderers import JSONRenderer
 from ninja.responses import NinjaJSONEncoder
-from pydantic import AfterValidator, ConfigDict, Field
+from pydantic import AfterValidator, AwareDatetime, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
-from postulo.core import errands, throttle
+from postulo.core import errands, site, throttle
 from postulo.core.addresses import page_address
 from postulo.jobs import pages, remembered
 from postulo.jobs.known import known
@@ -417,6 +417,7 @@ def whoami(request):
         "name": token.name,
         "owner": token.owner.email,
         "scopes": token.scopes,
+        "time_zone": getattr(token.owner.profile, "time_zone", "") or site.default_time_zone(),
         "expires_at": token.expires_at,
         "last_used_at": token.last_used_at,
     }
@@ -645,7 +646,7 @@ def _read(payload: PageIn, owner):
 @paginate(Page, row=_as_output)
 def list_captures(
     request,
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     """What is still waiting to be reviewed, newest first.

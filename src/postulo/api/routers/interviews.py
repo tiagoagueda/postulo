@@ -1,12 +1,11 @@
 """Interviews: the diary, readable by a calendar sync and writable by an agent."""
 
-import datetime as dt
-
 from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications import agenda, ical
 from postulo.applications.models import (
@@ -44,8 +43,8 @@ def list_interviews(
         description="upcoming (default: scheduled and not over), scheduled, past or all",
     ),
     application: int | None = Query(None, description="Only this application's"),
-    since: dt.datetime | None = Query(None, description="Starting on or after this moment"),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    since: AwareDatetime | None = Query(None, description="Starting on or after this moment"),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     interviews = _queryset(request)

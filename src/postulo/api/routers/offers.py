@@ -1,9 +1,8 @@
 """Offers: what was offered, readable. Recording one is the interface's, for now (#237)."""
 
-import datetime as dt
-
 from ninja import Query, Router
 from ninja.pagination import paginate
+from pydantic import AwareDatetime
 
 from postulo.applications.models import Offer
 
@@ -26,7 +25,7 @@ def _queryset(request):
 def list_offers(
     request,
     application: int | None = Query(None, description="Only this application's"),
-    updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     offers = _queryset(request).order_by("-created_at", "-pk")
