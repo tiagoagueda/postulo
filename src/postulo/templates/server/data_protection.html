@@ -69,6 +69,11 @@
             {% endblocktranslate %}
           </p>
           <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate with i=dry_run.would_remove.interviews_unlinked e=dry_run.would_remove.listing_events_unlinked trimmed %}
+              {{ i }} interviews and {{ e }} entries in listings' histories would be kept without the name.
+            {% endblocktranslate %}
+          </p>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
             {% translate "Nobody is named here: whose contacts they are is the account's own business. Each person erases from their own contact's page." %}
           </p>
         {% else %}

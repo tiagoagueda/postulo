@@ -258,6 +258,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- A contact's data-protection document, erasure report and retention dry run each account for every record that names them: the applications they are the contact or referrer for, the interviews they were at and the listing-history entries from them. (#370)
 - Saving an application's or an interview's edit page opened before a move no longer undoes it and logs a move nobody made: a status or time that comes back as the page drew it is left as it is now. (#545)
 - Saving an offer without changing its terms (a note, or nothing) no longer writes "Offer revised", sends a webhook, reopens a ticked-off answer-by reminder or undoes a postponement; the reminder follows only a moved date. (#442)
 - *Interviews attended* (Insights and the employment-office report) no longer counts a no-show, nor a held interview that was moved or settled again; a no-show is its own kind of timeline entry. (#448)

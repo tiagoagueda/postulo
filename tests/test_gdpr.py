@@ -15,10 +15,10 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.applications.models import Application
+from postulo.applications.models import Application, Interview
 from postulo.core import gdpr
 from postulo.core.models import SiteSettings, Tag, WebLink
-from postulo.jobs.models import Company, Contact, JobPosting
+from postulo.jobs.models import Company, Contact, JobPosting, ListingEvent
 from postulo.plugins.gdpr import GDPR
 from postulo.plugins.models import Connection, PluginPolicy
 
@@ -64,6 +64,67 @@ def add_link(contact, owner, url="https://aperture.example", kind=WebLink.Kind.W
 def make_application(user, company, contact):
     posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
     return Application.objects.create(owner=user, posting=posting, contact=contact)
+
+
+def reference_all_four_ways(user, contact):
+    """The contact is the main contact of one application, the referrer of another, at an
+    interview, and who a listing's history entry came from."""
+    company = make_company(user, name="Black Mesa")
+    main = make_application(user, company, contact)
+    referred = make_application(user, company, None)
+    Application.objects.filter(pk=referred.pk).update(referred_by=contact)
+    starts = timezone.now() + dt.timedelta(days=2)
+    interview = Interview.objects.create(
+        owner=user, application=main, starts_at=starts, ends_at=starts + dt.timedelta(hours=1)
+    )
+    interview.contacts.set([contact])
+    ListingEvent.objects.create(posting=main.posting, summary="Rang", contact=contact)
+
+
+def test_the_document_the_erasure_and_the_dry_run_account_for_every_reference(user):
+    contact = make_contact(user)
+    reference_all_four_ways(user, contact)
+    settings = SiteSettings.get()
+    settings.retention_days = 30
+    settings.save()
+    Contact.objects.filter(pk=contact.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
+    contact.refresh_from_db()
+
+    document = gdpr.contact_document(contact)
+    would = gdpr.retention_dry_run()["would_remove"]
+    report = gdpr.erase_contact(contact)
+
+    assert document["version"] == gdpr.DOCUMENT_VERSION
+    assert [row["role"] for row in document["applications"]] == ["Engineer"]
+    assert [row["company"] for row in document["referrals"]] == ["Black Mesa"]
+    assert [row["company"] for row in document["interviews"]] == ["Black Mesa"]
+    assert [row["summary"] for row in document["listing_events"]] == ["Rang"]
+    assert would["applications_unlinked"] == 2
+    assert would["interviews_unlinked"] == 1
+    assert would["listing_events_unlinked"] == 1
+    assert report.unlinked == {
+        "applications": 1,
+        "referrals": 1,
+        "interviews": 1,
+        "listing_events": 1,
+    }
+    assert "1 interview kept" in report.summary()
+
+
+def test_references_cover_every_relation_that_points_at_a_contact():
+    """A new model that points at a contact must be taken into account here, in the way
+    the merge's collector check makes it be there (#370)."""
+    from postulo.core.models import PhoneNumber, PostalAddress
+
+    covered = {queryset.model for queryset in gdpr.references(Contact(pk=0)).values()}
+    # The person's own numbers, addresses and links reach them through generic relations.
+    own = {PhoneNumber, PostalAddress, WebLink}
+    pointing = {relation.related_model for relation in Contact._meta.related_objects}
+    through = {Interview.contacts.through}
+
+    assert pointing - covered - own - through == set(), (
+        "references() must cover every relation to Contact"
+    )
 
 
 # --------------------------------------------------------------------- the export

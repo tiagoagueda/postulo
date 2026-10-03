@@ -55,7 +55,9 @@ from django.utils.translation import ngettext
 #: 2 added ``listing_events``: the entries in listings' histories that name the person as
 #: who they came from -- a message they sent, a call with them (#270).
 DOCUMENT_NAME = "postulo-contact"
-DOCUMENT_VERSION = 2
+#: 3 added ``applications``, ``referrals`` and ``interviews``: the account holder's records
+#: that name the person (#370).
+DOCUMENT_VERSION = 3
 
 
 def is_offered(person=None) -> bool:
@@ -152,6 +154,46 @@ def _listing_event_rows(contact) -> list[dict]:
     ]
 
 
+def references(contact) -> dict:
+    """Every row of the account holder's that points at this contact, as querysets by kind.
+
+    The one answer to "what refers to this person?", for the document, the erasure and the
+    dry run, which used to decide for themselves and disagree (#370). An application names
+    them as its main contact or as who referred them, an interview as somebody at it, an
+    entry in a listing's history as who it came from. The numbers, addresses and links that
+    belong to the person are not references: they are the person's own rows.
+    """
+    from postulo.applications.models import Application, Interview
+    from postulo.jobs.models import ListingEvent
+
+    return {
+        "applications": Application.objects.filter(contact=contact),
+        "referrals": Application.objects.filter(referred_by=contact),
+        "interviews": Interview.objects.filter(contacts=contact),
+        "listing_events": ListingEvent.objects.filter(contact=contact),
+    }
+
+
+def _application_rows(applications) -> list[dict]:
+    """Applications named by role and company, the way they read on the page."""
+    return [
+        {"role": row.posting.title, "company": row.posting.company.name}
+        for row in applications.select_related("posting", "posting__company")
+    ]
+
+
+def _interview_rows(interviews) -> list[dict]:
+    return [
+        {
+            "kind": row.kind,
+            "starts_at": row.starts_at.isoformat(),
+            "role": row.application.posting.title,
+            "company": row.application.posting.company.name,
+        }
+        for row in interviews.select_related("application__posting__company")
+    ]
+
+
 def contact_document(contact) -> dict:
     """Everything the instance holds on one other person, in one document.
 
@@ -164,6 +206,7 @@ def contact_document(contact) -> dict:
     from postulo.plugins.data import export_sections_for
 
     plugins = export_sections_for(contact)
+    found = references(contact)
     document = {
         "document": DOCUMENT_NAME,
         "version": DOCUMENT_VERSION,
@@ -172,6 +215,9 @@ def contact_document(contact) -> dict:
         "postal_addresses": _address_rows(contact),
         "web_links": _web_link_rows(contact),
         "listing_events": _listing_event_rows(contact),
+        "applications": _application_rows(found["applications"]),
+        "referrals": _application_rows(found["referrals"]),
+        "interviews": _interview_rows(found["interviews"]),
         "plugins": plugins,
     }
     if "not_carried" in plugins:
@@ -238,6 +284,15 @@ class ErasureReport:
                 )
                 % {"count": self.unlinked["listing_events"]}
             )
+        if self.unlinked.get("interviews"):
+            parts.append(
+                ngettext(
+                    "%(count)d interview kept, without them among who was there.",
+                    "%(count)d interviews kept, without them among who was there.",
+                    self.unlinked["interviews"],
+                )
+                % {"count": self.unlinked["interviews"]}
+            )
         return " ".join(parts) or _("Nothing was left to remove.")
 
 
@@ -302,8 +357,6 @@ def erase_contact(contact) -> ErasureReport:
     Raises `ErasureRefused`, having removed nothing, while a plugin holds rows about the
     person that it could not remove.
     """
-    from postulo.applications.models import Application
-    from postulo.jobs.models import ListingEvent
     from postulo.plugins import data as plugin_data
 
     with transaction.atomic():
@@ -318,14 +371,10 @@ def erase_contact(contact) -> ErasureReport:
             "web_links": contact.web_links.count(),
             "plugin_rows": removed,
         }
-        unlinked = {
-            "applications": Application.objects.filter(contact=contact).count(),
-            # The same person may have referred somebody to an application they were
-            # never the contact for, and that link goes with them as well (#239).
-            "referrals": Application.objects.filter(referred_by=contact).count(),
-            # And the entries in listings' histories that say they came from them (#270).
-            "listing_events": ListingEvent.objects.filter(contact=contact).count(),
-        }
+        # Each is kept and loses the person: an application its main contact (or whoever
+        # referred it, #239), an entry in a listing's history who it came from (#270), an
+        # interview a seat.
+        unlinked = {kind: rows.count() for kind, rows in references(contact).items()}
         name = contact.name
         contact.delete()
 
@@ -369,8 +418,8 @@ def retention_dry_run(days: int | None = None) -> dict:
     contacts, of the accounts that hold them, and of what an erasure would remove. The
     erasure itself is a person's act on their own contact's page.
     """
-    from postulo.applications.models import Application
-    from postulo.jobs.models import Contact
+    from postulo.applications.models import Application, Interview
+    from postulo.jobs.models import Contact, ListingEvent
 
     days = days or retention_days()
     cutoff = retention_cutoff(days)
@@ -393,6 +442,10 @@ def retention_dry_run(days: int | None = None) -> dict:
             "applications_unlinked": Application.objects.filter(
                 Q(contact__in=contacts) | Q(referred_by__in=contacts)
             ).count(),
+            "interviews_unlinked": Interview.objects.filter(contacts__in=contacts)
+            .distinct()
+            .count(),
+            "listing_events_unlinked": ListingEvent.objects.filter(contact__in=contacts).count(),
         },
     }
 

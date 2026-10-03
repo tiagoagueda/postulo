@@ -698,7 +698,7 @@ def test_the_person_named_finds_what_came_from_them_in_their_document(listing, c
 
     document = gdpr.contact_document(counsellor)
 
-    assert document["version"] == gdpr.DOCUMENT_VERSION == 2
+    assert document["version"] == gdpr.DOCUMENT_VERSION
     assert document["listing_events"] == [
         {
             "listing": "Research Engineer",
