@@ -49,6 +49,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A page, its `robots.txt` and a logo are read as they stream in and stop at their size limit, and the whole download, headers included, is over within 30, 10 and 20 seconds; only gzip and deflate are unpacked. A hostile site could make a worker hold as much as it liked, for as long as it liked. (#321)
 - `import_data` takes an archive's username only when it passes the username rules and is not reserved; otherwise the account keeps its own and the report says so. A username ending in a line break no longer passes the pattern. (#321)
 - *Find logo* reads an icon's `sizes` in time that follows its length: a company's website with an over-long one could hold a worker for hours. (#321)
+- Importing an archive builds every row from the fields an export writes, so a crafted file can no longer write into another account's records, profile or files. (#354)
 
 ### 🔧 Changed
 

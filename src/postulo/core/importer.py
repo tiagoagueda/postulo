@@ -25,12 +25,24 @@ from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
 from .export import (
+    APPLICATION_FIELDS,
+    CAPTURE_FIELDS,
+    COMPANY_FIELDS,
+    CONTACT_FIELDS,
     CV_FIELDS,
+    EVENT_FIELDS,
     FORMAT_VERSION,
+    INTERVIEW_FIELDS,
+    LETTER_FIELDS,
     MANIFEST_NAME,
     MEDIA_PREFIX,
+    OFFER_FIELDS,
+    POSTING_FIELDS,
     PROFILE_FIELDS,
+    RESUME_FIELDS,
+    SENT_FIELDS,
     TRANSLATION_SECTIONS,
+    UPLOAD_FIELDS,
 )
 
 
@@ -182,6 +194,32 @@ def _restore_copies(user, entries: list, document) -> None:
             next_attempt_at=None,
             document=document,
         )
+
+
+def _carried(entry: dict, names, report: ImportReport, what: str, *extra: str) -> dict:
+    """Only what an archive is defined to carry for this kind of row (#354).
+
+    An entry goes to a model's constructor, and a file can say anything: ``owner_id`` would
+    win over the ``owner=`` passed beside it, and ``posting_id`` would attach a row to
+    somebody else's listing. So every row is built from the names the exporter writes for
+    it (``names``, and ``extra`` for what it writes beside them), and never from a key that
+    is an ``id`` or ends in ``_id``: a relation is resolved through the importer's own maps
+    of what it has made, after the entry has been read, or not at all. What is left out is
+    said in the report, cut short, as a CV's is.
+    """
+    allowed = (set(names) | set(extra)) - {"id"}
+    kept = {
+        name: value
+        for name, value in entry.items()
+        if name in allowed and not str(name).endswith("_id")
+    }
+    left_out = sorted(str(name) for name in entry if name not in kept)
+    if left_out:
+        named = ", ".join(repr(name[:40]) for name in left_out[:10])
+        if len(left_out) > 10:
+            named += f" and {len(left_out) - 10} more"
+        report.skipped.append(f"{what}: {named}: not something an archive carries, and left out")
+    return kept
 
 
 def _dt(value):
@@ -726,7 +764,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         for entry in document.get("resume", {}).get(key, []):
             old_id = entry.pop("id", None)
             values = {}
-            for name, value in entry.items():
+            for name, value in _carried(
+                entry, RESUME_FIELDS[key], report, f"A {key} entry"
+            ).items():
                 if name in date_fields:
                     values[name] = _d(value)
                 elif name in moment_fields:
@@ -748,7 +788,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # nothing a file says ever reaches the column by way of the constructor.
         entry.pop("esco_uri", None)
         group = resume_map["skill_groups"].get(group_id)
-        created = resume.Skill.objects.create(owner=user, group=group, **entry)
+        created = resume.Skill.objects.create(
+            owner=user,
+            group=group,
+            **_carried(entry, RESUME_FIELDS["skills"], report, "A skill"),
+        )
         resume_map["skills"][old_id] = created
         report.resume_items += 1
 
@@ -808,7 +852,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         contact_addresses = _address_rows(entry)
         contact_links = _link_rows(entry)
         department_name = (entry.pop("department", "") or "").strip()[:120]
-        contact = Contact.objects.create(owner=user, company=company, **entry)
+        contact = Contact.objects.create(
+            owner=user, company=company, **_carried(entry, CONTACT_FIELDS, report, "A contact")
+        )
         if department_name and company is not None:
             department, _made = Department.objects.get_or_create(
                 owner=user, company=company, name=department_name
@@ -847,6 +893,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # Resolved after every company in the file exists: a parent may be named before it
         # has been read, and an archive written before format 5 names none at all.
         parent_name = (company_entry.pop("parent", "") or "").strip()
+        company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
 
         # A company is an identity keyed by its name, which is why intake matches on
@@ -932,7 +979,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             posting_entry.setdefault("state", "new")
             posting_entry.setdefault("discard_reason", "")
 
-            posting = JobPosting.objects.create(owner=user, company=company, **posting_entry)
+            posting = JobPosting.objects.create(
+                owner=user,
+                company=company,
+                **_carried(posting_entry, POSTING_FIELDS, report, "A listing"),
+            )
             postings[old_posting_id] = posting
             report.postings += 1
             if isinstance(history_entries, list) and history_entries:
@@ -971,7 +1022,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     owner=user,
                     posting=posting,
                     contact=contacts.get(contact_id),
-                    **application_entry,
+                    **_carried(application_entry, APPLICATION_FIELDS, report, "An application"),
                 )
                 applications[old_id] = application
                 report.applications += 1
@@ -993,7 +1044,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     event_entry.pop("id", None)
                     event_entry.pop("created_at", None)
                     event_entry["occurred_at"] = _dt(event_entry.get("occurred_at"))
-                    ApplicationEvent.objects.create(application=application, **event_entry)
+                    ApplicationEvent.objects.create(
+                        application=application,
+                        **_carried(event_entry, EVENT_FIELDS, report, "A timeline event"),
+                    )
                     report.events += 1
 
                 reminders: dict[int, Reminder] = {}
@@ -1035,7 +1089,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                         starts_at=_dt(interview_entry.pop("starts_at", None)),
                         ends_at=_dt(interview_entry.pop("ends_at", None)),
                         **({"uid": uid} if uid else {}),
-                        **interview_entry,
+                        **_carried(interview_entry, INTERVIEW_FIELDS, report, "An interview"),
                     )
                     interview.contacts.set([contacts[i] for i in contact_ids if i in contacts])
                     report.interviews += 1
@@ -1049,7 +1103,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                         reminder=reminders.get(reminder_id),
                         starts_on=_d(offer_entry.pop("starts_on", None)),
                         answer_by=_d(offer_entry.pop("answer_by", None)),
-                        **offer_entry,
+                        **_carried(offer_entry, OFFER_FIELDS, report, "An offer"),
                     )
 
     # The ownership tree, once every company in the file has been made or matched. A name
@@ -1182,7 +1236,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     letters: dict[int, CoverLetter] = {}
     for letter_entry in documents.get("cover_letters", []):
         old_id = letter_entry.pop("id", None)
-        letters[old_id] = CoverLetter.objects.create(owner=user, **letter_entry)
+        letters[old_id] = CoverLetter.objects.create(
+            owner=user, **_carried(letter_entry, LETTER_FIELDS, report, "A cover letter")
+        )
         report.cover_letters += 1
 
     uploads: dict[int, UploadedDocument] = {}
@@ -1194,7 +1250,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         upload_entry.pop("created_at", None)
         copies = upload_entry.pop("copies", [])
 
-        upload = UploadedDocument(owner=user, **upload_entry)
+        upload = UploadedDocument(
+            owner=user, **_carried(upload_entry, UPLOAD_FIELDS, report, "An upload")
+        )
         content = _extract(archive, stored_name)
         if content is None:
             report.skipped.append(f"File for “{upload.title}” was not in the archive")
@@ -1225,7 +1283,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             owner=user,
             application=application,
             source=source,
-            **sent_entry,
+            **_carried(
+                sent_entry, SENT_FIELDS, report, "A sent document", "source_text", "plain_text"
+            ),
         )
         if rendered_at:
             sent.rendered_at = rendered_at
@@ -1252,7 +1312,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if posting is None and application is not None:
             posting = application.posting
         capture = Capture.objects.create(
-            owner=user, application=application, posting=posting, **capture_entry
+            owner=user,
+            application=application,
+            posting=posting,
+            **_carried(capture_entry, CAPTURE_FIELDS, report, "A capture", "data"),
         )
         captures[old_capture_id] = capture
         if isinstance(kept, dict):
