@@ -23,7 +23,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from .export import CV_FIELDS, MANIFEST_NAME, MEDIA_PREFIX
+from .export import CV_FIELDS, MANIFEST_NAME, MEDIA_PREFIX, TRANSLATION_SECTIONS
 
 
 class ArchiveError(Exception):
@@ -949,14 +949,6 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     documents = document.get("documents", {})
 
     cvs: dict[int, CV] = {}
-    content_types = {
-        "experience": "experience",
-        "education": "education",
-        "project": "projects",
-        "skillgroup": "skill_groups",
-        "certification": "certifications",
-        "languageskill": "languages",
-    }
     for cv_entry in documents.get("cvs", []):
         entries = cv_entry.pop("entries", [])
         old_id = cv_entry.pop("id", None)
@@ -1011,7 +1003,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             )
 
         for item in entries:
-            section = content_types.get(item.get("kind", ""))
+            section = TRANSLATION_SECTIONS.get(item.get("kind", ""))
             target = resume_map.get(section, {}).get(item.get("ref")) if section else None
             if target is None:
                 report.skipped.append(

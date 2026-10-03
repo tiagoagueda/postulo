@@ -22,7 +22,7 @@ from postulo.core import importer
 from postulo.core.models import Tag
 from postulo.documents.models import CV, CoverLetter, CVItem, UploadedDocument
 from postulo.jobs.models import Company, Contact, JobPosting
-from postulo.resume.models import Experience, Skill, SkillGroup
+from postulo.resume.models import Experience, Link, Skill, SkillGroup
 
 
 @pytest.fixture
@@ -474,3 +474,23 @@ def test_an_uploads_and_a_snapshots_language_survive_the_round_trip(user, other_
 
     assert UploadedDocument.objects.for_user(other_user).get().language == ""
     assert RenderedDocument.objects.for_user(other_user).get().language == ""
+
+
+def test_a_link_on_a_cv_comes_back_with_it(populated, other_user):
+    """The importer once kept its own map of what a CV can hold and left the links out (#470)."""
+    link = Link.objects.create(owner=populated, title="Portfolio", url="https://example.com/me")
+    CVItem.objects.create(
+        owner=populated,
+        cv=CV.objects.for_user(populated).get(),
+        content_type=ContentType.objects.get_for_model(Link),
+        object_id=link.pk,
+    )
+    archive, _document = read_archive(populated)
+    report = importer.load(other_user, archive)
+
+    restored = Link.objects.for_user(other_user).get()
+    kept = CVItem.objects.for_user(other_user).filter(
+        content_type=ContentType.objects.get_for_model(Link)
+    )
+    assert [item.object_id for item in kept] == [restored.pk]
+    assert report.skipped == []
