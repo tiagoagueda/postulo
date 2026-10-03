@@ -161,6 +161,30 @@ def test_the_linked_companies_and_listings_pages_hold_as_many_rows_as_the_group_
         assert response.context["paginator"].count == groups[kind].total, kind
 
 
+def test_a_career_hit_links_to_a_section_the_career_page_has(client, user):
+    """The fragments the search wrote ("#experience", "#projects") were ids nowhere (#707)."""
+    from urllib.parse import urlsplit
+
+    from postulo.resume.models import Certification, Education, Project, Skill
+
+    Experience.objects.create(
+        owner=user, organisation="Zorbco", role="Welder", start_date=dt.date(2020, 1, 1)
+    )
+    Education.objects.create(owner=user, institution="Zorbco Institute", qualification="Diploma")
+    Project.objects.create(owner=user, name="Zorbco Bridge")
+    Certification.objects.create(owner=user, name="Zorbco Safety")
+    Skill.objects.create(owner=user, name="Zorbco Casting")
+    client.force_login(user)
+
+    hits = kinds(searching.search(user, "Zorbco"))["career"].hits
+    page = client.get(reverse("resume:overview")).content.decode()
+
+    assert len(hits) == 5
+    for hit in hits:
+        fragment = urlsplit(hit.url).fragment
+        assert f'id="{fragment}"' in page, hit.subtitle
+
+
 def test_the_text_you_sent_says_where_it_went(user, world):
     groups = kinds(searching.search(user, "calibration"))
     hit = groups["sent"].hits[0]

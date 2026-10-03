@@ -109,3 +109,21 @@ def test_on_a_phone_the_label_stays_as_it_is(live_server, page: Page, furnished)
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
     page.wait_for_timeout(200)
     assert label_text(page) == "On this page"
+
+
+def test_a_search_hit_lands_on_its_section_below_the_masthead(live_server, page: Page, furnished):  # noqa: F811
+    """The address a career hit carries (#707) names an id the page has, and the browser
+    scrolls to it clear of the sticky header, as it does for the sidebar's anchors."""
+    page.set_viewport_size({"width": 1280, "height": 700})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/search/?q=engineer")
+
+    hit = page.locator('a[href*="/career/#"]').first
+    fragment = hit.get_attribute("href").split("#")[1]
+    hit.click()
+
+    page.wait_for_url(f"**/career/#{fragment}")
+    box = page.locator(f"#{fragment}").bounding_box()
+    header = page.locator("header").first.bounding_box()
+    assert box and 0 <= box["y"] < 700, "the section was not brought onto the screen"
+    assert box["y"] >= header["height"] - 1, "the section is hidden behind the masthead"

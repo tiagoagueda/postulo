@@ -498,6 +498,20 @@ def search_sent(user, query: str, limit: int) -> Found:
     return take(rows, limit, build)
 
 
+def _career_anchor(model) -> str:
+    """The id of the section of the career page that draws this model's rows (#707).
+
+    Read from the registry, which names the page's sections, so a section renamed there
+    cannot leave the search pointing at nothing. A skill is drawn inside its group's section.
+    """
+    from postulo.resume import models as resume
+    from postulo.resume.registry import SECTIONS
+
+    if model is resume.Skill:
+        return "section-skill-group"
+    return next(f"section-{spec.slug}" for spec in SECTIONS.values() if spec.model is model)
+
+
 def search_career(user, query: str, limit: int) -> Found:
     """Five models under one heading, each counted and capped on its own.
 
@@ -510,31 +524,28 @@ def search_career(user, query: str, limit: int) -> Found:
     sections = [
         (
             resume.Experience,
-            "experience",
             ("organisation", "role", "summary", "highlights"),
             "role",
             lambda r: f"{r.role} · {r.organisation}",
         ),
         (
             resume.Education,
-            "education",
             ("institution", "qualification", "field_of_study", "highlights"),
             "qualification",
             lambda r: f"{r.qualification} · {r.institution}",
         ),
         (
             resume.Project,
-            "projects",
             ("name", "role", "summary", "highlights"),
             "name",
             lambda r: r.name,
         ),
-        (resume.Certification, "certifications", ("name", "issuer"), "name", lambda r: r.name),
-        (resume.Skill, "skills", ("name",), "name", lambda r: r.name),
+        (resume.Certification, ("name", "issuer"), "name", lambda r: r.name),
+        (resume.Skill, ("name",), "name", lambda r: r.name),
     ]
     overview = reverse("resume:overview")
     found = Found()
-    for model, section, fields, title_field, title_of in sections:
+    for model, fields, title_field, title_of in sections:
         rows = ranked(
             model.objects.for_user(user).filter(contains(query, *fields)),
             query,
@@ -542,7 +553,9 @@ def search_career(user, query: str, limit: int) -> Found:
             "pk",
         )
 
-        def build(row, section=section, fields=fields, title_of=title_of) -> Hit:
+        anchor = _career_anchor(model)
+
+        def build(row, anchor=anchor, fields=fields, title_of=title_of) -> Hit:
             texts = [getattr(row, name, "") or "" for name in fields]
             title = title_of(row)
             return Hit(
@@ -550,7 +563,7 @@ def search_career(user, query: str, limit: int) -> Found:
                 id=row.pk,
                 title=title,
                 subtitle=str(row._meta.verbose_name),
-                url=f"{overview}#{section}",
+                url=f"{overview}#{anchor}",
                 excerpt=excerpt(_first_match(query, *texts[2:], *texts[:2]), query),
                 in_title=query.lower() in title.lower(),
             )
