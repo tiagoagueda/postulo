@@ -154,3 +154,44 @@ def test_a_menu_opens_from_its_triggers_reading_end(
     assert abs(box["x"] - from_["x"]) <= 1, "its inline end, which is its left, on the trigger's"
     assert box["x"] + box["width"] <= page.viewport_size["width"], "and it stays in the window"
     assert 0 <= box["y"] - (from_["y"] + from_["height"]) <= 8, "below the trigger"
+
+
+KNOB = """async (input) => {
+    // The knob is the first flex item, so it starts at the input's inline-start content edge
+    // and the paint moves it by `translate`; the pseudo-element has no box to ask for.
+    // The knob slides when the switch changes: read it once the slide has finished.
+    getComputedStyle(input, '::before').translate;
+    await Promise.all(document.getAnimations().map((animation) => animation.finished));
+    const rtl = getComputedStyle(input).direction === 'rtl';
+    const knob = getComputedStyle(input, '::before');
+    const box = input.getBoundingClientRect();
+    const width = parseFloat(knob.width);
+    const shift = parseFloat(knob.translate) || 0;
+    const edge = rtl
+        ? box.right - parseFloat(getComputedStyle(input).borderRightWidth)
+            - parseFloat(getComputedStyle(input).paddingRight)
+        : box.left + parseFloat(getComputedStyle(input).borderLeftWidth)
+            + parseFloat(getComputedStyle(input).paddingLeft);
+    const left = (rtl ? edge - width : edge) + shift;
+    return {left, right: left + width, inputLeft: box.left, inputRight: box.right};
+}"""
+
+
+@pytest.mark.parametrize("on", [True, False])
+def test_a_switch_knob_stays_inside_its_track(live_server, page: Page, right_to_left, on):
+    """The knob's travel follows the reading direction (#517): it is the switch's cue to its
+    state besides colour, and a physical `translate-x` drew it outside the track in Arabic."""
+    base = live_server.url
+    sign_in(page, base)
+    page.goto(f"{base}/server/plugins/")
+
+    switch = page.locator("input[role='switch']").first
+    switch.evaluate("(input, on) => { input.checked = on; }", on)
+    knob = switch.evaluate(KNOB)
+
+    assert knob["left"] >= knob["inputLeft"], "the knob overhangs the track's left end"
+    assert knob["right"] <= knob["inputRight"], "the knob overhangs the track's right end"
+    # And it sits at the end that means this state: on is the inline-end, which
+    # is the left in Arabic, and off the inline-start.
+    near_left = knob["left"] - knob["inputLeft"] < knob["inputRight"] - knob["right"]
+    assert near_left is on, "the knob is at the wrong end for the state"

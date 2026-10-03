@@ -161,15 +161,16 @@
  */
 /*
  * The switch (#286): Basecoat's structure is a checkbox with `role="switch"` and a `::before`
- * knob, and no script. The paint is the track and the knob in the palette, the knob's travel,
- * and a focus outline said out loud for the reason the button's is (`outline-none` leaves
+ * knob, and no script. The paint is the track and the knob in the palette, the knob's travel
+ * (a translation is physical, so it has an `rtl:` partner, #517), and a focus outline said out loud for the reason the button's is (`outline-none` leaves
  * the style variable at `none`). Disabled keeps Basecoat's opacity and cursor.
  */
 @layer components {
   .input[type="checkbox"][role="switch"] {
     @apply h-5 w-9 cursor-pointer rounded-full bg-ink-300 before:size-4 before:translate-x-0.5
       before:rounded-full before:bg-white before:shadow-sm checked:bg-brand-600
-      checked:before:translate-x-4 dark:bg-ink-600 dark:checked:bg-brand-500;
+      checked:before:translate-x-4 rtl:before:-translate-x-0.5 rtl:checked:before:-translate-x-4
+      dark:bg-ink-600 dark:checked:bg-brand-500;
   }
 
   .input[type="checkbox"][role="switch"]:focus-visible {
