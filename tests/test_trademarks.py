@@ -60,10 +60,12 @@ def test_every_directory_of_borrowed_work_is_registered(directory: str):
 def test_the_register_names_every_work_and_the_copyright_holder():
     for work in ("Lucide", "flag-icons", "Tailwind CSS", "basecoat-css", "htmx", "zxcvbn"):
         assert work in REGISTER, f"{work} is shipped and not registered"
-    assert "Copyright (C) 2026 Tiago Agueda" in REGISTER
-    assert "Copyright (C) 2026 Tiago Agueda" in TEXT
+    assert "Copyright (C) 2026 Postulo contributors" in REGISTER
+    assert "Copyright (C) 2026 Postulo contributors" in TEXT
     readme = (REPO / "README.md").read_text(encoding="utf-8")
-    assert "Copyright (C) 2026 Tiago Agueda" in readme and "THIRD-PARTY.md" in readme
+    assert "Copyright (C) 2026 Postulo contributors" in readme and "THIRD-PARTY.md" in readme
+    for text in (REGISTER, TEXT, readme):
+        assert "Copyright (C) 2026 Tiago Agueda" not in text, "the holder is the contributors"
 
 
 def test_nothing_whose_code_is_in_the_tree_is_described_as_merely_a_name():

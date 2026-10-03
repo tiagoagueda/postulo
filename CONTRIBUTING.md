@@ -809,3 +809,5 @@ they can be asked.
 
 Contributions are accepted under the [AGPL-3.0-or-later](LICENSE) licence that covers
 the project.
+
+Contributors keep the copyright in what they write. The notice in the README and the other files, *Copyright (C) 2026 Postulo contributors*, names all of them together, and the list of who they are is the repository's git history.

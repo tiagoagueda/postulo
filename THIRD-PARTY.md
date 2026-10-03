@@ -1,6 +1,6 @@
 # Third-party works in this repository
 
-Postulo is Copyright (C) 2026 Tiago Agueda and is licensed under
+Postulo is Copyright (C) 2026 Postulo contributors and is licensed under
 [AGPL-3.0-or-later](LICENSE). Some of what the repository ships was written or drawn by
 somebody else, under a licence of their own. This is the register of those works: where
 each sits, whose it is, under what terms, and where its notice is. A copyright licence is

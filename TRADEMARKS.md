@@ -1,6 +1,6 @@
 # Trademarks
 
-Postulo's **code** is Copyright (C) 2026 Tiago Agueda, [AGPL-3.0-or-later](LICENSE).
+Postulo's **code** is Copyright (C) 2026 Postulo contributors, [AGPL-3.0-or-later](LICENSE).
 Postulo's **name and logo** are not, and this file says what that means — for anybody forking
 it, for anybody writing a plugin, and for the marks belonging to other people that appear in
 this repository. The third-party *code and artwork* shipped here, and the copyright licences

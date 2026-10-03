@@ -240,7 +240,7 @@ uv run ruff format .
 
 ## Licence
 
-Copyright (C) 2026 Tiago Agueda. [AGPL-3.0-or-later](LICENSE). If you run a modified
+Copyright (C) 2026 Postulo contributors. [AGPL-3.0-or-later](LICENSE). If you run a modified
 Postulo as a network service, your users are entitled to its source.
 
 Some of what ships in the repository is somebody else's work under a licence of its own:
