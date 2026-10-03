@@ -409,3 +409,24 @@ def test_the_profile_page_is_no_longer_short_of_pixels():
 
     with Image.open(io.BytesIO(content.read())) as image:
         assert image.width >= 288, "what a phone asks for on the profile page"
+
+
+def test_a_picture_cut_short_is_refused_even_after_a_pdf_was_drawn(client, user, monkeypatch):
+    """WeasyPrint sets Pillow's `LOAD_TRUNCATED_IMAGES` for the whole process when it is
+    imported, which made a cut-off upload be padded out and kept. The decision is the
+    upload's own: refused, and the switch is left as WeasyPrint wanted it."""
+    from PIL import ImageFile
+
+    monkeypatch.setattr(ImageFile, "LOAD_TRUNCATED_IMAGES", True)
+    client.force_login(user)
+    noise = io.BytesIO()
+    Image.frombytes("RGB", (64, 64), random.Random(302).randbytes(64 * 64 * 3)).save(  # noqa: S311 -- noise, not a secret
+        noise, "PNG"
+    )
+    cut = noise.getvalue()[: len(noise.getvalue()) // 2]
+    response = profile_page(
+        client, user, picture=SimpleUploadedFile("x.png", cut, content_type="image/png")
+    )
+    assert response.status_code == 200 and "could not be read" in response.content.decode()
+    assert not Profile.objects.get(user=user).avatar
+    assert ImageFile.LOAD_TRUNCATED_IMAGES is True

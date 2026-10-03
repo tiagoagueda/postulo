@@ -40,7 +40,7 @@ from xml.etree import ElementTree
 
 from defusedxml.ElementTree import fromstring as parse_xml
 from django.utils.translation import gettext as _
-from PIL import Image, ImageOps, UnidentifiedImageError
+from PIL import Image, ImageFile, ImageOps, UnidentifiedImageError
 
 #: Decoded images above this many pixels are refused: a decompression bomb, or a mistake.
 #: Not a size limit — a limit on what decoding is allowed to allocate.
@@ -102,7 +102,17 @@ def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Im
             raise WrongKind(str(_("That file could not be read as an image.")))
         if image.width * image.height > max_pixels:
             raise UnusablePicture(str(_("That image is far larger than it needs to be.")))
-        image.load()
+        # The whole picture, or a refusal: never a picture padded out to its size. Pillow
+        # pads a file that stops part way when `LOAD_TRUNCATED_IMAGES` is set, and WeasyPrint
+        # sets it, for the whole process, as it is imported -- so once a server had drawn
+        # one PDF, a cut-off upload was kept as a picture with a grey half. Unset for this
+        # load and put back: what WeasyPrint does with a document's images is its own affair.
+        loads_truncated = ImageFile.LOAD_TRUNCATED_IMAGES
+        ImageFile.LOAD_TRUNCATED_IMAGES = False
+        try:
+            image.load()
+        finally:
+            ImageFile.LOAD_TRUNCATED_IMAGES = loads_truncated
         return image
     except UnusablePicture:
         raise
