@@ -14,9 +14,13 @@
       </p>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      {% if showing_all %}
+      {% if showing != "pending" %}
         <a href="{% url 'jobs:capture_list' %}" class="btn" data-variant="outline">{% translate "Pending only" %}</a>
-      {% else %}
+      {% endif %}
+      {% if showing != "discarded" %}
+        <a href="?show=discarded" class="btn" data-variant="outline">{% translate "Discarded" %}</a>
+      {% endif %}
+      {% if showing != "all" %}
         <a href="?show=all" class="btn" data-variant="outline">{% translate "Show all" %}</a>
       {% endif %}
       <a href="{% url 'jobs:capture_create' %}" class="btn">{% translate "Capture a posting" %}</a>
@@ -52,6 +56,18 @@
                  class="shrink-0 text-sm text-brand-600 underline dark:text-brand-400">
                 {% translate "Application" %}
               </a>
+            {% elif capture.posting %}
+              <a href="{{ capture.posting.get_absolute_url }}"
+                 class="shrink-0 text-sm text-brand-600 underline dark:text-brand-400">
+                {% translate "Listing" %}
+              </a>
+            {% elif capture.status == "discarded" %}
+              <form method="post" action="{% url 'jobs:capture_restore' capture.pk %}">
+                {% csrf_token %}
+                <button type="submit" class="btn" data-variant="outline" data-size="xs">
+                  {% translate "Put it back" %}
+                </button>
+              </form>
             {% else %}
               <span class="shrink-0 text-xs text-ink-400">{{ capture.get_status_display }}</span>
             {% endif %}

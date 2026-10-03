@@ -260,6 +260,7 @@ Fixed
 Fixed
 - Fixed
 - A tag or an industry is its name, not an ASCII slug: `C#` and `C++` are two tags, names in Greek, Cyrillic or Japanese are kept, a renamed tag answers to its new name, and none of these is a 500 on the forms, the API, the spreadsheet import or an archive. Upgrading re-derives the slugs and merges industries left with one name. (#356)
+- *Put it back*: the *discarded captures* link in the message that follows a discard now opens a list of them, each with a button that restores it; the same page lists every capture waiting, and Listings says how many wait (it said twenty over a longer backlog) and links to it. (#380)
 - A capture that was saved or discarded is decided once: saving it again, from a second click or an old link, no longer makes a second listing, a saved one can no longer be discarded, and its review page shows what it became instead of the form. (#336)
 - A tag or an industry is its name, not an ASCII slug: `C#` and `C++` are two tags, non-Latin names are kept, a renamed tag answers to its new name, and none of it is a 500. Upgrading re-derives the slugs and merges duplicate industries. (#356)
 - A contact's data-protection document, erasure report and retention dry run each account for every record that names them: the applications they are the contact or referrer for, the interviews they were at and the listing-history entries from them. (#370)

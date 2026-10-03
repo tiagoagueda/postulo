@@ -172,9 +172,19 @@ def test_pending_captures_wait_at_the_top_of_the_listings_page(client, user):
     html = client.get(reverse("listings:list")).content.decode()
     assert "captures waiting for review" in html or "capture waiting for review" in html
     assert "Captured Role" in html
-    # The old captures page now points here.
-    response = client.get(reverse("jobs:capture_list"))
-    assert response.status_code == 302 and response.url == reverse("listings:list")
+    assert "Captured Role" in client.get(reverse("jobs:capture_list")).content.decode()
+
+
+def test_the_capture_heading_counts_them_all_and_links_to_the_rest(client, user):
+    for n in range(25):
+        Capture.objects.create(
+            owner=user, url=f"https://example.org/j/{n}", data={"title": f"Role {n}"}
+        )
+    client.force_login(user)
+    html = client.get(reverse("listings:list")).content.decode()
+    assert "25 captures waiting for review" in html
+    assert f'href="{reverse("jobs:capture_list")}"' in html
+    assert "Role 24" in client.get(reverse("jobs:capture_list")).content.decode()
 
 
 def test_adding_a_listing_by_hand_needs_only_a_company_and_a_title(client, user):

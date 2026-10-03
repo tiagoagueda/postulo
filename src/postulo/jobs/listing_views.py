@@ -133,11 +133,10 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # belonging to somebody with forty listings is not that, and keeps them (#160).
         context["has_listings"] = counts["all"] > 0
         # Without what each one's review will learn from (#267), which is for its review.
-        context["pending_captures"] = (
-            Capture.objects.for_user(self.request.user)
-            .filter(status=CaptureStatus.PENDING)
-            .defer("learning")[:20]
-        )
+        waiting = Capture.objects.for_user(self.request.user).filter(status=CaptureStatus.PENDING)
+        context["pending_captures"] = waiting.defer("learning")[:20]
+        # Counted on its own: the heading must not say twenty over a backlog of forty (#380).
+        context["pending_count"] = waiting.count()
         context["discard_reasons"] = DiscardReason.choices
         context["table"] = self.table
         context["page_sizes"] = tables.PAGE_SIZES

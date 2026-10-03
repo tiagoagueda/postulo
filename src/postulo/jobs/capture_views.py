@@ -16,7 +16,7 @@ from django.contrib import messages
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
@@ -144,13 +144,17 @@ class CaptureListView(OwnedObjectMixin, ListView):
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related("application").defer("learning")
-        if self.request.GET.get("show") != "all":
+        show = self.request.GET.get("show")
+        if show == "discarded":
+            queryset = queryset.filter(status=CaptureStatus.DISCARDED)
+        elif show != "all":
             queryset = queryset.filter(status=CaptureStatus.PENDING)
-        return queryset
+        return queryset.select_related("posting")
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        context["showing_all"] = self.request.GET.get("show") == "all"
+        show = self.request.GET.get("show")
+        context["showing"] = show if show in ("all", "discarded") else "pending"
         return context
 
 
@@ -460,12 +464,12 @@ class CaptureBindView(OwnedObjectMixin, View):
 def discarded_link():
     """Where the discarded captures are, for the message that says so (#260).
 
-    Discarding is a status rather than a deletion and the list can show what is not pending,
-    so a wrong key is recoverable; the message is the one place somebody looking for the way
-    back is looking. Sent with the ``safe`` tag, which is what lets a link through the
-    session storage unescaped.
+    Discarding is a status rather than a deletion and the captures list shows the discarded
+    ones, each with a button that puts it back, so a wrong key is recoverable; the message is
+    the one place somebody looking for the way back is looking. Sent with the ``safe`` tag,
+    which is what lets a link through the session storage unescaped.
     """
-    url = reverse("jobs:capture_list") + "?show=all"
+    url = reverse("jobs:capture_list") + "?show=discarded"
     return format_html('<a href="{}" class="underline">{}</a>', url, _("the discarded captures"))
 
 
@@ -495,6 +499,29 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         if request.POST.get("next"):
             return after_deciding(request, capture)
         return redirect("listings:list")
+
+
+class CaptureRestoreView(OwnedObjectMixin, View):
+    """Put a discarded capture back among those waiting (#380).
+
+    Discarding is fast because it can be undone; this is the undoing. Only a discarded
+    capture comes back -- a saved one is what it became -- and it is read under a lock,
+    as deciding is, so two presses restore it once. Somebody else's is a 404.
+    """
+
+    def get_queryset(self):
+        return Capture.objects.for_user(self.request.user)
+
+    def post(self, request: HttpRequest, pk: int) -> HttpResponse:
+        with transaction.atomic():
+            capture = get_object_or_404(self.get_queryset().select_for_update(), pk=pk)
+            if capture.status != CaptureStatus.DISCARDED:
+                messages.info(request, _("Only a discarded capture can be put back."))
+                return redirect("jobs:capture_list")
+            capture.status = CaptureStatus.PENDING
+            capture.save(update_fields=["status", "updated_at"])
+        messages.success(request, _("Capture put back. It is waiting for review again."))
+        return redirect(capture.get_absolute_url())
 
 
 class CaptureDiscardSelectedView(OwnedObjectMixin, View):
@@ -529,6 +556,3 @@ class CaptureDiscardSelectedView(OwnedObjectMixin, View):
         else:
             messages.info(request, _("Nothing was selected."))
         return redirect("listings:list")
-
-
-capture_list_url = reverse_lazy("jobs:capture_list")

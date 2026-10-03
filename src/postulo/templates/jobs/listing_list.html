@@ -99,7 +99,7 @@
 
   {% if pending_captures %}
     <section class="card mb-6 border-brand-200 dark:border-brand-800" aria-labelledby="captures-heading">
-      <c-section-title id="captures-heading">{% blocktranslate count counter=pending_captures|length trimmed %}
+      <c-section-title id="captures-heading">{% blocktranslate count counter=pending_count trimmed %}
           One capture waiting for review
         {% plural %}
           {{ counter }} captures waiting for review
@@ -139,6 +139,13 @@
           </li>
         {% endfor %}
       </ul>
+      {% if pending_count > 20 %}
+        <p class="mt-2 text-sm">
+          <a href="{% url 'jobs:capture_list' %}" class="text-brand-600 underline dark:text-brand-400">
+            {% translate "See every capture waiting for review" %}
+          </a>
+        </p>
+      {% endif %}
     </section>
   {% endif %}
 

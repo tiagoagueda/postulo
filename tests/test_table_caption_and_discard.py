@@ -40,12 +40,52 @@ def test_discarding_says_where_the_discarded_ones_are(client, user):
 
     response = client.post(reverse("jobs:capture_discard", args=[capture.pk]), follow=True)
     html = response.content.decode()
-    where = reverse("jobs:capture_list") + "?show=all"
+    where = reverse("jobs:capture_list") + "?show=discarded"
 
     capture.refresh_from_db()
     assert capture.status == CaptureStatus.DISCARDED
     assert f'Capture discarded. It is in <a href="{where}" class="underline">' in html
     assert "&lt;a" not in html, "the link survived the session storage"
+
+    # The link goes somewhere (#380): the discarded capture, with the way to put it back.
+    page = client.get(where)
+    assert page.status_code == 200
+    body = page.content.decode()
+    assert "Tester" in body
+    assert reverse("jobs:capture_restore", args=[capture.pk]) in body
+
+
+def test_a_discarded_capture_can_be_put_back(client, user, other_user):
+    from postulo.jobs.capture_views import next_pending
+    from postulo.jobs.models import Capture, CaptureStatus
+
+    capture = Capture.objects.create(
+        owner=user,
+        url="https://example.org/job",
+        data={"title": "Tester"},
+        status=CaptureStatus.DISCARDED,
+    )
+    client.force_login(user)
+    restore = reverse("jobs:capture_restore", args=[capture.pk])
+
+    client.post(restore)
+    capture.refresh_from_db()
+    assert capture.status == CaptureStatus.PENDING
+    assert next_pending(user) == capture
+
+    # Not discarded any more: nothing to put back, and nothing changes.
+    capture.status = CaptureStatus.ACCEPTED
+    capture.save()
+    client.post(restore)
+    capture.refresh_from_db()
+    assert capture.status == CaptureStatus.ACCEPTED
+
+    stranger = Capture.objects.create(
+        owner=other_user, url="https://example.org/x", status=CaptureStatus.DISCARDED
+    )
+    assert client.post(reverse("jobs:capture_restore", args=[stranger.pk])).status_code == 404
+    stranger.refresh_from_db()
+    assert stranger.status == CaptureStatus.DISCARDED
 
 
 def test_discarding_several_says_so_too(client, user):
