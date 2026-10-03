@@ -103,8 +103,28 @@ class Industry(OwnedModel):
 
     @classmethod
     def split(cls, text: str) -> list[str]:
-        """Names out of a typed list: commas, semicolons and slashes all separate."""
-        return [part.strip() for part in re.split(r"[;,/]", text or "") if part.strip()]
+        """Names out of a typed list: commas, semicolons and slashes all separate.
+
+        Except inside a name the input itself offers, such as a NACE division called
+        *Manufacture of computer, electronic and optical products*: those are taken out
+        whole first, so choosing a suggestion yields the suggestion (#531).
+        """
+        text = text or ""
+        whole: list[str] = []
+        for known in industries.names_with_separators():
+            pattern = re.compile(rf"(?<![^;,/\s]){re.escape(known)}(?![^;,/\s])", re.IGNORECASE)
+
+            def keep(match: re.Match[str]) -> str:
+                whole.append(match.group(0))
+                return f"\x00{len(whole) - 1}\x00"
+
+            text = pattern.sub(keep, text)
+        parts = (part.strip() for part in re.split(r"[;,/]", text))
+        return [
+            re.sub(r"\x00(\d+)\x00", lambda m: whole[int(m.group(1))], part)
+            for part in parts
+            if part
+        ]
 
 
 class CompanyQuerySet(OwnedQuerySet):

@@ -252,3 +252,32 @@ def test_the_data_is_valid_json_and_not_a_python_literal():
     raw = Path("src/postulo/jobs/data/nace-2.1.json").read_text(encoding="utf-8")
 
     assert json.loads(raw)["revision"] == "NACE Rev. 2.1"
+
+
+# ------------------------------------------------ a suggestion with a comma in it stays whole
+
+
+DIVISION_WITH_COMMAS = "Manufacture of computer, electronic and optical products"
+
+
+def test_a_division_name_with_commas_is_not_split_into_made_up_industries(client, user):
+    from django.urls import reverse
+
+    from postulo.jobs.models import Company
+
+    client.force_login(user)
+    response = client.post(
+        reverse("jobs:company_create"), {"name": "Acme", "new_industries": DIVISION_WITH_COMMAS}
+    )
+
+    assert response.status_code == 302
+    made = list(Company.objects.get(name="Acme").industries.values_list("name", "code"))
+    assert made == [(DIVISION_WITH_COMMAS, "26")]
+
+
+def test_a_division_name_with_commas_beside_another_name_stays_whole(user):
+    assert Industry.split(f"{DIVISION_WITH_COMMAS}, Software") == [DIVISION_WITH_COMMAS, "Software"]
+    assert Industry.split(f"Software; {DIVISION_WITH_COMMAS.lower()}") == [
+        "Software",
+        DIVISION_WITH_COMMAS.lower(),
+    ]

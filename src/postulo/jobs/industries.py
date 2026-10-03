@@ -45,6 +45,7 @@ no code, and that is not a lesser kind of industry.
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -195,3 +196,15 @@ def suggestions(exclude=(), language: str = "") -> list[str]:
         seen.add(folded)
         kept.append(name)
     return kept
+
+
+def names_with_separators(language: str = "") -> list[str]:
+    """The known names that hold a comma, semicolon or slash, longest first.
+
+    The divisions in the reader's language and in English, and Postulo's short names:
+    what the input offers, so that what it offers survives being split (#531).
+    """
+    names = {str(name) for name in STARTER_INDUSTRIES}
+    names.update(name for _code, name in divisions(language))
+    names.update(name for _code, name in divisions(FALLBACK))
+    return sorted((n for n in names if re.search(r"[;,/]", n)), key=len, reverse=True)
