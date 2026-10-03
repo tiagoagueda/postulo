@@ -259,7 +259,7 @@ def test_the_company_form_refuses_a_bad_or_borrowed_id(signed_in, user):
     assert response.status_code == 200
     body = response.content.decode()
     assert "Rival already carries this identifier" in body
-    assert "does not look like a" in body
+    assert "not the usual form" in body
     assert not Company.objects.filter(owner=user, name="Acme").exists(), "nothing half-saved"
 
 

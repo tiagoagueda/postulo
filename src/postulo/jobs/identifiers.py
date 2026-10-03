@@ -21,9 +21,6 @@ and looking it up is a deliberate action for later.
 
 from __future__ import annotations
 
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
-
 from postulo.core import identifiers as registry
 from postulo.core.identifiers import COMPANY
 
@@ -74,31 +71,22 @@ def label_for(key: str) -> str:
 
 def normalise(scheme_key: str, raw: str) -> str:
     """Tidy ``raw`` into the canonical spelling for its scheme."""
-    scheme = scheme_for(scheme_key)
-    return scheme.normalise(raw) if scheme else (raw or "").strip()
+    return registry.normalise(COMPANY, scheme_key, raw)
 
 
 def validate(scheme_key: str, value: str) -> None:
     """Raise :class:`ValidationError` unless ``value`` is a well-formed identifier.
 
-    A scheme that does not identify organisations is *unknown* here rather than merely
-    wrong: an ORCID reaching this is an ORCID on a company, and there is no such scheme.
+    A scheme that does not identify this subject is *unknown* here rather than merely
+    wrong; the registry says so, once, for both (#645).
     """
-    scheme = scheme_for(scheme_key)
-    if scheme is None:
-        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    registry.refuse_malformed(scheme, value)
+    registry.validate(COMPANY, scheme_key, value)
 
 
 def clean(scheme_key: str, raw: str) -> str:
     """Normalise then validate, returning the canonical value."""
-    if scheme_for(scheme_key) is None:
-        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    value = normalise(scheme_key, raw)
-    validate(scheme_key, value)
-    return value
+    return registry.clean(COMPANY, scheme_key, raw)
 
 
 def url_for(scheme_key: str, value: str) -> str:
-    scheme = scheme_for(scheme_key)
-    return scheme.url_for(value, COMPANY) if scheme else ""
+    return registry.url_for(COMPANY, scheme_key, value)

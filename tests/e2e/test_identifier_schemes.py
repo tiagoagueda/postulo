@@ -407,7 +407,7 @@ def test_an_identifier_its_kind_has_outgrown_is_marked_on_your_details(
     mark = page.locator("[data-identifiers] [data-kept-as-it-was]")
     expect(mark).to_have_count(1)
     expect(mark).to_contain_text("Kept as it was")
-    expect(mark).to_contain_text("That does not look like a Badge identifier.")
+    expect(mark).to_contain_text("Badge: that is not the usual form.")
     assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]
     found = violations_on(page, axe_source)
     assert not found, describe("Your details, with an identifier kept as it was", found)

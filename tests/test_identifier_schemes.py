@@ -1070,7 +1070,7 @@ def test_a_value_of_another_shape_is_refused_with_the_schemes_example(client, us
 
     assert response.status_code == 200
     html = response.content.decode()
-    assert "That does not look like a Staff number identifier (for example AB-123456)." in html
+    assert "Staff number: that is not the usual form (for example AB-123456)." in html
     assert not PersonIdentifier.objects.exists()
 
 
@@ -1078,7 +1078,7 @@ def test_a_scheme_with_no_example_refuses_without_an_empty_bracket(user):
     define(one())
     with pytest.raises(ValidationError) as refused:
         person_identifiers.clean("badge", "x")
-    assert refused.value.messages == ["That does not look like a Badge identifier."]
+    assert refused.value.messages == ["Badge: that is not the usual form."]
     assert refused.value.code == "format"
 
 
@@ -1143,7 +1143,7 @@ def test_the_api_takes_a_scheme_of_the_instances_own_as_it_takes_postulos(client
         **headers,
     )
     assert refused.status_code == 422
-    assert "does not look like a SIREN identifier" in refused.content.decode()
+    assert "SIREN: that is not the usual form" in refused.content.decode()
 
 
 def test_the_apis_description_says_an_instance_may_define_schemes_of_its_own():
@@ -1518,7 +1518,7 @@ def test_markup_in_a_label_an_example_and_a_link_is_never_markup_on_a_page(clien
         client, user, **{"identifiers-0-scheme": "hostile", "identifiers-0-value": "a b"}
     )
     html = response.content.decode()
-    assert "does not look like a &lt;img src=x" in html
+    assert "&lt;img src=x" in html
     assert "<script>alert(2)" not in html and "<img src=x" not in html
 
 
@@ -2486,7 +2486,7 @@ def test_it_answers_to_its_scheme_the_day_it_is_changed(outgrown, client, user, 
     )
     assert response.status_code == 200
     html = response.content.decode()
-    assert "That does not look like a Staff number identifier (for example ABC-123456)." in html
+    assert "Staff number: that is not the usual form (for example ABC-123456)." in html
     assert "data-kept-as-it-was" not in html, "it has answered: its error is beside it"
     assert PersonIdentifier.objects.get(pk=person.pk).value == "AB-123456"
 
@@ -2504,7 +2504,7 @@ def test_it_answers_to_its_scheme_the_day_it_is_changed(outgrown, client, user, 
         company_with(firm, company, **{"identifiers-0-value": "12345"}),
     )
     assert response.status_code == 200
-    assert "That does not look like a SIREN identifier." in response.content.decode()
+    assert "SIREN: that is not the usual form." in response.content.decode()
     firm.full_clean()
     firm.value = "1234"
     with pytest.raises(ValidationError):
@@ -2536,15 +2536,15 @@ def test_the_row_is_marked_where_it_is_edited_and_has_no_link(outgrown, client, 
     link, because one built from a value of another shape leads wherever it leads."""
     person, firm = outgrown
     assert person.kept_as_it_was == [
-        "That does not look like a Staff number identifier (for example ABC-123456)."
+        "Staff number: that is not the usual form (for example ABC-123456)."
     ]
-    assert firm.kept_as_it_was == ["That does not look like a SIREN identifier."]
+    assert firm.kept_as_it_was == ["SIREN: that is not the usual form."]
     assert person.url == "" and firm.url == ""
 
     client.force_login(user)
     for url, sentence in (
-        (reverse("accounts:profile"), "That does not look like a Staff number identifier"),
-        (reverse("jobs:company_update", args=[company.pk]), "does not look like a SIREN"),
+        (reverse("accounts:profile"), "Staff number: that is not the usual form"),
+        (reverse("jobs:company_update", args=[company.pk]), "SIREN: that is not the usual form"),
     ):
         html = client.get(url).content.decode()
         assert html.count("data-kept-as-it-was") == 1, url
@@ -2825,7 +2825,7 @@ def test_a_key_postulo_starts_to_ship_takes_nothing_from_the_rows_under_it(
     # The company's is under a scheme that would refuse it: kept, marked, not linked.
     assert firm.scheme_label == "VAT number" and firm.url == ""
     assert firm.kept_as_it_was == [
-        "That does not look like a VAT number identifier (for example PT123456789)."
+        "VAT number: that is not the usual form (for example PT123456789)."
     ]
 
     client.force_login(user)

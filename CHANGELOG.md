@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A malformed identifier now reads "ORCID: that is not the usual form (for example …)" instead of the ungrammatical "a ORCID identifier"; the person and company identifier checks now live once in core (#645).
 - Paginated API lists (applications, companies, CVs, letters, interviews, reminders) break ties by id, so paging can no longer repeat one row and skip another. (#440)
 - `GET /api/v1/captures` takes `after_id`, so a client can catch up past a run of captures sharing one `updated_at`. (#439)
 - The API refuses blank names for companies, listings, applications, contacts, reminders and letters, and renaming a company onto another's name is a 422, not a 500 or a duplicate. (#438)

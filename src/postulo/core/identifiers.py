@@ -586,17 +586,51 @@ def refuse_malformed(scheme: Scheme, value: str) -> None:
     if too_long or not scheme.pattern.match(value):
         if scheme.example:
             raise ValidationError(
-                _("That does not look like a %(scheme)s identifier (for example %(example)s)."),
+                _("%(scheme)s: that is not the usual form (for example %(example)s)."),
                 code="format",
                 params={"scheme": scheme.label, "example": scheme.example},
             )
         raise ValidationError(
-            _("That does not look like a %(scheme)s identifier."),
+            _("%(scheme)s: that is not the usual form."),
             code="format",
             params={"scheme": scheme.label},
         )
     if scheme.checksum is not None and not scheme.checksum(value):
         raise ValidationError(scheme.checksum_message, code="checksum")
+
+
+def normalise(subject: str, scheme_key: str, raw: str) -> str:
+    """Tidy ``raw`` into the canonical spelling for its scheme, as ``subject`` has it."""
+    scheme = find(scheme_key, subject)
+    return scheme.normalise(raw) if scheme else (raw or "").strip()
+
+
+def validate(subject: str, scheme_key: str, value: str) -> None:
+    """Raise `ValidationError` unless ``value`` is a well-formed identifier of ``subject``.
+
+    A scheme that does not identify ``subject`` is *unknown* here rather than merely wrong:
+    an LEI reaching this for a person is an LEI on a person, and the honest answer is that
+    there is no such scheme for one.
+    """
+    scheme = find(scheme_key, subject)
+    if scheme is None:
+        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
+    refuse_malformed(scheme, value)
+
+
+def clean(subject: str, scheme_key: str, raw: str) -> str:
+    """Normalise then validate, returning the canonical value."""
+    if find(scheme_key, subject) is None:
+        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
+    value = normalise(subject, scheme_key, raw)
+    validate(subject, scheme_key, value)
+    return value
+
+
+def url_for(subject: str, scheme_key: str, value: str) -> str:
+    """Where ``value`` links, or nothing."""
+    scheme = find(scheme_key, subject)
+    return scheme.url_for(value, subject) if scheme else ""
 
 
 def schemes_for(subject: str) -> dict[str, Scheme]:

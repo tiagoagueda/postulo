@@ -447,7 +447,7 @@ REFUSALS = {
     ),
     "an identifier row": (
         rows("identifiers", {"scheme": "wikidata", "value": "not an item", "label": ""}),
-        "That does not look like a Wikidata identifier",
+        "Wikidata: that is not the usual form",
     ),
 }
 

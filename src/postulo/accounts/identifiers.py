@@ -25,9 +25,7 @@ reason ORCID has one.
 
 from __future__ import annotations
 
-from django.core.exceptions import ValidationError
 from django.utils.text import get_text_list
-from django.utils.translation import gettext_lazy as _
 
 from postulo.core import identifiers as registry
 from postulo.core.identifiers import PERSON
@@ -63,30 +61,21 @@ def label_for(key: str) -> str:
 
 def normalise(scheme_key: str, raw: str) -> str:
     """Tidy ``raw`` into the canonical spelling for its scheme."""
-    scheme = scheme_for(scheme_key)
-    return scheme.normalise(raw) if scheme else (raw or "").strip()
+    return registry.normalise(PERSON, scheme_key, raw)
 
 
 def validate(scheme_key: str, value: str) -> None:
     """Raise :class:`ValidationError` unless ``value`` is a well-formed identifier.
 
-    A scheme that does not identify people is *unknown* here rather than merely wrong,
-    which is the point: an LEI reaching this is an LEI on a person, and the honest answer
-    is that there is no such scheme for a person.
+    A scheme that does not identify this subject is *unknown* here rather than merely
+    wrong; the registry says so, once, for both (#645).
     """
-    scheme = scheme_for(scheme_key)
-    if scheme is None:
-        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    registry.refuse_malformed(scheme, value)
+    registry.validate(PERSON, scheme_key, value)
 
 
 def clean(scheme_key: str, raw: str) -> str:
     """Normalise then validate, returning the canonical value."""
-    if scheme_for(scheme_key) is None:
-        raise ValidationError(_("Unknown identifier scheme."), code="scheme")
-    value = normalise(scheme_key, raw)
-    validate(scheme_key, value)
-    return value
+    return registry.clean(PERSON, scheme_key, raw)
 
 
 def pasted_whole() -> str:
@@ -101,5 +90,4 @@ def pasted_whole() -> str:
 
 
 def url_for(scheme_key: str, value: str) -> str:
-    scheme = scheme_for(scheme_key)
-    return scheme.url_for(value, PERSON) if scheme else ""
+    return registry.url_for(PERSON, scheme_key, value)

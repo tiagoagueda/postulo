@@ -265,3 +265,51 @@ def test_no_scheme_reaches_the_network():
 
     for forbidden in ("requests", "urlopen", "httpx", "socket"):
         assert forbidden not in code
+
+
+# ------------------------------------------------ the format error reads in any language (#645)
+
+
+def _malformed(scheme):
+    """A value in no scheme's alphabet."""
+    return "!?"
+
+
+@pytest.mark.parametrize("subject", registry.SUBJECTS)
+def test_the_format_error_needs_no_article_and_no_trailing_noun(subject):
+    """The label is a name, not a word in a sentence: "a ORCID identifier" was not English
+    and no translator could make a frame agree with every label."""
+    checked = 0
+    for key, scheme in registry.schemes_for(subject).items():
+        if scheme.pattern.match(_malformed(scheme)):
+            continue  # "other" takes anything: it has no malformed value to refuse
+        with pytest.raises(ValidationError) as refused:
+            registry.validate(subject, key, _malformed(scheme))
+        message = refused.value.messages[0]
+        label = str(scheme.label)
+        assert f"a {label}" not in message, key
+        assert f"{label} identifier" not in message, key
+        assert label in message, key
+        if scheme.example:
+            assert str(scheme.example) in message, key
+        checked += 1
+    assert checked
+
+
+def test_both_subjects_refuse_a_malformed_isni_in_the_same_words():
+    """One copy of `validate`: the two modules hold no `ValidationError` of their own."""
+    messages = []
+    for module in (person_schemes, company_schemes):
+        with pytest.raises(ValidationError) as refused:
+            module.validate("isni", "not an isni")
+        messages.append(refused.value.messages)
+    assert messages[0] == messages[1]
+    assert "ISNI" in messages[0][0]
+
+
+def test_the_two_views_hold_no_validation_of_their_own():
+    import inspect
+
+    for module in (person_schemes, company_schemes):
+        code = inspect.getsource(module).split('"""', 2)[2]
+        assert "raise ValidationError" not in code, module.__name__
