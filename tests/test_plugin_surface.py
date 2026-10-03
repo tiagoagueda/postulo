@@ -624,3 +624,34 @@ def test_the_published_check_fails_an_allowance_nobody_removed(tmp_path):
 
 def test_the_published_check_names_the_surface_it_is_checking_against():
     assert SURFACE == "postulo.plugins.api"
+
+
+@pytest.mark.django_db
+def test_a_plugin_asking_whether_a_number_is_held_spends_the_account_allowance(
+    user, other_user, settings
+):
+    """A sync asks it of every card it pulls, so the allowance must reach it (#333).
+
+    Once the answers are spent every number is *taken*, held or not: telling them apart is
+    the answer. The bare form still works, and says it is deprecated.
+    """
+    from postulo.core.models import PhoneNumber
+    from postulo.plugins import api
+
+    settings.POSTULO_NUMBER_RATE = "2/h"
+    PhoneNumber.objects.create(owner=other_user, holder=other_user.profile, number="+351912345678")
+
+    def asked(number):
+        return api.phone_number_is_taken(number, asked_by=user)
+
+    assert asked("+351912345679") is False, "free, and free numbers cost nothing"
+    assert asked("+351912345678") is True
+    assert asked("+351912345679") is False, "one answer left"
+    assert asked("+351912345678") is True
+    assert asked("+351912345679") is True, "spent: the free number reads as taken"
+    assert api.phone_number_is_taken("+351912345679", asked_by=other_user) is False, (
+        "the allowance is per account"
+    )
+
+    with pytest.warns(DeprecationWarning, match="asked_by"):
+        assert api.phone_number_is_taken("+351912345679") is False

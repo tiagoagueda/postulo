@@ -156,6 +156,47 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=(
     return rows.exists()
 
 
+def taken_by_asking(
+    number: str, *, exclude_pk: int | None = None, asked_by=None, exclude_pks=()
+) -> bool:
+    """``taken_elsewhere`` for a plugin, charged to the account it asks for (#333).
+
+    This is what `postulo.plugins.api.phone_number_is_taken` is. Whether a number is held
+    on the instance is the answer #142 bounds, and a sync plugin asks it of every card it
+    pulls, as often as every fifteen minutes. So the answer is charged to ``asked_by``
+    like any other: a *yes* spends one of that account's answers, and once they are spent
+    every number is answered *yes* alike, held or not, because telling them apart is the
+    answer. A plugin that gets *yes* says the number was left off, which is also true of
+    a number it was not allowed to ask about.
+
+    Without ``asked_by`` nobody is charged, which is the bare question the surface used to
+    hand out; it still answers, with a ``DeprecationWarning``, until the release that
+    removes it.
+    """
+    if asked_by is None:
+        import warnings
+
+        warnings.warn(
+            "phone_number_is_taken() without asked_by= is deprecated: pass the account the "
+            "plugin is working for, so the answer is charged to it (#333).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return taken_elsewhere(number, exclude_pk=exclude_pk, exclude_pks=exclude_pks)
+    from . import throttle
+
+    if not phones.normalise(number):
+        return False
+    try:
+        ensure_allowance(asked_by)
+        if not taken_elsewhere(number, exclude_pk=exclude_pk, exclude_pks=exclude_pks):
+            return False
+        collision_noticed(asked_by)
+    except throttle.TooOften:
+        pass
+    return True
+
+
 #: What somebody is told once they have been given that answer too many times in an hour.
 #: Honest about what happened rather than vague about it: a message that pretended the save
 #: failed for some other reason would be a lie, and would still refuse the save, so it would

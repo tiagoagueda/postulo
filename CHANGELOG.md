@@ -184,6 +184,10 @@ All notable changes to Postulo are recorded here. The format follows
   recorded have no code until their title is next saved.** (#266)
 - *Server settings → Defaults* draws a bar under each language, green for strings a speaker has reviewed, amber for drafts and grey for the untranslated, with the three counts in words beside it. (#312)
 
+### ⚠️ Deprecated
+
+- Plugins: `phone_number_is_taken(number)` without `asked_by=` is deprecated and will be removed in a later release. Pass the account the plugin works for: the answer is then charged to that account's allowance of answers about numbers recorded here, and once it is spent every number is answered as taken. (#333)
+
 ### 🐛 Fixed
 
 - The phone's bottom navigation bar no longer opens taller than it ends up: the safe-area padding now applies only to an installed app, not to a browser tab whose toolbar already stands under the bar. (#338)

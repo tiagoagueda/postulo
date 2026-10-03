@@ -86,7 +86,7 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
-    from postulo.core.phone_numbers import taken_elsewhere as phone_number_is_taken
+    from postulo.core.phone_numbers import taken_by_asking as phone_number_is_taken
     from postulo.core.phones import COUNTRY_CODES
     from postulo.core.redirects import safe_next
     from postulo.core.web_links import Kind as LinkKind
@@ -290,7 +290,10 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # would have to know that; these are the two reads and the two writes it actually
     # needs, and they keep the primary flag and the uniqueness rules with Postulo.
     "LinkKind": ("postulo.core.web_links", "Kind"),
-    "phone_number_is_taken": ("postulo.core.phone_numbers", "taken_elsewhere"),
+    # `phone_number_is_taken(number, asked_by=account)` charges the answer to the account the
+    # plugin works for (#333). Called without `asked_by` it is the bare question and
+    # warns: that form is deprecated and goes in a later release.
+    "phone_number_is_taken": ("postulo.core.phone_numbers", "taken_by_asking"),
     "primary_phone_number": ("postulo.core.phone_numbers", "primary_for"),
     "primary_web_link": ("postulo.core.web_links", "primary_for"),
     "save_phone_number": ("postulo.core.phone_numbers", "save_only_number"),
