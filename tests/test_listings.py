@@ -14,7 +14,14 @@ from postulo.core import export as export_module
 from postulo.core.export import build_document, write_archive
 from postulo.core.importer import load
 from postulo.jobs import esco
-from postulo.jobs.models import Capture, Company, DiscardReason, JobPosting, ListingState
+from postulo.jobs.models import (
+    TAB_ORDER,
+    Capture,
+    Company,
+    DiscardReason,
+    JobPosting,
+    ListingState,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -379,3 +386,34 @@ def test_a_format_one_archive_still_imports(user, other_user, company):
     assert restored.noted_at is not None
     assert restored.decided_at is not None, "it had an application, so it was decided"
     assert restored.derived_state == "applied"
+
+
+@pytest.mark.parametrize("stored", ListingState.values)
+@pytest.mark.parametrize("when", ["open", "past", "closed"])
+@pytest.mark.parametrize("applied", [False, True])
+def test_the_state_cell_the_tab_and_the_sort_agree(user, company, stored, when, applied):
+    """A decision outlives a date: a discarded listing never turns up under Closed (#529)."""
+    fields = {
+        "open": {},
+        "past": {"closes_at": timezone.localdate() - dt.timedelta(days=1)},
+        "closed": {"closed_at": timezone.now()},
+    }[when]
+    row = listing(user, company, state=stored, **fields)
+    if applied:
+        Application.objects.create(owner=user, posting=row, status=Status.APPLIED)
+
+    everything = JobPosting.objects.for_user(user)
+    derived = everything.with_application_count().get(pk=row.pk).derived_state
+    # The undecided tab holds the shortlisted rows too, and the shortlisted tab is inside it.
+    tabs = {"new": ["undecided"], "shortlisted": ["undecided", "shortlisted"]}.get(
+        derived, [derived]
+    )
+    order = {"new": 0, "shortlisted": 1, "applied": 2, "closed": 3, "discarded": 4}[derived]
+
+    holding = [name for name in TAB_ORDER if everything.in_state(name).filter(pk=row.pk).exists()]
+    assert holding == tabs
+    counts = everything.tab_counts()
+    assert [name for name in TAB_ORDER if counts[name]] == tabs
+    assert (
+        everything.with_application_count().with_state_order().get(pk=row.pk).state_order == order
+    )

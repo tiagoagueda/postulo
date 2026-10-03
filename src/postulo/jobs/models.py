@@ -741,6 +741,9 @@ def state_condition(state: str, *, applied=None):
     ``applied`` is how "this listing has an application" is expressed. A filtered queryset
     already annotates `application_count` and compares it; the one-query count cannot, since
     an aggregate cannot be grouped and totalled at once, so it passes an `Exists` instead.
+
+    A decision outlives a date: a discarded listing stays *discarded* after its closing date
+    passes, as `derived_state` has it, and is never counted as *closed* (#529).
     """
     has_application = applied if applied is not None else Q(application_count__gt=0)
     no_application = ~Q(has_application) if applied is not None else Q(application_count=0)
@@ -748,9 +751,11 @@ def state_condition(state: str, *, applied=None):
     if state == "applied":
         return Q(has_application)
     if state == "closed":
-        return no_application & shut
+        return no_application & shut & ~Q(state=ListingState.DISCARDED)
     if state == "undecided":
         return Q(state__in=(ListingState.NEW, ListingState.SHORTLISTED)) & no_application & ~shut
+    if state == ListingState.DISCARDED:
+        return Q(state=state) & no_application
     if state in ListingState.values:
         return Q(state=state) & no_application & ~shut
     return None
