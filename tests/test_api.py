@@ -439,3 +439,49 @@ def test_tokens_are_made_with_scopes_and_expiry_from_settings(client, user):
     response = client.post(reverse("api:token_create"), {"name": "No scopes"}, follow=True)
     assert "at least one scope" in response.content.decode()
     assert ApiToken.objects.filter(owner=user).count() == 1
+
+
+def test_blank_names_are_refused_and_nothing_is_made(client, user, search):
+    bearer = issue(user, "write", "read")
+    company = search["company"]
+    calls = [
+        ("/api/v1/companies", {"name": "   "}, "name"),
+        ("/api/v1/listings", {"company_name": " ", "title": "Tester"}, "company_name"),
+        ("/api/v1/listings", {"company_name": "Acme", "title": ""}, "title"),
+        ("/api/v1/applications", {"company_name": "", "title": "  "}, "company_name"),
+        (f"/api/v1/companies/{company.pk}/contacts", {"name": ""}, "name"),
+        ("/api/v1/reminders", {"summary": " ", "due_at": "2030-01-01T00:00:00Z"}, "summary"),
+        ("/api/v1/letters", {"name": "", "body": "x"}, "name"),
+    ]
+    before = Company.objects.count()
+    for path, payload, field in calls:
+        response = post(client, path, payload, **bearer)
+        assert response.status_code == 422, path
+        assert field in json.dumps(response.json()), path
+    assert Company.objects.count() == before
+    assert not Company.objects.filter(name="").exists()
+    assert not Contact.objects.filter(name="").exists()
+
+    for payload in ({"name": "  "}, {"name": ""}):
+        response = patch(client, f"/api/v1/companies/{company.pk}", payload, **bearer)
+        assert response.status_code == 422
+        company.refresh_from_db()
+        assert company.name == "Aperture Science"
+
+
+def test_renaming_a_company_onto_a_taken_name_is_refused(client, user, search):
+    bearer = issue(user, "write", "read")
+    other = Company.objects.create(owner=user, name="Other")
+    for name in ("Other", "other", " OTHER "):
+        response = patch(
+            client, f"/api/v1/companies/{search['company'].pk}", {"name": name}, **bearer
+        )
+        assert response.status_code == 422
+    search["company"].refresh_from_db()
+    other.refresh_from_db()
+    assert search["company"].name == "Aperture Science" and other.name == "Other"
+    # Keeping or recasing its own name is fine.
+    response = patch(
+        client, f"/api/v1/companies/{search['company'].pk}", {"name": "APERTURE science"}, **bearer
+    )
+    assert response.status_code == 200

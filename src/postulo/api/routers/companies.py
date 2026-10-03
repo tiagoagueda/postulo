@@ -3,6 +3,7 @@
 import datetime as dt
 
 from django.db.models import Q
+from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
@@ -91,6 +92,12 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     data = payload.dict(exclude_unset=True)
     industries = data.pop("industries", None)
     data.pop("identifiers", None)
+    name = data.get("name")
+    if name is not None:
+        # The constraint is case-sensitive; the forms and `get_or_create_company` are not.
+        clash = Company.objects.for_user(request.auth.owner).filter(name__iexact=name)
+        if clash.exclude(pk=company.pk).exists():
+            raise HttpError(422, _("You already have a company with that name."))
     for field, value in data.items():
         if value is not None:
             setattr(company, field, value)

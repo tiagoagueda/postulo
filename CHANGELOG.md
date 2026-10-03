@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The API refuses blank names for companies, listings, applications, contacts, reminders and letters, and renaming a company onto another's name is a 422, not a 500 or a duplicate. (#438)
 - Each letter's language is pinned in the API by a test, and the schemas no longer default it to an empty string. (#437)
 - `PATCH /api/v1/interviews/{id}` no longer answers 500 when `starts_at`, `location` or `notes` is `null`; `null` means unchanged, as on the other patch calls. (#436)
 - A capture's `Idempotency-Key` longer than 200 characters is refused with a 422 instead of a 500 on PostgreSQL. (#433)

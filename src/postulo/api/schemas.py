@@ -41,7 +41,7 @@ def _without_nul(value: str) -> str:
     return value
 
 
-def _line(longest: int):
+def _line(longest: int, *, shortest: int = 0):
     """One line of text, on the terms a page takes it: a person's name on *Your details*,
     what a link is called on a row.
 
@@ -60,10 +60,15 @@ def _line(longest: int):
     """
     return Annotated[
         str,
-        Field(max_length=longest),
+        Field(min_length=shortest, max_length=longest),
         BeforeValidator(_stripped),
         AfterValidator(_without_nul),
     ]
+
+
+#: A name the forms require: stripped, then at least one character (#438).
+def _required(longest: int):
+    return _line(longest, shortest=1)
 
 
 # ------------------------------------------------------------------ companies
@@ -208,7 +213,7 @@ class CompanyDetailOut(CompanyOut):
 
 
 class CompanyIn(Schema):
-    name: str = Field(max_length=200)
+    name: _required(200)
     kind: str = Field(
         default="",
         description="employer (the default) or employment_service; anything else is ignored.",
@@ -227,7 +232,7 @@ class CompanyIn(Schema):
 
 
 class CompanyPatch(Schema):
-    name: str | None = Field(default=None, max_length=200)
+    name: _required(200) | None = None
     website: WebAddress | None = Field(default=None, max_length=200)
     careers_url: WebAddress | None = Field(default=None, max_length=200)
     location: str | None = Field(default=None, max_length=200)
@@ -239,7 +244,7 @@ class CompanyPatch(Schema):
 
 
 class ContactIn(Schema):
-    name: str = Field(max_length=200)
+    name: _required(200)
     role: str = Field(default="", max_length=200)
     email: str = Field(default="", max_length=254)
     #: Checked against its country's numbering plan (#304), as the field on the page is.
@@ -405,13 +410,13 @@ class ListingEventIn(Schema):
 class ListingIn(Schema):
     """The posting half of intake: company by name, and what the listing says."""
 
-    company_name: str = Field(max_length=200)
+    company_name: _required(200)
     company_wikidata: str = Field(
         default="",
         max_length=200,
         description="The employer's Wikidata id, when known: a stronger match than the name.",
     )
-    title: str = Field(max_length=250)
+    title: _required(250)
     url: WebAddress = Field(default="", max_length=500)
     location: str = Field(default="", max_length=200)
     remote_type: str = Field(default="", max_length=20)
@@ -655,7 +660,7 @@ class EventIn(Schema):
 
 class ReminderIn(Schema):
     application_id: int | None = None
-    summary: str = Field(max_length=250)
+    summary: _required(250)
     due_at: dt.datetime
 
 
@@ -673,7 +678,7 @@ class ReminderPatch(Schema):
     """
 
     application_id: int | None = None
-    summary: str | None = Field(None, max_length=250)
+    summary: _required(250) | None = None
     due_at: dt.datetime | None = None
 
 
@@ -848,7 +853,7 @@ class LetterDetailOut(LetterOut):
 
 
 class LetterIn(Schema):
-    name: str = Field(max_length=120)
+    name: _required(120)
     subject: str = Field(default="", max_length=250)
     body: str
     is_template: bool = False
