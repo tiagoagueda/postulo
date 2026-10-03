@@ -12,7 +12,6 @@ from functools import cached_property
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db.models import Q
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -24,7 +23,7 @@ from postulo.core import tables
 from postulo.core.cells import EditableCellView
 from postulo.core.mixins import OwnedObjectMixin, PageOrFragmentMixin
 from postulo.core.redirects import safe_next
-from postulo.core.search import clean_query
+from postulo.core.search import clean_query, listing_match
 
 from .forms import JobPostingForm
 from .models import LISTING_FILTERS, Capture, CaptureStatus, DiscardReason, JobPosting, ListingState
@@ -108,11 +107,7 @@ class ListingListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # one SQLite refuses with an error, and an address can hold anything.
         search = clean_query(self.request.GET.get("q", ""))
         if search:
-            queryset = queryset.filter(
-                Q(title__icontains=search)
-                | Q(company__name__icontains=search)
-                | Q(location__icontains=search)
-            )
+            queryset = queryset.filter(listing_match(search))
         return self.table.apply(queryset)
 
     def get_context_data(self, **kwargs) -> dict:

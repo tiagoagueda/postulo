@@ -9,7 +9,7 @@ from urllib.parse import urlsplit
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
-from django.db.models import Count, Q
+from django.db.models import Count
 from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
@@ -38,7 +38,7 @@ from postulo.core.mixins import (
 from postulo.core.models import Tag
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
-from postulo.core.search import clean_query
+from postulo.core.search import application_match, clean_query
 from postulo.jobs.history import history_of
 from postulo.jobs.views import UserFormKwargsMixin
 
@@ -113,11 +113,7 @@ class ApplicationFilterMixin:
         # one SQLite refuses with an error, and an address can hold anything (#313).
         search = clean_query(params.get("q", ""))
         if search:
-            queryset = queryset.filter(
-                Q(posting__title__icontains=search)
-                | Q(posting__company__name__icontains=search)
-                | Q(posting__location__icontains=search)
-            )
+            queryset = queryset.filter(application_match(search))
 
         status = self.asked_status if by_status else ""
         if status:

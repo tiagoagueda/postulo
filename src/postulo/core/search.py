@@ -32,6 +32,7 @@ from dataclasses import dataclass, field
 from django.db.models import Case, Exists, IntegerField, OuterRef, Q, Subquery, Value, When
 from django.urls import reverse
 from django.utils import formats
+from django.utils.http import urlencode
 from django.utils.translation import gettext_lazy as _
 
 #: How many hits a group shows on the page before "more".
@@ -157,13 +158,47 @@ def take(rows, limit: int, build) -> Found:
 # ----------------------------------------------------------------- per model
 
 
+def listing_match(query: str) -> Q:
+    """What makes a listing match: the search and the Listings table's box read the same."""
+    return contains(query, "title", "description", "location", "source", "company__name")
+
+
+def _timeline_matching(query: str):
+    """The application's timeline entries that hold the term, newest first."""
+    from postulo.applications.models import ApplicationEvent
+
+    return (
+        ApplicationEvent.objects.filter(application=OuterRef("pk"))
+        .filter(contains(query, "summary", "body"))
+        .order_by("-occurred_at")
+    )
+
+
+def application_match(query: str) -> Q:
+    """What makes an application match, timeline text included, for the search and the table."""
+    return contains(query, "posting__title", "posting__company__name", "posting__location") | Q(
+        Exists(_timeline_matching(query))
+    )
+
+
+def company_match(query: str) -> Q:
+    """What makes a company match: the same for the search and the Companies table's box."""
+    from postulo.jobs.models import CompanyIdentifier, Industry
+
+    industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
+    identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
+    return (
+        contains(query, "name", "notes", "location", "website")
+        | Q(Exists(industry))
+        | Q(Exists(identifier))
+    )
+
+
 def search_listings(user, query: str, limit: int) -> Found:
     from postulo.jobs.models import JobPosting
 
     rows = ranked(
-        JobPosting.objects.for_user(user)
-        .select_related("company")
-        .filter(contains(query, "title", "description", "location", "source")),
+        JobPosting.objects.for_user(user).select_related("company").filter(listing_match(query)),
         query,
         "title",
         "-noted_at",
@@ -194,21 +229,13 @@ def search_applications(user, query: str, limit: int) -> Found:
     was four rows the database then had to de-duplicate, and the `COUNT` above paid for that
     twice: once to find them, once to fold them back into one.
     """
-    from postulo.applications.models import Application, ApplicationEvent
+    from postulo.applications.models import Application
 
-    matching = (
-        ApplicationEvent.objects.filter(application=OuterRef("pk"))
-        .filter(contains(query, "summary", "body"))
-        .order_by("-occurred_at")
-    )
+    matching = _timeline_matching(query)
     rows = ranked(
         Application.objects.for_user(user)
         .select_related("posting", "posting__company")
-        .filter(
-            Q(posting__title__icontains=query)
-            | Q(posting__company__name__icontains=query)
-            | Exists(matching)
-        )
+        .filter(application_match(query))
         .annotate(
             hit_summary=Subquery(matching.values("summary")[:1]),
             hit_body=Subquery(matching.values("body")[:1]),
@@ -240,18 +267,10 @@ def search_applications(user, query: str, limit: int) -> Found:
 
 
 def search_companies(user, query: str, limit: int) -> Found:
-    from postulo.jobs.models import Company, CompanyIdentifier, Industry
+    from postulo.jobs.models import Company
 
-    industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
-    identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
     rows = ranked(
-        Company.objects.for_user(user)
-        .prefetch_related("industries")
-        .filter(
-            contains(query, "name", "notes", "location", "website")
-            | Q(Exists(industry))
-            | Q(Exists(identifier))
-        ),
+        Company.objects.for_user(user).prefetch_related("industries").filter(company_match(query)),
         query,
         "name",
         "name",
@@ -543,27 +562,22 @@ def search_career(user, query: str, limit: int) -> Found:
     return found
 
 
-def _reminders_address() -> str:
-    from postulo.applications import agenda
-
-    return agenda.reminders_address()
-
-
-#: Every group, in the order the page shows them: (kind, label, function, "more" URL name
-#: -- or a function that gives the address, for a page that is a shape of another, like
-#: the reminders, which are the calendar's agenda narrowed to them (#316) -- and whether
-#: that page takes the query as ``q``).
-GROUPS: tuple[tuple[str, str, Callable, str | Callable[[], str], bool], ...] = (
-    ("applications", _("Applications"), search_applications, "applications:list", True),
-    ("listings", _("Listings"), search_listings, "listings:list", False),
-    ("companies", _("Companies"), search_companies, "jobs:company_list", True),
-    ("contacts", _("People"), search_contacts, "jobs:company_list", False),
-    ("reminders", _("Reminders"), search_reminders, _reminders_address, False),
-    ("sent", _("Text you sent"), search_sent, "documents:rendered_list", False),
-    ("letters", _("Letters"), search_letters, "documents:letter_list", False),
-    ("cvs", _("CVs"), search_cvs, "documents:cv_list", False),
-    ("uploads", _("Files"), search_uploads, "documents:upload_list", False),
-    ("career", _("Your career"), search_career, "resume:overview", False),
+#: Every group, in the order the page shows them: (kind, label, function, the list that
+#: holds all of the group, as a URL name, and the parameters that list needs beside the
+#: query to show every row). A group whose list takes no query has no list here, and so no
+#: "All N" link: one that opened the list unfiltered would promise N and show every row
+#: (#506).
+GROUPS: tuple[tuple[str, str, Callable, str, dict[str, str]], ...] = (
+    ("applications", _("Applications"), search_applications, "applications:list", {}),
+    ("listings", _("Listings"), search_listings, "listings:list", {"state": "all"}),
+    ("companies", _("Companies"), search_companies, "jobs:company_list", {}),
+    ("contacts", _("People"), search_contacts, "", {}),
+    ("reminders", _("Reminders"), search_reminders, "", {}),
+    ("sent", _("Text you sent"), search_sent, "", {}),
+    ("letters", _("Letters"), search_letters, "", {}),
+    ("cvs", _("CVs"), search_cvs, "", {}),
+    ("uploads", _("Files"), search_uploads, "", {}),
+    ("career", _("Your career"), search_career, "", {}),
 )
 
 
@@ -577,13 +591,13 @@ def search(user, raw_query: str, *, limit: int = GROUP_LIMIT) -> list[Group]:
     if len(query) < MIN_QUERY_LENGTH:
         return []
     groups: list[Group] = []
-    for kind, label, function, more_name, takes_query in GROUPS:
+    for kind, label, function, more_name, more_params in GROUPS:
         found = function(user, query, limit)
         if not found.total:
             continue
-        more_url = more_name() if callable(more_name) else reverse(more_name)
-        if takes_query:
-            more_url = f"{more_url}?q={query}"
+        more_url = ""
+        if more_name:
+            more_url = f"{reverse(more_name)}?{urlencode({**more_params, 'q': query})}"
         groups.append(
             Group(
                 kind=kind,

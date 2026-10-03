@@ -57,7 +57,7 @@
               {% endfor %}
             </ul>
           </div>
-          {% if group.has_more %}
+          {% if group.has_more and group.more_url %}
             <a href="{{ group.more_url }}" class="mt-2 inline-block text-sm text-brand-600 underline dark:text-brand-400">
               {% blocktranslate count counter=group.total with label=group.label trimmed %}
                 All {{ counter }} in {{ label }}

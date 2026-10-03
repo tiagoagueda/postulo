@@ -122,6 +122,45 @@ def test_the_case_of_accented_and_non_latin_letters_is_folded_on_sqlite(user):
         assert [hit.title for hit in groups["companies"].hits] == [name], query
 
 
+def test_the_link_to_all_of_a_group_keeps_the_query_whole(user):
+    """`&` and `#` once cut the query off where the address read them as syntax (#506)."""
+    from urllib.parse import parse_qs, urlsplit
+
+    Company.objects.create(owner=user, name="R&D #1 Labs")
+
+    groups = kinds(searching.search(user, "R&D #1"))
+
+    assert parse_qs(urlsplit(groups["companies"].more_url).query)["q"] == ["R&D #1"]
+    assert "#" not in groups["companies"].more_url
+
+
+def test_no_group_offers_a_link_that_opens_its_list_unfiltered(user, world):
+    for group in searching.search(user, "portal"):
+        assert not group.more_url or "q=portal" in group.more_url, group.kind
+
+
+def test_the_linked_applications_page_holds_as_many_rows_as_the_group_counts(client, user, world):
+    """The text was in the timeline only, which the list's own box did not read (#506)."""
+    client.force_login(user)
+    group = kinds(searching.search(user, "portal gun"))["applications"]
+    assert group.total == 1
+
+    response = client.get(group.more_url)
+
+    assert response.context["paginator"].count == group.total
+
+
+def test_the_linked_companies_and_listings_pages_hold_as_many_rows_as_the_group_counts(
+    client, user, world
+):
+    client.force_login(user)
+    groups = kinds(searching.search(user, "portals"))
+
+    for kind in ("companies", "listings"):
+        response = client.get(groups[kind].more_url)
+        assert response.context["paginator"].count == groups[kind].total, kind
+
+
 def test_the_text_you_sent_says_where_it_went(user, world):
     groups = kinds(searching.search(user, "calibration"))
     hit = groups["sent"].hits[0]

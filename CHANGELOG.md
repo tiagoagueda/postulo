@@ -251,6 +251,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+Fixed
 - Fixed
 - Search and the text filters now ignore the case of accented and non-Latin letters on SQLite, so `école` finds *École*. (#505)
 - The Plugins pages no longer fetch every catalogue's index and signature when they are drawn: an upload is labelled from the checksums the last Check for updates, install or `plugins` command verified. (#602)

@@ -38,7 +38,7 @@ from postulo.core.mixins import (
 )
 from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
-from postulo.core.search import clean_query
+from postulo.core.search import clean_query, company_match
 
 from . import duplicates, identifiers, logos, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
@@ -101,12 +101,7 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # pattern of sixty thousand characters with an error, which was a 500 (#313).
         search = clean_query(self.request.GET.get("q", ""))
         if search:
-            queryset = queryset.filter(
-                Q(name__icontains=search)
-                | Q(location__icontains=search)
-                | Q(industries__name__icontains=search)
-                | Q(identifiers__value__icontains=search)
-            )
+            queryset = queryset.filter(company_match(search))
         queryset = self._within_group(queryset)
         # A company in two matching industries is still one row.
         return self.table.apply(queryset).distinct()
