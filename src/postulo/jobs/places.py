@@ -110,26 +110,25 @@ def _index() -> dict[str, tuple[dict, ...]]:
 
 @lru_cache(maxsize=1)
 def _countries() -> dict[str, frozenset[str]]:
-    """A country's name, in the languages its table gives it, to the code the cities carry.
+    """A country's name to the code the cities carry: its ISO codes and its English name.
 
-    The table's own name columns and every name in its language list are folded and
-    matched to the two-letter code the cities' rows carry. A country name the table
-    does not know — the reader's language not among them — is not a hint at all, and
-    the matcher says nothing rather than guess.
+    ``countryInfo.txt`` has, by column, the ISO code (0), the ISO3 code (1) and the English
+    name (4); the capital (5) and the postal-code format (13) are not names of the country
+    and are not read, which is what made "Victoria" the Seychelles (#534). The file has no
+    names in other languages, so a country written in one narrows nothing: the matcher says
+    nothing rather than guess. Lines starting with ``#`` are the file's own header.
     """
     path = DATA_DIR / COUNTRIES_FILE
     if not path.is_file():
         return {}
     names: dict[str, set[str]] = {}
     for line in path.read_text(encoding="utf-8").splitlines():
-        columns = line.split("\t")
-        if len(columns) < 14 or not columns[0]:
+        if line.startswith("#"):
             continue
-        candidates = [columns[4], columns[5]]
-        candidates.extend(
-            entry.split(":", 1)[1] for entry in columns[13].split(";") if ":" in entry
-        )
-        for name in candidates:
+        columns = line.split("	")
+        if len(columns) < 5 or not columns[0]:
+            continue
+        for name in (columns[0], columns[1], columns[4]):
             key = fold(name)
             if key:
                 names.setdefault(key, set()).add(columns[0])

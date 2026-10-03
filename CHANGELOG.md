@@ -260,6 +260,7 @@ Fixed
 Fixed
 - Fixed
 - A tag or an industry is its name, not an ASCII slug: `C#` and `C++` are two tags, names in Greek, Cyrillic or Japanese are kept, a renamed tag answers to its new name, and none of these is a 500 on the forms, the API, the spreadsheet import or an archive. Upgrading re-derives the slugs and merges industries left with one name. (#356)
+- The company map no longer reads a capital city as a country: `Melbourne, Victoria` is placed in Australia instead of being dropped as the Seychelles, and a country is known by its ISO codes and English name. A country written in another language still narrows nothing. (#534)
 - A job title typed in one gender, or with a double space or a decomposed accent, finds its ISCO-08 code: ESCO's `développeur de logiciels/développeuse de logiciels` is indexed as both forms, and a name that sits in two unit groups gives no code instead of an arbitrary one. (#533)
 - On a page that embeds several postings, the schema.org source picks the one whose `url` is the page before it looks at identifiers, reads an identifier's value (never the employer's name in it) and matches it as a whole path segment or query value, so `1000` no longer picks the posting of `/jobs/10001`. (#590)
 - The schema.org source reads a microdata or RDFa posting inside a page-level item (a `WebPage` on the body, or the posting as its `mainEntity`): an item that is nobody's property is read wherever it sits, and a posting held inside another is found as in JSON-LD. (#589)

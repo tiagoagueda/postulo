@@ -43,24 +43,12 @@ def table_row(name: str, country: str, population: int, alternates: str = "") ->
     )
 
 
-def country_row(iso: str, name: str, languages: str) -> str:
+def country_row(iso: str, name: str, capital: str = "") -> str:
+    """One row of countryInfo.txt, in its real columns (the name is the fifth)."""
     return "\t".join(
         [
-            iso,
-            iso * 3,
-            iso[:2],
-            name,
-            name,
-            "",
-            "0",
-            "0",
-            "Europe",
-            "",
-            "EUR",
-            "Euro",
-            languages,
-            "",
-            "000",
+            *[iso, iso * 3, "000", iso[:2], name, capital or name, "0", "0", "EU"],
+            *["." + iso.lower(), "EUR", "Euro", "0", "#####", "^(\\d{5})$", "en", "1", "", ""],
         ]
     )
 
@@ -80,17 +68,14 @@ def city_table() -> str:
 
 def country_table() -> str:
     rows = [
-        country_row("DE", "Germany", "English:Germany;German:Deutschland"),
-        country_row("PT", "Portugal", "English:Portugal;Portuguese:Portugal"),
-        country_row("JP", "Japan", "English:Japan"),
-        country_row("KE", "Kenya", "English:Kenya"),
-        country_row("BR", "Brazil", "English:Brazil;Portuguese:Brasil"),
+        country_row("DE", "Germany", "Berlin"),
+        country_row("PT", "Portugal", "Lisbon"),
+        country_row("JP", "Japan", "Tokyo"),
+        country_row("KE", "Kenya", "Nairobi"),
+        country_row("BR", "Brazil", "Brasilia"),
     ]
-    rows.extend(
-        country_row(f"XX{number:02d}", f"A country {number}", "English:A country")
-        for number in range(1, 200)
-    )
-    return "\n".join(rows) + "\n"
+    rows.extend(country_row(f"XX{number:02d}", f"A country {number}") for number in range(1, 200))
+    return "#ISO\tISO3\tISO-Numeric\n" + "\n".join(rows) + "\n"
 
 
 def zip_of(text: str) -> bytes:

@@ -49,26 +49,14 @@ def city_row(
     )
 
 
-def country_row(iso: str, iso3: str, name: str, languages: str) -> str:
-    """One row of the country table; the languages are what a reader may call it."""
+def country_row(iso: str, iso3: str, name: str, capital: str, languages: str = "") -> str:
+    """One row of GeoNames' countryInfo.txt, in its real columns: the ISO codes, the FIPS
+    code, the English name, the capital, area, population, continent, domain, currency,
+    phone, postal-code format and regex, languages, geonameid and the neighbours."""
     return "\t".join(
         [
-            iso,
-            iso3,
-            iso3,
-            iso,
-            name,
-            name,
-            "",
-            "0",
-            "0",
-            "Europe",
-            "",
-            "EUR",
-            "Euro",
-            languages,
-            "",
-            "000",
+            *[iso, iso3, "000", iso, name, capital, "0", "0", "EU", "." + iso.lower()],
+            *["EUR", "Euro", "0", "#####", "^(\\d{5})$", languages, "1", "", ""],
         ]
     )
 
@@ -82,19 +70,27 @@ CITY_ROWS = [
     ("537445", "Springfield", "Springfield", "", "39.7817", "-89.6501", "US", 59503),
     ("5327371", "Springfield", "Springfield", "", "34.0064", "-120.4653", "US", 3460),
     ("2972817", "Springfield", "Springfield", "", "52.7036", "-6.9052", "IE", 1100),
+    ("2158177", "Melbourne", "Melbourne", "", "-37.814", "144.9633", "AU", 4529500),
+    ("2156643", "Geelong", "Geelong", "", "-38.1499", "144.3617", "AU", 253269),
+    ("241131", "Victoria", "Victoria", "", "-4.6167", "55.45", "SC", 26450),
+    ("2509954", "Valencia", "Valencia", "", "39.4698", "-0.3764", "ES", 814208),
+    ("3625549", "Valencia", "Valencia", "", "10.1620", "-68.0077", "VE", 1385000),
 ]
 TABLE = "\n".join(city_row(*row) for row in CITY_ROWS) + "\n"
 
 COUNTRIES = (
-    "\n".join(
+    "#ISO\tISO3\tISO-Numeric\tfips\tCountry\tCapital\n"
+    + "\n".join(
         [
-            country_row("PT", "PRT", "Portugal", "English:Portugal;Portuguese:Portugal"),
-            country_row("DE", "DEU", "Germany", "English:Germany;German:Deutschland"),
-            country_row("JP", "JPN", "Japan", "English:Japan;Japanese:\u65e5\u672c"),
-            country_row(
-                "US", "USA", "United States", "English:United States;Spanish:Estados Unidos"
-            ),
-            country_row("IE", "IRL", "Ireland", "English:Ireland;Irish:\u00c9ire"),
+            country_row("PT", "PRT", "Portugal", "Lisbon", "pt-PT,mwl"),
+            country_row("DE", "DEU", "Germany", "Berlin", "de"),
+            country_row("JP", "JPN", "Japan", "Tokyo", "ja"),
+            country_row("US", "USA", "United States", "Washington", "en-US,es-US"),
+            country_row("IE", "IRL", "Ireland", "Dublin", "en-IE,ga-IE"),
+            country_row("AU", "AUS", "Australia", "Canberra", "en-AU"),
+            country_row("SC", "SYC", "Seychelles", "Victoria", "en,fr-SC"),
+            country_row("ES", "ESP", "Spain", "Madrid", "es-ES,ca"),
+            country_row("VE", "VEN", "Venezuela", "Caracas", "es-VE"),
         ]
     )
     + "\n"
@@ -275,3 +271,26 @@ def test_a_correction_a_person_made_outlives_the_next_save(user, data_dir, monke
     assert calls == []
     assert company.location_lon == -6.9052
     assert company.location_resolved_by == LocationSource.MANUAL
+
+
+def test_a_region_that_is_also_a_capital_is_not_a_country(data_dir):
+    """Victoria is the capital of the Seychelles and a state of Australia (#534)."""
+    for text in ("Melbourne, Victoria", "Geelong, Victoria"):
+        answer = places.resolve(text)
+        assert answer is not None, text
+        assert answer["country"] == "AU"
+    assert "victoria" not in places._countries()
+    assert "#iso" not in places._countries()
+
+
+def test_a_country_is_known_by_its_codes_and_its_english_name(data_dir):
+    assert places.resolve("Valencia, Spain")["country"] == "ES"
+    assert places.resolve("Valencia, ES")["country"] == "ES"
+    assert places.resolve("Valencia, VEN")["country"] == "VE"
+
+
+@pytest.mark.xfail(
+    reason="countryInfo.txt has no names in other languages; needs a source (#534)", strict=True
+)
+def test_a_country_in_another_language_narrows_the_city(data_dir):
+    assert places.resolve("Valencia, España")["country"] == "ES"
