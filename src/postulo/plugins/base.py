@@ -15,7 +15,6 @@ not put a fabricated job title into their records.
 from __future__ import annotations
 
 import datetime as dt
-import re
 from dataclasses import dataclass, field, replace
 from decimal import Decimal
 from typing import Protocol, runtime_checkable
@@ -340,6 +339,59 @@ class ImportRefused(Exception):
     """The file will not be read, and the message says why, to the person who chose it."""
 
 
+#: Byte-order marks and what an XML document starts with in UTF-16, with or without one.
+BOM_8 = bytes([0xEF, 0xBB, 0xBF])
+BOM_LE = bytes([0xFF, 0xFE])
+BOM_BE = bytes([0xFE, 0xFF])
+NUL = bytes([0])
+_UTF16_STARTS = (BOM_LE, BOM_BE, b"<" + NUL, NUL + b"<")
+
+
+def _looks_like_xml(data: bytes) -> bool:
+    if data.startswith(_UTF16_STARTS):
+        return True
+    return data.lstrip(BOM_8).lstrip().startswith(b"<")
+
+
+class _Declared(Exception):
+    """Raised when the parser meets a document type declaration."""
+
+
+class _Found(Exception):
+    """Raised by the parser's handlers to stop at the first element: no DOCTYPE comes later."""
+
+
+def _declares_a_doctype(data: bytes) -> bool:
+    """Whether the document has a document type declaration, wherever it sits and in
+    whatever encoding, decided by an XML parser rather than by looking for bytes (#378).
+
+    A declaration has to come before the root element, so the parser is stopped at the
+    first element; a comment of any length before it, or UTF-16, changes nothing. Nothing
+    is expanded: the handler raises when the declaration starts, before any entity in it
+    is read. A document the parser cannot read at all is not refused here -- the
+    importer reports it as unreadable, in its own words.
+    """
+    from xml.parsers import expat
+
+    parser = expat.ParserCreate()
+
+    def doctype(*_args) -> None:
+        raise _Declared
+
+    def element(*_args) -> None:
+        raise _Found
+
+    parser.StartDoctypeDeclHandler = doctype
+    parser.StartElementHandler = element
+    try:
+        parser.Parse(data, True)
+    except _Declared:
+        return True
+    except (_Found, expat.ExpatError):
+        return False
+    return False
+
+
 def refuse_unreadable(data: bytes) -> None:
     """What Postulo refuses before any importer sees a byte.
 
@@ -360,8 +412,7 @@ def refuse_unreadable(data: bytes) -> None:
             _("That file is larger than %(limit)s MB, so it was not read.")
             % {"limit": MAX_IMPORT_BYTES // (1024 * 1024)}
         )
-    head = data[:4096].lstrip(b"\xef\xbb\xbf").lstrip()
-    if head.startswith(b"<") and re.search(rb"<!DOCTYPE", data[:4096], re.I):
+    if _looks_like_xml(data) and _declares_a_doctype(data):
         raise ImportRefused(
             _(
                 "That file carries a document type declaration, which Postulo will not "

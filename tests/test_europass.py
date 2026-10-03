@@ -157,6 +157,18 @@ def test_a_doctype_is_refused_before_anything_is_parsed():
         europass.read(bomb)
 
 
+def test_read_xml_itself_will_not_expand_an_entity():
+    """#378: not safe because a refusal ran first, but because the parser forbids it."""
+    padded = (
+        b"<!--" + b" " * 5000 + b"-->"
+        b'<!DOCTYPE r [<!ENTITY e "boom">]>'
+        b"<SkillsPassport><LearnerInfo><Headline>&e;</Headline></LearnerInfo></SkillsPassport>"
+    )
+    for data in (padded, padded.decode().encode("utf-16-le")):
+        with pytest.raises(europass.EuropassError, match="not readable XML"):
+            europass.read_xml(data)
+
+
 def test_an_external_entity_cannot_reach_the_disk():
     xxe = (
         b'<?xml version="1.0"?>\n'

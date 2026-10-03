@@ -9,6 +9,8 @@ rather than to Europass, because "every plugin author remembers" is not a contro
 
 from __future__ import annotations
 
+import codecs
+
 import pytest
 from django.urls import reverse
 
@@ -67,6 +69,45 @@ def test_it_says_what_it_is():
 )
 def test_the_kind_refuses_before_any_importer_sees_a_byte(data: bytes, expected: str):
     with pytest.raises(base.ImportRefused, match=expected):
+        base.refuse_unreadable(data)
+
+
+BOMB = '<!DOCTYPE x [<!ENTITY e "boom">]><SkillsPassport><a>&e;</a></SkillsPassport>'
+PADDING = "<!--" + " " * 5000 + "-->"
+
+
+@pytest.mark.parametrize(
+    "data",
+    [
+        (PADDING + BOMB).encode(),
+        BOMB.encode("utf-16-le"),
+        BOMB.encode("utf-16-be"),
+        BOMB.encode("utf-16"),
+        (PADDING + BOMB).encode("utf-16-le"),
+        (PADDING + BOMB).encode("utf-16-be"),
+        (PADDING + BOMB).encode("utf-16"),
+        codecs.BOM_UTF8 + (PADDING + BOMB).encode(),
+    ],
+    ids=[
+        "after-a-long-comment",
+        "utf16-le",
+        "utf16-be",
+        "utf16-bom",
+        "utf16-le-padded",
+        "utf16-be-padded",
+        "utf16-bom-padded",
+        "utf8-bom-padded",
+    ],
+)
+def test_a_doctype_is_found_wherever_it_sits_and_in_whatever_encoding(data: bytes):
+    """#378: it was looked for in the first 4 KB, as ASCII."""
+    with pytest.raises(base.ImportRefused, match="document type"):
+        base.refuse_unreadable(data)
+
+
+def test_xml_without_a_doctype_is_not_refused_whatever_its_encoding():
+    document = "<!--" + " " * 5000 + "--><SkillsPassport><a>x</a></SkillsPassport>"
+    for data in (document.encode(), document.encode("utf-16-le"), document.encode("utf-16")):
         base.refuse_unreadable(data)
 
 

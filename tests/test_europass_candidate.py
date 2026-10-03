@@ -745,6 +745,20 @@ def test_a_name_ending_in_stream_does_not_end_a_dictionary_early():
     assert europass.read(data).source == "pdf-candidate"
 
 
+def test_a_doctype_after_a_long_comment_is_refused_inside_a_pdf_too():
+    """#378: the refusal looked only at the first 4 KB of the attachment."""
+    bomb = (
+        b"<!--" + b" " * 5000 + b"-->"
+        b'<!DOCTYPE r [<!ENTITY e "boom">]>'
+        b"<SkillsPassport><LearnerInfo><Headline>&e;</Headline></LearnerInfo></SkillsPassport>"
+    )
+    for data in (bomb, bomb.decode().encode("utf-16-le")):
+        with pytest.raises((europass.EuropassError, base.ImportRefused)):
+            europass.read(europass_pdf(attachment(data)))
+    with pytest.raises(base.ImportRefused, match="document type"):
+        europass.read(europass_pdf(attachment(bomb)))
+
+
 def test_a_pdf_with_nothing_attached_says_what_to_upload_instead():
     with pytest.raises(europass.EuropassError, match="nothing attached") as refused:
         europass.read(europass_pdf())

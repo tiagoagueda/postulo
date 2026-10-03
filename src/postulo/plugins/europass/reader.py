@@ -44,7 +44,8 @@ other systems write too, and only Europass's is read as a Europass CV.
 * **any ``DOCTYPE`` is refused outright**. That is where entity expansion lives — the
   billion-laughs attack and external entity fetches both need one — and a Europass file has
   no legitimate use for a document type declaration. Refusing it is a complete answer to
-  both, and needs no dependency;
+  both. It is decided by an XML parser, not by looking for bytes, so a comment before
+  it or UTF-16 hides nothing (#378);
 * a nesting cap on the JSON. A career record is not forty levels deep, so anything that is
   is not one;
 * **no key is assumed to be present, and no value is assumed to have the type it should**.
@@ -67,6 +68,8 @@ import datetime as dt
 import json
 from xml.etree import ElementTree
 
+from defusedxml import DefusedXmlException
+from defusedxml.ElementTree import fromstring as parse_xml
 from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import MAX_IMPORT_BYTES, ImportRefused, Record, refuse_unreadable
@@ -283,17 +286,18 @@ def _levels(level) -> dict[str, str]:
 def read_xml(data: bytes) -> Record:
     """Read Europass XML, in either format. Raises :class:`EuropassError` with the reason.
 
-    A DOCTYPE has already been refused by ``refuse_unreadable``, which is what makes
-    ``fromstring`` below safe to call. The reasoning lives with the refusal, in
-    ``plugins/base.py``.
+    A DOCTYPE is refused by ``refuse_unreadable`` before this is called, and again here:
+    the parser is ``defusedxml``'s, which forbids a document type declaration whatever
+    its position or encoding, so calling this directly on such a document raises rather
+    than expanding an entity (#378).
 
     Which format is decided by the root element, because both are XML: a ``Candidate`` in
     a Europass namespace is what europass.europa.eu writes today, and anything carrying a
     ``LearnerInfo`` is the format of the editor before it.
     """
     try:
-        root = ElementTree.fromstring(data)  # noqa: S314 - no DOCTYPE, and nothing is fetched
-    except ElementTree.ParseError as error:
+        root = parse_xml(data, forbid_dtd=True)
+    except (ElementTree.ParseError, DefusedXmlException) as error:
         raise EuropassError(
             _("That file is not readable XML: %(reason)s") % {"reason": error}
         ) from error

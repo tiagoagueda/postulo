@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A career file's document type declaration is now found wherever it sits (after a long comment, or in UTF-16) and the Europass reader parses with `defusedxml`, so a declaration can no longer slip past the refusal and have its entities expanded (#378)
 - Appointing an administrator no longer makes them a superuser, and Django's admin lists no person's records. **Administrators appointed before keep the flag; clear it with `manage.py shell` (see the wiki's *Accounts and invitations*).** (#368)
 - The image carries `/app/constraints.txt`, so a plugin installed on top of it cannot move anything Postulo pins; the wiki's examples use it. (#542)
 - Wrong tokens presented to /logs and /metrics are counted per address and shut it out after ten an hour; a token shorter than 24 characters is warned about. (#472)
