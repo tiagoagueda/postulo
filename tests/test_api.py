@@ -10,7 +10,7 @@ from django.utils import timezone
 from postulo.api.models import SCOPES, ApiToken
 from postulo.applications.models import Application, Reminder, Status
 from postulo.documents.models import CV, CoverLetter, UploadedDocument
-from postulo.jobs.models import Company, Contact, JobPosting
+from postulo.jobs.models import Company, Contact, Industry, JobPosting
 
 pytestmark = pytest.mark.django_db
 
@@ -576,3 +576,62 @@ def test_me_says_the_owners_time_zone(client, user):
     user.profile.time_zone = "America/New_York"
     user.profile.save()
     assert client.get("/api/v1/me", **issue(user)).json()["time_zone"] == "America/New_York"
+
+
+def test_a_refused_company_or_interview_write_keeps_nothing(client, user, search):
+    """The check that refuses came after the saves, and the request committed them (#435)."""
+    from postulo.applications.models import Interview, InterviewKind
+    from postulo.applications.services import schedule_interview
+
+    bearer = issue(user, "write", "read")
+    company = search["company"]
+    bad = [{"scheme": "lei", "value": "not-a-lei"}]
+
+    response = post(
+        client,
+        "/api/v1/companies",
+        {"name": "Mesa", "website": "https://mesa.example", "identifiers": bad},
+        **bearer,
+    )
+    assert response.status_code == 422
+    assert not Company.objects.filter(owner=user, name="Mesa").exists()
+
+    response = post(
+        client,
+        "/api/v1/companies",
+        {"name": "aperture science", "website": "https://changed.example", "identifiers": bad},
+        **bearer,
+    )
+    assert response.status_code == 422
+    company.refresh_from_db()
+    assert company.website != "https://changed.example"
+
+    company.industries.add(*Industry.named(user, ["Research"]))
+    response = patch(
+        client,
+        f"/api/v1/companies/{company.pk}",
+        {"name": "Renamed", "industries": ["Software"], "identifiers": bad},
+        **bearer,
+    )
+    assert response.status_code == 422
+    company.refresh_from_db()
+    assert company.name == "Aperture Science"
+    assert [i.name for i in company.industries.all()] == ["Research"]
+
+    interview = schedule_interview(
+        search["application"],
+        kind=InterviewKind.VIDEO,
+        starts_at=timezone.now() + dt.timedelta(days=3),
+        location="Room 1",
+    )
+    stranger = Contact.objects.create(
+        owner=user, company=Company.objects.create(owner=user, name="Elsewhere"), name="Chell"
+    )
+    response = patch(
+        client,
+        f"/api/v1/interviews/{interview.pk}",
+        {"location": "Moved", "contact_ids": [stranger.pk]},
+        **bearer,
+    )
+    assert response.status_code == 422
+    assert Interview.objects.get(pk=interview.pk).location == "Room 1"

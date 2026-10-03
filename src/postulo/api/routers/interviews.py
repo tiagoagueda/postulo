@@ -166,11 +166,15 @@ def change_interview(request, pk: int, payload: InterviewPatch):
             _("%(later)s must be after %(earlier)s.")
             % {"later": "'ends_at'", "earlier": "'starts_at'"},
         )
+    # Looked up before anything is saved, so a refusal leaves the interview as it was (#435).
+    contacts = (
+        None if contact_ids is None else _contacts(request, interview.application, contact_ids)
+    )
     for name, value in data.items():
         setattr(interview, name, value)
     interview.save()
-    if contact_ids is not None:
-        interview.contacts.set(_contacts(request, interview.application, contact_ids))
+    if contacts is not None:
+        interview.contacts.set(contacts)
     reschedule_interview(interview, starts_at=starts_at, ends_at=ends_at, actor=actor_of(request))
     return interview_out(request, owned_or_404(request, _queryset(request), pk))
 

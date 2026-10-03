@@ -257,6 +257,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- API: a refused `POST`/`PATCH` of a company or `PATCH` of an interview (bad identifier, contact from another company) no longer keeps the changes it made before the refusal. (#435)
 - API: a time sent without an offset (`starts_at`, `due_at`, `occurred_at`, `updated_since`) is a 422 naming the field instead of a 500 or a reminder moved into the server's zone; `/me` now says the owner's `time_zone`. (#567)
 A scheduled sync now runs in its owner's language and time zone, like *Sync now*, so the reminders, timeline entries, notes and report it writes name the owner's hour and read in their language. (#335)
 With a background worker, slow work (reports, frozen letters, exports, captures) is done in its owner's language and time zone instead of the server's, so a report covers the period the page showed and a letter carries the owner's date. (#383)

@@ -1,5 +1,6 @@
 """Companies and the people at them."""
 
+from django.db import transaction
 from django.db.models import Q
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
@@ -55,18 +56,22 @@ def list_companies(
 def add_company(request, payload: CompanyIn):
     """Matched by name, case-insensitively, as the forms do: no second Acme."""
     wikidata = next((i.value for i in payload.identifiers if i.scheme == identifiers.WIKIDATA), "")
-    company = get_or_create_company(request.auth.owner, payload.name, wikidata=wikidata)
-    for field in ("website", "careers_url", "location", "notes"):
-        value = getattr(payload, field)
-        if value:
-            setattr(company, field, value)
-    if payload.kind in CompanyKind.values:
-        company.kind = payload.kind
-    company.save()
-    if payload.industries:
-        company.industries.add(*Industry.named(request.auth.owner, payload.industries))
-    if payload.identifiers:
-        identifiers_or_422(company, payload.identifiers)
+    # One transaction for the whole write: a refusal is an `HttpError` the handler turns
+    # into a response, so the request still commits, and what was saved before the refusal
+    # would stay (#435).
+    with transaction.atomic():
+        company = get_or_create_company(request.auth.owner, payload.name, wikidata=wikidata)
+        for field in ("website", "careers_url", "location", "notes"):
+            value = getattr(payload, field)
+            if value:
+                setattr(company, field, value)
+        if payload.kind in CompanyKind.values:
+            company.kind = payload.kind
+        company.save()
+        if payload.industries:
+            company.industries.add(*Industry.named(request.auth.owner, payload.industries))
+        if payload.identifiers:
+            identifiers_or_422(company, payload.identifiers)
     return Status(201, company_out(_detail(request, company.pk), detail=True))
 
 
@@ -104,14 +109,15 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     data.pop("identifiers", None)
     if data.get("name") is not None:
         data["name"] = _name_or_refusal(request, company, data["name"])
-    for field, value in data.items():
-        if value is not None:
-            setattr(company, field, value)
-    company.save()
-    if industries is not None:
-        company.industries.set(Industry.named(request.auth.owner, industries))
-    if payload.identifiers is not None:
-        identifiers_or_422(company, payload.identifiers, replace=True)
+    with transaction.atomic():  # a refusal below undoes the saves above it (#435)
+        for field, value in data.items():
+            if value is not None:
+                setattr(company, field, value)
+        company.save()
+        if industries is not None:
+            company.industries.set(Industry.named(request.auth.owner, industries))
+        if payload.identifiers is not None:
+            identifiers_or_422(company, payload.identifiers, replace=True)
     return company_out(_detail(request, pk), detail=True)
 
 
