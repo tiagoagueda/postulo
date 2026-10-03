@@ -196,6 +196,16 @@ def major_of(code: str) -> str:
     return entry["major"] if entry else ""
 
 
+def _forms(label: str) -> list[str]:
+    """The names one label holds: ESCO writes both genders of an occupation in one string,
+    ``développeur de logiciels/développeuse de logiciels``, and a title is typed as one of
+    them. The whole label is kept as well, for the few that have another slash in them."""
+    forms = [label]
+    if "/" in label:
+        forms.extend(part for part in label.split("/"))
+    return [folded for folded in (_fold(form) for form in forms) if folded]
+
+
 @lru_cache(maxsize=32)
 def _occupations_by_name(reading: str) -> dict[str, str]:
     """``{folded occupation name: unit group}`` for one language, so a typed title can find
@@ -203,19 +213,23 @@ def _occupations_by_name(reading: str) -> dict[str, str]:
 
     The value is the unit group rather than the occupation, because that is the level a
     report can say and a picker can offer. Two occupations that share a name in one
-    language point at the same group, which is the only answer a four-digit code can give.
+    language and sit in one group give that group; a name that sits in more than one gives
+    nothing, because a four-digit code cannot say which -- as for skills, no match is
+    better than an arbitrary one.
     """
-    return {
-        (entry["names"].get(reading) or entry["names"].get(FALLBACK, "")).casefold(): entry["isco"]
-        for entry in classification()["occupations"].values()
-    }
+    groups: dict[str, set[str]] = {}
+    for entry in classification()["occupations"].values():
+        label = entry["names"].get(reading) or entry["names"].get(FALLBACK, "")
+        for folded in _forms(label):
+            groups.setdefault(folded, set()).add(entry["isco"])
+    return {name: next(iter(found)) for name, found in groups.items() if len(found) == 1}
 
 
 @lru_cache(maxsize=32)
 def _unit_groups_by_name(reading: str) -> dict[str, str]:
     """``{folded unit group name: code}`` for one language, the level the picker offers."""
     return {
-        (entry["names"].get(reading) or entry["names"].get(FALLBACK, "")).casefold(): code
+        _fold(entry["names"].get(reading) or entry["names"].get(FALLBACK, "")): code
         for code, entry in classification()["unit_groups"].items()
     }
 
@@ -229,7 +243,7 @@ def code_for(name: str, language: str = "") -> str:
     an English title out of a form they were sent. A name that matches nothing has no
     code, which is the ordinary case and not a failure.
     """
-    folded = (name or "").strip().casefold()
+    folded = _fold(name)
     if not folded:
         return ""
     reading = _reading(language)

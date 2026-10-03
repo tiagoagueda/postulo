@@ -119,8 +119,13 @@ def test_an_english_occupation_name_finds_its_unit_group():
     is found among the occupation names, and the unit group it belongs to is the code.
     """
     document = esco.classification()
+    groups: dict[str, set[str]] = {}
     for entry in document["occupations"].values():
-        assert esco.code_for(entry["names"]["en"], "en") == entry["isco"]
+        groups.setdefault(entry["names"]["en"], set()).add(entry["isco"])
+    for entry in document["occupations"].values():
+        # A name that sits in two unit groups has no code from the occupations (#533).
+        if len(groups[entry["names"]["en"]]) == 1:
+            assert esco.code_for(entry["names"]["en"], "en") == entry["isco"]
 
 
 def test_the_suggestions_are_the_unit_groups_and_only_them():
