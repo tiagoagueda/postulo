@@ -257,6 +257,7 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- Saving an offer without changing its terms (a note, or nothing) no longer writes "Offer revised", sends a webhook, reopens a ticked-off answer-by reminder or undoes a postponement; the reminder follows only a moved date. (#442)
 - *Interviews attended* (Insights and the employment-office report) no longer counts a no-show, nor a held interview that was moved or settled again; a no-show is its own kind of timeline entry. (#448)
 - Editing an interview no longer drops a contact who has since moved company: they stay on the form, with their company beside the name, until you untick them. (#443)
 - API: a refused `POST`/`PATCH` of a company or `PATCH` of an interview (bad identifier, contact from another company) no longer keeps the changes it made before the refusal. (#435)

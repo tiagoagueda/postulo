@@ -1487,7 +1487,7 @@ class OfferUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         offer = form.save()
         # The revision is written on the timeline and the reminder follows the date, which
         # is the service's business and not the form's.
-        revise_offer(offer)
+        revise_offer(offer, changed=form.changed_data)
         messages.success(self.request, _("Offer updated."))
         return redirect(f"{offer.application.get_absolute_url()}#offers")
 

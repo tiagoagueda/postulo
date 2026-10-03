@@ -342,3 +342,67 @@ def test_the_terms_keep_the_catalogues_case(user, application, german):
     )
     with german({"%(figure)s %(currency)s per year": "%(figure)s %(currency)s Pro Jahr"}):
         assert offer.terms.endswith("EUR Pro Jahr")
+
+
+# ------------------------------------------- an edit that changes nothing (#442)
+
+
+def edit_offer(client, offer, **changes):
+    """The offer page saved the way a browser would: every field as it is, then the change."""
+    data = {
+        "base_amount": str(offer.base_amount),
+        "currency": offer.currency,
+        "period": offer.period,
+        "answer_by": offer.answer_by.isoformat() if offer.answer_by else "",
+        "notes": offer.notes,
+        **changes,
+    }
+    response = client.post(reverse("applications:offer_update", args=[offer.pk]), data)
+    assert response.status_code == 302, response.content
+    offer.refresh_from_db()
+
+
+def test_editing_only_the_notes_leaves_the_timeline_and_a_ticked_off_reminder_alone(
+    client, user, application
+):
+    offer = record_offer(
+        application, base_amount=Decimal("65000"), currency="EUR", answer_by=a_week_out()
+    )
+    Reminder.objects.get(pk=offer.reminder_id).complete()
+    before = application.events.count()
+    client.force_login(user)
+
+    edit_offer(client, offer, notes="Spoke to Cave")
+
+    assert offer.notes == "Spoke to Cave"
+    assert application.events.count() == before
+    assert Reminder.objects.get(pk=offer.reminder_id).done_at is not None
+
+
+def test_a_postponed_reminder_stays_put_when_only_the_notes_are_edited(client, user, application):
+    offer = record_offer(
+        application, base_amount=Decimal("65000"), currency="EUR", answer_by=a_week_out()
+    )
+    later = timezone.now() + dt.timedelta(days=2)
+    Reminder.objects.filter(pk=offer.reminder_id).update(due_at=later)
+    client.force_login(user)
+
+    edit_offer(client, offer, notes="Still thinking")
+    edit_offer(client, offer)
+
+    assert Reminder.objects.get(pk=offer.reminder_id).due_at == later
+
+
+def test_a_moved_answer_date_still_moves_the_reminder(client, user, application):
+    offer = record_offer(
+        application, base_amount=Decimal("65000"), currency="EUR", answer_by=a_week_out()
+    )
+    Reminder.objects.get(pk=offer.reminder_id).complete()
+    client.force_login(user)
+    new_day = a_week_out() + dt.timedelta(days=5)
+
+    edit_offer(client, offer, answer_by=new_day.isoformat())
+
+    reminder = Reminder.objects.get(pk=offer.reminder_id)
+    assert timezone.localdate(reminder.due_at) == new_day - dt.timedelta(days=1)
+    assert application.events.filter(kind=EventKind.OFFER, summary__startswith="Offer revised")

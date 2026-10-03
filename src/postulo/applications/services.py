@@ -702,7 +702,9 @@ def _remind_to_answer(offer: Offer) -> None:
 
     Made when the date is set, moved when it moves, ticked off when it is taken away or has
     already passed. Through `postpone_reminder`, so a moved date is announced again at its
-    new time rather than silenced by the stamp from the old one.
+    new time rather than silenced by the stamp from the old one. Called only when the date
+    is what changed: a reminder that was ticked off, put off or deleted is the person's
+    answer to it, and an edit to something else must not undo that (#442).
     """
     reminder = offer.reminder
     if offer.answer_by is None:
@@ -755,6 +757,24 @@ def record_offer(application: Application, *, actor: str = "", **fields) -> Offe
     return offer
 
 
+#: What an offer says that a revision is about. Its notes are the person's own and say
+#: nothing new about the offer (#442).
+OFFER_TERMS = frozenset(
+    {
+        "base_amount",
+        "currency",
+        "period",
+        "variable_pay",
+        "equity",
+        "benefits",
+        "location",
+        "holidays",
+        "starts_on",
+        "answer_by",
+    }
+)
+
+
 @transaction.atomic
 def withdraw_offer(offer: Offer) -> None:
     """Delete an offer and tick off its answer-by reminder (#444)."""
@@ -765,14 +785,23 @@ def withdraw_offer(offer: Offer) -> None:
 
 
 @transaction.atomic
-def revise_offer(offer: Offer, *, actor: str = "") -> Offer:
-    """After an offer's row has been edited: the revision on the timeline, the reminder moved."""
+def revise_offer(offer: Offer, *, changed=None, actor: str = "") -> Offer:
+    """After an offer's row has been edited: the revision on the timeline, the reminder moved.
+
+    ``changed`` names the fields that were edited. An edit that touched none of the terms
+    -- the notes, or nothing at all -- is not a revision, so it writes nothing, tells nobody
+    and leaves the reminder alone; the reminder follows only a moved ``answer_by``. Without
+    it everything is taken to have changed.
+    """
+    if changed is not None and not OFFER_TERMS & set(changed):
+        return offer
     entry = record_event(
         offer.application,
         kind=EventKind.OFFER,
         summary=_offer_summary(offer, revised=True),
         actor=actor,
     )
-    _remind_to_answer(offer)
+    if changed is None or "answer_by" in changed:
+        _remind_to_answer(offer)
     _tell_offer(offer, entry, revised=True, actor=actor)
     return offer
