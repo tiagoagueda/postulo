@@ -169,6 +169,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A saved view can be named in any script (Greek, Cyrillic, Arabic, Ge'ez and the rest): it was refused as nameless, and two names sharing a number replaced each other. A name with no letter or digit now says so. (#504)
 - The Tags list on an application's forms has a name with scripts off: its heading is now a real label for the list. (#625)
 - A mistake in the plugin repository form on *Server settings → Plugins* now shows the form with its error, instead of a blank *405 Method Not Allowed* page. (#491)
 - Importing an archive keeps the links on a CV: they were dropped as "no such record" and the CV came back without its portfolio and profile lines. (#470)

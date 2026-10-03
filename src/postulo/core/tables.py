@@ -344,7 +344,7 @@ class View:
         if not isinstance(raw, dict):
             return None
         name = str(raw.get("name") or "").strip()[:60]
-        slug = str(raw.get("slug") or slugify(name))[:60]
+        slug = str(raw.get("slug") or slugify(name, allow_unicode=True))[:60]
         if not name or not slug:
             return None
         columns = raw.get("columns")
@@ -534,7 +534,7 @@ class Table:
         the name was already taken. The page number and the view's own name are dropped from
         the query, because neither is part of the question."""
         name = " ".join((name or "").split())[:60]
-        slug = slugify(name)[:60]
+        slug = slugify(name, allow_unicode=True)[:60]
         if not name or not slug:
             return dict(current or {})
         kept = QueryDict(mutable=True)

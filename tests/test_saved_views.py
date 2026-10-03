@@ -98,6 +98,36 @@ def test_the_rest_of_the_settings_are_untouched_by_a_view():
 # ------------------------------------------------------------------ applying one
 
 
+@pytest.mark.parametrize("name", ["Αιτήσεις σε αναμονή", "Заявки", "طلبات", "ዝርዝር"])
+def test_a_name_in_any_script_keeps_a_view_that_a_link_reaches(user, name):
+    settings = CompaniesTable.save_view({}, name, "location=mexico", ["name"])
+    (view,) = CompaniesTable._views_of(settings)
+    assert view.name == name and view.slug
+
+    listed = table_for(user, settings=settings)
+    url = listed.view_url(view)
+    query = url.partition("?")[2]
+    applied = table_for(user, query=query, settings=settings)
+    assert applied.applied_view == view
+
+
+def test_names_that_differ_only_in_script_are_two_views_even_with_the_same_number():
+    settings = CompaniesTable.save_view({}, "Заявки 2026", "location=a", ["name"])
+    settings = CompaniesTable.save_view(settings, "Отказы 2026", "location=b", ["name"])
+    assert [v.name for v in CompaniesTable._views_of(settings)] == ["Заявки 2026", "Отказы 2026"]
+
+
+def test_a_name_of_punctuation_alone_is_refused_with_a_message_that_says_so(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("core:table_views", args=["companies"]),
+        {"action": "save", "name": "🎉!!!", "next": "/jobs/companies/"},
+        follow=True,
+    )
+    assert "needs at least one letter or digit" in response.content.decode()
+    assert not CompaniesTable._views_of(tables.settings_for(user, "companies"))
+
+
 def test_choosing_a_view_is_a_link_and_it_brings_its_columns(user):
     settings = CompaniesTable.save_view(
         {"columns": ["name"]}, "Wide", "location=mexico", ["name", "location", "website"]

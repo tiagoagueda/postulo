@@ -67,7 +67,10 @@ def table_views(request: HttpRequest, name: str) -> HttpResponse:
             table(request, current).visible_keys_in_order,
         )
         if saved == current:
-            messages.error(request, _("A view needs a name."))
+            if title.strip():
+                messages.error(request, _("A view's name needs at least one letter or digit."))
+            else:
+                messages.error(request, _("A view needs a name."))
         else:
             tables.save_settings(request.user, name, saved)
             messages.success(request, _("View saved."))
