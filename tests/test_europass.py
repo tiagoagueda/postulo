@@ -11,6 +11,7 @@ in, are ``test_europass_candidate.py`` (#244).
 """
 
 import datetime as dt
+import json
 from pathlib import Path
 
 import pytest
@@ -729,3 +730,46 @@ def test_the_review_page_says_that_no_level_will_be_claimed(client, user):
     client.post(url, {"file": upload("cv.xml", NO_LEVELS)})
 
     assert "no level in the file" in client.get(url).content.decode()
+
+
+def test_an_achievement_with_no_title_keeps_all_of_its_description():
+    """The name is a first line cut at a word; the rest of the text must not vanish."""
+    text = (
+        "Wrote the migration plan for the billing platform and led the cut-over across "
+        "three regions without a minute of downtime."
+    )
+    data = (
+        b'<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass"><LearnerInfo>'
+        b"<Achievement><Achievement><Description><Label>"
+        + text.encode()
+        + b"</Label></Description>"
+        b"</Achievement></Achievement></LearnerInfo></SkillsPassport>"
+    )
+
+    (project,) = europass.read(data).projects
+
+    assert project["summary"] == text
+    assert text.startswith(project["name"].rstrip("…"))
+    assert len(project["name"]) <= 80
+    assert not project["name"].rstrip("…").endswith(("th", "ac"))
+
+
+def test_every_skill_under_one_heading_is_kept():
+    lines = "\n".join(f"Skill {number}" for number in range(55))
+    document = {"LearnerInfo": {"Skills": {"Computer": {"Description": lines}}}}
+    data = json.dumps(document).encode()
+
+    (group,) = europass.read(data).skill_groups
+
+    assert len(group["skills"]) == 55
+
+
+@pytest.mark.parametrize(
+    "skills",
+    ['"a string"', '{"Computer": "Python; Django"}', '{"Computer": ["Python"]}'],
+)
+def test_json_skills_of_the_wrong_shape_are_said_out_loud(skills):
+    record = europass.read(('{"LearnerInfo": {"Skills": ' + skills + "}}").encode())
+
+    assert record.skill_groups == []
+    assert any("could not be read" in note for note in record.skipped)

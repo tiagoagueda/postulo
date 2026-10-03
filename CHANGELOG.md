@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Europass import no longer silently cuts content: an untitled entry keeps its whole description, a heading's skills are no longer capped at forty, and a JSON Skills block of the wrong shape is reported as unreadable (#640)
 - Europass import: skill group headings (Digital, Job-related, ...) are now written in the language the file states for the CV, not the interface language of whoever imports it (#641)
 - The address notes are now whole translated sentences, one per label ("Post to this country usually needs a postcode."), so "a address" and "A Eircode" are gone and no label or English country name is pasted into a sentence. (#642)
 - A company register number typed without a country code (HRB 12345, KVK 12345678) is no longer split into invented letters and saved; it is refused with the example, as is a prefix that is not a country code. (#636)

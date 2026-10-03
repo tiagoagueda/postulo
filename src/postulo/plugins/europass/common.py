@@ -13,6 +13,7 @@ from __future__ import annotations
 import calendar
 import datetime as dt
 import re
+import textwrap
 
 from django.core.exceptions import ValidationError
 from django.utils import translation
@@ -121,9 +122,21 @@ def _heading(label, locale: str) -> str:
 
 
 def _project_from(title: str, description: str) -> dict | None:
+    """A project from an entry, which may have a title, a description, or only the second.
+
+    With no title the name is the description's first line, shortened at a word, and the
+    whole description is kept as the summary: cutting it to a name would lose the rest
+    without a word, on a review page that is supposed to show everything that was read.
+    """
     if not title and not description:
         return None
-    return {"name": title or description[:80], "summary": description if title else ""}
+    if title:
+        return {"name": title, "summary": description}
+    first = description.strip().splitlines()[0].strip()
+    name = textwrap.shorten(first, 80, placeholder="…") if len(first) > 80 else first
+    if name == "…":  # one word longer than the limit: cut it, there is no boundary
+        name = first[:79] + "…"
+    return {"name": name, "summary": "" if name == description.strip() else description}
 
 
 # ------------------------------------------------------------ walking the XML

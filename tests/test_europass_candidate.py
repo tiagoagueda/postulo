@@ -921,3 +921,27 @@ def test_a_number_typed_with_its_leading_zero_is_stored_as_dialled(user, country
     importing.apply(user, europass.read(candidate_xml(person=channel)))
 
     assert user.profile.phone_numbers.get().number == stored
+
+
+def test_an_other_with_no_title_keeps_all_of_its_description():
+    text = (
+        "Wrote the migration plan for the billing platform and led the cut-over across "
+        "three regions without a minute of downtime."
+    )
+    data = candidate_xml(f"<Others><Other><Description>{text}</Description></Other></Others>")
+
+    (project,) = europass.read(data).projects
+
+    assert project["summary"] == text
+    assert len(project["name"]) <= 80
+
+
+def test_every_skill_in_a_group_is_kept():
+    skills = "".join(f"<DigitalSkill>Skill {number}</DigitalSkill>" for number in range(55))
+    data = candidate_xml(
+        f"<DigitalSkills><DigitalSkillsGroup>{skills}</DigitalSkillsGroup></DigitalSkills>"
+    )
+
+    (group,) = europass.read(data).skill_groups
+
+    assert len(group["skills"]) == 55

@@ -466,9 +466,7 @@ def _read_skills(learner, record: Record) -> None:
         if lines:
             # `str()` now rather than a lazy string: what is read is held in the session
             # between the review page and the confirmation, and a session is JSON.
-            record.skill_groups.append(
-                {"name": _heading(label, record.locale), "skills": lines[:40]}
-            )
+            record.skill_groups.append({"name": _heading(label, record.locale), "skills": lines})
 
 
 def _read_achievements(learner, record: Record) -> None:
@@ -711,11 +709,17 @@ def _read_json_education(learner: dict, record: Record) -> None:
 
 
 def _read_json_skills(learner: dict, record: Record) -> None:
-    skills = _obj(learner.get("Skills"))
+    block = learner.get("Skills")
+    if not _readable(record, block, _("Skills")):
+        return
+    skills = _obj(block)
     if skills is None:
         return
 
-    linguistic = _obj(skills.get("Linguistic")) or {}
+    linguistic = skills.get("Linguistic")
+    if not _readable(record, linguistic, _("Skills")):
+        linguistic = None
+    linguistic = _obj(linguistic) or {}
     for mother in _rows(linguistic.get("MotherTongue")):
         name = _json_text(mother, "Description")
         if name:
@@ -733,14 +737,14 @@ def _read_json_skills(learner: dict, record: Record) -> None:
         record.languages.append({"name": name, "proficiency": _lowest(levels), "levels": levels})
 
     for heading, label in SKILL_HEADINGS:
+        if not _readable(record, skills.get(heading), label):
+            continue
         block = _obj(skills.get(heading))
         if block is None:
             continue
         lines = _split_skills(_json_text(block, "Description", keep_lines=True))
         if lines:
-            record.skill_groups.append(
-                {"name": _heading(label, record.locale), "skills": lines[:40]}
-            )
+            record.skill_groups.append({"name": _heading(label, record.locale), "skills": lines})
 
 
 def _read_json_achievements(learner: dict, record: Record) -> None:
