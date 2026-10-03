@@ -37,6 +37,9 @@ class Command(BaseCommand):
         install.add_argument(
             "--by", default="command line", help="Who to record as having done it."
         )
+        install.add_argument(
+            "--catalogue", default="", help="Install the name from this catalogue only."
+        )
         remove = sub.add_parser("remove", help="Remove a plugin and forget it.")
         remove.add_argument("name")
         for action, help_text in (
@@ -93,7 +96,7 @@ class Command(BaseCommand):
                 entry = installing.install_wheel(path, by=options["by"])
             else:
                 replaces = installing.installed(what) is not None
-                entry = catalogue.install(what, by=options["by"])
+                entry = catalogue.install(what, by=options["by"], catalogue=options["catalogue"])
         except (installing.InstallError, catalogue.CatalogueError) as error:
             raise CommandError(str(error)) from error
         self.stdout.write(f"Installed {entry.name} {entry.version} from {entry.origin}.")

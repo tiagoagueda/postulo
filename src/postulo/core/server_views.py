@@ -1634,7 +1634,14 @@ class PluginActionView(StaffRequiredMixin, View):
         name = request.POST.get("name", "")
         replaces = installed(name) is not None
         try:
-            entry = catalogue.install(name, by=request.user.get_username())
+            # The catalogue and the version the pressed row showed, not whatever lists the
+            # name first (#601).
+            entry = catalogue.install(
+                name,
+                by=request.user.get_username(),
+                catalogue=request.POST.get("catalogue", ""),
+                version=request.POST.get("version", ""),
+            )
         except (catalogue.CatalogueError, InstallError) as error:
             messages.error(request, str(error))
             return redirect("server:plugins")

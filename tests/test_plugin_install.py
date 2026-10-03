@@ -742,6 +742,85 @@ def test_a_plugin_no_catalogue_lists_cannot_be_installed_by_name(served, setting
         catalogue.install("something-else")
 
 
+@pytest.fixture
+def two_catalogues(monkeypatch, tmp_path, settings):
+    """Two catalogues listing the same name, each with a wheel of its own."""
+    held, served = {}, {}
+    for label, version in (("alpha", "1.0"), ("beta", "2.0")):
+        folder = tmp_path / label
+        folder.mkdir()
+        wheel = a_wheel(folder, version=version)
+        index, signature, public = a_catalogue(wheel, version=version)
+        index = index.replace(
+            b"https://plugins.example.org/", f"https://{label}.example.org/".encode()
+        )
+        # Re-signed: the index carries the address its own host serves the wheel from.
+        key = Ed25519PrivateKey.generate()
+        signature = base64.b64encode(key.sign(index)).decode()
+        public = base64.b64encode(key.public_key().public_bytes_raw()).decode()
+        served[label] = {"index": index, "signature": signature, "wheel": wheel.read_bytes()}
+        held[label] = (public, wheel.name)
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        mine = served[request.url.host.split(".")[0]]
+        path = request.url.path
+        if path.endswith("/index.json"):
+            return httpx.Response(200, content=mine["index"])
+        if path.endswith("/index.json.sig"):
+            return httpx.Response(200, content=mine["signature"].encode())
+        if path.endswith(".whl"):
+            return httpx.Response(200, content=mine["wheel"])
+        return httpx.Response(404)
+
+    def client(**kwargs):
+        kwargs.pop("event_hooks", None)
+        kwargs.setdefault("timeout", 10)
+        return httpx.Client(transport=httpx.MockTransport(handler), **kwargs)
+
+    monkeypatch.setattr(catalogue.http, "client", client)
+    settings.POSTULO_PLUGIN_CATALOGUES = ",".join(
+        f"{label}|https://{label}.example.org/index.json|{held[label][0]}" for label in held
+    )
+    return served
+
+
+def test_installing_from_a_named_catalogue_installs_that_catalogues_wheel(
+    two_catalogues, plugins_dir, installer
+):
+    entry = catalogue.install("postulo-example", catalogue="beta", version="2.0")
+
+    assert entry.origin == "catalogue:beta"
+    assert entry.version == "2.0"
+
+
+def test_a_name_two_catalogues_list_is_refused_unless_one_is_chosen(
+    two_catalogues, plugins_dir, installer
+):
+    with pytest.raises(catalogue.CatalogueError, match="several catalogues"):
+        catalogue.install("postulo-example")
+    assert installing.installed("postulo-example") is None
+
+    # And the catalogue that no longer lists the release is not swapped for another.
+    with pytest.raises(catalogue.CatalogueError, match="No catalogue lists"):
+        catalogue.install("postulo-example", catalogue="alpha", version="2.0")
+
+
+def test_the_install_form_posts_the_catalogue_and_installs_from_it(
+    client, admin, two_catalogues, plugins_dir, installer
+):
+    client.force_login(admin)
+    client.post(reverse("server:plugin_action"), {"action": "refresh"})
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert 'name="catalogue" value="beta"' in html and 'name="version" value="2.0"' in html
+
+    client.post(
+        reverse("server:plugin_action"),
+        {"action": "install", "name": "postulo-example", "catalogue": "beta", "version": "2.0"},
+    )
+
+    assert installing.installed("postulo-example").origin == "catalogue:beta"
+
+
 # ------------------------------------------------------------- the page
 
 

@@ -435,6 +435,8 @@
                 <form method="post" action="{% url 'server:plugin_action' %}">
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ listing.name }}">
+                  <input type="hidden" name="catalogue" value="{{ listing.catalogue }}">
+                  <input type="hidden" name="version" value="{{ listing.version }}">
                   <input type="hidden" name="action" value="install">
                   <button type="submit" class="btn" data-variant="outline" data-size="sm">
                     {% if listing.installed %}{% translate "Reinstall" %}{% else %}{% translate "Install" %}{% endif %}

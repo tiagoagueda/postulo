@@ -259,7 +259,9 @@ def _get(client: httpx.Client, url: str, cap: int) -> bytes:
     return content
 
 
-def find(catalogues: list[Catalogue], plugin: str, version: str = "") -> tuple[Listing, Release]:
+def find(
+    catalogues: list[Catalogue], plugin: str, version: str = "", *, catalogue: str = ""
+) -> tuple[Listing, Release]:
     """The listing for a plugin and the release to install: the newest, or a named one.
 
     ``version`` is what a restore asks for. `plugins sync` puts back what the record says
@@ -268,10 +270,15 @@ def find(catalogues: list[Catalogue], plugin: str, version: str = "") -> tuple[L
     been installed, so the restore failed the moment the catalogue moved on, and would have
     silently upgraded the plugin if it had not (#228). An upgrade is a decision somebody
     makes; a restore is not the moment to make it for them.
+
+    With ``catalogue``, only that catalogue is searched: the publisher is the administrator's
+    choice and the first one that happens to list a name is not (#601).
     """
     canonical = canonicalise(plugin)
-    for catalogue in catalogues:
-        for listing in catalogue.listings:
+    for one in catalogues:
+        if catalogue and one.name != catalogue:
+            continue
+        for listing in one.listings:
             if canonicalise(listing.name) != canonical:
                 continue
             if not version and listing.latest:
@@ -326,16 +333,40 @@ def download(release: Release, into: Path) -> Path:
     return target
 
 
-def install(plugin: str, *, by: str = ""):
-    """Fetch, verify and install one plugin named in a configured catalogue."""
+def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""):
+    """Fetch, verify and install one plugin named in a configured catalogue.
+
+    With ``catalogue`` and ``version`` it is that catalogue's release that is installed, which
+    is what pressing Install on a row means; nothing else is fetched, and it is refused if
+    that catalogue no longer lists that release. Without ``catalogue`` a name that more than
+    one catalogue lists is refused rather than settled by whichever comes first (#601).
+    """
     from .installing import install_wheel
 
-    catalogues, problems = fetch_all()
+    if catalogue:
+        try:
+            catalogues, problems = [fetch(catalogue)], []
+        except (http.DestinationRefused, httpx.HTTPError) as error:
+            raise CatalogueError(f"{catalogue}: {error}") from error
+    else:
+        catalogues, problems = fetch_all()
     if not catalogues:
         raise CatalogueError(
             "; ".join(problems) or str(_("No catalogue is configured on this instance."))
         )
-    listing, release = find(catalogues, plugin)
+    if not catalogue:
+        canonical = canonicalise(plugin)
+        listing_it = [
+            one.name
+            for one in catalogues
+            if any(canonicalise(listed.name) == canonical for listed in one.listings)
+        ]
+        if len(listing_it) > 1:
+            raise CatalogueError(
+                str(_("%(name)s is listed by several catalogues (%(catalogues)s); say which."))
+                % {"name": plugin, "catalogues": ", ".join(listing_it)}
+            )
+    listing, release = find(catalogues, plugin, version, catalogue=catalogue)
     refuse_unless_it_fits(listing, release)
     with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
         wheel = download(release, Path(scratch))
