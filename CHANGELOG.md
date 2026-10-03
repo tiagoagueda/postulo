@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- @parcel/watcher 2.6.0, for GHSA-vfj7-8cjw-p6xm (a deeply nested pattern could exhaust the stack in braces), pinned by an npm override so that Tailwind stays at 4.3.3 and the stylesheet is unchanged; build-time only, nothing of it runs in the application. (#708)
 - An outbound request no longer writes its address to the log. The HTTP client recorded every URL at INFO, so staff and a log collector could read other people's capture, connection and webhook addresses. **Logs already kept hold those lines until they rotate out; delete `postulo.log*` to be rid of them now.** (#548)
 - An invitation opens one account: on PostgreSQL, sign-ups sent at the same moment through one invitation could each get one. (#544)
 - A new API token's secret is shown by the response that made it and stored nowhere: it used to wait in the session table, where a backup kept it if the next page was never drawn. Upgrading removes any left there. (#441)
