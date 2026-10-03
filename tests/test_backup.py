@@ -517,6 +517,30 @@ def test_a_restore_under_another_key_says_so_loudly(tmp_path, settings, capsys):
     assert "CANNOT be read here" in out and "POSTULO_FIELD_KEY" in out
 
 
+def test_a_restore_under_another_key_counts_the_mail_secrets_too(tmp_path, settings, capsys):
+    """The key check counted connections only, and said nothing was lost (#481)."""
+    from postulo.core.models import SiteSettings
+
+    a_search()
+    row = SiteSettings.get()
+    row.email_password = "smtp-secret"
+    row.save()
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+
+    User.objects.all().delete()
+    settings.POSTULO_FIELD_KEY = "an-entirely-different-key-42"
+
+    report = restore_backup(archive)
+    assert report.key_matches is False
+    assert report.connections_with_secrets == 0
+    assert report.site_secrets == 1
+
+    call_command("restore", str(archive), "--force")
+    out = capsys.readouterr().out
+    assert "nothing is lost" not in out
+    assert "CANNOT be read here" in out and "Server settings" in out
+
+
 def test_an_archive_from_before_the_plugins_went_in_still_restores(tmp_path, settings):
     """Format 1: no plugins, no fingerprint, and nothing to say about either."""
     a_search()

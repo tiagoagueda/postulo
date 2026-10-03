@@ -91,6 +91,10 @@ class RestoreReport:
     #: How many connections in the restored database actually hold an encrypted secret,
     #: so that a mismatch can be reported as a number of broken things and not a worry.
     connections_with_secrets: int = 0
+    #: How many of Server settings' encrypted stores hold a secret: the SMTP password, the
+    #: mail consent, and the mail and text transports' secrets (#481). Counted beside the
+    #: connections because they are under the same key and are read for every message.
+    site_secrets: int = 0
 
 
 def database_vendor() -> str:
@@ -148,6 +152,29 @@ def _connections_with_secrets() -> int:
     from postulo.plugins.models import Connection
 
     return Connection.objects.exclude(secrets_encrypted="").count()
+
+
+#: The columns of the policy row that are encrypted under the field key (#481).
+SITE_SECRET_COLUMNS = (
+    "email_password_encrypted",
+    "email_oauth_secrets_encrypted",
+    "transport_secrets_encrypted",
+    "text_secrets_encrypted",
+)
+
+
+def _site_secrets() -> int:
+    """How many of the policy row's encrypted stores hold something.
+
+    ``secrets.encrypt({})`` writes an empty string, so a store that is not empty has a
+    secret in it.
+    """
+    from postulo.core.models import SiteSettings
+
+    row = SiteSettings.objects.first()
+    if row is None:
+        return 0
+    return sum(1 for column in SITE_SECRET_COLUMNS if getattr(row, column))
 
 
 def busy_reason() -> str | None:
@@ -644,6 +671,7 @@ def restore_backup(
     call_command("migrate", interactive=False, verbosity=0)
     report.counts = _counts()
     report.connections_with_secrets = _connections_with_secrets()
+    report.site_secrets = _site_secrets()
     recorded = (manifest.get("secrets") or {}).get("field_key_sha256")
     if recorded:
         report.key_matches = recorded == secrets.fingerprint()

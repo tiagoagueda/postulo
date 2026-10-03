@@ -430,6 +430,7 @@ A document copy the scheduler is already sending is no longer sent a second time
 - *Export my data* and *Import* carry the reminders that are about no application, which were left out of the archive (format 30). Older archives still import. (#334)
 - The archive carries the files sent with an application and a sent document's *sent to* line, so a restored account keeps what went with each application and a sent PDF keeps its place (format 31). (#469)
 - `manage.py restore` onto a database that was never migrated, the state `POSTULO_SKIP_MIGRATE=1` leaves, restores instead of ending in a traceback. (#476)
+- `manage.py restore` counts the SMTP password, the mail consent and the transports' secrets under the field key, not only connections, and no longer says nothing is lost when they cannot be read. (#481)
 
 ## [0.3.0] — 2026-09-16
 

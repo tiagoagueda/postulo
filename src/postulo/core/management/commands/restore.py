@@ -72,21 +72,31 @@ class Command(BaseCommand):
 
         # The one thing a restore cannot bring with it, and the one thing whose absence is
         # invisible until a connection fails weeks later.
-        if report.key_matches is False and report.connections_with_secrets:
+        unreadable = []
+        if report.connections_with_secrets:
+            unreadable.append(f"{report.connections_with_secrets} connections")
+        if report.site_secrets:
+            unreadable.append(
+                f"{report.site_secrets} of the mail and text settings on Server settings "
+                "(the SMTP password, the mail consent, the transports' secrets)"
+            )
+        if report.key_matches is False and unreadable:
             self.stdout.write(
                 self.style.ERROR(
-                    f"  {report.connections_with_secrets} connections hold encrypted secrets "
-                    "that CANNOT be read here: this instance's key is not the one the backup "
-                    "was taken with. Set POSTULO_FIELD_KEY to that key — this instance "
-                    f"derives its own from {secrets.key_source()} — or open each connection "
-                    "and enter its password or token again."
+                    f"  {' and '.join(unreadable)} hold encrypted secrets that CANNOT be "
+                    "read here: this instance's key is not the one the backup was taken "
+                    "with. Set POSTULO_FIELD_KEY to that key — this instance derives its own "
+                    f"from {secrets.key_source()} — or enter each password or token again: "
+                    "on each connection, and on Server settings → Email for the SMTP "
+                    "password or the mail consent."
                 )
             )
         elif report.key_matches is False:
             self.stdout.write(
                 self.style.WARNING(
                     "  this instance's encryption key is not the one the backup was taken "
-                    "with; no connection holds a secret, so nothing is lost by it"
+                    "with; no connection and no server setting holds a secret, so nothing "
+                    "is lost by it"
                 )
             )
         # Only where it can be true: a restore writes what the archive holds and never
