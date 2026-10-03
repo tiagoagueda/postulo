@@ -821,3 +821,70 @@ def test_every_kind_of_interview_has_its_own_no_show_sentence(application):
         seen.add(application.events.filter(kind=EventKind.INTERVIEW).latest("pk").summary)
     assert len(seen) == len(InterviewKind)
     assert not any("%(" in text for text in seen)
+
+
+# ------------------------------------------------- whose zone and language the words use
+
+
+def test_a_booking_through_the_api_names_the_hour_in_the_owners_zone(
+    client, user, application, settings
+):
+    """15:00 UTC is 10:00 in New York; the instance sits in Paris, where it is 16:00 (#564)."""
+    from postulo.api.models import ApiToken
+
+    settings.TIME_ZONE = "Europe/Paris"
+    user.profile.language, user.profile.time_zone = "fr-FR", "America/New_York"
+    user.profile.save(update_fields=["language", "time_zone"])
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("write",))
+
+    response = client.post(
+        "/api/v1/interviews",
+        data=json.dumps(
+            {
+                "application_id": application.pk,
+                "kind": "video",
+                "starts_at": "2030-01-15T15:00:00Z",
+            }
+        ),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {raw}",
+    )
+    assert response.status_code == 201, response.content
+
+    interview = Interview.objects.get(application=application)
+    assert "10:00" in interview.reminder.summary and "16:00" not in interview.reminder.summary
+    entry = application.events.get(kind=EventKind.INTERVIEW_SCHEDULED)
+    assert "10:00" in entry.summary and "16:00" not in entry.summary
+
+
+def test_the_calendar_files_are_worded_in_the_owners_language(client, user, application):
+    """Whatever `Accept-Language` the calendar client sends (#564)."""
+    from postulo.api.models import ApiToken
+
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["language"])
+    interview = schedule_interview(
+        application,
+        kind=InterviewKind.VIDEO,
+        starts_at=dt.datetime(2030, 1, 15, 15, 0, tzinfo=dt.UTC),
+    )
+
+    def summary(text: str) -> str:
+        return next(line for line in text.split("\r\n") if line.startswith("SUMMARY:"))
+
+    client.force_login(user)
+    for route in ("interview_ics", "interview_calendar"):
+        args = [interview.pk] if route == "interview_ics" else []
+        response = client.get(
+            reverse(f"applications:{route}", args=args), HTTP_ACCEPT_LANGUAGE="de"
+        )
+        assert " chez " in summary(response.content.decode()), route
+
+    client.logout()
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("read",))
+    response = client.get(
+        f"/api/v1/interviews/{interview.pk}/calendar.ics",
+        HTTP_AUTHORIZATION=f"Bearer {raw}",
+        HTTP_ACCEPT_LANGUAGE="de",
+    )
+    assert " chez " in summary(response.content.decode())
