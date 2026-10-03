@@ -114,7 +114,7 @@
         {% for key, label in shapes %}
           <form method="post" action="{% url 'core:table_settings' table.name %}">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{{ switch_next }}">
+            <input type="hidden" name="next" value="{{ switch_next }}" data-next-here="view">
             <input type="hidden" name="shape" value="{{ key }}">
             <button type="submit" class="btn" data-variant="{% if key == shape %}primary{% else %}outline{% endif %}"
                     aria-pressed="{% if key == shape %}true{% else %}false{% endif %}">{{ label }}</button>

@@ -253,6 +253,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
 Fixed
 Fixed
+Fixed
 - Fixed
 - Search and the text filters now ignore the case of accented and non-Latin letters on SQLite, so `école` finds *École*. (#505)
 - The Plugins pages no longer fetch every catalogue's index and signature when they are drawn: an upload is labelled from the checksums the last Check for updates, install or `plugins` command verified. (#602)

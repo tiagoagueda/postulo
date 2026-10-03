@@ -38,7 +38,7 @@
             </a>
             <form method="post" action="{% url 'core:table_views' table.name %}">
               {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="next" value="{{ request.get_full_path }}" data-next-here>
               <input type="hidden" name="slug" value="{{ view.slug }}">
               {% if view.default %}
                 <button type="submit" name="action" value="default" class="btn" data-variant="ghost" data-size="xs"
@@ -54,7 +54,7 @@
             </form>
             <form method="post" action="{% url 'core:table_views' table.name %}">
               {% csrf_token %}
-              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <input type="hidden" name="next" value="{{ request.get_full_path }}" data-next-here>
               <input type="hidden" name="slug" value="{{ view.slug }}">
               <button type="submit" name="action" value="delete" class="btn" data-variant="destructive-ghost" data-size="xs"
                       aria-label="{% blocktranslate trimmed with name=view.name %}Forget {{ name }}{% endblocktranslate %}">
@@ -78,7 +78,7 @@
        what the page already showed: nothing is read out of the form but the name. {% endcomment %}
     <form method="post" action="{% url 'core:table_views' table.name %}" class="flex items-end gap-2">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="next" value="{{ request.get_full_path }}" data-next-here>
       <input type="hidden" name="action" value="save">
       <div class="field min-w-0 flex-1">
         <label for="view-name-{{ table.name }}">{% translate "Keep this view as" %}</label>

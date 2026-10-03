@@ -5957,6 +5957,27 @@
     });
   }
 
+  // The menus above a table (Views, Columns, the Table / Board switch) send the person back
+  // to "here" when they are used. They sit outside what a live filter, sort or page swaps,
+  // so the address written into their `next` field is the one the page loaded with; the
+  // address bar is the one on screen. Read it as the form is sent, so a view is kept as,
+  // and every other action returns to, the table as it is now (#623). A field may name the
+  // parameters to leave out: the shape switch drops `view`, which it is about to change.
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    if (!form || !form.querySelectorAll) {
+      return;
+    }
+    Array.prototype.forEach.call(form.querySelectorAll("input[data-next-here]"), function (input) {
+      var here = new URL(window.location.href);
+      var leave = (input.getAttribute("data-next-here") || "").split(" ").filter(Boolean);
+      leave.forEach(function (name) {
+        here.searchParams.delete(name);
+      });
+      input.value = here.pathname + (leave.length ? here.search : window.location.search);
+    });
+  });
+
   onContentReady(readyNoticeCollection);
 
 })();
