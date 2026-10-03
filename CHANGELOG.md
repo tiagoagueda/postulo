@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- *Your own email* now starts on STARTTLS and refuses to sign in with a password or token when no encryption is chosen. (#360)
 - The operator's `POSTULO_EMAIL_HOST` exemption from the private-address rule no longer covers a person's own outbox: it dials public addresses only unless the operator allows private ones. (#358)
 - A career file's document type declaration is now found wherever it sits (after a long comment, or in UTF-16) and the Europass reader parses with `defusedxml`, so a declaration can no longer slip past the refusal and have its entities expanded (#378)
 - Appointing an administrator no longer makes them a superuser, and Django's admin lists no person's records. **Administrators appointed before keep the flag; clear it with `manage.py shell` (see the wiki's *Accounts and invitations*).** (#368)

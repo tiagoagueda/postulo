@@ -87,7 +87,14 @@ class OwnMail:
                 name="security",
                 label=_lazy("Encryption"),
                 type="choice",
-                choices=tuple(mail.MailSecurity.choices),
+                # The safe ones first, and STARTTLS preselected, so a form left as it is
+                # means what the help says rather than a password in the clear (#360).
+                choices=(
+                    (mail.MailSecurity.STARTTLS.value, mail.MailSecurity.STARTTLS.label),
+                    (mail.MailSecurity.SSL.value, mail.MailSecurity.SSL.label),
+                    (mail.MailSecurity.NONE.value, mail.MailSecurity.NONE.label),
+                ),
+                default=mail.MailSecurity.STARTTLS.value,
                 required=False,
                 help=_lazy("Nearly every provider wants STARTTLS on 587. Some want TLS on 465."),
             ),
@@ -172,6 +179,7 @@ class OwnMail:
         from postulo.core import destinations, mail
 
         try:
+            _refuse_the_clear(config)
             report = mail.check_connection(
                 host=str(config.get("host") or ""),
                 port=_port(config),
@@ -191,6 +199,7 @@ class OwnMail:
         from postulo.core import destinations
         from postulo.core.mail import GuardedBackend
 
+        _refuse_the_clear(config)
         backend = GuardedBackend(
             alias="default",
             allow_private=destinations.private_allowed(),
@@ -212,6 +221,29 @@ class OwnMail:
         if not address:
             return str(_("No address set."))
         return f"{address} · {host}" if host else str(address)
+
+
+def _refuse_the_clear(config: dict) -> None:
+    """Never sign in over a session that was not encrypted (#360).
+
+    A password or a bearer token sent before TLS is readable by anybody on the path, and
+    `smtplib` sends either without asking whether the session is encrypted. With no
+    encryption chosen no session ever is, so this is decided from the settings, before
+    anything is dialled. A server with no sign-in at all is still free to be reached plainly.
+    """
+    from postulo.core import mail
+
+    if config.get("security") in ("starttls", "ssl"):
+        return
+    if _token(config) or config.get("username") or config.get("password"):
+        raise mail.ConnectionFailed(
+            str(
+                _(
+                    "Your password or token would cross the network unencrypted. Choose "
+                    "STARTTLS or TLS from the first byte under Encryption."
+                )
+            )
+        )
 
 
 def _token(config: dict) -> str:

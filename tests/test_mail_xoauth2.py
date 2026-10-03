@@ -651,6 +651,7 @@ def test_a_persons_mail_leaves_with_a_fresh_token(user, monkeypatch):
             "host": "smtp.office365.com",
             "sign_in": "microsoft",
             "client_id": "app-id",
+            "security": "starttls",
             "username": "me@example.org",
         },
     )
@@ -677,3 +678,55 @@ def test_a_persons_mail_leaves_with_a_fresh_token(user, monkeypatch):
 
     assert seen["oauth_token"] == "fresh"
     assert seen["password"] == ""
+
+
+# ------------------------------------------------------- never in the clear (#360)
+
+
+def test_a_token_is_never_sent_over_an_unencrypted_session(settings):
+    """A stub that offers neither STARTTLS nor AUTH, and keeps what it was sent."""
+    import socket
+    import threading
+
+    from postulo.plugins.own_mail import OwnMail
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+    received: list[bytes] = []
+    listener = socket.create_server(("127.0.0.1", 0))
+
+    def serve():
+        try:
+            listener.settimeout(5)
+            client, _address = listener.accept()
+        except OSError:
+            return  # nothing dialled, or the listener was closed first
+        with client:
+            client.sendall(b"220 stub ESMTP\r\n")
+            client.settimeout(2)
+            try:
+                while data := client.recv(1024):
+                    received.append(data)
+                    client.sendall(b"250 stub\r\n")
+            except OSError:
+                pass
+
+    thread = threading.Thread(target=serve, daemon=True)
+    thread.start()
+    try:
+        result = OwnMail().test(
+            {
+                "host": "127.0.0.1",
+                "port": listener.getsockname()[1],
+                "security": "none",
+                "username": "me@example.org",
+                "sign_in": "google",
+                "oauth_access_token": "secret-token",
+            }
+        )
+    finally:
+        listener.close()
+        thread.join(timeout=10)
+
+    assert result.ok is False
+    assert "unencrypted" in result.message
+    assert not any(b"AUTH" in sent for sent in received)

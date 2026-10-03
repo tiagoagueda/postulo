@@ -283,6 +283,19 @@ def test_the_form_offers_three_states_and_an_empty_one():
     assert offered == ["", "none", "starttls", "ssl"]
 
 
+@pytest.mark.django_db
+def test_a_persons_own_mail_starts_on_starttls_not_on_none():
+    """Nobody opens the list, so what it starts on is what most people save (#360)."""
+    from postulo.plugins.forms import ConnectionForm
+    from postulo.plugins.own_mail import OwnMail
+
+    form = ConnectionForm(OwnMail())
+
+    field = form.fields["plugin_security"]
+    assert field.initial == "starttls"
+    assert [value for value, _label in field.choices] == ["starttls", "ssl", "none"]
+
+
 def test_an_empty_port_takes_the_one_that_choice_normally_uses():
     form = EmailForm(
         data={
