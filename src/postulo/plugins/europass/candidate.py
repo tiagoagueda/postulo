@@ -412,7 +412,9 @@ def _phone(channel) -> str:
 
     The dialling code is its own element, digits and no plus; the rest is area and number.
     Without a dialling code the number is kept as written, because a national number with
-    a guessed country in front is a wrong number.
+    a guessed country in front is a wrong number. A trunk zero typed after the code stays
+    in what is returned; the importer reads the result against the country's numbering
+    plan, which drops it where the plan has one and keeps Italy's (#644).
     """
     country = re.sub(r"\D", "", _text(channel, "CountryDialing"))
     parts = (_text(channel, "AreaDialing"), _text(channel, "DialNumber"))

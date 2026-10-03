@@ -883,3 +883,22 @@ def test_the_command_reads_a_pdf(user, tmp_path, capsys):
     assert "PDF-CANDIDATE" in out
     assert "experience: 2" in out
     assert not Experience.objects.filter(owner=user).exists()
+
+
+@pytest.mark.parametrize(
+    ("country", "written", "stored"),
+    [("44", "07911 123456", "+447911123456"), ("39", "06 6982 1234", "+390669821234")],
+)
+def test_a_number_typed_with_its_leading_zero_is_stored_as_dialled(user, country, written, stored):
+    """The reader glues the code to the digits; the importer reads the result against the
+    country's plan, so a trunk zero goes and Italy's stays (#644)."""
+    from postulo.resume import importing
+
+    channel = (
+        "<Communication><ChannelCode>Telephone</ChannelCode>"
+        f"<CountryDialing>{country}</CountryDialing>"
+        f"<oa:DialNumber>{written}</oa:DialNumber></Communication>"
+    )
+    importing.apply(user, europass.read(candidate_xml(person=channel)))
+
+    assert user.profile.phone_numbers.get().number == stored

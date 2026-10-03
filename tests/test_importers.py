@@ -329,3 +329,22 @@ def test_the_refusal_names_what_is_installed(client, user, installed):
     response = client.post(url, {"file": _upload("cv.docx", WORD_FILE)}, follow=True)
 
     assert b"What is installed reads: HR-XML, Europass." in response.content
+
+
+@pytest.mark.parametrize(
+    ("written", "stored"),
+    [
+        ("+4407911123456", "+447911123456"),
+        ("+330612345678", "+33612345678"),
+        ("+390669821234", "+390669821234"),
+    ],
+)
+def test_any_importers_number_is_read_against_its_plan_on_the_way_in(user, written, stored):
+    """The importer is the one place every record's number passes through, so a plugin
+    that glues a dialling code to the national form is corrected here (#644)."""
+    from postulo.plugins.api import Record
+    from postulo.resume import importing
+
+    importing.apply(user, Record(source="hr-xml", person={"phone": written}))
+
+    assert user.profile.phone_numbers.get().number == stored
