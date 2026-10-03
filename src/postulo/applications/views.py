@@ -28,7 +28,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import tables
+from postulo.core import languages, tables
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
     OwnedObjectMixin,
@@ -1344,7 +1344,16 @@ class ReportPDFView(LoginRequiredMixin, View):
 
     def _html(self, request: HttpRequest) -> tuple:
         report = reports.build(request.user, reports.period_from(request.GET))
-        html = render(request, "applications/report_print.html", {"report": report}).content
+        language = languages.current()
+        html = render(
+            request,
+            "applications/report_print.html",
+            {
+                "report": report,
+                "document_language": language,
+                "document_direction": languages.direction(language),
+            },
+        ).content
         return report, html.decode()
 
     def _back_to_the_page(self, request: HttpRequest, report, unavailable) -> HttpResponse:

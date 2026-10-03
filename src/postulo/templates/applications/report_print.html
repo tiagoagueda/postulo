@@ -15,9 +15,11 @@
 
    **Every side is logical.** A report written in Arabic or Hebrew lays out from the other
    edge, and WeasyPrint honours `dir` on the root element, so `margin-inline-start` is the
-   only kind of margin here.
+   only kind of margin here. The language and direction come from the view and the errand
+   (`document_language`, `document_direction`), because the errand has no request and so no
+   context processor (#568).
 {% endcomment %}
-<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+<html lang="{{ document_language }}" dir="{{ document_direction|default:'ltr' }}">
 <head>
   <meta charset="utf-8">
   <title>{% blocktranslate with period=report.period.label %}Job search report · {{ period }}{% endblocktranslate %}</title>

@@ -566,6 +566,30 @@ def test_the_pdf_says_who_it_is_about_and_when_it_was_made(client, user, setting
     assert "Job search report" in html
 
 
+@pytest.mark.parametrize(
+    ("language", "root"),
+    [("he", '<html lang="he" dir="rtl">'), ("fr-FR", '<html lang="fr-FR" dir="ltr">')],
+)
+def test_a_filed_report_declares_its_language_and_direction(user, monkeypatch, language, root):
+    """The errand has no request, so no context processor: the root says it itself (#568)."""
+    from postulo.core import errands
+
+    user.profile.language = language
+    user.profile.save()
+    drawn: list[str] = []
+
+    def snapshot(owner, *, title, html, filename, backend=None):
+        drawn.append(html)
+        raise errands.Refused("stop here")
+
+    monkeypatch.setattr("postulo.documents.rendering.snapshot_report", snapshot)
+
+    errands.send("report_pdf", user, query={})
+
+    assert drawn, "the report was rendered"
+    assert root in drawn[0]
+
+
 def test_the_pdf_document_names_no_side_of_the_page():
     """A report written in Hebrew lays out from the other edge, and WeasyPrint honours it."""
     from pathlib import Path

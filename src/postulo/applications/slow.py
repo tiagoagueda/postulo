@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import languages
 from postulo.core.errands import Refused, handler
 
 
@@ -30,22 +31,34 @@ def render_a_report(errand) -> dict:
     from . import reports
 
     period = reports.period_from(errand.payload.get("query") or {})
-    report = reports.build(errand.owner, period)
-    # `render_to_string` rather than the view's `render`: there is no request here, and the
-    # print template asks for nothing a request carries. The language is the worker's, which
-    # is the instance default -- and `snapshot_report` writes down the language it drew in,
-    # so what was handed over says what it is either way (#283).
-    html = render_to_string("applications/report_print.html", {"report": report})
-    title = str(_("Job search report · %(period)s")) % {"period": report.period.label}
-    try:
-        document = snapshot_report(
-            errand.owner,
-            title=title,
-            html=html,
-            filename=reports.filename(report, "pdf"),
+    # The worker has no request to have chosen a language, so it reads the person's own: the
+    # report is drawn in what they read Postulo in, as the draft the GET serves is (#568).
+    profile = getattr(errand.owner, "profile", None)
+    with languages.override(getattr(profile, "language", "")):
+        report = reports.build(errand.owner, period)
+        # `render_to_string` rather than the view's `render`: there is no request here, and no
+        # context processor runs, so the language and direction the template declares are passed
+        # in as the CV and letter renderers pass theirs (#568). `snapshot_report` writes down the
+        # language it drew in, so what was handed over says what it is either way (#283).
+        language = languages.current()
+        html = render_to_string(
+            "applications/report_print.html",
+            {
+                "report": report,
+                "document_language": language,
+                "document_direction": languages.direction(language),
+            },
         )
-    except PDFBackendUnavailable as unavailable:
-        raise Refused(str(unavailable)) from unavailable
+        title = str(_("Job search report · %(period)s")) % {"period": report.period.label}
+        try:
+            document = snapshot_report(
+                errand.owner,
+                title=title,
+                html=html,
+                filename=reports.filename(report, "pdf"),
+            )
+        except PDFBackendUnavailable as unavailable:
+            raise Refused(str(unavailable)) from unavailable
 
     return {
         "message": str(
