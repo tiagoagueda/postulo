@@ -24,6 +24,7 @@ from postulo.jobs.models import Contact
 
 from ..auth import actor_of, scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..problems import refuses
 from ..schemas import InterviewIn, InterviewOut, InterviewOutcomeIn, InterviewPatch, interview_out
 from .common import choice_or_422, owned, owned_or_404
 
@@ -116,6 +117,7 @@ def _contacts(request, application: Application, ids: list[int]) -> list[Contact
 
 
 @router.post("", response={201: InterviewOut}, auth=scope("write"), summary="Schedule an interview")
+@refuses(404)  # an `application_id` that is not the caller's
 def add_interview(request, payload: InterviewIn):
     application = owned(request, Application.objects).filter(pk=payload.application_id).first()
     if application is None:

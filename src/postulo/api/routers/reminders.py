@@ -12,6 +12,7 @@ from postulo.applications.services import postpone_reminder
 
 from ..auth import scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..problems import refuses
 from ..schemas import ReminderIn, ReminderOut, ReminderPatch, reminder_out
 from .common import owned, owned_or_404
 
@@ -36,6 +37,7 @@ def list_reminders(
 
 
 @router.post("", response={201: ReminderOut}, auth=scope("write"), summary="Add a reminder")
+@refuses(404)  # an `application_id` that is not the caller's
 def add_reminder(request, payload: ReminderIn):
     owner = request.auth.owner
     application = None

@@ -429,6 +429,7 @@ def whoami(request):
     tags=["captures"],
     summary="Capture a posting",
 )
+@problems.refuses(409)  # the key is in use by a request still being answered
 def create_capture(
     request,
     payload: CaptureIn,

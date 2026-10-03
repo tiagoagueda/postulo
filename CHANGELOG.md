@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The OpenAPI description lists the refusals a call raises itself: 413 on every call with a body, 409 on `POST /captures`, 404 on `POST /interviews` and `POST /reminders`. (#431)
 - An unknown API address, a non-numeric id and a method an address does not take are answered as problem documents (401 without a token, 404 with one, 405 with `Allow`), not HTML. (#430)
 - A non-numeric `?application=` or `?company=` on the new reminder, contact and posting pages is ignored, and accepting a suggestion with a non-numeric application answers 404, instead of a server error. (#409)
 - `/logs` and `/metrics` answer 401, not 500, when the bearer token holds a non-ASCII character. (#372)

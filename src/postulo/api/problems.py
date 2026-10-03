@@ -329,7 +329,24 @@ def _address(prefix: str, path: str) -> str:
     return _CONVERTER.sub(r"{\1}", full)
 
 
-def _statuses(api, router, path: str, operation, scoped: type) -> list[int]:
+def refuses(*statuses: int):
+    """Say, on a call, which refusals it raises in its own body.
+
+    `_statuses` works out what it can from a call's shape; a `raise` halfway down a view is
+    not in the shape. The call names those itself, beside the raise, and they are added to
+    what the shape gives.
+    """
+
+    def mark(view):
+        view.refuses = tuple(statuses)
+        return view
+
+    return mark
+
+
+def _statuses(
+    api, router, path: str, operation, scoped: type, *, has_body: bool = False
+) -> list[int]:
     """Which refusals *this* call can actually make.
 
     Declared per call rather than a blanket five, because a description that says a
@@ -346,6 +363,11 @@ def _statuses(api, router, path: str, operation, scoped: type) -> list[int]:
         # path -- is something that can be the wrong shape. A call that takes none of the
         # three cannot be refused for its shape, and `/me` is the one such call.
         statuses.add(422)
+    if has_body:
+        # Any body over `DATA_UPLOAD_MAX_MEMORY_SIZE` is refused as `too-large`, before the
+        # call reads it (`_too_big`), on every call that takes one.
+        statuses.add(413)
+    statuses.update(getattr(operation.view_func, "refuses", ()))
     return sorted(statuses)
 
 
@@ -378,7 +400,9 @@ def describe(api, schema: dict, *, scoped: type) -> dict:
                     if entry is None:
                         continue
                     answers = entry.setdefault("responses", {})
-                    for status in _statuses(api, router, full, operation, scoped):
+                    for status in _statuses(
+                        api, router, full, operation, scoped, has_body="requestBody" in entry
+                    ):
                         # Keyed by the integer, which is how django-ninja keys the success
                         # it already described; the two spellings would be two entries for
                         # one status once this is serialised.

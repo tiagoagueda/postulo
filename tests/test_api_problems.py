@@ -235,6 +235,27 @@ def test_every_call_says_it_can_refuse_without_a_token_or_over_its_allowance():
     assert not undescribed, undescribed
 
 
+def test_a_refusal_raised_in_the_body_of_a_call_is_described_too():
+    """A client cannot type an answer the description never mentions (#431).
+
+    The extension that sends a whole page to `POST /captures` is the one most likely to meet
+    a 413, and a retried capture the 409; an `application_id` that is not the caller's is a
+    404 on two creates whose address names no record.
+    """
+    from postulo.api.api import api
+
+    paths = api.get_openapi_schema()["paths"]
+
+    def answers(path, method="post"):
+        return set(paths[path][method]["responses"])
+
+    assert {409, 413} <= answers("/api/v1/captures")
+    assert {404, 413} <= answers("/api/v1/interviews")
+    assert {404, 413} <= answers("/api/v1/reminders")
+    assert 413 not in answers("/api/v1/me", "get"), "it takes no body"
+    assert 404 not in answers("/api/v1/captures", "get"), "a listing names no record"
+
+
 def test_a_call_is_not_described_as_refusing_in_ways_it_cannot():
     """A description that lies is worse than one that is silent.
 
