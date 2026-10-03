@@ -257,6 +257,50 @@ def test_setting_it_back_to_available_removes_the_row(client, admin, user):
     assert policy.decide(PLUGIN, user).decided_by == "shipped", "back to nobody's decision"
 
 
+def test_a_persons_page_draws_what_the_instance_decided_for_them(client, admin, user):
+    """A plugin forced off for everybody is not on and theirs on the page of somebody who
+    has no row of their own, which is what the person themselves is told (#490)."""
+    PluginPolicy.objects.create(plugin=PLUGIN, person=None, state=PluginPolicy.State.FORCED_OFF)
+    client.force_login(admin)
+
+    html = client.get(reverse("server:person_plugins", args=[user.pk])).content.decode()
+
+    box = re.search(rf'<input[^>]*name="on:{re.escape(PLUGIN)}"[^>]*>', html).group(0)
+    assert "checked" not in box
+    assert f'data-follows-default="{PLUGIN}"' in html
+
+
+def test_giving_one_person_back_a_plugin_the_instance_switched_off(
+    client, admin, user, third_party
+):
+    PluginPolicy.objects.create(
+        plugin=third_party, person=None, state=PluginPolicy.State.FORCED_OFF
+    )
+    assert not policy.decide(third_party, user).on
+    client.force_login(admin)
+
+    client.post(
+        reverse("server:person_plugins", args=[user.pk]),
+        {f"row:{third_party}": "1", f"on:{third_party}": "on", f"free:{third_party}": "on"},
+    )
+
+    decision = policy.decide(third_party, user)
+    assert decision.on and decision.theirs
+    assert PluginPolicy.objects.get(plugin=third_party, person=user).state == (
+        PluginPolicy.State.AVAILABLE
+    )
+
+
+def test_saving_a_persons_page_unchanged_keeps_following_the_instance(client, admin, user):
+    PluginPolicy.objects.create(plugin=PLUGIN, person=None, state=PluginPolicy.State.FORCED_OFF)
+    client.force_login(admin)
+
+    client.post(reverse("server:person_plugins", args=[user.pk]), {f"row:{PLUGIN}": "1"})
+
+    assert not PluginPolicy.objects.filter(plugin=PLUGIN, person=user).exists()
+    assert not policy.decide(PLUGIN, user).on
+
+
 def test_the_page_says_who_decided_and_when(client, admin, user):
     PluginPolicy.objects.create(
         plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_OFF, decided_by=admin

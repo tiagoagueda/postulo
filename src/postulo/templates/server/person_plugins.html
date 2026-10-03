@@ -54,7 +54,11 @@
             {% if row.description %}
               <p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>
             {% endif %}
-            {% if row.decided_by %}
+            {% if row.follows_default %}
+              <p class="text-xs text-ink-500 dark:text-ink-400" data-follows-default="{{ row.name }}">
+                {% translate "Follows the instance default." %}
+              </p>
+            {% elif row.decided_by %}
               <p class="text-xs text-ink-500 dark:text-ink-400">
                 {% blocktranslate trimmed with who=row.decided_by.username when=row.decided_at|date:"DATE_FORMAT" %}
                   Decided by {{ who }} on {{ when }}

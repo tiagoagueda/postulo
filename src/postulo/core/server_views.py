@@ -1178,9 +1178,15 @@ def _policy_rows(person=None) -> list[dict]:
     from postulo.plugins.models import PluginPolicy
 
     stored = {row.plugin: row for row in PluginPolicy.objects.filter(person=person)}
+    # What applies to a person who has no row of their own is the instance's, so that is what
+    # their page draws (#490); a row of their own is an exception to it.
+    instance = (
+        {row.plugin: row for row in PluginPolicy.objects.filter(person=None)} if person else {}
+    )
     rows = []
     for plugin in _governed_plugins():
-        row = stored.get(plugin.name)
+        own = stored.get(plugin.name)
+        row = own or instance.get(plugin.name)
         state = row.state if row else PluginPolicy.State.AVAILABLE
         # The whole manifest, not three fields off it: this is the page an administrator
         # is on when the question is "whose code is running here", and #97 exists because
@@ -1200,6 +1206,8 @@ def _policy_rows(person=None) -> list[dict]:
                 "on": state in (PluginPolicy.State.AVAILABLE, PluginPolicy.State.FORCED_ON),
                 "free": state == PluginPolicy.State.AVAILABLE,
                 "hidden": state == PluginPolicy.State.UNAVAILABLE,
+                # Drawn from the instance's decision, not the person's own, and said so.
+                "follows_default": bool(person) and own is None and row is not None,
                 "held": False,
                 "why": "",
                 "decided_by": row.decided_by if row else None,
@@ -1253,6 +1261,14 @@ def _save_policies(request: HttpRequest, person=None) -> int:
     """
     from postulo.plugins.models import PluginPolicy
 
+    # What a person with no row of their own gets: the instance's decision. A person's row is
+    # kept only where it differs from that, so "available" is stored for them when the
+    # instance has decided otherwise, and dropped when it is what they would get anyway (#490).
+    instance = (
+        {row.plugin: row.state for row in PluginPolicy.objects.filter(person=None)}
+        if person
+        else {}
+    )
     changed = 0
     for plugin in _governed_plugins():
         # A checkbox that is not ticked submits nothing, so "off" and "not on the page"
@@ -1265,12 +1281,15 @@ def _save_policies(request: HttpRequest, person=None) -> int:
         free = f"free:{plugin.name}" in request.POST
         if on:
             wanted = PluginPolicy.State.AVAILABLE if free else PluginPolicy.State.FORCED_ON
-        elif existing and existing.state == PluginPolicy.State.UNAVAILABLE:
+        elif PluginPolicy.State.UNAVAILABLE in (
+            existing.state if existing else instance.get(plugin.name),
+        ):
             # Kept, not offered: the page shows it as off and says it is hidden.
             wanted = PluginPolicy.State.UNAVAILABLE
         else:
             wanted = PluginPolicy.State.FORCED_OFF
-        if wanted == PluginPolicy.State.AVAILABLE:
+        if wanted == instance.get(plugin.name, PluginPolicy.State.AVAILABLE):
+            # What they would get anyway: no row of their own.
             if existing:
                 existing.delete()
                 changed += 1
