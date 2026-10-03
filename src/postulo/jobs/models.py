@@ -35,6 +35,7 @@ from django.utils.formats import number_format
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import slugs
+from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
@@ -934,6 +935,9 @@ class JobPosting(OwnedModel):
     )
 
     url = models.URLField(_("posting URL"), blank=True, max_length=500)
+    #: The address as `same_url` reduces it, kept so that "have I seen this advert?" is one
+    #: indexed lookup instead of a comparison in Python over what the path narrowed to (#556).
+    url_key = models.CharField(max_length=500, blank=True, editable=False)
     source = models.CharField(
         _("found via"),
         max_length=120,
@@ -1002,12 +1006,19 @@ class JobPosting(OwnedModel):
         verbose_name = _("job posting")
         verbose_name_plural = _("job postings")
         ordering = ("-noted_at", "-created_at")
-        indexes = [models.Index(fields=("owner", "state"))]
+        indexes = [
+            models.Index(fields=("owner", "state")),
+            models.Index(fields=("owner", "url_key"), name="jobposting_owner_url_key"),
+        ]
 
     def __str__(self) -> str:
         return f"{self.title} — {self.company.name}"
 
     def save(self, *args, **kwargs):
+        self.url_key = same_url(self.url)
+        update = kwargs.get("update_fields")
+        if update is not None and "url" in update and "url_key" not in update:
+            kwargs["update_fields"] = [*update, "url_key"]
         # Upper-cased rather than refused: "eur" is the code, typed the way people type.
         # The validator then has only one shape to judge (#224).
         self.salary_currency = (self.salary_currency or "").strip().upper()
@@ -1151,6 +1162,8 @@ class Capture(OwnedModel):
     """
 
     url = models.URLField(_("address"), max_length=500, blank=True)
+    #: The address as `same_url` reduces it (#556), as on a listing.
+    url_key = models.CharField(max_length=500, blank=True, editable=False)
     source_name = models.CharField(_("read by"), max_length=60, blank=True)
     source_version = models.CharField(_("source version"), max_length=20, blank=True)
     origin = models.CharField(
@@ -1192,7 +1205,17 @@ class Capture(OwnedModel):
         verbose_name = _("capture")
         verbose_name_plural = _("captures")
         ordering = ("-created_at",)
-        indexes = [models.Index(fields=("owner", "status"))]
+        indexes = [
+            models.Index(fields=("owner", "status")),
+            models.Index(fields=("owner", "url_key"), name="capture_owner_url_key"),
+        ]
+
+    def save(self, *args, **kwargs):
+        self.url_key = same_url(self.url)
+        update = kwargs.get("update_fields")
+        if update is not None and "url" in update and "url_key" not in update:
+            kwargs["update_fields"] = [*update, "url_key"]
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return self.data.get("title") or self.url or _("Empty capture")

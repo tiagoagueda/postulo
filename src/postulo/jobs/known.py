@@ -14,15 +14,10 @@ fresh address on every visit is (#178).
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from urllib.parse import urlparse
 
 from postulo.core.addresses import same_url
 
 from .models import Capture, CaptureStatus, JobPosting
-
-#: How many rows the address narrows to before the normalised form decides. An account with
-#: more listings at one path than this has a larger problem than a duplicate.
-LIMIT = 200
 
 
 @dataclass(frozen=True)
@@ -40,17 +35,12 @@ class Known:
         return bool(self.listings or self.captures or self.similar)
 
 
-def _needle(url: str) -> str:
-    """The part of an address worth asking the database about: its path, or else its host."""
-    parsed = urlparse(url)
-    return parsed.path.rstrip("/") or parsed.netloc.removeprefix("www.")
-
-
 def known(owner, url: str, title: str = "", company: str = "", *, except_capture=None) -> Known:
     """What ``owner`` already holds for this address, and for this title at this company.
 
-    The address is narrowed in SQL by its path and decided in Python by ``same_url``, so
-    ``https://www.example.org/jobs/42/`` finds ``http://example.org/jobs/42``. The title and
+    The address is matched on ``url_key``, the form ``same_url`` reduces it to and the
+    models keep, so ``https://www.example.org/jobs/42/`` finds ``http://example.org/jobs/42``
+    in one indexed query however many listings the owner holds (#556). The title and
     the company are compared whole, case aside. ``except_capture`` is the capture being
     reviewed, which is at its own address and is not a duplicate of itself.
     """
@@ -58,24 +48,17 @@ def known(owner, url: str, title: str = "", company: str = "", *, except_capture
     listings: list[JobPosting] = []
     captures: list[Capture] = []
     if key:
-        needle = _needle(url)
-        candidates = (
+        listings = list(
             JobPosting.objects.for_user(owner)
-            .filter(url__icontains=needle)
+            .filter(url_key=key)
             .select_related("company")
-            .order_by("-created_at")[:LIMIT]
+            .defer("description")
+            .order_by("-created_at")
         )
-        listings = [posting for posting in candidates if same_url(posting.url) == key]
-        waiting = (
-            Capture.objects.for_user(owner)
-            .filter(status=CaptureStatus.PENDING, url__icontains=needle)
-            .order_by("-created_at")[:LIMIT]
-        )
-        captures = [
-            capture
-            for capture in waiting
-            if same_url(capture.url) == key and capture.pk != except_capture
-        ]
+        waiting = Capture.objects.for_user(owner).filter(status=CaptureStatus.PENDING, url_key=key)
+        if except_capture is not None:
+            waiting = waiting.exclude(pk=except_capture)
+        captures = list(waiting.defer("learning").order_by("-created_at"))
     similar: list[JobPosting] = []
     if title.strip() and company.strip():
         already = {posting.pk for posting in listings}
@@ -83,6 +66,7 @@ def known(owner, url: str, title: str = "", company: str = "", *, except_capture
             JobPosting.objects.for_user(owner)
             .filter(title__iexact=title.strip(), company__name__iexact=company.strip())
             .select_related("company")
+            .defer("description")
             .order_by("-created_at")[:20]
         )
         similar = [posting for posting in found if posting.pk not in already]

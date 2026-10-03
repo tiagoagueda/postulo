@@ -266,3 +266,42 @@ def test_the_api_needs_the_captures_scope_and_takes_a_hundred_at_most(client, us
     )
     too_many = [{"url": f"https://example.org/jobs/{n}"} for n in range(101)]
     assert ask(client, bearer_for(user), too_many).status_code == 422
+
+
+# ------------------------------------------------- an account with a long history (#556)
+
+
+def test_the_oldest_of_two_hundred_and_fifty_at_one_path_is_still_found(user):
+    """Indeed puts the job in the query, so every listing from it shares one path."""
+    for n in range(250):
+        a_listing(user, url=f"https://www.indeed.com/viewjob?jk={n}", title=f"Job {n}")
+
+    seen = known(user, "https://indeed.com/viewjob?jk=0")
+
+    assert [posting.title for posting in seen.listings] == ["Job 0"]
+    assert known(user, "https://www.indeed.com/viewjob?jk=249").listings[0].title == "Job 249"
+    assert not known(user, "https://www.indeed.com/viewjob?jk=250")
+
+
+def test_the_cost_of_asking_does_not_grow_with_the_account(client, user):
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    bearer = bearer_for(user)
+    asked = [
+        {"url": f"https://www.indeed.com/viewjob?jk=new{n}", "title": f"New {n}", "company": "X"}
+        for n in range(40)
+    ]
+
+    def queries() -> int:
+        with CaptureQueriesContext(connection) as seen:
+            assert ask(client, bearer, asked).status_code == 200
+        # What the question asks of the listings and captures; the rate limit's bookkeeping
+        # in the cache table is not part of it.
+        return len([q for q in seen.captured_queries if '"jobs_' in q["sql"]])
+
+    few = queries()
+    for n in range(60):
+        a_listing(user, url=f"https://www.indeed.com/viewjob?jk=old{n}")
+        a_capture(user, url=f"https://www.indeed.com/viewjob?jk=waiting{n}")
+    assert queries() == few
