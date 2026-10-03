@@ -48,7 +48,7 @@ def test_capturing_sends_the_fetch_off_and_still_leaves_a_capture(client, user, 
 
     monkeypatch.setattr(
         "postulo.plugins.registry.parse_page",
-        lambda url, html: (JobPostingData(title="Tester", company_name="Aperture"), Source()),
+        lambda url, html, **_: (JobPostingData(title="Tester", company_name="Aperture"), Source()),
     )
     client.force_login(user)
 

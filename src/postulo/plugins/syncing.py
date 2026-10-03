@@ -23,6 +23,7 @@ from django.utils.translation import gettext_lazy as _
 
 from .base import FieldSpec, SyncReport
 from .models import Connection
+from .policy import allows
 from .secrets import SecretsUnreadable
 
 logger = logging.getLogger(__name__)
@@ -101,7 +102,7 @@ def sync_connection(connection: Connection) -> SyncReport:
 def _run_connection(connection: Connection) -> SyncReport:
     now = timezone.now()
     plugin = connection.plugin_instance
-    if plugin is not None and not connection.allowed:
+    if plugin is not None and not allows(connection):
         # Off for its owner: nothing runs and nothing is recorded, so reversing the decision
         # finds the connection as it was (#362).
         return SyncReport(error=str(_("That plugin is switched off for you.")))
@@ -154,7 +155,7 @@ def due_connections(now=None):
         for connection in Connection.objects.filter(
             kind="sync", enabled=True, owner__is_active=True
         ).select_related("owner")
-        if is_due(connection, now) and connection.allowed
+        if is_due(connection, now) and allows(connection)
     ]
 
 

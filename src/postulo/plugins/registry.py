@@ -418,7 +418,7 @@ def reads_hints(source) -> bool:
 
 
 def parse_page(
-    url: str, html: str, *, hints=(), person=None
+    url: str, html: str, *, hints=(), sources=None
 ) -> tuple[JobPostingData, SourcePlugin] | None:
     """Ask each source in turn, and take the first answer.
 
@@ -426,19 +426,16 @@ def parse_page(
     somebody else's markup is exactly the kind of work that throws unexpectedly, and the
     next source along may well cope.
 
-    Given a ``person``, only the sources the policy has on for them are asked (#362).
+    Given ``sources``, only those are asked: the ones the policy has on for the person the
+    page belongs to, which the caller knows and this module, below the policy, does not
+    (#362).
 
     ``hints`` are the owner's remembered places for this page's site, as
     :class:`~postulo.plugins.base.RememberedPlace`; the source that answers sets each one's
     ``outcome``, and `jobs.remembered` keeps the score.
     """
     hints = list(hints)
-    sources = available_sources()
-    if person is not None:
-        from .policy import plugins_for
-
-        sources = plugins_for(person, "source")
-    for source in sources:
+    for source in available_sources() if sources is None else sources:
         try:
             if not source.can_handle(url):
                 continue

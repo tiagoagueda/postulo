@@ -203,7 +203,9 @@ def _create_a_capture_through_the_view(user, monkeypatch) -> None:
         "postulo.plugins.fetching.fetch_page",
         lambda url: type("P", (), {"url": url, "html": "<html>"})(),
     )
-    monkeypatch.setattr("postulo.plugins.registry.parse_page", lambda url, html: (Data(), Source()))
+    monkeypatch.setattr(
+        "postulo.plugins.registry.parse_page", lambda url, html, **_: (Data(), Source())
+    )
 
     request = RequestFactory().post("/captures/new/", {"url": "https://example.org/job"})
     request.user = user

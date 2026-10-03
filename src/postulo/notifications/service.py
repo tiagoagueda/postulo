@@ -12,6 +12,7 @@ from django.utils import timezone
 from postulo.core import languages
 from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
+from postulo.plugins.policy import allows
 
 from .base import Notification, wants
 
@@ -91,7 +92,7 @@ def _deliver(user, notification: Notification) -> int:
     delivered = 0
     connections = Connection.objects.for_user(user).enabled().of_kind("notifier")
     for connection in connections:
-        if not connection.allowed:
+        if not allows(connection):
             continue
         plugin = connection.plugin_instance
         if plugin is None:

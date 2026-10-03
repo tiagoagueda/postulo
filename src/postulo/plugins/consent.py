@@ -155,7 +155,9 @@ def finish(request, code: str, state: str):
     if connection.owner_id != getattr(request.user, "pk", None):
         raise ConsentFailed(str(_("That connection belongs to somebody else.")))
 
-    plugin = connection.active_plugin()
+    from .policy import active_plugin
+
+    plugin = active_plugin(connection)
     consent = wanted_by(plugin, connection.config) if plugin is not None else None
     if consent is None:
         raise ConsentFailed(str(_("That connection does not use consent.")))
@@ -186,7 +188,9 @@ def access_token(connection) -> str:
     if token and expires_at - REFRESH_MARGIN > time.time():
         return token
 
-    plugin = connection.active_plugin()
+    from .policy import active_plugin
+
+    plugin = active_plugin(connection)
     consent = wanted_by(plugin, connection.config) if plugin is not None else None
     refresh = str(secrets.get(REFRESH_TOKEN) or "")
     if consent is None or not refresh:

@@ -132,11 +132,12 @@ def anybody_wants(owner, event: str) -> bool:
     receive. One query; the errand and the delivery are the expensive part.
     """
     from postulo.plugins.models import Connection
+    from postulo.plugins.policy import active_plugin
 
     from .base import wants
 
     for connection in Connection.objects.for_user(owner).enabled().of_kind("notifier"):
-        plugin = connection.active_plugin()
+        plugin = active_plugin(connection)
         if plugin is not None and wants(connection.config, event, plugin):
             return True
     return False

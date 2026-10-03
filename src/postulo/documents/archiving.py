@@ -23,6 +23,7 @@ from postulo.core import languages
 from postulo.notifications.service import language_for
 from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
+from postulo.plugins.policy import allows, refused_connections
 from postulo.plugins.secrets import SecretsUnreadable
 
 from .models import CopyStatus, DocumentCopy, DocumentKind
@@ -57,8 +58,6 @@ def _lookup(document) -> dict:
 
 
 def store_connections(user):
-    from postulo.plugins.policy import refused_connections
-
     connections = Connection.objects.for_user(user).enabled().of_kind("store")
     connections = connections.exclude(plugin="local")
     # Not a store the policy has off for this person (#362).
@@ -84,7 +83,7 @@ def schedule_copies(document, *, connections=None) -> list[DocumentCopy]:
         connections = store_connections(document.owner)
     created: list[DocumentCopy] = []
     for connection in connections:
-        if not wants_kind(connection.config, document.kind) or not connection.allowed:
+        if not wants_kind(connection.config, document.kind) or not allows(connection):
             continue
         copy, was_created = DocumentCopy.objects.get_or_create(
             connection=connection,
@@ -117,7 +116,7 @@ def send_copy(copy: DocumentCopy) -> bool:
     now = timezone.now()
     connection = copy.connection
     document = copy.document
-    if connection is not None and not connection.allowed:
+    if connection is not None and not allows(connection):
         # The copy waits as it is, attempts untouched: reversing the decision resumes it (#362).
         return False
     copy.attempts += 1
@@ -188,8 +187,6 @@ def send_copy(copy: DocumentCopy) -> bool:
 
 
 def pending_copies(now=None):
-    from postulo.plugins.policy import refused_connections
-
     now = now or timezone.now()
     return (
         DocumentCopy.objects.filter(status__in=(CopyStatus.PENDING, CopyStatus.FAILED))
@@ -261,7 +258,7 @@ def send_now(document) -> tuple[int, int]:
     )
     sent = failed = 0
     for copy in copies.select_related("connection"):
-        if copy.connection is not None and not copy.connection.allowed:
+        if copy.connection is not None and not allows(copy.connection):
             continue
         if not claim(copy):
             continue

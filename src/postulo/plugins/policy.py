@@ -339,6 +339,22 @@ def plugins_for(person, kind: str) -> list:
     return [item for item in plugins(kind) if decide(item.name, person).on]
 
 
+def allows(connection) -> bool:
+    """Whether the policy lets this connection's plugin act for the connection's owner (#362).
+
+    `Connection.plugin_instance` is what the list page uses, which must still show the row of
+    a plugin that was switched off. Whatever *runs* the plugin asks this as well, or
+    :func:`active_plugin`, so the decision the pages make is the decision the scheduler keeps.
+    A function here rather than a property on the model, which the policy reads.
+    """
+    return decide(connection.plugin, connection.owner).on
+
+
+def active_plugin(connection):
+    """The connection's plugin, only when it is installed and the policy has it on."""
+    return connection.plugin_instance if allows(connection) else None
+
+
 def refused_connections(connections) -> list[int]:
     """The ids, among these connections, whose plugin is off for the connection's owner.
 

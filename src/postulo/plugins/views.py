@@ -30,7 +30,7 @@ from . import logos, registry
 from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
-from .policy import connected_plugins, decide
+from .policy import allows, connected_plugins, decide
 from .registry import find_plugin
 from .secrets import SecretsUnreadable
 
@@ -58,7 +58,7 @@ def _plugin_or_404(kind: str, name: str, person=None):
 
 def _switched_off(request, connection):
     """A redirect with the reason when the policy has this connection's plugin off, else None."""
-    if connection.allowed:
+    if allows(connection):
         return None
     messages.error(request, _("That plugin is switched off for you."))
     return redirect("connections:list")

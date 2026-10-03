@@ -22,6 +22,7 @@ from django.utils.translation import gettext as _
 
 from postulo.plugins import webhook as plugin
 from postulo.plugins.api import DestinationRefused, Notification
+from postulo.plugins.policy import allows, refused_connections
 
 from .models import DeliveryStatus, WebhookDelivery
 
@@ -76,7 +77,6 @@ def enqueue(connection, notification: Notification) -> WebhookDelivery | None:
 
 def pending(now=None):
     from postulo.plugins.models import Connection
-    from postulo.plugins.policy import refused_connections
 
     now = now or timezone.now()
     return (
@@ -124,7 +124,7 @@ def deliver(row) -> bool:
         row.save()
         return False
 
-    if connection is not None and not connection.allowed:
+    if connection is not None and not allows(connection):
         # Waits, and spends nothing: reversing the decision resumes it (#362).
         return False
     if connection is None or not connection.enabled:

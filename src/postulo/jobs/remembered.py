@@ -40,6 +40,7 @@ from django.db import transaction
 
 from postulo.plugins import registry
 from postulo.plugins.base import RememberedPlace
+from postulo.plugins.policy import plugins_for
 
 from .models import CaptureStatus, FieldHint, HintField
 
@@ -85,10 +86,11 @@ def read_page(owner, url: str, html: str):
     handed = remembered_for(owner, url)
     # Asked with the places only where there are some, so that the question is the same
     # one it always was for everybody who has none.
+    sources = plugins_for(owner, "source")
     result = (
-        registry.parse_page(url, html, hints=handed, person=owner)
+        registry.parse_page(url, html, hints=handed, sources=sources)
         if handed
-        else registry.parse_page(url, html, person=owner)
+        else registry.parse_page(url, html, sources=sources)
     )
     if result is None:
         return None

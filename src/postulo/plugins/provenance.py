@@ -29,12 +29,9 @@ both of those from quietly coming undone (#94).
 
 from __future__ import annotations
 
-import logging
 from dataclasses import asdict, dataclass
 
 from django.utils.translation import gettext_lazy as _
-
-logger = logging.getLogger(__name__)
 
 #: Shipped inside Postulo. Not installed, not removable, and running whatever else is.
 INTERNAL = "internal"
@@ -105,37 +102,6 @@ def official_repositories() -> set[str]:
     return {name for name, row in catalogue.configured().items() if row.get("key") in trusted}
 
 
-#: Where the checksums of the last verified fetch are kept, per repository (#602).
-DIGESTS_CACHE_KEY = "postulo:plugin-digests"
-
-
-def remember(one) -> None:
-    """Keep the checksums a repository signed, from an index that has just been verified.
-
-    Called by `catalogue.fetch` -- which an administrator's Refresh, an install and the
-    commands reach, and nothing that draws a page does -- so a page needs no network to say
-    where an upload came from. Per repository, with the key it was verified against: a key
-    that has changed since is a repository that has not been verified, and what it signed
-    before is not read (#602).
-    """
-    from django.core.cache import cache
-
-    digests = sorted(
-        {
-            release.sha256.lower()
-            for listing in one.listings
-            for release in listing.releases
-            if release.sha256
-        }
-    )
-    try:
-        held = cache.get(DIGESTS_CACHE_KEY) or {}
-        held[one.name] = {"key": one.public_key, "digests": digests}
-        cache.set(DIGESTS_CACHE_KEY, held, None)
-    except Exception:  # pragma: no cover - a cache that is down costs a label, not a page
-        logger.warning("Could not keep the checksums of repository %r", one.name, exc_info=True)
-
-
 def signed_digests() -> dict[str, str]:
     """Every checksum the enabled repositories published, to the repository that signed it.
 
@@ -148,21 +114,15 @@ def signed_digests() -> dict[str, str]:
     With nothing kept -- no Refresh yet, a repository since removed or given another key --
     its digests are simply not here, and the answer is *uploaded*, never a guess.
     """
-    from django.core.cache import cache
-
     from . import catalogue
 
-    try:
-        held = cache.get(DIGESTS_CACHE_KEY) or {}
-    except Exception:  # pragma: no cover - a cache that is down costs a label, not a page
-        return {}
-    configured = catalogue.configured()
+    kept = catalogue.kept_digests()
     found: dict[str, str] = {}
-    for name, row in configured.items():
-        kept = held.get(name)
-        if not kept or kept.get("key") != row.get("key"):
+    for name, row in catalogue.configured().items():
+        entry = kept.get(name)
+        if not entry or entry.get("key") != row.get("key"):
             continue
-        for digest in kept.get("digests", ()):
+        for digest in entry.get("digests", ()):
             found.setdefault(digest, name)
     return found
 
