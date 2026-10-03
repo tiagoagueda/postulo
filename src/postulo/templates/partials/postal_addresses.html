@@ -79,9 +79,11 @@
           </div>
         </div>
         {% comment %} Then the address, a line for each line its country writes. The
-           country's own select keeps its flag beside it, drawn by the server and kept in
-           step by the script, exactly as beside a telephone number (#88, #214); the space
-           is reserved whether or not a flag shows, so choosing moves nothing. {% endcomment %}
+           country's own select has its flag beside it, drawn by the server for a page
+           without scripts, exactly as beside a telephone number (#88, #214); with them
+           the flag is in the select's own button and beside every country in its list
+           (#301). The space is reserved whether or not a flag shows, so choosing moves
+           nothing. {% endcomment %}
         {% for line in row.lines %}
           <div class="address-line mb-3"{% if line.narrow %} data-narrow="{{ line.narrow }}"{% endif %}>
             {% for part in line.parts %}

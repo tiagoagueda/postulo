@@ -63,6 +63,29 @@ class Status(models.TextChoices):
     GHOSTED = "ghosted", _("Ghosted")
 
 
+#: The icon beside each status where one is chosen from a list (#301, #315): on the
+#: board's cards, whose list is what moves a card by keyboard, by touch and with a screen
+#: reader. Out of the Lucide set, and a second cue beside the word, never the only one.
+STATUS_ICONS = {
+    Status.DRAFT: "pencil",
+    Status.APPLIED: "send",
+    Status.ACKNOWLEDGED: "mail-check",
+    Status.SCREENING: "search",
+    Status.INTERVIEWING: "users",
+    Status.ASSESSMENT: "clipboard-check",
+    Status.OFFER: "handshake",
+    Status.ACCEPTED: "circle-check",
+    Status.REJECTED: "circle-x",
+    Status.WITHDRAWN: "circle-minus",
+    Status.GHOSTED: "ghost",
+}
+
+
+def status_options() -> list[tuple[str, str, str]]:
+    """Every status as its value, its label and its icon, in the order of `Status`."""
+    return [(value, label, STATUS_ICONS.get(value, "")) for value, label in Status.choices]
+
+
 #: Statuses where the outcome is still undecided.
 OPEN_STATUSES = frozenset(
     {

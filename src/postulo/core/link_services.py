@@ -89,7 +89,7 @@ _KEY = re.compile(r"[a-z0-9][a-z0-9-]*")
 ICON_DIR = Path(__file__).resolve().parent.parent / "static" / "icons"
 
 #: The icon a kind's services take when one names none, or names one Postulo does not ship.
-#: No brand marks, by the rule in ``TRADEMARKS.md``; #301 decides whether that ever changes.
+#: No brand marks, by the rule in ``TRADEMARKS.md``, which #301 decided to keep.
 KIND_ICONS = {SOCIAL: "user", REPOSITORY: "git-branch", WEBSITE: "globe"}
 
 #: The icon for *Other*, whatever the kind: an address on the web, and no more is known.

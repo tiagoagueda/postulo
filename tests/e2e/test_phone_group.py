@@ -19,6 +19,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from .selects import DRAWN, button_of, drawn
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_phone_flag import sign_in
 from .test_reflow import SCROLLS_SIDEWAYS, SPILLS
@@ -33,9 +34,12 @@ DESKTOP = {"width": 1280, "height": 900}
 WIDE = (768, 1024, 1280)
 
 #: Every row of the block: where its controls are, and whether its name box is drawn.
+#: A select is measured where a person sees it: at the button built for it, where scripts
+#: run (#301), and at the select itself where they do not.
 ROWS = """() => [...document.querySelectorAll('#section-phones li')].map((row) => {
+  const drawn = __DRAWN__;
   const box = (selector) => {
-    const el = row.querySelector(selector);
+    const el = drawn(row.querySelector(selector));
     const r = el.getBoundingClientRect();
     return {left: r.left, right: r.right, top: r.top, bottom: r.bottom,
             width: r.width, height: r.height, drawn: r.width > 0 && r.height > 0};
@@ -48,7 +52,7 @@ ROWS = """() => [...document.querySelectorAll('#section-phones li')].map((row) =
     number: box('input[name$="-number_1"]'),
     primary: box('input[name$="-primary"]'),
   };
-})"""
+})""".replace("__DRAWN__", DRAWN)
 
 #: Where the first digit and the last digit of an element's text are drawn. A number
 #: written left to right has its first digit to the left of its last, whatever the page.
@@ -75,23 +79,34 @@ def on_one_line(one: dict, other: dict) -> bool:
     return one["top"] < other["bottom"] and other["top"] < one["bottom"]
 
 
-#: Where each control of the first row is, and what the group as a whole occupies.
+#: Where each control of the first row is, and what the group as a whole occupies. The
+#: flag is the one that is drawn: in the chooser's button, beside its words (#301).
 BOXES = """() => {
   const row = document.querySelector('#section-phones li');
+  const drawn = __DRAWN__;
   const box = (selector) => {
-    const r = row.querySelector(selector).getBoundingClientRect();
+    const r = drawn(row.querySelector(selector)).getBoundingClientRect();
     return {left: r.left, right: r.right, top: r.top, bottom: r.bottom,
             width: r.width, height: r.height};
+  };
+  const flags = [...row.querySelectorAll('[data-phone-field] img.flag')]
+    .filter((flag) => flag.getBoundingClientRect().width > 0);
+  const edges = (el) => {
+    const r = el.getBoundingClientRect();
+    return {left: r.left, right: r.right, top: r.top, bottom: r.bottom};
   };
   return {
     kind: box('select[name$="-kind"]'),
     group: box('[data-phone-field]'),
     chooser: box('[data-phone-country]'),
     number: box('input[name$="-number_1"]'),
-    flag: box('[data-phone-flag]'),
+    flags: flags.length,
+    flag: edges(flags[0]),
+    words: edges(drawn(row.querySelector('[data-phone-country]'))
+      .querySelector('[data-select-text]')),
     primary: box('.primary-choice'),
   };
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 
 @pytest.fixture
@@ -157,8 +172,9 @@ def test_with_room_the_chooser_and_the_number_share_a_line(page: Page, live_serv
     assert abs(at["number"]["top"] - at["chooser"]["top"]) <= 2, "on one line"
     assert at["chooser"]["right"] <= at["number"]["left"] + 1, "the country first"
     assert at["number"]["width"] > at["chooser"]["width"], "and the room goes to the number"
-    assert at["flag"]["left"] >= at["group"]["left"], "the flag is inside the group"
-    assert at["flag"]["right"] <= at["chooser"]["left"] + 1
+    assert at["flags"] == 1, "one flag, in the chooser: the one beside it is put away"
+    assert at["flag"]["left"] >= at["chooser"]["left"], "the flag is inside the chooser"
+    assert at["flag"]["right"] <= at["words"]["left"] + 1, "before the country's words"
     assert on_one_line(at["kind"], at["number"]), "and the kind is on that line too (#213)"
     assert at["kind"]["right"] <= at["group"]["left"], "first, as it is read"
     assert at["group"]["bottom"] <= at["primary"]["top"]
@@ -180,8 +196,8 @@ def test_the_group_is_not_a_size_container(page: Page, live_server, numbers):
         """() => [...document.querySelectorAll('[data-phone-field]')].map((group) => ({
             container: getComputedStyle(group).containerType,
             boxes: [...group.querySelectorAll('select, input')].map(
-                (control) => control.getBoundingClientRect().height),
-        }))"""
+                (control) => __DRAWN__(control).getBoundingClientRect().height),
+        }))""".replace("__DRAWN__", DRAWN)
     )
 
     assert len(groups) == 5, "four rows and the empty one"
@@ -211,7 +227,7 @@ def test_the_one_box_is_whole_inside_its_group(page: Page, live_server, numbers,
     expect(group.locator("input")).to_have_value("6 12 34 56 78")
 
     frame = group.bounding_box()
-    for control in (group.locator("select"), group.locator("input")):
+    for control in (drawn(group.locator("select")), group.locator("input")):
         box = control.bounding_box()
         assert box["height"] >= 24
         assert box["y"] >= frame["y"] - 1
@@ -408,7 +424,8 @@ def test_right_to_left_mirrors_the_group(page: Page, live_server, numbers, appli
     at = page.evaluate(BOXES)
 
     assert at["number"]["right"] <= at["chooser"]["left"] + 1, "the country at the start"
-    assert at["chooser"]["right"] <= at["flag"]["left"] + 1
+    assert at["flag"]["right"] <= at["chooser"]["right"], "the flag at the chooser's start"
+    assert at["words"]["right"] <= at["flag"]["left"] + 1, "and its words after it"
 
 
 def test_choosing_a_country_moves_nothing(page: Page, live_server, applicant):
@@ -416,14 +433,17 @@ def test_choosing_a_country_moves_nothing(page: Page, live_server, applicant):
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/jobs/contacts/new/")
     chooser = page.locator("[data-phone-country]")
-    expect(page.locator("[data-phone-flag] img")).to_have_count(0)
-    before = chooser.bounding_box()
+    button = button_of(chooser)
+    words = button.locator("[data-select-text]")
+    expect(button.locator("img.flag")).to_have_count(0)
+    before, said = button.bounding_box(), words.bounding_box()
 
     chooser.select_option("PT")
 
-    expect(page.locator("[data-phone-flag] img")).to_have_attribute("data-flag", "pt")
-    after = chooser.bounding_box()
+    expect(button.locator("img.flag")).to_have_count(1)
+    after = button.bounding_box()
     assert abs(after["x"] - before["x"]) < 1 and abs(after["width"] - before["width"]) < 1
+    assert abs(words.bounding_box()["x"] - said["x"]) < 1, "nor the words inside it"
 
 
 def test_the_group_is_one_thing_with_two_named_controls(page: Page, live_server, numbers):
@@ -431,9 +451,15 @@ def test_the_group_is_one_thing_with_two_named_controls(page: Page, live_server,
     your_details(page, live_server.url)
 
     group = page.get_by_role("group", name="Telephone number", exact=True).first
-    expect(group.get_by_role("combobox", name="Country the number is in")).to_have_value("FR")
+    # One combobox by that name: the chooser's own button. The native select it drives is
+    # still what holds the country, hidden from the tree (#301).
+    chooser = group.get_by_role("combobox", name="Country the number is in")
+    expect(chooser).to_have_count(1)
+    expect(chooser).to_have_text("+33 France")
+    expect(group.locator("[data-phone-country]")).to_have_value("FR")
     expect(group.get_by_role("textbox", name="Phone")).to_have_value("6 12 34 56 78")
-    expect(group.locator("[data-phone-flag] img")).to_have_attribute("data-flag", "fr")
+    assert "/flags/fr" in chooser.locator("img.flag").get_attribute("src")
+    expect(group.locator("[data-phone-flag]")).to_be_hidden()
 
 
 def test_the_half_that_has_the_focus_is_the_one_outlined(page: Page, live_server, numbers):
@@ -442,8 +468,8 @@ def test_the_half_that_has_the_focus_is_the_one_outlined(page: Page, live_server
     sign_in(page, live_server.url)
     your_details(page, live_server.url)
     row = page.locator("#section-phones li").first
-    kind = row.locator("select[name$='-kind']")
-    chooser = row.locator("[data-phone-country]")
+    kind = button_of(row.locator("select[name$='-kind']"))
+    chooser = button_of(row.locator("[data-phone-country]"))
     number = row.locator("input[name$='-number_1']")
 
     def outlined(control) -> bool:
@@ -477,6 +503,11 @@ def test_forced_colours_keep_the_focus_inside_the_group(page: Page, live_server,
     expect(number).to_be_focused()
     offset = number.evaluate("(el) => parseFloat(getComputedStyle(el).outlineOffset)")
     assert offset < 0
+    # And the same for the other half, which is the chooser's button.
+    page.keyboard.press("Shift+Tab")
+    chooser = button_of(page.locator("#section-phones li [data-phone-country]").first)
+    expect(chooser).to_be_focused()
+    assert chooser.evaluate("(el) => parseFloat(getComputedStyle(el).outlineOffset)") < 0
 
 
 def test_the_name_follows_the_kind(page: Page, live_server, numbers):
@@ -490,7 +521,7 @@ def test_the_name_follows_the_kind(page: Page, live_server, numbers):
     rows.nth(0).locator("select[name$='-kind']").select_option("other")
     name = rows.nth(0).locator("input[name$='-label']")
     expect(name).to_be_visible()
-    kind = rows.nth(0).locator("select[name$='-kind']").bounding_box()
+    kind = button_of(rows.nth(0).locator("select[name$='-kind']")).bounding_box()
     group = rows.nth(0).locator("[data-phone-field]").bounding_box()
     assert name.bounding_box()["y"] + name.bounding_box()["height"] <= group["y"] + 1
     assert kind["x"] < name.bounding_box()["x"], "beside the kind, before the number"

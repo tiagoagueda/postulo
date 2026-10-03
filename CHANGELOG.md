@@ -93,6 +93,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The foot of every page names this instance and links its source, the help and, set by `POSTULO_LEGAL_NOTICE_URL`, your legal notice; `POSTULO_SOURCE_URL` points the source at your own code. The version is shown only to people signed in. (#212)
 - On *Your details* and a company's form, a kind of identifier another row already holds cannot be chosen again (Other excepted); a duplicate is still refused, naming the kind on its row, and a kind freed by *Remove* can be taken in the same save. (#307)
 - In European Portuguese an API token is “Token da API”, the wording its maintainer chose in Weblate. (#349)
+- Every list of choices is a button with a list of its own: a flag beside each language and country, an icon beside each kind and each status on the board's cards, time zones grouped by continent, and a box that narrows a long list. Without scripts it is the browser's own list, as before. (#301)
 
 ### ✨ Added
 

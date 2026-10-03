@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import phones
 from postulo.core.models import TagColour
 
 
@@ -125,12 +126,17 @@ PLANES: tuple[tuple[str, str, str], ...] = (
     ("shadow-floating", _("Floating"), _("A popover or a menu, over the page rather than in it.")),
 )
 
+#: The icons the gallery's short choice names on its options: the page draws each once,
+#: and the select's own control copies the one an option asks for (#301).
+CHOICE_ICONS: tuple[str, ...] = ("smartphone", "briefcase", "home", "phone")
+
 SECTIONS: tuple[Section, ...] = (
     Section("colour", _("Colour")),
     Section("tokens", _("Rounding and depth")),
     Section("type", _("Type")),
     Section("buttons", _("Buttons")),
     Section("fields", _("Fields")),
+    Section("choices", _("Choices")),
     Section("surfaces", _("Surfaces")),
     Section("chips", _("Chips and tags")),
     Section("alerts", _("Alerts")),
@@ -152,4 +158,8 @@ def gallery() -> dict:
         "button_sizes": BUTTON_SIZES,
         "alerts": ALERTS,
         "sections": SECTIONS,
+        # A select's own control (#301): a list long enough to have a box that narrows it,
+        # each option with its flag, and the icons the short one draws.
+        "countries": phones.country_choices(),
+        "choice_icons": CHOICE_ICONS,
     }

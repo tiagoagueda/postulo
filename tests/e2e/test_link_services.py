@@ -18,16 +18,18 @@ from itertools import pairwise
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
+from .selects import DRAWN, button_of, choose
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS, SPILLS
 from .test_row_removal import sign_in
 
 pytestmark = pytest.mark.e2e
 
-#: Where each control of a row is, and whether it is drawn at all.
+#: Where each control of a row is, and whether it is drawn at all. The service is measured
+#: where a person sees it: at the button built for the select, where scripts run (#301).
 BOXES = """(row) => {
   const box = (selector) => {
-    const found = row.querySelector(selector);
+    const found = __DRAWN__(row.querySelector(selector));
     if (!found || !found.checkVisibility()) return null;
     const r = found.getBoundingClientRect();
     return {left: r.left, right: r.right, top: r.top, bottom: r.bottom};
@@ -38,7 +40,7 @@ BOXES = """(row) => {
     address: box('input[type="url"]'),
     primary: box('.primary-choice, input[type="radio"]'),
   };
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 
 @pytest.fixture
@@ -99,10 +101,12 @@ def rows_of(page: Page, kind: str):
 
 
 def shown_icon(row) -> list[str]:
-    """The icons of a row that are drawn: one, the chosen service's."""
-    return row.locator("[data-service-icon]").evaluate_all(
-        "(icons) => icons.filter((i) => i.checkVisibility()).map((i) => i.dataset.serviceIcon)"
-    )
+    """The icons of a row that are drawn beside its service: one, the chosen service's. In
+    the select's own button where scripts run, and the server's, beside the native select,
+    where they do not -- never both (#301)."""
+    return row.locator(
+        ".input-group :is([data-option-mark], [data-select-mark]) svg[data-icon]"
+    ).evaluate_all("(icons) => icons.filter((i) => i.checkVisibility()).map((i) => i.dataset.icon)")
 
 
 def in_one_line(boxes: dict, *names: str) -> None:
@@ -213,8 +217,9 @@ def test_the_order_read_is_the_order_tabbed(page: Page, live_server, links):
 
 
 def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, links):
-    """An option holds words and nothing else, so the icon sits beside the closed select,
-    drawn by the server for what is stored and kept in step by the script."""
+    """An option holds words and nothing else, so the icon is drawn by the select's own
+    control: the chosen service's in the button, each service's in the list (#301). The one
+    the server draws beside the native select, for a page without scripts, is put away."""
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")
     row = rows_of(page, "social").nth(0)
@@ -222,6 +227,8 @@ def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, 
     name = row.locator('input[name$="-label"]')
 
     assert shown_icon(row) == ["user"], "LinkedIn, as stored"
+    expect(row.locator("[data-option-mark]")).to_be_hidden()
+    expect(button_of(select).locator("svg[data-icon=user]")).to_have_count(1)
     expect(name).to_be_hidden()
 
     select.select_option("mastodon")
@@ -235,6 +242,11 @@ def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, 
     select.select_option("youtube")
     assert shown_icon(row) == ["video"]
     expect(name).to_be_hidden()
+
+    # Chosen from the list, as a person does, it is the same.
+    choose(page, select, "Bluesky")
+    expect(select).to_have_value("bluesky")
+    assert shown_icon(row) == ["at-sign"]
 
     assert shown_icon(rows_of(page, "repository").nth(0)) == ["git-branch"]
 

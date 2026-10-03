@@ -361,6 +361,136 @@ def test_the_field_detector_knows_the_difference():
     assert not RETIRED_FIELD.search("field-separator")
 
 
+# ------------------------------------------------------- a select is Basecoat's
+
+#: An opening `<select>` tag, whatever it is spread over. A template tag inside it may hold
+#: a `>` of its own, so the tag's end is the first `>` outside `{% %}` and `{{ }}`.
+SELECT_TAG = re.compile(r"<select\b(?:\{%.*?%\}|\{\{.*?\}\}|[^>])*>", re.DOTALL)
+
+#: The selects that stay the browser's own where scripts run, each with its reason (#301).
+#:
+#: **The rule is that there are none.** Every `<select>` is drawn by the server as a native
+#: select, which is the control with scripts off, and `app.js` builds Basecoat's select
+#: beside it: a button and a list whose options can hold a flag or an icon. A page may say
+#: otherwise for one select by writing `data-native` on it, and then it is listed here, by
+#: the template it is in and the `id` or `name` it carries, with why. A `data-native` that
+#: is not listed fails, and so does an entry here that no template bears out any more.
+#:
+#: A `<select multiple>` or one with a `size` is a list box on the page, not this control,
+#: and the script leaves it alone without being told. One written in a template is listed
+#: here all the same, because it is a select somebody will see as the browser draws it.
+#: (The one the application has is a widget's, not a template's: the tags of an
+#: application, a `<select multiple>` that the label chips are layered over, #139.)
+NATIVE_ON_PURPOSE: dict[tuple[str, str], str] = {}
+
+SOURCE_ROOT = Path(__file__).resolve().parents[1] / "src" / "postulo"
+
+
+def native_selects(text: str) -> list[tuple[int, str]]:
+    """Line number and `id` or `name` of every select a template keeps native."""
+    found = []
+    for match in SELECT_TAG.finditer(text):
+        tag = match.group(0)
+        if not re.search(r"\s(?:data-native|multiple|size)(?=[\s=>{])", tag):
+            continue
+        named = re.search(r"""\s(?:id|name)\s*=\s*["']([^"']*)["']""", tag)
+        found.append((text.count("\n", 0, match.start()) + 1, named.group(1) if named else ""))
+    return found
+
+
+def template_name(path: Path) -> str:
+    return path.relative_to(SOURCE_ROOT).as_posix()
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_a_select_is_basecoats_unless_the_list_says_why_not(path: Path):
+    """Decided on #301: everywhere, not only where an option has a flag or an icon to show.
+
+    So a template that keeps a select native has to say so in the list above, where the
+    reason is written beside it and somebody reviewing the change reads it.
+    """
+    found = native_selects(path.read_text(encoding="utf-8"))
+    unlisted = [
+        (line, name) for line, name in found if (template_name(path), name) not in NATIVE_ON_PURPOSE
+    ]
+    assert not unlisted, (
+        f"{path.name}: a select kept native at {unlisted}. Every select is Basecoat's "
+        "(#301): take `data-native` off, or add the select to NATIVE_ON_PURPOSE in "
+        "tests/test_template_lint.py with the reason."
+    )
+
+
+def test_every_select_listed_as_native_is_still_one():
+    """An entry that is no longer true fails: the select went, or stopped saying
+    `data-native`, and the list would otherwise go on excusing something that is not there."""
+    by_name = {template_name(path): path for path in TEMPLATES}
+    stale = []
+    for (template, name), reason in NATIVE_ON_PURPOSE.items():
+        assert reason.strip(), f"{template}: {name} is listed without a reason"
+        path = by_name.get(template)
+        kept = native_selects(path.read_text(encoding="utf-8")) if path else []
+        if name not in [found for _line, found in kept]:
+            stale.append((template, name))
+    assert not stale, f"listed as native and not in the templates any more: {stale}"
+
+
+def test_nothing_else_keeps_a_select_native():
+    """The attribute is a template's to write, where the lint reads it. A widget that set it
+    from Python, or a script that added it, would be a select kept native that no list
+    names; and the script's own rule has to be the one this file describes."""
+    for path in PYTHON_SOURCES:
+        assert "data-native" not in path.read_text(encoding="utf-8"), (
+            f"{path.name}: `data-native` set from Python. Write it on the select in its "
+            "template, and list it in NATIVE_ON_PURPOSE."
+        )
+    script = (SOURCE_ROOT / "static" / "js" / "app.js").read_text(encoding="utf-8")
+    assert (
+        'return !select.multiple && select.size <= 1 && !select.hasAttribute("data-native");'
+        in script
+    ), "app.js no longer builds its control beside every select but the ones this lint lists"
+
+
+#: An opening tag that carries a class list, with the element it is and the classes.
+CLASSED_TAG = re.compile(
+    r"""<(?P<tag>[a-z][\w-]*)\b[^<>]*?\sclass\s*=\s*["'](?P<classes>[^"']*)["']"""
+)
+
+
+def test_no_template_writes_basecoats_select_out():
+    """Basecoat's own markup for a select -- `<div class="select">` round a button and a
+    list -- does nothing until a script has run, and every page here works with scripts off.
+    The server draws a `<select>`; `app.js` builds the rest beside it."""
+    for path in TEMPLATES:
+        text = path.read_text(encoding="utf-8")
+        found = [
+            text.count("\n", 0, match.start()) + 1
+            for match in CLASSED_TAG.finditer(text)
+            if match.group("tag") != "select" and "select" in match.group("classes").split()
+        ]
+        assert not found, (
+            f"{path.name}: Basecoat's select written out at line(s) {found}. Write a "
+            "native <select>; the script builds its button and its list (#301)."
+        )
+
+
+def test_the_select_detector_knows_the_difference():
+    assert native_selects('<select name="status" class="w-32" data-autosubmit>') == []
+    assert native_selects('<select id="zone" name="zone" data-native>') == [(1, "zone")]
+    assert native_selects('<p>\n<select name="tags" multiple>') == [(2, "tags")]
+    assert native_selects('<select name="rows" size="4">') == [(1, "rows")]
+    # A `>` inside a template tag does not end the select's own tag.
+    spread = '<select name="kind"{% if count > 1 %} data-native{% endif %}\n        id="kind">'
+    assert native_selects(spread) == [(1, "kind")]
+    # An attribute that only looks like one of the three.
+    assert native_selects('<select name="x" data-native-like data-size="xs">') == []
+    by_hand = CLASSED_TAG.search('<div id="kind" class="select w-40">')
+    assert by_hand and by_hand.group("tag") == "div" and "select" in by_hand.group("classes")
+    native = CLASSED_TAG.search('<select name="kind" class="select w-40">')
+    assert native and native.group("tag") == "select"
+
+
 # ----------------------------------------------------- a box that scrolls on purpose
 
 #: A scroll utility on its own. `.scroll-x` in the stylesheet is the same thing made safe.

@@ -3403,6 +3403,139 @@
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
+  .select:not(select) {
+    position: relative;
+    display: inline-flex;
+  }
+  .select:not(select) > button {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    justify-content: space-between;
+    --tw-font-weight: var(--font-weight-normal);
+    font-weight: var(--font-weight-normal);
+    white-space: nowrap;
+    --tw-outline-style: none;
+    outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
+    &:disabled {
+      pointer-events: none;
+    }
+    &:disabled {
+      cursor: not-allowed;
+    }
+    &:disabled {
+      opacity: 50%;
+    }
+    & svg {
+      pointer-events: none;
+    }
+    & svg {
+      flex-shrink: 0;
+    }
+  }
+  .select:not(select) > button > span {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: start;
+  }
+  .select:not(select) > button > svg {
+    flex-shrink: 0;
+  }
+  .select:not(select) [data-popover] {
+    isolation: isolate;
+    overflow-x: hidden;
+    min-width: max(100%, 9rem);
+  }
+  .select:not(select) [role='listbox'] {
+    --tw-outline-style: none;
+    outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
+  }
+  .select:not(select) [role='listbox'] [role='group']:not(:has([role='option']:not([aria-hidden='true']))) {
+    display: none;
+  }
+  .select:not(select) [role='listbox']:not(:has([data-value]:not([aria-hidden='true'])))::before {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .select:not(select) [role='listbox'][data-empty]:not(:has([data-value]:not([aria-hidden='true'])))::before {
+    --tw-content: attr(data-empty);
+    content: var(--tw-content);
+  }
+  .select:not(select) [role='listbox']:not([data-empty]):not(:has([data-value]:not([aria-hidden='true'])))::before {
+    --tw-content: 'No results found';
+    content: var(--tw-content);
+  }
+  .select:not(select) [role='option'] {
+    position: relative;
+    display: flex;
+    width: 100%;
+    cursor: default;
+    align-items: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    --tw-outline-style: none;
+    outline-style: none;
+    @media (forced-colors: active) {
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+    }
+    -webkit-user-select: none;
+    user-select: none;
+    &:disabled {
+      pointer-events: none;
+    }
+    &:disabled {
+      opacity: 50%;
+    }
+    &[aria-disabled="true"] {
+      pointer-events: none;
+    }
+    &[aria-disabled="true"] {
+      opacity: 50%;
+    }
+    &[aria-hidden="true"] {
+      display: none;
+    }
+    & svg {
+      pointer-events: none;
+    }
+    & svg {
+      flex-shrink: 0;
+    }
+  }
+  .select:not(select) [role='option'][aria-selected='true'] {
+    background-image: var(--check-icon);
+    background-size: 0.875rem;
+    background-position: center right 0.5rem;
+    background-repeat: no-repeat;
+  }
+  .select:not(select) [role='option'][aria-selected='true']:dir(rtl) {
+    background-position: center left 0.5rem;
+  }
+  .select:not(select) [role='separator'] {
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+  }
+  .select:not(select):not([data-select-initialized]) [role='option']:not([aria-disabled='true']):not(:disabled):hover, .select:not(select) [role='option'].active {
+    background-color: var(--color-accent);
+    color: var(--color-accent-foreground);
+  }
   .btn {
     flex-shrink: 1;
     gap: calc(var(--spacing) * 2);
@@ -4110,6 +4243,300 @@
   .field > input[type="checkbox"]:focus-visible, .input[type="checkbox"]:focus-visible, .field > input[type="radio"]:focus-visible, .input[type="radio"]:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+}
+@layer components {
+  .select:not(select) {
+    display: contents;
+  }
+  .select:not(select) > button {
+    margin: inherit;
+    width: 100%;
+    cursor: pointer;
+    gap: calc(var(--spacing) * 2);
+    border-radius: var(--radius-lg);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: var(--color-input);
+    background-color: var(--color-white);
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: calc(var(--spacing) * 2);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-ink-900);
+    &:focus-visible {
+      border-color: var(--color-brand-500);
+    }
+    &:focus-visible {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+    &:focus-visible {
+      --tw-ring-color: var(--color-brand-500);
+    }
+    &[aria-expanded="true"] {
+      border-color: var(--color-brand-500);
+    }
+    &[aria-expanded="true"] {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+    &[aria-expanded="true"] {
+      --tw-ring-color: var(--color-brand-500);
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-100);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-100);
+      }
+    }
+  }
+  .select:not(select) > button > span {
+    min-width: 0px;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+  .select:not(select) > button > svg {
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    color: var(--color-ink-500);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
+  .select:not(select) [data-select-text] {
+    display: grid;
+    min-width: 0px;
+    min-block-size: 1lh;
+  }
+  .select:not(select) [data-select-text] > span {
+    grid-column-start: 1;
+    grid-row-start: 1;
+    min-width: 0px;
+  }
+  .select:not(select) [data-select-label] {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+  .select:not(select) [data-select-text]::after {
+    visibility: hidden;
+    grid-column-start: 1;
+    grid-row-start: 1;
+    height: 0px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    content: attr(data-select-longest);
+  }
+  .select:not(select) [data-select-mark] {
+    display: inline-flex;
+    width: calc(var(--spacing) * 5);
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+  .field > .select:not(select) > button {
+    min-width: 0px;
+  }
+  .input-group > .select:not(select) > button {
+    height: 100%;
+    min-width: 0px;
+    flex: 1;
+    border-radius: 0;
+    border-style: var(--tw-border-style);
+    border-width: 0px;
+    background-color: transparent;
+    &:focus-visible {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+    &[aria-expanded="true"] {
+      --tw-ring-shadow: var(--tw-ring-inset,) 0 0 0 calc(0px + var(--tw-ring-offset-width)) var(--tw-ring-color, currentcolor);
+      box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    }
+  }
+  .input-group[data-phone-field] > .select:not(select) > button {
+    height: auto;
+    width: 0px;
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-basis: calc(var(--spacing) * 34);
+  }
+  .input-group[data-phone-field] > .select:not(select) > button:focus-visible {
+    outline-style: var(--tw-outline-style);
+    outline-width: 2px;
+    outline-offset: calc(2px * -1);
+    outline-color: var(--color-brand-500);
+    --tw-outline-style: solid;
+    outline-style: solid;
+  }
+  .select:not(select) [data-popover] {
+    width: max-content;
+    padding: 0px;
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    min-width: 9rem;
+  }
+  .select:not(select) [data-popover] > header {
+    border-bottom-style: var(--tw-border-style);
+    border-bottom-width: 1px;
+    border-color: var(--color-border);
+    padding: calc(var(--spacing) * 1.5);
+  }
+  .select:not(select) [role="listbox"] {
+    min-height: 0px;
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: var(--spacing);
+  }
+  .select:not(select) [role="listbox"]:not(:has([data-value]:not([aria-hidden="true"])))::before {
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 4);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    white-space: normal;
+    color: var(--color-ink-500);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
+  .select:not(select) [data-select-heading] {
+    padding-inline: calc(var(--spacing) * 2);
+    padding-top: calc(var(--spacing) * 2);
+    padding-bottom: var(--spacing);
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-ink-500);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
+  .select:not(select) [role="option"] {
+    cursor: pointer;
+    gap: calc(var(--spacing) * 2);
+    border-radius: var(--radius-md);
+    padding-inline: calc(var(--spacing) * 2);
+    padding-block: calc(var(--spacing) * 1.5);
+    white-space: normal;
+    color: var(--color-ink-700);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-200);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-200);
+      }
+    }
+  }
+  .select:not(select) [role="option"] > span:not([data-select-mark]) {
+    min-width: 0px;
+    overflow-wrap: anywhere;
+  }
+  .select:not(select) [role="option"].active {
+    color: var(--color-ink-900);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-50);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-50);
+      }
+    }
+  }
+  .select:not(select) [role="option"][aria-selected="true"] {
+    background-image: none;
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    color: var(--color-ink-900);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-50);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-50);
+      }
+    }
+  }
+  .select:not(select) [role="option"] > svg {
+    margin-inline-start: auto;
+    width: calc(var(--spacing) * 4);
+    height: calc(var(--spacing) * 4);
+    color: var(--color-brand-600);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-brand-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-brand-400);
+      }
+    }
+  }
+  @media (pointer: coarse) {
+    .select:not(select) [role="option"] {
+      padding-block: calc(var(--spacing) * 2.5);
+    }
+    .select:not(select) [data-popover] > header > input {
+      font-size: var(--text-base);
+      line-height: var(--tw-leading, var(--text-base--line-height));
+    }
+  }
+}
+@media (forced-colors: active) {
+  .select:not(select) > button {
+    border: 1px solid ButtonText;
+  }
+  .select:not(select) > button:not(:focus-visible), .select:not(select) [data-popover], .select:not(select) [role="listbox"], .select:not(select) [role="option"] {
+    outline: 0;
+  }
+  .input-group > .select:not(select) > button {
+    border: 0;
+  }
+  .select:not(select) > button:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+  .input-group[data-phone-field] > .select:not(select) > button:focus-visible {
+    outline-offset: -2px;
+  }
+  .select:not(select) [role="option"].active {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  .select:not(select) [role="option"].active > svg {
+    color: HighlightText;
   }
 }
 @layer components {
@@ -5776,7 +6203,7 @@
   .phone-row {
     grid-template-columns: minmax(0,1fr);
     @media (width >= 40rem) {
-      grid-template-columns: minmax(0,10rem) minmax(0,1fr);
+      grid-template-columns: minmax(0,12rem) minmax(0,1fr);
     }
   }
   @media (width >= 40rem) {
@@ -6059,6 +6486,57 @@ progress.funnel-bar::-moz-progress-bar {
   @position-try --menu-scrolls {
     max-block-size: calc(100% - 0.5rem);
     min-block-size: 10rem;
+  }
+}
+[data-popover][popover][data-select-panel] {
+  max-block-size: min(22rem, calc(100dvh - 1rem));
+  overflow: hidden;
+}
+[data-popover][popover][data-select-panel="long"] {
+  block-size: 22rem;
+}
+[data-popover][popover][data-select-panel]:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+@supports (position-area: block-end span-inline-start) and (position-try-fallbacks: flip-block) {
+  [data-popover][popover][data-select-panel] {
+    min-inline-size: min(anchor-size(width), calc(100vw - 2rem));
+    position-try-fallbacks: flip-block, --menu-scrolls, --menu-scrolls flip-block, --select-across-scrolls, --select-across-scrolls flip-block;
+  }
+  @position-try --select-across-scrolls {
+    position-area: block-end span-all;
+    max-block-size: calc(100% - 0.5rem);
+    min-block-size: 10rem;
+  }
+}
+select[data-select-ready] {
+  position: absolute;
+  inline-size: 1px;
+  min-inline-size: 0;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+  appearance: none;
+}
+[data-select-said] p {
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-red-600);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    color: var(--color-red-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      color: var(--color-red-400);
+    }
   }
 }
 .site-search[popover] {

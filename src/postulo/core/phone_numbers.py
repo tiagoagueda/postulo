@@ -24,6 +24,18 @@ from postulo.plugins.phone_numbers import PHONE_NUMBERS
 from . import phone_field, phones
 from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
 from .models import PhoneNumber
+from .option_icons import IconSelect
+
+#: The icon beside each kind of number in the row's choice (#301): out of the Lucide set,
+#: and a picture of the thing, since a kind of telephone is nobody's mark.
+KIND_ICONS = {
+    PhoneNumber.Kind.MOBILE: "smartphone",
+    PhoneNumber.Kind.WORK: "briefcase",
+    PhoneNumber.Kind.HOME: "home",
+    PhoneNumber.Kind.SWITCHBOARD: "headset",
+    PhoneNumber.Kind.FAX: "printer",
+    PhoneNumber.Kind.OTHER: "phone",
+}
 
 #: What somebody is told when the number they typed is already recorded here.
 #:
@@ -330,6 +342,8 @@ class PhoneNumberForm(forms.ModelForm):
 
     def __init__(self, *args, default_country: str = "", has_notes: bool = False, **kwargs):
         super().__init__(*args, **kwargs)
+        kind = self.fields["kind"]
+        kind.widget = IconSelect(icons=KIND_ICONS, choices=kind.choices)
         self.fields["number"] = phone_field.PhoneField(
             label=_("Phone"),
             required=False,

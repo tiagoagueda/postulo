@@ -273,7 +273,7 @@ class DefaultsForm(forms.ModelForm):
             help_text=_("What a new account starts with. Each person can change theirs."),
             # The chosen language's flag sits over the closed select, and the script keeps
             # it in step; `data-flag-select` is what the script looks for (#208).
-            widget=LanguageSelect(attrs={"data-flag-select": ""}, flagged=True),
+            widget=LanguageSelect(attrs={"data-flag-select": ""}),
         )
         self.fields["default_time_zone"] = forms.ChoiceField(
             label=_("Time zone for new accounts"),

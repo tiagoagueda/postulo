@@ -57,15 +57,19 @@
     {# Advancing a card is one click, because the alternative is not updating it at all. #}
     {% comment %} Named by its application, not "Change status" thirty times over: a board
        is a page of these, and a list of controls that all say the same thing is a list
-       nobody can choose from (#227). {% endcomment %}
+       nobody can choose from (#227).
+
+       Each status says its icon (#301, #315), which the list `app.js` builds beside this
+       select draws; the icons themselves are drawn once for the board, by the page, and
+       not once a card. With the script blocked this is the native select and *Move*. {% endcomment %}
     <form method="post" action="{% url 'applications:status' application.pk %}" class="shrink-0">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <select name="status" class="w-32 px-2 py-1 text-xs" data-autosubmit
+      <select name="status" class="w-40 px-2 py-1 text-xs" data-autosubmit
               aria-describedby="board-move-help"
               aria-label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
-        {% for value, label in statuses %}
-          <option value="{{ value }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>
+        {% for value, label, icon in status_options %}
+          <option value="{{ value }}" data-icon="{{ icon }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>
         {% endfor %}
       </select>
       <noscript><button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Move" %}</button></noscript>

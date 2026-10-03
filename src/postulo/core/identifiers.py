@@ -53,6 +53,7 @@ from django.utils.translation import gettext_lazy as _
 
 from . import languages
 from .addresses import _CONTROL, web_address
+from .option_icons import OptionIcons
 
 logger = logging.getLogger(__name__)
 
@@ -76,6 +77,10 @@ MAX_LINK_LENGTH = 500
 
 #: Who provides a scheme an administrator defined on this instance (`Scheme.provider`).
 DEFINED_HERE = "instance"
+
+#: The icon a scheme draws when it names none, or names one Postulo does not ship: a card
+#: with a name on it, which is what every identifier is.
+ICON = "id-card"
 
 
 @dataclass(frozen=True)
@@ -128,6 +133,18 @@ class Scheme:
     #: The longest value the pattern is ever run on; nothing, for a pattern that was
     #: reviewed with the code. An instance's own carries `MAX_VALUE_LENGTH`.
     max_length: int = 0
+
+    #: A Lucide icon Postulo ships (``assets/icons.txt``), drawn beside the scheme in a
+    #: row's choice of kind (#301). Generic, never the scheme's own mark
+    #: (``TRADEMARKS.md``). Blank, or a name Postulo does not have, draws `ICON`.
+    icon: str = field(default="")
+
+    @property
+    def icon_name(self) -> str:
+        """The icon to draw: the scheme's own where Postulo ships it, else the generic one."""
+        from .option_icons import shipped
+
+        return self.icon if shipped(self.icon) else ICON
 
     def identifies(self, subject: str) -> bool:
         return subject in self.subjects
@@ -876,13 +893,16 @@ def _set_to(row) -> str:
     return row["scheme"].value() or ""
 
 
-class SchemeSelect(forms.Select):
+class SchemeSelect(OptionIcons, forms.Select):
     """The choice of kind, with the kinds the other rows hold switched off (#307).
 
     ``<option disabled>`` needs no script, and a screen reader announces it as unavailable,
     so nothing more is said. The row's own kind is never switched off -- a row keeps what it
     has, even beside a duplicate about to be refused, or it could not be posted back -- and
     neither is Other, which may repeat.
+
+    Each kind says its icon as well (#301, `OptionIcons`): the scheme's own, which is a
+    generic one, drawn in the list of the control ``app.js`` builds beside the select.
     """
 
     def __init__(self, attrs=None, choices=()):
@@ -890,8 +910,16 @@ class SchemeSelect(forms.Select):
         #: Asked when the select is drawn, for the kinds the other rows hold. The formset the
         #: row sits in answers; a row on its own has no neighbours.
         self.taken: Callable[[], Iterable[str]] = lambda: ()
+        #: The schemes as they stood when the select was last drawn: asked once a drawing,
+        #: not once an option.
+        self._schemes: dict[str, Scheme] = {}
+
+    def option_icon(self, value: str) -> str:
+        scheme = self._schemes.get(value)
+        return scheme.icon_name if scheme is not None else ""
 
     def get_context(self, name, value, attrs):
+        self._schemes = registry()
         context = super().get_context(name, value, attrs)
         off = set(self.taken()) - set(context["widget"]["value"]) - {OTHER}
         for _group, options, _index in context["widget"]["optgroups"]:

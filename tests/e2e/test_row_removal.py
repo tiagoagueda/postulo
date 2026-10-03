@@ -21,6 +21,7 @@ from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.conftest import EMAIL, PASSWORD
 
+from .selects import drawn
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS, SPILLS
 from .test_unsaved_work import asked_before_leaving
@@ -128,7 +129,9 @@ def test_a_row_goes_by_keyboard_alone_and_focus_moves_to_the_next_row(
     expect(block.locator("[data-removed-said]")).to_have_text(removed("+351 912 345 671"))
     third = block.locator("li:not([hidden])").nth(1)
     expect(third.locator("input[name$='-number_1']")).to_have_value("912 345 672")
-    first_control = third.locator("input:not([type=hidden]), select").first
+    # The row's first control, as a person meets it: its kind, at the button built for the
+    # select (#301). One move of the focus, straight there.
+    first_control = drawn(third.locator("input:not([type=hidden]), select").first)
     expect(first_control).to_be_focused()
     count = page.locator('[data-section-link="section-phones"] .badge')
     expect(count).to_have_text("2")
@@ -725,7 +728,7 @@ def test_a_second_tab_takes_a_row_that_has_gone_off_its_own_copy(page: Page, liv
     expect(other.locator("[data-htmx-alert]")).to_be_empty()
     expect(other.locator('[data-section-link="section-phones"] .badge')).to_have_text("2")
     third = block.locator("li:not([hidden])").nth(1)
-    expect(third.locator("input:not([type=hidden]), select").first).to_be_focused()
+    expect(drawn(third.locator("input:not([type=hidden]), select").first)).to_be_focused()
     expect(other.locator("input[name=headline]")).to_have_value("Typed in the other tab")
 
     other.get_by_role("button", name="Save", exact=True).click()

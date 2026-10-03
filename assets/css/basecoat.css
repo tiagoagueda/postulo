@@ -548,6 +548,219 @@
   }
 }
 
+/* ------------------------------------------------------------------ select */
+
+/*
+ * A select's own control (#301): what `app.js` builds beside every native `<select>`, in
+ * Basecoat's vocabulary -- `.select` round a `<button>` that shows the choice and a
+ * `[data-popover]` holding the `role="listbox"`. The native select is still on the page
+ * and is still what the form posts; this is what is seen and pressed.
+ *
+ * **The wrapper is not a box.** Basecoat makes `.select` a relative inline box, to place a
+ * list that is laid out in the page. The list here is a popover in the top layer, placed
+ * against its button like a menu's panel (#310), so the wrapper has nothing to hold --
+ * and as `display: contents` it lets the button stand exactly where the select stood: a
+ * child of the same `.field`, the same grid, the same `input-group`, sized by the same
+ * rules. A page laid out round a native select is laid out round this without knowing.
+ * A margin the page gives its children (`space-y-3`) lands on the wrapper, which has no
+ * box to put it round, so the button takes the wrapper's.
+ *
+ * **The button is the select's box**: the border, the ground and the ring every control
+ * has (`app.css`), the widths and the padding the page wrote on its select, which the
+ * script copies across, and the select's own way of being as wide as its longest option
+ * whatever it shows -- the script says which option is the longest
+ * (`data-select-longest`) and it is drawn here, under the chosen one and out of sight, so
+ * a menu with no width written on it is the width it always was and choosing never moves
+ * anything.
+ *
+ * Basecoat's choices undone: the tick beside the chosen option is a background image in
+ * its packs, black in both themes and thrown away under forced colours, so it is an icon
+ * in the text's own colour instead; an option's words wrap rather than being cut, because
+ * an entry cut short is an entry nobody can read; the list is never narrower than its
+ * button and never asks for the width of the window, which is what `min-width: 100%`
+ * means to something in the top layer; and nothing fades or slides.
+ */
+@layer components {
+  .select:not(select) {
+    display: contents;
+  }
+
+  .select:not(select) > button {
+    margin: inherit;
+    @apply w-full cursor-pointer gap-2 rounded-lg border border-input bg-white px-3 py-2 text-sm
+      text-ink-900
+      focus-visible:border-brand-500 focus-visible:ring-2 focus-visible:ring-brand-500
+      aria-expanded:border-brand-500 aria-expanded:ring-2 aria-expanded:ring-brand-500
+      dark:bg-ink-950 dark:text-ink-100;
+  }
+
+  .select:not(select) > button > span {
+    @apply min-w-0 items-center gap-2;
+  }
+
+  .select:not(select) > button > svg {
+    @apply size-4 text-ink-500 dark:text-ink-400;
+  }
+
+  /* The chosen option's words over the longest option's, in one cell: the cell is as
+     wide as the wider and as tall as a line, with or without words in it.
+
+     A control narrower than its choice -- the country in front of a telephone number,
+     which is as wide as its dialling code on purpose, a status on a board's card in
+     German -- shows the first line of it and an ellipsis, where a native select cut the
+     words off with nothing to say so. A clamp and not `truncate`: it ends at a word where
+     there is one, so `+351 Portugal` is `+351…`, and it is the spelling the text-spacing
+     walk reads as cut short on purpose. The whole of it is in the list, where an option's
+     words wrap. The clamp is on the words inside the cell, not on the cell: an item of a
+     grid is made a block, and a block is not clamped. */
+  .select:not(select) [data-select-text] {
+    @apply grid min-w-0;
+    min-block-size: 1lh;
+  }
+
+  .select:not(select) [data-select-text] > span {
+    @apply col-start-1 row-start-1 min-w-0;
+  }
+
+  .select:not(select) [data-select-label] {
+    @apply line-clamp-1 wrap-anywhere whitespace-normal;
+  }
+
+  .select:not(select) [data-select-text]::after {
+    @apply invisible col-start-1 row-start-1 h-0 truncate;
+    content: attr(data-select-longest);
+  }
+
+  /* The flag or the icon of an option, and the room for one where an option has none,
+     so the words of a list line up and choosing an option without one moves nothing. */
+  .select:not(select) [data-select-mark] {
+    @apply inline-flex w-5 shrink-0 items-center justify-center;
+  }
+
+  /* In a `.field` a native select may be narrower than its longest option (Basecoat's
+     `min-w-0`), and so may this. */
+  .field > .select:not(select) > button {
+    @apply min-w-0;
+  }
+
+  /* In a group the group is the box (#290), and the control inside it has none. */
+  .input-group > .select:not(select) > button {
+    @apply h-full min-w-0 flex-1 rounded-none border-0 bg-transparent
+      focus-visible:ring-0 aria-expanded:ring-0;
+  }
+
+  /* The telephone field's chooser (#304), as its native select is: no width of its own,
+     and a basis that says how wide it is. */
+  .input-group[data-phone-field] > .select:not(select) > button {
+    @apply h-auto w-0 shrink grow basis-34;
+  }
+
+  .input-group[data-phone-field] > .select:not(select) > button:focus-visible {
+    @apply outline-2 -outline-offset-2 outline-brand-500 outline-solid;
+  }
+
+  .select:not(select) [data-popover] {
+    @apply w-max p-0 text-sm;
+    min-width: 9rem;
+  }
+
+  .select:not(select) [data-popover] > header {
+    @apply border-b border-border p-1.5;
+  }
+
+  .select:not(select) [role="listbox"] {
+    @apply min-h-0 flex-1 overflow-y-auto overscroll-contain p-1;
+  }
+
+  .select:not(select) [role="listbox"]:not(:has([data-value]:not([aria-hidden="true"])))::before {
+    @apply px-2 py-4 text-sm whitespace-normal text-ink-500 dark:text-ink-400;
+  }
+
+  .select:not(select) [data-select-heading] {
+    @apply px-2 pt-2 pb-1 text-xs font-medium text-ink-500 dark:text-ink-400;
+  }
+
+  .select:not(select) [role="option"] {
+    @apply cursor-pointer gap-2 rounded-md px-2 py-1.5 whitespace-normal text-ink-700
+      dark:text-ink-200;
+  }
+
+  .select:not(select) [role="option"] > span:not([data-select-mark]) {
+    @apply min-w-0 wrap-anywhere;
+  }
+
+  .select:not(select) [role="option"].active {
+    @apply text-ink-900 dark:text-ink-50;
+  }
+
+  .select:not(select) [role="option"][aria-selected="true"] {
+    @apply bg-none font-medium text-ink-900 dark:text-ink-50;
+  }
+
+  /* The tick, at the end of the chosen option: a shape as well as a weight. */
+  .select:not(select) [role="option"] > svg {
+    @apply ms-auto size-4 text-brand-600 dark:text-brand-400;
+  }
+
+  /* A finger: taller options, and a box whose type is large enough that a phone does not
+     zoom the page to show it. Both are over the 24 pixels SC 2.5.8 asks at any pointer. */
+  @media (pointer: coarse) {
+    .select:not(select) [role="option"] {
+      @apply py-2.5;
+    }
+
+    .select:not(select) [data-popover] > header > input {
+      @apply text-base;
+    }
+  }
+}
+
+/* Forced colours: the button's border and focus in the system's own colours, as on a
+   field and a button (#227, #277), and the option the keys are on in the colour the
+   system uses for "this is the one you are on" -- its tint is a background, which the
+   theme throws away. Unlayered, as the others are.
+
+   And an outline only where the focus is. Basecoat hides the outline of the button, the
+   list and every option with `outline-hidden`, which under forced colours is a transparent
+   outline two pixels wide -- and the theme paints a transparent outline, focus or no
+   focus. Every select on a page was drawn as if it had the focus, and every option of an
+   open list had a frame of its own. */
+@media (forced-colors: active) {
+  .select:not(select) > button {
+    border: 1px solid ButtonText;
+  }
+
+  .select:not(select) > button:not(:focus-visible),
+  .select:not(select) [data-popover],
+  .select:not(select) [role="listbox"],
+  .select:not(select) [role="option"] {
+    outline: 0;
+  }
+
+  .input-group > .select:not(select) > button {
+    border: 0;
+  }
+
+  .select:not(select) > button:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .input-group[data-phone-field] > .select:not(select) > button:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .select:not(select) [role="option"].active {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+
+  .select:not(select) [role="option"].active > svg {
+    color: HighlightText;
+  }
+}
+
 /* ---------------------------------------------------------- the empty state */
 
 /*

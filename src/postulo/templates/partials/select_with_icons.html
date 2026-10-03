@@ -1,0 +1,5 @@
+{% load postulo %}{% comment %} A select whose options each name an icon (#301): Django's own select, and after it
+   the icons its list can show, drawn once each for the script to copy. An `<option>` holds
+   words and nothing else, so the pictures are in the control `app.js` builds beside the
+   select; with the script blocked the template is inert and nothing is missing that was
+   ever there. `core/option_icons.py` says the rest. {% endcomment %}{% include "django/forms/widgets/select.html" %}{% option_icons widget.option_icons %}

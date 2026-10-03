@@ -255,15 +255,17 @@ class LanguageSelect(forms.Select):
     Right-to-left languages will want ``dir`` alongside this; that belongs with the rest of
     the layout work rather than here.
 
-    ``flagged`` makes each option carry its flag's URL as well, for a script that draws the
-    chosen language's flag over the closed select -- the telephone field's answer (#88) to
-    an ``<option>`` holding text and nothing else, used by *Server settings -> Defaults*
-    (#208). Per option because static files are served under a content hash, so there is
-    no pattern a script could build one from. Off by default: most language menus have no
-    flag beside them and would only carry the weight.
+    Each option carries its flag's URL as well, which is what the control ``app.js``
+    builds beside the select draws in its list and in the closed control (#301): an
+    ``<option>`` holds text and nothing else, so the native select shows no flag, and
+    where one is wanted with the script blocked the page draws the saved language's
+    beside the select, as *Server settings -> Defaults* does (#208). Per option because
+    static files are served under a content hash, so there is no pattern a script could
+    build one from. A language with no single home carries an empty address and draws
+    nothing: no flag beats a wrong flag. ``flagged=False`` is a menu that wants none.
     """
 
-    def __init__(self, attrs=None, choices=(), *, flagged: bool = False):
+    def __init__(self, attrs=None, choices=(), *, flagged: bool = True):
         super().__init__(attrs, choices)
         self.flagged = flagged
 
@@ -280,14 +282,48 @@ class LanguageSelect(forms.Select):
         return option
 
 
-def time_zone_choices() -> list[tuple[str, str]]:
-    """Every IANA zone this machine knows about.
+#: The areas a time zone's name begins with, each a group of the menu (#301), in the
+#: order they are drawn. A name that begins with none of them -- ``UTC``, ``Etc/GMT+3``,
+#: ``US/Eastern`` and the other names kept for old files -- is under `OTHER_ZONES`.
+TIME_ZONE_AREAS = {
+    "Africa": _("Africa"),
+    "America": _("Americas"),
+    "Antarctica": _("Antarctica"),
+    "Asia": _("Asia"),
+    "Atlantic": _("Atlantic Ocean"),
+    "Australia": _("Australia"),
+    "Europe": _("Europe"),
+    "Indian": _("Indian Ocean"),
+    "Pacific": _("Pacific Ocean"),
+}
+OTHER_ZONES = "Etc"
+
+
+def time_zone_area(name: str) -> str:
+    """Which group of the menu a zone is under: the part of its name before the slash
+    where that is one of the nine areas, and `OTHER_ZONES` for the rest."""
+    area = name.split("/", 1)[0] if "/" in name else ""
+    return area if area in TIME_ZONE_AREAS else OTHER_ZONES
+
+
+def time_zone_choices() -> list:
+    """Every IANA zone this machine knows about, grouped by the area its name begins with.
+
+    Some four hundred names in one list was a list nobody reads (#301). Grouped, the
+    native select draws an ``<optgroup>`` for each area, with no script, and the control
+    built beside it draws the same groups. A zone's label is still its whole name: the
+    closed menu shows the choice alone, and *Lisbon* without *Europe* is half a name.
 
     Built at render time rather than declared on the model, so that a time zone
     database update does not generate a migration.
     """
+    grouped: dict[str, list[tuple[str, str]]] = {area: [] for area in TIME_ZONE_AREAS}
+    grouped[OTHER_ZONES] = []
+    for name in sorted(zoneinfo.available_timezones()):
+        grouped[time_zone_area(name)].append((name, name.replace("_", " ")))
+    labels = {**TIME_ZONE_AREAS, OTHER_ZONES: _("Other time zones")}
     return [("", _("Use the instance default"))] + [
-        (name, name.replace("_", " ")) for name in sorted(zoneinfo.available_timezones())
+        (labels[area], zones) for area, zones in grouped.items() if zones
     ]
 
 

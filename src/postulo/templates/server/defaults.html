@@ -24,9 +24,10 @@
       {% comment %} Not `<c-field>`: the chosen language's flag sits beside the closed select
          in an input group, as the telephone field's country flag does (#88, #290), because
          an <option> holds text and nothing else. The server draws the saved language's flag,
-         so without a script the field is right; the script keeps it in step with the choice
-         (#208). The space is reserved whether or not a flag is showing, so choosing a
-         language moves nothing. {% endcomment %}
+         so without a script the field is right (#208). With one, the select's own control
+         draws the flag in its button and beside every language in its list (#301), and
+         this one is put away. The space is reserved whether or not a flag is showing, so
+         choosing a language moves nothing. {% endcomment %}
       <div class="field mb-4 wrap-anywhere"{% if form.default_language.errors %} data-invalid="true"{% endif %}>
         <label for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
         <div class="input-group">

@@ -114,6 +114,12 @@ def lei_checks_out(value: str) -> bool:
 
 
 # --------------------------------------------------------------------------- the table
+#
+# Each scheme names the icon drawn beside it in a row's choice of kind (#301): a generic
+# one out of the Lucide set -- a mortarboard for a researcher's identifier, a building for
+# a company's register, a globe for an item in an open database -- and never the scheme's
+# own mark, which is somebody's trademark (`TRADEMARKS.md`). One that names none, as ISNI
+# and Other do, draws the card every identifier is.
 
 SCHEMES: dict[str, Scheme] = {
     scheme.key: scheme
@@ -134,6 +140,7 @@ SCHEMES: dict[str, Scheme] = {
             checksum_message=_(
                 "That ORCID's last digit does not match the rest, so one of them is a typo."
             ),
+            icon="graduation-cap",
         ),
         Scheme(
             RESEARCHERID,
@@ -143,6 +150,7 @@ SCHEMES: dict[str, Scheme] = {
             link="https://www.webofscience.com/wos/author/record/{value}",
             example="A-1234-2020",
             upper=True,
+            icon="graduation-cap",
         ),
         Scheme(
             SCOPUS,
@@ -152,6 +160,7 @@ SCHEMES: dict[str, Scheme] = {
             link="https://www.scopus.com/authid/detail.uri?authorId={value}",
             example="7004212771",
             tidy=_digits_only,
+            icon="graduation-cap",
         ),
         # ---------------------------------------------------------------------- both
         Scheme(
@@ -174,6 +183,7 @@ SCHEMES: dict[str, Scheme] = {
             url_paths=("/wiki/", "/entity/"),
             hosts=("wikidata.org",),
             upper=True,
+            icon="globe",
         ),
         Scheme(
             LINKEDIN,
@@ -186,6 +196,7 @@ SCHEMES: dict[str, Scheme] = {
             url_paths=("/company/", "/school/", "/showcase/", "/in/"),
             hosts=("linkedin.com",),
             lower=True,
+            icon="user",
         ),
         # ----------------------------------------------------------------- companies
         Scheme(
@@ -201,6 +212,7 @@ SCHEMES: dict[str, Scheme] = {
             tidy=_no_spaces,
             checksum=lei_checks_out,
             checksum_message=_("The LEI's check digits do not match."),
+            icon="landmark",
         ),
         Scheme(
             REGISTER,
@@ -211,6 +223,7 @@ SCHEMES: dict[str, Scheme] = {
             example=_("PT 501234567, FR 552081317, DE HRB 12345"),
             upper=True,
             tidy=_country_then_number,
+            icon="building-2",
         ),
         Scheme(
             CRUNCHBASE,
@@ -222,6 +235,7 @@ SCHEMES: dict[str, Scheme] = {
             url_paths=("/organization/",),
             hosts=("crunchbase.com",),
             lower=True,
+            icon="building-2",
         ),
         Scheme(
             OPENCORPORATES,
@@ -235,6 +249,7 @@ SCHEMES: dict[str, Scheme] = {
             hosts=("opencorporates.com",),
             segments=2,
             lower=True,
+            icon="building-2",
         ),
         # --------------------------------------------------------------------- both
         # `other` was already the one key in both registries, and that overlap is the hint

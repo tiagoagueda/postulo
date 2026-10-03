@@ -21,6 +21,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from .selects import drawn
 from .test_accessibility import axe_source, describe, sign_in, violations_on  # noqa: F401
 from .test_reflow import LANGUAGES, NARROW, SCROLLS_SIDEWAYS, SPILLS
 from .test_target_size import too_small
@@ -108,9 +109,9 @@ def choose_and_save(page: Page, base: str, cv) -> None:
     phone = page.locator("select[name=prints_phone]")
     expect(page.locator("input[name=show_contact_details]")).to_be_visible()
     expect(page.locator("input[name=show_contact_details]")).to_be_checked()
-    expect(phone).to_be_hidden()
+    expect(drawn(phone)).to_be_hidden()
     card.locator("summary").click()
-    expect(phone).to_be_visible()
+    expect(drawn(phone)).to_be_visible()
 
     # Each menu names its rows the way *Your details* does, and opens on following it.
     expect(phone).to_have_value("default")
@@ -239,7 +240,7 @@ def test_a_card_saying_a_chosen_row_has_gone_has_no_violations(
         found = violations_on(page, axe_source)
         assert not found, describe(f"{path} with a chosen row gone ({scheme})", found)
     # The disclosure is open on it, and the menu on what the CV prints now.
-    expect(page.locator("select[name=prints_phone]")).to_be_visible()
+    expect(drawn(page.locator("select[name=prints_phone]"))).to_be_visible()
     expect(page.locator("select[name=prints_phone]")).to_have_value("none")
 
 
@@ -264,7 +265,10 @@ def test_the_open_card_reflows_at_320_pixels(live_server, page: Page, cv, langua
     assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0
     card = page.locator("[data-cv-prints]").bounding_box()
     for name in ("prints_phone", "prints_repository", "prints_identifiers"):
-        menu = page.locator(f"select[name={name}]").bounding_box()
+        # The menu as it is drawn: the button built for the select (#301), which is as wide
+        # as its longest option, as a native menu is, unless the card holds it.
+        menu = drawn(page.locator(f"select[name={name}]")).bounding_box()
+        assert menu["width"] >= 24, name
         assert menu["x"] >= card["x"] and menu["x"] + menu["width"] <= card["x"] + card["width"]
 
 

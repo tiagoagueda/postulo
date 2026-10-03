@@ -56,6 +56,7 @@ from .models import (
     BOARD_STATUSES,
     END_STATUSES,
     SETTLED_OUTCOMES,
+    STATUS_ICONS,
     Application,
     EventKind,
     Interview,
@@ -64,6 +65,7 @@ from .models import (
     Reminder,
     Status,
     Suggestion,
+    status_options,
 )
 from .services import (
     DEFAULT_INTERVIEW_LENGTH,
@@ -142,6 +144,10 @@ class ApplicationFilterMixin:
             "selected_state": self.request.GET.get("state", ""),
             "selected_quiet": bool(self.request.GET.get("quiet", "").strip()),
             "statuses": Status.choices,
+            # The same statuses with the icon each draws in a card's list, and the icons
+            # themselves, drawn once for the whole board (#301).
+            "status_options": status_options(),
+            "status_icons": list(STATUS_ICONS.values()),
             "tags": Tag.objects.for_user(self.request.user),
         }
 

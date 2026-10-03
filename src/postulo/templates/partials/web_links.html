@@ -36,17 +36,18 @@
              No width is written on the select: it is as wide as its longest option, so a
              service's name is whole in every language. The name is a fixed width and the
              address takes what is left: it is the longest thing in the row, and two rows
-             of one shape then line up whether or not each has a bin. The icon is the chosen
-             service's, drawn by the server, so the row is right without a script; every
-             icon the choice can draw is here, hidden, and `app.js` shows the one that
-             goes with the choice, as it does the flag beside a country (#88).
+             of one shape then line up whether or not each has a bin. The icon beside the
+             select is the chosen service's, drawn by the server, so the row is right
+             without a script. With one, the select's own control draws each service's icon
+             in its list and the chosen one in itself, and this one is put away (#301), as
+             the flag beside a country is (#88).
           {% endcomment %}
           <div class="flex flex-wrap items-end gap-3" data-link-row{% if block.has_services %} data-if-other{% if row.label.value %} data-has-name{% endif %}{% endif %}>
             {% if block.has_services %}
               <div class="field w-full sm:w-auto sm:max-w-full sm:flex-none">
                 <label for="{{ row.service.id_for_label }}">{% translate "Service" %}</label>
                 <div class="input-group">
-                  <span data-align="start" data-service-icons>{% for drawn in row.service_icons %}<span data-service-icon="{{ drawn.name }}"{% if not drawn.shown %} hidden{% endif %}>{% icon drawn.name %}</span>{% endfor %}</span>
+                  <span data-align="start" data-option-mark>{% if row.service_icon %}{% icon row.service_icon %}{% endif %}</span>
                   {{ row.service }}
                 </div>
               </div>

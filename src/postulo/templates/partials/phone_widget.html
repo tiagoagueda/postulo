@@ -7,12 +7,15 @@
   bare select in a two-part control is announced as nothing at all, and the visible label
   belongs to the box, which is the control somebody is looking for.
 {% endcomment %}
-{% comment %} The flag sits beside the select rather than inside it: an <option> holds text
-   and nothing else, in every browser, so no image can go in the list itself (#88). Out
-   here it is arguably more use than it was in there -- visible without opening anything.
-   The space is reserved whether or not a flag is showing, so choosing a country moves
-   nothing on the page. It comes first in the markup, which is where it is drawn, so it
-   needs no `data-align` to be put there.
+{% comment %} The flag sits beside the native select rather than inside it: an <option> holds
+   text and nothing else, in every browser, so no image can go in a native list (#88).
+   This one is the page without scripts: the flag of the country the field loaded with,
+   drawn by the server. Where scripts run, the control `app.js` builds beside the select
+   draws the chosen country's flag in its button and every country's in its list (#301),
+   and puts this one away, so a flag is never drawn twice. The space is reserved whether
+   or not a flag is showing, so choosing a country moves nothing on the page. It comes
+   first in the markup, which is where it is drawn, so it needs no `data-align` to be put
+   there.
 
    Each option carries its own flag's URL. That is around 11 KB of repeated attribute per
    field, which gzip takes to about two, and it is the only correct way: static files are

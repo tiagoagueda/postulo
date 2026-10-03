@@ -66,6 +66,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.logs",
             "postulo.core.mail_choices",
             "postulo.core.memo",
+            # What an option of a select draws beside its words (#301): a widget and the
+            # name of an icon, read by the identifiers' registry among the records.
+            "postulo.core.option_icons",
             "postulo.core.phone_field",
             "postulo.core.phones",
             "postulo.core.pictures",

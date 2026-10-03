@@ -93,14 +93,18 @@ def test_an_ending_and_its_reason_come_back_in_the_swapped_card(
     expect(card.locator("[data-ending]")).to_have_count(0)
 
     card.locator("select[name=status]").select_option("rejected")
-    card.get_by_label("Why it ended").select_option("pay")
+    # The label names the select and the button built for it (#301): the select is the
+    # form's control, and the one a value is set on.
+    why = card.get_by_label("Why it ended").and_(card.locator("select"))
+    why.select_option("pay")
     card.get_by_role("button", name="Record").click()
 
     expect(page.locator("#timeline")).to_contain_text("Why: The pay")
     expect(card.locator("[data-end-reason]")).to_have_text("The pay")
     expect(card.locator("[data-last-stage]")).to_have_text("Applied")
     # And the form under it is empty again, ready for the next thing to record.
-    expect(card.get_by_label("Why it ended")).to_have_value("")
+    expect(card.get_by_label("Why it ended").and_(card.locator("select"))).to_have_value("")
+    expect(card.get_by_role("combobox", name="Why it ended")).to_have_count(1)
 
 
 def test_a_page_load_would_have_moved_it(page: Page, live_server, application):

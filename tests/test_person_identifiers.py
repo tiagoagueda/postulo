@@ -146,7 +146,8 @@ def test_the_kind_is_a_select_of_the_schemes_that_identify_people(client, user):
     client.force_login(user)
     html = client.get(reverse("accounts:profile")).content.decode()
     assert '<select name="identifiers-0-scheme"' in html
-    assert '<option value="orcid">ORCID</option>' in html
+    # Each kind says the icon its list draws beside it (#301): generic, never a mark.
+    assert '<option value="orcid" data-icon="graduation-cap">ORCID</option>' in html
     assert '<option value="other"' in html
     assert '<option value="lei"' not in html, "a company's scheme has no business here"
 

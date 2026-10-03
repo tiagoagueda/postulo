@@ -91,6 +91,25 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
 
 
 @register.simple_tag
+def option_icons(names) -> str:
+    """The icons a select's options name, for the script to copy: ``{% option_icons names %}``.
+
+    An option says which icon it draws in ``data-icon``, and the control ``app.js`` builds
+    beside a select copies that icon out of a ``<template data-option-icons>`` on the page
+    (#301). A widget that knows its icons draws its own (`core.option_icons.OptionIcons`);
+    this is for a select a template writes out, and is drawn once for however many selects
+    share the icons -- the board's two hundred cards, one set of statuses. Nothing is drawn
+    for no names, and a name Postulo does not ship is left out rather than raised on.
+    """
+    from postulo.core.option_icons import distinct
+
+    drawn = [icon(name) for name in distinct(names or ())]
+    if not drawn:
+        return ""
+    return mark_safe(f"<template data-option-icons>{''.join(drawn)}</template>")  # noqa: S308
+
+
+@register.simple_tag
 def language_flag(code: str, css_class: str = "flag", **attrs: str) -> str:
     """The flag that stands for a language: ``{% language_flag "pt-PT" %}``.
 

@@ -233,6 +233,80 @@
     </div>
   </section>
 
+  <!-- ------------------------------------------------------------------ choices -->
+  {% comment %} A select's own control (#301). The server draws a native `<select>`, which is
+     the whole control with scripts off; `app.js` builds Basecoat's select beside it -- a
+     button and a list in a popover -- and the native one goes on being what a form posts.
+     An option says what it draws in `data-flag` or `data-icon`, and the icons are drawn
+     once, by `{% option_icons %}`, for the script to copy. A list of sixteen options or
+     more has a box that narrows it.
+
+     None of them is in a form, like everything else here, so none is sent anywhere. The
+     last one sits in a dialog, where its list is drawn over the dialog and Escape closes
+     the list alone. {% endcomment %}
+  <section id="design-choices" class="mb-10" aria-labelledby="design-choices-heading">
+    <c-section-title id="design-choices-heading">
+      {% translate "Choices" %}
+      <c-slot name="subtitle">{% translate "One of a list. Without scripts it is the browser's own select; with them, a button and a list whose options can hold a flag or an icon." %}</c-slot>
+    </c-section-title>
+    {% option_icons choice_icons %}
+    <div class="card grid gap-4 sm:grid-cols-2" data-design-choices>
+      <div class="field">
+        <label for="design-choice-icons">{% translate "Each with an icon" %}</label>
+        <select id="design-choice-icons">
+          <option value="mobile" data-icon="smartphone">{% translate "Mobile" %}</option>
+          <option value="work" data-icon="briefcase">{% translate "Work" %}</option>
+          <option value="home" data-icon="home">{% translate "Home" %}</option>
+          <option value="other" data-icon="phone">{% translate "Other" %}</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="design-choice-long">{% translate "A long list, with a box to narrow it" %}</label>
+        <select id="design-choice-long">
+          <option value="">—</option>
+          {% for code, name in countries %}
+            <option value="{{ code }}" data-flag="{% flag_url code %}">{{ name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="design-choice-groups">{% translate "In groups, with one switched off" %}</label>
+        <select id="design-choice-groups">
+          <optgroup label="{% translate 'Europe' %}">
+            <option value="Europe/Lisbon">Europe/Lisbon</option>
+            <option value="Europe/Paris" disabled>Europe/Paris</option>
+          </optgroup>
+          <optgroup label="{% translate 'Asia' %}">
+            <option value="Asia/Seoul">Asia/Seoul</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+          </optgroup>
+        </select>
+      </div>
+      <div class="field">
+        <label for="design-choice-disabled">{% translate "One nobody may change" %}</label>
+        <select id="design-choice-disabled" disabled>
+          <option>{% translate "Set by the operator" %}</option>
+        </select>
+      </div>
+      <div class="flex flex-wrap items-end gap-2 sm:col-span-2">
+        <button type="button" class="btn" data-variant="outline" popovertarget="design-choice-dialog" aria-haspopup="dialog">{% translate "Open a dialog with a choice in it" %}</button>
+      </div>
+    </div>
+    <c-dialog id="design-choice-dialog" tone="plain">
+      <c-slot name="title">{% translate "A choice in a dialog" %}</c-slot>
+      <c-slot name="description">{% translate "The list opens over the dialog. Escape closes the list and leaves the dialog open." %}</c-slot>
+      <div class="field">
+        <label for="design-choice-dialog-kind">{% translate "Kind" %}</label>
+        <select id="design-choice-dialog-kind">
+          <option value="mobile" data-icon="smartphone">{% translate "Mobile" %}</option>
+          <option value="work" data-icon="briefcase">{% translate "Work" %}</option>
+          <option value="home" data-icon="home">{% translate "Home" %}</option>
+          <option value="other" data-icon="phone">{% translate "Other" %}</option>
+        </select>
+      </div>
+    </c-dialog>
+  </section>
+
   <!-- ----------------------------------------------------------------- surfaces -->
   <section id="design-surfaces" class="mb-10" aria-labelledby="design-surfaces-heading">
     <c-section-title id="design-surfaces-heading">{% translate "Surfaces" %}</c-section-title>

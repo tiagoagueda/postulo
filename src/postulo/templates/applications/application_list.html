@@ -146,6 +146,10 @@
      Outside what the live filters swap, so the element they take turns on is never replaced
      under a request in flight. {% endcomment %}
   {% if shape == 'board' %}
+    {% comment %} The icon of each status, for the list every card's status opens (#301):
+       drawn once here, outside what the live filters swap, and copied by `app.js` into
+       whichever list is opened. {% endcomment %}
+    {% option_icons status_icons %}
     {% include "applications/partials/board_filters.html" with form_id="application-filters" table_id="applications-table" %}
   {% else %}
     <form method="get" id="application-filters"

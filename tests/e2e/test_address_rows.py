@@ -17,6 +17,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from .selects import DRAWN, button_of
 from .test_accessibility import axe_source, describe, sign_in, violations_on  # noqa: F401
 from .test_reflow import NARROW, SCROLLS_SIDEWAYS, SPILLS
 
@@ -71,17 +72,22 @@ def refuse_the_first_row(page: Page, base: str) -> None:
 
 
 #: One address row as it is drawn: every control that can be seen, in source order, with
-#: where it is; and each line of the row with where each of its boxes starts.
+#: where it is; and each line of the row with where each of its boxes starts. A select is
+#: seen as the button built for it (#301), which is named here by the select it drives; the
+#: select itself, out of sight beside it, is not one of the row's controls to a person.
 ROW = """(index) => {
   const row = document.querySelectorAll('#section-addresses li[data-address-row]')[index];
+  const drawn = __DRAWN__;
   const place = (el) => {
     const r = el.getBoundingClientRect();
     return {top: r.top, bottom: r.bottom, left: r.left, right: r.right};
   };
+  const itself = (control) => control.hasAttribute('data-select-trigger')
+    ? control.closest('[data-select]').previousElementSibling : control;
   const name = (control) => control.hasAttribute('data-remove-trigger')
-    ? 'remove' : control.name.split('-').pop();
+    ? 'remove' : itself(control).name.split('-').pop();
   const controls = [];
-  const every = 'select, textarea, input:not([type=hidden]), button';
+  const every = 'select:not([data-select-ready]), textarea, input:not([type=hidden]), button';
   for (const control of row.querySelectorAll(every)) {
     if (control.checkVisibility()) controls.push({name: name(control), ...place(control)});
   }
@@ -95,14 +101,14 @@ ROW = """(index) => {
       boxes.push({
         name: name(control),
         field: place(field),
-        box: place(control),
+        box: place(drawn(control)),
         said: said ? place(said) : null,
       });
     }
     lines.push(boxes);
   }
   return {controls, lines};
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 PARTS = ["street", "postcode", "municipality", "region", "country"]
 
@@ -408,4 +414,4 @@ def test_a_row_taken_off_leaves_focus_on_what_the_next_row_is(live_server, page:
     rows.nth(0).locator("[data-remove-trigger]").click()
     page.locator("dialog[open]").get_by_role("button", name="Remove", exact=True).click()
 
-    expect(page.locator("select[name=addresses-1-kind]")).to_be_focused()
+    expect(button_of(page.locator("select[name=addresses-1-kind]"))).to_be_focused()

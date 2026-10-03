@@ -7,8 +7,9 @@ means. What it cannot say is whether a person can use any of it. These do:
   status, outcome, tag, gone quiet -- narrows the table from a header, to the rows the
   queryset gives;
 * **by keyboard alone**: every one is reached with Tab, opened with Enter and worked with
-  the arrow keys and Space, and the focus stays in the control being used while the table
-  is swapped under it;
+  the arrow keys, Enter and Space, and the focus stays in the control being used while the
+  table is swapped under it. A list is the button built for its select (#301): the arrows
+  move in it and Enter chooses, so the table is asked once, for the status meant;
 * **with scripts off**: the same headers, and the *Filter* button each ends in;
 * **the neighbours' faults are not repeated**: a filter the page came with can be changed
   and cleared from its header (#622), a header put back to *Any* stays open with the focus
@@ -37,6 +38,7 @@ import re
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
+from .selects import DRAWN, button_of, drawn
 from .test_accessibility import axe_source, describe, sign_in, violations_on  # noqa: F401
 from .test_column_filters import settled
 from .test_navigation_bar import set_language
@@ -148,6 +150,12 @@ def header(page: Page, column: str):
     return page.locator(f'{TABLE} thead [data-col="{column}"]')
 
 
+def seen(page: Page, control: str):
+    """A header's control as a person sees it: a list at the button built for its select
+    where scripts run (#301), and anything else, or a list without scripts, as itself."""
+    return drawn(page.locator(control))
+
+
 def open_header(page: Page, column: str) -> None:
     disclosure = header(page, column).locator("[data-col-filter]")
     if disclosure.get_attribute("open") is None:
@@ -197,9 +205,9 @@ def test_nothing_stands_between_the_heading_and_the_table(page: Page, live_serve
 
     open_header(page, "status")
     for control in ("#filter-status", "#filter-state", "#filter-quiet"):
-        expect(page.locator(control)).to_be_visible()
+        expect(seen(page, control)).to_be_visible()
     open_header(page, "role")
-    expect(page.locator("#filter-tag")).to_be_visible()
+    expect(seen(page, "#filter-tag")).to_be_visible()
 
 
 # --------------------------------------------------------------- each filter, from a header
@@ -246,14 +254,14 @@ def test_each_filter_narrows_the_table_from_its_header(page: Page, live_server, 
     label = "Role is filtered" if column == "role" else "Status is filtered"
     expect(page.get_by_role("img", name=label)).to_be_visible()
     expect(header(page, column)).to_have_attribute("aria-label", label)
-    expect(page.locator(control)).to_be_visible()
-    expect(page.locator(control)).to_be_focused()
+    expect(seen(page, control)).to_be_visible()
+    expect(seen(page, control)).to_be_focused()
     expect(page.locator("#applications-count")).to_contain_text("Clear filters")
 
     # *Clear filters* is still the way out of all of them.
     page.locator("#applications-count a").click()
     shows(page, asked(person))
-    expect(page.locator(control)).to_be_hidden()
+    expect(seen(page, control)).to_be_hidden()
 
 
 def test_the_four_narrow_together_and_with_the_search(page: Page, live_server, search):
@@ -305,40 +313,60 @@ def tab_to(page: Page, selector: str, key: str = "Tab", limit: int = 80) -> None
 
 def test_every_header_filter_is_reached_and_worked_without_a_mouse(page: Page, live_server, search):
     """Tab reaches the column's name, Enter opens its filter, Tab goes into it, the arrow
-    keys choose and Space ticks -- and each time the table is swapped under the control the
-    focus is still in it, so the next key is the next thing done."""
+    keys move down its list, Enter chooses and Space ticks -- and each time the table is
+    swapped under the control the focus is still in it, so the next key is the next thing
+    done. Passing over a status on the way asks the table for nothing (#301): a native
+    list sent a request for every status an arrow key went past."""
     person = search["applicant"]
     sign_in(page, live_server.url)
     page.set_viewport_size(WIDE)
     page.goto(f"{live_server.url}/applications/")
     shows(page, asked(person))
 
+    asked_for = []
+    page.on(
+        "request",
+        lambda request: asked_for.append(request.url) if "/applications/?" in request.url else None,
+    )
+
     tab_to(page, '[data-col="status"] summary')
-    expect(page.locator("#filter-status")).to_be_hidden()
+    expect(seen(page, "#filter-status")).to_be_hidden()
     page.keyboard.press("Enter")
-    expect(page.locator("#filter-status")).to_be_visible()
+    expect(seen(page, "#filter-status")).to_be_visible()
 
     page.keyboard.press("Tab")
     status = page.locator("#filter-status")
-    expect(status).to_be_focused()
+    expect(button_of(status)).to_be_focused()
+    page.keyboard.press("ArrowDown")  # opens the list, on Any
     page.keyboard.press("ArrowDown")  # Any -> Draft
+    expect(button_of(status)).to_have_attribute("aria-expanded", "true")
+    expect(status).to_have_value(""), "nothing is chosen by passing over it"
+    page.keyboard.press("Enter")
     expect(status).to_have_value("draft")
     shows(page, asked(person, status="draft"))
-    expect(status).to_be_focused()
+    expect(button_of(status)).to_be_focused()
+    expect(button_of(status)).to_have_text("Draft")
     settled(page)
+    page.keyboard.press("ArrowDown")  # opens it again, on Draft
     page.keyboard.press("ArrowDown")  # Draft -> Applied
+    page.keyboard.press("ArrowDown")  # Applied -> Acknowledged
+    page.keyboard.press("ArrowUp")  # and back: two statuses passed over
+    page.keyboard.press("Enter")
     expect(status).to_have_value("applied")
     shows(page, asked(person, status="applied"))
-    expect(status).to_be_focused()
+    expect(button_of(status)).to_be_focused()
     settled(page)
+    assert len(asked_for) == 2, f"one request for each status chosen, and no more: {asked_for}"
 
     page.keyboard.press("Tab")
     outcome = page.locator("#filter-state")
-    expect(outcome).to_be_focused()
+    expect(button_of(outcome)).to_be_focused()
+    page.keyboard.press("ArrowDown")  # opens the list, on Any
     page.keyboard.press("ArrowDown")  # Any -> Still live
+    page.keyboard.press("Enter")
     expect(outcome).to_have_value("open")
     shows(page, asked(person, status="applied", state="open"))
-    expect(outcome).to_be_focused()
+    expect(button_of(outcome)).to_be_focused()
     settled(page)
 
     page.keyboard.press("Tab")
@@ -362,11 +390,12 @@ def test_every_header_filter_is_reached_and_worked_without_a_mouse(page: Page, l
     expect(page.locator("#filter-role")).to_be_focused()
     page.keyboard.press("Tab")
     tag = page.locator("#filter-tag")
-    expect(tag).to_be_focused()
-    page.keyboard.press("ArrowDown")  # Any -> Dream job, the first by name
+    expect(button_of(tag)).to_be_focused()
+    page.keyboard.press("d")  # opens the list on the first tag that starts with it
+    page.keyboard.press("Enter")
     expect(tag).to_have_value("dream-job")
     shows(page, asked(person, status="applied", state="open", tag="dream-job"))
-    expect(tag).to_be_focused()
+    expect(button_of(tag)).to_be_focused()
 
     # And the header folds again from its name, with nothing lost.
     settled(page)
@@ -581,15 +610,15 @@ def test_a_filter_put_back_to_any_leaves_its_header_open_with_the_focus_in_it(
     shows(page, asked(person))
     disclosure = header(page, column).locator("[data-col-filter]")
     expect(disclosure).to_have_attribute("open", "")
-    expect(page.locator(control)).to_be_visible()
-    expect(page.locator(control)).to_be_focused()
+    expect(seen(page, control)).to_be_visible()
+    expect(seen(page, control)).to_be_focused()
     expect(header(page, column).locator("[aria-label$='is filtered']")).to_have_count(0)
     expect(header(page, column)).not_to_have_attribute("aria-label", re.compile("is filtered"))
     # And it answers again from where it is.
     settled(page)
     use(page, control, value)
     shows(page, asked(person, **wanted))
-    expect(page.locator(control)).to_be_focused()
+    expect(seen(page, control)).to_be_focused()
 
 
 def test_a_search_that_matches_nothing_forgets_neither_the_sort_nor_the_filters(
@@ -610,7 +639,8 @@ def test_a_search_that_matches_nothing_forgets_neither_the_sort_nor_the_filters(
     box.fill("zzzz")
     expect(page.locator(TABLE)).to_contain_text("Nothing matches these filters")
     shows(page, [])
-    expect(page.locator("#filter-status")).to_be_visible()
+    expect(seen(page, "#filter-status")).to_be_visible()
+    expect(seen(page, "#filter-status")).to_have_text("Applied")
     expect(page.locator("#filter-status")).to_have_value("applied")
     expect(page.locator("#filter-state")).to_have_value("open")
     expect(page.locator("#sort-role")).to_be_visible()
@@ -624,7 +654,7 @@ def test_a_search_that_matches_nothing_forgets_neither_the_sort_nor_the_filters(
     # A filter that leaves nothing can be loosened where it is.
     use(page, "#filter-status", "rejected")
     expect(page.locator(TABLE)).to_contain_text("Nothing matches these filters")
-    expect(page.locator("#filter-status")).to_be_focused()
+    expect(seen(page, "#filter-status")).to_be_focused()
     settled(page)
     use(page, "#filter-state", "")
     shows(page, asked(person, status="rejected"))
@@ -696,13 +726,15 @@ def test_with_the_status_column_hidden_its_filters_are_under_narrow_at_any_width
 
         narrow.locator("summary").click()
         for field in ("#filter-status-narrow", "#filter-state-narrow", "#filter-quiet-narrow"):
-            expect(page.locator(field)).to_be_visible()
+            expect(seen(page, field)).to_be_visible()
         # The fields the headers hold are a phone's, and are not drawn here.
-        expect(page.locator("#filter-role-narrow")).to_be_hidden()
-        expect(page.locator("#filter-tag-narrow")).to_be_hidden()
-        expect(narrow.get_by_label("Status", exact=True)).to_be_visible()
-        expect(narrow.get_by_label("Outcome", exact=True)).to_be_visible()
-        expect(narrow.get_by_label("Gone quiet", exact=True)).to_be_visible()
+        expect(seen(page, "#filter-role-narrow")).to_be_hidden()
+        expect(seen(page, "#filter-tag-narrow")).to_be_hidden()
+        # Each is one control by its label's name: a list is a combobox either way, the
+        # native select without scripts and the button built for it with them.
+        expect(narrow.get_by_role("combobox", name="Status", exact=True)).to_be_visible()
+        expect(narrow.get_by_role("combobox", name="Outcome", exact=True)).to_be_visible()
+        expect(narrow.get_by_role("checkbox", name="Gone quiet", exact=True)).to_be_visible()
 
         page.locator("#filter-status-narrow").select_option("applied")
         narrow.get_by_role("button", name="Filter", exact=True).click()
@@ -711,8 +743,9 @@ def test_with_the_status_column_hidden_its_filters_are_under_narrow_at_any_width
         assert times_in_the_address(page, "status") == 1, page.url
 
         # In use, so open, and saying what it narrows by.
-        expect(page.locator("#filter-status-narrow")).to_be_visible()
+        expect(seen(page, "#filter-status-narrow")).to_be_visible()
         expect(page.locator("#filter-status-narrow")).to_have_value("applied")
+        expect(narrow.get_by_role("combobox", name="Status", exact=True)).to_contain_text("Applied")
 
         # A header's control keeps it.
         header(page, "role").locator("summary").click()
@@ -729,7 +762,7 @@ def test_with_the_status_column_hidden_its_filters_are_under_narrow_at_any_width
         assert rows_shown(page) == asked(person, role="engineer")
         expect(page).to_have_url(re.compile(r"[?&]role=engineer(&|$)"))
         assert "status=applied" not in page.url
-        expect(page.locator("#filter-status-narrow")).to_be_hidden()
+        expect(seen(page, "#filter-status-narrow")).to_be_hidden()
     finally:
         context.close()
 
@@ -787,12 +820,14 @@ def test_narrow_and_an_open_header_fit_at_320_pixels(page: Page, live_server, se
     page.set_viewport_size(NARROWEST)
     page.goto(f"{base}/applications/?status=applied&tag=remote")
     page.locator("[data-narrow] > summary").click()
-    expect(page.locator("#filter-status-narrow")).to_be_visible()
+    expect(seen(page, "#filter-status-narrow")).to_be_visible()
 
     result = page.evaluate(SCROLLS_SIDEWAYS)
     assert not result["reached"], f"{language}: {result}"
+    # What a person sees: a list is the button built for its select, which is a button.
     controls = page.locator(
-        "[data-narrow-form] :is(input:not([type=hidden]), select, button, summary)"
+        "[data-narrow-form] :is(input:not([type=hidden]), select:not([data-select-ready]),"
+        " button, summary)"
     )
     assert controls.count() >= 10
     for control in controls.all():
@@ -846,6 +881,7 @@ def test_on_a_phone_what_is_set_under_narrow_outlives_a_search(
         expect(page.locator("[data-narrow]")).to_have_attribute("open", "")
         expect(page.locator("#filter-role-narrow")).to_have_value("eng")
         expect(page.locator("#filter-tag-narrow")).to_have_value("remote")
+        expect(seen(page, "#filter-tag-narrow")).to_have_text("Remote")
         expect(page.locator("#filter-quiet-narrow")).to_be_checked()
         expect(page.locator("#filter-status-narrow")).to_have_value("applied")
 
@@ -887,6 +923,7 @@ def test_with_the_status_column_hidden_what_is_set_under_narrow_outlives_a_heade
 
     expect(page.locator("[data-narrow]")).to_have_attribute("open", "")
     expect(status).to_have_value("applied")
+    expect(button_of(status)).to_have_text("Applied"), "and its button shows it"
     expect(page.locator("#filter-quiet-narrow")).to_be_checked()
     expect(page.locator("#filter-state-narrow")).to_have_value("")
     expect(page.locator("#filter-role")).to_be_focused()
@@ -1110,25 +1147,32 @@ EVERY_HEADER_OPEN = (
     "&role=e&company=a&location=l&applied_from=2020-01-01"
 )
 
-#: Every list in a header that is narrower than it would be left to itself, which is as
-#: wide as its widest choice: measured by the browser, in whatever font it is drawing in.
+#: Every list in a header that cannot show the whole of one of its choices: measured by
+#: the browser, in whatever font it is drawing in. The list is the button built for the
+#: select (#301), and each of its options is written out beside the words it shows and
+#: measured against the room those words have.
 LISTS_CUT_SHORT = """() => {
   const short = [];
-  for (const list of document.querySelectorAll('#applications-table thead select')) {
+  for (const select of document.querySelectorAll('#applications-table thead select')) {
+    const list = __DRAWN__(select);
     if (!list.checkVisibility()) continue;
-    const alone = list.cloneNode(true);
-    for (const name of ['id', 'name', 'form']) alone.removeAttribute(name);
-    alone.style.cssText = 'position: absolute; visibility: hidden; width: auto; min-width: 0;';
-    list.parentElement.appendChild(alone);
-    const wants = alone.getBoundingClientRect().width;
-    alone.remove();
-    const has = list.getBoundingClientRect().width;
-    if (has < wants - 0.5) {
-      short.push(`${list.id} is ${Math.round(has)} wide and wants ${Math.round(wants)}`);
+    const words = list.querySelector('[data-select-text]');
+    const probe = document.createElement('span');
+    probe.style.cssText = 'position: absolute; visibility: hidden; white-space: nowrap;';
+    words.appendChild(probe);
+    const has = words.getBoundingClientRect().width;
+    for (const option of select.options) {
+      probe.textContent = option.text;
+      const wants = probe.getBoundingClientRect().width;
+      if (has < wants - 0.5) {
+        short.push(
+          `${select.id} has ${Math.round(has)} for "${option.text}", wanting ${Math.round(wants)}`);
+      }
     }
+    probe.remove();
   }
   return short;
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 
 @pytest.mark.parametrize("language", ["de", "fr-fr"])
@@ -1146,7 +1190,7 @@ def test_a_list_in_a_header_is_never_narrower_than_its_widest_choice(
         page.set_viewport_size({"width": width, "height": 900})
         page.goto(f"{base}{EVERY_HEADER_OPEN}")
         for control in ("#filter-status", "#filter-state", "#filter-tag", "#filter-applied-from"):
-            expect(page.locator(control)).to_be_visible()
+            expect(seen(page, control)).to_be_visible()
         assert page.evaluate(LISTS_CUT_SHORT) == [], (language, width)
         assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"], (language, width)
 
@@ -1276,8 +1320,21 @@ def test_the_boards_filters_still_work(browser: Browser, live_server, search, sc
         page.goto(f"{base}/applications/?view=board")
         assert cards_shown(page) == on_the_board(person)
         form = page.locator("#application-filters")
-        for label in ("Outcome", "Tag", "Gone quiet"):
-            expect(form.get_by_label(label, exact=True)).to_be_visible()
+
+        def field(label: str):
+            """The form's own control under this label: the tick box, or the native select,
+            which is what the form posts with scripts and without them (#301)."""
+            return form.get_by_label(label, exact=True).and_(form.locator("select, input"))
+
+        # One control a person can see for each: a list is a combobox either way, the
+        # native select without scripts and the button built for it with them. The status
+        # is not among them: on the board its columns are the status (#315).
+        for label, role in (
+            ("Outcome", "combobox"),
+            ("Tag", "combobox"),
+            ("Gone quiet", "checkbox"),
+        ):
+            expect(form.get_by_role(role, name=label, exact=True)).to_be_visible()
         expect(form.get_by_label("Status", exact=True)).to_have_count(0)
         expect(form.get_by_role("button", name="Filter")).to_be_visible()
         expect(page.locator("[data-narrow-form]")).to_have_count(0)
@@ -1288,13 +1345,13 @@ def test_the_boards_filters_still_work(browser: Browser, live_server, search, sc
         expect(page).to_have_url(re.compile(r"[?&]status=applied(&|$)"))
         if scripts:
             settled(page)
-        form.get_by_label("Tag", exact=True).select_option("remote")
+        field("Tag").select_option("remote")
         then(status="applied", tag="remote")
-        form.get_by_label("Gone quiet", exact=True).check()
+        field("Gone quiet").check()
         then(status="applied", tag="remote", quiet="1")
         assert times_in_the_address(page, "status") == 1, page.url
-        form.get_by_label("Gone quiet", exact=True).uncheck()
-        form.get_by_label("Tag", exact=True).select_option("")
+        field("Gone quiet").uncheck()
+        field("Tag").select_option("")
         then(status="applied")
         page.locator("#board-unfold").click()
         expect(page).not_to_have_url(re.compile(r"[?&]status=[^&]"))
@@ -1304,13 +1361,13 @@ def test_the_boards_filters_still_work(browser: Browser, live_server, search, sc
             settled(page)
 
         # What is settled is said, not shown: the board is for what is still live.
-        form.get_by_label("Outcome", exact=True).select_option("closed")
+        field("Outcome").select_option("closed")
         then(state="closed")
         assert cards_shown(page) == []
         expect(page.locator("[data-off-board]")).to_have_attribute(
             "data-off-board", str(len(asked(person, state="closed")))
         )
-        form.get_by_label("Outcome", exact=True).select_option("open")
+        field("Outcome").select_option("open")
         then(state="open")
         expect(page.locator("[data-off-board]")).to_have_count(0)
     finally:
@@ -1353,13 +1410,13 @@ def test_the_filters_pass_axe(live_server, page: Page, axe_source, search, schem
     expect(page.locator("[data-narrow] [data-narrow-count]")).to_be_visible()
     look("Narrow folded, saying how many filters are in use")
     page.locator("[data-narrow] > summary").click()
-    expect(page.locator("#filter-status-narrow")).to_be_visible()
+    expect(seen(page, "#filter-status-narrow")).to_be_visible()
     look("Narrow on a phone")
 
     hide_the_status_column(search["applicant"])
     page.set_viewport_size(WIDE)
     page.goto(f"{base}/applications/?status=applied&quiet=1")
-    expect(page.locator("#filter-status-narrow")).to_be_visible()
+    expect(seen(page, "#filter-status-narrow")).to_be_visible()
     look("Narrow for a hidden column")
 
     assert not failures, "\n\n".join(failures)

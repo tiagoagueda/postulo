@@ -21,6 +21,8 @@ from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.conftest import EMAIL, PASSWORD
 
+from .selects import button_of
+
 pytestmark = pytest.mark.e2e
 
 
@@ -152,9 +154,10 @@ def test_emptying_a_header_filter_leaves_it_open_with_the_focus_in_it(
 def test_choosing_any_in_a_header_list_leaves_it_open_with_the_focus_in_it(
     page: Page, live_server, applicant
 ):
-    """The same for a list, which is not kept across the swap as a box is: htmx puts the
-    focus back on the list that replaced it, by its id, and can only do that if the header
-    it is in was drawn open (#626)."""
+    """The same for a list, which is not kept across the swap as a box is: the focus goes
+    back to the list that replaced it, and can only do that if the header it is in was
+    drawn open (#626). The list a person sees is the button built for the select (#301),
+    which is built as the swap lands and given the focus the old one had."""
     from postulo.core import tables
     from postulo.jobs.models import Company
 
@@ -171,15 +174,23 @@ def test_choosing_any_in_a_header_list_leaves_it_open_with_the_focus_in_it(
     choice.focus()  # where a hand or a key would have put it; `select_option` does not
     choice.select_option("employment_service")
     expect(rows).to_have_count(1)
-    expect(choice).to_be_focused()
+    expect(button_of(choice)).to_be_focused()
     settled(page)
 
     choice.select_option("")
     expect(rows).to_have_count(2)
     expect(disclosure).to_have_attribute("open", "")
-    expect(choice).to_be_visible()
-    expect(choice).to_be_focused()
+    expect(button_of(choice)).to_be_visible()
+    expect(button_of(choice)).to_be_focused()
     expect(choice).to_have_value("")
+    # And from there the keys work it: the list opens and a choice narrows the table again.
+    settled(page)
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("ArrowDown")
+    page.keyboard.press("Enter")
+    expect(choice).not_to_have_value("")
+    expect(page).to_have_url(re.compile(r"[?&]kind=[a-z_]+"))
+    expect(button_of(choice)).to_be_focused()
 
 
 def test_sorting_is_an_icon_and_keeps_the_focus_it_swapped_away(page: Page, live_server, applicant):

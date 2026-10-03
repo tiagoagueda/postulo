@@ -15,10 +15,16 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
+from .selects import DRAWN, button_of, drawn, open_list
 from .test_accessibility import axe_source, describe, sign_in, violations_on  # noqa: F401
 from .test_reflow import NARROW, SCROLLS_SIDEWAYS, SPILLS
 
 pytestmark = pytest.mark.e2e
+
+
+def box_of(page: Page, name: str) -> dict:
+    """Where a control of the page is drawn: a select at the button built for it (#301)."""
+    return drawn(page.locator(f"[name={name}]")).bounding_box()
 
 
 def choose_other_and_type(page: Page, base: str) -> None:
@@ -130,7 +136,7 @@ def test_your_name_reflows_at_320_pixels(live_server, page: Page, applicant, lan
 
     # In reading order, one under another: the form of address, the name, the pronouns.
     tops = [
-        page.locator(f"[name={name}]").bounding_box()["y"]
+        box_of(page, name)["y"]
         for name in ("form_of_address", "first_name", "last_name", "pronouns")
     ]
     assert tops == sorted(tops) and len(set(tops)) == 4, tops
@@ -138,17 +144,36 @@ def test_your_name_reflows_at_320_pixels(live_server, page: Page, applicant, lan
 
 #: Each menu's width as drawn, and the width its longest option asks for. Measured by
 #: letting the menu size itself for a moment, through the CSSOM, which the policy allows.
+#: The menu is the button built for the select (#301), which holds its longest option out
+#: of sight to be as wide as a native select is. That is not taken on trust: every option
+#: is chosen in turn, and none may be drawn cut short.
 MENUS = """() => {
   const out = {};
   for (const name of ['form_of_address', 'pronouns']) {
-    const menu = document.querySelector(`select[name=${name}]`);
+    const select = document.querySelector(`select[name=${name}]`);
+    const menu = __DRAWN__(select);
     const drawn = menu.getBoundingClientRect().width;
     menu.style.width = 'max-content';
-    out[name] = {drawn, needs: menu.getBoundingClientRect().width};
+    const needs = menu.getBoundingClientRect().width;
     menu.style.width = '';
+    const words = menu.querySelector('[data-select-label]');
+    const held = select.value;
+    const cut = [];
+    for (const option of select.options) {
+      select.value = option.value;
+      select.dispatchEvent(new Event('change', {bubbles: true}));
+      if (words.textContent !== option.text) cut.push('not shown: ' + option.text);
+      const wide = words.scrollWidth > words.clientWidth + 1;
+      if (wide || words.scrollHeight > words.clientHeight + 1) {
+        cut.push(option.text);
+      }
+    }
+    select.value = held;
+    select.dispatchEvent(new Event('change', {bubbles: true}));
+    out[name] = {drawn, needs, cut, options: select.options.length};
   }
   return out;
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 
 @pytest.mark.parametrize("language", ["en-GB", "de", "el"])
@@ -165,6 +190,7 @@ def test_a_menu_is_as_wide_as_what_it_says(live_server, page: Page, applicant, l
         page.goto(f"{live_server.url}/accounts/profile/")
         for name, menu in page.evaluate(MENUS).items():
             assert menu["drawn"] + 0.5 >= menu["needs"], (width, name, menu)
+            assert menu["options"] >= 2 and menu["cut"] == [], (width, name, menu)
         assert page.evaluate(SPILLS) == []
         assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0
 
@@ -178,13 +204,13 @@ CONTROLS = """() => {
     if (!control.checkVisibility()) continue;
     const field = control.closest('.field').getBoundingClientRect();
     out[control.name] = {
-      top: control.getBoundingClientRect().top,
+      top: __DRAWN__(control).getBoundingClientRect().top,
       from: field.top,
       to: field.bottom,
     };
   }
   return out;
-}"""
+}""".replace("__DRAWN__", DRAWN)
 
 
 @pytest.mark.parametrize("language", ["en-GB", "pt-PT"])
@@ -248,6 +274,16 @@ def test_a_full_stop_stays_at_the_end_on_a_page_drawn_right_to_left(
     expect(menu).to_have_value("Prof.")
     assert menu.evaluate("menu => getComputedStyle(menu).direction") == "rtl", "the page's"
     assert menu.evaluate("menu => getComputedStyle(menu.selectedOptions[0]).direction") == "ltr"
+    # The button says the same of the choice it shows, and its list of each option (#301).
+    words = button_of(menu).locator("[data-select-label]")
+    expect(words).to_have_text("Prof.")
+    expect(words).to_have_attribute("dir", "ltr")
+    expect(words).to_have_attribute("lang", "pt-PT")
+    assert words.evaluate("words => getComputedStyle(words).direction") == "ltr"
+    panel = open_list(page, menu)
+    listed = panel.get_by_role("option", name="Prof.", exact=True).locator("span[lang]")
+    expect(listed).to_have_attribute("dir", "ltr")
+    page.keyboard.press("Escape")
 
     box = page.locator("input[name=pronouns_other]")
     expect(box).to_have_value("Prof. Dr.")

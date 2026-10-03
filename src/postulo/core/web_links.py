@@ -36,6 +36,7 @@ from postulo.plugins.websites import WEBSITES
 from . import link_services
 from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
 from .models import WebLink
+from .option_icons import OptionIcons
 
 Kind = WebLink.Kind
 
@@ -419,15 +420,17 @@ def save_single_boxes(form: forms.Form, holder, owner) -> None:
 # --------------------------------------------------------------- the rows on a page
 
 
-class ServiceSelect(forms.Select):
+class ServiceSelect(OptionIcons, forms.Select):
     """The choice of service, each option saying its icon and its hosts (#305).
 
-    An ``<option>`` holds words and nothing else, so the chosen service's icon is drawn
-    beside the closed select, by the server, and ``app.js`` keeps it in step from
-    ``data-icon``. ``data-hosts`` is what lets the same script show a service the moment
-    an address is pasted into a row where none was chosen. Shown, and not posted: the host
-    is all the script reads, so the row goes with nothing chosen and saving decides, by
-    the host and the shape, as it does with the script blocked.
+    An ``<option>`` holds words and nothing else, so the icons are drawn by the control
+    ``app.js`` builds beside the select: each option's in the list and the chosen one's in
+    the closed control, from ``data-icon`` (#301, `OptionIcons`). With the script blocked
+    the chosen service's icon is drawn beside the native select, by the server.
+    ``data-hosts`` is what lets the script show a service the moment an address is pasted
+    into a row where none was chosen. Shown, and not posted: the host is all the script
+    reads, so the row goes with nothing chosen and saving decides, by the host and the
+    shape, as it does with the script blocked.
     """
 
     def __init__(self, attrs=None, choices=()):
@@ -506,19 +509,18 @@ class WebLinkForm(forms.ModelForm):
             self.initial["service"] = self.instance.service if known else OTHER
 
     @property
-    def service_icons(self) -> list[dict]:
-        """Every icon the row's choice can draw, and which of them is drawn now.
+    def service_icon(self) -> str:
+        """The icon of the service the row is on, for the page to draw beside the select.
 
-        All of them are on the page, hidden but for the chosen service's, because the
-        script that follows the select has nowhere to fetch one from: it shows the one
-        that is already there.
+        The one icon, and the scripts-off path: the select's own control draws every
+        option's and follows the choice (#301), and hides this one. It used to be every
+        icon the choice could draw, hidden but for this, for a script of its own to show
+        the right one (#305). Nothing for a kind with no services.
         """
         if "service" not in self.fields:
-            return []
+            return ""
         facts = self.fields["service"].widget.facts
-        chosen = facts.get(self["service"].value() or "", {}).get("data-icon")
-        names = dict.fromkeys(fact["data-icon"] for fact in facts.values())
-        return [{"name": name, "shown": name == chosen} for name in names]
+        return facts.get(self["service"].value() or "", {}).get("data-icon", "")
 
     def clean(self):
         data = super().clean()

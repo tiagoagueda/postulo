@@ -163,8 +163,11 @@ PARTS = r"""() => {
     const r = el.getBoundingClientRect();
     return {x: r.x, right: r.right, width: r.width, name: el.name || el.tagName};
   };
+  // A list is drawn as the button built for its select (#301); the select beside it is
+  // one pixel, out of sight, and measuring that would say nothing.
   const typed = 'input:not([type=hidden]):not([type=checkbox]):not([type=radio])'
-    + ':not([type=submit]), select, textarea, [data-language-picker] > summary';
+    + ':not([type=submit]), select:not([data-select-ready]), [data-select-trigger], textarea,'
+    + ' [data-language-picker] > summary';
   const sidebar = main.querySelector('aside');
   return {
     cards: [...main.querySelectorAll('.card')].filter(drawn).map(box),

@@ -364,8 +364,12 @@
 
   // The flag beside a telephone field's country chooser, and beside the language chooser
   // on Server settings -> Defaults (#208). An <option> holds text and nothing else in
-  // every browser, so the flag cannot live in the list; it sits over the closed select
-  // instead, and this keeps it pointing at whatever is chosen (#88).
+  // every browser, so the flag cannot live in a native list; it sits over the closed
+  // select instead, and this keeps it pointing at whatever is chosen (#88).
+  //
+  // Since #301 a select has a control of its own, which draws the flag in its button and
+  // in its list and puts this one away. This is what is left for a select that has none:
+  // one a page keeps native, or a browser the control cannot be built in.
   //
   // The server has already drawn the right flag for the value the field loaded with, so
   // with this script blocked or still loading the field is correct -- it simply stops
@@ -402,29 +406,13 @@
     image.src = url;
   });
 
-  // The icon beside a web link's choice of service, and the service chosen from the
-  // address (#305).
+  // The service chosen from the address (#305).
   //
-  // The icon is an inline SVG, so unlike a flag there is no address to point an image at.
-  // The server draws every icon the choice can show and hides all but the one that goes
-  // with the saved service; this shows the one named by the chosen option's `data-icon`.
-  // With the script blocked the row is right as it loaded, and the name box still follows
-  // the select, because that is the stylesheet's doing (`data-if-other`).
-  function showServiceIcon(select) {
-    var holder = select.parentNode.querySelector("[data-service-icons]");
-    if (!holder) {
-      return;
-    }
-    var option = select.options[select.selectedIndex];
-    var wanted = option ? option.getAttribute("data-icon") : "";
-    Array.prototype.forEach.call(
-      holder.querySelectorAll("[data-service-icon]"),
-      function (drawn) {
-        drawn.hidden = drawn.getAttribute("data-service-icon") !== wanted;
-      }
-    );
-  }
-
+  // The icon beside the choice used to be this script's as well: the server drew every
+  // icon the choice could show and this un-hid the one that went with it. A select's own
+  // control draws its options' icons now (#301), the chosen one in the closed control,
+  // so that special case is gone; with the script blocked the server's one icon stands
+  // beside the native select, right as the row loaded.
   // The host of what is in an address box, read as the server will read it: with no
   // scheme typed, https is assumed.
   function hostOfAddress(typed) {
@@ -465,7 +453,6 @@
     if (select) {
       // Chosen by hand, so the address stops choosing for this row.
       delete select.dataset.serviceGuessed;
-      showServiceIcon(select);
     }
   });
 
@@ -491,7 +478,7 @@
     } else {
       delete select.dataset.serviceGuessed;
     }
-    showServiceIcon(select);
+    selectChanged(select);
   });
 
   // What this chose is shown and never posted. It reads the host alone, where saving reads
@@ -512,6 +499,7 @@
       form.querySelectorAll("[data-service-select][data-service-guessed]"),
       function (select) {
         select.value = "";
+        selectChanged(select);
       }
     );
   });
@@ -969,6 +957,7 @@
       oneFewerOnThePage();
     }
     select.value = status;
+    selectChanged(select);
     if (select.form) {
       var filters = boardFilters();
       var back = select.form.elements.namedItem("next");
@@ -1607,6 +1596,8 @@
         (active.tagName === "INPUT" ||
           active.tagName === "TEXTAREA" ||
           active.tagName === "SELECT" ||
+          // A select's own control (#301): a letter typed on it looks down its list.
+          active.hasAttribute("data-select-trigger") ||
           active.isContentEditable))
     );
   }
@@ -2199,6 +2190,11 @@
     style.maxHeight = "";
 
     // Zero while it is not drawn yet, which reads as "fits below".
+    // A select's list is never narrower than the control it opens from (#301).
+    if (panel.hasAttribute("data-select-panel")) {
+      style.minWidth = Math.min(box.width, width - 2 * PANEL_EDGE) + "px";
+    }
+
     var tall = panel.offsetHeight;
     var below = height - box.bottom - PANEL_GAP - PANEL_EDGE;
     var above = box.top - PANEL_GAP - PANEL_EDGE;
@@ -2223,13 +2219,17 @@
 
     var wide = panel.offsetWidth;
     var rtl = window.getComputedStyle(panel).direction === "rtl";
+    // A menu's inline end sits on its trigger's; a panel marked `data-align="start"` -- a
+    // select's list -- starts where its trigger starts. Either is the left edge in one
+    // direction of writing and the right edge in the other.
+    var fromLeft = (panel.getAttribute("data-align") === "start") !== rtl;
     if (!wide) {
-      // Not drawn yet: the inline end on the trigger's, which needs no width.
-      style.left = rtl ? box.left + "px" : "auto";
-      style.right = rtl ? "auto" : width - box.right + "px";
+      // Not drawn yet: one edge on the trigger's, which needs no width.
+      style.left = fromLeft ? box.left + "px" : "auto";
+      style.right = fromLeft ? "auto" : width - box.right + "px";
       return;
     }
-    var left = rtl ? box.left : box.right - wide;
+    var left = fromLeft ? box.left : box.right - wide;
     left = Math.max(PANEL_EDGE, Math.min(left, width - wide - PANEL_EDGE));
     style.left = left + "px";
     style.right = "auto";
@@ -2504,6 +2504,1231 @@
     placeCarets(document);
   });
 
+  /* ---------------------------------------------------------------------- selects
+   *
+   * Every `<select>` is Basecoat's select (#301): a button showing the choice and a list
+   * that opens from it, whose options are elements and so can hold a flag or an icon,
+   * which an `<option>` cannot. Basecoat's stylesheet gives the look and the vocabulary --
+   * `.select`, a `<button>`, a `[data-popover]` holding a `role="listbox"` -- and its
+   * script is not used, by the test that kept its menu script out (#262): its markup does
+   * nothing at all until the script has run, and a page here works with scripts off.
+   *
+   * **The native select stays, and stays the form's control.** The server draws it, it
+   * posts the name and the value, and with this script blocked it is the whole control.
+   * Here it is put out of sight and out of the tab order, and the button and the list are
+   * built beside it and drive it: a choice sets the select's value and raises its `input`
+   * and `change`, so whatever listened to a select -- htmx, the board's saving, the rows
+   * that hide a name unless the kind is Other, which the stylesheet reads off the select
+   * itself -- is listening still. The other way round, anything that sets the select
+   * tells this with `selectChanged`, and a `change` raised by anybody is followed.
+   *
+   * **It is the ARIA combobox with a listbox.** The button is the combobox and says its
+   * name, its choice and whether the list is open; the list's options say which is chosen
+   * and where each stands. Closed: the arrows, Enter, Space, Home, End and a letter open
+   * it. Open: the arrows, Home, End and Page Up and Down move; a letter looks down the
+   * list; Enter and Space choose; Escape closes it and chooses nothing; Tab chooses and
+   * moves on, which is what the pattern asks and what leaving an open native list by Tab
+   * does: the option the keys were on is kept. Nothing is chosen by passing over it, so a
+   * list that saves as it changes saves once (#227).
+   *
+   * **A long list has a box to narrow it**: sixteen options or more. The box takes the
+   * focus while the list is open and is itself a combobox over the same list; what is
+   * typed is matched anywhere in an option, whatever its case or its accents, and
+   * `00351` finds `+351`. Under a finger the focus stays on the button, so that opening
+   * a list does not call up the keyboard over it, and the box is a tap away.
+   *
+   * **The closed control is built for every select as the page arrives, and its list
+   * when it is opened**, every time, from the select as it then stands: a board of two
+   * hundred cards is two hundred buttons and no lists, and an option switched off since
+   * the last time (#307) is switched off in the list.
+   *
+   * **The list is a popover**, opened by the button's own `popovertarget`, so the browser
+   * draws it in the top layer -- above a dialog, outside every box that scrolls -- closes
+   * it on a click elsewhere, and ties it to its button for the stylesheet to place, as it
+   * does a menu's panel (#310).
+   *
+   * Everything is delegated from the document: there is no listener on any select, button
+   * or list, so what a swap takes away leaves nothing behind, and what it brings in is
+   * made ready by `onContentReady` like everything else.
+   */
+  var SELECT_FILTER_FROM = 16; // options: a list this long gets a box to narrow it
+  var SELECT_PAGE = 10; // options: how far Page Up and Page Down move
+  var SELECT_TYPED_FOR = 1000; // milliseconds a typed letter goes on being part of a word
+  var SELECT_PRESS_FOR = 1500; // milliseconds a press outside a list owns the click it ends in
+
+  var selectStates = new WeakMap(); // select -> what was built for it
+  var selectOfPart = new WeakMap(); // its button, its panel -> the select
+  var selectCount = 0;
+  var openSelectState = null;
+  var selectFocusBeforeSwap = "";
+
+  function selectPartsTemplate() {
+    return document.getElementById("select-parts");
+  }
+
+  // A list of one choice, drawn closed. A `<select multiple>` or one with a `size` is a
+  // list box on the page and not this control, and a page may keep one select as the
+  // browser draws it by saying `data-native` (`tests/test_template_lint.py` holds the
+  // list of those, each with its reason).
+  function selectIsEnhanced(select) {
+    return !select.multiple && select.size <= 1 && !select.hasAttribute("data-native");
+  }
+
+  /* An option's icon is a copy of one the server drew: `{% icon %}` writes each icon a
+   * list may show into a `<template data-option-icons>`, and an option names the one it
+   * wants in `data-icon`. Nothing is built from a string and nothing is fetched. The
+   * chevron and the tick come the same way, out of the page's `select-parts`. */
+  var optionIcons = {};
+
+  function optionIcon(name) {
+    if (!name) {
+      return null;
+    }
+    if (!optionIcons[name]) {
+      var wanted = '[data-icon="' + CSS.escape(name) + '"]';
+      Array.prototype.some.call(
+        document.querySelectorAll("template[data-option-icons], template#select-parts"),
+        function (template) {
+          var drawn = template.content.querySelector(wanted);
+          if (drawn) {
+            optionIcons[name] = drawn.cloneNode(true);
+          }
+          return Boolean(drawn);
+        }
+      );
+    }
+    return optionIcons[name] ? optionIcons[name].cloneNode(true) : null;
+  }
+
+  // The image the `{% flag %}` tag draws, from the address an option carries: static
+  // files are served under a content hash, so there is no pattern to build one from.
+  function optionFlag(url) {
+    var image = document.createElement("img");
+    image.className = "flag";
+    image.width = 20;
+    image.height = 15;
+    image.alt = "";
+    image.setAttribute("aria-hidden", "true");
+    image.loading = "lazy";
+    image.decoding = "async";
+    image.src = url;
+    return image;
+  }
+
+  // What an option shows beside its words: its flag, its icon, or the room for one, so
+  // that the words of a list line up and choosing moves nothing.
+  function drawOptionMark(holder, option) {
+    var flag = option ? option.getAttribute("data-flag") : "";
+    var icon = option ? option.getAttribute("data-icon") : "";
+    var key = flag ? "flag " + flag : icon ? "icon " + icon : "";
+    if (holder.getAttribute("data-select-mark") === key) {
+      return;
+    }
+    holder.setAttribute("data-select-mark", key);
+    holder.textContent = "";
+    var drawn = flag ? optionFlag(flag) : optionIcon(icon);
+    if (drawn) {
+      holder.appendChild(drawn);
+    }
+  }
+
+  function optionWords(option) {
+    return option.label || option.text || "";
+  }
+
+  // The language and the direction an option says it is written in (#309): *Mme* in a
+  // menu drawn in English is French, and is said and laid out as French.
+  function copyLanguage(from, to) {
+    ["lang", "dir"].forEach(function (name) {
+      var value = from ? from.getAttribute(name) : null;
+      if (value) {
+        to.setAttribute(name, value);
+      } else {
+        to.removeAttribute(name);
+      }
+    });
+  }
+
+  function drawChosen(state) {
+    var select = state.select;
+    var option = select.options[select.selectedIndex] || null;
+    var words = option ? optionWords(option) : "";
+    if (state.label.textContent !== words) {
+      state.label.textContent = words;
+    }
+    copyLanguage(option, state.label);
+    if (state.mark) {
+      drawOptionMark(state.mark, option);
+    }
+    state.trigger.disabled = select.matches(":disabled");
+  }
+
+  // Called by whatever sets a select from a script, which raises no event of its own.
+  function selectChanged(select) {
+    var state = select && selectStates.get(select);
+    if (state) {
+      drawChosen(state);
+    }
+  }
+
+  /* A native select is as wide as its longest option whatever it shows, and pages are
+   * laid out on that: a menu with no width written on it, a list in a table's header that
+   * holds its column open (#314). The button is told its longest option too, in an
+   * attribute the stylesheet draws out of sight under the chosen one, so it is that wide
+   * and choosing never changes its width -- and the button's own text is the choice and
+   * nothing else. Which option is the longest is measured on a canvas, which lays nothing
+   * out. */
+  var measuringContext = null;
+  var measuredWords = {};
+
+  function longestWords(select) {
+    if (!measuringContext) {
+      measuringContext = document.createElement("canvas").getContext("2d");
+      if (measuringContext) {
+        measuringContext.font = "16px " + window.getComputedStyle(document.body).fontFamily;
+      }
+    }
+    var longest = "";
+    var width = -1;
+    Array.prototype.forEach.call(select.options, function (option) {
+      var words = optionWords(option);
+      var measured = measuredWords[words];
+      if (measured === undefined) {
+        measured = measuringContext ? measuringContext.measureText(words).width : words.length;
+        measuredWords[words] = measured;
+      }
+      if (measured > width) {
+        width = measured;
+        longest = words;
+      }
+    });
+    return longest;
+  }
+
+  /* The labels that name a select, for every select on the page, from one pass over it.
+   * `select.labels` is the same answer and walks the whole document for each select it
+   * is asked about: on *Your details* with forty rows that was over half of the time
+   * it took to build every button. */
+  function labelsByControl() {
+    var found = {};
+    Array.prototype.forEach.call(document.querySelectorAll("label[for]"), function (label) {
+      var id = label.getAttribute("for");
+      (found[id] = found[id] || []).push(label);
+    });
+    return found;
+  }
+
+  function buildSelect(select, parts, labels) {
+    var base = select.id;
+    if (!base || document.getElementById(base + "-trigger")) {
+      selectCount += 1;
+      base = "select-" + selectCount;
+    }
+
+    var root = document.createElement("div");
+    root.className = "select";
+    root.setAttribute("data-select", "");
+
+    var trigger = document.createElement("button");
+    trigger.type = "button";
+    trigger.id = base + "-trigger";
+    // The widths, the padding and the size of type a page wrote on its select -- and not
+    // what htmx is saying about it at this moment. A select a swap brings in carries the
+    // classes of the one it replaced until the swap settles, `htmx-request` among them,
+    // and a button that copied that would say a request was in flight for ever.
+    trigger.className = select.className
+      .split(/\s+/)
+      .filter(function (name) {
+        return name && name.indexOf("htmx-") !== 0;
+      })
+      .join(" ");
+    trigger.setAttribute("data-select-trigger", "");
+    trigger.setAttribute("role", "combobox");
+    trigger.setAttribute("aria-haspopup", "listbox");
+    trigger.setAttribute("aria-expanded", "false");
+    trigger.setAttribute("aria-controls", base + "-listbox");
+    trigger.setAttribute("popovertarget", base + "-popover");
+
+    var panel = document.createElement("div");
+    panel.id = base + "-popover";
+    panel.setAttribute("popover", "");
+    panel.setAttribute("data-popover", "");
+    panel.setAttribute("data-align", "start");
+    panel.setAttribute("data-select-panel", "");
+
+    var listbox = document.createElement("div");
+    listbox.id = base + "-listbox";
+    listbox.setAttribute("role", "listbox");
+    listbox.setAttribute("data-empty", parts.getAttribute("data-empty") || "");
+
+    // The name is the select's own: its `aria-labelledby`, its `aria-label`, or the
+    // labels that point at it, which go on pointing at it -- a click on one gives the
+    // select the focus, and the focus is handed on to the button (below).
+    //
+    // A label written round its select is not pointed at: the button and its list are
+    // built inside that label, and a control named by an element it sits in is named by
+    // its own contents as well -- every option of the list, while it is open. So the
+    // name is the label's own words, the ones that are not the select.
+    var named = select.getAttribute("aria-labelledby");
+    var called = select.getAttribute("aria-label");
+    if (!named && !called) {
+      named = ((select.id && labels[select.id]) || [])
+        .filter(function (label) {
+          return !label.contains(select);
+        })
+        .map(function (label, index) {
+          if (!label.id) {
+            label.id = base + "-label" + (index ? "-" + index : "");
+          }
+          return label.id;
+        })
+        .join(" ");
+      var around = select.closest("label");
+      if (!named && around) {
+        called = Array.prototype.filter
+          .call(around.childNodes, function (node) {
+            return node !== select && !(node.contains && node.contains(select));
+          })
+          .map(function (node) {
+            return node.textContent;
+          })
+          .join(" ")
+          .replace(/\s+/g, " ")
+          .trim();
+      }
+    }
+    [trigger, listbox].forEach(function (element) {
+      if (named) {
+        element.setAttribute("aria-labelledby", named);
+      } else if (called) {
+        element.setAttribute("aria-label", called);
+      }
+    });
+    ["aria-describedby", "aria-invalid", "title", "dir", "lang"].forEach(function (name) {
+      if (select.hasAttribute(name)) {
+        trigger.setAttribute(name, select.getAttribute(name));
+      }
+    });
+    ["dir", "lang"].forEach(function (name) {
+      if (select.hasAttribute(name)) {
+        panel.setAttribute(name, select.getAttribute(name));
+      }
+    });
+    if (select.required) {
+      trigger.setAttribute("aria-required", "true");
+    }
+
+    var value = document.createElement("span");
+    var mark = null;
+    if (select.querySelector("option[data-flag], option[data-icon]")) {
+      mark = document.createElement("span");
+      mark.setAttribute("data-select-mark", "");
+      value.appendChild(mark);
+    }
+    // The words sit in a cell of their own inside the grid: a grid's own items cannot
+    // be clamped to a line, and the words are (see the stylesheet).
+    var text = document.createElement("span");
+    text.setAttribute("data-select-text", "");
+    var cell = document.createElement("span");
+    var label = document.createElement("span");
+    label.setAttribute("data-select-label", "");
+    cell.appendChild(label);
+    text.appendChild(cell);
+    value.appendChild(text);
+    trigger.appendChild(value);
+    var chevron = optionIcon("chevron-down");
+    if (chevron) {
+      trigger.appendChild(chevron);
+    }
+
+    panel.appendChild(listbox);
+    root.appendChild(trigger);
+    root.appendChild(panel);
+
+    var state = {
+      select: select,
+      base: base,
+      root: root,
+      trigger: trigger,
+      mark: mark,
+      label: label,
+      text: text,
+      panel: panel,
+      listbox: listbox,
+      filter: null,
+      said: null,
+      rows: [],
+      plain: [],
+      active: null,
+      settled: false,
+      typed: "",
+      typedAt: 0,
+      // Whether somebody moved the keys to the option they are on, or the box put them there.
+      moved: false,
+    };
+    selectStates.set(select, state);
+    selectOfPart.set(trigger, select);
+    selectOfPart.set(panel, select);
+    drawChosen(state);
+
+    // The flag or the icon the server drew beside the closed native select is the
+    // scripts-off path (#88, #208, #304, #305); the button draws its own.
+    var beside = select.parentNode.querySelector(
+      ":scope > [data-phone-flag], :scope > [data-flag-holder], :scope > [data-option-mark]"
+    );
+    if (beside) {
+      beside.hidden = true;
+    }
+
+    var focused = document.activeElement === select;
+    select.setAttribute("data-select-ready", "");
+    select.setAttribute("aria-hidden", "true");
+    select.tabIndex = -1;
+    select.insertAdjacentElement("afterend", root);
+    if (focused) {
+      trigger.focus({ preventScroll: true });
+    }
+    return state;
+  }
+
+  function readySelects() {
+    var parts = selectPartsTemplate();
+    if (!parts || !popovers) {
+      return;
+    }
+    // What a swap left behind: a button whose select has gone, which only happens where
+    // something replaced the select and not what was beside it.
+    Array.prototype.forEach.call(document.querySelectorAll("[data-select]"), function (root) {
+      var select = selectOfPart.get(root.firstElementChild);
+      if (!select || !select.isConnected || select.nextElementSibling !== root) {
+        root.remove();
+        if (select) {
+          selectStates.delete(select);
+        }
+      }
+    });
+    var fresh = [];
+    var labels = null;
+    Array.prototype.forEach.call(document.querySelectorAll("select"), function (select) {
+      var state = selectStates.get(select);
+      if (state && state.root.isConnected) {
+        return;
+      }
+      if (selectIsEnhanced(select)) {
+        labels = labels || labelsByControl();
+        fresh.push(buildSelect(select, parts, labels));
+      }
+    });
+    // After every button is on the page, so that nothing is measured between two writes.
+    fresh.forEach(function (state) {
+      state.text.setAttribute("data-select-longest", longestWords(state.select));
+    });
+
+    // The focus was on a select's button and the swap replaced it: htmx looks for the
+    // focused element's id as the new markup lands, and the button that will carry it
+    // was not built until now.
+    if (selectFocusBeforeSwap) {
+      var again = document.getElementById(selectFocusBeforeSwap);
+      selectFocusBeforeSwap = "";
+      var lost = !document.activeElement || document.activeElement === document.body;
+      if (again && lost) {
+        again.focus({ preventScroll: true });
+      }
+    }
+  }
+
+  document.addEventListener("htmx:beforeSwap", function () {
+    var active = document.activeElement;
+    selectFocusBeforeSwap =
+      active && active.hasAttribute && active.hasAttribute("data-select-trigger")
+        ? active.id
+        : "";
+  });
+
+  document.addEventListener("htmx:afterRequest", function () {
+    selectFocusBeforeSwap = "";
+  });
+
+  onContentReady(readySelects);
+
+  // A page that comes back from the browser's own cache, or with its form filled in
+  // again, may hold selects that say something other than what their buttons were
+  // drawn with.
+  window.addEventListener("pageshow", function () {
+    Array.prototype.forEach.call(
+      document.querySelectorAll("select[data-select-ready]"),
+      selectChanged
+    );
+  });
+
+  ["change", "input"].forEach(function (name) {
+    document.addEventListener(name, function (event) {
+      var state = event.target && selectStates.get(event.target);
+      if (state) {
+        drawChosen(state);
+        if (name === "change" && state.select.validity.valid) {
+          unsaySelect(state);
+        }
+      }
+    });
+  });
+
+  document.addEventListener("reset", function (event) {
+    var form = event.target;
+    // The controls go back to what they were drawn with after this event, not before.
+    window.setTimeout(function () {
+      Array.prototype.forEach.call(form.elements || [], selectChanged);
+    }, 0);
+  });
+
+  // The focus given to the select -- by a click on its label, by a script that looks for
+  // the first control of a row, by the browser on a page that says `autofocus` -- is the
+  // button's.
+  document.addEventListener("focusin", function (event) {
+    var state = event.target && selectStates.get(event.target);
+    if (state && state.root.isConnected) {
+      state.trigger.focus();
+    }
+  });
+
+  /* ---- a select that must have an answer, and has none
+   *
+   * The browser's own bubble points at the control that is wrong, and that control is out
+   * of sight. So the browser's is declined, and the button says it instead: in an alert
+   * under it, which the button is described by, in the words the page was drawn with --
+   * the browser's would be in the browser's language. The first control of the form that
+   * is wrong takes the focus, as it would have; where that is a box the browser still
+   * handles, the browser takes it there.
+   */
+  function saySelect(state, words) {
+    var id = state.base + "-said";
+    var said = document.getElementById(id);
+    if (!said) {
+      said = document.createElement("div");
+      said.id = id;
+      said.setAttribute("role", "alert");
+      said.setAttribute("data-select-said", "");
+      said.appendChild(document.createElement("p"));
+      state.root.insertAdjacentElement("afterend", said);
+      var described = state.trigger.getAttribute("aria-describedby");
+      state.trigger.setAttribute("aria-describedby", described ? described + " " + id : id);
+    }
+    said.firstChild.textContent = words;
+    state.trigger.setAttribute("aria-invalid", "true");
+  }
+
+  function unsaySelect(state) {
+    var id = state.base + "-said";
+    var said = document.getElementById(id);
+    if (!said) {
+      return;
+    }
+    said.remove();
+    var described = (state.trigger.getAttribute("aria-describedby") || "")
+      .split(/\s+/)
+      .filter(function (other) {
+        return other && other !== id;
+      })
+      .join(" ");
+    if (described) {
+      state.trigger.setAttribute("aria-describedby", described);
+    } else {
+      state.trigger.removeAttribute("aria-describedby");
+    }
+    // What the server said about the field stands; what this said is taken back.
+    if (state.select.hasAttribute("aria-invalid")) {
+      state.trigger.setAttribute("aria-invalid", state.select.getAttribute("aria-invalid"));
+    } else {
+      state.trigger.removeAttribute("aria-invalid");
+    }
+  }
+
+  document.addEventListener(
+    "invalid",
+    function (event) {
+      var select = event.target;
+      var state = select && selectStates.get(select);
+      var parts = selectPartsTemplate();
+      if (!state || !parts) {
+        return;
+      }
+      event.preventDefault();
+      saySelect(state, parts.getAttribute("data-required") || select.validationMessage);
+      var first = Array.prototype.filter.call(
+        (select.form && select.form.elements) || [select],
+        function (control) {
+          return control.willValidate && !control.validity.valid;
+        }
+      )[0];
+      if (first === select) {
+        state.trigger.focus();
+        // The browser goes on down the form and reports the first control whose
+        // `invalid` was not declined, which would take the focus off this button and
+        // show its bubble. So for the rest of this check, the others are declined too.
+        selectAnsweredInvalid = select.form || select;
+        window.setTimeout(function () {
+          selectAnsweredInvalid = null;
+        }, 0);
+      }
+    },
+    true
+  );
+
+  // The rest of a check whose first wrong control was a select's: see above.
+  var selectAnsweredInvalid = null;
+  document.addEventListener(
+    "invalid",
+    function (event) {
+      var control = event.target;
+      if (
+        selectAnsweredInvalid &&
+        control !== selectAnsweredInvalid &&
+        !selectStates.get(control) &&
+        (control.form === selectAnsweredInvalid || control === selectAnsweredInvalid)
+      ) {
+        event.preventDefault();
+      }
+    },
+    true
+  );
+
+  /* ---- the list */
+
+  // Lower case, without its accents, its spaces single: how what is typed and what an
+  // option says are compared.
+  function plainWords(text) {
+    var folded = String(text || "").toLowerCase();
+    if (folded.normalize) {
+      folded = folded.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    return folded.replace(/\s+/g, " ").trim();
+  }
+
+  // How well an option's plain words answer what was typed: 0 where they start with it, 1
+  // where one of their words does, 2 where they only hold it, and -1 where they do not. A
+  // dialling code in front is not one of the words: "+33 france" starts with "france".
+  function selectMatchRank(plain, wanted) {
+    if (!wanted) {
+      return 0;
+    }
+    var at = plain.indexOf(wanted);
+    if (at === -1) {
+      return -1;
+    }
+    var bare = plain.replace(/^\+\d[\d\s-]*\s/, "");
+    if (at === 0 || bare.indexOf(wanted) === 0) {
+      return 0;
+    }
+    var words = bare.split(/[\s\-‐-―(),.\/'’]+/);
+    for (var step = 0; step < words.length; step += 1) {
+      if (words[step].indexOf(wanted) === 0) {
+        return 1;
+      }
+    }
+    return 2;
+  }
+
+  // Of these rows, the one the keys should go to for what was typed: the first that ranks
+  // best, looking from `from` round to it again.
+  function bestSelectMatch(state, rows, wanted, from, worst) {
+    var best = null;
+    var bestRank = 3;
+    var last = worst === undefined ? 2 : worst;
+    for (var step = 0; step < rows.length && bestRank > 0; step += 1) {
+      var row = rows[(Math.max(from, 0) + step) % rows.length];
+      var rank = selectMatchRank(state.plain[state.rows.indexOf(row)], wanted);
+      if (rank !== -1 && rank <= last && rank < bestRank) {
+        best = row;
+        bestRank = rank;
+      }
+    }
+    return best;
+  }
+
+  function selectRow(state, option, index) {
+    var row = document.createElement("div");
+    row.id = state.base + "-option-" + index;
+    row.setAttribute("role", "option");
+    row.setAttribute("data-value", option.value);
+    row.setAttribute("data-option", String(option.index));
+    row.setAttribute("aria-selected", option.selected ? "true" : "false");
+    var group = option.parentNode;
+    if (option.disabled || (group.tagName === "OPTGROUP" && group.disabled)) {
+      row.setAttribute("aria-disabled", "true");
+    }
+    if (state.mark) {
+      var mark = document.createElement("span");
+      mark.setAttribute("data-select-mark", "");
+      drawOptionMark(mark, option);
+      row.appendChild(mark);
+    }
+    var words = document.createElement("span");
+    words.textContent = optionWords(option);
+    copyLanguage(option, words);
+    row.appendChild(words);
+    if (option.selected) {
+      var tick = optionIcon("check");
+      if (tick) {
+        row.appendChild(tick);
+      }
+    }
+    return row;
+  }
+
+  function fillSelectList(state) {
+    var select = state.select;
+    var parts = selectPartsTemplate();
+    var listbox = state.listbox;
+    listbox.textContent = "";
+    state.rows = [];
+    state.plain = [];
+    state.active = null;
+    state.typed = "";
+    state.settled = false;
+
+    var long = select.options.length >= SELECT_FILTER_FROM;
+    // Said to the stylesheet too: a long list keeps its height while it is narrowed.
+    state.panel.setAttribute("data-select-panel", long ? "long" : "");
+    if (long && !state.filter) {
+      var header = document.createElement("header");
+      var filter = document.createElement("input");
+      filter.type = "text";
+      filter.setAttribute("data-select-filter", "");
+      filter.setAttribute("role", "combobox");
+      filter.setAttribute("aria-expanded", "true");
+      filter.setAttribute("aria-autocomplete", "list");
+      filter.setAttribute("aria-controls", listbox.id);
+      ["aria-labelledby", "aria-label"].forEach(function (name) {
+        if (state.trigger.hasAttribute(name)) {
+          filter.setAttribute(name, state.trigger.getAttribute(name));
+        }
+      });
+      filter.placeholder = (parts && parts.getAttribute("data-filter")) || "";
+      // Not one of the form's controls: it has no name, and with no form it is not
+      // checked, not sent and not what Enter submits.
+      filter.setAttribute("form", "");
+      filter.autocomplete = "off";
+      filter.spellcheck = false;
+      filter.setAttribute("autocapitalize", "none");
+      filter.setAttribute("enterkeyhint", "done");
+      header.appendChild(filter);
+      // What the box found, for somebody who cannot see that the list is empty.
+      var said = document.createElement("p");
+      said.className = "sr-only";
+      said.setAttribute("role", "status");
+      header.appendChild(said);
+      state.panel.insertBefore(header, listbox);
+      state.filter = filter;
+      state.said = said;
+    } else if (!long && state.filter) {
+      state.filter.parentNode.remove();
+      state.filter = null;
+      state.said = null;
+    }
+    if (state.filter) {
+      state.filter.value = "";
+      state.said.textContent = "";
+    }
+
+    var count = 0;
+    function add(option, into) {
+      if (option.hidden) {
+        return;
+      }
+      var row = selectRow(state, option, count);
+      count += 1;
+      state.rows.push(row);
+      state.plain.push(plainWords(optionWords(option)));
+      into.appendChild(row);
+    }
+    var groups = 0;
+    Array.prototype.forEach.call(select.children, function (child) {
+      if (child.tagName === "OPTION") {
+        add(child, listbox);
+      } else if (child.tagName === "OPTGROUP") {
+        groups += 1;
+        var group = document.createElement("div");
+        var heading = document.createElement("div");
+        heading.id = state.base + "-group-" + groups;
+        heading.setAttribute("role", "presentation");
+        heading.setAttribute("data-select-heading", "");
+        heading.textContent = child.label;
+        group.setAttribute("role", "group");
+        group.setAttribute("aria-labelledby", heading.id);
+        group.appendChild(heading);
+        Array.prototype.forEach.call(child.children, function (option) {
+          if (option.tagName === "OPTION") {
+            add(option, group);
+          }
+        });
+        listbox.appendChild(group);
+      }
+    });
+    showMatching(state);
+  }
+
+  function selectRowIsOffered(row) {
+    return row.getAttribute("aria-hidden") !== "true";
+  }
+
+  function selectRowCanBeChosen(row) {
+    return selectRowIsOffered(row) && row.getAttribute("aria-disabled") !== "true";
+  }
+
+  // Which options the box leaves in the list, and where each stands among them.
+  function showMatching(state) {
+    var wanted = plainWords(state.filter ? state.filter.value : "").replace(/^00(?=\d)/, "+");
+    var shown = state.rows.filter(function (row, index) {
+      var matches = !wanted || state.plain[index].indexOf(wanted) !== -1;
+      if (matches) {
+        row.removeAttribute("aria-hidden");
+      } else {
+        row.setAttribute("aria-hidden", "true");
+      }
+      return matches;
+    });
+    shown.forEach(function (row, index) {
+      row.setAttribute("aria-posinset", String(index + 1));
+      row.setAttribute("aria-setsize", String(shown.length));
+    });
+    if (state.said) {
+      var words = shown.length ? "" : state.listbox.getAttribute("data-empty") || "";
+      if (state.said.textContent !== words) {
+        state.said.textContent = words;
+      }
+    }
+    // What was typed puts the keys on the option it most likely means -- "fr" on France,
+    // not on the first country whose name holds the two letters -- and that is a place the
+    // keys were put, not one somebody moved to: Tab does not choose it.
+    if (wanted || !state.active || !selectRowCanBeChosen(state.active)) {
+      var offered = shown.filter(selectRowCanBeChosen);
+      var chosen = offered.filter(function (row) {
+        return row.getAttribute("aria-selected") === "true";
+      })[0];
+      activateSelectRow(
+        state,
+        wanted ? bestSelectMatch(state, offered, wanted, 0) : chosen || offered[0]
+      );
+      state.moved = false;
+    }
+  }
+
+  // The option the keys are on. The focus stays where it is -- on the button, or in the
+  // box of a long list -- and that control says which option it means.
+  function activateSelectRow(state, row) {
+    if (state.active) {
+      state.active.classList.remove("active");
+    }
+    state.active = row || null;
+    // Said on the button and on a long list's box alike: whichever of the two has the
+    // focus is the one that is asked.
+    [state.trigger, state.filter].forEach(function (holder) {
+      if (holder && row) {
+        holder.setAttribute("aria-activedescendant", row.id);
+      } else if (holder) {
+        holder.removeAttribute("aria-activedescendant");
+      }
+    });
+    if (!row) {
+      return;
+    }
+    row.classList.add("active");
+    // Within the list alone: `scrollIntoView` would move the page as well.
+    var list = state.listbox;
+    var box = row.getBoundingClientRect();
+    var frame = list.getBoundingClientRect();
+    if (box.height && frame.height) {
+      if (box.top < frame.top) {
+        list.scrollTop -= frame.top - box.top;
+      } else if (box.bottom > frame.bottom) {
+        list.scrollTop += box.bottom - frame.bottom;
+      }
+    }
+  }
+
+  function moveInSelect(state, where) {
+    var rows = state.rows.filter(selectRowCanBeChosen);
+    if (!rows.length) {
+      return;
+    }
+    var here = rows.indexOf(state.active);
+    var next;
+    if (where === "first") {
+      next = 0;
+    } else if (where === "last") {
+      next = rows.length - 1;
+    } else if (here === -1) {
+      next = where > 0 ? 0 : rows.length - 1;
+    } else {
+      // No further than either end: a list does not go round.
+      next = Math.max(0, Math.min(rows.length - 1, here + where));
+    }
+    activateSelectRow(state, rows[next]);
+    state.moved = true;
+  }
+
+  // A letter typed on a short list goes to the next option that starts with it, and
+  // letters typed quickly spell the start of one, as in a native list.
+  function typeInSelect(state, key) {
+    var now = Date.now();
+    state.typed = now - state.typedAt > SELECT_TYPED_FOR ? key : state.typed + key;
+    state.typedAt = now;
+    var rows = state.rows.filter(selectRowCanBeChosen);
+    var here = rows.indexOf(state.active);
+    var wanted = plainWords(state.typed);
+    var same = wanted.split("").every(function (letter) {
+      return letter === wanted[0];
+    });
+    // One letter, or the same one again, moves on from where the keys are to an option
+    // that starts with it, or failing that has a word that does; a word being spelled
+    // stays on an option that still matches it, ranked as the box ranks them.
+    var found =
+      wanted.length > 1 && !same
+        ? bestSelectMatch(state, rows, wanted, Math.max(here, 0))
+        : bestSelectMatch(state, rows, wanted[0] || "", here + 1, 1);
+    if (found) {
+      activateSelectRow(state, found);
+      // A list with no box is worked by its letters as by its arrows, as a native one is.
+      state.moved = true;
+    }
+  }
+
+  function selectIsOpen(state) {
+    return panelIsOpen(state.panel);
+  }
+
+  // By pressing its own button, as a menu is opened (above): a panel opened by its
+  // `popovertarget` has that button for its anchor.
+  function openSelect(state) {
+    if (!selectIsOpen(state) && !state.trigger.disabled) {
+      state.trigger.click();
+    }
+    if (selectIsOpen(state)) {
+      settleSelect(state);
+    }
+    return selectIsOpen(state);
+  }
+
+  // Under a finger, a box that takes the focus calls up the keyboard, over half of the
+  // list somebody opened in order to look down it. So there the focus stays on the
+  // button, and the box is one tap away for whoever wants to type.
+  function selectIsUnderAFinger() {
+    return Boolean(window.matchMedia) && window.matchMedia("(pointer: coarse)").matches;
+  }
+
+  // Once the list is drawn: the focus goes into a long list's box, and the option the
+  // keys start on is brought into view.
+  function settleSelect(state) {
+    if (state.settled) {
+      return;
+    }
+    state.settled = true;
+    openSelectState = state;
+    state.trigger.setAttribute("aria-expanded", "true");
+    if (state.filter && !selectIsUnderAFinger()) {
+      state.filter.focus({ preventScroll: true });
+    } else if (document.activeElement !== state.trigger) {
+      // Safari gives a button no focus when it is clicked, and the keys of an open list
+      // are heard where the focus is.
+      state.trigger.focus({ preventScroll: true });
+    }
+    activateSelectRow(state, state.active);
+  }
+
+  // A letter typed while the focus is on the button of a long list goes into its box.
+  function typeInFilter(state, key, afresh) {
+    state.filter.focus({ preventScroll: true });
+    state.filter.value = afresh ? key : state.filter.value + key;
+    showMatching(state);
+  }
+
+  // What the button says once its list has gone, however it went: by a choice, by
+  // Escape, by a click elsewhere, which is the browser's doing and reaches here through
+  // the panel's `beforetoggle`.
+  function selectHasClosed(state) {
+    state.settled = false;
+    state.trigger.setAttribute("aria-expanded", "false");
+    state.trigger.removeAttribute("aria-activedescendant");
+    if (state.filter) {
+      state.filter.removeAttribute("aria-activedescendant");
+    }
+    if (openSelectState === state) {
+      openSelectState = null;
+    }
+  }
+
+  function closeSelect(state, focusTrigger) {
+    if (selectIsOpen(state)) {
+      state.panel.hidePopover();
+    }
+    if (focusTrigger && document.activeElement !== state.trigger) {
+      state.trigger.focus({ preventScroll: true });
+    }
+  }
+
+  function chooseInSelect(state, row, focusTrigger) {
+    var select = state.select;
+    var index = row && selectRowCanBeChosen(row) ? Number(row.getAttribute("data-option")) : -1;
+    closeSelect(state, focusTrigger);
+    if (index < 0 || index === select.selectedIndex) {
+      return;
+    }
+    select.selectedIndex = index;
+    drawChosen(state);
+    // What a native select raises when somebody chooses from it, in that order.
+    select.dispatchEvent(new Event("input", { bubbles: true }));
+    select.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
+  document.addEventListener(
+    "beforetoggle",
+    function (event) {
+      var select = selectOfPart.get(event.target);
+      var state = select && selectStates.get(select);
+      if (!state) {
+        return;
+      }
+      if (event.newState === "open") {
+        fillSelectList(state);
+      } else {
+        selectHasClosed(state);
+      }
+    },
+    true
+  );
+
+  document.addEventListener(
+    "toggle",
+    function (event) {
+      var select = selectOfPart.get(event.target);
+      var state = select && selectStates.get(select);
+      if (!state) {
+        return;
+      }
+      if (event.newState === "open" && selectIsOpen(state)) {
+        settleSelect(state);
+      } else if (!selectIsOpen(state)) {
+        selectHasClosed(state);
+      }
+    },
+    true
+  );
+
+  function selectStateAt(target) {
+    if (!target || !target.closest) {
+      return null;
+    }
+    var part = target.closest("[data-select-trigger], [data-select-panel]");
+    var select = part && selectOfPart.get(part);
+    return (select && selectStates.get(select)) || null;
+  }
+
+  function selectKeyIsALetter(event) {
+    return event.key.length === 1 && !event.ctrlKey && !event.metaKey && !event.altKey;
+  }
+
+  // In the capturing phase, and stopped once it is answered: Escape that closes a list
+  // must not also close the disclosure the select sits in, and a letter typed on a list
+  // must not also be one of the page's single-key shortcuts.
+  document.addEventListener(
+    "keydown",
+    function (event) {
+      var state = selectStateAt(event.target);
+      if (!state || event.isComposing || event.keyCode === 229) {
+        return;
+      }
+      var key = event.key;
+      var inFilter = event.target === state.filter;
+      function answered() {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      if (!selectIsOpen(state)) {
+        if (["ArrowDown", "ArrowUp", "Enter", " ", "Home", "End"].indexOf(key) !== -1) {
+          if (event.ctrlKey || event.metaKey) {
+            return;
+          }
+          answered();
+          if (openSelect(state) && (key === "Home" || key === "End")) {
+            moveInSelect(state, key === "Home" ? "first" : "last");
+          }
+        } else if (selectKeyIsALetter(event)) {
+          answered();
+          if (!openSelect(state)) {
+            return;
+          }
+          if (state.filter) {
+            typeInFilter(state, key, true);
+          } else {
+            typeInSelect(state, key);
+          }
+        }
+        return;
+      }
+
+      if (key === "Escape") {
+        answered();
+        closeSelect(state, true);
+      } else if (key === "ArrowDown" || key === "ArrowUp") {
+        answered();
+        if (key === "ArrowUp" && event.altKey) {
+          chooseInSelect(state, state.active, true);
+        } else {
+          moveInSelect(state, key === "ArrowDown" ? 1 : -1);
+        }
+      } else if ((key === "Home" || key === "End") && !inFilter) {
+        // In a long list's box they move the caret in what was typed, as in any box.
+        answered();
+        moveInSelect(state, key === "Home" ? "first" : "last");
+      } else if (key === "PageDown" || key === "PageUp") {
+        answered();
+        moveInSelect(state, key === "PageDown" ? SELECT_PAGE : -SELECT_PAGE);
+      } else if (key === "Enter" || (key === " " && !inFilter)) {
+        answered();
+        chooseInSelect(state, state.active, true);
+      } else if (key === "Tab") {
+        // Not cancelled: the focus is back on the button, and the browser moves it on from
+        // there. The option the keys are on is chosen only if somebody moved to it -- with
+        // the arrows, Home, End, the page keys, a letter or the pointer. Where only the box
+        // put them there, Tab leaves the choice as it was: what the box found first is a
+        // guess, and on a list that saves as it changes it would be saved.
+        if (state.moved) {
+          chooseInSelect(state, state.active, true);
+        } else {
+          closeSelect(state, true);
+        }
+      } else if (!inFilter && selectKeyIsALetter(event)) {
+        answered();
+        if (state.filter) {
+          typeInFilter(state, key, false);
+        } else {
+          typeInSelect(state, key);
+        }
+      }
+    },
+    true
+  );
+
+  // Space presses a button as the key comes up, and that press would open the list
+  // again, or close it without the choice.
+  document.addEventListener(
+    "keyup",
+    function (event) {
+      if (
+        event.key === " " &&
+        event.target.hasAttribute &&
+        event.target.hasAttribute("data-select-trigger")
+      ) {
+        event.preventDefault();
+      }
+    },
+    true
+  );
+
+  // What is typed in a long list's box is the list's business and nobody else's: the box
+  // sits inside the form the select belongs to, and its `input` and `change` would
+  // otherwise reach a form that narrows as it changes, and mark a form as having work in
+  // it that nobody has done (#258).
+  ["input", "change"].forEach(function (name) {
+    document.addEventListener(
+      name,
+      function (event) {
+        var state = selectStateAt(event.target);
+        if (state && event.target === state.filter) {
+          event.stopPropagation();
+          if (name === "input") {
+            showMatching(state);
+          }
+        }
+      },
+      true
+    );
+  });
+
+  function selectRowAt(state, target) {
+    var row = target.closest ? target.closest('[role="option"]') : null;
+    return row && state.listbox.contains(row) ? row : null;
+  }
+
+  document.addEventListener("click", function (event) {
+    var state = selectStateAt(event.target);
+    var row = state && selectRowAt(state, event.target);
+    if (row && selectRowCanBeChosen(row)) {
+      chooseInSelect(state, row, true);
+    }
+  });
+
+  // A press outside an open list closes it -- the browser's light dismiss -- and does
+  // nothing else: the click it ends in would otherwise also press whatever it landed on,
+  // a button that opens a dialog, another select's button, a link. Under a finger the
+  // list covers much of the screen, and the tap that was meant only to put it away would
+  // act on the page behind. A press on the list's own button is the button's, which
+  // closes it. So the press is noted, and the click that follows it is declined; one
+  // made from the keyboard, which says it was no press (`detail` 0), never is.
+  var selectPressedOutside = 0;
+  window.addEventListener(
+    "pointerdown",
+    function (event) {
+      var state = openSelectState;
+      var target = event.target;
+      // The button and the list are both inside the select's own wrapper.
+      selectPressedOutside =
+        state && selectIsOpen(state) && !(target instanceof Node && state.root.contains(target))
+          ? Date.now()
+          : 0;
+    },
+    true
+  );
+
+  window.addEventListener(
+    "click",
+    function (event) {
+      if (!selectPressedOutside) {
+        return;
+      }
+      var recent = Date.now() - selectPressedOutside < SELECT_PRESS_FOR;
+      selectPressedOutside = 0;
+      if (recent && event.detail !== 0) {
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+      }
+    },
+    true
+  );
+
+  // A press in the list must not take the focus off the control that is driving it --
+  // the button, or a long list's box -- or the keys would have nowhere to go: an option,
+  // a group's heading and the room round them hold no focus of their own. A press in the
+  // box itself is the box's.
+  document.addEventListener("mousedown", function (event) {
+    var state = selectStateAt(event.target);
+    if (state && state.panel.contains(event.target) && event.target !== state.filter) {
+      event.preventDefault();
+    }
+  });
+
+  // The pointer moves the keys' place with it, so the two never mark different options.
+  // Only a pointer that moved: a list scrolled under a still pointer changes nothing.
+  document.addEventListener("mousemove", function (event) {
+    var state = openSelectState;
+    if (!state) {
+      return;
+    }
+    var row = selectRowAt(state, event.target);
+    if (!row || !selectRowCanBeChosen(row)) {
+      return;
+    }
+    if (row !== state.active) {
+      var scroll = state.listbox.scrollTop;
+      activateSelectRow(state, row);
+      state.listbox.scrollTop = scroll;
+    }
+    // Onto the option the box had found, too: now somebody has moved to it.
+    state.moved = true;
+  });
+
   /* ------------------------------------------------ a row off *Your details*, at once
    *
    * A row's dialog is a form of its own, posting to that row's address (#303). htmx sends it,
@@ -2549,8 +3774,13 @@
     }
   }
 
+  // A select's own control stands for it (#301): the focus is sent straight to the
+  // button, not to the select for the button to take it from, which would be two moves
+  // and, to a screen reader, two announcements.
   function firstControl(row) {
-    return row.querySelector("input:not([type=hidden]), select, textarea, button, a[href]");
+    var first = row.querySelector("input:not([type=hidden]), select, textarea, button, a[href]");
+    var state = first && selectStates.get(first);
+    return state ? state.trigger : first;
   }
 
   function landingAfter(row, block) {
@@ -3345,6 +4575,7 @@
         if (field.value !== was.holds) {
           field.value = was.drawn;
         }
+        selectChanged(field);
       }
     });
     // htmx puts the focus back as the markup lands, before this runs: into a block the

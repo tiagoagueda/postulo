@@ -244,7 +244,8 @@ def test_the_company_form_offers_a_select_scoped_to_companies(signed_in, user):
     assert isinstance(CompanyIdentifierForm().fields["scheme"].widget, forms.Select)
     html = signed_in.get(reverse("jobs:company_create")).content.decode()
     assert '<select name="identifiers-0-scheme"' in html
-    assert '<option value="wikidata">Wikidata</option>' in html
+    # Each kind says the icon its list draws beside it (#301): generic, never a mark.
+    assert '<option value="wikidata" data-icon="globe">Wikidata</option>' in html
     assert '<option value="other"' in html
     assert '<option value="orcid"' not in html, "a person's scheme has no business here"
 

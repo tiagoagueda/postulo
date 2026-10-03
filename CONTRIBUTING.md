@@ -124,10 +124,56 @@ somebody's best guess. No flag beats a wrong flag.
 those, and `tests/test_flags.py` fails if the list and `core/phones.py` disagree — so a
 country added to the telephone field is a missing flag until the script is run.
 
-An `<option>` element can hold text and nothing else, so a `<select>` of countries cannot
-show flags in its list. Where one is needed, put it beside the closed select and let each
-option carry its own flag's URL in a `data-` attribute; see `partials/phone_widget.html`.
-Do not replace a native select with a custom listbox to make room for pictures.
+An `<option>` element can hold text and nothing else, so a native `<select>` of countries
+cannot show flags in its list. The control built beside every select does (see *Selects*,
+next): give each option its own flag's URL in `data-flag`. Where the chosen flag should
+show with scripts off as well, draw it beside the select as `partials/phone_widget.html`
+does, in a holder marked `data-flag-holder`; the script puts the holder away, so the flag
+is never drawn twice.
+
+## Selects
+
+**Every `<select>` is Basecoat's select** (#301): a button showing the choice and a list
+that opens from it, whose options are elements and so can hold a flag or an icon. You
+write a native `<select>`, or let a form field draw one, and that is all: `app.js` builds
+the button and the list beside it. The native select stays in the page and stays the
+form's control -- it is the whole control with scripts off, it posts the name and the
+value, and a choice made in the list sets it and raises its `input` and `change`. So htmx
+on a select, a script listening for `change`, and a stylesheet rule that follows a select
+with `:has(select option[value="other"]:checked)` all work as they did. A script that sets
+a select itself calls `selectChanged(select)` afterwards, because setting a value raises no
+event.
+
+Never write Basecoat's own markup for one (`<div class="select">` round a button): it does
+nothing until a script has run, and `tests/test_template_lint.py` refuses it.
+
+- **To keep one select native**, write `data-native` on it and add it to
+  `NATIVE_ON_PURPOSE` in `tests/test_template_lint.py`, with the reason. The list is empty,
+  and the lint fails on a `data-native` it does not list and on an entry no template bears
+  out. A `<select multiple>` is a list box, not this control, and is left alone.
+- **A flag beside a language or a country**: `LanguageSelect` and `CountrySelect` put the
+  flag's URL on each option, in `data-flag`. A language with no single home carries an
+  empty one and draws nothing.
+- **An icon beside a kind**: the option names a Lucide icon Postulo ships in `data-icon`,
+  generic and never somebody's mark (`TRADEMARKS.md`). `IconSelect(icons={value: name})`
+  does it for a form field, and draws the icons the list can show into a
+  `<template data-option-icons>` after the select, where the script copies them from: a
+  script builds no SVG from a string. A select written out in a template says `data-icon`
+  on its options and draws the template once for the page with
+  `{% option_icons names %}`, as the board does for all its cards.
+- **A list of sixteen options or more** gets a box that narrows it, whatever the case or
+  the accents. Nothing to do.
+- **A long list in groups** is `<optgroup>`, which Django draws from nested choices; the
+  list shows the same groups.
+
+In a browser test, a select is still a select: `select.select_option("work")` and
+`expect(select).to_have_value("work")` on the native control say *this field holds that
+value*, and the button follows. What a person sees and does goes through
+`tests/e2e/selects.py`: `button_of(select)` for the button (its box is where the select
+was; the select itself is one pixel), `open_list`, `options_of`, `choose`. A label names
+both the select and its button, so `get_by_label("Kind")` alone finds two things:
+ask for `get_by_role("combobox", name="Kind")`, which is the button, or narrow the label
+to the select with `.and_(page.locator("select"))`.
 
 ## Tables
 

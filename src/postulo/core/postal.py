@@ -32,6 +32,15 @@ from django.utils.translation import gettext_lazy as _
 
 from .formsets import RowsAlreadyGone, owner_of
 from .models import PostalAddress
+from .option_icons import IconSelect
+
+#: The icon beside each kind of address in the row's choice (#301).
+KIND_ICONS = {
+    PostalAddress.Kind.HOME: "home",
+    PostalAddress.Kind.WORK: "briefcase",
+    PostalAddress.Kind.POSTAL: "mailbox",
+    PostalAddress.Kind.OTHER: "map-pin",
+}
 
 
 def for_holder(holder):
@@ -237,12 +246,14 @@ def render(address, *, person=None) -> list[str]:
 
 
 class CountrySelect(forms.Select):
-    """A country dropdown whose options carry their flag for the script beside it.
+    """A country dropdown whose options carry their flag.
 
-    An `<option>` holds text and nothing else, so the flag cannot go in the list; it sits
-    over the closed select and follows the choice (#88). Per option because static files
-    are served under a content hash, so there is no pattern a script could build a URL
-    from. The same answer the language menu gives since #208.
+    An `<option>` holds text and nothing else, so the native select cannot draw a flag in
+    its list. The control ``app.js`` builds beside it does (#301), in every option and in
+    the closed control, from the address each option carries; with the script blocked the
+    flag the server drew beside the select stands for the country the row loaded with
+    (#88). Per option because static files are served under a content hash, so there is
+    no pattern a script could build a URL from. The same answer the language menu gives.
     """
 
     def create_option(self, name, value, *args, **kwargs):
@@ -335,6 +346,8 @@ class PostalAddressForm(forms.ModelForm):
         )
         self._kept_comparable = self.instance.comparable_form() if self.instance.pk else ""
         self._asked = False
+        kind = self.fields["kind"]
+        kind.widget = IconSelect(icons=KIND_ICONS, choices=kind.choices)
         # Two rows, because a street address is two lines in plenty of places and one box
         # of one line quietly asks somebody to leave the second out. `autocomplete` names
         # each part's purpose (SC 1.3.5, #276): these are the person's own addresses, and a

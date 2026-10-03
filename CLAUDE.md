@@ -39,6 +39,12 @@ Four commitments are stated in the README and are not negotiable in code:
   `assets/css/basecoat.css`; never the bundle, the base tokens or a style pack, and never
   a class name on both sides of the import (`tests/test_stylesheet.py`). Everything it
   ships must still work with scripts off and pass axe in both themes.
+- Every `<select>` is drawn native, which is the control with scripts off, and `app.js`
+  builds Basecoat's select beside it and drives it (#301): never write `<div
+  class="select">` yourself. An option says its flag in `data-flag` (`LanguageSelect`,
+  `CountrySelect`) or its icon in `data-icon` (`IconSelect`, or `{% option_icons %}` for
+  a select a template writes), generic and never a brand's mark. `data-native` keeps one
+  select native, and `tests/test_template_lint.py` lists each with its reason.
 - Every `next` redirect goes through `safe_next()`.
 - Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
   `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside

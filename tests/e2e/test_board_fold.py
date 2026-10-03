@@ -458,7 +458,7 @@ def test_without_a_script_a_heading_is_a_link_to_the_folded_board(
         # A filter, sent by its button, narrows the folded board and leaves it folded.
         form = page.locator("#application-filters")
         expect(form.get_by_label("Status", exact=True)).to_have_count(0)
-        form.get_by_label("Tag", exact=True).select_option("dream-job")
+        form.locator("select[name=tag]").select_option("dream-job")
         form.get_by_role("button", name="Filter", exact=True).click()
         says_status_once(page, "interviewing")
         expect(page).to_have_url(re.compile(r"[?&]tag=dream-job(&|$)"))
@@ -640,10 +640,11 @@ def test_a_live_filter_and_the_search_keep_the_board_folded(page: Page, live_ser
     folded_to(page, person, "applied")
     form = page.locator("#application-filters")
     expect(form.locator("select[name=status]")).to_have_count(0)
-    for label in ("Outcome", "Tag", "Gone quiet"):
-        expect(form.get_by_label(label, exact=True)).to_be_visible()
+    # What a person sees for each: a list is a combobox with scripts on or off (#301).
+    for label, role in (("Outcome", "combobox"), ("Tag", "combobox"), ("Gone quiet", "checkbox")):
+        expect(form.get_by_role(role, name=label, exact=True)).to_be_visible()
 
-    form.get_by_label("Tag", exact=True).select_option("remote")
+    form.locator("select[name=tag]").select_option("remote")
     expect(page).to_have_url(re.compile(r"[?&]tag=remote(&|$)"))
     folded_to(page, person, "applied", tag="remote")
     says_status_once(page, "applied")
@@ -738,7 +739,7 @@ def test_a_filter_chosen_while_a_fold_is_on_its_way_takes_the_fold_with_it(
     page.locator(pressed).click()
     wait_until_held(page, held)
     assert statuses_asked(seen[0]) == ([lands] if lands else [])
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
 
     expect(page).to_have_url(re.compile(r"[?&]tag=remote(&|$)"))
     assert len(seen) == 2, seen
@@ -770,7 +771,7 @@ def test_a_fold_pressed_while_a_filter_is_on_its_way_takes_the_filter_with_it(
     seen = asked_of_the_board(page)
     held = hold_the_first(page)
 
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     wait_until_held(page, held)
     assert statuses_asked(seen[0]) == ["applied"] and "tag=remote" in seen[0]
     fold(page, "draft").click()
@@ -805,7 +806,7 @@ def test_a_fold_that_fails_leaves_the_form_asking_for_the_board_that_is_drawn(
         expect(sent).to_have_count(1)
         page.unroute(refused)
 
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     expect(page).to_have_url(re.compile(r"[?&]tag=remote(&|$)"))
     says_status_once(page, "applied")
     folded_to(page, person, "applied", tag="remote")
@@ -1588,7 +1589,7 @@ def test_a_held_card_is_not_swapped_away_by_a_filter_or_a_fold(page: Page, live_
         }""",
         card.element_handle(),
     )
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     # Pressed from the page: a browser gives the mouse to the drag while a card is held.
     fold(page, "applied").evaluate("(control) => control.click()")
     page.wait_for_timeout(500)
@@ -1625,7 +1626,7 @@ def test_an_answer_that_lands_while_a_card_is_held_waits_for_the_card(
 
     held = []
     page.route(re.compile(r"/applications/\?.*tag=remote"), lambda route: held.append(route))
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     for _ in range(50):
         if held:
             break
@@ -1682,7 +1683,7 @@ def test_a_filter_refused_while_a_card_was_held_is_kept_by_the_move(
     held = []
     waits = re.compile(r"/applications/\?.*tag=remote")
     page.route(waits, lambda route: held.append(route))
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     wait_until_held(page, held)
 
     # Picked up with the mouse, as a hand does; the answer lands under it and is refused.
@@ -1873,7 +1874,7 @@ def test_a_drag_whose_end_was_never_said_does_not_hold_the_board_for_ever(
     page.mouse.move(320, 310)
     expect(card).not_to_have_class(re.compile(r"(^|\s)opacity-50(\s|$)"))
 
-    page.locator("#application-filters").get_by_label("Tag", exact=True).select_option("remote")
+    page.locator("#application-filters select[name=tag]").select_option("remote")
     expect(page).to_have_url(re.compile(r"[?&]tag=remote(&|$)"))
     unfolded(page, person, tag="remote")
 
@@ -2050,6 +2051,21 @@ ROW_CUT_SHORT = """() => {
   const limit = document.documentElement.clientWidth;
   const form = document.querySelector('#application-filters');
   for (const list of form.querySelectorAll('select')) {
+    // Where the script built a button for the select (#301), the button is what a person
+    // sees: it is whole when nothing in it is cut.
+    const built = list.nextElementSibling;
+    const button = built && built.matches('[data-select]')
+      ? built.querySelector('[data-select-trigger]')
+      : null;
+    if (button) {
+      for (const part of [button, ...button.querySelectorAll('*')]) {
+        if (part.scrollWidth > part.clientWidth + 0.5 && part.clientWidth > 0) {
+          short.push(`${list.id}'s button cuts "${part.textContent.trim().slice(0, 30)}"`);
+          break;
+        }
+      }
+      continue;
+    }
     const alone = list.cloneNode(true);
     for (const name of ['id', 'name', 'form', 'class']) alone.removeAttribute(name);
     alone.style.cssText = 'position: absolute; visibility: hidden; width: auto; min-width: 0;';

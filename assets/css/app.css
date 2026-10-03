@@ -72,6 +72,13 @@
    box and keys the header, the body and the footer on the elements; the paint, and the
    motion it would add, are decided in `basecoat.css`. */
 @import "basecoat-css/components/dialog.css";
+/* A select's own control (#301): a button showing the choice and a list that opens from
+   it, whose options are elements and so can hold a flag or an icon. The structure is the
+   button, the list box and its options; the paint is in `basecoat.css`. Basecoat's script
+   for it is not vendored, by the test its menu script failed (#262): the markup does
+   nothing until the script runs. The server draws a native `<select>`, which is the
+   control with scripts off, and `app.js` builds this beside it and drives it. */
+@import "basecoat-css/components/select.css";
 @import "./basecoat.css";
 
 /* Templates and Python live outside this directory, so point Tailwind at them. */
@@ -1145,9 +1152,13 @@
    * from 768 pixels in a row that shows no name, where it sits in the second column,
    * beside the kind: "on a wide screen, the kind sits on one line with the value". 768 and
    * not 640, because the kind's column and a group wide enough to keep its chooser and
-   * its box on one line are 516 pixels between them, and a row is not that wide before.
-   * With the name shown the three would want 688 pixels of a card that has 596, so that
+   * its box on one line are 548 pixels between them, and a row is not that wide before.
+   * With the name shown the three would want 720 pixels of a card that has 596, so that
    * row keeps the group underneath at every width.
+   *
+   * The kind's column is twelve rem: the ten it had for its words, and two for the icon
+   * each kind has drawn beside it since #301, without which *Switchboard* was cut short
+   * in the widest of the fonts.
    *
    * Which row shows a name is the select's to say, as it is for the name box below: the
    * exception is the rule with `:has()` in it, so a browser that cannot read it keeps the
@@ -1158,7 +1169,7 @@
    * in a language whose kinds are long words the row was wider than a phone.
    */
   .phone-row {
-    @apply grid-cols-[minmax(0,1fr)] sm:grid-cols-[minmax(0,10rem)_minmax(0,1fr)];
+    @apply grid-cols-[minmax(0,1fr)] sm:grid-cols-[minmax(0,12rem)_minmax(0,1fr)];
   }
 
   .phone-row > [data-phone-line] {
@@ -1481,6 +1492,93 @@ progress.funnel-bar::-moz-progress-bar {
     max-block-size: calc(100% - 0.5rem);
     min-block-size: 10rem;
   }
+}
+
+/*
+ * A select's list (#301) is a panel placed as a menu's is, by the rules above, with four
+ * differences. It starts where its button starts (`data-align="start"`, already above).
+ * It is at least as wide as its button, where the browser can say how wide that is; where
+ * it cannot, `app.js` writes the width when it places the panel. It is a column whose
+ * list scrolls inside it, under the box that narrows a long one, so the box stays in
+ * sight and the page behind never scrolls: twenty-two rem of it, or the window where that
+ * is less. A long list keeps that height while its box narrows it: a list that opened
+ * above its button is held by its foot, and one that shrank as its options went would
+ * carry the box down the screen under the hand typing in it. `display` only while it is
+ * open, or the rule would undo the browser's own for a popover that is closed.
+ *
+ * And it may be wider than what is left of the window from where its button starts: a
+ * list of languages or of countries on a phone is nearly the window's width. A panel that
+ * fits on neither side of its trigger in one direction fits none of the menus' places in
+ * the other either, and the browser then draws it where it was first put, off the foot of
+ * the window. So a list has two places of its own after the menus': across the window,
+ * below its button or above it, centred on the button as far as the window lets it be,
+ * and scrolling inside itself where it is taller than the room there. Five places and no
+ * more: Chromium tries the first five a rule names and ignores the rest, which is how a
+ * seventh place that fitted was never looked at.
+ *
+ * Keyed on the attribute `app.js` puts on the panel: the class round it is Basecoat's.
+ */
+[data-popover][popover][data-select-panel] {
+  max-block-size: min(22rem, calc(100dvh - 1rem));
+  overflow: hidden;
+}
+
+[data-popover][popover][data-select-panel="long"] {
+  block-size: 22rem;
+}
+
+[data-popover][popover][data-select-panel]:popover-open {
+  display: flex;
+  flex-direction: column;
+}
+
+@supports (position-area: block-end span-inline-start) and (position-try-fallbacks: flip-block) {
+  [data-popover][popover][data-select-panel] {
+    min-inline-size: min(anchor-size(width), calc(100vw - 2rem));
+    position-try-fallbacks:
+      flip-block,
+      --menu-scrolls,
+      --menu-scrolls flip-block,
+      --select-across-scrolls,
+      --select-across-scrolls flip-block;
+  }
+
+  @position-try --select-across-scrolls {
+    position-area: block-end span-all;
+    max-block-size: calc(100% - 0.5rem);
+    min-block-size: 10rem;
+  }
+}
+
+/*
+ * The native select once `app.js` has built its own control beside it (#301): still in
+ * the document, still the form's control -- it posts, it is validated, the rows that
+ * follow it with `:has()` still follow it -- and out of sight, out of the tab order and
+ * hidden from assistive technology, which the script says in attributes. Not
+ * `display: none`: a control with no box cannot take the focus a label hands it, and
+ * the script passes that focus on to the button. One pixel, out of the flow so that it
+ * is not an item of the row or the grid it sits in, and at the place it would have been.
+ * Unlayered, to outweigh the widths a page writes on its select as utilities.
+ */
+select[data-select-ready] {
+  position: absolute;
+  inline-size: 1px;
+  min-inline-size: 0;
+  block-size: 1px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  pointer-events: none;
+  appearance: none;
+}
+
+/* What a select's own control says when it must have an answer and has none (#301):
+   the words of an error under a field, wherever the select is. */
+[data-select-said] p {
+  @apply text-xs font-medium text-red-600 dark:text-red-400;
 }
 
 /*

@@ -344,6 +344,15 @@
         </ul>
       </nav>
     </footer>
+    {% comment %} What `app.js` builds a select's own control out of (#301): the chevron of
+       the closed control and the tick beside the chosen option, drawn here by `{% icon %}`
+       and copied from here, and the three things the control may have to say, translated
+       with everything else -- the script holds no words. A page without this keeps its
+       native selects, which is the whole fallback. {% endcomment %}
+    <template id="select-parts"
+              data-filter="{% translate 'Filter' %}"
+              data-empty="{% translate 'Nothing matches.' %}"
+              data-required="{% translate 'Choose one of the options.' %}">{% icon "chevron-down" %}{% icon "check" %}</template>
     {# Scripts a page needs and the rest do not; always from Postulo's own origin. #}
     {% block scripts %}{% endblock %}
     {% comment %} allauth's pages put theirs in `extra_body` rather than in `scripts`, and a

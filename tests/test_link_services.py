@@ -909,7 +909,7 @@ def test_a_kind_with_no_services_has_no_choice_to_draw(user):
     """A select holding Other alone would be a control that offers nothing."""
     row = form(WEBSITE, label="Blog", url="https://alex.example.org")
 
-    assert "service" not in row.fields and row.service_icons == []
+    assert "service" not in row.fields and row.service_icon == ""
     assert row.is_valid(), row.errors
     assert (row.cleaned_data["service"], row.cleaned_data["label"]) == ("", "Blog")
 
@@ -927,8 +927,18 @@ def test_each_option_says_its_icon_and_its_hosts_and_the_chosen_icon_is_the_one_
     )
     assert re.search(r'<option value="other" data-icon="globe">', html)
     assert "data-service-select" in html
-    drawn = {icon["name"]: icon["shown"] for icon in row.service_icons}
-    assert drawn == {"globe": False, "user": False, "at-sign": True, "video": False}
+    # The one icon the page draws beside the native select, for a page without scripts,
+    # and after the select every icon its list can show, once each, for the select's own
+    # control to copy (#301).
+    assert row.service_icon == "at-sign"
+    after = html[html.index("</select>") :]
+    assert re.match(r"</select>\s*<template data-option-icons>", after)
+    assert sorted(re.findall(r'data-icon="([a-z-]+)"', after)) == [
+        "at-sign",
+        "globe",
+        "user",
+        "video",
+    ]
 
 
 def test_a_stored_row_saved_as_it_was_is_not_checked_again(user, monkeypatch):
@@ -1066,10 +1076,18 @@ def test_a_row_reads_service_then_name_then_address_then_its_controls(client, us
     assert re.search(r'<option value="linkedin"[^>]*selected', on_a_service)
     assert "data-has-name" not in new
     assert re.search(r'<option value=""[^>]*selected', new), "a new row starts unchosen"
-    # The chosen service's icon is drawn, and the others are there and hidden.
-    assert re.search(r'<span data-service-icon="user"><svg', on_a_service)
-    assert re.search(r'<span data-service-icon="globe" hidden><svg', on_a_service)
-    assert re.search(r'<span data-service-icon="globe"><svg', other)
+    # The chosen service's icon is drawn beside the select, and no other: the rest are
+    # in the template after the select, for its own control to copy (#301).
+    for row, icon in ((on_a_service, "user"), (other, "globe"), (new, "globe")):
+        beside = re.search(r"<span[^>]*data-option-mark[^>]*>(.*?)</span>", row, re.S).group(1)
+        assert re.findall(r'data-icon="([a-z-]+)"', beside) == [icon]
+        listed = re.search(r"<template data-option-icons>(.*?)</template>", row, re.S).group(1)
+        assert sorted(re.findall(r'data-icon="([a-z-]+)"', listed)) == [
+            "at-sign",
+            "globe",
+            "user",
+            "video",
+        ]
 
 
 def test_the_websites_block_has_no_select_and_its_name_is_always_there(client, user):
