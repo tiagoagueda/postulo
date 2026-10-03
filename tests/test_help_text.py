@@ -150,7 +150,12 @@ def test_there_are_forms_to_check(forms_on_the_site):
 
 
 def test_every_field_either_explains_itself_or_is_excused(forms_on_the_site):
-    bare = sorted(name for name, field in forms_on_the_site.items() if not field.help_text)
+    # A hidden field is never met by a person, so there is nobody for a sentence to help.
+    bare = sorted(
+        name
+        for name, field in forms_on_the_site.items()
+        if not field.help_text and not field.widget.is_hidden
+    )
 
     unexplained = [name for name in bare if name not in EXCUSED]
 

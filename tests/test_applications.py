@@ -251,6 +251,39 @@ def test_editing_an_application_still_records_the_status_move(client, user, appl
     assert application.events.filter(to_status=Status.SCREENING).exists()
 
 
+def test_a_stale_edit_page_does_not_move_the_status_back(client, user, application):
+    """The form always posts the status it was drawn with; that is not a choice (#545)."""
+    change_status(application, Status.APPLIED)
+    client.force_login(user)
+    url = reverse("applications:update", args=[application.pk])
+    form = client.get(url).context["form"]
+    assert form["drawn_status"].value() == Status.APPLIED
+
+    change_status(application, Status.SCREENING)
+    before = application.events.count()
+    client.post(
+        url,
+        {
+            "status": Status.APPLIED,
+            "drawn_status": form["drawn_status"].value(),
+            "priority": "3",
+            "tags": [],
+        },
+    )
+
+    application.refresh_from_db()
+    assert application.priority == 3
+    assert application.status == Status.SCREENING
+    assert application.events.count() == before, "no move nobody made is logged"
+
+    client.post(
+        url,
+        {"status": Status.OFFER, "drawn_status": Status.APPLIED, "priority": "3", "tags": []},
+    )
+    application.refresh_from_db()
+    assert application.status == Status.OFFER, "a status somebody did choose is still applied"
+
+
 def test_the_board_shows_only_live_columns(client, user, application):
     change_status(application, Status.REJECTED)
     client.force_login(user)

@@ -20,7 +20,9 @@
            because it is the other half of the same control (#139).
         {% endcomment %}
         {% for field in form %}
-          {% if field.name != "tags" and field.name != "new_tags" %}
+          {% if field.is_hidden %}
+            {{ field }}
+          {% elif field.name != "tags" and field.name != "new_tags" %}
             <c-field :field="field" />
           {% endif %}
         {% endfor %}

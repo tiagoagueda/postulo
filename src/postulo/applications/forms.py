@@ -334,6 +334,9 @@ class ApplicationForm(OwnerScopedModelForm):
         required=False,
         help_text=_("Separate them with commas. A tag you have already keeps its colour."),
     )
+    #: The status this form was drawn with, sent back so that the view can tell a status
+    #: somebody chose from one that is only the page being old (#545).
+    drawn_status = forms.CharField(widget=forms.HiddenInput, required=False)
 
     class Meta:
         model = Application
@@ -379,6 +382,7 @@ class ApplicationForm(OwnerScopedModelForm):
         from postulo.jobs import structure
 
         self.fields["tags"].queryset = Tag.objects.for_user(self.user)
+        self.initial["drawn_status"] = self.instance.status
         contacts = Contact.objects.for_user(self.user).select_related("company")
         if self.instance.pk:
             # The contacts worth offering are the ones at this company -- and the one the
@@ -529,6 +533,11 @@ DATETIME_INPUT_FORMATS = ["%Y-%m-%dT%H:%M", "%Y-%m-%d %H:%M:%S", "%Y-%m-%d %H:%M
 class InterviewForm(OwnerScopedModelForm):
     """Schedule an interview — or record one that already happened, from the same form."""
 
+    #: The times as the form drew them, sent back so that the view can tell a time somebody
+    #: changed from one that is only the page being old (#545).
+    drawn_starts_at = forms.CharField(widget=forms.HiddenInput, required=False)
+    drawn_ends_at = forms.CharField(widget=forms.HiddenInput, required=False)
+
     remind = forms.BooleanField(
         label=_("Remind me the day before"),
         required=False,
@@ -573,6 +582,12 @@ class InterviewForm(OwnerScopedModelForm):
             # The reminder was made, or not, when it was scheduled; moving the interview
             # moves it.
             del self.fields["remind"]
+            for name in ("starts_at", "ends_at"):
+                field = self.fields[name]
+                shown = field.prepare_value(self.initial.get(name))
+                self.initial[f"drawn_{name}"] = field.widget.format_value(shown) or ""
+        else:
+            del self.fields["drawn_starts_at"], self.fields["drawn_ends_at"]
 
     def scope_querysets(self) -> None:
         contacts = Contact.objects.for_user(self.user)

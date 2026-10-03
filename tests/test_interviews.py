@@ -920,3 +920,42 @@ def test_editing_an_interview_keeps_a_contact_who_has_since_moved_company(
     interview.refresh_from_db()
     assert interview.location == "New room"
     assert list(interview.contacts.all()) == [recruiter]
+
+
+def test_a_stale_edit_page_does_not_move_the_interview_back(client, user, application):
+    """The times come back as drawn; that is not a move somebody made (#545)."""
+    interview = schedule_interview(
+        application, kind=InterviewKind.VIDEO, starts_at=in_days(4), location="old"
+    )
+    client.force_login(user)
+    url = reverse("applications:interview_update", args=[interview.pk])
+    form = client.get(url).context["form"]
+    drawn = {
+        name: form[name].value()
+        for name in ("starts_at", "ends_at", "drawn_starts_at", "drawn_ends_at")
+    }
+    assert drawn["drawn_starts_at"] == timezone.localtime(interview.starts_at).strftime(
+        "%Y-%m-%dT%H:%M"
+    )
+
+    moved = in_days(9)
+    reschedule_interview(interview, starts_at=moved, ends_at=moved + dt.timedelta(hours=1))
+    before = application.events.count()
+    response = client.post(
+        url,
+        {
+            "kind": InterviewKind.VIDEO,
+            "starts_at": drawn["drawn_starts_at"],
+            "ends_at": drawn["drawn_ends_at"],
+            "drawn_starts_at": drawn["drawn_starts_at"],
+            "drawn_ends_at": drawn["drawn_ends_at"],
+            "location": "new",
+            "notes": "",
+        },
+    )
+
+    assert response.status_code == 302
+    interview.refresh_from_db()
+    assert interview.location == "new"
+    assert interview.starts_at == moved
+    assert application.events.count() == before, "no move nobody made is logged"

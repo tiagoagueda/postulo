@@ -551,6 +551,9 @@ class ApplicationUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         thing is one transaction, so the row cannot move between the reading and the writing.
         """
         requested_status = form.cleaned_data["status"]
+        # A status the form only carried back as it was drawn is not a choice, and
+        # asking for it would undo a move made since: the status stays as it is now (#545).
+        drawn_status = form.cleaned_data.get("drawn_status")
         with transaction.atomic():
             current = (
                 Application.objects.select_for_update()
@@ -560,7 +563,8 @@ class ApplicationUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
             )
             form.instance.status = current or self.status_before_edit
             response = super().form_valid(form)
-            change_status(self.object, requested_status)
+            if requested_status != drawn_status:
+                change_status(self.object, requested_status)
         messages.success(self.request, _("Application updated."))
         return response
 
@@ -1122,8 +1126,22 @@ class InterviewUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         # Everything but the times is saved as edited; the times go through the service,
         # so a move is written on the timeline and the reminder moves with it.
         previous = Interview.objects.get(pk=self.object.pk)
-        starts_at = form.cleaned_data["starts_at"]
-        ends_at = form.cleaned_data["ends_at"] or starts_at + DEFAULT_INTERVIEW_LENGTH
+
+        def as_drawn(name: str) -> bool:
+            """Whether the time came back as the page showed it, so nobody changed it (#545).
+
+            Then the time is what it is now: the interview may have been moved since the
+            page was drawn, by the API or a calendar, and writing the old one back would
+            undo that and log a move nobody made.
+            """
+            drawn = form.cleaned_data.get(f"drawn_{name}")
+            return bool(drawn) and form.data.get(name, "").strip() == drawn
+
+        starts_at = previous.starts_at if as_drawn("starts_at") else form.cleaned_data["starts_at"]
+        if as_drawn("ends_at"):
+            ends_at = previous.ends_at
+        else:
+            ends_at = form.cleaned_data["ends_at"] or starts_at + DEFAULT_INTERVIEW_LENGTH
         form.instance.starts_at, form.instance.ends_at = previous.starts_at, previous.ends_at
         interview = form.save()
         reschedule_interview(interview, starts_at=starts_at, ends_at=ends_at)

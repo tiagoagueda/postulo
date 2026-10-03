@@ -21,6 +21,7 @@
 
     <form method="post" novalidate>
       {% csrf_token %}
+      {% if form.instance.pk %}{{ form.drawn_starts_at }}{{ form.drawn_ends_at }}{% endif %}
       <div class="card mb-6">
         <c-field :field="form.kind" />
         <div class="grid gap-x-4 sm:grid-cols-2">
