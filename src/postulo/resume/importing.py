@@ -252,15 +252,19 @@ def apply(owner, record: Record) -> Report:
         # marks it.
         number = phones.combine((record.person.get("phone") or "").strip(), "")[:40]
         wrote_number = False
-        if (
-            number
-            and phone_numbers.primary_for(profile) is None
-            and not phone_numbers.taken_elsewhere(number)
-        ):
-            # Saved on a row of its own, so deliberately not in `changed`: that list names
-            # columns for `update_fields`, and there is no phone column any more.
-            phone_numbers.save_only_number(profile, owner, number)
-            wrote_number = True
+        if number and phone_numbers.primary_for(profile) is None:
+            # Asked the way the form asks it (#615): a number held elsewhere spends one of
+            # this account's answers, and once they are spent a free number is refused in
+            # the same words, because writing one and not the other would be the answer.
+            # The rest of the import goes on.
+            refused = phone_numbers.refusal(owner, number)
+            if refused:
+                report.skipped.append(f"{number}: {refused}")
+            else:
+                # Saved on a row of its own, so deliberately not in `changed`: that list
+                # names columns for `update_fields`, and there is no phone column any more.
+                phone_numbers.save_only_number(profile, owner, number)
+                wrote_number = True
         if changed:
             fields = [*changed, "updated_at"] if hasattr(profile, "updated_at") else changed
             profile.save(update_fields=fields)
