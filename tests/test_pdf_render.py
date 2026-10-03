@@ -205,6 +205,19 @@ def test_a_cv_with_its_contact_block_off_names_nobody_in_the_file(user, experien
     assert b"/Author" not in readable(rendering.render_cv_html(cv))
 
 
+def test_a_cv_with_its_contact_block_off_is_titled_without_its_holder(user, experience):
+    """The title is the PDF's `/Title`, so the name must not lead it when the CV is anonymous."""
+    user.first_name, user.last_name = "Alex", "Morgan"
+    user.save()
+    cv = selection(user, experience, show_contact_details=False)
+
+    content = readable(rendering.render_cv_html(cv))
+
+    assert b"/Title" in content
+    assert b"Morgan" not in content
+    assert b"Morgan" not in rendering.snapshot_cv(cv).file.name.encode()
+
+
 @pytest.mark.parametrize("theme,kind", SETTINGS)
 def test_a_very_long_address_stays_on_the_page(user, theme, kind):
     """A 200-character link has nowhere to wrap, and used to run off the edge of the page."""

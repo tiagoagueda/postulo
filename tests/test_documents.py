@@ -23,6 +23,8 @@ from postulo.documents.pdf import (
 )
 from postulo.documents.rendering import (
     build_sections,
+    cv_outline,
+    draft_name,
     fill_placeholders,
     render_cv_html,
     render_letter_html,
@@ -185,6 +187,31 @@ def test_contact_details_can_be_left_off(cv, user):
     cv.save()
 
     assert user.email not in render_cv_html(cv)
+
+
+def test_a_cv_with_its_contact_block_off_is_named_without_its_holder(cv, user, fake_backend):
+    """The title, the draft's name, the outline's title and the file name all leave the name out."""
+    user.first_name, user.last_name = "Alex", "Morgan"
+    user.save()
+    cv.show_contact_details = False
+    cv.save()
+
+    snapshot = snapshot_cv(cv, backend=fake_backend)
+
+    assert "Morgan" not in render_cv_html(cv)
+    assert "Morgan" not in draft_name(cv)
+    assert "Morgan" not in cv_outline(cv).title
+    assert "Morgan" not in snapshot.title
+    assert "morgan" not in snapshot.file.name
+    assert snapshot.title, "it is still titled, by what it is"
+
+
+def test_a_cv_with_its_contact_block_on_is_named_for_its_holder(cv, user, fake_backend):
+    user.first_name, user.last_name = "Alex", "Morgan"
+    user.save()
+
+    assert "Morgan" in draft_name(cv)
+    assert "morgan" in snapshot_cv(cv, backend=fake_backend).file.name
 
 
 # ------------------------------------------------------------------ placeholders

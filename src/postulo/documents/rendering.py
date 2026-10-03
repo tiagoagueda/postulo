@@ -68,8 +68,12 @@ def document_title(document) -> str:
     variant's name, which is the person's own filing and is marked in the model as being
     for them and not for the employer (#223). Called inside the language override, so the
     word for the kind is in the document's language.
+
+    A CV with its contact details off is titled by its kind alone (#512): the switch is how
+    someone sends an anonymous copy, and the title is the PDF's `/Title`, the file's name
+    and the DOCX's title, none of which the person sees in the preview.
     """
-    holder = document_holder(document)
+    holder = document_holder(document) if getattr(document, "show_contact_details", True) else ""
     kind = str(getattr(document, "get_kind_display", lambda: "")()) or ""
     if holder and kind:
         return gettext("%(name)s — %(kind)s") % {"name": holder, "kind": kind}
