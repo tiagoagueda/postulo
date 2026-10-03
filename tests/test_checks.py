@@ -244,3 +244,45 @@ def test_no_token_and_a_long_one_are_fine(settings):
     settings.POSTULO_LOGS_TOKEN = ""
     settings.POSTULO_METRICS_TOKEN = "b" * 32
     assert checks.endpoint_tokens() == []
+
+
+# ------------------------------------------------------------ the mail provider and grant (#487)
+
+
+@pytest.mark.parametrize(
+    ("provider", "grant"),
+    [("microsft", ""), ("google", "aplication"), ("google", "application")],
+)
+def test_a_mail_provider_or_grant_xoauth2_cannot_use_is_an_error(settings, provider, grant):
+    settings.POSTULO_EMAIL_AUTH = "xoauth2"
+    settings.POSTULO_EMAIL_OAUTH_PROVIDER = provider
+    settings.POSTULO_EMAIL_OAUTH_GRANT = grant
+
+    assert ids(checks.mail_oauth()) == {"postulo.E008"}
+
+
+@pytest.mark.parametrize(
+    ("provider", "grant"),
+    [
+        ("", ""),
+        ("", "application"),
+        ("google", ""),
+        ("google", "mailbox"),
+        ("microsoft", "application"),
+        ("microsoft", ""),
+    ],
+)
+def test_a_provider_and_grant_the_code_acts_on_pass(settings, provider, grant):
+    settings.POSTULO_EMAIL_AUTH = "xoauth2"
+    settings.POSTULO_EMAIL_OAUTH_PROVIDER = provider
+    settings.POSTULO_EMAIL_OAUTH_GRANT = grant
+
+    assert checks.mail_oauth() == []
+
+
+def test_the_mail_provider_is_not_checked_without_xoauth2(settings):
+    settings.POSTULO_EMAIL_AUTH = "password"
+    settings.POSTULO_EMAIL_OAUTH_PROVIDER = "microsft"
+    settings.POSTULO_EMAIL_OAUTH_GRANT = "aplication"
+
+    assert checks.mail_oauth() == []

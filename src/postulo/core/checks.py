@@ -220,3 +220,52 @@ def footer_links(app_configs=None, **kwargs) -> list[Error]:
             )
         )
     return problems
+
+
+@register("postulo")
+def mail_oauth(app_configs=None, **kwargs) -> list[Error]:
+    """With `xoauth2`, the provider and the grant name something `mail_auth` can act on.
+
+    The words are read from `mail_auth` -- its `PROVIDERS` and `MailGrant` -- rather than
+    listed again, so this check and the code that acts on them cannot drift. Without it a
+    mistyped provider or grant passes `check --deploy` and fails at the first password reset;
+    the Email page refuses the same pairs, but a variable pins its field over that page.
+    """
+    from postulo.core import mail_auth
+
+    if getattr(settings, "POSTULO_EMAIL_AUTH", "password") != "xoauth2":
+        return []
+    problems = []
+    name = getattr(settings, "POSTULO_EMAIL_OAUTH_PROVIDER", "")
+    chosen = mail_auth.provider(name)
+    # A blank provider is not a mistake: the Email page may still choose one, and the page
+    # refuses to save xoauth2 without it. Only a word the code cannot act on is an error.
+    if chosen is None and name:
+        problems.append(
+            Error(
+                f"POSTULO_EMAIL_OAUTH_PROVIDER is {name!r}; with POSTULO_EMAIL_AUTH=xoauth2 "
+                f"it must be blank or one of: {', '.join(mail_auth.PROVIDERS)}.",
+                id="postulo.E008",
+            )
+        )
+    grant = getattr(settings, "POSTULO_EMAIL_OAUTH_GRANT", "")
+    grants = list(mail_auth.MailGrant.values)
+    if grant and grant not in grants:
+        problems.append(
+            Error(
+                f"POSTULO_EMAIL_OAUTH_GRANT is {grant!r}; it must be blank or one of: "
+                f"{', '.join(grants)}.",
+                id="postulo.E008",
+            )
+        )
+    elif grant == mail_auth.MailGrant.APPLICATION and chosen is not None:
+        if not chosen.application_grant:
+            problems.append(
+                Error(
+                    f"POSTULO_EMAIL_OAUTH_GRANT is {grant!r}, which {chosen.label} does not "
+                    "offer; an application cannot send on its own there.",
+                    hint="Leave the grant blank to sign in once as the mailbox.",
+                    id="postulo.E008",
+                )
+            )
+    return problems
