@@ -70,7 +70,10 @@ def _ask(url: str) -> tuple[str, str]:
             # Plenty of sites answer HEAD with 403 or 405 and are perfectly fine; ask
             # again properly rather than telling somebody their portfolio is broken.
             if response.status_code in (401, 403, 405, 501) or response.status_code >= 500:
-                response = client.get(url)
+                # Streamed, and closed unread: only the status is wanted, and a link to
+                # a large file must not be downloaded into the worker to learn it.
+                with client.stream("GET", url) as response:
+                    pass
     except http.DestinationRefused as error:
         return LinkStatus.BROKEN, str(
             _("It redirects to a private or local address, which was not followed.")

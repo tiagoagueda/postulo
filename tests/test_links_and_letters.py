@@ -96,6 +96,11 @@ def answering(monkeypatch):
         def get(self, url, **kwargs):
             return self._answer("GET", url)
 
+        def stream(self, method, url, **kwargs):
+            from contextlib import nullcontext
+
+            return nullcontext(self._answer(method, url))
+
     monkeypatch.setattr(link_checks.httpx, "Client", FakeClient)
     monkeypatch.setattr(link_checks, "validate_public_url", lambda url: url)
     return state
@@ -539,6 +544,34 @@ def test_the_certificate_is_still_checked_against_the_name(user, monkeypatch):
 
     link_checks.check(a_link(user, url="https://portfolio.example.org/cv"))
     assert names == ["portfolio.example.org"]
+
+
+def test_the_fallback_get_does_not_read_the_body(user, monkeypatch):
+    """A host that refuses HEAD must not make the worker download what is behind it."""
+    import httpx
+
+    read = []
+
+    class Endless(httpx.SyncByteStream):
+        def __iter__(self):
+            while True:
+                read.append(1)
+                yield b"x" * 1024
+                if len(read) > 10_000:
+                    raise AssertionError("the body was read without end")
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "HEAD":
+            return httpx.Response(405)
+        return httpx.Response(200, stream=Endless())
+
+    monkeypatch.setattr(link_checks, "validate_public_url", without_dns)
+    with_transport(monkeypatch, httpx.MockTransport(handler))
+
+    link = link_checks.check(a_link(user, url="https://portfolio.example.org/big"))
+
+    assert link.check_status == LinkStatus.OK
+    assert len(read) <= 8, "at most a small bound is read, here none"
 
 
 def test_checking_happens_only_when_a_person_asks(client, user, answering):
