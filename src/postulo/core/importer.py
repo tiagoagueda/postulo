@@ -15,6 +15,7 @@ old identifiers are mapped to new records as they go.
 from __future__ import annotations
 
 import json
+import re
 import zipfile
 from dataclasses import dataclass, field
 
@@ -251,6 +252,9 @@ def account_is_empty(user) -> bool:
 
 
 #: What an address row must have something in to be worth restoring at all.
+#: A calendar identifier worth keeping: anything else could carry a line break into a feed.
+SAFE_UID = re.compile(r"[A-Za-z0-9@._-]{1,64}")
+
 ADDRESS_PARTS = ("street", "postcode", "municipality", "region", "country")
 
 
@@ -432,6 +436,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         Application,
         ApplicationEvent,
         Interview,
+        InterviewKind,
+        InterviewOutcome,
         Offer,
         Reminder,
     )
@@ -867,8 +873,18 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                     # The calendar identifier travels, so a calendar that knew the meeting
                     # still does; a forced duplicate on the same instance gets a fresh one.
                     uid = interview_entry.pop("uid", None)
-                    if uid and Interview.objects.filter(owner=user, uid=uid).exists():
+                    if uid and (
+                        not isinstance(uid, str)
+                        or not SAFE_UID.fullmatch(uid)
+                        or Interview.objects.filter(owner=user, uid=uid).exists()
+                    ):
                         uid = None
+                    # A kind or outcome from a later Postulo, or typed by hand, is one this
+                    # version can name no better than the last of each (#450).
+                    if interview_entry.get("kind") not in InterviewKind.values:
+                        interview_entry["kind"] = InterviewKind.OTHER
+                    if interview_entry.get("outcome") not in InterviewOutcome.values:
+                        interview_entry["outcome"] = InterviewOutcome.SCHEDULED
                     interview = Interview.objects.create(
                         owner=user,
                         application=application,

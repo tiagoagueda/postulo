@@ -92,6 +92,52 @@ def test_one_interviews_file_is_nobody_elses(client, user, other_user):
     assert client.get(reverse("applications:interview_ics", args=[theirs.pk])).status_code == 404
 
 
+def test_a_uid_with_a_line_break_adds_no_property_to_the_feed(client, user):
+    """Both stored values reach the file only after the writer cleans them (#450)."""
+    interview = an_interview(user, "Own visible role")
+    Interview.objects.filter(pk=interview.pk).update(uid="abc\r\nATTENDEE:mailto:evil@example.org")
+    client.force_login(user)
+
+    for address in (
+        reverse("applications:interview_calendar"),
+        reverse("applications:interview_ics", args=[interview.pk]),
+    ):
+        text = client.get(address).content.decode()
+        assert "UID:abcATTENDEE:mailto:evil@example.org" in text
+        assert not [line for line in text.splitlines() if line.startswith("ATTENDEE")]
+
+
+def test_an_outcome_this_version_does_not_know_still_has_a_file(client, user):
+    interview = an_interview(user, "Own visible role")
+    Interview.objects.filter(pk=interview.pk).update(outcome="rescheduled")
+    client.force_login(user)
+
+    response = client.get(reverse("applications:interview_ics", args=[interview.pk]))
+    assert response.status_code == 200
+    assert "STATUS:CONFIRMED" in response.content.decode()
+
+
+def test_an_archive_cannot_bring_an_unsafe_uid_or_an_unknown_outcome(user, other_user):
+    from postulo.core import export as export_module
+    from postulo.core import importer
+
+    an_interview(user, "Own visible role")
+    document = export_module.build_document(user)
+    interview = document["companies"][0]["postings"][0]["applications"][0]["interviews"][0]
+    interview["uid"] = "abc\r\nATTENDEE:mailto:evil@example.org"
+    interview["outcome"] = "rescheduled"
+    interview["kind"] = "hologram"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document))
+
+    importer.load(other_user, zipfile.ZipFile(io.BytesIO(buffer.getvalue())))
+
+    kept = Interview.objects.get(owner=other_user)
+    assert "\n" not in kept.uid and kept.uid.endswith("@postulo"), "a fresh one"
+    assert kept.outcome == "scheduled" and kept.kind == "other"
+
+
 def test_the_feeds_need_a_sign_in(client, db, user):
     theirs = an_interview(user, "Own visible role")
     for url in (

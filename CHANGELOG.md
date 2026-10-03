@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- An imported interview with an unsafe calendar identifier or an unknown outcome can no longer add a line to a feed or break its file. (#450)
 - Server settings → People → Plugins answers the same to a stranger whether or not the account exists. (#373)
 - The weekly dependency audit also reads gunicorn and psycopg, which only the image installs. (#583)
 - @parcel/watcher 2.6.0, for GHSA-vfj7-8cjw-p6xm (a deeply nested pattern could exhaust the stack in braces), pinned by an npm override so that Tailwind stays at 4.3.3 and the stylesheet is unchanged; build-time only, nothing of it runs in the application. (#708)

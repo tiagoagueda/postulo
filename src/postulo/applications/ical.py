@@ -110,7 +110,9 @@ def calendar_status(interview: Interview) -> str:
     and a plugin holding its own table of four outcomes is a table that goes stale the day
     a fifth is added (#229).
     """
-    return STATUS_OF[interview.outcome]
+    # An outcome this version does not know, from an archive of a later Postulo, is a
+    # meeting that was not called off (#450).
+    return STATUS_OF.get(interview.outcome, "CONFIRMED")
 
 
 def alarm_lines(interview: Interview) -> list[str]:
@@ -169,7 +171,7 @@ def event_lines(interview: Interview, *, url: str = "", alarm: bool = False) -> 
 
     lines = [
         "BEGIN:VEVENT",
-        f"UID:{interview.uid}",
+        f"UID:{without_controls(interview.uid)}",
         f"DTSTAMP:{stamp(timezone.now())}",
         f"DTSTART:{stamp(interview.starts_at)}",
         f"DTEND:{stamp(interview.ends_at)}",
