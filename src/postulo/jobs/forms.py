@@ -627,6 +627,21 @@ class ContactForm(OwnerScopedModelForm):
         # And one box per kind of link whose feature is off, on the same terms (#189).
         web_links.add_single_boxes(self, self.user, holder=self.instance)
 
+    def clean(self):
+        cleaned = super().clean()
+        # A department belongs to one company, so a contact who changes employer, or
+        # has none now, leaves the team behind. This runs before the model is validated,
+        # which would otherwise refuse the old department against the new company with
+        # an error on a field this form does not draw. `_save_department` then attaches
+        # or makes the right team at the new company (#527).
+        if (
+            "company" in cleaned
+            and self.instance.department_id
+            and cleaned["company"] != self.instance.company
+        ):
+            self.instance.department = None
+        return cleaned
+
     def clean_phone(self) -> str:
         typed = (self.cleaned_data.get("phone") or "").strip()
         primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None

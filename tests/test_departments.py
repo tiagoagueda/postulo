@@ -172,6 +172,49 @@ def test_clearing_the_box_detaches_and_keeps_the_team(user, company, engineering
     assert Department.objects.filter(pk=engineering.pk).exists(), "a team survives one leaver"
 
 
+@pytest.mark.parametrize("structure_on", [True, False])
+@pytest.mark.parametrize("typed", ["Sales", ""])
+@pytest.mark.parametrize("move_to_other", [True, False])
+def test_moving_a_contact_to_another_company_or_none_leaves_the_old_team(
+    client, user, company, engineering, structure_on, typed, move_to_other
+):
+    from tests.test_employer_structure import switch_off
+
+    if not structure_on:
+        switch_off(user)
+    other = Company.objects.create(owner=user, name="Black Mesa")
+    contact = Contact.objects.create(
+        owner=user, company=company, name="Cave Johnson", department=engineering
+    )
+    data = {
+        "name": "Cave Johnson",
+        "role": "",
+        "company": other.pk if move_to_other else "",
+        "email": "",
+        "notes": "",
+        "phone": "",
+        "phone_numbers-TOTAL_FORMS": "0",
+        "phone_numbers-INITIAL_FORMS": "0",
+        "phone_numbers-MIN_NUM_FORMS": "0",
+        "phone_numbers-MAX_NUM_FORMS": "1000",
+    }
+    if structure_on:
+        data["new_department"] = typed
+    client.force_login(user)
+
+    response = client.post(reverse("jobs:contact_update", args=[contact.pk]), data)
+
+    assert response.status_code == 302
+    contact.refresh_from_db()
+    assert contact.company == (other if move_to_other else None)
+    if structure_on and typed and move_to_other:
+        assert contact.department.name == "Sales"
+        assert contact.department.company == other
+    else:
+        assert contact.department is None
+    assert Department.objects.filter(pk=engineering.pk).exists()
+
+
 def test_the_suggestions_are_this_companys_teams_only(user, company, engineering, other_user):
     elsewhere = Company.objects.create(owner=user, name="Black Mesa")
     Department.objects.create(owner=user, company=elsewhere, name="Research")

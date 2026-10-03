@@ -178,6 +178,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Moving a contact who is in a department to another company, or to none, saves instead of answering 500; the contact leaves the old team, and a team typed in the box joins the new company. (#527)
 - In the Docker image the ESCO classification lives on the data volume (`POSTULO_ESCO_DIR`, `/app/data/esco`): `fetch_esco` used to fail with a permission error writing into the image, and a file forced in with `-u root` was lost at the next upgrade and never seen by the worker. (#411)
 - Removing a tag or industry chip with the keyboard keeps focus in the control instead of dropping it to the top of the page. (#519)
 - Server settings → Plugins lists the own-mail outbox, so an administrator can switch off people sending mail through servers they type, as the code and the refusal always said. (#608)
