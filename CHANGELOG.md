@@ -256,6 +256,11 @@ Fixed
 Fixed
 Fixed
 - Fixed
+- A slow sort or page answer no longer lands over a newer filter's on Companies, Listings and Applications, and tick boxes are drawn only when there is a bulk bar for them. (#648)
+- Keeping a view, the Columns menu and the Table / Board switch now use the filtered table on screen, not the address the page loaded with. (#623)
+- A career hit in search now opens the career page at its section instead of at the top. (#707)
+- Search's "All N in …" links keep the whole query, open the same N rows they count (timeline text included), and are left out for groups whose list cannot take a query. (#506)
+- Renaming a company through the API refuses an empty name (422) and another company's name in any case (409) instead of saving it or answering 500; accented names in another case are one company. (#546)
 - Search and the text filters now ignore the case of accented and non-Latin letters on SQLite, so `école` finds *École*. (#505)
 - The Plugins pages no longer fetch every catalogue's index and signature when they are drawn: an upload is labelled from the checksums the last Check for updates, install or `plugins` command verified. (#602)
 - Every shipped plugin's description on the Plugins pages is shown in the reader's language: it was turned into English text when the plugin loaded, so its translations were never used. (#633)

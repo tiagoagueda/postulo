@@ -520,7 +520,7 @@ def test_the_calendar_says_where_a_reminder_is_made(client, user):
     assert "make a reminder here, on any day" in page
 
 
-def test_a_search_finds_a_reminder_on_its_day_and_more_of_them_on_the_calendar(user):
+def test_a_search_finds_a_reminder_on_its_day_and_does_not_offer_every_reminder(user):
     from postulo.core import search
 
     due = timezone.now() + dt.timedelta(days=4)
@@ -529,7 +529,9 @@ def test_a_search_finds_a_reminder_on_its_day_and_more_of_them_on_the_calendar(u
     group = {g.kind: g for g in search.search(user, "portfolio")}["reminders"]
 
     assert group.hits[0].url == agenda.url_for("day", timezone.localdate(due))
-    assert group.more_url == agenda.reminders_address()
+    assert group.more_url == "", (
+        "the agenda takes no query, so it would promise N and show all (#506)"
+    )
 
 
 def test_a_notification_about_a_reminder_of_its_own_leads_to_the_calendar(user):

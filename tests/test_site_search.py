@@ -206,8 +206,9 @@ def test_every_live_control_of_a_table_takes_its_turn_on_the_filter_form(client,
     the box, its button, the form and every column filter name one element to take turns on,
     the filter form, and a new request replaces the one in flight.
 
-    The sort and the page links do not: their address was written with the last answer, and
-    one of them replacing a newer request would put the older question back."""
+    The sort and the page links take their turn on it too, but with `drop` and not `replace`:
+    their address was written with the last answer, so one of them replacing a newer request
+    would put the older question back, while a newer filter may replace one of them (#648)."""
     url_name, form_id, table_id, _label = PAGES[page]
     client.force_login(rows)
     found = controls(client.get(reverse(url_name), {"state": "all"}).content.decode())
@@ -229,7 +230,7 @@ def test_every_live_control_of_a_table_takes_its_turn_on_the_filter_form(client,
 
     links = [a for a in found.links if a.get("hx-target") == f"#{table_id}"]
     assert links, "the sort links are drawn"
-    assert not any("hx-sync" in a for a in links), links
+    assert {a.get("hx-sync") for a in links} == {f"#{form_id}:drop"}, links
 
 
 @pytest.mark.parametrize("page", PAGES)
