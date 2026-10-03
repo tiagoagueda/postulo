@@ -224,3 +224,36 @@ def test_the_administrators_page_says_who_wrote_each_plugin(client, django_user_
     assert SHIPPED_LICENCE in html
     assert SHIPPED_SOURCE_URL in html
     assert __version__ in html
+
+
+# ------------------------------------------------- the description is read per request
+
+
+def test_no_shipped_description_is_resolved_when_the_module_is_imported():
+    """`shipped()` turned a lazy description into the English text at start-up, so the
+    translators' paragraphs could never be shown (#633)."""
+    from django.utils.functional import Promise
+
+    resolved = [
+        manifest_of(plugin_class()).name
+        for classes in registry.builtins().values()
+        for plugin_class in classes
+        if manifest_of(plugin_class()).description
+        and not isinstance(manifest_of(plugin_class()).description, Promise)
+    ]
+
+    assert resolved == []
+
+
+def test_a_shipped_plugins_description_is_in_the_readers_language():
+    from django.utils import translation
+
+    plugin = registry.find_any("gdpr")
+
+    with translation.override("en-GB"):
+        english = description_of(plugin)
+    with translation.override("pt-PT"):
+        portuguese = description_of(plugin)
+
+    assert english.startswith("The data the instance keeps")
+    assert portuguese.startswith("Os dados que a instância guarda")
