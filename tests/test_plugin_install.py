@@ -1158,3 +1158,55 @@ def test_an_upload_declares_nothing_and_is_never_marked(tmp_path, plugins_dir, i
     assert entry.requires_postulo == ""
     rows = {row["name"]: row for row in provenance.status()}
     assert rows["postulo-example"]["compatible"] is True
+
+
+# ------------------------------------------------- the record survives a bad write (#382)
+
+
+def test_a_write_that_fails_part_way_leaves_the_previous_record(
+    tmp_path, plugins_dir, installer, monkeypatch
+):
+    import os
+
+    from postulo.plugins import record
+
+    installing.install_wheel(a_wheel(tmp_path), by="ana")
+    installing.set_disabled("postulo-example", True)
+    before = record.record_path().read_text(encoding="utf-8")
+
+    def full_disk(descriptor):
+        raise OSError(28, "No space left on device")
+
+    monkeypatch.setattr(os, "fsync", full_disk)
+    with pytest.raises(OSError):
+        installing.set_disabled("postulo-example", False)
+    monkeypatch.undo()
+
+    assert record.record_path().read_text(encoding="utf-8") == before
+    assert installing.installed("postulo-example").disabled is True
+    assert "postulo-example" in installing.disabled_names()
+
+
+def test_a_record_that_does_not_parse_does_not_switch_everything_on(
+    tmp_path, plugins_dir, installer
+):
+    from postulo.plugins import record, registry
+
+    installing.install_wheel(a_wheel(tmp_path), by="ana")
+    installing.set_disabled("postulo-example", True)
+    assert "postulo-example" in registry._disabled()
+
+    record.record_path().write_text('{"version": 1, "plugins": [{', encoding="utf-8")
+
+    assert "postulo-example" in registry._disabled()
+    with pytest.raises(record.RecordUnreadable):
+        installing.set_disabled("postulo-example", False)
+    assert record.record_path().read_text(encoding="utf-8").endswith("[{")
+
+    # A process that never read the record knows nothing, so nothing is trusted.
+    monkey_cache = record._record_cache
+    record._record_cache = None
+    try:
+        assert "anything-at-all" in registry._disabled()
+    finally:
+        record._record_cache = monkey_cache

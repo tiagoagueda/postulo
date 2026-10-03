@@ -48,6 +48,7 @@ only administrators reach it, and a plugin can be switched off without being rem
 from __future__ import annotations
 
 import datetime as dt
+import functools
 import hashlib
 import importlib.util
 import logging
@@ -76,6 +77,7 @@ from .record import (  # noqa: F401 - re-exported: the callers above
     installed,
     plugins_dir,
     read_record,
+    record_lock,
     record_path,
     record_stamp,
     write_record,
@@ -101,7 +103,14 @@ PREVIOUS_NAME = ".previous"
 HELD_NAME = ".previous.held"
 #: What the snapshot never copies: itself, the one being held, and the scratch file an
 #: install writes.
-NOT_SNAPSHOTTED = (PREVIOUS_NAME, HELD_NAME, ".previous.writing", ".constraints.txt")
+NOT_SNAPSHOTTED = (
+    PREVIOUS_NAME,
+    HELD_NAME,
+    ".previous.writing",
+    ".constraints.txt",
+    ".record.lock",
+    ".plugins.json.writing",
+)
 
 
 def plugin_groups() -> tuple[str, ...]:
@@ -538,6 +547,18 @@ def run_install(target: Path, wheel: Path, constraint_file: Path) -> str:
     return (finished.stdout or "").strip()
 
 
+def _under_record_lock(function):
+    """Run ``function`` holding the record's lock: every change to the plugins directory
+    and the record is made by one process at a time (#382)."""
+
+    @functools.wraps(function)
+    def locked(*args, **kwargs):
+        with record_lock():
+            return function(*args, **kwargs)
+
+    return locked
+
+
 # ------------------------------------------------------- a way back, and a check
 
 
@@ -639,6 +660,7 @@ def _tidy_snapshots() -> None:
         shutil.rmtree(directory / name, ignore_errors=True)
 
 
+@_under_record_lock
 def roll_back() -> list[Installed]:
     """Undo the last install. Returns the record as it was before it.
 
@@ -722,6 +744,7 @@ def verify_imports(names: list[str]) -> list[str]:
     return said or [str(_("it could not be imported"))]
 
 
+@_under_record_lock
 def install_wheel(
     wheel: Path,
     *,
@@ -851,6 +874,7 @@ def _refuse_by_locks(name: str) -> None:
             raise InstallError(refusal)
 
 
+@_under_record_lock
 def remove(name: str) -> Installed:
     """Take a plugin off the instance: its files, and its line in the record.
 
@@ -952,6 +976,7 @@ def _prune_empty_directories() -> None:
             shutil.rmtree(path, ignore_errors=True)
 
 
+@_under_record_lock
 def set_disabled(name: str, disabled: bool) -> Installed:
     """Stop a plugin loading, or let it load again. Its files stay where they are.
 
@@ -986,6 +1011,7 @@ def set_disabled(name: str, disabled: bool) -> Installed:
     raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
 
 
+@_under_record_lock
 def backfill_metadata() -> list[str]:
     """Fill in what the record never kept, from the metadata still sitting on the volume.
 
