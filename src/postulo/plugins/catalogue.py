@@ -287,13 +287,21 @@ def find(catalogues: list[Catalogue], plugin: str, version: str = "") -> tuple[L
     raise CatalogueError(str(_("No catalogue lists %(name)s.")) % {"name": plugin})
 
 
+#: How long one read of a wheel's download may wait. Part of the install's budget in the
+#: request, which has to finish inside gunicorn's timeout (#604); see `installing`.
+DOWNLOAD_TIMEOUT = 15.0
+
+
 def download(release: Release, into: Path) -> Path:
     """Fetch a wheel and check it against the checksum the signed index carried."""
     from .installing import digest_of
 
     into.mkdir(parents=True, exist_ok=True)
     target = into / (release.url.rstrip("/").rsplit("/", 1)[-1] or "plugin.whl")
-    with http.client(timeout=120.0) as client, client.stream("GET", release.url) as response:
+    with (
+        http.client(timeout=DOWNLOAD_TIMEOUT) as client,
+        client.stream("GET", release.url) as response,
+    ):
         if response.status_code != 200:
             raise CatalogueError(
                 str(_("%(url)s answered %(code)s."))

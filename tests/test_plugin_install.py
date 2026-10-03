@@ -1237,3 +1237,60 @@ def test_a_record_that_does_not_parse_does_not_switch_everything_on(
         assert "anything-at-all" in registry._disabled()
     finally:
         record._record_cache = monkey_cache
+
+
+# -------------------------------------- a request that is killed restores (#604)
+
+
+def test_the_install_budgets_fit_inside_the_workers_timeout():
+    """The image kills a worker whose request passes its timeout, and the install's
+    clean-up does not run when it does."""
+    import re
+
+    dockerfile = Path(__file__).resolve().parent.parent / "docker" / "Dockerfile"
+    text = dockerfile.read_text(encoding="utf-8")
+    worker = int(re.search(r'GUNICORN_CMD_ARGS="--timeout (\d+)', text).group(1))
+
+    spent = installing.INSTALL_TIMEOUT + installing.VERIFY_TIMEOUT + catalogue.DOWNLOAD_TIMEOUT
+    assert spent < worker
+
+
+@pytest.mark.parametrize("where", ["run_install", "verify_imports"])
+def test_a_worker_killed_mid_install_leaves_everything_as_it_was(
+    tmp_path, plugins_dir, installer, monkeypatch, where
+):
+    """gunicorn turns the abort into `SystemExit`, which is not an `InstallError`."""
+    installing.install_wheel(a_wheel(tmp_path, version="1.0"))
+    installing.install_wheel(a_wheel(tmp_path, name="postulo-other", version="1.0"))
+    before_record = (plugins_dir / "plugins.json").read_text(encoding="utf-8")
+    before_files = sorted(
+        str(item.relative_to(plugins_dir))
+        for item in plugins_dir.rglob("*")
+        if item.name != ".record.lock"
+    )
+
+    def killed(*args, **kwargs):
+        raise SystemExit(1)
+
+    if where == "run_install":
+        real = installing.run_install
+
+        def half_way(target, wheel, constraint_file):
+            real(target, wheel, constraint_file)  # the files are on the volume ...
+            killed()  # ... and then the worker goes
+
+        monkeypatch.setattr(installing, "run_install", half_way)
+    else:
+        monkeypatch.setattr(installing, "verify_imports", killed)
+
+    with pytest.raises(SystemExit):
+        installing.install_wheel(a_wheel(tmp_path, version="2.0"))
+
+    assert (plugins_dir / "plugins.json").read_text(encoding="utf-8") == before_record
+    assert installing.installed("postulo-example").version == "1.0"
+    after_files = sorted(
+        str(item.relative_to(plugins_dir))
+        for item in plugins_dir.rglob("*")
+        if item.name != ".record.lock"
+    )
+    assert after_files == before_files, "the directory, `.previous` included, is as it was"

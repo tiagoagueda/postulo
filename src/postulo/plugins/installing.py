@@ -87,12 +87,16 @@ logger = logging.getLogger(__name__)
 
 #: Only wheels, and only pure-Python ones.
 PURE_PYTHON = "py3-none-any"
-#: How long an install may take before it is called a failure.
-INSTALL_TIMEOUT = 300
+#: How long an install may take before it is called a failure. The three budgets of an
+#: install -- this, the import check and a download's `catalogue.DOWNLOAD_TIMEOUT` -- run
+#: inside one request, and the image kills a worker whose request passes
+#: ``--timeout 120``; together they must stay well under it, or the clean-up below never
+#: runs (#604). `tests/test_plugin_install.py` holds them to the Dockerfile.
+INSTALL_TIMEOUT = 65
 #: How long the check that a new plugin imports may take. Short: it imports the plugin's
 #: modules and nothing else, and a module that takes a minute to import is a module that
 #: will take a minute on every worker start.
-VERIFY_TIMEOUT = 60
+VERIFY_TIMEOUT = 20
 #: Where the directory as it was before the last install is kept. Inside the plugins
 #: directory because that is certainly writable, and hidden behind a dot because nothing
 #: looks for `*.dist-info` below the top level and nothing imports from a dotted name --
@@ -845,56 +849,74 @@ def install_wheel(
     # upgrade: `--target --upgrade` writes over the working version, and until #246 there
     # was nothing to go back to once it had.
     take_snapshot()
-    constraint_file = target / ".constraints.txt"
-    constraint_file.write_text("\n".join(constraints(exclude=info.name)) + "\n", encoding="utf-8")
     try:
-        run_install(target, wheel, constraint_file)
-    except InstallError as error:
-        restore_snapshot()
-        give_back_snapshot()
-        raise InstallError(explain_conflict(str(error), exclude=info.name)) from error
-    finally:
-        constraint_file.unlink(missing_ok=True)
+        constraint_file = target / ".constraints.txt"
+        constraint_file.write_text(
+            "\n".join(constraints(exclude=info.name)) + "\n", encoding="utf-8"
+        )
+        try:
+            run_install(target, wheel, constraint_file)
+        except InstallError as error:
+            restore_snapshot()
+            give_back_snapshot()
+            raise InstallError(explain_conflict(str(error), exclude=info.name)) from error
+        finally:
+            constraint_file.unlink(missing_ok=True)
 
-    # It is on the volume; whether it *loads* is a different question, and the one that
-    # matters. Asked before the record names it, so a plugin that cannot be imported is a
-    # refused install rather than an instance with a line in its record and nothing behind
-    # it (#246).
-    _forget_metadata_cache()
-    if broken := verify_imports(info.entry_points):
+        # It is on the volume; whether it *loads* is a different question, and the one that
+        # matters. Asked before the record names it, so a plugin that cannot be imported is a
+        # refused install rather than an instance with a line in its record and nothing behind
+        # it (#246).
+        _forget_metadata_cache()
+        if broken := verify_imports(info.entry_points):
+            restore_snapshot()
+            give_back_snapshot()
+            activate()
+            _forget_metadata_cache()
+            raise InstallError(
+                str(_("%(name)s installed but could not be loaded, so it was put back: %(why)s"))
+                % {"name": info.name, "why": " ".join(broken)}
+            )
+
+        # The plugin's whole dependency tree as it is on the volume now, not the difference from
+        # before: what a plugin needs does not stop being its own because another plugin put
+        # it there first (#597).
+        arrived = dependency_closure(target, info.name)
+        entry = Installed(
+            name=info.name,
+            version=info.version,
+            origin=origin,
+            source=source or info.filename,
+            sha256=info.sha256,
+            installed_at=installed_at or dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
+            installed_by=by,
+            entry_points=info.entry_points,
+            disabled=disabled,
+            dependencies=arrived,
+            summary=info.summary,
+            licence=info.licence,
+            author=info.author,
+            source_url=info.source_url,
+            requires_postulo=requires_postulo,
+        )
+        record = [
+            item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)
+        ]
+        write_record([*record, entry])
+    except InstallError:
+        # Each place that raises one has already put the directory back.
+        raise
+    except BaseException:
+        # Not an `InstallError`: a `SystemExit` from gunicorn aborting a request that ran
+        # past its timeout, a `KeyboardInterrupt`, a `MemoryError`. The directory and the
+        # way back are put as they were before the attempt, and whatever it was goes on
+        # (#604). Without this the new plugin stayed on the volume with no line in the
+        # record, loaded by every worker and impossible to switch off.
         restore_snapshot()
         give_back_snapshot()
         activate()
         _forget_metadata_cache()
-        raise InstallError(
-            str(_("%(name)s installed but could not be loaded, so it was put back: %(why)s"))
-            % {"name": info.name, "why": " ".join(broken)}
-        )
-
-    # The plugin's whole dependency tree as it is on the volume now, not the difference from
-    # before: what a plugin needs does not stop being its own because another plugin put
-    # it there first (#597).
-    arrived = dependency_closure(target, info.name)
-
-    entry = Installed(
-        name=info.name,
-        version=info.version,
-        origin=origin,
-        source=source or info.filename,
-        sha256=info.sha256,
-        installed_at=installed_at or dt.datetime.now(dt.UTC).isoformat(timespec="seconds"),
-        installed_by=by,
-        entry_points=info.entry_points,
-        disabled=disabled,
-        dependencies=arrived,
-        summary=info.summary,
-        licence=info.licence,
-        author=info.author,
-        source_url=info.source_url,
-        requires_postulo=requires_postulo,
-    )
-    record = [item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)]
-    write_record([*record, entry])
+        raise
     keep_snapshot()
     activate()
     _forget_metadata_cache()
