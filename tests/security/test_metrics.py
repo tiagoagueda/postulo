@@ -56,6 +56,15 @@ def test_with_a_token_set_nothing_else_gets_in(client, on):
     assert fetch(client, TOKEN).status_code == 200
 
 
+def test_a_token_with_a_byte_above_ascii_is_refused_not_a_crash(client, on):
+    """Headers arrive as Latin-1; `compare_digest` on such a str raised a 500 (#372)."""
+    on.POSTULO_METRICS_TOKEN = TOKEN
+
+    response = client.get(reverse("core:metrics"), HTTP_AUTHORIZATION="Bearer café")
+
+    assert response.status_code == 401
+
+
 def test_without_a_token_it_serves_because_there_is_nothing_secret_in_it(client, on):
     """Unlike the log endpoint, which refuses. These are counts, not records.
 

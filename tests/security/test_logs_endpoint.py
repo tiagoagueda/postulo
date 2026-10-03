@@ -101,6 +101,16 @@ def test_the_wrong_token_gets_nothing(client, kept, settings):
         assert b"a delivery" not in response.content
 
 
+def test_a_token_with_a_byte_above_ascii_is_refused_not_a_crash(client, kept, settings):
+    """Headers arrive as Latin-1; `compare_digest` on such a str raised a 500 (#372)."""
+    settings.POSTULO_LOGS_ENDPOINT_ENABLED = True
+    settings.POSTULO_LOGS_TOKEN = TOKEN
+
+    response = client.get(reverse("core:logs_endpoint"), HTTP_AUTHORIZATION="Bearer café")
+
+    assert response.status_code == 401
+
+
 def test_a_session_is_not_a_substitute_for_the_token(client, kept, settings, admin_user):
     """The reader is a collector. Being signed in as an administrator is not the same thing."""
     settings.POSTULO_LOGS_ENDPOINT_ENABLED = True

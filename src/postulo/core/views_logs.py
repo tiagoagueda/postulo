@@ -60,7 +60,9 @@ def token() -> str:
 def _authorised(request: HttpRequest) -> bool:
     """Whether this request carries the configured token.
 
-    Compared in constant time, which costs nothing and removes the question.
+    Compared in constant time, which costs nothing and removes the question. Compared as
+    bytes: headers arrive decoded as Latin-1, and `compare_digest` refuses a non-ASCII
+    `str` with a `TypeError` where a wrong token should simply be refused (#372).
     """
     import hmac
 
@@ -71,7 +73,7 @@ def _authorised(request: HttpRequest) -> bool:
     scheme, _, presented = header.partition(" ")
     if scheme.lower() != "bearer" or not presented:
         return False
-    return hmac.compare_digest(presented.strip(), expected)
+    return hmac.compare_digest(presented.strip().encode(), expected.encode())
 
 
 def _moment(written: str) -> dt.datetime:

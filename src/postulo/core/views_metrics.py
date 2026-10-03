@@ -31,7 +31,7 @@ def _authorised(request: HttpRequest) -> bool:
     scheme, _, presented = header.partition(" ")
     if scheme.lower() != "bearer" or not presented:
         return False
-    return hmac.compare_digest(presented.strip(), expected)
+    return hmac.compare_digest(presented.strip().encode(), expected.encode())
 
 
 def scrape(request: HttpRequest) -> HttpResponse:
