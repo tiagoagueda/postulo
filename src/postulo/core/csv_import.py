@@ -340,6 +340,10 @@ STATUS_ALIASES: dict[str, str] = {
     "declined": "rejected",
     "refused": "rejected",
     "no": "rejected",
+    "no offer": "rejected",
+    "offer declined": "rejected",
+    "declined offer": "rejected",
+    "refused offer": "rejected",
     "refusé": "rejected",
     "refuse": "rejected",
     "rejeté": "rejected",
@@ -782,6 +786,28 @@ def _has_thousands(text: str) -> bool:
     return bool(re.search(r"\d\s*k\b", (text or "").lower()))
 
 
+#: Statuses that end an application. A cell naming one of them and a stage ("Rejected after
+#: interview") is about the outcome, so these win over the stage words.
+_OUTCOMES = ("rejected", "withdrawn")
+
+
+def _find_alias(key: str, aliases: dict[str, str], *, outcomes: tuple[str, ...] = ()) -> str | None:
+    """The value of the alias written as whole words in ``key``, or ``None``.
+
+    Substrings are not matches ("unknown" holds "no", "latest" holds "test"). When several
+    aliases match, an outcome beats a stage, then the one written first, then the longer.
+    A bare "no" counts only as the whole cell, which the caller has already tried.
+    """
+    found = []
+    for alias, value in aliases.items():
+        if alias == "no":
+            continue
+        match = re.search(rf"(?<!\w){re.escape(alias)}(?!\w)", key)
+        if match:
+            found.append((value not in outcomes, match.start(), -len(alias), value))
+    return min(found)[3] if found else None
+
+
 def map_status(text: str) -> tuple[str, bool]:
     """Postulo's status for a spreadsheet word, and whether it was recognised."""
     key = " ".join((text or "").lower().split())
@@ -789,10 +815,8 @@ def map_status(text: str) -> tuple[str, bool]:
         return "applied", True
     if key in STATUS_ALIASES:
         return STATUS_ALIASES[key], True
-    for alias, status in STATUS_ALIASES.items():
-        if alias in key:
-            return status, True
-    return "applied", False
+    status = _find_alias(key, STATUS_ALIASES, outcomes=_OUTCOMES)
+    return (status, True) if status else ("applied", False)
 
 
 def map_channel(text: str) -> str:
@@ -801,10 +825,7 @@ def map_channel(text: str) -> str:
         return ""
     if key in CHANNEL_ALIASES:
         return CHANNEL_ALIASES[key]
-    for alias, channel in CHANNEL_ALIASES.items():
-        if alias in key:
-            return channel
-    return "other"
+    return _find_alias(key, CHANNEL_ALIASES) or "other"
 
 
 # ------------------------------------------------------------------- rows

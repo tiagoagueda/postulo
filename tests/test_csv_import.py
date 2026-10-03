@@ -231,6 +231,25 @@ def test_an_unknown_status_becomes_applied_with_the_original_in_a_note(user):
     assert "Waiting for the stars" in note.body
 
 
+def test_statuses_and_channels_match_whole_words_and_outcomes_win():
+    for text in ("Rejected after interview", "Interview - rejected", "Offer declined", "No offer"):
+        assert csv_import.map_status(text) == ("rejected", True), text
+    assert csv_import.map_status("No") == ("rejected", True)
+    for text in ("Unknown", "Not sure", "Nothing yet", "announced", "latest", "Contest"):
+        assert csv_import.map_status(text) == ("applied", False), text
+    assert csv_import.map_channel("Referral via LinkedIn") == "referral"
+    assert csv_import.map_channel("eventually") == "other"
+
+
+def test_an_unrecognised_status_word_inside_a_longer_one_is_kept_in_a_note(user):
+    data = b"Company,Role,Date applied,Status\nAperture,Engineer,2026-09-01,Nothing yet\n"
+    sheet = csv_import.read_sheet(data, "odd.csv")
+    csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    application = Application.objects.for_user(user).get()
+    assert application.status == Status.APPLIED
+    assert "Nothing yet" in application.events.get(kind=EventKind.OTHER).body
+
+
 def test_french_headers_dates_and_statuses_import_as_they_mean(user):
     sheet = csv_import.read_sheet(FRENCH, "candidatures.csv")
     report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
