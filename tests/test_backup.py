@@ -234,6 +234,32 @@ def test_a_backup_restores_onto_an_empty_instance(tmp_path, settings):
     assert cv.read_bytes() == b"%PDF-1.4 fake"
 
 
+def test_a_backup_restores_onto_a_database_that_was_never_migrated(tmp_path):
+    """A rebuilt host with `POSTULO_SKIP_MIGRATE=1` has a file with no tables in it (#476)."""
+    if database_vendor() != "sqlite":
+        pytest.skip("a file of its own is something SQLite has")
+    from django.db import connections
+    from django.db.backends.sqlite3.base import DatabaseWrapper
+
+    a_search()
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+
+    # The instance the restore runs on: a file nothing has ever been written to.
+    original = connections["default"]
+    fresh = DatabaseWrapper(
+        {**original.settings_dict, "NAME": str(tmp_path / "new.sqlite3")}, "default"
+    )
+    connections["default"] = fresh
+    try:
+        assert User._meta.db_table not in fresh.introspection.table_names()
+        report = restore_backup(archive)
+        assert report.counts["users"] == 1 and report.counts["applications"] == 1
+        assert User.objects.get().username == "alex"
+    finally:
+        connections["default"] = original
+        fresh.close()
+
+
 def test_the_instances_own_identifier_schemes_come_back_and_are_held_to_the_rules(tmp_path):
     """The schemes an instance defines for itself are a column of its policy row (#311), so
     the backup carries them with everything else and a restore puts them back. What comes

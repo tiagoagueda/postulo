@@ -131,6 +131,19 @@ def _counts() -> dict[str, int]:
     }
 
 
+def _has_accounts() -> bool:
+    """Whether the database holds any account. A database never migrated holds none.
+
+    It has no user table to ask, and asking raises: the emptiest instance there is, and the
+    one a rebuild after losing a host starts from, is a restore's most ordinary target
+    (#476). `restore` runs the migrations itself afterwards.
+    """
+    model = get_user_model()
+    if model._meta.db_table not in connection.introspection.table_names():
+        return False
+    return model.objects.exists()
+
+
 def _connections_with_secrets() -> int:
     from postulo.plugins.models import Connection
 
@@ -552,7 +565,7 @@ def restore_backup(
             "`docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo python manage.py "
             "restore ...` — or pass --force if you are certain nothing else is connected."
         )
-    if get_user_model().objects.exists() and not force:
+    if _has_accounts() and not force:
         raise BackupError(
             "This instance is not empty. Restoring would replace everything on it; "
             "pass --force if that is what you mean."
