@@ -407,3 +407,136 @@ def test_the_months_widget_names_them_in_the_readers_language(client, user, comp
     response = client.get(reverse("core:home"), headers={"accept-language": "fr"})
 
     assert "février 2026" in response.content.decode()
+
+
+# ----------------------------------------------- what the kept figures may not outlive
+
+
+@pytest.fixture
+def fresh_cache():
+    from django.core.cache import cache
+
+    cache.clear()
+    yield
+    cache.clear()
+
+
+def same_as_built(user):
+    """The kept figures, after something happened, beside the ones worked out again."""
+    kept, built = analytics.insights_for(user), analytics.build(user)
+    return kept, built
+
+
+@pytest.mark.parametrize("how", ["snooze", "reminder form"])
+def test_a_reminder_on_a_quiet_application_is_not_missed_by_the_kept_figures(
+    client, user, company, fresh_cache, how
+):
+    from postulo.applications.quiet import quiet_applications
+
+    application = make_application(user, company, applied_days_ago=40)
+    assert analytics.insights_for(user).quiet_now == 1
+    client.force_login(user)
+
+    if how == "snooze":
+        client.post(
+            reverse("applications:quiet_action", args=[application.pk]), {"action": "snooze"}
+        )
+    else:
+        due = timezone.localtime(timezone.now() + dt.timedelta(days=1))
+        client.post(
+            reverse("applications:reminder_create"),
+            {
+                "application": application.pk,
+                "summary": "Chase",
+                "due_at": due.strftime("%Y-%m-%dT%H:%M"),
+            },
+        )
+
+    kept = analytics.insights_for(user)
+    assert quiet_applications(user).count() == 0
+    assert kept.quiet_now == 0
+    assert all(row.quiet == 0 for row in kept.sources)
+
+
+def test_a_corrected_interview_kind_reaches_the_kept_figures(client, user, company, fresh_cache):
+    from postulo.applications.models import InterviewKind, InterviewOutcome
+    from postulo.applications.services import schedule_interview
+
+    application = make_application(user, company, applied_days_ago=3)
+    interview = schedule_interview(
+        application,
+        kind=InterviewKind.PHONE,
+        starts_at=timezone.now() + dt.timedelta(days=2),
+    )
+    interview.outcome = InterviewOutcome.DONE
+    interview.save()
+    before = analytics.insights_for(user).interview_kinds
+    client.force_login(user)
+
+    response = client.post(
+        reverse("applications:interview_update", args=[interview.pk]),
+        {
+            "kind": InterviewKind.VIDEO,
+            "starts_at": timezone.localtime(interview.starts_at).strftime("%Y-%m-%dT%H:%M"),
+            "ends_at": "",
+            "location": "",
+            "notes": "",
+        },
+    )
+
+    assert response.status_code == 302
+    kept, built = same_as_built(user)
+    assert kept.interview_kinds == built.interview_kinds != before
+
+
+def test_an_application_crossing_the_quiet_threshold_is_in_the_kept_figures(
+    user, company, fresh_cache, monkeypatch
+):
+    make_application(user, company, applied_days_ago=20)
+    assert analytics.insights_for(user).quiet_now == 0
+    later = timezone.now() + dt.timedelta(days=3)
+    monkeypatch.setattr(timezone, "now", lambda: later)
+
+    kept, built = same_as_built(user)
+
+    assert built.quiet_now == 1
+    assert kept.quiet_now == built.quiet_now
+    assert [row.quiet for row in kept.sources] == [row.quiet for row in built.sources]
+
+
+def test_an_interview_that_has_ended_leaves_the_diary_count(
+    user, company, fresh_cache, monkeypatch
+):
+    from postulo.applications.models import InterviewKind
+    from postulo.applications.services import schedule_interview
+
+    application = make_application(user, company, applied_days_ago=3)
+    schedule_interview(
+        application,
+        kind=InterviewKind.VIDEO,
+        starts_at=timezone.now() + dt.timedelta(hours=1),
+        remind=False,
+    )
+    assert analytics.insights_for(user).interviews_ahead == 1
+    later = timezone.now() + dt.timedelta(hours=5)
+    monkeypatch.setattr(timezone, "now", lambda: later)
+
+    kept, built = same_as_built(user)
+
+    assert built.interviews_ahead == 0
+    assert kept.interviews_ahead == 0
+
+
+def test_months_follow_the_zone_in_force(user, company, fresh_cache):
+    make_application(user, company)  # a draft: dated by hand below
+    application = Application.objects.get(owner=user)
+    when = dt.datetime(2026, 3, 31, 23, 30, tzinfo=dt.UTC)
+    change_status(application, Status.APPLIED, occurred_at=when)
+
+    with timezone.override("UTC"):
+        warmed = analytics.insights_for(user).by_month
+    with timezone.override("Pacific/Kiritimati"):
+        kept, built = same_as_built(user)
+
+    assert kept.by_month == built.by_month
+    assert kept.by_month != warmed, "the same application is in the next month, 14 hours on"

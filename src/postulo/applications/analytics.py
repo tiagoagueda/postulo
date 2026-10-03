@@ -331,15 +331,18 @@ INSIGHTS_TTL = 60 * 60 * 24
 
 
 def fingerprint(user) -> str:
-    """What the figures depend on, in five small aggregates (#231).
+    """What the figures depend on, in a few small aggregates (#231, #396).
 
-    Everything `build` reads is an application, a timeline entry or a listing of this
-    person's, and the names it prints are a company's or a contact's. So: how many of each
-    there are, the newest change to one, and the newest entry written. Any of those moving
-    means the figures may have moved; none of them moving means they cannot have.
+    `build` reads an application, a timeline entry or a listing of this person's, the names
+    it prints are a company's or a contact's, and what has gone quiet or is in the diary
+    depends on their reminders, their interviews and the time. So: how many of each there
+    are, the newest change to one, and the newest entry written; then the two counts the
+    clock moves without anything being written (what is quiet now, what is still ahead), the
+    day and the zone months are cut in. Any of those moving means the figures may have
+    moved; none of them moving means they cannot have.
 
-    Five indexed aggregates against loading every application, every industry and every
-    status event a search has ever produced, which is what `build` does and what the
+    A handful of indexed aggregates against loading every application, every industry and
+    every status event a search has ever produced, which is what `build` does and what the
     dashboard did on every view. Counting *and* stamping, because a deletion moves the count
     and leaves the newest `updated_at` exactly where it was.
 
@@ -352,6 +355,9 @@ def fingerprint(user) -> str:
     from postulo.core import languages
     from postulo.jobs.models import Company, Contact
 
+    from .models import Reminder
+    from .quiet import quiet_applications
+
     applications = Application.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     events = ApplicationEvent.objects.filter(application__owner=user).aggregate(
         n=Count("pk"), at=Max("pk")
@@ -359,6 +365,11 @@ def fingerprint(user) -> str:
     listings = JobPosting.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     companies = Company.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
     contacts = Contact.objects.for_user(user).aggregate(n=Count("pk"), at=Max("updated_at"))
+    reminders = Reminder.objects.for_user(user).aggregate(
+        n=Count("pk"), open=Count("pk", filter=Q(done_at__isnull=True)), at=Max("updated_at")
+    )
+    diary = Interview.objects.for_user(user)
+    interviews = diary.aggregate(n=Count("pk"), at=Max("updated_at"))
     parts = (
         SHAPE,
         # The figures carry words -- the name of a stage, of a reason, *Not recorded* --
@@ -380,6 +391,19 @@ def fingerprint(user) -> str:
         # from it. Somebody changing it from 21 days to 14 changes the figures without
         # touching anything the three aggregates above can see.
         getattr(getattr(user, "profile", None), "quiet_after_days", None),
+        reminders["n"],
+        reminders["open"],
+        reminders["at"],
+        interviews["n"],
+        interviews["at"],
+        # What the clock moves with nothing written: an application crossing the quiet
+        # threshold, an interview ending. Counted the way `build` counts them, so a figure
+        # that would come out differently now has a different key.
+        diary.upcoming().count(),
+        quiet_applications(user).count(),
+        timezone.localdate(),
+        # Months are cut in the zone in force, so a person who moves theirs gets new ones.
+        timezone.get_current_timezone_name(),
     )
     # Hashed rather than joined. The parts hold timestamps, which carry spaces and colons,
     # and a cache key with either in it is a key some backends refuse -- Django warns about
