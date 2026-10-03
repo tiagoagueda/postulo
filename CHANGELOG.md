@@ -245,6 +245,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- Spreadsheet import: a sheet with no Status column, or a blank Status cell, no longer turns every undated row into an applied application; the date decides, so a list of jobs to look at imports as listings. (#468)
 - Spreadsheet import reads a status or channel by whole words, not substrings, and an outcome wins: "Rejected after interview" and "Offer declined" import as Rejected, "Nothing yet" is kept in a note, "Referral via LinkedIn" is a referral. (#467)
 - *Your own email* can be set up again: its connection form answered 500 because a secret field's help text was lazy. (#359)
 - A redirect from a connection's server to itself (a relative one, or an absolute one to the same host) is now followed by the server's name rather than the address it was pinned to, so credentials are kept and the next hop's certificate is checked against the name (#363)

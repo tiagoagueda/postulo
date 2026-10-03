@@ -250,6 +250,29 @@ def test_an_unrecognised_status_word_inside_a_longer_one_is_kept_in_a_note(user)
     assert "Nothing yet" in application.events.get(kind=EventKind.OTHER).body
 
 
+@pytest.mark.parametrize(
+    "data",
+    [
+        b"Company,Role,URL\nAcme,Dev,https://acme.example/1\nInitech,Analyst,\n",
+        b"Company,Role,Status\nAcme,Dev,\nInitech,Analyst,\n",
+    ],
+    ids=["no status column", "blank status cell"],
+)
+def test_rows_with_no_status_and_no_date_become_listings(user, data):
+    sheet = csv_import.read_sheet(data, "jobs.csv")
+    report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    assert report.listings == 2 and report.applications == 0
+    assert not Application.objects.for_user(user).exists()
+    assert JobPosting.objects.for_user(user).count() == 2
+
+
+def test_with_no_status_the_date_decides(user):
+    data = b"Company,Role,Date applied\nAcme,Dev,2026-09-01\nInitech,Analyst,\n"
+    sheet = csv_import.read_sheet(data, "jobs.csv")
+    report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    assert report.applications == 1 and report.listings == 1
+
+
 def test_french_headers_dates_and_statuses_import_as_they_mean(user):
     sheet = csv_import.read_sheet(FRENCH, "candidatures.csv")
     report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))

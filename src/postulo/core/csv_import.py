@@ -4,10 +4,11 @@ Most people track a job search in a spreadsheet until it hurts, and the day they
 here they should not have to retype their history. This reads a CSV — any delimiter, any
 of the encodings Excel produces — guesses which column is which from the header names in
 English, French and Portuguese, lets the person correct the guess and see how the first
-rows will be read, and then imports in one transaction: rows with an applied date become
-applications, rows without one become listings, companies are matched by name as the
-forms match them, and every imported application carries a timeline entry saying which
-file it came from, so provenance is never in doubt.
+rows will be read, and then imports in one transaction: a status the sheet states decides
+what a row becomes (draft is a listing, anything else an application) and without one
+the applied date does, companies are matched by name as the forms match them, and every
+imported application carries a timeline entry saying which file it came from, so
+provenance is never in doubt.
 
 Rows that would duplicate what is already recorded — the same address, or the same company,
 role and date — are reported, not created.
@@ -839,7 +840,7 @@ class ParsedRow:
     role: str = ""
     url: str = ""
     location: str = ""
-    status: str = "applied"
+    status: str = ""
     status_text: str = ""
     status_known: bool = True
     applied_at: dt.date | None = None
@@ -860,6 +861,8 @@ class ParsedRow:
         """The status's name in the reader's language, not Postulo's internal key."""
         from postulo.applications.models import Status
 
+        if not self.status:
+            return ""
         return str(Status(self.status).label)
 
     @property
