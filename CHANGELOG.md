@@ -242,6 +242,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- The PostgreSQL compose file no longer needs `POSTGRES_PASSWORD` in `docker/.env`: it is read from the root `.env`, and a password with `/`, `?` or `%` in it (`POSTULO_DATABASE_PASSWORD`, or `POSTGRES_PASSWORD`) reaches PostgreSQL exactly as typed (#582).
 - Saving a table view under a long name cut after a space no longer ends in a server error, and saving the same view twice in a row says "View saved." instead of claiming it needs a name. (#507)
 - Sending a CV or letter for an application with a very long job title and company name no longer fails on PostgreSQL: the "sent to" text and the document title are cut to their columns. (#513)
 - A document whose title holds a double quote or a line break now downloads correctly instead of sending a malformed header or answering 500. (#376)

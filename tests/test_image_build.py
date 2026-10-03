@@ -201,6 +201,23 @@ def test_the_postgresql_compose_file_runs_the_scheduler_too():
     )
 
 
+def test_the_postgresql_compose_file_interpolates_no_password():
+    """#582: Compose reads `docker/.env` for `${...}`, not the `.env` the operator filled.
+
+    The password goes to the database container through `env_file` and to Postulo through
+    its own variable, so no character in it is parsed as part of a URL.
+    """
+    import yaml
+
+    text = COMPOSE_POSTGRES.read_text(encoding="utf-8")
+    assert "${" not in text
+    compose = yaml.safe_load(text)
+    assert "../.env" in compose["services"]["db"]["env_file"]
+    for name in ("postulo", "scheduler", "worker"):
+        url = compose["services"][name]["environment"]["POSTULO_DATABASE_URL"]
+        assert "@" in url and ":" not in url.split("//")[1].split("@")[0]
+
+
 def test_every_group_in_the_project_is_covered_by_that_flag():
     """The reason `--no-default-groups` is the right flag, asserted rather than assumed.
 

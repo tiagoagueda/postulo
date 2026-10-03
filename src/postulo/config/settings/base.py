@@ -12,7 +12,7 @@ import environ
 from django.utils.csp import CSP
 
 from postulo.accounts.validators import USERNAME_BLACKLIST
-from postulo.config import sqlite
+from postulo.config import database_password, sqlite
 from postulo.core import languages, proxy
 
 # src/postulo/config/settings/base.py -> src/postulo
@@ -152,6 +152,10 @@ DATABASES = {
     ),
 }
 DATABASES["default"].setdefault("ATOMIC_REQUESTS", True)
+
+# A password with a `/` in it cannot be written into the URL above, so it may be given
+# beside it instead (#582).
+database_password.apply_password(DATABASES["default"], env.ENVIRON)
 
 # Several workers share one SQLite file, and its defaults fail the moment two of them
 # write at once: an immediate transaction, a write-ahead log and a longer wait make them

@@ -25,6 +25,18 @@ trap cleanup EXIT
 
 a_secret_key() { echo "check-only-$(head -c 32 /dev/urandom | base64 | tr -d '=+/')"; }
 
+# The PostgreSQL compose file, read the way an operator runs it: from the checkout, with
+# only the .env at its root holding the password (#582). It used to stop with "required
+# variable POSTGRES_PASSWORD is missing" because Compose looked in docker/.env.
+echo "Reading the PostgreSQL compose file"
+made_env=""
+if [ ! -e "$ROOT/.env" ]; then
+    echo "POSTGRES_PASSWORD=check/only?%41" > "$ROOT/.env"
+    made_env="yes"
+fi
+(cd "$ROOT" && $DOCKER compose -f docker/compose.postgres.yml config --quiet)
+[ -z "$made_env" ] || rm -f "$ROOT/.env"
+
 echo "Building $TAG"
 # With the moment, so the layer that takes Debian's updates runs and this checks the image
 # a build would make now (#300).

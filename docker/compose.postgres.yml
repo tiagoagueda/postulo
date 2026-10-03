@@ -5,6 +5,11 @@
 # thing to keep alive.
 #
 #   docker compose -f docker/compose.postgres.yml up -d
+#
+# Put POSTGRES_PASSWORD in the .env at the repository root, beside the rest. Nothing here
+# interpolates it: Compose would look for it in docker/.env, not there, and a password
+# written into a URL has to be escaped. The db container reads it from .env, and Postulo
+# reads the same variable on its own (#582).
 
 # Named explicitly. Compose otherwise takes the project name from the directory the
 # file sits in, which here is "docker" — so the container becomes docker-postulo-1
@@ -25,7 +30,7 @@ services:
     env_file:
       - ../.env
     environment:
-      POSTULO_DATABASE_URL: postgres://postulo:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/postulo
+      POSTULO_DATABASE_URL: postgres://postulo@db:5432/postulo
     volumes:
       # Media still lives here: the database holds the records, not the files.
       - postulo-data:/app/data
@@ -53,7 +58,7 @@ services:
     env_file:
       - ../.env
     environment:
-      POSTULO_DATABASE_URL: postgres://postulo:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@db:5432/postulo
+      POSTULO_DATABASE_URL: postgres://postulo@db:5432/postulo
       POSTULO_SKIP_MIGRATE: "1"
       # The web container restores the installed plugins on startup. Both doing it at the
       # same moment means two processes writing one record, so the scheduler leaves it to
@@ -85,10 +90,11 @@ services:
   db:
     image: postgres:17-alpine
     restart: unless-stopped
+    env_file:
+      - ../.env
     environment:
       POSTGRES_DB: postulo
       POSTGRES_USER: postulo
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
     volumes:
       - postulo-db:/var/lib/postgresql/data
     healthcheck:
