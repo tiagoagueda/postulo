@@ -1,6 +1,7 @@
 """Pictures of people: uploads re-encoded, a Gravatar fetched once, initials otherwise."""
 
 import io
+import random
 import zipfile
 from typing import ClassVar
 
@@ -180,7 +181,15 @@ def test_the_form_refuses_what_it_should(client, user):
     assert response.status_code == 200
     assert "That is not a kind of picture Postulo keeps." in response.content.decode()
 
-    corrupt = SimpleUploadedFile("x.png", picture_bytes(fmt="PNG")[:60], content_type="image/png")
+    # Half of a PNG of noise, which no compression can make small: the first bytes say PNG
+    # and the picture stops part way, on every platform. A solid picture cut at 60 bytes
+    # still decoded on Linux.
+    noise = io.BytesIO()
+    Image.frombytes("RGB", (64, 64), random.Random(302).randbytes(64 * 64 * 3)).save(  # noqa: S311 -- noise, not a secret
+        noise, "PNG"
+    )
+    cut = noise.getvalue()[: len(noise.getvalue()) // 2]
+    corrupt = SimpleUploadedFile("x.png", cut, content_type="image/png")
     response = profile_page(client, user, picture=corrupt)
     assert response.status_code == 200 and "could not be read" in response.content.decode()
     assert not Profile.objects.get(user=user).avatar
