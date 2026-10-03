@@ -370,7 +370,7 @@ def test_the_openapi_description_is_served_without_a_docs_page(client, user):
         "/api/v1/insights",
     ):
         assert path in paths, path
-    assert client.get("/api/v1/docs").status_code == 404
+    assert client.get("/api/v1/docs", **issue(user, "captures")).status_code == 404
 
 
 def test_the_schema_answers_a_token_or_a_person_and_nobody_else(client, user):

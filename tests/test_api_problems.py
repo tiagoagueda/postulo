@@ -491,3 +491,30 @@ def test_a_refusal_names_the_request_it_was(client, user):
     assert len(body["request_id"]) == 32
     assert body["instance"] == "/api/v1/applications/999999", "the address is still the address"
     assert assert_is_a_problem(supplied, 404)["request_id"] == "trace-41"
+
+
+class TestWhatNoOperationAnswers:
+    """An address no operation owns is refused as a problem document too (#430).
+
+    The handlers in `problems.install` only see what an operation raises. A mistyped
+    address, an id that is not a number and a method an address does not take happen before
+    one is chosen, and were Django's and ninja's HTML.
+    """
+
+    def test_an_address_that_is_nowhere_is_a_404_with_a_token(self, client, user):
+        response = client.get("/api/v1/nothing-here", **issue(user))
+        assert_is_a_problem(response, 404)
+
+    def test_an_id_that_is_not_a_number_is_a_404_with_a_token(self, client, user):
+        response = client.get("/api/v1/applications/abc", **issue(user))
+        assert_is_a_problem(response, 404)
+
+    def test_without_a_token_it_is_the_same_401_as_every_other_call(self, client):
+        for path in ("/api/v1/nothing-here", "/api/v1/applications/abc"):
+            assert_is_a_problem(client.get(path), 401)
+
+    def test_a_method_the_address_does_not_take_is_a_405_that_keeps_allow(self, client, user):
+        response = client.delete("/api/v1/applications", **issue(user))
+        assert_is_a_problem(response, 405)
+        assert "GET" in response["Allow"]
+        assert response.json()["title"] == "Method Not Allowed"

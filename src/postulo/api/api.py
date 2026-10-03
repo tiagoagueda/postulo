@@ -845,9 +845,56 @@ def urls():
     each time it is read, which is why this returns the ones it marked.
     """
     from django.db import transaction
+    from django.urls import re_path
 
     patterns, application, namespace = api.urls
     for pattern in patterns:
         if getattr(pattern, "name", None) in OUTSIDE_A_TRANSACTION:
             transaction.non_atomic_requests(pattern.callback)
-    return patterns, application, namespace
+        _answer_a_wrong_method_as_a_problem(pattern)
+    # Last, so that it only sees what no address above took: a mistyped path, or an id the
+    # `{int:pk}` converter turned away (#430).
+    return [*patterns, re_path(r"^", _no_such_address)], application, namespace
+
+
+def _answer_a_wrong_method_as_a_problem(pattern) -> None:
+    """Dress ninja's plain-text 405 as a problem document, keeping its `Allow` header.
+
+    The refusal is made by the view of the *address*, before any operation is chosen, so
+    `problems.install` never sees it. The pattern's callback is wrapped in place, as
+    `urls()` already does for the transactions, because the resolver is handed these very
+    patterns.
+    """
+    from functools import wraps
+
+    from django.urls import URLPattern
+
+    if not isinstance(pattern, URLPattern):
+        return
+    view = pattern.callback
+
+    @wraps(view)
+    def answering(request, *args, **kwargs):
+        response = view(request, *args, **kwargs)
+        if response.status_code == 405 and response.get("Content-Type") != problems.CONTENT_TYPE:
+            refusal = problems.refuse(request, api, 405)
+            if "Allow" in response:
+                refusal["Allow"] = response["Allow"]
+            return refusal
+        return response
+
+    pattern.callback = answering
+
+
+def _no_such_address(request, *args, **kwargs):
+    """What an address under `api/v1/` that nothing owns is answered with (#430).
+
+    A 401 for a request with no live token, as for every other call, so the route table is
+    not probed without one; a 404 for one that has.
+    """
+    from .auth import lookup
+
+    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
+    if scheme.lower() == "bearer" and lookup(raw.strip()) is not None:
+        return problems.refuse(request, api, 404, str(_("Nothing of yours is at this address.")))
+    return problems.refuse(request, api, 401, problems.no_token())
