@@ -322,6 +322,32 @@ def test_a_hostile_archive_writes_nothing(tmp_path, settings):
         restore_backup(linked)
 
 
+@pytest.mark.parametrize(
+    "name",
+    [
+        r"media/..\..\escaped.txt",
+        r"media/C:\escaped.txt",
+        r"plugins/a/..\..\..\escaped.txt",
+    ],
+)
+def test_a_name_that_is_a_path_on_windows_is_refused_everywhere(tmp_path, settings, name):
+    """Backslashes and drives are separators there, so they are refused here too (#478)."""
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+    hostile = tmp_path / "hostile.tar.gz"
+    with tarfile.open(archive, "r:gz") as source, tarfile.open(hostile, "w:gz") as target:
+        for member in source.getmembers():
+            target.addfile(member, source.extractfile(member))
+        evil = tarfile.TarInfo(name)
+        evil.size = 4
+        target.addfile(evil, io.BytesIO(b"boom"))
+
+    users = User.objects.count()
+    with pytest.raises(BackupError, match="escapes the"):
+        restore_backup(hostile, force=True)
+    assert User.objects.count() == users, "refused before the database was loaded"
+    assert not list(tmp_path.rglob("escaped.txt"))
+
+
 def test_an_archive_from_the_other_engine_is_refused(tmp_path, monkeypatch):
     """Whichever engine this run is on, the archive from the other one has to be refused.
 

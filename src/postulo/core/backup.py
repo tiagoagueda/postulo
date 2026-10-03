@@ -466,7 +466,14 @@ def _safe_member_path(name: str, prefix: str) -> PurePosixPath:
     rest = parts[1:]
     if not rest:
         raise BackupError(f"bare {prefix}/")
-    if relative.is_absolute() or any(part in ("..", "") for part in rest):
+    # A backslash or a colon is a separator or a drive on Windows, so a name that is one
+    # harmless part here would leave the directory there; none is allowed anywhere, so a
+    # name means the same on every platform (#478).
+    if (
+        relative.is_absolute()
+        or any(part in ("..", "") for part in rest)
+        or any(char in part for part in rest for char in ("\\", ":", chr(0)))
+    ):
         raise BackupError(f"Refusing a member that escapes the {prefix} directory: {name!r}")
     return PurePosixPath(*rest)
 
@@ -538,7 +545,13 @@ def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
                 continue
             if not entry.isfile():
                 raise BackupError(f"Refusing a member that is not a plain file: {entry.name!r}")
-            files.append((entry, prefix, _safe_member_path(entry.name, prefix)))
+            relative = _safe_member_path(entry.name, prefix)
+            # The name is checked as a POSIX path above; the destination is what a native
+            # path makes of it, and has to stay under its root whatever the platform (#478).
+            destination = roots[prefix] / Path(*relative.parts)
+            if not destination.resolve().is_relative_to(roots[prefix].resolve()):
+                raise BackupError(f"Refusing a member that escapes the {prefix} directory")
+            files.append((entry, prefix, relative))
 
         load_database(dump, member)
 
