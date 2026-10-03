@@ -1159,13 +1159,6 @@ class InterviewOutcomeView(OwnedObjectMixin, View):
         return redirect(safe_next(request, interview.application.get_absolute_url()))
 
 
-#: How far ahead the feed carries deadlines and closing dates. The interviews in it are
-#: *everything* still ahead, because a diary is short; deadlines and closings are not, and a
-#: year of them in somebody's calendar application is a year of clutter they did not ask
-#: for. Half a year is past any notice period worth planning around (#238).
-FEED_DAYS = 183
-
-
 class InterviewCalendarView(OwnedObjectMixin, View):
     """An .ics file: one interview, or everything still ahead.
 
@@ -1191,7 +1184,7 @@ class InterviewCalendarView(OwnedObjectMixin, View):
         else:
             interviews = list(self.get_queryset().upcoming())
             filename = "interviews.ics"
-            days = self.dated_days(request)
+            days = agenda.dated_days(request.user, request.build_absolute_uri)
         text = ical.calendar(
             interviews,
             url_for=lambda i: request.build_absolute_uri(i.application.get_absolute_url()),
@@ -1200,31 +1193,6 @@ class InterviewCalendarView(OwnedObjectMixin, View):
         response = HttpResponse(text, content_type="text/calendar; charset=utf-8")
         response["Content-Disposition"] = f'attachment; filename="{filename}"'
         return response
-
-    def dated_days(self, request) -> list[ical.DayEntry]:
-        """The deadlines and closing dates ahead, as whole days.
-
-        Read through `agenda.events_between`, which is the one place that decides what a
-        deadline is, which ones are over and what they are called -- so the feed and the
-        calendar page can never disagree about somebody's month.
-        """
-        today = timezone.localdate()
-        events = agenda.events_between(
-            request.user,
-            today,
-            today + timedelta(days=FEED_DAYS),
-            kinds=(agenda.DEADLINE, agenda.CLOSING, agenda.ANSWER),
-        )
-        return [
-            ical.DayEntry(
-                summary=event.title,
-                day=event.day,
-                url=request.build_absolute_uri(event.url),
-                description=event.detail,
-                over=event.muted,
-            )
-            for event in events
-        ]
 
 
 # ------------------------------------------------------------------------ tags

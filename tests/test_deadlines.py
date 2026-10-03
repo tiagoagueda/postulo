@@ -644,3 +644,17 @@ def test_changing_and_deleting_need_the_write_scope(client, user):
     assert changed.status_code == 403
     assert removed.status_code == 403
     assert Reminder.objects.filter(pk=reminder.pk).exists()
+
+
+def test_the_feed_a_calendar_can_subscribe_to_carries_the_dates_too(client, user, application):
+    """#451: only the page's download had them, and a calendar cannot sign in to a page."""
+    from postulo.api.models import ApiToken
+
+    day = timezone.localdate() + dt.timedelta(days=5)
+    application.deadline = day
+    application.save(update_fields=["deadline"])
+    _record, raw = ApiToken.issue(user, "Calendar", scopes=("read",))
+
+    response = client.get("/api/v1/interviews/calendar.ics", HTTP_AUTHORIZATION=f"Bearer {raw}")
+
+    assert f"DTSTART;VALUE=DATE:{day:%Y%m%d}" in response.content.decode()

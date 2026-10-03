@@ -8,7 +8,7 @@ from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
 
-from postulo.applications import ical
+from postulo.applications import agenda, ical
 from postulo.applications.models import (
     SETTLED_OUTCOMES,
     Application,
@@ -75,6 +75,7 @@ def calendar_feed(request):
     text = ical.calendar(
         _queryset(request).upcoming(),
         url_for=lambda i: request.build_absolute_uri(i.application.get_absolute_url()),
+        days=agenda.dated_days(request.auth.owner, request.build_absolute_uri),
     )
     return HttpResponse(text, content_type="text/calendar; charset=utf-8")
 

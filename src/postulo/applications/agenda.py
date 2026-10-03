@@ -60,6 +60,7 @@ from django.utils.translation import ngettext_lazy
 
 from postulo.jobs.models import JobPosting
 
+from . import ical
 from .models import Application, Interview, InterviewOutcome, Offer, Reminder, Status
 from .reports import MAX_YEAR, MIN_YEAR, week_start
 
@@ -715,3 +716,38 @@ def page_for(params, user, *, today: dt.date | None = None) -> Page:
     if view == DEFAULT_VIEW and "on" not in params and "month" in params:
         on = month_from(params.get("month", "")) or today
     return build(user, view, on, today=today, kinds=kinds_from(params.get("kinds", "")))
+
+
+#: How far ahead the feed carries deadlines and closing dates. The interviews in it are
+#: *everything* still ahead, because a diary is short; deadlines and closings are not, and a
+#: year of them in somebody's calendar application is a year of clutter they did not ask
+#: for. Half a year is past any notice period worth planning around (#238).
+FEED_DAYS = 183
+
+
+def dated_days(user, absolute) -> list[ical.DayEntry]:
+    """The deadlines and closing dates ahead, as whole days for the diary feed.
+
+    Read through ``events_between``, which is the one place that decides what a deadline
+    is, which ones are over and what they are called -- so the feed and the calendar page
+    can never disagree about somebody's month. ``absolute`` makes an address absolute
+    (``request.build_absolute_uri``). Both feeds call this: the page's download, and the
+    API's, which is the one a calendar application can subscribe to (#451).
+    """
+    today = timezone.localdate()
+    events = events_between(
+        user,
+        today,
+        today + dt.timedelta(days=FEED_DAYS),
+        kinds=(DEADLINE, CLOSING, ANSWER),
+    )
+    return [
+        ical.DayEntry(
+            summary=event.title,
+            day=event.day,
+            url=absolute(event.url),
+            description=event.detail,
+            over=event.muted,
+        )
+        for event in events
+    ]
