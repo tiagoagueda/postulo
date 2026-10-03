@@ -436,10 +436,11 @@ def create_capture(
     idempotency_key: str | None = Header(
         None,
         alias="Idempotency-Key",
+        max_length=200,
         description=(
-            "Any string of your own, one per posting. Send the same request again under the "
-            "same key — after a lost reply, say — and you get the first answer back rather "
-            "than a second capture. Honoured for 24 hours."
+            "Any string of your own, up to 200 characters, one per posting. Send the same "
+            "request again under the same key — after a lost reply, say — and you get the "
+            "first answer back rather than a second capture. Honoured for 24 hours."
         ),
     ),
 ):

@@ -365,6 +365,17 @@ def test_without_a_key_nothing_changes(client, bearer, user):
     assert Capture.objects.for_user(user).count() == 2
 
 
+def test_a_key_longer_than_the_column_is_refused_and_one_that_fits_is_not(client, bearer, user):
+    """PostgreSQL refuses a 201-character value with a 500; SQLite never notices (#433)."""
+    too_long = post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, key="k" * 201)
+    fits = post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, key="k" * 200)
+
+    assert too_long.status_code == 422
+    assert "Idempotency-Key" in json.dumps(too_long.json())
+    assert fits.status_code == 201
+    assert Capture.objects.for_user(user).count() == 1
+
+
 def test_a_key_reused_for_a_different_posting_is_refused(client, bearer, user):
     """Answering it with the first capture would hide the client's bug rather than show it."""
     post_capture(client, bearer, url="https://example.org/j/7", html=PAGE, key="reused")
