@@ -55,6 +55,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.config.settings*",
             "postulo.config.formats*",
             "postulo.config.sqlite",
+            "postulo.config.database_password",
             "postulo.accounts.tokens",
             "postulo.accounts.validators",
             "postulo.core.addresses",
