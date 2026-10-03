@@ -236,6 +236,27 @@ def test_the_postgresql_compose_file_interpolates_no_password():
         assert "@" in url and ":" not in url.split("//")[1].split("@")[0]
 
 
+def test_the_compose_files_name_the_image_of_the_version_in_the_tree():
+    """#403: both files named :0.2 while the project was 0.3, so installs ran the old release."""
+    import tomllib
+
+    import yaml
+
+    version = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))["project"][
+        "version"
+    ]
+    minor = ".".join(version.split(".")[:2])
+    named = 0
+    for name in ("compose.yml", "compose.postgres.yml"):
+        compose = yaml.safe_load((ROOT / "docker" / name).read_text(encoding="utf-8"))
+        for service, body in compose["services"].items():
+            image = body.get("image", "")
+            if "postulo/postulo" in image:
+                named += 1
+                assert image.rsplit(":", 1)[1] == minor, f"{name}: {service} names {image}"
+    assert named == 6
+
+
 def test_every_group_in_the_project_is_covered_by_that_flag():
     """The reason `--no-default-groups` is the right flag, asserted rather than assumed.
 

@@ -60,6 +60,28 @@ def test_disagreements_are_refused_in_words(repo):
         tools.check("v0.2.0", repo)
 
 
+LINES = "services:{n}  postulo:{n}    image: source.example/postulo/postulo:{{tag}}{n}".format(
+    n=chr(10)
+) + chr(10)
+DB = "  db:" + chr(10) + "    image: postgres:17-alpine" + chr(10)
+
+
+def test_a_compose_file_naming_another_minor_is_refused(repo):
+    """#403: nothing moved the image pin with the version, so installs ran the last minor."""
+    (repo / "docker").mkdir()
+    compose = repo / "docker" / "compose.yml"
+    old = LINES.format(tag="0.1")
+    compose.write_text(old, encoding="utf-8")
+    with pytest.raises(tools.ReleaseError, match=r"compose\.yml names the image :0\.1, not :0\.2"):
+        tools.check("v0.2.0", repo)
+
+    compose.write_text(
+        LINES.format(tag="0.2") + DB,
+        encoding="utf-8",
+    )
+    assert tools.check("v0.2.0", repo) == "0.2.0"
+
+
 def test_the_real_repository_agrees_with_itself():
     """pyproject.toml and __version__ must always say the same thing, tag or no tag."""
     assert tools.pyproject_version() == tools.package_version()

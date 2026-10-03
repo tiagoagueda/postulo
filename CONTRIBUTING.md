@@ -478,7 +478,10 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    in particular -- and revise what the release made untrue. The plan explains why the
    code is shaped as it is and says nothing about where the project stands, so this is
    the one moment it is revised (#255).
-4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree.
+3b. Move the image tag in `docker/compose.yml` and `docker/compose.postgres.yml` (every
+   `postulo/postulo:X.Y`) to the new minor, or an install runs the last release (#403).
+4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree, and that
+   both compose files name this minor.
 5. Commit, push, and **wait for CI to pass on that commit**. Then tag it and push the tag:
    `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
    tagged commit's statuses and refuses a tag on which any test leg or the browser job is

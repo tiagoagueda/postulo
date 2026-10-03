@@ -67,6 +67,10 @@ def is_prerelease(version: str) -> bool:
     return "-" in version
 
 
+def tag_name(version: str) -> str:
+    return f"v{version}"
+
+
 def image_tags(version: str) -> tuple[str, ...]:
     """The tags a release pushes.
 
@@ -93,6 +97,22 @@ def package_version(root: Path = ROOT) -> str:
     if not match:
         raise ReleaseError("src/postulo/__init__.py has no __version__.")
     return match.group(1)
+
+
+#: The compose files an operator installs from, and the image they name for Postulo.
+COMPOSE_FILES = ("docker/compose.yml", "docker/compose.postgres.yml")
+COMPOSE_IMAGE = re.compile(r"^\s*image:\s*\S*/postulo/postulo:(?P<tag>\S+)\s*$", re.MULTILINE)
+
+
+def compose_image_tags(root: Path = ROOT) -> dict[str, list[str]]:
+    """The tag each compose file names for the Postulo image, per file (#403)."""
+    found = {}
+    for name in COMPOSE_FILES:
+        path = root / name
+        if path.exists():
+            text = path.read_text(encoding="utf-8")
+            found[name] = [match["tag"] for match in COMPOSE_IMAGE.finditer(text)]
+    return found
 
 
 def changelog_section(version: str, root: Path = ROOT) -> str:
@@ -162,6 +182,17 @@ def check(tag: str, root: Path = ROOT) -> str:
     if packaged != version:
         raise ReleaseError(f"Tag {tag} but src/postulo/__init__.py says {packaged}.")
     changelog_section(version, root)
+    if not is_prerelease(version):
+        # A release candidate moves no minor tag, so the compose files keep naming the last
+        # stable one until the release itself is made.
+        minor = image_tags(version)[1]
+        for name, tags in compose_image_tags(root).items():
+            for tag in tags:
+                if tag != minor:
+                    raise ReleaseError(
+                        f"Tag {tag_name(version)} but {name} names the image :{tag}, not "
+                        f":{minor}. An install would run another release than the one just made."
+                    )
     return version
 
 
