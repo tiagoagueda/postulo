@@ -187,6 +187,28 @@ def test_a_companys_value_is_still_tidied_the_way_it_was(key, typed, expected):
     assert company_schemes.normalise(key, typed) == expected
 
 
+@pytest.mark.parametrize(
+    ("typed", "expected"),
+    [
+        ("DE HRB 12345", "DE HRB 12345"),
+        ("PT501234567", "PT 501234567"),
+        ("PT-501234567", "PT 501234567"),
+    ],
+)
+def test_a_register_number_keeps_what_is_not_a_country_prefix(typed, expected):
+    assert company_schemes.clean("register", typed) == expected
+
+
+@pytest.mark.parametrize(
+    ("typed", "code"),
+    [("HRB 12345", "format"), ("KVK 12345678", "format"), ("XX 12", "checksum")],
+)
+def test_a_register_number_without_a_country_is_refused(typed, code):
+    with pytest.raises(ValidationError) as refused:
+        company_schemes.clean("register", typed)
+    assert refused.value.code == code
+
+
 def test_both_checksums_came_across():
     with pytest.raises(ValidationError) as orcid:
         person_schemes.clean("orcid", "0000-0002-1825-0098")

@@ -32,6 +32,7 @@ import re
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.identifiers import COMPANY, PERSON, Scheme
+from postulo.core.phones import COUNTRIES
 
 BOTH = frozenset({PERSON, COMPANY})
 ONLY_PERSON = frozenset({PERSON})
@@ -87,9 +88,20 @@ def _no_spaces(value: str) -> str:
 def _country_then_number(value: str) -> str:
     """``PT501234567`` and ``PT 501 234 567`` read the same afterwards."""
     value = re.sub(r"\s+", " ", value)
-    if len(value) > 2 and value[:2].isalpha() and value[2] != " ":
+    # Only a digit, a hyphen or a colon straight after two letters says they are a country:
+    # ``HRB 12345`` and ``KVK 12345678`` begin with a register's name, and are left alone.
+    if len(value) > 2 and value[:2].isalpha() and (value[2].isdigit() or value[2] in "-:"):
         value = value[:2] + " " + value[2:].lstrip(" -:")
     return value
+
+
+#: Greece writes EL and Kosovo XK in registers and VAT numbers; neither is the table's code.
+_REGISTER_COUNTRIES = frozenset(code for code, _dial, _name in COUNTRIES) | {"EL", "XK"}
+
+
+def starts_with_a_country(value: str) -> bool:
+    """Whether the two letters a register number begins with are a country's code."""
+    return value[:2] in _REGISTER_COUNTRIES
 
 
 def orcid_checks_out(value: str) -> bool:
@@ -235,6 +247,8 @@ SCHEMES: dict[str, Scheme] = {
             example=_("PT 501234567, FR 552081317, DE HRB 12345"),
             upper=True,
             tidy=_country_then_number,
+            checksum=starts_with_a_country,
+            checksum_message=_("Start with the country's two-letter code."),
             icon="building-2",
         ),
         Scheme(

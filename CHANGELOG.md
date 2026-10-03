@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company register number typed without a country code (HRB 12345, KVK 12345678) is no longer split into invented letters and saved; it is refused with the example, as is a prefix that is not a country code. (#636)
 - An ISNI is now checked against its ISO 7064 check character, so a mistyped one is refused like an ORCID, and its link is built without spaces; an already-stored ISNI with a wrong check character is refused when its form is next saved (#637)
 - Identifiers: accented/percent-encoded LinkedIn names, 2-3 letter ResearcherIDs and Web of Science links are accepted; a pasted Scopus link keeps only its author ID; a Wikidata link's fragment is ignored; non-ASCII digits are refused. (#638)
 - A malformed identifier now reads "ORCID: that is not the usual form (for example …)" instead of the ungrammatical "a ORCID identifier"; the person and company identifier checks now live once in core (#645).
