@@ -75,3 +75,11 @@ def test_the_settings_sidebar_still_marks_its_page(client, user):
     nav = html[start : html.index("</nav>", start)]
     assert nav.count('aria-current="page"') == 1
     assert "nav-link-active" in nav
+
+
+def test_the_label_over_the_list_is_the_hook_and_keeps_its_text(client, user):
+    """The script swaps the label for the section's title; without it the text stays (#677)."""
+    html = the_page(client, user)
+    label = re.search(r"<p[^>]*data-section-label[^>]*>(.*?)</p>", html, re.S)
+    assert label and label.group(1).strip() == "On this page"
+    assert "aria-live" not in label.group(0), "the list's aria-current already says where you are"

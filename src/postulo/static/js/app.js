@@ -5344,6 +5344,11 @@
    * section, whatever the line says: a short final section can never reach the line,
    * and the person who scrolled to it is looking at it. Without this the list still
    * navigates; it only stops saying where you are.
+   *
+   * The label over the list says "On this page" until the title of the section being
+   * read has scrolled behind the masthead, and then says that title, so somebody deep in
+   * a long section still sees which one it is (#677). Only from `lg` up, where the list
+   * stays in view; the text it puts back is the template's, so nothing English is here.
    */
   (function () {
     var links = document.querySelectorAll("[data-section-link]");
@@ -5360,6 +5365,9 @@
     if (!sections.length) {
       return;
     }
+    var label = document.querySelector("[data-section-label]");
+    var original = label ? label.textContent : "";
+    var wide = window.matchMedia("(min-width: 64rem)");
     var scheduled = false;
     function mark() {
       scheduled = false;
@@ -5386,6 +5394,14 @@
           link.removeAttribute("aria-current");
         }
       });
+      if (label) {
+        var title = current.querySelector("h2, legend");
+        var away = wide.matches && title && title.getBoundingClientRect().bottom <= covered;
+        var wanted = away ? title.textContent.trim() : original;
+        if (label.textContent !== wanted) {
+          label.textContent = wanted;
+        }
+      }
     }
     // Once per frame however often the page scrolls; a scroll listener that lays out on
     // every event is how a page starts to stutter.
@@ -5397,6 +5413,9 @@
     }
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule, { passive: true });
+    if (wide.addEventListener) {
+      wide.addEventListener("change", schedule);
+    }
     mark();
   })();
 

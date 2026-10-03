@@ -44,3 +44,68 @@ def test_on_a_phone_the_list_is_a_strip_above_the_sections(live_server, page: Pa
     assert nav and first
     assert nav["y"] + nav["height"] <= first["y"] + 1, "the list sits above the sections"
     assert nav["width"] <= 390, "the strip scrolls inside itself rather than widening the page"
+
+
+def label_text(page: Page) -> str:
+    return page.locator("[data-section-label]").inner_text().strip()
+
+
+@pytest.mark.parametrize("address", ["/career/", "/accounts/profile/"])
+def test_the_label_names_the_section_once_its_title_is_behind_the_masthead(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+    applicant,
+    address,
+):
+    """The label says *On this page* until the section's title scrolls away, then that
+    title, and the text again on the way back (#677)."""
+    import datetime as dt
+
+    from postulo.resume.models import Experience
+
+    # A section several screens long, which is what the label is for.
+    for year in range(2000, 2012):
+        Experience.objects.create(
+            owner=applicant,
+            organisation=f"Firm {year}",
+            role="Engineer",
+            start_date=dt.date(year, 1, 1),
+            summary="Kept things running.",
+        )
+    page.set_viewport_size({"width": 1280, "height": 500})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}{address}")
+    expect(page.locator("[data-section-label]")).to_have_text("On this page")
+    assert page.locator("[data-section-label][aria-live]").count() == 0
+
+    # Somewhere inside a section, its title gone behind the masthead.
+    header = page.locator("header").first.bounding_box()["height"]
+    # The first section tall enough that, a few pixels past its title, it is still the one
+    # being read: its top above the reading line two-fifths down, and the next one below it.
+    tallest = page.evaluate(
+        """() => [...document.querySelectorAll("[data-section-link]")]
+            .map((link) => document.getElementById(link.dataset.sectionLink))
+            .filter(Boolean)
+            .find((section) => section.offsetHeight > 220).id"""
+    )
+    section = page.locator(f"#{tallest}")
+    title = section.locator("h2, legend").first
+    top = page.evaluate(
+        "(el) => el.getBoundingClientRect().bottom + window.scrollY", title.element_handle()
+    )
+    page.evaluate(f"window.scrollTo(0, {top - header + 4})")
+    expect(page.locator("[data-section-label]")).to_have_text(title.inner_text().strip())
+
+    page.evaluate("window.scrollTo(0, 0)")
+    expect(page.locator("[data-section-label]")).to_have_text("On this page")
+
+
+def test_on_a_phone_the_label_stays_as_it_is(live_server, page: Page, furnished):  # noqa: F811
+    page.set_viewport_size({"width": 390, "height": 844})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/career/")
+
+    page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
+    page.wait_for_timeout(200)
+    assert label_text(page) == "On this page"

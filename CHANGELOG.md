@@ -108,6 +108,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- On Your details and Your career the sidebar's label names the section you are reading once its title has scrolled away. (#677)
 - Your career is in the account menu after Your details, and the menu marks the row of the page you are on. (#676)
 - The Server settings and Settings sidebars stay in view while a long page scrolls. (#699)
 - An administrator adds an instance's own kinds of identifier, in JSON, from *Server settings → Plugins*: a key, a name per language, a pattern that is not a regular expression, a link. Offered beside Postulo's. Removing one deletes no identifier and changing its pattern refuses none: it is kept as it was, marked. (#311)
