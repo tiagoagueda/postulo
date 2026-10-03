@@ -44,12 +44,23 @@ from postulo.plugins.base import CaptureError
 PUBLIC = [ipaddress.ip_address("93.184.216.34")]
 
 
+def snapshot(request: httpx.Request) -> httpx.Request:
+    """The request as it was sent: the client puts the site's name back on the one it holds
+    once the answer is in, so that a redirect is built from the name (#363)."""
+    return httpx.Request(
+        request.method,
+        request.url,
+        headers=request.headers,
+        extensions=dict(request.extensions),
+    )
+
+
 def recorder(status: int = 200, body: bytes = b"", content_type: str = "text/plain"):
     """A transport that answers everything the same way and remembers what it was asked."""
     seen: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
+        seen.append(snapshot(request))
         return httpx.Response(status, content=body, headers={"Content-Type": content_type})
 
     return httpx.MockTransport(handler), seen
@@ -84,6 +95,71 @@ def test_the_connection_client_connects_to_the_address_it_approved(monkeypatch, 
     assert seen[0].extensions["sni_hostname"] == "paperless.example", "TLS proves the name"
 
 
+def test_a_relative_redirect_stays_on_the_site_s_name(monkeypatch, settings):
+    """#363: the next hop was built from the pinned request, so it asked for the number."""
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"paperless.example": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        if request.url.path == "/old":
+            return httpx.Response(301, headers={"Location": "/new"})
+        return httpx.Response(200)
+
+    with http.client(transport=httpx.MockTransport(handler)) as client:
+        response = client.get("https://paperless.example/old")
+
+    assert [str(r.url.host) for r in seen] == ["93.184.216.34"] * 2, "both went to the address"
+    assert seen[1].url.path == "/new"
+    assert seen[1].headers["Host"] == "paperless.example"
+    assert seen[1].extensions["sni_hostname"] == "paperless.example"
+    assert str(response.url) == "https://paperless.example/new", "the answer is the site's"
+
+
+def test_credentials_survive_a_redirect_within_the_same_site(monkeypatch, settings):
+    """#363: an absolute redirect to the same host looked like another origin, so the
+    login was dropped, which only the default, safer setting did."""
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"cloud.example": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        if request.url.path == "/.well-known/carddav":
+            return httpx.Response(
+                301, headers={"Location": "https://cloud.example/remote.php/dav/"}
+            )
+        return httpx.Response(207)
+
+    with http.client(transport=httpx.MockTransport(handler), auth=("me", "pw")) as client:
+        client.request("PROPFIND", "https://cloud.example/.well-known/carddav")
+
+    assert len(seen) == 2
+    assert seen[1].url.path == "/remote.php/dav/"
+    assert seen[1].headers["Authorization"] == seen[0].headers["Authorization"]
+    assert seen[1].headers["Host"] == "cloud.example"
+
+
+def test_a_redirect_to_another_site_does_not_carry_the_login(monkeypatch, settings):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"cloud.example": PUBLIC, "elsewhere.example": PUBLIC})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        if request.url.path == "/go":
+            return httpx.Response(301, headers={"Location": "https://elsewhere.example/x"})
+        return httpx.Response(200)
+
+    with http.client(transport=httpx.MockTransport(handler), auth=("me", "pw")) as client:
+        client.get("https://cloud.example/go")
+
+    assert "Authorization" in seen[0].headers
+    assert "Authorization" not in seen[1].headers
+    assert seen[1].headers["Host"] == "elsewhere.example"
+
+
 def test_the_connection_client_refuses_what_the_check_turns_down(monkeypatch, settings):
     settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
     resolving(monkeypatch, {})
@@ -105,7 +181,7 @@ def test_a_redirect_is_checked_as_the_request_it_is(monkeypatch, settings):
     seen: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
+        seen.append(snapshot(request))
         return httpx.Response(302, headers={"Location": "http://192.168.1.50/snapshot.jpg"})
 
     with (
@@ -155,7 +231,7 @@ def test_a_logo_is_fetched_publicly_even_where_connections_may_be_private(monkey
     seen: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
+        seen.append(snapshot(request))
         return httpx.Response(302, headers={"Location": "http://192.168.1.50/snapshot.jpg"})
 
     guarded_logo_client(monkeypatch, httpx.MockTransport(handler))
@@ -497,7 +573,7 @@ def serving(monkeypatch, answer) -> list[httpx.Request]:
     seen: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
+        seen.append(snapshot(request))
         if request.url.path == "/robots.txt":
             return httpx.Response(404)
         return answer(request)
@@ -827,7 +903,7 @@ def answering_robots(monkeypatch, answer) -> list[httpx.Request]:
     seen: list[httpx.Request] = []
 
     def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
+        seen.append(snapshot(request))
         return answer(request)
 
     real = http.public_only_client

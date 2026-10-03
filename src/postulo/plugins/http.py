@@ -188,10 +188,14 @@ def _pin(request: httpx.Request, addresses) -> None:
     host = request.url.host
     address, *rest = (str(each) for each in addresses)
     if host == address:
+        # A literal address has no name to prove, and one left over from the request this
+        # one was built from (a redirect) would be the wrong one.
+        request.extensions = {k: v for k, v in request.extensions.items() if k != "sni_hostname"}
         return
     request.extensions = {
         **request.extensions,
         "sni_hostname": host,
+        NAMED_URL: request.url,
         _FALLBACKS: tuple(each for each in rest if each != address),
     }
     request.url = request.url.copy_with(host=address)
@@ -233,6 +237,27 @@ def _fall_back_between_addresses(client: httpx.Client) -> None:
     client._send_single_request = send_single_request
 
 
+#: Where `_pin` keeps the URL a request was written with, for `_restore_name`.
+NAMED_URL = "postulo_named_url"
+
+
+def _restore_name(response: httpx.Response) -> None:
+    """Put the name back on the request that was pinned, before httpx builds a redirect.
+
+    The socket was opened to the approved address, and that is all the rewritten URL was
+    for. httpx builds the next request from the one that was sent: a relative ``Location``
+    resolved against the number asks the next hop for the number, and an absolute one to the
+    same site is "another origin", so the credentials were stripped from it (#363). With the
+    name restored, a redirect is judged and built as the site's own, and ``_pin`` pins it
+    again, after the same check, as it does every request.
+    """
+    request = response.request
+    named = request.extensions.get(NAMED_URL)
+    if named is not None:
+        request.url = named
+        request.extensions = {k: v for k, v in request.extensions.items() if k != NAMED_URL}
+
+
 def _public_only(request: httpx.Request) -> None:
     """Refuse anything not publicly routable, and connect to what was approved.
 
@@ -259,7 +284,11 @@ def _public_only(request: httpx.Request) -> None:
 def _build(guard, timeout: float, kwargs: dict, *, bounded: bool = False) -> httpx.Client:
     headers = {"User-Agent": USER_AGENT, **kwargs.pop("headers", {})}
     hooks = kwargs.pop("event_hooks", {})
-    hooks = {**hooks, "request": [guard, *hooks.get("request", [])]}
+    hooks = {
+        **hooks,
+        "request": [guard, *hooks.get("request", [])],
+        "response": [_restore_name, *hooks.get("response", [])],
+    }
     kwargs.setdefault("follow_redirects", True)
     kwargs.setdefault("max_redirects", MAX_REDIRECTS)
     built = httpx.Client(timeout=timeout, headers=headers, event_hooks=hooks, **kwargs)
