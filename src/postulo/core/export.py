@@ -85,7 +85,10 @@ logger = logging.getLogger(__name__)
 #: 31 added ``reminders`` at the top of the file: the reminders about no application,
 #: which used to travel only inside the application they were about and so were in no
 #: archive (#334).
-FORMAT_VERSION = 31
+#: 32 added ``sent_upload_ids`` on an application, the files it went out with, and
+#: ``sent_to`` on a sent document, the words saying where it went; an archive without them
+#: restores both empty, as they were (#469).
+FORMAT_VERSION = 32
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -342,6 +345,9 @@ SENT_FIELDS = (
     "checksum",
     "rendered_at",
     "language",
+    # Where it went, kept as text so a sent PDF can still be placed after its application
+    # is deleted (#469). Absent from an archive written before format 31.
+    "sent_to",
 )
 CAPTURE_FIELDS = (
     "id",
@@ -710,6 +716,7 @@ def build_document(user) -> dict:
         "postings__applications__department__company",
         "postings__applications__through_agency",
         "postings__applications__sent_links",
+        "postings__applications__sent_uploads",
         "departments",
     )
     for company in companies:
@@ -766,6 +773,10 @@ def build_document(user) -> dict:
                                 ),
                                 "tags": [tag.slug for tag in application.tags.all()],
                                 "sent_link_ids": [link.pk for link in application.sent_links.all()],
+                                # The files it went out with, by their id in this file (#469).
+                                "sent_upload_ids": [
+                                    upload.pk for upload in application.sent_uploads.all()
+                                ],
                                 "events": [
                                     _fields(event, EVENT_FIELDS)
                                     for event in application.events.all()

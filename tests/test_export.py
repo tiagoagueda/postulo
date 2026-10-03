@@ -615,3 +615,55 @@ def test_an_archive_from_before_reminders_about_none_still_imports(populated, ot
 
     assert report.reminders == 1
     assert Reminder.objects.for_user(other_user).get().summary == "Chase"
+
+
+def test_the_files_sent_with_an_application_and_where_a_sent_document_went_come_back(
+    populated, other_user
+):
+    """Both used to be left out of the archive (#469)."""
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import DocumentKind, RenderedDocument
+
+    application = Application.objects.for_user(populated).get()
+    upload = UploadedDocument.objects.for_user(populated).get()
+    application.sent_uploads.set([upload])
+    # A sent document whose application was deleted: only `sent_to` still says where it went.
+    sent = RenderedDocument(
+        owner=populated,
+        title="CV",
+        kind=DocumentKind.CV,
+        sent_to="Research Engineer at Black Mesa",
+    )
+    sent.file.save("cv.pdf", ContentFile(b"%PDF-1.7 y"), save=True)
+    assert sent.went_with_an_application
+
+    archive, document = read_archive(populated)
+    assert document["companies"][0]["postings"][0]["applications"][0]["sent_upload_ids"] == [
+        upload.pk
+    ]
+
+    importer.load(other_user, archive)
+
+    restored = Application.objects.for_user(other_user).get()
+    assert [u.title for u in restored.sent_uploads.all()] == ["Designed CV"]
+    assert restored.sent_uploads.get().owner_id == other_user.pk
+    came_back = RenderedDocument.objects.for_user(other_user).get()
+    assert came_back.sent_to == "Research Engineer at Black Mesa"
+    assert came_back.went_with_an_application
+
+
+def test_an_archive_without_sent_files_or_sent_to_still_imports(populated, other_user):
+    _archive, document = read_archive(populated)
+    for company in document["companies"]:
+        for posting in company["postings"]:
+            for application in posting["applications"]:
+                application.pop("sent_upload_ids")
+    document["postulo"]["format"] = 30
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as older:
+        older.writestr(export_module.MANIFEST_NAME, json.dumps(document))
+
+    importer.load(other_user, zipfile.ZipFile(buffer))
+
+    assert Application.objects.for_user(other_user).get().sent_uploads.count() == 0

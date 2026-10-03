@@ -841,6 +841,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     wants_referrer: dict[int, int] = {}
     wants_agency: dict[int, str] = {}
 
+    #: The files each application went out with, as their ids in the file; applied once the
+    #: uploads have been made (#469).
+    wants_sent_uploads: list[tuple[Application, list]] = []
+
     #: Each listing's history, as the file wrote it, held until the end: an entry may point
     #: at a capture or an upload, and those are made last (#270).
     listing_histories: list[tuple[JobPosting, list]] = []
@@ -1013,6 +1017,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 offer_entries = application_entry.pop("offers", [])
                 tag_slugs = application_entry.pop("tags", [])
                 sent_link_ids = application_entry.pop("sent_link_ids", [])
+                sent_upload_ids = application_entry.pop("sent_upload_ids", None) or []
                 old_id = application_entry.pop("id", None)
                 application_entry.pop("created_at", None)
                 contact_id = application_entry.pop("contact_id", None)
@@ -1043,6 +1048,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 )
                 applications[old_id] = application
                 report.applications += 1
+                # Held until the uploads exist, as an upload's predecessor is (#469).
+                if sent_upload_ids:
+                    wants_sent_uploads.append((application, sent_upload_ids))
 
                 if tag_slugs:
                     application.tags.set(
@@ -1287,6 +1295,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if earlier is not None:
             upload.replaces = earlier
             upload.save(update_fields=["replaces"])
+
+    for application, old_upload_ids in wants_sent_uploads:
+        application.sent_uploads.set(
+            [uploads[i] for i in old_upload_ids if isinstance(i, int) and i in uploads]
+        )
 
     for sent_entry in documents.get("sent", []):
         sent_entry.pop("id", None)
