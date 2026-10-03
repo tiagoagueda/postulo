@@ -51,6 +51,20 @@ def test_every_section_is_for_administrators_only(client, user, url_name):
     assert client.get(reverse(url_name)).status_code == 403
 
 
+def test_the_status_never_says_whether_an_account_exists(client, user, other_user, admin):
+    """The staff check runs before the account is looked up (#373)."""
+    present = reverse("server:person_plugins", kwargs={"pk": other_user.pk})
+    missing = reverse("server:person_plugins", kwargs={"pk": other_user.pk + 1000})
+
+    assert client.get(present).status_code == client.get(missing).status_code == 302
+    client.force_login(user)
+    assert client.get(present).status_code == client.get(missing).status_code == 403
+    assert client.post(present).status_code == client.post(missing).status_code == 403
+    client.force_login(admin)
+    assert client.get(present).status_code == 200
+    assert client.get(missing).status_code == 404
+
+
 @pytest.mark.parametrize("url_name", SECTION_URLS)
 def test_every_section_renders_inside_the_sidebar(client, admin, url_name):
     client.force_login(admin)

@@ -1279,23 +1279,25 @@ class PersonPluginsView(StaffRequiredMixin, TemplateView):
 
     template_name = "server/person_plugins.html"
 
-    def dispatch(self, request, *args, **kwargs):
-        self.person = get_object_or_404(get_user_model(), pk=kwargs["pk"])
-        return super().dispatch(request, *args, **kwargs)
+    def _person(self, pk: int):
+        """Looked up only once the staff check has passed, so a status code never says
+        whether an account exists (#373)."""
+        return get_object_or_404(get_user_model(), pk=pk)
 
     def get_context_data(self, **kwargs) -> dict:
-
+        person = self._person(kwargs["pk"])
         context = super().get_context_data(**kwargs)
-        context["person"] = self.person
-        context["rows"] = _policy_rows(self.person)
+        context["person"] = person
+        context["rows"] = _policy_rows(person)
         context["defaults"] = {row["name"]: row["state"] for row in _policy_rows()}
-        context["section_title"] = _("Plugins for %(name)s") % {"name": self.person.username}
+        context["section_title"] = _("Plugins for %(name)s") % {"name": person.username}
         return context
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
-        changed = _save_policies(request, self.person)
+        person = self._person(pk)
+        changed = _save_policies(request, person)
         messages.success(request, _("Saved.") if changed else _("Nothing was different."))
-        return redirect("server:person_plugins", pk=self.person.pk)
+        return redirect("server:person_plugins", pk=person.pk)
 
 
 class PluginRepositoryView(StaffRequiredMixin, View):
