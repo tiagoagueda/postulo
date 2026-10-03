@@ -821,6 +821,40 @@ def test_the_install_form_posts_the_catalogue_and_installs_from_it(
     assert installing.installed("postulo-example").origin == "catalogue:beta"
 
 
+def test_the_plugins_pages_make_no_request_to_a_catalogue(
+    client, admin, served, settings, plugins_dir, installer, monkeypatch
+):
+    """Rendering a page asked every repository for its index and its signature (#602)."""
+    configure(settings, served["public"])
+    installing.install_wheel(served["wheel_path"], by="ana")
+    asked = []
+    for name in ("fetch", "fetch_all"):
+        monkeypatch.setattr(catalogue, name, lambda *a, _n=name, **k: asked.append(_n))
+    client.force_login(admin)
+
+    assert client.get(reverse("settings:plugins")).status_code == 200
+    assert client.post(reverse("settings:plugins"), {}).status_code in (200, 302)
+    assert client.get(reverse("server:plugins")).status_code == 200
+
+    assert asked == []
+
+
+def test_a_refresh_is_what_labels_an_upload_afterwards(
+    client, admin, served, settings, plugins_dir, installer
+):
+    configure(settings, served["public"])
+    installing.install_wheel(served["wheel_path"], by="ana")
+    assert provenance.status()[-1]["provenance"] == provenance.UPLOADED, "nothing fetched yet"
+    client.force_login(admin)
+
+    client.post(reverse("server:plugin_action"), {"action": "refresh"})
+
+    row = provenance.status()[-1]
+    assert row["provenance"] == provenance.CUSTOM and row["repository"] == "official"
+    assert client.get(reverse("server:plugins")).status_code == 200
+    assert provenance.status()[-1]["provenance"] == provenance.CUSTOM
+
+
 # ------------------------------------------------------------- the page
 
 

@@ -229,9 +229,15 @@ def fetch(name: str) -> Catalogue:
         payload = _get(client, url, MAX_INDEX_BYTES)
         signature = _get(client, url + ".sig", 4096).decode("ascii", "replace").strip()
     verify(payload, signature, known[name]["key"])
-    return Catalogue(
+    fetched = Catalogue(
         name=name, url=url, public_key=known[name]["key"], listings=parse(payload, catalogue=name)
     )
+    # What the plugins pages label an upload by. Kept now, while somebody asked for this
+    # fetch, so that no page has to make one (#602).
+    from .provenance import remember
+
+    remember(fetched)
+    return fetched
 
 
 def fetch_all() -> tuple[list[Catalogue], list[str]]:

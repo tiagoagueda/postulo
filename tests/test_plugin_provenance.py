@@ -74,6 +74,9 @@ def a_signed_index(monkeypatch):
     monkeypatch.setattr(catalogue, "configured", configured)
     monkeypatch.setattr(catalogue, "fetch_all", fetch_all)
     monkeypatch.setattr(provenance, "OFFICIAL_KEYS", (OFFICIAL_KEY,))
+    # What an explicit fetch verified and kept; the labels are read from there (#602).
+    for one in fetch_all()[0]:
+        provenance.remember(one)
 
 
 # ------------------------------------------------------------- the three kinds
