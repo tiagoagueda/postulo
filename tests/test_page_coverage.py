@@ -143,6 +143,7 @@ EXCUSED: dict[str, str] = {
     "documents:rendered_archive": "a POST that files a sent document away",
     "documents:upload_archive": "a POST that files an uploaded document away",
     "jobs:capture_discard": "a POST that throws away a captured posting",
+    "jobs:capture_restore": "a POST that puts a discarded capture back; its button is on the list",
     "jobs:capture_page_source": (
         "the source a capture kept, arriving as a download of plain text: a "
         "`Content-Disposition` and bytes, and deliberately never a page (#256)"
