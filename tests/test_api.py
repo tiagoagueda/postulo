@@ -170,6 +170,12 @@ def test_documents_and_insights_read(client, user, search):
     assert "body" not in letter
     assert client.get(f"/api/v1/letters/{letter['id']}", **bearer).json()["body"] == "Dear team"
 
+    german = CoverLetter.objects.create(owner=user, name="Brief", body="Hallo", language="de")
+    assert client.get(f"/api/v1/letters/{german.pk}", **bearer).json()["language"] == "de"
+    listed = {row["id"]: row for row in client.get("/api/v1/letters", **bearer).json()["items"]}
+    assert listed[german.pk]["language"] == "de"
+    assert listed[letter["id"]]["language"] == ""
+
     documents = client.get("/api/v1/documents", **bearer).json()["items"]
     assert documents[0]["source"] == "upload" and documents[0]["kind"] == "portfolio"
     download = client.get(documents[0]["download_url"].replace("http://testserver", ""), **bearer)

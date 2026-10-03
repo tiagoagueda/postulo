@@ -687,7 +687,6 @@ class CVOut(Schema):
     summary: str = ""
     theme: str
     language: str = Field(
-        default="",
         description="The language it is written in, as a BCP 47 tag in its canonical form "
         "(`pt-BR`); blank follows the profile",
     )
@@ -833,10 +832,10 @@ class LetterOut(Schema):
     is_template: bool
     theme: str
     #: As `CVOut` has carried all along; the field has been on the model since the
-    #: beginning and only the schema had forgotten it (#283). The schema remembered and
-    #: the answer did not: nothing filled it, so every letter said blank until #337.
+    #: beginning and only the schema had forgotten it (#283). It has no default, so a
+    #: router that forgets the key fails its tests instead of sending a plausible blank
+    #: (#437).
     language: str = Field(
-        default="",
         description="The language it is written in, as a BCP 47 tag in its canonical form "
         "(`pt-BR`); blank follows the profile",
     )
