@@ -1,0 +1,12 @@
+{% load i18n %}
+<c-vars current="" />
+{% comment %} The section menu on the four lists under *Documents* (#667). The main navigation's
+   item goes to the CVs, so the other three lists were reachable only by search. Plain links
+   in the letters page's pill style, so it works with scripts off; `current` is one of
+   `cvs`, `letters`, `files`, `sent`, and that one is marked as the page. {% endcomment %}
+<nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Documents' %}">
+  <a href="{% url 'documents:cv_list' %}" class="btn" data-variant="{% if current == 'cvs' %}outline{% else %}ghost{% endif %}" data-size="sm"{% if current == 'cvs' %} aria-current="page"{% endif %}>{% translate "CVs and portfolios" %}</a>
+  <a href="{% url 'documents:letter_list' %}" class="btn" data-variant="{% if current == 'letters' %}outline{% else %}ghost{% endif %}" data-size="sm"{% if current == 'letters' %} aria-current="page"{% endif %}>{% translate "Letters" %}</a>
+  <a href="{% url 'documents:upload_list' %}" class="btn" data-variant="{% if current == 'files' %}outline{% else %}ghost{% endif %}" data-size="sm"{% if current == 'files' %} aria-current="page"{% endif %}>{% translate "Files" %}</a>
+  <a href="{% url 'documents:rendered_list' %}" class="btn" data-variant="{% if current == 'sent' %}outline{% else %}ghost{% endif %}" data-size="sm"{% if current == 'sent' %} aria-current="page"{% endif %}>{% translate "Sent documents" %}</a>
+</nav>

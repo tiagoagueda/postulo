@@ -29,7 +29,7 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
-from . import comparing, formats, printing, rendering, themes
+from . import comparing, formats, kinds, printing, rendering, themes
 from . import pdf as renderers
 from .forms import (
     AddCVItemsForm,
@@ -595,7 +595,26 @@ class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
     context_object_name = "documents"
 
     def get_queryset(self):
-        return super().get_queryset().prefetch_related("replaced_by")
+        queryset = super().get_queryset().prefetch_related("replaced_by")
+        # An unknown kind is ignored, as the letters list ignores one (#667).
+        if self.request.GET.get("kind", "") in dict(kinds.choices()):
+            queryset = queryset.filter(kind=self.request.GET["kind"])
+        return queryset
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        # From the registry, so a kind a plugin brings is offered; only those somebody has a
+        # file of, so the row is not a list of empty answers.
+        held = set(
+            UploadedDocument.objects.filter(owner=self.request.user).values_list("kind", flat=True)
+        )
+        current = self.request.GET.get("kind", "")
+        current = current if current in dict(kinds.choices()) else ""
+        context["kinds"] = [
+            (key, label) for key, label in kinds.choices() if key in held or key == current
+        ]
+        context["current_kind"] = current
+        return context
 
 
 class UploadCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):

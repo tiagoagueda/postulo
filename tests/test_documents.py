@@ -1266,3 +1266,64 @@ def test_several_entries_added_to_a_cv_are_told_in_the_plural(client, user, cv):
     )
 
     assert "Added 2 entries." in response.content.decode()
+
+
+# ------------------------------------------------------------ the section menu (#667)
+
+SECTION_LISTS = {
+    "cvs": "documents:cv_list",
+    "letters": "documents:letter_list",
+    "files": "documents:upload_list",
+    "sent": "documents:rendered_list",
+}
+
+
+@pytest.mark.parametrize("here", SECTION_LISTS)
+def test_each_list_of_the_section_links_to_the_others_and_marks_its_own(client, user, here):
+    client.force_login(user)
+    html = client.get(reverse(SECTION_LISTS[here])).content.decode()
+    menu = html[
+        html.index('<nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="Documents"') :
+    ]
+    menu = menu[: menu.index("</nav>")]
+
+    for name, route in SECTION_LISTS.items():
+        link = re.search(rf'<a href="{re.escape(reverse(route))}"[^>]*>', menu)
+        assert link, f"{here} does not link to {name}"
+        assert ('aria-current="page"' in link.group(0)) == (name == here)
+
+
+def test_the_page_of_a_letter_or_a_file_has_documents_lit(client, user, letter):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import DocumentKind, UploadedDocument
+
+    upload = UploadedDocument(owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE)
+    upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
+    client.force_login(user)
+
+    for address in (
+        reverse("documents:letter_detail", args=[letter.pk]),
+        reverse("documents:upload_update", args=[upload.pk]),
+    ):
+        html = client.get(address).content.decode()
+        lit = re.search(r'<a href="/documents/cvs/"[^>]*class="[^"]*nav-link-active', html)
+        assert lit, f"{address}: no Documents item is lit"
+
+
+def test_the_files_list_can_be_narrowed_by_kind(client, user):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import DocumentKind, UploadedDocument
+
+    for title, kind in (("Diploma", DocumentKind.CERTIFICATE), ("Old CV", DocumentKind.CV)):
+        upload = UploadedDocument(owner=user, title=title, kind=kind)
+        upload.file.save("x.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
+    client.force_login(user)
+    address = reverse("documents:upload_list")
+
+    narrowed = client.get(address, {"kind": "certificate"}).content.decode()
+    assert "Diploma" in narrowed and "Old CV" not in narrowed
+
+    everything = client.get(address, {"kind": "not-a-kind"}).content.decode()
+    assert "Diploma" in everything and "Old CV" in everything

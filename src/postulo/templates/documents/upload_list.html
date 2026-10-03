@@ -6,6 +6,7 @@
 {% block title %}{% translate "Files" %}{% endblock %}
 
 {% block content %}
+  <c-documents-nav current="files" />
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
       <c-page-title>{% translate "Files" %}</c-page-title>
@@ -17,6 +18,17 @@
       {% translate "Upload a file" %}
     </a>
   </div>
+
+  <nav class="mb-4 flex flex-wrap gap-2 text-sm" aria-label="{% translate 'Types of file' %}">
+    <a href="{% url 'documents:upload_list' %}"
+       class="btn" data-variant="{% if not current_kind %}outline{% else %}ghost{% endif %}" data-size="sm"
+       {% if not current_kind %}aria-current="page"{% endif %}>{% translate "All" %}</a>
+    {% for value, label in kinds %}
+      <a href="?kind={{ value }}"
+         class="btn" data-variant="{% if current_kind == value %}outline{% else %}ghost{% endif %}" data-size="sm"
+         {% if current_kind == value %}aria-current="page"{% endif %}>{{ label }}</a>
+    {% endfor %}
+  </nav>
 
   {% if documents %}
     <div class="card p-0">
@@ -61,7 +73,7 @@
     </div>
   {% else %}
     <c-empty icon="circle-dashed">
-      {% translate "Nothing uploaded yet." %}
+      {% if current_kind %}{% translate "No files of this type yet." %}{% else %}{% translate "Nothing uploaded yet." %}{% endif %}
     </c-empty>
   {% endif %}
 {% endblock %}

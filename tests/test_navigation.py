@@ -635,3 +635,37 @@ def test_the_row_of_the_page_being_looked_at_says_so(client, user, address, row,
     nav = html[html.index("<header") :]
     documents = re.search(rf'<a[^>]*href="{reverse("documents:cv_list")}"[^>]*>', nav)
     assert documents and "nav-link-active" not in documents.group(0), "Documents does not light"
+
+
+# ----------------------------------------------------------- the Documents section
+
+
+SECTION_VIEWS = (
+    "cv_list",
+    "cv_detail",
+    "cv_create",
+    "cv_update",
+    "cv_text",
+    "letter_list",
+    "letter_detail",
+    "letter_create",
+    "letter_update",
+    "upload_list",
+    "upload_create",
+    "upload_update",
+    "rendered_list",
+    "rendered_compare",
+)
+
+
+@pytest.mark.parametrize("name", SECTION_VIEWS)
+def test_documents_is_lit_on_every_page_of_its_section(name):
+    """The item goes to the CVs, but it is the section's, whichever of its pages is open (#667)."""
+    from types import SimpleNamespace
+
+    from postulo.core.templatetags.postulo import nav_active_names
+
+    item = navigation.BY_KEY["documents"]
+    request = SimpleNamespace(resolver_match=SimpleNamespace(app_name="documents", url_name=name))
+
+    assert nav_active_names({"request": request}, item.active_names) == ("nav-link-active")
