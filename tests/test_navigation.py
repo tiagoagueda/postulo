@@ -589,3 +589,49 @@ def test_accessibility_offers_the_switch_and_saves_it(client, user):
     response = client.post(reverse("settings:accessibility"), {"nav_underline": "on"})
     assert response.status_code == 302
     assert Profile.objects.get(user=user).nav_underline is True
+
+
+# ------------------------------------------------- the account menu's two rows (#676)
+
+
+def test_every_page_of_the_career_record_is_a_page_of_its_row():
+    """A page added to `resume/urls.py` without its name in the list fails here."""
+    from postulo.resume import urls
+
+    names = {f"{urls.app_name}:{pattern.name}" for pattern in urls.urlpatterns if pattern.name}
+    assert names == set(navigation.CAREER_NAMES)
+    assert not set(navigation.BY_KEY["documents"].match) & names, "not lit under Documents"
+
+
+def test_the_account_rows_have_icons_from_the_bundled_set():
+    from pathlib import Path
+
+    icons = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "icons"
+    assert (icons / "briefcase-business.svg").is_file()
+
+
+@pytest.mark.parametrize(
+    ("address", "row", "other"),
+    [
+        ("resume:overview", "resume:overview", "accounts:profile"),
+        ("resume:preview", "resume:overview", "accounts:profile"),
+        ("accounts:profile", "accounts:profile", "resume:overview"),
+    ],
+)
+def test_the_row_of_the_page_being_looked_at_says_so(client, user, address, row, other):
+    client.force_login(user)
+    html = client.get(reverse(address)).content.decode()
+    header = html[html.index("<header") : html.index("</header>")]
+
+    def tag_of(name):
+        href = f'href="{reverse(name)}"'
+        start = header.rindex("<a", 0, header.index(href + ' class="menu-item"'))
+        return header[start : header.index(">", start)]
+
+    assert 'aria-current="page"' in tag_of(row)
+    assert 'aria-current="page"' not in tag_of(other)
+    trigger = header[header.index("Account menu") - 400 : header.index("Account menu")]
+    assert "nav-link-active" in trigger, "the avatar is the current item"
+    nav = html[html.index("<header") :]
+    documents = re.search(rf'<a[^>]*href="{reverse("documents:cv_list")}"[^>]*>', nav)
+    assert documents and "nav-link-active" not in documents.group(0), "Documents does not light"

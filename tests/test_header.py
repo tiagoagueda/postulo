@@ -27,6 +27,10 @@ def test_the_right_side_holds_the_plus_menu_and_the_account_menu(client, user):
     assert "Account menu, applicant" in header
     assert "Your details" in header
     assert "Settings" in header
+    # Your career follows Your details and comes before Settings (#676).
+    details = header.index("Your details")
+    career = header.index(reverse("resume:overview"), details)
+    assert details < career < header.index(reverse("settings:index"), details)
     assert "Sign out" in header
     assert "data-theme-switch" in header
 

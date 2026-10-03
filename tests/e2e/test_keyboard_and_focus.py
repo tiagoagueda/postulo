@@ -104,6 +104,24 @@ def test_focus_stays_on_the_theme_switch(page: Page, live_server, applicant):
     expect(button).to_be_visible()
 
 
+def test_your_career_follows_your_details_in_the_account_menu(page: Page, live_server, applicant):
+    """Opened by keyboard, Tab walks the rows in the order they are written (#676)."""
+    sign_in(page, live_server.url)
+
+    trigger = page.get_by_label("Account menu", exact=False)
+    trigger.focus()
+    page.keyboard.press("Enter")
+    banner = page.get_by_role("banner")
+    details = banner.get_by_role("link", name="Your details")
+    career = banner.get_by_role("link", name="Your career")
+    expect(details).to_be_visible()
+    details.focus()
+    page.keyboard.press("Tab")
+    expect(career).to_be_focused()
+    page.keyboard.press("Enter")
+    page.wait_for_url(f"{live_server.url}/career/")
+
+
 def test_a_field_shows_its_focus_in_forced_colours(page: Page, live_server, applicant):
     """`focus:outline-none` compiled to `outline-style: none` and beat the base rule, so the
     only cue left was a border colour and a ring — and a high-contrast theme throws both

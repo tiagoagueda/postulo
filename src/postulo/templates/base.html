@@ -177,7 +177,7 @@
               </c-dropdown-menu>
               {# The account menu: a popover the browser opens and closes itself. #}
               {% comment %} The same component as the + menu beside it (#310), of the other
-                 kind: no `role="menu"`, because this is navigation -- the person, three
+                 kind: no `role="menu"`, because this is navigation -- the person, four
                  links, a switch and sign-out -- and the pattern for that is a disclosure,
                  where Tab moves between the rows. The people table's row actions are a
                  menu of actions and are drawn as one (#262).
@@ -190,7 +190,7 @@
                  and the avatar itself stays the size every other place in the interface
                  draws it. {% endcomment %}
               <c-dropdown-menu kind="navigation" trigger_variant="" trigger_size=""
-                               trigger_class="{% nav_active 'accounts:profile' %} flex cursor-pointer items-center gap-2 rounded-full p-2"
+                               trigger_class="{% account_menu_active %} flex cursor-pointer items-center gap-2 rounded-full p-2"
                                label="{% blocktranslate trimmed with name=user.display_name %}Account menu, {{ name }}{% endblocktranslate %}">
                 <c-slot name="trigger">
                   {% avatar user %}
@@ -213,8 +213,13 @@
                     <div class="break-words text-xs text-ink-500 dark:text-ink-400">{{ user.email }}</div>
                   </div>
                 </div>
-                <a href="{% url 'accounts:profile' %}" class="menu-item">
+                <a href="{% url 'accounts:profile' %}" class="menu-item"{% account_row_current "details" %}>
                   {% icon "user" %}{% translate "Your details" %}
+                </a>
+                {% comment %} The other half of what Postulo knows about the person as a
+                   candidate, beside the first rather than under Documents (#676). {% endcomment %}
+                <a href="{% url 'resume:overview' %}" class="menu-item"{% account_row_current "career" %}>
+                  {% icon "briefcase-business" %}{% translate "Your career" %}
                 </a>
                 <a href="{% url 'settings:index' %}" class="menu-item">
                   {% icon "settings" %}{% translate "Settings" %}

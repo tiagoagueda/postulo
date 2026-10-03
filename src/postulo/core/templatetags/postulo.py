@@ -536,6 +536,25 @@ def nav_active_names(context, url_names, css_class: str = "nav-link-active") -> 
     return nav_active(context, *url_names, css_class=css_class)
 
 
+@register.simple_tag(takes_context=True)
+def account_menu_active(context) -> str:
+    """The account menu's trigger is current on the pages of either of its rows (#676)."""
+    from postulo.core import navigation
+
+    return nav_active(context, *navigation.ACCOUNT_NAMES)
+
+
+@register.simple_tag(takes_context=True)
+def account_row_current(context, row: str) -> str:
+    """`aria-current="page"` on the account menu row whose pages these are (#676)."""
+    from postulo.core import navigation
+
+    names = navigation.ACCOUNT_ROWS[row]
+    if nav_active(context, *names, css_class="current") == "current":
+        return mark_safe(' aria-current="page"')
+    return ""
+
+
 @register.filter
 def highlight(text, query: str) -> str:
     """Wrap every occurrence of ``query`` in ``text`` in a <mark>, escaping everything else.

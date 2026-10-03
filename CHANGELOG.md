@@ -108,6 +108,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Your career is in the account menu after Your details, and the menu marks the row of the page you are on. (#676)
 - The Server settings and Settings sidebars stay in view while a long page scrolls. (#699)
 - An administrator adds an instance's own kinds of identifier, in JSON, from *Server settings → Plugins*: a key, a name per language, a pattern that is not a regular expression, a link. Offered beside Postulo's. Removing one deletes no identifier and changing its pattern refuses none: it is kept as it was, marked. (#311)
 - A CV chooses which of your details it prints: which number, email address, link of each kind and identifiers, the location or not, and your form of address and pronouns if you say so. Nothing changes until you choose; a chosen detail you delete prints none. The API gains `PATCH /cvs/{id}`; export format 27. (#308)

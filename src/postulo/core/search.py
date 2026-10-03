@@ -539,7 +539,7 @@ GROUPS: tuple[tuple[str, str, Callable, str | Callable[[], str], bool], ...] = (
     ("letters", _("Letters"), search_letters, "documents:letter_list", False),
     ("cvs", _("CVs"), search_cvs, "documents:cv_list", False),
     ("uploads", _("Files"), search_uploads, "documents:upload_list", False),
-    ("career", _("Career record"), search_career, "resume:overview", False),
+    ("career", _("Your career"), search_career, "resume:overview", False),
 )
 
 

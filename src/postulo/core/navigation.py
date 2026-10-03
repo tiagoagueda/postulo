@@ -90,7 +90,6 @@ ITEMS: tuple[NavItem, ...] = (
             "documents:letter_list",
             "documents:letter_detail",
             "documents:upload_list",
-            "resume:overview",
         ),
         icon="file-text",
     ),
@@ -118,6 +117,36 @@ ITEMS: tuple[NavItem, ...] = (
 )
 
 BY_KEY = {item.key: item for item in ITEMS}
+
+#: The pages of the career record, every one a page of the account menu's *Your career*
+#: row rather than of Documents (#676). `tests/test_navigation.py` walks `resume/urls.py`,
+#: so a page added there without its name here fails.
+CAREER_NAMES: tuple[str, ...] = (
+    "resume:overview",
+    "resume:preview",
+    "resume:europass_import",
+    "resume:candidate_file",
+    "resume:candidate_download",
+    "resume:skill_suggestions",
+    "resume:link_check_all",
+    "resume:link_check",
+    "resume:item_create",
+    "resume:item_update",
+    "resume:item_delete",
+    "resume:item_languages",
+    "resume:item_move",
+)
+
+#: The account menu's two rows about the person, and the pages each one is the way to.
+#: Your details and Your career are the two halves of what Postulo knows about the
+#: person as a candidate, so they sit together there (#676).
+ACCOUNT_ROWS: dict[str, tuple[str, ...]] = {
+    "details": ("accounts:profile",),
+    "career": CAREER_NAMES,
+}
+
+#: Every page on which the account menu's trigger is the current item.
+ACCOUNT_NAMES: tuple[str, ...] = tuple(name for names in ACCOUNT_ROWS.values() for name in names)
 
 #: Keys a person may hide. All of them: everything has another way in.
 HIDEABLE = tuple(item.key for item in ITEMS)
