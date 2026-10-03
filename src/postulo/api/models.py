@@ -31,7 +31,7 @@ from postulo.core.models import OwnedModel
 #: everything the scope reaches: `write` gained the person's own name and details with
 #: `PATCH /profile` (#309), and says so.
 SCOPES = {
-    "captures": _("Capture postings"),
+    "captures": _("Capture postings, and ask whether a posting is already held"),
     "listings:bind": _(
         "Add to a listing's history, and see the list of listings to choose one: for a mail "
         "client that files messages"

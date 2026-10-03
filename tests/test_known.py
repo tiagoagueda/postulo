@@ -248,6 +248,17 @@ def test_the_api_answers_per_posting_and_stores_nothing(client, user):
     assert Capture.objects.for_user(user).count() == 1, "asking makes nothing"
 
 
+def test_the_api_tells_nothing_about_where_the_person_stands(client, user):
+    """A `captures` token learns a posting is held, not its company, address or state (#536)."""
+    a_listing(user, "https://example.org/jobs/42")
+
+    first = ask(client, bearer_for(user), [{"url": "https://example.org/jobs/42"}]).json()[0]
+
+    held = first["listings"][0]
+    assert set(held) == {"id", "title", "created_at", "listing_url"}
+    assert not {"state", "company_name", "url"} & set(held)
+
+
 def test_the_api_needs_the_captures_scope_and_takes_a_hundred_at_most(client, user):
     assert (
         ask(client, bearer_for(user, "read"), [{"url": "https://example.org/jobs/1"}]).status_code

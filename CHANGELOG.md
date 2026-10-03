@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The capture API's "known" answer no longer carries a held listing's company, address or state, and the scope's label says it can ask. (#536)
 - Restoring a backup refuses member names that a Windows path would read as leaving the media or plugins directory. (#478)
 - An imported interview with an unsafe calendar identifier or an unknown outcome can no longer add a line to a feed or break its file. (#450)
 - Server settings → People → Plugins answers the same to a stranger whether or not the account exists. (#373)

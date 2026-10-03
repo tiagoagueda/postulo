@@ -294,11 +294,15 @@ class KnownIn(Schema):
 
 
 class KnownListingOut(Schema):
+    """What a client needs to say "captured before": no company, address or state (#536).
+
+    The `captures` scope answers whether a posting the caller names is already held, with
+    its title and date and a link; where the person stands with it is not for a token that
+    can fill a review queue and nothing else.
+    """
+
     id: int
     title: str
-    company_name: str
-    url: str
-    state: str
     created_at: dt.datetime
     listing_url: str
 
@@ -780,9 +784,6 @@ def known_captures(request, payload: KnownIn):
         return {
             "id": posting.pk,
             "title": posting.title,
-            "company_name": posting.company.name,
-            "url": posting.url,
-            "state": posting.state,
             "created_at": posting.created_at,
             "listing_url": request.build_absolute_uri(posting.get_absolute_url()),
         }
