@@ -67,7 +67,7 @@ def list_applications(
         .with_display_data()
         # How each ended is read from its timeline, loaded once for the page (#239).
         .with_status_log()
-        .order_by("-created_at")
+        .order_by("-created_at", "-pk")
     )
     if quiet:
         applications = applications.quiet(threshold_for(request.auth.owner))

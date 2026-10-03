@@ -28,7 +28,7 @@ def list_reminders(
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    reminders = owned(request, Reminder.objects).order_by("due_at")
+    reminders = owned(request, Reminder.objects).order_by("due_at", "pk")
     if due:
         reminders = reminders.due()
     elif outstanding:

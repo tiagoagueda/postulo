@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Paginated API lists (applications, companies, CVs, letters, interviews, reminders) break ties by id, so paging can no longer repeat one row and skip another. (#440)
 - `GET /api/v1/captures` takes `after_id`, so a client can catch up past a run of captures sharing one `updated_at`. (#439)
 - The API refuses blank names for companies, listings, applications, contacts, reminders and letters, and renaming a company onto another's name is a 422, not a 500 or a duplicate. (#438)
 - Each letter's language is pinned in the API by a test, and the schemas no longer default it to an empty string. (#437)

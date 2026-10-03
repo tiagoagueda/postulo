@@ -52,11 +52,11 @@ def list_interviews(
     if state == "upcoming":
         interviews = interviews.upcoming()
     elif state == "scheduled":
-        interviews = interviews.scheduled().order_by("starts_at")
+        interviews = interviews.scheduled().order_by("starts_at", "pk")
     elif state == "past":
-        interviews = interviews.exclude(pk__in=interviews.upcoming()).order_by("-starts_at")
+        interviews = interviews.exclude(pk__in=interviews.upcoming()).order_by("-starts_at", "-pk")
     elif state == "all":
-        interviews = interviews.order_by("starts_at")
+        interviews = interviews.order_by("starts_at", "pk")
     else:
         raise HttpError(
             422,

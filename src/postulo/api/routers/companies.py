@@ -40,7 +40,7 @@ def list_companies(
     companies = (
         owned(request, Company.objects)
         .prefetch_related("industries", "identifiers")
-        .order_by("name")
+        .order_by("name", "pk")
     )
     if q:
         companies = companies.filter(

@@ -128,7 +128,7 @@ def list_cvs(
     updated_since: dt.datetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    return changed_since(owned(request, CV.objects).order_by("name"), updated_since, after_id)
+    return changed_since(owned(request, CV.objects).order_by("name", "pk"), updated_since, after_id)
 
 
 @router.get("/cvs/{int:pk}", response=CVDetailOut, summary="One CV, with what it includes")
@@ -212,7 +212,7 @@ def list_letters(
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
     return changed_since(
-        owned(request, CoverLetter.objects).order_by("name"), updated_since, after_id
+        owned(request, CoverLetter.objects).order_by("name", "pk"), updated_since, after_id
     )
 
 

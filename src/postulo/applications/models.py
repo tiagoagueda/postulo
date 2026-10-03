@@ -700,7 +700,9 @@ class InterviewQuerySet(models.QuerySet):
 
     def upcoming(self, at=None) -> InterviewQuerySet:
         """Scheduled interviews that have not finished yet, soonest first."""
-        return self.scheduled().filter(ends_at__gte=at or timezone.now()).order_by("starts_at")
+        return (
+            self.scheduled().filter(ends_at__gte=at or timezone.now()).order_by("starts_at", "pk")
+        )
 
     def awaiting_outcome(self, at=None) -> InterviewQuerySet:
         """Scheduled interviews whose time has passed: the person should say how it went."""

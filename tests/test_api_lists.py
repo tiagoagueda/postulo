@@ -14,6 +14,7 @@ from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 from postulo.api.models import ApiToken
+from postulo.api.paging import Page
 from postulo.applications.models import Application, Reminder, Status
 from postulo.documents.models import CV, CoverLetter
 from postulo.jobs.models import Capture, CaptureStatus, Company, JobPosting
@@ -353,3 +354,40 @@ def test_without_the_id_the_cursor_answers_as_it_always_did(client, user, applic
     body = client.get(f"/api/v1/applications?updated_since={cursor(start)}&limit=100", **bearer)
 
     assert body.json()["count"] == 12
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/api/v1/applications",
+        "/api/v1/companies",
+        "/api/v1/cvs",
+        "/api/v1/letters",
+        "/api/v1/interviews",
+        "/api/v1/interviews?state=scheduled",
+        "/api/v1/interviews?state=past",
+        "/api/v1/interviews?state=all",
+        "/api/v1/reminders",
+    ],
+)
+def test_a_list_cut_into_pages_is_ordered_to_the_last_tie(client, user, monkeypatch, path):
+    """`LIMIT`/`OFFSET` over rows that tie can repeat one and skip another (#440).
+
+    PostgreSQL may order tied rows differently for different limits, SQLite happens not to,
+    so the tie cannot be provoked here; what is checked is that the ordering the page is cut
+    from ends in the primary key, which settles it everywhere.
+    """
+    seen = []
+    cut = Page.paginate_queryset
+
+    def record(self, queryset, *args, **kwargs):
+        seen.append(list(queryset.query.order_by))
+        return cut(self, queryset, *args, **kwargs)
+
+    monkeypatch.setattr(Page, "paginate_queryset", record)
+
+    response = client.get(path, **issue(user, "read"))
+
+    assert response.status_code == 200
+    assert seen, f"{path} was not cut into pages by Page"
+    assert seen[0][-1] in ("pk", "-pk"), f"{path} is ordered by {seen[0]}, which can tie"
