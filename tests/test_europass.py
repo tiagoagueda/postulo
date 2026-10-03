@@ -817,3 +817,71 @@ def test_the_old_formats_store_a_country_as_iso(make, written, stored):
     record = europass.read(make(written))
 
     assert record.person["address"]["country"] == stored
+
+
+# ------------------------------------------------- input that is half right (#634)
+
+
+def _json_with(learner: str) -> bytes:
+    return ('{"LearnerInfo": ' + learner + "}").encode()
+
+
+def test_an_address_without_a_country_still_reads():
+    record = europass.read(
+        _json_with(
+            '{"Identification": {"ContactInfo": {"Address": '
+            '{"Contact": {"Municipality": "Lisboa"}}}}}'
+        )
+    )
+
+    assert record.person["address"]["municipality"] == "Lisboa"
+    assert "country" not in record.person["address"] or not record.person["address"]["country"]
+
+
+def test_a_number_over_the_integer_limit_is_refused_with_a_sentence():
+    data = _json_with('{"WorkExperience": [{"Period": {"From": {"Year": ' + "9" * 5000 + "}}}]}")
+
+    with pytest.raises(europass.EuropassError, match="not readable JSON"):
+        europass.read(data)
+
+
+@pytest.mark.parametrize("year", ["Infinity", "1e400", "99999999999"])
+def test_a_year_no_date_can_hold_is_left_without_a_date(year):
+    data = _json_with(
+        '{"WorkExperience": [{"Position": {"Label": "Engineer"}, '
+        '"Period": {"From": {"Year": ' + year + "}}}]}"
+    )
+
+    record = europass.read(data)
+
+    assert record.experience == [] or record.experience[0]["start_date"] is None
+
+
+def test_a_year_no_date_can_hold_in_xml_is_left_without_a_date():
+    data = MINIMAL.replace(b'year="2020"', b'year="99999999999"')
+
+    record = europass.read(data)
+
+    assert record.experience == [] or record.experience[0]["start_date"] is None
+
+
+@pytest.mark.parametrize("fmt", ["json", "xml"])
+def test_a_website_urlsplit_rejects_does_not_stop_the_read(fmt):
+    site = "http://orcid.org[/0000"
+    if fmt == "json":
+        data = _json_with(
+            '{"Identification": {"PersonName": {"Surname": "Morgan"}, "ContactInfo": '
+            '{"Website": [{"Contact": "' + site + '"}]}}}'
+        )
+    else:
+        data = (
+            b'<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass"><LearnerInfo>'
+            b"<Identification><PersonName><Surname>Morgan</Surname></PersonName><ContactInfo>"
+            b"<Website><Contact>" + site.encode() + b"</Contact></Website>"
+            b"</ContactInfo></Identification></LearnerInfo></SkillsPassport>"
+        )
+
+    record = europass.read(data)
+
+    assert record.person["last_name"] == "Morgan"
+    assert not record.person.get("orcid")

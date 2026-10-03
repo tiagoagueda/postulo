@@ -134,7 +134,7 @@ def _country_code(address) -> str:
 
 
 def _json_country_code(address) -> str:
-    country = _obj(address.get("Country")) if isinstance(address, dict) else {}
+    country = (_obj(address.get("Country")) if isinstance(address, dict) else None) or {}
     return _country(str(country.get("Code") or ""))
 
 
@@ -583,7 +583,7 @@ def read_json(data: bytes) -> Record:
         document = json.loads(data.decode("utf-8-sig"))
     except UnicodeDecodeError as error:
         raise EuropassError(_("That file is not UTF-8, so it is not a Europass export.")) from error
-    except (json.JSONDecodeError, RecursionError) as error:
+    except (ValueError, RecursionError) as error:  # ValueError: bad JSON, or a number too long
         raise EuropassError(
             _("That file is not readable JSON: %(reason)s") % {"reason": error}
         ) from error

@@ -86,11 +86,11 @@ def _make_date(year, month, day) -> dt.date | None:
         year = int(year)
         month = max(1, min(12, int(month or 1)))
         day = max(1, int(day or 1))
-    except (TypeError, ValueError):
+    except (TypeError, ValueError, OverflowError):
         return None
     try:
         return dt.date(year, month, min(day, calendar.monthrange(year, month)[1]))
-    except (ValueError, TypeError):
+    except (ValueError, TypeError, OverflowError):
         return None
 
 
@@ -107,7 +107,8 @@ def _orcid_from(addresses: list[str]) -> str:
             continue
         try:
             return identifiers.clean(identifiers.ORCID, address)
-        except ValidationError:
+        except (ValidationError, ValueError):
+            # urlsplit refuses an unbalanced bracket in the host with a ValueError.
             continue
     return ""
 

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Importing a Europass file with an address without a country, an over-long number, an impossible year or a malformed website now reads what it can or is refused with a sentence, instead of ending in a server error. (#634)
 - Importing an old Europass XML or JSON file now reads the country codes UK and EL as GB and GR, and no longer cuts a three-letter code such as PRT down to another country (#639)
 - Europass import no longer silently cuts content: an untitled entry keeps its whole description, a heading's skills are no longer capped at forty, and a JSON Skills block of the wrong shape is reported as unreadable (#640)
 - Europass import: skill group headings (Digital, Job-related, ...) are now written in the language the file states for the CV, not the interface language of whoever imports it (#641)
