@@ -249,6 +249,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- Upgrading or rolling back a plugin now says that a restart is needed, instead of claiming the new code is already in use everywhere. (#599)
 - Upgrading a plugin that was installed with copies of Postulo's own packages no longer lets it move them: they stay pinned to Postulo's versions, and refusals say "Postulo has". (#598)
 - Removing a plugin no longer deletes a package another plugin still needs, and an upgrade or reinstall keeps the plugin's dependency list, because each plugin now records its whole dependency tree. (#597)
 - `plugins rollback` no longer switches back on a plugin that was switched off after the install it undoes, and says when a plugin's disabled state changes. (#600)

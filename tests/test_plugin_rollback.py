@@ -282,6 +282,20 @@ def test_the_command_names_a_plugin_whose_disabled_state_changed(plugins_dir, ca
     assert "postulo-example is now disabled." in capsys.readouterr().out
 
 
+def test_the_command_says_when_an_upgrade_or_a_rollback_needs_a_restart(
+    tmp_path, plugins_dir, installer, capsys
+):
+    call_command("plugins", "install", str(a_wheel(tmp_path, version="1.0")))
+    first = capsys.readouterr().out
+    assert "in use everywhere already" in first and "restart Postulo" not in first
+
+    call_command("plugins", "install", str(a_wheel(tmp_path, version="2.0")))
+    assert "restart Postulo" in capsys.readouterr().out
+
+    call_command("plugins", "rollback")
+    assert "restart Postulo" in capsys.readouterr().out
+
+
 # --------------------------------------------------- what a removal takes with it
 
 

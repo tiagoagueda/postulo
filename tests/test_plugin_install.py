@@ -782,6 +782,30 @@ def test_uploading_shows_the_package_before_installing_it(
     assert not (plugins_dir / ".pending").exists(), "the scratch copy goes"
 
 
+def test_the_confirmation_of_an_upgrade_says_a_restart_is_needed(
+    client, admin, plugins_dir, installer, tmp_path
+):
+    """Every process keeps the modules it imported, so an upgrade is not live until each is
+    restarted; a first install is, and says so (#599)."""
+    client.force_login(admin)
+
+    def upload_and_confirm(version: str) -> str:
+        with a_wheel(tmp_path, version=version).open("rb") as handle:
+            client.post(reverse("server:plugin_action"), {"action": "upload", "package": handle})
+        token = client.session["plugin_pending"]["token"]
+        response = client.post(
+            reverse("server:plugin_action"), {"action": "confirm", "token": token}, follow=True
+        )
+        return response.content.decode()
+
+    first = upload_and_confirm("1.0")
+    assert "A restart would add nothing" in first
+
+    second = upload_and_confirm("1.1")
+    assert "is installed, but this instance is still running the version" in second
+    assert "A restart would add nothing" not in second
+
+
 def test_an_upload_that_is_refused_never_waits_for_confirmation(
     client, admin, plugins_dir, tmp_path
 ):

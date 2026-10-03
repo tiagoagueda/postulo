@@ -1444,6 +1444,16 @@ class PluginRepositoryView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
 
+def _upgrade_notice(entry) -> str:
+    return str(
+        _(
+            "%(name)s %(version)s is installed, but this instance is still running the version "
+            "it replaced until it is restarted: every process keeps the code it has already loaded."
+        )
+        % {"name": entry.name, "version": entry.version}
+    )
+
+
 class PluginActionView(StaffRequiredMixin, View):
     """Upload, confirm, install from a catalogue, switch off, remove.
 
@@ -1524,7 +1534,7 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _confirm(self, request: HttpRequest) -> HttpResponse:
-        from postulo.plugins.installing import InstallError, install_wheel
+        from postulo.plugins.installing import InstallError, install_wheel, installed
 
         pending = request.session.get("plugin_pending") or {}
         token = request.POST.get("token", "")
@@ -1536,6 +1546,7 @@ class PluginActionView(StaffRequiredMixin, View):
             request.session.pop("plugin_pending", None)
             messages.error(request, _("That package is no longer waiting; upload it again."))
             return redirect("server:plugins")
+        replaces = installed(pending.get("name", "")) is not None
         try:
             entry = install_wheel(
                 wheel,
@@ -1549,6 +1560,11 @@ class PluginActionView(StaffRequiredMixin, View):
         finally:
             request.session.pop("plugin_pending", None)
             _drop_pending(token)
+        if replaces:
+            # Every process keeps the modules it already imported, so an upgrade is not
+            # running until each one has been restarted (#599).
+            messages.success(request, _upgrade_notice(entry))
+            return redirect("server:plugins")
         messages.success(
             request,
             _(
@@ -1594,13 +1610,17 @@ class PluginActionView(StaffRequiredMixin, View):
 
     def _install(self, request: HttpRequest) -> HttpResponse:
         from postulo.plugins import catalogue
-        from postulo.plugins.installing import InstallError
+        from postulo.plugins.installing import InstallError, installed
 
         name = request.POST.get("name", "")
+        replaces = installed(name) is not None
         try:
             entry = catalogue.install(name, by=request.user.get_username())
         except (catalogue.CatalogueError, InstallError) as error:
             messages.error(request, str(error))
+            return redirect("server:plugins")
+        if replaces:
+            messages.success(request, _upgrade_notice(entry))
             return redirect("server:plugins")
         messages.success(
             request,

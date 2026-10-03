@@ -15,6 +15,13 @@ from django.core.management.base import BaseCommand, CommandError
 
 from postulo.plugins import catalogue, installing, provenance
 
+#: What an upgrade or a rollback leaves true: modules already imported are not imported again
+#: (#599).
+RESTART_NEEDED = (
+    "Every running process keeps the code it has already loaded, so restart Postulo "
+    "(the web workers and the scheduler) for this to take effect."
+)
+
 
 class Command(BaseCommand):
     help = (
@@ -77,18 +84,24 @@ class Command(BaseCommand):
     def _install(self, options) -> None:
         what = options["what"]
         path = Path(what)
+        replaces = False
         try:
             if path.suffix == ".whl":
                 if not path.is_file():
                     raise CommandError(f"No such file: {path}")
+                replaces = installing.installed(installing.read_wheel(path).name) is not None
                 entry = installing.install_wheel(path, by=options["by"])
             else:
+                replaces = installing.installed(what) is not None
                 entry = catalogue.install(what, by=options["by"])
         except (installing.InstallError, catalogue.CatalogueError) as error:
             raise CommandError(str(error)) from error
         self.stdout.write(f"Installed {entry.name} {entry.version} from {entry.origin}.")
         for point in entry.entry_points:
             self.stdout.write(f"    {point}")
+        if replaces:
+            self.stdout.write(RESTART_NEEDED)
+            return
         self.stdout.write(
             "It is in use everywhere already; a plugin with pages or tables of its own "
             "has to be built into the image, and no restart changes that."
@@ -150,6 +163,7 @@ class Command(BaseCommand):
                 self.stdout.write(f"Put {name} {now} back.")
             else:
                 self.stdout.write(f"{name}: {was} to {now}.")
+        self.stdout.write(RESTART_NEEDED)
         self.stdout.write("There is nothing further to go back to.")
 
     # ------------------------------------------------------------------ sync
