@@ -545,8 +545,8 @@ class InterviewForm(OwnerScopedModelForm):
                 "lands at the right moment wherever it is opened."
             ),
             "contacts": _(
-                "Who you are meeting. Only the people you have recorded at this company are "
-                "offered."
+                "Who you are meeting. The people you have recorded at this company are "
+                "offered, and anybody already on this interview who has since moved on."
             ),
             "notes": _("Yours, to prepare with. Nothing here is sent to anybody."),
             "ends_at": _("Left blank, it lasts an hour."),
@@ -577,8 +577,23 @@ class InterviewForm(OwnerScopedModelForm):
     def scope_querysets(self) -> None:
         contacts = Contact.objects.for_user(self.user)
         if self.application is not None:
-            # The people worth offering are the ones at this company.
-            contacts = contacts.filter(company=self.application.posting.company_id)
+            # The people worth offering are the ones at this company -- and anybody already
+            # on this interview, wherever they are now. Somebody who has moved on, or been
+            # merged into a record of themselves elsewhere, would otherwise have no
+            # checkbox, and saving the form for any other reason would drop them (#443).
+            company_id = self.application.posting.company_id
+            contacts = contacts.select_related("company")
+            if self.instance.pk:
+                contacts = contacts.filter(
+                    Q(company=company_id) | Q(pk__in=self.instance.contacts.values("pk"))
+                )
+            else:
+                contacts = contacts.filter(company=company_id)
+            # Beside somebody who is not here any more, where they are, so that unticking
+            # them is a choice.
+            self.fields["contacts"].label_from_instance = lambda contact: (
+                contact.name if contact.company_id == company_id else who_and_where(contact)
+            )
         self.fields["contacts"].queryset = contacts
 
     def clean(self):

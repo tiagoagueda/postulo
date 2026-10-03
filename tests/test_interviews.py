@@ -888,3 +888,35 @@ def test_the_calendar_files_are_worded_in_the_owners_language(client, user, appl
         HTTP_ACCEPT_LANGUAGE="de",
     )
     assert " chez " in summary(response.content.decode())
+
+
+def test_editing_an_interview_keeps_a_contact_who_has_since_moved_company(
+    client, user, application, recruiter
+):
+    """The interview form offered only people at the company, so saving it dropped them (#443)."""
+    interview = schedule_interview(
+        application, kind=InterviewKind.VIDEO, starts_at=in_days(4), contacts=[recruiter]
+    )
+    recruiter.company = Company.objects.create(owner=user, name="Black Mesa")
+    recruiter.save()
+    client.force_login(user)
+    url = reverse("applications:interview_update", args=[interview.pk])
+
+    page = client.get(url).content.decode()
+    assert "Cave Johnson · Black Mesa" in page, "said where they are now"
+
+    response = client.post(
+        url,
+        {
+            "kind": InterviewKind.VIDEO,
+            "starts_at": timezone.localtime(interview.starts_at).strftime("%Y-%m-%dT%H:%M"),
+            "ends_at": "",
+            "location": "New room",
+            "notes": "",
+            "contacts": [recruiter.pk],
+        },
+    )
+    assert response.status_code == 302
+    interview.refresh_from_db()
+    assert interview.location == "New room"
+    assert list(interview.contacts.all()) == [recruiter]
