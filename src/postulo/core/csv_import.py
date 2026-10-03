@@ -19,18 +19,21 @@ from __future__ import annotations
 import base64
 import csv
 import datetime as dt
+import functools
 import io
 import re
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 
+from django.conf import settings
 from django.db import transaction
 from django.utils import timezone
+from django.utils.dates import MONTHS, MONTHS_3, MONTHS_ALT
 from django.utils.formats import date_format
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from . import spreadsheets
+from . import languages, spreadsheets
 
 # One list of currencies, below the models, which the plugin surface hands out too (#248).
 # Read here and still handed out here, where the importer's tests have always found it.
@@ -587,12 +590,29 @@ _MONTHS = {
 }
 
 
+@functools.cache
+def _month_names() -> dict[str, int]:
+    """Every month name Django knows in every offered language, by its lower-cased spelling.
+
+    The hand-written table above wins where two languages spell different months alike;
+    Django's own abbreviations (and the genitive forms Polish and Russian use after a day)
+    fill in the rest, so a sheet in German or Polish reads as one in French does (#394).
+    """
+    names = dict(_MONTHS)
+    for code, _name in settings.LANGUAGES:
+        with languages.override(code):
+            for number in range(1, 13):
+                for table in (MONTHS, MONTHS_3, MONTHS_ALT):
+                    names.setdefault(str(table[number]).lower().rstrip("."), number)
+    return names
+
+
 def parse_date(text: str, *, day_first: bool = True) -> dt.date | None:
     """A date from the ways people type them; ``None`` when there is none.
 
     ISO first, because it is unambiguous. Then numeric forms with ``/``, ``-`` or ``.``,
     read day-first or month-first as chosen once for the whole file. Then a month name,
-    in the three languages.
+    in any of the offered languages.
     """
     text = (text or "").strip()
     if not text:
@@ -614,12 +634,16 @@ def parse_date(text: str, *, day_first: bool = True) -> dt.date | None:
             return dt.date(year, month, day)
         except ValueError:
             return None
-    words = re.findall(r"[A-Za-zÀ-ÿ]+|\d+", text.lower())
+    words = re.findall(r"[^\W\d_]+|\d+", text.lower())
     numbers = [int(word) for word in words if word.isdigit()]
-    month = next((_MONTHS[word.rstrip(".")] for word in words if word.rstrip(".") in _MONTHS), None)
+    names = _month_names()
+    month = next((names[word] for word in words if word in names), None)
     if month and len(numbers) >= 2:
         day = next((n for n in numbers if n <= 31), None)
         year = next((n for n in numbers if n > 31), None)
+        if year is None and len(numbers) == 2:
+            # "5-Jan-26": a day, a month name and one other number, which is the year.
+            day, year = numbers
         if day and year:
             try:
                 return dt.date(year if year > 99 else 2000 + year, month, day)
@@ -920,6 +944,8 @@ def parse_rows(
                     row.notes.append(f"{sheet.headers[index]}: {value}")
             elif key == "deadline":
                 row.deadline = parse_date(value, day_first=day_first)
+                if row.deadline is None:
+                    row.notes.append(f"{sheet.headers[index]}: {value}")
             elif key == "salary_min":
                 row.salary_min = parse_money(value)
                 row.salary_currency = parse_currency(value, row.salary_currency)
@@ -946,6 +972,11 @@ def parse_rows(
             row.problems.append(str(_("no company")))
         if not row.role:
             row.problems.append(str(_("no role")))
+        if row.becomes == "listing" and row.tags:
+            # A listing has no tags of its own, so they are kept where they can be read.
+            row.notes.append(
+                str(_("Tags in the spreadsheet: %(tags)s") % {"tags": ", ".join(row.tags)})
+            )
         if not row.status_known:
             row.notes.append(
                 str(_("Status in the spreadsheet: %(text)s") % {"text": row.status_text})
@@ -1066,6 +1097,7 @@ def perform(
             notes = "\n".join(row.notes)
 
             if row.becomes == "listing":
+                posting_data["closes_at"] = row.deadline
                 listing = create_listing(user, company=company, posting_data=posting_data)
                 if notes:
                     listing.description = (listing.description + "\n\n" + notes).strip()

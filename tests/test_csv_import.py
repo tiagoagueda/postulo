@@ -273,6 +273,44 @@ def test_with_no_status_the_date_decides(user):
     assert report.applications == 1 and report.listings == 1
 
 
+def test_a_listing_keeps_its_deadline_and_its_tags(user):
+    data = b"Company,Role,Status,Deadline,Tags\nAcme,Dev,Wishlist,2026-10-15,remote; dream\n"
+    sheet = csv_import.read_sheet(data, "wish.csv")
+    csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    listing = JobPosting.objects.for_user(user).get()
+    assert listing.closes_at == dt.date(2026, 10, 15)
+    assert "Tags in the spreadsheet: remote, dream" in listing.description
+
+
+def test_a_deadline_that_cannot_be_read_is_kept_in_the_note(user):
+    data = (
+        b"Company,Role,Status,Deadline\n"
+        b"Acme,Dev,Wishlist,end of October\n"
+        b"Initech,Analyst,Applied,end of October\n"
+    )
+    sheet = csv_import.read_sheet(data, "wish.csv")
+    csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    listing = JobPosting.objects.for_user(user).get(company__name="Acme")
+    assert listing.closes_at is None
+    assert "Deadline: end of October" in listing.description
+    application = Application.objects.for_user(user).get()
+    note = application.events.get(summary__startswith="Imported from")
+    assert "Deadline: end of October" in note.body
+
+
+def test_month_names_are_read_in_the_offered_languages():
+    for text, expected in (
+        ("15. Oktober 2026", dt.date(2026, 10, 15)),
+        ("5 de enero de 2026", dt.date(2026, 1, 5)),
+        ("5 gennaio 2026", dt.date(2026, 1, 5)),
+        ("5 stycznia 2026", dt.date(2026, 1, 5)),
+        ("2026. január 5.", dt.date(2026, 1, 5)),
+        ("5-Jan-26", dt.date(2026, 1, 5)),
+    ):
+        assert csv_import.parse_date(text) == expected, text
+    assert csv_import.parse_date("end of October") is None
+
+
 def test_french_headers_dates_and_statuses_import_as_they_mean(user):
     sheet = csv_import.read_sheet(FRENCH, "candidatures.csv")
     report = csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))

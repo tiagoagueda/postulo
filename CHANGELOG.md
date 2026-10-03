@@ -245,6 +245,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)
 - The translation check now formats every translated form the way the runtime does, so a stray "%" or a dropped positional placeholder no longer gets through and breaks pages in that language. (#497)
 - A refused `seed_demo` run no longer marks the account's address verified and primary, and vouching for an address (also in `createsuperuser`) now leaves the account exactly one primary address. (#496)
+- Spreadsheet import: a listing keeps its deadline and its tags (in its description), an unreadable deadline is kept in the note, and month names are read in every offered language ("15. Oktober 2026", "5-Jan-26"). (#394)
 - Spreadsheet import: a salary written "45,000 - 55k" is 45,000 to 55,000 rather than 55,000 to 45 million, and an amount written with "R$" is read as Brazilian reais rather than US dollars. (#471)
 - Spreadsheet import: a sheet with no Status column, or a blank Status cell, no longer turns every undated row into an applied application; the date decides, so a list of jobs to look at imports as listings. (#468)
 - Spreadsheet import reads a status or channel by whole words, not substrings, and an outcome wins: "Rejected after interview" and "Offer declined" import as Rejected, "Nothing yet" is kept in a note, "Referral via LinkedIn" is a referral. (#467)
