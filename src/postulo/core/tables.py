@@ -28,6 +28,7 @@ whole of the risk and where the tests are.
 from __future__ import annotations
 
 import datetime as dt
+import re
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from functools import cached_property
@@ -1099,13 +1100,20 @@ def _date(text: str) -> dt.date | None:
         return None
 
 
+_NUMBER = re.compile(r"[+-]?\d{1,12}(\.\d{1,6})?")
+
+
 def _number(text: str) -> Decimal | None:
     """A bound for a number filter, or nothing: what is not a number narrows nothing."""
-    try:
-        value = Decimal(text.strip())
-    except (InvalidOperation, ValueError):
+    text = text.strip()
+    # No exponent and a bounded length: Django turns the bound into an int, and for
+    # "1e1000000" that conversion alone holds a worker for half a minute (#499).
+    if not _NUMBER.fullmatch(text):
         return None
-    return value if value.is_finite() else None
+    try:
+        return Decimal(text)
+    except InvalidOperation:
+        return None
 
 
 # ------------------------------------------------------------------- registry

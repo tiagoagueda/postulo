@@ -1,6 +1,7 @@
 """Tables: sort by column, narrow from the headers, choose and order the columns."""
 
 import datetime as dt
+import time
 
 import pytest
 from django.urls import reverse
@@ -678,6 +679,18 @@ def test_the_counts_narrow_by_a_least_and_a_most(client, user, search):
     assert sorted(names(client.get(url, {"contacts_min": "lots"}))) == sorted(
         names(client.get(url))
     ), "not a number, so it narrows nothing"
+
+
+def test_a_huge_exponent_in_a_number_filter_narrows_nothing_and_answers_fast(client, user, search):
+    """`1e1000000` once held a worker for half a minute while Django made an int of it (#499)."""
+    client.force_login(user)
+    url = reverse("jobs:company_list")
+
+    started = time.monotonic()
+    response = client.get(url, {"postings_min": "1e1000000"})
+    assert time.monotonic() - started < 1
+    assert sorted(names(response)) == sorted(names(client.get(url)))
+    assert names(client.get(url, {"applications_min": "2"})) == ["Aperture Science"]
 
 
 def test_the_dates_narrow_by_the_day_they_fall_on(client, user, search):
