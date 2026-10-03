@@ -87,6 +87,39 @@ services:
       postulo:
         condition: service_healthy
 
+  # Does the slow work: fetching a posting's page, finding a logo, rendering a PDF,
+  # building an export archive, telling your notifiers something arrived. Start it only
+  # together with POSTULO_BACKGROUND_WORK=true in .env, and set that only if this is
+  # running; the pair must agree (see docker/compose.yml).
+  #   docker compose -f docker/compose.postgres.yml --profile worker up -d
+  # Run it from this file, never docker/compose.yml: that one names the same project and
+  # service and would replace this instance's web container with one on an empty SQLite
+  # database (#581).
+  worker:
+    profiles: ["worker"]
+    image: source.tiagoagueda.com/postulo/postulo:0.2
+    restart: unless-stopped
+    env_file:
+      - ../.env
+    environment:
+      POSTULO_DATABASE_URL: postgres://postulo@db:5432/postulo
+      POSTULO_SKIP_MIGRATE: "1"
+      POSTULO_SKIP_PLUGIN_SYNC: "1"
+    volumes:
+      - postulo-data:/app/data
+    command: ["python", "manage.py", "work"]
+    healthcheck:
+      test: ["CMD-SHELL", "find /app/data/worker-heartbeat -mmin -5 | grep -q ."]
+      interval: 60s
+      timeout: 5s
+      start_period: 120s
+      retries: 3
+    depends_on:
+      db:
+        condition: service_healthy
+      postulo:
+        condition: service_healthy
+
   db:
     image: postgres:17-alpine
     restart: unless-stopped

@@ -201,6 +201,24 @@ def test_the_postgresql_compose_file_runs_the_scheduler_too():
     )
 
 
+def test_the_two_compose_files_run_the_same_postulo_services():
+    """#581: the worker was added to one file and not the other, as the scheduler had been.
+
+    The documented command named the SQLite file only, and on a PostgreSQL install it
+    replaced the web container with one on an empty database.
+    """
+    import yaml
+
+    sqlite = yaml.safe_load((ROOT / "docker" / "compose.yml").read_text(encoding="utf-8"))
+    postgres = yaml.safe_load(COMPOSE_POSTGRES.read_text(encoding="utf-8"))
+
+    assert set(sqlite["services"]) == set(postgres["services"]) - {"db"}
+    for compose in (sqlite, postgres):
+        worker = compose["services"]["worker"]
+        assert worker["command"][-1] == "work"
+        assert worker["environment"]["POSTULO_SKIP_MIGRATE"] == "1"
+
+
 def test_the_postgresql_compose_file_interpolates_no_password():
     """#582: Compose reads `docker/.env` for `${...}`, not the `.env` the operator filled.
 
