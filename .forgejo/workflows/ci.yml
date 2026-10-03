@@ -308,7 +308,7 @@ jobs:
         # accepts yet (`oauthlib<4`). `tests/test_security_audit.py` fails the day the
         # lock holds oauthlib 4, so this flag goes then and cannot outlive its reason.
         run: |
-          uv export --no-emit-project --all-groups --format requirements-txt --no-hashes \
+          uv export --no-emit-project --all-groups --all-extras --format requirements-txt --no-hashes \
             > /tmp/locked-requirements.txt
           uv run --with pip-audit==2.10.1 pip-audit --strict --progress-spinner off \
             --ignore-vuln CVE-2026-49265 \

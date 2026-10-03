@@ -654,3 +654,29 @@ def test_the_command_does_not_argue_with_the_environment_variable():
 def test_the_gunicorn_reader_finds_what_it_is_looking_for():
     """A test that reads a file has to be shown failing, or it passes on an empty match."""
     assert "--timeout" in gunicorn_defaults()
+
+
+# ------------------------------------------------------ what the weekly audit reads (#583)
+
+
+def test_the_audit_reads_every_extra_the_image_installs():
+    """`gunicorn` and `psycopg` live in extras, so an export without them audits neither.
+
+    The image installs `server` and `postgres`; `SECURITY.md` promises every locked
+    dependency is audited, and the internet-facing server is the one that matters most.
+    """
+    ci = (ROOT / ".forgejo" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    folded = ci.replace("\\n", " ")
+    exports = [
+        line for line in folded.splitlines() if "uv export" in line and "pip-audit" not in line
+    ]
+    audited = [line for line in exports if "--no-emit-project" in line]
+    assert audited, "expected the security job to export the lock for pip-audit"
+
+    wanted = set(re.findall(r"--extra (\w+)", " ".join(sync_lines())))
+    for line in audited:
+        if "--all-extras" in line:
+            continue
+        assert wanted <= set(re.findall(r"--extra (\w+)", line)), (
+            f"the audit reads fewer extras than the image installs: {line}"
+        )
