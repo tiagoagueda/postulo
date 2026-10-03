@@ -300,6 +300,23 @@ def test_recording_an_application_and_applying_to_a_listing(client, user, search
     assert post(client, f"/api/v1/listings/{new_id}/restore", {}, **bearer).json()["state"] == "new"
 
 
+def test_renaming_a_company_follows_the_forms_rules(client, user, search):
+    """Another company's name in any case and an empty name are a 422, never a 500 (#546)."""
+    bearer = issue(user, "write", "read")
+    path = f"/api/v1/companies/{search['company'].pk}"
+    Company.objects.create(owner=user, name="Black Mesa")
+
+    assert patch(client, path, {"name": "BLACK MESA"}, **bearer).status_code == 422
+    assert patch(client, path, {"name": "Black Mesa"}, **bearer).status_code == 422
+    assert patch(client, path, {"name": "  "}, **bearer).status_code == 422
+    search["company"].refresh_from_db()
+    assert search["company"].name == "Aperture Science"
+
+    assert patch(client, path, {"name": "APERTURE SCIENCE"}, **bearer).status_code == 200, (
+        "its own name in another case is a rename, not a clash"
+    )
+
+
 def test_companies_contacts_reminders_and_letters_write(client, user, search):
     bearer = issue(user, "write", "read")
     response = post(

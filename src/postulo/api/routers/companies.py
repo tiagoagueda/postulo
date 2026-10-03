@@ -84,6 +84,17 @@ def get_company(request, pk: int):
     return company_out(_detail(request, pk), detail=True)
 
 
+def _name_or_refusal(request, company: Company, name: str) -> str:
+    """The new name, or the form's refusals: an empty one is a 422, and so is another company's."""
+    name = name.strip()
+    if not name:
+        raise HttpError(422, _("This field is required."))
+    clash = Company.objects.for_user(request.auth.owner).filter(name__iexact=name)
+    if clash.exclude(pk=company.pk).exists():
+        raise HttpError(422, _("You already have a company with that name."))
+    return name
+
+
 @router.patch(
     "/{int:pk}", response=CompanyDetailOut, auth=scope("write"), summary="Change a company"
 )
@@ -92,12 +103,8 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     data = payload.dict(exclude_unset=True)
     industries = data.pop("industries", None)
     data.pop("identifiers", None)
-    name = data.get("name")
-    if name is not None:
-        # The constraint is case-sensitive; the forms and `get_or_create_company` are not.
-        clash = Company.objects.for_user(request.auth.owner).filter(name__iexact=name)
-        if clash.exclude(pk=company.pk).exists():
-            raise HttpError(422, _("You already have a company with that name."))
+    if data.get("name") is not None:
+        data["name"] = _name_or_refusal(request, company, data["name"])
     for field, value in data.items():
         if value is not None:
             setattr(company, field, value)

@@ -11,7 +11,7 @@ from __future__ import annotations
 import datetime as dt
 
 from django.core.exceptions import ValidationError
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -330,7 +330,15 @@ def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
             return by_id
     company = Company.objects.for_user(owner).filter(name__iexact=name).first()
     if company is None:
-        company = Company.objects.create(owner=owner, name=name)
+        try:
+            # A savepoint, so a concurrent request that made the same company first
+            # leaves this one a row to read rather than a broken transaction.
+            with transaction.atomic():
+                company = Company.objects.create(owner=owner, name=name)
+        except IntegrityError:
+            company = Company.objects.for_user(owner).filter(name__iexact=name).first()
+            if company is None:
+                raise
     if wikidata and not company.identifiers.filter(scheme=identifiers.WIKIDATA).exists():
         try:
             value = identifiers.clean(identifiers.WIKIDATA, wikidata)
