@@ -197,14 +197,14 @@ def language_choices() -> list[tuple[str, str]]:
             # deleted and nobody's stored choice is rewritten; the language is simply not
             # on the list until it is offered again.
             continue
-        row = languages.status_of(code, status)
-        if row is not None and row.get("total", 0) and not row.get("translated", 0):
+        if not languages.begun(code, status):
             # A language whose catalogue nobody has started is not offered. Postulo adds
             # the languages of a phase before their translations exist (#70), and offering
             # somebody their own language only to hand them an English interface is a
             # promise with nothing behind it. The catalogue sits there waiting for a
             # translator, and the language appears the day one starts.
             continue
+        row = languages.status_of(code, status)
         if row is None or row.get("total", 0) == 0:
             reviewed.append((code, name))
         elif row.get("percent", 0) < 95:
@@ -216,7 +216,7 @@ def language_choices() -> list[tuple[str, str]]:
         else:
             reviewed.append((code, name))
 
-    choices: list = [("", _("Use the instance default"))]
+    choices: list = [("", _("Follow the browser"))]
     if reviewed:
         choices.append((_("Reviewed by a speaker"), reviewed))
     if drafted:

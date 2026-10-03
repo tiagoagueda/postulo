@@ -654,6 +654,17 @@ def status_of(code, status: Mapping[str, dict[str, int]] | None = None) -> dict[
     return status.get(find(code, status))
 
 
+def begun(code, status: Mapping[str, dict[str, int]] | None = None) -> bool:
+    """Whether anybody has started translating this language.
+
+    A language is added before its translation exists (#70), and offering it, or declaring
+    a page to be in it, over English text is a promise with nothing behind it. A language
+    the status does not know, or that has no strings to translate, counts as begun.
+    """
+    row = status_of(code, status)
+    return row is None or not row.get("total", 0) or bool(row.get("translated", 0))
+
+
 #: The parts of a translation bar, in the order they are drawn from the inline start (#312).
 PROGRESS_PARTS: tuple[str, ...] = ("reviewed", "draft", "untranslated")
 

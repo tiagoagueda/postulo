@@ -95,16 +95,78 @@ def test_a_withdrawn_language_leaves_the_persons_choice_alone(user, settings_row
     assert user.profile.language == "fr-FR", "stored, so offering it again restores it"
 
 
-def test_a_withdrawn_language_is_not_applied_to_the_page(client, user, settings_row):
-    from postulo.core.middleware import UserPreferencesMiddleware
+def narrowed_to_german(settings_row):
+    SiteSettings.objects.filter(pk=settings_row.pk).update(
+        offered_languages=["de"], default_language="de"
+    )
 
+
+def served_in(client, **headers) -> tuple[str, str]:
+    """The `lang` the page declares and the `Content-Language` it is sent with."""
+    response = client.get(
+        reverse("core:home" if "_auth_user_id" in client.session else "account_login"), **headers
+    )
+    declared = re.search(r'<html lang="([^"]+)"', response.content.decode()).group(1)
+    return declared, response.headers["Content-Language"]
+
+
+@pytest.mark.parametrize("asked", ["fr", "pt", ""])
+def test_a_withdrawn_language_is_not_applied_to_the_page(client, user, settings_row, asked):
     user.profile.language = "fr-FR"
     user.profile.save(update_fields=["language"])
-    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["de"])
+    narrowed_to_german(settings_row)
+    client.force_login(user)
 
-    assert not site.offers("fr-FR")
-    assert UserPreferencesMiddleware._offered("fr-FR") is False
-    assert UserPreferencesMiddleware._offered("de") is True
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE=asked) == ("de", "de")
+
+
+@pytest.mark.parametrize("asked", ["fr", "pt", ""])
+def test_a_person_following_the_browser_is_given_what_it_asks_within_what_is_offered(
+    client, user, settings_row, asked
+):
+    assert user.profile.language == ""
+    narrowed_to_german(settings_row)
+    client.force_login(user)
+
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE=asked) == ("de", "de")
+
+
+def test_a_person_following_the_browser_is_given_an_offered_language_it_asks_for(
+    client, user, settings_row
+):
+    SiteSettings.objects.filter(pk=settings_row.pk).update(
+        offered_languages=["de", "fr-FR"], default_language="de"
+    )
+    client.force_login(user)
+
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE="fr") == ("fr-FR", "fr-FR")
+
+
+@pytest.mark.parametrize("asked", ["fr", "pt", ""])
+def test_a_visitor_is_given_the_default_where_the_browser_asks_for_what_is_not_offered(
+    client, settings_row, asked
+):
+    narrowed_to_german(settings_row)
+
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE=asked) == ("de", "de")
+
+
+def test_a_visitor_whose_browser_asks_for_an_offered_language_is_given_it(client, settings_row):
+    SiteSettings.objects.filter(pk=settings_row.pk).update(
+        offered_languages=["de", "fr-FR"], default_language="de"
+    )
+
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE="fr") == ("fr-FR", "fr-FR")
+
+
+def test_a_visitor_is_not_given_a_language_nobody_has_begun(client, settings_row):
+    from postulo.core import languages
+
+    status = languages.translation_status()
+    assert status["sw"]["translated"] == 0, "Swahili stands at nothing in the report"
+    SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="de")
+
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE="sw") == ("de", "de")
 
 
 def test_offering_it_again_brings_the_person_back(user, settings_row):

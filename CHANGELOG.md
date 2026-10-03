@@ -260,6 +260,7 @@ Fixed
 Fixed
 - Fixed
 - A tag or an industry is its name, not an ASCII slug: `C#` and `C++` are two tags, names in Greek, Cyrillic or Japanese are kept, a renamed tag answers to its new name, and none of these is a 500 on the forms, the API, the spreadsheet import or an archive. Upgrading re-derives the slugs and merges industries left with one name. (#356)
+- A page is never drawn in a language the instance does not offer or nobody has begun translating: a person with no language of their own, or whose language was withdrawn, reads the instance default, and a visitor the browser's language only where it is offered. (#398)
 - The language picker and the bars in *Server settings* no longer show languages as complete that are not: the progress file is refreshed, and CI now fails when it is stale. (#495)
 - The calendar and the report start the week on Monday in Bulgarian, Bosnian, Greek, Estonian, Irish, Armenian, Icelandic, Luxembourgish, Slovene and Albanian, which Django had starting on Sunday. (#569)
 - The company map no longer reads a capital city as a country: `Melbourne, Victoria` is placed in Australia instead of being dropped as the Seychelles, and a country is known by its ISO codes and English name. A country written in another language still narrows nothing. (#534)
