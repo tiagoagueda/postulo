@@ -39,7 +39,9 @@ services:
       - "127.0.0.1:8000:8000"
 
   # Notices reminders falling due and tells their owners through their notifiers. Only
-  # needed once somebody has set up a notification connection; start it with
+  # needed once somebody has set up a notification connection. It also deletes expired
+  # export archives and captured pages on its pass, which the export page does by itself
+  # at most once an hour while somebody uses it. Start it with
   #   docker compose -f docker/compose.yml --profile scheduler up -d
   # Alternatively run `manage.py send_due_reminders` from the host's cron every few minutes.
   scheduler:

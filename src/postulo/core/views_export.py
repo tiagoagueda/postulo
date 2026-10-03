@@ -12,6 +12,7 @@ from django.views.decorators.http import require_POST
 from . import errands
 from .export import counts, suggested_filename
 from .models import ExportArchive
+from .slow import tidy_up_if_due
 
 
 @login_required
@@ -22,6 +23,7 @@ def export_overview(request: HttpRequest):
     whole archive's document and measuring its lists, which read every record the account
     owns so that a page could print six of them (#220).
     """
+    tidy_up_if_due()
     return render(
         request,
         "core/export.html",
@@ -52,6 +54,7 @@ def export_download(request: HttpRequest) -> HttpResponse:
     Still outside a transaction of its own, for the reason #220 gave: the build reads
     everything and writes one row, and neither belongs inside a request-long lock.
     """
+    tidy_up_if_due()
     errand = errands.send("export", request.user)
     return redirect("core:errand", pk=errand.pk)
 

@@ -81,3 +81,29 @@ def reap_archives() -> int:
         archive.delete()
         gone += 1
     return gone
+
+
+#: How long a request that has just tidied up leaves the next one alone.
+TIDY_EVERY_SECONDS = 3600
+
+
+def tidy_up_if_due() -> None:
+    """Expire archives and unconfirmed captured pages, from a request, at most once an hour.
+
+    The scheduler is optional, and an instance run without it kept every archive for good
+    while the export page said it is deleted after a day (#539). So the deletion does not
+    depend on it: the pages that deal in archives ask for it, and the cache says whether an
+    hour has passed since somebody last did. Whoever loses the race, or finds the cache
+    gone, does nothing, and the scheduler's pass remains the one that always runs.
+    """
+    from django.core.cache import cache
+
+    from postulo.jobs import pages
+
+    try:
+        if not cache.add("core:tidied-up", True, TIDY_EVERY_SECONDS):
+            return
+    except Exception:  # a cache that is down is no reason to fail an export page
+        return
+    reap_archives()
+    pages.expire_unconfirmed()

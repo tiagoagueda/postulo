@@ -11,6 +11,7 @@ from io import BytesIO
 
 import pytest
 from django.contrib.contenttypes.models import ContentType
+from django.core.cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
@@ -667,3 +668,30 @@ def test_an_archive_without_sent_files_or_sent_to_still_imports(populated, other
     importer.load(other_user, zipfile.ZipFile(buffer))
 
     assert Application.objects.for_user(other_user).get().sent_uploads.count() == 0
+
+
+def test_an_expired_archive_is_deleted_by_the_export_page_without_the_scheduler(
+    client, populated, settings
+):
+    """The deletion used to wait for an optional scheduler; the page promised a day (#539)."""
+    from postulo.core.models import ExportArchive
+
+    client.force_login(populated)
+    client.post(reverse("core:export_download"))
+    archive = ExportArchive.objects.for_user(populated).get()
+    stored = archive.file.name
+    assert archive.file.storage.exists(stored)
+
+    ExportArchive.objects.filter(pk=archive.pk).update(
+        expires_at=timezone.now() - dt.timedelta(hours=1)
+    )
+    # Tidied at most once an hour: while the press just now has, the page leaves it be.
+    assert client.get(reverse("core:export")).status_code == 200
+    assert ExportArchive.objects.filter(pk=archive.pk).exists()
+    # An hour later.
+    cache.delete("core:tidied-up")
+    response = client.get(reverse("core:export"))
+
+    assert response.status_code == 200
+    assert not ExportArchive.objects.filter(pk=archive.pk).exists()
+    assert not archive.file.storage.exists(stored)
