@@ -367,7 +367,13 @@ def test_the_connection_test_says_no_when_there_is_no_server(settings):
     settings.POSTULO_EMAIL_HOST = ""
     with pytest.raises(postulo_mail.ConnectionFailed):
         postulo_mail.check_connection(
-            host="", port=25, username="", password="", security="none", timeout=1
+            host="",
+            port=25,
+            username="",
+            password="",
+            security="none",
+            allow_private=False,
+            timeout=1,
         )
 
 

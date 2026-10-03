@@ -146,6 +146,7 @@ def test_a_refusal_never_opens_a_socket(monkeypatch):
             username="",
             password="",
             security="none",
+            allow_private=False,
             timeout=1,
         )
 
@@ -179,6 +180,7 @@ def test_the_connection_goes_to_the_approved_address_not_the_name(monkeypatch):
         username="",
         password="",
         security="none",
+        allow_private=False,
         timeout=5,
     )
 
@@ -235,6 +237,27 @@ def test_a_host_pinned_by_the_environment_is_not_second_guessed(monkeypatch):
     assert mail.host_policy() is True
 
 
+def test_the_instance_transport_still_reaches_a_host_pinned_by_the_environment(monkeypatch):
+    """The exemption stays with the operator's transport, which passes `host_policy()` (#358)."""
+    monkeypatch.setenv("POSTULO_EMAIL_HOST", "localhost")
+    monkeypatch.setattr(destinations, "addresses_for", answering(ipaddress.ip_address("127.0.0.1")))
+    opened = mock.MagicMock()
+    monkeypatch.setattr(destinations, "PinnedSMTP", opened)
+
+    with override_settings(POSTULO_CONNECTIONS_ALLOW_PRIVATE=False):
+        mail.check_connection(
+            host="localhost",
+            port=25,
+            username="",
+            password="",
+            security="none",
+            allow_private=mail.host_policy(),
+            timeout=5,
+        )
+
+    assert opened.call_args.kwargs["host"] == "127.0.0.1"
+
+
 def test_a_host_stored_from_the_page_is_checked(monkeypatch):
     monkeypatch.delenv("POSTULO_EMAIL_HOST", raising=False)
 
@@ -256,7 +279,7 @@ def test_sending_dials_the_approved_address(monkeypatch):
     from postulo.plugins.smtp import GuardedBackend
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PUBLIC))
-    backend = GuardedBackend(alias="default", host="mail.example.org", port=25)
+    backend = GuardedBackend(alias="default", host="mail.example.org", port=25, allow_private=False)
     seen = {}
 
     def fake_open(self):
@@ -277,7 +300,7 @@ def test_the_backend_reports_the_name_afterwards(monkeypatch):
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PUBLIC))
     monkeypatch.setattr("django.core.mail.backends.smtp.EmailBackend.open", lambda self: True)
-    backend = GuardedBackend(alias="default", host="mail.example.org", port=25)
+    backend = GuardedBackend(alias="default", host="mail.example.org", port=25, allow_private=False)
 
     backend.open()
 
@@ -289,7 +312,7 @@ def test_sending_to_a_private_address_is_refused(monkeypatch):
 
     monkeypatch.setattr(destinations, "addresses_for", answering(PRIVATE))
     monkeypatch.delenv("POSTULO_EMAIL_HOST", raising=False)
-    backend = GuardedBackend(alias="default", host="relay.internal", port=25)
+    backend = GuardedBackend(alias="default", host="relay.internal", port=25, allow_private=False)
 
     with (
         override_settings(POSTULO_CONNECTIONS_ALLOW_PRIVATE=False),
@@ -304,7 +327,7 @@ def test_an_already_open_connection_is_not_re_approved(monkeypatch):
 
     called = mock.Mock(side_effect=AssertionError("resolved an open connection"))
     monkeypatch.setattr(destinations, "addresses_for", called)
-    backend = GuardedBackend(alias="default", host="mail.example.org", port=25)
+    backend = GuardedBackend(alias="default", host="mail.example.org", port=25, allow_private=False)
     backend.connection = object()
 
     assert backend.open() is False

@@ -188,15 +188,25 @@ def test_a_blank_port_follows_the_encryption_that_was_chosen():
     assert _port({"security": "ssl", "port": 2465}) == 2465, "never a correction"
 
 
-def test_it_dials_only_where_the_instance_is_allowed_to():
-    """A person's outbox is somewhere the server dials at somebody's typing, which is
-    exactly the shape #148 exists for — and the same guard as the instance's own mail,
-    rather than a second one that can drift.
+def test_it_refuses_a_private_host_even_when_the_operator_pinned_theirs(monkeypatch, settings):
+    """`POSTULO_EMAIL_HOST` exempts the operator's own relay, not whatever a person types
+    while it is set (#358): the test and the send are both refused before a socket opens.
     """
-    import inspect
+    from unittest import mock
 
-    from postulo.core.mail import GuardedBackend
+    from postulo.core import destinations
     from postulo.plugins.own_mail import OwnMail
 
-    assert "GuardedBackend" in inspect.getsource(OwnMail.send)
-    assert "approve" in inspect.getsource(GuardedBackend.open)
+    monkeypatch.setenv("POSTULO_EMAIL_HOST", "smtp.example.org")
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    opened = mock.Mock(side_effect=AssertionError("a socket was opened"))
+    monkeypatch.setattr(destinations, "PinnedSMTP", opened)
+    monkeypatch.setattr(destinations, "PinnedSMTP_SSL", opened)
+    config = {"host": "127.0.0.1", "port": 1, "security": "none", "from_address": "a@example.org"}
+
+    result = OwnMail().test(config)
+    with pytest.raises(destinations.Refused):
+        OwnMail().send(EmailMessage("Hi", "Body", "a@example.org", ["b@example.org"]), config)
+
+    assert result.ok is False
+    assert not opened.called

@@ -169,7 +169,7 @@ class OwnMail:
         guard: a person's outbox is somewhere the server dials at somebody's typing, which
         is exactly the shape #148 exists for.
         """
-        from postulo.core import mail
+        from postulo.core import destinations, mail
 
         try:
             report = mail.check_connection(
@@ -179,6 +179,7 @@ class OwnMail:
                 password=str(config.get("password") or ""),
                 security=str(config.get("security") or ""),
                 timeout=10,
+                allow_private=destinations.private_allowed(),
                 token=_token(config),
             )
         except mail.ConnectionFailed as error:
@@ -187,10 +188,12 @@ class OwnMail:
 
     def send(self, message, config: dict) -> int:
         """One message, over this person's server, with this person's address on it."""
+        from postulo.core import destinations
         from postulo.core.mail import GuardedBackend
 
         backend = GuardedBackend(
             alias="default",
+            allow_private=destinations.private_allowed(),
             host=str(config.get("host") or ""),
             port=_port(config),
             username=str(config.get("username") or ""),

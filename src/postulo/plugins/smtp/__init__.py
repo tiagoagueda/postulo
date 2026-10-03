@@ -53,6 +53,7 @@ class SMTPTransport:
                 password=str(config.get("password") or ""),
                 security=str(config.get("security") or ""),
                 timeout=int(config.get("timeout") or 10),
+                allow_private=mail.host_policy(),
                 token=token,
             )
         except (mail.ConnectionFailed, mail_auth.TokenUnavailable) as error:
@@ -66,8 +67,11 @@ class SMTPTransport:
         change, and a connection held open across a change would go on using the settings
         it was opened with.
         """
+        from postulo.core import mail
+
         backend = GuardedBackend(
             alias="default",
+            allow_private=mail.host_policy(),
             host=str(config.get("host") or ""),
             port=int(config.get("port") or 25),
             username=str(config.get("username") or ""),

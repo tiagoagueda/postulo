@@ -168,6 +168,7 @@ def test_the_connection_check_signs_in_with_a_token_when_given_one(monkeypatch):
             username="postulo@contoso.example",
             password="",
             security="starttls",
+            allow_private=False,
             timeout=10,
             token="T",
         )
@@ -195,6 +196,7 @@ def test_the_backend_opens_without_a_password_and_signs_in_with_the_token(monkey
         "postulo.core.destinations.approve", lambda host, allow_private=False: "93.184.216.34"
     )
     backend = mail.GuardedBackend(
+        allow_private=False,
         alias="default",
         host="smtp.office365.com",
         port=587,
@@ -229,7 +231,12 @@ def test_a_refused_token_closes_the_session_rather_than_leaving_it_open(monkeypa
         "postulo.core.destinations.approve", lambda host, allow_private=False: "93.184.216.34"
     )
     backend = mail.GuardedBackend(
-        alias="default", host="smtp.office365.com", port=587, username="p", oauth_token="T"
+        allow_private=False,
+        alias="default",
+        host="smtp.office365.com",
+        port=587,
+        username="p",
+        oauth_token="T",
     )
 
     with pytest.raises(smtplib.SMTPAuthenticationError):

@@ -74,6 +74,7 @@ def check_connection(
     password: str,
     security: str,
     timeout: int,
+    allow_private: bool,
     token: str = "",
 ) -> str:
     """Prove a set of SMTP settings without sending a message to anybody.
@@ -91,17 +92,19 @@ def check_connection(
     it is saved. Testing what is stored would mean overwriting whatever works in order to
     find out whether the replacement does.
 
-    The address is not checked against the private-address rule that governs capture. That
-    rule exists because a capture URL comes off a stranger's page; this is an administrator
-    typing their own infrastructure, and a relay on 10.0.0.0/8 is the ordinary case for a
-    self-hosted instance. Do not "fix" this by reusing the capture check.
+    The address is checked against the private-address rule, and the caller says how: the
+    instance's own transport passes `host_policy()`, because a relay on 10.0.0.0/8 is the
+    ordinary case for a self-hosted instance and the operator typed it; a person's own
+    outbox passes `destinations.private_allowed()` only, because its host is somebody
+    else's typing and the operator's exemption is not theirs (#358). No default, so a new
+    caller has to choose.
     """
     from . import destinations
 
     if not host:
         raise ConnectionFailed(str(_("No server to connect to.")))
     try:
-        with _open(host, port, security, timeout) as server:
+        with _open(host, port, security, timeout, allow_private) as server:
             server.ehlo()
             if security == "starttls":
                 if not server.has_extn("starttls"):
@@ -150,7 +153,11 @@ def check_connection(
 
 
 def host_policy() -> bool:
-    """Whether this instance may dial a private address for mail.
+    """Whether the instance's own mail transport may dial a private address.
+
+    Only for the transport the operator configures (the SMTP plugin and the Email page's
+    test). A person's own outbox must not use it: the exemption below belongs to the
+    operator's host, not to every host that is dialled while the variable is set (#358).
 
     The environment is exempt, and that is the project's ordinary rule rather than a hole in
     this one: `POSTULO_EMAIL_HOST` is a line in a file only the operator can edit, and the
@@ -165,7 +172,7 @@ def host_policy() -> bool:
     return destinations.private_allowed() or site.overridden_by("email_host") is not None
 
 
-def _open(host: str, port: int, security: str, timeout: int):
+def _open(host: str, port: int, security: str, timeout: int, allow_private: bool):
     """The socket, opened the way this kind of connection is opened, to an approved address.
 
     Implicit TLS is a different constructor rather than a flag, because the handshake happens
@@ -177,7 +184,7 @@ def _open(host: str, port: int, security: str, timeout: int):
     """
     from . import destinations
 
-    addresses = destinations.approve_all(host, allow_private=host_policy())
+    addresses = destinations.approve_all(host, allow_private=allow_private)
     if security == "ssl":
         return destinations.PinnedSMTP_SSL(
             host=str(addresses[0]),
@@ -221,8 +228,12 @@ class GuardedBackend(EmailBackend):
     the name kept for the certificate (#148).
     """
 
-    def __init__(self, *args, oauth_token: str = "", **kwargs):
-        """``oauth_token`` signs in with XOAUTH2 rather than the password (#151).
+    def __init__(self, *args, allow_private: bool, oauth_token: str = "", **kwargs):
+        """``allow_private`` is the caller's to give, with no default (#358): the instance's
+        own transport passes `mail.host_policy()`, a person's outbox the operator's switch
+        alone.
+
+        ``oauth_token`` signs in with XOAUTH2 rather than the password (#151).
 
         Django authenticates inside `open()` and only with a password, before it publishes
         the connection. So a token session is opened with no password -- Django then signs
@@ -230,6 +241,7 @@ class GuardedBackend(EmailBackend):
         A token wins where both were given, for the reason `mail_auth.authenticate` says.
         """
         super().__init__(*args, **kwargs)
+        self.allow_private = allow_private
         self.oauth_token = oauth_token
         if oauth_token:
             self.password = ""
@@ -237,12 +249,12 @@ class GuardedBackend(EmailBackend):
     def open(self):
         import functools
 
-        from postulo.core import destinations, mail, mail_auth
+        from postulo.core import destinations, mail_auth
 
         if self.connection:
             return False
         typed = self.host
-        approved = destinations.approve_all(typed, allow_private=mail.host_policy())
+        approved = destinations.approve_all(typed, allow_private=self.allow_private)
         pinned = destinations.PinnedSMTP_SSL if self.use_ssl else destinations.PinnedSMTP
         self.host = str(approved[0])
         self._pinned_class = functools.partial(pinned, certificate_name=typed, addresses=approved)

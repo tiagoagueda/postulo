@@ -861,6 +861,7 @@ class EmailConnectionTestView(StaffRequiredMixin, View):
                 password=password,
                 security=security,
                 timeout=int(value("email_timeout", int)),
+                allow_private=mail.host_policy(),
                 token=token,
             )
         except (mail.ConnectionFailed, mail_auth.TokenUnavailable) as error:

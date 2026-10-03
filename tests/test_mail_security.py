@@ -78,7 +78,13 @@ def test_implicit_tls_opens_a_tls_socket_from_the_start():
         mock.patch.object(destinations, "PinnedSMTP"),
     ):
         mail.check_connection(
-            host="mail.example.org", port=465, username="", password="", security="ssl", timeout=5
+            host="mail.example.org",
+            port=465,
+            username="",
+            password="",
+            security="ssl",
+            allow_private=False,
+            timeout=5,
         )
 
     assert secure.called, "port 465 needs the handshake before any SMTP"
@@ -98,6 +104,7 @@ def test_starttls_opens_a_plain_socket_and_upgrades_it():
             username="",
             password="",
             security="starttls",
+            allow_private=False,
             timeout=5,
         )
 
@@ -112,7 +119,13 @@ def test_no_security_never_upgrades():
     ):
         server = plain.return_value.__enter__.return_value
         mail.check_connection(
-            host="mail.example.org", port=25, username="", password="", security="none", timeout=5
+            host="mail.example.org",
+            port=25,
+            username="",
+            password="",
+            security="none",
+            allow_private=False,
+            timeout=5,
         )
 
     assert plain.called and not s.called
@@ -129,6 +142,7 @@ def test_a_server_without_starttls_is_told_so_rather_than_connected_to_in_the_cl
                 username="",
                 password="",
                 security="starttls",
+                allow_private=False,
                 timeout=5,
             )
 
@@ -148,6 +162,7 @@ def test_plain_settings_against_465_say_what_is_wrong():
                 username="",
                 password="",
                 security="starttls",
+                allow_private=False,
                 timeout=1,
             )
 
@@ -165,6 +180,7 @@ def test_implicit_tls_against_587_says_the_other_thing():
                 username="",
                 password="",
                 security="ssl",
+                allow_private=False,
                 timeout=1,
             )
 
@@ -181,6 +197,7 @@ def test_an_unconventional_port_is_not_second_guessed():
                 username="",
                 password="",
                 security="starttls",
+                allow_private=False,
                 timeout=1,
             )
 
