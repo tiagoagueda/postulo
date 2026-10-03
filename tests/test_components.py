@@ -92,6 +92,42 @@ def test_a_checkbox_lies_the_other_way():
     assert "*" not in html, "a checkbox is never marked required with an asterisk"
 
 
+class GroupForm(forms.Form):
+    files = forms.MultipleChoiceField(
+        choices=[("a", "A"), ("b", "B")],
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        help_text="Files you have.",
+    )
+    kind = forms.ChoiceField(
+        choices=[("x", "X"), ("y", "Y")], widget=forms.RadioSelect, help_text="Pick one."
+    )
+    nothing = forms.MultipleChoiceField(
+        choices=[], widget=forms.CheckboxSelectMultiple, required=False, help_text="Nothing yet."
+    )
+    nobody = forms.ChoiceField(
+        choices=[], widget=forms.RadioSelect, required=False, help_text="No one."
+    )
+
+
+@pytest.mark.parametrize("name", ["files", "kind", "nothing", "nobody"])
+def test_a_group_of_choices_is_a_fieldset_named_by_its_legend(name):
+    """Django gives a group no `id_for_label`; a `<label for="">` named nothing (#624)."""
+    form = GroupForm()
+    html = render(f'{{% cotton field :field="form.{name}" / %}}', form=form)
+
+    assert (
+        'for=""' not in html
+        and "<label" not in html.split("<fieldset", 1)[1].split("<legend", 1)[0]
+    )
+    assert html.count("<fieldset") == 1 and "<legend>" in html
+    assert form[name].label in html.split("<legend>", 1)[1].split("</legend>", 1)[0]
+    assert (
+        f'aria-describedby="id_{name}_helptext"' in html.split("<fieldset", 1)[1].split(">", 1)[0]
+    )
+    assert f'<p id="id_{name}_helptext">' in html
+
+
 def test_feedback_can_leave_the_help_to_the_caller():
     """``errors-only`` is for a caller that drew the help above the controls itself (#139)."""
     form = NameForm(data={})

@@ -18,6 +18,12 @@
    the label, which is how a yes-or-no question reads and what the settings pages used to
    build by hand, one `flex items-center` at a time.
 
+   A group of choices (`field.use_fieldset`: `CheckboxSelectMultiple`, `RadioSelect`) is a
+   <fieldset> with a <legend> instead (#624): Django gives such a widget no `id_for_label`, so a
+   `<label for>` named nothing, and hands the help and errors to the fieldset as
+   `aria_describedby`. It is tested before the lone checkbox, and whether it has choices does
+   not matter: an empty group is still a group.
+
    A widget carrying a `list` attribute gets its `<datalist>` drawn here, from the form's
    `datalists` -- so a field that suggests what somebody has already recorded (#261) is one
    line in the form, and the three templates that render it need to know nothing. A form
@@ -37,7 +43,18 @@
    sentence that says what the field is for. `<c-field-feedback>` says what that means. A
    tick box takes no `tip`: its sentence says what ticking does, and stays beside it.
 {% endcomment %}
-{% if field.field.widget.input_type == "checkbox" and not field.field.widget.choices %}
+{% if field.use_fieldset %}
+  <div class="field mb-4 wrap-anywhere"{% if field.errors %} data-invalid="true"{% endif %}>
+    <fieldset{% if field.aria_describedby %} aria-describedby="{{ field.aria_describedby }}"{% endif %}>
+      <legend>
+        {{ field.label }}
+        {% if field.field.required %}<span aria-hidden="true" class="text-red-600 dark:text-red-400">*</span>{% endif %}
+      </legend>
+      {{ field }}
+      <c-field-feedback :field="field" :tip="tip" />
+    </fieldset>
+  </div>
+{% elif field.field.widget.input_type == "checkbox" %}
   <div class="field mb-4 wrap-anywhere" data-orientation="horizontal"{% if field.errors %} data-invalid="true"{% endif %}>
     {{ field }}
     <section>

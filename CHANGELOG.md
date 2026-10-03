@@ -169,6 +169,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A group of tick boxes or radio buttons drawn through the form field component, such as the two lists on *Freeze and attach*, now has a name and its help text for a screen reader: it is a fieldset with a legend, not a label attached to nothing. (#624)
 - The counts on the company and application delete pages (*3 postings*, *2 interviews*, ...) are now translated: they were passed to `ngettext` through variables, so no catalogue held them. A test now fails on any translation call whose text is not a literal. (#388)
 - A saved view can be named in any script (Greek, Cyrillic, Arabic, Ge'ez and the rest): it was refused as nameless, and two names sharing a number replaced each other. A name with no letter or digit now says so. (#504)
 - The Tags list on an application's forms has a name with scripts off: its heading is now a real label for the list. (#625)
