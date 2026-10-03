@@ -14,8 +14,8 @@ import pytest
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.core import errands
-from postulo.core.models import Errand, ErrandState
+from postulo.core import errands, site
+from postulo.core.models import Errand, ErrandState, SiteSettings
 
 pytestmark = pytest.mark.django_db
 
@@ -86,6 +86,29 @@ def test_a_queue_that_refuses_the_work_does_not_lose_it(a_kind, user, settings, 
     errand = errands.send("test_kind", user)
 
     assert errand.state == ErrandState.DONE and a_kind.done == [errand.pk]
+
+
+def test_each_errand_reads_the_instance_settings_afresh(user):
+    """A worker has no request to forget the memoised policy row for it (#473)."""
+    seen: list[bool] = []
+
+    @errands.handler("test_policy", working="Reading the policy…")
+    def run(errand) -> dict:
+        seen.append(site.capture_keep_source())
+        return {}
+
+    try:
+        SiteSettings.objects.update_or_create(pk=1, defaults={"capture_keep_source": True})
+        first = Errand.objects.create(owner=user, kind="test_policy")
+        errands.perform(first.pk)
+        # Another process saves the row: this one's memo is not told.
+        SiteSettings.objects.filter(pk=1).update(capture_keep_source=False)
+        second = Errand.objects.create(owner=user, kind="test_policy")
+        errands.perform(second.pk)
+    finally:
+        errands.HANDLERS.pop("test_policy", None)
+
+    assert seen == [True, False]
 
 
 def test_an_unknown_kind_is_refused_at_the_door(user):
