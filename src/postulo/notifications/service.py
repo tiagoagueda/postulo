@@ -91,6 +91,8 @@ def _deliver(user, notification: Notification) -> int:
     delivered = 0
     connections = Connection.objects.for_user(user).enabled().of_kind("notifier")
     for connection in connections:
+        if not connection.allowed:
+            continue
         plugin = connection.plugin_instance
         if plugin is None:
             logger.warning(

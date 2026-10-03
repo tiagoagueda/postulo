@@ -258,6 +258,22 @@ class Connection(OwnedModel):
         return find_plugin(self.kind, self.plugin)
 
     @property
+    def allowed(self) -> bool:
+        """Whether the policy lets this plugin act for the connection's owner (#362).
+
+        `plugin_instance` is what the list page uses, which must still show the row of a
+        plugin that was switched off. Whatever *runs* the plugin asks this as well, or
+        `active_plugin` -- so the decision the pages make is the decision the scheduler keeps.
+        """
+        from .policy import decide
+
+        return decide(self.plugin, self.owner).on
+
+    def active_plugin(self):
+        """The plugin, only when it is installed and the policy has it on for the owner."""
+        return self.plugin_instance if self.allowed else None
+
+    @property
     def is_installed(self) -> bool:
         return self.plugin_instance is not None
 

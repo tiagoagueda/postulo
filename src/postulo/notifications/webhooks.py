@@ -75,6 +75,9 @@ def enqueue(connection, notification: Notification) -> WebhookDelivery | None:
 
 
 def pending(now=None):
+    from postulo.plugins.models import Connection
+    from postulo.plugins.policy import refused_connections
+
     now = now or timezone.now()
     return (
         WebhookDelivery.objects.filter(
@@ -87,6 +90,8 @@ def pending(now=None):
         .exclude(connection__enabled=False)
         # Nor is one whose owner has been deactivated; reactivating resumes the rows (#575).
         .filter(owner__is_active=True)
+        # Nor one whose plugin the policy has off for its owner (#362).
+        .exclude(connection__in=refused_connections(Connection.objects.filter(kind="notifier")))
         .select_related("connection", "owner")
         .order_by("next_attempt_at", "pk")
     )
@@ -119,6 +124,9 @@ def deliver(row) -> bool:
         row.save()
         return False
 
+    if connection is not None and not connection.allowed:
+        # Waits, and spends nothing: reversing the decision resumes it (#362).
+        return False
     if connection is None or not connection.enabled:
         return fail(str(_("The connection is gone or switched off.")), final=connection is None)
     url = (connection.config.get("url") or "").strip()

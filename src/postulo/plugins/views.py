@@ -30,7 +30,7 @@ from . import logos, registry
 from .base import CONNECTED_KINDS, call_with_user
 from .forms import ConnectionForm
 from .models import Connection
-from .policy import connected_plugins
+from .policy import connected_plugins, decide
 from .registry import find_plugin
 from .secrets import SecretsUnreadable
 
@@ -44,13 +44,24 @@ KIND_LABELS = {
 }
 
 
-def _plugin_or_404(kind: str, name: str):
+def _plugin_or_404(kind: str, name: str, person=None):
     if kind not in CONNECTED_KINDS:
         raise Http404("No such kind of plugin.")
     plugin = find_plugin(kind, name)
     if plugin is None:
         raise Http404("That plugin is not installed.")
+    # An address for a plugin the person is not offered is not theirs to open (#362).
+    if person is not None and not decide(name, person).offered:
+        raise Http404("That plugin is not available.")
     return plugin
+
+
+def _switched_off(request, connection):
+    """A redirect with the reason when the policy has this connection's plugin off, else None."""
+    if connection.allowed:
+        return None
+    messages.error(request, _("That plugin is switched off for you."))
+    return redirect("connections:list")
 
 
 def _summary(plugin, connection: Connection) -> str:
@@ -216,7 +227,7 @@ class ConnectionFormView(OwnedObjectMixin, View):
             if plugin is None:
                 raise Http404("That plugin is no longer installed.")
             return connection, plugin
-        return Connection(owner=request.user), _plugin_or_404(kind, name)
+        return Connection(owner=request.user), _plugin_or_404(kind, name, request.user)
 
     def _render(self, request, form, connection, plugin) -> HttpResponse:
         return render(
@@ -261,6 +272,9 @@ class ConnectionFormView(OwnedObjectMixin, View):
 
     def post(self, request: HttpRequest, pk: int | None = None, kind=None, name=None):
         connection, plugin = self._load(request, pk, kind, name)
+        if not decide(plugin.name, request.user).on:
+            messages.error(request, _("That plugin is switched off for you."))
+            return redirect("connections:list")
         try:
             form = ConnectionForm(plugin, request.POST, instance=connection)
         except SecretsUnreadable:
@@ -293,6 +307,8 @@ class ConnectionConsentView(OwnedObjectMixin, View):
         if plugin is None:
             messages.error(request, _("That plugin is no longer installed."))
             return redirect("connections:list")
+        if (refused := _switched_off(request, connection)) and not request.POST.get("forget"):
+            return refused
         if request.POST.get("forget"):
             consent_flow.forget(connection)
             messages.success(
@@ -375,6 +391,8 @@ class ConnectionTestView(OwnedObjectMixin, View):
         if plugin is None:
             messages.error(request, _("That plugin is no longer installed."))
             return redirect("connections:list")
+        if refused := _switched_off(request, connection):
+            return refused
         from postulo.core import throttle
 
         # A test is a real message, or a real request to somebody's server, at a press of
@@ -432,6 +450,8 @@ class ConnectionBackfillView(OwnedObjectMixin, View):
         from postulo.documents.archiving import backfill
 
         connection = get_object_or_404(self.get_queryset(), pk=pk)
+        if refused := _switched_off(request, connection):
+            return refused
         count = backfill(connection)
         if count:
             messages.success(
@@ -472,6 +492,8 @@ class ConnectionSyncNowView(OwnedObjectMixin, View):
         from .syncing import sync_connection
 
         connection = get_object_or_404(self.get_queryset(), pk=pk)
+        if refused := _switched_off(request, connection):
+            return refused
         report = sync_connection(connection)
         if report.already_running:
             messages.info(request, report.notes[0])

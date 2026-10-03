@@ -136,7 +136,7 @@ def anybody_wants(owner, event: str) -> bool:
     from .base import wants
 
     for connection in Connection.objects.for_user(owner).enabled().of_kind("notifier"):
-        plugin = connection.plugin_instance
+        plugin = connection.active_plugin()
         if plugin is not None and wants(connection.config, event, plugin):
             return True
     return False

@@ -26,7 +26,7 @@ from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormM
 from postulo.core.redirects import safe_next
 from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
-from postulo.plugins import base, registry
+from postulo.plugins import base
 
 from . import forms as resume_forms
 from . import importing, ordering, translating
@@ -470,10 +470,12 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
         # importer ships in the box and is the only one that answers today; the point is
         # that the second one need not be a change to this view.
         data = upload.read()
+        from postulo.plugins.policy import plugins_for
+
         try:
             base.refuse_unreadable(data)
             importer = None
-            for plugin in registry.plugins("importer"):
+            for plugin in plugins_for(request.user, "importer"):
                 # A plugin that raises is logged and skipped, as capture does (#611): one
                 # faulty add-on must not stop the importers behind it.
                 try:
@@ -489,7 +491,11 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
                 # second importer installed, the sentence has to say so (#105).
                 raise base.ImportRefused(
                     _("Nothing installed here reads that file. What is installed reads: %(what)s.")
-                    % {"what": ", ".join(str(p.label) for p in registry.plugins("importer"))}
+                    % {
+                        "what": ", ".join(
+                            str(p.label) for p in plugins_for(request.user, "importer")
+                        )
+                    }
                 )
             try:
                 record = importer.read(data)

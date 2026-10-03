@@ -339,6 +339,19 @@ def plugins_for(person, kind: str) -> list:
     return [item for item in plugins(kind) if decide(item.name, person).on]
 
 
+def refused_connections(connections) -> list[int]:
+    """The ids, among these connections, whose plugin is off for the connection's owner.
+
+    For the passes that pick rows to work on: a delivery or a copy whose plugin was switched
+    off waits, untouched, and is left out of the pass rather than tried and failed (#362).
+    """
+    return [
+        connection.pk
+        for connection in connections.select_related("owner")
+        if not decide(connection.plugin, connection.owner).on
+    ]
+
+
 def connected_plugins(person=None) -> list:
     """Every installed plugin a person can connect to, whatever its kind.
 

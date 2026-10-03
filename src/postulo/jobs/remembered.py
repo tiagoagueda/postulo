@@ -86,7 +86,9 @@ def read_page(owner, url: str, html: str):
     # Asked with the places only where there are some, so that the question is the same
     # one it always was for everybody who has none.
     result = (
-        registry.parse_page(url, html, hints=handed) if handed else registry.parse_page(url, html)
+        registry.parse_page(url, html, hints=handed, person=owner)
+        if handed
+        else registry.parse_page(url, html, person=owner)
     )
     if result is None:
         return None
