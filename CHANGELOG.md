@@ -169,6 +169,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Server settings → Plugins lists the own-mail outbox, so an administrator can switch off people sending mail through servers they type, as the code and the refusal always said. (#608)
 - *Check it answers* on a link whose host refuses `HEAD` no longer downloads the whole file behind it into memory to read the status: the second request is streamed and closed unread. (#619)
 - In a right-to-left language the plugin switches draw their knob inside the track, at the end that says on or off, instead of hanging outside it. (#517)
 - The report filed with Download declares its language and reads from the right edge in Arabic and Hebrew: the filed PDF used to say `lang=""` and `dir="ltr"`, unlike the draft. It is now drawn in the language of the person who pressed the button. (#568)

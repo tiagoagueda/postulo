@@ -381,3 +381,23 @@ def test_a_hidden_plugin_stays_hidden_while_it_stays_off(client, admin):
 
     client.post(reverse("server:plugin_policy"), {f"row:{PLUGIN}": "1", f"on:{PLUGIN}": "on"})
     assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "on"
+
+
+def test_the_own_mail_outbox_is_governed_like_any_connected_plugin(client, admin, user):
+    """The administrator's switch for a person's half of mail (#149) is drawn, saved and
+    applied: the row is on the page, and forcing it off takes it out of what the person
+    can connect to and out of `outbox_for`."""
+    from postulo.core import correspondence
+
+    client.force_login(admin)
+    html = client.get(reverse("server:plugins")).content.decode()
+    assert re.search(r'name="row:own-mail"', html)
+
+    assert "own-mail" in [item.name for item in policy.connected_plugins(user)]
+    assert correspondence.outbox_for(user) is not None
+
+    client.post(reverse("server:plugin_policy"), {"row:own-mail": "1"})
+
+    assert PluginPolicy.objects.get(plugin="own-mail", person=None).state == "off"
+    assert "own-mail" not in [item.name for item in policy.connected_plugins(user)]
+    assert correspondence.outbox_for(user) is None
