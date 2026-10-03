@@ -539,3 +539,30 @@ def test_the_test_button_reports_a_redirect_rather_than_answering_200(user):
 
     assert len(requests) == 1
     assert not result.ok and "https://hooks.example.org/in" in result.message
+
+
+def test_a_secret_nobody_can_read_gives_the_row_up_instead_of_ending_the_pass(user, settings):
+    """Raised out of `deliver` it ended every scheduler pass that met the row (#573)."""
+    settings.POSTULO_FIELD_KEY = ""
+    connection = webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    settings.SECRET_KEY = "a-key-rotated-since-the-secret-was-written"
+
+    with mock.patch.object(webhook, "post") as post:
+        assert webhooks.send_pending() == (0, 1)
+
+    post.assert_not_called()
+    row = WebhookDelivery.objects.get()
+    assert row.status == DeliveryStatus.GIVEN_UP
+    assert "different key" in row.last_error
+    connection.refresh_from_db()
+    assert connection.last_error == row.last_error
+
+
+def test_a_row_that_raises_does_not_stop_the_rows_behind_it(user):
+    webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    notify(user, Notification(event="reminder_due", title="y", key="r:2"))
+
+    with mock.patch.object(webhooks, "deliver", side_effect=[RuntimeError("boom"), True]):
+        assert webhooks.send_pending() == (1, 1)

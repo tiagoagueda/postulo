@@ -23,6 +23,7 @@ from django.utils.translation import gettext as _
 from postulo.plugins import webhook as plugin
 from postulo.plugins.api import DestinationRefused, Notification
 from postulo.plugins.policy import allows, refused_connections
+from postulo.plugins.secrets import SecretsUnreadable
 
 from .models import DeliveryStatus, WebhookDelivery
 
@@ -130,7 +131,14 @@ def deliver(row) -> bool:
     if connection is None or not connection.enabled:
         return fail(str(_("The connection is gone or switched off.")), final=connection is None)
     url = (connection.config.get("url") or "").strip()
-    secret = connection.secrets.get("secret") or ""
+    try:
+        secret = connection.secrets.get("secret") or ""
+    except SecretsUnreadable as unreadable:
+        # A key rotated, or a backup restored onto another instance: no retry can read it,
+        # so the row is given up on and the connection says why, as the copy pass does
+        # (#573). Raised here it ended the whole scheduler pass, every time it came back.
+        connection.record_test(False, str(unreadable))
+        return fail(str(unreadable), final=True)
     try:
         # Checked again at each delivery, not only when the form was saved: a public
         # hostname can come to point somewhere private later.
@@ -178,7 +186,14 @@ def send_pending(*, limit: int = BATCH) -> tuple[int, int]:
     for row in list(pending()[:limit]):
         if not claim(row):
             continue
-        if deliver(row):
+        try:
+            delivered = deliver(row)
+        except Exception:
+            # One row's surprise is not the pass's: the rest are still due (#573).
+            logger.exception("Webhook delivery %s could not be attempted", row.pk)
+            failed += 1
+            continue
+        if delivered:
             sent += 1
         else:
             failed += 1

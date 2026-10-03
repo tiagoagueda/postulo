@@ -230,3 +230,35 @@ def test_a_deactivated_account_is_not_sent_its_due_reminders(user, monkeypatch):
     user.is_active = True
     user.save(update_fields=["is_active"])
     assert announce_due_reminders() == (1, 1)
+
+
+def test_a_webhook_secret_nobody_can_read_does_not_cost_the_pass_its_syncs_or_heartbeat(
+    user, settings, monkeypatch
+):
+    """The row used to raise out of the pass before the syncs and the heartbeat (#573)."""
+    from unittest import mock
+
+    from postulo.notifications.base import Notification
+    from postulo.notifications.service import notify
+    from postulo.plugins.models import Connection
+
+    settings.POSTULO_FIELD_KEY = ""
+    connection = Connection(
+        owner=user, kind="notifier", plugin="webhook", label="Automation", enabled=True
+    )
+    connection.config = {"url": "https://hooks.example.org/postulo"}
+    connection.secrets = {"secret": "a-secret-of-sixteen-characters-or-more"}
+    connection.save()
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    settings.SECRET_KEY = "a-key-rotated-since-the-secret-was-written"
+
+    called = []
+    monkeypatch.setattr(
+        "postulo.plugins.syncing.run_syncs", lambda **kw: called.append(1) or (0, 0)
+    )
+
+    with mock.patch("postulo.plugins.webhook.post"):
+        call_command("send_due_reminders")
+
+    assert called == [1], "the syncs ran on the same pass"
+    assert scheduler.last_pass() is not None, "and the heartbeat was written"
