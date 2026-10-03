@@ -6,7 +6,8 @@ visit to the stored file is a same-origin document of ours**, and anything in it
 
 Two defences, and this file tests both because either one alone is a single point of
 failure: `core.pictures.sanitise_svg` walks an allowlist on the way in, and every private
-file is served under `default-src 'none'; sandbox`.
+file is served under `default-src 'none'; sandbox`. Behind nginx the second depends on the
+proxy adding the headers again, except for an SVG, which Django always streams (#415).
 
 The vectors below are the ones the issue enumerated plus the families they belong to. An
 allowlist is the shape that survives contact — a blocklist is a list of the attacks somebody

@@ -9,7 +9,12 @@ from pathlib import Path
 import pytest
 from django.http import Http404
 
-from postulo.core.files import UnsafeMediaPath, resolve_media_path, serve_private_file
+from postulo.core.files import (
+    FILE_POLICY,
+    UnsafeMediaPath,
+    resolve_media_path,
+    serve_private_file,
+)
 
 
 class FakeFieldFile:
@@ -135,6 +140,21 @@ def test_nginx_serves_the_bytes_when_configured(serve, settings, stored_file):
 
     assert response["X-Accel-Redirect"] == "/protected-media/cvs/backend-engineer.pdf"
     assert not response.content, "Django must not also send the body"
+
+
+def test_an_svg_is_never_handed_to_the_proxy(serve, settings):
+    """The proxy drops the policy header on an internal redirect; Django keeps it (#415)."""
+    path = Path(settings.MEDIA_ROOT) / "logos" / "mark.svg"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"<svg xmlns='http://www.w3.org/2000/svg'/>")
+    settings.POSTULO_MEDIA_ACCEL_PREFIX = "/protected-media/"
+    settings.POSTULO_MEDIA_SENDFILE = True
+
+    response = serve(FakeFieldFile("logos/mark.svg"))
+
+    assert not response.has_header("X-Accel-Redirect") and not response.has_header("X-Sendfile")
+    assert response["Content-Security-Policy"] == FILE_POLICY
+    assert response["X-Content-Type-Options"] == "nosniff"
 
 
 def test_apache_serves_the_bytes_when_configured(serve, settings, stored_file):

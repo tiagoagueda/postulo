@@ -17,6 +17,12 @@ Three delivery strategies are supported, in order of preference:
 ``FileResponse``
     Django streams the bytes. Correct everywhere, and the default, but it occupies an
     application worker for the duration of the download.
+
+Behind nginx or Apache the proxy's own response is the one the browser gets, and nginx
+carries over only a few of an upstream's headers on an internal redirect. The proxy must
+therefore add ``Content-Security-Policy`` (``FILE_POLICY``) and ``X-Content-Type-Options``
+itself for the files it sends. An SVG is never handed over: it is always streamed by
+Django, so the one type the policy exists for does not depend on the proxy (#415).
 """
 
 from __future__ import annotations
@@ -96,12 +102,13 @@ def serve_private_file(
     )
 
     accel_prefix = getattr(settings, "POSTULO_MEDIA_ACCEL_PREFIX", "")
-    if accel_prefix:
+    handed_over = content_type != "image/svg+xml"
+    if accel_prefix and handed_over:
         response = HttpResponse(content_type=content_type)
         response["X-Accel-Redirect"] = posixpath.join(
             accel_prefix.rstrip("/") + "/", quote(file_field.name)
         )
-    elif getattr(settings, "POSTULO_MEDIA_SENDFILE", False):
+    elif getattr(settings, "POSTULO_MEDIA_SENDFILE", False) and handed_over:
         response = HttpResponse(content_type=content_type)
         response["X-Sendfile"] = str(path)
     else:
