@@ -590,18 +590,30 @@ class ApplicationDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 
         context = super().get_context_data(**kwargs)
         application = self.object
-        counts = (
-            (
-                application.events.count(),
-                "%(count)d entry on its timeline",
-                "%(count)d entries on its timeline",
-            ),
-            (application.interviews.count(), "%(count)d interview", "%(count)d interviews"),
-            (application.reminders.count(), "%(count)d reminder", "%(count)d reminders"),
-        )
+        entries = application.events.count()
+        interviews = application.interviews.count()
+        reminders = application.reminders.count()
+        # Each ngettext carries its two texts as literals: the extractor reads call sites.
         context["consequences"] = [
-            ngettext(one, many, number) % {"count": number}
-            for number, one, many in counts
+            text % {"count": number}
+            for number, text in (
+                (
+                    entries,
+                    ngettext(
+                        "%(count)d entry on its timeline",
+                        "%(count)d entries on its timeline",
+                        entries,
+                    ),
+                ),
+                (
+                    interviews,
+                    ngettext("%(count)d interview", "%(count)d interviews", interviews),
+                ),
+                (
+                    reminders,
+                    ngettext("%(count)d reminder", "%(count)d reminders", reminders),
+                ),
+            )
             if number
         ]
         sent = application.rendered_documents.count()

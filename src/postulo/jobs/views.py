@@ -591,14 +591,17 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         company = self.object
         applications = Application.objects.filter(posting__company=company)
-        counts = (
-            (company.postings.count(), "%(count)d posting", "%(count)d postings"),
-            (applications.count(), "%(count)d application", "%(count)d applications"),
-            (company.contacts.count(), "%(count)d contact", "%(count)d contacts"),
-        )
+        postings = company.postings.count()
+        applied = applications.count()
+        contacts = company.contacts.count()
+        # Each ngettext carries its two texts as literals: the extractor reads call sites.
         context["consequences"] = [
-            ngettext(one, many, number) % {"count": number}
-            for number, one, many in counts
+            text % {"count": number}
+            for number, text in (
+                (postings, ngettext("%(count)d posting", "%(count)d postings", postings)),
+                (applied, ngettext("%(count)d application", "%(count)d applications", applied)),
+                (contacts, ngettext("%(count)d contact", "%(count)d contacts", contacts)),
+            )
             if number
         ]
         sent = RenderedDocument.objects.filter(application__in=applications).count()

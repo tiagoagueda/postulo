@@ -522,3 +522,60 @@ def test_the_extractor_knows_every_name_a_translation_function_is_called_by(tool
         f"{unknown} name a translation function that scripts/messages.py does not know, so "
         f"every string passed to them is silently untranslatable. Add each to CALLS."
     )
+
+
+def test_every_translation_call_gives_its_texts_as_literals(tool):
+    """The extractor reads call sites, so a text handed over in a variable is in no catalogue.
+
+    `ngettext(one, many, n)` over a tuple of texts compiled, ran and showed English in every
+    language, and the extraction check could not notice because a fresh extraction does not
+    see those strings either (#388).
+    """
+    import ast
+
+    offenders = []
+    for path in sorted((REPO / "src" / "postulo").rglob("*.py")):
+        if tool.SKIP_DIRS & set(path.relative_to(REPO / "src" / "postulo").parts[:-1]):
+            continue
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)):
+                continue
+            if node.func.id not in tool.CALLS:
+                continue
+            for index in tool.CALLS[node.func.id]:
+                if index is None or index == tool.CALLS[node.func.id][2]:
+                    continue
+                argument = node.args[index] if len(node.args) > index else None
+                if not (isinstance(argument, ast.Constant) and isinstance(argument.value, str)):
+                    offenders.append(f"{path.relative_to(REPO)}:{node.lineno}")
+                    break
+
+    assert not offenders, (
+        f"{offenders}: a message or plural text that is not a string literal is never "
+        f"extracted. Write each text inside the call."
+    )
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("code", ["fr-FR", "pt-PT", "pt-BR"])
+def test_the_company_delete_page_counts_in_the_readers_language(
+    client, user, code, compiled, catalogues
+):
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name="Black Mesa")
+    for title in ("One", "Two"):
+        posting = JobPosting.objects.create(owner=user, company=company, title=title)
+    Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+    user.profile.language = code
+    user.profile.save()
+    client.force_login(user)
+
+    page = client.get(reverse("jobs:company_delete", args=[company.pk])).content.decode()
+
+    assert "2 postings" not in page
+    assert "1 application" not in page
+    with translation.override(code):
+        expected = translation.ngettext("%(count)d posting", "%(count)d postings", 2) % {"count": 2}
+    assert expected in page
