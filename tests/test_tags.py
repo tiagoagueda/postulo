@@ -345,3 +345,131 @@ def test_the_migration_puts_every_row_on_the_palette(user):
         "A hex code": "grey",
         "Nothing at all": "grey",
     }
+
+
+# -------------------------------------------------- the name is the identity, not the slug (#356)
+
+
+def make_through_the_page(client, name):
+    return client.post(
+        reverse("applications:tag_create"), {"name": name, "colour": "grey", "icon": ""}
+    )
+
+
+@pytest.mark.parametrize(
+    "first, second", [("C++", "C#"), ("remote", "Remote!"), ("Επείγον", "Κάτι")]
+)
+def test_names_that_shared_a_slug_are_two_tags(client, user, first, second):
+    client.force_login(user)
+
+    assert make_through_the_page(client, first).status_code == 302
+    assert make_through_the_page(client, second).status_code == 302
+
+    assert sorted(Tag.objects.filter(owner=user).values_list("name", flat=True)) == sorted(
+        [first, second]
+    )
+    assert len({tag.slug for tag in Tag.objects.filter(owner=user)}) == 2
+    assert Tag.objects.filter(owner=user, slug="").count() == 0
+    assert [tag.name for tag in Tag.named(user, [first, second])] == sorted(
+        [first, second], key=[first, second].index
+    ), "the New tags box finds each by its name and makes no third"
+    assert Tag.objects.filter(owner=user).count() == 2
+
+
+def test_the_same_name_in_other_capitals_is_a_form_error_and_never_a_500(client, user):
+    client.force_login(user)
+    make_through_the_page(client, "Επείγον")
+
+    response = make_through_the_page(client, "επείγον")
+
+    assert response.status_code == 200
+    assert "already have a tag with that name" in response.content.decode()
+    assert Tag.objects.filter(owner=user).count() == 1
+
+
+@pytest.mark.parametrize("name", ["Κάτι", "Срочно", "日本語"])
+def test_a_name_in_any_script_is_a_tag(user, name):
+    [tag] = Tag.named(user, [name])
+
+    assert tag.name == name
+    assert tag.slug, "the slug keeps its letters instead of losing them"
+    assert Tag.named(user, [name]) == [tag]
+
+
+def test_a_renamed_tag_answers_to_its_new_name_only(client, user):
+    [remote] = Tag.named(user, ["Remote"])
+    remote.name = "Hybrid"
+    remote.save()
+
+    assert Tag.named(user, ["Hybrid"]) == [remote]
+    [again] = Tag.named(user, ["Remote"])
+    assert again.pk != remote.pk
+    again.delete()
+    client.force_login(user)
+    assert make_through_the_page(client, "Remote").status_code == 302
+
+
+def test_a_tag_name_is_cut_to_its_column_and_found_again(user):
+    long_name = "x" * 70
+
+    [first] = Tag.named(user, [long_name])
+    [second] = Tag.named(user, [long_name])
+
+    assert first == second and len(first.name) == 60
+
+
+def test_a_non_latin_tag_can_be_chosen_in_the_filter_and_survives_an_export(
+    client, user, other_user
+):
+    company = Company.objects.create(owner=user, name="Aperture")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
+    application = Application.objects.create(owner=user, posting=posting)
+    application.tags.set(Tag.named(user, ["Επείγον"]))
+    client.force_login(user)
+
+    [tag] = Tag.objects.filter(owner=user)
+    page = client.get(reverse("applications:list"), {"tag": tag.slug}).content.decode()
+    assert f'value="{tag.slug}"' in page and 'value=""' in page
+    assert tag.slug != ""
+    assert "Engineer" in page
+
+    importer.load(other_user, zipfile.ZipFile(export_module.write_archive(user)))
+    restored = Application.objects.get(owner=other_user)
+    assert [t.name for t in restored.tags.all()] == ["Επείγον"]
+
+
+def test_an_archive_written_with_an_empty_slug_keeps_its_tags(user, other_user):
+    company = Company.objects.create(owner=user, name="Aperture")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
+    application = Application.objects.create(owner=user, posting=posting)
+    application.tags.set(Tag.named(user, ["Επείγον"]))
+    document = export_module.build_document(user)
+    document["tags"][0]["slug"] = ""
+    as_text = json.dumps(document, default=str, ensure_ascii=False)
+    slug = Tag.objects.get(owner=user).slug
+    document = json.loads(as_text.replace(f'"tags": ["{slug}"]', '"tags": [""]'))
+    assert '"tags": [""]' in json.dumps(document, ensure_ascii=False)
+
+    imported_from(document, other_user)
+
+    assert [t.name for t in Application.objects.get(owner=other_user).tags.all()] == ["Επείγον"]
+
+
+def test_the_migration_gives_every_tag_a_slug_of_its_present_name(user):
+    migration = importlib.import_module("postulo.core.migrations.0029_tag_slugs")
+    empty = Tag.objects.create(owner=user, name="Κάτι", slug="x")
+    Tag.objects.create(owner=user, name="Hybrid", slug="remote")
+    fine = Tag.objects.create(owner=user, name="Dream job")
+    Tag.objects.filter(pk=empty.pk).update(slug="")
+    Tag.objects.create(owner=user, name="Hybrid2", slug="hybrid")
+    Tag.objects.filter(name="Hybrid2").update(name="Something else")
+
+    migration.rederive(django_apps, None)
+
+    slugs = {tag.name: tag.slug for tag in Tag.objects.filter(owner=user)}
+    assert slugs["Hybrid"] == "hybrid"
+    assert slugs["Κάτι"] == "κάτι"
+    assert slugs["Dream job"] == fine.slug
+    assert slugs["Something else"] == "something-else"
+    assert len(set(slugs.values())) == len(slugs), "distinct, and never empty"
+    assert "" not in slugs.values()

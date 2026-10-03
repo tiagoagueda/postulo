@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import slugs
 from postulo.core.csv_import import OFFERED_CURRENCIES
 from postulo.core.models import Tag, TagColour, TagIcon
 from postulo.jobs import esco, recall
@@ -652,10 +653,10 @@ class TagForm(OwnerScopedModelForm):
         name = self.cleaned_data["name"].strip()
         if self.user is None:
             return name
-        clash = Tag.objects.for_user(self.user).filter(name__iexact=name)
+        clash = Tag.objects.for_user(self.user)
         if self.instance.pk:
             clash = clash.exclude(pk=self.instance.pk)
-        if clash.exists():
+        if slugs.same_name(clash, name):
             raise forms.ValidationError(_("You already have a tag with that name."))
         return name
 

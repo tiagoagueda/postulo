@@ -502,3 +502,25 @@ def test_the_section_title_is_translated_when_shown_not_when_imported():
     from postulo.core import views_import
 
     assert isinstance(views_import.SECTION["section_title"], Promise)
+
+
+def test_tags_that_shared_a_slug_import_and_a_long_one_is_one_tag(user):
+    from postulo.core.models import Tag
+
+    long_name = "x" * 70
+    sheet = "\n".join(
+        [
+            "Company,Role,Tags",
+            'Aperture,Engineer,"C++; C#"',
+            'Black Mesa,Physicist,"удалённо; мечта"',
+            f"Initech,Consultant,{long_name}",
+            f"Vandelay,Importer,{long_name}",
+        ]
+    )
+    parsed = csv_import.read_sheet(sheet.encode("utf-8"), "tags.csv")
+
+    report = csv_import.perform(user, parsed, csv_import.guess_mapping(parsed.headers))
+
+    assert report.applications == 4
+    names = sorted(Tag.objects.filter(owner=user).values_list("name", flat=True))
+    assert names == sorted(["C++", "C#", "удалённо", "мечта", "x" * 60])

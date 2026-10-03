@@ -84,13 +84,4 @@ def priority_or_422(value: int) -> int:
 
 def tags_named(owner, names: list[str]) -> list[Tag]:
     """The owner's tags with these names, made if missing."""
-    tags = []
-    for name in names:
-        name = name.strip()
-        if not name:
-            continue
-        tag = Tag.objects.for_user(owner).filter(name__iexact=name).first()
-        if tag is None:
-            tag = Tag.objects.create(owner=owner, name=name)
-        tags.append(tag)
-    return tags
+    return Tag.named(owner, names)

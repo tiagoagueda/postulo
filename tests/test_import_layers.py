@@ -75,6 +75,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.pictures",
             "postulo.core.proxy",
             "postulo.core.redirects",
+            "postulo.core.slugs",
             "postulo.core.throttle",
             "postulo.documents.outline",
             "postulo.documents.themes",

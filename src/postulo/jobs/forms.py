@@ -9,10 +9,9 @@ from __future__ import annotations
 
 from django import forms
 from django.utils import timezone
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import phone_field, phone_numbers, phones, web_links
+from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
 from . import employment_services, esco, identifiers, industries, logos, structure
@@ -550,10 +549,10 @@ class IndustryForm(OwnerScopedModelForm):
         name = self.cleaned_data["name"].strip()
         if self.user is None:
             return name
-        clash = Industry.objects.for_user(self.user).filter(slug=slugify(name)[:60])
+        clash = Industry.objects.for_user(self.user)
         if self.instance.pk:
             clash = clash.exclude(pk=self.instance.pk)
-        if clash.exists() and not self.data.get("merge_into"):
+        if slugs.same_name(clash, name) and not self.data.get("merge_into"):
             raise forms.ValidationError(_("You already have that industry."))
         return name
 
@@ -565,7 +564,6 @@ class IndustryForm(OwnerScopedModelForm):
             self.instance.delete()
             return target
         industry = super().save(commit=False)
-        industry.slug = slugify(industry.name)[:60] or "other"
         if commit:
             industry.save()
         return industry

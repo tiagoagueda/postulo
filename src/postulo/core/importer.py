@@ -24,6 +24,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
+from . import slugs
 from .export import (
     APPLICATION_FIELDS,
     CAPTURE_FIELDS,
@@ -732,17 +733,24 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     # import that rejects a whole account over the shade of a label would be absurd.
     known_icons = {choice.value for choice in TagIcon}
     tags_by_slug: dict[str, Tag] = {}
+    known_tags = list(Tag.objects.filter(owner=user))
     for entry in document.get("tags", []):
-        tag, created = Tag.objects.get_or_create(
-            owner=user,
-            slug=entry.get("slug") or entry.get("name", "").lower(),
-            defaults={
-                "name": entry.get("name", ""),
-                "colour": nearest_tone(entry.get("colour", "")),
-                "icon": entry.get("icon", "") if entry.get("icon", "") in known_icons else "",
-            },
-        )
-        tags_by_slug[tag.slug] = tag
+        name = entry.get("name", "")
+        tag = slugs.same_name(known_tags, name)
+        created = tag is None
+        if created:
+            tag = Tag.objects.create(
+                owner=user,
+                name=slugs.collapse(name)[:60],
+                colour=nearest_tone(entry.get("colour", "")),
+                icon=entry.get("icon", "") if entry.get("icon", "") in known_icons else "",
+            )
+            known_tags.append(tag)
+        # The slug the archive wrote is what its applications name the tag by, whatever
+        # slug this instance gave the row: an archive written with an empty one still
+        # finds its tags (#356).
+        tags_by_slug[entry["slug"] if "slug" in entry else name.lower()] = tag
+        tags_by_slug.setdefault(tag.slug, tag)
         report.tags += int(created)
 
     # ------------------------------------------------------------------- career

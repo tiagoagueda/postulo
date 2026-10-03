@@ -16,10 +16,9 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils import timezone
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
-from . import phones
+from . import phones, slugs
 from .language_field import LanguageField
 
 # MailSecurity is not a model -- it is how TLS gets onto an SMTP session (#149) -- and
@@ -172,7 +171,7 @@ class Tag(OwnedModel):
     """
 
     name = models.CharField(_("name"), max_length=60)
-    slug = models.SlugField(_("slug"), max_length=60)
+    slug = models.SlugField(_("slug"), max_length=60, allow_unicode=True)
     colour = models.CharField(
         _("colour"),
         max_length=20,
@@ -201,9 +200,7 @@ class Tag(OwnedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)[:60]
-        super().save(*args, **kwargs)
+        slugs.save_with_slug(self, "tag", args, kwargs, super().save)
 
     @property
     def tone(self) -> str:
@@ -234,8 +231,9 @@ class Tag(OwnedModel):
     def named(cls, owner, names) -> "list[Tag]":
         """The owner's tags with these names, made if missing, in the order given.
 
-        The same helper `jobs.Industry` has, and for the same reason: matching by slug is
-        what stops *Remote*, *remote* and *REMOTE* from becoming three tags. A control that
+        The same helper `jobs.Industry` has, and for the same reason: matching by name,
+        ignoring capitals, accents and spacing, is what stops *Remote*, *remote* and
+        *REMOTE* from becoming three tags, while *C#* and *C++* stay two (#356). A control that
         offers to add a label somebody has not used before needs somewhere for that label to
         land, and this is it (#139).
 
@@ -244,19 +242,7 @@ class Tag(OwnedModel):
         corner of a control that exists to accept a typed word would be a worse choice than
         not offering one.
         """
-        found: list[Tag] = []
-        seen: set[str] = set()
-        for raw in names:
-            name = str(raw).strip()[:60]
-            slug = slugify(name)[:60]
-            if not name or not slug or slug in seen:
-                continue
-            seen.add(slug)
-            tag, _created = cls.objects.get_or_create(
-                owner=owner, slug=slug, defaults={"name": name}
-            )
-            found.append(tag)
-        return found
+        return slugs.named(cls, owner, names, fallback="tag")
 
     @classmethod
     def split(cls, text: str) -> list[str]:

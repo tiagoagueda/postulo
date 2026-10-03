@@ -32,9 +32,9 @@ from django.db.models.functions import Coalesce, Lower
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
-from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import slugs
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
@@ -53,7 +53,7 @@ class Industry(OwnedModel):
     """
 
     name = models.CharField(_("name"), max_length=160)
-    slug = models.SlugField(_("slug"), max_length=160)
+    slug = models.SlugField(_("slug"), max_length=160, allow_unicode=True)
     #: The NACE division this name is, where it is one of them. Empty for a word somebody
     #: made up, which is the ordinary case and not a lesser kind of industry -- the code is
     #: what makes a report legible to an employment office that thinks in NACE, and nothing
@@ -72,34 +72,20 @@ class Industry(OwnedModel):
         return self.name
 
     def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)[:160] or "other"
         # The code follows the name rather than being set beside it. Renaming an industry
         # to a division's name gives it that division; renaming it away takes it back. One
         # invariant, and no way for the two to disagree (#140).
         self.code = industries.code_for(self.name)
-        super().save(*args, **kwargs)
+        slugs.save_with_slug(self, "industry", args, kwargs, super().save)
 
     @classmethod
     def named(cls, owner, names) -> list[Industry]:
         """The owner's industries with these names, made if missing, in the order given.
 
-        Matching is by slug, so capitals and accents do not breed duplicates; a name
-        already known keeps the spelling it was first entered with.
+        Matching is by name, so capitals, accents and spacing do not breed duplicates; a
+        name already known keeps the spelling it was first entered with (#356).
         """
-        found: list[Industry] = []
-        seen: set[str] = set()
-        for raw in names:
-            name = str(raw).strip()[:160]
-            slug = slugify(name)[:160]
-            if not name or not slug or slug in seen:
-                continue
-            seen.add(slug)
-            industry, _created = cls.objects.get_or_create(
-                owner=owner, slug=slug, defaults={"name": name}
-            )
-            found.append(industry)
-        return found
+        return slugs.named(cls, owner, names, fallback="industry")
 
     @classmethod
     def split(cls, text: str) -> list[str]:

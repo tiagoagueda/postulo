@@ -1157,11 +1157,7 @@ def perform(
                 actor=provenance,
             )
             if row.tags:
-                tags = []
-                for name in row.tags:
-                    tag = Tag.objects.for_user(user).filter(name__iexact=name).first()
-                    tags.append(tag or Tag.objects.create(owner=user, name=name[:60]))
-                application.tags.set(tags)
+                application.tags.set(Tag.named(user, row.tags))
             report.applications += 1
     return report
 

@@ -315,3 +315,86 @@ def test_the_industry_table_is_a_dashboard_widget(client, user):
     client.force_login(user)
     body = client.get(reverse("core:home")).content.decode()
     assert "data-by-industry" in body and "By industry" in body
+
+
+# -------------------------------------------------- the name is the identity, not the slug (#356)
+
+
+def test_two_greek_industries_can_be_made_on_the_industries_page(client, user):
+    client.force_login(user)
+
+    for name in ("Ενέργεια", "Υγεία"):
+        assert client.post(reverse("jobs:industry_create"), {"name": name}).status_code == 302
+
+    assert sorted(Industry.objects.filter(owner=user).values_list("name", flat=True)) == [
+        "Ενέργεια",
+        "Υγεία",
+    ]
+    assert Industry.objects.filter(owner=user, slug="").count() == 0
+
+
+def test_a_name_in_any_script_is_found_again_and_a_company_keeps_it(user, other_user):
+    named = Industry.named(user, ["Банки", "Τράπεζες", "Software"])
+    assert [i.name for i in named] == ["Банки", "Τράπεζες", "Software"]
+    assert Industry.named(user, ["банки", " Τράπεζες "]) == named[:2]
+
+    company = company_with(user, "Aperture", "Банки")
+    importer.load(other_user, zipfile.ZipFile(export_module.write_archive(user)))
+    restored = Company.objects.get(owner=other_user, name="Aperture")
+    assert [i.name for i in restored.industries.all()] == ["Банки"]
+    assert [i.name for i in company.industries.all()] == ["Банки"]
+
+
+def test_a_company_form_keeps_a_non_latin_industry_typed_under_other_industries(user):
+    form = CompanyForm(data={"name": "Aperture", "new_industries": "Банки; Software"}, user=user)
+    assert form.is_valid(), form.errors
+    company = form.save(commit=False)
+    company.owner = user
+    company.save()
+    form.save_m2m()
+
+    assert sorted(i.name for i in company.industries.all()) == ["Software", "Банки"]
+
+
+def test_a_long_name_is_one_industry_through_every_door(client, user):
+    long_name = (
+        "Undifferentiated goods- and services-producing activities of private households "
+        "for own use"
+    )
+    [industry] = Industry.named(user, [long_name])
+    assert len(industry.slug) > 60
+    client.force_login(user)
+
+    assert (
+        client.post(
+            reverse("jobs:industry_update", args=[industry.pk]), {"name": long_name}
+        ).status_code
+        == 302
+    )
+    assert Industry.named(user, [long_name]) == [industry]
+    assert Industry.objects.filter(owner=user).count() == 1
+
+    response = client.post(reverse("jobs:industry_create"), {"name": long_name})
+    assert response.status_code == 200
+    assert "You already have that industry." in response.content.decode()
+
+
+def test_the_migration_gives_distinct_slugs_and_merges_a_name_made_twice(user):
+    migration = importlib.import_module("postulo.jobs.migrations.0023_industry_slugs")
+    first = Industry.objects.create(owner=user, name="Ενέργεια")
+    Industry.objects.filter(pk=first.pk).update(slug="other")
+    second = Industry.objects.create(owner=user, name="Υγεία")
+    Industry.objects.filter(pk=second.pk).update(slug="other-2")
+    Industry.objects.filter(pk=second.pk).update(slug="")
+    twin = Industry.objects.create(owner=user, name="Ενέργεια", slug="twin")
+    Industry.objects.create(owner=user, name="Other")
+    company = Company.objects.create(owner=user, name="Aperture")
+    company.industries.set([twin])
+
+    migration.merge_and_rederive(apps, None)
+
+    rows = list(Industry.objects.filter(owner=user).order_by("pk"))
+    assert [r.name for r in rows] == ["Ενέργεια", "Υγεία", "Other"]
+    assert len({r.slug for r in rows}) == 3 and "" not in {r.slug for r in rows}
+    assert rows[2].slug == "other", "Other keeps the slug of its own name"
+    assert list(company.industries.all()) == [rows[0]], "the company moved to the one that stays"

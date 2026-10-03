@@ -255,6 +255,34 @@ def test_writes_go_through_the_services_and_sign_the_timeline(client, user, sear
     assert "via API token Agent" in html
 
 
+def test_tags_that_shared_a_slug_are_accepted_and_kept(client, user):
+    from postulo.core.models import Tag
+
+    Tag.objects.create(owner=user, name="remote")
+    bearer = issue(user, "write", "read")
+    for tags in (["Remote!"], ["C++", "C#"], ["x" * 70], ["Κάτι", "Срочно"]):
+        response = post(
+            client,
+            "/api/v1/applications",
+            {"company_name": "Black Mesa", "title": "Engineer", "tags": tags},
+            **bearer,
+        )
+        assert response.status_code == 201, tags
+        assert len(response.json()["tags"]) == len(tags)
+    assert Tag.objects.filter(owner=user, name="x" * 60).count() == 1
+
+
+def test_a_company_posted_with_a_greek_industry_has_it(client, user):
+    bearer = issue(user, "write", "read")
+
+    response = post(
+        client, "/api/v1/companies", {"name": "Aperture", "industries": ["Πληροφορική"]}, **bearer
+    )
+
+    assert response.status_code == 201
+    assert response.json()["industries"] == ["Πληροφορική"]
+
+
 def test_recording_an_application_and_applying_to_a_listing(client, user, search):
     bearer = issue(user, "write", "read")
     response = post(
