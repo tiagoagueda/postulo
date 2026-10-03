@@ -21,7 +21,11 @@ def table_settings(request: HttpRequest, name: str) -> HttpResponse:
     if table is None:
         raise Http404
     if "reset" in request.POST:
-        tables.save_settings(request.user, name, None)
+        # Everything the person set on the table goes, shape included, but the saved views
+        # they built and named are not what this button says it undoes (#503).
+        current = tables.settings_for(request.user, name)
+        kept = {"views": current["views"]} if isinstance(current.get("views"), list) else None
+        tables.save_settings(request.user, name, kept)
         messages.success(request, _("Back to the usual columns."))
     elif "shape" in request.POST:
         # The shape switch on the applications page (#102): one field, remembered beside

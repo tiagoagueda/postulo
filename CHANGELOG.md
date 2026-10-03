@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Resizing a column, applying *Columns* or pressing *Reset* no longer deletes your saved views, and resizing under an applied view no longer overwrites your own columns. (#503)
 - Answering *Stay* to the unsaved-work question no longer leaves the button you pressed dead: *Discard this capture* or *Sign out* works again on your next key or click. (#518)
 - A discarded listing stays under *Discarded* after its closing date passes, instead of moving to *Closed* still labelled Discarded; the tab counts, the API filter and the insights figure agree with the State column. (#529)
 - A company form with a rejected identifier no longer says *Company added.* or *Company updated.*, and no longer fetches, replaces or removes the logo of a company it did not save (a logo address on a new company was a 500). (#530)

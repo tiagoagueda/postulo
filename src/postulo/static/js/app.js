@@ -5453,12 +5453,8 @@
     body.set("width", key);
     body.set("px", String(pixels));
     body.set("next", head.dataset.colHere || "/");
-    // Every column that is currently shown, so `clean_settings` keeps them rather than
-    // falling back to the defaults: it reads one form, and this is that form.
-    Array.prototype.forEach.call(head.querySelectorAll("th[data-col]"), function (cell) {
-      body.append("order", cell.dataset.col);
-      body.append("show", cell.dataset.col);
-    });
+    // Only the width: `clean_settings` keeps the stored columns when none arrive, so a drag
+    // under an applied saved view does not write the view's columns over the person's own.
     fetch(head.dataset.colSettings, {
       method: "POST",
       headers: {

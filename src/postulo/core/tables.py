@@ -1040,6 +1040,12 @@ class Table:
 
         shown = set(data.getlist("show"))
         columns = [key for key in order if key in shown]
+        if "order" not in data and "show" not in data and "move" not in data:
+            # A width drag posts neither: it says nothing about the columns, and under an
+            # applied saved view the page it came from shows the view's, not the person's
+            # own (#503). Keep what is stored.
+            kept = [key for key in (current or {}).get("columns") or [] if key in order]
+            columns = kept or columns
         if not columns:
             columns = cls.default_columns()
 
@@ -1072,6 +1078,10 @@ class Table:
         shape = (current or {}).get("shape")
         if shape in cls.shapes:
             cleaned["shape"] = shape
+        # Saved views are kept by their own controls and live in the same dictionary: a
+        # save of the columns is not a reason to lose them (#503).
+        if isinstance((current or {}).get("views"), list):
+            cleaned["views"] = current["views"]
         return cleaned
 
 

@@ -348,3 +348,61 @@ def test_views_leave_with_the_export_and_come_back(user, other_user):
     other_user.refresh_from_db()
     restored = CompaniesTable._views_of(tables.settings_for(other_user, "companies"))
     assert [v.name for v in restored] == ["Mexico"]
+
+
+# ---------------------------------------- the views survive the saves beside them (#503)
+
+
+def _stored_view(user):
+    settings = CompaniesTable.save_view(
+        tables.settings_for(user, "companies"), "Mexico", "location=mexico", ["name"]
+    )
+    tables.save_settings(user, "companies", {**settings, "columns": ["name", "location"]})
+    return tables.settings_for(user, "companies")["views"]
+
+
+@pytest.mark.parametrize(
+    "post",
+    [
+        {"width": "name", "px": "300"},
+        {"order": ["name", "location"], "show": ["name"], "page_size": "25"},
+        {"order": ["name", "location"], "show": ["name", "location"], "move": "down:name"},
+        {"reset": "1"},
+    ],
+    ids=["width", "apply", "move", "reset"],
+)
+def test_a_saved_view_survives_the_saves_of_the_columns_beside_it(client, user, post):
+    views = _stored_view(user)
+    client.force_login(user)
+    response = client.post(
+        reverse("core:table_settings", args=["companies"]), {**post, "next": "/jobs/companies/"}
+    )
+    assert response.status_code == 302
+    user.refresh_from_db()
+    assert tables.settings_for(user, "companies").get("views") == views
+
+
+def test_a_reset_forgets_the_columns_and_widths_and_keeps_the_views(client, user):
+    views = _stored_view(user)
+    tables.save_settings(
+        user,
+        "companies",
+        {**tables.settings_for(user, "companies"), "widths": {"name": 300}, "page_size": 50},
+    )
+    client.force_login(user)
+    client.post(reverse("core:table_settings", args=["companies"]), {"reset": "1"})
+    user.refresh_from_db()
+    assert tables.settings_for(user, "companies") == {"views": views}
+
+
+def test_a_width_posted_under_an_applied_view_leaves_the_stored_columns_alone(client, user):
+    _stored_view(user)  # the person's own columns are name and location; the view shows name
+    client.force_login(user)
+    client.post(
+        reverse("core:table_settings", args=["companies"]),
+        {"width": "name", "px": "300", "next": "/jobs/companies/?saved=mexico"},
+    )
+    user.refresh_from_db()
+    stored = tables.settings_for(user, "companies")
+    assert stored["columns"] == ["name", "location"]
+    assert stored["widths"] == {"name": 300}
