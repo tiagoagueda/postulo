@@ -742,7 +742,8 @@ def parse_currency(text: str, default: str = "") -> str:
     for code in re.findall(r"\b[A-Za-z]{3}\b", raw):
         if code.upper() in CURRENCY_CODES:
             return code.upper()
-    for symbol, code in CURRENCY_SYMBOLS.items():
+    # Longest first, so "R$" is read before the "$" inside it.
+    for symbol, code in sorted(CURRENCY_SYMBOLS.items(), key=lambda item: -len(item[0])):
         if symbol in raw or symbol.lower() in raw.lower():
             return code
     return default
@@ -776,7 +777,7 @@ def parse_salary_range(text: str) -> tuple[Decimal | None, Decimal | None]:
     if len(parts) == 2:
         low, high = parse_money(parts[0]), parse_money(parts[1])
         if low is not None and high is not None:
-            if _has_thousands(parts[1]) and not _has_thousands(parts[0]) and low < high:
+            if _has_thousands(parts[1]) and not _has_thousands(parts[0]) and low * 1000 <= high:
                 low *= 1000
             return (low, high) if low <= high else (high, low)
     single = parse_money(text)

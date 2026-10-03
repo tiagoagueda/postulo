@@ -182,6 +182,8 @@ def test_moving_an_interview_rewords_its_reminder(user, company):
         ("50k-60k", (Decimal(50000), Decimal(60000))),
         ("50000 - 60000", (Decimal(50000), Decimal(60000))),
         ("45k", (Decimal(45000), Decimal(45000))),
+        ("45,000 - 55k", (Decimal(45000), Decimal(55000))),
+        ("900 - 1.2k", (Decimal(900), Decimal(1200))),
     ],
 )
 def test_a_trailing_k_belongs_to_both_figures(text, expected):
@@ -198,6 +200,7 @@ def test_the_word_a_splits_a_range_and_the_letter_a_does_not():
     [
         ("£55,000", "GBP"),
         ("$55,000", "USD"),
+        ("R$ 8.000", "BRL"),
         ("55 000 €", "EUR"),
         ("55000 CHF", "CHF"),
         ("55000 chf", "CHF"),
