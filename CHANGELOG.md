@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Identifiers: accented/percent-encoded LinkedIn names, 2-3 letter ResearcherIDs and Web of Science links are accepted; a pasted Scopus link keeps only its author ID; a Wikidata link's fragment is ignored; non-ASCII digits are refused. (#638)
 - A malformed identifier now reads "ORCID: that is not the usual form (for example …)" instead of the ungrammatical "a ORCID identifier"; the person and company identifier checks now live once in core (#645).
 - Paginated API lists (applications, companies, CVs, letters, interviews, reminders) break ties by id, so paging can no longer repeat one row and skip another. (#440)
 - `GET /api/v1/captures` takes `after_id`, so a client can catch up past a run of captures sharing one `updated_at`. (#439)

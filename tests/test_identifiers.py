@@ -40,6 +40,7 @@ def company_with(user, name, *ids):
         ("wikidata", " q95 ", "Q95"),
         ("wikidata", "https://www.wikidata.org/wiki/Q95", "Q95"),
         ("wikidata", "http://www.wikidata.org/entity/Q95", "Q95"),
+        ("wikidata", "https://www.wikidata.org/wiki/Q95#P31", "Q95"),
         ("lei", "hwupkr0mpou8fgxbt394", LEI),
         ("lei", "https://search.gleif.org/#/record/HWUPKR0MPOU8FGXBT394", LEI),
         ("register", "PT501234567", "PT 501234567"),

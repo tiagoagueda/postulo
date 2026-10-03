@@ -816,8 +816,14 @@ def test_a_person_and_a_company_can_be_sent_to_different_places():
 
 
 def test_the_schemes_postulo_ships_build_their_links_as_they_did():
-    """`quoted` is for a scheme whose pattern is somebody's own, and for no other."""
-    assert not any(scheme.quoted or scheme.max_length for scheme in SCHEMES.values())
+    """`quoted` is for a scheme whose pattern is somebody's own, and for no other.
+
+    LinkedIn is the one exception: its names carry letters of any script, which a link
+    must write percent-encoded (#638). Its pattern is reviewed with the code and holds
+    no slash or question mark.
+    """
+    assert not any(scheme.max_length for scheme in SCHEMES.values())
+    assert [key for key, scheme in SCHEMES.items() if scheme.quoted] == ["linkedin"]
     assert (
         SCHEMES["opencorporates"].url_for("gb/01234567")
         == "https://opencorporates.com/companies/gb/01234567"

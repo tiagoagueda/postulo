@@ -77,7 +77,7 @@ def _regroup(size: int, separator: str):
 
 
 def _digits_only(value: str) -> str:
-    return re.sub(r"\D", "", value)
+    return re.sub(r"[^0-9]", "", value)
 
 
 def _no_spaces(value: str) -> str:
@@ -128,7 +128,7 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             ORCID,
             "ORCID",
-            pattern=re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$"),
+            pattern=re.compile(r"^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$", re.ASCII),
             subjects=ONLY_PERSON,
             link="https://orcid.org/{value}",
             example="0000-0002-1825-0097",
@@ -145,20 +145,25 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             RESEARCHERID,
             "ResearcherID",
-            pattern=re.compile(r"^[A-Z]-\d{4}-\d{4}$"),
+            pattern=re.compile(r"^[A-Z]{1,3}-\d{4}-\d{4}$", re.ASCII),
             subjects=ONLY_PERSON,
             link="https://www.webofscience.com/wos/author/record/{value}",
             example="A-1234-2020",
+            url_paths=("/record/", "/rid/"),
+            hosts=("webofscience.com", "researcherid.com"),
             upper=True,
             icon="graduation-cap",
         ),
         Scheme(
             SCOPUS,
             "Scopus Author ID",
-            pattern=re.compile(r"^\d{10,11}$"),
+            pattern=re.compile(r"^\d{10,11}$", re.ASCII),
             subjects=ONLY_PERSON,
             link="https://www.scopus.com/authid/detail.uri?authorId={value}",
             example="7004212771",
+            url_paths=("/",),
+            hosts=("scopus.com",),
+            query=("authorId",),
             tidy=_digits_only,
             icon="graduation-cap",
         ),
@@ -166,7 +171,7 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             ISNI,
             "ISNI",
-            pattern=re.compile(r"^\d{4} \d{4} \d{4} \d{3}[\dX]$"),
+            pattern=re.compile(r"^\d{4} \d{4} \d{4} \d{3}[\dX]$", re.ASCII),
             subjects=BOTH,
             link="https://isni.org/isni/{value}",
             example="0000 0001 2281 955X",
@@ -176,7 +181,7 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             WIKIDATA,
             "Wikidata",
-            re.compile(r"^Q[1-9]\d{0,11}$"),
+            re.compile(r"^Q[1-9]\d{0,11}$", re.ASCII),
             subjects=BOTH,
             link="https://www.wikidata.org/wiki/{value}",
             example="Q95",
@@ -188,10 +193,11 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             LINKEDIN,
             "LinkedIn",
-            re.compile(r"^[a-z0-9][a-z0-9._\-]{0,99}$"),
+            re.compile(r"^[^\W_][\w.\-]{0,99}$"),
             subjects=BOTH,
             link="https://www.linkedin.com/company/{value}/",
             person_link="https://www.linkedin.com/in/{value}/",
+            quoted=True,
             example="aperture-science",
             url_paths=("/company/", "/school/", "/showcase/", "/in/"),
             hosts=("linkedin.com",),
@@ -202,12 +208,13 @@ SCHEMES: dict[str, Scheme] = {
         Scheme(
             LEI,
             _("Legal Entity Identifier (LEI)"),
-            re.compile(r"^[A-Z0-9]{18}\d{2}$"),
+            re.compile(r"^[A-Z0-9]{18}\d{2}$", re.ASCII),
             subjects=ONLY_COMPANY,
             link="https://search.gleif.org/#/record/{value}",
             example="HWUPKR0MPOU8FGXBT394",
             url_paths=("/record/",),
             hosts=("gleif.org",),
+            fragment=True,
             upper=True,
             tidy=_no_spaces,
             checksum=lei_checks_out,

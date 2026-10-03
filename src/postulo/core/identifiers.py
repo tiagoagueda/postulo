@@ -42,7 +42,7 @@ from collections.abc import Callable, Iterable, Mapping
 from contextlib import contextmanager
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from urllib.parse import quote, urlsplit
+from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 from django import forms
 from django.core.exceptions import ValidationError
@@ -107,6 +107,13 @@ class Scheme:
     url_paths: tuple[str, ...] = ()
     #: The hosts those URLs live on; an address elsewhere is not an identifier of this kind.
     hosts: tuple[str, ...] = ()
+    #: Query parameters that carry the value in an address of this scheme, tried before the
+    #: path and compared without regard to case. Scopus keeps the author in ``authorId``, and
+    #: whatever else the link carries is not part of it.
+    query: tuple[str, ...] = ()
+    #: Whether the address's fragment is searched for the value too. GLEIF keeps the record
+    #: there; for everyone else a fragment is the page's own and belongs to nobody's value.
+    fragment: bool = False
     #: How many path segments make up the value. OpenCorporates keeps its jurisdiction and
     #: its number either side of a slash, and both are the identifier.
     segments: int = 1
@@ -212,14 +219,19 @@ def hosted_by(url: str, scheme: Scheme) -> bool:
 
 def value_from_url(url: str, scheme: Scheme, *, segments: int = 1) -> str | None:
     """The identifier inside a pasted URL, or nothing if it is not one of the scheme's."""
-    if "://" not in url or not scheme.url_paths or not hosted_by(url, scheme):
+    if "://" not in url or not (scheme.url_paths or scheme.query) or not hosted_by(url, scheme):
         return None
     parts = urlsplit(url)
-    # GLEIF keeps the record in the fragment; everyone else in the path.
-    haystack = parts.path + ("#" + parts.fragment if parts.fragment else "")
+    if scheme.query:
+        wanted = {name.lower() for name in scheme.query}
+        for name, found in parse_qs(parts.query).items():
+            if name.lower() in wanted and found:
+                return found[0]
+    haystack = parts.path + ("#" + parts.fragment if scheme.fragment and parts.fragment else "")
     for prefix in scheme.url_paths:
         if prefix in haystack:
-            tail = haystack.split(prefix, 1)[1].strip("/")
+            # A path is percent-encoded: an accented name arrives as ``%C3%A3``.
+            tail = unquote(haystack.split(prefix, 1)[1]).strip("/")
             return "/".join(tail.split("/")[:segments])
     return None
 

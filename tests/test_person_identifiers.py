@@ -40,6 +40,47 @@ def test_however_it_was_pasted_it_ends_up_the_same(typed):
     assert identifiers.clean(identifiers.ORCID, typed) == ORCID
 
 
+@pytest.mark.parametrize(
+    ("scheme", "typed", "value"),
+    [
+        ("linkedin", "https://www.linkedin.com/in/jo%C3%A3o-silva-1a2b3c/", "joão-silva-1a2b3c"),
+        ("linkedin", "https://www.linkedin.com/in/joão-silva-1a2b3c/", "joão-silva-1a2b3c"),
+        ("linkedin", "joão-silva-1a2b3c", "joão-silva-1a2b3c"),
+        ("researcherid", "AAB-1234-2020", "AAB-1234-2020"),
+        ("researcherid", "HGU-0221-2022", "HGU-0221-2022"),
+        (
+            "researcherid",
+            "https://www.webofscience.com/wos/author/record/J-7586-2012",
+            "J-7586-2012",
+        ),
+        (
+            "scopus",
+            "https://www.scopus.com/authid/detail.uri?authorId=7004212771&origin=1",
+            "7004212771",
+        ),
+        (
+            "scopus",
+            "https://www.scopus.com/inward/authorDetails.uri?authorID=7004212771&partnerID=MN8TOARS",
+            "7004212771",
+        ),
+    ],
+)
+def test_the_forms_people_paste_are_read_right(scheme, typed, value):
+    """An accent, a longer prefix and the rest of a link are what real values look like (#638)."""
+    assert identifiers.clean(scheme, typed) == value
+
+
+def test_digits_that_are_not_ascii_are_refused():
+    with pytest.raises(ValidationError):
+        identifiers.clean(identifiers.SCOPUS, "７００４２１２７７１")
+
+
+def test_an_accented_linkedin_name_links_percent_encoded():
+    assert identifiers.url_for("linkedin", "joão-silva") == (
+        "https://www.linkedin.com/in/jo%C3%A3o-silva/"
+    )
+
+
 def test_an_orcid_that_fails_its_own_checksum_is_a_typo(caplog):
     """Which is exactly why ORCID has one, and why Postulo never has to ask orcid.org."""
     with pytest.raises(ValidationError) as raised:
