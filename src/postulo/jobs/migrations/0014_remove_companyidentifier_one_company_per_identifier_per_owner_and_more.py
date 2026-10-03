@@ -1,6 +1,6 @@
 """Identifiers are compared without regard to letter case (#211).
 
-The data step runs **before** the constraints, and has to: rows written before a scheme
+The data step runs **after the old constraints are gone and before the new ones**, and has to: rows written before a scheme
 folded its values can already collide case-insensitively -- a lowercase `q95` beside `Q95` --
 and a unique constraint on `Lower(value)` cannot be created over them.
 
@@ -39,23 +39,36 @@ def _fold_and_report(apps) -> None:
 
     model = apps.get_model("jobs", "CompanyIdentifier")
     seen: dict[tuple[int, str, str], str] = {}
+    seen_other: set[tuple[int, str, str]] = set()
     removed = 0
 
-    for row in model.objects.select_related("company").order_by("pk").iterator():
+    # A list, because rows are deleted as it goes.
+    for row in list(model.objects.select_related("company").order_by("pk")):
         value = row.value
-        if row.scheme != "other":
-            try:
-                value = rules.clean(row.scheme, row.value)
-            except ValidationError:
-                # A value the rules no longer accept is left exactly as it is: it is somebody's
-                # data, and this migration is about case, not about tidying.
-                value = row.value
-            if value != row.value:
-                row.value = value
-                row.save(update_fields=["value"])
-
         if row.scheme == "other":
+            # Not folded: the value stays as typed. Only a second row of one company that
+            # differs from the first in case alone goes, or the expression constraint added
+            # below could not be created (#570).
+            key = (row.company_id, row.label.casefold(), value.casefold())
+            if key in seen_other:
+                print(
+                    f"  identifier {row.label!r} {value!r} is listed twice on "
+                    f"{row.company.name!r}, differing only in case; removed the second."
+                )
+                row.delete()
+                removed += 1
+                continue
+            seen_other.add(key)
             continue
+
+        try:
+            value = rules.clean(row.scheme, row.value)
+        except ValidationError:
+            # A value the rules no longer accept is left exactly as it is: it is somebody's
+            # data, and this migration is about case, not about tidying.
+            value = row.value
+        # The key is looked up before anything is written: with the old case-sensitive
+        # constraint gone, saving first would be fine, but a duplicate is deleted, not saved.
         key = (row.owner_id, row.scheme, value.casefold())
         if key in seen:
             print(
@@ -67,6 +80,9 @@ def _fold_and_report(apps) -> None:
             removed += 1
             continue
         seen[key] = row.company.name
+        if value != row.value:
+            row.value = value
+            row.save(update_fields=["value"])
 
     if removed:
         print(f"  {removed} duplicate identifier(s) removed; the companies were left alone.")
@@ -79,7 +95,8 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(fold_and_report, migrations.RunPython.noop),
+        # The case-sensitive constraints go first: the data step below changes values and
+        # deletes rows, and must not trip over a constraint it is about to replace (#570).
         migrations.RemoveConstraint(
             model_name="companyidentifier",
             name="one_company_per_identifier_per_owner",
@@ -88,6 +105,7 @@ class Migration(migrations.Migration):
             model_name="companyidentifier",
             name="unique_other_identifier_per_company",
         ),
+        migrations.RunPython(fold_and_report, migrations.RunPython.noop),
         migrations.AddConstraint(
             model_name="companyidentifier",
             constraint=models.UniqueConstraint(
