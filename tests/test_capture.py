@@ -648,3 +648,25 @@ def test_the_capture_form_tells_the_truth_about_robots_txt(client, user, ignored
     )
     assert honoured is not ignored
     assert ("set not to consult" in html) is ignored
+
+
+def test_an_identifier_matches_by_its_value_and_as_a_whole_segment():
+    def posting(title, identifier):
+        return {"@type": "JobPosting", "title": title, "identifier": identifier}
+
+    page = page_with_jsonld(
+        [
+            posting("Short one", "1000"),
+            posting("Longer one", "10001"),
+        ]
+    )
+    data = SchemaOrgSource().parse("https://jobs.example/jobs/10001", page)
+    assert data.title == "Longer one"
+
+    named = page_with_jsonld(
+        [
+            posting("Employer", {"@type": "PropertyValue", "name": "Acme", "value": "n1"}),
+            posting("Value", {"@type": "PropertyValue", "name": "Acme", "value": "n0002"}),
+        ]
+    )
+    assert SchemaOrgSource().parse("https://acme.example/jobs/n0002", named).title == "Value"

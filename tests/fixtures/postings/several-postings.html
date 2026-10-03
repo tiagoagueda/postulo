@@ -1,0 +1,27 @@
+<!doctype html>
+<!-- A job page that also embeds "similar jobs" from the same employer. Each posting carries
+     a PropertyValue identifier whose name is the employer's -- the shape schema.org and
+     Google's own example use -- and the employer's name is in the host, so reading the
+     identifier by its name makes the first posting match. The page is the third. -->
+<html lang="en">
+  <head>
+    <title>Careers | Acme</title>
+    <script type="application/ld+json">
+      [
+        {"@context": "https://schema.org/", "@type": "JobPosting", "title": "Welder",
+         "url": "https://careers.acme.example/jobs/1",
+         "identifier": {"@type": "PropertyValue", "name": "Acme", "value": "n0001"},
+         "hiringOrganization": {"@type": "Organization", "name": "Acme"}},
+        {"@context": "https://schema.org/", "@type": "JobPosting", "title": "Painter",
+         "url": "https://careers.acme.example/jobs/2",
+         "identifier": {"@type": "PropertyValue", "name": "Acme", "value": "n0002"},
+         "hiringOrganization": {"@type": "Organization", "name": "Acme"}},
+        {"@context": "https://schema.org/", "@type": "JobPosting", "title": "Rocket Surgeon",
+         "url": "https://careers.acme.example/jobs/3",
+         "identifier": {"@type": "PropertyValue", "name": "Acme", "value": "n0003"},
+         "hiringOrganization": {"@type": "Organization", "name": "Acme"}}
+      ]
+    </script>
+  </head>
+  <body><main><h1>Rocket Surgeon</h1></main></body>
+</html>

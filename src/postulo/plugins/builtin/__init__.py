@@ -53,7 +53,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 from decimal import Decimal, InvalidOperation
-from urllib.parse import urlparse
+from urllib.parse import parse_qsl, unquote, urlparse
 
 from django.utils.translation import gettext_lazy as _
 
@@ -240,13 +240,8 @@ def _same_url(raw: str) -> str:
     return f"{host}{path}{query}".lower()
 
 
-def _matches_url(posting: dict, url: str) -> bool:
-    """Is this posting the one the page is showing?
-
-    A search page carries a JobPosting for every hit, and the first is almost never the one
-    being looked at. Each states which advert it is, in ``url``, in ``@id``, or as the
-    ``identifier`` a board puts in its own links, so the one that names this page wins.
-    """
+def _names_page(posting: dict, url: str) -> bool:
+    """Does the posting say, in ``url``, ``@id`` or ``sameAs``, that it is this very page?"""
     here = _same_url(url)
     if not here:
         return False
@@ -254,9 +249,33 @@ def _matches_url(posting: dict, url: str) -> bool:
         stated = _same_url(_text(posting.get(key)))
         if stated and stated == here:
             return True
-    identifier = _text(posting.get("identifier"))
-    # Anything this short matches by accident; a board's own id never is.
-    return len(identifier) >= 4 and identifier.lower() in here
+    return False
+
+
+def _identifier(value) -> str:
+    """A posting's identifier: the ``value`` of a ``PropertyValue``, or the plain string.
+
+    Never its ``name``, which schema.org and Google's example make the employer's (#590).
+    """
+    value = _first(value)
+    if isinstance(value, dict):
+        value = value.get("value")
+    return str(value or "").strip()
+
+
+def _in_address(identifier: str, url: str) -> bool:
+    """Is the identifier a whole path segment or a whole query value of the address?
+
+    Not a substring: ``1000`` is not in ``/jobs/10001``. Anything this short matches by
+    accident; a board's own id never is.
+    """
+    if len(identifier) < 4:
+        return False
+    parsed = urlparse(url)
+    wanted = identifier.lower()
+    parts = [unquote(piece).lower() for piece in parsed.path.split("/") if piece]
+    parts += [value.lower() for _name, value in parse_qsl(parsed.query)]
+    return wanted in parts
 
 
 def _postings(objects: list[dict]) -> list[dict]:
@@ -275,8 +294,13 @@ def _best_posting(objects: list[dict], url: str) -> dict | None:
     found = _postings(objects)
     if len(found) < 2:
         return found[0] if found else None
+    # In two passes: a posting that names this page outright beats one whose identifier
+    # happens to appear in its address, whichever comes first on the page (#590).
     for posting in found:
-        if _matches_url(posting, url):
+        if _names_page(posting, url):
+            return posting
+    for posting in found:
+        if _in_address(_identifier(posting.get("identifier")), url):
             return posting
     return found[0]
 
