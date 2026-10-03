@@ -766,3 +766,33 @@ def test_a_period_at_the_edge_of_the_calendar_falls_back_to_today(client, user, 
     period = reports.period_from(query)
     assert period.start.year == timezone.localdate().year
     assert period.shifted(-1) and period.shifted(1)
+
+
+# ------------------------------------------------------- the first day of the week
+
+#: Every offered language and the day its week starts on (0 Sunday, 1 Monday), as the
+#: reader's calendar and report lay it out. A language added to ``LANGUAGES`` fails here
+#: until somebody has looked the answer up (#569).
+FIRST_DAY_OF_WEEK = {
+    **dict.fromkeys(
+        "en-GB ca cs cy da de es eu fi fr-FR gl hr hu ig it ka lt lv mk nb nl pl ro sk sr-Cyrl "
+        "sv tr uk bg bs el et ga hy is lb sl sq".split(),
+        1,
+    ),
+    **dict.fromkeys(
+        "af ak am ar bm ee ff ha kab ln mg mt nr ny om pt-PT pt-BR rw sn so ss st sw ti tn ts "
+        "ve wo xh yo zu".split(),
+        0,
+    ),
+}
+
+
+def test_every_offered_language_starts_its_week_on_the_day_pinned_for_it():
+    from django.conf import settings
+    from django.utils import formats, translation
+
+    offered = {code for code, _ in settings.LANGUAGES}
+    assert offered == set(FIRST_DAY_OF_WEEK)
+    for code in offered:
+        with translation.override(code):
+            assert int(formats.get_format("FIRST_DAY_OF_WEEK")) == FIRST_DAY_OF_WEEK[code], code

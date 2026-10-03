@@ -56,6 +56,13 @@ def test_the_month_is_whole_weeks_starting_on_the_locales_first_day():
     assert sum(day.today for week in weeks for day in week) == 1
 
 
+def test_a_greek_month_starts_its_rows_on_monday():
+    # Django's own Greek answers Sunday; Greece starts the week on Monday (#569).
+    with translation.override("el"):
+        weeks = agenda.month_grid(dt.date(2026, 10, 15), [], today=dt.date(2026, 10, 15))
+    assert weeks[0][0].date == dt.date(2026, 9, 28)
+
+
 def test_the_months_either_side_are_the_earlier_and_later_links(client, user):
     client.force_login(user)
     page = client.get(reverse(CALENDAR), {"month": "2026-01"}).context["page"]

@@ -510,7 +510,8 @@ SHORT_DATETIME_FORMAT = "d/m/Y H:i"
 # One locale is corrected rather than accepted: Django's en_GB writes a time as "2.30 p.m."
 # and Postulo has always shown 14:30. See postulo/config/formats/en_GB/formats.py. A module
 # found here is consulted before Django's own and only for the locale it is named after, so
-# this changes British English and leaves the other sixty-eight alone.
+# this changes British English, and ten languages whose week starts on a Monday where
+# Django says Sunday (#569), and leaves the rest alone.
 FORMAT_MODULE_PATH = ["postulo.config.formats"]
 
 # ---------------------------------------------------------------- static & media
