@@ -29,6 +29,25 @@ CEFR_PARTS = ("Listening", "Reading", "SpokenInteraction", "SpokenProduction", "
 
 _ORDER = list(CEFR.values())
 
+#: The two codes Cedefop's Europass wrote from the European Union's own list rather than
+#: ISO 3166-1: the United Kingdom as ``UK`` and Greece as ``EL``.
+_EU_COUNTRY_CODES = {"UK": "GB", "EL": "GR"}
+
+
+def _country(value: str) -> str:
+    """An ISO 3166-1 alpha-2 code, or nothing.
+
+    The official list writes a country as a Publications Office URI ending in an alpha-3
+    code; files seen since write ``pt`` or ``PT``; the old Europass wrote ``UK`` and ``EL``.
+    Only the two-letter form is taken: cutting ``PRT`` to two letters would make it Puerto
+    Rico.
+    """
+    code = value.strip().rsplit("/", 1)[-1]
+    if not (len(code) == 2 and code.isascii() and code.isalpha()):
+        return ""
+    code = code.upper()
+    return _EU_COUNTRY_CODES.get(code, code)
+
 
 # ------------------------------------------------------- shared by both formats
 

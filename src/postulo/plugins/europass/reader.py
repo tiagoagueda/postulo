@@ -75,6 +75,7 @@ from . import pdf
 from .common import (
     CEFR_PARTS,
     _all,
+    _country,
     _find,
     _heading,
     _local,
@@ -129,12 +130,12 @@ def _country_code(address) -> str:
     country = _find(address, "Country")
     if country is None:
         return ""
-    return (_text(country, "Code") or "").strip().upper()[:2]
+    return _country(_text(country, "Code") or "")
 
 
 def _json_country_code(address) -> str:
     country = _obj(address.get("Country")) if isinstance(address, dict) else {}
-    return str(country.get("Code") or "").strip().upper()[:2]
+    return _country(str(country.get("Code") or ""))
 
 
 def _place(municipality: str, country: str) -> str:

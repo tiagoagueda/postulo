@@ -773,3 +773,47 @@ def test_json_skills_of_the_wrong_shape_are_said_out_loud(skills):
 
     assert record.skill_groups == []
     assert any("could not be read" in note for note in record.skipped)
+
+
+def _address_xml(code: str) -> bytes:
+    return (
+        b'<SkillsPassport xmlns="http://europass.cedefop.europa.eu/Europass"><LearnerInfo>'
+        b"<Identification><ContactInfo><Address><Contact><Municipality>London</Municipality>"
+        b"<Country><Code>" + code.encode() + b"</Code><Label>Somewhere</Label></Country>"
+        b"</Contact></Address></ContactInfo></Identification></LearnerInfo></SkillsPassport>"
+    )
+
+
+def _address_json(code: str) -> bytes:
+    import json
+
+    return json.dumps(
+        {
+            "SkillsPassport": {
+                "LearnerInfo": {
+                    "Identification": {
+                        "ContactInfo": {
+                            "Address": {
+                                "Contact": {
+                                    "Municipality": "London",
+                                    "Country": {"Code": code, "Label": "Somewhere"},
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    ).encode()
+
+
+@pytest.mark.parametrize("make", [_address_xml, _address_json])
+@pytest.mark.parametrize(
+    ("written", "stored"),
+    [("UK", "GB"), ("EL", "GR"), ("pt", "PT"), ("PRT", ""), ("", "")],
+)
+def test_the_old_formats_store_a_country_as_iso(make, written, stored):
+    """Cedefop wrote UK and EL; a three-letter code is not cut to another country."""
+    record = europass.read(make(written))
+
+    assert record.person["address"]["country"] == stored

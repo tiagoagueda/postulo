@@ -47,6 +47,7 @@ from .common import (
     CEFR,
     CEFR_PARTS,
     _all,
+    _country,
     _find,
     _heading,
     _local,
@@ -289,17 +290,6 @@ def _city(holder) -> str:
             if city:
                 return city
     return ""
-
-
-def _country(value: str) -> str:
-    """An ISO 3166-1 alpha-2 code, or nothing.
-
-    The official list writes a country as a Publications Office URI ending in an alpha-3
-    code; files seen since write ``pt`` or ``PT``. Only the two-letter form is taken:
-    cutting ``PRT`` to two letters would make it Puerto Rico.
-    """
-    code = value.strip().rsplit("/", 1)[-1]
-    return code.upper() if len(code) == 2 and code.isascii() and code.isalpha() else ""
 
 
 def _language_code(value) -> str:
