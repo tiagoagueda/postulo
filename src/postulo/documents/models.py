@@ -991,6 +991,9 @@ class DocumentCopy(OwnedModel):
     next_attempt_at = models.DateTimeField(
         _("next attempt"), default=timezone.now, null=True, blank=True
     )
+    #: Set while somebody is sending this copy, and apart from `next_attempt_at` so that
+    #: *Send now* can override the wait of a failed copy without taking a live claim (#509).
+    claimed_until = models.DateTimeField(_("claimed until"), null=True, blank=True)
     last_attempt_at = models.DateTimeField(_("last attempt"), null=True, blank=True)
     sent_at = models.DateTimeField(_("sent on"), null=True, blank=True)
     last_error = models.TextField(_("last error"), blank=True)

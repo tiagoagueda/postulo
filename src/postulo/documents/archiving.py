@@ -16,6 +16,7 @@ import datetime as dt
 import logging
 
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -126,6 +127,7 @@ def send_copy(copy: DocumentCopy) -> bool:
         copy.status = CopyStatus.FAILED
         copy.last_error = message[:500]
         copy.next_attempt_at = now + FIRST_RETRY * (2 ** (copy.attempts - 1))
+        copy.claimed_until = None
         copy.save()
         return False
 
@@ -172,6 +174,7 @@ def send_copy(copy: DocumentCopy) -> bool:
         copy.status = CopyStatus.DECLINED
         copy.last_error = ""
         copy.next_attempt_at = None
+        copy.claimed_until = None
         copy.save()
         return False
 
@@ -181,6 +184,7 @@ def send_copy(copy: DocumentCopy) -> bool:
     copy.sent_at = now
     copy.last_error = ""
     copy.next_attempt_at = None
+    copy.claimed_until = None
     copy.save()
     connection.record_test(True)
     return True
@@ -192,6 +196,7 @@ def pending_copies(now=None):
         DocumentCopy.objects.filter(status__in=(CopyStatus.PENDING, CopyStatus.FAILED))
         .filter(attempts__lt=MAX_ATTEMPTS)
         .filter(next_attempt_at__lte=now)
+        .filter(Q(claimed_until__isnull=True) | Q(claimed_until__lt=now))
         # A connection that is switched off is not dialled, and its copies wait rather than
         # spending their attempts on a "the connection is switched off" they would record
         # once a document until there were none left (#243). Switching it on resumes them,
@@ -211,21 +216,24 @@ def pending_copies(now=None):
 
 
 def claim(copy, now=None) -> bool:
-    """Take this copy for sending, or say that somebody else already has (#221).
+    """Take this copy for sending, or say that somebody else already has (#221, #509).
 
     Nothing claimed these rows, so two passes -- cron and ``--loop`` together, or a pass
     overlapping the *Send now* somebody just pressed -- could both read the same copy as due
     and both ``put`` it, while the wiki said that nothing is ever sent twice. The claim is a
-    conditional update against the value that was read: whoever changes the row has it, and
-    the other finds nothing to change. It moves the next attempt forward rather than marking
-    the row *sending*, so that a process killed mid-send leaves a copy that comes back by
-    itself a quarter of an hour later, instead of one stuck in a state nobody clears.
+    conditional update: it takes the row only where nobody holds a live claim, in the same
+    statement, so whoever changes the row has it and the other finds nothing to change. The
+    claim is a lease rather than a *sending* status, so that a process killed mid-send
+    leaves a copy that comes back by itself a quarter of an hour later, instead of one stuck
+    in a state nobody clears. It is kept apart from `next_attempt_at`, which *Send now*
+    overrides: a lease written there looked like a retry wait, and was taken again.
     """
     now = now or timezone.now()
     return bool(
-        DocumentCopy.objects.filter(pk=copy.pk, next_attempt_at=copy.next_attempt_at).update(
-            next_attempt_at=now + SENDING_LEASE
-        )
+        DocumentCopy.objects.filter(pk=copy.pk)
+        .exclude(status=CopyStatus.SENT)
+        .filter(Q(claimed_until__isnull=True) | Q(claimed_until__lt=now))
+        .update(claimed_until=now + SENDING_LEASE)
     )
 
 

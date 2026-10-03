@@ -392,10 +392,24 @@ def test_one_copy_is_sent_once_however_many_passes_are_running(user):
 
     # A process killed mid-send leaves it to come back by itself, rather than stuck.
     DocumentCopy.objects.filter(pk=copy.pk).update(
-        next_attempt_at=timezone.now() - dt.timedelta(minutes=1)
+        claimed_until=timezone.now() - dt.timedelta(minutes=1)
     )
     assert send_pending() == (1, 0)
     assert len(ShelfStore.received) == 1
+
+
+def test_send_now_does_not_take_a_copy_the_scheduler_is_sending(user):
+    """A lease used to be written as a retry time, which *Send now* read as a wait (#509)."""
+    a_store(user)
+    upload = an_upload(user)
+    copy = upload.copies.get()
+
+    assert archiving.claim(upload.copies.get()) is True, "the scheduler has it"
+
+    assert archiving.send_now(upload) == (0, 0)
+    assert ShelfStore.received == [], "the store was not given it a second time"
+    copy.refresh_from_db()
+    assert copy.status == CopyStatus.PENDING
 
 
 def test_a_store_may_decline_a_kind(user):
