@@ -271,6 +271,29 @@ def test_a_plugin_switched_off_for_somebody_is_not_theirs_to_see(client, user, l
     assert response.status_code == 404
 
 
+def test_a_plugin_its_person_switched_off_still_shows_its_logo(client, user, loaded, monkeypatch):
+    """Settings -> Plugins lists a plugin the person switched off, and draws its logo (#594).
+
+    Off is not the same as not offered: the row is on the page, so the image beside it
+    must load rather than be a broken box.
+    """
+    from postulo.plugins import policy, registry
+
+    monkeypatch.setattr(registry, "find_any", lambda name: loaded if name == "logoplug" else None)
+    monkeypatch.setattr(
+        policy,
+        "decide",
+        lambda name, person: policy.Decision(
+            on=False, offered=True, theirs=True, decided_by="person"
+        ),
+    )
+    client.force_login(user)
+
+    response = client.get(reverse("connections:logo", args=["logoplug"]))
+
+    assert response.status_code == 200
+
+
 # ------------------------------------------------------------- and where it shows
 
 

@@ -77,8 +77,10 @@ class PluginLogoView(LoginRequiredMixin, View):
     somebody else's server would tell them which instances run their plugin and when.
 
     **Who may see one.** Anybody signed in can see the logo of a plugin that is available
-    to them; a plugin an administrator has switched off for this person is theirs to see
-    only if they administer the instance. That is not because a logo is sensitive -- it is
+    to them -- on or off, because *Settings -> Plugins* lists the ones that are off and
+    draws their logo; a plugin that is not offered to this person at all (unavailable, or
+    switched off for the whole instance) is theirs to see only if they administer the
+    instance. That is not because a logo is sensitive -- it is
     that the set of plugins an instance has installed is a fact about the instance, and the
     page it belongs on is the administrator's.
 
@@ -96,7 +98,9 @@ class PluginLogoView(LoginRequiredMixin, View):
         if not request.user.is_staff:
             from .policy import decide
 
-            if not decide(name, request.user).on:
+            decision = decide(name, request.user)
+            # `on` as well as `offered`: a transport is on for everyone but never listed.
+            if not (decision.on or decision.offered):
                 raise Http404
 
         found = logos.logo_for(plugin)
