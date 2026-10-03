@@ -21,6 +21,7 @@ as it is stored, so nothing is refused in retrospect.
 
 from __future__ import annotations
 
+import unicodedata
 from dataclasses import dataclass
 
 from django import forms
@@ -33,7 +34,7 @@ from postulo.plugins.repositories import REPOSITORIES
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
 from postulo.plugins.websites import WEBSITES
 
-from . import link_services
+from . import addresses, link_services
 from .formsets import RowsAlreadyGone, leaving, owner_of, remove_first
 from .models import WebLink
 from .option_icons import OptionIcons
@@ -200,6 +201,15 @@ def kept_back(holder, person) -> list[tuple[Block, int]]:
         if count:
             found.append((block, count))
     return found
+
+
+def same_address(value) -> str:
+    """An address as two spellings of it agree: the posting's identity for a URL, the folded
+    text for anything that is not one. What every importer asks before adding a link."""
+    text = str(value or "").strip()
+    return (
+        addresses.same_url(text) or " ".join(unicodedata.normalize("NFKC", text).split()).casefold()
+    )
 
 
 @transaction.atomic

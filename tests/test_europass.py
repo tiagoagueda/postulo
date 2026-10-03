@@ -22,6 +22,8 @@ from django.urls import reverse
 from postulo.accounts import identifiers
 from postulo.accounts.models import PersonIdentifier
 from postulo.core import postal
+from postulo.core.models import PostalAddress, WebLink
+from postulo.jobs.models import Company, Contact
 from postulo.plugins import base
 from postulo.plugins.europass import reader as europass
 from postulo.resume import importing
@@ -387,6 +389,51 @@ def test_a_file_that_cannot_be_read_says_why_and_keeps_the_page(client, user):
 
     assert b"not readable XML" in response.content
     assert response.context["found"] is None
+
+
+def _confirm(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    client.post(url, {"file": upload()})
+    return client.post(url, {"action": "confirm"}, follow=True)
+
+
+def test_a_website_the_account_keeps_as_a_social_profile_is_left_out_and_said(client, user):
+    """A link is unique on its holder and address whatever its kind (#616)."""
+    WebLink.objects.create(
+        owner=user,
+        holder=user.profile,
+        kind="social",
+        url="https://alex.example.org",
+        is_primary=True,
+    )
+
+    response = _confirm(client, user)
+
+    assert response.redirect_chain[-1][0] == reverse("resume:overview")
+    assert Experience.objects.filter(owner=user).count() == 2
+    assert user.profile.web_links.count() == 1
+    assert "is already among your links" in response.content.decode()
+
+
+def test_an_address_listed_for_a_contact_is_left_out_and_said(client, user):
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    PostalAddress.objects.create(
+        owner=user,
+        holder=contact,
+        street="rua do exemplo 1",
+        postcode="1000-001",
+        municipality="Lisboa",
+        country="PT",
+    )
+
+    response = _confirm(client, user)
+
+    assert response.redirect_chain[-1][0] == reverse("resume:overview")
+    assert Experience.objects.filter(owner=user).count() == 2
+    assert not user.profile.postal_addresses.exists()
+    assert "is already listed for somebody you deal with" in response.content.decode()
 
 
 def test_what_is_held_between_the_two_steps_is_the_record_and_not_the_file(client, user):

@@ -86,21 +86,20 @@ def _is_an_address(parts: dict) -> bool:
     return any((parts.get(key) or "").strip() for key in ("street", "postcode", "municipality"))
 
 
-def _write_address(profile, owner, parts: dict) -> bool:
-    """Put a read address on a profile that has none. Returns whether anything was written.
+def _new_address(profile, owner, parts: dict):
+    """The address a file would give a profile that has none, or nothing.
 
-    Only where the profile has no address at all: an import fills blanks and never argues
-    with what somebody entered. An address is not verified and never will be -- Postulo is
-    not going to post anything -- so there is nothing here to earn or to lose (#92).
+    Unsaved. Nothing where the file has no address, where the profile already has one, or
+    where the account already lists this one anywhere -- for a contact, say: an address is
+    listed once per account, whoever it is for, and saving a second would fail the import
+    (#616). The last of the three is the one the caller says in words.
     """
     from postulo.core import postal
     from postulo.core.models import PostalAddress
 
-    if not _is_an_address(parts):
-        return False
-    if postal.for_holder(profile).exists():
-        return False
-    PostalAddress.objects.create(
+    if not _is_an_address(parts) or postal.for_holder(profile).exists():
+        return None
+    return PostalAddress(
         owner=owner,
         holder=profile,
         street=(parts.get("street") or "")[:400],
@@ -110,6 +109,37 @@ def _write_address(profile, owner, parts: dict) -> bool:
         country=(parts.get("country") or "")[:2],
         is_primary=True,
     )
+
+
+def _listed_already(owner, address) -> bool:
+    from postulo.core.models import PostalAddress
+
+    key = address.comparable_form()
+    return bool(key) and PostalAddress.objects.filter(owner=owner, comparable=key).exists()
+
+
+def _write_address(profile, owner, parts: dict, report: Report) -> bool:
+    """Put a read address on a profile that has none. Returns whether anything was written.
+
+    Only where the profile has no address at all: an import fills blanks and never argues
+    with what somebody entered. An address is not verified and never will be -- Postulo is
+    not going to post anything -- so there is nothing here to earn or to lose (#92).
+    """
+    address = _new_address(profile, owner, parts)
+    if address is None:
+        return False
+    if _listed_already(owner, address):
+        report.skipped.append(
+            str(
+                _(
+                    "The address %(address)s is already listed for somebody you deal with, "
+                    "so it was not added."
+                )
+                % {"address": address.one_line()}
+            )
+        )
+        return False
+    address.save()
     return True
 
 
@@ -164,7 +194,10 @@ def apply(owner, record: Record) -> Report:
         # ("Lisboa" where the address gives "Lisboa, Portugal") and stayed behind when the
         # address moved. Only a file with a place and no address still writes one.
         address = record.person.get("address") or {}
-        an_address_says_where = postal.primary_for(profile) is not None or _is_an_address(address)
+        new_address = _new_address(profile, owner, address)
+        an_address_says_where = postal.primary_for(profile) is not None or (
+            new_address is not None and not _listed_already(owner, new_address)
+        )
         for field_name in ("headline", "location"):
             if field_name == "location" and an_address_says_where:
                 continue
@@ -190,8 +223,20 @@ def apply(owner, record: Record) -> Report:
         site = _clean_website(owner, (record.person.get("website") or "").strip()[:500], report)
         wrote_site = False
         if site and web_links.primary_for(profile, web_links.Kind.WEBSITE) is None:
-            web_links.save_only_link(profile, owner, web_links.Kind.WEBSITE, site)
-            wrote_site = True
+            # A link is unique on its holder and address whatever its kind, so one the
+            # profile keeps as its social profile or repository is not added again as its
+            # website: the insert would fail the whole import (#616).
+            same = web_links.same_address(site)
+            if any(web_links.same_address(row.url) == same for row in profile.web_links.all()):
+                report.skipped.append(
+                    str(
+                        _("The website %(site)s is already among your links, so it was not added.")
+                        % {"site": site}
+                    )
+                )
+            else:
+                web_links.save_only_link(profile, owner, web_links.Kind.WEBSITE, site)
+                wrote_site = True
         # The telephone number is a row of its own now, and the same rule applies to it:
         # filled in only where there is nothing there, so an import never overwrites what
         # somebody typed. A number this instance already holds is left alone rather than
@@ -221,7 +266,7 @@ def apply(owner, record: Record) -> Report:
         # carries a street and a postcode and Postulo kept only the town and the country.
         # Same rule as everything else here -- written only where there is nothing, so an
         # import never overwrites an address somebody typed themselves.
-        wrote_address = _write_address(profile, owner, address)
+        wrote_address = _write_address(profile, owner, address, report)
         report.profile_filled = [
             *changed,
             *(["website"] if wrote_site else []),

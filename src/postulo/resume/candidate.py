@@ -65,7 +65,6 @@ from django.utils.translation import gettext_lazy, ngettext
 from postulo.accounts.forms import PersonIdentifierForm
 from postulo.accounts.models import PersonIdentifier, Profile
 from postulo.core import (
-    addresses,
     export,
     language_field,
     languages,
@@ -553,8 +552,7 @@ def fold(value) -> str:
 
 
 def _same_address(value) -> str:
-    text = str(value or "").strip()
-    return addresses.same_url(text) or fold(text)
+    return links.same_address(value)
 
 
 def _said(value) -> str:
