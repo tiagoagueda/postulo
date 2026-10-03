@@ -178,6 +178,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company form with a rejected identifier no longer says *Company added.* or *Company updated.*, and no longer fetches, replaces or removes the logo of a company it did not save (a logo address on a new company was a 500). (#530)
 - Moving a contact who is in a department to another company, or to none, saves instead of answering 500; the contact leaves the old team, and a team typed in the box joins the new company. (#527)
 - In the Docker image the ESCO classification lives on the data volume (`POSTULO_ESCO_DIR`, `/app/data/esco`): `fetch_esco` used to fail with a permission error writing into the image, and a file forced in with `-u root` was lost at the next upgrade and never seen by the worker. (#411)
 - Removing a tag or industry chip with the keyboard keeps focus in the control instead of dropping it to the top of the page. (#519)

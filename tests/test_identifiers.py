@@ -263,6 +263,22 @@ def test_the_company_form_refuses_a_bad_or_borrowed_id(signed_in, user):
     assert not Company.objects.filter(owner=user, name="Acme").exists(), "nothing half-saved"
 
 
+def test_a_refused_identifier_does_not_say_the_company_was_saved(signed_in, user):
+    rows = identifier_rows([("wikidata", "not-an-id", "")])
+    response = signed_in.post(reverse("jobs:company_create"), {"name": "Acme", **rows})
+    assert response.status_code == 200
+    assert "Company added." not in response.content.decode()
+
+    company = company_with(user, "Rival", ("wikidata", "Q95"))
+    response = signed_in.post(
+        reverse("jobs:company_update", args=[company.pk]), {"name": "Renamed", **rows}
+    )
+    assert response.status_code == 200
+    assert "Company updated." not in response.content.decode()
+    company.refresh_from_db()
+    assert company.name == "Rival"
+
+
 def test_editing_can_remove_an_identifier(signed_in, user):
     acme = company_with(user, "Acme", ("wikidata", "Q95"), ("linkedin", "acme"))
     wikidata = acme.identifiers.get(scheme="wikidata")

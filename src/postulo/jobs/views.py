@@ -348,10 +348,19 @@ class CompanyIdentifiersMixin:
         context["identifier_schemes"] = identifiers.schemes().values()
         return context
 
-    def form_valid(self, form):
+    def refuse_bad_identifiers(self, form):
+        """The page again, if an identifier row is wrong; None when the save may go on.
+
+        Asked first by the outermost ``form_valid``, so that the success message and the
+        logo fields are reached only when the company really is saved.
+        """
         formset = self.get_identifiers()
         if formset.is_bound and not formset.is_valid():
             return self.render_to_response(self.get_context_data(form=form, identifiers=formset))
+        return None
+
+    def form_valid(self, form):
+        formset = self.get_identifiers()
         with transaction.atomic():
             response = super().form_valid(form)
             if formset.is_bound:
@@ -393,6 +402,8 @@ class CompanyCreateView(
     template_name = "jobs/company_form.html"
 
     def form_valid(self, form):
+        if (refused := self.refuse_bad_identifiers(form)) is not None:
+            return refused
         messages.success(self.request, _("Company added."))
         return super().form_valid(form)
 
@@ -405,6 +416,8 @@ class CompanyUpdateView(
     template_name = "jobs/company_form.html"
 
     def form_valid(self, form):
+        if (refused := self.refuse_bad_identifiers(form)) is not None:
+            return refused
         messages.success(self.request, _("Company updated."))
         return super().form_valid(form)
 

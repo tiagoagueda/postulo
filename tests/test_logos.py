@@ -334,6 +334,38 @@ def test_the_form_fetches_a_logo_and_keeps_the_company_when_it_cannot(client, us
     assert not aperture.logo, "the company is still saved without it"
 
 
+def test_a_refused_identifier_stops_the_logo_fields_too(client, user, company, web):
+    web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
+    bad = {
+        "identifiers-TOTAL_FORMS": "1",
+        "identifiers-INITIAL_FORMS": "0",
+        "identifiers-MIN_NUM_FORMS": "0",
+        "identifiers-MAX_NUM_FORMS": "1000",
+        "identifiers-0-scheme": "wikidata",
+        "identifiers-0-value": "not-an-id",
+        "identifiers-0-label": "",
+    }
+    client.force_login(user)
+    response = client.post(
+        reverse("jobs:company_create"),
+        {"name": "Aperture", "logo_url": "https://cdn.example/logo.png", **bad},
+    )
+    assert response.status_code == 200
+    assert not Company.objects.for_user(user).filter(name="Aperture").exists()
+    assert web["calls"] == [], "nothing fetched for a company that was not saved"
+
+    logos.from_url(company, "https://cdn.example/logo.png")
+    web["calls"].clear()
+    response = client.post(
+        reverse("jobs:company_update", args=[company.pk]),
+        {"name": "Renamed", "website": company.website, "remove_logo": "on", **bad},
+    )
+    assert response.status_code == 200
+    company.refresh_from_db()
+    assert company.name == "Black Mesa"
+    assert company.logo and company.logo_source == "url", "a refused edit leaves the logo alone"
+
+
 def test_a_logo_can_be_uploaded_and_removed(client, user, company):
     from django.core.files.uploadedfile import SimpleUploadedFile
 
