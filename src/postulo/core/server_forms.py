@@ -24,12 +24,14 @@ class PolicyField(forms.TypedChoiceField):
     def __init__(self, **kwargs):
         kwargs.setdefault("choices", POLICY_CHOICES)
         kwargs.setdefault("required", False)
-        kwargs.setdefault("coerce", self._coerce)
+        kwargs.setdefault("coerce", self._to_bool)
         kwargs.setdefault("empty_value", None)
         super().__init__(**kwargs)
 
     @staticmethod
-    def _coerce(value: str):
+    def _to_bool(value: str):
+        # Not named _coerce: that is the method TypedChoiceField.clean() calls, and it is
+        # what turns an empty choice into empty_value before anything is converted.
         return value == "true"
 
     def prepare_value(self, value):

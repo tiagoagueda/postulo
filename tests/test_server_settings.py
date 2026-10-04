@@ -401,6 +401,20 @@ def test_registration_follows_the_page_unless_the_environment_pins_it(
     assert 'name="registration_open"' not in html
 
 
+def test_not_set_here_is_saved_as_unset_and_drawn_selected(client, admin):
+    row = SiteSettings.get()
+    row.registration_open = True
+    row.save()
+    client.force_login(admin)
+    response = client.post(reverse("server:signin"), {"registration_open": ""})
+    assert response.status_code == 302
+    assert SiteSettings.get().registration_open is None
+    html = client.get(reverse("server:signin")).content.decode()
+    select = re.search(r'<select[^>]*name="registration_open".*?</select>', html, re.S).group(0)
+    selected = re.search(r"<option[^>]*selected[^>]*>", select)
+    assert selected and 'value=""' in selected.group(0)
+
+
 def test_unset_means_the_codes_default_which_a_test_may_change(settings):
     assert SiteSettings.get().registration_open is None
     settings.POSTULO_REGISTRATION_OPEN = True
