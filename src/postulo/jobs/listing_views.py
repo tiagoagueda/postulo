@@ -325,6 +325,6 @@ class ListingApplyView(OwnedObjectMixin, View):
         if not form.is_valid():
             return render(request, self.template_name, {"listing": listing, "form": form})
         application = apply_to_listing(listing, form.application_data)
-        application.tags.set(form.cleaned_data["tags"])
+        application.tags.set(form.chosen_tags())
         messages.success(request, _("Application recorded."))
         return redirect(application.get_absolute_url())

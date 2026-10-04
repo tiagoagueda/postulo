@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A listing's Apply page now shows the new-tags box its help text promised, and tags typed there are saved with the application. (#408)
 - A portfolio can now be saved in a plugin theme that sets only portfolios; the theme is checked against the document's own kind, not always as a CV. (#412)
 - The test settings no longer read a developer's .env and pin the cache, background work and file log handler, so the suite behaves the same on every machine and an empty POSTULO_LOG_DIR no longer breaks it. (#414)
 - the two tallies on the job-search report no longer share one id in Greek, Cyrillic and other non-Latin languages, so each region is named by its own heading. (#629)

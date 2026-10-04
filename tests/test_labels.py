@@ -252,3 +252,25 @@ def test_a_refusal_is_not_drawn_inside_a_box_the_chips_hide(client, user):
             assert 'role="alert"' not in inside
             assert '_helptext" ' not in inside
     assert re.search(r"data-labels-feedback>.*id_new_industries_error", html, flags=re.S)
+
+
+def test_the_listing_apply_page_offers_the_new_tags_box_and_saves_it(client, user):
+    from postulo.applications.models import Status
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name="Aperture Science")
+    listing = JobPosting.objects.create(owner=user, company=company, title="Test Engineer")
+    client.force_login(user)
+    url = reverse("listings:apply", args=[listing.pk])
+
+    html = client.get(url).content.decode()
+    assert 'name="new_tags"' in html
+    assert "data-labels-existing" in html
+
+    response = client.post(
+        url,
+        {"status": Status.APPLIED, "channel": "", "priority": 2, "new_tags": "Urgent"},
+    )
+    assert response.status_code == 302
+    application = listing.applications.get()
+    assert [tag.name for tag in application.tags.all()] == ["Urgent"]
