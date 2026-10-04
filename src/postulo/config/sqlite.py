@@ -28,7 +28,10 @@ Three options together make two writers take turns instead:
   ``transaction.non_atomic_requests`` and open short transactions around their own writes.
   Deliberately view by view rather than, say, all GETs at once: leaving a transaction is a
   decision about what has to succeed or fail together, and there is no answer to that which
-  is true of every view of a given method.
+  is true of every view of a given method. #357 finished the list: the link check, the
+  company and profile forms with a picture to fetch, the capture API, connection tests and
+  consent, *Send now* to a store, and the staff pages that call a mail host or a catalogue.
+  The plugin install still occupies a worker for as long as it takes, but holds no lock.
 * ``journal_mode=WAL`` -- readers stop blocking the writer and the writer stops blocking
   readers, which is what makes the serialisation above cheap. WAL keeps two files beside
   the database, ``-wal`` and ``-shm``, in the same directory; the backup uses SQLite's own
