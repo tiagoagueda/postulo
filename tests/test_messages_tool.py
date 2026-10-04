@@ -354,3 +354,55 @@ def test_a_translation_that_formats_cleanly_is_accepted(tool):
         },
     )
     assert tool.problems_in(catalogue, "fr-FR") == []
+
+
+# ------------------------------------------- a plugin's catalogues state its licence (#417)
+
+
+@pytest.fixture
+def mit_repo(tmp_path, tool):
+    (tmp_path / "pyproject.toml").write_text(
+        '[project]\nname = "postulo-example"\nversion = "0.3.0"\nlicense = "MIT"\n'
+        '[project.urls]\nIssues = "https://example.org/example/issues"\n',
+        encoding="utf-8",
+    )
+    package = tmp_path / "src" / "postulo_example"
+    package.mkdir(parents=True)
+    (package / "__init__.py").write_text(
+        'from django.utils.translation import gettext_lazy as _\n\nLABEL = _("Hello, world")\n',
+        encoding="utf-8",
+    )
+    yield tmp_path
+    tool.use(REPO)
+
+
+def test_a_plugins_catalogue_names_its_own_licence_not_postulos(tool, mit_repo):
+    tool.use(mit_repo)
+    text = tool.dump(tool.parse(""), "fr-FR", tool.catalogue_sets()[0])
+    comments = text.split('msgid ""')[0]
+    assert "postulo-example" in comments
+    assert "MIT" in comments
+    assert "AGPL" not in comments
+
+
+def test_a_plugin_reports_bugs_to_itself_and_postulo_keeps_its_own_header(tool, mit_repo):
+    tool.use(mit_repo)
+    header = tool.header_for("fr-FR", {})
+    assert header["Report-Msgid-Bugs-To"] == "https://example.org/example/issues"
+    assert header["Project-Id-Version"] == "postulo-example"
+    assert header["X-Generator"] == "postulo-messages"
+    tool.use(REPO)
+    core = tool.header_for("fr-FR", {})
+    assert core["Report-Msgid-Bugs-To"].startswith("https://source.tiagoagueda.com/postulo/")
+    assert core["Project-Id-Version"] == "Postulo"
+    assert "AGPL" in tool.dump(tool.parse(""), "fr-FR").split('msgid ""')[0]
+
+
+def test_a_plugin_without_a_url_or_licence_claims_neither(tool, plugin_repo):
+    tool.use(plugin_repo)
+    header = tool.header_for("fr-FR", {})
+    assert "Report-Msgid-Bugs-To" not in header
+    comments = tool.dump(tool.parse(""), "fr-FR", tool.catalogue_sets()[0]).split('msgid ""')[0]
+    assert "AGPL" not in comments
+    assert tool.cmd_extract(check=False) == 0
+    assert tool.cmd_extract(check=True) == 0

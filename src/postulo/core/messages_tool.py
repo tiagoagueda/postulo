@@ -60,6 +60,11 @@ class Project:
     root: Path
     package: Path
     name: str
+    #: ``project.license`` from ``pyproject.toml`` (an SPDX string, or the older table's
+    #: ``text``); empty when the project declares none.
+    licence: str = ""
+    #: Where the project takes bug reports, from ``project.urls``; empty when it says nothing.
+    issues_url: str = ""
 
     @property
     def locale(self) -> Path:
@@ -68,6 +73,14 @@ class Project:
     @property
     def is_postulo(self) -> bool:
         return self.name == "postulo"
+
+    def licence_line(self) -> str:
+        """The header sentence naming the licence the catalogues are under: the project's
+        own, since a plugin's licence is its author's choice and not Postulo's (#417)."""
+        if self.is_postulo:
+            return "This file is distributed under the same license as Postulo (AGPL-3.0-or-later)."
+        said = f" ({self.licence})" if self.licence else ""
+        return f"This file is distributed under the same license as the {self.name} package{said}."
 
     def describe(self, subject: CatalogueSet) -> str:
         """What a catalogue's header calls its set: Postulo, one of its plugins, or the
@@ -93,14 +106,39 @@ def use(root: Path | None = None) -> Project:
     pyproject = root / "pyproject.toml"
     if not pyproject.is_file():
         raise SystemExit(f"{root} has no pyproject.toml; run this from a project's root.")
-    name = tomllib.loads(pyproject.read_text(encoding="utf-8")).get("project", {}).get("name")
+    meta = tomllib.loads(pyproject.read_text(encoding="utf-8")).get("project", {})
+    name = meta.get("name")
     if not name:
         raise SystemExit(f"{pyproject} names no project.")
     package = root / "src" / name.replace("-", "_")
     if not package.is_dir():
         raise SystemExit(f"{package} is not there; the tool expects the package under src/.")
-    PROJECT = Project(root=root, package=package, name=name)
+    PROJECT = Project(
+        root=root,
+        package=package,
+        name=name,
+        licence=_licence_of(meta),
+        issues_url=_issues_url_of(meta),
+    )
     return PROJECT
+
+
+def _licence_of(meta: dict) -> str:
+    licence = meta.get("license")
+    if isinstance(licence, dict):
+        licence = licence.get("text")
+    return licence.strip() if isinstance(licence, str) else ""
+
+
+def _issues_url_of(meta: dict) -> str:
+    urls = meta.get("urls")
+    if not isinstance(urls, dict):
+        return ""
+    by_label = {str(label).strip().lower(): url for label, url in urls.items()}
+    for label in ("issues", "bug tracker", "bugs", "tracker", "issue tracker"):
+        if isinstance(by_label.get(label), str):
+            return by_label[label]
+    return ""
 
 
 def project() -> Project:
@@ -418,10 +456,11 @@ def _write_field(out: list[str], name: str, value: str) -> None:
 
 def dump(catalogue: Catalogue, code: str, subject: CatalogueSet | None = None) -> str:
     subject = subject or core_set()
-    what = project().describe(subject)
+    current = project()
+    what = current.describe(subject)
     out: list[str] = [
         f"# {NATIVE_NAMES.get(code, code)} translation of {what}.",
-        "# This file is distributed under the same license as Postulo (AGPL-3.0-or-later).",
+        f"# {current.licence_line()}",
         "#",
         'msgid ""',
         'msgstr ""',
@@ -558,9 +597,14 @@ def translated_languages() -> list[str]:
 
 def header_for(code: str, existing: dict[str, str]) -> dict[str, str]:
     now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M%z")
+    current = project()
     header = {
-        "Project-Id-Version": "Postulo",
-        "Report-Msgid-Bugs-To": "https://source.tiagoagueda.com/postulo/postulo/issues",
+        "Project-Id-Version": "Postulo" if current.is_postulo else current.name,
+        "Report-Msgid-Bugs-To": (
+            "https://source.tiagoagueda.com/postulo/postulo/issues"
+            if current.is_postulo
+            else current.issues_url
+        ),
         "POT-Creation-Date": now,
         "PO-Revision-Date": existing.get("PO-Revision-Date", now),
         "Last-Translator": existing.get("Last-Translator", "Postulo contributors"),
@@ -570,8 +614,10 @@ def header_for(code: str, existing: dict[str, str]) -> dict[str, str]:
         "Content-Type": "text/plain; charset=UTF-8",
         "Content-Transfer-Encoding": "8bit",
         "Plural-Forms": PLURAL_FORMS.get(code, "nplurals=2; plural=(n != 1);"),
-        "X-Generator": "postulo scripts/messages.py",
+        "X-Generator": "postulo scripts/messages.py" if current.is_postulo else "postulo-messages",
     }
+    if not header["Report-Msgid-Bugs-To"]:
+        del header["Report-Msgid-Bugs-To"]
     if "--check" in sys.argv:
         header["POT-Creation-Date"] = existing.get("POT-Creation-Date", now)
     return header

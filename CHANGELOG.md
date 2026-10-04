@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- postulo-messages now writes the project's own licence, name and issues URL into a plugin's catalogue headers instead of Postulo's AGPL line and tracker; the core's catalogues are unchanged. (#417)
 - A pre-release tag no longer moves :latest or the stable minor image tag; the image workflow takes its tags from release_tools.py, and a +build tag is refused. (#418)
 - The 500 page now speaks the reader's language with a matching lang and dir and is styled under the CSP; a refused CSRF token and a bad request get Postulo's own translated pages instead of Django's. (#421)
 - The demo data is valid and plainly fictional: contact addresses are ASCII, the French CV entry says Paris, and Initech's LEI and the Wikidata ids no longer point at real companies or places. (#423)
