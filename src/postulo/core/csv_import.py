@@ -499,23 +499,36 @@ def normalise_header(header: str) -> str:
 
 
 def guess_mapping(headers: list[str]) -> list[str]:
-    """One field key per header, ``ignore`` where nothing fits. Every guess is editable."""
-    mapping: list[str] = []
+    """One field key per header, ``ignore`` where nothing fits. Every guess is editable.
+
+    Two passes, so a loose match never takes a field a later header names exactly: first
+    every header that is word for word a synonym, then, for the headers and fields still
+    free, a leading or trailing synonym, the longest one across all fields winning.
+    """
+    names = [normalise_header(header) for header in headers]
+    mapping = ["ignore"] * len(names)
     taken: set[str] = set()
-    for header in headers:
-        name = normalise_header(header)
-        guess = "ignore"
+    for index, name in enumerate(names):
+        for key, words in SYNONYMS.items():
+            if (key not in taken or key == "notes") and name in words:
+                mapping[index] = key
+                taken.add(key)
+                break
+    for index, name in enumerate(names):
+        if mapping[index] != "ignore":
+            continue
+        best, best_length = "ignore", 0
         for key, words in SYNONYMS.items():
             if key in taken and key != "notes":
                 continue
-            if name in words or any(
-                name.startswith(word + " ") or name.endswith(" " + word) for word in words
-            ):
-                guess = key
-                break
-        if guess != "ignore":
-            taken.add(guess)
-        mapping.append(guess)
+            for word in words:
+                if len(word) > best_length and (
+                    name.startswith(word + " ") or name.endswith(" " + word)
+                ):
+                    best, best_length = key, len(word)
+        if best != "ignore":
+            mapping[index] = best
+            taken.add(best)
     return mapping
 
 

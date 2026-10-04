@@ -58,6 +58,23 @@ def test_empty_huge_and_rowless_files_are_refused():
 # --------------------------------------------------------------------- guessing
 
 
+def test_an_exact_header_is_not_taken_by_a_looser_match_on_an_earlier_field():
+    assert csv_import.guess_mapping(["Company", "Role", "Applied through", "Date applied"]) == [
+        "company",
+        "role",
+        "channel",
+        "applied_at",
+    ]
+    for header in ("Deadline date", "Interview date"):
+        mapping = csv_import.guess_mapping(["Company", "Role", header, "Date applied"])
+        assert mapping[3] == "applied_at"
+        assert mapping[2] != "applied_at"
+    assert csv_import.guess_mapping(["Company", "Role", "Deadline date", "Date applied"])[2:] == [
+        "deadline",
+        "applied_at",
+    ]
+
+
 def test_headers_are_guessed_in_three_languages_and_never_twice():
     assert csv_import.guess_mapping(
         ["Company", "Role", "URL", "Date applied", "Status", "Salary", "Tags", "Notes"]
