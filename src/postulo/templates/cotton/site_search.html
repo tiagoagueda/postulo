@@ -65,6 +65,15 @@
    anything but name -- the stylesheet undoes what the browser does to one. One form and one
    box at every width, so there is one search landmark on the page and one input named `q`.
 
+   **On a phone, over everything, the field opens in the masthead** (#350). Below `lg` the
+   icon is a link to the search page, and stays one: that is the whole answer with scripts
+   off. With them, `app.js` takes the tap, marks the masthead `data-search-open`, and the
+   stylesheet draws the form in the place of the wordmark and the instance's name, with the
+   close button (`data-search-close`, drawn only then) where the icon was. No
+   drawer and no second row, so the masthead stays one line high with the keyboard up.
+   Escape and the close button put the wordmark back and the focus on the icon, which says
+   `aria-expanded` meanwhile. 16 pixels of text, so that iOS does not zoom the page.
+
    Not `autofocus` in the panel, which would take the focus on every page load wherever the
    box is drawn in the row: `app.js` puts the focus in the box when the panel opens. {% endcomment %}
 {% if table %}
@@ -96,11 +105,13 @@
 {% else %}
   <a href="{% url 'core:search' %}" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
      data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</a>
-  <form method="get" action="{% url 'core:search' %}" role="search"
+  <form method="get" action="{% url 'core:search' %}" role="search" data-site-search-form
         aria-label="{% translate 'Site search' %}" class="hidden lg:block">
     <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
     <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
-           placeholder="{% if shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
+           enterkeyhint="search" placeholder="{% if shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
            class="w-32 py-1 text-sm transition-[width] focus:w-48">
+    <button type="button" class="btn size-11" data-variant="ghost" data-size="icon" data-search-close
+            aria-label="{% translate 'Close search' %}" title="{% translate 'Close search' %}">{% icon "x" class="size-5" %}</button>
   </form>
 {% endif %}

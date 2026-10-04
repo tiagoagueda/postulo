@@ -332,4 +332,7 @@ def test_the_navigation_becomes_a_bar_and_still_works(
 
     nav.locator("[data-nav-more] > button").click()
     more.locator("[data-nav-search]").click()
-    expect(page).to_have_url(f"{base}/search/")
+    # The search opens where the person is (#350), here the companies table's own panel,
+    # not the search page.
+    expect(page).to_have_url(f"{base}/jobs/companies/")
+    expect(page.locator("#site-search")).to_be_focused()

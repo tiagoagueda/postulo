@@ -107,7 +107,7 @@
             When the Dashboard link is hidden the wordmark takes the job over properly:
             the active style on the dashboard, and a name that says where it goes.
           {% endcomment %}
-          <a href="{% url 'core:home' %}"
+          <a href="{% url 'core:home' %}" data-wordmark
              class="flex items-center gap-2 text-lg font-semibold tracking-tight {% if dashboard_hidden %}{% nav_active 'core:home' %} !text-lg !font-semibold{% else %}text-ink-900 dark:text-ink-50{% endif %}"
              {% if dashboard_hidden %}aria-label="{% blocktranslate with name=instance_name trimmed %}{{ name }} — dashboard{% endblocktranslate %}"{% endif %}>
             {% comment %} Decorative: the name is right beside it, and a screen reader
@@ -120,7 +120,7 @@
           {% if user.is_authenticated %}
             {% include "partials/nav_links.html" %}
 
-            <div class="ms-auto flex items-center gap-1">
+            <div class="ms-auto flex items-center gap-1" data-header-tools>
               {% comment %} Search, in two shapes for two widths (#299) and two modes (#313):
                  everything, or the table the page is showing, which a page with one asks
                  for by filling this block. `cotton/site_search.html` says how. {% endcomment %}

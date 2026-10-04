@@ -2202,6 +2202,96 @@
   });
 
   /*
+   * The masthead's search over everything, below `lg` (#350). The icon is a link to the
+   * search page, and with scripts off that is all it is. Here it becomes the button of a
+   * disclosure: tapping it opens the box in the masthead, in the place of the wordmark
+   * (`data-search-open` on the masthead, and the stylesheet draws it), with the focus in
+   * the box and the page where it was. Escape and the close button shut it and give the
+   * focus back to the icon, which says `aria-expanded` meanwhile -- set from here, with
+   * `role="button"`, because a link may not carry it. The nav menu's *Search* opens the
+   * same thing (`data-nav-search`), and so does "/". Past `lg` the box is drawn in the row
+   * and none of this applies, and it is shut as the window grows. Where the box narrows
+   * the page's table the icon is a popover's button, not a link, and is left to the
+   * browser (#313).
+   */
+  var searchHeader = document.querySelector("[data-site-header]");
+  var searchIcon = searchHeader && searchHeader.querySelector("a[data-search-link]");
+  var searchBox = searchIcon && searchHeader.querySelector("[data-site-search-form] input");
+  var searchWide = window.matchMedia ? window.matchMedia("(min-width: 64rem)") : null;
+
+  function searchIsOpen() {
+    return !!searchHeader && searchHeader.hasAttribute("data-search-open");
+  }
+
+  function openSearch() {
+    searchHeader.setAttribute("data-search-open", "");
+    searchIcon.setAttribute("aria-expanded", "true");
+    searchBox.focus();
+    searchBox.select();
+  }
+
+  function closeSearch(giveFocusBack) {
+    searchHeader.removeAttribute("data-search-open");
+    searchIcon.setAttribute("aria-expanded", "false");
+    if (giveFocusBack) {
+      searchIcon.focus();
+    }
+  }
+
+  if (searchIcon && searchBox) {
+    searchIcon.setAttribute("role", "button");
+    searchIcon.setAttribute("aria-expanded", "false");
+    searchIcon.setAttribute("aria-controls", searchBox.id);
+    searchIcon.addEventListener("click", function (event) {
+      if (searchWide && searchWide.matches) {
+        return;
+      }
+      event.preventDefault();
+      openSearch();
+    });
+    // A link with a button's role answers Space as a button does.
+    searchIcon.addEventListener("keydown", function (event) {
+      if (event.key === " ") {
+        event.preventDefault();
+        searchIcon.click();
+      }
+    });
+    searchHeader.querySelector("[data-search-close]").addEventListener("click", function () {
+      closeSearch(true);
+    });
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && searchIsOpen() && !event.defaultPrevented) {
+        // Not the search box's own first Escape, which would only empty it.
+        event.preventDefault();
+        closeSearch(true);
+      }
+    });
+    if (searchWide && searchWide.addEventListener) {
+      searchWide.addEventListener("change", function (query) {
+        if (query.matches && searchIsOpen()) {
+          closeSearch(false);
+        }
+      });
+    }
+  }
+
+  // The navigation menu's Search is the same search, not the page: the field in the masthead,
+  // or the table's panel where the page has one.
+  document.addEventListener("click", function (event) {
+    var entry = event.target.closest && event.target.closest("[data-nav-search]");
+    var opener = searchHeader && searchHeader.querySelector("[data-search-link]");
+    if (!entry || !opener || event.defaultPrevented) {
+      return;
+    }
+    event.preventDefault();
+    var menu = entry.closest("[popover]");
+    if (menu && menu.hidePopover && menu.matches(":popover-open")) {
+      menu.hidePopover();
+    }
+    opener.click();
+  });
+
+  /*
    * The masthead's search panel, below `lg` on a page whose table the box narrows (#313).
    * Opening it is asking to type, so the box takes the focus -- here, and not by
    * `autofocus`, which would take it on every page load wherever the box is drawn in the

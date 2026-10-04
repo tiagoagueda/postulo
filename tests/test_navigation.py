@@ -531,6 +531,11 @@ def test_the_masthead_reaches_the_search_at_every_width(client, user):
     assert f'href="{reverse("core:search")}"' in link and "lg:hidden" in link
     assert 'aria-label="Search"' in link, "an icon standing alone carries the name"
     assert re.search(r'<form[^>]*role="search"[^>]*class="hidden lg:block"', header)
+    # Scripts off: the link is a plain link (no role or state a link may not carry), and the
+    # field the script opens is a search field a phone's keyboard labels as one (#350).
+    assert "aria-expanded" not in link and "role=" not in link
+    assert re.search(r'<input[^>]*type="search"[^>]*enterkeyhint="search"', header)
+    assert "data-search-close" in header
 
     search = client.get(reverse("core:search")).content.decode()
     assert re.search(r'<input[^>]*id="search-q"[^>]*data-search-shortcut', search)

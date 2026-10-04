@@ -1832,6 +1832,44 @@ select[data-select-ready] {
   }
 }
 
+/*
+ * The masthead's search over everything, open on a phone (#350). `app.js` sets
+ * `data-search-open` on the masthead when the magnifier is tapped; the form, which is
+ * `hidden` below `lg` with scripts off, is then drawn in the row in the place of the
+ * wordmark and the instance's name, takes the room they leave, and its close button
+ * stands where the magnifier was. The `+` menu and the account menu stay: they are one
+ * row, as high as it was. 16 pixels of text, because iOS zooms the page on focus into
+ * anything smaller, and the 44 pixels of a thumb. A `[data-search-close]` is only ever
+ * seen here: the form is `hidden` otherwise.
+ */
+[data-search-close] {
+  display: none;
+}
+
+@media (width < 64rem) {
+  [data-site-header][data-search-open] [data-wordmark],
+  [data-site-header][data-search-open] [data-search-link] {
+    display: none;
+  }
+
+  [data-site-header][data-search-open] [data-header-tools] {
+    @apply min-w-0 flex-1;
+  }
+
+  [data-site-header][data-search-open] [data-site-search-form] {
+    @apply flex min-w-0 flex-1 items-center;
+  }
+
+  [data-site-header][data-search-open] [data-site-search-form] input {
+    @apply min-h-11 min-w-0 flex-1 text-base focus:w-auto;
+    inline-size: auto;
+  }
+
+  [data-site-header][data-search-open] [data-search-close] {
+    display: inline-flex;
+  }
+}
+
 /* The disclosures that are not menus -- the column chooser, the saved views, the language
    picker -- are still `<details data-menu>`, and a summary is their trigger; the browser's
    disclosure triangle is not wanted on it. */
