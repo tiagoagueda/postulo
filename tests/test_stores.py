@@ -147,6 +147,24 @@ def a_render(user, application=None):
     return snapshot_cv(cv, application=application, backend=FakeBackend())
 
 
+def test_the_day_a_store_files_a_document_under_is_the_owners_not_utc(user):
+    user.profile.time_zone = "Europe/Paris"
+    user.profile.save()
+    render = a_render(user, application=an_application(user))
+    late = dt.datetime(2026, 10, 2, 22, 30, tzinfo=dt.UTC)
+    type(render).objects.filter(pk=render.pk).update(rendered_at=late)
+    render.refresh_from_db()
+
+    metadata = metadata_for(render)
+
+    assert metadata.sent_on == dt.date(2026, 10, 3), "00:30 in Paris is the next day"
+    assert metadata.created_on == dt.date(2026, 10, 3)
+    upload = an_upload(user)
+    type(upload).objects.filter(pk=upload.pk).update(created_at=late)
+    upload.refresh_from_db()
+    assert metadata_for(upload).created_on == dt.date(2026, 10, 3)
+
+
 # ----------------------------------------------------------------- the contract
 
 
@@ -169,7 +187,7 @@ def test_a_render_is_written_through_the_local_store(user, settings):
     assert metadata.kind_label == "CV" and metadata.content_type == "application/pdf"
     assert metadata.company == "Black Mesa" and metadata.role == "Research Engineer"
     assert metadata.application_url.endswith(render.application.get_absolute_url())
-    assert metadata.sent_on == render.rendered_at.date()
+    assert metadata.sent_on == timezone.localdate(render.rendered_at)
     assert metadata.checksum == render.checksum and metadata.size == len(b"%PDF-1.7 fake")
     assert metadata.tags == ("postulo", "cv")
 

@@ -47,7 +47,7 @@
       <c-section-title id="gdpr-dry-run-heading">{% translate "What the policy would touch" %}</c-section-title>
       {% if dry_run.cutoff %}
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate count days=dry_run.days with cutoff=dry_run.cutoff trimmed %}
+          {% blocktranslate count days=dry_run.days with cutoff=dry_run.cutoff|date:"DATE_FORMAT" trimmed %}
             Records older than {{ cutoff }} ({{ days }} day). Nothing was removed; this is
             the report a deletion would be made from.
           {% plural %}
@@ -61,7 +61,7 @@
               <li class="flex flex-wrap items-baseline gap-x-3 gap-y-1 py-2 text-sm">
                 <span class="font-medium">{{ contact.name }}</span>
                 {% if contact.company %}<span class="text-ink-500 dark:text-ink-400">{{ contact.company }}</span>{% endif %}
-                <span class="text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with date=contact.created_at trimmed %}recorded {{ date}}{% endblocktranslate %}</span>
+                <span class="text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with date=contact.created_at|date:"DATE_FORMAT" trimmed %}recorded {{ date}}{% endblocktranslate %}</span>
                 <span class="text-xs text-ink-500 dark:text-ink-400">
                   {{ contact.would_remove_line }}
                 </span>

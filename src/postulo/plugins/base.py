@@ -808,6 +808,9 @@ class DocumentMetadata:
     role: str = ""
     application_url: str = ""
     sent_on: dt.date | None = None
+    # The day ``created_at`` falls on in the owner's time zone, so a store never calls
+    # ``.date()`` on an aware moment and files a late-evening document under the wrong day.
+    created_on: dt.date | None = None
     language: str = ""
     tags: tuple[str, ...] = field(default_factory=tuple)
 

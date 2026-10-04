@@ -356,6 +356,21 @@ def test_the_dry_run_counts_what_the_erasures_would_keep(user):
     )
 
 
+def test_the_dry_run_reports_dates_in_the_active_zone_as_dates(user):
+    settings = SiteSettings.get()
+    settings.retention_days = 30
+    settings.save()
+    old = make_contact(user)
+    moment = dt.datetime(2020, 5, 1, 23, 30, tzinfo=dt.UTC)
+    Contact.objects.filter(pk=old.pk).update(created_at=moment)
+
+    with timezone.override("Europe/Paris"):
+        report = gdpr.retention_dry_run()
+
+    assert report["contacts"][0]["created_at"] == dt.date(2020, 5, 2)
+    assert isinstance(report["cutoff"], dt.date)
+
+
 # --------------------------------------------------------- the record of processing
 
 

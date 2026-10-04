@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A document's sent/created day for stores and the retention report's "recorded" and cutoff dates are now taken in the person's time zone rather than UTC, and the report shows them in the locale's date format. (#386)
 - A cover letter's date at the top is now the same locale-formatted date its {{ date }} placeholder prints, instead of an English "j F Y" pattern; the template lint now also rejects a literal format in {% now %}. (#387)
 - Bulk actions now say "N applications/companies/listings changed." as a real plural form per table, so every language's plural categories and the verb's agreement with the noun are right. (#390)
 - Sentences with a count now use plural forms everywhere ("Added 1 entry.", "1 copy sent.", "1 day", "1 web link"), so languages with several plural forms can translate them; two new checks keep it so. (#391)

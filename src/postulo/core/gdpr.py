@@ -392,12 +392,12 @@ def retention_dry_run(days: int | None = None) -> dict:
                 "id": contact.pk,
                 "name": contact.name,
                 "company": contact.company.name if contact.company_id else "",
-                "created_at": contact.created_at.date().isoformat(),
+                "created_at": timezone.localdate(contact.created_at),
                 "would_remove": would_remove,
                 "would_remove_line": would_remove_line(would_remove),
             }
         )
-    return {"days": days, "cutoff": cutoff.isoformat(), "contacts": rows}
+    return {"days": days, "cutoff": cutoff, "contacts": rows}
 
 
 def would_remove_line(would_remove: dict) -> str:

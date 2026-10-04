@@ -22,9 +22,12 @@ the metadata it assembles, and where a document can be downloaded from.
 
 from __future__ import annotations
 
+import datetime as dt
 import mimetypes
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.urls import reverse
+from django.utils import timezone
 
 from postulo.plugins.api import DocumentMetadata, FieldSpec
 
@@ -61,6 +64,25 @@ def _language_of(document) -> str:
     return (getattr(document, "language", "") or "").strip()
 
 
+def _day_in_owners_zone(moment, owner):
+    """The calendar day ``moment`` falls on for ``owner``, not in UTC (#386).
+
+    ``.date()`` on an aware datetime ignores the active zone, and the database hands
+    moments back in UTC, so a CV rendered at 00:30 in Paris would be filed under the day
+    before. The owner's zone is used, else the instance's: this also runs in the
+    scheduler, where no zone is active at all.
+    """
+    from postulo.core.preferences import instance_zone
+
+    profile = getattr(owner, "profile", None) if owner is not None else None
+    for name in ((getattr(profile, "time_zone", "") or ""), instance_zone()):
+        try:
+            return timezone.localtime(moment, ZoneInfo(name)).date()
+        except (ZoneInfoNotFoundError, ValueError):
+            continue
+    return timezone.localtime(moment, dt.UTC).date()
+
+
 def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
     """Describe a render or an upload for a store."""
     from postulo.notifications.base import absolute_url
@@ -82,6 +104,7 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         except (OSError, ValueError):
             size = 0
     when = getattr(document, "archived_at", None) or document.created_at
+    day = _day_in_owners_zone(when, getattr(document, "owner", None))
     return DocumentMetadata(
         kind=document.kind,
         # From the registry, so a kind a plugin brought is named rather than shown as a raw
@@ -97,7 +120,8 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
         company=company,
         role=role,
         application_url=application_url,
-        sent_on=when.date() if origin == "render" and application is not None else None,
+        sent_on=day if origin == "render" and application is not None else None,
+        created_on=day,
         # The document's language, not the owner's (#223). A French CV filed in Paperless
         # under the language its owner happens to read Postulo in is filed wrongly, and
         # the whole point of sending it there is to find it again.
