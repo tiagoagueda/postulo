@@ -578,3 +578,23 @@ def test_a_board_recipe_with_a_long_field_still_answers():
     data = BoardSource().parse("https://www.linkedin.com/jobs/view/1", page)
     assert data is not None
     assert data.title == "Engineer" and len(data.location) == 500
+
+
+@pytest.mark.parametrize("ignored", [False, True])
+def test_the_capture_form_tells_the_truth_about_robots_txt(client, user, ignored):
+    """The help beside the form states what this instance does, not what it usually does (#630)."""
+    from django.urls import reverse
+
+    from postulo.core.models import SiteSettings
+
+    row = SiteSettings.get()
+    row.capture_ignore_robots = ignored
+    row.save()
+    client.force_login(user)
+    html = client.get(reverse("jobs:capture_create")).content.decode()
+    honoured = (
+        "The site&#x27;s robots.txt is honoured." in html
+        or "The site's robots.txt is honoured." in html
+    )
+    assert honoured is not ignored
+    assert ("set not to consult" in html) is ignored

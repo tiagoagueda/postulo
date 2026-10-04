@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The capture form's help now says when the instance is set not to consult a site's robots.txt, instead of always claiming it is honoured. (#630)
 - The email sign-in security tests can now fail: the guess limit, the no-enumeration answer and the second-factor redirect are each checked by behaviour, not by assertions any outcome satisfied. (#631)
 - Connections: a sync report is stored as numbers and worded in the reader's language with plural forms; a private-address refusal says so once, only when it is one; Web Push errors are translatable in the browser plugin's catalogue. (#384)
 - Notifications are worded in the recipient's time zone and language: closing notices count days on their calendar, interview messages show the local formatted time, status titles use their language's label. (#385)

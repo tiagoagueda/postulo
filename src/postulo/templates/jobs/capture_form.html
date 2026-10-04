@@ -82,7 +82,11 @@
       <c-section-title>{% translate "How this works" %}</c-section-title>
       <ul class="mb-4 list-disc space-y-1 ps-5 text-sm text-ink-600 dark:text-ink-300">
         <li>{% translate "One page is fetched — the one you pasted. Postulo never crawls." %}</li>
-        <li>{% translate "The site's robots.txt is honoured." %}</li>
+        {% if ignore_robots %}
+          <li>{% translate "This instance is set not to consult the site's robots.txt." %}</li>
+        {% else %}
+          <li>{% translate "The site's robots.txt is honoured." %}</li>
+        {% endif %}
         <li>{% translate "Private and local addresses are refused." %}</li>
         <li>{% translate "Nothing is saved until you have reviewed it." %}</li>
       </ul>

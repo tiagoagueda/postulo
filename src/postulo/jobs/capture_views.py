@@ -25,7 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
 
-from postulo.core import errands, throttle
+from postulo.core import errands, site, throttle
 from postulo.core.mixins import OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
 
@@ -88,7 +88,12 @@ class CaptureCreateView(OwnedObjectMixin, View):
         return render(
             request,
             self.template_name,
-            {"form": form, "sources": plugins_for(request.user, "source"), "known": known_},
+            {
+                "form": form,
+                "sources": plugins_for(request.user, "source"),
+                "known": known_,
+                "ignore_robots": site.capture_ignore_robots(),
+            },
         )
 
     def get(self, request: HttpRequest) -> HttpResponse:
