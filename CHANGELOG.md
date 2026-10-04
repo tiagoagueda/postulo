@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Rolling back documents 0005 now carries copies back instead of failing, and accounts 0021 now refuses to be undone up front, since invitation tokens cannot be recovered from their fingerprints. (#571)
 - The archive now keeps single-key shortcuts, nav underline, density, plugins switched off, capture-keeping switches and closing notice, and a restore brings back a switch set off or a cleared dashboard instead of the defaults. (#464)
 - Importing an archive into an account whose profile already has a primary number, address, link or identifier now keeps the profile's rows and reports what it skipped, instead of failing with a traceback. (#375)
 - An account import now reports every telephone number it leaves out because another record on the instance already holds it, naming the profile or contact and the last two digits, so the report no longer reads clean. (#562)

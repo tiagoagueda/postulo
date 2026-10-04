@@ -48,7 +48,8 @@ def carry_across(apps, schema_editor):
             copy.document_type_id, copy.document_id = upload_type.pk, copy.upload_id
         else:
             # The check constraint made this impossible, and a row that reached here anyway
-            # is a row pointing at nothing. Left for the removal below to take with it.
+            # is a row pointing at nothing. Left with no document, so the `AlterField` to not-null
+            # below refuses it; removing columns removes no rows.
             continue
         copy.save(update_fields=["document_type", "document_id"])
 
@@ -122,10 +123,9 @@ class Migration(migrations.Migration):
             name="document_id",
             field=models.PositiveBigIntegerField(null=True),
         ),
-        # 2. The data, both ways.
-        migrations.RunPython(carry_across, carry_back),
-        # 3. The old rules, then the old columns. The check constraint goes first because
-        #    it names columns that are about to stop existing.
+        # 2. The old rules go before the data moves. Undone, this order re-creates them only
+        #    after `carry_back` has filled the columns they check; the other way round the
+        #    check constraint meets a row with both columns empty and the rollback aborts.
         migrations.RemoveConstraint(
             model_name="documentcopy", name="documents_copy_of_one_document"
         ),
@@ -135,11 +135,14 @@ class Migration(migrations.Migration):
         migrations.RemoveConstraint(
             model_name="documentcopy", name="documents_copy_once_per_upload"
         ),
+        # 3. The data, both ways.
+        migrations.RunPython(carry_across, carry_back),
+        # 4. The old columns, now that nothing names them.
         migrations.RemoveField(model_name="rendereddocument", name="cv"),
         migrations.RemoveField(model_name="rendereddocument", name="cover_letter"),
         migrations.RemoveField(model_name="documentcopy", name="rendered"),
         migrations.RemoveField(model_name="documentcopy", name="upload"),
-        # 4. And the copy's link stops being nullable, now that every row has one.
+        # 5. And the copy's link stops being nullable, now that every row has one.
         migrations.AlterField(
             model_name="documentcopy",
             name="document_type",

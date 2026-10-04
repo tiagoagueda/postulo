@@ -3,6 +3,10 @@
 The fingerprint of every existing token is computed here, so an invitation somebody is
 holding still opens: the link they were sent is the same, and only what the database keeps
 about it changes. The token column then goes.
+
+**This step is one-way.** A token cannot be recovered from its fingerprint, so undoing the
+removal could only refill the column with invented values; Django refuses the rollback up
+front with ``IrreversibleError`` instead of failing halfway on a unique constraint.
 """
 
 import hashlib
@@ -30,7 +34,7 @@ class Migration(migrations.Migration):
             name="token_fingerprint",
             field=models.CharField(default="", editable=False, max_length=64, verbose_name="token"),
         ),
-        migrations.RunPython(fingerprint_the_tokens, migrations.RunPython.noop),
+        migrations.RunPython(fingerprint_the_tokens),
         migrations.AlterField(
             model_name="invite",
             name="token_fingerprint",
