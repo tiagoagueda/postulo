@@ -39,18 +39,32 @@ stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
 which is the difference between finding out before the push and after it.
 
-There is also a browser test of the critical path (sign in, capture, review, board, record
-what was sent, export), which is left out of the default run because it needs a browser:
+There is also a browser suite, `tests/e2e`: some 650 tests in a real Chromium against a live
+server, with axe-core and a walk of every page. It is left out of the default run because it
+needs a browser:
 
 ```sh
 uv sync --group e2e
 uv run playwright install chromium
-uv run pytest -m e2e
+uv run pytest -m e2e -n 4        # about eight minutes on four workers; CI runs it on one
 ```
 
-CI runs it on every push. If you change a page on that path — the header, the capture
-review, the board, the export — run it before opening the pull request; it is the test that
-notices when steps stop joining up.
+CI runs it on every push, and a failure is run again alone with a trace. Run it before a pull
+request that touches a template, a stylesheet or a script.
+
+**What belongs in it, and how to keep it fast.** It grew from 149 tests to 645 in five days of
+October 2026, and every one costs seconds where a unit test costs milliseconds (#726).
+
+- A browser test is for what needs a browser: scripts, layout, focus, the content security
+  policy. Markup, permissions, redirects and what a form saves belong in the unit suite,
+  with Django's test client.
+- A new page joins the walk (`signed_in_paths()` in `tests/e2e/test_accessibility.py`), and
+  a check every page should pass joins the walk too, rather than walking the site again.
+- Sign in with `tests/e2e/signing_in.py`; fill the sign-in form only in a test about it.
+- Wait for state with `expect(...)`. A fixed `wait_for_timeout` is for a test whose subject
+  is time, and carries a comment beginning `# A fixed wait on purpose:` saying what it
+  measures.
+- CI's log ends with the 25 slowest tests. Read it before adding to the suite.
 
 **Every page is drawn in the suite's own font.** The interface uses the reader's own system
 font, so the browser suite used to measure whatever the machine it ran on drew in -- Segoe UI

@@ -58,7 +58,7 @@ Four commitments are stated in the README and are not negotiable in code:
 ```sh
 uv run ruff check . && uv run ruff format --check .
 uv run pytest                                    # in-memory SQLite, warnings are errors
-uv run pytest -m e2e --browser chromium          # the critical path plus axe-core
+uv run pytest -m e2e --browser chromium -n 4     # browser suite; what belongs there: CONTRIBUTING.md
 uv run python scripts/messages.py extract --check && uv run python scripts/messages.py check
 npm run build:css                                # then commit src/postulo/static/css/app.css
 ```
