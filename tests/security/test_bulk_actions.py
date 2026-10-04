@@ -230,6 +230,9 @@ def test_a_status_change_writes_a_timeline_entry(client, user):
     mine.refresh_from_db()
     assert mine.status == Status.APPLIED
     assert mine.events.exists(), "moved through change_status, not through update()"
+    assert not mine.events.exclude(actor="").exists(), (
+        "the person's own bulk move is not 'via' anyone: actor is for automation (#410)"
+    )
 
 
 def test_a_status_that_is_not_one_changes_nothing(client, user):

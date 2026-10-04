@@ -429,7 +429,7 @@ class ApplicationBulkView(LoginRequiredMixin, View):
         for application in rows:
             # Returns None when the status was already that, which is not a change and must
             # not be counted as one.
-            if change_status(application, wanted, actor=str(request.user)) is not None:
+            if change_status(application, wanted) is not None:
                 changed += 1
         return changed
 

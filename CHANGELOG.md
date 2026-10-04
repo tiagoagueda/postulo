@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A bulk status move on the Applications table no longer records the person's own username as the timeline actor ("via alex"); the event actor stays blank, as on every other browser path. (#410)
 - Deleting an offer now ticks off its outstanding answer-by reminder instead of leaving it on the calendar and announced to the person's notifiers. (#444)
 - A suggestion's action is now only accept or decline; any other word answers 404 instead of silently accepting the suggestion into the timeline and possibly moving the application's status. (#447)
 - Insights: the Interviews column of the sources tables and the Interviews widget now count the same applications: those with an interview entry or that reached Interviewing or Assessment; Screening alone no longer counts. (#449)
