@@ -567,15 +567,14 @@ def highlight(text, query: str) -> str:
     if not query:
         return escape(text)
     pieces = []
-    lowered, needle, position = text.lower(), query.lower(), 0
-    while True:
-        found = lowered.find(needle, position)
-        if found == -1:
-            pieces.append(escape(text[position:]))
-            break
-        pieces.append(escape(text[position:found]))
-        pieces.append(f"<mark>{escape(text[found : found + len(query)])}</mark>")
-        position = found + len(query)
+    position = 0
+    # Match on the text itself: lower-casing "İ" gives two code points, which shifts
+    # every position after it (#377).
+    for found in re.finditer(re.escape(query), text, re.IGNORECASE):
+        pieces.append(escape(text[position : found.start()]))
+        pieces.append(f"<mark>{escape(found.group())}</mark>")
+        position = found.end()
+    pieces.append(escape(text[position:]))
     return mark_safe("".join(pieces))  # noqa: S308
 
 

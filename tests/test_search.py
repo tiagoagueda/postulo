@@ -179,6 +179,19 @@ def test_highlight_escapes_what_it_does_not_mark():
     assert plain == "&lt;i&gt;x&lt;/i&gt;"
 
 
+def test_highlight_and_excerpt_survive_a_dotted_capital_i():
+    # "İ".lower() is two code points, which used to shift every later position (#377).
+    assert searching.excerpt("İ" * 100 + " needle here", "needle", radius=5).count("needle")
+    rendered = Template("{% load postulo %}{{ text|highlight:q }}").render(
+        Context({"text": "İstanbul office", "q": "stan"})
+    )
+    assert rendered == "İ<mark>stan</mark>bul office"
+    rendered = Template("{% load postulo %}{{ text|highlight:q }}").render(
+        Context({"text": "In İzmir and İstanbul, stand-up", "q": "stand"})
+    )
+    assert rendered == "In İzmir and İstanbul, <mark>stand</mark>-up"
+
+
 def test_the_api_returns_the_same_groups(client, user, world):
     _record, raw = ApiToken.issue(user, "Agent", scopes=("read",))
     headers = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}

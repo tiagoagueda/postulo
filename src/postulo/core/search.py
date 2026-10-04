@@ -25,6 +25,7 @@ ranking that decided which five is an `ORDER BY`, and the excerpt is a subquery 
 
 from __future__ import annotations
 
+import re
 from collections.abc import Callable
 from dataclasses import dataclass, field
 
@@ -86,12 +87,12 @@ def excerpt(text: str, query: str, radius: int = EXCERPT_RADIUS) -> str:
     text = " ".join((text or "").split())
     if not text:
         return ""
-    lowered = text.lower()
-    position = lowered.find(query.lower())
-    if position == -1:
+    # Search the text itself: lower-casing "İ" lengthens it and shifts positions (#377).
+    found = re.search(re.escape(query), text, re.IGNORECASE)
+    if found is None:
         return text[: radius * 2] + ("…" if len(text) > radius * 2 else "")
-    start = max(0, position - radius)
-    end = min(len(text), position + len(query) + radius)
+    start = max(0, found.start() - radius)
+    end = min(len(text), found.end() + radius)
     piece = text[start:end]
     if start > 0:
         piece = "…" + piece

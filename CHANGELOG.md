@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Search highlighting and excerpts no longer shift onto the wrong letters after a Turkish dotted capital İ, and long texts no longer return an empty excerpt. (#377)
 - The Applications by month widget now lists every month from your first application to the current one, with nought for a quiet month, and names each month in your language ("février 2026"). (#397)
 - A listing's Apply page now shows the new-tags box its help text promised, and tags typed there are saved with the application. (#408)
 - A portfolio can now be saved in a plugin theme that sets only portfolios; the theme is checked against the document's own kind, not always as a CV. (#412)
