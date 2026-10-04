@@ -109,7 +109,12 @@ jobs:
         # because it cannot know beforehand which one will fail: 645 traces and pictures to
         # keep the files of the rare failure (#715). The step below makes them for the
         # failed tests alone.
-        run: uv run pytest -m e2e --browser chromium --durations=25
+        #
+        # Two processes, each with its own live server, database and Chromium (#721): two
+        # and no more, because the unit job runs beside this one on the same host (#233).
+        # `worksteal` because the walks of every page take a minute or more each and the
+        # rest seconds; tests/e2e/conftest.py starts the walks first.
+        run: uv run pytest -m e2e --browser chromium -n 2 --dist worksteal --durations=25
         # Half again what the suite took on 4 October 2026, so a hang ends here, with
         # pytest's stack dump of the test that hung above it, rather than at the runner's
         # own limit with nothing said.

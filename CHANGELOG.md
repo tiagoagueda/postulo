@@ -6,6 +6,11 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔒 Security
+
+- Importing an archive reads every file, and the manifest, through a size cap, so an entry that unpacks to gigabytes is left out and reported instead of exhausting memory, and an imported avatar or company logo goes through the same checks as an uploaded one (an SVG is sanitised, a picture re-encoded). (#466)
+- *Check*, *Check all*, a new logo address and *Find logo* now spend a fetch allowance, `POSTULO_FETCH_RATE` (300/h by default, once per address fetched): *Check all* stops when it runs out and says how many links it did not check. (#407)
+
 ### 🔧 Changed
 
 - CI starts the browser tests first, checks lint, migrations, catalogues and the production settings once instead of on every Python, bounds each test step's time and lists each suite's slowest tests; a release also needs those checks to pass. (#712)
@@ -13,10 +18,13 @@ All notable changes to Postulo are recorded here. The format follows
 - CI's browser tests no longer trace every test: a failed test is run again alone with a trace, and the job stays failed either way. (#715)
 - CI runs the unit tests on Python 3.14 for every push; 3.12 and 3.13 run in a new *Every Python* workflow weekly, on release branches and by hand, and a release needs all three. (#713)
 - The dev image is built only from a commit CI passed: its workflow waits for the commit's CI before building. (#716)
-### 🔒 Security
-
-- Importing an archive reads every file, and the manifest, through a size cap, so an entry that unpacks to gigabytes is left out and reported instead of exhausting memory, and an imported avatar or company logo goes through the same checks as an uploaded one (an SVG is sanitised, a picture re-encoded). (#466)
-- *Check*, *Check all*, a new logo address and *Find logo* now spend a fetch allowance, `POSTULO_FETCH_RATE` (300/h by default, once per address fetched): *Check all* stops when it runs out and says how many links it did not check. (#407)
+- A signed-in person whose profile language is blank is now read in the instance's default language, never the browser's, and the menu's blank choice says *Use the instance default*. (#398)
+- Language and time and Server settings → Defaults say which language and which time zone the blank choice stands for (*Deutsch de — Default*, *Europe/Paris — Default*), with the flag and the name in its own language where the control can draw rows, and "In force now" names the language instead of printing a code. (#698)
+- The browser tests draw every page in their own copy of DejaVu Sans on every machine, so a layout that passes locally passes on CI. (#717)
+- Four browser tests wait for what they read instead of a fixed time or an idle network. (#718)
+- Three unit tests no longer depend on the machine being idle: robots.txt, the two-factor codes and a slow-filter guard. (#719)
+- Browser tests sign in through one helper that hands the browser a session, instead of filling the sign-in form in every test. (#720)
+- CI runs the browser tests on two processes, the walks of every page first. (#721)
 
 ### ✨ Added
 
@@ -25,15 +33,6 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🐛 Fixed
 
 - The Applications board is a box about the height of the window that scrolls inside the page, so every column's name, open or folded, stays on screen however far down a long column you are; the box is a named region you can scroll from the keyboard, and the page scrolls on past it. (#652)
-
-### 🔧 Changed
-
-- A signed-in person whose profile language is blank is now read in the instance's default language, never the browser's, and the menu's blank choice says *Use the instance default*. (#398)
-- Language and time and Server settings → Defaults say which language and which time zone the blank choice stands for (*Deutsch de — Default*, *Europe/Paris — Default*), with the flag and the name in its own language where the control can draw rows, and "In force now" names the language instead of printing a code. (#698)
-- The browser tests draw every page in their own copy of DejaVu Sans on every machine, so a layout that passes locally passes on CI. (#717)
-- Four browser tests wait for what they read instead of a fixed time or an idle network. (#718)
-- Three unit tests no longer depend on the machine being idle: robots.txt, the two-factor codes and a slow-filter guard. (#719)
-- Browser tests sign in through one helper that hands the browser a session, instead of filling the sign-in form in every test. (#720)
 
 ## [0.4.0] — 2026-10-04
 
