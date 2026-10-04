@@ -345,16 +345,35 @@ def test_a_store_that_says_the_connection_is_finished_is_not_dialled_again(user)
     assert copy.status == CopyStatus.SENT and copy.last_error == ""
 
 
-def test_a_copy_whose_connection_row_is_gone_is_still_told_so(user):
-    """The `exclude` added in #243 must not swallow a copy that has nothing to wait for."""
-    a_store(user)
+def test_a_copy_whose_connection_row_is_gone_is_never_dialled(user):
+    """A leftover with no connection has nothing to send to, so it is not retried (#511)."""
+    connection = a_store(user)
     upload = an_upload(user)
     copy = upload.copies.get()
     DocumentCopy.objects.filter(pk=copy.pk).update(connection=None)
+    # Switched off, so `send_now` has no store to schedule a new copy for.
+    connection.enabled = False
+    connection.save(update_fields=["enabled"])
 
-    assert send_pending() == (0, 1)
+    assert send_pending() == (0, 0)
+    assert send_now(upload) == (0, 0)
     copy.refresh_from_db()
-    assert copy.status == CopyStatus.FAILED and copy.last_error
+    assert copy.status == CopyStatus.PENDING and copy.attempts == 0
+
+
+def test_removing_a_connection_drops_its_unsent_copies_and_keeps_the_sent_ones(user):
+    connection = a_store(user)
+    sent = an_upload(user, "Sent")
+    failed = an_upload(user, "Failed")
+    DocumentCopy.objects.filter(pk=sent.copies.get().pk).update(status=CopyStatus.SENT)
+    DocumentCopy.objects.filter(pk=failed.copies.get().pk).update(status=CopyStatus.FAILED)
+
+    connection.delete()
+
+    assert not failed.copies.exists()
+    kept = sent.copies.get()
+    assert kept.connection is None and kept.status == CopyStatus.SENT
+    assert send_now(failed) == (0, 0)
 
 
 def test_one_copy_is_sent_once_however_many_passes_are_running(user):
@@ -398,9 +417,8 @@ def test_a_missing_plugin_or_connection_is_a_failure_in_words(user):
     assert send_copy(copy) is False
     assert "gone plugin is not installed" in copy.last_error
 
-    connection.delete()
+    DocumentCopy.objects.filter(pk=copy.pk).update(connection=None)
     copy.refresh_from_db()
-    assert copy.connection is None, "the copy outlives the connection"
     assert send_copy(copy) is False and "gone or switched off" in copy.last_error
 
 

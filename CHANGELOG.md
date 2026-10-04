@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Removing a store connection now deletes its unsent document copies, so no failed copy is left that can never be sent; sent copies keep their reference, and orphans already left behind are cleaned up. (#511)
 - A waiting capture whose kept page expires after the retention period no longer loses what its review would teach about the site; expiry now saves the places first, as deleting the page by hand does. (#524)
 - The capture form's help now says when the instance is set not to consult a site's robots.txt, instead of always claiming it is honoured. (#630)
 - The email sign-in security tests can now fail: the guess limit, the no-enumeration answer and the second-factor redirect are each checked by behaviour, not by assertions any outcome satisfied. (#631)

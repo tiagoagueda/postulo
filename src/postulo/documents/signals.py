@@ -17,7 +17,7 @@ from __future__ import annotations
 import logging
 
 from django.db import transaction
-from django.db.models.signals import post_delete, post_save
+from django.db.models.signals import post_delete, post_save, pre_delete
 from django.dispatch import receiver
 
 from .models import CV, CoverLetter, RenderedDocument, UploadedDocument
@@ -33,6 +33,21 @@ def schedule_copies_on_creation(sender, instance, created, raw=False, **kwargs) 
     from .archiving import schedule_copies
 
     schedule_copies(instance)
+
+
+@receiver(pre_delete, sender="plugins.Connection", dispatch_uid="documents.drop_unsent_copies")
+def drop_the_copies_a_removed_connection_still_owed(sender, instance, **kwargs) -> None:
+    """Removing a store connection removes the copies that had not reached it (#511).
+
+    Such a copy keeps no connection to send to, so it could only fail again on every pass
+    and every *Send now*, and the document showed a failure that nothing could resolve.
+    A copy that arrived stays: it is the reference to where the file went, and it is meant
+    to outlive the connection (#130). A signal rather than the delete view, so the admin and
+    the deletion of an account are covered too.
+    """
+    from .models import CopyStatus, DocumentCopy
+
+    DocumentCopy.objects.filter(connection=instance).exclude(status=CopyStatus.SENT).delete()
 
 
 @receiver(post_delete, sender=RenderedDocument, dispatch_uid="documents.remove_render_file")

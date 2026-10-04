@@ -189,8 +189,9 @@ def pending_copies(now=None):
         # spending their attempts on a "the connection is switched off" they would record
         # once a document until there were none left (#243). Switching it on resumes them,
         # which is what retiring a connection promises. A copy whose connection row is gone
-        # is still picked up: it has nothing to wait for, and is told so.
+        # is never picked up (#511): it has nothing to wait for or to send to.
         .exclude(connection__enabled=False)
+        .filter(connection__isnull=False)
         # A deactivated account's copies wait too, and resume with it (#575).
         .filter(owner__is_active=True)
         # No join to follow: a generic link is two columns. `document` is fetched per row
@@ -240,7 +241,12 @@ def send_now(document) -> tuple[int, int]:
     """
     with transaction.atomic():
         schedule_copies(document)
-    copies = DocumentCopy.objects.filter(**_lookup(document)).exclude(status=CopyStatus.SENT)
+    copies = (
+        DocumentCopy.objects.filter(**_lookup(document))
+        .exclude(status=CopyStatus.SENT)
+        # An orphan has no connection to send to and is never retried (#511).
+        .filter(connection__isnull=False)
+    )
     sent = failed = 0
     for copy in copies.select_related("connection"):
         if not claim(copy):
