@@ -397,13 +397,17 @@ def _restore_postal_addresses(holder, owner, rows: list[dict]) -> None:
         address.save()
 
 
-def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
+def _restore_phone_numbers(
+    holder, owner, rows: list[dict], report: ImportReport, whose: str
+) -> None:
     """Recreate a holder's numbers, skipping any this instance already has.
 
     Numbers are unique across the instance, so an archive carrying one somebody here
     already holds cannot be imported as it stands. Skipping that row is the only answer
     that neither fails the whole import nor takes a number away from whoever already had
-    it, and the rest of the archive lands intact.
+    it, and the rest of the archive lands intact. Each skip is a line in ``report``, naming
+    the record in the archive (``whose``) and the last digits of the number, never the
+    account that holds it (#562).
     """
     from postulo.core.models import PhoneNumber
     from postulo.core.phone_numbers import taken_elsewhere
@@ -412,6 +416,11 @@ def _restore_phone_numbers(holder, owner, rows: list[dict]) -> None:
     for row in rows:
         number = (row.get("number") or "").strip()
         if taken_elsewhere(number):
+            ending = "".join(ch for ch in number if ch.isdigit())[-2:]
+            report.skipped.append(
+                f"Telephone number ending {ending} {whose}: "
+                "already recorded on this instance, not restored"
+            )
             continue
         wants_primary = bool(row.get("is_primary")) and not primary_taken
         # `verified_at` is read from the file and thrown away, deliberately and visibly.
@@ -516,7 +525,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
                 setattr(profile, name, value)
         profile.save()
     if profile:
-        _restore_phone_numbers(profile, user, numbers)
+        _restore_phone_numbers(profile, user, numbers, report, "on the profile")
         _restore_postal_addresses(profile, user, addresses)
         _restore_web_links(profile, user, links)
     for row in account.get("identifiers") or []:
@@ -682,7 +691,7 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             )
             contact.department = department
             contact.save(update_fields=["department"])
-        _restore_phone_numbers(contact, user, numbers)
+        _restore_phone_numbers(contact, user, numbers, report, f"on the contact “{contact.name}”")
         _restore_postal_addresses(contact, user, contact_addresses)
         _restore_web_links(contact, user, contact_links)
         contacts[old_id] = contact

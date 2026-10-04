@@ -568,3 +568,24 @@ def test_a_copy_of_the_page_from_before_a_number_was_added_is_told_the_same(
     assert not formset.is_valid()
     assert [row["number"] for row in formset.errors] == [["This number is already listed."]]
     assert answers_spent == []
+
+
+def test_a_number_somebody_else_holds_is_left_out_of_an_import_and_said_so(user, other_user):
+    """The report must not read clean when a number did not come across (#562)."""
+    import zipfile
+
+    from postulo.core import export as export_module
+    from postulo.core import importer
+
+    add(user.profile, user, "+351912345678", primary=True)
+    archive = export_module.write_archive(user)
+    PhoneNumber.objects.all().delete()
+    add(other_user.profile, other_user, "+351912345678", primary=True)
+
+    report = importer.load(user, zipfile.ZipFile(archive))
+
+    assert not PhoneNumber.objects.filter(owner=user).exists()
+    lines = [line for line in report.skipped if "elephone" in line]
+    assert len(lines) == 1
+    assert "78" in lines[0] and "profile" in lines[0]
+    assert "other_user" not in lines[0] and other_user.email not in lines[0]
