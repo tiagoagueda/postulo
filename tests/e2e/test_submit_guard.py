@@ -9,6 +9,8 @@ why the guard is a script and not a template.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -31,7 +33,10 @@ def test_double_clicking_save_posts_once(live_server, page: Page, furnished):  #
     page.goto(f"{base}/jobs/companies/new/")
     page.locator("input[name=name]").fill("France Travail")
     page.get_by_role("button", name="Save", exact=True).dblclick()
-    page.wait_for_url(f"{base}/jobs/companies/**")
+    # The company's own page, by its number: a glob over /jobs/companies/ also matches the
+    # form's address, so the wait returned at once and the POSTs were counted before the
+    # click had sent one (run 723).
+    page.wait_for_url(re.compile(rf"{re.escape(base)}/jobs/companies/\d+/$"))
     page.wait_for_load_state("networkidle")
 
     assert [url for url in posts if url.endswith("/jobs/companies/new/")] == [
@@ -47,7 +52,7 @@ def test_the_back_button_gets_a_form_that_works_again(live_server, page: Page, f
     page.locator("input[name=name]").fill("Black Mesa")
     save = page.get_by_role("button", name="Save", exact=True)
     save.click()
-    page.wait_for_url(f"{base}/jobs/companies/**")
+    page.wait_for_url(re.compile(rf"{re.escape(base)}/jobs/companies/\d+/$"))
 
     # Waited for, not merely asked for. Back is a real page load since #226 turned off
     # htmx's history cache, so asserting straight away asks about a page that is still

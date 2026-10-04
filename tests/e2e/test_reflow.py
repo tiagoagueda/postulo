@@ -35,8 +35,14 @@ another, while in Greek it was 64 over on any machine at all (#165).
 
 from __future__ import annotations
 
+import sys
+import threading
+import time
+import traceback
+
 import pytest
 from playwright.sync_api import Page, expect
+from playwright.sync_api import TimeoutError as PlaywrightTimeoutError
 
 from .conftest import PASSWORD
 from .test_accessibility import furnished, sign_in, signed_in_paths  # noqa: F401
@@ -187,6 +193,39 @@ SPILLS = r"""() => {
 }"""
 
 
+def goto_watched(page: Page, url: str, seen: list[tuple[str, float]]) -> None:
+    """Open ``url``, and if it never arrives, say what this process was doing meanwhile.
+
+    Run 723 timed out on one page of 150, which then passed alone, and its log could not say
+    whether the live server in this process was stuck -- a request thread in a view or in
+    SQLite -- or whether nothing got the processor at all. A timer takes every thread's stack
+    25 seconds into a navigation that has not arrived; a timer rather than
+    `faulthandler.dump_traceback_later`, which holds one timer per process and would cancel
+    pytest's own (#721). Each page's time goes in the message too, the last few of them.
+    """
+    stacks: list[str] = []
+
+    def take() -> None:
+        for ident, frame in sys._current_frames().items():
+            stacks.append(f"--- thread {ident}\n" + "".join(traceback.format_stack(frame)))
+
+    timer = threading.Timer(25, take)
+    timer.daemon = True
+    started = time.monotonic()
+    timer.start()
+    try:
+        page.goto(url)
+    except PlaywrightTimeoutError as error:
+        recent = ", ".join(f"{path} {took:.1f}s" for path, took in seen[-5:])
+        raise AssertionError(
+            f"{url} never arrived. Pages before it: {recent}.\n"
+            "Every thread of this process 25 seconds into the wait:\n" + "\n".join(stacks)
+        ) from error
+    finally:
+        timer.cancel()
+    seen.append((url, time.monotonic() - started))
+
+
 @pytest.mark.parametrize("language", LANGUAGES)
 def test_no_page_scrolls_sideways_at_320_pixels(
     live_server,
@@ -211,8 +250,9 @@ def test_no_page_scrolls_sideways_at_320_pixels(
         things=furnished,
     )
     failures: dict[str, str] = {}
+    seen: list[tuple[str, float]] = []
     for path in paths:
-        page.goto(f"{base}{path}")
+        goto_watched(page, f"{base}{path}", seen)
         if "reauthenticate" in page.url:
             page.locator("input[name=password]").fill(PASSWORD)
             page.locator("form").get_by_role("button").first.click()
