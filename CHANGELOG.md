@@ -323,8 +323,7 @@ A document copy the scheduler is already sending is no longer sent a second time
 - An instance holding the same identifier in two cases (Wikidata `Q95` beside `q95`, or two *Other* values differing only in case) can now migrate past the identifier-case migration instead of stopping at an IntegrityError (#570)
 - Both compose files now name the `:0.3` image, and `release_tools.py check` refuses a tag whose compose files name another minor, so an install no longer runs the previous release (#403)
 - The PostgreSQL compose file gains the `worker` service the SQLite one has, and `.env.example` names the right file for each, so starting the worker no longer swaps an instance onto an empty SQLite database (#581)
-- The PostgreSQL compose file no longer needs `POSTGRES_PASSWORD` in `docker/.env`: it is read from the root `.env`, and a password with `/`, `?` or `%` in it (`POSTULO_DATABASE_PASSWORD`, or `POSTGRES_PASSWORD`) reaches PostgreSQL exactly as typed (#582)
-- The PostgreSQL compose file no longer needs `POSTGRES_PASSWORD` in `docker/.env`: it is read from the root `.env`, and a password with `/`, `?` or `%` in it (`POSTULO_DATABASE_PASSWORD`, or `POSTGRES_PASSWORD`) reaches PostgreSQL exactly as typed (#582).
+- The PostgreSQL compose file no longer needs `POSTGRES_PASSWORD` in `docker/.env`: it is read from the root `.env`, and a password with `/`, `?` or `%` in it reaches PostgreSQL exactly as typed (#582)
 - Saving a table view under a long name cut after a space no longer ends in a server error, and saving the same view twice in a row says "View saved." instead of claiming it needs a name. (#507)
 - Sending a CV or letter for an application with a very long job title and company name no longer fails on PostgreSQL: the "sent to" text and the document title are cut to their columns. (#513)
 - A document whose title holds a double quote or a line break now downloads correctly instead of sending a malformed header or answering 500. (#376)
