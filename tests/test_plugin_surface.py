@@ -73,6 +73,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "the identity-provider presets a person picks from to sign in with a token rather "
             "than a password (#151)"
         ),
+        "postulo.core.destinations": (
+            "whether the operator allows a connection to reach a private address: the switch "
+            "is Postulo's to read, and a person's outbox must not borrow the instance's own "
+            "exemption for it (#358)"
+        ),
     },
     "smtp": {
         "postulo.core.mail": (

@@ -510,11 +510,11 @@ def test_tags_that_shared_a_slug_import_and_a_long_one_is_one_tag(user):
     long_name = "x" * 70
     sheet = "\n".join(
         [
-            "Company,Role,Tags",
-            'Aperture,Engineer,"C++; C#"',
-            'Black Mesa,Physicist,"удалённо; мечта"',
-            f"Initech,Consultant,{long_name}",
-            f"Vandelay,Importer,{long_name}",
+            "Company,Role,Status,Tags",
+            'Aperture,Engineer,Applied,"C++; C#"',
+            'Black Mesa,Physicist,Applied,"удалённо; мечта"',
+            f"Initech,Consultant,Applied,{long_name}",
+            f"Vandelay,Importer,Applied,{long_name}",
         ]
     )
     parsed = csv_import.read_sheet(sheet.encode("utf-8"), "tags.csv")
