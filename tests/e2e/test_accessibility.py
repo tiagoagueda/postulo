@@ -972,12 +972,15 @@ def test_the_error_pages_have_no_violations(live_server, page: Page, db, axe_sou
 
     from django.template.loader import render_to_string
 
-    page.set_content(render_to_string("500.html"))
-    # set_content has no base URL, so the page's linked stylesheet (#421) is added by hand:
-    # the colours are what is being checked.
-    from django.contrib.staticfiles import finders
-
-    page.add_style_tag(path=finders.find("css/error.css"))
+    # Served from a real address on the live server, so the page's linked stylesheet (#421)
+    # loads as it does in production, under the browser suite's no-inline-style rule: the
+    # colours are what is being checked.
+    preview = f"{live_server.url}/preview-of-the-500-page/"
+    page.route(
+        preview,
+        lambda route: route.fulfill(body=render_to_string("500.html"), content_type="text/html"),
+    )
+    page.goto(preview)
     found = violations_on(page, axe_source)
     if found:
         failures.append(describe(f"500 ({scheme})", found))
