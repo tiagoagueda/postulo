@@ -21,7 +21,7 @@ from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
 from .export import CV_FIELDS, FORMAT_VERSION, MANIFEST_NAME, MEDIA_PREFIX, TRANSLATION_SECTIONS
@@ -251,6 +251,12 @@ def _languages_as_written(document: dict, report: ImportReport) -> None:
 
 
 def account_is_empty(user) -> bool:
+    """Whether the account holds none of what an archive restores wholesale.
+
+    The profile's own telephone numbers, addresses, links and identifiers do not count:
+    somebody who signed up and filled in *Your details* is still importing into an empty
+    account, and the importer keeps those rows and adds the archive's beside them (#375).
+    """
     from postulo.applications.models import Application
     from postulo.documents.models import CV
     from postulo.jobs.models import Company
@@ -321,7 +327,22 @@ def _link_rows(entry: dict) -> list[dict]:
     return [row for row in rows if (row.get("url") or "").strip() and row.get("kind") in KINDS]
 
 
-def _restore_web_links(holder, owner, rows: list[dict]) -> None:
+def _held(model, holder):
+    """The rows of ``model`` this holder already has: none, for a contact made a moment ago."""
+    from django.contrib.contenttypes.models import ContentType
+
+    return model.objects.filter(
+        content_type=ContentType.objects.get_for_model(holder), object_id=holder.pk
+    )
+
+
+def _skipped(report, what: str, value: str, why: str) -> None:
+    """Say a row was left out. `!r`, and cut short: the value is whatever the file says."""
+    if report is not None:
+        report.skipped.append(f"The {what} {value[:60]!r} {why}")
+
+
+def _restore_web_links(holder, owner, rows: list[dict], report=None) -> None:
     """Recreate a holder's links.
 
     Unique per holder and kind, so nothing here can collide with anybody else's; an address
@@ -338,12 +359,16 @@ def _restore_web_links(holder, owner, rows: list[dict]) -> None:
     from postulo.core import link_services, web_links
     from postulo.core.models import WebLink
 
-    primary_taken: set[str] = set()
-    seen: set[tuple[str, str]] = set()
+    # What the holder already has comes first (#375): the primary it has stays the primary,
+    # and a link it already holds is not made twice. `report` is where a skip is said.
+    held = _held(WebLink, holder)
+    primary_taken: set[str] = {link.kind for link in held if link.is_primary}
+    seen: set[tuple[str, str]] = {(link.kind, link.url) for link in held}
     for row in rows:
         url = (row.get("url") or "").strip()[:500]
         kind = row.get("kind")
         if (kind, url) in seen:
+            _skipped(report, "link", url, "is already among your details, and was not added again.")
             continue
         seen.add((kind, url))
         is_primary = bool(row.get("is_primary")) and kind not in primary_taken
@@ -362,19 +387,22 @@ def _restore_web_links(holder, owner, rows: list[dict]) -> None:
         )
 
 
-def _restore_postal_addresses(holder, owner, rows: list[dict]) -> None:
+def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> None:
     """Recreate a holder's addresses.
 
     No skipping, and that is the difference from the numbers above. Addresses are unique
     per owner rather than across the instance, so an archive can never collide with
     somebody else's -- two people at one address is a household. Within one import a
     repeated address is dropped, because listing the same one twice is the mistake the
-    constraint exists to catch.
+    constraint exists to catch. The same goes for one the owner already has, on this holder
+    or another, and a holder that already has a primary keeps it (#375).
     """
     from postulo.core.models import PostalAddress
 
-    primary_taken = False
-    seen: set[str] = set()
+    primary_taken = _held(PostalAddress, holder).filter(is_primary=True).exists()
+    seen: set[str] = set(
+        PostalAddress.objects.filter(owner=owner).values_list("comparable", flat=True)
+    )
     for row in rows:
         address = PostalAddress(
             owner=owner,
@@ -390,6 +418,12 @@ def _restore_postal_addresses(holder, owner, rows: list[dict]) -> None:
         )
         comparable = address.comparable_form()
         if comparable in seen:
+            named = ", ".join(
+                part for part in (address.street, address.postcode, address.municipality) if part
+            )
+            _skipped(
+                report, "address", named, "is already among your details, and was not added again."
+            )
             continue
         seen.add(comparable)
         if address.is_primary:
@@ -412,7 +446,7 @@ def _restore_phone_numbers(
     from postulo.core.models import PhoneNumber
     from postulo.core.phone_numbers import taken_elsewhere
 
-    primary_taken = False
+    primary_taken = _held(PhoneNumber, holder).filter(is_primary=True).exists()
     for row in rows:
         number = (row.get("number") or "").strip()
         if taken_elsewhere(number):
@@ -443,13 +477,25 @@ def _restore_phone_numbers(
         primary_taken = primary_taken or wants_primary
 
 
-@transaction.atomic
 def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
     """Create everything in ``archive`` under ``user``.
 
     Runs in one transaction: a failure half way through leaves the account exactly as it
-    was, rather than partly overwritten by a file that turned out to be broken.
+    was, rather than partly overwritten by a file that turned out to be broken. A row the
+    database refuses that the importer did not foresee is an `ArchiveError`, a sentence
+    for the operator rather than a traceback (#375).
     """
+    try:
+        return _load(user, archive, force=force)
+    except IntegrityError as error:
+        raise ArchiveError(
+            f"The archive clashes with what the account already holds: {error}. "
+            "Nothing was imported."
+        ) from error
+
+
+@transaction.atomic
+def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
     from postulo.accounts.models import PersonIdentifier
     from postulo.applications.models import (
         Application,
@@ -526,8 +572,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
         profile.save()
     if profile:
         _restore_phone_numbers(profile, user, numbers, report, "on the profile")
-        _restore_postal_addresses(profile, user, addresses)
-        _restore_web_links(profile, user, links)
+        _restore_postal_addresses(profile, user, addresses, report)
+        _restore_web_links(profile, user, links, report)
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -555,6 +601,18 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             # was taken for the first and never made -- and a CV that had chosen it then
             # printed the other one (#308).
             found["label"] = label
+        if scheme != identifiers.OTHER:
+            # One of each scheme per profile: the value the profile has stays (#375).
+            kept = PersonIdentifier.objects.filter(profile=profile, scheme=scheme).first()
+            if kept is not None:
+                if kept.value != value:
+                    _skipped(
+                        report,
+                        "identifier",
+                        value,
+                        f"was not added: your details already hold another under {scheme}.",
+                    )
+                continue
         PersonIdentifier.objects.get_or_create(**found, defaults={"label": label})
 
     avatar_file = account.get("avatar_file") or ""
@@ -692,8 +750,8 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
             contact.department = department
             contact.save(update_fields=["department"])
         _restore_phone_numbers(contact, user, numbers, report, f"on the contact “{contact.name}”")
-        _restore_postal_addresses(contact, user, contact_addresses)
-        _restore_web_links(contact, user, contact_links)
+        _restore_postal_addresses(contact, user, contact_addresses, report)
+        _restore_web_links(contact, user, contact_links, report)
         contacts[old_id] = contact
 
     # The people recorded at no company, which format 20 is the first to carry (#239).

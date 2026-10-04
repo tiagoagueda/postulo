@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Importing an archive into an account whose profile already has a primary number, address, link or identifier now keeps the profile's rows and reports what it skipped, instead of failing with a traceback. (#375)
 - An account import now reports every telephone number it leaves out because another record on the instance already holds it, naming the profile or contact and the last two digits, so the report no longer reads clean. (#562)
 - An account archive from a newer Postulo, or one whose format is not a known number, is now refused up front with a message naming both formats, instead of a traceback or a silent partial import. (#561)
 - The container restore advice now stops every service whatever its Compose profile, the background worker included, and starts the same profiles again afterwards, in `restore --help` and in the "something else is using the database" refusal. (#541)
