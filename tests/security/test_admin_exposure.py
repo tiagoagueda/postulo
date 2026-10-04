@@ -413,3 +413,63 @@ def test_even_a_superuser_gets_no_page_listing_somebody_elses_applications(
     ):
         assert client.get(f"/{CHOSEN}{path}").status_code == 404, path
     assert application.posting.title not in client.get(f"/{CHOSEN}").content.decode()
+
+
+# ------------------------------------------------------ people added through it
+
+
+def add_through_the_admin(client, email, **fields):
+    data = {
+        "email": email,
+        "first_name": "Ada",
+        "last_name": "Lovelace",
+        "password1": PASSWORD,
+        "password2": PASSWORD,
+        "usable_password": "true",
+        "profile-TOTAL_FORMS": "0",
+        "profile-INITIAL_FORMS": "0",
+        "profile-MIN_NUM_FORMS": "0",
+        "profile-MAX_NUM_FORMS": "1",
+        **fields,
+    }
+    return client.post(f"/{CHOSEN}accounts/user/add/", data)
+
+
+def test_two_people_added_through_the_admin_each_get_a_username(
+    client, with_an_admin, superuser, django_user_model
+):
+    """The finding (#427): the add form never asked for a username, so the first person had
+    '' and the second ended in an IntegrityError and a 500."""
+    client.force_login(superuser)
+
+    first = add_through_the_admin(client, "a@example.org", username="ada")
+    second = add_through_the_admin(client, "b@example.org", username="grace")
+
+    assert first.status_code == 302, first.context["errors"]
+    assert second.status_code == 302
+    names = set(
+        django_user_model.objects.filter(email__in=["a@example.org", "b@example.org"]).values_list(
+            "username", flat=True
+        )
+    )
+    assert names == {"ada", "grace"}
+
+
+def test_the_admin_add_form_refuses_a_blacklisted_or_taken_username(
+    client, with_an_admin, superuser, django_user_model
+):
+    client.force_login(superuser)
+
+    for refused in ("admin", "root"):
+        response = add_through_the_admin(client, "c@example.org", username=refused)
+        assert response.status_code == 200, refused
+        assert "username" in response.context["adminform"].form.errors, refused
+    assert not django_user_model.objects.filter(email="c@example.org").exists()
+
+
+def test_the_admin_add_form_asks_for_the_username_and_the_name(with_an_admin, rf, superuser):
+    request = rf.get("/")
+    request.user = superuser
+    fields = admin.site._registry[type(superuser)].get_form(request).base_fields
+
+    assert {"username", "first_name", "last_name"} <= set(fields)
