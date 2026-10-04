@@ -155,7 +155,7 @@ class Insights:
     #: The same figures by the company's industries. A company in three fields counts in
     #: all three, which is the honest reading.
     industries: list[SourceRow] = field(default_factory=list)
-    by_month: list[tuple[str, int]] = field(default_factory=list)
+    by_month: list[tuple[dt.date, int]] = field(default_factory=list)
     #: Gone quiet: open, sent, silent past the person's threshold, nothing planned.
     quiet_now: int = 0
     quiet_after_days: int = 0
@@ -569,11 +569,28 @@ def build(user) -> Insights:
         .annotate(count=Count("id"))
         .order_by("month")
     )
-    insights.by_month = [
-        (row["month"].strftime("%Y-%m"), row["count"]) for row in per_month if row["month"]
-    ]
+    insights.by_month = _fill_months(
+        {row["month"].date(): row["count"] for row in per_month if row["month"]}
+    )
 
     return insights
+
+
+def _fill_months(counts: dict[dt.date, int]) -> list[tuple[dt.date, int]]:
+    """Every month from the first with an application to this one, nought where none was sent.
+
+    The widget exists so a quiet stretch is visible (#397), and a month left out of the list
+    is a quiet stretch that cannot be seen. The months are the first day of each, as dates,
+    so the template prints them in the reader's language.
+    """
+    if not counts:
+        return []
+    month, last = min(counts), max(max(counts), timezone.localdate().replace(day=1))
+    months = []
+    while month <= last:
+        months.append((month, counts.get(month, 0)))
+        month = (month.replace(day=28) + dt.timedelta(days=4)).replace(day=1)
+    return months
 
 
 #: The order the stages of an ending are listed in: the board's, then *Accepted*, which an

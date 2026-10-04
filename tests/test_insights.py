@@ -358,3 +358,52 @@ def test_the_rounded_ends_are_in_the_compiled_stylesheet():
     # Firefox paints the filled part here, everything else on ::-webkit-progress-value.
     assert "::-moz-progress-bar" in css
     assert "::-webkit-progress-value" in css
+
+
+# ------------------------------------------------------------------ by month (#397)
+
+
+def sent_on(user, company, day):
+    posting = JobPosting.objects.create(owner=user, company=company, title="A role")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
+    when = dt.datetime.combine(day, dt.time(12), tzinfo=dt.UTC)
+    change_status(application, Status.APPLIED, occurred_at=when)
+
+
+@pytest.fixture
+def march(monkeypatch):
+    monkeypatch.setattr(analytics.timezone, "localdate", lambda *a: dt.date(2026, 3, 20))
+
+
+def test_a_quiet_month_is_listed_at_nought(user, company, march):
+    for _n in range(5):
+        sent_on(user, company, dt.date(2026, 1, 10))
+    for _n in range(3):
+        sent_on(user, company, dt.date(2026, 3, 5))
+
+    assert analytics.build(user).by_month == [
+        (dt.date(2026, 1, 1), 5),
+        (dt.date(2026, 2, 1), 0),
+        (dt.date(2026, 3, 1), 3),
+    ]
+
+
+def test_months_run_up_to_the_current_one(user, company, march):
+    sent_on(user, company, dt.date(2025, 12, 10))
+
+    months = [month for month, _count in analytics.build(user).by_month]
+
+    assert months[-1] == dt.date(2026, 3, 1)
+    assert len(months) == 4
+
+
+def test_the_months_widget_names_them_in_the_readers_language(client, user, company, march):
+    sent_on(user, company, dt.date(2026, 1, 10))
+    sent_on(user, company, dt.date(2026, 3, 5))
+    user.profile.dashboard_widgets = ["by_month"]
+    user.profile.save(update_fields=["dashboard_widgets"])
+    client.force_login(user)
+
+    response = client.get(reverse("core:home"), headers={"accept-language": "fr"})
+
+    assert "février 2026" in response.content.decode()

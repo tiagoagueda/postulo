@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The Applications by month widget now lists every month from your first application to the current one, with nought for a quiet month, and names each month in your language ("février 2026"). (#397)
 - A listing's Apply page now shows the new-tags box its help text promised, and tags typed there are saved with the application. (#408)
 - A portfolio can now be saved in a plugin theme that sets only portfolios; the theme is checked against the document's own kind, not always as a CV. (#412)
 - The test settings no longer read a developer's .env and pin the cache, background work and file log handler, so the suite behaves the same on every machine and an empty POSTULO_LOG_DIR no longer breaks it. (#414)
