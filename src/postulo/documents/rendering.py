@@ -524,6 +524,9 @@ def render_letter_html(
                 "subject": fill_placeholders(letter.subject, values, mark_empty=mark_empty),
                 "body": fill_placeholders(letter.body, values, mark_empty=mark_empty),
                 "contact": contact_details(letter.owner),
+                # The one date, spelled the one way: the theme prints what `{{ date }}`
+                # in the body prints, rather than a literal English pattern (#387).
+                "date": values["date"],
                 "application": application,
                 "document_language": document_language(letter),
                 "document_direction": document_direction(letter),

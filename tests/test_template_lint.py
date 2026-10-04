@@ -631,7 +631,10 @@ DATES_ON_PURPOSE: dict[str, str] = {
 }
 
 #: ``{{ value|date:"..." }}`` and ``{{ value|time:"..." }}``, either kind of quote.
-TEMPLATE_DATE = re.compile(r"\|\s*(?:date|time):(?P<quote>[\"'])(?P<format>.*?)(?P=quote)")
+TEMPLATE_DATE = re.compile(
+    r"\|\s*(?:date|time):(?P<quote>[\"'])(?P<format>.*?)(?P=quote)"
+    r"|\{%\s*now\s+(?P<nowquote>[\"'])(?P<nowformat>.*?)(?P=nowquote)"
+)
 
 #: ``formats.date_format(moment, "...")`` and its time and number siblings.
 PYTHON_DATE = re.compile(
@@ -643,7 +646,7 @@ def spelled_out_dates(text: str, pattern: re.Pattern[str]) -> list[tuple[int, st
     """Line number and format for every date format written out rather than named."""
     found = []
     for match in pattern.finditer(text):
-        spelling = match.group("format")
+        spelling = match.groupdict().get("nowformat") or match.group("format")
         if spelling in NAMED_FORMATS or spelling in ATOMS or spelling in DATES_ON_PURPOSE:
             continue
         found.append((text.count("\n", 0, match.start()) + 1, spelling))
@@ -700,6 +703,8 @@ def test_the_date_detector_knows_the_difference():
     assert spelled_out_dates('{{ x|date:"j M Y" }}', TEMPLATE_DATE) == [(1, "j M Y")]
     assert spelled_out_dates('{{ x|date:"H:i" }}', TEMPLATE_DATE) == [(1, "H:i")]
     assert spelled_out_dates('{{ x | date:"j F" }}', TEMPLATE_DATE) == [(1, "j F")], "spaced"
+    assert spelled_out_dates('{% now "j F Y" %}', TEMPLATE_DATE) == [(1, "j F Y")], "the tag"
+    assert spelled_out_dates('{% now "DATE_FORMAT" %}', TEMPLATE_DATE) == []
     assert spelled_out_dates('date_format(day, "DATE_FORMAT")', PYTHON_DATE) == []
     assert spelled_out_dates('date_format(day, "l j F Y")', PYTHON_DATE) == [(1, "l j F Y")]
     assert spelled_out_dates('formats.time_format(x, "H:i")', PYTHON_DATE) == [(1, "H:i")]

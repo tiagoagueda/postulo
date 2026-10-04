@@ -656,3 +656,24 @@ def test_links_and_letter_kinds_travel_in_the_export(user, other_user, applicati
     theirs = Application.objects.for_user(other_user).get()
     assert list(theirs.sent_links.all()) == [restored]
     assert CoverLetter.objects.for_user(other_user).filter(kind=LetterKind.MOTIVATION).exists()
+
+
+def test_a_letters_date_is_the_one_its_placeholder_prints(user):
+    """The theme printed `{% now "j F Y" %}`: English's order and a stand-alone month name
+    ("30 Wrzesień 2026"), while `{{ date }}` in the body used the locale's own format. One
+    page, one date, two spellings (#387)."""
+    from django.utils import formats, translation
+
+    from postulo.documents.models import CoverLetter
+    from postulo.documents.rendering import render_letter_html
+
+    letter = CoverLetter.objects.create(
+        owner=user, name="Data", body="Em {{ date }}.", language="pl"
+    )
+    html = render_letter_html(letter)
+    with translation.override("pl"):
+        expected = formats.date_format(timezone.localdate(), "DATE_FORMAT")
+    assert f'<p class="date">{expected}</p>' in html
+    assert html.count(expected) == 2, "the heading and the body carry the same date"
+    assert timezone.localdate().strftime("%Y") in expected
+    assert "{% now" not in html
