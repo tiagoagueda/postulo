@@ -227,12 +227,12 @@ def test_a_third_thing_that_holds_a_file_needs_no_branch(user):
     class ARecordSomebodyElseWrote:
         download_url_name = ""
         archive_origin = "report"
-        archived_at = dt.datetime(2026, 3, 1, 9, 0)
+        archived_at = dt.datetime(2026, 3, 1, 9, 0, tzinfo=dt.UTC)
         kind = DocumentKind.OTHER
         title = "A report"
         file = None
         owner = None
-        created_at = dt.datetime(2026, 3, 1, 9, 0)
+        created_at = dt.datetime(2026, 3, 1, 9, 0, tzinfo=dt.UTC)
 
     described = stores.metadata_for(ARecordSomebodyElseWrote(), filename="report.pdf")
 
