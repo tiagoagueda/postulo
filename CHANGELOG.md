@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- `manage.py plugins disable` and `remove` now refuse the package that carries the selected mail transport, as the plugins page always did; the lock moved into the install code both use. (#595)
 - Settings → Plugins now shows the Uploaded or Custom tag on an installed plugin whose package name differs from its own, as every official plugin's does; before, only built-ins were tagged. (#603)
 - The plugin surface check now records what a plugin imports by name: `from postulo.plugins import api` passes, and an allowance for `postulo.core.site` no longer lets `postulo.core.models` through. (#606)
 - A plugin switched off or removed now takes its document themes, template and translation directories with it at once, instead of staying in the pickers and breaking Export until a restart; an upgraded plugin shows its new logo. (#609)

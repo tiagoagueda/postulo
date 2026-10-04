@@ -293,6 +293,22 @@ def test_removing_the_package_that_carries_the_mail_is_refused(client, admin, mo
     assert "only way back into an account" in response.content.decode()
 
 
+@pytest.mark.parametrize("verb", ["disable", "remove"])
+def test_the_command_line_meets_the_same_lock_as_the_page(admin, monkeypatch, verb):
+    """The lock is in `installing`, the last door, not in the view in front of it (#595)."""
+    from django.core.management import CommandError, call_command
+
+    from postulo.plugins import installing
+
+    monkeypatch.setattr(transport, "_distribution_of", lambda plugin: "postulo-smtp")
+    before = installing.read_record()
+
+    with pytest.raises(CommandError, match="only way back into an account"):
+        call_command("plugins", verb, "postulo-smtp")
+
+    assert installing.read_record() == before
+
+
 def test_an_unrelated_package_is_not_caught_by_the_lock(client, admin, monkeypatch):
     monkeypatch.setattr(transport, "_distribution_of", lambda plugin: "postulo-smtp")
 

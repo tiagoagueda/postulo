@@ -1562,14 +1562,10 @@ class PluginActionView(StaffRequiredMixin, View):
         return self._switch(request, False)
 
     def _switch(self, request: HttpRequest, disabled: bool) -> HttpResponse:
-        from postulo.notifications import transport
         from postulo.plugins.installing import InstallError, set_disabled
 
         name = request.POST.get("name", "")
-        # Switching off a package that carries the mail is switching off the mail (#104).
-        if disabled and (refusal := transport.refuse_removing_distribution(name)):
-            messages.error(request, refusal)
-            return redirect("server:plugins")
+        # `set_disabled` refuses the package that carries the mail (#104).
         try:
             entry = set_disabled(name, disabled)
         except InstallError as error:
@@ -1586,20 +1582,11 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _remove(self, request: HttpRequest) -> HttpResponse:
-        from postulo.notifications import transport
-        from postulo.plugins import data as plugin_data
         from postulo.plugins.installing import InstallError, remove
 
         name = request.POST.get("name", "")
-        # Two refusals, both named after what they protect: the mail this instance sends
-        # (#104), and the records this package still holds (#128).
-        for refusal in (
-            transport.refuse_removing_distribution(name),
-            plugin_data.refuse_removing(name),
-        ):
-            if refusal:
-                messages.error(request, refusal)
-                return redirect("server:plugins")
+        # `remove` refuses the mail this instance sends (#104) and the records the package
+        # still holds (#128).
         try:
             entry = remove(name)
         except InstallError as error:

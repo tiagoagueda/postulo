@@ -838,8 +838,14 @@ def remove(name: str) -> Installed:
     happens to do first: this is the last door, and a management command or a shell reaching
     `remove()` directly would otherwise leave a table nothing can read.
     """
+    from postulo.notifications import transport
+
     from . import data
 
+    # The mail lock (#104) and the rows lock (#128) live here and not in the page: this is
+    # the last door, and `manage.py plugins remove` comes through it too.
+    if refusal := transport.refuse_removing_distribution(name):
+        raise InstallError(refusal)
     if is_internal(name):
         raise InstallError(
             str(_("%(name)s ships inside Postulo and cannot be removed.")) % {"name": name}
@@ -935,7 +941,15 @@ def set_disabled(name: str, disabled: bool) -> Installed:
     Not the way a built-in is switched off. `plugins/policy.py` decides those, per person
     and per instance, with a record of who decided -- and this record has no line to write
     on for a plugin that was never installed (#94).
+
+    Switching off the package that carries the mail is refused (#104) here, not in the
+    page, so that `manage.py plugins disable` meets the same lock.
     """
+    if disabled:
+        from postulo.notifications import transport
+
+        if refusal := transport.refuse_removing_distribution(name):
+            raise InstallError(refusal)
     if is_internal(name):
         raise InstallError(
             str(
