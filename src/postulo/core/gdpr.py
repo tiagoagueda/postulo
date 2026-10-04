@@ -326,16 +326,24 @@ def retention_days() -> int | None:
     return SiteSettings.get().retention_days
 
 
-def retention_cutoff() -> dt.date | None:
-    """The date the policy would draw the line at, or nothing with no policy."""
-    days = retention_days()
+def retention_cutoff(days: int | None = None) -> dt.date | None:
+    """The date the policy would draw the line at, or nothing with no policy.
+
+    `days` asks about a limit that is not the stored one — the number an administrator has
+    typed and not yet saved (#483); left out, the stored limit answers.
+    """
+    if days is None:
+        days = retention_days()
     if not days:
         return None
     return timezone.localdate() - dt.timedelta(days=days)
 
 
-def retention_dry_run() -> dict:
+def retention_dry_run(days: int | None = None) -> dict:
     """What the retention policy would touch. Deletes nothing — that is the whole point.
+
+    With `days` it is asked of that limit instead of the stored one, so the preview can
+    answer for the number on screen before it is saved (#483).
 
     A dry run that removed a row to check whether it could would be a deletion with an
     apology, so the question is asked of the query set alone: who is older than the line,
@@ -345,7 +353,8 @@ def retention_dry_run() -> dict:
     from postulo.applications.models import Application
     from postulo.jobs.models import Contact
 
-    cutoff = retention_cutoff()
+    days = days or retention_days()
+    cutoff = retention_cutoff(days)
     if cutoff is None:
         return {"days": None, "cutoff": None, "contacts": []}
 
@@ -370,7 +379,7 @@ def retention_dry_run() -> dict:
                 },
             }
         )
-    return {"days": retention_days(), "cutoff": cutoff.isoformat(), "contacts": rows}
+    return {"days": days, "cutoff": cutoff.isoformat(), "contacts": rows}
 
 
 # -------------------------------------------------------- the record of processing

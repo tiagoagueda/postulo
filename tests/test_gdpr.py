@@ -490,6 +490,33 @@ def test_the_dry_run_shows_what_would_be_touched_and_saves_nothing(client, admin
     assert SiteSettings.get().retention_days == 30, "and the button does not spend the form"
 
 
+def test_the_dry_run_answers_for_the_number_typed_not_the_one_saved(client, admin, user):
+    assert SiteSettings.get().retention_days is None
+    old = make_contact(user, make_company(user), name="A forty-five day contact")
+    Contact.objects.filter(pk=old.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
+    client.force_login(admin)
+
+    response = client.post(
+        reverse("server:data_protection"), {"retention_days": "30", "dry_run": "1"}
+    )
+
+    html = response.content.decode()
+    assert "A forty-five day contact" in html
+    assert "No retention limit is set" not in html
+    assert SiteSettings.get().retention_days is None, "the dry run saves nothing"
+
+    SiteSettings.objects.update(retention_days=90)
+    html = client.post(
+        reverse("server:data_protection"), {"retention_days": "30", "dry_run": "1"}
+    ).content.decode()
+    assert "A forty-five day contact" in html, "the typed 30 wins over the stored 90"
+
+    html = client.post(
+        reverse("server:data_protection"), {"retention_days": "-5", "dry_run": "1"}
+    ).content.decode()
+    assert "A forty-five day contact" not in html, "an invalid number falls back to the stored 90"
+
+
 def test_the_record_page_is_drawn_at_render_time(client, admin, user):
     client.force_login(admin)
     html = client.get(reverse("server:record_of_processing")).content.decode()

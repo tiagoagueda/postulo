@@ -636,7 +636,11 @@ class DataProtectionView(PolicyView):
 
         self.object = self.get_object()
         self.form = self.get_form()
-        return self.render_to_response(self.get_context_data(dry_run=gdpr.retention_dry_run()))
+        # The button sits under the retention field, so it asks about the number typed
+        # there; a number that does not validate, or none, falls back to the stored limit.
+        # Nothing is saved either way (#483).
+        typed = self.form.cleaned_data.get("retention_days") if self.form.is_valid() else None
+        return self.render_to_response(self.get_context_data(dry_run=gdpr.retention_dry_run(typed)))
 
 
 class RecordOfProcessingView(ServerSectionMixin, TemplateView):

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The retention dry run on Server settings → Data protection now reports on the number typed in the retention field, falling back to the saved limit when it is invalid or empty, and still saves nothing. (#483)
 - Saving the Sign-in or Defaults page no longer overwrites a stored setting that an environment variable pins; all four policy forms now share one rule for dropping pinned fields. (#492)
 - Choosing "Not set here" on a Server settings policy select (registration, single sign-on as second factor, capture options) now stores "unset" instead of silently saving "No". (#493)
 - Server settings → Plugins: a posted action the page does not have, such as a stale or hand-built form, now gets the polite refusal instead of an Internal Server Error. (#484)
