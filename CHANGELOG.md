@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The email sign-in security tests can now fail: the guess limit, the no-enumeration answer and the second-factor redirect are each checked by behaviour, not by assertions any outcome satisfied. (#631)
 - Connections: a sync report is stored as numbers and worded in the reader's language with plural forms; a private-address refusal says so once, only when it is one; Web Push errors are translatable in the browser plugin's catalogue. (#384)
 - Notifications are worded in the recipient's time zone and language: closing notices count days on their calendar, interview messages show the local formatted time, status titles use their language's label. (#385)
 - A document's sent/created day for stores and the retention report's "recorded" and cutoff dates are now taken in the person's time zone rather than UTC, and the report shows them in the locale's date format. (#386)

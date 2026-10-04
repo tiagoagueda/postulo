@@ -17,7 +17,6 @@ other way in.
 from __future__ import annotations
 
 import pytest
-from django.test import override_settings
 from django.urls import reverse
 
 from postulo.core.models import SiteSettings
@@ -108,7 +107,7 @@ def test_a_code_does_not_skip_an_authenticator(client, offering, person):
     response = client.post(reverse("account_confirm_login_code"), {"code": code}, follow=True)
 
     assert "_auth_user_id" not in client.session, "authenticated, but not signed in"
-    assert "authenticator" in response.content.decode().lower() or response.redirect_chain, (
+    assert response.redirect_chain[-1][0] == reverse("mfa_authenticate"), (
         "and sent on to the second factor"
     )
 
@@ -141,22 +140,45 @@ def test_there_is_no_setting_that_would_make_it_a_factor(db):
 
 
 def test_asking_about_an_address_nobody_has_says_the_same_thing(client, offering, person):
-    """Otherwise the form is a list of which addresses have accounts here."""
-    known = client.post(reverse("account_request_login_code"), {"email": person.email}, follow=True)
-    unknown = client.post(
-        reverse("account_request_login_code"), {"email": "nobody@example.org"}, follow=True
-    )
+    """Otherwise the form is a list of which addresses have accounts here.
 
-    assert known.status_code == unknown.status_code
-    assert _asked_for_a_code(known) == _asked_for_a_code(unknown)
+    Two separate clients: after the known address the session holds a pending code login,
+    and a second request from the same client would be sent to the confirm page before its
+    address was looked at.
+    """
+    from django.core import mail
+    from django.test import Client
+
+    stranger = Client()
+    known = client.post(reverse("account_request_login_code"), {"email": person.email})
+    outbox_after_known = len(mail.outbox)
+    unknown = stranger.post(reverse("account_request_login_code"), {"email": "nobody@example.org"})
+
+    confirm = reverse("account_confirm_login_code")
+    assert known.status_code == unknown.status_code == 302
+    assert known.url == unknown.url == confirm
+    for response, asker in ((known, client), (unknown, stranger)):
+        page = asker.get(response.url)
+        assert page.status_code == 200
+        assert not page.context["form"].errors
+        assert "not assigned" not in page.content.decode()
+    assert outbox_after_known == 1
+    # allauth tells the stranger's inbox that no account exists; it must not carry a code.
+    assert [m.to for m in mail.outbox[:1]] == [[person.email]]
+    for message in mail.outbox[1:]:
+        assert message.to == ["nobody@example.org"]
+        assert not any(_looks_like_a_code(line) for line in message.body.splitlines())
 
 
-@override_settings(ACCOUNT_LOGIN_BY_CODE_MAX_ATTEMPTS=2)
 def test_guessing_the_code_runs_out(client, offering, person):
+    """After the allowed wrong guesses the real code is refused too, and works without them."""
     client.post(reverse("account_request_login_code"), {"email": person.email})
-
+    code = _the_code_from(client)
+    # Three is the shipped limit (POSTULO_EMAIL_CODE_ATTEMPTS); a larger one lets the code in.
     for _ in range(3):
         client.post(reverse("account_confirm_login_code"), {"code": "000000"})
+
+    client.post(reverse("account_confirm_login_code"), {"code": code})
 
     assert "_auth_user_id" not in client.session
 
@@ -184,18 +206,16 @@ def _the_code_from(client) -> str:
     allauth's setting, and grouping it as `XNQJ-KDLR` is exactly the sort of thing that
     changes between their releases without anybody being wrong.
     """
-    import re
-
     from django.core import mail
 
     body = mail.outbox[-1].body
     for line in body.splitlines():
-        token = line.strip()
-        if token and re.fullmatch(r"[A-Z0-9][A-Z0-9-]{5,}", token):
-            return token
+        if _looks_like_a_code(line):
+            return line.strip()
     raise AssertionError(f"no code in the message: {body!r}")
 
 
-def _asked_for_a_code(response) -> bool:
-    """Whether the page is the one saying 'we have sent you a code'."""
-    return "code" in response.content.decode().lower()
+def _looks_like_a_code(line: str) -> bool:
+    import re
+
+    return bool(re.fullmatch(r"[A-Z0-9][A-Z0-9-]{5,}", line.strip()))
