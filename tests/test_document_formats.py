@@ -299,7 +299,7 @@ def test_a_portfolio_leads_with_the_work_and_so_does_its_text(cv):
 
     lines = rendering.cv_text(cv).splitlines()
 
-    assert "- Senior Engineer · Aperture Science · 2021" in lines
+    assert "- Senior Engineer · Aperture Science · 2021 – present" in lines
     assert "- BSc Computer Science · Universidade de Lisboa · 2010–2013" in lines
     assert "- Cut deploy time from 40 minutes to 4." not in lines
     piece = lines.index("Turret firmware")
