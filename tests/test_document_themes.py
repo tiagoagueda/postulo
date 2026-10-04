@@ -148,6 +148,30 @@ def test_the_field_says_the_same_thing_to_anything_that_arrives_another_way(user
     assert raised.value.error_dict["theme"][0].code == "wrong_kind"
 
 
+def test_a_portfolio_can_be_saved_in_a_theme_that_only_sets_portfolios(user, client):
+    """The picker offered it, so the model must accept it (#412)."""
+    themes.register(a_theme("gallery", themes.Kind.PORTFOLIO, label="Gallery"))
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:cv_create"),
+        {"name": "Work", "kind": "portfolio", "theme": "gallery", "language": ""},
+    )
+
+    assert response.status_code == 302, "the form was refused"
+    assert CV.objects.get(name="Work").theme == "gallery"
+
+
+def test_a_cv_is_still_refused_a_theme_that_only_sets_portfolios(user):
+    themes.register(a_theme("gallery", themes.Kind.PORTFOLIO))
+    cv = CV(owner=user, name="Work", kind="cv", theme="gallery")
+
+    with pytest.raises(ValidationError) as raised:
+        cv.full_clean()
+
+    assert raised.value.error_dict["theme"][0].code == "wrong_kind"
+
+
 def test_a_name_nothing_recognises_is_refused_too(user):
     cv = CV(owner=user, name="Backend", theme="brutalist")
 

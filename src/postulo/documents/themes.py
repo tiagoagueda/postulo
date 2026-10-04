@@ -234,15 +234,18 @@ def template_for(name: str, kind: str) -> str:
 
 @deconstructible
 class SetsThisKind:
-    """Field validator: this theme exists, and sets the kind this field belongs to.
+    """Field validator: this theme exists, and sets one of the kinds this field holds.
+
+    A column that holds more than one kind (a CV's holds CVs and portfolios) names them all
+    here and leaves the choice between them to the row's own `clean()` (#412).
 
     On the field rather than only in the form, because the form is one of the ways a value
     arrives. A validator that a migration can write down is the only version of this rule
     that travels with the column (#132).
     """
 
-    def __init__(self, kind: str) -> None:
-        self.kind = kind
+    def __init__(self, *kinds: str) -> None:
+        self.kinds = kinds
 
     def __call__(self, value: str) -> None:
         theme = find(value)
@@ -252,7 +255,7 @@ class SetsThisKind:
                 code="unknown_theme",
                 params={"theme": value},
             )
-        if not theme.sets(self.kind):
+        if not any(theme.sets(kind) for kind in self.kinds):
             raise ValidationError(
                 _("The %(theme)s theme does not set this type of document."),
                 code="wrong_kind",
@@ -260,7 +263,7 @@ class SetsThisKind:
             )
 
     def __eq__(self, other: object) -> bool:
-        return isinstance(other, SetsThisKind) and other.kind == self.kind
+        return isinstance(other, SetsThisKind) and other.kinds == self.kinds
 
     def __hash__(self) -> int:
-        return hash((type(self), self.kind))
+        return hash((type(self), self.kinds))

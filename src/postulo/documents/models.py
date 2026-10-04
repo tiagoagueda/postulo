@@ -25,6 +25,7 @@ from functools import cached_property
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.core.exceptions import ValidationError
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse
@@ -50,7 +51,7 @@ def upload_to_documents(instance, filename: str) -> str:
     return f"documents/{instance.owner_id}/{timezone.now():%Y/%m}/{filename}"
 
 
-def theme_field(kind: str) -> models.CharField:
+def theme_field(*kinds: str) -> models.CharField:
     """The column a document's theme lives in.
 
     Not `choices`, which is what it was. Choices are frozen into every migration that
@@ -64,7 +65,7 @@ def theme_field(kind: str) -> models.CharField:
         _("theme"),
         max_length=themes.MAX_NAME_LENGTH,
         default=themes.DEFAULT,
-        validators=[themes.SetsThisKind(kind)],
+        validators=[themes.SetsThisKind(*kinds)],
     )
 
 
@@ -261,7 +262,7 @@ class CV(DeclaresALanguage, OwnedModel):
     summary = models.TextField(
         _("summary"), blank=True, help_text=_("The opening paragraph, if you use one.")
     )
-    theme = theme_field(themes.Kind.CV)
+    theme = theme_field(themes.Kind.CV, themes.Kind.PORTFOLIO)
     language = LanguageField(
         _("language"),
         blank=True,
@@ -373,6 +374,27 @@ class CV(DeclaresALanguage, OwnedModel):
         from . import themes
 
         return themes.Kind.PORTFOLIO if self.kind == CVKind.PORTFOLIO else themes.Kind.CV
+
+    def clean(self):
+        """The theme must set *this row's* kind, which the column's validator cannot know.
+
+        The column holds CVs and portfolios, so its validator only asks for a theme that
+        sets one of them; a portfolio-only theme from a plugin is then a legitimate choice
+        for a portfolio and a refused one for a CV (#412). A name nothing recognises is the
+        validator's to refuse, and falls back to `plain` when rendered.
+        """
+        super().clean()
+        theme = themes.find(self.theme)
+        if theme is not None and not theme.sets(self.theme_kind):
+            raise ValidationError(
+                {
+                    "theme": ValidationError(
+                        _("The %(theme)s theme does not set this type of document."),
+                        code="wrong_kind",
+                        params={"theme": theme.label},
+                    )
+                }
+            )
 
 
 class CVItem(OwnedModel):
