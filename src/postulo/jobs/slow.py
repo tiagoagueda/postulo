@@ -148,7 +148,8 @@ def find_a_logo(errand) -> dict:
         elif action == "refresh":
             if not company.logo_source_url:
                 raise Refused(_("There is no address to fetch it from again."))
-            logos.from_url(company, company.logo_source_url)
+            # The button press spent the allowance (#407).
+            logos.from_url(company, company.logo_source_url, spend=False)
             message = _("Fetched again.")
         else:
             raise Refused(_("Postulo does not know how to do that to a logo."))

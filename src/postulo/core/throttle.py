@@ -166,6 +166,16 @@ def capture(user) -> None:
     consume("capture", user, rate_for("POSTULO_CAPTURE_RATE"))
 
 
+def fetch(user) -> None:
+    """One outbound request to an address a person chose, outside capture.
+
+    Spent once per URL by the link check, the logo address and *Find logo*: the other places
+    where the server fetches what somebody typed. Its own allowance and not capture's, since
+    checking a hundred links is a normal afternoon and capturing a hundred pages is not (#407).
+    """
+    consume("fetch", user, rate_for("POSTULO_FETCH_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

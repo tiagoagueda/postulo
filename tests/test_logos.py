@@ -17,6 +17,7 @@ from django.db import DatabaseError, OperationalError
 from django.urls import reverse
 from PIL import Image
 
+from postulo.core.models import Errand
 from postulo.jobs import logos
 from postulo.jobs.models import Company
 
@@ -707,3 +708,39 @@ def test_the_company_form_downloads_the_logo_outside_any_transaction(
     )
 
     assert seen == [False, False]
+
+
+def test_saving_a_new_logo_address_spends_the_fetch_allowance(client, user, web, settings):
+    """The address is somebody's choice and the server goes and gets it (#407)."""
+    settings.POSTULO_FETCH_RATE = "1/h"
+    web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
+    client.force_login(user)
+
+    client.post(
+        reverse("jobs:company_create"),
+        {"name": "Black Mesa", "logo_url": "https://cdn.example/logo.png"},
+    )
+    response = client.post(
+        reverse("jobs:company_create"),
+        {"name": "Aperture", "logo_url": "https://cdn.example/other.png"},
+        follow=True,
+    )
+
+    assert web["calls"] == ["https://cdn.example/logo.png"], "the second was never fetched"
+    assert "Too many requests" in response.content.decode()
+    assert Company.objects.for_user(user).filter(name="Aperture").exists()
+
+
+def test_find_logo_spends_the_fetch_allowance_and_is_refused_once_it_is_spent(
+    client, user, company, web, settings, monkeypatch
+):
+    settings.POSTULO_FETCH_RATE = "1/h"
+    client.force_login(user)
+    url = reverse("jobs:company_logo_action", args=[company.pk, "website"])
+
+    first = client.post(url)
+    assert first.status_code == 302 and first["Location"].startswith("/working/")
+    response = client.post(url, follow=True)
+
+    assert "Too many requests" in response.content.decode()
+    assert Errand.objects.filter(owner=user).count() == 1, "only the first press sent one"

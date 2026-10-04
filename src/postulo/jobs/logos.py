@@ -42,7 +42,7 @@ from django.utils import timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
-from postulo.core import pictures
+from postulo.core import pictures, throttle
 from postulo.plugins import fetching, http
 
 logger = logging.getLogger(__name__)
@@ -283,8 +283,21 @@ def _discard(storage, name: str) -> None:
     transaction.on_commit(remove)
 
 
-def from_url(company, url: str) -> None:
-    """Fetch the address, keep the picture. Raises :class:`UnusableLogo` with the reason."""
+def spend_fetch(owner) -> None:
+    """Use one of the owner's fetches, or raise :class:`UnusableLogo` saying why not (#407)."""
+    try:
+        throttle.fetch(owner)
+    except throttle.TooOften as too_often:
+        raise UnusableLogo(str(too_often)) from too_often
+
+
+def from_url(company, url: str, *, spend: bool = True) -> None:
+    """Fetch the address, keep the picture. Raises :class:`UnusableLogo` with the reason.
+
+    ``spend=False`` for a caller that has already spent the allowance for this fetch.
+    """
+    if spend:
+        spend_fetch(company.owner)
     content, extension = process(download(url))
     store(company, content, source="url", url=url, extension=extension)
 

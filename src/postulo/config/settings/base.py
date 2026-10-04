@@ -423,6 +423,11 @@ if POSTULO_ADMIN_URL and not POSTULO_ADMIN_URL.endswith("/"):
 # recording their own applications will use and far less than a scanner wants; an instance
 # doing bulk work should raise it deliberately rather than discover it has no ceiling.
 POSTULO_CAPTURE_RATE = env("POSTULO_CAPTURE_RATE", default="30/h")
+# The other places the server fetches an address somebody typed: *Check* and *Check all* on
+# career links, the logo address on a company, *Find logo* and *Refresh*. One use per
+# outbound URL (#407). Looser than capture, because pressing *Check all* on a few dozen
+# links is ordinary use, but it is a ceiling where there was none.
+POSTULO_FETCH_RATE = env("POSTULO_FETCH_RATE", default="300/h")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
 # Mail somebody sends as themselves (#149). Per account, and low: this is the one surface

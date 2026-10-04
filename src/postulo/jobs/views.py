@@ -24,7 +24,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import slugs, tables
+from postulo.core import slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
@@ -476,7 +476,13 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
         if action not in ("website", "refresh"):
             raise Http404
         # The other two read the company's site and then try up to six images, one round
-        # trip each, which is not a thing to make somebody sit through (#247).
+        # trip each, which is not a thing to make somebody sit through (#247). One use of
+        # the fetch allowance for the press, spent before the errand is sent (#407).
+        try:
+            throttle.fetch(request.user)
+        except throttle.TooOften as too_often:
+            messages.error(request, str(too_often))
+            return redirect(safe_next(request, company.get_absolute_url()))
         errand = errands.send(
             "logo", request.user, subject=company, company_id=company.pk, action=action
         )

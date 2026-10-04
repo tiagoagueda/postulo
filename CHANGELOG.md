@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### 🔒 Security
 
 - Importing an archive reads every file, and the manifest, through a size cap, so an entry that unpacks to gigabytes is left out and reported instead of exhausting memory, and an imported avatar or company logo goes through the same checks as an uploaded one (an SVG is sanitised, a picture re-encoded). (#466)
+- *Check*, *Check all*, a new logo address and *Find logo* now spend a fetch allowance, `POSTULO_FETCH_RATE` (300/h by default, once per address fetched): *Check all* stops when it runs out and says how many links it did not check. (#407)
 
 ## [0.4.0] — 2026-10-04
 

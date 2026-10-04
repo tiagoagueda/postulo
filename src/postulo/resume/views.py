@@ -388,7 +388,11 @@ class LinkCheckView(OwnedObjectMixin, View):
         fallback = reverse("resume:overview")
         if pk is not None:
             link = get_object_or_404(self.get_queryset(), pk=pk)
-            link_checks.check(link)
+            try:
+                link_checks.check(link)
+            except throttle.TooOften as too_often:
+                messages.error(request, str(too_often))
+                return redirect(safe_next(request, fallback))
             if link.is_broken:
                 messages.error(
                     request,
@@ -400,7 +404,19 @@ class LinkCheckView(OwnedObjectMixin, View):
             return redirect(safe_next(request, fallback))
 
         ok, broken, left = link_checks.check_all(request.user)
-        if left:
+        if left and throttle.spent("fetch", request.user, throttle.rate_for("POSTULO_FETCH_RATE")):
+            messages.warning(
+                request,
+                ngettext(
+                    "You have fetched as many addresses as are allowed for now: "
+                    "%(count)d link was not checked. Check again later for the rest.",
+                    "You have fetched as many addresses as are allowed for now: "
+                    "%(count)d links were not checked. Check again later for the rest.",
+                    left,
+                )
+                % {"count": left},
+            )
+        elif left:
             messages.warning(
                 request,
                 ngettext(

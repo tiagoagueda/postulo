@@ -27,6 +27,7 @@ import httpx
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from postulo.core import throttle
 from postulo.plugins import http
 from postulo.plugins.fetching import UnsafeURL, validate_public_url
 
@@ -39,7 +40,12 @@ DEADLINE = 60.0
 
 
 def check(link: Link) -> Link:
-    """Ask whether ``link`` answers, and record what came back. Never raises."""
+    """Ask whether ``link`` answers, and record what came back.
+
+    Spends one use of the fetch allowance first and raises :class:`throttle.TooOften` when
+    it is spent, before any request is made (#407). Nothing else raises.
+    """
+    throttle.fetch(link.owner)
     status, detail = _ask(link.url)
     link.check_status = status
     link.check_detail = detail[:250]
@@ -53,7 +59,8 @@ def check_all(owner, *, deadline: float = DEADLINE) -> tuple[int, int, int]:
 
     Returns (answered, did not answer, not reached). A link already asked keeps its result;
     the ones the clock cut off are left as they were, for the person to press the button
-    again, rather than a worker killed with nothing saved (#357).
+    again, rather than a worker killed with nothing saved (#357). The ones the fetch
+    allowance did not cover are left the same way and counted the same way (#407).
     """
     ok = broken = 0
     stop = time.monotonic() + deadline
@@ -61,7 +68,10 @@ def check_all(owner, *, deadline: float = DEADLINE) -> tuple[int, int, int]:
     for index, link in enumerate(pending):
         if time.monotonic() >= stop:
             return ok, broken, len(pending) - index
-        check(link)
+        try:
+            check(link)
+        except throttle.TooOften:
+            return ok, broken, len(pending) - index
         if link.is_broken:
             broken += 1
         else:

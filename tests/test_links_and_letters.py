@@ -722,3 +722,33 @@ def test_checking_all_stops_at_its_deadline_and_says_how_many_were_left(client, 
     client.force_login(user)
     response = client.post(reverse("resume:link_check_all"), follow=True)
     assert "3 links were not reached" in response.content.decode()
+
+
+def test_checking_all_stops_when_the_fetch_allowance_runs_out(
+    client, user, answering, settings, django_capture_on_commit_callbacks
+):
+    """Every link is a request to a host the person chose, so each one spends (#407)."""
+    settings.POSTULO_FETCH_RATE = "2/h"
+    for number in range(3):
+        a_link(user, title=f"Link {number}", url=f"https://alex.example/{number}")
+    client.force_login(user)
+
+    response = client.post(reverse("resume:link_check_all"), follow=True)
+
+    assert len(answering["calls"]) == 2
+    assert "1 link was not checked" in response.content.decode()
+    assert Link.objects.for_user(user).filter(checked_at__isnull=True).count() == 1
+
+
+def test_checking_one_link_is_refused_with_a_sentence_once_the_allowance_is_spent(
+    client, user, answering, settings
+):
+    settings.POSTULO_FETCH_RATE = "1/h"
+    link = a_link(user)
+    client.force_login(user)
+
+    client.post(reverse("resume:link_check", args=[link.pk]))
+    response = client.post(reverse("resume:link_check", args=[link.pk]), follow=True)
+
+    assert len(answering["calls"]) == 1
+    assert "Too many requests" in response.content.decode()
