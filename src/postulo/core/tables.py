@@ -528,13 +528,19 @@ class Table:
             params.append(f"sort={sort}")
         return columns, params
 
+    @staticmethod
+    def clean_view_name(name: str | None) -> tuple[str, str]:
+        """The name a view is kept under and its slug, both empty if there is no usable
+        name. The one place a name is normalised, so a caller finds what was saved."""
+        name = " ".join((name or "").split())[:60].strip()
+        return name, slugify(name, allow_unicode=True)[:60]
+
     @classmethod
     def save_view(cls, current: dict | None, name: str, query: str, columns: list[str]) -> dict:
         """``current`` with a view called ``name`` holding ``query``: added, or replaced if
         the name was already taken. The page number and the view's own name are dropped from
         the query, because neither is part of the question."""
-        name = " ".join((name or "").split())[:60]
-        slug = slugify(name, allow_unicode=True)[:60]
+        name, slug = cls.clean_view_name(name)
         if not name or not slug:
             return dict(current or {})
         kept = QueryDict(mutable=True)

@@ -406,3 +406,31 @@ def test_a_width_posted_under_an_applied_view_leaves_the_stored_columns_alone(cl
     stored = tables.settings_for(user, "companies")
     assert stored["columns"] == ["name", "location"]
     assert stored["widths"] == {"name": 300}
+
+
+def test_a_name_cut_after_a_space_is_saved_and_shown_rather_than_a_server_error(client, user):
+    client.force_login(user)
+    name = "a" * 59 + " bcd" + "e" * 4
+    assert len(name) == 67 and name[59] == " "
+    response = client.post(
+        reverse("core:table_views", args=["companies"]),
+        {"action": "save", "name": name, "next": "/jobs/companies/?location=x"},
+    )
+    assert response.status_code == 302
+    user.refresh_from_db()
+    (view,) = CompaniesTable._views_of(tables.settings_for(user, "companies"))
+    assert view.name == "a" * 59
+    assert f"saved={view.slug}" in response["Location"]
+
+
+def test_saving_the_same_view_twice_says_it_is_saved_both_times(client, user):
+    client.force_login(user)
+    url = reverse("core:table_views", args=["companies"])
+    data = {"action": "save", "name": "Waiting", "next": "/jobs/companies/?q=acme"}
+    for _attempt in range(2):
+        response = client.post(url, data, follow=True)
+        html = response.content.decode()
+        assert "View saved." in html
+        assert "needs a name" not in html
+    user.refresh_from_db()
+    assert len(CompaniesTable._views_of(tables.settings_for(user, "companies"))) == 1

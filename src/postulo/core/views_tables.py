@@ -64,22 +64,23 @@ def table_views(request: HttpRequest, name: str) -> HttpResponse:
     back = safe_next(request, "/")
     if action == "save":
         title = request.POST.get("name", "")
-        saved = table.save_view(
-            current,
-            title,
-            urlsplit(back).query,
-            table(request, current).visible_keys_in_order,
-        )
-        if saved == current:
-            if title.strip():
+        clean, view_slug = table.clean_view_name(title)
+        if not view_slug:
+            if clean:
                 messages.error(request, _("A view's name needs at least one letter or digit."))
             else:
                 messages.error(request, _("A view needs a name."))
         else:
+            saved = table.save_view(
+                current,
+                title,
+                urlsplit(back).query,
+                table(request, current).visible_keys_in_order,
+            )
             tables.save_settings(request.user, name, saved)
             messages.success(request, _("View saved."))
             # Back to the view under its own name, so what was saved is what is shown.
-            view = next(v for v in table._views_of(saved) if v.name == " ".join(title.split())[:60])
+            view = next(v for v in table._views_of(saved) if v.slug == view_slug)
             return redirect(table(request, saved).view_url(view, path=urlsplit(back).path))
     elif action == "delete":
         tables.save_settings(request.user, name, table.forget_view(current, slug))

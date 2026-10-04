@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Saving a table view under a long name cut after a space no longer ends in a server error, and saving the same view twice in a row says "View saved." instead of claiming it needs a name. (#507)
 - Sending a CV or letter for an application with a very long job title and company name no longer fails on PostgreSQL: the "sent to" text and the document title are cut to their columns. (#513)
 - A document whose title holds a double quote or a line break now downloads correctly instead of sending a malformed header or answering 500. (#376)
 - The calendar and the report no longer answer 500 for a hand-edited address at the edge of the calendar (year 9999, 0001 or 20266-Q3); they fall back to today, and only years 1900 to 2200 are read. (#389)
