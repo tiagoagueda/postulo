@@ -138,7 +138,7 @@ def _guard(request: httpx.Request) -> None:
         addresses = public_addresses_for(str(request.url))
     except UnsafeURL as exc:
         raise _refused(exc) from exc
-    _pin(request, addresses[0])
+    _pin(request, addresses)
     if original:
         request.headers["Host"] = original
 
@@ -161,8 +161,11 @@ def approve_host(host: str) -> str:
         raise DestinationRefused(str(error)) from error
 
 
-def _pin(request: httpx.Request, address) -> None:
-    """Send this request to ``address``, while still speaking to the host it names.
+def _pin(request: httpx.Request, addresses) -> None:
+    """Send this request to the first of ``addresses``, while still speaking to the host it names.
+
+    The rest ride along under `_FALLBACKS`, for `_Client` to try if the first cannot be
+    connected to (#547).
 
     Rewriting the URL is what makes the connection go to the address that was actually
     approved. The ``Host`` header and the TLS server name keep the original hostname, so
@@ -170,10 +173,51 @@ def _pin(request: httpx.Request, address) -> None:
     a person typed rather than against a number.
     """
     host = request.url.host
-    if host == str(address):
+    address, *rest = (str(each) for each in addresses)
+    if host == address:
         return
-    request.extensions = {**request.extensions, "sni_hostname": host}
-    request.url = request.url.copy_with(host=str(address))
+    request.extensions = {
+        **request.extensions,
+        "sni_hostname": host,
+        _FALLBACKS: tuple(each for each in rest if each != address),
+    }
+    request.url = request.url.copy_with(host=address)
+
+
+#: The extension that carries the approved addresses a pinned request has not tried yet.
+_FALLBACKS = "postulo_fallbacks"
+
+
+def _fall_back_between_addresses(client: httpx.Client) -> None:
+    """Make ``client`` try the other approved addresses when a pinned one cannot be connected to.
+
+    Pinning replaced the name with a single address, and with it the fallback that
+    `socket.create_connection` makes from one address to the next: a dual-stack name whose
+    IPv6 is broken, or a round-robin name with a node down, failed whenever that address came
+    first (#547). Every address was approved, so trying the next opens no gap. Only a failure
+    to connect is retried: nothing was sent, so nothing is sent twice.
+
+    It wraps the one step that sends a single hop, redirects included, on the instance and
+    not in a subclass, so a client a test has stood in for is wrapped the same way.
+    """
+    send = getattr(client, "_send_single_request", None)
+    if send is None:  # a test's stand-in for the client, which sends nothing
+        return
+
+    def send_single_request(request: httpx.Request) -> httpx.Response:
+        remaining = list(request.extensions.get(_FALLBACKS, ()))
+        request.extensions = {
+            key: value for key, value in request.extensions.items() if key != _FALLBACKS
+        }
+        while True:
+            try:
+                return send(request)
+            except (httpx.ConnectError, httpx.ConnectTimeout):
+                if not remaining:
+                    raise
+                request.url = request.url.copy_with(host=remaining.pop(0))
+
+    client._send_single_request = send_single_request
 
 
 def _public_only(request: httpx.Request) -> None:
@@ -194,7 +238,7 @@ def _public_only(request: httpx.Request) -> None:
         addresses = public_addresses_for(str(request.url))
     except UnsafeURL as exc:
         raise DestinationRefused(str(exc)) from exc
-    _pin(request, addresses[0])
+    _pin(request, addresses)
     if original:
         request.headers["Host"] = original
 
@@ -206,6 +250,7 @@ def _build(guard, timeout: float, kwargs: dict, *, bounded: bool = False) -> htt
     kwargs.setdefault("follow_redirects", True)
     kwargs.setdefault("max_redirects", MAX_REDIRECTS)
     built = httpx.Client(timeout=timeout, headers=headers, event_hooks=hooks, **kwargs)
+    _fall_back_between_addresses(built)
     if bounded:
         _hold_to_deadlines(built)
     return built

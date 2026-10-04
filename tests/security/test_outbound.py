@@ -1437,3 +1437,109 @@ def test_httpx_is_held_to_the_minor_whose_private_names_the_deadline_wraps():
         assert isinstance(client._mounts, dict)
     finally:
         client.close()
+
+
+# ----------------------------------------- an approved name with one address that will not answer
+
+UNREACHABLE = ipaddress.ip_address("2606:4700:4700::1111")
+REACHABLE = ipaddress.ip_address("93.184.216.34")
+
+
+def test_a_request_falls_back_to_the_next_approved_address(monkeypatch, settings):
+    """Pinning to the first address lost the fallback a name's other addresses gave (#547).
+
+    A dual-stack name whose IPv6 is broken answered with that address first, and every request
+    to it timed out although the IPv4 one worked.
+    """
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"paperless.example": [UNREACHABLE, REACHABLE]})
+    dialled: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        dialled.append(request.url.host)
+        if request.url.host == str(UNREACHABLE):
+            raise httpx.ConnectTimeout("timed out", request=request)
+        return httpx.Response(200, content=b"ok")
+
+    with http.client(transport=httpx.MockTransport(handler)) as client:
+        response = client.get("https://paperless.example/api/")
+
+    assert response.status_code == 200
+    assert dialled == [str(UNREACHABLE), str(REACHABLE)], "each approved address, in order"
+    assert response.request.headers["Host"] == "paperless.example"
+    assert response.request.extensions["sni_hostname"] == "paperless.example", "TLS proves the name"
+
+
+def test_a_request_with_no_address_that_answers_fails_as_it_did(monkeypatch, settings):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"paperless.example": [UNREACHABLE, REACHABLE]})
+    dialled: list[str] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        dialled.append(request.url.host)
+        raise httpx.ConnectError("refused", request=request)
+
+    with (
+        http.client(transport=httpx.MockTransport(handler)) as client,
+        pytest.raises(httpx.ConnectError),
+    ):
+        client.get("https://paperless.example/api/")
+
+    assert len(dialled) == 2, "both were tried, neither more than once"
+
+
+def test_an_answer_that_is_an_error_is_not_tried_again_elsewhere(monkeypatch, settings):
+    """Only a failure to connect moves on: a server that answered 500 was reached."""
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    resolving(monkeypatch, {"paperless.example": [REACHABLE, UNREACHABLE]})
+    transport, seen = recorder(status=500)
+
+    with http.client(transport=transport) as client:
+        assert client.get("https://paperless.example/").status_code == 500
+
+    assert len(seen) == 1
+
+
+def test_a_mail_connection_falls_back_to_the_next_approved_address(monkeypatch):
+    """The same for `mail.check_connection`, which dialled the first address only (#547)."""
+    from postulo.core import mail
+
+    monkeypatch.setattr(destinations, "addresses_for", lambda host: [UNREACHABLE, REACHABLE])
+    dialled: list[str] = []
+
+    def create_connection(address, timeout=None, source_address=None):
+        dialled.append(address[0])
+        if address[0] == str(UNREACHABLE):
+            raise TimeoutError("timed out")
+        return types.SimpleNamespace(
+            close=lambda: None, sendall=lambda data: None, settimeout=lambda value: None
+        )
+
+    monkeypatch.setattr(socket, "create_connection", create_connection)
+    replies = iter([(220, b"hello"), (250, b"ok"), (250, b"ok"), (221, b"bye")])
+    monkeypatch.setattr("smtplib.SMTP.getreply", lambda self: next(replies))
+
+    summary = mail.check_connection(
+        host="mail.example.org", port=25, username="", password="", security="none", timeout=5
+    )
+
+    assert dialled == [str(UNREACHABLE), str(REACHABLE)]
+    assert "Connected to mail.example.org:25" in summary
+
+
+def test_a_mail_connection_that_reaches_no_address_says_why(monkeypatch):
+    from postulo.core import mail
+
+    monkeypatch.setattr(destinations, "addresses_for", lambda host: [UNREACHABLE, REACHABLE])
+
+    def create_connection(address, timeout=None, source_address=None):
+        raise ConnectionRefusedError(f"nobody at {address[0]}")
+
+    monkeypatch.setattr(socket, "create_connection", create_connection)
+
+    with pytest.raises(mail.ConnectionFailed) as failure:
+        mail.check_connection(
+            host="mail.example.org", port=25, username="", password="", security="none", timeout=5
+        )
+
+    assert "nobody at" in str(failure.value)

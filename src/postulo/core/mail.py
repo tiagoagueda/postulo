@@ -177,17 +177,22 @@ def _open(host: str, port: int, security: str, timeout: int):
     """
     from . import destinations
 
-    address = destinations.approve(host, allow_private=host_policy())
+    addresses = destinations.approve_all(host, allow_private=host_policy())
     if security == "ssl":
         return destinations.PinnedSMTP_SSL(
-            host=str(address),
+            host=str(addresses[0]),
             port=port,
             timeout=timeout,
             context=ssl.create_default_context(),
             certificate_name=host,
+            addresses=addresses,
         )
     return destinations.PinnedSMTP(
-        host=str(address), port=port, timeout=timeout, certificate_name=host
+        host=str(addresses[0]),
+        port=port,
+        timeout=timeout,
+        certificate_name=host,
+        addresses=addresses,
     )
 
 
@@ -237,10 +242,10 @@ class GuardedBackend(EmailBackend):
         if self.connection:
             return False
         typed = self.host
-        approved = destinations.approve(typed, allow_private=mail.host_policy())
+        approved = destinations.approve_all(typed, allow_private=mail.host_policy())
         pinned = destinations.PinnedSMTP_SSL if self.use_ssl else destinations.PinnedSMTP
-        self.host = str(approved)
-        self._pinned_class = functools.partial(pinned, certificate_name=typed)
+        self.host = str(approved[0])
+        self._pinned_class = functools.partial(pinned, certificate_name=typed, addresses=approved)
         try:
             opened = super().open()
         finally:

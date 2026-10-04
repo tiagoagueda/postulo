@@ -162,17 +162,27 @@ def addresses_for(host: str) -> list[Address]:
 
 
 def approve(host: str, *, allow_private: bool) -> Address:
-    """The address to dial, or a refusal that never touched the network.
+    """The first address to dial, or a refusal that never touched the network.
 
-    Returns one of the resolved addresses. Which one does not matter — every one of them had
-    to pass — and returning it rather than the name is the whole point: the caller connects
-    to this, not to whatever the resolver says a second from now.
+    Which one does not matter — every one of them had to pass — and returning it rather
+    than the name is the whole point: the caller connects to this, not to whatever the
+    resolver says a second from now. A caller that can fall back wants `approve_all`.
+    """
+    return approve_all(host, allow_private=allow_private)[0]
+
+
+def approve_all(host: str, *, allow_private: bool) -> list[Address]:
+    """Every address to dial, in the resolver's order, or a refusal that never touched the network.
+
+    Every one of them had to pass, so a caller may try them in turn: a name with one
+    unreachable address (a broken IPv6, a round-robin node that is down) still connects over
+    another, as it did before connections were pinned (#547).
     """
     found = addresses_for(host)
     if not found:
         raise Unresolvable(str(_("%(host)s could not be looked up.") % {"host": host}))
     if allow_private:
-        return found[0]
+        return found
     private = [address for address in found if not is_public(address)]
     if private:
         raise Refused(
@@ -184,7 +194,7 @@ def approve(host: str, *, allow_private: bool) -> Address:
                 % {"host": host}
             )
         )
-    return found[0]
+    return found
 
 
 def private_allowed() -> bool:
@@ -209,8 +219,11 @@ class _ProvesTheName:
     reason and in the same shape.
     """
 
-    def __init__(self, *args, certificate_name: str = "", **kwargs):
+    def __init__(self, *args, certificate_name: str = "", addresses=(), **kwargs):
         self._certificate_name = certificate_name
+        # Every approved address, tried in order as `socket.create_connection` does for a
+        # name; empty means the one the connection was given (#547).
+        self._addresses = tuple(str(address) for address in addresses)
         super().__init__(*args, **kwargs)
 
     def _get_socket(self, host, port, timeout):
@@ -218,7 +231,13 @@ class _ProvesTheName:
         # that wraps the socket, and it reads the name from the attribute set here.
         if self._certificate_name:
             self._host = self._certificate_name
-        return super()._get_socket(host, port, timeout)
+        failure = None
+        for address in self._addresses or (host,):
+            try:
+                return super()._get_socket(address, port, timeout)
+            except OSError as error:
+                failure = error
+        raise failure
 
 
 class PinnedSMTP(_ProvesTheName, smtplib.SMTP):

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Outbound connections (HTTP guards, mail test and sending) now try each approved address in turn, so a name with one dead address, such as a broken IPv6, no longer fails whenever that address comes first. (#547)
 - A webhook delivery whose receiver's hostname briefly fails to resolve is now retried with back-off instead of being given up on and blamed on the private-address setting. (#549)
 - Webhooks no longer follow a redirect, which re-sent the POST as a bodyless GET and could record the event as sent; a 3xx now fails the delivery and the Test button, naming the address to use instead. (#550)
 - Putting a reminder off until tomorrow or next week now keeps the hour it was set for, in your own time zone, instead of the minute you pressed the button, and no longer shifts an hour across a clock change. (#565)
