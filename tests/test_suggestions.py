@@ -258,3 +258,25 @@ def test_a_company_typed_that_was_never_offered_is_recorded_as_typed(user, clien
 
     assert Application.objects.for_user(user).count() == 1
     assert Company.objects.for_user(user).get().name == "Somewhere Entirely New"
+
+
+def test_an_action_that_is_not_accept_or_decline_answers_404_and_changes_nothing(user, client):
+    from postulo.applications.models import Suggestion
+
+    client.force_login(user)
+    application = Application.objects.create(
+        owner=user, posting=a_posting(user), status=Status.APPLIED
+    )
+    suggestion = Suggestion.objects.create(
+        owner=user,
+        source="mail",
+        summary="An invitation",
+        application=application,
+        suggested_status=Status.INTERVIEWING,
+    )
+    answer = client.post(reverse("applications:suggestion_action", args=[suggestion.pk, "later"]))
+    assert answer.status_code == 404
+    suggestion.refresh_from_db()
+    application.refresh_from_db()
+    assert suggestion.is_pending
+    assert application.status == Status.APPLIED

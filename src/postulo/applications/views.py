@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
-from django.http import HttpRequest, HttpResponse, QueryDict
+from django.http import Http404, HttpRequest, HttpResponse, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
@@ -1432,6 +1432,9 @@ class SuggestionActionView(OwnedObjectMixin, View):
         return Suggestion.objects.for_user(self.request.user)
 
     def post(self, request: HttpResponse, pk: int, action: str):
+        # Only the two words are answers; anything else is not a route (#447).
+        if action not in ("accept", "decline"):
+            raise Http404
         suggestion = get_object_or_404(self.get_queryset(), pk=pk)
         fallback = reverse("applications:suggestion_list")
         if not suggestion.is_pending:

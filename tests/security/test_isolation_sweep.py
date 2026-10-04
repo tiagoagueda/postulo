@@ -326,7 +326,7 @@ FACTORIES: dict[str, Callable] = {
     "applications:reminder_delete": pk_of(reminder),
     "applications:reminder_later": pk_of(reminder),
     "applications:reminder_update": pk_of(reminder),
-    "applications:suggestion_action": pk_of(suggestion, action="dismiss"),
+    "applications:suggestion_action": pk_of(suggestion, action="decline"),
     "applications:tag_delete": pk_of(tag),
     "applications:tag_update": pk_of(tag),
     # core: a piece of slow work, and the archive it produced (#247)
