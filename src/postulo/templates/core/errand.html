@@ -10,12 +10,14 @@
 
      The heading names the work rather than the moment, so it is still true once the work has
      finished -- the line under it is what changes, and it is that line the live region
-     announces.
+     announces. The region stays put and only what is inside it is swapped (#500).
   {% endcomment %}
   <div class="mx-auto max-w-lg">
     <div class="card py-10 text-center">
       <h1 class="mb-4 text-title font-semibold tracking-tight">{{ working_label }}</h1>
-      {% include "core/partials/errand_state.html" %}
+      <div role="status" aria-live="polite" aria-atomic="true">
+        {% include "core/partials/errand_state.html" %}
+      </div>
     </div>
   </div>
 {% endblock %}

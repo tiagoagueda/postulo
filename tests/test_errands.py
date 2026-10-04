@@ -157,6 +157,45 @@ def test_the_page_says_what_is_happening_and_where_to_go(a_kind, client, user):
     assert 'aria-live="polite"' in html, "the change is announced, not merely painted"
 
 
+def test_the_live_region_is_not_the_element_the_poll_replaces(a_kind, client, user, settings):
+    """htmx swaps `#errand-state` whole; a live region inserted with its text already in place
+    is announced unreliably, so the region must be an ancestor that stays (#500)."""
+    from html.parser import HTMLParser
+
+    class Ancestry(HTMLParser):
+        VOID = ("meta", "link", "input", "br", "img", "hr")
+
+        def __init__(self):
+            super().__init__()
+            self.stack: list[dict] = []
+            self.live_above_state = False
+            self.live_on_state = False
+
+        def handle_starttag(self, tag, attrs):
+            attrs = dict(attrs)
+            if attrs.get("id") == "errand-state":
+                self.live_on_state = "aria-live" in attrs
+                self.live_above_state = any("aria-live" in a for a in self.stack)
+            if tag not in self.VOID:
+                self.stack.append(attrs)
+
+        def handle_endtag(self, tag):
+            if tag not in self.VOID and self.stack:
+                self.stack.pop()
+
+    settings.POSTULO_BACKGROUND_WORK = True
+    client.force_login(user)
+    errand = errands.send("test_kind", user)
+
+    page = Ancestry()
+    page.feed(client.get(reverse("core:errand", args=[errand.pk])).content.decode())
+    assert page.live_above_state, "the live region wraps the element that is swapped"
+    assert not page.live_on_state
+
+    fragment = client.get(reverse("core:errand_state", args=[errand.pk])).content.decode()
+    assert "aria-live" not in fragment, "the polled fragment carries no live region of its own"
+
+
 def test_an_unfinished_page_polls_and_a_finished_one_stops(a_kind, client, user, settings):
     settings.POSTULO_BACKGROUND_WORK = True
     client.force_login(user)
