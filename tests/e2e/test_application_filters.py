@@ -1231,19 +1231,19 @@ def test_a_header_cell_is_announced_by_its_columns_name(page: Page, live_server,
     expect(header(page, "role")).to_have_attribute("aria-sort", "ascending")
 
     status = header(page, "status")
-    expect(status.get_by_role("combobox", name="Filter by status", exact=True)).to_be_visible()
+    expect(status.get_by_role("combobox", name="Filter by Status", exact=True)).to_be_visible()
     expect(status.get_by_role("combobox", name="Outcome", exact=True)).to_be_visible()
     expect(status.get_by_role("checkbox", name="Gone quiet", exact=True)).to_be_visible()
     expect(status.get_by_role("img", name="Status is filtered", exact=True)).to_be_visible()
     expect(
-        status.get_by_role("link", name="Sort by status, lowest first", exact=True)
+        status.get_by_role("link", name="Sort by Status, lowest first", exact=True)
     ).to_be_visible()
     expect(status.get_by_role("separator", name="Width of Status", exact=True)).to_be_attached()
     role = header(page, "role")
-    expect(role.get_by_role("searchbox", name="Filter by role", exact=True)).to_be_visible()
+    expect(role.get_by_role("searchbox", name="Filter by Role", exact=True)).to_be_visible()
     expect(role.get_by_role("combobox", name="Tag", exact=True)).to_be_visible()
     company = header(page, "company")
-    expect(company.get_by_role("searchbox", name="Filter by company", exact=True)).to_be_visible()
+    expect(company.get_by_role("searchbox", name="Filter by Company", exact=True)).to_be_visible()
 
 
 START_OF_THE_NAME = """(cell) => {
