@@ -862,20 +862,51 @@ class SyncReport:
     #: connection was already being synced (#586).
     already_running: bool = False
 
+    def record(self) -> dict:
+        """The numbers and the notes, as stored on the connection (#384).
+
+        The sentence is not stored: it is worded when somebody reads it, in their language.
+        """
+        return {
+            "pushed": self.pushed,
+            "pulled": self.pulled,
+            "removed": self.removed,
+            "skipped": self.skipped,
+            "notes": [str(note)[:500] for note in self.notes],
+        }
+
     def summary(self) -> str:
-        parts = []
-        if self.pushed:
-            parts.append(f"{self.pushed} pushed")
-        if self.pulled:
-            parts.append(f"{self.pulled} pulled")
-        if self.removed:
-            parts.append(f"{self.removed} removed")
-        if self.skipped:
-            parts.append(f"{self.skipped} skipped")
-        text = ", ".join(parts) if parts else "nothing to do"
-        if self.notes:
-            text += " · " + " · ".join(self.notes)
-        return text
+        return describe_sync(self.record())
+
+
+def describe_sync(record: dict) -> str:
+    """Word a stored sync report in the language that is active now (#384)."""
+    from django.utils.translation import gettext, ngettext
+
+    def count(key: str) -> int:
+        try:
+            return int(record.get(key) or 0)
+        except (TypeError, ValueError):
+            return 0
+
+    parts = []
+    if pushed := count("pushed"):
+        parts.append(ngettext("%(count)s pushed", "%(count)s pushed", pushed) % {"count": pushed})
+    if pulled := count("pulled"):
+        parts.append(ngettext("%(count)s pulled", "%(count)s pulled", pulled) % {"count": pulled})
+    if removed := count("removed"):
+        parts.append(
+            ngettext("%(count)s removed", "%(count)s removed", removed) % {"count": removed}
+        )
+    if skipped := count("skipped"):
+        parts.append(
+            ngettext("%(count)s skipped", "%(count)s skipped", skipped) % {"count": skipped}
+        )
+    text = ", ".join(parts) if parts else gettext("nothing to do")
+    notes = [str(note) for note in record.get("notes") or []]
+    if notes:
+        text += " · " + " · ".join(notes)
+    return text
 
 
 @runtime_checkable

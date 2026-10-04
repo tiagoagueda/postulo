@@ -62,7 +62,7 @@ def resolving(monkeypatch, answers: dict[str, list]):
         host = httpx.URL(url).host
         answer = answers.get(host)
         if answer is None:
-            raise fetching.UnsafeURL("That address is on a private or local network.")
+            raise public_addresses.PrivateAddress("That address is on a private or local network.")
         return answer
 
     monkeypatch.setattr(http, "public_addresses_for", public_addresses_for)
@@ -1543,3 +1543,49 @@ def test_a_mail_connection_that_reaches_no_address_says_why(monkeypatch):
         )
 
     assert "nobody at" in str(failure.value)
+
+
+# ---------------------------------------------- what a refusal says, and only that (#384)
+
+
+def test_a_host_that_does_not_resolve_is_not_told_about_the_private_address_policy(
+    monkeypatch, settings
+):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+
+    def nothing(*args, **kwargs):
+        raise socket.gaierror("no such host")
+
+    monkeypatch.setattr(public_addresses.socket, "getaddrinfo", nothing)
+
+    with pytest.raises(http.DestinationRefused) as refusal:
+        http.check_destination("https://nowhere.example/hook")
+
+    assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" not in str(refusal.value)
+    assert refusal.value.transient is True
+
+
+def test_a_malformed_or_foreign_address_is_not_told_about_the_policy_either(settings):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    for url in ("ftp://files.example/x", "https://", "https://[::1/x"):
+        with pytest.raises(http.DestinationRefused) as refusal:
+            http.check_destination(url)
+        assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" not in str(refusal.value), url
+
+
+def test_a_private_address_for_a_connection_names_the_switch_and_does_not_advise_pasting(
+    monkeypatch, settings
+):
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    monkeypatch.setattr(
+        "postulo.plugins.public_addresses._addresses_for",
+        lambda host: [ipaddress.ip_address("192.168.1.10")],
+    )
+
+    with pytest.raises(http.DestinationRefused) as refusal:
+        http.check_destination("https://nas.home/hook")
+
+    message = str(refusal.value)
+    assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" in message
+    assert "posting" not in message and "Paste" not in message
+    assert refusal.value.transient is False

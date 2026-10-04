@@ -434,3 +434,36 @@ def test_base64url_round_trips_without_padding():
         encoded = webpush.b64url(data)
         assert "=" not in encoded
         assert webpush.unb64url(encoded) == data == base64.urlsafe_b64decode(encoded + "=" * 4)
+
+
+# ---------------------------------------------------- in the reader's words (#384)
+
+
+def _worded(monkeypatch):
+    """Stand in for the plugin's catalogue: whatever passes through gettext comes out marked."""
+    monkeypatch.setattr(webpush, "_", lambda message: f"«{message}»")
+
+
+def test_a_refused_subscription_goes_through_gettext(monkeypatch):
+    _, subscription = a_browser()
+    _worded(monkeypatch)
+
+    problems = BrowserNotifier().validate(
+        {"subscription": json.dumps({**subscription, "endpoint": "http://push.example.net/x"})}
+    )
+    assert problems == {"subscription": ["«A push address has to be HTTPS.»"]}
+    assert BrowserNotifier().validate({"subscription": "not json"}) == {
+        "subscription": ["«The subscription is not something a browser wrote.»"]
+    }
+
+
+def test_a_push_service_failing_is_reported_through_gettext(push_service, monkeypatch):
+    _received, answer = push_service
+    answer["status"] = 503
+    _, subscription = a_browser()
+    _worded(monkeypatch)
+
+    result = BrowserNotifier().test({"subscription": json.dumps(subscription)})
+
+    assert not result.ok
+    assert result.message == "«The push service answered 503.»"

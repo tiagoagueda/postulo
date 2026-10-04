@@ -33,6 +33,10 @@ class UnsafeURL(CaptureError):
     """The URL points somewhere Postulo will not go."""
 
 
+class PrivateAddress(UnsafeURL):
+    """The address is private or local: the one refusal an operator's policy can lift (#384)."""
+
+
 class Unresolvable(UnsafeURL):
     """The name did not resolve. Not the same as private: a resolver can answer next time (#549)."""
 
@@ -76,7 +80,7 @@ def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv
     if not addresses:
         raise Unresolvable(_("That hostname could not be resolved."))
     if not all(is_public(address) for address in addresses):
-        raise UnsafeURL(
+        raise PrivateAddress(
             _(
                 "That address is on a private or local network, and Postulo will not "
                 "fetch it. Paste the posting text in by hand instead."

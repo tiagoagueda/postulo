@@ -326,3 +326,74 @@ def test_a_deactivated_account_is_not_synced(user):
     user.is_active = True
     user.save(update_fields=["is_active"])
     assert syncing.due_connections() == [connection]
+
+
+# ------------------------------------------------------ worded for the reader (#384)
+
+
+def _marking_the_language(monkeypatch):
+    """Stand in for a catalogue the suite does not compile: every counter says its language."""
+    from django.utils import translation
+
+    def ngettext(singular, plural, number):
+        return f"[{translation.get_language()}] " + (singular if number == 1 else plural)
+
+    def gettext(message):
+        return f"[{translation.get_language()}] {message}"
+
+    monkeypatch.setattr(translation, "ngettext", ngettext)
+    monkeypatch.setattr(translation, "gettext", gettext)
+
+
+def test_a_run_keeps_its_numbers_and_the_sentence_is_worded_when_read(user, monkeypatch):
+    from postulo.core import languages
+
+    connection = a_sync(user)
+    a_contact(user)
+    syncing.sync_connection(connection)
+    connection.refresh_from_db()
+
+    assert connection.last_report == {
+        "pushed": 1,
+        "pulled": 0,
+        "removed": 0,
+        "skipped": 0,
+        "notes": ["all quiet"],
+    }
+    assert connection.last_summary == "1 pushed · all quiet"
+
+    _marking_the_language(monkeypatch)
+    with languages.override("de"):
+        worded = connection.last_summary
+    assert worded == "[de] 1 pushed · all quiet"
+
+
+def test_the_counters_of_a_report_take_their_plural_form_from_the_count():
+    assert SyncReport(pushed=1).summary() == "1 pushed"
+    assert SyncReport(pushed=3, skipped=1).summary() == "3 pushed, 1 skipped"
+    assert SyncReport().summary() == "nothing to do"
+
+
+def test_the_connections_page_words_the_last_run_in_the_readers_language(client, user, monkeypatch):
+    connection = a_sync(user)
+    a_contact(user)
+    syncing.sync_connection(connection)
+    client.force_login(user)
+    _marking_the_language(monkeypatch)
+
+    html = client.get(reverse("connections:list"), headers={"Accept-Language": "de"}).content
+    assert "[de]" in html.decode() and "[de] 1 pushed" in html.decode()
+
+
+def test_the_sync_now_flash_is_worded_in_the_requests_language(client, user, monkeypatch):
+    connection = a_sync(user)
+    a_contact(user)
+    client.force_login(user)
+    _marking_the_language(monkeypatch)
+
+    response = client.post(
+        reverse("connections:sync_now", args=[connection.pk]),
+        follow=True,
+        headers={"Accept-Language": "de"},
+    )
+    assert "[de] 1 pushed" in response.content.decode()

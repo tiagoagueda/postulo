@@ -31,6 +31,7 @@ from cryptography.hazmat.primitives.asymmetric.utils import decode_dss_signature
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 #: The order of P-256, which a derived private key has to be below.
 _P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
@@ -188,21 +189,21 @@ def parse_subscription(raw) -> Subscription | None:
     try:
         data = json.loads(raw) if isinstance(raw, str) else raw
     except json.JSONDecodeError as error:
-        raise ValueError("The subscription is not something a browser wrote.") from error
+        raise ValueError(_("The subscription is not something a browser wrote.")) from error
     if not isinstance(data, dict):
-        raise ValueError("The subscription is not something a browser wrote.")
+        raise ValueError(_("The subscription is not something a browser wrote."))
     endpoint = str(data.get("endpoint") or "")
     keys = data.get("keys") if isinstance(data.get("keys"), dict) else {}
     if not endpoint.startswith("https://"):
-        raise ValueError("A push address has to be HTTPS.")
+        raise ValueError(_("A push address has to be HTTPS."))
     try:
         receiver = unb64url(str(keys.get("p256dh") or ""))
         auth = unb64url(str(keys.get("auth") or ""))
         ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256R1(), receiver)
     except (ValueError, TypeError) as error:
-        raise ValueError("The subscription's keys are not the browser's.") from error
+        raise ValueError(_("The subscription's keys are not the browser's.")) from error
     if len(receiver) != 65 or len(auth) != 16:
-        raise ValueError("The subscription's keys are not the browser's.")
+        raise ValueError(_("The subscription's keys are not the browser's."))
     return Subscription(endpoint=endpoint, p256dh=str(keys["p256dh"]), auth=str(keys["auth"]))
 
 
@@ -249,7 +250,7 @@ def push(subscription: Subscription, payload: dict, *, ttl: int = TIME_TO_LIVE) 
         # this string is shown on the connection and stored in `last_error`; a reply read off
         # some other machine does not belong in either (#216).
         raise PushFailed(
-            f"The push service answered {response.status_code}.",
+            _("The push service answered %(status)s.") % {"status": response.status_code},
             status=response.status_code,
         )
     return response.status_code

@@ -22,9 +22,11 @@ from collections.abc import Iterator
 
 import httpcore
 import httpx
+from django.utils.translation import gettext as _
 
 from .public_addresses import (
     USER_AGENT,
+    PrivateAddress,
     Unresolvable,
     UnsafeURL,
     public_addresses_for,
@@ -91,6 +93,16 @@ def private_destinations_allowed() -> bool:
     return destinations.private_allowed()
 
 
+def _private_refusal() -> str:
+    """The one sentence for a connection's address that is private or local, under gettext."""
+    return str(
+        _(
+            "That address is on a private or local network. Connections may only reach such "
+            "addresses when the operator sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
+        )
+    )
+
+
 def check_destination(url: str) -> None:
     """Raise unless ``url`` may be reached under the instance's policy."""
     if private_destinations_allowed():
@@ -111,10 +123,11 @@ def _refused(exc: UnsafeURL) -> DestinationRefused:
         refused = DestinationRefused(str(exc))
         refused.transient = True
         return refused
-    return DestinationRefused(
-        f"{exc} Connections may only reach private or local addresses when the operator "
-        "sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
-    )
+    if isinstance(exc, PrivateAddress):
+        # Its own sentence: the capture wording tells somebody to paste a posting in by hand,
+        # and that is no advice for a webhook or a sync (#384).
+        return DestinationRefused(_private_refusal())
+    return DestinationRefused(str(exc))
 
 
 def _guard(request: httpx.Request) -> None:

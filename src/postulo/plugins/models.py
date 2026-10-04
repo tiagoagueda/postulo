@@ -205,9 +205,18 @@ class Connection(OwnedModel):
     last_error = models.TextField(_("last error"), blank=True)
     #: For syncs: when the plugin last ran, whatever the outcome, and what it reported.
     synced_at = models.DateTimeField(_("last run"), null=True, blank=True)
-    last_summary = models.TextField(_("last run's report"), blank=True)
+    #: The counters and notes of that run, as numbers (``SyncReport.record``): the sentence is
+    #: worded at display time, so it follows the reader's language rather than the run's (#384).
+    last_report = models.JSONField(_("last run's report"), default=dict, blank=True)
 
     objects = ConnectionQuerySet.as_manager()
+
+    @property
+    def last_summary(self) -> str:
+        """The last run's report in the active language, or nothing before a first run."""
+        from .base import describe_sync
+
+        return describe_sync(self.last_report) if self.last_report else ""
 
     class Meta:
         verbose_name = _("connection")

@@ -119,9 +119,9 @@ def _run_connection(connection: Connection) -> SyncReport:
     else:
         connection.last_ok_at = now
         connection.last_error = ""
-    connection.last_summary = report.summary()[:500]
+    connection.last_report = report.record()
     connection.save(
-        update_fields=["synced_at", "last_ok_at", "last_error", "last_summary", "updated_at"]
+        update_fields=["synced_at", "last_ok_at", "last_error", "last_report", "updated_at"]
     )
     return report
 

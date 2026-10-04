@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Connections: a sync report is stored as numbers and worded in the reader's language with plural forms; a private-address refusal says so once, only when it is one; Web Push errors are translatable in the browser plugin's catalogue. (#384)
 - Notifications are worded in the recipient's time zone and language: closing notices count days on their calendar, interview messages show the local formatted time, status titles use their language's label. (#385)
 - A document's sent/created day for stores and the retention report's "recorded" and cutoff dates are now taken in the person's time zone rather than UTC, and the report shows them in the locale's date format. (#386)
 - A cover letter's date at the top is now the same locale-formatted date its {{ date }} placeholder prints, instead of an English "j F Y" pattern; the template lint now also rejects a literal format in {% now %}. (#387)
