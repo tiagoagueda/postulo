@@ -120,6 +120,22 @@ def test_a_withdrawn_language_is_not_applied_to_the_page(client, user, settings_
     assert served_in(client, HTTP_ACCEPT_LANGUAGE=asked) == ("de", "de")
 
 
+def test_work_done_for_a_person_is_not_in_a_language_the_instance_stopped_offering(
+    user, settings_row
+):
+    """A queued report, a frozen letter or a sync words what it writes as a page would (#398)."""
+    from postulo.core import memo, preferences
+
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["language"])
+    assert preferences.language_for(user) == "fr-FR"
+
+    narrowed_to_german(settings_row)
+    memo.site.row = None  # the row is remembered for a request; a queryset update leaves it
+
+    assert preferences.language_for(user) == "de"
+
+
 @pytest.mark.parametrize("asked", ["fr", "pt", ""])
 def test_a_person_following_the_browser_is_given_what_it_asks_within_what_is_offered(
     client, user, settings_row, asked

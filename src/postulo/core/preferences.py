@@ -123,6 +123,10 @@ def language_for(user) -> str:
 
     profile = getattr(user, "profile", None)
     chosen = (getattr(profile, "language", "") or "").strip()
+    # A language the instance has stopped offering gives way to its default here as it does
+    # for a page (#398): nothing is emitted in a language that is no longer on offer.
+    if chosen and not offered(languages.catalogue(chosen) or chosen):
+        chosen = ""
     return chosen or site.default_language() or languages.SOURCE
 
 
