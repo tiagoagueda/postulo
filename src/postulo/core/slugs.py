@@ -29,6 +29,25 @@ def fold(name) -> str:
     return "".join(ch for ch in text if not unicodedata.combining(ch)).casefold()
 
 
+def name_key(name) -> str:
+    """The key a database constraint can hold two spellings of one employer to (#546).
+
+    Capitals and spacing only, and accents kept: ``casefold`` folds *ΟΤΕ* to *οτε* and
+    *Émile* to *émile* wherever the database runs, which ``iexact`` does not do on SQLite.
+    `fold` also strips accents, which is right for a hint that tells and too loose for a
+    rule that refuses.
+    """
+    return collapse(name).casefold()
+
+
+def keep_name_key(instance, kwargs) -> None:
+    """Write ``name_key`` from the name, and into ``update_fields`` when only some are saved."""
+    instance.name_key = name_key(instance.name)
+    fields = kwargs.get("update_fields")
+    if fields is not None and "name" in fields and "name_key" not in fields:
+        kwargs["update_fields"] = [*fields, "name_key"]
+
+
 def same_name(rows, name):
     """The first of ``rows`` whose name is ``name`` apart from capitals, accents and spacing."""
     key = fold(name)

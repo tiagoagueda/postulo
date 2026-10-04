@@ -15,6 +15,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from postulo.core import slugs
 from postulo.core.addresses import same_url
 
 from .models import Capture, CaptureStatus, JobPosting
@@ -64,7 +65,7 @@ def known(owner, url: str, title: str = "", company: str = "", *, except_capture
         already = {posting.pk for posting in listings}
         found = (
             JobPosting.objects.for_user(owner)
-            .filter(title__iexact=title.strip(), company__name__iexact=company.strip())
+            .filter(title__iexact=title.strip(), company__name_key=slugs.name_key(company))
             .select_related("company")
             .defer("description")
             .order_by("-created_at")[:20]

@@ -24,7 +24,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import tables
+from postulo.core import slugs, tables
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
@@ -121,7 +121,7 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         wanted = self.request.GET.get("group", "").strip()
         if not wanted or not structure.structure_allowed(self.request.user):
             return queryset
-        tops = Company.objects.for_user(self.request.user).filter(name__iexact=wanted)
+        tops = Company.objects.for_user(self.request.user).filter(name_key=slugs.name_key(wanted))
         members: set[int] = set()
         for top in tops.select_related("parent"):
             members.update(member.pk for member in top.group_members())

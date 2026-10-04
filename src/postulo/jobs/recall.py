@@ -4,7 +4,7 @@ Adding an application asks for a company by name and the box is empty every time
 ``Acme`` today and ``Acme Ltd`` next month and there are two employers, two sets of
 postings, two rows in the companies table, and a funnel that quietly counts them apart.
 
-`applications.services.get_or_create_company` matches on ``name__iexact``, which catches
+`applications.services.get_or_create_company` matches on ``name_key``, which catches
 the variation it was written for — *Acme*, *acme*, *ACME* — and nothing else. A list of
 what this person has already recorded is the other half of that defence and the better
 half, because it works **before** the record exists rather than reconciling two afterwards.

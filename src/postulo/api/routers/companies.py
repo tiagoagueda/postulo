@@ -9,6 +9,7 @@ from ninja.pagination import paginate
 from pydantic import AwareDatetime
 
 from postulo.applications.services import get_or_create_company
+from postulo.core import slugs
 from postulo.jobs import identifiers
 from postulo.jobs.models import Company, CompanyKind, Contact, Industry
 
@@ -93,7 +94,7 @@ def _name_or_refusal(request, company: Company, name: str) -> str:
     name = name.strip()
     if not name:
         raise HttpError(422, _("This field is required."))
-    clash = Company.objects.for_user(request.auth.owner).filter(name__iexact=name)
+    clash = Company.objects.for_user(request.auth.owner).filter(name_key=slugs.name_key(name))
     if clash.exclude(pk=company.pk).exists():
         raise HttpError(422, _("You already have a company with that name."))
     return name

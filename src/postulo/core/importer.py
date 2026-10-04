@@ -869,7 +869,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         )
         if department_name and company is not None:
             department, _made = Department.objects.get_or_create(
-                owner=user, company=company, name=department_name
+                owner=user,
+                company=company,
+                name_key=slugs.name_key(department_name),
+                defaults={"name": department_name},
             )
             contact.department = department
             contact.save(update_fields=["department"])
@@ -944,7 +947,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 if company is not None:
                     break
         if company is None:
-            company = Company.objects.for_user(user).filter(name__iexact=name).first()
+            company = Company.objects.for_user(user).filter(name_key=slugs.name_key(name)).first()
         if company is None:
             company = Company.objects.create(owner=user, name=name, **company_entry)
             report.companies += 1
@@ -956,7 +959,12 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
         for department_name in department_names:
-            Department.objects.get_or_create(owner=user, company=company, name=department_name)
+            Department.objects.get_or_create(
+                owner=user,
+                company=company,
+                name_key=slugs.name_key(department_name),
+                defaults={"name": department_name},
+            )
         for entry in identifier_entries:
             # A scheme only the other instance defined comes back as *Other*, named by
             # its key, as a person's does, and so does a value the scheme here refuses
@@ -1174,7 +1182,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             continue
         department = (
             Department.objects.for_user(user)
-            .filter(company__name__iexact=company_name, name__iexact=department_name)
+            .filter(
+                company__name_key=slugs.name_key(company_name),
+                name_key=slugs.name_key(department_name),
+            )
             .first()
         )
         if department is not None:

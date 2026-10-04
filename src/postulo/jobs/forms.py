@@ -380,7 +380,9 @@ class CompanyForm(OwnerScopedModelForm):
                 data["name"] = service.name
                 # The registry's name may clash with one the person already has, and
                 # `clean_name` ran on a blank; the same refusal, in the same words.
-                clash = Company.objects.for_user(self.user).filter(name__iexact=service.name)
+                clash = Company.objects.for_user(self.user).filter(
+                    name_key=slugs.name_key(service.name)
+                )
                 if self.instance.pk:
                     clash = clash.exclude(pk=self.instance.pk)
                 if clash.exists():
@@ -414,7 +416,7 @@ class CompanyForm(OwnerScopedModelForm):
         name = self.cleaned_data["name"].strip()
         if self.user is None:
             return name
-        clash = Company.objects.for_user(self.user).filter(name__iexact=name)
+        clash = Company.objects.for_user(self.user).filter(name_key=slugs.name_key(name))
         if self.instance.pk:
             clash = clash.exclude(pk=self.instance.pk)
         if clash.exists():
@@ -696,7 +698,9 @@ class ContactForm(OwnerScopedModelForm):
         # Capitals do not make a second team; the spelling first entered stays.
         department = (
             Department.objects.filter(
-                owner=self.user, company_id=contact.company_id, name__iexact=name
+                owner=self.user,
+                company_id=contact.company_id,
+                name_key=slugs.name_key(name),
             )
             .order_by("pk")
             .first()

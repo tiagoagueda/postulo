@@ -33,7 +33,7 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from . import languages, spreadsheets
+from . import languages, slugs, spreadsheets
 
 # One list of currencies, below the models, which the plugin surface hands out too (#248).
 # Read here and still handed out here, where the importer's tests have always found it.
@@ -1052,7 +1052,7 @@ def perform(
                 )
                 continue
             existed = (
-                Company.objects.for_user(user).filter(name__iexact=row.company.strip()).exists()
+                Company.objects.for_user(user).filter(name_key=slugs.name_key(row.company)).exists()
                 or Company.by_identifier(user, "wikidata", row.wikidata) is not None
             )
             company = get_or_create_company(user, row.company, wikidata=row.wikidata)

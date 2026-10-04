@@ -15,6 +15,7 @@ from django.db import IntegrityError, transaction
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import slugs
 from postulo.jobs.models import Company, JobPosting
 from postulo.notifications import slow
 
@@ -330,7 +331,7 @@ def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
         by_id = Company.by_identifier(owner, identifiers.WIKIDATA, wikidata)
         if by_id is not None:
             return by_id
-    company = Company.objects.for_user(owner).filter(name__iexact=name).first()
+    company = Company.objects.for_user(owner).filter(name_key=slugs.name_key(name)).first()
     if company is None:
         try:
             # A savepoint, so a concurrent request that made the same company first
@@ -338,7 +339,7 @@ def get_or_create_company(owner, name: str, *, wikidata: str = "") -> Company:
             with transaction.atomic():
                 company = Company.objects.create(owner=owner, name=name)
         except IntegrityError:
-            company = Company.objects.for_user(owner).filter(name__iexact=name).first()
+            company = Company.objects.for_user(owner).filter(name_key=slugs.name_key(name)).first()
             if company is None:
                 raise
     if wikidata and not company.identifiers.filter(scheme=identifiers.WIKIDATA).exists():

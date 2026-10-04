@@ -115,6 +115,13 @@ class Industry(OwnedModel):
 
 
 class CompanyQuerySet(OwnedQuerySet):
+    def bulk_create(self, objs, *args, **kwargs):
+        """Give each company its `name_key`, which `save` would have: the constraint reads it."""
+        objs = list(objs)
+        for company in objs:
+            company.name_key = slugs.name_key(company.name)
+        return super().bulk_create(objs, *args, **kwargs)
+
     def employers(self) -> CompanyQuerySet:
         """The companies that are employers: everything but the employment service (#202).
 
@@ -254,6 +261,10 @@ class Company(OwnedModel):
     """
 
     name = models.CharField(_("name"), max_length=200)
+    #: What the unique constraint reads, kept by `save`: the name in one case and with its
+    #: spacing collapsed (`slugs.name_key`), so *Émile* and *ÉMILE* are one employer on
+    #: every database (#546). Three times the name's length, which casefolding can reach.
+    name_key = models.CharField(max_length=600, blank=True, editable=False)
     #: A column with a default, so the migration invents nothing: every company recorded
     #: before there were kinds is an employer, which is what it was recorded as.
     kind = models.CharField(
@@ -318,7 +329,9 @@ class Company(OwnedModel):
         verbose_name_plural = _("companies")
         ordering = ("name",)
         constraints = [
-            models.UniqueConstraint(fields=("owner", "name"), name="unique_company_name_per_owner")
+            models.UniqueConstraint(
+                fields=("owner", "name_key"), name="unique_company_name_per_owner"
+            )
         ]
 
     def __str__(self) -> str:
@@ -328,6 +341,7 @@ class Company(OwnedModel):
         return reverse("jobs:company_detail", args=[self.pk])
 
     def save(self, *args, **kwargs) -> None:
+        slugs.keep_name_key(self, kwargs)
         # A correction a person made is not a guess to be made again: the text it was
         # made from is not this location's text, so the comparison below would not
         # keep it either way.
@@ -626,6 +640,8 @@ class Department(OwnedModel):
         verbose_name=_("company"),
     )
     name = models.CharField(_("name"), max_length=120)
+    #: As on `Company`: the name the constraint compares (#546).
+    name_key = models.CharField(max_length=360, blank=True, editable=False)
 
     class Meta:
         verbose_name = _("department")
@@ -633,13 +649,17 @@ class Department(OwnedModel):
         ordering = ("name",)
         constraints = [
             models.UniqueConstraint(
-                fields=("owner", "company", "name"),
+                fields=("owner", "company", "name_key"),
                 name="unique_department_name_per_company",
             )
         ]
 
     def __str__(self) -> str:
         return self.name
+
+    def save(self, *args, **kwargs) -> None:
+        slugs.keep_name_key(self, kwargs)
+        super().save(*args, **kwargs)
 
 
 class Contact(OwnedModel):
