@@ -170,12 +170,13 @@ known-first-party = ["postulo"]
 DJANGO_SETTINGS_MODULE = "postulo.config.settings.test"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-# Browser and release tests are opted into with `-m e2e` or `-m release`; a command-line
-# -m replaces this one.
-addopts = "--strict-markers --strict-config -m 'not e2e and not release'"
+# Browser, release and CI-step tests are opted into with `-m e2e`, `-m release` or `-m step`;
+# a command-line -m replaces this one.
+addopts = "--strict-markers --strict-config -m 'not e2e and not release and not step'"
 markers = [
     "e2e: drives a real browser against a live server; needs `playwright install chromium`",
     "release: a promise that must hold in a published version, not in every commit",
+    "step: the same check a step of CI's Checks job makes once per push; run with `-m step`",
 ]
 filterwarnings = ["error"]
 # A test still running after five minutes has its threads' stacks written to the log, so a

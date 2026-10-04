@@ -184,6 +184,8 @@ def test_every_european_union_language_stays_complete(name, code, catalogues):
     assert not missing, f"{name} {code}: {len(missing)} untranslated, e.g. {missing[:3]}"
 
 
+# `scripts/messages.py check` in CI's Checks job, once per push (#725).
+@pytest.mark.step
 @pytest.mark.parametrize(("name", "code"), EVERY, ids=str)
 def test_every_language_has_a_catalogue_with_the_right_plural_rule(name, code, catalogues):
     """True of every language the day it is added, translated or not.
@@ -196,12 +198,16 @@ def test_every_language_has_a_catalogue_with_the_right_plural_rule(name, code, c
     assert catalogue.header["Plural-Forms"] == languages.PLURAL_FORMS[code]
 
 
+# `scripts/messages.py check` in CI's Checks job, once per push (#725).
+@pytest.mark.step
 @pytest.mark.parametrize(("name", "code"), EVERY, ids=str)
 def test_every_translation_keeps_its_placeholders_and_plural_forms(name, code, catalogues, tool):
     problems = tool.problems_in(catalogues[name, code], code)
     assert not problems, "\n".join(problems[:10])
 
 
+# `scripts/messages.py extract --check` in CI's Checks job, once per push (#725).
+@pytest.mark.step
 @pytest.mark.parametrize("name", NAMES)
 def test_the_catalogues_are_current(name, tool):
     """What the source says, the catalogues carry: no string added without a slot."""
@@ -219,6 +225,8 @@ def test_the_catalogues_are_current(name, tool):
         )
 
 
+# `scripts/messages.py extract --check` in CI's Checks job, once per push (#725).
+@pytest.mark.step
 @pytest.mark.parametrize("name", NAMES)
 def test_the_catalogues_are_what_a_fresh_extraction_writes(name, tool):
     """Byte for byte, dates aside -- which is a stricter question than the one above.

@@ -408,6 +408,8 @@ def test_a_plugin_without_a_url_or_licence_claims_neither(tool, plugin_repo):
     assert tool.cmd_extract(check=True) == 0
 
 
+# `scripts/messages.py stats --check` in CI's Checks job, once per push (#725).
+@pytest.mark.step
 def test_the_committed_status_report_is_what_the_catalogues_give(tool):
     # The picker and *Defaults* read locale/status.json and nothing else, so a file nobody
     # refreshed shows languages as complete that are not (#495). CI runs `stats --check`.

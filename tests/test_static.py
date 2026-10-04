@@ -7,9 +7,12 @@ failed the image build while every test passed; this is the test that would have
 it.
 """
 
+import pytest
 from django.core.management import call_command
 
 
+# `manage.py collectstatic` with this storage in CI's Checks job, once per push (#725).
+@pytest.mark.step
 def test_collectstatic_with_the_manifest_storage_succeeds(tmp_path, settings):
     settings.STATIC_ROOT = tmp_path / "static"
     settings.STORAGES = {

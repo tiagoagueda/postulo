@@ -25,6 +25,7 @@ uv run ruff check --fix .
 uv run pytest -n auto        # every core; plain `uv run pytest` is the same suite, slower
                              # (CI runs `-n 2`: its jobs share one host, see ci.yml)
 uv run manage.py makemigrations --check --dry-run
+uv run pytest -m step         # the catalogue and static-file checks CI's Checks job runs
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
