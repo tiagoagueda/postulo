@@ -495,7 +495,7 @@ def test_your_details_saved_untouched_stores_no_empty_row(client, user, language
     html = client.get(reverse("accounts:profile")).content.decode()
     data = as_a_browser_would(html, "phone_numbers-TOTAL_FORMS")
     starts_on = data["phone_numbers-0-number_0"]
-    assert starts_on == ([""] if language == "uk" else [phones.default_country(language)])
+    assert starts_on == [phones.default_country(language)]
     response = client.post(reverse("accounts:profile"), data)
 
     assert response.status_code == 302, refused(response)

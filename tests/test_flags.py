@@ -107,6 +107,17 @@ def test_the_two_maps_never_contradict_each_other():
         )
 
 
+def test_every_language_with_a_flag_starts_its_telephone_field_on_a_country():
+    """The telephone map only has to name the languages whose answer differs from the flag;
+    every other language with a flag country starts on that country, or on the country a
+    subdivision belongs to (#456)."""
+    for code, flag in languages.FLAG_COUNTRIES.items():
+        got = phones.default_country(code)
+        assert got, f"{code} starts its telephone field blank"
+        assert got in phones.BY_CODE
+        assert got == phones.FROM_LANGUAGE.get(code, flag.split("-")[0])
+
+
 # ------------------------------------------------------------------- the tag
 
 

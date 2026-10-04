@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A telephone or address row now starts on the flag's country for every offered language that has one (Ukrainian, Turkish, Catalan, Welsh and 27 more), not only for EU languages. (#456)
 - A bulk status move on the Applications table no longer records the person's own username as the timeline actor ("via alex"); the event actor stays blank, as on every other browser path. (#410)
 - Deleting an offer now ticks off its outstanding answer-by reminder instead of leaving it on the calendar and announced to the person's notifiers. (#444)
 - A suggestion's action is now only accept or decline; any other word answers 404 instead of silently accepting the suggestion into the timeline and possibly moving the application's status. (#447)

@@ -425,7 +425,13 @@ def country_choices() -> list[tuple[str, str]]:
 
 def default_country(language: str = "") -> str:
     """Which country to offer first, given what somebody reads Postulo in."""
-    return FROM_LANGUAGE.get(languages.find(language, FROM_LANGUAGE), "")
+    chosen = FROM_LANGUAGE.get(languages.find(language, FROM_LANGUAGE), "")
+    if chosen:
+        return chosen
+    # Where the telephone answer need not differ from the flag, the flag's country is the
+    # answer; a subdivision (ES-CT, GB-WLS) stands for the country it is part of.
+    country = languages.flag_country(language).split("-")[0]
+    return country if country in BY_CODE else ""
 
 
 # ------------------------------------------------------------- the numbering plans
