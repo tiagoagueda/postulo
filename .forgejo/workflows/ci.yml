@@ -260,10 +260,10 @@ jobs:
           assert Application.objects.exists(), 'the restore brought back an empty instance'
           "
           # The restore is all or nothing (#477). First a table the archive never held
-          # and one that points at auth_user must not survive or block the restore ...
+          # and one that points at accounts_user must not survive or block the restore ...
           psql "postgres://postulo:ci-only-not-a-secret@db:5432/postulo" -v ON_ERROR_STOP=1 -c "
           CREATE TABLE ci_unreferenced (id integer);
-          CREATE TABLE ci_pointing (id integer, owner integer REFERENCES auth_user (id));"
+          CREATE TABLE ci_pointing (id integer, owner integer REFERENCES accounts_user (id));"
           uv run manage.py restore /tmp/postulo-roundtrip.tar.gz --force
           uv run manage.py migrate --check
           uv run manage.py shell -c "
