@@ -412,16 +412,39 @@ class Company(OwnedModel):
             seen.add(node.pk)
             depth += 1
             if depth > self.MAX_DEPTH:
-                raise ValidationError(
-                    {
-                        "parent": _(
-                            "That chain is more than %(limit)s companies deep, which is "
-                            "deeper than any group Postulo can usefully draw."
-                        )
-                        % {"limit": self.MAX_DEPTH}
-                    }
-                )
+                raise self._too_deep()
             node = node.parent
+        # The company may already have companies under it: the chain is what hangs above
+        # the new parent, this company, and the longest run beneath it (#532).
+        if self.pk and depth + self._height_below() - 1 > self.MAX_DEPTH:
+            raise self._too_deep()
+
+    def _too_deep(self) -> ValidationError:
+        return ValidationError(
+            {
+                "parent": _(
+                    "That chain is more than %(limit)s companies deep, which is "
+                    "deeper than any group Postulo can usefully draw."
+                )
+                % {"limit": self.MAX_DEPTH}
+            }
+        )
+
+    def _height_below(self) -> int:
+        """How many companies the longest run under this one holds, itself included."""
+        seen = {self.pk}
+        level = [self]
+        height = 1
+        while True:
+            level = [
+                child
+                for node in level
+                for child in node.children.all()
+                if child.pk not in seen and not seen.add(child.pk)
+            ]
+            if not level:
+                return height
+            height += 1
 
     @property
     def group(self) -> Company:

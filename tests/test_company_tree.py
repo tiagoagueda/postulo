@@ -234,3 +234,21 @@ def test_an_archive_from_before_this_still_reads(user, other_user, group):
     landed = Company.objects.for_user(other_user)
     assert landed.count() == 3, "every company still arrives"
     assert not landed.exclude(parent=None).exists(), "and none of them claims a parent"
+
+
+def test_a_chain_built_from_the_bottom_up_cannot_outgrow_the_cap(user):
+    chain = [Company.objects.create(owner=user, name="Level 0")]
+    for step in range(1, Company.MAX_DEPTH):
+        child_of = chain[-1]
+        top = Company.objects.create(owner=user, name=f"Level {step}")
+        child_of.parent = top
+        child_of.full_clean()
+        child_of.save()
+        chain.append(top)
+
+    new_top = Company.objects.create(owner=user, name="One too many")
+    chain[-1].parent = new_top
+    with pytest.raises(ValidationError) as refused:
+        chain[-1].full_clean()
+
+    assert "more than 10 companies deep" in str(refused.value)
