@@ -20,8 +20,10 @@ SECTIONS: tuple[SettingsSection, ...] = (
             "accounts:invite_list",
             "accounts:invite_create",
             "accounts:invite_revoke",
-            "server:person_admin",
-            "server:person_active",
+            "server:person_username",
+            "server:person_recovery",
+            "server:person_delete",
+            "server:person_plugins",
         ),
     ),
     SettingsSection(

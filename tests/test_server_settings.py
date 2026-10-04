@@ -94,6 +94,22 @@ def test_every_section_renders_inside_the_sidebar(client, admin, url_name):
     assert html.count('aria-current="page"') == 1
 
 
+@pytest.mark.parametrize(
+    "url_name", ["person_username", "person_recovery", "person_delete", "person_plugins"]
+)
+def test_the_person_pages_mark_the_people_entry_as_current(client, admin, other_user, url_name):
+    """The four pages for one account sit under People, and say so (#486)."""
+    client.force_login(admin)
+    response = client.get(reverse(f"server:{url_name}", kwargs={"pk": other_user.pk}))
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert html.count('aria-current="page"') == 1
+    current = re.search(r'<a[^>]*href="([^"]*)"[^>]*aria-current="page"', html) or re.search(
+        r'<a[^>]*aria-current="page"[^>]*href="([^"]*)"', html
+    )
+    assert current and current.group(1) == reverse("server:people")
+
+
 def test_the_menu_shows_server_settings_to_administrators_only(client, user, admin):
     client.force_login(user)
     html = client.get(reverse("core:home")).content.decode()
