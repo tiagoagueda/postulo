@@ -188,6 +188,10 @@ def send_pending(*, limit: int = BATCH) -> tuple[int, int]:
     """Deliver what is due. Returns (sent, failed). Called by the scheduler on every pass."""
     sent = failed = 0
     for row in list(pending()[:limit]):
+        if row.connection is not None and not allows(row.connection):
+            # Asked before the claim, which would move the retry time a lease ahead: a row the
+            # policy has off waits where it is, and resumes the moment it is switched on (#362).
+            continue
         if not claim(row):
             continue
         try:

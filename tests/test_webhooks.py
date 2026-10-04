@@ -242,6 +242,22 @@ def test_a_switched_off_connection_waits_rather_than_spending_its_attempts(user)
     assert WebhookDelivery.objects.get().attempts == 0
 
 
+def test_a_row_the_policy_turned_off_between_listing_and_sending_keeps_its_time(user):
+    """The claim moves the retry time a lease ahead, so it must not be taken for a row that
+    will not be sent: switching the plugin back on resumes it at once (#362)."""
+    webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    before = WebhookDelivery.objects.get().next_attempt_at
+    with (
+        mock.patch.object(webhooks, "allows", lambda connection: False),
+        mock.patch.object(webhook, "post") as posted,
+    ):
+        assert webhooks.send_pending() == (0, 0)
+    assert not posted.called
+    row = WebhookDelivery.objects.get()
+    assert row.next_attempt_at == before and row.attempts == 0
+
+
 def test_a_private_destination_is_refused_at_delivery_too(user, settings):
     """A public hostname can come to point somewhere private later, so the check is not
     only the form's."""
