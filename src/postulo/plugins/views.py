@@ -327,8 +327,12 @@ class ConnectionConsentView(OwnedObjectMixin, View):
         return redirect(where)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ConnectionConsentCallbackView(LoginRequiredMixin, View):
     """Where every provider sends people back, for every connection on the instance.
+
+    Out of the request's transaction: the token exchange waits on the provider, and the
+    tokens are written in a short one of their own (#357).
 
     One address rather than one per plugin, because it is the thing an operator registers by
     hand: registering it once is the difference between this being usable and being a chore
@@ -381,7 +385,14 @@ class ConnectionConsentCallbackView(LoginRequiredMixin, View):
         return redirect("server:email")
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ConnectionTestView(OwnedObjectMixin, View):
+    """*Test*: a login or a real request to the connected server, then what came of it.
+
+    Out of the request's transaction (#357); `record_test` and a token refresh write in
+    short ones of their own.
+    """
+
     def get_queryset(self):
         return Connection.objects.for_user(self.request.user)
 

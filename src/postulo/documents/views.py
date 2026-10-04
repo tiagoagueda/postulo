@@ -693,11 +693,16 @@ class RenderedDownloadView(OwnedObjectMixin, View):
         return serve_private_file(request, document.file, download_name=document.download_name)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class SendCopiesNowView(OwnedObjectMixin, View):
     """*Send now*: try every store this document is still missing from, at once.
 
     The one place a store is called inside a request. It is what the person asked for,
     with the button in front of them, and the outcome is told to them in a sentence.
+
+    Out of the request's transaction (#357): `send_now` schedules in a block of its own, and
+    each copy is claimed and recorded by statements that commit themselves, as the
+    scheduler's pass does.
     """
 
     models = {"upload": UploadedDocument, "render": RenderedDocument}

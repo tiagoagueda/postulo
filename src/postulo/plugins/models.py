@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.models import OwnedModel
@@ -285,7 +285,9 @@ class Connection(OwnedModel):
             self.last_error = ""
         else:
             self.last_error = message or str(_("Failed without saying why."))
-        self.save(update_fields=["last_ok_at", "last_error", "updated_at"])
+        # Its own short transaction: a test waits on the connected server first (#357).
+        with transaction.atomic():
+            self.save(update_fields=["last_ok_at", "last_error", "updated_at"])
 
 
 class SyncLink(OwnedModel):

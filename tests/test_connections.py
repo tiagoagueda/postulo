@@ -430,3 +430,27 @@ def test_the_client_checks_every_request_it_makes(settings, monkeypatch):
         assert session.headers["User-Agent"].startswith("Postulo")
         with pytest.raises(http.DestinationRefused):
             session.get("https://public.example.org/start")
+
+
+@pytest.mark.django_db(transaction=True)
+def test_testing_a_connection_calls_the_server_outside_any_transaction(
+    client, user, atomic_requests, monkeypatch
+):
+    """The call is a login or a request to somebody's server: it must not hold the lock (#357)."""
+    from django.db import connection as database
+
+    seen = []
+    original = EchoNotifier.test
+
+    def test(self, config):
+        seen.append(database.in_atomic_block)
+        return original(self, config)
+
+    monkeypatch.setattr(EchoNotifier, "test", test)
+    connection = a_connection(user)
+    client.force_login(user)
+    client.post(reverse("connections:test", args=[connection.pk]))
+
+    assert seen == [False]
+    connection.refresh_from_db()
+    assert connection.last_ok_at is not None

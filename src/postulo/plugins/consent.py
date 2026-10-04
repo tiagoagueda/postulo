@@ -40,6 +40,7 @@ from __future__ import annotations
 import time
 
 from django.core import signing
+from django.db import transaction
 from django.utils.translation import gettext as _
 
 from .base import Consent
@@ -295,4 +296,7 @@ def _keep(connection, tokens: dict, *, keep_refresh: bool) -> None:
         lifetime = 0
     secrets[EXPIRES_AT] = time.time() + lifetime if lifetime else 0
     connection.secrets = secrets
-    connection.save(update_fields=["secrets_encrypted", "updated_at"])
+    # Its own short transaction: the callers have just waited on the provider and are not in
+    # one (#357).
+    with transaction.atomic():
+        connection.save(update_fields=["secrets_encrypted", "updated_at"])

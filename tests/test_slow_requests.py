@@ -50,6 +50,14 @@ SLOW = [
     ("jobs:company_update", (1,)),
     ("accounts:avatar_refresh", ()),
     ("accounts:profile", ()),
+    ("connections:test", (1,)),
+    ("connections:sync_now", (1,)),
+    ("connections:consent_callback", ()),
+    ("documents:upload_archive", (1,)),
+    ("documents:rendered_archive", (1,)),
+    ("server:email_test", ()),
+    ("server:email_connection_test", ()),
+    ("server:plugin_action", ()),
     ("postulo-api:create_capture", ()),
     ("postulo-api:preview_capture", ()),
 ]
@@ -229,6 +237,30 @@ def test_an_api_capture_is_written_in_a_transaction_of_its_own(db, user, monkeyp
 
     assert response.status_code == 201
     assert seen["depth"] > outside, "the capture was created outside any transaction"
+
+
+def test_a_connection_test_and_a_fresh_token_are_written_in_transactions_of_their_own(
+    db, user, monkeypatch
+):
+    """They follow a wait on the connected server, and cannot rely on the request (#357)."""
+    from postulo.plugins import consent
+    from postulo.plugins.models import Connection
+
+    connection = Connection(owner=user, kind="notifier", plugin="echo", label="x", config={})
+    connection.save()
+    outside = depth()
+    seen: list[int] = []
+    original = Connection.save
+
+    def spy(self, *args, **kwargs):
+        seen.append(depth())
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Connection, "save", spy)
+    connection.record_test(True)
+    consent._keep(connection, {"access_token": "a", "expires_in": 60}, keep_refresh=False)
+
+    assert len(seen) == 2 and all(level > outside for level in seen)
 
 
 def _create_a_capture_through_the_view(user, monkeypatch) -> None:

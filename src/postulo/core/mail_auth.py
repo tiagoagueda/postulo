@@ -31,6 +31,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from django.db import transaction
 from django.utils.translation import gettext_lazy as _
 
 # The choices live with the other mail choices, below the models that store them (#248);
@@ -257,7 +258,10 @@ def keep_tokens(row, answer: dict) -> None:
         lifetime = 0
     secrets["expires_at"] = time.time() + lifetime if lifetime else 0
     row.email_oauth_secrets = secrets
-    row.save(update_fields=["email_oauth_secrets_encrypted", "updated_at"])
+    # Its own short transaction: the callers have just waited on the provider and are not in
+    # one (#357).
+    with transaction.atomic():
+        row.save(update_fields=["email_oauth_secrets_encrypted", "updated_at"])
 
 
 # ------------------------------------------- signing in once, from the Email page

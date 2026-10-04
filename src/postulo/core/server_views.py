@@ -21,11 +21,12 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.core.mail import send_mail
-from django.db import connection
+from django.db import connection, transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from django.views import View
@@ -787,8 +788,12 @@ class EmailView(PolicyView):
         return context
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class EmailConnectionTestView(StaffRequiredMixin, View):
     """Open a connection with what is on screen, and hang up without sending anything.
+
+    Out of the request's transaction (#357): it waits on a mail server and writes nothing
+    but a refreshed token, which `keep_tokens` writes in a block of its own.
 
     On screen, not in the database, so a configuration can be tried before it replaces one
     that works. The password is the exception it has to be: it is never rendered, so a blank
@@ -899,8 +904,12 @@ class EmailConsentView(StaffRequiredMixin, View):
         return redirect(where)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class EmailTestView(StaffRequiredMixin, View):
-    """Send one message, so a configuration can be proven before anyone depends on it."""
+    """Send one message, so a configuration can be proven before anyone depends on it.
+
+    Out of the request's transaction (#357), like the connection test beside it.
+    """
 
     def post(self, request: HttpRequest) -> HttpResponse:
         form = TestEmailForm(request.POST)
@@ -1473,8 +1482,13 @@ def _upgrade_notice(entry) -> str:
     )
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class PluginActionView(StaffRequiredMixin, View):
     """Upload, confirm, install from a catalogue, switch off, remove.
+
+    Out of the request's transaction (#357): a refresh or an install waits on a catalogue and
+    on subprocesses, and none of the actions writes a row (the record is a file; the session
+    is saved by its middleware).
 
     Uploading only *reads* the package: what it says about itself is shown for
     confirmation, and the wheel waits in a scratch directory until an administrator says
