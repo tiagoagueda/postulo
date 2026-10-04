@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Server settings → Plugins: a posted action the page does not have, such as a stale or hand-built form, now gets the polite refusal instead of an Internal Server Error. (#484)
 - Uploading, cancelling or confirming a plugin package now removes only that administrator's own waiting package, so another administrator's package under review is no longer thrown away; abandoned ones are swept after a day. (#485)
 - Server settings: the four per-account pages (username, recovery link, delete account, plugins) now mark People as the current sidebar section (aria-current), as the other sections' sub-pages already did. (#486)
 - A mistyped mail provider or grant, or Google with the application grant, in the environment is now refused at start-up by a new check (postulo.E008) when POSTULO_EMAIL_AUTH is xoauth2; a blank provider is left to the Email page. (#487)

@@ -14,6 +14,7 @@ import secrets
 import sys
 import time
 from pathlib import Path
+from typing import ClassVar
 
 import django
 from django.conf import settings
@@ -1438,9 +1439,22 @@ class PluginActionView(StaffRequiredMixin, View):
     entry points, the licence and the dependencies before somebody else's code runs.
     """
 
+    # What the template posts, and nothing else: a name looked up on the view would also
+    # reach `_switch`, `_allowed_methods` and whatever a base class has (#484).
+    ACTIONS: ClassVar[dict[str, str]] = {
+        "upload": "_upload",
+        "cancel": "_cancel",
+        "confirm": "_confirm",
+        "refresh": "_refresh",
+        "install": "_install",
+        "disable": "_disable",
+        "enable": "_enable",
+        "remove": "_remove",
+    }
+
     def post(self, request: HttpRequest) -> HttpResponse:
-        action = request.POST.get("action", "")
-        handler = getattr(self, f"_{action}", None)
+        method = self.ACTIONS.get(request.POST.get("action", ""))
+        handler = getattr(self, method) if method else None
         if handler is None:
             messages.error(request, _("That is not something this page does."))
             return redirect("server:plugins")

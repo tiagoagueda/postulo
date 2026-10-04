@@ -853,6 +853,14 @@ def test_a_package_nobody_came_back_for_is_swept_after_a_day(client, admin, plug
     assert len(list(scratch.glob("*.whl"))) == 1
 
 
+@pytest.mark.parametrize("action", ["switch", "allowed_methods", "_init__", "_eq__", ""])
+def test_an_action_the_page_does_not_have_is_refused_politely(client, admin, action):
+    client.force_login(admin)
+    response = client.post(reverse("server:plugin_action"), {"action": action}, follow=True)
+    assert response.redirect_chain[-1][0] == reverse("server:plugins")
+    assert "That is not something this page does." in response.content.decode()
+
+
 def test_switching_off_and_removing_from_the_page(client, admin, plugins_dir, installer, tmp_path):
     installing.install_wheel(a_wheel(tmp_path))
     client.force_login(admin)
