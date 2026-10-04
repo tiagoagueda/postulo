@@ -7,7 +7,7 @@ from django.core.management.base import CommandError
 from postulo.applications import analytics
 from postulo.applications.models import Application, Status
 from postulo.documents.models import CV, CoverLetter, UploadedDocument
-from postulo.jobs.models import Capture, Company
+from postulo.jobs.models import Capture, Company, CompanyIdentifier, Contact
 from postulo.resume.models import Experience, Link
 
 
@@ -111,3 +111,35 @@ def test_the_account_keeps_exactly_one_primary_address(seeded):
 
     rows = EmailAddress.objects.filter(user=seeded, primary=True)
     assert [row.email for row in rows] == [seeded.email]
+
+
+@pytest.mark.parametrize("seed", [2026, 5])
+def test_every_seeded_contact_survives_the_form_validation(db, user, seed):
+    # Seed 5 picks João, whose name is not ASCII, as the default seed picks Inês (#423).
+    call_command("seed_demo", user.email, "--no-pdf", "--seed", str(seed), verbosity=0)
+
+    contacts = Contact.objects.for_user(user)
+    assert contacts
+    for contact in contacts:
+        contact.full_clean()
+
+
+def test_some_seed_picks_a_contact_whose_name_is_not_ascii(db, user):
+    call_command("seed_demo", user.email, "--no-pdf", "--seed", "5", verbosity=0)
+
+    assert Contact.objects.for_user(user).filter(name__startswith="João").exists()
+
+
+def test_the_french_location_is_the_experiences_own_city(seeded):
+    experience = Experience.objects.for_user(seeded).get(organisation="Weyland-Yutani")
+    translation = experience.translations.get(language="fr-FR", field="location")
+
+    assert experience.location == "Paris"
+    assert translation.text == "Paris"
+
+
+def test_no_demo_company_carries_a_real_lei(seeded):
+    leis = CompanyIdentifier.objects.for_user(seeded).filter(scheme="lei")
+
+    assert leis
+    assert not leis.filter(value="HWUPKR0MPOU8FGXBT394").exists()

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The demo data is valid and plainly fictional: contact addresses are ASCII, the French CV entry says Paris, and Initech's LEI and the Wikidata ids no longer point at real companies or places. (#423)
 - "Fetch my Gravatar again" no longer shows an unreachable or empty Gravatar as a success: one helper now reports found, none and error as success, info and warning from both places. (#425)
 - Saving Settings → Language and time no longer erases a stored language the instance has withdrawn; the closed row shows the instance default instead of a blank. (#426)
 - The Account page's Two-factor card no longer tells a passkey-only account it has an authenticator app, and now says a password sign-in skips the second factor in a browser marked trusted, for the configured days. (#428)

@@ -18,6 +18,7 @@ from __future__ import annotations
 import datetime as dt
 import random
 import secrets
+import unicodedata
 from dataclasses import dataclass
 
 from django.contrib.auth import get_user_model
@@ -79,14 +80,16 @@ from postulo.resume.models import (
 # --------------------------------------------------------------------- material
 
 #: Identifiers for a few of the companies, so the block on the company page and the
-#: table's optional columns have something to show. The ids are made up, as the
-#: companies are.
+#: table's optional columns have something to show. The LEI, the register numbers and
+#: the slugs are made up, as the companies are (the LEI passes its check digits and
+#: is listed nowhere). The Wikidata items are the real ones that describe the fictional
+#: companies, so the link leads to a page about the fiction and to no real employer.
 DEMO_IDENTIFIERS = {
-    "Aperture Science": (("wikidata", "Q4779874"), ("linkedin", "aperture-science")),
-    "Black Mesa": (("wikidata", "Q2313543"),),
-    "Initech": (("lei", "HWUPKR0MPOU8FGXBT394"), ("crunchbase", "initech")),
-    "Globex Corporation": (("wikidata", "Q5570047"), ("register", "DE HRB 12345")),
-    "Wayne Enterprises": (("wikidata", "Q2586409"), ("opencorporates", "us_de/2345678")),
+    "Aperture Science": (("wikidata", "Q1195255"), ("linkedin", "aperture-science")),
+    "Black Mesa": (("wikidata", "Q1145741"),),
+    "Initech": (("lei", "EXAMPLE0INITECH0033"), ("crunchbase", "initech")),
+    "Globex Corporation": (("register", "DE HRB 12345"),),
+    "Wayne Enterprises": (("wikidata", "Q1982407"), ("opencorporates", "us_de/2345678")),
 }
 
 COMPANIES = [
@@ -148,6 +151,12 @@ CONTACT_NAMES = [
     ("Inês Carvalho", "HR business partner"),
     ("Luc Moreau", "CTO"),
 ]
+
+
+def _ascii_fold(word: str) -> str:
+    """The word without its accents: an address's local part is ASCII only."""
+    return unicodedata.normalize("NFKD", word).encode("ascii", "ignore").decode()
+
 
 #: How an application unfolds: (status, days after applying). A note of None on the
 #: first entry means it was never sent at all.
@@ -557,7 +566,7 @@ class Command(BaseCommand):
                         company=company,
                         name=contact_name,
                         role=role,
-                        email=f"{contact_name.split()[0].lower()}@{website.removeprefix('https://')}",
+                        email=f"{_ascii_fold(contact_name.split()[0]).lower()}@{website.removeprefix('https://')}",
                     )
                 ]
 
@@ -764,8 +773,8 @@ class Command(BaseCommand):
             )
             for field, text in {
                 "role": "Ingénieur back-end principal",
-                "location": "Lisbonne",
-                "summary": "J'ai maintenu en service ce dont les autres équipes dépendaient.",
+                "location": "Paris",
+                "summary": "Équipe plateforme du produit de logistique.",
             }.items()
         )
 
