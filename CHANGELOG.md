@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- the two tallies on the job-search report no longer share one id in Greek, Cyrillic and other non-Latin languages, so each region is named by its own heading. (#629)
 - postulo-messages now writes the project's own licence, name and issues URL into a plugin's catalogue headers instead of Postulo's AGPL line and tracker; the core's catalogues are unchanged. (#417)
 - A pre-release tag no longer moves :latest or the stable minor image tag; the image workflow takes its tags from release_tools.py, and a +build tag is refused. (#418)
 - The 500 page now speaks the reader's language with a matching lang and dir and is styled under the CSP; a refused CSRF token and a bad request get Postulo's own translated pages instead of Django's. (#421)

@@ -182,3 +182,33 @@ def test_an_applications_uploads_name_their_row(client, user):
         registry.unregister_builtin("store", ShelfStore)
     assert 'Download<span class="sr-only">: <bdi>Diploma</bdi></span>' in html
     assert 'Send to stores now<span class="sr-only">: <bdi>Diploma</bdi></span>' in html
+
+
+def test_the_two_tallies_get_their_own_ids_in_any_script():
+    """#629: the id came from slugify of the translated heading, which drops every character
+    outside ASCII, so two Greek headings both became "tally-" and the second region was
+    named by the first one's heading."""
+    from django.template.loader import render_to_string
+
+    def tally(key, heading):
+        return render_to_string(
+            "applications/partials/report_tally.html",
+            {"key": key, "heading": heading, "rows": [], "total": 0},
+        )
+
+    first = tally("sources", "Πού βρέθηκαν")
+    second = tally("industries", "Τι είδους εργοδότης")
+    for html, key, heading in (
+        (first, "sources", "Πού βρέθηκαν"),
+        (second, "industries", "Τι είδους εργοδότης"),
+    ):
+        assert f'aria-labelledby="tally-{key}"' in html
+        assert re.search(rf'<h2 id="tally-{key}"[^>]*>\s*{heading}\s*</h2>', html)
+    assert 'id="tally-sources"' in first and 'id="tally-industries"' in second
+
+
+def test_no_id_is_built_from_translated_text():
+    """An id made by slugify of a heading is empty in every script slugify cannot read."""
+    for path in TEMPLATES.rglob("*.html"):
+        text = path.read_text(encoding="utf-8")
+        assert not re.search(r'\bid="[^"]*\|\s*slugify', text), path

@@ -186,10 +186,10 @@
   {% if report.sources or report.industries %}
     <div class="mb-6 grid gap-6 lg:grid-cols-2">
       {% translate "Where they were found" as found_heading %}
-      {% include "applications/partials/report_tally.html" with rows=report.sources total=report.total heading=found_heading %}
+      {% include "applications/partials/report_tally.html" with rows=report.sources total=report.total heading=found_heading key="sources" %}
       {% translate "What type of employer" as kind_heading %}
       {% translate "A company in several fields counts in each of them, so these can add up to more than everything." as kind_note %}
-      {% include "applications/partials/report_tally.html" with rows=report.industries total=report.total heading=kind_heading note=kind_note %}
+      {% include "applications/partials/report_tally.html" with rows=report.industries total=report.total heading=kind_heading key="industries" note=kind_note %}
     </div>
   {% endif %}
 
