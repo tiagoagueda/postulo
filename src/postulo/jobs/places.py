@@ -26,8 +26,13 @@ from __future__ import annotations
 import logging
 import os
 import unicodedata
+from collections.abc import Iterator
 from functools import lru_cache
 from pathlib import Path
+
+from babel import Locale, UnknownLocaleError
+
+from postulo.core import languages
 
 logger = logging.getLogger(__name__)
 
@@ -110,13 +115,15 @@ def _index() -> dict[str, tuple[dict, ...]]:
 
 @lru_cache(maxsize=1)
 def _countries() -> dict[str, frozenset[str]]:
-    """A country's name to the code the cities carry: its ISO codes and its English name.
+    """A country's name to the code the cities carry: its ISO codes and its names.
 
     ``countryInfo.txt`` has, by column, the ISO code (0), the ISO3 code (1) and the English
     name (4); the capital (5) and the postal-code format (13) are not names of the country
     and are not read, which is what made "Victoria" the Seychelles (#534). The file has no
-    names in other languages, so a country written in one narrows nothing: the matcher says
-    nothing rather than guess. Lines starting with ``#`` are the file's own header.
+    names in other languages, so those come from the CLDR tables Babel carries, in every
+    language Postulo speaks: "España", "Deutschland" and "Ελλάδα" are names of a country
+    too. A name two countries share keeps both codes, and the matcher then says nothing
+    rather than guess. Lines starting with ``#`` are the file's own header.
     """
     path = DATA_DIR / COUNTRIES_FILE
     if not path.is_file():
@@ -132,7 +139,29 @@ def _countries() -> dict[str, frozenset[str]]:
             key = fold(name)
             if key:
                 names.setdefault(key, set()).add(columns[0])
+    for code, name in _translated_countries(
+        frozenset(code for codes in names.values() for code in codes if len(code) == 2)
+    ):
+        key = fold(name)
+        if key:
+            names.setdefault(key, set()).add(code)
     return {key: frozenset(codes) for key, codes in names.items()}
+
+
+def _translated_countries(known: frozenset[str]) -> Iterator[tuple[str, str]]:
+    """Each ``(code, name)`` CLDR gives a country of ``known``, in each language Postulo has.
+
+    Only the codes ``countryInfo.txt`` lists: CLDR also names regions ("Europe", "World")
+    and codes with no country, which no city carries.
+    """
+    for tag in languages.NATIVE_NAMES:
+        try:
+            territories = Locale.parse(tag, sep="-").territories
+        except (UnknownLocaleError, ValueError):
+            continue
+        for code, name in territories.items():
+            if code in known:
+                yield code, name
 
 
 def available() -> bool:

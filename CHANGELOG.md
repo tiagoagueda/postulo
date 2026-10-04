@@ -195,6 +195,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company's location written with the country in another language ("Valencia, España", "Köln, Deutschland") now places it: country names come from the CLDR tables of the new `babel` dependency, in every language Postulo speaks. (#534)
 - Pages that wait on another server (link checks, a logo address, Gravatar, the capture API, connection tests, sending to a store, the mail test) no longer hold the database lock meanwhile; Check them all stops after a minute and says how many links it left. (#357)
 - Restoring a backup on PostgreSQL is all or nothing: the dump is applied by `psql` in one transaction that stops at the first error, so a dump that fails half way leaves the database as it was. (#477)
 - Deleting an account removes its files only once the deletion commits, so a request that fails afterwards no longer leaves rows whose files are gone; an export whose file has gone from the disk says it has expired. (#355)

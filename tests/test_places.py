@@ -289,8 +289,34 @@ def test_a_country_is_known_by_its_codes_and_its_english_name(data_dir):
     assert places.resolve("Valencia, VEN")["country"] == "VE"
 
 
-@pytest.mark.xfail(
-    reason="countryInfo.txt has no names in other languages; needs a source (#534)", strict=True
-)
 def test_a_country_in_another_language_narrows_the_city(data_dir):
     assert places.resolve("Valencia, España")["country"] == "ES"
+
+
+@pytest.mark.parametrize(
+    "text, code",
+    [
+        ("Valencia, España", "ES"),
+        ("Valencia, Espanha", "ES"),
+        ("Valencia, Venezuela", "VE"),
+        ("Berlin, Deutschland", "DE"),
+        ("Tokyo, Japão", "JP"),
+        ("Porto, Πορτογαλία", "PT"),
+        ("Lisboa, portugal", "PT"),
+    ],
+)
+def test_a_country_is_known_by_its_name_in_any_language_postulo_speaks(data_dir, text, code):
+    assert places.resolve(text)["country"] == code
+
+
+def test_a_country_name_two_countries_share_keeps_both(data_dir, monkeypatch):
+    """A name two countries answer to keeps both codes; a city of neither is not placed."""
+    monkeypatch.setattr(
+        places, "_translated_countries", lambda known: iter([("PT", "Iberia"), ("DE", "Iberia")])
+    )
+    places._countries.cache_clear()
+    try:
+        assert places._countries()["iberia"] == {"PT", "DE"}
+        assert places.resolve("Valencia, Iberia") is None
+    finally:
+        places._countries.cache_clear()

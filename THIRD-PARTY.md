@@ -20,6 +20,7 @@ work with no notice beside it, or a work committed here and not listed, fails th
 | htmx | `src/postulo/static/js/vendor/htmx.min.js` | [Big Sky Software](https://htmx.org) | 0BSD | `htmx.LICENSE.txt` beside it. 0BSD asks for no notice; it is carried all the same. |
 | @zxcvbn-ts | `src/postulo/static/js/vendor/zxcvbn/` (core and two dictionaries) | Dan Wheeler and Dropbox, Inc.; [@zxcvbn-ts](https://github.com/zxcvbn-ts/zxcvbn) | MIT | `LICENSE.txt` beside the three files; the three packages carry one identical text. |
 | Natural Earth world outline | `src/postulo/templates/jobs/map/world_outline.html` | [Natural Earth](https://www.naturalearthdata.com) | Public domain | `LICENCE.txt` beside it. A drawing of the 1:110m data, not a copy of it. |
+| Babel and CLDR country names | not in the tree: the `babel` package, installed with the dependencies; read by `src/postulo/jobs/places.py` | [Babel](https://babel.pocoo.org) (the Babel team) and the Unicode CLDR data it carries (Unicode, Inc.) | BSD-3-Clause (Babel); Unicode License v3 (CLDR) | Both notices travel in the installed package's `licenses` files; nothing is copied into this repository. |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | A mark, not a licensed work | `NOTICE.txt` beside them; see [TRADEMARKS.md](TRADEMARKS.md). |
 
 ## How they get here, and how they stay right
