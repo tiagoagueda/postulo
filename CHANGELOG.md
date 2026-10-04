@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Saving the Sign-in or Defaults page no longer overwrites a stored setting that an environment variable pins; all four policy forms now share one rule for dropping pinned fields. (#492)
 - Choosing "Not set here" on a Server settings policy select (registration, single sign-on as second factor, capture options) now stores "unset" instead of silently saving "No". (#493)
 - Server settings → Plugins: a posted action the page does not have, such as a stale or hand-built form, now gets the polite refusal instead of an Internal Server Error. (#484)
 - Uploading, cancelling or confirming a plugin package now removes only that administrator's own waiting package, so another administrator's package under review is no longer thrown away; abandoned ones are swept after a day. (#485)

@@ -40,7 +40,31 @@ class PolicyField(forms.TypedChoiceField):
         return "true" if value else "false"
 
 
-class SignInForm(forms.ModelForm):
+class PinnedPolicyForm(forms.ModelForm):
+    """A form over the site's policy row that never writes a field the environment pins.
+
+    The page draws a notice in place of a pinned input, so the post carries nothing for it
+    and Django would clean that to an empty answer and store it, quietly replacing what an
+    administrator had chosen while the variable shadowed it (#492). The field is dropped
+    from the cleaned data, and so from what the model form saves, so the stored value
+    survives until the variable is removed.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.pinned = {
+            field: variable for field in self.fields if (variable := site.overridden_by(field))
+        }
+
+    def clean(self):
+        cleaned = super().clean()
+        for field in self.pinned:
+            cleaned.pop(field, None)
+            self.errors.pop(field, None)
+        return cleaned
+
+
+class SignInForm(PinnedPolicyForm):
     registration_open = PolicyField(
         label=_("Registration open"),
         help_text=_(
@@ -77,7 +101,7 @@ class SignInForm(forms.ModelForm):
         fields = ("registration_open", "sso_is_second_factor", "email_sign_in")
 
 
-class CaptureForm(forms.ModelForm):
+class CaptureForm(PinnedPolicyForm):
     """How capture behaves, and what it may keep of the page it read (#256).
 
     **A pinned field is refused, not merely drawn read-only**, for the reason `EmailForm`
@@ -131,9 +155,6 @@ class CaptureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["capture_rendering_max_mb"].required = False
-        self.pinned = {
-            field: variable for field in self.fields if (variable := site.overridden_by(field))
-        }
         # The value in force, so a pinned field shows what the instance is doing rather
         # than whatever happens to be stored under it.
         effective = {
@@ -146,13 +167,6 @@ class CaptureForm(forms.ModelForm):
         }
         for field in self.pinned:
             self.initial[field] = effective[field]()
-
-    def clean(self):
-        cleaned = super().clean()
-        for field in self.pinned:
-            cleaned.pop(field, None)
-            self.errors.pop(field, None)
-        return cleaned
 
 
 class OfferedLanguagesForm(forms.ModelForm):
@@ -259,7 +273,7 @@ class OfferedLanguagesForm(forms.ModelForm):
         return languages.native_name(code, code)
 
 
-class DefaultsForm(forms.ModelForm):
+class DefaultsForm(PinnedPolicyForm):
     class Meta:
         model = SiteSettings
         fields = ("instance_name", "tagline", "default_language", "default_time_zone")
@@ -425,7 +439,7 @@ class TestEmailForm(forms.Form):
     to = forms.EmailField(label=_("Send a test message to"))
 
 
-class EmailForm(forms.ModelForm):
+class EmailForm(PinnedPolicyForm):
     """How this instance sends mail, from the interface, with the environment still winning.
 
     Three things here are not ordinary form work.
@@ -590,14 +604,9 @@ class EmailForm(forms.ModelForm):
                 self.fields[name].help_text = sentence
 
     def clean(self):
+        # The base drops every pinned field, so the stored value stays as it was, shadowed
+        # rather than overwritten.
         cleaned = super().clean()
-        # `_post_clean` builds the instance from `cleaned_data`, and skips what is not in
-        # it, so removing a pinned field here is what stops it being written. The stored
-        # value stays as it was, shadowed rather than overwritten -- which is the state the
-        # page warns about, and would be a lie if saving quietly changed it.
-        for field in self.pinned:
-            cleaned.pop(field, None)
-            self.errors.pop(field, None)
         self._suggest_the_port(cleaned)
         self._refuse_a_grant_the_provider_lacks(cleaned)
         return cleaned

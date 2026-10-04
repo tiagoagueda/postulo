@@ -624,3 +624,30 @@ def test_an_empty_backup_directory_still_says_none_yet(client, admin, settings, 
     client.force_login(admin)
 
     assert "none yet" in client.get(reverse("server:overview")).content.decode()
+
+
+def test_saving_sign_in_keeps_a_stored_answer_the_environment_pins(client, admin, monkeypatch):
+    """A pinned field is shadowed, not overwritten (#492)."""
+    row = SiteSettings.get()
+    row.registration_open = True
+    row.save()
+    monkeypatch.setenv("POSTULO_REGISTRATION_OPEN", "false")
+    client.force_login(admin)
+    response = client.post(reverse("server:signin"), {"email_sign_in": "true"})
+    assert response.status_code == 302
+    row = SiteSettings.get()
+    assert row.registration_open is True
+    assert row.email_sign_in is True
+
+
+def test_saving_defaults_keeps_a_stored_time_zone_the_environment_pins(client, admin, monkeypatch):
+    row = SiteSettings.get()
+    row.default_time_zone = "Europe/Lisbon"
+    row.save()
+    monkeypatch.setenv("POSTULO_TIME_ZONE", "UTC")
+    client.force_login(admin)
+    response = client.post(reverse("server:defaults"), {"instance_name": "Jobs at Home"})
+    assert response.status_code == 302
+    row = SiteSettings.get()
+    assert row.default_time_zone == "Europe/Lisbon"
+    assert row.instance_name == "Jobs at Home"
