@@ -481,6 +481,28 @@ def reschedule_interview(interview: Interview, *, starts_at, ends_at, actor: str
     return interview
 
 
+#: One whole sentence per kind of interview, because the noun's case and article are the
+#: catalogue's to decide, not Python's (#392): lower-casing a translated label flattens an
+#: acronym and misspells a German noun.
+_NO_SHOW = {
+    InterviewKind.PHONE: _("Nobody showed up for the phone screen"),
+    InterviewKind.VIDEO: _("Nobody showed up for the video call"),
+    InterviewKind.ONSITE: _("Nobody showed up for the on-site interview"),
+    InterviewKind.PANEL: _("Nobody showed up for the panel"),
+    InterviewKind.ASSESSMENT: _("Nobody showed up for the assessment or test"),
+    InterviewKind.OTHER: _("Nobody showed up for the interview"),
+}
+
+
+def _no_show_sentence(value: str, label):
+    """The no-show entry for an interview of kind ``value``; an unlisted kind gets the
+    generic sentence, with its label as written."""
+    sentence = _NO_SHOW.get(value)
+    if sentence is not None:
+        return sentence
+    return _("Nobody showed up for the interview: %(kind)s") % {"kind": label}
+
+
 @transaction.atomic
 def settle_interview(
     interview: Interview, outcome: str, *, note: str = "", actor: str = ""
@@ -525,7 +547,7 @@ def settle_interview(
         record_event(
             application,
             kind=EventKind.INTERVIEW,
-            summary=str(_("Nobody showed up for the %(kind)s") % {"kind": str(kind).lower()}),
+            summary=str(_no_show_sentence(interview.kind, kind)),
             body=note,
             occurred_at=interview.starts_at,
             actor=actor,

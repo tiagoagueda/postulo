@@ -82,8 +82,8 @@ def test_the_header_says_what_a_click_would_do(client, user):
 
     html = client.get(reverse(LIST) + "?sort=postings").content.decode()
 
-    assert "Stop sorting by postings" in html
-    assert "Sort by applications, highest first" in html
+    assert "Stop sorting by Postings" in html
+    assert "Sort by Applications, highest first" in html
 
 
 def test_the_link_that_gives_up_drops_the_parameter(client, user):

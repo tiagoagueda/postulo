@@ -184,7 +184,7 @@ class Control:
 
     @property
     def filter_label(self) -> str:
-        return str(_("Filter by %(column)s") % {"column": str(self.label).lower()})
+        return str(_("Filter by %(column)s") % {"column": str(self.label)})
 
     @property
     def given(self) -> tuple[tuple[str, str], ...]:
@@ -692,12 +692,10 @@ class Table:
         """What clicking would do, in words, for the link nobody can see an arrow on."""
         wanted = self.next_sort(column)
         if wanted is None:
-            return str(_("Stop sorting by %(column)s") % {"column": str(column.label).lower()})
+            return str(_("Stop sorting by %(column)s") % {"column": str(column.label)})
         if wanted.startswith("-"):
-            return str(
-                _("Sort by %(column)s, highest first") % {"column": str(column.label).lower()}
-            )
-        return str(_("Sort by %(column)s, lowest first") % {"column": str(column.label).lower()})
+            return str(_("Sort by %(column)s, highest first") % {"column": str(column.label)})
+        return str(_("Sort by %(column)s, lowest first") % {"column": str(column.label)})
 
     # ----------------------------------------------------------------- filters
 

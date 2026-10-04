@@ -707,3 +707,39 @@ def test_the_date_detector_knows_the_difference():
     assert spelled_out_dates('{{ x|date:"SHORT_MONTH_DATE_FORMAT" }}', TEMPLATE_DATE) == [
         (1, "SHORT_MONTH_DATE_FORMAT")
     ]
+
+
+# ------------------------------------------- a label, lowercased in Python (#392)
+
+PYTHON_SOURCES = sorted((Path(__file__).resolve().parents[1] / "src" / "postulo").rglob("*.py"))
+
+#: Where a label is lower-cased on purpose: the one name here and why.
+LOWERCASED_ON_PURPOSE: dict[tuple[str, str], str] = {}
+
+
+def lowercased_in_python(text: str) -> list[int]:
+    """Line numbers where a choice's display or a ``label`` is lower-cased in Python.
+
+    `get_kind_display().lower()` and `str(column.label).lower()` are the same mistake as
+    `|lower` in a template: English typography applied to a word a translator wrote.
+    """
+    pattern = re.compile(r"(?:get_\w+_display\(\)|\blabel\b)\s*\)?\s*\.lower\(\)")
+    return [text.count("\n", 0, match.start()) + 1 for match in pattern.finditer(text)]
+
+
+@pytest.mark.parametrize("path", PYTHON_SOURCES, ids=lambda p: p.name)
+def test_no_python_lowercases_a_translated_label(path: Path):
+    """Let the catalogue decide the case: a whole sentence per value, or a pattern with the
+    in-sentence form, never `.lower()` on the label (#168, #392)."""
+    lines = lowercased_in_python(path.read_text(encoding="utf-8"))
+    rel = path.relative_to(PYTHON_SOURCES[0].parents[2]).as_posix()
+    lines = [line for line in lines if (rel, str(line)) not in LOWERCASED_ON_PURPOSE]
+    assert not lines, f"{rel}: a translated label is lowercased at line(s) {lines}"
+
+
+def test_the_python_detector_knows_the_difference():
+    assert lowercased_in_python("x = sent.get_kind_display().lower()") == [1]
+    assert lowercased_in_python("a\nb = str(self.label).lower()") == [2]
+    assert lowercased_in_python("b = str(column.label).lower()") == [1]
+    assert lowercased_in_python("host = request.POST.get('host').lower()") == []
+    assert lowercased_in_python("label.strip().lower()") == []

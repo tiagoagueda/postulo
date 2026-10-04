@@ -410,6 +410,26 @@ def search_uploads(user, query: str, limit: int) -> Found:
     return take(rows, limit, build)
 
 
+#: Keyed by the stored value of the kind (`documents.kinds.DocumentKind`), which core may not
+#: import. Whole sentences per kind of document, so the catalogue cases and inflects the noun
+#: itself (#392). A kind a plugin adds has no entry and takes the sentence that names its
+#: label as written.
+_SENT_TO = {
+    "cv": _("in the CV you sent to %(company)s on %(when)s"),
+    "cover_letter": _("in the cover letter you sent to %(company)s on %(when)s"),
+    "motivation_letter": _("in the motivation letter you sent to %(company)s on %(when)s"),
+    "portfolio": _("in the portfolio you sent to %(company)s on %(when)s"),
+    "report": _("in the report you sent to %(company)s on %(when)s"),
+}
+_RENDERED_ON = {
+    "cv": _("in the CV rendered on %(when)s"),
+    "cover_letter": _("in the cover letter rendered on %(when)s"),
+    "motivation_letter": _("in the motivation letter rendered on %(when)s"),
+    "portfolio": _("in the portfolio rendered on %(when)s"),
+    "report": _("in the report rendered on %(when)s"),
+}
+
+
 def search_sent(user, query: str, limit: int) -> Found:
     """The text of what was actually sent: "what did I claim?" without opening a PDF."""
     from postulo.documents.models import RenderedDocument
@@ -427,20 +447,23 @@ def search_sent(user, query: str, limit: int) -> Found:
         application = sent.application
         when = _day(sent.rendered_at)
         if application is not None:
+            sentence = _SENT_TO.get(sent.kind) or _(
+                "in the document (%(kind)s) you sent to %(company)s on %(when)s"
+            )
             subtitle = str(
-                _("in the %(kind)s you sent to %(company)s on %(when)s")
+                sentence
                 % {
-                    "kind": sent.get_kind_display().lower(),
+                    "kind": sent.get_kind_display(),
                     "company": application.posting.company.name,
                     "when": when,
                 }
             )
             url = application.get_absolute_url()
         else:
-            subtitle = str(
-                _("in the %(kind)s rendered on %(when)s")
-                % {"kind": sent.get_kind_display().lower(), "when": when}
+            sentence = _RENDERED_ON.get(sent.kind) or _(
+                "in the document (%(kind)s) rendered on %(when)s"
             )
+            subtitle = str(sentence % {"kind": sent.get_kind_display(), "when": when})
             url = reverse("documents:rendered_list")
         return Hit(
             kind="sent",

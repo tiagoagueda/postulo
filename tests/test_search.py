@@ -110,7 +110,7 @@ def test_everything_is_searched_and_grouped_and_nothing_of_anyone_elses(user, wo
 def test_the_text_you_sent_says_where_it_went(user, world):
     groups = kinds(searching.search(user, "calibration"))
     hit = groups["sent"].hits[0]
-    assert hit.subtitle == "in the cv you sent to Aperture Science on 12 May 2026"
+    assert hit.subtitle == "in the CV you sent to Aperture Science on 12 May 2026"
     assert hit.url == world["application"].get_absolute_url()
     assert "calibration team" in hit.excerpt
 
@@ -187,7 +187,16 @@ def test_the_api_returns_the_same_groups(client, user, world):
     groups = {group["kind"]: group for group in response.json()}
     assert groups["listings"]["hits"][0]["title"] == "Portal Researcher"
     assert groups["listings"]["hits"][0]["web_url"].startswith("http://testserver/")
-    assert groups["sent"]["hits"][0]["subtitle"].startswith("in the cv you sent to Aperture")
+    assert groups["sent"]["hits"][0]["subtitle"].startswith("in the CV you sent to Aperture")
     assert all(len(group["hits"]) <= 2 for group in groups.values())
     assert client.get("/api/v1/search?q=p", **headers).json() == []
     assert client.get("/api/v1/search", **headers).status_code == 422, "q is required"
+
+
+def test_a_sent_cover_letter_is_named_by_its_own_sentence(user, world):
+    """The sentence is whole per kind, so a catalogue cases the noun itself (#392)."""
+    rendered = RenderedDocument.objects.get(application=world["application"])
+    rendered.kind = "cover_letter"
+    rendered.save()
+    hit = kinds(searching.search(user, "calibration"))["sent"].hits[0]
+    assert hit.subtitle == "in the cover letter you sent to Aperture Science on 12 May 2026"

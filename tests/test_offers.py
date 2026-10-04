@@ -314,3 +314,17 @@ def test_offers_leave_with_the_export_and_come_back(user, other_user, applicatio
     assert restored.base_amount == Decimal("65000") and restored.benefits == "Pension"
     assert restored.answer_by == a_week_out()
     assert restored.reminder is not None and restored.reminder.owner == other_user
+
+
+def test_the_terms_keep_the_catalogues_case(user, application, german):
+    """The period's in-sentence form is the catalogue's; Python does not lower-case a label
+    (#392)."""
+    offer = Offer(
+        owner=user,
+        application=application,
+        base_amount=Decimal("65000"),
+        currency="EUR",
+        period=SalaryPeriod.YEAR,
+    )
+    with german({"%(figure)s %(currency)s per year": "%(figure)s %(currency)s Pro Jahr"}):
+        assert offer.terms.endswith("EUR Pro Jahr")

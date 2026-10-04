@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Translated labels are no longer lower-cased inside sentences: no-show entries, offer terms, sent-document search hits and table filter/sort names now keep the catalogue's capitalisation in every language, and CV stays CV. (#392)
 - The spreadsheet import preview names each status instead of its key, skip reasons and the row-count sentence are translatable with plural forms, the summary shows labelled counts, and the tab title follows the language. (#395)
 - The Browser and Email notifier labels, the "This is before the start date." career error and the unreadable-secrets message now go through translation, so they appear in the reader's language. (#566)
 - Every dated career entry (Experience, Education, Project, Certification) now refuses an end date before its start, and the error message is translatable instead of English in every language. (#621)

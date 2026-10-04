@@ -227,3 +227,28 @@ def third_party(monkeypatch):
         yield InstalledSource.name
     finally:
         registry._cache.pop("source", None)
+
+
+@pytest.fixture
+def german(monkeypatch):
+    """German active, with the catalogue entries a test hands it, whatever is compiled (#392).
+
+    ``german({"msgid": "Nachricht"})`` writes those entries into the German catalogue for the
+    test and returns the context in which they are read. A test of *how a sentence is built*
+    needs a translation that differs from the English, and the compiled catalogues are not
+    this suite's to depend on.
+    """
+    from contextlib import contextmanager
+
+    from django.utils import translation
+    from django.utils.translation import trans_real
+
+    @contextmanager
+    def active(entries: dict[str, str]):
+        with translation.override("de"):
+            catalogue = trans_real.translation("de")._catalog._catalogs[0]
+            for msgid, text in entries.items():
+                monkeypatch.setitem(catalogue, msgid, text)
+            yield
+
+    return active

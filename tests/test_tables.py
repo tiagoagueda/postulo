@@ -338,7 +338,7 @@ def test_the_header_carries_live_filter_inputs_and_the_sort_in_force(client, use
     body = client.get(reverse("applications:list"), {"sort": "-applied"}).content.decode()
     assert 'name="company"' in body and 'form="application-filters"' in body
     assert 'hx-trigger="input changed delay:300ms, search"' in body
-    assert 'aria-label="Filter by company"' in body
+    assert 'aria-label="Filter by Company"' in body
     assert 'name="sort" value="-applied" form="application-filters"' in body
     assert "hx-preserve" in body
 
@@ -422,7 +422,7 @@ def test_the_sort_is_an_icon_now_and_still_says_what_it_will_do(client, user, se
     body = client.get(reverse("jobs:company_list"), {"sort": "name"}).content.decode()
 
     assert 'id="sort-name"' in body
-    assert 'aria-label="Sort by name, highest first"' in body
+    assert 'aria-label="Sort by Name, highest first"' in body
     assert 'data-icon="arrow-up"' in body, "the state it is in"
     assert 'data-icon="chevrons-up-down"' in body, "and a picture for the state that had none"
     assert "tap-target shrink-0" in body
@@ -488,7 +488,7 @@ def test_the_header_and_the_phone_block_draw_the_same_control(client, user, sear
     live = body.split('id="filter-location"')[1][:600]
     quiet = body.split('id="filter-location-narrow"')[1][:600]
     assert "hx-get" in live and "hx-get" not in quiet
-    assert 'aria-label="Filter by location"' in live
+    assert 'aria-label="Filter by Location"' in live
     assert "aria-label" not in quiet, "the phone block draws a visible label instead"
 
 
@@ -859,3 +859,19 @@ def test_the_pages_own_apply_is_not_drawn_where_narrow_is(client, user, search, 
     (button,) = [b for b in found.buttons if b["_form"] is form]
     assert button["type"] == "submit", "still the form's, for Enter in a header's box"
     assert any(form_of(i) == form_id and "hx-get" in i for i in found.inputs)
+
+
+def test_the_filter_and_sort_names_carry_the_label_as_the_catalogue_wrote_it(german, rf):
+    """No lower-casing in Python (#392): a German noun keeps its capital, an acronym its case."""
+    from dataclasses import replace
+
+    entries = {
+        "Filter by %(column)s": "Nach %(column)s filtern",
+        "Sort by %(column)s, highest first": "Nach %(column)s sortieren, höchste zuerst",
+    }
+    table = CompaniesTable(rf.get("/", {"sort": "name"}))
+    column = replace(next(column for column in table.columns if column.key == "name"), label="CV")
+    with german(entries):
+        control = tables.Control(kind="text", name="name", key="name", label="Unternehmen CV")
+        assert control.filter_label == "Nach Unternehmen CV filtern"
+        assert table.sort_hint(column) == "Nach CV sortieren, höchste zuerst"

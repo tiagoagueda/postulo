@@ -151,7 +151,7 @@ def test_the_status_header_holds_the_status_the_outcome_and_gone_quiet(client, u
 
     # The first list sits under the column's own name and is named by it; the second asks
     # something else and has its word written above it; the tick box has its word beside it.
-    assert status["aria-label"] == "Filter by status"
+    assert status["aria-label"] == "Filter by Status"
     assert "aria-label" not in state and '<label for="filter-state"' in cell
     assert ">Outcome</label>" in cell and '<label for="filter-status"' not in cell
     assert "Gone quiet" in cell.split('id="filter-quiet"')[1].split("</label>")[0]
@@ -171,7 +171,7 @@ def test_the_tag_is_in_the_header_of_the_column_that_shows_the_tags(client, user
     body = page(client, user)
     role = controls(header_cell(body, "role"))
     assert [c["name"] for c in role.inputs] == ["role", "tag"]
-    assert role.inputs[0]["aria-label"] == "Filter by role"
+    assert role.inputs[0]["aria-label"] == "Filter by Role"
     assert '<label for="filter-tag"' in header_cell(body, "role")
     options = header_cell(body, "role").split('id="filter-tag"')[1].split("</select>")[0]
     assert 'value="dream-job"' in options and 'value="remote"' in options
@@ -462,9 +462,9 @@ def test_a_header_cell_is_called_by_its_columns_name(client, user, search):
     assert 'aria-sort="ascending"' in head_of(body).split('data-col="role"')[1].split(">")[0]
 
     cell = header_cell(body, "status")
-    assert 'aria-label="Filter by status"' in cell and '<label for="filter-state"' in cell
+    assert 'aria-label="Filter by Status"' in cell and '<label for="filter-state"' in cell
     assert 'role="img" aria-label="Status is filtered"' in cell, "the mark on the name stays"
-    assert 'aria-label="Sort by status, lowest first"' in cell
+    assert 'aria-label="Sort by Status, lowest first"' in cell
 
     # On every table, and for a column that has no filter to open.
     client.force_login(user)

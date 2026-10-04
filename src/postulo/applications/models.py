@@ -934,6 +934,16 @@ YEARLY_UNITS = {
 }
 
 
+#: The money and its period as one pattern per period, so a catalogue sets the order and
+#: the case of the period's in-sentence form itself (#392).
+_OFFER_TERMS = {
+    SalaryPeriod.YEAR: _("%(figure)s %(currency)s per year"),
+    SalaryPeriod.MONTH: _("%(figure)s %(currency)s per month"),
+    SalaryPeriod.DAY: _("%(figure)s %(currency)s per day"),
+    SalaryPeriod.HOUR: _("%(figure)s %(currency)s per hour"),
+}
+
+
 class Offer(OwnedModel):
     """What was actually offered, as against what was advertised (#237).
 
@@ -1033,8 +1043,10 @@ class Offer(OwnedModel):
         if amount is None:
             return ""
         figure = number_format(amount.normalize(), use_l10n=True, force_grouping=True)
-        period = str(self.get_period_display()).lower()
-        return f"{figure} {self.currency} {period}".replace("  ", " ").strip()
+        pattern = _OFFER_TERMS.get(self.period)
+        if pattern is None:
+            return f"{figure} {self.currency}".strip()
+        return str(pattern % {"figure": figure, "currency": self.currency}).strip()
 
     @property
     def yearly_amount(self) -> Decimal | None:
