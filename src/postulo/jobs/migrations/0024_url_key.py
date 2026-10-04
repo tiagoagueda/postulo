@@ -30,7 +30,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('applications', '0015_type_labels'),
-        ('jobs', '0022_type_labels'),
+        ('jobs', '0023_industry_slugs'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
