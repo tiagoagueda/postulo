@@ -176,7 +176,7 @@ class Command(BaseCommand):
         from postulo.documents.archiving import send_pending
         from postulo.jobs import pages
         from postulo.jobs.closing import announce_closing_postings
-        from postulo.notifications import webhooks
+        from postulo.notifications import inbox, webhooks
         from postulo.plugins import policy
         from postulo.plugins.syncing import run_syncs
 
@@ -201,7 +201,7 @@ class Command(BaseCommand):
             # The two things #247 leaves lying about: an export archive holding a whole
             # account, and a week of errand rows nobody is watching any more. Reaped on the
             # pass that already exists rather than by a second timer.
-            reaped = reap_archives() + errands.forget_old()
+            reaped = reap_archives() + errands.forget_old() + inbox.forget_old()
             # The pages of captures that never became a listing, past the days the
             # instance keeps them (#256). The captures stay; the copies of the pages go.
             pages_gone = pages.expire_unconfirmed()

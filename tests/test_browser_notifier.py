@@ -346,6 +346,29 @@ def test_shown_and_stale_notices_are_cleared_when_the_next_one_arrives(user):
     assert list(BrowserNotice.objects.for_user(user).values_list("title", flat=True)) == ["New"]
 
 
+def test_a_notice_past_its_week_is_not_handed_to_a_tab_and_is_gone(user):
+    from django.utils import timezone
+
+    inbox.leave(user, Notification(event="reminder_due", title="Old"))
+    BrowserNotice.objects.update(created_at=timezone.now() - inbox.KEPT_FOR - inbox.SAME_WITHIN)
+
+    assert inbox.collect(user) == []
+    assert not BrowserNotice.objects.exists()
+
+
+def test_the_scheduler_pass_reaps_shown_and_expired_notices_of_every_account(user):
+    from django.utils import timezone
+
+    long_ago = timezone.now() - inbox.KEPT_FOR - inbox.SAME_WITHIN
+    BrowserNotice.objects.create(owner=user, event="reminder_due", title="Shown", shown_at=long_ago)
+    BrowserNotice.objects.create(owner=user, event="reminder_due", title="Old")
+    BrowserNotice.objects.create(owner=user, event="reminder_due", title="Fresh")
+    BrowserNotice.objects.filter(title="Old").update(created_at=long_ago)
+
+    assert inbox.forget_old() == 2
+    assert list(BrowserNotice.objects.values_list("title", flat=True)) == ["Fresh"]
+
+
 # --------------------------------------------------------------------------- the pages
 
 

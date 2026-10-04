@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A browser notice older than a week is no longer shown to the next tab you open; expired and already-shown notices are also cleared on the scheduler pass, not only when a new notice arrives. (#577)
 - A deactivated account no longer gets due reminders, webhook posts, syncs or document copies sent on its behalf; its queued rows wait and resume if the account is reactivated. (#575)
 - A scheduler pass that outlives its lease no longer deletes the next pass's lease, and a sync connection is claimed before it runs, so overlapping passes no longer sync it twice. (#576)
 - Two runs of one sync connection no longer overlap: Sync now during a scheduler pass, or from two tabs, reports that a sync is already running instead of duplicating contacts. (#586)

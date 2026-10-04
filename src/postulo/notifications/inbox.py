@@ -26,6 +26,25 @@ TITLE_LENGTH = 300
 BODY_LENGTH = 1000
 
 
+def expire(notices, now=None) -> int:
+    """Delete the notices in ``notices`` that are older than :data:`KEPT_FOR`."""
+    now = now or timezone.now()
+    deleted, _rows = notices.filter(created_at__lt=now - KEPT_FOR).delete()
+    return deleted
+
+
+def forget_old() -> int:
+    """Drop every account's shown and expired notices. Called by the scheduler.
+
+    :func:`leave` only tidies the table of the person it is leaving a notice for, so a table
+    nobody is announced to would keep its rows past the week the model promises.
+    """
+    from .models import BrowserNotice
+
+    deleted, _rows = BrowserNotice.objects.filter(shown_at__isnull=False).delete()
+    return deleted + expire(BrowserNotice.objects.all())
+
+
 def leave(user, notification) -> bool:
     """Keep ``notification`` for ``user``'s next open tab. False if it was already waiting."""
     from .models import BrowserNotice
@@ -33,7 +52,7 @@ def leave(user, notification) -> bool:
     now = timezone.now()
     mine = BrowserNotice.objects.for_user(user)
     mine.filter(shown_at__isnull=False).delete()
-    mine.filter(created_at__lt=now - KEPT_FOR).delete()
+    expire(mine, now)
 
     title = str(notification.title)[:TITLE_LENGTH]
     body = str(notification.body or "")[:BODY_LENGTH]
@@ -61,6 +80,7 @@ def collect(user) -> list[dict]:
     """
     from .models import BrowserNotice
 
+    expire(BrowserNotice.objects.for_user(user))
     waiting = list(
         BrowserNotice.objects.for_user(user)
         .filter(shown_at__isnull=True)
