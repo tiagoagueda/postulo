@@ -9,9 +9,11 @@ from postulo.plugins import secrets
 class Command(BaseCommand):
     help = (
         "Restore an archive written by `backup` onto this instance. Nothing else may be "
-        "using the database while it runs — in the container, `docker compose stop postulo "
-        "scheduler` and then `docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo "
-        "python manage.py restore /app/data/backups/....tar.gz`. Refuses an instance that "
+        "using the database while it runs — in the container, `docker compose --profile "
+        "scheduler --profile worker stop` and then `docker compose run --rm "
+        "-e POSTULO_SKIP_MIGRATE=1 postulo python manage.py restore "
+        "/app/data/backups/....tar.gz`, and `up -d` with the same profiles afterwards. "
+        "Refuses an instance that "
         "already has accounts unless --force is given, and then replaces everything."
     )
 

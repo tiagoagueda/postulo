@@ -534,6 +534,25 @@ def test_a_restore_refuses_while_something_else_is_using_the_database(tmp_path, 
     assert restore_backup(archive, force=True).counts["users"] == 1
 
 
+def test_the_advice_to_stop_the_stack_names_every_service_whatever_its_profile(
+    tmp_path, monkeypatch
+):
+    """The worker keeps the database open too, and a profile's service is not named by a bare
+    ``stop``: both the refusal and ``restore --help`` must say to stop all of them (#541)."""
+    a_search()
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+    User.objects.all().delete()
+    monkeypatch.setattr(backup_module, "busy_reason", lambda: "the worker has it open")
+
+    with pytest.raises(BackupError) as refused:
+        restore_backup(archive)
+    from postulo.core.management.commands.restore import Command
+
+    for text in (str(refused.value), Command.help):
+        assert "--profile scheduler --profile worker stop" in text
+        assert "worker" in text
+
+
 def test_sqlite_notices_another_process_by_the_files_wal_leaves_behind(tmp_path, monkeypatch):
     """WAL keeps `-shm` beside the database for as long as any connection is open (#206)."""
     database = {

@@ -141,9 +141,9 @@ def busy_reason() -> str | None:
     """What else is using the database right now, in words, or ``None`` if nothing is.
 
     A restore does not write a new database and swap it in: it overwrites the one that is
-    there, through SQLite's backup API or ``pg_restore --clean``. A gunicorn worker or the
-    scheduler reading through that is reading a database that is changing underneath it,
-    and the answers it gives are nobody's.
+    there, through SQLite's backup API or ``pg_restore --clean``. A gunicorn worker, the
+    scheduler or the background worker reading through that is reading a database that is
+    changing underneath it, and the answers it gives are nobody's.
 
     What can be seen differs by engine, and neither engine sees everything:
 
@@ -546,8 +546,9 @@ def restore_backup(
     if not force and (reason := busy_reason()):
         raise BackupError(
             f"Something else is using the database: {reason}. A restore overwrites it "
-            "underneath whatever is reading it. Stop the web service and the scheduler "
-            "first — in the container, `docker compose stop postulo scheduler`, then "
+            "underneath whatever is reading it. Stop the web service, the scheduler and the "
+            "worker first — in the container, `docker compose --profile scheduler --profile "
+            "worker stop`, then "
             "`docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo python manage.py "
             "restore ...` — or pass --force if you are certain nothing else is connected."
         )
