@@ -594,10 +594,14 @@ def test_a_slow_upload_does_not_hold_the_database(user):
     from django.urls import resolve
 
     slow = resolve("/api/v1/captures/1/rendering").func
-    ordinary = resolve("/api/v1/captures").func
+    # These two wait on the posting's own server when no `html` is sent (#357), and write in
+    # short transactions of their own.
+    fetching = [resolve("/api/v1/captures").func, resolve("/api/v1/captures/preview").func]
 
     assert getattr(slow, "_non_atomic_requests", set()) == {"default"}
-    assert not getattr(ordinary, "_non_atomic_requests", set())
+    for view in fetching:
+        assert getattr(view, "_non_atomic_requests", set()) == {"default"}
+    assert not getattr(resolve("/api/v1/captures/1").func, "_non_atomic_requests", set())
     assert not getattr(resolve("/api/v1/me").func, "_non_atomic_requests", set())
 
 

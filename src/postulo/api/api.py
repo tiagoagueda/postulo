@@ -35,6 +35,7 @@ from decimal import Decimal
 from typing import Annotated
 from urllib.parse import urlsplit
 
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -492,15 +493,37 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             ]
         )
 
-    capture = Capture.objects.create(
-        owner=owner,
-        url=url[:500],
-        source_name=source.name,
-        source_version=getattr(source, "version", ""),
-        origin="api",
-        data=data.model_dump(mode="json"),
-        status=CaptureStatus.PENDING,
-    )
+    # **The capture's own writes are one short transaction, and the request is not (#357).**
+    # The fetch above and the notifiers below wait on somebody else's server, and a transaction
+    # for the whole request would hold SQLite's write lock for every second of it. The row, the
+    # page it keeps and what its review will learn from succeed or fail together; the errand
+    # is sent after they commit, which is also when a worker can see the capture it is told of.
+    #
+    # What was parsed, kept beside what it was read as, where the instance and the owner
+    # have both said so and the request has not asked for less (#256). After the capture
+    # and never instead of it: a source that is too large to keep, or an account with no
+    # room left, is a sentence in the answer beside a capture that was made.
+    keeping = pages.keeping_for(owner)
+    if payload.keep is not None:
+        keeping = keeping.narrowed(source=payload.keep.source)
+    with transaction.atomic():
+        capture = Capture.objects.create(
+            owner=owner,
+            url=url[:500],
+            source_name=source.name,
+            source_version=getattr(source, "version", ""),
+            origin="api",
+            data=data.model_dump(mode="json"),
+            status=CaptureStatus.PENDING,
+        )
+        _page, note = pages.keep_source_quietly(capture, html, keeping)
+        # What its review will learn from, and what the corrections sent with it teach now:
+        # the same act as correcting a field on the review screen, only earlier (#267).
+        if payload.data is not None:
+            remembered.after_capture(capture, handed, html, read=read, corrected=data)
+        else:
+            remembered.after_capture(capture, handed, html)
+
     # The one event a person cannot see coming: something arrived from outside. Their
     # notifiers, if any, hear about it; the capture is saved whether or not they do.
     #
@@ -548,26 +571,11 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             at=capture.created_at.isoformat(),
         )
 
-    # What was parsed, kept beside what it was read as, where the instance and the owner
-    # have both said so and the request has not asked for less (#256). After the capture
-    # and never instead of it: a source that is too large to keep, or an account with no
-    # room left, is a sentence in the answer beside a capture that was made. And last of
-    # the work, because a file is the one thing here a failed request cannot take back.
-    keeping = pages.keeping_for(owner)
-    if payload.keep is not None:
-        keeping = keeping.narrowed(source=payload.keep.source)
-    _page, note = pages.keep_source_quietly(capture, html, keeping)
-    # What its review will learn from, and what the corrections sent with it teach now:
-    # the same act as correcting a field on the review screen, only earlier (#267).
-    if payload.data is not None:
-        remembered.after_capture(capture, handed, html, read=read, corrected=data)
-    else:
-        remembered.after_capture(capture, handed, html)
-
     body = _as_output(request, capture, keeping=keeping, note=note)
     # Kept before the answer goes out, so that a client which retries because it never saw
     # the answer is retrying against something already written down.
-    answer.keep(201, body)
+    with transaction.atomic():
+        answer.keep(201, body)
     return body
 
 
@@ -836,7 +844,11 @@ api.add_router("/profile", profile.router)
 #: of theirs. Sending a rendering is the slow call here: megabytes read off a connection
 #: that may be a telephone's, a piece at a time, and none of that reading is a write. What
 #: it writes is one row, when the file is whole, in a statement of its own.
-OUTSIDE_A_TRANSACTION = frozenset({"attach_rendering"})
+#:
+#: The capture calls wait on the posting's own server (and, with no worker, on every notifier)
+#: and write in short transactions of their own (#357). `GET /captures` is answered by the
+#: same address function, so it leaves the transaction too; it only reads.
+OUTSIDE_A_TRANSACTION = frozenset({"attach_rendering", "create_capture", "preview_capture"})
 
 
 def urls():
@@ -848,7 +860,6 @@ def urls():
     very patterns that are handed to the resolver. `api.urls` builds its patterns afresh
     each time it is read, which is why this returns the ones it marked.
     """
-    from django.db import transaction
     from django.urls import re_path
 
     patterns, application, namespace = api.urls

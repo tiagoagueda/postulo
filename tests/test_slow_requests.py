@@ -50,6 +50,8 @@ SLOW = [
     ("jobs:company_update", (1,)),
     ("accounts:avatar_refresh", ()),
     ("accounts:profile", ()),
+    ("postulo-api:create_capture", ()),
+    ("postulo-api:preview_capture", ()),
 ]
 
 #: Ordinary pages, which stay inside the request's transaction. Listed so that a future
@@ -184,6 +186,48 @@ def test_a_capture_is_written_in_a_transaction_of_its_own(db, user, monkeypatch)
     monkeypatch.setattr(Capture, "save", spy)
     _create_a_capture_through_the_view(user, monkeypatch)
 
+    assert seen["depth"] > outside, "the capture was created outside any transaction"
+
+
+def test_an_api_capture_is_written_in_a_transaction_of_its_own(db, user, monkeypatch, client):
+    """The API's capture is out of the request's transaction (#357), so its row, its page and
+    what its review will learn from are written inside one that is short."""
+    import json
+
+    from postulo.api.models import ApiToken
+    from postulo.jobs.models import Capture
+
+    _record, raw = ApiToken.issue(user, "Test device")
+    outside = depth()
+    seen: dict[str, int] = {}
+    original = Capture.save
+
+    def spy(self, *args, **kwargs):
+        seen["depth"] = depth()
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Capture, "save", spy)
+    page = (
+        '<html><head><script type="application/ld+json">'
+        + json.dumps(
+            {
+                "@context": "https://schema.org/",
+                "@type": "JobPosting",
+                "title": "Chemist",
+                "hiringOrganization": {"name": "Aperture"},
+                "description": "<p>x</p>",
+            }
+        )
+        + "</script></head></html>"
+    )
+    response = client.post(
+        "/api/v1/captures",
+        data=json.dumps({"url": "https://example.org/jobs/1", "html": page}),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {raw}",
+    )
+
+    assert response.status_code == 201
     assert seen["depth"] > outside, "the capture was created outside any transaction"
 
 

@@ -665,3 +665,46 @@ def test_a_refused_fetch_explains_itself_where_the_fetch_is_watched(client, user
     page = client.get(response.url).content.decode()
     assert "That did not work." in page and "403" in page
     assert not Capture.objects.for_user(user).exists()
+
+
+# -------------------------------------- no transaction while the posting is fetched (#357)
+
+
+@pytest.mark.django_db(transaction=True)
+@pytest.mark.parametrize("address", ["/api/v1/captures", "/api/v1/captures/preview"])
+def test_the_posting_is_fetched_outside_any_transaction(
+    client, bearer, address, atomic_requests, monkeypatch
+):
+    from django.db import connection
+
+    from postulo.plugins.fetching import FetchedPage
+
+    seen = []
+
+    def fetch(url):
+        seen.append(connection.in_atomic_block)
+        return FetchedPage(url=url, html=PAGE)
+
+    monkeypatch.setattr("postulo.api.api.fetch_page", fetch)
+
+    response = client.post(
+        address,
+        data=json.dumps({"url": "https://example.org/jobs/1"}),
+        content_type="application/json",
+        **bearer,
+    )
+
+    assert response.status_code in (200, 201)
+    assert seen == [False]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_capture_made_with_a_key_is_still_replayed_outside_the_request_transaction(
+    client, bearer, user, atomic_requests
+):
+    first = post_capture(client, bearer, key="abc", url="https://example.org/jobs/1", html=PAGE)
+    again = post_capture(client, bearer, key="abc", url="https://example.org/jobs/1", html=PAGE)
+
+    assert first.status_code == again.status_code == 201
+    assert again.json() == first.json()
+    assert Capture.objects.for_user(user).count() == 1
