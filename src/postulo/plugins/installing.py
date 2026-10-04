@@ -52,6 +52,7 @@ import functools
 import hashlib
 import importlib.util
 import logging
+import os
 import re
 import shutil
 import subprocess
@@ -692,18 +693,28 @@ def restore_snapshot() -> bool:
     if not previous.is_dir():
         return False
     directory = plugins_dir()
+    # The record is never absent in between: a request in another worker that read it in the
+    # gap would see no switched-off plugin and so run them all (#382). It is replaced in one
+    # step below, or removed once nothing else is, when the snapshot never had one.
+    record_name = record_path().name
     for item in _copyable(directory):
-        if item.name == PREVIOUS_NAME:
+        if item.name in (PREVIOUS_NAME, record_name):
             continue
         if item.is_dir():
             shutil.rmtree(item, ignore_errors=True)
         else:
             item.unlink(missing_ok=True)
     for item in previous.iterdir():
-        if item.is_dir():
+        if item.name == record_name:
+            scratch = directory / ".plugins.json.writing"
+            shutil.copy2(item, scratch)
+            os.replace(scratch, directory / record_name)
+        elif item.is_dir():
             shutil.copytree(item, directory / item.name, symlinks=True)
         else:
             shutil.copy2(item, directory / item.name)
+    if not (previous / record_name).exists():
+        (directory / record_name).unlink(missing_ok=True)
     _forget_metadata_cache()
     return True
 

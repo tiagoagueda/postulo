@@ -190,6 +190,29 @@ def test_the_previous_state_is_kept_and_can_be_returned_to(tmp_path, plugins_dir
     assert "version = '1.0'" in text, "the files went back too, not only the record"
 
 
+def test_the_record_is_never_missing_while_the_directory_is_put_back(
+    tmp_path, plugins_dir, installer, monkeypatch
+):
+    """A request in another worker that read the record in a gap would see no plugin switched
+    off and run them all, which is what the record failing closed is meant to stop (#382)."""
+    import shutil
+
+    installing.install_wheel(a_wheel(tmp_path, version="1.0"))
+    installing.install_wheel(a_wheel(tmp_path, version="2.0"))
+    seen = []
+    copytree = shutil.copytree
+
+    def watching(source, destination, *args, **kwargs):
+        seen.append(installing.record_path().is_file())
+        return copytree(source, destination, *args, **kwargs)
+
+    monkeypatch.setattr(installing.shutil, "copytree", watching)
+
+    installing.roll_back()
+
+    assert seen and all(seen), "the record was there every time the files were being copied"
+
+
 def test_rolling_back_the_first_install_of_all_takes_it_away(tmp_path, plugins_dir, installer):
     """The state before the first install is no plugin at all, and that is a state."""
     installing.install_wheel(a_wheel(tmp_path))
