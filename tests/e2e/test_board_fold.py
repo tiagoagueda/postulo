@@ -2163,6 +2163,8 @@ def test_the_board_passes_axe_open_and_folded(live_server, page: Page, axe_sourc
     failures = []
 
     def look(what: str) -> None:
+        # A strip's name is fading in after a fold; axe reads the colour it has mid-way.
+        still(page)
         found = violations_on(page, axe_source)
         if found:
             failures.append(describe(f"{what} ({scheme})", found))
