@@ -522,11 +522,14 @@ catalogue, so nothing enforces it there. `postulo-templates` is not a package an
 no version at all, deliberately: a template pack is copied, not installed.
 
 
-Every push to `main` builds an image and publishes it as **`:dev`**, alongside a pinnable
-`:<version>-dev.<short sha>` — `dev-image.yml`. It exists so a change can be run somewhere
-real before it is in a release, and it is **not** a release: unsupported, never `:latest`,
-and free to change a database in ways a release will not. Quote the pinned tag in a bug
-report; `:dev` moves and says nothing about what somebody was running.
+Every push to `main` that CI passes builds an image and publishes it as **`:dev`**,
+alongside a pinnable `:<version>-dev.<short sha>` — `dev-image.yml`. The job starts with the
+push and waits for the commit's CI (`scripts/release_tools.py wait-ci`), so a commit the
+tests failed on is never published, and the build does not compete with the tests for the
+host. It exists so a change can be run somewhere real before it is in a release, and it is
+**not** a release: unsupported, never `:latest`, and free to change a database in ways a
+release will not. Quote the pinned tag in a bug report; `:dev` moves and says nothing about
+what somebody was running.
 
 It is scanned by the same `scripts/scan-image.sh` a release is, because a dev image somebody
 runs against their own applications is an image. It is built for `linux/amd64` and

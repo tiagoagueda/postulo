@@ -6,6 +6,7 @@
     python scripts/release_tools.py publish v0.2.0 dist/*    # a Forgejo release with those files
     python scripts/release_tools.py attach v0.2.0 sbom.json  # one more file on that release
     python scripts/release_tools.py verify-image v0.2.0 --registry host --image owner/name
+    python scripts/release_tools.py wait-ci <commit>         # wait for CI; did it pass?
 
 Standard library only, so it runs on the runner's Python without installing anything -- and
 the docker runner's Python is Ubuntu's 3.10, so nothing newer is used. ``publish`` and
@@ -26,6 +27,7 @@ import mimetypes
 import os
 import re
 import sys
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -166,25 +168,17 @@ def supported_pythons(root: Path = ROOT) -> tuple[str, ...]:
     return found
 
 
-def ci_problems(
-    ref: str, *, server: str, repository: str, token: str, every_python: bool = True
-) -> list[str]:
-    """What stands between ``ref`` and a release: every required job not recorded as a success.
-
-    Empty means go. The combined status is asked for by the tag itself, so the answer is
-    about the commit the tag points at, whichever branch it was pushed from.
-
-    A push to `main` runs the unit tests on the newest Python alone, so a release also needs
-    a leg on every supported Python, which the *Every Python* workflow, started by hand on
-    the commit, provides (#713);
-    ``every_python=False`` asks only what a push's own run answers.
-    """
+def _statuses(ref: str, *, server: str, repository: str, token: str) -> dict[str, str]:
+    """The latest state of each CI context Forgejo records on ``ref``."""
     base = _repository_api(server, repository)
     combined = _api("GET", f"{base}/commits/{urllib.parse.quote(ref, safe='')}/status", token)
-    recorded = {
+    return {
         status.get("context", ""): status.get("status", "")
         for status in (combined or {}).get("statuses") or []
     }
+
+
+def _problems(recorded: dict[str, str], ref: str, *, every_python: bool) -> list[str]:
     problems = []
     for what, pattern in REQUIRED_JOBS:
         matching = sorted(context for context in recorded if pattern.match(context))
@@ -202,6 +196,67 @@ def ci_problems(
                     "Python only; start *Every Python* by hand on this commit for the rest"
                 )
     return problems
+
+
+def ci_problems(
+    ref: str, *, server: str, repository: str, token: str, every_python: bool = True
+) -> list[str]:
+    """What stands between ``ref`` and a release: every required job not recorded as a success.
+
+    Empty means go. The combined status is asked for by the tag itself, so the answer is
+    about the commit the tag points at, whichever branch it was pushed from.
+
+    A push to `main` runs the unit tests on the newest Python alone, so a release also needs
+    a leg on every supported Python, which the *Every Python* workflow, started by hand on
+    the commit, provides (#713); ``every_python=False`` asks only what a push's own run answers.
+    """
+    recorded = _statuses(ref, server=server, repository=repository, token=token)
+    return _problems(recorded, ref, every_python=every_python)
+
+
+#: The states a commit status holds while its job has not finished: queued, blocked behind
+#: the runner's two slots, or running. Anything else is the job's answer.
+UNDECIDED = frozenset({"", "pending", "waiting", "blocked", "running"})
+
+
+def wait_for_ci(
+    ref: str,
+    *,
+    server: str,
+    repository: str,
+    token: str,
+    minutes: float = 90.0,
+    every: float = 30.0,
+    sleep=time.sleep,
+    clock=time.monotonic,
+) -> list[str]:
+    """Wait until CI has answered for ``ref``, and say what stands in the way; empty is a pass.
+
+    The dev image is built only from a commit CI passed (#716). It cannot simply follow the
+    tests with `needs:`: the dev-image job must not run for a pull request or a release
+    branch, and this runner fails a job whose `if` is false rather than skipping it. So the
+    dev-image workflow starts with the push, as before, and waits here. What it waits for is
+    what a push's own run answers -- the same jobs the release gate asks for, on the newest
+    Python. A job not recorded yet or still running is waited for; the first that ends in
+    anything but a pass ends the wait. A run cancelled by a newer push is not a pass, so it
+    is the newer push's image that gets built.
+    """
+    deadline = clock() + minutes * 60
+    while True:
+        recorded = _statuses(ref, server=server, repository=repository, token=token)
+        problems = _problems(recorded, ref, every_python=False)
+        if not problems:
+            return []
+        required = [
+            context
+            for context in recorded
+            if any(pattern.match(context) for _what, pattern in REQUIRED_JOBS)
+        ]
+        if any(recorded[context] not in UNDECIDED | {"success"} for context in required):
+            return problems  # one has failed: there is nothing left worth waiting for
+        if clock() >= deadline:
+            return [*problems, f"CI had not answered for {ref} after {minutes:g} minutes."]
+        sleep(every)
 
 
 def check(tag: str, root: Path = ROOT) -> str:
@@ -446,6 +501,14 @@ def main(argv: list[str] | None = None) -> int:
         ),
     )
 
+    waiter = commands.add_parser(
+        "wait-ci", help="Wait for CI on a commit, and fail unless it passed."
+    )
+    waiter.add_argument("ref", help="the commit, as a full or short hash, or a branch")
+    waiter.add_argument(
+        "--minutes", type=float, default=90.0, help="how long to wait before giving up"
+    )
+
     noter = commands.add_parser("notes", help="Print that version's changelog section.")
     noter.add_argument("version")
     noter.add_argument("-o", "--output", type=Path)
@@ -484,6 +547,15 @@ def main(argv: list[str] | None = None) -> int:
                     listed = "".join(f"\n  {problem}" for problem in problems)
                     raise ReleaseError(f"CI has not passed on {args.tag}:{listed}")
                 print(f"{args.tag}: every test leg and the browser job passed.")
+        elif args.command == "wait-ci":
+            server, repository, token = _forgejo()
+            problems = wait_for_ci(
+                args.ref, server=server, repository=repository, token=token, minutes=args.minutes
+            )
+            if problems:
+                listed = "".join(f"\n  {problem}" for problem in problems)
+                raise ReleaseError(f"CI has not passed on {args.ref}:{listed}")
+            print(f"{args.ref}: CI passed.")
         elif args.command == "notes":
             body = changelog_section(args.version)
             if args.output:

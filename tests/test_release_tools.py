@@ -494,3 +494,121 @@ def test_the_check_command_fails_in_words_when_ci_did_not_pass(monkeypatch, caps
         "CI has not passed" in said
         and "CI / Unit tests and coverage (Python 3.14) (push): failure" in said
     )
+
+
+# ------------------------------------------- waiting for CI before the dev image (#716)
+
+
+def answering(monkeypatch, *answers):
+    """`_api` giving each call the next of ``answers``, and the last one for ever after."""
+    queue = list(answers)
+    asked = []
+
+    def api(method, url, token, body=None, content_type="application/json"):
+        asked.append(url)
+        return queue.pop(0) if len(queue) > 1 else queue[0]
+
+    monkeypatch.setattr(tools, "_api", api)
+    return asked
+
+
+class Clock:
+    """A clock that moves only when the code under test sleeps."""
+
+    def __init__(self):
+        self.now = 0.0
+
+    def __call__(self):
+        return self.now
+
+    def sleep(self, seconds):
+        self.now += seconds
+
+
+RUNNING = statuses(
+    ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
+    ("CI / Browser tests (Chromium) (push)", "pending"),
+    ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
+)
+
+
+def wait(clock, **options):
+    return tools.wait_for_ci(
+        "abc123",
+        server="https://f",
+        repository="o/r",
+        token="t",
+        sleep=clock.sleep,
+        clock=clock,
+        **options,
+    )
+
+
+def test_the_dev_image_waits_for_ci_and_goes_once_it_passes(monkeypatch):
+    clock = Clock()
+    asked = answering(monkeypatch, statuses(), RUNNING, A_PUSH)
+
+    assert wait(clock) == []
+    assert len(asked) == 3, "not recorded yet, then running, then passed"
+    assert clock.now == 60
+
+
+def test_a_failed_job_ends_the_wait_without_waiting_for_the_rest(monkeypatch):
+    """The browser is still running, but a red check already means no image."""
+    clock = Clock()
+    answering(
+        monkeypatch,
+        statuses(
+            ("CI / Unit tests and coverage (Python 3.14) (push)", "pending"),
+            ("CI / Browser tests (Chromium) (push)", "pending"),
+            ("CI / Checks: lint (push)", "failure"),
+        ),
+    )
+
+    problems = wait(clock)
+
+    assert "CI / Checks: lint (push): failure" in problems
+    assert clock.now == 0
+
+
+def test_a_run_cancelled_by_a_newer_push_builds_nothing(monkeypatch):
+    clock = Clock()
+    answering(
+        monkeypatch,
+        statuses(*PUSHED[::2], ("CI / Browser tests (Chromium) (push)", "cancelled")),
+    )
+
+    assert wait(clock) == ["CI / Browser tests (Chromium) (push): cancelled"]
+
+
+def test_the_wait_gives_up_and_says_so(monkeypatch):
+    clock = Clock()
+    answering(monkeypatch, RUNNING)
+
+    problems = wait(clock, minutes=2)
+
+    assert problems[-1] == "CI had not answered for abc123 after 2 minutes."
+    assert clock.now == 120
+
+
+def test_a_push_is_not_asked_for_every_python(monkeypatch):
+    """The older Pythons run weekly and before a release; a push's image cannot wait for them."""
+    clock = Clock()
+    answering(monkeypatch, A_PUSH)
+
+    assert wait(clock) == []
+
+
+def test_the_wait_command_fails_unless_ci_passed(monkeypatch, capsys):
+    monkeypatch.setenv("FORGEJO_URL", "https://f")
+    monkeypatch.setenv("FORGEJO_REPOSITORY", "o/r")
+    monkeypatch.setenv("FORGEJO_TOKEN", "t")
+    monkeypatch.setattr(tools.time, "sleep", lambda seconds: None)
+    answering(monkeypatch, statuses(*PUSHED[:2], ("CI / Checks: lint (push)", "failure")))
+
+    assert tools.main(["wait-ci", "abc123"]) == 1
+    assert "CI / Checks: lint (push): failure" in capsys.readouterr().err
+
+    answering(monkeypatch, A_PUSH)
+    assert tools.main(["wait-ci", "abc123"]) == 0
+    assert "abc123: CI passed." in capsys.readouterr().out
