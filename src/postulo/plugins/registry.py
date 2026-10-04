@@ -48,7 +48,9 @@ from .base import (
     TransportPlugin,
 )
 from .builtin import BUILTIN_SOURCES
+from .locale import forget_registered as forget_registered_locales
 from .locale import register_plugin_locale
+from .themes import forget_registered as forget_registered_templates
 from .themes import register_plugin_themes
 
 logger = logging.getLogger(__name__)
@@ -274,7 +276,36 @@ def catch_up() -> bool:
     # The files under the directory changed, so what the import machinery remembers about
     # what is installed there is out of date with them.
     metadata.MetadataPathFinder.invalidate_caches()
+    rebuild_registrations()
     return True
+
+
+def rebuild_registrations() -> None:
+    """Forget what plugins registered, then register what is loaded now (#609).
+
+    Loading a plugin registers its document themes, its template directory, its catalogues
+    and, when its mark is first shown, a copy of the mark. Clearing ``_cache`` undid none of
+    that, so a plugin switched off kept offering its theme, and one removed left documents
+    set in it resolving to a template that was gone: a server error on export. Everything is
+    forgotten and every plugin that is still on registers again, built-ins first, so the
+    answer is the one a restart would give. The caller has already moved ``_stamp``, so the
+    lookups made here do not come back through ``catch_up``.
+    """
+    from postulo.documents import themes as document_themes
+
+    from . import logos
+
+    document_themes.forget()
+    logos.forget()
+    forget_registered_templates()
+    forget_registered_locales()
+    register_builtin_locales()
+    register_builtin_themes()
+    for kind in GROUPS:
+        try:
+            plugins(kind, refresh=True)
+        except Exception:  # pragma: no cover - a kind that cannot even be enumerated
+            logger.exception("The %s plugins could not be loaded again", kind)
 
 
 def plugins(kind: str, *, refresh: bool = False) -> list:

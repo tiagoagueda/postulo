@@ -1077,15 +1077,15 @@ def _forget_metadata_cache() -> None:
     the install -- and the plugin the administrator had just watched arrive was not there
     until something else happened to refresh it (#228).
     """
-    from .registry import GROUPS
-    from .registry import plugins as registry_plugins
+    from .registry import rebuild_registrations
 
     metadata.MetadataPathFinder.invalidate_caches()
-    for kind in GROUPS:
-        try:
-            registry_plugins(kind, refresh=True)
-        except Exception:  # pragma: no cover - the registry logs the plugin that broke
-            logger.exception("Refreshing the %s plugins failed after an install", kind)
+    # Every kind, and what each loaded plugin registered with it: a removed plugin's theme
+    # and template directory went on being offered until a restart (#609).
+    try:
+        rebuild_registrations()
+    except Exception:  # pragma: no cover - the registry logs the plugin that broke
+        logger.exception("Refreshing the plugins failed after an install")
 
 
 def _every_builtin(registry) -> list:

@@ -286,3 +286,17 @@ def test_a_plugin_with_no_logo_gets_the_initials_tile_the_interface_already_uses
 
     assert 'aria-hidden="true"' in html, "the tile is decorative, beside a name that is not"
     assert "<img" not in html.split('data-policy="europass"')[1][:500], "nothing to show yet"
+
+
+def test_a_rebuild_of_the_registry_forgets_every_logo(loaded, monkeypatch):
+    """An upgraded plugin showed its old mark until a restart (#609)."""
+    from postulo.plugins import record, registry
+
+    assert logos.logo_for(loaded) is not None
+    assert logos._cache
+
+    monkeypatch.setattr(record, "record_stamp", lambda: "moved")
+    monkeypatch.setattr(registry, "_stamp", "before")
+    registry.catch_up()
+
+    assert logos._cache == {}

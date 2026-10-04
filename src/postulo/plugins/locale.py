@@ -76,8 +76,8 @@ def register_locale_dir(path: Path | str) -> bool:
     Django caches the merged catalogue per language the first time it is asked for it, so
     adding a path afterwards means throwing those caches away; the next ``gettext`` call
     rebuilds them with the new directory included. Every caller is a plugin being
-    registered, and every plugin is registered while the apps are loading, so the throwing
-    away happens at start-up and never during a request.
+    registered, which happens while the apps load and again, since #228, inside whichever
+    request first notices that the record of installed plugins moved (`registry.catch_up`).
 
     Appended, never prepended, and that decides who wins: Django merges
     ``reversed(LOCALE_PATHS)`` with each merge overriding the last, so the *first* path
@@ -95,6 +95,23 @@ def register_locale_dir(path: Path | str) -> bool:
     trans_real._default = None
     logger.debug("Reading translations from %s", path)
     return True
+
+
+def forget_registered() -> None:
+    """Take back every catalogue directory a plugin registered, and the merged catalogues.
+
+    Called when the registry is rebuilt, so that a plugin that was removed or switched off
+    stops being read and those still on register again (#609).
+    """
+    if not _registered:
+        return
+    taken = {str(Path(one).resolve()) for one in _registered}
+    settings.LOCALE_PATHS = [
+        one for one in settings.LOCALE_PATHS if str(Path(one).resolve()) not in taken
+    ]
+    _registered.clear()
+    trans_real._translations = {}
+    trans_real._default = None
 
 
 def register_plugin_locale(module_name: str) -> bool:

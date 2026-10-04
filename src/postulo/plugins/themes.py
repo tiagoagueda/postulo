@@ -85,6 +85,24 @@ def _forget_the_engines() -> None:
     engines._engines = {}
 
 
+def forget_registered() -> None:
+    """Take back every template directory a plugin registered, and rebuild the engines.
+
+    What a plugin that was loaded put in front of the renderer stays there until it is told
+    otherwise, so a rebuild of the registry (#228) starts from nothing and lets every
+    plugin that is still on register again (#609).
+    """
+    if not _registered:
+        return
+    taken = {str(Path(one).resolve()) for one in _registered}
+    configured = settings.TEMPLATES[0].get("DIRS", [])
+    settings.TEMPLATES[0]["DIRS"] = [
+        one for one in configured if str(Path(one).resolve()) not in taken
+    ]
+    _registered.clear()
+    _forget_the_engines()
+
+
 def themes_of(plugin) -> list[themes.Theme]:
     """What this plugin says it can set documents in.
 

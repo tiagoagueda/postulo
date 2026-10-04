@@ -483,7 +483,8 @@ def test_a_plugin_the_registry_rejects_registers_nothing_either(monkeypatch):
 
     loaded = [plugin.name for plugin in registry.plugins("notifier", refresh=True)]
     assert "shapeless" not in loaded
-    assert registered == [], "nothing of it was registered on the way past"
+    # A rebuild registers the built-ins again (#609); the rejected package is not among them.
+    assert "postulo_shapeless" not in registered, "nothing of it was registered on the way past"
 
 
 def test_a_plugin_that_exits_at_import_takes_nothing_with_it(monkeypatch):

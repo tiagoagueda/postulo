@@ -19,6 +19,7 @@ removing a plugin quietly took somebody's documents with it.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
 import pytest
 from django.core.exceptions import ValidationError
@@ -365,3 +366,91 @@ def test_the_surface_is_where_a_plugin_gets_the_two_names_it_needs():
     assert api.Theme is themes.Theme
     assert api.ThemeKind is themes.Kind
     assert {"Theme", "ThemeKind"} <= set(api.__all__)
+
+
+# ------------------------------------------- what a plugin that goes away takes with it
+
+
+@pytest.fixture
+def vellum_installed(theme_plugin, settings, monkeypatch):
+    """Vellum as an installed distribution that the record can switch off (#609).
+
+    Returns the set of switched-off distribution names; the record's stamp moves by hand,
+    as it does when another process writes the file.
+    """
+    from importlib.metadata import EntryPoint
+
+    from postulo.plugins import locale as plugin_locale
+    from postulo.plugins import record, registry
+    from postulo.plugins import themes as plugin_themes
+
+    settings.TEMPLATES = [{**settings.TEMPLATES[0], "DIRS": list(settings.TEMPLATES[0]["DIRS"])}]
+    off: set[str] = set()
+    stamp = ["one"]
+
+    class Dist:
+        name = "postulo-vellum"
+
+    entry = EntryPoint(name="vellum", value="vellum:Vellum", group=registry.GROUPS["feature"])
+    monkeypatch.setattr(entry.__class__, "dist", Dist(), raising=False)
+    real = registry.entry_points
+    monkeypatch.setattr(
+        registry,
+        "entry_points",
+        lambda group: [entry] if group == registry.GROUPS["feature"] else real(group=group),
+    )
+    monkeypatch.setattr(registry, "_disabled", lambda: set(off))
+    monkeypatch.setattr(record, "record_stamp", lambda: stamp[0])
+    monkeypatch.setattr(registry, "_stamp", None)
+    registry._cache.clear()
+    before = (list(plugin_themes._registered), list(plugin_locale._registered))
+    yield off, stamp
+    themes.forget()
+    registry._cache.clear()
+    plugin_themes._registered[:] = before[0]
+    plugin_locale._registered[:] = before[1]
+
+
+def test_switching_a_theme_plugin_off_takes_its_theme_with_it(vellum_installed):
+    """It stayed in the pickers, and documents set in it still rendered (#609)."""
+    from postulo.plugins import registry
+
+    off, stamp = vellum_installed
+    registry.plugins("feature")
+    assert themes.find("vellum") is not None, "loaded, so offered"
+    assert themes.template_for("vellum", themes.Kind.LETTER) == "vellum/letter.html"
+
+    off.add("postulo-vellum")
+    stamp[0] = "two"
+    registry.plugins("feature")
+
+    assert themes.find("vellum") is None
+    assert "vellum" not in [one.name for one in themes.for_kind(themes.Kind.LETTER)]
+    assert themes.template_for("vellum", themes.Kind.LETTER) == themes.template_for(
+        themes.DEFAULT, themes.Kind.LETTER
+    ), "falls back to the default, as it does after a restart"
+
+
+def test_the_templates_of_a_plugin_that_went_away_are_no_longer_read(
+    vellum_installed, theme_plugin, settings
+):
+    from postulo.plugins import registry
+
+    off, stamp = vellum_installed
+    directory = (theme_plugin / "templates").resolve()
+
+    def read() -> bool:
+        return directory in [Path(one).resolve() for one in settings.TEMPLATES[0]["DIRS"]]
+
+    registry.plugins("feature")
+    assert read()
+
+    off.add("postulo-vellum")
+    stamp[0] = "two"
+    registry.plugins("feature")
+    assert not read()
+
+    off.clear()
+    stamp[0] = "three"
+    registry.plugins("feature")
+    assert read() and themes.find("vellum") is not None, "and back again"
