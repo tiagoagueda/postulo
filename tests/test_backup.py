@@ -669,6 +669,81 @@ def test_postgres_needs_pg_dump_and_calls_it_the_right_way(tmp_path, monkeypatch
     assert kwargs["env"] is not None
 
 
+def _fake_postgres_restore(monkeypatch, *, psql_fails=False, pg_restore_fails=False):
+    """Stand in for pg_restore and psql; return the list of (args, script text) calls."""
+    calls = []
+
+    class Result:
+        def __init__(self, returncode, stderr=""):
+            self.returncode = returncode
+            self.stderr = stderr
+
+    def fake_run(args, **kwargs):
+        script = next(a for a in args if a.startswith("--file=")).removeprefix("--file=")
+        if args[0].endswith("pg_restore"):
+            if pg_restore_fails:
+                return Result(1, "could not read the dump")
+            Path(script).write_text("DROP TABLE IF EXISTS public.x;\n", encoding="utf-8")
+            calls.append((args, None, script))
+            return Result(0)
+        calls.append((args, Path(script).read_text(encoding="utf-8"), script))
+        return Result(3, "ERROR: boom") if psql_fails else Result(0)
+
+    monkeypatch.setattr(backup_module, "database_vendor", lambda: "postgresql")
+    monkeypatch.setattr(backup_module.shutil, "which", lambda name: f"/usr/bin/{name}")
+    monkeypatch.setattr(backup_module.subprocess, "run", fake_run)
+    monkeypatch.setattr(backup_module.connection, "close", lambda: None)
+    return calls
+
+
+def test_a_postgres_restore_runs_one_transaction_that_stops_at_the_first_error(
+    tmp_path, monkeypatch
+):
+    calls = _fake_postgres_restore(monkeypatch)
+    dump = tmp_path / "database.dump"
+    dump.write_bytes(b"PGDMP fake")
+    backup_module.load_database(dump, "database.dump")
+
+    (made, _, made_script), (ran, text, ran_script) = calls
+    # pg_restore only writes a script: it is given no database to change.
+    assert made[0] == "/usr/bin/pg_restore" and not any(a.startswith("--dbname") for a in made)
+    assert made[-1] == str(dump)
+    assert ran[0] == "/usr/bin/psql"
+    assert "--single-transaction" in ran and "--set=ON_ERROR_STOP=1" in ran
+    # What is there is emptied first, inside the same transaction, ahead of the dump's own.
+    assert text.index("DROP TABLE IF EXISTS public.%I CASCADE") < text.index(
+        "DROP TABLE IF EXISTS public.x;"
+    )
+    assert made_script == ran_script and not Path(ran_script).exists()
+
+
+def test_a_failed_postgres_restore_says_nothing_was_restored_and_cleans_up(tmp_path, monkeypatch):
+    calls = _fake_postgres_restore(monkeypatch, psql_fails=True)
+    dump = tmp_path / "database.dump"
+    dump.write_bytes(b"PGDMP fake")
+    with pytest.raises(BackupError, match="nothing was restored: ERROR: boom"):
+        backup_module.load_database(dump, "database.dump")
+    assert not Path(calls[-1][2]).exists()
+
+
+def test_a_dump_pg_restore_cannot_read_never_reaches_psql(tmp_path, monkeypatch):
+    calls = _fake_postgres_restore(monkeypatch, pg_restore_fails=True)
+    dump = tmp_path / "database.dump"
+    dump.write_bytes(b"not a dump")
+    with pytest.raises(BackupError, match="pg_restore failed: could not read the dump"):
+        backup_module.load_database(dump, "database.dump")
+    assert calls == []
+
+
+def test_a_postgres_restore_needs_psql(tmp_path, monkeypatch):
+    _fake_postgres_restore(monkeypatch)
+    monkeypatch.setattr(
+        backup_module.shutil, "which", lambda name: None if name == "psql" else f"/usr/bin/{name}"
+    )
+    with pytest.raises(BackupError, match="psql is not on the PATH"):
+        backup_module.load_database(tmp_path / "x", "database.dump")
+
+
 # ------------------------------------------------------------------ the commands
 
 

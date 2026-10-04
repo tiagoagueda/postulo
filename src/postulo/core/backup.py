@@ -181,7 +181,7 @@ def busy_reason() -> str | None:
     """What else is using the database right now, in words, or ``None`` if nothing is.
 
     A restore does not write a new database and swap it in: it overwrites the one that is
-    there, through SQLite's backup API or ``pg_restore --clean``. A gunicorn worker, the
+    there, through SQLite's backup API or ``pg_restore`` and ``psql``. A gunicorn worker, the
     scheduler or the background worker reading through that is reading a database that is
     changing underneath it, and the answers it gives are nobody's.
 
@@ -274,6 +274,23 @@ def dump_database(target: Path) -> str:
     raise BackupError(f"Backups are not supported for the {vendor!r} database engine.")
 
 
+_EMPTY_THE_PUBLIC_SCHEMA = """DO $postulo$
+DECLARE item record;
+BEGIN
+    FOR item IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' LOOP
+        EXECUTE format('DROP TABLE IF EXISTS public.%I CASCADE', item.tablename);
+    END LOOP;
+    FOR item IN SELECT viewname FROM pg_views WHERE schemaname = 'public' LOOP
+        EXECUTE format('DROP VIEW IF EXISTS public.%I CASCADE', item.viewname);
+    END LOOP;
+    FOR item IN SELECT sequencename FROM pg_sequences WHERE schemaname = 'public' LOOP
+        EXECUTE format('DROP SEQUENCE IF EXISTS public.%I CASCADE', item.sequencename);
+    END LOOP;
+END
+$postulo$;
+"""
+
+
 def load_database(source: Path, member: str) -> None:
     """Replace the database's contents with the copy in ``source``."""
     vendor = database_vendor()
@@ -296,25 +313,57 @@ def load_database(source: Path, member: str) -> None:
         tool = shutil.which("pg_restore")
         if tool is None:
             raise BackupError("pg_restore is not on the PATH.")
+        psql = shutil.which("psql")
+        if psql is None:
+            raise BackupError("psql is not on the PATH.")
         env, name = _postgres_env()
         connection.close()
-        result = subprocess.run(  # noqa: S603 - a fixed tool with fixed arguments
-            [
-                tool,
-                "--clean",
-                "--if-exists",
-                "--no-owner",
-                "--no-privileges",
-                f"--dbname={name}",
-                str(source),
-            ],
-            env=env,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
+        # All or nothing (#477). pg_restore --dbname applies the dump statement by
+        # statement, so a dump that fails half way left a database that was neither the old
+        # one nor the new. Instead pg_restore writes the dump out as SQL (it touches no
+        # database), and psql runs that script in ONE transaction that stops at the first
+        # error: either every table is the archive's, or none was touched.
+        with tempfile.TemporaryDirectory(prefix="postulo-restore-") as scratch:
+            script = Path(scratch) / "restore.sql"
+            made = subprocess.run(  # noqa: S603 - a fixed tool with fixed arguments
+                [
+                    tool,
+                    "--clean",
+                    "--if-exists",
+                    "--no-owner",
+                    "--no-privileges",
+                    f"--file={script}",
+                    str(source),
+                ],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if made.returncode != 0:
+                raise BackupError(f"pg_restore failed: {made.stderr.strip()}")
+            # The dump's own DROPs only name what the archive holds; a table added since
+            # (by a later migration) would stay behind and collide. Drop whatever the
+            # public schema holds first -- its contents, not the schema, so extensions and
+            # grants survive -- inside the same transaction.
+            script.write_bytes(_EMPTY_THE_PUBLIC_SCHEMA.encode() + script.read_bytes())
+            result = subprocess.run(  # noqa: S603 - a fixed tool with fixed arguments
+                [
+                    psql,
+                    "--single-transaction",
+                    "--no-psqlrc",
+                    "--quiet",
+                    "--set=ON_ERROR_STOP=1",
+                    f"--dbname={name}",
+                    f"--file={script}",
+                ],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
         if result.returncode != 0:
-            raise BackupError(f"pg_restore failed: {result.stderr.strip()}")
+            raise BackupError(f"psql failed, and nothing was restored: {result.stderr.strip()}")
         return
     raise BackupError(f"Restores are not supported for the {vendor!r} database engine.")
 

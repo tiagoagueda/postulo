@@ -259,6 +259,48 @@ jobs:
           assert emails == ['demo@example.org'], emails
           assert Application.objects.exists(), 'the restore brought back an empty instance'
           "
+          # The restore is all or nothing (#477). First a table the archive never held
+          # and one that points at auth_user must not survive or block the restore ...
+          psql "postgres://postulo:ci-only-not-a-secret@db:5432/postulo" -v ON_ERROR_STOP=1 -c "
+          CREATE TABLE ci_unreferenced (id integer);
+          CREATE TABLE ci_pointing (id integer, owner integer REFERENCES auth_user (id));"
+          uv run manage.py restore /tmp/postulo-roundtrip.tar.gz --force
+          uv run manage.py migrate --check
+          uv run manage.py shell -c "
+          from django.contrib.auth import get_user_model
+          from postulo.applications.models import Application
+          assert get_user_model().objects.count() == 1
+          assert Application.objects.exists()
+          "
+          test "$(psql "postgres://postulo:ci-only-not-a-secret@db:5432/postulo" -Atc "SELECT count(*) FROM pg_tables WHERE tablename LIKE 'ci\_%'")" = 0
+          # ... and a dump that breaks half way must leave the database exactly as it was.
+          python3 - <<'PY'
+          import hashlib, io, json, tarfile
+          src = tarfile.open("/tmp/postulo-roundtrip.tar.gz")
+          members = {m.name: (m, src.extractfile(m).read() if m.isfile() else None) for m in src.getmembers()}
+          dump = members["database.dump"][1]
+          dump = dump[: len(dump) * 2 // 3]
+          manifest = json.loads(members["manifest.json"][1])
+          manifest["database"]["sha256"] = hashlib.sha256(dump).hexdigest()
+          manifest["database"]["bytes"] = len(dump)
+          members["database.dump"] = (members["database.dump"][0], dump)
+          members["manifest.json"] = (members["manifest.json"][0], json.dumps(manifest).encode())
+          out = tarfile.open("/tmp/postulo-corrupt.tar.gz", "w:gz")
+          for m, data in members.values():
+              if data is not None:
+                  m.size = len(data)
+              out.addfile(m, io.BytesIO(data) if data is not None else None)
+          out.close()
+          PY
+          uv run manage.py seed_demo rival@example.org --no-pdf --password ci-only-not-a-secret-either
+          if uv run manage.py restore /tmp/postulo-corrupt.tar.gz --force; then
+            echo "a truncated dump was restored" >&2; exit 1
+          fi
+          uv run manage.py shell -c "
+          from django.contrib.auth import get_user_model
+          emails = sorted(get_user_model().objects.values_list('email', flat=True))
+          assert emails == ['demo@example.org', 'rival@example.org'], emails
+          "
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.prod
           POSTULO_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo

@@ -195,6 +195,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Restoring a backup on PostgreSQL is all or nothing: the dump is applied by `psql` in one transaction that stops at the first error, so a dump that fails half way leaves the database as it was. (#477)
 - Deleting an account removes its files only once the deletion commits, so a request that fails afterwards no longer leaves rows whose files are gone; an export whose file has gone from the disk says it has expired. (#355)
 - The phone's bottom navigation bar no longer opens taller than it ends up: the safe-area padding now applies only to an installed app, not to a browser tab whose toolbar already stands under the bar. (#338)
 - Capture now follows a redirected robots.txt (up to five hops) and reads the robots.txt of any other site a posting redirects to, instead of treating a redirect as "no rules". (#364)
