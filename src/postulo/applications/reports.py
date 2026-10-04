@@ -59,6 +59,10 @@ DEFAULT_WEEKS = 4
 #: page nobody reads and a query nobody needs.
 MAX_DAYS = 400
 
+# The years an address may ask for. `datetime` accepts 1 to 9999, but the pages step a period
+# past the one asked for, and a hand-edited year at the edge would overflow doing it.
+MIN_YEAR, MAX_YEAR = 1900, 2200
+
 
 # ------------------------------------------------------------------------ weeks
 
@@ -182,9 +186,10 @@ def _int(raw, fallback: int) -> int:
 
 def _date(raw) -> dt.date | None:
     try:
-        return dt.date.fromisoformat(str(raw))
+        day = dt.date.fromisoformat(str(raw))
     except (TypeError, ValueError):
         return None
+    return day if MIN_YEAR <= day.year <= MAX_YEAR else None
 
 
 def period_from(params, *, today: dt.date | None = None) -> Period:
@@ -212,9 +217,10 @@ def period_from(params, *, today: dt.date | None = None) -> Period:
         raw = str(params.get("on", "") or "")
         year, marked, number = raw.partition("-Q")
         if marked:
-            return quarter_period(
-                _int(year, today.year), min(4, max(1, _int(number, (today.month - 1) // 3 + 1)))
-            )
+            year = _int(year, today.year)
+            if not MIN_YEAR <= year <= MAX_YEAR:
+                year = today.year
+            return quarter_period(year, min(4, max(1, _int(number, (today.month - 1) // 3 + 1))))
         month = _date(f"{raw}-01") or today
         return quarter_period(month.year, (month.month - 1) // 3 + 1)
 

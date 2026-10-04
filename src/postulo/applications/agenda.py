@@ -60,7 +60,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.jobs.models import JobPosting
 
 from .models import Application, Interview, InterviewOutcome, Offer, Reminder, Status
-from .reports import week_start
+from .reports import MAX_YEAR, MIN_YEAR, week_start
 
 VIEWS = ("month", "week", "day", "agenda")
 DEFAULT_VIEW = "month"
@@ -512,16 +512,18 @@ def url_for(view: str, day: dt.date, kinds=None) -> str:
 
 def month_from(raw: str) -> dt.date | None:
     try:
-        return dt.datetime.strptime((raw or "").strip(), "%Y-%m").date()
+        day = dt.datetime.strptime((raw or "").strip(), "%Y-%m").date()
     except ValueError:
         return None
+    return day if MIN_YEAR <= day.year <= MAX_YEAR else None
 
 
 def day_from(raw: str) -> dt.date | None:
     try:
-        return dt.datetime.strptime((raw or "").strip(), "%Y-%m-%d").date()
+        day = dt.datetime.strptime((raw or "").strip(), "%Y-%m-%d").date()
     except ValueError:
         return None
+    return day if MIN_YEAR <= day.year <= MAX_YEAR else None
 
 
 @dataclass

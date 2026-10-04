@@ -236,3 +236,20 @@ def test_calendar_is_in_the_navigation_in_place_of_reminders_and_can_be_hidden(c
     )
     html = client.get(reverse("core:home")).content.decode()
     assert 'data-nav="calendar"' not in html
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        {"month": "0001-01"},
+        {"month": "9999-12"},
+        {"view": "day", "on": "9999-12-31"},
+        {"view": "week", "on": "9999-12-31"},
+        {"view": "agenda", "on": "9999-12-31"},
+    ],
+)
+def test_a_date_at_the_edge_of_the_calendar_is_this_month(client, user, query):
+    client.force_login(user)
+    response = client.get(reverse(CALENDAR), query)
+    assert response.status_code == 200
+    assert response.context["page"].on == timezone.localdate()

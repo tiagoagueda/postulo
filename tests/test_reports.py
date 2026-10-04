@@ -747,3 +747,22 @@ def test_the_page_downloads_by_pressing_rather_than_following(client, user):
     client.force_login(user)
     html = client.get(reverse("applications:report")).content.decode()
     assert 'method="post" action="' + reverse(PDF) in html
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        {"period": "month", "on": "9999-12"},
+        {"period": "month", "on": "0001-01"},
+        {"period": "quarter", "on": "20266-Q3"},
+        {"period": "quarter", "on": "9999-Q4"},
+        {"period": "custom", "from": "9999-12-01", "to": "9999-12-31"},
+    ],
+)
+def test_a_period_at_the_edge_of_the_calendar_falls_back_to_today(client, user, query):
+    client.force_login(user)
+    for name in (PAGE, CSV):
+        assert client.get(reverse(name), query).status_code == 200
+    period = reports.period_from(query)
+    assert period.start.year == timezone.localdate().year
+    assert period.shifted(-1) and period.shifted(1)
