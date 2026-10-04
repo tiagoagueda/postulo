@@ -727,6 +727,26 @@ def counts_beyond_one(code: str) -> tuple[bool, ...]:
     return tuple(beyond)
 
 
+def _fails_to_format(source: str, form: str, singular: bool) -> str | None:
+    """What Python's `%` operator says about a form, formatted the way the runtime will.
+
+    The placeholder sets cannot see a stray `%`, nor a singular message that drops a
+    positional placeholder; running the operator does, as `msgfmt --check-format` does
+    (#497).
+    """
+    named = {m.group(1) for m in PLACEHOLDER.finditer(form) if m.group(1)}
+    positional = [m.group(0) for m in PLACEHOLDER.finditer(form) if m.group(0)[1:2] in "sdifr"]
+    expected = len([m for m in PLACEHOLDER.finditer(source) if m.group(0)[1:2] in "sdifr"])
+    try:
+        if named:
+            form % dict.fromkeys(named, 1)
+        else:
+            form % ((1,) * (expected if singular else len(positional)))
+    except (ValueError, TypeError, KeyError) as error:
+        return f"{type(error).__name__}: {error}"
+    return None
+
+
 def problems_in(catalogue: Catalogue, code: str) -> list[str]:
     found: list[str] = []
     forms = nplurals(code)
@@ -739,8 +759,16 @@ def problems_in(catalogue: Catalogue, code: str) -> list[str]:
         sources_ = [message.msgid] if message.plural is None else [message.msgid, message.plural]
         expected = {p for s in sources_ for p in placeholders(s)}
         named = {p for p in expected if p.startswith("%(") or p.startswith("{")}
+        python_format = "python-format" in message.flags or any(
+            "%" in p for s_ in sources_ for p in placeholders(s_)
+        )
         for index, form in enumerate(message.msgstr):
             got = set(placeholders(form))
+            if python_format and (
+                error := _fails_to_format(message.msgid, form, message.plural is None)
+            ):
+                found.append(f"{message.msgid!r} → {form!r}: would fail to format ({error})")
+                continue
             counts_higher = index < len(beyond) and beyond[index]
             # A form that only ever says *one* may drop the count ("one application"); a
             # form that also counts higher must carry every named placeholder; and nothing

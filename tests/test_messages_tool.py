@@ -299,3 +299,39 @@ def test_the_tool_refuses_a_directory_that_is_not_a_project(tool, tmp_path):
     with pytest.raises(SystemExit, match="pyproject"):
         tool.use(tmp_path)
     tool.use(REPO)
+
+
+@pytest.mark.parametrize(
+    ("msgid", "translation"),
+    [
+        ("%(share)s%%", "%(share)s %"),
+        ("%(share)s%%", "% %(share)s"),
+        ("%(n)s done", "%(n)s % d"),
+        ("Delete %s?", "Supprimer ?"),
+    ],
+)
+def test_a_translation_that_would_raise_when_formatted_is_refused(tool, msgid, translation):
+    """The placeholder sets cannot see a stray `%`; formatting the form can (#497)."""
+    catalogue = tool.Catalogue(
+        header={},
+        messages={
+            (None, msgid): tool.Message(msgid=msgid, msgstr=[translation], flags=["python-format"])
+        },
+    )
+    problems = tool.problems_in(catalogue, "fr-FR")
+    assert len(problems) == 1 and msgid in problems[0]
+
+
+def test_a_translation_that_formats_cleanly_is_accepted(tool):
+    catalogue = tool.Catalogue(
+        header={},
+        messages={
+            (None, "%(share)s%%"): tool.Message(
+                msgid="%(share)s%%", msgstr=["%(share)s %%"], flags=["python-format"]
+            ),
+            (None, "Delete %s?"): tool.Message(
+                msgid="Delete %s?", msgstr=["Supprimer %s ?"], flags=["python-format"]
+            ),
+        },
+    )
+    assert tool.problems_in(catalogue, "fr-FR") == []
