@@ -743,6 +743,15 @@ def record_offer(application: Application, *, actor: str = "", **fields) -> Offe
 
 
 @transaction.atomic
+def withdraw_offer(offer: Offer) -> None:
+    """Delete an offer and tick off its answer-by reminder (#444)."""
+    reminder = offer.reminder
+    if reminder is not None and not reminder.is_done:
+        reminder.complete()
+    offer.delete()
+
+
+@transaction.atomic
 def revise_offer(offer: Offer, *, actor: str = "") -> Offer:
     """After an offer's row has been edited: the revision on the timeline, the reminder moved."""
     entry = record_event(

@@ -206,6 +206,20 @@ def test_editing_and_deleting_from_the_page(client, user, application):
     assert not Offer.objects.filter(pk=offer.pk).exists()
 
 
+def test_deleting_an_offer_ticks_off_its_answer_by_reminder(client, user, application):
+    offer = record_offer(application, answer_by=a_week_out())
+    reminder = offer.reminder
+    assert reminder is not None and not reminder.is_done
+    client.force_login(user)
+
+    response = client.post(reverse("applications:offer_delete", args=[offer.pk]))
+
+    assert response.status_code == 302
+    assert not Offer.objects.filter(pk=offer.pk).exists()
+    reminder.refresh_from_db()
+    assert reminder.is_done
+
+
 def test_the_comparison_is_the_latest_offer_of_each_application_at_offer(client, user, application):
     record_offer(application, base_amount=Decimal("60000"), currency="EUR")
     record_offer(

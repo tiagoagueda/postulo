@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Deleting an offer now ticks off its outstanding answer-by reminder instead of leaving it on the calendar and announced to the person's notifiers. (#444)
 - A suggestion's action is now only accept or decline; any other word answers 404 instead of silently accepting the suggestion into the timeline and possibly moving the application's status. (#447)
 - Insights: the Interviews column of the sources tables and the Interviews widget now count the same applications: those with an interview entry or that reached Interviewing or Assessment; Screening alone no longer counts. (#449)
 - A calendar narrowed with ?kinds= keeps the narrowing on the day number, the "and N more" link and the week view's day headings, so they open the same set of events. (#452)

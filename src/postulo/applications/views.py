@@ -10,7 +10,7 @@ from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import transaction
 from django.db.models import Count, Q
-from django.http import Http404, HttpRequest, HttpResponse, QueryDict
+from django.http import Http404, HttpRequest, HttpResponse, HttpResponseRedirect, QueryDict
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
@@ -81,6 +81,7 @@ from .services import (
     revise_offer,
     schedule_interview,
     settle_interview,
+    withdraw_offer,
 )
 from .tables import ApplicationsTable
 
@@ -1526,10 +1527,15 @@ class OfferDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     template_name = "partials/confirm_delete.html"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("application")
+        return super().get_queryset().select_related("application", "reminder")
 
     def get_success_url(self) -> str:
         return f"{self.object.application.get_absolute_url()}#offers"
+
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+        withdraw_offer(self.object)
+        return HttpResponseRedirect(success_url)
 
     def get_cancel_url(self) -> str:
         return self.get_success_url()
