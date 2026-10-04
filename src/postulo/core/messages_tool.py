@@ -918,10 +918,13 @@ def build_report() -> dict[str, dict[str, int]]:
     the part of it that happens to live in core (#127).
     """
     report: dict[str, dict[str, int]] = {}
+    # Found once: each call walks the source tree, and inside the loop that was once per
+    # language, 68 walks for one answer (#724).
+    subjects = catalogue_sets()
     for code in translated_languages():
         found = [
             parse(po_path(code, subject).read_text(encoding="utf-8"))
-            for subject in catalogue_sets()
+            for subject in subjects
             if po_path(code, subject).exists()
         ]
         if not found:

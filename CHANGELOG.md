@@ -25,6 +25,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Three unit tests no longer depend on the machine being idle: robots.txt, the two-factor codes and a slow-filter guard. (#719)
 - Browser tests sign in through one helper that hands the browser a session, instead of filling the sign-in form in every test. (#720)
 - CI runs the browser tests on two processes, the walks of every page first. (#721)
+- `scripts/messages.py stats` finds the catalogue sets once instead of once per language: 4 seconds instead of 45. (#724)
 
 ### ✨ Added
 
