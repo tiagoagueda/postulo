@@ -19,7 +19,8 @@ API reads ``offset``, and checked against that total, so an answer that stops sh
 refused rather than written. The API names its versions with a ``v`` prefix and says
 nothing about which it served where none is asked, and its default is not the newest, so
 the revision is a required argument, recorded inside each file; a new revision is a
-re-run with the new ``--revision`` and the old files deleted. What is written is checked
+re-run with the new ``--revision``, which deletes the old files once the new are
+written. What is written is checked
 against the shape the loader reads before anything is replaced, nothing is written until
 both halves are, and the command says what it found. Nothing in a request path calls
 this; it runs once, at provisioning.
@@ -180,17 +181,19 @@ class Command(BaseCommand):
             self.stdout.write(
                 f"{tidied} of the names had a line break, or space at an end, taken out."
             )
-        others = sorted(
-            p.name
+        # Both new files are written and checked, so the files they replace can go: the
+        # loader reads one revision at a time, and a directory holding two refuses every
+        # read until somebody deletes the old ones, which this command already knows.
+        replaced = sorted(
+            p
             for p in (*DATA_DIR.glob("esco-*.json"), *DATA_DIR.glob("esco-skills-*.zip"))
             if p not in (target, skills_target)
         )
-        if others:
+        for old in replaced:
+            old.unlink()
+        if replaced:
             self.stdout.write(
-                self.style.WARNING(
-                    f"Delete {', '.join(others)} once the new files are checked: the "
-                    "loader reads one revision at a time."
-                )
+                f"Deleted {', '.join(p.name for p in replaced)}, the revision replaced."
             )
 
     def _harvest(self, client, selected_version) -> tuple[dict, dict]:

@@ -113,16 +113,15 @@ _warned = False
 def data_file() -> Path | None:
     """The classification in the data directory, or None where it has not been downloaded.
 
-    One revision at a time: ``manage.py fetch_esco`` writes ``esco-<revision>.json``, and
-    a replacement is not finished until the old file is deleted, so two files are a state
-    to be reported, not a choice to be made.
+    One revision at a time: ``manage.py fetch_esco`` writes ``esco-<revision>.json`` and
+    deletes the one it replaces, so two files, which only a hand-filled directory has, are a
+    state to be reported (`postulo.jobs.checks` does it at start-up), not a choice to be made.
     """
     files = sorted(DATA_DIR.glob("esco-*.json"))
     if len(files) > 1:
         names = ", ".join(file.name for file in files)
         raise RuntimeError(
-            f"two ESCO classifications in {DATA_DIR} ({names}); delete the one being "
-            "replaced before starting Postulo"
+            f"two ESCO classifications in {DATA_DIR} ({names}); delete the one being replaced"
         )
     return files[0] if files else None
 
@@ -304,8 +303,7 @@ def skills_file() -> Path | None:
     if len(files) > 1:
         names = ", ".join(file.name for file in files)
         raise RuntimeError(
-            f"two ESCO skills files in {DATA_DIR} ({names}); delete the one being replaced "
-            "before starting Postulo"
+            f"two ESCO skills files in {DATA_DIR} ({names}); delete the one being replaced"
         )
     return files[0] if files else None
 

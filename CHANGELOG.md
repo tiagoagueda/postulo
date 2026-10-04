@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- `manage.py fetch_esco` now deletes the ESCO files of the revision it replaces once the new ones are written, and `manage.py check` reports two revisions of either file, so an upgrade no longer breaks saving listings. (#535)
 - A posting field that runs past 500 characters, a NaN, infinite or oversized salary, or a currency that is no ISO code no longer makes the schema.org or board source fail and lose the rest of the posting; only that field is dropped. (#592)
 - A document store is now told the kind's name, and any error sentence it raises, in the owner's language whichever path sends the copy, so Paperless and other stores no longer file one kind under two names. (#605)
 - An imported CV's website and ORCID are now checked as the profile forms check them; a value that fails is named in the import report instead of being stored and printed on the CV. (#610)

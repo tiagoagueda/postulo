@@ -415,3 +415,45 @@ def test_the_directory_can_be_moved_to_the_data_volume(monkeypatch, tmp_path):
     finally:
         monkeypatch.undo()
         importlib.reload(esco)
+
+
+def test_a_new_revision_leaves_only_the_new_two_files(data_dir, harvest):
+    """The directory goes from one revision to one, so no read in between is refused (#535)."""
+    (data_dir / "esco-1.2.1.json").write_text("{}", encoding="utf-8")
+    (data_dir / "esco-skills-1.2.1.zip").write_bytes(b"")
+
+    harvest(tables())
+
+    assert sorted(p.name for p in data_dir.iterdir()) == [
+        "esco-9.9.9.json",
+        "esco-skills-9.9.9.zip",
+    ]
+
+
+def test_a_refused_run_keeps_the_previous_revision(data_dir, harvest):
+    (data_dir / "esco-1.2.1.json").write_text("{}", encoding="utf-8")
+    pages = {**tables(), (SKILL_TYPE, "v9.9.9", 0): Answer(page(SKILLS[:2], total=3))}
+    pages[(SKILL_TYPE, "v9.9.9", 1)] = Answer(page([], total=3))
+
+    with pytest.raises(CommandError, match="said 3 concepts"):
+        harvest(pages)
+
+    assert [p.name for p in data_dir.iterdir()] == ["esco-1.2.1.json"]
+
+
+@pytest.mark.parametrize(
+    ("names", "check_id"),
+    [
+        (("esco-1.2.1.json", "esco-1.2.2.json"), "postulo.E040"),
+        (("esco-skills-1.2.1.zip", "esco-skills-1.2.2.zip"), "postulo.E041"),
+    ],
+)
+def test_the_system_check_reports_two_revisions(tmp_path, monkeypatch, names, check_id):
+    from postulo.jobs import checks
+
+    monkeypatch.setattr(esco, "DATA_DIR", tmp_path)
+    assert checks.esco_one_revision(None) == []
+    for name in names:
+        (tmp_path / name).write_bytes(b"")
+
+    assert [error.id for error in checks.esco_one_revision(None)] == [check_id]
