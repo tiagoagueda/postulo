@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Capture now follows a redirected robots.txt (up to five hops) and reads the robots.txt of any other site a posting redirects to, instead of treating a redirect as "no rules". (#364)
 - The GeoNames and ESCO downloads now use the guarded client, the entrypoint follows POSTULO_GEOLOCATIONS_DIR and POSTULO_SKIP_GEONAMES=1 turns the start-up download off; SECURITY, README and PLAN no longer call capture the only outbound request. (#366)
 - Search highlighting and excerpts no longer shift onto the wrong letters after a Turkish dotted capital İ, and long texts no longer return an empty excerpt. (#377)
 - The Applications by month widget now lists every month from your first application to the current one, with nought for a quiet month, and names each month in your language ("février 2026"). (#397)

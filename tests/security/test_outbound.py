@@ -891,9 +891,9 @@ def test_robots_txt_asks_only_for_what_it_can_read(monkeypatch):
 
 
 @pytest.mark.django_db
-def test_a_redirected_robots_txt_is_not_followed_or_read(monkeypatch):
+def test_a_redirected_robots_txt_is_followed_without_reading_the_redirect(monkeypatch):
     """httpx following a redirect itself reads the redirect's body whole first, past every
-    limit here. A redirected robots.txt counts as none, as it always did for `fetch_page`."""
+    limit here, so each hop is followed by hand and closed unread (#364)."""
     ballast = Trickle(chunks=100)
 
     def answer(request: httpx.Request) -> httpx.Response:
@@ -903,9 +903,19 @@ def test_a_redirected_robots_txt_is_not_followed_or_read(monkeypatch):
 
     seen = answering_robots(monkeypatch, answer)
 
-    assert fetching.robots_allow("https://blackmesa.test/jobs/1") is True
+    assert fetching.robots_allow("https://blackmesa.test/jobs/1") is False
     assert ballast.sent == 0, "the redirect's body was never read"
-    assert [request.url.path for request in seen] == ["/robots.txt"]
+    assert [request.url.path for request in seen] == ["/robots.txt", "/elsewhere.txt"]
+
+
+@pytest.mark.django_db
+def test_a_robots_txt_that_redirects_for_ever_allows_after_the_limit(monkeypatch):
+    seen = answering_robots(
+        monkeypatch, lambda request: httpx.Response(302, headers={"Location": "/robots.txt"})
+    )
+
+    assert fetching.robots_allow("https://blackmesa.test/jobs/1") is True
+    assert len(seen) == fetching.ROBOTS_MAX_REDIRECTS + 1
 
 
 @pytest.mark.django_db

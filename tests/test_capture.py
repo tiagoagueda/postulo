@@ -402,6 +402,56 @@ def test_an_unreachable_robots_txt_does_not_block_the_capture():
         assert fetching.robots_allow("https://example.org/jobs/1", client=client) is True
 
 
+@pytest.mark.django_db
+def test_a_robots_txt_that_redirects_to_a_file_that_disallows_is_obeyed(settings):
+    """http to https and the bare domain to ``www.`` are the common redirects, and the
+    redirect was once taken for "no robots.txt" (#364)."""
+    settings.POSTULO_CAPTURE_IGNORE_ROBOTS = False
+
+    def answer(request):
+        if request.url.host == "example.org":
+            return httpx.Response(301, headers={"Location": "https://www.example.org/robots.txt"})
+        return httpx.Response(200, text="User-agent: *\nDisallow: /careers")
+
+    with robots_client(answer) as client:
+        assert fetching.robots_allow("https://example.org/careers/1", client=client) is False
+        assert fetching.robots_allow("https://example.org/about", client=client) is True
+
+
+@pytest.mark.django_db
+def test_a_posting_that_redirects_to_a_site_whose_robots_txt_disallows_it(
+    resolves_to, settings, monkeypatch
+):
+    """The first host's robots.txt is not the second's: the one the page ends at is asked."""
+    from postulo.plugins import http as plugin_http
+
+    settings.POSTULO_CAPTURE_IGNORE_ROBOTS = False
+    resolves_to("93.184.216.34")
+    pages = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        host = request.headers["Host"].split(":")[0]
+        if request.url.path == "/robots.txt":
+            rules = "User-agent: *\nDisallow: /careers" if host == "jobs.example.com" else ""
+            return httpx.Response(200, text=rules)
+        pages.append((host, request.url.path))
+        if host == "short.example":
+            return httpx.Response(302, headers={"Location": "https://jobs.example.com/careers/123"})
+        return httpx.Response(200, headers={"content-type": "text/html"}, content=b"<p>Hi</p>")
+
+    real = httpx.Client
+    monkeypatch.setattr(
+        plugin_http.httpx,
+        "Client",
+        lambda *a, **kw: real(*a, **{**kw, "transport": httpx.MockTransport(handler)}),
+    )
+
+    with pytest.raises(fetching.RobotsDisallowed):
+        fetching.fetch_page("https://short.example/123")
+
+    assert pages == [("short.example", "/123")], "the second site's page was never requested"
+
+
 # --------------------------------------------------------------- text handling
 
 

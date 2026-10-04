@@ -59,6 +59,8 @@ TIMEOUT_SECONDS = 10.0
 #: (`http.until`), so a fetch is over by then, the name lookups aside.
 DOWNLOAD_SECONDS = 30.0
 MAX_REDIRECTS = 3
+#: RFC 9309 §2.3.1.2 asks a crawler to follow at least five redirects for a robots.txt.
+ROBOTS_MAX_REDIRECTS = 5
 ROBOTS_TIMEOUT_SECONDS = 5.0
 #: robots.txt gets its own, shorter budget, spent before the page's begins.
 ROBOTS_DOWNLOAD_SECONDS = 10.0
@@ -115,8 +117,13 @@ def _describe_failure(status: int) -> str:
 def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
     """Whether the site's robots.txt permits fetching ``url``.
 
-    A missing, unreachable or unparseable robots.txt means yes, which is what the
-    standard says and what every other client does.
+    A robots.txt that redirects is followed, by hand, up to `ROBOTS_MAX_REDIRECTS` times
+    (http to https and the bare domain to ``www.`` are the common cases), and the file it
+    ends at is the one obeyed (#364). A missing, unreachable or unparseable robots.txt means
+    yes, which is what RFC 9309 says for a missing file (§2.3.1.3) and what every other
+    client does. For a server error the standard says the opposite (§2.3.1.4: assume
+    complete disallow); Postulo allows, because one page the person is looking at is not
+    worth refusing over a site's bad hour.
     """
     # Imported here: the plugins package is the foundation that core builds capture on,
     # and the policy module needs the database models.
@@ -139,8 +146,8 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
         # this function is public in a plugin-facing module, and one that reached robots.txt
         # on an address nothing had approved would be a way round the whole policy (#215).
         # Not following redirects, as `fetch_page`'s client does not: httpx reads every
-        # redirect's body whole before it follows one, and a redirected robots.txt has
-        # always counted as none.
+        # redirect's body whole before it follows one, so they are followed below, each
+        # one streamed and closed unread.
         client = http.public_only_client(timeout=ROBOTS_TIMEOUT_SECONDS, follow_redirects=False)
     # The encodings on the request, not the client, so they hold whichever client it is:
     # httpx would offer brotli, which `read_body` refuses, and a refusal allows everything.
@@ -149,10 +156,22 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
         # Streamed and capped like the page: the server that answers for robots.txt is the
         # same stranger's, and it is asked first (#321).
         deadline = http.deadline_in(ROBOTS_DOWNLOAD_SECONDS)
-        with http.until(deadline), client.stream("GET", robots_url, headers=headers) as response:
-            if response.status_code != 200:
+        with http.until(deadline):
+            for _hop in range(ROBOTS_MAX_REDIRECTS + 1):
+                with client.stream("GET", robots_url, headers=headers) as response:
+                    if response.is_redirect:
+                        location = response.headers.get("location", "")
+                        if not location:
+                            return True
+                        robots_url = urljoin(robots_url, location)
+                        continue
+                    if response.status_code != 200:
+                        return True
+                    body, cut = http.read_start(response, limit=ROBOTS_MAX_BYTES, deadline=deadline)
+                    break
+            else:
+                # Past the redirects asked of a crawler: as good as unreachable.
                 return True
-            body, cut = http.read_start(response, limit=ROBOTS_MAX_BYTES, deadline=deadline)
         if cut:
             # The last line may be half a rule, and half of "Disallow: /private/" says
             # something else entirely.
@@ -166,6 +185,21 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
     finally:
         if owned_client:
             client.close()
+
+
+def _origin(url: str) -> tuple[str, str, int | None]:
+    """The scheme, host and port of ``url``: what a robots.txt speaks for (RFC 9309 §2.3)."""
+    parts = urlparse(url)
+    return (parts.scheme, parts.hostname or "", parts.port)
+
+
+def _robots_disallowed() -> RobotsDisallowed:
+    return RobotsDisallowed(
+        _(
+            "This site's robots.txt asks automated clients not to fetch that "
+            "page. Copy the posting text in by hand instead."
+        )
+    )
 
 
 def _too_slow() -> FetchFailed:
@@ -265,19 +299,21 @@ def _fetch(url: str) -> FetchedPage:
             "Accept-Encoding": http.ACCEPT_ENCODING,
         },
     ) as client:
+        asked_of = _origin(current)
         if not robots_allow(current, client=client):
-            raise RobotsDisallowed(
-                _(
-                    "This site's robots.txt asks automated clients not to fetch that "
-                    "page. Copy the posting text in by hand instead."
-                )
-            )
+            raise _robots_disallowed()
 
         deadline = http.deadline_in(DOWNLOAD_SECONDS)
         with http.until(deadline):
             for _hop in range(MAX_REDIRECTS + 1):
                 if http.past(deadline):
                     raise _too_slow()
+                if _origin(current) != asked_of:
+                    # A redirect to another site: its robots.txt is its own, and it is
+                    # asked before the page is (#364).
+                    asked_of = _origin(current)
+                    if not robots_allow(current, client=client):
+                        raise _robots_disallowed()
                 try:
                     with client.stream("GET", current) as response:
                         if response.is_redirect:
