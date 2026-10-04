@@ -132,9 +132,11 @@ def _decimal(value) -> Decimal | None:
         return None
     try:
         amount = Decimal(str(_first(value)))
+        # A board's template can render "NaN" or "Infinity", and the review form holds
+        # twelve digits: an amount outside what the text reader accepts is no amount.
+        return amount if amount.is_finite() and 0 < amount < patterns.LARGEST else None
     except (InvalidOperation, TypeError, ValueError):
         return None
-    return amount if amount > 0 else None
 
 
 def _one_place(place) -> str:
@@ -192,7 +194,10 @@ def _one_salary(value) -> tuple[Decimal | None, Decimal | None, str, str]:
     if not isinstance(salary, dict):
         return None, None, "", ""
 
-    currency = str(salary.get("currency") or salary.get("salaryCurrency") or "").strip()[:3]
+    # Kept only where it is an ISO code or a symbol that names one currency, as the text
+    # reader does; "US Dollar" or a bare "$" is left for the person to state.
+    written = str(salary.get("currency") or salary.get("salaryCurrency") or "").strip()
+    currency = patterns.currency_code(written.upper() if written.isalpha() else written, "")
     inner = salary.get("value")
 
     if isinstance(inner, dict):
@@ -204,7 +209,7 @@ def _one_salary(value) -> tuple[Decimal | None, Decimal | None, str, str]:
     else:
         low, high, period = _decimal(inner), None, ""
 
-    return low, high, currency.upper(), period
+    return low, high, currency, period
 
 
 def _salary(posting: dict) -> tuple[Decimal | None, Decimal | None, str, str]:
@@ -311,9 +316,9 @@ def _from_posting(posting: dict, url: str, *, description_is_html: bool) -> JobP
     description = strip_tags(described) if description_is_html else described
 
     return JobPostingData(
-        title=title,
-        company_name=_text(posting.get("hiringOrganization")),
-        location=location,
+        title=title[:MAX_FIELD_CHARS],
+        company_name=_text(posting.get("hiringOrganization"))[:MAX_FIELD_CHARS],
+        location=location[:MAX_FIELD_CHARS],
         remote_type=remote,
         employment_type=employment_type(_first(posting.get("employmentType")) or ""),
         description=description,
@@ -367,6 +372,9 @@ class SchemaOrgSource:
 
 
 #: The fields a recipe may state. Anything else it returns is ignored rather than trusted.
+#: What `JobPostingData` holds of a title, a company and a place; it raises rather than cuts.
+MAX_FIELD_CHARS = 500
+CUT_FIELDS = frozenset({"title", "company_name", "location"})
 RECIPE_FIELDS = frozenset(
     {
         "title",
@@ -420,6 +428,12 @@ class BoardSource:
             field: value
             for field, value in stated.items()
             if field in RECIPE_FIELDS and value not in (None, "", [])
+        }
+        # A recipe's field may run past what a posting holds; cut it, as the page's own
+        # metadata is, rather than lose the board's whole answer to a validation error.
+        stated = {
+            field: value[:MAX_FIELD_CHARS] if field in CUT_FIELDS else value
+            for field, value in stated.items()
         }
         if not stated.get("title"):
             # A recipe that cannot name the job has not recognised the page -- an advert

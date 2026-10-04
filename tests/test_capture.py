@@ -515,3 +515,66 @@ def test_a_location_is_not_said_twice(address, expected):
     data = SchemaOrgSource().parse("https://example.org/j/1", page_with_jsonld(posting))
 
     assert data.location == expected
+
+
+# ------------------------------------------- a careless field costs the field (#592)
+
+
+def _stated(**changes) -> dict:
+    return {**FULL_POSTING, **changes}
+
+
+def _salary_of(value, currency="EUR") -> dict:
+    return {"baseSalary": {"currency": currency, "value": {"minValue": value, "unitText": "YEAR"}}}
+
+
+@pytest.mark.parametrize("amount", ["NaN", "Infinity", 1e400, 1e30, "-5"])
+def test_an_unusable_salary_amount_costs_the_salary_only(amount):
+    posting = _stated(**_salary_of(amount))
+    page = page_with_jsonld(posting).replace("1e+400", "1e400").replace("Infinity", "1e400")
+    data = SchemaOrgSource().parse("https://example.org/j/1", page)
+    assert data.title == "Senior Backend Engineer"
+    assert data.location == "Paris, FR"
+    assert data.salary_min is None and data.salary_max is None
+    assert data.salary_currency == ""
+
+
+@pytest.mark.parametrize("written", ["US Dollar", "$"])
+def test_a_currency_that_is_no_code_is_left_empty(written):
+    posting = _stated(**_salary_of(50000, written))
+    data = SchemaOrgSource().parse("https://example.org/j/1", page_with_jsonld(posting))
+    assert data.salary_min == 50000
+    assert data.salary_currency == ""
+
+
+def test_a_lowercase_code_is_still_read():
+    posting = _stated(**_salary_of(50000, "usd"))
+    data = SchemaOrgSource().parse("https://example.org/j/1", page_with_jsonld(posting))
+    assert data.salary_currency == "USD"
+
+
+def test_a_long_title_company_and_place_are_cut_to_what_a_posting_holds():
+    long = "x" * 600
+    posting = _stated(
+        title=long,
+        hiringOrganization={"@type": "Organization", "name": long},
+        jobLocation={"@type": "Place", "address": long},
+    )
+    data = SchemaOrgSource().parse("https://example.org/j/1", page_with_jsonld(posting))
+    assert len(data.title) == len(data.company_name) == len(data.location) == 500
+    assert data.posted_at is not None
+
+
+def test_a_board_recipe_with_a_long_field_still_answers():
+    page = (
+        "<html><body>"
+        '<h1 class="topcard__title">Engineer</h1>'
+        '<a class="topcard__org-name-link">Acme</a>'
+        f'<span class="topcard__flavor topcard__flavor--bullet">{"y" * 700}</span>'
+        "</body></html>"
+    )
+    from postulo.plugins.builtin import BoardSource
+
+    data = BoardSource().parse("https://www.linkedin.com/jobs/view/1", page)
+    assert data is not None
+    assert data.title == "Engineer" and len(data.location) == 500

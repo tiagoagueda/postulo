@@ -456,7 +456,7 @@ def _currency(dollar: str) -> str:
     return "|".join(ways)
 
 
-def _code(written: str, dollar: str) -> str:
+def currency_code(written: str, dollar: str) -> str:
     """The ISO 4217 code for a currency as it was written beside a figure."""
     from postulo.plugins.api import CURRENCY_CODES
 
@@ -501,7 +501,7 @@ def _pay(
     """
     get = match.group
     written = [get(name) for name in ("before1", "after1", "before2", "after2") if get(name)]
-    currencies = {_code(one, dollar) for one in written}
+    currencies = {currency_code(one, dollar) for one in written}
     if "" in currencies or len(currencies) > 1 or (named and not currencies):
         return None
     low = figure(get("figure1"))
