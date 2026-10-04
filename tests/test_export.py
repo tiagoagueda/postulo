@@ -525,3 +525,63 @@ def test_a_link_on_a_cv_comes_back_with_it(populated, other_user):
     )
     assert [item.object_id for item in kept] == [restored.pk]
     assert report.skipped == []
+
+
+# ------------------------------------------- every preference travels, off as well as on (#464)
+
+
+@pytest.mark.django_db
+def test_every_exported_preference_survives_the_round_trip(user, other_user):
+    """A switch turned off and a dashboard cleared are values like any other: the importer
+    used to skip every falsy one, so they came back as the defaults."""
+    from postulo.plugins.policy import GOVERNED_KINDS
+    from postulo.plugins.registry import plugins
+
+    installed = sorted({p.name for kind in GOVERNED_KINDS for p in plugins(kind)})
+    assert installed, "the test needs one governed plugin to switch off"
+
+    chosen = {
+        "keyboard_shortcuts": False,
+        "nav_underline": False,
+        "density": "compact",
+        "plugins_off": installed[:1],
+        "keep_page_source": True,
+        "keep_page_rendering": True,
+        "closing_notice_days": 10,
+        "dashboard_widgets": [],
+        "quiet_after_days": 40,
+        "use_gravatar": True,
+        "show_career_order": not user.profile.show_career_order,
+    }
+    for name, value in chosen.items():
+        assert getattr(other_user.profile, name) != value, f"{name} must differ from the default"
+        setattr(user.profile, name, value)
+    user.profile.save()
+
+    importer.load(other_user, zipfile.ZipFile(export_module.write_archive(user)))
+
+    other_user.profile.refresh_from_db()
+    for name, value in chosen.items():
+        assert getattr(other_user.profile, name) == value, name
+
+
+@pytest.mark.django_db
+def test_a_preference_the_file_gets_wrong_is_not_believed(user):
+    document = export_module.build_document(user)
+    document["account"]["profile"].update(
+        density="enormous",
+        closing_notice_days=9999,
+        keyboard_shortcuts="no",
+        plugins_off=["no-such-plugin"],
+    )
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    user.profile.density = "comfortable"
+    user.profile.save()
+    importer.load(user, zipfile.ZipFile(buffer), force=True)
+    user.profile.refresh_from_db()
+    assert user.profile.density == "comfortable"
+    assert user.profile.closing_notice_days == 3
+    assert user.profile.keyboard_shortcuts is True
+    assert user.profile.plugins_off == []

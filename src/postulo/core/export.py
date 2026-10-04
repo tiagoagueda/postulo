@@ -76,8 +76,13 @@ logger = logging.getLogger(__name__)
 #: read as it was written, and its codes are respelt on the way in (#337). 29 added
 #: ``service`` on a web link, the key of the service the address is on, blank for
 #: *Other*; an archive without it has each link's service worked out from its address,
-#: and a key this instance does not know restores as *Other* (#305).
-FORMAT_VERSION = 29
+#: and a key this instance does not know restores as *Other* (#305). 30 added the rest of
+#: the profile's preferences -- ``keyboard_shortcuts``, ``nav_underline``, ``density``,
+#: ``plugins_off``, ``keep_page_source``, ``keep_page_rendering`` and
+#: ``closing_notice_days`` -- and made the importer restore a field the file names whatever
+#: its value, so a switch set off and a dashboard cleared come back as they were (#464). An
+#: archive without them restores each at its default.
+FORMAT_VERSION = 30
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -134,6 +139,16 @@ PROFILE_FIELDS = (
     "quiet_after_days",
     "use_gravatar",
     "show_career_order",
+    # The rest of how the account behaves (#464). Each is a choice somebody made, and two
+    # are privacy choices (what a capture keeps) or an accessibility one (single-key
+    # shortcuts, WCAG 2.1.4): a restore that quietly reset them would undo the choice.
+    "keyboard_shortcuts",
+    "nav_underline",
+    "density",
+    "plugins_off",
+    "keep_page_source",
+    "keep_page_rendering",
+    "closing_notice_days",
 )
 #: What the candidate document takes from the profile: what a CV prints, and the language
 #: the career is written in, which its translations are translations *from*. Everything

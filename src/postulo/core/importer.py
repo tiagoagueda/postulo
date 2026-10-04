@@ -24,7 +24,14 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from .export import CV_FIELDS, FORMAT_VERSION, MANIFEST_NAME, MEDIA_PREFIX, TRANSLATION_SECTIONS
+from .export import (
+    CV_FIELDS,
+    FORMAT_VERSION,
+    MANIFEST_NAME,
+    MEDIA_PREFIX,
+    PROFILE_FIELDS,
+    TRANSLATION_SECTIONS,
+)
 
 
 class ArchiveError(Exception):
@@ -56,6 +63,61 @@ class ImportReport:
             for name, value in vars(self).items()
             if isinstance(value, int) and value
         ]
+
+
+#: What `_profile_value` returns for a value the field would not take.
+_REFUSED = object()
+
+#: The preferences added to the file in format 30, which are the ones checked against their
+#: field. The older keys are set as they always were, apart from the blanks and nulls.
+_CHECKED_PROFILE_FIELDS = frozenset(
+    {
+        "keyboard_shortcuts",
+        "nav_underline",
+        "density",
+        "keep_page_source",
+        "keep_page_rendering",
+        "closing_notice_days",
+    }
+)
+
+
+def _profile_value(profile, name: str, value):
+    """What to set on the profile for one key of the file, or `_REFUSED`.
+
+    A key the file names is restored whatever its value: a switch somebody turned off is
+    `False`, a dashboard somebody cleared is `[]`, and passing over either hands back the
+    default they changed (#464). An archive is a claim, so each value is checked against
+    the field before it is believed -- a choice for `density`, the range for a number, the
+    plugins this instance has for `plugins_off`. A blank text is "nobody said", and is
+    left to the default unless the field is allowed to be blank.
+    """
+    column = type(profile)._meta.get_field(name)
+    if value is None:
+        return _REFUSED
+    if isinstance(value, str) and not value and not column.blank:
+        return _REFUSED
+    if name == "plugins_off":
+        if not isinstance(value, list):
+            return _REFUSED
+        from postulo.plugins.policy import GOVERNED_KINDS
+        from postulo.plugins.registry import plugins
+
+        installed = {plugin.name for kind in GOVERNED_KINDS for plugin in plugins(kind)}
+        return sorted({item for item in value if isinstance(item, str) and item in installed})
+    if name in _CHECKED_PROFILE_FIELDS:
+        wanted = (
+            bool
+            if column.get_internal_type() == "BooleanField"
+            else (str if column.get_internal_type() == "CharField" else int)
+        )
+        if type(value) is not wanted:
+            return _REFUSED
+        try:
+            return column.clean(value, profile)
+        except ValidationError:
+            return _REFUSED
+    return value
 
 
 def _kept_as_other(key: str, value: str, subject: str, whose: str = "") -> str:
@@ -567,8 +629,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     profile = getattr(user, "profile", None)
     if profile and profile_data:
         for name, value in profile_data.items():
-            if hasattr(profile, name) and value:
-                setattr(profile, name, value)
+            if name not in PROFILE_FIELDS or not hasattr(profile, name):
+                continue
+            settled = _profile_value(profile, name, value)
+            if settled is not _REFUSED:
+                setattr(profile, name, settled)
         profile.save()
     if profile:
         _restore_phone_numbers(profile, user, numbers, report, "on the profile")
