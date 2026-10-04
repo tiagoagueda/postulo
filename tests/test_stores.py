@@ -14,9 +14,9 @@ from django.urls import reverse
 from django.utils import timezone
 
 from postulo.applications.models import Application, Status
-from postulo.core import importer
+from postulo.core import importer, languages
 from postulo.core.export import write_archive
-from postulo.documents import archiving
+from postulo.documents import archiving, kinds
 from postulo.documents.archiving import (
     backfill,
     schedule_copies,
@@ -438,6 +438,27 @@ def test_send_now_tries_at_once_and_is_private(client, user, other_user):
     assert len(ShelfStore.received) == 1
     response = client.post(url, follow=True)
     assert "already has this document" in response.content.decode()
+
+
+def test_a_store_is_told_the_kind_in_the_owners_language_whichever_path_sends(user):
+    user.profile.language = "fr-FR"
+    user.profile.save()
+    a_store(user)
+    first = an_upload(user, title="One")
+    second = an_upload(user, title="Two")
+    DocumentCopy.objects.filter(document_id=second.pk).delete()
+
+    with languages.override("pt-PT"):
+        assert send_now(second) == (1, 0)
+    with languages.override("en-GB"):
+        assert send_pending() == (1, 0)
+
+    labels = {m.kind_label for _p, _c, m, _cfg in ShelfStore.received}
+    assert len(ShelfStore.received) == 2 and first.pk != second.pk
+    assert len(labels) == 1, "one kind, one name"
+    with languages.override("fr-FR"):
+        assert labels == {kinds.label_for(DocumentKind.CERTIFICATE)}
+    assert labels != {"Certificate"}
 
 
 def test_send_now_without_a_store_explains(client, user):

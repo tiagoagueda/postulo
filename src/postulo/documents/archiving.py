@@ -19,6 +19,8 @@ from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
+from postulo.core import languages
+from postulo.notifications.service import language_for
 from postulo.plugins.base import ConnectionUnusable
 from postulo.plugins.models import Connection
 from postulo.plugins.secrets import SecretsUnreadable
@@ -131,7 +133,14 @@ def send_copy(copy: DocumentCopy) -> bool:
         return fail(str(_("There is no file to send.")))
 
     try:
-        with document.file.open("rb") as handle:
+        # What a store is told, the kind's name among it, is worded in the owner's language
+        # and not in whatever one the sender happens to have: the scheduler has none and a
+        # person's *Send now* has the request's, and a store that files by that name would
+        # file one kind under two (#605).
+        with (
+            languages.override(language_for(document.owner)),
+            document.file.open("rb") as handle,
+        ):
             ref = plugin.put(
                 document, handle, metadata_for(document), connection.full_config, document.owner
             )

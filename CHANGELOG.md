@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A document store is now told the kind's name, and any error sentence it raises, in the owner's language whichever path sends the copy, so Paperless and other stores no longer file one kind under two names. (#605)
 - An imported CV's website and ORCID are now checked as the profile forms check them; a value that fails is named in the import report instead of being stored and printed on the CV. (#610)
 - A CV importer plugin that raises in can_handle is now logged and skipped, and one that raises in read shows a message naming it, instead of a 500 that blocked every upload on the import page. (#611)
 - The career preview now shows your Links (title, type and host) after Projects, so "Everything you have written" really lists every career section. (#612)
