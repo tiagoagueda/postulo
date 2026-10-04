@@ -366,7 +366,9 @@ def test_an_interview_is_worded_in_the_readers_zone_and_language(user):
     assert "2026-11-02T" not in body
 
 
-def test_a_status_label_comes_out_in_the_readers_language_whatever_the_callers(user):
+def test_a_status_label_comes_out_in_the_readers_language_whatever_the_callers(
+    user, django_capture_on_commit_callbacks
+):
     """`change_status` ran under `en` (a token request); the reader reads `fr` (#385)."""
     from django.utils import translation
 
@@ -377,7 +379,11 @@ def test_a_status_label_comes_out_in_the_readers_language_whatever_the_callers(u
     user.profile.save(update_fields=["language"])
     application = an_application(user)
 
-    with translation.override("en"), mock.patch("postulo.core.errands.send") as queued:
+    with (
+        translation.override("en"),
+        mock.patch("postulo.core.errands.send") as queued,
+        django_capture_on_commit_callbacks(execute=True),
+    ):
         change_status(application, Status.INTERVIEWING)
     payload = queued.call_args.kwargs
     assert "status" not in payload, "no pre-translated label travels in the errand"

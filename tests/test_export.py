@@ -671,7 +671,7 @@ def test_an_archive_without_sent_files_or_sent_to_still_imports(populated, other
 
 
 def test_an_expired_archive_is_deleted_by_the_export_page_without_the_scheduler(
-    client, populated, settings
+    client, populated, settings, django_capture_on_commit_callbacks
 ):
     """The deletion used to wait for an optional scheduler; the page promised a day (#539)."""
     from postulo.core.models import ExportArchive
@@ -690,7 +690,9 @@ def test_an_expired_archive_is_deleted_by_the_export_page_without_the_scheduler(
     assert ExportArchive.objects.filter(pk=archive.pk).exists()
     # An hour later.
     cache.delete("core:tidied-up")
-    response = client.get(reverse("core:export"))
+    # The file goes when the deletion commits (#355), which a test inside a transaction runs.
+    with django_capture_on_commit_callbacks(execute=True):
+        response = client.get(reverse("core:export"))
 
     assert response.status_code == 200
     assert not ExportArchive.objects.filter(pk=archive.pk).exists()
