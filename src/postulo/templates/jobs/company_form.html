@@ -58,7 +58,6 @@
                 {% translate "Your list is empty. Type the first ones below; the suggestions are only a start." %}
               </p>
             {% endif %}
-            <c-field-feedback :field="form.industries" />
           </div>
           <div class="field" data-labels-newbox>
             <label for="{{ form.new_industries.id_for_label }}">{{ form.new_industries.label }}</label>
@@ -66,6 +65,10 @@
             <datalist id="industry-suggestions">
               {% for name in form.suggestions %}<option value="{{ name }}">{% endfor %}
             </datalist>
+          </div>
+          {% comment %} Outside the two boxes the chips hide, so what a refusal says stays on the page (#522). {% endcomment %}
+          <div class="field" data-labels-feedback>
+            <c-field-feedback :field="form.industries" />
             <c-field-feedback :field="form.new_industries" />
           </div>
         </fieldset>

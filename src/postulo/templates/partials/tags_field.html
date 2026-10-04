@@ -7,11 +7,14 @@
   <label for="{{ form.tags.id_for_label }}" class="label" id="labels-{{ form.tags.html_name }}-heading">{{ form.tags.label }}</label>
   <div class="field" data-labels-existing>
     {{ form.tags }}
-    <c-field-feedback :field="form.tags" />
   </div>
   <div class="field mt-3" data-labels-newbox>
     <label for="{{ form.new_tags.id_for_label }}">{{ form.new_tags.label }}</label>
     {{ form.new_tags }}
+  </div>
+  {% comment %} Outside the two boxes the chips hide, so what a refusal says stays on the page (#522). {% endcomment %}
+  <div class="field" data-labels-feedback>
+    <c-field-feedback :field="form.tags" />
     <c-field-feedback :field="form.new_tags" />
   </div>
 </div>

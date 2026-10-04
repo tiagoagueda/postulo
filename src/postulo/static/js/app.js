@@ -5059,6 +5059,16 @@
 
     var native = box.querySelector("[data-labels-existing]");
     var newBox = box.querySelector("[data-labels-newbox]");
+    // The help and the errors of both controls stay on the page (#522); the chip input is
+    // described by them, as the controls it stands in for were.
+    var feedback = Array.prototype.map
+      .call(box.querySelectorAll("[data-labels-feedback] [id]"), function (node) {
+        return node.id;
+      })
+      .join(" ");
+    if (feedback) {
+      field.setAttribute("aria-describedby", feedback);
+    }
     box.insertBefore(chips, native);
     box.insertBefore(field, native);
     box.insertBefore(options, native);

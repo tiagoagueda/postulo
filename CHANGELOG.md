@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Tags and industries: with scripts on, the chip control no longer hides the help text and validation errors of the tag and industry fields (and their new-name fields), and the chip input is described by them. (#522)
 - Fixed: the uploads on an application's Documents page now name their file to screen readers on Download and "Send to stores now", as the other documents pages do. (#516)
 - A portfolio now prints "2020 – present" for a current role or course, instead of the start year alone, in the page, the text and the Word file. (#515)
 - Recording what you sent now offers only reusable-template letters and files that no newer version replaces; a one-off letter or an older version already chosen stays selectable. (#510)

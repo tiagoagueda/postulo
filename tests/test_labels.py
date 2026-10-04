@@ -228,3 +228,27 @@ def test_the_script_does_not_replace_the_control_it_is_layered_over():
 
     assert "hidden = true" in source, "the native control is hidden, not removed"
     assert "remove()" not in block
+
+
+def test_a_refusal_is_not_drawn_inside_a_box_the_chips_hide(client, user):
+    """The script hides `data-labels-existing` and `data-labels-newbox` whole; whatever
+    the page says about the fields must sit outside them (#522).
+    """
+    import re
+
+    client.force_login(user)
+
+    html = client.post(
+        reverse("jobs:company_create"),
+        {
+            "name": "Aperture Science",
+            "new_industries": ", ".join(f"Industry {n}" for n in range(60)),
+        },
+    ).content.decode()
+
+    assert "id_new_industries_error" in html
+    for box in ("data-labels-existing", "data-labels-newbox"):
+        for inside in re.findall(rf"{box}>(.*?)</div>", html, flags=re.S):
+            assert 'role="alert"' not in inside
+            assert '_helptext" ' not in inside
+    assert re.search(r"data-labels-feedback>.*id_new_industries_error", html, flags=re.S)

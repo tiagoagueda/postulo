@@ -12,6 +12,8 @@ being ticked, the picture is a lie.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -216,3 +218,24 @@ def test_tags_get_the_same_control(page: Page, live_server, applicant):
 
     expect(page.locator("[data-labels-chips] .badge")).to_have_count(1)
     expect(page.get_by_role("button", name="Remove Remote")).to_be_visible()
+
+
+def test_a_refused_company_keeps_its_error_in_sight_with_the_chips_on(
+    page: Page, live_server, applicant
+):
+    """The chips hide the controls, not what the page says about them (#522)."""
+    company = a_company_with_industries(applicant)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/jobs/companies/{company.pk}/edit/")
+
+    page.locator('input[name="new_industries"]').evaluate(
+        "(node, value) => { node.value = value; }", ", ".join(f"Industry {n}" for n in range(60))
+    )
+    page.get_by_role("button", name="Save").click()
+
+    expect(page.locator("[data-labels-chips]")).to_be_visible()
+    error = page.locator("#id_new_industries_error")
+    expect(error).to_be_visible()
+    expect(page.locator("[data-labels-input]")).to_have_attribute(
+        "aria-describedby", re.compile(".*id_new_industries_error.*")
+    )
