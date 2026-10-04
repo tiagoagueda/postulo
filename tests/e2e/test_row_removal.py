@@ -686,6 +686,8 @@ def test_focus_moves_first_and_the_block_says_what_went_once(page: Page, live_se
 
     region = page.locator("#section-phones [data-removed-said]")
     expect(region).to_have_text(removed("+351 912 345 671"))
+    # A fixed wait on purpose: no second write may follow within 300 ms (the sentence is
+    # written SAID_AFTER = 100 ms late).
     page.wait_for_timeout(300)  # long enough for a second write to have happened
     heard = page.evaluate("() => window.heard")
     assert heard["landed"] == 1, heard

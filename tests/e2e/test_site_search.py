@@ -244,6 +244,8 @@ def test_a_slow_answer_to_the_box_never_lands_over_a_newer_one_from_the_form(
     page.locator("#filter-status").select_option("rejected")
     expect(page.locator("#applications-table")).to_contain_text("Nothing matches these filters")
     held.release.set()
+    # A fixed wait on purpose: the released stale answer must have 700 ms to land and still
+    # not be drawn.
     page.wait_for_timeout(700)  # long enough for the answer held back to land, if it could
 
     expect(page).to_have_url(re.compile(r"[?&]q=aperture(&|$)"))
@@ -279,6 +281,8 @@ def test_a_slow_answer_to_a_column_filter_never_lands_over_a_newer_one_from_the_
     page.locator("#site-search").fill("aperture")
     expect(rows).to_have_count(1)
     held.release.set()
+    # A fixed wait on purpose: the released stale answer must have 700 ms to land and still
+    # not be drawn.
     page.wait_for_timeout(700)
 
     expect(page).to_have_url(re.compile(r"[?&]q=aperture(&|$)"))
@@ -353,6 +357,7 @@ def test_enter_after_the_table_has_narrowed_is_not_a_second_place_in_the_history
 
     with page.expect_response(lambda response: "q=aperture" in response.url):
         box.press("Enter")
+    # A fixed wait on purpose: a second history push must have 300 ms to happen and still not.
     page.wait_for_timeout(300)
     expect(rows).to_have_count(2)
     assert page.evaluate("history.length") == before + 1, "Enter pushed the same address again"

@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 - CI runs the browser tests on two processes, the walks of every page first. (#721)
 - `scripts/messages.py stats` finds the catalogue sets once instead of once per language: 4 seconds instead of 45. (#724)
 - The unit suite no longer repeats the catalogue and collectstatic checks CI's Checks job makes; `pytest -m step` runs them. (#725)
+- Browser tests wait for the page's state instead of a fixed time where the time is not the point, and every fixed wait left says what it measures. (#723)
 
 ### ✨ Added
 

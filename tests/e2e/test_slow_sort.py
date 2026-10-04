@@ -50,6 +50,7 @@ def test_a_slow_sort_does_not_land_over_a_newer_filter(
     for _ in range(50):
         if held:
             break
+        # A fixed wait on purpose: paces the poll of `held`, Python state no expect can watch.
         page.wait_for_timeout(50)
     assert len(held) == 1, "the sort's request is out, and held"
 
@@ -60,6 +61,7 @@ def test_a_slow_sort_does_not_land_over_a_newer_filter(
     # Let the old answer go: it must not be drawn.
     with contextlib.suppress(Exception):  # already abandoned, which is the point
         held[0].continue_()
+    # A fixed wait on purpose: 400 ms for the released sort answer to land, as it must not.
     page.wait_for_timeout(400)
 
     assert asked not in page.url, page.url

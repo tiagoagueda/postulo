@@ -1186,6 +1186,8 @@ def test_the_first_wrong_control_keeps_the_focus_whichever_it_is(
         # The button has the focus and says why; the box is told nothing yet, so no
         # bubble of the browser's points elsewhere.
         expect(button).to_be_focused()
+        # A fixed wait on purpose: the focus must stay on the button for 100 ms, not be
+        # taken by a late browser bubble or the box.
         page.wait_for_timeout(100)
         expect(button).to_be_focused()
         assert declined == {"two-select": True, "two-box": True}
@@ -1280,6 +1282,8 @@ def test_a_tap_outside_an_open_list_closes_it_and_presses_nothing_else(
         )
         page.touchscreen.tap(*middle)
         expect(panel).to_be_hidden()
+        # A fixed wait on purpose: 300 ms for a late synthetic click from the tap to land;
+        # the button must stay unpressed.
         page.wait_for_timeout(300)
         assert page.evaluate("() => window.pressed") == 0
         # With the list closed, the same tap presses the button.

@@ -373,12 +373,14 @@ def test_space_held_down_presses_a_heading_once(page: Page, live_server, search)
     page.keyboard.down("Space")
     for _ in range(6):
         # Each further `down` of a key that is down is a repeat, as a held key sends them.
+        # A fixed wait on purpose: the 60 ms between key repeats, paced as a held key sends them.
         page.wait_for_timeout(60)
         page.keyboard.down("Space")
     page.keyboard.up("Space")
 
     unfolded(page, person)
     settled(page)
+    # A fixed wait on purpose: 300 ms in which no second request may follow the one press.
     page.wait_for_timeout(300)
     assert len(asked_for) == 1, asked_for
     unfolded(page, person)
@@ -583,6 +585,8 @@ def click_heard(page: Page, control, modifiers: list[str]) -> dict:
         "() => window.clicksHeard.length && 'cancelled' in window.clicksHeard.at(-1)"
     )
     heard = page.evaluate("() => window.clicksHeard.at(-1)")
+    # A fixed wait on purpose: 400 ms for a tab the browser may or may not open (not asserted)
+    # to appear and be closed.
     page.wait_for_timeout(400)
     for other in page.context.pages:
         if other != page:
@@ -730,6 +734,8 @@ def wait_until_held(page: Page, held: list) -> None:
     for _ in range(100):
         if held:
             return
+        # A fixed wait on purpose: a 50 ms poll step that lets the route handler run; the
+        # loop waits for the held request.
         page.wait_for_timeout(50)
     raise AssertionError("the request never left the page")
 
@@ -1110,6 +1116,8 @@ def hold_at(page: Page, x: float, y: float, for_ms: int) -> None:
     the pointer moves."""
     for step in range(max(1, for_ms // 50)):
         page.mouse.move(x, y + (step % 2))
+        # A fixed wait on purpose: 50 ms between pointer moves, the pace of a hand holding
+        # a drag still.
         page.wait_for_timeout(50)
 
 
@@ -1125,6 +1133,7 @@ def hold_until(page: Page, x: float, y: float, done, what: str) -> None:
 
 def is_still(page: Page) -> bool:
     first = scroll_of(page)
+    # A fixed wait on purpose: the scroll position must stay unchanged for 250 ms to count as still.
     page.wait_for_timeout(250)
     return scroll_of(page) == first
 
@@ -1214,6 +1223,8 @@ def test_the_nearer_the_edge_the_faster_the_board_scrolls(page: Page, live_serve
     def speed(inside: float) -> float:
         x, y = at_the_edge(page, end=True, inside=inside)
         page.mouse.move(x, y)
+        # A fixed wait on purpose: 60 ms for the scroll to get going at this depth before
+        # its speed is timed.
         page.wait_for_timeout(60)
         began = page.evaluate(f"() => [performance.now(), ({SCROLL})()]")
         hold_at(page, x, y, for_ms=500)
@@ -1332,6 +1343,8 @@ def test_a_swap_elsewhere_on_the_page_leaves_the_board_where_it_was_scrolled(
     with page.expect_response(lambda r: "/theme/" in r.url and r.request.method == "POST"):
         page.locator("#theme-switch-button").click()
     settled(page)
+    # A fixed wait on purpose: 200 ms in which the board must not be scrolled back after the
+    # theme swap.
     page.wait_for_timeout(200)
     assert scroll_of(page) == 0, "the theme changed, and the board stayed where it was put"
 
@@ -1430,6 +1443,8 @@ def measured(page: Page, inside: float, for_ms: int = 400) -> float:
     page.evaluate("() => { document.querySelector('[data-board]').scrollLeft = 0; }")
     x, y = at_the_edge(page, end=True, inside=inside)
     page.mouse.move(x, y)
+    # A fixed wait on purpose: 80 ms for the scroll to get going at this depth before its
+    # speed is timed.
     page.wait_for_timeout(80)
     began = page.evaluate(f"() => [performance.now(), ({SCROLL})()]")
     hold_at(page, x, y, for_ms=for_ms)
@@ -1548,6 +1563,8 @@ def test_the_board_stops_when_the_pointer_leaves_the_window_or_the_drag_is_given
     page.goto(f"{base}{BOARD}")
     held_at_the_edge(page)
     page.evaluate("() => window.heldDrag.quiet()")
+    # A fixed wait on purpose: a second without a `dragover`, past app.js's 700 ms SILENCE,
+    # after which the scroll stops by itself.
     page.wait_for_timeout(1000)
     assert is_still(page), "nothing reported for a second, and still"
     room = page.evaluate(
@@ -1585,6 +1602,8 @@ def test_under_reduced_motion_the_board_scrolls_only_by_hand(page: Page, live_se
     # The same held card, told to the page rather than made by the browser.
     page.evaluate("() => { document.querySelector('[data-board]').scrollLeft = 0; }")
     page.evaluate(HELD_AT_THE_EDGE)
+    # A fixed wait on purpose: 400 ms held at the edge in which, under reduced motion, the
+    # board must not move.
     page.wait_for_timeout(400)
     assert scroll_of(page) == 0
 
@@ -1626,6 +1645,7 @@ def test_a_held_card_is_not_swapped_away_by_a_filter_or_a_fold(page: Page, live_
     page.locator("#application-filters select[name=tag]").select_option("remote")
     # Pressed from the page: a browser gives the mouse to the drag while a card is held.
     fold(page, "applied").evaluate("(control) => control.click()")
+    # A fixed wait on purpose: 500 ms in which neither the filter nor the press may send a request.
     page.wait_for_timeout(500)
 
     assert asked_for == [], "nothing is asked for while the card is held"
@@ -1664,6 +1684,8 @@ def test_an_answer_that_lands_while_a_card_is_held_waits_for_the_card(
     for _ in range(50):
         if held:
             break
+        # A fixed wait on purpose: a 50 ms poll step that lets the route handler run; the
+        # loop waits for the held request.
         page.wait_for_timeout(50)
     assert len(held) == 1, "the filter's request is out, and held"
 
@@ -1679,6 +1701,8 @@ def test_an_answer_that_lands_while_a_card_is_held_waits_for_the_card(
     with page.expect_response(re.compile(r"tag=remote")) as answer:
         held[0].continue_()
     answer.value.finished()
+    # A fixed wait on purpose: 200 ms in which the landed answer must not be swapped in under
+    # the held card.
     page.wait_for_timeout(200)
 
     assert is_the_same_board(page), "the answer was not put under the held card"
@@ -1727,6 +1751,8 @@ def test_a_filter_refused_while_a_card_was_held_is_kept_by_the_move(
         held[0].continue_()
     answer.value.finished()
     page.unroute(waits)
+    # A fixed wait on purpose: 200 ms in which the refused answer must not be put under the
+    # held card.
     page.wait_for_timeout(200)
     assert "tag=remote" not in page.url, "the answer was not put under the held card"
 
@@ -2233,6 +2259,8 @@ def still(page: Page) -> None:
     )
     # The box's scrolling is a frame loop of its own, as long as the columns' motion.
     first = page.evaluate(SCROLL)
+    # A fixed wait on purpose: the box's scroll position must stay unchanged for 300 ms to
+    # count as stopped.
     page.wait_for_timeout(300)
     assert page.evaluate(SCROLL) == first, "the box is still scrolling"
 

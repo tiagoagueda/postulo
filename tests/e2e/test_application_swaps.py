@@ -110,7 +110,9 @@ def test_a_page_load_would_have_moved_it(page: Page, live_server, application):
     page.goto(f"{live_server.url}{application.get_absolute_url()}")
     page.locator("#status-card select[name=status]").select_option("interviewing")
     page.mouse.wheel(0, 400)
-    page.wait_for_timeout(100)
+    # `mouse.wheel` does not wait for the scroll; the masthead is marked `data-scrolled` by
+    # app.js once `scrollY` is past zero, so that is the page saying it has moved.
+    expect(page.locator("header[data-site-header]")).to_have_attribute("data-scrolled", "")
     scrolled = page.evaluate("window.scrollY")
 
     page.locator("#status-card").get_by_role("button", name="Record").click()

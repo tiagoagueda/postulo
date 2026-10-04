@@ -37,8 +37,10 @@ def asked_before_leaving(page: Page, go) -> bool:
 
     page.on("dialog", remember)
     try:
-        go()
-        page.wait_for_timeout(300)
+        # Asked or not, ``go`` ends on another page, and a question has to be answered
+        # before the browser may leave: once the navigation lands, any dialog has been seen.
+        with page.expect_navigation():
+            go()
     finally:
         page.remove_listener("dialog", remember)
     return "beforeunload" in seen

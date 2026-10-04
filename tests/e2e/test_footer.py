@@ -9,8 +9,10 @@ version is there, and an operator who has set a legal notice, so all four links 
 
 from __future__ import annotations
 
+import re
+
 import pytest
-from playwright.sync_api import Page
+from playwright.sync_api import Page, expect
 
 from .test_accessibility import furnished, sign_in  # noqa: F401
 from .test_navigation_bar import bar_top
@@ -46,10 +48,23 @@ def everything_set(settings):
     settings.POSTULO_LEGAL_NOTICE_URL = "https://example.org/impressum"
 
 
+#: The bar's height when the main navigation is the bar fixed to the foot of the window,
+#: and None when it is a row in the masthead.
+BAR_HEIGHT = """(nav) => getComputedStyle(nav).position === 'fixed' ? nav.offsetHeight : null"""
+
+
 def measure(page: Page, size: dict) -> dict:
     page.set_viewport_size(size)
+    # The page's bottom padding is `--bottom-bar-height`, which app.js writes on the root
+    # after a resize (and takes off again once the navigation is a row): scrolling to the
+    # end before it has caught up with the new width would measure the old page's end.
+    height = page.locator("[data-nav-main]").evaluate(BAR_HEIGHT)
+    root = page.locator("html")
+    if height is None:
+        expect(root).not_to_have_attribute("style", re.compile(r"--bottom-bar-height"))
+    else:
+        expect(root).to_have_attribute("style", re.compile(rf"--bottom-bar-height:\s*{height}px"))
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
-    page.wait_for_timeout(100)
     return page.evaluate(ROWS)
 
 

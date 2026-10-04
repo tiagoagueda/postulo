@@ -308,6 +308,9 @@ def test_after_a_refusal_the_sentence_the_line_and_save_are_within_reach(
         " box.value.slice(0, box.selectionStart).split('\\n').length === line; }",
         arg=LONG_LINE,
     )
+    # A fixed wait on purpose: htmx's settle (20 ms) then focuses the [autofocus] box again,
+    # which can scroll the page; the box is already focused by app.js, so nothing visible
+    # marks that second focus, and the positions read below must be the ones after it.
     page.wait_for_timeout(150)  # past htmx's own settling, which hands the focus over
 
     found = root.evaluate(WHERE)

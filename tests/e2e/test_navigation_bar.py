@@ -163,6 +163,9 @@ def test_the_row_is_fitted_to_more_in_the_weight_it_is_drawn_in(live_server, pag
     page.set_viewport_size({"width": 1024, "height": 800})
     page.goto(f"{base}/jobs/companies/")
     page.evaluate(ADOPT, TEXT_SPACING)
+    # A fixed wait on purpose: the time the ResizeObserver and the frame-scheduled fit get to
+    # re-fit the row to the override; the count it settles on is what is being found out, so
+    # there is no end state to wait for.
     page.wait_for_timeout(100)
     started = page.evaluate(THE_FIT)["line"]
 
@@ -180,6 +183,9 @@ def test_the_row_is_fitted_to_more_in_the_weight_it_is_drawn_in(live_server, pag
         page.set_viewport_size({"width": width + 1, "height": 800})
         page.goto(f"{base}/jobs/companies/")
         page.evaluate(ADOPT, TEXT_SPACING)
+        # A fixed wait on purpose: the time the ResizeObserver and the frame-scheduled fit get
+        # to re-fit the row to the override; waiting for `count` items instead could pass on
+        # the fit made before the override, which is not the one being checked.
         page.wait_for_timeout(100)
         fit = page.evaluate(THE_FIT)
         assert fit == {"line": count, "bold": True}, (width, fit)
@@ -212,7 +218,7 @@ def test_nothing_on_a_page_ends_up_behind_the_bar(live_server, page: Page, furni
 
     # The last line of the page scrolls clear of it.
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
-    page.wait_for_timeout(100)
+    expect(page.locator("footer [data-version]")).to_be_in_viewport()
     version = page.locator("footer [data-version]").bounding_box()
     assert version["y"] + version["height"] <= bar_top(page), "the footer ends under the bar"
 
@@ -223,11 +229,11 @@ def test_nothing_on_a_page_ends_up_behind_the_bar(live_server, page: Page, furni
     last = page.locator("main a:visible").last
     top = last.evaluate("el => el.getBoundingClientRect().top + window.scrollY")
     page.evaluate("y => window.scrollTo(0, y)", top - (PHONE["height"] - 30))
-    page.wait_for_timeout(100)
+    expect(last).to_be_in_viewport()
     box = last.bounding_box()
     assert box["y"] + box["height"] > bar_top(page), "the link should start out under the bar"
     last.focus()
-    page.wait_for_timeout(100)
+    expect(last).to_be_focused()
     box = last.bounding_box()
     assert box["y"] + box["height"] <= bar_top(page), "a focused link is under the bar"
 
@@ -267,6 +273,8 @@ def test_the_bar_is_a_thumbs_size_and_keeps_it_under_the_spacing_override(
     page.set_viewport_size({"width": PHONE["width"], "height": 740})
     page.goto(f"{base}/applications/")
     page.evaluate(ADOPT, TEXT_SPACING)
+    # A fixed wait on purpose: the time the ResizeObserver gets to re-measure the bar into
+    # `--bottom-bar-height` under the override, read below against the bar's own height.
     page.wait_for_timeout(200)
     assert not page.evaluate(LABELS_THAT_SPILL)
     assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]

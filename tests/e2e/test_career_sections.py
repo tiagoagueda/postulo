@@ -107,6 +107,8 @@ def test_on_a_phone_the_label_stays_as_it_is(live_server, page: Page, furnished)
     page.goto(f"{live_server.url}/career/")
 
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
+    # A fixed wait on purpose: the label must stay unchanged past the scroll event and the
+    # animation frame app.js marks it in.
     page.wait_for_timeout(200)
     assert label_text(page) == "On this page"
 

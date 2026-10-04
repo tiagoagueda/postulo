@@ -103,6 +103,9 @@ def test_a_table_narrowing_as_you_type_keeps_it(live_server, page: Page, applica
     field = page.locator("input[type=search]").first
     if field.count():
         field.fill("engineer")
+        # A fixed wait on purpose: the window must outlast the 300 ms htmx input delay and
+        # its swap so any violation they cause is heard, and the first search box need not
+        # fire a request at all.
         page.wait_for_timeout(600)
 
     assert not breaches, "\n".join(breaches)

@@ -355,15 +355,18 @@ def test_resting_the_pointer_on_a_field_shows_it_and_the_pointer_can_go_onto_it(
 
     onto = tip.bounding_box()
     page.mouse.move(onto["x"] + onto["width"] / 2, onto["y"] + onto["height"] / 2, steps=8)
+    # A fixed wait on purpose: the tip must still show past its 500 ms keep.
     page.wait_for_timeout(700)
     expect(tip).to_be_visible()
 
     page.keyboard.press("Escape")
     expect(tip).to_be_hidden()
+    # A fixed wait on purpose: it must stay away past the 500 ms keep, unmoved.
     page.wait_for_timeout(700)
     expect(tip).to_be_hidden()
 
     page.mouse.move(5, 400, steps=4)
+    # A fixed wait on purpose: off for longer than the 500 ms slip allowed.
     page.wait_for_timeout(700)
     page.locator("#id_headline").hover()
     expect(tip).to_be_visible()
@@ -386,6 +389,7 @@ def test_a_pointer_that_only_crosses_a_field_shows_nothing(page: Page, live_serv
     page.mouse.move(field["x"], field["bottom"] + 30)
     page.mouse.move(field["x"], field["top"] - 60, steps=4)
     page.mouse.move(5, 300)
+    # A fixed wait on purpose: nothing may open past the 300 ms rest delay.
     page.wait_for_timeout(900)
 
     assert page.evaluate("() => window.__opened") == 0, "a pointer crossing the field showed it"
@@ -417,7 +421,9 @@ def test_a_slow_hand_reaches_the_tooltip_straight_up_and_on_a_diagonal(
     while y > target:
         y -= 1
         page.mouse.move(x, y)
+        # A fixed wait on purpose: a slow hand, a pixel every 30 ms.
         page.wait_for_timeout(30)
+    # A fixed wait on purpose: time for a stray close to land.
     page.wait_for_timeout(200)
     assert page.evaluate("() => window.__closed") == 0, "lost on the way straight up"
     expect(tip).to_be_visible()
@@ -425,6 +431,7 @@ def test_a_slow_hand_reaches_the_tooltip_straight_up_and_on_a_diagonal(
     box = page.locator("#id_headline").bounding_box()
     far = (box["x"] + box["width"] - 10, box["y"] + box["height"] / 2)
     page.mouse.move(*far, steps=10)
+    # A fixed wait on purpose: the pointer settles before the re-measure.
     page.wait_for_timeout(200)
     expect(tip).to_be_visible()
     page.evaluate(WATCH, "id_headline_helptext")
@@ -436,7 +443,9 @@ def test_a_slow_hand_reaches_the_tooltip_straight_up_and_on_a_diagonal(
             far[0] + (middle[0] - far[0]) * step / steps,
             far[1] + (middle[1] - far[1]) * step / steps,
         )
+        # A fixed wait on purpose: a slow hand, a step every 25 ms.
         page.wait_for_timeout(25)
+    # A fixed wait on purpose: time for a stray close to land.
     page.wait_for_timeout(200)
     assert page.evaluate("() => window.__closed") == 0, "lost on the diagonal"
     expect(tip).to_be_visible()
@@ -541,6 +550,7 @@ def test_a_tooltip_never_lies_over_a_mark_under_a_row(
     page.locator("#id_phone_numbers-1-number_1").blur()
 
     page.locator("label[for=id_phone_numbers-1-number_1]").hover()
+    # A fixed wait on purpose: rests past the 300 ms open delay.
     page.wait_for_timeout(500)
     drawn(page)
     assert page.evaluate(BY_THE_RULE) == []
@@ -601,6 +611,7 @@ def test_a_tooltip_never_lies_over_the_masthead(page: Page, live_server, details
             " window.scrollBy(0, field.getBoundingClientRect().top - top); }",
             top,
         )
+        # A fixed wait on purpose: the scroll and re-placing settle.
         page.wait_for_timeout(100)
         drawn(page)
         assert page.evaluate(BY_THE_RULE) == [], top
@@ -697,6 +708,7 @@ def test_a_fields_tooltip_stays_away_while_its_list_is_open(
     expect(tip).to_be_hidden()
 
     page.mouse.move(*centre_of(page, f"[id='{panel.get_attribute('id')}']"))
+    # A fixed wait on purpose: stays away past the 300 ms open delay.
     page.wait_for_timeout(600)
     drawn(page)
     expect(tip).to_be_hidden()
@@ -752,7 +764,7 @@ def test_no_tooltip_lies_over_an_open_list(page: Page, live_server, details):  #
         first,
     )
     page.locator("label[for=id_headline]").hover()
-    page.wait_for_timeout(600)
+    expect(tip).to_be_visible()
     drawn(page)
     expect(panel).to_be_visible()
     assert page.evaluate(BY_THE_RULE) == []

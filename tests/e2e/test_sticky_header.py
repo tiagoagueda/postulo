@@ -7,6 +7,8 @@ and an anchor that stops clear of it rather than behind it.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -33,13 +35,15 @@ def test_the_header_is_there_after_scrolling_and_an_anchor_clears_it(
 
     page.goto(f"{live_server.url}/career/")
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
-    page.wait_for_timeout(100)
+    # The page has seen the scroll: its handler marks the masthead once scrollY > 0.
+    expect(page.locator("[data-site-header]")).to_have_attribute("data-scrolled", "")
     assert top_of(page, "header") == 0, "the header scrolled away"
     header_height = page.locator("header").first.bounding_box()["height"]
 
     page.evaluate("window.scrollTo(0, 0)")
     page.locator("[data-section-link=section-language]").first.click()
-    page.wait_for_timeout(300)
+    # The jump to the anchor is done once the address carries its fragment.
+    expect(page).to_have_url(re.compile(r"#section-language$"))
     assert top_of(page, "#section-language") >= header_height, "the section landed under the header"
 
 
@@ -53,7 +57,8 @@ def test_the_server_settings_list_stays_in_view_and_fits_the_window(
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/server/design/")
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
-    page.wait_for_timeout(100)
+    # The page has seen the scroll: its handler marks the masthead once scrollY > 0.
+    expect(page.locator("[data-site-header]")).to_have_attribute("data-scrolled", "")
 
     header_height = page.locator("header").first.bounding_box()["height"]
     aside = page.locator("aside[data-sidebar-frame]")
