@@ -149,6 +149,11 @@ def change_status(
     locked = Application.objects.select_for_update().filter(pk=application.pk).first()
     previous = locked.status if locked is not None else application.status
     application.status = previous
+    if locked is not None:
+        # The two derived columns are decided from the locked row as well (#543): a copy
+        # fetched before another move would otherwise stamp or clear them from stale data.
+        application.applied_at = locked.applied_at
+        application.closed_at = locked.closed_at
     if previous == new_status:
         if end_reason:
             return _say_why(

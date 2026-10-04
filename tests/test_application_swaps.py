@@ -246,3 +246,53 @@ def test_one_person_never_swaps_anothers_record(client, other_user, application)
     )
 
     assert response.status_code == 404
+
+
+# ------------------------------------------------------- two copies, one application
+
+
+def test_a_move_from_a_stale_copy_clears_the_close_another_move_set(application):
+    """``closed_at`` is decided from the locked row, not the copy fetched earlier (#543)."""
+    from postulo.applications.services import change_status
+
+    a = Application.objects.get(pk=application.pk)
+    b = Application.objects.get(pk=application.pk)
+
+    change_status(a, Status.REJECTED)
+    change_status(b, Status.INTERVIEWING)
+
+    application.refresh_from_db()
+    assert application.status == Status.INTERVIEWING
+    assert application.closed_at is None
+
+
+def test_a_move_from_a_stale_copy_does_not_close_what_another_move_reopened(application):
+    from postulo.applications.services import change_status
+
+    change_status(application, Status.REJECTED)
+    a = Application.objects.get(pk=application.pk)
+    b = Application.objects.get(pk=application.pk)
+
+    change_status(a, Status.INTERVIEWING)
+    change_status(b, Status.WITHDRAWN)
+
+    application.refresh_from_db()
+    assert application.status == Status.WITHDRAWN
+    assert application.closed_at is not None
+
+
+def test_applied_at_keeps_the_first_stamp_when_a_stale_copy_moves_on(user):
+    from postulo.applications.services import change_status
+
+    company = Company.objects.create(owner=user, name="Black Mesa")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Guard")
+    draft = Application.objects.create(owner=user, posting=posting, status=Status.DRAFT)
+    a = Application.objects.get(pk=draft.pk)
+    b = Application.objects.get(pk=draft.pk)
+
+    change_status(a, Status.APPLIED)
+    first = Application.objects.get(pk=draft.pk).applied_at
+    assert first is not None
+    change_status(b, Status.SCREENING)
+
+    assert Application.objects.get(pk=draft.pk).applied_at == first

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Moving an application's status now decides applied_at and closed_at from the locked row, so two concurrent moves no longer leave an open application closed, re-stamp the applied date, or leave a withdrawn one without a close date. (#543)
 - Outbound connections (HTTP guards, mail test and sending) now try each approved address in turn, so a name with one dead address, such as a broken IPv6, no longer fails whenever that address comes first. (#547)
 - A webhook delivery whose receiver's hostname briefly fails to resolve is now retried with back-off instead of being given up on and blamed on the private-address setting. (#549)
 - Webhooks no longer follow a redirect, which re-sent the POST as a bodyless GET and could record the event as sent; a 3xx now fails the delivery and the Test button, naming the address to use instead. (#550)
