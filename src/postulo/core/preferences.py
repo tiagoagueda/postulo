@@ -25,8 +25,10 @@ from . import languages
 def apply(profile, request=None) -> None:
     """Activate ``profile``'s time zone and language for the rest of this request.
 
-    Without a profile the zone is the instance's and the language is whatever
-    `LocaleMiddleware` took from the request, if the instance offers it (see `fallback`).
+    A profile with no language is read in the instance's default language, never the
+    browser's (#398). Without a profile -- a visitor not signed in -- the zone is the
+    instance's and the language is whatever `LocaleMiddleware` took from the request, if
+    the instance offers it (see `fallback`).
 
     The zone is set on every call, rather than only when a profile supplies one. Workers
     are reused across requests, and a time zone left activated by the previous visitor
@@ -53,27 +55,30 @@ def apply(profile, request=None) -> None:
     if withdrawn:
         language = ""
     if not language:
-        language = fallback(withdrawn=withdrawn)
+        # Somebody signed in who chose none follows the instance, as one whose choice was
+        # withdrawn does: the same page on a desktop and on a phone (#398).
+        language = fallback(own=withdrawn or profile is not None)
     if language:
         languages.activate(language)
         if request is not None:
             request.LANGUAGE_CODE = languages.current()
 
 
-def fallback(*, withdrawn: bool) -> str:
+def fallback(*, own: bool) -> str:
     """The language when no profile language applies, so that the page is never in one the
     instance does not offer (#398).
 
-    Somebody whose language has been withdrawn reads the instance's default. Somebody who
-    chose none, and a visitor, are heard by their browser, but only within what the instance
+    Somebody whose language has been withdrawn, or who chose none, reads the instance's
+    default. A visitor is heard by their browser, but only within what the instance
     offers and only for a language somebody has begun translating -- the two filters the
-    picker applies -- and the default otherwise.
+    picker applies -- and the default otherwise. Somebody signed in with no language of their
+    own is not heard by their browser at all: `apply` passes ``own=True`` for them.
     """
     from . import site
 
     try:
         default = site.default_language()
-        if withdrawn:
+        if own:
             return default
         asked = languages.current()
         if offered(asked) and languages.begun(asked):

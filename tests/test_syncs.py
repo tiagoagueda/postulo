@@ -331,6 +331,12 @@ def test_a_deactivated_account_is_not_synced(user):
 # ------------------------------------------------------ worded for the reader (#384)
 
 
+def _reading_german(user):
+    """A blank profile language is the instance's, not the browser's (#398), so say it."""
+    user.profile.language = "de"
+    user.profile.save(update_fields=["language"])
+
+
 def _marking_the_language(monkeypatch):
     """Stand in for a catalogue the suite does not compile: every counter says its language."""
     from django.utils import translation
@@ -378,6 +384,7 @@ def test_the_connections_page_words_the_last_run_in_the_readers_language(client,
     connection = a_sync(user)
     a_contact(user)
     syncing.sync_connection(connection)
+    _reading_german(user)
     client.force_login(user)
     _marking_the_language(monkeypatch)
 
@@ -388,6 +395,7 @@ def test_the_connections_page_words_the_last_run_in_the_readers_language(client,
 def test_the_sync_now_flash_is_worded_in_the_requests_language(client, user, monkeypatch):
     connection = a_sync(user)
     a_contact(user)
+    _reading_german(user)
     client.force_login(user)
     _marking_the_language(monkeypatch)
 

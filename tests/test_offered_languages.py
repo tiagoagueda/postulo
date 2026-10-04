@@ -137,7 +137,7 @@ def test_work_done_for_a_person_is_not_in_a_language_the_instance_stopped_offeri
 
 
 @pytest.mark.parametrize("asked", ["fr", "pt", ""])
-def test_a_person_following_the_browser_is_given_what_it_asks_within_what_is_offered(
+def test_a_person_with_no_language_of_their_own_is_given_the_instance_default(
     client, user, settings_row, asked
 ):
     assert user.profile.language == ""
@@ -147,7 +147,7 @@ def test_a_person_following_the_browser_is_given_what_it_asks_within_what_is_off
     assert served_in(client, HTTP_ACCEPT_LANGUAGE=asked) == ("de", "de")
 
 
-def test_a_person_following_the_browser_is_given_an_offered_language_it_asks_for(
+def test_a_person_with_no_language_of_their_own_is_not_given_the_browsers_even_if_offered(
     client, user, settings_row
 ):
     SiteSettings.objects.filter(pk=settings_row.pk).update(
@@ -155,7 +155,7 @@ def test_a_person_following_the_browser_is_given_an_offered_language_it_asks_for
     )
     client.force_login(user)
 
-    assert served_in(client, HTTP_ACCEPT_LANGUAGE="fr") == ("fr-FR", "fr-FR")
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE="fr") == ("de", "de")
 
 
 @pytest.mark.parametrize("asked", ["fr", "pt", ""])

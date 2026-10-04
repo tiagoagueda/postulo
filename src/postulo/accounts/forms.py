@@ -170,7 +170,7 @@ def _percent_suffix(percent) -> str:
 
 
 def language_choices() -> list[tuple[str, str]]:
-    """Languages this instance offers, plus an option to follow the browser.
+    """Languages this instance offers, plus an option to follow the instance default.
 
     A language that is only partly translated says so beside its name, and one nobody has
     reviewed says that, so nobody is surprised by English in the gaps or by an odd turn of
@@ -216,7 +216,7 @@ def language_choices() -> list[tuple[str, str]]:
         else:
             reviewed.append((code, name))
 
-    choices: list = [("", _("Follow the browser"))]
+    choices: list = [("", _("Use the instance default"))]
     if reviewed:
         choices.append((_("Reviewed by a speaker"), reviewed))
     if drafted:

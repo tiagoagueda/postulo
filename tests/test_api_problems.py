@@ -387,8 +387,10 @@ def test_the_words_have_not_changed_for_somebody_who_reads_english(client, user,
 
 
 def test_a_router_s_refusals_are_translated(client, user, application):
-    """Two that were English literals, asked for in French by an account that set no
-    language of its own: which line refused must not decide what language the answer is in."""
+    """Two that were English literals, asked for in French by an account whose language is
+    French: which line refused must not decide what language the answer is in."""
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["language"])
     french = {"HTTP_ACCEPT_LANGUAGE": "fr"}
 
     scope = client.get("/api/v1/interviews", **issue(user, "captures"), **french)
@@ -403,6 +405,8 @@ def test_a_router_s_refusals_are_translated(client, user, application):
 
 
 def test_the_sentence_about_a_refused_body_is_translated_too(client, user):
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["language"])
     response = post(
         client,
         "/api/v1/captures",
