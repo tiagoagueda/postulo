@@ -230,3 +230,16 @@ def test_prune_media_lists_orphans_and_removes_them_when_told(user, tmp_path, se
     call_command("prune_media", "--remove")
     assert not orphan.exists()
     assert kept.is_file(), "a file a record points at is never touched"
+
+
+def test_sent_to_fits_its_column_however_long_the_posting_is(user):
+    from postulo.documents.rendering import sent_to
+
+    company = Company.objects.create(owner=user, name="C" * 200)
+    posting = JobPosting.objects.create(owner=user, company=company, title="T" * 250)
+    application = Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+
+    said = sent_to(application)
+
+    assert len(said) <= RenderedDocument._meta.get_field("sent_to").max_length
+    assert said.endswith("…")

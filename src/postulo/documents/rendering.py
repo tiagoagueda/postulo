@@ -9,7 +9,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.template.loader import render_to_string
 from django.utils import formats, timezone
-from django.utils.text import slugify
+from django.utils.text import Truncator, slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
@@ -589,10 +589,20 @@ def sent_to(application) -> str:
     if application is None:
         return ""
     posting = application.posting
-    return gettext("%(role)s at %(company)s") % {
-        "role": posting.title,
-        "company": posting.company.name,
-    }
+    return _fit(
+        gettext("%(role)s at %(company)s")
+        % {"role": posting.title, "company": posting.company.name},
+        "sent_to",
+    )
+
+
+def _fit(text: str, field: str) -> str:
+    """Cut `text` to the column a RenderedDocument keeps it in, ending in an ellipsis (#513).
+
+    A title and an employer can each fill their own column and together outrun this one;
+    SQLite lets that through and PostgreSQL refuses the row.
+    """
+    return Truncator(text).chars(RenderedDocument._meta.get_field(field).max_length)
 
 
 def draft_name(document) -> str:
@@ -675,7 +685,7 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
     # screen reader announces, and into the file name attached to portals and emails.
     language = document_language(cv)
     with languages.override(language):
-        title = document_title(cv)
+        title = _fit(document_title(cv), "title")
 
     document = RenderedDocument(
         owner=cv.owner,
@@ -742,7 +752,7 @@ def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> R
     # The recipient's name, not the person's own filing name for this draft (#223).
     language = document_language(letter)
     with languages.override(language):
-        title = document_title(letter)
+        title = _fit(document_title(letter), "title")
 
     document = RenderedDocument(
         owner=letter.owner,
