@@ -74,6 +74,24 @@
       </section>
     {% endif %}
 
+    {% if links %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Links" %}</c-section-title>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for item in links %}
+              <li class="px-4 py-3">
+                <p class="font-medium">{{ item.title }}</p>
+                <p class="text-sm text-ink-500 dark:text-ink-400">
+                  {{ item.get_kind_display }} · <bdi>{{ item.host }}</bdi>
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+
     {% if skill_groups %}
       <section class="mb-8">
         <c-section-title>{% translate "Skills" %}</c-section-title>

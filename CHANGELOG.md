@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The career preview now shows your Links (title, type and host) after Projects, so "Everything you have written" really lists every career section. (#612)
 - The listing form's Cancel now returns to the listing when editing, and to the company it was opened for (else the Listings page) when adding, instead of always going to Companies. (#628)
 - Tags and industries: with scripts on, the chip control no longer hides the help text and validation errors of the tag and industry fields (and their new-name fields), and the chip input is described by them. (#522)
 - Fixed: the uploads on an application's Documents page now name their file to screen readers on Download and "Send to stores now", as the other documents pages do. (#516)

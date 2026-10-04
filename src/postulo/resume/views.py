@@ -357,6 +357,7 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "experience": Experience.objects.for_user(user),
                 "education": Education.objects.for_user(user),
                 "projects": Project.objects.for_user(user),
+                "links": Link.objects.for_user(user),
                 "skill_groups": SkillGroup.objects.for_user(user).prefetch_related("skills"),
                 "certifications": Certification.objects.for_user(user),
                 "languages": LanguageSkill.objects.for_user(user),
