@@ -178,6 +178,9 @@ markers = [
     "release: a promise that must hold in a published version, not in every commit",
 ]
 filterwarnings = ["error"]
+# A test still running after five minutes has its threads' stacks written to the log, so a
+# hang on CI names where it stands instead of ending at the job's limit in silence (#712).
+faulthandler_timeout = 300
 
 [tool.coverage.run]
 source = ["src/postulo"]

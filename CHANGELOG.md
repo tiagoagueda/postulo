@@ -6,6 +6,10 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+### 🔧 Changed
+
+- CI starts the browser tests first, checks lint, migrations, catalogues and the production settings once instead of on every Python, bounds each test step's time and lists each suite's slowest tests; a release also needs those checks to pass. (#712)
+
 ## [0.4.0] — 2026-10-04
 
 ### 🔒 Security

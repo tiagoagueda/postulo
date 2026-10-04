@@ -281,6 +281,7 @@ GREEN = statuses(
     ("CI / Unit tests (Python 3.13) (push)", "success"),
     ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
     ("CI / Browser tests (Chromium) (push)", "success"),
+    ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
     ("CI / Security audit (push)", "success"),
     # A registry timeout on the dev image says nothing about the code, and the combined
     # state above is "failure" because of it; the gate reads the jobs, not the state.
@@ -319,6 +320,7 @@ def test_one_red_leg_is_named(monkeypatch):
             ("CI / Unit tests (Python 3.12) (push)", "success"),
             ("CI / Unit tests and coverage (Python 3.14) (push)", "failure"),
             ("CI / Browser tests (Chromium) (push)", "success"),
+            ("CI / Checks: lint, migrations, catalogues (push)", "success"),
         ),
     )
 
@@ -333,6 +335,7 @@ def test_a_leg_still_running_is_not_a_pass(monkeypatch):
         statuses(
             ("CI / Unit tests and coverage (Python 3.14) (push)", "pending"),
             ("CI / Browser tests (Chromium) (push)", "success"),
+            ("CI / Checks: lint, migrations, catalogues (push)", "success"),
         ),
     )
 
@@ -347,8 +350,26 @@ def test_no_ci_at_all_is_refused_rather_than_waved_through(monkeypatch):
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
-    assert len(problems) == 2
+    assert len(problems) == 3
     assert any("a test leg" in p for p in problems) and any("the browser" in p for p in problems)
+    assert any("the checks" in p for p in problems)
+
+
+def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
+    """Lint, the migrations and the catalogues used to fail a test leg; since #712 they run
+    once, in a job of their own, and a release over a red one is still refused."""
+    asking(
+        monkeypatch,
+        statuses(
+            ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
+            ("CI / Browser tests (Chromium) (push)", "success"),
+            ("CI / Checks: lint, migrations, translations (push)", "failure"),
+        ),
+    )
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert problems == ["CI / Checks: lint, migrations, translations (push): failure"]
 
 
 def test_the_check_command_asks_only_when_told_to(monkeypatch, capsys):

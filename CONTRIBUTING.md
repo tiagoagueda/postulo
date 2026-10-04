@@ -23,14 +23,15 @@ uv run manage.py runserver
 uv run ruff format .
 uv run ruff check --fix .
 uv run pytest -n auto        # every core; plain `uv run pytest` is the same suite, slower
-                             # (CI runs `-n 2`: three legs share one host, see ci.yml)
+                             # (CI runs `-n 2`: its jobs share one host, see ci.yml)
 uv run manage.py makemigrations --check --dry-run
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
-Continuous integration runs all of the above across Python 3.12, 3.13, and 3.14, plus
-`manage.py check --deploy` against production settings, and it fails if the committed
-stylesheet has drifted from its source. Coverage is measured on the 3.14 leg only, and
+Continuous integration runs the suite across Python 3.12, 3.13, and 3.14, and the rest of
+the above once, in its *Checks* job, together with the catalogue checks,
+`manage.py check --deploy` against production settings, and a check that the committed
+stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg only, and
 `fail_under` in `pyproject.toml` is the floor it has to clear; run
 `uv run pytest -n auto --cov` to see the number yourself. So does `uv run pytest` on your machine, once
 `npm ci` has installed the Tailwind CLI: `tests/test_stylesheet.py` rebuilds it and compares,
@@ -484,8 +485,8 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    both compose files name this minor.
 5. Commit, push, and **wait for CI to pass on that commit**. Then tag it and push the tag:
    `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
-   tagged commit's statuses and refuses a tag on which any test leg or the browser job is
-   not a success (`release_tools.py check vX.Y.Z --ci` is the same question, from a
+   tagged commit's statuses and refuses a tag on which any test leg, the browser job or the
+   checks are not a success (`release_tools.py check vX.Y.Z --ci` is the same question, from a
    terminal); the image workflow asks it again before building a layer (#233).
 6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds
    and scans the image, pushes `X.Y.Z`, `X.Y` and `latest`, asks the registry for all

@@ -9,6 +9,16 @@
 # resolves bare action names against its own instance rather than GitHub, so an action
 # published only on GitHub -- setup-uv and setup-node among them -- may not resolve at
 # all. Installing those two tools directly is a few more lines and no guesswork.
+#
+# The jobs start in the order this file lists them. The runner takes two jobs at a time
+# and hands them out in file order, so the longest one comes first: listed last, the
+# browser job waited nineteen minutes for a slot behind the unit legs and the checks, and
+# a push took 55 minutes to report (#712).
+#
+# Time limits sit on the steps that run the tests, not on the jobs: this runner
+# (forgejo-runner 6.4) ignores a job's `timeout-minutes` and honours a step's. Both were
+# tried on a throwaway branch (#712), and a job-level `if` was found to fail its job rather
+# than skip it, which is why nothing here is skipped that way.
 name: CI
 
 on:
@@ -36,6 +46,75 @@ env:
   UV_VERSION: "0.12.17"
 
 jobs:
+  browser:
+    name: Browser tests (Chromium)
+    # The critical path in a real browser: sign in, capture, review, board, send, export.
+    # One Python version is enough; the matrix below covers the interpreter, this covers
+    # the pages joining up. Traces and screenshots of a failure are kept as artifacts.
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
+
+      - name: Install WeasyPrint's system libraries
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Keep uv's downloads and the browser between runs
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            ~/.cache/uv
+            ~/.cache/ms-playwright
+          key: browser-${{ runner.os }}-${{ hashFiles('uv.lock') }}
+          restore-keys: browser-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: uv sync --locked --python 3.14 --group e2e
+
+      - name: Install Chromium for Playwright
+        run: uv run playwright install --with-deps chromium
+
+      - name: Install axe-core for the accessibility checks
+        run: npm ci
+
+      - name: Compile the translations
+        run: uv run python scripts/messages.py compile
+
+      - name: Drive the critical path in a browser
+        # `--durations` ends the log with the slowest tests: the suite grew from 149 to 645
+        # tests in five days, and the list is where to look before adding to it (#712).
+        run: >
+          uv run pytest -m e2e --browser chromium --durations=25
+          --tracing retain-on-failure --screenshot only-on-failure --output browser-artifacts
+        # Half again what the suite took on 4 October 2026, so a hang ends here, with
+        # pytest's stack dump of the test that hung above it, rather than at the runner's
+        # own limit with nothing said.
+        timeout-minutes: 45
+
+      - name: Keep the trace and screenshots of a failure
+        # v3 works on Forgejo Actions; v4 depends on GitHub's own artifact backend.
+        if: failure()
+        uses: actions/upload-artifact@v3
+        continue-on-error: true
+        with:
+          name: browser-failure
+          path: browser-artifacts
+
   test:
     # Named for what it checks (#319). The 3.14 leg is the one that measures coverage.
     name: "${{ matrix.python-version == '3.14' && 'Unit tests and coverage' || 'Unit tests' }} (Python ${{ matrix.python-version }})"
@@ -50,6 +129,9 @@ jobs:
       matrix:
         python-version: ["3.12", "3.13", "3.14"]
 
+    # Only what depends on the interpreter. Lint, the migrations, the catalogues and the
+    # production settings read the same on every Python, so they run once, in `checks`
+    # below, instead of once per leg (#712).
     steps:
       - uses: actions/checkout@v4
         with:
@@ -87,6 +169,71 @@ jobs:
         # `default-groups` would otherwise install it on every leg of the matrix (#233).
         run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
 
+      - name: Compile the translations
+        # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
+        # its `.mo` exists, and the `.mo` files are not committed.
+        run: uv run python scripts/messages.py compile
+
+      - name: Download the ESCO classification
+        # Not committed: megabytes of reference data, the occupations and the skills, and
+        # the fetch validates the files it writes, which is the check that the API still
+        # answers in the shape the loader reads and the tests pin.
+        run: uv run manage.py fetch_esco --revision 1.2.1
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+
+      - name: Test
+        # Two processes, not `-n auto` (#233): the jobs of this workflow share one host, and
+        # `auto` gave each of them a worker per host core. Run 539 spent 59 minutes on a
+        # suite that takes 4 serially, and starved every other job on the box -- the
+        # postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to install
+        # Chromium, the image scan an hour -- until the runner's limit ended them. The
+        # in-memory database and the temporary directories are each process's own.
+        if: matrix.python-version != '3.14'
+        run: uv run pytest -n 2 --durations=25
+        timeout-minutes: 30
+
+      - name: Test, and measure what the suite covers
+        # On one leg only: measuring slows the run, and three copies of the same number are
+        # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
+        if: matrix.python-version == '3.14'
+        run: uv run pytest -n 2 --durations=25 --cov --cov-report=term-missing
+        timeout-minutes: 30
+
+  checks:
+    # "Checks" first: the release gate requires a job whose name starts with it
+    # (`scripts/release_tools.py`, REQUIRED_JOBS), since lint and the catalogues left the
+    # unit legs for here (#712).
+    name: "Checks: lint, migrations, catalogues, settings, built files"
+    # Everything here reads the same on every Python, so it runs once per push rather than
+    # once per leg of the matrix, where it used to cost each leg two and a half minutes.
+    runs-on: ubuntu-latest
+    container:
+      image: node:22-bookworm
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Keep uv's downloads between runs
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-3.14-${{ hashFiles('uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-3.14-
+
+      - name: Install dependencies
+        run: uv sync --locked --python 3.14 --no-group e2e
+
       - name: Lint
         run: |
           uv run ruff check --output-format=full .
@@ -105,33 +252,6 @@ jobs:
           uv run python scripts/messages.py check
           uv run python scripts/messages.py stats --check
 
-      - name: Compile the translations
-        run: uv run python scripts/messages.py compile
-
-      - name: Download the ESCO classification
-        # Not committed: megabytes of reference data, the occupations and the skills, and
-        # the fetch validates the files it writes, which is the check that the API still
-        # answers in the shape the loader reads and the tests pin.
-        run: uv run manage.py fetch_esco --revision 1.2.1
-        env:
-          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
-
-      - name: Test
-        # Two processes, not `-n auto` (#233): the three legs of this matrix run at once on
-        # one host, and `auto` gave each of them a worker per host core. Run 539 spent 59
-        # minutes on a suite that takes 4 serially, and starved every other job on the box
-        # -- the postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to
-        # install Chromium, the image scan an hour -- until the runner's limit ended them.
-        # The in-memory database and the temporary directories are each process's own.
-        if: matrix.python-version != '3.14'
-        run: uv run pytest -n 2
-
-      - name: Test, and measure what the suite covers
-        # On one leg only: measuring slows the run, and three copies of the same number are
-        # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
-        if: matrix.python-version == '3.14'
-        run: uv run pytest -n 2 --cov --cov-report=term-missing
-
       - name: Production settings deployment check
         # check --deploy, and collectstatic with the manifest storage the image uses,
         # which follows references inside CSS and JS and refuses one that points at
@@ -145,6 +265,34 @@ jobs:
           POSTULO_SECRET_KEY: ci-only-placeholder-nS7pQ2xV9wR4tY6uI8oA3sD5fG1hJ0kL2zX4cV6b
           POSTULO_ALLOWED_HOSTS: postulo.example.org
           POSTULO_STATIC_ROOT: /tmp/postulo-static
+
+      # The compiled stylesheet is committed so that the application runs without Node.
+      # That only works if it is kept in step with its source; the same goes for the
+      # icons, the vendored scripts and the mark.
+      - run: npm ci
+
+      - name: Rebuild the stylesheet
+        run: npm run build:css
+
+      - name: Re-copy the icons
+        run: npm run sync:icons
+
+      - name: Re-copy the vendored scripts
+        run: npm run sync:vendor
+
+      - name: Fail if the committed stylesheet or icons are out of date
+        run: |
+          # A container-backed runner may check out as a different user than the one
+          # running the steps, and git then refuses to read the repository at all.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git diff --exit-code -- src/postulo/static/css/app.css \
+            || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
+          test -z "$(git status --porcelain -- src/postulo/static/icons)" \
+            || (echo "::error::static/icons disagrees with assets/icons.txt. Run 'npm run sync:icons' and commit the result." && git status --porcelain -- src/postulo/static/icons && exit 1)
+          test -z "$(git status --porcelain -- src/postulo/static/js/vendor)" \
+            || (echo "::error::static/js/vendor disagrees with node_modules. Run 'npm run sync:vendor' and commit the result." && git status --porcelain -- src/postulo/static/js/vendor && exit 1)
+          test -z "$(git status --porcelain -- src/postulo/static/brand)" \
+            || (echo "::error::static/brand disagrees with assets/brand/postulo.png. Run 'uv run python scripts/brand.py' and commit the result." && git status --porcelain -- src/postulo/static/brand && exit 1)
 
   postgres:
     name: Database tests on PostgreSQL
@@ -236,6 +384,7 @@ jobs:
         run: >-
           uv run pytest tests/test_smoke.py tests/test_ownership.py tests/test_backup.py
           tests/test_language_storage.py tests/test_invites.py
+        timeout-minutes: 15
         env:
           POSTULO_TEST_DATABASE_URL: postgres://postulo:ci-only-not-a-secret@db:5432/postulo
 
@@ -383,106 +532,3 @@ jobs:
         run: >
           uvx zizmor==1.30.1 --offline --no-progress --config .forgejo/zizmor.yml
           --min-severity medium .forgejo/workflows/*.yml
-
-  styles:
-    name: Stylesheet, icons and scripts current
-    # The compiled stylesheet is committed so that the application runs without Node.
-    # That only works if it is kept in step with its source.
-    runs-on: ubuntu-latest
-    container:
-      image: node:22-bookworm
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # The token is not needed after the checkout; leaving it in .git/config
-          # would hand it to every later step and any artifact that packs the tree.
-          persist-credentials: false
-
-      - run: npm ci
-
-      - name: Rebuild the stylesheet
-        run: npm run build:css
-
-      - name: Re-copy the icons
-        run: npm run sync:icons
-
-      - name: Re-copy the vendored scripts
-        run: npm run sync:vendor
-
-      - name: Fail if the committed stylesheet or icons are out of date
-        run: |
-          # A container-backed runner may check out as a different user than the one
-          # running the steps, and git then refuses to read the repository at all.
-          git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          git diff --exit-code -- src/postulo/static/css/app.css \
-            || (echo "::error::app.css is stale. Run 'npm run build:css' and commit the result." && exit 1)
-          test -z "$(git status --porcelain -- src/postulo/static/icons)" \
-            || (echo "::error::static/icons disagrees with assets/icons.txt. Run 'npm run sync:icons' and commit the result." && git status --porcelain -- src/postulo/static/icons && exit 1)
-          test -z "$(git status --porcelain -- src/postulo/static/js/vendor)" \
-            || (echo "::error::static/js/vendor disagrees with node_modules. Run 'npm run sync:vendor' and commit the result." && git status --porcelain -- src/postulo/static/js/vendor && exit 1)
-          test -z "$(git status --porcelain -- src/postulo/static/brand)" \
-            || (echo "::error::static/brand disagrees with assets/brand/postulo.png. Run 'uv run python scripts/brand.py' and commit the result." && git status --porcelain -- src/postulo/static/brand && exit 1)
-
-  browser:
-    name: Browser tests (Chromium)
-    # The critical path in a real browser: sign in, capture, review, board, send, export.
-    # One Python version is enough; the matrix above covers the interpreter, this covers
-    # the pages joining up. Traces and screenshots of a failure are kept as artifacts.
-    runs-on: ubuntu-latest
-    container:
-      image: node:22-bookworm
-
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          # The token is not needed after the checkout; leaving it in .git/config
-          # would hand it to every later step and any artifact that packs the tree.
-          persist-credentials: false
-
-      - name: Install WeasyPrint's system libraries
-        run: |
-          apt-get update
-          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
-          rm -rf /var/lib/apt/lists/*
-
-      - name: Install uv
-        run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
-      - name: Keep uv's downloads and the browser between runs
-        uses: actions/cache@v4
-        continue-on-error: true
-        with:
-          path: |
-            ~/.cache/uv
-            ~/.cache/ms-playwright
-          key: browser-${{ runner.os }}-${{ hashFiles('uv.lock') }}
-          restore-keys: browser-${{ runner.os }}-
-
-      - name: Install dependencies
-        run: uv sync --locked --python 3.14 --group e2e
-
-      - name: Install Chromium for Playwright
-        run: uv run playwright install --with-deps chromium
-
-      - name: Install axe-core for the accessibility checks
-        run: npm ci
-
-      - name: Compile the translations
-        run: uv run python scripts/messages.py compile
-
-      - name: Drive the critical path in a browser
-        run: >
-          uv run pytest -m e2e --browser chromium
-          --tracing retain-on-failure --screenshot only-on-failure --output browser-artifacts
-
-      - name: Keep the trace and screenshots of a failure
-        # v3 works on Forgejo Actions; v4 depends on GitHub's own artifact backend.
-        if: failure()
-        uses: actions/upload-artifact@v3
-        continue-on-error: true
-        with:
-          name: browser-failure
-          path: browser-artifacts

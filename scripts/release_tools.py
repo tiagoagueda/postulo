@@ -137,15 +137,18 @@ def changelog_section(version: str, root: Path = ROOT) -> str:
 
 #: The CI jobs a release has to have passed, by the names Forgejo Actions records a commit
 #: status under: "<workflow> / <job> (<event>)". Every test leg, whichever Pythons the matrix
-#: holds this year, and the browser. The combined state is deliberately not used: the dev
-#: image job fails on a registry timeout often enough that "failure" there says nothing
-#: about the code (#233).
+#: holds this year, the browser, and the checks. The combined state is deliberately not
+#: used: the dev image job fails on a registry timeout often enough that "failure" there
+#: says nothing about the code (#233).
 REQUIRED_JOBS = (
     # By the names the jobs carry since #319, which say what each checks: "Unit tests
     # (Python 3.12)", "Unit tests and coverage (Python 3.14)", "Browser tests (Chromium)".
     # A prefix, so a Python added to the matrix is required without an edit here.
     ("a test leg", re.compile(r"^CI / Unit tests")),
     ("the browser", re.compile(r"^CI / Browser tests")),
+    # Lint, the migrations, the catalogues and the production settings left the test legs
+    # for a job of their own, which runs once per push instead of once per Python (#712).
+    ("the checks", re.compile(r"^CI / Checks")),
 )
 
 
