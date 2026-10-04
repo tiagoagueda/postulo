@@ -304,7 +304,9 @@ each *shipped* is the changelog's. For the record of shape rather than state: 0.
 (2026-09-07) brought the twenty-four languages of the Union, passkeys and SSO, the audit
 findings, arrangeable widgets, Europass import, ORCID, the log and the metrics; 0.3.0
 (2026-09-16) the rest of Europe, parent and child companies, reports, and the second
-audit's fixes; the languages that were to be Africa's milestone are now ordered by speakers
+audit's fixes; 0.4.0 (2026-10-04) Cotton and Basecoat components, the review sweep's fixes
+and the bug sweeps of the milestones after it, email sent from the person's own address,
+CV choices of which details print, and a listing's history; the languages that were to be Africa's milestone are now ordered by speakers
 (#269) across the releases after it.
 
 **What was "deliberately after v1" and is now built.** The browser extension (two of them,

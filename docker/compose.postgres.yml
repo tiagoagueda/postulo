@@ -22,7 +22,7 @@ services:
     # The published image, pinned to a minor: `docker compose pull` takes the next patch
     # and never a surprise. To build from this checkout instead, layer the build override
     # over this file (docker/compose.postgres.build.yml); it tags the result postulo:local (#403).
-    image: source.tiagoagueda.com/postulo/postulo:0.3
+    image: source.tiagoagueda.com/postulo/postulo:0.4
     restart: unless-stopped
     env_file:
       - ../.env
@@ -48,7 +48,7 @@ services:
   scheduler:
     profiles: ["scheduler"]
     # The published image, pinned to a minor; see the postulo service above.
-    image: source.tiagoagueda.com/postulo/postulo:0.3
+    image: source.tiagoagueda.com/postulo/postulo:0.4
     restart: unless-stopped
     env_file:
       - ../.env
@@ -92,7 +92,7 @@ services:
   # database (#581).
   worker:
     profiles: ["worker"]
-    image: source.tiagoagueda.com/postulo/postulo:0.3
+    image: source.tiagoagueda.com/postulo/postulo:0.4
     restart: unless-stopped
     env_file:
       - ../.env

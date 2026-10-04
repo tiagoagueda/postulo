@@ -6,6 +6,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-10-04
+
 ### 🔒 Security
 
 - Deleting an account or a company removes its export archives and logos from the disk, and `prune_media` no longer lists a live export as an orphan: the files are found by walking every model's file fields, and an archive's bytes go with its row however the row is deleted. (#355)
