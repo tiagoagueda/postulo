@@ -37,6 +37,7 @@ from importlib import resources
 
 from postulo.core import pictures
 
+from . import registry
 from .base import manifest_of
 
 logger = logging.getLogger(__name__)
@@ -175,3 +176,6 @@ def forget(name: str = "") -> None:
         _cache.pop(name, None)
     else:
         _cache.clear()
+
+
+registry.on_rebuild(forget)

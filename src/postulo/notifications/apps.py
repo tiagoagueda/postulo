@@ -14,7 +14,11 @@ class NotificationsConfig(AppConfig):
         # other, and merging them would make notification settings and delivery settings the
         # same form (#104).
         # Registers delivery as a piece of slow work, and the messages it can build (#247).
-        from postulo.notifications import slow  # noqa: F401
+        from postulo.notifications import (
+            slow,  # noqa: F401
+            transport,
+        )
+        from postulo.plugins import installing
         from postulo.plugins.browser import BrowserNotifier
         from postulo.plugins.email import EmailNotifier
         from postulo.plugins.own_mail import OwnMail
@@ -22,6 +26,9 @@ class NotificationsConfig(AppConfig):
         from postulo.plugins.smtp import SMTPTransport
         from postulo.plugins.webhook import WebhookNotifier
 
+        # The package that carries the selected mail transport cannot be switched off or
+        # removed while mail is the last way back into accounts; asked of every route in (#595).
+        installing.add_lock(transport.refuse_removing_distribution)
         register_builtin("notifier", EmailNotifier)
         # The notifier for a machine: signed JSON to an address, delivered by the scheduler
         # with backoff, so an automation no longer has to poll the API and diff (#240).

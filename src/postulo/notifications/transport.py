@@ -388,7 +388,7 @@ def refuse_removing_distribution(distribution: str) -> str:
     An administrator switches off *distributions* on the plugins page, not plugins, so the
     interlock has to be able to answer for the package that provides the locked transport.
     """
-    from postulo.plugins.installing import canonicalise
+    from postulo.plugins.record import canonicalise
 
     transport = selected()
     if transport is None:

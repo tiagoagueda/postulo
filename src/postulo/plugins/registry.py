@@ -87,6 +87,16 @@ _builtin: dict[str, list[type]] = {"source": list(BUILTIN_SOURCES)}
 #: The record as it was when the cache was filled. ``None`` means "never looked".
 _stamp: str | None = None
 
+#: What a module above this one remembers about a plugin and must forget when the registry is
+#: rebuilt (#609). A module adds itself here, so that this one never imports upwards.
+_forgetters: list = []
+
+
+def on_rebuild(forget) -> None:
+    """Have ``forget()`` called whenever the registrations are rebuilt, once however often asked."""
+    if forget not in _forgetters:
+        _forgetters.append(forget)
+
 
 def _protocol_for(kind: str):
     return {
@@ -293,10 +303,9 @@ def rebuild_registrations() -> None:
     """
     from postulo.documents import themes as document_themes
 
-    from . import logos
-
     document_themes.forget()
-    logos.forget()
+    for forget in _forgetters:
+        forget()
     forget_registered_templates()
     forget_registered_locales()
     register_builtin_locales()

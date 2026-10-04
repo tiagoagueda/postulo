@@ -831,6 +831,26 @@ def is_internal(name: str) -> bool:
     )
 
 
+#: Questions put before a package is switched off or removed, each answering with a refusal
+#: or nothing. What holds a package in place (the mail it carries, #104) belongs to a module
+#: above this one, which adds its question when its app is ready, so that the page, the
+#: command and a shell all meet it and this module never imports upwards (#595).
+_locks: list = []
+
+
+def add_lock(question) -> None:
+    """Ask ``question(name)`` before a package is switched off or removed; it answers with the
+    refusal, or an empty string."""
+    if question not in _locks:
+        _locks.append(question)
+
+
+def _refuse_by_locks(name: str) -> None:
+    for question in _locks:
+        if refusal := question(name):
+            raise InstallError(refusal)
+
+
 def remove(name: str) -> Installed:
     """Take a plugin off the instance: its files, and its line in the record.
 
@@ -838,14 +858,11 @@ def remove(name: str) -> Installed:
     happens to do first: this is the last door, and a management command or a shell reaching
     `remove()` directly would otherwise leave a table nothing can read.
     """
-    from postulo.notifications import transport
-
     from . import data
 
     # The mail lock (#104) and the rows lock (#128) live here and not in the page: this is
     # the last door, and `manage.py plugins remove` comes through it too.
-    if refusal := transport.refuse_removing_distribution(name):
-        raise InstallError(refusal)
+    _refuse_by_locks(name)
     if is_internal(name):
         raise InstallError(
             str(_("%(name)s ships inside Postulo and cannot be removed.")) % {"name": name}
@@ -946,10 +963,7 @@ def set_disabled(name: str, disabled: bool) -> Installed:
     page, so that `manage.py plugins disable` meets the same lock.
     """
     if disabled:
-        from postulo.notifications import transport
-
-        if refusal := transport.refuse_removing_distribution(name):
-            raise InstallError(refusal)
+        _refuse_by_locks(name)
     if is_internal(name):
         raise InstallError(
             str(
