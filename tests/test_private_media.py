@@ -131,7 +131,7 @@ def test_downloads_can_be_forced_and_renamed(serve, stored_file):
     disposition = response["Content-Disposition"]
 
     assert disposition.startswith("attachment;")
-    assert "filename*=UTF-8''" in disposition, "non-ASCII names need the RFC 6266 form"
+    assert "filename*=utf-8''" in disposition.lower(), "non-ASCII names need the RFC 6266 form"
 
 
 def test_nginx_serves_the_bytes_when_configured(serve, settings, stored_file):
@@ -164,3 +164,12 @@ def test_apache_serves_the_bytes_when_configured(serve, settings, stored_file):
 
     assert response["X-Sendfile"].endswith("backend-engineer.pdf")
     assert not response.content
+
+
+def test_a_text_download_with_a_quote_or_line_break_in_its_name_is_well_formed(rf):
+    from postulo.core.files import serve_private_text
+
+    response = serve_private_text(rf.get("/"), b"x", download_name='a "b"\r\nc')
+
+    assert "\n" not in response["Content-Disposition"]
+    assert "%22b%22" in response["Content-Disposition"]

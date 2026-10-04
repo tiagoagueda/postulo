@@ -27,7 +27,14 @@ from django.contrib.contenttypes.models import ContentType
 from django.urls import reverse
 
 from postulo.documents import docx, formats, rendering
-from postulo.documents.models import CV, CVItem, CVKind, DocumentCopy, RenderedDocument
+from postulo.documents.models import (
+    CV,
+    CVItem,
+    CVKind,
+    DocumentCopy,
+    RenderedDocument,
+    UploadedDocument,
+)
 from postulo.resume.models import (
     Certification,
     Education,
@@ -774,3 +781,24 @@ def test_a_format_that_fails_is_a_sentence_and_the_others_still_work(client, per
     assert "That file could not be written." in page
     assert "the plugin's own bug" not in page, "the log has that; the page has a sentence"
     assert "the plugin's own bug" in caplog.text
+
+
+# ----------------------------------------------------- the name a download goes out under
+
+
+@pytest.mark.parametrize("title", ['CV "final"', "CV\r\nfor Acme"])
+def test_a_title_with_a_quote_or_a_line_break_still_downloads(client, person, title):
+    """The title is written into a header; a quote or a line break must not break it (#376)."""
+    upload = UploadedDocument.objects.create(owner=person, title=title)
+    upload.file.save("cv.pdf", io.BytesIO(b"%PDF-1.4 private"), save=True)
+    client.force_login(person)
+
+    response = client.get(reverse("documents:upload_download", args=[upload.pk]))
+
+    assert response.status_code == 200
+    disposition = response["Content-Disposition"]
+    assert "\r" not in disposition and "\n" not in disposition
+    assert disposition.startswith("attachment;")
+    if '"' in title:
+        assert 'filename="CV \\"final\\".pdf"' in disposition
+    response.close()

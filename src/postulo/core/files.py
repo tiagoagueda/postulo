@@ -34,6 +34,7 @@ from urllib.parse import quote
 
 from django.conf import settings
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse
+from django.utils.http import content_disposition_header
 
 
 class UnsafeMediaPath(Exception):
@@ -94,12 +95,9 @@ def serve_private_file(
 
     filename = download_name or posixpath.basename(file_field.name)
     content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
-    disposition = "attachment" if as_attachment else "inline"
-    # RFC 6266: an ASCII fallback plus a UTF-8 form for names with accents.
-    content_disposition = (
-        f'{disposition}; filename="{filename.encode("ascii", "ignore").decode()}"; '
-        f"filename*=UTF-8''{quote(filename)}"
-    )
+    # Django escapes what a quoted name cannot hold, refuses nothing, and adds the
+    # RFC 6266 UTF-8 form for names with accents; a title is whatever somebody typed (#376).
+    content_disposition = content_disposition_header(as_attachment, filename)
 
     accel_prefix = getattr(settings, "POSTULO_MEDIA_ACCEL_PREFIX", "")
     handed_over = content_type != "image/svg+xml"
@@ -150,10 +148,7 @@ def serve_private_text(request: HttpRequest, text: bytes, *, download_name: str)
     """
     name = download_name if download_name.endswith(".txt") else f"{download_name}.txt"
     response = HttpResponse(text, content_type=PLAIN_TEXT)
-    response["Content-Disposition"] = (
-        f'attachment; filename="{name.encode("ascii", "ignore").decode()}"; '
-        f"filename*=UTF-8''{quote(name)}"
-    )
+    response["Content-Disposition"] = content_disposition_header(True, name)
     response["Cache-Control"] = "private, max-age=0, no-store"
     response["X-Content-Type-Options"] = "nosniff"
     response["Content-Security-Policy"] = FILE_POLICY

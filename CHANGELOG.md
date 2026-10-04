@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A document whose title holds a double quote or a line break now downloads correctly instead of sending a malformed header or answering 500. (#376)
 - The calendar and the report no longer answer 500 for a hand-edited address at the edge of the calendar (year 9999, 0001 or 20266-Q3); they fall back to today, and only years 1900 to 2200 are read. (#389)
 - Django admin: adding a person now asks for a username and full name, and the change form, list and search show the username, so a second person no longer ends in a 500; signup's username rules apply there too. (#427)
 - New application, new listing and capture review, and the listing API, now refuse a salary currency that is not three letters and store it in capitals, so the listing's edit form no longer rejects it later. (#446)
