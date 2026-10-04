@@ -56,6 +56,11 @@ CARDS = {
 }
 
 
+#: The registers the identifiers help says an address can be pasted whole for.
+REGISTERS_LIFTED = "ORCID, ResearcherID, Scopus Author ID, Wikidata or LinkedIn"
+PASTED_WHOLE = f"An address on {REGISTERS_LIFTED} can be pasted whole"
+
+
 def details(client, user) -> str:
     client.force_login(user)
     response = client.get(reverse("accounts:profile"))
@@ -397,7 +402,7 @@ def test_what_a_field_is_for_is_its_tooltip_and_what_may_be_typed_stays(client, 
     gravatar = re.search(r'<span[^>]*id="id_use_gravatar_helptext"[^>]*>', html).group(0)
     assert "data-tooltip" not in gravatar
     # What may be typed into an identifier, and what a country's rules refuse: in sight.
-    assert "An address on ORCID, Wikidata or LinkedIn can be pasted whole" in html
+    assert PASTED_WHOLE in html
     assert "data-rules-help" in html and "data-tooltip" not in re.search(
         r"<p[^>]*data-rules-help[^>]*>", html
     ).group(0)
@@ -566,8 +571,7 @@ def test_the_help_says_what_the_code_does(client, user):
     assert "above" not in kind and "below" not in kind and "What goes where" in kind
     # Only some registers lift an identifier out of an address, and the code says which.
     identifiers = topic_text("identifiers")
-    assert "An address on ORCID, Wikidata or LinkedIn can be pasted whole" in identifiers
-    assert "ResearcherID" not in identifiers
+    assert PASTED_WHOLE in identifiers
     # https:// is put in front, and a named service drops the name.
     links = topic_text("links")
     assert "with https:// put in front where you left it out" in links
