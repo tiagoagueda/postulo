@@ -17,6 +17,7 @@ from __future__ import annotations
 import json
 import re
 import zipfile
+import zlib
 from dataclasses import dataclass, field
 
 from django.core.exceptions import ValidationError
@@ -45,6 +46,9 @@ from .export import (
     TRANSLATION_SECTIONS,
     UPLOAD_FIELDS,
 )
+
+# The manifest is text and every row of the person's data is in it: generous, but a cap.
+MANIFEST_MAX_BYTES = 256 * 1024 * 1024
 
 
 class ArchiveError(Exception):
@@ -233,9 +237,12 @@ def _d(value):
 
 def read_manifest(archive: zipfile.ZipFile) -> dict:
     try:
-        raw = archive.read(MANIFEST_NAME)
+        archive.getinfo(MANIFEST_NAME)
     except KeyError as exc:
         raise ArchiveError(f"No {MANIFEST_NAME} in that archive.") from exc
+    raw = _read_within(archive, MANIFEST_NAME, MANIFEST_MAX_BYTES)
+    if raw is None:
+        raise ArchiveError(f"{MANIFEST_NAME} is larger than an export of Postulo makes.")
     try:
         document = json.loads(raw)
     except ValueError as exc:
@@ -722,9 +729,20 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
 
     avatar_file = account.get("avatar_file") or ""
     if profile and avatar_file:
-        content = _extract(archive, avatar_file)
+        from postulo.accounts import avatars
+
+        content = _extract_within(archive, avatar_file, avatars.MAX_UPLOAD_BYTES)
         if content is not None:
-            profile.avatar.save(avatar_file.rsplit("/", 1)[-1], ContentFile(content), save=True)
+            # The same checks the profile form applies: decoded, cropped and written out
+            # again, so what an archive carries is not kept as it came (#466).
+            try:
+                processed = avatars.process(content)
+            except avatars.UnusableImage as exc:
+                report.skipped.append(f"The profile picture: {exc}, and left out")
+            else:
+                profile.avatar.save(avatars.picture_name(profile, "avatar"), processed, save=True)
+        elif avatar_file:
+            report.skipped.append("The profile picture was too large, or not in the archive")
 
     # --------------------------------------------------------------------- tags
     # An archive written before #285 carries whatever its owner typed into a free-text
@@ -951,9 +969,18 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if company is None:
             company = Company.objects.create(owner=user, name=name, **company_entry)
             report.companies += 1
-            logo = _extract(archive, logo_name) if logo_name else None
+            from postulo.jobs import logos
+
+            logo = _extract_within(archive, logo_name, logos.MAX_BYTES) if logo_name else None
             if logo is not None:
-                company.logo.save(logo_name.rsplit("/", 1)[-1], ContentFile(logo), save=True)
+                try:
+                    processed, extension = logos.process(logo)
+                except logos.UnusableLogo as exc:
+                    report.skipped.append(f"Logo of “{name}”: {exc}, and left out")
+                else:
+                    company.logo.save(f"logo-{company.pk}.{extension}", processed, save=True)
+            elif logo_name:
+                report.skipped.append(f"Logo of “{name}” was too large, or not in the archive")
         if parent_name:
             wants_parent[company.pk] = parent_name
         if industry_names:
@@ -1307,9 +1334,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         upload = UploadedDocument(
             owner=user, **_carried(upload_entry, UPLOAD_FIELDS, report, "An upload")
         )
-        content = _extract(archive, stored_name)
+        from postulo.documents.forms import MAX_UPLOAD_BYTES
+
+        content = _extract_within(archive, stored_name, MAX_UPLOAD_BYTES)
         if content is None:
-            report.skipped.append(f"File for “{upload.title}” was not in the archive")
+            report.skipped.append(f"File for “{upload.title}” was too large, or not in the archive")
         else:
             upload.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         upload.save()
@@ -1348,9 +1377,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         )
         if rendered_at:
             sent.rendered_at = rendered_at
-        content = _extract(archive, stored_name)
+        from postulo.documents.forms import MAX_UPLOAD_BYTES
+
+        content = _extract_within(archive, stored_name, MAX_UPLOAD_BYTES)
         if content is None:
-            report.skipped.append(f"File for “{sent.title}” was not in the archive")
+            report.skipped.append(f"File for “{sent.title}” was too large, or not in the archive")
         else:
             sent.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         sent.save()
@@ -1545,16 +1576,24 @@ def _extract_within(archive: zipfile.ZipFile, stored_name: str, limit: int) -> b
     """
     if not stored_name or not stored_name.startswith(MEDIA_PREFIX):
         return None
+    return _read_within(archive, stored_name, limit)
+
+
+def _read_within(archive: zipfile.ZipFile, stored_name: str, limit: int) -> bytes | None:
     try:
         described = archive.getinfo(stored_name)
     except KeyError:
         return None
     if described.file_size > limit:
         return None
-    with archive.open(described) as handle:
-        # One byte past the limit, so a directory that understated a file is caught here
-        # rather than believed.
-        content = handle.read(limit + 1)
+    try:
+        with archive.open(described) as handle:
+            # One byte past the limit, so a directory that understated a file is caught here
+            # rather than believed.
+            content = handle.read(limit + 1)
+    except (zipfile.BadZipFile, EOFError, zlib.error, NotImplementedError):
+        # A directory that lies about an entry, or an entry that will not unpack: left out.
+        return None
     return None if len(content) > limit else content
 
 
@@ -1570,12 +1609,3 @@ def _free_cv_name(user, name: str) -> str:
         if candidate not in taken:
             return candidate
     return f"{name} ({len(taken)})"
-
-
-def _extract(archive: zipfile.ZipFile, stored_name: str) -> bytes | None:
-    if not stored_name or not stored_name.startswith(MEDIA_PREFIX):
-        return None
-    try:
-        return archive.read(stored_name)
-    except KeyError:
-        return None

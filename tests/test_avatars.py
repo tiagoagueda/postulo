@@ -1,6 +1,7 @@
 """Pictures of people: uploads re-encoded, a Gravatar fetched once, initials otherwise."""
 
 import io
+import json
 import random
 import zipfile
 from typing import ClassVar
@@ -392,6 +393,32 @@ def test_the_uploaded_picture_travels_in_the_export(user, other_user):
     assert restored.avatar and restored.avatar.name.startswith(f"avatars/{other_user.pk}/")
     assert restored.use_gravatar is True
     assert not restored.gravatar_image, "a Gravatar copy is refetched, never copied"
+
+
+def _archive_with(document: dict, files: dict[str, bytes]) -> zipfile.ZipFile:
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+        for name, content in files.items():
+            archive.writestr(name, content)
+    return zipfile.ZipFile(io.BytesIO(buffer.getvalue()))
+
+
+@pytest.mark.parametrize(
+    "content",
+    [b"not a picture at all", b"x" * (avatars.MAX_UPLOAD_BYTES + 1)],
+    ids=["not an image", "over the cap"],
+)
+def test_an_imported_avatar_that_is_not_a_usable_picture_is_refused_and_reported(
+    user, other_user, content
+):
+    document = export_module.build_document(user)
+    document["account"]["avatar_file"] = "media/avatars/1/avatar-1.png"
+    report = importer.load(
+        other_user, _archive_with(document, {"media/avatars/1/avatar-1.png": content})
+    )
+    assert not Profile.objects.get(user=other_user).avatar
+    assert any("profile picture" in line for line in report.skipped)
 
 
 # ------------------------------------------------------------------ the tag
