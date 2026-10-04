@@ -1606,7 +1606,13 @@ def test_a_mail_connection_falls_back_to_the_next_approved_address(monkeypatch):
     monkeypatch.setattr("smtplib.SMTP.getreply", lambda self: next(replies))
 
     summary = mail.check_connection(
-        host="mail.example.org", port=25, username="", password="", security="none", timeout=5
+        host="mail.example.org",
+        port=25,
+        username="",
+        password="",
+        security="none",
+        timeout=5,
+        allow_private=False,
     )
 
     assert dialled == [str(UNREACHABLE), str(REACHABLE)]
@@ -1625,7 +1631,13 @@ def test_a_mail_connection_that_reaches_no_address_says_why(monkeypatch):
 
     with pytest.raises(mail.ConnectionFailed) as failure:
         mail.check_connection(
-            host="mail.example.org", port=25, username="", password="", security="none", timeout=5
+            host="mail.example.org",
+            port=25,
+            username="",
+            password="",
+            security="none",
+            timeout=5,
+            allow_private=False,
         )
 
     assert "nobody at" in str(failure.value)
