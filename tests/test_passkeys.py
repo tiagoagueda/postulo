@@ -36,6 +36,32 @@ def test_a_passkey_needs_a_secure_page_and_localhost_counts(rf, settings):
     assert not passkeys.usable_here(rf.get("/", HTTP_HOST="postulo.example.org"))
 
 
+@pytest.mark.parametrize(
+    ("host", "secure"),
+    [("127.0.0.1:8000", False), ("[::1]:8000", False), ("[fd7a:115c::1]:8443", True)],
+)
+def test_an_address_host_is_not_offered_a_passkey(client, user, settings, host, secure):
+    """WebAuthn takes a domain only: an IP address is refused over HTTP and HTTPS alike."""
+    settings.MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = False
+    settings.ALLOWED_HOSTS = ["testserver", "localhost", "127.0.0.1", "[::1]", "[fd7a:115c::1]"]
+    client.force_login(user)
+    html = client.get(reverse("settings:account"), HTTP_HOST=host, secure=secure).content.decode()
+
+    assert "Add one" not in html
+    assert "data-passkeys-address" in html
+    assert "not a bare address" in html
+    assert "data-passkeys-insecure" not in html
+
+
+def test_the_host_is_split_with_its_brackets_gone(rf, settings):
+    from postulo.accounts import passkeys
+
+    settings.MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = False
+    settings.ALLOWED_HOSTS = ["[::1]", "localhost", "app.localhost"]
+    assert passkeys.bound_to(rf.get("/", HTTP_HOST="[::1]:8000")) == "::1"
+    assert passkeys.usable_here(rf.get("/", HTTP_HOST="app.localhost"))
+
+
 def test_the_page_says_so_rather_than_offering_something_that_cannot_work(client, user, settings):
     """An instance on a mesh VPN reaches Postulo over plain HTTP and cannot have passkeys.
 

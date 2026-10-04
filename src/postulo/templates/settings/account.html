@@ -110,7 +110,13 @@
         {% endif %}
       </div>
 
-      {% if not passkeys.usable %}
+      {% if not passkeys.usable and passkeys.at_address %}
+        <p class="alert mt-3 text-sm" data-variant="warning" role="note" data-passkeys-address>
+          <span>
+            {% translate "Passkeys need the instance to be reached by a name, not a bare address. Open it at its domain name to add one." %}
+          </span>
+        </p>
+      {% elif not passkeys.usable %}
         <p class="alert mt-3 text-sm" data-variant="warning" role="note" data-passkeys-insecure>
           <span>
             {% blocktranslate trimmed %}

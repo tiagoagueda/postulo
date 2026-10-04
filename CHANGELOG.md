@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The Account page no longer offers "Add one" for a passkey at an IP address (IPv4 or IPv6, HTTP or HTTPS), where browsers refuse it, and says to use a domain name; IPv6 hosts are no longer garbled. (#429)
 - Armenian and Georgian are now declared in the script table and probed, so check_fonts and the Server settings font status ask whether they can be drawn, and a test derived from the language registry catches the next one. (#455)
 - A telephone or address row now starts on the flag's country for every offered language that has one (Ukrainian, Turkish, Catalan, Welsh and 27 more), not only for EU languages. (#456)
 - A bulk status move on the Applications table no longer records the person's own username as the timeline actor ("via alex"); the event actor stays blank, as on every other browser path. (#410)

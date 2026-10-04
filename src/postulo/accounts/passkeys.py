@@ -8,6 +8,8 @@ to get hold of. It is the best way in Postulo has to offer.
 Two facts govern whether it can be offered at all, and both are the browser's rules rather
 than Postulo's:
 
+* **the host must be a name**, not an IP address: WebAuthn takes only a domain as the
+  relying-party id, over HTTP or HTTPS alike;
 * **the page must be a secure context** — HTTPS, with ``localhost`` the exception. Over
   plain HTTP the browser refuses the API outright, so an instance reached at a bare address
   on a mesh VPN cannot use passkeys however it is configured;
@@ -20,10 +22,14 @@ if a person only meets it when they cannot get in.
 
 from __future__ import annotations
 
-from django.http import HttpRequest
+import ipaddress
 
-#: Hosts a browser treats as a secure context even over plain HTTP.
-LOCAL_HOSTS = {"localhost", "127.0.0.1", "[::1]", "::1"}
+from django.http import HttpRequest
+from django.http.request import split_domain_port
+
+#: The one name a browser treats as a secure context even over plain HTTP (its
+#: subdomains too). An address never qualifies: WebAuthn wants a domain.
+LOCAL_HOSTS = {"localhost"}
 
 
 def _host(request: HttpRequest) -> str:
@@ -35,9 +41,23 @@ def _host(request: HttpRequest) -> str:
     from django.core.exceptions import DisallowedHost
 
     try:
-        return request.get_host().partition(":")[0]
+        domain, _port = split_domain_port(request.get_host())
     except DisallowedHost:
         return ""
+    return domain.strip("[]")
+
+
+def is_address(host: str) -> bool:
+    """Whether the host is a bare IPv4 or IPv6 address, which WebAuthn refuses."""
+    try:
+        ipaddress.ip_address(host)
+    except ValueError:
+        return False
+    return True
+
+
+def _is_local(host: str) -> bool:
+    return host in LOCAL_HOSTS or host.endswith(".localhost")
 
 
 def usable_here(request: HttpRequest) -> bool:
@@ -46,9 +66,12 @@ def usable_here(request: HttpRequest) -> bool:
 
     if getattr(settings, "MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN", False):
         return True
+    host = _host(request)
+    if is_address(host):
+        return False
     if request.is_secure():
         return True
-    return _host(request) in LOCAL_HOSTS
+    return _is_local(host)
 
 
 def bound_to(request: HttpRequest) -> str:
@@ -69,6 +92,7 @@ def summary(user, request: HttpRequest) -> dict:
         "keys": keys,
         "count": len(keys),
         "usable": usable_here(request),
+        "at_address": is_address(bound_to(request)),
         "bound_to": bound_to(request),
         "has_password": user.has_usable_password(),
         # Recovery codes matter more once a passkey can be the only way in: lose the
