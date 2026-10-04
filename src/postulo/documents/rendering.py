@@ -301,6 +301,8 @@ def _period(item, *, years_only: bool = False) -> str:
     start = getattr(item, "start_date", None)
     end = getattr(item, "end_date", None)
     if years_only:
+        if start and not end:
+            return f"{start.year} – {gettext('present')}"
         return "–".join(str(day.year) for day in (start, end) if day)
     first = formats.date_format(start, "YEAR_MONTH_FORMAT") if start else ""
     last = formats.date_format(end, "YEAR_MONTH_FORMAT") if end else ""

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A portfolio now prints "2020 – present" for a current role or course, instead of the start year alone, in the page, the text and the Word file. (#515)
 - Recording what you sent now offers only reusable-template letters and files that no newer version replaces; a one-off letter or an older version already chosen stays selectable. (#510)
 - Bulk Shortlist, Discard and Restore on listings now count only the rows they changed and no longer overwrite the decision date of listings already in the target state. (#508)
 - Dashboard picker: the blurbs of How long they take, Outcomes and Where they came from now describe what those widgets actually show. (#502)

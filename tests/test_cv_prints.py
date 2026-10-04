@@ -1417,3 +1417,15 @@ def test_the_schema_describes_the_choice(person, client):
     }
     assert "prints" in components["CVDetailOut"]["properties"]
     assert "patch" in schema["paths"]["/api/v1/cvs/{pk}"]
+
+
+@pytest.mark.parametrize("theme", ["classic", "plain"])
+def test_a_portfolio_says_a_current_role_is_still_current(person, theme):
+    """An entry with a start and no end prints "2021 – present", not 2021 alone (#515).
+
+    The page and the plain text are the same line, as an employer reads one or the other.
+    """
+    cv = a_cv(person, kind=CVKind.PORTFOLIO, theme=theme)
+    html = " ".join(rendering.render_cv_html(cv).split())
+    assert re.search(r"2021\s*–\s*(<[^>]+>\s*)*present", html)
+    assert "2021 – present" in rendering.cv_text(cv)

@@ -144,7 +144,7 @@
                 <span class="dates">
                   {% if entry.item.start_date %}{{ entry.item.start_date|date:"Y" }}{% endif %}
                   {% if entry.item.start_date and entry.item.end_date %}–{% endif %}
-                  {% if entry.item.end_date %}{{ entry.item.end_date|date:"Y" }}{% endif %}
+                  {% if entry.item.end_date %}{{ entry.item.end_date|date:"Y" }}{% elif entry.item.start_date %}– {% translate "present" %}{% endif %}
                 </span>
               </li>
             {% endfor %}
