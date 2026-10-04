@@ -32,6 +32,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Language and time and Server settings → Defaults say which language and which time zone the blank choice stands for (*Deutsch de — Default*, *Europe/Paris — Default*), with the flag and the name in its own language where the control can draw rows, and "In force now" names the language instead of printing a code. (#698)
 - The browser tests draw every page in their own copy of DejaVu Sans on every machine, so a layout that passes locally passes on CI. (#717)
 - Four browser tests wait for what they read instead of a fixed time or an idle network. (#718)
+- Three unit tests no longer depend on the machine being idle: robots.txt, the two-factor codes and a slow-filter guard. (#719)
 
 ## [0.4.0] — 2026-10-04
 

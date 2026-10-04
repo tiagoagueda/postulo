@@ -686,9 +686,14 @@ def test_a_huge_exponent_in_a_number_filter_narrows_nothing_and_answers_fast(cli
     client.force_login(user)
     url = reverse("jobs:company_list")
 
+    # Against the same page with an ordinary number rather than a fixed second: on a loaded
+    # host, under coverage, the page alone can take that long, and the fault took thirty (#719).
+    started = time.monotonic()
+    client.get(url, {"postings_min": "1"})
+    ordinary = time.monotonic() - started
     started = time.monotonic()
     response = client.get(url, {"postings_min": "1e1000000"})
-    assert time.monotonic() - started < 1
+    assert time.monotonic() - started < 3 * ordinary + 1
     assert sorted(names(response)) == sorted(names(client.get(url)))
     assert names(client.get(url, {"applications_min": "2"})) == ["Aperture Science"]
 

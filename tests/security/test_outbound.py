@@ -1050,7 +1050,11 @@ def stalling_server(monkeypatch):
 
     listener = socket.create_server(("127.0.0.1", 0))
     server = types.SimpleNamespace(
-        port=listener.getsockname()[1], stall="the headers", robots=False, asked=[]
+        port=listener.getsockname()[1],
+        stall="the headers",
+        robots=False,
+        asked=[],
+        heard=threading.Event(),
     )
 
     def answer(connection: socket.socket) -> None:
@@ -1064,6 +1068,7 @@ def stalling_server(monkeypatch):
                     request += received
                 path = request.split(b" ")[1]
                 server.asked.append(path.decode())
+                server.heard.set()
                 if path == b"/robots.txt" and not server.robots:
                     connection.sendall(
                         b"HTTP/1.1 404 Not Found\r\nContent-Length: 0\r\nConnection: close\r\n\r\n"
@@ -1143,6 +1148,10 @@ def test_a_robots_txt_trickled_the_same_way_is_given_up_on(monkeypatch, stalling
     assert fetching.robots_allow(f"http://blackmesa.test:{stalling_server.port}/jobs/1") is True
 
     assert time.monotonic() - started < STALL_SECONDS / 2
+    # The request is on the wire before the client gives up, but the server's thread writes
+    # it down only once it has read it, and on a loaded machine that can be after the 0.15
+    # seconds are over: so the list is read once the server says it has heard (#719).
+    assert stalling_server.heard.wait(timeout=5), "the server never heard a request"
     assert stalling_server.asked == ["/robots.txt"]
 
 

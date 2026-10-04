@@ -1,7 +1,5 @@
 """Two-factor authentication: a code from an app after the password, and a way back."""
 
-import time
-
 import pytest
 from allauth.account.models import EmailAddress
 from allauth.mfa.models import Authenticator
@@ -16,22 +14,34 @@ User = get_user_model()
 PASSWORD = "a-fairly-long-password-42"
 
 
-def current_code(secret: str) -> str:
-    """The code an authenticator app would show now.
+class PinnedClock:
+    """The clock allauth's TOTP check reads, standing still in the middle of a period."""
 
-    The server accepts only the code for the counter the clock is on: the tolerance is
-    zero, so the window does not slide. A code made in the last moments of a
-    thirty-second period is one generation old by the time the period rolls over and the
-    server checks it, and the sign-in is refused. So when a roll is near, wait for it:
-    a pause of a few seconds at most, never a flake.
-    """
+    def __init__(self):
+        self.now = 1_800_000_015.0
+
+    def time(self) -> float:
+        return self.now
+
+
+@pytest.fixture(autouse=True)
+def pinned_clock(monkeypatch):
+    """The server accepts only the code for the counter its clock is on, so a code made in
+    the last moments of a thirty-second period used to be one generation old when checked,
+    and the helper slept up to five and a half seconds to keep clear of the roll -- slow on
+    every run, and still a failure on a machine loaded enough to take longer (#719). Pinned,
+    the clock cannot roll between making a code and checking it."""
+    clock = PinnedClock()
+    monkeypatch.setattr(totp, "time", clock)
+    return clock
+
+
+def current_code(secret: str) -> str:
+    """The code an authenticator app would show, a period after the last one made: allauth
+    refuses a code it has already accepted, and a test may ask for two."""
     period = totp.app_settings.TOTP_PERIOD
-    now = time.time()
-    if now % period > period - 5:
-        time.sleep(period - now % period + 0.5)
-        now = time.time()
-    counter = int(now) // period
-    return totp.format_hotp_value(totp.hotp_value(secret, counter))
+    totp.time.now += period
+    return totp.format_hotp_value(totp.hotp_value(secret, int(totp.time.now) // period))
 
 
 @pytest.fixture

@@ -34,9 +34,10 @@ from django.contrib import admin
 from django.test import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, reverse
 
-from tests.test_mfa import current_code
+# The code is made from the clock `pinned_clock` stands still, as in test_mfa.py (#719).
+from tests.test_mfa import current_code, pinned_clock  # noqa: F401
 
-pytestmark = pytest.mark.django_db
+pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("pinned_clock")]
 
 #: A path an operator might choose. Nothing guesses this, which is the point of choosing.
 CHOSEN = "back-office-7f3a/"
