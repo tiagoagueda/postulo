@@ -26,7 +26,7 @@
     <form method="post" action="{{ send_url }}" class="mt-1">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Send to stores now" %}</button>
+      <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Send to stores now" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></button>
     </form>
   {% else %}
     <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">

@@ -160,3 +160,25 @@ def test_the_telephone_box_says_it_is_wrong_and_what_describes_it(client, user):
     assert 'aria-label="Country the number is in"' in chooser, "the chooser keeps its own name"
     label = re.search(r'<label for="([^"]*)">\s*Phone', html).group(1)
     assert label == "id_phone_1", "and the visible label is the box's"
+
+
+def test_an_applications_uploads_name_their_row(client, user):
+    """The "Files you already had" list on an application's Documents page drew a bare
+    "Download" (and "Send to stores now") on every row, missed by the #276 sweep."""
+    from postulo.plugins import registry
+    from tests.test_stores import ShelfStore, a_store, an_application, an_upload
+
+    registry.register_builtin("store", ShelfStore)
+    try:
+        a_store(user)
+        application = an_application(user)
+        upload = an_upload(user, title="Diploma")
+        application.sent_uploads.add(upload)
+        client.force_login(user)
+        html = client.get(
+            reverse("documents:application_documents", args=[application.pk])
+        ).content.decode()
+    finally:
+        registry.unregister_builtin("store", ShelfStore)
+    assert 'Download<span class="sr-only">: <bdi>Diploma</bdi></span>' in html
+    assert 'Send to stores now<span class="sr-only">: <bdi>Diploma</bdi></span>' in html

@@ -86,7 +86,7 @@
                 {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               </div>
               <a href="{% url 'documents:upload_download' document.pk %}"
-                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}</a>
+                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
             </li>
           {% endfor %}
         </ul>

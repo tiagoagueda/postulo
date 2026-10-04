@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Fixed: the uploads on an application's Documents page now name their file to screen readers on Download and "Send to stores now", as the other documents pages do. (#516)
 - A portfolio now prints "2020 – present" for a current role or course, instead of the start year alone, in the page, the text and the Word file. (#515)
 - Recording what you sent now offers only reusable-template letters and files that no newer version replaces; a one-off letter or an older version already chosen stays selectable. (#510)
 - Bulk Shortlist, Discard and Restore on listings now count only the rows they changed and no longer overwrite the decision date of listings already in the target state. (#508)
