@@ -16,6 +16,7 @@ from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import ngettext
 from django.views import View
@@ -369,11 +370,13 @@ class ResumePreviewView(OwnedObjectMixin, View):
         )
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class LinkCheckView(OwnedObjectMixin, View):
     """*Check*: ask once whether a link still answers, because a person asked.
 
     One link with a primary key, or all of them without. Postulo checks nothing on a
-    schedule and nothing on its own.
+    schedule and nothing on its own. Each link is saved by its own `save()`, so the view
+    holds no transaction while it waits on somebody else's server (#357).
     """
 
     def get_queryset(self):
@@ -396,8 +399,18 @@ class LinkCheckView(OwnedObjectMixin, View):
                 messages.success(request, _("%(title)s still answers.") % {"title": link.title})
             return redirect(safe_next(request, fallback))
 
-        ok, broken = link_checks.check_all(request.user)
-        if not ok and not broken:
+        ok, broken, left = link_checks.check_all(request.user)
+        if left:
+            messages.warning(
+                request,
+                ngettext(
+                    "Time ran out: %(count)d link was not reached. Check again for the rest.",
+                    "Time ran out: %(count)d links were not reached. Check again for the rest.",
+                    left,
+                )
+                % {"count": left},
+            )
+        elif not ok and not broken:
             messages.info(request, _("There are no links to check."))
         elif broken:
             messages.warning(

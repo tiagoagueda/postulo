@@ -21,6 +21,8 @@ person's behalf is a different thing from one that answers a question they asked
 
 from __future__ import annotations
 
+import time
+
 import httpx
 from django.utils import timezone
 from django.utils.translation import gettext as _
@@ -32,6 +34,8 @@ from .models import Link, LinkStatus
 
 TIMEOUT = 8.0
 MAX_REDIRECTS = 3
+#: Seconds *Check them all* may spend in all, well inside gunicorn's `--timeout` (#357).
+DEADLINE = 60.0
 
 
 def check(link: Link) -> Link:
@@ -44,16 +48,25 @@ def check(link: Link) -> Link:
     return link
 
 
-def check_all(owner) -> tuple[int, int]:
-    """Check every link this person has. Returns (answered, did not answer)."""
+def check_all(owner, *, deadline: float = DEADLINE) -> tuple[int, int, int]:
+    """Check every link this person has, for at most ``deadline`` seconds.
+
+    Returns (answered, did not answer, not reached). A link already asked keeps its result;
+    the ones the clock cut off are left as they were, for the person to press the button
+    again, rather than a worker killed with nothing saved (#357).
+    """
     ok = broken = 0
-    for link in Link.objects.for_user(owner):
+    stop = time.monotonic() + deadline
+    pending = list(Link.objects.for_user(owner))
+    for index, link in enumerate(pending):
+        if time.monotonic() >= stop:
+            return ok, broken, len(pending) - index
         check(link)
         if link.is_broken:
             broken += 1
         else:
             ok += 1
-    return ok, broken
+    return ok, broken, 0
 
 
 def _ask(url: str) -> tuple[str, str]:

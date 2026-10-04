@@ -677,3 +677,48 @@ def test_a_letters_date_is_the_one_its_placeholder_prints(user):
     assert html.count(expected) == 2, "the heading and the body carry the same date"
     assert timezone.localdate().strftime("%Y") in expected
     assert "{% now" not in html
+
+
+def test_checking_all_waits_on_the_web_outside_any_transaction(
+    client, user, answering, atomic_requests, transactional_db
+):
+    """A link on a host that does not answer must not hold the write lock (#357)."""
+    from django.db import connection
+
+    a_link(user)
+    seen = []
+    original = link_checks._ask
+
+    def ask(url):
+        seen.append(connection.in_atomic_block)
+        return original(url)
+
+    link_checks._ask = ask
+    try:
+        client.force_login(user)
+        client.post(reverse("resume:link_check_all"))
+    finally:
+        link_checks._ask = original
+
+    assert seen == [False]
+
+
+def test_checking_all_stops_at_its_deadline_and_says_how_many_were_left(client, user, monkeypatch):
+    for number in range(5):
+        a_link(user, title=f"Link {number}", url=f"https://alex.example/{number}")
+    clock = {"now": 1000.0}
+
+    def ask(url):
+        clock["now"] += 30
+        return LinkStatus.OK, "Answered 200."
+
+    monkeypatch.setattr(link_checks, "_ask", ask)
+    monkeypatch.setattr(link_checks.time, "monotonic", lambda: clock["now"])
+
+    assert link_checks.check_all(user, deadline=60) == (2, 0, 3)
+    assert Link.objects.for_user(user).filter(checked_at__isnull=False).count() == 2
+
+    clock["now"] = 1000.0
+    client.force_login(user)
+    response = client.post(reverse("resume:link_check_all"), follow=True)
+    assert "3 links were not reached" in response.content.decode()

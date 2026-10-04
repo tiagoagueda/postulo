@@ -43,6 +43,9 @@ SLOW = [
     ("documents:send", (1,)),
     ("applications:report_pdf", ()),
     ("core:export_download", ()),
+    # Each waits on a remote host and writes in short transactions of its own (#357).
+    ("resume:link_check", (1,)),
+    ("resume:link_check_all", ()),
 ]
 
 #: Ordinary pages, which stay inside the request's transaction. Listed so that a future

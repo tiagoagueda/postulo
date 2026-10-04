@@ -252,3 +252,16 @@ def german(monkeypatch):
             yield
 
     return active
+
+
+@pytest.fixture
+def atomic_requests(monkeypatch):
+    """Requests run in a transaction each, as an instance runs them (#357).
+
+    The test settings replace the database and leave `ATOMIC_REQUESTS` off, so a view which
+    forgot `non_atomic_requests` looks fine in the suite. Use with `django_db(transaction=True)`
+    and assert `not connection.in_atomic_block` at the point the remote call is made.
+    """
+    from django.db import connections
+
+    monkeypatch.setitem(connections.settings["default"], "ATOMIC_REQUESTS", True)
