@@ -64,8 +64,8 @@
             {% endblocktranslate %}
           </p>
           <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
-            {% blocktranslate with n=dry_run.would_remove.phone_numbers a=dry_run.would_remove.postal_addresses l=dry_run.would_remove.web_links apps=dry_run.would_remove.applications_unlinked trimmed %}
-              An erasure would remove {{ n }} telephone numbers, {{ a }} addresses and {{ l }} web links; {{ apps }} applications would be kept without the name.
+            {% blocktranslate with line=dry_run.would_remove_line trimmed %}
+              An erasure would remove: {{ line }}.
             {% endblocktranslate %}
           </p>
           <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">

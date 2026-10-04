@@ -428,25 +428,25 @@ def retention_dry_run(days: int | None = None) -> dict:
 
     older_than = timezone.make_aware(dt.datetime.combine(cutoff, dt.time.min))
     contacts = Contact.objects.filter(created_at__lt=older_than)
+    would_remove = {
+        "phone_numbers": sum(c.phone_numbers.count() for c in contacts),
+        "postal_addresses": sum(c.postal_addresses.count() for c in contacts),
+        "web_links": sum(c.web_links.count() for c in contacts),
+        # Every application that names them, as its contact or as who referred the
+        # person: each is kept, and each loses the name (#239).
+        "applications_unlinked": Application.objects.filter(
+            Q(contact__in=contacts) | Q(referred_by__in=contacts)
+        ).count(),
+        "interviews_unlinked": Interview.objects.filter(contacts__in=contacts).distinct().count(),
+        "listing_events_unlinked": ListingEvent.objects.filter(contact__in=contacts).count(),
+    }
     return {
         "days": days,
         "cutoff": cutoff,
         "contacts": contacts.count(),
         "accounts": contacts.values("owner").distinct().count(),
-        "would_remove": {
-            "phone_numbers": sum(c.phone_numbers.count() for c in contacts),
-            "postal_addresses": sum(c.postal_addresses.count() for c in contacts),
-            "web_links": sum(c.web_links.count() for c in contacts),
-            # Every application that names them, as its contact or as who referred the
-            # person: each is kept, and each loses the name (#239).
-            "applications_unlinked": Application.objects.filter(
-                Q(contact__in=contacts) | Q(referred_by__in=contacts)
-            ).count(),
-            "interviews_unlinked": Interview.objects.filter(contacts__in=contacts)
-            .distinct()
-            .count(),
-            "listing_events_unlinked": ListingEvent.objects.filter(contact__in=contacts).count(),
-        },
+        "would_remove": would_remove,
+        "would_remove_line": would_remove_line(would_remove),
     }
 
 
