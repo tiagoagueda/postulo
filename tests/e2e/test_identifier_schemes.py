@@ -151,16 +151,26 @@ def test_a_click_that_asks_for_a_new_tab_is_left_to_open_the_page(
     expect(opener).to_have_attribute("role", "button")
     expect(opener).to_have_attribute("href", "/server/plugins/identifiers/")
 
-    with page.context.expect_page() as opened:
-        opener.click(modifiers=["ControlOrMeta"])
+    # What the browser does with the click is the browser's business; what this promises is
+    # that the page leaves it alone. A listener on `window` hears the click last, notes
+    # whether anything before it cancelled the click, and then cancels it, so no tab opens.
+    # The tab used to be opened and waited for, and under CI's load its first navigation
+    # sometimes never committed: runs 663 and 690 failed on Chromium's background tabs,
+    # not on this page (#718).
+    page.evaluate(
+        """() => {
+            window.leftToTheBrowser = null;
+            window.addEventListener("click", (event) => {
+                window.leftToTheBrowser = !event.defaultPrevented;
+                event.preventDefault();
+            }, { once: true });
+        }"""
+    )
+    opener.click(modifiers=["ControlOrMeta"])
 
+    assert page.evaluate("window.leftToTheBrowser") is True, "the page cancelled the click"
     expect(page.locator("#settings-identifiers > *")).to_be_hidden()
-    # The tab is opened by the browser and loads on its own clock: under CI's load its
-    # first navigation took longer than `expect`'s five seconds once (run 663), so it is
-    # waited for before its address is read.
-    tab = opened.value
-    tab.wait_for_load_state("domcontentloaded", timeout=30_000)
-    expect(tab).to_have_url(f"{live_server.url}/server/plugins/identifiers/", timeout=15_000)
+    expect(page).to_have_url(f"{live_server.url}/server/plugins/")
 
 
 def test_the_dialog_fits_a_phone(page: Page, live_server, administrator):

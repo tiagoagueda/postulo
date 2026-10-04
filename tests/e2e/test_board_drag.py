@@ -77,8 +77,8 @@ def test_a_card_dropped_on_a_column_moves_and_is_recorded(live_server, page: Pag
     interviewing = page.locator("[data-board-column='interviewing']")
     assert interviewing.locator("[data-card]").count() == 0
 
-    drag(page, card.element_handle(), interviewing.element_handle())
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        drag(page, card.element_handle(), interviewing.element_handle())
 
     application.refresh_from_db()
     assert application.status == Status.INTERVIEWING
@@ -104,8 +104,8 @@ def test_the_status_menu_still_does_the_same_thing(live_server, page: Page, appl
 
     card = page.locator(f"[data-card='{application.pk}']")
     assert card.locator("select[name='status']").count() == 1
-    card.locator("select[name='status']").select_option("offer")
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        card.locator("select[name='status']").select_option("offer")
 
     application.refresh_from_db()
     assert application.status == Status.OFFER

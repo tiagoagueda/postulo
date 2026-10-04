@@ -79,8 +79,8 @@ def test_dropping_one_onto_another_moves_it(page: Page, live_server, applicant):
     before = order(applicant)
 
     third = rows(page).nth(2).element_handle()
-    drag(page, rows(page).first.element_handle(), third)
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        drag(page, rows(page).first.element_handle(), third)
 
     after = order(applicant)
     assert after[0] != before[0], "the one that was first has moved"
@@ -94,8 +94,8 @@ def test_a_drop_is_saved_where_the_arrows_save(page: Page, live_server, applican
     """
     open_the_arrange_page(page, live_server)
 
-    drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
     landed = [row.get_attribute("data-widget-row") for row in rows(page).all()]
 
     page.goto(f"{live_server.url}/?arrange=1")
@@ -106,8 +106,8 @@ def test_a_drop_says_where_it_landed(page: Page, live_server, applicant):
     """The same sentence a keyboard move gets, because it is the same move."""
     open_the_arrange_page(page, live_server)
 
-    drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
 
     # Not the page-wide alert #226 added for a failed request: it is a `role="alert"` that
     # is on every page and empty until something goes wrong, so it comes first in the
@@ -120,8 +120,8 @@ def test_the_arrows_are_still_there_afterwards(page: Page, live_server, applican
     """Dragging is an addition to the control that works everywhere, never a replacement."""
     open_the_arrange_page(page, live_server)
 
-    drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
-    page.wait_for_load_state("networkidle")
+    with page.expect_navigation():
+        drag(page, rows(page).first.element_handle(), rows(page).nth(2).element_handle())
 
     moved = rows(page).nth(2)
     for way in ("up a row", "down a row", "one place earlier", "one place later"):

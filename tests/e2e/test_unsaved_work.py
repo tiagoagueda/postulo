@@ -12,6 +12,8 @@ handler is attached, which is what these tests attach to see whether it appeared
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from playwright.sync_api import Page, expect
 
@@ -167,7 +169,9 @@ def test_answering_stay_leaves_the_discard_button_working(page: Page, live_serve
 
     page.once("dialog", lambda dialog: dialog.dismiss())
     button.click()
-    page.wait_for_timeout(300)
+    # Answering *Stay* sends nothing, so there is no request to wait for: the page is still
+    # where it was (#718).
+    expect(page).to_have_url(re.compile(r"/review/$"))
     captures[-1].refresh_from_db()
     assert captures[-1].status == CaptureStatus.PENDING
 
@@ -175,7 +179,7 @@ def test_answering_stay_leaves_the_discard_button_working(page: Page, live_serve
     # The key, not a click: Playwright will not press a button the guard has marked
     # `aria-disabled`, and a pointer press only lifts the mark, it does not also click.
     button.focus()
-    page.keyboard.press("Enter")
-    page.wait_for_timeout(1500)
+    with page.expect_navigation():
+        page.keyboard.press("Enter")
     captures[-1].refresh_from_db()
     assert captures[-1].status == CaptureStatus.DISCARDED
