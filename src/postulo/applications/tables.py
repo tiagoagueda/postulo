@@ -3,6 +3,7 @@
 from typing import ClassVar
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from postulo.core.models import Tag
 from postulo.core.tables import Column, ExtraFilter, Table, register
@@ -40,7 +41,9 @@ class ApplicationsTable(Table):
         ExtraFilter("quiet", _("Gone quiet"), kind="flag", columns=("status",)),
         ExtraFilter("tag", _("Tag"), columns=("tags", "role")),
     )
-    noun = (_("application"), _("applications"))
+    changed_message = ngettext_lazy(
+        "%(count)d application changed.", "%(count)d applications changed.", "count"
+    )
     search_label = _("Search applications")
     columns = (
         Column(

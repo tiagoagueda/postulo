@@ -99,21 +99,17 @@ def nothing_chosen() -> str:
     return str(_("Nothing was selected, so nothing changed."))
 
 
-def changed(count: int, noun: tuple[str, str]) -> str:
+def changed(count: int, table) -> str:
     """What to say afterwards: the number, and nothing about what was not changed.
 
     Deliberately says how many *did* change rather than how many were sent. The difference
     between the two is the number of rows belonging to somebody else, and that is a fact
     nobody outside this account is entitled to learn.
+
+    The table carries the whole sentence as a plural form (#390), because it knows its own
+    noun and the catalogue can then agree the verb with it in every plural category.
     """
-    singular, plural = noun
-    # One string with the noun already in the right number, rather than a plural form: the
-    # noun is the table's, so a plural form here would have to pluralise a word it does not
-    # know. The same trick the transport interlock uses for the same reason.
-    return str(
-        _("%(count)d %(noun)s changed.")
-        % {"count": count, "noun": singular if count == 1 else plural}
-    )
+    return str(table.changed_message % {"count": count})
 
 
 def link_all(rows, field: str, target) -> int:

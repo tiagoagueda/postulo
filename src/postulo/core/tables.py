@@ -36,6 +36,7 @@ from django.db.models import F, Q
 from django.http import QueryDict
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 #: What a column may be dragged to. Narrower than the lower bound is a column nobody can
 #: read and nobody can grab again; wider than the upper one is a table that scrolls sideways
@@ -384,8 +385,10 @@ class Table:
     #: The questions outside the columns that the table does draw a control for, in one of
     #: its headers (#314). They count as filters too, and a saved view may hold them.
     extra_filters: tuple[ExtraFilter, ...] = ()
-    #: What a row is called, for the live count: ("application", "applications").
-    noun: tuple[str, str] = ("row", "rows")
+    #: The whole sentence said after a bulk action, as a plural form on the count, so each
+    #: language's plural rule and its participle's agreement with this table's noun are the
+    #: catalogue's to settle (#390). A table names its rows in its own message.
+    changed_message = ngettext_lazy("%(count)d row changed.", "%(count)d rows changed.", "count")
     #: The shapes the page can take, the first being the usual one: the applications page
     #: is a table or a board of the same rows under the same filters (#102). Empty for a
     #: page that is a table and nothing else.

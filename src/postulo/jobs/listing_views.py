@@ -199,7 +199,7 @@ class ListingBulkView(LoginRequiredMixin, View):
             else:
                 did = listing.restore()
             changed += bool(did)
-        messages.success(request, bulk.changed(changed, ListingsTable.noun))
+        messages.success(request, bulk.changed(changed, ListingsTable))
         return redirect(self._back(request))
 
     @staticmethod

@@ -1,6 +1,7 @@
 """The tables this app draws: companies, and the listings waiting to be decided."""
 
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from postulo.core.tables import Column, Table, register
 
@@ -22,7 +23,9 @@ class CompaniesTable(Table):
     #: table's half of the company page's *across the group* (#138). Handled by the view
     #: rather than by a lookup, because "everything in this group" is a walk and not a join.
     extra_params = ("q", "group")
-    noun = (_("company"), _("companies"))
+    changed_message = ngettext_lazy(
+        "%(count)d company changed.", "%(count)d companies changed.", "count"
+    )
     search_label = _("Search companies")
     columns = (
         # The one column here that can be changed where it sits, and the one worth
@@ -179,7 +182,9 @@ class ListingsTable(Table):
     #: The state tabs above the table, which narrow the list without being a column, and
     #: the masthead's search box, which narrows it by role, company and place (#313).
     extra_params = ("state", "q")
-    noun = (_("listing"), _("listings"))
+    changed_message = ngettext_lazy(
+        "%(count)d listing changed.", "%(count)d listings changed.", "count"
+    )
     search_label = _("Search listings")
     columns = (
         # The role, which opens the posting; the pencil beside it renames where it sits,

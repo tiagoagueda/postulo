@@ -401,7 +401,7 @@ class ApplicationBulkView(LoginRequiredMixin, View):
             messages.error(request, _("That is not something Postulo can do to several at once."))
             return redirect(self._back(request))
 
-        messages.success(request, bulk.changed(count, ApplicationsTable.noun))
+        messages.success(request, bulk.changed(count, ApplicationsTable))
         return redirect(self._back(request))
 
     def _tag(self, request: HttpRequest, rows) -> int:

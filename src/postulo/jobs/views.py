@@ -236,7 +236,7 @@ class CompanyBulkView(LoginRequiredMixin, View):
             return redirect(self._back(request))
 
         count = self._industry(request, rows)
-        messages.success(request, bulk.changed(count, CompaniesTable.noun))
+        messages.success(request, bulk.changed(count, CompaniesTable))
         return redirect(self._back(request))
 
     def _industry(self, request: HttpRequest, rows) -> int:
