@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from django import forms
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
@@ -554,9 +555,31 @@ class SendDocumentsForm(forms.Form):
         self.user = user
         super().__init__(*args, **kwargs)
         self.fields["cv"].queryset = CV.objects.for_user(user)
-        self.fields["cover_letter"].queryset = CoverLetter.objects.for_user(user)
-        self.fields["uploads"].queryset = UploadedDocument.objects.for_user(user)
+        # What the help texts promise: a letter ticked as a one-off is not a template, and a
+        # file something replaces is "kept but no longer offered" (#510). Whatever was posted
+        # stays valid and listed, so that recording something sent long ago with an older
+        # version is still possible and a form re-rendered with errors does not lose it.
+        letters = CoverLetter.objects.for_user(user)
+        uploads = UploadedDocument.objects.for_user(user)
+        self.fields["cover_letter"].queryset = letters.filter(
+            Q(is_template=True) | Q(pk__in=self._posted_pks("cover_letter"))
+        )
+        self.fields["uploads"].queryset = uploads.filter(
+            Q(replaced_by__isnull=True) | Q(pk__in=self._posted_pks("uploads"))
+        ).distinct()
         self.fields["links"].queryset = Link.objects.for_user(user)
+
+    def _posted_pks(self, name: str) -> list[int]:
+        """The ids this form was given for a field, those that are numbers."""
+        if not self.is_bound:
+            return []
+        values = self.data.getlist(name) if hasattr(self.data, "getlist") else self.data.get(name)
+        if values is None:
+            return []
+        if not isinstance(values, (list, tuple)):
+            values = [values]
+        texts = [str(v) for v in values]
+        return [int(v) for v in texts if v.isascii() and v.isdigit() and len(v) < 19]
 
     def clean(self):
         cleaned = super().clean()

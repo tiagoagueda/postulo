@@ -1183,3 +1183,53 @@ def test_an_upload_says_its_language_or_says_that_nobody_has(client, user):
     upload.save(update_fields=["language"])
     html = client.get(reverse("documents:upload_list")).content.decode()
     assert 'data-flag="de"' in html and "language not said" not in html
+
+
+def _send_choices(user, data=None):
+    from postulo.documents.forms import SendDocumentsForm
+
+    form = SendDocumentsForm(data, user=user)
+    return (
+        set(form.fields["cover_letter"].queryset.values_list("pk", flat=True)),
+        set(form.fields["uploads"].queryset.values_list("pk", flat=True)),
+    )
+
+
+def test_record_what_you_sent_offers_templates_and_current_files_only(db, user):
+    """The flag and the supersedes link promise this; the picker did not keep it (#510)."""
+    template = CoverLetter.objects.create(owner=user, name="General", body="x")
+    one_off = CoverLetter.objects.create(owner=user, name="Black Mesa", body="x", is_template=False)
+    old = UploadedDocument.objects.create(
+        owner=user, title="CV", kind="cv", file=SimpleUploadedFile("a.pdf", b"1")
+    )
+    new = UploadedDocument.objects.create(
+        owner=user, title="CV", kind="cv", file=SimpleUploadedFile("b.pdf", b"2"), replaces=old
+    )
+
+    letters, uploads = _send_choices(user)
+
+    assert letters == {template.pk}, "a one-off letter is not offered"
+    assert one_off.pk not in letters
+    assert uploads == {new.pk}, "a superseded version is not offered"
+
+
+def test_record_what_you_sent_keeps_a_posted_choice_that_is_no_longer_offered(db, user):
+    """Recording something sent in the past with an older version stays possible."""
+    one_off = CoverLetter.objects.create(owner=user, name="Old", body="x", is_template=False)
+    old = UploadedDocument.objects.create(
+        owner=user, title="CV", kind="cv", file=SimpleUploadedFile("a.pdf", b"1")
+    )
+    UploadedDocument.objects.create(
+        owner=user, title="CV", kind="cv", file=SimpleUploadedFile("b.pdf", b"2"), replaces=old
+    )
+
+    letters, uploads = _send_choices(user, {"cover_letter": str(one_off.pk), "uploads": [old.pk]})
+
+    assert one_off.pk in letters
+    assert old.pk in uploads
+
+
+def test_record_what_you_sent_survives_odd_posted_ids(db, user):
+    """A posted id that is not a plain number must be refused by the field, not crash."""
+    letters, uploads = _send_choices(user, {"cover_letter": "²", "uploads": ["9" * 40, "x"]})
+    assert letters == set() and uploads == set()
