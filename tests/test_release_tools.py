@@ -207,10 +207,25 @@ def test_verify_image_wants_every_tag_every_architecture_and_one_image(monkeypat
         tools.verify_image("0.2.0", registry="reg.example", image="a/postulo")
 
 
-def test_the_minor_tag_is_computed_the_way_the_workflow_computes_it():
-    """`${version%.*}` in image.yml: the last dotted part goes, whatever it is."""
+def test_a_release_pushes_its_minor_and_latest_but_a_prerelease_only_itself():
     assert tools.image_tags("0.3.0") == ("0.3.0", "0.3", "latest")
-    assert tools.image_tags("1.0.0-rc.1") == ("1.0.0-rc.1", "1.0.0-rc", "latest")
+    for version in ("0.4.0-rc.1", "0.4.1-rc1", "1.0.0-beta"):
+        assert tools.is_prerelease(version)
+        assert tools.image_tags(version) == (version,)
+    assert not tools.is_prerelease("0.4.0")
+
+
+def test_a_build_suffix_is_not_a_release_tag():
+    assert tools.version_of_tag("v0.4.0-rc.1") == "0.4.0-rc.1"
+    with pytest.raises(tools.ReleaseError):
+        tools.version_of_tag("v0.4.0+build.1")
+
+
+def test_the_tags_command_prints_what_the_workflow_pushes(capsys):
+    assert tools.main(["tags", "v0.4.1-rc1", "--image", "r/o/postulo"]) == 0
+    assert capsys.readouterr().out.strip() == "r/o/postulo:0.4.1-rc1"
+    assert tools.main(["tags", "v0.4.0", "--image", "r/o/postulo"]) == 0
+    assert capsys.readouterr().out.strip() == "r/o/postulo:0.4.0,r/o/postulo:0.4,r/o/postulo:latest"
 
 
 # ------------------------------------------------------ the version in the interface

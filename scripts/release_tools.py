@@ -56,17 +56,26 @@ class ReleaseError(Exception):
 
 
 def version_of_tag(tag: str) -> str:
-    if not re.fullmatch(r"v\d+\.\d+\.\d+(?:[-+.][0-9A-Za-z.]+)?", tag):
-        raise ReleaseError(f"{tag!r} is not a release tag; expected vX.Y.Z.")
+    # No `+build` part: a Docker tag cannot carry a `+`, so the push would fail late.
+    if not re.fullmatch(r"v\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?", tag):
+        raise ReleaseError(f"{tag!r} is not a release tag; expected vX.Y.Z or vX.Y.Z-rc.1.")
     return tag[1:]
 
 
-def image_tags(version: str) -> tuple[str, str, str]:
-    """The three tags a release pushes: the version, its minor, and ``latest``.
+def is_prerelease(version: str) -> bool:
+    """Whether a version is a pre-release: the one place that decides it (#418)."""
+    return "-" in version
 
-    The minor is the version with its last dotted part removed, exactly as the workflow
-    computes it with ``${version%.*}``, so the two cannot disagree about a pre-release.
+
+def image_tags(version: str) -> tuple[str, ...]:
+    """The tags a release pushes.
+
+    A stable release gets the version, its minor and ``latest``. A pre-release gets only its
+    own version: the minor and ``latest`` are what operators follow, and a release candidate
+    must not move them. The workflow takes its list from here (``release_tools.py tags``).
     """
+    if is_prerelease(version):
+        return (version,)
     return (version, version.rsplit(".", 1)[0], "latest")
 
 
@@ -237,7 +246,7 @@ def publish(
                 "name": f"Postulo {version}",
                 "body": notes,
                 "draft": False,
-                "prerelease": "-" in version or "+" in version,
+                "prerelease": is_prerelease(version),
             }
         ).encode("utf-8")
         existing = _api("POST", f"{base}/releases", token, payload)
@@ -387,6 +396,10 @@ def main(argv: list[str] | None = None) -> int:
     attacher.add_argument("tag")
     attacher.add_argument("assets", nargs="+", type=Path)
 
+    tagger = commands.add_parser("tags", help="Print the image tags a release pushes.")
+    tagger.add_argument("tag")
+    tagger.add_argument("--image", required=True, help="registry/owner/name, lowercase")
+
     verifier = commands.add_parser(
         "verify-image", help="Ask the registry whether the tag's image is really there."
     )
@@ -440,6 +453,8 @@ def main(argv: list[str] | None = None) -> int:
                 if uploaded
                 else f"{args.tag}: every file was already there."
             )
+        elif args.command == "tags":
+            print(",".join(f"{args.image}:{tag}" for tag in image_tags(version_of_tag(args.tag))))
         elif args.command == "verify-image":
             tags = verify_image(
                 version_of_tag(args.tag),

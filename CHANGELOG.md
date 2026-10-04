@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A pre-release tag no longer moves :latest or the stable minor image tag; the image workflow takes its tags from release_tools.py, and a +build tag is refused. (#418)
 - The 500 page now speaks the reader's language with a matching lang and dir and is styled under the CSP; a refused CSRF token and a bad request get Postulo's own translated pages instead of Django's. (#421)
 - The demo data is valid and plainly fictional: contact addresses are ASCII, the French CV entry says Paris, and Initech's LEI and the Wikidata ids no longer point at real companies or places. (#423)
 - "Fetch my Gravatar again" no longer shows an unreachable or empty Gravatar as a success: one helper now reports found, none and error as success, info and warning from both places. (#425)
