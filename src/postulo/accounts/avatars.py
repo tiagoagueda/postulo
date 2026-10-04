@@ -30,6 +30,7 @@ import hashlib
 import logging
 from decimal import ROUND_DOWN, Decimal
 
+from django.contrib import messages
 from django.core.files.base import ContentFile
 from django.utils import timezone
 from django.utils.formats import number_format
@@ -190,6 +191,24 @@ def fetch_gravatar(profile) -> str:
     profile.gravatar_checked_at = timezone.now()
     profile.save(update_fields=["gravatar_image", "gravatar_checked_at", "updated_at"])
     return outcome
+
+
+def report_gravatar(request, outcome: str, *, found: str = "") -> None:
+    """Tell the person how a Gravatar fetch went, at the level the outcome deserves.
+
+    The one table for both places that ask (#425): a picture is good news, none is
+    information, a failure is a warning. `found` is the sentence for a picture, or empty
+    when the caller already said something that covers it.
+    """
+    if outcome == "found":
+        if found:
+            messages.success(request, found)
+    elif outcome == "none":
+        messages.info(
+            request, _("Gravatar has no picture for your address, so your initials stay.")
+        )
+    else:
+        messages.warning(request, _("Gravatar could not be reached just now. Try again later."))
 
 
 def forget_gravatar(profile) -> None:

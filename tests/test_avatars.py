@@ -333,6 +333,26 @@ def test_refresh_asks_again_and_a_new_primary_address_refetches(client, user, gr
     assert len(gravatar.calls) == 3, "nobody asked"
 
 
+def test_a_refresh_reports_each_outcome_at_its_own_level(client, user, gravatar):
+    from django.contrib import messages
+    from django.contrib.messages import get_messages
+
+    client.force_login(user)
+    profile_page(client, user, use_gravatar="on")
+    client.get(reverse("accounts:profile"))  # reads and clears the messages so far
+    expected = {
+        FakeResponse(200, picture_bytes((80, 80), fmt="PNG")): messages.SUCCESS,
+        FakeResponse(404): messages.INFO,
+        FakeResponse(500): messages.WARNING,
+    }
+    for answer, level in expected.items():
+        gravatar.answer = answer
+        response = client.post(reverse("accounts:avatar_refresh"))
+        levels = [m.level for m in get_messages(response.wsgi_request)]
+        client.get(reverse("accounts:profile"))
+        assert levels == [level], (answer.status_code, levels)
+
+
 def test_a_failing_gravatar_is_reported_not_fatal(client, user, monkeypatch):
     class Boom(FakeClient):
         def get(self, url):

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- "Fetch my Gravatar again" no longer shows an unreachable or empty Gravatar as a success: one helper now reports found, none and error as success, info and warning from both places. (#425)
 - Saving Settings → Language and time no longer erases a stored language the instance has withdrawn; the closed row shows the instance default instead of a blank. (#426)
 - The Account page's Two-factor card no longer tells a passkey-only account it has an authenticator app, and now says a password sign-in skips the second factor in a browser marked trusted, for the configured days. (#428)
 - The Account page no longer offers "Add one" for a passkey at an IP address (IPv4 or IPv6, HTTP or HTTPS), where browsers refuse it, and says to use a domain name; IPv6 hosts are no longer garbled. (#429)

@@ -236,15 +236,8 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
     def _after_saving(self, form, response):
         messages.success(self.request, _("Your details have been saved."))
         outcome = getattr(form, "gravatar_outcome", "")
-        if outcome == "none":
-            messages.info(
-                self.request,
-                _("Gravatar has no picture for your address, so your initials stay."),
-            )
-        elif outcome == "error":
-            messages.warning(
-                self.request, _("Gravatar could not be reached just now. Try again later.")
-            )
+        if outcome:
+            avatars.report_gravatar(self.request, outcome)
         return response
 
 
@@ -346,13 +339,8 @@ class GravatarRefreshView(LoginRequiredMixin, View):
             messages.error(request, _("Turn on “Use my Gravatar” first."))
         else:
             outcome = avatars.fetch_gravatar(profile)
-            messages.success(
-                request,
-                {
-                    "found": _("Your Gravatar has been fetched again."),
-                    "none": _("Gravatar has no picture for your address, so your initials stay."),
-                    "error": _("Gravatar could not be reached just now. Try again later."),
-                }[outcome],
+            avatars.report_gravatar(
+                request, outcome, found=_("Your Gravatar has been fetched again.")
             )
         return redirect("accounts:profile")
 
