@@ -7,11 +7,12 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_POST
 
 from . import csv_import
 
-SECTION = {"section_title": _("Your data")}
+SECTION = {"section_title": gettext_lazy("Your data")}
 
 
 @login_required

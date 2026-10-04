@@ -2,6 +2,7 @@
 
 import datetime as dt
 import json
+import re
 from decimal import Decimal
 
 import pytest
@@ -264,7 +265,9 @@ def test_the_page_uploads_maps_previews_and_imports(client, user):
     assert '<option value="company" selected>' in mapping_page
     assert "data-preview" in mapping_page and "Research Engineer" in mapping_page
     # The duplicate row counts here: duplicates are only found as they are imported.
-    assert "3 applications, 1 listings, 1 rows skipped" in mapping_page
+    summary = mapping_page.split("data-summary", 1)[1].split("</dl>", 1)[0]
+    for label, number in (("Applications", 3), ("Listings", 1), ("Rows skipped", 1)):
+        assert re.search(rf"<dt>{label}</dt><dd[^>]*>{number}</dd>", summary), label
 
     # Correct a guess and re-preview: read the Notes column as a description instead.
     fields = {
@@ -358,3 +361,64 @@ def test_a_very_long_file_name_does_not_overflow_the_timeline_columns(user):
     assert all(len(event.actor) <= 120 for event in events)
     assert all(len(event.summary) <= 250 for event in events)
     assert any(event.actor.endswith(".csv") for event in events), "the extension survives"
+
+
+def _upload(client, name, text):
+    client.post(
+        reverse("core:import_csv"),
+        {"file": SimpleUploadedFile(name, text.encode("utf-8"), content_type="text/csv")},
+    )
+    return client.get(reverse("core:import_csv")).content.decode()
+
+
+def test_the_preview_names_the_status_not_its_key(client, user):
+    from django.utils import translation
+
+    client.force_login(user)
+    data = "Company,Role,Date applied,Status\nAperture,Engineer,2026-09-01,Interviewing\n"
+    page = _upload(client, "one.csv", data)
+    preview = page.split("data-preview", 1)[1]
+    assert str(Status.INTERVIEWING.label) in preview
+    assert "interviewing" not in preview.split("</table>", 1)[0]
+    with translation.override("fr-FR"):
+        row = csv_import.parse_rows(
+            csv_import.read_sheet(data.encode(), "one.csv"),
+            csv_import.guess_mapping(csv_import.read_sheet(data.encode(), "one.csv").headers),
+        )[0]
+        assert row.status == "interviewing"
+        assert row.status_label == str(Status.INTERVIEWING.label)
+        assert row.status_label != row.status
+
+
+def test_skip_reasons_pass_through_the_catalogue(user, monkeypatch):
+    data = b"Company,Role,Date applied\nAperture,Engineer,2026-09-01\n"
+    sheet = csv_import.read_sheet(data, "a.csv")
+    mapping = csv_import.guess_mapping(sheet.headers)
+    csv_import.perform(user, sheet, mapping)
+    calls = []
+
+    def fake(message):
+        calls.append(message)
+        return "[fr] " + message
+
+    monkeypatch.setattr(csv_import, "gettext", fake)
+    again = csv_import.perform(user, sheet, mapping)
+    assert again.skipped and all(line.startswith("[fr] ") for line in again.skipped)
+    assert "Row %(number)s: already recorded (%(role)s at %(company)s, %(date)s)" in calls
+    assert "2026-09-01" not in again.skipped[0], "the date follows the locale's format"
+
+
+def test_one_data_row_is_one_row_and_the_summary_pairs_labels_with_numbers(client, user):
+    client.force_login(user)
+    page = _upload(client, "one.csv", "Company,Role\nAperture,Engineer\n")
+    assert "1 row." in page and "1 rows" not in page
+    for label in ("Applications", "Listings", "Rows skipped"):
+        assert re.search(rf"<dt>{label}</dt><dd[^>]*>\d+</dd>", page)
+
+
+def test_the_section_title_is_translated_when_shown_not_when_imported():
+    from django.utils.functional import Promise
+
+    from postulo.core import views_import
+
+    assert isinstance(views_import.SECTION["section_title"], Promise)

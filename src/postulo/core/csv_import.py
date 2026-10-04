@@ -25,6 +25,8 @@ from decimal import Decimal, InvalidOperation
 
 from django.db import transaction
 from django.utils import timezone
+from django.utils.formats import date_format
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from . import spreadsheets
@@ -833,6 +835,13 @@ class ParsedRow:
     problems: list[str] = field(default_factory=list)
 
     @property
+    def status_label(self) -> str:
+        """The status's name in the reader's language, not Postulo's internal key."""
+        from postulo.applications.models import Status
+
+        return str(Status(self.status).label)
+
+    @property
     def becomes(self) -> str:
         """What this row turns into: the **status** decides, not whether a date was given.
 
@@ -974,11 +983,17 @@ def perform(
     with transaction.atomic():
         for row in parse_rows(sheet, mapping, day_first=day_first, currency=currency):
             if row.problems:
-                report.skipped.append(f"row {row.number}: {', '.join(row.problems)}")
+                report.skipped.append(
+                    gettext("Row %(number)s: %(problems)s")
+                    % {"number": row.number, "problems": ", ".join(row.problems)}
+                )
                 continue
 
             if row.url and JobPosting.objects.for_user(user).filter(url=row.url).exists():
-                report.skipped.append(f"row {row.number}: already recorded (same address)")
+                report.skipped.append(
+                    gettext("Row %(number)s: already recorded (same address)")
+                    % {"number": row.number}
+                )
                 continue
             existed = (
                 Company.objects.for_user(user).filter(name__iexact=row.company.strip()).exists()
@@ -995,8 +1010,15 @@ def perform(
                 )
                 if twin.exists():
                     report.skipped.append(
-                        f"row {row.number}: already recorded "
-                        f"({row.role} at {company.name}, {row.applied_at})"
+                        gettext(
+                            "Row %(number)s: already recorded (%(role)s at %(company)s, %(date)s)"
+                        )
+                        % {
+                            "number": row.number,
+                            "role": row.role,
+                            "company": company.name,
+                            "date": date_format(row.applied_at, "DATE_FORMAT"),
+                        }
                     )
                     continue
 
