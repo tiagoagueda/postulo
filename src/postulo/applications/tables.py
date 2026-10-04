@@ -136,7 +136,21 @@ class ApplicationsTable(Table):
 
     def choices_for(self, extra: ExtraFilter) -> tuple:
         """A person's own tags for *Tag*, by slug, which is what the address holds. Somebody
-        with no tags is offered no list, as the form above the table offered none."""
+        with no tags is offered no list, as the form above the table offered none.
+
+        *Status* offers, first, the set of statuses the address names, while it names more
+        than one (#709): the board leaves several columns open with one value,
+        ``applied,interviewing``, the switch carries it here, and the table narrows to all
+        of them. A list that could not show that value would say *Any* over a narrowed
+        table, and the next filter would send *Any* and widen it."""
+        if extra.name == "status":
+            asked = self.params.get(extra.name, "").strip()
+            named = [status.strip() for status in asked.split(",") if status.strip()]
+            if len(named) < 2:
+                return extra.choices
+            labels = dict(extra.choices)
+            together = ", ".join(str(labels.get(status, status)) for status in named)
+            return ((asked, together), *extra.choices)
         if extra.name != "tag":
             return super().choices_for(extra)
         user = getattr(self.request, "user", None)

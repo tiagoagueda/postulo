@@ -23,7 +23,14 @@ whether a person can use any of it. These do:
 * **a status with no column** folds every column and says where those applications are;
 * **on a phone** the page does not scroll sideways, no strip's name is cut, and nothing in
   the row of filters is cut, in the widest languages;
-* **axe**, in both themes, open and folded.
+* **axe**, in both themes, open and folded;
+* **several columns open at once** (#709): a strip opens beside the columns already open, an
+  open column's heading folds that one alone, and a card moved between two open columns is
+  still what the address asks for;
+* **the board is centred**: in its box while it fits, and with its open columns brought to
+  the middle of a box it does not fit;
+* **a fold moves**: each column goes from its old width to its new one, and nothing moves
+  for somebody who asked for less motion.
 
 Every count is the queryset's, never a number written here; and nothing here counts lines
 of text, which differ between the font this machine draws in and the one CI does.
@@ -114,31 +121,37 @@ def page_count(page: Page) -> int:
 
 
 def folded_to(page: Page, person, status: str, **wanted) -> None:
-    """The board is folded to one column: that one open and holding the cards the queryset
-    gives it, every other a strip with no card on the screen, each saying its name and the
+    """The board is folded to the columns of ``status`` -- one status, or several in one
+    value, ``applied,interviewing`` (#709): those open and holding the cards the queryset
+    gives them, every other a strip with no card on the screen, each saying its name and the
     count the queryset gives it under the rest of the filters -- and the page's own count is
-    of what the address asks for, the status included."""
-    # Waited for, since a fold in place lands a moment after the press: this column open
+    of what the address asks for, the statuses included. Each heading is named for what it
+    does: the one column open shows every column, one of several folds itself, a strip opens
+    beside them, and where nothing is open a strip opens alone."""
+    named = status.split(",")
+    opened = [key for key in statuses() if key in named]
+    # Waited for, since a fold in place lands a moment after the press: these columns open
     # (or none, for a status with no column) and every other a strip.
-    expect(page.locator(f"[data-board-section='{status}']:not([data-board-strip])")).to_have_count(
-        int(status in statuses())
-    )
-    expect(page.locator("[data-board-strip]")).to_have_count(
-        len(statuses()) - (status in statuses())
-    )
+    for key in opened:
+        expect(page.locator(f"[data-board-section='{key}']:not([data-board-strip])")).to_have_count(
+            1
+        )
+    expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()) - len(opened))
     drawn = columns(page)
     assert list(drawn) == statuses()
     for key, column in drawn.items():
         held = on_the_board(person, **{**wanted, "status": key})
-        if key == status:
+        if key in opened:
+            does = "show all columns" if len(opened) == 1 else "fold this column"
             assert not column["strip"] and column["listed"], key
             assert column["expanded"] == "true", key
-            assert column["name"] == f"{label_of(key)}: show all columns"
+            assert column["name"] == f"{label_of(key)}: {does}"
             assert column["cards"] == held, key
         else:
+            does = "show this column too" if opened else "show only this column"
             assert column["strip"] and not column["listed"], key
             assert column["expanded"] == "false", key
-            assert column["name"] == f"{label_of(key)}: show only this column"
+            assert column["name"] == f"{label_of(key)}: {does}"
             assert column["cards"] == [], key
         assert column["count"] == len(held), (key, column["count"], held)
         assert column["described"] == in_words(len(held)), (key, column["described"])
@@ -178,7 +191,10 @@ def headings_are_the_statuses(page: Page) -> None:
 
 
 def says_status_once(page: Page, status: str) -> None:
-    expect(page).to_have_url(re.compile(rf"[?&]status={status}(&|$)"))
+    """The address names these statuses, once: one, or a set in one value, its commas
+    written as they are or escaped, as htmx writes them."""
+    written = "(?:,|%2C)".join(re.escape(one) for one in status.split(","))
+    expect(page).to_have_url(re.compile(rf"[?&]status={written}(&|$)"))
     assert times_in_the_address(page, "status") == 1, page.url
 
 
@@ -195,8 +211,9 @@ def fold(page: Page, status: str):
 
 def test_a_heading_folds_the_board_to_its_column_in_place(page: Page, live_server, search):
     """Press *Applied*: that column stays, the others become strips, the address says so,
-    and nothing was loaded. Press a strip: the board folds to that column instead. Press
-    the open column's heading, or *All columns*: every column is back."""
+    and nothing was loaded. Press a strip: its column opens beside it (#709). Press one of
+    two open columns' headings: that one folds and the other stays. Press the open column's
+    heading, or *All columns*: every column is back."""
     person = search["applicant"]
     base = live_server.url
     sign_in(page, base)
@@ -214,14 +231,23 @@ def test_a_heading_folds_the_board_to_its_column_in_place(page: Page, live_serve
     expect(fold(page, "applied")).to_be_focused()
     expect(page.get_by_role("button", name="Applied: show all columns", exact=True)).to_be_focused()
 
-    # A strip is the same control, for its own column.
+    # A strip is the same control, for its own column: it opens it beside the one open.
     settled(page)
-    strip = page.get_by_role("button", name="Interviewing: show only this column", exact=True)
+    strip = page.get_by_role("button", name="Interviewing: show this column too", exact=True)
     expect(strip).to_have_attribute("aria-expanded", "false")
     strip.click()
+    folded_to(page, person, "applied,interviewing")
+    says_status_once(page, "applied,interviewing")
+    expect(fold(page, "interviewing")).to_be_focused()
+    expect(fold(page, "interviewing")).to_have_attribute("aria-expanded", "true")
+
+    # One of two open columns folds itself alone, and the focus stays on its strip.
+    settled(page)
+    page.get_by_role("button", name="Applied: fold this column", exact=True).click()
     folded_to(page, person, "interviewing")
     says_status_once(page, "interviewing")
-    expect(fold(page, "interviewing")).to_be_focused()
+    expect(fold(page, "applied")).to_be_focused()
+    expect(fold(page, "applied")).to_have_attribute("aria-expanded", "false")
 
     # The open column's heading is one way back, and the focus stays on it.
     settled(page)
@@ -275,7 +301,7 @@ def test_the_board_folds_and_unfolds_from_the_keyboard(page: Page, live_server, 
     """Tab reaches a heading, Enter folds to it and the focus is still on it; *All columns*
     is the first of the board's controls the keyboard reaches, before any strip; Space
     presses a strip as Enter does, because the control is a button while it folds in
-    place."""
+    place, and opens its column beside the open one (#709)."""
     person = search["applicant"]
     base = live_server.url
     sign_in(page, base)
@@ -302,8 +328,8 @@ def test_the_board_folds_and_unfolds_from_the_keyboard(page: Page, live_server, 
     expect(fold(page, "interviewing")).to_have_attribute("aria-expanded", "false")
     scrolled = page.evaluate("() => window.scrollY")
     page.keyboard.press("Space")
-    folded_to(page, person, "interviewing")
-    says_status_once(page, "interviewing")
+    folded_to(page, person, "applied,interviewing")
+    says_status_once(page, "applied,interviewing")
     expect(fold(page, "interviewing")).to_be_focused()
     expect(fold(page, "interviewing")).to_have_attribute("aria-expanded", "true")
     assert page.evaluate("() => window.scrollY") == scrolled, (
@@ -311,18 +337,18 @@ def test_the_board_folds_and_unfolds_from_the_keyboard(page: Page, live_server, 
     )
     settled(page)
 
-    # Back up to *All columns*, and Enter: the focus lands on the column that was open.
+    # Back up to *All columns*, and Enter: the focus lands on the first column that was open.
     tab_to(page, "#board-unfold", key="Shift+Tab")
     page.keyboard.press("Enter")
     unfolded(page, person)
     says_no_status(page)
-    expect(fold(page, "interviewing")).to_be_focused()
+    expect(fold(page, "applied")).to_be_focused()
     settled(page)
 
     # And Space on an open column's heading folds to it.
     page.keyboard.press("Space")
-    folded_to(page, person, "interviewing")
-    expect(fold(page, "interviewing")).to_be_focused()
+    folded_to(page, person, "applied")
+    expect(fold(page, "applied")).to_be_focused()
 
 
 def test_space_held_down_presses_a_heading_once(page: Page, live_server, search):
@@ -451,15 +477,21 @@ def test_without_a_script_a_heading_is_a_link_to_the_folded_board(
         says_status_once(page, "applied")
         folded_to(page, person, "applied")
 
-        page.get_by_role("link", name="Interviewing: show only this column", exact=True).click()
-        says_status_once(page, "interviewing")
-        folded_to(page, person, "interviewing")
+        page.get_by_role("link", name="Interviewing: show this column too", exact=True).click()
+        says_status_once(page, "applied,interviewing")
+        folded_to(page, person, "applied,interviewing")
 
         # A filter, sent by its button, narrows the folded board and leaves it folded.
         form = page.locator("#application-filters")
         expect(form.get_by_label("Status", exact=True)).to_have_count(0)
         form.locator("select[name=tag]").select_option("dream-job")
         form.get_by_role("button", name="Filter", exact=True).click()
+        says_status_once(page, "applied,interviewing")
+        expect(page).to_have_url(re.compile(r"[?&]tag=dream-job(&|$)"))
+        folded_to(page, person, "applied,interviewing", tag="dream-job")
+
+        # One of the two folds alone, the tag kept.
+        page.get_by_role("link", name="Applied: fold this column", exact=True).click()
         says_status_once(page, "interviewing")
         expect(page).to_have_url(re.compile(r"[?&]tag=dream-job(&|$)"))
         folded_to(page, person, "interviewing", tag="dream-job")
@@ -658,8 +690,8 @@ def test_a_live_filter_and_the_search_keep_the_board_folded(page: Page, live_ser
 
     # A fold asked for now is the question as it stands: the tag and the search with it.
     fold(page, "draft").click()
-    says_status_once(page, "draft")
-    folded_to(page, person, "draft", tag="remote", q="aperture")
+    says_status_once(page, "draft,applied")
+    folded_to(page, person, "draft,applied", tag="remote", q="aperture")
     settled(page)
 
     page.locator("#board-unfold").click()
@@ -711,7 +743,7 @@ def statuses_asked(url: str) -> list[str]:
 @pytest.mark.parametrize(
     ("starts", "pressed", "lands"),
     [
-        ("&status=applied", "#board-fold-draft", "draft"),
+        ("&status=applied", "#board-fold-draft", "draft,applied"),
         ("", "#board-fold-applied", "applied"),
         ("&status=applied", "#board-unfold", ""),
         ("&status=applied", "#board-fold-applied", ""),
@@ -776,9 +808,10 @@ def test_a_fold_pressed_while_a_filter_is_on_its_way_takes_the_filter_with_it(
     assert statuses_asked(seen[0]) == ["applied"] and "tag=remote" in seen[0]
     fold(page, "draft").click()
 
-    says_status_once(page, "draft")
-    assert len(seen) == 2 and statuses_asked(seen[1]) == ["draft"] and "tag=remote" in seen[1]
-    folded_to(page, person, "draft", tag="remote")
+    says_status_once(page, "draft,applied")
+    assert len(seen) == 2 and statuses_asked(seen[1]) == ["draft,applied"]
+    assert "tag=remote" in seen[1]
+    folded_to(page, person, "draft,applied", tag="remote")
 
 
 def test_a_fold_that_fails_leaves_the_form_asking_for_the_board_that_is_drawn(
@@ -834,7 +867,7 @@ def test_back_a_reload_and_a_bookmark_agree_with_what_is_drawn(page: Page, live_
     folded_to(page, person, "applied")
     settled(page)
     fold(page, "interviewing").click()
-    folded_to(page, person, "interviewing")
+    folded_to(page, person, "applied,interviewing")
     settled(page)
 
     page.go_back()
@@ -1010,10 +1043,10 @@ def test_tabbing_to_a_strip_says_how_many_cards_it_holds(page: Page, live_server
         held = len(on_the_board(person, status=status))
         expect(control).to_have_accessible_description(in_words(held))
 
-    said("applied", "show only this column")
+    said("applied", "show this column too")
     assert len(on_the_board(person, status="applied")) == 2
-    said("draft", "show only this column")
-    said("offer", "show only this column")
+    said("draft", "show this column too")
+    said("offer", "show this column too")
     said("interviewing", "show all columns")
     # The figure is what is seen, and is not read out a second time beside the words.
     figure = page.locator("[data-board-section='applied'] [data-column-count]")
@@ -1022,9 +1055,10 @@ def test_tabbing_to_a_strip_says_how_many_cards_it_holds(page: Page, live_server
     expect(figure).to_have_text("2")
 
     fold(page, "applied").click()
-    folded_to(page, person, "applied")
-    said("applied", "show all columns")
-    said("interviewing", "show only this column")
+    folded_to(page, person, "applied,interviewing")
+    said("applied", "fold this column")
+    said("interviewing", "fold this column")
+    said("draft", "show this column too")
 
 
 # ------------------------------------------------------------- scrolling at the edge
@@ -1798,8 +1832,8 @@ COUNTED = """() => ({
 
 @pytest.mark.parametrize(
     "address",
-    ["&status=applied&quiet=1", "&quiet=1", "&status=applied", ""],
-    ids=["folded and gone quiet", "gone quiet", "folded", "open"],
+    ["&status=applied&quiet=1", "&quiet=1", "&status=applied", "&status=applied,interviewing", ""],
+    ids=["folded and gone quiet", "gone quiet", "folded", "two columns open", "open"],
 )
 def test_what_a_drop_counts_is_what_the_page_comes_back_with(
     page: Page, live_server, search, address
@@ -1808,7 +1842,8 @@ def test_what_a_drop_counts_is_what_the_page_comes_back_with(
     truth: so the two are compared. Under *Gone quiet* a card that is moved is quiet no
     longer, so it leaves the board and the column it went to gains nothing; and a card
     that leaves what the address asks for -- that, or out of a folded board's open column
-    -- is one fewer under the page's title. Each was wrong for the length of the move."""
+    into a strip -- is one fewer under the page's title, and one moved between two open
+    columns is not (#709). Each was wrong for the length of the move."""
     from postulo.applications.models import Application, Status
 
     person = search["applicant"]
@@ -1819,7 +1854,8 @@ def test_what_a_drop_counts_is_what_the_page_comes_back_with(
     wanted = {"quiet": True} if "quiet" in address else {}
     moved = on_the_board(person, status="applied", **wanted)[0]
     before = page.evaluate(COUNTED)
-    scope = {**wanted, **({"status": "applied"} if "status" in address else {})}
+    status = re.search(r"status=([^&]*)", address)
+    scope = {**wanted, **({"status": status.group(1)} if status else {})}
     assert before["page"] == in_words(len(asked(person, **scope)))
 
     # The card's form is kept from sending, so the page as the drop left it can be read.
@@ -1838,6 +1874,8 @@ def test_what_a_drop_counts_is_what_the_page_comes_back_with(
     dropped = page.evaluate(COUNTED)
     assert dropped != before
     assert dropped["columns"]["applied"][0] == before["columns"]["applied"][0] - 1
+    if "interviewing" in address:
+        assert dropped["page"] == before["page"], "still what the address asks for"
 
     with page.expect_navigation():
         page.evaluate(
@@ -2143,6 +2181,10 @@ def test_the_board_passes_axe_open_and_folded(live_server, page: Page, axe_sourc
     expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()) - 1)
     look("the board, folded by its address")
 
+    page.goto(f"{base}{BOARD}&status=applied,interviewing")
+    expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()) - 2)
+    look("the board, two columns open")
+
     page.goto(f"{base}{BOARD}&status=rejected")
     expect(page.locator("[data-board-strip]")).to_have_count(len(statuses()))
     look("the board, folded with no column open")
@@ -2153,3 +2195,199 @@ def test_the_board_passes_axe_open_and_folded(live_server, page: Page, axe_sourc
     look("the board, folded on a phone")
 
     assert not failures, "\n\n".join(failures)
+
+
+# ------------------------------------------------------------ centred, and in motion (#709)
+
+#: Where the columns are in the board's box, on the screen: the room between the box's left
+#: edge and the first column drawn, and between the last and its right edge; whether the box
+#: scrolls; and how far the middle of each column is from the middle of the box.
+PLACED = """() => {
+  const box = document.querySelector('[data-board]');
+  const b = box.getBoundingClientRect();
+  const left = b.left + box.clientLeft;
+  const right = left + box.clientWidth;
+  const drawn = [...box.querySelectorAll('[data-board-section]')]
+    .map((section) => [section.dataset.boardSection, section.getBoundingClientRect()]);
+  const lefts = drawn.map(([, at]) => at.left);
+  const rights = drawn.map(([, at]) => at.right);
+  return {
+    before: Math.min(...lefts) - left,
+    after: right - Math.max(...rights),
+    scrolls: box.scrollWidth > box.clientWidth + 1,
+    off: Object.fromEntries(drawn.map(([status, at]) =>
+      [status, (at.left + at.right) / 2 - (left + right) / 2])),
+  };
+}"""
+
+
+def still(page: Page) -> None:
+    """Nothing on the board is moving: the swap has settled, its columns have arrived and
+    the copies of what they held are gone, and the box has stopped scrolling."""
+    settled(page)
+    page.wait_for_function(
+        """() => !document.querySelector('[data-fold-copy]')
+          && !document.querySelector('[data-board]').getAnimations({subtree: true}).length"""
+    )
+    # The box's scrolling is a frame loop of its own, as long as the columns' motion.
+    first = page.evaluate(SCROLL)
+    page.wait_for_timeout(300)
+    assert page.evaluate(SCROLL) == first, "the box is still scrolling"
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+def test_a_board_that_fits_in_its_box_is_centred_in_it(page: Page, live_server, search, language):
+    """Folded, the board is narrower than the screen, and it sat against the start of its
+    box with the rest of the width empty. It is in the middle of the box, after a fold in
+    place as on arrival, in either direction of writing. A board wider than its box starts
+    at the box's edge -- centred, its first column would be past an edge no scrolling
+    reaches."""
+    set_language(search, language)
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size(WIDE)
+    page.goto(f"{base}{BOARD}&status=applied")
+    placed = page.evaluate(PLACED)
+    assert not placed["scrolls"] and placed["before"] > 100, placed
+    assert abs(placed["before"] - placed["after"]) <= 1, placed
+
+    fold(page, "interviewing").click()
+    expect(fold(page, "interviewing")).to_have_attribute("aria-expanded", "true")
+    still(page)
+    placed = page.evaluate(PLACED)
+    assert not placed["scrolls"] and placed["before"] > 100, placed
+    assert abs(placed["before"] - placed["after"]) <= 1, placed
+
+    page.locator("#board-unfold").click()
+    expect(page.locator("[data-board-strip]")).to_have_count(0)
+    still(page)
+    placed = page.evaluate(PLACED)
+    assert placed["scrolls"], placed
+    start = placed["after"] if language == "ar" else placed["before"]
+    assert abs(start + abs(scroll_of(page))) <= 1, ("the first column at the box's edge", placed)
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+def test_the_open_columns_are_brought_to_the_middle_of_a_box_they_do_not_fit(
+    page: Page, live_server, search, language
+):
+    """On a phone the folded board is wider than its box. The open column is in the middle
+    of the box when the page arrives; a strip pressed opens a column the two do not fit
+    beside, and the box brings the one pressed to the middle; one of them folded leaves the
+    other, which fits, in the middle again."""
+    set_language(search, language)
+    person = search["applicant"]
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size({"width": 390, "height": 740})
+    page.goto(f"{base}{BOARD}&status=applied")
+    folded_to(page, person, "applied")
+    placed = page.evaluate(PLACED)
+    assert placed["scrolls"] and abs(placed["off"]["applied"]) <= 1, placed
+
+    fold(page, "interviewing").click()
+    folded_to(page, person, "applied,interviewing")
+    still(page)
+    placed = page.evaluate(PLACED)
+    assert abs(placed["off"]["interviewing"]) <= 1, placed
+
+    fold(page, "applied").click()
+    folded_to(page, person, "interviewing")
+    still(page)
+    placed = page.evaluate(PLACED)
+    assert abs(placed["off"]["interviewing"]) <= 1, placed
+    expect(fold(page, "applied")).to_be_focused()
+
+
+#: Every frame from now until the flag is read: the width of one column, found afresh each
+#: time since a fold replaces the board, and what the copy of an old column was, if one is
+#: on the screen.
+WATCH = """(status) => {
+  window.watched = {widths: [], copies: []};
+  const began = performance.now();
+  const look = () => {
+    const section = document.querySelector(`[data-board-section='${status}']`);
+    window.watched.widths.push(section ? section.getBoundingClientRect().width : null);
+    for (const copy of document.querySelectorAll('[data-fold-copy]')) {
+      window.watched.copies.push({
+        hidden: copy.getAttribute('aria-hidden'),
+        inert: copy.inert,
+        reachable: copy.querySelectorAll('[id], [name], [data-board-fold], [data-card]').length,
+      });
+    }
+    if (performance.now() - began < 2500) {
+      requestAnimationFrame(look);
+    } else {
+      window.watched.done = true;
+    }
+  };
+  requestAnimationFrame(look);
+}"""
+
+
+def watched(page: Page, status: str, press) -> dict:
+    page.evaluate(WATCH, status)
+    press()
+    page.wait_for_function("() => window.watched && window.watched.done", timeout=10_000)
+    return page.evaluate("() => window.watched")
+
+
+@pytest.mark.parametrize("motion", ["no-preference", "reduce"])
+def test_a_column_opens_and_folds_in_motion_unless_less_motion_is_asked(
+    page: Page, live_server, search, motion
+):
+    """A strip pressed grows to a column's width, and a column folded shrinks to a strip's,
+    frame by frame, instead of the board jumping between two drawings. What a column held
+    fades out over what it holds now, as a copy nobody can reach or hear, gone once the
+    column has arrived. Somebody who asked for less motion sees the board drawn at once."""
+    page.emulate_media(reduced_motion=motion)
+    person = search["applicant"]
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size(WIDE)
+    page.goto(f"{base}{BOARD}&status=applied")
+    folded_to(page, person, "applied")
+
+    def between(widths: list) -> tuple[float, float, list]:
+        drawn = [width for width in widths if width]
+        start, end = drawn[0], drawn[-1]
+        low, high = sorted((start, end))
+        return start, end, [width for width in drawn if low + 2 < width < high - 2]
+
+    seen = watched(page, "interviewing", lambda: fold(page, "interviewing").click())
+    folded_to(page, person, "applied,interviewing")
+    start, end, on_the_way = between(seen["widths"])
+    assert start < 60 and end > 250, (start, end)
+    if motion == "reduce":
+        assert on_the_way == [] and seen["copies"] == [], seen
+    else:
+        assert on_the_way, ("a frame between the two widths", seen["widths"])
+        assert on_the_way == sorted(on_the_way), "it grows, and only grows"
+        assert seen["copies"], "what the strip held fades out"
+        for copy in seen["copies"]:
+            assert copy == {"hidden": "true", "inert": True, "reachable": 0}, copy
+    expect(page.locator("[data-fold-copy]")).to_have_count(0)
+    still(page)
+
+    seen = watched(page, "applied", lambda: fold(page, "applied").click())
+    folded_to(page, person, "interviewing")
+    start, end, on_the_way = between(seen["widths"])
+    assert start > 250 and end < 60, (start, end)
+    if motion == "reduce":
+        assert on_the_way == [] and seen["copies"] == [], seen
+    else:
+        assert on_the_way, ("a frame between the two widths", seen["widths"])
+        assert on_the_way == sorted(on_the_way, reverse=True), "it shrinks, and only shrinks"
+    expect(page.locator("[data-fold-copy]")).to_have_count(0)
+    # Arrived, nothing is left of the motion on the columns: their widths are the page's,
+    # and nothing in them has a style of its own for htmx to carry into the next board.
+    assert page.evaluate(
+        """() => [...document.querySelectorAll('[data-board-section]')].every((section) =>
+          !section.style.width && !section.style.overflow
+          && !section.style.getPropertyValue('--board-arrives')
+          && !section.querySelector('[id][style]'))"""
+    )
+    assert page.evaluate(
+        """() => { const box = document.querySelector('[data-board]');
+          return !box.style.height && !box.style.overflowY && !box.style.columnGap; }"""
+    )

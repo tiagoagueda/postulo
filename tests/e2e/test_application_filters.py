@@ -99,7 +99,8 @@ def asked(person, **wanted) -> list[int]:
     if wanted.get("quiet"):
         rows = rows.quiet(quiet.threshold_for(person))
     if wanted.get("status"):
-        rows = rows.filter(status=wanted["status"])
+        # One status, or several in one value, as the board's columns ask for them (#709).
+        rows = rows.filter(status__in=str(wanted["status"]).split(","))
     if wanted.get("tag"):
         rows = rows.filter(tags__slug=wanted["tag"])
     if wanted.get("state") == "open":

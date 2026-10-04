@@ -941,10 +941,11 @@
     // The counts say what that page will say. A move is something happening, so under
     // *Gone quiet* the card is quiet no longer: it leaves the board, and the column it
     // went to gains nothing. And a card that leaves what the address asks for -- that, or
-    // out of the open column of a folded board into a strip -- is one fewer under the
-    // page's title as well as in its column.
+    // out of an open column of a folded board into a strip -- is one fewer under the
+    // page's title as well as in its column. Into another open column it is still what the
+    // address asks for (#709).
     var quiet = drawnQuiet();
-    var folded = Boolean(document.querySelector("[data-board-strip]"));
+    var folded = column.hasAttribute("data-board-strip");
     cards.appendChild(card);
     card.dataset.status = status;
     recount(from, -1);
@@ -1054,13 +1055,16 @@
    * htmx is about to send and not at the click, so a fold that is refused, while a card
    * is held, leaves the form's question alone.
    *
-   * **The open column is brought into the scroll box.** Folded, the open column sits among
-   * the strips in the order of the statuses, and on a narrow screen the last of them is off
-   * the edge. The box is scrolled sideways, at once, until the column is in it: when the
-   * page arrives folded, and after a swap that brought a new board, which is a new box at
-   * its start again. Not after a swap of anything else on the page -- the theme switch is
-   * one -- which would take the board out of the hands of somebody who had scrolled it;
-   * and not on the page a move loads, where the board is put back where it was.
+   * **The open columns are brought to the middle of the scroll box** (#709). Folded, the
+   * open columns sit among the strips in the order of the statuses, and on a narrow screen
+   * the last of them is off the edge. The box is scrolled sideways until they are in the
+   * middle of it -- and where they do not fit, the column whose heading was pressed, or
+   * the first open one; a column wider than the box shows where it starts. At once when
+   * the page arrives folded, and after a swap that brought a board. Not after a swap of
+   * anything else on the page -- the theme switch is one -- which would take the board out
+   * of the hands of somebody who had scrolled it; and not on the page a move loads, where
+   * the board is put back where it was. The columns are centred by the stylesheet while
+   * they fit (`board.html`), so this moves only a board wider than its box.
    */
   function foldControl(node) {
     return node && node.closest ? node.closest("[data-board-fold]") : null;
@@ -1132,23 +1136,47 @@
     });
   });
 
-  function showTheOpenColumn() {
-    var box = document.querySelector("[data-board]");
-    var open = box && box.querySelector("[data-board-section]:not([data-board-strip])");
-    if (!open || !box.querySelector("[data-board-strip]")) {
-      return;
+  // Where the box is to be scrolled to have the open columns in its middle, or null where
+  // nothing is to move: an open board, with no column pressed. `pressed` is the section of
+  // the column whose heading asked for this board. In the box's own reckoning, which is
+  // negative in a right-to-left page; the edges are the box's as drawn, so the sum is the
+  // same either way.
+  function boardMiddle(box, pressed) {
+    var open = box.querySelectorAll("[data-board-section]:not([data-board-strip])");
+    var folded = Boolean(box.querySelector("[data-board-strip]"));
+    var around = box.getBoundingClientRect();
+    var start = around.left + box.clientLeft;
+    var wide = box.clientWidth;
+    var span = null;
+    if (folded && open.length) {
+      var first = open[0].getBoundingClientRect();
+      var last = open[open.length - 1].getBoundingClientRect();
+      span = { left: Math.min(first.left, last.left), right: Math.max(first.right, last.right) };
     }
-    // Its far edge, then its near one: a column wider than the box shows where it starts.
-    var forwards = window.getComputedStyle(box).direction !== "rtl";
-    [!forwards, forwards].forEach(function (leftEdge) {
-      var around = box.getBoundingClientRect();
-      var column = open.getBoundingClientRect();
-      if (leftEdge && column.left < around.left) {
-        box.scrollLeft -= around.left - column.left;
-      } else if (!leftEdge && column.right > around.right) {
-        box.scrollLeft += column.right - around.right;
+    if (!span || span.right - span.left > wide) {
+      var column = pressed || (folded ? open[0] : null);
+      if (!column) {
+        return null;
       }
-    });
+      span = column.getBoundingClientRect();
+    }
+    var by = (span.left + span.right) / 2 - (start + wide / 2);
+    if (span.right - span.left > wide) {
+      // Wider than the box: it shows where it starts.
+      var forwards = window.getComputedStyle(box).direction !== "rtl";
+      by = forwards ? span.left - start : span.right - (start + wide);
+    }
+    var most = box.scrollWidth - box.clientWidth;
+    var rtl = window.getComputedStyle(box).direction === "rtl";
+    return Math.min(Math.max(box.scrollLeft + by, rtl ? -most : 0), rtl ? 0 : most);
+  }
+
+  function centreTheBoard(pressed) {
+    var box = document.querySelector("[data-board]");
+    var goal = box ? boardMiddle(box, pressed) : null;
+    if (goal !== null) {
+      box.scrollLeft = goal;
+    }
   }
 
   function readyBoardFolds(event) {
@@ -1161,20 +1189,297 @@
       );
     }
     if (!event || event.type !== "htmx:afterSwap") {
-      // The page arriving: where a move left the board, or with its open column in sight.
+      // The page arriving: where a move left the board, or with its open columns in sight.
       if (!backWhereItWas()) {
-        showTheOpenColumn();
+        centreTheBoard(null);
       }
       return;
     }
-    // A swap: only one that brought a board with it. htmx says so on what it put in.
+    // A swap: only one that brought a board with it. htmx says so on what it put in. Where
+    // its columns go is the next block's, once the swap has settled.
     if (hasABoard(event.target)) {
       drawnStatus = null;
-      showTheOpenColumn();
     }
   }
 
   onContentReady(readyBoardFolds);
+
+  /* --------------------------------------------------- a column opens and folds in motion (#709)
+   *
+   * A fold redraws the board: the server sends the columns at their new widths, and htmx
+   * puts them in place of the old ones. Drawn as it comes, the board jumped -- every column
+   * after the one pressed leapt sideways by the width of a column, and the box, being a new
+   * one, was back at its start. So the board that is replaced is measured as the answer
+   * lands, and the new one is moved there from it:
+   *
+   * - **the box stays where it was scrolled**, and then goes to where the open columns are
+   *   in its middle (`boardMiddle`), on the same beat as the columns;
+   * - **each column that changes width goes from its old width to its new one**, its
+   *   content laid out at the new width and uncovered by its edge as it opens, or covered
+   *   as it folds; what it held fades out over what it holds now, which fades in. What
+   *   fades out is a copy, inert and hidden from assistive technology, taken from the board
+   *   that was replaced and gone when the column arrives;
+   * - **the gap between the columns** goes from the open board's to the folded one's, and
+   *   **the box's height** from the old board's to the new one's, so that nothing below the
+   *   board leaps when a long column folds.
+   *
+   * Any swap of the board does this, a filter's as much as a fold's: a filter changes no
+   * width, so only the box moves, and only where the open columns are not in its middle.
+   *
+   * **The new widths are measured once the swap has settled.** htmx gives an element with
+   * the id an old one had that element's classes for twenty milliseconds, to let a style
+   * change between the two be animated; a heading is such an element, and a strip measured
+   * with an open column's heading in it was a dozen pixels too narrow. Until then the
+   * columns are held at their old widths, so the board does not move twice.
+   *
+   * **Nobody who asked for less motion sees anything move.** The board is drawn at its new
+   * widths and the box is put where it goes, at once. Nor does anything move while a card
+   * is held, since nothing of the board is swapped then (above).
+   */
+  var FOLD_TIME = 240; // milliseconds
+  var FOLD_EASING = "cubic-bezier(0.2, 0, 0, 1)";
+
+  // The board on the screen as an answer for it lands: each column's width and a copy of
+  // what it holds, the gap between columns, the box's height and how far it is scrolled,
+  // and the id of the heading the answer puts the focus on, when a fold asked for it. Then,
+  // once the new board is in, the same for the settle to finish with.
+  var boardWas = null;
+  var boardLanding = null;
+  var boardScrolling = 0;
+
+  function lessMotionAsked() {
+    return Boolean(lessMotion && lessMotion.matches);
+  }
+
+  function sectionsOf(box) {
+    return Array.prototype.slice.call(box.querySelectorAll("[data-board-section]"));
+  }
+
+  // What a column held, to fade out over what it holds now: nothing in it can be reached,
+  // read out, found by an id or taken for a part of the board.
+  function copyOfColumn(section) {
+    var copy = document.createElement("div");
+    Array.prototype.forEach.call(section.childNodes, function (node) {
+      // Not the copy of an older board still fading out of it, on a second press.
+      if (!(node.nodeType === 1 && node.hasAttribute("data-fold-copy"))) {
+        copy.appendChild(node.cloneNode(true));
+      }
+    });
+    [copy].concat(Array.prototype.slice.call(copy.querySelectorAll("*"))).forEach(function (node) {
+      Array.prototype.slice.call(node.attributes).forEach(function (attribute) {
+        if (/^(id|name|form|for|hx-.*|data-(board|card|column|empty|count).*)$/.test(attribute.name)) {
+          node.removeAttribute(attribute.name);
+        }
+      });
+    });
+    copy.inert = true;
+    copy.setAttribute("aria-hidden", "true");
+    copy.setAttribute("data-fold-copy", "");
+    return copy;
+  }
+
+  document.addEventListener("htmx:beforeSwap", function (event) {
+    var detail = event.detail || {};
+    var box = document.querySelector("[data-board]");
+    boardWas = null;
+    if (!detail.shouldSwap || !box || !detail.target || !detail.target.contains(box)) {
+      return;
+    }
+    // `elt` is the target here; the element that asked is the request's.
+    var asking = foldControl((detail.requestConfig || {}).elt);
+    var pressed = null;
+    if (asking) {
+      pressed = asking.hasAttribute("data-focus-after")
+        ? asking.getAttribute("data-focus-after").replace(/^#/, "")
+        : asking.id;
+    }
+    var widths = {};
+    var copies = {};
+    sectionsOf(box).forEach(function (section) {
+      var status = section.getAttribute("data-board-section");
+      widths[status] = section.getBoundingClientRect().width;
+      copies[status] = copyOfColumn(section);
+    });
+    boardWas = {
+      widths: widths,
+      copies: copies,
+      gap: parseFloat(window.getComputedStyle(box).columnGap) || 0,
+      height: box.getBoundingClientRect().height,
+      left: box.scrollLeft,
+      pressed: pressed,
+    };
+  });
+
+  document.addEventListener("htmx:afterSwap", function (event) {
+    var was = boardWas;
+    var box = hasABoard(event.target) ? document.querySelector("[data-board]") : null;
+    if (!box) {
+      return;
+    }
+    boardWas = null;
+    window.cancelAnimationFrame(boardScrolling);
+    boardLanding = { box: box, was: was };
+    if (!was) {
+      return;
+    }
+    // Held where the old board was until the swap settles.
+    if (!lessMotionAsked()) {
+      sectionsOf(box).forEach(function (section) {
+        var width = was.widths[section.getAttribute("data-board-section")];
+        if (width !== undefined) {
+          section.style.width = width + "px";
+        }
+      });
+      box.style.columnGap = was.gap + "px";
+      box.style.height = was.height + "px";
+    }
+    box.scrollLeft = was.left;
+  });
+
+  // An answer that was not swapped in leaves the board as it was, and what was measured
+  // for it must not be taken for some later swap's.
+  document.addEventListener("htmx:afterRequest", function () {
+    boardWas = null;
+  });
+
+  // Every width is read before anything moves: an animation that has begun is the width
+  // it begins from, to whatever reads it next.
+  //
+  // What a column holds is laid out at the width it arrives at through a property set on
+  // the column, which its content takes (`w-(--board-arrives)`, `board.html`), and never
+  // through a style on the content itself: htmx carries the style of an element with an id
+  // -- the list of cards has one -- into the next board, and the page's content security
+  // policy refuses a style written that way.
+  function moveTheColumns(box, was) {
+    var sections = sectionsOf(box).map(function (section) {
+      return {
+        section: section,
+        status: section.getAttribute("data-board-section"),
+        to: section.getBoundingClientRect().width,
+        inside: section.clientWidth,
+        parts: Array.prototype.slice.call(section.children),
+      };
+    });
+    var gap = parseFloat(window.getComputedStyle(box).columnGap) || 0;
+    var high = box.getBoundingClientRect().height;
+    var moves = [];
+    var tidy = [];
+    var timing = { duration: FOLD_TIME, easing: FOLD_EASING };
+    sections.forEach(function (column) {
+      var section = column.section;
+      var parts = column.parts;
+      var from = was.widths[column.status];
+      var to = column.to;
+      if (from === undefined || Math.abs(from - to) < 1) {
+        return;
+      }
+      var copy = was.copies[column.status];
+      // Laid out at the width it arrives at, and uncovered or covered by its edge.
+      section.style.overflow = "clip";
+      section.style.position = "relative";
+      section.style.setProperty("--board-arrives", column.inside + "px");
+      parts.forEach(function (part) {
+        moves.push(part.animate([{ opacity: 0 }, { opacity: 1 }], timing));
+      });
+      if (copy) {
+        // At the width it was, whatever the column it is in arrives at.
+        copy.style.setProperty("--board-arrives", "auto");
+        copy.style.position = "absolute";
+        copy.style.insetBlockStart = "0";
+        copy.style.insetInlineStart = "0";
+        copy.style.width = from + "px";
+        copy.style.pointerEvents = "none";
+        section.appendChild(copy);
+        moves.push(copy.animate([{ opacity: 1 }, { opacity: 0 }], timing));
+      }
+      moves.push(section.animate([{ width: from + "px" }, { width: to + "px" }], timing));
+      tidy.push(function () {
+        section.style.overflow = "";
+        section.style.position = "";
+        section.style.removeProperty("--board-arrives");
+        if (copy) {
+          copy.remove();
+        }
+      });
+    });
+    if (Math.abs(was.gap - gap) >= 1) {
+      moves.push(box.animate([{ columnGap: was.gap + "px" }, { columnGap: gap + "px" }], timing));
+    }
+    if (Math.abs(was.height - high) >= 1) {
+      // Shorter than what it holds on the way, and no scroll bar for it.
+      box.style.overflowY = "hidden";
+      moves.push(box.animate([{ height: was.height + "px" }, { height: high + "px" }], timing));
+      tidy.push(function () {
+        box.style.overflowY = "";
+      });
+    }
+    var done = function () {
+      tidy.forEach(function (step) {
+        step();
+      });
+    };
+    Promise.all(
+      moves.map(function (move) {
+        return move.finished;
+      })
+    ).then(done, done);
+    return moves[0] || null;
+  }
+
+  // The box from where it was to `goal`, on the columns' beat: eased as they are, and timed
+  // by their motion, `lead`, where they move -- a frame they are late is a frame the box
+  // waits, or the room it is scrolled into would not be there yet, and it would stop short.
+  // To the very place at the end.
+  function scrollTheBoard(box, goal, lead) {
+    var from = box.scrollLeft;
+    var began = window.performance.now();
+    var step = function (now) {
+      if (!box.isConnected || (lead && lead.playState === "idle")) {
+        boardScrolling = 0;
+        return;
+      }
+      var time = lead ? lead.currentTime || 0 : now - began;
+      var done = lead && lead.playState === "finished" ? 1 : Math.min(time / FOLD_TIME, 1);
+      box.scrollLeft = from + (goal - from) * (1 - Math.pow(1 - done, 3));
+      boardScrolling = done < 1 ? window.requestAnimationFrame(step) : 0;
+    };
+    boardScrolling = window.requestAnimationFrame(step);
+  }
+
+  document.addEventListener("htmx:afterSettle", function () {
+    var landing = boardLanding;
+    boardLanding = null;
+    if (!landing || !landing.box.isConnected) {
+      return;
+    }
+    var box = landing.box;
+    var was = landing.was;
+    var moving = Boolean(was) && !lessMotionAsked();
+    // Where everything goes is measured on the new board as it will be drawn, before
+    // anything is moved.
+    sectionsOf(box).forEach(function (section) {
+      section.style.width = "";
+    });
+    box.style.columnGap = "";
+    box.style.height = "";
+    var heading = was && was.pressed ? document.getElementById(was.pressed) : null;
+    var goal = boardMiddle(box, heading ? columnOf(heading) : null);
+    var lead = null;
+    if (moving) {
+      lead = moveTheColumns(box, was);
+      // Measured at the new widths, a narrower board had the box pulled back into it; at
+      // the old ones, where the columns start from, there is room again.
+      box.scrollLeft = was.left;
+    }
+    if (goal === null || Math.abs(goal - box.scrollLeft) < 1) {
+      return;
+    }
+    if (moving) {
+      scrollTheBoard(box, goal, lead);
+    } else {
+      box.scrollLeft = goal;
+    }
+  });
 
   document.addEventListener("click", function (event) {
     var control = foldControl(event.target);

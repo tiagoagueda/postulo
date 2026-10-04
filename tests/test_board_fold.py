@@ -8,10 +8,14 @@ the columns do its job -- and a column's heading is the control that sets it.
 What is held here is what the server draws for an address:
 
 * **which columns are open**, with scripts on or off, as a page and as the fragment a live
-  swap asks for, and what each strip counts;
+  swap asks for, and what each strip counts -- several, where the address names several
+  statuses in one value, `?status=applied,interviewing` (#709);
 * **a heading is a link** to the board folded to its column, and on the open column of a
-  folded board to the board unfolded; each says whether its column is open, names the list
-  it controls, and says what pressing it does;
+  folded board to the board unfolded; on a strip of a folded board, to the board with that
+  column open as well, and on one of several open columns to the board with that one
+  folded; each says whether its column is open, names the list it controls, and says what
+  pressing it does;
+* **the table narrows to the same set**, and its status list shows it;
 * ***All columns*** is drawn before the columns whenever a status is in the address, and
   never otherwise; where a default view would answer the bare address, the way back says
   the plain board instead;
@@ -230,6 +234,139 @@ def test_of_two_statuses_the_last_is_the_fold_as_it_is_the_tables_filter(client,
     assert [c["status"] for c in found.columns if not c["strip"]] == ["applied"]
 
 
+# ------------------------------------------------------------ several columns open (#709)
+
+
+def in_order(*statuses: str) -> str:
+    """A set of statuses as the board writes it: one value, in the order of `Status`."""
+    return ",".join(status for status in Status.values if status in statuses)
+
+
+@pytest.mark.parametrize(
+    "query", ["status=applied,interviewing", "status=interviewing,+applied,applied,"]
+)
+def test_several_statuses_in_one_value_open_each_of_their_columns(client, user, search, query):
+    """The set is one value, comma-separated, its order, spaces and repeats forgiven. Each
+    of its columns is open and holds its cards, every other is a strip with its count, the
+    page counts what the set matches, and the filter form sends the set on as drawn."""
+    wanted = ["applied", "interviewing"]
+    for extra in ({}, HTMX):
+        found, body, response = board(client, user, query, **extra)
+        assert [c["status"] for c in found.columns if not c["strip"]] == wanted
+        counts = live(user)
+        for column in found.columns:
+            assert column["count"] == counts[column["status"]], column
+            expanded = "false" if column["strip"] else "true"
+            assert column["control"]["aria-expanded"] == expanded, column
+            assert ("hidden" in column["list"]) is column["strip"], column
+        drawn = {
+            c["status"]: sorted(a.pk for a in c["applications"])
+            for c in response.context["columns"]
+        }
+        for status, pks in drawn.items():
+            rows = Application.objects.for_user(user).filter(status=status)
+            assert pks == (sorted(rows.values_list("pk", flat=True)) if status in wanted else [])
+        assert response.context["total"] == counts["applied"] + counts["interviewing"] == 3
+        seen = controls(body).inputs
+        (sent,) = [c for c in seen if c.get("name") == "status" and form_of(c) == FORM]
+        assert sorted(sent["value"].split(",")) == wanted and sent["type"] == "hidden"
+        assert found.unfold["data-focus-after"] == "#board-fold-applied", "the first open"
+
+
+def test_with_several_columns_open_each_heading_says_what_it_leaves_open(client, user, search):
+    """An open column's heading folds that column and leaves the others; a strip's opens its
+    column beside the ones open. Each keeps the rest of the question, sends the set it
+    leaves open in place of the form's, and is named for what it does."""
+    found, _body, _response = board(client, user, "status=interviewing,applied&tag=remote")
+    for column in found.columns:
+        control = column["control"]
+        label = Status(column["status"]).label
+        query = asked_by(control["href"])
+        assert query["tag"] == ["remote"] and query["view"] == ["board"]
+        if column["status"] in ("applied", "interviewing"):
+            (other,) = {"applied", "interviewing"} - {column["status"]}
+            leaves = other
+            assert control["aria-label"] == f"{label}: fold this column"
+            assert control["aria-expanded"] == "true"
+        else:
+            leaves = in_order("applied", "interviewing", column["status"])
+            assert control["aria-label"] == f"{label}: show this column too"
+            assert control["aria-expanded"] == "false"
+        assert query["status"] == [leaves], column["status"]
+        assert json.loads(control["hx-vals"]) == {"status": leaves}
+        assert "hx-params" not in control
+
+
+def test_the_strip_that_opens_the_last_column_opens_the_board(client, user, search):
+    """With every column but one open, the last strip's heading leads to the open board --
+    no status in the address at all, which is the same columns. Not where the set holds a
+    settled status as well: opening every column would then widen what the page counts and
+    the table narrows to, so the set is kept, with the column in it."""
+    every = [str(status) for status in BOARD_STATUSES]
+    found, _body, _response = board(client, user, f"status={','.join(every[:-1])}")
+    (strip,) = [c for c in found.columns if c["strip"]]
+    assert strip["status"] == every[-1]
+    assert "status" not in asked_by(strip["control"]["href"])
+    assert strip["control"]["hx-params"] == "not status" and "hx-vals" not in strip["control"]
+    label = Status(every[-1]).label
+    assert strip["control"]["aria-label"] == f"{label}: show this column too"
+
+    found, _body, _response = board(client, user, f"status={','.join(every[:-1])},rejected")
+    (strip,) = [c for c in found.columns if c["strip"]]
+    assert asked_by(strip["control"]["href"])["status"] == [in_order(*every, "rejected")]
+
+
+def test_where_no_column_is_open_a_strip_opens_its_own_alone(client, user, search):
+    """A board folded to a settled status has no column open for a strip to join: its
+    heading folds the board to its own column, as it did before there could be several."""
+    found, _body, _response = board(client, user, "status=rejected,withdrawn")
+    assert all(c["strip"] for c in found.columns)
+    for column in found.columns:
+        assert asked_by(column["control"]["href"])["status"] == [column["status"]]
+        label = Status(column["status"]).label
+        assert column["control"]["aria-label"] == f"{label}: show only this column"
+
+
+def test_a_status_postulo_does_not_have_is_left_out_of_every_heading(client, user, search):
+    """It matches nothing and opens nothing. The set it was asked in still folds the board
+    to the columns it names, and the first press leaves it behind."""
+    found, body, response = board(client, user, "status=applied,nonsense")
+    assert [c["status"] for c in found.columns if not c["strip"]] == ["applied"]
+    assert response.context["total"] == live(user)["applied"]
+    assert "data-no-such-status" not in body
+    for column in found.columns:
+        assert "nonsense" not in column["control"]["href"], column["status"]
+        assert "nonsense" not in column["control"].get("hx-vals", ""), column["status"]
+
+
+def test_the_table_narrows_to_the_set_and_its_status_list_holds_it(client, user, search):
+    """The switch carries the set from the board to the table, which narrows to all of it.
+    The status list in the table's header holds the set as a choice of its own, first and
+    chosen, named by its statuses: a list that said *Any* over a narrowed table would send
+    *Any* with the next filter and widen it. One status asked offers no such choice."""
+    client.force_login(user)
+    response = client.get(reverse(LIST), {"view": "table", "status": "applied,interviewing"})
+    shown = sorted(a.pk for a in response.context["applications"])
+    rows = Application.objects.for_user(user).filter(status__in=["applied", "interviewing"])
+    assert shown == sorted(rows.values_list("pk", flat=True)) and len(shown) == 3
+    assert response.context["total"] == 3
+
+    def choices(body: str) -> list[tuple[str, str, str]]:
+        held = body.split('id="filter-status"')[1].split("</select>")[0]
+        return re.findall(r'<option value="([^"]*)"\s*(selected)?\s*>([^<]*)</option>', held)
+
+    offered = choices(response.content.decode())
+    assert offered[0][0] == "" and not offered[0][1], "Any, not chosen"
+    assert offered[1] == ("applied,interviewing", "selected", "Applied, Interviewing")
+    assert [one for one in offered if one[1]] == [offered[1]]
+    assert [one[0] for one in offered[2:]] == list(Status.values)
+
+    one = client.get(reverse(LIST), {"view": "table", "status": "applied"})
+    offered = choices(one.content.decode())
+    assert [one[0] for one in offered] == ["", *Status.values]
+    assert [one[0] for one in offered if one[1]] == ["applied"]
+
+
 # ------------------------------------------------------------------ a heading is a link
 
 
@@ -251,8 +388,9 @@ def test_a_heading_leads_to_the_board_folded_to_its_column(client, user, search)
         assert query["quiet"] == ["1"]
         label = Status(column["status"]).label
         if column["strip"]:
-            assert query["status"] == [column["status"]], "one status, its own"
-            assert control["aria-label"] == f"{label}: show only this column"
+            together = ",".join(s for s in Status.values if s in ("offer", column["status"]))
+            assert query["status"] == [together], "its own, beside the one open"
+            assert control["aria-label"] == f"{label}: show this column too"
         else:
             assert column["status"] == "offer", "the last of the two asked for"
             assert "status" not in query, "the open column's heading unfolds"
@@ -431,7 +569,8 @@ def test_a_fold_takes_its_turn_on_the_filter_form_and_sends_the_whole_question(
     for column in found.columns:
         control = column["control"]
         if column["strip"]:
-            assert json.loads(control["hx-vals"]) == {"status": column["status"]}
+            together = ",".join(s for s in Status.values if s in ("applied", column["status"]))
+            assert json.loads(control["hx-vals"]) == {"status": together}
             assert "hx-params" not in control
         else:
             assert control["hx-params"] == "not status" and "hx-vals" not in control
@@ -663,3 +802,17 @@ def test_a_heading_is_called_a_button_only_where_it_folds_in_place():
     ready = APP_JS.split("function readyBoardFolds(event) {")[1].split("\n  }\n")[0]
     assert "if (window.htmx)" in ready and 'setAttribute("role", "button")' in ready
     assert "onContentReady(readyBoardFolds)" in APP_JS
+
+
+def test_the_columns_move_only_for_somebody_who_has_not_asked_for_less_motion():
+    """The motion is the browser suite's to show (#709). This holds its one rule to the
+    source: nothing in this file animates but the fold, and the fold animates only behind
+    the preference, which the board's scrolling at its edge is held to as well."""
+    assert APP_JS.count(".animate(") == 5, "the parts, the copy, the column, gap and height"
+    moving = APP_JS.split("function moveTheColumns(box, was) {")[1].split("\n  }\n")[0]
+    assert moving.count(".animate(") == 5
+    settle = APP_JS.split("var landing = boardLanding;")[1].split("\n  });\n")[0]
+    assert "var moving = Boolean(was) && !lessMotionAsked();" in settle
+    assert APP_JS.count("moveTheColumns(") == 2, "defined once and called once"
+    assert settle.index("if (moving) {") < settle.index("moveTheColumns(box, was)")
+    assert "scrollTheBoard(box, goal, lead)" in settle.split("if (moving) {")[2]

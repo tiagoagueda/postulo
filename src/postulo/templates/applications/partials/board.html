@@ -48,36 +48,47 @@
   {% endblocktranslate %}
 </p>
 
-{% comment %} The columns fold to one (#315). `?status=` in the address is the fold: that
-   column open, every other a strip that still says its name and its count. The server
+{% comment %} The columns fold (#315). `?status=` in the address is the fold: the column of
+   each status it names open, every other a strip that still says its name and its count.
+   Several are one value, comma-separated -- `?status=applied,interviewing` -- so that one
+   field, one `hx-vals` and the table's one list each carry the set (#709). The server
    draws it, so a plain link folds the board with scripts off, and Back, a reload, a
    bookmark and a saved view all open it folded.
 
-   **A column's heading is the control**: a link to the board folded to that column, and,
-   on the one a folded board has open, to the board with every column open. It says
-   whether its column is open (`aria-expanded`, with `aria-controls` naming the column's
-   list of cards) and is named for what pressing it does, the status first, which is the
-   word on the screen. A strip's heading is the same control, for its own column. The
-   heading itself says its own name, the status: left to its contents it would be called
-   by the control's, and a list of the page's headings would be a list of instructions.
+   **A column's heading is the control**, and a link to what pressing it draws
+   (`column.action`, `views.py`): on the open board, the board folded to that column; on
+   a strip, that column open beside the ones already open; on one of several open
+   columns, that column folded and the others left; on the one column open, every column
+   again. It says whether its column is open (`aria-expanded`, with `aria-controls`
+   naming the column's list of cards) and is named for what pressing it does, the status
+   first, which is the word on the screen. The heading itself says its own name, the
+   status: left to its contents it would be called by the control's, and a list of the
+   page's headings would be a list of instructions.
+
+   **The columns are centred in their box** while they fit in it, and start at its edge
+   when they do not (`justify-center-safe`): centred on a box that scrolls, the first
+   column would be off its start edge, where no scrolling reaches. `app.js` brings the open
+   columns to the middle of the box after a fold, and moves the columns to their new
+   widths rather than drawing them there, for anybody who has not asked for less motion.
 
    **With a script it folds in place**, by the machinery every live control of this page
    uses (#313): it asks for this page with the filter form and the masthead's box, takes
    its turn on that form, and the answer replaces the board and is put in the address. So
    a fold is the question as it stands, never an address written with an older answer. The
-   status it names is its own (`hx-vals`, which is put in place of the form's); the way
-   back sends everything but the status (`hx-params`). Each control has an id, which is
-   how htmx puts the focus back on the one that was pressed, in the column it opened.
-   `app.js` calls each a button while it folds in place, so Space presses it as Enter does.
+   statuses it leaves open are its own (`hx-vals`, which is put in place of the form's);
+   one that opens every column sends everything but the status (`hx-params`). Each control
+   has an id, which is how htmx puts the focus back on the one that was pressed, in the
+   column it opened or folded. `app.js` calls each a button while it folds in place, so
+   Space presses it as Enter does.
 
    **The status in force is a hidden field of the filter form**, drawn here, inside what a
    swap replaces: a tag chosen above a folded board keeps it folded, and the field is
-   always the status this board was drawn with. It was a list in that form until #315.
+   always the statuses this board was drawn with. It was a list in that form until #315.
 
    ***All columns* is the one way back**, drawn before the columns whenever a status is in
    the address, so it is reached before any strip and is always in the same place. It goes
    when the board unfolds, and says where the focus is to land then: the heading of the
-   column that was open.
+   first column that was open.
 
    **A strip is still a column**: `data-board-section` is what a dragged card is dropped
    on, the strip included, and its list of cards is on the page, empty and hidden, for
@@ -96,7 +107,7 @@
   </p>
 {% endif %}
 
-<c-scroll-box class="flex pb-4 {% if folded %}gap-2{% else %}gap-4{% endif %}" label="{% translate 'Board' %}" data-board data-board-filters="application-filters">
+<c-scroll-box class="flex justify-center-safe pb-4 {% if folded %}gap-2{% else %}gap-4{% endif %}" label="{% translate 'Board' %}" data-board data-board-filters="application-filters">
   {% for column in columns %}
     {% comment %} A strip is as wide as one line of text and the room round it, and as tall
        as its name is long: the name is written down it, so no language's word for a
@@ -114,34 +125,49 @@
        sentence for a count. Tabbing through the strips said each name and never how many
        cards it holds; and a bare "3" read after a heading is a number of nothing. `app.js`
        steps the figure when a card is dropped, and has no words of its own: it writes the
-       figure in their place until the page comes back with them. {% endcomment %}
+       figure in their place until the page comes back with them.
+
+       **`w-(--board-arrives)` is for the column in motion** (#709): while it goes from one
+       width to the other, `app.js` sets the width it arrives at on the section, and its
+       content is laid out at that width and uncovered or covered by its edge, rather than
+       squeezed. Set nowhere else, it is no width at all and the content fills the column.
+       A property and not a style on the content, because htmx carries the style of an
+       element with an id -- the list of cards has one -- into the next board it draws,
+       which the page's content security policy refuses. {% endcomment %}
     <section class="shrink-0 {% if column.open %}w-72{% else %}relative rounded-lg border border-ink-200 pb-2 dark:border-ink-800{% endif %}"
              data-board-section="{{ column.status }}"{% if not column.open %} data-board-strip{% endif %}>
-      <div class="flex {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
+      <div class="flex w-(--board-arrives) {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
         <h2 class="text-sm font-medium" aria-label="{{ column.label }}">
           <a id="board-fold-{{ column.status }}" href="{{ column.url }}"
              class="-outline-offset-2 hover:underline {% if column.open %}tap-target -ms-1 gap-1 rounded px-1{% else %}flex justify-center rounded-md px-2.5 pt-2 pb-1 after:absolute after:inset-0{% endif %}"
              data-board-fold aria-expanded="{{ column.open|yesno:'true,false' }}"
              aria-controls="board-cards-{{ column.status }}"
              aria-describedby="board-count-{{ column.status }}"
-             {% if column.unfolds %}
+             {% if column.action == "all" %}
                aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show all columns{% endblocktranslate %}"
-               hx-params="not status"
+             {% elif column.action == "fold" %}
+               aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: fold this column{% endblocktranslate %}"
+             {% elif column.action == "add" %}
+               aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show this column too{% endblocktranslate %}"
              {% else %}
                aria-label="{% blocktranslate trimmed with status=column.label %}{{ status }}: show only this column{% endblocktranslate %}"
-               hx-vals='{"status": "{{ column.status }}"}'
+             {% endif %}
+             {% if column.statuses %}
+               hx-vals='{"status": "{{ column.statuses }}"}'
+             {% else %}
+               hx-params="not status"
              {% endif %}
              hx-get="{{ request.path }}" hx-include="#application-filters, [data-table-search]"
              hx-sync="#application-filters:replace"
              hx-target="#applications-table" hx-swap="outerHTML" hx-push-url="true">
-            {% if column.unfolds %}
+            {% if not column.open %}
+              <span class="[writing-mode:vertical-rl]">{{ column.label }}</span>
+            {% elif column.action == "all" %}
               {{ column.label }}
               {% icon "unfold-horizontal" class="size-3.5 text-ink-400" %}
-            {% elif column.open %}
+            {% else %}
               {{ column.label }}
               {% icon "fold-horizontal" class="size-3.5 text-ink-400" %}
-            {% else %}
-              <span class="[writing-mode:vertical-rl]">{{ column.label }}</span>
             {% endif %}
           </a>
         </h2>
@@ -157,7 +183,7 @@
         </span>
       </div>
       <div id="board-cards-{{ column.status }}"
-           class="flex min-h-24 flex-col gap-2 rounded-lg transition-colors"
+           class="flex min-h-24 w-(--board-arrives) flex-col gap-2 rounded-lg transition-colors"
            data-board-column="{{ column.status }}"
            data-column-label="{{ column.label }}"{% if not column.open %} hidden{% endif %}>
         {% for application in column.applications %}

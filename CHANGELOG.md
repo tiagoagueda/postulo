@@ -55,6 +55,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The *Applications* board is centred on the screen, its columns open and fold in motion (not where less motion is asked for), and several can be open at once: a strip opens beside the open columns and an open column's heading folds it alone. `?status=` takes several, comma-separated, in the table too. (#709)
 - The interface says Type, not Kind, for what sort of thing something is; the design page's typography section is Typography, and the report's period selector is Period. (#705)
 - Copyright notices name the Postulo contributors as the holder, and CONTRIBUTING.md says on what terms a contribution comes in. (#346)
 - *Your details* keeps its help where the question is asked: each card has a question mark that shows one sentence and opens the card's help in a drawer, and what a field is for is a tooltip on hover and on focus, wherever there is room for one. With scripts off the help is on the page. (#302)

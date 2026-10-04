@@ -94,14 +94,26 @@ class ApplicationFilterMixin:
     """
 
     @property
-    def asked_status(self) -> str:
-        """The status the address asks for: the parameter itself, so the last of two.
+    def asked_statuses(self) -> list[str]:
+        """The statuses the address asks for: the parameter itself, so the last of two, and
+        in it one status or several, comma-separated (#709).
 
-        One reading for both shapes (#315). The table narrows to it and the board folds to
-        it, and a board that read the address another way would fold to one column under a
-        count of another.
+        One reading for both shapes (#315). The table narrows to them and the board opens
+        their columns, and a board that read the address another way would open one set of
+        columns under a count of another. A set is one value, not the parameter repeated,
+        because the table's status list and the filter form's hidden field each send one.
         """
-        return self.request.GET.get("status", "").strip()
+        asked: list[str] = []
+        for status in self.request.GET.get("status", "").split(","):
+            status = status.strip()
+            if status and status not in asked:
+                asked.append(status)
+        return asked
+
+    @property
+    def asked_status(self) -> str:
+        """The statuses asked for as the address writes them: what the filter form sends."""
+        return ",".join(self.asked_statuses)
 
     def filter_queryset(self, queryset, *, by_status: bool = True):
         """Narrow by everything the address asks. ``by_status=False`` leaves the status out,
@@ -115,9 +127,9 @@ class ApplicationFilterMixin:
         if search:
             queryset = queryset.filter(application_match(search))
 
-        status = self.asked_status if by_status else ""
-        if status:
-            queryset = queryset.filter(status=status)
+        statuses = self.asked_statuses if by_status else []
+        if statuses:
+            queryset = queryset.filter(status__in=statuses)
 
         tag = params.get("tag", "").strip()
         if tag:
@@ -168,6 +180,8 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
     A status in the address means one thing in both shapes (#315): the table narrows to
     it, and the board folds to it -- that column open, the others strips that keep their
     name and their count. So the count above either shape is of the same applications.
+    The address may name several, and then the table narrows to all of them and the board
+    leaves each of their columns open (#709).
     """
 
     model = Application
@@ -242,8 +256,9 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
         query["view"] = shape
         return f"{self.request.path}?{query.urlencode()}"
 
-    def fold_url(self, status: str = "") -> str:
-        """This board folded to one column, or with every column open (#315).
+    def fold_url(self, statuses: list[str] | tuple[str, ...] = ()) -> str:
+        """This board with the columns of ``statuses`` open and the rest folded, or with
+        every column open when there are none (#315, #709).
 
         The rest of the question is kept. Not a saved view's name, which the question no
         longer is, as the search box and *Narrow* leave it out (`Table.search_keeps`).
@@ -257,8 +272,8 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
         query = self.request.GET.copy()
         for name in ("status", *tables.NOT_SAVED):
             query.pop(name, None)
-        if status:
-            query["status"] = status
+        if statuses:
+            query["status"] = ",".join(statuses)
         elif not query and self.table.default_view is not None:
             query[tables.SAVED] = tables.PLAIN
         return f"{self.request.path}?{query.urlencode()}" if query else self.request.path
@@ -279,23 +294,47 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
         return {row["status"]: row["cards"] for row in counted}
 
     def board_columns(self, applications: list) -> list[dict]:
-        """The board's columns, and which of them the address leaves open (#315).
+        """The board's columns, and which of them the address leaves open (#315, #709).
 
-        ``?status=`` folds the board: the column of that status is open and holds its
-        cards, and every other is a strip that says its name and its count. The rows read
-        are the open column's alone, which is what the address has always asked for; the
-        strips are counted. A status with no column -- a settled one -- leaves every
-        column a strip, and the page says where those applications are.
+        ``?status=`` folds the board: the column of each status it names is open and holds
+        its cards, and every other is a strip that says its name and its count. The rows
+        read are the open columns' alone, which is what the address has always asked for;
+        the strips are counted. A status with no column -- a settled one -- opens none, and
+        the page says where those applications are.
 
-        Each column carries the address its heading leads to: the board folded to it, or,
-        for the one a folded board has open, the board with every column open again.
+        Each column carries what pressing its heading does, ``action``, and the statuses
+        that leaves open, ``statuses`` (none, for every column), with the address of that:
+
+        * ``only``, on the open board, and on a strip where no column is open: its column
+          alone;
+        * ``add``, on a strip: its column beside the ones open -- and every column, where
+          that is all of them;
+        * ``fold``, on one of several open columns: the others;
+        * ``all``, on the one column open: every column again.
+
+        The statuses are written in the order of `Status`, so one set of columns is one
+        address, and a status Postulo does not have is left out of every one of them.
         """
-        asked = self.asked_status
+        asked = self.asked_statuses
+        board = [str(status) for status in BOARD_STATUSES]
+        kept = [status for status in Status.values if status in asked]
+        opened = [status for status in board if status in asked]
         counts = self.column_counts() if asked else {}
         columns = []
-        for status in BOARD_STATUSES:
+        for status in board:
             cards = [a for a in applications if a.status == status]
-            is_open = not asked or status == asked
+            is_open = not asked or status in asked
+            if not asked or not opened:
+                action, after = "only", [status]
+            elif not is_open:
+                action = "add"
+                after = [one for one in Status.values if one in kept or one == status]
+                if after == board:
+                    after = []
+            elif len(opened) > 1:
+                action, after = "fold", [one for one in kept if one != status]
+            else:
+                action, after = "all", []
             columns.append(
                 {
                     "status": status,
@@ -303,8 +342,9 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
                     "applications": cards,
                     "count": len(cards) if is_open else counts.get(status, 0),
                     "open": is_open,
-                    "unfolds": bool(asked) and is_open,
-                    "url": self.fold_url("" if asked and is_open else status),
+                    "action": action,
+                    "statuses": ",".join(after),
+                    "url": self.fold_url(after),
                 }
             )
         return columns
@@ -338,11 +378,13 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
             context["columns"] = self.board_columns(applications)
             # Folded whenever the address asks for a status, with a column or without one:
             # *All columns* is then the one way back, drawn in the one place (#315). It
-            # leaves the focus on the heading of the column that was open, or on the first.
-            asked = self.asked_status
+            # leaves the focus on the heading of the first column that was open, or on the
+            # first column.
+            asked = self.asked_statuses
+            opened = [column["status"] for column in context["columns"] if column["open"]]
             context["folded"] = bool(asked)
             context["unfold_url"] = self.fold_url()
-            context["unfold_lands"] = asked if asked in BOARD_STATUSES else BOARD_STATUSES[0]
+            context["unfold_lands"] = opened[0] if asked and opened else BOARD_STATUSES[0]
             context["total"] = self.matching().count()
             # Said only when a filter is narrowing: with none, settled applications are
             # simply not the board's business and the table is where they live. A `COUNT`
@@ -353,15 +395,14 @@ class ApplicationListView(PageOrFragmentMixin, OwnedObjectMixin, ApplicationFilt
                 if self.table.filters_active
                 else 0
             )
-            # A board folded to a status that has no column draws no column open, and has
+            # A board folded to statuses that have no column draws no column open, and has
             # to say why whether anything matches or not: seven strips and no word was
-            # what *Withdrawn* drew for somebody who never withdrew. A status that is no
-            # status at all is said to be none, since nothing is settled about it.
-            no_column = bool(asked) and asked not in BOARD_STATUSES
-            context["off_board_said"] = bool(context["off_board"]) or (
-                no_column and asked in Status.values
-            )
-            context["no_such_status"] = no_column and asked not in Status.values
+            # what *Withdrawn* drew for somebody who never withdrew. Statuses that are no
+            # status at all are said to be none, since nothing is settled about them.
+            no_column = bool(asked) and not opened
+            known = any(status in Status.values for status in asked)
+            context["off_board_said"] = bool(context["off_board"]) or (no_column and known)
+            context["no_such_status"] = no_column and not known
             context["table_url"] = self.shape_url("table")
         else:
             context["total"] = context["paginator"].count
