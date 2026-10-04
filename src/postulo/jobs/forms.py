@@ -694,9 +694,18 @@ class ContactForm(OwnerScopedModelForm):
                 contact.department = None
                 contact.save(update_fields=["department", "updated_at"])
             return
-        department, _created = Department.objects.get_or_create(
-            owner=self.user, company_id=contact.company_id, name=name
+        # Capitals do not make a second team; the spelling first entered stays.
+        department = (
+            Department.objects.filter(
+                owner=self.user, company_id=contact.company_id, name__iexact=name
+            )
+            .order_by("pk")
+            .first()
         )
+        if department is None:
+            department = Department.objects.create(
+                owner=self.user, company_id=contact.company_id, name=name
+            )
         if contact.department_id != department.pk:
             contact.department = department
             contact.save(update_fields=["department", "updated_at"])

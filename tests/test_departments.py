@@ -144,8 +144,30 @@ def test_a_name_the_company_already_has_is_reused(user, company, engineering):
     form.save()
 
     contact.refresh_from_db()
-    assert Department.objects.for_user(user).count() == 2, "case differs, so it is a new one"
-    assert contact.department.name == "engineering"
+    assert Department.objects.for_user(user).count() == 1
+    assert contact.department.name == "Engineering"
+
+
+def test_an_identical_name_reuses_the_department(user, company, engineering):
+    contact = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    form = ContactForm(
+        data={
+            "name": "Cave Johnson",
+            "company": company.pk,
+            "role": "",
+            "email": "",
+            "notes": "",
+            "new_department": "Engineering",
+        },
+        instance=contact,
+        user=user,
+    )
+    assert form.is_valid(), form.errors
+    form.save()
+
+    contact.refresh_from_db()
+    assert Department.objects.for_user(user).count() == 1
+    assert contact.department == engineering
 
 
 def test_clearing_the_box_detaches_and_keeps_the_team(user, company, engineering):

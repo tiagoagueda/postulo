@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Adding a contact to a department now reuses the company's existing team when the typed name differs only in capitals, instead of creating a duplicate department. (#528)
 - Changing a company's parent now counts the companies already under it, so an ownership chain built from the bottom up can no longer grow past the ten-deep cap. (#532)
 - `manage.py fetch_esco` now deletes the ESCO files of the revision it replaces once the new ones are written, and `manage.py check` reports two revisions of either file, so an upgrade no longer breaks saving listings. (#535)
 - A posting field that runs past 500 characters, a NaN, infinite or oversized salary, or a currency that is no ISO code no longer makes the schema.org or board source fail and lose the rest of the posting; only that field is dropped. (#592)
