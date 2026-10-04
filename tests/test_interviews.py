@@ -809,7 +809,7 @@ def test_a_no_show_keeps_the_catalogues_capitalisation(application, german):
     entry_text = {"Nobody showed up for the video call": "Zum Videogespräch ist niemand erschienen"}
     with german(entry_text):
         settle_interview(interview, InterviewOutcome.NO_SHOW)
-    entry = application.events.get(kind=EventKind.INTERVIEW)
+    entry = application.events.get(kind=EventKind.INTERVIEW_NO_SHOW)
     assert entry.summary == "Zum Videogespräch ist niemand erschienen"
 
 
@@ -818,7 +818,7 @@ def test_every_kind_of_interview_has_its_own_no_show_sentence(application):
     for kind in InterviewKind:
         interview = schedule_interview(application, kind=kind, starts_at=in_days(1))
         settle_interview(interview, InterviewOutcome.NO_SHOW)
-        seen.add(application.events.filter(kind=EventKind.INTERVIEW).latest("pk").summary)
+        seen.add(application.events.filter(kind=EventKind.INTERVIEW_NO_SHOW).latest("pk").summary)
     assert len(seen) == len(InterviewKind)
     assert not any("%(" in text for text in seen)
 

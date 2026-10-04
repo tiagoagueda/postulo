@@ -364,13 +364,16 @@ def test_moving_a_held_interview_does_not_count_it_twice(user, company):
 
 
 def test_settling_a_held_interview_again_replaces_it_in_the_count(user, company):
+    """The interviews attended follow the outcome. The application that *reached* an interview
+    does not unreach it: its status was Interviewing, and the Insights rule (#449) counts that
+    however the interview ended."""
     interview = held_interview(user, company)
 
     settle_interview(interview, InterviewOutcome.NO_SHOW)
-    assert interviews_counted(user) == (0, 0, 0)
+    assert interviews_counted(user) == (0, 0, 1)
 
     settle_interview(interview, InterviewOutcome.CANCELLED)
-    assert interviews_counted(user) == (0, 0, 0)
+    assert interviews_counted(user) == (0, 0, 1)
 
     settle_interview(interview, InterviewOutcome.DONE)
     assert interviews_counted(user) == (1, 1, 1)
