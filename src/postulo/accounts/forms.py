@@ -1068,6 +1068,11 @@ class LocaleForm(forms.ModelForm):
         from postulo.core import languages
 
         current = self["language"].value() or ""
+        offered = {code for _label, entries in language_choices()[1:] for code, _name in entries}
+        if current not in offered:
+            # A stored language the instance has withdrawn (#120, #426) has no row, so the
+            # page shows the instance default, which is what the person actually gets.
+            current = ""
         status = languages.translation_status()
         groups = []
         for label, entries in language_choices()[1:]:
@@ -1128,6 +1133,17 @@ class LocaleForm(forms.ModelForm):
             "state": state,
             "percent": percent,
         }
+
+    def clean_language(self) -> str:
+        """Keep a stored language the page had no radio for.
+
+        An administrator may have withdrawn it (#120); the form then posts no `language`
+        at all, and saving the time zone must not erase the stored choice (#426).
+        """
+        value = self.cleaned_data.get("language") or ""
+        if not value and "language" not in self.data and self.instance.pk:
+            return self.instance.language
+        return value
 
     def language_now(self) -> dict:
         """The row the closed disclosure shows: what is in use right now.

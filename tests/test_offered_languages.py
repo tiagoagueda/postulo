@@ -322,3 +322,36 @@ def test_a_partly_translated_regional_language_keeps_its_region(client, administ
     )
 
     assert '<span lang="fr-FR">français (France)</span>' in row
+
+
+# ---------------------------------------------- saving the page with a withdrawn language
+
+
+def test_saving_the_time_zone_keeps_a_withdrawn_language(client, user, settings_row):
+    """#426: the page has no radio for a withdrawn language, so none is posted."""
+    user.profile.language = "de"
+    user.profile.time_zone = "UTC"
+    user.profile.save(update_fields=["language", "time_zone"])
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["en", "pt-pt"])
+    client.force_login(user)
+
+    response = client.post(reverse("settings:locale"), {"time_zone": "Europe/Lisbon"})
+
+    assert response.status_code == 302
+    user.profile.refresh_from_db()
+    assert user.profile.language == "de"
+    assert user.profile.time_zone == "Europe/Lisbon"
+
+
+def test_the_closed_row_names_the_default_for_a_withdrawn_language(client, user, settings_row):
+    user.profile.language = "de"
+    user.profile.save(update_fields=["language"])
+    SiteSettings.objects.filter(pk=settings_row.pk).update(offered_languages=["en", "pt-pt"])
+    client.force_login(user)
+
+    from postulo.accounts.forms import LocaleForm
+
+    now = LocaleForm(instance=user.profile).language_now()
+    assert now["name"], "the closed row is not left empty"
+    assert now["code"] == ""
+    assert client.get(reverse("settings:locale")).status_code == 200
