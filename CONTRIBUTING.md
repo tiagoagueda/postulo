@@ -51,15 +51,12 @@ CI runs it on every push. If you change a page on that path — the header, the 
 review, the board, the export — run it before opening the pull request; it is the test that
 notices when steps stop joining up.
 
-**CI draws in a wider font than your desktop does.** The interface uses the reader's own
-system font, so the suite measures whatever the machine it runs on draws in: Segoe UI or
-San Francisco on a desktop, DejaVu Sans in CI. A row that fits in the first can spill in the
-second, and three changes passed here and failed there for exactly that reason. If you
-changed a layout, draw the suite the way CI will before you push, with the font installed:
-
-```sh
-POSTULO_E2E_FONT="DejaVu Sans" uv run pytest -m e2e
-```
+**Every page is drawn in the suite's own font.** The interface uses the reader's own system
+font, so the browser suite used to measure whatever the machine it ran on drew in -- Segoe UI
+on a desktop, DejaVu Sans on CI -- and a row that fitted on one spilled on the other. The
+suite now brings DejaVu Sans with it (`tests/e2e/fonts/`) and draws every page in it, on
+every machine, so a layout that passes on your desktop passes on CI. Nothing needs
+installing or remembering; the run stops at once, saying so, if the font does not load.
 
 ## The mark
 

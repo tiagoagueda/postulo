@@ -6,14 +6,10 @@ they need a browser installed. Run them with::
     uv run playwright install chromium
     uv run pytest -m e2e
 
-CI runs them on every push in their own job, with traces kept on failure.
+CI runs them on every push in their own job, and runs a failure again alone with a trace.
 
-CI draws in DejaVu Sans, which is wider than the font a desktop draws in, so a row that
-fits here can spill there. To draw every page as CI does, name the font::
-
-    POSTULO_E2E_FONT="DejaVu Sans" uv run pytest -m e2e
-
-The font has to be installed; `_drawn_in_the_font_asked_for` below says how it is applied.
+Every page is drawn in DejaVu Sans, from files in `fonts/` beside this one, on every machine:
+`_drawn_in_the_suites_own_font` below says why and how.
 """
 
 import os
@@ -21,6 +17,7 @@ import re
 import sqlite3
 import threading
 import weakref
+from pathlib import Path
 
 import pytest
 
@@ -125,45 +122,80 @@ def pytest_sessionfinish(session, exitstatus):
         _WRAPPERS.pop(ident, None)
 
 
-# ------------------------------------------------------------------- the font CI draws in
+# --------------------------------------------------------------- the font every page is drawn in
 #: The application's stylesheet, whatever its name carries after `app`.
 _STYLESHEET = re.compile(r"/static/css/app[^/]*\.css")
 
+#: The suite's own copy of DejaVu Sans and DejaVu Sans Mono, regular and bold: the four files
+#: Debian's `fonts-dejavu-core` installs on CI, and their licence.
+FONTS = Path(__file__).resolve().parent / "fonts"
+
+#: Where the live server answers for them, under the static prefix, so the content security
+#: policy's `font-src 'self'` already allows them.
+_FONT_PATH = "e2e-fonts/"
+
+#: Family names no machine has installed, so a page can only ever draw in the files above:
+#: a desktop with the whole DejaVu family would otherwise lend its real oblique to text that
+#: CI, with none installed, slants by itself.
+SANS = "Postulo E2E Sans"
+MONO = "Postulo E2E Mono"
+
+_FACES = (
+    (SANS, "normal", "DejaVuSans.ttf"),
+    (SANS, "bold", "DejaVuSans-Bold.ttf"),
+    (MONO, "normal", "DejaVuSansMono.ttf"),
+    (MONO, "bold", "DejaVuSansMono-Bold.ttf"),
+)
+
+
+def _font_rules(static_url: str) -> bytes:
+    faces = "".join(
+        f'\n@font-face {{ font-family: "{family}"; font-weight: {weight}; '
+        f'src: url("{static_url}{_FONT_PATH}{name}") format("truetype"); }}'
+        for family, weight, name in _FACES
+    )
+    return (
+        faces
+        + f'\n*, ::before, ::after {{ font-family: "{SANS}" !important; }}'
+        + f'\ncode, code *, kbd, samp, pre, pre * {{ font-family: "{MONO}" !important; }}\n'
+    ).encode()
+
 
 @pytest.fixture(scope="session", autouse=True)
-def _drawn_in_the_font_asked_for():
-    """With ``POSTULO_E2E_FONT`` set, every page of every test is drawn in that font.
+def _drawn_in_the_suites_own_font():
+    """Every page of every test is drawn in DejaVu Sans, from the suite's own files (#717).
 
-    The interface uses the reader's own system font, so the suite measures whatever the
-    machine it runs on draws in: Segoe UI on a Windows desktop, DejaVu Sans in CI, which is
-    wider. A title squeezed to 41 pixels on the calendar (#316), a footer on two rows (#212)
-    and an address cut short on *Server settings → Capture* (#320) each passed here and
-    failed there. ``POSTULO_E2E_FONT="DejaVu Sans"`` draws this run the way CI draws it.
+    The interface uses the reader's own system font, so the suite measured whatever the
+    machine it ran on draws in: Segoe UI on a Windows desktop, DejaVu Sans on CI, which is
+    wider. A title squeezed to 41 pixels on the calendar (#316), a footer on three rows
+    (#212) and boxes clipped under the text spacing override each passed on a desktop and
+    failed on CI. The cure used to be a switch somebody had to remember, and that drew in
+    Times on a machine without DejaVu installed; now the suite brings the font with it.
 
-    The font is put on by the live server: it serves the application's own stylesheet with
-    two rules after it, everything in the font and `code` in its ``Mono`` face. A stylesheet
-    from the application's own address is what the content security policy allows, so the
-    policy stays on; it reaches a page whose scripts are off and a context a test opened for
-    itself; and the browser is left alone. It is not done by intercepting the request in the
-    browser, because that turns the browser's cache off, and the tests that press *Back*
-    are about what the cache brings back.
+    The live server serves the application's own stylesheet with `@font-face` rules and two
+    rules after it -- everything in the sans, `code` in the mono -- and serves the font files
+    themselves under the static prefix. A stylesheet and fonts from the application's own
+    address are what the content security policy allows, so the policy stays on; the rules
+    reach a page whose scripts are off and a context a test opened for itself; and the
+    browser is left alone. It is not done by intercepting requests in the browser, because
+    that turns the browser's cache off, and the tests that press *Back* are about what the
+    cache brings back.
     """
-    font = os.environ.get("POSTULO_E2E_FONT", "").strip()
-    if not font:
-        yield
-        return
-
+    from django.conf import settings
     from django.contrib.staticfiles import handlers
     from django.http import HttpResponse
 
-    mono = f'"{font} Mono", "{font}"'
-    rules = (
-        f'\n*, ::before, ::after {{ font-family: "{font}" !important; }}'
-        f"\ncode, code *, kbd, samp, pre, pre * {{ font-family: {mono} !important; }}\n"
-    ).encode()
+    rules = _font_rules(settings.STATIC_URL)
+    files = {name: (FONTS / name).read_bytes() for _family, _weight, name in _FACES}
     served = handlers.serve
 
     def in_the_font(request, path, **kwargs):
+        # A file path by now, with Windows' separators on Windows.
+        asked = path.replace("\\", "/")
+        if asked.startswith(_FONT_PATH) and asked[len(_FONT_PATH) :] in files:
+            answer = HttpResponse(files[asked[len(_FONT_PATH) :]], content_type="font/ttf")
+            answer["Cache-Control"] = "max-age=86400"
+            return answer
         response = served(request, path, **kwargs)
         if response.status_code != 200 or not _STYLESHEET.search(request.path):
             return response
@@ -177,6 +209,46 @@ def _drawn_in_the_font_asked_for():
     with pytest.MonkeyPatch.context() as patch:
         patch.setattr(handlers, "serve", in_the_font)
         yield
+
+
+#: Whether this process has seen a page draw in the suite's font yet.
+_FONT_SEEN = []
+
+
+@pytest.fixture(autouse=True)
+def _the_suites_font_is_the_one_drawn(_drawn_in_the_suites_own_font, browser, live_server):
+    """The run stops at once, saying why, if a page cannot load the suite's font.
+
+    Otherwise every layout test would measure the browser's fallback and fail, or pass, for
+    a reason nobody would guess from the message. Asked by the first test of each process,
+    in a context of its own, once that test's database is there to draw a page from.
+    """
+    if _FONT_SEEN:
+        return
+    context = browser.new_context()
+    try:
+        page = context.new_page()
+        page.goto(f"{live_server.url}/accounts/login/")
+        loaded = page.evaluate(
+            """async () => {
+                const faces = await Promise.all([
+                    document.fonts.load('16px "Postulo E2E Sans"'),
+                    document.fonts.load('bold 16px "Postulo E2E Sans"'),
+                    document.fonts.load('16px "Postulo E2E Mono"'),
+                ]);
+                return faces.every((found) => found.length > 0);
+            }"""
+        )
+    finally:
+        context.close()
+    if loaded:
+        _FONT_SEEN.append(True)
+    else:
+        pytest.exit(
+            "the browser did not load the suite's own DejaVu Sans from tests/e2e/fonts; "
+            "every layout test would measure a fallback font instead",
+            returncode=3,
+        )
 
 
 @pytest.fixture(autouse=True)

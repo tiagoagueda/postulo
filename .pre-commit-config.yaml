@@ -7,6 +7,9 @@ repos:
     rev: v6.0.0
     hooks:
       - id: check-added-large-files
+        # The browser suite's own DejaVu Sans, which it draws every page in so a desktop
+        # and CI measure the same widths (#717): two of the four faces are over 500 KB.
+        exclude: ^tests/e2e/fonts/
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml

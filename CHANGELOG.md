@@ -30,6 +30,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - A signed-in person whose profile language is blank is now read in the instance's default language, never the browser's, and the menu's blank choice says *Use the instance default*. (#398)
 - Language and time and Server settings → Defaults say which language and which time zone the blank choice stands for (*Deutsch de — Default*, *Europe/Paris — Default*), with the flag and the name in its own language where the control can draw rows, and "In force now" names the language instead of printing a code. (#698)
+- The browser tests draw every page in their own copy of DejaVu Sans on every machine, so a layout that passes locally passes on CI. (#717)
 
 ## [0.4.0] — 2026-10-04
 
