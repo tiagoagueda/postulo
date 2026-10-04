@@ -20,12 +20,9 @@ name: postulo
 
 services:
   postulo:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile
     # The published image, pinned to a minor: `docker compose pull` takes the next patch
-    # and never a surprise. `build:` above still works for anyone building from source;
-    # it tags the result with the same name.
+    # and never a surprise. To build from this checkout instead, layer the build override
+    # over this file (docker/compose.build.yml); it tags the result postulo:local (#403).
     image: source.tiagoagueda.com/postulo/postulo:0.3
     restart: unless-stopped
     env_file:
@@ -46,9 +43,7 @@ services:
   # Alternatively run `manage.py send_due_reminders` from the host's cron every few minutes.
   scheduler:
     profiles: ["scheduler"]
-    # The published image, pinned to a minor: `docker compose pull` takes the next patch
-    # and never a surprise. `build:` above still works for anyone building from source;
-    # it tags the result with the same name.
+    # The published image, pinned to a minor; see the postulo service above.
     image: source.tiagoagueda.com/postulo/postulo:0.3
     restart: unless-stopped
     env_file:
@@ -89,9 +84,7 @@ services:
   #   docker compose -f docker/compose.yml --profile worker up -d
   worker:
     profiles: ["worker"]
-    # The published image, pinned to a minor: `docker compose pull` takes the next patch
-    # and never a surprise. `build:` above still works for anyone building from source;
-    # it tags the result with the same name.
+    # The published image, pinned to a minor; see the postulo service above.
     image: source.tiagoagueda.com/postulo/postulo:0.3
     restart: unless-stopped
     env_file:

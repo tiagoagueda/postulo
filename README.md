@@ -176,10 +176,14 @@ Postulo is in each language so nobody has to guess.
 ```sh
 git clone https://source.tiagoagueda.com/postulo/postulo.git
 cd postulo
+git checkout vX.Y.Z           # the latest release tag, see the releases page
 cp .env.example .env          # set POSTULO_SECRET_KEY and POSTULO_ALLOWED_HOSTS
 docker compose -f docker/compose.yml up -d
 docker compose -f docker/compose.yml exec postulo python manage.py createsuperuser
 ```
+
+That pulls the published image. To build it from the checkout instead, add the build
+override: `docker compose -f docker/compose.yml -f docker/compose.build.yml up -d --build`.
 
 Then put a reverse proxy in front of it for TLS. See
 [Installing Postulo](https://source.tiagoagueda.com/postulo/postulo/wiki/Installing-Postulo)

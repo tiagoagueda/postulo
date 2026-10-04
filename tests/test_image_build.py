@@ -257,6 +257,59 @@ def test_the_compose_files_name_the_image_of_the_version_in_the_tree():
     assert named == 6
 
 
+BUILD_OVERRIDES = (
+    ("compose.yml", "compose.build.yml"),
+    ("compose.postgres.yml", "compose.postgres.build.yml"),
+)
+
+
+def test_a_source_build_has_a_local_name_that_is_never_pulled():
+    """#403: a build was tagged with the registry's name, so `pull` and `build` swapped each other.
+
+    The override names every Postulo service `postulo:local`, builds it, and says so with
+    `pull_policy: build`; it never names the published image. Docker is not available to
+    `compose config` here, so the files are parsed, not resolved.
+    """
+    import yaml
+
+    for base_name, override_name in BUILD_OVERRIDES:
+        base = yaml.safe_load((ROOT / "docker" / base_name).read_text(encoding="utf-8"))
+        text = (ROOT / "docker" / override_name).read_text(encoding="utf-8")
+        override = yaml.safe_load(text)
+        assert "postulo/postulo" not in text.replace("postulo/postulo.git", "")
+        postulo_services = {
+            name
+            for name, body in base["services"].items()
+            if "postulo/postulo" in body.get("image", "")
+        }
+        assert postulo_services == {"postulo", "scheduler", "worker"}
+        assert set(override["services"]) == postulo_services
+        for name, body in override["services"].items():
+            assert body["image"] == "postulo:local", f"{override_name}: {name}"
+            assert body["pull_policy"] == "build", f"{override_name}: {name}"
+            assert body["build"]["dockerfile"] == "docker/Dockerfile", f"{override_name}: {name}"
+        # The base file no longer builds: it names the published image and nothing else.
+        for name in postulo_services:
+            assert "build" not in base["services"][name], f"{base_name}: {name}"
+
+
+def test_the_build_reader_would_notice_a_service_left_out():
+    """The loop above passes on an empty override; show it failing on one."""
+    import yaml
+
+    base = yaml.safe_load((ROOT / "docker" / "compose.yml").read_text(encoding="utf-8"))
+    override = yaml.safe_load((ROOT / "docker" / "compose.build.yml").read_text(encoding="utf-8"))
+    assert {"postulo", "scheduler", "worker"} <= set(base["services"])
+    del override["services"]["worker"]
+    assert set(override["services"]) != {"postulo", "scheduler", "worker"}
+
+
+def test_the_image_check_reads_both_pairs_of_compose_files():
+    script = (ROOT / "scripts" / "check-image.sh").read_text(encoding="utf-8")
+    for base_name, override_name in BUILD_OVERRIDES:
+        assert f"-f docker/{base_name} -f docker/{override_name} config" in script
+
+
 def test_every_group_in_the_project_is_covered_by_that_flag():
     """The reason `--no-default-groups` is the right flag, asserted rather than assumed.
 

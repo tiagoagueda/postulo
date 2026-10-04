@@ -35,6 +35,9 @@ if [ ! -e "$ROOT/.env" ]; then
     made_env="yes"
 fi
 (cd "$ROOT" && $DOCKER compose -f docker/compose.postgres.yml config --quiet)
+# And each file with its build override, the way a source install runs it (#403).
+(cd "$ROOT" && $DOCKER compose -f docker/compose.postgres.yml -f docker/compose.postgres.build.yml config --quiet)
+(cd "$ROOT" && $DOCKER compose -f docker/compose.yml -f docker/compose.build.yml config --quiet)
 [ -z "$made_env" ] || rm -f "$ROOT/.env"
 
 echo "Building $TAG"

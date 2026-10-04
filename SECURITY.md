@@ -72,7 +72,9 @@ report is urgent, say so in the subject.
 ## Supported versions
 
 Until version 1.0, only the latest release and the `main` branch receive fixes. Upgrading
-is a `docker compose pull`; there is no reason to stay behind.
+is one path per kind of install, never both: `docker compose pull` and `up -d` for the
+published image, or `git pull` and `up -d --build` with `docker/compose.build.yml` for one
+built from source. There is no reason to stay behind.
 
 ## Notes for operators
 

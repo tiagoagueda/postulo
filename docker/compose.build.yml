@@ -1,0 +1,35 @@
+# Build Postulo from this checkout instead of pulling the published image (#403).
+#
+# Layered over compose.yml, which names the published image pinned to a minor:
+#
+#   docker compose -f docker/compose.yml -f docker/compose.build.yml up -d --build
+#
+# The image is tagged postulo:local, a name nothing is ever published under, so a later
+# `docker compose pull` cannot replace your build with the registry's release (or the
+# reverse). `pull_policy: build` makes Compose build it rather than look for it in a
+# registry. The scheduler and worker keep the profiles the base file gives them.
+#
+# Upgrade a source install with `git pull` and the same command; upgrade a registry
+# install with `docker compose pull`. Never both on one instance.
+
+services:
+  postulo:
+    image: postulo:local
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+
+  scheduler:
+    image: postulo:local
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+
+  worker:
+    image: postulo:local
+    pull_policy: build
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
