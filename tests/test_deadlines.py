@@ -420,6 +420,18 @@ def test_next_week_keeps_the_local_hour_across_a_clock_change(user):
     assert later.astimezone(dt.UTC).hour == 9
 
 
+def test_a_postponed_time_is_cut_to_the_minute_the_edit_form_shows(user):
+    paris = ZoneInfo("Europe/Paris")
+    reminder = a_reminder(user)
+    reminder.due_at = dt.datetime(2026, 10, 20, 10, 0, 37, 123456, tzinfo=paris)
+    now = dt.datetime(2026, 10, 20, 16, 40, tzinfo=paris)
+
+    with timezone.override("Europe/Paris"):
+        later = later_time("tomorrow", reminder, now=now)
+
+    assert (later.second, later.microsecond) == (0, 0), "the minute is all the form shows (#445)"
+
+
 def test_the_row_offers_later_edit_and_delete(client, user, application):
     """On the calendar, where the reminders page's rows went (#316)."""
     reminder = a_reminder(user, application)
@@ -490,6 +502,26 @@ def test_editing_a_reminder_moves_it_and_unstamps_it(client, user, application):
     reminder.refresh_from_db()
     assert reminder.summary == "Chase them again"
     assert reminder.notified_at is None
+
+
+def test_rewording_a_reminder_that_was_put_off_keeps_its_stamp(client, user, application):
+    """Later stored the time with seconds and the form posts the minute; that is no move (#445)."""
+    reminder = a_reminder(user, application)
+    seconds = timezone.now().replace(second=37, microsecond=123) - dt.timedelta(hours=1)
+    Reminder.objects.filter(pk=reminder.pk).update(due_at=seconds)
+    stamp = timezone.now()
+    Reminder.objects.filter(pk=reminder.pk).update(notified_at=stamp)
+    client.force_login(user)
+    same_minute = timezone.localtime(seconds).strftime("%Y-%m-%dT%H:%M")
+
+    client.post(
+        reverse("applications:reminder_update", args=[reminder.pk]),
+        {"summary": "Corrected typo", "due_at": same_minute, "application": application.pk},
+    )
+
+    reminder.refresh_from_db()
+    assert reminder.summary == "Corrected typo"
+    assert reminder.notified_at == stamp
 
 
 def test_deleting_a_reminder(client, user, application):

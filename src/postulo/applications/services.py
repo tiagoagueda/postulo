@@ -565,13 +565,19 @@ def later_time(choice: str, reminder: Reminder, *, now=None) -> dt.datetime | No
     would move the local hour across a clock change, so the date is added and the wall
     time put back. A time a change of clocks skips lands after the gap, and one it
     repeats takes its first occurrence (`fold=0`, which is what both rules ask for).
+    It is cut to the minute, which is all the edit form shows and posts, so the stored time and
+    the displayed one agree (#445).
     """
     days = LATER_DAYS.get(choice)
     if days is None:
         return None
     zone = timezone.get_current_timezone()
     today = timezone.localtime(now or timezone.now(), zone).date()
-    wall = timezone.localtime(reminder.due_at, zone).timetz().replace(tzinfo=None)
+    wall = (
+        timezone.localtime(reminder.due_at, zone)
+        .timetz()
+        .replace(second=0, microsecond=0, tzinfo=None)
+    )
     moved = dt.datetime.combine(today + dt.timedelta(days=days), wall, tzinfo=zone)
     return moved.astimezone(dt.UTC).astimezone(zone)
 

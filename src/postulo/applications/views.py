@@ -882,6 +882,10 @@ class ReminderCompleteView(OwnedObjectMixin, View):
         return redirect(safe_next(request, agenda.reminders_address()))
 
 
+def to_the_minute(when):
+    return when.replace(second=0, microsecond=0)
+
+
 class ReminderUpdateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     """Change what a reminder says or when it falls due (#238).
 
@@ -897,8 +901,16 @@ class ReminderUpdateView(ReminderFormMixin, OwnedObjectMixin, UserFormKwargsMixi
     form_class = ReminderForm
     template_name = "applications/reminder_form.html"
 
+    def get_object(self, queryset=None):
+        # Read before the form binds: validation writes the posted values onto the instance.
+        reminder = super().get_object(queryset)
+        self.due_before = reminder.due_at
+        return reminder
+
     def form_valid(self, form):
-        moved = "due_at" in form.changed_data
+        # The form shows and posts the minute; a time set by *Later* or *Snooze* once kept
+        # its seconds, so only a difference at the minute is a move (#445).
+        moved = to_the_minute(form.cleaned_data["due_at"]) != to_the_minute(self.due_before)
         response = super().form_valid(form)
         if moved:
             postpone_reminder(self.object, self.object.due_at)

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Editing a reminder that was put off with Later or Snooze no longer announces it a second time when only its wording changes; those times are now stored to the minute, as the edit form shows them. (#445)
 - Moving an application's status now decides applied_at and closed_at from the locked row, so two concurrent moves no longer leave an open application closed, re-stamp the applied date, or leave a withdrawn one without a close date. (#543)
 - Outbound connections (HTTP guards, mail test and sending) now try each approved address in turn, so a name with one dead address, such as a broken IPv6, no longer fails whenever that address comes first. (#547)
 - A webhook delivery whose receiver's hostname briefly fails to resolve is now retried with back-off instead of being given up on and blamed on the private-address setting. (#549)

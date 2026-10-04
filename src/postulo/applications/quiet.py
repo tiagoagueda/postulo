@@ -156,4 +156,5 @@ def quiet_by(applications: list[Application], key) -> dict[str, int]:
 
 
 def snooze_until(now=None) -> dt.datetime:
-    return (now or timezone.now()) + dt.timedelta(days=SNOOZE_DAYS)
+    later = (now or timezone.now()) + dt.timedelta(days=SNOOZE_DAYS)
+    return later.replace(second=0, microsecond=0)
