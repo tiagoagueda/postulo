@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('documents', '0016_drop_unsent_orphan_copies'),
+        ('documents', '0017_cv_theme_sets_a_cv_or_a_portfolio'),
     ]
 
     operations = [
