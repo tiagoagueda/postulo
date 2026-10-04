@@ -494,7 +494,7 @@ def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> N
 
 
 def _restore_phone_numbers(
-    holder, owner, rows: list[dict], report: ImportReport, whose: str
+    holder, owner, rows: list[dict], report: ImportReport | None = None, whose: str = ""
 ) -> None:
     """Recreate a holder's numbers, skipping any this instance already has.
 
@@ -512,11 +512,12 @@ def _restore_phone_numbers(
     for row in rows:
         number = (row.get("number") or "").strip()
         if taken_elsewhere(number):
-            ending = "".join(ch for ch in number if ch.isdigit())[-2:]
-            report.skipped.append(
-                f"Telephone number ending {ending} {whose}: "
-                "already recorded on this instance, not restored"
-            )
+            if report is not None:
+                ending = "".join(ch for ch in number if ch.isdigit())[-2:]
+                report.skipped.append(
+                    f"Telephone number ending {ending} {whose}: "
+                    "already recorded on this instance, not restored"
+                )
             continue
         wants_primary = bool(row.get("is_primary")) and not primary_taken
         # `verified_at` is read from the file and thrown away, deliberately and visibly.
