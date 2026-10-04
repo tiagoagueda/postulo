@@ -157,6 +157,31 @@ def test_the_scheduler_runs_what_is_due_and_records_the_report(user):
     assert connection.last_summary == "nothing to do · all quiet"
 
 
+def test_a_run_leaves_a_connection_another_run_is_syncing_alone(user, monkeypatch):
+    """Overlapping passes both find a connection due; only the one that claims it runs it (#576)."""
+    a_sync(user)
+    nested = []
+    original = MirrorSync.sync
+
+    def sync_while_another_pass_comes_round(self, connection, config):
+        if not nested:
+            nested.append(syncing.run_syncs())
+        return original(self, connection, config)
+
+    monkeypatch.setattr(MirrorSync, "sync", sync_while_another_pass_comes_round)
+
+    assert syncing.run_syncs() == (1, 0)
+    assert nested == [(0, 0)], "the second run found the claim and left it"
+    assert len(MirrorSync.runs) == 1
+
+
+def test_a_stale_list_of_due_connections_does_not_run_one_twice(user):
+    connection = a_sync(user)
+    stale = syncing.due_connections()
+    assert syncing.claim_connection(connection) is True
+    assert syncing.claim_connection(stale[0]) is False, "the row changed under the second run"
+
+
 def test_a_slow_sync_does_not_hold_up_everything_behind_it(user, monkeypatch):
     """The budget decides whether to *begin* another, which is the only safe place to stop."""
     for label in ("One", "Two", "Three"):

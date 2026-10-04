@@ -126,6 +126,23 @@ def _run_connection(connection: Connection) -> SyncReport:
     return report
 
 
+def claim_connection(connection: Connection) -> bool:
+    """Take a connection's turn before running it, or say that another run already has.
+
+    ``due_connections`` reads ``synced_at`` and ``sync_connection`` writes it only when the
+    sync has finished, so two passes that overlap both found the same connection due and ran
+    it at once (#576). This stamps ``synced_at`` with a conditional ``UPDATE`` first, the way
+    a reminder is stamped before it is announced: whichever run changes the row owns the turn,
+    and the other sees no row changed. The stamp is replaced by the real time when the sync
+    ends; if the run dies, the connection waits one interval, not forever.
+    """
+    claimed = Connection.objects.filter(
+        pk=connection.pk,
+        synced_at=connection.synced_at,
+    ).update(synced_at=timezone.now())
+    return bool(claimed)
+
+
 def due_connections(now=None):
     now = now or timezone.now()
     return [
@@ -153,6 +170,9 @@ def run_syncs(*, budget: int = 0) -> tuple[int, int]:
         if budget and time.monotonic() - started >= budget:
             logger.info("Sync budget of %ss spent; the rest wait for the next pass", budget)
             break
+        if not claim_connection(connection):
+            logger.info("Sync connection %s was claimed by another run", connection.pk)
+            continue
         try:
             report = sync_connection(connection)
         except Exception:

@@ -150,6 +150,16 @@ def test_only_one_pass_runs_at_a_time():
         assert afterwards is True, "and it is given back at the end of a pass"
 
 
+def test_a_pass_that_outlived_its_lease_leaves_the_later_pass_s_lease_alone():
+    """The key expired mid-pass and a later pass took it; ending must not delete theirs (#576)."""
+    with scheduler.only_one_pass(60) as mine:
+        assert mine is True
+        cache.set(scheduler.LEASE_KEY, "a later pass", 60)
+    assert cache.get(scheduler.LEASE_KEY) == "a later pass"
+    with scheduler.only_one_pass(60) as third:
+        assert third is False, "so a third pass still finds the lease held"
+
+
 def test_the_command_leaves_a_pass_already_running_alone(user, capsys):
     Reminder.objects.create(
         owner=user, summary="x", due_at=timezone.now() - dt.timedelta(minutes=5)

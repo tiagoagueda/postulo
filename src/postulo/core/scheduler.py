@@ -22,6 +22,7 @@ from __future__ import annotations
 import datetime as dt
 import os
 import tempfile
+import uuid
 from contextlib import contextmanager
 from pathlib import Path
 
@@ -89,12 +90,21 @@ def last_pass(*, path: Path | None = None) -> dt.datetime | None:
 
 @contextmanager
 def only_one_pass(seconds: int):
-    """Hold the pass lease, or yield ``False`` because somebody else has it."""
-    got_it = cache.add(LEASE_KEY, timezone.now().isoformat(), max(seconds, 60))
+    """Hold the pass lease, or yield ``False`` because somebody else has it.
+
+    The key holds a token that is this pass's own, and the end of the pass gives back only a
+    key that still holds it (#576). A pass that outlives its lease finds, when it ends, that
+    the key has expired and a later pass has taken it; deleting that one would let a third
+    pass start beside the later one. The cache offers no atomic compare-and-delete, so the
+    check and the delete are two calls, and what is left is the instant between them rather
+    than the whole of a long pass.
+    """
+    token = uuid.uuid4().hex
+    got_it = cache.add(LEASE_KEY, token, max(seconds, 60))
     try:
         yield bool(got_it)
     finally:
-        if got_it:
+        if got_it and cache.get(LEASE_KEY) == token:
             cache.delete(LEASE_KEY)
 
 
