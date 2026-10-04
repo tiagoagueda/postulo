@@ -4,6 +4,7 @@ Values that differ between a laptop and a server belong in the environment, not 
 this file. See ``.env.example`` for the full set of recognised variables.
 """
 
+import os
 from datetime import timedelta
 from pathlib import Path
 
@@ -20,7 +21,11 @@ PACKAGE_DIR = Path(__file__).resolve().parents[2]
 REPO_DIR = PACKAGE_DIR.parents[1]
 
 env = environ.Env()
-environ.Env.read_env(REPO_DIR / ".env")
+# The test settings are built from the process environment alone: a developer's `.env`
+# belongs to their own instance, and a suite that read it ran differently from one machine
+# to the next (#414).
+if os.environ.get("DJANGO_SETTINGS_MODULE") != "postulo.config.settings.test":
+    environ.Env.read_env(REPO_DIR / ".env")
 
 # --------------------------------------------------------------------------- core
 

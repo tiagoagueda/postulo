@@ -36,8 +36,31 @@ MFA_WEBAUTHN_ALLOW_INSECURE_ORIGIN = True
 
 MEDIA_ROOT = tempfile.mkdtemp(prefix="postulo-test-media-")
 
+# Whatever the environment says, the file handler exists and writes somewhere throwaway:
+# `base.py` leaves it out when POSTULO_LOG_DIR is empty.
 POSTULO_LOG_DIR = tempfile.mkdtemp(prefix="postulo-test-logs-")
-LOGGING["handlers"]["file"]["filename"] = str(Path(POSTULO_LOG_DIR) / "postulo.log")
+LOGGING["handlers"]["file"] = {
+    "class": "postulo.core.logs.SharedRotatingFileHandler",
+    "filename": str(Path(POSTULO_LOG_DIR) / "postulo.log"),
+    "maxBytes": POSTULO_LOG_MAX_BYTES,
+    "backupCount": POSTULO_LOG_BACKUPS,
+    "encoding": "utf-8",
+    "formatter": "json",
+    "delay": True,
+}
+LOGGING["root"]["handlers"] = ["console", "file"]
+
+# What decides behaviour is pinned, because a variable exported in the shell still reaches
+# `base.py`: the database cache, which lives in the test database and so is rolled back
+# with each test (a process-wide cache would carry one test's rate-limit counts into the
+# next), and errands done inline.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.db.DatabaseCache",
+        "LOCATION": CACHE_TABLE,
+    }
+}
+POSTULO_BACKGROUND_WORK = False
 
 # WhiteNoise warns about a missing static root; give it a real, empty directory.
 STATIC_ROOT = tempfile.mkdtemp(prefix="postulo-test-static-")
