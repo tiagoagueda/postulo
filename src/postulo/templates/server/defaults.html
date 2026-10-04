@@ -31,7 +31,7 @@
       <div class="field mb-4 wrap-anywhere"{% if form.default_language.errors %} data-invalid="true"{% endif %}>
         <label for="{{ form.default_language.id_for_label }}">{{ form.default_language.label }}</label>
         <div class="input-group">
-          <span data-align="start" data-flag-holder>{% language_flag form.default_language.value %}</span>
+          <span data-align="start" data-flag-holder>{% language_flag form.default_language.value|default:builtin_language %}</span>
           {{ form.default_language }}
         </div>
         <c-field-feedback :field="form.default_language" />
@@ -47,7 +47,7 @@
         <c-field :field="form.default_time_zone" />
       {% endif %}
       <p class="text-xs text-ink-500 dark:text-ink-400">
-        {% blocktranslate with zone=effective_time_zone language=effective_language trimmed %}
+        {% blocktranslate with zone=effective_time_zone language=effective_language_name trimmed %}
           In force now: {{ language }}, {{ zone }}.
         {% endblocktranslate %}
       </p>

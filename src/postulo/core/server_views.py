@@ -36,7 +36,7 @@ from postulo import __version__
 from postulo.accounts import deletion
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import errands, proxy, scheduler, site, updates
+from . import errands, languages, proxy, scheduler, site, updates
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -584,6 +584,11 @@ class DefaultsView(PolicyView):
         context = super().get_context_data(**kwargs)
         context["effective_time_zone"] = site.default_time_zone()
         context["effective_language"] = site.default_language()
+        # Named, not a raw code (#698); a language Postulo has no name for is left as written.
+        context["effective_language_name"] = languages.native_name(
+            context["effective_language"], context["effective_language"]
+        )
+        context["builtin_language"] = settings.LANGUAGE_CODE
         context.setdefault("languages_form", self.languages_form())
         context["offers_everything"] = not site.offered_languages()
         return context

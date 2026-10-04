@@ -226,3 +226,73 @@ def test_choosing_one_still_saves(client, user):
     user.profile.refresh_from_db()
 
     assert user.profile.language == "de"
+
+
+# ------------------------------------------------- the blank row names what it stands for (#698)
+
+
+def with_default(code: str) -> None:
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_language": code})
+
+
+def default_row(html: str) -> str:
+    """The first row of the picker, up to its closing label."""
+    return html.split('name="language" value=""')[1].split("</label>")[0]
+
+
+def test_the_first_row_names_the_instance_default_in_itself(client, user):
+    with_default("de")
+    client.force_login(user)
+    html = client.get(reverse("settings:locale")).content.decode()
+
+    row = default_row(html)
+    assert '<span lang="de">Deutsch</span>' in row
+    assert '<bdi dir="ltr" aria-hidden="true"' in row and ">de</bdi>" in row
+    # The word and its dash follow, in the interface language and outside the name's span.
+    after = row.split("</bdi>")[1]
+    assert "— Default" in after and "lang=" not in after
+    assert "checked" in row, "nothing stored, so the row is the one chosen"
+
+
+def test_the_closed_summary_says_the_same(client, user):
+    with_default("de")
+    client.force_login(user)
+    html = client.get(reverse("settings:locale")).content.decode()
+
+    summary = between(html, "<summary", "</summary>")
+    assert '<span lang="de">Deutsch</span>' in summary and "Default" in summary
+
+
+def test_a_default_with_a_region_keeps_it_and_one_with_no_flag_closes_up(client, user):
+    with_default("pt-PT")
+    client.force_login(user)
+    row = default_row(client.get(reverse("settings:locale")).content.decode())
+    assert '<span lang="pt-PT">português (Portugal)</span>' in row
+    assert 'class="flag"' in row
+
+    with_default("sw")
+    row = default_row(client.get(reverse("settings:locale")).content.decode())
+    assert '<span lang="sw">' in row and 'class="flag"' not in row
+
+
+def test_the_default_is_named_though_it_is_not_offered(client, user):
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"default_language": "fr-FR", "offered_languages": ["de", "fr-FR"]}
+    )
+    SiteSettings.objects.filter(pk=1).update(offered_languages=["de"])
+    client.force_login(user)
+    row = default_row(client.get(reverse("settings:locale")).content.decode())
+    assert '<span lang="fr-FR">français (France)</span>' in row
+
+
+def test_the_plain_text_label_of_the_blank_choice(settings):
+    from postulo.accounts.forms import default_language_label, language_choices
+
+    assert default_language_label("de") == "Deutsch de — Default"
+    assert default_language_label("en-GB") == "English (United Kingdom) en-GB — Default"
+    assert language_choices(default="de")[0] == ("", "Deutsch de — Default")
+    assert default_language_label("xx") == "xx — Default", "a tag with no name is not doubled"

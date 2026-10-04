@@ -25,7 +25,7 @@
          Closed it is one line like the time zone below it, showing what is in use. It opens
          and closes itself with no script at all, and the radios inside submit either way.
       {% endcomment %}
-      <fieldset class="card mb-6" {% if form.language.aria_describedby %}aria-describedby="{{ form.language.aria_describedby }}"{% endif %}>
+      <fieldset class="card mb-6 min-inline-0" {% if form.language.aria_describedby %}aria-describedby="{{ form.language.aria_describedby }}"{% endif %}>
         <legend class="label mb-1">{{ form.language.label }}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Each is written in itself, so you can find yours without reading this one." %}
@@ -33,9 +33,11 @@
 
         {% with now=form.language_now %}
           <details class="relative" data-menu data-language-picker>
-            <summary class="btn flex w-full cursor-pointer items-center gap-3 px-3 py-2 text-start" data-variant="outline">
+            <summary class="btn flex w-full cursor-pointer flex-wrap items-center gap-x-3 gap-y-1 px-3 py-2 text-start whitespace-normal" data-variant="outline">
               {% flag now.country %}
-              {% if now.code %}
+              {% if now.markup %}
+                {{ now.markup }}
+              {% elif now.code %}
                 <span lang="{{ now.code }}">{{ now.name }}</span>
               {% else %}
                 <span>{{ now.name }}</span>
@@ -65,7 +67,9 @@
                          uncontested home, and the row simply closes up.
                       {% endcomment %}
                       {% flag option.country %}
-                      {% if option.code %}
+                      {% if option.markup %}
+                        {{ option.markup }}
+                      {% elif option.code %}
                         <span lang="{{ option.code }}">{{ option.name }}</span>
                       {% else %}
                         <span>{{ option.name }}</span>

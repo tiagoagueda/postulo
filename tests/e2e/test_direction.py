@@ -35,6 +35,7 @@ PAGES = (
     "/career/",
     "/?arrange=1",
     "/server/plugins/",
+    "/settings/language/",
 )
 
 
@@ -195,3 +196,19 @@ def test_a_switch_knob_stays_inside_its_track(live_server, page: Page, right_to_
     # is the left in Arabic, and off the inline-start.
     near_left = knob["left"] - knob["inputLeft"] < knob["inputRight"] - knob["right"]
     assert near_left is on, "the knob is at the wrong end for the state"
+
+
+def test_the_default_language_row_keeps_its_tag_whole(live_server, page: Page, right_to_left):
+    """The grey tag on the first row of the language picker is isolated left to right, so a
+    right-to-left page does not reorder `pt-PT` into `PT-pt` (#698)."""
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_language": "pt-PT"})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/settings/language/")
+
+    expect(page.locator("html")).to_have_attribute("dir", "rtl")
+    tag = page.locator("[data-language-list] bdi").first
+    expect(tag).to_have_text("pt-PT")
+    expect(tag).to_have_attribute("dir", "ltr")
+    assert tag.evaluate("e => getComputedStyle(e).unicodeBidi") in ("isolate", "isolate-override")

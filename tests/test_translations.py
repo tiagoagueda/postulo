@@ -410,10 +410,13 @@ def test_every_language_says_which_language_it_is_in(client, user):
             continue
         assert f'lang="{code}"' in html, f"{code} does not say what language it is in"
 
-    # The "use the instance default" row is in the interface language, not in any listed
-    # one, so it must not claim to be.
-    assert "<span >" not in html
-    assert 'lang=""' not in html
+    # The default row names the instance default in its own language (#698): that name has
+    # a `lang`, and the words about it, in the interface language, have none of their own.
+    default_row = html.split('name="language" value=""')[1].split("</label>")[0]
+    assert re.search(r'<span lang="[A-Za-z-]+">[^<]+</span>', default_row)
+    assert "<span >" not in html and 'lang=""' not in html
+    outside = re.sub(r"<span lang=[^>]*>[^<]*</span>|<[^>]+>", "", default_row)
+    assert "Default" in outside, "the word is outside the span, in the interface language"
 
 
 def test_each_language_shows_its_flag_without_reading_it_out(client, user):

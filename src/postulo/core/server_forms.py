@@ -279,22 +279,26 @@ class DefaultsForm(PinnedPolicyForm):
         fields = ("instance_name", "tagline", "default_language", "default_time_zone")
 
     def __init__(self, *args, **kwargs):
+        from django.conf import settings
+
         from postulo.accounts.forms import LanguageSelect, language_choices, time_zone_choices
 
         super().__init__(*args, **kwargs)
+        # The blank choice here is "nothing stored", which is the built-in fallback, not
+        # the instance default this page sets (#698).
         self.fields["default_language"] = LanguageChoiceField(
             label=_("Language for new accounts"),
-            choices=language_choices,
+            choices=lambda: language_choices(default=settings.LANGUAGE_CODE),
             required=False,
             help_text=_("What a new account starts with. Each person can change theirs."),
             # The chosen language's flag sits over the closed select, and the script keeps
             # it in step; `data-flag-select` is what the script looks for (#208).
-            widget=LanguageSelect(attrs={"data-flag-select": ""}),
+            widget=LanguageSelect(attrs={"data-flag-select": ""}, default=settings.LANGUAGE_CODE),
         )
         self.fields["default_time_zone"] = forms.ChoiceField(
             label=_("Time zone for new accounts"),
             help_text=_("What a new account starts with. Each person can change theirs."),
-            choices=time_zone_choices,
+            choices=lambda: time_zone_choices(default=settings.TIME_ZONE),
             required=False,
         )
 

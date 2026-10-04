@@ -293,8 +293,8 @@ def test_time_zones_are_grouped_by_the_area_their_name_begins_with():
         time_zone_choices,
     )
 
-    choices = time_zone_choices()
-    assert choices[0][0] == "", "the instance default comes first, in no group"
+    choices = time_zone_choices(default="Europe/Paris")
+    assert choices[0] == ("", "Europe/Paris — Default"), "the default comes first, in no group"
     groups = choices[1:]
     assert [str(label) for label, _zones in groups] == [
         "Africa",

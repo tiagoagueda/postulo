@@ -15,8 +15,11 @@ from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.utils.html import escape, format_html
+from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext
 
 from postulo.core import (
     language_field,
@@ -169,8 +172,75 @@ def _percent_suffix(percent) -> str:
     return f" ({percent}%)"
 
 
-def language_choices() -> list[tuple[str, str]]:
+def _named_default(code: str) -> dict[str, str]:
+    """The language the blank choice stands for: its tag as Postulo spells it and its name in
+    itself, which is the tag again for one that is on no list (#698)."""
+    tag = languages.find(code) or languages.tag(code) or str(code or "")
+    return {"tag": tag, "name": languages.native_name(code, tag)}
+
+
+def default_language_label(code: str) -> str:
+    """The blank choice of a language menu as plain text: ``Deutsch de — Default``.
+
+    Plain because an ``<option>`` holds nothing else. The words about it are in the
+    interface language, one message with its placeholders so that a translation can order
+    and punctuate them. A name that is only its tag is not written twice.
+    """
+    named = _named_default(code)
+    tag = "" if named["tag"] == named["name"] else named["tag"]
+    text = pgettext(
+        "names the language used when nothing was chosen", "%(name)s %(tag)s — Default"
+    ) % {"name": named["name"], "tag": tag}
+    return " ".join(text.split())
+
+
+def default_language_markup(code: str):
+    """The same sentence as rows draw it: the name in a span of its own ``lang``, the tag
+    grey, whole and left to right in a ``<bdi>``, and the word about them outside both.
+
+    The tag is ``aria-hidden``: the name already says which language this is.
+    """
+    named = _named_default(code)
+    name = format_html('<span lang="{}">{}</span>', named["tag"], named["name"])
+    tag = (
+        ""
+        if named["tag"] == named["name"]
+        else format_html(
+            '<bdi dir="ltr" aria-hidden="true" class="text-xs text-ink-500 dark:text-ink-400">'
+            "{}</bdi>",
+            named["tag"],
+        )
+    )
+    sentence = pgettext(
+        "names the language used when nothing was chosen", "%(name)s %(tag)s — Default"
+    )
+    # The translation is escaped, the two pieces are already markup.
+    return mark_safe(  # noqa: S308
+        escape(sentence) % {"name": name, "tag": tag}
+    )
+
+
+def default_time_zone_label(zone: str) -> str:
+    """The blank choice of a time zone menu: ``Europe/Paris — Default`` (#698)."""
+    return pgettext("names the time zone used when nothing was chosen", "%(zone)s — Default") % {
+        "zone": str(zone).replace("_", " ")
+    }
+
+
+def instance_defaults() -> tuple[str, str]:
+    """The language and the time zone the instance gives whoever chose none."""
+    from postulo.core import preferences, site
+
+    return site.default_language(), preferences.instance_zone()
+
+
+def language_choices(default: str | None = None) -> list[tuple[str, str]]:
     """Languages this instance offers, plus an option to follow the instance default.
+
+    ``default`` is the language that option stands for, named on it (#698): the instance's
+    own default for a person, the built-in one on the page that sets the instance default.
+    Its stored value stays empty, so it still means "follow the default" and never "pin
+    today's". It is named even when the instance does not offer it, as a statement of fact.
 
     A language that is only partly translated says so beside its name, and one nobody has
     reviewed says that, so nobody is surprised by English in the gaps or by an odd turn of
@@ -216,7 +286,9 @@ def language_choices() -> list[tuple[str, str]]:
         else:
             reviewed.append((code, name))
 
-    choices: list = [("", _("Use the instance default"))]
+    if default is None:
+        default = instance_defaults()[0]
+    choices: list = [("", default_language_label(default))]
     if reviewed:
         choices.append((_("Reviewed by a speaker"), reviewed))
     if drafted:
@@ -265,20 +337,23 @@ class LanguageSelect(forms.Select):
     nothing: no flag beats a wrong flag. ``flagged=False`` is a menu that wants none.
     """
 
-    def __init__(self, attrs=None, choices=(), *, flagged: bool = True):
+    def __init__(self, attrs=None, choices=(), *, flagged: bool = True, default: str = ""):
         super().__init__(attrs, choices)
         self.flagged = flagged
+        # The language the blank option stands for (#698): it draws that language's flag, but
+        # claims no ``lang``, since its words are in the interface language.
+        self.default = default
 
     def create_option(self, name, value, *args, **kwargs):
         option = super().create_option(name, value, *args, **kwargs)
         code = str(value or "")
         if code:
             option["attrs"]["lang"] = code
-            if self.flagged:
-                from postulo.core import languages
-                from postulo.core.flags import flag_url
+        if (code or self.default) and self.flagged:
+            from postulo.core import languages
+            from postulo.core.flags import flag_url
 
-                option["attrs"]["data-flag"] = flag_url(languages.flag_country(code))
+            option["attrs"]["data-flag"] = flag_url(languages.flag_country(code or self.default))
         return option
 
 
@@ -306,7 +381,7 @@ def time_zone_area(name: str) -> str:
     return area if area in TIME_ZONE_AREAS else OTHER_ZONES
 
 
-def time_zone_choices() -> list:
+def time_zone_choices(default: str | None = None) -> list:
     """Every IANA zone this machine knows about, grouped by the area its name begins with.
 
     Some four hundred names in one list was a list nobody reads (#301). Grouped, the
@@ -314,15 +389,20 @@ def time_zone_choices() -> list:
     built beside it draws the same groups. A zone's label is still its whole name: the
     closed menu shows the choice alone, and *Lisbon* without *Europe* is half a name.
 
+    The blank choice names the zone it stands for, ``default`` (the instance's own where
+    none is given), as the list writes its own (#698).
+
     Built at render time rather than declared on the model, so that a time zone
     database update does not generate a migration.
     """
+    if default is None:
+        default = instance_defaults()[1]
     grouped: dict[str, list[tuple[str, str]]] = {area: [] for area in TIME_ZONE_AREAS}
     grouped[OTHER_ZONES] = []
     for name in sorted(zoneinfo.available_timezones()):
         grouped[time_zone_area(name)].append((name, name.replace("_", " ")))
     labels = {**TIME_ZONE_AREAS, OTHER_ZONES: _("Other time zones")}
-    return [("", _("Use the instance default"))] + [
+    return [("", default_time_zone_label(default))] + [
         (labels[area], zones) for area, zones in grouped.items() if zones
     ]
 
@@ -1094,15 +1174,19 @@ class LocaleForm(forms.ModelForm):
                     ],
                 }
             )
-        default = language_choices()[0]
+        # The blank row names what it stands for: the flag, the name in its own language, the
+        # grey tag and the word, the last in the interface language (#698). It is a statement
+        # of fact about the instance, so it names the default even if it is not offered.
+        default = instance_defaults()[0]
         return [
             {
                 "label": "",
                 "options": [
                     {
                         "code": "",
-                        "name": default[1],
-                        "country": "",
+                        "name": default_language_label(default),
+                        "markup": default_language_markup(default),
+                        "country": languages.flag_country(default),
                         "selected": not current,
                         "state": "",
                         "percent": None,

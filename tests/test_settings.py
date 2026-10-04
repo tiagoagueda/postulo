@@ -205,3 +205,32 @@ def test_everything_a_control_says_describes_it_is_on_the_page(client, user):
         for described in re.findall(r'aria-describedby="([^"]+)"', html):
             for wanted in described.split():
                 assert wanted in ids, f"{name}: {wanted} is named but not on the page"
+
+
+def zone_choices_first(client, user) -> str:
+    client.force_login(user)
+    html = client.get(reverse("settings:locale")).content.decode()
+    first = html.split('name="time_zone"')[1].split("<option")[1].split("</option>")[0]
+    return first.split(">", 1)[1].strip()
+
+
+def test_the_blank_time_zone_names_the_instance_default(client, user):
+    assert zone_choices_first(client, user) == "Europe/Paris — Default"
+
+
+def test_the_blank_time_zone_names_a_zone_an_administrator_stored(client, user):
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_time_zone": "America/Sao_Paulo"})
+    assert zone_choices_first(client, user) == "America/Sao Paulo — Default"
+
+
+def test_the_blank_time_zone_names_the_environment_s_when_it_pins_it(client, user, monkeypatch):
+    from postulo.core.models import SiteSettings
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_time_zone": "Asia/Tokyo"})
+    monkeypatch.setenv("POSTULO_TIME_ZONE", "UTC")
+    from django.conf import settings
+
+    monkeypatch.setattr(settings, "TIME_ZONE", "UTC")
+    assert zone_choices_first(client, user) == "UTC — Default"

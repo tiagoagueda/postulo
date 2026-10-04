@@ -469,6 +469,7 @@ def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admi
     row.default_language = "pt-PT"
     row.default_time_zone = "Europe/Lisbon"
     row.save()
+    reads_english(admin)
     client.force_login(admin)
 
     def name_input(html: str) -> str:
@@ -651,3 +652,37 @@ def test_saving_defaults_keeps_a_stored_time_zone_the_environment_pins(client, a
     row = SiteSettings.get()
     assert row.default_time_zone == "Europe/Lisbon"
     assert row.instance_name == "Jobs at Home"
+
+
+def reads_english(person) -> None:
+    """A blank profile language is the instance's (#398), so a test that moves the instance
+    default and reads English on the page says which language it reads."""
+    person.profile.language = "en-GB"
+    person.profile.save(update_fields=["language"])
+
+
+def test_defaults_label_their_blank_options_with_the_built_in_fallback(client, admin):
+    """Blank here is "nothing stored", which is what the environment says (#698)."""
+    SiteSettings.objects.update_or_create(
+        pk=1, defaults={"default_language": "de", "default_time_zone": "Asia/Tokyo"}
+    )
+    reads_english(admin)
+    client.force_login(admin)
+    html = client.get(reverse("server:defaults")).content.decode()
+
+    assert re.search(r'<option value=""[^>]*>English \(United Kingdom\) en-GB — Default</', html)
+    assert re.search(r'<option value=""[^>]*>Europe/Paris — Default</', html)
+    # The blank option draws the flag of the language it stands for, and claims no `lang`.
+    blank = re.search(r'<option value=""[^>]*>English \(United Kingdom\)', html).group(0)
+    assert "data-flag=" in blank and "lang=" not in blank
+    assert "Use the instance default" not in html
+
+
+def test_in_force_now_names_the_language(client, admin):
+    SiteSettings.objects.update_or_create(pk=1, defaults={"default_language": "pt-PT"})
+    reads_english(admin)
+    client.force_login(admin)
+    html = client.get(reverse("server:defaults")).content.decode()
+
+    assert "In force now: português (Portugal)," in " ".join(html.split())
+    assert "In force now: pt-PT" not in " ".join(html.split())

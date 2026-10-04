@@ -401,10 +401,11 @@ def test_the_months_widget_names_them_in_the_readers_language(client, user, comp
     sent_on(user, company, dt.date(2026, 1, 10))
     sent_on(user, company, dt.date(2026, 3, 5))
     user.profile.dashboard_widgets = ["by_month"]
-    user.profile.save(update_fields=["dashboard_widgets"])
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["dashboard_widgets", "language"])
     client.force_login(user)
 
-    response = client.get(reverse("core:home"), headers={"accept-language": "fr"})
+    response = client.get(reverse("core:home"))
 
     assert "février 2026" in response.content.decode()
 
