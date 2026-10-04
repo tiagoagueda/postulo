@@ -189,6 +189,39 @@ def test_an_unrecorded_source_is_named_rather_than_dropped(user, company):
     assert names == ["Not recorded"]
 
 
+def test_the_sources_table_and_the_interviews_widget_count_the_same_applications(user, company):
+    """A recruiter's call moves a status; an interview entry is an interview (#449).
+
+    Both figures read one rule: an *interview* entry, or *Interviewing* or *Assessment*
+    reached. Screening alone is not an interview, and an entry on an application whose
+    status never moved is.
+    """
+    from postulo.applications.models import ApplicationEvent, EventKind
+
+    for n in range(3):
+        screened = make_application(
+            user, company, title=f"Call {n}", source="Job board", applied_days_ago=30
+        )
+        change_status(screened, Status.SCREENING)
+    typed = make_application(user, company, title="Typed", source="Job board", applied_days_ago=30)
+    ApplicationEvent.objects.create(
+        application=typed,
+        kind=EventKind.INTERVIEW,
+        summary="Talked to the team",
+        occurred_at=timezone.now() - dt.timedelta(days=10),
+    )
+    assessed = make_application(
+        user, company, title="Test", source="Job board", applied_days_ago=30
+    )
+    change_status(assessed, Status.ASSESSMENT)
+
+    insights = analytics.build(user)
+    rows = {row.name: row for row in insights.sources}
+
+    assert insights.interviewed == 2
+    assert rows["Job board"].interviewed == insights.interviewed
+
+
 # --------------------------------------------------------------------- the page
 
 

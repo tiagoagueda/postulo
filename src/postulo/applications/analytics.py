@@ -287,12 +287,34 @@ def _first_interview_days(applications) -> dict[int, int]:
     return days
 
 
+#: The stages that mean an interview took place, as far as the status alone can tell.
+#: Screening is not one: a recruiter's call moves it without any interview being recorded.
+INTERVIEW_STATUSES = {Status.INTERVIEWING, Status.ASSESSMENT}
+
+
+def _reached_interview(applications, reached: dict[int, set[str]]) -> set[int]:
+    """The applications that reached an interview, by the one rule every figure shares.
+
+    An application has reached one when it has an *interview* entry on its timeline, or its
+    status ever reached *Interviewing* or *Assessment*. The Interviews widget and the
+    Interviews column of every table of sources read this set, so the two can be compared
+    (#449).
+    """
+    ids = {a.pk for a in applications}
+    typed = set(
+        ApplicationEvent.objects.filter(application_id__in=ids, kind=EventKind.INTERVIEW)
+        .values_list("application_id", flat=True)
+        .distinct()
+    )
+    return typed | {pk for pk in ids if reached[pk] & INTERVIEW_STATUSES}
+
+
 #: What the cached figures are shaped like. The cache is a table and outlives an upgrade,
 #: so figures kept by one release are read by the next -- and when `Insights` gains a field
 #: they would arrive without it. Counted into the fingerprint, so a release that changes
 #: the shape asks for keys no earlier one wrote. 2 added the endings and the two
-#: breakdowns of the sources (#239).
-SHAPE = 2
+#: breakdowns of the sources (#239); 3 made one rule of an interview reached (#449).
+SHAPE = 3
 
 #: How long a set of figures may sit in the cache at most. The fingerprint below is what
 #: actually decides whether they are still true; this is only so that a key for a state
@@ -455,7 +477,8 @@ def build(user) -> Insights:
 
     # ------------------------------------------------------------- interviews
     interview_days = _first_interview_days(ever_applied)
-    insights.interviewed = len(interview_days)
+    interviewed_ids = _reached_interview(ever_applied, reached)
+    insights.interviewed = len(interviewed_ids)
     if interview_days:
         insights.median_days_to_interview = statistics.median(sorted(interview_days.values()))
     diary = Interview.objects.for_user(user)
@@ -489,7 +512,7 @@ def build(user) -> Insights:
         statuses = reached[application.pk]
         if statuses & RESPONSE_STATUSES:
             row.responded += 1
-        if statuses & {Status.INTERVIEWING, Status.SCREENING, Status.ASSESSMENT}:
+        if application.pk in interviewed_ids:
             row.interviewed += 1
         if Status.OFFER in statuses:
             row.offers += 1
