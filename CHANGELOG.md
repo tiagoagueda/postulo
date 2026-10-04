@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A calendar narrowed with ?kinds= keeps the narrowing on the day number, the "and N more" link and the week view's day headings, so they open the same set of events. (#452)
 - The calendar no longer reads out an interview nobody came to as "Cancelled interview:" to screen readers; a no-show now has its own spoken prefix, and a cancellation is unchanged. (#453)
 - Removing a store connection now deletes its unsent document copies, so no failed copy is left that can never be sent; sent copies keep their reference, and orphans already left behind are cleaned up. (#511)
 - A waiting capture whose kept page expires after the retention period no longer loses what its review would teach about the site; expiry now saves the places first, as deleting the page by hand does. (#524)

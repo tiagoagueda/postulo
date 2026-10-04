@@ -195,6 +195,38 @@ def test_a_cell_holds_two_and_counts_the_rest_and_the_day_opens_on_them(client, 
     assert "Tuesday 8 Sep 2026" in day
 
 
+def _three_deadlines(user):
+    company = Company.objects.create(owner=user, name="Black Mesa")
+    for title in ("One", "Two", "Three"):
+        posting = JobPosting.objects.create(owner=user, company=company, title=title)
+        Application.objects.create(
+            owner=user, posting=posting, status=Status.APPLIED, deadline=dt.date(2026, 9, 8)
+        )
+
+
+def test_a_narrowed_months_day_links_keep_the_kinds(client, user):
+    _three_deadlines(user)
+    client.force_login(user)
+
+    html = client.get(reverse(CALENDAR), {"month": "2026-09", "kinds": "deadline"}).content.decode()
+    assert "and 1 more" in html
+    day_url = reverse(CALENDAR) + "?view=day&amp;on=2026-09-08&amp;kinds=deadline"
+    # The day's number and the *and 1 more* link both carry the narrowing (#452).
+    assert html.count(day_url) == 2
+
+
+def test_a_narrowed_weeks_day_headings_keep_the_kinds(client, user):
+    _three_deadlines(user)
+    client.force_login(user)
+
+    html = client.get(
+        reverse(CALENDAR), {"view": "week", "on": "2026-09-08", "kinds": "deadline"}
+    ).content.decode()
+    # Every heading of the week opens its day narrowed; the 9th has no other link to it.
+    day_url = reverse(CALENDAR) + "?view=day&amp;on=2026-09-09&amp;kinds=deadline"
+    assert day_url in html
+
+
 def test_week_day_and_agenda_are_the_same_events_in_another_shape(client, user, application):
     schedule_interview(application, kind="phone", starts_at=at(2026, 9, 10, 14), remind=False)
     Reminder.objects.create(owner=user, summary="Chase", due_at=at(2026, 9, 25, 9))

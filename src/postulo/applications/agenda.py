@@ -417,6 +417,8 @@ class Day:
     today: bool = False
     #: Which of the week's seven columns the day is drawn in, from 0.
     column: int = 0
+    #: The kinds the page is narrowed to, so the day it opens is narrowed the same way (#452).
+    kinds: frozenset[str] = field(default_factory=lambda: frozenset(ALL_KINDS))
 
     @property
     def shown(self) -> list[Event]:
@@ -428,7 +430,7 @@ class Day:
 
     @property
     def url(self) -> str:
-        return url_for("day", self.date)
+        return url_for("day", self.date, self.kinds)
 
     @property
     def menu_align(self) -> str:
@@ -472,10 +474,11 @@ def days_between(start: dt.date, end: dt.date):
         day += dt.timedelta(days=1)
 
 
-def month_grid(day: dt.date, events: list[Event], *, today: dt.date) -> list[list[Day]]:
+def month_grid(day: dt.date, events: list[Event], *, today: dt.date, kinds=None) -> list[list[Day]]:
     """Weeks of seven, the days outside the month marked so the grid can grey them."""
     start, end = month_range(day)
     on = by_day(events)
+    kinds = frozenset(kinds) if kinds else ALL_KINDS
     days = [
         Day(
             date=date,
@@ -483,17 +486,19 @@ def month_grid(day: dt.date, events: list[Event], *, today: dt.date) -> list[lis
             outside=date.month != day.month,
             today=date == today,
             column=index % 7,
+            kinds=kinds,
         )
         for index, date in enumerate(days_between(start, end))
     ]
     return [days[index : index + 7] for index in range(0, len(days), 7)]
 
 
-def week_days(day: dt.date, events: list[Event], *, today: dt.date) -> list[Day]:
+def week_days(day: dt.date, events: list[Event], *, today: dt.date, kinds=None) -> list[Day]:
     start = week_start(day)
     on = by_day(events)
+    kinds = frozenset(kinds) if kinds else ALL_KINDS
     return [
-        Day(date=date, events=on.get(date, []), today=date == today, column=index)
+        Day(date=date, events=on.get(date, []), today=date == today, column=index, kinds=kinds)
         for index, date in enumerate(days_between(start, start + dt.timedelta(days=7)))
     ]
 
@@ -640,7 +645,7 @@ def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=N
             events=events,
             kinds=kinds,
         )
-        page.weeks = month_grid(on, events, today=today)
+        page.weeks = month_grid(on, events, today=today, kinds=kinds)
         page.weekday_names = [formats.date_format(day.date, "D") for day in page.weeks[0]]
         return page
     if view == "week":
@@ -659,7 +664,7 @@ def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=N
             events=events,
             kinds=kinds,
         )
-        page.days = week_days(on, events, today=today)
+        page.days = week_days(on, events, today=today, kinds=kinds)
         return page
     if view == "day":
         start, end = on, on + dt.timedelta(days=1)
