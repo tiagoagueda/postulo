@@ -878,7 +878,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         _restore_web_links(contact, user, contact_links, report)
         contacts[old_id] = contact
 
-    # The reminders about no application, which format 30 is the first to carry (#334).
+    # The reminders about no application, which format 31 is the first to carry (#334).
     for reminder_entry in document.get("reminders") or []:
         due_at = _dt(reminder_entry.get("due_at"))
         if due_at is None:

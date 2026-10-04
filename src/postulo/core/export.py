@@ -350,7 +350,7 @@ SENT_FIELDS = (
     "rendered_at",
     "language",
     # Where it went, kept as text so a sent PDF can still be placed after its application
-    # is deleted (#469). Absent from an archive written before format 31.
+    # is deleted (#469). Absent from an archive written before format 32.
     "sent_to",
 )
 CAPTURE_FIELDS = (
