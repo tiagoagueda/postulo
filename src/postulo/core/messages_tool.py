@@ -389,9 +389,16 @@ def _reference_key(reference: str):
 # ------------------------------------------------------------------ .po files
 
 
+_UNESCAPES = {"n": "\n", "t": "\t", "r": "\r", '"': '"', "\\": "\\"}
+
+
 def _quote(text: str) -> str:
     escaped = (
-        text.replace("\\", "\\\\").replace('"', '\\"').replace("\n", "\\n").replace("\t", "\\t")
+        text.replace("\\", "\\\\")
+        .replace('"', '\\"')
+        .replace("\n", "\\n")
+        .replace("\t", "\\t")
+        .replace("\r", "\\r")
     )
     return f'"{escaped}"'
 
@@ -526,7 +533,8 @@ def _unquote(chunk: str) -> str:
     chunk = chunk.strip()
     if chunk.startswith('"') and chunk.endswith('"'):
         chunk = chunk[1:-1]
-    return chunk.replace("\\n", "\n").replace("\\t", "\t").replace('\\"', '"').replace("\\\\", "\\")
+    # One left-to-right pass: chained replaces misread an escaped backslash before n or t.
+    return re.sub(r"\\(.)", lambda m: _UNESCAPES.get(m.group(1), m.group(0)), chunk)
 
 
 def po_path(code: str, subject: CatalogueSet | None = None) -> Path:

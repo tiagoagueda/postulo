@@ -97,6 +97,25 @@ def test_a_catalogue_survives_the_round_trip(tool):
     assert again.messages[("month name", "May")].msgstr == ["mai"]
 
 
+def test_backslashes_and_carriage_returns_survive_the_round_trip(tool):
+    ids = [
+        "Type C:\\new",
+        "tab\\t here",
+        'quote \\" and "',
+        "two\\\\n",
+        "carriage\rreturn",
+        "mixed \\n\n\\t\t\r\\",
+    ]
+    catalogue = tool.Catalogue(
+        header=tool.header_for("fr-FR", {}),
+        messages={m.key: m for m in (tool.Message(msgid=i, msgstr=[i + " fr"]) for i in ids)},
+    )
+    again = tool.parse(tool.dump(catalogue, "fr-FR"))
+    assert set(again.messages) == set(catalogue.messages)
+    for message in catalogue.messages.values():
+        assert again.messages[message.key].msgstr == message.msgstr
+
+
 def test_merging_keeps_translations_and_drops_what_the_source_lost(tool):
     old = tool.Catalogue(
         header={},
