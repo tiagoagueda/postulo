@@ -408,20 +408,31 @@ def test_the_builders_word_the_three_events(user):
         "role": "Engineer",
         "company": "Aperture",
         "status": "Offer",
+        "to_status": "offer",
     }
     message = slow.BUILDERS["status_changed"](payload)
     assert message.key == "status:1:9" and "Aperture" in message.title
+    assert message.title == "Engineer at Aperture: Offer"
+    # An errand queued before the label was looked up by the builder carries only the label.
+    old = slow.BUILDERS["status_changed"]({**payload, "to_status": "", "status": "Offered"})
+    assert old.title == "Engineer at Aperture: Offered"
     moved = slow.BUILDERS["interview_scheduled"](
         {
             "interview_id": 3,
             "application_id": 1,
-            "starts_at": "x",
+            "starts_at": "2026-11-02T15:00:00+00:00",
             "moved": True,
             "role": "E",
             "company": "A",
         }
     )
     assert "moved" in moved.title.lower() and moved.data["moved"]
+    assert moved.data["starts_at"] == "2026-11-02T15:00:00+00:00"
+    assert moved.body and "T15:00" not in moved.body and "2026" in moved.body
+    unparsed = slow.BUILDERS["interview_scheduled"](
+        {"interview_id": 3, "application_id": 1, "starts_at": "x", "role": "E", "company": "A"}
+    )
+    assert unparsed.body == "x"
     offered = slow.BUILDERS["offer_recorded"](
         {
             "offer_id": 4,

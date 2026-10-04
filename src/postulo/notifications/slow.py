@@ -24,6 +24,7 @@ import datetime as dt
 from collections.abc import Callable
 
 from django.urls import reverse
+from django.utils import formats, timezone
 from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
@@ -161,12 +162,27 @@ def _role_at(payload: dict) -> str:
     }
 
 
+def _status_label(payload: dict) -> str:
+    """The new status in the language this is being worded in.
+
+    Looked up from the status itself, because a label resolved when the errand was queued is
+    in whatever language was active there -- a token request's, or none at all (#385). An
+    errand queued before that carries only the label, and keeps it.
+    """
+    from postulo.applications.models import Status
+
+    to_status = payload.get("to_status", "")
+    if to_status in Status.values:
+        return str(Status(to_status).label)
+    return payload.get("status", "")
+
+
 @builder("status_changed")
 def a_status_changed(payload: dict) -> Notification:
     return Notification(
         event="status_changed",
         title=_("%(what)s: %(status)s")
-        % {"what": _role_at(payload), "status": payload.get("status", "")},
+        % {"what": _role_at(payload), "status": _status_label(payload)},
         body=payload.get("note", ""),
         url=link(payload, reverse("applications:detail", args=[payload["application_id"]])),
         # The timeline entry, not the application: an application moves many times and each
@@ -183,6 +199,21 @@ def a_status_changed(payload: dict) -> Notification:
     )
 
 
+def _when_it_starts(payload: dict) -> str:
+    """The interview's start in the reader's zone and format; as received if it is not a time.
+
+    The ISO value stays in `data` for a machine (#385).
+    """
+    raw = payload.get("starts_at", "")
+    try:
+        starts = dt.datetime.fromisoformat(raw)
+    except (TypeError, ValueError):
+        return raw
+    if timezone.is_naive(starts):
+        return raw
+    return formats.date_format(timezone.localtime(starts), "DATETIME_FORMAT")
+
+
 @builder("interview_scheduled")
 def an_interview_was_scheduled(payload: dict) -> Notification:
     moved = bool(payload.get("moved"))
@@ -190,7 +221,7 @@ def an_interview_was_scheduled(payload: dict) -> Notification:
         event="interview_scheduled",
         title=(_("Interview moved: %(what)s") if moved else _("Interview scheduled: %(what)s"))
         % {"what": _role_at(payload)},
-        body=payload.get("starts_at", ""),
+        body=_when_it_starts(payload),
         url=link(payload, reverse("applications:detail", args=[payload["application_id"]])),
         key=f"interview:{payload['interview_id']}:{payload.get('starts_at', '')}",
         occurred_at=when(payload),

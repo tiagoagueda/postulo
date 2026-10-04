@@ -342,6 +342,64 @@ def test_a_capture_through_the_api_is_announced(client, user):
     assert "http://testserver/jobs/captures/" in message.body
 
 
+def test_an_interview_is_worded_in_the_readers_zone_and_language(user):
+    """The body was the ISO string the errand was queued with (#385)."""
+    from postulo.notifications import slow
+
+    email_connection(user, event_interview_scheduled=True)
+    user.profile.language = "fr-FR"
+    user.profile.time_zone = "America/New_York"
+    user.profile.save(update_fields=["language", "time_zone"])
+    payload = {
+        "interview_id": 3,
+        "application_id": 1,
+        "role": "Analyst",
+        "company": "Initech",
+        "starts_at": "2026-11-02T15:00:00+00:00",
+    }
+
+    notify(user, lambda: slow.BUILDERS["interview_scheduled"](payload))
+
+    body = mail.outbox[0].body
+    assert "10:00" in body, "ten in the morning in New York, not the UTC offset it was queued in"
+    assert "novembre" in body, "written in the person's language"
+    assert "2026-11-02T" not in body
+
+
+def test_a_status_label_comes_out_in_the_readers_language_whatever_the_callers(user):
+    """`change_status` ran under `en` (a token request); the reader reads `fr` (#385)."""
+    from django.utils import translation
+
+    from postulo.applications.services import change_status
+
+    email_connection(user, event_status_changed=True)
+    user.profile.language = "fr-FR"
+    user.profile.save(update_fields=["language"])
+    application = an_application(user)
+
+    with translation.override("en"), mock.patch("postulo.core.errands.send") as queued:
+        change_status(application, Status.INTERVIEWING)
+    payload = queued.call_args.kwargs
+    assert "status" not in payload, "no pre-translated label travels in the errand"
+
+    from postulo.notifications import slow
+
+    notify(user, lambda: slow.BUILDERS["status_changed"](payload | {"application_id": 1}))
+
+    assert "En entretien" in mail.outbox[0].subject
+
+
+def test_the_zone_is_the_profiles_then_the_instances_then_the_servers(user, settings):
+    from postulo.notifications.service import zone_for
+
+    settings.TIME_ZONE = "Europe/Paris"
+    assert str(zone_for(user)) == "Europe/Paris"
+    user.profile.time_zone = "America/New_York"
+    assert str(zone_for(user)) == "America/New_York"
+    user.profile.time_zone = "Not/AZone"
+    assert str(zone_for(user)) == "Europe/Paris"
+
+
 # ------------------------------------------------------------ the scheduler
 
 

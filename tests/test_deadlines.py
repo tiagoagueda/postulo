@@ -346,6 +346,32 @@ def test_the_notice_follows_the_person(user, company):
     assert closing.announce_closing_postings()[0] == 1
 
 
+def test_the_notice_counts_days_on_the_persons_calendar(user, company):
+    """Paris is already on 2 October when Los Angeles is still on the 1st (#385)."""
+    from unittest import mock
+
+    from postulo.accounts.models import Profile
+
+    Profile.objects.filter(user=user).update(time_zone="America/Los_Angeles")
+    user.refresh_from_db()
+    JobPosting.objects.create(
+        owner=user, company=company, title="Analyst", closes_at=dt.date(2026, 10, 2)
+    )
+    sent = []
+    now = dt.datetime(2026, 10, 1, 23, 30, tzinfo=dt.UTC)
+
+    with (
+        timezone.override(ZoneInfo("Europe/Paris")),
+        mock.patch.object(timezone, "now", lambda: now),
+        mock.patch.object(closing, "notify", lambda owner, build: sent.append(build()) or 1),
+    ):
+        stamped, _delivered = closing.announce_closing_postings()
+
+    assert stamped == 1
+    assert "Analyst at" in sent[0].body
+    assert "in 1 day" in sent[0].body and "today" not in sent[0].body
+
+
 def test_the_event_is_one_a_notifier_can_be_switched_off_for():
     from postulo.notifications.base import EVENTS
 

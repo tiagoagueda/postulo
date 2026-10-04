@@ -207,7 +207,6 @@ def change_status(
         event_id=entry.pk,
         role=application.posting.title,
         company=application.posting.company.name,
-        status=str(Status(new_status).label),
         from_status=previous,
         to_status=new_status,
         note=note,

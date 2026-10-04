@@ -3,7 +3,11 @@
 from __future__ import annotations
 
 import logging
+import zoneinfo
 from collections.abc import Callable
+
+from django.conf import settings
+from django.utils import timezone
 
 from postulo.core import languages
 from postulo.plugins.base import ConnectionUnusable
@@ -27,6 +31,25 @@ def language_for(user) -> str:
     profile = getattr(user, "profile", None)
     chosen = (getattr(profile, "language", "") or "").strip()
     return chosen or site.default_language() or languages.SOURCE
+
+
+def zone_for(user) -> zoneinfo.ZoneInfo:
+    """The time zone this person lives in: their profile's, else the instance default.
+
+    The scheduler and the worker activate no zone of their own, so a date or a time worded
+    outside a request was the server's, whoever it was for. Falls back to the server's zone
+    for a name `zoneinfo` does not know, as the request middleware does (#385).
+    """
+    from postulo.core import site
+
+    profile = getattr(user, "profile", None)
+    for name in (getattr(profile, "time_zone", "") or "", site.default_time_zone() or ""):
+        try:
+            if name:
+                return zoneinfo.ZoneInfo(name)
+        except (zoneinfo.ZoneInfoNotFoundError, ValueError):
+            continue
+    return zoneinfo.ZoneInfo(settings.TIME_ZONE)
 
 
 def notify(user, notification: Notification | Callable[[], Notification]) -> int:
@@ -54,7 +77,7 @@ def notify(user, notification: Notification | Callable[[], Notification]) -> int
     if not user.is_active:
         return 0
     language = language_for(user)
-    with languages.override(language):
+    with languages.override(language), timezone.override(zone_for(user)):
         message = notification() if callable(notification) else notification
         # Stamped here rather than by every sender: this is the one place that knows whose
         # language the words came out in, and a notifier rendering around them needs it

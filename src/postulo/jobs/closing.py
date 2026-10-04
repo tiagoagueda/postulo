@@ -35,7 +35,7 @@ from postulo.notifications.base import (
     announcement_body,
     owner_of,
 )
-from postulo.notifications.service import notify
+from postulo.notifications.service import notify, zone_for
 
 from .models import JobPosting
 
@@ -56,16 +56,19 @@ def notice_days_for(user) -> int:
 
 def closing_for(user, at=None):
     """The person's undecided listings closing within their notice, soonest first."""
-    today = at or timezone.localdate()
-    return (
-        JobPosting.objects.for_user(user)
-        .undecided()
-        .filter(
-            closes_at__gte=today,
-            closes_at__lte=today + dt.timedelta(days=notice_days_for(user)),
+    # The person's own calendar, not the server's: a listing closes on their last day, and
+    # `undecided()` reads the date too, so the same override serves both (#385).
+    with timezone.override(zone_for(user)):
+        today = at or timezone.localdate()
+        return (
+            JobPosting.objects.for_user(user)
+            .undecided()
+            .filter(
+                closes_at__gte=today,
+                closes_at__lte=today + dt.timedelta(days=notice_days_for(user)),
+            )
+            .order_by("closes_at", "pk")
         )
-        .order_by("closes_at", "pk")
-    )
 
 
 def announce_closing_postings(at=None) -> tuple[int, int]:
@@ -74,12 +77,14 @@ def announce_closing_postings(at=None) -> tuple[int, int]:
     One message per person per pass, naming the listings. Returns (listings stamped,
     deliveries made) -- the shape every announcer in the scheduler returns.
     """
-    today = at or timezone.localdate()
     now = timezone.now()
+    # The server's date can be a day ahead of an owner's, so the pre-filter is a day wide and
+    # each owner's own calendar decides what is inside their window (#385).
+    earliest = (at or timezone.localdate()) - dt.timedelta(days=1)
     # Only the people who have a listing closing at all, so a pass over an instance with a
     # thousand accounts and three dated listings asks three questions rather than a thousand.
     owners = (
-        JobPosting.objects.filter(owner__is_active=True, closes_at__gte=today)
+        JobPosting.objects.filter(owner__is_active=True, closes_at__gte=earliest)
         .values_list("owner", flat=True)
         .distinct()
     )
@@ -87,6 +92,8 @@ def announce_closing_postings(at=None) -> tuple[int, int]:
     delivered = 0
     for owner_id in owners:
         owner = owner_of(owner_id)
+        with timezone.override(zone_for(owner)):
+            today = at or timezone.localdate()
         rows = list(closing_for(owner, at=today).select_related("company"))
         # Announced again when the date moves, and never twice for the same date. The stamp
         # holds the date it was written *for*, so "already told them about the 30th" and
@@ -103,7 +110,10 @@ def announce_closing_postings(at=None) -> tuple[int, int]:
             continue
         stamped += len(claimed)
         try:
-            delivered += notify(owner, lambda claimed=claimed: _announcement(claimed, today))
+            delivered += notify(
+                owner,
+                lambda claimed=claimed, today=today: _announcement(claimed, today),
+            )
         except Exception:
             logger.exception("Could not announce closing listings for owner %s", owner_id)
     return stamped, delivered
