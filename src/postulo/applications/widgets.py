@@ -211,7 +211,7 @@ register(
     Widget(
         key="outcomes",
         label=_("Outcomes"),
-        blurb=_("Replied, rejected, went silent, still waiting — what became of what you sent."),
+        blurb=_("Still live, waiting, rejected, ghosted: what became of what you sent."),
         template="widgets/outcomes.html",
         context=_insight,
         width="half",
@@ -238,7 +238,7 @@ register(
     Widget(
         key="durations",
         label=_("How long they take"),
-        blurb=_("Days to a first reply and to a first interview: fastest, median, slowest."),
+        blurb=_("Days to a first reply: fastest, median, slowest."),
         template="widgets/durations.html",
         context=_insight,
         width="half",
@@ -262,9 +262,10 @@ register(
     Widget(
         key="sources",
         label=_("Where they came from"),
-        # The sentence is as it was: the two tables #239 added sit under the first and need
-        # no announcing, and rewording it would untranslate it in every language at once.
-        blurb=_("Applications, replies and offers per company, with the ones gone quiet."),
+        blurb=_(
+            "Applications, replies, interviews and offers by where you found the posting, "
+            "by referrer and by agency."
+        ),
         template="widgets/sources.html",
         context=_insight,
         width="full",

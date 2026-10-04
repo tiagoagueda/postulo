@@ -252,3 +252,19 @@ def test_the_shared_pass_is_still_shared():
 
     assert "class Sources" in source
     assert "sources = Sources(" in source or "Sources(" in source
+
+
+def test_a_blurb_names_only_what_its_widget_draws():
+    """The picker's sentence is the only description before a widget is added (#502)."""
+    from postulo.applications import widgets as _registered  # noqa: F401
+
+    durations = str(widgets.get("durations").blurb)
+    assert "interview" not in durations
+
+    outcomes = str(widgets.get("outcomes").blurb)
+    assert "replied" not in outcomes.lower()
+    assert "went silent" not in outcomes
+
+    sources = str(widgets.get("sources").blurb)
+    assert "per company" not in sources
+    assert "referrer" in sources and "agency" in sources
