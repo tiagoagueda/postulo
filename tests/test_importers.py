@@ -348,3 +348,51 @@ def test_any_importers_number_is_read_against_its_plan_on_the_way_in(user, writt
     importing.apply(user, Record(source="hr-xml", person={"phone": written}))
 
     assert user.profile.phone_numbers.get().number == stored
+
+
+# ------------------------------------------------- a faulty importer (#611)
+
+
+def _europass_file() -> bytes:
+    return b'{"SkillsPassport": {"LearnerInfo": {"Identification": {}}}}'
+
+
+def test_an_importer_that_raises_in_can_handle_is_skipped_and_logged(
+    client, user, installed, monkeypatch, caplog
+):
+    def boom(self, data, filename=""):
+        raise ValueError("not what I expected")
+
+    monkeypatch.setattr(_Installed, "can_handle", boom)
+    client.force_login(user)
+
+    with caplog.at_level("ERROR"):
+        response = client.post(
+            reverse("resume:europass_import"),
+            {"file": _upload("cv.json", _europass_file())},
+            follow=True,
+        )
+
+    assert response.status_code == 200
+    assert "Nothing installed here reads that file" not in response.content.decode()
+    assert any("hr-xml" in r.getMessage() for r in caplog.records)
+
+
+def test_an_importer_that_raises_in_read_says_so_instead_of_a_500(
+    client, user, installed, monkeypatch, caplog
+):
+    def boom(self, data):
+        raise RuntimeError("broken")
+
+    monkeypatch.setattr(_Installed, "read", boom)
+    client.force_login(user)
+
+    with caplog.at_level("ERROR"):
+        response = client.post(
+            reverse("resume:europass_import"), {"file": _upload("a.dat", b"HRXML x")}, follow=True
+        )
+
+    assert response.status_code == 200
+    assert b"HR-XML failed while reading that file" in response.content
+    assert response.context["found"] is None
+    assert any("hr-xml" in r.getMessage() for r in caplog.records)

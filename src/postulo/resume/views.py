@@ -8,6 +8,7 @@ only in a noun.
 from __future__ import annotations
 
 import datetime as dt
+import logging
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -40,6 +41,8 @@ from .models import (
     SkillGroup,
 )
 from .registry import OVERVIEW_ORDER, SECTIONS
+
+logger = logging.getLogger(__name__)
 
 
 def get_section(slug: str):
@@ -455,14 +458,18 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
         data = upload.read()
         try:
             base.refuse_unreadable(data)
-            importer = next(
-                (
-                    plugin
-                    for plugin in registry.plugins("importer")
-                    if plugin.can_handle(data, upload.name or "")
-                ),
-                None,
-            )
+            importer = None
+            for plugin in registry.plugins("importer"):
+                # A plugin that raises is logged and skipped, as capture does (#611): one
+                # faulty add-on must not stop the importers behind it.
+                try:
+                    claimed = plugin.can_handle(data, upload.name or "")
+                except Exception:
+                    logger.exception("Importer %r could not be asked about a file", plugin.name)
+                    continue
+                if claimed:
+                    importer = plugin
+                    break
             if importer is None:
                 # Named from the registry, for the same reason the lookup above is: with a
                 # second importer installed, the sentence has to say so (#105).
@@ -470,7 +477,16 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
                     _("Nothing installed here reads that file. What is installed reads: %(what)s.")
                     % {"what": ", ".join(str(p.label) for p in registry.plugins("importer"))}
                 )
-            record = importer.read(data)
+            try:
+                record = importer.read(data)
+            except base.ImportRefused:
+                raise
+            except Exception:
+                logger.exception("Importer %r failed while reading a file", importer.name)
+                raise base.ImportRefused(
+                    _("The importer %(name)s failed while reading that file. Nothing was imported.")
+                    % {"name": importer.label}
+                ) from None
         except base.ImportRefused as error:
             messages.error(request, str(error))
             return redirect("resume:europass_import")

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A CV importer plugin that raises in can_handle is now logged and skipped, and one that raises in read shows a message naming it, instead of a 500 that blocked every upload on the import page. (#611)
 - The career preview now shows your Links (title, type and host) after Projects, so "Everything you have written" really lists every career section. (#612)
 - The listing form's Cancel now returns to the listing when editing, and to the company it was opened for (else the Listings page) when adding, instead of always going to Companies. (#628)
 - Tags and industries: with scripts on, the chip control no longer hides the help text and validation errors of the tag and industry fields (and their new-name fields), and the chip input is described by them. (#522)
