@@ -450,3 +450,60 @@ def test_a_deactivated_account_has_no_deliveries_pending_and_gets_no_new_ones(us
     user.is_active = True
     user.save(update_fields=["is_active"])
     assert webhooks.pending().count() == 1
+
+
+# ------------------------------------------------------------- a receiver that redirects
+
+
+def redirecting_receiver(status=301):
+    """A receiver that answers `status` to the first address and 200 to the one it names."""
+    requests = []
+
+    def handler(request):
+        requests.append(request)
+        if request.url.scheme == "http":
+            return httpx.Response(status, headers={"Location": "https://hooks.example.org/in"})
+        return httpx.Response(200)
+
+    def make_client(**kwargs):
+        return httpx.Client(transport=httpx.MockTransport(handler), **kwargs)
+
+    return requests, make_client
+
+
+@pytest.mark.parametrize(
+    ("status", "final"),
+    [(301, True), (308, True), (302, False), (303, False), (307, False)],
+)
+def test_a_redirect_is_a_failure_that_names_where_it_pointed_and_posts_once(user, status, final):
+    webhook_connection(user, url="http://hooks.example.org/in")
+    notify(user, Notification(event="reminder_due", title="Chase them", key="reminder:1"))
+    requests, make_client = redirecting_receiver(status)
+
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "client", make_client),
+    ):
+        assert webhooks.send_pending() == (0, 1)
+
+    row = WebhookDelivery.objects.get()
+    assert len(requests) == 1 and requests[0].method == "POST"
+    assert row.status != DeliveryStatus.SENT
+    assert (row.status == DeliveryStatus.GIVEN_UP) is final
+    assert "https://hooks.example.org/in" in row.last_error
+    assert row.last_status == status
+
+
+def test_the_test_button_reports_a_redirect_rather_than_answering_200(user):
+    requests, make_client = redirecting_receiver(301)
+
+    with (
+        mock.patch.object(webhook, "check_destination", lambda url: None),
+        mock.patch.object(webhook, "client", make_client),
+    ):
+        result = WebhookNotifier().test(
+            {"url": "http://hooks.example.org/in", "secret": SECRET}, user
+        )
+
+    assert len(requests) == 1
+    assert not result.ok and "https://hooks.example.org/in" in result.message

@@ -149,6 +149,12 @@ def deliver(row) -> bool:
         row.save()
         connection.record_test(True)
         return True
+    moved = plugin.redirect_message(response)
+    if moved:
+        connection.record_test(False, moved)
+        row.last_status = status
+        # Moved for good: the address has to be corrected, so retrying is pointless.
+        return fail(moved, final=status in (301, 308))
     answered = str(_("The receiver answered %(status)s.") % {"status": status})
     connection.record_test(False, answered)
     row.last_status = status

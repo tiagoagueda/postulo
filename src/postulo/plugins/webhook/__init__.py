@@ -223,6 +223,9 @@ class WebhookNotifier:
             return TestResult(False, str(refused))
         except Exception as error:
             return TestResult(False, f"{type(error).__name__}: {error}")
+        redirected = redirect_message(response)
+        if redirected:
+            return TestResult(False, redirected)
         if 200 <= response.status_code < 300:
             return TestResult(
                 True, str(_("Answered %(status)s.") % {"status": response.status_code})
@@ -241,5 +244,18 @@ def post(url: str, secret: str, body: str, *, event: str, delivery: str):
         EVENT_HEADER: event,
         DELIVERY_HEADER: delivery,
     }
-    with client(timeout=TIMEOUT) as http:
+    # Not followed: a redirected POST is re-sent as a GET with no body, and the receiver
+    # would never hear the event while the answer to the GET looked like success (#550).
+    with client(timeout=TIMEOUT, follow_redirects=False) as http:
         return http.post(url, content=body.encode("utf-8"), headers=headers)
+
+
+def redirect_message(response) -> str:
+    """What to tell the person when the receiver answered with a redirect, else ``""``."""
+    if not 300 <= response.status_code < 400:
+        return ""
+    location = response.headers.get("Location", "")
+    return str(
+        _("The receiver redirected to %(location)s; use that address instead.")
+        % {"location": location}
+    )

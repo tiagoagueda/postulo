@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Webhooks no longer follow a redirect, which re-sent the POST as a bodyless GET and could record the event as sent; a 3xx now fails the delivery and the Test button, naming the address to use instead. (#550)
 - Putting a reminder off until tomorrow or next week now keeps the hour it was set for, in your own time zone, instead of the minute you pressed the button, and no longer shifts an hour across a clock change. (#565)
 - A browser notice older than a week is no longer shown to the next tab you open; expired and already-shown notices are also cleared on the scheduler pass, not only when a new notice arrives. (#577)
 - A deactivated account no longer gets due reminders, webhook posts, syncs or document copies sent on its behalf; its queued rows wait and resume if the account is reactivated. (#575)
