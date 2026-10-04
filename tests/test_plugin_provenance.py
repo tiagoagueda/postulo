@@ -15,6 +15,8 @@ of difference means they are not.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 
 from postulo.plugins import provenance
@@ -233,3 +235,31 @@ def test_a_built_in_offers_no_button_that_could_not_work(admin_client):
 
     assert "Remove" not in row
     assert "Switch off" not in row
+
+
+# ------------------------------------ the person's page, for a plugin named unlike its package
+
+
+def test_the_persons_page_tags_an_installed_plugin_by_its_distribution(
+    client, user, third_party, monkeypatch
+):
+    """The record names a distribution (`postulo-installed`) and the plugin a different
+    thing (`installed`), as every official plugin's do. The page looked the row up by the
+    second and so labelled exactly the plugins that needed it least (#603)."""
+    from django.urls import reverse
+
+    from postulo.plugins import catalogue, record, registry
+
+    entry = Installed(name="postulo-installed", version="1.0", origin="upload", sha256=DIGEST)
+    assert entry.name != third_party
+    monkeypatch.setattr(catalogue, "fetch_all", lambda: ([], []))
+    monkeypatch.setattr(record, "read_record", lambda: [entry])
+    module = type(next(p for p in registry.plugins("source") if p.name == third_party)).__module__
+    module = module.split(".")[0]
+    monkeypatch.setattr(record, "packages_by_distribution", lambda: {module: ["postulo-installed"]})
+
+    client.force_login(user)
+    html = client.get(reverse("settings:plugins")).content.decode()
+
+    row = re.search(rf'<li[^>]*data-plugin="{re.escape(third_party)}".*?</li>', html, re.S).group(0)
+    assert "Uploaded" in row

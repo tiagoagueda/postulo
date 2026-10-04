@@ -270,12 +270,27 @@ def overview(person, *, internal: bool = False) -> list[dict]:
     decision held over an account never hides behind a check mark.
     """
     from . import base, kinds, provenance
+    from .record import canonicalise, packages_by_distribution
     from .registry import plugins
 
     # Where each plugin came from, read once for the whole page rather than per row: the
     # answer for an installed one involves the record and the repositories' checksums, and
     # asking eight times would ask eight times (#184).
     marks = {row["name"]: row for row in provenance.status()}
+    # An installed plugin's row is named for its distribution (`postulo-imap`), not for what
+    # the plugin registers as (`imap`), so the second is found through the package the
+    # plugin's code lives in, as `base._from_the_wheel` does (#603).
+    by_distribution = {canonicalise(name): row for name, row in marks.items()}
+    packages = packages_by_distribution()
+
+    def mark_of(plugin) -> dict:
+        top_level = type(plugin).__module__.split(".")[0]
+        if top_level != "postulo":
+            for distribution in packages.get(top_level, []):
+                found = by_distribution.get(canonicalise(distribution))
+                if found:
+                    return found
+        return marks.get(plugin.name, {})
 
     rows = []
     for kind in GOVERNED_KINDS:
@@ -286,7 +301,7 @@ def overview(person, *, internal: bool = False) -> list[dict]:
             shipped = shipped_inside(plugin.name)
             if shipped and not internal and decision.decided_by != "administrator":
                 continue
-            mark = marks.get(plugin.name, {})
+            mark = mark_of(plugin)
             rows.append(
                 {
                     "name": plugin.name,

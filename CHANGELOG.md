@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Settings → Plugins now shows the Uploaded or Custom tag on an installed plugin whose package name differs from its own, as every official plugin's does; before, only built-ins were tagged. (#603)
 - The plugin surface check now records what a plugin imports by name: `from postulo.plugins import api` passes, and an allowance for `postulo.core.site` no longer lets `postulo.core.models` through. (#606)
 - A plugin switched off or removed now takes its document themes, template and translation directories with it at once, instead of staying in the pickers and breaking Export until a restart; an upgraded plugin shows its new logo. (#609)
 - Importing a Europass file with an address without a country, an over-long number, an impossible year or a malformed website now reads what it can or is refused with a sentence, instead of ending in a server error. (#634)
