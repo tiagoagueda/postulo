@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A spreadsheet import with a cell over 128 KiB, usually from an unclosed quotation mark, now says the file could not be read instead of giving a server error. (#462)
 - A long spreadsheet file name no longer overflows the timeline's actor and summary columns, which made the import fail on PostgreSQL. (#463)
 - Spreadsheet import no longer mistakes "Applied through" or "Deadline date" for the applied date, so the channel, deadline and real "Date applied" columns are guessed correctly in any column order. (#465)
 - Editing a reminder that was put off with Later or Snooze no longer announces it a second time when only its wording changes; those times are now stored to the minute, as the edit form shows them. (#445)

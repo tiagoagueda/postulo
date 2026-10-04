@@ -458,7 +458,17 @@ def read_sheet(data: bytes, filename: str = "import.csv") -> Sheet:
     sample = "\n".join(text.splitlines()[:20])
     delimiter = _delimiter(sample)
     reader = csv.reader(io.StringIO(text), delimiter=delimiter)
-    rows = [row for row in reader if any(cell.strip() for cell in row)]
+    try:
+        rows = [row for row in reader if any(cell.strip() for cell in row)]
+    except csv.Error as error:
+        raise SheetError(
+            str(
+                _(
+                    "The file could not be read: a cell is over 128 KiB. "
+                    "A quotation mark that is never closed is the usual cause."
+                )
+            )
+        ) from error
     if not rows:
         raise SheetError(str(_("The file holds no rows.")))
     headers = [cell.strip() for cell in rows[0]]

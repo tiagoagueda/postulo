@@ -46,6 +46,25 @@ def test_it_reads_a_bom_a_semicolon_and_latin_one():
     assert french.rows[0][0] == "Société Générale"
 
 
+OVERSIZED = b'Company,Role\nAcme,"' + b"x" * 200000 + b'"\n'
+
+
+def test_a_field_over_the_reader_limit_is_a_sheet_error():
+    with pytest.raises(csv_import.SheetError, match="never closed"):
+        csv_import.read_sheet(OVERSIZED)
+
+
+def test_the_page_answers_an_oversized_field_with_a_message(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("core:import_csv"),
+        {"file": SimpleUploadedFile("big.csv", OVERSIZED, content_type="text/csv")},
+        follow=True,
+    )
+    assert response.status_code == 200
+    assert "never closed" in response.content.decode()
+
+
 def test_empty_huge_and_rowless_files_are_refused():
     with pytest.raises(csv_import.SheetError, match="empty"):
         csv_import.read_sheet(b"   ")
