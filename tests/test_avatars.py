@@ -309,7 +309,9 @@ def test_the_upload_beats_the_gravatar_and_opting_out_deletes_the_copy(client, u
     assert profile.gravatar_checked_at is None
 
 
-def test_refresh_asks_again_and_a_new_primary_address_refetches(client, user, gravatar):
+def test_refresh_asks_again_and_a_new_primary_address_refetches(
+    client, user, gravatar, django_capture_on_commit_callbacks
+):
     client.force_login(user)
     profile_page(client, user, use_gravatar="on")
     assert len(gravatar.calls) == 1
@@ -319,17 +321,19 @@ def test_refresh_asks_again_and_a_new_primary_address_refetches(client, user, gr
 
     from allauth.account.signals import email_changed
 
-    email_changed.send(
-        sender=None, request=None, user=user, from_email_address=None, to_email_address=None
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        email_changed.send(
+            sender=None, request=None, user=user, from_email_address=None, to_email_address=None
+        )
     assert len(gravatar.calls) == 3
 
     profile = Profile.objects.get(user=user)
     profile.use_gravatar = False
     profile.save()
-    email_changed.send(
-        sender=None, request=None, user=user, from_email_address=None, to_email_address=None
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        email_changed.send(
+            sender=None, request=None, user=user, from_email_address=None, to_email_address=None
+        )
     assert len(gravatar.calls) == 3, "nobody asked"
 
 
@@ -450,3 +454,60 @@ def test_a_picture_cut_short_is_refused_even_after_a_pdf_was_drawn(client, user,
     assert response.status_code == 200 and "could not be read" in response.content.decode()
     assert not Profile.objects.get(user=user).avatar
     assert ImageFile.LOAD_TRUNCATED_IMAGES is True
+
+
+# ----------------------------------------------- no transaction while Gravatar is asked (#357)
+
+
+@pytest.fixture
+def asked_in_a_transaction(monkeypatch, gravatar):
+    """Record whether a transaction was open at the moment Gravatar was asked."""
+    from django.db import connection
+
+    seen: list[bool] = []
+    original = FakeClient.get
+
+    def get(self, url):
+        seen.append(connection.in_atomic_block)
+        return original(self, url)
+
+    monkeypatch.setattr(FakeClient, "get", get)
+    return seen
+
+
+@pytest.mark.django_db(transaction=True)
+def test_ticking_the_box_asks_gravatar_outside_any_transaction(
+    client, user, atomic_requests, asked_in_a_transaction
+):
+    client.force_login(user)
+    profile_page(client, user, use_gravatar="on")
+
+    assert asked_in_a_transaction == [False]
+    assert Profile.objects.get(user=user).gravatar_checked_at is not None
+
+
+@pytest.mark.django_db(transaction=True)
+def test_fetching_it_again_asks_gravatar_outside_any_transaction(
+    client, user, atomic_requests, asked_in_a_transaction
+):
+    Profile.objects.update_or_create(user=user, defaults={"use_gravatar": True})
+    client.force_login(user)
+    client.post(reverse("accounts:avatar_refresh"))
+
+    assert asked_in_a_transaction == [False]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_new_primary_address_asks_gravatar_after_the_transaction_commits(
+    user, asked_in_a_transaction
+):
+    from allauth.account.signals import email_changed
+    from django.db import transaction
+
+    Profile.objects.update_or_create(user=user, defaults={"use_gravatar": True})
+    with transaction.atomic():
+        email_changed.send(
+            sender=None, request=None, user=user, from_email_address=None, to_email_address=None
+        )
+        assert asked_in_a_transaction == [], "nothing is asked while the transaction is open"
+    assert asked_in_a_transaction == [False]

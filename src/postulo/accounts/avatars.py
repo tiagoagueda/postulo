@@ -32,6 +32,7 @@ from decimal import ROUND_DOWN, Decimal
 
 from django.contrib import messages
 from django.core.files.base import ContentFile
+from django.db import transaction
 from django.utils import timezone
 from django.utils.formats import number_format
 from django.utils.text import get_text_list
@@ -172,20 +173,24 @@ def fetch_gravatar(profile) -> str:
 
     One request, from the server, when the person asks — never from a page view. A 404 is
     the normal answer for most addresses and leaves the initials showing.
+
+    The request is made first and holds no transaction; what it brought back is written in
+    one of its own (#357), so a caller must not be inside one while it waits.
     """
     outcome = "error"
     try:
         with http.client(timeout=8.0) as client:
             response = client.get(gravatar_url(profile.user.email))
-        if response.status_code == 404:
-            if profile.gravatar_image:
-                profile.gravatar_image.delete(save=False)
-            outcome = "none"
-        elif response.status_code == 200 and response.content:
-            store(profile, "gravatar_image", process(response.content), "gravatar")
-            outcome = "found"
-        else:
-            logger.warning("Gravatar answered %s for %s", response.status_code, profile.user_id)
+        with transaction.atomic():
+            if response.status_code == 404:
+                if profile.gravatar_image:
+                    profile.gravatar_image.delete(save=False)
+                outcome = "none"
+            elif response.status_code == 200 and response.content:
+                store(profile, "gravatar_image", process(response.content), "gravatar")
+                outcome = "found"
+            else:
+                logger.warning("Gravatar answered %s for %s", response.status_code, profile.user_id)
     except Exception:
         logger.exception("Gravatar could not be fetched for user %s", profile.user_id)
     profile.gravatar_checked_at = timezone.now()

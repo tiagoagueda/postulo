@@ -46,6 +46,10 @@ SLOW = [
     # Each waits on a remote host and writes in short transactions of its own (#357).
     ("resume:link_check", (1,)),
     ("resume:link_check_all", ()),
+    ("jobs:company_create", ()),
+    ("jobs:company_update", (1,)),
+    ("accounts:avatar_refresh", ()),
+    ("accounts:profile", ()),
 ]
 
 #: Ordinary pages, which stay inside the request's transaction. Listed so that a future

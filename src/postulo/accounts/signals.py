@@ -6,6 +6,7 @@ from allauth.account.models import EmailAddress
 from allauth.account.signals import email_changed, user_signed_up
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
+from django.db import transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
@@ -99,4 +100,6 @@ def gravatar_follows_the_primary_address(
     # Read afresh: the instance cached on the user may predate the person opting in.
     profile = Profile.objects.filter(user=user).first()
     if profile is not None and profile.use_gravatar:
-        avatars.fetch_gravatar(profile)
+        # allauth's view is not ours to take out of its transaction, so the wait on Gravatar
+        # starts once that transaction has committed (#357).
+        transaction.on_commit(lambda: avatars.fetch_gravatar(profile))

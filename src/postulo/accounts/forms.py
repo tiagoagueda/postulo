@@ -687,6 +687,15 @@ class ProfileForm(forms.ModelForm):
 
     #: How the Gravatar fetch went, for the view to word its message: found, none, error, "".
     gravatar_outcome: str = ""
+    #: Set by `save` when the box was just ticked; `fetch_gravatar` then asks, after the
+    #: view's transaction has ended, so the wait on gravatar.com holds no lock (#357).
+    gravatar_to_fetch: bool = False
+
+    def fetch_gravatar(self) -> None:
+        """Ask Gravatar, if `save` saw *Use my Gravatar* switched on. Call outside a transaction."""
+        if self.gravatar_to_fetch:
+            self.gravatar_to_fetch = False
+            self.gravatar_outcome = avatars.fetch_gravatar(self.instance)
 
     def _save_picture(self, profile: Profile) -> None:
         processed = getattr(self, "_processed_picture", None)
@@ -701,7 +710,7 @@ class ProfileForm(forms.ModelForm):
             profile.use_gravatar = wanted
             profile.save(update_fields=["use_gravatar", "updated_at"])
             if wanted:
-                self.gravatar_outcome = avatars.fetch_gravatar(profile)
+                self.gravatar_to_fetch = True
             else:
                 avatars.forget_gravatar(profile)
 

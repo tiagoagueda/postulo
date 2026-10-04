@@ -373,6 +373,10 @@ class LogoFormMixin:
     After, because a logo needs the company's primary key to be filed under; and never
     fatally, because a picture that would not come is no reason to lose everything else
     the person typed. The problem is shown and the company is saved.
+
+    The views that use it are out of the request's transaction (#357): the company and its
+    identifiers are written in the one `atomic` of `CompanyIdentifiersMixin`, `logos.store`
+    writes in its own, and the download between them holds no lock.
     """
 
     def form_valid(self, form):
@@ -385,6 +389,7 @@ class LogoFormMixin:
         return response
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyCreateView(
     LogoFormMixin,
     OwnedObjectMixin,
@@ -404,6 +409,7 @@ class CompanyCreateView(
         return super().form_valid(form)
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyUpdateView(
     LogoFormMixin, OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifiersMixin, UpdateView
 ):

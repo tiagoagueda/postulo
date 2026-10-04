@@ -675,3 +675,35 @@ def test_deleting_a_company_takes_its_logo_and_a_merge_keeps_the_kept_ones(
     kept.refresh_from_db()
     assert kept.logo.name == handed_over
     assert default_storage.exists(handed_over), "the logo the kept company now uses stays"
+
+
+@pytest.mark.django_db(transaction=True)
+def test_the_company_form_downloads_the_logo_outside_any_transaction(
+    client, user, web, atomic_requests, monkeypatch
+):
+    """The logo address is on somebody else's server, and the form must not hold the lock (#357)."""
+    from django.db import connection
+
+    web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
+    seen: list[bool] = []
+    original = logos.download
+
+    def download(url):
+        seen.append(connection.in_atomic_block)
+        return original(url)
+
+    monkeypatch.setattr(logos, "download", download)
+    client.force_login(user)
+    client.post(
+        reverse("jobs:company_create"),
+        {"name": "Black Mesa", "logo_url": "https://cdn.example/logo.png"},
+    )
+    black_mesa = Company.objects.for_user(user).get(name="Black Mesa")
+    assert black_mesa.logo, "the logo still arrives"
+
+    client.post(
+        reverse("jobs:company_update", args=[black_mesa.pk]),
+        {"name": "Black Mesa", "logo_url": "https://cdn.example/other.png"},
+    )
+
+    assert seen == [False, False]

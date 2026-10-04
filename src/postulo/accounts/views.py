@@ -7,6 +7,7 @@ from allauth.account.views import LoginView as AllauthLoginView
 from django.contrib import messages
 from django.contrib.auth import logout
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import (
     Http404,
     HttpRequest,
@@ -33,8 +34,13 @@ from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
 from .models import Invite, Profile, Theme
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
-    """Edit your own details. There is no view of anyone else's."""
+    """Edit your own details. There is no view of anyone else's.
+
+    Out of the request's transaction (#357) so the Gravatar fetch holds no lock: the save is
+    one `atomic` block in `form_valid`, and the fetch follows it.
+    """
 
     model = Profile
     form_class = ProfileForm
@@ -197,8 +203,6 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         return entries
 
     def form_valid(self, form):
-        from django.db import transaction
-
         formset = self.get_identifiers()
         numbers = self.get_numbers()
         addresses = self.get_addresses()
@@ -231,6 +235,9 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
                 addresses.instance = self.object
                 addresses.save()
             self.save_web_links(links, self.object)
+        # After the transaction, which is all of this view's writes: waiting on Gravatar
+        # must not hold the database's write lock (#357).
+        form.fetch_gravatar()
         return self._after_saving(form, response)
 
     def _after_saving(self, form, response):
@@ -330,8 +337,12 @@ class AvatarView(LoginRequiredMixin, View):
         return response
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class GravatarRefreshView(LoginRequiredMixin, View):
-    """Ask Gravatar again, on demand, for one's own picture."""
+    """Ask Gravatar again, on demand, for one's own picture.
+
+    Out of the request's transaction: `fetch_gravatar` writes in one of its own (#357).
+    """
 
     def post(self, request: HttpRequest) -> HttpResponse:
         profile, _created = Profile.objects.get_or_create(user=request.user)
