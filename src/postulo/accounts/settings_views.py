@@ -8,6 +8,7 @@ its own view so that it can grow, and so that a plugin can add one beside them.
 
 from __future__ import annotations
 
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
@@ -178,6 +179,7 @@ class AccountView(SettingsSectionMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         from allauth.mfa.adapter import get_adapter as get_mfa_adapter
+        from allauth.mfa.models import Authenticator
 
         from postulo.notifications import transport
 
@@ -190,6 +192,15 @@ class AccountView(SettingsSectionMixin, UpdateView):
         context["several_addresses"] = addresses.is_offered(self.request.user)
         context["password_url"] = reverse("account_change_password")
         context["mfa_enabled"] = get_mfa_adapter().is_mfa_enabled(self.request.user)
+        # Which second factors there are, so the card words each case truthfully (#428).
+        context["mfa_totp"] = get_mfa_adapter().is_mfa_enabled(
+            self.request.user, [Authenticator.Type.TOTP]
+        )
+        # How long a browser the person marked as trusted is not asked again; None when the
+        # instance does not offer that, so the page never states a number settings do not hold.
+        context["mfa_trust_days"] = (
+            settings.MFA_TRUST_COOKIE_AGE.days if settings.MFA_TRUST_ENABLED else None
+        )
         # A fourth way in, on a page that already explains three (#153).
         context["email_sign_in"] = transport.email_sign_in()
         context["mfa_url"] = reverse("mfa_index")

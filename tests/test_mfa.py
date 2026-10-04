@@ -228,3 +228,31 @@ def test_the_stylesheet_inverts_the_qr_in_the_dark_theme_only():
     assert all("data-theme" in rule for rule in rules), (
         "the QR must only be inverted in the dark theme; on a light page it is already right"
     )
+
+
+def _second_factor_card(html: str) -> str:
+    start = html.index('data-mfa-status="on"')
+    return html[start : html.index("</ul>", start)]
+
+
+def test_a_person_with_only_a_key_is_not_told_they_have_an_authenticator_app(client, person):
+    """#428: the card describes the factors the account has, and the trust window as set."""
+    sign_in(client)
+    Authenticator.objects.create(
+        user=person, type=Authenticator.Type.WEBAUTHN, data={"name": "Laptop", "credential": {}}
+    )
+    card = _second_factor_card(client.get(reverse("settings:account")).content.decode())
+    assert "authenticator app" not in card
+    assert "security key" in card
+    assert "marked this browser as trusted" in card
+    assert "30 days" in card
+    assert "Always" not in card
+
+
+def test_a_person_with_an_app_is_still_told_so(client, person):
+    sign_in(client)
+    activate_totp(client)
+    card = _second_factor_card(client.get(reverse("settings:account")).content.decode())
+    assert "authenticator app" in card
+    assert "marked this browser as trusted" in card
+    assert "Always" not in card

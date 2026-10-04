@@ -17,7 +17,7 @@ are the only one who knows what their provider enforces, and it is off until the
 
 What this never does: it does not remove anybody's TOTP, and it does not apply to a
 password sign-in. Somebody who has a second factor and signs in with a password is asked
-for it, always.
+for it, unless this browser was marked as trusted (`MFA_TRUST_COOKIE_AGE`, 30 days).
 """
 
 from __future__ import annotations
