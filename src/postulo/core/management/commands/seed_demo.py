@@ -20,7 +20,6 @@ import random
 import secrets
 from dataclasses import dataclass
 
-from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from django.contrib.contenttypes.models import ContentType
 from django.core.files.base import ContentFile
@@ -28,6 +27,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from django.utils import timezone
 
+from postulo.accounts.models import vouch_for_address
 from postulo.applications.models import (
     Application,
     Channel,
@@ -299,14 +299,6 @@ class Command(BaseCommand):
                 email=options["email"],
                 password=options["password"] or secrets.token_urlsafe(24),
             )
-        # Nobody will click a verification link for a fictional account; the seeder
-        # vouches for the address so the account can sign in straight away.
-        EmailAddress.objects.update_or_create(
-            user=user,
-            email__iexact=user.email,
-            defaults={"email": user.email, "verified": True, "primary": True},
-        )
-
         has_data = any(
             model.objects.for_user(user).exists()
             for model in (Application, Company, CV, Experience)
@@ -318,6 +310,10 @@ class Command(BaseCommand):
             )
 
         with transaction.atomic():
+            # Nobody will click a verification link for a fictional account; the seeder
+            # vouches for the address so the account can sign in straight away. Only now:
+            # a refused run must leave the account as it found it.
+            vouch_for_address(user)
             if has_data:
                 self._reset(user)
             # Deterministic fixtures, not secrets: the same seed must give the same search.

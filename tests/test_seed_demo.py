@@ -87,3 +87,27 @@ def test_it_creates_the_account_when_asked_to(db, django_user_model):
     user = django_user_model.objects.get(email="fresh@example.org")
     assert user.check_password("pw")
     assert Application.objects.for_user(user).exists()
+
+
+def test_a_refused_run_leaves_the_address_as_it_found_it(db, user):
+    from allauth.account.models import EmailAddress
+
+    EmailAddress.objects.filter(user=user).update(verified=False, primary=False)
+    call_command("seed_demo", user.email, "--no-pdf", verbosity=0)
+    EmailAddress.objects.filter(user=user).update(verified=False)
+
+    with pytest.raises(CommandError, match="already holds"):
+        call_command("seed_demo", user.email, "--no-pdf", verbosity=0)
+
+    assert not EmailAddress.objects.get(user=user, email__iexact=user.email).verified
+
+
+def test_the_account_keeps_exactly_one_primary_address(seeded):
+    from allauth.account.models import EmailAddress
+
+    EmailAddress.objects.filter(user=seeded).update(email="old@example.org", primary=True)
+
+    call_command("seed_demo", seeded.email, "--no-pdf", "--reset", verbosity=0)
+
+    rows = EmailAddress.objects.filter(user=seeded, primary=True)
+    assert [row.email for row in rows] == [seeded.email]

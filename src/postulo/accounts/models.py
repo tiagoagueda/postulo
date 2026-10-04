@@ -34,6 +34,24 @@ ADDRESSING_MAX_LENGTH = 40
 DEFAULT_INVITE_VALIDITY = timedelta(days=14)
 
 
+def vouch_for_address(user) -> None:
+    """Mark ``user.email`` verified and the account's one primary address.
+
+    For an operator at the console, who vouches for the address by typing it. Any other
+    primary row is cleared, so the account never ends with two.
+    """
+    from allauth.account.models import EmailAddress
+
+    EmailAddress.objects.filter(user=user, primary=True).exclude(email__iexact=user.email).update(
+        primary=False
+    )
+    EmailAddress.objects.update_or_create(
+        user=user,
+        email__iexact=user.email,
+        defaults={"email": user.email, "verified": True, "primary": True},
+    )
+
+
 def unique_username(candidate: str, taken) -> str:
     """``candidate``, or ``candidate`` with the smallest numeric suffix not in ``taken``.
 
@@ -91,13 +109,7 @@ class UserManager(DjangoUserManager):
         # all the proof there is going to be, and without it the first account could not
         # sign in until email delivery worked — which is the thing it would be signing in
         # to configure.
-        from allauth.account.models import EmailAddress
-
-        EmailAddress.objects.update_or_create(
-            user=user,
-            email__iexact=user.email,
-            defaults={"email": user.email, "verified": True, "primary": True},
-        )
+        vouch_for_address(user)
         return user
 
 
