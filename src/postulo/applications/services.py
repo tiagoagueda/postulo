@@ -551,17 +551,24 @@ LATER_CHOICES = (LATER_TOMORROW, LATER_NEXT_WEEK)
 LATER_DAYS = {LATER_TOMORROW: 1, LATER_NEXT_WEEK: 7}
 
 
-def later_time(choice: str, *, now=None) -> dt.datetime | None:
+def later_time(choice: str, reminder: Reminder, *, now=None) -> dt.datetime | None:
     """When ``tomorrow`` or ``next week`` falls, keeping the time of day it was set for.
 
-    Measured from *now* and not from the due time, and the hour is carried across rather
-    than reset to midnight: a reminder to ring somebody at ten was set for ten on purpose,
-    and a postponement is a change of day.
+    The day is measured from the person's today and not from the due time, and the hour
+    is the reminder's own, in their zone: a reminder to ring somebody at ten was set for
+    ten on purpose, and a postponement is a change of day. Adding days to the instant
+    would move the local hour across a clock change, so the date is added and the wall
+    time put back. A time a change of clocks skips lands after the gap, and one it
+    repeats takes its first occurrence (`fold=0`, which is what both rules ask for).
     """
     days = LATER_DAYS.get(choice)
     if days is None:
         return None
-    return (now or timezone.now()) + dt.timedelta(days=days)
+    zone = timezone.get_current_timezone()
+    today = timezone.localtime(now or timezone.now(), zone).date()
+    wall = timezone.localtime(reminder.due_at, zone).timetz().replace(tzinfo=None)
+    moved = dt.datetime.combine(today + dt.timedelta(days=days), wall, tzinfo=zone)
+    return moved.astimezone(dt.UTC).astimezone(zone)
 
 
 def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:

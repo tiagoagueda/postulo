@@ -937,7 +937,9 @@ class ReminderLaterView(OwnedObjectMixin, View):
 
     def post(self, request, pk: int) -> HttpResponse:
         reminder = get_object_or_404(self.get_queryset(), pk=pk)
-        due = later_time(request.POST.get("when", "")) or _a_named_day(request.POST.get("due_at"))
+        due = later_time(request.POST.get("when", ""), reminder) or _a_named_day(
+            request.POST.get("due_at")
+        )
         if due is None:
             messages.error(request, _("That is not a time Postulo can read."))
         elif reminder.is_done:

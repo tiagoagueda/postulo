@@ -17,6 +17,7 @@ missing button.
 from __future__ import annotations
 
 import datetime as dt
+from zoneinfo import ZoneInfo
 
 import pytest
 from django.urls import reverse
@@ -394,12 +395,29 @@ def test_a_reminder_already_done_is_left_where_it_is(user):
     assert reminder.due_at == was
 
 
-def test_tomorrow_and_next_week_keep_the_hour_they_were_set_for(user):
-    now = timezone.now()
+def test_tomorrow_keeps_the_hour_the_reminder_was_set_for(user):
+    reminder = a_reminder(user)
+    reminder.due_at = dt.datetime(2026, 10, 20, 10, 0, tzinfo=ZoneInfo("Europe/Paris"))
+    now = dt.datetime(2026, 10, 20, 16, 40, tzinfo=ZoneInfo("Europe/Paris"))
 
-    assert later_time("tomorrow", now=now) == now + dt.timedelta(days=1)
-    assert later_time("next_week", now=now) == now + dt.timedelta(days=7)
-    assert later_time("whenever") is None
+    with timezone.override("Europe/Paris"):
+        assert later_time("tomorrow", reminder, now=now) == dt.datetime(
+            2026, 10, 21, 10, 0, tzinfo=ZoneInfo("Europe/Paris")
+        )
+        assert later_time("whenever", reminder) is None
+
+
+def test_next_week_keeps_the_local_hour_across_a_clock_change(user):
+    paris = ZoneInfo("Europe/Paris")
+    reminder = a_reminder(user)
+    reminder.due_at = dt.datetime(2026, 10, 20, 10, 0, tzinfo=paris)
+    now = dt.datetime(2026, 10, 20, 10, 0, tzinfo=paris)
+
+    with timezone.override("Europe/Paris"):
+        later = later_time("next_week", reminder, now=now)
+
+    assert later == dt.datetime(2026, 10, 27, 10, 0, tzinfo=paris)
+    assert later.astimezone(dt.UTC).hour == 9
 
 
 def test_the_row_offers_later_edit_and_delete(client, user, application):
