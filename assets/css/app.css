@@ -900,6 +900,21 @@
     @apply relative overflow-x-auto;
   }
 
+  /*
+   * The Applications board, which scrolls in both directions inside the page (#652). Its
+   * height is bounded to what is left of the window under the masthead, so a column with
+   * two hundred cards is a column to scroll in and not a page 23,000 pixels tall -- and
+   * `position: sticky` on a column's heading, which needs a box that scrolls vertically to
+   * stick to, keeps every name on the screen. Short of that height nothing scrolls
+   * vertically and the box is as tall as its columns. The document still scrolls as it
+   * did: `overscroll-behavior` is left at its default, so a wheel or a key that has taken
+   * the box to its end goes on to the page.
+   */
+  .board-box {
+    overflow-y: auto;
+    max-block-size: calc(100dvh - var(--header-height, 4.25rem) - 2rem);
+  }
+
   /* Weight and an underline as well as the tint (#274): the tint is 1.1:1 against the
      header, which is nothing to somebody who does not see colour well and nothing at all
      under forced colours, where a background is discarded and a text decoration kept. */

@@ -2391,3 +2391,90 @@ def test_a_column_opens_and_folds_in_motion_unless_less_motion_is_asked(
         """() => { const box = document.querySelector('[data-board]');
           return !box.style.height && !box.style.overflowY && !box.style.columnGap; }"""
     )
+
+
+# ------------------------------------------------------- the names stay in view (#652)
+
+#: Each column's name -- an open column's heading, a strip's -- against the board's box and
+#: the window, vertically: the board scrolls sideways at 320, and a name off the side is
+#: the sideways scroll's business, not this one's.
+NAMES_IN_VIEW = """() => {
+  const box = document.querySelector('[data-board]').getBoundingClientRect();
+  const header = document.querySelector('[data-site-header]').getBoundingClientRect();
+  return [...document.querySelectorAll('[data-board-section]')].map((section) => {
+    const name = section.querySelector('h2 a').getBoundingClientRect();
+    return {
+      status: section.dataset.boardSection,
+      inBox: name.top >= box.top - 1 && name.bottom <= box.bottom + 1,
+      inWindow: name.top >= header.bottom - 1 && name.bottom <= innerHeight + 1,
+    };
+  });
+}"""
+
+
+@pytest.mark.parametrize("language", ["en", "ar"])
+@pytest.mark.parametrize("width", [320, 1280])
+def test_every_columns_name_stays_in_view_down_a_long_column(
+    page: Page, live_server, search, language, width
+):
+    """The board is a box of bounded height that scrolls inside the page, so a heading's
+    `position: sticky` has a box to stick to. With two hundred cards in one column, scrolled
+    to the middle and to the end, no column's name -- open or a strip's -- has left the
+    screen, in a right-to-left page too; the box is a named, focusable region; and the
+    document itself is not the thing that grew."""
+    from postulo.applications.models import Application, Status
+    from postulo.jobs.models import Company, JobPosting
+
+    person = search["applicant"]
+    company = Company.objects.create(owner=person, name="Weyland", location="London")
+    for number in range(200):
+        posting = JobPosting.objects.create(owner=person, company=company, title=f"Role {number}")
+        Application.objects.create(owner=person, posting=posting, status=Status.APPLIED)
+    set_language(search, language)
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size({"width": width, "height": 800})
+    page.goto(f"{base}{BOARD}")
+    expect(page.locator("html")).to_have_attribute("dir", "rtl" if language == "ar" else "ltr")
+
+    box = page.locator("[data-board]")
+    expect(box).to_have_attribute("tabindex", "0")
+    expect(box).to_have_attribute("role", "region")
+    assert box.get_attribute("aria-label")
+
+    sizes = page.evaluate(
+        """() => { const b = document.querySelector('[data-board]');
+          return {box: b.clientHeight, content: b.scrollHeight, window: innerHeight}; }"""
+    )
+    assert sizes["box"] <= sizes["window"], sizes
+    assert sizes["content"] > 2 * sizes["window"], (
+        "a column that needs scrolling, or this shows nothing"
+    )
+
+    # Both ends of the page's own scrolling put the box in the window: scroll it into view,
+    # then scroll inside it.
+    box.scroll_into_view_if_needed()
+    for fraction in (0, 0.5, 1):
+        page.evaluate(
+            """(fraction) => { const b = document.querySelector('[data-board]');
+              b.scrollTop = (b.scrollHeight - b.clientHeight) * fraction; }""",
+            fraction,
+        )
+        page.evaluate(
+            """() => { const b = document.querySelector('[data-board]');
+              b.scrollIntoView({block: 'end'}); }"""
+        )
+        names = page.evaluate(NAMES_IN_VIEW)
+        assert [name["status"] for name in names] == statuses()
+        for name in names:
+            assert name["inBox"], (language, width, fraction, name)
+
+    # The keyboard scrolls it, and Tab leaves it rather than being kept inside.
+    box.focus()
+    before = page.evaluate("() => document.querySelector('[data-board]').scrollTop")
+    page.keyboard.press("PageUp")
+    page.wait_for_function(
+        "(before) => document.querySelector('[data-board]').scrollTop < before", arg=before
+    )
+    page.keyboard.press("Tab")
+    assert not page.evaluate("() => document.activeElement.matches('[data-board]')")

@@ -65,6 +65,12 @@
    status: left to its contents it would be called by the control's, and a list of the
    page's headings would be a list of instructions.
 
+   **The board is a box of bounded height that scrolls both ways** (#652, `.board-box`), so a
+   column's heading, which is `sticky`, keeps its name on the screen however far down a long
+   column the box is scrolled; a strip's heading sticks too, its name being its heading. The
+   box is a focusable region with a name (`c-scroll-box`), Tab leaves it, and the page
+   scrolls on from where the box ends. Pure CSS: with scripts off it is the same.
+
    **The columns are centred in their box** while they fit in it, and start at its edge
    when they do not (`justify-center-safe`): centred on a box that scrolls, the first
    column would be off its start edge, where no scrolling reaches. `app.js` brings the open
@@ -107,7 +113,7 @@
   </p>
 {% endif %}
 
-<c-scroll-box class="flex justify-center-safe pb-4 {% if folded %}gap-2{% else %}gap-4{% endif %}" label="{% translate 'Board' %}" data-board data-board-filters="application-filters">
+<c-scroll-box class="board-box grid auto-cols-max grid-flow-col justify-center-safe pb-4 {% if folded %}gap-2{% else %}gap-4{% endif %}" label="{% translate 'Board' %}" data-board data-board-filters="application-filters">
   {% for column in columns %}
     {% comment %} A strip is as wide as one line of text and the room round it, and as tall
        as its name is long: the name is written down it, so no language's word for a
@@ -136,7 +142,7 @@
        which the page's content security policy refuses. {% endcomment %}
     <section class="shrink-0 {% if column.open %}w-72{% else %}relative rounded-lg border border-ink-200 pb-2 dark:border-ink-800{% endif %}"
              data-board-section="{{ column.status }}"{% if not column.open %} data-board-strip{% endif %}>
-      <div class="flex w-(--board-arrives) {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
+      <div class="sticky top-0 z-10 flex w-(--board-arrives) bg-ink-50 dark:bg-ink-950 {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
         <h2 class="text-sm font-medium" aria-label="{{ column.label }}">
           <a id="board-fold-{{ column.status }}" href="{{ column.url }}"
              class="-outline-offset-2 hover:underline {% if column.open %}tap-target -ms-1 gap-1 rounded px-1{% else %}flex justify-center rounded-md px-2.5 pt-2 pb-1 after:absolute after:inset-0{% endif %}"
