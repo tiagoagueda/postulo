@@ -9,7 +9,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.management import call_command
 from django.urls import reverse
 
-from postulo.applications.models import Application, EventKind, Status
+from postulo.applications.models import Application, ApplicationEvent, EventKind, Status
 from postulo.core import csv_import
 from postulo.jobs.models import Company, JobPosting, ListingState
 
@@ -327,3 +327,15 @@ def test_the_command_shows_maps_dry_runs_and_imports(user, tmp_path, capsys):
     assert Application.objects.for_user(user).filter(posting__location="").count() == 2, (
         "Lieu was ignored"
     )
+
+
+def test_a_very_long_file_name_does_not_overflow_the_timeline_columns(user):
+    name = "x" * 246 + ".csv"
+    data = b"Company,Role,Date applied,Status\nAperture,Engineer,2026-09-01,Applied\n"
+    sheet = csv_import.read_sheet(data, name)
+    csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    events = list(ApplicationEvent.objects.filter(application__owner=user))
+    assert events
+    assert all(len(event.actor) <= 120 for event in events)
+    assert all(len(event.summary) <= 250 for event in events)
+    assert any(event.actor.endswith(".csv") for event in events), "the extension survives"

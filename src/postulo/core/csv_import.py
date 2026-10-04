@@ -933,6 +933,16 @@ class CsvReport:
         return lines
 
 
+def _short_file_name(name: str, limit: int = 80) -> str:
+    """A file name cut to ``limit`` characters, keeping the extension (#463)."""
+    if len(name) <= limit:
+        return name
+    stem, dot, extension = name.rpartition(".")
+    if not dot or len(extension) > 10:
+        return name[: limit - 1] + "…"
+    return stem[: limit - len(extension) - 2] + "…." + extension
+
+
 def perform(
     user, sheet: Sheet, mapping: list[str], *, day_first: bool = True, currency: str = "EUR"
 ) -> CsvReport:
@@ -949,7 +959,7 @@ def perform(
     from postulo.jobs.models import Company, JobPosting, SalaryPeriod
 
     report = CsvReport(filename=sheet.filename, rows=sheet.row_count)
-    provenance = str(_("Imported from %(file)s") % {"file": sheet.filename})
+    provenance = str(_("Imported from %(file)s") % {"file": _short_file_name(sheet.filename)})
 
     with transaction.atomic():
         for row in parse_rows(sheet, mapping, day_first=day_first, currency=currency):

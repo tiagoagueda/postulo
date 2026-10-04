@@ -54,6 +54,9 @@ def record_event(
     ``actor`` names who wrote it when it was not the person themselves — an API token, an
     import — so the timeline shows what an agent did and the person can undo it by hand.
     """
+    # Clip to the columns: PostgreSQL refuses what SQLite stores silently (#463).
+    summary = summary[: ApplicationEvent._meta.get_field("summary").max_length]
+    actor = actor[: ApplicationEvent._meta.get_field("actor").max_length]
     return ApplicationEvent.objects.create(
         application=application,
         kind=kind,

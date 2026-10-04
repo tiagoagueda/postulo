@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A long spreadsheet file name no longer overflows the timeline's actor and summary columns, which made the import fail on PostgreSQL. (#463)
 - Spreadsheet import no longer mistakes "Applied through" or "Deadline date" for the applied date, so the channel, deadline and real "Date applied" columns are guessed correctly in any column order. (#465)
 - Editing a reminder that was put off with Later or Snooze no longer announces it a second time when only its wording changes; those times are now stored to the minute, as the edit form shows them. (#445)
 - Moving an application's status now decides applied_at and closed_at from the locked row, so two concurrent moves no longer leave an open application closed, re-stamp the applied date, or leave a withdrawn one without a close date. (#543)
