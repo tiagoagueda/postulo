@@ -147,9 +147,9 @@ def due_connections(now=None):
     now = now or timezone.now()
     return [
         connection
-        for connection in Connection.objects.filter(kind="sync", enabled=True).select_related(
-            "owner"
-        )
+        for connection in Connection.objects.filter(
+            kind="sync", enabled=True, owner__is_active=True
+        ).select_related("owner")
         if is_due(connection, now)
     ]
 

@@ -50,6 +50,9 @@ def notify(user, notification: Notification | Callable[[], Notification]) -> int
     own typing — a reminder they wrote for themselves — passes the notification as it
     always did (#223).
     """
+    # A deactivated account is sent nothing, whoever asks (#575).
+    if not user.is_active:
+        return 0
     language = language_for(user)
     with languages.override(language):
         message = notification() if callable(notification) else notification

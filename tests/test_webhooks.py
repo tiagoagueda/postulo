@@ -432,3 +432,21 @@ def test_the_test_button_posts_one_signed_request(user):
         result = plugin.test({"url": "https://hooks.example.org/x", "secret": SECRET}, user)
 
     assert result.ok and seen["event"] == "test" and seen["body"]["event"] == "test"
+
+
+def test_a_deactivated_account_has_no_deliveries_pending_and_gets_no_new_ones(user):
+    """The rows wait, so reactivating resumes them; `notify` itself queues nothing (#575)."""
+    webhook_connection(user)
+    message = Notification(event="reminder_due", title="Chase them", key="reminder:1")
+    assert notify(user, message) == 1
+    assert webhooks.pending().count() == 1
+
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+    assert list(webhooks.pending()) == []
+    assert notify(user, message.but(key="reminder:2")) == 0
+    assert WebhookDelivery.objects.count() == 1
+
+    user.is_active = True
+    user.save(update_fields=["is_active"])
+    assert webhooks.pending().count() == 1

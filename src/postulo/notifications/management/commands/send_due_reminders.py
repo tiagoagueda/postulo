@@ -48,6 +48,8 @@ def announce_due_reminders() -> tuple[int, int]:
     due = (
         Reminder.objects.outstanding()
         .filter(due_at__lte=now, notified_at__isnull=True)
+        # A deactivated account is not announced to; the reminder waits for reactivation (#575).
+        .filter(owner__is_active=True)
         .select_related("owner", "application", "application__posting__company")
     )
     stamped = 0

@@ -515,3 +515,19 @@ def test_references_travel_in_the_export_and_survive_an_import(user, other_user)
     assert copy.next_attempt_at is None, "nothing to retry: it is a record, not a job"
     restored_render = next(one for one in restored if isinstance(one.document, RenderedDocument))
     assert upload.pk != copy.document_id and render.pk != restored_render.document_id
+
+
+def test_a_deactivated_account_has_no_copies_sent(user):
+    """The copies stay queued, so reactivating resumes them (#575)."""
+    a_store(user)
+    an_upload(user)
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+
+    assert list(archiving.pending_copies()) == []
+    assert send_pending() == (0, 0)
+    assert ShelfStore.received == []
+
+    user.is_active = True
+    user.save(update_fields=["is_active"])
+    assert send_pending() == (1, 0)

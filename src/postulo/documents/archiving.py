@@ -182,6 +182,8 @@ def pending_copies(now=None):
         # which is what retiring a connection promises. A copy whose connection row is gone
         # is still picked up: it has nothing to wait for, and is told so.
         .exclude(connection__enabled=False)
+        # A deactivated account's copies wait too, and resume with it (#575).
+        .filter(owner__is_active=True)
         # No join to follow: a generic link is two columns. `document` is fetched per row
         # where a caller needs it, and the batch above is what a list page uses (#130).
         .select_related("connection", "owner")

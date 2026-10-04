@@ -85,6 +85,8 @@ def pending(now=None):
         # A connection that is switched off is not dialled, and its rows wait rather than
         # spending their attempts; switching it on resumes them (#243).
         .exclude(connection__enabled=False)
+        # Nor is one whose owner has been deactivated; reactivating resumes the rows (#575).
+        .filter(owner__is_active=True)
         .select_related("connection", "owner")
         .order_by("next_attempt_at", "pk")
     )

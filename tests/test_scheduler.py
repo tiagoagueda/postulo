@@ -208,3 +208,25 @@ def test_overdue_counts_only_what_is_late_and_pending_only_what_is_due(user):
 
     assert samples("postulo_pending")["reminders"] == 2, "due, not everything ever set"
     assert samples("postulo_overdue")["reminders"] == 1, "late enough to mean something"
+
+
+def test_a_deactivated_account_is_not_sent_its_due_reminders(user, monkeypatch):
+    """Deactivating an account stops what is sent on its behalf; reactivating resumes it (#575)."""
+    reminder = Reminder.objects.create(
+        owner=user, summary="Chase them", due_at=timezone.now() - dt.timedelta(hours=1)
+    )
+    sent = []
+    monkeypatch.setattr(
+        "postulo.notifications.management.commands.send_due_reminders.notify",
+        lambda owner, notification: sent.append(owner) or 1,
+    )
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+
+    assert announce_due_reminders() == (0, 0)
+    assert sent == []
+    assert Reminder.objects.get(pk=reminder.pk).notified_at is None
+
+    user.is_active = True
+    user.save(update_fields=["is_active"])
+    assert announce_due_reminders() == (1, 1)

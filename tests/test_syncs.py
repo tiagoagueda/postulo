@@ -311,3 +311,18 @@ def test_links_are_one_per_record_per_connection_and_die_with_it(user, other_use
     assert link.target is None, (
         "a record deleted here leaves a dangling link for the plugin to clean"
     )
+
+
+def test_a_deactivated_account_is_not_synced(user):
+    """Its connections wait with their rows, and reactivating picks them up again (#575)."""
+    connection = a_sync(user)
+    user.is_active = False
+    user.save(update_fields=["is_active"])
+
+    assert syncing.due_connections() == []
+    assert syncing.run_syncs() == (0, 0)
+    assert MirrorSync.runs == []
+
+    user.is_active = True
+    user.save(update_fields=["is_active"])
+    assert syncing.due_connections() == [connection]
