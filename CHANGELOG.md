@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Bulk Shortlist, Discard and Restore on listings now count only the rows they changed and no longer overwrite the decision date of listings already in the target state. (#508)
 - Dashboard picker: the blurbs of How long they take, Outcomes and Where they came from now describe what those widgets actually show. (#502)
 - The errand page's screen-reader announcement now works: the live region stays in place and only its contents are swapped on each poll, so "done" and "failed" are announced reliably. (#500)
 - Translation catalogues no longer lose entries whose text holds a backslash before n or t, or a carriage return: the .po reader decodes escapes in one pass and the writer escapes carriage returns. (#498)

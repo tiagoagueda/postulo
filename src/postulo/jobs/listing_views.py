@@ -193,12 +193,12 @@ class ListingBulkView(LoginRequiredMixin, View):
         changed = 0
         for listing in rows:
             if action == "shortlist":
-                listing.shortlist()
+                did = listing.shortlist()
             elif action == "discard":
-                listing.discard(reason)
+                did = listing.discard(reason)
             else:
-                listing.restore()
-            changed += 1
+                did = listing.restore()
+            changed += bool(did)
         messages.success(request, bulk.changed(changed, ListingsTable.noun))
         return redirect(self._back(request))
 

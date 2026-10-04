@@ -339,3 +339,27 @@ def test_the_row_still_says_which_state_it_is_in(client, user, company):
     html = client.get(reverse(LIST)).content.decode()
 
     assert re.search(r'data-listing-state="shortlisted"', html)
+
+
+def test_a_sweep_counts_only_the_rows_it_changed_and_keeps_their_dates(client, user, company):
+    """Shortlisting what is already shortlisted changes nothing, so it neither counts
+    nor re-stamps the day the decision was really made (#508)."""
+    fresh = listing(user, company, title="Fresh")
+    done = listing(user, company, title="Done")
+    done.shortlist()
+    stamped = timezone.now() - dt.timedelta(days=30)
+    JobPosting.objects.filter(pk=done.pk).update(decided_at=stamped)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("listings:bulk"),
+        {"chosen": [fresh.pk, done.pk], "bulk-action": "shortlist"},
+        follow=True,
+    )
+
+    assert "1 listing changed." in response.content.decode()
+    done.refresh_from_db()
+    fresh.refresh_from_db()
+    assert done.decided_at == stamped
+    assert fresh.state == ListingState.SHORTLISTED
+    assert fresh.decided_at is not None

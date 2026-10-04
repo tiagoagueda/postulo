@@ -1055,24 +1055,35 @@ class JobPosting(OwnedModel):
     def is_undecided(self) -> bool:
         return self.derived_state in (ListingState.NEW, ListingState.SHORTLISTED)
 
-    def shortlist(self) -> None:
+    def shortlist(self) -> bool:
+        """Shortlist it; False, and nothing touched, when it already was."""
+        if self.state == ListingState.SHORTLISTED:
+            return False
         self.state = ListingState.SHORTLISTED
         self.discard_reason = ""
         self.decided_at = timezone.now()
         self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        return True
 
-    def discard(self, reason: str = "") -> None:
+    def discard(self, reason: str = "") -> bool:
+        """Discard it; False, and the date kept, when it already was, for the same reason."""
+        if self.state == ListingState.DISCARDED and self.discard_reason == reason:
+            return False
         self.state = ListingState.DISCARDED
         self.discard_reason = reason
         self.decided_at = timezone.now()
         self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        return True
 
-    def restore(self) -> None:
-        """Back to new, as if the decision had not been made."""
+    def restore(self) -> bool:
+        """Back to new, as if the decision had not been made; False when it was new already."""
+        if self.state == ListingState.NEW:
+            return False
         self.state = ListingState.NEW
         self.discard_reason = ""
         self.decided_at = None
         self.save(update_fields=["state", "discard_reason", "decided_at", "updated_at"])
+        return True
 
     def close(self) -> None:
         if self.closed_at is None:
