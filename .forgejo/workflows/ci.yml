@@ -44,6 +44,10 @@ env:
   # newest, and a lock file read by an unpinned tool is pinned only in name (#233). Bump all
   # three together.
   UV_VERSION: "0.12.17"
+  # The ESCO revision the unit legs download, and the key their copy of it is kept under:
+  # the loader refuses a directory holding two revisions (`jobs/esco.py`), so the key is the
+  # revision and nothing else (#714).
+  ESCO_REVISION: "1.2.1"
 
 jobs:
   browser:
@@ -174,11 +178,27 @@ jobs:
         # its `.mo` exists, and the `.mo` files are not committed.
         run: uv run python scripts/messages.py compile
 
+      - name: Keep the ESCO classification between runs
+        # Downloading it took half a minute of every leg and asked an outside service
+        # on every push, and a slow or rate-limited answer failed the leg (#714). The
+        # weekly run does not look here, so it always downloads, and that download stays
+        # the check that the API still answers in the shape the loader reads.
+        id: esco
+        if: github.event_name != 'schedule'
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
+            src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
+          key: esco-${{ env.ESCO_REVISION }}
+
       - name: Download the ESCO classification
         # Not committed: megabytes of reference data, the occupations and the skills, and
         # the fetch validates the files it writes, which is the check that the API still
         # answers in the shape the loader reads and the tests pin.
-        run: uv run manage.py fetch_esco --revision 1.2.1
+        if: steps.esco.outputs.cache-hit != 'true'
+        run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"
         env:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
