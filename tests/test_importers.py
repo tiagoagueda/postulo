@@ -396,3 +396,43 @@ def test_an_importer_that_raises_in_read_says_so_instead_of_a_500(
     assert b"HR-XML failed while reading that file" in response.content
     assert response.context["found"] is None
     assert any("hr-xml" in r.getMessage() for r in caplog.records)
+
+
+def test_a_website_and_an_orcid_no_form_would_accept_are_reported_not_stored(user):
+    """`apply` writes without a form, so it reads each value as its page does; what the
+    page would refuse is named in the report and never printed on the CV (#610)."""
+    from postulo.plugins.api import Record
+    from postulo.resume import importing
+
+    report = importing.apply(
+        user,
+        Record(
+            source="hr-xml",
+            person={"website": "javascript:alert(1)", "orcid": "not-an-orcid"},
+        ),
+    )
+
+    assert not user.profile.web_links.exists()
+    assert not user.profile.identifiers.exists()
+    assert "website" not in report.profile_filled
+    assert "orcid" not in report.profile_filled
+    assert len(report.skipped) == 2
+    assert any("javascript:alert(1)" in line for line in report.skipped)
+    assert any("not-an-orcid" in line for line in report.skipped)
+
+
+def test_a_good_website_and_orcid_are_still_stored(user):
+    from postulo.plugins.api import Record
+    from postulo.resume import importing
+
+    report = importing.apply(
+        user,
+        Record(
+            source="hr-xml",
+            person={"website": "example.com/me", "orcid": "0000-0002-1825-0097"},
+        ),
+    )
+
+    assert report.skipped == []
+    assert user.profile.web_links.get().url == "https://example.com/me"
+    assert user.profile.identifiers.get().value == "0000-0002-1825-0097"

@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- An imported CV's website and ORCID are now checked as the profile forms check them; a value that fails is named in the import report instead of being stored and printed on the CV. (#610)
 - A CV importer plugin that raises in can_handle is now logged and skipped, and one that raises in read shows a message naming it, instead of a 500 that blocked every upload on the import page. (#611)
 - The career preview now shows your Links (title, type and host) after Projects, so "Everything you have written" really lists every career section. (#612)
 - The listing form's Cancel now returns to the listing when editing, and to the company it was opened for (else the Listings page) when adding, instead of always going to Companies. (#628)

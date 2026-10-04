@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
 
 from postulo.accounts import identifiers
@@ -112,6 +113,30 @@ def _write_address(profile, owner, parts: dict) -> bool:
     return True
 
 
+def _clean_website(owner, site: str, report: Report) -> str:
+    """The address as the link form would keep it, or nothing, with a sentence saying why.
+
+    Only an http(s) address is a website: the form's URL field also lets ``ftp`` through,
+    and a record is no place for that.
+    """
+    if not site:
+        return ""
+    from postulo.core.web_links import WebLink, WebLinkForm
+
+    data = {"url": site}
+    form = WebLinkForm(data=data, instance=WebLink(owner=owner, kind=web_links.Kind.WEBSITE))
+    scheme = site.partition(":")[0].lower() if "://" in site else ""
+    if (scheme and scheme not in ("http", "https")) or not form.is_valid():
+        report.skipped.append(
+            str(
+                _("The website “%(value)s” is not a valid address, so it was not added.")
+                % {"value": site[:80]}
+            )
+        )
+        return ""
+    return form.cleaned_data["url"]
+
+
 def apply(owner, record: Record) -> Report:
     """Write what was found. Only ever adds; nothing existing is changed or removed.
 
@@ -158,7 +183,11 @@ def apply(owner, record: Record) -> Report:
         # The website is a row of its own now (#189), filled on the same terms as the
         # number below: only where there is nothing, so an import never overwrites what
         # somebody typed.
-        site = (record.person.get("website") or "").strip()[:500]
+        #
+        # Read the way the page reads it (#610): a record's website is whatever the file
+        # said, and a plugin's is whatever it likes. What the link form would refuse is
+        # reported and not stored, since it would be printed on the CV.
+        site = _clean_website(owner, (record.person.get("website") or "").strip()[:500], report)
         wrote_site = False
         if site and web_links.primary_for(profile, web_links.Kind.WEBSITE) is None:
             web_links.save_only_link(profile, owner, web_links.Kind.WEBSITE, site)
@@ -203,8 +232,20 @@ def apply(owner, record: Record) -> Report:
         # An ORCID somebody already has is theirs; a second one is not an improvement.
         orcid = record.person.get("orcid")
         if orcid and not profile.identifiers.filter(scheme=identifiers.ORCID).exists():
-            PersonIdentifier.objects.create(profile=profile, scheme=identifiers.ORCID, value=orcid)
-            report.profile_filled.append("orcid")
+            try:
+                orcid = identifiers.clean(identifiers.ORCID, str(orcid))
+            except ValidationError:
+                report.skipped.append(
+                    str(
+                        _("The ORCID iD “%(value)s” is not valid, so it was not added.")
+                        % {"value": str(orcid)[:40]}
+                    )
+                )
+            else:
+                PersonIdentifier.objects.create(
+                    profile=profile, scheme=identifiers.ORCID, value=orcid
+                )
+                report.profile_filled.append("orcid")
 
     for field_name in ("first_name", "last_name"):
         value = record.person.get(field_name)
