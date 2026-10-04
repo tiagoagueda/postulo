@@ -224,24 +224,58 @@ def store(
     hold the write lock for (#220). The picture is decoded before this is entered, so what
     the transaction covers is one `UPDATE`.
     """
-    if company.logo:
-        company.logo.delete(save=False)
-    company.logo.save(f"logo-{company.pk}.{extension}", content, save=False)
+    old = company.logo.name if company.logo else ""
+    held = company.logo
+    held.save(f"logo-{company.pk}.{extension}", content, save=False)
+    new = held.name
     company.logo_source = source
     company.logo_source_url = url[:500]
     company.logo_fetched_at = timezone.now()
-    with transaction.atomic():
-        company.save(update_fields=LOGO_FIELDS)
+    try:
+        with transaction.atomic():
+            company.save(update_fields=LOGO_FIELDS)
+    except BaseException:
+        # The row did not take it: the new file is bytes nothing points at, and the old
+        # one is still what the row names, so it stays (#525).
+        held.storage.delete(new)
+        company.logo.name = old
+        raise
+    if old != new:
+        _discard(held.storage, old)
 
 
 def clear(company) -> None:
-    if company.logo:
-        company.logo.delete(save=False)
-    company.logo_source = ""
-    company.logo_source_url = ""
-    company.logo_fetched_at = None
+    """Take the logo off the company: the row first, the file once the change commits."""
+    old = company.logo.name if company.logo else ""
+    storage = company.logo.storage
     with transaction.atomic():
+        company.logo = ""
+        company.logo_source = ""
+        company.logo_source_url = ""
+        company.logo_fetched_at = None
         company.save(update_fields=LOGO_FIELDS)
+    _discard(storage, old)
+
+
+def _discard(storage, name: str) -> None:
+    """Remove a file the row has stopped pointing at, once the change is committed.
+
+    Only when no company row still uses the name -- the rule #217 set for documents.
+    """
+    if not name:
+        return
+
+    def remove() -> None:
+        from .models import Company
+
+        if Company.objects.filter(logo=name).exists():
+            return
+        try:
+            storage.delete(name)
+        except OSError:  # pragma: no cover - a file already gone is the outcome we wanted
+            logger.warning("Could not remove %s from storage", name, exc_info=True)
+
+    transaction.on_commit(remove)
 
 
 def from_url(company, url: str) -> None:

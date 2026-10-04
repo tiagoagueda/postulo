@@ -9,9 +9,11 @@ view, which companies this person is looking at and when. Everything below exist
 from __future__ import annotations
 
 import io
+from types import SimpleNamespace
 
 import httpx
 import pytest
+from django.db import DatabaseError, OperationalError
 from django.urls import reverse
 from PIL import Image
 
@@ -567,3 +569,83 @@ def test_an_icons_sizes_are_read_in_time_that_follows_their_length():
     assert logos._largest("1" * 400_000 + "x16") == 0, "no size is 400,000 digits long"
     assert logos._largest("7" * 200_000 + " 48x48") == 48
     assert time.perf_counter() - started < 2.0
+
+
+# ------------------------------------------------------- a failed save keeps the files (#525)
+
+
+def _stored(company, extension="png"):
+    from django.core.files.base import ContentFile
+
+    logos.store(company, ContentFile(an_image()), source="upload", extension=extension)
+    company.refresh_from_db()
+    return company.logo.name
+
+
+def test_clearing_a_logo_whose_row_cannot_be_saved_keeps_the_file(company, monkeypatch):
+    name = _stored(company)
+    storage = company.logo.storage
+
+    def fail(*args, **kwargs):
+        raise OperationalError("database is locked")
+
+    monkeypatch.setattr(Company, "save", fail)
+    with pytest.raises(OperationalError):
+        logos.clear(company)
+    assert storage.exists(name)
+
+
+def test_storing_a_logo_whose_row_cannot_be_saved_leaves_no_new_file(company, monkeypatch):
+    from django.core.files.base import ContentFile
+
+    name = _stored(company)
+    storage = company.logo.storage
+    before = set(storage.listdir(name.rpartition("/")[0])[1])
+
+    def fail(*args, **kwargs):
+        raise OperationalError("database is locked")
+
+    monkeypatch.setattr(Company, "save", fail)
+    with pytest.raises(OperationalError):
+        logos.store(company, ContentFile(b"<svg/>"), source="upload", extension="svg")
+    assert storage.exists(name)
+    assert set(storage.listdir(name.rpartition("/")[0])[1]) == before
+
+
+def test_a_replaced_logo_leaves_only_the_new_file_once_committed(
+    company, django_capture_on_commit_callbacks
+):
+    from django.core.files.base import ContentFile
+
+    old = _stored(company)
+    storage = company.logo.storage
+    with django_capture_on_commit_callbacks(execute=True):
+        logos.store(company, ContentFile(b"<svg/>"), source="upload", extension="svg")
+    company.refresh_from_db()
+    assert company.logo.name != old and storage.exists(company.logo.name)
+    assert not storage.exists(old)
+
+
+def test_a_cleared_logo_is_removed_once_committed(company, django_capture_on_commit_callbacks):
+    name = _stored(company)
+    storage = company.logo.storage
+    with django_capture_on_commit_callbacks(execute=True):
+        logos.clear(company)
+    assert not storage.exists(name)
+
+
+def test_finding_a_logo_for_a_company_deleted_meanwhile_is_refused(company, monkeypatch):
+    from postulo.core.errands import Refused
+    from postulo.jobs import slow
+
+    def gone(company, url):
+        Company.objects.filter(pk=company.pk).delete()
+        raise DatabaseError("Save with update_fields did not affect any rows.")
+
+    monkeypatch.setattr(logos, "find_on_website", lambda c: gone(c, ""))
+
+    errand = SimpleNamespace(
+        payload={"company_id": company.pk, "action": "website"}, owner_id=company.owner_id
+    )
+    with pytest.raises(Refused):
+        slow.find_a_logo(errand)

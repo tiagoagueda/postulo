@@ -14,6 +14,7 @@ and a question asked after the work is a question asked too late.
 
 from __future__ import annotations
 
+from django.db import DatabaseError
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core.errands import Refused, handler
@@ -153,5 +154,10 @@ def find_a_logo(errand) -> dict:
             raise Refused(_("Postulo does not know how to do that to a logo."))
     except logos.UnusableLogo as error:
         raise Refused(str(error)) from error
+    except DatabaseError as error:
+        # Deleted while the fetch was running: the save found no row (#525).
+        if Company.objects.filter(pk=company.pk).exists():
+            raise
+        raise Refused(_("That company is no longer here.")) from error
 
     return {"message": str(message), "url": company.get_absolute_url()}

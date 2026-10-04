@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company's logo file is now kept until the change to its row commits, so a failed save no longer leaves a missing or orphaned logo; Find logo on a company deleted meanwhile is refused cleanly. (#525)
 - Adding a contact to a department now reuses the company's existing team when the typed name differs only in capitals, instead of creating a duplicate department. (#528)
 - Changing a company's parent now counts the companies already under it, so an ownership chain built from the bottom up can no longer grow past the ten-deep cap. (#532)
 - `manage.py fetch_esco` now deletes the ESCO files of the revision it replaces once the new ones are written, and `manage.py check` reports two revisions of either file, so an upgrade no longer breaks saving listings. (#535)
