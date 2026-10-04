@@ -485,3 +485,27 @@ def test_renaming_a_company_onto_a_taken_name_is_refused(client, user, search):
         client, f"/api/v1/companies/{search['company'].pk}", {"name": "APERTURE science"}, **bearer
     )
     assert response.status_code == 200
+
+
+def test_a_listing_currency_is_checked_and_stored_in_capitals(client, user, search):
+    """The listing endpoint held the currency to three characters only (#446)."""
+    bearer = issue(user, "write", "read")
+    before = JobPosting.objects.count()
+    refused = post(
+        client,
+        "/api/v1/listings",
+        {"company_name": "Initech", "title": "Dev", "salary_currency": "eu1"},
+        **bearer,
+    )
+    assert refused.status_code == 422
+    assert "salary_currency" in json.dumps(refused.json())
+    assert JobPosting.objects.count() == before
+
+    made = post(
+        client,
+        "/api/v1/listings",
+        {"company_name": "Initech", "title": "Dev", "salary_currency": "eur"},
+        **bearer,
+    )
+    assert made.status_code == 201
+    assert JobPosting.objects.get(pk=made.json()["id"]).salary_currency == "EUR"

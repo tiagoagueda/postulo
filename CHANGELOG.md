@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- New application, new listing and capture review, and the listing API, now refuse a salary currency that is not three letters and store it in capitals, so the listing's edit form no longer rejects it later. (#446)
 - An identifier pasted with an unbalanced "[" in its address is now refused with the format message instead of crashing the page, API call or import with a server error. (#460)
 - A spreadsheet import with a cell over 128 KiB, usually from an unclosed quotation mark, now says the file could not be read instead of giving a server error. (#462)
 - A long spreadsheet file name no longer overflows the timeline's actor and summary columns, which made the import fail on PostgreSQL. (#463)

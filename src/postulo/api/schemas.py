@@ -14,6 +14,7 @@ import datetime as dt
 from decimal import Decimal
 from typing import Annotated
 
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from ninja import Field, Schema
 from pydantic import AfterValidator, BeforeValidator
@@ -23,6 +24,7 @@ from postulo.core import phones
 from postulo.core.addresses import web_address
 from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
+from postulo.jobs.models import currency_code
 
 #: An address that is going to be stored and later drawn as a link. The routers set these
 #: with ``setattr`` rather than through a form, so this annotation is where the check the
@@ -135,6 +137,20 @@ def _a_country(value: str) -> str:
 
 #: The country a national telephone number is in (#304).
 PhoneCountry = Annotated[str, AfterValidator(_a_country)]
+
+
+def _a_currency(value: str) -> str:
+    """Three letters in capitals, as `JobPosting.salary_currency` holds them (#446); or nothing."""
+    code = (value or "").strip().upper()
+    try:
+        currency_code(code)
+    except ValidationError as refusal:
+        raise ValueError(refusal.messages[0]) from refusal
+    return code
+
+
+#: A currency a salary is stated in.
+CurrencyCode = Annotated[str, AfterValidator(_a_currency)]
 
 
 class PhoneNumberOut(Schema):
@@ -424,7 +440,7 @@ class ListingIn(Schema):
     source: str = Field(default="", max_length=120)
     salary_min: Decimal | None = None
     salary_max: Decimal | None = None
-    salary_currency: str = Field(default="EUR", max_length=3)
+    salary_currency: CurrencyCode = Field(default="EUR", max_length=3)
     salary_period: str = Field(default="year", max_length=10)
     closes_at: dt.date | None = None
     description: str = ""

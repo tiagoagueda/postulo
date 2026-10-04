@@ -18,6 +18,7 @@ from postulo.jobs.models import (
     JobPosting,
     RemoteType,
     SalaryPeriod,
+    currency_code,
 )
 
 from .models import (
@@ -196,6 +197,11 @@ class PostingIntakeForm(UserAwareForm):
         widget=forms.Textarea(attrs={"rows": 8}),
         help_text=POSTING_HELP["description"],
     )
+
+    def clean_salary_currency(self) -> str:
+        code = (self.cleaned_data.get("salary_currency") or "").strip().upper()
+        currency_code(code)
+        return code
 
     def clean(self):
         cleaned = super().clean()

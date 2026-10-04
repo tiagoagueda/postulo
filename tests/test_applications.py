@@ -355,3 +355,40 @@ def test_an_event_belonging_to_someone_else_is_not_visible(db, user, other_user,
 
     assert ApplicationEvent.objects.for_user(user).count() == 1
     assert ApplicationEvent.objects.for_user(other_user).count() == 0
+
+
+def test_intake_refuses_a_currency_that_is_not_a_code(client, user):
+    """The form stored any three characters, which the listing's own form then refused (#446)."""
+    client.force_login(user)
+    data = {
+        "company_name": "Black Mesa",
+        "title": "Research Engineer",
+        "status": Status.APPLIED,
+        "priority": "2",
+        "salary_period": "year",
+    }
+    response = client.post(reverse("applications:create"), {**data, "salary_currency": "eu1"})
+
+    assert response.status_code == 200
+    assert "salary_currency" in response.context["form"].errors
+    assert not Application.objects.for_user(user).exists()
+
+
+def test_intake_stores_the_currency_in_capitals(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("applications:create"),
+        {
+            "company_name": "Black Mesa",
+            "title": "Research Engineer",
+            "status": Status.APPLIED,
+            "priority": "2",
+            "salary_currency": " eur ",
+            "salary_period": "year",
+        },
+    )
+
+    assert response.status_code == 302, response.context["form"].errors
+    posting = Application.objects.for_user(user).get().posting
+    assert posting.salary_currency == "EUR"
+    posting.full_clean()
