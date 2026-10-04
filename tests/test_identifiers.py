@@ -65,6 +65,7 @@ def test_a_pasted_value_is_tidied_into_the_canonical_id(scheme, raw, value):
         ("wikidata", "Q0"),
         ("wikidata", "P31"),
         ("wikidata", "https://www.wikidata.org/wiki/Property:P31"),
+        ("wikidata", "https://[wikidata.org/x"),  # an unbalanced bracket in the host (#460)
         ("lei", "HWUPKR0MPOU8FGXBT395"),  # check digits do not match
         ("lei", "TOOSHORT"),
         ("register", "501234567"),  # no country

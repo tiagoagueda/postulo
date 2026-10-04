@@ -219,7 +219,10 @@ def hosted_by(url: str, scheme: Scheme) -> bool:
     Checked before anything is lifted out of a pasted address, so a link on somebody
     else's site cannot be read as an identifier of this kind.
     """
-    host = (urlsplit(url).hostname or "").lower()
+    try:
+        host = (urlsplit(url).hostname or "").lower()
+    except ValueError:  # an unbalanced "[" in the host: not an address at all (#460)
+        return False
     return any(host == known or host.endswith("." + known) for known in scheme.hosts)
 
 
@@ -227,7 +230,10 @@ def value_from_url(url: str, scheme: Scheme, *, segments: int = 1) -> str | None
     """The identifier inside a pasted URL, or nothing if it is not one of the scheme's."""
     if "://" not in url or not (scheme.url_paths or scheme.query) or not hosted_by(url, scheme):
         return None
-    parts = urlsplit(url)
+    try:
+        parts = urlsplit(url)
+    except ValueError:
+        return None
     if scheme.query:
         wanted = {name.lower() for name in scheme.query}
         for name, found in parse_qs(parts.query).items():

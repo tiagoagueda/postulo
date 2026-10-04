@@ -252,6 +252,34 @@ def test_a_wrong_checksum_is_refused_with_the_reason(client, user):
     assert not user.profile.identifiers.exists()
 
 
+def test_an_address_with_an_unbalanced_bracket_is_refused_not_a_crash(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "",
+            "last_name": "",
+            "headline": "",
+            "phone_0": "",
+            "phone_1": "",
+            "location": "",
+            "website": "",
+            "linkedin_url": "",
+            "source_repo_url": "",
+            "identifiers-TOTAL_FORMS": "1",
+            "identifiers-INITIAL_FORMS": "0",
+            "identifiers-MIN_NUM_FORMS": "0",
+            "identifiers-MAX_NUM_FORMS": "1000",
+            "identifiers-0-scheme": identifiers.ORCID,
+            "identifiers-0-value": "https://[orcid.org/0000-0002-1825-0097",
+            "identifiers-0-label": "",
+        },
+    )
+
+    assert response.status_code == 200
+    assert not user.profile.identifiers.exists()
+
+
 # ---------------------------------------------------------------------- on a CV
 
 
