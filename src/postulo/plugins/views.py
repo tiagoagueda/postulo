@@ -12,9 +12,11 @@ import re
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html_join
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -447,8 +449,13 @@ class ConnectionBackfillView(OwnedObjectMixin, View):
         return redirect("connections:list")
 
 
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
 class ConnectionSyncNowView(OwnedObjectMixin, View):
-    """*Sync now*: run a sync connection at once rather than on its interval."""
+    """*Sync now*: run a sync connection at once rather than on its interval.
+
+    Not atomic, so that the connection's lease is committed the moment it is taken and a
+    scheduler pass in another process sees it (#586).
+    """
 
     def get_queryset(self):
         return Connection.objects.for_user(self.request.user).of_kind("sync")
@@ -458,7 +465,9 @@ class ConnectionSyncNowView(OwnedObjectMixin, View):
 
         connection = get_object_or_404(self.get_queryset(), pk=pk)
         report = sync_connection(connection)
-        if report.error:
+        if report.already_running:
+            messages.info(request, report.notes[0])
+        elif report.error:
             messages.error(request, _("Sync failed: %(error)s") % {"error": report.error})
         else:
             messages.success(request, _("Synced: %(summary)s.") % {"summary": report.summary()})

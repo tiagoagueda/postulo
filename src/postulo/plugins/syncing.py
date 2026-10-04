@@ -17,6 +17,7 @@ from __future__ import annotations
 import logging
 import time
 
+from django.core.cache import cache
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -34,6 +35,9 @@ INTERVALS = (
     ("1440", _("Once a day")),
 )
 DEFAULT_INTERVAL = "60"
+
+#: How long a connection's lease lasts if the run holding it dies without letting go.
+LEASE_SECONDS = 15 * 60
 
 
 def kind_specs() -> list[FieldSpec]:
@@ -67,8 +71,34 @@ def is_due(connection: Connection, now=None) -> bool:
     return elapsed >= interval_minutes(connection)
 
 
+def lease_key(connection: Connection) -> str:
+    return f"postulo:sync:{connection.pk}"
+
+
 def sync_connection(connection: Connection) -> SyncReport:
-    """Run one connection's plugin once, and record how it went. Never raises."""
+    """Run one connection's plugin once, and record how it went. Never raises.
+
+    One connection runs once at a time: a plugin decides what to push and what to adopt
+    from the links it read at the start, so two overlapping runs would each do the other's
+    work again. The run that cannot take the connection's lease returns a report that says
+    so, without calling the plugin and without touching the connection (#586). The lease
+    is in the cache, which is a table of the same database, so a caller inside a
+    transaction would not make it visible to anyone else until it ended; *Sync now* is
+    therefore not atomic.
+    """
+    key = lease_key(connection)
+    if not cache.add(key, timezone.now().isoformat(), LEASE_SECONDS):
+        return SyncReport(
+            notes=[str(_("A sync of this connection is already running."))],
+            already_running=True,
+        )
+    try:
+        return _run_connection(connection)
+    finally:
+        cache.delete(key)
+
+
+def _run_connection(connection: Connection) -> SyncReport:
     now = timezone.now()
     plugin = connection.plugin_instance
     if plugin is None:

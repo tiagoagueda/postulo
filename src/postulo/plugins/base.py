@@ -855,6 +855,9 @@ class SyncReport:
     skipped: int = 0
     notes: list[str] = field(default_factory=list)
     error: str = ""
+    #: Set by Postulo, never by a plugin: this run did not start because the same
+    #: connection was already being synced (#586).
+    already_running: bool = False
 
     def summary(self) -> str:
         parts = []

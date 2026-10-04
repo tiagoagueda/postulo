@@ -7,6 +7,7 @@ import io
 from typing import ClassVar
 
 import pytest
+from django.core.cache import cache
 from django.core.management import call_command
 from django.urls import reverse
 from django.utils import timezone
@@ -29,6 +30,7 @@ class MirrorSync:
     label = "Mirror"
     runs: ClassVar[list[dict]] = []
     fail_with: ClassVar[str | None] = None
+    during: ClassVar[object] = None
 
     def config_fields(self):
         return [FieldSpec("url", "Server", type="url")]
@@ -37,6 +39,9 @@ class MirrorSync:
         return Outcome(True, "mirrored")
 
     def sync(self, connection, config):
+        if MirrorSync.during:
+            MirrorSync.during()
+            return SyncReport()
         MirrorSync.runs.append(config)
         if MirrorSync.fail_with:
             raise RuntimeError(MirrorSync.fail_with)
@@ -62,6 +67,7 @@ class MirrorSync:
 def mirror():
     MirrorSync.runs = []
     MirrorSync.fail_with = None
+    MirrorSync.during = None
     registry.register_builtin("sync", MirrorSync)
     yield MirrorSync
     registry.unregister_builtin("sync", MirrorSync)
@@ -223,6 +229,39 @@ def test_sync_now_runs_at_once_and_is_private(client, user, other_user):
     MirrorSync.fail_with = "no answer"
     response = client.post(reverse("connections:sync_now", args=[connection.pk]), follow=True)
     assert "Sync failed: RuntimeError: no answer" in response.content.decode()
+
+
+def test_a_connection_runs_once_at_a_time(user, monkeypatch):
+    connection = a_sync(user)
+    inner = []
+    MirrorSync.during = lambda: inner.append(syncing.sync_connection(connection))
+    outer = syncing.sync_connection(connection)
+
+    assert not outer.already_running
+    assert len(inner) == 1 and inner[0].already_running
+    assert "already running" in inner[0].notes[0]
+    assert MirrorSync.runs == [], "the inner call never reached the plugin"
+    assert cache.add(syncing.lease_key(connection), "x", 5), "the lease is gone afterwards"
+    cache.delete(syncing.lease_key(connection))
+
+
+def test_the_lease_is_let_go_when_the_plugin_raises(user):
+    connection = a_sync(user)
+    MirrorSync.fail_with = "boom"
+    assert syncing.sync_connection(connection).error == "RuntimeError: boom"
+    assert cache.add(syncing.lease_key(connection), "x", 5)
+    cache.delete(syncing.lease_key(connection))
+
+
+def test_sync_now_on_a_held_connection_says_so_and_does_not_run(client, user):
+    connection = a_sync(user)
+    cache.add(syncing.lease_key(connection), "x", 60)
+    client.force_login(user)
+    response = client.post(reverse("connections:sync_now", args=[connection.pk]), follow=True)
+    assert "A sync of this connection is already running." in response.content.decode()
+    assert MirrorSync.runs == []
+    connection.refresh_from_db()
+    assert connection.synced_at is None, "a refused run leaves no trace on the connection"
 
 
 # ------------------------------------------------------------------- links
