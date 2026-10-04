@@ -51,42 +51,39 @@ HOME = "postulo.plugins."
 #: either a name that should become part of the surface, or work left to do.
 REACHING_PAST: dict[str, dict[str, str]] = {
     "email": {
-        "postulo.core": "`site`: the instance's name and from-address, for the message it sends",
+        "postulo.core.site": "the instance's name and from-address, for the message it sends",
         # `Notification` used to be reached past the surface as well — by this plugin and by
         # every notifier written outside the core, which is what #229 was about. It is on the
         # surface now, and this plugin imports it from there like anybody else's.
     },
     "browser": {
-        "postulo.notifications": (
-            "`inbox`: where a notification waits for an open tab when it cannot be pushed. A "
+        "postulo.notifications.inbox": (
+            "where a notification waits for an open tab when it cannot be pushed. A "
             "plugin holds no rows, and a notice has to outlive the send that left it, scoped "
             "to its owner by Postulo rather than by the plugin (#209)"
         ),
     },
     "own_mail": {
-        "postulo.core": (
-            "`mail`: the encryption choices, which are how TLS gets onto a session; and "
-            "`mail_auth`: the identity-provider presets a person picks from to sign in with a "
-            "token rather than a password (#151)"
-        ),
         "postulo.core.mail": (
-            "the connection check, and the backend that dials only where it is allowed to "
-            "(#148). One guard for the instance's mail and the person's, rather than two "
-            "that can drift (#149)"
+            "the encryption choices, which are how TLS gets onto a session; the connection "
+            "check; and the backend that dials only where it is allowed to (#148). One guard "
+            "for the instance's mail and the person's, rather than two that can drift (#149)"
+        ),
+        "postulo.core.mail_auth": (
+            "the identity-provider presets a person picks from to sign in with a token rather "
+            "than a password (#151)"
         ),
     },
     "smtp": {
-        "postulo.core": (
-            "`mail` to open an SMTP connection and prove it, and `mail_auth` for the "
-            "instance's own token when it signs in with XOAUTH2 (#151)"
-        ),
         "postulo.core.mail": (
-            "the guarded backend, which is where the server is allowed to dial (#148)"
+            "opening an SMTP connection and proving it, and the guarded backend, which is "
+            "where the server is allowed to dial (#148)"
         ),
+        "postulo.core.mail_auth": ("the instance's own token when it signs in with XOAUTH2 (#151)"),
     },
     "webhook": {
-        "postulo.notifications": (
-            "`webhooks`: where a delivery waits for the scheduler. A plugin holds no rows, and a "
+        "postulo.notifications.webhooks": (
+            "where a delivery waits for the scheduler. A plugin holds no rows, and a "
             "delivery has to outlive the send that left it, scoped to its owner by Postulo rather "
             "than by the plugin -- the browser notifier's reason, for the same kind of row (#240)"
         ),
@@ -98,16 +95,16 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         ),
     },
     "europass": {
-        "postulo.accounts": (
-            "`identifiers`: the schemes an ORCID in a Europass file is checked against. #109 "
+        "postulo.accounts.identifiers": (
+            "the schemes an ORCID in a Europass file is checked against. #109 "
             "would make this a registry of its own"
         ),
         # `Record` used to be reached past the surface as well. It is on it since #105,
         # because a third-party importer has to fill the same one.
     },
     "postal_rules": {
-        "postulo.core": (
-            "`phones.country_name`: the country table, which was built for dialling codes "
+        "postulo.core.phones": (
+            "`country_name`: the country table, which was built for dialling codes "
             "and is the same table an address needs. Two of them would be two things to "
             "keep current (#147)"
         ),
@@ -171,7 +168,8 @@ def reaching(module: str) -> set[str]:
     `europass` keeping its reader beside its declaration is the point of #129 rather than a
     violation of it, so a plugin reaching into its own package does not count.
     """
-    return imports_of(package_of(module), package=module)
+    names = imports_of(package_of(module), package=module)
+    return {SURFACE if name.startswith(f"{SURFACE}.") else name for name in names}
 
 
 def names() -> list[str]:
@@ -284,7 +282,9 @@ def test_no_plugin_postulo_ships_reaches_for_a_model():
     data, and the way not to get it wrong in seven places is not to need it in seven places.
     """
     offenders = {
-        module: sorted(name for name in reaching(module) if name.endswith(".models"))
+        module: sorted(
+            name for name in reaching(module) if name.endswith(".models") or ".models." in name
+        )
         for module in shipped()
     }
 
@@ -546,7 +546,49 @@ def test_the_published_check_reads_a_lazy_import_too(tmp_path):
 
     past = reaching_past_the_surface(package, package="postulo_elsewhere")
 
-    assert past == ["postulo.core"]
+    assert past == ["postulo.core.site"]
+
+
+def test_the_surface_imported_the_way_the_cores_own_tests_import_it_passes(tmp_path):
+    """`from postulo.plugins import api` is the surface, not `postulo.plugins` (#606)."""
+    package = tmp_path / "postulo_elsewhere"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins import api\nfrom postulo.plugins.api import FieldSpec\n",
+        encoding="utf-8",
+    )
+
+    assert_imports_only_the_surface(package, package="postulo_elsewhere")
+
+
+def test_the_rest_of_the_plugins_package_is_not_the_surface(tmp_path):
+    package = tmp_path / "postulo_elsewhere"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.plugins import base, registry\nfrom postulo import plugins\n",
+        encoding="utf-8",
+    )
+
+    assert reaching_past_the_surface(package, package="postulo_elsewhere") == [
+        "postulo.plugins",
+        "postulo.plugins.base",
+        "postulo.plugins.registry",
+    ]
+
+
+def test_an_allowance_admits_the_module_it_names_and_not_its_neighbours(tmp_path):
+    package = tmp_path / "postulo_elsewhere"
+    package.mkdir()
+    (package / "__init__.py").write_text(
+        "from postulo.core import site, models\nfrom postulo.core.site import name\n",
+        encoding="utf-8",
+    )
+
+    past = reaching_past_the_surface(
+        package, package="postulo_elsewhere", allowed={"postulo.core.site": "the name"}
+    )
+
+    assert past == ["postulo.core.models"]
 
 
 def test_the_published_check_does_not_mistake_a_plugins_own_package_for_postulo(tmp_path):

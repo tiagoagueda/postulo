@@ -62,8 +62,16 @@ def _package_parts(path: Path, *, root: Path, package: str) -> list[str]:
     return [*package.split("."), *path.relative_to(root).parts[:-1]]
 
 
+def _within(name: str, entry: str) -> bool:
+    """Whether ``name`` is ``entry`` or inside it: ``a.b.c`` is within ``a.b``, ``a.bc`` is not."""
+    return name == entry or name.startswith(f"{entry}.")
+
+
 def imports_in(path: Path, *, root: Path, package: str) -> set[str]:
-    """Every ``postulo.*`` module one file imports, at any depth, read rather than run.
+    """Every ``postulo.*`` name one file imports, at any depth, read rather than run.
+
+    ``from postulo.core import site`` is ``postulo.core.site``: the module and the name it
+    takes, so that a name can be allowed or refused for itself and not for its package.
 
     ``package`` is the plugin's own dotted name: reaching into itself is not reaching past
     the surface, and a plugin that has become a package is allowed an inside.
@@ -78,7 +86,11 @@ def imports_in(path: Path, *, root: Path, package: str) -> set[str]:
                 module = ".".join([*base, node.module] if node.module else base)
             else:
                 module = node.module or ""
-            names = [module]
+            # What is imported, not only where from: `from postulo.core import site` reaches
+            # `postulo.core.site`, and an allowance for that module says no more than it reads.
+            names = [
+                f"{module}.{alias.name}" if alias.name != "*" else module for alias in node.names
+            ]
         elif isinstance(node, ast.Import):
             names = [alias.name for alias in node.names]
         else:
@@ -91,7 +103,7 @@ def imports_in(path: Path, *, root: Path, package: str) -> set[str]:
 
 
 def imports_of(package_dir: Path | str, *, package: str) -> set[str]:
-    """Every ``postulo.*`` module a whole plugin package imports.
+    """Every ``postulo.*`` name a whole plugin package imports (see `imports_in`).
 
     ``package_dir`` is the directory the package's ``__init__.py`` is in; ``package`` is what
     it is imported as. Every ``.py`` under it is read, because a plugin is more than its
@@ -111,7 +123,12 @@ def reaching_past_the_surface(
     allowed: Mapping[str, str] | Iterable[str] = (),
 ) -> list[str]:
     """What this plugin imports from Postulo that is neither the surface nor written down."""
-    return sorted(imports_of(package_dir, package=package) - {SURFACE} - set(allowed))
+    permitted = [SURFACE, *allowed]
+    return sorted(
+        name
+        for name in imports_of(package_dir, package=package)
+        if not any(_within(name, entry) for entry in permitted)
+    )
 
 
 def unused_allowances(
@@ -125,7 +142,10 @@ def unused_allowances(
     Checked as well as the other direction, because the list is the map of what is left to
     do: an entry nobody removed lets the next real dependency in behind it.
     """
-    return sorted(set(allowed) - imports_of(package_dir, package=package))
+    imported = imports_of(package_dir, package=package)
+    return sorted(
+        entry for entry in set(allowed) if not any(_within(name, entry) for name in imported)
+    )
 
 
 def assert_imports_only_the_surface(
