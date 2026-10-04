@@ -29,8 +29,12 @@ were the only thing that mattered.
   `Cache-Control: no-store`.
 - The browser runs under a strict content security policy: no inline script, no
   third-party origins.
-- Nothing is fetched from the network unless a person asked for it, and never from
-  private addresses unless the operator allowed it.
+- Nothing is fetched from the network on a page view. What is fetched without a person
+  asking is named in the wiki's *Hardening* page: the GeoNames city tables at first
+  start (`POSTULO_SKIP_GEONAMES=1` turns it off), plugin packages on `plugins sync`
+  after an upgrade, deliveries to the connections a person set up, and the update check
+  when `POSTULO_UPDATE_CHECK` is on. Never from private addresses unless the operator
+  allowed it.
 - The test suite contains security tests — ownership sweeps across every view and
   queryset, policy checks, path-traversal and redirect checks — and they fail the build.
 - Dependencies are audited against known vulnerabilities in CI on every run and on a
@@ -72,8 +76,9 @@ is a `docker compose pull`; there is no reason to stay behind.
 
 ## Notes for operators
 
-- Postulo makes no outbound network calls except URL captures you explicitly trigger.
-  There is no telemetry.
+- There is no telemetry. Postulo makes outbound requests only for the features listed in
+  *Hardening* in the wiki, under "Where the server is allowed to dial"; write egress
+  rules and privacy notices from that list, not from the capture feature alone.
 - Uploaded documents are never served directly by the web server; they are delivered
   through an ownership-checked view.
 - Set a strong, unique `POSTULO_SECRET_KEY` and serve the application over HTTPS.

@@ -178,7 +178,7 @@ def harvest(monkeypatch):
 
     def run(pages_to_serve, revision="9.9.9"):
         client = FakeClient(pages_to_serve)
-        monkeypatch.setattr(fetch_esco.httpx, "Client", lambda **kw: client)
+        monkeypatch.setattr(fetch_esco, "public_only_client", lambda **kw: client)
         monkeypatch.setattr(fetch_esco, "LANGUAGES", ("en", "fr"))
         command = fetch_esco.Command()
         command.stdout = io.StringIO()

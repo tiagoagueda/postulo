@@ -27,6 +27,7 @@ import httpx
 from django.core.management.base import BaseCommand, CommandError
 
 from postulo.jobs import places
+from postulo.plugins.http import public_only_client
 
 CITIES_URL = "https://download.geonames.org/export/dump/cities1000.zip"
 COUNTRIES_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
@@ -52,9 +53,10 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options) -> None:
         self.stdout.write("Downloading the GeoNames city dataset from download.geonames.org ...")
-        with httpx.Client(
+        # The guarded client (rule 5 of the threat model): the addresses are fixed, but
+        # this runs at start-up with nobody behind it, and a redirect is checked too.
+        with public_only_client(
             timeout=httpx.Timeout(TIMEOUT, connect=10.0),
-            follow_redirects=True,
             headers={
                 "User-Agent": "postulo fetch_geonames (a self-hosted Postulo provisioning data)",
             },
@@ -135,6 +137,8 @@ class Command(BaseCommand):
         return problems
 
     def _write(self, target, text: str) -> None:
+        # The directory is whatever POSTULO_GEOLOCATIONS_DIR names, and may be new.
+        target.parent.mkdir(parents=True, exist_ok=True)
         temporary = target.with_name(target.name + ".tmp")
         temporary.write_text(text, encoding="utf-8")
         os.replace(temporary, target)

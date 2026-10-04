@@ -148,7 +148,7 @@ def run(monkeypatch, data_dir):
 
     def perform(answers):
         client = FakeClient(answers)
-        monkeypatch.setattr(fetch_geonames.httpx, "Client", lambda **kw: client)
+        monkeypatch.setattr(fetch_geonames, "public_only_client", lambda **kw: client)
         command = fetch_geonames.Command()
         command.stdout = io.StringIO()
         command.stderr = io.StringIO()
@@ -195,7 +195,7 @@ def test_the_download_identifies_itself_the_way_the_policy_asks(monkeypatch, dat
         seen["kwargs"] = kwargs
         return inner
 
-    monkeypatch.setattr(fetch_geonames.httpx, "Client", factory)
+    monkeypatch.setattr(fetch_geonames, "public_only_client", factory)
     command = fetch_geonames.Command()
     command.stdout = io.StringIO()
     command.stderr = io.StringIO()
@@ -235,3 +235,42 @@ def test_a_table_missing_a_required_city_is_not_the_table(run, data_dir):
     with pytest.raises(CommandError, match="Lisbon is not in the table"):
         run(answers_for(cities="\n".join(rows) + "\n"))
     assert not (data_dir / places.CITIES_FILE).exists()
+
+
+def test_the_download_goes_through_the_guarded_client(monkeypatch, data_dir):
+    """Rule 5 of the threat model: an outbound request is made by `postulo.plugins.http`,
+    which refuses private addresses, redirects included (#366)."""
+    built = []
+
+    def spy(**kwargs):
+        built.append(kwargs)
+        return FakeClient(answers_for())
+
+    monkeypatch.setattr(fetch_geonames, "public_only_client", spy)
+    command = fetch_geonames.Command()
+    command.stdout = io.StringIO()
+    command.handle()
+    assert len(built) == 1
+
+
+def test_the_real_client_is_the_guarded_one(monkeypatch, data_dir):
+    """Unpatched, the command's client carries the destination guard as a request hook."""
+    from postulo.plugins import http
+
+    seen = {}
+
+    def fake_build(guard, timeout, kwargs, **options):
+        seen["guard"] = guard
+        return FakeClient(answers_for())
+
+    monkeypatch.setattr(http, "_build", fake_build)
+    command = fetch_geonames.Command()
+    command.stdout = io.StringIO()
+    command.handle()
+    assert seen["guard"] is http._public_only
+
+
+def test_the_tables_are_written_into_a_directory_that_does_not_exist_yet(tmp_path):
+    target = tmp_path / "maps" / "deeper" / places.CITIES_FILE
+    fetch_geonames.Command()._write(target, "table")
+    assert target.read_text(encoding="utf-8") == "table"

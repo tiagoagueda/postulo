@@ -21,10 +21,15 @@ fi
 
 # The offline city table the map places company locations from: fetched once, into the
 # data volume where POSTULO_GEOLOCATIONS_DIR points, and kept there across upgrades.
-# A start-up without a network is a map without dots until one returns, and the map
-# page says the dataset is not there; the rest of Postulo does not care.
-if [ ! -f /app/data/geonames/geonames-cities1000.txt ]; then
-    mkdir -p /app/data/geonames
+# This is the one request Postulo makes with nobody asking for it, to
+# download.geonames.org, through the same guarded client as every other. A start-up
+# without a network is a map without dots until one returns, and the map page says the
+# dataset is not there; the rest of Postulo does not care. POSTULO_SKIP_GEONAMES=1
+# turns the download off (put geonames-cities1000.txt and geonames-countryinfo.txt in
+# that directory by hand to have the map anyway).
+geonames_dir="${POSTULO_GEOLOCATIONS_DIR:-/app/data/geonames}"
+if [ "${POSTULO_SKIP_GEONAMES:-}" != "1" ] && [ ! -f "$geonames_dir/geonames-cities1000.txt" ]; then
+    mkdir -p "$geonames_dir"
     python manage.py fetch_geonames || \
         echo "Postulo: the GeoNames city dataset could not be fetched; locations are not placed on the map until it is"
 fi

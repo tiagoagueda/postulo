@@ -253,7 +253,8 @@ log drives the analytics and never lies about history.
 - **Hardened defaults.** `DEBUG=False`, a required `POSTULO_SECRET_KEY`, strict
   `ALLOWED_HOSTS`, secure cookies, a restrictive Content-Security-Policy, a relocatable
   admin path, and invite-only registration.
-- **No telemetry**, and no outbound requests except the URL captures a user triggers.
+- **No telemetry**, and outbound requests only for the features listed in the wiki's
+  *Hardening* page ("Where the server is allowed to dial").
 
 ## 7. Plugin architecture
 

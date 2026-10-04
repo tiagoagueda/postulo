@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The GeoNames and ESCO downloads now use the guarded client, the entrypoint follows POSTULO_GEOLOCATIONS_DIR and POSTULO_SKIP_GEONAMES=1 turns the start-up download off; SECURITY, README and PLAN no longer call capture the only outbound request. (#366)
 - Search highlighting and excerpts no longer shift onto the wrong letters after a Turkish dotted capital İ, and long texts no longer return an empty excerpt. (#377)
 - The Applications by month widget now lists every month from your first application to the current one, with nought for a quiet month, and names each month in your language ("février 2026"). (#397)
 - A listing's Apply page now shows the new-tags box its help text promised, and tags typed there are saved with the application. (#408)

@@ -97,7 +97,7 @@ feature cannot be made to work for someone, that is a bug, and it is filed as on
 ## Principles
 
 - **Your data is yours.** Full JSON + media export, always one command away.
-- **No telemetry.** No outbound calls except URL captures you explicitly trigger.
+- **No telemetry.** Outbound requests only for the features listed in the wiki's *Hardening* page.
 - **Private by default.** Uploaded documents are never publicly served.
 - **Secure by obligation.** Ownership-scoped queries, permission-checked files, a strict
   content security policy, security tests in the suite, and dependency vulnerability

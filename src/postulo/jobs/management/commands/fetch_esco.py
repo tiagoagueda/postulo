@@ -40,6 +40,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 from postulo.jobs import esco
 from postulo.jobs.esco import DATA_DIR, FALLBACK
+from postulo.plugins.http import public_only_client
 
 #: The ESCO web-service API. If a run fails to fetch, this block is the first thing to
 #: check against the API's own documentation, at https://ec.europa.eu/esco/api/doc/.
@@ -134,9 +135,8 @@ class Command(BaseCommand):
         self.stdout.write(
             f"Downloading the ESCO classification in {len(LANGUAGES)} languages from {API_BASE} ..."
         )
-        with httpx.Client(
+        with public_only_client(
             timeout=httpx.Timeout(TIMEOUT, connect=10.0),
-            follow_redirects=True,
             headers={
                 "User-Agent": "postulo fetch_esco (a self-hosted Postulo provisioning data)",
                 "Accept": "application/json",

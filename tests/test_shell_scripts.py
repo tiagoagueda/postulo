@@ -104,3 +104,20 @@ def test_every_one_starts_with_a_shebang():
         script.name for script in SCRIPTS if not script.read_text(encoding="utf-8").startswith("#!")
     ]
     assert not missing, f"no shebang: {missing}"
+
+
+def test_the_entrypoint_follows_the_geolocations_directory():
+    """The city table is looked for where `POSTULO_GEOLOCATIONS_DIR` points, not at a path
+    fixed in the script: an operator who moves it would otherwise download it again on
+    every start (#366)."""
+    text = (REPO / "docker" / "entrypoint.sh").read_text(encoding="utf-8")
+    code = "\n".join(line for line in text.splitlines() if not line.lstrip().startswith("#"))
+    assert "POSTULO_GEOLOCATIONS_DIR" in code
+    assert "/app/data/geonames" not in code.replace(
+        "${POSTULO_GEOLOCATIONS_DIR:-/app/data/geonames}", ""
+    )
+
+
+def test_the_entrypoint_lets_the_startup_download_be_switched_off():
+    text = (REPO / "docker" / "entrypoint.sh").read_text(encoding="utf-8")
+    assert "POSTULO_SKIP_GEONAMES" in text
