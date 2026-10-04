@@ -363,3 +363,33 @@ def test_a_sweep_counts_only_the_rows_it_changed_and_keeps_their_dates(client, u
     assert done.decided_at == stamped
     assert fresh.state == ListingState.SHORTLISTED
     assert fresh.decided_at is not None
+
+
+# ------------------------------------------------------------ the listing form's Cancel
+
+
+def cancel_href(response) -> str:
+    match = re.search(r'<a href="([^"]*)"[^>]*>Cancel</a>', response.content.decode())
+    assert match, "the form has a Cancel link"
+    return match.group(1)
+
+
+def test_cancel_on_the_edit_form_goes_back_to_the_listing(client, user, company):
+    posting = listing(user, company)
+    client.force_login(user)
+
+    response = client.get(reverse("jobs:posting_update", args=[posting.pk]))
+
+    assert cancel_href(response) == posting.get_absolute_url()
+
+
+def test_cancel_on_the_new_form_goes_back_to_the_company_it_was_opened_for(
+    client, user, other_user, company
+):
+    client.force_login(user)
+    new = reverse("jobs:posting_create")
+
+    assert cancel_href(client.get(new, {"company": company.pk})) == company.get_absolute_url()
+    assert cancel_href(client.get(new)) == reverse(LIST), "otherwise the Listings page"
+    foreign = Company.objects.create(owner=other_user, name="Elsewhere")
+    assert cancel_href(client.get(new, {"company": foreign.pk})) == reverse(LIST)

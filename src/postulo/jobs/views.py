@@ -910,6 +910,12 @@ class PostingUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
     form_class = JobPostingForm
     template_name = "jobs/posting_form.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Cancel goes back to the listing the person came from (#628).
+        context["cancel_url"] = self.object.get_absolute_url()
+        return context
+
     def form_valid(self, form):
         messages.success(self.request, _("Posting updated."))
         return super().form_valid(form)
@@ -929,6 +935,18 @@ class PostingCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, C
         ):
             initial["company"] = company_id
         return initial
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Cancel goes back to the company the form was opened for, else to Listings (#628).
+        company_id = self.get_initial().get("company")
+        company = (
+            Company.objects.for_user(self.request.user).filter(pk=company_id).first()
+            if company_id
+            else None
+        )
+        context["cancel_url"] = company.get_absolute_url() if company else reverse("listings:list")
+        return context
 
 
 class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
