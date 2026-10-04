@@ -5595,6 +5595,28 @@
     outline-color: var(--color-brand-500);
   }
 }
+@layer utilities {
+  select option, select optgroup {
+    background-color: var(--color-white);
+    color: var(--color-ink-900);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-100);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-100);
+      }
+    }
+  }
+}
 @layer components {
   .tag-picker {
     display: flex;
@@ -7325,6 +7347,10 @@ html {
   input:focus-visible, select:focus-visible, textarea:focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+  select option, select optgroup {
+    background-color: Canvas;
+    color: CanvasText;
   }
   .menu-item, .nav-link, .nav-link-active {
     border: 1px solid ButtonText;
