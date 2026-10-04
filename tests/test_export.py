@@ -314,6 +314,37 @@ def test_something_that_is_not_an_export_is_refused_clearly(db, user, contents, 
         importer.load(user, zipfile.ZipFile(buffer))
 
 
+def _archive_with_format(fmt) -> BytesIO:
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps({"postulo": {"format": fmt}}))
+    buffer.seek(0)
+    return buffer
+
+
+def test_an_archive_from_a_newer_postulo_is_refused_naming_both_formats(db, user):
+    newer = export_module.FORMAT_VERSION + 1
+    with pytest.raises(importer.ArchiveError) as caught:
+        importer.load(user, zipfile.ZipFile(_archive_with_format(newer)))
+    assert str(newer) in str(caught.value)
+    assert f"1 to {export_module.FORMAT_VERSION}" in str(caught.value)
+
+
+@pytest.mark.parametrize("fmt", ["25", True, 0, 1.5, None])
+def test_a_format_that_is_not_a_known_number_is_refused(db, user, fmt):
+    with pytest.raises(importer.ArchiveError, match="this version of Postulo reads"):
+        importer.load(user, zipfile.ZipFile(_archive_with_format(fmt)))
+
+
+def test_import_data_says_so_rather_than_a_traceback_for_a_newer_archive(db, user, tmp_path):
+    from django.core.management import CommandError, call_command
+
+    path = tmp_path / "newer.zip"
+    path.write_bytes(_archive_with_format(export_module.FORMAT_VERSION + 1).getvalue())
+    with pytest.raises(CommandError, match="this version of Postulo reads"):
+        call_command("import_data", user.email, str(path))
+
+
 # ------------------------------------------------------------------- the views
 
 

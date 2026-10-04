@@ -24,7 +24,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from .export import CV_FIELDS, MANIFEST_NAME, MEDIA_PREFIX, TRANSLATION_SECTIONS
+from .export import CV_FIELDS, FORMAT_VERSION, MANIFEST_NAME, MEDIA_PREFIX, TRANSLATION_SECTIONS
 
 
 class ArchiveError(Exception):
@@ -143,6 +143,16 @@ def read_manifest(archive: zipfile.ZipFile) -> dict:
     header = document.get("postulo") or {}
     if "format" not in header:
         raise ArchiveError("That does not look like a Postulo export.")
+    # Every format so far has added keys and sections, so an older archive reads as it is
+    # and a newer one cannot be read as if it were current: a new key on a record ends in
+    # a traceback and a new section is dropped while the import reports success. Refuse it
+    # before anything is written, as the backup reader does.
+    fmt = header["format"]
+    if not isinstance(fmt, int) or isinstance(fmt, bool) or not 1 <= fmt <= FORMAT_VERSION:
+        raise ArchiveError(
+            f"This archive is export format {fmt!r}; this version of Postulo reads "
+            f"1 to {FORMAT_VERSION}."
+        )
     return document
 
 

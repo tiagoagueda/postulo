@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- An account archive from a newer Postulo, or one whose format is not a known number, is now refused up front with a message naming both formats, instead of a traceback or a silent partial import. (#561)
 - The container restore advice now stops every service whatever its Compose profile, the background worker included, and starts the same profiles again afterwards, in `restore --help` and in the "something else is using the database" refusal. (#541)
 - Restore now refuses an archive written by a newer Postulo (naming the version to install) or a database with unknown migrations, unless the new --allow-newer flag is given. (#479)
 - The retention dry run on Server settings → Data protection now reports on the number typed in the retention field, falling back to the saved limit when it is invalid or empty, and still saves nothing. (#483)
