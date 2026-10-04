@@ -20,6 +20,7 @@ import pytest
 from playwright.sync_api import Browser, Page, expect
 
 from tests.e2e.conftest import EMAIL, PASSWORD
+from tests.e2e.signing_in import sign_in
 
 from .selects import drawn
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
@@ -29,14 +30,6 @@ from .test_unsaved_work import asked_before_leaving
 pytestmark = pytest.mark.e2e
 
 NUMBERS = ("+351912345670", "+351912345671", "+351912345672")
-
-
-def sign_in(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
-    expect(page).to_have_url(f"{base}/")
 
 
 @pytest.fixture

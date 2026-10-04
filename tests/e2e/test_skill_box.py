@@ -12,17 +12,9 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
-from .conftest import EMAIL, PASSWORD
+from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
-
-
-def sign_in(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
-    expect(page).to_have_url(f"{base}/")
 
 
 def test_the_box_is_offered_names_as_it_is_typed(live_server, page: Page, applicant, esco_skills):

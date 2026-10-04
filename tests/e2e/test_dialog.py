@@ -13,7 +13,8 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
-from tests.e2e.conftest import EMAIL, PASSWORD
+from tests.e2e.conftest import PASSWORD
+from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
 
@@ -32,11 +33,7 @@ NOTHING = "rgba(0, 0, 0, 0)"
 
 
 def open_the_gallery(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
-    expect(page).to_have_url(f"{base}/")
+    sign_in(page, base)
     page.goto(f"{base}/server/design/")
     if "reauthenticate" in page.url:
         page.locator("input[name=password]").fill(PASSWORD)

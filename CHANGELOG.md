@@ -33,6 +33,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The browser tests draw every page in their own copy of DejaVu Sans on every machine, so a layout that passes locally passes on CI. (#717)
 - Four browser tests wait for what they read instead of a fixed time or an idle network. (#718)
 - Three unit tests no longer depend on the machine being idle: robots.txt, the two-factor codes and a slow-filter guard. (#719)
+- Browser tests sign in through one helper that hands the browser a session, instead of filling the sign-in form in every test. (#720)
 
 ## [0.4.0] — 2026-10-04
 

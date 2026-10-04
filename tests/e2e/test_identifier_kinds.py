@@ -12,17 +12,9 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page, expect
 
-from tests.e2e.conftest import EMAIL, PASSWORD
+from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
-
-
-def sign_in(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
-    expect(page).to_have_url(f"{base}/")
 
 
 def test_changing_a_rows_kind_moves_what_the_other_rows_offer(page: Page, live_server, applicant):

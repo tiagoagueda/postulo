@@ -14,20 +14,12 @@ from pathlib import Path
 import pytest
 from playwright.sync_api import Page, expect
 
-from tests.e2e.conftest import EMAIL, PASSWORD
+from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
 
 AXE = Path(__file__).resolve().parents[2] / "node_modules" / "axe-core" / "axe.min.js"
 TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]
-
-
-def sign_in(page: Page, base: str) -> None:
-    page.goto(f"{base}/accounts/login/")
-    page.locator("input[name=login]").fill(EMAIL)
-    page.locator("input[name=password]").fill(PASSWORD)
-    page.locator("form").get_by_role("button", name="Sign In", exact=True).click()
-    expect(page).to_have_url(f"{base}/")
 
 
 def a_company(applicant, name: str = "Aperture Science"):
