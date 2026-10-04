@@ -64,15 +64,11 @@ def freeze_what_was_sent(errand) -> dict:
     render that fails half way still keeps the document it managed to file, which is a
     document that genuinely exists (#220).
     """
-    from django.db import transaction
-
     from postulo.applications.models import Application
-    from postulo.applications.services import record_event
     from postulo.resume.models import Link
 
     from .models import UploadedDocument
-    from .pdf import PDFBackendUnavailable, pdf_session
-    from .rendering import snapshot_cv, snapshot_letter
+    from .pdf import PDFBackendUnavailable
 
     application = Application.objects.filter(
         pk=errand.payload.get("application_id"), owner=errand.owner
@@ -91,21 +87,51 @@ def freeze_what_was_sent(errand) -> dict:
         Link.objects.for_user(errand.owner).filter(pk__in=errand.payload.get("link_ids") or [])
     )
 
+    try:
+        freeze(application, cv=cv, letter=letter, uploads=uploads, links=links)
+    except PDFBackendUnavailable as unavailable:
+        raise Refused(str(unavailable)) from unavailable
+
+    return {
+        "message": str(_("Recorded what you sent.")),
+        "url": application.get_absolute_url(),
+    }
+
+
+NEWLINE = "\n"
+
+
+def freeze(
+    application, *, cv, letter, uploads, links, drawn: dict | None = None, emailed_to: str = ""
+) -> None:
+    """File what was sent with an application and tell its timeline.
+
+    The one place both ways of sending end up: the errand above, which draws the PDFs
+    itself, and *Email these* (#361), which has already drawn them to attach to the message
+    and hands the same bytes over in ``drawn`` (``{"cv": bytes, "letter": bytes}``), so the
+    copy that is kept is the copy that was mailed. ``emailed_to`` says to whom, on the
+    timeline; it is never logged.
+    """
+    from django.db import transaction
+
+    from postulo.applications.models import EventKind
+    from postulo.applications.services import record_event
+
+    from .pdf import pdf_session
+
+    drawn = drawn or {}
     created: list[str] = []
     if cv or letter:
-        try:
-            # Opened once, and only where there is something to draw: a *Send* of uploads and
-            # links alone should not start a browser. Opening it also settles whether there is
-            # a usable backend before the first document is written down.
+        # Opened once, and only where there is something to draw: a *Send* of uploads and
+        # links alone should not start a browser. Opening it also settles whether there is
+        # a usable backend before the first document is written down. Nothing is opened
+        # when every PDF was drawn already.
+        needs_drawing = (cv and "cv" not in drawn) or (letter and "letter" not in drawn)
+        if needs_drawing:
             with pdf_session() as backend:
-                if cv:
-                    created.append(snapshot_cv(cv, application=application, backend=backend).title)
-                if letter:
-                    created.append(
-                        snapshot_letter(letter, application=application, backend=backend).title
-                    )
-        except PDFBackendUnavailable as unavailable:
-            raise Refused(str(unavailable)) from unavailable
+                created.extend(_snapshots(application, cv, letter, drawn, backend))
+        else:
+            created.extend(_snapshots(application, cv, letter, drawn, None))
 
     created.extend(str(upload) for upload in uploads)
     created.extend(f"{link.title} — {link.url}" for link in links)
@@ -120,16 +146,38 @@ def freeze_what_was_sent(errand) -> dict:
                 application.sent_uploads.add(*uploads)
             if links:
                 application.sent_links.add(*links)
-            record_event(
-                application,
-                summary=str(_("Documents sent")),
-                body="\n".join(created),
-            )
+            if emailed_to:
+                record_event(
+                    application,
+                    kind=EventKind.EMAIL_SENT,
+                    summary=str(_("Documents emailed")),
+                    body=NEWLINE.join(
+                        [str(_("Emailed to %(address)s.")) % {"address": emailed_to}, *created]
+                    ),
+                )
+            else:
+                record_event(
+                    application,
+                    summary=str(_("Documents sent")),
+                    body=NEWLINE.join(created),
+                )
 
-    return {
-        "message": str(_("Recorded what you sent.")),
-        "url": application.get_absolute_url(),
-    }
+
+def _snapshots(application, cv, letter, drawn, backend) -> list[str]:
+    from .rendering import snapshot_cv, snapshot_letter
+
+    titles: list[str] = []
+    if cv:
+        titles.append(
+            snapshot_cv(cv, application=application, backend=backend, content=drawn.get("cv")).title
+        )
+    if letter:
+        titles.append(
+            snapshot_letter(
+                letter, application=application, backend=backend, content=drawn.get("letter")
+            ).title
+        )
+    return titles
 
 
 def _one(model_name: str, pk, owner):

@@ -210,3 +210,244 @@ def test_it_refuses_a_private_host_even_when_the_operator_pinned_theirs(monkeypa
 
     assert result.ok is False
     assert not opened.called
+
+
+# ----------------------------------------- the action that sends (#361)
+#
+# The kind was offered, its secret kept, and nothing ever sent through it. The one place
+# that does is the page that freezes what was sent with an application.
+
+
+class _Server:
+    """An outbox plugin that keeps what it was asked to send, or refuses to."""
+
+    name = "own-mail"
+
+    def __init__(self, refuses=None):
+        self.sent = []
+        self.refuses = refuses
+
+    def send(self, message, config):
+        if self.refuses:
+            raise self.refuses
+        self.sent.append(message)
+        return 1
+
+
+@pytest.fixture
+def server(monkeypatch, mine):
+    plugin = _Server()
+    monkeypatch.setattr(correspondence, "outbox_for", lambda person: plugin)
+    return plugin
+
+
+class _Backend:
+    name = "fake"
+
+    def __init__(self, bytes_=b"%PDF-1.7 mailed"):
+        self.drawn = []
+        self.bytes_ = bytes_
+
+    def is_available(self):
+        return True
+
+    def render(self, html):
+        self.drawn.append(html)
+        return self.bytes_
+
+
+@pytest.fixture
+def pdf(monkeypatch):
+    backend = _Backend()
+    monkeypatch.setattr("postulo.documents.pdf.get_pdf_backend", lambda name=None: backend)
+    return backend
+
+
+@pytest.fixture
+def filed(user):
+    from postulo.applications.models import Application, Status
+    from postulo.documents.models import CV, CoverLetter
+    from postulo.jobs.models import Company, JobPosting
+
+    company = Company.objects.create(owner=user, name="Black Mesa")
+    posting = JobPosting.objects.create(owner=user, company=company, title="Research Engineer")
+    application = Application.objects.create(owner=user, posting=posting, status=Status.APPLIED)
+    cv = CV.objects.create(owner=user, name="Backend EN", headline="Backend engineer")
+    letter = CoverLetter.objects.create(
+        owner=user, name="General", subject="About {{ role }}", body="Dear {{ company }}, hello."
+    )
+    return application, cv, letter
+
+
+def _post(client, application, **fields):
+    from django.urls import reverse
+
+    return client.post(reverse("documents:send", args=[application.pk]), fields)
+
+
+def _frozen(user):
+    from postulo.documents.models import RenderedDocument
+
+    return RenderedDocument.objects.filter(owner=user).count()
+
+
+def _email(**over):
+    return {
+        "send_email": "on",
+        "recipient": "hr@example.net",
+        "subject": "Hi",
+        "body": "Hello",
+        **over,
+    }
+
+
+def test_the_page_offers_to_email_only_to_somebody_with_an_outbox(client, user, filed):
+    from django.urls import reverse
+
+    client.force_login(user)
+
+    page = client.get(reverse("documents:send", args=[filed[0].pk])).content.decode()
+
+    assert 'name="send_email"' not in page
+    assert "Postulo sends nothing itself" in page
+
+
+def test_the_page_shows_the_block_prefilled_when_there_is_an_outbox(client, user, filed, server):
+    from django.urls import reverse
+
+    from postulo.jobs.models import Contact
+
+    application = filed[0]
+    contact = Contact.objects.create(owner=user, name="Chell", email="chell@example.net")
+    application.contact = contact
+    application.save(update_fields=["contact"])
+    client.force_login(user)
+
+    page = client.get(reverse("documents:send", args=[application.pk])).content.decode()
+
+    assert 'name="send_email"' in page
+    assert 'value="chell@example.net"' in page
+    assert "Postulo sends nothing itself" not in page
+
+
+def test_it_mails_the_documents_and_freezes_the_very_bytes_it_mailed(
+    client, user, filed, server, pdf
+):
+    from postulo.documents.models import RenderedDocument
+
+    application, cv, letter = filed
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk, cover_letter=letter.pk, **_email(body=""))
+
+    assert response.status_code == 302
+    (message,) = server.sent
+    assert message.from_email == "alex@example.org", "the outbox's own address, never rewritten"
+    assert message.to == ["hr@example.net"]
+    assert "Dear Black Mesa" in message.body, "empty means the chosen letter's text"
+    assert [a[2] for a in message.attachments] == ["application/pdf"] * 2
+    assert {a[1] for a in message.attachments} == {b"%PDF-1.7 mailed"}
+    assert _frozen(user) == 2
+    kept = RenderedDocument.objects.filter(owner=user).first()
+    with kept.file.open("rb") as stored:
+        assert stored.read() == b"%PDF-1.7 mailed"
+    event = application.events.get(summary="Documents emailed")
+    assert "hr@example.net" in event.body
+
+
+def test_each_document_is_drawn_once(client, user, filed, server, pdf):
+    application, cv, letter = filed
+    client.force_login(user)
+
+    _post(client, application, cv=cv.pk, cover_letter=letter.pk, **_email())
+
+    assert len(pdf.drawn) == 2, "one for the CV and one for the letter, mailed and kept"
+
+
+def test_a_refused_send_freezes_and_records_nothing(client, user, filed, server, pdf):
+    application, cv, _letter = filed
+    server.refuses = OSError("connection reset by hr@example.net")
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk, **_email())
+
+    page = response.content.decode()
+    assert response.status_code == 200
+    assert "nothing was sent or recorded" in page
+    assert 'value="hr@example.net"' in page, "what was typed is kept"
+    assert "connection reset" not in page, "a server's words can quote the recipient"
+    assert _frozen(user) == 0
+    assert not application.events.exists()
+
+
+def test_without_an_outbox_the_post_sends_nothing(client, user, filed, pdf):
+    """The fields are not on the form for somebody with no outbox, so a posted tick is
+    ignored: it is an ordinary freeze, and nothing is mailed behind their back."""
+    application, cv, _letter = filed
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk, **_email())
+
+    assert response.status_code == 302
+    assert not application.events.filter(summary="Documents emailed").exists()
+
+
+def test_another_sender_is_refused_not_rewritten(client, user, filed, server, pdf, monkeypatch):
+    application, cv, _letter = filed
+    original = correspondence.send
+
+    def lying(person, message):
+        message.from_email = "someone@else.example"
+        return original(person, message)
+
+    monkeypatch.setattr(correspondence, "send", lying)
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk, **_email())
+
+    assert response.status_code == 200
+    assert "not as someone@else.example" in response.content.decode()
+    assert server.sent == [] and _frozen(user) == 0
+
+
+def test_the_rate_limit_holds_and_the_page_says_so(client, user, filed, server, pdf, settings):
+    settings.POSTULO_OUTBOX_RATE = "1/h"
+    application, cv, _letter = filed
+    client.force_login(user)
+
+    assert _post(client, application, cv=cv.pk, **_email()).status_code == 302
+    second = _post(client, application, cv=cv.pk, **_email())
+
+    assert second.status_code == 200
+    assert "Too many requests" in second.content.decode()
+    assert len(server.sent) == 1
+    assert _frozen(user) == 1, "only the one that went"
+
+
+@pytest.mark.parametrize(
+    "fields",
+    [
+        {"recipient": "not an address"},
+        {"recipient": ""},
+        {"subject": ""},
+        {"body": ""},
+    ],
+)
+def test_the_recipient_subject_and_message_are_checked(client, user, filed, server, pdf, fields):
+    application, cv, _letter = filed
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk, **_email(**fields))
+
+    assert response.status_code == 200
+    assert server.sent == [] and _frozen(user) == 0
+
+
+def test_without_ticking_the_box_nothing_is_mailed(client, user, filed, server, pdf):
+    application, cv, _letter = filed
+    client.force_login(user)
+
+    response = _post(client, application, cv=cv.pk)
+
+    assert response.status_code == 302
+    assert server.sent == []

@@ -117,6 +117,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- *Record what you sent* can email the CV, the letter and the files you chose from your own address when you have a *Your own email* connection: it sends first, and freezes and records only if the email went. (#361)
 - On Your details and Your career the sidebar's label names the section you are reading once its title has scrolled away. (#677)
 - Your career is in the account menu after Your details, and the menu marks the row of the page you are on. (#676)
 - The Server settings and Settings sidebars stay in view while a long page scrolls. (#699)

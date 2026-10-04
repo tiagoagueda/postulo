@@ -49,10 +49,21 @@
         <div class="alert mb-4" data-variant="error">{{ form.non_field_errors }}</div>
       {% endif %}
       <div class="card mb-6">
-        {% for field in form %}
+        {% for field in form.document_fields %}
           <c-field :field="field" />
         {% endfor %}
       </div>
+      {% if form.can_email %}
+        {% comment %} A plain part of the form, so it works with scripts off: the box is
+           ticked or it is not, and the server decides. Shown only to somebody with an
+           outbox (#361); the fields do not exist for anybody else. {% endcomment %}
+        <fieldset class="card mb-6">
+          <legend class="label px-1">{% translate "Email these" %}</legend>
+          {% for field in form.email_fields %}
+            <c-field :field="field" />
+          {% endfor %}
+        </fieldset>
+      {% endif %}
       <div class="flex items-center gap-3">
         {% if letter_preview %}
           <button type="submit" name="confirmed" value="1" class="btn">

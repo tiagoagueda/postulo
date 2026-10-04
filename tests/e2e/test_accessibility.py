@@ -807,6 +807,33 @@ def test_the_europass_review_page_has_no_violations(
     assert not found, describe(f"/career/import/ review ({scheme})", found)
 
 
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_send_page_with_the_email_block_has_no_violations(
+    live_server, page: Page, axe_source, furnished, applicant, scheme
+):
+    """The walk reaches the page without an outbox; the block that sends from one (#361) is
+    only there for somebody who has set one up, so it is looked at with one."""
+    from postulo.plugins.models import Connection
+
+    Connection.objects.create(
+        owner=applicant,
+        kind="outbox",
+        plugin="own-mail",
+        label="Mine",
+        enabled=True,
+        config={"from_address": "alex@example.org", "host": "mail.example.org"},
+    )
+    page.emulate_media(color_scheme=scheme)
+    base = live_server.url
+    sign_in(page, base)
+
+    page.goto(f"{base}/documents/applications/{furnished['application'].pk}/send/")
+
+    expect(page.get_by_label("Email these from my own address")).to_be_visible()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"the send page with the email block ({scheme})", found)
+
+
 def a_candidate_file(path: Path) -> Path:
     """A file with one of everything the review can say about a row, written to ``path``.
 

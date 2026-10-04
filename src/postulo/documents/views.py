@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from pathlib import Path
 
 from django.conf import settings
 from django.contrib import messages
@@ -851,12 +852,15 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
         return render(
             request,
             self.template_name,
-            {"application": application, "form": SendDocumentsForm(user=request.user)},
+            {
+                "application": application,
+                "form": SendDocumentsForm(user=request.user, application=application),
+            },
         )
 
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         application = self.get_application(pk)
-        form = SendDocumentsForm(request.POST, user=request.user)
+        form = SendDocumentsForm(request.POST, user=request.user, application=application)
         if not form.is_valid():
             return render(request, self.template_name, {"application": application, "form": form})
 
@@ -880,6 +884,9 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
                 },
             )
 
+        if form.cleaned_data.get("send_email"):
+            return self.email_then_freeze(request, application, form)
+
         # The slowest button in Postulo, and it no longer waits for itself (#247). What
         # gets drawn, what is attached and what the timeline is told are all in the handler,
         # in the order they were in here: one renderer for both documents, each snapshot
@@ -897,6 +904,99 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
             link_ids=[link.pk for link in form.cleaned_data["links"]],
         )
         return redirect("core:errand", pk=errand.pk)
+
+    def email_then_freeze(self, request: HttpRequest, application, form) -> HttpResponse:
+        """Mail the chosen documents from the person's own address; freeze only if it went (#361).
+
+        **Sent first.** A snapshot is the record of what somebody handed over, so one filed
+        for an email that never left would be a record of nothing. Each PDF is drawn once
+        here, mailed, and the very same bytes are what is kept afterwards: what was sent is
+        what is on file. Whatever refuses -- no outbox, a sender that is not the outbox's,
+        the limit, the server, a lapsed grant -- puts the form back with the server's own
+        words and what was typed, and files and records nothing.
+
+        This runs in the request, not as an errand: the answer to *did it go* has to be on
+        the page the person is looking at. The view is not atomic (#220), so no write lock is
+        held while the renderer and the mail server are waited on.
+        """
+        import smtplib
+
+        from django.core.mail import EmailMessage
+        from django.utils.text import slugify
+
+        from postulo.core import correspondence, destinations, throttle
+        from postulo.core.mail import ConnectionFailed
+        from postulo.plugins.consent import ConsentFailed
+
+        from .slow import freeze
+
+        data = form.cleaned_data
+        cv, letter = data["cv"], data["cover_letter"]
+        uploads = list(data["uploads"])
+        recipient = data["recipient"]
+
+        def refuse(words) -> HttpResponse:
+            form.add_error(None, str(words))
+            return render(request, self.template_name, {"application": application, "form": form})
+
+        drawn: dict[str, bytes] = {}
+        attachments: list[tuple[str, bytes, str]] = []
+        try:
+            if cv or letter:
+                with renderers.pdf_session() as backend:
+                    if cv:
+                        drawn["cv"] = renderers.html_to_pdf(
+                            rendering.render_cv_html(cv), backend=backend
+                        )
+                        name = slugify(rendering.document_title(cv)) or "cv"
+                        attachments.append((f"{name}.pdf", drawn["cv"], "application/pdf"))
+                    if letter:
+                        drawn["letter"] = renderers.html_to_pdf(
+                            rendering.render_letter_html(letter, application), backend=backend
+                        )
+                        name = slugify(rendering.document_title(letter)) or "cover-letter"
+                        attachments.append((f"{name}.pdf", drawn["letter"], "application/pdf"))
+        except PDFBackendUnavailable as unavailable:
+            return refuse(unavailable)
+        try:
+            for upload in uploads:
+                with upload.file.open("rb") as handle:
+                    attachments.append((Path(upload.file.name).name, handle.read(), ""))
+        except OSError:
+            return refuse(_("One of the files you chose could not be read, so nothing was sent."))
+
+        body = data["body"] or (rendering.letter_text(letter, application) if letter else "")
+        # No sender: `correspondence.send` puts the outbox's own address on it, and refuses
+        # rather than rewrites if a caller ever claims another.
+        message = EmailMessage(subject=data["subject"], body=body, to=[recipient])
+        for filename, content, mimetype in attachments:
+            message.attach(filename, content, mimetype or None)
+        try:
+            correspondence.send(request.user, message)
+        except (correspondence.NoOutbox, correspondence.WrongSender) as refused:
+            return refuse(refused)
+        except throttle.TooOften as often:
+            return refuse(often)
+        except (ConnectionFailed, ConsentFailed, destinations.Refused) as failed:
+            return refuse(failed)
+        except (smtplib.SMTPException, OSError):
+            # Never the exception's text: a server's reply can quote the recipient.
+            logger.warning("An outbox for account %s failed to send", request.user.pk)
+            return refuse(
+                _("The mail server did not take the message, so nothing was sent or recorded.")
+            )
+
+        freeze(
+            application,
+            cv=cv,
+            letter=letter,
+            uploads=uploads,
+            links=list(data["links"]),
+            drawn=drawn,
+            emailed_to=recipient,
+        )
+        messages.success(request, _("Emailed, and recorded what you sent."))
+        return redirect(application.get_absolute_url())
 
 
 class ApplicationDocumentsView(OwnedObjectMixin, DetailView):

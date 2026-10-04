@@ -659,8 +659,14 @@ def already_exported(cv: CV, *, html: str = "", checksum: str = "") -> RenderedD
     return None
 
 
-def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
+def snapshot_cv(
+    cv: CV, *, application=None, backend=None, content: bytes | None = None
+) -> RenderedDocument:
     """Freeze a CV as a PDF, exactly as it stands now.
+
+    ``content`` is a PDF already drawn from this CV a moment ago -- the bytes that were just
+    mailed (#361) -- and is filed as it is instead of drawing the page a second time, so
+    what was sent is what is kept.
 
     This is the record of what an employer received. It is never regenerated: months
     later, when someone asks about a line on your CV, you need the version they read.
@@ -677,7 +683,8 @@ def snapshot_cv(cv: CV, *, application=None, backend=None) -> RenderedDocument:
         if filed is not None:
             filed.already_filed = True
             return filed
-    content = html_to_pdf(html, backend=backend)
+    if content is None:
+        content = html_to_pdf(html, backend=backend)
     checksum = RenderedDocument.checksum_for(content)
     if application is None:
         filed = already_exported(cv, checksum=checksum)
@@ -750,10 +757,15 @@ def snapshot_report(owner, *, title: str, html: str, filename: str, backend=None
     return document
 
 
-def snapshot_letter(letter: CoverLetter, *, application=None, backend=None) -> RenderedDocument:
-    """Freeze a cover letter as a PDF, with its placeholders already resolved."""
-    html = render_letter_html(letter, application)
-    content = html_to_pdf(html, backend=backend)
+def snapshot_letter(
+    letter: CoverLetter, *, application=None, backend=None, content: bytes | None = None
+) -> RenderedDocument:
+    """Freeze a cover letter as a PDF, with its placeholders already resolved.
+
+    ``content`` is the PDF just mailed, filed as it is rather than drawn again (#361).
+    """
+    if content is None:
+        content = html_to_pdf(render_letter_html(letter, application), backend=backend)
     # The recipient's name, not the person's own filing name for this draft (#223).
     language = document_language(letter)
     with languages.override(language):

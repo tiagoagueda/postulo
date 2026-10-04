@@ -551,9 +551,44 @@ class SendDocumentsForm(forms.Form):
         ),
     )
 
-    def __init__(self, *args, user=None, **kwargs):
+    #: The block that sends it (#361). It exists only for somebody with an outbox set up;
+    #: for everybody else the fields are removed below and Postulo sends nothing itself.
+    EMAIL_FIELDS = ("send_email", "recipient", "subject", "body")
+
+    send_email = forms.BooleanField(
+        label=_("Email these from my own address"),
+        required=False,
+        help_text=_(
+            "Sent first, over your own outbox, with the CV, the letter and the files you "
+            "chose attached. They are frozen and recorded only if the email went."
+        ),
+    )
+    recipient = forms.EmailField(label=_("Recipient"), required=False)
+    subject = forms.CharField(label=_("Subject"), max_length=200, required=False)
+    body = forms.CharField(
+        label=_("Message"),
+        required=False,
+        widget=forms.Textarea(attrs={"rows": 6}),
+        help_text=_("Leave it empty to send the text of the letter you chose."),
+    )
+
+    def __init__(self, *args, user=None, application=None, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
+        from postulo.core import correspondence
+
+        self.can_email = correspondence.can_send_as_themselves(user)
+        if self.can_email:
+            self.fields["links"].help_text = _(
+                "Recorded as part of what they were sent. They are not added to the email."
+            )
+            if application is not None and not self.is_bound:
+                contact = application.contact
+                self.initial.setdefault("recipient", contact.email if contact else "")
+                self.initial.setdefault("subject", application.posting.title)
+        else:
+            for name in self.EMAIL_FIELDS:
+                del self.fields[name]
         self.fields["cv"].queryset = CV.objects.for_user(user)
         # What the help texts promise: a letter ticked as a one-off is not a template, and a
         # file something replaces is "kept but no longer offered" (#510). Whatever was posted
@@ -568,6 +603,14 @@ class SendDocumentsForm(forms.Form):
             Q(replaced_by__isnull=True) | Q(pk__in=self._posted_pks("uploads"))
         ).distinct()
         self.fields["links"].queryset = Link.objects.for_user(user)
+
+    def document_fields(self):
+        """The fields that choose what was sent: all of them but the email block."""
+        return [field for field in self if field.name not in self.EMAIL_FIELDS]
+
+    def email_fields(self):
+        """The email block's fields, none where there is no outbox."""
+        return [field for field in self if field.name in self.EMAIL_FIELDS]
 
     def _posted_pks(self, name: str) -> list[int]:
         """The ids this form was given for a field, those that are numbers."""
@@ -591,4 +634,13 @@ class SendDocumentsForm(forms.Form):
         )
         if not any(chosen):
             raise forms.ValidationError(_("Choose at least one document to record."))
+        if cleaned.get("send_email"):
+            if not cleaned.get("recipient") and not self.has_error("recipient"):
+                self.add_error("recipient", _("Say who to send it to."))
+            if not cleaned.get("subject"):
+                self.add_error("subject", _("Give the email a subject."))
+            if not cleaned.get("body") and not cleaned.get("cover_letter"):
+                self.add_error(
+                    "body", _("Write a message, or choose a letter to send as the message.")
+                )
         return cleaned
