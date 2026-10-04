@@ -54,7 +54,7 @@ jobs:
     name: Browser tests (Chromium)
     # The critical path in a real browser: sign in, capture, review, board, send, export.
     # One Python version is enough; the matrix below covers the interpreter, this covers
-    # the pages joining up. Traces and screenshots of a failure are kept as artifacts.
+    # the pages joining up. A failure is run again alone with a trace, kept as an artifact.
     runs-on: ubuntu-latest
     container:
       image: node:22-bookworm
@@ -100,19 +100,44 @@ jobs:
         run: uv run python scripts/messages.py compile
 
       - name: Drive the critical path in a browser
+        id: e2e
         # `--durations` ends the log with the slowest tests: the suite grew from 149 to 645
         # tests in five days, and the list is where to look before adding to it (#712).
-        run: >
-          uv run pytest -m e2e --browser chromium --durations=25
-          --tracing retain-on-failure --screenshot only-on-failure --output browser-artifacts
+        #
+        # No trace and no screenshot here. pytest-playwright's `retain-on-failure` and
+        # `only-on-failure` record both for every test and throw them away when it passes,
+        # because it cannot know beforehand which one will fail: 645 traces and pictures to
+        # keep the files of the rare failure (#715). The step below makes them for the
+        # failed tests alone.
+        run: uv run pytest -m e2e --browser chromium --durations=25
         # Half again what the suite took on 4 October 2026, so a hang ends here, with
         # pytest's stack dump of the test that hung above it, rather than at the runner's
         # own limit with nothing said.
         timeout-minutes: 45
 
+      - name: Run the failed tests again, alone, with a trace
+        # Diagnosis, never a retry: the job stays failed whatever this does (#715). What it
+        # adds is a trace of each failed test, and a second opinion. Failing again alone,
+        # the test fails on its own merits; passing alone, it was a flake or it depends on
+        # the tests that ran before it, and either is a bug to file with this trace.
+        #
+        # Only when the test step itself failed: `failure()` alone is also true when an
+        # install step did, and then there is nothing to run again. `-m e2e` again, because
+        # the default `-m` in pyproject.toml deselects every browser test, and one process,
+        # so the test runs as nearly alone as it can.
+        if: failure() && steps.e2e.outcome == 'failure'
+        run: |
+          if uv run pytest -m e2e --browser chromium --last-failed --last-failed-no-failures none \
+              -p no:xdist --tracing on --screenshot on --output browser-artifacts; then
+            echo "::warning::The failed tests pass when run again alone: a flake, or a test that depends on the ones before it. The job stays failed; the trace is in the browser-failure artifact."
+          else
+            echo "::error::The failed tests fail again when run alone. The trace is in the browser-failure artifact."
+            exit 1
+          fi
+
       - name: Keep the trace and screenshots of a failure
         # v3 works on Forgejo Actions; v4 depends on GitHub's own artifact backend.
-        if: failure()
+        if: failure() && steps.e2e.outcome == 'failure'
         uses: actions/upload-artifact@v3
         continue-on-error: true
         with:
