@@ -811,11 +811,18 @@ def expire_unconfirmed() -> int:
     if not days:
         return 0
     cutoff = timezone.now() - dt.timedelta(days=days)
-    stale = CapturedPage.objects.filter(capture__created_at__lt=cutoff).exclude(
-        capture__status=CaptureStatus.ACCEPTED
+    stale = (
+        CapturedPage.objects.filter(capture__created_at__lt=cutoff)
+        .exclude(capture__status=CaptureStatus.ACCEPTED)
+        .select_related("capture")
     )
     gone = 0
     for page in stale:
+        if page.source:
+            from . import remembered
+
+            # What a waiting capture's review learns from is read from the kept source.
+            remembered.before_the_source_goes(page)
         page.delete()
         gone += 1
     return gone

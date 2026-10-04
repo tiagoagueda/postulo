@@ -20,9 +20,10 @@ from decimal import Decimal
 
 import pytest
 from django.urls import reverse
+from django.utils import timezone
 
 from postulo.core import export as export_module
-from postulo.core import importer
+from postulo.core import importer, site
 from postulo.jobs import pages, remembered
 from postulo.jobs.capture_views import REMEMBERED
 from postulo.jobs.models import Capture, CaptureStatus, FieldHint
@@ -296,6 +297,23 @@ def test_a_kept_source_deleted_before_review_leaves_the_lesson_behind(
 
     pages.forget(first.kept_page)
     first.refresh_from_db()
+    assert first.learning.get("places")
+    review(signed_in, first, company_name=COUNCIL)
+
+    assert places_of(user) == {"company_name": {"id": "entidade"}}
+
+
+def test_a_kept_source_expired_before_review_leaves_the_lesson_behind(
+    keeping_sources, signed_in, user
+):
+    first = capture(signed_in, FIRST, page("notice"))
+    Capture.objects.filter(pk=first.pk).update(
+        created_at=timezone.now() - dt.timedelta(days=site.capture_page_keep_days() + 1)
+    )
+
+    assert pages.expire_unconfirmed() == 1
+    first.refresh_from_db()
+    assert first.kept_page is None
     assert first.learning.get("places")
     review(signed_in, first, company_name=COUNCIL)
 
