@@ -7,6 +7,9 @@ from django.urls import include, path
 
 from postulo.api.api import urls as api_urls
 
+# The 500 page needs the person's language, which Django's own view does not pass (#421).
+handler500 = "postulo.core.views.server_error"
+
 urlpatterns = [
     path("", include("postulo.core.urls")),
     # The service worker has to be served from the root to receive pushes for the whole site.

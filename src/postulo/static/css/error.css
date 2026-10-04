@@ -1,0 +1,35 @@
+/* The 500 page's own rules, linked from `500.html` with a plain <link> (#421).
+   Inline they were refused: that page is rendered with no request, so no nonce is drawn
+   and `style-src` is `'self'` alone.
+
+   The page is rendered when the application is broken, so it shares nothing with the
+   rest: no main stylesheet, no fonts, nothing that might be the thing that failed. That
+   means it must state its own colours rather than inherit half of them -- `color-scheme`
+   alone gave a dark link on a light ground. */
+:root {
+  color-scheme: light dark;
+  --ground: #f9fafb;
+  --text: #1f2937;
+  --muted: #4b535d;
+  --link: #4338ca;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ground: #0b0f14;
+    --text: #e5e7eb;
+    --muted: #9ba3ad;
+    --link: #a5b4fc;
+  }
+}
+body {
+  margin: 0; display: grid; place-items: center; min-height: 100vh;
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif;
+  text-align: center; padding: 2rem;
+  background: var(--ground); color: var(--text);
+}
+a { color: var(--link); }
+/* Hidden from a screen reader, and still legible: 0.25 opacity was 1.8:1, which
+   is unreadable for anyone with low vision looking straight at it. */
+p.code { font-size: 3rem; font-weight: 600; color: var(--muted); margin: 0 0 0.5rem; }
+h1 { font-size: 1.25rem; margin: 0 0 0.5rem; }
+p.detail { color: var(--muted); font-size: 0.875rem; max-width: 28rem; }

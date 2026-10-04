@@ -973,6 +973,11 @@ def test_the_error_pages_have_no_violations(live_server, page: Page, db, axe_sou
     from django.template.loader import render_to_string
 
     page.set_content(render_to_string("500.html"))
+    # set_content has no base URL, so the page's linked stylesheet (#421) is added by hand:
+    # the colours are what is being checked.
+    from django.contrib.staticfiles import finders
+
+    page.add_style_tag(path=finders.find("css/error.css"))
     found = violations_on(page, axe_source)
     if found:
         failures.append(describe(f"500 ({scheme})", found))

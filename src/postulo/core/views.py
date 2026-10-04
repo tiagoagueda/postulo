@@ -91,3 +91,22 @@ def manifest(request: HttpRequest) -> JsonResponse:
         },
         content_type="application/manifest+json",
     )
+
+
+def server_error(request: HttpRequest):
+    """The 500 page, in the language the request was being read in (#421).
+
+    Django's own view renders the template with no context, which leaves the page to name
+    a language and a direction of its own. This one says them, and nothing else: no
+    context processor runs, because the database may be the very thing that failed.
+    """
+    from django.http import HttpResponseServerError
+    from django.template import loader
+
+    from . import languages
+
+    code = languages.current()
+    body = loader.render_to_string(
+        "500.html", {"LANGUAGE_CODE": code, "text_direction": languages.direction(code)}
+    )
+    return HttpResponseServerError(body)
