@@ -1,0 +1,137 @@
+# The unit suite on the Pythons a push does not test (#713).
+#
+# `ci.yml` runs the unit tests on the newest supported Python alone, on every push: the
+# runner takes two jobs at a time, each leg cost twelve minutes of one, and in the fortnight
+# measured before the change the legs only ever failed together, on real faults. The older
+# Pythons the classifiers promise run here instead -- weekly, on every release branch, and
+# whenever somebody starts it by hand, which the release recipe in CONTRIBUTING.md does
+# before a tag. The release gate (`scripts/release_tools.py`) asks for a passed leg on every
+# supported Python, from either workflow.
+#
+# A workflow of its own rather than a matrix that changes with the event, because this
+# Forgejo expands a matrix before it knows the event, and rather than legs skipped with a
+# job-level `if`, because this runner fails a job whose `if` is false instead of skipping it.
+# Both were tried on a throwaway branch (#712, #713).
+name: Every Python
+
+on:
+  push:
+    # Release branches only; `main` is `ci.yml`'s alone.
+    branches: ["[0-9]*"]
+  schedule:
+    # The same morning as `ci.yml`'s weekly run, half an hour after it.
+    - cron: "47 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  # Kept in step with `ci.yml`, whose comments say why each is pinned.
+  UV_VERSION: "0.12.17"
+  ESCO_REVISION: "1.2.1"
+
+jobs:
+  test:
+    # Named for what it checks (#319). The 3.14 leg is the one that measures coverage.
+    name: "${{ matrix.python-version == '3.14' && 'Unit tests and coverage' || 'Unit tests' }} (Python ${{ matrix.python-version }})"
+    runs-on: ubuntu-latest
+    container:
+      # Debian with Node and git already present. uv brings its own Python, so nothing
+      # else needs installing, and the image is a fraction of the size of a full
+      # Actions runner image.
+      image: node:22-bookworm
+    strategy:
+      fail-fast: false
+      matrix:
+        # Every supported Python but the newest, which `ci.yml` runs on every push. The job
+        # is `ci.yml`'s word for word but for this list, and `tests/test_release_tools.py`
+        # holds the two to that (#713).
+        python-version: ["3.12", "3.13"]
+
+    # Only what depends on the interpreter. Lint, the migrations, the catalogues and the
+    # production settings read the same on every Python, so they run once, in `checks`
+    # below, instead of once per leg (#712).
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The token is not needed after the checkout; leaving it in .git/config
+          # would hand it to every later step and any artifact that packs the tree.
+          persist-credentials: false
+
+      - name: Install WeasyPrint's system libraries
+        # WeasyPrint is the default renderer and loads Pango through the system linker.
+        # With these present the suite exercises real PDF rendering rather than skipping
+        # the one test that needs a working backend.
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 fonts-dejavu-core
+          rm -rf /var/lib/apt/lists/*
+
+      - name: Install uv
+        run: |
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: Keep uv's downloads between runs
+        # Forgejo's runner serves the cache API the action talks to. Should this instance's
+        # not, the step is skipped rather than failed -- the run then downloads what the
+        # last one did, which is what it always did.
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: ~/.cache/uv
+          key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
+          restore-keys: uv-${{ runner.os }}-${{ matrix.python-version }}-
+
+      - name: Install dependencies
+        # Without the browser group: Playwright is 136 MB of tool this job never starts, and
+        # `default-groups` would otherwise install it on every leg of the matrix (#233).
+        run: uv sync --locked --python ${{ matrix.python-version }} --no-group e2e
+
+      - name: Compile the translations
+        # The suite reads compiled catalogues: a page in Portuguese is only Portuguese if
+        # its `.mo` exists, and the `.mo` files are not committed.
+        run: uv run python scripts/messages.py compile
+
+      - name: Keep the ESCO classification between runs
+        # Downloading it took half a minute of every leg and asked an outside service
+        # on every push, and a slow or rate-limited answer failed the leg (#714). The
+        # weekly run does not look here, so it always downloads, and that download stays
+        # the check that the API still answers in the shape the loader reads.
+        id: esco
+        if: github.event_name != 'schedule'
+        uses: actions/cache@v4
+        continue-on-error: true
+        with:
+          path: |
+            src/postulo/jobs/data/esco-${{ env.ESCO_REVISION }}.json
+            src/postulo/jobs/data/esco-skills-${{ env.ESCO_REVISION }}.zip
+          key: esco-${{ env.ESCO_REVISION }}
+
+      - name: Download the ESCO classification
+        # Not committed: megabytes of reference data, the occupations and the skills, and
+        # the fetch validates the files it writes, which is the check that the API still
+        # answers in the shape the loader reads and the tests pin.
+        if: steps.esco.outputs.cache-hit != 'true'
+        run: uv run manage.py fetch_esco --revision "$ESCO_REVISION"
+        env:
+          DJANGO_SETTINGS_MODULE: postulo.config.settings.test
+
+      - name: Test
+        # Two processes, not `-n auto` (#233): the jobs of this workflow share one host, and
+        # `auto` gave each of them a worker per host core. Run 539 spent 59 minutes on a
+        # suite that takes 4 serially, and starved every other job on the box -- the
+        # postgres leg took 27 minutes over 41 tests, the browser leg 12 minutes to install
+        # Chromium, the image scan an hour -- until the runner's limit ended them. The
+        # in-memory database and the temporary directories are each process's own.
+        if: matrix.python-version != '3.14'
+        run: uv run pytest -n 2 --durations=25
+        timeout-minutes: 30
+
+      - name: Test, and measure what the suite covers
+        # On one leg only: measuring slows the run, and three copies of the same number are
+        # not three facts. `fail_under` in pyproject.toml is the floor it must clear.
+        if: matrix.python-version == '3.14'
+        run: uv run pytest -n 2 --durations=25 --cov --cov-report=term-missing
+        timeout-minutes: 30

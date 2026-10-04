@@ -144,7 +144,9 @@ REQUIRED_JOBS = (
     # By the names the jobs carry since #319, which say what each checks: "Unit tests
     # (Python 3.12)", "Unit tests and coverage (Python 3.14)", "Browser tests (Chromium)".
     # A prefix, so a Python added to the matrix is required without an edit here.
-    ("a test leg", re.compile(r"^CI / Unit tests")),
+    # From either workflow: a push runs the newest Python in CI, and the others run in
+    # "Every Python" (#713).
+    ("a test leg", re.compile(r"^(?:CI|Every Python) / Unit tests")),
     ("the browser", re.compile(r"^CI / Browser tests")),
     # Lint, the migrations, the catalogues and the production settings left the test legs
     # for a job of their own, which runs once per push instead of once per Python (#712).
@@ -152,11 +154,30 @@ REQUIRED_JOBS = (
 )
 
 
-def ci_problems(ref: str, *, server: str, repository: str, token: str) -> list[str]:
+def supported_pythons(root: Path = ROOT) -> tuple[str, ...]:
+    """Every Python the classifiers in pyproject.toml promise, oldest first.
+
+    A push tests one of them; a release has to have been tested on all of them (#713).
+    """
+    text = (root / "pyproject.toml").read_text(encoding="utf-8")
+    found = tuple(re.findall(r'"Programming Language :: Python :: (3\.\d+)"', text))
+    if not found:
+        raise ReleaseError("pyproject.toml names no Python version among its classifiers.")
+    return found
+
+
+def ci_problems(
+    ref: str, *, server: str, repository: str, token: str, every_python: bool = True
+) -> list[str]:
     """What stands between ``ref`` and a release: every required job not recorded as a success.
 
     Empty means go. The combined status is asked for by the tag itself, so the answer is
     about the commit the tag points at, whichever branch it was pushed from.
+
+    A push to `main` runs the unit tests on the newest Python alone, so a release also needs
+    a leg on every supported Python, which the *Every Python* workflow, started by hand on
+    the commit, provides (#713);
+    ``every_python=False`` asks only what a push's own run answers.
     """
     base = _repository_api(server, repository)
     combined = _api("GET", f"{base}/commits/{urllib.parse.quote(ref, safe='')}/status", token)
@@ -172,6 +193,14 @@ def ci_problems(ref: str, *, server: str, repository: str, token: str) -> list[s
         for context in matching:
             if recorded[context] != "success":
                 problems.append(f"{context}: {recorded[context]}")
+    if every_python:
+        for python in supported_pythons():
+            leg = re.compile(rf"^(?:CI|Every Python) / Unit tests.*\(Python {re.escape(python)}\)")
+            if not any(leg.match(context) for context in recorded):
+                problems.append(
+                    f"no unit tests on Python {python} for {ref}: a push tests the newest "
+                    "Python only; start *Every Python* by hand on this commit for the rest"
+                )
     return problems
 
 

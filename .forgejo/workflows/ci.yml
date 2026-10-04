@@ -156,7 +156,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13", "3.14"]
+        # The newest Python alone, on every push (#713). The older ones the project supports
+        # run the same job in `every-python.yml`, weekly, on release branches and when started
+        # by hand; a release needs them all (`scripts/release_tools.py`). In the measured
+        # fortnight before this the three legs only ever failed together, on real faults.
+        # Not a matrix computed from the event: this Forgejo expands a matrix before it knows
+        # the event, so such an expression always takes its last branch (#713).
+        python-version: ["3.14"]
 
     # Only what depends on the interpreter. Lint, the migrations, the catalogues and the
     # production settings read the same on every Python, so they run once, in `checks`
@@ -351,8 +357,8 @@ jobs:
     # mistake reading finds -- it is the kind a server finds in ten seconds.
     #
     # A subset rather than the whole suite: the pages, the permissions and the
-    # translations do not change with the engine, and the matrix above already runs them
-    # three times. What does change is whether the driver imports, whether the migrations
+    # translations do not change with the engine, and the unit job above already runs
+    # them. What does change is whether the driver imports, whether the migrations
     # apply, and whether the backup path -- which shells out to pg_dump and pg_restore
     # instead of copying a file -- actually works. That is what this runs, and then it
     # takes a real backup of a seeded instance and puts it back.

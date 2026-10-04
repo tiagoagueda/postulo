@@ -28,8 +28,9 @@ uv run manage.py makemigrations --check --dry-run
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 
-Continuous integration runs the suite across Python 3.12, 3.13, and 3.14, and the rest of
-the above once, in its *Checks* job, together with the catalogue checks,
+Continuous integration runs the suite on Python 3.14 for every push, and on 3.12 and 3.13
+in its *Every Python* workflow: weekly, on release branches, and whenever it is started by
+hand. The rest of the above runs once, in its *Checks* job, together with the catalogue checks,
 `manage.py check --deploy` against production settings, and a check that the committed
 stylesheet has not drifted from its source. Coverage is measured on the 3.14 leg only, and
 `fail_under` in `pyproject.toml` is the floor it has to clear; run
@@ -483,10 +484,12 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    `postulo/postulo:X.Y`) to the new minor, or an install runs the last release (#403).
 4. `python scripts/release_tools.py check vX.Y.Z` says whether the three agree, and that
    both compose files name this minor.
-5. Commit, push, and **wait for CI to pass on that commit**. Then tag it and push the tag:
+5. Commit and push. A push tests the newest Python only, so start *Actions → Every Python*
+   on `main` as well, which runs the unit tests on the others, and **wait for CI and Every
+   Python to pass on that commit**. Then tag it and push the tag:
    `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
    tagged commit's statuses and refuses a tag on which any test leg, the browser job or the
-   checks are not a success (`release_tools.py check vX.Y.Z --ci` is the same question, from a
+   checks are not a success, or on which a supported Python has no passed leg (`release_tools.py check vX.Y.Z --ci` is the same question, from a
    terminal); the image workflow asks it again before building a layer (#233).
 6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds
    and scans the image, pushes `X.Y.Z`, `X.Y` and `latest`, asks the registry for all

@@ -318,6 +318,7 @@ def test_one_red_leg_is_named(monkeypatch):
         monkeypatch,
         statuses(
             ("CI / Unit tests (Python 3.12) (push)", "success"),
+            ("CI / Unit tests (Python 3.13) (push)", "success"),
             ("CI / Unit tests and coverage (Python 3.14) (push)", "failure"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, catalogues (push)", "success"),
@@ -333,6 +334,8 @@ def test_a_leg_still_running_is_not_a_pass(monkeypatch):
     asking(
         monkeypatch,
         statuses(
+            ("CI / Unit tests (Python 3.12) (workflow_dispatch)", "success"),
+            ("CI / Unit tests (Python 3.13) (workflow_dispatch)", "success"),
             ("CI / Unit tests and coverage (Python 3.14) (push)", "pending"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, catalogues (push)", "success"),
@@ -350,9 +353,10 @@ def test_no_ci_at_all_is_refused_rather_than_waved_through(monkeypatch):
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
-    assert len(problems) == 3
+    assert len(problems) == 6
     assert any("a test leg" in p for p in problems) and any("the browser" in p for p in problems)
     assert any("the checks" in p for p in problems)
+    assert sum("no unit tests on Python" in p for p in problems) == 3
 
 
 def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
@@ -361,6 +365,8 @@ def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
     asking(
         monkeypatch,
         statuses(
+            ("CI / Unit tests (Python 3.12) (workflow_dispatch)", "success"),
+            ("CI / Unit tests (Python 3.13) (workflow_dispatch)", "success"),
             ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, translations (push)", "failure"),
@@ -370,6 +376,92 @@ def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
     assert problems == ["CI / Checks: lint, migrations, translations (push): failure"]
+
+
+#: What a push to `main` leaves on its commit since #713: the newest Python only.
+PUSHED = (
+    ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
+    ("CI / Browser tests (Chromium) (push)", "success"),
+    ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
+)
+A_PUSH = statuses(*PUSHED)
+
+
+def test_a_push_alone_does_not_make_a_release(monkeypatch):
+    """A push tests the newest Python; a release promises every one the classifiers name."""
+    asking(monkeypatch, A_PUSH)
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert [p.split(" for ")[0] for p in problems] == [
+        "no unit tests on Python 3.12",
+        "no unit tests on Python 3.13",
+    ]
+    assert all("start *Every Python* by hand" in p for p in problems), problems
+
+
+def test_a_push_and_every_python_by_hand_make_a_release(monkeypatch):
+    asking(
+        monkeypatch,
+        statuses(
+            *PUSHED,
+            ("Every Python / Unit tests (Python 3.12) (workflow_dispatch)", "success"),
+            ("Every Python / Unit tests (Python 3.13) (workflow_dispatch)", "success"),
+        ),
+    )
+
+    assert tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t") == []
+
+
+def test_a_red_leg_in_every_python_is_named(monkeypatch):
+    asking(
+        monkeypatch,
+        statuses(
+            *PUSHED,
+            ("Every Python / Unit tests (Python 3.12) (workflow_dispatch)", "failure"),
+            ("Every Python / Unit tests (Python 3.13) (workflow_dispatch)", "success"),
+        ),
+    )
+
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+
+    assert problems == ["Every Python / Unit tests (Python 3.12) (workflow_dispatch): failure"]
+
+
+def test_ci_and_every_python_together_test_every_supported_python():
+    """One job in two workflows: CI's on every push, the same job on the other Pythons in
+    every-python.yml. A step changed in one and not the other is a Python that stops being
+    tested the way the newest is (#713)."""
+    import yaml
+
+    workflows = ROOT / ".forgejo" / "workflows"
+    newest = yaml.safe_load((workflows / "ci.yml").read_text(encoding="utf-8"))["jobs"]["test"]
+    rest = yaml.safe_load((workflows / "every-python.yml").read_text(encoding="utf-8"))["jobs"][
+        "test"
+    ]
+
+    def without_matrix(job):
+        return {key: value for key, value in job.items() if key != "strategy"}
+
+    assert without_matrix(newest) == without_matrix(rest), "the two copies of the job differ"
+    supported = tools.supported_pythons()
+    assert newest["strategy"]["matrix"]["python-version"] == [supported[-1]]
+    assert rest["strategy"]["matrix"]["python-version"] == list(supported[:-1])
+
+
+def test_a_push_alone_is_all_a_push_is_asked_for(monkeypatch):
+    asking(monkeypatch, A_PUSH)
+
+    assert (
+        tools.ci_problems(
+            "abc123", server="https://f", repository="o/r", token="t", every_python=False
+        )
+        == []
+    )
+
+
+def test_the_supported_pythons_are_the_classifiers():
+    assert tools.supported_pythons() == ("3.12", "3.13", "3.14")
 
 
 def test_the_check_command_asks_only_when_told_to(monkeypatch, capsys):

@@ -11,6 +11,7 @@ All notable changes to Postulo are recorded here. The format follows
 - CI starts the browser tests first, checks lint, migrations, catalogues and the production settings once instead of on every Python, bounds each test step's time and lists each suite's slowest tests; a release also needs those checks to pass. (#712)
 - CI keeps the ESCO classification between runs and downloads it live only on its weekly run. (#714)
 - CI's browser tests no longer trace every test: a failed test is run again alone with a trace, and the job stays failed either way. (#715)
+- CI runs the unit tests on Python 3.14 for every push; 3.12 and 3.13 run in a new *Every Python* workflow weekly, on release branches and by hand, and a release needs all three. (#713)
 
 ## [0.4.0] — 2026-10-04
 
