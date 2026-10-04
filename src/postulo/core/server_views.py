@@ -11,8 +11,8 @@ from __future__ import annotations
 import logging
 import platform
 import secrets
-import shutil
 import sys
+import time
 from pathlib import Path
 
 import django
@@ -947,6 +947,33 @@ def _pending_dir() -> Path:
     return plugins_dir() / PENDING_DIRNAME
 
 
+#: A waiting wheel nobody confirmed or cancelled is swept after this long.
+PENDING_MAX_AGE = 24 * 60 * 60
+
+
+def _drop_pending(token: str = "", *, sweep: bool = False) -> None:
+    """Remove the wheel this session owns, never another administrator's.
+
+    ``sweep`` also removes what was abandoned (older than ``PENDING_MAX_AGE``). The
+    directory goes once nothing is left in it.
+    """
+    scratch = _pending_dir()
+    if token:
+        (scratch / f"{token}.whl").unlink(missing_ok=True)
+    if sweep and scratch.is_dir():
+        cutoff = time.time() - PENDING_MAX_AGE
+        for stale in scratch.glob("*.whl"):
+            try:
+                if stale.stat().st_mtime < cutoff:
+                    stale.unlink(missing_ok=True)
+            except OSError:
+                continue
+    try:
+        scratch.rmdir()
+    except OSError:
+        pass  # missing, or another administrator's package is waiting in it
+
+
 class PluginsView(ServerSectionMixin, TemplateView):
     """What is installed, what can be, and the plain warning about what installing means."""
 
@@ -1429,8 +1456,9 @@ class PluginActionView(StaffRequiredMixin, View):
             messages.error(request, _("Choose a package first."))
             return redirect("server:plugins")
 
+        previous = (request.session.get("plugin_pending") or {}).get("token", "")
+        _drop_pending(previous, sweep=True)
         scratch = _pending_dir()
-        shutil.rmtree(scratch, ignore_errors=True)
         scratch.mkdir(parents=True, exist_ok=True)
         token = secrets.token_urlsafe(16)
         target = scratch / f"{token}.whl"
@@ -1462,8 +1490,8 @@ class PluginActionView(StaffRequiredMixin, View):
         return redirect("server:plugins")
 
     def _cancel(self, request: HttpRequest) -> HttpResponse:
-        request.session.pop("plugin_pending", None)
-        shutil.rmtree(_pending_dir(), ignore_errors=True)
+        pending = request.session.pop("plugin_pending", None) or {}
+        _drop_pending(pending.get("token", ""))
         messages.info(request, _("Nothing was installed."))
         return redirect("server:plugins")
 
@@ -1492,7 +1520,7 @@ class PluginActionView(StaffRequiredMixin, View):
             return redirect("server:plugins")
         finally:
             request.session.pop("plugin_pending", None)
-            shutil.rmtree(_pending_dir(), ignore_errors=True)
+            _drop_pending(token)
         messages.success(
             request,
             _(

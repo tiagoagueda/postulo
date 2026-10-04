@@ -806,6 +806,53 @@ def test_cancelling_leaves_nothing_behind(client, admin, plugins_dir, tmp_path):
     assert not (plugins_dir / ".pending").exists()
 
 
+def test_one_administrators_package_survives_another_uploading_and_cancelling(
+    client, admin, plugins_dir, installer, tmp_path
+):
+    from django.contrib.auth import get_user_model
+    from django.test import Client
+
+    second = get_user_model().objects.create_user(
+        username="second", email="second@example.com", password="x", is_staff=True
+    )
+    second.is_superuser = True
+    second.save()
+    other = Client()
+    client.force_login(admin)
+    other.force_login(second)
+    with a_wheel(tmp_path).open("rb") as handle:
+        client.post(reverse("server:plugin_action"), {"action": "upload", "package": handle})
+    token = client.session["plugin_pending"]["token"]
+
+    (tmp_path / "again").mkdir()
+    with a_wheel(tmp_path / "again").open("rb") as handle:
+        other.post(reverse("server:plugin_action"), {"action": "upload", "package": handle})
+    other.post(reverse("server:plugin_action"), {"action": "cancel"})
+
+    response = client.post(
+        reverse("server:plugin_action"), {"action": "confirm", "token": token}, follow=True
+    )
+    assert "is installed" in response.content.decode()
+    assert [item.name for item in installing.read_record()] == ["postulo-example"]
+
+
+def test_a_package_nobody_came_back_for_is_swept_after_a_day(client, admin, plugins_dir, tmp_path):
+    import os
+    import time
+
+    client.force_login(admin)
+    scratch = plugins_dir / ".pending"
+    scratch.mkdir(parents=True)
+    abandoned = scratch / "abandoned.whl"
+    abandoned.write_bytes(b"x")
+    old = time.time() - 2 * 24 * 60 * 60
+    os.utime(abandoned, (old, old))
+    with a_wheel(tmp_path).open("rb") as handle:
+        client.post(reverse("server:plugin_action"), {"action": "upload", "package": handle})
+    assert not abandoned.exists()
+    assert len(list(scratch.glob("*.whl"))) == 1
+
+
 def test_switching_off_and_removing_from_the_page(client, admin, plugins_dir, installer, tmp_path):
     installing.install_wheel(a_wheel(tmp_path))
     client.force_login(admin)
