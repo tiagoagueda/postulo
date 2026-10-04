@@ -44,7 +44,10 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.db import connection
+from django.db.migrations.loader import MigrationLoader
+from django.db.migrations.recorder import MigrationRecorder
 from django.utils import timezone
+from packaging.version import InvalidVersion, Version
 
 from postulo import __version__
 from postulo.config import sqlite as sqlite_options
@@ -486,12 +489,53 @@ def _prefix_of(name: str) -> str | None:
     return None
 
 
-def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
-    """Put an archive back: database, then media and plugins, then migrations."""
+def _version_key(text: object):
+    try:
+        return Version(str(text))
+    except InvalidVersion:
+        return None
+
+
+def _newer_than_installed(manifest: dict) -> str | None:
+    """The version a manifest names when it is newer than this Postulo, else None."""
+    recorded = (manifest.get("postulo") or {}).get("version")
+    archive, here = _version_key(recorded), _version_key(__version__)
+    if archive is not None and here is not None and archive > here:
+        return str(recorded)
+    return None
+
+
+def _unknown_migrations() -> list[str]:
+    """Migrations the loaded database says were applied that this code does not have."""
+    loader = MigrationLoader(None, ignore_no_migrations=True)
+    known = set(loader.disk_migrations)
+    applied = MigrationRecorder(connection).applied_migrations()
+    return sorted(
+        f"{app}.{name}"
+        for app, name in applied
+        if app in loader.migrated_apps and (app, name) not in known
+    )
+
+
+def restore_backup(
+    path: Path | str, *, force: bool = False, allow_newer: bool = False
+) -> RestoreReport:
+    """Put an archive back: database, then media and plugins, then migrations.
+
+    An archive written by a newer Postulo is refused unless ``allow_newer``: ``migrate``
+    cannot go backwards, so the database would carry a schema this code does not know.
+    """
     from postulo.plugins import secrets
 
     path = Path(path)
     manifest = verify_backup(path)
+    if not allow_newer and (newer := _newer_than_installed(manifest)):
+        raise BackupError(
+            f"This archive was written by Postulo {newer}; this instance runs {__version__}. "
+            f"Install Postulo {newer} or later and restore it there — a restore cannot "
+            "undo the schema changes of a newer release. Nothing was changed. "
+            "Pass --allow-newer only if you know the two schemas match."
+        )
     engine = manifest["database"]["engine"]
     if engine != database_vendor():
         raise BackupError(
@@ -554,6 +598,14 @@ def restore_backup(path: Path | str, *, force: bool = False) -> RestoreReport:
             files.append((entry, prefix, relative))
 
         load_database(dump, member)
+        if not allow_newer and (unknown := _unknown_migrations()):
+            raise BackupError(
+                "The restored database records migrations this version of Postulo does not "
+                f"have ({', '.join(unknown[:3])}{', ...' if len(unknown) > 3 else ''}), so it "
+                "was written by a newer build. The database has been replaced; install the "
+                "newer version and restore again, or pass --allow-newer only if you know the "
+                "two schemas match."
+            )
 
         for entry, prefix, relative in files:
             destination = roots[prefix] / Path(*relative.parts)

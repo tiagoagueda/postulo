@@ -361,6 +361,43 @@ def test_an_archive_from_the_other_engine_is_refused(tmp_path, monkeypatch):
         restore_backup(archive)
 
 
+def test_an_archive_from_a_newer_postulo_is_refused_before_the_database_is_touched(tmp_path):
+    a_search("kept")
+    source = write_backup(tmp_path / "instance.tar.gz").path
+
+    def newer(manifest):
+        manifest["postulo"]["version"] = "99.1.0"
+        return manifest
+
+    archive = rewritten_manifest(source, tmp_path / "newer.tar.gz", newer)
+    with pytest.raises(BackupError, match=r"Postulo 99\.1\.0"):
+        restore_backup(archive, force=True)
+    assert get_user_model().objects.filter(username="kept").exists()
+
+
+def test_a_newer_archive_restores_when_asked_to(tmp_path):
+    source = write_backup(tmp_path / "instance.tar.gz").path
+
+    def newer(manifest):
+        manifest["postulo"]["version"] = "99.1.0"
+        return manifest
+
+    archive = rewritten_manifest(source, tmp_path / "newer.tar.gz", newer)
+    assert restore_backup(archive, force=True, allow_newer=True).counts
+
+
+def test_a_database_with_migrations_this_code_lacks_is_refused(tmp_path, monkeypatch):
+    archive = write_backup(tmp_path / "instance.tar.gz").path
+    monkeypatch.setattr(backup_module, "_unknown_migrations", lambda: ["jobs.9999_future"])
+    with pytest.raises(BackupError, match=r"jobs\.9999_future"):
+        restore_backup(archive, force=True)
+    assert restore_backup(archive, force=True, allow_newer=True).counts
+
+
+def test_this_codes_own_migrations_are_all_known():
+    assert backup_module._unknown_migrations() == []
+
+
 # ---------------------------------------------------- plugins and the field key
 
 

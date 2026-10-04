@@ -26,9 +26,21 @@ class Command(BaseCommand):
             ),
         )
 
+        parser.add_argument(
+            "--allow-newer",
+            action="store_true",
+            help=(
+                "Restore an archive written by a newer Postulo than this one. The database "
+                "then has a schema this code does not know; only for archives whose schema "
+                "is known to match."
+            ),
+        )
+
     def handle(self, *args, **options) -> None:
         try:
-            report = restore_backup(options["archive"], force=options["force"])
+            report = restore_backup(
+                options["archive"], force=options["force"], allow_newer=options["allow_newer"]
+            )
         except BackupError as error:
             raise CommandError(str(error)) from error
 
