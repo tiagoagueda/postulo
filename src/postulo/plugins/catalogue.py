@@ -342,9 +342,12 @@ def find(
     raise CatalogueError(str(_("No catalogue lists %(name)s.")) % {"name": plugin})
 
 
-#: How long one read of a wheel's download may wait. Part of the install's budget in the
-#: request, which has to finish inside gunicorn's timeout (#604); see `installing`.
-DOWNLOAD_TIMEOUT = 15.0
+#: How long one read of a wheel's download may wait, and how long the whole download may
+#: take. Part of the install's budget in the request, which has to finish inside gunicorn's
+#: timeout (#604); see `installing`. A host sending a byte every few seconds trips the first
+#: never, so the second is checked as each chunk arrives.
+DOWNLOAD_TIMEOUT = 5.0
+DOWNLOAD_BUDGET = 15.0
 
 
 def download(release: Release, into: Path) -> Path:
@@ -353,6 +356,7 @@ def download(release: Release, into: Path) -> Path:
 
     into.mkdir(parents=True, exist_ok=True)
     target = into / (release.url.rstrip("/").rsplit("/", 1)[-1] or "plugin.whl")
+    deadline = http.deadline_in(DOWNLOAD_BUDGET)
     with (
         http.client(timeout=DOWNLOAD_TIMEOUT) as client,
         client.stream("GET", release.url) as response,
@@ -366,6 +370,10 @@ def download(release: Release, into: Path) -> Path:
         with target.open("wb") as handle:
             for chunk in response.iter_bytes():
                 written += len(chunk)
+                if http.past(deadline):
+                    handle.close()
+                    target.unlink(missing_ok=True)
+                    raise CatalogueError(str(_("The download is taking too long.")))
                 if written > MAX_WHEEL_BYTES:
                     handle.close()
                     target.unlink(missing_ok=True)

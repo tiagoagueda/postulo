@@ -89,7 +89,7 @@ logger = logging.getLogger(__name__)
 #: Only wheels, and only pure-Python ones.
 PURE_PYTHON = "py3-none-any"
 #: How long an install may take before it is called a failure. The three budgets of an
-#: install -- this, the import check and a download's `catalogue.DOWNLOAD_TIMEOUT` -- run
+#: install -- this, the import check and a download's `catalogue.DOWNLOAD_BUDGET` -- run
 #: inside one request, and the image kills a worker whose request passes
 #: ``--timeout 120``; together they must stay well under it, or the clean-up below never
 #: runs (#604). `tests/test_plugin_install.py` holds them to the Dockerfile.

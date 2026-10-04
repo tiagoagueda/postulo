@@ -1364,8 +1364,38 @@ def test_the_install_budgets_fit_inside_the_workers_timeout():
     text = dockerfile.read_text(encoding="utf-8")
     worker = int(re.search(r'GUNICORN_CMD_ARGS="--timeout (\d+)', text).group(1))
 
-    spent = installing.INSTALL_TIMEOUT + installing.VERIFY_TIMEOUT + catalogue.DOWNLOAD_TIMEOUT
+    # The download may run one read past its budget, so both count.
+    spent = (
+        installing.INSTALL_TIMEOUT
+        + installing.VERIFY_TIMEOUT
+        + catalogue.DOWNLOAD_BUDGET
+        + catalogue.DOWNLOAD_TIMEOUT
+    )
     assert spent < worker
+
+
+def test_a_download_that_trickles_is_stopped_by_its_budget_not_only_per_read(tmp_path, monkeypatch):
+    """A byte every few seconds never trips the per-read timeout; the whole is held to a
+    budget (#604)."""
+    import httpx
+
+    chunks = iter([b"x"] * 100)
+
+    def handler(request):
+        return httpx.Response(200, content=b"".join(chunks))
+
+    def client(**kwargs):
+        return httpx.Client(transport=httpx.MockTransport(handler))
+
+    monkeypatch.setattr(catalogue.http, "client", client)
+    monkeypatch.setattr(catalogue.http, "past", lambda deadline: True)
+    release = catalogue.Release(
+        version="1.0", url="https://plugins.example/p-1.0-py3-none-any.whl", sha256="0" * 64
+    )
+
+    with pytest.raises(catalogue.CatalogueError, match="too long"):
+        catalogue.download(release, tmp_path)
+    assert not list(tmp_path.iterdir()), "nothing half-written is left"
 
 
 @pytest.mark.parametrize("where", ["run_install", "verify_imports"])
