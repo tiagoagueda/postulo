@@ -33,13 +33,17 @@ class UnsafeURL(CaptureError):
     """The URL points somewhere Postulo will not go."""
 
 
+class Unresolvable(UnsafeURL):
+    """The name did not resolve. Not the same as private: a resolver can answer next time (#549)."""
+
+
 def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
     try:
         infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
     except (socket.gaierror, UnicodeError) as exc:
         # `UnicodeError`: the name is encoded before it is looked up, and one with an empty
         # label or one over 63 characters cannot be. Nothing answers to such a name either.
-        raise UnsafeURL(_("That hostname could not be resolved.")) from exc
+        raise Unresolvable(_("That hostname could not be resolved.")) from exc
     return [ipaddress.ip_address(info[4][0]) for info in infos]
 
 
@@ -70,7 +74,7 @@ def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv
 
     addresses = _addresses_for(host)
     if not addresses:
-        raise UnsafeURL(_("That hostname could not be resolved."))
+        raise Unresolvable(_("That hostname could not be resolved."))
     if not all(is_public(address) for address in addresses):
         raise UnsafeURL(
             _(

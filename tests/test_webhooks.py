@@ -255,6 +255,27 @@ def test_a_private_destination_is_refused_at_delivery_too(user, settings):
     assert row.status == DeliveryStatus.GIVEN_UP
 
 
+def test_a_hostname_that_fails_to_resolve_is_retried_not_blamed_on_a_private_address(
+    user, settings
+):
+    """A resolver hiccup is transient whatever the operator's address policy says (#549)."""
+    import socket
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = False
+    webhook_connection(user)
+    notify(user, Notification(event="reminder_due", title="x", key="r:1"))
+    with (
+        mock.patch("socket.getaddrinfo", side_effect=socket.gaierror(socket.EAI_AGAIN, "again")),
+        mock.patch.object(webhook, "post") as posted,
+    ):
+        assert webhooks.send_pending() == (0, 1)
+    assert not posted.called
+    row = WebhookDelivery.objects.get()
+    assert row.status == DeliveryStatus.FAILED and row.attempts == 1
+    assert row.next_attempt_at > timezone.now()
+    assert "POSTULO_CONNECTIONS_ALLOW_PRIVATE" not in row.last_error
+
+
 # ------------------------------------------- what the connection says about it
 
 

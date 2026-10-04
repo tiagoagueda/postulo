@@ -131,7 +131,8 @@ def deliver(row) -> bool:
         # Said on the connection as well as the row: the row is given up on for good,
         # and the connection is the only place a person looks (#574).
         connection.record_test(False, str(refused))
-        return fail(str(refused), final=True)
+        # A name that did not resolve is a resolver's bad moment, not a verdict (#549).
+        return fail(str(refused), final=not refused.transient)
     try:
         response = plugin.post(url, secret, row.body, event=row.event, delivery=str(row.pk))
     except Exception as error:

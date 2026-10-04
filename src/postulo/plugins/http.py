@@ -23,7 +23,13 @@ from collections.abc import Iterator
 import httpcore
 import httpx
 
-from .public_addresses import USER_AGENT, UnsafeURL, public_addresses_for, validate_public_url
+from .public_addresses import (
+    USER_AGENT,
+    Unresolvable,
+    UnsafeURL,
+    public_addresses_for,
+    validate_public_url,
+)
 
 DEFAULT_TIMEOUT = 10.0
 MAX_REDIRECTS = 3
@@ -40,7 +46,13 @@ _PIECE = 64 * 1024
 
 
 class DestinationRefused(Exception):
-    """The address is private and the operator has not allowed private destinations."""
+    """The address is private and the operator has not allowed private destinations.
+
+    ``transient`` is true when the name merely did not resolve: that says nothing about the
+    address, and a later attempt may get an answer (#549).
+    """
+
+    transient = False
 
 
 class BodyRefused(Exception):
@@ -86,14 +98,19 @@ def check_destination(url: str) -> None:
     try:
         validate_public_url(url)
     except UnsafeURL as exc:
-        raise DestinationRefused(
-            f"{exc} Connections may only reach private or local addresses when the operator "
-            "sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
-        ) from exc
+        raise _refused(exc) from exc
 
 
 def _refused(exc: UnsafeURL) -> DestinationRefused:
-    """The connection policy's wording for an address the public check turned down."""
+    """The connection policy's wording for an address the public check turned down.
+
+    A name that did not resolve is not turned down for being private, so it is not told it
+    was, and it is marked transient for a caller that can try again (#549).
+    """
+    if isinstance(exc, Unresolvable):
+        refused = DestinationRefused(str(exc))
+        refused.transient = True
+        return refused
     return DestinationRefused(
         f"{exc} Connections may only reach private or local addresses when the operator "
         "sets POSTULO_CONNECTIONS_ALLOW_PRIVATE=true."
