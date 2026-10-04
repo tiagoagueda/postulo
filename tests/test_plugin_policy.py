@@ -401,3 +401,38 @@ def test_the_own_mail_outbox_is_governed_like_any_connected_plugin(client, admin
     assert PluginPolicy.objects.get(plugin="own-mail", person=None).state == "off"
     assert "own-mail" not in [item.name for item in policy.connected_plugins(user)]
     assert correspondence.outbox_for(user) is None
+
+
+def test_a_name_another_kind_already_holds_is_refused(caplog):
+    """The policy rows, the form fields and the logo URL all key on the name alone, so two
+    plugins of different kinds with one name would be governed by one switch (#593). The
+    first kind in line keeps it and the second is left out, with a line in the log."""
+    from postulo.plugins import registry
+    from tests.test_connections import EchoNotifier
+
+    class DupSource:
+        name = "dup"
+        version = "1.0"
+        kind = "source"
+
+        def can_handle(self, url):
+            return False
+
+        def parse(self, url, html):
+            return None
+
+    class DupNotifier(EchoNotifier):
+        name = "dup"
+
+    registry.register_builtin("source", DupSource)
+    registry.register_builtin("notifier", DupNotifier)
+    try:
+        with caplog.at_level("ERROR"):
+            registry.plugins("notifier", refresh=True)
+        assert [p.name for p in registry.plugins("source") if p.name == "dup"] == ["dup"]
+        assert [p.name for p in registry.plugins("notifier")].count("dup") == 0
+        assert registry.find_any("dup").kind == "source"
+        assert "dup" in caplog.text
+    finally:
+        registry.unregister_builtin("source", DupSource)
+        registry.unregister_builtin("notifier", DupNotifier)

@@ -314,11 +314,41 @@ def plugins(kind: str, *, refresh: bool = False) -> list:
         raise ValueError(f"Unknown plugin kind {kind!r}; one of {sorted(GROUPS)}.")
     catch_up()
     if kind not in _cache or refresh:
-        _cache[kind] = [
-            *_load_third_party(kind),
-            *(plugin_class() for plugin_class in _builtin.get(kind, [])),
-        ]
+        _cache[kind] = _unique_names(
+            kind,
+            [
+                *_load_third_party(kind),
+                *(plugin_class() for plugin_class in _builtin.get(kind, [])),
+            ],
+        )
     return list(_cache[kind])
+
+
+def _unique_names(kind: str, candidates: list) -> list:
+    """Leave out a plugin whose name is already held, by its own kind or an earlier one.
+
+    A name is unique across the instance: the policy rows, the form fields, the logo URL
+    and ``find_any`` all key on it alone, so two plugins sharing one would be governed by a
+    single switch and drawn with one id (#593). The kinds are taken in ``GROUPS`` order, so
+    which of two wins does not depend on which was asked for first.
+    """
+    held: set[str] = set()
+    for earlier in GROUPS:
+        if earlier == kind:
+            break
+        held.update(plugin.name for plugin in plugins(earlier))
+    kept: list = []
+    for plugin in candidates:
+        if plugin.name in held:
+            logger.error(
+                "Plugin %r (%s) was ignored: another plugin already has that name",
+                plugin.name,
+                kind,
+            )
+            continue
+        held.add(plugin.name)
+        kept.append(plugin)
+    return kept
 
 
 def load_everything() -> None:

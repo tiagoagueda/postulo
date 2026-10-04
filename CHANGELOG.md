@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A plugin whose name another kind already holds is now left out and logged, so one policy switch, form id and logo can no longer govern two plugins (a source and a notifier sharing a name). (#593)
 - Fixed a broken logo image on Settings → Plugins for plugins a person (or an administrator) switched off: the logo is now served to anyone the plugin is offered to, on or off. (#594)
 - `manage.py plugins disable` and `remove` now refuse the package that carries the selected mail transport, as the plugins page always did; the lock moved into the install code both use. (#595)
 - Settings → Plugins now shows the Uploaded or Custom tag on an installed plugin whose package name differs from its own, as every official plugin's does; before, only built-ins were tagged. (#603)
