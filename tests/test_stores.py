@@ -412,6 +412,23 @@ def test_send_now_does_not_take_a_copy_the_scheduler_is_sending(user):
     assert copy.status == CopyStatus.PENDING
 
 
+def test_a_pass_holding_a_copy_another_pass_already_failed_does_not_send_it_again(user):
+    """The lease is cleared when a send fails, so a stale row must not find it free (#509)."""
+    a_store(user)
+    ShelfStore.fail_with = "the shelf is full"
+    upload = an_upload(user)
+    stale = upload.copies.get()
+
+    assert archiving.claim(upload.copies.get()) is True
+    assert send_pending() == (0, 0), "the first pass has it"
+    first = upload.copies.get()
+    assert archiving.send_copy(first) is False, "and it fails, clearing the lease"
+    first.refresh_from_db()
+    assert first.claimed_until is None and first.attempts == 1
+
+    assert archiving.claim(stale) is False, "a pass that read it before the failure is too late"
+
+
 def test_a_store_may_decline_a_kind(user):
     a_store(user)
     ShelfStore.decline_kinds = {"certificate"}

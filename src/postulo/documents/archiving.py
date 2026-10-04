@@ -227,10 +227,14 @@ def claim(copy, now=None) -> bool:
     leaves a copy that comes back by itself a quarter of an hour later, instead of one stuck
     in a state nobody clears. It is kept apart from `next_attempt_at`, which *Send now*
     overrides: a lease written there looked like a retry wait, and was taken again.
+
+    It also requires the copy to be as it was read: a pass holding a copy it read before
+    another pass tried and failed it would otherwise find the lease cleared and the status
+    not *sent*, and put the document a second time at once.
     """
     now = now or timezone.now()
     return bool(
-        DocumentCopy.objects.filter(pk=copy.pk)
+        DocumentCopy.objects.filter(pk=copy.pk, status=copy.status, attempts=copy.attempts)
         .exclude(status=CopyStatus.SENT)
         .filter(Q(claimed_until__isnull=True) | Q(claimed_until__lt=now))
         .update(claimed_until=now + SENDING_LEASE)
