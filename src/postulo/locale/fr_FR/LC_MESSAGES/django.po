@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-04 07:17+0000\n"
+"POT-Creation-Date: 2026-10-04 08:05+0000\n"
 "PO-Revision-Date: 2026-09-05 22:22+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: français (France)\n"
@@ -783,7 +783,7 @@ msgstr "%(name)s est désormais administrateur."
 msgid "%(name)s is now in row %(row)s, place %(place)s."
 msgstr "%(name)s est maintenant à la ligne %(row)s, place %(place)s."
 
-#: src/postulo/accounts/settings_views.py:90
+#: src/postulo/accounts/settings_views.py:91
 #, python-format, draft
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr "%(name)s est maintenant à la place %(place)s dans la navigation."
@@ -1672,7 +1672,7 @@ msgstr ""
 msgid "A page title"
 msgstr "Un titre de page"
 
-#: src/postulo/templates/settings/account.html:129
+#: src/postulo/templates/settings/account.html:135
 #, python-format, draft
 msgid ""
 "A passkey is tied to the address you made it at, which here is %(host)s. Reaching this instance by another name, or moving it, will not carry your passkeys over."
@@ -2083,14 +2083,14 @@ msgstr "acceptée le"
 msgid "accepted by"
 msgstr "acceptée par"
 
-#: src/postulo/accounts/settings_views.py:104
+#: src/postulo/accounts/settings_views.py:105
 #: src/postulo/core/settings_sections.py:49
 #: src/postulo/templates/settings/accessibility.html:7
 #, draft
 msgid "Accessibility"
 msgstr "Accessibilité"
 
-#: src/postulo/accounts/settings_views.py:172
+#: src/postulo/accounts/settings_views.py:173
 #: src/postulo/core/settings_sections.py:63
 #: src/postulo/templates/settings/account.html:7
 #, draft
@@ -2576,14 +2576,14 @@ msgstr "Une entrée sans nom"
 msgid "An example scheme"
 msgstr "Un exemple de système"
 
-#: src/postulo/core/phones.py:678
+#: src/postulo/core/phones.py:684
 #, draft
 msgid ""
 "An extension cannot be kept as part of the number. Leave it out here, and put it in the notes."
 msgstr ""
 "Un numéro de poste ne peut pas être conservé avec le numéro. Ne le mettez pas ici, et mettez-le dans les notes."
 
-#: src/postulo/core/phones.py:653
+#: src/postulo/core/phones.py:659
 #, draft
 msgid "An extension cannot be kept as part of the number. Leave it out."
 msgstr ""
@@ -2822,7 +2822,7 @@ msgstr "Jeton d'API"
 msgid "API tokens"
 msgstr "Jetons d'API"
 
-#: src/postulo/accounts/settings_views.py:68
+#: src/postulo/accounts/settings_views.py:69
 #: src/postulo/core/settings_sections.py:39
 #: src/postulo/templates/settings/appearance.html:7
 #, draft
@@ -3539,7 +3539,7 @@ msgstr "Ne peut pas être ajouté"
 msgid "cannot be checked on this machine"
 msgstr "impossible à vérifier sur cette machine"
 
-#: src/postulo/accounts/settings_views.py:126
+#: src/postulo/accounts/settings_views.py:127
 #: src/postulo/core/server_sections.py:50 src/postulo/core/server_views.py:540
 #: src/postulo/core/settings_sections.py:87 src/postulo/jobs/models.py:1386
 #: src/postulo/templates/server/capture.html:8
@@ -5385,7 +5385,7 @@ msgstr "adresse e-mail"
 msgid "Email address"
 msgstr "Adresse e-mail"
 
-#: src/postulo/accounts/forms.py:1195
+#: src/postulo/accounts/forms.py:1211
 #, draft
 msgid "Email address (optional)"
 msgstr "Adresse e-mail (facultatif)"
@@ -5586,7 +5586,7 @@ msgid ""
 msgstr ""
 "Toutes les connexions de cette instance : le type de plugin, le plugin, et la configuration qui dit à qui il s'adresse. Les secrets ne figurent pas sur cette page ; ils sont stockés chiffrés et ne sont montrés à personne."
 
-#: src/postulo/accounts/forms.py:1162
+#: src/postulo/accounts/forms.py:1178
 #, draft
 msgid "Every date and time on these pages is shown in it."
 msgstr "Toutes les dates et heures de ces pages s'affichent dans ce fuseau."
@@ -6222,7 +6222,7 @@ msgstr "Oublier le jeton"
 msgid "Forget what is remembered for %(host)s"
 msgstr "Oublier ce qui est retenu pour %(host)s"
 
-#: src/postulo/accounts/settings_views.py:161
+#: src/postulo/accounts/settings_views.py:162
 #, python-format, draft
 msgid ""
 "Forgotten. Your next capture from %(host)s is read as if for the first time."
@@ -6421,10 +6421,17 @@ msgstr "Donnez un nom au jeton et au moins une portée."
 msgid "Given up"
 msgstr "Abandonné"
 
-#: src/postulo/templates/403.html:19 src/postulo/templates/404.html:19
+#: src/postulo/templates/400.html:15 src/postulo/templates/403.html:19
+#: src/postulo/templates/403_csrf.html:18 src/postulo/templates/404.html:19
+#: src/postulo/templates/500.html:18
 #, draft
 msgid "Go back"
 msgstr "Retour"
+
+#: src/postulo/templates/403_csrf.html:16
+#, draft
+msgid "Go back, reload the page and send the form again."
+msgstr "Revenez en arrière, rechargez la page et renvoyez le formulaire."
 
 #: src/postulo/templates/jobs/merge.html:119
 #, draft
@@ -6474,7 +6481,7 @@ msgstr "Gravatar vérifié le"
 msgid "Gravatar copy"
 msgstr "Copie du Gravatar"
 
-#: src/postulo/accounts/views.py:246 src/postulo/accounts/views.py:354
+#: src/postulo/accounts/avatars.py:211
 #, draft
 msgid "Gravatar could not be reached just now. Try again later."
 msgstr "Gravatar est injoignable pour le moment. Réessayez plus tard."
@@ -6485,7 +6492,7 @@ msgid "Gravatar had no picture for your address when last asked, on %(when)s."
 msgstr ""
 "Gravatar n'avait pas d'image pour votre adresse à la dernière vérification, le %(when)s."
 
-#: src/postulo/accounts/views.py:242 src/postulo/accounts/views.py:353
+#: src/postulo/accounts/avatars.py:208
 #, draft
 msgid "Gravatar has no picture for your address, so your initials stay."
 msgstr ""
@@ -7331,7 +7338,7 @@ msgid ""
 msgstr ""
 "Sur invitation uniquement : le formulaire d'inscription n'est pas proposé. Invitez des personnes depuis la section Personnes."
 
-#: src/postulo/accounts/views.py:408
+#: src/postulo/accounts/views.py:396
 #, draft
 msgid "Invitation revoked."
 msgstr "Invitation révoquée."
@@ -7679,7 +7686,7 @@ msgctxt "an identifier"
 msgid "Kept as it was"
 msgstr "Conservé tel quel"
 
-#: src/postulo/core/phones.py:671
+#: src/postulo/core/phones.py:677
 #, python-format, draft
 msgid "Kept as it was written. The number that can be dialled is %(number)s."
 msgstr ""
@@ -7752,7 +7759,7 @@ msgstr ""
 msgid "label"
 msgstr "libellé"
 
-#: src/postulo/accounts/forms.py:1149 src/postulo/resume/forms.py:314
+#: src/postulo/accounts/forms.py:1165 src/postulo/resume/forms.py:314
 #: src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
@@ -7766,7 +7773,7 @@ msgstr "Langue"
 msgid "language"
 msgstr "langue"
 
-#: src/postulo/accounts/settings_views.py:110
+#: src/postulo/accounts/settings_views.py:111
 #: src/postulo/core/settings_sections.py:56
 #: src/postulo/templates/settings/locale.html:7
 #, draft
@@ -8425,8 +8432,8 @@ msgstr "Nommer administrateur"
 
 #: src/postulo/templates/settings/account.html:53
 #: src/postulo/templates/settings/account.html:112
-#: src/postulo/templates/settings/account.html:162
-#: src/postulo/templates/settings/account.html:204
+#: src/postulo/templates/settings/account.html:174
+#: src/postulo/templates/settings/account.html:226
 #, draft
 msgid "Manage"
 msgstr "Gérer"
@@ -8986,7 +8993,7 @@ msgid ""
 msgstr ""
 "Aucune connexion. Cette instance ne parle à rien en dehors d'elle-même, ce qui est la liste de destinataires la plus courte qui soit."
 
-#: src/postulo/core/phones.py:655
+#: src/postulo/core/phones.py:661
 #, draft
 msgid ""
 "No country has the dialling code that number begins with, so it could not be checked. It is kept as it was typed."
@@ -9528,7 +9535,7 @@ msgstr "note"
 msgid "Note"
 msgstr "Note"
 
-#: src/postulo/accounts/forms.py:1196
+#: src/postulo/accounts/forms.py:1212
 #: src/postulo/templates/applications/partials/status_card.html:61
 #, draft
 msgid "Note (optional)"
@@ -9891,7 +9898,7 @@ msgstr ""
 msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Rien n'a été connecté. Personne n'a consenti à quoi que ce soit."
 
-#: src/postulo/accounts/settings_views.py:259
+#: src/postulo/accounts/settings_views.py:270
 #: src/postulo/core/server_views.py:1308 src/postulo/core/server_views.py:1342
 #, draft
 msgid "Nothing was different."
@@ -9929,7 +9936,7 @@ msgid ""
 msgstr ""
 "Rien n'a été fusionné : Postulo ne sait pas déplacer ce que la fiche contient (%(what)s)."
 
-#: src/postulo/accounts/settings_views.py:165
+#: src/postulo/accounts/settings_views.py:166
 #, draft
 msgid "Nothing was remembered for that site."
 msgstr "Rien n’était retenu pour ce site."
@@ -10004,7 +10011,7 @@ msgstr ""
 msgid "Off — and they may not switch it on"
 msgstr "Désactivé — et elle ne peut pas l’activer"
 
-#: src/postulo/templates/settings/account.html:157
+#: src/postulo/templates/settings/account.html:169
 #, draft
 msgid ""
 "Off. A code from an authenticator app, asked for after the password, means a leaked password alone is not enough."
@@ -10143,12 +10150,25 @@ msgid ""
 msgstr ""
 "Activé, elle remplace entièrement le mot de passe et votre appareil demande une empreinte, votre visage ou un code PIN. Désactivé, elle n’est qu’une seconde étape après le mot de passe et n’apparaîtra pas sur la page de connexion."
 
-#: src/postulo/templates/settings/account.html:155
+#: src/postulo/templates/settings/account.html:162
+#, draft
+msgid ""
+"On. Signing in asks for a code from your authenticator app or for one of your security keys, or a recovery code."
+msgstr ""
+"Activée. La connexion demande un code de votre application d’authentification ou l’une de vos clés de sécurité, ou un code de récupération."
+
+#: src/postulo/templates/settings/account.html:166
 #, draft
 msgid ""
 "On. Signing in asks for a code from your authenticator app, or a recovery code."
 msgstr ""
 "Activée. La connexion demande un code de votre application d'authentification, ou un code de récupération."
+
+#: src/postulo/templates/settings/account.html:164
+#, draft
+msgid "On. Signing in asks for one of your security keys, or a recovery code."
+msgstr ""
+"Activée. La connexion demande l’une de vos clés de sécurité, ou un code de récupération."
 
 #: src/postulo/plugins/syncing.py:35
 #, draft
@@ -10758,6 +10778,13 @@ msgstr "Les parties de vos coordonnées"
 msgid "Passkeys"
 msgstr "Clés d’accès"
 
+#: src/postulo/templates/settings/account.html:120
+#, draft
+msgid ""
+"Passkeys need the instance to be reached by a name, not a bare address. Open it at its domain name to add one."
+msgstr ""
+"Les clés d’accès exigent que l’instance soit jointe par un nom, et non par une adresse brute. Ouvrez-la à son nom de domaine pour en ajouter une."
+
 #: src/postulo/core/models.py:1032
 #, draft
 msgid "password"
@@ -11046,7 +11073,7 @@ msgstr "dépôts de plugins"
 msgid "plugin repository"
 msgstr "dépôt de plugins"
 
-#: src/postulo/accounts/settings_views.py:226
+#: src/postulo/accounts/settings_views.py:237
 #: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:995
 #: src/postulo/core/server_views.py:1058
 #: src/postulo/core/settings_sections.py:108 src/postulo/plugins/apps.py:9
@@ -11252,6 +11279,12 @@ msgstr ""
 #, draft
 msgid "Postulo could not be reached. Nothing on this page has changed."
 msgstr "Postulo est injoignable. Rien n’a changé sur cette page."
+
+#: src/postulo/templates/400.html:13
+#, draft
+msgid "Postulo could not make sense of that request. Go back and try again."
+msgstr ""
+"Postulo n’a pas pu comprendre cette requête. Revenez en arrière et réessayez."
 
 #: src/postulo/jobs/slow.py:154
 #, draft
@@ -12276,6 +12309,11 @@ msgstr "Rapport"
 msgid "Report · %(period)s"
 msgstr "Rapport · %(period)s"
 
+#: src/postulo/templates/400.html:4 src/postulo/templates/400.html:11
+#, draft
+msgid "Request refused"
+msgstr "Requête refusée"
+
 #: src/postulo/jobs/industries.py:77
 #, draft
 msgid "Research"
@@ -12573,8 +12611,8 @@ msgstr "Enregistré en %(language)s."
 msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Enregistrée dans vos offres. Décidez quand vous serez prêt."
 
-#: src/postulo/accounts/settings_views.py:42
-#: src/postulo/accounts/settings_views.py:259
+#: src/postulo/accounts/settings_views.py:43
+#: src/postulo/accounts/settings_views.py:270
 #: src/postulo/core/server_views.py:452 src/postulo/core/server_views.py:616
 #: src/postulo/core/server_views.py:1308 src/postulo/core/server_views.py:1342
 #: src/postulo/core/server_views.py:1442 src/postulo/resume/views.py:315
@@ -12956,7 +12994,7 @@ msgstr "défini dans l’environnement"
 msgid "Set the password"
 msgstr "Définir le mot de passe"
 
-#: src/postulo/templates/settings/account.html:162
+#: src/postulo/templates/settings/account.html:174
 #, draft
 msgid "Set up"
 msgstr "Configurer"
@@ -13151,7 +13189,7 @@ msgstr "Se déconnecter"
 msgid "Sign-in"
 msgstr "Connexion"
 
-#: src/postulo/templates/settings/account.html:196
+#: src/postulo/templates/settings/account.html:218
 #, draft
 msgid "Sign-in methods"
 msgstr "Méthodes de connexion"
@@ -13464,6 +13502,11 @@ msgstr "Quelqu'un y a consenti. Testez-le pour vérifier que cela tient toujours
 #, draft
 msgid "Something that is not an entry"
 msgstr "Quelque chose qui n'est pas une entrée"
+
+#: src/postulo/templates/500.html:6 src/postulo/templates/500.html:14
+#, draft
+msgid "Something went wrong"
+msgstr "Quelque chose s’est mal passé"
 
 #: src/postulo/core/errands.py:162
 #, draft
@@ -14146,7 +14189,7 @@ msgstr "Cette connexion n'utilise pas le consentement."
 msgid "That connection no longer exists."
 msgstr "Cette connexion n'existe plus."
 
-#: src/postulo/core/phones.py:663
+#: src/postulo/core/phones.py:669
 #, draft
 msgid ""
 "That could not be read as a telephone number, so it could not be checked. It is kept as it was typed."
@@ -14276,14 +14319,14 @@ msgid ""
 msgstr ""
 "Ce fichier a été envoyé avec l'encodage de contenu « %(coding)s », que Postulo ne décompresse pas."
 
-#: src/postulo/core/phones.py:682
+#: src/postulo/core/phones.py:688
 #, draft
 msgid ""
 "That has words in it as well as a number. Leave them out here, and put them in the notes."
 msgstr ""
 "Il y a des mots en plus du numéro. Ne les mettez pas ici, et mettez-les dans les notes."
 
-#: src/postulo/core/phones.py:654
+#: src/postulo/core/phones.py:660
 #, draft
 msgid "That has words in it as well as a number. Leave them out."
 msgstr "Il y a des mots en plus du numéro. Ne les mettez pas."
@@ -14304,7 +14347,7 @@ msgstr "Cette image ne peut pas être réduite assez pour être conservée."
 msgid "That image is far larger than it needs to be."
 msgstr "Cette image est bien plus grande qu'il n'est nécessaire."
 
-#: src/postulo/accounts/views.py:404
+#: src/postulo/accounts/views.py:392
 #, draft
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Cette invitation a déjà été acceptée et ne peut pas être révoquée."
@@ -14321,7 +14364,7 @@ msgid_plural "That is a lot of tests. Try again in %(seconds)d seconds."
 msgstr[0] "Cela fait beaucoup de tests. Réessayez dans %(seconds)d seconde."
 msgstr[1] "Cela fait beaucoup de tests. Réessayez dans %(seconds)d secondes."
 
-#: src/postulo/core/phones.py:659
+#: src/postulo/core/phones.py:665
 #, python-format, draft
 msgid ""
 "That is a short number in %(country)s, which can only be dialled from inside the country. It is kept as it was typed, with no country in front of it."
@@ -14346,20 +14389,20 @@ msgid ""
 msgstr ""
 "Ce n'est pas un fichier que cette page lit. Elle lit le fichier JSON qu'elle propose de télécharger — le dossier d'une personne, tel que Postulo l'écrit — et rien d'autre."
 
-#: src/postulo/accounts/avatars.py:110
+#: src/postulo/accounts/avatars.py:111
 #, python-format, draft
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
 msgstr ""
 "Ce n'est pas un type d'image que Postulo garde. Utilisez un fichier %(formats)s."
 
-#: src/postulo/core/phones.py:644
+#: src/postulo/core/phones.py:650
 #, python-format, draft
 msgid ""
 "That is not a number %(country)s uses. It is one %(territory)s uses: choose %(choice)s beside the number."
 msgstr ""
 "Ce n'est pas un numéro utilisé par %(country)s. C'est un numéro utilisé par %(territory)s : choisissez %(choice)s à côté du numéro."
 
-#: src/postulo/core/phones.py:642
+#: src/postulo/core/phones.py:648
 #, python-format, draft
 msgid "That is not a number %(country)s uses: no number there begins that way."
 msgstr ""
@@ -14420,7 +14463,7 @@ msgstr "Postulo ne sait pas faire cela sur plusieurs à la fois."
 msgid "That is not something this page does."
 msgstr "Ce n'est pas ce que fait cette page."
 
-#: src/postulo/accounts/views.py:510
+#: src/postulo/accounts/views.py:498
 #, draft
 msgid "That is not the address on this account."
 msgstr "Ce n'est pas l'adresse de ce compte."
@@ -14463,12 +14506,12 @@ msgstr "Ce lien ne peut pas être utilisé."
 msgid "That link will not work any more."
 msgstr "Ce lien ne fonctionnera plus."
 
-#: src/postulo/core/phones.py:643
+#: src/postulo/core/phones.py:649
 #, draft
 msgid "That number has no area code."
 msgstr "Il manque l'indicatif régional à ce numéro."
 
-#: src/postulo/core/channels.py:263 src/postulo/core/phones.py:649
+#: src/postulo/core/channels.py:263 src/postulo/core/phones.py:655
 #, draft
 msgid ""
 "That number has no country in front of it, so nowhere else can dial it. Choose the country, or write it starting with +."
@@ -14487,27 +14530,27 @@ msgid ""
 msgstr ""
 "Ce numéro est déjà enregistré sur cette instance. Les numéros de téléphone y sont uniques pour l'ensemble des comptes : il peut donc appartenir aux données de quelqu'un d'autre."
 
-#: src/postulo/core/phones.py:641
+#: src/postulo/core/phones.py:647
 #, python-format, draft
 msgid "That number is not a length %(country)s uses."
 msgstr "Ce numéro n'a pas une longueur utilisée par %(country)s."
 
-#: src/postulo/core/phones.py:640
+#: src/postulo/core/phones.py:646
 #, python-format, draft
 msgid "That number is too long for %(country)s."
 msgstr "Ce numéro est trop long pour %(country)s."
 
-#: src/postulo/core/phones.py:690
+#: src/postulo/core/phones.py:696
 #, draft
 msgid "That number is too long."
 msgstr "Ce numéro est trop long."
 
-#: src/postulo/core/phones.py:639
+#: src/postulo/core/phones.py:645
 #, python-format, draft
 msgid "That number is too short for %(country)s."
 msgstr "Ce numéro est trop court pour %(country)s."
 
-#: src/postulo/core/phones.py:689
+#: src/postulo/core/phones.py:695
 #, draft
 msgid "That number is too short."
 msgstr "Ce numéro est trop court."
@@ -14550,7 +14593,7 @@ msgid ""
 msgstr ""
 "Cette page a été envoyée avec l'encodage de contenu « %(coding)s », que Postulo ne décompresse pas, elle n'a donc pas été lue."
 
-#: src/postulo/accounts/avatars.py:115
+#: src/postulo/accounts/avatars.py:116
 #, python-format, draft
 msgid "That picture is over %(megabytes)s MB. A smaller one, please."
 msgstr "Cette photo dépasse %(megabytes)s Mo. Une plus petite, s'il vous plaît."
@@ -14852,6 +14895,13 @@ msgstr "L'entrée à laquelle elle appartient n'est pas dans le fichier."
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "L’environnement fixe « %(name)s » : il ne peut pas être modifié ici."
 
+#: src/postulo/templates/500.html:16
+#, draft
+msgid ""
+"The error has been logged. If you administer this instance, the server log will have the details."
+msgstr ""
+"L’erreur a été consignée. Si vous administrez cette instance, le journal du serveur en donnera le détail."
+
 #: src/postulo/templates/resume/item_form.html:50
 #, python-format, draft
 msgid ""
@@ -14972,6 +15022,13 @@ msgstr ""
 #, python-format, draft
 msgid "The first: %(title)s"
 msgstr "La première : %(title)s"
+
+#: src/postulo/templates/403_csrf.html:13
+#, draft
+msgid ""
+"The form had expired, or came from a page that has since been signed out. Nothing was saved."
+msgstr ""
+"Le formulaire avait expiré, ou provenait d’une page dont la session a été fermée depuis. Rien n’a été enregistré."
 
 #: src/postulo/core/design.py:51
 #, draft
@@ -16029,6 +16086,11 @@ msgid ""
 msgstr ""
 "Ce fichier a été écrit par un Postulo plus récent que celui-ci. Ce que celui-ci ne sait pas lire est laissé de côté."
 
+#: src/postulo/templates/403_csrf.html:4 src/postulo/templates/403_csrf.html:11
+#, draft
+msgid "This form could not be checked"
+msgstr "Ce formulaire n’a pas pu être vérifié"
+
 #: src/postulo/api/idempotency.py:36
 #, draft
 msgid "This Idempotency-Key was already used for a different capture."
@@ -16052,7 +16114,7 @@ msgstr "Cet identifiant est déjà dans la liste."
 msgid "This instance"
 msgstr "Cette instance"
 
-#: src/postulo/templates/settings/account.html:198
+#: src/postulo/templates/settings/account.html:220
 #, python-format, draft
 msgid ""
 "This instance also signs in through %(provider)s. Connect it to this account to use it, or disconnect it."
@@ -16115,7 +16177,7 @@ msgstr ""
 msgid "this instance is up to date"
 msgstr "cette instance est à jour"
 
-#: src/postulo/accounts/views.py:432
+#: src/postulo/accounts/views.py:420
 #, python-format, draft
 msgid "This invitation is for %(email)s. Please sign up with that address."
 msgstr "Cette invitation est pour %(email)s. Inscrivez-vous avec cette adresse."
@@ -16136,7 +16198,7 @@ msgstr "C'est antérieur à la date de délivrance."
 msgid "This is before the start date."
 msgstr "C'est antérieur à la date de début."
 
-#: src/postulo/core/phones.py:667
+#: src/postulo/core/phones.py:673
 #, draft
 msgid ""
 "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
@@ -16292,14 +16354,14 @@ msgid ""
 msgstr ""
 "Trois plans. Une ombre disparaît en contraste élevé : elle peut dire ce qui est au-dessus de quoi, jamais le dire seule — chacun a donc aussi une bordure."
 
-#: src/postulo/templates/settings/account.html:178
+#: src/postulo/templates/settings/account.html:200
 #, python-format, draft
 msgid ""
 "Through %(provider)s: no code. This instance is set to treat that as enough."
 msgstr ""
 "Via %(provider)s : pas de code. Cette instance considère cela comme suffisant."
 
-#: src/postulo/templates/settings/account.html:182
+#: src/postulo/templates/settings/account.html:204
 #, python-format, draft
 msgid "Through %(provider)s: you are asked for a code as well."
 msgstr "Via %(provider)s : un code vous est demandé en plus."
@@ -16364,7 +16426,7 @@ msgstr ""
 msgid "tier"
 msgstr "niveau"
 
-#: src/postulo/accounts/forms.py:1159
+#: src/postulo/accounts/forms.py:1175
 #, draft
 msgid "Time zone"
 msgstr "Fuseau horaire"
@@ -16550,7 +16612,7 @@ msgstr "De confiance :"
 msgid "Try fewer words, or a different spelling."
 msgstr "Essayez moins de mots, ou une autre orthographe."
 
-#: src/postulo/accounts/views.py:346
+#: src/postulo/accounts/views.py:339
 #, draft
 msgid "Turn on “Use my Gravatar” first."
 msgstr "Activez d'abord « Utiliser mon Gravatar »."
@@ -16573,7 +16635,7 @@ msgid "Two spellings of the same thing? Edit one and merge it into the other."
 msgstr ""
 "Deux orthographes de la même chose ? Modifiez l'une et fusionnez-la dans l'autre."
 
-#: src/postulo/templates/settings/account.html:152
+#: src/postulo/templates/settings/account.html:158
 #, draft
 msgid "Two-factor authentication"
 msgstr "Authentification à deux facteurs"
@@ -16879,7 +16941,7 @@ msgstr ""
 msgid "user"
 msgstr "utilisateur"
 
-#: src/postulo/accounts/forms.py:1172
+#: src/postulo/accounts/forms.py:1188
 #: src/postulo/templates/server/email.html:24
 #: src/postulo/templates/server/people.html:37
 #, draft
@@ -17425,7 +17487,7 @@ msgstr "Ce qui est déplacé"
 msgid "What needs doing"
 msgstr "Ce qu'il y a à faire"
 
-#: src/postulo/accounts/forms.py:1153
+#: src/postulo/accounts/forms.py:1169
 #, draft
 msgid ""
 "What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
@@ -17638,7 +17700,7 @@ msgid "What you have noticed and not yet acted on, and what closes this week."
 msgstr ""
 "Ce que vous avez repéré sans encore trancher, et ce qui se clôt cette semaine."
 
-#: src/postulo/accounts/forms.py:1175
+#: src/postulo/accounts/forms.py:1191
 #, draft
 msgid ""
 "What you sign in with. Lowercase letters, digits, dots, underscores, hyphens."
@@ -18138,15 +18200,26 @@ msgstr "Avec"
 msgid "with"
 msgstr "avec"
 
-#: src/postulo/templates/settings/account.html:173
+#: src/postulo/templates/settings/account.html:195
 #, draft
 msgid "With a passkey: no code. The passkey is both factors already."
 msgstr "Avec une clé d’accès : pas de code. La clé est déjà les deux facteurs."
 
-#: src/postulo/templates/settings/account.html:171
+#: src/postulo/templates/settings/account.html:191
 #, draft
-msgid "With a password: you are asked for a code. Always."
-msgstr "Avec un mot de passe : un code vous est demandé. Toujours."
+msgid "With a password: you are asked for your second factor every time."
+msgstr "Avec un mot de passe : le second facteur vous est demandé à chaque fois."
+
+#: src/postulo/templates/settings/account.html:185
+#, python-format, draft
+msgid ""
+"With a password: you are asked for your second factor, unless you marked this browser as trusted. That lasts %(days)s day."
+msgid_plural ""
+"With a password: you are asked for your second factor, unless you marked this browser as trusted. That lasts %(days)s days."
+msgstr[0] ""
+"Avec un mot de passe : le second facteur vous est demandé, sauf si vous avez marqué ce navigateur comme de confiance. Cela dure %(days)s jour."
+msgstr[1] ""
+"Avec un mot de passe : le second facteur vous est demandé, sauf si vous avez marqué ce navigateur comme de confiance. Cela dure %(days)s jours."
 
 #: src/postulo/applications/ical.py:161
 #, python-format, draft
@@ -18348,7 +18421,7 @@ msgid ""
 msgstr ""
 "Vous avez déjà cette adresse pour quelqu'un avec qui vous êtes en relation, et une adresse ne figure qu'une fois."
 
-#: src/postulo/accounts/views.py:425
+#: src/postulo/accounts/views.py:413
 #, draft
 msgid "You are already signed in."
 msgstr "Vous êtes déjà connecté."
@@ -18431,7 +18504,7 @@ msgid ""
 msgstr ""
 "Vous n'avez pas de boîte d'envoi configurée, il n'y a donc rien pour envoyer depuis votre propre adresse."
 
-#: src/postulo/templates/settings/account.html:139
+#: src/postulo/templates/settings/account.html:145
 #, python-format, draft
 msgid ""
 "You have no recovery codes. Lose the device holding your passkey and there is nothing else to try. <a class=\"underline\" href=\"%(url)s\">Generate some</a> and keep them somewhere that is not the device."
@@ -18484,7 +18557,7 @@ msgid ""
 msgstr ""
 "Vous vous connecterez ensuite comme d'habitude, et donnerez votre deuxième facteur si vous en avez un. Ce lien change le mot de passe et rien d'autre."
 
-#: src/postulo/accounts/views.py:519
+#: src/postulo/accounts/views.py:507
 #, draft
 msgid "Your account and everything in it have been deleted."
 msgstr "Votre compte et tout ce qu'il contenait ont été supprimés."
@@ -18518,7 +18591,7 @@ msgstr ""
 msgid "Your application"
 msgstr "Votre candidature"
 
-#: src/postulo/templates/settings/account.html:120
+#: src/postulo/templates/settings/account.html:126
 #, draft
 msgid ""
 "Your browser will only make a passkey on a page served over HTTPS. This instance is being reached over plain HTTP, so passkeys cannot be offered here. That is the browser's rule, not a setting on this server."
@@ -18574,7 +18647,7 @@ msgstr "Vos CV"
 msgid "Your dashboard is empty"
 msgstr "Votre tableau de bord est vide"
 
-#: src/postulo/accounts/views.py:497 src/postulo/core/settings_sections.py:123
+#: src/postulo/accounts/views.py:485 src/postulo/core/settings_sections.py:123
 #: src/postulo/core/views_import.py:15 src/postulo/templates/core/export.html:4
 #, draft
 msgid "Your data"
@@ -18628,7 +18701,7 @@ msgid ""
 msgstr ""
 "Votre prénom et votre nom forment le nom que vos CV et vos lettres impriment en tête. <em>Civilité</em> et <em>Pronoms</em> sont facultatifs."
 
-#: src/postulo/accounts/views.py:352
+#: src/postulo/accounts/views.py:343
 #, draft
 msgid "Your Gravatar has been fetched again."
 msgstr "Votre Gravatar a été récupéré à nouveau."
@@ -18706,7 +18779,7 @@ msgid "Your own words for grouping applications. New ones go in the box below."
 msgstr ""
 "Vos propres mots pour regrouper les candidatures. Les nouvelles se saisissent dans le champ ci-dessous."
 
-#: src/postulo/accounts/views.py:596
+#: src/postulo/accounts/views.py:584
 #, draft
 msgid "Your password is set. Sign in with it."
 msgstr "Votre mot de passe est défini. Connectez-vous avec."
@@ -18776,7 +18849,7 @@ msgid ""
 msgstr ""
 "Vos numéros de téléphone et vos liens ont leurs propres cartes plus bas. Quand le fait d'en garder plusieurs d'une même sorte est désactivé pour vous, cette carte a une seule case pour cette sorte à la place. Elle contient le principal : ce que vous y saisissez le remplace, et vider la case le supprime. Les autres, déjà enregistrés, sont conservés sans être affichés, et reviennent intacts si la fonction est réactivée."
 
-#: src/postulo/accounts/settings_views.py:173
+#: src/postulo/accounts/settings_views.py:174
 #, draft
 msgid "Your username has been changed."
 msgstr "Votre nom d'utilisateur a été modifié."
