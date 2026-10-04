@@ -110,11 +110,13 @@ jobs:
         # keep the files of the rare failure (#715). The step below makes them for the
         # failed tests alone.
         #
-        # Two processes, each with its own live server, database and Chromium (#721): two
-        # and no more, because the unit job runs beside this one on the same host (#233).
-        # `worksteal` because the walks of every page take a minute or more each and the
-        # rest seconds; tests/e2e/conftest.py starts the walks first.
-        run: uv run pytest -m e2e --browser chromium -n 2 --dist worksteal --durations=25
+        # One process. Two (`-n 2 --dist worksteal`, #721) saved two minutes in run 723 and
+        # cost three failures that passed alone: beside the unit job on the same six-core
+        # host, a Chromium went thirty seconds without answering a click. The suite runs on
+        # workers without change -- each gets its own live server, database and Chromium,
+        # and tests/e2e/conftest.py starts the long walks first -- so it goes back to two
+        # once this job stops sharing the host with the unit job (#726).
+        run: uv run pytest -m e2e --browser chromium --durations=25
         # Half again what the suite took on 4 October 2026, so a hang ends here, with
         # pytest's stack dump of the test that hung above it, rather than at the runner's
         # own limit with nothing said.
@@ -132,6 +134,9 @@ jobs:
         # so the test runs as nearly alone as it can.
         if: failure() && steps.e2e.outcome == 'failure'
         run: |
+          # How loaded the host is, so a failure that passes alone can be read against it:
+          # starved of processor, or of memory (run 723).
+          uptime; nproc; free -m; cat /proc/pressure/cpu /proc/pressure/memory 2>/dev/null || true
           if uv run pytest -m e2e --browser chromium --last-failed --last-failed-no-failures none \
               -p no:xdist --tracing on --screenshot on --output browser-artifacts; then
             echo "::warning::The failed tests pass when run again alone: a flake, or a test that depends on the ones before it. The job stays failed; the trace is in the browser-failure artifact."
