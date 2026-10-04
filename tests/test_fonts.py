@@ -31,6 +31,8 @@ COVERAGE: dict[str, tuple[str, ...]] = {
     "Grek": ("fonts-dejavu-core", "fonts-noto-core"),
     "Cyrl": ("fonts-dejavu-core", "fonts-noto-core"),
     "Arab": ("fonts-noto-core",),
+    "Armn": ("fonts-noto-core",),
+    "Geor": ("fonts-noto-core",),
     "Ethi": ("fonts-noto-core",),
     "Hebr": ("fonts-noto-core",),
     "Deva": ("fonts-noto-core",),
@@ -68,14 +70,21 @@ def test_the_image_can_draw_every_script_postulo_offers():
 
 
 def test_every_non_latin_language_declares_its_script():
-    """A language whose script is not recorded is one nobody checked the fonts for."""
-    from postulo.core.languages import LANGUAGES, SCRIPTS
+    """A language whose script is not recorded is one nobody checked the fonts for.
 
-    # The ones known to be written in something other than the Latin alphabet.
-    not_latin = {"ar", "am", "ti", "bg", "el", "mk", "uk"}
-    offered = {code for code, _name in LANGUAGES}
-    for code in not_latin & offered:
-        assert code in SCRIPTS, f"{code} is not written in Latin and says nothing about it"
+    Which languages are not written in Latin is the registry's to say, not a list kept
+    here by hand: a fixed list is what let Armenian and Georgian through (#455).
+    """
+    from postulo.core.languages import NATIVE_NAMES, SCRIPTS
+    from tests.test_language_registry import registry
+
+    for code in NATIVE_NAMES:
+        usual = registry()["language", languages.primary(code)].get("Suppress-Script", "")
+        if usual and usual != "Latn":
+            assert languages.primary(code) in SCRIPTS or languages.script_of(code) != "Latn", (
+                f"{code} is not written in Latin and says nothing about it"
+            )
+            assert languages.script_of(code) in languages.scripts_offered(), code
 
 
 def test_the_scripts_offered_are_the_ones_the_languages_need():

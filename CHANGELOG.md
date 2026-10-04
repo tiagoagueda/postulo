@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Armenian and Georgian are now declared in the script table and probed, so check_fonts and the Server settings font status ask whether they can be drawn, and a test derived from the language registry catches the next one. (#455)
 - A telephone or address row now starts on the flag's country for every offered language that has one (Ukrainian, Turkish, Catalan, Welsh and 27 more), not only for EU languages. (#456)
 - A bulk status move on the Applications table no longer records the person's own username as the timeline actor ("via alex"); the event actor stays blank, as on every other browser path. (#410)
 - Deleting an offer now ticks off its outstanding answer-by reminder instead of leaving it on the calendar and announced to the person's notifiers. (#444)

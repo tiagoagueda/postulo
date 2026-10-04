@@ -38,10 +38,12 @@ import struct
 #: a document nobody can read, the way the African phase once did.
 PROBES: dict[str, tuple[str, str]] = {
     "Arab": ("ara", "\u0628"),
+    "Armn": ("hye", "\u0531"),
     "Beng": ("ben", "\u0985"),
     "Cyrl": ("bul", "\u0414"),
     "Deva": ("hin", "\u0905"),
     "Ethi": ("amh", "\u1200"),
+    "Geor": ("kat", "\u10d0"),
     "Grek": ("ell", "\u0395"),
     "Gujr": ("guj", "\u0a85"),
     "Guru": ("pan", "\u0a05"),

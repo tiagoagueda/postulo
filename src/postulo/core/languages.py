@@ -886,6 +886,8 @@ SCRIPTS: dict[str, str] = {
     "ar": "Arab",
     "bg": "Cyrl",
     "el": "Grek",
+    "hy": "Armn",
+    "ka": "Geor",
     "mk": "Cyrl",
     "ti": "Ethi",
     "uk": "Cyrl",
@@ -895,10 +897,12 @@ SCRIPTS: dict[str, str] = {
 #: server overview and ``manage.py check_fonts``. In English, as those two always were.
 SCRIPT_NAMES: dict[str, str] = {
     "Arab": "Arabic",
+    "Armn": "Armenian",
     "Beng": "Bengali",
     "Cyrl": "Cyrillic",
     "Deva": "Devanagari",
     "Ethi": "Ethiopic",
+    "Geor": "Georgian",
     "Grek": "Greek",
     "Gujr": "Gujarati",
     "Guru": "Gurmukhi",

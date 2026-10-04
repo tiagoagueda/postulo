@@ -142,7 +142,7 @@ def test_serbian_says_its_script_because_nothing_else_does():
 #: covers them. Known, and #455's to put right, which needs a probe and a font package for
 #: each. Held here so that the gap is a list somebody reads and not a thing nobody noticed,
 #: and so that it has to come off this list the day it is closed.
-UNDECLARED = {"hy", "ka"}
+UNDECLARED: set[str] = set()
 
 
 def test_a_script_is_named_as_the_registry_names_it():
@@ -184,4 +184,4 @@ def test_the_scripts_offered_are_what_the_tags_and_the_table_say():
     assert languages.script_of("sr-Cyrl") == "Cyrl", "stated"
     assert languages.script_of("bg") == "Cyrl", "usual"
     assert languages.script_of("pt-BR") == "Latn"
-    assert languages.scripts_offered() == {"Arab", "Cyrl", "Ethi", "Grek"}
+    assert languages.scripts_offered() == {"Arab", "Armn", "Cyrl", "Ethi", "Geor", "Grek"}
