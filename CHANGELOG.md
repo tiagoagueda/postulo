@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The Browser and Email notifier labels, the "This is before the start date." career error and the unreadable-secrets message now go through translation, so they appear in the reader's language. (#566)
 - Every dated career entry (Experience, Education, Project, Certification) now refuses an end date before its start, and the error message is translatable instead of English in every language. (#621)
 - A company's logo file is now kept until the change to its row commits, so a failed save no longer leaves a missing or orphaned logo; Find logo on a company deleted meanwhile is refused cleanly. (#525)
 - Adding a contact to a department now reuses the company's existing team when the typed name differs only in capitals, instead of creating a duplicate department. (#528)

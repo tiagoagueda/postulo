@@ -84,7 +84,7 @@ def _body(notification: Notification) -> str:
 @declares(
     shipped(
         name="email",
-        label="Email",
+        label=_lazy("Email"),
         kind="notifier",
         description=_lazy(
             "Sends a notification as plain email, through whatever this instance uses to send mail."

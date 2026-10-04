@@ -20,6 +20,7 @@ import json
 
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
+from django.utils.translation import gettext as _
 
 
 class SecretsUnreadable(Exception):
@@ -66,8 +67,10 @@ def decrypt(token: str) -> dict:
         raw = Fernet(_key()).decrypt(token.encode("ascii"))
     except InvalidToken as exc:
         raise SecretsUnreadable(
-            "The connection's secrets cannot be read: they were encrypted under a different "
-            "key. If SECRET_KEY was rotated, set POSTULO_FIELD_KEY to the old key, or enter "
-            "the secrets again."
+            _(
+                "The connection's secrets cannot be read: they were encrypted under a different "
+                "key. If SECRET_KEY was rotated, set POSTULO_FIELD_KEY to the old key, or enter "
+                "the secrets again."
+            )
         ) from exc
     return json.loads(raw.decode("utf-8"))

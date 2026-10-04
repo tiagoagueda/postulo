@@ -49,7 +49,7 @@ def _payload(title: str, body: str = "", url: str = "", tag: str = "") -> dict:
 @declares(
     shipped(
         name="browser",
-        label="Browser",
+        label=_lazy("Browser"),
         kind="notifier",
         description=_lazy(
             "Shows a notification in your browser: pushed to it when it can receive one, "
