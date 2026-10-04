@@ -697,3 +697,21 @@ def test_an_expired_archive_is_deleted_by_the_export_page_without_the_scheduler(
     assert response.status_code == 200
     assert not ExportArchive.objects.filter(pk=archive.pk).exists()
     assert not archive.file.storage.exists(stored)
+
+
+def test_an_archive_whose_file_is_gone_says_it_expired(client, populated, rf):
+    """A row that still names a file the disk no longer has is not a bare 404 (#355)."""
+    from django.http import Http404
+
+    from postulo.core import views_export
+    from postulo.core.models import ExportArchive
+
+    client.force_login(populated)
+    client.post(reverse("core:export_download"))
+    archive = ExportArchive.objects.for_user(populated).get()
+    archive.file.storage.delete(archive.file.name)
+
+    request = rf.get("/")
+    request.user = populated
+    with pytest.raises(Http404, match="That export has expired"):
+        views_export.export_archive(request, archive.pk)

@@ -83,14 +83,17 @@ def fill(user) -> dict[str, Path]:
     }
 
 
-def test_deleting_removes_every_owned_row_and_every_file(user, other_user, settings, tmp_path):
+def test_deleting_removes_every_owned_row_and_every_file(
+    user, other_user, settings, tmp_path, django_capture_on_commit_callbacks
+):
     settings.MEDIA_ROOT = str(tmp_path)
     mine = fill(user)
     theirs = fill(other_user)
     for path in {**mine, **theirs}.values():
         assert path.is_file()
 
-    report = deletion.delete_account(user)
+    with django_capture_on_commit_callbacks(execute=True):
+        report = deletion.delete_account(user)
 
     for model in owned_models():
         assert not model.objects.filter(owner_id=user.pk).exists(), f"{model.__name__} rows remain"
@@ -119,6 +122,31 @@ def test_deleting_removes_every_owned_row_and_every_file(user, other_user, setti
     assert report.files_removed == 5 and report.files_missing == 0
     assert report.rows["pending invitations revoked"] == 1
     assert any("files removed" in line for line in report.as_lines())
+
+
+def test_the_files_stay_when_the_transaction_around_the_deletion_fails(
+    user, settings, tmp_path, django_capture_on_commit_callbacks
+):
+    """#355: under ATOMIC_REQUESTS the deletion is a savepoint of the request's transaction,
+    so a request that fails afterwards rolls the rows back; the files must still be there."""
+    from django.db import transaction
+
+    settings.MEDIA_ROOT = str(tmp_path)
+    mine = fill(user)
+    pk = user.pk
+
+    with django_capture_on_commit_callbacks(execute=False) as callbacks:
+        try:
+            with transaction.atomic():
+                report = deletion.delete_account(user)
+                raise RuntimeError("the rest of the request failed")
+        except RuntimeError:
+            pass
+    # Django drops the callbacks of a rolled-back block, so nothing is left to run.
+    assert callbacks == []
+    assert get_user_model().objects.filter(pk=pk).exists()
+    assert all(path.is_file() for path in mine.values())
+    assert report.files_removed == 5
 
 
 def test_the_last_administrator_cannot_be_deleted_by_anyone(admin_only):
@@ -194,10 +222,13 @@ def test_typing_the_wrong_address_deletes_nothing(client, person):
     assert get_user_model().objects.filter(pk=person.pk).exists()
 
 
-def test_typing_the_address_deletes_everything_and_signs_out(client, person):
+def test_typing_the_address_deletes_everything_and_signs_out(
+    client, person, django_capture_on_commit_callbacks
+):
     files = fill(person)
     sign_in_properly(client, person)
-    response = client.post(reverse("accounts:delete"), {"confirm_email": "ALEX@example.org"})
+    with django_capture_on_commit_callbacks(execute=True):
+        response = client.post(reverse("accounts:delete"), {"confirm_email": "ALEX@example.org"})
     assert response.status_code == 302 and response["Location"] == reverse("account_login")
     assert not get_user_model().objects.filter(pk=person.pk).exists()
     for path in files.values():
@@ -224,7 +255,9 @@ def test_the_your_data_page_links_to_it(client, person):
 # ------------------------------------------------------------------ administrators
 
 
-def test_an_administrator_deletes_another_account_files_included(client, admin_only, person):
+def test_an_administrator_deletes_another_account_files_included(
+    client, admin_only, person, django_capture_on_commit_callbacks
+):
     files = fill(person)
     client.force_login(admin_only)
     page = client.get(reverse("server:person_delete", args=[person.pk])).content.decode()
@@ -235,9 +268,10 @@ def test_an_administrator_deletes_another_account_files_included(client, admin_o
     )
     assert response.status_code == 200 and get_user_model().objects.filter(pk=person.pk).exists()
 
-    response = client.post(
-        reverse("server:person_delete", args=[person.pk]), {"confirm_username": "Alex"}
-    )
+    with django_capture_on_commit_callbacks(execute=True):
+        response = client.post(
+            reverse("server:person_delete", args=[person.pk]), {"confirm_username": "Alex"}
+        )
     assert response.status_code == 302
     assert not get_user_model().objects.filter(pk=person.pk).exists()
     for path in files.values():
@@ -272,10 +306,11 @@ def test_a_member_cannot_reach_the_administrators_page(client, person, other_use
 
 
 def test_the_command_deletes_after_confirmation_and_refuses_the_last_administrator(
-    person, admin_only, capsys
+    person, admin_only, capsys, django_capture_on_commit_callbacks
 ):
     files = fill(person)
-    call_command("delete_account", "alex@example.org", "--yes")
+    with django_capture_on_commit_callbacks(execute=True):
+        call_command("delete_account", "alex@example.org", "--yes")
     assert "Deleted the account alex" in capsys.readouterr().out
     assert not get_user_model().objects.filter(pk=person.pk).exists()
     assert not files["upload"].exists()

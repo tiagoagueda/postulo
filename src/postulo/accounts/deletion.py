@@ -7,9 +7,11 @@ at the database would leave a person's CV on the server, readable by nobody and 
 nobody. That is not a deletion.
 
 So the order here is deliberate: collect the names of every file the person's rows point
-at, delete the account in one transaction, and only then remove the files. A transaction
-that fails leaves the files exactly where they were, and a file that fails to delete costs
-that file, not the account.
+at, delete the account, and remove the files only once the transaction that deleted it
+commits (``transaction.on_commit``). Inside a request that transaction is the request's own
+(``ATOMIC_REQUESTS``), so a request that fails after the deletion rolls the rows back and
+leaves the files exactly where they were, and a file that fails to delete costs that file,
+not the account (#355).
 
 One rule sits above all of it: the last administrator of an instance cannot be deleted,
 by anyone, including themselves. Somebody has to be able to open the door.
@@ -115,19 +117,67 @@ def delete_account(user) -> DeletionReport:
         for label, count in per_model.items():
             report.rows[label.split(".")[-1].lower()] = count
 
+    # What the report says is worked out now, from what is on disk, because the callers read
+    # it straight away; the removal itself waits for the commit.
+    present = []
     for name in names:
         try:
-            if default_storage.exists(name):
-                default_storage.delete(name)
-                report.files_removed += 1
-            else:
-                report.files_missing += 1
+            exists = default_storage.exists(name)
         except OSError:
+            exists = False
+        if exists:
+            present.append(name)
+        else:
             report.files_missing += 1
+    report.files_removed = len(present)
+    report.directories_removed = sum(_would_prune(d, present) for d in directories)
 
-    for directory in directories:
-        report.directories_removed += _prune_empty(directory)
+    def remove_files() -> None:
+        for name in names:
+            try:
+                if default_storage.exists(name):
+                    default_storage.delete(name)
+            except OSError:
+                pass
+        for directory in directories:
+            _prune_empty(directory)
+
+    # Registered after ``user.delete()``, so it runs after the receivers that remove files
+    # of their own, and only if the deletion really commits.
+    transaction.on_commit(remove_files)
     return report
+
+
+def _would_prune(directory: Path, names: list[str]) -> int:
+    """How many directories :func:`_prune_empty` will remove once ``names`` are gone."""
+    if not directory.is_dir():
+        return 0
+    going = set()
+    for name in names:
+        try:
+            going.add(Path(default_storage.path(name)).resolve())
+        except (NotImplementedError, OSError):
+            pass
+    count = 0
+    # Deepest first, remembering which directories end up empty.
+    emptied: set[Path] = set()
+    nodes = sorted(
+        [directory, *(p for p in directory.rglob("*") if p.is_dir())],
+        key=lambda p: len(p.parts),
+        reverse=True,
+    )
+    for node in nodes:
+        try:
+            children = list(node.iterdir())
+        except OSError:
+            continue
+        if all(
+            (child in emptied) or (child.is_file() and child.resolve() in going)
+            for child in children
+        ):
+            emptied.add(node)
+            count += 1
+    return count
 
 
 def _prune_empty(directory: Path) -> int:

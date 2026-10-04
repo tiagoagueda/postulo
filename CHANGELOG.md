@@ -195,6 +195,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Deleting an account removes its files only once the deletion commits, so a request that fails afterwards no longer leaves rows whose files are gone; an export whose file has gone from the disk says it has expired. (#355)
 - The phone's bottom navigation bar no longer opens taller than it ends up: the safe-area padding now applies only to an installed app, not to a browser tab whose toolbar already stands under the bar. (#338)
 - Capture now follows a redirected robots.txt (up to five hops) and reads the robots.txt of any other site a posting redirects to, instead of treating a redirect as "no rules". (#364)
 - The GeoNames and ESCO downloads now use the guarded client, the entrypoint follows POSTULO_GEOLOCATIONS_DIR and POSTULO_SKIP_GEONAMES=1 turns the start-up download off; SECURITY, README and PLAN no longer call capture the only outbound request. (#366)

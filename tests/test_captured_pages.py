@@ -899,14 +899,17 @@ def test_discarding_a_capture_keeps_its_page_until_it_expires(client, kept):
     assert path_of(kept.page.source).is_file()
 
 
-def test_deleting_the_account_removes_every_kept_file(kept, other_user):
+def test_deleting_the_account_removes_every_kept_file(
+    kept, other_user, django_capture_on_commit_callbacks
+):
     want(other_user)
     theirs = Capture.objects.create(owner=other_user, url="https://example.org/j/9", data={})
     their_page = pages.keep_source(theirs, PAGE)
     mine = [path_of(kept.page.source), path_of(kept.page.rendering)]
     owner = kept.owner
 
-    report = deletion.delete_account(owner)
+    with django_capture_on_commit_callbacks(execute=True):
+        report = deletion.delete_account(owner)
 
     assert not any(path.exists() for path in mine)
     assert report.files_removed >= 2

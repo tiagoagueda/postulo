@@ -72,7 +72,7 @@ def export_archive(request: HttpRequest, pk: int) -> HttpResponse:
     from .files import serve_private_file
 
     archive = get_object_or_404(ExportArchive.objects.for_user(request.user), pk=pk)
-    if archive.has_expired or not archive.file:
+    if archive.has_expired or not _on_disk(archive):
         raise Http404(_("That export has expired. Ask for a new one."))
     response = serve_private_file(
         request, archive.file, download_name=archive.filename, as_attachment=True
@@ -85,3 +85,8 @@ def _keep_hours() -> int:
     from django.conf import settings
 
     return int(getattr(settings, "POSTULO_EXPORT_KEEP_HOURS", 24) or 24)
+
+
+def _on_disk(archive: ExportArchive) -> bool:
+    """Whether the archive's bytes are still there; the row can outlive them (#355)."""
+    return bool(archive.file) and archive.file.storage.exists(archive.file.name)
