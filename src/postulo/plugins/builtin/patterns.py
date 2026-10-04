@@ -275,15 +275,16 @@ def _labelling(before: str) -> str:
     """The tail of ``before`` that can label the figure after it, for ``_period`` (#420).
 
     Not the line: "Daily standups. Salary: 40,000" is not paid by the day. What is kept is
-    the last word when only spaces separate it from the end, so "Monthly salary" and "Gross
-    annual salary" keep their period, and nothing at or before a sentence stop or a
-    separator such as a bar. Bounded, so a long run of spaces costs nothing.
+    the last three words when only spaces and colons separate them from the end, so "Monthly
+    salary", "Gross annual salary" and "Hourly rate:" keep their period, and nothing at or
+    before a sentence stop or a separator such as a bar. Bounded, so a long run of spaces
+    costs nothing.
     """
     tail = before[-LABEL_REACH:]
     stop = max(tail.rfind(mark) for mark in (".", "!", "?", ";", "|", "\n", "•"))
     tail = tail[stop + 1 :]
-    word = re.search(r"[^\W\d_]+[\s:]{0,3}$", tail)
-    return word.group(0) if word else ""
+    found = re.search(r"(?:[^\W\d_]+[\s:]{0,3}){1,3}$", tail)
+    return found.group(0) if found else ""
 
 
 def _after(labels: tuple[str, ...], text: str):

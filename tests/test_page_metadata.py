@@ -286,3 +286,16 @@ def test_a_long_run_of_unicode_spaces_does_not_make_the_search_quadratic():
     assert found == (40000, None, "EUR", "")
     assert patterns.pay_in("\xa0" * 50_000 + "€40,000", "en")[3] == ""
     assert time.perf_counter() - started < 2
+
+
+@pytest.mark.parametrize(
+    "written,period",
+    [
+        ("Hourly rate: €40", "hour"),
+        ("Monthly gross pay: €3,000", "month"),
+        ("Daily standups. Rate: €40", ""),
+    ],
+)
+def test_a_period_two_words_before_the_figure_still_labels_it(written, period):
+    """#420: the bound keeps the last three words, not only the one beside the figure."""
+    assert patterns.pay_in(written, "en")[3] == period
