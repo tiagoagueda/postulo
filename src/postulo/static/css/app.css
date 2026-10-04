@@ -7064,6 +7064,7 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
     background-color: var(--color-white);
     padding-inline: calc(var(--spacing) * 0.5);
     padding-top: var(--spacing);
+    padding-bottom: var(--spacing);
     &:where([data-theme="dark"], [data-theme="dark"] *) {
       border-color: var(--color-ink-800);
     }
@@ -7080,7 +7081,11 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
         background-color: var(--color-ink-900);
       }
     }
-    padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+  }
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    .nav-main {
+      padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+    }
   }
   .nav-main > a, .nav-main > [data-nav-more] {
     flex: 1 1 0;

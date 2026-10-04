@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The phone's bottom navigation bar no longer opens taller than it ends up: the safe-area padding now applies only to an installed app, not to a browser tab whose toolbar already stands under the bar. (#338)
 - Capture now follows a redirected robots.txt (up to five hops) and reads the robots.txt of any other site a posting redirects to, instead of treating a redirect as "no rules". (#364)
 - The GeoNames and ESCO downloads now use the guarded client, the entrypoint follows POSTULO_GEOLOCATIONS_DIR and POSTULO_SKIP_GEONAMES=1 turns the start-up download off; SECURITY, README and PLAN no longer call capture the only outbound request. (#366)
 - Search highlighting and excerpts no longer shift onto the wrong letters after a Turkish dotted capital İ, and long texts no longer return an empty excerpt. (#377)

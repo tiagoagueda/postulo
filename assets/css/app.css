@@ -1931,13 +1931,22 @@ html:has(.page-alert > [role="alert"]:not(:empty)) {
  *
  * The bar lives inside the sticky header, so the header's `z-30` is its layer too: over
  * the page and under the skip link and the alert. `env(safe-area-inset-bottom)` keeps it
- * clear of a phone's home indicator where the browser reports one.
+ * clear of a phone's home indicator, in an installed app only (#338).
  */
 @media (width < 48rem) {
   .nav-main {
     @apply fixed inset-x-0 bottom-0 flex-wrap items-stretch gap-0 border-t border-ink-200 bg-white
-      px-0.5 pt-1 dark:border-ink-800 dark:bg-ink-900;
-    padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+      px-0.5 pt-1 pb-1 dark:border-ink-800 dark:bg-ink-900;
+  }
+
+  /* The inset only where the page is drawn to the screen's edge: an installed app, with no
+     browser toolbar under the bar. In a browser tab Firefox for Android reports a bottom
+     inset while its toolbar still stands between the bar and the gesture area, so the bar
+     opened taller than it ends up once the toolbar hides on scrolling (#338). */
+  @media (display-mode: standalone), (display-mode: fullscreen) {
+    .nav-main {
+      padding-bottom: max(0.25rem, env(safe-area-inset-bottom));
+    }
   }
 
   /* Equal shares from nothing, each held at its own longest word by the automatic minimum
