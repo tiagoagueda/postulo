@@ -21,6 +21,7 @@ from typing import Any, Protocol, runtime_checkable
 from django.conf import settings
 from django.http import HttpRequest
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from postulo.plugins.base import ConnectedPlugin, FieldSpec
 
@@ -172,3 +173,29 @@ def absolute_url(path: str, request: HttpRequest | None = None) -> str:
         return request.build_absolute_uri(path)
     base = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
     return f"{base}{path}" if base else path
+
+
+#: At most this many titles are named in one announcement: a notification is a line on a
+#: lock screen. The quiet and the closing announcements share it, and the shape below.
+NAMED_IN_ANNOUNCEMENT = 5
+
+
+def owner_of(owner_id):
+    """The account an announcement is for, with its profile, for the language it is worded in."""
+    from django.contrib.auth import get_user_model
+
+    return get_user_model().objects.select_related("profile").get(pk=owner_id)
+
+
+def announcement_body(lines: list[str], total: int) -> str:
+    """The named lines, then how many more there were than were named.
+
+    Worded when it is sent (#223): `lines` are already in the reader's language, and "and N
+    more" takes its plural form from the count, as every other sentence with a number does
+    (#391). Both announcements end this way, so a correction lands in both.
+    """
+    lines = list(lines[:NAMED_IN_ANNOUNCEMENT])
+    if total > NAMED_IN_ANNOUNCEMENT:
+        more = total - NAMED_IN_ANNOUNCEMENT
+        lines.append(ngettext("and %(count)s more", "and %(count)s more", more) % {"count": more})
+    return "\n".join(lines)

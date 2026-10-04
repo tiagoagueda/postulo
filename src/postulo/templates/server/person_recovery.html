@@ -7,7 +7,11 @@
   <c-page-title>
     {% translate "Recovery link" %}
     <c-slot name="subtitle">
-    {% blocktranslate trimmed with name=person.get_full_name|default:person.email minutes=lifetime_minutes %}
+    {% blocktranslate trimmed count minutes=lifetime_minutes with name=person.get_full_name|default:person.email %}
+      A single-use link that lets {{ name }} choose a new password, good for {{ minutes }}
+      minute. Postulo does not send it anywhere: you hand it over yourself, by whatever
+      means you already trust.
+    {% plural %}
       A single-use link that lets {{ name }} choose a new password, good for {{ minutes }}
       minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever
       means you already trust.

@@ -52,7 +52,7 @@ import logging
 from collections.abc import Callable, Iterator
 
 from django.db import transaction
-from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 logger = logging.getLogger(__name__)
 
@@ -113,11 +113,16 @@ def refuse_removing(distribution: str) -> str:
             continue
         total = sum(held.values())
         return str(
-            _(
-                "%(label)s still holds %(count)d record(s), and uninstalling it would leave "
+            ngettext(
+                "%(label)s still holds %(count)d record, and uninstalling it would leave "
+                "it in a table nothing can read, export or restore. Empty it from the "
+                "plugin's own pages first, or switch the plugin off instead — off keeps "
+                "everything.",
+                "%(label)s still holds %(count)d records, and uninstalling it would leave "
                 "them in a table nothing can read, export or restore. Empty it from the "
                 "plugin's own pages first, or switch the plugin off instead — off keeps "
-                "everything."
+                "everything.",
+                total,
             )
             % {"label": getattr(plugin, "label", canonicalise(distribution)), "count": total}
         )

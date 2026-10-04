@@ -20,10 +20,15 @@ from collections import defaultdict
 
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.translation import gettext as _
 from django.utils.translation import ngettext
 
-from postulo.notifications.base import Notification, absolute_url
+from postulo.notifications.base import (
+    NAMED_IN_ANNOUNCEMENT,
+    Notification,
+    absolute_url,
+    announcement_body,
+    owner_of,
+)
 from postulo.notifications.service import notify
 
 from .models import Application
@@ -36,9 +41,6 @@ DEFAULT_QUIET_AFTER_DAYS = 21
 
 #: How far out *Snooze* sets its reminder.
 SNOOZE_DAYS = 14
-
-#: At most this many titles are named in one announcement.
-NAMED_IN_ANNOUNCEMENT = 5
 
 
 def threshold_for(user) -> int:
@@ -76,7 +78,7 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
         rows = list(
             Application.objects.filter(owner_id=owner_id)
             .select_related("owner", "owner__profile", "posting", "posting__company")
-            .quiet(threshold_for(_owner_of(owner_id)), at=now)
+            .quiet(threshold_for(owner_of(owner_id)), at=now)
             .order_by("last_activity_at", "pk")
         )
         fresh = [
@@ -110,16 +112,14 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
     return stamped, delivered
 
 
-def _owner_of(owner_id):
-    from django.contrib.auth import get_user_model
-
-    return get_user_model().objects.select_related("profile").get(pk=owner_id)
-
-
 def _announcement(applications: list[Application], now) -> Notification:
     count = len(applications)
     lines = [
-        _("%(role)s at %(company)s — %(days)s days")
+        ngettext(
+            "%(role)s at %(company)s — %(days)s day",
+            "%(role)s at %(company)s — %(days)s days",
+            (now - row.last_activity_at).days,
+        )
         % {
             "role": row.posting.title,
             "company": row.posting.company.name,
@@ -127,8 +127,6 @@ def _announcement(applications: list[Application], now) -> Notification:
         }
         for row in applications[:NAMED_IN_ANNOUNCEMENT]
     ]
-    if count > NAMED_IN_ANNOUNCEMENT:
-        lines.append(_("and %(more)s more") % {"more": count - NAMED_IN_ANNOUNCEMENT})
     return Notification(
         event="went_quiet",
         title=ngettext(
@@ -137,7 +135,7 @@ def _announcement(applications: list[Application], now) -> Notification:
             count,
         )
         % {"count": count},
-        body="\n".join(lines),
+        body=announcement_body(lines, count),
         url=absolute_url(reverse("applications:list") + "?quiet=1"),
         # One announcement per person per pass, named by the applications it is about, so
         # a notifier that retries does not say it twice (#229).

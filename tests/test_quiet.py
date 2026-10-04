@@ -356,6 +356,29 @@ def test_the_scheduler_command_reports_quiet_applications(user, company, capsys)
     assert "Nothing due." in capsys.readouterr().out
 
 
+def test_a_silence_of_one_day_is_announced_in_the_singular(user, company):
+    """ "1 days" was said at the threshold's smallest value (#391)."""
+    sent(user, company, days_ago=2, title="Brand new")
+    user.profile.quiet_after_days = 1
+    user.profile.save()
+
+    day_later = timezone.now() - dt.timedelta(days=1)
+
+    body = quiet._announcement(list(quiet.quiet_applications(user)), day_later).body
+
+    assert "Brand new at Aperture Science — 1 day" in body
+    assert "1 days" not in body
+
+
+def test_one_more_than_were_named_is_told_with_its_own_count(user, company):
+    for index in range(6):
+        sent(user, company, days_ago=30, title=f"Role {index}")
+
+    body = quiet._announcement(list(quiet.quiet_applications(user)), timezone.now()).body
+
+    assert body.splitlines()[-1] == "and 1 more"
+
+
 def test_a_long_list_is_cut_short_in_the_announcement(user, company):
     email_connection(user)
     for index in range(7):

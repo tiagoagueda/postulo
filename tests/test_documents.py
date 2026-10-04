@@ -1233,3 +1233,36 @@ def test_record_what_you_sent_survives_odd_posted_ids(db, user):
     """A posted id that is not a plain number must be refused by the field, not crash."""
     letters, uploads = _send_choices(user, {"cover_letter": "²", "uploads": ["9" * 40, "x"]})
     assert letters == set() and uploads == set()
+
+
+def test_one_entry_added_to_a_cv_is_told_in_the_singular(client, user, cv):
+    """ "Added 1 entries." was said for every number, one included (#391)."""
+    from postulo.resume.models import Project
+
+    project = Project.objects.create(owner=user, name="Something new")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:cv_add_items", args=[cv.pk]),
+        {"add_project": [str(project.pk)]},
+        follow=True,
+    )
+
+    assert "Added 1 entry." in response.content.decode()
+    assert "1 entries" not in response.content.decode()
+
+
+def test_several_entries_added_to_a_cv_are_told_in_the_plural(client, user, cv):
+    from postulo.resume.models import Project
+
+    first = Project.objects.create(owner=user, name="First")
+    second = Project.objects.create(owner=user, name="Second")
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:cv_add_items", args=[cv.pk]),
+        {"add_project": [str(first.pk), str(second.pk)]},
+        follow=True,
+    )
+
+    assert "Added 2 entries." in response.content.decode()

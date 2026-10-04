@@ -17,6 +17,7 @@ from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from django.views import View
 from django.views.generic import CreateView, DeleteView, TemplateView, UpdateView
 
@@ -401,11 +402,24 @@ class LinkCheckView(OwnedObjectMixin, View):
         elif broken:
             messages.warning(
                 request,
-                _("%(ok)d answered, %(broken)d did not; the ones that did not say why.")
-                % {"ok": ok, "broken": broken},
+                _("%(ok)s, %(broken)s; the ones that did not say why.")
+                % {
+                    "ok": ngettext("%(count)d link answered", "%(count)d links answered", ok)
+                    % {"count": ok},
+                    "broken": ngettext("%(count)d did not", "%(count)d did not", broken)
+                    % {"count": broken},
+                },
             )
         else:
-            messages.success(request, _("All %(ok)d links still answer.") % {"ok": ok})
+            messages.success(
+                request,
+                ngettext(
+                    "All %(count)d link still answers.",
+                    "All %(count)d links still answer.",
+                    ok,
+                )
+                % {"count": ok},
+            )
         return redirect(safe_next(request, fallback))
 
 
@@ -515,11 +529,14 @@ class EuropassImportView(LoginRequiredMixin, TemplateView):
         request.session.pop(f"{self.SESSION_KEY}_data", None)
         messages.success(
             request,
-            _(
-                "Added %(total)s entries. Nothing was overwritten; anything duplicated is "
-                "yours to delete."
+            ngettext(
+                "Added %(count)s entry. Nothing was overwritten; anything duplicated is "
+                "yours to delete.",
+                "Added %(count)s entries. Nothing was overwritten; anything duplicated is "
+                "yours to delete.",
+                report.total,
             )
-            % {"total": report.total},
+            % {"count": report.total},
         )
         for note in report.skipped:
             messages.warning(request, note)

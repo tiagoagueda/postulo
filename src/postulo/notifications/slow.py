@@ -25,6 +25,7 @@ from collections.abc import Callable
 
 from django.urls import reverse
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from postulo.core.errands import handler
 
@@ -100,7 +101,11 @@ def a_batch_arrived(payload: dict) -> Notification:
     """Forty came in because somebody pressed one button, and the first says so (#177)."""
     return Notification(
         event="capture_received",
-        title=_("Captured %(count)s postings from %(host)s")
+        title=ngettext(
+            "Captured %(count)s posting from %(host)s",
+            "Captured %(count)s postings from %(host)s",
+            payload.get("count", 0),
+        )
         % {"count": payload.get("count", 0), "host": payload.get("host", "")},
         body=_("The first: %(title)s") % {"title": payload.get("title", "")},
         url=link(payload, reverse("jobs:capture_list")),

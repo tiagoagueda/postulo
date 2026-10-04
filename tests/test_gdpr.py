@@ -119,6 +119,46 @@ def test_erasure_deletes_and_says_what_it_removed(user):
     assert "application kept, without its main contact" in report.summary()
 
 
+def test_the_summary_counts_each_kind_in_its_own_form(user):
+    """ "1 web link", "1 application kept": the nouns follow the count (#391)."""
+    company = make_company(user)
+    contact = make_contact(user, company)
+    add_link(contact, user)
+    make_application(user, company, contact)
+
+    summary = gdpr.erase_contact(contact).summary()
+
+    assert "1 web link" in summary and "1 web links" not in summary
+    assert "1 application kept, without its main contact." in summary
+
+
+def test_the_summary_pluralises_what_there_is_more_of(user):
+    company = make_company(user)
+    contact = make_contact(user, company)
+    add_link(contact, user)
+    add_link(contact, user, url="https://aperture.example/two")
+    make_application(user, company, contact)
+    make_application(user, company, contact)
+
+    summary = gdpr.erase_contact(contact).summary()
+
+    assert "2 web links" in summary
+    assert "2 applications kept, without their main contact." in summary
+
+
+def test_the_dry_run_line_counts_each_kind_in_its_own_form():
+    line = gdpr.would_remove_line(
+        {
+            "phone_numbers": 1,
+            "postal_addresses": 0,
+            "web_links": 1,
+            "applications_unlinked": 3,
+        }
+    )
+
+    assert line == "1 telephone number, 0 postal addresses, 1 web link; 3 applications kept"
+
+
 def test_erasure_says_when_it_left_nothing(user):
     contact = make_contact(user)
 
@@ -486,6 +526,8 @@ def test_the_dry_run_shows_what_would_be_touched_and_saves_nothing(client, admin
     html = response.content.decode()
     assert "An old contact" in html
     assert "Nothing was removed" in html
+    assert "0 telephone numbers" in html and "0 applications kept" in html
+    assert "(1 day)" in html
     assert Contact.objects.filter(pk=old.pk).exists(), "the dry run deletes nothing"
     assert SiteSettings.get().retention_days == 30, "and the button does not spend the form"
 
@@ -533,3 +575,23 @@ def test_everyone_but_the_administrator_is_kept_from_the_pages(client, user):
     client.force_login(user)
     assert client.get(reverse("server:data_protection")).status_code == 403
     assert client.get(reverse("server:record_of_processing")).status_code == 403
+
+
+def test_the_data_protection_page_says_one_telephone_number_in_the_singular(client, admin, user):
+    from postulo.core.models import PhoneNumber
+
+    settings = SiteSettings.get()
+    settings.retention_days = 30
+    settings.save()
+    old = make_contact(user, make_company(user), name="An old contact")
+    PhoneNumber.objects.create(owner=user, holder=old, number="+351 912 345 678", kind="mobile")
+    Contact.objects.filter(pk=old.pk).update(created_at=timezone.now() - dt.timedelta(days=45))
+    client.force_login(admin)
+
+    response = client.post(
+        reverse("server:data_protection"), {"retention_days": "30", "dry_run": "1"}
+    )
+
+    html = response.content.decode()
+    assert "1 telephone number," in html
+    assert "1 telephone numbers" not in html

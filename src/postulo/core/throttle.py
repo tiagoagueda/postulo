@@ -32,7 +32,7 @@ from dataclasses import dataclass
 
 from django.conf import settings
 from django.core.cache import cache
-from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 #: `20/h`, `5/m`, `600/d`. Empty, `0` or anything unparseable means no limit, because an
 #: operator who mistypes a rate should get their instance working rather than locked.
@@ -82,7 +82,11 @@ class TooOften(Exception):
         self.retry_after = retry_after
         super().__init__(
             str(
-                _("Too many requests: %(times)d allowed every %(seconds)d seconds.")
+                ngettext(
+                    "Too many requests: %(times)d allowed every %(seconds)d second.",
+                    "Too many requests: %(times)d allowed every %(seconds)d seconds.",
+                    rate.seconds,
+                )
                 % {"times": rate.times, "seconds": rate.seconds}
             )
         )

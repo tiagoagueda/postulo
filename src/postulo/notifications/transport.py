@@ -26,6 +26,7 @@ from dataclasses import dataclass
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from postulo.plugins import base
 
@@ -370,13 +371,15 @@ def refuse_switching_off(name: str) -> str:
         # that fact is the useful one and a quietly-opened lock would not carry it (#152).
         return ""
     stranded = accounts_needing_email()
-    # "%(count)d of them would" rather than "have", so one account and four read equally
-    # well and the sentence needs no plural form.
     return str(
-        _(
+        ngettext(
             "%(label)s is how this instance sends mail, and mail is the only way back into "
             "an account here — %(count)d of them would have no way in. Set up another "
-            "transport first."
+            "transport first.",
+            "%(label)s is how this instance sends mail, and mail is the only way back into "
+            "accounts here — %(count)d of them would have no way in. Set up another "
+            "transport first.",
+            stranded,
         )
         % {"label": getattr(transport, "label", name), "count": stranded}
     )

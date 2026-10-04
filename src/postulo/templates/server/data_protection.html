@@ -47,7 +47,10 @@
       <c-section-title id="gdpr-dry-run-heading">{% translate "What the policy would touch" %}</c-section-title>
       {% if dry_run.cutoff %}
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate with days=dry_run.days cutoff=dry_run.cutoff trimmed %}
+          {% blocktranslate count days=dry_run.days with cutoff=dry_run.cutoff trimmed %}
+            Records older than {{ cutoff }} ({{ days }} day). Nothing was removed; this is
+            the report a deletion would be made from.
+          {% plural %}
             Records older than {{ cutoff }} ({{ days }} days). Nothing was removed; this is
             the report a deletion would be made from.
           {% endblocktranslate %}
@@ -60,9 +63,7 @@
                 {% if contact.company %}<span class="text-ink-500 dark:text-ink-400">{{ contact.company }}</span>{% endif %}
                 <span class="text-xs text-ink-500 dark:text-ink-400">{% blocktranslate with date=contact.created_at trimmed %}recorded {{ date}}{% endblocktranslate %}</span>
                 <span class="text-xs text-ink-500 dark:text-ink-400">
-                  {% blocktranslate with n=contact.would_remove.phone_numbers a=contact.would_remove.postal_addresses l=contact.would_remove.web_links apps=contact.would_remove.applications_unlinked trimmed %}
-                    {{ n }} telephone numbers, {{ a }} addresses, {{ l }} web links; {{ apps }} application kept
-                  {% endblocktranslate %}
+                  {{ contact.would_remove_line }}
                 </span>
               </li>
             {% endfor %}

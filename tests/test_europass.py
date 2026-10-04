@@ -362,6 +362,29 @@ def test_the_overview_offers_the_import(client, user):
     assert reverse("resume:europass_import").encode() in page.content
 
 
+def test_confirming_one_entry_says_so_in_the_singular(client, user):
+    """ "Added 1 entries." was said at one (#391)."""
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    client.post(url, {"file": upload(data=MINIMAL)})
+
+    response = client.post(url, {"action": "confirm"}, follow=True)
+
+    body = response.content.decode()
+    assert "Added 1 entry. Nothing was overwritten" in body
+    assert "1 entries" not in body
+
+
+def test_confirming_several_says_so_in_the_plural(client, user):
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    client.post(url, {"file": upload()})
+
+    response = client.post(url, {"action": "confirm"}, follow=True)
+
+    assert "entries. Nothing was overwritten" in response.content.decode()
+
+
 # ------------------------------------------------------------ the command line
 
 

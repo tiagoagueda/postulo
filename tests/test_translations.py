@@ -13,7 +13,9 @@ filesystem, so a plugin that moves its strings out of core is covered here the m
 does, with no list to remember to add it to.
 """
 
+import ast
 import gettext
+import re
 from pathlib import Path
 
 import pytest
@@ -601,3 +603,74 @@ def test_the_interface_says_type_and_never_kind_on_its_own():
     assert french.messages[(None, "Typography")].msgstr == ["Typographie"]
     assert portuguese.messages[(None, "Type")].msgstr == ["Tipo"]
     assert portuguese.messages[(None, "Typography")].msgstr == ["Tipografia"]
+
+
+# ------------------------------------------------------ a number beside a noun (#391)
+
+COUNT_PLACEHOLDERS = (
+    "count",
+    "days",
+    "seconds",
+    "minutes",
+    "files",
+    "total",
+    "sent",
+    "more",
+    "counter",
+)
+
+#: A number, then a word or another placeholder: the shape of "1 copies sent".
+COUNTED_NOUN = re.compile(r"%\((?:" + "|".join(COUNT_PLACEHOLDERS) + r")\)[sd]?\s+(?:[^\W\d_]|%\()")
+
+#: Sentences where the placeholder is not a count of the noun after it. Each says why.
+NOT_A_COUNT: dict[str, str] = {
+    "%(count)d %(noun)s changed.": "chooses its noun by hand; left to its own issue",
+}
+
+GETTEXT_NAMES = {"_", "gettext", "gettext_lazy", "pgettext", "pgettext_lazy"}
+
+
+def single_form_messages() -> list[tuple[str, int, str]]:
+    """Every message written in a single-form call, as (file, line, msgid).
+
+    Read from the source rather than from the catalogue, so the answer is the same before and
+    after the catalogues are regenerated: what is written is what is checked.
+    """
+    found = []
+    for path in sorted((REPO / "src").rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Call):
+                continue
+            name = getattr(node.func, "id", None) or getattr(node.func, "attr", None)
+            if name not in GETTEXT_NAMES or not node.args:
+                continue
+            # `pgettext(context, message)`: the message is the second argument.
+            arg = (
+                node.args[1] if name.startswith("pgettext") and len(node.args) > 1 else node.args[0]
+            )
+            if isinstance(arg, ast.Constant) and isinstance(arg.value, str):
+                found.append((str(path.relative_to(REPO)), node.lineno, arg.value))
+    return found
+
+
+def test_no_message_puts_a_number_beside_a_noun_in_a_single_form():
+    """ "Added 1 entries." and "3 application kept" are what a sentence with a count says when
+    it has one form: wrong in English at one, and impossible to write in a language with three
+    or more plural forms, because one `msgstr` holds one form. A sentence with a count is an
+    `ngettext` with the count as its selector (#391)."""
+    wrong = [
+        f"{where}:{line}: {msgid!r}"
+        for where, line, msgid in single_form_messages()
+        if COUNTED_NOUN.search(msgid) and msgid not in NOT_A_COUNT
+    ]
+    assert not wrong, "a count beside a noun in a single-form message:\n" + "\n".join(wrong)
+
+
+def test_the_detector_finds_a_count_beside_a_noun():
+    assert COUNTED_NOUN.search("Added %(count)s entries.")
+    assert COUNTED_NOUN.search("%(count)d %(kind)s")
+    assert COUNTED_NOUN.search("Try again in %(seconds)d seconds.")
+    assert not COUNTED_NOUN.search("%(count)s")
+    assert not COUNTED_NOUN.search("Hello %(name)s, welcome")
+    assert not COUNTED_NOUN.search("%(total)d.")

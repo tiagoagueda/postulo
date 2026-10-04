@@ -40,6 +40,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from postulo.core import pictures
 from postulo.plugins import fetching, http
@@ -165,7 +166,11 @@ def download(url: str) -> bytes:
         raise UnusableLogo(str(_("That file is larger than a logo should be."))) from error
     except http.BodyTooSlow as error:
         raise UnusableLogo(
-            str(_("That file took longer than %(seconds)s seconds to arrive."))
+            ngettext(
+                "That file took longer than %(seconds)s second to arrive.",
+                "That file took longer than %(seconds)s seconds to arrive.",
+                int(DOWNLOAD_SECONDS),
+            )
             % {"seconds": int(DOWNLOAD_SECONDS)}
         ) from error
     except http.BodyInAnotherCoding as error:

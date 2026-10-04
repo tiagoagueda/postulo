@@ -434,7 +434,7 @@ def test_send_now_tries_at_once_and_is_private(client, user, other_user):
     client.force_login(user)
     response = client.post(url, {"next": reverse("documents:upload_list")}, follow=True)
     assert response.redirect_chain[-1][0] == reverse("documents:upload_list")
-    assert "1 copies sent" in response.content.decode()
+    assert "1 copy sent." in response.content.decode()
     assert len(ShelfStore.received) == 1
     response = client.post(url, follow=True)
     assert "already has this document" in response.content.decode()
@@ -477,7 +477,7 @@ def test_send_everything_queues_what_existed_before_the_store(client, user, othe
 
     client.force_login(user)
     response = client.post(reverse("connections:backfill", args=[connection.pk]), follow=True)
-    assert "1 documents are queued for My shelf" in response.content.decode()
+    assert "1 document is queued for My shelf" in response.content.decode()
     assert DocumentCopy.objects.filter(owner=user).count() == 1, "the certificate was not wanted"
     assert DocumentCopy.objects.filter(owner=other_user).count() == 0
 

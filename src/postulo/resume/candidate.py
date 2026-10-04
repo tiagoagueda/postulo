@@ -60,7 +60,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.text import capfirst
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 
 from postulo.accounts.forms import PersonIdentifierForm
 from postulo.accounts.models import PersonIdentifier, Profile
@@ -661,11 +661,19 @@ class _Planner:
         for name, total in (self.held.get("cut") or {}).items():
             limit = self._limit(name)
             notes.append(
-                _(
-                    "“%(name)s” has %(total)s rows in the file. The first %(limit)s are "
-                    "read, and the rest are not."
+                ngettext(
+                    "“%(name)s” has %(count)s row in the file.",
+                    "“%(name)s” has %(count)s rows in the file.",
+                    total,
                 )
-                % {"name": name, "total": total, "limit": limit}
+                % {"name": name, "count": total}
+                + " "
+                + ngettext(
+                    "The first %(count)s is read, and the rest are not.",
+                    "The first %(count)s are read, and the rest are not.",
+                    limit,
+                )
+                % {"count": limit}
             )
         return notes
 

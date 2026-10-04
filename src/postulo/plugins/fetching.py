@@ -33,6 +33,7 @@ from urllib.robotparser import RobotFileParser
 
 import httpx
 from django.utils.translation import gettext as _
+from django.utils.translation import ngettext
 
 from . import http
 from .base import CaptureError
@@ -169,7 +170,11 @@ def robots_allow(url: str, *, client: httpx.Client | None = None) -> bool:
 
 def _too_slow() -> FetchFailed:
     return FetchFailed(
-        _("That page took longer than %(seconds)s seconds to arrive, so it was not read.")
+        ngettext(
+            "That page took longer than %(seconds)s second to arrive, so it was not read.",
+            "That page took longer than %(seconds)s seconds to arrive, so it was not read.",
+            int(DOWNLOAD_SECONDS),
+        )
         % {"seconds": int(DOWNLOAD_SECONDS)}
     )
 

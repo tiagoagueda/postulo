@@ -27,6 +27,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from django.views import View
 from django.views.generic import RedirectView, TemplateView, UpdateView
 
@@ -312,8 +313,12 @@ class PersonDeleteView(StaffRequiredMixin, View):
         report = deletion.delete_account(person)
         messages.success(
             request,
-            _("%(name)s is gone: the account, its records and %(files)s files on disk.")
-            % {"name": report.username, "files": report.files_removed},
+            ngettext(
+                "%(name)s is gone: the account, its records and %(count)s file on disk.",
+                "%(name)s is gone: the account, its records and %(count)s files on disk.",
+                report.files_removed,
+            )
+            % {"name": report.username, "count": report.files_removed},
         )
         return redirect("server:people")
 
@@ -914,7 +919,11 @@ class EmailTestView(StaffRequiredMixin, View):
         except throttle.TooOften as too_often:
             messages.error(
                 request,
-                _("That is a lot of tests. Try again in %(seconds)d seconds.")
+                ngettext(
+                    "That is a lot of tests. Try again in %(seconds)d second.",
+                    "That is a lot of tests. Try again in %(seconds)d seconds.",
+                    too_often.retry_after,
+                )
                 % {"seconds": too_often.retry_after},
             )
             return redirect("server:email")

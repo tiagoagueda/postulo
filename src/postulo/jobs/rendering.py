@@ -30,7 +30,7 @@ import sys
 from dataclasses import dataclass
 
 from django.utils.translation import gettext as _
-from django.utils.translation import gettext_lazy
+from django.utils.translation import gettext_lazy, ngettext
 
 from postulo.core import site
 
@@ -105,7 +105,11 @@ def draw(html: str, *, using: Renderer | None = None) -> bytes:
     except subprocess.TimeoutExpired as error:
         raise CannotDraw(
             str(
-                _("The page was not drawn within %(seconds)s seconds, so it was left.")
+                ngettext(
+                    "The page was not drawn within %(seconds)s second, so it was left.",
+                    "The page was not drawn within %(seconds)s seconds, so it was left.",
+                    DRAW_SECONDS,
+                )
                 % {"seconds": DRAW_SECONDS}
             )
         ) from error

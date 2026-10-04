@@ -581,8 +581,24 @@ def test_checking_happens_only_when_a_person_asks(client, user, answering):
     assert answering["calls"] == [], "opening the page fetches nothing"
 
     response = client.post(reverse("resume:link_check_all"), follow=True)
-    assert "still answer" in response.content.decode()
+    assert "All 1 link still answers." in response.content.decode()
     assert len(answering["calls"]) == 1
+
+
+def test_checking_several_says_so_in_the_plural(client, user, answering):
+    a_link(user)
+    a_link(user, title="Old site", url="https://alex.example/old")
+    client.force_login(user)
+    response = client.post(reverse("resume:link_check_all"), follow=True)
+    assert "All 2 links still answer." in response.content.decode()
+
+
+def test_checking_one_that_did_not_answer_counts_each_side_in_its_own_form(client, user, answering):
+    a_link(user)
+    answering["status"] = 410
+    client.force_login(user)
+    response = client.post(reverse("resume:link_check_all"), follow=True)
+    assert "0 links answered, 1 did not" in response.content.decode()
 
 
 def test_checking_all_reports_the_ones_that_did_not_answer(client, user, answering):
@@ -591,7 +607,7 @@ def test_checking_all_reports_the_ones_that_did_not_answer(client, user, answeri
     answering["status"] = 410
     client.force_login(user)
     response = client.post(reverse("resume:link_check_all"), follow=True)
-    assert "0 answered, 2 did not" in response.content.decode()
+    assert "0 links answered, 2 did not" in response.content.decode()
     assert Link.objects.for_user(user).filter(check_status=LinkStatus.BROKEN).count() == 2
 
 

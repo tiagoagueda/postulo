@@ -61,14 +61,20 @@
     </ul>
   </div>
   <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
-    {% blocktranslate trimmed with days=quiet_after_days %}
+    {% blocktranslate trimmed count days=quiet_after_days %}
+      Open applications with nothing for {{ days }} day and nothing planned. Snooze sets a
+      reminder two weeks out; Ghosted records that you stopped waiting.
+    {% plural %}
       Open applications with nothing for {{ days }} days and nothing planned. Snooze sets a
       reminder two weeks out; Ghosted records that you stopped waiting.
     {% endblocktranslate %}
   </p>
 {% else %}
   <c-empty variant="quiet">
-    {% blocktranslate trimmed with days=quiet_after_days %}
+    {% blocktranslate trimmed count days=quiet_after_days %}
+      Nothing has gone quiet for {{ days }} day. Either you are on top of it, or it is
+      time to send out a few more.
+    {% plural %}
       Nothing has gone quiet for {{ days }} days. Either you are on top of it, or it is
       time to send out a few more.
     {% endblocktranslate %}

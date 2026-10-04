@@ -56,6 +56,7 @@ from dataclasses import dataclass, field
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from postulo.jobs.models import JobPosting
 
@@ -669,7 +670,7 @@ def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=N
         on=on,
         start=start,
         end=end,
-        title=_("%(days)s days from %(day)s")
+        title=ngettext_lazy("%(days)s day from %(day)s", "%(days)s days from %(day)s", AGENDA_DAYS)
         % {"days": AGENDA_DAYS, "day": formats.date_format(on, "DATE_FORMAT")},
         earlier=url_for("agenda", on - dt.timedelta(days=AGENDA_DAYS), kinds),
         later=url_for("agenda", end, kinds),

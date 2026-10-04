@@ -743,3 +743,71 @@ def test_the_python_detector_knows_the_difference():
     assert lowercased_in_python("b = str(column.label).lower()") == [1]
     assert lowercased_in_python("host = request.POST.get('host').lower()") == []
     assert lowercased_in_python("label.strip().lower()") == []
+
+
+# ------------------------------------------------- a count bound without `count`
+
+#: Names a template gives a number of things. A block that binds one of them with `with` and
+#: no `count` has a single form for every number: "1 days" in English, one `msgstr` for the
+#: three plural forms of Polish (#391).
+COUNT_NAMES = {
+    "count",
+    "counter",
+    "days",
+    "rows",
+    "total",
+    "seconds",
+    "minutes",
+    "hours",
+    "weeks",
+    "files",
+    "entries",
+    "number",
+}
+
+
+def uncounted_counts(text: str) -> list[int]:
+    """Line numbers of a `blocktranslate` that binds a count with `with` and has no `count`."""
+    found = []
+    for match in re.finditer(r"\{%-?\s*blocktrans(?:late)?\b(.*?)-?%\}", text, re.DOTALL):
+        options = match.group(1)
+        if re.search(r"\bcount\s+\w+\s*=", options):
+            continue
+        end = text.find("endblocktrans", match.end())
+        body = text[match.end() : end if end != -1 else len(text)]
+        bound = set(re.findall(r"\b(\w+)\s*=", options)) & COUNT_NAMES
+        # A number beside a noun. "Closing this week: {{ total }}" is a label and a number,
+        # which needs no plural form, and "{{ current }} of {{ total }}" is a position.
+        if any(re.search(r"\{\{\s*" + name + r"\s*\}\}\s*[^\W\d_]", body) for name in bound):
+            found.append(text.count("\n", 0, match.start()) + 1)
+    return found
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_binds_a_count_without_counting_it(path: Path):
+    """A sentence with a number in it is a `{% blocktranslate count n=... %}` with a
+    `{% plural %}`, so that every language's plural forms apply to it (#391)."""
+    lines = uncounted_counts(path.read_text(encoding="utf-8"))
+    assert not lines, f"{path.name}: a count is bound without `count` at line(s) {lines}"
+
+
+def test_the_count_detector_knows_the_difference():
+    assert uncounted_counts(
+        "{% blocktranslate with days=n %}{{ days }} days{% endblocktranslate %}"
+    ) == [1]
+    assert uncounted_counts(
+        "x\n{% blocktranslate trimmed with rows=sheet.n %}{{ rows }}\n rows{% endblocktranslate %}"
+    ) == [2]
+    assert uncounted_counts("{% blocktranslate count days=n with cutoff=c %}{{ days }} day") == []
+    assert (
+        uncounted_counts(
+            "{% blocktranslate with total=n %}Closing this week: {{ total }}{% endblocktranslate %}"
+        )
+        == []
+    )
+    assert (
+        uncounted_counts("{% blocktranslate with name=n %}Hello {{ name }}{% endblocktranslate %}")
+        == []
+    )

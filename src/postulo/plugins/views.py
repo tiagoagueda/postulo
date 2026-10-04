@@ -19,6 +19,7 @@ from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html_join
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from django.views import View
 from django.views.generic import DeleteView, ListView
 
@@ -385,7 +386,11 @@ class ConnectionTestView(OwnedObjectMixin, View):
         except throttle.TooOften as too_often:
             messages.error(
                 request,
-                _("That is a lot of tests. Try again in %(seconds)d seconds.")
+                ngettext(
+                    "That is a lot of tests. Try again in %(seconds)d second.",
+                    "That is a lot of tests. Try again in %(seconds)d seconds.",
+                    too_often.retry_after,
+                )
                 % {"seconds": too_often.retry_after},
             )
             return redirect("connections:list")
@@ -431,9 +436,12 @@ class ConnectionBackfillView(OwnedObjectMixin, View):
         if count:
             messages.success(
                 request,
-                _(
+                ngettext(
+                    "%(count)d document is queued for %(label)s. The scheduler sends "
+                    "it on its next pass; the document shows how that went.",
                     "%(count)d documents are queued for %(label)s. The scheduler sends "
-                    "them on its next pass; each document shows how that went."
+                    "them on its next pass; each document shows how that went.",
+                    count,
                 )
                 % {"count": count, "label": connection.label},
             )

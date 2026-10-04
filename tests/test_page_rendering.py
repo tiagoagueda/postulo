@@ -79,7 +79,7 @@ def test_a_page_that_never_finishes_is_left(tmp_path, monkeypatch):
     monkeypatch.setattr(rendering, "DRAW_SECONDS", 1)
     drawer = stand_in(tmp_path, "time.sleep(60)\n")
 
-    with pytest.raises(rendering.CannotDraw, match="within 1 seconds"):
+    with pytest.raises(rendering.CannotDraw, match="within 1 second,"):
         rendering.draw("<p>x</p>", using=drawer)
 
 

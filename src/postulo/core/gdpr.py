@@ -204,21 +204,27 @@ class ErasureReport:
     def summary(self) -> str:
         """The sentence shown to whoever did it: what went, and what stayed without them."""
         gone = ", ".join(
-            _("%(count)d %(kind)s") % {"count": count, "kind": _kinds(kind)}
-            for kind, count in self.deleted.items()
-            if count
+            _counted_kind(kind, count) for kind, count in self.deleted.items() if count
         )
         parts = []
         if gone:
             parts.append(_("%(name)s is gone, with %(what)s.") % {"name": self.name, "what": gone})
         if self.unlinked.get("applications"):
             parts.append(
-                _("%(count)d application kept, without its main contact.")
+                ngettext(
+                    "%(count)d application kept, without its main contact.",
+                    "%(count)d applications kept, without their main contact.",
+                    self.unlinked["applications"],
+                )
                 % {"count": self.unlinked["applications"]}
             )
         if self.unlinked.get("referrals"):
             parts.append(
-                _("%(count)d application kept, without its referrer.")
+                ngettext(
+                    "%(count)d application kept, without its referrer.",
+                    "%(count)d applications kept, without their referrer.",
+                    self.unlinked["referrals"],
+                )
                 % {"count": self.unlinked["referrals"]}
             )
         if self.unlinked.get("listing_events"):
@@ -235,14 +241,24 @@ class ErasureReport:
         return " ".join(parts) or _("Nothing was left to remove.")
 
 
-def _kinds(key: str) -> str:
-    """The words for a deleted kind. The count beside them carries the number."""
-    return {
-        "phone_numbers": _("telephone numbers"),
-        "postal_addresses": _("postal addresses"),
-        "web_links": _("web links"),
-        "plugin_rows": _("plugin rows"),
-    }.get(key, key)
+def _counted_kind(key: str, count: int) -> str:
+    """A number of one deleted kind, in the form its count needs (#391).
+
+    One counted phrase per kind rather than a count beside a noun that is always plural:
+    "1 telephone numbers" is wrong in English, and a language with more than two plural
+    forms has nowhere to put the others.
+    """
+    phrase = {
+        "phone_numbers": lambda: ngettext(
+            "%(count)d telephone number", "%(count)d telephone numbers", count
+        ),
+        "postal_addresses": lambda: ngettext(
+            "%(count)d postal address", "%(count)d postal addresses", count
+        ),
+        "web_links": lambda: ngettext("%(count)d web link", "%(count)d web links", count),
+        "plugin_rows": lambda: ngettext("%(count)d plugin row", "%(count)d plugin rows", count),
+    }.get(key)
+    return (phrase() if phrase else f"%(count)d {key}") % {"count": count}
 
 
 class ErasureRefused(Exception):
@@ -361,25 +377,45 @@ def retention_dry_run(days: int | None = None) -> dict:
     older_than = timezone.make_aware(dt.datetime.combine(cutoff, dt.time.min))
     rows = []
     for contact in Contact.objects.filter(created_at__lt=older_than).select_related("company"):
+        would_remove = {
+            "phone_numbers": contact.phone_numbers.count(),
+            "postal_addresses": contact.postal_addresses.count(),
+            "web_links": contact.web_links.count(),
+            # Every application that names them, as its contact or as who
+            # referred the person: each is kept, and each loses the name (#239).
+            "applications_unlinked": Application.objects.filter(
+                Q(contact=contact) | Q(referred_by=contact)
+            ).count(),
+        }
         rows.append(
             {
                 "id": contact.pk,
                 "name": contact.name,
                 "company": contact.company.name if contact.company_id else "",
                 "created_at": contact.created_at.date().isoformat(),
-                "would_remove": {
-                    "phone_numbers": contact.phone_numbers.count(),
-                    "postal_addresses": contact.postal_addresses.count(),
-                    "web_links": contact.web_links.count(),
-                    # Every application that names them, as its contact or as who
-                    # referred the person: each is kept, and each loses the name (#239).
-                    "applications_unlinked": Application.objects.filter(
-                        Q(contact=contact) | Q(referred_by=contact)
-                    ).count(),
-                },
+                "would_remove": would_remove,
+                "would_remove_line": would_remove_line(would_remove),
             }
         )
     return {"days": days, "cutoff": cutoff.isoformat(), "contacts": rows}
+
+
+def would_remove_line(would_remove: dict) -> str:
+    """One contact's row of the dry run as a sentence, each count in its own plural form.
+
+    The same phrases `ErasureReport.summary` uses, so the preview and the report read alike
+    (#391).
+    """
+    removed = ", ".join(
+        _counted_kind(kind, would_remove.get(kind, 0))
+        for kind in ("phone_numbers", "postal_addresses", "web_links")
+    )
+    kept = would_remove.get("applications_unlinked", 0)
+    return _("%(removed)s; %(kept)s") % {
+        "removed": removed,
+        "kept": ngettext("%(count)d application kept", "%(count)d applications kept", kept)
+        % {"count": kept},
+    }
 
 
 # -------------------------------------------------------- the record of processing

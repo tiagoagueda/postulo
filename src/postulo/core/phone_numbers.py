@@ -18,6 +18,7 @@ from django import forms
 from django.contrib.contenttypes import forms as generic_forms
 from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext_lazy
 
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
@@ -159,9 +160,12 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=(
 #: Honest about what happened rather than vague about it: a message that pretended the save
 #: failed for some other reason would be a lie, and would still refuse the save, so it would
 #: disclose the same thing while sounding evasive.
-ASKED_TOO_OFTEN = _(
+ASKED_TOO_OFTEN = ngettext_lazy(
     "You have been told about a lot of numbers already recorded here. That answer is "
-    "available again in %(minutes)d minutes."
+    "available again in %(minutes)d minute.",
+    "You have been told about a lot of numbers already recorded here. That answer is "
+    "available again in %(minutes)d minutes.",
+    "minutes",
 )
 
 

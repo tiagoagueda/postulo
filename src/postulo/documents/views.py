@@ -15,6 +15,7 @@ from django.utils.csp import CSP
 from django.utils.decorators import method_decorator
 from django.utils.http import content_disposition_header
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 from django.views import View
 from django.views.decorators.clickjacking import xframe_options_sameorigin
 from django.views.decorators.csp import csp_override
@@ -232,7 +233,9 @@ class CVAddItemsView(OwnedObjectMixin, View):
 
         messages.success(
             request,
-            _("Added %(count)s entries.") % {"count": added} if added else _("Nothing was added."),
+            ngettext("Added %(count)s entry.", "Added %(count)s entries.", added) % {"count": added}
+            if added
+            else _("Nothing was added."),
         )
         return redirect(cv.get_absolute_url())
 
@@ -712,13 +715,18 @@ class SendCopiesNowView(OwnedObjectMixin, View):
         elif failed:
             messages.warning(
                 request,
-                _("%(sent)d copies sent, %(failed)d failed; each document says which.")
-                % {"sent": sent, "failed": failed},
+                _("%(sent)s, %(failed)s; each document says which.")
+                % {
+                    "sent": ngettext("%(count)d copy sent", "%(count)d copies sent", sent)
+                    % {"count": sent},
+                    "failed": ngettext("%(count)d failed", "%(count)d failed", failed)
+                    % {"count": failed},
+                },
             )
         elif sent:
             messages.success(
                 request,
-                _("%(sent)d copies sent.") % {"sent": sent},
+                ngettext("%(count)d copy sent.", "%(count)d copies sent.", sent) % {"count": sent},
             )
         else:
             messages.info(request, _("Every store already has this document."))
