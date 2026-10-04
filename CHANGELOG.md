@@ -183,6 +183,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Every dated career entry (Experience, Education, Project, Certification) now refuses an end date before its start, and the error message is translatable instead of English in every language. (#621)
 - A company's logo file is now kept until the change to its row commits, so a failed save no longer leaves a missing or orphaned logo; Find logo on a company deleted meanwhile is refused cleanly. (#525)
 - Adding a contact to a department now reuses the company's existing team when the typed name differs only in capitals, instead of creating a duplicate department. (#528)
 - Changing a company's parent now counts the companies already under it, so an ownership chain built from the bottom up can no longer grow past the ten-deep cap. (#532)

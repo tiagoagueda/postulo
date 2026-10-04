@@ -49,10 +49,24 @@ class ResumeItemForm(OwnerScopedModelForm):
     and this takes it off; `item_form.html` draws whatever is left.
     """
 
+    #: The start and end field names of an entry that spans a time, or None for one that
+    #: does not. An end before the start is refused for every kind that names them (#621).
+    date_range: tuple[str, str] | None = None
+    end_before_start_message = _("This is before the start date.")
+
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, user=user, **kwargs)
         if "order" in self.fields and not show_order_to(user):
             del self.fields["order"]
+
+    def clean(self):
+        cleaned = super().clean()
+        if self.date_range:
+            start_name, end_name = self.date_range
+            start, end = cleaned.get(start_name), cleaned.get(end_name)
+            if start and end and end < start:
+                self.add_error(end_name, forms.ValidationError(self.end_before_start_message))
+        return cleaned
 
 
 def show_order_to(user) -> bool:
@@ -61,6 +75,8 @@ def show_order_to(user) -> bool:
 
 
 class ExperienceForm(ResumeItemForm):
+    date_range = ("start_date", "end_date")
+
     class Meta:
         model = Experience
         fields = (
@@ -87,15 +103,10 @@ class ExperienceForm(ResumeItemForm):
             "location": _("Where the work was, as you would write it on a CV."),
         }
 
-    def clean(self):
-        cleaned = super().clean()
-        start, end = cleaned.get("start_date"), cleaned.get("end_date")
-        if start and end and end < start:
-            self.add_error("end_date", forms.ValidationError("This is before the start date."))
-        return cleaned
-
 
 class EducationForm(ResumeItemForm):
+    date_range = ("start_date", "end_date")
+
     class Meta:
         model = Education
         fields = (
@@ -125,6 +136,8 @@ class EducationForm(ResumeItemForm):
 
 
 class ProjectForm(ResumeItemForm):
+    date_range = ("start_date", "end_date")
+
     class Meta:
         model = Project
         fields = ("name", "role", "url", "start_date", "end_date", "summary", "highlights", "order")
@@ -193,6 +206,9 @@ class SkillForm(ResumeItemForm):
 
 
 class CertificationForm(ResumeItemForm):
+    date_range = ("issued_on", "expires_on")
+    end_before_start_message = _("This is before the date it was issued.")
+
     class Meta:
         model = Certification
         fields = ("name", "issuer", "issued_on", "expires_on", "credential_url", "order")
