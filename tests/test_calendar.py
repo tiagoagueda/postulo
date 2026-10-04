@@ -121,6 +121,25 @@ def test_what_is_over_is_drawn_as_over_rather_than_dropped(user, application):
     assert [(e.kind, e.muted) for e in events] == [("reminder", True), ("interview", True)]
 
 
+def test_a_no_show_is_not_read_out_as_a_cancellation(user, application):
+    """The record keeps the two apart (an interview entry against an interview cancelled
+    entry), so the words a screen reader is given must too (#453)."""
+    said = {}
+    for outcome, day in ((InterviewOutcome.CANCELLED, 4), (InterviewOutcome.NO_SHOW, 5)):
+        interview = schedule_interview(
+            application, kind="onsite", starts_at=at(2026, 9, day), remind=False
+        )
+        interview.outcome = outcome
+        interview.save()
+
+    for event in agenda.events_between(user, dt.date(2026, 9, 1), dt.date(2026, 10, 1)):
+        said[event.day.day] = event.said
+
+    assert said[4] == "Cancelled interview:"
+    assert said[5] != "Cancelled interview:"
+    assert said[5] == "Interview nobody came to:"
+
+
 def test_what_is_over_says_so_to_a_screen_reader_and_is_not_faded(client, user):
     """The strike says "over" to eyes; the word says it to a screen reader, and the fading
     that went with the strike took 12-pixel text under 4.5:1 (#274)."""

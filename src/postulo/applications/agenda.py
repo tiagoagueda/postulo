@@ -89,6 +89,9 @@ KINDS: tuple[tuple[str, object, str], ...] = (
     (ANSWER, _("Answers due"), "violet"),
 )
 
+#: The state of an interview the other side did not come to, as `Event.state` holds it.
+NO_SHOW = "no_show"
+
 ALL_KINDS = frozenset(kind for kind, _label, _tone in KINDS)
 
 TONES = {kind: tone for kind, _label, tone in KINDS}
@@ -114,6 +117,12 @@ SPOKEN: dict[tuple[str, bool], object] = {
     (CLOSING, True): _("Already decided —"),
     (ANSWER, False): "",
     (ANSWER, True): _("Already answered —"),
+}
+
+#: Said instead of `SPOKEN` for an event whose `state` is one of these: an interview nobody came
+#: to is muted like a cancelled one, but it is not a cancellation (#453).
+SPOKEN_STATES: dict[tuple[str, str], object] = {
+    (INTERVIEW, NO_SHOW): _("Interview nobody came to:"),
 }
 
 
@@ -143,6 +152,9 @@ class Event:
     #: Drawn as over -- a reminder done, an interview cancelled, a listing already applied
     #: to or discarded -- rather than dropped.
     muted: bool = False
+    #: What is said of an event that is over in a way its kind alone cannot tell: an interview
+    #: nobody came to is drawn as over, like a cancelled one, but is not one (#453).
+    state: str = ""
     #: A whole day rather than a moment: a deadline and a closing date are dates, and a time
     #: drawn beside them would be a midnight nobody chose (#238).
     all_day: bool = False
@@ -185,6 +197,8 @@ class Event:
 
         Empty where the title already carries it, which is the whole of `SPOKEN`'s comment.
         """
+        if (self.kind, self.state) in SPOKEN_STATES:
+            return str(SPOKEN_STATES[(self.kind, self.state)])
         return str(SPOKEN.get((self.kind, self.muted), ""))
 
 
@@ -218,6 +232,7 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
                 ends_at=interview.ends_at,
                 detail=f"{interview.get_kind_display()} · {posting.title}",
                 muted=interview.outcome in {InterviewOutcome.CANCELLED, InterviewOutcome.NO_SHOW},
+                state=NO_SHOW if interview.outcome == InterviewOutcome.NO_SHOW else "",
             )
         )
     reminders = (
