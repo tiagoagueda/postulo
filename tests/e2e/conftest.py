@@ -149,7 +149,7 @@ def pytest_collection_modifyitems(config, items):
 _STYLESHEET = re.compile(r"/static/css/app[^/]*\.css")
 
 #: The suite's own copy of DejaVu Sans and DejaVu Sans Mono, regular and bold: the four files
-#: Debian's `fonts-dejavu-core` installs on CI, and their licence.
+#: Debian's `fonts-dejavu-core` 2.37-6 installs on CI, byte for byte, and their licence.
 FONTS = Path(__file__).resolve().parent / "fonts"
 
 #: Where the live server answers for them, under the static prefix, so the content security
@@ -162,19 +162,24 @@ _FONT_PATH = "e2e-fonts/"
 SANS = "Postulo E2E Sans"
 MONO = "Postulo E2E Mono"
 
+#: Each face as the system names it, then the suite's file. Where DejaVu is installed -- CI,
+#: and any machine with `fonts-dejavu-core` -- the browser draws the installed font: Chromium
+#: on Linux renders a web font differently from the same font installed, and the masthead
+#: wrapped on CI under the text spacing override (run 723) where the installed font had always
+#: fitted. The files are for a machine with no DejaVu at all.
 _FACES = (
-    (SANS, "normal", "DejaVuSans.ttf"),
-    (SANS, "bold", "DejaVuSans-Bold.ttf"),
-    (MONO, "normal", "DejaVuSansMono.ttf"),
-    (MONO, "bold", "DejaVuSansMono-Bold.ttf"),
+    (SANS, "normal", "DejaVu Sans", "DejaVuSans.ttf"),
+    (SANS, "bold", "DejaVu Sans Bold", "DejaVuSans-Bold.ttf"),
+    (MONO, "normal", "DejaVu Sans Mono", "DejaVuSansMono.ttf"),
+    (MONO, "bold", "DejaVu Sans Mono Bold", "DejaVuSansMono-Bold.ttf"),
 )
 
 
 def _font_rules(static_url: str) -> bytes:
     faces = "".join(
         f'\n@font-face {{ font-family: "{family}"; font-weight: {weight}; '
-        f'src: url("{static_url}{_FONT_PATH}{name}") format("truetype"); }}'
-        for family, weight, name in _FACES
+        f'src: local("{installed}"), url("{static_url}{_FONT_PATH}{name}") format("truetype"); }}'
+        for family, weight, installed, name in _FACES
     )
     return (
         faces
@@ -208,7 +213,7 @@ def _drawn_in_the_suites_own_font():
     from django.http import HttpResponse
 
     rules = _font_rules(settings.STATIC_URL)
-    files = {name: (FONTS / name).read_bytes() for _family, _weight, name in _FACES}
+    files = {name: (FONTS / name).read_bytes() for _family, _weight, _installed, name in _FACES}
     served = handlers.serve
 
     def in_the_font(request, path, **kwargs):
