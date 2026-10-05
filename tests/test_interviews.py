@@ -5,6 +5,7 @@ import io
 import json
 import zipfile
 
+import icalendar
 import pytest
 from django.urls import reverse
 from django.utils import timezone
@@ -444,7 +445,9 @@ def test_the_ics_file_is_one_every_calendar_can_import(client, user, application
         line.startswith("DESCRIPTION:Bring ID.\\nAsk about the team.\\nWith: Cave")
         for line in lines
     )
-    assert "ATTENDEE;CN=Cave Johnson;ROLE=REQ-PARTICIPANT:mailto:cave@aperture.test" in lines
+    attendee = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]["ATTENDEE"]
+    assert str(attendee) == "mailto:cave@aperture.test"
+    assert attendee.params["CN"] == "Cave Johnson" and attendee.params["ROLE"] == "REQ-PARTICIPANT"
     assert any(line.startswith("URL:http://testserver/applications/") for line in lines)
     assert "STATUS:CONFIRMED" in lines
     assert all(len(line.encode()) <= 75 for line in lines), "folded at 75 octets"
@@ -474,8 +477,8 @@ def test_an_event_carries_the_reminder_as_an_alarm_only_when_it_is_asked_for(app
     lines = ical.event_lines(interview, alarm=True)
     assert "BEGIN:VALARM" in lines and "END:VALARM" in lines
     assert lines[-1] == "END:VEVENT", "the alarm is inside the event"
-    minutes = int((interview.starts_at - reminder.due_at).total_seconds() // 60)
-    assert f"TRIGGER:-PT{minutes}M" in lines
+    alarm = icalendar.Calendar.from_ical("\r\n".join(lines) + "\r\n").walk("VALARM")[0]
+    assert alarm["TRIGGER"].dt == -(interview.starts_at - reminder.due_at), "a lead time"
     assert f"DESCRIPTION:{ical.escape(reminder.summary)}" in lines
 
 
@@ -531,11 +534,13 @@ def test_the_whole_diary_downloads_as_one_file(client, user, application):
     assert first.uid in text and second.uid in text and gone.uid not in text
 
 
-def test_folding_never_splits_a_character():
-    line = "DESCRIPTION:" + "é" * 100
-    pieces = ical.fold(line)
-    assert all(len(piece.encode()) <= 75 for piece in pieces)
-    assert "".join(piece[1:] if index else piece for index, piece in enumerate(pieces)) == line
+def test_folding_never_splits_a_character(application):
+    interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
+    interview.notes = "é" * 100
+    text = ical.calendar([interview])
+    assert all(len(line.encode()) <= 75 for line in text.split("\r\n"))
+    parsed = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]
+    assert str(parsed["DESCRIPTION"]).startswith("é" * 100), "and unfolds to what was written"
 
 
 def test_a_property_value_keeps_no_way_of_ending_its_own_line():
@@ -545,11 +550,39 @@ def test_a_property_value_keeps_no_way_of_ending_its_own_line():
     assert "\r" not in ical.escape("a\rb") and "\n" not in ical.escape("a\rb")
 
 
-def test_a_parameter_value_cannot_start_a_property_of_its_own():
+def test_a_parameter_value_cannot_start_a_property_of_its_own(application):
     """``CN=`` sits mid-line, so a break in a name would be a break in the file."""
-    assert ical.parameter("Cave\r\nBEGIN:VALARM") == '"CaveBEGIN:VALARM"'
-    assert ical.parameter('Cave "Jack" Johnson') == "Cave Jack Johnson"
-    assert ical.parameter("Johnson, Cave") == '"Johnson, Cave"', "still quoted when it needs to be"
+    company = application.posting.company
+    for name, expected in [
+        ("Cave\r\nBEGIN:VALARM", "CaveBEGIN:VALARM"),
+        ('Cave "Jack" Johnson', "Cave Jack Johnson"),
+        ("Johnson, Cave", "Johnson, Cave"),
+    ]:
+        person = Contact.objects.create(
+            owner=application.owner, company=company, name=name, email="x@example.test"
+        )
+        interview = schedule_interview(
+            application, kind=InterviewKind.VIDEO, starts_at=in_days(2), contacts=[person]
+        )
+        text = ical.calendar([interview])
+        assert not any(line.startswith("BEGIN:VALARM") for line in text.split("\r\n"))
+        event = icalendar.Calendar.from_ical(text).walk("VEVENT")[0]
+        assert event["ATTENDEE"].params["CN"] == expected
+
+
+def test_the_identifier_of_an_interview_cannot_add_a_property(application):
+    """It was the one value written as it was found (#450)."""
+    interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
+    interview.uid = "x@postulo\r\nATTACH:https://evil.example/x"
+    text = ical.calendar([interview])
+    assert not any(line.startswith("ATTACH") for line in text.split("\r\n"))
+    assert len(icalendar.Calendar.from_ical(text).walk("VEVENT")) == 1
+
+
+def test_an_outcome_this_version_does_not_know_is_not_a_cancellation(application):
+    interview = schedule_interview(application, kind=InterviewKind.VIDEO, starts_at=in_days(2))
+    interview.outcome = "rescheduled-by-a-later-postulo"
+    assert "STATUS:CONFIRMED" in ical.calendar([interview])
 
 
 # ---------------------------------------------------------------- export, import

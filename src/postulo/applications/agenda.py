@@ -53,6 +53,7 @@ from __future__ import annotations
 import datetime as dt
 from dataclasses import dataclass, field
 
+from django.conf import settings
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
@@ -737,6 +738,9 @@ def dated_days(user, absolute) -> list[ical.DayEntry]:
         today + dt.timedelta(days=FEED_DAYS),
         kinds=(DEADLINE, CLOSING, ANSWER),
     )
+    # The identifier comes from the instance's own public name where it has one, so the same
+    # deadline reached under two host names is one entry in a calendar and not two (#661).
+    public = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
     return [
         ical.DayEntry(
             summary=event.title,
@@ -744,6 +748,7 @@ def dated_days(user, absolute) -> list[ical.DayEntry]:
             url=absolute(event.url),
             description=event.detail,
             over=event.muted,
+            identity=f"{public}{event.url}" if public else "",
         )
         for event in events
     ]

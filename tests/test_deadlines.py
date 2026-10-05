@@ -272,6 +272,40 @@ def test_a_day_entry_keeps_its_name_between_fetches(client, user, application):
     assert uid in second, "a changing UID doubles the entry in somebody's calendar"
 
 
+def test_a_day_entry_has_one_name_whichever_host_it_is_fetched_under(
+    client, user, application, settings
+):
+    """The address was the identity, and an instance answers under more than one (#661)."""
+    settings.POSTULO_PUBLIC_URL = "https://postulo.example"
+    settings.ALLOWED_HOSTS = ["*"]
+    application.deadline = timezone.localdate() + dt.timedelta(days=5)
+    application.save(update_fields=["deadline"])
+    client.force_login(user)
+    address = reverse("applications:interview_calendar")
+
+    one = client.get(address, HTTP_HOST="postulo.example").content.decode()
+    two = client.get(address, HTTP_HOST="192.168.1.5:8000").content.decode()
+
+    uid = next(line for line in one.splitlines() if line.startswith("UID:"))
+    assert uid in two
+
+
+def test_a_day_entry_is_still_named_by_its_address_where_no_public_address_is_set(
+    client, user, application, settings
+):
+    settings.POSTULO_PUBLIC_URL = ""
+    settings.ALLOWED_HOSTS = ["*"]
+    application.deadline = timezone.localdate() + dt.timedelta(days=5)
+    application.save(update_fields=["deadline"])
+    client.force_login(user)
+    address = reverse("applications:interview_calendar")
+
+    one = client.get(address, HTTP_HOST="a.example").content.decode()
+    two = client.get(address, HTTP_HOST="b.example").content.decode()
+
+    assert next(x for x in one.splitlines() if x.startswith("UID:")) not in two
+
+
 # ------------------------------------------------------- telling somebody about it
 
 
