@@ -77,6 +77,23 @@ def _directory_size(root: Path) -> tuple[int, int]:
     return files, size
 
 
+#: How old the media figures may be, five minutes: they change slowly, and the walk
+#: costs as much as the instance's whole history (#488).
+MEDIA_FIGURES_TTL = 300
+
+
+def _media_figures(root: Path) -> tuple[int, int]:
+    from django.core.cache import cache
+
+    key = f"server-media-figures:{root}"
+    held = cache.get(key)
+    if isinstance(held, (list, tuple)) and len(held) == 2:
+        return held[0], held[1]
+    figures = _directory_size(root)
+    cache.set(key, list(figures), MEDIA_FIGURES_TTL)
+    return figures
+
+
 def _newest_backup(root: Path):
     if not root.is_dir():
         return None
@@ -138,7 +155,7 @@ class OverviewView(ServerSectionMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         media_root = Path(settings.MEDIA_ROOT)
-        media_files, media_bytes = _directory_size(media_root)
+        media_files, media_bytes = _media_figures(media_root)
         database = settings.DATABASES["default"]
         context.update(
             {

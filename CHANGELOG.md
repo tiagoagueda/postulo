@@ -32,6 +32,7 @@ All notable changes to Postulo are recorded here. The format follows
 - `scripts/messages.py stats` finds the catalogue sets once instead of once per language: 4 seconds instead of 45. (#724)
 - The unit suite no longer repeats the catalogue and collectstatic checks CI's Checks job makes; `pytest -m step` runs them. (#725)
 - Browser tests wait for the page's state instead of a fixed time where the time is not the point, and every fixed wait left says what it measures. (#723)
+- Server settings Overview no longer walks the whole media directory on every visit; the file count and size are cached for five minutes, so the page opens fast on older instances. (#488)
 - CONTRIBUTING.md says what belongs in the browser suite and how to keep it fast. (#726)
 - The browser suite's walks of every page check the accessibility, target size, text spacing and described-by rules on one load per page, in three walks instead of six. (#722)
 
