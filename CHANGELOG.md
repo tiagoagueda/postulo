@@ -14,6 +14,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The applications and companies tables no longer de-duplicate every row on each view, so counts and pages load faster, most on large accounts. (#552)
 - The company page's duplicate check is much faster for people with hundreds of companies: legal forms are looked up by their edge word and company names are cached. (#553)
 - Social profile rows now ask for the username with the service's address shown fixed in front of it, and a name that breaks the service's rule is refused beside the box (#678)
 - Find logo and Refresh logo open a dialog on the company's page instead of a page of their own (#674)

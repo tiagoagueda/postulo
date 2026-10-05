@@ -144,7 +144,9 @@ class ApplicationFilterMixin:
         if params.get("quiet", "").strip():
             queryset = queryset.quiet(quiet.threshold_for(self.request.user))
 
-        return queryset.distinct()
+        # No filter here can repeat a row: search goes through single foreign keys, the tag
+        # slug is unique per owner, and the rest are columns or annotations (#552).
+        return queryset
 
     def filter_context(self) -> dict:
         return {

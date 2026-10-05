@@ -104,8 +104,14 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         if search:
             queryset = queryset.filter(company_match(search))
         queryset = self._within_group(queryset)
-        # A company in two matching industries is still one row.
-        return self.table.apply(queryset).distinct()
+        queryset = self.table.apply(queryset)
+        # The search matches industries and identifiers through `Exists`, so it cannot
+        # repeat a company. Only the Industries column joins a many-valued relation, where
+        # a company in two matching industries is still one row; the plain table skips the
+        # de-duplication, which made every count and page dearer (#552).
+        if self.table.given("industry"):
+            queryset = queryset.distinct()
+        return queryset
 
     def _within_group(self, queryset):
         """Narrow to one ownership tree, when `?group=` names a company in one.

@@ -920,3 +920,28 @@ def test_the_filter_and_sort_names_carry_the_label_as_the_catalogue_wrote_it(ger
         control = tables.Control(kind="text", name="name", key="name", label="Unternehmen CV")
         assert control.filter_label == "Nach Unternehmen CV filtern"
         assert table.sort_hint(column) == "Nach CV sortieren, höchste zuerst"
+
+
+def _sql_of(client, user, url_name, **params) -> list[str]:
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    client.force_login(user)
+    with CaptureQueriesContext(connection) as captured:
+        assert client.get(reverse(url_name), params).status_code == 200
+    return [q["sql"] for q in captured.captured_queries]
+
+
+@pytest.mark.parametrize("url_name", ["applications:list", "jobs:company_list"])
+def test_the_plain_tables_do_not_deduplicate_their_rows(client, user, search, url_name):
+    """No filter on these tables can repeat a row, so no query pays for DISTINCT (#552)."""
+    assert not [q for q in _sql_of(client, user, url_name) if "DISTINCT" in q.upper()]
+
+
+def test_a_company_in_two_matching_industries_appears_once(client, user, search):
+    company = search["aperture"]
+    for name in ("Software", "Software services"):
+        company.industries.add(Industry.objects.create(owner=user, name=name))
+    client.force_login(user)
+    response = client.get(reverse("jobs:company_list"), {"industry": "Software"})
+    assert list(response.context["companies"]).count(company) == 1
