@@ -218,3 +218,28 @@ def test_it_spans_the_screen_and_stays_quiet(client):
     opening = footer[: footer.index(">") + 1]
     assert "text-xs" in opening and "text-ink-500" in opening
     assert "max-w-" not in footer
+
+
+def test_the_version_is_read_from_the_metadata_once_however_many_pages(client, user, monkeypatch):
+    """The version cannot change without a restart, so no page re-reads it (#560)."""
+    import importlib.metadata
+
+    from postulo.core import updates
+
+    updates.installed_version.cache_clear()
+    real = importlib.metadata.version
+    calls = []
+
+    def counting(name):
+        calls.append(name)
+        return real(name)
+
+    monkeypatch.setattr(importlib.metadata, "version", counting)
+    client.force_login(user)
+    try:
+        client.get(reverse("core:home"))
+        client.get(reverse("core:home"))
+    finally:
+        updates.installed_version.cache_clear()
+
+    assert len(calls) <= 1

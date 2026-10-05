@@ -268,3 +268,28 @@ def test_a_blurb_names_only_what_its_widget_draws():
     sources = str(widgets.get("sources").blurb)
     assert "per company" not in sources
     assert "referrer" in sources and "agency" in sources
+
+
+# ---------------------------------------------------- one pass of the processors
+
+
+def test_the_dashboard_runs_the_ui_processor_once_not_once_per_widget(client, user, monkeypatch):
+    """A widget is drawn against a plain dict, not a RequestContext (#560)."""
+    from postulo.core import context_processors
+
+    # `ui` is bound by the engine at start-up, so count what it calls on every run.
+    real = context_processors.release_notes_url
+    calls = []
+
+    def counting(*args, **kwargs):
+        calls.append(1)
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(context_processors, "release_notes_url", counting)
+    arrange(user, widgets.default_keys())
+    client.force_login(user)
+
+    response = client.get(reverse(ARRANGE))
+
+    assert response.status_code == 200
+    assert len(calls) == 1

@@ -18,6 +18,7 @@ last check stored, and a page never fetches.
 
 from __future__ import annotations
 
+import functools
 import logging
 from datetime import timedelta
 
@@ -103,6 +104,7 @@ def due() -> bool:
     return checked_at is None or timezone.now() - checked_at >= EVERY
 
 
+@functools.cache
 def installed_version() -> str:
     """The version of the package that is actually running.
 
@@ -114,6 +116,8 @@ def installed_version() -> str:
     context processor that prints it in the footer: this module is asked by pages and by the
     scheduler, and reaching up into a context processor for the number was an import
     pointing the wrong way (#248). The context processor still hands it out.
+
+    Cached: it cannot change without a restart, and every page asks (#560).
     """
     from importlib.metadata import PackageNotFoundError, version
 

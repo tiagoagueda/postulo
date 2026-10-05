@@ -618,14 +618,19 @@ def render_widget(context, rendered):
 
     ``{% include %}`` would hand the widget the whole page's context, which is how one
     widget ends up quietly reading a variable another one set. Each is rendered against
-    its own dict and the request, so a widget can only see what it asked for.
+    a plain dict: what it computed, itself, the request and the page's CSRF token (two
+    widgets post forms). Giving ``render_to_string`` the request instead would build a
+    ``RequestContext`` and run every context processor again for every widget (#560).
     """
-    from django.template.loader import render_to_string
+    from django.template.loader import get_template
 
-    return render_to_string(
-        rendered.spec.template,
-        {**rendered.context, "widget": rendered.spec},
-        request=context.get("request"),
+    return get_template(rendered.spec.template).render(
+        {
+            **rendered.context,
+            "widget": rendered.spec,
+            "request": context.get("request"),
+            "csrf_token": context.get("csrf_token"),
+        }
     )
 
 
