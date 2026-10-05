@@ -25,6 +25,7 @@ from django.db.models import (
     IntegerField,
     OuterRef,
     Q,
+    Subquery,
     Value,
     When,
 )
@@ -878,7 +879,29 @@ class JobPostingQuerySet(models.QuerySet):
         return self.filter(closed_at__isnull=True)
 
     def with_application_count(self) -> JobPostingQuerySet:
-        return self.annotate(application_count=models.Count("applications", distinct=True))
+        """How many applications each listing has, and the first one to link to (#558).
+
+        Correlated subqueries, as `CompanyQuerySet.with_table_data` does, not a `GROUP BY`
+        over every posting column; and the application's key is annotated so a row draws its
+        *Application* button without fetching the application, a query per applied row.
+        """
+        # By label, as `with_table_data` does: a listing's model importing theirs is a cycle.
+        Application = apps.get_model("applications", "Application")
+        mine = Application.objects.filter(posting=OuterRef("pk")).order_by()
+        return self.annotate(
+            application_count=Coalesce(
+                Subquery(
+                    mine.values(placeholder=Value(1)).annotate(n=Count("*")).values("n")[:1],
+                    output_field=IntegerField(),
+                ),
+                Value(0),
+                output_field=IntegerField(),
+            ),
+            first_application_id=Subquery(
+                mine.order_by("created_at", "pk").values("pk")[:1],
+                output_field=IntegerField(),
+            ),
+        )
 
     def with_salary_order(self) -> JobPostingQuerySet:
         """Annotate a yearly figure to sort the salary column by, within a currency.

@@ -112,13 +112,11 @@
           <button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Restore" %}</button>
         </form>
       {% elif listing.derived_state == "applied" %}
-        {% with application=listing.applications.all|first %}
-          {% if application %}
-            <a href="{{ application.get_absolute_url }}" class="btn" data-variant="ghost" data-size="xs">
-              {% translate "Application" %}
-            </a>
-          {% endif %}
-        {% endwith %}
+        {% if listing.first_application_id %}
+          <a href="{% url 'applications:detail' listing.first_application_id %}" class="btn" data-variant="ghost" data-size="xs">
+            {% translate "Application" %}
+          </a>
+        {% endif %}
       {% endif %}
     </div>
   </td>

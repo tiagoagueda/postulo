@@ -57,6 +57,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The Listings Applied and Everything tabs no longer make a query per applied row, so they cost the same however many listings you have applied to. (#558)
 - A company's page no longer scrolls sideways on a phone, and a contact's link is no longer cut off under wider text spacing (#654)
 - Find logo now says why a site gave nothing, and always tries the favicon (#526)
 - Fixed: THIRD-PARTY.md now lists the NACE table and the GeoNames and ESCO data downloaded when an instance is provisioned, and a test finds any licence file the register does not name (#579)

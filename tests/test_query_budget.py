@@ -96,6 +96,8 @@ PAGES = [
     ("the board, folded", "applications:list", {"view": "board", "status": "applied"}),
     ("the companies table", "jobs:company_list", {}),
     ("the listings page", "listings:list", {}),
+    ("the listings page, applied", "listings:list", {"state": "applied"}),
+    ("the listings page, everything", "listings:list", {"state": "all"}),
     ("the dashboard", "core:home", {}),
     ("search", "core:search", {"q": "engineer"}),
     ("the report", "applications:report", {}),
