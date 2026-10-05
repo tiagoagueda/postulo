@@ -12,9 +12,13 @@ Every page is drawn in DejaVu Sans, from files in `fonts/` beside this one, on e
 `_drawn_in_the_suites_own_font` below says why and how.
 """
 
+import functools
 import os
 import re
+import shutil
 import sqlite3
+import subprocess
+import sys
 import threading
 import weakref
 from pathlib import Path
@@ -175,6 +179,27 @@ _FACES = (
 )
 
 
+@functools.cache
+def drawn_in_dejavu_already() -> bool:
+    """Whether this machine's own sans-serif is DejaVu Sans, as on CI's Debian.
+
+    There the suite leaves every page alone. Its font stack (`"Inter var", ui-sans-serif,
+    system-ui, ...`) resolves to the installed DejaVu Sans through fontconfig, and forcing the
+    same font through `@font-face` -- even `local()` -- drew each item of the masthead a pixel
+    or two wider on CI and put the search box on a second line under the text spacing
+    override (runs 723 and 725; a probe branch drew it with the override and without). The
+    override is for the machines whose system font is not DejaVu, to draw as near to CI as
+    they can.
+    """
+    matcher = shutil.which("fc-match") if sys.platform.startswith("linux") else None
+    if not matcher:
+        return False
+    found = subprocess.run(  # noqa: S603 - fontconfig, asked a fixed question
+        [matcher, "-f", "%{family}", "system-ui"], capture_output=True, text=True, check=False
+    ).stdout
+    return found.split(",")[0].strip() == "DejaVu Sans"
+
+
 def _font_rules(static_url: str) -> bytes:
     faces = "".join(
         f'\n@font-face {{ font-family: "{family}"; font-weight: {weight}; '
@@ -208,6 +233,10 @@ def _drawn_in_the_suites_own_font():
     that turns the browser's cache off, and the tests that press *Back* are about what the
     cache brings back.
     """
+    if drawn_in_dejavu_already():
+        yield
+        return
+
     from django.conf import settings
     from django.contrib.staticfiles import handlers
     from django.http import HttpResponse
@@ -250,7 +279,7 @@ def _the_suites_font_is_the_one_drawn(_drawn_in_the_suites_own_font, browser, li
     a reason nobody would guess from the message. Asked by the first test of each process,
     in a context of its own, once that test's database is there to draw a page from.
     """
-    if _FONT_SEEN:
+    if _FONT_SEEN or drawn_in_dejavu_already():
         return
     context = browser.new_context()
     try:
