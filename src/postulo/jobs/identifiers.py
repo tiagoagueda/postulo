@@ -95,3 +95,8 @@ def clean(scheme_key: str, raw: str) -> str:
 
 def url_for(scheme_key: str, value: str) -> str:
     return registry.url_for(COMPANY, scheme_key, value)
+
+
+def findings(rows) -> list:
+    """Which of a company's identifiers do not fit together: a warning, never a refusal (#675)."""
+    return registry.findings_for(COMPANY, rows)

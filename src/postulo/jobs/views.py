@@ -312,6 +312,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         )
         context["identifier_rows"] = shown
         context["identifiers_hidden"] = len(hidden)
+        # Which of the company's identifiers do not fit together, worked out as the page is
+        # drawn and told, never refused (#675). Hidden ones count: a warning concerns them too.
+        context["identifier_findings"] = identifiers.findings(self.object.identifiers.all())
         # The data-subject export beside each contact, while the feature offers it (#297).
         from postulo.core import gdpr
 

@@ -352,3 +352,9 @@ def test_an_isni_with_a_wrong_check_character_is_refused_and_its_link_has_no_spa
     scheme = person_schemes.schemes()["isni"]
     assert person_schemes.clean("isni", scheme.example) == scheme.example
     assert scheme.url_for(scheme.example) == "https://isni.org/isni/000000012281955X"
+
+
+def test_the_cross_check_rules_come_from_the_plugin_the_way_schemes_do():
+    from postulo.plugins.identifiers.crosschecks import CROSS_CHECKS
+
+    assert set(CROSS_CHECKS) <= set(registry.cross_checks())

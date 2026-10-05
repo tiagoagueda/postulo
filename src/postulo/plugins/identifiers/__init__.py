@@ -50,6 +50,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.plugins.api import declares, shipped
 
 from . import custom
+from .crosschecks import CROSS_CHECKS
 from .schemes import SCHEMES
 
 #: The identifier this plugin is known by. Not a policy key -- nothing decides about it.
@@ -75,6 +76,10 @@ class Identifiers:
     #: Every scheme this plugin contributes. `core.identifiers.registry` merges these across
     #: whatever identifier plugins are installed, first registration keeping the key.
     schemes = tuple(SCHEMES.values())
+
+    #: The rules that compare one identifier with another; `core.identifiers.cross_checks`
+    #: gathers them the way the registry gathers schemes (#675).
+    cross_checks = CROSS_CHECKS
 
     #: The page of *Server settings* this plugin's own settings are on, by its URL name:
     #: where an administrator defines the instance's schemes. The Plugins page draws a

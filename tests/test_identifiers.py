@@ -526,3 +526,72 @@ def test_a_company_page_draws_no_mark_beside_the_schemes_postulo_ships(signed_in
 def test_the_identifier_form_draws_no_mark(signed_in):
     html = signed_in.get(reverse("jobs:company_create")).content.decode()
     assert "data-brand=" not in html, "a select draws icons only (#301)"
+
+
+# ------------------------------------------- identifiers that disagree with each other (#675)
+
+
+def sentences(company):
+    return [finding.sentence for finding in identifiers.findings(company.identifiers.all())]
+
+
+def test_a_register_number_and_an_opencorporates_id_that_agree_have_no_finding(user):
+    acme = company_with(
+        user, "Acme", ("register", "PT 501234567"), ("opencorporates", "pt/501234567")
+    )
+    assert sentences(acme) == []
+
+
+def test_the_same_country_under_two_spellings_is_still_the_same(user):
+    acme = company_with(
+        user, "Acme", ("register", "EL 123456789"), ("opencorporates", "gr/123456789")
+    )
+    assert sentences(acme) == []
+
+
+def test_different_numbers_name_both_values(user):
+    acme = company_with(
+        user, "Acme", ("register", "PT 501234567"), ("opencorporates", "pt/999999999")
+    )
+    [finding] = identifiers.findings(acme.identifiers.all())
+    assert "PT 501234567" in finding.sentence
+    assert "pt/999999999" in finding.sentence
+    assert "different numbers" in finding.sentence
+    assert finding.severity == "warning"
+
+
+def test_different_countries_say_the_jurisdictions_differ(user):
+    acme = company_with(
+        user, "Acme", ("register", "PT 501234567"), ("opencorporates", "gb/501234567")
+    )
+    [sentence] = sentences(acme)
+    assert "different jurisdictions" in sentence
+
+
+def test_a_company_with_one_identifier_has_no_finding(user):
+    assert sentences(company_with(user, "Acme", ("register", "PT 501234567"))) == []
+    assert sentences(company_with(user, "Bare")) == []
+
+
+def test_a_stored_value_its_scheme_would_refuse_today_is_reported(user):
+    acme = company_with(user, "Acme", ("isni", "0000 0001 2281 9559"))
+    [sentence] = sentences(acme)
+    assert "0000 0001 2281 9559" in sentence
+    assert "refused today" in sentence
+
+
+def test_the_company_page_draws_the_note_only_when_there_is_a_finding(client, user):
+    client.force_login(user)
+    fine = company_with(user, "Fine", ("register", "PT 501234567"))
+    odd = company_with(user, "Odd", ("register", "PT 509999999"), ("opencorporates", "gb/1"))
+    assert "data-identifier-findings" not in client.get(fine.get_absolute_url()).content.decode()
+    page = client.get(odd.get_absolute_url()).content.decode()
+    assert "data-identifier-findings" in page
+    assert "Identifiers that do not fit together" in page
+    assert "gb/1" in page
+
+
+def test_another_persons_page_never_shows_my_findings(client, user, other_user):
+    odd = company_with(user, "Odd", ("register", "PT 509999999"), ("opencorporates", "gb/1"))
+    client.force_login(other_user)
+    assert client.get(odd.get_absolute_url()).status_code == 404

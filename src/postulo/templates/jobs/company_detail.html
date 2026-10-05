@@ -91,6 +91,10 @@
      component draws nothing where there are none. {% endcomment %}
   <c-duplicates :candidates="duplicates" />
 
+  {% comment %} Which of its identifiers disagree with each other, worked out as the page is
+     drawn and told, never refused (#675). Nothing is drawn where none do. {% endcomment %}
+  <c-identifier-findings :findings="identifier_findings" />
+
   {% if identifier_rows or identifiers_hidden %}
     <div class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
       {% if identifier_rows %}

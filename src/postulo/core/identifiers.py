@@ -682,6 +682,51 @@ def find(key: str, subject: str = "") -> Scheme | None:
     return scheme
 
 
+# ------------------------------------------- identifiers that disagree with each other (#675)
+#
+# A scheme is checked alone: by shape and, where it has one, by check digit. These are the
+# rules that compare one identifier with another. Each is a function the identifier plugin
+# contributes, and what they find is a warning: told when a page is drawn, never refused
+# when a row is saved, never kept in a table. Nothing is looked up -- a clean page is
+# "nothing here contradicts anything else", and not "verified".
+
+WARNING = "warning"
+
+
+@dataclass(frozen=True)
+class Finding:
+    """One thing that does not fit: a sentence, the identifiers it is about, a severity."""
+
+    sentence: str
+    #: ``(scheme label, value)`` for each identifier the sentence concerns.
+    identifiers: tuple[tuple[str, str], ...] = ()
+    #: Only ever "warning": a register may be right where another record is wrong.
+    severity: str = WARNING
+
+
+def cross_checks() -> tuple[Callable[[str, list], list[Finding]], ...]:
+    """The rules the installed identifier plugins bring, each ``rule(subject, rows)``.
+
+    ``rows`` are anything with a ``scheme`` and a ``value``, a subject's own stored
+    identifiers; a rule returns its findings.
+    """
+    from postulo.plugins.registry import plugins
+
+    found: list[Callable[[str, list], list[Finding]]] = []
+    for plugin in plugins("identifier"):
+        found.extend(getattr(plugin, "cross_checks", ()))
+    return tuple(found)
+
+
+def findings_for(subject: str, rows) -> list[Finding]:
+    """What every rule says about one subject's identifiers, in the rules' order."""
+    rows = list(rows)
+    found: list[Finding] = []
+    for rule in cross_checks():
+        found.extend(rule(subject, rows))
+    return found
+
+
 def label_for(key: str, subject: str = "") -> str:
     """A scheme's name in words, or its key where nothing recognises it.
 

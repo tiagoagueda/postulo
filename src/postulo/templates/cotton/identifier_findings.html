@@ -1,0 +1,28 @@
+{% load i18n %}
+<c-vars findings />
+{% comment %} Identifiers of one record that do not fit together (#675).
+
+   `<c-identifier-findings :findings="identifier_findings" />`, where each finding is a
+   `core.identifiers.Finding`: a sentence and the identifiers it concerns. Nothing at all is
+   drawn where there are none.
+
+   A component beside `<c-duplicates>`, in the same shape, and for the same reason: it
+   tells and never refuses. A register may be right where another record is wrong, so the
+   note says what disagrees and leaves both values as they are. A clean page is not a
+   verified one, and the wiki says what is and is not compared.
+
+   Said in words and not by colour, and an alert is a row, so this one says `flex-col` and
+   draws its heading bare, as `<c-duplicates>` does.
+{% endcomment %}
+{% if findings %}
+  <section class="alert mb-6 flex-col items-stretch" data-variant="info"
+           aria-labelledby="identifier-findings" data-identifier-findings>
+    <h2 id="identifier-findings" class="font-medium">{% translate "Identifiers that do not fit together" %}</h2>
+    <p>
+      {% translate "Nothing has been changed, and none of this stops you saving. Only you know which of them is right." %}
+    </p>
+    <ul class="list-disc space-y-1 ps-5">
+      {% for finding in findings %}<li data-finding>{{ finding.sentence }}</li>{% endfor %}
+    </ul>
+  </section>
+{% endif %}
