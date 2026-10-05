@@ -108,6 +108,17 @@ def _orphaned_live_server_connections():
     _close_connections_left_behind()
 
 
+def pytest_terminal_summary(terminalreporter):
+    """Page loads a walk asked for twice, so a stall stays in the log without failing it."""
+    # Only where this run loaded the walks: the unit job has no Playwright to import them with.
+    walks = sys.modules.get("tests.e2e.test_reflow")
+    stalls = walks.STALLS if walks else []
+    if stalls:
+        terminalreporter.section("page loads that stalled and arrived on a second try")
+        for line in stalls:
+            terminalreporter.line(line)
+
+
 def pytest_sessionfinish(session, exitstatus):
     """Sweep once more after the server stops, so a worker that dies while the last
     response is still in flight leaves no connection behind either (#294). Every test

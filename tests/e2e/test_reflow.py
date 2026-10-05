@@ -193,16 +193,12 @@ SPILLS = r"""() => {
 }"""
 
 
-def goto_watched(page: Page, url: str, seen: list[tuple[str, float]]) -> None:
-    """Open ``url``, and if it never arrives, say what this process was doing meanwhile.
+#: Page loads that stalled and arrived on a second try, for the run's summary (#722).
+STALLS: list[str] = []
 
-    Run 723 timed out on one page of 150, which then passed alone, and its log could not say
-    whether the live server in this process was stuck -- a request thread in a view or in
-    SQLite -- or whether nothing got the processor at all. A timer takes every thread's stack
-    25 seconds into a navigation that has not arrived; a timer rather than
-    `faulthandler.dump_traceback_later`, which holds one timer per process and would cancel
-    pytest's own (#721). Each page's time goes in the message too, the last few of them.
-    """
+
+def _watched_goto(page: Page, url: str) -> list[str] | None:
+    """Open ``url``; None if it arrived, else every thread's stack 25 seconds in."""
     stacks: list[str] = []
 
     def take() -> None:
@@ -211,18 +207,43 @@ def goto_watched(page: Page, url: str, seen: list[tuple[str, float]]) -> None:
 
     timer = threading.Timer(25, take)
     timer.daemon = True
-    started = time.monotonic()
     timer.start()
     try:
         page.goto(url)
-    except PlaywrightTimeoutError as error:
-        recent = ", ".join(f"{path} {took:.1f}s" for path, took in seen[-5:])
-        raise AssertionError(
-            f"{url} never arrived. Pages before it: {recent}.\n"
-            "Every thread of this process 25 seconds into the wait:\n" + "\n".join(stacks)
-        ) from error
+    except PlaywrightTimeoutError:
+        return stacks
     finally:
         timer.cancel()
+    return None
+
+
+def goto_watched(page: Page, url: str, seen: list[tuple[str, float]]) -> None:
+    """Open ``url`` for a walk, once more if it stalls, and say what this process was doing.
+
+    A timer takes every thread's stack 25 seconds into a navigation that has not arrived; a
+    timer rather than `faulthandler.dump_traceback_later`, which holds one timer per process
+    and would cancel pytest's own (#721). Run 732 caught one: the live server's request
+    threads all idle on their sockets and the server waiting on `select` -- the request never
+    left the browser, on a host whose load average stood at 19. So a stalled page is asked
+    for once more, and the stall is listed at the end of the run instead of failing a walk
+    of 150 pages; a page that stalls twice fails, with the stacks of both waits.
+    """
+    started = time.monotonic()
+    stacks = _watched_goto(page, url)
+    if stacks is not None:
+        recent = ", ".join(f"{path} {took:.1f}s" for path, took in seen[-5:])
+        busy = any("django/core/handlers" in stack for stack in stacks)
+        server = "busy with a request" if busy else "idle"
+        STALLS.append(f"{url}: the live server was {server}")
+        again = _watched_goto(page, url)
+        if again is not None:
+            raise AssertionError(
+                f"{url} never arrived, twice. Pages before it: {recent}.\n"
+                "Every thread of this process 25 seconds into the first wait:\n"
+                + "\n".join(stacks)
+                + "\n\nand into the second:\n"
+                + "\n".join(again)
+            )
     seen.append((url, time.monotonic() - started))
 
 
