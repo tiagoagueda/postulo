@@ -325,6 +325,25 @@ def test_no_page_scrolls_sideways_at_320_pixels(
     )
 
 
+def test_the_leave_question_reflows_at_320_pixels(live_server, page: Page, applicant):
+    """Postulo's own "Leave without saving?" must not push the page sideways (#657)."""
+    from postulo.documents.models import CoverLetter
+
+    letter = CoverLetter.objects.create(owner=applicant, name="A", body="x")
+    sign_in(page, live_server.url)
+    page.set_viewport_size({"width": NARROW, "height": 800})
+    page.goto(f"{live_server.url}/documents/letters/{letter.pk}/edit/")
+    page.locator("textarea[name=body]").fill("Typed.")
+    page.locator("a[href='/applications/']:visible").first.focus()
+    page.keyboard.press("Enter")
+    expect(page.locator("#leave-dialog > *")).to_be_visible()
+
+    result = page.evaluate(SCROLLS_SIDEWAYS)
+    assert not result["reached"], result["culprits"]
+    box = page.locator("#leave-dialog > *").bounding_box()
+    assert box["x"] >= 0 and box["x"] + box["width"] <= NARROW
+
+
 @pytest.mark.parametrize("language", LANGUAGES)
 def test_the_navigation_becomes_a_bar_and_still_works(
     live_server,

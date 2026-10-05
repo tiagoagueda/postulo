@@ -358,6 +358,17 @@
               data-filter="{% translate 'Filter' %}"
               data-empty="{% translate 'Nothing matches.' %}"
               data-required="{% translate 'Choose one of the options.' %}">{% icon "chevron-down" %}{% icon "check" %}</template>
+    {% comment %} The question asked when somebody leaves a page through a link or a button
+       with something typed and not saved (#657): Postulo's own words, where the browser's
+       `beforeunload` prompt, which stays for what a page cannot see, has none of ours.
+       `app.js` opens it; with no script nothing is guarded and it is never drawn open. {% endcomment %}
+    <c-dialog id="leave-dialog" data-leave-dialog>
+      <c-slot name="title">{% translate "Leave without saving?" %}</c-slot>
+      <c-slot name="description">{% translate "What you typed on this page has not been saved. If you leave, it is lost." %}</c-slot>
+      <c-slot name="footer">
+        <button type="button" class="btn" data-variant="destructive" data-leave-page>{% translate "Leave this page" %}</button>
+      </c-slot>
+    </c-dialog>
     {# Scripts a page needs and the rest do not; always from Postulo's own origin. #}
     {% block scripts %}{% endblock %}
     {% comment %} allauth's pages put theirs in `extra_body` rather than in `scripts`, and a

@@ -1791,6 +1791,136 @@
     event.returnValue = "";
   });
 
+  /* ------------------------------------------ asking in Postulo's words when leaving (#657)
+   *
+   * `beforeunload` cannot be worded or translated, and it is all a page gets for the tab
+   * closed, a reload, the address bar and Back. For what a page *can* see -- a click on a
+   * link that goes elsewhere in Postulo, and a form submitted that is not the dirty one
+   * (*Sign out*, a discard) -- the question is Postulo's own dialog. Both listeners run in
+   * the capture phase, before the double-submit guard marks a form as sent, so a refusal
+   * leaves no dead form behind. *Leave this page* lifts every dirty mark, so that
+   * `beforeunload` is silent, and does what was pressed; *Cancel* and Escape change
+   * nothing, and focus goes back to what was pressed. A browser with no `showModal` keeps
+   * `beforeunload` alone, and with no script nothing is guarded.
+   */
+  var leavingDialog = null;
+  var leavingFor = null;
+  var leavingNow = false;
+
+  function askBeforeLeaving(event, opener, resume) {
+    var dialog = document.getElementById("leave-dialog");
+    if (leavingNow || !dialog || typeof dialog.showModal !== "function" || dialog.open) {
+      return;
+    }
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    leavingDialog = dialog;
+    leavingFor = resume;
+    dialogOpener[dialog.id] = opener;
+    dialog.showModal();
+  }
+
+  function leavesThisPage(link, event) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return false;
+    }
+    if (link.hasAttribute("download") || link.hasAttribute("data-opens-dialog")) {
+      return false;
+    }
+    if (link.hasAttribute("hx-get") || link.hasAttribute("hx-post")) {
+      return false;
+    }
+    var target = link.getAttribute("target");
+    if (target && target !== "_self") {
+      return false;
+    }
+    var url = new URL(link.href, window.location.href);
+    if (url.origin !== window.location.origin) {
+      return false;
+    }
+    return !(url.hash && url.pathname === window.location.pathname && url.search === window.location.search);
+  }
+
+  document.addEventListener(
+    "click",
+    function (event) {
+      var link = event.target.closest ? event.target.closest("a[href]") : null;
+      if (!link || event.defaultPrevented || !anythingDirty() || !leavesThisPage(link, event)) {
+        return;
+      }
+      askBeforeLeaving(event, link, function () {
+        link.click();
+      });
+    },
+    true
+  );
+
+  document.addEventListener(
+    "submit",
+    function (event) {
+      var form = event.target;
+      if (!form || form.tagName !== "FORM" || event.defaultPrevented) {
+        return;
+      }
+      if (
+        form.hasAttribute("hx-post") ||
+        form.hasAttribute("hx-get") ||
+        form.hasAttribute("data-theme-switch") ||
+        form.hasAttribute("data-download")
+      ) {
+        return;
+      }
+      var others = formsOnThePage().some(function (other) {
+        return other !== form && isDirty(other);
+      });
+      if (!others) {
+        return;
+      }
+      var submitter = event.submitter;
+      askBeforeLeaving(event, submitter || form, function () {
+        if (typeof form.requestSubmit === "function") {
+          form.requestSubmit(submitter || undefined);
+        } else {
+          form.submit();
+        }
+      });
+    },
+    true
+  );
+
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("[data-leave-page]") : null;
+    if (!button || !leavingDialog) {
+      return;
+    }
+    var resume = leavingFor;
+    leavingFor = null;
+    Array.prototype.forEach.call(document.querySelectorAll("form[data-dirty]"), function (form) {
+      delete form.dataset.dirty;
+    });
+    leavingNow = true;
+    leavingDialog.close();
+    if (resume) {
+      resume();
+    }
+    leavingNow = false;
+  });
+
+  document.addEventListener(
+    "close",
+    function (event) {
+      if (event.target === leavingDialog) {
+        leavingFor = null;
+        leavingDialog = null;
+      }
+    },
+    true
+  );
+
+  window.addEventListener("pageshow", function () {
+    leavingNow = false;
+  });
+
   /* ------------------------------------------------ saving a field as it is changed (#656)
    *
    * A form marked `data-save-as-you-go` is on a page whose person asked for it: the server

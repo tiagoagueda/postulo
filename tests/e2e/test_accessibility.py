@@ -736,6 +736,30 @@ def axe_should_read(path: str) -> bool:
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_the_leave_question_has_no_violations_and_is_operable_by_keyboard(
+    live_server, page: Page, axe_source, furnished, scheme
+):
+    """The page with Postulo's "Leave without saving?" open, in both schemes (#657)."""
+    from postulo.documents.models import CoverLetter
+
+    letter = CoverLetter.objects.create(owner=furnished["applicant"], name="A", body="x")
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/documents/letters/{letter.pk}/edit/")
+    page.locator("textarea[name=body]").fill("Typed.")
+    page.locator("a[href='/applications/']:visible").first.focus()
+    page.keyboard.press("Enter")
+
+    question = page.get_by_role("alertdialog", name="Leave without saving?")
+    expect(page.locator("#leave-dialog > *")).to_be_visible()
+    expect(question.get_by_role("button", name="Cancel")).to_be_focused()
+    found = violations_on(page, axe_source)
+    assert not found, describe(f"the leave question ({scheme})", found)
+    page.keyboard.press("Escape")
+    expect(page.locator("#leave-dialog > *")).to_be_hidden()
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_company_form_in_two_columns_has_no_violations(
     live_server, page: Page, axe_source, furnished, scheme
 ):
