@@ -63,7 +63,10 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     # Listed here so a reader, an editor and a linter all see the whole surface in one
     # place. They cannot be imported at module load: several are Django models and this
     # module is reachable before the app registry is ready.
-    from postulo.applications.ical import calendar_status, event_lines
+    from postulo.applications.ical import calendar_status, event_lines, reminder_lines
+    from postulo.applications.ical_reader import Entry as CalendarEntry
+    from postulo.applications.ical_reader import Refused as CalendarRefused
+    from postulo.applications.ical_reader import read as read_calendar
     from postulo.applications.models import (
         Application,
         EventKind,
@@ -177,6 +180,8 @@ __all__ = [
     "MEDIUMS",
     "TEXT",
     "Application",
+    "CalendarEntry",
+    "CalendarRefused",
     "ConnectedPlugin",
     "ConnectionUnusable",
     "Consent",
@@ -246,10 +251,12 @@ __all__ = [
     "primary_phone_number",
     "primary_web_link",
     "public_only_client",
+    "read_calendar",
     "record_event",
     "record_listing_event",
     "refuse_unreadable",
     "register_document_format",
+    "reminder_lines",
     "reschedule_interview",
     "safe_next",
     "save_phone_number",
@@ -366,6 +373,17 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # event. `alarm=True` adds the interview's reminder as a VALARM.
     "calendar_status": ("postulo.applications.ical", "calendar_status"),
     "event_lines": ("postulo.applications.ical", "event_lines"),
+    # The other direction, and the task (#661). `read_calendar` turns the text of an .ics
+    # file into a list of `CalendarEntry`, plain values -- a `uid`, a start and an end or a
+    # `day`, a summary, a place, a description with an alarm's text kept apart, a status and
+    # why it was refused if it was -- and raises `CalendarRefused`, with the reason in words,
+    # before parsing anything that is too large, too deep or too long. A time with no zone
+    # Postulo could use is never read as UTC: it is `local`, with the `zone` the file named.
+    # `reminder_lines` is a reminder written as a VTODO, the way the reminders feed writes it.
+    "CalendarEntry": ("postulo.applications.ical_reader", "Entry"),
+    "CalendarRefused": ("postulo.applications.ical_reader", "Refused"),
+    "read_calendar": ("postulo.applications.ical_reader", "read"),
+    "reminder_lines": ("postulo.applications.ical", "reminder_lines"),
     # ------------------------------------------------------- what a page is read against
     # A source reading a page with no structured data has two questions only Postulo can
     # answer (#267): is this three-letter word a currency a job advert carries -- the list

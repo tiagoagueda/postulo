@@ -199,7 +199,7 @@ def read(data: bytes) -> Reading:
         except (ValueError, KeyError, IndexError, TypeError):
             raise Refused(_("That file could not be read as an iCalendar file.")) from None
         reading = Reading()
-        components = [*calendar.walk("VEVENT"), *calendar.walk("VTODO")]
+        components = [c for c in calendar.walk() if c.name in ("VEVENT", "VTODO")]
         if len(components) > MAX_ENTRIES:
             raise Refused(
                 _("That file holds more than %(limit)s events and tasks, too many to go through.")

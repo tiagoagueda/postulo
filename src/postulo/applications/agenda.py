@@ -166,6 +166,8 @@ class Event:
     #: Whether the link is to a form that should bring the person back to the page it was
     #: followed from: a reminder about no application opens its own form, having no page.
     returns: bool = False
+    #: The interview itself, for the file the calendar can be downloaded as (#661).
+    interview: Interview | None = field(default=None, compare=False, repr=False)
 
     @property
     def day(self) -> dt.date:
@@ -231,6 +233,7 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
                 detail=f"{interview.get_kind_display()} · {posting.title}",
                 muted=interview.outcome in {InterviewOutcome.CANCELLED, InterviewOutcome.NO_SHOW},
                 state=NO_SHOW if interview.outcome == InterviewOutcome.NO_SHOW else "",
+                interview=interview,
             )
         )
     reminders = (
@@ -738,9 +741,21 @@ def dated_days(user, absolute) -> list[ical.DayEntry]:
         today + dt.timedelta(days=FEED_DAYS),
         kinds=(DEADLINE, CLOSING, ANSWER),
     )
-    # The identifier comes from the instance's own public name where it has one, so the same
-    # deadline reached under two host names is one entry in a calendar and not two (#661).
+    return day_entries(events, absolute)
+
+
+def public_identity(path: str) -> str:
+    """An address under the instance's public name, or nothing where it has none.
+
+    What a whole day's identifier and a task's ``RELATED-TO`` are made from, so the same
+    deadline reached under two host names is one entry in a calendar and not two (#661).
+    """
     public = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
+    return f"{public}{path}" if public else ""
+
+
+def day_entries(events: list[Event], absolute) -> list[ical.DayEntry]:
+    """The whole days among ``events`` -- a deadline, a closing date, an answer due."""
     return [
         ical.DayEntry(
             summary=event.title,
@@ -748,7 +763,63 @@ def dated_days(user, absolute) -> list[ical.DayEntry]:
             url=absolute(event.url),
             description=event.detail,
             over=event.muted,
-            identity=f"{public}{event.url}" if public else "",
+            identity=public_identity(event.url),
         )
         for event in events
+        if event.all_day
     ]
+
+
+def download_for(events: list[Event], absolute) -> str:
+    """Every one of ``events`` as an iCalendar document: the page's own download (#661).
+
+    Read from the same list the page draws, which is the one place that decides what a
+    deadline is, so the file and the page cannot disagree. An interview is a meeting, a
+    deadline a whole day and a reminder a task; each is written the way its own file writes
+    it.
+    """
+    interviews = [event.interview for event in events if event.interview is not None]
+    reminders = [event.reminder for event in events if event.reminder is not None]
+    return ical.calendar(
+        interviews,
+        url_for=lambda i: absolute(i.application.get_absolute_url()),
+        days=day_entries(events, absolute),
+        reminders=reminders,
+        reminder_url_for=lambda r: (
+            absolute(r.application.get_absolute_url()) if r.application_id else ""
+        ),
+        reminder_identity_for=lambda r: (
+            public_identity(r.application.get_absolute_url()) if r.application_id else ""
+        ),
+    )
+
+
+def feed_reminders(reminders) -> list[Reminder]:
+    """The reminders a tasks file carries: every one still to do, and those done in the last
+    half year. A task done a year ago is a year of clutter in somebody's calendar (#661).
+
+    ``reminders`` is a queryset already scoped to its owner, which this narrows and reads.
+    """
+    since = timezone.now() - dt.timedelta(days=FEED_DAYS)
+    return [
+        reminder
+        for reminder in reminders.select_related("application", "application__posting").order_by(
+            "due_at", "pk"
+        )
+        if reminder.done_at is None or reminder.done_at >= since
+    ]
+
+
+def reminders_file(reminders, absolute) -> str:
+    """Reminders as one tasks file, each tied to its application by address (#661).
+
+    Shared by the page's address and the API's, which is the one a calendar application can
+    subscribe to.
+    """
+    return ical.reminders_calendar(
+        reminders,
+        url_for=lambda r: absolute(r.application.get_absolute_url()) if r.application_id else "",
+        identity_for=lambda r: (
+            public_identity(r.application.get_absolute_url()) if r.application_id else ""
+        ),
+    )

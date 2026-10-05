@@ -1,11 +1,13 @@
 """Reminders: the nudges a person set for themselves."""
 
+from django.http import HttpResponse
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
 from pydantic import AwareDatetime
 
+from postulo.applications import agenda
 from postulo.applications.models import Application, Reminder
 from postulo.applications.services import postpone_reminder
 
@@ -33,6 +35,15 @@ def list_reminders(
     elif outstanding:
         reminders = reminders.outstanding()
     return changed_since(reminders, updated_since, after_id)
+
+
+@router.get("/calendar.ics", summary="Every reminder still to do, as iCalendar tasks")
+def calendar_feed(request):
+    """The reminders as ``VTODO``, in an address of their own: the interviews feed is what
+    existing subscribers read, and what it means is not changed under them (#661)."""
+    reminders = agenda.feed_reminders(owned(request, Reminder.objects))
+    text = agenda.reminders_file(reminders, request.build_absolute_uri)
+    return HttpResponse(text, content_type="text/calendar; charset=utf-8")
 
 
 @router.post("", response={201: ReminderOut}, auth=scope("write"), summary="Add a reminder")

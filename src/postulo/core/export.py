@@ -117,7 +117,9 @@ logger = logging.getLogger(__name__)
 #: the primary; an archive without them restores none (#682).
 #: 42 added ``with_properties`` on a sent document: whether the file went with its author,
 #: subject and keywords or without them (#480).
-FORMAT_VERSION = 42
+#: 43 added ``uid`` on a reminder, its calendar identifier, so a task written to a calendar is
+#: found again after a restore; an archive without it restores each with a fresh one (#661).
+FORMAT_VERSION = 43
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -347,7 +349,7 @@ LISTING_EVENT_FIELDS = (
     "actor",
     "created_at",
 )
-REMINDER_FIELDS = ("id", "summary", "due_at", "done_at")
+REMINDER_FIELDS = ("id", "uid", "summary", "due_at", "done_at")
 INTERVIEW_FIELDS = (
     "id",
     "uid",

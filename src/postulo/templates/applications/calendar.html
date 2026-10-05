@@ -155,6 +155,18 @@
         {% icon "plus" %}{% translate "New reminder" %}
       </a>
     </div>
+    {% comment %} The file is what this page is showing: the same period and the same kinds,
+       carried in the address, and the same list (#661). The import is a page of its own,
+       which shows what a file holds before it adds anything. {% endcomment %}
+    <div class="flex w-full flex-wrap items-center gap-2">
+      <a href="{% url 'applications:calendar_download' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
+         class="btn" data-variant="outline" data-size="sm" download data-calendar-download>
+        {% translate "Download as iCalendar" %}
+      </a>
+      <a href="{% url 'applications:ical_import' %}" class="btn" data-variant="outline" data-size="sm">
+        {% translate "Import an iCalendar file" %}
+      </a>
+    </div>
   </div>
 
   <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Period' %}">

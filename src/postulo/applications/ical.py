@@ -43,7 +43,7 @@ from django.utils.translation import gettext as _
 
 from postulo import __version__
 
-from .models import Interview, InterviewOutcome
+from .models import Interview, InterviewOutcome, Reminder
 
 PRODID = f"-//Postulo//Postulo {__version__}//EN"
 
@@ -208,6 +208,11 @@ def event_lines(interview: Interview, *, url: str = "", alarm: bool = False) -> 
     return lines_of(event_component(interview, url=url, alarm=alarm))
 
 
+def address_uid(address: str) -> str:
+    """An identifier made from an address: the same address is always the same identifier."""
+    return f"{uuid.uuid5(uuid.NAMESPACE_URL, address)}@postulo"
+
+
 @dataclass(frozen=True)
 class DayEntry:
     """One whole day in the feed: a deadline, or the day a listing closes (#238)."""
@@ -227,9 +232,7 @@ class DayEntry:
     @property
     def uid(self) -> str:
         """Stable for the life of the thing, and unique to this instance. See the module."""
-        return (
-            f"{uuid.uuid5(uuid.NAMESPACE_URL, self.identity or self.url or self.summary)}@postulo"
-        )
+        return address_uid(self.identity or self.url or self.summary)
 
 
 def day_component(entry: DayEntry) -> icalendar.Event:
@@ -261,6 +264,57 @@ def day_lines(entry: DayEntry) -> list[str]:
     return lines_of(day_component(entry))
 
 
+def reminder_component(reminder: Reminder, *, url: str = "", identity: str = "") -> icalendar.Todo:
+    """The VTODO for one reminder: what to do, by when, and whether it is done (#661).
+
+    ``url`` is the absolute address of the application the reminder is about, which is also
+    what ``RELATED-TO`` is made from -- an application has no identifier of its own, and its
+    address is the one thing about it that is stable and unique to this instance, as it is for
+    a whole day. ``identity`` stands in for it where the instance has a public name.
+    """
+    url = without_controls(url)
+    todo = icalendar.Todo()
+    todo.add("uid", without_controls(reminder.uid))
+    todo.add("dtstamp", _moment(timezone.now()))
+    todo.add("summary", clean(reminder.summary))
+    todo.add("due", _moment(reminder.due_at))
+    if reminder.is_done:
+        todo.add("status", "COMPLETED")
+        todo.add("completed", _moment(reminder.done_at))
+    else:
+        todo.add("status", "NEEDS-ACTION")
+    todo.add("created", _moment(reminder.created_at))
+    todo.add("last-modified", _moment(reminder.updated_at))
+    if reminder.application_id and url:
+        todo.add("related-to", address_uid(identity or url))
+        todo.add("url", url)
+    return todo
+
+
+def reminder_lines(reminder: Reminder, *, url: str = "", identity: str = "") -> list[str]:
+    return lines_of(reminder_component(reminder, url=url, identity=identity))
+
+
+def reminders_calendar(reminders: Iterable[Reminder], *, url_for=None, identity_for=None) -> str:
+    """A complete iCalendar document of reminders as tasks, and nothing else.
+
+    Its own address and its own file: the interviews feed is what existing subscribers read,
+    and what it means is not changed under them (#661). ``url_for`` and ``identity_for`` turn
+    a reminder into the absolute address of its application, and that address under the
+    instance's public name, where it has one.
+    """
+    wrapper = _wrapper()
+    for reminder in reminders:
+        wrapper.add_component(
+            reminder_component(
+                reminder,
+                url=url_for(reminder) if url_for else "",
+                identity=identity_for(reminder) if identity_for else "",
+            )
+        )
+    return wrapper.to_ical().decode("utf-8")
+
+
 def _wrapper(method: str | None = "PUBLISH") -> icalendar.Calendar:
     wrapper = icalendar.Calendar()
     wrapper.add("version", "2.0")
@@ -272,18 +326,33 @@ def _wrapper(method: str | None = "PUBLISH") -> icalendar.Calendar:
 
 
 def calendar(
-    interviews: Iterable[Interview], *, url_for=None, days: Iterable[DayEntry] = ()
+    interviews: Iterable[Interview],
+    *,
+    url_for=None,
+    days: Iterable[DayEntry] = (),
+    reminders: Iterable[Reminder] = (),
+    reminder_url_for=None,
+    reminder_identity_for=None,
 ) -> str:
-    """A complete iCalendar document holding these interviews and whole days.
+    """A complete iCalendar document holding these interviews, whole days and reminders.
 
     ``url_for`` turns an interview into the absolute address of its application page, when
     the caller has a request to build one from. ``days`` is already built, because a deadline
     and a closing date come from two different models and only the caller knows the request
-    the addresses are absolute against.
+    the addresses are absolute against. ``reminders`` are written as tasks, for the one
+    download that carries every kind of dated thing; the feed leaves them out (#661).
     """
     wrapper = _wrapper()
     for interview in interviews:
         wrapper.add_component(event_component(interview, url=url_for(interview) if url_for else ""))
     for entry in days:
         wrapper.add_component(day_component(entry))
+    for reminder in reminders:
+        wrapper.add_component(
+            reminder_component(
+                reminder,
+                url=reminder_url_for(reminder) if reminder_url_for else "",
+                identity=reminder_identity_for(reminder) if reminder_identity_for else "",
+            )
+        )
     return wrapper.to_ical().decode("utf-8")

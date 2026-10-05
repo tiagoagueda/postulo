@@ -159,6 +159,133 @@ def test_the_api_feed_is_scoped_the_same_way(client, user, other_user):
     assert client.get("/api/v1/interviews/calendar.ics").status_code == 401, "no token, no feed"
 
 
+# ------------------------------------------------- reminders, the download, the import (#661)
+
+
+def a_reminder(owner, summary: str):
+    from postulo.applications.models import Reminder
+
+    return Reminder.objects.create(owner=owner, summary=summary, due_at=timezone.now())
+
+
+def test_the_reminders_address_holds_only_ones_own(client, user, other_user):
+    a_reminder(user, "Own nudge")
+    a_reminder(other_user, "Secret nudge")
+    client.force_login(user)
+
+    text = client.get(reverse("applications:reminder_calendar")).content.decode()
+
+    assert "BEGIN:VTODO" in text and "Own nudge" in text and "Secret nudge" not in text
+
+
+def test_the_reminders_address_and_the_download_need_a_sign_in(client, db):
+    for name in ("applications:reminder_calendar", "applications:calendar_download"):
+        response = client.get(reverse(name))
+        assert response.status_code == 302 and reverse("account_login") in response["Location"], (
+            name
+        )
+    response = client.get(reverse("applications:ical_import"))
+    assert response.status_code == 302 and reverse("account_login") in response["Location"]
+
+
+def test_the_api_reminders_feed_is_scoped_and_needs_a_token(client, user, other_user):
+    a_reminder(user, "Own nudge")
+    a_reminder(other_user, "Secret nudge")
+
+    text = client.get("/api/v1/reminders/calendar.ics", **bearer(user, "read")).content.decode()
+
+    assert "Own nudge" in text and "Secret nudge" not in text
+    assert client.get("/api/v1/reminders/calendar.ics").status_code == 401, "no token, no feed"
+
+
+def test_the_calendar_download_holds_only_ones_own(client, user, other_user):
+    an_interview(user, "Own visible role")
+    an_interview(other_user, "Secret other role")
+    a_reminder(user, "Own nudge")
+    a_reminder(other_user, "Secret nudge")
+    client.force_login(user)
+
+    for query in ({"view": "agenda"}, {"month": timezone.localdate().strftime("%Y-%m")}):
+        text = client.get(reverse("applications:calendar_download"), query).content.decode()
+        assert "Secret" not in text, query
+    agenda = client.get(reverse("applications:calendar_download"), {"view": "agenda"})
+    assert "Own nudge" in agenda.content.decode()
+    assert agenda["Cache-Control"] == "private, max-age=0, no-store"
+
+
+def test_a_reminder_cannot_add_a_property_to_the_tasks_file(client, user):
+    from postulo.applications.models import Reminder
+
+    reminder = a_reminder(user, "Chase\r\nATTACH:https://evil.example/x\rX-INJECTED:1")
+    Reminder.objects.filter(pk=reminder.pk).update(uid="abc\r\nATTENDEE:mailto:evil@example.org")
+    client.force_login(user)
+
+    text = client.get(reverse("applications:reminder_calendar")).content.decode()
+
+    lines = text.split("\r\n")
+    assert not any(line.startswith(("ATTACH", "X-INJECTED", "ATTENDEE")) for line in lines)
+    assert [line for line in lines if line.startswith("BEGIN:")] == [
+        "BEGIN:VCALENDAR",
+        "BEGIN:VTODO",
+    ]
+
+
+def test_an_import_cannot_make_an_interview_on_somebody_elses_application(client, user, other_user):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    from postulo.applications.models import Interview
+
+    theirs = an_interview(other_user, "Secret other role").application
+    client.force_login(user)
+    file = (
+        b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:x@y\r\nDTSTART:20991001T100000Z\r\n"
+        b"END:VEVENT\r\nEND:VCALENDAR\r\n"
+    )
+    client.post(reverse("applications:ical_import"), {"file": SimpleUploadedFile("a.ics", file)})
+
+    response = client.post(
+        reverse("applications:ical_import"),
+        {"action": "confirm", "r0-action": "interview", "r0-application": theirs.pk},
+    )
+
+    assert response.status_code == 200, "refused as a choice that is not one"
+    assert "Secret other role" not in response.content.decode(), "and its name is not drawn"
+    assert not Interview.objects.filter(owner=user, uid="x@y").exists()
+    assert Interview.objects.filter(application=theirs).count() == 1, "theirs is untouched"
+
+
+def test_what_one_account_has_read_is_not_offered_to_another(client, user, other_user):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    file = (
+        b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:x@y\r\nDTSTART:20991001T100000Z\r\n"
+        b"SUMMARY:Private plans\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+    )
+    client.force_login(user)
+    client.post(reverse("applications:ical_import"), {"file": SimpleUploadedFile("a.ics", file)})
+    client.logout()
+    client.force_login(other_user)
+
+    assert "Private plans" not in client.get(reverse("applications:ical_import")).content.decode()
+
+
+def test_an_imported_text_is_escaped_where_it_is_drawn(client, user):
+    from django.core.files.uploadedfile import SimpleUploadedFile
+
+    file = (
+        b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:x@y\r\nDTSTART:20991001T100000Z\r\n"
+        b"SUMMARY:<script>alert(1)</script>\r\nLOCATION:<img src=x onerror=alert(1)>\r\n"
+        b"END:VEVENT\r\nEND:VCALENDAR\r\n"
+    )
+    client.force_login(user)
+    client.post(reverse("applications:ical_import"), {"file": SimpleUploadedFile("a.ics", file)})
+
+    page = client.get(reverse("applications:ical_import")).content.decode()
+
+    assert "<script>alert(1)" not in page and "<img src=x" not in page
+    assert "&lt;script&gt;" in page
+
+
 # ---------------------------------------------------------------- the pictures
 
 

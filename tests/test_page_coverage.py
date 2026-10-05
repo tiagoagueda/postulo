@@ -63,6 +63,11 @@ EXCUSED: dict[str, str] = {
     "applications:report_pdf": "the report arriving as a rendered PDF",
     "applications:interview_ics": "a calendar file for one interview",
     "applications:interview_calendar": "a calendar feed of every interview",
+    "applications:calendar_download": (
+        "the calendar page's own period and kinds as an .ics file arriving as a download; the "
+        "link is on the calendar page, which the suite visits (#661)"
+    ),
+    "applications:reminder_calendar": "a feed of every reminder as iCalendar tasks (#661)",
     "accounts:avatar": "an image, served through a permission check",
     "jobs:company_logo": "a company's logo image, served from this instance",
     "connections:logo": (

@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Import an iCalendar file" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-4xl">
+    <c-page-title>
+      {% translate "Import an iCalendar file" %}
+      <c-slot name="subtitle">
+      {% blocktranslate trimmed %}
+        Events and tasks from a calendar, as interviews and reminders. You are shown each one
+        and choose what it becomes before anything is added.
+      {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% if not review %}
+      <form method="post" enctype="multipart/form-data" class="card mb-6" data-ical-upload>
+        {% csrf_token %}
+        <c-section-title>{% translate "The file" %}</c-section-title>
+        <div class="field mb-4">
+          <label for="id_file">{% translate "An .ics file" %}</label>
+          <input type="file" id="id_file" name="file" accept=".ics,text/calendar" required
+                 aria-describedby="id_file_helptext">
+          <p id="id_file_helptext">
+            {% blocktranslate trimmed %}
+              A calendar exported from another application, or one Postulo wrote. Repeating
+              events, attachments, links, alarms and the people invited are not read.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <button type="submit" class="btn">{% translate "Read the file" %}</button>
+      </form>
+
+      <div class="alert mb-6 text-sm" data-variant="info" role="note">
+        <div>
+          <p>
+            {% blocktranslate trimmed %}
+              Importing only ever adds. An event you already have is recognised by its
+              identifier and not added a second time, so the same file twice is the same as
+              once. Times are never guessed: where a file does not say which time zone a
+              time is in, you are asked.
+            {% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="{% url 'applications:calendar' %}" class="btn" data-variant="outline">{% translate "Calendar" %}</a>
+      </div>
+    {% else %}
+      <section class="card mb-6" aria-labelledby="in-the-file" data-ical-review>
+        <c-section-title id="in-the-file">{% translate "What is in the file" %}</c-section-title>
+        <p class="text-sm wrap-anywhere"><bdi>{{ review.filename }}</bdi></p>
+        {% if review.notes %}
+          <ul class="mt-3 space-y-1 text-sm text-amber-700 dark:text-amber-400" data-notes>
+            {% for note in review.notes %}<li class="wrap-anywhere">{{ note }}</li>{% endfor %}
+          </ul>
+        {% endif %}
+        <p class="mt-3 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed %}
+            Nothing has been added yet. Choose what each one becomes, or leave it out, and
+            then add them.
+          {% endblocktranslate %}
+        </p>
+      </section>
+
+      <form method="post">
+        {% csrf_token %}
+        <ul class="mb-6 space-y-4" data-ical-rows>
+          {% for row in review.rows %}
+            <li class="card" data-outcome="{{ row.outcome }}">
+              <div class="mb-3">
+                <p class="font-medium wrap-anywhere"><bdi>{{ row.entry.summary|default:_("(untitled)") }}</bdi></p>
+                <p class="text-sm text-ink-500 tabular-nums dark:text-ink-400">
+                  {% if row.entry.start %}
+                    {{ row.entry.start|date:"DATETIME_FORMAT" }}{% if row.entry.end %} – {{ row.entry.end|date:"TIME_FORMAT" }}{% endif %}
+                  {% elif row.entry.local %}
+                    {{ row.entry.local|date:"DATETIME_FORMAT" }}
+                  {% elif row.entry.day %}
+                    {{ row.entry.day|date:"DATE_FORMAT" }}
+                  {% endif %}
+                  {% if row.entry.kind == "todo" %}· {% translate "Task" %}{% endif %}
+                </p>
+                {% if row.entry.location %}
+                  <p class="text-sm wrap-anywhere"><bdi>{{ row.entry.location }}</bdi></p>
+                {% endif %}
+              </div>
+              {% if row.outcome == "present" %}
+                <p class="text-sm">{% translate "Already there: you have this one, so it is not added again." %}</p>
+              {% elif row.outcome == "cannot" %}
+                <p class="text-sm text-ink-600 dark:text-ink-300">{% translate "Cannot be added." %} {{ row.note }}</p>
+              {% else %}
+                {% if row.note %}<p class="mb-2 text-sm text-ink-500 dark:text-ink-400">{{ row.note }}</p>{% endif %}
+                {% if row.why_zone %}<p class="mb-2 text-sm text-amber-700 dark:text-amber-400" data-needs-zone>{{ row.why_zone }}</p>{% endif %}
+                <div class="grid gap-3 sm:grid-cols-2">
+                  <c-field :field="row.form.action" />
+                  <c-field :field="row.form.application" />
+                  {% if row.form.zone %}<c-field :field="row.form.zone" />{% endif %}
+                  {% if row.form.kind %}<c-field :field="row.form.kind" />{% endif %}
+                </div>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="flex flex-wrap items-center gap-3">
+          {% if review.adds %}
+            <button type="submit" name="action" value="confirm" class="btn">
+              {% translate "Add what I chose" %}
+            </button>
+          {% endif %}
+          <button type="submit" name="action" value="forget" class="btn" data-variant="ghost">
+            {% translate "Start again" %}
+          </button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

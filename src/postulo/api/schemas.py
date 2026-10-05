@@ -572,6 +572,7 @@ class EventOut(Schema):
 
 class ReminderOut(Schema):
     id: int
+    uid: str = Field(description="Stable across edits; what a calendar keys the task by")
     application_id: int | None = None
     summary: str
     due_at: dt.datetime
@@ -1358,6 +1359,7 @@ def interview_out(request, interview) -> dict:
 def reminder_out(reminder) -> dict:
     return {
         "id": reminder.pk,
+        "uid": reminder.uid,
         "application_id": reminder.application_id,
         "summary": reminder.summary,
         "due_at": reminder.due_at,

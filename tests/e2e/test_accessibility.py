@@ -496,6 +496,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/calendar/",
         "/applications/calendar/?view=week",
         "/applications/calendar/?view=day",
+        "/applications/calendar/import/",
         "/applications/calendar/?view=agenda",
         # What the reminders page was: the agenda narrowed to them (#316).
         "/applications/calendar/?view=agenda&kinds=reminder",

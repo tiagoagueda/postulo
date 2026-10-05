@@ -404,15 +404,21 @@ def schedule_interview(
     contacts=(),
     remind: bool = True,
     actor: str = "",
+    uid: str = "",
 ) -> Interview:
     """Put an interview in the diary, on the timeline, and — the day before — in the reminders.
 
     One that is already over when it is entered, because the person forgot to schedule
     it, is recorded as held straight away: the timeline then reads as it would have had
     they remembered, and there is nothing to remind them of.
+
+    ``uid`` is the calendar identifier it is kept under, for a meeting that came out of a
+    calendar file and so keeps the name that file gave it (#661); the column mints one when
+    there is none.
     """
     ends_at = ends_at or starts_at + DEFAULT_INTERVIEW_LENGTH
     interview = Interview.objects.create(
+        **({"uid": uid} if uid else {}),
         owner=application.owner,
         application=application,
         kind=kind,

@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import views
+from . import views, views_ical
 
 app_name = "applications"
 
@@ -35,6 +35,15 @@ urlpatterns = [
     ),
     path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
     path("calendar/", views.CalendarView.as_view(), name="calendar"),
+    path(
+        "calendar/download.ics", views_ical.CalendarDownloadView.as_view(), name="calendar_download"
+    ),
+    path("calendar/import/", views_ical.CalendarImportView.as_view(), name="ical_import"),
+    path(
+        "reminders/calendar.ics",
+        views_ical.ReminderCalendarView.as_view(),
+        name="reminder_calendar",
+    ),
     path(
         "interviews/calendar.ics",
         views.InterviewCalendarView.as_view(),

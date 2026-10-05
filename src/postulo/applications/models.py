@@ -629,6 +629,11 @@ class ApplicationEvent(models.Model):
         return self.summary or self.get_kind_display()
 
 
+def _mint_uid() -> str:
+    """A calendar identifier: minted once, never changed, so a sync recognises the meeting."""
+    return f"{uuid.uuid4()}@postulo"
+
+
 class ReminderQuerySet(models.QuerySet):
     def for_user(self, user) -> ReminderQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):
@@ -659,6 +664,9 @@ class Reminder(OwnedModel):
     done_at = models.DateTimeField(_("done on"), null=True, blank=True)
     #: When its falling due was announced through the person's notifiers, if it was.
     notified_at = models.DateTimeField(_("notified on"), null=True, blank=True)
+    #: Stable across edits and across an export, so a task a calendar was given once is
+    #: found again and not made a second time (#661).
+    uid = models.CharField(_("calendar identifier"), max_length=64, default=_mint_uid)
 
     objects = ReminderQuerySet.as_manager()
 
@@ -670,6 +678,10 @@ class Reminder(OwnedModel):
             # *Has this application anything planned* -- outstanding, soonest first. Asked
             # per application by `with_activity` and by the quiet predicate (#231).
             models.Index(fields=("application", "done_at", "due_at"), name="reminder_next_per_app"),
+        ]
+        constraints = [
+            # Per calendar, which is per person, as an interview's is.
+            models.UniqueConstraint(fields=("owner", "uid"), name="reminder_uid_per_owner"),
         ]
 
     def __str__(self) -> str:
@@ -735,11 +747,6 @@ class InterviewQuerySet(models.QuerySet):
         return self.select_related(
             "application", "application__posting", "application__posting__company"
         ).prefetch_related("contacts")
-
-
-def _mint_uid() -> str:
-    """A calendar identifier: minted once, never changed, so a sync recognises the meeting."""
-    return f"{uuid.uuid4()}@postulo"
 
 
 class Interview(OwnedModel):

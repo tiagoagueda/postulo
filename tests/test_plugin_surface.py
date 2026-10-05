@@ -411,6 +411,24 @@ def test_the_surface_holds_what_a_sync_needs():
         assert getattr(api, name) is not None, name
 
 
+def test_the_surface_holds_the_calendar_reader_and_the_task_writer():
+    """The reader's plain values and the VTODO mapping, so a calendar plugin drops its own
+    parser and its own copy of the escaping (#661). The library itself is not on it: a plugin
+    that wants `icalendar` declares its own dependency."""
+    from postulo.plugins import api
+
+    entries = api.read_calendar(
+        b"BEGIN:VCALENDAR\r\nVERSION:2.0\r\nBEGIN:VEVENT\r\nUID:a@b\r\n"
+        b"DTSTART:20260310T100000Z\r\nSUMMARY:x\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n"
+    ).entries
+    assert [type(entry) for entry in entries] == [api.CalendarEntry]
+    assert entries[0].uid == "a@b" and entries[0].start is not None
+    with pytest.raises(api.CalendarRefused):
+        api.read_calendar(b"not a calendar")
+    assert callable(api.reminder_lines)
+    assert not hasattr(api, "icalendar"), "the library is nobody's by way of Postulo"
+
+
 def test_the_surface_holds_the_one_call_into_a_listings_history():
     """A listing has a history since #270, and a plugin that binds has one way into it.
 

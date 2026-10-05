@@ -416,6 +416,23 @@ def account_is_empty(user) -> bool:
 #: A calendar identifier worth keeping: anything else could carry a line break into a feed.
 SAFE_UID = re.compile(r"[A-Za-z0-9@._-]{1,64}")
 
+
+def _restored_uid(model, user, raw) -> dict:
+    """``{"uid": …}`` for a record whose calendar identifier can travel, or nothing.
+
+    Kept where it is plainly safe and not already held by this owner; a forced duplicate on
+    the same instance, a file from a later Postulo and an identifier somebody typed by hand
+    each get a fresh one, which is what the column's default mints.
+    """
+    if (
+        isinstance(raw, str)
+        and SAFE_UID.fullmatch(raw)
+        and not model.objects.filter(owner=user, uid=raw).exists()
+    ):
+        return {"uid": raw}
+    return {}
+
+
 ADDRESS_PARTS = ("street", "postcode", "municipality", "region", "country")
 
 
@@ -1018,6 +1035,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             summary=reminder_entry.get("summary", ""),
             due_at=due_at,
             done_at=_dt(reminder_entry.get("done_at")),
+            **_restored_uid(Reminder, user, reminder_entry.get("uid")),
         )
         report.reminders += 1
 
@@ -1240,6 +1258,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                         summary=reminder_entry.get("summary", ""),
                         due_at=_dt(reminder_entry.get("due_at")),
                         done_at=_dt(reminder_entry.get("done_at")),
+                        **_restored_uid(Reminder, user, reminder_entry.get("uid")),
                     )
                     report.reminders += 1
 
