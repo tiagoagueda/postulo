@@ -365,8 +365,12 @@ def test_the_page_uploads_maps_previews_and_imports(client, user):
     )
 
     response = client.post(reverse("core:import_csv"), {**fields, "action": "import"})
-    assert response.status_code == 200
-    done = response.content.decode()
+    assert response.status_code == 302 and response.url.startswith("/working/")
+    watched = client.get(response.url).content.decode()
+    assert "Imported 3 rows from history.csv" in watched
+    done = client.get(reverse("core:import_csv_done", args=[response.url.split("/")[2]]))
+    assert done.status_code == 200
+    done = done.content.decode()
     assert "data-report" in done and "Imported" in done
     assert Application.objects.for_user(user).count() == 2
     assert (
@@ -524,3 +528,102 @@ def test_tags_that_shared_a_slug_import_and_a_long_one_is_one_tag(user):
     assert report.applications == 4
     names = sorted(Tag.objects.filter(owner=user).values_list("name", flat=True))
     assert names == sorted(["C++", "C#", "удалённо", "мечта", "x" * 60])
+
+
+# ------------------------------------------------------------------ at the cap (#555)
+
+
+def _sheet_of(rows: int, *, companies: int = 50) -> csv_import.Sheet:
+    lines = ["Company,Role,URL,Date applied,Status"]
+    for number in range(rows):
+        lines.append(
+            f"Company {number % companies},Role {number},https://jobs.example/{number},"
+            f"2026-0{1 + number % 9}-{1 + number % 28:02d},Applied"
+        )
+    return csv_import.read_sheet("\n".join(lines).encode(), "big.csv")
+
+
+def test_a_sheet_at_the_cap_is_imported_in_queries_that_do_not_grow_with_the_rows(
+    user, django_assert_max_num_queries
+):
+    from collections import deque
+
+    from django.db import connection
+
+    sheet = _sheet_of(csv_import.MAX_ROWS)
+    mapping = csv_import.guess_mapping(sheet.headers)
+    # Django keeps the last 9,000 queries and warns when it drops one; the whole run is wanted.
+    connection.queries_log = deque(maxlen=csv_import.MAX_ROWS * 40)
+    # A fixed handful for what is read once, three per distinct company, two per chunk, and
+    # what writing a row costs (its inserts and savepoints). The lookups that used to come
+    # with each row, ten or so apiece, are not in it.
+    bound = (
+        100
+        + 50 * 3
+        + (csv_import.MAX_ROWS // csv_import.CHUNK_ROWS) * 2
+        + csv_import.MAX_ROWS * PER_ROW_WRITES
+    )
+    with django_assert_max_num_queries(bound):
+        report = csv_import.perform(user, sheet, mapping)
+    assert report.applications == csv_import.MAX_ROWS and not report.skipped
+    assert Company.objects.for_user(user).count() == 50
+
+
+#: What writing one application with its timeline costs, measured at 16 with savepoints.
+PER_ROW_WRITES = 18
+
+
+def test_a_second_run_of_the_same_sheet_creates_nothing_and_asks_once(
+    user, django_assert_max_num_queries
+):
+    sheet = _sheet_of(600)
+    mapping = csv_import.guess_mapping(sheet.headers)
+    csv_import.perform(user, sheet, mapping)
+    with django_assert_max_num_queries(60):
+        report = csv_import.perform(user, sheet, mapping)
+    assert report.applications == 0 and len(report.skipped) == 600
+
+
+def test_imported_history_is_not_announced(user, monkeypatch):
+    from postulo.notifications import slow
+
+    asked = []
+    monkeypatch.setattr(slow, "anybody_wants", lambda *args: asked.append(args) or True)
+    sheet = _sheet_of(5)
+    csv_import.perform(user, sheet, csv_import.guess_mapping(sheet.headers))
+    assert asked == []
+
+
+def test_a_chunk_is_committed_on_its_own(user, monkeypatch):
+    monkeypatch.setattr(csv_import, "CHUNK_ROWS", 2)
+    sheet = _sheet_of(5)
+    mapping = csv_import.guess_mapping(sheet.headers)
+    calls = {"n": 0}
+    original = csv_import.transaction.atomic
+
+    def counting(*args, **kwargs):
+        calls["n"] += 1
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(csv_import.transaction, "atomic", counting)
+    csv_import.perform(user, sheet, mapping)
+    assert calls["n"] >= 3
+
+
+def test_somebody_elses_import_report_is_not_found(client, user, other_user):
+    from postulo.core import errands
+
+    errand = errands.send(
+        "csv_import",
+        user,
+        filename="h.csv",
+        data=__import__("base64").b64encode(ENGLISH.encode()).decode(),
+        mapping=csv_import.guess_mapping(csv_import.read_sheet(ENGLISH.encode(), "h").headers),
+        day_first=True,
+        currency="EUR",
+    )
+    assert errand.state == "done" and errand.payload == {}
+    client.force_login(other_user)
+    assert client.get(reverse("core:import_csv_done", args=[errand.pk])).status_code == 404
+    client.force_login(user)
+    assert client.get(reverse("core:import_csv_done", args=[errand.pk])).status_code == 200

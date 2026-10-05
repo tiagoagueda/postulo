@@ -55,6 +55,8 @@ SLOW = [
     ("documents:send", (1,)),
     ("applications:report_pdf", ()),
     ("core:export_download", ()),
+    # The sheet is imported by an errand, in chunks of a transaction each (#555).
+    ("core:import_csv", ()),
     # Each waits on a remote host and writes in short transactions of its own (#357).
     ("resume:link_check", (1,)),
     ("resume:link_check_all", ()),

@@ -67,6 +67,48 @@ def build_an_export(errand) -> dict:
     }
 
 
+@handler("csv_import", working=_("Importing your spreadsheet"))
+def import_a_spreadsheet(errand) -> dict:
+    """Read the held sheet and bring it in, chunk by chunk, then say how it went (#555).
+
+    The sheet travels in the errand's payload because a worker has no session; it is dropped
+    from the row as soon as it has been read, so a finished errand holds only the report.
+    """
+    import base64
+
+    from django.urls import reverse
+    from django.utils.translation import ngettext
+
+    from . import csv_import
+    from .models import Errand
+
+    asked = errand.payload
+    sheet = csv_import.read_sheet(base64.b64decode(asked["data"]), asked["filename"])
+    Errand.objects.filter(pk=errand.pk).update(payload={})
+    report = csv_import.perform(
+        errand.owner,
+        sheet,
+        asked["mapping"],
+        day_first=asked["day_first"],
+        currency=asked["currency"],
+    )
+    return {
+        "message": ngettext(
+            "Imported %(count)s row from %(file)s.",
+            "Imported %(count)s rows from %(file)s.",
+            report.applications + report.listings,
+        )
+        % {"count": report.applications + report.listings, "file": report.filename},
+        "url": reverse("core:import_csv_done", args=[errand.pk]),
+        "filename": report.filename,
+        "rows": report.rows,
+        "applications": report.applications,
+        "listings": report.listings,
+        "companies_created": report.companies_created,
+        "skipped": report.skipped,
+    }
+
+
 def reap_archives() -> int:
     """Delete the archives that have run out. Called by the scheduler.
 

@@ -22,6 +22,8 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Callable
+from contextlib import contextmanager
+from contextvars import ContextVar
 
 from django.db import transaction
 from django.urls import reverse
@@ -144,8 +146,27 @@ def anybody_wants(owner, event: str) -> bool:
     return False
 
 
+_quiet: ContextVar[bool] = ContextVar("postulo_notifications_quiet", default=False)
+
+
+@contextmanager
+def quiet():
+    """Announce nothing inside the block: history being brought in is not news (#555).
+
+    A spreadsheet of two years of applications would otherwise ask, once per status change,
+    whether anybody wants to hear of it.
+    """
+    token = _quiet.set(True)
+    try:
+        yield
+    finally:
+        _quiet.reset(token)
+
+
 def tell(event: str, owner, *, subject=None, **payload) -> None:
     """Queue the announcement of ``event``, if anybody would hear it."""
+    if _quiet.get():
+        return
     from django.utils import timezone
 
     from postulo.core import errands

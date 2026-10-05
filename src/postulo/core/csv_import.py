@@ -4,7 +4,8 @@ Most people track a job search in a spreadsheet until it hurts, and the day they
 here they should not have to retype their history. This reads a CSV — any delimiter, any
 of the encodings Excel produces — guesses which column is which from the header names in
 English, French and Portuguese, lets the person correct the guess and see how the first
-rows will be read, and then imports in one transaction: a status the sheet states decides
+rows will be read, and then imports a transaction per chunk of rows: a status the sheet states
+decides
 what a row becomes (draft is a listing, anything else an application) and without one
 the applied date does, companies are matched by name as the forms match them, and every
 imported application carries a timeline entry saying which file it came from, so
@@ -33,6 +34,8 @@ from django.utils.formats import date_format
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
+from postulo.notifications import slow
+
 from . import languages, slugs, spreadsheets
 
 # One list of currencies, below the models, which the plugin surface hands out too (#248).
@@ -42,6 +45,8 @@ from .currencies import CURRENCY_CODES
 #: Files above this are refused: a spreadsheet of one job search is kilobytes.
 MAX_BYTES = 2 * 1024 * 1024
 MAX_ROWS = 5000
+#: Rows imported in one transaction; the write lock is released between two chunks (#555).
+CHUNK_ROWS = 200
 PREVIEW_ROWS = 10
 
 #: What a column can be mapped to. ``ignore`` drops it; ``notes`` collects free text.
@@ -1018,16 +1023,46 @@ def _short_file_name(name: str, limit: int = 80) -> str:
     return stem[: limit - len(extension) - 2] + "…." + extension
 
 
+def _company_for(user, row: ParsedRow, by_name: dict, by_identifier: dict):
+    """The row's company and whether it was just made; the database is asked once per name."""
+    from postulo.applications.services import get_or_create_company
+    from postulo.jobs.models import Company
+
+    key = slugs.name_key(row.company)
+    if row.wikidata:
+        found = by_identifier.get((key, row.wikidata))
+        if found is not None:
+            return found, False
+    elif key in by_name:
+        return by_name[key], False
+    existed = (
+        key in by_name
+        or Company.objects.for_user(user).filter(name_key=key).exists()
+        or Company.by_identifier(user, "wikidata", row.wikidata) is not None
+    )
+    company = get_or_create_company(user, row.company, wikidata=row.wikidata)
+    by_name.setdefault(key, company)
+    if row.wikidata:
+        by_identifier[(key, row.wikidata)] = company
+    return company, not existed
+
+
 def perform(
     user, sheet: Sheet, mapping: list[str], *, day_first: bool = True, currency: str = "EUR"
 ) -> CsvReport:
-    """Import the sheet in one transaction. Duplicates are reported, never created."""
+    """Import the sheet, a transaction per ``CHUNK_ROWS`` rows. Duplicates are reported, not made.
+
+    What a row is checked against is read once before the loop, not asked per row (#555): the
+    addresses already recorded, the applications already made, and each company the first time
+    its name turns up. Imported history is not announced to a person's notifiers (a sheet of two
+    years is not two years of news), and a chunk is its own transaction, so the database's write
+    lock is released between them and a sheet that stops half way keeps the chunks before it.
+    """
     from postulo.applications.models import Application, EventKind
     from postulo.applications.services import (
         change_status,
         create_application,
         create_listing,
-        get_or_create_company,
         record_event,
     )
     from postulo.core.models import Tag
@@ -1036,129 +1071,145 @@ def perform(
     report = CsvReport(filename=sheet.filename, rows=sheet.row_count)
     provenance = str(_("Imported from %(file)s") % {"file": _short_file_name(sheet.filename)})
 
-    with transaction.atomic():
-        for row in parse_rows(sheet, mapping, day_first=day_first, currency=currency):
-            if row.problems:
-                report.skipped.append(
-                    gettext("Row %(number)s: %(problems)s")
-                    % {"number": row.number, "problems": ", ".join(row.problems)}
-                )
-                continue
+    rows = parse_rows(sheet, mapping, day_first=day_first, currency=currency)
+    urls = set(
+        JobPosting.objects.for_user(user).exclude(url="").values_list("url", flat=True).distinct()
+    )
+    twins = {
+        (company_id, title.casefold(), timezone.localtime(applied_at).date())
+        for company_id, title, applied_at in Application.objects.for_user(user)
+        .filter(applied_at__isnull=False)
+        .values_list("posting__company_id", "posting__title", "applied_at")
+    }
+    by_name: dict[str, Company] = {}
+    by_identifier: dict[tuple[str, str], Company] = {}
 
-            if row.url and JobPosting.objects.for_user(user).filter(url=row.url).exists():
-                report.skipped.append(
-                    gettext("Row %(number)s: already recorded (same address)")
-                    % {"number": row.number}
-                )
-                continue
-            existed = (
-                Company.objects.for_user(user).filter(name_key=slugs.name_key(row.company)).exists()
-                or Company.by_identifier(user, "wikidata", row.wikidata) is not None
-            )
-            company = get_or_create_company(user, row.company, wikidata=row.wikidata)
-            if not existed:
-                report.companies_created += 1
-            if row.applied_at is not None:
-                twin = Application.objects.for_user(user).filter(
-                    posting__company=company,
-                    posting__title__iexact=row.role,
-                    applied_at__date=row.applied_at,
-                )
-                if twin.exists():
+    for start in range(0, len(rows), CHUNK_ROWS):
+        with transaction.atomic(), slow.quiet():
+            for row in rows[start : start + CHUNK_ROWS]:
+                if row.problems:
                     report.skipped.append(
-                        gettext(
-                            "Row %(number)s: already recorded (%(role)s at %(company)s, %(date)s)"
-                        )
-                        % {
-                            "number": row.number,
-                            "role": row.role,
-                            "company": company.name,
-                            "date": date_format(row.applied_at, "DATE_FORMAT"),
-                        }
+                        gettext("Row %(number)s: %(problems)s")
+                        % {"number": row.number, "problems": ", ".join(row.problems)}
                     )
                     continue
 
-            posting_data = {
-                "title": row.role,
-                "url": row.url,
-                "location": row.location,
-                "source": row.source,
-                "description": row.description,
-                "salary_min": row.salary_min,
-                "salary_max": row.salary_max,
-                "salary_currency": row.salary_currency
-                if (row.salary_min or row.salary_max)
-                else "",
-                "salary_period": row.salary_period or SalaryPeriod.YEAR
-                if (row.salary_min or row.salary_max)
-                else "",
-                "closes_at": None,
-            }
-            notes = "\n".join(row.notes)
+                if row.url and row.url in urls:
+                    report.skipped.append(
+                        gettext("Row %(number)s: already recorded (same address)")
+                        % {"number": row.number}
+                    )
+                    continue
+                company, created = _company_for(user, row, by_name, by_identifier)
+                if created:
+                    report.companies_created += 1
+                if row.applied_at is not None:
+                    if (company.pk, row.role.casefold(), row.applied_at) in twins:
+                        report.skipped.append(
+                            gettext(
+                                "Row %(number)s: already recorded "
+                                "(%(role)s at %(company)s, %(date)s)"
+                            )
+                            % {
+                                "number": row.number,
+                                "role": row.role,
+                                "company": company.name,
+                                "date": date_format(row.applied_at, "DATE_FORMAT"),
+                            }
+                        )
+                        continue
 
-            if row.becomes == "listing":
-                posting_data["closes_at"] = row.deadline
-                listing = create_listing(user, company=company, posting_data=posting_data)
-                if notes:
-                    listing.description = (listing.description + "\n\n" + notes).strip()
-                    listing.save(update_fields=["description", "updated_at"])
-                report.listings += 1
-                continue
+                posting_data = {
+                    "title": row.role,
+                    "url": row.url,
+                    "location": row.location,
+                    "source": row.source,
+                    "description": row.description,
+                    "salary_min": row.salary_min,
+                    "salary_max": row.salary_max,
+                    "salary_currency": row.salary_currency
+                    if (row.salary_min or row.salary_max)
+                    else "",
+                    "salary_period": row.salary_period or SalaryPeriod.YEAR
+                    if (row.salary_min or row.salary_max)
+                    else "",
+                    "closes_at": None,
+                }
+                notes = "\n".join(row.notes)
 
-            # A row that says what happened but not when: keep the status, the channel, the
-            # tags and the deadline, and leave the date unknown rather than inventing today
-            # (#222). `mark_applied=False` is what stops the status change stamping one.
-            applied_moment = (
-                timezone.make_aware(
-                    dt.datetime.combine(row.applied_at, dt.time(12, 0)),
-                    timezone.get_current_timezone(),
+                if row.becomes == "listing":
+                    posting_data["closes_at"] = row.deadline
+                    listing = create_listing(user, company=company, posting_data=posting_data)
+                    if notes:
+                        listing.description = (listing.description + "\n\n" + notes).strip()
+                        listing.save(update_fields=["description", "updated_at"])
+                    report.listings += 1
+                    if row.url:
+                        urls.add(row.url)
+                    continue
+
+                # A row that says what happened but not when: keep the status, the channel, the
+                # tags and the deadline, and leave the date unknown rather than inventing today
+                # (#222). `mark_applied=False` is what stops the status change stamping one.
+                applied_moment = (
+                    timezone.make_aware(
+                        dt.datetime.combine(row.applied_at, dt.time(12, 0)),
+                        timezone.get_current_timezone(),
+                    )
+                    if row.applied_at
+                    else None
                 )
-                if row.applied_at
-                else None
-            )
-            application = create_application(
-                user,
-                company=company,
-                posting_data=posting_data,
-                application_data={
-                    "status": "draft",
-                    "channel": row.channel,
-                    "priority": 2,
-                    "deadline": row.deadline,
-                },
-                actor=provenance,
-            )
-            wanted = row.status or "applied"
-            if applied_moment is not None:
-                change_status(application, "applied", occurred_at=applied_moment, actor=provenance)
-                if wanted != "applied":
-                    change_status(application, wanted, occurred_at=applied_moment, actor=provenance)
-            else:
-                change_status(application, wanted, actor=provenance, mark_applied=False)
+                application = create_application(
+                    user,
+                    company=company,
+                    posting_data=posting_data,
+                    application_data={
+                        "status": "draft",
+                        "channel": row.channel,
+                        "priority": 2,
+                        "deadline": row.deadline,
+                    },
+                    actor=provenance,
+                )
+                wanted = row.status or "applied"
+                if applied_moment is not None:
+                    change_status(
+                        application, "applied", occurred_at=applied_moment, actor=provenance
+                    )
+                    if wanted != "applied":
+                        change_status(
+                            application, wanted, occurred_at=applied_moment, actor=provenance
+                        )
+                else:
+                    change_status(application, wanted, actor=provenance, mark_applied=False)
+                    record_event(
+                        application,
+                        kind=EventKind.OTHER,
+                        summary=str(_("Applied on an unknown date")),
+                        body=str(
+                            _(
+                                "The spreadsheet gave a status but no date, so this application "
+                                "is not counted in figures measured from the date it was sent. "
+                                "Set it on the application to include it."
+                            )
+                        ),
+                        actor=provenance,
+                    )
                 record_event(
                     application,
                     kind=EventKind.OTHER,
-                    summary=str(_("Applied on an unknown date")),
-                    body=str(
-                        _(
-                            "The spreadsheet gave a status but no date, so this application "
-                            "is not counted in figures measured from the date it was sent. "
-                            "Set it on the application to include it."
-                        )
-                    ),
+                    summary=provenance,
+                    body=notes,
+                    occurred_at=applied_moment,
                     actor=provenance,
                 )
-            record_event(
-                application,
-                kind=EventKind.OTHER,
-                summary=provenance,
-                body=notes,
-                occurred_at=applied_moment,
-                actor=provenance,
-            )
-            if row.tags:
-                application.tags.set(Tag.named(user, row.tags))
-            report.applications += 1
+                if row.tags:
+                    application.tags.set(Tag.named(user, row.tags))
+                report.applications += 1
+                if row.url:
+                    urls.add(row.url)
+                if row.applied_at is not None:
+                    twins.add((company.pk, row.role.casefold(), row.applied_at))
     return report
 
 

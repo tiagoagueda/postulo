@@ -4,17 +4,20 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
 from django.http import HttpRequest, HttpResponse
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views.decorators.http import require_POST
 
-from . import csv_import
+from . import csv_import, errands
+from .models import Errand, ErrandState
 
 SECTION = {"section_title": gettext_lazy("Your data")}
 
 
+@transaction.non_atomic_requests
 @login_required
 def import_csv(request: HttpRequest):
     """Step one: the file. Step two, on the same address once a file is held: the mapping."""
@@ -59,11 +62,17 @@ def import_csv(request: HttpRequest):
         ):
             messages.error(request, _("Map a column to Company and one to Role first."))
         else:
-            report = csv_import.perform(
-                request.user, sheet, mapping, day_first=day_first, currency=currency
+            errand = errands.send(
+                "csv_import",
+                request.user,
+                filename=sheet.filename,
+                data=request.session[csv_import.SESSION_KEY]["data"],
+                mapping=mapping,
+                day_first=day_first,
+                currency=currency,
             )
             csv_import.forget(request.session)
-            return render(request, "core/import_csv_done.html", {**SECTION, "report": report})
+            return redirect("core:errand", pk=errand.pk)
 
     parsed = csv_import.parse_rows(sheet, mapping, day_first=day_first, currency=currency)
     return render(
@@ -83,6 +92,15 @@ def import_csv(request: HttpRequest):
             "would_skip": sum(1 for row in parsed if row.becomes == "skipped"),
         },
     )
+
+
+@login_required
+def import_csv_done(request: HttpRequest, pk: int) -> HttpResponse:
+    """What an import came to, read from the errand that did it."""
+    errand = get_object_or_404(
+        Errand.objects.for_user(request.user), pk=pk, kind="csv_import", state=ErrandState.DONE
+    )
+    return render(request, "core/import_csv_done.html", {**SECTION, "report": errand.outcome})
 
 
 @login_required

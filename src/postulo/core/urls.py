@@ -37,6 +37,7 @@ urlpatterns = [
     path("working/<int:pk>/state/", views_errands.errand_state, name="errand_state"),
     path("import/", views_import.import_csv, name="import_csv"),
     path("import/template.csv", views_import.import_csv_template, name="import_csv_template"),
+    path("import/done/<int:pk>/", views_import.import_csv_done, name="import_csv_done"),
     path("import/forget/", views_import.import_csv_forget, name="import_csv_forget"),
     path("tables/<slug:name>/settings/", views_tables.table_settings, name="table_settings"),
     path("tables/<slug:name>/views/", views_tables.table_views, name="table_views"),
