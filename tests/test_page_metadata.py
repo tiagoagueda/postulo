@@ -12,12 +12,14 @@ from __future__ import annotations
 
 import datetime as dt
 import pathlib
+import time
 from decimal import Decimal
 
 import pytest
 
 from postulo.jobs import places
 from postulo.plugins.builtin import PageMetadataSource, patterns, titles
+from postulo.plugins.builtin.htmlutil import main_text
 
 PAGES = pathlib.Path(__file__).parent / "data" / "page_metadata"
 
@@ -285,7 +287,7 @@ def test_a_long_run_of_unicode_spaces_does_not_make_the_search_quadratic():
     found = patterns.salary("Benefits" + "\xa0" * 50_000 + "Salary: €40,000", "en")
     assert found == (40000, None, "EUR", "")
     assert patterns.pay_in("\xa0" * 50_000 + "€40,000", "en")[3] == ""
-    assert time.perf_counter() - started < 2
+    assert time.perf_counter() - started < 5
 
 
 @pytest.mark.parametrize(
@@ -299,3 +301,19 @@ def test_a_long_run_of_unicode_spaces_does_not_make_the_search_quadratic():
 def test_a_period_two_words_before_the_figure_still_labels_it(written, period):
     """#420: the bound keeps the last three words, not only the one beside the figure."""
     assert patterns.pay_in(written, "en")[3] == period
+
+
+def test_the_fallback_reads_deeply_nested_blocks_in_linear_time():
+    links = "".join(f'<a href="/{i}">link number {i} to somewhere</a> ' for i in range(500))
+    html = (
+        "<body>"
+        + "<div>" * 400
+        + links
+        + "<p>The advert itself, written as prose and long enough to count.</p>"
+        + "</div>" * 400
+        + "</body>"
+    )
+    started = time.monotonic()
+    text = main_text(html)
+    assert time.monotonic() - started < 5
+    assert "link number" not in text

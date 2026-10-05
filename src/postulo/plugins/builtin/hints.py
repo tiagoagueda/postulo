@@ -183,15 +183,46 @@ def _elements(root: Element):
             stack.pop()
 
 
-def _next_element(element: Element) -> Element | None:
-    siblings = element.parent.children if element.parent is not None else []
-    seen = False
-    for sibling in siblings:
-        if sibling is element:
-            seen = True
-        elif seen and isinstance(sibling, Element):
-            return sibling
-    return None
+class _Siblings:
+    """Where each child sits among its parent's, found once per parent.
+
+    Asking a parent "who follows this child?" by scanning from its first child costs the
+    parent's width every time, and a row of ten thousand cells asks ten thousand times.
+    """
+
+    def __init__(self) -> None:
+        self._index: dict[int, int] = {}
+        self._next: dict[int, Element | None] = {}
+        self._elements: dict[int, list[Element]] = {}
+
+    def _load(self, parent: Element) -> list[Element]:
+        elements = self._elements.get(id(parent))
+        if elements is not None:
+            return elements
+        elements = self._elements[id(parent)] = []
+        for position, child in enumerate(parent.children):
+            self._index[id(child)] = position
+            if isinstance(child, Element):
+                if elements:
+                    self._next[id(elements[-1])] = child
+                self._next[id(child)] = None
+                elements.append(child)
+        return elements
+
+    def position(self, element: Element) -> int:
+        """The index of ``element`` in its parent's children."""
+        self._load(element.parent)
+        return self._index[id(element)]
+
+    def elements(self, parent: Element) -> list[Element]:
+        """The parent's children that are elements."""
+        return self._load(parent)
+
+    def next_element(self, element: Element) -> Element | None:
+        if element.parent is None:
+            return None
+        self._load(element.parent)
+        return self._next[id(element)]
 
 
 def _label_key(text: str) -> str:
@@ -202,19 +233,15 @@ def _ends_a_label(text: str) -> bool:
     return _plain(text).endswith((":", "："))
 
 
-def _rest_of_line(element: Element) -> str:
+def _rest_of_line(element: Element, siblings: _Siblings) -> str:
     """What follows a "Label:" on its line: up to a break, a block, or the next label."""
     parent = element.parent
     if parent is None:
         return ""
     parts: list[str] = []
-    seen = False
-    for child in parent.children:
-        if child is element:
-            seen = True
-            continue
-        if not seen:
-            continue
+    children = parent.children
+    for at in range(siblings.position(element) + 1, len(children)):
+        child = children[at]
         if isinstance(child, str):
             parts.append(child)
             continue
@@ -228,22 +255,22 @@ def _rest_of_line(element: Element) -> str:
     return _plain("".join(parts))
 
 
-def _labelled(element: Element, own: str) -> str:
+def _labelled(element: Element, own: str, siblings: _Siblings) -> str:
     """What a label element labels, or "": the ``<dd>`` after a ``<dt>``, the cell after a
     ``<th>`` or a row's first of two cells, the rest of a line after "Label:"."""
     if element.tag in ("dt", "th", "td"):
-        following = _next_element(element)
+        following = siblings.next_element(element)
         wanted = {"dt": "dd", "th": "td", "td": "td"}[element.tag]
         if following is None or following.tag != wanted:
             return ""
         if element.tag == "td":
-            cells = [c for c in element.parent.children if isinstance(c, Element)]
+            cells = siblings.elements(element.parent)
             if len(cells) != 2 or cells[0] is not element:
                 return ""
         return text_of(following)
     if not _ends_a_label(own):
         return ""
-    return _rest_of_line(element)
+    return _rest_of_line(element, siblings)
 
 
 def _labels(root: Element) -> list[tuple[str, str]]:
@@ -254,13 +281,14 @@ def _labels(root: Element) -> list[tuple[str, str]]:
     nothing is not a label at all.
     """
     found: list[tuple[str, str]] = []
+    siblings = _Siblings()
     for element in _elements(root):
         if element.tag not in LABELS:
             continue
         own = _plain(text_of(element))
         if not own or len(own) > LONGEST_LABEL:
             continue
-        labelled = _labelled(element, own)
+        labelled = _labelled(element, own, siblings)
         if labelled.strip():
             found.append((_label_key(own), labelled))
     return found

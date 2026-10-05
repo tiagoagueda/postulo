@@ -13,6 +13,7 @@ from __future__ import annotations
 import datetime as dt
 import json
 import pathlib
+import time
 from decimal import Decimal
 
 import pytest
@@ -274,3 +275,22 @@ def test_the_label_place_survives_omitted_end_tags():
         place["place"].get("label") == "local"
         for place in hints.places("https://e.example/1", html)
     )
+
+
+def test_a_row_of_twenty_thousand_cells_is_read_in_linear_time():
+    html = "<table><tr>" + "<td>a</td>" * 20000 + "</tr></table>"
+    started = time.monotonic()
+    hints.places("https://jobs.example.org/1", html)
+    assert time.monotonic() - started < 5
+
+
+def test_a_paragraph_of_twenty_thousand_labels_is_read_in_linear_time():
+    html = "<p>" + "<span>Label:</span> value " * 20000 + "</p>"
+    started = time.monotonic()
+    hints.places("https://jobs.example.org/1", html)
+    assert time.monotonic() - started < 5
+
+
+def test_a_label_still_finds_what_follows_it_among_many_siblings():
+    root = parse_html("<p><b>x</b> y <span>Salary:</span> 50k <i>net</i><br>z</p>")
+    assert dict(hints._labels(root))["salary"] == "50k net"

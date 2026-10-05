@@ -85,6 +85,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Importing a spreadsheet now runs as a watched errand in chunks of 200 rows, so a large sheet no longer times out, rolls back or locks the database for everyone else; imported history is not announced to notifiers. (#555)
 - A CV's page, preview, downloads and API read its entries a query per kind instead of one per entry and three per skill group, as does the career overview, so large CVs open and export as fast as small ones. (#559)
 - The GeoNames city table is indexed once at provisioning into a lookup database, so saving a company with a location no longer parses 32 MB and holds about 190 MB per worker (#399)
+- A captured page with thousands of label-like siblings or deeply nested link blocks no longer holds a worker for minutes: remembered places and the fallback's link-farm measure now read the page in one pass (#588)
 
 ## [0.4.0] — 2026-10-04
 

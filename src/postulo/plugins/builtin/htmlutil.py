@@ -344,12 +344,32 @@ FARM_FLOOR = 100
 FARM_TAGS = frozenset({"section", "div", "ul", "ol", "aside", "nav"})
 
 
-def _text_length(node: Element) -> int:
-    """How much text is under a node, whitespace collapsed."""
-    parts: list[str] = []
-    for child in [node, *node.iter()]:
-        parts.extend(part for part in child.children if isinstance(part, str))
-    return len(re.sub(r"\s+", " ", "".join(parts)).strip())
+#: What is known of a run of text once its whitespace is collapsed: how long it is, and
+#: whether it starts and ends with the one space a run of whitespace becomes.
+_Run = tuple[int, bool, bool]
+_NO_RUN: _Run = (0, False, False)
+
+
+def _join(left: _Run, right: _Run) -> _Run:
+    if not left[0]:
+        return right
+    if not right[0]:
+        return left
+    return (left[0] + right[0] - (left[2] and right[1]), left[1], right[2])
+
+
+def _run_of(text: str) -> _Run:
+    collapsed = re.sub(r"\s+", " ", text)
+    if not collapsed:
+        return _NO_RUN
+    return (len(collapsed), collapsed[0] == " ", collapsed[-1] == " ")
+
+
+def _stripped(run: _Run) -> int:
+    length, lead, trail = run
+    if length == 1 and lead:
+        return 0
+    return length - lead - trail
 
 
 def _link_farms(body: Element) -> set[int]:
@@ -364,23 +384,48 @@ def _link_farms(body: Element) -> set[int]:
     measurement every reading-mode extractor makes, and prose does not look like it. The
     floor keeps it off a short run of links inside a real paragraph.
     """
+    # One pass from the leaves up gives every node its text, its links and their text, so
+    # the page costs what it holds and not what it holds times how deep it nests.
+    elements = list(body.iter())
+    runs: dict[int, _Run] = {}
+    link_counts: dict[int, int] = {}
+    linked: dict[int, int] = {}
+    for element in [*reversed(elements), body]:
+        run = _NO_RUN
+        count = 0
+        share = 0
+        for child in element.children:
+            if isinstance(child, str):
+                run = _join(run, _run_of(child))
+            else:
+                run = _join(run, runs[id(child)])
+                count += link_counts[id(child)]
+                share += linked[id(child)]
+        runs[id(element)] = run
+        if element.tag == "a":
+            count += 1
+            share += _stripped(run)
+        link_counts[id(element)] = count
+        linked[id(element)] = share
+
     farms: set[int] = set()
-    for element in body.iter():
+    inside: set[int] = set()
+    for element in elements:
+        parent = id(element.parent)
+        # The outermost one is enough; everything inside it goes with it.
+        if parent in farms or parent in inside:
+            inside.add(id(element))
+            continue
         if element.tag not in FARM_TAGS:
             continue
-        # The outermost one is enough; everything inside it goes with it.
-        if any(id(parent) in farms for parent in element.ancestors()):
-            farms.add(id(element))
+        key = id(element)
+        if link_counts[key] - (element.tag == "a") < FARM_LINKS:
             continue
-        links = [node for node in element.iter() if node.tag == "a"]
-        if len(links) < FARM_LINKS:
-            continue
-        total = _text_length(element)
+        total = _stripped(runs[key])
         if total < FARM_FLOOR:
             continue
-        linked = sum(_text_length(link) for link in links)
-        if linked / total >= FARM_SHARE:
-            farms.add(id(element))
+        if linked[key] / total >= FARM_SHARE:
+            farms.add(key)
     return farms
 
 
