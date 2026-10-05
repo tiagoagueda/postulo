@@ -21,11 +21,24 @@ work with no notice beside it, or a work committed here and not listed, fails th
 | @zxcvbn-ts | `src/postulo/static/js/vendor/zxcvbn/` (core and two dictionaries) | Dan Wheeler and Dropbox, Inc.; [@zxcvbn-ts](https://github.com/zxcvbn-ts/zxcvbn) | MIT | `LICENSE.txt` beside the three files; the three packages carry one identical text. |
 | Natural Earth world outline | `src/postulo/templates/jobs/map/world_outline.html` | [Natural Earth](https://www.naturalearthdata.com) | Public domain | `LICENCE.txt` beside it. A drawing of the 1:110m data, not a copy of it. |
 | Babel and CLDR country names | not in the tree: the `babel` package, installed with the dependencies; read by `src/postulo/jobs/places.py` | [Babel](https://babel.pocoo.org) (the Babel team) and the Unicode CLDR data it carries (Unicode, Inc.) | BSD-3-Clause (Babel); Unicode License v3 (CLDR) | Both notices travel in the installed package's `licenses` files; nothing is copied into this repository. |
+| NACE Rev. 2.1 sections and divisions | `src/postulo/jobs/data/nace-2.1.json` | Eurostat; published by the [Publications Office of the European Union](https://op.europa.eu) | CC BY 4.0 (Commission Decision 2011/833/EU) | `LICENCE.md` beside it, saying where the file came from and what was changed. |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | A mark, not a licensed work | `NOTICE.txt` beside them; see [TRADEMARKS.md](TRADEMARKS.md). |
+
+## Data downloaded when an instance is provisioned
+
+Two datasets are not committed and not installed with the dependencies: an operator
+fetches them with a management command, and they are then used from the instance's own
+disk. The licence notice for each is committed in `src/postulo/jobs/data/`, beside the
+NACE file, so the attribution is in the tree even though the data is not.
+
+| Data | Fetched by | Whose | Licence | Notice |
+| --- | --- | --- | --- | --- |
+| GeoNames place names | `manage.py fetch_geonames` | [GeoNames](https://www.geonames.org) | CC BY 3.0 | `src/postulo/jobs/data/GEONAMES-LICENCE.md` |
+| ESCO skills and occupations | `manage.py fetch_esco` | the European Commission ([ESCO](https://esco.ec.europa.eu)) | CC BY 4.0 | `src/postulo/jobs/data/ESCO-LICENCE.md` |
 
 ## How they get here, and how they stay right
 
-Nothing above is fetched at run time: the content security policy allows scripts and
+Nothing in the table above is fetched at run time: the content security policy allows scripts and
 styles from Postulo's own origin only, so every one of these is copied into the tree and
 committed. Three scripts do the copying and each carries the notice with the work:
 

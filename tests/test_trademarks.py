@@ -12,6 +12,7 @@ artwork carries a notice beside the files -- the arrangement the flags already u
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -41,6 +42,7 @@ THIRD_PARTY = {
     "src/postulo/static/js/vendor": "htmx.LICENSE.txt",
     "src/postulo/static/css": "basecoat.LICENSE.txt",
     "src/postulo/templates/jobs/map": "LICENCE.txt",
+    "src/postulo/jobs/data": "LICENCE.md",
 }
 
 
@@ -52,9 +54,29 @@ def test_the_document_is_there_at_all():
 def test_every_directory_of_borrowed_work_is_registered(directory: str):
     """Vendoring something new without a line in the register is the failure this catches."""
     assert (REPO / directory).is_dir(), f"{directory} has moved; update {THIRD_PARTY_MD.name}"
-    assert directory.rsplit("/", 1)[-1] in REGISTER, (
+    assert directory in REGISTER, (
         f"{directory} holds work from somewhere else and {THIRD_PARTY_MD.name} does not mention it"
     )
+
+
+def test_every_licence_file_in_the_tree_sits_in_a_directory_the_register_names():
+    """The test above checks the directories this file lists; this one finds the ones it
+    does not. A `*LICENCE*` or `NOTICE*` file is the sign that somebody vendored a work,
+    and a directory the register never names is how NACE went unregistered (#579)."""
+    found = []
+    for root in ("src", "assets"):
+        for path in (REPO / root).rglob("*"):
+            if not path.is_file() or "node_modules" in path.parts:
+                continue
+            name = path.name.upper()
+            if re.search(r"LICEN[CS]E", name) or name.startswith("NOTICE"):
+                found.append(path)
+    assert found, "no licence file found at all; the glob is wrong"
+    for path in found:
+        directory = path.parent.relative_to(REPO).as_posix()
+        where = path.relative_to(REPO).as_posix()
+        assert directory in REGISTER, f"{where} sits in a directory the register never names"
+        assert directory in THIRD_PARTY, f"{directory} is not in THIRD_PARTY in this test"
 
 
 def test_the_register_names_every_work_and_the_copyright_holder():
