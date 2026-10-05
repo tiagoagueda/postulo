@@ -5566,6 +5566,17 @@
       }
     }
   }
+  [data-brand-mode="single-colour"] {
+    color: #000;
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: #fff;
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: #fff;
+      }
+    }
+  }
   input:where( [type="text"], [type="email"], [type="password"], [type="url"], [type="tel"], [type="number"], [type="date"], [type="datetime-local"], [type="month"], [type="week"], [type="time"], [type="search"], [type="file"] ), select, textarea {
     width: 100%;
     border-radius: var(--radius-lg);

@@ -3,7 +3,10 @@
 A mark is somebody else's logo, shown to say which service a link goes to and for nothing
 else, under the rule in ``TRADEMARKS.md``. They are the Simple Icons files listed in
 ``assets/brands.txt``, copied by ``npm run sync:brands`` into ``static/brands/`` beside a
-``NOTICE.txt`` that names each owner and the one mode it is drawn in. A service names a mark
+``NOTICE.txt`` that names each owner and the one mode it is drawn in: ``brand`` (the owner's
+published colour) or ``single-colour`` (``currentColor``, where the owner's guidelines
+allow it, which the stylesheet makes black on the light page and white on the dark one).
+A service names a mark
 by its slug; a slug Postulo does not ship draws the Lucide icon instead, which is the
 rule's own neutral fallback.
 
@@ -21,12 +24,27 @@ BRAND_DIR = Path(__file__).resolve().parents[1] / "static" / "brands"
 
 BRAND_NAME = re.compile(r"[a-z0-9-]+")
 
+BRAND = "brand"
+SINGLE_COLOUR = "single-colour"
+
 
 def brand_exists(name: str) -> bool:
     """Whether Postulo ships a mark of this name. The name is checked against the pattern
     before it becomes a path, so nothing a plugin or a template says can reach another
     file; and a name a plugin got wrong costs a picture, never a page."""
     return bool(name) and bool(BRAND_NAME.fullmatch(name)) and (BRAND_DIR / f"{name}.svg").is_file()
+
+
+def brand_mode(name: str) -> str:
+    """How the mark is drawn: ``brand``, or ``single-colour`` when `sync:brands` wrote it
+    as ``currentColor``. The file is the record the page draws from, so the page cannot
+    disagree with it."""
+    from django import template
+
+    if not brand_exists(name):
+        raise template.TemplateSyntaxError(f"No brand mark named {name!r}.")
+    root = re.search(r"<svg\b[^>]*>", (BRAND_DIR / f"{name}.svg").read_text(encoding="utf-8"))
+    return SINGLE_COLOUR if root and 'fill="currentColor"' in root.group(0) else BRAND
 
 
 @functools.cache

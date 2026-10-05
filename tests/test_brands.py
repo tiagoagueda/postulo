@@ -1,8 +1,11 @@
 """The brand marks: the tag, the agreement between the list and the files, and the rule.
 
 In the shape of ``tests/test_icons.py``, with what a mark adds: it is somebody else's logo,
-so every one has an owner line and a mode in its notice, is drawn only in the colour its
-owner published, and is shipped only where that colour clears 3:1 on both pages (#654).
+so every one has an owner line and a mode in its notice. A ``brand`` mark is drawn only in
+the colour its owner published and is shipped only where that colour clears 3:1 on both
+pages; a ``single-colour`` one only where its line in the list records the owner's
+guidelines allowing it, and is drawn black on the light page and white on the dark one
+(#654).
 """
 
 import json
@@ -15,7 +18,7 @@ import pytest
 from django.template import Context, Template, TemplateSyntaxError
 
 from postulo.core.brands import BRAND_DIR
-from tests.test_contrast import contrast, tokens
+from tests.test_contrast import CSS, contrast, tokens
 
 REPO = Path(__file__).resolve().parents[1]
 TEMPLATES = REPO / "src" / "postulo" / "templates"
@@ -28,17 +31,45 @@ def render(source: str) -> str:
     return Template("{% load postulo %}" + source).render(Context())
 
 
-def entries(path: Path) -> list[str]:
+def lines_of(path: Path) -> list[str]:
+    """The lines of a list file, a comment being a ``#`` that starts the line or follows a space."""
     found = []
     for line in path.read_text(encoding="utf-8").splitlines():
-        name = line.split("#", 1)[0].strip()
-        if name:
-            found.append(name)
+        line = re.sub(r"(^|\s)#.*", "", line).strip()
+        if line:
+            found.append(line)
     return found
+
+
+def entries(path: Path) -> list[str]:
+    return [line.split()[0] for line in lines_of(path)]
 
 
 def listed() -> set[str]:
     return set(entries(BRAND_LIST))
+
+
+def modes() -> dict[str, str]:
+    """Each listed mark's mode: the second word of its line, ``brand`` where there is none."""
+    return {line.split()[0]: ([*line.split(), "brand"])[1] for line in lines_of(BRAND_LIST)}
+
+
+def single_colour() -> set[str]:
+    return {slug for slug, mode in modes().items() if mode == "single-colour"}
+
+
+def page_colours() -> dict[str, str]:
+    """The two colours the stylesheet gives a one-colour mark, from the rule itself."""
+    block = re.search(r'\[data-brand-mode="single-colour"\]\s*\{(.*?)\n  \}', CSS, re.S).group(1)
+    light = re.match(r"\s*color:\s*#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})", block).group(1)
+    dark = re.search(
+        r"@variant dark\s*\{\s*color:\s*#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})", block
+    ).group(1)
+    return {"light": _six(light), "dark": _six(dark)}
+
+
+def _six(digits: str) -> str:
+    return "".join(c * 2 for c in digits) if len(digits) == 3 else digits
 
 
 def notice_blocks() -> dict[str, str]:
@@ -69,6 +100,7 @@ def test_a_brand_is_inline_svg_decorative_by_default_and_marked_with_data_brand(
     assert 'class="size-4 shrink-0"' in html
     assert 'viewBox="0 0 24 24"' in html
     assert "<title>" not in html and "role=" not in html
+    assert 'data-brand-mode="brand"' in html
     assert 'fill="#6364FF"' in html, "the owner's published colour, and no currentColor"
     assert "currentColor" not in html
     assert "data-icon" not in html, "icons and marks are read by different selectors"
@@ -91,10 +123,18 @@ def test_an_unknown_brand_is_a_template_error_that_says_what_to_do():
         render('{% brand "no-such-mark" %}')
 
 
+def test_a_single_colour_mark_is_drawn_in_currentcolor_and_says_so():
+    html = render('{% brand "github" %}')
+    assert 'data-brand="github"' in html and 'data-brand-mode="single-colour"' in html
+    assert 'fill="currentColor"' in html and 'aria-hidden="true"' in html
+    assert not re.search(r'fill="#', html), "one colour, and the page chooses it"
+
+
 def test_a_mark_that_was_not_shipped_is_not_a_brand():
-    """LinkedIn has no mark in Simple Icons and none is taken from elsewhere; GitHub and the
-    rest fail 3:1 on one page. Each is the Lucide icon, so each is an error here."""
-    for name in ("linkedin", "github", "x", "orcid"):
+    """LinkedIn has no mark in Simple Icons and none is taken from elsewhere; X, Threads,
+    Xing, Bitbucket and GitLab fail 3:1 on a page and no guidelines were found allowing
+    them in one colour. Each is the Lucide icon, so each is an error here."""
+    for name in ("linkedin", "x", "threads", "xing", "bitbucket", "gitlab"):
         with pytest.raises(TemplateSyntaxError):
             render(f'{{% brand "{name}" %}}')
 
@@ -126,7 +166,7 @@ def test_every_mark_has_an_owner_line_a_mode_and_a_source_in_its_notice():
     assert set(blocks) == listed()
     for slug, block in blocks.items():
         assert re.search(r"^  Owner: \S", block, re.M), f"{slug} has no owner"
-        assert re.search(r"^  Mode: (brand|none)\b", block, re.M), f"{slug} has no mode"
+        assert re.search(r"^  Mode: (brand|single-colour)\b", block, re.M), f"{slug} has no mode"
         assert re.search(r"^  Licence: \S", block, re.M), f"{slug} has no licence line"
         assert re.search(r"^  Guidelines: \S", block, re.M), f"{slug} has no guidelines"
     text = NOTICE.read_text(encoding="utf-8")
@@ -134,15 +174,31 @@ def test_every_mark_has_an_owner_line_a_mode_and_a_source_in_its_notice():
     assert "NOT covered by Postulo's AGPL" in text
 
 
-def test_the_only_mode_is_the_published_colour():
-    """Rule 2 of TRADEMARKS.md: unmodified. There is no single-colour mode, so no mark is
-    drawn in currentColor, and each file carries its owner's colour as a fill."""
-    for slug in listed():
+def test_a_mark_is_in_one_of_two_modes_and_its_file_and_notice_agree():
+    """Rule 2 of TRADEMARKS.md: unmodified. A brand mark's file carries its owner's colour as
+    its fill and no currentColor; a single-colour one is currentColor and nothing else."""
+    assert set(modes().values()) <= {"brand", "single-colour"}
+    for slug, mode in modes().items():
         svg = (BRAND_DIR / f"{slug}.svg").read_text(encoding="utf-8")
-        assert re.match(r'<svg fill="#[0-9A-F]{6}"', svg), f"{slug} has no published colour"
-        assert "currentColor" not in svg
-        colour = re.match(r'<svg fill="(#[0-9A-F]{6})"', svg).group(1)
-        assert f"Mode: brand (the published colour {colour}" in notice_blocks()[slug]
+        block = notice_blocks()[slug]
+        if mode == "brand":
+            assert re.match(r'<svg fill="#[0-9A-F]{6}"', svg), f"{slug} has no published colour"
+            assert "currentColor" not in svg
+            colour = re.match(r'<svg fill="(#[0-9A-F]{6})"', svg).group(1)
+            assert f"Mode: brand (the published colour {colour}" in block
+        else:
+            assert svg.startswith('<svg fill="currentColor"'), slug
+            assert "Mode: single-colour" in block
+            assert re.search(r"^  Allowed by: https://\S+", block, re.M), f"{slug}: no page"
+            assert re.search(r"^  They say: \S", block, re.M), f"{slug}: no words"
+
+
+def test_the_marks_that_are_single_colour_are_the_ones_whose_guidelines_were_read():
+    """The decision per candidate, recorded in the list: GitHub, SourceHut, Forgejo and
+    ORCID are published by their owners in black or white (or as a monochrome file), and X,
+    Threads, Xing, Bitbucket and GitLab are not here, for want of a page showing it."""
+    assert single_colour() == {"github", "sourcehut", "forgejo", "orcid"}
+    assert not listed() & {"x", "threads", "xing", "bitbucket", "gitlab", "linkedin"}
 
 
 def test_every_brand_mark_clears_three_to_one_on_both_pages():
@@ -150,13 +206,27 @@ def test_every_brand_mark_clears_three_to_one_on_both_pages():
     holds the field boundary to, from the colour in the file."""
     light, dark = tokens()
     white = 1.0
-    for slug in listed():
+    for slug in listed() - single_colour():
         svg = (BRAND_DIR / f"{slug}.svg").read_text(encoding="utf-8")
         hex_colour = re.match(r'<svg fill="#([0-9A-F]{6})"', svg).group(1)
         own = luminance_of(hex_colour)
         assert contrast(own, white) >= 3, f"{slug} {hex_colour} on the light page"
         assert contrast(own, dark["ink-950"]) >= 3, f"{slug} {hex_colour} on the dark page"
     assert light["ink-50"] and dark["ink-950"] < 0.01, "the dark page is the dark page"
+
+
+def test_a_single_colour_mark_clears_three_to_one_on_each_page_in_its_own_colour():
+    """Black on the light page and white on the dark one, the colours the stylesheet gives
+    it, each held to 3:1 on the page it is drawn on (and each fails on the other one)."""
+    _, dark = tokens()
+    colours = page_colours()
+    black, white = luminance_of(colours["light"]), luminance_of(colours["dark"])
+    assert contrast(black, 1.0) >= 3, "the light page"
+    assert contrast(white, dark["ink-950"]) >= 3, "the dark page"
+    assert contrast(white, 1.0) < 3 and contrast(black, dark["ink-950"]) < 3
+    assert {colours["light"].lower(), colours["dark"].lower()} == {"000000", "ffffff"}, (
+        "the owners' guidelines allow black and white and no other colour"
+    )
 
 
 def test_the_contrast_check_fails_what_it_should():
@@ -210,6 +280,7 @@ def fake_package(root: Path, marks: dict[str, dict]) -> None:
 
 
 def sync(root: Path, slugs: list[str]) -> subprocess.CompletedProcess:
+    """`slugs` are lines of the list: a slug, or a slug with its mode and evidence."""
     (root / "assets" / "brands.txt").write_text("\n".join(slugs) + "\n", encoding="utf-8")
     return subprocess.run(  # noqa: S603
         [NODE, str(REPO / "scripts" / "sync-brands.mjs")],
@@ -230,6 +301,40 @@ def test_sync_copies_the_listed_marks_with_their_colour_and_notice(tmp_path):
     assert not (out / "beta.svg").exists()
     notice = (out / "NOTICE.txt").read_text()
     assert "Licence: CC-BY-SA-4.0" in notice and "Mode: brand" in notice
+
+
+GUIDELINES = 'single-colour https://example.org/brand "A one-colour version is allowed."'
+
+
+@pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
+def test_sync_draws_a_single_colour_mark_in_currentcolor_and_records_the_page(tmp_path):
+    fake_package(tmp_path, {"alpha": {}})
+    result = sync(tmp_path, [f"alpha {GUIDELINES}"])
+    assert result.returncode == 0, result.stderr
+    out = tmp_path / "src" / "postulo" / "static" / "brands"
+    assert (out / "alpha.svg").read_text().startswith('<svg fill="currentColor" role="img"')
+    notice = (out / "NOTICE.txt").read_text()
+    assert "Mode: single-colour" in notice
+    assert "Allowed by: https://example.org/brand" in notice
+    assert 'They say: "A one-colour version is allowed."' in notice
+
+
+@pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
+@pytest.mark.parametrize(
+    "line",
+    [
+        "alpha single-colour",
+        "alpha single-colour https://example.org/brand",
+        "alpha single-colour http://example.org/brand it is allowed",
+        "alpha single-colour not-a-link it is allowed",
+        "alpha monochrome https://example.org/brand it is allowed",
+    ],
+)
+def test_sync_refuses_a_single_colour_mark_without_its_guidelines_recorded(tmp_path, line):
+    fake_package(tmp_path, {"alpha": {}})
+    result = sync(tmp_path, [line])
+    assert result.returncode != 0 and "alpha" in result.stderr
+    assert not (tmp_path / "src" / "postulo" / "static" / "brands" / "alpha.svg").exists()
 
 
 @pytest.mark.skipif(NODE is None, reason="Node is only needed to change the set")
@@ -263,8 +368,10 @@ def test_shipped_link_services_name_only_marks_that_exist_and_linkedin_names_non
         assert brand in listed(), f"{key} names {brand}, which is not shipped"
         assert SERVICES[key].brand_name == brand
     assert SERVICES["linkedin"].brand == "", "LinkedIn has no mark (#654)"
-    for key in ("github", "x", "threads", "xing", "bitbucket", "gitlab", "forgejo", "sourcehut"):
-        assert SERVICES[key].brand_name == "", f"{key} fails contrast and keeps its icon"
+    for key in ("github", "forgejo", "sourcehut"):
+        assert SERVICES[key].brand_name == key, f"{key} is drawn in one colour"
+    for key in ("x", "threads", "xing", "bitbucket", "gitlab"):
+        assert SERVICES[key].brand_name == "", f"{key} has no mark and keeps its icon"
         assert SERVICES[key].icon_name, "and the Lucide icon is its fallback"
 
 
@@ -291,5 +398,6 @@ def test_a_web_link_on_a_service_with_a_mark_says_which():
     from postulo.core.models import WebLink
 
     assert WebLink(service="mastodon", kind="social").brand == "mastodon"
-    assert WebLink(service="github", kind="repository").brand == ""
+    assert WebLink(service="github", kind="repository").brand == "github"
+    assert WebLink(service="gitlab", kind="repository").brand == ""
     assert WebLink(service="", kind="social").brand == ""

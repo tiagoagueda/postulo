@@ -19,7 +19,11 @@ from django.utils.translation import gettext_lazy as _
 
 # The flag lookup lives in `core.flags`, below the forms that ask it directly (#248). This
 # library registers it as the `flag_url` tag, and hands `FLAG_DIR` on to the flag tests.
-from postulo.core.brands import BRAND_DIR, brand_source  # noqa: F401 - re-exported: BRAND_DIR
+from postulo.core.brands import (  # noqa: F401 - re-exported: BRAND_DIR
+    BRAND_DIR,
+    brand_mode,
+    brand_source,
+)
 from postulo.core.flags import FLAG_DIR, flag_url  # noqa: F401 - re-exported: FLAG_DIR
 
 register = template.Library()
@@ -99,12 +103,18 @@ def brand(name: str, label: str = "", **attrs: str) -> str:
     own file, notice and rule (``TRADEMARKS.md``), and the icon's selectors and tests read
     ``data-icon``. It is decorative by default, ``aria-hidden``, since the service's name
     is written beside it; give it a ``label`` where it stands alone. The mark is drawn in
-    its owner's published colour and never recoloured, so there is no ``currentColor``.
-    A name that is not a shipped mark, or is a path, is a template error.
+    its owner's published colour and never recoloured; a mark whose owner's guidelines allow
+    a one-colour version is ``currentColor`` instead, which the stylesheet makes black on the
+    light page and white on the dark one. ``data-brand-mode`` says which. A name that is
+    not a shipped mark, or is a path, is a template error.
     """
     source = brand_source(name)
     css_class = attrs.pop("class", "size-4")
-    rendered = [f'class="{escape(css_class)} shrink-0"', f'data-brand="{escape(name)}"']
+    rendered = [
+        f'class="{escape(css_class)} shrink-0"',
+        f'data-brand="{escape(name)}"',
+        f'data-brand-mode="{brand_mode(name)}"',
+    ]
     if label:
         rendered.append(f'role="img" aria-label="{escape(label)}"')
     else:

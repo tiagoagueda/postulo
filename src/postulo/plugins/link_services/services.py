@@ -318,6 +318,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/{_not(*_GITHUB_PAGES)}(?P<handle>{PART}(?:/{PART})?){REST}"),
             hosts=("github.com",),
             icon="git-branch",
+            brand="github",
             example="https://github.com/name/project",
         ),
         LinkService(
@@ -356,6 +357,7 @@ SERVICES: dict[str, LinkService] = {
             hosts=("gitea.com",),
             any_host=True,
             icon="git-branch",
+            brand="forgejo",
             example="https://git.example.org/name/project",
         ),
         LinkService(
@@ -379,6 +381,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/(?P<handle>~{PART}(?:/{PART})?){REST}"),
             hosts=("sr.ht",),
             icon="git-branch",
+            brand="sourcehut",
             example="https://git.sr.ht/~name/project",
         ),
     )

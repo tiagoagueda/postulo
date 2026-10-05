@@ -429,6 +429,21 @@
   }
 
   /*
+   * A brand mark drawn in one colour (#654, TRADEMARKS.md rule 2): only where its owner's
+   * guidelines allow a one-colour version, and the ones recorded allow black and white, so
+   * it is exactly black on the light page and exactly white on the dark one rather than
+   * whichever ink the surrounding text has. The {% brand %} tag stamps data-brand-mode;
+   * tests/test_brands.py reads these two values and holds each to 3:1 on its own page.
+   */
+  [data-brand-mode="single-colour"] {
+    color: #000;
+
+    @variant dark {
+      color: #fff;
+    }
+  }
+
+  /*
    * The box every control is typed into, on the element itself rather than on a class a
    * template has to remember (#290). This was `field-input`, a utility applied here and
    * written out by hand in 29 templates besides -- redundantly, since this rule already

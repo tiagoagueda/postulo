@@ -1,18 +1,29 @@
-# Brand marks from Simple Icons that Postulo ships, one slug per line (#654).
+# Brand marks from Simple Icons that Postulo ships, one per line (#654).
 # `npm run sync:brands` copies exactly these into src/postulo/static/brands/ and writes
 # NOTICE.txt beside them; it exits non-zero on a slug the package no longer has, so an
 # upstream removal is decided at the bump and never silent.
 #
-# A mark is here only in the one mode Postulo allows: "brand", the published colour,
-# unmodified, and only where it clears 3:1 on BOTH the white page and the dark one
-# (tests/test_brands.py computes it from the colour in Simple Icons' data). Where it does
-# not, the service draws its Lucide icon instead, and is listed below so that nobody
-# vendors it again without reading why.
+# A line is `slug` or `slug single-colour <guidelines URL> <what they say>`: the mode
+# (TRADEMARKS.md rule 2) is one of
 #
-# Considered and not shipped, with the contrast against white and against the dark page:
-#   github     17.9 / 1.1     sourcehut  21.0 / 1.0     x          21.0 / 1.0
-#   threads    21.0 / 1.0     bitbucket   6.8 / 2.9     xing        6.9 / 2.9
-#   gitlab      2.9 / 7.0     forgejo     2.3 / 8.9     orcid       1.8 / 11.0
+#   brand          the owner's published colour, unmodified, and only where it clears 3:1 on
+#                  BOTH the white page and the dark one (tests/test_brands.py computes it
+#                  from the colour in Simple Icons' data). The default.
+#   single-colour  drawn in currentColor, which the stylesheet makes black on the light page
+#                  and white on the dark one, and only where the owner's own guidelines
+#                  allow a one-colour version. The line records the page and what it says,
+#                  and the script refuses the mark without them. Do not add one on the
+#                  strength of a guess: a mark whose guidelines cannot be shown to allow it
+#                  stays brand-or-none.
+#   none           not here at all: the service draws its Lucide icon.
+#
+# Considered, and why a mark is in none (contrast of its published colour against white /
+# against the dark page, and what the owner's page was found to say on 2026-10-05):
+#   x          21.0 / 1.0   about.x.com brand toolkit would not be fetched (HTTP 402); nothing shown
+#   threads    21.0 / 1.0   Meta's Threads page says nothing on colour versions
+#   bitbucket   6.8 / 2.9   Atlassian's page says nothing on colour versions
+#   gitlab      2.9 / 7.0   the trademark page had no usable text; nothing shown
+#   xing        6.9 / 2.9   dev.xing.com/logo_rules is a 404
 # LinkedIn has no mark in Simple Icons any more (removed at its owner's terms, 14.0.0),
 # and none is taken from anywhere else (#654).
 bluesky
@@ -21,3 +32,7 @@ facebook
 instagram
 mastodon
 youtube
+forgejo single-colour https://codeberg.org/forgejo/meta/src/branch/readme/branding/README.md#logo The branding README lists a "Monochrome version of the logo. SVG version uses `currentColor` to inherit the current text colour."; the logo is CC BY-SA 4.0, attribution given in NOTICE.txt
+github single-colour https://brand.github.com/foundations/logo "The Invertocat and our wordmark should only appear in white, black, or in few cases grey or green."
+orcid single-colour https://info.orcid.org/documentation/integration-guide/orcid-id-display-guidelines/ "If a specific level of color contrast is required for accessibility reasons then you can use the high contrast black and white icon or the reversed-out white icon on darker color backgrounds." Any other colourway is forbidden.
+sourcehut single-colour https://sourcehut.org/logo/ The page publishes the logo in black and in white, and releases it as CC0 ("A circle is not copyrightable. But, if you insist, you may consider these CC-0."); trademark rights are not waived, so it is shown to identify SourceHut only
