@@ -122,6 +122,22 @@ def test_a_page_costs_the_same_with_ten_times_the_data(client, user, what, name,
     )
 
 
+def test_the_tag_list_costs_the_same_with_ten_times_the_tags(client, user):
+    """The page counted each tag's applications on its own (#554)."""
+    client.force_login(user)
+    url = reverse("applications:tag_list")
+
+    for index in range(3):
+        Tag.objects.create(owner=user, name=f"small {index}")
+    small = cost(client, url)
+
+    for index in range(30):
+        Tag.objects.create(owner=user, name=f"large {index}")
+    large = cost(client, url)
+
+    assert large == small, f"{small} queries for 3 tags and {large} for 33"
+
+
 def test_the_api_lists_cost_the_same_with_ten_times_the_data(client, user):
     from postulo.api.models import ApiToken
 

@@ -1264,6 +1264,10 @@ class TagListView(OwnedObjectMixin, ListView):
     template_name = "applications/tag_list.html"
     context_object_name = "tags"
 
+    def get_queryset(self):
+        # The count is annotated, not asked of each tag in the template (#554).
+        return super().get_queryset().annotate(application_count=Count("applications"))
+
 
 class TagCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):
     model = Tag
