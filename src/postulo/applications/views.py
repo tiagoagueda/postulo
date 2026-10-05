@@ -718,11 +718,6 @@ class ApplicationStatusView(OwnedObjectMixin, View):
 
         if wants_a_detail_fragment(request):
             return detail_fragments(request, application, target="status-card")
-        if request.htmx:
-            application.refresh_from_db()
-            return render(
-                request, "applications/partials/application_row.html", {"application": application}
-            )
         return redirect(safe_next(request, application.get_absolute_url()))
 
 
@@ -745,9 +740,9 @@ def moved_on_the_board(request) -> bool:
     return table.shape == "board"
 
 
-#: What the detail page's forms name as their swap target. The list page posts to the
-#: same status view and wants a table row, so the two are told apart by what they asked
-#: for rather than by a flag the caller has to remember to set (#257).
+#: What the detail page's forms name as their swap target. A request that names any
+#: other target (the list, the board and the dashboard post plainly) gets the ordinary
+#: redirect, told apart by what it asked for rather than by a flag (#257, #402).
 DETAIL_TARGETS = ("status-card", "event-form", "reminders")
 
 

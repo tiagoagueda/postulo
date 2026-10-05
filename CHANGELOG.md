@@ -73,6 +73,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Who an interview is with now reads as one translatable phrase with its own list separator, on the interview list and the application page, instead of a bare "with" and a hard-coded comma (#627)
 - The API tokens page now translates the name placeholder and lists each token's scopes as translated sentences, one per item, instead of raw keys like "captures, read". (#432)
 - The Tags page counts each tag's applications in one query instead of one per tag, so it no longer gets slower as a person keeps more tags. (#554)
+- A status change posted with htmx at a table row now redirects as a plain post does, instead of answering an empty row that no page asked for (#402)
 
 ## [0.4.0] — 2026-10-04
 

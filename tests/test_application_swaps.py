@@ -72,8 +72,9 @@ def test_the_status_card_comes_back_showing_the_new_status(client, user, applica
     assert f'value="{Status.OFFER}" selected' in page or f'"{Status.OFFER}" selected' in page
 
 
-def test_the_list_page_still_gets_its_row(client, user, application):
-    """The same view answers both, and told apart by what was asked for rather than a flag."""
+def test_a_status_post_aimed_at_a_table_row_gets_the_ordinary_redirect(client, user, application):
+    """No page swaps a row in place: a request naming any other target is answered as a
+    plain post, not with a row that has no cells (#402)."""
     client.force_login(user)
 
     response = client.post(
@@ -82,9 +83,10 @@ def test_the_list_page_still_gets_its_row(client, user, application):
         **{**HTMX, "HTTP_HX_TARGET": f"application-{application.pk}"},
     )
 
-    page = response.content.decode()
-    assert f'id="application-{application.pk}"' in page
-    assert 'id="status-card"' not in page
+    assert response.status_code == 302
+    assert response["Location"] == application.get_absolute_url()
+    application.refresh_from_db()
+    assert application.status == Status.INTERVIEWING
 
 
 def test_without_the_script_a_status_change_redirects_as_it_always_did(client, user, application):
