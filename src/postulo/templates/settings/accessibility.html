@@ -9,8 +9,9 @@
       {% translate "What changes how Postulo behaves for you. Everything here works from the keyboard, with a screen reader and with scripts off; these are the choices on top of that." %}
       </c-slot>
     </c-page-title>
+    {% if save_as_you_go %}{% include "settings/_save_status.html" %}{% endif %}
 
-    <form method="post" novalidate>
+    <form method="post" novalidate{% if save_as_you_go %} data-save-as-you-go data-save-url="{{ save_as_you_go.url }}" data-save-fields="{{ save_as_you_go.fields }}" data-stamp="{{ save_as_you_go.stamp }}"{% endif %}>
       {% csrf_token %}
       <div class="card mb-6">
         <c-section-title>{% translate "Your career" %}</c-section-title>
@@ -43,6 +44,14 @@
            underline it regardless (#289). {% endcomment %}
         <c-section-title>{% translate "Navigation" %}</c-section-title>
         <c-field :field="form.nav_underline" />
+      </div>
+
+      <div class="card mb-6">
+        {% comment %} Whether the Appearance and Accessibility pages save a field when it changes
+           instead of at the foot of the page (#656). Here, and not itself saved as it changes:
+           turning it on changes how the page behaves, which is worth a *Save* and a new page. {% endcomment %}
+        <c-section-title>{% translate "Saving" %}</c-section-title>
+        <c-field :field="form.save_as_you_go" />
       </div>
 
       <button type="submit" class="btn">{% translate "Save" %}</button>

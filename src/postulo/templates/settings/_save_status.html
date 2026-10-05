@@ -1,0 +1,11 @@
+{% load i18n %}
+{% comment %} Where a page that saves a field as it changes says what it is doing (#656), beside the
+   heading and in a live region, so that a write nobody pressed a button for is still said: *Saving…*,
+   *Saved at 14:03*, or *Not saved*, the reason being under the field. It is on the page from the
+   start and empty, because a live region is announced for what is put into it and not for being
+   drawn. `app.js` writes it; the words it needs that the server does not send are here, so they
+   are translated with the page. Save stays below, for the keyboard, for scripts off, and for the
+   person who wants to say when. {% endcomment %}
+<p class="mb-4 text-sm text-ink-500 dark:text-ink-400" role="status" data-save-status
+   data-saving="{% translate "Saving…" %}"
+   data-offline="{% translate "Not saved: Postulo could not be reached. Press Save when it can." %}"></p>

@@ -11,13 +11,19 @@ from __future__ import annotations
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404, JsonResponse
 from django.shortcuts import redirect
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
+from django.utils.formats import time_format
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo.core import site
+from postulo.core.cells import STALE, moved_on, one_field_form
 
 from . import addresses, passkeys, sso
 from .forms import (
@@ -57,14 +63,34 @@ class SettingsSectionMixin(LoginRequiredMixin):
 
 class ProfileSectionView(SettingsSectionMixin, UpdateView):
     model = Profile
+    #: The name this section answers to in `SAVE_AS_YOU_GO`, when its form can save a field
+    #: as it changes (#656).
+    section = ""
 
     def get_object(self, queryset=None) -> Profile:
         profile, _created = Profile.objects.get_or_create(user=self.request.user)
         return profile
 
+    def get_context_data(self, **kwargs):
+        """What the page needs to save a field as it changes, when the person has asked.
+
+        Nothing at all otherwise, so the form is the form it always was: the form says
+        whether it *can*, and this person says whether it *does*.
+        """
+        context = super().get_context_data(**kwargs)
+        fields = getattr(self.form_class, "save_as_you_go_fields", ())
+        if self.section and fields and self.object.save_as_you_go:
+            context["save_as_you_go"] = {
+                "url": reverse("settings:save_field", args=[self.section, "__name__"]),
+                "fields": " ".join(fields),
+                "stamp": self.object.updated_at.isoformat(),
+            }
+        return context
+
 
 class AppearanceView(ProfileSectionView):
     form_class = AppearanceForm
+    section = "appearance"
     template_name = "settings/appearance.html"
     section_title = _("Appearance")
 
@@ -121,8 +147,77 @@ class AppearanceView(ProfileSectionView):
 
 class AccessibilityView(ProfileSectionView):
     form_class = AccessibilityForm
+    section = "accessibility"
     template_name = "settings/accessibility.html"
     section_title = _("Accessibility")
+
+
+#: The sections whose form can save one field at a time, by the name in the address (#656).
+#: What each form lets through is its own `save_as_you_go_fields`; a field not on that list
+#: cannot be named, whatever the address says.
+SAVE_AS_YOU_GO = {"appearance": AppearanceForm, "accessibility": AccessibilityForm}
+
+
+class SaveFieldView(LoginRequiredMixin, View):
+    """One field of a Settings form, saved as it changes (#656).
+
+    Built from the cell's machinery (`core.cells`): the page's own form narrowed to one
+    field, so a field refuses what the page refuses, in the same words, and a save whose
+    stamp has moved is refused with the cell's sentence. The record is the signed-in
+    person's own profile and nothing in the address names it, so there is no other
+    account's to reach; what the address does name -- a section and a field -- is looked up
+    in the forms' own lists and is a 404 when it is not on one.
+
+    **Never for a person who has not asked.** A person who has not turned it on has the form
+    as it was, and a request that says otherwise is a 404 rather than a write nobody expects.
+    The answer is JSON: whether it saved, a sentence for the live region, the new stamp, and
+    the refusal drawn by the same feedback partial the page uses.
+    """
+
+    def post(self, request, section: str, name: str):
+        form_class = SAVE_AS_YOU_GO.get(section)
+        if form_class is None or name not in form_class.save_as_you_go_fields:
+            raise Http404("That field is not saved as it changes.")
+        profile, _created = Profile.objects.get_or_create(user=request.user)
+        if not profile.save_as_you_go:
+            raise Http404("Saving as you go is not switched on.")
+
+        if moved_on(profile, request.POST.get("stamp", "")):
+            # What it says now, put back in the field with the cell's sentence beside it.
+            profile.refresh_from_db()
+            current = getattr(profile, name)
+            shown = {} if current is False or current is None else {name: current}
+            form = one_field_form(Profile, form_class, name, profile, shown, alone=True)
+            form.is_valid()
+            form.add_error(name, STALE)
+            return self._answer(request, form, name, saved=False, value=current, code=409)
+
+        form = one_field_form(Profile, form_class, name, profile, request.POST, alone=True)
+        if not form.is_valid():
+            return self._answer(request, form, name, saved=False, code=422)
+        form.save()
+        return self._answer(request, form, name, saved=True)
+
+    def _answer(self, request, form, name, *, saved, code=200, **more):
+        field = form[name]
+        if field.errors:
+            field.field.widget.attrs["aria-invalid"] = "true"
+        stamp = Profile.objects.get(pk=form.instance.pk).updated_at
+        said = gettext("Saved at %(time)s") % {
+            "time": time_format(timezone.localtime(), "TIME_FORMAT")
+        }
+        body = {
+            "saved": saved,
+            "status": said if saved else gettext("Not saved"),
+            "stamp": stamp.isoformat(),
+            "feedback": (
+                render_to_string("settings/save_feedback.html", {"field": field}, request=request)
+                if field.errors
+                else ""
+            ),
+            **more,
+        }
+        return JsonResponse(body, status=code)
 
 
 class LocaleView(ProfileSectionView):

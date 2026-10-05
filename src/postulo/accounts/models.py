@@ -463,6 +463,12 @@ class Profile(models.Model):
     keep_page_rendering = models.BooleanField(
         _("keep a rendering of a captured page"), default=False
     )
+    #: Whether a change to a field on a Settings page is saved as it is made, instead of at
+    #: the foot of the page (#656). Off, so *Save* stays the moment of decision for anybody
+    #: who has not said otherwise; a form says whether it *can* (`data-save-as-you-go`) and
+    #: this says whether it *does*. Saving the field, not the form, is the only "draft" an
+    #: existing record needs.
+    save_as_you_go = models.BooleanField(_("save as I go"), default=False)
     #: How each table is laid out — which columns, in what order, how many rows a page
     #: holds — keyed by the table's name. A preference, so it follows the account.
     table_settings = models.JSONField(_("table settings"), default=dict, blank=True)

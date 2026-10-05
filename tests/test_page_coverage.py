@@ -171,6 +171,10 @@ EXCUSED: dict[str, str] = {
         "a POST that forgets the places remembered for one site; the button is on "
         "Settings → Capture, which is visited with a site listed (#267)"
     ),
+    "settings:save_field": (
+        "a POST that saves one field of Settings → Appearance or Accessibility as it changes; "
+        "the pages that draw those forms are visited (#656)"
+    ),
     "listings:shortlist": "a POST from the listings table",
     "listings:discard": "a POST from the listings table",
     "listings:restore": "a POST that brings a discarded listing back",

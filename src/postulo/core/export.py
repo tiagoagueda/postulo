@@ -107,7 +107,8 @@ logger = logging.getLogger(__name__)
 #: 38 added ``identifier_order`` and ``hidden_identifiers`` on the profile: which identifier
 #: schemes the person sees and in what order, read back through the same filter as the
 #: navigation's pair (#672).
-FORMAT_VERSION = 38
+#: 39 added ``save_as_you_go`` to the profile: a preference, so a restore keeps it (#656).
+FORMAT_VERSION = 39
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -196,6 +197,7 @@ PROFILE_FIELDS = (
     "keep_page_source",
     "keep_page_rendering",
     "closing_notice_days",
+    "save_as_you_go",
 )
 #: What the candidate document takes from the profile: what a CV prints, and the language
 #: the career is written in, which its translations are translations *from*. Everything

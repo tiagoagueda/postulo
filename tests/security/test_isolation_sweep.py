@@ -58,6 +58,11 @@ EXCUSED: dict[str, str] = {
     "core:table_settings": "a table's name in the address, and the settings are the caller's",
     "core:table_views": "a table's name in the address, and the views are the caller's",
     "resume:item_create": "a section's name in the address, and no record",
+    "settings:save_field": (
+        "a section and a field in the address, and no record: it always writes the "
+        "signed-in person's own profile; tests/security/test_save_as_you_go.py asks for "
+        "another account's and for a field no form lists (#656)"
+    ),
 }
 
 

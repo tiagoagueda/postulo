@@ -9,8 +9,9 @@
       {% translate "The switch at the top right cycles through the same three; this is the explicit version." %}
       </c-slot>
     </c-page-title>
+    {% if save_as_you_go %}{% include "settings/_save_status.html" %}{% endif %}
 
-    <form method="post" novalidate>
+    <form method="post" novalidate{% if save_as_you_go %} data-save-as-you-go data-save-url="{{ save_as_you_go.url }}" data-save-fields="{{ save_as_you_go.fields }}" data-stamp="{{ save_as_you_go.stamp }}"{% endif %}>
       {% csrf_token %}
       {% comment %} The form's default button, first so that it is the one Enter presses in the
          two number boxes below (#299). The navigation's arrows are submit buttons of this form

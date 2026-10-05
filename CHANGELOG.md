@@ -46,6 +46,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The company map is a feature an administrator can switch off under *Server settings → Plugins*: off, the map page, its button and the guessing of a location's place go, and every stored coordinate stays for when it is back on. (#700)
 - Key caps now sit beside *Save and next*, *Discard and next*, *Skip to the next* and the search box, and *Settings → Accessibility* has a switch for them apart from the one for the keys; the controls name their key to screen readers either way. (#658)
 - Settings → Appearance lets you choose which identifier schemes are shown and in what order, on a company's page, in *Your details*, in the companies table's column list and in a CV's choice of rows; hidden ones are counted, never deleted. (#672)
+- *Settings → Accessibility* can save a field on *Appearance* and *Accessibility* as it changes, with the result said beside the heading; off by default, and *Save* stays. (#656)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 
 ### 🐛 Fixed

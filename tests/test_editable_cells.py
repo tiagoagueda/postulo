@@ -183,12 +183,12 @@ def test_the_cell_cannot_save_what_the_page_would_refuse(client, user):
     """`modelform_factory` over the page's own form, so every clean_ method comes with it."""
     import inspect
 
-    from postulo.core.cells import EditableCellView
+    from postulo.core.cells import EditableCellView, one_field_form
 
-    source = inspect.getsource(EditableCellView.form_for)
-
-    assert "modelform_factory" in source
-    assert "form=self.form_class" in source
+    assert "form=form_class" in inspect.getsource(one_field_form)
+    assert "modelform_factory" in inspect.getsource(one_field_form)
+    # The one-field form is shared with Settings (#656); the cell hands it the page's form.
+    assert "self.form_class" in inspect.getsource(EditableCellView.form_for)
 
 
 def test_somebody_elses_company_is_a_404(client, user, other_user):

@@ -71,6 +71,37 @@ from django.views import View
 STALE = _("Somebody else changed this while you were editing. This is what it says now.")
 
 
+def one_field_form(model, form_class, name, instance, data=None, *, alone=False, **kwargs):
+    """The page's own form, narrowed to one field of one instance.
+
+    What a table cell edits is one field of a row; what a Settings page saves as it goes
+    (#656) is one field of a person's profile. Both are this: `modelform_factory` keeps the
+    base form's ``clean_`` methods, labels and widgets, so a field refuses exactly what its
+    page refuses, in the same words.
+
+    ``alone`` also drops the fields the base form *declares* rather than takes from the
+    model -- a list the page assembles from several inputs, say -- which narrowing the model
+    fields does not reach and which a one-field post would otherwise read as empty.
+    """
+    narrowed = modelform_factory(model, form=form_class, fields=[name])
+    form = narrowed(data=data, instance=instance, **kwargs)
+    if alone:
+        for other in [key for key in form.fields if key != name]:
+            del form.fields[other]
+    return form
+
+
+def moved_on(obj, stamp: str) -> bool:
+    """Whether the row changed since the form was drawn.
+
+    A missing or unreadable stamp is treated as *not moved*: refusing every save because a
+    browser sent something odd would be a worse failure than the one this prevents.
+    """
+    held = getattr(obj, "updated_at", None)
+    seen = parse_datetime(stamp) if stamp else None
+    return bool(held and seen and held.replace(microsecond=0) > seen.replace(microsecond=0))
+
+
 class EditableCellView(View):
     """One cell: drawn, edited, saved, or refused.
 
@@ -112,8 +143,14 @@ class EditableCellView(View):
         `modelform_factory` keeps the base form's ``clean_`` methods and its widgets, so a
         cell refuses exactly what the page refuses, in the same words.
         """
-        narrowed = modelform_factory(self.model, form=self.form_class, fields=[column.editable])
-        return narrowed(data=data, instance=instance, user=self.request.user)
+        return one_field_form(
+            self.model,
+            self.form_class,
+            column.editable,
+            instance,
+            data,
+            user=self.request.user,
+        )
 
     def form_url(self, obj) -> str:
         """Where the pencil points when there is no script to open an editor.
@@ -185,11 +222,5 @@ class EditableCellView(View):
 
     @staticmethod
     def moved_on(obj, stamp: str) -> bool:
-        """Whether the row changed since the editor was drawn.
-
-        A missing or unreadable stamp is treated as *not moved*: refusing every save because
-        a browser sent something odd would be a worse failure than the one this prevents.
-        """
-        held = getattr(obj, "updated_at", None)
-        seen = parse_datetime(stamp) if stamp else None
-        return bool(held and seen and held.replace(microsecond=0) > seen.replace(microsecond=0))
+        """Whether the row changed since the editor was drawn (see `moved_on`)."""
+        return moved_on(obj, stamp)

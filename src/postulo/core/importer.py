@@ -96,6 +96,7 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "keep_page_source",
         "keep_page_rendering",
         "closing_notice_days",
+        "save_as_you_go",
         # The personal details (#679, #680): each held to its column's own rule, the one the
         # form, the API and the candidate file are held to, and a value it refuses is left
         # out and said in the report (`_PERSONAL_FIELDS`).

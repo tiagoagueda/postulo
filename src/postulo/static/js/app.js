@@ -1719,6 +1719,14 @@
     if (autosubmitControl(field)) {
       return;
     }
+    // On a form that saves a field as it changes (#656), a field that saves is unsaved until
+    // it has, and the guard asks only while one is: the field is marked, and the form is
+    // told whether anything *else* in it is outstanding, which only *Save* can settle.
+    if (savesAsItGoes(field)) {
+      field.dataset.unsaved = "1";
+    } else if (form.hasAttribute("data-save-as-you-go")) {
+      form.dataset.dirtyOther = "1";
+    }
     form.dataset.dirty = "1";
   }
 
@@ -1781,6 +1789,199 @@
     // what older engines act on, and a browser that wants neither ignores both.
     event.preventDefault();
     event.returnValue = "";
+  });
+
+  /* ------------------------------------------------ saving a field as it is changed (#656)
+   *
+   * A form marked `data-save-as-you-go` is on a page whose person asked for it: the server
+   * draws the attribute only then. A field it names in `data-save-fields` is sent on its own
+   * to `data-save-url` when it *changes* -- blur for text, at once for a box or a choice,
+   * never on a keystroke -- and the page says what happened in the live region beside its
+   * heading: *Saving…*, *Saved at 14:03*, or *Not saved* with the reason under the field,
+   * drawn by the server through the feedback partial the page uses everywhere.
+   *
+   * A select commits as `data-autosubmit` decides (#227): arrowing through a closed one
+   * fires `change` at every step, so a choice made with the keyboard is saved on Enter, on
+   * Tab or when focus leaves, and one made with the pointer at once.
+   *
+   * Saves of one form go one after another, because each answer carries the stamp the next
+   * must send. The guard follows: a field that saved is not unsaved, one that failed or is
+   * in flight is. With scripts off none of this exists and the form is what it always was,
+   * with *Save* below.
+   */
+  function saveForm(node) {
+    return node && node.closest ? node.closest("form[data-save-as-you-go]") : null;
+  }
+
+  function savesAsItGoes(field) {
+    var form = saveForm(field);
+    if (!form || !field.name) {
+      return false;
+    }
+    return (form.dataset.saveFields || "").split(" ").indexOf(field.name) !== -1;
+  }
+
+  function saveStatusBox(form) {
+    return form.parentNode && form.parentNode.querySelector("[data-save-status]");
+  }
+
+  function saveStatus(form, text) {
+    var status = saveStatusBox(form);
+    if (status) {
+      status.textContent = text;
+    }
+  }
+
+  function saveControls(field) {
+    var controls = field.form.elements[field.name];
+    return controls && controls.length !== undefined && !controls.tagName
+      ? Array.prototype.slice.call(controls)
+      : [field];
+  }
+
+  function saveFieldBox(field) {
+    var box = field.closest(".field");
+    if (!box) {
+      var group = field.closest("fieldset");
+      box = group && group.querySelector(".field");
+    }
+    return box;
+  }
+
+  function showSaveFeedback(field, html, refused) {
+    var box = saveFieldBox(field);
+    var errorId = "id_" + field.name + "_error";
+    var old = document.getElementById(errorId);
+    if (old) {
+      old.parentNode.removeChild(old);
+    }
+    saveControls(field).forEach(function (control) {
+      var ids = (control.getAttribute("aria-describedby") || "").split(" ").filter(function (id) {
+        return id && id !== errorId;
+      });
+      if (refused) {
+        control.setAttribute("aria-invalid", "true");
+        ids.push(errorId);
+      } else {
+        control.removeAttribute("aria-invalid");
+      }
+      if (ids.length) {
+        control.setAttribute("aria-describedby", ids.join(" "));
+      } else {
+        control.removeAttribute("aria-describedby");
+      }
+    });
+    if (!box) {
+      return;
+    }
+    if (refused) {
+      box.insertAdjacentHTML("beforeend", html);
+      box.setAttribute("data-invalid", "true");
+    } else {
+      box.removeAttribute("data-invalid");
+    }
+  }
+
+  function putBack(field, value) {
+    saveControls(field).forEach(function (control) {
+      if (control.type === "checkbox") {
+        control.checked = Boolean(value);
+      } else if (control.type === "radio") {
+        control.checked = control.value === String(value);
+      } else {
+        control.value = value;
+      }
+    });
+  }
+
+  function settleGuard(form) {
+    if (!form.querySelector("[data-unsaved]") && !form.dataset.dirtyOther) {
+      delete form.dataset.dirty;
+    }
+  }
+
+  function sendField(field) {
+    var form = field.form;
+    var sent = new FormData(form);
+    var body = new URLSearchParams();
+    body.append("csrfmiddlewaretoken", sent.get("csrfmiddlewaretoken") || "");
+    sent.getAll(field.name).forEach(function (value) {
+      body.append(field.name, value);
+    });
+    body.append("stamp", form.dataset.stamp || "");
+    return fetch(form.dataset.saveUrl.replace("__name__", encodeURIComponent(field.name)), {
+      method: "POST",
+      credentials: "same-origin",
+      headers: { "X-Requested-With": "XMLHttpRequest", Accept: "application/json" },
+      body: body
+    })
+      .then(function (response) {
+        return response.json();
+      })
+      .then(function (answer) {
+        if (answer.stamp) {
+          form.dataset.stamp = answer.stamp;
+        }
+        if (answer.saved) {
+          delete field.dataset.unsaved;
+          showSaveFeedback(field, "", false);
+          saveStatus(form, answer.status);
+          settleGuard(form);
+          return;
+        }
+        if (Object.prototype.hasOwnProperty.call(answer, "value")) {
+          // Somebody else changed it: the field says what it says now, which is saved.
+          putBack(field, answer.value);
+          delete field.dataset.unsaved;
+          settleGuard(form);
+        }
+        showSaveFeedback(field, answer.feedback || "", true);
+        saveStatus(form, answer.status);
+      })
+      .catch(function () {
+        var status = saveStatusBox(form);
+        saveStatus(form, status ? status.dataset.offline : "");
+      });
+  }
+
+  function queueSave(field) {
+    var form = field.form;
+    var status = saveStatusBox(form);
+    saveStatus(form, status ? status.dataset.saving : "");
+    form.saveQueue = (form.saveQueue || Promise.resolve()).then(function () {
+      return sendField(field);
+    });
+  }
+
+  document.addEventListener("keydown", function (event) {
+    var field = event.target;
+    if (!savesAsItGoes(field) || field.tagName !== "SELECT" || event.isComposing) {
+      return;
+    }
+    if (event.key === "Enter") {
+      if (field.dataset.saveChoosing) {
+        delete field.dataset.saveChoosing;
+        queueSave(field);
+        event.preventDefault();
+      }
+    } else if (!event.ctrlKey && !event.metaKey && !event.altKey && event.key !== "Tab") {
+      field.dataset.saveChoosing = "1";
+    }
+  });
+
+  document.addEventListener("change", function (event) {
+    var field = event.target;
+    if (savesAsItGoes(field) && !field.dataset.saveChoosing) {
+      queueSave(field);
+    }
+  });
+
+  document.addEventListener("focusout", function (event) {
+    var field = event.target;
+    if (savesAsItGoes(field) && field.dataset.saveChoosing) {
+      delete field.dataset.saveChoosing;
+      queueSave(field);
+    }
   });
 
   window.addEventListener("pageshow", function () {

@@ -992,16 +992,38 @@ class AccessibilityForm(forms.ModelForm):
     at level A (#227). The third is the first one filed here on purpose (#289).
     """
 
+    #: The fields that can be saved as they change (#656). Not the switch itself: turning it
+    #: on changes how the page behaves, which is the one change worth a reload and a *Save*.
+    save_as_you_go_fields = (
+        "show_career_order",
+        "keyboard_shortcuts",
+        "show_key_hints",
+        "nav_underline",
+    )
+
     class Meta:
         model = Profile
-        fields = ("show_career_order", "keyboard_shortcuts", "show_key_hints", "nav_underline")
+        fields = (
+            "show_career_order",
+            "keyboard_shortcuts",
+            "show_key_hints",
+            "nav_underline",
+            "save_as_you_go",
+        )
         labels = {
+            "save_as_you_go": _("Save a change as soon as I make it"),
             "show_career_order": _("Show the order number on each career entry"),
             "keyboard_shortcuts": _("Let a single key do something"),
             "show_key_hints": _("Show the keys beside the controls that have one"),
             "nav_underline": _("Underline the page you are on"),
         }
         help_texts = {
+            "save_as_you_go": _(
+                "On the Appearance and Accessibility pages, a field is saved when you leave "
+                "it or choose a value, and the page says so beside its heading. A wrong "
+                "change is saved too, so change it back. Save stays on the page for when "
+                "you want to say when."
+            ),
             "show_career_order": _(
                 "The arrows on Your career move an entry past its neighbour. If you cannot "
                 "use them, or would rather type a number, each entry's form shows its place "
@@ -1128,6 +1150,10 @@ class AppearanceForm(forms.ModelForm):
     #: The same, for the identifier list.
     ident_moved: tuple[str, str] | None = None
 
+    #: The fields that can be saved as they change (#656). Not the navigation, which is a
+    #: list changed row by row and moved with arrows: it is saved whole, by *Save*.
+    save_as_you_go_fields = ("theme", "density", "quiet_after_days", "closing_notice_days")
+
     class Meta:
         model = Profile
         fields = ("theme", "density", "quiet_after_days", "closing_notice_days")
@@ -1151,8 +1177,10 @@ class AppearanceForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Left blank, either threshold goes back to its default rather than refusing to save.
-        self.fields["quiet_after_days"].required = False
-        self.fields["closing_notice_days"].required = False
+        # Not every field is here when one is saved on its own (#656).
+        for name in ("quiet_after_days", "closing_notice_days"):
+            if name in self.fields:
+                self.fields[name].required = False
 
         from postulo.core import navigation
 
@@ -1236,6 +1264,11 @@ class AppearanceForm(forms.ModelForm):
         placed, and nothing at all for the default order (`navigation.to_store`).
         """
         from postulo.core import navigation
+
+        if "navigation" not in self.fields:
+            # One field saved on its own (#656): the list was not sent, and reading its
+            # absence as *nothing shown* would hide the whole navigation.
+            return super().save(commit)
 
         profile = super().save(commit=False)
         shown = set(self.cleaned_data.get("navigation") or [])
