@@ -426,3 +426,23 @@ def test_a_long_list_is_cut_short_in_the_announcement(user, company):
     quiet.announce_quiet_applications()
     body = mail.outbox[-1].body
     assert "and 2 more" in body and body.count(" at Aperture Science") == 5
+
+
+def test_the_quiet_pass_costs_the_same_however_many_applications_one_owner_has(user, company):
+    """The owners are asked for once each, not once per application (#400)."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    sent(user, company, days_ago=60, title="One")
+    sent(user, company, days_ago=55, title="Two")
+
+    def cost():
+        quiet.announce_quiet_applications()
+        # Everything is stamped now, so what is left is the per-owner question itself.
+        with CaptureQueriesContext(connection) as queries:
+            quiet.announce_quiet_applications()
+        return len(queries)
+
+    two = cost()
+    sent(user, company, days_ago=50, title="Three")
+    assert cost() == two

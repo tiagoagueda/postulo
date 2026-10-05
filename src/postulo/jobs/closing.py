@@ -87,6 +87,7 @@ def announce_closing_postings(at=None) -> tuple[int, int]:
     owners = (
         JobPosting.objects.filter(owner__is_active=True, closes_at__gte=earliest)
         .values_list("owner", flat=True)
+        .order_by()  # the default ordering would ride into the DISTINCT and give a row per listing
         .distinct()
     )
     stamped = 0

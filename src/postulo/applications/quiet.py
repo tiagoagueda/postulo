@@ -69,8 +69,12 @@ def announce_quiet_applications(at=None) -> tuple[int, int]:
     not repeated every pass. Returns (applications stamped, deliveries made).
     """
     now = at or timezone.now()
+    # No ordering, or the default one rides into the DISTINCT and gives a row per application.
     owners = (
-        Application.objects.filter(owner__is_active=True).values_list("owner", flat=True).distinct()
+        Application.objects.filter(owner__is_active=True)
+        .values_list("owner", flat=True)
+        .order_by()
+        .distinct()
     )
     stamped = 0
     delivered = 0

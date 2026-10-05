@@ -697,3 +697,27 @@ def test_the_feed_a_calendar_can_subscribe_to_carries_the_dates_too(client, user
     response = client.get("/api/v1/interviews/calendar.ics", HTTP_AUTHORIZATION=f"Bearer {raw}")
 
     assert f"DTSTART;VALUE=DATE:{day:%Y%m%d}" in response.content.decode()
+
+
+def test_the_closing_pass_costs_the_same_however_many_listings_one_owner_has(user, company):
+    """The owners are asked for once each, not once per listing (#400)."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    tomorrow = timezone.localdate() + dt.timedelta(1)
+
+    def listing(title):
+        JobPosting.objects.create(owner=user, company=company, title=title, closes_at=tomorrow)
+
+    def cost():
+        closing.announce_closing_postings()
+        # Everything is stamped now, so what is left is the per-owner question itself.
+        with CaptureQueriesContext(connection) as queries:
+            closing.announce_closing_postings()
+        return len(queries)
+
+    listing("One")
+    listing("Two")
+    two = cost()
+    listing("Three")
+    assert cost() == two
