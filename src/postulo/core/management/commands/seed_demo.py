@@ -273,6 +273,20 @@ def _seed_link(holder, owner, kind: str, url: str) -> None:
         save_only_link(holder, owner, kind, url)
 
 
+def _seed_messaging(holder, owner, service: str, handle: str) -> None:
+    """Give a seeded holder its one handle on a messaging service, where it has none."""
+    from postulo.core import messaging_handles
+
+    if not holder.messaging_handles.exists():
+        messaging_handles.add_handles(
+            holder,
+            owner,
+            messaging_handles.checked_rows(
+                [{"service": service, "handle": handle, "is_primary": True}]
+            ),
+        )
+
+
 def _seed_phone(holder, owner, number: str) -> None:
     """Give a seeded holder its primary number, skipping one already on this instance."""
     from postulo.core.phone_numbers import save_only_number, taken_elsewhere
@@ -384,6 +398,7 @@ class Command(BaseCommand):
         _seed_link(profile, user, "website", "https://alexmorgan.example")
         _seed_link(profile, user, "social", "https://www.linkedin.com/in/alex-morgan-example")
         _seed_link(profile, user, "repository", "https://source.example/alexmorgan")
+        _seed_messaging(profile, user, "matrix", "@alex:example.org")
 
         # ---- career ----------------------------------------------------------
         experiences = [

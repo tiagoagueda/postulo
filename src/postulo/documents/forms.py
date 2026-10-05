@@ -192,7 +192,9 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
                 label=detail.label,
                 required=False,
                 choices=[
-                    (Prints.DEFAULT.value, detail.follow),
+                    # A kind whose default prints nothing has *none* and no second way of
+                    # saying it (#682).
+                    *(((Prints.DEFAULT.value, detail.follow),) if detail.follows else ()),
                     *((str(row.pk), printing.name_of(row, detail.key)) for row in rows),
                     (Prints.NONE.value, detail.none),
                 ],
@@ -313,10 +315,10 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         from . import printing
 
         if not self.instance.pk:
-            return Prints.DEFAULT.value
+            return Prints.DEFAULT.value if detail.follows else Prints.NONE.value
         answer = getattr(self.instance, detail.choice_field)
         if answer != Prints.CHOSEN:
-            return answer
+            return answer if detail.follows or answer != Prints.DEFAULT else Prints.NONE.value
         row = printing.pinned(self.instance, detail)
         return str(row.pk) if row is not None else Prints.NONE.value
 
@@ -364,7 +366,9 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
                 continue
             try:
                 if raw in (Prints.DEFAULT, Prints.NONE):
-                    printing.choose(self.instance, detail.key, raw, owner=owner)
+                    # *None* of a kind that prints nothing by default is the default.
+                    answer = raw if detail.follows else Prints.DEFAULT
+                    printing.choose(self.instance, detail.key, answer, owner=owner)
                 else:
                     printing.choose(self.instance, detail.key, Prints.CHOSEN, int(raw), owner=owner)
             except (printing.NotOffered, ValueError):

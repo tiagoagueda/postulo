@@ -101,8 +101,24 @@ def furnished(applicant):
 
     company = Company.objects.create(owner=applicant, name="Aperture Science", location="Cambridge")
     company.industries.set(Industry.named(applicant, ["Research"]))
-    Contact.objects.create(owner=applicant, company=company, name="Cave Johnson", role="CEO")
-    # In Markdown, so the walk reads the rendered block in both themes (#665).
+    cave = Contact.objects.create(owner=applicant, company=company, name="Cave Johnson", role="CEO")
+    # Handles on messaging services, on the person and on a contact, so that the new block
+    # is walked with a row in it, an *Other* one included (#682).
+    from postulo.core.models import MessagingHandle
+
+    for holder, service, label, handle, primary in (
+        (applicant.profile, "matrix", "", "@alex:example.org", True),
+        (applicant.profile, "", "Our IRC", "alex on #aperture", False),
+        (cave, "signal", "", "cave.42", True),
+    ):
+        MessagingHandle.objects.create(
+            owner=applicant,
+            holder=holder,
+            service=service,
+            label=label,
+            handle=handle,
+            is_primary=primary,
+        )
     JobPosting.objects.create(
         owner=applicant,
         company=company,
@@ -838,6 +854,7 @@ def a_candidate_file(path: Path) -> Path:
                     {"kind": "home", "street": "Rua do Exemplo 1", "country": "PT"}
                 ],
                 "web_links": [{"kind": "website", "url": "https://alex.example.org"}],
+                "messaging_handles": [{"service": "matrix", "handle": "@alex:example.org"}],
             },
             "identifiers": [{"scheme": "orcid", "value": "0000-0002-1825-0097"}],
         },

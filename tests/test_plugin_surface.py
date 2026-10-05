@@ -130,6 +130,10 @@ REACHING_PAST: dict[str, dict[str, str]] = {
     # the surface, because a package installed beside Postulo may add services of its own
     # (#305). The table Postulo ships is written the way that package would write it.
     "link_services": {},
+    # And the registry of messaging services, and the feature that governs messaging
+    # handles, which is a declaration and nothing else (#682).
+    "messaging_services": {},
+    "messaging_contacts": {},
     "builtin": {},
     "phone_numbers": {},
     "email_addresses": {},
@@ -276,6 +280,8 @@ def test_the_plugins_that_hold_no_data_need_only_the_surface():
     # And a third: a registry of link services is a table, built from one name on the
     # surface (#305).
     assert reaching("postulo.plugins.link_services") == {SURFACE}
+    assert reaching("postulo.plugins.messaging_services") == {SURFACE}
+    assert reaching("postulo.plugins.messaging_contacts") == {SURFACE}
 
 
 def test_no_plugin_postulo_ships_reaches_for_a_model():

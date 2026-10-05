@@ -12,7 +12,7 @@ import re
 import pytest
 from django.urls import reverse
 
-from postulo.core.models import PhoneNumber, PostalAddress, WebLink
+from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 
 pytestmark = pytest.mark.django_db
@@ -35,6 +35,9 @@ def test_every_entry_points_at_a_part_of_the_page(client, user):
     WebLink.objects.create(
         owner=user, holder=profile, kind="website", url="https://alex.example", is_primary=True
     )
+    MessagingHandle.objects.create(
+        owner=user, holder=profile, service="matrix", handle="@alex:example.org", is_primary=True
+    )
     client.force_login(user)
 
     html = client.get(reverse("accounts:profile")).content.decode()
@@ -49,6 +52,7 @@ def test_every_entry_points_at_a_part_of_the_page(client, user):
         "section-links-repository",
         "section-links-website",
         "section-phones",
+        "section-messaging",
         "section-addresses",
         "section-identifiers",
     }
@@ -56,6 +60,7 @@ def test_every_entry_points_at_a_part_of_the_page(client, user):
         assert f'id="{anchor}"' in html, f"{anchor} is offered and not on the page"
     assert nav["section-phones"] == "2"
     assert nav["section-addresses"] == "1"
+    assert nav["section-messaging"] == "1"
     assert nav["section-links-website"] == "1"
     assert nav["section-links-social"] == "0", (
         "listed all the same: that is how you learn it exists"

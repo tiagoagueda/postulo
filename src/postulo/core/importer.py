@@ -472,6 +472,20 @@ def _link_rows(entry: dict) -> list[dict]:
     return [row for row in rows if (row.get("url") or "").strip() and row.get("kind") in KINDS]
 
 
+def _messaging_rows(entry: dict) -> list[dict]:
+    """Take the messaging handles out of a record. Format 34 is the first to write any; the
+    key is removed from ``entry`` because what remains is passed straight to a model that
+    has no such field (#682)."""
+    from postulo.core.messaging_handles import MAX_PER_HOLDER
+
+    rows = entry.pop("messaging_handles", None)
+    if not isinstance(rows, list):
+        return []
+    # A file with thousands of them is not a person's contact details: the first few are
+    # kept and the rest are not read.
+    return [row for row in rows[:MAX_PER_HOLDER] if isinstance(row, dict)]
+
+
 def _held(model, holder):
     """The rows of ``model`` this holder already has: none, for a contact made a moment ago."""
     from django.contrib.contenttypes.models import ContentType
@@ -528,6 +542,50 @@ def _restore_web_links(holder, owner, rows: list[dict], report=None) -> None:
             service=service,
             label=label,
             url=url,
+            is_primary=is_primary,
+        )
+
+
+def _restore_messaging_handles(holder, owner, rows: list[dict], report=None) -> None:
+    """Recreate a holder's messaging handles (#682).
+
+    The service is a claim, as a link's is: kept where this instance offers it and the
+    handle is one of its handles, and *Other* -- named by the key the file carried --
+    otherwise. No row is refused for its service. What the holder already has comes first:
+    the primary it has stays the primary, and a handle it already holds is not made twice.
+    """
+    from postulo.core import messaging_handles
+    from postulo.core.models import MessagingHandle
+
+    held = _held(MessagingHandle, holder)
+    primary_taken = held.filter(is_primary=True).exists()
+    seen: set[tuple[str, str]] = {(row.service, row.comparable) for row in held}
+    for row in rows:
+        settled = messaging_handles.read_from_a_file(row)
+        if settled is None:
+            _skipped(report, "messaging handle", str(row.get("handle") or ""), "could not be read.")
+            continue
+        key = (
+            settled["service"],
+            MessagingHandle.fold(settled["service"], settled["label"], settled["handle"]),
+        )
+        if key in seen:
+            _skipped(
+                report,
+                "messaging handle",
+                settled["handle"],
+                "is already among your details, and was not added again.",
+            )
+            continue
+        seen.add(key)
+        is_primary = settled["is_primary"] and not primary_taken
+        primary_taken = primary_taken or is_primary
+        MessagingHandle.objects.create(
+            owner=owner,
+            holder=holder,
+            service=settled["service"],
+            label=settled["label"],
+            handle=settled["handle"],
             is_primary=is_primary,
         )
 
@@ -710,6 +768,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     numbers = _phone_rows(profile_data)
     addresses = _address_rows(profile_data)
     links = _link_rows(profile_data)
+    handles = _messaging_rows(profile_data)
     profile = getattr(user, "profile", None)
     if profile and profile_data:
         for name, value in profile_data.items():
@@ -729,6 +788,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         _restore_phone_numbers(profile, user, numbers, report, "on the profile")
         _restore_postal_addresses(profile, user, addresses, report)
         _restore_web_links(profile, user, links, report)
+        _restore_messaging_handles(profile, user, handles, report)
     for row in account.get("identifiers") or []:
         scheme = (row.get("scheme") or "").strip()
         value = (row.get("value") or "").strip()
@@ -924,6 +984,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         numbers = _phone_rows(entry)
         contact_addresses = _address_rows(entry)
         contact_links = _link_rows(entry)
+        contact_handles = _messaging_rows(entry)
         department_name = (entry.pop("department", "") or "").strip()[:120]
         contact = Contact.objects.create(
             owner=user, company=company, **_carried(entry, CONTACT_FIELDS, report, "A contact")
@@ -940,6 +1001,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         _restore_phone_numbers(contact, user, numbers, report, f"on the contact “{contact.name}”")
         _restore_postal_addresses(contact, user, contact_addresses, report)
         _restore_web_links(contact, user, contact_links, report)
+        _restore_messaging_handles(contact, user, contact_handles, report)
         contacts[old_id] = contact
 
     # The reminders about no application, which format 31 is the first to carry (#334).

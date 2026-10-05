@@ -420,8 +420,9 @@ def test_a_contact_s_details_and_rows_are_two_columns_each_with_the_measure(clie
 
 
 def test_with_every_row_switched_off_a_contact_is_one_column(client, furnished):  # noqa: F811
-    """No telephone numbers and no kind of link: nothing to put in a second column, so there
-    is none, and the details keep their measure on their own (#320)."""
+    """No telephone numbers, no messaging handles and no kind of link: nothing to put in a
+    second column, so there is none, and the details keep their measure on their own (#320)."""
+    from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
     from postulo.plugins.models import PluginPolicy
     from postulo.plugins.phone_numbers import PHONE_NUMBERS
     from postulo.plugins.repositories import REPOSITORIES
@@ -429,7 +430,7 @@ def test_with_every_row_switched_off_a_contact_is_one_column(client, furnished):
     from postulo.plugins.websites import WEBSITES
 
     person = furnished["applicant"]
-    for plugin in (PHONE_NUMBERS, SOCIAL_PROFILES, REPOSITORIES, WEBSITES):
+    for plugin in (PHONE_NUMBERS, SOCIAL_PROFILES, REPOSITORIES, WEBSITES, MESSAGING_CONTACTS):
         PluginPolicy.objects.create(
             plugin=plugin, person=person, state=PluginPolicy.State.FORCED_OFF
         )

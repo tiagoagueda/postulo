@@ -50,6 +50,9 @@ record; the plugin never says whose history it writes.
 **A web link is on a service now (#305)**, and the list of services is a registry a plugin
 may add to: `LinkService` is one entry, `LinkServicePlugin` what holds them, and
 `link_service_of` the read a plugin makes of a link it was handed.
+
+**A messaging handle is on a service too (#682)**, a registry of its own: `MessagingService`
+is one entry, `MessagingServicePlugin` what holds them, `messaging_service_of` the read.
 """
 
 from __future__ import annotations
@@ -83,6 +86,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.languages import well_formed as is_language_tag
     from postulo.core.link_services import Service as LinkService
     from postulo.core.link_services import find as link_service_of
+    from postulo.core.messaging_services import Service as MessagingService
+    from postulo.core.messaging_services import find as messaging_service_of
     from postulo.core.models import OwnedModel, OwnedQuerySet
     from postulo.core.phone_numbers import primary_for as primary_phone_number
     from postulo.core.phone_numbers import save_only_number as save_phone_number
@@ -133,6 +138,7 @@ from .base import (
     JobPostingData,
     LinkServicePlugin,
     Manifest,
+    MessagingServicePlugin,
     OutboxPlugin,
     SourcePlugin,
     StorePlugin,
@@ -180,6 +186,8 @@ __all__ = [
     "LinkService",
     "LinkServicePlugin",
     "Manifest",
+    "MessagingService",
+    "MessagingServicePlugin",
     "Notification",
     "NotifierPlugin",
     "OutboxPlugin",
@@ -215,6 +223,7 @@ __all__ = [
     "link_service_of",
     "manifest_of",
     "medium_of",
+    "messaging_service_of",
     "phone_number_is_taken",
     "place_of",
     "primary_phone_number",
@@ -307,6 +316,14 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # nothing installed knows.
     "LinkService": ("postulo.core.link_services", "Service"),
     "link_service_of": ("postulo.core.link_services", "find"),
+    # ------------------------------------------- the service a messaging handle is on (#682)
+    # Matrix, XMPP, Signal, an IRC network: a handle's `service` is a key into a registry a
+    # `messaging-service` plugin adds entries to. `MessagingService` is one entry -- a key,
+    # a name, the pattern a handle has there, how it is normalised, an icon and an example
+    # -- and holds no model, so a plugin builds its table at import. `messaging_service_of`
+    # reads one back by key, or `None` for *Other* and for a key nothing installed knows.
+    "MessagingService": ("postulo.core.messaging_services", "Service"),
+    "messaging_service_of": ("postulo.core.messaging_services", "find"),
     # ------------------------------------------------------------------- calendar text
     # RFC 5545 for one interview, written the way Postulo's own feed writes it, so an event
     # pushed to somebody's calendar by a plugin and one they subscribed to are the same

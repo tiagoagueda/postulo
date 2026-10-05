@@ -129,6 +129,26 @@ def test_a_latin_name_keeps_its_own_direction(live_server, page: Page, right_to_
     assert page.locator("html").get_attribute("dir") == "rtl"
 
 
+def test_a_handle_keeps_its_own_direction_in_a_right_to_left_page(
+    live_server, page: Page, right_to_left
+):
+    """A handle is Latin text with an @, a colon and dots in it, and typed beside Arabic
+    words it must read in the order it was written (#682): on the company page it sits in a
+    `<bdi>`, and in the box on *Your details* the text is left to right whatever the page."""
+    base = live_server.url
+    sign_in(page, base)
+
+    page.goto(f"{base}/accounts/profile/")
+    box = page.locator("#section-messaging input[name$='-handle']").first
+    expect(box).to_have_value("@alex:example.org")
+    assert page.locator("html").get_attribute("dir") == "rtl"
+    assert box.evaluate("(box) => getComputedStyle(box).direction") == "ltr"
+
+    page.goto(f"{base}/jobs/companies/{right_to_left['company'].pk}/")
+    handle = page.locator("bdi", has_text="cave.42")
+    expect(handle).to_be_visible()
+
+
 @pytest.mark.parametrize("placed_by", ["anchor", "script"])
 def test_a_menu_opens_from_its_triggers_reading_end(
     live_server, page: Page, right_to_left, placed_by

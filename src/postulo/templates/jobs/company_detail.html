@@ -270,6 +270,12 @@
                         </p>
                       {% endif %}
                     {% endfor %}
+                    {% if messaging_offered %}{% for handle in contact.messaging_handles.all %}
+                      <p class="truncate text-xs text-ink-500 dark:text-ink-400">
+                        <span class="text-ink-400 dark:text-ink-500">{{ handle.service_label }}</span>
+                        <bdi>{{ handle.handle }}</bdi>
+                      </p>
+                    {% endfor %}{% endif %}
                     {% comment %} Somebody else in the record has this name or this address
                        (#239). Said here because a person has no page of their own to say
                        it on; the link is to the page that shows who, and what a merge

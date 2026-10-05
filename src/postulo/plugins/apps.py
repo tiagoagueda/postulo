@@ -17,6 +17,7 @@ class PluginsConfig(AppConfig):
         from .identifiers import Identifiers
         from .installing import activate
         from .link_services import LinkServices
+        from .messaging_services import MessagingServices
         from .registry import (
             load_everything,
             register_builtin,
@@ -30,6 +31,8 @@ class PluginsConfig(AppConfig):
         register_builtin("identifier", Identifiers)
         # And the registry of the services a web link can be on, for the same reason (#305).
         register_builtin("link-service", LinkServices)
+        # And the services a messaging handle can be on, the same way (#682).
+        register_builtin("messaging-service", MessagingServices)
         register_builtin_locales()
         register_builtin_themes()
         # And now import what is installed, so a plugin that will not load says so in the

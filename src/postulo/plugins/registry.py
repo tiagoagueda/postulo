@@ -37,6 +37,7 @@ from .base import (
     IDENTIFIER_GROUP,
     IMPORTER_GROUP,
     LINK_SERVICE_GROUP,
+    MESSAGING_SERVICE_GROUP,
     TRANSPORT_GROUP,
     ConnectedPlugin,
     FeaturePlugin,
@@ -44,6 +45,7 @@ from .base import (
     ImporterPlugin,
     JobPostingData,
     LinkServicePlugin,
+    MessagingServicePlugin,
     SourcePlugin,
     TransportPlugin,
 )
@@ -79,6 +81,7 @@ GROUPS = {
     "feature": FEATURE_GROUP,
     "identifier": IDENTIFIER_GROUP,
     "link-service": LINK_SERVICE_GROUP,
+    "messaging-service": MESSAGING_SERVICE_GROUP,
     **CONNECTED_KINDS,
 }
 
@@ -106,6 +109,7 @@ def _protocol_for(kind: str):
         "feature": FeaturePlugin,
         "identifier": IdentifierPlugin,
         "link-service": LinkServicePlugin,
+        "messaging-service": MessagingServicePlugin,
     }.get(kind, ConnectedPlugin)
 
 

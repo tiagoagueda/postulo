@@ -734,6 +734,8 @@ class Contact(OwnedModel):
     #: And for the addresses on the web -- a LinkedIn was one column here until #189, and
     #: a social profile, a repository or a website is a row of one table now.
     web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
+    #: And their handles on messaging services (#682).
+    messaging_handles = GenericRelation("core.MessagingHandle", verbose_name=_("messaging handles"))
     notes = models.TextField(_("notes"), blank=True)
 
     class Meta:

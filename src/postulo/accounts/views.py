@@ -25,7 +25,7 @@ from django.views.generic import CreateView, ListView, UpdateView
 
 from postulo.core.context_processors import theme_switch
 from postulo.core.files import serve_private_file
-from postulo.core.mixins import StaffRequiredMixin, WebLinksMixin
+from postulo.core.mixins import MessagingHandlesMixin, StaffRequiredMixin, WebLinksMixin
 from postulo.core.redirects import safe_next
 
 from . import avatars, deletion, removals
@@ -35,7 +35,7 @@ from .models import Invite, Profile, Theme
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
-class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
+class ProfileView(LoginRequiredMixin, WebLinksMixin, MessagingHandlesMixin, UpdateView):
     """Edit your own details. There is no view of anyone else's.
 
     Out of the request's transaction (#357) so the Gravatar fetch holds no lock: the save is
@@ -135,7 +135,12 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         form = context.get("form")
         if form is not None and form.is_bound and not form.is_valid():
             return True
-        blocks = [context.get("identifiers"), context.get("numbers"), context.get("addresses")]
+        blocks = [
+            context.get("identifiers"),
+            context.get("numbers"),
+            context.get("messaging"),
+            context.get("addresses"),
+        ]
         blocks += list(context.get("links") or [])
         return any(
             block is not None and block.is_bound and not block.is_valid() for block in blocks
@@ -152,6 +157,8 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         numbers = context.get("numbers")
         if numbers is not None:
             found += removals.offer(removals.NUMBER, numbers)
+        if context.get("messaging") is not None:
+            found += removals.offer(removals.MESSAGING, context["messaging"])
         for block in context.get("links") or []:
             found += removals.offer(removals.LINK, block)
         if context.get("addresses") is not None:
@@ -185,6 +192,11 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
             entry("section-personal", _("Personal details")),
             entry("section-contact", _("Contact block")),
         ]
+        messaging = context.get("messaging")
+        if messaging is not None:
+            entries.append(
+                entry("section-messaging", _("Messaging"), removals.saved_count(messaging))
+            )
         for block in context.get("links") or []:
             entries.append(
                 entry(
@@ -215,11 +227,13 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         numbers = self.get_numbers()
         addresses = self.get_addresses()
         links = self.get_web_links()
+        messaging = self.get_messaging()
         invalid = (
             (formset.is_bound and not formset.is_valid())
             or (numbers is not None and numbers.is_bound and not numbers.is_valid())
             or (addresses.is_bound and not addresses.is_valid())
             or self.web_links_invalid(links)
+            or self.messaging_invalid(messaging)
         )
         if invalid:
             return self.render_to_response(
@@ -229,6 +243,7 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
                     numbers=numbers,
                     addresses=addresses,
                     links=links,
+                    messaging=messaging,
                 )
             )
         with transaction.atomic():
@@ -243,6 +258,7 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
                 addresses.instance = self.object
                 addresses.save()
             self.save_web_links(links, self.object)
+            self.save_messaging(messaging, self.object)
         # After the transaction, which is all of this view's writes: waiting on Gravatar
         # must not hold the database's write lock (#357).
         form.fetch_gravatar()

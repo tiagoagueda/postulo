@@ -205,6 +205,38 @@ class WebLinkIn(Schema):
     )
 
 
+class MessagingHandleOut(Schema):
+    service: str = Field(
+        default="",
+        description=(
+            "The service the handle is on, by its key: matrix, xmpp, signal, telegram, "
+            "threema and the others this instance knows. Blank is Other (#682)."
+        ),
+    )
+    label: str = Field(default="", description="What the service is called, for Other")
+    handle: str
+    is_primary: bool = False
+
+
+#: How many messaging handles one contact is handed with: the number a holder may keep
+#: (`core.messaging_handles.MAX_PER_HOLDER`), each checked against a pattern in the request.
+MAX_MESSAGING_HANDLES = 50
+
+
+class MessagingHandleIn(Schema):
+    handle: _line(255, shortest=1) = Field(description="The handle, as the service writes it")
+    service: str = Field(
+        default="",
+        max_length=40,
+        description=(
+            "A service's key, and the handle then has to be one of that service's; 'other' "
+            "or blank for any handle, which then needs a label."
+        ),
+    )
+    label: _LinkNameLine = Field(default="", description="What the service is called, for 'other'")
+    is_primary: bool = Field(default=False, description="The one to use. The first otherwise.")
+
+
 class ContactOut(Schema):
     id: int
     company_id: int
@@ -220,6 +252,7 @@ class ContactOut(Schema):
     #: list, of every kind (#189).
     linkedin_url: str = ""
     web_links: list[WebLinkOut] = Field(default_factory=list)
+    messaging_handles: list[MessagingHandleOut] = Field(default_factory=list)
     notes: str = ""
 
 
@@ -298,6 +331,14 @@ class ContactIn(Schema):
         description=(
             "Social profiles, code repositories and websites, each with its service. "
             "Twenty at most."
+        ),
+    )
+    messaging_handles: list[MessagingHandleIn] = Field(
+        default_factory=list,
+        max_length=MAX_MESSAGING_HANDLES,
+        description=(
+            "How the contact is reached on Matrix, XMPP, Signal, Telegram, Threema or "
+            "another service, each with its service. Fifty at most."
         ),
     )
     notes: str = ""
@@ -795,6 +836,7 @@ class CVPrintsOut(Schema):
     social: CVPrintsOneOut
     repository: CVPrintsOneOut
     website: CVPrintsOneOut
+    messaging: CVPrintsOneOut
     identifiers: CVPrintsIdentifiersOut
     location: bool = Field(
         description="Whether the location is printed: the profile's `printed_location`"
@@ -845,6 +887,7 @@ class CVPrintsIn(Schema):
     social: CVPrintsOneIn | None = None
     repository: CVPrintsOneIn | None = None
     website: CVPrintsOneIn | None = None
+    messaging: CVPrintsOneIn | None = None
     identifiers: CVPrintsIdentifiersIn | None = None
     location: bool | None = None
     form_of_address: bool | None = None
@@ -1382,6 +1425,15 @@ def contact_out(contact) -> dict:
                 "is_primary": row.is_primary,
             }
             for row in contact.web_links.all()
+        ],
+        "messaging_handles": [
+            {
+                "service": row.service,
+                "label": row.label,
+                "handle": row.handle,
+                "is_primary": row.is_primary,
+            }
+            for row in contact.messaging_handles.all()
         ],
         "notes": contact.notes,
     }

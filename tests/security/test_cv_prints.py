@@ -117,7 +117,8 @@ def test_the_page_offers_only_the_owners_own_rows(client, user, cv, theirs, recr
     form = CVForm(user=user, instance=cv)
     for detail in printing.DETAILS:
         offered = [value for value, _label in form.fields[f"prints_{detail.key}"].choices]
-        assert offered == ["default", "none"], detail.key
+        # A kind whose default prints nothing has no second way of saying none (#682).
+        assert offered == (["default", "none"] if detail.follows else ["none"]), detail.key
     assert form.fields["identifier_rows"].choices == []
 
 
@@ -520,3 +521,102 @@ def test_the_api_does_not_echo_a_pointer_at_somebody_elses_row(client, user, cv,
     body = client.get(f"/api/v1/cvs/{cv.pk}", **bearer(user)).json()["prints"]
     assert body["phone"] == {"choice": "chosen", "id": None, "printed": "", "offered": []}
     assert body["identifiers"]["ids"] == [] and body["identifiers"]["printed"] == []
+
+
+# ------------------------------------------------------------ a messaging handle (#682)
+
+THEIR_HANDLE = "@sam-private:example.org"
+
+
+@pytest.fixture
+def their_handle(other_user):
+    from postulo.core.models import MessagingHandle
+
+    return MessagingHandle.objects.create(
+        owner=other_user,
+        holder=other_user.profile,
+        service="matrix",
+        handle=THEIR_HANDLE,
+        is_primary=True,
+    )
+
+
+@pytest.fixture
+def a_contacts_handle(user):
+    """A handle this account recorded for somebody else: owned by it, and not its own."""
+    from postulo.core.models import MessagingHandle
+    from postulo.jobs.models import Company, Contact
+
+    contact = Contact.objects.create(
+        owner=user, company=Company.objects.create(owner=user, name="Aperture"), name="Cave"
+    )
+    return MessagingHandle.objects.create(
+        owner=user, holder=contact, service="xmpp", handle="cave@aperture.example", is_primary=True
+    )
+
+
+def test_another_accounts_handle_cannot_be_pinned_on_the_page(client, user, cv, their_handle):
+    client.force_login(user)
+    response = client.post(
+        reverse("documents:cv_update", args=[cv.pk]), posted(prints_messaging=str(their_handle.pk))
+    )
+
+    assert response.status_code == 200
+    assert "prints_messaging" in response.context["form"].errors
+    assert THEIR_HANDLE not in response.content.decode()
+    untouched(cv)
+    with pytest.raises(printing.NotOffered):
+        printing.choose(cv, "messaging", Prints.CHOSEN, their_handle.pk)
+
+
+def test_a_contacts_handle_is_not_one_of_the_owners_own(client, user, cv, a_contacts_handle):
+    client.force_login(user)
+    response = client.post(
+        reverse("documents:cv_update", args=[cv.pk]),
+        posted(prints_messaging=str(a_contacts_handle.pk)),
+    )
+
+    assert response.status_code == 200
+    assert "prints_messaging" in response.context["form"].errors
+    untouched(cv)
+
+
+def test_the_api_refuses_another_accounts_handle_as_it_refuses_one_that_does_not_exist(
+    client, user, cv, their_handle
+):
+    token = bearer(user, "write")
+    refused = patch(
+        client, cv, {"prints": {"messaging": {"choice": "chosen", "id": their_handle.pk}}}, **token
+    )
+    missing = patch(
+        client, cv, {"prints": {"messaging": {"choice": "chosen", "id": 987654321}}}, **token
+    )
+
+    assert refused.status_code == missing.status_code == 422
+    assert refused.json()["detail"] == missing.json()["detail"], "one answer for both"
+    assert THEIR_HANDLE not in refused.content.decode()
+    untouched(cv)
+
+
+def test_an_id_that_reached_the_column_another_way_prints_nothing(
+    user, cv, their_handle, a_contacts_handle
+):
+    for row in (their_handle, a_contacts_handle):
+        CV.objects.filter(pk=cv.pk).update(messaging_choice="chosen", pinned_messaging=row)
+        loaded = CV.objects.get(pk=cv.pk)
+        assert rendering.contact_details(user, loaded)["messaging"] == ""
+        html = rendering.render_cv_html(loaded) + rendering.cv_text(loaded)
+        assert THEIR_HANDLE not in html and "cave@aperture.example" not in html
+
+
+def test_the_list_offers_only_the_callers_own_handles(client, user, cv, their_handle):
+    from postulo.core.models import MessagingHandle
+
+    own = MessagingHandle.objects.create(
+        owner=user, holder=user.profile, service="signal", handle="mine.42"
+    )
+    response = client.get(f"/api/v1/cvs/{cv.pk}", **bearer(user, "read"))
+
+    offered = response.json()["prints"]["messaging"]["offered"]
+    assert [one["id"] for one in offered] == [own.pk]
+    assert THEIR_HANDLE not in response.content.decode()

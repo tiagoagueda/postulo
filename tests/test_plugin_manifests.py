@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_twenty_one_of_them_across_nine_kinds():
+def test_there_are_twenty_three_of_them_across_ten_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -164,13 +164,16 @@ def test_there_are_twenty_one_of_them_across_nine_kinds():
 
     `link-services` is the other vocabulary, and a kind of its own: the services a web link
     can be on, which a package installed beside Postulo may add to (#305).
+
+    `messaging-services` is the same for a messaging handle (#682), and `messaging-contacts`
+    governs whether a person and their contacts may hold handles at all.
     """
     found = {
         manifest_of(plugin_class()).name
         for classes in registry.builtins().values()
         for plugin_class in classes
     }
-    assert len(registry.builtins()) == 9, sorted(registry.builtins())
+    assert len(registry.builtins()) == 10, sorted(registry.builtins())
 
     assert found == {
         "board",
@@ -192,6 +195,8 @@ def test_there_are_twenty_one_of_them_across_nine_kinds():
         "websites",
         "identifiers",
         "link-services",
+        "messaging-contacts",
+        "messaging-services",
         "gdpr",
         "maps",
     }

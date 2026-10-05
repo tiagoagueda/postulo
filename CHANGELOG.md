@@ -48,6 +48,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Settings → Appearance lets you choose which identifier schemes are shown and in what order, on a company's page, in *Your details*, in the companies table's column list and in a CV's choice of rows; hidden ones are counted, never deleted. (#672)
 - *Settings → Accessibility* can save a field on *Appearance* and *Accessibility* as it changes, with the result said beside the heading; off by default, and *Save* stays. (#656)
 - A listing's description can be written in Markdown (lists, links, emphasis, quotes, headings), chosen per listing, drawn and sanitised on the server; the API and archive carry `description_format`. (#665)
+- Messaging handles, several per person and per contact, each checked against its service (Matrix, XMPP, Signal, Telegram, Threema or Other): a Messaging block on Your details and on a contact, kept in the archive, the API and a merge, never printed on a CV unless chosen; plugins can add services. (#682)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 
 ### 🐛 Fixed

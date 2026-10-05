@@ -148,3 +148,68 @@ def test_a_duplicate_company_name_is_refused_for_one_account_only(db, user, othe
 
     assert not mine.is_valid(), "matching loosely stops Acme, acme and ACME piling up"
     assert theirs.is_valid()
+
+
+# ------------------------------------------------------------ messaging handles (#682)
+
+
+def test_another_accounts_handles_are_not_found_not_offered_and_not_touched(
+    client, user, their_data, other_user
+):
+    """A contact's handles are the account's own: the page of somebody else's contact is a
+    404, and a row of theirs named in a post to one of mine is neither read nor changed."""
+    from postulo.core.models import MessagingHandle
+
+    theirs = MessagingHandle.objects.create(
+        owner=other_user,
+        holder=their_data["contact"],
+        service="matrix",
+        handle="@secret:umbrella.example",
+        is_primary=True,
+    )
+    mine = Contact.objects.create(
+        owner=user, company=Company.objects.create(owner=user, name="Mine"), name="Mine"
+    )
+    client.force_login(user)
+
+    assert (
+        client.get(reverse("jobs:contact_update", args=[their_data["contact"].pk])).status_code
+        == 404
+    )
+    assert (
+        client.post(
+            reverse("jobs:contact_update", args=[their_data["contact"].pk]),
+            {"name": "Taken", "messaging-TOTAL_FORMS": "0", "messaging-INITIAL_FORMS": "0"},
+        ).status_code
+        == 404
+    )
+    page = client.get(reverse("jobs:contact_update", args=[mine.pk])).content.decode()
+    assert "@secret:umbrella.example" not in page
+
+    response = client.post(
+        reverse("jobs:contact_update", args=[mine.pk]),
+        {
+            "name": "Mine",
+            "role": "",
+            "company": mine.company_id,
+            "email": "",
+            "notes": "",
+            "messaging-TOTAL_FORMS": "1",
+            "messaging-INITIAL_FORMS": "1",
+            "messaging-MIN_NUM_FORMS": "0",
+            "messaging-MAX_NUM_FORMS": "1000",
+            "messaging-0-id": str(theirs.pk),
+            "messaging-0-service": "matrix",
+            "messaging-0-handle": "@taken-over:mine.example",
+            "messaging-0-DELETE": "on",
+        },
+    )
+
+    assert response.status_code in (200, 302)
+    theirs.refresh_from_db()
+    assert (theirs.handle, theirs.owner, theirs.object_id) == (
+        "@secret:umbrella.example",
+        other_user,
+        their_data["contact"].pk,
+    )
+    assert not mine.messaging_handles.exists(), "nothing of theirs was moved to mine either"

@@ -760,6 +760,115 @@ class WebLink(OwnedModel):
         return link_services.brand_for(self.service, self.kind)
 
 
+class MessagingHandle(OwnedModel):
+    """How somebody is reached on a messaging service: a person's or a contact's (#682).
+
+    Matrix, XMPP, Signal, Telegram, Threema, or whatever else: a **handle** the service gave
+    them, and not an address on the web -- which is why this is not a fourth kind of
+    :class:`WebLink`. A generic relation, for the reason :class:`PhoneNumber` gives, and the
+    same holders: a profile and a contact, with the cascade written on the relation.
+
+    **The service is a key into a registry plugins supply** (``core.messaging_services``),
+    as a link's is (#305): no list of brands in a migration, and a key nothing knows any more
+    reads as *Other* instead of failing. Blank is *Other*, which keeps a ``label`` -- the name
+    of the service, in the person's words -- and takes any text for a handle. Under a named
+    service the handle has been normalised and checked where it was taken in; the model
+    stores what it is given, so that nothing already stored is refused in retrospect.
+
+    **Never a way back in.** A number is unique across the instance and may be verified and
+    made the recovery number, because a number is a way into an account (#142, #144). A handle
+    is none of that: unique per holder, service and folded form, never verified, never
+    recovery. Refusing a second holder would disclose that somebody else here has the same
+    handle (``docs/THREAT-MODEL.md``), exactly as it would for a web link or an address.
+
+    **One primary per holder**, by a partial unique index, as the numbers have.
+
+    **Never opened or built into a link.** Postulo shows the handle as text; a
+    ``matrix.to`` or ``t.me`` link is a third party's page, and Postulo never opens or
+    builds one nobody asked for.
+    """
+
+    content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
+    object_id = models.PositiveBigIntegerField()
+    holder = GenericForeignKey("content_type", "object_id")
+
+    #: Not ``choices``, for the reason ``WebLink.service`` is not. As long as
+    #: `core.messaging_services.MAX_KEY_LENGTH`, written out because a migration reads it.
+    service = models.CharField(_("service"), max_length=40, blank=True)
+    label = models.CharField(
+        _("name"),
+        max_length=60,
+        blank=True,
+        help_text=_("What the service is called, when it is not one in the list."),
+    )
+    handle = models.CharField(_("handle"), max_length=255)
+    is_primary = models.BooleanField(_("primary"), default=False)
+    #: What the uniqueness constraint compares: the handle folded, with the name in front of
+    #: it under *Other*, where two networks may share a handle. Written by `save`, never by
+    #: a form: a value a constraint depends on cannot be somebody's to type.
+    comparable = models.CharField(max_length=330, blank=True)
+
+    class Meta:
+        verbose_name = _("messaging handle")
+        verbose_name_plural = _("messaging handles")
+        ordering = ("-is_primary", "created_at", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("content_type", "object_id"),
+                condition=Q(is_primary=True),
+                name="one_primary_messaging_handle_per_holder",
+            ),
+            models.UniqueConstraint(
+                fields=("content_type", "object_id", "service", "comparable"),
+                name="messaging_handle_unique_per_holder_and_service",
+            ),
+        ]
+        indexes = [models.Index(fields=("content_type", "object_id"))]
+
+    def __str__(self) -> str:
+        return self.display
+
+    def save(self, *args, **kwargs):
+        self.handle = (self.handle or "").strip()
+        self.label = (self.label or "").strip()
+        self.comparable = self.fold(self.service, self.label, self.handle)
+        update_fields = kwargs.get("update_fields")
+        if update_fields is not None and "comparable" not in update_fields:
+            kwargs["update_fields"] = [*update_fields, "comparable"]
+        return super().save(*args, **kwargs)
+
+    @staticmethod
+    def fold(service: str, label: str, handle: str) -> str:
+        """The form two spellings of one handle agree in."""
+        from postulo.core.messaging_services import comparable
+
+        if service:
+            return comparable(handle)
+        return comparable(label) + "\x1f" + comparable(handle)
+
+    @property
+    def service_label(self) -> str:
+        """The service's name in words: what the row says under *Other*, or the *Other* of a
+        row with none, or with one that no installed plugin knows any more."""
+        from postulo.core import messaging_services
+
+        if messaging_services.find(self.service) is None and self.label:
+            return self.label
+        return messaging_services.label_for(self.service)
+
+    @property
+    def display(self) -> str:
+        """What to print for it: the service and the handle, "Matrix @alex:example.org"."""
+        return f"{self.service_label} {self.handle}".strip()
+
+    @property
+    def icon(self) -> str:
+        """The Lucide icon the row draws: its service's, or the generic one for *Other*."""
+        from postulo.core import messaging_services
+
+        return messaging_services.icon_for(self.service)
+
+
 class ErrandState(models.TextChoices):
     """Where a piece of slow work stands. Four words, and only four."""
 

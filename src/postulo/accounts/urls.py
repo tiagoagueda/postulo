@@ -24,6 +24,11 @@ urlpatterns = [
         name="remove_link",
     ),
     path(
+        "profile/messaging/<int:pk>/remove/",
+        views.RemoveRowView.as_view(kind=removals.MESSAGING),
+        name="remove_messaging",
+    ),
+    path(
         "profile/addresses/<int:pk>/remove/",
         views.RemoveRowView.as_view(kind=removals.ADDRESS),
         name="remove_address",

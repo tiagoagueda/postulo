@@ -110,7 +110,11 @@ logger = logging.getLogger(__name__)
 #: 39 added ``save_as_you_go`` to the profile: a preference, so a restore keeps it (#656).
 #: 40 added ``description_format`` on a listing, *plain* or *markdown*; an archive without
 #: it restores every description as plain text, as it was written (#665).
-FORMAT_VERSION = 40
+#: 41 added ``messaging_handles`` on the profile and on each contact: how somebody is
+#: reached on Matrix, XMPP, Signal, Telegram, Threema or another service, each with its
+#: ``service`` key (blank for *Other*), its ``label``, its ``handle`` and whether it is
+#: the primary; an archive without them restores none (#682).
+FORMAT_VERSION = 41
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -141,7 +145,10 @@ FORMAT_VERSION = 40
 #: no list (#680).
 #: 7 added ``gender`` on the profile, read back as the form of address is: filled where blank,
 #: kept where not (#681).
-CANDIDATE_FORMAT = 7
+#: 8 added ``messaging_handles`` on the profile, read back as a
+#: claim as a link's service is: a handle is kept under the service the importing side
+#: knows and the handle is one of its handles, and under *Other* otherwise (#682).
+CANDIDATE_FORMAT = 8
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -252,6 +259,8 @@ CONTACT_FIELDS = ("id", "name", "role", "email", "notes")
 #: What one telephone number is, in the file. Every number a holder has, in order, with
 #: the primary marked -- not the primary alone.
 PHONE_NUMBER_FIELDS = ("kind", "label", "number", "is_primary", "verified_at", "is_recovery")
+#: A messaging handle has no verification either, and is never a way back in (#682).
+MESSAGING_FIELDS = ("service", "label", "handle", "is_primary")
 #: An address has no verification and is never a way back in, so it carries neither: it
 #: is the parts, and which one is primary (#92).
 POSTAL_ADDRESS_FIELDS = (
@@ -531,6 +540,12 @@ def _web_links(holder) -> list[dict]:
     return [_fields(row, WEB_LINK_FIELDS) for row in holder.web_links.all()]
 
 
+def _messaging_handles(holder) -> list[dict]:
+    """Every handle this holder has. Same rule as the numbers above: what is recorded, not
+    what the interface is showing."""
+    return [_fields(row, MESSAGING_FIELDS) for row in holder.messaging_handles.all()]
+
+
 def _profile_block(profile, names: tuple[str, ...] = PROFILE_FIELDS) -> dict:
     """The profile and the rows that hang off it, or nothing for an account without one.
 
@@ -546,6 +561,7 @@ def _profile_block(profile, names: tuple[str, ...] = PROFILE_FIELDS) -> dict:
         "phone_numbers": _phone_numbers(profile),
         "postal_addresses": _postal_addresses(profile),
         "web_links": _web_links(profile),
+        "messaging_handles": _messaging_handles(profile),
     }
 
 
@@ -596,6 +612,7 @@ def _contact(contact) -> dict:
         "phone_numbers": _phone_numbers(contact),
         "postal_addresses": _postal_addresses(contact),
         "web_links": _web_links(contact),
+        "messaging_handles": _messaging_handles(contact),
     }
 
 
@@ -1021,7 +1038,13 @@ def candidate_counts(user) -> dict[str, int]:
         .count()
     )
     profile = Profile.objects.filter(user=user).first()
-    for key in ("phone_numbers", "postal_addresses", "web_links", "identifiers"):
+    for key in (
+        "phone_numbers",
+        "postal_addresses",
+        "web_links",
+        "messaging_handles",
+        "identifiers",
+    ):
         found[key] = getattr(profile, key).count() if profile else 0
     return found
 

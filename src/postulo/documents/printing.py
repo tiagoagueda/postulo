@@ -83,6 +83,10 @@ class Detail:
     not_yours: str
     #: The kind of `core.WebLink`, for the three that are links.
     link_kind: str = ""
+    #: Whether the default follows something the profile marks. A messaging handle does
+    #: not: it is not printed because it was added (the promise of #308, kept by #682), so
+    #: the answer is *none* or *chosen*, and a CV nobody touched prints what it always did.
+    follows: bool = True
 
     @property
     def choice_field(self) -> str:
@@ -148,6 +152,18 @@ DETAILS: tuple[Detail, ...] = (
         not_yours=_("%(field)s is not one of your websites."),
         link_kind="website",
     ),
+    Detail(
+        key="messaging",
+        label=_("Messaging handle"),
+        follow=_("No messaging handle"),
+        none=_("No messaging handle"),
+        gone=_(
+            "The messaging handle chosen for this CV is no longer in your details, so it "
+            "prints none."
+        ),
+        not_yours=_("%(field)s is not one of your messaging handles."),
+        follows=False,
+    ),
 )
 
 #: The same, by key.
@@ -207,6 +223,10 @@ def offered(owner, key: str) -> list:
         # In the order the person arranged the schemes in (#672). Every row is offered,
         # switched off or not: hiding is for drawing summaries, and a CV's choice is its own.
         return identifier_order.arranged(profile.identifiers.all(), profile)
+    if key == "messaging":
+        from postulo.core import messaging_handles
+
+        return messaging_handles.handles_for(profile, owner)
     from postulo.core import web_links
 
     return web_links.links_for(profile, owner, BY_KEY[key].link_kind)
@@ -246,6 +266,8 @@ def value_of(row, key: str) -> str:
         return row.number
     if key == "email":
         return row.email
+    if key == "messaging":
+        return row.display
     return row.url
 
 
@@ -261,6 +283,8 @@ def name_of(row, key: str) -> str:
         return row.email
     if key == "identifiers":
         return f"{row.display_label}: {row.value}"
+    if key == "messaging":
+        return row.display
     return f"{row.url} ({row.label})" if row.label else row.url
 
 
@@ -301,6 +325,8 @@ class Printed:
     social: str = ""
     repository: str = ""
     website: str = ""
+    #: A messaging handle, printed only where the CV chose one (#682).
+    messaging: str = ""
     identifiers: list = field(default_factory=list)
     location: str = ""
     form_of_address: str = ""
@@ -522,6 +548,8 @@ def reference(row, key: str) -> dict:
         return {"number": row.number}
     if key == "email":
         return {"email": row.email}
+    if key == "messaging":
+        return {"service": row.service, "label": row.label, "handle": row.handle}
     if key == "identifiers":
         named = {"scheme": row.scheme, "value": row.value}
         if row.scheme == OTHER:
@@ -542,6 +570,12 @@ def _matches(row, key: str, named: dict) -> bool:
         return bool(said("number")) and row.number == said("number")
     if key == "email":
         return bool(said("email")) and row.email.casefold() == said("email").casefold()
+    if key == "messaging":
+        return bool(said("handle")) and (row.service, row.label, row.handle) == (
+            said("service"),
+            said("label"),
+            said("handle"),
+        )
     if key == "identifiers":
         scheme, name = as_restored(said("scheme"), subject=PERSON, value=said("value"))
         if scheme != said("scheme"):

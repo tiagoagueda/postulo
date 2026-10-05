@@ -650,3 +650,64 @@ def test_a_list_of_nationalities_of_the_wrong_type_too_long_or_unknown_stores_no
 def test_a_file_cannot_hold_a_thousand_nationalities_in_a_session(user):
     held = candidate.read(a_file(account={"profile": {"nationalities": ["PT"] * 5000}}))
     assert len(held["details"]["nationalities"]) <= 11
+
+
+# ------------------------------------------------------------ messaging handles (#682)
+
+
+def test_too_many_handles_are_read_so_far_and_no_further():
+    rows = [{"service": "telegram", "handle": f"person_{n:04d}"} for n in range(200)]
+
+    held = candidate.read(a_file(account={"profile": {"messaging_handles": rows}}))
+
+    assert len(held["messaging_handles"]) == candidate.MAX_CONTACT_ROWS
+    assert held["cut"] == {"messaging_handles": 200}
+
+
+def test_a_handle_that_is_malformed_is_refused_in_the_plan_and_never_raises(user):
+    rows = [
+        "a string",
+        {"service": "matrix", "handle": 7},
+        {"service": ["matrix"], "handle": "@a:example.org"},
+        {"service": "matrix", "handle": None},
+        {"service": "matrix", "handle": "x" * 5000},
+        {"service": "matrix", "handle": "@ok:example.org"},
+    ]
+    held = candidate.read(a_file(account={"profile": {"messaging_handles": rows}}))
+
+    drawn = candidate.plan(user, held)
+    candidate.apply(user, held)
+
+    outcomes = [row.outcome for section in drawn.sections for row in section.rows]
+    assert candidate.ADD in outcomes and candidate.REFUSED in outcomes
+    kept = [row.handle for row in user.profile.messaging_handles.all()]
+    assert "@ok:example.org" in kept and all(len(handle) <= 255 for handle in kept)
+
+
+def test_whose_a_handle_is_is_never_the_files_to_say(user, other_user):
+    from postulo.core.models import MessagingHandle
+
+    somebody_else = {
+        "owner": other_user.pk,
+        "owner_id": other_user.pk,
+        "user_id": other_user.pk,
+        "object_id": other_user.profile.pk,
+        "content_type": 1,
+        "is_recovery": True,
+        "verified_at": "2026-01-01T00:00:00Z",
+        "comparable": "taken",
+    }
+    data = a_file(
+        account={
+            "profile": {
+                "messaging_handles": [{"service": "matrix", "handle": "@a:b.c", **somebody_else}]
+            }
+        }
+    )
+
+    candidate.apply(user, candidate.read(data))
+
+    row = MessagingHandle.objects.get()
+    assert (row.owner, row.holder) == (user, user.profile)
+    assert row.comparable == "@a:b.c"
+    assert not MessagingHandle.objects.for_user(other_user).exists()

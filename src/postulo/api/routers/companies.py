@@ -131,7 +131,7 @@ def patch_company(request, pk: int, payload: CompanyPatch):
 def add_contact(request, pk: int, payload: ContactIn):
     from django.core.exceptions import ValidationError
 
-    from postulo.core import phone_numbers, phones, web_links
+    from postulo.core import messaging_handles, phone_numbers, phones, web_links
 
     company = _detail(request, pk)
     fields = payload.dict()
@@ -149,6 +149,11 @@ def add_contact(request, pk: int, payload: ContactIn):
     # that service's addresses, and a refusal leaves no contact behind it.
     try:
         links = web_links.checked_rows(links)
+    except ValidationError as exc:
+        raise HttpError(422, "; ".join(exc.messages)) from exc
+    handles = list(fields.pop("messaging_handles", None) or [])
+    try:
+        handles = messaging_handles.checked_rows(handles)
     except ValidationError as exc:
         raise HttpError(422, "; ".join(exc.messages)) from exc
     # One number in the payload, as there has always been, written to the row that holds
@@ -179,4 +184,5 @@ def add_contact(request, pk: int, payload: ContactIn):
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)
     web_links.add_links(contact, request.auth.owner, links)
+    messaging_handles.add_handles(contact, request.auth.owner, handles)
     return Status(201, contact_out(contact))

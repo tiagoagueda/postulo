@@ -127,7 +127,7 @@ def test_the_tag_draws_the_icons_a_template_asks_for_once_each():
 def kinds() -> dict[str, dict[str, str]]:
     """Every table of kinds to icons, by what it is for."""
     from postulo.applications.models import STATUS_ICONS
-    from postulo.core import identifiers, link_services, phone_numbers, postal
+    from postulo.core import identifiers, link_services, messaging_services, phone_numbers, postal
 
     return {
         "telephone kinds": dict(phone_numbers.KIND_ICONS),
@@ -139,6 +139,10 @@ def kinds() -> dict[str, dict[str, str]]:
         "link services": {
             **{key: service.icon_name for key, service in link_services.registry().items()},
             "other": link_services.OTHER_ICON,
+        },
+        "messaging services": {
+            **{key: service.icon_name for key, service in messaging_services.registry().items()},
+            "other": messaging_services.OTHER_ICON,
         },
     }
 

@@ -349,6 +349,8 @@ class Profile(models.Model):
     #: And for the addresses on the web -- social profiles, repositories, websites -- which
     #: were three single columns here until #189 and are rows of one table now.
     web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
+    #: And for how somebody is reached on a messaging service (#682).
+    messaging_handles = GenericRelation("core.MessagingHandle", verbose_name=_("messaging handles"))
     #: What was typed, and only that. Blank means the town and country of the primary
     #: postal address, worked out whenever it is printed rather than copied in here, so a
     #: new primary address moves it without this being saved again (#309). Everything that

@@ -238,6 +238,7 @@ def test_a_cv_nobody_opened_the_choice_on_is_the_document_it_was_byte_for_byte(
     assert list(now)[: len(before)] == list(before), "and in the order they were in"
     # What is new is blank until the CV says otherwise, and the name's line is the name.
     assert now["form_of_address"] == now["pronouns"] == ""
+    assert now["messaging"] == "", "a handle is not printed because it was added (#682)"
     assert now["name_line"] == before["name"] == "Alex Morgan"
 
     html = rendering.render_cv_html(cv)
@@ -961,6 +962,7 @@ def test_the_archive_carries_the_choice_with_the_cv_by_what_each_row_says(person
         "social": {"choice": "chosen", "url": MASTODON},
         "repository": {"choice": "none"},
         "website": {"choice": "default"},
+        "messaging": {"choice": "default"},
         "identifiers": {"choice": "chosen", "rows": [{"scheme": "orcid", "value": ORCID}]},
         "location": True,
         "form_of_address": False,
@@ -1416,6 +1418,7 @@ def test_the_schema_describes_the_choice(person, client):
         "social",
         "repository",
         "website",
+        "messaging",
         "identifiers",
         "location",
         "form_of_address",
@@ -1439,3 +1442,171 @@ def test_a_portfolio_says_a_current_role_is_still_current(person, theme):
     html = " ".join(rendering.render_cv_html(cv).split())
     assert re.search(r"2021\s*–\s*(<[^>]+>\s*)*present", html)
     assert "2021 – present" in rendering.cv_text(cv)
+
+
+# ------------------------------------------------------------ a messaging handle (#682)
+#
+# A handle is not printed because it was added: the default prints nothing, so the choice
+# is *none* or *chosen*, and a CV nobody touched is the document it was.
+
+
+@pytest.fixture
+def with_handles(person):
+    from postulo.core.models import MessagingHandle
+
+    for service, handle, primary in (
+        ("matrix", "@alex:example.org", True),
+        ("signal", "alex.42", False),
+    ):
+        MessagingHandle.objects.create(
+            owner=person,
+            holder=person.profile,
+            service=service,
+            handle=handle,
+            is_primary=primary,
+        )
+    return person
+
+
+def test_a_handle_is_not_printed_because_it_was_added(with_handles):
+    """Even the primary one: a CV nobody opened the choice on is byte for byte the same."""
+    cv = a_cv(with_handles)
+
+    now = rendering.contact_details(with_handles, cv)
+    before = contact_details_before_308(with_handles)
+
+    assert now["messaging"] == ""
+    assert {key: now[key] for key in before} == before
+    html = rendering.render_cv_html(cv)
+    assert "@alex:example.org" not in html and "alex.42" not in html
+    assert printing.is_default(cv)
+
+
+def test_a_chosen_handle_prints_beside_the_number_in_the_details_list(with_handles):
+    cv = a_cv(with_handles)
+    row = with_handles.profile.messaging_handles.get(service="signal")
+
+    pin(cv, messaging=row)
+    cv = CV.objects.get(pk=cv.pk)
+    details = rendering.contact_details(with_handles, cv)
+
+    assert details["messaging"] == "Signal alex.42"
+    assert details["details"].index(MOBILE_PRINTED) + 1 == details["details"].index(
+        "Signal alex.42"
+    )
+    assert "Signal alex.42" in rendering.render_cv_html(cv)
+    assert "Signal alex.42" in rendering.cv_text(cv)
+    assert not printing.is_default(cv)
+
+
+def test_one_at_most_can_be_chosen_per_cv(with_handles):
+    cv = a_cv(with_handles)
+    first, second = with_handles.profile.messaging_handles.order_by("-is_primary")
+
+    pin(cv, messaging=first)
+    pin(cv, messaging=second)
+
+    assert CV.objects.get(pk=cv.pk).pinned_messaging == second
+
+
+def test_none_of_a_kind_that_prints_nothing_is_the_default_on_the_page(with_handles):
+    cv = a_cv(with_handles)
+    row = with_handles.profile.messaging_handles.get(service="matrix")
+    pin(cv, messaging=row)
+
+    form = CVForm(user=with_handles, instance=CV.objects.get(pk=cv.pk))
+    assert form.initial["prints_messaging"] == str(row.pk)
+    offered = [value for value, _label in form.fields["prints_messaging"].choices]
+    assert offered[-1] == "none" and "default" not in offered
+
+    saved = CVForm(
+        user=with_handles,
+        instance=cv,
+        data={
+            "name": cv.name,
+            "kind": cv.kind,
+            "theme": cv.theme,
+            "language": "",
+            "show_contact_details": "on",
+            "show_location": "on",
+            "prints_messaging": "none",
+        },
+    )
+    assert saved.is_valid(), saved.errors
+    saved.save()
+    cv.refresh_from_db()
+    assert cv.messaging_choice == Prints.DEFAULT and cv.pinned_messaging_id is None
+    assert printing.is_default(cv)
+
+
+def test_a_chosen_handle_that_has_gone_prints_none_and_says_so(with_handles):
+    cv = a_cv(with_handles)
+    row = with_handles.profile.messaging_handles.get(service="signal")
+    pin(cv, messaging=row)
+    row.delete()
+    cv = CV.objects.get(pk=cv.pk)
+
+    assert rendering.contact_details(with_handles, cv)["messaging"] == ""
+    assert [detail.key for detail in printing.gone(cv)] == ["messaging"]
+
+
+def test_a_handle_chosen_while_the_feature_is_off_prints_nothing_and_comes_back(with_handles):
+    from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
+    from postulo.plugins.models import PluginPolicy
+
+    cv = a_cv(with_handles)
+    row = with_handles.profile.messaging_handles.get(service="matrix")
+    pin(cv, messaging=row)
+    policy = PluginPolicy.objects.create(
+        plugin=MESSAGING_CONTACTS, person=with_handles, state=PluginPolicy.State.FORCED_OFF
+    )
+
+    assert rendering.contact_details(with_handles, CV.objects.get(pk=cv.pk))["messaging"] == ""
+    assert CV.objects.get(pk=cv.pk).pinned_messaging_id == row.pk, "kept, not deleted"
+    policy.delete()
+    assert (
+        rendering.contact_details(with_handles, CV.objects.get(pk=cv.pk))["messaging"]
+        == "Matrix @alex:example.org"
+    )
+
+
+def test_the_archive_names_a_chosen_handle_by_what_it_says(with_handles):
+    cv = a_cv(with_handles)
+    pin(cv, messaging=with_handles.profile.messaging_handles.get(service="signal"))
+
+    block = printing.as_archived(CV.objects.get(pk=cv.pk))
+
+    assert block["messaging"] == {
+        "choice": "chosen",
+        "service": "signal",
+        "label": "",
+        "handle": "alex.42",
+    }
+    assert "pinned_messaging" not in json.dumps(block), "no row is named by an id"
+    other = CV.objects.create(owner=with_handles, name="Restored")
+    assert printing.restore(other, block) == []
+    assert other.pinned_messaging == with_handles.profile.messaging_handles.get(service="signal")
+
+
+def test_the_api_reads_and_writes_the_choice(client, with_handles):
+    from postulo.api.models import ApiToken
+
+    cv = a_cv(with_handles)
+    row = with_handles.profile.messaging_handles.get(service="matrix")
+    _record, raw = ApiToken.issue(with_handles, "Agent", scopes=("read", "write"))
+    headers = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
+
+    answer = client.patch(
+        f"/api/v1/cvs/{cv.pk}",
+        data=json.dumps({"prints": {"messaging": {"choice": "chosen", "id": row.pk}}}),
+        content_type="application/json",
+        **headers,
+    )
+
+    assert answer.status_code == 200, answer.content
+    prints = answer.json()["prints"]["messaging"]
+    assert prints["choice"] == "chosen" and prints["id"] == row.pk
+    assert prints["printed"] == "Matrix @alex:example.org"
+    assert {one["id"] for one in prints["offered"]} == {
+        one.pk for one in with_handles.profile.messaging_handles.all()
+    }

@@ -62,7 +62,19 @@ def details(applicant):
         is_primary=True,
     )
     identifier = PersonIdentifier.objects.create(profile=profile, scheme="wikidata", value="Q95")
-    return {"numbers": numbers, "identifier": identifier}
+    from postulo.core.models import MessagingHandle
+
+    handles = [
+        MessagingHandle.objects.create(
+            owner=applicant,
+            holder=profile,
+            service="matrix",
+            handle=handle,
+            is_primary=index == 0,
+        )
+        for index, handle in enumerate(("@alex:example.org", "@alex:chat.example.org"))
+    ]
+    return {"numbers": numbers, "identifier": identifier, "handles": handles}
 
 
 def panel(dialog):
@@ -151,6 +163,53 @@ def test_the_last_row_of_a_block_hands_focus_to_the_blocks_heading(
     expect(page.locator('[data-section-link="section-identifiers"] .badge')).to_have_text("0")
     # The kind the row held is free for the new row again (#307).
     expect(page.locator("select[name$='-scheme'] option[value=wikidata]").first).to_be_enabled()
+
+
+def test_a_messaging_handle_goes_by_keyboard_and_the_primary_is_handed_on(
+    page: Page, live_server, details
+):
+    """The bin, its dialog and the star for the block of handles (#682)."""
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    stars = page.locator("#section-messaging input[name='messaging-primary']")
+    expect(stars.first).to_be_checked()
+
+    dialog = open_dialog_by_keyboard(page, "Matrix @alex:example.org")
+    assert dialog.get_by_text("The next one in the list becomes the primary.").count() == 1
+    page.keyboard.press("Tab")
+    page.keyboard.press("Enter")
+
+    expect(bin_for(page, "Matrix @alex:example.org")).to_have_count(0)
+    block = page.locator("#section-messaging")
+    expect(block.locator("[data-removed-said]")).to_have_text(removed("Matrix @alex:example.org"))
+    heir = block.locator("li:not([hidden])").first
+    expect(heir.locator("input[name$='-handle']")).to_have_value("@alex:chat.example.org")
+    expect(heir.locator("input[name='messaging-primary']")).to_be_checked()
+    expect(page.locator('[data-section-link="section-messaging"] .badge')).to_have_text("1")
+
+    from postulo.core.models import MessagingHandle
+
+    assert not MessagingHandle.objects.filter(pk=details["handles"][0].pk).exists()
+
+
+def test_a_messaging_handle_that_went_from_another_tab_is_taken_off_this_copy(
+    page: Page, live_server, details
+):
+    """A row already gone: its address says so, and the copy of the page drops it (#303)."""
+    from postulo.core.models import MessagingHandle
+
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    MessagingHandle.objects.filter(pk=details["handles"][1].pk).delete()
+
+    open_dialog_by_keyboard(page, "Matrix @alex:chat.example.org")
+    page.keyboard.press("Tab")
+    page.keyboard.press("Enter")
+
+    expect(bin_for(page, "Matrix @alex:chat.example.org")).to_have_count(0)
+    expect(page.locator("#section-messaging [data-removed-said]")).to_have_text(
+        already_removed("Matrix @alex:chat.example.org")
+    )
 
 
 def test_removing_the_primary_moves_the_star(page: Page, live_server, details):

@@ -114,11 +114,11 @@ def test_the_document_the_erasure_and_the_dry_run_account_for_every_reference(us
 def test_references_cover_every_relation_that_points_at_a_contact():
     """A new model that points at a contact must be taken into account here, in the way
     the merge's collector check makes it be there (#370)."""
-    from postulo.core.models import PhoneNumber, PostalAddress
+    from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress
 
     covered = {queryset.model for queryset in gdpr.references(Contact(pk=0)).values()}
     # The person's own numbers, addresses and links reach them through generic relations.
-    own = {PhoneNumber, PostalAddress, WebLink}
+    own = {PhoneNumber, PostalAddress, WebLink, MessagingHandle}
     pointing = {relation.related_model for relation in Contact._meta.related_objects}
     through = {Interview.contacts.through}
 
@@ -217,7 +217,10 @@ def test_the_dry_run_line_counts_each_kind_in_its_own_form():
         }
     )
 
-    assert line == "1 telephone number, 0 postal addresses, 1 web link; 3 applications kept"
+    assert line == (
+        "1 telephone number, 0 postal addresses, 1 web link, 0 messaging handles; "
+        "3 applications kept"
+    )
 
 
 def test_erasure_says_when_it_left_nothing(user):

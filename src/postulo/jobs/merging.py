@@ -522,6 +522,16 @@ def _link_moves(kept, other) -> tuple[list, list]:
     return moving, already
 
 
+def _handle_moves(kept, other) -> tuple[list, list]:
+    """The other person's messaging handles: the ones that move, and the ones the kept one
+    already lists under the same service, which a holder may not list twice (#682)."""
+    ours = {(row.service, row.comparable) for row in kept.messaging_handles.all()}
+    moving, already = [], []
+    for row in other.messaging_handles.all():
+        (already if (row.service, row.comparable) in ours else moving).append(row)
+    return moving, already
+
+
 def plan_contacts(kept, other) -> Plan:
     """What merging the person ``other`` into ``kept`` would do."""
     from postulo.applications.models import Application, Interview
@@ -538,6 +548,7 @@ def plan_contacts(kept, other) -> Plan:
     )
     met = sent.filter(interviews__contacts=other).distinct()
     moving_links, _already = _link_moves(kept, other)
+    moving_handles, _listed = _handle_moves(kept, other)
 
     lines = [
         _moved(
@@ -567,6 +578,16 @@ def plan_contacts(kept, other) -> Plan:
                 label=str(_("Web links")),
                 count=len(moving_links),
                 names=[row.url for row in moving_links[:NAMES_SHOWN]],
+            ),
+        )
+
+    if moving_handles:
+        plan.moves.insert(
+            min(1, len(plan.moves)),
+            Moved(
+                label=str(_("Messaging handles")),
+                count=len(moving_handles),
+                names=[row.display for row in moving_handles[:NAMES_SHOWN]],
             ),
         )
 
@@ -630,7 +651,7 @@ def _move_held(rows, kept, *, kinds: bool, now) -> None:
 def merge_contacts(kept, other) -> Plan:
     """Make the person ``other`` the same record as ``kept``, and delete the other."""
     from postulo.applications.models import Application, Interview
-    from postulo.core.models import WebLink
+    from postulo.core.models import MessagingHandle, WebLink
 
     _same_owner(kept, other)
     locked = {
@@ -662,8 +683,10 @@ def merge_contacts(kept, other) -> Plan:
     seats.filter(contact=other).update(contact=kept)
 
     moving_links, _already = _link_moves(kept, other)
+    moving_handles, _listed = _handle_moves(kept, other)
     for rows, kinds in (
         (list(other.phone_numbers.all()), False),
+        (moving_handles, False),
         (list(other.postal_addresses.all()), False),
         (moving_links, True),
     ):
@@ -681,7 +704,9 @@ def merge_contacts(kept, other) -> Plan:
     kept.save()
 
     _write_entries(plan)
-    _refuse_what_is_left(other, expected={Contact, WebLink, Interview.contacts.through})
+    _refuse_what_is_left(
+        other, expected={Contact, WebLink, MessagingHandle, Interview.contacts.through}
+    )
     other.delete()
     return plan
 

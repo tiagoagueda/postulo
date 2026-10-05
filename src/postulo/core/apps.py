@@ -13,6 +13,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.gdpr import GdprFeature
         from postulo.plugins.maps import MapsFeature
+        from postulo.plugins.messaging_contacts import MessagingContactsFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
         from postulo.plugins.repositories import RepositoriesFeature
@@ -25,6 +26,8 @@ class CoreConfig(AppConfig):
         from . import checks, signals, slow, widgets_builtin  # noqa: F401
 
         registry.register_builtin("feature", PhoneNumbersFeature)
+        # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
+        registry.register_builtin("feature", MessagingContactsFeature)
         # What a country expects of an address, and what it calls each part (#147).
         registry.register_builtin("feature", PostalRulesFeature)
         # An employer as a structure rather than a single name (#138).

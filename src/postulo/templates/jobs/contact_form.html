@@ -55,10 +55,11 @@
           </datalist>
         {% endif %}
       </div>
-      {% if numbers or links %}
+      {% if numbers or links or messaging %}
         <div class="max-w-2xl 2xl:flex-1" data-contact-rows>
           {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
           {% include "partials/web_links.html" %}
+          {% if messaging %}{% include "partials/messaging_handles.html" %}{% endif %}
         </div>
       {% endif %}
     </div>

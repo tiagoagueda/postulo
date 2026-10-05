@@ -225,3 +225,47 @@ class PhoneNumbersMixin:
             phone_numbers.kept_back(holder, self.request.user) if holder is not None else 0
         )
         return context
+
+
+class MessagingHandlesMixin:
+    """The messaging rows on a view whose object holds them (#682).
+
+    One place, for the reasons the telephone mixin gives: the feature may be off, a create
+    view has no holder to bind rows to until its object exists, and the rows are saved
+    inside the same transaction as the form or not at all.
+
+    ``messaging`` in the context is ``None`` while the feature is off: off offers none, and
+    keeps every row.
+    """
+
+    messaging_prefix = "messaging"
+
+    def messaging_holder(self):
+        return getattr(self, "object", None)
+
+    def get_messaging(self):
+        from postulo.core import messaging_handles
+
+        if not messaging_handles.several_allowed(self.request.user):
+            return None
+        posted = f"{self.messaging_prefix}-TOTAL_FORMS" in self.request.POST
+        data = self.request.POST if self.request.method == "POST" and posted else None
+        return messaging_handles.formset_for(
+            self.messaging_holder(), data=data, prefix=self.messaging_prefix
+        )
+
+    def messaging_invalid(self, formset) -> bool:
+        return formset is not None and formset.is_bound and not formset.is_valid()
+
+    def save_messaging(self, formset, holder) -> None:
+        """Bind the rows to the holder and write them; a new row takes its owner from the
+        formset, which asks the holder (`core.formsets.owner_of`)."""
+        if formset is None or not formset.is_bound:
+            return
+        formset.instance = holder
+        formset.save()
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context.setdefault("messaging", self.get_messaging())
+        return context

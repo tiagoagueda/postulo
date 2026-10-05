@@ -297,6 +297,10 @@ class CV(DeclaresALanguage, OwnedModel):
     pinned_repository = pinned_row("core.WebLink", _("code repository chosen"))
     website_choice = prints_field(_("website printed"))
     pinned_website = pinned_row("core.WebLink", _("website chosen"))
+    #: A handle is never printed because it was added: the default prints none, and a CV
+    #: prints one only when somebody chose it (#682).
+    messaging_choice = prints_field(_("messaging handle printed"))
+    pinned_messaging = pinned_row("core.MessagingHandle", _("messaging handle chosen"))
     #: Any number of them, so the pin is a set. The default is every identifier, including
     #: one added later; *chosen* is exactly the ticked ones, and one deleted from the
     #: profile leaves the set by itself.

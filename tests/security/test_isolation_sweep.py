@@ -284,6 +284,14 @@ def web_link(owner):
     )
 
 
+def messaging_handle(owner):
+    from postulo.core.models import MessagingHandle
+
+    return MessagingHandle.objects.create(
+        owner=owner, holder=owner.profile, service="matrix", handle="@them:example.org"
+    )
+
+
 def postal_address(owner):
     from postulo.core.models import PostalAddress
 
@@ -310,6 +318,7 @@ FACTORIES: dict[str, Callable] = {
     # a row taken off *Your details* at once, one address per kind of row (#303)
     "accounts:remove_number": pk_of(number),
     "accounts:remove_link": pk_of(web_link),
+    "accounts:remove_messaging": pk_of(messaging_handle),
     "accounts:remove_address": pk_of(postal_address),
     "accounts:remove_identifier": pk_of(person_identifier),
     "api:token_revoke": pk_of(token),

@@ -282,6 +282,7 @@ def test_every_block_is_the_block_the_archive_writes(somebody):
         assert value == whole["account"]["profile"][name], name
     for name in ("phone_numbers", "postal_addresses", "web_links"):
         assert own["account"]["profile"][name], f"{name} is there, and has something in it"
+    assert own["account"]["profile"]["messaging_handles"] == [], "none yet, and the block is there"
     assert len(own["resume"]["translations"]) == 3
 
 
@@ -306,6 +307,7 @@ def test_what_belongs_to_the_account_stays_with_the_account(somebody):
         "phone_numbers",
         "postal_addresses",
         "web_links",
+        "messaging_handles",
     }
     written = json.dumps(document)
     assert somebody.email not in written and "avatar" not in written
@@ -351,6 +353,7 @@ def test_the_archive_is_written_as_it_was(somebody):
         "phone_numbers",
         "postal_addresses",
         "web_links",
+        "messaging_handles",
     ]
     assert list(document["resume"]) == [*export.RESUME_FIELDS, "translations"]
     for block, names in export.RESUME_FIELDS.items():
@@ -365,6 +368,7 @@ def fingerprint() -> str:
         "phone_numbers": export.PHONE_NUMBER_FIELDS,
         "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
         "web_links": export.WEB_LINK_FIELDS,
+        "messaging_handles": export.MESSAGING_FIELDS,
         "resume": export.RESUME_FIELDS,
         "translations": sorted(export.TRANSLATION_SECTIONS.items()),
     }
@@ -376,7 +380,8 @@ def fingerprint() -> str:
 #: added the form of address and the pronouns beside the name (#309). 4 added the service
 #: a web link is on, read back where the importing side knows it and worked out from the
 #: address in a file that does not say (#305). 5 added the date and place of birth (#679).
-#: 6 added the nationalities and their scope (#680). 7 added the gender (#681).
+#: 6 added the nationalities and their scope (#680). 7 added the gender (#681). 8 added the
+#: messaging handles a person is reached on, read back as a link's service is (#682).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -385,6 +390,7 @@ SHAPES = {
     5: "041a451ff678f708",
     6: "4ddd1e43407b6177",
     7: "e5e8e4a8666679f8",
+    8: "2bc0ec0af53cd958",
 }
 
 
@@ -419,6 +425,7 @@ def test_what_reads_the_file_knows_every_field_that_is_written_to_it():
         "phone_numbers": export.PHONE_NUMBER_FIELDS,
         "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
         "web_links": export.WEB_LINK_FIELDS,
+        "messaging_handles": export.MESSAGING_FIELDS,
     }
     assert set(wrote) == set(candidate.CONTACT_BLOCKS)
     for block, written in wrote.items():

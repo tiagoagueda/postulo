@@ -564,6 +564,39 @@ class LinkServicePlugin(Protocol):
     services: tuple
 
 
+# ---------------------------------------------------------- messaging services
+
+#: Where a package that knows more services a messaging handle can be on registers itself
+#: (#682): an IRC network, a company's own chat. Open, as the link-service group is, and for
+#: the same reason: a service is a key, a name and a pattern, there is always *Other*, and a
+#: registry somebody else wrote can add to what is offered and refuse nothing.
+MESSAGING_SERVICE_GROUP = "postulo.messaging_services"
+
+
+@runtime_checkable
+class MessagingServicePlugin(Protocol):
+    """A registry of the services a messaging handle can be on.
+
+    The shape of a link-service plugin: it is not asked to *do* anything. It answers "what
+    does this key mean" -- a name, what a handle there looks like, how it is normalised, an
+    icon -- for the messaging handles of a person and of their contacts.
+
+    **A service owns no rows.** ``core.MessagingHandle`` is a core model, migrated by core,
+    and a row whose service no installed plugin knows any more reads as *Other* and keeps
+    its key, so removing a plugin loses nothing.
+
+    **It must not reach the network.** A service says what a handle looks like; whether
+    anybody answers there is not asked, by Postulo or by a plugin.
+    """
+
+    #: The identifier the registry keys on.
+    name: str
+    #: What kind of plugin this is; always ``"messaging-service"``.
+    kind: str
+    #: The services it contributes, each a `MessagingService` from the plugin surface.
+    services: tuple
+
+
 # --------------------------------------------------------------------- features
 
 #: Where something that *changes what Postulo keeps* registers itself.

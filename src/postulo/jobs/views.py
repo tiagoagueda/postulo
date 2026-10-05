@@ -30,6 +30,7 @@ from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
     GdprNoticeMixin,
+    MessagingHandlesMixin,
     OwnedObjectMixin,
     OwnerFormMixin,
     PageOrFragmentMixin,
@@ -292,7 +293,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         )
 
     def get_context_data(self, **kwargs) -> dict:
-        from postulo.core import phone_numbers, web_links
+        from postulo.core import messaging_handles, phone_numbers, web_links
 
         from . import structure
 
@@ -322,7 +323,7 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["parent"] = structure.parent_of(self.object, person)
         context["children"] = structure.children_of(self.object, person)
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
-            "phone_numbers", "web_links"
+            "phone_numbers", "web_links", "messaging_handles"
         )
         context["postings"] = (
             JobPosting.objects.for_user(person)
@@ -336,6 +337,8 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # The kinds of link this person is offered several of; a contact's other rows of
         # a kind that is off stay unlisted, exactly as the numbers do (#189).
         context["several_links"] = web_links.offered_kinds(person)
+        # A contact's handles are listed while the feature is on, and not at all when off (#682).
+        context["messaging_offered"] = messaging_handles.several_allowed(person)
         context["structure_on"] = structure.structure_allowed(person)
         # Worked out as the page is drawn, from the record as it is now (#239): which of
         # this person's other companies look like this one, and which of the people here
@@ -754,6 +757,7 @@ class ContactCreateView(
     GdprNoticeMixin,
     PhoneNumbersMixin,
     WebLinksMixin,
+    MessagingHandlesMixin,
     CreateView,
 ):
     model = Contact
@@ -778,14 +782,20 @@ class ContactCreateView(
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
         links = self.get_web_links()
-        if self.phone_numbers_invalid(numbers) or self.web_links_invalid(links):
+        messaging = self.get_messaging()
+        if (
+            self.phone_numbers_invalid(numbers)
+            or self.web_links_invalid(links)
+            or self.messaging_invalid(messaging)
+        ):
             return self.render_to_response(
-                self.get_context_data(form=form, numbers=numbers, links=links)
+                self.get_context_data(form=form, numbers=numbers, links=links, messaging=messaging)
             )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
             self.save_web_links(links, self.object)
+            self.save_messaging(messaging, self.object)
         messages.success(self.request, _("Contact added."))
         return response
 
@@ -796,6 +806,7 @@ class ContactUpdateView(
     GdprNoticeMixin,
     PhoneNumbersMixin,
     WebLinksMixin,
+    MessagingHandlesMixin,
     UpdateView,
 ):
     model = Contact
@@ -822,14 +833,20 @@ class ContactUpdateView(
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
         links = self.get_web_links()
-        if self.phone_numbers_invalid(numbers) or self.web_links_invalid(links):
+        messaging = self.get_messaging()
+        if (
+            self.phone_numbers_invalid(numbers)
+            or self.web_links_invalid(links)
+            or self.messaging_invalid(messaging)
+        ):
             return self.render_to_response(
-                self.get_context_data(form=form, numbers=numbers, links=links)
+                self.get_context_data(form=form, numbers=numbers, links=links, messaging=messaging)
             )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
             self.save_web_links(links, self.object)
+            self.save_messaging(messaging, self.object)
         return response
 
 

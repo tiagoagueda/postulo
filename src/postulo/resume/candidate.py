@@ -68,6 +68,7 @@ from postulo.core import (
     export,
     language_field,
     languages,
+    messaging_handles,
     personal,
     phone_numbers,
     phones,
@@ -75,7 +76,7 @@ from postulo.core import (
     throttle,
 )
 from postulo.core import web_links as links
-from postulo.core.models import PhoneNumber, PostalAddress, WebLink
+from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
 from . import forms as resume_forms
 from . import models as resume
@@ -299,6 +300,7 @@ CONTACT_BLOCKS: dict[str, tuple[str, ...]] = {
     ),
     "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
     "web_links": export.WEB_LINK_FIELDS,
+    "messaging_handles": export.MESSAGING_FIELDS,
 }
 IDENTIFIER_FIELDS = ("scheme", "value", "label")
 TRANSLATION_FIELDS = ("section", "ref", "language", "field", "text")
@@ -636,6 +638,7 @@ class _Planner:
         sections = [
             self._details(),
             self._numbers(),
+            self._messaging(),
             self._addresses(),
             *self._web_links(),
             self._identifiers(),
@@ -1060,6 +1063,50 @@ class _Planner:
             section.rows.append(row)
         return section
 
+    def _messaging(self) -> Section:
+        """The handles on messaging services (#682). A service the file names is a claim,
+        believed where this instance offers it and the handle is one of its handles and
+        *Other* otherwise, so no handle is refused over its service."""
+        section = Section("messaging_handles", gettext_lazy("Messaging"))
+        mine = {(row.service, row.comparable) for row in self._mine("messaging_handles")}
+        seen: set[tuple[str, str]] = set()
+        for entry in self.held.get("messaging_handles") or []:
+            if not isinstance(entry, dict):
+                section.rows.append(_not_a_record())
+                continue
+            data, wrong = self._posted(entry, ("service", "label", "handle"))
+            shown = data.get("handle", "").strip()[:80] or _("A handle with nothing in it")
+            settled = None if wrong else messaging_handles.read_from_a_file(entry)
+            if settled is None:
+                note = [_problem(name, message) for name, message in wrong]
+                note = note or [_("There is no handle here to read.")]
+                section.rows.append(Row(shown, REFUSED, notes=note))
+                continue
+            instance = MessagingHandle(
+                owner=self.user,
+                service=settled["service"],
+                label=settled["label"],
+                handle=settled["handle"],
+            )
+            row = Row(
+                label=settled["handle"],
+                outcome=ADD,
+                sub=instance.service_label,
+                instance=instance,
+                wants_primary=entry.get("is_primary") is True,
+            )
+            key = (
+                instance.service,
+                MessagingHandle.fold(instance.service, instance.label, instance.handle),
+            )
+            if key in mine:
+                row.outcome = PRESENT
+            elif key in seen:
+                row.outcome = REPEATED
+            seen.add(key)
+            section.rows.append(row)
+        return section
+
     def _web_links(self) -> list[Section]:
         sections = {
             block.kind: Section("web_links", block.legend, link_kind=block.kind)
@@ -1447,6 +1494,10 @@ def apply(user, held: dict) -> Report:
             _fill(user, profile, rows)
         elif section.key == "phone_numbers":
             _hang(user, profile, rows, profile.phone_numbers.all(), phone_numbers.set_primary)
+        elif section.key == "messaging_handles":
+            _hang(
+                user, profile, rows, profile.messaging_handles.all(), messaging_handles.set_primary
+            )
         elif section.key == "postal_addresses":
             _hang(user, profile, rows, profile.postal_addresses.all(), postal.make_primary)
         elif section.key == "web_links":

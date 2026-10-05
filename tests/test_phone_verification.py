@@ -315,7 +315,10 @@ def test_the_format_version_moved(user):
     written for (#448); 34 added the date and place of birth on the profile and the switches
     that print them on a CV (#679); 35 added the nationalities and the scope that stands in for
     them, and the switch that prints them (#680); 36 added the gender and the switch that prints it
-    (#681).
+    (#681); 37 added the switch for the key badges (#658);
+    38 added the order of the identifier schemes (#672); 39 added the switch that saves a
+    setting as it changes (#656); 40 added a listing's description format (#665); 41 added
+    the messaging handles on a profile and a contact (#682).
 
     At least rather than exactly: two branches each adding to the archive take a number
     each, and whichever lands second renumbers.

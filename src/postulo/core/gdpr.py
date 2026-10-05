@@ -56,8 +56,9 @@ from django.utils.translation import ngettext
 #: who they came from -- a message they sent, a call with them (#270).
 DOCUMENT_NAME = "postulo-contact"
 #: 3 added ``applications``, ``referrals`` and ``interviews``: the account holder's records
-#: that name the person (#370).
-DOCUMENT_VERSION = 3
+#: that name the person (#370). 4 added ``messaging_handles``: how they are reached on
+#: Matrix, XMPP, Signal, Telegram, Threema or another service (#682).
+DOCUMENT_VERSION = 4
 
 
 def is_offered(person=None) -> bool:
@@ -126,6 +127,18 @@ def _web_link_rows(contact) -> list[dict]:
             "primary": row.is_primary,
         }
         for row in contact.web_links.all()
+    ]
+
+
+def _messaging_rows(contact) -> list[dict]:
+    return [
+        {
+            "service": row.service,
+            "label": row.label,
+            "handle": row.handle,
+            "primary": row.is_primary,
+        }
+        for row in contact.messaging_handles.all()
     ]
 
 
@@ -214,6 +227,7 @@ def contact_document(contact) -> dict:
         "phone_numbers": _phone_rows(contact),
         "postal_addresses": _address_rows(contact),
         "web_links": _web_link_rows(contact),
+        "messaging_handles": _messaging_rows(contact),
         "listing_events": _listing_event_rows(contact),
         "applications": _application_rows(found["applications"]),
         "referrals": _application_rows(found["referrals"]),
@@ -311,6 +325,9 @@ def _counted_kind(key: str, count: int) -> str:
             "%(count)d postal address", "%(count)d postal addresses", count
         ),
         "web_links": lambda: ngettext("%(count)d web link", "%(count)d web links", count),
+        "messaging_handles": lambda: ngettext(
+            "%(count)d messaging handle", "%(count)d messaging handles", count
+        ),
         "plugin_rows": lambda: ngettext("%(count)d plugin row", "%(count)d plugin rows", count),
     }.get(key)
     return (phrase() if phrase else f"%(count)d {key}") % {"count": count}
@@ -369,6 +386,7 @@ def erase_contact(contact) -> ErasureReport:
             "phone_numbers": contact.phone_numbers.count(),
             "postal_addresses": contact.postal_addresses.count(),
             "web_links": contact.web_links.count(),
+            "messaging_handles": contact.messaging_handles.count(),
             "plugin_rows": removed,
         }
         # Each is kept and loses the person: an application its main contact (or whoever
@@ -432,6 +450,7 @@ def retention_dry_run(days: int | None = None) -> dict:
         "phone_numbers": sum(c.phone_numbers.count() for c in contacts),
         "postal_addresses": sum(c.postal_addresses.count() for c in contacts),
         "web_links": sum(c.web_links.count() for c in contacts),
+        "messaging_handles": sum(c.messaging_handles.count() for c in contacts),
         # Every application that names them, as its contact or as who referred the
         # person: each is kept, and each loses the name (#239).
         "applications_unlinked": Application.objects.filter(
@@ -458,7 +477,7 @@ def would_remove_line(would_remove: dict) -> str:
     """
     removed = ", ".join(
         _counted_kind(kind, would_remove.get(kind, 0))
-        for kind in ("phone_numbers", "postal_addresses", "web_links")
+        for kind in ("phone_numbers", "postal_addresses", "web_links", "messaging_handles")
     )
     kept = would_remove.get("applications_unlinked", 0)
     return _("%(removed)s; %(kept)s") % {

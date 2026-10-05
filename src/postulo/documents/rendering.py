@@ -211,6 +211,7 @@ def contact_details(owner, cv: CV | None = None) -> dict:
         for part in (
             details["email"],
             details["phone"],
+            printed.messaging,
             *(f"{row.display_label} {row.value}" for row in identifiers),
             details["location"],
             details["website"],
@@ -223,6 +224,9 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     details["brief_details"] = [
         part for part in (details["email"], details["phone"], details["location"]) if part
     ]
+    # A handle on a messaging service, and only where the CV chose one (#682). Added last,
+    # so that no key a theme already reads moves.
+    details["messaging"] = printed.messaging
     # What is written beside the name, each only where the CV says so (#308): the form of
     # address before it and the pronouns after. Keys of their own rather than folded into
     # `name`, which a theme prints as the heading and the file's properties carry as the

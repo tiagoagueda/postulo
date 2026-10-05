@@ -43,6 +43,7 @@ COUNTED = (
     ("languages", gettext_lazy("Languages")),
     ("translations", capfirst(resume.Translation._meta.verbose_name_plural)),
     ("phone_numbers", gettext_lazy("Telephone numbers")),
+    ("messaging_handles", gettext_lazy("Messaging")),
     ("postal_addresses", gettext_lazy("Postal addresses")),
     ("web_links", capfirst(WebLink._meta.verbose_name_plural)),
     ("identifiers", gettext_lazy("Identifiers")),

@@ -29,7 +29,7 @@ from django.urls import reverse
 from postulo.accounts import removals
 from postulo.accounts.models import PersonIdentifier
 from postulo.core import phone_numbers
-from postulo.core.models import PhoneNumber, PostalAddress, WebLink
+from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 from postulo.plugins.phone_numbers import PHONE_NUMBERS
 from postulo.plugins.social_profiles import SOCIAL_PROFILES
 
@@ -55,6 +55,12 @@ def a_link(user, url="https://example.org/me", *, kind=WebLink.Kind.SOCIAL, prim
     )
 
 
+def a_handle(user, handle="@alex:example.org", *, primary=False) -> MessagingHandle:
+    return MessagingHandle.objects.create(
+        owner=user, holder=user.profile, service="matrix", handle=handle, is_primary=primary
+    )
+
+
 def an_address(user, street="Rua do Exemplo 1", *, primary=False) -> PostalAddress:
     return PostalAddress.objects.create(
         owner=user,
@@ -75,6 +81,7 @@ def an_identifier(user, scheme="wikidata", value="Q95") -> PersonIdentifier:
 KINDS = {
     "remove_number": (a_number, "section-phones"),
     "remove_link": (a_link, "section-links-social"),
+    "remove_messaging": (a_handle, "section-messaging"),
     "remove_address": (an_address, "section-addresses"),
     "remove_identifier": (an_identifier, "section-identifiers"),
 }
@@ -708,6 +715,9 @@ WHAT_A_ROW_HOLDS = {
     "remove_identifier": [
         PersonIdentifier._meta.get_field(name) for name in ("scheme", "value", "label")
     ],
+    "remove_messaging": [
+        MessagingHandle._meta.get_field(name) for name in ("service", "handle", "label")
+    ],
 }
 
 
@@ -722,6 +732,8 @@ def two_rows(user, name):
         return make(user, "https://example.org/a", primary=True), make(
             user, "https://example.org/b"
         )
+    if name == "remove_messaging":
+        return make(user, "@a:example.org", primary=True), make(user, "@b:example.org")
     return make(user, "Rua A 1", primary=True), make(user, "Rua B 2")
 
 

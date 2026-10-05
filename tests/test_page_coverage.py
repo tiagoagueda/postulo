@@ -124,6 +124,10 @@ EXCUSED: dict[str, str] = {
         "a POST from a row's dialog on Your details, answered with a redirect back to it, "
         "or JSON for the script; a GET is that redirect and nothing else"
     ),
+    "accounts:remove_messaging": (
+        "a POST from a row's dialog on Your details, answered with a redirect back to it, "
+        "or JSON for the script; a GET is that redirect and nothing else"
+    ),
     "accounts:remove_address": (
         "a POST from a row's dialog on Your details, answered with a redirect back to it, "
         "or JSON for the script; a GET is that redirect and nothing else"

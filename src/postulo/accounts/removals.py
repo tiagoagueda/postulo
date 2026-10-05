@@ -26,8 +26,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext as _
 
-from postulo.core import phone_numbers, phones, postal, web_links
-from postulo.core.models import PhoneNumber, PostalAddress, WebLink
+from postulo.core import messaging_handles, phone_numbers, phones, postal, web_links
+from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
 from .models import PersonIdentifier
 
@@ -46,6 +46,7 @@ class Kind:
 NUMBER = Kind("number", PhoneNumber)
 LINK = Kind("link", WebLink)
 ADDRESS = Kind("address", PostalAddress)
+MESSAGING = Kind("messaging", MessagingHandle)
 IDENTIFIER = Kind("identifier", PersonIdentifier, has_primary=False)
 
 
@@ -81,6 +82,8 @@ def offered(kind: Kind, person, row) -> bool:
         return phone_numbers.several_allowed(person)
     if kind is LINK:
         return web_links.several_allowed(person, row.kind)
+    if kind is MESSAGING:
+        return messaging_handles.several_allowed(person)
     return True
 
 
@@ -92,6 +95,8 @@ def anchor(kind: Kind, row) -> str:
         return f"section-links-{row.kind}"
     if kind is ADDRESS:
         return "section-addresses"
+    if kind is MESSAGING:
+        return "section-messaging"
     return "section-identifiers"
 
 
@@ -112,6 +117,8 @@ def words(kind: Kind, row) -> str:
         return row.label or row.url.partition("://")[2] or row.url
     if kind is ADDRESS:
         return str(row)
+    if kind is MESSAGING:
+        return row.display
     return f"{row.display_label} {row.value}"
 
 
@@ -170,6 +177,8 @@ def hand_on(kind: Kind, row, holder):
         return web_links.ensure_one_primary(holder, row.kind)
     if kind is ADDRESS:
         return postal.ensure_one_primary(holder)
+    if kind is MESSAGING:
+        return messaging_handles.ensure_one_primary(holder)
     return None
 
 
