@@ -1,6 +1,6 @@
 from django.urls import path
 
-from . import capture_views, page_views, views
+from . import capture_views, page_views, vcard_views, views
 
 app_name = "jobs"
 
@@ -33,6 +33,24 @@ urlpatterns = [
     path("contacts/<int:pk>/delete/", views.ContactDeleteView.as_view(), name="contact_delete"),
     path("contacts/<int:pk>/export/", views.ContactExportView.as_view(), name="contact_export"),
     path("contacts/<int:pk>/merge/", views.ContactMergeView.as_view(), name="contact_merge"),
+    # Contacts as vCard 4.0 (#660): the page that offers the files and reads one, and the
+    # downloads. None takes an id but a record's own, and that is looked up for the owner.
+    path("contacts/vcard/", vcard_views.ContactVCardsView.as_view(), name="contact_vcards"),
+    path("contacts/all.vcf", vcard_views.AllContactsVCardView.as_view(), name="contacts_vcard"),
+    path("contacts/me.vcf", vcard_views.OwnCardView.as_view(), name="own_vcard"),
+    path(
+        "contacts/<int:pk>/card.vcf", vcard_views.ContactVCardView.as_view(), name="contact_vcard"
+    ),
+    path(
+        "companies/<int:pk>/card.vcf",
+        vcard_views.CompanyVCardView.as_view(),
+        name="company_vcard",
+    ),
+    path(
+        "companies/<int:pk>/contacts.vcf",
+        vcard_views.CompanyContactsVCardView.as_view(),
+        name="company_contacts_vcard",
+    ),
     # Every capture waiting, and the discarded ones with the way to put each back (#380).
     path("captures/", capture_views.CaptureListView.as_view(), name="capture_list"),
     path("captures/new/", capture_views.CaptureCreateView.as_view(), name="capture_create"),

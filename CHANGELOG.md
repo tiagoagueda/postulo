@@ -69,6 +69,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Server settings gains a Backups page for administrators: list, back up now, download and delete (with re-authentication), a daily or weekly schedule with retention, backup metrics, and a verified restore guide that prints the commands. (#242)
 - Companies, contacts, listings and applications can each be exported as a JSON file of their own from Settings > Your data and read back through a review page that adds only what is new and never changes what you have. (#659)
 - Leaving a page with unsaved work through a link or a button now asks "Leave without saving?" in Postulo's own translated dialog instead of the browser's prompt, which stays for closing the tab, reload and Back. (#657)
+- Contacts export and import as vCard 4.0 (.vcf): one contact, a company's people, every contact, a company card and your own card out; a 3.0 or 4.0 file in through a review with nothing ticked; the one mapping is on the plugin surface for the DAV plugin. (#660)
 
 ### 🐛 Fixed
 

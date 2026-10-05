@@ -353,6 +353,20 @@
       </c-section-title>
       <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="outline">{% translate "Export or import your record" %}</a>
     </div>
+
+    {% comment %} Your own card (#660): what your default CV prints, as a vCard to hand to
+       an address book. Export only; a card is never read back into these details. {% endcomment %}
+    <div class="mt-6" data-own-vcard>
+      <c-section-title>
+        {% translate "Your details as a vCard" %}
+        <c-slot name="subtitle">{% blocktranslate trimmed %}
+          Your name, headline, email address, number, links and town, as the CV you have not
+          changed prints them, in a file an address book reads. It is never read back here.
+        {% endblocktranslate %}</c-slot>
+      </c-section-title>
+      {% url 'jobs:own_vcard' as own_card_url %}
+      <c-vcard-download :url="own_card_url" label="{% translate 'Download your card' %}" />
+    </div>
     </div>
   </div>
   </div>

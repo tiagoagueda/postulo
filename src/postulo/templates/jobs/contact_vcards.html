@@ -1,0 +1,134 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "Contacts as vCard" %}{% endblock %}
+
+{% block content %}
+  <div class="mx-auto max-w-3xl">
+    <c-page-title>
+      {% translate "Contacts as vCard" %}
+      <c-slot name="subtitle">
+      {% blocktranslate trimmed %}
+        Your contacts in a .vcf file an address book reads, and the cards of one put back.
+        Nothing is added from a file until you have seen it and ticked what you want.
+      {% endblocktranslate %}
+      </c-slot>
+    </c-page-title>
+
+    {% if not entries %}
+      <section class="card mb-6" aria-labelledby="vcard-out" data-vcard-export>
+        <c-section-title id="vcard-out">{% translate "Taking them out" %}</c-section-title>
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+          {% blocktranslate trimmed %}
+            Every contact, as vCard 4.0. A company's people, one contact and the company
+            itself are on the pages where they live. Your notes are private and stay
+            behind unless you tick the box.
+          {% endblocktranslate %}
+        </p>
+        {% url 'jobs:contacts_vcard' as all_url %}
+        <c-vcard-download :url="all_url" label="{% translate 'Download every contact' %}" notes />
+      </section>
+
+      <form method="post" enctype="multipart/form-data" class="card mb-6" data-vcard-upload>
+        {% csrf_token %}
+        <c-section-title>{% translate "Putting cards in" %}</c-section-title>
+        <div class="field mb-4">
+          <label for="id_file">{% translate "The file" %}</label>
+          <input type="file" id="id_file" name="file" accept=".vcf,.vcard,text/vcard" required
+                 aria-describedby="id_file_helptext">
+          <p id="id_file_helptext">
+            {% blocktranslate trimmed %}
+              A vCard 3.0 or 4.0 file, up to 2 MB. Cards are shown to you, none ticked,
+              before anything is added.
+            {% endblocktranslate %}
+          </p>
+        </div>
+        <button type="submit" class="btn">{% translate "Read the file" %}</button>
+      </form>
+
+      <div class="alert mb-6 text-sm" data-variant="info" role="note">
+        <div>
+          <p>
+            {% blocktranslate trimmed %}
+              An address book is not a job search, so nothing is added unless you choose
+              it. A card becomes a contact at the company it names, or a company when it
+              is one. What you already have is never overwritten, and nothing a card
+              points to, such as a picture, is ever fetched.
+            {% endblocktranslate %}
+          </p>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-3">
+        <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="outline">{% translate "Companies" %}</a>
+        <a href="{% url 'accounts:profile' %}" class="btn" data-variant="outline">{% translate "Your details" %}</a>
+      </div>
+    {% else %}
+      <form method="post" data-vcard-review>
+        {% csrf_token %}
+        <section class="mb-6">
+          <c-section-title>{% translate "The cards in the file" %}</c-section-title>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Nothing has been added. Tick the cards you want; what each would become, and
+              what of it is not kept, is beside it.
+            {% endblocktranslate %}
+          </p>
+          {% if skipped %}
+            <p class="mb-3 text-sm text-amber-700 dark:text-amber-400" data-skipped>
+              {% blocktranslate trimmed count counter=skipped with limit=limit %}
+                The file holds {{ counter }} more card than the first {{ limit }}, which are
+                the ones shown.
+              {% plural %}
+                The file holds {{ counter }} more cards than the first {{ limit }}, which are
+                the ones shown.
+              {% endblocktranslate %}
+            </p>
+          {% endif %}
+          <c-scroll-box class="card p-0" label="{% translate 'The cards in the file' %}">
+            <table class="table table-fixed">
+              <thead>
+                <tr>
+                  <th scope="col" class="w-1/3 text-start">{% translate "In the file" %}</th>
+                  <th scope="col" class="w-1/3 text-start">{% translate "What would happen" %}</th>
+                  <th scope="col" class="w-1/3 text-start">{% translate "Not kept" %}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for entry in entries %}
+                  <tr data-outcome="{{ entry.outcome }}">
+                    <td class="align-top wrap-anywhere">
+                      {% if entry.can_choose %}
+                        <label class="flex items-start gap-2 font-medium">
+                          <input type="checkbox" class="input mt-1 shrink-0" name="chosen" value="{{ entry.index }}">
+                          <span><bdi>{{ entry.label }}</bdi></span>
+                        </label>
+                      {% else %}
+                        <p class="font-medium"><bdi>{{ entry.label }}</bdi></p>
+                      {% endif %}
+                      {% if entry.keeps %}
+                        <p class="text-xs text-ink-500 dark:text-ink-400">{{ entry.keeps|join:", " }}</p>
+                      {% endif %}
+                    </td>
+                    <td class="align-top wrap-anywhere">{{ entry.becomes }}</td>
+                    <td class="align-top wrap-anywhere text-xs text-ink-500 dark:text-ink-400">
+                      {% if entry.not_kept %}{{ entry.not_kept|join:", " }}{% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </c-scroll-box>
+        </section>
+        <div class="flex flex-wrap items-center gap-3">
+          <button type="submit" name="action" value="confirm" class="btn">
+            {% translate "Add the cards I ticked" %}
+          </button>
+          <button type="submit" name="action" value="forget" class="btn" data-variant="ghost">
+            {% translate "Start again" %}
+          </button>
+        </div>
+      </form>
+    {% endif %}
+  </div>
+{% endblock %}

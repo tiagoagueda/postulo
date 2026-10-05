@@ -94,6 +94,13 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.phone_numbers import taken_by_asking as phone_number_is_taken
     from postulo.core.phones import COUNTRY_CODES
     from postulo.core.redirects import safe_next
+    from postulo.core.vcard import Address as VCardAddress
+    from postulo.core.vcard import Card as VCard
+    from postulo.core.vcard import Link as VCardLink
+    from postulo.core.vcard import Phone as VCardPhone
+    from postulo.core.vcard import VCardRefused
+    from postulo.core.vcard import card_to_text as vcard_from_values
+    from postulo.core.vcard import read as vcards_from_text
     from postulo.core.web_links import Kind as LinkKind
     from postulo.core.web_links import primary_for as primary_web_link
     from postulo.core.web_links import save_only_link as save_web_link
@@ -210,6 +217,11 @@ __all__ = [
     "Theme",
     "ThemeKind",
     "TransportPlugin",
+    "VCard",
+    "VCardAddress",
+    "VCardLink",
+    "VCardPhone",
+    "VCardRefused",
     "access_token",
     "approve_host",
     "calendar_status",
@@ -245,6 +257,8 @@ __all__ = [
     "settle_interview",
     "shipped",
     "suggest",
+    "vcard_from_values",
+    "vcards_from_text",
 ]
 
 #: Where a plugin author reads what the names above are for, and why nothing else is (#170).
@@ -330,6 +344,22 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # reads one back by key, or `None` for *Other* and for a key nothing installed knows.
     "MessagingService": ("postulo.core.messaging_services", "Service"),
     "messaging_service_of": ("postulo.core.messaging_services", "find"),
+    # ------------------------------------------------------------------- vCard text (#660)
+    # RFC 6350 for a contact, written and read by the one mapping Postulo's own export and
+    # import use, so a card a plugin writes and one Postulo writes are the same card and the
+    # two cannot disagree. Plain values in and text out, and text in and plain values out:
+    # `VCard` is a card as values (with `VCardPhone`, `VCardAddress` and `VCardLink` for the
+    # rows on it), `vcard_from_values(card)` its vCard 4.0 text, `vcards_from_text(text)` the
+    # cards of a file -- 3.0 and 4.0, bounded, and `VCardRefused` for one it will not read.
+    # Nothing a card names is fetched. Writing 3.0 for a book that lists no 4.0 stays the
+    # plugin's own small step down.
+    "VCard": ("postulo.core.vcard", "Card"),
+    "VCardAddress": ("postulo.core.vcard", "Address"),
+    "VCardLink": ("postulo.core.vcard", "Link"),
+    "VCardPhone": ("postulo.core.vcard", "Phone"),
+    "VCardRefused": ("postulo.core.vcard", "VCardRefused"),
+    "vcard_from_values": ("postulo.core.vcard", "card_to_text"),
+    "vcards_from_text": ("postulo.core.vcard", "read"),
     # ------------------------------------------------------------------- calendar text
     # RFC 5545 for one interview, written the way Postulo's own feed writes it, so an event
     # pushed to somebody's calendar by a plugin and one they subscribed to are the same

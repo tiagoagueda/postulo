@@ -304,6 +304,15 @@
           {% translate "Nobody recorded here yet." %}
         </c-empty>
       {% endif %}
+      {% comment %} What is held here as cards (#660): the people, and the company itself. {% endcomment %}
+      <div class="mt-4 flex flex-col gap-3" data-vcards>
+        {% if contacts %}
+          {% url 'jobs:company_contacts_vcard' company.pk as people_url %}
+          <c-vcard-download :url="people_url" label="{% translate 'Download these people as a vCard' %}" notes />
+        {% endif %}
+        {% url 'jobs:company_vcard' company.pk as company_url %}
+        <c-vcard-download :url="company_url" label="{% translate 'Download the company as a vCard' %}" notes />
+      </div>
     </aside>
   </div>
 {% endblock %}

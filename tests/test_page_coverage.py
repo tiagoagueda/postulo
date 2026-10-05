@@ -95,6 +95,26 @@ EXCUSED: dict[str, str] = {
         )
         for kind in ("companies", "contacts", "listings", "applications")
     },
+    "jobs:contact_vcard": (
+        "one contact as a vCard file arriving as a download: a `Content-Disposition` and "
+        "bytes. The page that offers it, the contact's form, is walked (#660)"
+    ),
+    "jobs:company_vcard": (
+        "a company as a vCard file arriving as a download; the company's page, which offers "
+        "it, is walked (#660)"
+    ),
+    "jobs:company_contacts_vcard": (
+        "a company's contacts as a vCard file arriving as a download; the company's page, "
+        "which offers it, is walked (#660)"
+    ),
+    "jobs:contacts_vcard": (
+        "every contact as a vCard file arriving as a download; `jobs:contact_vcards`, which "
+        "offers it, is walked (#660)"
+    ),
+    "jobs:own_vcard": (
+        "the person's own card as a vCard file arriving as a download; Your details, which "
+        "offers it, is walked (#660)"
+    ),
     "resume:candidate_download": (
         "one person's own record as one JSON document arriving as a download: a "
         "`Content-Disposition` and bytes, with nothing to check for accessibility. The "

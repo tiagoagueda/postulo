@@ -676,3 +676,43 @@ def test_a_plugin_asking_whether_a_number_is_held_spends_the_account_allowance(
 
     with pytest.warns(DeprecationWarning, match="asked_by"):
         assert api.phone_number_is_taken("+351912345679") is False
+
+
+def test_the_surface_holds_the_one_vcard_mapping_and_nothing_to_fetch_with():
+    """A card from plain values and cards from text, the core's own and not a copy (#660).
+
+    The DAV plugin deletes its hand-written vCard half and imports these, so a card it
+    writes and one Postulo writes are one card. Plain values in and text out: no model is
+    handed over, and reading a file makes no request.
+    """
+    from postulo.core import vcard
+    from postulo.plugins import api
+
+    for name in (
+        "VCard",
+        "VCardAddress",
+        "VCardLink",
+        "VCardPhone",
+        "VCardRefused",
+        "vcard_from_values",
+        "vcards_from_text",
+    ):
+        assert name in api.__all__, name
+    assert api.VCard is vcard.Card
+    assert api.vcard_from_values is vcard.card_to_text
+    assert api.vcards_from_text is vcard.read
+
+    card = api.VCard(
+        name="Alex Morgan",
+        company="Acme",
+        department="Legal",
+        phones=(api.VCardPhone("+351912345678", "mobile", True),),
+        addresses=(api.VCardAddress(municipality="Lisboa", country="PT"),),
+        links=(api.VCardLink("https://acme.example"),),
+    )
+    text = api.vcard_from_values(card)
+    assert "ORG:Acme;Legal" in text and "TEL;VALUE=uri;TYPE=cell;PREF=1:tel:+351912345678" in text
+    (read,) = api.vcards_from_text(text).cards
+    assert (read.name, read.company, read.department) == ("Alex Morgan", "Acme", "Legal")
+    with pytest.raises(api.VCardRefused):
+        api.vcards_from_text("BEGIN:VCARD\nVERSION:2.1\nFN:A\nEND:VCARD\n")

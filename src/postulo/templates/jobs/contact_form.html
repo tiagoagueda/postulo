@@ -76,4 +76,12 @@
       {% endif %}
     </div>
   </form>
+  {% comment %} The one contact as a card (#660), outside the form above: a form does not hold
+     a form. Only for a contact that exists. {% endcomment %}
+  {% if object.pk %}
+    <div class="mt-8 max-w-2xl">
+      {% url 'jobs:contact_vcard' object.pk as card_url %}
+      <c-vcard-download :url="card_url" label="{% translate 'Download as a vCard' %}" notes />
+    </div>
+  {% endif %}
 {% endblock %}

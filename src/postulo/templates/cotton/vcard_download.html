@@ -1,0 +1,17 @@
+{% load i18n %}
+<c-vars url label notes=False />
+{% comment %} A vCard download (#660): `<c-vcard-download :url="url" label="{% translate 'Download as a vCard' %}" notes />`.
+
+   A form that gets rather than a link, because *Include my notes* is a question asked before
+   the file is made: a contact's notes are Postulo's private ones, and they leave only when
+   ticked. With scripts off it is the same form. `notes` offers the box; the person's own card
+   and a company's card have no use for it. {% endcomment %}
+<form method="get" action="{{ url }}" class="flex flex-wrap items-center gap-x-4 gap-y-2">
+  {% if notes %}
+    <label class="flex items-center gap-2 text-sm">
+      <input type="checkbox" class="input" name="notes" value="1">
+      {% translate "Include my notes" %}
+    </label>
+  {% endif %}
+  <button type="submit" class="btn" data-variant="outline">{{ label }}</button>
+</form>
