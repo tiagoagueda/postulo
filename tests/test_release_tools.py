@@ -612,3 +612,37 @@ def test_the_wait_command_fails_unless_ci_passed(monkeypatch, capsys):
     answering(monkeypatch, A_PUSH)
     assert tools.main(["wait-ci", "abc123"]) == 0
     assert "abc123: CI passed." in capsys.readouterr().out
+
+
+def test_a_failed_lookup_is_asked_again_rather_than_ending_the_wait(monkeypatch):
+    """Run 733 lost its dev image to one `Temporary failure in name resolution`."""
+    import urllib.error
+
+    clock = Clock()
+    answers = [urllib.error.URLError("Temporary failure in name resolution"), A_PUSH]
+
+    def api(method, url, token, body=None, content_type="application/json"):
+        answer = answers.pop(0)
+        if isinstance(answer, Exception):
+            raise answer
+        return answer
+
+    monkeypatch.setattr(tools, "_api", api)
+
+    assert wait(clock) == []
+    assert clock.now == 30
+
+
+def test_a_network_that_never_comes_back_gives_up_at_the_deadline(monkeypatch):
+    import urllib.error
+
+    clock = Clock()
+
+    def api(method, url, token, body=None, content_type="application/json"):
+        raise urllib.error.URLError("unreachable")
+
+    monkeypatch.setattr(tools, "_api", api)
+
+    problems = wait(clock, minutes=1)
+
+    assert len(problems) == 1 and "could not ask Forgejo" in problems[0]

@@ -243,7 +243,15 @@ def wait_for_ci(
     """
     deadline = clock() + minutes * 60
     while True:
-        recorded = _statuses(ref, server=server, repository=repository, token=token)
+        try:
+            recorded = _statuses(ref, server=server, repository=repository, token=token)
+        except OSError as error:
+            # The network, not an answer: run 733 lost the dev image to one failed name
+            # lookup. Asked again at the next turn, until the deadline (#716).
+            if clock() >= deadline:
+                return [f"could not ask Forgejo about {ref}: {error}"]
+            sleep(every)
+            continue
         problems = _problems(recorded, ref, every_python=False)
         if not problems:
             return []
