@@ -5,9 +5,10 @@
    about: a control that swaps itself away has to hand focus somewhere, or the next Tab
    starts again at the skip link. `hx-focus-after` names where -- the next tick if there
    is one, the heading if that was the last -- and `app.js` does the handing over. *Later*
-   swaps the same region, and the row **stays**: a reminder put off until next week is still
-   outstanding and still this application's, so what changes is the date under it. Nothing is
-   handed anywhere, because nothing was taken away.
+   swaps the same region, and the row **stays**, but the menu item that was pressed is
+   replaced with it and htmx restores focus only to an element with an id, so focus would
+   fall to the body. Each *Later* item names its reminder's actions trigger, which has an
+   id, and focus goes back to it (#520).
 
    `aria-live="polite"` for the same reason as the timeline: the row disappearing is the
    only sign that anything happened, and a disappearance is not something a screen reader

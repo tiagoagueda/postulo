@@ -1,5 +1,5 @@
 {% load postulo %}
-<c-vars label trigger trigger_class="btn cursor-pointer" trigger_variant="ghost" trigger_size="icon-xs" align="end" kind="menu" />
+<c-vars label trigger trigger_id="" trigger_class="btn cursor-pointer" trigger_variant="ghost" trigger_size="icon-xs" align="end" kind="menu" />
 {% comment %} A panel that opens from a button: Basecoat's dropdown menu, on the browser's own
    popover (#262, #310).
 
@@ -13,7 +13,8 @@
    - `kind="navigation"` is a disclosure of links -- the account menu, the bar's *More*.
      No `role="menu"`, rows of `menu-item`, and Tab is the key that moves between them.
 
-   Any other attribute goes on the root, which is how *More* carries `data-nav-more`.
+   `trigger_id` gives the trigger an id, for a control that must hand focus back to it
+   after a swap (#520). Any other attribute goes on the root, which is how *More* carries `data-nav-more`.
 
    The panel is a `popover` and the trigger a `<button popovertarget>`, so the browser
    opens and closes it with no script at all, closes it on Escape and on a click anywhere
@@ -31,7 +32,7 @@
    two menus sharing an id would open each other's panels. {% endcomment %}
 {% unique_id "menu" as panel %}
 <div class="dropdown-menu" data-menu{% if attrs.attrs_dict %} {{ attrs }}{% endif %}>
-  <button type="button" popovertarget="{{ panel }}" class="{{ trigger_class }}"{% if trigger_variant %} data-variant="{{ trigger_variant }}"{% endif %}{% if trigger_size %} data-size="{{ trigger_size }}"{% endif %}{% if kind == "menu" %} aria-haspopup="menu"{% endif %} aria-label="{{ label }}">{{ trigger }}</button>
+  <button type="button"{% if trigger_id %} id="{{ trigger_id }}"{% endif %} popovertarget="{{ panel }}" class="{{ trigger_class }}"{% if trigger_variant %} data-variant="{{ trigger_variant }}"{% endif %}{% if trigger_size %} data-size="{{ trigger_size }}"{% endif %}{% if kind == "menu" %} aria-haspopup="menu"{% endif %} aria-label="{{ label }}">{{ trigger }}</button>
   <div popover id="{{ panel }}" data-popover data-align="{{ align }}">
     {% if kind == "menu" %}
       <div role="menu" aria-label="{{ label }}">

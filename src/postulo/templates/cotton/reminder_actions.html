@@ -16,6 +16,9 @@
    month's cell, a week's narrow column (#316) -- and there *Done* is the menu's first item
    rather than a second control squeezing the reminder's own words.
 
+   On an application's page the *Later* items name their reminder's trigger in
+   `data-focus-after`, so focus returns to it once the row is redrawn (#520).
+
    **Later is two items and a link, not a date control.** *Tomorrow* and *next week* are
    what somebody pressing *Later* nearly always means, and they need no typing. A date box
    inside `role="menu"` is not a menu item, and a menu with a form field in the middle of it
@@ -42,7 +45,7 @@
   {% endif %}
   {% comment %} Named by its reminder, not "Actions" ten times over: a page of these is a
      list of controls that all say the same thing, which is what #227 is about. {% endcomment %}
-  <c-dropdown-menu label="{% blocktranslate trimmed with what=reminder.summary %}Actions for {{ what }}{% endblocktranslate %}" align="{{ align }}">
+  <c-dropdown-menu trigger_id="{% if target %}reminder-{{ reminder.pk }}-actions{% endif %}" label="{% blocktranslate trimmed with what=reminder.summary %}Actions for {{ what }}{% endblocktranslate %}" align="{{ align }}">
     <c-slot name="trigger">{% icon "ellipsis-vertical" %}</c-slot>
     {% if not reminder.is_done and compact %}
       <form method="post" action="{% url 'applications:reminder_complete' reminder.pk %}" role="none">
@@ -57,10 +60,10 @@
               hx-target="{{ target }}" hx-swap="outerHTML"{% endif %}>
         {% csrf_token %}
         {% if next_url %}<input type="hidden" name="next" value="{{ next_url }}">{% endif %}
-        <button type="submit" name="when" value="tomorrow" role="menuitem">
+        <button type="submit" name="when" value="tomorrow" role="menuitem" {% if target %}data-focus-after="#reminder-{{ reminder.pk }}-actions"{% endif %}>
           {% icon "clock" %}{% translate "Put off until tomorrow" %}
         </button>
-        <button type="submit" name="when" value="next_week" role="menuitem">
+        <button type="submit" name="when" value="next_week" role="menuitem" {% if target %}data-focus-after="#reminder-{{ reminder.pk }}-actions"{% endif %}>
           {% icon "clock" %}{% translate "Put off until next week" %}
         </button>
       </form>

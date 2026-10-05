@@ -144,7 +144,7 @@ def test_ticking_a_reminder_hands_focus_to_the_next_one(page: Page, live_server,
     page.goto(f"{live_server.url}{reminders[0].application.get_absolute_url()}")
     # The ticks, not every button in the block: since #238 each row also carries a menu
     # with *Put off until tomorrow* and *next week* in it, and those are not what swaps.
-    ticks = page.locator("#reminders button[data-focus-after]")
+    ticks = page.locator("#reminders button.btn[data-focus-after]")
     expect(ticks).to_have_count(2)
 
     ticks.first.click()
@@ -175,6 +175,24 @@ def test_ticking_the_last_reminder_lands_on_the_region_rather_than_nowhere(
 
     expect(page.locator("#reminders")).to_contain_text("None outstanding")
     expect(page.locator("#reminders")).to_be_focused()
+
+
+def test_putting_a_reminder_off_keeps_focus_on_its_actions_trigger(
+    page: Page, live_server, reminders
+):
+    """#520: the menu item that was pressed is swapped away with its row; htmx restores
+    focus only to an id, so without a named landing it fell to `<body>`."""
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}{reminders[0].application.get_absolute_url()}")
+    trigger = page.locator(f"#reminder-{reminders[0].pk}-actions")
+    trigger.focus()
+    page.keyboard.press("Enter")
+    page.locator(f"#reminder-{reminders[0].pk}-actions + [popover]").get_by_role(
+        "menuitem", name="Put off until tomorrow"
+    ).focus()
+    page.keyboard.press("Enter")
+
+    expect(page.locator(f"#reminder-{reminders[0].pk}-actions")).to_be_focused()
 
 
 def test_with_no_script_the_page_still_works(page: Page, live_server, application, context):

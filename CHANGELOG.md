@@ -74,6 +74,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The API tokens page now translates the name placeholder and lists each token's scopes as translated sentences, one per item, instead of raw keys like "captures, read". (#432)
 - The Tags page counts each tag's applications in one query instead of one per tag, so it no longer gets slower as a person keeps more tags. (#554)
 - A status change posted with htmx at a table row now redirects as a plain post does, instead of answering an empty row that no page asked for (#402)
+- Putting a reminder off until tomorrow or next week on an application's page now keeps keyboard focus on that reminder's actions button instead of dropping it to the start of the page (#520).
 
 ## [0.4.0] — 2026-10-04
 

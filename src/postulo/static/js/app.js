@@ -5915,11 +5915,16 @@
     var landing = document.querySelector(focusAfterSwap);
     focusAfterSwap = null;
     if (!landing) {
+      // The trigger is gone (#520): the region it sat in takes focus instead.
+      landing = document.querySelector("#reminders");
+    }
+    if (!landing) {
       return;
     }
     // The next tick if there is one, so working through a list stays a list of Tab-free
     // presses; the region itself when that was the last of them.
-    var next = landing.querySelector("[data-focus-after]");
+    // A menu item that names its own trigger (*Later*) is not a tick.
+    var next = landing.querySelector("[data-focus-after]:not([role=menuitem])");
     (next || landing).focus();
   });
 
