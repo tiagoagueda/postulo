@@ -20,7 +20,7 @@ from ninja import Field, Schema
 from pydantic import AfterValidator, AwareDatetime, BeforeValidator
 
 from postulo.accounts.models import Profile, User
-from postulo.core import phones
+from postulo.core import personal, phones
 from postulo.core.addresses import web_address
 from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
@@ -794,6 +794,8 @@ class CVPrintsOut(Schema):
     )
     form_of_address: bool = Field(description="Whether it is printed before the name")
     pronouns: bool = Field(description="Whether they are printed after the name")
+    birth_date: bool = Field(description="Whether the date of birth is printed (#679)")
+    birth_place: bool = Field(description="Whether the place of birth is printed (#679)")
 
 
 class CVDetailOut(CVOut):
@@ -836,6 +838,8 @@ class CVPrintsIn(Schema):
     location: bool | None = None
     form_of_address: bool | None = None
     pronouns: bool | None = None
+    birth_date: bool | None = None
+    birth_place: bool | None = None
 
 
 class CVPatch(Schema):
@@ -932,6 +936,25 @@ _NAME = _longest(User, "first_name")
 _HEADLINE = _longest(Profile, "headline")
 _LOCATION = _longest(Profile, "location")
 _ADDRESSING = _longest(Profile, "form_of_address")
+_BIRTH_PLACE = _longest(Profile, "birth_place")
+
+
+def _held_to(rule):
+    """A pydantic check that runs one of `core.personal`'s validators, the very function the
+    column holds the page to, and says what it said as a 422 naming the field (#679)."""
+
+    def check(value):
+        try:
+            rule(value)
+        except ValidationError as refused:
+            raise ValueError(" ".join(refused.messages)) from refused
+        return value
+
+    return AfterValidator(check)
+
+
+def _capitals(value):
+    return value.upper() if isinstance(value, str) else value
 
 
 class ProfileOut(Schema):
@@ -952,6 +975,25 @@ class ProfileOut(Schema):
             "How to refer to the person (she/her, iel), as the text itself; blank when not "
             "given. Printed only on a CV whose `prints.pronouns` is true."
         ),
+    )
+    birth_date: str = Field(
+        default="",
+        description=(
+            "When the person was born, as an ISO 8601 reduced date -- `1990`, `1990-03` or "
+            "`1990-03-12` -- or blank when not given. Never worked out, never an age. Printed "
+            "only on a CV whose `prints.birth_date` is true."
+        ),
+    )
+    birth_place: str = Field(
+        default="",
+        description=(
+            "The town or city of birth, as typed; blank when not given. Printed only on a CV "
+            "whose `prints.birth_place` is true."
+        ),
+    )
+    birth_country: str = Field(
+        default="",
+        description="The country of birth, as a two-letter code from the address form's list",
     )
     headline: str = ""
     location: str = Field(
@@ -981,6 +1023,17 @@ _NameLine = _line(_NAME)
 _AddressingLine = _line(_ADDRESSING)
 _HeadlineLine = _line(_HEADLINE)
 _LocationLine = _line(_LOCATION)
+_BirthDateLine = Annotated[
+    _line(personal.BIRTH_DATE_LENGTH), _held_to(personal.validate_birth_date)
+]
+_BirthPlaceLine = _line(_BIRTH_PLACE)
+_CountryCode = Annotated[
+    str,
+    Field(max_length=2),
+    BeforeValidator(_stripped),
+    BeforeValidator(_capitals),
+    _held_to(personal.validate_country_code),
+]
 
 
 class ProfilePatch(Schema):
@@ -997,6 +1050,19 @@ class ProfilePatch(Schema):
         default=None,
         description="Any text, including one no list offers; empty clears it",
     )
+    birth_date: _BirthDateLine | None = Field(
+        default=None,
+        description=(
+            "`1990`, `1990-03` or `1990-03-12`: a real date, not in the future and not before "
+            "1900; empty clears it"
+        ),
+    )
+    birth_place: _BirthPlaceLine | None = Field(
+        default=None, description="A town or city as typed; empty clears it"
+    )
+    birth_country: _CountryCode | None = Field(
+        default=None, description="A country's two-letter code from the list; empty clears it"
+    )
     headline: _HeadlineLine | None = None
     location: _LocationLine | None = Field(
         default=None,
@@ -1011,6 +1077,9 @@ def profile_out(profile) -> dict:
         "last_name": user.last_name,
         "form_of_address": profile.form_of_address,
         "pronouns": profile.pronouns,
+        "birth_date": profile.birth_date,
+        "birth_place": profile.birth_place,
+        "birth_country": profile.birth_country,
         "headline": profile.headline,
         "location": profile.location,
         "printed_location": printed_location(profile),

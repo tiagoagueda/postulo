@@ -320,6 +320,10 @@ class CV(DeclaresALanguage, OwnedModel):
         _("print your form of address before your name"), default=False
     )
     show_pronouns = models.BooleanField(_("print your pronouns after your name"), default=False)
+    #: Off as well (#679): the two most identifying things a profile can hold are printed
+    #: only by a CV that says so, each by its own switch, in one line under the name.
+    show_birth_date = models.BooleanField(_("print your date of birth"), default=False)
+    show_birth_place = models.BooleanField(_("print your place of birth"), default=False)
 
     class Meta:
         verbose_name = _("CV")

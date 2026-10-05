@@ -22,6 +22,12 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.core.identifiers import MAX_VALUE_LENGTH, PERSON, KeepsItsScheme, scheme_field
 from postulo.core.language_field import LanguageField
+from postulo.core.personal import (
+    BIRTH_DATE_LENGTH,
+    BIRTH_PLACE_LENGTH,
+    validate_birth_date,
+    validate_country_code,
+)
 
 from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
@@ -281,6 +287,22 @@ class Profile(models.Model):
         _("form of address"), max_length=ADDRESSING_MAX_LENGTH, blank=True
     )
     pronouns = models.CharField(_("pronouns"), max_length=ADDRESSING_MAX_LENGTH, blank=True)
+    #: When and where the person was born (#679). Optional, never worked out from anything,
+    #: and printed nowhere unless a CV says so. The date is the text of an ISO 8601 reduced
+    #: form -- a year, a year and month, or a whole date -- held to `core.personal`'s rule by
+    #: this validator, which the form, the API, the candidate file and the archive importer
+    #: all run through; the place is what was typed and a country's code, with no lookup and
+    #: nothing for the map. An age is never computed, stored or shown.
+    birth_date = models.CharField(
+        _("date of birth"),
+        max_length=BIRTH_DATE_LENGTH,
+        blank=True,
+        validators=[validate_birth_date],
+    )
+    birth_place = models.CharField(_("place of birth"), max_length=BIRTH_PLACE_LENGTH, blank=True)
+    birth_country = models.CharField(
+        _("country of birth"), max_length=2, blank=True, validators=[validate_country_code]
+    )
     headline = models.CharField(
         _("headline"),
         max_length=200,

@@ -37,6 +37,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Your details has a Personal details card with an optional date and place of birth, which a CV prints as one “Born …” line only when it is set to (#679)
 - Added: links to Mastodon, Bluesky, Facebook, Instagram, YouTube and Codeberg now show the service's own mark beside them where a contact's links are listed, with the generic icon kept for every other service (#654)
 - Added: CONTRIBUTING.md now says to look for an open-source library before writing one and which format an export or import picks first, and pull requests get a template that asks the same questions (#653)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)

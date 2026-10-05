@@ -95,8 +95,17 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "keep_page_source",
         "keep_page_rendering",
         "closing_notice_days",
+        # The personal details (#679, #680): each held to its column's own rule, the one the
+        # form, the API and the candidate file are held to, and a value it refuses is left
+        # out and said in the report (`_PERSONAL_FIELDS`).
+        "birth_date",
+        "birth_place",
+        "birth_country",
     }
 )
+#: The checked fields a refusal of which the report says: they are the person's own facts,
+#: and an archive that carried one the page would not take has lost something to say so.
+_PERSONAL_FIELDS = frozenset({"birth_date", "birth_place", "birth_country"})
 
 
 def _profile_value(profile, name: str, value):
@@ -681,6 +690,12 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             settled = _profile_value(profile, name, value)
             if settled is not _REFUSED:
                 setattr(profile, name, settled)
+            elif name in _PERSONAL_FIELDS:
+                label = str(type(profile)._meta.get_field(name).verbose_name)
+                report.skipped.append(
+                    f"Your {label} {str(value)[:60]!r} is not one this page would take, "
+                    "and was left out"
+                )
         profile.save()
     if profile:
         _restore_phone_numbers(profile, user, numbers, report, "on the profile")

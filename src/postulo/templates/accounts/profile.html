@@ -150,6 +150,39 @@
         </div>
       </div>
 
+      {% comment %} What an identity check asks for, and nothing a job search needs until a
+         CV says so (#679). A card of its own so that none of it is read as part of the name:
+         every part is optional, none is ever worked out from anything, and the one sentence
+         says what the card is for and that none of it is printed until a CV is set to print
+         it. The date is three boxes in a fieldset, in the order the interface language
+         writes a date, each with the autocomplete token that names it (SC 1.3.5). {% endcomment %}
+      <div class="card mb-4" id="section-personal">
+        <c-section-title anchor="section-personal">{% translate "Personal details" %}</c-section-title>
+        <p class="mb-4 text-sm text-ink-500 dark:text-ink-400" id="personal-details-help">
+          {% blocktranslate trimmed %}
+            All optional, and none of it is worked out from anything else. None of it is
+            printed until a CV is set to print it, one by one, under <em>Choose which details</em>
+            on the CV.
+          {% endblocktranslate %}
+        </p>
+        <fieldset class="mb-4" aria-describedby="personal-details-help"{% if form.birth_year.errors %} data-invalid="true"{% endif %}>
+          <legend class="label">{% translate "Date of birth" %}</legend>
+          <div class="flex flex-wrap items-start gap-x-4">
+            {% for box in form.birth_boxes %}
+              <div class="field mb-2 w-20"{% if box.errors %} data-invalid="true"{% endif %}>
+                <label for="{{ box.id_for_label }}">{{ box.label }}</label>
+                {{ box }}
+              </div>
+            {% endfor %}
+          </div>
+          <c-field-feedback :field="form.birth_year" />
+        </fieldset>
+        <div class="flex flex-wrap items-start gap-x-4">
+          <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_place" /></div>
+          <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_country" /></div>
+        </div>
+      </div>
+
       <div class="card mb-6" id="section-contact">
         <c-section-title help="contact-block" anchor="section-contact" :in_sight="refused">{% translate "Contact block" %}</c-section-title>
         <c-field :field="form.headline" :tip="tips" />

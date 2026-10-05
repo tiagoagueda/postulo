@@ -294,6 +294,9 @@ def test_what_belongs_to_the_account_stays_with_the_account(somebody):
     assert set(document["account"]["profile"]) == {
         "form_of_address",
         "pronouns",
+        "birth_date",
+        "birth_place",
+        "birth_country",
         "headline",
         "location",
         "record_language",
@@ -369,12 +372,13 @@ def fingerprint() -> str:
 #: 2 added the ESCO skill a skill's name matches, written and never read back (#266). 3
 #: added the form of address and the pronouns beside the name (#309). 4 added the service
 #: a web link is on, read back where the importing side knows it and worked out from the
-#: address in a file that does not say (#305).
+#: address in a file that does not say (#305). 5 added the date and place of birth (#679).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
     3: "c1fc71fec061fadc",
     4: "bcb06c758a353ad3",
+    5: "041a451ff678f708",
 }
 
 

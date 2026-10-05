@@ -768,6 +768,9 @@ class _Planner:
                 continue
             try:
                 value = column.formfield(required=False).clean(raw)
+                # The column's own validators too, which a form field built from it does not
+                # carry: the one rule a date of birth is held to everywhere (#679).
+                column.run_validators(value)
                 if name == "record_language":
                     value = self._language(value)
             except ValidationError as error:

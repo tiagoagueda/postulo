@@ -48,6 +48,11 @@
         <p class="details">
           {% for part in contact.details %}{% if not forloop.first %}<span class="sep">{% block detail_separator %} · {% endblock %}</span>{% endif %}<span{% if part == contact.phone %} dir="ltr"{% endif %}>{{ part }}</span>{% endfor %}
         </p>
+        {% comment %} What a CV says about the person beyond how to reach them, one line and only
+           where the CV chose to print it (#679): "Born 12 March 1990 in Porto, Portugal". {% endcomment %}
+        {% if contact.personal %}<p class="details personal">
+          {% for part in contact.personal %}{% if not forloop.first %}<span class="sep"> · </span>{% endif %}<span>{{ part }}</span>{% endfor %}
+        </p>{% endif %}
       </header>
     {% elif cv.headline %}
       <header class="contact"><h1>{{ cv.headline }}</h1></header>

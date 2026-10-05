@@ -41,6 +41,22 @@ somebody can be found. Three consequences, and each is a rule rather than an int
   address reaching a stranger by default, and `Profile.location` staying its own line is the
   mechanism rather than a convention.
 
+**A date and a place of birth sit beside it (#679).** They are what an identity check asks
+for, so they are the most identifying things a profile can hold. They are columns of the
+account holder's own `Profile`, optional, never worked out from anything (an age is never
+computed, stored or shown) and held to one rule in `core/personal.py`, whichever door a value
+comes in at: the page, the API, a candidate file and an archive. The same rules as the
+address, each with a test:
+
+- Owner-scoped like every row, and removed with the account.
+- Never in a list, a log, a search result, a webhook or an error message. The API reads and
+  writes them only through `GET` and `PATCH /profile`, under the `read` and `write` scopes, and
+  no list endpoint carries them.
+- Printed only where a CV says so: each is a switch on the CV, off by default, so a CV, a
+  letter or a file made without choosing prints neither.
+- A place of birth is the text typed and a country, never looked up and never offered to
+  the map, which stops at city level for a company and holds nothing about a person.
+
 **Nothing about an address is verified, and nothing about it is a way back in.** Postulo is
 not going to post anything, so *valid* means well-formed enough to be used. An address can
 never become a recovery route by accident, because there is no flag on it that could.

@@ -33,6 +33,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts.identifiers import OTHER
+from postulo.core import personal
 from postulo.core.identifiers import PERSON, as_restored, find
 
 from .models import CV, Prints
@@ -152,12 +153,14 @@ DETAILS: tuple[Detail, ...] = (
 #: The same, by key.
 BY_KEY: dict[str, Detail] = {detail.key: detail for detail in DETAILS}
 
-#: The three yes-or-no answers, as the form, the API and the archive call them, and the
+#: The yes-or-no answers, as the form, the API and the archive call them, and the
 #: column each is kept in.
 SWITCHES: dict[str, str] = {
     "location": "show_location",
     "form_of_address": "show_form_of_address",
     "pronouns": "show_pronouns",
+    "birth_date": "show_birth_date",
+    "birth_place": "show_birth_place",
 }
 
 
@@ -296,6 +299,10 @@ class Printed:
     location: str = ""
     form_of_address: str = ""
     pronouns: str = ""
+    #: The date as stored (an ISO 8601 reduced form) and the place with its country, each only
+    #: where the CV says so (#679); the renderer words the date in the document's language.
+    birth_date: str = ""
+    birth_place: str = ""
     #: The kinds whose pinned row is no longer there, for the page to say so.
     gone: tuple[Detail, ...] = ()
 
@@ -382,6 +389,10 @@ def resolve(owner, cv: CV | None = None) -> Printed:
             printed.form_of_address = (profile.form_of_address or "").strip()
         if cv.show_pronouns:
             printed.pronouns = (profile.pronouns or "").strip()
+        if cv.show_birth_date:
+            printed.birth_date = (profile.birth_date or "").strip()
+        if cv.show_birth_place:
+            printed.birth_place = personal.place_text(profile.birth_place, profile.birth_country)
     printed.gone = tuple(missing)
     return printed
 
@@ -392,7 +403,9 @@ def is_default(cv: CV) -> bool:
         return False
     if cv.identifiers_choice != Prints.DEFAULT:
         return False
-    return cv.show_location and not cv.show_form_of_address and not cv.show_pronouns
+    return cv.show_location and not any(
+        getattr(cv, column) for name, column in SWITCHES.items() if name != "location"
+    )
 
 
 # -------------------------------------------------------------------- choosing

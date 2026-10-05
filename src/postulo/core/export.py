@@ -90,7 +90,11 @@ logger = logging.getLogger(__name__)
 #: restores both empty, as they were (#469).
 #: 33 added ``interview_id`` on an event: the interview settling wrote it for, by its id in
 #: this file; an archive without it restores every entry untied (#448).
-FORMAT_VERSION = 33
+#: 34 added ``birth_date``, ``birth_place`` and ``birth_country`` on the profile: when and where
+#: the person was born, as an ISO 8601 reduced date, the town typed and a country's code,
+#: each read back through the column's own rule; and ``birth_date`` and ``birth_place`` among
+#: a CV's ``prints``. An archive without them restores each blank and off (#679).
+FORMAT_VERSION = 34
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -113,8 +117,10 @@ FORMAT_VERSION = 33
 #: filled where blank, kept where not (#309). 4 added ``service`` on a web link (#305),
 #: read back as a claim: kept where the importing side offers that service and the address
 #: is one of its addresses, *Other* otherwise, and worked out from the address's host in a
-#: file that says nothing.
-CANDIDATE_FORMAT = 4
+#: file that says nothing. 5 added ``birth_date``, ``birth_place`` and ``birth_country`` on the
+#: profile, each read back as the other details are -- filled where blank, kept where not --
+#: and a date only through the column's own rule, so a malformed one is a refused row (#679).
+CANDIDATE_FORMAT = 5
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -125,6 +131,11 @@ PROFILE_FIELDS = (
     # Before the name, and apart from it (#309): stored as the text, so they travel as it.
     "form_of_address",
     "pronouns",
+    # The most identifying things a profile holds, optional and printed only where a CV says so
+    # (#679): the date as its ISO 8601 reduced form, the place as typed and its country's code.
+    "birth_date",
+    "birth_place",
+    "birth_country",
     "headline",
     # As typed. A blank is a blank here, not the address's town and country: that is worked
     # out when it is printed, and writing it in would pin it to today's primary address.
@@ -166,6 +177,9 @@ PROFILE_FIELDS = (
 CANDIDATE_PROFILE_FIELDS = (
     "form_of_address",
     "pronouns",
+    "birth_date",
+    "birth_place",
+    "birth_country",
     "headline",
     "location",
     "record_language",

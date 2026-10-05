@@ -594,3 +594,24 @@ def test_what_is_not_unique_across_the_instance_says_nothing_about_anybody(user,
 
     assert [row.outcome for row in plan.rows()] == [candidate.ADD] * 3
     assert not any(row.notes for row in plan.rows())
+
+
+@pytest.mark.parametrize("bad", ["1987-02-30", "3000", "1899", "soon", 1987, ["1987"], "1987\x00"])
+def test_a_malformed_date_of_birth_is_a_refused_row_and_nothing_is_stored(user, bad):
+    """A date of birth is the most identifying thing a file can carry, so it is read through
+    the column's own rule and a failure is a row on the review page (#679)."""
+    data = a_file(account={"profile": {"birth_date": bad, "headline": "Engineer"}})
+    held = candidate.read(data)
+    drawn = candidate.plan(user, held)
+    assert "refused" in outcomes(drawn, "details")
+    assert any(
+        "Date of birth" == row.label
+        for s in drawn.sections
+        for row in s.rows
+        if row.outcome == "refused"
+    )
+
+    candidate.apply(user, held)
+    user.profile.refresh_from_db()
+    assert user.profile.birth_date == ""
+    assert user.profile.headline == "Engineer", "and the rest of the file is still read"

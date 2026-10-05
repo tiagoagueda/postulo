@@ -357,3 +357,18 @@ def test_every_model_that_keeps_a_file_is_one_account_deletion_reads():
             if isinstance(field, models.FileField):
                 assert (model, field.name) in found, f"{model.__name__}.{field.name} is not read"
                 assert media.owner_lookup(model), f"{model.__name__} files belong to nobody"
+
+
+def test_the_personal_details_go_with_the_account(user, other_user):
+    """A date and place of birth are columns of the profile, which goes with the account
+    (#679); another account's stay."""
+    for person in (user, other_user):
+        person.profile.birth_date = "1990-03-12"
+        person.profile.birth_place = "Porto"
+        person.profile.birth_country = "PT"
+        person.profile.save()
+    deletion.delete_account(user)
+    assert not Profile.objects.filter(birth_date="1990-03-12", user_id=user.pk).exists()
+    assert not Profile.objects.filter(user_id=user.pk).exists()
+    kept = Profile.objects.get(user=other_user)
+    assert (kept.birth_date, kept.birth_place, kept.birth_country) == ("1990-03-12", "Porto", "PT")

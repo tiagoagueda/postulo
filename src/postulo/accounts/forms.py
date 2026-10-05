@@ -15,6 +15,7 @@ from allauth.socialaccount.forms import SignupForm as AllauthSocialSignupForm
 from django import forms
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.utils.html import escape, format_html
 from django.utils.safestring import mark_safe
 from django.utils.text import format_lazy
@@ -24,6 +25,7 @@ from django.utils.translation import pgettext
 from postulo.core import (
     language_field,
     languages,
+    personal,
     phone_field,
     phone_numbers,
     phones,
@@ -553,6 +555,42 @@ class ProfileForm(forms.ModelForm):
         max_length=ADDRESSING_MAX_LENGTH,
         widget=forms.TextInput(attrs={"dir": "auto"}),
     )
+    # The date of birth is three boxes, as the GOV.UK Design System draws a date somebody
+    # knows part of (#679): `clean` joins them into the ISO 8601 reduced form the column
+    # holds, and `save` writes it, because the column is not a field of this form. Each is a
+    # text box with a numeric keyboard rather than a menu of a hundred and twenty years or a
+    # `SelectDateWidget` that insists on all three parts. The autocomplete tokens say what
+    # each is for (SC 1.3.5).
+    birth_day = forms.CharField(
+        label=_("Day"),
+        required=False,
+        max_length=2,
+        widget=forms.TextInput(
+            attrs={"inputmode": "numeric", "autocomplete": "bday-day", "size": 3}
+        ),
+    )
+    birth_month = forms.CharField(
+        label=_("Month"),
+        required=False,
+        max_length=2,
+        widget=forms.TextInput(
+            attrs={"inputmode": "numeric", "autocomplete": "bday-month", "size": 3}
+        ),
+    )
+    birth_year = forms.CharField(
+        label=_("Year"),
+        required=False,
+        max_length=4,
+        widget=forms.TextInput(
+            attrs={"inputmode": "numeric", "autocomplete": "bday-year", "size": 5}
+        ),
+    )
+    birth_country = forms.ChoiceField(
+        label=_("Country of birth"),
+        required=False,
+        choices=[("", _("Not stated")), *phones.country_choices()],
+        widget=postal.CountrySelect,
+    )
     # A plain FileField, not an ImageField: the size and type are checked before anything
     # is decoded, and the decoding is done once, by the same code that stores the result.
     # Its help is what a file has to be, which stays under the box (#302), and is written
@@ -574,6 +612,8 @@ class ProfileForm(forms.ModelForm):
         fields = (
             "form_of_address",
             "pronouns",
+            "birth_place",
+            "birth_country",
             "headline",
             "location",
             "record_language",
@@ -581,6 +621,7 @@ class ProfileForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._start_birth_boxes()
         # The career record's language decides the lists, falling back to the interface's:
         # the name is written in the language the record is (#309).
         language = addressing.language_of(self.instance)
@@ -632,6 +673,38 @@ class ProfileForm(forms.ModelForm):
             self.fields["use_gravatar"].initial = self.instance.use_gravatar
             if not self.instance.avatar:
                 del self.fields["remove_picture"]
+
+    def _start_birth_boxes(self) -> None:
+        """Open the three boxes on the date the profile holds, and leave a bound form's alone."""
+        day, month, year = personal.birth_parts(getattr(self.instance, "birth_date", ""))
+        self.initial.update(birth_day=day, birth_month=month, birth_year=year)
+        self.fields["birth_place"].widget.attrs["autocomplete"] = "off"
+        self.fields["birth_place"].help_text = _(
+            "The town or city as you would write it. It is only ever text: it is not looked up "
+            "and never put on a map."
+        )
+
+    @property
+    def birth_boxes(self) -> list:
+        """The day, month and year boxes in the order the interface language writes a date."""
+        return [self[f"birth_{name}"] for name in personal.box_order()]
+
+    def _clean_birth_date(self, cleaned: dict) -> None:
+        """Join the three boxes into the column's text, or say what is wrong with them.
+
+        A form posted without any of the three -- a page drawn before they existed -- leaves
+        the date as it is rather than clearing it.
+        """
+        names = ("birth_day", "birth_month", "birth_year")
+        if self.is_bound and not any(self.add_prefix(name) in self.data for name in names):
+            cleaned["birth_date"] = getattr(self.instance, "birth_date", "")
+            return
+        try:
+            cleaned["birth_date"] = personal.birth_date_from_parts(
+                *(cleaned.get(name) or "" for name in names)
+            )
+        except ValidationError as refused:
+            self.add_error("birth_year", refused)
 
     def _offer(self, name: str, listed: tuple[str, ...], written_in: str) -> None:
         """Fill one menu with its language's list, and start it where the stored text is.
@@ -709,6 +782,7 @@ class ProfileForm(forms.ModelForm):
         the box, not beside it (WCAG 1.3.3).
         """
         cleaned = super().clean()
+        self._clean_birth_date(cleaned)
         for name in ("form_of_address", "pronouns"):
             box = f"{name}_other"
             chosen = (cleaned.get(name) or "").strip()
@@ -753,6 +827,8 @@ class ProfileForm(forms.ModelForm):
         return typed
 
     def save(self, commit: bool = True) -> Profile:
+        # Not a field of this form, so it is not on the instance until it is put there.
+        self.instance.birth_date = self.cleaned_data.get("birth_date", self.instance.birth_date)
         profile = super().save(commit=commit)
         user = profile.user
         user.first_name = self.cleaned_data["first_name"].strip()

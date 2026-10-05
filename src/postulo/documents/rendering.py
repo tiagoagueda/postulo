@@ -13,7 +13,7 @@ from django.utils.text import Truncator, slugify
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import languages
+from postulo.core import languages, personal
 
 from . import formats as file_formats
 from . import themes
@@ -237,7 +237,26 @@ def contact_details(owner, cv: CV | None = None) -> dict:
         details["name"],
         f"({printed.pronouns})" if printed.pronouns else "",
     )
+    # The personal details a CV may print, each only where it says so (#679): in keys of their
+    # own, and as one list of lines for a renderer that sets them as a line. The date is
+    # worded in the document's language and date style, which is the language this is called
+    # in; the place is the town as typed and the country's English name, as the location is.
+    details["birth_date"] = personal.birth_date_text(printed.birth_date)
+    details["birth_place"] = printed.birth_place
+    details["personal"] = _personal_lines(details["birth_date"], details["birth_place"])
     return details
+
+
+def _personal_lines(date: str, place: str) -> list[str]:
+    """The lines under the contact details that say something about the person: one
+    "Born ..." line, in the document's language, whichever of the two it has."""
+    if date and place:
+        return [gettext("Born %(date)s in %(place)s") % {"date": date, "place": place}]
+    if date:
+        return [gettext("Born %(date)s") % {"date": date}]
+    if place:
+        return [gettext("Born in %(place)s") % {"place": place}]
+    return []
 
 
 def cv_contact(cv: CV) -> dict | None:
@@ -416,6 +435,8 @@ def cv_outline(cv: CV) -> file_formats.Outline:
                 blocks.append(file_formats.paragraph(cv.headline or contact["headline"]))
             if contact["details"]:
                 blocks.append(file_formats.paragraph(BETWEEN.join(contact["details"])))
+            if contact.get("personal"):
+                blocks.append(file_formats.paragraph(BETWEEN.join(contact["personal"])))
         elif cv.headline:
             blocks.append(file_formats.heading(cv.headline, 1))
         if cv.summary.strip():

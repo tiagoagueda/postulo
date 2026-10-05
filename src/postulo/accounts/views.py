@@ -175,6 +175,7 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         entries = [
             entry("section-picture", _("Your picture")),
             entry("section-name", _("Your name")),
+            entry("section-personal", _("Personal details")),
             entry("section-contact", _("Contact block")),
         ]
         for block in context.get("links") or []:

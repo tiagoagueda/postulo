@@ -8,7 +8,7 @@ from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import postal
+from postulo.core import personal, postal
 from postulo.jobs.forms import OwnerScopedModelForm
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
@@ -151,6 +151,8 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_location",
             "show_form_of_address",
             "show_pronouns",
+            "show_birth_date",
+            "show_birth_place",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -252,6 +254,24 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
                 if said
                 else GIVES_NONE
             )
+        # What each would print as things stand, and said so where there is nothing to print:
+        # a switch for a date nobody has given would otherwise look broken (#679). The values
+        # are the person's own, drawn only on their own form, as the neighbours' are.
+        if profile is not None and profile.birth_date:
+            self.fields["show_birth_date"].help_text = format_html(
+                str(_("As things stand: {value}.")),
+                value=_typed(personal.birth_date_text(profile.birth_date) or profile.birth_date),
+            )
+        else:
+            self.fields["show_birth_date"].help_text = GIVES_NONE
+        place = personal.place_text(
+            getattr(profile, "birth_place", ""), getattr(profile, "birth_country", "")
+        )
+        self.fields["show_birth_place"].help_text = (
+            format_html(str(_("As things stand: {value}.")), value=_typed(place))
+            if place
+            else GIVES_NONE
+        )
         #: The kinds whose chosen row is no longer there, for the page to say so.
         self.gone = printing.gone(saved)
 
