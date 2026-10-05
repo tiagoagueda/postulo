@@ -97,19 +97,43 @@ def test_the_instance_default_applies_where_there_is_no_exception(user):
     assert not policy.decide(PLUGIN, user).on
 
 
-def test_switched_off_for_the_instance_beats_everything(user, tmp_path, settings):
-    """A plugin an administrator has disabled is not loaded at all, so nothing below can
-    turn it back on for anybody. This is not really a policy decision; it is the code not
-    being there."""
-    from postulo.plugins import installing
+def test_the_registry_is_the_instance_wide_switch(user, tmp_path, settings, monkeypatch):
+    """A package an administrator has disabled is not loaded, so its plugin never reaches
+    `decide()`. The record names the distribution (`postulo-example`) and a plugin has its
+    own name (`example`); policy compares neither, and does not pretend to (#596)."""
+    from postulo.plugins import installing, registry
+
+    class Fake:
+        name = "example"
+        dist = type("D", (), {"name": "postulo-example"})()
+        module = "postulo_example"
+
+        def load(self):
+            class Source:
+                name = "example"
+                version = "1.0"
+
+                def can_handle(self, url):
+                    return False
+
+                def parse(self, url, html):
+                    return None
+
+            return Source
 
     settings.POSTULO_PLUGINS_DIR = tmp_path / "plugins"
-    installing.write_record([installing.Installed(name=PLUGIN, version="1.0", disabled=True)])
-    PluginPolicy.objects.create(plugin=PLUGIN, person=user, state=PluginPolicy.State.FORCED_ON)
+    monkeypatch.setattr(
+        registry, "entry_points", lambda group: [Fake()] if group == "postulo.sources" else []
+    )
+    monkeypatch.setattr(registry, "register_plugin_locale", lambda module: None)
+    installing.write_record([installing.Installed(name="postulo-example", version="1.0")])
+    assert "example" in [s.name for s in registry.available_sources(refresh=True)]
 
-    decision = policy.decide(PLUGIN, user)
-    assert not decision.on
-    assert decision.decided_by == "instance"
+    installing.write_record(
+        [installing.Installed(name="postulo-example", version="1.0", disabled=True)]
+    )
+    assert "example" not in [s.name for s in registry.available_sources(refresh=True)]
+    assert policy.decide("example", user).decided_by != "instance"
 
 
 # ------------------------------------------------------- the person's own choice

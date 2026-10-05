@@ -41,6 +41,7 @@ All notable changes to Postulo are recorded here. The format follows
 - CONTRIBUTING.md says what belongs in the browser suite and how to keep it fast. (#726)
 - The browser suite's walks of every page check the accessibility, target size, text spacing and described-by rules on one load per page, in three walks instead of six. (#722)
 - Pages no longer re-read the package metadata for the footer's version, and the dashboard draws its widgets without re-running every context processor for each one, so it renders faster (#560)
+- Plugin policy no longer has a "switched off for the instance" step that compared a plugin's name with package names and never matched; the registry's filter on disabled packages is the instance-wide switch, as before. (#596)
 
 ### ✨ Added
 

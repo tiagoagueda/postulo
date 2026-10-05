@@ -6,17 +6,21 @@ for.
 
 **The order, and why it is this order.**
 
-1. *Switched off for the instance.* A plugin an administrator has disabled is not loaded at
-   all, so nothing below can turn it back on for anybody. This one is not really a policy
-   decision; it is the code not being there.
-2. *An administrator's decision about this person.*
-3. *An administrator's decision about everybody.*
-4. *The person's own choice*, which applies wherever an administrator has not taken it
+1. *An administrator's decision about this person.*
+2. *An administrator's decision about everybody.*
+3. *The person's own choice*, which applies wherever an administrator has not taken it
    away -- **and only to a plugin installed on the instance.** A plugin shipped inside
    Postulo is the administrator's to switch, for one person or for everybody, and never
    the person's (#200): what Postulo itself does is a decision about the instance, taken
    by whoever runs it, and a page of a dozen built-in switches was a page of things
    nobody meant to be a choice.
+
+**Switching a package off for the instance is not a step here.** The plugins record names
+distributions (``postulo-imap``), a policy asks about plugins (``imap``), and the two are
+not the same string. The registry is the switch: it leaves out every plugin of a disabled
+distribution, so one never reaches :func:`decide`. That is the code not being there, not a
+policy decision, and a check here that compared the two names would only look like
+protection (#596).
 
 **Forcing a plugin on does not make it run.** A notifier, store or sync needs a
 ``Connection`` holding credentials only the person can supply, so *on* means "this is
@@ -88,7 +92,7 @@ class Decision:
 
     @property
     def imposed(self) -> bool:
-        return self.decided_by in {"administrator", "instance"}
+        return self.decided_by == "administrator"
 
     def explain(self):
         """The sentence under the row on the person's own page, or nothing.
@@ -102,22 +106,12 @@ class Decision:
         still disabled; what is dropped is the attribution, not the visibility.
         """
         return {
-            "instance": _("Switched off for this whole instance."),
             "administrator": _("Set for your account."),
             "shipped": "",
             "person": _("You chose this."),
             "default": _("Available; you have not changed it."),
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
         }[self.decided_by]
-
-
-def _switched_off_for_the_instance(name: str) -> bool:
-    from .installing import canonicalise, disabled_names
-
-    try:
-        return canonicalise(name) in disabled_names()
-    except Exception:  # pragma: no cover - a broken record must not decide anything
-        return False
 
 
 def shipped_inside(plugin_name: str) -> bool:
@@ -176,9 +170,6 @@ def _decide(plugin_name: str, person) -> Decision:
     # `set_choice` with a transport's name and switching the mail off for somebody.
     if is_ungoverned(plugin_name):
         return Decision(on=True, offered=False, theirs=False, decided_by="infrastructure")
-
-    if _switched_off_for_the_instance(plugin_name):
-        return Decision(on=False, offered=False, theirs=False, decided_by="instance")
 
     rows = {
         row.person_id: row
