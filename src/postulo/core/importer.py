@@ -143,6 +143,10 @@ def _profile_value(profile, name: str, value):
             return personal.clean_nationalities(value)
         except ValidationError:
             return _REFUSED
+    if name in {"identifier_order", "hidden_identifiers"}:
+        from postulo.core import identifier_order
+
+        return identifier_order.known_keys(value)
     if name == "plugins_off":
         if not isinstance(value, list):
             return _REFUSED

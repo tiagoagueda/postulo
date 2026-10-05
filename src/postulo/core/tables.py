@@ -404,7 +404,14 @@ class Table:
         self.request = request
         self.params: QueryDict = request.GET
         self.settings = settings if isinstance(settings, dict) else {}
+        self.columns = self.arranged(self.columns)
         self.by_key = {column.key: column for column in self.columns}
+
+    def arranged(self, columns: tuple[Column, ...]) -> tuple[Column, ...]:
+        """``columns`` as this person's settings would have them listed. A table that has
+        a setting of its own for the order of some of them says so here; the default is
+        the declared order."""
+        return columns
 
     # ------------------------------------------------------------- preferences
 

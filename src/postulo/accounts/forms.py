@@ -1108,8 +1108,25 @@ class AppearanceForm(forms.ModelForm):
         ),
     )
 
+    #: The same list for the identifier schemes (#672): a switch and two arrows each, read
+    #: from ``ident_order``, ``ident_move`` and ``ident_reset``. Only acted on when the page
+    #: said it drew the list (``ident_order`` is posted), so a post without it -- an older
+    #: client, a script -- changes nothing rather than switching every scheme off.
+    identifiers_shown = forms.MultipleChoiceField(
+        label=_("Show in the lists of identifiers"),
+        required=False,
+        widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "A scheme left out is not drawn in a company's summary. It is never deleted: "
+            "its values stay in the forms, in the export and on any CV you chose to print "
+            "them on."
+        ),
+    )
+
     #: The key that moved on this save and which way, for the view to say where it went.
     moved: tuple[str, str] | None = None
+    #: The same, for the identifier list.
+    ident_moved: tuple[str, str] | None = None
 
     class Meta:
         model = Profile
@@ -1151,6 +1168,20 @@ class AppearanceForm(forms.ModelForm):
             "navigation", [key for key in navigation.HIDEABLE if key not in hidden]
         )
 
+        from postulo.core import identifier_order, identifiers
+
+        self.ident_order = identifier_order.complete(
+            self._posted("ident_order") or identifier_order.order_of(self.instance)
+        )
+        registry = identifiers.registry()
+        self.fields["identifiers_shown"].choices = [
+            (key, registry[key].label) for key in self.ident_order
+        ]
+        ident_hidden = identifier_order.hidden_keys(self.instance)
+        self.initial.setdefault(
+            "identifiers_shown", [key for key in self.ident_order if key not in ident_hidden]
+        )
+
     def _posted(self, name: str) -> list[str]:
         if not self.is_bound or not hasattr(self.data, "getlist"):
             return []
@@ -1168,6 +1199,33 @@ class AppearanceForm(forms.ModelForm):
         from postulo.core import navigation
 
         return not navigation.to_store(self.nav_order)
+
+    @property
+    def ident_is_default(self) -> bool:
+        """Whether the identifiers are in the usual order, when *Back* has nothing to do."""
+        from postulo.core import identifier_order
+
+        return not identifier_order.to_store(self.ident_order)
+
+    def _save_identifiers(self, profile: Profile) -> None:
+        from postulo.core import identifier_order
+
+        if not self._posted("ident_order"):
+            return
+        shown = set(self.cleaned_data.get("identifiers_shown") or [])
+        profile.hidden_identifiers = [
+            key for key in identifier_order.default_order() if key not in shown
+        ]
+        order = self.ident_order
+        if self._posted("ident_reset"):
+            order = identifier_order.default_order()
+        else:
+            direction, _sep, key = (self._posted("ident_move") or [""])[0].partition(":")
+            if identifier_order.can_move(order, key, direction):
+                order = identifier_order.move(order, key, direction)
+                self.ident_moved = (key, direction)
+        self.ident_order = identifier_order.complete(order)
+        profile.identifier_order = identifier_order.to_store(order)
 
     def save(self, commit: bool = True) -> Profile:
         """The form asks what to show; the profile records what to hide, and the order.
@@ -1193,6 +1251,7 @@ class AppearanceForm(forms.ModelForm):
                 self.moved = (key, direction)
         self.nav_order = navigation.complete(order)
         profile.nav_order = navigation.to_store(order)
+        self._save_identifiers(profile)
         if commit:
             profile.save()
         return profile

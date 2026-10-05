@@ -81,6 +81,8 @@ class AppearanceView(ProfileSectionView):
         from postulo.core import navigation
 
         self.object = form.save()
+        if form.ident_moved:
+            return self._identifier_moved(form)
         if not form.moved:
             messages.success(self.request, self.saved_message)
             return redirect(self.get_success_url())
@@ -95,6 +97,24 @@ class AppearanceView(ProfileSectionView):
             f"nav-{direction}-{key}"
             if navigation.can_move(order, key, direction)
             else f"nav-row-{key}"
+        )
+        return redirect(f"{self.request.path}#{target}")
+
+    def _identifier_moved(self, form):
+        """The same for the identifier list (#672): say where it went, and put focus back."""
+        from postulo.core import identifier_order, identifiers
+
+        key, direction = form.ident_moved
+        order = form.ident_order
+        messages.success(
+            self.request,
+            _("%(name)s is now number %(place)s in the identifiers.")
+            % {"name": identifiers.registry()[key].label, "place": order.index(key) + 1},
+        )
+        target = (
+            f"ident-{direction}-{key}"
+            if identifier_order.can_move(order, key, direction)
+            else f"ident-row-{key}"
         )
         return redirect(f"{self.request.path}#{target}")
 

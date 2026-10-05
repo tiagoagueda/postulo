@@ -24,7 +24,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import slugs, tables, throttle
+from postulo.core import identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_private_file
 from postulo.core.mixins import (
@@ -298,6 +298,13 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         person = self.request.user
+        # The summary of identifiers in the person's order, with the schemes they switched
+        # off counted rather than drawn (#672). All of them are still in the edit form.
+        shown, hidden = identifier_order.shown_and_hidden(
+            self.object.identifiers.all(), getattr(person, "profile", None)
+        )
+        context["identifier_rows"] = shown
+        context["identifiers_hidden"] = len(hidden)
         # The data-subject export beside each contact, while the feature offers it (#297).
         from postulo.core import gdpr
 

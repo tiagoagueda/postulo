@@ -27,6 +27,28 @@ class CompaniesTable(Table):
         "%(count)d company changed.", "%(count)d companies changed.", "count"
     )
     search_label = _("Search companies")
+
+    def arranged(self, columns):
+        """The identifier columns in the order set under Settings → Appearance (#672).
+
+        They keep the places the identifier columns hold among the others, and are
+        reordered among themselves, so the chooser lists the schemes as the person
+        arranged them. None is a default column, so a scheme switched off there has
+        nothing to lose here; it stays in the chooser.
+        """
+        from postulo.core import identifier_order
+
+        profile = getattr(getattr(self.request, "user", None), "profile", None)
+        if profile is None:
+            return columns
+        ranks = {key: place for place, key in enumerate(identifier_order.order_of(profile))}
+        ids = sorted(
+            (c for c in columns if c.key.startswith("id_")),
+            key=lambda c: ranks.get(c.key.removeprefix("id_"), len(ranks)),
+        )
+        queue = iter(ids)
+        return tuple(next(queue) if c.key.startswith("id_") else c for c in columns)
+
     columns = (
         # The one column here that can be changed where it sits, and the one worth
         # choosing first: it has a real refusal to place -- two companies of one name

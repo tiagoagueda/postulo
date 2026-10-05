@@ -97,6 +97,42 @@
         </fieldset>
       </div>
       <div class="card mb-6">
+        <fieldset{% if form.identifiers_shown.aria_describedby %} aria-describedby="{{ form.identifiers_shown.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.identifiers_shown.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.identifiers_shown.auto_id }}_helptext">{{ form.identifiers_shown.help_text }}</p>
+          {% comment %} The navigation's list again, for the identifier schemes (#672): the same rows, the same arrows as submit buttons of this form, the same disabled arrow at either end. One order serves people and companies; a scheme that identifies only one of them is simply not there on the other. {% endcomment %}
+          <ol class="max-w-md space-y-1" data-identifier-order>
+            {% for choice in form.identifiers_shown|widgets_classed:"input" %}
+              {% with key=choice.data.value %}
+                <li class="flex items-center gap-2 rounded-lg" id="ident-row-{{ key }}" tabindex="-1">
+                  <input type="hidden" name="ident_order" value="{{ key }}">
+                  <label class="flex min-w-0 flex-1 items-center gap-3 py-1 text-sm text-ink-800 dark:text-ink-200">
+                    {{ choice.tag }}
+                    <span>{{ choice.choice_label }}</span>
+                  </label>
+                  <button type="submit" name="ident_move" value="up:{{ key }}" id="ident-up-{{ key }}"
+                          class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.first %} disabled{% endif %}
+                          aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} up{% endblocktranslate %}">
+                    {% icon "chevron-up" %}
+                  </button>
+                  <button type="submit" name="ident_move" value="down:{{ key }}" id="ident-down-{{ key }}"
+                          class="btn" data-variant="ghost" data-size="icon-sm"{% if forloop.last %} disabled{% endif %}
+                          aria-label="{% blocktranslate with column=choice.choice_label %}Move {{ column }} down{% endblocktranslate %}">
+                    {% icon "chevron-down" %}
+                  </button>
+                </li>
+              {% endwith %}
+            {% endfor %}
+          </ol>
+          {% if not form.ident_is_default %}
+            <button type="submit" name="ident_reset" value="1" class="btn mt-3" data-variant="ghost" data-size="sm">
+              {% translate "Back to the usual order" %}
+            </button>
+          {% endif %}
+          <div class="field"><c-field-feedback :field="form.identifiers_shown" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
         <c-section-title>
           {% translate "Gone quiet" %}
           <c-slot name="subtitle">{% translate "The dashboard lists open applications nothing has happened to for a while, with nothing planned. Recruiters' own advice clusters around two to three weeks." %}</c-slot>

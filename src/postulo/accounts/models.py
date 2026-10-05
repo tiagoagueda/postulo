@@ -384,6 +384,12 @@ class Profile(models.Model):
     #: release is in neither list, and is drawn after the placed ones rather than lost.
     #: `postulo.core.navigation` reads and writes it.
     nav_order = models.JSONField(_("navigation order"), default=list, blank=True)
+    #: The same pair for the registry's identifier schemes (#672): the keys placed, in the
+    #: person's order, and the keys switched off. Empty is the default, so nothing was
+    #: migrated; a scheme in neither is drawn after the placed ones. `postulo.core.
+    #: identifier_order` reads and writes them.
+    identifier_order = models.JSONField(_("identifier order"), default=list, blank=True)
+    hidden_identifiers = models.JSONField(_("hidden identifiers"), default=list, blank=True)
     #: Whether an entry's form on Your career shows its order number. Off, because the
     #: arrows on the overview are the control; on for somebody who cannot use them or would
     #: rather type a number, which is why it lives under Appearance with the other

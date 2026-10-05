@@ -202,7 +202,11 @@ def offered(owner, key: str) -> list:
 
         return phone_numbers.numbers_for(profile, owner)
     if key == "identifiers":
-        return list(profile.identifiers.all())
+        from postulo.core import identifier_order
+
+        # In the order the person arranged the schemes in (#672). Every row is offered,
+        # switched off or not: hiding is for drawing summaries, and a CV's choice is its own.
+        return identifier_order.arranged(profile.identifiers.all(), profile)
     from postulo.core import web_links
 
     return web_links.links_for(profile, owner, BY_KEY[key].link_kind)

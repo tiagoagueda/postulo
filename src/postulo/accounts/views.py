@@ -59,6 +59,13 @@ class ProfileView(LoginRequiredMixin, WebLinksMixin, UpdateView):
         # to the identifiers, not an error about a missing management form.
         if self.request.method == "POST" and "identifiers-TOTAL_FORMS" in self.request.POST:
             kwargs["data"] = self.request.POST
+        from postulo.core import identifier_order
+
+        # In the order the person arranged under Settings → Appearance (#672). Every row is
+        # here, switched off or not: a hidden value must stay reachable and removable.
+        kwargs["queryset"] = identifier_order.order_queryset(
+            self.object.identifiers.all(), self.object
+        )
         return PersonIdentifierFormSet(**kwargs)
 
     def get_numbers(self):

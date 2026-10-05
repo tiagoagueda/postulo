@@ -91,9 +91,9 @@
      component draws nothing where there are none. {% endcomment %}
   <c-duplicates :candidates="duplicates" />
 
-  {% if company.identifiers.all %}
+  {% if identifier_rows or identifiers_hidden %}
     <dl class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm" data-identifiers>
-      {% for identifier in company.identifiers.all %}
+      {% for identifier in identifier_rows %}
         <div class="flex items-baseline gap-2">
           <dt class="text-ink-500 dark:text-ink-400">{% if identifier.brand %}{% brand identifier.brand class="inline-block size-4 align-text-bottom" %} {% endif %}{{ identifier.scheme_label }}</dt>
           <dd class="tabular-nums">
@@ -106,6 +106,14 @@
           </dd>
         </div>
       {% endfor %}
+      {% if identifiers_hidden %}
+        {% comment %} What Settings → Appearance switched off is counted, never lost: the edit form has every one (#672). {% endcomment %}
+        <div class="flex items-baseline gap-2" data-identifiers-hidden>
+          <a href="{% url 'jobs:company_update' company.pk %}#section-identifiers" class="text-brand-600 underline dark:text-brand-400">
+            {% blocktranslate count counter=identifiers_hidden trimmed %}{{ counter }} hidden{% plural %}{{ counter }} hidden{% endblocktranslate %}
+          </a>
+        </div>
+      {% endif %}
     </dl>
   {% endif %}
 

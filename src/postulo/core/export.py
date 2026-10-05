@@ -104,7 +104,10 @@ logger = logging.getLogger(__name__)
 #: them restores it blank and off (#681).
 #: 37 added the preference ``show_key_hints``: whether the key badges are drawn; an
 #: archive without it restores it on, the default (#658).
-FORMAT_VERSION = 37
+#: 38 added ``identifier_order`` and ``hidden_identifiers`` on the profile: which identifier
+#: schemes the person sees and in what order, read back through the same filter as the
+#: navigation's pair (#672).
+FORMAT_VERSION = 38
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -176,6 +179,9 @@ PROFILE_FIELDS = (
     # names an item this instance does not have is passed over rather than trusted.
     "nav_order",
     "hidden_nav_items",
+    # The identifiers' arrangement (#672), read back through `identifier_order.known_keys`.
+    "identifier_order",
+    "hidden_identifiers",
     "quiet_after_days",
     "use_gravatar",
     "show_career_order",
