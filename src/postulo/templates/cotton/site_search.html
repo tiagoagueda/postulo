@@ -111,7 +111,7 @@
     {% comment %} The "/" is a key cap beside the box rather than text in its placeholder
        (#658): drawn while the box is empty and not focused, and only when hints and
        shortcuts are both on. The key is named by `aria-keyshortcuts` either way. {% endcomment %}
-    <span class="relative inline-block">
+    <span class="relative inline-block" data-search-box>
       <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
              enterkeyhint="search" placeholder="{% translate 'Search' %}"{% if shortcuts %} aria-keyshortcuts="/"{% endif %} data-search-shortcut
              class="peer w-32 py-1 text-sm transition-[width] focus:w-48">

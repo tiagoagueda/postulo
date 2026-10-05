@@ -1886,6 +1886,16 @@ select[data-select-ready] {
     @apply flex min-w-0 flex-1 items-center;
   }
 
+  /* The box sits in a wrapper that carries the "/" key cap (#658); it takes the room the
+     input took, and the cap, which is for a keyboard, is not drawn here. */
+  [data-site-header][data-search-open] [data-search-box] {
+    @apply flex min-w-0 flex-1;
+  }
+
+  [data-site-header][data-search-open] [data-search-box] [data-key-hint] {
+    display: none;
+  }
+
   [data-site-header][data-search-open] [data-site-search-form] input {
     @apply min-h-11 min-w-0 flex-1 text-base focus:w-auto;
     inline-size: auto;

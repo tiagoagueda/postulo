@@ -501,3 +501,17 @@ def test_the_hint_switch_is_on_the_accessibility_page_and_saves_apart_from_the_k
 
 def test_the_script_says_command_where_the_key_is_command():
     assert "data-key-ctrl" in APP_JS and "⌘" in APP_JS
+
+
+def test_the_boxs_wrapper_takes_the_room_the_input_took_when_the_field_opens_on_a_phone(
+    client, user
+):
+    """The "/" cap needs a wrapper round the input, and the stylesheet that stretches the
+    input in the masthead (#350) must stretch the wrapper too, and drop the cap (#658)."""
+    client.force_login(user)
+    html = client.get(reverse("core:home")).content.decode()
+    assert "data-search-box" in html
+
+    sheet = (Path(__file__).resolve().parents[1] / "assets" / "css" / "app.css").read_text("utf-8")
+    assert "[data-search-open] [data-search-box] {" in sheet
+    assert "[data-search-box] [data-key-hint]" in sheet
