@@ -382,6 +382,8 @@ FACTORIES: dict[str, Callable] = {
     "documents:letter_delete": pk_of(letter),
     "documents:letter_detail": pk_of(letter),
     "documents:letter_draft": pk_of(letter),
+    # A format the registry holds, so that the 404 is the record's and not the format's.
+    "documents:letter_download": pk_of(letter, format="txt"),
     "documents:letter_preview": pk_of(letter),
     "documents:letter_update": pk_of(letter),
     "documents:rendered_archive": pk_of(rendered),
