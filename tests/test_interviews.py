@@ -959,3 +959,53 @@ def test_a_stale_edit_page_does_not_move_the_interview_back(client, user, applic
     assert interview.location == "new"
     assert interview.starts_at == moved
     assert application.events.count() == before, "no move nobody made is logged"
+
+
+# ------------------------------------------------------------------- the people
+
+
+@pytest.fixture
+def people_catalogue():
+    """A test locale whose catalogue translates the phrases and the separator."""
+    from django.utils.translation import trans_real
+
+    sep = "separator between the names of the people at an interview"
+    inline = "introduces the people at an interview, after its place; {people} is their names"
+    line = "introduces the people at an interview, on a line of its own; {people} is their names"
+    extra = {
+        f"{sep}, ": " 、 ",
+        f"{inline}with {{people}}": "mit {people} (inline)",
+        f"{line}With {{people}}": "Mit {people} (line)",
+    }
+    catalogue = trans_real.translation("fr-FR")._catalog
+    catalogue._catalogs.insert(0, extra)
+    yield
+    catalogue._catalogs.remove(extra)
+
+
+def test_the_people_phrase_and_separator_are_translatable(
+    client, user, application, recruiter, people_catalogue
+):
+    other = Contact.objects.create(owner=user, company=recruiter.company, name="Glados")
+    interview = schedule_interview(
+        application, starts_at=in_days(3), kind=InterviewKind.ONSITE, contacts=[recruiter, other]
+    )
+    assert interview.contacts.count() == 2
+    client.force_login(user)
+    user.profile.language = "fr-FR"
+    user.profile.save()
+    listing = client.get(reverse("applications:interview_list")).content.decode()
+    page = client.get(application.get_absolute_url()).content.decode()
+    assert "(inline)" in listing and " 、 " in listing
+    assert "(line)" in page and " 、 " in page
+    assert "Cave Johnson" in listing and "Glados" in page
+
+
+def test_the_people_phrase_in_english_and_nothing_for_nobody(application, recruiter):
+    interview = schedule_interview(
+        application, starts_at=in_days(3), kind=InterviewKind.VIDEO, contacts=[recruiter]
+    )
+    assert "with <bdi>Cave Johnson</bdi>" == interview.with_people
+    assert interview.with_people_line.startswith("With ")
+    empty = schedule_interview(application, starts_at=in_days(4), kind=InterviewKind.VIDEO)
+    assert empty.with_people == "" and empty.with_people_line == ""

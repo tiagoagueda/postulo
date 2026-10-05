@@ -67,10 +67,7 @@
                     {{ interview.location }}
                   {% endif %}
                 {% endif %}
-                {% for person in interview.contacts.all %}
-                  {% if forloop.first %}{% if interview.location %} · {% endif %}{% translate "with" %}{% else %},{% endif %}
-                  {{ person.name }}
-                {% endfor %}
+                {% if interview.with_people %}{% if interview.location %} · {% endif %}{{ interview.with_people }}{% endif %}
               </p>
               {% if interview.awaits_outcome %}
                 <p class="mt-1 text-xs text-amber-700 dark:text-amber-400">{% translate "How did it go?" %}</p>

@@ -281,11 +281,8 @@
                         {% endif %}
                       </p>
                     {% endif %}
-                    {% if interview.contacts.all %}
-                      <p class="text-xs text-ink-500 dark:text-ink-400">
-                        {% translate "With" %}
-                        {% for person in interview.contacts.all %}{% if not forloop.first %}, {% endif %}{{ person.name }}{% endfor %}
-                      </p>
+                    {% if interview.with_people_line %}
+                      <p class="text-xs text-ink-500 dark:text-ink-400">{{ interview.with_people_line }}</p>
                     {% endif %}
                     {% if interview.notes %}
                       <p class="mt-1 whitespace-pre-line text-xs text-ink-600 dark:text-ink-300">{{ interview.notes }}</p>

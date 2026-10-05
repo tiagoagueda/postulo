@@ -36,7 +36,9 @@ from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import number_format
+from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import pgettext
 
 from postulo.core.models import OwnedModel, Tag
 from postulo.jobs.models import Contact, JobPosting, SalaryPeriod, currency_code
@@ -826,6 +828,43 @@ class Interview(OwnedModel):
     def is_over(self) -> bool:
         """Whether its time has passed, whatever was recorded about it."""
         return self.ends_at < timezone.now()
+
+    def _people(self):
+        """The names, joined with the language's own separator, each isolated for bidi."""
+        names = [(person.name,) for person in self.contacts.all()]
+        if not names:
+            return None
+        separator = pgettext("separator between the names of the people at an interview", ", ")
+        return format_html_join(separator, "<bdi>{}</bdi>", names)
+
+    @property
+    def with_people(self) -> str:
+        """ "with Ana, Rui", to follow a place on the interview list; empty with nobody."""
+        people = self._people()
+        if people is None:
+            return ""
+        return format_html(
+            pgettext(
+                "introduces the people at an interview, after its place; {people} is their names",
+                "with {people}",
+            ),
+            people=people,
+        )
+
+    @property
+    def with_people_line(self) -> str:
+        """ "With Ana, Rui", a line of its own on the application page; empty with nobody."""
+        people = self._people()
+        if people is None:
+            return ""
+        return format_html(
+            pgettext(
+                "introduces the people at an interview, on a line of its own; "
+                "{people} is their names",
+                "With {people}",
+            ),
+            people=people,
+        )
 
     @property
     def awaits_outcome(self) -> bool:

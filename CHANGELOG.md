@@ -62,6 +62,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The dashboard widget code no longer declares one field three times, and the linter now catches that mistake (#501)
 - The Applications board is a box about the height of the window that scrolls inside the page, so every column's name, open or folded, stays on screen however far down a long column you are; the box is a named region you can scroll from the keyboard, and the page scrolls on past it. (#652)
 - The doc comment on ResumeItem.order is written once instead of twice, so later edits cannot leave a stale copy (#614)
+- Who an interview is with now reads as one translatable phrase with its own list separator, on the interview list and the application page, instead of a bare "with" and a hard-coded comma (#627)
 
 ## [0.4.0] — 2026-10-04
 
