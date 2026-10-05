@@ -79,6 +79,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A status change posted with htmx at a table row now redirects as a plain post does, instead of answering an empty row that no page asked for (#402)
 - Putting a reminder off until tomorrow or next week on an application's page now keeps keyboard focus on that reminder's actions button instead of dropping it to the start of the page (#520).
 - The scheduler's closing-date and quiet-application announcers now handle each person once per pass instead of once per listing or application, cutting the repeated work on large accounts. (#400)
+- The monthly dependency upgrade pull request now gets the full CI run through a bot token, says what the workflow ran, and keeps the pre-commit ruff version in step with the lock (#585)
 
 ## [0.4.0] — 2026-10-04
 

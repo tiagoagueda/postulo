@@ -3,9 +3,13 @@
 # CONTRIBUTING.md said "once a month, `uv lock --upgrade`", and nothing did it: the weekly
 # audit in ci.yml reports a vulnerability, not staleness, and a lock that is never moved is
 # one whose next move is a year of changes at once. So, monthly and on demand, this upgrades
-# the lock, runs the suite against it, and -- only if the suite passes -- opens a pull
-# request with the result. A person still reads the changelogs of anything that moved a major
-# version and merges; the workflow does the part that was being forgotten.
+# the lock, runs a quick check against it, and -- only if that passes -- opens a pull
+# request with the result. The full check is the pull request's own CI run (every job of
+# ci.yml, over every Python, with PostgreSQL, the audit and the browser), which is why the
+# pull request is opened with a token that is not the automatic one: Forgejo ignores events
+# whose doer is the Actions user, so a branch pushed with it never starts ci.yml (#585). A
+# person still reads the changelogs of anything that moved a major version and merges; the
+# workflow does the part that was being forgotten.
 #
 # It writes a branch and opens a pull request, so it needs more than `contents: read`. That
 # is why it is its own file with its own permissions rather than a job in ci.yml, where every
@@ -63,18 +67,25 @@ jobs:
           else
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git diff --stat -- uv.lock
+            # The pre-commit hook formats with the ruff the lock names, or a contributor's
+            # hook and CI disagree (tests/test_tooling.py holds the two together).
+            ruff_version="$(python3 -c 'import tomllib; print(next(p["version"] for p in tomllib.load(open("uv.lock", "rb"))["package"] if p["name"] == "ruff"))')"
+            sed -i -E "/ruff-pre-commit/{n;s/rev: v.*/rev: v${ruff_version}/}" .pre-commit-config.yaml
           fi
 
       - name: Install the upgraded dependencies
         if: steps.lock.outputs.changed == 'true'
         run: uv sync --locked --python 3.14 --no-group e2e
 
-      - name: Run the suite against them
-        # The same checks the test job runs, minus the browser: a lock that fails here is
-        # not proposed at all, and the run's log says what moved and what broke.
+      - name: Run a quick check against them
+        # Ruff, migrations and the suite on Python 3.14 alone: enough that a lock which
+        # fails here is not proposed at all, and the run's log says what moved and what
+        # broke. It is not the test job: the other Pythons, the translation checks, ESCO,
+        # PostgreSQL, the audit and the browser run on the pull request itself.
         if: steps.lock.outputs.changed == 'true'
         run: |
           uv run ruff check .
+          uv run ruff format --check .
           uv run manage.py makemigrations --check --dry-run
           uv run python scripts/messages.py compile
           uv run pytest -n 2
@@ -86,7 +97,13 @@ jobs:
         env:
           # Through the environment, never expanded into the script: a value that reaches a
           # shell as text is data, one pasted into it is code.
-          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          #
+          # A bot account's token (repository secret DEPENDENCIES_TOKEN, with write access
+          # to code and pull requests), so the push and the pull request start ci.yml like
+          # any other. Without it the automatic token still works, but CI never runs on the
+          # pull request, and its body says so.
+          TOKEN: ${{ secrets.DEPENDENCIES_TOKEN || secrets.GITHUB_TOKEN }}
+          BOT_TOKEN_SET: ${{ secrets.DEPENDENCIES_TOKEN != '' && 'yes' || 'no' }}
           SERVER: ${{ github.server_url }}
           REPOSITORY: ${{ github.repository }}
           BASE: ${{ github.ref_name }}
@@ -95,9 +112,9 @@ jobs:
           git config user.name "Postulo dependencies"
           git config user.email "dependencies@postulo.invalid"
           git checkout -B "$branch"
-          git add uv.lock
+          git add uv.lock .pre-commit-config.yaml
           git commit -m "Upgrade the lock file ($(date -u +%Y-%m-%d))" \
-            -m "Every dependency moved to its newest version the constraints allow; the suite passed against them. Read the changelogs of anything that crossed a major version before merging."
+            -m "Every dependency moved to its newest version the constraints allow; ruff, the migration check and the suite on Python 3.14 passed against them. The pull request's CI run is the full check. Read the changelogs of anything that crossed a major version before merging."
           # The token in the URL of this one push, not in .git/config.
           git push --force "${SERVER%%://*}://x-access-token:${TOKEN}@${SERVER#*://}/${REPOSITORY}.git" "HEAD:refs/heads/${branch}"
           python3 - "$branch" <<'PY'
@@ -105,6 +122,11 @@ jobs:
           branch = sys.argv[1]
           server, repository, token = os.environ["SERVER"], os.environ["REPOSITORY"], os.environ["TOKEN"]
           base = os.environ["BASE"]
+          ci = (
+              "CI on this pull request is the full check; merge only when it is green."
+              if os.environ["BOT_TOKEN_SET"] == "yes"
+              else "No bot token is configured (secret `DEPENDENCIES_TOKEN`), so CI did not run on this pull request: run it by hand before merging."
+          )
           api = f"{server.rstrip('/')}/api/v1/repos/{repository}"
           def call(method, path, body=None):
               request = urllib.request.Request(api + path, method=method, data=json.dumps(body).encode() if body else None)
@@ -123,8 +145,9 @@ jobs:
                   "base": base,
                   "title": f"Upgrade the lock file ({branch.split('/')[-1]})",
                   "body": (
-                      "`uv lock --upgrade`, run by the Dependencies workflow, and the suite passed "
-                      "against the result. Before merging, read the changelogs of anything that "
+                      "`uv lock --upgrade`, run by the Dependencies workflow. Before opening this, "
+                      "ruff, the migration check and the suite passed on Python 3.14 alone. "
+                      + ci + " Before merging, read the changelogs of anything that "
                       "crossed a major version, and land the lock file on its own, as CONTRIBUTING.md asks."
                   ),
               })

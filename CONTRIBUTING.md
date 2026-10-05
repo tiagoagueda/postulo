@@ -479,8 +479,10 @@ catalogues exist and are waiting for contributors — see
 ## Keeping dependencies current
 
 The `Dependencies` workflow runs `uv lock --upgrade` once a month (and on demand from
-*Actions*), runs the suite against the result, and opens a pull request only if it passed.
-What is left for a person is the reading: the changelogs of anything that moved a major
+*Actions*), runs ruff and the suite on one Python against the result, and opens a pull
+request only if that passed, moving the pre-commit ruff `rev` to the locked version. The
+pull request is pushed with the `DEPENDENCIES_TOKEN` secret (a bot account), so `ci.yml`
+runs on it as on any other; merge when that is green. What is left for a person is the reading: the changelogs of anything that moved a major
 version. Merge the lock file on its own. Between runs, when the `security` job says so,
 the same by hand: `uv lock --upgrade`, run the suite, commit the lock file on its own.
 
