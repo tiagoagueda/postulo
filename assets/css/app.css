@@ -1470,6 +1470,62 @@
   }
 
   /*
+   * A thumb is not a pointer (#73). 24 pixels is what WCAG 2.2 AA asks and what a mouse
+   * needs; 44 is what a finger comfortably lands on, so where the primary pointer is
+   * coarse every control a person presses grows to it: the small buttons, the row actions
+   * and the tap targets. `pointer: coarse` and not a width, because a narrow desktop
+   * window has a mouse in it and a tablet has a finger at any width. Only the height of a
+   * button changes, so a line of them wraps rather than overflows; an icon-only control
+   * gets the width as well.
+   */
+  @media (pointer: coarse) {
+    .tap-target,
+    .btn[data-size="xs"],
+    .btn[data-size="sm"],
+    td[data-actions] :is(button, a[href], summary),
+    .table-cards td[data-actions] :is(button, a[href], summary) {
+      min-block-size: 2.75rem;
+    }
+
+    .tap-target {
+      min-inline-size: 2.75rem;
+      justify-content: center;
+    }
+
+    /* The small filter boxes and the card's status menu (`px-2 py-1 text-xs`) are the
+       same fingers' targets. 16 pixels as well, because a phone's browser zooms the page
+       in on a text box set smaller and leaves it zoomed. */
+    :is(select, textarea, input:not([type="checkbox"], [type="radio"], [type="hidden"], [type="range"], [type="file"])) {
+      min-block-size: 2.75rem;
+      font-size: 1rem;
+    }
+
+    .btn[data-size="icon"],
+    .btn[data-size="icon-xs"],
+    .btn[data-size="icon-sm"] {
+      min-block-size: 2.75rem;
+      min-inline-size: 2.75rem;
+    }
+  }
+
+  /*
+   * The board on a phone (#73): one column and the edge of the next is a column and a
+   * hint, so below `sm` an open column is nearly the window's width and the box snaps
+   * to the column it stops nearest -- a swipe moves a column, and the folded strips
+   * beside it say what else there is. Drag and drop does not fire on a touch screen; each
+   * card's own status menu is the way to move one, and stays in the card.
+   */
+  @media (width < 40rem) {
+    .board-box {
+      scroll-snap-type: x proximity;
+    }
+
+    .board-box [data-board-section] {
+      scroll-snap-align: start;
+    }
+  }
+
+  /*
    * *Primary*, drawn as a star (#303). Still a radio -- the rows of a block share one name,
    * so the browser enforces exactly one before anything is posted -- kept for the keyboard
    * and the screen reader, and hidden from sight inside the label that is its 24-pixel

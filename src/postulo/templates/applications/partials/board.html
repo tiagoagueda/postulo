@@ -140,7 +140,7 @@
        A property and not a style on the content, because htmx carries the style of an
        element with an id -- the list of cards has one -- into the next board it draws,
        which the page's content security policy refuses. {% endcomment %}
-    <section class="shrink-0 {% if column.open %}w-72{% else %}relative rounded-lg border border-ink-200 pb-2 dark:border-ink-800{% endif %}"
+    <section class="shrink-0 {% if column.open %}w-[calc(100vw-4rem)] sm:w-72{% else %}relative rounded-lg border border-ink-200 pb-2 dark:border-ink-800{% endif %}"
              data-board-section="{{ column.status }}"{% if not column.open %} data-board-strip{% endif %}>
       <div class="sticky top-0 z-10 flex w-(--board-arrives) bg-ink-50 dark:bg-ink-950 {% if column.open %}mb-2 items-baseline justify-between px-1{% else %}flex-col items-center gap-1{% endif %}">
         <h2 class="text-sm font-medium" aria-label="{{ column.label }}">

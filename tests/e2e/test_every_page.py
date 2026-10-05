@@ -226,3 +226,35 @@ def test_nothing_is_lost_at_two_hundred_percent_zoom(
         f"{len(failures)} box(es) clip their words or push the page sideways at 200% zoom:\n"
         f"{report(failures)}"
     )
+
+
+#: A phone held upright: the width the interface is read at while standing on a train (#73).
+PHONE = {"width": 390, "height": 844}
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_every_page_on_a_phone_has_no_violations_and_does_not_scroll_sideways(
+    live_server,
+    page: Page,
+    axe_source,  # noqa: F811
+    furnished,  # noqa: F811
+    scheme,
+):
+    """The axe run again at 390 pixels, in both themes (#73). A table may scroll inside its
+    own box; the page itself may not, or the person is panning to read a sentence."""
+    from .test_reflow import SCROLLS_SIDEWAYS
+
+    page.emulate_media(color_scheme=scheme)
+    page.set_viewport_size(PHONE)
+
+    failures = []
+    for path in every_page(
+        page, live_server.url, furnished, skip=lambda path: not axe_should_read(path)
+    ):
+        found = violations_on(page, axe_source)
+        if found:
+            failures.append(describe(f"{path} ({scheme}, phone)", found))
+        reached = page.evaluate(SCROLLS_SIDEWAYS)["reached"]
+        if reached:
+            failures.append(f"{path} ({scheme}, phone): the page scrolls {reached}px sideways")
+    assert not failures, "\n\n".join(failures)
