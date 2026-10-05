@@ -243,20 +243,35 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     # in; the place is the town as typed and the country's English name, as the location is.
     details["birth_date"] = personal.birth_date_text(printed.birth_date)
     details["birth_place"] = printed.birth_place
-    details["personal"] = _personal_lines(details["birth_date"], details["birth_place"])
+    # Countries are named in English under a translated label, as the location is (#680); a
+    # person who listed none and said only a scope prints the scope's wording instead.
+    details["nationalities"] = list(printed.nationalities)
+    details["nationality_scope"] = personal.scope_text(printed.nationality_scope)
+    details["personal"] = _personal_lines(
+        details["birth_date"],
+        details["birth_place"],
+        details["nationalities"],
+        details["nationality_scope"],
+    )
     return details
 
 
-def _personal_lines(date: str, place: str) -> list[str]:
-    """The lines under the contact details that say something about the person: one
-    "Born ..." line, in the document's language, whichever of the two it has."""
+def _personal_lines(date: str, place: str, countries: list, scope: str) -> list[str]:
+    """The lines under the contact details that say something about the person, in the
+    document's language: one "Born ..." line, whichever of its two parts there is, and
+    the nationality, as the countries or as the scope's wording where none is listed."""
+    lines = []
     if date and place:
-        return [gettext("Born %(date)s in %(place)s") % {"date": date, "place": place}]
-    if date:
-        return [gettext("Born %(date)s") % {"date": date}]
-    if place:
-        return [gettext("Born in %(place)s") % {"place": place}]
-    return []
+        lines.append(gettext("Born %(date)s in %(place)s") % {"date": date, "place": place})
+    elif date:
+        lines.append(gettext("Born %(date)s") % {"date": date})
+    elif place:
+        lines.append(gettext("Born in %(place)s") % {"place": place})
+    if countries:
+        lines.append(gettext("Nationality: %(countries)s") % {"countries": ", ".join(countries)})
+    elif scope:
+        lines.append(scope)
+    return lines
 
 
 def cv_contact(cv: CV) -> dict | None:

@@ -121,3 +121,78 @@ def test_nothing_is_printed_by_a_document_that_did_not_choose(born):
     cv.show_birth_place = True
     cv.save()
     assert SECRET_PLACE in rendering.cv_text(cv) and "1987" not in rendering.cv_text(cv)
+
+
+# ---------------------------------------------------------------- nationalities (#680)
+
+
+def test_nationalities_are_the_owners_own_and_need_the_same_scopes(client, user, other_user):
+    user.profile.nationalities = ["PT", "BR"]
+    user.profile.save()
+    assert client.get("/api/v1/profile", **issue(user, "captures")).status_code == 403
+    assert patch(client, {"nationalities": ["GB"]}, **issue(user, "read")).status_code == 403
+    assert client.get("/api/v1/profile", **issue(user, "write")).status_code == 403
+    body = client.get("/api/v1/profile", **issue(other_user, "read")).json()
+    assert body["nationalities"] == [] and body["nationality_scope"] == ""
+    assert patch(client, {"nationalities": ["GB"]}, **issue(other_user, "write")).status_code == 200
+    user.profile.refresh_from_db()
+    assert user.profile.nationalities == ["PT", "BR"]
+
+
+def test_no_list_or_search_carries_a_nationality(client, user):
+    user.profile.nationalities = ["PT"]
+    user.profile.nationality_scope = ""
+    user.profile.save()
+    CV.objects.create(owner=user, name="Main", show_nationality=True)
+    token = issue(user, "read")
+    for path in ("/api/v1/cvs", "/api/v1/companies", "/api/v1/listings"):
+        written = client.get(path, **token).content.decode()
+        assert "Portugal" not in written and '"PT"' not in written, path
+    assert "Portugal" not in client.get("/api/v1/search?q=Portugal", **token).content.decode()
+
+
+def test_a_refused_list_does_not_echo_what_was_sent(client, user, caplog):
+    caplog.set_level(logging.DEBUG)
+    response = patch(client, {"nationalities": ["PT", "Zanzibarland"]}, **issue(user, "write"))
+    assert response.status_code == 422
+    assert "Zanzibarland" not in caplog.text
+    user.profile.refresh_from_db()
+    assert user.profile.nationalities == []
+
+
+def test_a_document_that_did_not_choose_prints_no_nationality(user):
+    user.profile.nationalities = ["PT", "BR"]
+    user.profile.save()
+    cv = CV.objects.create(owner=user, name="Main")
+    assert "Portugal" not in rendering.render_cv_html(cv)
+    assert "Portugal" not in rendering.cv_text(cv)
+    cv.show_nationality = True
+    cv.save()
+    assert "Nationality: Portugal, Brazil" in rendering.cv_text(cv)
+
+
+def test_the_page_refusing_a_menu_does_not_save_the_others(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("accounts:profile"),
+        {
+            "first_name": "Alex",
+            "last_name": "Morgan",
+            "nationality_1": "PT",
+            "nationality_2": "ZZ",
+            "headline": "Changed",
+        },
+    )
+    assert response.status_code == 200
+    user.profile.refresh_from_db()
+    assert user.profile.nationalities == [] and user.profile.headline == ""
+
+
+def test_a_hand_made_page_cannot_make_a_thousand_menus(client, user):
+    client.force_login(user)
+    data = {"first_name": "Alex", "last_name": "Morgan"}
+    data.update({f"nationality_{number}": "PT" for number in range(1, 100)})
+    response = client.post(reverse("accounts:profile"), data)
+    assert response.status_code == 200
+    user.profile.refresh_from_db()
+    assert user.profile.nationalities == []

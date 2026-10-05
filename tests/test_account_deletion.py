@@ -366,9 +366,11 @@ def test_the_personal_details_go_with_the_account(user, other_user):
         person.profile.birth_date = "1990-03-12"
         person.profile.birth_place = "Porto"
         person.profile.birth_country = "PT"
+        person.profile.nationalities = ["PT", "BR"]
         person.profile.save()
     deletion.delete_account(user)
     assert not Profile.objects.filter(birth_date="1990-03-12", user_id=user.pk).exists()
     assert not Profile.objects.filter(user_id=user.pk).exists()
     kept = Profile.objects.get(user=other_user)
     assert (kept.birth_date, kept.birth_place, kept.birth_country) == ("1990-03-12", "Porto", "PT")
+    assert kept.nationalities == ["PT", "BR"]

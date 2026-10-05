@@ -794,6 +794,9 @@ class CVPrintsOut(Schema):
     )
     form_of_address: bool = Field(description="Whether it is printed before the name")
     pronouns: bool = Field(description="Whether they are printed after the name")
+    nationality: bool = Field(
+        description="Whether the countries listed, or the scope's wording, are printed (#680)"
+    )
     birth_date: bool = Field(description="Whether the date of birth is printed (#679)")
     birth_place: bool = Field(description="Whether the place of birth is printed (#679)")
 
@@ -840,6 +843,7 @@ class CVPrintsIn(Schema):
     pronouns: bool | None = None
     birth_date: bool | None = None
     birth_place: bool | None = None
+    nationality: bool | None = None
 
 
 class CVPatch(Schema):
@@ -995,6 +999,21 @@ class ProfileOut(Schema):
         default="",
         description="The country of birth, as a two-letter code from the address form's list",
     )
+    nationalities: list[str] = Field(
+        default_factory=list,
+        description=(
+            "The countries the person is a citizen of, as two-letter codes in the order given, "
+            "each once, at most ten. Printed only on a CV whose `prints.nationality` is true."
+        ),
+    )
+    nationality_scope: str = Field(
+        default="",
+        description=(
+            "`eu` (a citizen of an EU or EEA country, or of Switzerland), `other`, or blank when "
+            "nothing is said. Worked out from `nationalities` while any are listed; the "
+            "answer given is stored only while there are none"
+        ),
+    )
     headline: str = ""
     location: str = Field(
         default="",
@@ -1027,6 +1046,15 @@ _BirthDateLine = Annotated[
     _line(personal.BIRTH_DATE_LENGTH), _held_to(personal.validate_birth_date)
 ]
 _BirthPlaceLine = _line(_BIRTH_PLACE)
+_Nationalities = Annotated[
+    list[str],
+    Field(max_length=personal.MAX_NATIONALITIES),
+    _held_to(personal.validate_nationalities),
+    AfterValidator(personal.clean_nationalities),
+]
+_Scope = Annotated[
+    str, Field(max_length=5), BeforeValidator(_stripped), _held_to(personal.validate_scope)
+]
 _CountryCode = Annotated[
     str,
     Field(max_length=2),
@@ -1063,6 +1091,21 @@ class ProfilePatch(Schema):
     birth_country: _CountryCode | None = Field(
         default=None, description="A country's two-letter code from the list; empty clears it"
     )
+    nationalities: _Nationalities | None = Field(
+        default=None,
+        description=(
+            "Country codes from the address form's list, in the order given: case is folded, "
+            "a repeat is dropped, an unknown code or more than ten is refused; empty clears "
+            "them"
+        ),
+    )
+    nationality_scope: _Scope | None = Field(
+        default=None,
+        description=(
+            "`eu`, `other` or empty. Stored only while `nationalities` is empty, and cleared "
+            "when countries are listed, since it is worked out from them then"
+        ),
+    )
     headline: _HeadlineLine | None = None
     location: _LocationLine | None = Field(
         default=None,
@@ -1080,6 +1123,10 @@ def profile_out(profile) -> dict:
         "birth_date": profile.birth_date,
         "birth_place": profile.birth_place,
         "birth_country": profile.birth_country,
+        "nationalities": list(profile.nationalities or []),
+        # Worked out from the countries while there are any, which is what the person meant.
+        "nationality_scope": personal.derived_scope(profile.nationalities)
+        or profile.nationality_scope,
         "headline": profile.headline,
         "location": profile.location,
         "printed_location": printed_location(profile),

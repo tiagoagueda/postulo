@@ -34,7 +34,7 @@ def get_profile(request):
 @router.patch("", response=ProfileOut, auth=scope("write"), summary="Change your details")
 def patch_profile(request, payload: ProfilePatch):
     """Change the name, the form of address, the pronouns, the date and place of birth, the
-    headline or the location.
+    nationalities, the headline or the location.
 
     A field left out is left alone. A date of birth is `1990`, `1990-03` or `1990-03-12`, a
     real date that is not in the future, and a country is a two-letter code from the list;

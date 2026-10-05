@@ -102,6 +102,8 @@ EXCUSED = {
     "ProfileForm.birth_month": "a box of the date's fieldset, described with it",
     "ProfileForm.birth_year": "a box of the date's fieldset, described with it",
     "ProfileForm.birth_country": "a menu of countries, described by the card's one sentence",
+    # One menu per nationality held, each named by its own label, under a legend (#680).
+    "ProfileForm.nationality_1": "a menu of countries, described by the card's one sentence",
     "LoginForm.remember": "a tick box whose label is the sentence",
     "AppearanceForm.theme": "three named choices, shown as they will look",
     "PluginRepositoryForm.enabled": "a tick box whose label is the sentence",

@@ -25,8 +25,10 @@ from postulo.core.language_field import LanguageField
 from postulo.core.personal import (
     BIRTH_DATE_LENGTH,
     BIRTH_PLACE_LENGTH,
+    SCOPE_CHOICES,
     validate_birth_date,
     validate_country_code,
+    validate_nationalities,
 )
 
 from . import identifiers
@@ -303,6 +305,22 @@ class Profile(models.Model):
     birth_country = models.CharField(
         _("country of birth"), max_length=2, blank=True, validators=[validate_country_code]
     )
+    #: What the person is a citizen of (#680): a list of country codes from `core.phones`'s
+    #: table, in the order given, each once, at most ten, held to `core.personal`'s rule at
+    #: every door. Optional, never worked out from anything, printed only where a CV says so.
+    #: A list rather than rows: a nationality has no label, kind or primary, so a table of its
+    #: own would be a model and a migration for a list of codes, as the navigation lists are
+    #: not.
+    nationalities = models.JSONField(
+        _("nationalities"), default=list, blank=True, validators=[validate_nationalities]
+    )
+    #: For somebody who would rather say less: only whether they are a citizen of the EU, the
+    #: EEA or Switzerland, or of another country. The answer only while the list above is
+    #: empty -- with countries listed the scope is worked out from them (`personal.derived_scope`)
+    #: and this is cleared on save, so the two can never disagree.
+    nationality_scope = models.CharField(
+        _("nationality scope"), max_length=5, blank=True, choices=SCOPE_CHOICES
+    )
     headline = models.CharField(
         _("headline"),
         max_length=200,
@@ -476,6 +494,20 @@ class Profile(models.Model):
 
     def __str__(self) -> str:
         return f"Profile for {self.user}"
+
+    def save(self, *args, **kwargs) -> None:
+        """Clear the nationality scope while countries are listed (#680).
+
+        Here rather than in a form, because the page, the API, a candidate file and the
+        archive importer all write a profile and none of them may leave the two disagreeing.
+        A save of some columns only (`update_fields`) takes the scope along when it clears it.
+        """
+        if self.nationalities and self.nationality_scope:
+            self.nationality_scope = ""
+            fields = kwargs.get("update_fields")
+            if fields is not None and "nationality_scope" not in fields:
+                kwargs["update_fields"] = [*fields, "nationality_scope"]
+        super().save(*args, **kwargs)
 
     @property
     def picture(self):

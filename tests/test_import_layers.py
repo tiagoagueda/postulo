@@ -59,6 +59,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.accounts.tokens",
             "postulo.accounts.validators",
             "postulo.core.addresses",
+            "postulo.core.country_sets",
             "postulo.core.currencies",
             "postulo.core.destinations",
             "postulo.core.brands",

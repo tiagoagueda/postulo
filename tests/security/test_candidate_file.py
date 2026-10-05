@@ -615,3 +615,38 @@ def test_a_malformed_date_of_birth_is_a_refused_row_and_nothing_is_stored(user, 
     user.profile.refresh_from_db()
     assert user.profile.birth_date == ""
     assert user.profile.headline == "Engineer", "and the rest of the file is still read"
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "PT",
+        {"PT": 1},
+        7,
+        [1, 2],
+        [["PT"]],
+        ["ZZ", "QQ", "XX"],
+        ["PT"] * 11,
+        [MARKUP],
+    ],
+)
+def test_a_list_of_nationalities_of_the_wrong_type_too_long_or_unknown_stores_nothing(user, bad):
+    """Read code by code through the one function the page is held to (#680): what it will
+    not take is a refused row, and nothing the file says about countries is stored."""
+    data = a_file(account={"profile": {"nationalities": bad, "headline": "Engineer"}})
+    held = candidate.read(data)
+    drawn = candidate.plan(user, held)
+    assert "refused" in outcomes(drawn, "details")
+    assert "add" not in [
+        row.outcome for s in drawn.sections for row in s.rows if row.label == "Nationality"
+    ]
+    candidate.apply(user, held)
+    user.profile.refresh_from_db()
+    assert user.profile.nationalities == []
+    assert user.profile.headline == "Engineer"
+    assert MARKUP not in " ".join(notes(drawn, "details")), "what a row says is never the file's"
+
+
+def test_a_file_cannot_hold_a_thousand_nationalities_in_a_session(user):
+    held = candidate.read(a_file(account={"profile": {"nationalities": ["PT"] * 5000}}))
+    assert len(held["details"]["nationalities"]) <= 11

@@ -94,7 +94,12 @@ logger = logging.getLogger(__name__)
 #: the person was born, as an ISO 8601 reduced date, the town typed and a country's code,
 #: each read back through the column's own rule; and ``birth_date`` and ``birth_place`` among
 #: a CV's ``prints``. An archive without them restores each blank and off (#679).
-FORMAT_VERSION = 34
+#: 35 added ``nationalities`` and ``nationality_scope`` on the profile: the countries somebody
+#: is a citizen of as a list of two-letter codes, or only whether they are a citizen of the EU,
+#: the EEA or Switzerland, each read back through the one rule the page is held to; and
+#: ``nationality`` among a CV's ``prints``. An archive without them restores both blank and off
+#: (#680).
+FORMAT_VERSION = 35
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -120,7 +125,10 @@ FORMAT_VERSION = 34
 #: file that says nothing. 5 added ``birth_date``, ``birth_place`` and ``birth_country`` on the
 #: profile, each read back as the other details are -- filled where blank, kept where not --
 #: and a date only through the column's own rule, so a malformed one is a refused row (#679).
-CANDIDATE_FORMAT = 5
+#: 6 added ``nationalities`` and ``nationality_scope`` on the profile: each listed code is
+#: read back as a row of its own, added or already there, and the scope only while there is
+#: no list (#680).
+CANDIDATE_FORMAT = 6
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -136,6 +144,10 @@ PROFILE_FIELDS = (
     "birth_date",
     "birth_place",
     "birth_country",
+    # What the person is a citizen of (#680): the list of codes, and the scope that stands in
+    # for it while there is none. Both are read back through `core.personal`.
+    "nationalities",
+    "nationality_scope",
     "headline",
     # As typed. A blank is a blank here, not the address's town and country: that is worked
     # out when it is printed, and writing it in would pin it to today's primary address.
@@ -180,6 +192,8 @@ CANDIDATE_PROFILE_FIELDS = (
     "birth_date",
     "birth_place",
     "birth_country",
+    "nationalities",
+    "nationality_scope",
     "headline",
     "location",
     "record_language",

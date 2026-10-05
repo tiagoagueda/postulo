@@ -181,6 +181,22 @@
           <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_place" /></div>
           <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_country" /></div>
         </div>
+        {% comment %} A menu for each nationality held and one empty: saving draws the next
+           one (#680). Each is a native select, which is what there is with scripts off. What
+           is said only as a scope is the next field, and is used while none is listed. {% endcomment %}
+        <fieldset class="mb-4" aria-describedby="personal-details-help">
+          <legend class="label">{% translate "Nationalities" %}</legend>
+          <div class="flex flex-wrap items-start gap-x-4">
+            {% for menu in form.nationality_menus %}
+              <div class="field mb-2 min-w-48 flex-1 basis-48"{% if menu.errors %} data-invalid="true"{% endif %}>
+                <label for="{{ menu.id_for_label }}">{{ menu.label }}</label>
+                {{ menu }}
+                <c-field-feedback :field="menu" />
+              </div>
+            {% endfor %}
+          </div>
+          <c-field :field="form.nationality_scope" />
+        </fieldset>
       </div>
 
       <div class="card mb-6" id="section-contact">

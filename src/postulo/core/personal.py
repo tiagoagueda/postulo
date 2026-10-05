@@ -1,4 +1,5 @@
-"""The personal details nobody has to give: when and where somebody was born (#679).
+"""The personal details nobody has to give: when and where somebody was born, and what
+they are a citizen of (#679, #680).
 
 **Optional, never worked out from anything, and never printed unless a CV says so.** They
 are the most identifying things a profile can hold and exactly what an identity check asks
@@ -26,7 +27,7 @@ from django.core.exceptions import ValidationError
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
-from . import phones
+from . import country_sets, phones
 
 #: The earliest year a date of birth may name.
 EARLIEST_YEAR = 1900
@@ -160,3 +161,85 @@ def place_text(place: str, country: str) -> str:
     as `core.postal.location_line` writes where somebody is."""
     name = phones.BY_CODE[country][2] if country in phones.BY_CODE else ""
     return ", ".join(part for part in ((place or "").strip(), name) if part)
+
+
+# ------------------------------------------------------------------ nationalities (#680)
+
+#: How many a person may hold: nobody holds more, and a bound keeps a hand-written request
+#: from storing a thousand.
+MAX_NATIONALITIES = 10
+
+#: What somebody says who would rather not list a country: only whether they are a citizen
+#: of the EU, the EEA or Switzerland. The scope is the answer while the list is empty.
+SCOPE_EU = "eu"
+SCOPE_OTHER = "other"
+SCOPE_CHOICES = (
+    (SCOPE_EU, _("Citizen of an EU or EEA country, or of Switzerland")),
+    (SCOPE_OTHER, _("Citizen of another country")),
+)
+SCOPES = frozenset(code for code, _label in SCOPE_CHOICES)
+
+
+def clean_nationalities(value) -> list[str]:
+    """A list of nationalities as it is held: known codes, in capitals, each once, in the
+    order given, at most `MAX_NATIONALITIES`. Raises `ValidationError` for anything else.
+
+    Blank (``None`` or an empty list) is an empty list. The one function every door calls: the
+    form, the API, a candidate file and the archive importer.
+    """
+    if value in (None, "", [], ()):
+        return []
+    if not isinstance(value, list | tuple):
+        raise ValidationError(_("Give nationalities as a list of country codes."), code="type")
+    if len(value) > MAX_NATIONALITIES:
+        raise ValidationError(
+            _("Give at most %(most)s nationalities."),
+            code="too_many",
+            params={"most": MAX_NATIONALITIES},
+        )
+    kept: list[str] = []
+    for item in value:
+        if not isinstance(item, str):
+            raise ValidationError(_("Give each nationality as a country code."), code="type")
+        code = item.strip().upper()
+        if not code:
+            continue
+        if code not in phones.BY_CODE:
+            raise ValidationError(
+                _("%(code)s is not a country in the list."),
+                code="unknown",
+                params={"code": item.strip()[:8]},
+            )
+        if code not in kept:
+            kept.append(code)
+    return kept
+
+
+def validate_scope(value) -> None:
+    """The scope's validator: blank, or one of the two answers."""
+    if value and value not in SCOPES:
+        raise ValidationError(_("Choose one of the answers in the list."), code="scope")
+
+
+def validate_nationalities(value) -> None:
+    """The column's validator: `clean_nationalities` finding nothing to refuse."""
+    clean_nationalities(value)
+
+
+def derived_scope(codes) -> str:
+    """What the countries listed come to: the EU scope if any is one of the set, the other
+    if there are countries and none is, and blank for an empty list."""
+    held = [code for code in (codes or []) if isinstance(code, str)]
+    if not held:
+        return ""
+    return SCOPE_EU if any(code in country_sets.EU_EEA_CH for code in held) else SCOPE_OTHER
+
+
+def scope_text(scope: str) -> str:
+    """The wording of a scope, or blank for none."""
+    return str(dict(SCOPE_CHOICES).get(scope, ""))
+
+
+def country_names(codes) -> list[str]:
+    """The countries' English names, in the order held; a code the list lacks is left out."""
+    return [phones.BY_CODE[code][2] for code in codes or [] if code in phones.BY_CODE]

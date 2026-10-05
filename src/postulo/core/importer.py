@@ -25,7 +25,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from . import slugs
+from . import personal, slugs
 from .export import (
     APPLICATION_FIELDS,
     CAPTURE_FIELDS,
@@ -101,11 +101,14 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "birth_date",
         "birth_place",
         "birth_country",
+        "nationality_scope",
     }
 )
 #: The checked fields a refusal of which the report says: they are the person's own facts,
 #: and an archive that carried one the page would not take has lost something to say so.
-_PERSONAL_FIELDS = frozenset({"birth_date", "birth_place", "birth_country"})
+_PERSONAL_FIELDS = frozenset(
+    {"birth_date", "birth_place", "birth_country", "nationalities", "nationality_scope"}
+)
 
 
 def _profile_value(profile, name: str, value):
@@ -123,6 +126,14 @@ def _profile_value(profile, name: str, value):
         return _REFUSED
     if isinstance(value, str) and not value and not column.blank:
         return _REFUSED
+    if name == "nationalities":
+        # One function holds a list of nationalities to the rule at every door (#680).
+        if not isinstance(value, list):
+            return _REFUSED
+        try:
+            return personal.clean_nationalities(value)
+        except ValidationError:
+            return _REFUSED
     if name == "plugins_off":
         if not isinstance(value, list):
             return _REFUSED

@@ -161,6 +161,7 @@ SWITCHES: dict[str, str] = {
     "pronouns": "show_pronouns",
     "birth_date": "show_birth_date",
     "birth_place": "show_birth_place",
+    "nationality": "show_nationality",
 }
 
 
@@ -303,6 +304,9 @@ class Printed:
     #: where the CV says so (#679); the renderer words the date in the document's language.
     birth_date: str = ""
     birth_place: str = ""
+    #: The countries' names, in the order held, or none and then the scope's key (#680).
+    nationalities: list = field(default_factory=list)
+    nationality_scope: str = ""
     #: The kinds whose pinned row is no longer there, for the page to say so.
     gone: tuple[Detail, ...] = ()
 
@@ -393,6 +397,10 @@ def resolve(owner, cv: CV | None = None) -> Printed:
             printed.birth_date = (profile.birth_date or "").strip()
         if cv.show_birth_place:
             printed.birth_place = personal.place_text(profile.birth_place, profile.birth_country)
+        if cv.show_nationality:
+            printed.nationalities = personal.country_names(profile.nationalities)
+            if not printed.nationalities and profile.nationality_scope in personal.SCOPES:
+                printed.nationality_scope = profile.nationality_scope
     printed.gone = tuple(missing)
     return printed
 

@@ -68,6 +68,7 @@ from postulo.core import (
     export,
     language_field,
     languages,
+    personal,
     phone_numbers,
     phones,
     postal,
@@ -342,6 +343,22 @@ def _kept(value):
     return []
 
 
+def _kept_detail(name: str, value):
+    """One of the profile's details as it will be held.
+
+    A text is `_kept`. The list of nationalities is the one that is not text: a list is held
+    as a list of what is in it, each `_kept`, and no more than one past the most a profile may
+    have, so that too many can be told from just enough without holding a thousand. Anything
+    else that is not a list is held as ``0``, which says *something was here and it was not a
+    list* (#680).
+    """
+    if name != "nationalities" or value is None:
+        return _kept(value)
+    if not isinstance(value, list):
+        return 0
+    return [_kept(item) for item in value[: personal.MAX_NATIONALITIES + 1]]
+
+
 def _prune(entry, names: tuple[str, ...]):
     """One entry, down to what is read of it. ``None`` for a thing that is not an entry."""
     if not isinstance(entry, dict):
@@ -422,7 +439,7 @@ def read(data: bytes) -> dict:
     held["details"] = {
         **{name: _kept(account[name]) for name in NAME_FIELDS if name in account},
         **{
-            name: _kept(profile[name])
+            name: _kept_detail(name, profile[name])
             for name in export.CANDIDATE_PROFILE_FIELDS
             if name in profile
         },
@@ -756,9 +773,18 @@ class _Planner:
     def _details(self) -> Section:
         section = Section("details", gettext_lazy("Your details"))
         said = self.held.get("details") or {}
+        listed = bool(said.get("nationalities")) or bool(
+            self.profile is not None and self.profile.nationalities
+        )
         for name in DETAIL_FIELDS:
             raw = said.get(name)
             if raw in (None, ""):
+                continue
+            if name == "nationalities":
+                section.rows.extend(self._nationalities(raw))
+                continue
+            if name == "nationality_scope" and listed:
+                # With countries listed the scope is worked out from them (#680).
                 continue
             model = get_user_model() if name in NAME_FIELDS else Profile
             column = model._meta.get_field(name)
@@ -788,6 +814,72 @@ class _Planner:
             else:
                 section.rows.append(Row(label, KEPT, sub=shown))
         return section
+
+    def _nationalities(self, raw) -> list[Row]:
+        """The countries a file lists, one row each: added, or already there (#680).
+
+        Read code by code, each through the one function the page is held to, so a code the
+        list does not have is a refused row of its own and the others are still read. Nothing
+        the account holds is replaced, and the profile is never taken past the most it may
+        have: what does not fit is a refused row saying so.
+        """
+        label = _("Nationality")
+        if raw == []:
+            return []
+        if not isinstance(raw, list):
+            return [
+                Row(
+                    label,
+                    REFUSED,
+                    notes=[_("Nationalities are written as a list of country codes.")],
+                )
+            ]
+        if len(raw) > personal.MAX_NATIONALITIES:
+            return [
+                Row(
+                    label,
+                    REFUSED,
+                    notes=[
+                        _("A profile holds at most %(most)s nationalities, and this lists more.")
+                        % {"most": personal.MAX_NATIONALITIES}
+                    ],
+                )
+            ]
+        held = list(self.profile.nationalities or []) if self.profile is not None else []
+        met = set(held)
+        room = personal.MAX_NATIONALITIES - len(held)
+        rows: list[Row] = []
+        for item in raw:
+            if not isinstance(item, str):
+                rows.append(Row(label, REFUSED, notes=[_("This is not a country code.")]))
+                continue
+            try:
+                found = personal.clean_nationalities([item])
+            except ValidationError as error:
+                rows.append(Row(label, REFUSED, sub=item[:80], notes=error.messages))
+                continue
+            if not found:
+                continue
+            code = found[0]
+            shown = phones.BY_CODE[code][2]
+            if code in held:
+                rows.append(Row(label, PRESENT, sub=shown))
+            elif code in met:
+                continue
+            elif room <= 0:
+                rows.append(
+                    Row(
+                        label,
+                        REFUSED,
+                        sub=shown,
+                        notes=[_("You already hold the most nationalities a profile can.")],
+                    )
+                )
+            else:
+                rows.append(Row(label, ADD, sub=shown, fill=("nationalities", code)))
+                room -= 1
+            met.add(code)
+        return rows
 
     @staticmethod
     def _language(value: str) -> str:
@@ -1376,14 +1468,23 @@ def _fill(user, profile, rows: list[Row]) -> None:
     """Fill in what was blank. A blank is not an opinion, so nothing is being overruled."""
     names: list[str] = []
     details: list[str] = []
+    countries: list[str] = []
     for row in rows:
         name, value = row.fill
         if name in NAME_FIELDS:
             setattr(user, name, value)
             names.append(name)
+        elif name == "nationalities":
+            countries.append(value)
         else:
             setattr(profile, name, value)
             details.append(name)
+    if countries:
+        # Added to what the profile holds, never replacing it (#680).
+        profile.nationalities = personal.clean_nationalities(
+            [*(profile.nationalities or []), *countries]
+        )
+        details.append("nationalities")
     if names:
         user.save(update_fields=names)
     if details:

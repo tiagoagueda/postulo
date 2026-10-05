@@ -313,7 +313,8 @@ def test_the_format_version_moved(user):
     reminders about no application (#334); 32 added the files an application went out with
     and where a sent document went (#469); 33 added the interview a timeline entry was
     written for (#448); 34 added the date and place of birth on the profile and the switches
-    that print them on a CV (#679).
+    that print them on a CV (#679); 35 added the nationalities and the scope that stands in for
+    them, and the switch that prints them (#680).
 
     At least rather than exactly: two branches each adding to the archive take a number
     each, and whichever lands second renumbers.

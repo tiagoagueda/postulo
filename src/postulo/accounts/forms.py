@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 import zoneinfo
 
 from allauth.account.adapter import get_adapter
@@ -591,6 +592,19 @@ class ProfileForm(forms.ModelForm):
         choices=[("", _("Not stated")), *phones.country_choices()],
         widget=postal.CountrySelect,
     )
+    # Nationalities are a menu of countries for each held and one empty (#680), added to the
+    # form as `nationality_1`, `nationality_2`, ... by `_start_nationality_menus`: a person
+    # with two is drawn three, and saving draws the next empty one. A native select each,
+    # which is the scripts-off path, with every country's flag in its options (`CountrySelect`).
+    nationality_scope = forms.ChoiceField(
+        label=_("Or say only this"),
+        required=False,
+        choices=[("", _("Not stated")), *personal.SCOPE_CHOICES],
+        help_text=_(
+            "For somebody who would rather not list a country. It is used only while no country "
+            "is listed above: once one is, the answer is worked out from the countries."
+        ),
+    )
     # A plain FileField, not an ImageField: the size and type are checked before anything
     # is decoded, and the decoding is done once, by the same code that stores the result.
     # Its help is what a file has to be, which stays under the box (#302), and is written
@@ -614,6 +628,7 @@ class ProfileForm(forms.ModelForm):
             "pronouns",
             "birth_place",
             "birth_country",
+            "nationality_scope",
             "headline",
             "location",
             "record_language",
@@ -622,6 +637,7 @@ class ProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._start_birth_boxes()
+        self._start_nationality_menus()
         # The career record's language decides the lists, falling back to the interface's:
         # the name is written in the language the record is (#309).
         language = addressing.language_of(self.instance)
@@ -683,6 +699,62 @@ class ProfileForm(forms.ModelForm):
             "The town or city as you would write it. It is only ever text: it is not looked up "
             "and never put on a map."
         )
+
+    #: ``nationality_3``, and no other name: a scope is ``nationality_scope``.
+    _MENU = re.compile(r"nationality_(\d{1,2})")
+
+    def _posted_menus(self) -> list[int]:
+        """Which of the nationality menus the page that was posted had, by number."""
+        found = set()
+        for key in self.data:
+            named = self._MENU.fullmatch(key[len(self.prefix) + 1 :] if self.prefix else key)
+            if named:
+                found.add(int(named.group(1)))
+        return sorted(found)
+
+    def _start_nationality_menus(self) -> None:
+        """Draw a menu for each nationality held and one empty, or for each one that was sent.
+
+        What was sent is what is drawn again when the page comes back refused, so a country
+        chosen in the third menu is still in it. The number is whatever the posted names say,
+        and at most two digits' worth, so a hand-made request cannot make a thousand fields.
+        """
+        held = list(getattr(self.instance, "nationalities", None) or [])
+        if self.is_bound:
+            numbers = self._posted_menus()
+        else:
+            numbers = list(range(1, min(len(held) + 1, personal.MAX_NATIONALITIES) + 1))
+        for number in numbers or [1]:
+            name = f"nationality_{number}"
+            self.fields[name] = forms.ChoiceField(
+                label=_("Nationality %(number)s") % {"number": number},
+                required=False,
+                choices=[("", _("Not stated")), *phones.country_choices()],
+                widget=postal.CountrySelect,
+            )
+            self.initial[name] = held[number - 1] if number <= len(held) else ""
+
+    @property
+    def nationality_menus(self) -> list:
+        """The menus, in order, for the template to draw."""
+        names = [name for name in self.fields if self._MENU.fullmatch(name)]
+        return [self[name] for name in sorted(names, key=lambda name: int(name.rsplit("_", 1)[1]))]
+
+    def _clean_nationalities(self, cleaned: dict) -> None:
+        """Join the menus into the column's list, or say what is wrong with it.
+
+        A page posted with none of the menus -- one drawn before they existed -- leaves the
+        list as it is. An empty menu is skipped, a country chosen twice is kept once, and more
+        than ten is refused, all by the function every other door uses.
+        """
+        if self.is_bound and not self._posted_menus():
+            cleaned["nationalities"] = list(getattr(self.instance, "nationalities", None) or [])
+            return
+        chosen = [cleaned.get(menu.name) or "" for menu in self.nationality_menus]
+        try:
+            cleaned["nationalities"] = personal.clean_nationalities(chosen)
+        except ValidationError as refused:
+            self.add_error(self.nationality_menus[0].name, refused)
 
     @property
     def birth_boxes(self) -> list:
@@ -783,6 +855,7 @@ class ProfileForm(forms.ModelForm):
         """
         cleaned = super().clean()
         self._clean_birth_date(cleaned)
+        self._clean_nationalities(cleaned)
         for name in ("form_of_address", "pronouns"):
             box = f"{name}_other"
             chosen = (cleaned.get(name) or "").strip()
@@ -829,6 +902,9 @@ class ProfileForm(forms.ModelForm):
     def save(self, commit: bool = True) -> Profile:
         # Not a field of this form, so it is not on the instance until it is put there.
         self.instance.birth_date = self.cleaned_data.get("birth_date", self.instance.birth_date)
+        self.instance.nationalities = self.cleaned_data.get(
+            "nationalities", self.instance.nationalities
+        )
         profile = super().save(commit=commit)
         user = profile.user
         user.first_name = self.cleaned_data["first_name"].strip()

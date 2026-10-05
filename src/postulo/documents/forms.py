@@ -153,6 +153,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_pronouns",
             "show_birth_date",
             "show_birth_place",
+            "show_nationality",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -270,6 +271,13 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         self.fields["show_birth_place"].help_text = (
             format_html(str(_("As things stand: {value}.")), value=_typed(place))
             if place
+            else GIVES_NONE
+        )
+        said = personal.country_names(getattr(profile, "nationalities", None))
+        scope = personal.scope_text(getattr(profile, "nationality_scope", ""))
+        self.fields["show_nationality"].help_text = (
+            format_html(str(_("As things stand: {value}.")), value=_typed(", ".join(said) or scope))
+            if said or scope
             else GIVES_NONE
         )
         #: The kinds whose chosen row is no longer there, for the page to say so.
