@@ -571,8 +571,9 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    on `main` as well, which runs the unit tests on the others, and **wait for CI and Every
    Python to pass on that commit**. Then tag it and push the tag:
    `git tag vX.Y.Z && git push origin vX.Y.Z`. The release workflow asks Forgejo for the
-   tagged commit's statuses and refuses a tag on which any test leg, the browser job or the
-   checks are not a success, or on which a supported Python has no passed leg (`release_tools.py check vX.Y.Z --ci` is the same question, from a
+   tagged commit's statuses and refuses a tag on which any test leg, the browser job, the
+   checks (lint, migrations, catalogues, and the committed stylesheet, icons and scripts),
+   the PostgreSQL job or the security audit are not a success, or on which a supported Python has no passed leg (`release_tools.py check vX.Y.Z --ci` is the same question, from a
    terminal); the image workflow asks it again before building a layer (#233).
 6. Once the release exists, start *Actions → Image* for the tag, from the tag. It builds
    and scans the image, pushes `X.Y.Z`, `X.Y` and `latest`, asks the registry for all

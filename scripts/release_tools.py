@@ -139,8 +139,12 @@ def changelog_section(version: str, root: Path = ROOT) -> str:
 
 #: The CI jobs a release has to have passed, by the names Forgejo Actions records a commit
 #: status under: "<workflow> / <job> (<event>)". Every test leg, whichever Pythons the matrix
-#: holds this year, the browser, and the checks. The combined state is deliberately not
-#: used: the dev image job fails on a registry timeout often enough that "failure" there
+#: holds this year, the browser, the checks (which include the committed stylesheet, icons
+#: and vendored scripts), the PostgreSQL job and the security audit. These fail because of
+#: what the commit ships, not because of the runner. The audit is required on purpose: a
+#: newly published advisory holds a release until it is dealt with, as SECURITY.md promises
+#: (#419). The combined state is deliberately not used: the dev image job fails on a
+#: registry timeout often enough that "failure" there
 #: says nothing about the code (#233).
 REQUIRED_JOBS = (
     # By the names the jobs carry since #319, which say what each checks: "Unit tests
@@ -153,6 +157,9 @@ REQUIRED_JOBS = (
     # Lint, the migrations, the catalogues and the production settings left the test legs
     # for a job of their own, which runs once per push instead of once per Python (#712).
     ("the checks", re.compile(r"^CI / Checks")),
+    # The only place migrations and the pg_dump/pg_restore half of the backup run for real (#419).
+    ("the PostgreSQL job", re.compile(r"^CI / Database tests on PostgreSQL")),
+    ("the security audit", re.compile(r"^CI / Security audit")),
 )
 
 

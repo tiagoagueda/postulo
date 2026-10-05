@@ -276,17 +276,19 @@ def statuses(*pairs):
     }
 
 
-GREEN = statuses(
+GREEN_PAIRS = (
     ("CI / Unit tests (Python 3.12) (push)", "success"),
     ("CI / Unit tests (Python 3.13) (push)", "success"),
     ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
     ("CI / Browser tests (Chromium) (push)", "success"),
     ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
+    ("CI / Database tests on PostgreSQL (push)", "success"),
     ("CI / Security audit (push)", "success"),
     # A registry timeout on the dev image says nothing about the code, and the combined
     # state above is "failure" because of it; the gate reads the jobs, not the state.
     ("Dev image / Dev image: build, scan, push (push)", "failure"),
 )
+GREEN = statuses(*GREEN_PAIRS)
 
 
 def asking(monkeypatch, answer):
@@ -322,6 +324,8 @@ def test_one_red_leg_is_named(monkeypatch):
             ("CI / Unit tests and coverage (Python 3.14) (push)", "failure"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, catalogues (push)", "success"),
+            ("CI / Database tests on PostgreSQL (push)", "success"),
+            ("CI / Security audit (push)", "success"),
         ),
     )
 
@@ -339,6 +343,8 @@ def test_a_leg_still_running_is_not_a_pass(monkeypatch):
             ("CI / Unit tests and coverage (Python 3.14) (push)", "pending"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, catalogues (push)", "success"),
+            ("CI / Database tests on PostgreSQL (push)", "success"),
+            ("CI / Security audit (push)", "success"),
         ),
     )
 
@@ -353,9 +359,11 @@ def test_no_ci_at_all_is_refused_rather_than_waved_through(monkeypatch):
 
     problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
 
-    assert len(problems) == 6
+    assert len(problems) == 8
     assert any("a test leg" in p for p in problems) and any("the browser" in p for p in problems)
     assert any("the checks" in p for p in problems)
+    assert any("the PostgreSQL job" in p for p in problems)
+    assert any("the security audit" in p for p in problems)
     assert sum("no unit tests on Python" in p for p in problems) == 3
 
 
@@ -370,6 +378,8 @@ def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
             ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
             ("CI / Browser tests (Chromium) (push)", "success"),
             ("CI / Checks: lint, migrations, translations (push)", "failure"),
+            ("CI / Database tests on PostgreSQL (push)", "success"),
+            ("CI / Security audit (push)", "success"),
         ),
     )
 
@@ -378,11 +388,35 @@ def test_the_checks_are_required_now_that_they_left_the_test_legs(monkeypatch):
     assert problems == ["CI / Checks: lint, migrations, translations (push): failure"]
 
 
+@pytest.mark.parametrize(
+    "context, what",
+    [
+        ("CI / Database tests on PostgreSQL (push)", "the PostgreSQL job"),
+        ("CI / Security audit (push)", "the security audit"),
+        ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "the checks"),
+    ],
+)
+def test_the_postgresql_job_the_audit_and_the_built_files_are_required(monkeypatch, context, what):
+    """Jobs that fail because of what the commit ships hold a tag (#419); the stylesheet,
+    icons and scripts check is part of the checks job."""
+    others = [(name, status) for name, status in GREEN_PAIRS if name != context]
+
+    asking(monkeypatch, statuses(*others, (context, "failure")))
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+    assert problems == [f"{context}: failure"]
+
+    asking(monkeypatch, statuses(*others))
+    problems = tools.ci_problems("v0.3.0", server="https://f", repository="o/r", token="t")
+    assert len(problems) == 1 and f"no CI status for {what}" in problems[0]
+
+
 #: What a push to `main` leaves on its commit since #713: the newest Python only.
 PUSHED = (
     ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
     ("CI / Browser tests (Chromium) (push)", "success"),
     ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
+    ("CI / Database tests on PostgreSQL (push)", "success"),
+    ("CI / Security audit (push)", "success"),
 )
 A_PUSH = statuses(*PUSHED)
 
@@ -529,6 +563,8 @@ RUNNING = statuses(
     ("CI / Unit tests and coverage (Python 3.14) (push)", "success"),
     ("CI / Browser tests (Chromium) (push)", "pending"),
     ("CI / Checks: lint, migrations, catalogues, settings, built files (push)", "success"),
+    ("CI / Database tests on PostgreSQL (push)", "success"),
+    ("CI / Security audit (push)", "success"),
 )
 
 
@@ -575,7 +611,7 @@ def test_a_run_cancelled_by_a_newer_push_builds_nothing(monkeypatch):
     clock = Clock()
     answering(
         monkeypatch,
-        statuses(*PUSHED[::2], ("CI / Browser tests (Chromium) (push)", "cancelled")),
+        statuses(*PUSHED[:1], *PUSHED[2:], ("CI / Browser tests (Chromium) (push)", "cancelled")),
     )
 
     assert wait(clock) == ["CI / Browser tests (Chromium) (push): cancelled"]

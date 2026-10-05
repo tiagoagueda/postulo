@@ -50,7 +50,7 @@ jobs:
 
       - name: Refuse a tag that disagrees with the code or the changelog, or whose CI did not pass
         # `--ci` asks Forgejo for the commit statuses of the tagged commit and refuses unless
-        # every test leg and the browser job are recorded as a success. A tag used to publish
+        # every test leg, the browser, the checks, the PostgreSQL job and the security audit are recorded as a success. A tag used to publish
         # the sdist and the wheel whatever CI had said about the commit (#233).
         env:
           FORGEJO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
