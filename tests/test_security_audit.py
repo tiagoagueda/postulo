@@ -53,6 +53,18 @@ def test_an_ignored_advisory_goes_once_the_lock_can_take_its_fix():
         )
 
 
+def test_the_lock_holds_an_icalendar_that_limits_how_deep_a_file_may_nest():
+    """GHSA-cv84-9p8j-fj68 / CVE-2026-55099: before 7.1.3 comparing parsed components took
+    exponential time in their nesting depth, and the parser set no limit (#661). The importer
+    bounds depth itself and never compares components, but the floor is what says so."""
+    assert version(locked("icalendar")) >= (7, 1, 3)
+    declared = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+    assert any(
+        re.match(r"icalendar\s*>=\s*7\.1\.3", dependency)
+        for dependency in declared["project"]["dependencies"]
+    )
+
+
 def test_postulo_never_runs_oauthlibs_provider_side():
     """The reason CVE-2026-49265 cannot reach Postulo: no OAuth2 provider is installed,
     and nothing in the code talks to oauthlib directly."""
