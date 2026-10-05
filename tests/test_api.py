@@ -697,3 +697,30 @@ def test_the_listing_detail_and_writes_carry_the_description_format(client, user
         **bearer,
     )
     assert refused.status_code == 422
+
+
+def test_the_token_list_names_scopes_as_sentences_and_translates_the_placeholder(
+    client, user, german
+):
+    from django.urls import reverse
+    from django.utils.functional import Promise
+    from django.utils.html import escape
+
+    from postulo.api.forms import ApiTokenForm
+
+    ApiToken.issue(user, "Agent", scopes=("read", "captures"))
+    user.profile.language = "de"
+    user.profile.save()
+    client.force_login(user)
+    entries = {
+        str(SCOPES["read"]): "Alles lesen",
+        str(SCOPES["captures"]): "Stellen erfassen",
+        "Firefox on the laptop": "Firefox auf dem Laptop",
+    }
+    with german(entries):
+        html = client.get(reverse("api:token_list")).content.decode()
+    assert "Alles lesen <code>read</code>" in html
+    assert "Stellen erfassen <code>captures</code>" in html
+    assert escape(str(SCOPES["read"])) not in html and "captures, read" not in html
+    assert 'placeholder="Firefox auf dem Laptop"' in html
+    assert isinstance(ApiTokenForm().fields["name"].widget.attrs["placeholder"], Promise)

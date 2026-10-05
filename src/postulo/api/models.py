@@ -138,6 +138,11 @@ class ApiToken(OwnedModel):
     def scope_labels(self) -> list[str]:
         return [str(SCOPES.get(scope, scope)) for scope in self.scopes or []]
 
+    @property
+    def scope_entries(self) -> list[tuple[str, str]]:
+        """Each scope's wire key beside its sentence, for a page that shows both."""
+        return [(scope, str(SCOPES.get(scope, scope))) for scope in self.scopes or []]
+
     def revoke(self) -> None:
         if self.revoked_at is None:
             self.revoked_at = timezone.now()

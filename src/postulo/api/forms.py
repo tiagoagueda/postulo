@@ -20,7 +20,7 @@ class ApiTokenForm(forms.Form):
     name = forms.CharField(
         label=_("Name"),
         max_length=100,
-        widget=forms.TextInput(attrs={"placeholder": "Firefox on the laptop"}),
+        widget=forms.TextInput(attrs={"placeholder": _("Firefox on the laptop")}),
         help_text=_("Which device or tool this is for."),
     )
     scopes = forms.MultipleChoiceField(

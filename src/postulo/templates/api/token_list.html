@@ -67,7 +67,6 @@
                 <p class="font-medium">{{ token.name }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   <code>{{ token.prefix }}…</code>
-                  · {{ token.scopes|join:", " }}
                   {% comment %} Whole sentences, not a word and a date beside each other. A
                      verb and its date read as one clause and no language promises to keep
                      them in that order or to leave the verb unchanged in front of a date
@@ -88,6 +87,12 @@
                   {% endif %}
                   {% if token.revoked_at %} · {% translate "Revoked" %}{% endif %}
                 </p>
+                {% comment %} One item per scope: the sentences hold commas and colons of their own. {% endcomment %}
+                <ul class="mt-1 list-disc ps-4 text-xs text-ink-500 dark:text-ink-400">
+                  {% for key, label in token.scope_entries %}
+                    <li>{{ label }} <code>{{ key }}</code></li>
+                  {% endfor %}
+                </ul>
               </div>
               {% if token.is_active %}
                 <form method="post" action="{% url 'api:token_revoke' token.pk %}">
