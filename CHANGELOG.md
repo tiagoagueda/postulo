@@ -81,6 +81,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The scheduler's closing-date and quiet-application announcers now handle each person once per pass instead of once per listing or application, cutting the repeated work on large accounts. (#400)
 - The monthly dependency upgrade pull request now gets the full CI run through a bot token, says what the workflow ran, and keeps the pre-commit ruff version in step with the lock (#585)
 - Importing a spreadsheet now runs as a watched errand in chunks of 200 rows, so a large sheet no longer times out, rolls back or locks the database for everyone else; imported history is not announced to notifiers. (#555)
+- A CV's page, preview, downloads and API read its entries a query per kind instead of one per entry and three per skill group, as does the career overview, so large CVs open and export as fast as small ones. (#559)
 
 ## [0.4.0] — 2026-10-04
 

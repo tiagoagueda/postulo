@@ -204,3 +204,95 @@ def test_tagging_a_hundred_at_once_is_not_three_hundred_queries(client, user):
     assert Application.objects.filter(tags=tag).count() == len(ids)
     writes = [q for q in captured if "applications_application_tags" in q["sql"]]
     assert len(writes) <= 2, f"one read and one write, not one per row: {len(writes)}"
+
+
+# ------------------------------------------------------------------------- CVs (#559)
+
+
+def put_on_cv(cv, user, *, each: int, mark: str) -> None:
+    """``each`` entries of every kind a CV can hold, with two skills in every skill group."""
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.documents.models import CVItem
+    from postulo.resume.models import (
+        Certification,
+        Education,
+        Experience,
+        LanguageSkill,
+        Link,
+        Project,
+        Skill,
+        SkillGroup,
+    )
+
+    today = dt.date(2024, 1, 1)
+    for index in range(each):
+        label = f"{mark}{index}"
+        group = SkillGroup.objects.create(owner=user, name=f"Group {label}")
+        for number in range(2):
+            Skill.objects.create(owner=user, name=f"Python {label}{number}", group=group)
+        entries = [
+            Experience.objects.create(
+                owner=user, organisation=f"Org {label}", role="Dev", start_date=today
+            ),
+            Education.objects.create(owner=user, institution=f"School {label}"),
+            group,
+            Project.objects.create(owner=user, name=f"Project {label}"),
+            Certification.objects.create(owner=user, name=f"Cert {label}"),
+            LanguageSkill.objects.create(owner=user, name=f"Language {label}"),
+            Link.objects.create(owner=user, title=f"Link {label}", url="https://example.org/a"),
+        ]
+        for entry in entries:
+            CVItem.objects.create(
+                owner=user,
+                cv=cv,
+                content_type=ContentType.objects.get_for_model(entry),
+                object_id=entry.pk,
+                order=CVItem.objects.filter(cv=cv).count(),
+            )
+
+
+@pytest.mark.parametrize("language", ["", "pt-PT"], ids=["no language", "in a language"])
+def test_a_cv_costs_the_same_at_seven_entries_and_sixty_three(client, user, language):
+    """The page somebody edits most, its preview, a download and the API: each costs the
+    same however many entries the CV holds, skill groups included (#559)."""
+    from postulo.api.models import ApiToken
+    from postulo.documents.models import CV
+
+    client.force_login(user)
+    _token, raw = ApiToken.issue(owner=user, name="test", scopes=["read"])
+    headers = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
+    cv = CV.objects.create(owner=user, name="Main", language=language)
+    urls = {
+        "page": (reverse("documents:cv_detail", args=[cv.pk]), {}),
+        "preview": (reverse("documents:cv_preview", args=[cv.pk]), {}),
+        "text": (reverse("documents:cv_text", args=[cv.pk]), {}),
+        "docx": (reverse("documents:cv_download", args=[cv.pk, "docx"]), {}),
+        "api": (f"/api/v1/cvs/{cv.pk}", headers),
+    }
+
+    put_on_cv(cv, user, each=1, mark="a")
+    small = {name: cost(client, url, **extra) for name, (url, extra) in urls.items()}
+
+    put_on_cv(cv, user, each=8, mark="b")
+    large = {name: cost(client, url, **extra) for name, (url, extra) in urls.items()}
+
+    assert large == small, f"a CV read is per-entry: {small} became {large}"
+
+
+def test_the_career_overview_costs_the_same_with_one_skill_group_and_nine(client, user):
+    from postulo.resume.models import Skill, SkillGroup
+
+    client.force_login(user)
+    url = reverse("resume:overview")
+
+    def groups(count: int, mark: str) -> None:
+        for index in range(count):
+            group = SkillGroup.objects.create(owner=user, name=f"Group {mark}{index}")
+            for number in range(3):
+                Skill.objects.create(owner=user, name=f"Skill {mark}{index}{number}", group=group)
+
+    groups(1, "a")
+    small = cost(client, url)
+    groups(8, "b")
+    assert cost(client, url) == small
