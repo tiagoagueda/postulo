@@ -31,8 +31,10 @@ postal addresses as structured rows — street, postcode, town — for the accou
 contacts. A leaked application history is embarrassing; a leaked home address is somewhere
 somebody can be found. Three consequences, and each is a rule rather than an intention:
 
-- It is an `OwnedModel` like everything else, so the sweep in `tests/` covers it and another
-  account's address is a `404` and never a `403`.
+- It is an `OwnedModel` like everything else, so another account's address is a `404` and
+  never a `403`. No URL names an address, so the sweep of ids in the address cannot reach
+  it: `tests/security/test_formset_rows.py` posts another account's row id into the formset,
+  and `accounts:remove_address` is in `tests/security/test_isolation_sweep.py`.
 - It is **not unique across the instance**, deliberately. Two people at one address is a
   household, and a uniqueness constraint would refuse the second one *and* disclose, in
   refusing, that somebody else on this server lives there. The telephone numbers make the

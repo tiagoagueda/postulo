@@ -12,6 +12,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Importing an archive reads every file, and the manifest, through a size cap, so an entry that unpacks to gigabytes is left out and reported instead of exhausting memory, and an imported avatar or company logo goes through the same checks as an uploaded one (an SVG is sanitised, a picture re-encoded). (#466)
 - *Check*, *Check all*, a new logo address and *Find logo* now spend a fetch allowance, `POSTULO_FETCH_RATE` (300/h by default, once per address fetched): *Check all* stops when it runs out and says how many links it did not check. (#407)
 - A release tag is now refused unless the PostgreSQL job and the security audit passed on its commit, as well as the test legs, browser and checks; maintainers tagging with either red are blocked. (#419)
+- Isolation tests now cover administrator-only routes, ids sent in API bodies, form choices and Your details rows, and the API download of a sent document, so a dropped ownership or staff check fails the suite (#422)
 
 ### 🔧 Changed
 

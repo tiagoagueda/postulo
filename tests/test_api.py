@@ -206,6 +206,35 @@ def test_an_upload_downloads_under_its_own_extension_over_the_api(client, user):
         download.close()
 
 
+def test_a_sent_document_downloads_over_the_api_for_its_owner_only(client, user, other_user):
+    """The `rendered` branch of the download, which nothing asked for before (#422)."""
+    from postulo.documents.models import RenderedDocument
+
+    bearer = issue(user, "read", "documents:read")
+    mine = RenderedDocument.objects.create(
+        owner=user,
+        title="My sent CV",
+        kind="cv",
+        source=CV.objects.create(owner=user, name="Main CV"),
+        file=ContentFile(b"%PDF-1.7 mine", name="sent.pdf"),
+        checksum="mine",
+    )
+
+    download = client.get(f"/api/v1/documents/rendered/{mine.pk}/download", **bearer)
+    try:
+        assert download.status_code == 200
+        assert b"".join(download.streaming_content) == b"%PDF-1.7 mine"
+        assert "attachment" in download["Content-Disposition"]
+    finally:
+        download.close()
+
+    listed = client.get("/api/v1/documents", **bearer).json()["items"]
+    assert [row["source"] for row in listed] == ["rendered"]
+
+    theirs = issue(other_user, "read", "documents:read")
+    assert client.get(f"/api/v1/documents/rendered/{mine.pk}/download", **theirs).status_code == 404
+
+
 # --------------------------------------------------------------------- writes
 
 
