@@ -513,9 +513,11 @@ def test_the_navigation_is_one_list_with_more_and_the_search(client, user):
     assert more.startswith('<div class="dropdown-menu" data-menu data-nav-more>')
     assert "popovertarget=" in more and "<div popover " in more
     assert 'role="menu"' not in more and "aria-haspopup" not in more
-    # Every item has a copy under More, and More carries the search, which a phone had none of.
+    # Every item has a copy under More, and nothing else: the search is the masthead's icon
+    # (#339), not a row here.
     assert re.findall(r'data-nav="([^"]+)"', more) == list(navigation.DEFAULT_ORDER)
-    assert f'href="{reverse("core:search")}"' in more
+    assert f'href="{reverse("core:search")}"' not in more
+    assert "data-nav-search" not in more
     # Nothing the account menu already holds.
     for elsewhere in ("accounts:profile", "settings:index", "account_logout"):
         assert f'href="{reverse(elsewhere)}"' not in nav

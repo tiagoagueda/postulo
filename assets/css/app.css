@@ -981,17 +981,13 @@
     @apply cursor-pointer;
   }
 
+  /* *More* goes wherever the line holds everything, the bar included: a person whose
+     navigation has four items or fewer has nothing under it (#339). The search is not
+     under it: it is the masthead's icon, at every width. */
   @media (width < 48rem) {
     .nav-main > a:nth-of-type(n + 5),
-    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 4) {
-      display: none;
-    }
-  }
-
-  /* The search is in the masthead from `md` up, as a link and then as a box, so *More*
-     carries it only in the bar. And *More* itself goes wherever the line holds everything. */
-  @media (width >= 48rem) {
-    .nav-main [data-nav-search] {
+    .nav-main [data-popover] > a[data-nav]:nth-of-type(-n + 4),
+    .nav-main:not(:has(> a:nth-of-type(5))) > [data-nav-more] {
       display: none;
     }
   }

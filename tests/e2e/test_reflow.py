@@ -387,12 +387,11 @@ def test_the_navigation_becomes_a_bar_and_still_works(
         copies = nav.locator(f'[data-nav="{key}"]')
         drawn = [copies.nth(i).is_visible() for i in range(copies.count())]
         assert drawn.count(True) == 1, f"{key}: {drawn.count(True)} copies drawn"
-    expect(more.locator("[data-nav-search]")).to_be_visible()
+    expect(more.locator("[data-nav-search]")).to_have_count(0)
     more.locator('[data-nav="companies"]').click()
     expect(page).to_have_url(f"{base}/jobs/companies/")
 
-    nav.locator("[data-nav-more] > button").click()
-    more.locator("[data-nav-search]").click()
+    page.locator("header [data-search-link]").click()
     # The search opens where the person is (#350), here the companies table's own panel,
     # not the search page.
     expect(page).to_have_url(f"{base}/jobs/companies/")

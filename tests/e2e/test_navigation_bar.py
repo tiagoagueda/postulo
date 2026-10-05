@@ -340,6 +340,29 @@ def test_the_bar_has_no_violations(live_server, page: Page, axe_source, furnishe
     assert not failures, "\n\n".join(failures)
 
 
+def test_more_is_not_drawn_when_nothing_is_under_it(live_server, page: Page, furnished):  # noqa: F811
+    """A person whose navigation has four items or fewer fills the bar and has nothing to
+    open: *More* is not drawn, and the search is the masthead's icon and nothing else (#339)."""
+    from postulo.accounts.models import Profile
+    from postulo.core import navigation
+
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size(PHONE)
+    page.goto(f"{base}/applications/")
+    more = page.locator("header [data-nav-more]")
+    expect(more).to_be_visible()
+
+    keys = list(navigation.DEFAULT_ORDER)
+    Profile.objects.filter(user=furnished["applicant"]).update(hidden_nav_items=keys[4:])
+    page.goto(f"{base}/applications/")
+    shown = page.locator("header [data-nav-main] > a:visible")
+    assert shown.count() == 4
+    expect(more).to_be_hidden()
+    expect(page.locator("header [data-nav-search]")).to_have_count(0)
+    expect(page.locator("header [data-search-link]")).to_be_visible()
+
+
 def test_more_opens_with_scripts_off(live_server, browser: Browser, furnished):  # noqa: F811
     """A popover since #310, and a `<details>` before it: either way the browser opens it,
     so it opens for everybody. And with nothing to measure the bar, the page's padding falls
@@ -354,7 +377,7 @@ def test_more_opens_with_scripts_off(live_server, browser: Browser, furnished): 
         more.locator(":scope > button").click()
         expect(more.locator(":scope > [popover]")).to_be_visible()
         expect(more.locator('[data-nav="companies"]')).to_be_visible()
-        expect(more.locator("[data-nav-search]")).to_be_visible()
+        expect(more.locator("[data-nav-search]")).to_have_count(0)
 
         padding = page.evaluate("() => parseFloat(getComputedStyle(document.body).paddingBottom)")
         assert padding >= page.locator("header [data-nav-main]").bounding_box()["height"]

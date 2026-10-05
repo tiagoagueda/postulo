@@ -83,9 +83,7 @@ def test_escape_and_the_close_button_put_the_masthead_back(page: Page, live_serv
     expect(icon).to_be_focused()
 
 
-def test_the_slash_key_and_the_navigation_menu_open_the_same_field(
-    page: Page, live_server, applicant
-):
+def test_the_slash_key_and_the_icon_open_the_same_field(page: Page, live_server, applicant):
     base = live_server.url
     icon = open_on_phone(page, base)
     box = page.locator("#site-search")
@@ -96,8 +94,8 @@ def test_the_slash_key_and_the_navigation_menu_open_the_same_field(
     page.keyboard.press("Escape")
     expect(box).to_be_hidden()
 
-    page.locator("[data-nav-main] [data-nav-more] > button").click()
-    page.locator("[data-nav-search]").click()
+    expect(page.locator("[data-nav-search]")).to_have_count(0)
+    icon.click()
     expect(page).to_have_url(f"{base}/")
     expect(box).to_be_focused()
     expect(icon).to_have_attribute("aria-expanded", "true")

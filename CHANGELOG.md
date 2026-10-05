@@ -38,6 +38,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Removed the duplicate Search row from the phone bottom bar's More menu, and More is no longer drawn when nothing is under it (#339)
 - The dashboard widget code no longer declares one field three times, and the linter now catches that mistake (#501)
 - The Applications board is a box about the height of the window that scrolls inside the page, so every column's name, open or folded, stays on screen however far down a long column you are; the box is a named region you can scroll from the keyboard, and the page scrolls on past it. (#652)
 
