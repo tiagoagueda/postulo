@@ -299,6 +299,7 @@ def test_what_belongs_to_the_account_stays_with_the_account(somebody):
         "birth_country",
         "nationalities",
         "nationality_scope",
+        "gender",
         "headline",
         "location",
         "record_language",
@@ -375,7 +376,7 @@ def fingerprint() -> str:
 #: added the form of address and the pronouns beside the name (#309). 4 added the service
 #: a web link is on, read back where the importing side knows it and worked out from the
 #: address in a file that does not say (#305). 5 added the date and place of birth (#679).
-#: 6 added the nationalities and their scope (#680).
+#: 6 added the nationalities and their scope (#680). 7 added the gender (#681).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -383,6 +384,7 @@ SHAPES = {
     4: "bcb06c758a353ad3",
     5: "041a451ff678f708",
     6: "4ddd1e43407b6177",
+    7: "e5e8e4a8666679f8",
 }
 
 

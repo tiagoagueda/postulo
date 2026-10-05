@@ -45,6 +45,14 @@ def choose_other_and_type(page: Page, base: str) -> None:
     pronouns.select_option("they/them")
     expect(pronouns_other).to_be_hidden()
 
+    # Gender is the third of the kind (#681): the same box, shown by the same rule.
+    gender = page.locator("select[name=gender]")
+    gender_other = page.locator("input[name=gender_other]")
+    expect(gender_other).to_be_hidden()
+    gender.select_option("other")
+    expect(gender_other).to_be_visible()
+    gender_other.fill("agender")
+
     page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
     expect(page.get_by_text("Your details have been saved.")).to_be_visible()
 
@@ -54,6 +62,8 @@ def choose_other_and_type(page: Page, base: str) -> None:
     expect(other).to_have_value("Rev")
     expect(pronouns).to_have_value("they/them")
     expect(pronouns_other).to_be_hidden()
+    expect(gender).to_have_value("other")
+    expect(gender_other).to_have_value("agender")
 
 
 def test_choosing_other_shows_the_box_and_keeps_what_was_typed(page: Page, live_server, applicant):
@@ -63,6 +73,7 @@ def test_choosing_other_shows_the_box_and_keeps_what_was_typed(page: Page, live_
     applicant.profile.refresh_from_db()
     assert applicant.profile.form_of_address == "Rev"
     assert applicant.profile.pronouns == "they/them"
+    assert applicant.profile.gender == "agender"
 
 
 def test_the_same_with_scripts_off(browser, live_server, applicant):
@@ -87,6 +98,13 @@ def _with_both_boxes_and_a_derived_location(applicant) -> None:
     profile = applicant.profile
     profile.form_of_address = "Prof. Dr."
     profile.pronouns = "xe/xem"
+    # The *Personal details* card with everything in it (#679, #680, #681): a gender no list
+    # offers, so its box is open too, a date and place of birth and two nationalities.
+    profile.gender = "agender"
+    profile.birth_date = "1990-03-12"
+    profile.birth_place = "Porto"
+    profile.birth_country = "PT"
+    profile.nationalities = ["PT", "BR"]
     profile.save()
     PostalAddress.objects.create(
         owner=applicant,
@@ -112,6 +130,9 @@ def test_your_details_with_both_boxes_open_has_no_violations(
     page.goto(f"{live_server.url}/accounts/profile/")
     expect(page.locator("input[name=form_of_address_other]")).to_be_visible()
     expect(page.locator("input[name=pronouns_other]")).to_be_visible()
+    expect(page.locator("input[name=gender_other]")).to_be_visible()
+    expect(page.locator("input[name=birth_year]")).to_have_value("1990")
+    expect(page.locator("select[name=nationality_3]")).to_have_count(1)
     expect(page.locator("input[name=location]")).to_have_attribute(
         "placeholder", "Lisboa, Portugal"
     )
@@ -149,7 +170,7 @@ def test_your_name_reflows_at_320_pixels(live_server, page: Page, applicant, lan
 #: is chosen in turn, and none may be drawn cut short.
 MENUS = """() => {
   const out = {};
-  for (const name of ['form_of_address', 'pronouns']) {
+  for (const name of ['form_of_address', 'pronouns', 'gender']) {
     const select = document.querySelector(`select[name=${name}]`);
     const menu = __DRAWN__(select);
     const drawn = menu.getBoundingClientRect().width;

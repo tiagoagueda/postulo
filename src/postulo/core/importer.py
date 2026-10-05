@@ -102,12 +102,20 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "birth_place",
         "birth_country",
         "nationality_scope",
+        "gender",
     }
 )
 #: The checked fields a refusal of which the report says: they are the person's own facts,
 #: and an archive that carried one the page would not take has lost something to say so.
 _PERSONAL_FIELDS = frozenset(
-    {"birth_date", "birth_place", "birth_country", "nationalities", "nationality_scope"}
+    {
+        "birth_date",
+        "birth_place",
+        "birth_country",
+        "nationalities",
+        "nationality_scope",
+        "gender",
+    }
 )
 
 
@@ -149,6 +157,9 @@ def _profile_value(profile, name: str, value):
             else (str if column.get_internal_type() == "CharField" else int)
         )
         if type(value) is not wanted:
+            return _REFUSED
+        if isinstance(value, str) and "\x00" in value:
+            # What no text column may hold, and what a form refuses (#679).
             return _REFUSED
         try:
             return column.clean(value, profile)

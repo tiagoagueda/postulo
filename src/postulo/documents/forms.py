@@ -154,6 +154,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_birth_date",
             "show_birth_place",
             "show_nationality",
+            "show_gender",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -271,6 +272,12 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         self.fields["show_birth_place"].help_text = (
             format_html(str(_("As things stand: {value}.")), value=_typed(place))
             if place
+            else GIVES_NONE
+        )
+        gender = (getattr(profile, "gender", "") or "").strip()
+        self.fields["show_gender"].help_text = (
+            format_html(str(_("As things stand: {value}.")), value=_typed(gender))
+            if gender
             else GIVES_NONE
         )
         said = personal.country_names(getattr(profile, "nationalities", None))

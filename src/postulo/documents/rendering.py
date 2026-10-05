@@ -247,19 +247,24 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     # person who listed none and said only a scope prints the scope's wording instead.
     details["nationalities"] = list(printed.nationalities)
     details["nationality_scope"] = personal.scope_text(printed.nationality_scope)
+    details["gender"] = printed.gender
     details["personal"] = _personal_lines(
         details["birth_date"],
         details["birth_place"],
         details["nationalities"],
         details["nationality_scope"],
+        details["gender"],
     )
     return details
 
 
-def _personal_lines(date: str, place: str, countries: list, scope: str) -> list[str]:
+def _personal_lines(
+    date: str, place: str, countries: list, scope: str, gender: str = ""
+) -> list[str]:
     """The lines under the contact details that say something about the person, in the
     document's language: one "Born ..." line, whichever of its two parts there is, and
-    the nationality, as the countries or as the scope's wording where none is listed."""
+    the nationality, as the countries or as the scope's wording where none is listed, and the
+    gender in the person's own word."""
     lines = []
     if date and place:
         lines.append(gettext("Born %(date)s in %(place)s") % {"date": date, "place": place})
@@ -271,6 +276,8 @@ def _personal_lines(date: str, place: str, countries: list, scope: str) -> list[
         lines.append(gettext("Nationality: %(countries)s") % {"countries": ", ".join(countries)})
     elif scope:
         lines.append(scope)
+    if gender:
+        lines.append(gettext("Gender: %(gender)s") % {"gender": gender})
     return lines
 
 

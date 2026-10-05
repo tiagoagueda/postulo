@@ -326,6 +326,8 @@ class CV(DeclaresALanguage, OwnedModel):
     show_birth_place = models.BooleanField(_("print your place of birth"), default=False)
     #: And off (#680): the countries listed, or the scope's wording where none is.
     show_nationality = models.BooleanField(_("print your nationality"), default=False)
+    #: And off (#681), one plain switch.
+    show_gender = models.BooleanField(_("print your gender"), default=False)
 
     class Meta:
         verbose_name = _("CV")

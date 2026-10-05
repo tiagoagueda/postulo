@@ -289,6 +289,12 @@ class Profile(models.Model):
         _("form of address"), max_length=ADDRESSING_MAX_LENGTH, blank=True
     )
     pronouns = models.CharField(_("pronouns"), max_length=ADDRESSING_MAX_LENGTH, blank=True)
+    #: Gender in the person's own words (#681), stored as the text itself exactly as the form
+    #: of address is: a listed word, or whatever they typed. Optional, never worked out from a
+    #: name, an address or any other field, independent of the two above, and printed only on
+    #: a CV that says so. There is none on a contact, which would record something about
+    #: another person that nobody asked to be recorded.
+    gender = models.CharField(_("gender"), max_length=ADDRESSING_MAX_LENGTH, blank=True)
     #: When and where the person was born (#679). Optional, never worked out from anything,
     #: and printed nowhere unless a CV says so. The date is the text of an ISO 8601 reduced
     #: form -- a year, a year and month, or a whole date -- held to `core.personal`'s rule by

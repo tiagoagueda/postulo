@@ -34,14 +34,14 @@ def get_profile(request):
 @router.patch("", response=ProfileOut, auth=scope("write"), summary="Change your details")
 def patch_profile(request, payload: ProfilePatch):
     """Change the name, the form of address, the pronouns, the date and place of birth, the
-    nationalities, the headline or the location.
+    nationalities, the gender, the headline or the location.
 
     A field left out is left alone. A date of birth is `1990`, `1990-03` or `1990-03-12`, a
     real date that is not in the future, and a country is a two-letter code from the list;
-    either refused is a 422 naming the field. The form of address and the pronouns take any text:
-    the lists *Your details* offers are a convenience of the page, and what is stored is the
-    text either way. A first or last name may not be emptied, as on the page, because a job
-    search is conducted under one's own name.
+    either refused is a 422 naming the field. The form of address, the pronouns and the
+    gender take any text: the lists *Your details* offers are a convenience of the page, and
+    what is stored is the text either way. A first or last name may not be emptied, as on the
+    page, because a job search is conducted under one's own name.
 
     Answers with the record as it now stands, as every `PATCH` here does, including one
     that changed nothing.

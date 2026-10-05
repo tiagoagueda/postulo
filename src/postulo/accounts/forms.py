@@ -450,6 +450,23 @@ class SocialSignupForm(AllauthSocialSignupForm):
 ADDRESSING_HELP_ID = "name-addressing-help"
 
 
+#: The id of the sentence of *Personal details* (#679): what the card is for, and that none of
+#: it is printed until a CV is set to. The gender menu is described by it (#681).
+PERSONAL_HELP_ID = "personal-details-help"
+
+
+class DescribedByThePersonalSentence(forms.BoundField):
+    """The gender menu, described by the *Personal details* card's one sentence (#681), and by its
+    own error where it has one, for the reason `DescribedByTheCardsSentence` gives."""
+
+    @property
+    def aria_describedby(self):
+        described_by = [PERSONAL_HELP_ID]
+        if self.auto_id and self.errors:
+            described_by.append(f"{self.auto_id}_error")
+        return " ".join(described_by)
+
+
 class DescribedByTheCardsSentence(forms.BoundField):
     """A menu of *Your name*, described by the card's one sentence (#309).
 
@@ -505,11 +522,11 @@ class ProfileForm(forms.ModelForm):
     be printed at the top of a CV, and nobody thinks of it as an account setting. How
     Postulo behaves for the person — theme, language, username, addresses — is Settings.
 
-    The form of address and the pronouns are each two controls writing one column (#309):
-    a menu of what is in use in the career record's language, and a box for *Other*. The
-    box is drawn for every one of them and shown by the stylesheet while *Other…* is
-    chosen, so it works the same with scripts off; `clean` decides which of the two is the
-    answer, and the menu wins unless it says *Other…*.
+    The form of address, the pronouns and the gender (#681) are each two controls writing one
+    column (#309): a menu of what is in use in the career record's language, and a box for
+    *Other*. The box is drawn for every one of them and shown by the stylesheet while
+    *Other…* is chosen, so it works the same with scripts off; `clean` decides which of the
+    two is the answer, and the menu wins unless it says *Other…*.
     """
 
     # `autocomplete` names what the field is for (SC 1.3.5, #276): a browser can fill it and
@@ -555,6 +572,22 @@ class ProfileForm(forms.ModelForm):
         required=False,
         max_length=ADDRESSING_MAX_LENGTH,
         widget=forms.TextInput(attrs={"dir": "auto"}),
+    )
+    # Gender is the third of the same kind (#681): a menu of what is in use in the record's
+    # language, *Other…* for anything else with its box, and the text stored as it is. The token
+    # `sex` is HTML's "gender identity, free-form text" (SC 1.3.5). Independent of the two
+    # above: nothing here reads either to offer or to decide anything.
+    gender = forms.CharField(
+        label=_("Gender"),
+        required=False,
+        widget=ListedSelect(attrs={"autocomplete": "sex"}),
+        bound_field_class=DescribedByThePersonalSentence,
+    )
+    gender_other = forms.CharField(
+        label=_("Other gender"),
+        required=False,
+        max_length=ADDRESSING_MAX_LENGTH,
+        widget=forms.TextInput(attrs={"autocomplete": "sex", "dir": "auto"}),
     )
     # The date of birth is three boxes, as the GOV.UK Design System draws a date somebody
     # knows part of (#679): `clean` joins them into the ISO 8601 reduced form the column
@@ -626,6 +659,7 @@ class ProfileForm(forms.ModelForm):
         fields = (
             "form_of_address",
             "pronouns",
+            "gender",
             "birth_place",
             "birth_country",
             "nationality_scope",
@@ -644,6 +678,7 @@ class ProfileForm(forms.ModelForm):
         written_in = addressing.written_in(language)
         self._offer("form_of_address", addressing.forms_of_address(language), written_in)
         self._offer("pronouns", addressing.pronouns(language), written_in)
+        self._offer("gender", addressing.genders(language), written_in)
         self._explain_location()
         # The formats and the size are the ones `clean_picture` refuses by (#302): read from
         # `avatars`, so the sentence under the box cannot promise what the form turns away.
@@ -856,7 +891,7 @@ class ProfileForm(forms.ModelForm):
         cleaned = super().clean()
         self._clean_birth_date(cleaned)
         self._clean_nationalities(cleaned)
-        for name in ("form_of_address", "pronouns"):
+        for name in ("form_of_address", "pronouns", "gender"):
             box = f"{name}_other"
             chosen = (cleaned.get(name) or "").strip()
             if chosen == addressing.OTHER:

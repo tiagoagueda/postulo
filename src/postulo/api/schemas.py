@@ -797,6 +797,7 @@ class CVPrintsOut(Schema):
     nationality: bool = Field(
         description="Whether the countries listed, or the scope's wording, are printed (#680)"
     )
+    gender: bool = Field(description="Whether the gender is printed (#681)")
     birth_date: bool = Field(description="Whether the date of birth is printed (#679)")
     birth_place: bool = Field(description="Whether the place of birth is printed (#679)")
 
@@ -844,6 +845,7 @@ class CVPrintsIn(Schema):
     birth_date: bool | None = None
     birth_place: bool | None = None
     nationality: bool | None = None
+    gender: bool | None = None
 
 
 class CVPatch(Schema):
@@ -1014,6 +1016,13 @@ class ProfileOut(Schema):
             "answer given is stored only while there are none"
         ),
     )
+    gender: str = Field(
+        default="",
+        description=(
+            "In the person's own words, as the text itself; blank when not given. Never worked "
+            "out from anything. Printed only on a CV whose `prints.gender` is true."
+        ),
+    )
     headline: str = ""
     location: str = Field(
         default="",
@@ -1106,6 +1115,10 @@ class ProfilePatch(Schema):
             "when countries are listed, since it is worked out from them then"
         ),
     )
+    gender: _AddressingLine | None = Field(
+        default=None,
+        description="Any text, including one no list offers; empty clears it",
+    )
     headline: _HeadlineLine | None = None
     location: _LocationLine | None = Field(
         default=None,
@@ -1127,6 +1140,7 @@ def profile_out(profile) -> dict:
         # Worked out from the countries while there are any, which is what the person meant.
         "nationality_scope": personal.derived_scope(profile.nationalities)
         or profile.nationality_scope,
+        "gender": profile.gender,
         "headline": profile.headline,
         "location": profile.location,
         "printed_location": printed_location(profile),

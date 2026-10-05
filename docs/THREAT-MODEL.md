@@ -41,12 +41,14 @@ somebody can be found. Three consequences, and each is a rule rather than an int
   address reaching a stranger by default, and `Profile.location` staying its own line is the
   mechanism rather than a convention.
 
-**A date and a place of birth sit beside it (#679), and so do nationalities (#680).** They
-are what an identity check asks for, and a nationality can reveal an ethnic origin, so they
-are the most identifying things a profile can hold. They are columns of the account holder's
+**A date and a place of birth sit beside it (#679), and so do nationalities (#680) and
+gender (#681).** They are what an identity check asks for, a nationality can reveal an ethnic
+origin, and gender is personal data that some regulators treat as sensitive, so they are the
+most identifying things a profile can hold. They are columns of the account holder's
 own `Profile`, optional, never worked out from anything (an age is never computed, stored or
-shown; a nationality is never guessed from a name, an address, a language or a telephone
-number) and held to one rule in `core/personal.py`, whichever door a value comes in at: the
+shown; a nationality or a gender is never guessed from a name, an address, a language or a
+telephone number, and a gender is kept off contacts, which would record it of somebody who
+never asked) and held to one rule in `core/personal.py`, whichever door a value comes in at: the
 page, the API, a candidate file and an archive. The same rules as the address, each with a
 test:
 

@@ -196,3 +196,46 @@ def test_a_hand_made_page_cannot_make_a_thousand_menus(client, user):
     assert response.status_code == 200
     user.profile.refresh_from_db()
     assert user.profile.nationalities == []
+
+
+# ------------------------------------------------------------------------ gender (#681)
+
+
+def test_gender_is_the_owners_own_and_needs_the_same_scopes(client, user, other_user):
+    user.profile.gender = "Zanzibarian"
+    user.profile.save()
+    assert client.get("/api/v1/profile", **issue(user, "captures")).status_code == 403
+    assert patch(client, {"gender": "x"}, **issue(user, "read")).status_code == 403
+    assert client.get("/api/v1/profile", **issue(user, "write")).status_code == 403
+    assert (
+        "Zanzibarian"
+        not in client.get("/api/v1/profile", **issue(other_user, "read")).content.decode()
+    )
+    assert patch(client, {"gender": "Man"}, **issue(other_user, "write")).status_code == 200
+    user.profile.refresh_from_db()
+    assert user.profile.gender == "Zanzibarian"
+
+
+def test_no_list_search_or_contact_carries_a_gender(client, user):
+    user.profile.gender = "Zanzibarian"
+    user.profile.save()
+    CV.objects.create(owner=user, name="Main", show_gender=True)
+    token = issue(user, "read")
+    for path in ("/api/v1/cvs", "/api/v1/companies", "/api/v1/listings"):
+        assert "Zanzibarian" not in client.get(path, **token).content.decode(), path
+    assert "Zanzibarian" not in client.get("/api/v1/search?q=Zanzibarian", **token).content.decode()
+
+
+def test_a_refused_gender_does_not_echo_what_was_sent(client, user, caplog):
+    caplog.set_level(logging.DEBUG)
+    response = patch(client, {"gender": "Zanzibarian" * 5}, **issue(user, "write"))
+    assert response.status_code == 422
+    assert "Zanzibarian" not in caplog.text
+
+
+def test_a_document_that_did_not_choose_prints_no_gender(user):
+    user.profile.gender = "Zanzibarian"
+    user.profile.save()
+    cv = CV.objects.create(owner=user, name="Main")
+    assert "Zanzibarian" not in rendering.render_cv_html(cv)
+    assert "Zanzibarian" not in rendering.cv_text(cv)

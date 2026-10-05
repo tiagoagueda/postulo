@@ -181,6 +181,25 @@
           <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_place" /></div>
           <div class="min-w-0 flex-1 basis-48"><c-field :field="form.birth_country" /></div>
         </div>
+        {% comment %} Gender, in the person's own words (#681): a menu, with a box for Other
+           that the stylesheet shows only while Other is chosen, as for the form of address
+           and the pronouns above (`data-if-other`, one rule for the three), so it is the same
+           with scripts off. Described by the card's sentence, never offered from, nor
+           narrowed by, either of the two in the card above. {% endcomment %}
+        <div class="flex flex-wrap items-start gap-x-4" data-fields-in-line>
+          <div class="flex w-full flex-wrap items-start gap-x-4 sm:w-auto sm:max-w-full" data-if-other data-gender>
+            <div class="field mb-4 w-full sm:w-auto sm:max-w-full"{% if form.gender.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.gender.id_for_label }}">{{ form.gender.label }}</label>
+              {{ form.gender }}
+              <c-field-feedback :field="form.gender" />
+            </div>
+            <div class="field mb-4 w-full sm:w-auto sm:min-w-36 sm:max-w-full" data-name-if-other{% if form.gender_other.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ form.gender_other.id_for_label }}">{{ form.gender_other.label }}</label>
+              {{ form.gender_other }}
+              <c-field-feedback :field="form.gender_other" />
+            </div>
+          </div>
+        </div>
         {% comment %} A menu for each nationality held and one empty: saving draws the next
            one (#680). Each is a native select, which is what there is with scripts off. What
            is said only as a scope is the next field, and is used while none is listed. {% endcomment %}

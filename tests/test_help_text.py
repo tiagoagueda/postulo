@@ -96,6 +96,10 @@ EXCUSED = {
     "ProfileForm.form_of_address_other": "the menu's Other, described with it",
     "ProfileForm.pronouns": "described by the card's one sentence",
     "ProfileForm.pronouns_other": "the menu's Other, described with it",
+    # Gender is the third menu of the kind, described by the *Personal details* card's one
+    # sentence (#681).
+    "ProfileForm.gender": "described by the card's one sentence",
+    "ProfileForm.gender_other": "the menu's Other, described with it",
     # The date of birth is three boxes in a fieldset whose legend names it, and the card's one
     # sentence describes the fieldset; the country is a menu that names itself (#679).
     "ProfileForm.birth_day": "a box of the date's fieldset, described with it",

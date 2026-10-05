@@ -1,10 +1,17 @@
-"""How a person is addressed and referred to: the lists *Your name* offers, per language (#309).
+"""How a person is addressed and referred to, and what gender they say: the lists *Your details*
+offers, per language (#309, #681).
 
 Two fields, and deliberately two. A **form of address** is written before a name -- Mr,
 Mme, *Eng.ª* -- in a formal letter's greeting and, in some countries, at the top of a CV.
 **Pronouns** say how to refer to somebody, and are written apart from the name. Somebody
 may give either, both or neither; nothing is assumed when one is blank, and neither is ever
 worked out from a name.
+
+A third list sits in the same card and follows the same promises (#681): **gender**, in the
+person's own words or not at all. It is a short list of what is in common use, and *Other…* for
+anything else; setting it never sets, narrows or suggests a form of address or pronouns, and
+the reverse. No code reads one of the three to decide another, and none reads any of them to
+decide anything but what a CV prints.
 
 **These lists are data, not translations.** Portuguese *Eng.* is not the translation of
 anything in English, French *iel* is not a translation of *they*, and English has no *Me*
@@ -38,6 +45,16 @@ Sources, so a list can be argued with rather than guessed at:
   Eng.ª, Prof.ª).
 - Brazilian Portuguese: the Federal Senate's *Manual de Comunicação* (Sr., Sra., Dr.,
   Dra., Prof., Prof.ª). *Eng.* before a name is Portuguese usage rather than Brazilian.
+- Gender (#681): three plain words per language -- the woman, the man and the non-binary
+  answer -- and no more, since *Other…* is there for the rest and a list that offers only
+  two would be wrong for many people. No authority publishes a list of genders for the forms
+  of any of these languages, and none is claimed: the words are the ones the general
+  dictionaries carry for each (the *Oxford English Dictionary* has *non-binary*, *Le Robert*
+  has *non binaire*, and the Portuguese dictionaries have *não binário*), with *Mulher* and
+  *Homem* the same in both Portuguese norms. What is stored is the word itself, so the
+  mapping to vCard's ``GENDER`` that #660 will write is the stored word as the free-text
+  identity with an empty sex component (``GENDER:;Non-binary``), never a guess at ``M`` or
+  ``F``, and a card read back never sets the field without the person confirming it.
 - Portuguese pronouns: the object of the preposition *de* is how a Portuguese speaker
   says which set they use (*ela/dela*); *elu/delu* is the neutral set most asked for.
 """
@@ -65,6 +82,15 @@ PRONOUNS: dict[str, tuple[str, ...]] = {
     "fr": ("elle", "il", "iel"),
     "pt-PT": ("ela/dela", "ele/dele", "elu/delu"),
     "pt-BR": ("ela/dela", "ele/dele", "elu/delu"),
+}
+
+#: What gender somebody says, by language, in the order a form in that language lists them
+#: (#681). Not a statement that these are all there is: see the module's note.
+GENDERS: dict[str, tuple[str, ...]] = {
+    "en": ("Woman", "Man", "Non-binary"),
+    "fr": ("Femme", "Homme", "Non binaire"),
+    "pt-PT": ("Mulher", "Homem", "Não binário"),
+    "pt-BR": ("Mulher", "Homem", "Não binário"),
 }
 
 
@@ -96,10 +122,14 @@ def pronouns(language: str) -> tuple[str, ...]:
     return _in(PRONOUNS, language)
 
 
+def genders(language: str) -> tuple[str, ...]:
+    return _in(GENDERS, language)
+
+
 def written_in(language: str) -> str:
     """The language the lists offered for ``language`` are written in, or nothing.
 
     What an option's ``lang`` says, so a screen reader reading English pronounces *Mme* as
     French (WCAG 3.1.2, Language of Parts).
     """
-    return languages.match(language, list(dict.fromkeys([*FORMS_OF_ADDRESS, *PRONOUNS])))
+    return languages.match(language, list(dict.fromkeys([*FORMS_OF_ADDRESS, *PRONOUNS, *GENDERS])))

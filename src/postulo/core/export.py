@@ -99,7 +99,10 @@ logger = logging.getLogger(__name__)
 #: the EEA or Switzerland, each read back through the one rule the page is held to; and
 #: ``nationality`` among a CV's ``prints``. An archive without them restores both blank and off
 #: (#680).
-FORMAT_VERSION = 35
+#: 36 added ``gender`` on the profile: the word somebody gave or typed, as text, read back
+#: through the column's own bounds; and ``gender`` among a CV's ``prints``. An archive without
+#: them restores it blank and off (#681).
+FORMAT_VERSION = 36
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -128,7 +131,9 @@ FORMAT_VERSION = 35
 #: 6 added ``nationalities`` and ``nationality_scope`` on the profile: each listed code is
 #: read back as a row of its own, added or already there, and the scope only while there is
 #: no list (#680).
-CANDIDATE_FORMAT = 6
+#: 7 added ``gender`` on the profile, read back as the form of address is: filled where blank,
+#: kept where not (#681).
+CANDIDATE_FORMAT = 7
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -148,6 +153,8 @@ PROFILE_FIELDS = (
     # for it while there is none. Both are read back through `core.personal`.
     "nationalities",
     "nationality_scope",
+    # In the person's own words, as the text itself (#681), like the two before the name.
+    "gender",
     "headline",
     # As typed. A blank is a blank here, not the address's town and country: that is worked
     # out when it is printed, and writing it in would pin it to today's primary address.
@@ -194,6 +201,7 @@ CANDIDATE_PROFILE_FIELDS = (
     "birth_country",
     "nationalities",
     "nationality_scope",
+    "gender",
     "headline",
     "location",
     "record_language",
