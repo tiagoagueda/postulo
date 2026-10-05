@@ -670,3 +670,85 @@ def test_an_identifier_matches_by_its_value_and_as_a_whole_segment():
         ]
     )
     assert SchemaOrgSource().parse("https://acme.example/jobs/n0002", named).title == "Value"
+
+
+# ------------------------------------------------------- a page is parsed once (#591)
+
+
+@pytest.fixture
+def parses(monkeypatch):
+    """How many trees are built: every one is a pure-Python walk of the whole page."""
+    from postulo.plugins.builtin import htmlutil
+
+    built = []
+
+    class Counting(htmlutil._TreeBuilder):
+        def __init__(self):
+            built.append(1)
+            super().__init__()
+
+    monkeypatch.setattr(htmlutil, "_TreeBuilder", Counting)
+    return built
+
+
+def test_a_page_without_json_ld_is_parsed_once(parses):
+    page = "<html><head><title>A job</title></head><body><h1>Chef</h1><p>Cook.</p></body></html>"
+
+    result = parse_page("https://example.org/j/1", page)
+
+    assert result is not None and result[1].name == "page-metadata"
+    assert len(parses) == 1
+
+
+def test_a_page_on_a_board_with_a_recipe_is_parsed_once(parses):
+    from pathlib import Path
+
+    page = Path(__file__).parent.joinpath("fixtures/postings/linkedin.html").read_text("utf-8")
+
+    result = parse_page("https://www.linkedin.com/jobs/view/4435670736/", page)
+
+    assert result is not None and result[1].name == "board"
+    assert len(parses) == 1
+
+
+def test_remembered_places_add_no_parse(parses):
+    from postulo.plugins.base import RememberedPlace
+    from postulo.plugins.builtin import hints, htmlutil
+
+    page = "<html><body><h1>Chef</h1><p class='aviso-local'>Lisbon</p></body></html>"
+    here = [RememberedPlace("location", {"class": "aviso-local", "tag": "p"})]
+
+    result = parse_page("https://example.org/j/1", page, hints=here)
+
+    assert result is not None and result[0].location == "Lisbon"
+    assert len(parses) == 1
+    # Handed the tree, `fill` and `places` build nothing of their own.
+    root = htmlutil.parse_html(page)
+    assert len(parses) == 2
+    hints.fill("https://example.org/j/1", root, here, {})
+    hints.places("https://example.org/j/1", root)
+    assert len(parses) == 2
+
+
+def test_reading_a_tree_does_not_change_it():
+    from postulo.plugins.builtin import PageMetadataSource, SchemaOrgSource, htmlutil
+
+    page = (
+        '<html lang="en"><head><title>A job</title></head><body><main><h1>Chef</h1>'
+        '<div itemscope itemtype="https://schema.org/JobPosting"><span itemprop="title">Chef'
+        "</span></div><p>Cook for us. " + "More. " * 50 + "</p></main></body></html>"
+    )
+    root = htmlutil.parse_html(page)
+
+    def shape(node):
+        return (
+            node.tag,
+            dict(node.attrs),
+            [shape(c) if hasattr(c, "tag") else c for c in node.children],
+        )
+
+    before = shape(root)
+    SchemaOrgSource()._parse("https://example.org/j/1", root)
+    PageMetadataSource()._parse("https://example.org/j/1", root)
+
+    assert shape(root) == before

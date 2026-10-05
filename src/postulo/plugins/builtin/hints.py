@@ -60,8 +60,8 @@ from .htmlutil import (
     classes_of,
     find,
     language_of,
-    parse_html,
     text_of,
+    tree_of,
 )
 from .vocabulary import employment_type
 
@@ -443,7 +443,7 @@ def read(found: Element | str | None, field: str, tag: str = "") -> dict:
     }
 
 
-def fill(url: str, html: str, hints, stated: dict) -> dict:
+def fill(url: str, page: Element | str, hints, stated: dict) -> dict:
     """Fill what the tiers above left empty from a person's remembered places.
 
     ``hints`` are what Postulo hands a source (`plugins.base.RememberedPlace`): each has a
@@ -460,7 +460,7 @@ def fill(url: str, html: str, hints, stated: dict) -> dict:
         hint.outcome = ""
     if not hints:
         return stated
-    root = parse_html(html)
+    root = tree_of(page)
     tag = patterns.tag_of(language_of(root))
     for hint in hints:
         targets = FIELDS.get(hint.field)
@@ -570,14 +570,14 @@ def _candidates(root: Element):
     return by_kind
 
 
-def places(url: str, html: str) -> list[dict]:
+def places(url: str, page: Element | str) -> list[dict]:
     """Every place on a page a correction could be remembered at, and what each holds.
 
     Bounded by kind, by count and by weight, and holding no text of the page: a digest of
     each place's text and what it reads as, which is what recognising a corrected value
     takes. Most stable kinds first, and each kind in the order the page has them.
     """
-    root = parse_html(html)
+    root = tree_of(page)
     tag = patterns.tag_of(language_of(root))
     records: list[dict] = []
     weight = 2

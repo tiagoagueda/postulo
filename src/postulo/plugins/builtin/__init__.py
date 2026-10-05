@@ -63,6 +63,7 @@ from . import hints as remembered
 from . import patterns, titles
 from .boards import recipe_for
 from .htmlutil import (
+    Element,
     body_of,
     extract_jsonld,
     extract_meta,
@@ -89,7 +90,9 @@ def _stated(data: JobPostingData) -> dict:
     }
 
 
-def _with_hints(data: JobPostingData | None, url: str, html: str, hints) -> JobPostingData | None:
+def _with_hints(
+    data: JobPostingData | None, url: str, page: Element, hints
+) -> JobPostingData | None:
     """What a person's remembered places add to what a tier above them stated (#267).
 
     Only a field the tier left empty is asked about, so a site's own statement is never
@@ -97,7 +100,7 @@ def _with_hints(data: JobPostingData | None, url: str, html: str, hints) -> JobP
     """
     if data is None or not hints:
         return data
-    stated = remembered.fill(url, html, hints, _stated(data))
+    stated = remembered.fill(url, page, hints, _stated(data))
     return JobPostingData(**stated, url=data.url, source=data.source)
 
 
@@ -384,16 +387,20 @@ class SchemaOrgSource:
 
     def parse(self, url: str, html: str, hints=None) -> JobPostingData | None:
         """``hints``, a person's remembered places, fill only what the posting left empty."""
-        posting = _best_posting(extract_jsonld(html), url)
+        return self._parse(url, parse_html(html), hints)
+
+    def _parse(self, url: str, root: Element, hints=None) -> JobPostingData | None:
+        """`parse`, for a page already built into a tree, which is shared and never changed."""
+        posting = _best_posting(extract_jsonld(root), url)
         if posting is not None:
             read = _from_posting(posting, url, description_is_html=True)
-            return _with_hints(read, url, html, hints)
+            return _with_hints(read, url, root, hints)
 
         # A posting held inside another item is found as it is in JSON-LD (#589).
-        posting = _best_posting(flatten([*extract_microdata(html), *extract_rdfa(html)]), url)
+        posting = _best_posting(flatten([*extract_microdata(root), *extract_rdfa(root)]), url)
         if posting is not None:
             read = _from_posting(posting, url, description_is_html=False)
-            return _with_hints(read, url, html, hints)
+            return _with_hints(read, url, root, hints)
         return None
 
 
@@ -447,8 +454,13 @@ class BoardSource:
         board = recipe_for(url)
         if board is None:
             return None
+        return self._parse(url, parse_html(html), hints)
 
-        root = parse_html(html)
+    def _parse(self, url: str, root: Element, hints=None) -> JobPostingData | None:
+        """`parse`, for a page already built into a tree."""
+        board = recipe_for(url)
+        if board is None:
+            return None
         stated = board.read(body_of(root) or root, url)
         stated = {
             field: value
@@ -468,18 +480,18 @@ class BoardSource:
 
         # Whatever the recipe did not state: the page's own standards first, then the
         # person's remembered places, then what the page says about itself.
-        stated = self._fill_from(SchemaOrgSource, url, html, stated)
-        stated = remembered.fill(url, html, hints, stated)
-        stated = self._fill_from(PageMetadataSource, url, html, stated)
+        stated = self._fill_from(SchemaOrgSource, url, root, stated)
+        stated = remembered.fill(url, root, hints, stated)
+        stated = self._fill_from(PageMetadataSource, url, root, stated)
         return JobPostingData(**stated, url=url, source=urlparse(url).netloc)
 
     @staticmethod
-    def _fill_from(source_class, url: str, html: str, stated: dict) -> dict:
+    def _fill_from(source_class, url: str, root: Element, stated: dict) -> dict:
         """The fields nothing above has stated, from one of the standard sources."""
         if len(stated) >= len(RECIPE_FIELDS):
             return stated
         try:
-            fallback = source_class().parse(url, html)
+            fallback = source_class()._parse(url, root)
         except Exception:
             # The recipe already has a title, so the capture survives this. Logged rather
             # than silenced: a standard source throwing is worth looking at.
@@ -558,17 +570,21 @@ class PageMetadataSource:
         return urlparse(url).scheme in {"http", "https"}
 
     def parse(self, url: str, html: str, hints=None) -> JobPostingData | None:
-        from_hints = remembered.fill(url, html, hints, {})
-        read = self._read(url, html)
+        return self._parse(url, parse_html(html), hints)
+
+    def _parse(self, url: str, root: Element, hints=None) -> JobPostingData | None:
+        """`parse`, for a page already built into a tree."""
+        from_hints = remembered.fill(url, root, hints, {})
+        read = self._read(url, root)
         # Each group a remembered place filled is the place's, whole; the rest is the page's.
         stated = {**read, **from_hints}
         if not str(stated.get("title") or "").strip():
             return None
         return JobPostingData(**stated, url=url, source=urlparse(url).netloc)
 
-    def _read(self, url: str, html: str) -> dict:
+    def _read(self, url: str, root: Element) -> dict:
         """What the page says about itself, field by field, before any remembered place."""
-        meta = extract_meta(html)
+        meta = extract_meta(root)
         site_name = (meta.get("og:site_name") or "").strip()
         # The page's own heading first, then what it declares for a link to read, in the
         # order they are trusted. All of it is the page talking about itself; the heading is
@@ -580,17 +596,17 @@ class PageMetadataSource:
                 meta.get("twitter:title", ""),
                 meta.get("title", ""),
             ],
-            heading=heading_title(html),
+            heading=heading_title(root),
             site_name=site_name,
             host=urlparse(url).hostname or "",
             is_place=_is_place,
         )
 
-        text = main_text(html)
+        text = main_text(root)
         # The pay and the closing date, in the page's own language, from its text and from
         # the pairs a Twitter card may carry. The advert's text rather than the whole page:
         # a sidebar of other adverts carries other adverts' salaries.
-        language = patterns.tag_of(page_language(html))
+        language = patterns.tag_of(page_language(root))
         stated = "\n".join([text, *_card_lines(meta)])
         low, high, currency, period = patterns.salary(stated, language)
 

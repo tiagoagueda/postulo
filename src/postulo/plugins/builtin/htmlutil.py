@@ -19,6 +19,8 @@ from __future__ import annotations
 import json
 import logging
 import re
+from contextlib import contextmanager
+from contextvars import ContextVar
 from html import unescape
 from html.parser import HTMLParser
 
@@ -228,8 +230,18 @@ class _TreeBuilder(HTMLParser):
         self._here.children.append(data)
 
 
+#: The page being read and its tree, while a caller has said it will be read more than once.
+_SHARED: ContextVar[tuple[str, Element] | None] = ContextVar("postulo_shared_page", default=None)
+
+
 def parse_html(html: str) -> Element:
-    """The page as a tree. Whatever was built before a parser error is still worth having."""
+    """The page as a tree. Whatever was built before a parser error is still worth having.
+
+    Inside `one_parse` the same string is parsed once, however many sources read it.
+    """
+    shared = _SHARED.get()
+    if shared is not None and shared[0] is html:
+        return shared[1]
     builder = _TreeBuilder()
     try:
         builder.feed(html or "")
@@ -237,6 +249,27 @@ def parse_html(html: str) -> Element:
     except Exception:
         logger.warning("Could not finish parsing the page", exc_info=True)
     return builder.root
+
+
+@contextmanager
+def one_parse(html: str):
+    """Parse ``html`` once for everything read inside the block, and hand back its tree.
+
+    A page is read by several sources in turn, each asking for the tree; none of them
+    changes it, so they can all be given the same one. Matched by identity, so a different
+    string (a fragment, a description) is parsed as it always was.
+    """
+    root = parse_html(html)
+    token = _SHARED.set((html, root))
+    try:
+        yield root
+    finally:
+        _SHARED.reset(token)
+
+
+def tree_of(page: Element | str) -> Element:
+    """A page as a tree, parsing it only if it is not one already."""
+    return page if isinstance(page, Element) else parse_html(page)
 
 
 def find(root: Element, tag: str):
@@ -429,7 +462,7 @@ def _link_farms(body: Element) -> set[int]:
     return farms
 
 
-def main_text(html: str) -> str:
+def main_text(page: Element | str) -> str:
     """The readable text of a page, less its navigation, header, footer and sidebars.
 
     A page's own landmarks say which part is the advert: where it declares a ``<main>`` or
@@ -437,7 +470,7 @@ def main_text(html: str) -> str:
     furniture around it. This is the fallback's text, and it goes to somebody who is about
     to read and correct it, so it would rather keep a stray line than cut the advert.
     """
-    root = parse_html(html)
+    root = tree_of(page)
     body = body_of(root) or root
     farms = _link_farms(body)
 
@@ -464,7 +497,7 @@ def main_text(html: str) -> str:
     return whole
 
 
-def heading_title(html: str) -> str:
+def heading_title(page: Element | str) -> str:
     """The one heading a page gives itself, where it gives exactly one.
 
     A board with no structured data still says what the advert is called, in the element
@@ -475,7 +508,7 @@ def heading_title(html: str) -> str:
     Exactly one, and not inside the furniture. Two headings is a page that has not said
     which is the subject, and guessing between them is the thing this does not do.
     """
-    root = parse_html(html)
+    root = tree_of(page)
     body = body_of(root) or root
     headings = [
         heading
@@ -523,14 +556,14 @@ def flatten(node) -> list[dict]:
     return found
 
 
-def extract_jsonld(html: str) -> list[dict]:
+def extract_jsonld(page: Element | str) -> list[dict]:
     """Return every JSON-LD object in the page.
 
     A block that will not parse is skipped rather than failing the capture: pages routinely
     carry several, and one being malformed says nothing about the others.
     """
     objects: list[dict] = []
-    for script in find(parse_html(html), "script"):
+    for script in find(tree_of(page), "script"):
         if "ld+json" not in script.get("type").lower():
             continue
         raw = "".join(child for child in script.children if isinstance(child, str))
@@ -622,9 +655,9 @@ def _top_level(root: Element, opens, names) -> list[Element]:
     ]
 
 
-def extract_microdata(html: str) -> list[dict]:
+def extract_microdata(page: Element | str) -> list[dict]:
     """Every microdata item in the page, shaped as the object JSON-LD would have given."""
-    root = parse_html(html)
+    root = tree_of(page)
 
     def scope_of(element: Element) -> bool:
         return element.has("itemscope")
@@ -643,14 +676,14 @@ def extract_microdata(html: str) -> list[dict]:
     ]
 
 
-def extract_rdfa(html: str) -> list[dict]:
+def extract_rdfa(page: Element | str) -> list[dict]:
     """Every RDFa item in the page, shaped the same way.
 
     RDFa Lite is all a board ever uses here: ``typeof`` opens an item and ``property`` names
     a value. The ``vocab`` in force is not tracked, because a type name is what the reader
     matches on either way, and a prefix like "schema:title" is dropped for the same reason.
     """
-    root = parse_html(html)
+    root = tree_of(page)
 
     return [
         _read_item(
@@ -668,9 +701,9 @@ def extract_rdfa(html: str) -> list[dict]:
 # ----------------------------------------------------------------- metadata
 
 
-def extract_meta(html: str) -> dict[str, str]:
+def extract_meta(page: Element | str) -> dict[str, str]:
     """Return ``{"title": ..., "og:title": ..., ...}`` for what the page declares."""
-    root = parse_html(html)
+    root = tree_of(page)
     meta: dict[str, str] = {}
     for tag in find(root, "meta"):
         key = tag.get("property") or tag.get("name")
@@ -682,14 +715,14 @@ def extract_meta(html: str) -> dict[str, str]:
     return {"title": title, **meta}
 
 
-def page_language(html: str) -> str:
+def page_language(page: Element | str) -> str:
     """The language a page says it is written in, exactly as it says it; "" if it does not.
 
     Its ``<html lang>`` first, which is where HTML asks for it; then an ``og:locale`` or a
     ``Content-Language`` it declares, whichever comes first. What comes back is a stranger's
     text and is checked by whoever uses it (`patterns.tag_of`).
     """
-    return language_of(parse_html(html))
+    return language_of(tree_of(page))
 
 
 def language_of(root: Element) -> str:

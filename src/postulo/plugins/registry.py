@@ -50,6 +50,7 @@ from .base import (
     TransportPlugin,
 )
 from .builtin import BUILTIN_SOURCES
+from .builtin.htmlutil import one_parse
 from .locale import forget_registered as forget_registered_locales
 from .locale import register_plugin_locale
 from .themes import forget_registered as forget_registered_templates
@@ -439,19 +440,21 @@ def parse_page(
     ``outcome``, and `jobs.remembered` keeps the score.
     """
     hints = list(hints)
-    for source in available_sources() if sources is None else sources:
-        try:
-            if not source.can_handle(url):
+    # The page is built into a tree once, however many sources read it in turn (#591).
+    with one_parse(html):
+        for source in available_sources() if sources is None else sources:
+            try:
+                if not source.can_handle(url):
+                    continue
+                if hints and reads_hints(source):
+                    parsed = source.parse(url, html, hints=hints)
+                else:
+                    parsed = source.parse(url, html)
+            except Exception:
+                logger.exception("Capture source %r failed on %r", source.name, url)
                 continue
-            if hints and reads_hints(source):
-                parsed = source.parse(url, html, hints=hints)
-            else:
-                parsed = source.parse(url, html)
-        except Exception:
-            logger.exception("Capture source %r failed on %r", source.name, url)
-            continue
-        if parsed is not None:
-            return parsed, source
+            if parsed is not None:
+                return parsed, source
     return None
 
 
