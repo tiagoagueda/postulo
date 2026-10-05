@@ -443,3 +443,16 @@ def test_documents_still_come_newest_first_and_catch_up_oldest_first(client, use
     assert [d["title"] for d in oldest.json()["items"]] == ["Sent 1", "Sent 2"]
     only = client.get("/api/v1/documents?source=upload", **bearer).json()
     assert [d["title"] for d in only["items"]] == ["Scan"]
+
+
+def test_a_list_cannot_be_asked_for_more_than_the_documented_maximum(client, user, applications):
+    from postulo.api.paging import MAX_LIMIT
+
+    bearer = issue(user, "read")
+    assert client.get("/api/v1/applications?limit=10000", **bearer).status_code == 422
+    assert client.get(f"/api/v1/applications?limit={MAX_LIMIT}", **bearer).status_code == 200
+    parameters = {
+        p["name"]: p["schema"]
+        for p in openapi()["paths"]["/api/v1/applications"]["get"]["parameters"]
+    }
+    assert parameters["limit"]["maximum"] == MAX_LIMIT

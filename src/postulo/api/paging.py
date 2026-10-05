@@ -26,7 +26,9 @@ from collections.abc import Callable
 from typing import Any
 
 from django.db.models import Q
+from ninja import Schema
 from ninja.pagination import LimitOffsetPagination
+from pydantic import Field
 
 #: What every list says about its cursor, written once so every list says the same thing.
 UPDATED_SINCE = (
@@ -42,12 +44,23 @@ AFTER_ID = (
 )
 
 
+#: The most rows one call may ask for. The call runs in a transaction, and on SQLite that
+#: holds the instance's write lock while every row is loaded, shaped and serialised, so an
+#: unbounded `limit` let one token make a whole account the page (#434).
+MAX_LIMIT = 200
+
+
 class Page(LimitOffsetPagination):
     """``limit`` and ``offset``, with the rows shaped after the page is cut, not before.
 
     ``row`` is called with the request and one record, exactly as the view used to call it,
-    and only for the records that are actually going out.
+    and only for the records that are actually going out. ``limit`` is at most
+    ``MAX_LIMIT``, and the schema says so; a larger one is a 422.
     """
+
+    class Input(Schema):
+        limit: int = Field(100, ge=1, le=MAX_LIMIT)
+        offset: int = Field(0, ge=0)
 
     def __init__(self, *, row: Callable[[Any, Any], dict] | None = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)
