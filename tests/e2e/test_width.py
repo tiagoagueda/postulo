@@ -386,13 +386,14 @@ def test_below_the_breakpoint_a_contact_is_one_column(live_server, page: Page, f
 def test_a_contact_with_no_rows_is_one_column_at_any_width(live_server, page: Page, furnished):  # noqa: F811
     """Every feature that draws a row switched off: nothing for a second column, and the
     details keep their measure at the start edge, *Merge* still at the end of it."""
+    from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
     from postulo.plugins.models import PluginPolicy
     from postulo.plugins.phone_numbers import PHONE_NUMBERS
     from postulo.plugins.repositories import REPOSITORIES
     from postulo.plugins.social_profiles import SOCIAL_PROFILES
     from postulo.plugins.websites import WEBSITES
 
-    for plugin in (PHONE_NUMBERS, SOCIAL_PROFILES, REPOSITORIES, WEBSITES):
+    for plugin in (PHONE_NUMBERS, SOCIAL_PROFILES, REPOSITORIES, WEBSITES, MESSAGING_CONTACTS):
         PluginPolicy.objects.create(
             plugin=plugin, person=furnished["applicant"], state=PluginPolicy.State.FORCED_OFF
         )
