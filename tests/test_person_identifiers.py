@@ -317,3 +317,11 @@ def test_identifiers_travel_in_the_export(user):
     document = export.build_document(user)
     rows = document["account"]["identifiers"]
     assert rows == [{"scheme": identifiers.ORCID, "value": ORCID, "label": ""}]
+
+
+def test_a_person_identifier_says_its_schemes_mark_and_a_company_scheme_has_none():
+    """ORCID is drawn in one colour (#654); an identifier whose scheme names no mark draws none."""
+    assert PersonIdentifier(scheme="orcid", value="0000-0002-1825-0097").brand == "orcid"
+    assert identifiers.brand_for("orcid") == "orcid"
+    assert PersonIdentifier(scheme="isni", value="0000 0001 2281 955X").brand == ""
+    assert identifiers.brand_for("lei") == "", "an LEI does not identify a person"

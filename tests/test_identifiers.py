@@ -1,5 +1,6 @@
 """Company identifiers: a Wikidata id first, and the others people have to hand."""
 
+import re
 import zipfile
 
 import pytest
@@ -449,3 +450,79 @@ def test_the_csv_importer_matches_on_a_wikidata_column(user):
     assert acme.postings.filter(title="Engineer").exists()
     initech = Company.objects.get(owner=user, name="Initech")
     assert initech.identifiers.get(scheme="wikidata").value == "Q42"
+
+
+# ------------------------------------------------------------------- the brand marks (#654)
+
+
+def test_orcid_names_a_mark_and_no_other_shipped_scheme_does():
+    """Wikidata names none: its official logo is three coloured bars and a flat one-colour
+    version would be a recolouring the Wikimedia trademark policy does not allow."""
+    from postulo.core import identifiers as core_identifiers
+
+    shipped = core_identifiers.shipped()
+    assert {key for key, scheme in shipped.items() if scheme.brand} == {"orcid"}
+    assert shipped["orcid"].brand_name == "orcid"
+    assert core_identifiers.brand_for("orcid") == "orcid"
+    assert core_identifiers.brand_for("wikidata", "company") == ""
+    assert core_identifiers.brand_for("isni") == ""
+    assert core_identifiers.brand_for("no-such-scheme") == ""
+    assert core_identifiers.brand_for("orcid", "company") == "", "ORCID does not identify a company"
+
+
+def test_a_mark_that_is_not_shipped_is_no_mark_and_the_icon_stays():
+    from postulo.core.identifiers import Scheme
+
+    scheme = Scheme("odd", "Odd", re.compile("."), brand="../static/css/app", icon="globe")
+    assert scheme.brand_name == "" and scheme.icon_name == "globe"
+    assert Scheme("odd", "Odd", re.compile(".")).brand == ""
+
+
+def test_orcid_is_drawn_in_one_colour():
+    from postulo.core.brands import brand_mode
+
+    assert brand_mode("orcid") == "single-colour", "ORCID's green fails 3:1 on the white page"
+
+
+@pytest.fixture
+def wikidata_names_a_mark(monkeypatch):
+    """No company scheme Postulo ships names a mark, so the page is tried with one that
+    does: Wikidata's, given ORCID's mark for the test."""
+    import dataclasses
+
+    from postulo.core import identifiers as core_identifiers
+
+    real = core_identifiers.registry()
+    patched = {**real, "wikidata": dataclasses.replace(real["wikidata"], brand="orcid")}
+    monkeypatch.setattr(core_identifiers, "registry", lambda: patched)
+
+
+def test_a_row_says_its_schemes_mark(user, wikidata_names_a_mark):
+    company = company_with(user, "Acme", ("wikidata", "Q95"), ("lei", LEI))
+    marks = {row.scheme: row.brand for row in company.identifiers.all()}
+    assert marks == {"wikidata": "orcid", "lei": ""}
+
+
+def test_a_company_page_draws_the_mark_beside_the_scheme_and_not_beside_one_without(
+    signed_in, user, wikidata_names_a_mark
+):
+    company = company_with(user, "Acme", ("wikidata", "Q95"), ("lei", LEI))
+    html = signed_in.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
+    listing = html[html.index("data-identifiers") :]
+    listing = listing[: listing.index("</dl>")]
+    assert listing.count("<svg") == 1
+    assert 'data-brand="orcid"' in listing and 'data-brand-mode="single-colour"' in listing
+    assert 'aria-hidden="true"' in listing, "decorative: the scheme's name is written beside it"
+    assert "role=" not in listing.split("<dt", 1)[1].split("</dt>")[0]
+
+
+def test_a_company_page_draws_no_mark_beside_the_schemes_postulo_ships(signed_in, user):
+    company = company_with(user, "Acme", ("wikidata", "Q95"), ("lei", LEI))
+    html = signed_in.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
+    listing = html[html.index("data-identifiers") :]
+    assert "<svg" not in listing[: listing.index("</dl>")]
+
+
+def test_the_identifier_form_draws_no_mark(signed_in):
+    html = signed_in.get(reverse("jobs:company_create")).content.decode()
+    assert "data-brand=" not in html, "a select draws icons only (#301)"

@@ -126,7 +126,9 @@ and each mark there has one recorded mode, in `NOTICE.txt` beside it:
 - **none**: a mark whose published colour fails 3:1 on a page and whose owner's guidelines
   were not shown to allow a one-colour version is not shipped, and the service shows its
   generic icon. A guess about what an owner allows does not count: X, Threads, Xing,
-  Bitbucket and GitLab are in this case.
+  Bitbucket and GitLab are in this case, and so is Wikidata, whose official logo is three
+  coloured bars: Simple Icons' flat one-colour version would be a recolouring, which
+  the Wikimedia trademark policy does not allow without separate permission.
 
 LinkedIn has no mark here, and none is taken from elsewhere: the one source Postulo
 weighed dropped it on the strength of LinkedIn's own terms.

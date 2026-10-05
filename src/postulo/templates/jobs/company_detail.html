@@ -95,7 +95,7 @@
     <dl class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm" data-identifiers>
       {% for identifier in company.identifiers.all %}
         <div class="flex items-baseline gap-2">
-          <dt class="text-ink-500 dark:text-ink-400">{{ identifier.scheme_label }}</dt>
+          <dt class="text-ink-500 dark:text-ink-400">{% if identifier.brand %}{% brand identifier.brand %} {% endif %}{{ identifier.scheme_label }}</dt>
           <dd class="tabular-nums">
             {% if identifier.url %}
               <a href="{{ identifier.url }}" rel="noopener noreferrer external" target="_blank"

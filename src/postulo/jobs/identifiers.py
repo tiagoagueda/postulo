@@ -69,6 +69,11 @@ def label_for(key: str) -> str:
     return registry.label_for(key, COMPANY)
 
 
+def brand_for(key: str) -> str:
+    """The brand mark Postulo ships for the scheme, or nothing (#654)."""
+    return registry.brand_for(key, COMPANY)
+
+
 def normalise(scheme_key: str, raw: str) -> str:
     """Tidy ``raw`` into the canonical spelling for its scheme."""
     return registry.normalise(COMPANY, scheme_key, raw)

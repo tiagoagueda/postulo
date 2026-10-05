@@ -53,6 +53,7 @@ from django.utils.translation import gettext_lazy as _
 
 from . import languages
 from .addresses import _CONTROL, web_address
+from .brands import brand_exists
 from .option_icons import OptionIcons
 
 logger = logging.getLogger(__name__)
@@ -149,6 +150,17 @@ class Scheme:
     #: row's choice of kind (#301). Generic, never the scheme's own mark
     #: (``TRADEMARKS.md``). Blank, or a name Postulo does not have, draws `ICON`.
     icon: str = field(default="")
+    #: A brand mark Postulo ships (``assets/brands.txt``), drawn where an identifier is
+    #: shown (#654), in the one mode its notice records and never recoloured otherwise
+    #: (``TRADEMARKS.md``). Blank draws nothing, so the icon above is the fallback and the
+    #: scheme's name does the identifying. A select never draws a mark (#301). Only the
+    #: schemes Postulo ships name one; an instance's own cannot.
+    brand: str = field(default="")
+
+    @property
+    def brand_name(self) -> str:
+        """The mark to draw: the scheme's own where Postulo ships it, else nothing."""
+        return self.brand if isinstance(self.brand, str) and brand_exists(self.brand) else ""
 
     @property
     def icon_name(self) -> str:
@@ -679,6 +691,12 @@ def label_for(key: str, subject: str = "") -> str:
     """
     scheme = find(key, subject)
     return str(scheme.label) if scheme is not None else key
+
+
+def brand_for(key: str, subject: str = "") -> str:
+    """The mark a row draws: its scheme's where it has one Postulo ships, else nothing."""
+    scheme = find(key, subject)
+    return scheme.brand_name if scheme is not None else ""
 
 
 #: How long a scheme key may be. The column has to hold it, and the keys are short words.

@@ -130,8 +130,10 @@ def lei_checks_out(value: str) -> bool:
 # Each scheme names the icon drawn beside it in a row's choice of kind (#301): a generic
 # one out of the Lucide set -- a mortarboard for a researcher's identifier, a building for
 # a company's register, a globe for an item in an open database -- and never the scheme's
-# own mark, which is somebody's trademark (`TRADEMARKS.md`). One that names none, as ISNI
-# and Other do, draws the card every identifier is.
+# own mark in a select, which is somebody's trademark (`TRADEMARKS.md`). One that names none,
+# as ISNI and Other do, draws the card every identifier is. A scheme may also name a
+# `brand`, a mark Postulo ships (#654), drawn where an identifier is shown: ORCID's, in the
+# one colour its display guidelines allow.
 
 SCHEMES: dict[str, Scheme] = {
     scheme.key: scheme
@@ -153,6 +155,7 @@ SCHEMES: dict[str, Scheme] = {
                 "That ORCID's last digit does not match the rest, so one of them is a typo."
             ),
             icon="graduation-cap",
+            brand="orcid",
         ),
         Scheme(
             RESEARCHERID,

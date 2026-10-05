@@ -631,6 +631,11 @@ class CompanyIdentifier(KeepsItsScheme, OwnedModel):
         return identifiers.label_for(self.scheme)
 
     @property
+    def brand(self) -> str:
+        """The brand mark Postulo ships for the row's scheme, or nothing (#654)."""
+        return identifiers.brand_for(self.scheme)
+
+    @property
     def url(self) -> str:
         """Where the identifier leads; nowhere for a value its scheme refuses today (#311)."""
         return self.link_for(identifiers.url_for(self.scheme, self.value))
