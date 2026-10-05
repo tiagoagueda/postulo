@@ -716,3 +716,73 @@ def test_an_archive_whose_file_is_gone_says_it_expired(client, populated, rf):
     request.user = populated
     with pytest.raises(Http404, match="That export has expired"):
         views_export.export_archive(request, archive.pk)
+
+
+# ------------------------------------------------------------- the query count
+
+
+def _grow(user, label: str, how_many: int) -> None:
+    """``how_many`` companies, each with a contact reached three ways, an application with
+    a tag and an offer, and a sent document with a copy; plus a contact at no company."""
+    from django.core.files.base import ContentFile
+
+    from postulo.applications.models import Offer
+    from postulo.core.models import PhoneNumber, PostalAddress, WebLink
+    from postulo.documents.models import DocumentCopy, RenderedDocument
+    from postulo.jobs.models import Department
+
+    contact_type = ContentType.objects.get_for_model(Contact)
+    cv = CV.objects.filter(owner=user).first()
+    tag = Tag.objects.for_user(user).first()
+    people = [Contact.objects.create(owner=user, name=f"{label} loner")]
+    for n in range(how_many):
+        company = Company.objects.create(owner=user, name=f"{label} {n}")
+        department = Department.objects.create(owner=user, company=company, name="R&D")
+        people.append(
+            Contact.objects.create(
+                owner=user, company=company, department=department, name=f"{label} {n}"
+            )
+        )
+        posting = JobPosting.objects.create(owner=user, company=company, title="Engineer")
+        application = Application.objects.create(
+            owner=user, posting=posting, status=Status.DRAFT, contact=people[-1]
+        )
+        application.tags.set([tag])
+        Offer.objects.create(owner=user, application=application, base_amount=1000)
+        sent = RenderedDocument.objects.create(
+            owner=user,
+            title="Sent",
+            kind="cv",
+            source=cv,
+            application=application,
+            file=ContentFile(b"%PDF-1.7 sent", name="sent.pdf"),
+            checksum="x",
+        )
+        DocumentCopy.objects.create(
+            owner=user, store="paperless", label="Paperless", document=sent, status="sent"
+        )
+    for contact in people:
+        held = {"content_type": contact_type, "object_id": contact.pk, "owner": user}
+        PhoneNumber.objects.create(number=f"+33 1 23 {contact.pk:06d}", **held)
+        PostalAddress.objects.create(**held)
+        WebLink.objects.create(url="https://example.org/", kind="website", **held)
+
+
+def test_the_archive_costs_the_same_queries_however_much_the_account_holds(populated):
+    """The build runs inside the write lock, so a query per application, per contact and
+    per sent document is every other request waiting on it (#557)."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    def count() -> int:
+        with CaptureQueriesContext(connection) as queries:
+            export_module.build_document(populated)
+        return len(queries)
+
+    _grow(populated, "small", 2)
+    count()  # the first build fills the content-type cache, which is not the growth
+    small = count()
+    _grow(populated, "large", 20)
+    large = count()
+
+    assert large == small

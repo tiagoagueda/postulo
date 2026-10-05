@@ -58,6 +58,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Exporting an account no longer runs a query per contact, application or sent document, so a large export holds the database write lock for far less time. (#557)
 - The Listings Applied and Everything tabs no longer make a query per applied row, so they cost the same however many listings you have applied to. (#558)
 - A company's page no longer scrolls sideways on a phone, and a contact's link is no longer cut off under wider text spacing (#654)
 - Find logo now says why a site gave nothing, and always tries the favicon (#526)

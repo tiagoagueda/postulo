@@ -21,6 +21,7 @@ from io import BytesIO
 from typing import Any
 
 from django.db import transaction
+from django.db.models import Prefetch
 from django.utils import timezone
 
 from postulo import __version__
@@ -604,6 +605,10 @@ def _resume_block(user) -> dict:
     return block
 
 
+#: What `_contact` reads off a contact besides its own columns, to be prefetched (#557).
+CONTACT_CHANNELS = ("phone_numbers", "postal_addresses", "web_links", "messaging_handles")
+
+
 def _contact(contact) -> dict:
     """One person, with everything recorded about how to reach them."""
     return {
@@ -761,7 +766,10 @@ def build_document(user) -> dict:
         # exactly who refers people -- was in the account and not in the archive.
         "contacts": [
             _contact(contact)
-            for contact in Contact.objects.for_user(user).filter(company__isnull=True)
+            for contact in Contact.objects.for_user(user)
+            .filter(company__isnull=True)
+            .select_related("department")
+            .prefetch_related(*CONTACT_CHANNELS)
         ],
         # The reminders about no application (#334). Every other reminder is written under
         # the application it is about, so one about none was in the account and not in
@@ -776,19 +784,33 @@ def build_document(user) -> dict:
     }
 
     # --------------------------------------------------- companies and the rest
-    companies = Company.objects.for_user(user).prefetch_related(
-        "industries",
-        "identifiers",
-        "contacts",
-        "postings__events",
-        "postings__applications__events",
-        "postings__applications__reminders",
-        "postings__applications__interviews__contacts",
-        "postings__applications__department__company",
-        "postings__applications__through_agency",
-        "postings__applications__sent_links",
-        "postings__applications__sent_uploads",
-        "departments",
+    # Everything the loop below touches is read here, in a fixed number of queries: this
+    # runs inside the write lock, so a query per application or per contact is every other
+    # request waiting on it (#557).
+    companies = (
+        Company.objects.for_user(user)
+        .select_related("parent")
+        .prefetch_related(
+            "industries",
+            "identifiers",
+            Prefetch(
+                "contacts",
+                queryset=Contact.objects.select_related("department").prefetch_related(
+                    *CONTACT_CHANNELS
+                ),
+            ),
+            "postings__applications__tags",
+            "postings__applications__offers",
+            "postings__events",
+            "postings__applications__events",
+            "postings__applications__reminders",
+            "postings__applications__interviews__contacts",
+            "postings__applications__department__company",
+            "postings__applications__through_agency",
+            "postings__applications__sent_links",
+            "postings__applications__sent_uploads",
+            "departments",
+        )
     )
     for company in companies:
         document["companies"].append(
@@ -924,7 +946,9 @@ def build_document(user) -> dict:
             "plain_text": sent.plain_text,
             "copies": _copies(sent),
         }
-        for sent in RenderedDocument.objects.for_user(user).select_related("source_type")
+        for sent in RenderedDocument.objects.for_user(user)
+        .select_related("source_type")
+        .prefetch_related("copies")
     ]
 
     document["captures"] = [
