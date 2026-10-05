@@ -40,7 +40,7 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query, company_match
 
-from . import duplicates, identifiers, logos, merging
+from . import duplicates, identifiers, logos, mapping, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import Company, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
@@ -137,6 +137,7 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # page cannot keep (#134).
         context["bulk_industries"] = Industry.objects.for_user(self.request.user)
         context["group"] = self.request.GET.get("group", "").strip()
+        context["map_offered"] = mapping.map_offered(self.request.user)
         return context
 
 
@@ -157,18 +158,40 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
 
     template_name = "jobs/company_map.html"
 
+    def dispatch(self, request, *args, **kwargs):
+        # Off, there is no map: the page is not found rather than empty (#700). A person
+        # who is not signed in is still sent to sign in first, as everywhere else.
+        if request.user.is_authenticated and not mapping.map_offered(request.user):
+            raise Http404
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs) -> dict:
         from . import places as places_data
+        from .models import LocationSource
 
         context = super().get_context_data(**kwargs)
         places: dict[str, dict] = {}
         rows = (
             Company.objects.for_user(self.request.user)
             .filter(location__gt="")
-            .values_list("location", "name", "pk", "location_lat", "location_lon")
+            .values_list(
+                "location",
+                "name",
+                "pk",
+                "location_lat",
+                "location_lon",
+                "location_resolved_from",
+                "location_resolved_by",
+            )
             .order_by("location", "name")
         )
-        for location, name, pk, lat, lon in rows:
+        for location, name, pk, lat, lon, resolved_from, resolved_by in rows:
+            if resolved_by != LocationSource.MANUAL and location != resolved_from:
+                # The text changed while the map was switched off, so the stored
+                # coordinate belongs to the old text. Placed here and not saved: a page
+                # view writes nothing.
+                answer = places_data.resolve(location)
+                lat, lon = (answer["lat"], answer["lon"]) if answer else (None, None)
             entry = places.setdefault(
                 location,
                 {"label": location, "count": 0, "companies": [], "lat": None, "lon": None},

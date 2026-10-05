@@ -14,6 +14,6 @@ this note, kept beside the files, and the line in `THIRD-PARTY.md` beside it. Th
 cities are matched against when a company's location is saved, and nothing in a
 request path sends any part of a person's record to geonames.org.
 
-The world outline the map draws under the points — `src/postulo/static/map/` — is
+The world outline the map draws under the points — `src/postulo/templates/jobs/map/` — is
 [Natural Earth](https://www.naturalearthdata.com), public domain: a note beside it
 says so, and `THIRD-PARTY.md` says the same.

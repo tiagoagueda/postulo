@@ -216,3 +216,145 @@ def test_taking_a_correction_off_guesses_again(client, user, monkeypatch, tmp_pa
     company.refresh_from_db()
     assert company.location_resolved_by == "geonames"
     assert (company.location_lat, company.location_lon) == (38.72509, -9.1498)
+
+
+# The switch (#700): one feature decides whether the map is offered, and off deletes nothing.
+
+
+def switch_off(person) -> None:
+    from postulo.plugins import policy
+    from postulo.plugins.maps import MAPS
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.update_or_create(
+        plugin=MAPS, person=person, defaults={"state": PluginPolicy.State.FORCED_OFF}
+    )
+    # A decision is memoised for one request; outside one, the next request is this.
+    policy.forget_decisions()
+
+
+def switch_on(person) -> None:
+    from postulo.plugins import policy
+    from postulo.plugins.maps import MAPS
+    from postulo.plugins.models import PluginPolicy
+
+    PluginPolicy.objects.filter(plugin=MAPS, person=person).delete()
+    policy.forget_decisions()
+
+
+def with_cities(monkeypatch, tmp_path, *cities) -> None:
+    (tmp_path / places.CITIES_FILE).write_text(city_table(*cities), encoding="utf-8")
+    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+
+
+def test_the_map_is_a_feature_plugin_and_on_by_default(client, user):
+    from postulo.plugins import registry
+    from postulo.plugins.base import manifest_of
+    from postulo.plugins.maps import MAPS
+
+    names = {manifest_of(cls()).name: manifest_of(cls()) for cls in registry.builtins()["feature"]}
+
+    assert names[MAPS].kind == "feature"
+    assert page(client, user).status_code == 200
+
+
+def test_off_the_map_page_is_not_found(client, user):
+    switch_off(user)
+
+    assert page(client, user).status_code == 404
+
+
+def test_off_for_one_person_is_on_for_another(client, user, other_user):
+    switch_off(user)
+
+    assert page(client, other_user).status_code == 200
+
+
+def test_off_the_companies_page_does_not_offer_the_map(client, user):
+    client.force_login(user)
+    url = reverse("jobs:company_map")
+    assert url in client.get(reverse("jobs:company_list")).content.decode()
+
+    switch_off(user)
+
+    assert url not in client.get(reverse("jobs:company_list")).content.decode()
+
+
+def test_off_the_form_does_not_offer_the_correction(client, user):
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    client.force_login(user)
+    url = reverse("jobs:company_update", args=[company.pk])
+    assert "Or, exactly where" in client.get(url).content.decode()
+
+    switch_off(user)
+    html = client.get(url).content.decode()
+
+    assert "Or, exactly where" not in html
+    assert "offline table of cities" not in html
+
+
+def test_off_nothing_is_placed_and_nothing_stored_is_touched(client, user, monkeypatch, tmp_path):
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    assert company.location_resolved_by == "geonames"
+    stored = (company.location_lat, company.location_lon, company.location_resolved_at)
+
+    switch_off(user)
+    edit(client, user, company, location="Berlin")
+
+    company.refresh_from_db()
+    assert company.location == "Berlin"
+    assert (company.location_lat, company.location_lon) == stored[:2], "the old place is kept"
+    assert company.location_resolved_from == "Lisbon", "the text it belongs to is kept too"
+    assert company.location_resolved_at == stored[2]
+
+    new = Company.objects.create(owner=user, name="Two", location="Berlin")
+    assert new.location_lat is None and new.location_resolved_by == ""
+
+
+def test_switching_back_on_guesses_again_on_the_next_save(client, user, monkeypatch, tmp_path):
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    switch_off(user)
+    edit(client, user, company, location="Berlin")
+
+    switch_on(user)
+    company.refresh_from_db()
+    company.save()
+
+    company.refresh_from_db()
+    assert (company.location_lat, company.location_lon) == (52.52437, 13.41053)
+    assert company.location_resolved_from == "Berlin"
+
+
+def test_a_company_edited_while_off_is_drawn_where_its_text_says(
+    client, user, monkeypatch, tmp_path
+):
+    """The stored coordinate belongs to the old text; the page does not draw it there."""
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    switch_off(user)
+    edit(client, user, company, location="Berlin")
+    switch_on(user)
+
+    response = page(client, user)
+
+    (entry,) = response.context["places"]
+    assert entry["label"] == "Berlin"
+    assert entry["cx"] == pytest.approx(13.41053 + 180.0)
+    company.refresh_from_db()
+    assert company.location_resolved_from == "Lisbon", "a page view writes nothing"
+
+
+def test_a_correction_a_person_made_is_drawn_and_survives_the_switch(
+    client, user, monkeypatch, tmp_path
+):
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    edit(client, user, company, location_correction="Berlin")
+
+    switch_off(user)
+    switch_on(user)
+
+    (entry,) = page(client, user).context["places"]
+    assert entry["cx"] == pytest.approx(13.41053 + 180.0)

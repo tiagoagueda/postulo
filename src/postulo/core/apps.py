@@ -12,6 +12,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins import registry
         from postulo.plugins.employer_structure import EmployerStructureFeature
         from postulo.plugins.gdpr import GdprFeature
+        from postulo.plugins.maps import MapsFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
         from postulo.plugins.repositories import RepositoriesFeature
@@ -34,6 +35,8 @@ class CoreConfig(AppConfig):
         registry.register_builtin("feature", WebsitesFeature)
         # What the instance keeps on other people, and the duties that go with it (#297).
         registry.register_builtin("feature", GdprFeature)
+        # The companies on a map, placed from an offline table of cities (#700).
+        registry.register_builtin("feature", MapsFeature)
 
         # The contact channels Postulo already has, described by one contract (#146).
         from . import channels

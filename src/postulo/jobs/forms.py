@@ -14,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import employment_services, esco, identifiers, industries, logos, structure
+from . import employment_services, esco, identifiers, industries, logos, mapping, structure
 from .models import (
     Company,
     CompanyIdentifier,
@@ -233,6 +233,11 @@ class CompanyForm(OwnerScopedModelForm):
             # Not required, so that a form posted without it -- an older client, a script,
             # a test that predates kinds -- records an employer, which is the default.
             self.fields["kind"].required = False
+
+        if "location" in self.fields and not mapping.map_offered(self.user):
+            # Off (#700), nothing places a location, so the help text does not promise it.
+            self.fields["location"].help_text = _("Where they are, as you would write it.")
+            self.fields.pop("location_correction", None)
 
         if "location_correction" in self.fields:
             # A correction a person made is shown where it is, so it can be seen and

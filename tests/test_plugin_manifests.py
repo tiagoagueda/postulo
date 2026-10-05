@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_twenty_of_them_across_nine_kinds():
+def test_there_are_twenty_one_of_them_across_nine_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -144,7 +144,7 @@ def test_there_are_twenty_of_them_across_nine_kinds():
     needs nothing but a browser that allows it (#209), and `webhook`, the one for a machine
     (#240).
 
-    Eight govern something other than a service. `phone-numbers` and `email-addresses`
+    Nine govern something other than a service. `phone-numbers` and `email-addresses`
     govern a page -- the second owns no data at all, since the addresses are allauth's, which
     is the honest limit of what a feature can be here (#145). `postal-rules` governs a table:
     what a country expects of an address, and what it calls each part (#147).
@@ -154,7 +154,9 @@ def test_there_are_twenty_of_them_across_nine_kinds():
     each: whether a person and their contacts may hold more than one address on the web of
     that kind, three switches because they are three decisions (#189).
     `gdpr` governs the data the instance keeps about other people: the export, the erasure,
-    the retention policy, the record of processing and the notice (#297).
+    the retention policy, the record of processing and the notice (#297). `maps` governs
+    whether the companies are drawn on a map and their locations placed from the offline
+    table of cities, and keeps every stored coordinate when it is off (#700).
 
     `identifiers` governs nothing at all, which is why its kind is ungoverned: it is a
     vocabulary rather than a behaviour, and *off* would leave every stored identifier without
@@ -191,6 +193,7 @@ def test_there_are_twenty_of_them_across_nine_kinds():
         "identifiers",
         "link-services",
         "gdpr",
+        "maps",
     }
 
 

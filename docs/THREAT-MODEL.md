@@ -67,14 +67,26 @@ test:
 not going to post anything, so *valid* means well-formed enough to be used. An address can
 never become a recovery route by accident, because there is no flag on it that could.
 
-**The map knows the city and stops there.** A company's location is placed from an offline
-table of cities, and the coordinate it keeps is city level by design (#108): a search at
-street precision is a map of where the person will be at nine in the morning if any of it
-works out, sitting in the same database as the CV that carries the home address. City level
-is also all the data supports, which keeps the private answer and the accurate answer the
-same one. Nothing about a location is ever sent to a geocoding service to be placed, and
-the map is SVG the server itself writes, so a tile server never sees where somebody is
-applying.
+**The map knows the city and stops there, unless a person places an address.** A company's
+location is placed from an offline table of cities, and the coordinate it keeps is city level
+by default (#108, #700): a search at street precision is a map of where the person will be at
+nine in the morning if any of it works out, sitting in the same database as the CV that carries
+the home address. The overview is SVG the server itself writes, and nothing about a location is
+ever sent to a geocoding service to be placed, so no outside party learns where somebody is
+applying. Three things follow, and each is a promise:
+
+- **A finer pin is an act, not a default.** A pin at the precision of an address exists only
+  for one address a person deliberately places (#702). Their own home address is never pinned
+  unless they ask, and a contact's address, which is somebody else's personal data, only on
+  request. A coordinate is stored on the instance and never leaves it.
+- **A tile server is told nothing unless the operator sets one.** A zoomable map exists only
+  where the operator has configured a tile source. Tiles from the instance's own origin send
+  nothing anywhere. A proxy of OpenStreetMap's public tiles hides the browser but not the
+  places asked for, and on a homelab the instance's address is the person's, so it is an
+  opt-in that carries that warning.
+- **The map can be switched off.** The `maps` feature plugin decides whether the map, the
+  placing of a location and any pin are offered. Off, nothing is shown and nothing is
+  deleted: every stored coordinate stays for the day it is switched back on.
 
 ## What is out of scope
 

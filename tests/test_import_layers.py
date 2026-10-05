@@ -111,6 +111,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.plugins.email_addresses*",
             "postulo.plugins.employer_structure*",
             "postulo.plugins.gdpr*",
+            "postulo.plugins.maps*",
             "postulo.plugins.phone_numbers*",
             "postulo.plugins.postal_rules*",
             "postulo.plugins.repositories*",

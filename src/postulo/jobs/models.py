@@ -42,6 +42,16 @@ from postulo.core.models import OwnedModel, OwnedQuerySet
 from . import esco, identifiers, industries, roles
 
 
+def _always_placing(person) -> bool:
+    return True
+
+
+#: Whether this person's locations are placed on the map. The answer is the maps feature's,
+#: which sits above the models, so `JobsConfig.ready` plugs `mapping.map_offered` in here
+#: rather than the model importing upward; until then everything is placed (#700).
+placing_offered = _always_placing
+
+
 class Industry(OwnedModel):
     """A field a company operates in, in the applicant's own words.
 
@@ -361,12 +371,18 @@ class Company(OwnedModel):
         # A correction a person made is not a guess to be made again: the text it was
         # made from is not this location's text, so the comparison below would not
         # keep it either way.
+        # Switched off (#700), nothing is placed and nothing already placed is touched:
+        # the text stays unresolved, so the first save after it is back on guesses again.
         if (
             self.location_resolved_by != LocationSource.MANUAL
             and self.location != self.location_resolved_from
+            and self._map_offered()
         ):
             self.apply_location_guess()
         super().save(*args, **kwargs)
+
+    def _map_offered(self) -> bool:
+        return placing_offered(self.owner)
 
     def apply_location_guess(self) -> None:
         """Put this location on the map from the offline dataset, or nowhere at all (#108).
