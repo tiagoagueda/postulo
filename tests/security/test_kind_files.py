@@ -373,3 +373,20 @@ def test_the_number_allowance_is_spent_like_the_forms_and_then_every_number_is_l
         phone_numbers.ensure_allowance(user)
     assert Contact.objects.for_user(user).count() == 40
     assert not PhoneNumber.objects.filter(owner=user).exists()
+
+
+@pytest.mark.parametrize("bad", [5, True])
+def test_a_contacts_ways_of_being_reached_that_are_not_text_do_not_break_the_import(user, bad):
+    """A number or a flag where text belongs is held as nothing: it is not a 500."""
+    row = {
+        "name": "Ada",
+        "phone_numbers": [{"number": bad, "kind": bad, "label": bad, "is_primary": bad}],
+        "postal_addresses": [{"street": bad, "municipality": bad}],
+        "web_links": [{"url": bad, "label": bad}],
+        "messaging_handles": [{"service": bad, "handle": bad}],
+    }
+    data = json.dumps({"postulo": {"contacts_format": 1}, "contacts": [row]}).encode()
+    held = kind_files.read("contacts", data, "x.json")
+    assert kind_files.apply(user, held).added == 1
+    assert Contact.objects.for_user(user).filter(name="Ada").exists()
+    assert not PhoneNumber.objects.filter(owner=user).exists()

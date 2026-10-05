@@ -447,6 +447,23 @@ def _text(value, limit: int) -> str:
     return value.strip()[:limit] if isinstance(value, str) else ""
 
 
+def _detail_rows(rows) -> list[dict]:
+    """The ways of reaching somebody, as the restorers expect them: text where text is
+    meant and a yes or no only for ``is_primary``. A number or a flag where a number's
+    digits should be is not text, and is held as nothing rather than failing the import."""
+    kept = []
+    for entry in rows if isinstance(rows, list) else []:
+        if not isinstance(entry, dict):
+            continue
+        kept.append(
+            {
+                key: (bool(value) if key == "is_primary" else _text(value, 500))
+                for key, value in entry.items()
+            }
+        )
+    return kept
+
+
 # --------------------------------------------------------------------- the verdicts
 
 
@@ -632,7 +649,7 @@ def _assess_contact(run: _Run, row: dict) -> Verdict:
         "fields": {**clean, "name": name},
         "company": company_name,
         "department": _text(row.get("department"), 120),
-        "details": {block: row.get(block) or [] for block in CONTACT_DETAILS},
+        "details": {block: _detail_rows(row.get(block)) for block in CONTACT_DETAILS},
     }
     return verdict
 
