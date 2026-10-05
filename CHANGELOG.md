@@ -61,6 +61,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The language picker in Settings can be searched by a language's own name or tag, and says plainly that a partly translated language shows English where its translation stops; TRANSLATING.md describes adding a language without a developer (#72)
 - On a phone, controls grow to 44px where the pointer is coarse, the Applications board shows one column at a time with swipe snapping, and the browser suite checks every page at 390px in both themes (#73)
 - The wiki and the README now show the interface: one command, scripts/screenshots.py, retakes every picture from a seeded demo instance (and --check names stale ones), and the release steps run it. (#353)
+- New issue on Forgejo now offers a Bug report form (version, install, database, browser, steps) and a Feature request form, with a link above them telling reporters to send security problems privately (#351)
 
 ### 🐛 Fixed
 

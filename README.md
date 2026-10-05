@@ -277,4 +277,6 @@ here, and none of their owners is involved with this project.
 
 Developed on [Forgejo](https://source.tiagoagueda.com/postulo/postulo) and mirrored to
 GitHub. Issues and pull requests belong on the Forgejo repository; the GitHub copy is a
-read-only mirror.
+read-only mirror. A bug or a request has a form there (see
+[CONTRIBUTING.md](CONTRIBUTING.md#opening-an-issue)); a security problem does not go in an
+issue, see [SECURITY.md](SECURITY.md).

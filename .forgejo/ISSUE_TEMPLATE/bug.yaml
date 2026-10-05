@@ -1,0 +1,87 @@
+name: Bug report
+about: Something does not work, or does not work for you.
+title: "[Bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time. Write in whatever language you can; English is easiest for the maintainer to act on, but a report in another language is better than none.
+
+        **Is it a security problem?** Do not post it here, this page is public. Follow [SECURITY.md](https://source.tiagoagueda.com/postulo/postulo/src/branch/main/SECURITY.md).
+
+        **Remove personal details before you paste anything.** Postulo holds CVs, home addresses and the names of the people somebody is applying to. A log or a screenshot is where those leak: blank out names, addresses, e-mail addresses, company and listing details, tokens and cookies first.
+  - type: input
+    id: version
+    attributes:
+      label: Version or commit
+      description: The foot of every page shows the version. On the `:dev` image, give the pinned tag (`<version>-dev.<short sha>`), because `:dev` moves.
+      placeholder: "0.4.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: install
+    attributes:
+      label: How it is installed
+      options:
+        - The published image
+        - A build of my own
+        - From source
+        - Other (say so below)
+    validations:
+      required: true
+  - type: dropdown
+    id: database
+    attributes:
+      label: Database
+      options:
+        - SQLite
+        - PostgreSQL
+    validations:
+      required: true
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and version
+      placeholder: Firefox 142 on Android 16
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Phone, laptop, tablet, and anything that matters, such as a screen reader or a zoomed page.
+  - type: input
+    id: language
+    attributes:
+      label: Interface language
+      description: A wrong word in a translation is corrected in the translation, not reported here; see the link above the forms.
+      placeholder: Português (Portugal)
+  - type: textarea
+    id: steps
+    attributes:
+      label: What you did, step by step
+      placeholder: |
+        1. Open ...
+        2. Press ...
+    validations:
+      required: true
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Anything from the logs that bears on it, with personal details removed first.
+      render: text

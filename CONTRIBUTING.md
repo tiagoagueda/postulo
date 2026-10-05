@@ -4,6 +4,14 @@ Thank you for considering it. Postulo is developed on
 [Forgejo](https://source.tiagoagueda.com/postulo/postulo); the GitHub repository is a
 read-only mirror, so please open issues and pull requests on Forgejo.
 
+## Opening an issue
+
+*New issue* on Forgejo offers two forms, **Bug report** and **Feature request**, and each
+asks for what a fix or a decision needs, so use them rather than a blank box (the
+maintainer's long hand-written issues are the exception, and blank issues stay allowed). A
+vulnerability is not a public issue: follow [SECURITY.md](SECURITY.md). Remove personal
+details from any log or screenshot first. The forms live in `.forgejo/ISSUE_TEMPLATE/`.
+
 ## Getting set up
 
 Requires Python 3.12.4 or newer and [uv](https://docs.astral.sh/uv/).
