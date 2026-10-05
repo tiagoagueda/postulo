@@ -17,6 +17,19 @@ From the Latin *postulō* — "I apply for". First person, deliberately.
 > act rather than something that happens on a schedule, so `main` may be ahead of the last
 > tag — the [changelog](CHANGELOG.md) says by how much.
 
+![The dashboard: what is due today, the applications still alive and the latest events across the whole search.](assets/screenshots/dashboard.png)
+
+| | |
+| --- | --- |
+| ![The board: one column per status from Draft to Offer, each application a card that can be dragged to the next column.](assets/screenshots/board.png) | ![One application's page: its status, the company and contacts, and the timeline of everything that happened, newest first.](assets/screenshots/application.png) |
+| ![The calendar for the month: interviews and reminders on the days they fall.](assets/screenshots/calendar.png) | ![A CV's page: the entries it is made of on one side and a live preview of the page as it will print on the other.](assets/screenshots/cv.png) |
+
+*These pictures are of a demo instance filled with a fictional job search, and are retaken by
+`scripts/screenshots.py` rather than by hand. There is no public demo to try: it would be
+something to host, reset and secure, and nobody's data belongs on it. Run your own with
+`manage.py seed_demo <email>`; the [wiki](https://source.tiagoagueda.com/postulo/postulo/wiki)
+shows every page.*
+
 ## Never paywalled
 
 **No feature of Postulo is, or ever will be, behind a paywall.** People looking for work

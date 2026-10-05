@@ -460,6 +460,20 @@ names the same issue as the code, pushed when the code is.
   `[Configuration](Configuration)`.
 - **Images** go in `images/` and are referred to by a relative path, `images/postulo.png`;
   Forgejo serves them from the wiki repository.
+- **Pictures of the interface are generated, never taken by hand** (#353). A page that
+  describes a screen shows it with `![what it shows](images/board.png)`, and the alternative
+  text says what the picture shows, because the reader may not see it. Add the page to
+  `SHOTS` in `scripts/screenshots.py` (a name is a file name and is permanent, so the Markdown
+  never changes when a picture is retaken), then run `uv run python scripts/screenshots.py`:
+  it seeds a throwaway database with `seed_demo --seed 2026`, freezes the clock, draws every
+  page in the suite's own font and writes the PNGs to the wiki's `images/` and, for the few the
+  README shows, to `assets/screenshots/`. `--only NAME`, `--language fr`, `--list` (the names
+  and the Markdown to paste) and `--check` (say which pictures are stale, write nothing) are
+  its other modes. It needs `uv run playwright install chromium`. A picture shows only the
+  demo person and the demo employers, which are fictional; never add a page to `SHOTS` that
+  would show something from the machine taking it, and never a real company's logo
+  (`TRADEMARKS.md`). Pictures are retaken before a release (below) and committed in the wiki
+  with the release's wiki changes.
 
 Please keep it honest: the wiki says plainly what is not built yet, and a page that
 describes a feature which does not exist is a bug.
@@ -530,6 +544,10 @@ End the entry with the issue it closes, in brackets: `(#42)`.
    where the rest are swept up**, and it is the only check between an unfinished catalogue
    and a published version. Fill what it names (`scripts/messages.py extract` first if the
    strings are new) and run it again until it passes.
+1b. `uv run python scripts/screenshots.py --check` names the documentation's pictures that
+   no longer match the interface. Run `uv run python scripts/screenshots.py` to retake them,
+   look at what changed, and commit the new files: those in `assets/screenshots/` here, those
+   in `images/` in the wiki (#353).
 2. Move the *Unreleased* entries in `CHANGELOG.md` under a new `## [X.Y.Z] — YYYY-MM-DD`
    heading, and leave an empty *Unreleased* above it.
 3. Set the same version in `pyproject.toml` and in `src/postulo/__init__.py`.

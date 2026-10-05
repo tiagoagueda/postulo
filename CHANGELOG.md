@@ -60,6 +60,7 @@ All notable changes to Postulo are recorded here. The format follows
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 - The language picker in Settings can be searched by a language's own name or tag, and says plainly that a partly translated language shows English where its translation stops; TRANSLATING.md describes adding a language without a developer (#72)
 - On a phone, controls grow to 44px where the pointer is coarse, the Applications board shows one column at a time with swipe snapping, and the browser suite checks every page at 390px in both themes (#73)
+- The wiki and the README now show the interface: one command, scripts/screenshots.py, retakes every picture from a seeded demo instance (and --check names stale ones), and the release steps run it. (#353)
 
 ### 🐛 Fixed
 
