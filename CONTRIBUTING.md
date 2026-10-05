@@ -397,6 +397,49 @@ root tells an assistant how this project works; keep it current when the rules c
   a new page to its list.
 - Keep commits focused, and describe *why* in the message rather than *what*.
 
+## Look for a library before you write one
+
+Before you write code that implements a standard, a format, a data set or a well-known
+algorithm, look for an open-source library that already does it, and say in the pull
+request what you found. It can save work and time, and a hand-written parser is where
+Postulo has had its injection bugs (#218, #450). Take a library when:
+
+- its licence is compatible with AGPL-3.0-or-later: MIT, BSD-2-Clause, BSD-3-Clause, ISC,
+  0BSD, Apache-2.0, MPL-2.0, LGPL-3.0, CC0, AGPL-3.0 and GPL-3.0 are taken; GPL-2.0-only,
+  BSD-4-Clause with its advertising clause, non-commercial and source-available terms are
+  not;
+- it is maintained;
+- `pip-audit` or `npm audit` (or OSV) report no unpatched advisory in the range the lock
+  would hold;
+- its cost is stated in the pull request: its size, a compiled or system dependency, and
+  what it brings with it. Weight is a cost, not a veto: a compiled extension for every
+  instance weighs heavily, and a pure-Python library with no new dependency does not;
+- it fits the content security policy and makes no request nobody asked for.
+
+A library with an **unpatched severe advisory** (High or Critical, CVSS 7.0 and up, and no
+fixed release) is not taken, and writing it by hand is then right; the pull request says
+which advisory. An advisory with a fix is met by raising the floor in `pyproject.toml`; one
+whose fix cannot be taken yet is ignored by name, with a test that expires the ignore
+(`tests/test_security_audit.py`), and the library is still taken.
+
+The rule applies to new code and to code a commit touches; working code is not rewritten
+for it. It binds plugins too. A package from the index gets a comment in `pyproject.toml`
+saying why it is there; files copied into the tree get a line in
+[THIRD-PARTY.md](THIRD-PARTY.md).
+
+## Formats
+
+What a new export or import picks, in this order, and a format further down the list needs
+a reason in the issue:
+
+1. **JSON** for data of every kind.
+2. **vCard 4.0** for contact details.
+3. **iCalendar** for events and anything with a date and a time.
+4. **PDF** for a document, then **ODT**, then **DOCX**.
+
+CSV stays where a spreadsheet is the other end of the exchange, as in the report and the
+spreadsheet import.
+
 ## Documentation
 
 User documentation is the [wiki](https://source.tiagoagueda.com/postulo/postulo/wiki), and

@@ -34,6 +34,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Added: CONTRIBUTING.md now says to look for an open-source library before writing one and which format an export or import picks first, and pull requests get a template that asks the same questions (#653)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 
 ### 🐛 Fixed

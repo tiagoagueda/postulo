@@ -49,6 +49,11 @@ Four commitments are stated in the README and are not negotiable in code:
 - Never name a side of the page: logical utilities (`ms`/`me`, `ps`/`pe`, `start`/`end`,
   `text-start`/`text-end`) only, and `<bdi>` around typed text that sits inline beside
   other text. `tests/test_template_lint.py` fails on a physical one.
+- Before writing code that implements a standard, a format, a data set or a well-known
+  algorithm, look for an open-source library that does it (`CONTRIBUTING.md`, *Look for a
+  library before you write one*), and say in the pull request what you found.
+- A new export or import picks JSON first, vCard 4.0 for contacts, iCalendar for events,
+  and PDF, then ODT, then DOCX for documents (`CONTRIBUTING.md`, *Formats*).
 - Every user-facing string is wrapped for translation. After adding or changing one, run
   `uv run python scripts/messages.py extract` so every catalogue gets its slot; a new
   translation carries the `draft` flag until a speaker reviews it (`docs/TRANSLATING.md`).
