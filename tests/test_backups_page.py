@@ -434,3 +434,13 @@ def test_the_metrics_carry_the_two_backup_numbers():
     assert "postulo_backup_failures_total 2" in text
     assert "postulo_backup_last_success_timestamp_seconds " in text
     assert "# TYPE postulo_backup_failures_total counter" in text
+
+
+def test_listing_reads_the_manifest_without_unpacking_the_archive():
+    """`getmember` indexes the whole archive; the list does this for every file on every load."""
+    from postulo.core.backup import read_manifest
+
+    path = make_archive()
+    with tarfile.open(path, "r:gz") as opened:
+        read_manifest(opened)
+        assert not opened._loaded

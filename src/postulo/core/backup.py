@@ -495,10 +495,19 @@ def write_backup(
 
 
 def read_manifest(archive: tarfile.TarFile) -> dict:
-    try:
-        member = archive.getmember(MANIFEST)
-    except KeyError as exc:
-        raise BackupError("Not a Postulo backup: the archive has no manifest.") from exc
+    # The manifest is the first member, so look there before anything else: `getmember`
+    # decompresses the whole archive to index it, and the Backups page reads this for every
+    # archive on every load (#242).
+    member = None
+    if not archive._loaded and not archive.members:
+        first = archive.next()
+        if first is not None and first.name == MANIFEST:
+            member = first
+    if member is None:
+        try:
+            member = archive.getmember(MANIFEST)
+        except KeyError as exc:
+            raise BackupError("Not a Postulo backup: the archive has no manifest.") from exc
     handle = archive.extractfile(member)
     if handle is None:
         raise BackupError("Not a Postulo backup: the manifest cannot be read.")
