@@ -1989,6 +1989,20 @@
     );
   }
 
+  // The key caps are drawn with "Ctrl", which is all the server can know; on an Apple
+  // platform the key that does the same is Command, so the cap says so (#658). A hint only
+  // matters where this script runs, which is why it is not done on the server.
+  (function () {
+    var platform =
+      (navigator.userAgentData && navigator.userAgentData.platform) || navigator.platform || "";
+    if (!/^(Mac|iP)/i.test(platform)) {
+      return;
+    }
+    document.querySelectorAll("[data-key-ctrl]").forEach(function (cap) {
+      cap.textContent = "⌘";
+    });
+  })();
+
   // The capture review page is the one screen somebody works through forty times in a
   // row, so it has keys: "d" discards and moves on, "j" skips to the next, Ctrl+Enter
   // saves and moves on -- never while typing in a field, and only where the page marks

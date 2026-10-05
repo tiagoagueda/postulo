@@ -166,14 +166,18 @@ def test_the_script_asks_the_body_before_acting_on_a_single_key(client, user):
 
 def test_the_search_box_stops_advertising_a_key_that_does_nothing(client, user):
     client.force_login(user)
-    assert "Search  /" in client.get(reverse("core:home")).content.decode()
+    html = client.get(reverse("core:home")).content.decode()
+    assert 'aria-keyshortcuts="/"' in html
+    assert '<kbd class="kbd">/</kbd>' in html
+    assert 'placeholder="Search"' in html, "the key is a cap beside the box, not placeholder text"
 
     profile = Profile.objects.get(user=user)
     profile.keyboard_shortcuts = False
     profile.save(update_fields=["keyboard_shortcuts"])
     html = client.get(reverse("core:home")).content.decode()
 
-    assert "Search  /" not in html
+    assert '<kbd class="kbd">/</kbd>' not in html
+    assert 'aria-keyshortcuts="/"' not in html
     assert 'placeholder="Search"' in html
 
 
@@ -418,3 +422,82 @@ def test_cancel_falls_back_to_where_deleting_would_have_gone(client, user):
     response = client.get(reverse("documents:cv_item_delete", args=[item.pk]))
 
     assert response.context["cancel_url"] == cv.get_absolute_url()
+
+
+# ------------------------------------------------------------------ key hints (#658)
+
+
+def _review(client, user):
+    from postulo.jobs.models import Capture
+
+    capture = Capture.objects.create(
+        owner=user,
+        url="https://example.org/research-engineer",
+        data={"title": "Research Engineer", "company_name": "Black Mesa"},
+    )
+    Capture.objects.create(
+        owner=user,
+        url="https://example.org/other",
+        data={"title": "Other", "company_name": "Aperture"},
+    )
+    client.force_login(user)
+    return client.get(reverse("jobs:capture_review", args=[capture.pk])).content.decode()
+
+
+def _set(user, **fields):
+    Profile.objects.filter(user=user).update(**fields)
+
+
+def _hints(html):
+    return re.findall(r"<span[^>]*data-key-hint[^>]*>.*?</span>", html, flags=re.S)
+
+
+def test_hints_are_on_by_default_and_each_is_hidden_from_assistive_technology(client, user):
+    html = _review(client, user)
+
+    hints = _hints(html)
+    # Save and next, Discard and next, Skip to the next; the search box's "/".
+    assert len(hints) >= 4
+    assert all('aria-hidden="true"' in hint for hint in hints)
+    assert 'aria-keyshortcuts="Control+Enter Meta+Enter"' in html
+    assert 'aria-keyshortcuts="d"' in html
+    assert 'aria-keyshortcuts="j"' in html
+    assert 'aria-keyshortcuts="/"' in html
+    assert "data-key-ctrl" in html
+
+
+def test_with_hints_off_there_is_no_badge_and_the_attribute_stays(client, user):
+    _set(user, show_key_hints=False)
+    html = _review(client, user)
+
+    assert _hints(html) == []
+    for keys in ("Control+Enter Meta+Enter", "d", "j", "/"):
+        assert f'aria-keyshortcuts="{keys}"' in html
+
+
+def test_with_shortcuts_off_no_single_key_has_a_badge_but_ctrl_enter_does(client, user):
+    _set(user, keyboard_shortcuts=False)
+    html = _review(client, user)
+
+    hints = _hints(html)
+    assert len(hints) == 1 and all("data-key-ctrl" in hint for hint in hints)
+    assert 'aria-keyshortcuts="d"' not in html and 'aria-keyshortcuts="j"' not in html
+    assert 'aria-keyshortcuts="Control+Enter Meta+Enter"' in html
+
+
+def test_the_hint_switch_is_on_the_accessibility_page_and_saves_apart_from_the_keys(client, user):
+    client.force_login(user)
+    page = client.get(reverse("settings:accessibility")).content.decode()
+    assert 'name="show_key_hints"' in page
+
+    # Keys kept on, hints unticked.
+    response = client.post(reverse("settings:accessibility"), {"keyboard_shortcuts": "on"})
+
+    assert response.status_code == 302
+    profile = Profile.objects.get(user=user)
+    assert profile.show_key_hints is False
+    assert profile.keyboard_shortcuts is True
+
+
+def test_the_script_says_command_where_the_key_is_command():
+    assert "data-key-ctrl" in APP_JS and "⌘" in APP_JS

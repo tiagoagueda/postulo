@@ -43,6 +43,8 @@ def ui(request: HttpRequest) -> dict:
     # On unless somebody has said otherwise, which is also the answer where nobody is signed
     # in: there is no profile to ask, and the pages a stranger sees have no shortcuts (#227).
     shortcuts = True
+    # Likewise on: the badges are a default, and a stranger has none of the keys (#658).
+    key_hints = True
     # Likewise on unless somebody has said otherwise: the default is what the conformance
     # claim rests on, and a stranger has no profile to ask (#289).
     nav_underline = True
@@ -55,6 +57,7 @@ def ui(request: HttpRequest) -> dict:
         if profile:
             choice = profile.theme
             shortcuts = profile.keyboard_shortcuts
+            key_hints = profile.show_key_hints
             nav_underline = profile.nav_underline
             density = profile.density
         # "system" means stamp nothing and let the operating system preference apply.
@@ -77,6 +80,7 @@ def ui(request: HttpRequest) -> dict:
         # Read by `app.js` off <body>, and by the pages that document a key so that they do
         # not promise one that is switched off.
         "keyboard_shortcuts": shortcuts,
+        "key_hints": key_hints,
         # Read off <body> by the stylesheet alone; nothing scripts this one.
         "nav_underline": nav_underline,
         # Likewise: the stylesheet tightens what it tightens and no script is involved.

@@ -543,6 +543,7 @@ def test_every_exported_preference_survives_the_round_trip(user, other_user):
 
     chosen = {
         "keyboard_shortcuts": False,
+        "show_key_hints": False,
         "nav_underline": False,
         "density": "compact",
         "plugins_off": installed[:1],

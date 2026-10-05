@@ -1,5 +1,5 @@
 {% load i18n postulo %}
-<c-vars table="" form_id="" table_id="" shortcuts=False />
+<c-vars table="" form_id="" table_id="" shortcuts=False hints=False />
 {% comment %} The masthead's search: one box, which searches everything or narrows the table the
    page is showing (#313).
 
@@ -108,9 +108,15 @@
   <form method="get" action="{% url 'core:search' %}" role="search" data-site-search-form
         aria-label="{% translate 'Site search' %}" class="hidden lg:block">
     <label for="site-search" class="sr-only">{% translate "Search everything" %}</label>
-    <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
-           enterkeyhint="search" placeholder="{% if shortcuts %}{% translate 'Search  /' %}{% else %}{% translate 'Search' %}{% endif %}" data-search-shortcut
-           class="w-32 py-1 text-sm transition-[width] focus:w-48">
+    {% comment %} The "/" is a key cap beside the box rather than text in its placeholder
+       (#658): drawn while the box is empty and not focused, and only when hints and
+       shortcuts are both on. The key is named by `aria-keyshortcuts` either way. {% endcomment %}
+    <span class="relative inline-block">
+      <input type="search" id="site-search" name="q" value="{% if request.resolver_match.view_name == 'core:search' %}{{ request.GET.q }}{% endif %}"
+             enterkeyhint="search" placeholder="{% translate 'Search' %}"{% if shortcuts %} aria-keyshortcuts="/"{% endif %} data-search-shortcut
+             class="peer w-32 py-1 text-sm transition-[width] focus:w-48">
+      {% if hints and shortcuts %}<span class="pointer-events-none absolute inset-y-0 end-2 flex items-center peer-focus:hidden peer-[:not(:placeholder-shown)]:hidden" aria-hidden="true" data-key-hint><kbd class="kbd">/</kbd></span>{% endif %}
+    </span>
     <button type="button" class="btn size-11" data-variant="ghost" data-size="icon" data-search-close
             aria-label="{% translate 'Close search' %}" title="{% translate 'Close search' %}">{% icon "x" class="size-5" %}</button>
   </form>

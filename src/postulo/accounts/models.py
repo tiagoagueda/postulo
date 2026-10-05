@@ -400,6 +400,12 @@ class Profile(models.Model):
     #: are why that is bearable. The criterion asks for a way out, not for the default.
     #: Shortcuts with a modifier, Ctrl+Enter among them, are outside this and always work.
     keyboard_shortcuts = models.BooleanField(_("single-key shortcuts"), default=True)
+    #: Whether the small key badges beside a control that has a key are drawn (#658). Apart
+    #: from `keyboard_shortcuts`: that switch is the behaviour, this one is only what tells
+    #: somebody the keys exist. The control keeps `aria-keyshortcuts` either way, so
+    #: assistive technology is told whether or not the badge is on screen. On by default,
+    #: because a hint helps discovery and the conformance claim rests on the default.
+    show_key_hints = models.BooleanField(_("show key hints"), default=True)
     #: Whether the navigation link for the page you are on is underlined as well as tinted
     #: and set in bolder type. The underline arrived with #274, because the tint alone is
     #: 1.1:1 against the header -- nothing to somebody who does not tell those two greys

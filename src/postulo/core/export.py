@@ -102,7 +102,9 @@ logger = logging.getLogger(__name__)
 #: 36 added ``gender`` on the profile: the word somebody gave or typed, as text, read back
 #: through the column's own bounds; and ``gender`` among a CV's ``prints``. An archive without
 #: them restores it blank and off (#681).
-FORMAT_VERSION = 36
+#: 37 added the preference ``show_key_hints``: whether the key badges are drawn; an
+#: archive without it restores it on, the default (#658).
+FORMAT_VERSION = 37
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -181,6 +183,7 @@ PROFILE_FIELDS = (
     # are privacy choices (what a capture keeps) or an accessibility one (single-key
     # shortcuts, WCAG 2.1.4): a restore that quietly reset them would undo the choice.
     "keyboard_shortcuts",
+    "show_key_hints",
     "nav_underline",
     "density",
     "plugins_off",

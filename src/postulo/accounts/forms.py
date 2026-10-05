@@ -994,10 +994,11 @@ class AccessibilityForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("show_career_order", "keyboard_shortcuts", "nav_underline")
+        fields = ("show_career_order", "keyboard_shortcuts", "show_key_hints", "nav_underline")
         labels = {
             "show_career_order": _("Show the order number on each career entry"),
             "keyboard_shortcuts": _("Let a single key do something"),
+            "show_key_hints": _("Show the keys beside the controls that have one"),
             "nav_underline": _("Underline the page you are on"),
         }
         help_texts = {
@@ -1011,6 +1012,11 @@ class AccessibilityForm(forms.ModelForm):
                 "“/” jumps to the search box anywhere. Turn this off if you dictate to your "
                 "computer, or if a key pressed by accident does more than you meant. "
                 "Shortcuts that need Ctrl go on working either way."
+            ),
+            "show_key_hints": _(
+                "A small key cap beside Save and next, Discard and next, Skip to the next and "
+                "the search box. Turning it off hides the caps only; the keys keep working "
+                "(see above), and a screen reader is still told about them."
             ),
             "nav_underline": _(
                 "The link for the page you are on is underlined as well as shaded and set "

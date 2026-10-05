@@ -225,3 +225,85 @@ def test_a_single_key_does_nothing_once_it_is_switched_off(page: Page, live_serv
     page.locator("body").press("/")
 
     assert focused_id(page) != "site-search", "the key is off, so the box did not take focus"
+
+
+# ------------------------------------------------------------------ key hints (#658)
+
+
+@pytest.fixture
+def review_url(applicant, live_server):
+    """A capture with another waiting behind it, so *and next* and *Skip* are drawn."""
+    from postulo.jobs.models import Capture
+
+    older = Capture.objects.create(
+        owner=applicant,
+        url="https://example.org/a",
+        data={"title": "A", "company_name": "Aperture"},
+    )
+    Capture.objects.create(
+        owner=applicant,
+        url="https://example.org/b",
+        data={"title": "B", "company_name": "Black Mesa"},
+    )
+    newest = Capture.objects.filter(owner=applicant).order_by("-created_at").first()
+    return f"{live_server.url}/jobs/captures/{newest.pk}/review/", older
+
+
+def _set_switches(page: Page, live_server, *, keys: bool, hints: bool) -> None:
+    page.goto(f"{live_server.url}/settings/accessibility/")
+    page.locator("#id_keyboard_shortcuts").set_checked(keys)
+    page.locator("#id_show_key_hints").set_checked(hints)
+    page.get_by_role("button", name="Save").click()
+
+
+CONTROLS = (
+    ("Save and next", "Control+Enter Meta+Enter"),
+    ("Discard and next", "d"),
+    ("Skip to the next", "j"),
+)
+
+
+def test_hints_on_show_a_hidden_badge_beside_each_control(
+    page: Page, live_server, applicant, review_url
+):
+    sign_in(page, live_server.url)
+    page.goto(review_url[0])
+
+    for name, keys in CONTROLS:
+        control = page.get_by_role("button" if name != "Skip to the next" else "link", name=name)
+        expect(control).to_have_attribute("aria-keyshortcuts", keys)
+        badge = control.locator("[data-key-hint]")
+        expect(badge).to_be_visible()
+        expect(badge).to_have_attribute("aria-hidden", "true")
+    search = page.locator("#site-search")
+    expect(search).to_have_attribute("aria-keyshortcuts", "/")
+    expect(page.locator("[data-key-hint] kbd", has_text="/")).to_be_visible()
+
+
+def test_hints_off_leave_no_badge_and_keep_the_attribute(
+    page: Page, live_server, applicant, review_url
+):
+    sign_in(page, live_server.url)
+    _set_switches(page, live_server, keys=True, hints=False)
+    page.goto(review_url[0])
+
+    expect(page.locator("[data-key-hint]")).to_have_count(0)
+    for name, keys in CONTROLS:
+        control = page.get_by_role("button" if name != "Skip to the next" else "link", name=name)
+        expect(control).to_have_attribute("aria-keyshortcuts", keys)
+    expect(page.locator("#site-search")).to_have_attribute("aria-keyshortcuts", "/")
+
+
+def test_shortcuts_off_leave_no_badge_for_a_single_key(
+    page: Page, live_server, applicant, review_url
+):
+    sign_in(page, live_server.url)
+    _set_switches(page, live_server, keys=False, hints=True)
+    page.goto(review_url[0])
+
+    badges = page.locator("[data-key-hint]")
+    expect(badges).to_have_count(1)
+    expect(badges.first).to_contain_text("Enter")
+    expect(page.get_by_role("link", name="Skip to the next").locator("kbd")).to_have_count(0)
+    expect(page.get_by_role("button", name="Discard and next").locator("kbd")).to_have_count(0)
+    expect(page.locator("[data-key-hint] kbd", has_text="/")).to_have_count(0)

@@ -205,3 +205,22 @@ def test_a_selects_list_is_painted_from_the_tokens_of_its_box_and_clears_four_an
     light, dark = tokens()
     assert contrast(light["ink-900"], 1.0) >= 4.5, "light: ink on white"
     assert contrast(dark["ink-100"], dark["ink-950"]) >= 4.5, "dark: ink on its near-black"
+
+
+# ------------------------------------------------------------------ a key cap
+
+
+def test_a_key_cap_holds_four_and_a_half_to_one_in_both_themes():
+    """`.kbd` is text, so SC 1.4.3 and not 1.4.11 (#658)."""
+    sheet = (Path(__file__).resolve().parents[1] / "assets" / "css" / "basecoat.css").read_text(
+        "utf-8"
+    )
+    rule = sheet[sheet.index("  .kbd {") : sheet.index("}", sheet.index("  .kbd {"))]
+    assert "bg-ink-100" in rule and "text-ink-700" in rule
+    assert "dark:bg-ink-800" in rule and "dark:text-ink-200" in rule
+
+    light, dark = tokens()
+    colours = palette()
+    light, dark = {**colours, **light}, {**colours, **dark}
+    assert contrast(light["ink-700"], light["ink-100"]) >= 4.5, "light: the cap"
+    assert contrast(dark["ink-200"], dark["ink-800"]) >= 4.5, "dark: the cap"

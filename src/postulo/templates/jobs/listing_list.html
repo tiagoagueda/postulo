@@ -8,7 +8,7 @@
 {% comment %} The masthead's box narrows this table (#313) -- once there is a table: at no
    listings at all the page wears none of its table chrome (#160), and the box stays the
    search over everything. {% endcomment %}
-{% block site_search %}{% if has_listings %}<c-site-search :table="table" form_id="listing-filters" table_id="listings-table" :shortcuts="keyboard_shortcuts" />{% else %}{{ block.super }}{% endif %}{% endblock %}
+{% block site_search %}{% if has_listings %}<c-site-search :table="table" form_id="listing-filters" table_id="listings-table" :shortcuts="keyboard_shortcuts" :hints="key_hints" />{% else %}{{ block.super }}{% endif %}{% endblock %}
 
 {% partialdef count %}
   <p id="listings-count" class="text-sm text-ink-500 dark:text-ink-400"

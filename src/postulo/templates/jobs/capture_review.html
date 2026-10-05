@@ -170,12 +170,13 @@
       </div>
 
       <div class="flex flex-wrap items-center gap-3">
-        <button type="submit" class="btn" {% if not next_url %}data-key-save-next{% endif %}>
-          {% translate "Save to listings" %}
+        <button type="submit" class="btn" aria-keyshortcuts="Control+Enter Meta+Enter" {% if not next_url %}data-key-save-next{% endif %}>
+          {% translate "Save to listings" %}{% if not next_url %}<c-key-hint key="Enter" ctrl :show="key_hints" />{% endif %}
         </button>
         {% if next_url %}
-          <button type="submit" name="next" value="1" class="btn" data-variant="outline" data-key-save-next>
-            {% translate "Save and next" %}
+          <button type="submit" name="next" value="1" class="btn" data-variant="outline" data-key-save-next
+                  aria-keyshortcuts="Control+Enter Meta+Enter">
+            {% translate "Save and next" %}<c-key-hint key="Enter" ctrl :show="key_hints" />
           </button>
         {% endif %}
         <a href="{% url 'listings:list' %}" class="btn" data-variant="ghost">{% translate "Later" %}</a>
@@ -186,15 +187,15 @@
           class="mt-6 flex flex-wrap items-center gap-3">
       {% csrf_token %}
       <button type="submit" class="btn" data-variant="destructive-ghost"
-              {% if not next_url %}data-key-discard-next{% endif %}>
-        {% translate "Discard this capture" %}
+              {% if not next_url %}data-key-discard-next{% if keyboard_shortcuts %} aria-keyshortcuts="d"{% endif %}{% endif %}>
+        {% translate "Discard this capture" %}{% if not next_url %}{% if key_hints and keyboard_shortcuts %}<c-key-hint key="d" show />{% endif %}{% endif %}
       </button>
       {% if next_url %}
         <button type="submit" name="next" value="1" data-key-discard-next
-                class="btn" data-variant="destructive-ghost">
-          {% translate "Discard and next" %}
+                class="btn" data-variant="destructive-ghost"{% if keyboard_shortcuts %} aria-keyshortcuts="d"{% endif %}>
+          {% translate "Discard and next" %}{% if key_hints and keyboard_shortcuts %}<c-key-hint key="d" show />{% endif %}
         </button>
-        <a href="{{ next_url }}" class="btn" data-variant="ghost" data-key-next>{% translate "Skip to the next" %}</a>
+        <a href="{{ next_url }}" class="btn" data-variant="ghost" data-key-next{% if keyboard_shortcuts %} aria-keyshortcuts="j"{% endif %}>{% translate "Skip to the next" %}{% if key_hints and keyboard_shortcuts %}<c-key-hint key="j" show />{% endif %}</a>
       {% endif %}
     </form>
     {% comment %} The page says what the keys are, so it has to say the truth about them:

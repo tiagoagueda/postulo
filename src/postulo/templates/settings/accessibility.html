@@ -29,6 +29,11 @@
            sentence (#227). Moved here from Appearance (#281). {% endcomment %}
         <c-section-title>{% translate "Keyboard shortcuts" %}</c-section-title>
         <c-field :field="form.keyboard_shortcuts" />
+        {% comment %} Apart from the switch above: that one is what the keys do, this one is
+           whether the page draws the key caps that say they exist (#658). {% endcomment %}
+        <div class="mt-4">
+          <c-field :field="form.show_key_hints" />
+        </div>
       </div>
 
       <div class="card mb-6">

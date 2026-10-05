@@ -44,6 +44,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Added: links to Mastodon, Bluesky, Facebook, Instagram, YouTube and Codeberg now show the service's own mark beside them where a contact's links are listed, with the generic icon kept for every other service (#654)
 - Added: CONTRIBUTING.md now says to look for an open-source library before writing one and which format an export or import picks first, and pull requests get a template that asks the same questions (#653)
 - The company map is a feature an administrator can switch off under *Server settings → Plugins*: off, the map page, its button and the guessing of a location's place go, and every stored coordinate stays for when it is back on. (#700)
+- Key caps now sit beside *Save and next*, *Discard and next*, *Skip to the next* and the search box, and *Settings → Accessibility* has a switch for them apart from the one for the keys; the controls name their key to screen readers either way. (#658)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 
 ### 🐛 Fixed

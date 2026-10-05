@@ -90,6 +90,7 @@ _REFUSED = object()
 _CHECKED_PROFILE_FIELDS = frozenset(
     {
         "keyboard_shortcuts",
+        "show_key_hints",
         "nav_underline",
         "density",
         "keep_page_source",

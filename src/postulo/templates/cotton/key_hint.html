@@ -1,0 +1,17 @@
+{% load i18n %}
+<c-vars key="" ctrl="" show="" />
+{% comment %} The key cap beside a control that has a key (#658).
+
+   `{% if key_hints and keyboard_shortcuts %}<c-key-hint key="d" show />{% endif %}`
+   `<c-key-hint key="Enter" ctrl :show="key_hints" />`
+
+   `show` is the whole decision, made by the caller (a prop takes one variable, not an expression, so a single key is wrapped in its own `{% if %}`): hints on, and for a single key,
+   shortcuts on too, because a hint for a dead key is a lie. Drawn `aria-hidden`: the
+   control carries `aria-keyshortcuts` for assistive technology, so a visible cap is never
+   part of its accessible name. `Ctrl` is drawn for the server's sake, which cannot tell the
+   platform; `app.js` swaps `[data-key-ctrl]` for ⌘ on Apple platforms. Key names that are
+   words are translated, with a context, since keyboards print Strg and Entrée. {% endcomment %}
+{% if show %}<span class="ms-1.5 whitespace-nowrap" aria-hidden="true" data-key-hint>
+  {% if ctrl %}<kbd class="kbd" data-key-ctrl>{% translate "Ctrl" context "name of a keyboard key" %}</kbd>+{% endif %}
+  {% if key == "Enter" %}<kbd class="kbd">{% translate "Enter" context "name of a keyboard key" %}</kbd>{% else %}<kbd class="kbd">{{ key }}</kbd>{% endif %}
+</span>{% endif %}
