@@ -437,7 +437,7 @@ def test_the_report_is_addressed_to_the_office_when_there_is_one(client, user):
     assert report.through_service == 1, "a fact of the period whether or not there is an office"
     client.force_login(user)
     page = client.get(reverse(PAGE), {"month": "2026-03"}).content.decode()
-    assert "Through the employment service" not in page
+    assert "Through the public employment service" not in page
 
     office = Company.objects.create(
         owner=user, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
@@ -448,7 +448,7 @@ def test_the_report_is_addressed_to_the_office_when_there_is_one(client, user):
     assert report.office == "France Travail" and report.adviser == "Camille Durand"
     page = client.get(reverse(PAGE), {"month": "2026-03"}).content.decode()
     assert "For France Travail" in page and "Camille Durand" in page
-    assert "Through the employment service" in page
+    assert "Through the public employment service" in page
     document = render_to_string("applications/report_print.html", {"report": report})
     assert "For France Travail" in document and "Camille Durand" in document
 

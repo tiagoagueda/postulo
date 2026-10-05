@@ -166,7 +166,7 @@ def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_dow
     assert differed == {
         "Website": ("https://acme.example", "https://acme.co.uk"),
         "Location": ("London", "Leeds"),
-        "Type": ("Employer", "Employment service"),
+        "Type": ("Employer", "Public employment service"),
         "Wikidata": ("Q95", "Q96"),
     }
     for line in (
@@ -174,7 +174,7 @@ def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_dow
         "Merged with Acme Ltd on ",
         "Website: https://acme.co.uk",
         "Location: Leeds",
-        "Type: Employment service",
+        "Type: Public employment service",
         "Wikidata: Q96",
         "Met them at the fair.",
     ):

@@ -84,6 +84,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.jobs.esco",
             "postulo.jobs.industries",
             "postulo.jobs.places",
+            "postulo.jobs.roles",
             "postulo.plugins.kinds",
             "postulo.plugins.locale",
             "postulo.plugins.record",

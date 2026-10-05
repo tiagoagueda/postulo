@@ -578,6 +578,12 @@ class ApplicationUpdateView(OwnedObjectMixin, UserFormKwargsMixin, UpdateView):
         self.status_before_edit = application.status
         return application
 
+    def get_form_kwargs(self) -> dict:
+        kwargs = super().get_form_kwargs()
+        # "Show every company" beside the agency list: a link, so it needs no script (#671).
+        kwargs["show_all_companies"] = self.request.GET.get("companies") == "all"
+        return kwargs
+
     def form_valid(self, form):
         """Save everything but the status, then move the status through the service.
 

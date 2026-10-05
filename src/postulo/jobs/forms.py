@@ -189,8 +189,9 @@ class CompanyForm(OwnerScopedModelForm):
         widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
             "kind": _(
-                "An employer is somewhere you might work; an employment service is an "
-                "office or agency that lists other people's openings."
+                "An employer is somewhere you might work; a public employment service is "
+                "the office you are registered with. A recruitment agency is an ordinary "
+                "company: give it the industry Employment activities."
             ),
             "website": _(
                 "Used by Find logo, and only when you press it. Postulo fetches nothing "

@@ -1,0 +1,63 @@
+"""The roles a company can play, and the NACE divisions that qualify a company for each (#671).
+
+A company has no classification of its own: its **industries** carry one, because an
+`Industry` whose name is a NACE division's name has that division's code (`industries.py`).
+A *role* is a question asked of that: "does this company do what an intermediary does?",
+answered from the codes of its industries and never from a column of its own, so nothing
+new is stored and no archive, API or candidate format changes.
+
+**One role ships here, the intermediary** -- a company that stands between a listing and its
+employer: a recruitment agency, a staffing firm, a placement service. That is NACE division
+78, *Employment activities*. The next roles are a place of learning (division 85), an
+awarding body (85 and 94) and a membership organisation (94); each adds a row to `ROLES`
+and nothing else. An *employer* is not a role: any company may be one.
+
+**A kind can qualify on its own.** The public employment service (`CompanyKind`) is the
+office a person is registered with, and it refers people to other companies' listings. It is
+not certain that NACE puts a public body in division 78, so the kind qualifies whatever
+industries it has, and the answer does not depend on the classification's wording.
+
+The role *offers* and does not *require*: callers put the qualifying companies first and keep
+the rest one step away, because no existing company carries a code yet, and a row that names
+an agency which does not qualify must not become invalid.
+"""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+
+from django.utils.translation import gettext_lazy as _
+
+
+@dataclass(frozen=True)
+class Role:
+    """One thing a company can be to the person recording it, and what makes it so."""
+
+    key: str
+    label: object  # a lazy string
+    #: The NACE divisions whose industries qualify a company.
+    divisions: frozenset[str]
+    #: Company kinds (`jobs.CompanyKind` values) that qualify on their own, written as the
+    #: stored strings so that this module imports no model.
+    kinds: frozenset[str] = frozenset()
+
+
+INTERMEDIARY = "intermediary"
+
+ROLES: dict[str, Role] = {
+    INTERMEDIARY: Role(
+        key=INTERMEDIARY,
+        label=_("Employment services and agencies"),
+        divisions=frozenset({"78"}),
+        kinds=frozenset({"employment_service"}),
+    ),
+}
+
+
+def role(key: str) -> Role:
+    """The role with this key. An unknown key is refused rather than answered with nothing,
+    because a typo that quietly qualified no company would look like an empty list."""
+    try:
+        return ROLES[key]
+    except KeyError:
+        raise ValueError(f"unknown company role: {key!r}") from None

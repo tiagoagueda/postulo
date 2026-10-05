@@ -24,6 +24,9 @@
             {{ field }}
           {% elif field.name != "tags" and field.name != "new_tags" %}
             <c-field :field="field" />
+            {% if field.name == "through_agency" and form.agencies_narrowed %}
+              <p class="-mt-2 mb-4 text-sm"><a href="?companies=all" class="underline" data-show-every-company>{% translate "Show every company" %}</a></p>
+            {% endif %}
           {% endif %}
         {% endfor %}
         {% include "partials/tags_field.html" with form=form %}

@@ -29,7 +29,7 @@ from postulo.applications.forms import ApplicationForm
 from postulo.applications.models import Application, Status
 from postulo.applications.services import change_status
 from postulo.core import export, gdpr, importer
-from postulo.jobs.models import Company, Contact, JobPosting
+from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
 
 pytestmark = pytest.mark.django_db
 
@@ -118,6 +118,19 @@ def test_the_application_outlives_the_referrer_and_the_agency(application, frien
 # ----------------------------------------------------------------------- the form
 
 
+def drawn(form) -> list:
+    """The primary keys the agency list draws, in order, without the empty choice."""
+    return [value.value for value, _label in form.fields["through_agency"].choices if value != ""]
+
+
+@pytest.fixture
+def recruiter(user):
+    """A company in NACE division 78, which is what the list offers first (#671)."""
+    made = Company.objects.create(owner=user, name="Zeta Staffing")
+    made.industries.set(Industry.named(user, ["Employment activities"]))
+    return made
+
+
 def test_the_form_offers_only_the_owners_own(user, other_user, application, friend, agency):
     their_contact, their_company = theirs(other_user)
 
@@ -127,6 +140,81 @@ def test_the_form_offers_only_the_owners_own(user, other_user, application, frie
     assert their_contact not in form.fields["referred_by"].queryset
     assert list(form.fields["through_agency"].queryset) == [agency]
     assert their_company not in form.fields["through_agency"].queryset
+
+
+def test_the_qualifying_companies_come_first_and_are_the_ones_drawn(
+    user, application, agency, recruiter
+):
+    form = ApplicationForm(instance=application, user=user)
+
+    assert list(form.fields["through_agency"].queryset) == [recruiter, agency]
+    assert drawn(form) == [recruiter.pk], "Hays has no industry, so it is behind the link"
+    assert form.agencies_narrowed
+
+
+def test_show_every_company_lists_the_rest_after_the_qualifying(
+    user, application, agency, recruiter
+):
+    form = ApplicationForm(instance=application, user=user, show_all_companies=True)
+
+    assert drawn(form) == [recruiter.pk, agency.pk]
+    assert not form.agencies_narrowed
+
+
+def test_a_public_employment_service_is_offered_first_whatever_its_industries(
+    user, application, agency
+):
+    office = Company.objects.create(
+        owner=user, name="France Travail", kind=CompanyKind.EMPLOYMENT_SERVICE
+    )
+
+    form = ApplicationForm(instance=application, user=user)
+
+    assert drawn(form) == [office.pk]
+
+
+def test_a_company_that_does_not_qualify_is_still_a_valid_answer(
+    user, application, agency, recruiter
+):
+    """Suggested, not strict: a stored answer must not become invalid."""
+    form = ApplicationForm(
+        posted(application, through_agency=agency.pk), instance=application, user=user
+    )
+
+    assert form.is_valid(), form.errors
+    assert form.cleaned_data["through_agency"] == agency
+
+
+def test_the_company_the_row_names_stays_drawn_though_it_does_not_qualify(
+    user, application, agency, recruiter
+):
+    Application.objects.filter(pk=application.pk).update(through_agency=agency)
+    application.refresh_from_db()
+
+    form = ApplicationForm(instance=application, user=user)
+
+    assert drawn(form) == [recruiter.pk, agency.pk]
+
+
+def test_the_edit_page_links_to_every_company_and_the_link_works_without_scripts(
+    client, user, application, agency, recruiter
+):
+    client.force_login(user)
+    url = reverse("applications:update", args=[application.pk])
+
+    narrow = client.get(url).content.decode()
+    wide = client.get(url, {"companies": "all"}).content.decode()
+
+    assert "Zeta Staffing" in narrow and "Hays" not in narrow
+    assert "data-show-every-company" in narrow and 'href="?companies=all"' in narrow
+    assert "Hays" in wide and "data-show-every-company" not in wide
+
+
+def test_the_list_says_what_qualifies(user, application, agency):
+    form = ApplicationForm(instance=application, user=user)
+
+    text = str(form.fields["through_agency"].help_text)
+    assert "Employment activities" in text and "public employment services" in text
 
 
 def test_a_referrer_may_be_anywhere_and_the_main_contact_may_not(user, application, friend):
@@ -155,10 +243,13 @@ def test_two_people_of_one_name_are_told_apart_in_the_list(user, application):
     assert field.label_from_instance(nowhere) == "Sam Porter"
 
 
-def test_the_employer_is_not_offered_as_its_own_agency(user, application, agency):
-    form = ApplicationForm(instance=application, user=user)
+def test_the_employer_is_not_offered_as_its_own_agency(user, application, agency, employer):
+    """Not even when it is itself in division 78, nor behind "Show every company"."""
+    employer.industries.set(Industry.named(user, ["Employment activities"]))
+    form = ApplicationForm(instance=application, user=user, show_all_companies=True)
 
-    assert application.posting.company not in form.fields["through_agency"].queryset
+    assert employer not in form.fields["through_agency"].queryset
+    assert employer.pk not in drawn(form)
     assert agency in form.fields["through_agency"].queryset
 
 

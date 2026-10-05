@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 from django import forms
-from django.db.models import Q
+from django.db.models import Case, IntegerField, Q, When
+from django.db.models.functions import Lower
+from django.forms.models import ModelChoiceIterator
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
@@ -42,7 +44,7 @@ from .models import (
 APPLICATION_HELP = {
     "channel": _(
         "The route it went through. The report counts by this, including how many went "
-        "through the employment service's own board."
+        "through the public employment service's own board."
     ),
     "priority": _("Yours, not the employer's. The list can be sorted and narrowed by it."),
     "deadline": _(
@@ -56,7 +58,9 @@ APPLICATION_HELP = {
         "another, or at none. The figures count what each referrer led to."
     ),
     "through_agency": _(
-        "The recruitment agency it went through, from the companies you have recorded. "
+        "The agency or employment service it went through, from the companies you have "
+        "recorded. Companies in Employment activities, and public employment services, "
+        "are offered first; add that industry to a company to have it offered here. "
         "The company on the posting stays the employer."
     ),
 }
@@ -322,6 +326,28 @@ class ApplicationIntakeForm(PostingIntakeForm, ApplicationDetailsForm):
     """
 
 
+class _OfferedChoices(ModelChoiceIterator):
+    """The choices of a company list, narrowed to what the field says it offers."""
+
+    def __iter__(self):
+        offered = self.field.offered
+        for value, label in super().__iter__():
+            key = getattr(value, "value", value)
+            if offered is None or key == "" or key in offered:
+                yield value, label
+
+
+class AgencyChoiceField(forms.ModelChoiceField):
+    """A company picker that validates against every company and draws only some (#671).
+
+    ``queryset`` is what is *valid*; ``offered`` (primary keys, or ``None`` for all) is what
+    is *drawn*. Suggesting the qualifying companies must not make a stored answer invalid.
+    """
+
+    iterator = _OfferedChoices
+    offered: set[int] | None = None
+
+
 class ApplicationForm(OwnerScopedModelForm):
     """Edit an existing application.
 
@@ -339,8 +365,17 @@ class ApplicationForm(OwnerScopedModelForm):
     #: somebody chose from one that is only the page being old (#545).
     drawn_status = forms.CharField(widget=forms.HiddenInput, required=False)
 
+    def __init__(self, *args, show_all_companies: bool = False, **kwargs):
+        # Read by `_scope_referrer_and_agency`, which the base class calls from its own
+        # `__init__`: "Show every company" is a link with a query parameter, so it works
+        # with scripts off (#671).
+        self.show_all_companies = show_all_companies
+        self.agencies_narrowed = False
+        super().__init__(*args, **kwargs)
+
     class Meta:
         model = Application
+        field_classes = {"through_agency": AgencyChoiceField}
         fields = (
             "status",
             "channel",
@@ -416,7 +451,8 @@ class ApplicationForm(OwnerScopedModelForm):
         the main contact above: a referrer is as often a friend somewhere else as somebody
         here. The agency is any company but the employer, because the posting's company
         stays the employer and an application that went through its own employer went
-        through nobody.
+        through nobody. Of those, the ones that qualify as intermediaries come first and
+        are the ones drawn, until the person asks for every company (#671).
 
         Each is offered only where there is somebody to choose, for the reason the
         department gives: a picker of one empty option is a control asking to be ignored.
@@ -439,11 +475,33 @@ class ApplicationForm(OwnerScopedModelForm):
             employer = self.instance.posting.company_id
             if self.instance.through_agency_id != employer:
                 agencies = agencies.exclude(pk=employer)
-        if agencies.exists():
-            self.fields["through_agency"].queryset = agencies
-            self.fields["through_agency"].empty_label = _("No agency")
-        else:
+        if not agencies.exists():
             del self.fields["through_agency"]
+            return
+        # Every company stays a valid answer, so a row that names one which does not
+        # qualify (or a company that lost its industry) is never made invalid; what the
+        # list *draws* is narrowed to the intermediaries and the company the row names,
+        # with the rest behind "Show every company" (#671).
+        qualifying = agencies.qualifying()
+        intermediaries = set(qualifying.values_list("pk", flat=True))
+        agencies = agencies.annotate(
+            _intermediary=Case(
+                When(pk__in=qualifying.values("pk"), then=0),
+                default=1,
+                output_field=IntegerField(),
+            )
+        ).order_by("_intermediary", Lower("name"), "pk")
+        field = self.fields["through_agency"]
+        field.queryset = agencies
+        field.empty_label = _("No agency")
+        named = {self.instance.through_agency_id} - {None} if self.instance.pk else set()
+        posted = self.data.get(self.add_prefix("through_agency")) if self.is_bound else None
+        if posted and str(posted).isdigit():
+            named.add(int(posted))
+        everyone = set(agencies.values_list("pk", flat=True))
+        offered = intermediaries | (named & everyone)
+        self.agencies_narrowed = not self.show_all_companies and offered != everyone
+        field.offered = offered if self.agencies_narrowed else None
 
 
 class StatusChangeForm(forms.Form):

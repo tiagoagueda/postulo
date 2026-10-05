@@ -179,7 +179,7 @@ class Channel(models.TextChoices):
     #: The listings of the public employment service the person is registered with, so
     #: the report can say how many came from the office's own board -- which is the
     #: number the office asks first (#202).
-    EMPLOYMENT_SERVICE = "employment_service", _("Employment service")
+    EMPLOYMENT_SERVICE = "employment_service", _("Public employment service")
     EMAIL = "email", _("Email")
     REFERRAL = "referral", _("Referral")
     RECRUITER = "recruiter", _("Recruiter")
@@ -412,7 +412,10 @@ class Application(OwnedModel):
     #: company stays the employer**: an agency is deliberately not a kind of company
     #: (`jobs.CompanyKind`), because its listings are applied to like anybody's, and this
     #: is how a search run mostly through two agencies can be compared by agency without
-    #: the employer ever becoming one.
+    #: the employer ever becoming one. Any of the owner's companies may be named, so a
+    #: stored row is never invalid; the form *offers* the intermediaries first -- companies
+    #: in NACE division 78 and the public employment service (`jobs.roles`) -- and keeps
+    #: the rest behind "Show every company" (#671).
     through_agency = models.ForeignKey(
         "jobs.Company",
         on_delete=models.SET_NULL,

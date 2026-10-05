@@ -125,7 +125,7 @@ def test_the_companies_page_says_which_is_the_office_and_narrows_to_it(client, u
     client.force_login(user)
 
     page = client.get(reverse("jobs:company_list")).content.decode()
-    assert page.count("Employment service") == 1, (
+    assert page.count("Public employment service") == 1, (
         "a chip beside the office's name, and nothing beside an employer"
     )
 
@@ -135,7 +135,7 @@ def test_the_companies_page_says_which_is_the_office_and_narrows_to_it(client, u
     assert [c.name for c in narrowed.context["companies"]] == ["Aperture Science"]
 
     detail = client.get(office.get_absolute_url()).content.decode()
-    assert "Employment service" in detail
+    assert "Public employment service" in detail
 
 
 def test_every_company_from_before_there_were_kinds_is_an_employer(user):

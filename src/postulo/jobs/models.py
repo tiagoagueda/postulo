@@ -39,7 +39,7 @@ from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
 
-from . import esco, identifiers, industries
+from . import esco, identifiers, industries, roles
 
 
 class Industry(OwnedModel):
@@ -130,6 +130,19 @@ class CompanyQuerySet(OwnedQuerySet):
         employers are counted or offered, this is the set.
         """
         return self.filter(kind=CompanyKind.EMPLOYER)
+
+    def qualifying(self, role: str = roles.INTERMEDIARY) -> CompanyQuerySet:
+        """The companies that play a role, from what they do (#671).
+
+        Answered from the codes of their industries (`jobs.roles`), plus the kinds that
+        qualify on their own -- the public employment service is an intermediary whatever
+        industries it has. An unknown role raises. Scope by owner first, as with any
+        query: a company's industries are its owner's, so a set that starts from
+        ``for_user`` never holds another person's company.
+        """
+        wanted = roles.role(role)
+        coded = self.model.objects.filter(industries__code__in=wanted.divisions).values("pk")
+        return self.filter(Q(kind__in=wanted.kinds) | Q(pk__in=coded))
 
     def with_table_data(self) -> CompanyQuerySet:
         """Annotate the counts, dates and identifiers the companies table can show, sort by
@@ -225,15 +238,18 @@ class CompanyKind(models.TextChoices):
     """What a company is to the person recording it (#202).
 
     An *employer* is what every company was until there were kinds, and what every
-    existing row is. An *employment service* is the public office a job seeker is
+    existing row is. A *public employment service* is the office a job seeker is
     registered with -- France Travail, IEFP, the Bundesagentur für Arbeit, Jobcentre Plus
-    -- dealt with throughout a search and never applied to. A recruitment agency is not a
-    third kind: an agency's listings are applied to, and *recruiter* is already the
-    channel an application through one records.
+    -- dealt with throughout a search and never applied to. The stored value stays
+    ``employment_service`` (it is in the archive, the API and the CSV aliases); only the
+    label says *public*, because "employment service" in the interface also names the
+    companies in NACE division 78 (`jobs.roles`). A recruitment agency is not a third
+    kind: an agency's listings are applied to, it is an ordinary company, and what makes it
+    an intermediary is the industry it is in, not a column (#671).
     """
 
     EMPLOYER = "employer", _("Employer")
-    EMPLOYMENT_SERVICE = "employment_service", _("Employment service")
+    EMPLOYMENT_SERVICE = "employment_service", _("Public employment service")
 
 
 class LocationSource(models.TextChoices):
