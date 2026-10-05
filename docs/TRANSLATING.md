@@ -52,7 +52,7 @@ The set grows in phases, one per release (#43):
 | 0.3.0 | The rest of Europe (#118) — 15 languages | Complete, machine-drafted |
 | 0.3.0 | Africa (#70) — 29 languages | Catalogues created, awaiting translation |
 | 0.4.0 | Asia and South America (#71) | Not started |
-| 0.5.0 | The rest of the world (#72) | Not started |
+| 0.5.0 | The rest of the world (#72) | Not started; the process is below |
 
 "Every language of Africa" is some two thousand of them, so the rule drawn for 0.3.0 is
 **a language with official or national status in at least one African state, plus the
@@ -260,6 +260,25 @@ help rather than fight that.
    application in a right-to-left language.
 4. `uv run python scripts/messages.py extract` creates the catalogue.
 5. Translate, `check`, `stats --write`, and open a pull request.
+
+## Adding a language without a developer
+
+The aim of the last phase is a process rather than a list: a speaker adds a language
+without waiting for a release, and what they add shows up as soon as it is merged (#72).
+
+- **A catalogue is a pull request**, or a translation made on the project's translation
+  platform; either way it is the `.po` file under `src/postulo/locale/<locale>/` and
+  nothing else. No code needs to change for a language already on the list.
+- **A language is offered once one string is translated** (`accounts/forms.py::language_choices`),
+  and not before, so a scaffolded catalogue nobody has begun stays invisible.
+- **Partial is normal.** A language below 95% sits in the *Partly translated* group of the
+  picker with its percentage, and the page says that English shows wherever the translation
+  has not reached. Nothing is hidden and nothing is promised.
+- **The picker is searchable.** With scripts on, a box above the list narrows it by the
+  name in its own language or by the tag; with scripts off the list is whole, grouped by
+  how far along each language is.
+- **Plugins carry their own catalogues** and are completed, checked and offered the same
+  way; a language is as complete as the interface somebody sees, core and plugins together.
 
 ## Plugins
 

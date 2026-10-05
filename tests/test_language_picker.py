@@ -296,3 +296,21 @@ def test_the_plain_text_label_of_the_blank_choice(settings):
     assert default_language_label("en-GB") == "English (United Kingdom) en-GB — Default"
     assert language_choices(default="de")[0] == ("", "Deutsch de — Default")
     assert default_language_label("xx") == "xx — Default", "a tag with no name is not doubled"
+
+
+def test_the_list_can_be_searched_but_only_where_a_script_can_do_it(page):
+    """A hundred languages is not a list somebody scrolls (#72). The box is `hidden` in the
+    markup so that, with scripts off, there is no control that does nothing; `app.js` shows it.
+    """
+    panel = picker(page)
+    box = between(panel, "data-language-filter", "</div>")
+
+    assert "hidden" in panel.split("data-language-filter")[1].split(">")[0]
+    assert 'type="search"' in box
+    assert panel.count("data-language-row") >= 2
+    assert "data-language-group" in panel
+    assert "data-language-search=" in panel, "a row says what it can be found by"
+
+
+def test_the_page_says_plainly_that_a_partly_translated_language_shows_english(page):
+    assert "shows English wherever its translation has not reached" in page

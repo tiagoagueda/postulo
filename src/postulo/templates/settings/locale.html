@@ -46,9 +46,23 @@
               <span class="ms-auto text-xs text-ink-500 dark:text-ink-400">{% translate "Change" %}</span>
             </summary>
 
+            {% comment %} Searching is for scripts-on only: a box that did nothing with scripts
+               off would be a lie, so it is `hidden` until `app.js` takes the attribute off.
+               The list is a long one and grows with every catalogue somebody starts. {% endcomment %}
+            <div class="mt-2" data-language-filter hidden>
+              <label for="language-filter" class="label mb-1">{% translate "Find a language" %}</label>
+              <input type="search" id="language-filter" class="w-full" autocomplete="off"
+                     aria-controls="language-list">
+              <p class="sr-only" role="status" data-language-filter-status></p>
+              <p class="mt-2 hidden text-sm text-ink-500 dark:text-ink-400" data-language-filter-empty>
+                {% translate "No language here has that name. A catalogue for it is welcome, and the page on translating says how to start one." %}
+              </p>
+            </div>
+
             <div class="mt-2 max-h-96 overflow-y-auto rounded-xl border border-ink-200 p-2 dark:border-ink-800"
-                 data-language-list>
+                 id="language-list" data-language-list>
               {% for group in form.language_groups %}
+                <div data-language-group>
                 {% if group.label %}
                   <p class="mt-3 mb-2 text-xs font-semibold text-ink-500 dark:text-ink-400">
                     {{ group.label }}
@@ -57,7 +71,8 @@
                 <div class="grid gap-1 sm:grid-cols-2">
                   {% for option in group.options %}
                     <label class="flex items-center gap-3 rounded-lg px-2 py-1.5 text-sm
-                                  hover:bg-ink-100 dark:hover:bg-ink-800">
+                                  hover:bg-ink-100 dark:hover:bg-ink-800"
+                           data-language-row data-language-search="{{ option.name|lower }} {{ option.code|lower }}">
                       <input type="radio" class="input" name="language" value="{{ option.code }}"
                              {% if option.selected %}checked{% endif %}>
                       {% comment %} Decorative: the name beside it already says which language
@@ -77,6 +92,7 @@
                       {% include "partials/translation_state.html" with state=option.state percent=option.percent %}
                     </label>
                   {% endfor %}
+                </div>
                 </div>
               {% endfor %}
             </div>
@@ -99,6 +115,9 @@
             <span aria-hidden="true">{% icon "circle-dashed" %}</span>
             {% translate "still being translated" %}
           </span>
+        </p>
+        <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
+          {% translate "A language that is still being translated shows English wherever its translation has not reached. That is normal here, and the percentage says how much is done." %}
         </p>
 
         <div class="field"><c-field-feedback :field="form.language" /></div>

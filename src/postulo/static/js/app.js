@@ -5430,8 +5430,49 @@
   // follows is required for the control to work.
   var picker = document.querySelector("[data-language-picker]");
 
+  // Only the rows the search has not hidden, so the arrow keys, Home, End and type-ahead
+  // move among what is shown.
   function languageRadios() {
-    return picker ? Array.prototype.slice.call(picker.querySelectorAll('input[type="radio"]')) : [];
+    return picker
+      ? Array.prototype.slice.call(picker.querySelectorAll('input[type="radio"]')).filter(function (radio) {
+          var row = radio.closest("[data-language-row]");
+          return !row || !row.hidden;
+        })
+      : [];
+  }
+
+  // A search box over a list that grows with every catalogue somebody starts (#72). It is
+  // hidden in the markup and shown here, because with scripts off it would do nothing; the
+  // list itself is whole either way. It narrows by the name in its own language and by the
+  // tag, hides a group left with no row, and says how many are left for a screen reader.
+  var languageFilter = picker && picker.querySelector("[data-language-filter]");
+  if (languageFilter) {
+    var filterInput = languageFilter.querySelector("input");
+    var filterStatus = languageFilter.querySelector("[data-language-filter-status]");
+    var filterEmpty = languageFilter.querySelector("[data-language-filter-empty]");
+    languageFilter.hidden = false;
+    filterInput.addEventListener("input", function () {
+      var wanted = filterInput.value.trim().toLowerCase();
+      var shown = 0;
+      Array.prototype.forEach.call(picker.querySelectorAll("[data-language-group]"), function (group) {
+        var inGroup = 0;
+        Array.prototype.forEach.call(group.querySelectorAll("[data-language-row]"), function (row) {
+          var match = !wanted || row.getAttribute("data-language-search").indexOf(wanted) !== -1;
+          row.hidden = !match;
+          inGroup += match ? 1 : 0;
+        });
+        group.hidden = inGroup === 0;
+        shown += inGroup;
+      });
+      filterEmpty.classList.toggle("hidden", shown > 0);
+      filterStatus.textContent = wanted ? String(shown) : "";
+    });
+    // Enter in the box must not submit the form; it chooses nothing.
+    filterInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+      }
+    });
   }
 
   function chooseLanguage(radio) {
@@ -5467,6 +5508,10 @@
 
   document.addEventListener("keydown", function (event) {
     if (!picker || !picker.open || !picker.contains(document.activeElement)) {
+      return;
+    }
+    // Typing in the search box is searching, not the type-ahead of the rows.
+    if (document.activeElement.type === "search") {
       return;
     }
     var radios = languageRadios();

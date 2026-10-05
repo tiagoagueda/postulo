@@ -51,6 +51,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A listing's description can be written in Markdown (lists, links, emphasis, quotes, headings), chosen per listing, drawn and sanitised on the server; the API and archive carry `description_format`. (#665)
 - Messaging handles, several per person and per contact, each checked against its service (Matrix, XMPP, Signal, Telegram, Threema or Other): a Messaging block on Your details and on a contact, kept in the archive, the API and a merge, never printed on a CV unless chosen; plugins can add services. (#682)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
+- The language picker in Settings can be searched by a language's own name or tag, and says plainly that a partly translated language shows English where its translation stops; TRANSLATING.md describes adding a language without a developer (#72)
 
 ### 🐛 Fixed
 
