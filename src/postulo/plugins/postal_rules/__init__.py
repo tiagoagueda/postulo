@@ -1,4 +1,4 @@
-"""Address rules, per country: what a part is called, what order the parts are written in,
+"""Address rules, per country: what a part is called, what order the form draws the parts in,
 what is expected -- and the little that is certain enough to refuse.
 
 > another internet plugin, multiple postal address, not unique across instance, validades is
@@ -117,7 +117,7 @@ NEUTRAL = {
         kind="feature",
         description=_(
             "Name each part of an address the way its own country does — State, Distrito, "
-            "Prefecture — draw the parts in that country's order, and check an address "
+            "Prefecture — draw the parts on the form in that country's order, and check an address "
             "against its country before it is kept: a postcode in a form the country never "
             "uses is refused, and so is an address that leaves empty a part every address "
             "there has, with the reason beside it. A town and a country alone, with no "
@@ -232,15 +232,6 @@ def label_for(part: str, country: str):
         return NEUTRAL[part]
     key = rule_for(country).calls.get(part) or NEUTRAL.get(part, part)
     return LABELS.get(key, LABELS.get(part, key))
-
-
-def expects(part: str, country: str) -> bool:
-    """Whether post in that country normally needs this part.
-
-    Read by the form to mark a field, never to refuse one. A field somebody leaves empty is
-    a warning at most.
-    """
-    return part in rule_for(country).expects
 
 
 def _parts_of(address) -> tuple[str, dict[str, str]]:
@@ -362,34 +353,6 @@ def warnings_for(address) -> list:
     return [sentence for _part, sentence in notes_for(address)]
 
 
-def render(address) -> list[str]:
-    """The parts in the order that country writes them, as lines.
-
-    A country with no row gets the order they were entered in, which is what an address with
-    no rules has always had and is never wrong enough to matter.
-    """
-    code = (getattr(address, "country", "") or "").strip().upper()
-    values = {part: (getattr(address, part, "") or "").strip() for part in PARTS}
-    # The country prints as its name, not its code: a letter is addressed to Portugal, not
-    # to PT. Everything else prints as it was typed.
-    values["country"] = _country_name(code)
-
-    order = rule_for(code).order or PARTS
-    lines = []
-    for group in order:
-        joined = " ".join(values.get(part, "") for part in group.split()).strip()
-        joined = " ".join(joined.split())
-        if joined:
-            lines.append(joined)
-    return lines
-
-
-def _country_name(code: str) -> str:
-    from postulo.core import phones
-
-    return phones.country_name(code) if len(code) == 2 else code
-
-
 __all__ = [
     "HELP",
     "LABELS",
@@ -403,13 +366,11 @@ __all__ = [
     "PostalRulesFeature",
     "Rule",
     "canonical",
-    "expects",
     "label_for",
     "lines_for",
     "notes_for",
     "place_for",
     "refusals_for",
-    "render",
     "rule_for",
     "warnings_for",
 ]

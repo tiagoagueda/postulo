@@ -953,51 +953,14 @@ def test_the_lines_follow_the_country():
 # ------------------------------------------------------------------ the printing
 
 
-def test_an_address_prints_the_way_its_country_writes_it():
-    lines = postal_rules.render(
-        address(country="PT", street="Rua do Exemplo 1", postcode="1000-001", municipality="Lisboa")
-    )
-
-    assert lines == ["Rua do Exemplo 1", "1000-001 Lisboa", "Portugal"]
-
-
-def test_and_differently_where_the_country_does():
-    british = postal_rules.render(
-        address(
-            country="GB", street="10 Downing Street", postcode="SW1A 2AA", municipality="London"
-        )
-    )
-    american = postal_rules.render(
-        address(
-            country="US",
-            street="1600 Pennsylvania Avenue NW",
-            postcode="20500",
-            municipality="Washington",
-            region="DC",
-        )
-    )
-
-    assert british == ["10 Downing Street", "London", "SW1A 2AA", "United Kingdom"]
-    assert american == ["1600 Pennsylvania Avenue NW", "Washington DC 20500", "United States"]
-
-
-def test_japan_writes_largest_first():
-    lines = postal_rules.render(
-        address(
-            country="JP", street="1-1", postcode="100-8111", municipality="Chiyoda", region="Tokyo"
-        )
-    )
-
-    assert lines[0] == "100-8111"
-    assert lines[-2] == "1-1"
-
-
-def test_a_country_with_no_rules_prints_in_the_order_it_was_entered():
-    lines = postal_rules.render(
-        address(country="ZZ", street="Somewhere 1", postcode="0000", municipality="A town")
-    )
-
-    assert lines == ["Somewhere 1", "0000", "A town", "ZZ"]
+def test_no_page_prints_an_address_through_the_rules():
+    """Nothing prints an address in its country's order (#643): the order column draws the
+    form's lines (`lines_for`), and an address is shown as it was entered. A function that
+    would print one was kept for years with no caller, and would have collapsed a two-line
+    street and dropped a typed region; it comes back with a caller and its own test."""
+    for module in (postal_rules, postal):
+        assert not hasattr(module, "render")
+    assert not hasattr(postal_rules, "expects")
 
 
 # ---------------------------------------------------------------- switched off

@@ -1,5 +1,5 @@
-"""What an address looks like in each country: what its parts are called, the order they are
-written in, the form its postcode takes and the parts it cannot do without.
+"""What an address looks like in each country: what its parts are called, the order a form
+draws them in, the form its postcode takes and the parts it cannot do without.
 
 A **curated table**, which is the shape this codebase already uses for everything of this
 kind — `phones.COUNTRIES`, `NATIVE_NAMES`, `PLURAL_FORMS`, `FLAG_COUNTRIES` — each entry
@@ -15,9 +15,9 @@ Postulo could not call at render time in any case.
 
 **What is borrowed, and it is an idea rather than a file.** OpenCage's `address-formatting`
 is MIT and covers 251 territories with templates and test cases, and it does exactly one
-thing: renders the parts in the right order for a country. The ``order`` column below is that
-idea, hand-written for the places Postulo speaks the language of. Their work is worth reading
-before extending this.
+thing: puts the parts in the right order for a country. The ``order`` column below is that
+idea, which the form draws its lines from (``lines_for``), hand-written for the places
+Postulo speaks the language of. Their work is worth reading before extending this.
 
 **It fails in the right direction.** A country with no row gets no rules: free-form entry, no
 warnings, nothing refused, and the parts in the order they were entered. An absent row is a
@@ -117,7 +117,8 @@ class Rule:
     #: What to call each part in this country. Keys are part names; values are label keys
     #: that `LABELS` turns into words in the *reader's* language.
     calls: dict[str, str] = field(default_factory=dict)
-    #: The order the parts are written in. Empty means the order they were entered in.
+    #: The order the parts are written in, which the form draws its lines in (`lines_for`).
+    #: Empty means the lines it always drew.
     order: tuple[str, ...] = ()
     #: Why this row says what it says, where that is not obvious.
     note: str = ""

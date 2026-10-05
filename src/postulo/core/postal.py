@@ -233,15 +233,6 @@ def help_for(person=None):
     return postal_rules.HELP
 
 
-def render(address, *, person=None) -> list[str]:
-    """The address as lines, in the order its country writes them."""
-    from postulo.plugins import postal_rules
-
-    if person is not None and not rules_apply(person):
-        return [part for part in address.one_line(chr(10)).split(chr(10)) if part]
-    return postal_rules.render(address)
-
-
 # --------------------------------------------------------------- the rows on a page
 
 
