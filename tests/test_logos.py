@@ -308,6 +308,37 @@ def test_a_site_with_nothing_usable_says_so(web, company, monkeypatch):
         logos.find_on_website(company)
 
 
+def test_a_site_that_blocks_the_icon_says_why(web, company, monkeypatch):
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(
+            url="https://blackmesa.test/",
+            html=a_page(icon='<link rel="icon" href="/only.png">').decode(),
+        ),
+    )
+    web["responses"]["https://blackmesa.test/only.png"] = (403, b"", "text/plain")
+    with pytest.raises(logos.UnusableLogo, match=r"Nothing on blackmesa\.test.*403"):
+        logos.find_on_website(company)
+
+
+def test_the_favicon_is_tried_however_many_icons_a_page_declares(web, company, monkeypatch):
+    icons = "".join(
+        f'<link rel="apple-touch-icon" sizes="{n}x{n}" href="/touch{n}.png">'
+        for n in (57, 60, 72, 76, 114, 120, 144)
+    )
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(
+            url="https://blackmesa.test/", html=a_page(icons=icons).decode()
+        ),
+    )
+    with pytest.raises(logos.UnusableLogo):
+        logos.find_on_website(company)
+    assert "https://blackmesa.test/favicon.ico" in web["calls"]
+
+
 def test_a_company_with_no_website_has_nowhere_to_look(user):
     company = Company.objects.create(owner=user, name="Aperture")
     with pytest.raises(logos.UnusableLogo, match="no website"):

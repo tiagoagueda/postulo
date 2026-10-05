@@ -41,6 +41,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- Find logo now says why a site gave nothing, and always tries the favicon (#526)
 - Fixed: THIRD-PARTY.md now lists the NACE table and the GeoNames and ESCO data downloaded when an instance is provisioned, and a test finds any licence file the register does not name (#579)
 - Removed the duplicate Search row from the phone bottom bar's More menu, and More is no longer drawn when nothing is under it (#339)
 - The dashboard widget code no longer declares one field three times, and the linter now catches that mistake (#501)

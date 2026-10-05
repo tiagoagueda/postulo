@@ -433,11 +433,12 @@ def find_on_website(company) -> str:
     except Exception:  # pragma: no cover - a broken page is not an error worth showing
         logger.exception("Could not read the markup of %r", website)
     base = page.url or website
-    candidates = [urljoin(base, href) for href in parser.candidates()]
+    # Five declared images at most, so that the conventional favicon is always the sixth try.
+    candidates = [urljoin(base, href) for href in parser.candidates()][:5]
     candidates.append(urljoin(base, "/favicon.ico"))
 
     problems = []
-    for candidate in candidates[:6]:
+    for candidate in candidates:
         try:
             content, extension = process(download(candidate))
             store(company, content, source="website", url=candidate, extension=extension)
@@ -445,7 +446,10 @@ def find_on_website(company) -> str:
             problems.append(str(error))
             continue
         return candidate
+    host = urlsplit(base).hostname or website
+    for problem in problems[1:]:
+        logger.info("Logo for %s: %s", host, problem)
     raise UnusableLogo(
-        str(_("Nothing on %(host)s could be used as a logo."))
-        % {"host": urlsplit(base).hostname or website}
+        str(_("Nothing on %(host)s could be used as a logo: %(reason)s"))
+        % {"host": host, "reason": problems[0] if problems else ""}
     )
