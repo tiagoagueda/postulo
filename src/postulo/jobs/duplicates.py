@@ -28,7 +28,9 @@ Four signals, and each is said with the record it matched:
 from __future__ import annotations
 
 import unicodedata
+from collections import defaultdict
 from dataclasses import dataclass
+from functools import lru_cache
 from urllib.parse import urlsplit
 
 from django.utils.translation import gettext as _
@@ -132,10 +134,20 @@ def _forms(written: tuple[str, ...]) -> tuple[tuple[str, ...], ...]:
     return tuple(sorted((form for form in folded if form), key=len, reverse=True))
 
 
-_TRAILING = _forms(LEGAL_FORMS)
-_LEADING = _forms(LEADING_FORMS)
+def _by_edge_word(forms: tuple[tuple[str, ...], ...], *, front: bool) -> dict[str, tuple]:
+    """The forms keyed by the word they touch the name's edge with, longest first within a key,
+    so a name is checked against the few forms that can match and not against all of them (#553)."""
+    keyed: dict[str, list[tuple[str, ...]]] = defaultdict(list)
+    for form in forms:
+        keyed[form[0 if front else -1]].append(form)
+    return {word: tuple(group) for word, group in keyed.items()}
 
 
+_TRAILING = _by_edge_word(_forms(LEGAL_FORMS), front=False)
+_LEADING = _by_edge_word(_forms(LEADING_FORMS), front=True)
+
+
+@lru_cache(maxsize=8192)
 def bare_name(name: str) -> str:
     """A company's name with its legal form set aside, for comparing and for nothing else.
 
@@ -151,7 +163,7 @@ def bare_name(name: str) -> str:
 
     def strip(forms, *, front: bool) -> bool:
         """Take one form off one end, if one is there and something would be left."""
-        for form in forms:
+        for form in forms.get(words[0 if front else -1], ()) if words else ():
             size = len(form)
             if len(words) <= size:
                 continue

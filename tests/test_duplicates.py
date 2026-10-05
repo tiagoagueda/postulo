@@ -543,3 +543,16 @@ def test_the_notice_says_it_in_words_and_offers_only_the_page_that_shows_first(u
         "a page of these is a page of buttons that all say Merge, unless each says which"
     )
     assert "<form" not in html and "<button" not in html, "a link to a page, and nothing that acts"
+
+
+def test_bare_name_stays_cheap_over_many_names():
+    """The legal forms are looked up by their edge word, not scanned one by one (#553)."""
+    import time
+
+    names = [f"Company {n} GmbH & Co. KG" for n in range(2000)]
+    duplicates.bare_name.cache_clear()
+    started = time.perf_counter()
+    for name in names:
+        duplicates.bare_name(name)
+    assert time.perf_counter() - started < 0.25
+    assert duplicates.bare_name("Company 7 GmbH & Co. KG") == "company7"
