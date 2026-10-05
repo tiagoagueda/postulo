@@ -97,8 +97,9 @@ def test_a_forged_post_changes_nothing_it_should_not(client, user):
     )
     assert client.get(reverse("settings:appearance")).status_code == 200
     user.profile.refresh_from_db()
-    assert set(user.profile.identifier_order) <= set(identifiers.registry())
+    assert "bogus" not in user.profile.identifier_order
     assert "bogus" not in user.profile.hidden_identifiers
+    assert set(user.profile.identifier_order) <= set(identifiers.registry())
 
 
 def test_a_post_without_the_list_changes_nothing(client, user):
@@ -127,7 +128,9 @@ def test_the_page_lists_every_scheme_with_a_switch_and_arrows(client, user):
     for key in identifiers.registry():
         assert f'id="ident-row-{key}"' in html
         assert f'value="up:{key}"' in html
-        assert f'value="{key}" checked' in html or f'value="{key}"' in html
+        assert re.search(
+            rf'<input[^>]*name="identifiers_shown"[^>]*value="{key}"[^>]*checked', html
+        )
     assert 'name="ident_reset"' not in html, "nothing to go back to yet"
 
 
@@ -190,7 +193,7 @@ def test_the_company_page_follows_the_order_and_counts_what_is_hidden(client, us
     html = client.get(url).content.decode()
     assert LEI not in html
     assert "Q95" in html
-    assert "data-identifiers-hidden" in html and "1 hidden" in html
+    assert "data-identifiers-hidden" in html and "1 identifier hidden" in html
     assert f"{reverse('jobs:company_update', args=[company.pk])}#section-identifiers" in html
 
 
@@ -211,7 +214,7 @@ def test_a_company_with_only_hidden_identifiers_still_says_so(client, user):
     user.profile.save()
     client.force_login(user)
     html = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
-    assert "1 hidden" in html
+    assert "1 identifier hidden" in html
 
 
 def test_your_details_and_the_cvs_choice_follow_the_order(client, user):
