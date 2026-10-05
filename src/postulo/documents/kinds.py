@@ -133,11 +133,6 @@ def choices() -> list[tuple[str, object]]:
     return [(kind.key, kind.label) for kind in REGISTRY.values()]
 
 
-def authored_choices() -> list[tuple[str, object]]:
-    """The kinds Postulo composes. What a *render* can be filed as."""
-    return [(kind.key, kind.label) for kind in REGISTRY.values() if kind.authored]
-
-
 def theme_kind_for(key: str) -> str:
     """Which theme vocabulary sets this kind, or empty where none does."""
     kind = REGISTRY.get(key)

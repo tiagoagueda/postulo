@@ -460,14 +460,6 @@ class PhoneNumber(OwnedModel):
         self.verified_at = timezone.now()
         self.save(update_fields=["verified_at", "updated_at"])
 
-    def forget_verification(self) -> None:
-        """Unprove it, because the number itself changed and that is a new claim."""
-        if self.verified_at is None and not self.is_recovery:
-            return
-        self.verified_at = None
-        self.is_recovery = False
-        self.save(update_fields=["verified_at", "is_recovery", "updated_at"])
-
 
 class PostalAddress(OwnedModel):
     """One postal address belonging to a person or to a contact.

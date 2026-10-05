@@ -586,7 +586,6 @@ def _catch_up(application: Application, kind: str, *, occurred_at, actor: str) -
 #: and the point of the control is not having to make one; anything else is *a date*.
 LATER_TOMORROW = "tomorrow"
 LATER_NEXT_WEEK = "next_week"
-LATER_CHOICES = (LATER_TOMORROW, LATER_NEXT_WEEK)
 
 #: How far out each of them moves the reminder. A week rather than seven days from the
 #: original: somebody pressing *Later* on a reminder that fell due last Tuesday means a week

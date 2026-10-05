@@ -26,7 +26,6 @@ def test_a_primary_key_is_a_number_or_nothing(value, expected):
     [
         ("applications:reminder_create", "application"),
         ("jobs:contact_create", "company"),
-        ("jobs:posting_create", "company"),
     ],
 )
 def test_a_preselection_that_is_not_a_number_is_ignored(user, client, name, parameter):

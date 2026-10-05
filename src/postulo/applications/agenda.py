@@ -175,10 +175,6 @@ class Event:
         return timezone.localtime(self.starts_at)
 
     @property
-    def local_end(self) -> dt.datetime | None:
-        return timezone.localtime(self.ends_at) if self.ends_at else None
-
-    @property
     def is_span(self) -> bool:
         return self.ends_at is not None
 

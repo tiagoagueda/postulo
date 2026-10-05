@@ -228,14 +228,6 @@ def core_set() -> CatalogueSet:
     return catalogue_sets()[0]
 
 
-def owner_of(path: Path) -> CatalogueSet:
-    """Which set claims a source file: the innermost whose root contains it."""
-    return max(
-        (s for s in catalogue_sets() if _within(path, s.root)),
-        key=lambda s: len(s.root.parts),
-    )
-
-
 PLACEHOLDER = re.compile(r"%\((\w+)\)[sdifr]|%[sdifr%]|\{(\w*)\}")
 
 

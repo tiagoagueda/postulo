@@ -21,11 +21,6 @@ from .mail_choices import MailSecurity
 #: Split out only because it does not fit on a line inside the branch that raises it.
 NO_STARTTLS = _("The server does not offer STARTTLS. Turn it off, or use a port that does.")
 
-#: The port each kind of connection is conventionally offered on. Used only to explain a
-#: failure -- never to refuse one, because a relay on a port of its own is ordinary.
-CONVENTIONAL_PORTS = {"none": (25,), "starttls": (587, 25), "ssl": (465,)}
-
-
 #: The port each kind of connection is normally offered on. A suggestion, filled in when
 #: nobody typed one -- never a correction of a port somebody did type, because a relay on a
 #: port of its own is an ordinary thing for a self-hosted instance to have.
@@ -47,7 +42,8 @@ def _mismatch(security: str, port: int) -> str:
     the wait is the worst part of it. Pointing one at the other's port is not an exotic
     mistake: the two ports are documented interchangeably by half the providers there are.
     """
-    if security != "ssl" and port == 465:
+    ssl_port = DEFAULT_MAIL_PORTS[MailSecurity.SSL]
+    if security != MailSecurity.SSL and port == ssl_port:
         return str(
             _(
                 "Port 465 expects TLS from the first byte, so it is waiting for a "
@@ -55,7 +51,8 @@ def _mismatch(security: str, port: int) -> str:
                 "first byte”, or use port 587 with STARTTLS."
             )
         )
-    if security == "ssl" and port in (587, 25):
+    clear_ports = (DEFAULT_MAIL_PORTS[MailSecurity.STARTTLS], DEFAULT_MAIL_PORTS[MailSecurity.NONE])
+    if security == MailSecurity.SSL and port in clear_ports:
         return str(
             _(
                 "Port %(port)s expects a connection in the clear that is upgraded "

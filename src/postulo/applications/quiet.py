@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
-from collections import defaultdict
 
 from django.urls import reverse
 from django.utils import timezone
@@ -145,14 +144,6 @@ def _announcement(applications: list[Application], now) -> Notification:
         occurred_at=now,
         data={"application_ids": [row.pk for row in applications], "count": count},
     )
-
-
-def quiet_by(applications: list[Application], key) -> dict[str, int]:
-    """Count quiet applications grouped by ``key(application)``, for the figures."""
-    counts: dict[str, int] = defaultdict(int)
-    for application in applications:
-        counts[key(application)] += 1
-    return dict(counts)
 
 
 def snooze_until(now=None) -> dt.datetime:

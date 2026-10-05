@@ -50,7 +50,6 @@ from .translatable import (  # noqa: F401 - re-exported: views, candidate, rende
     _gather,
     _model_name,
     fields_for,
-    may_translate,
     overrides_for,
     record_language_of,
     stored_for,

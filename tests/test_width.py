@@ -64,7 +64,6 @@ WIDE = [
 #: paragraph, so these keep the 1280-pixel measure.
 MEASURED = [
     "/applications/new/",
-    "/jobs/postings/new/",
     "/documents/letters/new/",
     "/career/",
     # Three cards that could sit two by two, but two of its 768-pixel columns need a window

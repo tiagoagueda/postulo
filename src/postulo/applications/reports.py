@@ -369,9 +369,6 @@ class Tally:
     name: str
     count: int
 
-    def share_of(self, total: int) -> float:
-        return 100 * self.count / total if total else 0.0
-
 
 @dataclass
 class Happened:

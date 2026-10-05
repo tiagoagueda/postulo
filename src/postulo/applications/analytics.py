@@ -678,24 +678,3 @@ def _endings(applications) -> Endings:
     )
     summary.reasons = sorted(reasons.values(), key=lambda row: (not row.key, -row.total, row.label))
     return summary
-
-
-def applications_needing_a_nudge(user, *, after_days: int = 14) -> list[Application]:
-    """Applications that were sent, never answered, and are getting old."""
-    cutoff = timezone.now() - dt.timedelta(days=after_days)
-    candidates = (
-        Application.objects.for_user(user)
-        .filter(applied_at__lte=cutoff, status__in=[Status.APPLIED, Status.ACKNOWLEDGED])
-        .with_display_data()
-    )
-    return list(candidates)
-
-
-def has_enough_history(user) -> bool:
-    """Whether there is enough recorded to be worth showing figures at all."""
-    return (
-        Application.objects.for_user(user).aggregate(
-            sent=Count("id", filter=Q(applied_at__isnull=False))
-        )["sent"]
-        > 0
-    )

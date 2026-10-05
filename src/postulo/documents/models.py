@@ -193,11 +193,6 @@ class CVKind(models.TextChoices):
     PORTFOLIO = "portfolio", _("Portfolio")
 
 
-#: What each kind starts out set in. A portfolio leads with the work, so it gets the theme
-#: written for that; a CV keeps the one it has always had.
-CV_THEMES = {CVKind.CV: "plain", CVKind.PORTFOLIO: "plain"}
-
-
 class Prints(models.TextChoices):
     """How one CV chooses the detail it prints of one kind (#308).
 
@@ -436,15 +431,6 @@ class CVItem(OwnedModel):
 
     def __str__(self) -> str:
         return str(self.item) if self.item else str(_("Missing entry"))
-
-    @property
-    def highlight_lines(self) -> list[str]:
-        """The highlights to render: this variant's override, or the master copy."""
-        from postulo.resume.models import split_highlights
-
-        if self.override_highlights.strip():
-            return split_highlights(self.override_highlights)
-        return split_highlights(getattr(self.item, "highlights", ""))
 
 
 class LetterKind(models.TextChoices):

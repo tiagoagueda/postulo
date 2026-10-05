@@ -91,7 +91,6 @@ urlpatterns = [
         page_views.CapturedPageForgetView.as_view(),
         name="capture_page_forget",
     ),
-    path("postings/new/", views.PostingCreateView.as_view(), name="posting_create"),
     path("postings/<int:pk>/", views.PostingDetailView.as_view(), name="posting_detail"),
     path("postings/<int:pk>/edit/", views.PostingUpdateView.as_view(), name="posting_update"),
     path("postings/<int:pk>/delete/", views.PostingDeleteView.as_view(), name="posting_delete"),

@@ -935,10 +935,6 @@ class Suggestion(OwnedModel):
     def is_pending(self) -> bool:
         return self.status == SuggestionStatus.PENDING
 
-    @property
-    def is_matched(self) -> bool:
-        return self.application_id is not None
-
 
 #: What a year of each period is, for putting two offers beside each other (#237). The
 #: same conventional full-time year `with_salary_order` uses to sort a column (#224): 1,680

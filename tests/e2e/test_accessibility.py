@@ -470,7 +470,6 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/jobs/captures/",
         # The page a button that sends work off lands on, finished (#247).
         f"/working/{errand.pk}/",
-        "/jobs/postings/new/",
         "/documents/cvs/",
         "/documents/cvs/new/",
         "/documents/letters/",
@@ -536,7 +535,6 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/jobs/contacts/new/",
         "/jobs/industries/new/",
         "/jobs/captures/new/",
-        "/jobs/postings/new/",
         "/career/education/new/",
         # The skill box, with the list htmx fills as somebody types beside it (#266).
         "/career/skill/new/",

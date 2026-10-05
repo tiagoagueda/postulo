@@ -427,3 +427,16 @@ def test_the_state_cell_the_tab_and_the_sort_agree(user, company, stored, when, 
     assert (
         everything.with_application_count().with_state_order().get(pk=row.pk).state_order == order
     )
+
+
+def test_the_old_posting_form_has_no_address_and_listings_are_added_through_the_listings_page(
+    client, user
+):
+    """One way to add a listing (#401): the orphaned `jobs:posting_create` route is gone."""
+    from django.urls import NoReverseMatch
+
+    with pytest.raises(NoReverseMatch):
+        reverse("jobs:posting_create")
+    client.force_login(user)
+    assert client.get("/jobs/postings/new/").status_code == 404
+    assert client.get(reverse("listings:create")).status_code == 200

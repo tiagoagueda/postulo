@@ -56,10 +56,6 @@ class Ending:
     ended_at: dt.datetime | None = None
 
     @property
-    def status_label(self) -> str:
-        return _label(Status, self.status)
-
-    @property
     def last_stage_label(self) -> str:
         return _label(Status, self.last_stage)
 

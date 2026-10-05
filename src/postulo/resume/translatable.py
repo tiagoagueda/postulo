@@ -49,10 +49,6 @@ def fields_for(subject) -> tuple[str, ...]:
     return TRANSLATABLE.get(_model_name(subject), ())
 
 
-def may_translate(subject, field: str) -> bool:
-    return field in fields_for(subject)
-
-
 # ------------------------------------------------------------------ matching a language
 #
 # How one code is written and compared with another is `postulo.core.languages`' to say,

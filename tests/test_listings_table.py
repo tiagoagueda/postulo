@@ -381,15 +381,3 @@ def test_cancel_on_the_edit_form_goes_back_to_the_listing(client, user, company)
     response = client.get(reverse("jobs:posting_update", args=[posting.pk]))
 
     assert cancel_href(response) == posting.get_absolute_url()
-
-
-def test_cancel_on_the_new_form_goes_back_to_the_company_it_was_opened_for(
-    client, user, other_user, company
-):
-    client.force_login(user)
-    new = reverse("jobs:posting_create")
-
-    assert cancel_href(client.get(new, {"company": company.pk})) == company.get_absolute_url()
-    assert cancel_href(client.get(new)) == reverse(LIST), "otherwise the Listings page"
-    foreign = Company.objects.create(owner=other_user, name="Elsewhere")
-    assert cancel_href(client.get(new, {"company": foreign.pk})) == reverse(LIST)

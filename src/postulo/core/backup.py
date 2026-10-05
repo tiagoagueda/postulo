@@ -37,7 +37,7 @@ import sqlite3
 import subprocess
 import tarfile
 import tempfile
-from dataclasses import asdict, dataclass, field
+from dataclasses import dataclass, field
 from pathlib import Path, PurePosixPath
 
 from django.conf import settings
@@ -725,10 +725,3 @@ def restore_backup(
     if recorded:
         report.key_matches = recorded == secrets.fingerprint()
     return report
-
-
-def as_dict(report: BackupReport | RestoreReport) -> dict:
-    data = asdict(report)
-    if "path" in data:
-        data["path"] = str(data["path"])
-    return data

@@ -5,7 +5,6 @@ from __future__ import annotations
 from django.contrib import messages
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
-from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import ListView
@@ -71,6 +70,3 @@ class ApiTokenRevokeView(OwnedObjectMixin, View):
         token.revoke()
         messages.success(request, _("Token revoked."))
         return redirect("api:token_list")
-
-
-token_list_url = reverse_lazy("api:token_list")
