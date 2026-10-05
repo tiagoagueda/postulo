@@ -320,3 +320,26 @@ def test_a_country_name_two_countries_share_keeps_both(data_dir, monkeypatch):
         assert places.resolve("Valencia, Iberia") is None
     finally:
         places._countries.cache_clear()
+
+
+def test_a_save_reads_the_lookup_and_never_parses_the_table(data_dir, monkeypatch, user):
+    """The table is parsed at provisioning (#399): with its lookup beside it, a company
+    saved with a location reads that and nothing else, so no request pays for the build."""
+    places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
+
+    def refuse(*args, **kwargs):
+        raise AssertionError("the table was parsed on a save")
+
+    monkeypatch.setattr(places, "build_lookup", refuse)
+    company = Company.objects.create(owner=user, name="Acme", location="Lisboa, Portugal")
+
+    assert (company.location_lat, company.location_lon) == (38.7167, -9.1333)
+
+
+def test_a_table_without_a_lookup_gets_one_built_beside_it(data_dir):
+    assert not (data_dir / places.LOOKUP_FILE).exists()
+
+    assert places.resolve("Berlin")["country"] == "DE"
+
+    assert (data_dir / places.LOOKUP_FILE).is_file()
+    assert places.cities() == len(CITY_ROWS)

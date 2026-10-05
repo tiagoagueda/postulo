@@ -159,6 +159,7 @@ def test_the_download_is_checked_and_written_where_the_loader_reads_it(run, data
 
     assert (data_dir / places.CITIES_FILE).is_file()
     assert (data_dir / places.COUNTRIES_FILE).is_file()
+    assert (data_dir / places.LOOKUP_FILE).is_file()
     assert client.requests == [fetch_geonames.CITIES_URL, fetch_geonames.COUNTRIES_URL]
 
 

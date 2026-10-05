@@ -25,6 +25,8 @@ from __future__ import annotations
 
 import logging
 import os
+import sqlite3
+import tempfile
 import unicodedata
 from collections.abc import Iterator
 from functools import lru_cache
@@ -48,6 +50,9 @@ DATA_DIR = Path(
 #: terms.
 CITIES_FILE = "geonames-cities1000.txt"
 COUNTRIES_FILE = "geonames-countryinfo.txt"
+
+#: What the cities table is indexed into at provisioning, so no process parses it (#399).
+LOOKUP_FILE = "geonames-cities1000.sqlite"
 
 #: Once is enough to say the dataset is not there; the absence is not an error to repeat.
 _warned = False
@@ -73,15 +78,67 @@ def _cities_file() -> Path | None:
     return path if path.is_file() else None
 
 
-@lru_cache(maxsize=1)
-def _index() -> dict[str, tuple[dict, ...]]:
-    """The table by every name it answers to, folded, so a match is a dictionary look.
+def _lookup_path() -> Path:
+    return DATA_DIR / LOOKUP_FILE
 
-    A city's row is indexed under its own name, its ascii name and each of the
-    alternates the table carries — "Lisboa" answers to "Lisbon" because the table says
-    so, not because the matcher believes it. Read once per process, the way the ESCO
-    classification is: the table is a few megabytes and a save is not where it gets
-    reparsed.
+
+def build_lookup(cities: Path, target: Path) -> int:
+    """Write the lookup database for the table at ``cities`` to ``target``; the city count.
+
+    Every name a city answers to, folded (its own, its ascii name and the alternates the
+    table carries) points at its row, so a match is an indexed read and no process holds
+    the table in memory. "Lisboa" answers to "Lisbon" because the table says so, not
+    because the matcher believes it. ``manage.py fetch_geonames`` runs this once at
+    provisioning; the file is replaced atomically, so a reader never sees half of one.
+    """
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(target.name + ".tmp")
+    temporary.unlink(missing_ok=True)
+    connection = sqlite3.connect(temporary)
+    try:
+        connection.executescript(
+            "CREATE TABLE cities (id INTEGER PRIMARY KEY, name TEXT, lat REAL, lon REAL,"
+            " country TEXT, population INTEGER);"
+            "CREATE TABLE names (key TEXT, city INTEGER, PRIMARY KEY (key, city))"
+            " WITHOUT ROWID;"
+        )
+        count = 0
+        with cities.open(encoding="utf-8") as handle:
+            for line in handle:
+                columns = line.rstrip("\r\n").split("\t")
+                if len(columns) < 15:
+                    continue
+                count += 1
+                connection.execute(
+                    "INSERT INTO cities VALUES (?, ?, ?, ?, ?, ?)",
+                    (
+                        count,
+                        columns[1],
+                        float(columns[4]),
+                        float(columns[5]),
+                        columns[8],
+                        int(columns[14] or 0),
+                    ),
+                )
+                keys = {fold(name) for name in [columns[1], columns[2], *columns[3].split(",")]}
+                connection.executemany(
+                    "INSERT INTO names VALUES (?, ?)", [(key, count) for key in keys if key]
+                )
+        connection.commit()
+    finally:
+        connection.close()
+    os.replace(temporary, target)
+    return count
+
+
+@lru_cache(maxsize=1)
+def _index() -> Path | None:
+    """The lookup database to read, or ``None`` where the dataset is not on this machine.
+
+    Provisioning writes it beside the table (``fetch_geonames``), so this is a path
+    and no request parses anything. An install that has the table from before the
+    lookup existed, or whose lookup is older than its table, gets it built here once,
+    beside the table, or in a temporary directory where that one is not writable.
     """
     path = _cities_file()
     if path is None:
@@ -93,24 +150,36 @@ def _index() -> dict[str, tuple[dict, ...]]:
                 "not placed on the map. Run 'manage.py fetch_geonames' to download it "
                 "in place."
             )
-        return {}
-    index: dict[str, list[dict]] = {}
-    for line in path.read_text(encoding="utf-8").splitlines():
-        columns = line.split("\t")
-        if len(columns) < 15:
-            continue
-        row = {
-            "name": columns[1],
-            "lat": float(columns[4]),
-            "lon": float(columns[5]),
-            "country": columns[8],
-            "population": int(columns[14] or 0),
-        }
-        for name in [columns[1], columns[2], *columns[3].split(",")]:
-            key = fold(name)
-            if key:
-                index.setdefault(key, []).append(row)
-    return {key: tuple(rows) for key, rows in index.items()}
+        return None
+    lookup = _lookup_path()
+    if lookup.is_file() and lookup.stat().st_mtime_ns >= path.stat().st_mtime_ns:
+        return lookup
+    try:
+        build_lookup(path, lookup)
+    except OSError:
+        lookup = Path(tempfile.mkdtemp(prefix="postulo-geonames-")) / LOOKUP_FILE
+        build_lookup(path, lookup)
+    return lookup
+
+
+def _candidates(key: str) -> list[dict]:
+    """Every city that answers to the folded name ``key``, as rows."""
+    lookup = _index()
+    if lookup is None:
+        return []
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        found = connection.execute(
+            "SELECT c.name, c.lat, c.lon, c.country, c.population FROM names n"
+            " JOIN cities c ON c.id = n.city WHERE n.key = ?",
+            (key,),
+        ).fetchall()
+    finally:
+        connection.close()
+    return [
+        {"name": name, "lat": lat, "lon": lon, "country": country, "population": population}
+        for name, lat, lon, country, population in found
+    ]
 
 
 @lru_cache(maxsize=1)
@@ -170,9 +239,16 @@ def available() -> bool:
 
 
 def cities() -> int:
-    """How many distinct cities the table answers to; a download that answered with a
+    """How many cities the table holds; a download that answered with a
     handful is not a download, and the command that wrote the file checks it."""
-    return len(_index())
+    lookup = _index()
+    if lookup is None:
+        return 0
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        return connection.execute("SELECT COUNT(*) FROM cities").fetchone()[0]
+    finally:
+        connection.close()
 
 
 def resolve(text: str) -> dict | None:
@@ -191,7 +267,7 @@ def resolve(text: str) -> dict | None:
     parts = [part.strip() for part in text.replace(";", ",").split(",")]
     city = parts[0]
     country = ", ".join(parts[1:]) if len(parts) > 1 else ""
-    candidates = _index().get(fold(city))
+    candidates = _candidates(fold(city))
     if not candidates:
         return None
     if country:

@@ -4,7 +4,7 @@
 ``data/geonames-countryinfo.txt``; this command is how the files get there. It asks
 download.geonames.org for the table of the cities above a thousand inhabitants and the
 table of the countries, and writes them beside the code that reads them. The download
-is one request per table, at provisioning, for data that is a few megabytes — a
+is one request per table, at provisioning, for data that is a few dozen megabytes — a
 repository is not where reference data is kept, and neither is a request on the path
 of a save.
 
@@ -32,11 +32,11 @@ from postulo.plugins.http import public_only_client
 CITIES_URL = "https://download.geonames.org/export/dump/cities1000.zip"
 COUNTRIES_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
 
-#: A minute and a half for a file of a few megabytes; more than that is a connection
+#: A minute and a half for a file of a few dozen megabytes; more than that is a connection
 #: in trouble, not a dataset.
 TIMEOUT = 90.0
 
-#: The cities1000 table is twenty thousand rows; an answer with a handful is not the
+#: The cities1000 table is some 170,000 rows; an answer with a handful is not the
 #: table, and the download is a refusal in a different coat.
 MINIMUM_CITIES = 10000
 
@@ -66,14 +66,16 @@ class Command(BaseCommand):
         self._validate(cities, countries)
         self._write(places.DATA_DIR / places.CITIES_FILE, cities)
         self._write(places.DATA_DIR / places.COUNTRIES_FILE, countries)
+        # The table is parsed here, once, into the lookup the saves read (#399).
+        places.build_lookup(places.DATA_DIR / places.CITIES_FILE, places._lookup_path())
         # The loader caches what it has read, and this process may have read the
         # absence; the new file is the state now.
         places._index.cache_clear()
         places._countries.cache_clear()
         self.stdout.write(
             self.style.SUCCESS(
-                "Wrote the city table and the country table. A location is placed from "
-                "them when it is saved."
+                "Wrote the city table, its lookup and the country table. A location is "
+                "placed from them when it is saved."
             )
         )
 
