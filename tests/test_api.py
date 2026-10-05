@@ -663,3 +663,37 @@ def test_a_refused_company_or_interview_write_keeps_nothing(client, user, search
     )
     assert response.status_code == 422
     assert Interview.objects.get(pk=interview.pk).location == "Room 1"
+
+
+def test_the_listing_detail_and_writes_carry_the_description_format(client, user):
+    bearer = issue(user, "read", "write")
+    made = post(
+        client,
+        "/api/v1/listings",
+        {
+            "company_name": "Initech",
+            "title": "Developer",
+            "description": "- **a**",
+            "description_format": "markdown",
+        },
+        **bearer,
+    )
+    assert made.status_code in (200, 201)
+    listing_id = made.json()["id"]
+    detail = client.get(f"/api/v1/listings/{listing_id}", **bearer).json()
+    # The source as it was stored, never markup.
+    assert detail["description"] == "- **a**" and detail["description_format"] == "markdown"
+    assert "<" not in detail["description"]
+
+    plain = post(client, "/api/v1/listings", {"company_name": "Initech", "title": "Two"}, **bearer)
+    assert (
+        client.get(f"/api/v1/listings/{plain.json()['id']}", **bearer).json()["description_format"]
+        == "plain"
+    )
+    refused = post(
+        client,
+        "/api/v1/listings",
+        {"company_name": "Initech", "title": "Three", "description_format": "html"},
+        **bearer,
+    )
+    assert refused.status_code == 422

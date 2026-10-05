@@ -102,7 +102,14 @@ def furnished(applicant):
     company = Company.objects.create(owner=applicant, name="Aperture Science", location="Cambridge")
     company.industries.set(Industry.named(applicant, ["Research"]))
     Contact.objects.create(owner=applicant, company=company, name="Cave Johnson", role="CEO")
-    JobPosting.objects.create(owner=applicant, company=company, title="Undecided Role")
+    # In Markdown, so the walk reads the rendered block in both themes (#665).
+    JobPosting.objects.create(
+        owner=applicant,
+        company=company,
+        title="Undecided Role",
+        description="## Duties\n\n- Calibrate **portals**\n- [Apply](https://example.com/apply)",
+        description_format="markdown",
+    )
     posting = JobPosting.objects.create(owner=applicant, company=company, title="Test Engineer")
     application = Application.objects.create(owner=applicant, posting=posting, status=Status.DRAFT)
     change_status(application, Status.APPLIED, occurred_at=timezone.now() - dt.timedelta(days=30))

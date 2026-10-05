@@ -71,6 +71,11 @@ POSTING_HELP = {
         "Paste the posting's text. It is kept exactly as pasted, and nothing is ever "
         "fetched from the address above to fill it."
     ),
+    "description_format": _(
+        "Plain text is shown as typed. Markdown shows paragraphs, **bold**, *italic*, "
+        "`code`, lists, quotes, [links](https://example.com) and # headings; raw HTML and "
+        "images are never shown. The text is stored as you typed it either way."
+    ),
 }
 
 
@@ -748,6 +753,7 @@ class JobPostingForm(OwnerScopedModelForm):
             "posted_at",
             "closes_at",
             "description",
+            "description_format",
         )
         widgets = {
             "posted_at": forms.DateInput(attrs={"type": "date"}),

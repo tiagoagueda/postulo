@@ -59,7 +59,11 @@
     <div class="min-w-0 lg:col-span-2">
       <c-section-title>{% translate "Description" %}</c-section-title>
       {% if posting.description %}
-        <div class="card whitespace-pre-line text-sm">{{ posting.description }}</div>
+        {% if posting.description_format == "markdown" %}
+          <div class="card text-sm"><div class="markdown-body">{{ posting.description_html }}</div></div>
+        {% else %}
+          <div class="card whitespace-pre-line text-sm">{{ posting.description }}</div>
+        {% endif %}
       {% else %}
         <c-empty variant="quiet">
           {% translate "Nothing saved. Postings vanish from the web; pasting the text keeps your copy." %}

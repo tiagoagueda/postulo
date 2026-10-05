@@ -108,7 +108,9 @@ logger = logging.getLogger(__name__)
 #: schemes the person sees and in what order, read back through the same filter as the
 #: navigation's pair (#672).
 #: 39 added ``save_as_you_go`` to the profile: a preference, so a restore keeps it (#656).
-FORMAT_VERSION = 39
+#: 40 added ``description_format`` on a listing, *plain* or *markdown*; an archive without
+#: it restores every description as plain text, as it was written (#665).
+FORMAT_VERSION = 40
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -276,6 +278,7 @@ POSTING_FIELDS = (
     "url",
     "source",
     "description",
+    "description_format",
     "salary_min",
     "salary_max",
     "salary_currency",

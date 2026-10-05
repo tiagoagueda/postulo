@@ -211,7 +211,7 @@ def search_listings(user, query: str, limit: int) -> Found:
             title=posting.title,
             subtitle=posting.company.name,
             url=posting.get_absolute_url(),
-            excerpt=excerpt(_first_match(query, posting.description, posting.location), query),
+            excerpt=excerpt(_first_match(query, posting.description_text, posting.location), query),
             in_title=query.lower() in posting.title.lower(),
         )
 

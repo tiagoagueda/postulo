@@ -69,6 +69,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.languages",
             "postulo.core.logs",
             "postulo.core.mail_choices",
+            # Markdown to sanitised markup for a listing's description (#665): a parser, an
+            # allowlist and nothing of Postulo's, read by the record that holds the text.
+            "postulo.core.markdown",
             "postulo.core.memo",
             # What an option of a select draws beside its words (#301): a widget and the
             # name of an icon, read by the identifiers' registry among the records.

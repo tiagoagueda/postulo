@@ -555,6 +555,52 @@
   /* The buttons are in basecoat.css: Basecoat's `.btn`, painted there in this palette, with
      the two destructive shapes #227 settled on under `data-variant` (#262). */
 
+  /* A listing's description written in Markdown (#665): what `core/markdown.py` lets
+     through and nothing else -- paragraphs, lists, quotes, headings from the third level
+     down, links and code. A card lays its children out in a column with a gap, so the
+     rendered block sits in a div of its own, and the rhythm is set here. */
+  .markdown-body {
+    @apply min-w-0 break-words;
+  }
+
+  .markdown-body > * + * {
+    @apply mt-3;
+  }
+
+  .markdown-body h3 {
+    @apply text-base font-semibold;
+  }
+
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    @apply text-sm font-semibold;
+  }
+
+  .markdown-body ul {
+    @apply list-disc ps-6;
+  }
+
+  .markdown-body ol {
+    @apply list-decimal ps-6;
+  }
+
+  .markdown-body li + li {
+    @apply mt-1;
+  }
+
+  .markdown-body blockquote {
+    @apply border-s-4 border-ink-300 ps-4 text-ink-600 dark:border-ink-600 dark:text-ink-300;
+  }
+
+  .markdown-body a {
+    @apply text-brand-600 underline dark:text-brand-400;
+  }
+
+  .markdown-body code {
+    @apply rounded bg-ink-100 px-1 font-mono text-[0.9em] dark:bg-ink-800;
+  }
+
   /* Choosing a tag's colour and its icon, on the one page where that is the subject (#285).
      Two radio groups and a preview, and the preview is the point: a name out of a select
      ("Violet", "graduation-cap") tells nobody what they are about to get.

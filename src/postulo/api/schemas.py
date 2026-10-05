@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import datetime as dt
 from decimal import Decimal
-from typing import Annotated
+from typing import Annotated, Literal
 
 from django.core.exceptions import ValidationError
 from django.urls import reverse
@@ -362,7 +362,10 @@ class ListingEventOut(Schema):
 
 
 class ListingDetailOut(ListingOut):
+    #: The source as it was stored, never HTML; a client that renders it picks its own
+    #: Markdown reader by `description_format` (#665).
     description: str = ""
+    description_format: str = "plain"
     #: What arrived about the listing, newest first (#270). An application's own timeline is
     #: on the application; this is the half before and beside it.
     events: list[ListingEventOut] = Field(default_factory=list)
@@ -444,6 +447,10 @@ class ListingIn(Schema):
     salary_period: str = Field(default="year", max_length=10)
     closes_at: dt.date | None = None
     description: str = ""
+    description_format: Literal["plain", "markdown"] = Field(
+        default="plain",
+        description="How `description` is read: plain (the default) or markdown. Stored as sent.",
+    )
 
     def posting_data(self) -> dict:
         """Only the listing's own fields — the one-step schema below adds more."""
@@ -1186,6 +1193,7 @@ def listing_out(request, posting, *, detail: bool = False) -> dict:
         from postulo.jobs.history import history_of
 
         data["description"] = posting.description
+        data["description_format"] = posting.description_format
         data["events"] = [listing_event_out(event) for event in history_of(posting)]
     return data
 

@@ -1085,6 +1085,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 posting_entry.pop("noted_at")
             posting_entry.setdefault("state", "new")
             posting_entry.setdefault("discard_reason", "")
+            # A file from before format 34 has none, and one that says something this
+            # instance does not know is read as plain text rather than refused (#665).
+            if posting_entry.get("description_format") not in ("plain", "markdown"):
+                posting_entry.pop("description_format", None)
 
             posting = JobPosting.objects.create(
                 owner=user,

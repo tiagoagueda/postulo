@@ -440,3 +440,121 @@ def test_the_old_posting_form_has_no_address_and_listings_are_added_through_the_
     client.force_login(user)
     assert client.get("/jobs/postings/new/").status_code == 404
     assert client.get(reverse("listings:create")).status_code == 200
+
+
+# ------------------------------------------------------------- Markdown in a description (#665)
+
+MARKDOWN = "## Duties\n\n- Calibrate **portals**\n- [Apply](https://example.com/apply)\n"
+
+
+def test_a_markdown_listing_shows_a_list_and_a_link_on_its_page(client, user, company):
+    item = listing(user, company, description=MARKDOWN, description_format="markdown")
+    client.force_login(user)
+    html = client.get(item.get_absolute_url()).content.decode()
+    assert "<li>Calibrate <strong>portals</strong></li>" in html
+    assert 'href="https://example.com/apply"' in html
+    assert 'rel="noopener noreferrer external"' in html
+    assert "<h3>Duties</h3>" in html
+
+
+def test_a_plain_listing_is_printed_as_typed_whatever_it_looks_like(client, user, company):
+    item = listing(user, company, description="- not a list\n**not bold** <b>x</b>")
+    assert item.description_format == "plain"
+    client.force_login(user)
+    html = client.get(item.get_absolute_url()).content.decode()
+    assert "- not a list\n**not bold** &lt;b&gt;x&lt;/b&gt;" in html
+    assert "<li>Calibrate" not in html and "<strong>not bold" not in html
+
+
+def test_the_table_and_the_search_excerpt_show_a_markdown_listing_as_words(client, user, company):
+    from postulo.core import search as searching
+    from postulo.core.tables import save_settings
+
+    listing(user, company, description=MARKDOWN, description_format="markdown")
+    client.force_login(user)
+    # The description is a column to choose, not one of the defaults.
+    save_settings(user, "listings", {"columns": ["title", "description"]})
+    html = client.get(reverse("listings:list")).content.decode()
+    assert "Calibrate portals" in html
+    assert "**portals**" not in html and "](https://example.com" not in html
+    group = next(g for g in searching.search(user, "portals") if g.kind == "listings")
+    excerpt = group.hits[0].excerpt
+    assert "portals" in excerpt and "**" not in excerpt and "](" not in excerpt
+
+
+def test_the_form_chooses_the_format_and_stores_the_text_as_typed(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("listings:create"),
+        {
+            "company_name": "Black Mesa",
+            "title": "Engineer",
+            "salary_period": "year",
+            "description": "**as typed**",
+            "description_format": "markdown",
+        },
+    )
+    assert response.status_code == 302
+    created = JobPosting.objects.get(owner=user)
+    assert created.description == "**as typed**" and created.description_format == "markdown"
+
+
+def test_a_listing_made_without_a_format_is_plain(client, user):
+    client.force_login(user)
+    client.post(
+        reverse("listings:create"),
+        {"company_name": "Black Mesa", "title": "Engineer", "salary_period": "year"},
+    )
+    assert JobPosting.objects.get(owner=user).description_format == "plain"
+
+
+def test_a_format_that_is_not_offered_is_refused(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("listings:create"),
+        {
+            "company_name": "Black Mesa",
+            "title": "Engineer",
+            "salary_period": "year",
+            "description_format": "html",
+        },
+    )
+    assert response.status_code == 200 and not JobPosting.objects.exists()
+
+
+def test_the_archive_carries_the_format_and_an_older_one_imports_as_plain(
+    user, other_user, company
+):
+    listing(user, company, description="# x", description_format="markdown")
+    document = build_document(user)
+    assert document["companies"][0]["postings"][0]["description_format"] == "markdown"
+    load(other_user, zipfile.ZipFile(io.BytesIO(write_archive(user).getvalue())))
+    assert JobPosting.objects.get(owner=other_user).description_format == "markdown"
+
+    JobPosting.objects.filter(owner=other_user).delete()
+    for posting in document["companies"][0]["postings"]:
+        posting.pop("description_format")
+    document["postulo"]["format"] = 33
+    older = io.BytesIO()
+    with zipfile.ZipFile(older, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    load(other_user, zipfile.ZipFile(io.BytesIO(older.getvalue())), force=True)
+    assert JobPosting.objects.get(owner=other_user).description_format == "plain"
+
+
+def test_an_archive_naming_a_format_this_instance_lacks_imports_as_plain(user, other_user, company):
+    listing(user, company, description="# x", description_format="markdown")
+    document = build_document(user)
+    document["companies"][0]["postings"][0]["description_format"] = "html"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr("postulo.json", json.dumps(document, default=str))
+    load(other_user, zipfile.ZipFile(io.BytesIO(buffer.getvalue())))
+    assert JobPosting.objects.get(owner=other_user).description_format == "plain"
+
+
+def test_somebody_elses_markdown_listing_is_a_404(client, user, other_user):
+    theirs = Company.objects.create(owner=other_user, name="Theirs")
+    item = listing(other_user, theirs, description=MARKDOWN, description_format="markdown")
+    client.force_login(user)
+    assert client.get(item.get_absolute_url()).status_code == 404

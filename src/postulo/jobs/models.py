@@ -753,6 +753,15 @@ class Contact(OwnedModel):
             )
 
 
+class DescriptionFormat(models.TextChoices):
+    """How a listing's description is read (#665). Plain is the default, because what a
+    capture keeps is text read off somebody's page and a line that begins with ``-`` or
+    ``#`` is a line there, not markup."""
+
+    PLAIN = "plain", _("Plain text")
+    MARKDOWN = "markdown", _("Markdown")
+
+
 class RemoteType(models.TextChoices):
     ONSITE = "onsite", _("On site")
     HYBRID = "hybrid", _("Hybrid")
@@ -1002,6 +1011,12 @@ class JobPosting(OwnedModel):
         help_text=_("Where you came across it: a job board, a referral, the company site."),
     )
     description = models.TextField(_("description"), blank=True)
+    description_format = models.CharField(
+        _("description format"),
+        max_length=10,
+        choices=DescriptionFormat.choices,
+        default=DescriptionFormat.PLAIN,
+    )
 
     salary_min = models.DecimalField(
         _("salary from"), max_digits=12, decimal_places=2, null=True, blank=True
@@ -1111,6 +1126,28 @@ class JobPosting(OwnedModel):
         if count is None:
             count = self.applications.count()
         return count > 0
+
+    @property
+    def is_markdown(self) -> bool:
+        return self.description_format == DescriptionFormat.MARKDOWN
+
+    @property
+    def description_html(self):
+        """The description as sanitised markup, for the one page that shows it as such.
+        Plain text is not routed through here: the template prints it escaped (#665)."""
+        from postulo.core import markdown
+
+        return markdown.render(self.description)
+
+    @property
+    def description_text(self) -> str:
+        """The description as words, for a table cell or a search excerpt: what Markdown
+        marks up is left out, and plain text is as it was typed (#665)."""
+        if not self.is_markdown:
+            return self.description
+        from postulo.core import markdown
+
+        return markdown.plain(self.description)
 
     @property
     def derived_state(self) -> str:

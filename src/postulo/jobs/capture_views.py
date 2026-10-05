@@ -269,6 +269,7 @@ class CaptureReviewView(OwnedObjectMixin, View):
             "salary_period": data.salary_period or "year",
             "closes_at": data.closes_at,
             "description": data.description,
+            "description_format": "plain",
         }
 
     def _known(self, capture: Capture):

@@ -17,6 +17,7 @@ from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
     Company,
     Contact,
+    DescriptionFormat,
     EmploymentType,
     JobPosting,
     RemoteType,
@@ -202,6 +203,16 @@ class PostingIntakeForm(UserAwareForm):
         widget=forms.Textarea(attrs={"rows": 8}),
         help_text=POSTING_HELP["description"],
     )
+    description_format = forms.ChoiceField(
+        label=_("Description format"),
+        choices=DescriptionFormat.choices,
+        required=False,
+        initial=DescriptionFormat.PLAIN,
+        help_text=POSTING_HELP["description_format"],
+    )
+
+    def clean_description_format(self) -> str:
+        return self.cleaned_data.get("description_format") or DescriptionFormat.PLAIN
 
     def clean_salary_currency(self) -> str:
         code = (self.cleaned_data.get("salary_currency") or "").strip().upper()
@@ -226,6 +237,7 @@ class PostingIntakeForm(UserAwareForm):
         "salary_currency",
         "salary_period",
         "description",
+        "description_format",
     )
     #: Posting fields that are genuinely nullable. An empty string is not a decimal or
     #: a date, so these must stay None rather than being flattened with the rest.
