@@ -499,8 +499,9 @@ def read_manifest(archive: tarfile.TarFile) -> dict:
     # decompresses the whole archive to index it, and the Backups page reads this for every
     # archive on every load (#242).
     member = None
-    if not archive._loaded and not archive.members:
-        first = archive.next()
+    if not archive._loaded:
+        # Opening for reading has already read the first member.
+        first = archive.members[0] if archive.members else archive.next()
         if first is not None and first.name == MANIFEST:
             member = first
     if member is None:
