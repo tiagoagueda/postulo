@@ -95,7 +95,7 @@
     <dl class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm" data-identifiers>
       {% for identifier in company.identifiers.all %}
         <div class="flex items-baseline gap-2">
-          <dt class="text-ink-500 dark:text-ink-400">{% if identifier.brand %}{% brand identifier.brand %} {% endif %}{{ identifier.scheme_label }}</dt>
+          <dt class="text-ink-500 dark:text-ink-400">{% if identifier.brand %}{% brand identifier.brand class="inline-block size-4 align-text-bottom" %} {% endif %}{{ identifier.scheme_label }}</dt>
           <dd class="tabular-nums">
             {% if identifier.url %}
               <a href="{{ identifier.url }}" rel="noopener noreferrer external" target="_blank"
@@ -122,7 +122,7 @@
     </div>
   {% endif %}
 
-  <div class="grid gap-6 lg:grid-cols-3">
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">
       {% comment %} A hierarchy that silently keeps counting leaves is a hierarchy that
          changes nothing, so this says which reading it is showing and offers the other.
@@ -251,8 +251,8 @@
                     {% endif %}
                     {% for link in contact.web_links.all %}
                       {% if link.is_primary or link.kind in several_links %}
-                        <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                          {% if link.brand %}{% brand link.brand %} {% endif %}<a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
+                        <p class="wrap-anywhere text-xs text-ink-500 dark:text-ink-400">
+                          {% if link.brand %}{% brand link.brand class="inline-block size-4 align-text-bottom" %} {% endif %}<a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
                              class="underline">{{ link.display }}</a>
                           <span class="text-ink-400 dark:text-ink-500">{{ link.kind_label }}</span>
                         </p>
