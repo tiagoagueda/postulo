@@ -1,0 +1,48 @@
+<c-vars sections />
+{% load i18n %}
+{% for section in sections %}
+  {% comment %} The heading names the part and the box under it carries the same name,
+     because the box is what a keyboard stops on (#275). The section itself is given
+     none: two regions of one name are two landmarks nobody can tell apart. {% endcomment %}
+  <section class="mb-6" data-found="{{ section.key }}">
+    <c-section-title>{{ section.title }}</c-section-title>
+    <c-scroll-box class="card p-0" label="{{ section.title }}">
+      {% comment %} Two halves, the same two in every part of the file: a table that
+         sizes itself gives each part its own columns, and at 320 pixels gives the
+         one with the words in it whatever the other left over. {% endcomment %}
+      <table class="table table-fixed">
+        <thead>
+          <tr>
+            <th scope="col" class="w-1/2 text-start">{% translate "In the file" %}</th>
+            <th scope="col" class="w-1/2 text-start">{% translate "What happens" %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in section.rows %}
+            <tr data-outcome="{{ row.outcome }}">
+              <td class="align-top wrap-anywhere">
+                <p class="font-medium"><bdi>{{ row.label }}</bdi></p>
+                {% if row.sub %}
+                  <p class="text-ink-500 dark:text-ink-400"><bdi>{{ row.sub }}</bdi></p>
+                {% endif %}
+                {% if row.start or row.end %}
+                  <p class="text-xs text-ink-500 tabular-nums dark:text-ink-400">
+                    {% if row.start %}{{ row.start|date:"DATE_FORMAT" }}{% endif %}
+                    {% if row.start and row.end or row.start and row.ongoing %}–{% endif %}
+                    {% if row.end %}{{ row.end|date:"DATE_FORMAT" }}{% elif row.start and row.ongoing %}{% translate "present" %}{% endif %}
+                  </p>
+                {% endif %}
+              </td>
+              <td class="align-top">
+                <p{% if row.outcome == "add" %} class="font-medium"{% endif %}>{{ row.outcome_label }}</p>
+                {% for note in row.notes %}
+                  <p class="text-xs text-ink-500 dark:text-ink-400">{{ note }}</p>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </c-scroll-box>
+  </section>
+{% endfor %}

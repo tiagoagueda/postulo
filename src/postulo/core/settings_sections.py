@@ -128,6 +128,13 @@ BUILTIN: tuple[SettingsSection, ...] = (
             "core:export_download",
             "core:import_csv",
             "core:import_csv_template",
+            # The files of one kind of record (#659), by the names `core.urls` gives them; a
+            # test holds this list to `kind_files.FORMATS`.
+            *(
+                f"core:file_{kind}{end}"
+                for kind in ("companies", "contacts", "listings", "applications")
+                for end in ("", "_download")
+            ),
             "accounts:delete",
         ),
     ),

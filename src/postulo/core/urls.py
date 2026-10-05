@@ -1,11 +1,13 @@
 from django.urls import path
 
 from . import (
+    kind_files,
     views,
     views_errands,
     views_export,
     views_help,
     views_import,
+    views_kind_files,
     views_logs,
     views_metrics,
     views_search,
@@ -31,6 +33,27 @@ urlpatterns = [
         "export/archive/<int:pk>/",
         views_export.export_archive,
         name="export_archive",
+    ),
+    # One kind of record as a file of its own, and back (#659). Four pages and four
+    # downloads, written out by kind rather than with a slug in the address: none of them
+    # names a record, and a kind that is not one of the four is a 404 by not being a route.
+    *(
+        route
+        for kind in kind_files.FORMATS
+        for route in (
+            path(
+                f"export/{kind}/",
+                views_kind_files.KindFileView.as_view(),
+                {"kind": kind},
+                name=f"file_{kind}",
+            ),
+            path(
+                f"export/{kind}/download/",
+                views_kind_files.KindDownloadView.as_view(),
+                {"kind": kind},
+                name=f"file_{kind}_download",
+            ),
+        )
     ),
     # Where a button that sends work off lands, and the fragment that page polls (#247).
     path("working/<int:pk>/", views_errands.errand_page, name="errand"),

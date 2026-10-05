@@ -66,6 +66,7 @@ from postulo.accounts.forms import PersonIdentifierForm
 from postulo.accounts.models import PersonIdentifier, Profile
 from postulo.core import (
     export,
+    file_review,
     language_field,
     languages,
     messaging_handles,
@@ -112,24 +113,17 @@ MAX_ORDER = 2**31 - 1
 
 # --------------------------------------------------------------------- what may happen
 
-ADD = "add"
-PRESENT = "present"
-KEPT = "kept"
-REFUSED = "refused"
-REPEATED = "repeated"
+ADD = file_review.ADD
+PRESENT = file_review.PRESENT
+KEPT = file_review.KEPT
+REFUSED = file_review.REFUSED
+REPEATED = file_review.REPEATED
 
 #: What the page calls each of them, in the order it counts them.
-OUTCOMES = {
-    ADD: gettext_lazy("Will be added"),
-    PRESENT: gettext_lazy("Already in your record"),
-    KEPT: gettext_lazy("Yours is kept"),
-    REPEATED: gettext_lazy("In the file twice"),
-    REFUSED: gettext_lazy("Cannot be added"),
-}
+OUTCOMES = file_review.OUTCOMES
 
-
-class Refused(Exception):
-    """The file will not be read, and the message says why, to the person who chose it."""
+#: Shared with the files of one kind of record (#659), and still reached by these names.
+Refused = file_review.Refused
 
 
 class _Ambiguous:
@@ -322,27 +316,9 @@ def _not_one_of_these() -> str:
     )
 
 
-def _no_constants(name: str):
-    """`NaN` and `Infinity` are not JSON, and nothing a career says is either of them."""
-    raise ValueError(name)
-
-
-def _short(value, limit: int = 40) -> str:
-    return value.strip()[:limit] if isinstance(value, str) else ""
-
-
-def _kept(value):
-    """A value as it will be held: text, a whole number, a yes or a no, or nothing.
-
-    Anything else -- a list where a title should be, an object, a fraction -- is held as an
-    empty list, which says *something was here and it was not text* without holding
-    whatever it was. What a session keeps is then as flat as a career is.
-    """
-    if value is None or isinstance(value, str | bool):
-        return value
-    if isinstance(value, int):
-        return value
-    return []
+_no_constants = file_review.no_constants
+_short = file_review.short
+_kept = file_review.kept
 
 
 def _kept_detail(name: str, value):

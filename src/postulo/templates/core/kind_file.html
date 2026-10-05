@@ -1,61 +1,68 @@
-{% extends "base.html" %}
+{% extends "settings/base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Your record as a file" %}{% endblock %}
+{% block title %}{% translate "Settings" %} &gt; {% translate "Your data" %} &gt; {{ title }}{% endblock %}
 
 {% block content %}
-  <div class="mx-auto max-w-3xl">
+  <div class="max-w-3xl">
     <c-page-title>
-      {% translate "Your record as a file" %}
+      {{ title }}
       <c-slot name="subtitle">
       {% blocktranslate trimmed %}
-        Your details and your career in one JSON file: to keep, to read, or to hand to
-        another Postulo. Nothing about where you applied is in it.
+        One kind of record in a JSON file of its own: to keep, to read, or to hand to
+        another Postulo.
       {% endblocktranslate %}
       </c-slot>
     </c-page-title>
 
     {% if not review %}
-      <section class="card mb-6" aria-labelledby="taking-it-out" data-candidate-export>
+      <section class="card mb-6" aria-labelledby="taking-it-out" data-kind-export>
         <c-section-title id="taking-it-out">{% translate "Taking it out" %}</c-section-title>
-        <dl class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-          {% for row in counts %}
-            <div class="flex justify-between gap-3">
-              <dt>{{ row.label }}</dt>
-              <dd class="tabular-nums">{{ row.total }}</dd>
-            </div>
-          {% endfor %}
-        </dl>
-        <p class="mt-4 text-sm text-ink-500 dark:text-ink-400">
-          {% blocktranslate trimmed %}
-            And your name, with your form of address, pronouns, and date and place of birth
-            if you gave them, your headline, where you are, and the language your career is
-            written in.
+        <p class="text-sm">
+          {% blocktranslate trimmed count total=total %}
+            {{ total }} record is in the file.
+          {% plural %}
+            {{ total }} records are in the file.
           {% endblocktranslate %}
         </p>
-        {% comment %} Said before the file is taken rather than discovered after it has
-           been put somewhere: what is not in it, and why (#181). {% endcomment %}
-        <p class="mt-2 text-sm text-ink-500 dark:text-ink-400" data-picture-left-out>
-          {% blocktranslate trimmed %}
-            Your picture is left out. A JSON file cannot carry one, and leaving it out
-            keeps this a file you can open and read in a text editor.
-          {% endblocktranslate %}
+        <p class="mt-3 text-sm text-ink-500 dark:text-ink-400" data-left-out>
+          {% if kind == "companies" %}
+            {% blocktranslate trimmed %}
+              With their industries, departments and identifiers. Logos are left out, because a
+              JSON file cannot carry one, and so are the people at each company: they are a
+              file of their own.
+            {% endblocktranslate %}
+          {% elif kind == "contacts" %}
+            {% blocktranslate trimmed %}
+              With the company each is at, by name, and every way of reaching them.
+            {% endblocktranslate %}
+          {% elif kind == "listings" %}
+            {% blocktranslate trimmed %}
+              With the company of each, by name. What happened to a listing, and what was
+              captured from its page, is left out.
+            {% endblocktranslate %}
+          {% else %}
+            {% blocktranslate trimmed %}
+              With the listing of each, its company by name, its timeline and its
+              interviews. Reminders, offers and the files an application went out with are
+              left out, because a JSON file cannot carry a file.
+            {% endblocktranslate %}
+          {% endif %}
         </p>
         <p class="mt-2 text-sm text-ink-500 dark:text-ink-400">
           {% blocktranslate trimmed %}
-            Companies, listings, applications, captures and documents are not in it
-            either. They are one job search; this is you. The export of everything is
-            under Settings.
+            What other programs and plugins keep is in the export of everything, which this
+            file is not a part of.
           {% endblocktranslate %}
         </p>
         <div class="mt-4 flex flex-wrap items-center gap-3">
-          <a href="{% url 'resume:candidate_download' %}" class="btn" download>{% translate "Download the file" %}</a>
+          <a href="{% url download %}" class="btn" download>{% translate "Download the file" %}</a>
           <a href="{% url 'core:export' %}" class="btn" data-variant="ghost">{% translate "Export everything" %}</a>
         </div>
         <p class="mt-3 text-xs wrap-anywhere text-ink-500 dark:text-ink-400">{{ filename }}</p>
       </section>
 
-      <form method="post" enctype="multipart/form-data" class="card mb-6" data-candidate-upload>
+      <form method="post" enctype="multipart/form-data" class="card mb-6" data-kind-upload>
         {% csrf_token %}
         <c-section-title>{% translate "Putting one back" %}</c-section-title>
         <div class="field mb-4">
@@ -63,13 +70,13 @@
           <input type="file" id="id_file" name="file" accept=".json,application/json" required
                  aria-describedby="id_file_helptext">
           <p id="id_file_helptext">
-            {% blocktranslate trimmed %}
-              A file this page made, here or on another Postulo. You are shown what is
-              in it, and what adding it would do, before anything is added.
+            {% blocktranslate trimmed with size=max_mb most=max_rows %}
+              A file this page made, here or on another Postulo, of up to {{ size }} MB
+              and {{ most }} records. You are shown what is in it, and what adding it would
+              do, before anything is added.
             {% endblocktranslate %}
           </p>
         </div>
-        {# Words of its own: *Read it* is a plugin's package as well, and is translated as one. #}
         <button type="submit" class="btn">{% translate "Read the file" %}</button>
       </form>
 
@@ -77,21 +84,19 @@
         <div>
           <p>
             {% blocktranslate trimmed %}
-              Adding a file only ever adds. What you already have is left exactly as it
-              is and is not added a second time, so the same file twice is the same as
-              once. Nothing in your record is changed or removed.
+              Adding a file only ever adds. What you already have is left exactly as it is
+              and is not added a second time, so the same file twice is the same as once.
+              Nothing in your account is changed or removed.
             {% endblocktranslate %}
           </p>
         </div>
       </div>
 
-      <div class="flex flex-wrap items-center gap-3">
-        <a href="{% url 'resume:overview' %}" class="btn" data-variant="outline">{% translate "Your career" %}</a>
-        <a href="{% url 'accounts:profile' %}" class="btn" data-variant="outline">{% translate "Your details" %}</a>
-        <a href="{% url 'resume:europass_import' %}" class="btn" data-variant="ghost">{% translate "Import a Europass CV" %}</a>
-      </div>
+      <p class="text-sm">
+        <a href="{% url 'core:export' %}">{% translate "Back to your data" %}</a>
+      </p>
     {% else %}
-      <section class="card mb-6" aria-labelledby="in-the-file" data-candidate-review>
+      <section class="card mb-6" aria-labelledby="in-the-file" data-kind-review>
         <c-section-title id="in-the-file">{% translate "What is in the file" %}</c-section-title>
         {% if review.version and review.exported_at %}
           <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
@@ -111,8 +116,6 @@
           </dl>
         {% endif %}
         {% if review.notes %}
-          {% comment %} Told, not refused (#178): what is odd about the file is said here,
-             and the rest of it is read all the same. {% endcomment %}
           <ul class="mt-4 space-y-1 text-sm text-amber-700 dark:text-amber-400" data-notes>
             {% for note in review.notes %}<li class="wrap-anywhere">{{ note }}</li>{% endfor %}
           </ul>

@@ -6,10 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.db import transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_POST
 
-from . import errands
+from . import errands, kind_files
 from .export import counts, suggested_filename
 from .models import ExportArchive
 from .slow import tidy_up_if_due
@@ -24,11 +25,22 @@ def export_overview(request: HttpRequest):
     owns so that a page could print six of them (#220).
     """
     tidy_up_if_due()
+    in_files = kind_files.counts(request.user)
     return render(
         request,
         "core/export.html",
         {
             "counts": counts(request.user),
+            # A card per kind that has a file of its own, each with its count (#659).
+            "kind_files": [
+                {
+                    "kind": kind,
+                    "title": kind_files.TITLES[kind],
+                    "total": in_files[kind],
+                    "url": reverse(f"core:file_{kind}"),
+                }
+                for kind in kind_files.FORMATS
+            ],
             "filename": suggested_filename(request.user),
             "keep_hours": _keep_hours(),
             "ready": ExportArchive.objects.for_user(request.user).first(),

@@ -81,6 +81,26 @@
       <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="outline">{% translate "Export or import your record" %}</a>
     </div>
 
+    {% comment %} One kind of record as a file of its own, with what is in each: the
+       counts are the archive's own, a query each (#659). {% endcomment %}
+    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800" data-kind-files>
+      <c-section-title>
+        {% translate "One kind of record as a file" %}
+        <c-slot name="subtitle">{% translate "Your companies, contacts, listings or applications in a JSON file each: to keep, to read, or to put into another account. Importing only adds; it never changes what you have." %}</c-slot>
+      </c-section-title>
+      <ul class="grid gap-3 sm:grid-cols-2">
+        {% for card in kind_files %}
+          <li class="card flex items-center justify-between gap-3" data-kind-file="{{ card.kind }}">
+            <span>
+              <span class="block font-medium">{{ card.title }}</span>
+              <span class="block text-sm tabular-nums text-ink-500 dark:text-ink-400">{{ card.total }}</span>
+            </span>
+            <a href="{{ card.url }}" class="btn" data-variant="outline" aria-label="{% blocktranslate with title=card.title %}Export or import: {{ title }}{% endblocktranslate %}">{% translate "Export or import" %}</a>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
     <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800">
       <c-section-title>
         {% translate "Bringing a spreadsheet in" %}

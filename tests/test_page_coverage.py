@@ -83,6 +83,14 @@ EXCUSED: dict[str, str] = {
         "the contact's data as one JSON document arriving as a download: a "
         "`Content-Disposition` and bytes, with nothing to check for accessibility (#297)"
     ),
+    **{
+        f"core:file_{kind}_download": (
+            f"one kind of record, {kind}, as one JSON document arriving as a download: a "
+            "`Content-Disposition` and bytes, with nothing to check for accessibility. The "
+            f"page that links to it, `core:file_{kind}`, is walked (#659)"
+        )
+        for kind in ("companies", "contacts", "listings", "applications")
+    },
     "resume:candidate_download": (
         "one person's own record as one JSON document arriving as a download: a "
         "`Content-Disposition` and bytes, with nothing to check for accessibility. The "

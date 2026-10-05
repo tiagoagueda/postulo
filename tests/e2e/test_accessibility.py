@@ -541,6 +541,12 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/settings/connections/add/",
         "/capture-tokens/",
         "/export/",
+        # One kind of record as a file of its own, the four pages (#659). The half that
+        # comes after a file has been chosen is `tests/e2e/test_kind_files.py`.
+        "/export/companies/",
+        "/export/contacts/",
+        "/export/listings/",
+        "/export/applications/",
         "/import/",
         "/accounts/delete/",
         "/server/overview/",
