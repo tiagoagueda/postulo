@@ -1841,3 +1841,291 @@ def test_the_migration_still_passes_over_a_row_that_is_refused(user, contact, mo
     refused.refresh_from_db()
     read.refresh_from_db()
     assert (refused.service, read.service) == ("", "linkedin")
+
+
+# ------------------------------------------------- the name typed beside a fixed prefix (#678)
+#
+# A row on a service with a prefix asks for the name alone, with the prefix shown in front
+# of it. What is stored is still the whole address, so the API, the archive and the candidate
+# file are untouched (`tests/test_export.py` and the fingerprint in `test_candidate_file.py`
+# hold that), and a stored row that is not the prefix and a name is drawn as it is.
+
+#: A name that is one on each service that has a prefix.
+NAMES = {
+    "linkedin": "alex-morgan",
+    "bluesky": "alex.bsky.social",
+    "x": "alex_morgan",
+    "xing": "Alex_Morgan",
+    "facebook": "alex.morgan",
+    "instagram": "alex.morgan",
+    "threads": "alex.morgan",
+    "youtube": "alexmorgan",
+}
+
+
+def test_each_social_service_with_a_front_says_it_and_the_rest_say_none():
+    shipped = link_services.services_for(SOCIAL)
+    assert {key for key, service in shipped.items() if service.prefix} == set(NAMES)
+    assert shipped["mastodon"].prefix == "", "on any server, so there is no fixed front"
+    assert not any(service.prefix for service in link_services.services_for("repository").values())
+
+
+@pytest.mark.parametrize("key", sorted(NAMES))
+def test_a_prefix_is_https_on_the_services_host_and_a_name_after_it_reads_back(key):
+    from urllib.parse import urlsplit
+
+    service = link_services.find(key)
+    name = NAMES[key]
+
+    assert urlsplit(service.prefix).scheme == "https"
+    assert service.hosted(service.prefix)
+    assert service.prefix[-1] in "/@"
+    assert service.accepts(service.prefix + name)
+    assert service.handle(service.prefix + name).removeprefix("@") == name
+    assert service.username_in(service.prefix + name) == name
+    assert service.example.startswith(service.prefix), "taken from the service's own example"
+
+
+@pytest.mark.parametrize(
+    ("posted", "key", "stored"),
+    [
+        ("name", "linkedin", "https://www.linkedin.com/in/name"),
+        ("  name  ", "linkedin", "https://www.linkedin.com/in/name"),
+        ("@name", "threads", "https://www.threads.com/@name"),
+        ("name", "threads", "https://www.threads.com/@name"),
+        ("name", "x", "https://x.com/name"),
+        ("joão-silva", "linkedin", "https://www.linkedin.com/in/joão-silva"),
+        # A whole address pasted into the box is the same canonical address.
+        ("https://www.linkedin.com/in/name", "linkedin", "https://www.linkedin.com/in/name"),
+        ("https://linkedin.com/in/name/?trk=x", "linkedin", "https://www.linkedin.com/in/name"),
+        ("linkedin.com/in/name", "linkedin", "https://www.linkedin.com/in/name"),
+        ("https://twitter.com/name", "x", "https://x.com/name"),
+        ("https://www.threads.net/@name", "threads", "https://www.threads.com/@name"),
+        (
+            "https://www.linkedin.com/in/jo%C3%A3o",
+            "linkedin",
+            "https://www.linkedin.com/in/jo%C3%A3o",
+        ),
+    ],
+)
+def test_the_name_typed_is_stored_as_the_address_it_makes(posted, key, stored):
+    row = form(service=key, label="", url=posted)
+
+    assert row.is_valid(), row.errors
+    assert row.cleaned_data["url"] == stored
+    assert (row.cleaned_data["service"], row.cleaned_data["label"]) == (key, "")
+
+
+def test_an_address_that_is_not_a_profile_there_is_pasted_and_kept_as_pasted():
+    """A company page is not a person's profile, so it is not rewritten into one."""
+    company = "https://www.linkedin.com/company/aperture/"
+    row = form(service="linkedin", label="", url=company)
+
+    assert row.is_valid(), row.errors
+    assert row.cleaned_data["url"] == company
+
+    post = "https://x.com/name/status/12345"
+    tweet = form(service="x", label="", url=post)
+    assert tweet.is_valid(), tweet.errors
+    assert tweet.cleaned_data["url"] == post
+
+
+def test_a_pasted_address_whose_query_is_the_profile_is_kept_as_pasted():
+    """Facebook's profile.php holds the person in its query string: dropping the query as
+    tracking would store a link to nobody."""
+    pasted = "https://www.facebook.com/profile.php?id=100001234567890"
+    row = form(service="facebook", label="", url=pasted)
+
+    assert row.is_valid(), row.errors
+    assert row.cleaned_data["url"] == pasted
+
+
+@pytest.mark.parametrize(
+    ("key", "typed"),
+    [
+        ("linkedin", "two words"),
+        ("linkedin", "a?b"),
+        ("linkedin", "a#b"),
+        ("linkedin", "a\\b"),
+        ("x", "a_name_that_is_too_long"),
+        ("x", "bad-name"),
+        ("instagram", "x" * 31),
+        ("instagram", "no spaces"),
+        ("bluesky", "nodots"),
+        ("youtube", "ab"),
+        ("threads", "@@name"),
+    ],
+)
+def test_a_name_that_breaks_the_services_rule_is_refused_beside_the_box_saying_the_rule(key, typed):
+    row = form(service=key, label="", url=typed)
+
+    assert not row.is_valid()
+    assert list(row.errors) == ["url"]
+    message = row.errors["url"][0]
+    assert "That is not a username on " in message
+    assert link_services.find(key).example in message
+
+
+def test_the_handle_rules_are_written_where_each_service_publishes_them():
+    """Each rule added to a pattern carries a comment naming where it is written."""
+    source = (ROOT / "src/postulo/plugins/link_services/services.py").read_text(encoding="utf-8")
+
+    for rule, where in (
+        ("BLUESKY_HANDLE", "atproto.com/specs/handle"),
+        ("INSTAGRAM_NAME", "Changing your username"),
+        ("YOUTUBE_HANDLE", "Handles on YouTube"),
+    ):
+        assert where in source
+        assert source.index(where) < source.index(f"{rule} = ")
+
+
+def test_a_row_on_a_service_with_no_front_is_the_whole_address_box_as_before():
+    mastodon = form(service="mastodon", label="", url="https://fosstodon.org/@alex")
+
+    assert mastodon.is_valid(), mastodon.errors
+    assert mastodon.cleaned_data["url"] == "https://fosstodon.org/@alex"
+    other = form(service="other", label="Forum", url="forum.example.org/u/alex")
+    assert other.is_valid() and other.cleaned_data["url"] == "https://forum.example.org/u/alex"
+    assert not form(REPOSITORY, service="github", label="", url="name/project").is_valid()
+
+
+def test_a_stored_row_in_the_canonical_form_is_drawn_as_its_name_and_saves_unchanged(user):
+    saved = add(user.profile, user, "https://www.linkedin.com/in/alex", service="linkedin")
+    drawn = web_links.WebLinkForm(instance=saved, kind=SOCIAL)
+    box = str(drawn["url"])
+
+    assert drawn.prefix_of_service == "https://www.linkedin.com/in/"
+    assert 'value="alex"' in box and 'type="text"' in box
+    assert 'aria-describedby="id_url_prefix"' in box
+    assert not drawn.kept_as_written
+
+    untouched = web_links.WebLinkForm(
+        data={"service": "linkedin", "label": "", "url": "alex"}, instance=saved, kind=SOCIAL
+    )
+    assert untouched.is_valid(), untouched.errors
+    assert "url" not in untouched.changed_data
+    moved = web_links.WebLinkForm(
+        data={"service": "linkedin", "label": "", "url": "alex2"}, instance=saved, kind=SOCIAL
+    )
+    assert moved.is_valid() and moved.changed_data == ["url"]
+    assert moved.cleaned_data["url"] == "https://www.linkedin.com/in/alex2"
+
+
+@pytest.mark.parametrize(
+    "stored",
+    [
+        "https://linkedin.com/in/alex",
+        "https://www.linkedin.com/in/alex/",
+        "https://www.linkedin.com/in/alex?trk=x",
+        "https://www.linkedin.com/company/aperture",
+        "https://pt.linkedin.com/in/alex",
+    ],
+)
+def test_a_stored_row_that_is_not_the_prefix_and_a_name_is_drawn_whole_and_kept(user, stored):
+    saved = add(user.profile, user, stored, service="linkedin")
+    drawn = web_links.WebLinkForm(instance=saved, kind=SOCIAL)
+
+    assert drawn.prefix_of_service == ""
+    assert f'value="{stored}"' in str(drawn["url"]) and 'type="url"' in str(drawn["url"])
+    assert drawn.kept_as_written and drawn.service_prefix == "https://www.linkedin.com/in/"
+
+    untouched = web_links.WebLinkForm(
+        data={"service": "linkedin", "label": "", "url": stored}, instance=saved, kind=SOCIAL
+    )
+    assert untouched.is_valid(), untouched.errors
+    assert untouched.changed_data == []
+    assert untouched.cleaned_data["url"] == stored, "nothing is rewritten"
+
+
+def test_retyping_the_name_moves_a_kept_row_to_the_short_form(user):
+    saved = add(user.profile, user, "https://linkedin.com/in/alex/", service="linkedin")
+    retyped = web_links.WebLinkForm(
+        data={"service": "linkedin", "label": "", "url": "alex"}, instance=saved, kind=SOCIAL
+    )
+
+    assert retyped.is_valid(), retyped.errors
+    assert retyped.cleaned_data["url"] == "https://www.linkedin.com/in/alex"
+
+
+def test_a_name_that_was_refused_comes_back_in_the_box_as_it_was_typed():
+    row = form(service="linkedin", label="", url="two words")
+    row.full_clean()
+
+    assert row.prefix_of_service == "https://www.linkedin.com/in/"
+    assert 'value="two words"' in str(row["url"])
+
+
+@pytest.mark.parametrize("page", ["profile", "contact"])
+def test_the_page_draws_the_prefix_beside_the_box_and_saves_the_address(
+    client, user, contact, page
+):
+    holder = user.profile if page == "profile" else contact
+    add(holder, user, "https://www.threads.com/@alex", service="threads", primary=True)
+    add(holder, user, "https://www.linkedin.com/company/aperture", service="linkedin")
+    client.force_login(user)
+    url = (
+        reverse("accounts:profile")
+        if page == "profile"
+        else reverse("jobs:contact_update", args=[contact.pk])
+    )
+
+    html = client.get(url).content.decode()
+    named, kept, new = (row_markup(html, "social", index) for index in range(3))
+
+    assert re.search(
+        r'<span data-align="start" id="id_social_profiles-0-url_prefix">'
+        r'<bdi dir="ltr">https://www.threads.com/@</bdi></span>',
+        named,
+    )
+    assert 'aria-describedby="id_social_profiles-0-url_prefix"' in named
+    assert 'data-address-label data-username="Username" data-address="Address">Username<' in named
+    assert "data-kept-as-written" not in named
+    # Kept as written: whole box, prefix put away, and the line that says so.
+    assert 'id="id_social_profiles-1-url_prefix" hidden' in kept
+    assert "data-kept-as-written" in kept and ">Address<" in kept
+    assert "aria-describedby" not in re.search(r"<input[^>]*-1-url[^>]*>", kept)[0]
+    # A new row starts on nothing, so with scripts off it is the whole-address box.
+    assert 'id="id_social_profiles-2-url_prefix" hidden' in new and ">Address<" in new
+    # Each option carries its prefix for the script, and Mastodon has none.
+    assert 'data-prefix="https://www.linkedin.com/in/"' in named
+    assert not re.search(r'value="mastodon"[^>]*data-prefix', named)
+
+    posted = rows(
+        "social_profiles",
+        {"service": "linkedin", "label": "", "url": "alex-morgan"},
+        {"service": "threads", "label": "", "url": "@sam"},
+    )
+    posted |= rows("repositories") | rows("websites")
+    if page == "profile":
+        response = client.post(reverse("accounts:profile"), {**PROFILE_POST, **posted})
+    else:
+        response = client.post(url, contact_post(contact, **posted))
+    assert response.status_code == 302, response.content.decode()[:800]
+    assert set(holder.web_links.filter(kind=SOCIAL).values_list("url", flat=True)) >= {
+        "https://www.linkedin.com/in/alex-morgan",
+        "https://www.threads.com/@sam",
+    }
+
+
+def test_the_prefix_is_text_in_the_page_and_not_a_control(client, user):
+    add(user.profile, user, "https://www.linkedin.com/in/alex", service="linkedin")
+    client.force_login(user)
+
+    row = row_markup(client.get(reverse("accounts:profile")).content.decode(), "social")
+
+    group = re.search(r'<div class="input-group" data-address-group>(.*?)</div>', row, re.S)[1]
+    assert re.findall(r"<(input|select|button|textarea)\b", group) == ["input"], (
+        "one control in the group: the box, and the prefix is a span"
+    )
+
+
+def test_the_single_box_with_several_profiles_off_has_no_prefix(user):
+    """Switching *Several social profiles* off is the way Postulo was before services."""
+    from django import forms
+
+    box = forms.Form()
+    web_links.add_single_boxes(box, user)
+
+    for field in box.fields.values():
+        assert type(field) is forms.URLField
+        assert "data-address-box" not in field.widget.attrs

@@ -454,6 +454,105 @@ class ServiceSelect(OptionIcons, forms.Select):
         return option
 
 
+class AddressInput(forms.URLInput):
+    """The address box, which is the name alone beside a service's fixed prefix (#678).
+
+    ``prefix`` is the service's, set by the form for the row it draws. While the box holds
+    nothing, or an address that is exactly the prefix and a name, the box is drawn as that
+    name, as a text box -- a name is not a URL, and a browser would refuse it as one -- and
+    the template draws the prefix in front of it. Holding anything else it is the whole
+    address, as it is stored, and an ordinary URL box.
+    """
+
+    def __init__(self, attrs=None):
+        # `data-address-box` is how the script finds the box beside the prefix.
+        super().__init__({"data-address-box": "", **(attrs or {})})
+        self.service = None
+
+    @property
+    def prefix(self) -> str:
+        return self.service.prefix if self.service is not None else ""
+
+    def username_of(self, value) -> str | None:
+        """The name to show, where the box is drawn as one; nothing where it is not.
+
+        Blank is one, and so is anything typed that is not an address (a name that was
+        refused comes back as it was typed); an address is one only where it is exactly the
+        prefix and a name, which is how a row is stored when it was typed as a name.
+        """
+        value = str(value or "").strip()
+        if self.service is None:
+            return None
+        if not value or not link_services.reads_as_address(value):
+            return value
+        return self.service.username_in(value)
+
+    def format_value(self, value):
+        name = self.username_of(value)
+        return super().format_value(value if name is None else name)
+
+    def get_context(self, name, value, attrs):
+        context = super().get_context(name, value, attrs)
+        widget = context["widget"]
+        widget["username"] = self.username_of(value) is not None
+        widget["prefix"] = self.prefix
+        if widget["username"]:
+            widget["type"] = "text"
+            box = widget["attrs"]
+            # The prefix is what the box's name goes on to say, so a screen reader hears
+            # "Username", then where it goes (#678); beside what Django says it is described
+            # by already.
+            if box.get("id"):
+                described = f"{box['id']}_prefix {box.get('aria-describedby', '')}".strip()
+                box["aria-describedby"] = described
+        return context
+
+
+class AddressField(forms.URLField):
+    """The address of a link, which a row on a service with a prefix takes as a name (#678).
+
+    Typed as **a name** it is the prefix and the name; pasted as **a whole address** it is
+    read as one, which is the canonical address where it is the service's own profile and
+    as it came where it is not. Either way the result is what `settle` then checks, so the
+    stored form is the one every reader of a link already understands. Without a prefix it
+    is the URL field it always was.
+    """
+
+    widget = AddressInput
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.service = None
+
+    def use(self, service) -> None:
+        """Take the service of the row it is drawn for. One without a prefix takes none."""
+        self.service = service if service is not None and service.prefix else None
+        self.widget.service = self.service
+
+    def to_python(self, value):
+        if self.service is not None:
+            value = self.service.address_for(value)
+        return super().to_python(value)
+
+    def has_changed(self, initial, data):
+        """Whether the box says another address than the row holds: a name is compared as
+        the address it makes, so an untouched row is not a changed one."""
+        if self.service is not None:
+            if str(data or "").strip() == str(initial or ""):
+                # Posted back as it is stored: a whole address is not changed by being read
+                # as one, so a row kept as written is not a row somebody touched.
+                return False
+            try:
+                data = self.service.address_for(data)
+            except ValidationError:
+                return True
+        return super().has_changed(initial, data)
+
+    def typed_as_a_name(self, value) -> bool:
+        """Whether what was posted is a name for the prefix, rather than an address."""
+        return self.service is not None and not link_services.reads_as_address(value)
+
+
 class WebLinkForm(forms.ModelForm):
     """One row: the service it is on, what to call it under *Other*, and the address.
 
@@ -488,7 +587,17 @@ class WebLinkForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         #: The kind of link the row is. The formset says; a row on its own carries it.
         self.link_kind = kind or self.instance.kind
-        self.fields["url"].assume_scheme = "https"
+        # The address, with the prefix of the row's service in front of the name where it
+        # has one (#678). Replaced rather than declared, because it is the model's own
+        # field and its limits are the model's.
+        model_field = self.fields["url"]
+        address = AddressField(
+            label=model_field.label,
+            required=model_field.required,
+            max_length=model_field.max_length,
+            assume_scheme="https",
+        )
+        self.fields["url"] = address
         # Said once under the block rather than under every row, where it would stand
         # beneath a box that is only drawn for *Other*.
         self.fields["label"].help_text = ""
@@ -497,6 +606,7 @@ class WebLinkForm(forms.ModelForm):
             del self.fields["service"]
             return
         stored = bool(self.instance.pk)
+        address.use(offered.get(self._chosen_key(offered)))
         choices = [(key, service.label) for key, service in offered.items()]
         choices.append((OTHER, _("Other")))
         if not stored:
@@ -508,7 +618,12 @@ class WebLinkForm(forms.ModelForm):
             "": {"data-icon": link_services.OTHER_ICON},
             OTHER: {"data-icon": link_services.OTHER_ICON},
             **{
-                key: {"data-icon": service.icon_name, "data-hosts": " ".join(service.hosts)}
+                key: {
+                    "data-icon": service.icon_name,
+                    "data-hosts": " ".join(service.hosts),
+                    # Only where there is one: the script shows it in front of the name.
+                    **({"data-prefix": service.prefix} if service.prefix else {}),
+                }
                 for key, service in offered.items()
             },
         }
@@ -517,6 +632,38 @@ class WebLinkForm(forms.ModelForm):
             # plugin knows any more; that one keeps its key unless somebody chooses.
             known = self.instance.service in offered
             self.initial["service"] = self.instance.service if known else OTHER
+
+    def _chosen_key(self, offered) -> str:
+        """The key of the service the row is on as it is drawn: what was posted, and for a
+        stored row posted with no choice, what it has -- the rule `clean` follows. Nothing
+        for a new row left unchosen, and for *Other*."""
+        stored = bool(self.instance.pk)
+        kept = self.instance.service if stored and self.instance.service in offered else ""
+        if not self.is_bound:
+            return kept
+        posted = (self.data.get(self.add_prefix("service")) or "").strip()
+        return posted if posted else kept
+
+    @property
+    def prefix_of_service(self) -> str:
+        """The prefix the address box is drawn after, for the template: the service's where
+        the box holds a name, blank where it holds a whole address (#678)."""
+        widget = self.fields["url"].widget
+        return widget.prefix if widget.username_of(self["url"].value()) is not None else ""
+
+    @property
+    def service_prefix(self) -> str:
+        """The prefix of the service the row is on, whether or not the box is showing it:
+        what the script puts in front of the name when somebody chooses one."""
+        return self.fields["url"].widget.prefix
+
+    @property
+    def kept_as_written(self) -> bool:
+        """Whether a stored row is on a service with a prefix and holds an address that is
+        not that prefix and a name: shown whole, and kept as it is (#678)."""
+        service = self.fields["url"].service
+        stored = self.instance.url if self.instance.pk else ""
+        return bool(service and stored and service.username_in(stored) is None)
 
     @property
     def service_icon(self) -> str:
@@ -552,6 +699,9 @@ class WebLinkForm(forms.ModelForm):
             # telephone number or an identifier (#284).
             data["service"] = kept
             data["label"] = "" if known else data.get("label", "")
+            # What is stored, and not what it reads as: a row kept as written is saved
+            # as written (#678).
+            data["url"] = self.instance.url
             return data
         try:
             data["service"], data["label"] = link_services.settle(
@@ -560,6 +710,15 @@ class WebLinkForm(forms.ModelForm):
         except ValidationError as error:
             # Beside the address when the address is what is wrong with it.
             beside = "service" if error.code == "service" and "service" in self.fields else "url"
+            address = self.fields["url"]
+            if error.code == "address" and address.typed_as_a_name(
+                self.data.get(self.add_prefix("url"))
+            ):
+                # Said as the rule for a name, the sentence an address would have been
+                # refused with talks of addresses (#678).
+                error = ValidationError(
+                    link_services.username_refusal(address.service), code="address"
+                )
             self.add_error(beside, error)
         return data
 

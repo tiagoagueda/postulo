@@ -75,9 +75,28 @@
               <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
               {{ row.label }}
             </div>
+            {% comment %} With a service to choose, the address is a name beside a fixed prefix
+               where the service has one (#678): Basecoat's `input-group`, the prefix its
+               start addon, text and not an input, so it cannot be changed and can be
+               selected; written left to right inside `<bdi>`; named by the box's
+               `aria-describedby`. A service with none, *Other*, and a row whose stored
+               address is not the prefix and a name, draw the whole address and the addon
+               is put away -- `hidden`, because a reader told "described by" something
+               hears it hidden or not, and `app.js` takes the id off the box with it. With
+               scripts on, `app.js` shows the chosen service's prefix (`data-prefix` on its
+               option). {% endcomment %}
             <div class="field w-full sm:w-auto sm:min-w-36 sm:flex-1">
-              <label for="{{ row.url.id_for_label }}">{% translate "Address" %}</label>
-              {{ row.url }}
+              {% with prefix=row.prefix_of_service %}
+              <label for="{{ row.url.id_for_label }}"><span data-address-label data-username="{% translate 'Username' %}" data-address="{% translate 'Address' %}">{% if prefix %}{% translate "Username" %}{% else %}{% translate "Address" %}{% endif %}</span></label>
+              {% if block.has_services %}
+                <div class="input-group" data-address-group>
+                  <span data-align="start" id="{{ row.url.auto_id }}_prefix"{% if not prefix %} hidden{% endif %}><bdi dir="ltr">{{ prefix }}</bdi></span>
+                  {{ row.url }}
+                </div>
+              {% else %}
+                {{ row.url }}
+              {% endif %}
+              {% endwith %}
             </div>
             <div class="flex flex-none flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
               {% if remove_at_once %}
@@ -98,6 +117,9 @@
             </div>
           </div>
           <div class="field">
+            {% if row.kept_as_written %}
+              <p class="text-xs text-ink-500 dark:text-ink-400" data-kept-as-written>{% translate "This address is kept as written. To change it to the short form, type the name alone in the box." %}</p>
+            {% endif %}
             {% for field in row.visible_fields %}
               <c-field-feedback :field="field" />
             {% endfor %}

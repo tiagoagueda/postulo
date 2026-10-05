@@ -577,6 +577,53 @@
     @apply outline-2 -outline-offset-2 outline-brand-500 outline-solid;
   }
 
+  /*
+   * The address of a link on a service with a fixed front (#678): the prefix as a start
+   * addon, the name in the box. The prefix is text in a span, so it cannot be changed and
+   * can be selected and copied; it is whole at any width, because the group wraps -- the box
+   * keeps eight rem and drops to a line of its own under the prefix, inside the same border
+   * -- and a prefix longer than the line breaks inside itself rather than being cut.
+   *
+   * Written left to right whatever the page is, as the telephone box is: an address is
+   * read from its left, and in a right-to-left group the name would have come out on the
+   * wrong side of what it goes on. With the prefix put away the box is the whole address,
+   * which keeps to the side the page's other boxes start at, as the number does.
+   *
+   * `hidden` needs a rule of its own: Basecoat's group asks every span to be `inline-flex`,
+   * which outweighs the browser's own `[hidden]`.
+   */
+  .input-group[data-address-group] {
+    @apply flex-wrap overflow-clip;
+    direction: ltr;
+  }
+
+  .input-group[data-address-group] > span[hidden] {
+    display: none;
+  }
+
+  .input-group[data-address-group] > span:not([hidden]) {
+    @apply max-w-full min-w-0 shrink py-1.5 pe-0 break-all;
+    overflow-wrap: anywhere;
+  }
+
+  .input-group[data-address-group] > input {
+    @apply h-auto w-auto min-w-32 shrink grow basis-32;
+    box-shadow: 0 -1px 0 0 var(--color-input);
+  }
+
+  /* The name begins close to what it follows: the box's own padding would be a gap. */
+  .input-group[data-address-group] > span:not([hidden]) + input {
+    @apply ps-0.5;
+  }
+
+  .input-group[data-address-group] > span[hidden] + input:dir(rtl) {
+    text-align: end;
+  }
+
+  .input-group[data-address-group] > input:focus-visible {
+    @apply outline-2 -outline-offset-2 outline-brand-500 outline-solid;
+  }
+
   /* What the field says under the group about a number already stored: the help's size,
      and room for the pill it begins with to sit on the first line of the sentence. */
   .field > [data-phone-mark] {
@@ -588,7 +635,8 @@
    clips what is outside it: the two pixels the rule in `app.css` puts round every field
    would be cut off (#227). Unlayered, as that rule is, and more specific than it. */
 @media (forced-colors: active) {
-  .input-group[data-phone-field] > :is(select, input):focus-visible {
+  .input-group[data-phone-field] > :is(select, input):focus-visible,
+  .input-group[data-address-group] > input:focus-visible {
     outline-offset: -2px;
   }
 }

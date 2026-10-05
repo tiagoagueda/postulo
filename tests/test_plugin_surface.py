@@ -511,6 +511,23 @@ def test_the_surface_holds_what_a_registry_of_link_services_needs():
     assert api.link_service_of("linkedin").label == "LinkedIn"
     assert api.link_service_of("") is None, "Other is not a service"
 
+    # A prefix is optional, and one that is not an https address on a host, ending where a
+    # name goes, is read as none (#678): the entry is still a service, and has no fixed front.
+    assert made.prefix == ""
+    fixed = api.LinkService(
+        "elsewhere",
+        "Elsewhere",
+        api.LinkKind.SOCIAL,
+        re.compile(r"/u/(?P<handle>[^/]+)/?"),
+        hosts=["elsewhere.example"],
+        prefix="https://elsewhere.example/u/",
+    )
+    assert fixed.prefix == "https://elsewhere.example/u/"
+    assert fixed.username_in("https://elsewhere.example/u/alex") == "alex"
+    for odd in ("http://elsewhere.example/u/", "https://elsewhere.example/u", "/u/", None, 3):
+        plain = api.LinkService("e", "E", "social", re.compile("/.*"), hosts=["e.x"], prefix=odd)
+        assert plain.prefix == ""
+
 
 def test_the_surface_hands_over_the_same_object_the_core_uses():
     """A re-export that is a copy would be a second thing to keep current.

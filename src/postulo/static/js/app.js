@@ -448,11 +448,71 @@
     return found;
   }
 
+  // The prefix of the chosen service, drawn in front of the address box (#678).
+  //
+  // The server draws a row as it is stored; this keeps the row right while somebody
+  // chooses. The prefix shows where the chosen option has one (`data-prefix`) and the box
+  // holds a name: nothing in it, or anything but a whole address, so pasting an address
+  // shows the address whole rather than the prefix and an address after it. Choosing
+  // *Other*, or a service with no fixed front, gives the whole-address box back, and a
+  // name already typed keeps the prefix it was typed after, so no address is lost.
+  var wholeAddress = /^https?:\/\//i;
+
+  function describedBy(box, id, on) {
+    var ids = (box.getAttribute("aria-describedby") || "").split(/\s+/).filter(function (one) {
+      return one && one !== id;
+    });
+    if (on) {
+      ids.unshift(id);
+    }
+    if (ids.length) {
+      box.setAttribute("aria-describedby", ids.join(" "));
+    } else {
+      box.removeAttribute("aria-describedby");
+    }
+  }
+
+  function refreshAddress(row, changing) {
+    var select = row.querySelector("[data-service-select]");
+    var group = row.querySelector("[data-address-group]");
+    var box = group && group.querySelector("[data-address-box]");
+    var addon = group && group.querySelector("[id$='_prefix']");
+    var chosen = select && select.options[select.selectedIndex];
+    if (!box || !addon) {
+      return;
+    }
+    var prefix = (chosen && chosen.getAttribute("data-prefix")) || "";
+    var shown = !addon.hidden ? addon.textContent.trim() : "";
+    // A name has no scheme and no slash; anything else is an address, shown whole.
+    var isName = !wholeAddress.test(box.value.trim()) && box.value.indexOf("/") < 0;
+    var show = prefix && isName;
+    if (changing && shown && !prefix && box.value.trim() && isName) {
+      // The name was typed after the prefix; without it the box is an address, so the
+      // address is what it holds.
+      box.value = shown + box.value.trim();
+    }
+    addon.hidden = !show;
+    var words = addon.querySelector("bdi");
+    if (words) {
+      words.textContent = show ? prefix : "";
+    }
+    box.type = show ? "text" : "url";
+    describedBy(box, addon.id, show);
+    var label = row.querySelector("[data-address-label]");
+    if (label) {
+      label.textContent = label.getAttribute(show ? "data-username" : "data-address");
+    }
+  }
+
   document.addEventListener("change", function (event) {
     var select = event.target.closest && event.target.closest("[data-service-select]");
     if (select) {
       // Chosen by hand, so the address stops choosing for this row.
       delete select.dataset.serviceGuessed;
+      var row = select.closest("[data-link-row]");
+      if (row) {
+        refreshAddress(row, true);
+      }
     }
   });
 
@@ -464,9 +524,11 @@
   document.addEventListener("input", function (event) {
     var box = event.target;
     var row = box.closest && box.closest("[data-link-row]");
-    if (!row || box.type !== "url") {
+    if (!row || !box.matches("[data-address-box]")) {
       return;
     }
+    // A name typed, or an address pasted over one, changes whether the prefix shows.
+    refreshAddress(row, false);
     var select = row.querySelector("[data-service-select]");
     if (!select || (select.value !== "" && !select.dataset.serviceGuessed)) {
       return;
@@ -479,6 +541,7 @@
       delete select.dataset.serviceGuessed;
     }
     selectChanged(select);
+    refreshAddress(row, false);
   });
 
   // What this chose is shown and never posted. It reads the host alone, where saving reads

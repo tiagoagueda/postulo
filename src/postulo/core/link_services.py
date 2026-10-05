@@ -131,6 +131,12 @@ class Service:
     #: A brand mark Postulo ships (``assets/brands.txt``), drawn where a link is shown. Blank,
     #: or a name Postulo does not ship, draws the icon alone: the rule's neutral fallback.
     brand: str = ""
+    #: The address up to where a person's own name goes, as the service writes it
+    #: (``https://www.linkedin.com/in/``): a row on this service is then asked for the name
+    #: alone, with this fixed in front of it (#678). Blank where there is no fixed front --
+    #: a Mastodon server, somebody's Forgejo, *Other*. An address, so it is https, on a
+    #: host, and without a name in it; one that is not is read as blank.
+    prefix: str = ""
 
     def __post_init__(self) -> None:
         # Whatever a plugin wrote them as -- a `LinkKind`, a list -- they are read as a
@@ -138,6 +144,7 @@ class Service:
         object.__setattr__(self, "kind", str(getattr(self.kind, "value", self.kind)))
         hosts = (self.hosts,) if isinstance(self.hosts, str) else tuple(self.hosts or ())
         object.__setattr__(self, "hosts", tuple(str(host).lower().strip(".") for host in hosts))
+        object.__setattr__(self, "prefix", _fixed_front(self.prefix))
 
     def hosted(self, url: str) -> bool:
         """Whether ``url`` is on one of this service's own hosts, or a subdomain of one."""
@@ -189,6 +196,58 @@ class Service:
             return f"{host}/{handle}" if handle else host
         return handle
 
+    def username_in(self, url: str) -> str | None:
+        """The name, where ``url`` is exactly this service's ``prefix`` and a name: the
+        canonical address a row on this service is typed as (#678). Nothing for a service
+        with no prefix and for any other address -- another host, a trailing path, a query
+        string, a company page -- which is shown as it is stored, never rewritten."""
+        if not self.prefix or not url.startswith(self.prefix):
+            return None
+        name = url[len(self.prefix) :]
+        if not name or not is_plain_name(name) or not self.accepts(url):
+            return None
+        return name
+
+    def address_for(self, typed: str) -> str:
+        """The address a row on this service stores for what was typed in its box (#678).
+
+        A **name** has its prefix put in front of it; a leading ``@`` typed where the
+        prefix already ends in one is the prefix's. A **whole address** is read as one, so
+        that pasting never breaks: where it is on this service and begins with the prefix's
+        own path -- ``/in/``, not a company's page -- it is the canonical address of that
+        name; any other is returned as it came, for `settle` to accept or refuse.
+
+        Raises `ValidationError` for a name that cannot be one: it holds a space, a slash,
+        a question mark, a hash or a control character.
+        """
+        typed = (typed or "").strip()
+        if not self.prefix or not typed:
+            return typed
+        if reads_as_address(typed):
+            return self._canonical(typed if ADDRESS_START.match(typed) else "https://" + typed)
+        if self.prefix.endswith("@") and typed.startswith("@"):
+            typed = typed[1:]
+        if not typed or not is_plain_name(typed):
+            raise ValidationError(username_refusal(self), code="address")
+        return self.prefix + typed
+
+    def _canonical(self, url: str) -> str:
+        if not self.accepts(url):
+            return url
+        mine, theirs = urlsplit(self.prefix), urlsplit(url)
+        if not self.hosted(url) or not unquote(theirs.path).startswith(unquote(mine.path)):
+            return url
+        # The name as it was written in the address, not as it decodes: a copy of
+        # ``jo%C3%A3o`` stays one. Behind it only a slash and a query string are let go; a
+        # further path (a post, a tab) is somebody's own address and is kept as written.
+        name, _slash, behind = theirs.path[len(mine.path) :].partition("/")
+        # A script (``profile.php?id=...``) is a page whose query says who: dropping the
+        # query would store a link to nobody, so it is kept as pasted.
+        if behind or not name or not is_plain_name(unquote(name)) or name.lower().endswith(".php"):
+            return url
+        canonical = self.prefix + name
+        return canonical if self.accepts(canonical) else url
+
     @property
     def icon_name(self) -> str:
         """The icon to draw: the service's own where Postulo ships it, else the kind's."""
@@ -198,6 +257,52 @@ class Service:
     def brand_name(self) -> str:
         """The mark to draw: the service's own where Postulo ships it, else nothing."""
         return self.brand if isinstance(self.brand, str) and brand_exists(self.brand) else ""
+
+
+#: A name somebody types where a prefix is already written: no space, slash, question mark,
+#: hash, backslash or control character. A name is one part of a path.
+_NOT_A_NAME = re.compile(r"[\s/?#\\\x00-\x1f\x7f]")
+
+#: What a whole address pasted into a username box begins with.
+ADDRESS_START = re.compile(r"https?://", re.IGNORECASE)
+
+
+def reads_as_address(typed: str) -> bool:
+    """Whether what was typed in a username box is an address and not a name: it begins
+    with a scheme, or holds a slash, which no name does (``linkedin.com/in/name``)."""
+    typed = (typed or "").strip()
+    return bool(ADDRESS_START.match(typed)) or "/" in typed
+
+
+def is_plain_name(name: str) -> bool:
+    """Whether ``name`` could be the one part of a path a person's name there is."""
+    return bool(name) and not _NOT_A_NAME.search(name)
+
+
+def _fixed_front(prefix) -> str:
+    """What a plugin's ``prefix`` comes to: itself where it is an https address on a host,
+    ends where a name goes, and holds no query, fragment or space; otherwise blank, which
+    is a service with no fixed front."""
+    if not isinstance(prefix, str) or not prefix or len(prefix) > 200:
+        return ""
+    try:
+        parts = urlsplit(prefix)
+    except ValueError:
+        return ""
+    if (
+        parts.scheme != "https"
+        or not _host(prefix)
+        or "\\" in parts.netloc
+        or "@" in parts.netloc
+        or parts.query
+        or parts.fragment
+        or "?" in prefix
+        or "#" in prefix
+        or _NOT_A_NAME.search(prefix.removeprefix("https://").replace("/", ""))
+        or prefix[-1] not in "/@"
+    ):
+        return ""
+    return prefix
 
 
 def _host(url: str) -> str:
@@ -407,6 +512,15 @@ def refusal(service: Service) -> str:
         "That does not look like an address on %(service)s. Choose “Other” to list an "
         "address of another shape."
     ) % {"service": service.label}
+
+
+def username_refusal(service: Service) -> str:
+    """Why what was typed after a service's prefix is not a name there (#678)."""
+    return _(
+        "That is not a username on %(service)s. Type the name alone, with no spaces or "
+        "slashes, as it ends %(example)s; choose “Other” to list an address of another "
+        "shape."
+    ) % {"service": service.label, "example": service.example or service.prefix}
 
 
 def display(key: str, kind: str, url: str) -> str:

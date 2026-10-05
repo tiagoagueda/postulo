@@ -61,6 +61,29 @@ PART = r"[^/\s]+"
 REST = r"(?:/.*)?"
 
 
+# ----------------------------------------------------------------- the handle rules
+#
+# Where a service publishes what a name there may be, the pattern says it, and a name that
+# breaks it is refused with the sentence that says what an address there looks like; the
+# way out is *Other*. Where none is published, as for LinkedIn and Xing, there is no rule
+# here, because a guessed one refuses somebody's real name (#638). Nothing is looked up.
+
+#: Bluesky: a handle is a domain name -- dot-separated labels of letters, digits and
+#: hyphens, at least two -- or a DID. Written in the AT Protocol's handle specification,
+#: https://atproto.com/specs/handle, and in the DID's, https://atproto.com/specs/did.
+BLUESKY_HANDLE = r"(?:did:[a-z]+:[A-Za-z0-9._:%-]+|[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+)"
+
+#: Instagram, and Threads which takes its names from it: one to thirty letters, digits,
+#: full stops and underscores. Written in Instagram's help, "Changing your username".
+INSTAGRAM_NAME = r"[A-Za-z0-9._]{1,30}"
+
+#: YouTube: a handle is three to thirty letters, digits, underscores, hyphens and full
+#: stops. Written in YouTube's help, "Handles on YouTube". X's own rule, one to fifteen
+#: letters, digits and underscores, is in its pattern below, from X's help, "Change your
+#: username".
+YOUTUBE_HANDLE = r"[\w.-]{3,30}"
+
+
 def _not(*words: str) -> str:
     """Refuse a first part that is one of the service's own pages rather than a name."""
     return r"(?!(?:" + "|".join(re.escape(word) for word in words) + r")(?:/|$))"
@@ -126,6 +149,10 @@ SERVICES: dict[str, LinkService] = {
             hosts=("linkedin.com",),
             icon="user",
             example="https://www.linkedin.com/in/name",
+            # A person's own profile; a company, a school and a showcase page stay a
+            # stored address, or *Other*. No handle rule: LinkedIn's custom address takes
+            # accented letters (#638) and a rule here would refuse a real one.
+            prefix="https://www.linkedin.com/in/",
         ),
         LinkService(
             MASTODON,
@@ -147,11 +174,12 @@ SERVICES: dict[str, LinkService] = {
             "Bluesky",
             LinkKind.SOCIAL,
             # The handle is a domain name, or a DID with colons in it.
-            _path(rf"/profile/(?P<handle>{PART}){REST}"),
+            _path(rf"/profile/(?P<handle>{BLUESKY_HANDLE}){REST}"),
             hosts=("bsky.app",),
             icon="at-sign",
             brand="bluesky",
             example="https://bsky.app/profile/name.bsky.social",
+            prefix="https://bsky.app/profile/",
         ),
         LinkService(
             X,
@@ -181,6 +209,7 @@ SERVICES: dict[str, LinkService] = {
             hosts=("x.com", "twitter.com"),
             icon="at-sign",
             example="https://x.com/name",
+            prefix="https://x.com/",
         ),
         LinkService(
             XING,
@@ -191,6 +220,7 @@ SERVICES: dict[str, LinkService] = {
             hosts=("xing.com",),
             icon="user",
             example="https://www.xing.com/profile/Name_Surname",
+            prefix="https://www.xing.com/profile/",
         ),
         LinkService(
             FACEBOOK,
@@ -226,6 +256,7 @@ SERVICES: dict[str, LinkService] = {
             icon="user",
             brand="facebook",
             example="https://www.facebook.com/name",
+            prefix="https://www.facebook.com/",
         ),
         LinkService(
             INSTAGRAM,
@@ -247,32 +278,35 @@ SERVICES: dict[str, LinkService] = {
                     "stories",
                     "tv",
                 )
-                + rf"(?P<handle>[\w.]+){REST}"
+                + rf"(?P<handle>{INSTAGRAM_NAME}){REST}"
             ),
             hosts=("instagram.com",),
             icon="user",
             brand="instagram",
             example="https://www.instagram.com/name",
+            prefix="https://www.instagram.com/",
         ),
         LinkService(
             THREADS,
             "Threads",
             LinkKind.SOCIAL,
-            _path(rf"/(?P<handle>@[\w.]+){REST}"),
+            _path(rf"/(?P<handle>@{INSTAGRAM_NAME}){REST}"),
             hosts=("threads.com", "threads.net"),
             icon="at-sign",
             example="https://www.threads.com/@name",
+            prefix="https://www.threads.com/@",
         ),
         LinkService(
             YOUTUBE,
             "YouTube",
             LinkKind.SOCIAL,
             # A channel under each of its four addresses; a single video is not a profile.
-            _path(rf"/(?P<handle>@{PART}|(?:channel|c|user)/{PART}){REST}"),
+            _path(rf"/(?P<handle>@{YOUTUBE_HANDLE}|(?:channel|c|user)/{PART}){REST}"),
             hosts=("youtube.com",),
             icon="video",
             brand="youtube",
             example="https://www.youtube.com/@name",
+            prefix="https://www.youtube.com/@",
         ),
         # ---------------------------------------------------------- code repositories
         LinkService(

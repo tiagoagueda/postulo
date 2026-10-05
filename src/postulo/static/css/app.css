@@ -4502,13 +4502,53 @@
     --tw-outline-style: solid;
     outline-style: solid;
   }
+  .input-group[data-address-group] {
+    flex-wrap: wrap;
+    overflow: clip;
+    direction: ltr;
+  }
+  .input-group[data-address-group] > span[hidden] {
+    display: none;
+  }
+  .input-group[data-address-group] > span:not([hidden]) {
+    max-width: 100%;
+    min-width: 0px;
+    flex-shrink: 1;
+    padding-block: calc(var(--spacing) * 1.5);
+    padding-inline-end: 0px;
+    word-break: break-all;
+    overflow-wrap: anywhere;
+  }
+  .input-group[data-address-group] > input {
+    height: auto;
+    width: auto;
+    min-width: calc(var(--spacing) * 32);
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-basis: calc(var(--spacing) * 32);
+    box-shadow: 0 -1px 0 0 var(--color-input);
+  }
+  .input-group[data-address-group] > span:not([hidden]) + input {
+    padding-inline-start: calc(var(--spacing) * 0.5);
+  }
+  .input-group[data-address-group] > span[hidden] + input:dir(rtl) {
+    text-align: end;
+  }
+  .input-group[data-address-group] > input:focus-visible {
+    outline-style: var(--tw-outline-style);
+    outline-width: 2px;
+    outline-offset: calc(2px * -1);
+    outline-color: var(--color-brand-500);
+    --tw-outline-style: solid;
+    outline-style: solid;
+  }
   .field > [data-phone-mark] {
     --tw-leading: var(--leading-relaxed);
     line-height: var(--leading-relaxed);
   }
 }
 @media (forced-colors: active) {
-  .input-group[data-phone-field] > :is(select, input):focus-visible {
+  .input-group[data-phone-field] > :is(select, input):focus-visible, .input-group[data-address-group] > input:focus-visible {
     outline-offset: -2px;
   }
   .field > input[type="checkbox"], .input[type="checkbox"], .field > input[type="radio"], .input[type="radio"] {

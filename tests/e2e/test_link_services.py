@@ -13,6 +13,7 @@ is asserted is where one control sits beside another, which is what the issue pr
 
 from __future__ import annotations
 
+import re
 from itertools import pairwise
 
 import pytest
@@ -37,7 +38,7 @@ BOXES = """(row) => {
   return {
     service: box('select[data-service-select]'),
     name: box('input[name$="-label"]'),
-    address: box('input[type="url"]'),
+    address: box('[data-address-box]'),
     primary: box('.primary-choice, input[type="radio"]'),
   };
 }""".replace("__DRAWN__", DRAWN)
@@ -51,7 +52,7 @@ def links(applicant):
 
     profile = applicant.profile
     wanted = [
-        ("social", "linkedin", "", "https://www.linkedin.com/in/alex-morgan-1a2b3c/", True),
+        ("social", "linkedin", "", "https://www.linkedin.com/in/alex-morgan-1a2b3c", True),
         ("social", "mastodon", "", "https://fosstodon.org/@alex", False),
         ("social", "", "A forum", "https://forum.example.org/u/alex", False),
         ("repository", "forgejo", "", "https://git.example.org/alex/thing", True),
@@ -471,4 +472,266 @@ def test_the_rows_have_no_violations(
     found = violations_on(page, axe_source)
     if found:
         failures.append(describe(f"your details with an address refused ({scheme})", found))
+    assert not failures, "\n\n".join(failures)
+
+
+# ------------------------------------------- the name typed beside the service's address (#678)
+#
+# A row on a service with a fixed front asks for the name, with the front drawn before it:
+# text in the group, so it cannot be typed into and can be selected, named by the box's
+# description, written left to right, and whole at every width.
+
+PREFIX = "[data-address-group] > span[id$='_prefix']"
+
+
+def prefix_of(row):
+    return row.locator(PREFIX)
+
+
+def address_of(row):
+    return row.locator("[data-address-box]")
+
+
+def test_choosing_a_service_shows_its_prefix_and_other_gives_the_address_box_back(
+    page: Page, live_server, links
+):
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    new = rows_of(page, "social").last
+    select = new.locator("select")
+    label = new.locator("[data-address-label]")
+
+    # A new row starts on nothing: the whole address, as before.
+    expect(prefix_of(new)).to_be_hidden()
+    expect(label).to_have_text("Address")
+    expect(address_of(new)).to_have_attribute("type", "url")
+
+    select.select_option("linkedin")
+    expect(prefix_of(new)).to_be_visible()
+    expect(prefix_of(new)).to_have_text("https://www.linkedin.com/in/")
+    expect(label).to_have_text("Username")
+    expect(address_of(new)).to_have_attribute("type", "text")
+    expect(address_of(new)).to_have_accessible_description("https://www.linkedin.com/in/")
+
+    # Nothing can be typed into the prefix, and it is not a control: it is text.
+    assert not prefix_of(new).evaluate("(el) => el.isContentEditable")
+    assert prefix_of(new).evaluate("(el) => el.querySelector('input, select, textarea') === null")
+    assert prefix_of(new).evaluate("(el) => getComputedStyle(el).userSelect !== 'none'")
+
+    # Another service swaps it; a name already typed stays where it was typed.
+    address_of(new).fill("alex")
+    select.select_option("threads")
+    expect(prefix_of(new)).to_have_text("https://www.threads.com/@")
+    expect(address_of(new)).to_have_value("alex")
+
+    # A service with no front, and Other, are the address box.
+    select.select_option("mastodon")
+    expect(prefix_of(new)).to_be_hidden()
+    expect(label).to_have_text("Address")
+    expect(address_of(new)).to_have_attribute("type", "url")
+    select.select_option("linkedin")
+    select.select_option("other")
+    expect(prefix_of(new)).to_be_hidden()
+    # The name typed after the prefix is not lost: it is the address.
+    expect(address_of(new)).to_have_value("https://www.threads.com/@alex")
+    expect(address_of(new)).not_to_have_attribute("aria-describedby", re.compile("_prefix"))
+
+
+def test_a_whole_address_pasted_beside_a_prefix_is_shown_whole(page: Page, live_server, links):
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    new = rows_of(page, "social").last
+    new.locator("select").select_option("linkedin")
+
+    address_of(new).fill("https://www.linkedin.com/company/aperture")
+    expect(prefix_of(new)).to_be_hidden()
+    expect(address_of(new)).not_to_have_attribute("aria-describedby", re.compile("_prefix"))
+    address_of(new).fill("alex")
+    expect(prefix_of(new)).to_be_visible()
+
+
+def test_a_name_typed_is_saved_as_the_address_it_makes(page: Page, live_server, links):
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    new = rows_of(page, "social").last
+    new.locator("select").select_option("threads")
+    address_of(new).fill("@alex")
+    page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
+
+    expect(page.get_by_text("Your details have been saved.")).to_be_visible()
+    from postulo.core.models import WebLink
+
+    saved = WebLink.objects.get(url="https://www.threads.com/@alex")
+    assert (saved.kind, saved.service) == ("social", "threads")
+    # And drawn again as the name after its prefix.
+    again = rows_of(page, "social").filter(has=page.locator("[data-address-box][value='alex']"))
+    expect(again).to_have_count(1)
+    expect(prefix_of(again)).to_have_text("https://www.threads.com/@")
+
+
+def test_a_name_that_breaks_the_rule_is_refused_beside_the_box(page: Page, live_server, links):
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    new = rows_of(page, "social").last
+    new.locator("select").select_option("x")
+    address_of(new).fill("far_too_long_for_x_name")
+    page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
+
+    refused = rows_of(page, "social").filter(
+        has=page.locator("[data-address-box][value='far_too_long_for_x_name']")
+    )
+    expect(address_of(refused)).to_have_attribute("aria-invalid", "true")
+    expect(address_of(refused)).to_have_accessible_description(
+        re.compile(r"^https://x\.com/ That is not a username on X\.")
+    )
+    expect(prefix_of(refused)).to_be_visible()
+
+
+def test_with_scripts_off_a_saved_row_shows_its_prefix_and_a_new_one_the_address_box(
+    browser: Browser, live_server, links
+):
+    context = browser.new_context(java_script_enabled=False)
+    page = context.new_page()
+    try:
+        sign_in(page, live_server.url)
+        page.goto(f"{live_server.url}/accounts/profile/")
+        saved = rows_of(page, "social").nth(0)
+        expect(prefix_of(saved)).to_have_text("https://www.linkedin.com/in/")
+        expect(address_of(saved)).to_have_value("alex-morgan-1a2b3c")
+        assert not prefix_of(saved).evaluate("(el) => el.isContentEditable")
+        new = rows_of(page, "social").last
+        expect(prefix_of(new)).to_be_hidden()
+        expect(address_of(new)).to_have_attribute("type", "url")
+
+        # The server drew the saved row's service, so a name typed there is composed.
+        address_of(saved).fill("alex-morgan")
+        page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
+        expect(page.get_by_text("Your details have been saved.")).to_be_visible()
+        from postulo.core.models import WebLink
+
+        assert WebLink.objects.filter(url="https://www.linkedin.com/in/alex-morgan").exists()
+    finally:
+        context.close()
+
+
+def test_a_row_stored_in_another_shape_is_kept_and_says_so(page: Page, live_server, applicant):
+    from postulo.core.models import WebLink
+
+    WebLink.objects.create(
+        owner=applicant,
+        holder=applicant.profile,
+        kind="social",
+        service="linkedin",
+        url="https://www.linkedin.com/company/aperture",
+        is_primary=True,
+    )
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    row = rows_of(page, "social").first
+
+    expect(prefix_of(row)).to_be_hidden()
+    expect(address_of(row)).to_have_value("https://www.linkedin.com/company/aperture")
+    expect(row.locator("[data-kept-as-written]")).to_be_visible()
+    page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
+    expect(page.get_by_text("Your details have been saved.")).to_be_visible()
+    assert WebLink.objects.get().url == "https://www.linkedin.com/company/aperture"
+
+
+#: Where the prefix sits against its group: whole inside it, and nothing sideways.
+PREFIX_FITS = """(row) => {
+  const group = row.querySelector('[data-address-group]');
+  const prefix = group.querySelector("span[id$='_prefix']");
+  const box = group.querySelector('[data-address-box]');
+  const g = group.getBoundingClientRect(), p = prefix.getBoundingClientRect();
+  const b = box.getBoundingClientRect();
+  return {
+    group: [g.left, g.right, g.top, g.bottom], prefix: [p.left, p.right, p.top, p.bottom],
+    box: [b.left, b.right, b.top, b.bottom], wide: prefix.scrollWidth > prefix.clientWidth + 1,
+    text: prefix.textContent.trim(),
+  };
+}"""
+
+
+def test_at_320_pixels_the_group_wraps_and_the_prefix_is_whole(page: Page, live_server, links):
+    page.set_viewport_size({"width": 320, "height": 640})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    row = rows_of(page, "social").nth(0)
+
+    fit = row.evaluate(PREFIX_FITS)
+
+    assert fit["text"] == "https://www.linkedin.com/in/" and not fit["wide"]
+    assert fit["prefix"][0] >= fit["group"][0] - 0.5 and fit["prefix"][1] <= fit["group"][1] + 0.5
+    assert fit["box"][1] <= fit["group"][1] + 0.5, "the box is inside the group"
+    assert fit["box"][2] >= fit["prefix"][3] - 0.5, "the box wraps under the prefix"
+    assert page.evaluate(SPILLS) == []
+    assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]
+
+
+def test_the_prefix_is_whole_at_200_percent_and_under_the_text_spacing_override(
+    page: Page, live_server, links
+):
+    from .test_text_spacing import ADOPT, TEXT_SPACING, ZOOMED, lost_on
+
+    page.set_viewport_size({"width": ZOOMED, "height": 800})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    page.evaluate(ADOPT, TEXT_SPACING)
+    row = rows_of(page, "social").nth(0)
+
+    fit = row.evaluate(PREFIX_FITS)
+
+    assert not fit["wide"] and fit["text"] == "https://www.linkedin.com/in/"
+    assert fit["prefix"][1] <= fit["group"][1] + 0.5
+    assert [lost for lost in lost_on(page) if "data-address-group" in lost] == []
+
+
+def test_on_a_right_to_left_page_the_prefix_keeps_its_order(
+    page: Page, live_server, links, applicant
+):
+    profile = applicant.profile
+    profile.language = "ar"
+    profile.save(update_fields=["language"])
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    expect(page.locator("html")).to_have_attribute("dir", "rtl")
+    row = rows_of(page, "social").nth(0)
+
+    fit = row.evaluate(PREFIX_FITS)
+
+    assert fit["text"] == "https://www.linkedin.com/in/"
+    assert prefix_of(row).evaluate("(el) => el.querySelector('bdi').dir") == "ltr"
+    # Read left to right whatever the page is: the prefix, then the name after it.
+    assert fit["prefix"][0] - fit["group"][0] < 12, fit
+    assert fit["box"][0] >= fit["prefix"][0] - 0.5, fit
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+def test_a_row_with_a_prefix_has_no_violations(
+    page: Page,
+    live_server,
+    links,
+    axe_source,  # noqa: F811
+    scheme,
+):
+    """The saved row with its prefix, a new row with a service chosen by hand, and the
+    row beside a refused name."""
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    failures = []
+    found = violations_on(page, axe_source)
+    if found:
+        failures.append(describe(f"a saved row with its prefix ({scheme})", found))
+    new = rows_of(page, "social").last
+    new.locator("select").select_option("instagram")
+    address_of(new).fill("two words")
+    found = violations_on(page, axe_source)
+    if found:
+        failures.append(describe(f"a prefix chosen ({scheme})", found))
+    page.locator("main form").first.get_by_role("button", name="Save", exact=True).click()
+    expect(page.locator("[data-address-box][aria-invalid=true]")).to_have_count(1)
+    found = violations_on(page, axe_source)
+    if found:
+        failures.append(describe(f"a name refused ({scheme})", found))
     assert not failures, "\n\n".join(failures)
