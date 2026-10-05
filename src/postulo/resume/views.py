@@ -55,6 +55,12 @@ def get_section(slug: str):
         raise Http404(f"Unknown section {slug!r}") from exc
 
 
+def _for_overview(model, user):
+    """One section's rows, a skill group with its skills so it does not ask twice (#559)."""
+    rows = model.objects.for_user(user)
+    return rows.prefetch_related("skills") if model is SkillGroup else rows
+
+
 class ResumeOverviewView(OwnedObjectMixin, TemplateView):
     """Everything you have written about yourself, on one page."""
 
@@ -70,7 +76,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
         context["sections"] = [
             {
                 "spec": SECTIONS[slug],
-                "items": list(SECTIONS[slug].model.objects.for_user(user)),
+                "items": list(_for_overview(SECTIONS[slug].model, user)),
             }
             for slug in OVERVIEW_ORDER
         ]

@@ -10,7 +10,13 @@ from pydantic import AwareDatetime
 
 from postulo.core.files import serve_private_file
 from postulo.documents import printing
-from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
+from postulo.documents.models import (
+    CV,
+    CoverLetter,
+    RenderedDocument,
+    UploadedDocument,
+    with_entries,
+)
 
 from ..auth import scope
 from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
@@ -98,7 +104,7 @@ def _cv_out(cv: CV, *, detail: bool = False, offered: bool = True) -> dict:
                 "label": str(item),
                 "included": item.is_included,
             }
-            for item in cv.items.select_related("content_type").order_by("order")
+            for item in with_entries(cv.items.all()).order_by("order")
         ]
         data["show_contact_details"] = cv.show_contact_details
         data["prints"] = _prints_out(cv, offered=offered)

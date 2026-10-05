@@ -148,13 +148,17 @@ class Translated:
     falls through to the entry itself, dates and links and proficiency levels included.
     """
 
-    def __init__(self, entry, overrides: dict[str, str], language: str = "") -> None:
+    def __init__(
+        self, entry, overrides: dict[str, str], language: str = "", skills: tuple | None = None
+    ) -> None:
         # Straight into __dict__: __setattr__ is not overridden, but going through the
         # instance dictionary makes it plain that these three are the wrapper's own and
         # everything else is the entry's.
         self.__dict__["entry"] = entry
         self.__dict__["overrides"] = overrides
         self.__dict__["language"] = language
+        # What `skills_in` found for every group on the document, so one group does not ask.
+        self.__dict__["lookup"] = skills
 
     def __getattr__(self, name: str):
         overrides = self.__dict__["overrides"]
@@ -201,12 +205,21 @@ class Translated:
         language = self.__dict__["language"]
         if not language:
             return [skill.name for skill in skills]
-        found = overrides_by_entry(skills, language)
-        classified = classified_names(skills, language, entry.owner)
+        found, classified = self.__dict__["lookup"] or skills_in([entry], language, entry.owner)
         return [
             found.get(key_of(skill), {}).get("name") or classified.get(skill.pk) or skill.name
             for skill in skills
         ]
+
+
+def skills_in(groups, language: str, owner) -> tuple[dict, dict[int, str]]:
+    """The translated names and the classified names of every skill in these groups.
+
+    Two queries at most, however many groups there are: what a document asks once so that
+    each group need not (#559).
+    """
+    skills = [skill for group in groups if group is not None for skill in group.skills.all()]
+    return overrides_by_entry(skills, language), classified_names(skills, language, owner)
 
 
 def classified_names(skills, language: str, owner=None) -> dict[int, str]:
@@ -280,11 +293,13 @@ def named_by_classification(cv) -> list[tuple[object, str]]:
     ]
 
 
-def in_language(entry, language: str, overrides: dict[str, str] | None = None):
+def in_language(
+    entry, language: str, overrides: dict[str, str] | None = None, skills: tuple | None = None
+):
     """This entry as it reads in ``language`` — the entry itself where nothing differs.
 
     ``overrides`` is for a caller that has already fetched them in bulk; without it this
-    asks for one entry's own.
+    asks for one entry's own. ``skills`` is `skills_in`'s answer, likewise.
     """
     if entry is None or not language:
         return entry
@@ -292,7 +307,7 @@ def in_language(entry, language: str, overrides: dict[str, str] | None = None):
         overrides = overrides_for(entry, language)
     # Wrapped even when this entry itself has nothing translated, because a skill group with
     # an English heading may still hold skills that do, and the wrapper is what reaches them.
-    return Translated(entry, overrides, language)
+    return Translated(entry, overrides, language, skills)
 
 
 # ------------------------------------------------------------------- saying what fell back

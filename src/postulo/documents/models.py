@@ -364,7 +364,7 @@ class CV(DeclaresALanguage, OwnedModel):
 
     def included_items(self):
         """The items that will actually be rendered, in order."""
-        return self.items.filter(is_included=True).select_related("content_type")
+        return with_entries(self.items.filter(is_included=True))
 
     @property
     def document_kind(self) -> str:
@@ -402,6 +402,28 @@ class CV(DeclaresALanguage, OwnedModel):
                     )
                 }
             )
+
+
+def with_entries(items):
+    """These CV items with the entries they point at, a query per kind rather than per item.
+
+    A generic link has no join to follow, so every reader that walked the items and read
+    ``item.item`` cost a query an entry, and three more for each skill group shown in a
+    language (#559). A skill group arrives with its skills.
+    """
+    from django.apps import apps
+    from django.contrib.contenttypes.prefetch import GenericPrefetch
+
+    from postulo.resume.models import ResumeItem
+
+    querysets = [
+        model.objects.prefetch_related("skills")
+        if model._meta.model_name == "skillgroup"
+        else model.objects.all()
+        for model in apps.get_app_config("resume").get_models()
+        if issubclass(model, ResumeItem)
+    ]
+    return items.select_related("content_type").prefetch_related(GenericPrefetch("item", querysets))
 
 
 class CVItem(OwnedModel):

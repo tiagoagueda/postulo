@@ -40,7 +40,15 @@ from .forms import (
     SendDocumentsForm,
     UploadedDocumentForm,
 )
-from .models import CV, CoverLetter, CVItem, LetterKind, RenderedDocument, UploadedDocument
+from .models import (
+    CV,
+    CoverLetter,
+    CVItem,
+    LetterKind,
+    RenderedDocument,
+    UploadedDocument,
+    with_entries,
+)
 from .pdf import PDFBackendUnavailable
 from .rendering import (
     render_cv_html,
@@ -153,7 +161,7 @@ class CVDetailView(OwnedObjectMixin, DetailView):
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
-        context["items"] = self.object.items.select_related("content_type").order_by("order", "pk")
+        context["items"] = with_entries(self.object.items.all()).order_by("order", "pk")
         context["add_form"] = AddCVItemsForm(cv=self.object)
         context["renders"] = newest_versions(self.object.renders)
         # What it can leave as beside the PDF: the registry's list, so a format a plugin

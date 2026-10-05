@@ -144,6 +144,8 @@ def build_sections(cv: CV) -> list[Section]:
     ]
     entries = [cv_item.item for cv_item in cv_items]
     overrides = translating.overrides_by_entry(entries, language)
+    groups = [entry for entry in entries if hasattr(entry, "skill_names")]
+    skills = translating.skills_in(groups, language, cv.owner) if language else None
 
     sections: dict[str, Section] = {}
     for cv_item, entry in zip(cv_items, entries, strict=True):
@@ -152,7 +154,9 @@ def build_sections(cv: CV) -> list[Section]:
             sections[kind] = Section(kind=kind, label=str(SECTION_LABELS.get(kind, kind)))
         found = overrides.get(translating.key_of(entry))
         sections[kind].items.append(
-            Entry(cv_item=cv_item, item=translating.in_language(entry, language, found or {}))
+            Entry(
+                cv_item=cv_item, item=translating.in_language(entry, language, found or {}, skills)
+            )
         )
     return list(sections.values())
 
