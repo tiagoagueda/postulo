@@ -37,9 +37,6 @@ class ResumeItem(OwnedModel):
     #: The person's own order for the section, dense and exactly what the overview shows:
     #: the arrows there swap an entry with its neighbour and renumber (`ordering.move`,
     #: #203). Hidden on the entry's form unless Settings > Appearance says otherwise.
-    #: The person's own order for the section, dense and exactly what the overview shows:
-    #: the arrows there swap an entry with its neighbour and renumber (`ordering.move`,
-    #: #203). Hidden on the entry's form unless Settings > Appearance says otherwise.
     order = models.PositiveIntegerField(
         _("order"), default=0, help_text=_("Lower numbers appear first.")
     )
