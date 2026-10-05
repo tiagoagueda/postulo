@@ -13,10 +13,17 @@
    *Check again*, which is the same request made by hand: this page is watchable with no
    script at all, and on an instance with no worker it is already finished on its first paint
    and the link never appears.
+
+   **In a dialog (#674)** the same fragment is the body of one: the page's wording changes (*close*
+   rather than *leave*), the finished state ends with *Done* rather than a link, a failure points to
+   the other ways of giving a logo, and the polls ask for the same wording again. It is marked
+   `data-finished` once there is nothing more to wait for, which is what makes the dialog draw the
+   page behind it again when it closes, and `data-focus-result` when the line has just changed
+   under somebody, so that focus goes to it.
 {% endcomment %}
-<div id="errand-state"
+<div id="errand-state"{% if focus_result %} tabindex="-1" data-focus-result{% endif %}{% if in_dialog and errand.is_finished %} data-finished{% endif %}
      {% if not errand.is_finished %}
-       hx-get="{% url 'core:errand_state' errand.pk %}"
+       hx-get="{% url 'core:errand_state' errand.pk %}{% if in_dialog %}?dialog=1{% endif %}"
        hx-trigger="every {{ poll_seconds }}s"
        hx-target="#errand-state" hx-swap="outerHTML"
      {% endif %}>
@@ -25,7 +32,9 @@
       {% icon "check" class="size-4 text-emerald-600 dark:text-emerald-400" %}
       {{ errand.message }}
     </p>
-    {% if errand.url %}
+    {% if in_dialog %}
+      <button type="button" class="btn mt-4" data-dialog-done>{% translate "Done" %}</button>
+    {% elif errand.url %}
       <a href="{{ errand.url }}" class="btn mt-4">{% translate "Take me to it" %}</a>
     {% endif %}
   {% elif errand.state == 'failed' %}
@@ -34,6 +43,14 @@
       {% translate "That did not work." %}
     </p>
     <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{{ errand.message }}</p>
+    {% if in_dialog and errand.kind == "logo" and errand.subject_id %}
+      <p class="mt-3 text-sm">
+        <a href="{% url 'jobs:company_update' errand.subject_id %}" class="underline">{% translate "Paste an address or upload a file instead" %}</a>
+      </p>
+    {% endif %}
+    {% if in_dialog %}
+      <button type="button" class="btn mt-4" data-variant="outline" data-dialog-done>{% translate "Close" %}</button>
+    {% endif %}
   {% else %}
     <p class="flex items-center gap-2 font-medium">
       {% comment %} A spinner that is not the only thing saying so: the sentence beside it is
@@ -44,7 +61,7 @@
       {% blocktranslate trimmed with what=working_label %}{{ what }}…{% endblocktranslate %}
     </p>
     <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">
-      {% translate "You can leave this page. The work carries on without you." %}
+      {% if in_dialog %}{% translate "You can close this. The work carries on without you." %}{% else %}{% translate "You can leave this page. The work carries on without you." %}{% endif %}
     </p>
     <noscript>
       <a href="{% url 'core:errand' errand.pk %}" class="btn mt-4" data-variant="outline">

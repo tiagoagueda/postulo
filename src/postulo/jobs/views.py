@@ -481,11 +481,25 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
         try:
             throttle.fetch(request.user)
         except throttle.TooOften as too_often:
+            if request.htmx:
+                # In the dialog: said where the answer would have been, not as a redirect
+                # that would draw the whole page inside it.
+                return render(request, "jobs/partials/logo_refused.html", {"said": str(too_often)})
             messages.error(request, str(too_often))
             return redirect(safe_next(request, company.get_absolute_url()))
         errand = errands.send(
             "logo", request.user, subject=company, company_id=company.pk, action=action
         )
+        if request.htmx:
+            # The dialog on the company's page (#674): the same errand, shown where it was
+            # asked for. A plain post -- no script -- still lands on the errand's own page.
+            from postulo.core.views_errands import state_context
+
+            return render(
+                request,
+                "core/partials/errand_state.html",
+                state_context(errand, in_dialog=True, first=True),
+            )
         return redirect("core:errand", pk=errand.pk)
 
 

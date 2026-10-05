@@ -4,7 +4,9 @@
 {% block title %}{{ company.name }}{% endblock %}
 
 {% block content %}
-  <div class="mb-6 flex flex-wrap items-start gap-4">
+  {% comment %} The header is a region of its own so that the logo dialog can have it drawn again
+     once a logo has been found, without the person pressing anything more (#674). {% endcomment %}
+  <div id="company-head" class="mb-6 flex flex-wrap items-start gap-4">
     {% company_logo company "size-14 text-lg" %}
     <div>
       <c-page-title>{{ company.name }}</c-page-title>
@@ -45,16 +47,17 @@
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
       <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
+      {% comment %} Finding or fetching a logo again is a dialog on this page, not a page of its
+         own (#674): two presses, the first to say what will be fetched and from where, the
+         second to do it, which is what keeps fetching "only ever pressed by a person". The
+         button is a `popovertarget` one, so with no script the dialog is a popover and its
+         form posts as it always did. {% endcomment %}
       {% if company.website and not company.logo %}
-        <form method="post" action="{% url 'jobs:company_logo_action' company.pk 'website' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn" data-variant="ghost">{% translate "Find logo" %}</button>
-        </form>
+        <button type="button" id="logo-action" class="btn" data-variant="ghost"
+                popovertarget="logo-dialog">{% translate "Find logo" %}</button>
       {% elif company.logo and company.logo_source_url %}
-        <form method="post" action="{% url 'jobs:company_logo_action' company.pk 'refresh' %}">
-          {% csrf_token %}
-          <button type="submit" class="btn" data-variant="ghost">{% translate "Refresh logo" %}</button>
-        </form>
+        <button type="button" id="logo-action" class="btn" data-variant="ghost"
+                popovertarget="logo-dialog">{% translate "Refresh logo" %}</button>
       {% endif %}
       {% comment %} Always offered, not only beside a notice (#239): the comparison finds
          *Acme* and *Acme Ltd*, and somebody who knows that *Google* and *Alphabet* are
@@ -63,6 +66,24 @@
       <a href="{% url 'jobs:company_delete' company.pk %}"
          class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
     </div>
+
+    {% if company.website and not company.logo or company.logo and company.logo_source_url %}
+      <c-dialog id="logo-dialog" tone="plain" data-refresh="company-head">
+        <c-slot name="title">{% if company.logo %}{% translate "Refresh logo" %}{% else %}{% translate "Find logo" %}{% endif %}</c-slot>
+        <c-slot name="description">{% if company.logo %}{% blocktranslate trimmed with address=company.logo_source_url %}Postulo will fetch the logo again from <bdi>{{ address }}</bdi>.{% endblocktranslate %}{% else %}{% blocktranslate trimmed with address=company.website %}Postulo will read <bdi>{{ address }}</bdi> and keep the first image that works as the logo.{% endblocktranslate %}{% endif %}</c-slot>
+        {% comment %} What the press leaves behind, and where the answer comes: htmx posts this
+           same form and puts the errand's state in its place (a plain post redirects, as it
+           does with no script). The region is polite and announces the change. {% endcomment %}
+        <div id="logo-dialog-result" role="status" aria-live="polite" aria-atomic="true">
+          <form method="post" action="{% url 'jobs:company_logo_action' company.pk company.logo|yesno:'refresh,website' %}"
+                hx-post="{% url 'jobs:company_logo_action' company.pk company.logo|yesno:'refresh,website' %}"
+                hx-target="#logo-dialog-result" hx-swap="innerHTML" hx-sync="this:drop">
+            {% csrf_token %}
+            <button type="submit" class="btn">{% if company.logo %}{% translate "Refresh logo" %}{% else %}{% translate "Find logo" %}{% endif %}</button>
+          </form>
+        </div>
+      </c-dialog>
+    {% endif %}
   </div>
 
   {% comment %} Which of this person's other companies look like this one, and why (#239).

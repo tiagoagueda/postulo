@@ -1,0 +1,8 @@
+{% load i18n postulo %}
+{% comment %} Why the logo dialog did nothing: the allowance for fetching is spent (#407, #674).
+   Drawn where the errand's state would have been, which is why it is not a redirect. {% endcomment %}
+<p class="flex items-center gap-2 font-medium" tabindex="-1" data-focus-result>
+  {% icon "triangle-alert" class="size-4 text-amber-600 dark:text-amber-400" %}
+  {% translate "That did not work." %}
+</p>
+<p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{{ said }}</p>

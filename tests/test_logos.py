@@ -452,7 +452,10 @@ def test_a_company_page_shows_the_logo_and_never_the_far_address(client, user, c
     logos.from_url(company, "https://cdn.example/logo.png")
     html = client.get(company.get_absolute_url()).content.decode()
     assert reverse("jobs:company_logo", args=[company.pk]) in html
-    assert "cdn.example" not in html, "the far address never reaches a page"
+    # Said in words in the refresh dialog (#674), never drawn: nothing is loaded from it.
+    assert html.count("cdn.example") == html.count("<bdi>https://cdn.example/logo.png</bdi>"), (
+        "the far address appears only as text in the dialog, never as an attribute"
+    )
     assert "Refresh logo" in html
 
 
@@ -498,6 +501,90 @@ def test_logo_actions_are_private_to_the_owner(client, other_user, company):
     for action in ("website", "refresh", "remove"):
         url = reverse("jobs:company_logo_action", args=[company.pk, action])
         assert client.post(url).status_code == 404
+        assert client.post(url, headers={"HX-Request": "true"}).status_code == 404
+
+
+def _a_site_with_an_icon(web, monkeypatch):
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(
+            url="https://blackmesa.test/",
+            html=a_page(icon='<link rel="icon" href="/icon.png">').decode(),
+        ),
+    )
+    web["responses"]["https://blackmesa.test/icon.png"] = (200, an_image(), "image/png")
+
+
+def test_an_htmx_press_is_answered_with_the_errand_state_for_the_dialog(
+    client, user, company, web, monkeypatch
+):
+    """The dialog on the company's page shows the answer where the button was (#674)."""
+    _a_site_with_an_icon(web, monkeypatch)
+    client.force_login(user)
+    response = client.post(
+        reverse("jobs:company_logo_action", args=[company.pk, "website"]),
+        headers={"HX-Request": "true"},
+    )
+    assert response.status_code == 200, "no redirect to the errand's own page"
+    html = response.content.decode()
+    assert 'id="errand-state"' in html and "Found a logo" in html
+    assert "data-dialog-done" in html and "Take me to it" not in html
+    assert "<html" not in html
+    company.refresh_from_db()
+    assert company.logo_source == "website"
+
+
+def test_a_plain_press_still_lands_on_the_errand_page(client, user, company, web, monkeypatch):
+    _a_site_with_an_icon(web, monkeypatch)
+    client.force_login(user)
+    response = client.post(reverse("jobs:company_logo_action", args=[company.pk, "website"]))
+    assert response.status_code == 302
+    assert response["Location"].startswith(reverse("core:errand", args=[1])[:-2])
+
+
+def test_a_failure_in_the_dialog_gives_its_reason_and_the_other_ways(
+    client, user, company, web, monkeypatch
+):
+    monkeypatch.setattr(
+        logos.fetching,
+        "fetch_page",
+        lambda url: logos.fetching.FetchedPage(url="https://blackmesa.test/", html=a_page()),
+    )
+    web["responses"]["https://blackmesa.test/favicon.ico"] = (403, b"", "text/plain")
+    client.force_login(user)
+    response = client.post(
+        reverse("jobs:company_logo_action", args=[company.pk, "website"]),
+        headers={"HX-Request": "true"},
+    )
+    html = response.content.decode()
+    assert "answered 403" in html
+    assert reverse("jobs:company_update", args=[company.pk]) in html
+
+
+def test_the_state_fragment_keeps_its_dialog_wording_while_it_polls(
+    client, user, company, web, monkeypatch
+):
+    from postulo.core import errands
+
+    errand = errands.send("logo", user, subject=company, company_id=company.pk, action="website")
+    errand.state = "running"
+    errand.save()
+    client.force_login(user)
+    page = client.get(reverse("core:errand_state", args=[errand.pk])).content.decode()
+    assert "You can leave this page" in page
+    boxed = client.get(
+        reverse("core:errand_state", args=[errand.pk]) + "?dialog=1"
+    ).content.decode()
+    assert "You can close this" in boxed and "?dialog=1" in boxed
+
+
+def test_the_company_page_opens_the_logo_dialog_with_a_button(client, user, company):
+    client.force_login(user)
+    html = client.get(company.get_absolute_url()).content.decode()
+    assert 'popovertarget="logo-dialog"' in html
+    assert 'id="logo-dialog"' in html and 'id="company-head"' in html
+    assert "blackmesa.test" in html
 
 
 def test_two_people_recording_the_same_company_keep_their_own(user, other_user, web):

@@ -2774,9 +2774,77 @@
       if (opener && opener.isConnected && (lost || dialog.contains(document.activeElement))) {
         opener.focus();
       }
+      // A dialog that did something to the page behind it -- the logo's -- has that part
+      // of the page drawn again once the work it showed has finished (#674).
+      if (dialog.hasAttribute("data-refresh") && dialog.querySelector("[data-finished]")) {
+        drawAgain(dialog, opener);
+      }
     },
     true
   );
+
+  /* ------------------------------------------ a dialog whose work changed the page behind it
+   *
+   * `data-refresh="id"` on a dialog names the region of the page its work changes. When the
+   * dialog is closed with the work finished -- by *Done*, by Escape, by *Close* -- that region
+   * is fetched again from the address on screen and put in the place of the old one, so the
+   * new logo is there without anything more being pressed (#674). The region holds the dialog
+   * and the button that opens it, so both are new, and focus is handed to the new button,
+   * which has the old one's id. A request that fails leaves the page as it was.
+   */
+  function drawAgain(dialog, opener) {
+    var id = dialog.getAttribute("data-refresh");
+    var region = id ? document.getElementById(id) : null;
+    if (!region || !window.htmx || dialog.hasAttribute("data-drawing-again")) {
+      return;
+    }
+    dialog.setAttribute("data-drawing-again", "");
+    var openerId = opener && opener.id;
+    var request = window.htmx.ajax("GET", window.location.pathname + window.location.search, {
+      target: "#" + id,
+      select: "#" + id,
+      swap: "outerHTML",
+    });
+    Promise.resolve(request).then(
+      function () {
+        var again = openerId ? document.getElementById(openerId) : null;
+        if (again) {
+          again.focus();
+        }
+      },
+      function () {
+        dialog.removeAttribute("data-drawing-again");
+      }
+    );
+  }
+
+  // *Done* and *Close* at the foot of the logo dialog's answer (#674): they close the dialog
+  // it is in, which draws the page behind it again when the work has finished.
+  document.addEventListener("click", function (event) {
+    var button = event.target.closest ? event.target.closest("[data-dialog-done]") : null;
+    var dialog = button && button.closest("dialog[data-dialog]");
+    if (!dialog) {
+      return;
+    }
+    if (dialog.open) {
+      dialog.close();
+    } else if (popovers && dialog.matches(":popover-open")) {
+      dialog.hidePopover();
+      if (dialog.hasAttribute("data-refresh") && dialog.querySelector("[data-finished]")) {
+        drawAgain(dialog, document.querySelector('[popovertarget="' + CSS.escape(dialog.id) + '"]'));
+      }
+    }
+  });
+
+  // The line a dialog's work has just changed takes focus, so that it is read where somebody
+  // is looking and not only announced (#674). Once: the mark is taken off as it is used.
+  document.addEventListener("htmx:afterSettle", function () {
+    var line = document.querySelector("dialog[data-dialog] [data-focus-result]");
+    if (line) {
+      line.removeAttribute("data-focus-result");
+      line.focus();
+    }
+  });
 
   /* ------------------------------------------------ a link that opens a dialog instead
    *

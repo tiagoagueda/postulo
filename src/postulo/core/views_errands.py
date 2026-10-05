@@ -30,12 +30,24 @@ def _errand(request: HttpRequest, pk: int) -> Errand:
     return get_object_or_404(Errand.objects.for_user(request.user), pk=pk)
 
 
-def _context(errand: Errand) -> dict:
+def state_context(errand: Errand, *, in_dialog: bool = False, first: bool = False) -> dict:
+    """What the state fragment is drawn with; ``in_dialog`` is its wording for a dialog (#674).
+
+    ``first`` is the answer to the press that started the work: the line has just appeared
+    where a button was, so focus is sent to it, and again when the work finishes -- not on
+    every poll in between, which would pull it out of whatever else is being read.
+    """
     return {
         "errand": errand,
         "working_label": errand_layer.working_label(errand.kind),
         "poll_seconds": POLL_SECONDS,
+        "in_dialog": in_dialog,
+        "focus_result": in_dialog and (first or errand.is_finished),
     }
+
+
+def _context(errand: Errand) -> dict:
+    return state_context(errand)
 
 
 @login_required
@@ -47,4 +59,5 @@ def errand_page(request: HttpRequest, pk: int) -> HttpResponse:
 @login_required
 def errand_state(request: HttpRequest, pk: int) -> HttpResponse:
     """The fragment the page polls. Ownership checked here, not only on the POST."""
-    return render(request, "core/partials/errand_state.html", _context(_errand(request, pk)))
+    context = state_context(_errand(request, pk), in_dialog=request.GET.get("dialog") == "1")
+    return render(request, "core/partials/errand_state.html", context)
