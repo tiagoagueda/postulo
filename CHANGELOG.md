@@ -37,6 +37,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- GitHub, Forgejo and SourceHut brand marks appear beside contact links, drawn in black or white where the owner's guidelines allow it, and an identifier scheme can name a mark (#654)
 - Your details can hold a gender, chosen from a short list or in your own words, and a CV prints it only when it is set to (#681)
 - Your details can hold your nationalities, one or several, or only whether you are a citizen of the EU, the EEA or Switzerland, and a CV prints them only when it is set to (#680)
 - Your details has a Personal details card with an optional date and place of birth, which a CV prints as one “Born …” line only when it is set to (#679)
@@ -46,6 +47,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A company's page no longer scrolls sideways on a phone, and a contact's link is no longer cut off under wider text spacing (#654)
 - Find logo now says why a site gave nothing, and always tries the favicon (#526)
 - Fixed: THIRD-PARTY.md now lists the NACE table and the GeoNames and ESCO data downloaded when an instance is provisioned, and a test finds any licence file the register does not name (#579)
 - Removed the duplicate Search row from the phone bottom bar's More menu, and More is no longer drawn when nothing is under it (#339)
