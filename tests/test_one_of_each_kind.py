@@ -148,9 +148,13 @@ def test_a_filled_row_keeps_its_own_kind(client, holder):
 
     html = client.get(holder.url).content.decode()
 
-    # Listed by kind: LinkedIn first, then Wikidata.
-    assert switched_off(html, 0) == {"wikidata"}, "its own kind stays, the other row's goes"
-    assert switched_off(html, 1) == {"linkedin"}
+    # Each row keeps its own kind and loses the other's, whichever is listed first: your
+    # details list them in the person's order (#672), a company's form by kind.
+    first, second = switched_off(html, 0), switched_off(html, 1)
+    assert {frozenset(first), frozenset(second)} == {
+        frozenset({"wikidata"}),
+        frozenset({"linkedin"}),
+    }
 
 
 def test_other_is_never_switched_off(client, holder):
