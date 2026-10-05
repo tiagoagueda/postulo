@@ -29,8 +29,6 @@ from playwright.sync_api import Page, expect
 
 from tests.e2e.signing_in import sign_in
 
-from .conftest import PASSWORD
-
 pytestmark = pytest.mark.e2e
 
 AXE = Path(__file__).resolve().parents[2] / "node_modules" / "axe-core" / "axe.min.js"
@@ -699,36 +697,10 @@ def axe_should_read(path: str) -> bool:
 
 
 @pytest.mark.parametrize("scheme", ["light", "dark"])
-def test_every_signed_in_page_has_no_violations(
-    live_server, page: Page, axe_source, furnished, scheme
-):
-    page.emulate_media(color_scheme=scheme)
-    base = live_server.url
-    sign_in(page, base)
-    a = furnished["application"]
-    c = furnished["company"]
-    me = furnished["applicant"]
-    paths = signed_in_paths(a, c, me, furnished["experience"], things=furnished)
-    failures = []
-    for path in paths:
-        if not axe_should_read(path):
-            continue
-        page.goto(f"{base}{path}")
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
-            page.goto(f"{base}{path}")
-        found = violations_on(page, axe_source)
-        if found:
-            failures.append(describe(f"{path} ({scheme})", found))
-    assert not failures, "\n\n".join(failures)
-
-
-@pytest.mark.parametrize("scheme", ["light", "dark"])
 def test_the_company_form_in_two_columns_has_no_violations(
     live_server, page: Page, axe_source, furnished, scheme
 ):
-    """The walk above runs at the default window, 1280 pixels, where the company form is one
+    """The walks (`test_every_page.py`) run at 1280 pixels, where the company form is one
     column. From `2xl` it is two, the details beside the identifiers (#210), and that state
     exists only in a wide window, so it is looked at in one."""
     page.emulate_media(color_scheme=scheme)
@@ -1026,7 +998,7 @@ def test_the_skip_link_and_keyboard_reach_the_main_content(live_server, page: Pa
     expect(page.locator("details[data-menu][open]")).to_have_count(0)
 
 
-#: Which URL patterns the walk above reaches, **resolved from the walk itself** rather than
+#: Which URL patterns the walk reaches, **resolved from the walk itself** rather than
 #: written down beside it. `tests/test_page_coverage.py` compares this with every pattern
 #: the resolver knows, and until #167 the comparison was against a hand-written tuple that
 #: had drifted: it claimed 104 names and the walk reached 69, so thirty-five pages were

@@ -27,8 +27,8 @@ What this cannot judge is the *equivalent* exception — "another control on the
 the same job at full size" — which needs a person. Nothing here relies on it; if something
 ever does, it belongs in `EXEMPT` with the reason written down rather than in a filter.
 
-One viewport, 1280 by 900. Narrow layouts rearrange enough to deserve their own pass, and
-that belongs with the reflow work rather than here.
+One viewport, 1280 by 900, in the walk `test_every_page.py` takes. Narrow layouts rearrange
+enough to deserve their own pass, and that belongs with the reflow work rather than here.
 """
 
 from __future__ import annotations
@@ -211,55 +211,34 @@ def too_small(page: Page, menu: int = -1) -> list[str]:
     return failures
 
 
-def test_everything_clickable_is_big_enough_to_hit(live_server, page: Page, furnished):  # noqa: F811
-    base = live_server.url
-    sign_in(page, base)
-    page.set_viewport_size({"width": 1280, "height": 900})
+def measure_targets(page: Page, path: str, found: dict[str, str], *, masthead: bool) -> None:
+    """Hold the page as it stands to the criterion, and then each of its menus, open.
 
-    paths = signed_in_paths(
-        furnished["application"],
-        furnished["company"],
-        furnished["applicant"],
-        furnished["experience"],
-        things=furnished,
+    Findings go into ``found``, keyed by what failed, with where it was first seen. The
+    walk that calls this for every page is in `test_every_page.py` (#722).
+
+    A closed menu has no boxes to measure, and the column chooser -- which is what #115 was
+    about -- lives inside one. They are opened one at a time: two menus open at once is not
+    a state anybody reaches, and their boxes would overlap. The masthead's menus are the
+    same on every page, so they are measured only when ``masthead`` says so -- on the first
+    page of a walk -- and the count is spent on the page's own.
+    """
+    for failure in too_small(page):
+        found.setdefault(failure, path)
+
+    in_masthead = page.evaluate(
+        f"() => [...document.querySelectorAll('{MENUS}')]"
+        ".map((menu) => !!menu.closest('[data-site-header]'))"
     )
-    found: dict[str, str] = {}
-    masthead_measured = False
-    for path in paths:
-        page.goto(f"{base}{path}")
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
-            page.goto(f"{base}{path}")
-
-        for failure in too_small(page):
-            found.setdefault(failure, path)
-
-        # A closed menu has no boxes to measure, and the column chooser -- which is what
-        # #115 was about -- lives inside one. Open them one at a time: two menus open at
-        # once is not a state anybody reaches, and their boxes would overlap. The
-        # masthead's menus are the same on every page, so they are measured on the first
-        # one, and the count is spent on the page's own.
-        in_masthead = page.evaluate(
-            f"() => [...document.querySelectorAll('{MENUS}')]"
-            ".map((menu) => !!menu.closest('[data-site-header]'))"
-        )
-        mine = [index for index, masthead in enumerate(in_masthead) if not masthead]
-        wanted = mine[:MENUS_PER_PAGE]
-        if not masthead_measured:
-            wanted = [index for index, masthead in enumerate(in_masthead) if masthead] + wanted
-            masthead_measured = True
-        for index in wanted:
-            page.evaluate(TOGGLE, [index, True])
-            for failure in too_small(page, menu=index):
-                found.setdefault(failure, f"{path} (menu {index + 1})")
-            page.evaluate(TOGGLE, [index, False])
-
-    report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(found.items()))
-    assert not found, (
-        f"{len(found)} target(s) under {MINIMUM}x{MINIMUM} with no exception "
-        f"(WCAG 2.2 SC 2.5.8):\n{report}"
-    )
+    mine = [index for index, inside in enumerate(in_masthead) if not inside]
+    wanted = mine[:MENUS_PER_PAGE]
+    if masthead:
+        wanted = [index for index, inside in enumerate(in_masthead) if inside] + wanted
+    for index in wanted:
+        page.evaluate(TOGGLE, [index, True])
+        for failure in too_small(page, menu=index):
+            found.setdefault(failure, f"{path} (menu {index + 1})")
+        page.evaluate(TOGGLE, [index, False])
 
 
 def test_everything_is_still_big_enough_when_somebody_asks_for_less_room(
@@ -275,9 +254,10 @@ def test_everything_is_still_big_enough_when_somebody_asks_for_less_room(
     padding inside a card and inside a table cell. A cell's padding is the row's height,
     and a row is not a target; what is clickable inside it carries its own minimum.
 
-    This is the whole walk a second time, which is worth the minute it costs: the failure
-    it guards against is one nobody would see, on whichever page somebody happens to have
-    tightened.
+    This is the whole walk a second time, beside the one in `test_every_page.py`, because
+    every page is drawn differently and so has to be loaded again. It is worth what it
+    costs: the failure it guards against is one nobody would see, on whichever page
+    somebody happens to have tightened.
     """
     from postulo.accounts.models import Profile
 

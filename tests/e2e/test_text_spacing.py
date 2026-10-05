@@ -6,7 +6,8 @@ override low-vision and dyslexic readers apply -- and nothing when the window is
 200%. Neither had ever been run, and the stylesheet has the shapes that break under them:
 `truncate`, `whitespace-nowrap`, fixed heights. The same measure-in-the-browser shape as
 the target-size and reflow checks: the override is injected, every page is visited, and
-any box that clips its own words, or a page that scrolls sideways, is named.
+any box that clips its own words, or a page that scrolls sideways, is named. The walks
+themselves are in `test_every_page.py` (#722).
 """
 
 from __future__ import annotations
@@ -14,8 +15,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page
 
-from .conftest import PASSWORD
-from .test_accessibility import furnished, sign_in, signed_in_paths  # noqa: F401
+from .test_accessibility import furnished, sign_in  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS
 
 pytestmark = pytest.mark.e2e
@@ -77,70 +77,29 @@ CLIPPED = r"""() => {
 }"""
 
 
-def walk(page: Page, base: str, furnished, before=None) -> dict[str, str]:  # noqa: F811
-    failures: dict[str, str] = {}
-    paths = signed_in_paths(
-        furnished["application"],
-        furnished["company"],
-        furnished["applicant"],
-        furnished["experience"],
-        things=furnished,
-    )
-    for path in paths:
-        page.goto(f"{base}{path}")
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
-            page.goto(f"{base}{path}")
-        if before:
-            before(page)
-        for clipped in page.evaluate(CLIPPED):
-            failures.setdefault(
-                f"words {clipped['needs']}px {clipped['axis']} in a box of {clipped['box']}px  "
-                f"{clipped['what']}",
-                path,
-            )
-        result = page.evaluate(SCROLLS_SIDEWAYS)
-        for culprit in result["culprits"]:
-            failures.setdefault(
-                f"{culprit['width']}px wide, {culprit['over']}px over  {culprit['what']}", path
-            )
-        if result["reached"] and not result["culprits"]:
-            failures.setdefault(f"scrolls {result['reached']}px sideways", path)
-    return failures
+def lost_on(page: Page) -> list[str]:
+    """Every box on the page as it stands that clips its words, and whatever pushes it sideways.
+
+    The walks that ask it, at 200% zoom and under the override, are in
+    `test_every_page.py` (#722).
+    """
+    lost = [
+        f"words {clipped['needs']}px {clipped['axis']} in a box of {clipped['box']}px  "
+        f"{clipped['what']}"
+        for clipped in page.evaluate(CLIPPED)
+    ]
+    result = page.evaluate(SCROLLS_SIDEWAYS)
+    lost += [
+        f"{culprit['width']}px wide, {culprit['over']}px over  {culprit['what']}"
+        for culprit in result["culprits"]
+    ]
+    if result["reached"] and not result["culprits"]:
+        lost.append(f"scrolls {result['reached']}px sideways")
+    return lost
 
 
 def report(failures: dict[str, str]) -> str:
     return "\n".join(f"  {where}\n    {what}" for what, where in sorted(failures.items()))
-
-
-def test_nothing_is_lost_under_the_text_spacing_override(page: Page, live_server, furnished):  # noqa: F811
-    base = live_server.url
-    sign_in(page, base)
-    page.set_viewport_size({"width": 1280, "height": 900})
-
-    failures = walk(page, base, furnished, before=lambda p: p.evaluate(ADOPT, TEXT_SPACING))
-
-    assert not failures, (
-        f"{len(failures)} box(es) clip their words or push the page sideways under the text "
-        f"spacing override (WCAG 2.2 SC 1.4.12):\n{report(failures)}"
-    )
-
-
-def test_nothing_is_lost_at_two_hundred_percent_zoom(page: Page, live_server, furnished):  # noqa: F811
-    """A 640-pixel layout viewport is what 200% zoom leaves a 1280-pixel window with. The
-    320-pixel reflow pass is 400%; a table may scroll in its box there and here alike, and
-    what may not happen is a box clipping its own words."""
-    base = live_server.url
-    sign_in(page, base)
-    page.set_viewport_size({"width": ZOOMED, "height": 450})
-
-    failures = walk(page, base, furnished)
-
-    assert not failures, (
-        f"{len(failures)} box(es) clip their words or push the page sideways at 200% zoom:\n"
-        f"{report(failures)}"
-    )
 
 
 def test_less_motion_means_no_motion(page: Page, live_server, furnished):  # noqa: F811

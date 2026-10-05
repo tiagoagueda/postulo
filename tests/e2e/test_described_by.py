@@ -11,6 +11,8 @@ with one empty field, four of them dangling.
 **axe cannot catch this.** It does not report a dangling `aria-describedby`, and it has no
 way to know that a `<p>` below an input was meant to describe it. Resolving the ids against
 the document is four lines, and it is the check worth keeping — which is what this is.
+Every page is held to it by the light walk in `test_every_page.py`, which shares each page
+load among four instruments (#722); the forms below are the half a walk cannot reach.
 
 The forms are submitted empty on purpose. A valid form has no errors, so the half of the
 bug that only appears once something has gone wrong would never be reached by walking pages.
@@ -21,8 +23,7 @@ from __future__ import annotations
 import pytest
 from playwright.sync_api import Page
 
-from .conftest import PASSWORD
-from .test_accessibility import furnished, sign_in, signed_in_paths  # noqa: F401
+from .test_accessibility import furnished, sign_in  # noqa: F401
 
 pytestmark = pytest.mark.e2e
 
@@ -77,30 +78,6 @@ def dangling_on(page: Page) -> list[str]:
     problems = [f"{row['id']} referenced by {row['what']}" for row in result["dangling"]]
     problems += [f"id {name!r} is on more than one element" for name in result["duplicated"]]
     return problems
-
-
-def test_no_page_references_an_element_that_is_not_there(live_server, page: Page, furnished):  # noqa: F811
-    base = live_server.url
-    sign_in(page, base)
-
-    failures: dict[str, str] = {}
-    for path in signed_in_paths(
-        furnished["application"],
-        furnished["company"],
-        furnished["applicant"],
-        furnished["experience"],
-        things=furnished,
-    ):
-        page.goto(f"{base}{path}")
-        if "reauthenticate" in page.url:
-            page.locator("input[name=password]").fill(PASSWORD)
-            page.locator("form").get_by_role("button").first.click()
-            page.goto(f"{base}{path}")
-        for problem in dangling_on(page):
-            failures.setdefault(problem, path)
-
-    report = "\n".join(f"  {where}\n    {what}" for what, where in sorted(failures.items()))
-    assert not failures, f"{len(failures)} broken reference(s):\n{report}"
 
 
 @pytest.mark.parametrize("path,selector", FORMS_TO_BREAK)

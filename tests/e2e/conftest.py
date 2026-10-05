@@ -131,13 +131,11 @@ def pytest_sessionfinish(session, exitstatus):
 #: first, so that under xdist no worker is left holding one while the others sit idle (#721).
 WALKS = frozenset(
     {
-        "test_every_signed_in_page_has_no_violations",
-        "test_no_page_scrolls_sideways_at_320_pixels",
-        "test_nothing_is_lost_under_the_text_spacing_override",
+        "test_every_page_in_light_with_every_instrument",
+        "test_every_page_in_dark_has_no_violations",
         "test_nothing_is_lost_at_two_hundred_percent_zoom",
-        "test_everything_clickable_is_big_enough_to_hit",
+        "test_no_page_scrolls_sideways_at_320_pixels",
         "test_everything_is_still_big_enough_when_somebody_asks_for_less_room",
-        "test_no_page_references_an_element_that_is_not_there",
     }
 )
 
