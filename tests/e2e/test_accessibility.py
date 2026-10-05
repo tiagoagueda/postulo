@@ -585,6 +585,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # that reads one back (#181). The half that comes after a file has a test below.
         "/career/file/",
         "/server/logs/",
+        "/server/backups/",
         "/accounts/invitations/new/",
         f"/server/people/{me.pk}/recovery/",
         # The two halves of a recovery link, walked in order: the first sets the ticket in

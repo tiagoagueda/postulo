@@ -1214,6 +1214,60 @@ class SiteSettings(models.Model):
     #: backup is held to the same rules as one that was typed.
     identifier_schemes = models.TextField(_("identifier schemes of its own"), blank=True)
 
+    # --- scheduled backups (#242) ------------------------------------------------------
+    #
+    #: Off, daily or weekly. Off by default: a backup is a copy of everybody's data on the
+    #: same disk, and an instance writes one only because its administrator asked.
+    backup_schedule = models.CharField(
+        _("scheduled backups"),
+        max_length=10,
+        default="off",
+        choices=[
+            ("off", _("Off")),
+            ("daily", _("Every day")),
+            ("weekly", _("Every week")),
+        ],
+    )
+    backup_hour = models.PositiveSmallIntegerField(
+        _("at"),
+        default=3,
+        choices=[(hour, f"{hour:02d}:00") for hour in range(24)],
+        help_text=_("In the instance's time zone."),
+    )
+    backup_weekday = models.PositiveSmallIntegerField(
+        _("on"),
+        default=0,
+        choices=[
+            (0, _("Monday")),
+            (1, _("Tuesday")),
+            (2, _("Wednesday")),
+            (3, _("Thursday")),
+            (4, _("Friday")),
+            (5, _("Saturday")),
+            (6, _("Sunday")),
+        ],
+        help_text=_("Only for weekly backups."),
+    )
+    backup_keep = models.PositiveSmallIntegerField(
+        _("keep the newest"),
+        default=7,
+        validators=[MinValueValidator(1), MaxValueValidator(365)],
+        help_text=_(
+            "Older backups are deleted only after a new one has been written and checked. "
+            "Archives you uploaded are never deleted by this."
+        ),
+    )
+    #: When the scheduler last took a slot, and whether that run worked (``None`` while it
+    #: is still running). The slot is claimed before the work, so two schedulers cannot both
+    #: take it and a long backup is not queued again on every pass.
+    backup_last_run_at = models.DateTimeField(null=True, blank=True, editable=False)
+    backup_last_run_ok = models.BooleanField(null=True, blank=True, editable=False)
+    #: The last backup that worked, scheduled or not, and the last failure's words.
+    backup_last_ok_at = models.DateTimeField(null=True, blank=True, editable=False)
+    backup_last_error = models.TextField(blank=True, editable=False)
+    #: Backups that failed since this row was made: the counter the metric exports.
+    backup_failures = models.PositiveIntegerField(default=0, editable=False)
+
     updated_at = models.DateTimeField(_("updated at"), auto_now=True)
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

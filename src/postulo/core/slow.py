@@ -109,6 +109,37 @@ def import_a_spreadsheet(errand) -> dict:
     }
 
 
+@handler("backup", working=_("Taking a backup"))
+def take_a_backup(errand) -> dict:
+    """Write a verified archive of the whole instance (#242).
+
+    An errand rather than a request, because on SQLite a request holds the write lock for
+    as long as it runs (#220) and an archive with media takes minutes.
+    """
+    from django.urls import reverse
+
+    from . import backups
+    from .backup import BackupError
+    from .errands import Refused
+
+    try:
+        path = backups.take()
+    except backups.Busy as busy:
+        raise Refused(str(_("A backup is already running."))) from busy
+    except BackupError as error:
+        backups.record(False, str(error))
+        raise Refused(str(error)) from error
+    except Exception:
+        backups.record(False, str(_("Something went wrong. The server log has the details.")))
+        raise
+    backups.record(True)
+    return {
+        "message": str(_("The backup is written and checked.")),
+        "url": reverse("server:backups"),
+        "archive": path.name,
+    }
+
+
 def reap_archives() -> int:
     """Delete the archives that have run out. Called by the scheduler.
 

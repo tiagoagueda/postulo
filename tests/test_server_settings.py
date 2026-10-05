@@ -48,7 +48,10 @@ SECTION_URLS = [section.url_name for section in SECTIONS]
 def test_every_section_is_for_administrators_only(client, user, url_name):
     assert client.get(reverse(url_name)).status_code == 302, "anonymous: to the sign-in page"
     client.force_login(user)
-    assert client.get(reverse(url_name)).status_code == 403
+    # Backups answers 404: the page is the way to a file holding everybody's data, and a
+    # refusal would say that it is there (#242).
+    expected = 404 if url_name == "server:backups" else 403
+    assert client.get(reverse(url_name)).status_code == expected
 
 
 @pytest.mark.parametrize("url_name", ["server:overview", "settings:index"])

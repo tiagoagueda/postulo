@@ -47,6 +47,22 @@ EXCUSED: dict[str, str] = {
     "server:person_plugins": "administrators only, on an account; tests/test_server_settings.py",
     "server:person_recovery": "administrators only, on an account; tests/test_server_settings.py",
     "server:person_username": "administrators only, on an account; tests/test_server_settings.py",
+    "server:backup_delete": (
+        "administrators only, and a file named in the address rather than an owned record; "
+        "tests/security/test_backups_page.py"
+    ),
+    "server:backup_download": (
+        "administrators only, and a file named in the address rather than an owned record; "
+        "tests/security/test_backups_page.py"
+    ),
+    "server:backup_restore": (
+        "administrators only, and a file named in the address rather than an owned record; "
+        "tests/security/test_backups_page.py"
+    ),
+    "server:backup_verify": (
+        "administrators only, and a file named in the address rather than an owned record; "
+        "tests/security/test_backups_page.py"
+    ),
     "connections:create": "a plugin kind and name in the address, and no record",
     "connections:logo": (
         "a plugin name, and no record; who may see which logo is tests/test_plugin_logos.py"

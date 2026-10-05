@@ -174,10 +174,23 @@
           </dd>
         </div>
       </dl>
+      {% if backup_failed %}
+        <p class="mt-4 text-sm font-medium text-red-700 dark:text-red-400" data-backup-failed>
+          {% translate "The last backup failed." %}
+          <a href="{% url 'server:backups' %}" class="underline">{% translate "See why" %}</a>
+        </p>
+      {% endif %}
+      {% if backup_missed %}
+        <p class="mt-4 text-sm font-medium text-amber-700 dark:text-amber-400" data-backup-missed>
+          {% translate "A scheduled backup was due and nothing took it." %}
+          <a href="{% url 'server:backups' %}" class="underline">{% translate "Backups" %}</a>
+        </p>
+      {% endif %}
       <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+        {% url 'server:backups' as backups_url %}
         {% blocktranslate trimmed %}
-          Back up with <code>manage.py backup</code>; see the wiki page on backups for a
-          schedule and for restoring.
+          Take, download and schedule backups under <a href="{{ backups_url }}" class="underline">Backups</a>,
+          or run <code>manage.py backup</code>; see the wiki page on backups for restoring.
         {% endblocktranslate %}
       </p>
     </div>

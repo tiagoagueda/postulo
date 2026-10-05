@@ -61,6 +61,18 @@ SECTIONS: tuple[SettingsSection, ...] = (
     SettingsSection(
         slug="logs", label=_("Logs"), url_name="server:logs", icon="file-text", order=70
     ),
+    # The instance's own copies: list, take, download, delete, schedule (#242).
+    SettingsSection(
+        slug="backups",
+        label=_("Backups"),
+        url_name="server:backups",
+        icon="download",
+        order=72,
+        match=(
+            "server:backup_delete",
+            "server:backup_restore",
+        ),
+    ),
     SettingsSection(
         slug="defaults", label=_("Defaults"), url_name="server:defaults", icon="settings", order=70
     ),

@@ -37,7 +37,7 @@ from django.db import connection
 from django.utils import timezone
 
 from postulo import __version__
-from postulo.core import scheduler
+from postulo.core import scheduler, site
 
 #: How late a reminder has to be before it counts as overdue rather than merely due. Long
 #: enough that a scheduler running every five minutes never reports one in the ordinary way
@@ -259,6 +259,29 @@ def collect() -> list[Metric]:
                     .count(),
                 ),
             ],
+        )
+    )
+
+    # ---- the instance's own copies, which is the one thing an operator cannot afford to
+    # find out is missing when they need it (#242).
+    row = site.current()
+    metrics.append(
+        Metric(
+            "postulo_backup_last_success_timestamp_seconds",
+            "gauge",
+            (
+                "When a backup last finished and verified, as a Unix time, whether it was "
+                "taken by hand or by the schedule. 0 when none has here."
+            ),
+            [({}, row.backup_last_ok_at.timestamp() if row.backup_last_ok_at else 0)],
+        )
+    )
+    metrics.append(
+        Metric(
+            "postulo_backup_failures_total",
+            "counter",
+            "Backups that failed, by hand or by the schedule, since this instance began.",
+            [({}, row.backup_failures or 0)],
         )
     )
 

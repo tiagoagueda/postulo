@@ -21,3 +21,11 @@ def perform_errand(errand_id: int) -> None:
     from . import errands
 
     errands.perform(errand_id)
+
+
+@task()
+def scheduled_backup() -> None:
+    """The scheduled backup, run by a worker so a pass of the scheduler never waits on it (#242)."""
+    from . import backups
+
+    backups.run_scheduled()

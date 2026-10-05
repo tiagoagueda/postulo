@@ -1,0 +1,27 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block measure %}max-w-2xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Delete a backup" %}
+    <c-slot name="subtitle">
+    {% blocktranslate trimmed with name=archive.name when=archive.made_at|date:"DATETIME_FORMAT" size=archive.size|filesizeformat %}
+      {{ name }}, made {{ when }}, {{ size }}. The file is removed from the disk and cannot be brought back.
+    {% endblocktranslate %}
+    </c-slot>
+  </c-page-title>
+  {% if blocked %}
+    <div class="alert mb-6" data-variant="warning" role="status">{{ blocked }}</div>
+    <a href="{% url 'server:backups' %}" class="btn" data-variant="ghost">{% translate "Back to Backups" %}</a>
+  {% else %}
+    <form method="post" class="card border-red-300 dark:border-red-900">
+      {% csrf_token %}
+      <div class="flex items-center gap-3">
+        <button type="submit" class="btn" data-variant="destructive">{% translate "Delete the backup" %}</button>
+        <a href="{% url 'server:backups' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+      </div>
+    </form>
+  {% endif %}
+{% endblock %}

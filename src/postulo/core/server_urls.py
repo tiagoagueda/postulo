@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import server_views as views
+from . import views_backups as backups
 
 app_name = "server"
 
@@ -47,6 +48,15 @@ urlpatterns = [
         name="record_of_processing",
     ),
     path("logs/", views.LogsView.as_view(), name="logs"),
+    path("backups/", backups.BackupsView.as_view(), name="backups"),
+    path("backups/run/", backups.BackupRunView.as_view(), name="backup_run"),
+    path("backups/upload/", backups.BackupUploadView.as_view(), name="backup_upload"),
+    path(
+        "backups/<str:name>/download/", backups.BackupDownloadView.as_view(), name="backup_download"
+    ),
+    path("backups/<str:name>/verify/", backups.BackupVerifyView.as_view(), name="backup_verify"),
+    path("backups/<str:name>/delete/", backups.BackupDeleteView.as_view(), name="backup_delete"),
+    path("backups/<str:name>/restore/", backups.BackupRestoreView.as_view(), name="backup_restore"),
     path("design/", views.DesignView.as_view(), name="design"),
     path("capture/", views.CaptureView.as_view(), name="capture"),
     path("defaults/", views.DefaultsView.as_view(), name="defaults"),

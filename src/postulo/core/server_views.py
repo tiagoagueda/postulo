@@ -36,7 +36,7 @@ from postulo import __version__
 from postulo.accounts import deletion
 from postulo.plugins.forms import PluginRepositoryForm
 
-from . import errands, languages, proxy, scheduler, site, updates
+from . import backups, errands, languages, proxy, scheduler, site, updates
 from .mixins import StaffRequiredMixin
 from .models import SiteSettings
 from .server_forms import (
@@ -175,6 +175,10 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 "backup_dir": Path(settings.POSTULO_BACKUP_DIR),
                 "newest_backup": _newest_backup(Path(settings.POSTULO_BACKUP_DIR)),
                 "queued_tasks": _queued_tasks(),
+                # A scheduled backup that failed or was never picked up, so that the page an
+                # administrator opens first says so (#242).
+                "backup_failed": site.current().backup_last_error,
+                "backup_missed": backups.is_missed(site.current()),
                 # Whether the slow work is sent off at all, and whether whoever was meant
                 # to do it has been round lately (#247). Both, because the interesting
                 # state is the disagreement: a queue switched on and a worker that has

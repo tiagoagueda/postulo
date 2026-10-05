@@ -208,6 +208,16 @@ class Command(BaseCommand):
             # instance keeps them (#256). The captures stay; the copies of the pages go.
             pages_gone = pages.expire_unconfirmed()
 
+        # Outside the lease on purpose: a backup of a large media directory takes minutes,
+        # and what it needs is its own claim on the slot, not this pass's. A failed one
+        # never fails the pass that carries the reminders (#242).
+        try:
+            from postulo.core import backups
+
+            backups.start_if_due()
+        except Exception:
+            logger.exception("Could not start the scheduled backup")
+
         when = f"{timezone.now():%Y-%m-%d %H:%M}"
         if stamped:
             self.stdout.write(f"{when} {stamped} reminders due, {delivered} deliveries")

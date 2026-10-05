@@ -1,0 +1,223 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Backups" %}
+    <c-slot name="subtitle">
+    {% translate "Copies of the whole instance: every account, every file, the plugins. Take one, keep the newest few, and carry one away." %}
+    </c-slot>
+  </c-page-title>
+
+  <div class="alert mb-6" data-variant="warning" role="note">
+    <div>
+      <p class="font-medium">{% translate "An archive holds everybody's data, unencrypted." %}</p>
+      <p class="text-sm">
+        {% blocktranslate trimmed %}
+          Downloading one needs you to sign in again, and is written to the log with your
+          name. Keep what you download as carefully as the instance itself. The key that the
+          connection secrets are under is not in an archive: keep your <code>.env</code>
+          somewhere else.
+        {% endblocktranslate %}
+      </p>
+    </div>
+  </div>
+
+  {% comment %} The live region is the page's and stays put; only what is inside it is
+     swapped by the poll, which is how an announcement reliably reaches a screen reader
+     (#500). Without a script the same line has a *Check again* link. {% endcomment %}
+  <div role="status" aria-live="polite" aria-atomic="true" id="backup-status" class="mb-6 empty:hidden">
+    {% if errand_state %}
+      <div class="card">
+        {% include "core/partials/errand_state.html" with errand=errand_state.errand working_label=errand_state.working_label poll_seconds=errand_state.poll_seconds in_dialog=False focus_result=False %}
+      </div>
+    {% elif running %}
+      <div class="card"><p class="font-medium">{% translate "A backup is running." %}</p></div>
+    {% endif %}
+  </div>
+
+  {% if low_on_room %}
+    <div class="alert mb-6" data-variant="warning" role="alert" data-backup-room="low">
+      <div>
+        <p class="font-medium">{% translate "The next backup may not fit." %}</p>
+        <p class="text-sm">
+          {% blocktranslate with free=free_bytes|filesizeformat trimmed %}
+            {{ free }} is free where the archives are kept, which is less than a quarter more
+            than the newest archive. Delete old ones or move the directory to a larger volume.
+          {% endblocktranslate %}
+        </p>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="card mb-6">
+    <c-section-title>{% translate "Back up now" %}</c-section-title>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% if background_work %}
+        {% translate "Runs in the background; you can leave this page while it works." %}
+      {% else %}
+        {% translate "No worker is configured, so this page waits until the backup is finished. An instance with a lot of files takes a while." %}
+      {% endif %}
+    </p>
+    <form method="post" action="{% url 'server:backup_run' %}">
+      {% csrf_token %}
+      <button type="submit" class="btn" {% if running %}disabled{% endif %}>{% translate "Back up now" %}</button>
+    </form>
+  </div>
+
+  <c-scroll-box class="card mb-2 p-0" label="{% translate 'Backups' %}">
+    <table class="table" data-backups>
+      <caption class="sr-only">{% translate "Backups, newest first" %}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{% translate "When" %}</th>
+          <th scope="col">{% translate "Size" %}</th>
+          <th scope="col">{% translate "Version" %}</th>
+          <th scope="col">{% translate "Database" %}</th>
+          <th scope="col">{% translate "Records" %}</th>
+          <th scope="col">{% translate "Checked" %}</th>
+          <th scope="col"><span class="sr-only">{% translate "Actions" %}</span></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for archive in archives %}
+          <tr data-archive="{{ archive.name }}">
+            <td class="align-top">
+              <time datetime="{{ archive.made_at|date:'Y-m-d' }}">{{ archive.made_at|date:"DATETIME_FORMAT" }}</time>
+              <span class="block text-xs text-ink-500 wrap-anywhere dark:text-ink-400"><code>{{ archive.name }}</code></span>
+              {% if archive.uploaded %}<span class="badge" data-tone="grey">{% translate "Uploaded" %}</span>{% endif %}
+            </td>
+            <td class="align-top whitespace-nowrap tabular-nums">{{ archive.size|filesizeformat }}</td>
+            <td class="align-top">{{ archive.version|default:"—" }}</td>
+            <td class="align-top">{{ archive.engine|default:"—" }}</td>
+            <td class="align-top text-xs">
+              {% for kind, count in archive.counts.items %}{{ count }} {{ kind }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+            </td>
+            <td class="align-top">
+              {% comment %} In words as well as in colour: a failed archive says so. {% endcomment %}
+              {% if archive.checked == "ok" %}
+                <span class="badge" data-tone="green">{% translate "Verified" %}</span>
+              {% elif archive.checked == "failed" or archive.unreadable %}
+                <span class="badge" data-tone="rose">{% translate "Does not verify" %}</span>
+                {% if archive.problem %}<span class="block text-xs wrap-anywhere">{{ archive.problem }}</span>{% endif %}
+              {% else %}
+                <span class="badge" data-tone="grey">{% translate "Not checked yet" %}</span>
+              {% endif %}
+            </td>
+            <td class="align-top">
+              <div class="flex flex-wrap items-center gap-2">
+                <form method="post" action="{% url 'server:backup_verify' archive.name %}">
+                  {% csrf_token %}
+                  <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Check" %}<span class="sr-only"> {{ archive.name }}</span></button>
+                </form>
+                <a href="{% url 'server:backup_download' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% icon "download" %}{% translate "Download" %}<span class="sr-only"> {{ archive.name }}</span></a>
+                <a href="{% url 'server:backup_restore' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% translate "Restore" %}<span class="sr-only"> {{ archive.name }}</span></a>
+                <a href="{% url 'server:backup_delete' archive.name %}" class="btn" data-variant="ghost" data-size="sm">{% translate "Delete" %}<span class="sr-only"> {{ archive.name }}</span></a>
+              </div>
+            </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td colspan="7" class="py-6 text-center text-ink-500 dark:text-ink-400">
+              {% translate "No backups yet. Take one above." %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </c-scroll-box>
+  <p class="mb-6 text-xs text-ink-500 wrap-anywhere dark:text-ink-400">
+    {% blocktranslate with dir=backup_dir trimmed %}Kept in {{ dir }}.{% endblocktranslate %}
+    {% if free_bytes is not None %}
+      {% blocktranslate with free=free_bytes|filesizeformat trimmed %}{{ free }} free on that volume.{% endblocktranslate %}
+    {% endif %}
+  </p>
+
+  <div class="card mb-6">
+    <c-section-title>{% translate "Schedule" %}</c-section-title>
+    <form method="post" novalidate class="max-w-2xl">
+      {% csrf_token %}
+      <c-field :field="form.backup_schedule" />
+      <c-field :field="form.backup_hour" />
+      <c-field :field="form.backup_weekday" />
+      <c-field :field="form.backup_keep" />
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    </form>
+
+    <dl class="mt-6 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[12rem_1fr]" data-backup-schedule>
+      <dt class="text-ink-500 dark:text-ink-400">{% translate "Next run" %}</dt>
+      <dd>
+        {% if scheduled and next_slot %}
+          <time datetime="{{ next_slot|date:'Y-m-d' }}">{{ next_slot|date:"DATETIME_FORMAT" }}</time>
+        {% else %}
+          {% translate "Scheduled backups are off." %}
+        {% endif %}
+      </dd>
+      <dt class="text-ink-500 dark:text-ink-400">{% translate "Last scheduled run" %}</dt>
+      <dd>
+        {% if object.backup_last_run_at and scheduled %}
+          <time datetime="{{ object.backup_last_run_at|date:'Y-m-d' }}">{{ object.backup_last_run_at|date:"DATETIME_FORMAT" }}</time>
+          —
+          {% if object.backup_last_run_ok is None %}
+            {% translate "still running" %}
+          {% elif object.backup_last_run_ok %}
+            {% translate "it worked" %}
+          {% else %}
+            <span class="font-medium text-red-700 dark:text-red-400">{% translate "it failed" %}</span>
+          {% endif %}
+        {% else %}
+          {% translate "none yet" %}
+        {% endif %}
+      </dd>
+      <dt class="text-ink-500 dark:text-ink-400">{% translate "Last backup that worked" %}</dt>
+      <dd>
+        {% if object.backup_last_ok_at %}
+          <time datetime="{{ object.backup_last_ok_at|date:'Y-m-d' }}">{{ object.backup_last_ok_at|date:"DATETIME_FORMAT" }}</time>
+        {% else %}
+          {% translate "none yet" %}
+        {% endif %}
+      </dd>
+    </dl>
+    {% if missed %}
+      <div class="alert mt-4 text-sm" data-variant="warning" role="note" data-backup-missed>
+        <div>{% translate "A scheduled backup was due and nothing took it. Is the scheduler running? A backup on a schedule needs it." %}</div>
+      </div>
+    {% endif %}
+    {% if object.backup_last_error %}
+      <div class="alert mt-4 text-sm" data-variant="error" role="note" data-backup-error>
+        <div>
+          <p class="font-medium">{% translate "The last backup failed." %}</p>
+          <p class="wrap-anywhere">{{ object.backup_last_error }}</p>
+        </div>
+      </div>
+    {% endif %}
+    <p class="mt-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "A cron line on the host still works the same way and is described on the wiki page about backups." %}
+    </p>
+  </div>
+
+  <div class="card mb-6">
+    <c-section-title>{% translate "Restore from an archive" %}</c-section-title>
+    <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">
+      {% blocktranslate trimmed %}
+        Restoring replaces the database under a running instance, so it is done on the
+        command line with the services stopped. Choose Restore beside an archive above, or
+        upload one here; the page that opens checks it, shows what it holds, and writes out
+        the commands for this installation.
+      {% endblocktranslate %}
+    </p>
+    <form method="post" action="{% url 'server:backup_upload' %}" enctype="multipart/form-data" class="max-w-2xl">
+      {% csrf_token %}
+      <div class="field mb-4">
+        <label for="backup-upload">{% translate "An archive to restore from" %}</label>
+        <input type="file" id="backup-upload" name="archive" accept=".gz,.tar.gz,application/gzip" aria-describedby="backup-upload-help">
+        <p id="backup-upload-help" class="text-xs text-ink-500 dark:text-ink-400">
+          {% blocktranslate with mb=upload_max_mb trimmed %}
+            Up to {{ mb }} MB. It is opened and checked before anything is kept.
+          {% endblocktranslate %}
+        </p>
+      </div>
+      <button type="submit" class="btn" data-variant="outline">{% translate "Upload and check" %}</button>
+    </form>
+  </div>
+{% endblock %}

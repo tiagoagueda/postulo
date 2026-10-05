@@ -215,6 +215,18 @@ EXCUSED: dict[str, str] = {
     # This one stays because the walk visits `/server/overview/` and never `/server/`.
     "documents:cv_add_items": "answers POST only; the form that posts to it is on the CV page",
     "applications:interview_outcome": "answers POST only; recorded from the interview's own page",
+    "server:backup_run": "a POST that starts a backup",
+    "server:backup_upload": "a POST that keeps an archive after checking it",
+    "server:backup_verify": "a POST that checks one archive, then returns to the list",
+    "server:backup_download": "an archive arriving as a download",
+    "server:backup_delete": (
+        "a confirmation page for one named archive file, and the walk has no archive to name; "
+        "its markup is the one the People deletion page already has, which is visited"
+    ),
+    "server:backup_restore": (
+        "a page about one named archive file, and the walk has no archive to name; the "
+        "list it is reached from is visited, and tests/test_backups_page.py reads this page"
+    ),
     "server:index": "redirects to the overview, which is visited",
     "openid_connect_login": "hands the browser to an identity provider",
     "openid_connect_callback": "returns from an identity provider",

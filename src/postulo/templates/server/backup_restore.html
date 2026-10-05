@@ -1,0 +1,103 @@
+{% extends "server/base.html" %}
+{% load i18n %}
+
+{% block measure %}max-w-3xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Restore from a backup" %}
+    <c-slot name="subtitle"><code class="wrap-anywhere">{{ name }}</code></c-slot>
+  </c-page-title>
+
+  {% if not verified %}
+    <div class="alert mb-6" data-variant="error" role="alert" data-restore="refused">
+      <div>
+        <p class="font-medium">{% translate "This archive does not verify, so do not restore from it." %}</p>
+        <p class="text-sm wrap-anywhere">{{ problem }}</p>
+      </div>
+    </div>
+    <a href="{% url 'server:backups' %}" class="btn" data-variant="ghost">{% translate "Back to Backups" %}</a>
+  {% else %}
+    <div class="alert mb-6" data-variant="info" role="status" data-restore="verified">
+      <div>{% translate "The archive opens and its database matches its checksum." %}</div>
+    </div>
+
+    {% if not engine_matches %}
+      <div class="alert mb-6" data-variant="error" role="alert" data-restore="engine">
+        <div>
+          {% blocktranslate with there=engine here=this_engine trimmed %}
+            This archive holds a {{ there }} database and this instance runs {{ here }}. A
+            restore refuses an archive from the other engine.
+          {% endblocktranslate %}
+        </div>
+      </div>
+    {% endif %}
+    {% if newer %}
+      <div class="alert mb-6" data-variant="warning" role="note" data-restore="newer">
+        <div>
+          {% blocktranslate with there=newer trimmed %}
+            This archive was written by Postulo {{ there }}, which is newer than the one
+            running here. Update first.
+          {% endblocktranslate %}
+        </div>
+      </div>
+    {% endif %}
+
+    <div class="card mb-6">
+      <c-section-title>{% translate "What it holds" %}</c-section-title>
+      <dl class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-[12rem_1fr]">
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Written" %}</dt>
+        <dd>{{ created|default:"—" }}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Postulo version" %}</dt>
+        <dd>{{ version|default:"—" }}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Database" %}</dt>
+        <dd>{{ engine|default:"—" }}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Records" %}</dt>
+        <dd>{% for kind, count in counts %}{{ count }} {{ kind }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}</dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Files" %}</dt>
+        <dd>
+          {% if media.included %}
+            {% blocktranslate count n=media.files trimmed %}{{ n }} media file{% plural %}{{ n }} media files{% endblocktranslate %}
+          {% else %}
+            {% translate "No media" %}
+          {% endif %}
+        </dd>
+        <dt class="text-ink-500 dark:text-ink-400">{% translate "Plugins" %}</dt>
+        <dd>{% if plugins.installed %}{{ plugins.installed|join:", " }}{% elif plugins.included %}{% translate "included" %}{% else %}{% translate "none" %}{% endif %}</dd>
+      </dl>
+    </div>
+
+    <div class="card mb-6" data-restore="commands">
+      <c-section-title>{% translate "How to restore it" %}</c-section-title>
+      <p class="mb-4 text-sm">
+        {% blocktranslate trimmed %}
+          A restore replaces everything on this instance with what is in the archive, so
+          nothing else may be using the database while it runs. Stop the web service, the
+          scheduler and the worker first, restore, and start them again. Run these on the
+          machine that hosts the instance, not in this browser. The restore command is given
+          <code>--force</code> because this instance already has accounts.
+        {% endblocktranslate %}
+      </p>
+
+      <h3 class="mb-1 text-sm font-semibold">{% translate "With Docker Compose" %}</h3>
+      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0"><code>docker compose --profile scheduler --profile worker stop
+docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo \
+  python manage.py restore {{ quoted_path }} --force
+docker compose --profile scheduler --profile worker up -d</code></pre>
+
+      <h3 class="mb-1 text-sm font-semibold">{% translate "Without containers" %}</h3>
+      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0"><code># stop gunicorn, the scheduler and the worker, then:
+python manage.py restore {{ quoted_path }} --force
+# start them again</code></pre>
+
+      <p class="text-xs text-ink-500 dark:text-ink-400">
+        {% blocktranslate trimmed %}
+          The key the connection secrets are under is not in the archive. Restore with the
+          same <code>.env</code> the archive was written under, or those secrets cannot be read.
+        {% endblocktranslate %}
+      </p>
+    </div>
+
+    <a href="{% url 'server:backups' %}" class="btn" data-variant="ghost">{% translate "Back to Backups" %}</a>
+  {% endif %}
+{% endblock %}

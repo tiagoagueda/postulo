@@ -758,3 +758,11 @@ class EmailForm(PinnedPolicyForm):
         if commit:
             row.save()
         return row
+
+
+class BackupScheduleForm(forms.ModelForm):
+    """When the instance backs itself up, and how many to keep (#242)."""
+
+    class Meta:
+        model = SiteSettings
+        fields = ("backup_schedule", "backup_hour", "backup_weekday", "backup_keep")

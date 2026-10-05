@@ -552,6 +552,11 @@ POSTULO_SCHEDULER_HEARTBEAT = env.path(
 # single volume holds both; move it elsewhere if that volume is the thing being backed up.
 POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / "backups")
 
+# The largest archive Server settings > Backups accepts for a restore, in megabytes. An
+# upload is checked against this before any of it is kept; a reverse proxy in front has its
+# own, smaller limit that has to be raised to match (#242).
+POSTULO_BACKUP_UPLOAD_MAX_MB = env.int("POSTULO_BACKUP_UPLOAD_MAX_MB", default=512)
+
 # Where this instance is reached from outside, for the links in messages sent when no
 # request is around — a reminder falling due at three in the morning. Unset, such links
 # are bare paths. Where a request exists, the link is built from it instead.
