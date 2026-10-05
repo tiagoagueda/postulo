@@ -945,3 +945,21 @@ def test_a_company_in_two_matching_industries_appears_once(client, user, search)
     client.force_login(user)
     response = client.get(reverse("jobs:company_list"), {"industry": "Software"})
     assert list(response.context["companies"]).count(company) == 1
+
+
+def test_a_background_width_save_answers_204_and_says_nothing(client, user):
+    client.force_login(user)
+    url = settings_url("applications")
+    # What the column handle's script posts: the width alone, or with the form's fields.
+    for extra in ({}, {"order": ["company", "role"], "show": ["company", "role"]}):
+        response = client.post(url, {"width": "role", "px": "240", "next": "/x/", **extra})
+        assert response.status_code == 204
+        assert response.content == b""
+        assert not list(response.wsgi_request._messages)
+    stored = Profile.objects.get(user=user).table_settings["applications"]
+    assert stored["widths"] == {"role": 240}
+
+    # The Columns form still redirects and says so.
+    response = client.post(url, {"order": ["company", "role"], "show": ["company"], "next": "/x/"})
+    assert response.status_code == 302
+    assert [str(m) for m in response.wsgi_request._messages] == ["Columns saved."]

@@ -6227,7 +6227,19 @@
   var RESIZE_MIN = 64;
   var RESIZE_MAX = 900;
 
+  var widthTimers = {};
+
+  // The keyboard saves once the arrows have been still, so a held key is one write and the
+  // last width is the one that lands (#521). Pointer saves are one per drag and go at once.
+  function saveWidthSoon(head, key, pixels) {
+    clearTimeout(widthTimers[key]);
+    widthTimers[key] = setTimeout(function () {
+      saveWidth(head, key, pixels);
+    }, 400);
+  }
+
   function saveWidth(head, key, pixels) {
+    clearTimeout(widthTimers[key]);
     var body = new URLSearchParams();
     body.set("width", key);
     body.set("px", String(pixels));
@@ -6379,7 +6391,7 @@
           .replace("{column}", cell.dataset.colLabel || "")
           .replace("{width}", String(wanted))
       );
-      saveWidth(head, cell.dataset.col, wanted);
+      saveWidthSoon(head, cell.dataset.col, wanted);
     });
 
     // The room the handle needs, added with it: a 24-wide target over a 16-pixel padding

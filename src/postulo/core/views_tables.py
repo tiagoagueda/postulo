@@ -38,6 +38,11 @@ def table_settings(request: HttpRequest, name: str) -> HttpResponse:
     else:
         current = tables.settings_for(request.user, name)
         tables.save_settings(request.user, name, table.clean_settings(request.POST, current))
+        if "width" in request.POST:
+            # A drag or an arrow press on a column's handle (#136) saves in the background:
+            # nothing to render and nothing to say, so the script gets no redirect to follow
+            # and no message is left queued for the next page (#521).
+            return HttpResponse(status=204)
         if "move" not in request.POST:
             messages.success(request, _("Columns saved."))
 

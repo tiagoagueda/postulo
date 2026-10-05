@@ -372,12 +372,13 @@ def _stored_view(user):
     ids=["width", "apply", "move", "reset"],
 )
 def test_a_saved_view_survives_the_saves_of_the_columns_beside_it(client, user, post):
+    # A background width save answers 204; the form's saves redirect (#521).
     views = _stored_view(user)
     client.force_login(user)
     response = client.post(
         reverse("core:table_settings", args=["companies"]), {**post, "next": "/jobs/companies/"}
     )
-    assert response.status_code == 302
+    assert response.status_code == (204 if "width" in post else 302)
     user.refresh_from_db()
     assert tables.settings_for(user, "companies").get("views") == views
 
