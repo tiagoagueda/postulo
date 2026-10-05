@@ -23,6 +23,10 @@ _test_database_url = os.environ.get("POSTULO_TEST_DATABASE_URL")
 if _test_database_url:
     DATABASES = {"default": env.db_url_config(_test_database_url)}
 
+# `DATABASES` was replaced wholesale above, so base.py's `ATOMIC_REQUESTS` went with it. The
+# suite runs views the way an instance does, in a transaction per request (#572).
+DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
 PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 
 MAILERS = {"default": {"BACKEND": "django.core.mail.backends.locmem.EmailBackend"}}

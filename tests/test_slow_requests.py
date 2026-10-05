@@ -30,6 +30,18 @@ from postulo.resume.models import Experience
 pytestmark = pytest.mark.django_db
 
 
+def test_requests_are_atomic_under_the_test_settings():
+    """#572: the suite runs views in the transaction production gives them, or the opt-outs
+    below are checks of an attribute and nothing more."""
+    assert connection.settings_dict["ATOMIC_REQUESTS"] is True
+
+
+def test_requests_are_atomic_in_production():
+    from tests.security.conftest import read_production_settings
+
+    assert read_production_settings()["ATOMIC_REQUESTS"] is True
+
+
 #: Every view that renders, fetches or reads a whole account, by the address it answers.
 #: A name here is a promise that the view opens its own transactions; the tests below check
 #: the writes each one makes.

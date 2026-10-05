@@ -14,6 +14,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The test suite now runs views inside the per-request transaction production uses, so a view that forgets non_atomic_requests fails in tests too. (#572)
 - The applications and companies tables no longer de-duplicate every row on each view, so counts and pages load faster, most on large accounts. (#552)
 - The company page's duplicate check is much faster for people with hundreds of companies: legal forms are looked up by their edge word and company names are cached. (#553)
 - Social profile rows now ask for the username with the service's address shown fixed in front of it, and a name that breaks the service's rule is refused beside the box (#678)

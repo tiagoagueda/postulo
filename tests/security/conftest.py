@@ -50,6 +50,7 @@ print(json.dumps({
     "SECURE_REDIRECT_EXEMPT": list(prod.SECURE_REDIRECT_EXEMPT),
     "SECURE_CSP": {k: [str(v) for v in vs] for k, vs in prod.SECURE_CSP.items()},
     "POSTULO_ADMIN_URL": prod.POSTULO_ADMIN_URL,
+    "ATOMIC_REQUESTS": prod.DATABASES["default"]["ATOMIC_REQUESTS"],
 }))
 """
 
