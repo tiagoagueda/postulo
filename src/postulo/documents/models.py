@@ -835,6 +835,13 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     #: exactly what a snapshot exists not to be. `text_to_compare` is what a reader asks.
     plain_text = models.TextField(_("text without its layout"), blank=True, editable=False)
     checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
+    #: Whether the file was written with its properties -- the author, the subject, the
+    #: keywords, a title with the person's name in it -- or without them (#480). Part of what
+    #: is recorded, because a copy exported without them is a different file from one with
+    #: them, and the stored copy is the one that was actually sent.
+    with_properties = models.BooleanField(
+        _("written with its properties"), default=True, editable=False
+    )
     rendered_at = models.DateTimeField(_("rendered on"), default=timezone.now)
 
     #: Every copy of this render, and the cascade that used to be `on_delete` on the

@@ -65,4 +65,8 @@ class Outline:
     language: str
     direction: str = "ltr"
     author: str = ""
+    #: What the file says about what it is and what it is for, where the person typed
+    #: something (#480). Empty is the usual case, and means the property is not written.
+    subject: str = ""
+    keywords: str = ""
     blocks: tuple[Block, ...] = ()

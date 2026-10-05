@@ -24,7 +24,8 @@ core stays light, and this stays short enough to read.
 ``word/_rels/document.xml.rels``
     Where the document finds the two above.
 ``docProps/core.xml``
-    The title, the author and the language, which is what a viewer announces for the file.
+    The title, the author, the language, and the subject and keywords where the person
+    typed them (#480), which is what a viewer announces for the file.
 
 **The same input is the same file, byte for byte.** Every entry carries one fixed date, so
 nothing in the package says when it was made -- a document somebody hands to an employer
@@ -232,6 +233,10 @@ def _properties(outline: Outline) -> str:
     fields = [f"<dc:title>{escape(clean(outline.title))}</dc:title>"]
     if outline.author:
         fields.append(f"<dc:creator>{escape(clean(outline.author))}</dc:creator>")
+    if outline.subject:
+        fields.append(f"<dc:subject>{escape(clean(outline.subject))}</dc:subject>")
+    if outline.keywords:
+        fields.append(f"<cp:keywords>{escape(clean(outline.keywords))}</cp:keywords>")
     tag = languages.tag(clean(outline.language))
     if tag:
         fields.append(f"<dc:language>{escape(tag)}</dc:language>")

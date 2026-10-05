@@ -1,0 +1,18 @@
+<c-vars form />
+{% comment %} What a file says about itself, as fields, so that a person sees it before the
+   file is made and can leave it out or change it (#480). Used inside a <form> the page owns,
+   on a CV and on a letter: the buttons that make a file are `formaction` buttons of that
+   form, so each of them -- the PDF, the draft, every format -- is given the same choice and
+   none of it is in an address. Plain HTML, and it works with scripts off.
+
+   The hidden field comes first, so that a box left unticked still posts an answer: a
+   browser sends nothing for an unticked box, and nothing has to mean *with*, for the links
+   that were written before there was a choice. The last value of a name is the one read, so
+   a ticked box wins over it. {% endcomment %}
+<input type="hidden" name="with_properties" value="0">
+<c-field :field="form.with_properties" />
+<c-field :field="form.title" />
+<c-field :field="form.author" />
+<c-field :field="form.subject" />
+<c-field :field="form.keywords" />
+<c-field :field="form.language" />

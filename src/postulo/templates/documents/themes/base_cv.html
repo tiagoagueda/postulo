@@ -46,9 +46,14 @@
   filing -- "Backend, English" -- and the model's help text says as much (#223).
 {% endcomment %}
     <title>{{ document_title }}</title>
-    {% comment %} Only where the contact block is shown. Somebody who left their name off a
-       CV on purpose did not mean "except in the file's properties". {% endcomment %}
-    {% if contact %}<meta name="author" content="{{ contact.name }}">{% endif %}
+    {% comment %} Only where the contact block is shown, and only where the export carries its
+       properties. Somebody who left their name off a CV on purpose did not mean "except in
+       the file's properties", and nor did somebody who exported without them (#480). {% endcomment %}
+    {% if document_author %}<meta name="author" content="{{ document_author }}">{% endif %}
+    {% comment %} The subject and the keywords, where the person typed them (#480). Never
+       written otherwise: a PDF's properties say only what was chosen. {% endcomment %}
+    {% if document_subject %}<meta name="description" content="{{ document_subject }}">{% endif %}
+    {% if document_keywords %}<meta name="keywords" content="{{ document_keywords }}">{% endif %}
     {% comment %} The nonce is there on the preview page, where a browser's content security
        policy would otherwise refuse the inlined stylesheet; the PDF renderer is given none
        and the attribute is left out (#232).

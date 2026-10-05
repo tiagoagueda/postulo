@@ -1475,11 +1475,15 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         source = _source_of(sent_entry, cvs, letters)
         rendered_at = _dt(sent_entry.pop("rendered_at", None))
         copies = sent_entry.pop("copies", [])
+        # A boolean, or the default: an archive from before format 42 has no key, and a value
+        # that is not one is not a reason to refuse the file (#480).
+        with_properties = sent_entry.pop("with_properties", True) is not False
 
         sent = RenderedDocument(
             owner=user,
             application=application,
             source=source,
+            with_properties=with_properties,
             **_carried(
                 sent_entry, SENT_FIELDS, report, "A sent document", "source_text", "plain_text"
             ),

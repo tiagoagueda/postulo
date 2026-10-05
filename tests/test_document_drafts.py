@@ -195,10 +195,15 @@ def test_a_draft_is_handed_over_as_a_file_that_says_it_is_one(client, user, cv, 
     assert response["Content-Security-Policy"] == FILE_POLICY
 
 
-def test_a_draft_changes_nothing_so_it_is_a_get_and_only_a_get(client, user, cv, drawing):
+def test_a_draft_changes_nothing_whether_it_is_asked_for_or_posted_for(client, user, cv, drawing):
+    """A GET, and a POST where the page's form carries what the file is to say about itself
+    (#480) -- which keeps that out of an address. Neither files anything."""
     client.force_login(user)
 
-    assert client.post(reverse("documents:cv_draft", args=[cv.pk])).status_code == 405
+    assert client.get(reverse("documents:cv_draft", args=[cv.pk])).status_code == 200
+    assert client.post(reverse("documents:cv_draft", args=[cv.pk])).status_code == 200
+    assert not RenderedDocument.objects.exists()
+    assert client.put(reverse("documents:cv_draft", args=[cv.pk])).status_code == 405
 
 
 def test_the_same_draft_asked_for_twice_is_drawn_once(client, user, cv, drawing):

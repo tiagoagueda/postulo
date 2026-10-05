@@ -37,6 +37,7 @@ from .forms import (
     CoverLetterForm,
     CVForm,
     CVItemForm,
+    FilePropertiesForm,
     SendDocumentsForm,
     UploadedDocumentForm,
 )
@@ -50,6 +51,7 @@ from .models import (
     with_entries,
 )
 from .pdf import PDFBackendUnavailable
+from .properties import Properties
 from .rendering import (
     render_cv_html,
     render_letter_html,
@@ -80,6 +82,44 @@ def handed_over(content: bytes, *, content_type: str, name: str) -> HttpResponse
     response["X-Content-Type-Options"] = "nosniff"
     response["Content-Security-Policy"] = FILE_POLICY
     return response
+
+
+def chosen_properties(request: HttpRequest) -> Properties:
+    """What a file is to say about itself, as the person chose it (#480).
+
+    From the form on the page, which posts every button's choice to its own address, or from
+    a link's query string. Neither says anything on a link from before this existed, and
+    then it is what it always was.
+    """
+    return Properties.from_data(request.POST if request.method == "POST" else request.GET)
+
+
+def written_file(request: HttpRequest, document, outline, key: str):
+    """A document in one of the registry's formats, handed over, or a sentence about why not.
+
+    The one place a CV and a letter are written out: the record is already the person's, the
+    format is looked up, and a format that fails -- it may be a plugin's -- is a message on
+    the document's own page rather than a traceback about it (#236).
+    """
+    chosen = formats.get(key)
+    if chosen is None:
+        raise Http404("No such format.")
+    try:
+        content = chosen.write(outline)
+    except Exception:
+        logger.exception(
+            "Format %r could not write %s %s", chosen.key, type(document).__name__, document.pk
+        )
+        messages.error(
+            request,
+            _("That file could not be written. The server log has the details."),
+        )
+        return redirect(document.get_absolute_url())
+    return handed_over(
+        content,
+        content_type=chosen.content_type,
+        name=f"{outline.title}.{chosen.extension}",
+    )
 
 
 def newest_versions(renders, *, shown: int = VERSIONS_SHOWN) -> list:
@@ -167,6 +207,10 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # What it can leave as beside the PDF: the registry's list, so a format a plugin
         # brings is on the page without the page being edited (#236).
         context["formats"] = formats.all_formats()
+        # What the file will say about itself, before anybody exports it (#480).
+        context["properties_form"] = FilePropertiesForm(
+            initial=rendering.file_defaults(self.object)
+        )
         # Which entries will print their original text, said here rather than discovered in
         # the PDF an employer already has (#131).
         context["fell_back"] = translating.fallen_back(self.object)
@@ -351,7 +395,13 @@ class CVExportView(OwnedObjectMixin, PDFErrorMixin, View):
         cv = get_object_or_404(self.get_queryset(), pk=pk)
         # Sent off rather than waited for: on the Chromium backend this is a browser launch
         # and then a render, and it was holding a request open for all of it (#247).
-        errand = errands.send("cv_pdf", request.user, subject=cv, cv_id=cv.pk)
+        errand = errands.send(
+            "cv_pdf",
+            request.user,
+            subject=cv,
+            cv_id=cv.pk,
+            properties=chosen_properties(request).as_data(),
+        )
         return redirect("core:errand", pk=errand.pk)
 
 
@@ -364,7 +414,11 @@ class CVDraftView(OwnedObjectMixin, DraftMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         cv = get_object_or_404(self.get_queryset(), pk=pk)
-        return self.draft(request, cv, lambda: render_cv_html(cv))
+        chosen = chosen_properties(request)
+        return self.draft(request, cv, lambda: render_cv_html(cv, properties=chosen))
+
+    #: The page's form posts, so that what it chose is not in an address (#480).
+    post = get
 
 
 class CVTextView(OwnedObjectMixin, View):
@@ -400,7 +454,7 @@ class CVTextView(OwnedObjectMixin, View):
 
 
 class CVDownloadView(OwnedObjectMixin, View):
-    """A CV in one of the formats the registry holds: `.txt`, `.docx`, or a plugin's.
+    """A CV in one of the formats the registry holds: `.txt`, `.odt`, `.docx`, or a plugin's.
 
     Written for the request and kept nowhere. This is not a version somebody sent -- a
     Word file is for a portal to read and a person to restyle, and what reached the
@@ -420,24 +474,14 @@ class CVDownloadView(OwnedObjectMixin, View):
         chosen = formats.get(format)
         if chosen is None:
             raise Http404("No such format.")
-        outline = rendering.cv_outline(cv)
-        try:
-            content = chosen.write(outline)
-        except Exception:
-            # A format may be a plugin's, and its failing is not a reason to show somebody
-            # a traceback about their own CV. The log has what went wrong; the page has a
-            # sentence, and the other formats beside it still work.
-            logger.exception("Format %r could not write CV %s", chosen.key, cv.pk)
-            messages.error(
-                request,
-                _("That file could not be written. The server log has the details."),
-            )
-            return redirect(cv.get_absolute_url())
-        return handed_over(
-            content,
-            content_type=chosen.content_type,
-            name=f"{outline.title}.{chosen.extension}",
+        # A format may be a plugin's, and its failing is not a reason to show somebody a
+        # traceback about their own CV: `written_file` says it in a sentence.
+        return written_file(
+            request, cv, rendering.cv_outline(cv, chosen_properties(request)), format
         )
+
+    #: The page's form posts what it chose (#480).
+    post = get
 
 
 # ------------------------------------------------------------------ cover letters
@@ -481,6 +525,11 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
             Application.objects.for_user(self.request.user)
             .select_related("posting", "posting__company")
             .order_by("-created_at")[:50]
+        )
+        # What the file will say about itself, and the formats it can leave as (#480).
+        context["formats"] = formats.all_formats()
+        context["properties_form"] = FilePropertiesForm(
+            initial=rendering.file_defaults(self.object)
         )
         return context
 
@@ -548,7 +597,10 @@ def chosen_application(request: HttpRequest):
     already draws when none is chosen (#235). Somebody else's application is no
     application either, and fills in nothing.
     """
-    application_id = as_pk(request.GET.get("application"))
+    # The page's form posts what it chose, and a link carries it in the address (#480).
+    application_id = as_pk(
+        (request.POST if request.method == "POST" else request.GET).get("application")
+    )
     if application_id is None:
         return None
     return (
@@ -576,9 +628,39 @@ class CoverLetterDraftView(OwnedObjectMixin, DraftMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         letter = get_object_or_404(self.get_queryset(), pk=pk)
         application = chosen_application(request)
+        chosen = chosen_properties(request)
         return self.draft(
-            request, letter, lambda: render_letter_html(letter, application, mark_empty=True)
+            request,
+            letter,
+            lambda: render_letter_html(letter, application, mark_empty=True, properties=chosen),
         )
+
+    #: The page's form posts what it chose (#480).
+    post = get
+
+
+@method_decorator(transaction.non_atomic_requests, name="dispatch")
+class CoverLetterDownloadView(OwnedObjectMixin, View):
+    """A letter in one of the formats the registry holds, as it would read for an application.
+
+    The counterpart of `CVDownloadView` (#480): written for the request and kept nowhere, with
+    the placeholders filled in from the application that was chosen and nothing marked, and
+    with whatever the person chose to leave out or edit in the file's properties.
+    """
+
+    def get_queryset(self):
+        return CoverLetter.objects.for_user(self.request.user)
+
+    def get(self, request: HttpRequest, pk: int, format: str) -> HttpResponse:
+        letter = get_object_or_404(self.get_queryset(), pk=pk)
+        if formats.get(format) is None:
+            raise Http404("No such format.")
+        outline = rendering.letter_outline(
+            letter, chosen_application(request), chosen_properties(request)
+        )
+        return written_file(request, letter, outline, format)
+
+    post = get
 
 
 # ----------------------------------------------------------------------- uploads
@@ -910,6 +992,7 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
             letter_id=letter.pk if letter else None,
             upload_ids=[upload.pk for upload in form.cleaned_data["uploads"]],
             link_ids=[link.pk for link in form.cleaned_data["links"]],
+            properties=Properties(include=form.cleaned_data["with_properties"]).as_data(),
         )
         return redirect("core:errand", pk=errand.pk)
 
@@ -947,6 +1030,8 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
             form.add_error(None, str(words))
             return render(request, self.template_name, {"application": application, "form": form})
 
+        # Which of the two the files are written as is recorded with them (#480).
+        carried = Properties(include=data["with_properties"])
         drawn: dict[str, bytes] = {}
         attachments: list[tuple[str, bytes, str]] = []
         try:
@@ -954,15 +1039,16 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
                 with renderers.pdf_session() as backend:
                     if cv:
                         drawn["cv"] = renderers.html_to_pdf(
-                            rendering.render_cv_html(cv), backend=backend
+                            rendering.render_cv_html(cv, properties=carried), backend=backend
                         )
-                        name = slugify(rendering.document_title(cv)) or "cv"
+                        name = slugify(rendering.file_title(cv, carried)) or "cv"
                         attachments.append((f"{name}.pdf", drawn["cv"], "application/pdf"))
                     if letter:
                         drawn["letter"] = renderers.html_to_pdf(
-                            rendering.render_letter_html(letter, application), backend=backend
+                            rendering.render_letter_html(letter, application, properties=carried),
+                            backend=backend,
                         )
-                        name = slugify(rendering.document_title(letter)) or "cover-letter"
+                        name = slugify(rendering.file_title(letter, carried)) or "cover-letter"
                         attachments.append((f"{name}.pdf", drawn["letter"], "application/pdf"))
         except PDFBackendUnavailable as unavailable:
             return refuse(unavailable)
@@ -1002,6 +1088,7 @@ class SendDocumentsView(OwnedObjectMixin, PDFErrorMixin, View):
             links=list(data["links"]),
             drawn=drawn,
             emailed_to=recipient,
+            properties=carried,
         )
         messages.success(request, _("Emailed, and recorded what you sent."))
         return redirect(application.get_absolute_url())

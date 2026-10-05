@@ -12,11 +12,13 @@ sees the theme, and a theme never sees it.
 
 **The registry is `kinds.py`'s, for the reason that one gives.** A key already taken is
 refused rather than overridden, Postulo's own are registered as the app loads, and a second
-implementation is a call to `register` rather than a branch in a view. Plain text and Word
-are Postulo's; OpenDocument, or anything a portal invents next, arrives the same way.
+implementation is a call to `register` rather than a branch in a view. Plain text, OpenDocument
+and Word are Postulo's; anything a portal invents next arrives the same way, and a plugin
+registers one through `postulo.plugins.api` (#480).
 
-**The core stays dependency-light.** Both formats here are written with the standard
-library: a text file is a string, and a `.docx` is a zip of XML parts (`docx.py`). A
+**The core stays dependency-light.** The formats here are written with the standard
+library: a text file is a string, and a `.docx` (`docx.py`) and an `.odt` (`odt.py`) are zips
+of XML parts. A
 library that reads and writes every corner of a format is the right tool for a program
 that edits documents, and this one only ever writes a list of paragraphs.
 """
@@ -107,6 +109,10 @@ class Format:
     write: Callable[[Outline], bytes]
     #: Who provides it, in words. Empty for Postulo's own.
     provider: str = ""
+    #: Whether the file carries properties -- a title, an author -- that the person may
+    #: leave out or edit (#480). Plain text has none; a plugin's format says so if it does,
+    #: and is handed an outline already carrying the choice.
+    has_properties: bool = False
 
 
 #: Every format, in the order a page should offer them.
@@ -154,7 +160,7 @@ def register_the_ones_postulo_has() -> None:
     `kinds.register_the_ones_postulo_has` gives: a registry filled at import time is empty
     in whichever test imported the module first.
     """
-    from . import docx
+    from . import docx, odt
 
     described = (
         Format(
@@ -165,11 +171,20 @@ def register_the_ones_postulo_has() -> None:
             write=write_text,
         ),
         Format(
+            key="odt",
+            label=_("OpenDocument text"),
+            extension="odt",
+            content_type=odt.CONTENT_TYPE,
+            write=odt.write,
+            has_properties=True,
+        ),
+        Format(
             key="docx",
             label=_("Word document"),
             extension="docx",
             content_type=docx.CONTENT_TYPE,
             write=docx.write,
+            has_properties=True,
         ),
     )
     for one in described:

@@ -28,18 +28,21 @@ from postulo.core.errands import Refused, handler
 
 @handler("cv_pdf", working=_("Drawing the PDF"))
 def render_a_cv(errand) -> dict:
-    """Render one CV and file the snapshot."""
+    """Render one CV and file the snapshot, with the properties it was asked to carry (#480)."""
     from django.urls import reverse
 
     from .models import CV
     from .pdf import PDFBackendUnavailable
+    from .properties import Properties
     from .rendering import snapshot_cv
 
     cv = CV.objects.filter(pk=errand.payload.get("cv_id"), owner=errand.owner).first()
     if cv is None:
         raise Refused(_("That CV is no longer here."))
     try:
-        document = snapshot_cv(cv)
+        document = snapshot_cv(
+            cv, properties=Properties.from_data(errand.payload.get("properties"))
+        )
     except PDFBackendUnavailable as unavailable:
         raise Refused(str(unavailable)) from unavailable
     # The same CV exported twice is one version, and saying "created" of a PDF that was
@@ -69,6 +72,7 @@ def freeze_what_was_sent(errand) -> dict:
 
     from .models import UploadedDocument
     from .pdf import PDFBackendUnavailable
+    from .properties import Properties
 
     application = Application.objects.filter(
         pk=errand.payload.get("application_id"), owner=errand.owner
@@ -88,7 +92,14 @@ def freeze_what_was_sent(errand) -> dict:
     )
 
     try:
-        freeze(application, cv=cv, letter=letter, uploads=uploads, links=links)
+        freeze(
+            application,
+            cv=cv,
+            letter=letter,
+            uploads=uploads,
+            links=links,
+            properties=Properties.from_data(errand.payload.get("properties")),
+        )
     except PDFBackendUnavailable as unavailable:
         raise Refused(str(unavailable)) from unavailable
 
@@ -102,7 +113,15 @@ NEWLINE = "\n"
 
 
 def freeze(
-    application, *, cv, letter, uploads, links, drawn: dict | None = None, emailed_to: str = ""
+    application,
+    *,
+    cv,
+    letter,
+    uploads,
+    links,
+    drawn: dict | None = None,
+    emailed_to: str = "",
+    properties=None,
 ) -> None:
     """File what was sent with an application and tell its timeline.
 
@@ -110,7 +129,8 @@ def freeze(
     itself, and *Email these* (#361), which has already drawn them to attach to the message
     and hands the same bytes over in ``drawn`` (``{"cv": bytes, "letter": bytes}``), so the
     copy that is kept is the copy that was mailed. ``emailed_to`` says to whom, on the
-    timeline; it is never logged.
+    timeline; it is never logged. ``properties`` is what the files were told to say about
+    themselves, which is part of what is recorded (#480).
     """
     from django.db import transaction
 
@@ -129,9 +149,9 @@ def freeze(
         needs_drawing = (cv and "cv" not in drawn) or (letter and "letter" not in drawn)
         if needs_drawing:
             with pdf_session() as backend:
-                created.extend(_snapshots(application, cv, letter, drawn, backend))
+                created.extend(_snapshots(application, cv, letter, drawn, backend, properties))
         else:
-            created.extend(_snapshots(application, cv, letter, drawn, None))
+            created.extend(_snapshots(application, cv, letter, drawn, None, properties))
 
     created.extend(str(upload) for upload in uploads)
     created.extend(f"{link.title} — {link.url}" for link in links)
@@ -163,18 +183,28 @@ def freeze(
                 )
 
 
-def _snapshots(application, cv, letter, drawn, backend) -> list[str]:
+def _snapshots(application, cv, letter, drawn, backend, properties=None) -> list[str]:
     from .rendering import snapshot_cv, snapshot_letter
 
     titles: list[str] = []
     if cv:
         titles.append(
-            snapshot_cv(cv, application=application, backend=backend, content=drawn.get("cv")).title
+            snapshot_cv(
+                cv,
+                application=application,
+                backend=backend,
+                content=drawn.get("cv"),
+                properties=properties,
+            ).title
         )
     if letter:
         titles.append(
             snapshot_letter(
-                letter, application=application, backend=backend, content=drawn.get("letter")
+                letter,
+                application=application,
+                backend=backend,
+                content=drawn.get("letter"),
+                properties=properties,
             ).title
         )
     return titles

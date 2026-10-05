@@ -97,6 +97,9 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.web_links import Kind as LinkKind
     from postulo.core.web_links import primary_for as primary_web_link
     from postulo.core.web_links import save_only_link as save_web_link
+    from postulo.documents.formats import Format as DocumentFormat
+    from postulo.documents.formats import register as register_document_format
+    from postulo.documents.outline import Outline
     from postulo.documents.themes import Kind as ThemeKind
     from postulo.documents.themes import Theme
     from postulo.jobs.history import record_listing_event
@@ -172,6 +175,7 @@ __all__ = [
     "Consent",
     "Contact",
     "DestinationRefused",
+    "DocumentFormat",
     "DocumentMetadata",
     "EventKind",
     "ExternalRef",
@@ -191,6 +195,7 @@ __all__ = [
     "Notification",
     "NotifierPlugin",
     "OutboxPlugin",
+    "Outline",
     "OwnedModel",
     "OwnedQuerySet",
     "Record",
@@ -232,6 +237,7 @@ __all__ = [
     "record_event",
     "record_listing_event",
     "refuse_unreadable",
+    "register_document_format",
     "reschedule_interview",
     "safe_next",
     "save_phone_number",
@@ -413,6 +419,19 @@ def __getattr__(name: str):
         from postulo.documents import themes
 
         return themes.Kind if name == "ThemeKind" else themes.Theme
+    if name in ("DocumentFormat", "register_document_format", "Outline"):
+        # A format a document can be downloaded in beside the PDF: a key, a label, an
+        # extension, a media type and a function from an `Outline` -- the document's words,
+        # not its page -- to bytes. Registering one puts a download beside the others on
+        # every CV and letter, with the properties choice already applied to the outline it
+        # is handed (#480).
+        from postulo.documents import formats, outline
+
+        return {
+            "DocumentFormat": formats.Format,
+            "register_document_format": formats.register,
+            "Outline": outline.Outline,
+        }[name]
     if name == "access_token":
         # For a connection that authenticates by consent: ask for the token at the moment of
         # use, never keep one, because refreshing is the part that has to happen then (#150).

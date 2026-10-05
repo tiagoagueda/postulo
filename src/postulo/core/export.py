@@ -115,7 +115,9 @@ logger = logging.getLogger(__name__)
 #: reached on Matrix, XMPP, Signal, Telegram, Threema or another service, each with its
 #: ``service`` key (blank for *Other*), its ``label``, its ``handle`` and whether it is
 #: the primary; an archive without them restores none (#682).
-FORMAT_VERSION = 41
+#: 42 added ``with_properties`` on a sent document: whether the file went with its author,
+#: subject and keywords or without them (#480).
+FORMAT_VERSION = 42
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -412,6 +414,9 @@ SENT_FIELDS = (
     # Where it went, kept as text so a sent PDF can still be placed after its application
     # is deleted (#469). Absent from an archive written before format 32.
     "sent_to",
+    # Whether the file carried its properties (#480). Absent from an archive written before
+    # format 42, which restores as with them, as every file was.
+    "with_properties",
 )
 CAPTURE_FIELDS = (
     "id",

@@ -948,6 +948,11 @@ class DocumentOut(Schema):
         "blank where nobody has said",
     )
     application_id: int | None = None
+    with_properties: bool | None = Field(
+        default=None,
+        description="For a snapshot: whether the file was written with its properties (author, "
+        "subject, keywords) or without them. Null for an upload, which Postulo did not write",
+    )
     created_at: dt.datetime
     updated_at: dt.datetime
     download_url: str
@@ -1448,6 +1453,7 @@ def document_out(request, document, *, source: str) -> dict:
         "title": document.title,
         "language": getattr(document, "language", "") or "",
         "application_id": getattr(document, "application_id", None),
+        "with_properties": getattr(document, "with_properties", None),
         "created_at": document.created_at,
         "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(

@@ -101,6 +101,45 @@
         </p>
       </div>
 
+      {% comment %} The letter as a file, and what the file says about itself (#480). One form,
+         and every button that makes a file belongs to it, as on a CV: the draft above takes
+         the application chosen there, and these take the one chosen here. {% endcomment %}
+      <section class="card" aria-labelledby="letter-formats-heading">
+        <c-section-title id="letter-formats-heading">
+          {% translate "As a file" %}
+          <c-slot name="subtitle">{% translate "The words without the layout, in this letter's language. None of these is filed as a version you sent." %}</c-slot>
+        </c-section-title>
+        <form id="file-properties" method="post"
+              action="{% url 'documents:letter_draft' letter.pk %}" class="space-y-3">
+          {% csrf_token %}
+          {% if applications %}
+            <div>
+              <label for="file-application">{% translate "Fill in from" %}</label>
+              <select name="application" id="file-application" class="w-full">
+                <option value="">{% translate "No application" %}</option>
+                {% for entry in applications %}
+                  <option value="{{ entry.pk }}">
+                    {{ entry.posting.title }} — {{ entry.posting.company.name }}
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+          {% endif %}
+          <h3 class="text-sm font-medium">{% translate "What the file says about itself" %}</h3>
+          <c-file-properties :form="properties_form" />
+        </form>
+        <ul class="mt-3 space-y-2 text-sm">
+          {% for format in formats %}
+            <li class="flex flex-wrap items-center gap-2">
+              <span class="min-w-0 grow basis-24">{{ format.label }}</span>
+              <button type="submit" class="btn" data-variant="outline" data-size="sm"
+                      form="file-properties"
+                      formaction="{% url 'documents:letter_download' letter.pk format.key %}">{% blocktranslate trimmed with extension=format.extension %}Download .{{ extension }}{% endblocktranslate %}</button>
+            </li>
+          {% endfor %}
+        </ul>
+      </section>
+
       <div class="card">
         <c-section-title>{% translate "Placeholders" %}</c-section-title>
         <p class="mb-3 text-xs text-ink-500 dark:text-ink-400">

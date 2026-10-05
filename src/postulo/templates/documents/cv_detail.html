@@ -20,10 +20,10 @@
          class="btn" data-variant="outline">{% translate "Open on its own" %}<span class="sr-only"> {% translate "(opens in a new tab)" %}</span></a>
       {# No longer `data-download`: the answer is the page that watches the drawing, not #}
       {# the PDF, so the guard waits for the navigation like every other form (#247). #}
-      <form method="post" action="{% url 'documents:cv_export' cv.pk %}">
-        {% csrf_token %}
-        <button type="submit" class="btn">{% translate "Export PDF" %}</button>
-      </form>
+      {# The button of the form further down, which holds what the file will say about #}
+      {# itself, so that the PDF is given the same choice every other format is (#480). #}
+      <button type="submit" class="btn" form="file-properties"
+              formaction="{% url 'documents:cv_export' cv.pk %}">{% translate "Export PDF" %}</button>
       <a href="{% url 'documents:cv_update' cv.pk %}" class="btn" data-variant="outline">{% translate "Settings" %}</a>
       <a href="{% url 'documents:cv_delete' cv.pk %}"
          class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
@@ -197,8 +197,9 @@
            beside this one and queued it for every store, once a try. A draft is the same
            PDF and no record: a link, because it changes nothing, and it says so under
            itself because the two buttons are otherwise one word apart (#236). {% endcomment %}
-        <a href="{% url 'documents:cv_draft' cv.pk %}"
-           class="btn mt-3 w-full" data-variant="outline">{% translate "Download draft PDF" %}</a>
+        <button type="submit" class="btn mt-3 w-full" data-variant="outline"
+                form="file-properties"
+                formaction="{% url 'documents:cv_draft' cv.pk %}">{% translate "Download draft PDF" %}</button>
         <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
           {% translate "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version." %}
         </p>
@@ -216,13 +217,26 @@
         </c-section-title>
         <a href="{% url 'documents:cv_text' cv.pk %}"
            class="btn w-full" data-variant="outline">{% translate "Copy as plain text" %}</a>
+        {% comment %} What the files say about themselves (#480): a form of its own, and every
+           button that makes a file -- Export PDF, the draft, each format below -- belongs to it
+           through `form=` and takes its choice to its own address. {% endcomment %}
+        <form id="file-properties" method="post" action="{% url 'documents:cv_export' cv.pk %}"
+              class="mt-4 space-y-3">
+          {% csrf_token %}
+          <h3 class="text-sm font-medium">{% translate "What the file says about itself" %}</h3>
+          <p class="text-xs text-ink-500 dark:text-ink-400">
+            {% translate "Its properties are what a recruiter's software and a file manager read: the title, the author and the rest. They start as what the file has always carried; change them for this file only." %}
+          </p>
+          <c-file-properties :form="properties_form" />
+        </form>
         {% if formats %}
           <ul class="mt-3 space-y-2 text-sm">
             {% for format in formats %}
               <li class="flex flex-wrap items-center gap-2">
                 <span class="min-w-0 grow basis-24">{{ format.label }}</span>
-                <a href="{% url 'documents:cv_download' cv.pk format.key %}"
-                   class="btn" data-variant="outline" data-size="sm">{% blocktranslate trimmed with extension=format.extension %}Download .{{ extension }}{% endblocktranslate %}</a>
+                <button type="submit" class="btn" data-variant="outline" data-size="sm"
+                        form="file-properties"
+                        formaction="{% url 'documents:cv_download' cv.pk format.key %}">{% blocktranslate trimmed with extension=format.extension %}Download .{{ extension }}{% endblocktranslate %}</button>
               </li>
             {% endfor %}
           </ul>

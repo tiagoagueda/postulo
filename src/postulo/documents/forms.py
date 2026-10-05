@@ -6,6 +6,7 @@ from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.utils.html import format_html
+from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import personal, postal
@@ -24,6 +25,14 @@ from .models import (
     LetterKind,
     Prints,
     UploadedDocument,
+)
+from .properties import (
+    KEYWORDS_HELP,
+    MAX_AUTHOR,
+    MAX_KEYWORDS,
+    MAX_SUBJECT,
+    MAX_TITLE,
+    WHAT_IS_KEPT,
 )
 
 #: Maximum size for an upload, in bytes. Generous for a CV, mean for a video.
@@ -565,6 +574,40 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         return document
 
 
+class FilePropertiesForm(forms.Form):
+    """What a file says about itself, shown before it is made (#480).
+
+    Never validated as a form: it is what the page shows, and what is posted is read by
+    `Properties.from_data`, which cuts each field to its length and drops a language that is
+    not a tag. Each field starts as today's value, so a person sees what the file will say
+    even if they change nothing.
+    """
+
+    with_properties = forms.BooleanField(
+        label=_("Write the file with its properties"),
+        required=False,
+        initial=True,
+        help_text=WHAT_IS_KEPT,
+    )
+    title = forms.CharField(label=_("Title"), max_length=MAX_TITLE, required=False)
+    author = forms.CharField(label=_("Author"), max_length=MAX_AUTHOR, required=False)
+    subject = forms.CharField(label=_("Subject"), max_length=MAX_SUBJECT, required=False)
+    keywords = forms.CharField(
+        label=_("Keywords"),
+        max_length=MAX_KEYWORDS,
+        required=False,
+        help_text=KEYWORDS_HELP,
+    )
+    language = forms.CharField(
+        label=_("Language"),
+        max_length=35,
+        required=False,
+        help_text=_(
+            "A language tag such as fr or pt-BR. A screen reader announces the file in it."
+        ),
+    )
+
+
 class SendDocumentsForm(forms.Form):
     """Choose what to send with an application, and freeze it."""
 
@@ -587,6 +630,20 @@ class SendDocumentsForm(forms.Form):
         help_text=_(
             "Recorded as part of what they were sent. Postulo sends nothing itself — this "
             "is the note of what you sent."
+        ),
+    )
+
+    with_properties = forms.BooleanField(
+        label=_("Write the files with their properties"),
+        required=False,
+        initial=True,
+        help_text=format_lazy(
+            "{} {}",
+            _(
+                "The author, and the title with your name in it, go into the PDF's "
+                "properties, as they always have. Untick it to send files without them."
+            ),
+            WHAT_IS_KEPT,
         ),
     )
 

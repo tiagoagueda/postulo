@@ -350,7 +350,7 @@ def test_a_file_of_somebody_elses_cv_is_not_found(client, other_user, cv):
 def test_a_format_nobody_registered_is_not_found(client, person, cv):
     client.force_login(person)
 
-    assert client.get(reverse("documents:cv_download", args=[cv.pk, "odt"])).status_code == 404
+    assert client.get(reverse("documents:cv_download", args=[cv.pk, "rtf"])).status_code == 404
 
 
 # ------------------------------------------------ copy as plain text, with no script
@@ -442,7 +442,8 @@ def test_the_cvs_page_offers_all_three(client, person, cv):
     assert reverse("documents:cv_text", args=[cv.pk]) in page and "Copy as plain text" in page
     assert reverse("documents:cv_download", args=[cv.pk, "txt"]) in page
     assert reverse("documents:cv_download", args=[cv.pk, "docx"]) in page
-    assert "Download .txt" in page and "Download .docx" in page
+    assert reverse("documents:cv_download", args=[cv.pk, "odt"]) in page
+    assert "Download .txt" in page and "Download .docx" in page and "Download .odt" in page
     assert "Word document" in page, "an extension is not a name everybody knows"
 
 
@@ -706,8 +707,8 @@ def a_plugins_format():
         formats.forget("shout")
 
 
-def test_postulo_ships_plain_text_and_word():
-    assert [one.key for one in formats.all_formats()] == ["txt", "docx"]
+def test_postulo_ships_plain_text_opendocument_and_word():
+    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
     assert formats.get("docx").extension == "docx"
 
 
@@ -748,13 +749,13 @@ def test_a_format_with_no_key_or_no_extension_is_ignored(key, extension):
     )
 
     assert formats.register(nameless) is False
-    assert [one.key for one in formats.all_formats()] == ["txt", "docx"]
+    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
 
 
 def test_registering_postulos_own_twice_changes_nothing():
     formats.register_the_ones_postulo_has()
 
-    assert [one.key for one in formats.all_formats()] == ["txt", "docx"]
+    assert [one.key for one in formats.all_formats()] == ["txt", "odt", "docx"]
 
 
 def test_a_format_that_fails_is_a_sentence_and_the_others_still_work(client, person, cv, caplog):
