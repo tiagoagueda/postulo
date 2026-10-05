@@ -1,6 +1,7 @@
 """CVs, letters and files. Files themselves travel only under ``documents:read``."""
 
 from django.db import transaction
+from django.db.models import CharField, Value
 from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
@@ -228,6 +229,60 @@ def draft_letter(request, payload: LetterIn):
     return Status(201, _letter_out(letter, detail=True))
 
 
+class _DocumentPages:
+    """Uploads and renders as one ordered sequence the paginator can count and slice.
+
+    The union is over `(source, pk, created_at, updated_at)` only, so counting and cutting
+    a page read no text; the page's own rows are then fetched by id from each table, with
+    the long columns deferred, and put back in the order the union gave.
+    """
+
+    def __init__(self, request, streams, updated_since) -> None:
+        self.request = request
+        self.models = dict(streams)
+        self.updated_since = updated_since
+        keys = [
+            changed_since(owned(request, model.objects), updated_since)
+            .order_by()
+            .values("pk", "created_at", "updated_at")
+            .annotate(source=Value(name, output_field=CharField()))
+            for name, model in streams
+        ]
+        union = keys[0].union(*keys[1:], all=True)
+        if updated_since is not None:
+            self.keys = union.order_by("updated_at", "pk", "source")
+        else:
+            self.keys = union.order_by("-created_at", "-pk", "source")
+
+    def all(self):
+        return self
+
+    def count(self) -> int:
+        return self.keys.count()
+
+    def __len__(self) -> int:
+        return self.count()
+
+    def __getitem__(self, cut):
+        keys = list(self.keys[cut])
+        found = {}
+        for name, model in self.models.items():
+            pks = [k["pk"] for k in keys if k["source"] == name]
+            if not pks:
+                continue
+            queryset = owned(self.request, model.objects).filter(pk__in=pks)
+            if model is RenderedDocument:
+                queryset = queryset.defer("source_text", "plain_text")
+            else:
+                queryset = queryset.defer("notes")
+            found.update({(name, row.pk): row for row in queryset})
+        return [
+            (k["source"], found[k["source"], k["pk"]])
+            for k in keys
+            if (k["source"], k["pk"]) in found
+        ]
+
+
 @router.get("/documents", response=list[DocumentOut], summary="List files: uploads and snapshots")
 @paginate(Page, row=lambda request, row: document_out(request, row[1], source=row[0]))
 def list_documents(
@@ -237,10 +292,10 @@ def list_documents(
 ):
     """Uploads and snapshots in one list.
 
-    The one list here that cannot be a queryset: an upload and a render are separate
-    tables with separate columns, so they are read and then ordered together in Python.
-    Only the rows on the page are shaped, though, which is where the cost was — an
-    absolute download address built for every file somebody has ever had (#230).
+    The one list that is not a single queryset: an upload and a render are separate
+    tables with separate columns, so the two are ordered together in SQL as a union of
+    their keys, the page is cut there, and only that page's rows are read and shaped (#551,
+    #230). A render's text is never read at all, and the cost of a page follows the page.
 
     It is also the one list that takes no `after_id` (#245). The ids come from two tables,
     so upload 5 and render 5 are different files, and one id used against both would drop
@@ -254,22 +309,12 @@ def list_documents(
             _("%(field)s must be one of %(choices)s.")
             % {"field": "'source'", "choices": ["upload", "rendered"]},
         )
-    rows = []
+    streams = []
     if source in (None, "upload"):
-        rows += [
-            ("upload", d)
-            for d in changed_since(owned(request, UploadedDocument.objects), updated_since)
-        ]
+        streams.append(("upload", UploadedDocument))
     if source in (None, "rendered"):
-        rows += [
-            ("rendered", d)
-            for d in changed_since(owned(request, RenderedDocument.objects), updated_since)
-        ]
-    if updated_since is not None:
-        rows.sort(key=lambda row: (row[1].updated_at, row[1].pk))
-    else:
-        rows.sort(key=lambda row: (row[1].created_at, row[1].pk), reverse=True)
-    return rows
+        streams.append(("rendered", RenderedDocument))
+    return _DocumentPages(request, streams, updated_since)
 
 
 @router.get(

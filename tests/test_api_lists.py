@@ -9,6 +9,7 @@ import datetime as dt
 from urllib.parse import quote
 
 import pytest
+from django.core.files.base import ContentFile
 from django.db import connection
 from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
@@ -16,7 +17,7 @@ from django.utils import timezone
 from postulo.api.models import ApiToken
 from postulo.api.paging import Page
 from postulo.applications.models import Application, Reminder, Status
-from postulo.documents.models import CV, CoverLetter
+from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
 from postulo.jobs.models import Capture, CaptureStatus, Company, JobPosting
 
 pytestmark = pytest.mark.django_db
@@ -391,3 +392,54 @@ def test_a_list_cut_into_pages_is_ordered_to_the_last_tie(client, user, monkeypa
     assert response.status_code == 200
     assert seen, f"{path} was not cut into pages by Page"
     assert seen[0][-1] in ("pk", "-pk"), f"{path} is ordered by {seen[0]}, which can tie"
+
+
+def _render_documents(user, count):
+    for number in range(count):
+        RenderedDocument.objects.create(
+            owner=user,
+            title=f"Sent {number}",
+            file=ContentFile(b"%PDF-1.4 sent", name=f"sent-{number}.pdf"),
+            source_text="long text " * 100,
+            plain_text="long text " * 100,
+        )
+
+
+@pytest.mark.parametrize("total", [5, 50])
+def test_a_page_of_documents_reads_the_page_and_never_the_texts(client, user, total):
+    """The list used to read every upload and render, texts included, to answer one page (#551)."""
+    UploadedDocument.objects.create(
+        owner=user, title="Scan", file=ContentFile(b"%PDF-1.4 scan", name="scan.pdf")
+    )
+    _render_documents(user, total)
+    bearer = issue(user, "read")
+
+    with CaptureQueriesContext(connection) as queries:
+        body = client.get("/api/v1/documents?limit=20", **bearer).json()
+
+    assert body["count"] == total + 1
+    assert len(body["items"]) == min(20, total + 1)
+    sql = [q["sql"] for q in queries.captured_queries]
+    assert not [q for q in sql if "source_text" in q or "plain_text" in q]
+    # Sign-in, the count, the page's keys and one fetch per table: the same handful of
+    # queries whether there are 5 documents or 50, and the rows fetched are the page's.
+    assert len(sql) <= 12
+    assert len(body["items"]) <= 20
+
+
+def test_documents_still_come_newest_first_and_catch_up_oldest_first(client, user):
+    _render_documents(user, 3)
+    UploadedDocument.objects.create(
+        owner=user, title="Scan", file=ContentFile(b"%PDF-1.4 scan", name="scan.pdf")
+    )
+    bearer = issue(user, "read")
+
+    newest = client.get("/api/v1/documents", **bearer).json()["items"]
+    assert [d["title"] for d in newest] == ["Scan", "Sent 2", "Sent 1", "Sent 0"]
+    assert {d["source"] for d in newest} == {"upload", "rendered"}
+
+    long_ago = cursor((timezone.now() - dt.timedelta(days=1)).isoformat())
+    oldest = client.get(f"/api/v1/documents?updated_since={long_ago}&limit=2&offset=1", **bearer)
+    assert [d["title"] for d in oldest.json()["items"]] == ["Sent 1", "Sent 2"]
+    only = client.get("/api/v1/documents?source=upload", **bearer).json()
+    assert [d["title"] for d in only["items"]] == ["Scan"]
