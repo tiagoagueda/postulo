@@ -19,6 +19,7 @@ from django.utils.translation import gettext_lazy as _
 
 # The flag lookup lives in `core.flags`, below the forms that ask it directly (#248). This
 # library registers it as the `flag_url` tag, and hands `FLAG_DIR` on to the flag tests.
+from postulo.core.brands import BRAND_DIR, brand_source  # noqa: F401 - re-exported: BRAND_DIR
 from postulo.core.flags import FLAG_DIR, flag_url  # noqa: F401 - re-exported: FLAG_DIR
 
 register = template.Library()
@@ -81,6 +82,29 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
     source = _icon_source(name)
     css_class = attrs.pop("class", "size-4")
     rendered = [f'class="{escape(css_class)} shrink-0"', f'data-icon="{escape(name)}"']
+    if label:
+        rendered.append(f'role="img" aria-label="{escape(label)}"')
+    else:
+        rendered.append('aria-hidden="true"')
+    for key, value in attrs.items():
+        rendered.append(f'{escape(key.replace("_", "-"))}="{escape(value)}"')
+    return mark_safe(source.replace("<svg", "<svg " + " ".join(rendered), 1))  # noqa: S308
+
+
+@register.simple_tag
+def brand(name: str, label: str = "", **attrs: str) -> str:
+    """Inline a brand mark: ``{% brand "mastodon" class="size-4" %}`` (#654).
+
+    Beside ``{% icon %}`` and not in it, because a mark is somebody else's logo with its
+    own file, notice and rule (``TRADEMARKS.md``), and the icon's selectors and tests read
+    ``data-icon``. It is decorative by default, ``aria-hidden``, since the service's name
+    is written beside it; give it a ``label`` where it stands alone. The mark is drawn in
+    its owner's published colour and never recoloured, so there is no ``currentColor``.
+    A name that is not a shipped mark, or is a path, is a template error.
+    """
+    source = brand_source(name)
+    css_class = attrs.pop("class", "size-4")
+    rendered = [f'class="{escape(css_class)} shrink-0"', f'data-brand="{escape(name)}"']
     if label:
         rendered.append(f'role="img" aria-label="{escape(label)}"')
     else:

@@ -17,8 +17,11 @@ is nothing at all.
 
 **Websites have no services.** A website is its own thing; its block offers *Other* alone.
 
-**Nothing here is looked up anywhere**, and no service has a mark: the icon is a generic
-one out of the Lucide set (``TRADEMARKS.md``).
+**Nothing here is looked up anywhere.** The icon is a generic one out of the Lucide set, and
+is what a select draws. A service may also name a ``brand`` mark (#654), drawn where a link
+is shown, and only where the owner's published colour clears 3:1 on both pages: Mastodon,
+Bluesky, Facebook, Instagram, YouTube and Codeberg. The others keep the icon alone, and
+LinkedIn has no mark at all (``assets/brands.txt``, ``TRADEMARKS.md``).
 """
 
 from __future__ import annotations
@@ -136,6 +139,7 @@ SERVICES: dict[str, LinkService] = {
             hosts=("mastodon.social", "mastodon.online"),
             any_host=True,
             icon="at-sign",
+            brand="mastodon",
             example="https://mastodon.social/@name",
         ),
         LinkService(
@@ -146,6 +150,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/profile/(?P<handle>{PART}){REST}"),
             hosts=("bsky.app",),
             icon="at-sign",
+            brand="bluesky",
             example="https://bsky.app/profile/name.bsky.social",
         ),
         LinkService(
@@ -219,6 +224,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("facebook.com", "fb.com"),
             icon="user",
+            brand="facebook",
             example="https://www.facebook.com/name",
         ),
         LinkService(
@@ -245,6 +251,7 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("instagram.com",),
             icon="user",
+            brand="instagram",
             example="https://www.instagram.com/name",
         ),
         LinkService(
@@ -264,6 +271,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/(?P<handle>@{PART}|(?:channel|c|user)/{PART}){REST}"),
             hosts=("youtube.com",),
             icon="video",
+            brand="youtube",
             example="https://www.youtube.com/@name",
         ),
         # ---------------------------------------------------------- code repositories
@@ -301,6 +309,7 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/{_not(*_FORGEJO_PAGES)}(?P<handle>{PART}(?:/{PART})?){REST}"),
             hosts=("codeberg.org",),
             icon="git-branch",
+            brand="codeberg",
             example="https://codeberg.org/name/project",
         ),
         LinkService(

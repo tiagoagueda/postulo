@@ -43,6 +43,7 @@ THIRD_PARTY = {
     "src/postulo/static/css": "basecoat.LICENSE.txt",
     "src/postulo/templates/jobs/map": "LICENCE.txt",
     "src/postulo/jobs/data": "LICENCE.md",
+    "src/postulo/static/brands": "NOTICE.txt",
 }
 
 

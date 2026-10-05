@@ -65,6 +65,7 @@ project. They are not.
 
 | What | Where | Whose | Under |
 | --- | --- | --- | --- |
+| Brand marks of Bluesky, Codeberg, Facebook, Instagram, Mastodon and YouTube | `src/postulo/static/brands/` | Their owners, via [Simple Icons](https://simpleicons.org) | Shown beside a link to say which service it goes to, in the owner's published colour and unmodified, under the rule below. The notice beside them names each owner and says no endorsement is claimed. |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | Both published by Buy Me a Coffee for people to use, and used to link to the project's own account. The code is scaled and nothing else. See the notice beside them. |
 
 That is a mark, which is not licensed at all — hence this file. The works shipped here
@@ -103,6 +104,13 @@ connects to, the format it reads. It may be shipped with the plugin when **all f
 4. **It sits outside the licence grant**, in its own directory, with that stated. The AGPL
    covers the code and cannot speak for somebody else's mark, and every fork redistributes
    whatever is in the tree.
+
+The same rule binds the marks in Postulo's own interface (`src/postulo/static/brands/`). A
+mark is drawn in its owner's published colour or not at all: where that colour does not
+clear 3:1 on both the light and the dark page, the mark is not shipped and the service
+shows its generic icon, because recolouring it to fit a theme is what rule 2 forbids.
+LinkedIn has no mark here, and none is taken from elsewhere: the one source Postulo
+weighed dropped it on the strength of LinkedIn's own terms.
 
 Where any of the four fails, the plugin shows the neutral fallback and its own name does the
 identifying. A plugin with no logo is not a broken plugin.

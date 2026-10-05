@@ -22,6 +22,7 @@ work with no notice beside it, or a work committed here and not listed, fails th
 | Natural Earth world outline | `src/postulo/templates/jobs/map/world_outline.html` | [Natural Earth](https://www.naturalearthdata.com) | Public domain | `LICENCE.txt` beside it. A drawing of the 1:110m data, not a copy of it. |
 | Babel and CLDR country names | not in the tree: the `babel` package, installed with the dependencies; read by `src/postulo/jobs/places.py` | [Babel](https://babel.pocoo.org) (the Babel team) and the Unicode CLDR data it carries (Unicode, Inc.) | BSD-3-Clause (Babel); Unicode License v3 (CLDR) | Both notices travel in the installed package's `licenses` files; nothing is copied into this repository. |
 | NACE Rev. 2.1 sections and divisions | `src/postulo/jobs/data/nace-2.1.json` | Eurostat; published by the [Publications Office of the European Union](https://op.europa.eu) | CC BY 4.0 (Commission Decision 2011/833/EU) | `LICENCE.md` beside it, saying where the file came from and what was changed. |
+| Brand marks (Bluesky, Codeberg, Facebook, Instagram, Mastodon, YouTube) | `src/postulo/static/brands/` | Their owners, taken from [Simple Icons](https://simpleicons.org) (CC0-1.0 for its own artwork; the marks themselves are not licensed) | A mark, not a licensed work; Codeberg's carries CC0-1.0 | `NOTICE.txt` beside them, naming each owner, its source, its guidelines and the mode it is drawn in; see [TRADEMARKS.md](TRADEMARKS.md). |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | A mark, not a licensed work | `NOTICE.txt` beside them; see [TRADEMARKS.md](TRADEMARKS.md). |
 
 ## Data downloaded when an instance is provisioned
@@ -43,6 +44,8 @@ styles from Postulo's own origin only, so every one of these is copied into the 
 committed. Three scripts do the copying and each carries the notice with the work:
 
 - `npm run sync:icons` — the icons, from `lucide-static`, each with its `@license` line.
+- `npm run sync:brands` — the brand marks, from `simple-icons`, with `NOTICE.txt`; it
+  refuses a mark whose own licence is outside `assets/brand-terms.txt`.
 - `npm run sync:flags` — the flags, from `flag-icons`, with `LICENSE.txt`.
 - `npm run sync:vendor` — htmx and zxcvbn, from their packages at the versions
   `package.json` pins, with their notices; and Basecoat's notice beside the stylesheet.

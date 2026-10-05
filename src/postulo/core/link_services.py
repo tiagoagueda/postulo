@@ -8,7 +8,7 @@ identifier schemes are (`core.identifiers`), and it always has an **Other**: a f
 and the web-address check alone, so nobody is refused an address because the list does not
 know it.
 
-A service says five things about itself:
+A service says six things about itself:
 
 - which **kind** of link it is -- a social profile, a code repository, a website -- and so
   which block of the page offers it;
@@ -16,6 +16,8 @@ A service says five things about itself:
   Forgejo instance), in which case it is recognised by shape alone;
 - the **pattern** an address's path has there;
 - an **icon**, out of the Lucide set Postulo ships;
+- optionally a **brand** mark, out of the Simple Icons marks Postulo ships (#654), drawn
+  where the link is shown and never in a select, with the icon as the fallback;
 - an **example**, for the sentence that refuses an address.
 
 **Nothing here touches the network**, for the reason the identifier schemes give and the
@@ -60,6 +62,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from .addresses import _CONTROL
+from .brands import brand_exists
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +92,7 @@ _KEY = re.compile(r"[a-z0-9][a-z0-9-]*")
 ICON_DIR = Path(__file__).resolve().parent.parent / "static" / "icons"
 
 #: The icon a kind's services take when one names none, or names one Postulo does not ship.
-#: No brand marks, by the rule in ``TRADEMARKS.md``, which #301 decided to keep.
+#: A select never draws a mark (#301); where a link is shown, a service's `brand` may (#654).
 KIND_ICONS = {SOCIAL: "user", REPOSITORY: "git-branch", WEBSITE: "globe"}
 
 #: The icon for *Other*, whatever the kind: an address on the web, and no more is known.
@@ -125,6 +128,9 @@ class Service:
     example: str = ""
     #: Who provides this service, for a page that lists them. Empty for Postulo's own.
     provider: str = field(default="")
+    #: A brand mark Postulo ships (``assets/brands.txt``), drawn where a link is shown. Blank,
+    #: or a name Postulo does not ship, draws the icon alone: the rule's neutral fallback.
+    brand: str = ""
 
     def __post_init__(self) -> None:
         # Whatever a plugin wrote them as -- a `LinkKind`, a list -- they are read as a
@@ -187,6 +193,11 @@ class Service:
     def icon_name(self) -> str:
         """The icon to draw: the service's own where Postulo ships it, else the kind's."""
         return self.icon if icon_exists(self.icon) else KIND_ICONS.get(self.kind, OTHER_ICON)
+
+    @property
+    def brand_name(self) -> str:
+        """The mark to draw: the service's own where Postulo ships it, else nothing."""
+        return self.brand if isinstance(self.brand, str) and brand_exists(self.brand) else ""
 
 
 def _host(url: str) -> str:
@@ -324,6 +335,12 @@ def icon_for(key: str, kind: str = "") -> str:
     """The icon a row draws: its service's, or the globe for *Other*."""
     service = find(key, kind)
     return service.icon_name if service is not None else OTHER_ICON
+
+
+def brand_for(key: str, kind: str = "") -> str:
+    """The mark a row draws: its service's where it has one Postulo ships, else nothing."""
+    service = find(key, kind)
+    return service.brand_name if service is not None else ""
 
 
 def guess(url: str, kind: str) -> Service | None:

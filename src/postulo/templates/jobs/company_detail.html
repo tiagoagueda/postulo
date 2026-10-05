@@ -231,7 +231,7 @@
                     {% for link in contact.web_links.all %}
                       {% if link.is_primary or link.kind in several_links %}
                         <p class="truncate text-xs text-ink-500 dark:text-ink-400">
-                          <a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
+                          {% if link.brand %}{% brand link.brand %} {% endif %}<a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
                              class="underline">{{ link.display }}</a>
                           <span class="text-ink-400 dark:text-ink-500">{{ link.kind_label }}</span>
                         </p>

@@ -752,6 +752,13 @@ class WebLink(OwnedModel):
 
         return link_services.icon_for(self.service, self.kind)
 
+    @property
+    def brand(self) -> str:
+        """The brand mark Postulo ships for the row's service, or nothing (#654)."""
+        from postulo.core import link_services
+
+        return link_services.brand_for(self.service, self.kind)
+
 
 class ErrandState(models.TextChoices):
     """Where a piece of slow work stands. Four words, and only four."""
