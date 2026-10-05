@@ -308,7 +308,10 @@ def test_escape_is_not_taken_by_a_tooltip_nobody_is_looking_at(page: Page, live_
     pointer resting on a field and the focus in the masthead's search, the one Escape puts
     the tooltip away and is the search's as well. And with the pointer rested on a question
     mark until its sentence showed, a press opens the drawer and one Escape closes it."""
-    page.set_viewport_size({"width": 1280, "height": 800})
+    # Tall enough to hold the whole page, so that nothing scrolls (the Personal details card
+    # of #679 pushed the headline below an 800-pixel window, where scrolling it into view for
+    # the hover then moved it from under the pointer and put the tooltip away).
+    page.set_viewport_size({"width": 1280, "height": 2600})
     your_details(page, live_server.url)
     tip = page.locator("#id_headline_helptext")
     page.locator("label[for=id_headline]").hover()
