@@ -342,7 +342,8 @@ def test_education_reads_the_programme_its_grade_and_what_it_covered():
     assert row["qualification"] == "MSc Computer Science"
     assert row["institution"] == "Universidade de Lisboa"
     assert row["location"] == "Lisboa"
-    assert row["grade"] == "EQF 7"
+    assert row["grade"] == ""
+    assert row["eqf_level"] == 7, "the level has a field of its own, and is not the grade"
     assert row["highlights"] == "Distributed systems."
 
 
@@ -360,8 +361,23 @@ def test_a_degree_name_serves_where_there_is_no_programme_name():
     row = europass.read(data).education[0]
 
     assert row["qualification"] == "BSc Informatics"
-    assert row["grade"] == "17/20", "a final grade is the grade; the level is only a fallback"
+    assert row["grade"] == "17/20"
     assert row["end_date"] is None
+
+
+def test_a_final_grade_and_an_eqf_code_are_both_kept():
+    data = candidate_xml(
+        "<EducationHistory><EducationOrganizationAttendance>"
+        "<hr:OrganizationName>ISEL</hr:OrganizationName><hr:ProgramName>BSc</hr:ProgramName>"
+        "<EducationDegree><FinalGrade><hr:ScoreText>17/20</hr:ScoreText></FinalGrade>"
+        "</EducationDegree>"
+        '<EducationLevelCode listName="EQF">6</EducationLevelCode>'
+        "</EducationOrganizationAttendance></EducationHistory>"
+    )
+
+    row = europass.read(data).education[0]
+
+    assert (row["grade"], row["eqf_level"]) == ("17/20", 6)
 
 
 def test_a_level_that_does_not_say_it_is_eqf_is_not_called_one():
@@ -373,7 +389,8 @@ def test_a_level_that_does_not_say_it_is_eqf_is_not_called_one():
         "</EducationOrganizationAttendance></EducationHistory>"
     )
 
-    assert europass.read(data).education[0]["grade"] == ""
+    row = europass.read(data).education[0]
+    assert (row["grade"], row["eqf_level"]) == ("", None), "nothing is read from an ISCED code"
 
 
 # ------------------------------------------------------------------- the person
@@ -620,7 +637,8 @@ def test_the_commissions_own_sample_reads():
             "location": "",
             "start_date": dt.date(2005, 9, 1),
             "end_date": dt.date(2010, 7, 1),
-            "grade": "EQF 5",
+            "grade": "",
+            "eqf_level": 5,
             "highlights": "",
         }
     ]

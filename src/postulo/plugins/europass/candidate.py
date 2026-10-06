@@ -433,34 +433,41 @@ def _read_education(profile, record: Record) -> None:
                 "location": _city(attendance),
                 "start_date": _date(period, "StartDate"),
                 "end_date": None if _true(period, "Ongoing") else _date(period, "EndDate"),
-                "grade": _grade(attendance, degree),
+                "grade": _grade(degree),
+                "eqf_level": _eqf_level(attendance),
                 "highlights": _plain(_raw(degree, "OccupationalSkillsCovered"))
                 or _plain(_raw(period, "Description")),
             }
         )
 
 
-def _grade(attendance, degree) -> str:
-    """The final grade where the file gives one, and otherwise the EQF level, as before.
+def _grade(degree) -> str:
+    """The final grade where the file gives one, and nothing otherwise.
 
-    The old reader filled ``grade`` from the old format's level, which was the EQF label;
-    a level is written the same way here so that the two formats agree. Only where the file
-    says it is EQF: a bare 6 on the ISCED list is a different level.
+    The level is no longer written here as the text "EQF 6": it has a field of its own
+    (#684), so a file with a grade and a level keeps both.
     """
     if degree is not None:
         final = _find(degree, "FinalGrade")
         if final is not None:
-            text = _text(final, "ScoreText") or _text(final, "ScoreNumeric")
-            if text:
-                return text
+            return _text(final, "ScoreText") or _text(final, "ScoreNumeric")
+    return ""
+
+
+def _eqf_level(attendance) -> int | None:
+    """The EQF level the file states, 1 to 8, or ``None``.
+
+    Only where the file says it is EQF: a bare 6 on the ISCED list is a different scale, and
+    nothing is read from an ISCED code.
+    """
     for level in _all(attendance, "EducationLevelCode"):
         value = _text(level)
         match = _EQF.match(value)
         if match and (
             "EQF" in (level.get("listName") or "").upper() or value.upper().startswith("EQF")
         ):
-            return f"EQF {match.group(1)}"
-    return ""
+            return int(match.group(1))
+    return None
 
 
 # ------------------------------------------------------------------- languages

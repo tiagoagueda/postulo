@@ -591,6 +591,22 @@ def test_both_formats_read_the_same_career():
     assert from_json.projects == from_xml.projects
 
 
+def test_both_readers_move_exactly_eqf_n_into_the_level_and_keep_any_other_label():
+    """The older formats copied the `Level` label into the grade; an EQF one is a level (#684)."""
+    for read in (europass.read(FIXTURE.read_bytes()), europass.read(JSON_FIXTURE.read_bytes())):
+        row = read.education[0]
+        assert (row["grade"], row["eqf_level"]) == ("", 7)
+
+    def json_with(label: str) -> dict:
+        data = {"LearnerInfo": {"Education": [{"Title": "MSc", "Level": {"Label": label}}]}}
+        return europass.read(json.dumps(data).encode()).education[0]
+
+    assert json_with("EQF 6")["eqf_level"] == 6
+    for label in ("EQF 9", "EQF 6 or equivalent", "eqf 6", "Master 2", "6.0 GPA"):
+        row = json_with(label)
+        assert (row["grade"], row["eqf_level"]) == (label, None), label
+
+
 def test_the_format_is_sniffed_so_nobody_has_to_know_which_they_have():
     assert europass.read(FIXTURE.read_bytes()).source == "xml"
     assert europass.read(JSON_FIXTURE.read_bytes()).source == "json"

@@ -858,6 +858,9 @@ class CVPrintsOut(Schema):
     gender: bool = Field(description="Whether the gender is printed (#681)")
     birth_date: bool = Field(description="Whether the date of birth is printed (#679)")
     birth_place: bool = Field(description="Whether the place of birth is printed (#679)")
+    eqf_level: bool = Field(
+        description="Whether the EQF level of each qualification that states one is printed (#684)"
+    )
 
 
 class CVDetailOut(CVOut):
@@ -905,6 +908,7 @@ class CVPrintsIn(Schema):
     birth_place: bool | None = None
     nationality: bool | None = None
     gender: bool | None = None
+    eqf_level: bool | None = None
 
 
 class CVPatch(Schema):

@@ -131,7 +131,9 @@ logger = logging.getLogger(__name__)
 #: 47 added ``eqf_level`` on an education entry: its level in the European Qualifications
 #: Framework, 1 to 8 or none; an archive without it restores none, and one with a value
 #: outside 1 to 8 restores none and says so (#684).
-FORMAT_VERSION = 47
+#: 48 added ``eqf_level`` among a CV's ``prints``: whether the EQF level of each qualification
+#: that states one is printed; an archive without it restores it off (#684).
+FORMAT_VERSION = 48
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:

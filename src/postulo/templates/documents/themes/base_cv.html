@@ -144,7 +144,7 @@
                     <p class="org"><bdi>{{ entry.item.organisation }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
                   {% elif section.kind == 'education' %}
                     <h3 class="role">{{ entry.item.qualification }}</h3>
-                    <p class="org"><bdi>{{ entry.item.institution }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}</p>
+                    <p class="org"><bdi>{{ entry.item.institution }}</bdi>{% if entry.item.location %} · <bdi>{{ entry.item.location }}</bdi>{% endif %}{% if cv.show_eqf_level and entry.item.eqf_level %} · {% blocktranslate with level=entry.item.eqf_level %}EQF level {{ level }}{% endblocktranslate %}{% endif %}</p>
                   {% else %}
                     <h3 class="role">{{ entry.item.name }}</h3>
                     {% if entry.item.role %}<p class="org">{{ entry.item.role }}</p>{% endif %}

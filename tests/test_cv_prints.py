@@ -971,6 +971,7 @@ def test_the_archive_carries_the_choice_with_the_cv_by_what_each_row_says(person
         "birth_place": False,
         "nationality": False,
         "gender": False,
+        "eqf_level": False,
     }
     assert "pinned_phone" not in json.dumps(entry), "no row is named by an id"
 
@@ -1323,6 +1324,7 @@ def test_the_api_reads_the_choice_with_what_it_comes_to_and_what_may_be_chosen(p
     )
     assert (prints["birth_date"], prints["birth_place"]) == (False, False), "off, as a new CV is"
     assert prints["nationality"] is False and prints["gender"] is False
+    assert prints["eqf_level"] is False
     # The list of CVs is the list it was: the choice is on the one CV asked for.
     assert "prints" not in client.get("/api/v1/cvs", **bearer(person)).json()["items"][0]
 
@@ -1427,6 +1429,7 @@ def test_the_schema_describes_the_choice(person, client):
         "birth_place",
         "nationality",
         "gender",
+        "eqf_level",
     }
     assert "prints" in components["CVDetailOut"]["properties"]
     assert "patch" in schema["paths"]["/api/v1/cvs/{pk}"]

@@ -352,6 +352,7 @@ def apply(owner, record: Record) -> Report:
                 start_date=entry["start_date"],
                 end_date=entry["end_date"],
                 grade=entry["grade"][:100],
+                eqf_level=entry.get("eqf_level"),
                 highlights=entry["highlights"],
             )
         )

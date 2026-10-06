@@ -427,14 +427,26 @@ def _period(item, *, years_only: bool = False) -> str:
     return _joined(" – ", first, last)
 
 
-def _entry_blocks(section: Section, entry: Entry) -> list:
+def _eqf_text(cv: CV, item) -> str:
+    """ "EQF level 7", in the document's language, where the CV prints the level and the
+    entry states one (#684). The themes print the same words."""
+    level = getattr(item, "eqf_level", None)
+    if cv.show_eqf_level and level:
+        return gettext("EQF level %(level)s") % {"level": level}
+    return ""
+
+
+def _entry_blocks(cv: CV, section: Section, entry: Entry) -> list:
     """One experience, qualification or project, as a CV sets it: a heading and what is
     under it."""
     item = entry.item
     if section.kind == "experience":
         title, under = item.role, _joined(BETWEEN, item.organisation, item.location)
     elif section.kind == "education":
-        title, under = item.qualification, _joined(BETWEEN, item.institution, item.location)
+        title, under = (
+            item.qualification,
+            _joined(BETWEEN, item.institution, item.location, _eqf_text(cv, item)),
+        )
     else:
         title, under = item.name, getattr(item, "role", "")
     blocks = [file_formats.heading(title, 3)]
@@ -460,7 +472,7 @@ def _piece_blocks(entry: Entry) -> list:
     return blocks
 
 
-def _section_blocks(section: Section, *, as_portfolio: bool) -> list:
+def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
     """What one section says, in the shape the themes give its kind.
 
     The same branches `base_cv.html` and `base_portfolio.html` take, and they are kept in
@@ -504,12 +516,13 @@ def _section_blocks(section: Section, *, as_portfolio: bool) -> list:
                 BETWEEN,
                 one.item.role if section.kind == "experience" else one.item.qualification,
                 one.item.organisation if section.kind == "experience" else one.item.institution,
+                "" if section.kind == "experience" else _eqf_text(cv, one.item),
                 _period(one.item, years_only=True),
             )
             for one in entries
         ]
     else:
-        return [block for one in entries for block in _entry_blocks(section, one)]
+        return [block for one in entries for block in _entry_blocks(cv, section, one)]
     return [file_formats.bullets(lines)]
 
 
@@ -542,7 +555,7 @@ def cv_outline(cv: CV, properties=None) -> file_formats.Outline:
         as_portfolio = cv.kind == CVKind.PORTFOLIO
         for section in build_sections(cv):
             blocks.append(file_formats.heading(section.label, 2))
-            blocks.extend(_section_blocks(section, as_portfolio=as_portfolio))
+            blocks.extend(_section_blocks(cv, section, as_portfolio=as_portfolio))
         outline = file_formats.Outline(
             title=document_title(cv),
             language=language,

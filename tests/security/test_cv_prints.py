@@ -341,6 +341,16 @@ def test_the_api_changes_nobody_elses_cv(client, user, other_user, cv):
     untouched(cv)
 
 
+def test_the_eqf_switch_is_a_yes_or_a_no_and_is_the_owners_to_flip(client, user, other_user, cv):
+    response = patch(client, cv, {"prints": {"eqf_level": True}}, **bearer(other_user, "write"))
+    assert response.status_code == 404
+    untouched(cv)
+    for nonsense in ("maybe", 7, [True], {"a": 1}):
+        response = patch(client, cv, {"prints": {"eqf_level": nonsense}}, **bearer(user, "write"))
+        assert response.status_code == 422, nonsense
+    untouched(cv)
+
+
 def test_unknown_fields_change_nothing_they_name(client, user, cv, theirs):
     """Only what the schema lists is written: not the columns, and not whose CV it is."""
     response = patch(

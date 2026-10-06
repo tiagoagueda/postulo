@@ -179,6 +179,7 @@ SWITCHES: dict[str, str] = {
     "birth_place": "show_birth_place",
     "nationality": "show_nationality",
     "gender": "show_gender",
+    "eqf_level": "show_eqf_level",
 }
 
 

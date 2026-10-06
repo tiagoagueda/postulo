@@ -66,6 +66,7 @@ from __future__ import annotations
 
 import datetime as dt
 import json
+import re
 from xml.etree import ElementTree
 
 from defusedxml import DefusedXmlException
@@ -470,11 +471,26 @@ def _read_education(learner, record: Record) -> None:
                 "location": location,
                 "start_date": _date(period, "From") if period is not None else None,
                 "end_date": _date(period, "To") if period is not None else None,
-                "grade": _text(entry, "Level", "Label"),
+                **_level(_text(entry, "Level", "Label")),
                 "highlights": _plain(_text(entry, "Activities", keep_lines=True)),
             }
         )
     _unread(record, entries, len(record.education) - before, _("Education"))
+
+
+_EQF_LABEL = re.compile(r"^EQF (?P<level>[1-8])$")
+
+
+def _level(label: str) -> dict:
+    """What an education entry's ``Level`` label becomes (#684).
+
+    Exactly "EQF n" is the level, which the record has a field for; any other label is kept
+    in the grade as it always was, whatever it says.
+    """
+    match = _EQF_LABEL.match(label)
+    if match:
+        return {"grade": "", "eqf_level": int(match.group("level"))}
+    return {"grade": label, "eqf_level": None}
 
 
 def _read_skills(learner, record: Record) -> None:
@@ -752,7 +768,7 @@ def _read_json_education(learner: dict, record: Record) -> None:
                 "location": _json_place(organisation),
                 "start_date": _json_date(period, "From"),
                 "end_date": _json_date(period, "To"),
-                "grade": _json_text(entry, "Level"),
+                **_level(_json_text(entry, "Level")),
                 "highlights": _plain(_json_text(entry, "Activities", keep_lines=True)),
             }
         )

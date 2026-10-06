@@ -332,6 +332,17 @@ class CV(DeclaresALanguage, OwnedModel):
     show_nationality = models.BooleanField(_("print your nationality"), default=False)
     #: And off (#681), one plain switch.
     show_gender = models.BooleanField(_("print your gender"), default=False)
+    #: And off (#684): the EQF level of each qualification that states one, beside the
+    #: institution. Not a detail of the profile, so it has no line in `PrintedDetails`; the
+    #: themes read it from the CV they are handed.
+    show_eqf_level = models.BooleanField(
+        _("print the EQF level of my qualifications"),
+        default=False,
+        help_text=_(
+            "Beside the institution, for each qualification where you have stated one. "
+            "The level means little on a CV for a country outside the framework’s reach."
+        ),
+    )
 
     class Meta:
         verbose_name = _("CV")

@@ -145,6 +145,7 @@
                 {% else %}
                   <span class="piece-name">{{ entry.item.qualification }}</span>
                   <span class="org"><bdi>{{ entry.item.institution }}</bdi></span>
+                  {% if cv.show_eqf_level and entry.item.eqf_level %}<span class="org">{% blocktranslate with level=entry.item.eqf_level %}EQF level {{ level }}{% endblocktranslate %}</span>{% endif %}
                 {% endif %}
                 <span class="dates">
                   {% if entry.item.start_date %}{{ entry.item.start_date|date:"Y" }}{% endif %}

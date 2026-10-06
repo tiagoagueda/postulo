@@ -49,8 +49,9 @@ def test_the_form_saves_a_level_and_clears_it(user):
 def test_not_stated_is_the_first_choice_and_the_default(user):
     form = EducationForm(user=user)
     choices = list(form.fields["eqf_level"].choices)
-    assert choices[0][0] == ""
+    assert str(choices[0][1]) == "Not stated"
     assert [value for value, _label in choices[1:]] == list(range(1, 9))
+    assert '<option value="" selected>Not stated</option>' in str(form["eqf_level"])
     assert Education().eqf_level is None
 
 
@@ -158,7 +159,166 @@ def test_a_level_that_is_not_one_is_a_refused_row(user, value):
     assert any("EQF level" in note for note in row.notes), row.notes
 
 
+def test_a_level_the_europass_import_reads_is_stored(user):
+    from postulo.resume import importing
+
+    record = importing.Record(
+        education=[
+            {
+                "qualification": "BSc",
+                "institution": "ISEL",
+                "location": "",
+                "start_date": None,
+                "end_date": None,
+                "grade": "17/20",
+                "eqf_level": 6,
+                "highlights": "",
+            }
+        ]
+    )
+    importing.apply(user, record)
+    entry = Education.objects.get(owner=user)
+    assert (entry.grade, entry.eqf_level) == ("17/20", 6)
+
+
 def test_a_level_a_file_gives_is_added(user):
     assert the_row(user, a_file(5)).outcome == candidate.ADD
     candidate.apply(user, candidate.read(a_file(5)))
     assert Education.objects.get(owner=user).eqf_level == 5
+
+
+# ------------------------------------------------------------ what a CV prints, under a switch
+
+LINE = "EQF level 7"
+
+
+def a_cv_with_a_level(user, **fields):
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.documents.models import CV, CVItem
+
+    user.first_name, user.last_name = "Alex", "Morgan"
+    user.save(update_fields=["first_name", "last_name"])
+    cv = CV.objects.create(owner=user, name="Main", **fields)
+    for order, entry in enumerate(
+        [
+            an_education(user, eqf_level=7, location="Lisboa"),
+            an_education(user, qualification="Short course", institution="Evening school"),
+        ]
+    ):
+        CVItem.objects.create(
+            owner=user,
+            cv=cv,
+            content_type=ContentType.objects.get_for_model(Education),
+            object_id=entry.pk,
+            order=order,
+        )
+    return cv
+
+
+@pytest.mark.parametrize("theme", ["plain", "classic"])
+@pytest.mark.parametrize("kind", ["cv", "portfolio"])
+def test_with_the_switch_off_the_page_the_text_and_the_word_file_say_nothing_of_it(
+    user, theme, kind
+):
+    from postulo.documents import formats, rendering
+
+    cv = a_cv_with_a_level(user, theme=theme, kind=kind)
+    assert cv.show_eqf_level is False
+    assert "EQF" not in rendering.render_cv_html(cv)
+    assert "EQF" not in rendering.cv_text(cv)
+    outline = rendering.cv_outline(cv)
+    with zipfile.ZipFile(io.BytesIO(formats.get("docx").write(outline))) as word:
+        assert "EQF" not in word.read("word/document.xml").decode()
+
+
+@pytest.mark.parametrize("theme", ["plain", "classic"])
+@pytest.mark.parametrize("kind", ["cv", "portfolio"])
+def test_with_the_switch_on_all_three_print_the_same_line_once(user, theme, kind):
+    import re
+
+    from postulo.documents import formats, printing, rendering
+
+    cv = a_cv_with_a_level(user, theme=theme, kind=kind, show_eqf_level=True)
+    assert not printing.is_default(cv)
+    html = rendering.render_cv_html(cv)
+    assert html.count(LINE) == 1, "once, and not for the entry that states none"
+    text = rendering.cv_text(cv)
+    assert text.count(LINE) == 1
+    outline = rendering.cv_outline(cv)
+    with zipfile.ZipFile(io.BytesIO(formats.get("docx").write(outline))) as word:
+        assert word.read("word/document.xml").decode().count(LINE) == 1
+    page = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html))
+    for line in text.splitlines():
+        for part in re.split(r" · | — |: |, ", line.removeprefix(formats.BULLET)):
+            assert part.strip() in page, f"{part!r} of {line!r} is not on the page"
+
+
+def test_the_level_is_set_beside_the_institution_and_the_place(user):
+    from postulo.documents import rendering
+
+    text = rendering.cv_text(a_cv_with_a_level(user, show_eqf_level=True))
+    assert "Universidade de Lisboa · Lisboa · EQF level 7" in text.splitlines()
+
+
+def test_the_switch_is_in_the_cv_form_and_off_by_default(user):
+    from postulo.documents.forms import CVForm
+
+    assert not CVForm(user=user).fields["show_eqf_level"].initial
+    data = {
+        "name": "Main",
+        "kind": "cv",
+        "theme": "plain",
+        "language": "",
+        "show_contact_details": "on",
+        "show_eqf_level": "on",
+        "prints_phone": "default",
+        "prints_email": "default",
+        "prints_social": "default",
+        "prints_repository": "default",
+        "prints_website": "default",
+        "prints_identifiers": "default",
+    }
+    form = CVForm(data, user=user)
+    assert form.is_valid(), form.errors
+    assert form.save(commit=False).show_eqf_level is True
+
+
+def test_the_archive_and_the_api_carry_the_switch(client, user, other_user):
+    from postulo.api.models import ApiToken
+    from postulo.documents.models import CV
+
+    cv = a_cv_with_a_level(user, show_eqf_level=True)
+    prints = export.build_document(user)["documents"]["cvs"][0]["prints"]
+    assert prints["eqf_level"] is True
+    importer.load(other_user, zipfile.ZipFile(export.write_archive(user)))
+    assert CV.objects.get(owner=other_user, name="Main").show_eqf_level is True
+
+    _row, raw = ApiToken.issue(user, "Agent", scopes=("read", "write"))
+    headers = {"HTTP_AUTHORIZATION": f"Bearer {raw}"}
+    url = f"/api/v1/cvs/{cv.pk}"
+    assert client.get(url, **headers).json()["prints"]["eqf_level"] is True
+    response = client.patch(
+        url,
+        data=json.dumps({"prints": {"eqf_level": False}}),
+        content_type="application/json",
+        **headers,
+    )
+    assert response.status_code == 200, response.content
+    assert response.json()["prints"]["eqf_level"] is False
+    cv.refresh_from_db()
+    assert cv.show_eqf_level is False
+
+
+def test_an_archive_that_does_not_say_restores_the_switch_off(user, other_user):
+    from postulo.documents.models import CV
+
+    a_cv_with_a_level(user, show_eqf_level=True)
+    document = export.build_document(user)
+    del document["documents"]["cvs"][0]["prints"]["eqf_level"]
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(export.MANIFEST_NAME, json.dumps(document, default=str))
+    buffer.seek(0)
+    importer.load(other_user, zipfile.ZipFile(buffer))
+    assert CV.objects.get(owner=other_user).show_eqf_level is False
