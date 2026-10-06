@@ -458,6 +458,7 @@ FACTORIES: dict[str, Callable] = {
     "documents:upload_download": pk_of(upload),
     "documents:upload_update": pk_of(upload),
     # jobs
+    "jobs:capture_delete": pk_of(capture),
     "jobs:capture_discard": pk_of(capture),
     "jobs:capture_restore": pk_of(capture),
     # What a capture kept of its page (#256): the page that shows it, the two files, and

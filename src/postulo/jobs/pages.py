@@ -802,8 +802,8 @@ def expire_unconfirmed() -> int:
 
     A capture discarded, or one still waiting for review, keeps its page for
     `POSTULO_CAPTURE_PAGE_KEEP_DAYS` from the day it was captured; a capture somebody saved
-    keeps its page for as long as it exists. The capture itself is never touched here: what
-    goes is the copy of the page, which is the part that weighs something.
+    keeps its page while the listing it became exists (#664). The capture itself is never
+    touched here: what goes is the copy of the page, which is the part that weighs something.
 
     Returns how many pages went.
     """

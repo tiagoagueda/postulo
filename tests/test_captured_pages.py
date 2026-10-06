@@ -1339,3 +1339,140 @@ def test_the_pages_that_count_what_an_account_holds_count_these(client, kept):
 
     assert client.get(reverse("core:export")).context["counts"]["captured_pages"] == 1
     assert "Pages kept from captures" in client.get(reverse("core:export")).content.decode()
+
+
+# ------------------------------------------- the page goes when its listing does (#664)
+
+
+@pytest.fixture
+def became_a_listing(kept):
+    from postulo.jobs.models import Company, JobPosting
+
+    listing = JobPosting.objects.create(
+        owner=kept.owner,
+        company=Company.objects.create(owner=kept.owner, name="Black Mesa"),
+        title="Research Engineer",
+    )
+    Capture.objects.filter(pk=kept.pk).update(status=CaptureStatus.ACCEPTED, posting=listing)
+    return listing
+
+
+def test_deleting_the_listing_a_capture_became_takes_the_capture_and_its_page(
+    kept, became_a_listing, django_capture_on_commit_callbacks
+):
+    files = [path_of(kept.page.source), path_of(kept.page.rendering)]
+
+    with django_capture_on_commit_callbacks(execute=True):
+        became_a_listing.delete()
+
+    assert not Capture.objects.filter(pk=kept.pk).exists()
+    assert not CapturedPage.objects.exists()
+    assert not any(path.exists() for path in files)
+
+
+def test_a_bound_capture_goes_with_the_listing_it_was_bound_to(
+    kept, became_a_listing, django_capture_on_commit_callbacks
+):
+    from postulo.jobs.history import bind_capture
+
+    other = Capture.objects.create(owner=kept.owner, url="https://other.example/j/1", data={})
+    pages.keep_source(other, PAGE)
+    files = [path_of(other.page.source)]
+    bind_capture(other, became_a_listing)
+
+    with django_capture_on_commit_callbacks(execute=True):
+        became_a_listing.delete()
+
+    assert not Capture.objects.filter(pk=other.pk).exists()
+    assert not any(path.exists() for path in files)
+
+
+def test_a_rolled_back_listing_deletion_keeps_the_page(kept, became_a_listing):
+    from django.db import transaction
+
+    source = path_of(kept.page.source)
+
+    with pytest.raises(RuntimeError), transaction.atomic():
+        became_a_listing.delete()
+        raise RuntimeError("changed my mind")
+
+    assert Capture.objects.filter(pk=kept.pk).exists() and source.is_file()
+
+
+def test_somebody_elses_listing_leaves_a_waiting_capture_alone(kept, became_a_listing):
+    from postulo.jobs.models import JobPosting
+
+    mine = Capture.objects.create(owner=kept.owner, url="https://x.example/j/2", data={})
+    page = pages.keep_source(mine, PAGE)
+    stranger = JobPosting.objects.create(
+        owner=kept.owner, company=became_a_listing.company, title="Another"
+    )
+
+    stranger.delete()
+
+    assert Capture.objects.filter(pk=mine.pk).exists() and path_of(page.source).is_file()
+
+
+def test_deleting_a_waiting_capture_removes_its_page(
+    client, kept, django_capture_on_commit_callbacks
+):
+    files = [path_of(kept.page.source), path_of(kept.page.rendering)]
+    client.force_login(kept.owner)
+    url = reverse("jobs:capture_delete", args=[kept.pk])
+
+    assert client.get(url).status_code == 200
+    with django_capture_on_commit_callbacks(execute=True):
+        response = client.post(url)
+
+    assert response.status_code == 302
+    assert not Capture.objects.filter(pk=kept.pk).exists()
+    assert not any(path.exists() for path in files)
+
+
+def test_a_discarded_capture_can_be_deleted_too(client, kept):
+    Capture.objects.filter(pk=kept.pk).update(status=CaptureStatus.DISCARDED)
+    client.force_login(kept.owner)
+
+    client.post(reverse("jobs:capture_delete", args=[kept.pk]))
+
+    assert not Capture.objects.filter(pk=kept.pk).exists()
+
+
+def test_a_saved_capture_is_not_deleted_on_its_own(client, kept, became_a_listing):
+    client.force_login(kept.owner)
+    url = reverse("jobs:capture_delete", args=[kept.pk])
+
+    assert client.get(url).status_code == 302
+    assert client.post(url).status_code == 302
+
+    assert Capture.objects.filter(pk=kept.pk).exists()
+    assert path_of(kept.page.source).is_file()
+
+
+def test_somebody_elses_capture_cannot_be_deleted(client, kept, other_user):
+    client.force_login(other_user)
+
+    assert client.post(reverse("jobs:capture_delete", args=[kept.pk])).status_code == 404
+    assert Capture.objects.filter(pk=kept.pk).exists()
+
+
+def test_prune_captures_lists_a_stranded_page_and_leaves_a_live_one(
+    kept, became_a_listing, capsys, django_capture_on_commit_callbacks
+):
+    stranded = Capture.objects.create(
+        owner=kept.owner, url="https://gone.example/j/3", data={}, status=CaptureStatus.ACCEPTED
+    )
+    page = pages.keep_source(stranded, PAGE)
+    path = path_of(page.source)
+
+    call_command("prune_captures")
+    out = capsys.readouterr().out
+    assert f"capture {stranded.pk} " in out and f"capture {kept.pk} " not in out
+    assert Capture.objects.filter(pk=stranded.pk).exists() and path.is_file()
+
+    with django_capture_on_commit_callbacks(execute=True):
+        call_command("prune_captures", "--remove")
+
+    assert not Capture.objects.filter(pk=stranded.pk).exists() and not path.exists()
+    assert Capture.objects.filter(pk=kept.pk).exists()
+    assert path_of(kept.page.source).is_file()

@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Deleting a listing now deletes the captures that became it, with their kept pages; a capture nobody saved can be deleted at once, and `manage.py prune_captures` finds saved captures already stranded without a listing (#664)
 - A profile picture, its Gravatar copy and a company logo are now rows in the database that go with their owner however it is deleted (page, merge, admin, account deletion), no longer files that could be left behind (#662)
 - The test suite now runs views inside the per-request transaction production uses, so a view that forgets non_atomic_requests fails in tests too. (#572)
 - The applications and companies tables no longer de-duplicate every row on each view, so counts and pages load faster, most on large accounts. (#552)

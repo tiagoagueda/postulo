@@ -198,6 +198,7 @@
         </button>
         <a href="{{ next_url }}" class="btn" data-variant="ghost" data-key-next{% if keyboard_shortcuts %} aria-keyshortcuts="j"{% endif %}>{% translate "Skip to the next" %}{% if key_hints and keyboard_shortcuts %}<c-key-hint key="j" show />{% endif %}</a>
       {% endif %}
+      <a href="{% url 'jobs:capture_delete' capture.pk %}" class="btn" data-variant="ghost">{% translate "Delete it for good" %}</a>
     </form>
     {% comment %} The page says what the keys are, so it has to say the truth about them:
        single-key shortcuts can be switched off under Settings → Appearance now (#227), and a

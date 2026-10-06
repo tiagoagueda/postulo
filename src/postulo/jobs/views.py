@@ -1078,9 +1078,12 @@ class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 
     def get_context_data(self, **kwargs):
         """A listing takes its applications with it; say how many before it does (#217)."""
+        from django.contrib.contenttypes.models import ContentType
         from django.utils.translation import ngettext
 
         from postulo.documents.models import RenderedDocument
+
+        from .models import Capture, CapturedPage
 
         context = super().get_context_data(**kwargs)
         applications = self.object.applications.all()
@@ -1095,9 +1098,29 @@ class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
                 )
                 % {"count": number}
             )
-        # Its history goes with it; what the history pointed at does not (#270). A file
-        # somebody forwarded lives in their documents and a capture stays a capture, and
-        # saying so here is the difference between deleting a listing and deleting those.
+        # Its history goes with it, and so do the captures that became it, with what they
+        # kept of the page (#664); a file somebody forwarded lives in their documents and
+        # is not deleted with a listing (#270), and saying so here is the difference.
+        captures = self.object.captures.all()
+        if captures.exists():
+            consequences.append(
+                ngettext(
+                    "%(count)d capture that became it",
+                    "%(count)d captures that became it",
+                    captures.count(),
+                )
+                % {"count": captures.count()}
+            )
+            kept_pages = CapturedPage.objects.filter(capture__in=captures).count()
+            if kept_pages:
+                consequences.append(
+                    ngettext(
+                        "%(count)d kept page of a capture",
+                        "%(count)d kept pages of captures",
+                        kept_pages,
+                    )
+                    % {"count": kept_pages}
+                )
         entries = self.object.events.all()
         if entries.exists():
             consequences.append(
@@ -1123,6 +1146,7 @@ class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
             )
         pointed = (
             entries.filter(artefact_id__isnull=False)
+            .exclude(artefact_type=ContentType.objects.get_for_model(Capture))
             .order_by()
             .values("artefact_type", "artefact_id")
             .distinct()
@@ -1131,9 +1155,8 @@ class PostingDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         if pointed:
             kept.append(
                 ngettext(
-                    "The %(count)d file or capture its history points at is kept where it is.",
-                    "The %(count)d files and captures its history points at are kept where "
-                    "they are.",
+                    "The %(count)d file its history points at is kept where it is.",
+                    "The %(count)d files its history points at are kept where they are.",
                     pointed,
                 )
                 % {"count": pointed}

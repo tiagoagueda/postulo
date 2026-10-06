@@ -1361,7 +1361,7 @@ class Capture(OwnedModel):
     )
     posting = models.ForeignKey(
         JobPosting,
-        on_delete=models.SET_NULL,
+        on_delete=models.CASCADE,
         null=True,
         blank=True,
         related_name="captures",
@@ -1482,7 +1482,8 @@ class CapturedPage(OwnedModel):
     A model of its own rather than columns on `Capture`. Almost no capture has one, the
     review queue reads captures by the dozen and has no use for file columns, and what was
     kept can be thrown away without touching the capture -- which is a deletion of this row
-    and of nothing else.
+    and of nothing else. A saved capture's page goes with its listing, because the capture
+    does (#664).
 
     **The source is a stranger's markup and is never served as a page.** It is kept
     gzipped under a name ending `.txt.gz`, so that nothing reading the media directory by

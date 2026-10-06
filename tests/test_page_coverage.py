@@ -183,6 +183,7 @@ EXCUSED: dict[str, str] = {
     "documents:cv_item_move": "a POST that reorders one entry on a CV",
     "documents:rendered_archive": "a POST that files a sent document away",
     "documents:upload_archive": "a POST that files an uploaded document away",
+    "jobs:capture_delete": "a confirmation and a POST that deletes a capture nobody saved (#664)",
     "jobs:capture_discard": "a POST that throws away a captured posting",
     "jobs:capture_restore": "a POST that puts a discarded capture back; its button is on the list",
     "jobs:capture_page_source": (

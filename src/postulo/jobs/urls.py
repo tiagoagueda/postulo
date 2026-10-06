@@ -70,6 +70,11 @@ urlpatterns = [
         name="capture_restore",
     ),
     path(
+        "captures/<int:pk>/delete/",
+        capture_views.CaptureDeleteView.as_view(),
+        name="capture_delete",
+    ),
+    path(
         "captures/discard/",
         capture_views.CaptureDiscardSelectedView.as_view(),
         name="capture_discard_selected",

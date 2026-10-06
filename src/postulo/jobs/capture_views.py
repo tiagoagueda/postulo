@@ -16,17 +16,17 @@ from django.contrib import messages
 from django.db import transaction
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import ListView
+from django.views.generic import DeleteView, ListView
 
 from postulo.core import errands, site, throttle
-from postulo.core.mixins import OwnedObjectMixin
+from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
 
 from . import remembered
@@ -523,6 +523,62 @@ class CaptureRestoreView(OwnedObjectMixin, View):
             capture.save(update_fields=["status", "updated_at"])
         messages.success(request, _("Capture put back. It is waiting for review again."))
         return redirect(capture.get_absolute_url())
+
+
+class CaptureDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+    """Delete a capture that is nobody's yet, and what it kept of the page with it (#664).
+
+    Discarding is a status, so a wrong key can be undone; this is the other answer, for a
+    capture the person is sure about. The page goes through the same receiver every other
+    deletion sends. A saved capture is refused: what it kept is the listing's, and goes
+    when the listing does.
+    """
+
+    model = Capture
+    template_name = "partials/confirm_delete.html"
+    success_url = reverse_lazy("jobs:capture_list")
+
+    def get_queryset(self):
+        return Capture.objects.for_user(self.request.user)
+
+    def get_cancel_url(self) -> str:
+        return reverse("jobs:capture_list") + "?show=discarded"
+
+    def dispatch(self, request, *args, **kwargs):
+        response = self.refuse_a_saved_one(request)
+        return response or super().dispatch(request, *args, **kwargs)
+
+    def refuse_a_saved_one(self, request: HttpRequest) -> HttpResponse | None:
+        # Signed out is the login redirect's to say, and a stranger's is the queryset's 404;
+        # only somebody's own saved capture reaches the refusal.
+        if not request.user.is_authenticated:
+            return None
+        capture = get_object_or_404(self.get_queryset(), pk=self.kwargs["pk"])
+        if capture.status == CaptureStatus.ACCEPTED:
+            messages.info(
+                request,
+                _("A saved capture is part of its listing. It goes when the listing does."),
+            )
+            return redirect(became_url(capture))
+        return None
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.object.kept_page is not None:
+            context["consequences"] = [_("The page it kept, its source and its picture")]
+        return context
+
+    def form_valid(self, form):
+        with transaction.atomic():
+            # Read again under a lock: a capture saved since the page was drawn is no
+            # longer this person's to delete.
+            capture = get_object_or_404(self.get_queryset().select_for_update(), pk=self.object.pk)
+            if capture.status == CaptureStatus.ACCEPTED:
+                messages.info(self.request, ALREADY_DECIDED)
+                return redirect(became_url(capture))
+            capture.delete()
+        messages.success(self.request, _("Capture deleted."))
+        return redirect(self.get_success_url())
 
 
 class CaptureDiscardSelectedView(OwnedObjectMixin, View):

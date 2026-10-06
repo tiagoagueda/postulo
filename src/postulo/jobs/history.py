@@ -211,8 +211,8 @@ def bind_capture(capture: Capture, posting: JobPosting, *, actor: str = "") -> L
     advert read off another board is evidence about the job rather than noise, so the
     capture is **kept and pointed at**, not copied: what it read, the address it was read at,
     and whatever it kept of the page (#256) stay on the capture, which becomes the listing's
-    as the first one did. The entry keeps the words -- the board, the title, the address --
-    so it still says what it was if the capture ever goes.
+    as the first one did, and goes when it does (#664). The entry keeps the words -- the
+    board, the title, the address -- so it still says what it was if the capture ever goes.
 
     Read under a lock, so the review screen open in two tabs binds once; a capture that is
     no longer waiting raises `AlreadyDecided`.

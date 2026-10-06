@@ -636,7 +636,7 @@ POSTULO_CAPTURE_ACCOUNT_MAX_BYTES = env.int(
 )
 # How many days the page of a capture that never became a listing is kept -- one discarded,
 # or one still waiting for review. The capture itself stays; what goes is the copy of the
-# page. A capture that was saved keeps its page for as long as it exists. 0 keeps them all.
+# page. A capture that was saved keeps its page while its listing exists (#664). 0 keeps them all.
 POSTULO_CAPTURE_PAGE_KEEP_DAYS = env.int("POSTULO_CAPTURE_PAGE_KEEP_DAYS", default=30)
 
 # Connections: plugins that talk to another service on a person's behalf. Their secrets

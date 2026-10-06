@@ -51,6 +51,9 @@
                   {% translate "Discard" %}
                 </button>
               </form>
+              <a href="{% url 'jobs:capture_delete' capture.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                {% translate "Delete" %}
+              </a>
             {% elif capture.application %}
               <a href="{{ capture.application.get_absolute_url }}"
                  class="shrink-0 text-sm text-brand-600 underline dark:text-brand-400">
@@ -68,6 +71,9 @@
                   {% translate "Put it back" %}
                 </button>
               </form>
+              <a href="{% url 'jobs:capture_delete' capture.pk %}" class="btn" data-variant="destructive-ghost" data-size="xs">
+                {% translate "Delete" %}
+              </a>
             {% else %}
               <span class="shrink-0 text-xs text-ink-400">{{ capture.get_status_display }}</span>
             {% endif %}

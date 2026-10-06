@@ -501,7 +501,37 @@ def test_deleting_a_listing_says_what_goes_and_what_stays(client, user, listing,
     html = client.get(reverse("jobs:posting_delete", args=[listing.pk])).content.decode()
 
     assert "2 entries in its history" in html
-    assert "The 1 file or capture its history points at is kept where it is." in html
+    assert "The 1 file its history points at is kept where it is." in html
+
+
+def test_deleting_a_listing_counts_its_captures_and_their_kept_pages(
+    client, user, listing, settings, tmp_path
+):
+    from postulo.jobs import pages
+
+    settings.MEDIA_ROOT = tmp_path
+    capture = a_capture(user)
+    pages.keep_source(
+        capture, "<html><body>Hello</body></html>", pages.Keeping(True, False, True, False)
+    )
+    bind_capture(capture, listing)
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:posting_delete", args=[listing.pk])).content.decode()
+
+    assert "1 capture that became it" in html
+    assert "1 kept page of a capture" in html
+    assert "kept where it is" not in html
+
+
+def test_deleting_a_listing_takes_the_captures_and_their_entries(user, listing):
+    capture = a_capture(user)
+    bind_capture(capture, listing)
+
+    listing.delete()
+
+    assert not Capture.objects.filter(pk=capture.pk).exists()
+    assert not ListingEvent.objects.filter(summary__isnull=False, posting_id=listing.pk).exists()
 
 
 # ------------------------------------------------------------ the application's page
