@@ -384,7 +384,7 @@ def fingerprint() -> str:
 #: messaging handles a person is reached on, read back as a link's service is (#682).
 #: 9 added the company an experience links to, read back as a hint (#683). 10 added the EQF
 #: level of an education entry, read back through the form's choices (#684). 11 added the
-#: publications, read back through the form a person types one into (#687).
+#: publications, read back through the form a person types one into (#687). 12 added the code of a spoken language (#689).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -397,6 +397,7 @@ SHAPES = {
     9: "6cf32b0e61e73b80",
     10: "d61ddfdc2bf0ece2",
     11: "671549ba3d4d429b",
+    12: "652352ad5c856158",
 }
 
 
@@ -1916,6 +1917,51 @@ def test_a_publication_is_added_and_its_key_is_made_here(user):
 
     data = a_file(resume={"publications": [a_paper(cite_key="theirs")]})
 
+# ------------------------------------------------------- a language by its code (#689)
+
+
+def test_english_and_ingles_are_one_entry_when_both_say_which_language(user):
+    LanguageSkill.objects.create(owner=user, name="English", code="en", proficiency="c1")
+    data = a_file(
+        resume={"languages": [{"name": "Inglês", "code": "en", "proficiency": "c1"}]},
+    )
+
+    plan = drawn(user, data)
+
+    assert outcomes(plan, "languages") == [candidate.PRESENT]
+
+
+def test_an_entry_with_a_code_is_the_one_whose_name_is_that_language(user):
+    LanguageSkill.objects.create(owner=user, name="English", proficiency="c1")
+    data = a_file(resume={"languages": [{"name": "Inglês", "code": "en", "proficiency": "c1"}]})
+
+    assert outcomes(drawn(user, data), "languages") == [candidate.PRESENT]
+
+
+def test_two_codes_are_two_entries_and_a_code_is_read_back(user):
+    data = a_file(
+        resume={
+            "languages": [
+                {"name": "Français", "code": "fr", "proficiency": "c1"},
+                {"name": "Deutsch", "code": "DE", "proficiency": "b1"},
+                {"name": "Mirandês", "proficiency": "b2"},
+            ]
+        }
+    )
+
+    add(user, data)
+
+    assert {row.code: row.name for row in LanguageSkill.objects.for_user(user)} == {
+        "fr": "French",
+        "de": "German",
+        "": "Mirandês",
+    }
+
+
+def test_a_file_from_before_the_code_reads_as_it_did(user):
+    """The file of format 8 has no `code`, and every name in it is the text it was."""
+    data = a_file(resume={"languages": [{"name": "English", "proficiency": "c1"}]})
+
     plan = drawn(user, data)
     add(user, data)
 
@@ -1965,3 +2011,14 @@ def test_a_publication_the_form_would_refuse_is_a_refused_row(user, changes):
 
     assert outcomes(plan, "publications") == [candidate.REFUSED]
     assert rows(plan, "publications")[0].notes
+
+    assert outcomes(plan, "languages") == [candidate.ADD]
+    assert LanguageSkill.objects.for_user(user).get().code == ""
+
+
+def test_the_file_a_person_writes_carries_the_code(user):
+    LanguageSkill.objects.create(owner=user, name="English", code="en", proficiency="c1")
+
+    document = export.build_candidate_document(user)
+
+    assert document["resume"]["languages"][0]["code"] == "en"

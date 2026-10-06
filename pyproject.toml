@@ -61,9 +61,13 @@ dependencies = [
     "phonenumberslite>=9.0,<10",
     # The names of the countries in every language Postulo speaks (#534), from the CLDR tables
     # it carries: GeoNames' country file has the English name only, so "Valencia, España"
-    # narrowed nothing. BSD-3-Clause. Only `jobs/places.py` imports it. The locale data is
-    # most of its installed size (about 33 MB) and is loaded one language at a time.
-    "babel>=2.17,<3",
+    # narrowed nothing. BSD-3-Clause. `jobs/places.py` and, since #689, `core/language_names.py`
+    # (what a language is called, in every language) import it. The locale data is most of
+    # its installed size (about 33 MB) and is loaded one language at a time. Held to one
+    # minor, the one whose CLDR (47) the capitalisation rules of `language_names` were read
+    # from: `tests/test_language_names.py` fails when an upgrade changes the data beneath
+    # them, and raising the ceiling is the act of checking them again.
+    "babel>=2.18,<2.19",
     # A listing's description in Markdown, rendered on the server (#665). `core/markdown.py`
     # is the only importer: the parser with raw HTML off and a short list of rules, then
     # `nh3` (the Rust `ammonia`, abi3 wheels, no compiler) over what it wrote, as the second

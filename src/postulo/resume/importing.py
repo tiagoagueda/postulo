@@ -169,6 +169,23 @@ def _clean_website(owner, site: str, report: Report) -> str:
     return form.cleaned_data["url"]
 
 
+def language_code_of(entry: dict) -> str:
+    """The code a language of a record is chosen by, or nothing.
+
+    What an importer says, where it is shaped like a tag and Postulo has a name for it: a
+    code nobody here can name -- a sign language -- would print as itself, lower case, where
+    the file's own name read better. Otherwise the language the name is exactly, which is
+    what lets a reader that only has names (the older Europass formats) give the code too
+    (#689). Never a guess: a name two languages share is nothing.
+    """
+    from postulo.core import language_names
+
+    code = str(entry.get("code") or "")
+    if languages.well_formed(code) and language_names.known(code):
+        return languages.tag(code)
+    return language_names.match(entry.get("name", ""))
+
+
 def apply(owner, record: Record) -> Report:
     """Write what was found. Only ever adds; nothing existing is changed or removed.
 
@@ -367,7 +384,12 @@ def apply(owner, record: Record) -> Report:
         # is most of them, because the editor never made the five boxes compulsory -- ended
         # up claiming B1 in it, on a CV, without ever having said so (#235).
         spoken.append(
-            LanguageSkill(owner=owner, name=entry["name"][:100], proficiency=entry["proficiency"])
+            LanguageSkill(
+                owner=owner,
+                name=entry["name"][:100],
+                code=language_code_of(entry),
+                proficiency=entry["proficiency"],
+            )
         )
     ordering.place_many(LanguageSkill, owner, spoken)
     if spoken:

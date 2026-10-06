@@ -39,7 +39,8 @@ import re
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
-from postulo.plugins.api import Record
+from postulo.core.language_names import ISO_639_2
+from postulo.plugins.api import Record, is_language_tag, language_tag
 
 from .common import (
     _ORDER,
@@ -78,26 +79,10 @@ DIMENSIONS = {
 
 #: The spoken languages of the official list (ECV06, in the schema's CodeLists.xsd, where
 #: each is a Publications Office URI ending in a three-letter code), onto the two-letter
-#: code Django names languages by. Bibliographic variants too, because files written by
-#: hand use either. Sign languages and language families have no two-letter code and are
-#: kept as written.
-TWO_LETTER = {
-    "alb": "sq", "ara": "ar", "arm": "hy", "aze": "az", "baq": "eu", "bel": "be",
-    "ben": "bn", "bos": "bs", "bul": "bg", "cat": "ca", "ces": "cs", "chi": "zh",
-    "cym": "cy", "cze": "cs", "dan": "da", "deu": "de", "dut": "nl", "ell": "el",
-    "eng": "en", "est": "et", "eus": "eu", "fas": "fa", "fin": "fi", "fra": "fr",
-    "fre": "fr", "geo": "ka", "ger": "de", "gle": "ga", "glg": "gl", "gre": "el",
-    "guj": "gu", "heb": "he", "hin": "hi", "hrv": "hr", "hun": "hu", "hye": "hy",
-    "ice": "is", "isl": "is", "ita": "it", "jav": "jv", "jpn": "ja", "kat": "ka",
-    "kaz": "kk", "kor": "ko", "kur": "ku", "lat": "la", "lav": "lv", "lim": "li",
-    "lit": "lt", "mac": "mk", "mar": "mr", "may": "ms", "mkd": "mk", "mlt": "mt",
-    "msa": "ms", "nld": "nl", "nor": "no", "oci": "oc", "pan": "pa", "per": "fa",
-    "pol": "pl", "por": "pt", "ron": "ro", "rum": "ro", "rus": "ru", "san": "sa",
-    "slk": "sk", "slo": "sk", "slv": "sl", "spa": "es", "sqi": "sq", "srd": "sc",
-    "srp": "sr", "swe": "sv", "tam": "ta", "tel": "te", "tur": "tr", "ukr": "uk",
-    "urd": "ur", "vie": "vi", "vol": "vo", "wel": "cy", "wln": "wa", "yid": "yi",
-    "zho": "zh",
-}  # fmt: skip
+#: code Django names languages by: Postulo's own table, which a name typed as `fra` is looked
+#: up in as well (`core.language_names`, #689). Sign languages and language families have no
+#: two-letter code and are kept as written.
+TWO_LETTER = ISO_639_2
 
 #: The languages of that list Django has no name for, by the name each gives itself.
 AUTONYMS = {
@@ -274,6 +259,29 @@ def _language_name(node, cv_language: str) -> str:
         with translation.override(cv_language):
             return str(info["name_translated"])
     return str(info["name_translated"])
+
+
+def _language_coded(node) -> str:
+    """The code of a language the file gives as a code, for the entry to be chosen by.
+
+    Nothing for free text -- the editor's way of recording a language that has no code. A
+    code Postulo has no name for is dropped on the importing side, which is the one that
+    knows (`resume.importing`), and the name the file gave stays (#689).
+    """
+    if node is None:
+        return ""
+    written = _text(node)
+    kind = " ".join(node.get(key, "") for key in ("typeCode", "name", "schemeName"))
+    if not written or "FREETEXT" in kind.upper().replace("_", "").replace(" ", ""):
+        return ""
+    code = _language_code(written)
+    return language_tag(code) if is_language_tag(code) else ""
+
+
+def _spoken(name: str, code: str, proficiency: str, levels: dict) -> dict:
+    """A language as the record holds it: the code only where the file gave one."""
+    row = {"name": name, "proficiency": proficiency, "levels": levels}
+    return {"name": name, "code": code, **row} if code else row
 
 
 def _has_text(element) -> bool:
@@ -477,7 +485,7 @@ def _read_mother_tongues(person_node, record: Record) -> None:
     for tongue in _all(person_node, "PrimaryLanguageCode"):
         name = _language_name(tongue, record.locale)
         if name:
-            record.languages.append({"name": name, "proficiency": "native", "levels": {}})
+            record.languages.append(_spoken(name, _language_coded(tongue), "native", {}))
 
 
 def _read_languages(profile, record: Record) -> None:
@@ -487,9 +495,8 @@ def _read_languages(profile, record: Record) -> None:
     for competency in _all(qualifications, "PersonCompetency"):
         if _text(competency, "TaxonomyID").casefold() != "language":
             continue
-        name = _language_name(_find(competency, "CompetencyID"), record.locale) or _text(
-            competency, "CompetencyName"
-        )
+        named = _find(competency, "CompetencyID")
+        name = _language_name(named, record.locale) or _text(competency, "CompetencyName")
         if not name:
             continue
         found: dict[str, str] = {}
@@ -504,7 +511,7 @@ def _read_languages(profile, record: Record) -> None:
         # One level for the whole language, where the file gives no dimensions.
         overall = _text(competency, "ProficiencyLevel", "ScoreText").upper()
         proficiency = _lowest(levels) if levels else CEFR.get(overall, "")
-        record.languages.append({"name": name, "proficiency": proficiency, "levels": levels})
+        record.languages.append(_spoken(name, _language_coded(named), proficiency, levels))
 
 
 # ------------------------------------------------------------------- skills and the rest

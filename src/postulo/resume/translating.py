@@ -39,7 +39,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from postulo.core import languages
+from postulo.core import language_names, languages
 from postulo.jobs import esco
 
 # The rules live in `translatable`, below the models and the forms that declare and offer
@@ -164,7 +164,12 @@ class Translated:
         overrides = self.__dict__["overrides"]
         if name in overrides:
             return overrides[name]
-        return getattr(self.__dict__["entry"], name)
+        entry = self.__dict__["entry"]
+        if name == "name" and self.__dict__["language"] and getattr(entry, "code", ""):
+            # A language chosen by its code is named in the language of the document, the
+            # person's own translation above having been asked first (#689).
+            return language_names.name(entry.code, self.__dict__["language"]) or entry.name
+        return getattr(entry, name)
 
     def __str__(self) -> str:
         return str(self.entry)
@@ -352,8 +357,16 @@ def fields_that_fell_back(entry, language: str) -> tuple[str, ...]:
     return tuple(
         field
         for field in fields_for(entry)
-        if str(getattr(entry, field, "") or "").strip() and field not in overrides
+        if str(getattr(entry, field, "") or "").strip()
+        and field not in overrides
+        and not named_by_code(entry, field)
     )
+
+
+def named_by_code(entry, field: str) -> bool:
+    """Whether this field is printed from the language's code, which has a name in every
+    language and so never falls back (#689)."""
+    return field == "name" and bool(getattr(entry, "code", ""))
 
 
 def field_label(entry, field: str) -> str:
@@ -387,7 +400,9 @@ def fallen_back(cv) -> list[FellBack]:
         missing = tuple(
             field
             for field in fields_for(entry)
-            if str(getattr(entry, field, "") or "").strip() and field not in found
+            if str(getattr(entry, field, "") or "").strip()
+            and field not in found
+            and not named_by_code(entry, field)
         )
         if missing:
             report.append(FellBack(entry=entry, fields=missing))

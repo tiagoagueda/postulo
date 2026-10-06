@@ -7,6 +7,8 @@ from django.db import models as django_models
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import language_names, languages
+from postulo.core.language_field import LanguageChoiceField
 from postulo.jobs.forms import OwnerScopedModelForm
 
 from . import publications, translatable
@@ -255,10 +257,56 @@ class CertificationForm(ResumeItemForm):
         }
 
 
+#: What the language menu says for a language that is not in it: the name is typed.
+OTHER_LANGUAGE = "other"
+
+
+class SpokenLanguageSelect(forms.Select):
+    """The menu of spoken languages, each named in the language Postulo is being read in.
+
+    Unlike `LanguageSelect`, an option claims no ``lang``: its words are in the interface
+    language, not in the language it names. It carries the flag where there is one, for the
+    control `app.js` builds beside it (#301), and none where there is none.
+    """
+
+    def create_option(self, name, value, *args, **kwargs):
+        from postulo.core.flags import flag_url
+
+        option = super().create_option(name, value, *args, **kwargs)
+        code = str(value or "")
+        country = languages.flag_country(languages.match(code) or code) if code else ""
+        if country and code != OTHER_LANGUAGE:
+            option["attrs"]["data-flag"] = flag_url(country)
+        return option
+
+
+class SpokenLanguageField(LanguageChoiceField):
+    """A language from the list, *Other*, or any well-formed code a file or an older page
+    carries: a code the list does not hold is kept and shown as it is (#689)."""
+
+    def valid_value(self, value):
+        return value == OTHER_LANGUAGE or languages.well_formed(value)
+
+    def to_python(self, value):
+        value = super().to_python(value)
+        return value if value == OTHER_LANGUAGE else languages.tag(value)
+
+
 class LanguageSkillForm(ResumeItemForm):
+    """A spoken language, chosen from the list; *Other* asks for the name instead.
+
+    The menu is the native select without scripts and Basecoat's with them, and the box for
+    the name shows only while *Other* is chosen, by the rule the kinds of phone number and
+    the form of address already use (`data-if-other`). A chosen language fills `name` in the
+    language the career record is written in, so anything that reads a plain name has one.
+    """
+
+    code = SpokenLanguageField(label=_("Language"), required=False, widget=SpokenLanguageSelect)
+
     class Meta:
         model = LanguageSkill
-        fields = ("name", "proficiency", "order")
+        fields = ("code", "name", "proficiency", "order")
+        labels = {"name": _("Name of the language")}
         help_texts = {
             "proficiency": _(
                 "The Common European Framework levels. “Not stated” prints nothing at all, "
@@ -266,6 +314,45 @@ class LanguageSkillForm(ResumeItemForm):
                 "claim somebody may test in an interview."
             )
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["name"].required = False
+        held = languages.tag(self.instance.code)
+        shown = languages.current()
+        choices = [("", _("Choose a language"))]
+        choices += list(language_names.listing(shown))
+        if held and held not in {code for code, _name in choices}:
+            choices.append((held, language_names.name(held, shown)))
+        choices.append((OTHER_LANGUAGE, _("Other…")))
+        self.fields["code"].choices = choices
+        if self.instance.pk and not held:
+            self.initial["code"] = OTHER_LANGUAGE
+        else:
+            self.initial["code"] = held
+
+    def clean(self):
+        cleaned = super().clean()
+        code = cleaned.get("code", "")
+        name = (cleaned.get("name") or "").strip()
+        if "code" in self.errors:
+            return cleaned
+        if code and code != OTHER_LANGUAGE:
+            record = translatable.record_language_of(self.user)
+            cleaned["name"] = language_names.name(code, record)[:100]
+        else:
+            cleaned["code"] = ""
+            if not name:
+                self.add_error(
+                    "code" if not code else "name",
+                    forms.ValidationError(
+                        _("Choose a language, or Other and write its name.")
+                        if not code
+                        else _("Write the name of the language."),
+                        code="required",
+                    ),
+                )
+        return cleaned
 
 
 class LinkForm(ResumeItemForm):

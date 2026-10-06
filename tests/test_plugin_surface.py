@@ -104,6 +104,11 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "the schemes an ORCID in a Europass file is checked against. #109 "
             "would make this a registry of its own"
         ),
+        "postulo.core.language_names": (
+            "`ISO_639_2`: the table of three-letter codes a Publications Office URI ends in, "
+            "which Postulo's own matching of a typed name reads as well (#689). One table, "
+            "not two; a name on the surface would be #109's to promise"
+        ),
         # `Record` used to be reached past the surface as well. It is on it since #105,
         # because a third-party importer has to fill the same one.
     },

@@ -825,8 +825,10 @@ def test_a_level_that_was_never_stated_prints_nothing_at_all(user):
 
     html = render_cv_html(cv)
 
-    assert "Deutsch" in html
-    assert "Deutsch —" not in html
+    # The file calls it Deutsch and the importer found the language, so a CV in English
+    # prints its name in English (#689); what the test is for is the dash.
+    assert "German" in html
+    assert "German —" not in html
 
 
 def test_the_language_of_the_record_comes_from_the_file(user):
@@ -1080,3 +1082,32 @@ def test_a_website_urlsplit_rejects_does_not_stop_the_read(fmt):
 
     assert record.person["last_name"] == "Morgan"
     assert not record.person.get("orcid")
+
+
+def test_the_older_reader_has_names_and_the_importer_gives_each_language_its_code(user):
+    """The older formats write whatever the file says, so the code is found from the name
+    when it is written, and a name that is more than one language is left as it was (#689)."""
+    record = europass.read(FIXTURE.read_bytes())
+    assert all("code" not in row for row in record.languages)
+    record.languages.append({"name": "Norwegian", "proficiency": "b1", "levels": {}})
+
+    importing.apply(user, record)
+
+    codes = {row.name: row.code for row in LanguageSkill.objects.filter(owner=user)}
+    assert codes["English"] == "en"
+    assert codes["português"] == "", "Portuguese is two countries', and the person chooses"
+    assert codes["Norwegian"] == ""
+
+
+def test_a_language_code_from_a_reader_that_has_one_is_kept_where_postulo_can_name_it(user):
+    record = europass.read(FIXTURE.read_bytes())
+    record.languages[:] = [
+        {"name": "Whatever", "code": "fr", "proficiency": "b2", "levels": {}},
+        {"name": "BSL", "code": "bfi", "proficiency": "b2", "levels": {}},
+        {"name": "Not a code", "code": "not a code", "proficiency": "b2", "levels": {}},
+    ]
+
+    importing.apply(user, record)
+
+    codes = {row.name: row.code for row in LanguageSkill.objects.filter(owner=user)}
+    assert codes == {"Whatever": "fr", "BSL": "", "Not a code": ""}

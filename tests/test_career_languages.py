@@ -19,6 +19,7 @@ from __future__ import annotations
 import pytest
 from django.urls import reverse
 
+from postulo.documents import rendering
 from postulo.documents.models import CV, CVItem
 from postulo.documents.rendering import build_sections, render_cv_html
 from postulo.resume import translating
@@ -461,3 +462,205 @@ def test_an_archive_written_before_this_still_restores(user, other_user):
 
     assert report.resume_items == 1
     assert not Translation.objects.for_user(other_user).exists()
+
+
+# ------------------------------------------- a spoken language, chosen by its code (#689)
+
+
+def a_spoken(user, code="en", name="English", **kwargs):
+    from postulo.resume.models import LanguageSkill
+
+    return LanguageSkill.objects.create(
+        owner=user, name=name, code=code, proficiency="c1", **kwargs
+    )
+
+
+@pytest.mark.parametrize("theme", ["classic", "plain"])
+@pytest.mark.parametrize("kind", ["cv", "portfolio"])
+def test_a_coded_language_prints_in_the_language_of_the_document(user, theme, kind):
+    cv = a_cv_with(user, a_spoken(user), language="pt-PT", theme=theme, kind=kind)
+
+    html = rendering.render_cv_html(cv)
+
+    assert "Inglês" in html
+    assert "English" not in html
+
+
+def test_the_same_entry_is_anglais_on_a_french_cv(user):
+    entry = a_spoken(user)
+
+    assert "Anglais" in render_cv_html(a_cv_with(user, entry, language="fr-FR"))
+
+
+def test_a_persons_own_translation_beats_the_table(user):
+    entry = a_spoken(user)
+    translate(entry, "pt-PT", name="Língua inglesa")
+    cv = a_cv_with(user, entry, language="pt-PT")
+
+    html = render_cv_html(cv)
+
+    assert "Língua inglesa" in html
+    assert "Inglês" not in html
+
+
+def test_an_uncoded_language_is_unchanged_whatever_the_document_says(user):
+    from postulo.resume.models import LanguageSkill
+
+    entry = LanguageSkill.objects.create(owner=user, name="Mirandês", proficiency="b2")
+    cv = a_cv_with(user, entry, language="fr-FR")
+
+    assert "Mirandês" in render_cv_html(cv)
+    assert entry.shown_name == "Mirandês"
+
+
+def test_the_plain_text_and_the_word_file_follow_the_documents_language(user):
+    import io
+    import zipfile
+
+    from postulo.documents import docx
+
+    cv = a_cv_with(user, a_spoken(user), language="pt-PT")
+
+    assert "Inglês — C1" in rendering.cv_text(cv)
+    word = zipfile.ZipFile(io.BytesIO(docx.write(rendering.cv_outline(cv))))
+    assert "Inglês" in word.read("word/document.xml").decode()
+
+
+def test_a_coded_language_does_not_count_as_a_fallback(user):
+    """It has a name in every language, so the CV's page does not list it as untranslated."""
+    cv = a_cv_with(user, a_spoken(user), language="pt-PT")
+
+    assert translating.fallen_back(cv) == []
+    assert translating.fields_that_fell_back(a_spoken(user, "fr", "French"), "pt-PT") == ()
+
+
+def test_the_career_page_names_it_in_the_language_being_read(user, client):
+    a_spoken(user)
+    user.profile.language = "pt-PT"
+    user.profile.save()
+    client.force_login(user)
+
+    page = client.get(reverse("resume:overview")).content.decode()
+
+    assert "Inglês (C1" in page
+
+
+def test_a_coded_entry_with_no_name_is_named_in_the_record_language_when_saved(user):
+    user.profile.record_language = "fr-FR"
+    user.profile.save()
+
+    entry = a_spoken(user, "en", "")
+
+    assert entry.name == "Anglais"
+
+
+def test_the_form_offers_the_list_and_other_and_fills_the_name(user, client):
+    from postulo.resume.models import LanguageSkill
+
+    user.profile.record_language = "pt-PT"
+    user.profile.save()
+    client.force_login(user)
+    url = reverse("resume:item_create", args=["language"])
+
+    page = client.get(url).content.decode()
+    assert 'value="other"' in page and 'value="fr"' in page
+    assert "data-if-other" in page and "data-name-if-other" in page
+
+    client.post(url, {"code": "fr", "proficiency": "b2"})
+
+    saved = LanguageSkill.objects.get(owner=user)
+    assert (saved.code, saved.name) == ("fr", "Francês")
+
+
+def test_other_asks_for_a_name_and_keeps_no_code(user, client):
+    from postulo.resume.models import LanguageSkill
+
+    client.force_login(user)
+    url = reverse("resume:item_create", args=["language"])
+
+    refused = client.post(url, {"code": "other", "name": "", "proficiency": "b2"})
+    assert refused.status_code == 200 and not LanguageSkill.objects.exists()
+
+    nothing = client.post(url, {"code": "", "name": "", "proficiency": "b2"})
+    assert nothing.status_code == 200 and not LanguageSkill.objects.exists()
+
+    client.post(url, {"code": "other", "name": "British Sign Language", "proficiency": "b2"})
+    saved = LanguageSkill.objects.get(owner=user)
+    assert (saved.code, saved.name) == ("", "British Sign Language")
+
+
+def test_an_entry_with_no_code_opens_on_other_and_a_coded_one_on_its_language(user, client):
+    from postulo.resume.models import LanguageSkill
+
+    typed = LanguageSkill.objects.create(owner=user, name="Mirandês", proficiency="b2")
+    coded = a_spoken(user)
+    client.force_login(user)
+
+    opened = client.get(reverse("resume:item_update", args=["language", typed.pk]))
+    assert opened.context["form"].initial["code"] == "other"
+    opened = client.get(reverse("resume:item_update", args=["language", coded.pk]))
+    assert opened.context["form"].initial["code"] == "en"
+
+
+def test_a_code_the_list_does_not_hold_is_kept_and_shown_as_it_is(user):
+    from postulo.resume.forms import LanguageSkillForm
+
+    form = LanguageSkillForm(
+        data={"code": "bfi", "proficiency": "b2"}, user=user, instance=a_spoken(user, "bfi", "BSL")
+    )
+
+    assert form.is_valid(), form.errors
+    assert ("bfi", "bfi") in form.fields["code"].choices
+
+
+def test_the_menu_options_claim_no_language_of_their_own(user):
+    """An option is in the interface language, whatever language it names (WCAG 3.1.2)."""
+    from postulo.resume.forms import LanguageSkillForm
+
+    html = str(LanguageSkillForm(user=user)["code"])
+
+    assert 'value="fr"' in html and "lang=" not in html
+    assert "data-flag" in html
+
+
+def test_a_language_travels_in_the_archive_with_its_code(user, other_user):
+    from postulo.core import export, importer
+    from postulo.resume.models import LanguageSkill
+
+    a_spoken(user)
+    document = export.build_document(user)
+
+    assert document["resume"]["languages"][0]["code"] == "en"
+    importer.load(other_user, an_archive(document))
+    assert LanguageSkill.objects.for_user(other_user).get().code == "en"
+
+
+def test_an_archive_from_before_the_code_restores_with_the_names_matched(user, other_user):
+    from postulo.core import export, importer
+    from postulo.resume.models import LanguageSkill
+
+    for name in ("French", "Francês", "Norwegian", "Mirandês-ish"):
+        LanguageSkill.objects.create(owner=user, name=name, proficiency="b2")
+    document = export.build_document(user)
+    document["postulo"]["format"] = 43
+    for row in document["resume"]["languages"]:
+        row.pop("code")
+
+    importer.load(other_user, an_archive(document))
+
+    restored = {row.name: row.code for row in LanguageSkill.objects.for_user(other_user)}
+    assert restored == {"French": "fr", "Francês": "fr", "Norwegian": "", "Mirandês-ish": ""}
+
+
+def test_an_archive_with_a_code_that_is_not_one_leaves_it_blank_and_says_so(user, other_user):
+    from postulo.core import export, importer
+    from postulo.resume.models import LanguageSkill
+
+    a_spoken(user)
+    document = export.build_document(user)
+    document["resume"]["languages"][0]["code"] = "not a code at all"
+
+    report = importer.load(other_user, an_archive(document))
+
+    assert LanguageSkill.objects.for_user(other_user).get().code == "en", "the name is matched"
+    assert any("not a language code" in line for line in report.skipped)

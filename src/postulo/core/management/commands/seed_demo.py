@@ -516,10 +516,14 @@ class Command(BaseCommand):
         ]
         languages = [
             LanguageSkill.objects.create(
-                owner=user, name="Portuguese", proficiency="native", order=0
+                owner=user, name="Portuguese", code="pt-PT", proficiency="native", order=0
             ),
-            LanguageSkill.objects.create(owner=user, name="English", proficiency="c2", order=1),
-            LanguageSkill.objects.create(owner=user, name="French", proficiency="b2", order=2),
+            LanguageSkill.objects.create(
+                owner=user, name="English", code="en", proficiency="c2", order=1
+            ),
+            LanguageSkill.objects.create(
+                owner=user, name="French", code="fr", proficiency="b2", order=2
+            ),
         ]
 
         links = [

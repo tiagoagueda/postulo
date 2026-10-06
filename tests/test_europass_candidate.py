@@ -642,7 +642,9 @@ def test_the_commissions_own_sample_reads():
             "highlights": "",
         }
     ]
-    assert record.languages == [{"name": "French", "proficiency": "native", "levels": {}}]
+    assert record.languages == [
+        {"name": "French", "code": "fr", "proficiency": "native", "levels": {}}
+    ]
     assert record.person["address"]["country"] == "BE"
     assert record.skipped == []
 
@@ -1003,3 +1005,25 @@ def test_a_europass_employer_with_no_company_of_that_name_adds_none(user):
     importing.apply(user, europass.read(candidate_xml(post("Engineer", FROM_2020))))
     assert Experience.objects.get(owner=user).company is None
     assert not Company.objects.filter(owner=user).exists()
+
+@pytest.mark.parametrize(
+    "written,code",
+    [
+        ("eng", "en"),
+        ("de", "de"),
+        ("http://publications.europa.eu/resource/authority/language/MLT", "mt"),
+        ("http://publications.europa.eu/resource/authority/language/BFI", "bfi"),
+    ],
+)
+def test_a_language_given_as_a_code_keeps_its_code(written, code):
+    """A code Postulo cannot name, a sign language, is kept here and dropped by the importer
+    (`resume.importing.language_code_of`), which is the one that knows what it can name."""
+    person = f"<PrimaryLanguageCode>{written}</PrimaryLanguageCode>"
+
+    assert europass.read(candidate_xml(person=person)).languages[0]["code"] == code
+
+
+def test_free_text_is_a_name_and_no_code():
+    person = '<PrimaryLanguageCode typeCode="FREETEXT">French</PrimaryLanguageCode>'
+
+    assert "code" not in europass.read(candidate_xml(person=person)).languages[0]

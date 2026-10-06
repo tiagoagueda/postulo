@@ -887,3 +887,30 @@ def test_a_cv_holding_a_publication_and_a_link_keeps_both(populated, other_user)
     assert entries["publication"].owner == other_user
     assert entries["link"].title == "Site"
     assert entries["link"].owner == other_user
+
+def test_a_language_is_written_with_its_code_and_an_older_archive_has_its_names_matched(
+    user, other_user
+):
+    """Format 50 (#689): the code beside the name, and none to be read in an older one."""
+    from postulo.resume.models import LanguageSkill
+
+    LanguageSkill.objects.create(owner=user, name="Francês", code="fr", proficiency="b2")
+    LanguageSkill.objects.create(owner=user, name="Norwegian", proficiency="b2")
+    document = export_module.build_document(user)
+
+    assert export_module.FORMAT_VERSION >= 44
+    assert [row["code"] for row in document["resume"]["languages"]] == ["fr", ""]
+
+    older = json.loads(json.dumps(document))
+    older["postulo"]["format"] = 43
+    for row in older["resume"]["languages"]:
+        del row["code"]
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as archive:
+        archive.writestr(export_module.MANIFEST_NAME, json.dumps(older))
+    buffer.seek(0)
+
+    importer.load(other_user, zipfile.ZipFile(buffer))
+
+    restored = {row.name: row.code for row in LanguageSkill.objects.for_user(other_user)}
+    assert restored == {"Francês": "fr", "Norwegian": ""}

@@ -68,6 +68,7 @@ from postulo.core import (
     export,
     file_review,
     language_field,
+    language_names,
     languages,
     messaging_handles,
     personal,
@@ -312,7 +313,7 @@ KINDS: tuple[Kind, ...] = (
         model=resume.LanguageSkill,
         form=resume_forms.LanguageSkillForm,
         title=gettext_lazy("Languages"),
-        fields=("name", "proficiency"),
+        fields=("code", "name", "proficiency"),
         names=("name",),
     ),
 )
@@ -1291,6 +1292,12 @@ class _Planner:
         return (self._key(kind, get, group),)
 
     def _key(self, kind: Kind, get: Callable[[str], Any], group: str = "") -> tuple:
+        if kind.block == "languages":
+            # The same language is one entry whatever it is called: by its code where it has
+            # one, by the one language its name is where it has not, by the name otherwise
+            # (#689).
+            code = fold(get("code") or language_names.match(get("name")) or get("name"))
+            return (code,)
         names = tuple(
             _same_address(get(name)) if name == kind.address else fold(get(name))
             for name in kind.names

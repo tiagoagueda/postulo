@@ -34,6 +34,7 @@ from postulo.resume import candidate
 from postulo.resume.models import (
     Certification,
     Experience,
+    LanguageSkill,
     Link,
     Project,
     Publication,
@@ -793,3 +794,48 @@ def test_a_hostile_publication_is_text_on_the_page_and_a_refused_row_where_it_is
     client.force_login(user)
     page = client.get(reverse("resume:overview")).content.decode()
     assert "<img src=x" not in page and "<script>alert(1)" not in page
+
+# ------------------------------------------------- the code of a spoken language (#689)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        "not a code",
+        "e" * 80,
+        "en;DROP",
+        "<script>",
+        "e\x00n",
+        7,
+        ["en"],
+        {"en": 1},
+        "en-" + "x" * 40,
+    ],
+)
+def test_a_malformed_or_over_long_language_code_is_a_refused_row_and_stores_nothing(user, bad):
+    data = a_file(resume={"languages": [{"name": "English", "code": bad, "proficiency": "c1"}]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "languages") == [candidate.REFUSED]
+    assert not LanguageSkill.objects.for_user(user).exists()
+
+
+def test_a_code_in_a_file_is_stored_for_the_person_who_added_it_and_nobody_else(user, other_user):
+    data = a_file(resume={"languages": [{"name": "English", "code": "en", "proficiency": "c1"}]})
+
+    candidate.apply(user, candidate.read(data))
+
+    assert LanguageSkill.objects.for_user(user).get().code == "en"
+    assert not LanguageSkill.objects.for_user(other_user).exists()
+
+
+def test_the_word_other_in_a_file_is_not_a_code(user):
+    data = a_file(
+        resume={"languages": [{"name": "Mirandês", "code": "other", "proficiency": "c1"}]}
+    )
+
+    candidate.apply(user, candidate.read(data))
+
+    assert LanguageSkill.objects.for_user(user).get().code == ""

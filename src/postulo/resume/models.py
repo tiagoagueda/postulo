@@ -381,9 +381,18 @@ class Proficiency(models.TextChoices):
 
 
 class LanguageSkill(ResumeItem):
-    """A spoken language. Named to avoid colliding with Django's own Language."""
+    """A spoken language. Named to avoid colliding with Django's own Language.
+
+    **Chosen by code where the language is on the list** (#689): `code` is a BCP 47 tag, and
+    what a CV prints is the language's name in the CV's own language, from CLDR through
+    `core.language_names` -- *Inglês* on a Portuguese one, *Anglais* on a French one -- with
+    nobody typing either. `name` stays beside it, filled in the record's language, so that
+    anything that wants a plain name (an older reader, a theme from a plugin) has one. A
+    language that is not on the list has no code and is the name it was typed as.
+    """
 
     name = models.CharField(_("language"), max_length=100)
+    code = LanguageField(_("language code"), blank=True)
     proficiency = models.CharField(
         _("proficiency"),
         max_length=10,
@@ -399,8 +408,28 @@ class LanguageSkill(ResumeItem):
         verbose_name = _("language")
         verbose_name_plural = _("languages")
 
+    def save(self, *args, **kwargs):
+        if self.code and not self.name.strip():
+            from postulo.core import language_names
+
+            record = translatable.record_language_of(self.owner) if self.owner_id else ""
+            self.name = language_names.name(self.code, record)[:100]
+            update = kwargs.get("update_fields")
+            if update is not None and "name" not in update:
+                kwargs["update_fields"] = [*update, "name"]
+        return super().save(*args, **kwargs)
+
+    @property
+    def shown_name(self) -> str:
+        """The name in the language being read: the table's for a coded entry, else as typed."""
+        if not self.code:
+            return self.name
+        from postulo.core import language_names
+
+        return language_names.name(self.code, languages.current()) or self.name
+
     def __str__(self) -> str:
-        return f"{self.name} ({self.get_proficiency_display()})"
+        return f"{self.shown_name} ({self.get_proficiency_display()})"
 
 
 class LinkKind(models.TextChoices):

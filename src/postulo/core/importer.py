@@ -25,7 +25,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from . import personal, slugs
+from . import language_names, personal, slugs
 from .export import (
     APPLICATION_FIELDS,
     CAPTURE_FIELDS,
@@ -401,6 +401,8 @@ def _languages_as_written(document: dict, report: ImportReport) -> None:
     profile = (document.get("account") or {}).get("profile")
     written(profile, "language", "The language you read Postulo in")
     written(profile, "record_language", "The language of your career record")
+    for row in (document.get("resume") or {}).get("languages") or []:
+        written(row, "code", "The code of a language in your career record")
     for row in (document.get("resume") or {}).get("translations") or []:
         section = row.get("section") if isinstance(row, dict) else ""
         written(row, "language", f"The language of a translation of {str(section)[:40]}")
@@ -953,6 +955,12 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 # What no page has looked at is held to what a page would have (#687).
                 values = publications.sanitise(values, held_keys)
                 held_keys.add(values.get("cite_key", ""))
+
+            if key == "languages":
+                # A code is read as a claim, as any language code is: shaped like a tag or
+                # nothing. An archive from before format 50 has none, and a name that is
+                # exactly one language is given the code it stands for (#689).
+                values["code"] = values.get("code") or language_names.match(values.get("name", ""))
             created = model.objects.create(owner=user, **values)
             if isinstance(company_name, str) and company_name.strip():
                 wants_company[created.pk] = company_name

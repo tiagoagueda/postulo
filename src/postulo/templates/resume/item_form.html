@@ -19,18 +19,31 @@
       {% endif %}
       <div class="card mb-6">
         {% for field in form %}
-          {% with follows=form.type_wrappers|get_item:field.name %}
-            {% if follows %}
-              {% comment %} A publication's field that follows its type (#687): drawn for the
-                 type the form was opened with, and shown or hidden by `app.js` as the type is
-                 chosen. Hidden is not refused: a hidden box is posted and kept. {% endcomment %}
-              <div data-type-field="{{ follows.types }}"{% if follows.hidden %} hidden{% endif %}>
-                <c-field :field="field" />
-              </div>
-            {% else %}
+          {% if field.name == 'code' and 'name' in form.fields %}
+            {% comment %} A spoken language is chosen from a list, and the box for its name
+               is there only while Other is: the rule the kinds of phone number and the form
+               of address use (`data-if-other`, #284), so with scripts off exactly as with
+               them on (#689). {% endcomment %}
+            <div data-if-other>
               <c-field :field="field" />
-            {% endif %}
-          {% endwith %}
+              <div data-name-if-other><c-field :field="form.name" /></div>
+            </div>
+          {% elif field.name == 'name' and 'code' in form.fields %}
+            {% comment %} Drawn under the menu above. {% endcomment %}
+          {% else %}
+            {% with follows=form.type_wrappers|get_item:field.name %}
+              {% if follows %}
+                {% comment %} A publication's field that follows its type (#687): drawn for the
+                   type the form was opened with, and shown or hidden by `app.js` as the type is
+                   chosen. Hidden is not refused: a hidden box is posted and kept. {% endcomment %}
+                <div data-type-field="{{ follows.types }}"{% if follows.hidden %} hidden{% endif %}>
+                  <c-field :field="field" />
+                </div>
+              {% else %}
+                <c-field :field="field" />
+              {% endif %}
+            {% endwith %}
+          {% endif %}
         {% endfor %}
         {% if 'order' not in form.fields %}
           {% comment %} The order number is hidden unless Settings > Appearance says

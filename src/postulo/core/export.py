@@ -137,7 +137,10 @@ logger = logging.getLogger(__name__)
 #: fields that type uses -- names as typed, one per line, the date as an ISO 8601 reduced
 #: date, the DOI bare and the citation key -- each read back through the form's own rules;
 #: an archive without them restores none, and a CV's entry may name one (#687).
-FORMAT_VERSION = 49
+#: 50 added ``code`` on a language in the career record: the BCP 47 tag of the language
+#: chosen from the list, blank for one typed. An archive without it restores each language
+#: whose name is exactly one language with its code, and the rest as the text they were (#689).
+FORMAT_VERSION = 50
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -178,7 +181,10 @@ FORMAT_VERSION = 49
 #: a level outside 1 to 8 is a refused row (#684).
 #: 11 added ``publications``, read back through the form a person would have typed one in, and
 #: matched on the DOI, or on the title and the year (#687).
-CANDIDATE_FORMAT = 11
+#: 12 added ``code`` on a language, read back as a language code is: shaped like a tag or
+#: nothing; and a language is the same entry as one the file names by the same code, whatever
+#: the name it is written under (#689).
+CANDIDATE_FORMAT = 12
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -541,7 +547,7 @@ RESUME_FIELDS = {
         "credential_url",
         "order",
     ),
-    "languages": ("id", "name", "proficiency", "order"),
+    "languages": ("id", "name", "code", "proficiency", "order"),
     "links": (
         "id",
         "title",
