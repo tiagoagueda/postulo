@@ -824,7 +824,7 @@ def build_document(user) -> dict:
     from postulo.core.models import Tag
     from postulo.documents import printing
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
-    from postulo.jobs.models import Capture, Company, Contact, FieldHint
+    from postulo.jobs.models import Capture, Company, CompanyLogo, Contact, FieldHint
 
     # Read afresh rather than through the instance cached on the user, which may be stale.
     profile = Profile.objects.filter(user=user).first()
@@ -854,9 +854,7 @@ def build_document(user) -> dict:
             "profile": _profile_block(profile),
             "identifiers": _identifier_rows(profile),
             # The uploaded picture travels with the files; a Gravatar copy is refetched.
-            "avatar_file": (
-                f"{MEDIA_PREFIX}{profile.avatar.name}" if profile and profile.avatar else ""
-            ),
+            "avatar_file": avatar_member(user) if profile and profile.has_avatar else "",
         },
         "tags": [_fields(tag, TAG_FIELDS) for tag in Tag.objects.for_user(user)],
         # The career, built by the function the candidate document calls too, so there is
@@ -913,11 +911,16 @@ def build_document(user) -> dict:
             "departments",
         )
     )
+    logo_types = dict(
+        CompanyLogo.objects.filter(company__owner=user).values_list("company_id", "media_type")
+    )
     for company in companies:
         document["companies"].append(
             {
                 **_fields(company, COMPANY_FIELDS),
-                "logo_file": f"{MEDIA_PREFIX}{company.logo.name}" if company.logo else "",
+                "logo_file": (
+                    logo_member(company, logo_types[company.pk]) if company.pk in logo_types else ""
+                ),
                 # By name, not by id: identifiers in this file are local to it, and a name
                 # is what the importer can resolve against companies it has just made or
                 # matched. An empty string is a company that belongs to nobody.
@@ -1216,6 +1219,47 @@ def _copies(document) -> list[dict]:
     ]
 
 
+def avatar_member(user) -> str:
+    """The name of the uploaded picture inside the archive.
+
+    The picture is a row, not a file (#662), so this is a name the archive gives it and not
+    a storage path; it is the one the files used to have, so archives written before and
+    after read alike and the format number does not move.
+    """
+    return f"{MEDIA_PREFIX}avatars/{user.pk}/avatar-{user.pk}.png"
+
+
+def logo_member(company, media_type: str) -> str:
+    """The name of a company's logo inside the archive: the one the file used to have."""
+    extension = "svg" if media_type == "image/svg+xml" else "png"
+    return f"{MEDIA_PREFIX}logos/{company.owner_id}/logo-{company.pk}.{extension}"
+
+
+def _picture_members(user, document: dict) -> dict[str, bytes]:
+    """The bytes of every picture the document names, by the name it gave each (#662).
+
+    Read from the database in the transaction the document was built in, so what the
+    manifest says was kept is what is in the zip.
+    """
+    from postulo.accounts.models import ProfilePicture
+    from postulo.jobs.models import CompanyLogo
+
+    members: dict[str, bytes] = {}
+    avatar = document.get("account", {}).get("avatar_file")
+    if avatar:
+        row = ProfilePicture.objects.filter(profile__user=user, kind=ProfilePicture.UPLOAD).first()
+        if row is not None:
+            members[avatar] = bytes(row.data)
+    named = {
+        entry["id"]: entry["logo_file"]
+        for entry in document.get("companies", [])
+        if entry.get("logo_file")
+    }
+    for row in CompanyLogo.objects.filter(company__owner=user, company_id__in=list(named)):
+        members[named[row.company_id]] = bytes(row.data)
+    return members
+
+
 def _media_paths(document: dict) -> list[str]:
     """Every file the document refers to, as a storage name."""
     names = []
@@ -1223,12 +1267,6 @@ def _media_paths(document: dict) -> list[str]:
         for entry in document["documents"].get(section, []):
             if entry.get("file"):
                 names.append(entry["file"][len(MEDIA_PREFIX) :])
-    avatar = document.get("account", {}).get("avatar_file")
-    if avatar:
-        names.append(avatar[len(MEDIA_PREFIX) :])
-    for company in document.get("companies", []):
-        if company.get("logo_file"):
-            names.append(company["logo_file"][len(MEDIA_PREFIX) :])
     # What captures kept of their pages (#256): the source as gzipped text, the rendering
     # as the picture or PDF it is. Copied as they are -- nothing here unpacks the source.
     for capture in document.get("captures", []):
@@ -1256,12 +1294,15 @@ def write_archive(user, target=None) -> BytesIO:
 
     with transaction.atomic():
         document = build_document(user)
+        pictures = _picture_members(user, document)
     buffer = target if target is not None else BytesIO()
 
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
         archive.writestr(
             MANIFEST_NAME, json.dumps(document, indent=2, ensure_ascii=False, sort_keys=False)
         )
+        for member, content in pictures.items():
+            archive.writestr(member, content)
         for name in _media_paths(document):
             try:
                 with default_storage.open(name, "rb") as handle:

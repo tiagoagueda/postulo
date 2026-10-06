@@ -292,7 +292,7 @@ def test_each_person_has_a_picture_that_says_nothing(client, admin, user):
     decorative -- the username beside it names the row -- so the initials are hidden from a
     screen reader and a picture has an empty `alt`; the column's header, which axe asks for,
     is for a screen reader alone. On a phone the tile heads the card, with the username."""
-    Profile.objects.filter(user=user).update(avatar="avatars/2/picture.jpg")
+    Profile.objects.filter(user=user).update(has_avatar=True)
     client.force_login(admin)
     html = client.get(reverse("server:people")).content.decode()
 

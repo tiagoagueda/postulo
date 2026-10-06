@@ -37,6 +37,7 @@ from postulo.jobs.models import (
     Company,
     CompanyIdentifier,
     CompanyKind,
+    CompanyLogo,
     Contact,
     Department,
     Industry,
@@ -222,36 +223,39 @@ def test_an_identifier_both_carry_is_not_doubled(user, acme, limited):
     assert not [row for row in plan.differences if row.label == "NIPC"], "the same is no difference"
 
 
+PNG = b"\x89PNG\r\n\x1a\n" + b"\0" * 32
+
+
+def logo_of(company, data: bytes) -> None:
+    from postulo.jobs import logos
+
+    logos.store(company, ContentFile(data), source="upload")
+
+
 def test_the_logo_goes_with_the_company_that_had_one(user, acme, limited):
-    limited.logo.save("logo-limited.png", ContentFile(b"a picture"), save=False)
-    limited.logo_source = "upload"
-    limited.logo_fetched_at = timezone.now()
-    limited.save()
-    name = limited.logo.name
+    logo_of(limited, PNG + b"theirs")
+    row = CompanyLogo.objects.get(company=limited)
 
     plan = merging.merge_companies(acme, limited)
 
     acme.refresh_from_db()
-    assert acme.logo.name == name and acme.logo_source == "upload"
-    assert acme.logo.storage.exists(name), "the file is where it was, under its new holder"
+    assert acme.has_logo and acme.logo_source == "upload"
+    assert CompanyLogo.objects.get(company=acme).pk == row.pk, "the row moved, nothing was copied"
+    assert CompanyLogo.objects.count() == 1
     assert "Logo" in {row.label for row in plan.fills}
 
 
-def test_a_logo_the_kept_company_has_no_room_for_is_said_and_then_removed(
-    user, acme, limited, django_capture_on_commit_callbacks
-):
-    acme.logo.save("logo-acme.png", ContentFile(b"ours"), save=True)
-    limited.logo.save("logo-limited.png", ContentFile(b"theirs"), save=True)
-    ours, theirs = acme.logo.name, limited.logo.name
+def test_a_logo_the_kept_company_has_no_room_for_is_said_and_then_gone(user, acme, limited):
+    logo_of(acme, PNG + b"ours")
+    logo_of(limited, PNG + b"theirs")
 
-    with django_capture_on_commit_callbacks(execute=True):
-        plan = merging.merge_companies(acme, limited)
+    plan = merging.merge_companies(acme, limited)
 
     acme.refresh_from_db()
-    assert acme.logo.name == ours
+    assert bytes(CompanyLogo.objects.get(company=acme).data).endswith(b"ours")
+    assert CompanyLogo.objects.count() == 1, "one logo row, and the other's went with its company"
     assert any("Its logo" in line for line in plan.left_behind)
     assert "Its logo" in acme.notes
-    assert not acme.logo.storage.exists(theirs), "once the merge is certain, and not before"
 
 
 def test_the_place_goes_with_the_words_for_it(user, acme):

@@ -39,6 +39,7 @@ from postulo.core import slugs
 from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
 from postulo.core.models import OwnedModel, OwnedQuerySet
+from postulo.core.stored_pictures import StoredPicture
 
 from . import esco, identifiers, industries, roles
 
@@ -368,13 +369,15 @@ class Company(OwnedModel):
         ),
     )
 
-    #: The logo, always a file of Postulo's own: fetched from an address, found on the
-    #: company's site, or uploaded. Never a URL rendered into a page — that would tell
-    #: somebody else's server which companies this person is looking at.
-    #: A plain file field, not an ImageField: the bytes were decoded, checked and
-    #: re-encoded on the way in, so there is nothing left for Django to verify, and
-    #: ImageField would open the file again on every load to measure it.
+    #: LEGACY (#662): the logo was a file, and is a `CompanyLogo` row now. Read only by the
+    #: migration that moved it and by `prune_media`, which lists what is left as orphans;
+    #: dropped in the release after, so a rollback finds its files. A plain file field, not
+    #: an ImageField, so that nothing opens the file to measure it.
     logo = models.FileField(_("logo"), upload_to=logo_upload_to, blank=True, max_length=255)
+    #: Whether a `CompanyLogo` row exists: on this row so that a list of companies draws its
+    #: marks without reading the table that holds the bytes. Written only by `logos.store`,
+    #: `logos.clear` and a merge, in the transaction that writes or deletes the picture.
+    has_logo = models.BooleanField(_("has a logo"), default=False, editable=False)
     logo_source = models.CharField(
         _("where the logo came from"), max_length=10, choices=LogoSource, blank=True
     )
@@ -688,6 +691,26 @@ class CompanyIdentifier(KeepsItsScheme, OwnedModel):
     def url(self) -> str:
         """Where the identifier leads; nowhere for a value its scheme refuses today (#311)."""
         return self.link_for(identifiers.url_for(self.scheme, self.value))
+
+
+class CompanyLogo(StoredPicture):
+    """A company's logo, kept in the database so that it goes with the company (#662).
+
+    At most one per company: a PNG re-encoded within a mebibyte, or a sanitised SVG of at
+    most 512 KiB. The company says on its own row (`has_logo`) whether it has one, so a
+    list of companies never reads this table; `jobs:company_logo` does, to serve one. A
+    company deleted, by its page, a merge, an account's deletion or the admin, takes its
+    logo in the same statement.
+    """
+
+    company = models.OneToOneField(Company, on_delete=models.CASCADE, related_name="stored_logo")
+
+    class Meta:
+        verbose_name = _("company logo")
+        verbose_name_plural = _("company logos")
+
+    def __str__(self) -> str:
+        return f"logo of company {self.company_id}"
 
 
 class Department(OwnedModel):

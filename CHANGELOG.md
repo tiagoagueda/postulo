@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- A profile picture, its Gravatar copy and a company logo are now rows in the database that go with their owner however it is deleted (page, merge, admin, account deletion), no longer files that could be left behind (#662)
 - The test suite now runs views inside the per-request transaction production uses, so a view that forgets non_atomic_requests fails in tests too. (#572)
 - The applications and companies tables no longer de-duplicate every row on each view, so counts and pages load faster, most on large accounts. (#552)
 - The company page's duplicate check is much faster for people with hundreds of companies: legal forms are looked up by their edge word and company names are cached. (#553)

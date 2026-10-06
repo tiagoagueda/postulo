@@ -291,7 +291,7 @@ def company_logo(company, css_class: str = "size-6 text-[0.6rem]") -> str:
     """
     if company is None:
         return ""
-    if getattr(company, "logo", None):
+    if getattr(company, "has_logo", False):
         url = reverse("jobs:company_logo", args=[company.pk])
         stamp = int(company.logo_fetched_at.timestamp()) if company.logo_fetched_at else 0
         return _tile(css_class, "rounded", picture=f"{url}?v={stamp}")

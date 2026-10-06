@@ -46,7 +46,15 @@ from django.utils.translation import ngettext
 from postulo.core import phones
 
 from . import identifiers
-from .models import Company, CompanyIdentifier, Contact, Department, JobPosting, ListingEvent
+from .models import (
+    Company,
+    CompanyIdentifier,
+    CompanyLogo,
+    Contact,
+    Department,
+    JobPosting,
+    ListingEvent,
+)
 
 #: How many names a line of the plan prints before it says how many more there are.
 NAMES_SHOWN = 5
@@ -399,9 +407,9 @@ def plan_companies(kept, other) -> Plan:
             Difference(str(kept_row.scheme_label), kept_row.value, other_row.value)
         )
 
-    if other.logo and not kept.logo:
+    if other.has_logo and not kept.has_logo:
         plan.fills.append(Filled(_label(Company, "logo"), str(_("The one it has"))))
-    elif other.logo and kept.logo:
+    elif other.has_logo and kept.has_logo:
         plan.left_behind.append(
             _("Its logo: %(name)s has one of its own, and a picture cannot be kept in a note.")
             % {"name": kept.name}
@@ -501,24 +509,23 @@ def merge_companies(kept, other) -> Plan:
             "location_resolved_by",
         ):
             setattr(kept, name, getattr(other, name))
-    unwanted = ""
-    if other.logo and not kept.logo:
-        kept.logo = other.logo.name
+    if other.has_logo and not kept.has_logo:
+        # A row moves to the kept company. The other's, where the kept one has its own,
+        # goes with the company in the delete below: a merge moves a row or deletes one,
+        # and nothing is left to remove afterwards (#662).
+        CompanyLogo.objects.filter(company=other).update(company=kept)
+        kept.has_logo = True
         kept.logo_source = other.logo_source
         kept.logo_source_url = other.logo_source_url
         kept.logo_fetched_at = other.logo_fetched_at
-    elif other.logo:
-        unwanted = other.logo.name
     _join_notes(kept, plan.note())
     kept.save()
 
     _write_entries(plan)
-    _refuse_what_is_left(other, expected={Company, CompanyIdentifier, Company.industries.through})
+    _refuse_what_is_left(
+        other, expected={Company, CompanyIdentifier, CompanyLogo, Company.industries.through}
+    )
     other.delete()
-    if unwanted:
-        # After the transaction and not inside it: a file cannot be rolled back, and a
-        # merge undone at the last step must not have deleted a picture on the way.
-        transaction.on_commit(lambda: other.logo.storage.delete(unwanted))
     return plan
 
 

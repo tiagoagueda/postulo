@@ -748,6 +748,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         Reminder,
     )
     from postulo.core import identifiers as scheme_registry
+    from postulo.core import pictures
     from postulo.core.models import Tag, TagIcon, nearest_tone
     from postulo.documents import printing
     from postulo.documents.models import (
@@ -763,6 +764,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         Capture,
         Company,
         CompanyKind,
+        CompanyLogo,
         Contact,
         Department,
         Industry,
@@ -881,7 +883,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             except avatars.UnusableImage as exc:
                 report.skipped.append(f"The profile picture: {exc}, and left out")
             else:
-                profile.avatar.save(avatars.picture_name(profile, "avatar"), processed, save=True)
+                avatars.store(profile, avatars.ProfilePicture.UPLOAD, processed)
         elif avatar_file:
             report.skipped.append("The profile picture was too large, or not in the archive")
 
@@ -1144,11 +1146,17 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             logo = _extract_within(archive, logo_name, logos.MAX_BYTES) if logo_name else None
             if logo is not None:
                 try:
-                    processed, extension = logos.process(logo)
+                    processed = logos.process(logo)
                 except logos.UnusableLogo as exc:
                     report.skipped.append(f"Logo of “{name}”: {exc}, and left out")
                 else:
-                    company.logo.save(f"logo-{company.pk}.{extension}", processed, save=True)
+                    # Written as it arrived, stamp and source included, rather than as a
+                    # fetch that happened now: through the one function that writes a
+                    # picture, so what an archive carries is checked as an upload is (#662).
+                    with transaction.atomic():
+                        pictures.keep(CompanyLogo, processed, company=company)
+                        company.has_logo = True
+                        company.save(update_fields=["has_logo"])
             elif logo_name:
                 report.skipped.append(f"Logo of “{name}” was too large, or not in the archive")
         if parent_name:

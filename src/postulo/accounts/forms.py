@@ -722,7 +722,7 @@ class ProfileForm(forms.ModelForm):
             self.fields["first_name"].initial = self.instance.user.first_name
             self.fields["last_name"].initial = self.instance.user.last_name
             self.fields["use_gravatar"].initial = self.instance.use_gravatar
-            if not self.instance.avatar:
+            if not self.instance.has_avatar:
                 del self.fields["remove_picture"]
 
     def _start_birth_boxes(self) -> None:
@@ -967,8 +967,7 @@ class ProfileForm(forms.ModelForm):
     def _save_picture(self, profile: Profile) -> None:
         processed = getattr(self, "_processed_picture", None)
         if processed is not None:
-            avatars.store(profile, "avatar", processed, "avatar")
-            profile.save(update_fields=["avatar", "updated_at"])
+            avatars.store(profile, avatars.ProfilePicture.UPLOAD, processed)
         elif self.cleaned_data.get("remove_picture"):
             avatars.remove_upload(profile)
 

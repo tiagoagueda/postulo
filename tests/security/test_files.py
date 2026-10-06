@@ -139,9 +139,8 @@ def test_an_imported_svg_logo_is_stored_without_its_script(user, other_user):
     importer.load(other_user, _archive_with(document, {"media/logos/1/acme.svg": svg}))
 
     company = Company.objects.for_user(other_user).get(name="Acme")
-    if company.logo:
-        with company.logo.open("rb") as handle:
-            assert b"script" not in handle.read().lower()
+    if company.has_logo:
+        assert b"script" not in bytes(company.stored_logo.data).lower()
 
 
 def test_an_oversized_manifest_is_refused(monkeypatch):

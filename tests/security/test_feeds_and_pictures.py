@@ -22,6 +22,7 @@ from django.utils import timezone
 
 from postulo.api.models import ApiToken
 from postulo.applications.models import Application, Interview, InterviewKind, Status
+from postulo.jobs import logos
 from postulo.jobs.models import Company, JobPosting
 
 pytestmark = pytest.mark.django_db
@@ -290,10 +291,11 @@ def test_an_imported_text_is_escaped_where_it_is_drawn(client, user):
 
 
 def with_picture(person):
+    from postulo.accounts import avatars
     from postulo.accounts.models import Profile
 
     profile, _created = Profile.objects.get_or_create(user=person)
-    profile.avatar.save("face.png", ContentFile(PNG), save=True)
+    avatars.store(profile, avatars.ProfilePicture.UPLOAD, ContentFile(PNG))
     return profile
 
 
@@ -332,9 +334,9 @@ def test_a_picture_needs_a_sign_in(client, user):
 
 def test_a_companys_logo_is_its_owners(client, user, other_user):
     mine = Company.objects.create(owner=user, name="Mine")
-    mine.logo.save("logo.png", ContentFile(PNG), save=True)
+    logos.store(mine, ContentFile(PNG), source="upload")
     theirs = Company.objects.create(owner=other_user, name="Theirs")
-    theirs.logo.save("logo.png", ContentFile(PNG), save=True)
+    logos.store(theirs, ContentFile(PNG), source="upload")
     bare = Company.objects.create(owner=user, name="No logo")
 
     client.force_login(user)

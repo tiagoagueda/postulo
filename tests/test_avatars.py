@@ -13,7 +13,7 @@ from django.urls import reverse
 from PIL import Image
 
 from postulo.accounts import avatars
-from postulo.accounts.models import Profile
+from postulo.accounts.models import Profile, ProfilePicture
 from postulo.core import export as export_module
 from postulo.core import importer
 
@@ -130,8 +130,8 @@ def test_uploading_a_picture_shows_it_in_the_header_and_serves_it_privately(
     )
     assert response.status_code == 302
     profile = Profile.objects.get(user=user)
-    assert profile.avatar.name.startswith(f"avatars/{user.pk}/")
-    assert profile.picture == profile.avatar
+    assert profile.has_avatar and profile.picture == "upload"
+    assert ProfilePicture.objects.get(profile=profile, kind="upload").data[1:4] == b"PNG"
 
     header = client.get(reverse("core:home")).content.decode()
     avatar_url = reverse("accounts:avatar", args=[user.pk])
@@ -141,9 +141,9 @@ def test_uploading_a_picture_shows_it_in_the_header_and_serves_it_privately(
     assert served.status_code == 200
     assert served["Content-Type"] == "image/png"
     assert served["Cache-Control"] == "private, max-age=86400"
-    body = b"".join(served.streaming_content) if served.streaming else served.content
-    served.close()
-    assert body.startswith(b"\x89PNG")
+    assert served.content.startswith(b"\x89PNG")
+    assert served["X-Content-Type-Options"] == "nosniff"
+    assert "sandbox" in served["Content-Security-Policy"]
 
     client.force_login(other_user)
     assert client.get(avatar_url).status_code == 404, "another person's picture is not theirs"
@@ -154,8 +154,7 @@ def test_an_administrator_may_see_anyones_picture(client, user, other_user):
     other_user.is_staff = True
     other_user.save()
     profile = Profile.objects.get(user=user)
-    avatars.store(profile, "avatar", avatars.process(picture_bytes()), "avatar")
-    profile.save()
+    avatars.store(profile, "upload", avatars.process(picture_bytes()))
     client.force_login(other_user)
     response = client.get(reverse("accounts:avatar", args=[user.pk]))
     assert response.status_code == 200
@@ -193,7 +192,7 @@ def test_the_form_refuses_what_it_should(client, user):
     corrupt = SimpleUploadedFile("x.png", cut, content_type="image/png")
     response = profile_page(client, user, picture=corrupt)
     assert response.status_code == 200 and "could not be read" in response.content.decode()
-    assert not Profile.objects.get(user=user).avatar
+    assert not Profile.objects.get(user=user).has_avatar
 
 
 def test_removing_the_picture_brings_the_initials_back(client, user):
@@ -204,15 +203,12 @@ def test_removing_the_picture_brings_the_initials_back(client, user):
         picture=SimpleUploadedFile("me.png", picture_bytes(fmt="PNG"), content_type="image/png"),
     )
     profile = Profile.objects.get(user=user)
-    stored = profile.avatar.path
-    assert profile.avatar
+    assert profile.has_avatar and ProfilePicture.objects.filter(profile=profile).exists()
 
     profile_page(client, user, remove_picture="on")
     profile.refresh_from_db()
-    assert not profile.avatar
-    import os
-
-    assert not os.path.exists(stored), "the file goes with the field"
+    assert not profile.has_avatar
+    assert not ProfilePicture.objects.filter(profile=profile).exists(), "the row goes too"
     header = client.get(reverse("core:home")).content.decode()
     assert "<img" not in header.split("Account menu")[1].split("</summary>")[0]
     assert ">AM</span>" in header
@@ -263,8 +259,8 @@ def test_opting_in_fetches_once_server_side_and_serves_the_copy(client, user, gr
     assert gravatar.calls == [avatars.gravatar_url(user.email)], "one request, from the server"
 
     profile = Profile.objects.get(user=user)
-    assert profile.use_gravatar and profile.gravatar_image and profile.gravatar_checked_at
-    assert profile.picture == profile.gravatar_image
+    assert profile.use_gravatar and profile.has_gravatar_copy and profile.gravatar_checked_at
+    assert profile.picture == "gravatar"
 
     page = client.get(reverse("accounts:profile")).content.decode()
     assert "From Gravatar" in page
@@ -282,7 +278,7 @@ def test_no_gravatar_means_initials_and_an_honest_note(client, user, gravatar):
     response = profile_page(client, user, use_gravatar="on")
     assert response.status_code == 302
     profile = Profile.objects.get(user=user)
-    assert profile.use_gravatar and not profile.gravatar_image and profile.gravatar_checked_at
+    assert profile.use_gravatar and not profile.has_gravatar_copy and profile.gravatar_checked_at
     assert profile.picture is None
     page = client.get(reverse("accounts:profile"), follow=True).content.decode()
     assert "data-no-gravatar" in page and "Gravatar has no picture" in page
@@ -298,15 +294,15 @@ def test_the_upload_beats_the_gravatar_and_opting_out_deletes_the_copy(client, u
         picture=SimpleUploadedFile("me.png", picture_bytes(fmt="PNG"), content_type="image/png"),
     )
     profile = Profile.objects.get(user=user)
-    assert profile.picture == profile.avatar, "uploaded first, Gravatar second"
-    copy = profile.gravatar_image.path
+    assert profile.picture == "upload", "uploaded first, Gravatar second"
+    assert profile.has_gravatar_copy
+    assert ProfilePicture.objects.filter(profile=profile, kind="gravatar").exists()
 
     profile_page(client, user, picture="", remove_picture="")  # use_gravatar unticked
     profile.refresh_from_db()
-    import os
 
-    assert not profile.use_gravatar and not profile.gravatar_image
-    assert not os.path.exists(copy)
+    assert not profile.use_gravatar and not profile.has_gravatar_copy
+    assert not ProfilePicture.objects.filter(profile=profile, kind="gravatar").exists()
     assert profile.gravatar_checked_at is None
 
 
@@ -370,7 +366,7 @@ def test_a_failing_gravatar_is_reported_not_fatal(client, user, monkeypatch):
     page = client.get(reverse("accounts:profile")).content.decode()
     assert "could not be reached" in page
     profile = Profile.objects.get(user=user)
-    assert profile.use_gravatar and not profile.gravatar_image
+    assert profile.use_gravatar and not profile.has_gravatar_copy
 
 
 # ----------------------------------------------------------------- export, import
@@ -378,21 +374,23 @@ def test_a_failing_gravatar_is_reported_not_fatal(client, user, monkeypatch):
 
 def test_the_uploaded_picture_travels_in_the_export(user, other_user):
     profile = Profile.objects.get(user=user)
-    avatars.store(profile, "avatar", avatars.process(picture_bytes()), "avatar")
+    avatars.store(profile, "upload", avatars.process(picture_bytes()))
     profile.use_gravatar = True
     profile.save()
 
     document = export_module.build_document(user)
-    assert document["account"]["avatar_file"] == f"media/{profile.avatar.name}"
+    member = f"media/avatars/{user.pk}/avatar-{user.pk}.png"
+    assert document["account"]["avatar_file"] == member
     assert document["account"]["profile"]["use_gravatar"] is True
     archive = zipfile.ZipFile(export_module.write_archive(user))
-    assert f"media/{profile.avatar.name}" in archive.namelist()
+    assert archive.read(member)[1:4] == b"PNG", "the bytes come from the row, into the zip"
 
     importer.load(other_user, archive)
     restored = Profile.objects.get(user=other_user)
-    assert restored.avatar and restored.avatar.name.startswith(f"avatars/{other_user.pk}/")
+    assert restored.has_avatar
+    assert ProfilePicture.objects.get(profile=restored, kind="upload").data[1:4] == b"PNG"
     assert restored.use_gravatar is True
-    assert not restored.gravatar_image, "a Gravatar copy is refetched, never copied"
+    assert not restored.has_gravatar_copy, "a Gravatar copy is refetched, never copied"
 
 
 def _archive_with(document: dict, files: dict[str, bytes]) -> zipfile.ZipFile:
@@ -417,8 +415,64 @@ def test_an_imported_avatar_that_is_not_a_usable_picture_is_refused_and_reported
     report = importer.load(
         other_user, _archive_with(document, {"media/avatars/1/avatar-1.png": content})
     )
-    assert not Profile.objects.get(user=other_user).avatar
+    assert not Profile.objects.get(user=other_user).has_avatar
+    assert not ProfilePicture.objects.filter(profile__user=other_user).exists()
     assert any("profile picture" in line for line in report.skipped)
+
+
+# ------------------------------------------- moving the files into rows (#662)
+
+
+def test_the_migration_moves_a_file_and_reports_a_missing_and_an_undecodable_one(
+    user, other_user, settings, tmp_path, capsys
+):
+    import importlib
+
+    from django.apps import apps
+    from django.core.files.base import ContentFile
+
+    settings.MEDIA_ROOT = str(tmp_path)
+    mine, theirs = user.profile, other_user.profile
+    mine.avatar.save("face.png", ContentFile(avatars.process(picture_bytes()).read()), save=True)
+    mine.gravatar_image.save("copy.png", ContentFile(b"this is not a picture"), save=True)
+    theirs.avatar.name = "avatars/2/nowhere.png"
+    theirs.save()
+
+    move = importlib.import_module(
+        "postulo.accounts.migrations.0036_move_pictures_into_the_database"
+    )
+    move.move(apps, None)
+
+    mine.refresh_from_db()
+    theirs.refresh_from_db()
+    assert (
+        mine.has_avatar
+        and ProfilePicture.objects.get(profile=mine, kind="upload").data[1:4] == b"PNG"
+    )
+    assert not mine.has_gravatar_copy, "a file that no longer decodes becomes none"
+    assert not theirs.has_avatar and not ProfilePicture.objects.filter(profile=theirs).exists()
+    said = capsys.readouterr().out
+    assert "2 picture(s) could not be moved" in said
+    assert "the file is missing" in said and "no longer decodes" in said
+    assert mine.avatar, "the old file stays where it was, for a rollback"
+
+
+def test_replacing_a_picture_removes_the_file_it_used_to_be(
+    user, settings, tmp_path, django_capture_on_commit_callbacks
+):
+    """Until the old field is dropped, a face removed or replaced must not stay on disk."""
+    import os
+
+    from django.core.files.base import ContentFile
+
+    settings.MEDIA_ROOT = str(tmp_path)
+    profile = user.profile
+    profile.avatar.save("face.png", ContentFile(picture_bytes(fmt="PNG")), save=True)
+    old = profile.avatar.path
+    with django_capture_on_commit_callbacks(execute=True):
+        avatars.store(profile, "upload", avatars.process(picture_bytes()))
+    profile.refresh_from_db()
+    assert not profile.avatar and not os.path.exists(old)
 
 
 # ------------------------------------------------------------------ the tag
@@ -479,7 +533,7 @@ def test_a_picture_cut_short_is_refused_even_after_a_pdf_was_drawn(client, user,
         client, user, picture=SimpleUploadedFile("x.png", cut, content_type="image/png")
     )
     assert response.status_code == 200 and "could not be read" in response.content.decode()
-    assert not Profile.objects.get(user=user).avatar
+    assert not Profile.objects.get(user=user).has_avatar
     assert ImageFile.LOAD_TRUNCATED_IMAGES is True
 
 

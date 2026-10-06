@@ -64,9 +64,9 @@
           <div class="shrink-0">
             {% avatar user "size-24 text-3xl" %}
             <p class="mt-2 max-w-24 text-center text-xs text-ink-500 dark:text-ink-400">
-              {% if profile.avatar %}
+              {% if profile.has_avatar %}
                 {% translate "Uploaded" %}
-              {% elif profile.use_gravatar and profile.gravatar_image %}
+              {% elif profile.use_gravatar and profile.has_gravatar_copy %}
                 {% translate "From Gravatar" %}
               {% else %}
                 {% translate "Your initials" %}
@@ -87,7 +87,7 @@
                 <span class="block text-xs text-ink-500 dark:text-ink-400" id="{{ form.use_gravatar.auto_id }}_helptext">{{ form.use_gravatar.help_text }}</span>
               </span>
             </label>
-            {% if profile.use_gravatar and profile.gravatar_checked_at and not profile.gravatar_image %}
+            {% if profile.use_gravatar and profile.gravatar_checked_at and not profile.has_gravatar_copy %}
               <p class="mt-2 text-xs text-ink-500 dark:text-ink-400" data-no-gravatar>
                 {% blocktranslate trimmed with when=profile.gravatar_checked_at|date:"DATETIME_FORMAT" %}
                   Gravatar had no picture for your address when last asked, on {{ when }}.

@@ -124,14 +124,18 @@ def company(owner):
 def logo_kept(owner):
     """A company with its logo stored, so that a 404 is the lookup refusing and not a file
     that was never there (as `kept_page` does)."""
+    from postulo.jobs import logos
+
     made = company(owner)
-    made.logo.save("logo.png", ContentFile(PNG), save=True)
+    logos.store(made, ContentFile(PNG), source="upload")
     return made
 
 
 def pictured(owner):
     """Somebody else's profile, with a picture stored for the same reason."""
-    owner.profile.avatar.save("face.png", ContentFile(PNG), save=True)
+    from postulo.accounts import avatars
+
+    avatars.store(owner.profile, avatars.ProfilePicture.UPLOAD, ContentFile(PNG))
     return owner
 
 

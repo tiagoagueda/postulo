@@ -3,10 +3,14 @@
 Two rules shape this. **Postulo makes no request on a reader's behalf.** An avatar
 referenced by URL would have every page view ask Automattic for it, carrying the reader's
 address and a hash of the person's email; so when somebody opts into Gravatar the server
-fetches the picture once, keeps a copy under private media, and serves it itself. The
-content security policy stays exactly as it is. **A photograph carries more than a face.**
-A phone's picture holds the place it was taken; every upload is decoded and re-encoded,
-which drops the metadata along with everything else the file knew.
+fetches the picture once, keeps a copy in the database beside the profile, and serves it
+itself. The content security policy stays exactly as it is. **A photograph carries more than
+a face.** A phone's picture holds the place it was taken; every upload is decoded and
+re-encoded, which drops the metadata along with everything else the file knew.
+
+**A picture is a row, not a file** (#662). Uploaded and fetched alike it is a
+`ProfilePicture`, deleted with the profile by the database's own cascade, so it cannot
+outlive the person however their account goes. `store` is the one place that writes it.
 
 **Bounded by file size, not by dimensions** (#265). Every picture used to be normalised to
 exactly 256×256 — and the profile page draws one at `size-24`, which is 96 CSS pixels and
@@ -40,6 +44,8 @@ from django.utils.translation import gettext as _
 
 from postulo.core import pictures
 from postulo.plugins import http
+
+from .models import ProfilePicture
 
 logger = logging.getLogger(__name__)
 
@@ -156,16 +162,35 @@ def gravatar_url(email: str, size: int = GRAVATAR_SIZE) -> str:
     return f"{GRAVATAR_ENDPOINT}{gravatar_hash(email)}?s={size}&d=404"
 
 
-def picture_name(profile, prefix: str) -> str:
-    return f"{prefix}-{profile.user_id}.png"
+#: The flag on the profile that says a picture of each kind exists (#662).
+FLAGS = {ProfilePicture.UPLOAD: "has_avatar", ProfilePicture.GRAVATAR: "has_gravatar_copy"}
+
+#: The file fields the pictures used to be, until the release that drops them (#662).
+LEGACY_FILES = {ProfilePicture.UPLOAD: "avatar", ProfilePicture.GRAVATAR: "gravatar_image"}
 
 
-def store(profile, field: str, content: ContentFile, prefix: str) -> None:
-    """Replace the file behind ``field`` with ``content``, deleting what was there."""
-    existing = getattr(profile, field)
-    if existing:
-        existing.delete(save=False)
-    getattr(profile, field).save(picture_name(profile, prefix), content, save=False)
+def store(profile, kind: str, content) -> None:
+    """Keep ``content`` as the profile's picture of this ``kind``, replacing what was there.
+
+    The row and the flag that says it exists are one transaction, so the two cannot
+    disagree. ``content`` is what `process` returned (#662).
+    """
+    flag = FLAGS[kind]
+    with transaction.atomic():
+        pictures.keep(ProfilePicture, content, profile=profile, kind=kind)
+        setattr(profile, flag, True)
+        legacy = pictures.let_go_of_the_file(profile, LEGACY_FILES[kind])
+        profile.save(update_fields=[flag, *legacy, "updated_at"])
+
+
+def forget(profile, kind: str) -> None:
+    """Drop the picture of this ``kind``, if there is one."""
+    flag = FLAGS[kind]
+    with transaction.atomic():
+        ProfilePicture.objects.filter(profile=profile, kind=kind).delete()
+        setattr(profile, flag, False)
+        legacy = pictures.let_go_of_the_file(profile, LEGACY_FILES[kind])
+        profile.save(update_fields=[flag, *legacy, "updated_at"])
 
 
 def fetch_gravatar(profile) -> str:
@@ -183,18 +208,17 @@ def fetch_gravatar(profile) -> str:
             response = client.get(gravatar_url(profile.user.email))
         with transaction.atomic():
             if response.status_code == 404:
-                if profile.gravatar_image:
-                    profile.gravatar_image.delete(save=False)
+                forget(profile, ProfilePicture.GRAVATAR)
                 outcome = "none"
             elif response.status_code == 200 and response.content:
-                store(profile, "gravatar_image", process(response.content), "gravatar")
+                store(profile, ProfilePicture.GRAVATAR, process(response.content))
                 outcome = "found"
             else:
                 logger.warning("Gravatar answered %s for %s", response.status_code, profile.user_id)
     except Exception:
         logger.exception("Gravatar could not be fetched for user %s", profile.user_id)
     profile.gravatar_checked_at = timezone.now()
-    profile.save(update_fields=["gravatar_image", "gravatar_checked_at", "updated_at"])
+    profile.save(update_fields=["gravatar_checked_at", "updated_at"])
     return outcome
 
 
@@ -218,13 +242,10 @@ def report_gravatar(request, outcome: str, *, found: str = "") -> None:
 
 def forget_gravatar(profile) -> None:
     """Drop the stored copy: switched off means nothing of theirs is kept."""
-    if profile.gravatar_image:
-        profile.gravatar_image.delete(save=False)
+    forget(profile, ProfilePicture.GRAVATAR)
     profile.gravatar_checked_at = None
-    profile.save(update_fields=["gravatar_image", "gravatar_checked_at", "updated_at"])
+    profile.save(update_fields=["gravatar_checked_at", "updated_at"])
 
 
 def remove_upload(profile) -> None:
-    if profile.avatar:
-        profile.avatar.delete(save=False)
-    profile.save(update_fields=["avatar", "updated_at"])
+    forget(profile, ProfilePicture.UPLOAD)

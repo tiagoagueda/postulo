@@ -127,7 +127,7 @@ def test_a_logo_is_written_in_a_transaction_of_its_own(db, user, monkeypatch):
         return original(self, *args, **kwargs)
 
     monkeypatch.setattr(Company, "save", spy)
-    logos.store(company, ContentFile(b"not really a png"), source="upload")
+    logos.store(company, ContentFile(b"\x89PNG\r\n\x1a\nnot really a png"), source="upload")
 
     assert seen["depth"] > outside, "the logo was saved outside any transaction"
 

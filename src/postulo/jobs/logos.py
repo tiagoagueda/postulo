@@ -4,7 +4,8 @@ The production policy is ``img-src 'self'``, and that is not an obstacle to work
 it is the reason this module exists. An ``<img>`` pointing at somebody else's server would
 tell them, on every page view, which companies this person is applying to and when they
 looked. So "from a URL" cannot mean "show the URL": Postulo fetches the image **once**,
-from the server, re-encodes it, keeps it under private media and serves it itself.
+from the server, re-encodes it, keeps it in the database beside the company and serves it
+itself (#662): a logo is a row that the database deletes with its company, not a file.
 
 Everything else follows from that:
 
@@ -44,6 +45,8 @@ from django.utils.translation import ngettext
 
 from postulo.core import pictures, throttle
 from postulo.plugins import fetching, http
+
+from .models import CompanyLogo
 
 logger = logging.getLogger(__name__)
 
@@ -88,8 +91,8 @@ class UnusableLogo(ValueError):
     """The bytes are not an image Postulo will keep, and the message says why."""
 
 
-def process(data: bytes) -> tuple[ContentFile, str]:
-    """The bytes as Postulo will keep them, and the extension to keep them under.
+def process(data: bytes) -> ContentFile:
+    """The bytes as Postulo will keep them: a sanitised SVG or a PNG.
 
     An SVG is sanitised and stays an SVG — it is a vector, and flattening a vector to
     pixels to store it would throw away the reason it is the better file. Anything else is
@@ -101,9 +104,9 @@ def process(data: bytes) -> tuple[ContentFile, str]:
     (#264).
     """
     if pictures.looks_like_svg(data):
-        return ContentFile(_svg(data)), "svg"
+        return ContentFile(_svg(data))
     try:
-        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES)), "png"
+        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES))
     except pictures.UnusablePicture as error:
         raise UnusableLogo(str(error)) from error
 
@@ -213,12 +216,10 @@ def _image(response, deadline: float) -> bytes:
 #: What a logo sets on the company, whether one was found or the last one was thrown away.
 #: Written as one list because the two are the same act in opposite directions, and a field
 #: on one and not the other is how a cleared logo keeps saying where it came from.
-LOGO_FIELDS = ["logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
+LOGO_FIELDS = ["has_logo", "logo_source", "logo_source_url", "logo_fetched_at", "updated_at"]
 
 
-def store(
-    company, content: ContentFile, *, source: str, url: str = "", extension: str = "png"
-) -> None:
+def store(company, content: ContentFile, *, source: str, url: str = "") -> None:
     """Put the image on the company, replacing whatever was there.
 
     The most recent action wins — a URL, the website, an upload — so there is no
@@ -227,60 +228,39 @@ def store(
     The database write is here rather than around the view, because the view fetches: the
     page, then up to six images, none of it quick and none of it the instance's business to
     hold the write lock for (#220). The picture is decoded before this is entered, so what
-    the transaction covers is one `UPDATE`.
+    the transaction covers is the picture's row and the company's.
+
+    The picture is a row beside the company (#662), so there is no file to write first, to
+    remove afterwards or to leave behind when the save fails: the two writes are one
+    transaction and either both happen or neither does.
     """
-    old = company.logo.name if company.logo else ""
-    held = company.logo
-    held.save(f"logo-{company.pk}.{extension}", content, save=False)
-    new = held.name
+    before = {name: getattr(company, name) for name in LOGO_FIELDS}
+    company.has_logo = True
     company.logo_source = source
     company.logo_source_url = url[:500]
     company.logo_fetched_at = timezone.now()
     try:
         with transaction.atomic():
-            company.save(update_fields=LOGO_FIELDS)
+            pictures.keep(CompanyLogo, content, company=company)
+            legacy = pictures.let_go_of_the_file(company, "logo")
+            company.save(update_fields=[*LOGO_FIELDS, *legacy])
     except BaseException:
-        # The row did not take it: the new file is bytes nothing points at, and the old
-        # one is still what the row names, so it stays (#525).
-        held.storage.delete(new)
-        company.logo.name = old
+        # Nothing was written, so the company in memory says what the database does.
+        for name, value in before.items():
+            setattr(company, name, value)
         raise
-    if old != new:
-        _discard(held.storage, old)
 
 
 def clear(company) -> None:
-    """Take the logo off the company: the row first, the file once the change commits."""
-    old = company.logo.name if company.logo else ""
-    storage = company.logo.storage
+    """Take the logo off the company: the row, and the flag that says there is one."""
     with transaction.atomic():
-        company.logo = ""
+        CompanyLogo.objects.filter(company=company).delete()
+        company.has_logo = False
         company.logo_source = ""
         company.logo_source_url = ""
         company.logo_fetched_at = None
-        company.save(update_fields=LOGO_FIELDS)
-    _discard(storage, old)
-
-
-def _discard(storage, name: str) -> None:
-    """Remove a file the row has stopped pointing at, once the change is committed.
-
-    Only when no company row still uses the name -- the rule #217 set for documents.
-    """
-    if not name:
-        return
-
-    def remove() -> None:
-        from .models import Company
-
-        if Company.objects.filter(logo=name).exists():
-            return
-        try:
-            storage.delete(name)
-        except OSError:  # pragma: no cover - a file already gone is the outcome we wanted
-            logger.warning("Could not remove %s from storage", name, exc_info=True)
-
-    transaction.on_commit(remove)
+        legacy = pictures.let_go_of_the_file(company, "logo")
+        company.save(update_fields=[*LOGO_FIELDS, *legacy])
 
 
 def spend_fetch(owner) -> None:
@@ -298,15 +278,13 @@ def from_url(company, url: str, *, spend: bool = True) -> None:
     """
     if spend:
         spend_fetch(company.owner)
-    content, extension = process(download(url))
-    store(company, content, source="url", url=url, extension=extension)
+    store(company, process(download(url)), source="url", url=url)
 
 
 def from_upload(company, data: bytes) -> None:
     if len(data) > MAX_BYTES:
         raise UnusableLogo(str(_("That file is larger than a logo should be.")))
-    content, extension = process(data)
-    store(company, content, source="upload", extension=extension)
+    store(company, process(data), source="upload")
 
 
 # ------------------------------------------------- finding one on their site
@@ -440,8 +418,7 @@ def find_on_website(company) -> str:
     problems = []
     for candidate in candidates:
         try:
-            content, extension = process(download(candidate))
-            store(company, content, source="website", url=candidate, extension=extension)
+            store(company, process(download(candidate)), source="website", url=candidate)
         except UnusableLogo as error:
             problems.append(str(error))
             continue

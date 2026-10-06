@@ -11,6 +11,9 @@ class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
     extra = 0
+    # The old file fields are not edited here (#662): a picture is a row, written by
+    # `avatars.store` after it has been decoded and re-encoded, and nothing else.
+    exclude = ("avatar", "gravatar_image")
 
 
 class CleanUsernameMixin:

@@ -24,14 +24,14 @@ from django.views import View
 from django.views.generic import CreateView, ListView, UpdateView
 
 from postulo.core.context_processors import theme_switch
-from postulo.core.files import serve_private_file
+from postulo.core.files import serve_stored_picture
 from postulo.core.mixins import MessagingHandlesMixin, StaffRequiredMixin, WebLinksMixin
 from postulo.core.redirects import safe_next
 
 from . import avatars, deletion, removals
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
-from .models import Invite, Profile, Theme
+from .models import Invite, Profile, ProfilePicture, Theme
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
@@ -343,20 +343,23 @@ class RemoveRowView(LoginRequiredMixin, View):
 class AvatarView(LoginRequiredMixin, View):
     """Serve a person's picture: their own, or anyone's to an administrator.
 
-    The file lives under private media like every other personal file and comes out only
-    through here, so the content security policy can keep saying ``img-src 'self'``. A
-    face is not a CV, so the cache may keep it for a day; the address changes with the
-    profile, so a new picture is never hidden by an old cache entry.
+    The picture is a row beside the profile (#662) and comes out only through here, so the
+    content security policy can keep saying ``img-src 'self'``. A face is not a CV, so the
+    cache may keep it for a day; the address changes with the profile, so a new picture is
+    never hidden by an old cache entry.
     """
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         if pk != request.user.pk and not request.user.is_staff:
             raise Http404
         profile = get_object_or_404(Profile, user_id=pk)
-        picture = profile.picture
-        if not picture:
+        kind = profile.picture
+        picture = (
+            ProfilePicture.objects.filter(profile=profile, kind=kind).first() if kind else None
+        )
+        if picture is None:
             raise Http404
-        response = serve_private_file(request, picture, download_name="picture.png")
+        response = serve_stored_picture(picture, download_name="picture.png")
         response["Cache-Control"] = "private, max-age=86400"
         return response
 

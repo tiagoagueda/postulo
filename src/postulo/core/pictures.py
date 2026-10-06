@@ -39,6 +39,8 @@ import re
 from xml.etree import ElementTree
 
 from defusedxml.ElementTree import fromstring as parse_xml
+from django.db import transaction
+from django.utils import timezone
 from django.utils.translation import gettext as _
 from PIL import Image, ImageFile, ImageOps, UnidentifiedImageError
 
@@ -372,3 +374,70 @@ def sanitise_svg(data: bytes) -> bytes:
     if len(written) > MAX_SVG_BYTES:  # pragma: no cover - re-serialising shrinks it
         raise UnusablePicture(str(_("That file is larger than a logo should be.")))
     return written
+
+
+# ---------------------------------------------------------------------- keeping
+
+#: How a stored PNG begins: `as_stored` writes nothing else of the raster kinds.
+PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
+
+
+def media_type_of_stored(data: bytes) -> str:
+    """What these bytes are, read from them: ``image/png`` or ``image/svg+xml``, or refused.
+
+    The guard on the one write function. What it is given has been through `as_stored` or
+    `sanitise_svg`, so it is one of these two; anything else is a caller that skipped the
+    checks, and is refused rather than kept (#662, #466).
+    """
+    if data.startswith(PNG_SIGNATURE):
+        return "image/png"
+    if looks_like_svg(data):
+        return "image/svg+xml"
+    raise UnusablePicture(str(_("That file could not be read as an image.")))
+
+
+def let_go_of_the_file(owner, field_name: str) -> list[str]:
+    """LEGACY (#662): remove the file a picture used to be, once its row has taken over.
+
+    Until the release that drops the old file fields they stay, so that a rollback finds its
+    files; but a picture the person replaces or removes must not linger on disk because of
+    that. Empties the field on ``owner`` and deletes the file when the transaction commits,
+    and returns the field names for the caller's ``update_fields`` -- none when there was no
+    file. Goes with the fields.
+    """
+    held = getattr(owner, field_name)
+    if not held:
+        return []
+    storage, name = held.storage, held.name
+    setattr(owner, field_name, "")
+
+    def remove() -> None:
+        try:
+            storage.delete(name)
+        except OSError:  # pragma: no cover - a file already gone is what was wanted
+            pass
+
+    transaction.on_commit(remove)
+    return [field_name]
+
+
+def keep(model, content, **owner):
+    """Write one picture, replacing the one its owner had: the only place that does (#662).
+
+    ``model`` is a `core.stored_pictures.StoredPicture` subclass and ``owner`` says whose row it is
+    (``company=...``, or ``profile=..., kind=...``). ``content`` is the bytes, or a file
+    holding them, **after** `as_stored` or `sanitise_svg`. This refuses what is neither a
+    PNG nor an SVG and what is over the budget its kind is kept to, so the upload form,
+    *Find logo*, the Gravatar fetch, a merge and the archive importer cannot write a picture
+    that was not checked. One statement; the caller owns the transaction around it and the
+    flag on the owner.
+    """
+    data = content.read() if hasattr(content, "read") else bytes(content)
+    media_type = media_type_of_stored(data)
+    ceiling = MAX_SVG_BYTES if media_type == "image/svg+xml" else DEFAULT_BUDGET
+    if len(data) > ceiling:
+        raise UnusablePicture(str(_("That image is far larger than it needs to be.")))
+    row, _made = model.objects.update_or_create(
+        **owner, defaults={"data": data, "media_type": media_type, "stored_at": timezone.now()}
+    )
+    return row

@@ -448,6 +448,19 @@ a reason in the issue:
 CSV stays where a spreadsheet is the other end of the exchange, as in the report and the
 spreadsheet import.
 
+## Where a picture or a file lives
+
+A file a person uploads or Postulo keeps for them is a file under private media, deleted with
+its row by a receiver and served through an ownership-checked view: documents, renders,
+kept pages and exports. **Two pictures are rows instead** (#662): a profile's avatar and its
+Gravatar copy (`ProfilePicture`) and a company's logo (`CompanyLogo`). Each is at most a
+mebibyte, each belongs to exactly one owner, and a foreign key with `on_delete=CASCADE`
+deletes it with that owner in the same statement, however the owner goes, with nothing to
+remember. A new picture of that kind subclasses `core.stored_pictures.StoredPicture`, is
+written only through `core.pictures.keep` (after the bytes have been through `as_stored` or
+`sanitise_svg`), and its owner says on its own row whether one exists, so reading the owner
+never reads the bytes. A new kind of file that can be large stays a file.
+
 ## Documentation
 
 User documentation is the [wiki](https://source.tiagoagueda.com/postulo/postulo/wiki), and

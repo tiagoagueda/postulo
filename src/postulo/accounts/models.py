@@ -30,6 +30,7 @@ from postulo.core.personal import (
     validate_country_code,
     validate_nationalities,
 )
+from postulo.core.stored_pictures import StoredPicture
 
 from . import identifiers
 from .validators import USERNAME_MAX_LENGTH, slug_from_email, username_validator
@@ -492,11 +493,19 @@ class Profile(models.Model):
     #: nobody is ever "never arranged", and the rule the null carried had to be written
     #: down somewhere rather than dropped (#123).
     dashboard_known = models.JSONField(_("widgets already offered"), blank=True, default=list)
-    #: A picture the person uploaded, re-encoded to a square; beats the Gravatar.
+    #: LEGACY (#662): the avatar was a file, and is a `ProfilePicture` row now. Read only by
+    #: the migration that moved it and by `prune_media`, which lists what is left as
+    #: orphans; dropped in the release after, so a rollback finds its files.
     avatar = models.ImageField(_("picture"), upload_to=upload_to_avatars, blank=True)
+    #: Whether a `ProfilePicture` of the `upload` kind exists, and the same for the copy of
+    #: the Gravatar: on this row so that drawing the masthead never touches the table that
+    #: holds the bytes, and written only by `avatars.store` and `avatars.forget`, in the
+    #: transaction that writes or deletes the row.
+    has_avatar = models.BooleanField(_("has an uploaded picture"), default=False, editable=False)
+    has_gravatar_copy = models.BooleanField(_("has a Gravatar copy"), default=False, editable=False)
     #: Opt-in: fetch the Gravatar for the primary address, once, server-side.
     use_gravatar = models.BooleanField(_("use my Gravatar"), default=False)
-    #: The copy the server fetched; served by Postulo, never by gravatar.com.
+    #: LEGACY (#662): the copy the server fetched, a `ProfilePicture` row now.
     gravatar_image = models.ImageField(
         _("Gravatar copy"), upload_to=upload_to_avatars, blank=True, editable=False
     )
@@ -541,18 +550,46 @@ class Profile(models.Model):
         super().save(*args, **kwargs)
 
     @property
-    def picture(self):
-        """The file to show: the upload, else the Gravatar when opted in, else nothing."""
-        if self.avatar:
-            return self.avatar
-        if self.use_gravatar and self.gravatar_image:
-            return self.gravatar_image
+    def picture(self) -> str | None:
+        """The kind of picture to show: the upload, else the Gravatar when opted in, else
+        nothing. Read from the flags on this row, so it costs no query (#662)."""
+        if self.has_avatar:
+            return ProfilePicture.UPLOAD
+        if self.use_gravatar and self.has_gravatar_copy:
+            return ProfilePicture.GRAVATAR
         return None
 
     @property
     def picture_version(self) -> int:
         """Changes whenever the profile does, so a browser cache never shows an old face."""
         return int(self.updated_at.timestamp()) if self.updated_at else 0
+
+
+class ProfilePicture(StoredPicture):
+    """A person's picture, kept in the database so that it goes with the profile (#662).
+
+    Up to two per profile: the one they uploaded and the copy of their Gravatar the server
+    fetched once. `Profile.picture` chooses between them. The profile's own flags say which
+    exist, so a page that draws the avatar never reads this table; `accounts:avatar` does,
+    to serve one.
+    """
+
+    UPLOAD = "upload"
+    GRAVATAR = "gravatar"
+    KINDS = ((UPLOAD, _("Uploaded")), (GRAVATAR, _("From Gravatar")))
+
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="pictures")
+    kind = models.CharField(_("kind"), max_length=10, choices=KINDS)
+
+    class Meta:
+        verbose_name = _("profile picture")
+        verbose_name_plural = _("profile pictures")
+        constraints = [
+            models.UniqueConstraint(fields=["profile", "kind"], name="one_picture_of_each_kind")
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.kind} picture of profile {self.profile_id}"
 
 
 class RecoveryLinkQuerySet(models.QuerySet):

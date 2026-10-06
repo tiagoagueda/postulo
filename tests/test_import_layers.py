@@ -84,6 +84,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.proxy",
             "postulo.core.redirects",
             "postulo.core.slugs",
+            # The abstract row a picture's bytes are kept in (#662), subclassed by two
+            # records and importing nothing of Postulo's.
+            "postulo.core.stored_pictures",
             "postulo.core.throttle",
             "postulo.documents.outline",
             "postulo.documents.themes",

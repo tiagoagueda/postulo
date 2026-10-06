@@ -122,6 +122,23 @@ def serve_private_file(
     return response
 
 
+def serve_stored_picture(row, *, download_name: str) -> HttpResponse:
+    """Answer a picture kept in the database (#662): its bytes, its type, and the policy.
+
+    For the avatar and the company logo, which are a row and not a file, so there is
+    nothing for a web server to be handed and a worker always answers. The type is the one
+    written beside the bytes by `pictures.keep`, never one a name suggests; ``nosniff`` and
+    the file policy are what every private file carries. The cache header is the caller's,
+    since a picture's address carries its own stamp. Performs **no** permission checking.
+    """
+    response = HttpResponse(bytes(row.data), content_type=row.media_type)
+    response["Content-Disposition"] = content_disposition_header(False, download_name)
+    response["Cache-Control"] = "private, max-age=0, no-store"
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Content-Security-Policy"] = FILE_POLICY
+    return response
+
+
 #: What text a stranger wrote is answered as, and the whole of it. Never anything a name
 #: or a client suggested: the point of the function below is that this cannot vary.
 PLAIN_TEXT = "text/plain; charset=utf-8"

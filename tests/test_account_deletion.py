@@ -13,20 +13,22 @@ from django.core.management.base import CommandError
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.accounts import deletion
-from postulo.accounts.models import Invite, Profile
+from postulo.accounts import avatars, deletion
+from postulo.accounts.models import Invite, Profile, ProfilePicture
 from postulo.api.models import ApiToken
 from postulo.applications.models import Application, Reminder, Status
 from postulo.applications.services import change_status
 from postulo.core.models import ExportArchive, OwnedModel
 from postulo.documents.models import CV, RenderedDocument, UploadedDocument
-from postulo.jobs.models import Company, Contact, JobPosting
+from postulo.jobs import logos
+from postulo.jobs.models import Company, CompanyLogo, Contact, JobPosting
 from postulo.plugins.models import Connection
 from postulo.resume.models import Publication
 
 pytestmark = pytest.mark.django_db
 
 PASSWORD = "a-fairly-long-password-42"
+PNG = b"\x89PNG\r\n\x1a\n"
 
 
 def owned_models() -> list[type]:
@@ -40,7 +42,7 @@ def owned_models() -> list[type]:
 def fill(user) -> dict[str, Path]:
     """A little of everything, with real files, so a deletion has something to miss."""
     company = Company.objects.create(owner=user, name=f"Aperture {user.pk}")
-    company.logo.save(f"logo-{company.pk}.png", ContentFile(b"\x89PNG logo"), save=True)
+    logos.store(company, ContentFile(PNG + b"logo"), source="upload")
     export = ExportArchive.objects.create(
         owner=user,
         file=ContentFile(b"PK the whole job search", name="export.zip"),
@@ -70,7 +72,8 @@ def fill(user) -> dict[str, Path]:
         checksum="abc",
     )
     profile = Profile.objects.get(user=user)
-    profile.avatar.save("avatar.png", ContentFile(b"\x89PNG fake"), save=True)
+    avatars.store(profile, ProfilePicture.UPLOAD, ContentFile(PNG + b"face"))
+    avatars.store(profile, ProfilePicture.GRAVATAR, ContentFile(PNG + b"gravatar"))
     ApiToken.issue(user, "Agent", scopes=("read",))
     Connection.objects.create(
         owner=user, kind="notifier", plugin="email", label="Mail", config={"to": "x@example.org"}
@@ -79,8 +82,6 @@ def fill(user) -> dict[str, Path]:
     return {
         "upload": Path(upload.file.path),
         "sent": Path(sent.file.path),
-        "avatar": Path(profile.avatar.path),
-        "logo": Path(company.logo.path),
         "export": Path(export.file.path),
     }
 
@@ -130,7 +131,13 @@ def test_deleting_removes_every_owned_row_and_every_file(
     for path in theirs.values():
         assert path.is_file(), "nobody else's files move"
 
-    assert report.files_removed == 5 and report.files_missing == 0
+    # The pictures are rows and went with the profile and the company, in the same
+    # statement; what was on disk is the documents, the sent copy and the export (#662).
+    assert not ProfilePicture.objects.filter(profile__user_id=user.pk).exists()
+    assert not CompanyLogo.objects.filter(company__owner_id=user.pk).exists()
+    assert ProfilePicture.objects.filter(profile__user=other_user).count() == 2
+    assert CompanyLogo.objects.filter(company__owner=other_user).count() == 1
+    assert report.files_removed == 3 and report.files_missing == 0
     assert report.rows["pending invitations revoked"] == 1
     assert any("files removed" in line for line in report.as_lines())
 
@@ -157,7 +164,7 @@ def test_the_files_stay_when_the_transaction_around_the_deletion_fails(
     assert callbacks == []
     assert get_user_model().objects.filter(pk=pk).exists()
     assert all(path.is_file() for path in mine.values())
-    assert report.files_removed == 5
+    assert report.files_removed == 3
 
 
 def test_the_last_administrator_cannot_be_deleted_by_anyone(admin_only):
@@ -386,3 +393,27 @@ def test_the_personal_details_go_with_the_account(user, other_user):
     kept = Profile.objects.get(user=other_user)
     assert (kept.birth_date, kept.birth_place, kept.birth_country) == ("1990-03-12", "Porto", "PT")
     assert kept.nationalities == ["PT", "BR"] and kept.gender == "Woman"
+
+
+def test_a_user_deleted_from_the_admin_loses_the_pictures_too(user, other_user):
+    """The path `delete_account` does not cover (#662): the admin deletes the user, the
+    profile goes by cascade, and a picture that was a file would have stayed on disk."""
+    from django.contrib import admin
+
+    for person in (user, other_user):
+        avatars.store(person.profile, ProfilePicture.UPLOAD, ContentFile(PNG + b"face"))
+        avatars.store(person.profile, ProfilePicture.GRAVATAR, ContentFile(PNG + b"gravatar"))
+
+    model_admin = admin.site._registry[get_user_model()]
+    model_admin.delete_model(None, user)
+
+    assert not ProfilePicture.objects.filter(profile__user_id=user.pk).exists()
+    assert ProfilePicture.objects.filter(profile__user=other_user).count() == 2
+
+
+def test_the_admins_profile_form_offers_no_way_to_put_a_picture_past_the_checks():
+    """The old file fields are not editable there: a picture is written by `avatars.store`."""
+    from django.contrib import admin
+
+    inline = admin.site._registry[get_user_model()].inlines[0]
+    assert {"avatar", "gravatar_image"} <= set(inline.exclude)

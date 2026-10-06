@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from functools import cached_property
-from pathlib import PurePosixPath
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -26,7 +25,7 @@ from django.views.generic import (
 
 from postulo.core import identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
-from postulo.core.files import serve_private_file
+from postulo.core.files import serve_stored_picture
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
     GdprNoticeMixin,
@@ -43,7 +42,7 @@ from postulo.core.search import clean_query, company_match
 
 from . import duplicates, identifiers, logos, mapping, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
-from .models import Company, Contact, DiscardReason, Industry, JobPosting
+from .models import Company, CompanyLogo, Contact, DiscardReason, Industry, JobPosting
 from .tables import CompaniesTable
 
 
@@ -477,10 +476,9 @@ class CompanyUpdateView(
 class CompanyLogoView(OwnedObjectMixin, View):
     """Serve a company's logo — from this instance, never from anybody else's server.
 
-    It lives under private media like every other file and comes out only through here,
-    which is what lets the content security policy keep saying ``img-src 'self'``. The
-    address carries the moment it was fetched, so a new logo is never hidden behind an
-    old cache entry.
+    It is a row beside the company (#662) and comes out only through here, which is what
+    lets the content security policy keep saying ``img-src 'self'``. The address carries
+    the moment it was fetched, so a new logo is never hidden behind an old cache entry.
     """
 
     def get_queryset(self):
@@ -488,13 +486,13 @@ class CompanyLogoView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         company = get_object_or_404(self.get_queryset(), pk=pk)
-        if not company.logo:
+        logo = CompanyLogo.objects.filter(company=company).first()
+        if logo is None:
             raise Http404
-        # The extension follows what is stored, which is no longer always PNG (#264): a
-        # hardcoded name would make `serve_private_file` guess the wrong content type for
-        # an SVG and serve a vector as an octet-stream.
-        suffix = PurePosixPath(company.logo.name).suffix or ".png"
-        response = serve_private_file(request, company.logo, download_name=f"logo{suffix}")
+        # The name follows what is stored, which is not always a PNG (#264): the type is the
+        # one written beside the bytes, and an SVG is a vector with its own extension.
+        suffix = ".svg" if logo.media_type == "image/svg+xml" else ".png"
+        response = serve_stored_picture(logo, download_name=f"logo{suffix}")
         response["Cache-Control"] = "private, max-age=86400"
         return response
 

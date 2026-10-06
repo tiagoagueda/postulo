@@ -61,7 +61,7 @@ def snapshot(account) -> dict:
     account.profile.refresh_from_db()
     return {
         "headline": account.profile.headline,
-        "avatar": account.profile.avatar.name,
+        "avatar": account.profile.has_avatar,
         "profile_pk": account.profile.pk,
         "profile_user": account.profile.user_id,
         "experience": Experience.objects.for_user(account).count(),
@@ -147,7 +147,7 @@ def test_an_archive_cannot_write_into_another_account(user, victim):
     assert newcomer.profile.headline == "Imported headline"
     assert newcomer.profile.pk != victim["user"].profile.pk
     assert newcomer.profile.user_id == newcomer.pk
-    assert not newcomer.profile.avatar
+    assert not newcomer.profile.has_avatar
     assert any("not something an archive carries" in line for line in report.skipped)
     # The victim's file was never handed to the newcomer's upload.
     stolen = UploadedDocument.objects.for_user(newcomer)

@@ -269,7 +269,7 @@ class CompanyForm(OwnerScopedModelForm):
             self.fields["industries"].queryset = Industry.objects.for_user(self.user)
         if "logo_url" in self.fields and self.instance.pk and self.instance.logo_source_url:
             self.fields["logo_url"].initial = self.instance.logo_source_url
-        if "remove_logo" in self.fields and not (self.instance.pk and self.instance.logo):
+        if "remove_logo" in self.fields and not (self.instance.pk and self.instance.has_logo):
             del self.fields["remove_logo"]
 
     def clean_logo_upload(self):

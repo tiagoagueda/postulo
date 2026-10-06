@@ -248,6 +248,11 @@ log drives the analytics and never lies about history.
 - **Private media.** Uploaded CVs carry a home address and a full employment history.
   Files are served only through an ownership-checked view, using `X-Accel-Redirect` or
   `X-Sendfile` when a reverse proxy is present. WhiteNoise handles static assets only.
+  **Two pictures are not files** (#662): an avatar and a company's logo are at most a
+  mebibyte each, so each is a row (`ProfilePicture`, `CompanyLogo`) with a foreign key and
+  `on_delete=CASCADE`, written only by `core.pictures.keep` and answered by a worker
+  through the same ownership checks. The database deletes them with their owner, which no
+  receiver has to remember; documents, renders and kept pages stay files.
 - **Export everything.** One command and one button produce a JSON dump and a media
   archive. Data ownership you cannot walk away with is not ownership.
 - **Hardened defaults.** `DEBUG=False`, a required `POSTULO_SECRET_KEY`, strict

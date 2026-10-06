@@ -256,6 +256,28 @@ def test_prune_media_lists_orphans_and_removes_them_when_told(user, tmp_path, se
     assert kept.is_file(), "a file a record points at is never touched"
 
 
+def test_a_picture_is_no_file_for_prune_media_to_find(user, tmp_path, settings, capsys):
+    """An avatar and a logo are rows (#662): nothing of them is on disk to be an orphan or
+    to be named as in use. The old files are still named by their fields, so `--remove`
+    does not take what a rollback would need; once the fields are dropped they are orphans."""
+    from django.core.files.base import ContentFile
+
+    from postulo.accounts import avatars
+    from postulo.jobs import logos
+
+    settings.MEDIA_ROOT = str(tmp_path)
+
+    def png():
+        return ContentFile(b"\x89PNG\r\n\x1a\n" + b"0" * 16)
+
+    avatars.store(user.profile, avatars.ProfilePicture.UPLOAD, png())
+    logos.store(Company.objects.create(owner=user, name="Aperture"), png(), source="upload")
+
+    call_command("prune_media")
+    assert "0 file(s) in use, 0 with no record" in capsys.readouterr().out
+    assert not any(tmp_path.rglob("*")), "no file was written for either picture"
+
+
 def test_sent_to_fits_its_column_however_long_the_posting_is(user):
     from postulo.documents.rendering import sent_to
 

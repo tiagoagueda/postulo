@@ -9,6 +9,7 @@ view, which companies this person is looking at and when. Everything below exist
 from __future__ import annotations
 
 import io
+import os
 from types import SimpleNamespace
 
 import httpx
@@ -17,9 +18,10 @@ from django.db import DatabaseError, OperationalError
 from django.urls import reverse
 from PIL import Image
 
+from postulo.core import pictures
 from postulo.core.models import Errand
 from postulo.jobs import logos
-from postulo.jobs.models import Company
+from postulo.jobs.models import Company, CompanyLogo
 
 pytestmark = pytest.mark.django_db
 
@@ -95,9 +97,8 @@ def test_a_wide_wordmark_keeps_its_own_shape_and_size(company):
     was given: a design that wants more than 56 pixels later is not blocked by a decision
     taken today, and the original bytes are not kept to go back to.
     """
-    content, extension = logos.process(an_image(size=(400, 100)))
+    content = logos.process(an_image(size=(400, 100)))
 
-    assert extension == "png"
     with Image.open(io.BytesIO(content.read())) as image:
         assert image.size == (400, 100), "kept, not flattened onto a square"
         assert image.mode == "RGBA"
@@ -110,7 +111,7 @@ def test_a_picture_too_heavy_for_the_budget_is_reduced_until_it_fits(monkeypatch
     PNG -- so the rule cannot be "refuse what is too big"; it has to reduce until it fits.
     """
     monkeypatch.setattr(logos, "MAX_STORED_BYTES", 20_000)
-    content, _extension = logos.process(a_photograph((900, 900)))
+    content = logos.process(a_photograph((900, 900)))
 
     written = content.read()
     assert len(written) <= 20_000
@@ -137,13 +138,13 @@ def test_something_that_is_not_an_image_is_refused():
 
 def test_an_svg_is_kept_as_an_svg(company):
     """The format a logo most often comes in, and the reason #264 exists."""
-    content, extension = logos.process(
+    content = logos.process(
         b'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 10">'
         b'<rect width="40" height="10" fill="#123456"/></svg>'
     )
 
-    assert extension == "svg"
     written = content.read()
+    assert pictures.media_type_of_stored(written) == "image/svg+xml"
     assert b"<rect" in written and b"#123456" in written
 
 
@@ -169,7 +170,7 @@ def test_an_svg_is_stripped_of_what_it_must_not_carry(hostile, gone):
         b'<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">'
         + hostile
         + b'<rect width="4" height="4"/></svg>'
-    )[0].read()
+    ).read()
 
     assert gone not in written
     assert b"<rect" in written, "and the drawing survives"
@@ -188,7 +189,7 @@ def test_a_logo_is_fetched_once_and_kept_here(web, company):
     logos.from_url(company, "https://cdn.example/logo.png")
 
     company.refresh_from_db()
-    assert company.logo, "the file is ours now"
+    assert company.has_logo, "the file is ours now"
     assert company.logo_source == "url"
     assert company.logo_source_url == "https://cdn.example/logo.png"
     assert company.logo_fetched_at is not None
@@ -229,7 +230,7 @@ def test_a_private_address_is_never_fetched(company):
     with pytest.raises(logos.UnusableLogo, match="private or local network"):
         logos.from_url(company, "http://192.168.1.20/logo.png")
     company.refresh_from_db()
-    assert not company.logo
+    assert not company.has_logo
 
 
 def test_a_logo_is_public_even_where_connections_may_reach_the_network(company, settings):
@@ -237,7 +238,7 @@ def test_a_logo_is_public_even_where_connections_may_reach_the_network(company, 
 
     with pytest.raises(logos.UnusableLogo, match="private or local network"):
         logos.from_url(company, "http://192.168.1.20/logo.png")
-    assert not company.logo
+    assert not company.has_logo
 
 
 # ------------------------------------------------------- finding one on a site
@@ -266,7 +267,7 @@ def test_the_site_is_asked_what_its_own_icon_is(web, company, monkeypatch):
     found = logos.find_on_website(company)
     assert found == "https://blackmesa.test/touch.png", "the largest declared icon first"
     company.refresh_from_db()
-    assert company.logo and company.logo_source == "website"
+    assert company.has_logo and company.logo_source == "website"
 
 
 def test_the_organisations_own_logo_and_the_favicon_are_tried_too(web, company, monkeypatch):
@@ -356,7 +357,7 @@ def test_the_form_fetches_a_logo_and_keeps_the_company_when_it_cannot(client, us
         {"name": "Black Mesa", "logo_url": "https://cdn.example/logo.png"},
     )
     company = Company.objects.for_user(user).get(name="Black Mesa")
-    assert company.logo and company.logo_source == "url"
+    assert company.has_logo and company.logo_source == "url"
 
     response = client.post(
         reverse("jobs:company_create"),
@@ -365,7 +366,7 @@ def test_the_form_fetches_a_logo_and_keeps_the_company_when_it_cannot(client, us
     )
     assert "The logo was not changed" in response.content.decode()
     aperture = Company.objects.for_user(user).get(name="Aperture")
-    assert not aperture.logo, "the company is still saved without it"
+    assert not aperture.has_logo, "the company is still saved without it"
 
 
 def test_a_refused_identifier_stops_the_logo_fields_too(client, user, company, web):
@@ -397,7 +398,7 @@ def test_a_refused_identifier_stops_the_logo_fields_too(client, user, company, w
     assert response.status_code == 200
     company.refresh_from_db()
     assert company.name == "Black Mesa"
-    assert company.logo and company.logo_source == "url", "a refused edit leaves the logo alone"
+    assert company.has_logo and company.logo_source == "url", "a refused edit leaves the logo alone"
 
 
 def test_a_logo_can_be_uploaded_and_removed(client, user, company):
@@ -413,14 +414,14 @@ def test_a_logo_can_be_uploaded_and_removed(client, user, company):
         },
     )
     company.refresh_from_db()
-    assert company.logo and company.logo_source == "upload"
+    assert company.has_logo and company.logo_source == "upload"
 
     client.post(
         reverse("jobs:company_update", args=[company.pk]),
         {"name": company.name, "website": company.website, "remove_logo": "on"},
     )
     company.refresh_from_db()
-    assert not company.logo and company.logo_source == ""
+    assert not company.has_logo and company.logo_source == ""
 
 
 def test_the_logo_is_served_from_this_instance_and_only_to_its_owner(
@@ -433,10 +434,10 @@ def test_the_logo_is_served_from_this_instance_and_only_to_its_owner(
     response = client.get(reverse("jobs:company_logo", args=[company.pk]))
     assert response.status_code == 200
     assert response["Cache-Control"] == "private, max-age=86400"
-    assert b"".join(response.streaming_content)[1:4] == b"PNG"
-    # A file response holds the file open until it is read and closed; leaving it open
-    # would keep the handle alive into whatever test the collector happens to run in.
-    response.close()
+    assert response.content[1:4] == b"PNG"
+    assert response["Content-Type"] == "image/png"
+    assert response["X-Content-Type-Options"] == "nosniff"
+    assert "sandbox" in response["Content-Security-Policy"]
 
     client.force_login(other_user)
     assert client.get(reverse("jobs:company_logo", args=[company.pk])).status_code == 404
@@ -493,7 +494,7 @@ def test_find_logo_and_refresh_are_only_ever_pressed_by_a_person(
     )
     assert "The logo is gone" in response.content.decode()
     company.refresh_from_db()
-    assert not company.logo
+    assert not company.has_logo
 
 
 def test_logo_actions_are_private_to_the_owner(client, other_user, company):
@@ -594,9 +595,9 @@ def test_two_people_recording_the_same_company_keep_their_own(user, other_user, 
     theirs = Company.objects.create(owner=other_user, name="Black Mesa")
     logos.from_url(mine, "https://cdn.example/logo.png")
     logos.from_url(theirs, "https://cdn.example/logo.png")
-    assert mine.logo.name != theirs.logo.name
-    assert f"logos/{user.pk}/" in mine.logo.name
-    assert f"logos/{other_user.pk}/" in theirs.logo.name
+    assert CompanyLogo.objects.get(company=mine).pk != CompanyLogo.objects.get(company=theirs).pk
+    assert CompanyLogo.objects.filter(company__owner=user).count() == 1
+    assert CompanyLogo.objects.filter(company__owner=other_user).count() == 1
 
 
 def test_a_logo_travels_in_the_export_and_comes_back(user, other_user, web):
@@ -624,7 +625,7 @@ def test_a_logo_travels_in_the_export_and_comes_back(user, other_user, web):
     with zipfile.ZipFile(archive) as bundle:
         importer.load(other_user, bundle)
     restored = Company.objects.for_user(other_user).get(name="Black Mesa")
-    assert restored.logo, "the picture came with it; nothing was fetched"
+    assert restored.has_logo, "the picture came with it; nothing was fetched"
     assert restored.logo_source == "url"
     assert restored.logo_fetched_at is not None
     assert web["calls"] == ["https://cdn.example/logo.png"], "still just the one fetch"
@@ -690,20 +691,58 @@ def test_an_icons_sizes_are_read_in_time_that_follows_their_length():
     assert time.perf_counter() - started < 2.0
 
 
-# ------------------------------------------------------- a failed save keeps the files (#525)
+# ------------------------------------------------ a logo is a row, written with its flag (#662)
 
 
-def _stored(company, extension="png"):
+def _stored(company, data=None):
     from django.core.files.base import ContentFile
 
-    logos.store(company, ContentFile(an_image()), source="upload", extension=extension)
+    logos.store(company, ContentFile(data or an_image()), source="upload")
     company.refresh_from_db()
-    return company.logo.name
 
 
-def test_clearing_a_logo_whose_row_cannot_be_saved_keeps_the_file(company, monkeypatch):
-    name = _stored(company)
-    storage = company.logo.storage
+def test_a_logo_is_one_row_and_a_flag_that_agree(company):
+    assert not company.has_logo and not CompanyLogo.objects.filter(company=company).exists()
+
+    _stored(company)
+    assert company.has_logo
+    row = CompanyLogo.objects.get(company=company)
+    assert row.media_type == "image/png" and bytes(row.data)[1:4] == b"PNG"
+
+    logos.clear(company)
+    company.refresh_from_db()
+    assert not company.has_logo and not CompanyLogo.objects.filter(company=company).exists()
+
+
+def test_a_replaced_logo_is_still_one_row(company):
+    _stored(company)
+    first = CompanyLogo.objects.get(company=company)
+    svg = b'<svg xmlns="http://www.w3.org/2000/svg"><rect width="4" height="4"/></svg>'
+    _stored(company, logos.process(svg).read())
+
+    assert CompanyLogo.objects.filter(company=company).count() == 1
+    row = CompanyLogo.objects.get(company=company)
+    assert row.pk == first.pk and row.media_type == "image/svg+xml"
+
+
+def test_storing_a_logo_whose_row_cannot_be_saved_writes_nothing(company, monkeypatch):
+    _stored(company)
+    before = bytes(CompanyLogo.objects.get(company=company).data)
+
+    def fail(*args, **kwargs):
+        raise OperationalError("database is locked")
+
+    monkeypatch.setattr(Company, "save", fail)
+    with pytest.raises(OperationalError):
+        _stored(company, logos.process(an_image(size=(50, 50))).read())
+    monkeypatch.undo()
+
+    assert bytes(CompanyLogo.objects.get(company=company).data) == before, "the row rolled back"
+    assert company.has_logo and company.logo_source == "upload", "and so did the company"
+
+
+def test_clearing_a_logo_whose_row_cannot_be_saved_keeps_it(company, monkeypatch):
+    _stored(company)
 
     def fail(*args, **kwargs):
         raise OperationalError("database is locked")
@@ -711,46 +750,42 @@ def test_clearing_a_logo_whose_row_cannot_be_saved_keeps_the_file(company, monke
     monkeypatch.setattr(Company, "save", fail)
     with pytest.raises(OperationalError):
         logos.clear(company)
-    assert storage.exists(name)
+    monkeypatch.undo()
+    assert CompanyLogo.objects.filter(company=company).exists()
 
 
-def test_storing_a_logo_whose_row_cannot_be_saved_leaves_no_new_file(company, monkeypatch):
+def test_what_was_not_checked_is_not_kept(company):
+    """`pictures.keep` is the one write, and it refuses what `process` did not make (#466)."""
     from django.core.files.base import ContentFile
 
-    name = _stored(company)
-    storage = company.logo.storage
-    before = set(storage.listdir(name.rpartition("/")[0])[1])
-
-    def fail(*args, **kwargs):
-        raise OperationalError("database is locked")
-
-    monkeypatch.setattr(Company, "save", fail)
-    with pytest.raises(OperationalError):
-        logos.store(company, ContentFile(b"<svg/>"), source="upload", extension="svg")
-    assert storage.exists(name)
-    assert set(storage.listdir(name.rpartition("/")[0])[1]) == before
+    unchecked = (b"GIF89a not a png", b"<html></html>", pictures.PNG_SIGNATURE + b"0" * 2_000_000)
+    for data in unchecked:
+        with pytest.raises(pictures.UnusablePicture):
+            logos.store(company, ContentFile(data), source="upload")
+    assert not CompanyLogo.objects.filter(company=company).exists()
+    company.refresh_from_db()
+    assert not company.has_logo
 
 
-def test_a_replaced_logo_leaves_only_the_new_file_once_committed(
-    company, django_capture_on_commit_callbacks
+def test_a_logo_the_old_way_is_let_go_of_when_it_is_replaced_or_cleared(
+    company, settings, tmp_path, django_capture_on_commit_callbacks
 ):
+    """Until the old field is dropped, a file left from before must not outlive a removal."""
     from django.core.files.base import ContentFile
 
-    old = _stored(company)
-    storage = company.logo.storage
+    settings.MEDIA_ROOT = str(tmp_path)
+    company.logo.save("logo.png", ContentFile(an_image()), save=True)
+    old = company.logo.path
     with django_capture_on_commit_callbacks(execute=True):
-        logos.store(company, ContentFile(b"<svg/>"), source="upload", extension="svg")
+        _stored(company)
     company.refresh_from_db()
-    assert company.logo.name != old and storage.exists(company.logo.name)
-    assert not storage.exists(old)
+    assert not company.logo and not os.path.exists(old)
 
-
-def test_a_cleared_logo_is_removed_once_committed(company, django_capture_on_commit_callbacks):
-    name = _stored(company)
-    storage = company.logo.storage
+    company.logo.save("logo.png", ContentFile(an_image()), save=True)
+    old = company.logo.path
     with django_capture_on_commit_callbacks(execute=True):
         logos.clear(company)
-    assert not storage.exists(name)
+    assert not os.path.exists(old)
 
 
 def test_finding_a_logo_for_a_company_deleted_meanwhile_is_refused(company, monkeypatch):
@@ -770,30 +805,89 @@ def test_finding_a_logo_for_a_company_deleted_meanwhile_is_refused(company, monk
         slow.find_a_logo(errand)
 
 
-def test_deleting_a_company_takes_its_logo_and_a_merge_keeps_the_kept_ones(
-    client, user, company, django_capture_on_commit_callbacks
-):
-    from django.core.files.base import ContentFile
-    from django.core.files.storage import default_storage
+def test_deleting_a_company_takes_its_logo(client, user, other_user, company):
+    _stored(company)
+    theirs = Company.objects.create(owner=other_user, name="Theirs")
+    _stored(theirs)
 
-    from postulo.jobs import merging
-
-    company.logo.save("logo.png", ContentFile(an_image()), save=True)
-    name = company.logo.name
     client.force_login(user)
-    with django_capture_on_commit_callbacks(execute=True):
-        assert client.post(reverse("jobs:company_delete", args=[company.pk])).status_code == 302
-    assert not default_storage.exists(name), "the logo goes with the company"
+    assert client.post(reverse("jobs:company_delete", args=[company.pk])).status_code == 302
 
-    kept = Company.objects.create(owner=user, name="Aperture")
-    other = Company.objects.create(owner=user, name="Aperture Science")
-    other.logo.save("logo.png", ContentFile(an_image()), save=True)
-    handed_over = other.logo.name
-    with django_capture_on_commit_callbacks(execute=True):
-        merging.merge_companies(kept, other)
-    kept.refresh_from_db()
-    assert kept.logo.name == handed_over
-    assert default_storage.exists(handed_over), "the logo the kept company now uses stays"
+    assert not Company.objects.filter(pk=company.pk).exists()
+    assert not CompanyLogo.objects.filter(company_id=company.pk).exists(), "gone with it"
+    assert CompanyLogo.objects.filter(company=theirs).exists(), "and nobody else's"
+
+
+def test_a_company_deleted_without_the_application_takes_its_logo_too(company):
+    """The path a hand-written list would have missed, the admin's among it: the database's
+    own cascade, with no receiver involved."""
+    _stored(company)
+    Company.objects.filter(pk=company.pk).delete()
+    assert not CompanyLogo.objects.exists()
+
+
+def test_a_list_of_companies_never_loads_a_logo(client, user):
+    """The flag is on the company's row, so the bytes are read only to serve one."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    for number in range(6):
+        _stored(Company.objects.create(owner=user, name=f"Company {number}"))
+    client.force_login(user)
+
+    with CaptureQueriesContext(connection) as queries:
+        response = client.get(reverse("jobs:company_list"))
+    assert response.status_code == 200
+    assert response.content.count(b"/logo/") >= 6, "every company draws its mark"
+    assert not [q for q in queries if "jobs_companylogo" in q["sql"]], "and none read the bytes"
+
+
+# --------------------------------------------- moving the files into rows (#662)
+
+
+def test_the_migration_moves_a_file_and_reports_a_missing_and_an_undecodable_one(
+    company, settings, tmp_path, capsys
+):
+    import importlib
+
+    from django.apps import apps
+    from django.core.files.base import ContentFile
+
+    settings.MEDIA_ROOT = str(tmp_path)
+    company.logo.save("logo.png", ContentFile(an_image()), save=True)
+    Company.objects.filter(pk=company.pk).update(
+        logo_source="url", logo_source_url="https://x.test/"
+    )
+    gone = Company.objects.create(owner=company.owner, name="Missing file")
+    Company.objects.filter(pk=gone.pk).update(
+        logo="logos/1/nowhere.png", logo_source="url", logo_source_url="https://x.test/gone"
+    )
+    broken = Company.objects.create(owner=company.owner, name="Broken file")
+    broken.logo.save("logo.png", ContentFile(b"this is not a picture"), save=True)
+    vector = Company.objects.create(owner=company.owner, name="Vector")
+    vector.logo.save(
+        "logo.svg",
+        ContentFile(b'<svg xmlns="http://www.w3.org/2000/svg"><script>x</script><rect/></svg>'),
+        save=True,
+    )
+
+    move = importlib.import_module("postulo.jobs.migrations.0030_move_logos_into_the_database")
+    move.move(apps, None)
+
+    for row in (company, gone, broken, vector):
+        row.refresh_from_db()
+    assert company.has_logo and CompanyLogo.objects.get(company=company).media_type == "image/png"
+    assert vector.has_logo
+    stored = bytes(CompanyLogo.objects.get(company=vector).data)
+    assert b"<rect" in stored and b"script" not in stored, "sanitised again on the way"
+    for lost in (gone, broken):
+        assert not lost.has_logo and not CompanyLogo.objects.filter(company=lost).exists()
+        assert lost.logo_source == "" and lost.logo_source_url == ""
+    assert company.logo_source == "url", "what was moved keeps where it came from"
+    said = capsys.readouterr().out
+    assert "2 picture(s) could not be moved" in said
+    assert "the file is missing" in said and "no longer decodes" in said
+    assert company.logo, "the old file stays where it was, for a rollback"
 
 
 @pytest.mark.django_db(transaction=True)
@@ -818,7 +912,7 @@ def test_the_company_form_downloads_the_logo_outside_any_transaction(
         {"name": "Black Mesa", "logo_url": "https://cdn.example/logo.png"},
     )
     black_mesa = Company.objects.for_user(user).get(name="Black Mesa")
-    assert black_mesa.logo, "the logo still arrives"
+    assert black_mesa.has_logo, "the logo still arrives"
 
     client.post(
         reverse("jobs:company_update", args=[black_mesa.pk]),
