@@ -561,3 +561,20 @@ def test_a_file_is_forgotten_when_somebody_starts_again(client, user):
     assert b"What is in the file" not in client.get(address).content
     assert client.post(address, {"action": "confirm"}).status_code == 302
     assert not Company.objects.for_user(user).exists()
+
+
+def test_the_contacts_file_costs_the_same_queries_however_many_contacts(user):
+    """Their numbers, addresses, links and handles are fetched together, not per person."""
+    from django.db import connection
+    from django.test.utils import CaptureQueriesContext
+
+    def queries() -> int:
+        with CaptureQueriesContext(connection) as captured:
+            kind_files.build_document(user, "contacts")
+        return len(captured)
+
+    Contact.objects.create(owner=user, name="First")
+    few = queries()
+    for number in range(10):
+        Contact.objects.create(owner=user, name=f"Person {number}")
+    assert queries() == few

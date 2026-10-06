@@ -66,6 +66,7 @@ All notable changes to Postulo are recorded here. The format follows
 - New issue on Forgejo now offers a Bug report form (version, install, database, browser, steps) and a Feature request form, with a link above them telling reporters to send security problems privately (#351)
 - A CV and a letter can be downloaded as OpenDocument (.odt); each file's title, author, subject, keywords and language are shown before export and can be edited or left out, and what was sent records the choice (#480)
 - Server settings gains a Backups page for administrators: list, back up now, download and delete (with re-authentication), a daily or weekly schedule with retention, backup metrics, and a verified restore guide that prints the commands. (#242)
+- Companies, contacts, listings and applications can each be exported as a JSON file of their own from Settings > Your data and read back through a review page that adds only what is new and never changes what you have. (#659)
 - Leaving a page with unsaved work through a link or a button now asks "Leave without saving?" in Postulo's own translated dialog instead of the browser's prompt, which stays for closing the tab, reload and Back. (#657)
 
 ### 🐛 Fixed

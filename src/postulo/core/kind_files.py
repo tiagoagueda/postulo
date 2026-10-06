@@ -237,6 +237,7 @@ def _queryset(user, kind: str):
         return (
             Contact.objects.for_user(user)
             .select_related("company", "department")
+            .prefetch_related(*CONTACT_DETAILS)
             .order_by("name", "pk")
         )
     if kind == "listings":
