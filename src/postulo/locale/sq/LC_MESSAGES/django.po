@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Postulo\n"
 "Report-Msgid-Bugs-To: https://source.tiagoagueda.com/postulo/postulo/issues\n"
-"POT-Creation-Date: 2026-10-06 03:54+0000\n"
+"POT-Creation-Date: 2026-10-06 05:19+0000\n"
 "PO-Revision-Date: 2026-09-08 13:57+0000\n"
 "Last-Translator: Postulo contributors\n"
 "Language-Team: shqip\n"
@@ -111,14 +111,14 @@ msgid_plural "%(count)d contacts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/documents/views.py:753
+#: src/postulo/documents/views.py:835
 #, python-format
 msgid "%(count)d copy sent"
 msgid_plural "%(count)d copies sent"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/documents/views.py:762
+#: src/postulo/documents/views.py:844
 #, python-format
 msgid "%(count)d copy sent."
 msgid_plural "%(count)d copies sent."
@@ -163,7 +163,7 @@ msgid_plural "%(count)d entries on its timeline"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/documents/views.py:755
+#: src/postulo/documents/views.py:837
 #, python-format
 msgid "%(count)d failed"
 msgid_plural "%(count)d failed"
@@ -539,9 +539,19 @@ msgstr ""
 msgid "%(field)s names an identifier that is not one of yours."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:598
+#: src/postulo/resume/candidate.py:574
 #, python-format
 msgid "%(field)s: %(problem)s"
+msgstr ""
+
+#: src/postulo/core/kind_files.py:429
+#, python-format
+msgid "%(field)s: this is not a date written as 2026-09-28."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:413
+#, python-format
+msgid "%(field)s: this is not text."
 msgstr ""
 
 #: src/postulo/applications/views.py:1624
@@ -598,6 +608,17 @@ msgstr[1] ""
 msgid "%(formats)s, up to %(megabytes)s MB."
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:134
+#, python-format
+msgid "%(free)s free on that volume."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:45
+#, python-format
+msgid ""
+"%(free)s is free where the archives are kept, which is less than a quarter more than the newest archive. Delete old ones or move the directory to a larger volume."
+msgstr ""
+
 #: src/postulo/applications/reports.py:113
 #, python-format, draft
 msgid "%(from)s to %(to)s"
@@ -626,7 +647,7 @@ msgstr ""
 msgid "%(kilobytes)s on disk"
 msgstr "%(kilobytes)s në disk"
 
-#: src/postulo/documents/views.py:195
+#: src/postulo/documents/views.py:239
 #, python-format, draft
 msgid "%(kind)s created. Now choose what goes on it."
 msgstr "%(kind)s u krijua. Tani zgjidh çfarë do të hyjë në të."
@@ -675,7 +696,7 @@ msgid_plural ""
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/resume/candidate.py:1442
+#: src/postulo/resume/candidate.py:1418
 #, python-format
 msgid "%(language)s: %(fields)s"
 msgstr ""
@@ -705,6 +726,13 @@ msgid_plural "%(n)s contacts in %(a)s accounts are past the line."
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/postulo/templates/server/backup_restore.html:60
+#, python-format
+msgid "%(n)s media file"
+msgid_plural "%(n)s media files"
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/accounts/forms.py:194 src/postulo/accounts/forms.py:217
 #, python-format
 msgctxt "names the language used when nothing was chosen"
@@ -718,19 +746,19 @@ msgid ""
 msgstr ""
 "%(name)s %(version)s është për Postulo %(wanted)s, kurse ky është Postulo %(have)s."
 
-#: src/postulo/core/server_views.py:1689
+#: src/postulo/core/server_views.py:1693
 #, python-format, draft
 msgid "%(name)s %(version)s is installed from the catalogue."
 msgstr "%(name)s %(version)s është instaluar nga katalogu."
 
-#: src/postulo/core/server_views.py:1625
+#: src/postulo/core/server_views.py:1629
 #, python-format, draft
 msgid ""
 "%(name)s %(version)s is installed, and every part of this instance is using it already. A restart would add nothing: a plugin with pages or tables of its own has to be built into the image."
 msgstr ""
 "%(name)s %(version)s është i instaluar dhe çdo pjesë e këtij instalimi po e përdor tashmë. Një rinisje nuk do të shtonte asgjë: një shtojcë me faqet ose tabelat e veta duhet të jetë e ndërtuar brenda imazhit."
 
-#: src/postulo/core/server_views.py:1499
+#: src/postulo/core/server_views.py:1503
 #, python-format
 msgid ""
 "%(name)s %(version)s is installed, but this instance is still running the version it replaced until it is restarted: every process keeps the code it has already loaded."
@@ -755,7 +783,7 @@ msgstr ""
 msgid "%(name)s as plain text"
 msgstr ""
 
-#: src/postulo/core/server_views.py:281
+#: src/postulo/core/server_views.py:285
 #, python-format, draft
 msgid "%(name)s can sign in again."
 msgstr "%(name)s mund të hyjë përsëri."
@@ -772,34 +800,49 @@ msgstr ""
 msgid "%(name)s does not match the checksum it was published with."
 msgstr "%(name)s nuk përputhet me shumën e kontrollit me të cilën u publikua."
 
+#: src/postulo/core/views_backups.py:172
+#, python-format
+msgid "%(name)s does not verify: %(problem)s"
+msgstr ""
+
 #: src/postulo/plugins/installing.py:888
 #, python-format
 msgid "%(name)s installed but could not be loaded, so it was put back: %(why)s"
 msgstr ""
 
-#: src/postulo/core/server_views.py:276
+#: src/postulo/core/server_views.py:280
 #, python-format, draft
 msgid "%(name)s is deactivated: nothing deleted, no sign-in."
 msgstr "%(name)s është çaktivizuar: asgjë e fshirë, asnjë hyrje."
+
+#: src/postulo/core/views_backups.py:225
+#, python-format
+msgid "%(name)s is deleted."
+msgstr ""
 
 #: src/postulo/core/gdpr.py:271
 #, python-format
 msgid "%(name)s is gone, with %(what)s."
 msgstr ""
 
-#: src/postulo/core/server_views.py:334
+#: src/postulo/core/server_views.py:338
 #, python-format
 msgid "%(name)s is gone: the account, its records and %(count)s file on disk."
 msgid_plural "%(name)s is gone: the account, its records and %(count)s files on disk."
 msgstr[0] ""
 msgstr[1] ""
 
+#: src/postulo/core/views_backups.py:279
+#, python-format
+msgid "%(name)s is kept and opens cleanly."
+msgstr ""
+
 #: src/postulo/plugins/catalogue.py:422
 #, python-format
 msgid "%(name)s is listed by several catalogues (%(catalogues)s); say which."
 msgstr ""
 
-#: src/postulo/core/server_views.py:249
+#: src/postulo/core/server_views.py:253
 #, python-format, draft
 msgid "%(name)s is no longer an administrator."
 msgstr "%(name)s nuk është më administrator."
@@ -816,12 +859,12 @@ msgid ""
 msgstr ""
 "%(name)s nuk është Python i pastër. Postulo instalon vetëm rrota të ndërtuara për çdo platformë (py3-none-any); kjo imazh nuk ka përpilues."
 
-#: src/postulo/core/server_views.py:444
+#: src/postulo/core/server_views.py:448
 #, python-format, draft
 msgid "%(name)s is now @%(username)s."
 msgstr "%(name)s tani është @%(username)s."
 
-#: src/postulo/core/server_views.py:257
+#: src/postulo/core/server_views.py:261
 #, python-format, draft
 msgid "%(name)s is now an administrator."
 msgstr "%(name)s tani është administrator."
@@ -841,19 +884,19 @@ msgstr ""
 msgid "%(name)s is now number %(place)s in the navigation."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1735
+#: src/postulo/core/server_views.py:1739
 #, python-format, draft
 msgid ""
 "%(name)s is removed. Restart Postulo to be sure nothing of it is left loaded."
 msgstr ""
 "%(name)s u hoq. Rinisni Postulo për t'u siguruar që asgjë prej tij nuk ka mbetur e ngarkuar."
 
-#: src/postulo/core/server_views.py:1716
+#: src/postulo/core/server_views.py:1720
 #, python-format, draft
 msgid "%(name)s is switched off; its files are still here."
 msgstr "%(name)s është i fikur; skedarët e tij janë ende këtu."
 
-#: src/postulo/core/server_views.py:1718
+#: src/postulo/core/server_views.py:1722
 #, python-format, draft
 msgid "%(name)s is switched on again."
 msgstr "%(name)s është ndezur përsëri."
@@ -864,6 +907,11 @@ msgid ""
 "%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
 msgstr ""
 "%(name)s është gjuha me të cilën fillon një llogari e re, prandaj nuk mund të pushojë së ofruari. Ndryshoni së pari gjuhën e parazgjedhur."
+
+#: src/postulo/core/views_backups.py:167
+#, python-format
+msgid "%(name)s opens and matches its checksum."
+msgstr ""
 
 #: src/postulo/plugins/installing.py:989
 #, python-format, draft
@@ -890,7 +938,7 @@ msgid ""
 "%(name)s would change what something here already depends on. %(problems)s"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:79
+#: src/postulo/documents/rendering.py:80
 #, python-format, draft
 msgid "%(name)s — %(kind)s"
 msgstr "%(name)s — %(kind)s"
@@ -903,6 +951,12 @@ msgstr "%(name)s — pamje e përgjithshme"
 #: src/postulo/templates/core/export.html:55
 #, python-format
 msgid "%(name)s, kept until %(when)s."
+msgstr ""
+
+#: src/postulo/templates/server/backup_delete.html:10
+#, python-format
+msgid ""
+"%(name)s, made %(when)s, %(size)s. The file is removed from the disk and cannot be brought back."
 msgstr ""
 
 #: src/postulo/resume/views.py:440
@@ -963,7 +1017,7 @@ msgctxt "translation progress"
 msgid "%(reviewed)s, %(draft)s, %(untranslated)s"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:649
+#: src/postulo/documents/rendering.py:762
 #: src/postulo/notifications/management/commands/send_due_reminders.py:75
 #: src/postulo/notifications/slow.py:187
 #, python-format, draft
@@ -1007,7 +1061,7 @@ msgstr ""
 msgid "%(scheme)s: that is not the usual form."
 msgstr ""
 
-#: src/postulo/documents/views.py:751
+#: src/postulo/documents/views.py:833
 #, python-format
 msgid "%(sent)s, %(failed)s; each document says which."
 msgstr ""
@@ -1042,7 +1096,7 @@ msgstr ""
 msgid "%(theme)s, from %(provider)s"
 msgstr "%(theme)s, nga %(provider)s"
 
-#: src/postulo/documents/rendering.py:672
+#: src/postulo/documents/rendering.py:785
 #, python-format
 msgid "%(title)s (draft)"
 msgstr ""
@@ -1109,6 +1163,13 @@ msgid_plural "%(total)s records"
 msgstr[0] "%(total)s regjistrim"
 msgstr[1] "%(total)s regjistrime"
 
+#: src/postulo/templates/core/kind_file.html:22
+#, python-format
+msgid "%(total)s record is in the file."
+msgid_plural "%(total)s records are in the file."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/plugins/catalogue.py:300 src/postulo/plugins/catalogue.py:366
 #, python-format, draft
 msgid "%(url)s answered %(code)s."
@@ -1159,6 +1220,14 @@ msgstr ""
 #, draft
 msgid "(empty address)"
 msgstr "(adresë e zbrazët)"
+
+#: src/postulo/core/kind_files.py:533 src/postulo/core/kind_files.py:620
+msgid "(no name)"
+msgstr ""
+
+#: src/postulo/core/kind_files.py:750 src/postulo/core/kind_files.py:787
+msgid "(no title)"
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:242
 #: src/postulo/templates/cotton/help_mark.html:45
@@ -1268,6 +1337,18 @@ msgstr ""
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr ""
 
+#: src/postulo/core/slow.py:128
+msgid "A backup is already running."
+msgstr ""
+
+#: src/postulo/core/views_backups.py:152
+msgid "A backup is already running. Wait for it to finish."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:36
+msgid "A backup is running."
+msgstr ""
+
 #: src/postulo/core/models.py:685
 msgid "A blog, a portfolio — what to call it. Left blank, the host is shown."
 msgstr ""
@@ -1287,7 +1368,7 @@ msgid ""
 msgstr ""
 "Një shtojce shfletuesi i duhet vetëm e para. Një agjenti jepini vetëm lexim derisa t'i besoni shkrimin."
 
-#: src/postulo/templates/server/overview.html:234
+#: src/postulo/templates/server/overview.html:247
 #, python-format, draft
 msgid ""
 "A bug report is worth as much as anything else here. The repository is at <a href=\"%(repo)s\" class=\"underline\">source.tiagoagueda.com/postulo</a>, and <a href=\"%(guide)s\" class=\"underline\">CONTRIBUTING</a> says how a change lands."
@@ -1390,6 +1471,10 @@ msgstr ""
 msgid "A company in several industries counts in each of them."
 msgstr "Një kompani në disa industri numërohet në secilën prej tyre."
 
+#: src/postulo/core/kind_files.py:549
+msgid "A company with the same identifier is already yours."
+msgstr ""
+
 #: src/postulo/templates/core/search.html:15
 #, draft
 msgid "A company, a role, a phrase from a letter, a name…"
@@ -1409,12 +1494,17 @@ msgstr ""
 msgid "A country and a number in one group"
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:197
+msgid ""
+"A cron line on the host still works the same way and is described on the wiki page about backups."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv.html:16
 #, draft
 msgid "A CSV file"
 msgstr "Një skedar CSV"
 
-#: src/postulo/documents/forms.py:161
+#: src/postulo/documents/forms.py:170
 msgid ""
 "A CV leads with a career, a portfolio with work. It decides which themes are offered below."
 msgstr ""
@@ -1450,6 +1540,11 @@ msgid ""
 "A draft is kept nowhere, and marks whatever it has nothing to fill in. A letter is filed when you record what you sent with an application."
 msgstr ""
 
+#: src/postulo/documents/properties.py:55
+msgid ""
+"A few words a search of your own files could use, separated by commas. Stuffing them does not help with applicant tracking software, and can count against an application."
+msgstr ""
+
 #: src/postulo/resume/forms.py:245
 msgid "A few words about it, where the title does not say enough."
 msgstr ""
@@ -1483,6 +1578,12 @@ msgstr ""
 msgid "A file that Postulo itself wrote is read on a page of its own."
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:73
+#, python-format
+msgid ""
+"A file this page made, here or on another Postulo, of up to %(size)s MB and %(most)s records. You are shown what is in it, and what adding it would do, before anything is added."
+msgstr ""
+
 #: src/postulo/templates/resume/candidate_file.html:67
 msgid ""
 "A file this page made, here or on another Postulo. You are shown what is in it, and what adding it would do, before anything is added."
@@ -1507,7 +1608,7 @@ msgstr ""
 msgid "A handle is needed."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1078
+#: src/postulo/resume/candidate.py:1054
 msgid "A handle with nothing in it"
 msgstr ""
 
@@ -1523,6 +1624,11 @@ msgstr ""
 #, draft
 msgid "A known service"
 msgstr "Një shërbim i njohur"
+
+#: src/postulo/documents/forms.py:605
+msgid ""
+"A language tag such as fr or pt-BR. A screen reader announces the file in it."
+msgstr ""
 
 #: src/postulo/templates/settings/locale.html:124
 msgid ""
@@ -1570,7 +1676,7 @@ msgstr ""
 msgid "A link needs an address."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1132
+#: src/postulo/resume/candidate.py:1108
 msgid "A link with no address"
 msgstr ""
 
@@ -1674,7 +1780,7 @@ msgid ""
 "A number its country cannot have is refused, and the refusal says why. A number Postulo cannot place is kept as you typed it, with a note beside it. One recorded before numbers were checked stays as it is, marked, until you change it. Nothing here proves that a number is yours."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:932
+#: src/postulo/resume/candidate.py:908
 msgid "A number with nothing in it"
 msgstr ""
 
@@ -1803,7 +1909,7 @@ msgid ""
 msgstr ""
 "Një shpallje që keni vënë re. Kompania dhe titulli mjaftojnë për të nisur; pjesa tjetër mund të vijë më vonë."
 
-#: src/postulo/resume/candidate.py:846
+#: src/postulo/resume/candidate.py:822
 #, python-format
 msgid "A profile holds at most %(most)s nationalities, and this lists more."
 msgstr ""
@@ -1881,6 +1987,11 @@ msgstr ""
 msgid "A report on a period"
 msgstr "Një raport për një periudhë"
 
+#: src/postulo/templates/server/backup_restore.html:73
+msgid ""
+"A restore replaces everything on this instance with what is in the archive, so nothing else may be using the database while it runs. Stop the web service, the scheduler and the worker first, restore, and start them again. Run these on the machine that hosts the instance, not in this browser. The restore command is given <code>--force</code> because this instance already has accounts."
+msgstr ""
+
 #: src/postulo/templates/server/design.html:371
 msgid "A row"
 msgstr ""
@@ -1888,6 +1999,15 @@ msgstr ""
 #: src/postulo/templates/core/import_csv.html:34
 msgid ""
 "A row whose status is draft becomes a listing and any other status an application; a row with no status becomes an application if it has a date applied and a listing if it has none. Applications are dated as the spreadsheet says and marked as imported on their timeline."
+msgstr ""
+
+#: src/postulo/templates/server/overview.html:191
+msgid "A scheduled backup was due and nothing took it."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:185
+msgid ""
+"A scheduled backup was due and nothing took it. Is the scheduler running? A backup on a schedule needs it."
 msgstr ""
 
 #: src/postulo/accounts/forms.py:1141
@@ -1962,7 +2082,7 @@ msgid ""
 msgstr ""
 "Një shabllon me kolonat e vetë Postulo-s dhe një rresht shembull. Plotësojeni dhe ngarkojeni më lart."
 
-#: src/postulo/core/server_views.py:964
+#: src/postulo/core/server_views.py:968
 #, python-format, draft
 msgid "A test message from %(name)s"
 msgstr "Një mesazh prove nga %(name)s"
@@ -1992,7 +2112,7 @@ msgid ""
 "A town and a country alone are kept as a place. Nothing checks that an address exists, and a country Postulo has no rules for is free-form."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1384
+#: src/postulo/resume/candidate.py:1360
 msgid "A translation"
 msgstr ""
 
@@ -2122,6 +2242,7 @@ msgstr ""
 
 #: src/postulo/templates/accounts/invite_list.html:27
 #: src/postulo/templates/documents/rendered_list.html:29
+#: src/postulo/templates/server/backups.html:80
 #: src/postulo/templates/server/people.html:42
 #: src/postulo/templates/server/person_recovery.html:72
 #, draft
@@ -2204,7 +2325,7 @@ msgstr "Shto një etiketë"
 msgid "Add all of this"
 msgstr "Shto gjithë këtë"
 
-#: src/postulo/templates/documents/cv_detail.html:244
+#: src/postulo/templates/documents/cv_detail.html:259
 #, draft
 msgid "Add entries"
 msgstr "Shto zëra"
@@ -2229,7 +2350,7 @@ msgstr "Shto një"
 msgid "Add the first one."
 msgstr "Shtoni të parin."
 
-#: src/postulo/templates/documents/cv_detail.html:262
+#: src/postulo/templates/documents/cv_detail.html:277
 #, draft
 msgid "Add these"
 msgstr "Shto këto"
@@ -2261,7 +2382,8 @@ msgstr "Shto te shpalljet"
 msgid "Add to the timeline"
 msgstr "Shto në vijën kohore"
 
-#: src/postulo/templates/resume/candidate_file.html:190
+#: src/postulo/templates/core/kind_file.html:144
+#: src/postulo/templates/resume/candidate_file.html:143
 msgid "Add what is new"
 msgstr ""
 
@@ -2275,7 +2397,7 @@ msgstr "U shtua"
 msgid "added"
 msgstr "u shtua"
 
-#: src/postulo/documents/views.py:245
+#: src/postulo/documents/views.py:289
 #, python-format
 msgid "Added %(count)s entry."
 msgid_plural "Added %(count)s entries."
@@ -2316,6 +2438,11 @@ msgstr "U shtua."
 
 #: src/postulo/templates/documents/partials/comparison_line.html:32
 msgid "Added:"
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:86
+msgid ""
+"Adding a file only ever adds. What you already have is left exactly as it is and is not added a second time, so the same file twice is the same as once. Nothing in your account is changed or removed."
 msgstr ""
 
 #: src/postulo/templates/resume/candidate_file.html:80
@@ -2448,7 +2575,7 @@ msgstr ""
 msgid "Already decided —"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:124
+#: src/postulo/core/file_review.py:27
 msgid "Already in your record"
 msgstr ""
 
@@ -2484,7 +2611,7 @@ msgstr "Një identifikues „tjetër“ ka nevojë për një emër."
 msgid "An address cannot contain a line break or any other control character."
 msgstr ""
 
-#: src/postulo/documents/forms.py:116
+#: src/postulo/documents/forms.py:125
 msgid "An address of yours is offered here once it has been confirmed."
 msgstr ""
 
@@ -2505,7 +2632,7 @@ msgid ""
 "An address recorded before addresses were checked, or brought in by a file, that its country would refuse today stays as it is, marked <em>Kept as it was</em>, and is checked the next time you change it."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1025
+#: src/postulo/resume/candidate.py:1001
 msgid "An address that could not be read"
 msgstr ""
 
@@ -2525,19 +2652,27 @@ msgstr ""
 msgid "An application's status changes"
 msgstr ""
 
-#: src/postulo/templates/core/export.html:97
+#: src/postulo/templates/core/export.html:118
 #, draft
 msgid ""
 "An archive can be imported into an empty account from the command line. It is not offered here because importing creates records rather than merging them, and that is a decision worth making deliberately rather than by clicking."
 msgstr ""
 "Një arkiv mund të importohet në një llogari bosh nga rreshti i komandës. Nuk ofrohet këtu sepse importimi krijon regjistrime në vend që t'i bashkojë, dhe kjo është një vendim që ia vlen të merret me vetëdije e jo me një klikim."
 
+#: src/postulo/templates/server/backups.html:14
+msgid "An archive holds everybody's data, unencrypted."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:214
+msgid "An archive to restore from"
+msgstr ""
+
 #: src/postulo/jobs/forms.py:196
 msgid ""
 "An employer is somewhere you might work; a public employment service is the office you are registered with. A recruitment agency is an ordinary company: give it the industry Employment activities."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1287
+#: src/postulo/resume/candidate.py:1263
 msgid "An entry with no name"
 msgstr ""
 
@@ -2563,7 +2698,7 @@ msgstr ""
 msgid "An icon button"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1186
+#: src/postulo/resume/candidate.py:1162
 msgid "An identifier"
 msgstr ""
 
@@ -2589,11 +2724,11 @@ msgstr ""
 msgid "An offer is recorded"
 msgstr ""
 
-#: src/postulo/documents/forms.py:520
+#: src/postulo/documents/forms.py:529
 msgid "An older version of the same thing, kept but no longer offered."
 msgstr ""
 
-#: src/postulo/documents/forms.py:217
+#: src/postulo/documents/forms.py:226
 msgid "An ORCID or another public id, as your details list them."
 msgstr ""
 
@@ -2639,6 +2774,10 @@ msgstr ""
 #: src/postulo/templates/resume/candidate_file.html:30
 msgid ""
 "And your name, with your form of address, pronouns, and date and place of birth if you gave them, your headline, where you are, and the language your career is written in."
+msgstr ""
+
+#: src/postulo/core/backups.py:364
+msgid "Another backup was already running."
 msgstr ""
 
 #: src/postulo/templates/accounts/invite_created.html:41
@@ -2823,8 +2962,9 @@ msgid "Application updated."
 msgstr "Aplikimi u përditësua."
 
 #: src/postulo/applications/apps.py:9 src/postulo/applications/tables.py:17
-#: src/postulo/core/navigation.py:79 src/postulo/core/search.py:584
-#: src/postulo/jobs/tables.py:99 src/postulo/jobs/tables.py:315
+#: src/postulo/core/kind_files.py:907 src/postulo/core/navigation.py:79
+#: src/postulo/core/search.py:584 src/postulo/jobs/tables.py:99
+#: src/postulo/jobs/tables.py:315
 #: src/postulo/templates/applications/application_list.html:6
 #: src/postulo/templates/applications/application_list.html:66
 #: src/postulo/templates/applications/application_list.html:108
@@ -2980,7 +3120,7 @@ msgstr "Apliko: %(title)s"
 msgid "Apprenticeship"
 msgstr "Praktikë profesionale"
 
-#: src/postulo/documents/models.py:968
+#: src/postulo/documents/models.py:975
 #, draft
 msgid "Archived"
 msgstr "Arkivuar"
@@ -3014,6 +3154,10 @@ msgstr "Rregulloni pamjen tuaj të përgjithshme"
 #: src/postulo/resume/forms.py:190
 msgid ""
 "As a CV should print it. A name that is a skill in the ESCO classification is recognised as that skill, and the box offers the classification's names as you type; a skill that is in no classification is not a lesser kind of skill."
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html:116
+msgid "As a file"
 msgstr ""
 
 #: src/postulo/applications/forms.py:776
@@ -3051,13 +3195,13 @@ msgid ""
 "As they wrote it. The application moves to Offer, and an answer-by date goes on the calendar."
 msgstr ""
 
-#: src/postulo/documents/forms.py:111
+#: src/postulo/documents/forms.py:120
 msgid "As things stand, none is printed."
 msgstr ""
 
-#: src/postulo/documents/forms.py:257 src/postulo/documents/forms.py:266
-#: src/postulo/documents/forms.py:275 src/postulo/documents/forms.py:281
-#: src/postulo/documents/forms.py:288
+#: src/postulo/documents/forms.py:266 src/postulo/documents/forms.py:275
+#: src/postulo/documents/forms.py:284 src/postulo/documents/forms.py:290
+#: src/postulo/documents/forms.py:297
 msgid "As things stand: {value}."
 msgstr ""
 
@@ -3077,6 +3221,10 @@ msgstr "Vlerësim"
 #, draft
 msgid "Assessment or test"
 msgstr "Vlerësim ose test"
+
+#: src/postulo/core/models.py:1232
+msgid "at"
+msgstr ""
 
 #: src/postulo/templates/cotton/table/filter.html:110
 #: src/postulo/templates/cotton/table/filter.html:111
@@ -3100,7 +3248,7 @@ msgstr "së shumti"
 msgid "Atlantic Ocean"
 msgstr ""
 
-#: src/postulo/documents/models.py:1010 src/postulo/notifications/models.py:73
+#: src/postulo/documents/models.py:1017 src/postulo/notifications/models.py:73
 #, draft
 msgid "attempts"
 msgstr "përpjekje"
@@ -3113,6 +3261,10 @@ msgstr ""
 #, draft
 msgid "authentication"
 msgstr "vërtetim"
+
+#: src/postulo/documents/forms.py:593
+msgid "Author"
+msgstr ""
 
 #: src/postulo/jobs/industries.py:85
 #, draft
@@ -3158,6 +3310,12 @@ msgstr "Prapa"
 #, draft
 msgid "Back in your listings."
 msgstr "Përsëri te shpalljet tuaja."
+
+#: src/postulo/templates/server/backup_delete.html:17
+#: src/postulo/templates/server/backup_restore.html:19
+#: src/postulo/templates/server/backup_restore.html:101
+msgid "Back to Backups"
+msgstr ""
 
 #: src/postulo/templates/accounts/invite_created.html:40
 msgid "Back to invitations"
@@ -3208,6 +3366,10 @@ msgstr "Kthehu te kolonat e zakonshme."
 msgid "Back to the usual order"
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:96
+msgid "Back to your data"
+msgstr ""
+
 #: src/postulo/core/help.py:50
 msgid "Back to Your details"
 msgstr ""
@@ -3217,12 +3379,10 @@ msgstr ""
 msgid "Back to your listings"
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:184
-#, draft
-msgid ""
-"Back up with <code>manage.py backup</code>; see the wiki page on backups for a schedule and for restoring."
+#: src/postulo/templates/server/backups.html:55
+#: src/postulo/templates/server/backups.html:65
+msgid "Back up now"
 msgstr ""
-"Bëni kopje rezervë me <code>manage.py backup</code>; për orarin dhe rikthimin shihni faqen e wiki-t për kopjet rezervë."
 
 #: src/postulo/templates/server/email.html:21
 #, draft
@@ -3231,6 +3391,17 @@ msgstr "Backend"
 
 #: src/postulo/templates/server/overview.html:97
 msgid "Background work"
+msgstr ""
+
+#: src/postulo/core/server_sections.py:67 src/postulo/core/views_backups.py:60
+#: src/postulo/templates/server/backups.html:6
+#: src/postulo/templates/server/backups.html:69
+#: src/postulo/templates/server/overview.html:192
+msgid "Backups"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:71
+msgid "Backups, newest first"
 msgstr ""
 
 #: src/postulo/jobs/industries.py:70
@@ -3284,17 +3455,17 @@ msgstr "Tabelë"
 msgid "body"
 msgstr "trupi"
 
-#: src/postulo/documents/rendering.py:280
+#: src/postulo/documents/rendering.py:344
 #, python-format
 msgid "Born %(date)s"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:278
+#: src/postulo/documents/rendering.py:342
 #, python-format
 msgid "Born %(date)s in %(place)s"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:282
+#: src/postulo/documents/rendering.py:346
 #, python-format
 msgid "Born in %(place)s"
 msgstr ""
@@ -3303,7 +3474,7 @@ msgstr ""
 msgid "Brand"
 msgstr ""
 
-#: src/postulo/templates/core/export.html:88
+#: src/postulo/templates/core/export.html:109
 #, draft
 msgid "Bringing a spreadsheet in"
 msgstr "Sjellja e një fletëllogaritëse"
@@ -3336,7 +3507,7 @@ msgstr "i integruar"
 msgid "Buttons"
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:227
+#: src/postulo/templates/server/overview.html:240
 #, draft
 msgid "Buy me a coffee — scan to open buymeacoffee.com/tiagoagueda"
 msgstr "Buy me a coffee — skanoni për të hapur buymeacoffee.com/tiagoagueda"
@@ -3440,6 +3611,7 @@ msgstr "Adresë kthimi për t'u regjistruar tek ai"
 #: src/postulo/templates/partials/confirm_delete.html:51
 #: src/postulo/templates/partials/table/cell.html:44
 #: src/postulo/templates/resume/item_form.html:40
+#: src/postulo/templates/server/backup_delete.html:23
 #: src/postulo/templates/server/identifier_schemes.html:30
 #: src/postulo/templates/server/person_delete.html:34
 #: src/postulo/templates/server/person_username.html:26
@@ -3458,7 +3630,7 @@ msgstr "Anuluar"
 msgid "Cancelled interview:"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:127
+#: src/postulo/core/file_review.py:30
 msgid "Cannot be added"
 msgstr ""
 
@@ -3467,7 +3639,7 @@ msgid "cannot be checked on this machine"
 msgstr ""
 
 #: src/postulo/accounts/settings_views.py:242
-#: src/postulo/core/server_sections.py:50 src/postulo/core/server_views.py:558
+#: src/postulo/core/server_sections.py:50 src/postulo/core/server_views.py:562
 #: src/postulo/core/settings_sections.py:87 src/postulo/jobs/models.py:1514
 #: src/postulo/templates/server/capture.html:8
 #: src/postulo/templates/settings/capture.html:13
@@ -3619,7 +3791,7 @@ msgstr "certifikim"
 msgid "Certification"
 msgstr "Certifikim"
 
-#: src/postulo/documents/rendering.py:47 src/postulo/resume/candidate.py:263
+#: src/postulo/documents/rendering.py:48 src/postulo/resume/candidate.py:257
 #: src/postulo/resume/registry.py:63 src/postulo/resume/views_candidate.py:42
 #: src/postulo/templates/resume/preview.html:110
 #, draft
@@ -3667,6 +3839,10 @@ msgstr ""
 msgid "Chase %(company)s about %(role)s"
 msgstr "Kujto %(company)s për %(role)s"
 
+#: src/postulo/templates/server/backups.html:113
+msgid "Check"
+msgstr ""
+
 #: src/postulo/templates/core/partials/errand_state.html:69
 msgid "Check again"
 msgstr ""
@@ -3689,6 +3865,10 @@ msgstr ""
 #, draft
 msgid "Check them all"
 msgstr "Kontrollo të gjitha"
+
+#: src/postulo/templates/server/backups.html:79
+msgid "Checked"
+msgstr ""
 
 #: src/postulo/templates/server/overview.html:56
 #, python-format
@@ -3743,6 +3923,7 @@ msgstr ""
 msgid "Choose a Europass file first."
 msgstr "Zgjidhni fillimisht një skedar Europass."
 
+#: src/postulo/core/views_kind_files.py:79
 #: src/postulo/resume/views_candidate.py:105
 msgid "Choose a file first."
 msgstr ""
@@ -3752,7 +3933,7 @@ msgstr ""
 msgid "Choose a new password"
 msgstr "Zgjidhni një fjalëkalim të ri"
 
-#: src/postulo/core/server_views.py:1549
+#: src/postulo/core/server_views.py:1553
 #, draft
 msgid "Choose a package first."
 msgstr "Zgjidhni fillimisht një paketë."
@@ -3764,6 +3945,10 @@ msgid ""
 msgstr ""
 "Zgjidhni një status për ta zhvendosur këtë kartë në një kolonë tjetër. Nga tastiera zhvendosja bëhet kur shtypni Enter ose dilni nga menyja, prandaj kalimi mbi një status rrugës nuk regjistron asgjë. Kartat mund të tërhiqen edhe mes kolonave me miun."
 
+#: src/postulo/core/views_backups.py:240
+msgid "Choose an archive to upload."
+msgstr ""
+
 #: src/postulo/core/mail_auth.py:291
 #, draft
 msgid "Choose an identity provider and save it first."
@@ -3774,7 +3959,7 @@ msgstr "Zgjidh së pari një ofrues identiteti dhe ruaje."
 msgid "Choose another file"
 msgstr "Zgjidh një skedar tjetër"
 
-#: src/postulo/documents/forms.py:675
+#: src/postulo/documents/forms.py:732
 #, draft
 msgid "Choose at least one document to record."
 msgstr "Zgjidhni të paktën një dokument për të regjistruar."
@@ -3787,7 +3972,7 @@ msgstr ""
 msgid "Choose one of the options."
 msgstr ""
 
-#: src/postulo/documents/forms.py:375 src/postulo/documents/forms.py:385
+#: src/postulo/documents/forms.py:384 src/postulo/documents/forms.py:394
 msgid "Choose one of the rows in your details."
 msgstr ""
 
@@ -3845,7 +4030,7 @@ msgid ""
 "City and country, as it should appear on a CV. Left blank, the town and country of your primary postal address are printed, once you have one."
 msgstr ""
 
-#: src/postulo/documents/models.py:1016
+#: src/postulo/documents/models.py:1023
 msgid "claimed until"
 msgstr ""
 
@@ -3951,7 +4136,7 @@ msgstr ""
 msgid "Closing this week: %(total)s"
 msgstr "Mbyllet këtë javë: %(total)s"
 
-#: src/postulo/templates/server/overview.html:232
+#: src/postulo/templates/server/overview.html:245
 #, draft
 msgid "Code"
 msgstr "Kodi"
@@ -4027,8 +4212,9 @@ msgstr "Së shpejti"
 msgid "Compact"
 msgstr ""
 
-#: src/postulo/core/navigation.py:107 src/postulo/core/search.py:586
-#: src/postulo/jobs/tables.py:20 src/postulo/templates/core/export.html:21
+#: src/postulo/core/kind_files.py:904 src/postulo/core/navigation.py:107
+#: src/postulo/core/search.py:586 src/postulo/jobs/tables.py:20
+#: src/postulo/templates/core/export.html:21
 #: src/postulo/templates/jobs/company_list.html:6
 #: src/postulo/templates/jobs/company_list.html:38
 #: src/postulo/templates/jobs/company_list.html:83
@@ -4182,7 +4368,7 @@ msgstr "U lidh me %(host)s:%(port)s. Pa emër përdoruesi, prandaj nuk u hy."
 msgid "Connected. Test it to make sure it works."
 msgstr "E lidhur. Testojeni për t'u siguruar se funksionon."
 
-#: src/postulo/documents/models.py:989 src/postulo/notifications/models.py:65
+#: src/postulo/documents/models.py:996 src/postulo/notifications/models.py:65
 #: src/postulo/plugins/models.py:222 src/postulo/plugins/models.py:305
 #, draft
 msgid "connection"
@@ -4258,6 +4444,10 @@ msgstr "Kontakti u shtua."
 msgid "Contact block"
 msgstr "Blloku i kontaktit"
 
+#: src/postulo/core/kind_files.py:905
+msgid "Contacts"
+msgstr ""
+
 #: src/postulo/jobs/models.py:744
 #, draft
 msgid "contacts"
@@ -4288,11 +4478,16 @@ msgstr "bisedë"
 msgid "Copied"
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:8
+msgid ""
+"Copies of the whole instance: every account, every file, the plugins. Take one, keep the newest few, and carry one away."
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html:47
 msgid "Copy"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:229
+#: src/postulo/templates/documents/cv_detail.html:230
 msgid "Copy as plain text"
 msgstr ""
 
@@ -4440,7 +4635,7 @@ msgstr "monedha"
 msgid "Custom"
 msgstr "Vetjake"
 
-#: src/postulo/documents/forms.py:571 src/postulo/documents/kinds.py:58
+#: src/postulo/documents/forms.py:614 src/postulo/documents/kinds.py:58
 #: src/postulo/documents/kinds.py:151 src/postulo/documents/models.py:192
 #: src/postulo/documents/models.py:337 src/postulo/documents/models.py:437
 #: src/postulo/documents/themes.py:71 src/postulo/templates/base.html:183
@@ -4495,8 +4690,8 @@ msgstr "modulet e pamjes së përgjithshme"
 msgid "Data"
 msgstr "Të dhëna"
 
-#: src/postulo/core/server_sections.py:55 src/postulo/core/server_views.py:650
-#: src/postulo/core/server_views.py:679
+#: src/postulo/core/server_sections.py:55 src/postulo/core/server_views.py:654
+#: src/postulo/core/server_views.py:683
 #: src/postulo/templates/server/data_protection.html:16
 msgid "Data protection"
 msgstr ""
@@ -4508,6 +4703,8 @@ msgid ""
 msgstr ""
 "Të dhëna me të cilat nuk mund të ikni nuk janë vërtet tuajat. Ky është një zip i vetëm që përmban çdo regjistrim në llogarinë tuaj dhe çdo skedar në të."
 
+#: src/postulo/templates/server/backup_restore.html:53
+#: src/postulo/templates/server/backups.html:77
 #: src/postulo/templates/server/overview.html:154
 #, draft
 msgid "Database"
@@ -4733,7 +4930,7 @@ msgstr "gjuha e parazgjedhur"
 msgid "default time zone"
 msgstr "zona kohore e parazgjedhur"
 
-#: src/postulo/core/server_sections.py:65 src/postulo/core/server_views.py:597
+#: src/postulo/core/server_sections.py:77 src/postulo/core/server_views.py:601
 #: src/postulo/templates/server/defaults.html:8
 #, draft
 msgid "Defaults"
@@ -4758,9 +4955,14 @@ msgstr "Mbrojtje"
 #: src/postulo/templates/partials/confirm_delete.html:4
 #: src/postulo/templates/partials/confirm_delete.html:43
 #: src/postulo/templates/resume/overview.html:146
+#: src/postulo/templates/server/backups.html:117
 #, draft
 msgid "Delete"
 msgstr "Fshi"
+
+#: src/postulo/templates/server/backup_delete.html:8
+msgid "Delete a backup"
+msgstr ""
 
 #: src/postulo/templates/server/people.html:100
 #: src/postulo/templates/server/person_delete.html:8
@@ -4773,7 +4975,7 @@ msgid "Delete everything kept of this page"
 msgstr ""
 
 #: src/postulo/templates/accounts/delete_account.html:7
-#: src/postulo/templates/core/export.html:111
+#: src/postulo/templates/core/export.html:132
 #, draft
 msgid "Delete my account"
 msgstr "Fshi llogarinë time"
@@ -4788,6 +4990,10 @@ msgstr "Fshi llogarinë time dhe gjithçka në të"
 msgid "Delete the account"
 msgstr "Fshi llogarinë"
 
+#: src/postulo/templates/server/backup_delete.html:22
+msgid "Delete the backup"
+msgstr ""
+
 #: src/postulo/templates/jobs/capture_page.html:118
 msgid "Delete the rendering"
 msgstr ""
@@ -4800,7 +5006,7 @@ msgstr ""
 msgid "Delete what was kept"
 msgstr ""
 
-#: src/postulo/core/server_views.py:297
+#: src/postulo/core/server_views.py:301
 #, draft
 msgid "Delete your own account from Settings, not from here."
 msgstr "Llogarinë tuaj fshijeni te Cilësimet, jo nga këtu."
@@ -4867,7 +5073,7 @@ msgstr ""
 msgid "description format"
 msgstr ""
 
-#: src/postulo/core/server_sections.py:71 src/postulo/core/server_views.py:207
+#: src/postulo/core/server_sections.py:83 src/postulo/core/server_views.py:211
 #: src/postulo/templates/server/design.html:15
 msgid "Design"
 msgstr ""
@@ -4981,12 +5187,12 @@ msgstr "Bëj këtë"
 msgid "Document"
 msgstr "Dokument"
 
-#: src/postulo/documents/models.py:1023
+#: src/postulo/documents/models.py:1030
 #, draft
 msgid "document copies"
 msgstr "kopje dokumenti"
 
-#: src/postulo/documents/models.py:1022
+#: src/postulo/documents/models.py:1029
 #, draft
 msgid "document copy"
 msgstr "kopje dokumenti"
@@ -5012,11 +5218,11 @@ msgstr "Depo dokumentesh"
 msgid "Documents"
 msgstr "Dokumente"
 
-#: src/postulo/documents/slow.py:153
+#: src/postulo/documents/slow.py:173
 msgid "Documents emailed"
 msgstr ""
 
-#: src/postulo/documents/slow.py:161
+#: src/postulo/documents/slow.py:181
 #, draft
 msgid "Documents sent"
 msgstr "Dokumente të dërguara"
@@ -5025,6 +5231,10 @@ msgstr "Dokumente të dërguara"
 #, draft
 msgid "Documents you already had. Nothing here is served publicly."
 msgstr "Dokumente që i kishit tashmë. Asgjë këtu nuk shërbehet publikisht."
+
+#: src/postulo/templates/server/backups.html:103
+msgid "Does not verify"
+msgstr ""
 
 #: src/postulo/core/models.py:877 src/postulo/templates/core/dashboard.html:70
 #: src/postulo/templates/core/partials/errand_state.html:36
@@ -5053,14 +5263,16 @@ msgstr ""
 #: src/postulo/templates/documents/application_documents.html:90
 #: src/postulo/templates/documents/rendered_compare.html:42
 #: src/postulo/templates/documents/rendered_compare.html:60
-#: src/postulo/templates/documents/rendered_list.html:68
+#: src/postulo/templates/documents/rendered_list.html:74
 #: src/postulo/templates/documents/upload_list.html:65
+#: src/postulo/templates/server/backups.html:115
 #, draft
 msgid "Download"
 msgstr "Shkarko"
 
-#: src/postulo/templates/documents/cv_detail.html:236
+#: src/postulo/templates/documents/cv_detail.html:251
 #: src/postulo/templates/documents/cv_text.html:61
+#: src/postulo/templates/documents/letter_detail.html:144
 #, python-format
 msgid "Download .%(extension)s"
 msgstr ""
@@ -5070,7 +5282,7 @@ msgstr ""
 msgid "Download CSV"
 msgstr "Shkarko CSV"
 
-#: src/postulo/templates/documents/cv_detail.html:211
+#: src/postulo/templates/documents/cv_detail.html:212
 #: src/postulo/templates/documents/letter_detail.html:96
 #: src/postulo/templates/documents/letter_detail.html:103
 msgid "Download draft PDF"
@@ -5084,6 +5296,7 @@ msgstr ""
 msgid "Download it as text"
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:59
 #: src/postulo/templates/resume/candidate_file.html:53
 msgid "Download the file"
 msgstr ""
@@ -5101,6 +5314,11 @@ msgstr ""
 #, draft
 msgid "Download the template"
 msgstr "Shkarko shabllonin"
+
+#: src/postulo/templates/server/backups.html:16
+msgid ""
+"Downloading one needs you to sign in again, and is written to the log with your name. Keep what you download as carefully as the instance itself. The key that the connection secrets are under is not in an archive: keep your <code>.env</code> somewhere else."
+msgstr ""
 
 #: src/postulo/applications/models.py:55
 #, draft
@@ -5176,7 +5394,7 @@ msgid ""
 "Each menu offers what is in use in the language of your career record, which is chosen under <em>Contact block</em>, or in the language you read Postulo in while that is blank. Choose <em>Other…</em> to write your own in the box that opens after the menu. A language Postulo has no list for offers <em>Other…</em> alone."
 msgstr ""
 
-#: src/postulo/documents/forms.py:580
+#: src/postulo/documents/forms.py:623
 msgid "Each one is frozen as it is now, so what they received stays readable."
 msgstr ""
 
@@ -5251,8 +5469,8 @@ msgstr "Redakto ose bashko"
 msgid "Edit, or choose another time"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:43 src/postulo/jobs/industries.py:76
-#: src/postulo/resume/candidate.py:202 src/postulo/resume/registry.py:41
+#: src/postulo/documents/rendering.py:44 src/postulo/jobs/industries.py:76
+#: src/postulo/resume/candidate.py:196 src/postulo/resume/registry.py:41
 #: src/postulo/resume/registry.py:42 src/postulo/resume/views_candidate.py:37
 #: src/postulo/templates/resume/europass_import.html:92
 #: src/postulo/templates/resume/preview.html:45
@@ -5266,7 +5484,7 @@ msgid "education"
 msgstr "arsimim"
 
 #: src/postulo/applications/models.py:185
-#: src/postulo/core/server_sections.py:34 src/postulo/core/server_views.py:745
+#: src/postulo/core/server_sections.py:34 src/postulo/core/server_views.py:749
 #: src/postulo/templates/server/email.html:8
 #: src/postulo/templates/server/people.html:39
 #: src/postulo/templates/server/people.html:53
@@ -5317,16 +5535,16 @@ msgstr "Email i dërguar"
 msgid "Email these"
 msgstr ""
 
-#: src/postulo/documents/forms.py:598
+#: src/postulo/documents/forms.py:655
 msgid "Email these from my own address"
 msgstr ""
 
-#: src/postulo/documents/slow.py:155
+#: src/postulo/documents/slow.py:175
 #, python-format
 msgid "Emailed to %(address)s."
 msgstr ""
 
-#: src/postulo/documents/views.py:1006
+#: src/postulo/documents/views.py:1093
 msgid "Emailed, and recorded what you sent."
 msgstr ""
 
@@ -5491,6 +5709,10 @@ msgstr "Çdo kompani nën këtë industri kalon te ajo e zgjedhura, dhe kjo zhdu
 msgid "Every date and time on these pages is shown in it."
 msgstr ""
 
+#: src/postulo/core/models.py:1227
+msgid "Every day"
+msgstr ""
+
 #: src/postulo/templates/documents/rendered_list.html:13
 #, draft
 msgid ""
@@ -5508,7 +5730,7 @@ msgstr "Çdo katër orë"
 msgid "Every hour"
 msgstr "Çdo orë"
 
-#: src/postulo/documents/forms.py:206
+#: src/postulo/documents/forms.py:215
 msgid "Every identifier, and any you add later"
 msgstr ""
 
@@ -5524,7 +5746,7 @@ msgid ""
 "Every kind of connection on this instance, by plugin, with how many there are. What each one is called and where it talks belongs to its owner, and is not on this page; secrets are stored encrypted and shown to nobody."
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:244
+#: src/postulo/templates/server/overview.html:257
 #, python-format, draft
 msgid ""
 "Every language here but English is a machine draft waiting for somebody who speaks it to read it and say so. If one of them is yours, <a href=\"%(guide)s\" class=\"underline\">Translating</a> says how a review goes."
@@ -5559,10 +5781,14 @@ msgstr ""
 msgid "Every step derived from one radius, so there is one number to change."
 msgstr ""
 
-#: src/postulo/documents/views.py:765
+#: src/postulo/documents/views.py:847
 #, draft
 msgid "Every store already has this document."
 msgstr "Çdo depo e ka tashmë këtë dokument."
+
+#: src/postulo/core/models.py:1228
+msgid "Every week"
+msgstr ""
 
 #: src/postulo/jobs/listing_views.py:38
 #: src/postulo/templates/server/logs.html:46
@@ -5616,7 +5842,7 @@ msgstr ""
 msgid "Everything you have written"
 msgstr "Gjithçka që keni shkruar"
 
-#: src/postulo/templates/documents/cv_detail.html:266
+#: src/postulo/templates/documents/cv_detail.html:281
 #, draft
 msgid "Everything you have written is already on it."
 msgstr "Gjithçka që ke shkruar është tashmë në të."
@@ -5640,7 +5866,7 @@ msgstr ""
 
 #: src/postulo/templates/api/token_list.html:119
 #: src/postulo/templates/api/token_list.html:124
-#: src/postulo/templates/core/export.html:103
+#: src/postulo/templates/core/export.html:124
 msgid "Example command"
 msgstr ""
 
@@ -5651,7 +5877,7 @@ msgid ""
 msgstr ""
 "Përjashtime nga ajo që ky instalim vendos për të gjithë. Çfarëdo që vendosni këtu i shfaqet këtij personi në faqen e tij të cilësimeve, me emrin tuaj pranë."
 
-#: src/postulo/documents/rendering.py:42 src/postulo/resume/candidate.py:182
+#: src/postulo/documents/rendering.py:43 src/postulo/resume/candidate.py:176
 #: src/postulo/resume/registry.py:33 src/postulo/resume/registry.py:34
 #: src/postulo/resume/views_candidate.py:36
 #: src/postulo/templates/resume/europass_import.html:83
@@ -5724,18 +5950,28 @@ msgid "export archives"
 msgstr ""
 
 #: src/postulo/templates/core/export.html:9
+#: src/postulo/templates/core/kind_file.html:60
 #: src/postulo/templates/resume/candidate_file.html:54
 #: src/postulo/templates/widgets/shortcuts.html:28
 #, draft
 msgid "Export everything"
 msgstr "Eksporto gjithçka"
 
+#: src/postulo/templates/core/export.html:101
+msgid "Export or import"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html:372
 #: src/postulo/templates/core/export.html:83
 msgid "Export or import your record"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:26
+#: src/postulo/templates/core/export.html:101
+#, python-format
+msgid "Export or import: %(title)s"
+msgstr ""
+
+#: src/postulo/templates/documents/cv_detail.html:27
 #, draft
 msgid "Export PDF"
 msgstr "Eksporto PDF"
@@ -5743,7 +5979,7 @@ msgstr "Eksporto PDF"
 #: src/postulo/templates/cotton/sent_versions.html:36
 #: src/postulo/templates/documents/rendered_compare.html:33
 #: src/postulo/templates/documents/rendered_compare.html:55
-#: src/postulo/templates/documents/rendered_list.html:60
+#: src/postulo/templates/documents/rendered_list.html:66
 #, draft
 msgid "Exported on its own"
 msgstr "Eksportuar veçmas"
@@ -5752,12 +5988,12 @@ msgstr "Eksportuar veçmas"
 msgid "Extra small"
 msgstr ""
 
-#: src/postulo/core/models.py:878 src/postulo/documents/models.py:969
+#: src/postulo/core/models.py:878 src/postulo/documents/models.py:976
 #, draft
 msgid "Failed"
 msgstr "Dështoi"
 
-#: src/postulo/core/models.py:1267 src/postulo/plugins/models.py:287
+#: src/postulo/core/models.py:1321 src/postulo/plugins/models.py:287
 #, draft
 msgid "Failed without saying why."
 msgstr "Dështoi pa thënë pse."
@@ -5854,7 +6090,7 @@ msgstr "Skedar"
 msgid "File it as a PDF"
 msgstr ""
 
-#: src/postulo/documents/views.py:636
+#: src/postulo/documents/views.py:718
 #, draft
 msgid "File saved."
 msgstr "Skedari u ruajt."
@@ -5874,6 +6110,7 @@ msgstr ""
 #: src/postulo/templates/cotton/documents_nav.html:11
 #: src/postulo/templates/documents/upload_list.html:6
 #: src/postulo/templates/documents/upload_list.html:12
+#: src/postulo/templates/server/backup_restore.html:57
 #, draft
 msgid "Files"
 msgstr "Skedarë"
@@ -5893,12 +6130,16 @@ msgstr "Skedarë që i kishit tashmë"
 msgid "Files you already had, as opposed to documents Postulo rendered."
 msgstr "Skedarë që i kishit tashmë, ndryshe nga dokumentet që i prodhoi Postulo."
 
-#: src/postulo/documents/forms.py:576
+#: src/postulo/documents/forms.py:619
 #, draft
 msgid "Files you have already"
 msgstr "Skedarë që i keni tashmë"
 
-#: src/postulo/templates/documents/letter_detail.html:113
+#: src/postulo/templates/documents/letter_detail.html:124
+msgid "Fill in from"
+msgstr ""
+
+#: src/postulo/templates/documents/letter_detail.html:153
 #, draft
 msgid "Filled in when the letter is sent with an application."
 msgstr "Plotësohet kur letra dërgohet bashkë me një aplikim."
@@ -5993,7 +6234,7 @@ msgstr ""
 msgid "Follow your details"
 msgstr ""
 
-#: src/postulo/documents/forms.py:43
+#: src/postulo/documents/forms.py:52
 #, draft
 msgid "Follow your profile"
 msgstr "Ndiq profilin tuaj"
@@ -6177,8 +6418,12 @@ msgstr "Ngri dhe bashkëngjit"
 msgid "Freeze it anyway"
 msgstr "Ngrije sidoqoftë"
 
-#: src/postulo/documents/slow.py:57
+#: src/postulo/documents/slow.py:60
 msgid "Freezing what you sent"
+msgstr ""
+
+#: src/postulo/core/models.py:1245
+msgid "Friday"
 msgstr ""
 
 #: src/postulo/jobs/forms.py:832
@@ -6267,7 +6512,7 @@ msgstr ""
 msgid "gender"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:288
+#: src/postulo/documents/rendering.py:352
 #, python-format
 msgid "Gender: %(gender)s"
 msgstr ""
@@ -6332,7 +6577,7 @@ msgstr ""
 msgid "Give nationalities as a list of country codes."
 msgstr ""
 
-#: src/postulo/documents/forms.py:680
+#: src/postulo/documents/forms.py:737
 msgid "Give the email a subject."
 msgstr ""
 
@@ -6580,7 +6825,7 @@ msgid ""
 "How it is gathered on a CV, which prints each group as “Group: one, two, three”. Groups are made on the career page."
 msgstr ""
 
-#: src/postulo/documents/forms.py:168 src/postulo/documents/forms.py:493
+#: src/postulo/documents/forms.py:177 src/postulo/documents/forms.py:502
 msgid "How it is set on the page. Change it later without touching a word."
 msgstr ""
 
@@ -6666,6 +6911,10 @@ msgstr "Si punon ky instalim, e jo një zgjedhje që i takon dikujt."
 msgid "How this works"
 msgstr "Si funksionon kjo"
 
+#: src/postulo/templates/server/backup_restore.html:71
+msgid "How to restore it"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html:9
 #, draft
 msgid "How you sign in: your username, your addresses, your password."
@@ -6690,7 +6939,7 @@ msgstr "Kam aplikuar tashmë për këtë"
 msgid "icon"
 msgstr ""
 
-#: src/postulo/documents/models.py:1008
+#: src/postulo/documents/models.py:1015
 #, draft
 msgid "id in the store"
 msgstr "identifikues në depo"
@@ -6735,8 +6984,8 @@ msgid "identifiers"
 msgstr "identifikues"
 
 #: src/postulo/accounts/views.py:221 src/postulo/core/help.py:135
-#: src/postulo/documents/forms.py:213 src/postulo/jobs/merging.py:366
-#: src/postulo/plugins/kinds.py:34 src/postulo/resume/candidate.py:1164
+#: src/postulo/documents/forms.py:222 src/postulo/jobs/merging.py:366
+#: src/postulo/plugins/kinds.py:34 src/postulo/resume/candidate.py:1140
 #: src/postulo/resume/views_candidate.py:49
 #: src/postulo/templates/accounts/profile.html:286
 #: src/postulo/templates/jobs/company_form.html:84
@@ -6757,7 +7006,7 @@ msgstr ""
 msgid "identifiers printed"
 msgstr ""
 
-#: src/postulo/documents/forms.py:223
+#: src/postulo/documents/forms.py:232
 msgid "Identifiers to print"
 msgstr ""
 
@@ -6786,7 +7035,7 @@ msgid ""
 "If the advert has gone from the web, this may be the only copy. It cannot be undone."
 msgstr ""
 
-#: src/postulo/core/server_views.py:966
+#: src/postulo/core/server_views.py:970
 #, draft
 msgid ""
 "If you are reading this, the email settings of your Postulo instance work. Nothing else to do."
@@ -6834,7 +7083,7 @@ msgstr "Importo një CV Europass"
 msgid "Import another file"
 msgstr "Importo një skedar tjetër"
 
-#: src/postulo/templates/core/export.html:91
+#: src/postulo/templates/core/export.html:112
 #: src/postulo/templates/core/import_csv.html:7
 #, draft
 msgid "Import from a spreadsheet"
@@ -6857,7 +7106,7 @@ msgid_plural "Imported %(count)s rows from %(file)s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/core/csv_import.py:1072
+#: src/postulo/core/csv_import.py:1072 src/postulo/core/kind_files.py:994
 #, python-format, draft
 msgid "Imported from %(file)s"
 msgstr "Importuar nga %(file)s"
@@ -6912,7 +7161,7 @@ msgstr "Në fuqi tani: %(language)s, %(zone)s."
 msgid "In groups, with one switched off"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:225
+#: src/postulo/templates/documents/cv_detail.html:226
 msgid "In other formats"
 msgstr ""
 
@@ -6951,12 +7200,16 @@ msgstr ""
 msgid "in the document (%(kind)s) you sent to %(company)s on %(when)s"
 msgstr ""
 
-#: src/postulo/templates/resume/candidate_file.html:152
+#: src/postulo/templates/cotton/review_sections.html:18
 msgid "In the file"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:126
+#: src/postulo/core/file_review.py:29
 msgid "In the file twice"
+msgstr ""
+
+#: src/postulo/core/models.py:1235
+msgid "In the instance's time zone."
 msgstr ""
 
 #: src/postulo/core/search.py:447
@@ -7013,6 +7266,7 @@ msgid "include contact details"
 msgstr "përfshi të dhënat e kontaktit"
 
 #: src/postulo/documents/models.py:445
+#: src/postulo/templates/server/backup_restore.html:66
 #, draft
 msgid "included"
 msgstr "përfshirë"
@@ -7120,7 +7374,7 @@ msgstr "institucion"
 msgid "Insurance"
 msgstr "Sigurime"
 
-#: src/postulo/core/server_views.py:1140 src/postulo/plugins/provenance.py:59
+#: src/postulo/core/server_views.py:1144 src/postulo/plugins/provenance.py:59
 #, draft
 msgid "Internal"
 msgstr "I brendshëm"
@@ -7319,6 +7573,22 @@ msgstr ""
 msgid "it did not finish importing within %(seconds)ss"
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:168
+msgid "it failed"
+msgstr ""
+
+#: src/postulo/core/kind_files.py:748 src/postulo/core/kind_files.py:783
+msgid "It has no company."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:533 src/postulo/core/kind_files.py:620
+msgid "It has no name."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:735
+msgid "It has no title."
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html:84
 msgid "It has nothing of its own in these, so the other's is used."
 msgstr ""
@@ -7344,11 +7614,11 @@ msgid ""
 "It is not a regular expression: nothing repeats without a limit, and where one part ends and the next begins must never be in doubt. In JSON a backslash is written twice, <code dir=\"ltr\">\\\\d</code>."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:613
+#: src/postulo/resume/candidate.py:589
 msgid "It is not written the way an entry is, so it could not be read."
 msgstr ""
 
-#: src/postulo/documents/views.py:665
+#: src/postulo/documents/views.py:747
 #, python-format, draft
 msgid ""
 "It is recorded as sent with %(count)d application, which will no longer say it was sent."
@@ -7386,7 +7656,7 @@ msgstr ""
 msgid "It said these differently, and what is here was kept:"
 msgstr ""
 
-#: src/postulo/documents/forms.py:491
+#: src/postulo/documents/forms.py:500
 msgid ""
 "It sets the shape the box below starts from, and which themes are offered."
 msgstr ""
@@ -7411,6 +7681,10 @@ msgstr ""
 
 #: src/postulo/jobs/merging.py:409
 msgid "It was the employer on the posting."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:166
+msgid "it worked"
 msgstr ""
 
 #: src/postulo/templates/accounts/invite_created.html:33
@@ -7446,6 +7720,11 @@ msgstr ""
 
 #: src/postulo/jobs/merging.py:160
 msgid "Its notes:"
+msgstr ""
+
+#: src/postulo/templates/documents/cv_detail.html:240
+msgid ""
+"Its properties are what a recruiter's software and a file manager read: the title, the author and the rest. They start as what the file has always carried; change them for this file only."
 msgstr ""
 
 #: src/postulo/applications/models.py:180
@@ -7507,6 +7786,10 @@ msgstr ""
 msgid "Keep a rendering of the pages I capture"
 msgstr ""
 
+#: src/postulo/core/models.py:1252
+msgid "keep the newest"
+msgstr ""
+
 #: src/postulo/templates/jobs/merge.html:50
 msgid "Keep the other one instead"
 msgstr ""
@@ -7528,7 +7811,7 @@ msgid ""
 "Keeping a page Postulo was allowed to fetch, for the person who asked for it, asks nothing more of robots.txt: no page is fetched a second time to keep it."
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:205
+#: src/postulo/templates/server/overview.html:218
 #, draft
 msgid "Keeping Postulo going"
 msgstr "Mbajtja e Postulos në këmbë"
@@ -7562,9 +7845,14 @@ msgstr ""
 msgid "Kept as it was written. The number that can be dialled is %(number)s."
 msgstr ""
 
-#: src/postulo/documents/views.py:742
+#: src/postulo/documents/views.py:824
 #: src/postulo/templates/documents/partials/copies.html:33
 msgid "Kept here only: a store is sent what went with an application."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:132
+#, python-format
+msgid "Kept in %(dir)s."
 msgstr ""
 
 #: src/postulo/templates/server/logs.html:142
@@ -7613,13 +7901,17 @@ msgid ""
 "Keys: <kbd class=\"kbd\">d</kbd> discards and moves on, <kbd class=\"kbd\">j</kbd> skips to the next, <kbd class=\"kbd\">Ctrl</kbd>+<kbd class=\"kbd\">Enter</kbd> saves and moves on — while nothing is being typed."
 msgstr ""
 
-#: src/postulo/documents/models.py:992 src/postulo/plugins/models.py:196
+#: src/postulo/documents/forms.py:596
+msgid "Keywords"
+msgstr ""
+
+#: src/postulo/documents/models.py:999 src/postulo/plugins/models.py:196
 #, draft
 msgid "label"
 msgstr "emri i shfaqur"
 
-#: src/postulo/accounts/forms.py:1544 src/postulo/resume/forms.py:314
-#: src/postulo/resume/registry.py:77
+#: src/postulo/accounts/forms.py:1544 src/postulo/documents/forms.py:602
+#: src/postulo/resume/forms.py:314 src/postulo/resume/registry.py:77
 #, draft
 msgid "Language"
 msgstr "Gjuha"
@@ -7653,7 +7945,7 @@ msgstr ""
 msgid "language of your career record"
 msgstr "gjuha e regjistrit tuaj të karrierës"
 
-#: src/postulo/documents/rendering.py:48 src/postulo/resume/candidate.py:273
+#: src/postulo/documents/rendering.py:49 src/postulo/resume/candidate.py:267
 #: src/postulo/resume/registry.py:78 src/postulo/resume/views.py:592
 #: src/postulo/resume/views_candidate.py:43
 #: src/postulo/templates/resume/europass_import.html:101
@@ -7721,10 +8013,14 @@ msgstr "Aktiviteti i fundit"
 msgid "last answer"
 msgstr ""
 
-#: src/postulo/documents/models.py:1017 src/postulo/notifications/models.py:75
+#: src/postulo/documents/models.py:1024 src/postulo/notifications/models.py:75
 #, draft
 msgid "last attempt"
 msgstr "përpjekja e fundit"
+
+#: src/postulo/templates/server/backups.html:174
+msgid "Last backup that worked"
+msgstr ""
 
 #: src/postulo/resume/models.py:317
 #, draft
@@ -7736,7 +8032,7 @@ msgstr "kontrolli i fundit"
 msgid "last checked"
 msgstr "kontrolluar së fundmi"
 
-#: src/postulo/documents/models.py:1019 src/postulo/notifications/models.py:77
+#: src/postulo/documents/models.py:1026 src/postulo/notifications/models.py:77
 #: src/postulo/plugins/models.py:205
 #, draft
 msgid "last error"
@@ -7767,6 +8063,10 @@ msgstr "Ekzekutimi i fundit %(when)s: %(report)s"
 #, draft
 msgid "last run's report"
 msgstr "raporti i ekzekutimit të fundit"
+
+#: src/postulo/templates/server/backups.html:158
+msgid "Last scheduled run"
+msgstr ""
 
 #: src/postulo/templates/server/people.html:40
 #: src/postulo/templates/server/people.html:54
@@ -7830,7 +8130,7 @@ msgstr "Lëreni bosh nëse ky është pozicioni juaj aktual."
 msgid "Leave it empty if it does not expire."
 msgstr ""
 
-#: src/postulo/documents/forms.py:611
+#: src/postulo/documents/forms.py:668
 msgid "Leave it empty to send the text of the letter you chose."
 msgstr ""
 
@@ -7844,7 +8144,15 @@ msgid ""
 "Leave the box empty and a CV in this language prints the name the ESCO classification gives this skill: “%(name)s”."
 msgstr ""
 
-#: src/postulo/templates/core/export.html:108
+#: src/postulo/templates/base.html:393
+msgid "Leave this page"
+msgstr ""
+
+#: src/postulo/templates/base.html:390
+msgid "Leave without saving?"
+msgstr ""
+
+#: src/postulo/templates/core/export.html:129
 #, draft
 msgid "Leaving"
 msgstr "Largohet"
@@ -7910,7 +8218,7 @@ msgstr "Lejo që ky çelës kalimi të më fusë vetë"
 msgid "Let {column} size itself"
 msgstr "Lëre {column} të përcaktojë vetë gjerësinë"
 
-#: src/postulo/documents/forms.py:573 src/postulo/documents/themes.py:73
+#: src/postulo/documents/forms.py:616 src/postulo/documents/themes.py:73
 #, draft
 msgid "Letter"
 msgstr "Letër"
@@ -7973,7 +8281,7 @@ msgstr "lidhje"
 msgid "Link"
 msgstr "Lidhje"
 
-#: src/postulo/documents/models.py:1009
+#: src/postulo/documents/models.py:1016
 #, draft
 msgid "link in the store"
 msgstr "lidhje në depo"
@@ -7982,7 +8290,7 @@ msgstr "lidhje në depo"
 msgid "Link services"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:45 src/postulo/resume/candidate.py:232
+#: src/postulo/documents/rendering.py:46 src/postulo/resume/candidate.py:226
 #: src/postulo/resume/registry.py:70 src/postulo/resume/views_candidate.py:39
 #: src/postulo/templates/resume/preview.html:79
 #, draft
@@ -8011,7 +8319,7 @@ msgid ""
 msgstr ""
 "Lidhje drejt vendeve ku kthehet një kërkim pune: tabela, CV-të, kompanitë."
 
-#: src/postulo/documents/forms.py:583
+#: src/postulo/documents/forms.py:626
 #: src/postulo/templates/documents/application_documents.html:62
 #, draft
 msgid "Links you pointed them at"
@@ -8046,8 +8354,8 @@ msgstr ""
 msgid "Listing filters"
 msgstr "Filtra shpalljesh"
 
-#: src/postulo/core/navigation.py:65 src/postulo/core/search.py:585
-#: src/postulo/jobs/tables.py:200
+#: src/postulo/core/kind_files.py:906 src/postulo/core/navigation.py:65
+#: src/postulo/core/search.py:585 src/postulo/jobs/tables.py:200
 #: src/postulo/templates/applications/report.html:218
 #: src/postulo/templates/core/import_csv_done.html:17
 #: src/postulo/templates/core/import_csv_map.html:116
@@ -8118,7 +8426,7 @@ msgstr "adresa e logos"
 msgid "logo fetched"
 msgstr "logoja u mor"
 
-#: src/postulo/core/server_sections.py:62 src/postulo/core/server_views.py:515
+#: src/postulo/core/server_sections.py:62 src/postulo/core/server_views.py:519
 #: src/postulo/templates/server/logs.html:6
 #: src/postulo/templates/server/logs.html:84
 #, draft
@@ -8401,11 +8709,11 @@ msgstr ""
 msgid "Merged."
 msgstr "U bashkua."
 
-#: src/postulo/documents/forms.py:608 src/postulo/jobs/models.py:1512
+#: src/postulo/documents/forms.py:665 src/postulo/jobs/models.py:1512
 msgid "Message"
 msgstr ""
 
-#: src/postulo/accounts/views.py:198 src/postulo/resume/candidate.py:1070
+#: src/postulo/accounts/views.py:198 src/postulo/resume/candidate.py:1046
 #: src/postulo/resume/views_candidate.py:46
 #: src/postulo/templates/partials/messaging_handles.html:11
 msgid "Messaging"
@@ -8459,7 +8767,11 @@ msgstr "Zë që mungon"
 msgid "Mobile"
 msgstr "Celular"
 
-#: src/postulo/templates/server/overview.html:217
+#: src/postulo/core/models.py:1241
+msgid "Monday"
+msgstr ""
+
+#: src/postulo/templates/server/overview.html:230
 #, draft
 msgid "Money"
 msgstr "Paratë"
@@ -8656,11 +8968,11 @@ msgstr ""
 msgid "Nationalities"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:837
+#: src/postulo/resume/candidate.py:813
 msgid "Nationalities are written as a list of country codes."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:829
+#: src/postulo/resume/candidate.py:805
 msgid "Nationality"
 msgstr ""
 
@@ -8673,7 +8985,7 @@ msgstr ""
 msgid "nationality scope"
 msgstr ""
 
-#: src/postulo/documents/rendering.py:284
+#: src/postulo/documents/rendering.py:348
 #, python-format
 msgid "Nationality: %(countries)s"
 msgstr ""
@@ -8791,7 +9103,7 @@ msgstr ""
 msgid "Next"
 msgstr "Tjetra"
 
-#: src/postulo/documents/models.py:1012 src/postulo/notifications/models.py:74
+#: src/postulo/documents/models.py:1019 src/postulo/notifications/models.py:74
 #, draft
 msgid "next attempt"
 msgstr "përpjekja tjetër"
@@ -8805,6 +9117,10 @@ msgstr "Intervista tjetër"
 #, draft
 msgid "Next reminder"
 msgstr "Kujtesa tjetër"
+
+#: src/postulo/templates/server/backups.html:150
+msgid "Next run"
+msgstr ""
 
 #: src/postulo/core/server_forms.py:17
 #, draft
@@ -8821,12 +9137,17 @@ msgid "No agency"
 msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html:80
+#: src/postulo/templates/documents/letter_detail.html:126
 #, draft
 msgid "No application"
 msgstr "Pa aplikim"
 
 #: src/postulo/templates/jobs/merge.html:150
 msgid "No application is touched, so no timeline changes."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:124
+msgid "No backups yet. Take one above."
 msgstr ""
 
 #: src/postulo/plugins/catalogue.py:228
@@ -8871,7 +9192,7 @@ msgstr "Ende asnjë kompani. Krijohen për ju kur regjistroni një aplikim."
 msgid "no company"
 msgstr "pa kompani"
 
-#: src/postulo/core/server_views.py:895
+#: src/postulo/core/server_views.py:899
 #, python-format, draft
 msgid "No connection: %(why)s"
 msgstr "Pa lidhje: %(why)s"
@@ -8891,7 +9212,7 @@ msgid ""
 "No country has the dialling code that number begins with, so it could not be checked. It is kept as it was typed."
 msgstr ""
 
-#: src/postulo/documents/views.py:733
+#: src/postulo/documents/views.py:815
 #, draft
 msgid "No document store is connected. Add one under Settings → Connections."
 msgstr ""
@@ -8913,7 +9234,7 @@ msgstr ""
 msgid "No icon"
 msgstr ""
 
-#: src/postulo/documents/forms.py:211
+#: src/postulo/documents/forms.py:220
 msgid "No identifiers"
 msgstr ""
 
@@ -8977,6 +9298,10 @@ msgid ""
 "No letters yet. A cover letter is for one posting; a motivation letter tells your story; a speculative letter goes where nothing is advertised; a follow-up note comes after an interview."
 msgstr ""
 "Ende asnjë letër. Një letër motivimi është për një shpallje; një letër motivuese tregon historinë tuaj; një letër me nismë shkon atje ku nuk shpallet asgjë; një shënim ndjekjeje vjen pas një interviste."
+
+#: src/postulo/templates/server/backup_restore.html:62
+msgid "No media"
+msgstr ""
 
 #: src/postulo/documents/printing.py:158 src/postulo/documents/printing.py:159
 msgid "No messaging handle"
@@ -9089,6 +9414,11 @@ msgstr "Nuk është instaluar asnjë temë që mund ta faqosë këtë dokument."
 msgid "No website"
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:60
+msgid ""
+"No worker is configured, so this page waits until the backup is finished. An instance with a lot of files takes a while."
+msgstr ""
+
 #: src/postulo/templates/server/signin.html:37
 #, draft
 msgid "no — each person connects it themselves"
@@ -9185,6 +9515,7 @@ msgstr "Asnjë"
 
 #: src/postulo/templates/applications/report.html:158
 #: src/postulo/templates/applications/report_print.html:123
+#: src/postulo/templates/server/backup_restore.html:66
 #, draft
 msgid "none"
 msgstr "asnjë"
@@ -9209,6 +9540,8 @@ msgstr "Asgjë e mbetur."
 msgid "none usable"
 msgstr "asnjë i përdorshëm"
 
+#: src/postulo/templates/server/backups.html:171
+#: src/postulo/templates/server/backups.html:179
 #: src/postulo/templates/server/overview.html:177
 #, draft
 msgid "none yet"
@@ -9242,7 +9575,7 @@ msgstr ""
 msgid "Not a possible number"
 msgstr ""
 
-#: src/postulo/documents/models.py:970
+#: src/postulo/documents/models.py:977
 #, draft
 msgid "Not accepted"
 msgstr "Nuk u pranua"
@@ -9268,6 +9601,10 @@ msgstr "Nuk u kontrollua"
 
 #: src/postulo/templates/server/overview.html:36
 msgid "not checked"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:106
+msgid "Not checked yet"
 msgstr ""
 
 #: src/postulo/templates/server/overview.html:52
@@ -9336,7 +9673,7 @@ msgstr "Nuk është pjesë e një kompanie tjetër"
 msgid "Not recorded"
 msgstr "Nuk u regjistrua"
 
-#: src/postulo/documents/forms.py:531
+#: src/postulo/documents/forms.py:540
 msgid "Not said"
 msgstr ""
 
@@ -9353,7 +9690,7 @@ msgstr ""
 msgid "Not sent yet"
 msgstr "Nuk është dërguar ende"
 
-#: src/postulo/core/server_views.py:695
+#: src/postulo/core/server_views.py:699
 #, draft
 msgid "Not set"
 msgstr "E pacaktuar"
@@ -9473,6 +9810,7 @@ msgstr[1] "Asgjë nuk i plotëson %(names)s, prandaj dalin bosh."
 msgid "Nothing has arrived about this one yet."
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:125
 #: src/postulo/templates/resume/candidate_file.html:124
 msgid ""
 "Nothing has been added yet. What you already have stays exactly as it is, whatever the file says about it."
@@ -9610,7 +9948,7 @@ msgstr ""
 msgid "Nothing on %(host)s could be used as a logo: %(reason)s"
 msgstr ""
 
-#: src/postulo/documents/slow.py:48
+#: src/postulo/documents/slow.py:51
 msgid "Nothing on it has changed, so this is the PDF already filed."
 msgstr ""
 
@@ -9685,7 +10023,7 @@ msgstr ""
 msgid "Nothing scheduled."
 msgstr "Asgjë e caktuar."
 
-#: src/postulo/templates/documents/rendered_list.html:77
+#: src/postulo/templates/documents/rendered_list.html:83
 #, draft
 msgid "Nothing sent yet."
 msgstr "Ende asgjë e dërguar."
@@ -9736,10 +10074,15 @@ msgstr "Ende asgjë e ngarkuar."
 msgid "Nothing waiting"
 msgstr "Asgjë në pritje"
 
-#: src/postulo/documents/views.py:223 src/postulo/documents/views.py:247
+#: src/postulo/documents/views.py:267 src/postulo/documents/views.py:291
 #, draft
 msgid "Nothing was added."
 msgstr "Nuk u shtua asgjë."
+
+#: src/postulo/core/views_kind_files.py:123
+msgid ""
+"Nothing was added. What that file holds is already in your account, or could not be added."
+msgstr ""
 
 #: src/postulo/resume/views_candidate.py:153
 msgid ""
@@ -9752,12 +10095,12 @@ msgid "Nothing was connected. Nobody agreed to anything."
 msgstr "Asgjë nuk u lidh. Askush nuk pranoi asgjë."
 
 #: src/postulo/accounts/settings_views.py:385
-#: src/postulo/core/server_views.py:1359 src/postulo/core/server_views.py:1393
+#: src/postulo/core/server_views.py:1363 src/postulo/core/server_views.py:1397
 #, draft
 msgid "Nothing was different."
 msgstr "Asgjë nuk ishte ndryshe."
 
-#: src/postulo/core/server_views.py:1588
+#: src/postulo/core/server_views.py:1592
 #, draft
 msgid "Nothing was installed."
 msgstr "Nuk u instalua asgjë."
@@ -9847,6 +10190,10 @@ msgid ""
 "Of the listings you noticed, how many you applied to and how many you let go."
 msgstr "Nga shpalljet që vutë re — për sa aplikuat dhe sa i latë të shkojnë."
 
+#: src/postulo/core/models.py:1226
+msgid "Off"
+msgstr ""
+
 #: src/postulo/plugins/models.py:111
 #, draft
 msgid "Off — and they may not switch it on"
@@ -9935,10 +10282,19 @@ msgstr ""
 msgid "Official"
 msgstr "Zyrtare"
 
+#: src/postulo/core/models.py:1255
+msgid ""
+"Older backups are deleted only after a new one has been written and checked. Archives you uploaded are never deleted by this."
+msgstr ""
+
 #: src/postulo/templates/server/overview.html:174
 #, draft
 msgid "older than a week"
 msgstr "më e vjetër se një javë"
+
+#: src/postulo/core/models.py:1238
+msgid "on"
+msgstr ""
 
 #: src/postulo/templates/applications/tag_form.html:35
 msgid "On a board it looks like this:"
@@ -10047,6 +10403,15 @@ msgid_plural "%(counter)s drafts in this period are left out."
 msgstr[0] "Një skicë e kësaj periudhe lihet jashtë."
 msgstr[1] "%(counter)s skica të kësaj periudhe lihen jashtë."
 
+#: src/postulo/core/kind_files.py:826
+#, python-format
+msgid ""
+"One entry of its timeline or one interview cannot be added, and is left out."
+msgid_plural ""
+"%(count)s entries of its timeline or interviews cannot be added, and are left out."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/resume/views_candidate.py:141
 #, python-format
 msgid ""
@@ -10065,6 +10430,15 @@ msgstr[1] "%(counter)s shtojca të instaluara mund të lidhen."
 
 #: src/postulo/templates/core/export.html:53
 msgid "One is already built"
+msgstr ""
+
+#: src/postulo/templates/core/export.html:91
+msgid "One kind of record as a file"
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:11
+msgid ""
+"One kind of record in a JSON file of its own: to keep, to read, or to hand to another Postulo."
 msgstr ""
 
 #: src/postulo/resume/models.py:312
@@ -10107,7 +10481,7 @@ msgid ""
 "One of a list. Without scripts it is the browser's own select; with them, a button and a list whose options can hold a flag or an icon."
 msgstr ""
 
-#: src/postulo/documents/views.py:974
+#: src/postulo/documents/views.py:1060
 msgid "One of the files you chose could not be read, so nothing was sent."
 msgstr ""
 
@@ -10159,6 +10533,14 @@ msgstr[1] ""
 msgid "One per line. A CV prints them as bullets."
 msgstr ""
 
+#: src/postulo/core/views_kind_files.py:113
+#, python-format
+msgid "One record was added. Nothing you already had was changed or removed."
+msgid_plural ""
+"%(total)s records were added. Nothing you already had was changed or removed."
+msgstr[0] ""
+msgstr[1] ""
+
 #: src/postulo/templates/help/postal_addresses.html:5
 msgid ""
 "One row for each address you want to keep. <em>Kind</em> says which it is and can be left blank. Choose <em>Other</em> and a box asks what to call it."
@@ -10168,6 +10550,13 @@ msgstr ""
 msgid ""
 "One row for each number. A new number goes in the empty row at the end of the list: saving the page adds it and offers another empty row."
 msgstr ""
+
+#: src/postulo/core/kind_files.py:930
+#, python-format
+msgid "One row is not a record, and is not read."
+msgid_plural "%(count)s rows are not records, and are not read."
+msgstr[0] ""
+msgstr[1] ""
 
 #: src/postulo/core/templatetags/postulo.py:681
 #, python-format, draft
@@ -10216,7 +10605,7 @@ msgid ""
 msgstr ""
 "Një variant për çdo lloj pozicioni. Secili zgjedh nga rrugëtimi yt; një portofol nis me punën."
 
-#: src/postulo/documents/forms.py:227
+#: src/postulo/documents/forms.py:236
 msgid "One you add to your details later is not printed until you tick it here."
 msgstr ""
 
@@ -10236,7 +10625,7 @@ msgstr "Vetëm %(name)s"
 msgid "Only a discarded capture can be put back."
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:246
+#: src/postulo/templates/documents/cv_detail.html:261
 #, draft
 msgid "Only entries not already on it are listed."
 msgstr "Renditen vetëm zërat që nuk janë ende në të."
@@ -10251,6 +10640,10 @@ msgstr ""
 #: src/postulo/applications/forms.py:531
 msgid ""
 "Only for Rejected, Withdrawn and Ghosted, and never required. A reason you learn later can be added then: choose the same status again, and the reason."
+msgstr ""
+
+#: src/postulo/core/models.py:1249
+msgid "Only for weekly backups."
 msgstr ""
 
 #: src/postulo/accounts/forms.py:1341
@@ -10279,7 +10672,7 @@ msgid ""
 "Only the applications that name a referrer or an agency are in these two; the company on a posting stays the employer."
 msgstr ""
 
-#: src/postulo/documents/forms.py:210
+#: src/postulo/documents/forms.py:219
 msgid "Only the ones ticked below"
 msgstr ""
 
@@ -10333,6 +10726,10 @@ msgstr ""
 #: src/postulo/templates/partials/table/views.html:50
 #, python-format
 msgid "Open the table as %(name)s"
+msgstr ""
+
+#: src/postulo/documents/formats.py:175
+msgid "OpenDocument text"
 msgstr ""
 
 #: src/postulo/templates/jobs/partials/company_row.html:93
@@ -10645,7 +11042,7 @@ msgstr ""
 msgid "PDF"
 msgstr ""
 
-#: src/postulo/documents/slow.py:50
+#: src/postulo/documents/slow.py:53
 #, draft
 msgid "PDF created."
 msgstr "PDF-ja u krijua."
@@ -10655,7 +11052,7 @@ msgstr "PDF-ja u krijua."
 msgid "PDF renderer"
 msgstr "Motori i PDF-së"
 
-#: src/postulo/documents/forms.py:514
+#: src/postulo/documents/forms.py:523
 msgid ""
 "PDF, Word, OpenDocument, RTF, plain text, PNG or JPEG. Postulo keeps it exactly as uploaded, under a name of its own — what you send is the file you gave it."
 msgstr ""
@@ -10675,9 +11072,9 @@ msgid "Pension, insurance, allowances, equipment: whatever was named."
 msgstr ""
 
 #: src/postulo/core/search.py:587 src/postulo/core/server_sections.py:15
-#: src/postulo/core/server_views.py:219 src/postulo/core/server_views.py:308
-#: src/postulo/core/server_views.py:325 src/postulo/core/server_views.py:407
-#: src/postulo/core/server_views.py:424 src/postulo/jobs/merging.py:352
+#: src/postulo/core/server_views.py:223 src/postulo/core/server_views.py:312
+#: src/postulo/core/server_views.py:329 src/postulo/core/server_views.py:411
+#: src/postulo/core/server_views.py:428 src/postulo/jobs/merging.py:352
 #: src/postulo/jobs/tables.py:127
 #: src/postulo/templates/jobs/company_detail.html:241
 #: src/postulo/templates/server/people.html:7
@@ -10809,7 +11206,7 @@ msgstr ""
 msgid "place on the page"
 msgstr ""
 
-#: src/postulo/templates/documents/letter_detail.html:111
+#: src/postulo/templates/documents/letter_detail.html:151
 #, draft
 msgid "Placeholders"
 msgstr "Vendmbajtëse"
@@ -10842,7 +11239,7 @@ msgstr ""
 msgid "Plain table"
 msgstr ""
 
-#: src/postulo/documents/formats.py:162 src/postulo/jobs/models.py:764
+#: src/postulo/documents/formats.py:168 src/postulo/jobs/models.py:764
 msgid "Plain text"
 msgstr ""
 
@@ -10882,9 +11279,10 @@ msgid "plugin repository"
 msgstr "depo shtojcash"
 
 #: src/postulo/accounts/settings_views.py:352
-#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:1027
-#: src/postulo/core/server_views.py:1090
+#: src/postulo/core/server_sections.py:42 src/postulo/core/server_views.py:1031
+#: src/postulo/core/server_views.py:1094
 #: src/postulo/core/settings_sections.py:108 src/postulo/plugins/apps.py:9
+#: src/postulo/templates/server/backup_restore.html:65
 #: src/postulo/templates/server/plugins.html:6
 #: src/postulo/templates/server/plugins.html:498
 #: src/postulo/templates/settings/plugins.html:7
@@ -10892,7 +11290,7 @@ msgstr "depo shtojcash"
 msgid "Plugins"
 msgstr "Shtojca"
 
-#: src/postulo/core/server_views.py:1387
+#: src/postulo/core/server_views.py:1391
 #: src/postulo/templates/server/person_plugins.html:6
 #, python-format, draft
 msgid "Plugins for %(name)s"
@@ -10996,7 +11394,7 @@ msgid "postal addresses"
 msgstr "adresa postare"
 
 #: src/postulo/accounts/views.py:216 src/postulo/core/help.py:125
-#: src/postulo/jobs/merging.py:559 src/postulo/resume/candidate.py:996
+#: src/postulo/jobs/merging.py:559 src/postulo/resume/candidate.py:972
 #: src/postulo/resume/views_candidate.py:47
 #: src/postulo/templates/partials/postal_addresses.html:36
 #, draft
@@ -11119,7 +11517,7 @@ msgid ""
 "Postulo has forgotten it. The provider still has the grant until you withdraw it there as well."
 msgstr "Postulo e harroi. Ofruesi e ka ende lejen derisa ta tërhiqni edhe atje."
 
-#: src/postulo/core/server_views.py:915
+#: src/postulo/core/server_views.py:919
 #, draft
 msgid ""
 "Postulo has forgotten the grant. The provider still has it until you withdraw it there as well."
@@ -11161,6 +11559,10 @@ msgstr ""
 
 #: src/postulo/accounts/forms.py:1340
 msgid "Postulo tidies it into the register's own spelling and checks the shape."
+msgstr ""
+
+#: src/postulo/templates/server/backup_restore.html:51
+msgid "Postulo version"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html:77
@@ -11210,12 +11612,12 @@ msgstr "parashtesë"
 msgid "preparation notes"
 msgstr "shënime përgatitjeje"
 
-#: src/postulo/documents/rendering.py:354
-#: src/postulo/documents/rendering.py:359
-#: src/postulo/templates/documents/themes/base_cv.html:156
+#: src/postulo/documents/rendering.py:421
+#: src/postulo/documents/rendering.py:426
+#: src/postulo/templates/cotton/review_sections.html:34
+#: src/postulo/templates/documents/themes/base_cv.html:162
 #: src/postulo/templates/documents/themes/base_portfolio.html:87
 #: src/postulo/templates/documents/themes/base_portfolio.html:158
-#: src/postulo/templates/resume/candidate_file.html:168
 #: src/postulo/templates/resume/preview.html:28
 #, draft
 msgid "present"
@@ -11297,11 +11699,11 @@ msgstr ""
 msgid "print your pronouns after your name"
 msgstr ""
 
-#: src/postulo/documents/forms.py:110
+#: src/postulo/documents/forms.py:119
 msgid "Printed as things stand: {value}."
 msgstr ""
 
-#: src/postulo/documents/forms.py:492
+#: src/postulo/documents/forms.py:501
 msgid "Printed at the top. It takes the same placeholders as the body."
 msgstr ""
 
@@ -11361,7 +11763,7 @@ msgstr "projekt"
 msgid "Project"
 msgstr "Projekt"
 
-#: src/postulo/documents/rendering.py:44 src/postulo/resume/candidate.py:222
+#: src/postulo/documents/rendering.py:45 src/postulo/resume/candidate.py:216
 #: src/postulo/resume/registry.py:45 src/postulo/resume/views_candidate.py:38
 #: src/postulo/templates/resume/europass_import.html:144
 #: src/postulo/templates/resume/preview.html:61
@@ -11458,11 +11860,12 @@ msgstr ""
 msgid "Put them back"
 msgstr ""
 
-#: src/postulo/templates/core/export.html:96
+#: src/postulo/templates/core/export.html:117
 #, draft
 msgid "Putting it back"
 msgstr "Si të kthehet"
 
+#: src/postulo/templates/core/kind_file.html:67
 #: src/postulo/templates/resume/candidate_file.html:61
 msgid "Putting one back"
 msgstr ""
@@ -11635,6 +12038,7 @@ msgstr ""
 msgid "Read it. Check what was found before it becomes a listing."
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:80
 #: src/postulo/templates/resume/candidate_file.html:74
 msgid "Read the file"
 msgstr ""
@@ -11678,7 +12082,7 @@ msgstr ""
 msgid "Recent activity"
 msgstr "Aktivitet i fundit"
 
-#: src/postulo/documents/forms.py:605
+#: src/postulo/documents/forms.py:662
 msgid "Recipient"
 msgstr ""
 
@@ -11751,12 +12155,12 @@ msgstr "Regjistruar si e anuluar."
 msgid "Recorded as held."
 msgstr "Regjistruar si e mbajtur."
 
-#: src/postulo/documents/forms.py:587
+#: src/postulo/documents/forms.py:630
 msgid ""
 "Recorded as part of what they were sent. Postulo sends nothing itself — this is the note of what you sent."
 msgstr ""
 
-#: src/postulo/documents/forms.py:621
+#: src/postulo/documents/forms.py:678
 msgid ""
 "Recorded as part of what they were sent. They are not added to the email."
 msgstr ""
@@ -11771,7 +12175,7 @@ msgstr "regjistruar nga"
 msgid "recorded on"
 msgstr "regjistruar më"
 
-#: src/postulo/documents/slow.py:96
+#: src/postulo/documents/slow.py:107
 #, draft
 msgid "Recorded what you sent."
 msgstr "U regjistrua çfarë dërguat."
@@ -11780,6 +12184,11 @@ msgstr "U regjistrua çfarë dërguat."
 #, draft
 msgid "Recorded: nobody showed up."
 msgstr "Regjistruar: askush nuk u paraqit."
+
+#: src/postulo/templates/server/backup_restore.html:55
+#: src/postulo/templates/server/backups.html:78
+msgid "Records"
+msgstr ""
 
 #: src/postulo/core/models.py:1190
 msgid "records about other people are kept for (days)"
@@ -12051,7 +12460,7 @@ msgstr ""
 msgid "Rename %(what)s"
 msgstr ""
 
-#: src/postulo/documents/models.py:838
+#: src/postulo/documents/models.py:845
 #, draft
 msgid "rendered on"
 msgstr "krijuar më"
@@ -12104,9 +12513,23 @@ msgstr "Rivendos"
 
 #: src/postulo/templates/jobs/partials/listing_row.html:116
 #: src/postulo/templates/jobs/posting_detail.html:49
+#: src/postulo/templates/server/backups.html:116
 #, draft
 msgid "Restore"
 msgstr "Riktheje"
+
+#: src/postulo/templates/server/backup_restore.html:8
+msgid "Restore from a backup"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:202
+msgid "Restore from an archive"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:204
+msgid ""
+"Restoring replaces the database under a running instance, so it is done on the command line with the services stopped. Choose Restore beside an archive above, or upload one here; the page that opens checks it, shows what it holds, and writes out the commands for this installation."
+msgstr ""
 
 #: src/postulo/resume/apps.py:9
 #, draft
@@ -12260,6 +12683,10 @@ msgstr "Ekzekuto"
 msgid "Run the dry run"
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:58
+msgid "Runs in the background; you can leave this page while it works."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:58
 #, draft
 msgid "Salaries are in"
@@ -12303,6 +12730,10 @@ msgstr "Paga deri"
 msgid "salary to"
 msgstr "paga deri"
 
+#: src/postulo/core/models.py:1246
+msgid "Saturday"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html:321
 #: src/postulo/templates/applications/application_form.html:36
 #: src/postulo/templates/applications/application_intake.html:77
@@ -12322,6 +12753,7 @@ msgstr "paga deri"
 #: src/postulo/templates/partials/table/cell.html:41
 #: src/postulo/templates/resume/item_form.html:39
 #: src/postulo/templates/resume/translations.html:96
+#: src/postulo/templates/server/backups.html:146
 #: src/postulo/templates/server/capture.html:125
 #: src/postulo/templates/server/data_protection.html:43
 #: src/postulo/templates/server/defaults.html:57
@@ -12393,9 +12825,10 @@ msgstr "U ruajt te shpalljet tuaja. Vendosni për të kur të jeni gati."
 
 #: src/postulo/accounts/settings_views.py:49
 #: src/postulo/accounts/settings_views.py:385
-#: src/postulo/core/server_views.py:470 src/postulo/core/server_views.py:639
-#: src/postulo/core/server_views.py:1359 src/postulo/core/server_views.py:1393
-#: src/postulo/core/server_views.py:1493 src/postulo/resume/views.py:322
+#: src/postulo/core/server_views.py:474 src/postulo/core/server_views.py:643
+#: src/postulo/core/server_views.py:1363 src/postulo/core/server_views.py:1397
+#: src/postulo/core/server_views.py:1497 src/postulo/core/views_backups.py:112
+#: src/postulo/resume/views.py:322
 #, draft
 msgid "Saved."
 msgstr "U ruajt."
@@ -12428,12 +12861,13 @@ msgstr "Thoni çfarë është ky numër."
 msgid "Say which currency the amount is in."
 msgstr ""
 
-#: src/postulo/documents/forms.py:678
+#: src/postulo/documents/forms.py:735
 msgid "Say who to send it to."
 msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html:267
 #: src/postulo/templates/applications/interview_form.html:69
+#: src/postulo/templates/server/backups.html:139
 #, draft
 msgid "Schedule"
 msgstr "Cakto"
@@ -12448,6 +12882,14 @@ msgstr "Cakto një intervistë"
 #, draft
 msgid "Scheduled"
 msgstr "Caktuar"
+
+#: src/postulo/core/models.py:1222
+msgid "scheduled backups"
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:155
+msgid "Scheduled backups are off."
+msgstr ""
 
 #: src/postulo/templates/applications/interview_list.html:23
 #, draft
@@ -12551,6 +12993,10 @@ msgstr "Shih shpalljet"
 msgid "See what would move"
 msgstr ""
 
+#: src/postulo/templates/server/overview.html:186
+msgid "See why"
+msgstr ""
+
 #: src/postulo/templates/applications/partials/application_row.html:11
 #: src/postulo/templates/jobs/partials/company_row.html:11
 #: src/postulo/templates/jobs/partials/listing_row.html:17
@@ -12609,7 +13055,7 @@ msgstr "Dërgo te depot tani"
 msgid "Sending as yourself"
 msgstr "Dërgim si ju vetë"
 
-#: src/postulo/core/server_views.py:976
+#: src/postulo/core/server_views.py:980
 #, python-format, draft
 msgid "Sending failed: %(error)s"
 msgstr "Dërgimi dështoi: %(error)s"
@@ -12628,12 +13074,12 @@ msgstr "Dërguar"
 msgid "sent at"
 msgstr ""
 
-#: src/postulo/documents/models.py:863
+#: src/postulo/documents/models.py:870
 #, draft
 msgid "sent document"
 msgstr "dokument i dërguar"
 
-#: src/postulo/documents/models.py:864
+#: src/postulo/documents/models.py:871
 #, draft
 msgid "sent documents"
 msgstr "dokumente të dërguara"
@@ -12648,12 +13094,12 @@ msgstr "dokumente të dërguara"
 msgid "Sent documents"
 msgstr "Dokumente të dërguara"
 
-#: src/postulo/documents/forms.py:600
+#: src/postulo/documents/forms.py:657
 msgid ""
 "Sent first, over your own outbox, with the CV, the letter and the files you chose attached. They are frozen and recorded only if the email went."
 msgstr ""
 
-#: src/postulo/documents/models.py:1018
+#: src/postulo/documents/models.py:1025
 #, draft
 msgid "sent on"
 msgstr "dërguar më"
@@ -12663,7 +13109,7 @@ msgstr "dërguar më"
 msgid "sent to"
 msgstr "dërguar te"
 
-#: src/postulo/core/server_views.py:979
+#: src/postulo/core/server_views.py:983
 #, python-format, draft
 msgid "Sent to %(to)s."
 msgstr "Dërguar te %(to)s."
@@ -12781,6 +13227,7 @@ msgstr "Vendoseni kur vendi i punës nuk është më i disponueshëm."
 
 #: src/postulo/templates/api/token_list.html:4
 #: src/postulo/templates/base.html:244 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/core/kind_file.html:4
 #: src/postulo/templates/documents/cv_detail.html:28
 #: src/postulo/templates/server/email.html:149
 #: src/postulo/templates/server/plugins.html:102
@@ -12967,7 +13414,7 @@ msgstr ""
 msgid "Sign out"
 msgstr "Dil"
 
-#: src/postulo/core/server_sections.py:30 src/postulo/core/server_views.py:486
+#: src/postulo/core/server_sections.py:30 src/postulo/core/server_views.py:490
 #: src/postulo/templates/server/signin.html:8
 #, draft
 msgid "Sign-in"
@@ -13046,7 +13493,7 @@ msgstr ""
 msgid "Site search"
 msgstr "Kërkim në faqe"
 
-#: src/postulo/core/models.py:1228 src/postulo/core/models.py:1229
+#: src/postulo/core/models.py:1282 src/postulo/core/models.py:1283
 #, draft
 msgid "site settings"
 msgstr "cilësimet e faqes"
@@ -13056,6 +13503,7 @@ msgid "size"
 msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html:147
+#: src/postulo/templates/server/backups.html:75
 msgid "Size"
 msgstr ""
 
@@ -13100,7 +13548,7 @@ msgstr "Grup aftësish"
 msgid "skill groups"
 msgstr "grupe aftësish"
 
-#: src/postulo/documents/rendering.py:46 src/postulo/resume/candidate.py:253
+#: src/postulo/documents/rendering.py:47 src/postulo/resume/candidate.py:247
 #: src/postulo/resume/registry.py:52 src/postulo/resume/registry.py:56
 #: src/postulo/resume/views.py:593 src/postulo/resume/views_candidate.py:41
 #: src/postulo/templates/resume/europass_import.html:135
@@ -13267,7 +13715,7 @@ msgstr ""
 msgid "Somebody has agreed to this. Test it to be sure it still stands."
 msgstr "Dikush e ka pranuar këtë. Testojeni për t'u siguruar se ende qëndron."
 
-#: src/postulo/resume/candidate.py:611
+#: src/postulo/resume/candidate.py:587
 msgid "Something that is not an entry"
 msgstr ""
 
@@ -13275,7 +13723,7 @@ msgstr ""
 msgid "Something went wrong"
 msgstr ""
 
-#: src/postulo/core/errands.py:172
+#: src/postulo/core/errands.py:172 src/postulo/core/slow.py:133
 msgid "Something went wrong. The server log has the details."
 msgstr ""
 
@@ -13350,7 +13798,8 @@ msgstr "Letër me nismë"
 msgid "Stable"
 msgstr ""
 
-#: src/postulo/templates/resume/candidate_file.html:194
+#: src/postulo/templates/core/kind_file.html:148
+#: src/postulo/templates/resume/candidate_file.html:147
 #: src/postulo/templates/resume/europass_import.html:178
 #, draft
 msgid "Start again"
@@ -13418,7 +13867,7 @@ msgid "State"
 msgstr "Gjendja"
 
 #: src/postulo/api/models.py:196 src/postulo/applications/models.py:358
-#: src/postulo/applications/models.py:946 src/postulo/documents/models.py:1006
+#: src/postulo/applications/models.py:946 src/postulo/documents/models.py:1013
 #: src/postulo/jobs/models.py:1296 src/postulo/notifications/models.py:71
 #, draft
 msgid "status"
@@ -13491,6 +13940,10 @@ msgstr "Ende gjallë, në bisedë, ofertat, dhe çfarë dërguat muajin e fundit
 msgid "Still live, waiting, rejected, ghosted: what became of what you sent."
 msgstr ""
 
+#: src/postulo/templates/server/backups.html:164
+msgid "still running"
+msgstr ""
+
 #: src/postulo/templates/server/person_recovery.html:91
 #, draft
 msgid "Stop it working"
@@ -13506,7 +13959,7 @@ msgstr ""
 msgid "Stop sorting by %(column)s"
 msgstr "Ndalo renditjen sipas %(column)s"
 
-#: src/postulo/documents/models.py:991
+#: src/postulo/documents/models.py:998
 #, draft
 msgid "store"
 msgstr "depo"
@@ -13525,7 +13978,7 @@ msgstr "I fortë"
 msgid "Study"
 msgstr ""
 
-#: src/postulo/documents/forms.py:606
+#: src/postulo/documents/forms.py:594 src/postulo/documents/forms.py:663
 msgid "Subject"
 msgstr ""
 
@@ -13572,12 +14025,16 @@ msgstr "Sugjerime nga shtojcat"
 msgid "summary"
 msgstr "përmbledhje"
 
+#: src/postulo/core/models.py:1247
+msgid "Sunday"
+msgstr ""
+
 #: src/postulo/templates/documents/upload_list.html:55
 #, draft
 msgid "superseded"
 msgstr "zëvendësuar"
 
-#: src/postulo/documents/forms.py:546
+#: src/postulo/documents/forms.py:555
 #, draft
 msgid "Supersedes"
 msgstr "Zëvendëson"
@@ -13739,11 +14196,22 @@ msgstr "Hiq %(name)s"
 msgid "Take me to it"
 msgstr ""
 
+#: src/postulo/templates/server/overview.html:197
+#, python-format
+msgid ""
+"Take, download and schedule backups under <a href=\"%(backups_url)s\" class=\"underline\">Backups</a>, or run <code>manage.py backup</code>; see the wiki page on backups for restoring."
+msgstr ""
+
+#: src/postulo/core/slow.py:112
+msgid "Taking a backup"
+msgstr ""
+
 #: src/postulo/templates/cotton/identifier_schemes.html:102
 msgid ""
 "Taking a scheme out deletes no identifier. The ones recorded under it are kept and shown under its key, with no link, and are what they were again once the scheme is back. Changing a scheme's pattern refuses none either: an identifier that no longer fits is kept as it was, marked where it is shown, and checked when it is next changed."
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:20
 #: src/postulo/templates/resume/candidate_file.html:20
 msgid "Taking it out"
 msgstr ""
@@ -13789,7 +14257,7 @@ msgid "telephone numbers"
 msgstr "numra telefoni"
 
 #: src/postulo/accounts/views.py:211 src/postulo/core/help.py:107
-#: src/postulo/jobs/merging.py:555 src/postulo/resume/candidate.py:912
+#: src/postulo/jobs/merging.py:555 src/postulo/resume/candidate.py:888
 #: src/postulo/resume/views_candidate.py:45
 #: src/postulo/templates/partials/phone_numbers.html:34
 #, draft
@@ -13894,7 +14362,7 @@ msgstr "Ajo adresë ridrejtoi shumë herë."
 msgid "That address returned %(kind)s rather than a web page."
 msgstr "Ajo adresë ktheu %(kind)s në vend të një faqeje uebi."
 
-#: src/postulo/documents/slow.py:77
+#: src/postulo/documents/slow.py:81
 msgid "That application is no longer here."
 msgstr ""
 
@@ -13937,7 +14405,7 @@ msgid ""
 "That could not be read as a telephone number, so it could not be checked. It is kept as it was typed."
 msgstr ""
 
-#: src/postulo/documents/slow.py:40
+#: src/postulo/documents/slow.py:41
 msgid "That CV is no longer here."
 msgstr ""
 
@@ -13997,7 +14465,7 @@ msgstr ""
 msgid "That entry could not be saved."
 msgstr "Ai zë nuk mundi të ruhej."
 
-#: src/postulo/core/views_export.py:76
+#: src/postulo/core/views_export.py:88
 msgid "That export has expired. Ask for a new one."
 msgstr ""
 
@@ -14015,22 +14483,29 @@ msgstr ""
 msgid "That file could not be read as an image."
 msgstr "Ai skedar nuk mundi të lexohej si imazh."
 
-#: src/postulo/documents/views.py:433
+#: src/postulo/documents/views.py:115
 msgid "That file could not be written. The server log has the details."
 msgstr ""
 
-#: src/postulo/plugins/base.py:409 src/postulo/resume/candidate.py:381
+#: src/postulo/core/kind_files.py:350
+msgid ""
+"That file holds another kind of record. Read it from the page of the kind it holds."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:317 src/postulo/plugins/base.py:409
+#: src/postulo/resume/candidate.py:357
 #, draft
 msgid "That file is empty."
 msgstr "Ai skedar është bosh."
 
-#: src/postulo/plugins/base.py:412 src/postulo/resume/candidate.py:384
+#: src/postulo/core/kind_files.py:320 src/postulo/core/views_kind_files.py:86
+#: src/postulo/plugins/base.py:412 src/postulo/resume/candidate.py:360
 #: src/postulo/resume/views_candidate.py:112
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Ai skedar është më i madh se %(limit)s MB, prandaj nuk u lexua."
 
-#: src/postulo/documents/forms.py:552
+#: src/postulo/documents/forms.py:561
 #, python-format, draft
 msgid "That file is larger than %(limit)s MB."
 msgstr "Ai skedar është më i madh se %(limit)s MB."
@@ -14041,6 +14516,11 @@ msgstr "Ai skedar është më i madh se %(limit)s MB."
 #, draft
 msgid "That file is larger than a logo should be."
 msgstr "Ai skedar është më i madh se sa duhet të jetë një logo."
+
+#: src/postulo/core/views_backups.py:246
+#, python-format
+msgid "That file is larger than the %(mb)s MB this instance accepts."
+msgstr ""
 
 #: src/postulo/resume/views.py:498
 #, python-format, draft
@@ -14054,7 +14534,8 @@ msgid_plural "That file took longer than %(seconds)s seconds to arrive."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/resume/views.py:551 src/postulo/resume/views_candidate.py:123
+#: src/postulo/core/views_kind_files.py:97 src/postulo/resume/views.py:551
+#: src/postulo/resume/views_candidate.py:123
 #, draft
 msgid "That file was read, and there was nothing in it to import."
 msgstr "Ai skedar u lexua, dhe në të nuk kishte asgjë për të importuar."
@@ -14093,12 +14574,12 @@ msgstr ""
 msgid "That invitation has already been accepted and cannot be revoked."
 msgstr "Ajo ftesë është pranuar tashmë dhe nuk mund të revokohet."
 
-#: src/postulo/core/server_views.py:376
+#: src/postulo/core/server_views.py:380
 #, draft
 msgid "That is a lot of recovery links. Try again shortly."
 msgstr "Ato janë shumë lidhje rikuperimi. Provoni sërish së shpejti."
 
-#: src/postulo/core/server_views.py:954 src/postulo/plugins/views.py:418
+#: src/postulo/core/server_views.py:958 src/postulo/plugins/views.py:418
 #, python-format
 msgid "That is a lot of tests. Try again in %(seconds)d second."
 msgid_plural "That is a lot of tests. Try again in %(seconds)d seconds."
@@ -14121,7 +14602,12 @@ msgstr ""
 msgid "That is not a %(kind)s, whatever it was sent as."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:319
+#: src/postulo/core/kind_files.py:289
+msgid ""
+"That is not a file this page reads. It reads the JSON file it offers to download for this kind of record, as Postulo writes it, and nothing else."
+msgstr ""
+
+#: src/postulo/resume/candidate.py:313
 msgid ""
 "That is not a file this page reads. It reads the JSON file it offers to download — one person's own record, as Postulo writes it — and nothing else."
 msgstr ""
@@ -14140,6 +14626,11 @@ msgstr ""
 #: src/postulo/core/phones.py:648
 #, python-format
 msgid "That is not a number %(country)s uses: no number there begins that way."
+msgstr ""
+
+#: src/postulo/core/views_backups.py:264
+#, python-format
+msgid "That is not a Postulo backup that opens cleanly: %(problem)s"
 msgstr ""
 
 #: src/postulo/core/messaging_services.py:271
@@ -14200,7 +14691,7 @@ msgstr "Kjo nuk është diçka që Postulo mund të bëjë për të."
 msgid "That is not something Postulo can do to several at once."
 msgstr "Kjo nuk është diçka që Postulo mund ta bëjë për disa njëherësh."
 
-#: src/postulo/core/server_views.py:1465 src/postulo/core/server_views.py:1538
+#: src/postulo/core/server_views.py:1469 src/postulo/core/server_views.py:1542
 #, draft
 msgid "That is not something this page does."
 msgstr "Kjo nuk është diçka që bën kjo faqe."
@@ -14215,18 +14706,28 @@ msgstr "Kjo nuk është adresa e kësaj llogarie."
 msgid "That is not the shape of an email address."
 msgstr "Ajo nuk ka formën e një adrese e-mail."
 
-#: src/postulo/core/server_views.py:328
+#: src/postulo/core/server_views.py:332
 #, draft
 msgid "That is not the username."
 msgstr "Ky nuk është emri i përdoruesit."
 
-#: src/postulo/resume/candidate.py:398
+#: src/postulo/core/kind_files.py:343
+msgid ""
+"That is somebody's own record, details and career. It is read from Your record as a file, under Your career."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:336
+msgid ""
+"That is the export of a whole account. This page reads only the file it offers to download itself, which holds one kind of record."
+msgstr ""
+
+#: src/postulo/resume/candidate.py:374
 msgid ""
 "That is the export of a whole account. This page reads only the file it offers to download itself: one person's own record, without the applications."
 msgstr ""
 
-#: src/postulo/core/server_views.py:243 src/postulo/core/server_views.py:270
-#: src/postulo/core/server_views.py:299
+#: src/postulo/core/server_views.py:247 src/postulo/core/server_views.py:274
+#: src/postulo/core/server_views.py:303
 #, draft
 msgid "That is the last administrator. Appoint another first."
 msgstr "Ky është administratori i fundit. Emëroni fillimisht një tjetër."
@@ -14241,7 +14742,7 @@ msgstr "Ajo lidhje nuk mund të përdoret"
 msgid "That link cannot be used."
 msgstr "Ajo lidhje nuk mund të përdoret."
 
-#: src/postulo/core/server_views.py:398
+#: src/postulo/core/server_views.py:402
 #, draft
 msgid "That link will not work any more."
 msgstr "Ajo lidhje nuk do të punojë më."
@@ -14292,7 +14793,7 @@ msgstr ""
 msgid "That number is too short."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1597 src/postulo/core/server_views.py:1602
+#: src/postulo/core/server_views.py:1601 src/postulo/core/server_views.py:1606
 #, draft
 msgid "That package is no longer waiting; upload it again."
 msgstr "Ajo paketë nuk pret më; ngarkojeni sërish."
@@ -14446,6 +14947,10 @@ msgstr ""
 msgid "The application sends on its own"
 msgstr "Aplikacioni dërgon vetë"
 
+#: src/postulo/templates/server/backup_restore.html:22
+msgid "The archive opens and its database matches its checksum."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:1027
 #, draft
 msgid ""
@@ -14458,8 +14963,17 @@ msgid ""
 "The arrows put them in your order, and the order decides what stays in reach: the row across the top holds as many as there is room for, the bar at the foot of a phone's screen the first four, and the rest are under More."
 msgstr ""
 
+#: src/postulo/documents/forms.py:642
+msgid ""
+"The author, and the title with your name in it, go into the PDF's properties, as they always have. Untick it to send files without them."
+msgstr ""
+
 #: src/postulo/core/design.py:124
 msgid "The background. Everything else is above it."
+msgstr ""
+
+#: src/postulo/core/slow.py:137
+msgid "The backup is written and checked."
 msgstr ""
 
 #: src/postulo/templates/server/design.html:234
@@ -14485,7 +14999,7 @@ msgstr "Nënshkrimi i katalogut nuk përputhet me përmbajtjen e tij; nuk u për
 msgid "The catalogue's signature or key is not readable: %(error)s"
 msgstr "Nënshkrimi ose çelësi i katalogut nuk është i lexueshëm: %(error)s"
 
-#: src/postulo/core/server_views.py:1663
+#: src/postulo/core/server_views.py:1667
 #, draft
 msgid "The catalogues answered, and list nothing yet."
 msgstr "Katalogët u përgjigjën, dhe ende nuk renditin asgjë."
@@ -14510,6 +15024,11 @@ msgstr ""
 #: src/postulo/resume/forms.py:228
 msgid ""
 "The Common European Framework levels. “Not stated” prints nothing at all, which is the honest answer where you have never been tested — a level is a claim somebody may test in an interview."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:513
+#, python-format
+msgid "The company %(name)s is not in your account, and is added with it."
 msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html:11
@@ -14545,7 +15064,7 @@ msgid ""
 "The contact block is what a CV prints under your name, and each CV chooses which parts of it to print under its own <em>Settings</em>. A letter prints only your email address, your telephone number and where you are."
 msgstr ""
 
-#: src/postulo/documents/views.py:747
+#: src/postulo/documents/views.py:829
 #, draft
 msgid "The copy could not be sent; the document says why."
 msgstr "Kopja nuk mundi të dërgohej; dokumenti thotë pse."
@@ -14602,15 +15121,15 @@ msgid ""
 "The employer's own closing date, if the posting gives one. Empty means unknown, not open forever."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1397
+#: src/postulo/resume/candidate.py:1373
 msgid "The entry it belongs to cannot be added."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1399
+#: src/postulo/resume/candidate.py:1375
 msgid "The entry it belongs to is not in the file."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1424 src/postulo/plugins/forms.py:55
+#: src/postulo/core/server_views.py:1428 src/postulo/plugins/forms.py:55
 #, python-format, draft
 msgid "The environment sets “%(name)s”, so it cannot be changed here."
 msgstr "Mjedisi vendos „%(name)s“, prandaj kjo nuk mund të ndryshohet këtu."
@@ -14637,13 +15156,14 @@ msgstr ""
 msgid "The figure as they wrote it, before tax."
 msgstr ""
 
+#: src/postulo/templates/core/kind_file.html:69
 #: src/postulo/templates/resume/candidate_file.html:63
 #: src/postulo/templates/resume/europass_import.html:30
 #, draft
 msgid "The file"
 msgstr "Skedari"
 
-#: src/postulo/resume/candidate.py:671
+#: src/postulo/resume/candidate.py:647
 #, python-format
 msgid "The file also holds %(names)s, which this page does not read."
 msgstr ""
@@ -14653,12 +15173,17 @@ msgid ""
 "The file could not be read: a cell is over 128 KiB. A quotation mark that is never closed is the usual cause."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1210
+#: src/postulo/resume/candidate.py:1186
 msgid "The file has another of this type, and a person has one of each."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1347
+#: src/postulo/resume/candidate.py:1323
 msgid "The file has two groups under the number it names."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:925
+#, python-format
+msgid "The file holds more than %(limit)s rows. The first %(limit)s are read."
 msgstr ""
 
 #: src/postulo/core/csv_import.py:488
@@ -14683,7 +15208,7 @@ msgid ""
 msgstr ""
 "Vetë skedari nuk mund të ndryshohet. Ngarkoni të riun dhe shënojeni si zëvendësim të këtij, që ajo çka dërguat të nënkuptojë ende skedarin që dërguat."
 
-#: src/postulo/resume/candidate.py:1328
+#: src/postulo/resume/candidate.py:1304
 msgid "The file words it differently. Yours is left as it is."
 msgstr ""
 
@@ -14707,7 +15232,7 @@ msgstr ""
 msgid "The first"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:689
+#: src/postulo/resume/candidate.py:665
 #, python-format
 msgid "The first %(count)s is read, and the rest are not."
 msgid_plural "The first %(count)s are read, and the rest are not."
@@ -14734,11 +15259,11 @@ msgid ""
 "The greys. A warm near-black rather than pure black, easier to read at length."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1351
+#: src/postulo/resume/candidate.py:1327
 msgid "The group it belongs to cannot be added."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1343
+#: src/postulo/resume/candidate.py:1319
 msgid "The group it belongs to is not in the file."
 msgstr ""
 
@@ -14776,12 +15301,17 @@ msgstr ""
 msgid "The kept source could not be read back."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1485
+#: src/postulo/core/server_views.py:1489
 #, python-format, draft
 msgid ""
 "The key for “%(name)s” was replaced. That key is the only thing standing between its index and code running here, so make sure it came from somewhere you trust."
 msgstr ""
 "Çelësi për „%(name)s“ u zëvendësua. Ai çelës është e vetmja gjë që qëndron mes indeksit të tij dhe kodit që ekzekutohet këtu, prandaj sigurohuni se erdhi nga diku ku keni besim."
+
+#: src/postulo/templates/server/backup_restore.html:94
+msgid ""
+"The key the connection secrets are under is not in the archive. Restore with the same <code>.env</code> the archive was written under, or those secrets cannot be read."
+msgstr ""
 
 #: src/postulo/templates/server/identifier_schemes.html:21
 #: src/postulo/templates/server/plugins.html:142
@@ -14793,6 +15323,11 @@ msgstr ""
 #, draft
 msgid "The language you read Postulo in"
 msgstr "Gjuha në të cilën lexoni Postulo"
+
+#: src/postulo/templates/server/backups.html:191
+#: src/postulo/templates/server/overview.html:185
+msgid "The last backup failed."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html:61
 #, draft
@@ -14829,16 +15364,16 @@ msgstr ""
 msgid "The line the timeline shows."
 msgstr ""
 
-#: src/postulo/documents/forms.py:165
+#: src/postulo/documents/forms.py:174
 msgid ""
 "The line under your name. Left empty, the one on your profile is printed instead."
 msgstr ""
 
-#: src/postulo/documents/forms.py:248
+#: src/postulo/documents/forms.py:257
 msgid "The line your details give, never a street. As things stand: {value}."
 msgstr ""
 
-#: src/postulo/documents/forms.py:252
+#: src/postulo/documents/forms.py:261
 msgid "The line your details give, never a street. They give none yet."
 msgstr ""
 
@@ -14854,6 +15389,10 @@ msgstr ""
 
 #: src/postulo/templates/applications/partials/timeline.html:25
 msgid "The listing"
+msgstr ""
+
+#: src/postulo/core/kind_files.py:805
+msgid "The listing is already yours; the application is added to it."
 msgstr ""
 
 #: src/postulo/jobs/models.py:1305
@@ -14890,12 +15429,12 @@ msgid ""
 msgstr ""
 "Pauza më e gjatë matet brenda kësaj periudhe. Një periudhë ende në vazhdim numërohet deri në ditën kur u prodhua kjo. Një javë e shënuar (pjesërisht) shtrihet jashtë periudhës; asgjë jashtë saj nuk numërohet."
 
-#: src/postulo/core/server_views.py:981
+#: src/postulo/core/server_views.py:985
 #, draft
 msgid "The mail backend accepted nothing."
 msgstr "Motori i postës nuk pranoi asgjë."
 
-#: src/postulo/documents/views.py:994
+#: src/postulo/documents/views.py:1080
 msgid ""
 "The mail server did not take the message, so nothing was sent or recorded."
 msgstr ""
@@ -14914,6 +15453,10 @@ msgstr ""
 #: src/postulo/documents/printing.py:160
 msgid ""
 "The messaging handle chosen for this CV is no longer in your details, so it prints none."
+msgstr ""
+
+#: src/postulo/templates/server/backups.html:43
+msgid "The next backup may not fit."
 msgstr ""
 
 #: src/postulo/applications/widgets.py:151
@@ -14941,7 +15484,7 @@ msgstr ""
 msgid "The office, the remote arrangement, or the days of each."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1454
+#: src/postulo/core/server_views.py:1458
 #, draft
 msgid "The official repository is emptied, not removed."
 msgstr "Depoja zyrtare zbrazet, nuk hiqet."
@@ -15048,7 +15591,7 @@ msgid ""
 "The places your companies are in, and the companies at each. The map draws the same list."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1141
+#: src/postulo/core/server_views.py:1145
 #, draft
 msgid "The plugins that ship inside Postulo. Nothing is fetched."
 msgstr "Shtojcat që vijnë brenda Postulo-s. Asgjë nuk merret."
@@ -15176,7 +15719,7 @@ msgstr ""
 msgid "The same email address: %(email)s"
 msgstr ""
 
-#: src/postulo/templates/documents/cv_detail.html:226
+#: src/postulo/templates/documents/cv_detail.html:227
 msgid ""
 "The same entries without the layout, in this document's language. None of these is filed as a version you sent."
 msgstr ""
@@ -15430,6 +15973,11 @@ msgid ""
 "The words are the same in both. If the two PDFs look different, what changed is how they are set: the theme, or the layout."
 msgstr ""
 
+#: src/postulo/templates/documents/letter_detail.html:117
+msgid ""
+"The words without the layout, in this letter's language. None of these is filed as a version you sent."
+msgstr ""
+
 #: src/postulo/core/errands.py:206
 msgid "The work was interrupted before it finished. Please try again."
 msgstr ""
@@ -15478,7 +16026,7 @@ msgstr "Nuk ka adresë prej nga ta marrim sërish."
 msgid "There is no file to send."
 msgstr "Nuk ka skedar për të dërguar."
 
-#: src/postulo/resume/candidate.py:1082
+#: src/postulo/resume/candidate.py:1058
 msgid "There is no handle here to read."
 msgstr ""
 
@@ -15486,7 +16034,7 @@ msgstr ""
 msgid "There is no kept source to draw from, and a rendering is drawn from it."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1419
+#: src/postulo/core/server_views.py:1423
 #, draft
 msgid "There is no repository by that name."
 msgstr "Nuk ka depo me atë emër."
@@ -15505,6 +16053,7 @@ msgstr ""
 msgid "There is nothing here, or it is not yours to see."
 msgstr "Këtu nuk ka asgjë, ose nuk është e juaja për ta parë."
 
+#: src/postulo/templates/core/kind_file.html:130
 #: src/postulo/templates/resume/candidate_file.html:129
 msgid ""
 "There is nothing in this file to add: what it holds, you already have, or cannot be added."
@@ -15518,7 +16067,8 @@ msgstr ""
 msgid "There is nothing to go back to: no plugin has been installed since."
 msgstr ""
 
-#: src/postulo/resume/views.py:562 src/postulo/resume/views_candidate.py:133
+#: src/postulo/core/views_kind_files.py:106 src/postulo/resume/views.py:562
+#: src/postulo/resume/views_candidate.py:133
 #, draft
 msgid "There is nothing waiting to be imported."
 msgstr "Nuk ka asgjë në pritje për t'u importuar."
@@ -15633,6 +16183,22 @@ msgid ""
 "This applies to the captures made from now on. What has been kept stays until you delete it, from the capture's own page; what was not kept cannot be fetched back."
 msgstr ""
 
+#: src/postulo/templates/server/backup_restore.html:15
+msgid "This archive does not verify, so do not restore from it."
+msgstr ""
+
+#: src/postulo/templates/server/backup_restore.html:28
+#, python-format
+msgid ""
+"This archive holds a %(there)s database and this instance runs %(here)s. A restore refuses an archive from the other engine."
+msgstr ""
+
+#: src/postulo/templates/server/backup_restore.html:38
+#, python-format
+msgid ""
+"This archive was written by Postulo %(there)s, which is newer than the one running here. Update first."
+msgstr ""
+
 #: src/postulo/templates/core/partials/widget_offers.html:80
 #, draft
 msgid ""
@@ -15688,9 +16254,14 @@ msgstr "Ky zë e shtyp tekstin e tij origjinal në çdo CV."
 msgid "This field is required."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:663
+#: src/postulo/resume/candidate.py:639
 msgid ""
 "This file was written by a newer Postulo than this one. What this one does not know how to read is left out."
+msgstr ""
+
+#: src/postulo/core/kind_files.py:939
+msgid ""
+"This file was written by a newer Postulo than this one. What this one knows of it is read, and the rest is not."
 msgstr ""
 
 #: src/postulo/templates/403_csrf.html:4 src/postulo/templates/403_csrf.html:11
@@ -15747,7 +16318,7 @@ msgid ""
 msgstr ""
 "Ky instalim ende nuk ka llogari, prandaj formulari i regjistrimit i ofrohet kujtdo që arrin tek ai: llogaria e parë bëhet administratore."
 
-#: src/postulo/resume/candidate.py:1233
+#: src/postulo/resume/candidate.py:1209
 #, python-format
 msgid ""
 "This instance has no kind of identifier called “%(key)s”, so it is added as Other, named “%(name)s”."
@@ -15801,17 +16372,17 @@ msgid ""
 "This is kept as it was typed, with no country in front of it, so it could not be checked and cannot be dialled from anywhere else."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:857
+#: src/postulo/resume/candidate.py:833
 msgid "This is not a country code."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1237
+#: src/postulo/resume/candidate.py:1213
 #, python-format
 msgid ""
 "This is not a value %(kind)s accepts here, so it is added as Other, named “%(name)s”."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:602
+#: src/postulo/resume/candidate.py:578
 msgid "This is not text."
 msgstr ""
 
@@ -15830,6 +16401,11 @@ msgstr ""
 #, draft
 msgid "This is the most recent period."
 msgstr "Kjo është periudha më e fundit."
+
+#: src/postulo/core/backups.py:214
+msgid ""
+"This is the only archive that is known to open. Check another one first, or take a new backup, and then this one can go."
+msgstr ""
 
 #: src/postulo/core/views_tables.py:97
 msgid "This is what the table opens as now."
@@ -15963,6 +16539,10 @@ msgstr ""
 msgid "Through the public employment service"
 msgstr ""
 
+#: src/postulo/core/models.py:1244
+msgid "Thursday"
+msgstr ""
+
 #: src/postulo/templates/jobs/listing_list.html:127
 #, python-format, draft
 msgid "Tick %(title)s"
@@ -16040,6 +16620,10 @@ msgstr "Skadim kohe"
 msgid "timeout in seconds"
 msgstr "skadim kohe në sekonda"
 
+#: src/postulo/documents/forms.py:592
+msgid "Title"
+msgstr ""
+
 #: src/postulo/documents/models.py:614 src/postulo/documents/models.py:757
 #: src/postulo/jobs/models.py:1014 src/postulo/notifications/models.py:24
 #: src/postulo/resume/models.py:305
@@ -16076,7 +16660,7 @@ msgstr "Për të vendosur"
 msgid "To hand over a posting (needs the captures scope):"
 msgstr "Për të dorëzuar një shpallje (kërkon fushëveprimin captures):"
 
-#: src/postulo/templates/documents/cv_detail.html:213
+#: src/postulo/templates/documents/cv_detail.html:214
 msgid ""
 "To see where the pages break. A draft is kept nowhere; Export PDF is what files a version."
 msgstr ""
@@ -16139,7 +16723,7 @@ msgstr[1] ""
 msgid "town or city"
 msgstr "qyteti"
 
-#: src/postulo/templates/core/export.html:89
+#: src/postulo/templates/core/export.html:110
 #, draft
 msgid ""
 "Tracked your search in a spreadsheet, or in another tool that exports one? Upload the CSV, say which column is which, check the preview, and it becomes applications and listings here."
@@ -16151,7 +16735,7 @@ msgstr ""
 msgid "translation"
 msgstr "përkthim"
 
-#: src/postulo/templates/server/overview.html:242
+#: src/postulo/templates/server/overview.html:255
 #, draft
 msgid "Translation"
 msgstr "Përkthimi"
@@ -16189,6 +16773,10 @@ msgstr ""
 #, draft
 msgid "Try fewer words, or a different spelling."
 msgstr "Provoni me më pak fjalë, ose me një shkrim tjetër."
+
+#: src/postulo/core/models.py:1242
+msgid "Tuesday"
+msgstr ""
 
 #: src/postulo/accounts/views.py:374
 #, draft
@@ -16254,7 +16842,7 @@ msgstr ""
 msgid "Type it in instead"
 msgstr "Shkruajeni në vend të kësaj"
 
-#: src/postulo/documents/models.py:999
+#: src/postulo/documents/models.py:1006
 #, draft
 msgid "type of document"
 msgstr "lloji i dokumentit"
@@ -16297,7 +16885,7 @@ msgstr "Shkruani për të gjetur një, ose shtoni një të re"
 msgid "Type your address, %(email)s, to confirm"
 msgstr "Shkruani adresën tuaj, %(email)s, për të konfirmuar"
 
-#: src/postulo/resume/candidate.py:1044
+#: src/postulo/resume/candidate.py:1020
 msgid ""
 "Typed on Your details it would be refused. It is imported as it is, and marked there until you change it."
 msgstr ""
@@ -16377,18 +16965,23 @@ msgstr "deri"
 msgid "up to %(high)s"
 msgstr "deri në %(high)s"
 
+#: src/postulo/templates/server/backups.html:217
+#, python-format
+msgid "Up to %(mb)s MB. It is opened and checked before anything is kept."
+msgstr ""
+
 #: src/postulo/templates/core/import_csv_map.html:70
 #, draft
 msgid "Update the preview"
 msgstr "Përditëso paraparjen"
 
 #: src/postulo/accounts/models.py:520 src/postulo/core/models.py:36
-#: src/postulo/core/models.py:1217
+#: src/postulo/core/models.py:1271
 #, draft
 msgid "updated at"
 msgstr "përditësuar më"
 
-#: src/postulo/core/models.py:1224
+#: src/postulo/core/models.py:1278
 #, draft
 msgid "updated by"
 msgstr "përditësuar nga"
@@ -16406,6 +16999,10 @@ msgstr "Ngarko një skedar"
 msgid "Upload a picture"
 msgstr "Ngarko një foto"
 
+#: src/postulo/templates/server/backups.html:222
+msgid "Upload and check"
+msgstr ""
+
 #: src/postulo/templates/core/import_csv.html:22
 #, draft
 msgid "Upload and map the columns"
@@ -16413,6 +17010,7 @@ msgstr "Ngarkoni dhe lidhni kolonat"
 
 #: src/postulo/jobs/models.py:240 src/postulo/plugins/provenance.py:62
 #: src/postulo/templates/accounts/profile.html:72
+#: src/postulo/templates/server/backups.html:89
 #, draft
 msgid "Uploaded"
 msgstr "Ngarkuar"
@@ -16561,6 +17159,7 @@ msgstr ""
 msgid "verified"
 msgstr "i verifikuar"
 
+#: src/postulo/templates/server/backups.html:101
 #: src/postulo/templates/settings/account.html:63
 #, draft
 msgid "Verified"
@@ -16572,6 +17171,7 @@ msgstr "I verifikuar"
 msgid "version"
 msgstr "version"
 
+#: src/postulo/templates/server/backups.html:76
 #: src/postulo/templates/server/plugins.html:503
 #, draft
 msgid "Version"
@@ -16625,7 +17225,7 @@ msgstr ""
 msgid "Violet"
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:207
+#: src/postulo/templates/server/overview.html:220
 #, draft
 msgid ""
 "Voluntary support is this project's only income: one person writes it, and nothing is owed or unlocked by any of this. It is said once, here, to whoever runs the instance — never to the people using it to look for work, and for many of them money is the wrong thing to give."
@@ -16657,7 +17257,7 @@ msgstr "Në pritje të një përgjigjeje"
 msgid "Waiting only"
 msgstr "Vetëm në pritje përgjigjeje"
 
-#: src/postulo/documents/models.py:967
+#: src/postulo/documents/models.py:974
 #, draft
 msgid "Waiting to be sent"
 msgstr "Në pritje për t'u dërguar"
@@ -16749,6 +17349,10 @@ msgstr ""
 #, draft
 msgid "Websites"
 msgstr "Faqe interneti"
+
+#: src/postulo/core/models.py:1243
+msgid "Wednesday"
+msgstr ""
 
 #: src/postulo/applications/agenda.py:620
 #, draft
@@ -16889,7 +17493,7 @@ msgstr "Çfarë shkon ku"
 msgid "What happened"
 msgstr "Çfarë ndodhi"
 
-#: src/postulo/templates/resume/candidate_file.html:153
+#: src/postulo/templates/cotton/review_sections.html:19
 msgid "What happens"
 msgstr ""
 
@@ -16918,6 +17522,7 @@ msgid ""
 msgstr ""
 "Çfarë ka në ditar, më i afërti i pari. Caktoni një nga faqja e një aplikimi."
 
+#: src/postulo/templates/core/kind_file.html:100
 #: src/postulo/templates/resume/candidate_file.html:96
 #: src/postulo/templates/resume/europass_import.html:59
 #, draft
@@ -16961,6 +17566,10 @@ msgstr ""
 msgid "What is written down"
 msgstr ""
 
+#: src/postulo/templates/server/backup_restore.html:47
+msgid "What it holds"
+msgstr ""
+
 #: src/postulo/templates/cotton/identifier_schemes.html:57
 msgid ""
 "What it identifies: “person”, “company” or both. It is offered on Your details, on a company's form, or on both."
@@ -17000,6 +17609,11 @@ msgstr ""
 msgid "What needs doing"
 msgstr "Çfarë duhet bërë"
 
+#: src/postulo/templates/core/kind_file.html:53
+msgid ""
+"What other programs and plugins keep is in the export of everything, which this file is not a part of."
+msgstr ""
+
 #: src/postulo/accounts/forms.py:1548
 msgid ""
 "What Postulo is in for you, and nothing else. What a CV or a letter is written in is that document's own setting."
@@ -17026,7 +17640,7 @@ msgid ""
 "What sort of thing it is, never who hosts it: a portfolio is a portfolio wherever it lives."
 msgstr ""
 
-#: src/postulo/documents/forms.py:513
+#: src/postulo/documents/forms.py:522
 msgid "What sort of thing it is, so the lists can be narrowed by it."
 msgstr ""
 
@@ -17047,6 +17661,11 @@ msgstr ""
 #: src/postulo/jobs/forms.py:62
 msgid ""
 "What the figure is per. It means nothing without an amount beside it, and is ignored then."
+msgstr ""
+
+#: src/postulo/templates/documents/cv_detail.html:238
+#: src/postulo/templates/documents/letter_detail.html:135
+msgid "What the file says about itself"
 msgstr ""
 
 #: src/postulo/accounts/models.py:208 src/postulo/jobs/models.py:582
@@ -17200,16 +17819,21 @@ msgid "What you type here is what a CV in that language prints instead."
 msgstr ""
 "Ajo që shkruani këtu është ajo që shtyp në vend të saj një CV në atë gjuhë."
 
+#: src/postulo/templates/base.html:391
+msgid ""
+"What you typed on this page has not been saved. If you leave, it is lost."
+msgstr ""
+
 #: src/postulo/templates/help/your_picture.html:22
 msgid ""
 "What you upload is cut to a square around its middle and written out again as a new file. That drops everything the file carried besides the picture, including where a photograph was taken."
 msgstr ""
 
-#: src/postulo/documents/forms.py:512
+#: src/postulo/documents/forms.py:521
 msgid "What you will look for it under."
 msgstr ""
 
-#: src/postulo/documents/forms.py:490
+#: src/postulo/documents/forms.py:499
 msgid "What you will look for it under. It is never printed on the letter."
 msgstr ""
 
@@ -17229,7 +17853,7 @@ msgid ""
 "What “%(name)s” says, without the layout: for a form that wants the text pasted in. Select all of it and copy."
 msgstr ""
 
-#: src/postulo/templates/server/overview.html:219
+#: src/postulo/templates/server/overview.html:232
 #, python-format, draft
 msgid ""
 "Whatever it is worth to you, once or now and then, at <a href=\"%(url)s\" class=\"underline\">buymeacoffee.com/tiagoagueda</a>."
@@ -17242,6 +17866,7 @@ msgid "when"
 msgstr "kur"
 
 #: src/postulo/templates/documents/rendered_list.html:27
+#: src/postulo/templates/server/backups.html:74
 #: src/postulo/templates/server/design.html:366
 #: src/postulo/templates/server/logs.html:88
 #, draft
@@ -17616,7 +18241,7 @@ msgstr "widget-e tashmë të ofruar"
 msgid "Width of {column}"
 msgstr "Gjerësia e {column}"
 
-#: src/postulo/resume/candidate.py:123
+#: src/postulo/core/file_review.py:26
 msgid "Will be added"
 msgstr ""
 
@@ -17638,6 +18263,29 @@ msgid_plural ""
 "With a password: you are asked for your second factor, unless you marked this browser as trusted. That lasts %(days)s days."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/server/backup_restore.html:82
+msgid "With Docker Compose"
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:36
+msgid "With the company each is at, by name, and every way of reaching them."
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:40
+msgid ""
+"With the company of each, by name. What happened to a listing, and what was captured from its page, is left out."
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:45
+msgid ""
+"With the listing of each, its company by name, its timeline and its interviews. Reminders, offers and the files an application went out with are left out, because a JSON file cannot carry a file."
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:30
+msgid ""
+"With their industries, departments and identifiers. Logos are left out, because a JSON file cannot carry one, and so are the people at each company: they are a file of their own."
+msgstr ""
 
 #: src/postulo/applications/models.py:847
 msgctxt ""
@@ -17663,7 +18311,16 @@ msgstr "Me: %(people)s"
 msgid "Withdrawn"
 msgstr "Tërhequr"
 
-#: src/postulo/documents/formats.py:169
+#: src/postulo/templates/server/backup_restore.html:88
+msgid "Without containers"
+msgstr ""
+
+#: src/postulo/documents/properties.py:48
+msgid ""
+"Without them the file has no author, subject, keywords or dates, and a neutral title instead of your name. It keeps its language and a title, because a screen reader announces both and the PDF standard for accessibility requires them. The program that draws a PDF may still name itself."
+msgstr ""
+
+#: src/postulo/documents/formats.py:183
 msgid "Word document"
 msgstr ""
 
@@ -17703,7 +18360,7 @@ msgstr ""
 msgid "would move it to %(status)s"
 msgstr "do ta zhvendoste te %(status)s"
 
-#: src/postulo/documents/forms.py:683
+#: src/postulo/documents/forms.py:740
 msgid "Write a message, or choose a letter to send as the message."
 msgstr ""
 
@@ -17712,13 +18369,21 @@ msgstr ""
 msgid "Write one well, then let placeholders do the rest."
 msgstr "Shkruani një mirë, dhe pjesën tjetër lërjani vendmbajtëseve."
 
-#: src/postulo/templates/documents/cv_detail.html:268
+#: src/postulo/templates/documents/cv_detail.html:283
 #, draft
 msgid "Write some more."
 msgstr "Shkruani edhe pak."
 
-#: src/postulo/resume/candidate.py:606
+#: src/postulo/resume/candidate.py:582
 msgid "Write the date as year, month and day, like 2021-03-31."
+msgstr ""
+
+#: src/postulo/documents/forms.py:587
+msgid "Write the file with its properties"
+msgstr ""
+
+#: src/postulo/documents/forms.py:637
+msgid "Write the files with their properties"
 msgstr ""
 
 #: src/postulo/templates/documents/cv_list.html:56
@@ -17731,6 +18396,11 @@ msgstr "Së pari shkruani karrierën tuaj, pastaj ndërtoni variante prej saj."
 msgid "writing"
 msgstr "shkrimi"
 
+#: src/postulo/templates/server/backup_restore.html:49
+msgid "Written"
+msgstr ""
+
+#: src/postulo/templates/core/kind_file.html:103
 #: src/postulo/templates/resume/candidate_file.html:99
 #, python-format
 msgid "Written by Postulo %(version)s on %(when)s."
@@ -17749,6 +18419,14 @@ msgid ""
 "Written once, here. Every CV variant draws on this, so correcting a job title corrects it everywhere."
 msgstr ""
 "Shkruar një herë, këtu. Çdo variant i CV-së merr prej kësaj, prandaj korrigjimi i një titulli pune e korrigjon atë kudo."
+
+#: src/postulo/documents/models.py:843
+msgid "written with its properties"
+msgstr ""
+
+#: src/postulo/templates/documents/rendered_list.html:47
+msgid "Written without its properties"
+msgstr ""
 
 #: src/postulo/templates/partials/translation_state.html:19
 #: src/postulo/templates/settings/locale.html:116
@@ -17821,7 +18499,7 @@ msgstr ""
 msgid "You already have a company with that name."
 msgstr "Keni tashmë një kompani me atë emër."
 
-#: src/postulo/documents/forms.py:413
+#: src/postulo/documents/forms.py:422
 #, draft
 msgid "You already have a CV or portfolio with that name."
 msgstr "Ke tashmë një CV ose portofol me atë emër."
@@ -17831,7 +18509,7 @@ msgstr "Ke tashmë një CV ose portofol me atë emër."
 msgid "You already have a tag with that name."
 msgstr "Keni tashmë një etiketë me atë emër."
 
-#: src/postulo/resume/candidate.py:1206
+#: src/postulo/resume/candidate.py:1182
 msgid "You already have another of this type."
 msgstr ""
 
@@ -17840,11 +18518,11 @@ msgstr ""
 msgid "You already have that industry."
 msgstr "Keni tashmë atë industri."
 
-#: src/postulo/resume/candidate.py:878
+#: src/postulo/resume/candidate.py:854
 msgid "You already hold the most nationalities a profile can."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1055
+#: src/postulo/resume/candidate.py:1031
 msgid ""
 "You already list this address for somebody you deal with, and an address is listed once."
 msgstr ""
@@ -17873,7 +18551,7 @@ msgstr ""
 msgid "You can close this. The work carries on without you."
 msgstr ""
 
-#: src/postulo/templates/core/export.html:109
+#: src/postulo/templates/core/export.html:130
 #, draft
 msgid ""
 "You can delete your account yourself: every record, every file on the disk, tokens, connections, and the account. The export above is the safety net; take it first."
@@ -17894,7 +18572,7 @@ msgid ""
 "You can sign in with this or with your address. Nobody else sees it — Postulo shows people your name."
 msgstr ""
 
-#: src/postulo/core/server_views.py:267
+#: src/postulo/core/server_views.py:271
 #, draft
 msgid "You cannot deactivate the account you are signed in with."
 msgstr "Nuk mund të çaktivizoni llogarinë me të cilën keni hyrë."
@@ -17966,7 +18644,7 @@ msgstr[0] ""
 msgstr[1] ""
 "Keni vënë re %(counter)s shpallje; keni aplikuar për %(applied)s (%(share)s%%) dhe keni hedhur poshtë %(discarded)s."
 
-#: src/postulo/resume/candidate.py:1331
+#: src/postulo/resume/candidate.py:1307
 msgid "You have one like it with other dates. Both will be in your record."
 msgstr ""
 
@@ -18053,6 +18731,11 @@ msgid ""
 msgstr ""
 "Regjistri juaj i karrierës është shkruar në %(original)s. Ajo që shkruani këtu është ajo që shtyp në vend të saj një CV në një gjuhë tjetër."
 
+#: src/postulo/templates/core/export.html:92
+msgid ""
+"Your companies, contacts, listings or applications in a JSON file each: to keep, to read, or to put into another account. Importing only adds; it never changes what you have."
+msgstr ""
+
 #: src/postulo/templates/partials/postal_addresses.html:184
 #, draft
 msgid ""
@@ -18074,6 +18757,7 @@ msgstr "Pamja juaj e përgjithshme është bosh"
 
 #: src/postulo/accounts/views.py:520 src/postulo/core/settings_sections.py:123
 #: src/postulo/core/views_import.py:17 src/postulo/templates/core/export.html:4
+#: src/postulo/templates/core/kind_file.html:4
 #, draft
 msgid "Your data"
 msgstr "Të dhënat tuaja"
@@ -18088,7 +18772,7 @@ msgstr ""
 msgid "Your deadline"
 msgstr "Afati juaj"
 
-#: src/postulo/resume/candidate.py:777
+#: src/postulo/resume/candidate.py:753
 #: src/postulo/templates/accounts/profile.html:4
 #: src/postulo/templates/accounts/profile.html:12
 #: src/postulo/templates/base.html:235
@@ -18105,7 +18789,7 @@ msgid ""
 "Your details and your career in one JSON file: to keep, to read, or to hand to another Postulo. Nothing about where you applied is in it."
 msgstr ""
 
-#: src/postulo/documents/forms.py:114
+#: src/postulo/documents/forms.py:123
 msgid "Your details give none yet, so nothing is printed until they do."
 msgstr ""
 
@@ -18256,7 +18940,7 @@ msgstr ""
 msgid "Your username has been changed."
 msgstr "Emri juaj i përdoruesit u ndryshua."
 
-#: src/postulo/resume/candidate.py:125
+#: src/postulo/core/file_review.py:28
 msgid "Yours is kept"
 msgstr ""
 
@@ -18268,7 +18952,7 @@ msgstr ""
 msgid "Yours, to prepare with. Nothing here is sent to anybody."
 msgstr ""
 
-#: src/postulo/documents/forms.py:519
+#: src/postulo/documents/forms.py:528
 msgid "Yours. They go nowhere with the file."
 msgstr ""
 
@@ -18331,7 +19015,7 @@ msgstr "· ende në vazhdim"
 msgid "“%(code)s” is not a language code, like %(first)s or %(second)s."
 msgstr ""
 
-#: src/postulo/core/web_links.py:337 src/postulo/resume/candidate.py:1136
+#: src/postulo/core/web_links.py:337 src/postulo/resume/candidate.py:1112
 #, python-format
 msgid "“%(kind)s” is not one of the types of link."
 msgstr ""
@@ -18342,42 +19026,42 @@ msgid ""
 "“%(name)s” asks for things this table no longer has, and is shown without them:"
 msgstr ""
 
-#: src/postulo/resume/candidate.py:682
+#: src/postulo/resume/candidate.py:658
 #, python-format
 msgid "“%(name)s” has %(count)s row in the file."
 msgid_plural "“%(name)s” has %(count)s rows in the file."
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/postulo/core/server_views.py:1460
+#: src/postulo/core/server_views.py:1464
 #, python-format, draft
 msgid "“%(name)s” is gone. Anything installed from it stays installed."
 msgstr "„%(name)s“ u zhduk. Gjithçka e instaluar prej tij mbetet e instaluar."
 
-#: src/postulo/resume/candidate.py:676
+#: src/postulo/resume/candidate.py:652
 #, python-format
 msgid ""
 "“%(name)s” is in the file, and is not written the way this page reads it."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1408
+#: src/postulo/resume/candidate.py:1384
 #, python-format
 msgid "“%(name)s” is not a part of an entry that Postulo translates."
 msgstr ""
 
-#: src/postulo/resume/candidate.py:1389
+#: src/postulo/resume/candidate.py:1365
 #, python-format
 msgid "“%(name)s” is not a part of the career that Postulo translates."
 msgstr ""
 
-#: src/postulo/core/server_views.py:1445
+#: src/postulo/core/server_views.py:1449
 #, python-format, draft
 msgid ""
 "“%(name)s” is off. Nothing new is installed or updated from it; what was already installed goes on working."
 msgstr ""
 "„%(name)s“ është i fikur. Prej tij nuk instalohet e nuk përditësohet asgjë e re; ajo që është tashmë e instaluar vazhdon të punojë."
 
-#: src/postulo/core/server_views.py:1442
+#: src/postulo/core/server_views.py:1446
 #, python-format, draft
 msgid "“%(name)s” is on. Plugins may be installed and updated from it."
 msgstr ""
