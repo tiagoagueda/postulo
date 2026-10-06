@@ -168,6 +168,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_birth_place",
             "show_nationality",
             "show_gender",
+            "show_photo",
             "show_eqf_level",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}

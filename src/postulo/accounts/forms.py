@@ -644,6 +644,10 @@ class ProfileForm(forms.ModelForm):
     # in `__init__` from the limits `clean_picture` enforces.
     picture = forms.FileField(label=_("Upload a picture"), required=False)
     remove_picture = forms.BooleanField(label=_("Remove the uploaded picture"), required=False)
+    #: A photograph for CVs, apart from the picture above (#668): kept as framed, and
+    #: printed only by a CV that says so.
+    cv_photo = forms.FileField(label=_("Upload a CV photo"), required=False)
+    remove_cv_photo = forms.BooleanField(label=_("Remove the CV photo"), required=False)
     use_gravatar = forms.BooleanField(
         label=_("Use my Gravatar"),
         required=False,
@@ -685,6 +689,7 @@ class ProfileForm(forms.ModelForm):
         self.fields["picture"].help_text = (
             _("%(formats)s, up to %(megabytes)s MB.") % avatars.limits()
         )
+        self.fields["cv_photo"].help_text = self.fields["picture"].help_text
         # Said before anything asks for the bound field: `self["record_language"]` below is
         # kept by the form, and a sentence given to the field after that was never drawn.
         self.fields["record_language"].required = False
@@ -724,6 +729,8 @@ class ProfileForm(forms.ModelForm):
             self.fields["use_gravatar"].initial = self.instance.use_gravatar
             if not self.instance.has_avatar:
                 del self.fields["remove_picture"]
+            if not self.instance.has_cv_photo:
+                del self.fields["remove_cv_photo"]
 
     def _start_birth_boxes(self) -> None:
         """Open the three boxes on the date the profile holds, and leave a bound form's alone."""
@@ -919,6 +926,19 @@ class ProfileForm(forms.ModelForm):
             raise forms.ValidationError(str(exc)) from exc
         return upload
 
+    def clean_cv_photo(self):
+        """The same two refusals as the picture, and the file is kept uncropped (#668)."""
+        upload = self.cleaned_data.get("cv_photo")
+        if not upload:
+            return upload
+        if upload.size > avatars.MAX_UPLOAD_BYTES:
+            raise forms.ValidationError(avatars.too_large())
+        try:
+            self._processed_cv_photo = avatars.process_cv_photo(upload.read())
+        except avatars.UnusableImage as exc:
+            raise forms.ValidationError(str(exc)) from exc
+        return upload
+
     @property
     def link_boxes(self) -> list:
         """The one-box-per-kind fields, for the template to lay out where the columns were."""
@@ -970,6 +990,12 @@ class ProfileForm(forms.ModelForm):
             avatars.store(profile, avatars.ProfilePicture.UPLOAD, processed)
         elif self.cleaned_data.get("remove_picture"):
             avatars.remove_upload(profile)
+
+        photo = getattr(self, "_processed_cv_photo", None)
+        if photo is not None:
+            avatars.store(profile, avatars.ProfilePicture.CV, photo)
+        elif self.cleaned_data.get("remove_cv_photo"):
+            avatars.forget(profile, avatars.ProfilePicture.CV)
 
         wanted = bool(self.cleaned_data.get("use_gravatar"))
         if wanted != profile.use_gravatar:

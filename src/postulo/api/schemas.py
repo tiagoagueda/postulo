@@ -856,6 +856,7 @@ class CVPrintsOut(Schema):
         description="Whether the countries listed, or the scope's wording, are printed (#680)"
     )
     gender: bool = Field(description="Whether the gender is printed (#681)")
+    photo: bool = Field(description="Whether the CV photo from the profile is printed (#668)")
     birth_date: bool = Field(description="Whether the date of birth is printed (#679)")
     birth_place: bool = Field(description="Whether the place of birth is printed (#679)")
     eqf_level: bool = Field(
@@ -908,6 +909,7 @@ class CVPrintsIn(Schema):
     birth_place: bool | None = None
     nationality: bool | None = None
     gender: bool | None = None
+    photo: bool | None = None
     eqf_level: bool | None = None
 
 

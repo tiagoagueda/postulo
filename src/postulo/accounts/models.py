@@ -503,6 +503,9 @@ class Profile(models.Model):
     #: transaction that writes or deletes the row.
     has_avatar = models.BooleanField(_("has an uploaded picture"), default=False, editable=False)
     has_gravatar_copy = models.BooleanField(_("has a Gravatar copy"), default=False, editable=False)
+    #: Whether a `ProfilePicture` of the `cv` kind exists: the photograph a CV may print,
+    #: kept apart from the avatar and never shown by the interface (#668).
+    has_cv_photo = models.BooleanField(_("has a CV photo"), default=False, editable=False)
     #: Opt-in: fetch the Gravatar for the primary address, once, server-side.
     use_gravatar = models.BooleanField(_("use my Gravatar"), default=False)
     #: LEGACY (#662): the copy the server fetched, a `ProfilePicture` row now.
@@ -568,15 +571,17 @@ class Profile(models.Model):
 class ProfilePicture(StoredPicture):
     """A person's picture, kept in the database so that it goes with the profile (#662).
 
-    Up to two per profile: the one they uploaded and the copy of their Gravatar the server
-    fetched once. `Profile.picture` chooses between them. The profile's own flags say which
+    Up to three per profile: the one they uploaded, the copy of their Gravatar the server
+    fetched once, and a photograph for CVs that is not either (#668). `Profile.picture`
+    chooses between the first two and never offers the third. The profile's own flags say which
     exist, so a page that draws the avatar never reads this table; `accounts:avatar` does,
     to serve one.
     """
 
     UPLOAD = "upload"
     GRAVATAR = "gravatar"
-    KINDS = ((UPLOAD, _("Uploaded")), (GRAVATAR, _("From Gravatar")))
+    CV = "cv"
+    KINDS = ((UPLOAD, _("Uploaded")), (GRAVATAR, _("From Gravatar")), (CV, _("CV photo")))
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="pictures")
     kind = models.CharField(_("Type"), max_length=10, choices=KINDS)

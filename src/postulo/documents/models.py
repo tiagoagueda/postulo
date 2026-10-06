@@ -332,6 +332,16 @@ class CV(DeclaresALanguage, OwnedModel):
     show_nationality = models.BooleanField(_("print your nationality"), default=False)
     #: And off (#681), one plain switch.
     show_gender = models.BooleanField(_("print your gender"), default=False)
+    #: And off (#668): the person's CV photo, from *Your details*, in the contact block --
+    #: a CV whose contact details are off prints none, as it prints no name.
+    show_photo = models.BooleanField(
+        _("print your CV photo"),
+        default=False,
+        help_text=_(
+            "The photo from your details, beside your name. It is in the PDF and the preview; "
+            "the plain text and the Word file leave it out."
+        ),
+    )
     #: And off (#684): the EQF level of each qualification that states one, beside the
     #: institution. Not a detail of the profile, so it has no line in `PrintedDetails`; the
     #: themes read it from the CV they are handed.

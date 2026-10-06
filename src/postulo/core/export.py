@@ -153,7 +153,10 @@ logger = logging.getLogger(__name__)
 #: 54 added ``checksum`` and ``size`` on an upload: the SHA-256 and the length of the file as it
 #: was kept. The importer measures what it unpacked against them and restores the row without
 #: the file, and says so, where they differ; an archive without them restores as before (#663).
-FORMAT_VERSION = 54
+#: 55 added ``cv_photo_file`` on the account: the photograph a CV may print, kept apart from
+#: the avatar, and ``photo`` among each CV's ``prints`` switches. An archive without them
+#: restores no photo and every CV with it off (#668).
+FORMAT_VERSION = 55
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -901,6 +904,8 @@ def build_document(user) -> dict:
             "identifiers": _identifier_rows(profile),
             # The uploaded picture travels with the files; a Gravatar copy is refetched.
             "avatar_file": avatar_member(user) if profile and profile.has_avatar else "",
+            # And the CV photo, which is its own file and never the avatar (#668).
+            "cv_photo_file": cv_photo_member(user) if profile and profile.has_cv_photo else "",
         },
         "tags": [_fields(tag, TAG_FIELDS) for tag in Tag.objects.for_user(user)],
         # The career, built by the function the candidate document calls too, so there is
@@ -1281,6 +1286,11 @@ def logo_member(company, media_type: str) -> str:
     return f"{MEDIA_PREFIX}logos/{company.owner_id}/logo-{company.pk}.{extension}"
 
 
+def cv_photo_member(user) -> str:
+    """The name of the CV photo inside the archive (#668)."""
+    return f"{MEDIA_PREFIX}avatars/{user.pk}/cv-photo-{user.pk}.png"
+
+
 def _picture_members(user, document: dict) -> dict[str, bytes]:
     """The bytes of every picture the document names, by the name it gave each (#662).
 
@@ -1296,6 +1306,11 @@ def _picture_members(user, document: dict) -> dict[str, bytes]:
         row = ProfilePicture.objects.filter(profile__user=user, kind=ProfilePicture.UPLOAD).first()
         if row is not None:
             members[avatar] = bytes(row.data)
+    photo = document.get("account", {}).get("cv_photo_file")
+    if photo:
+        row = ProfilePicture.objects.filter(profile__user=user, kind=ProfilePicture.CV).first()
+        if row is not None:
+            members[photo] = bytes(row.data)
     named = {
         entry["id"]: entry["logo_file"]
         for entry in document.get("companies", [])

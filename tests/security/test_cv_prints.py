@@ -630,3 +630,37 @@ def test_the_list_offers_only_the_callers_own_handles(client, user, cv, their_ha
     offered = response.json()["prints"]["messaging"]["offered"]
     assert [one["id"] for one in offered] == [own.pk]
     assert THEIR_HANDLE not in response.content.decode()
+
+
+# ------------------------------------------------------------------------- the photo
+
+
+def test_nobody_prints_or_names_another_accounts_cv_photo(client, user, cv, other_user):
+    """The photo is the profile's, read through the CV's owner: there is no id to name."""
+    from postulo.accounts import avatars
+    from postulo.accounts.models import ProfilePicture
+    from tests.test_cv_photo import image_bytes
+
+    avatars.store(
+        other_user.profile, ProfilePicture.CV, avatars.process_cv_photo(image_bytes(colour="red"))
+    )
+    cv.show_photo = True
+    cv.save()
+    cv = CV.objects.get(pk=cv.pk)
+    assert rendering.contact_details(user, cv)["photo"] == ""
+    assert "data:image" not in rendering.render_cv_html(cv)
+
+    client.force_login(user)
+    page = client.get(reverse("documents:cv_update", args=[cv.pk])).content.decode()
+    assert "base64" not in page
+    # The CV photo is not the avatar, and the avatar's address never serves it.
+    assert client.get(reverse("accounts:avatar", args=[other_user.pk])).status_code == 404
+
+    _record, raw = ApiToken.issue(user, "Agent", scopes=("read", "write"))
+    sent = client.patch(
+        f"/api/v1/cvs/{cv.pk}",
+        data=json.dumps({"prints": {"photo": True}}),
+        content_type="application/json",
+        HTTP_AUTHORIZATION=f"Bearer {raw}",
+    )
+    assert "base64" not in sent.content.decode()

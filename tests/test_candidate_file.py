@@ -347,6 +347,7 @@ def test_the_archive_is_written_as_it_was(somebody):
         "profile",
         "identifiers",
         "avatar_file",
+        "cv_photo_file",
     ]
     assert list(document["account"]["profile"]) == [
         *export.PROFILE_FIELDS,

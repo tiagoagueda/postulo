@@ -30,6 +30,7 @@ so extending it to this would be attack surface bought for nothing.
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import logging
 from decimal import ROUND_DOWN, Decimal
@@ -146,6 +147,23 @@ def process(data: bytes) -> ContentFile:
         raise UnusableImage(str(error)) from error
 
 
+def process_cv_photo(data: bytes) -> ContentFile:
+    """The same checks as `process`, and **not cropped** (#668).
+
+    A photograph for a CV is framed by the theme that prints it, which may want a
+    portrait, a square or a circle, so what the person gave is kept as it was framed: only
+    straightened and re-encoded, which drops what the file knew about where it was taken.
+    """
+    try:
+        return ContentFile(
+            pictures.as_stored(data, budget=MAX_STORED_BYTES, kinds=frozenset(ALLOWED_TYPES))
+        )
+    except pictures.WrongKind as error:
+        raise UnusableImage(wrong_kind()) from error
+    except pictures.UnusablePicture as error:
+        raise UnusableImage(str(error)) from error
+
+
 def gravatar_hash(email: str) -> str:
     """Gravatar's current scheme: SHA-256 of the trimmed, lower-cased address."""
     return hashlib.sha256(email.strip().lower().encode("utf-8")).hexdigest()
@@ -163,10 +181,19 @@ def gravatar_url(email: str, size: int = GRAVATAR_SIZE) -> str:
 
 
 #: The flag on the profile that says a picture of each kind exists (#662).
-FLAGS = {ProfilePicture.UPLOAD: "has_avatar", ProfilePicture.GRAVATAR: "has_gravatar_copy"}
+FLAGS = {
+    ProfilePicture.UPLOAD: "has_avatar",
+    ProfilePicture.GRAVATAR: "has_gravatar_copy",
+    ProfilePicture.CV: "has_cv_photo",
+}
 
 #: The file fields the pictures used to be, until the release that drops them (#662).
 LEGACY_FILES = {ProfilePicture.UPLOAD: "avatar", ProfilePicture.GRAVATAR: "gravatar_image"}
+
+
+def _let_go(profile, kind: str) -> list[str]:
+    """The old file of this kind, if it ever had one: the CV photo never was a file."""
+    return pictures.let_go_of_the_file(profile, LEGACY_FILES[kind]) if kind in LEGACY_FILES else []
 
 
 def store(profile, kind: str, content) -> None:
@@ -179,7 +206,7 @@ def store(profile, kind: str, content) -> None:
     with transaction.atomic():
         pictures.keep(ProfilePicture, content, profile=profile, kind=kind)
         setattr(profile, flag, True)
-        legacy = pictures.let_go_of_the_file(profile, LEGACY_FILES[kind])
+        legacy = _let_go(profile, kind)
         profile.save(update_fields=[flag, *legacy, "updated_at"])
 
 
@@ -189,7 +216,7 @@ def forget(profile, kind: str) -> None:
     with transaction.atomic():
         ProfilePicture.objects.filter(profile=profile, kind=kind).delete()
         setattr(profile, flag, False)
-        legacy = pictures.let_go_of_the_file(profile, LEGACY_FILES[kind])
+        legacy = _let_go(profile, kind)
         profile.save(update_fields=[flag, *legacy, "updated_at"])
 
 
@@ -249,3 +276,17 @@ def forget_gravatar(profile) -> None:
 
 def remove_upload(profile) -> None:
     forget(profile, ProfilePicture.UPLOAD)
+
+
+def cv_photo_data_uri(profile) -> str:
+    """The profile's CV photo as a ``data:`` address, or an empty string where it has none.
+
+    The one way it reaches a document: neither renderer may fetch anything, and the page's
+    policy allows images from ``'self'`` and ``data:`` only (#668).
+    """
+    if profile is None or not profile.has_cv_photo:
+        return ""
+    row = ProfilePicture.objects.filter(profile=profile, kind=ProfilePicture.CV).first()
+    if row is None:
+        return ""
+    return f"data:{row.media_type};base64,{base64.b64encode(bytes(row.data)).decode('ascii')}"

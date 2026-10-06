@@ -322,6 +322,9 @@ def contact_details(owner, cv: CV | None = None) -> dict:
     details["nationalities"] = list(printed.nationalities)
     details["nationality_scope"] = personal.scope_text(printed.nationality_scope)
     details["gender"] = printed.gender
+    # A ``data:`` address, which is all either renderer may open, or an empty string; a theme
+    # that does not read it prints no photo and is none the worse (#668).
+    details["photo"] = printed.photo
     details["personal"] = _personal_lines(
         details["birth_date"],
         details["birth_place"],

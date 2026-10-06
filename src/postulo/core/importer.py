@@ -991,6 +991,22 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         elif avatar_file:
             report.skipped.append("The profile picture was too large, or not in the archive")
 
+    cv_photo_file = account.get("cv_photo_file") or ""
+    if profile and cv_photo_file:
+        from postulo.accounts import avatars
+
+        content = _extract_within(archive, cv_photo_file, avatars.MAX_UPLOAD_BYTES)
+        if content is not None:
+            # Decoded and written out again, as the profile form does, and not cropped (#668).
+            try:
+                processed = avatars.process_cv_photo(content)
+            except avatars.UnusableImage as exc:
+                report.skipped.append(f"The CV photo: {exc}, and left out")
+            else:
+                avatars.store(profile, avatars.ProfilePicture.CV, processed)
+        else:
+            report.skipped.append("The CV photo was too large, or not in the archive")
+
     # --------------------------------------------------------------------- tags
     # An archive written before #285 carries whatever its owner typed into a free-text
     # colour box, and one written by a later Postulo than this may carry an icon this one

@@ -94,8 +94,26 @@
                 {% endblocktranslate %}
               </p>
             {% endif %}
+            <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">{% translate "This picture is not the one a CV prints. A CV photo is kept separately, just below." %}</p>
           </div>
         </div>
+      </div>
+
+      {% comment %} A photograph for CVs, of its own (#668): not the picture above, not cropped, and printed only by a CV whose own page says so. {% endcomment %}
+      <div class="card mb-4" id="section-cv-photo" data-cv-photo>
+        <c-section-title id="section-cv-photo-title">
+          {% translate "Your CV photo" %}
+          <c-slot name="subtitle">{% translate "A photograph for your CVs, kept apart from your picture. It is kept as you frame it, and a CV prints it only when you tick that on the CV. The plain text and the Word file never carry it." %}</c-slot>
+        </c-section-title>
+        <p class="mb-3 text-sm" data-cv-photo-state>
+          {% if profile.has_cv_photo %}{% translate "A CV photo is kept." %}{% else %}{% translate "No CV photo is kept." %}{% endif %}
+        </p>
+        <c-field :field="form.cv_photo" />
+        {% if form.remove_cv_photo %}
+          <label class="flex items-center gap-2 text-sm">
+            {{ form.remove_cv_photo }} {{ form.remove_cv_photo.label }}
+          </label>
+        {% endif %}
       </div>
 
       {% comment %} The card's one sentence is also what describes its two menus: its id is

@@ -67,12 +67,19 @@
       /* Beside the name, in the contact line's own small print. What a theme gives the
          name itself -- its weight, small capitals, its letter-spacing -- stays on the name. */
       .pronouns { color: #4a4f5a; font-size: 8.5pt; font-weight: normal; font-variant: normal; letter-spacing: normal; }
+{% endblock %}{% endif %}{% if contact.photo %}{% block photo_styles %}
+      /* The photograph beside the name, in a 35 x 45 mm frame whatever shape it was given
+         in: `cover` fills the frame and keeps the top, where a face is. Which theme draws
+         it is not this rule's business; a theme may set the frame as it likes. */
+      .contact.has-photo { display: flex; gap: 6mm; align-items: flex-start; }
+      .contact-text { flex: 1; min-width: 0; }
+      .photo { flex: none; width: 35mm; height: 45mm; object-fit: cover; object-position: 50% 0; }
 {% endblock %}{% endif %}</style>
   </head>
   <body>
 
     {% if contact %}
-      <header class="contact">
+      <header class="contact{% if contact.photo %} has-photo{% endif %}">{% if contact.photo %}<img class="photo" src="{{ contact.photo }}" alt=""><div class="contact-text">{% endif %}
         <h1>{% if contact.form_of_address or contact.pronouns %}{% if contact.form_of_address %}<bdi class="form-of-address">{{ contact.form_of_address }}</bdi> {% endif %}<bdi>{{ contact.name }}</bdi>{% if contact.pronouns %} <span class="pronouns">(<bdi>{{ contact.pronouns }}</bdi>)</span>{% endif %}{% else %}{{ contact.name }}{% endif %}</h1>
         {% if cv.headline or contact.headline %}
           <p class="headline">{{ cv.headline|default:contact.headline }}</p>
@@ -84,7 +91,7 @@
            where the CV chose to print it (#679): "Born 12 March 1990 in Porto, Portugal". {% endcomment %}
         {% if contact.personal %}<p class="details personal">
           {% for part in contact.personal %}{% if not forloop.first %}<span class="sep"> · </span>{% endif %}<span>{{ part }}</span>{% endfor %}
-        </p>{% endif %}
+        </p>{% endif %}{% if contact.photo %}</div>{% endif %}
       </header>
     {% elif cv.headline %}
       <header class="contact"><h1>{{ cv.headline }}</h1></header>

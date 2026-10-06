@@ -971,6 +971,7 @@ def test_the_archive_carries_the_choice_with_the_cv_by_what_each_row_says(person
         "birth_place": False,
         "nationality": False,
         "gender": False,
+        "photo": False,
         "eqf_level": False,
     }
     assert "pinned_phone" not in json.dumps(entry), "no row is named by an id"
@@ -1429,6 +1430,7 @@ def test_the_schema_describes_the_choice(person, client):
         "birth_place",
         "nationality",
         "gender",
+        "photo",
         "eqf_level",
     }
     assert "prints" in components["CVDetailOut"]["properties"]

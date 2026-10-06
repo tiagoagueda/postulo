@@ -66,6 +66,32 @@ def test_the_preview_is_on_the_page_and_follows_an_edit(page: Page, live_server,
     assert text.index("Black Mesa") < text.index("Aperture Science"), "the frame redrew"
 
 
+def test_the_cv_photo_is_drawn_in_the_preview_under_the_real_policy(
+    page: Page, live_server, cv, applicant
+):
+    """A `data:` image is the one way a photo reaches a document (#668): the frame must draw
+    it with no policy violation, which the autouse fixture in `conftest.py` would fail on."""
+    import io
+
+    from PIL import Image
+
+    from postulo.accounts import avatars
+    from postulo.accounts.models import ProfilePicture
+
+    buffer = io.BytesIO()
+    Image.new("RGB", (210, 270), "teal").save(buffer, format="PNG")
+    avatars.store(applicant.profile, ProfilePicture.CV, avatars.process_cv_photo(buffer.getvalue()))
+    cv.show_photo = True
+    cv.save()
+
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
+    photo = page.frame_locator("iframe[data-document-preview]").locator("img.photo")
+    expect(photo).to_have_count(1)
+    expect(photo).to_have_attribute("alt", "")
+    assert photo.evaluate("image => image.complete && image.naturalWidth > 0")
+
+
 def test_the_frame_is_named_and_is_not_a_keyboard_trap(page: Page, live_server, cv):
     """A frame is a second document and a reading context of its own (#275); it may be a
     stop in the tab order, but a stop somebody can leave again."""

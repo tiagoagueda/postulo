@@ -179,6 +179,7 @@ SWITCHES: dict[str, str] = {
     "birth_place": "show_birth_place",
     "nationality": "show_nationality",
     "gender": "show_gender",
+    "photo": "show_photo",
     "eqf_level": "show_eqf_level",
 }
 
@@ -341,6 +342,9 @@ class Printed:
     nationality_scope: str = ""
     #: The person's own word, only where the CV says so (#681).
     gender: str = ""
+    #: The person's CV photo as a ``data:`` address, only where the CV says so and one is
+    #: kept (#668).
+    photo: str = ""
     #: The kinds whose pinned row is no longer there, for the page to say so.
     gone: tuple[Detail, ...] = ()
 
@@ -437,6 +441,10 @@ def resolve(owner, cv: CV | None = None) -> Printed:
                 printed.nationality_scope = profile.nationality_scope
         if cv.show_gender:
             printed.gender = (profile.gender or "").strip()
+        if cv.show_photo:
+            from postulo.accounts import avatars
+
+            printed.photo = avatars.cv_photo_data_uri(profile)
     printed.gone = tuple(missing)
     return printed
 
