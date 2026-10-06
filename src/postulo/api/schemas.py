@@ -985,6 +985,20 @@ class DocumentOut(Schema):
         description="For an upload of kind `reference`: who wrote it, when, until when it is "
         "good to send and who sends it. Null otherwise",
     )
+    checksum: str = Field(
+        default="", description="The SHA-256 of the file as it was kept, in hexadecimal"
+    )
+    size: int | None = Field(
+        default=None, description="The file's length in bytes as it was kept, for an upload"
+    )
+    damage: str = Field(
+        default="",
+        description="For an upload: `missing` or `changed` where the last check found the file "
+        "gone or no longer what was recorded; blank where it is as recorded or not yet checked",
+    )
+    verified_at: dt.datetime | None = Field(
+        default=None, description="When an upload's file was last read against its record"
+    )
     created_at: dt.datetime
     updated_at: dt.datetime
     download_url: str
@@ -1501,6 +1515,10 @@ def document_out(request, document, *, source: str) -> dict:
         "application_id": getattr(document, "application_id", None),
         "with_properties": getattr(document, "with_properties", None),
         "reference_letter": _reference_letter_out(document),
+        "checksum": getattr(document, "checksum", "") or "",
+        "size": getattr(document, "size", None),
+        "damage": getattr(document, "damage", "") or "",
+        "verified_at": getattr(document, "verified_at", None),
         "created_at": document.created_at,
         "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(

@@ -88,6 +88,11 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # records and importing nothing of Postulo's.
             "postulo.core.stored_pictures",
             "postulo.core.throttle",
+            # Where kept files live, and what a file is (#663): the one boundary for the
+            # bytes and a check that reads them, each importing nothing of Postulo's but the
+            # foundation, and read by the record that holds the file.
+            "postulo.documents.filestore",
+            "postulo.documents.integrity",
             "postulo.documents.outline",
             "postulo.documents.themes",
             "postulo.jobs.esco",

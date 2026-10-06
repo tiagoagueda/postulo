@@ -36,7 +36,10 @@ def application(user):
 
 def a_letter(user, referee=None, *, title="Letter from Ada", **fields):
     upload = UploadedDocument.objects.create(
-        owner=user, title=title, kind="reference", file=ContentFile(b"%PDF-1.7 ref", name="r.pdf")
+        owner=user,
+        title=title,
+        kind="reference",
+        file=ContentFile(b"%PDF-1.7 ref\n%%EOF", name="r.pdf"),
     )
     ReferenceLetter.objects.create(owner=user, upload=upload, referee=referee, **fields)
     return upload
@@ -45,7 +48,7 @@ def a_letter(user, referee=None, *, title="Letter from Ada", **fields):
 def the_form(user, data, *, instance=None):
     from django.core.files.uploadedfile import SimpleUploadedFile
 
-    files = None if instance else {"file": SimpleUploadedFile("r.pdf", b"%PDF-1.7 ref")}
+    files = None if instance else {"file": SimpleUploadedFile("r.pdf", b"%PDF-1.7 ref\n%%EOF")}
     return UploadedDocumentForm(data, files=files, user=user, instance=instance)
 
 

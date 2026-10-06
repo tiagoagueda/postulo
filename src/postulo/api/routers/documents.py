@@ -333,7 +333,11 @@ def download_document(request, source: str, pk: int):
     if source == "upload":
         document = owned_or_404(request, UploadedDocument.objects, pk)
         return serve_private_file(
-            request, document.file, download_name=document.download_name, as_attachment=True
+            request,
+            document.file,
+            download_name=document.download_name,
+            as_attachment=True,
+            within=document.storage_prefix,
         )
     if source == "rendered":
         document = owned_or_404(request, RenderedDocument.objects, pk)

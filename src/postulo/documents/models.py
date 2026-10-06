@@ -35,7 +35,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 
-from . import kinds, themes
+from . import integrity, kinds, themes
 
 # The stored values of Postulo's own kinds live with the registry that describes them, which
 # no longer has to import this module to find them (#248). Handed out here as well, because
@@ -634,11 +634,7 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     file = models.FileField(
         _("file"),
         upload_to=upload_to_documents,
-        validators=[
-            FileExtensionValidator(
-                ["pdf", "doc", "docx", "odt", "rtf", "txt", "png", "jpg", "jpeg"]
-            )
-        ],
+        validators=[FileExtensionValidator(list(integrity.EXTENSIONS))],
     )
     notes = models.TextField(_("notes"), blank=True)
     #: Which language the file is in, said by the person who uploaded it (#283).
@@ -665,6 +661,15 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: written at creation and never changes: a different file is a different version, through
     #: `replaces`.
     checksum = models.CharField(_("checksum"), max_length=64, blank=True, editable=False)
+    #: The file's size in bytes, written beside the checksum and for the same reason (#663):
+    #: a download compares it with the disk without reading the file, and the scrub compares
+    #: it first. Null for a row from before it was kept, which is held to nothing.
+    size = models.PositiveBigIntegerField(_("size"), null=True, blank=True, editable=False)
+    #: When the scrub last read the file, and what it found: empty where it is as recorded,
+    #: otherwise `integrity.Damage`. The file is never deleted for being damaged; the row says
+    #: so and the person replaces it (#663).
+    verified_at = models.DateTimeField(_("last checked"), null=True, blank=True, editable=False)
+    damage = models.CharField(_("damage"), max_length=10, blank=True, editable=False)
 
     version = models.PositiveIntegerField(_("version"), default=1)
     replaces = models.ForeignKey(
@@ -703,6 +708,7 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
         """
         if self.file and not self.checksum:
             digest = hashlib.sha256()
+            length = 0
             # Leave the file as it was found. Hashing opens it, and a handle left open is a
             # file Windows will not let anything delete afterwards -- which is exactly what
             # the delete this issue adds has to be able to do.
@@ -710,20 +716,37 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
             try:
                 for chunk in self.file.chunks():
                     digest.update(chunk)
+                    length += len(chunk)
             finally:
                 if was_closed:
                     self.file.close()
                 else:
                     self.file.seek(0)
-            self.checksum = digest.hexdigest()
+            # What an archive said the file was is kept where it said one, so that a file
+            # that arrived damaged is not given the figures of the damage (#663).
+            self.checksum = self.checksum or digest.hexdigest()
+            self.size = length if self.size is None else self.size
             if "update_fields" in kwargs and kwargs["update_fields"] is not None:
-                kwargs["update_fields"] = [*kwargs["update_fields"], "checksum"]
-        super().save(*args, **kwargs)
+                kwargs["update_fields"] = [*kwargs["update_fields"], "checksum", "size"]
+        # The file is written as the row is saved. A row the database then refuses must not
+        # leave the bytes behind with nothing pointing at them (#663).
+        fresh = bool(self.file) and not self.file._committed
+        try:
+            super().save(*args, **kwargs)
+        except BaseException:
+            if fresh and self.file._committed:
+                self.file.storage.delete(self.file.name)
+            raise
 
     @property
     def archived_at(self):
         """When a store should say this document is from. See `archive_origin`."""
         return self.created_at
+
+    @property
+    def storage_prefix(self) -> str:
+        """The folder this person's uploads are kept under, and no other's (#663)."""
+        return f"documents/{self.owner_id}/"
 
     class Meta:
         verbose_name = _("uploaded document")

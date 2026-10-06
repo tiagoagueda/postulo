@@ -56,8 +56,8 @@ def test_a_crafted_archive_writes_only_under_the_persons_own_directory(user, oth
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w") as archive:
         archive.writestr("postulo.json", json.dumps(document, default=str))
-        archive.writestr("media/../../escaped.pdf", b"%PDF-1.4 escaped")
-        archive.writestr(f"media/documents/{user.pk}/2026/01/theirs.pdf", b"%PDF-1.4 theirs")
+        archive.writestr("media/../../escaped.pdf", b"%PDF-1.4 escaped\n%%EOF")
+        archive.writestr(f"media/documents/{user.pk}/2026/01/theirs.pdf", b"%PDF-1.4 theirs\n%%EOF")
 
     importer.load(other_user, zipfile.ZipFile(io.BytesIO(buffer.getvalue())))
 
@@ -72,7 +72,7 @@ def test_a_crafted_archive_writes_only_under_the_persons_own_directory(user, oth
 
 def test_private_files_are_never_served_by_path(client, user, other_user):
     upload = UploadedDocument.objects.create(owner=user, title="Mine")
-    upload.file.save("cv.pdf", io.BytesIO(b"%PDF-1.4 private"), save=True)
+    upload.file.save("cv.pdf", io.BytesIO(b"%PDF-1.4 private\n%%EOF"), save=True)
     assert client.get(f"{settings.MEDIA_URL}{upload.file.name}").status_code == 404, (
         "MEDIA_URL is not routed; the web server never serves media"
     )

@@ -584,6 +584,13 @@ POSTULO_MEDIA_ACCEL_PREFIX = env("POSTULO_MEDIA_ACCEL_PREFIX", default="")
 # Apache with mod_xsendfile.
 POSTULO_MEDIA_SENDFILE = env.bool("POSTULO_MEDIA_SENDFILE", default=False)
 
+# The scheduler removes a file under the media root that no row names, once it is older than
+# the grace period: a request that failed after its file was written leaves one behind, and
+# Django has no hook for a rollback (#663). The grace is what stops it taking a file a
+# request is about to attach. Set POSTULO_MEDIA_SWEEP=false to leave it to `prune_media`.
+POSTULO_MEDIA_SWEEP = env.bool("POSTULO_MEDIA_SWEEP", default=True)
+POSTULO_MEDIA_SWEEP_GRACE_HOURS = env.int("POSTULO_MEDIA_SWEEP_GRACE_HOURS", default=24)
+
 # ------------------------------------------------------------------------ pdf
 
 # auto | weasyprint | chromium. WeasyPrint is the default renderer and ships with

@@ -54,6 +54,13 @@
               </p>
               {% url 'documents:upload_archive' document.pk as send_url %}
               {% include "documents/partials/copies.html" with document=document send_url=send_url %}
+              {% comment %} What the last check found (#663). Said where the person looks, with
+                 the way out: a damaged file is never deleted, and a new version replaces it. {% endcomment %}
+              {% if document.damage == "missing" %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400" data-damage="missing">{% translate "This file is missing. Upload it again as a new version that supersedes this one." %}</p>
+              {% elif document.damage %}
+                <p class="mt-1 text-xs text-red-600 dark:text-red-400" data-damage="changed">{% translate "This file no longer matches what was uploaded. Upload it again as a new version that supersedes this one." %}</p>
+              {% endif %}
             </div>
             <div class="flex flex-wrap items-center gap-2">
               {% comment %} Each action names its row in hidden text (#276): a links list read

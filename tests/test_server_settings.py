@@ -151,15 +151,15 @@ def test_the_overview_says_what_is_running(client, admin):
 
 
 def test_the_overview_does_not_walk_the_media_directory_on_every_visit(client, admin, monkeypatch):
-    from postulo.core import server_views
+    from postulo.documents import filestore
 
     calls = []
 
-    def counted(root):
-        calls.append(root)
+    def counted():
+        calls.append(1)
         return 3, 2048
 
-    monkeypatch.setattr(server_views, "_directory_size", counted)
+    monkeypatch.setattr(filestore, "totals", counted)
     client.force_login(admin)
     for _visit in range(2):
         assert client.get(reverse("server:overview")).status_code == 200

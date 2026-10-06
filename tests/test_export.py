@@ -75,7 +75,7 @@ def populated(db, user):
     UploadedDocument.objects.create(
         owner=user,
         title="Designed CV",
-        file=SimpleUploadedFile("designed.pdf", b"%PDF-1.7 pretend"),
+        file=SimpleUploadedFile("designed.pdf", b"%PDF-1.7 pretend\n%%EOF"),
     )
     return user
 
@@ -246,7 +246,7 @@ def test_files_come_back_with_their_contents(populated, other_user):
     upload = UploadedDocument.objects.for_user(other_user).get()
     upload.file.open("rb")
     try:
-        assert upload.file.read() == b"%PDF-1.7 pretend"
+        assert upload.file.read() == b"%PDF-1.7 pretend\n%%EOF"
     finally:
         upload.file.close()
 
@@ -476,7 +476,7 @@ def test_an_uploads_and_a_snapshots_language_survive_the_round_trip(user, other_
     upload = UploadedDocument(
         owner=user, title="Diploma", kind=DocumentKind.CERTIFICATE, language="de"
     )
-    upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x"), save=True)
+    upload.file.save("diploma.pdf", ContentFile(b"%PDF-1.7 x\n%%EOF"), save=True)
     sent = RenderedDocument(
         owner=user, title="CV", kind=DocumentKind.CV, language="fr-FR", checksum="abc"
     )

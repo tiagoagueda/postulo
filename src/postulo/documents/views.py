@@ -769,7 +769,11 @@ class UploadDownloadView(OwnedObjectMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         document = get_object_or_404(self.get_queryset(), pk=pk)
         return serve_private_file(
-            request, document.file, download_name=document.download_name, as_attachment=True
+            request,
+            document.file,
+            download_name=document.download_name,
+            as_attachment=True,
+            within=document.storage_prefix,
         )
 
 

@@ -33,6 +33,7 @@ from pathlib import Path
 from urllib.parse import quote
 
 from django.conf import settings
+from django.core.exceptions import SuspiciousFileOperation
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse
 from django.utils.http import content_disposition_header
 
@@ -48,7 +49,9 @@ def resolve_media_path(name: str) -> Path:
     a crafted upload name could still produce something like ``../../etc/passwd``. The
     check is cheap and the failure mode is severe, so it happens on every request.
     """
-    media_root = Path(settings.MEDIA_ROOT).resolve()
+    from postulo.documents import filestore
+
+    media_root = filestore.root().resolve()
     candidate = (media_root / name).resolve()
     if candidate != media_root and media_root not in candidate.parents:
         raise UnsafeMediaPath(f"{name!r} resolves outside MEDIA_ROOT")
@@ -75,22 +78,37 @@ def serve_private_file(
     *,
     download_name: str | None = None,
     as_attachment: bool = False,
+    within: str | None = None,
 ) -> HttpResponse:
     """Return a response delivering ``file_field`` to an already-authorised requester.
 
     This function performs **no** permission checking. The caller is responsible for
     establishing that the requester may see the file; keeping that decision at the call
     site is what stops it from being forgotten inside a generic helper.
+
+    ``within`` is the folder the name must lie under: an upload is kept under its owner's
+    own, and a row whose name says otherwise is not handed over whatever it points at, so
+    one wrong row cannot become another person's file (#663). Where the store has a path
+    for a name it is checked as it always was; where it has none the bytes are streamed.
     """
+    from postulo.documents import filestore
+
     if not file_field or not getattr(file_field, "name", ""):
         raise Http404("No file associated with this record.")
+    if within is not None and not file_field.name.startswith(within):
+        raise Http404("File not found.")
 
     try:
-        path = resolve_media_path(file_field.name)
-    except UnsafeMediaPath as exc:  # pragma: no cover - defensive
+        path = filestore.local_path(file_field.name)
+    except SuspiciousFileOperation as exc:  # pragma: no cover - defensive
         raise Http404("File not found.") from exc
+    if path is not None:
+        try:
+            resolve_media_path(file_field.name)
+        except UnsafeMediaPath as exc:  # pragma: no cover - defensive
+            raise Http404("File not found.") from exc
 
-    if not path.is_file():
+    if not filestore.exists(file_field.name):
         raise Http404("File not found.")
 
     filename = download_name or posixpath.basename(file_field.name)
@@ -106,11 +124,11 @@ def serve_private_file(
         response["X-Accel-Redirect"] = posixpath.join(
             accel_prefix.rstrip("/") + "/", quote(file_field.name)
         )
-    elif getattr(settings, "POSTULO_MEDIA_SENDFILE", False) and handed_over:
+    elif getattr(settings, "POSTULO_MEDIA_SENDFILE", False) and handed_over and path is not None:
         response = HttpResponse(content_type=content_type)
         response["X-Sendfile"] = str(path)
     else:
-        response = FileResponse(path.open("rb"), content_type=content_type)
+        response = FileResponse(filestore.open_file(file_field.name), content_type=content_type)
 
     response["Content-Disposition"] = content_disposition
     # Private documents have no business in a shared cache.

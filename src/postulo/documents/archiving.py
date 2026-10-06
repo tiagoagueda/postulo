@@ -27,6 +27,7 @@ from postulo.plugins.models import Connection
 from postulo.plugins.policy import allows, refused_connections
 from postulo.plugins.secrets import SecretsUnreadable
 
+from . import integrity
 from .models import CopyStatus, DocumentCopy, DocumentKind
 from .stores import documents_of, metadata_for, wants_kind
 
@@ -140,6 +141,19 @@ def send_copy(copy: DocumentCopy) -> bool:
         )
     if document is None or not document.file:
         return fail(str(_("There is no file to send.")))
+    # What is sent is what was kept: a file that is gone or no longer matches its record is
+    # never handed to a store as though it did (#663).
+    found = integrity.damage_of(
+        document.file.name,
+        size=getattr(document, "size", None),
+        checksum=getattr(document, "checksum", ""),
+    )
+    if found == integrity.Damage.MISSING:
+        return fail(str(_("The file is missing from this server, so it was not sent.")))
+    if found:
+        return fail(
+            str(_("The file no longer matches what was recorded for it, so it was not sent."))
+        )
 
     try:
         # What a store is told, the kind's name among it, is worded in the owner's language

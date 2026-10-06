@@ -28,6 +28,9 @@ from postulo.notifications.service import notify
 
 logger = logging.getLogger(__name__)
 
+#: How many uploads a scheduled pass reads against their record (#663).
+SCRUB_SLICE = 25
+
 
 def announce_due_reminders() -> tuple[int, int]:
     """Announce every outstanding reminder that is due and not yet announced.
@@ -174,6 +177,7 @@ class Command(BaseCommand):
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.core import errands, site
         from postulo.core.slow import reap_archives
+        from postulo.documents import scrub
         from postulo.documents.archiving import send_pending
         from postulo.jobs import pages
         from postulo.jobs.closing import announce_closing_postings
@@ -207,6 +211,11 @@ class Command(BaseCommand):
             # The pages of captures that never became a listing, past the days the
             # instance keeps them (#256). The captures stay; the copies of the pages go.
             pages_gone = pages.expire_unconfirmed()
+            # A slice of the uploads read against what was recorded, the least recently
+            # checked first, and the files no row names once they are older than the grace
+            # period (#663).
+            scrubbed = scrub.verify_uploads(limit=SCRUB_SLICE)
+            swept = scrub.sweep()
 
         # Outside the lease on purpose: a backup of a large media directory takes minutes,
         # and what it needs is its own claim on the slot, not this pass's. A failed one
@@ -240,6 +249,12 @@ class Command(BaseCommand):
             self.stdout.write(f"{when} {reaped} finished errands and expired archives removed")
         if pages_gone:
             self.stdout.write(f"{when} {pages_gone} kept pages of unconfirmed captures removed")
+        if scrubbed.damaged:
+            self.stdout.write(
+                f"{when} {scrubbed.damaged} of {scrubbed.checked} uploads checked are damaged"
+            )
+        if swept:
+            self.stdout.write(f"{when} {len(swept)} files no record names were removed")
         if self.quiet_pass and not any(
             (
                 stamped,
@@ -252,6 +267,8 @@ class Command(BaseCommand):
                 syncs_ran,
                 reaped,
                 pages_gone,
+                scrubbed.damaged,
+                swept,
             )
         ):
             self.stdout.write("Nothing due.")

@@ -51,6 +51,7 @@ from packaging.version import InvalidVersion, Version
 
 from postulo import __version__
 from postulo.config import sqlite as sqlite_options
+from postulo.documents import filestore
 
 #: Bumped when the archive's shape changes. Anything up to this is read: format 2 only
 #: adds members and manifest keys, so a format 1 archive taken before plugins and the key
@@ -424,7 +425,7 @@ def write_backup(
     from postulo.plugins import secrets
 
     path = resolve_target(target)
-    media_root = Path(settings.MEDIA_ROOT)
+    media_root = filestore.root()
     with_media = include_media and media_root.is_dir()
     media_files, media_bytes = _tree_stats(media_root) if with_media else (0, 0)
 
@@ -658,7 +659,7 @@ def restore_backup(
         )
 
     roots = {
-        MEDIA_PREFIX: Path(settings.MEDIA_ROOT),
+        MEDIA_PREFIX: filestore.root(),
         PLUGINS_PREFIX: Path(settings.POSTULO_PLUGINS_DIR),
     }
     report = RestoreReport(plugins=list((manifest.get("plugins") or {}).get("installed") or []))

@@ -66,30 +66,21 @@ class ServerSectionMixin(StaffRequiredMixin):
         return context
 
 
-def _directory_size(root: Path) -> tuple[int, int]:
-    files = 0
-    size = 0
-    if root.is_dir():
-        for entry in root.rglob("*"):
-            if entry.is_file():
-                files += 1
-                size += entry.stat().st_size
-    return files, size
-
-
 #: How old the media figures may be, five minutes: they change slowly, and the walk
 #: costs as much as the instance's whole history (#488).
 MEDIA_FIGURES_TTL = 300
 
 
-def _media_figures(root: Path) -> tuple[int, int]:
+def _media_figures() -> tuple[int, int]:
     from django.core.cache import cache
 
-    key = f"server-media-figures:{root}"
+    from postulo.documents import filestore
+
+    key = f"server-media-figures:{filestore.root()}"
     held = cache.get(key)
     if isinstance(held, (list, tuple)) and len(held) == 2:
         return held[0], held[1]
-    figures = _directory_size(root)
+    figures = filestore.totals()
     cache.set(key, list(figures), MEDIA_FIGURES_TTL)
     return figures
 
@@ -154,8 +145,10 @@ class OverviewView(ServerSectionMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        media_root = Path(settings.MEDIA_ROOT)
-        media_files, media_bytes = _media_figures(media_root)
+        from postulo.documents import filestore
+        from postulo.documents.models import UploadedDocument
+
+        media_files, media_bytes = _media_figures()
         database = settings.DATABASES["default"]
         context.update(
             {
@@ -169,7 +162,10 @@ class OverviewView(ServerSectionMixin, TemplateView):
                 # the scripts the offered languages need this machine's fonts draw.
                 # ``None`` says the machine cannot be asked (#74).
                 "font_scripts": _font_scripts(),
-                "media_root": media_root,
+                "media_root": filestore.root(),
+                # What the scrub last found wrong, across every account: a count and no more,
+                # as the rest of this page is (#663).
+                "media_damaged": UploadedDocument.objects.exclude(damage="").count(),
                 "media_files": media_files,
                 "media_bytes": media_bytes,
                 "backup_dir": Path(settings.POSTULO_BACKUP_DIR),

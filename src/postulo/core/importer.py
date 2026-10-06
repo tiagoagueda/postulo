@@ -14,7 +14,9 @@ old identifiers are mapped to new records as they go.
 
 from __future__ import annotations
 
+import contextvars
 import json
+import logging
 import re
 import zipfile
 import zlib
@@ -770,13 +772,71 @@ def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport
     database refuses that the importer did not foresee is an `ArchiveError`, a sentence
     for the operator rather than a traceback (#375).
     """
+    # Every file written on the way, so that a failure takes them back with the rows (#663):
+    # the transaction rolls the rows back and has no say over the bytes beside them.
+    written: list[str] = []
+    marker = _written.set(written)
     try:
         return _load(user, archive, force=force)
-    except IntegrityError as error:
-        raise ArchiveError(
-            f"The archive clashes with what the account already holds: {error}. "
-            "Nothing was imported."
-        ) from error
+    except BaseException as error:
+        _take_back(written)
+        if isinstance(error, IntegrityError):
+            raise ArchiveError(
+                f"The archive clashes with what the account already holds: {error}. "
+                "Nothing was imported."
+            ) from error
+        raise
+    finally:
+        _written.reset(marker)
+
+
+#: The files `load` has written so far, set for the length of one import.
+_written: contextvars.ContextVar[list[str] | None] = contextvars.ContextVar(
+    "importer_written", default=None
+)
+
+logger = logging.getLogger(__name__)
+
+
+def _wrote(*names: str) -> None:
+    held = _written.get()
+    if held is not None:
+        held.extend(name for name in names if name)
+
+
+def _take_back(names: list[str]) -> None:
+    """Remove every file an import that failed had written. Never raises."""
+    from postulo.documents import filestore
+
+    for name in names:
+        try:
+            filestore.delete(name)
+        except OSError:  # pragma: no cover - a file already gone is the outcome wanted
+            logger.warning("Could not remove %s after a failed import", name, exc_info=True)
+
+
+def _file_problem(stored_name: str, content: bytes, said: dict, *, uploaded: bool) -> str | None:
+    """Why a file unpacked from the archive is not to be kept, or nothing where it is.
+
+    Nothing in an archive is taken on trust, as for a kept page: the figures it says are
+    measured against the bytes that arrived, and an upload is held to the same extension
+    list and the same look-alike check a form applies (#663).
+    """
+    from postulo.documents import integrity
+
+    size, checksum = integrity.digest_of_bytes(content)
+    said_size, said_checksum = said.get("size"), said.get("checksum")
+    if isinstance(said_checksum, str) and said_checksum and said_checksum != checksum:
+        return "it does not match the checksum the archive recorded for it"
+    if isinstance(said_size, int) and not isinstance(said_size, bool) and said_size != size:
+        return "it is not the size the archive recorded for it"
+    if uploaded:
+        extension = integrity.extension_of(stored_name)
+        if extension not in integrity.EXTENSIONS:
+            return "it is not a type of file an upload may be"
+        if integrity.problem_with_bytes(extension, content):
+            return "its content is not what its name says"
+    return None
 
 
 @transaction.atomic
@@ -1578,6 +1638,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         upload_entry.pop("created_at", None)
         copies = upload_entry.pop("copies", [])
         letter_entry = upload_entry.pop("reference_letter", None)
+        # The archive's figures are measured against the bytes and never written to the row:
+        # the row's own are worked out from what was kept (#663).
+        figures = {name: upload_entry.pop(name, None) for name in ("checksum", "size")}
 
         upload = UploadedDocument(
             owner=user, **_carried(upload_entry, UPLOAD_FIELDS, report, "An upload")
@@ -1587,8 +1650,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         content = _extract_within(archive, stored_name, MAX_UPLOAD_BYTES)
         if content is None:
             report.skipped.append(f"File for “{upload.title}” was too large, or not in the archive")
+        elif problem := _file_problem(stored_name, content, figures, uploaded=True):
+            report.skipped.append(f"File for “{upload.title}” was left out: {problem}")
         else:
             upload.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
+            _wrote(upload.file.name)
         upload.save()
         _restore_copies(user, copies, upload)
         if isinstance(letter_entry, dict):
@@ -1620,6 +1686,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # that is not one is not a reason to refuse the file (#480).
         with_properties = sent_entry.pop("with_properties", True) is not False
 
+        figures = {"checksum": sent_entry.get("checksum")}
         sent = RenderedDocument(
             owner=user,
             application=application,
@@ -1636,8 +1703,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         content = _extract_within(archive, stored_name, MAX_UPLOAD_BYTES)
         if content is None:
             report.skipped.append(f"File for “{sent.title}” was too large, or not in the archive")
+        elif problem := _file_problem(stored_name, content, figures, uploaded=False):
+            report.skipped.append(f"File for “{sent.title}” was left out: {problem}")
         else:
             sent.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
+            _wrote(sent.file.name)
         sent.save()
         _restore_copies(user, copies, sent)
         report.sent_documents += 1
@@ -1846,6 +1916,8 @@ def _restore_kept_page(archive: zipfile.ZipFile, capture, kept: dict, report) ->
         rendered_by=str(kept.get("rendered_by") or ""),
     )
     report.skipped.extend(f"Capture “{capture}”: {line}" for line in left_out)
+    if page is not None:
+        _wrote(page.source.name, page.rendering.name)
     return 1 if page is not None else 0
 
 

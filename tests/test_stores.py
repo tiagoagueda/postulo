@@ -647,3 +647,33 @@ def test_an_existing_connection_keeps_the_setting_it_has_for_reference_letters(u
     assert "kind_reference" not in old.config
     assert wants_kind(old.config, "reference") is True, "unset still means yes"
     assert wants_kind(a_store(user, "Chose", kind_reference=False).config, "reference") is False
+
+
+def test_a_copy_whose_bytes_do_not_match_the_recorded_checksum_is_not_sent(user, shelf):
+    """What leaves is what was kept: a file that changed on disk is never handed over (#663)."""
+    from pathlib import Path
+
+    a_store(user)
+    upload = an_upload(user)
+    Path(upload.file.path).write_bytes(b"%PDF-1.7 something else")
+    copy = copies_of(upload).get()
+
+    assert send_copy(copy) is False
+
+    copy.refresh_from_db()
+    assert copy.status == CopyStatus.FAILED
+    assert "no longer matches" in copy.last_error
+    assert shelf.received == [], "nothing reached the store"
+
+
+def test_a_copy_of_a_file_that_is_gone_says_so(user, shelf):
+    from pathlib import Path
+
+    a_store(user)
+    upload = an_upload(user)
+    Path(upload.file.path).unlink()
+    copy = copies_of(upload).get()
+
+    assert send_copy(copy) is False
+    copy.refresh_from_db()
+    assert "missing" in copy.last_error and shelf.received == []

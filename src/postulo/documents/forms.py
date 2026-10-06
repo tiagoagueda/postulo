@@ -15,7 +15,7 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import themes
+from . import integrity, themes
 from .kinds import DocumentKind
 from .models import (
     CV,
@@ -642,6 +642,14 @@ class UploadedDocumentForm(OwnerScopedModelForm):
                 _("That file is larger than %(limit)s MB.")
                 % {"limit": MAX_UPLOAD_BYTES // (1024 * 1024)}
             )
+        if uploaded:
+            # What the bytes are, not only what the name says: a file called cv.pdf that is
+            # not a PDF is refused here and not stored, hashed and delivered (#663).
+            refusal = integrity.problem(
+                integrity.extension_of(uploaded.name), uploaded.file, uploaded.size
+            )
+            if refusal:
+                raise forms.ValidationError(refusal)
         return uploaded
 
     def clean(self):

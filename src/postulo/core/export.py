@@ -150,7 +150,10 @@ logger = logging.getLogger(__name__)
 #: codes, a note of national ones, and two dates -- never a number or anything else a licence
 #: carries. An archive without them restores none; a code outside the fifteen restores no
 #: licence and says so (#691).
-FORMAT_VERSION = 53
+#: 54 added ``checksum`` and ``size`` on an upload: the SHA-256 and the length of the file as it
+#: was kept. The importer measures what it unpacked against them and restores the row without
+#: the file, and says so, where they differ; an archive without them restores as before (#663).
+FORMAT_VERSION = 54
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -458,6 +461,10 @@ UPLOAD_FIELDS = (
     # builds the row from what is there, so an older one restores with the field blank --
     # which is what blank means here anyway: nobody has said.
     "language",
+    # Format 54 (#663): what the file was when it was kept, so that a restore can tell a file
+    # that arrived whole from one that did not. An older archive has neither key.
+    "checksum",
+    "size",
 )
 SENT_FIELDS = (
     "id",

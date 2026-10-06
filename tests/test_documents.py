@@ -446,12 +446,12 @@ def test_a_new_version_numbers_itself_from_the_one_it_supersedes(db, user):
     first = UploadedDocument.objects.create(
         owner=user,
         title="Designed CV",
-        file=SimpleUploadedFile("cv.pdf", b"%PDF-1.7 one"),
+        file=SimpleUploadedFile("cv.pdf", b"%PDF-1.7 one\n%%EOF"),
     )
 
     form = UploadedDocumentForm(
         data={"title": "Designed CV", "kind": "cv", "replaces": first.pk, "notes": ""},
-        files={"file": SimpleUploadedFile("cv-v2.pdf", b"%PDF-1.7 two")},
+        files={"file": SimpleUploadedFile("cv-v2.pdf", b"%PDF-1.7 two\n%%EOF")},
         user=user,
     )
     assert form.is_valid(), form.errors

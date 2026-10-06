@@ -20,12 +20,11 @@ by anyone, including themselves. Somebody has to be able to open the door.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from pathlib import Path
 
-from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.core.files.storage import default_storage
 from django.db import transaction
+
+from postulo.documents import filestore
 
 
 class LastAdministrator(Exception):
@@ -60,6 +59,10 @@ def is_last_administrator(user) -> bool:
     return not others.exists()
 
 
+#: The folders under the media root that are kept per person, one folder each.
+MEDIA_FOLDERS = ("documents", "avatars", "captures", "exports", "logos")
+
+
 def files_of(user) -> list[str]:
     """Every storage name the person's rows point at.
 
@@ -80,16 +83,9 @@ def files_of(user) -> list[str]:
     return [name for name in names if name]
 
 
-def media_directories_of(user) -> list[Path]:
-    """The per-person directories files were stored under, to prune once empty."""
-    root = Path(settings.MEDIA_ROOT)
-    return [
-        root / "documents" / str(user.pk),
-        root / "avatars" / str(user.pk),
-        root / "captures" / str(user.pk),
-        root / "exports" / str(user.pk),
-        root / "logos" / str(user.pk),
-    ]
+def media_directories_of(user) -> list[str]:
+    """The per-person folders files were stored under, to prune once empty."""
+    return [f"{folder}/{user.pk}" for folder in MEDIA_FOLDERS]
 
 
 def delete_account(user) -> DeletionReport:
@@ -121,80 +117,24 @@ def delete_account(user) -> DeletionReport:
     # it straight away; the removal itself waits for the commit.
     present = []
     for name in names:
-        try:
-            exists = default_storage.exists(name)
-        except OSError:
-            exists = False
-        if exists:
+        if filestore.exists(name):
             present.append(name)
         else:
             report.files_missing += 1
     report.files_removed = len(present)
-    report.directories_removed = sum(_would_prune(d, present) for d in directories)
+    report.directories_removed = sum(filestore.would_prune(d, set(present)) for d in directories)
 
     def remove_files() -> None:
         for name in names:
             try:
-                if default_storage.exists(name):
-                    default_storage.delete(name)
+                if filestore.exists(name):
+                    filestore.delete(name)
             except OSError:
                 pass
         for directory in directories:
-            _prune_empty(directory)
+            filestore.prune_empty_directories(directory)
 
     # Registered after ``user.delete()``, so it runs after the receivers that remove files
     # of their own, and only if the deletion really commits.
     transaction.on_commit(remove_files)
     return report
-
-
-def _would_prune(directory: Path, names: list[str]) -> int:
-    """How many directories :func:`_prune_empty` will remove once ``names`` are gone."""
-    if not directory.is_dir():
-        return 0
-    going = set()
-    for name in names:
-        try:
-            going.add(Path(default_storage.path(name)).resolve())
-        except (NotImplementedError, OSError):
-            pass
-    count = 0
-    # Deepest first, remembering which directories end up empty.
-    emptied: set[Path] = set()
-    nodes = sorted(
-        [directory, *(p for p in directory.rglob("*") if p.is_dir())],
-        key=lambda p: len(p.parts),
-        reverse=True,
-    )
-    for node in nodes:
-        try:
-            children = list(node.iterdir())
-        except OSError:
-            continue
-        if all(
-            (child in emptied) or (child.is_file() and child.resolve() in going)
-            for child in children
-        ):
-            emptied.add(node)
-            count += 1
-    return count
-
-
-def _prune_empty(directory: Path) -> int:
-    """Remove ``directory`` and any empty directories inside it. Never a file."""
-    removed = 0
-    if not directory.is_dir():
-        return removed
-    for child in sorted(directory.rglob("*"), key=lambda p: len(p.parts), reverse=True):
-        if child.is_dir():
-            try:
-                child.rmdir()
-                removed += 1
-            except OSError:
-                pass
-    try:
-        directory.rmdir()
-        removed += 1
-    except OSError:
-        pass
-    return removed

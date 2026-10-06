@@ -157,6 +157,15 @@
               {{ counter }} files, {{ size }}
             {% endblocktranslate %}
             <span class="block text-xs text-ink-500 dark:text-ink-400"><code>{{ media_root }}</code></span>
+            {% if media_damaged %}
+              <span class="block text-xs text-amber-700 dark:text-amber-400" data-media-damaged>
+                {% blocktranslate count counter=media_damaged trimmed %}
+                  {{ counter }} uploaded file is missing or changed; see <code>verify_media</code>
+                {% plural %}
+                  {{ counter }} uploaded files are missing or changed; see <code>verify_media</code>
+                {% endblocktranslate %}
+              </span>
+            {% endif %}
           </dd>
         </div>
         <div class="flex justify-between gap-4">

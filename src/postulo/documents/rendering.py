@@ -761,12 +761,17 @@ def _file_and_save(document: RenderedDocument, filename: str, content: bytes) ->
     for every store the owner has connected — and that is these two statements and nothing
     slow between them.
 
-    The file is written first and outside, as it always was. A row that fails to save leaves
-    bytes nobody points at, which is the same orphan a rolled-back request left before.
+    The file is written first and outside, as it always was. A row that fails to save takes
+    the file back before the failure is passed on (#663); a request that fails after both
+    have returned is the scheduled sweep's.
     """
     _keep(document, filename, content)
-    with transaction.atomic():
-        document.save()
+    try:
+        with transaction.atomic():
+            document.save()
+    except BaseException:
+        document.file.storage.delete(document.file.name)
+        raise
 
 
 def sent_to(application) -> str:
