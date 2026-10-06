@@ -21,14 +21,14 @@ def test_an_entry_takes_you_to_its_section_and_is_marked_there(live_server, page
     page.goto(f"{live_server.url}/career/")
 
     nav = page.locator('nav[aria-label="Career sections"]')
-    expect(nav.locator("a")).to_have_count(9)
+    expect(nav.locator("a")).to_have_count(13)
 
-    nav.locator('a[href="#section-language"]').click()
+    nav.locator('a[href="#section-reference"]').click()
 
-    section = page.locator("#section-language")
+    section = page.locator("#section-reference")
     box = section.bounding_box()
     assert box and 0 <= box["y"] < 700, "the section was not brought onto the screen"
-    expect(nav.locator('a[href="#section-language"]')).to_have_attribute("aria-current", "location")
+    expect(nav.locator('a[href="#section-reference"]')).to_have_attribute("aria-current", "location")
     expect(nav.locator('a[href="#section-experience"]')).not_to_have_attribute(
         "aria-current", "location"
     )
