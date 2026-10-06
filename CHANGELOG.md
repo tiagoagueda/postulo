@@ -52,6 +52,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Diploma and Diploma supplement are kinds of file, and a certificate, diploma or supplement can say which education or certification entry it proves; the Files list, the career page, the API and the archive carry the link (#669)
 - Uploads are now checked for what they are, kept with a size and checksum the archive carries (format 54), scrubbed on a schedule without ever deleting a damaged file, and orphans are swept after a grace period (#663)
 - A CV can print a photograph of its own, kept apart from your picture, uncropped and off until a CV's "Print your CV photo" is ticked; it is left out of the plain text and Word file, and the archive format is now 55 (#668)
 - Your career gains a Driving licences section: tick the categories you hold (AM to DE) and a CV prints "Driving licence: B, A2 (Portugal)"; the licence number and everything else on the card is never kept (#691)

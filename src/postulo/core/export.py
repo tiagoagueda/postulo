@@ -1228,8 +1228,8 @@ def build_document(user) -> dict:
             "proves": _proves(upload),
         }
         for upload in UploadedDocument.objects.for_user(user)
-        .select_related("reference_letter", "proves_type")
-        .prefetch_related("copies")
+        .select_related("reference_letter")
+        .prefetch_related("copies", "proves")
     ]
     document["documents"]["sent"] = [
         {
