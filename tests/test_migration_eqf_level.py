@@ -11,8 +11,8 @@ import pytest
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
-BEFORE = [("resume", "0010_an_education_entry_states_its_eqf_level")]
-AFTER = [("resume", "0011_move_an_eqf_grade_to_the_level")]
+BEFORE = [("resume", "0011_an_education_entry_states_its_eqf_level")]
+AFTER = [("resume", "0012_move_an_eqf_grade_to_the_level")]
 
 pytestmark = pytest.mark.django_db(transaction=True)
 

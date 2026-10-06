@@ -45,7 +45,7 @@ def write_it_as_the_grade(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [
         ("contenttypes", "0002_remove_content_type_name"),
-        ("resume", "0010_an_education_entry_states_its_eqf_level"),
+        ("resume", "0011_an_education_entry_states_its_eqf_level"),
     ]
 
     operations = [migrations.RunPython(move_to_the_level, write_it_as_the_grade)]

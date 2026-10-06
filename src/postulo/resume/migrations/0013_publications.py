@@ -10,7 +10,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resume', '0009_type_labels'),
+        ('resume', '0012_move_an_eqf_grade_to_the_level'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
