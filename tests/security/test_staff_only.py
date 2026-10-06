@@ -24,6 +24,11 @@ pytestmark = pytest.mark.django_db
 #: A token rather than a staff gate: whoever holds the link may open it.
 OPEN_TO_STRANGERS = {"accounts:invite_accept"}
 
+#: The backups page hides itself from everybody but an administrator with a 404 rather than
+#: a 403, and names a file in the address rather than a record, so it has its own sweep:
+#: `tests/security/test_backups_page.py`.
+OWN_SWEEP = ("server:backup",)
+
 
 def staff_only_routes() -> list[str]:
     """Every name under `server:` and `accounts:invite_*`, as the resolver lists them."""
@@ -41,7 +46,7 @@ def staff_only_routes() -> list[str]:
     return sorted(
         name
         for name in found
-        if name.startswith("server:")
+        if (name.startswith("server:") and not name.startswith(OWN_SWEEP))
         or (name.startswith("accounts:invite_") and name not in OPEN_TO_STRANGERS)
     )
 

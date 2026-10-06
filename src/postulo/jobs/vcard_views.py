@@ -162,8 +162,14 @@ class ContactVCardsView(LoginRequiredMixin, TemplateView):
         for problem in report.problems[:20]:
             messages.warning(request, problem)
         if len(report.problems) > 20:
+            more = len(report.problems) - 20
             messages.warning(
                 request,
-                _("%(more)s more values were left out.") % {"more": len(report.problems) - 20},
+                ngettext(
+                    "%(more)s more value was left out.",
+                    "%(more)s more values were left out.",
+                    more,
+                )
+                % {"more": more},
             )
         return redirect("jobs:company_list")
