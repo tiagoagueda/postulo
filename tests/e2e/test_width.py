@@ -69,7 +69,7 @@ def company_form_parts(page: Page) -> tuple[dict, dict, dict]:
     details = page.locator("main form .card").first.bounding_box()
     identifiers = page.locator("main form [data-identifiers]").bounding_box()
     # By its type rather than its name: the right-to-left test reads the page in Arabic.
-    save = page.locator('main form button[type="submit"]').bounding_box()
+    save = page.locator('main form button[type="submit"]').first.bounding_box()
     assert details and identifiers and save
     return details, identifiers, save
 
@@ -333,7 +333,7 @@ def contact_form_parts(page: Page) -> tuple[dict, dict | None, dict]:
     details = page.locator("main form .card").first.bounding_box()
     rows = page.locator("main form [data-contact-rows]")
     rows_box = rows.bounding_box() if rows.count() else None
-    save = page.locator('main form button[type="submit"]').bounding_box()
+    save = page.locator('main form button[type="submit"]').first.bounding_box()
     assert details and save
     return details, rows_box, save
 
@@ -429,7 +429,7 @@ def test_a_contact_s_two_columns_mirror_right_to_left(live_server, page: Page, f
 def capture_form_parts(page: Page) -> tuple[dict, dict, dict]:
     form = page.locator("main form[method=post]").bounding_box()
     help_ = page.locator("main [data-capture-help]").bounding_box()
-    button = page.locator('main form button[type="submit"]').bounding_box()
+    button = page.locator('main form button[type="submit"]').first.bounding_box()
     assert form and help_ and button
     return form, help_, button
 
