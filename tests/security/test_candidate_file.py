@@ -795,6 +795,7 @@ def test_a_hostile_publication_is_text_on_the_page_and_a_refused_row_where_it_is
     page = client.get(reverse("resume:overview")).content.decode()
     assert "<img src=x" not in page and "<script>alert(1)" not in page
 
+
 # ------------------------------------------------- the code of a spoken language (#689)
 
 

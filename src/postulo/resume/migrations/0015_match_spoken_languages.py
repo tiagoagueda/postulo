@@ -22,7 +22,7 @@ def place(apps, schema_editor) -> None:
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("resume", "0010_language_by_code"),
+        ("resume", "0014_language_by_code"),
     ]
 
     operations = [

@@ -7,7 +7,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('resume', '0009_type_labels'),
+        ('resume', '0013_publications'),
     ]
 
     operations = [

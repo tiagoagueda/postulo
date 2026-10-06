@@ -12,8 +12,8 @@ from django.core.management import call_command
 from django.db import connection
 from django.db.migrations.executor import MigrationExecutor
 
-BEFORE = [("resume", "0010_language_by_code")]
-AFTER = [("resume", "0011_match_spoken_languages")]
+BEFORE = [("resume", "0014_language_by_code")]
+AFTER = [("resume", "0015_match_spoken_languages")]
 
 
 @pytest.mark.django_db(transaction=True)

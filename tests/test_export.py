@@ -888,6 +888,7 @@ def test_a_cv_holding_a_publication_and_a_link_keeps_both(populated, other_user)
     assert entries["link"].title == "Site"
     assert entries["link"].owner == other_user
 
+
 def test_a_language_is_written_with_its_code_and_an_older_archive_has_its_names_matched(
     user, other_user
 ):

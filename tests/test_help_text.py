@@ -64,6 +64,7 @@ EXCUSED = {
     "IndustryForm.name": "what the industry is called",
     "InterviewForm.kind": "the choices are the answer, and they are named",
     "JobPostingForm.company": "who the employer is",
+    "LanguageSkillForm.code": "which language, from the list",
     "LanguageSkillForm.name": "which language",
     "LinkForm.title": "what to call the link",
     "LinkForm.url": "where it goes",

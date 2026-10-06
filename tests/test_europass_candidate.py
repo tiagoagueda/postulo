@@ -1006,6 +1006,7 @@ def test_a_europass_employer_with_no_company_of_that_name_adds_none(user):
     assert Experience.objects.get(owner=user).company is None
     assert not Company.objects.filter(owner=user).exists()
 
+
 @pytest.mark.parametrize(
     "written,code",
     [
