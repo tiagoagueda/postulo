@@ -919,16 +919,20 @@ class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         # What was asked about their letters is done first, while the link is there to find
         # them by (#666); the contact's erasure then counts what is left as unlinked.
         letters = self.object.reference_letters.select_related("upload")
-        if self.request.POST.get("delete_letters"):
-            for letter in letters:
-                letter.upload.delete()
+        delete_letters = bool(self.request.POST.get("delete_letters"))
 
         # A deletion that does not say what it removed is a guess about its own effect, so
         # while the feature is offered the erasure carries the report and the person who
         # deleted reads it; off, the plain delete is what Postulo has always done (#297).
         if gdpr.is_offered(self.request.user):
             try:
-                report = gdpr.erase_contact(self.object)
+                # One savepoint: a refused erasure leaves the contact, so it must leave their
+                # letters too, and the refusal is a normal response that would commit them.
+                with transaction.atomic():
+                    if delete_letters:
+                        for letter in letters:
+                            letter.upload.delete()
+                    report = gdpr.erase_contact(self.object)
             except gdpr.ErasureRefused as refused:
                 # A plugin holds rows about them that it could not remove, so nothing
                 # was. Back to the person, who is still there, with the reason (#371).
@@ -936,6 +940,9 @@ class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
                 return redirect(reverse("jobs:contact_update", args=[self.object.pk]))
             messages.success(self.request, report.summary())
             return redirect(self.get_success_url())
+        if delete_letters:
+            for letter in letters:
+                letter.upload.delete()
         return super().form_valid(form)
 
     def get_success_url(self) -> str:

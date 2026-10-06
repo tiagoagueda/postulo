@@ -72,6 +72,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Contacts export and import as vCard 4.0 (.vcf): one contact, a company's people, every contact, a company card and your own card out; a 3.0 or 4.0 file in through a review with nothing ticked; the one mapping is on the plugin surface for the DAV plugin. (#660)
 - A company's page now warns, never blocking a save, when its register number and OpenCorporates id name different companies, or a stored identifier would be refused by its own kind today (#675)
 - Events as iCalendar: the calendar downloads as .ics, reminders become VTODO tasks in their own feed, and an .ics file is imported through a review with nothing made until you choose and no time guessed; the writer now runs on the icalendar library (#661)
+- A reference letter now records who wrote it, when, until when it is good to send and who sends it, shows its referee when you record what you sent and on the contact, and is off by default when copying to a new store (#666)
 
 ### 🐛 Fixed
 

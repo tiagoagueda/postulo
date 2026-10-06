@@ -563,6 +563,25 @@ def test_a_refused_erasure_is_a_message_on_the_contact_and_not_an_error_page(cli
     assert "Breaking" in str(refusal) and "Nothing was removed" in str(refusal)
 
 
+def test_a_refused_erasure_keeps_the_letters_it_was_asked_to_delete(client, user):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import ReferenceLetter, UploadedDocument
+
+    contact = make_contact(user, make_company(user))
+    upload = UploadedDocument.objects.create(
+        owner=user, title="Letter", kind="reference", file=ContentFile(b"%PDF-1.7", name="r.pdf")
+    )
+    ReferenceLetter.objects.create(owner=user, upload=upload, referee=contact)
+    client.force_login(user)
+
+    with installed_from(Breaking):
+        client.post(reverse("jobs:contact_delete", args=[contact.pk]), {"delete_letters": "1"})
+
+    assert Contact.objects.filter(pk=contact.pk).exists()
+    assert UploadedDocument.objects.filter(pk=upload.pk).exists(), "the contact stayed, so did it"
+
+
 def test_deleting_without_the_feature_is_the_plain_delete(client, user):
     contact = make_contact(user, make_company(user))
     add_link(contact, user)
