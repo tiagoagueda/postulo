@@ -46,15 +46,19 @@ from PIL import Image, ImageFile, ImageOps, UnidentifiedImageError
 #: Not a size limit — a limit on what decoding is allowed to allocate.
 MAX_PIXELS = 40_000_000
 
-#: What a stored picture may weigh. Chosen so the reduction below effectively never runs: a
-#: flat wordmark at a thousand pixels is well under two hundred kilobytes, and only a
-#: photographic or pathological file comes near this (#264).
+#: What a stored picture may weigh. Flat artwork -- a wordmark at a thousand pixels is well
+#: under two hundred kilobytes -- stays at the size it was given; a photograph never gets
+#: near this as a PNG at camera resolution, so it is reduced, in one estimated step (#264, #482).
 DEFAULT_BUDGET = 1024 * 1024
 
-#: How much smaller each attempt is when the budget is missed, and how far that may go. A
-#: gentle step because the first one usually succeeds; the floor is there so a file that
-#: cannot be made to fit fails instead of looping.
-REDUCTION = 0.8
+#: The longest edge a picture is brought down to before it is first encoded, so a phone's
+#: twelve megapixels are never written out as PNG only to be thrown away (#482).
+WORKING_EDGE = 2048
+
+#: How much of the budget an estimated reduction aims at, since a PNG's size does not follow
+#: the area exactly and a photograph loses less than its share when shrunk; and the floor,
+#: so a file that cannot be made to fit fails instead of looping.
+MARGIN = 0.6
 SMALLEST_EDGE = 64
 
 
@@ -83,7 +87,9 @@ def content_type_of(image: Image.Image) -> str:
 # ------------------------------------------------------------------------ raster
 
 
-def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Image:
+def decode(
+    data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None, draft_to: int | None = None
+) -> Image.Image:
     """The bytes as an image, or a refusal saying why.
 
     The dimensions are checked against ``max_pixels`` before anything is converted, and
@@ -94,6 +100,9 @@ def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Im
     what the image library reads from the bytes (#302): a BMP sent as ``image/png`` is a
     BMP, and is refused with `WrongKind`, and so is a file the library recognises as no
     picture at all -- an SVG, a PDF, text -- since that is not one of the kinds either.
+
+    ``draft_to`` lets a JPEG be decoded at a fraction of its size when that is still at
+    least this many pixels on the longest edge, which makes the decode itself cheaper (#482).
     """
     Image.MAX_IMAGE_PIXELS = max_pixels
     try:
@@ -102,6 +111,8 @@ def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Im
             raise WrongKind(str(_("That file could not be read as an image.")))
         if image.width * image.height > max_pixels:
             raise UnusablePicture(str(_("That image is far larger than it needs to be.")))
+        if draft_to and image.format == "JPEG":
+            image.draft(None, (draft_to, draft_to))
         # The whole picture, or a refusal: never a picture padded out to its size. Pillow
         # pads a file that stops part way when `LOAD_TRUNCATED_IMAGES` is set, and WeasyPrint
         # sets it, for the whole process, as it is imported -- so once a server had drawn
@@ -127,14 +138,15 @@ def decode(data: bytes, *, max_pixels: int = MAX_PIXELS, kinds=None) -> Image.Im
 def encode_within(image: Image.Image, *, budget: int = DEFAULT_BUDGET) -> bytes:
     """PNG bytes no larger than ``budget``, reducing the picture only as far as it must.
 
-    A small picture comes back exactly as it was given. A large one is halved towards the
-    budget a step at a time, so what is stored is the biggest version that fits rather than
-    a fixed size everything is flattened to.
+    A small picture comes back exactly as it was given, after one plain encode. A large one
+    is reduced once, to the size the first encode suggests will fit, and written with the
+    optimiser on only then, when it is the smaller picture (#482).
     """
     picture = image
+    optimize = False
     while True:
         out = io.BytesIO()
-        picture.save(out, format="PNG", optimize=True)
+        picture.save(out, format="PNG", optimize=optimize)
         written = out.getvalue()
         if len(written) <= budget:
             return written
@@ -143,12 +155,15 @@ def encode_within(image: Image.Image, *, budget: int = DEFAULT_BUDGET) -> bytes:
             # Already tiny and still over budget: the file is not a picture in any useful
             # sense, and reducing further would leave nothing to look at.
             raise UnusablePicture(str(_("That image cannot be made small enough to keep.")))
-        target = max(SMALLEST_EDGE, int(longest * REDUCTION))
+        # A PNG's size follows the area, so the edge follows its square root.
+        scale = min(0.95, (budget * MARGIN / len(written)) ** 0.5)
+        target = max(SMALLEST_EDGE, int(longest * scale))
         scale = target / longest
         picture = picture.resize(
             (max(1, int(picture.width * scale)), max(1, int(picture.height * scale))),
             Image.Resampling.LANCZOS,
         )
+        optimize = True
 
 
 def as_stored(
@@ -165,12 +180,13 @@ def as_stored(
 
     ``kinds`` is passed to `decode`: the content types the caller keeps, or every kind.
     """
-    with decode(data, kinds=kinds) as opened:
+    with decode(data, kinds=kinds, draft_to=WORKING_EDGE) as opened:
         image = ImageOps.exif_transpose(opened) or opened
         image = image.convert("RGBA")
         if square:
             side = min(image.width, image.height)
             image = ImageOps.fit(image, (side, side), Image.Resampling.LANCZOS)
+        image.thumbnail((WORKING_EDGE, WORKING_EDGE), Image.Resampling.LANCZOS)
         return encode_within(image, budget=budget)
 
 
