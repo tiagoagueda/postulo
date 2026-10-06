@@ -107,13 +107,6 @@ REACHING_PAST: dict[str, dict[str, str]] = {
         # `Record` used to be reached past the surface as well. It is on it since #105,
         # because a third-party importer has to fill the same one.
     },
-    "postal_rules": {
-        "postulo.core.phones": (
-            "`country_name`: the country table, which was built for dialling codes "
-            "and is the same table an address needs. Two of them would be two things to "
-            "keep current (#147)"
-        ),
-    },
     "identifiers": {
         "postulo.core.identifiers": (
             "`Scheme`, and the two subject names. This is the one plugin whose whole content "

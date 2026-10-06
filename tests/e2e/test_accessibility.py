@@ -310,6 +310,21 @@ def furnished(applicant):
         outcome={"message": "Your data is ready to download.", "url": "/settings/export/"},
         finished_at=timezone.now(),
     )
+    # The report a finished spreadsheet import lands on (#555).
+    import_errand = Errand.objects.create(
+        owner=applicant,
+        kind="csv_import",
+        state=ErrandState.DONE,
+        outcome={
+            "filename": "jobs.csv",
+            "rows": 3,
+            "applications": 2,
+            "listings": 1,
+            "companies_created": 1,
+            "skipped": ["Row 3: no company."],
+        },
+        finished_at=timezone.now(),
+    )
 
     # A second record of the same company and of the same person, so the notice that says
     # so is on the pages it is drawn on and the page that merges them has something to
@@ -360,6 +375,7 @@ def furnished(applicant):
         "duplicate": duplicate,
         "twin": twin,
         "errand": errand,
+        "import_errand": import_errand,
         "company": company,
         "applicant": applicant,
         "experience": experience,
@@ -452,6 +468,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     offer = it.get("offer", a)
     connection = it.get("connection", a)
     errand = it.get("errand", a)
+    import_errand = it.get("import_errand", a)
     ended = it.get("ended", a)
     duplicate = it.get("duplicate", c)
     twin = it.get("twin", contact)
@@ -493,6 +510,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/jobs/captures/",
         # The page a button that sends work off lands on, finished (#247).
         f"/working/{errand.pk}/",
+        f"/import/done/{import_errand.pk}/",
         "/documents/cvs/",
         "/documents/cvs/new/",
         "/documents/letters/",
