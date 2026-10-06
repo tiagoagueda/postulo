@@ -650,6 +650,9 @@
   .w-80 {
     width: calc(var(--spacing) * 80);
   }
+  .w-\[calc\(100vw-4rem\)\] {
+    width: calc(100vw - 4rem);
+  }
   .w-auto {
     width: auto;
   }
@@ -1650,6 +1653,9 @@
     }
     .sm\:w-64 {
       width: calc(var(--spacing) * 64);
+    }
+    .sm\:w-72 {
+      width: calc(var(--spacing) * 72);
     }
     .sm\:w-auto {
       width: auto;
@@ -6773,6 +6779,31 @@
     min-height: calc(var(--spacing) * 6);
     min-width: calc(var(--spacing) * 6);
     align-items: center;
+  }
+  @media (pointer: coarse) {
+    .tap-target, .btn[data-size="xs"], .btn[data-size="sm"], td[data-actions] :is(button, a[href], summary), .table-cards td[data-actions] :is(button, a[href], summary) {
+      min-block-size: 2.75rem;
+    }
+    .tap-target {
+      min-inline-size: 2.75rem;
+      justify-content: center;
+    }
+    :is(select, textarea, input:not([type="checkbox"], [type="radio"], [type="hidden"], [type="range"], [type="file"])) {
+      min-block-size: 2.75rem;
+      font-size: 1rem;
+    }
+    .btn[data-size="icon"], .btn[data-size="icon-xs"], .btn[data-size="icon-sm"] {
+      min-block-size: 2.75rem;
+      min-inline-size: 2.75rem;
+    }
+  }
+  @media (width < 40rem) {
+    .board-box {
+      scroll-snap-type: x proximity;
+    }
+    .board-box [data-board-section] {
+      scroll-snap-align: start;
+    }
   }
   .primary-choice {
     position: relative;
