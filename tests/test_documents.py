@@ -1327,3 +1327,160 @@ def test_the_files_list_can_be_narrowed_by_kind(client, user):
 
     everything = client.get(address, {"kind": "not-a-kind"}).content.decode()
     assert "Diploma" in everything and "Old CV" in everything
+
+
+# ------------------------------------- diplomas and what they prove (#669)
+
+
+def _held(user, kind, title="Scan", **extra):
+    from django.core.files.base import ContentFile
+
+    upload = UploadedDocument(owner=user, title=title, kind=kind, **extra)
+    upload.file.save("scan.pdf", ContentFile(b"%PDF-1.7 x"), save=False)
+    return upload
+
+
+def _degree(user, qualification="BSc Computer Science"):
+    from postulo.resume.models import Education
+
+    return Education.objects.create(
+        owner=user, institution="University of Aveiro", qualification=qualification
+    )
+
+
+def _form(user, entry_key, kind="diploma"):
+    from postulo.documents.forms import UploadedDocumentForm
+
+    body = b"%PDF-1.7\n1 0 obj<<>>endobj\n%%EOF\n"
+    pdf = SimpleUploadedFile("scan.pdf", body, content_type="application/pdf")
+    return UploadedDocumentForm(
+        data={"title": "Scan", "kind": kind, "notes": "", "proves": entry_key},
+        files={"file": pdf},
+        user=user,
+    )
+
+
+def test_a_diploma_and_its_supplement_point_at_one_entry(user):
+    from postulo.documents import proofs
+
+    degree = _degree(user)
+    for kind in ("diploma", "diploma_supplement"):
+        form = _form(user, proofs.key_of(degree), kind)
+        assert form.is_valid(), form.errors
+        document = form.save(commit=False)
+        document.owner = user
+        document.save()
+        assert document.proves == degree
+
+    assert UploadedDocument.objects.filter(owner=user, proves_id=degree.pk).count() == 2
+
+
+def test_the_form_offers_only_the_owners_own_entries(user, other_user):
+    from postulo.documents import proofs
+
+    mine, theirs = _degree(user, "Mine"), _degree(other_user, "Theirs")
+    form = _form(user, "")
+
+    offered = [
+        value
+        for _group, options in form.fields["proves"].choices
+        if isinstance(options, list | tuple)
+        for value, _label in options
+    ]
+    assert proofs.key_of(mine) in offered
+    assert proofs.key_of(theirs) not in offered
+    assert "Mine, University of Aveiro" in str(form["proves"])
+
+    refused = _form(user, proofs.key_of(theirs))
+    assert not refused.is_valid() and "proves" in refused.errors
+
+
+def test_a_save_refuses_another_persons_entry(user, other_user):
+    from django.core.exceptions import ValidationError
+
+    from postulo.documents import proofs
+
+    upload = _held(user, "diploma")
+    proofs.set_proof(upload, _degree(other_user))
+
+    with pytest.raises(ValidationError):
+        upload.save()
+    assert not UploadedDocument.objects.exists()
+
+
+def test_deleting_the_entry_clears_the_link_and_keeps_the_files(user):
+    from postulo.documents import proofs
+
+    degree = _degree(user)
+    upload = _held(user, "diploma")
+    proofs.set_proof(upload, degree)
+    upload.save()
+
+    degree.delete()
+
+    upload.refresh_from_db()
+    assert upload.proves is None and upload.proves_id is None
+    assert upload.file.storage.exists(upload.file.name)
+
+
+def test_deleting_the_document_leaves_the_entry(user):
+    from postulo.documents import proofs
+
+    degree = _degree(user)
+    upload = _held(user, "diploma")
+    proofs.set_proof(upload, degree)
+    upload.save()
+
+    upload.delete()
+
+    degree.refresh_from_db()
+
+
+def test_a_kind_that_proves_nothing_drops_the_link_on_edit(client, user):
+    from postulo.documents import proofs
+
+    degree = _degree(user)
+    upload = _held(user, "diploma")
+    proofs.set_proof(upload, degree)
+    upload.save()
+    client.force_login(user)
+
+    response = client.post(
+        reverse("documents:upload_update", args=[upload.pk]),
+        {"title": "Scan", "kind": "other", "notes": "", "proves": proofs.key_of(degree)},
+    )
+
+    assert response.status_code == 302
+    upload.refresh_from_db()
+    assert upload.proves is None
+
+
+def test_the_files_list_shows_the_entry_and_narrows_to_it(client, user):
+    from postulo.documents import proofs
+
+    degree = _degree(user)
+    proof = _held(user, "diploma", title="Degree scroll")
+    proofs.set_proof(proof, degree)
+    proof.save()
+    _held(user, "other", title="Unrelated").save()
+    client.force_login(user)
+
+    html = client.get(reverse("documents:upload_list")).content.decode()
+    assert "It proves" in html and "BSc Computer Science" in html
+
+    narrowed = client.get(reverse("documents:upload_list"), {"proves": proofs.key_of(degree)})
+    assert "Degree scroll" in narrowed.content.decode()
+    assert "Unrelated" not in narrowed.content.decode()
+
+
+def test_another_persons_entry_narrows_the_list_to_nothing(client, user, other_user):
+    from postulo.documents import proofs
+
+    _held(user, "other", title="Unrelated").save()
+    client.force_login(user)
+
+    html = client.get(
+        reverse("documents:upload_list"), {"proves": proofs.key_of(_degree(other_user))}
+    ).content.decode()
+
+    assert "Unrelated" not in html

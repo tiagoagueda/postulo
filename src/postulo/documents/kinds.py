@@ -59,6 +59,8 @@ class DocumentKind(TextChoices):
     COVER_LETTER = "cover_letter", _("Cover letter")
     MOTIVATION_LETTER = "motivation_letter", _("Motivation letter")
     CERTIFICATE = "certificate", _("Certificate")
+    DIPLOMA = "diploma", _("Diploma")
+    DIPLOMA_SUPPLEMENT = "diploma_supplement", _("Diploma supplement")
     PORTFOLIO = "portfolio", _("Portfolio")
     #: A job-search report, frozen at the moment somebody downloads it (#162).
     REPORT = "report", _("Report")
@@ -133,6 +135,10 @@ def choices() -> list[tuple[str, object]]:
     return [(kind.key, kind.label) for kind in REGISTRY.values()]
 
 
+#: The kinds of file that prove an entry of the career, and so offer to say which (#669).
+PROOF_KINDS = (DocumentKind.CERTIFICATE, DocumentKind.DIPLOMA, DocumentKind.DIPLOMA_SUPPLEMENT)
+
+
 def theme_kind_for(key: str) -> str:
     """Which theme vocabulary sets this kind, or empty where none does."""
     kind = REGISTRY.get(key)
@@ -172,6 +178,9 @@ def register_the_ones_postulo_has() -> None:
         Kind(DocumentKind.REPORT, _("Report"), authored=True),
         # Held rather than authored: somebody else issues these, and Postulo keeps the file.
         Kind(DocumentKind.CERTIFICATE, _("Certificate")),
+        Kind(DocumentKind.DIPLOMA, _("Diploma")),
+        # Issued beside a diploma, never in place of it: a second document (#669).
+        Kind(DocumentKind.DIPLOMA_SUPPLEMENT, _("Diploma supplement")),
         Kind(DocumentKind.REFERENCE, _("Reference")),
         Kind(DocumentKind.OTHER, _("Other")),
     )

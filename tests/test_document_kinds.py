@@ -335,3 +335,14 @@ def test_a_report_is_a_kind_postulo_makes_and_an_email_is_not(user):
     assert any(spec.name.endswith("report") for spec in stores.kind_specs()), (
         "a store gets a switch for reports like any other kind"
     )
+
+
+def test_diplomas_and_supplements_are_held_kinds_with_their_own_store_switch():
+    from postulo.documents import stores
+
+    names = {spec.name for spec in stores.kind_specs()}
+
+    for kind in (DocumentKind.DIPLOMA, DocumentKind.DIPLOMA_SUPPLEMENT):
+        assert not kinds.get(kind).authored
+        assert f"kind_{kind}" in names
+    assert kinds.label_for("diploma_supplement") == "Diploma supplement"

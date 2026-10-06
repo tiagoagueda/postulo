@@ -1773,6 +1773,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         upload_entry.pop("created_at", None)
         copies = upload_entry.pop("copies", [])
         letter_entry = upload_entry.pop("reference_letter", None)
+        proves_entry = upload_entry.pop("proves", None)
         # The archive's figures are measured against the bytes and never written to the row:
         # the row's own are worked out from what was kept (#663).
         figures = {name: upload_entry.pop(name, None) for name in ("checksum", "size")}
@@ -1780,7 +1781,19 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         upload = UploadedDocument(
             owner=user, **_carried(upload_entry, UPLOAD_FIELDS, report, "An upload")
         )
+        from postulo.documents import proofs
         from postulo.documents.forms import MAX_UPLOAD_BYTES
+
+        if isinstance(proves_entry, dict):
+            section = proves_entry.get("section")
+            target = resume_map.get(section, {}).get(proves_entry.get("ref"))
+            if target is not None and proofs.name_of(target):
+                proofs.set_proof(upload, target)
+            else:
+                report.skipped.append(
+                    f"File “{upload.title}” proves {section}#{proves_entry.get('ref')}: "
+                    "no such record, so it proves nothing"
+                )
 
         content = _extract_within(archive, stored_name, MAX_UPLOAD_BYTES)
         if content is None:

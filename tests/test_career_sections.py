@@ -263,3 +263,26 @@ def test_a_cv_holding_one_entry_of_every_section_renders_in_every_format(user):
         outline = rendering.cv_outline(cv)
         assert formats.as_text(outline), kind
         assert docx.write(outline), kind
+
+
+def test_an_entry_says_how_many_documents_prove_it_and_links_to_them(client, user):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents import proofs
+    from postulo.documents.models import UploadedDocument
+    from postulo.resume.models import Education
+
+    degree = Education.objects.create(
+        owner=user, institution="University of Aveiro", qualification="BSc"
+    )
+    assert "prove this" not in the_page(client, user)
+    for title in ("Diploma", "Supplement"):
+        upload = UploadedDocument(owner=user, title=title, kind="diploma")
+        upload.file.save("x.pdf", ContentFile(b"%PDF-1.7 x"), save=False)
+        proofs.set_proof(upload, degree)
+        upload.save()
+
+    html = the_page(client, user)
+
+    assert "2 documents prove this" in html
+    assert f"?proves=education:{degree.pk}" in html

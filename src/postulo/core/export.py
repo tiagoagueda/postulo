@@ -181,7 +181,11 @@ logger = logging.getLogger(__name__)
 #: role and the type of event as codes (blank where not stated), two optional dates, a place,
 #: a link and a summary. An archive without them restores none; a role or a type this
 #: version does not list restores as not stated (#694).
-FORMAT_VERSION = 63
+#: 64 added ``proves`` on an upload: the entry of the career it is the proof of, as the
+#: block it is in and its local id, or none. An archive without it restores every upload
+#: proving nothing, and one naming an entry the file does not hold restores none and says
+#: so (#669).
+FORMAT_VERSION = 64
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -728,6 +732,19 @@ def _fields(instance, names: tuple[str, ...]) -> dict:
     return {name: _value(getattr(instance, name)) for name in names}
 
 
+def _proves(upload) -> dict | None:
+    """The entry an upload is the proof of, as a section and a local id (#669).
+
+    The block's name and the id the entry has in this archive, as a CV's entry is written,
+    and not a content type, which is this instance's number and means nothing in the file.
+    """
+    entry = upload.proves
+    if entry is None:
+        return None
+    section = TRANSLATION_SECTIONS.get(entry._meta.model_name)
+    return {"section": section, "ref": entry.pk} if section else None
+
+
 def _reference_letter(upload) -> dict | None:
     """What is known about an upload that is a reference letter, or nothing (#666).
 
@@ -1208,9 +1225,10 @@ def build_document(user) -> dict:
             "file": f"{MEDIA_PREFIX}{upload.file.name}" if upload.file else "",
             "copies": _copies(upload),
             "reference_letter": _reference_letter(upload),
+            "proves": _proves(upload),
         }
         for upload in UploadedDocument.objects.for_user(user)
-        .select_related("reference_letter")
+        .select_related("reference_letter", "proves_type")
         .prefetch_related("copies")
     ]
     document["documents"]["sent"] = [

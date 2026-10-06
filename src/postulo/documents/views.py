@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib import messages
+from django.contrib.contenttypes.models import ContentType
 from django.db import models, transaction
 from django.http import Http404, HttpRequest, HttpResponse
 from django.middleware.csp import get_nonce
@@ -30,7 +31,7 @@ from postulo.core.redirects import safe_next
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.resume import ordering, translating
 
-from . import comparing, formats, kinds, printing, rendering, themes
+from . import comparing, formats, kinds, printing, proofs, rendering, themes
 from . import pdf as renderers
 from .forms import (
     AddCVItemsForm,
@@ -688,7 +689,16 @@ class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
     context_object_name = "documents"
 
     def get_queryset(self):
-        queryset = super().get_queryset().prefetch_related("replaced_by")
+        queryset = super().get_queryset().prefetch_related("replaced_by", "proves")
+        # The files that prove one entry, from its row on the career page (#669). A value
+        # that is not one of this person's entries narrows to nothing rather than to all.
+        if wanted := self.request.GET.get("proves", ""):
+            entry = proofs.find(self.request.user, wanted)
+            if entry is None:
+                return queryset.none()
+            queryset = queryset.filter(
+                proves_type=ContentType.objects.get_for_model(entry), proves_id=entry.pk
+            )
         # An unknown kind is ignored, as the letters list ignores one (#667).
         if self.request.GET.get("kind", "") in dict(kinds.choices()):
             queryset = queryset.filter(kind=self.request.GET["kind"])
@@ -707,6 +717,8 @@ class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
             (key, label) for key, label in kinds.choices() if key in held or key == current
         ]
         context["current_kind"] = current
+        wanted = proofs.find(self.request.user, self.request.GET.get("proves", ""))
+        context["proving"] = proofs.label_of(wanted) if wanted else ""
         return context
 
 

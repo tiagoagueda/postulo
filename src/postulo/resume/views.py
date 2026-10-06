@@ -26,6 +26,7 @@ from django.views.generic import CreateView, DeleteView, TemplateView, UpdateVie
 from postulo.core import languages, throttle
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin, OwnerFormMixin
 from postulo.core.redirects import safe_next
+from postulo.documents import proofs
 from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base
@@ -120,6 +121,12 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             entry: [languages.native_name(code, code) for code in codes]
             for entry in everything
             if (codes := spoken.get(translating.key_of(entry)))
+        }
+        # How many files prove each qualification and certification, one query per model
+        # (#669), keyed by the entry as the languages are.
+        context["proofs_by_entry"] = {
+            entry: {"count": number, "key": proofs.key_of(entry)}
+            for entry, number in proofs.counts_for(everything).items()
         }
         context["counts"] = {
             "experience": Experience.objects.for_user(user).count(),

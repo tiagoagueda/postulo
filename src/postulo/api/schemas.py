@@ -991,6 +991,11 @@ class DocumentOut(Schema):
         description="For an upload of kind `reference`: who wrote it, when, until when it is "
         "good to send and who sends it. Null otherwise",
     )
+    proves: str | None = Field(
+        default=None,
+        description="For an upload: the entry of the career it is the proof of, as `education:12` "
+        "or `certification:3`. Null where it proves none",
+    )
     checksum: str = Field(
         default="", description="The SHA-256 of the file as it was kept, in hexadecimal"
     )
@@ -1510,6 +1515,14 @@ def _reference_letter_out(document) -> dict | None:
     }
 
 
+def _proves_out(document) -> str | None:
+    """`education:12` for an upload that proves an entry, none for anything else (#669)."""
+    from postulo.documents import proofs
+
+    entry = getattr(document, "proves", None)
+    return proofs.key_of(entry) if entry is not None else None
+
+
 def document_out(request, document, *, source: str) -> dict:
     name = "postulo-api:document_download"
     return {
@@ -1521,6 +1534,7 @@ def document_out(request, document, *, source: str) -> dict:
         "application_id": getattr(document, "application_id", None),
         "with_properties": getattr(document, "with_properties", None),
         "reference_letter": _reference_letter_out(document),
+        "proves": _proves_out(document),
         "checksum": getattr(document, "checksum", "") or "",
         "size": getattr(document, "size", None),
         "damage": getattr(document, "damage", "") or "",

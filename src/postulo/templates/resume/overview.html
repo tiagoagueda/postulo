@@ -158,6 +158,19 @@
                           {% endblocktranslate %}
                         </p>
                       {% endif %}
+                      {% with proving=proofs_by_entry|get_item:item %}
+                        {% if proving %}
+                          <p class="text-xs text-ink-500 dark:text-ink-400">
+                            <a href="{% url 'documents:upload_list' %}?proves={{ proving.key }}" class="underline">
+                              {% blocktranslate trimmed count total=proving.count %}
+                                {{ total }} document proves this
+                              {% plural %}
+                                {{ total }} documents prove this
+                              {% endblocktranslate %}
+                            </a>
+                          </p>
+                        {% endif %}
+                      {% endwith %}
                       {% with spoken=languages_by_entry|get_item:item %}
                         {% if spoken %}
                           <p class="text-xs text-ink-500 dark:text-ink-400">

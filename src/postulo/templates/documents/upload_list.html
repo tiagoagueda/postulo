@@ -30,6 +30,15 @@
     {% endfor %}
   </nav>
 
+  {% if proving %}
+    <p class="mb-4 text-sm" data-proving>
+      {% blocktranslate trimmed with entry=proving %}
+        Files that prove <bdi>{{ entry }}</bdi>.
+      {% endblocktranslate %}
+      <a href="{% url 'documents:upload_list' %}" class="underline">{% translate "Show all files" %}</a>
+    </p>
+  {% endif %}
+
   {% if documents %}
     <div class="card p-0">
       <ul class="divide-y divide-ink-100 dark:divide-ink-800">
@@ -52,6 +61,13 @@
                 · {{ document.created_at|date:"DATE_FORMAT" }}
                 {% if not document.is_current %} · {% translate "superseded" %}{% endif %}
               </p>
+              {% if document.proves %}
+                <p class="text-xs text-ink-500 dark:text-ink-400" data-proves>
+                  {% blocktranslate trimmed with entry=document.proves %}
+                    It proves <bdi>{{ entry }}</bdi>
+                  {% endblocktranslate %}
+                </p>
+              {% endif %}
               {% url 'documents:upload_archive' document.pk as send_url %}
               {% include "documents/partials/copies.html" with document=document send_url=send_url %}
               {% comment %} What the last check found (#663). Said where the person looks, with

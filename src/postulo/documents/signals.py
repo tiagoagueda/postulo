@@ -102,3 +102,21 @@ def forget_the_source_of_a_render(sender, instance, **kwargs) -> None:
     RenderedDocument.objects.filter(
         source_type=ContentType.objects.get_for_model(sender), source_id=instance.pk
     ).update(source_type=None, source_id=None)
+
+
+@receiver(post_delete, sender="resume.Education", dispatch_uid="documents.forget_proof_education")
+@receiver(
+    post_delete, sender="resume.Certification", dispatch_uid="documents.forget_proof_certification"
+)
+def forget_the_entry_a_file_proved(sender, instance, **kwargs) -> None:
+    """Deleting an entry keeps the files that proved it and clears what they pointed at (#669).
+
+    A `GenericRelation` on the entry would have deleted the diploma with it, which is the
+    opposite of what is wanted: the scan outlives the line of the career record. The same
+    reason, and the same shape, as `forget_the_source_of_a_render`.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    UploadedDocument.objects.filter(
+        proves_type=ContentType.objects.get_for_model(sender), proves_id=instance.pk
+    ).update(proves_type=None, proves_id=None)

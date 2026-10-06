@@ -16,8 +16,8 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import integrity, themes
-from .kinds import DocumentKind
+from . import integrity, proofs, themes
+from .kinds import PROOF_KINDS, DocumentKind
 from .models import (
     CV,
     LETTER_STARTERS,
@@ -593,6 +593,23 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         ),
     )
 
+    #: The entry of the career a certificate, diploma or supplement is the proof of (#669).
+    #: Not a column the form writes by name: the choices are the owner's own entries, built
+    #: in `scope_querysets`, so another person's is not a choice and is refused as one.
+    proves = forms.ChoiceField(
+        label=_("It proves"),
+        required=False,
+        help_text=_(
+            "The entry of your career this is the proof of. Used for a certificate, a diploma "
+            "or a diploma supplement; a diploma and its supplement point at the same entry."
+        ),
+    )
+
+    @property
+    def takes_proof(self) -> bool:
+        """Whether this form asks what the file proves: a new file, or one of a kind that does."""
+        return not self.instance.pk or self.instance.kind in PROOF_KINDS
+
     @property
     def takes_reference(self) -> bool:
         """Whether this form asks about a reference letter: a new file, or one that is."""
@@ -602,11 +619,32 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         """The bound fields about the letter, none where the file is of another kind."""
         return [self[name] for name in self.REFERENCE_FIELDS if name in self.fields]
 
+    def _write_proof(self, document: UploadedDocument) -> None:
+        """Point the file at the entry chosen, or at none; a kind that proves nothing clears it."""
+        if "proves" not in self.fields:
+            return
+        chosen = self.cleaned_data.get("proves")
+        proofs.set_proof(
+            document, proofs.find(self.user, chosen) if document.kind in PROOF_KINDS else None
+        )
+
     def own_fields(self):
         """Every field but the letter's, which the page draws in a group of their own."""
         return [field for field in self if field.name not in self.REFERENCE_FIELDS]
 
     def scope_querysets(self) -> None:
+        if not self.takes_proof:
+            del self.fields["proves"]
+        else:
+            entries = proofs.entries_for(self.user)
+            groups: dict[str, list] = {}
+            for entry in entries:
+                groups.setdefault(entry._meta.verbose_name.capitalize(), []).append(
+                    (proofs.key_of(entry), proofs.label_of(entry))
+                )
+            self.fields["proves"].choices = [("", _("Nothing yet")), *groups.items()]
+            if self.instance.pk and self.instance.proves is not None and not self.is_bound:
+                self.initial["proves"] = proofs.key_of(self.instance.proves)
         if not self.takes_reference:
             for name in self.REFERENCE_FIELDS:
                 del self.fields[name]
@@ -703,6 +741,7 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         # in order without anyone having to keep count.
         if document.replaces_id and not self.instance.pk:
             document.version = document.replaces.version + 1
+        self._write_proof(document)
         if commit:
             document.save()
             self._keep_reference_letter(document)

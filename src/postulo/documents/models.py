@@ -694,6 +694,22 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     verified_at = models.DateTimeField(_("last checked"), null=True, blank=True, editable=False)
     damage = models.CharField(_("damage"), max_length=10, blank=True, editable=False)
 
+    #: The entry of the career this file is the proof of (#669), as a `CVItem` points at one:
+    #: a generic link, so a section added later needs one line in `proofs.PROVABLE` and no
+    #: column. Optional, because a scan often arrives before the entry exists. **No
+    #: `GenericRelation` on the entry**: that would delete the diploma with it, and the
+    #: receiver in `signals.py` clears the link instead.
+    proves_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="+",
+    )
+    proves_id = models.PositiveIntegerField(null=True, blank=True, editable=False)
+    proves = GenericForeignKey("proves_type", "proves_id")
+
     version = models.PositiveIntegerField(_("version"), default=1)
     replaces = models.ForeignKey(
         "self",
@@ -723,12 +739,26 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: it. See `RenderedDocument.goes_to_stores` for the one that is not always (#236).
     goes_to_stores = True
 
+    def check_proves(self) -> None:
+        """What a file proves is one of its owner's own entries, or nothing (#669).
+
+        Asked on every save, so no way of writing the link -- the form, the importer, the
+        shell -- can point at somebody else's entry.
+        """
+        if self.proves_type_id is None and self.proves_id is None:
+            return
+        from . import proofs
+
+        if not proofs.is_own(self):
+            raise ValidationError(_("That entry is not one of yours."))
+
     def save(self, *args, **kwargs):
         """Write the checksum the first time the bytes are here, and never again.
 
         Read in chunks rather than whole: an upload is capped, but a model that reads a file
         into memory to save a row is a habit that outlives the cap.
         """
+        self.check_proves()
         if self.file and not self.checksum:
             digest = hashlib.sha256()
             length = 0

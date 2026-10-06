@@ -1005,3 +1005,65 @@ def test_a_certification_company_the_archive_does_not_hold_adds_nothing(user, ot
 
     assert Certification.objects.for_user(other_user).get().company is None
     assert not Company.objects.for_user(other_user).exists()
+
+
+def _proof_of(user, entry):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents import proofs
+
+    upload = UploadedDocument(owner=user, title="Diploma", kind="diploma")
+    upload.file.save("d.pdf", ContentFile(b"%PDF-1.7 x"), save=False)
+    proofs.set_proof(upload, entry)
+    upload.save()
+    return upload
+
+
+def test_what_an_upload_proves_survives_the_round_trip(user, other_user):
+    from postulo.resume.models import Education
+
+    degree = Education.objects.create(owner=user, institution="Aveiro", qualification="BSc")
+    _proof_of(user, degree)
+    archive, document = read_archive(user)
+    assert document["documents"]["uploads"][0]["proves"] == {
+        "section": "education",
+        "ref": degree.pk,
+    }
+
+    importer.load(other_user, archive)
+
+    restored = UploadedDocument.objects.for_user(other_user).get()
+    assert restored.proves.qualification == "BSc" and restored.proves.owner == other_user
+
+
+def test_an_older_archive_restores_every_upload_proving_nothing(user, other_user):
+    from postulo.resume.models import Education
+
+    _proof_of(user, Education.objects.create(owner=user, institution="A", qualification="B"))
+    _archive, document = read_archive(user)
+    document["postulo"]["format"] = 55
+    del document["documents"]["uploads"][0]["proves"]
+
+    _restored(document, other_user)
+
+    assert UploadedDocument.objects.for_user(other_user).get().proves is None
+
+
+def test_an_entry_the_archive_does_not_hold_is_proved_by_nothing(user, other_user):
+    from postulo.resume.models import Education
+
+    _proof_of(user, Education.objects.create(owner=user, institution="A", qualification="B"))
+    _archive, document = read_archive(user)
+    document["documents"]["uploads"][0]["proves"] = {"section": "education", "ref": 9999}
+
+    _restored(document, other_user)
+
+    assert UploadedDocument.objects.for_user(other_user).get().proves is None
+
+
+def test_the_candidate_file_carries_no_document_link(user):
+    from postulo.resume.models import Education
+
+    _proof_of(user, Education.objects.create(owner=user, institution="A", qualification="B"))
+
+    assert "proves" not in json.dumps(export_module.build_candidate_document(user))
