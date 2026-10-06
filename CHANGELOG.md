@@ -75,6 +75,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A reference letter now records who wrote it, when, until when it is good to send and who sends it, shows its referee when you record what you sent and on the contact, and is off by default when copying to a new store (#666)
 - An experience's organisation is now linked to one of your companies, added and marked "from your career" if none matches, and kept out of the posting, contact and agency pickers, the map and the companies table until you use it for something (#683)
 - An education entry can state its EQF level, 1 to 8, kept by the Europass import beside the grade, and a CV can print it as "EQF level 7" under a new switch, off by default (#684)
+- Your career record has a *Publications* section: papers, books, chapters, theses, datasets and software typed like BibTeX entries, printed as one line on a CV, and carried in the archive and your own record file (#687)
 
 ### 🐛 Fixed
 

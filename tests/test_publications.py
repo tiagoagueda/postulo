@@ -555,6 +555,15 @@ def test_a_file_cannot_put_what_a_page_would_refuse_into_a_restored_publication(
     assert (clean["date"], clean["doi"], clean["cite_key"]) == ("", "", "")
 
 
+def test_a_file_that_says_a_list_or_a_number_for_a_text_does_not_stop_the_restore():
+    values = {"entry_type": ["a"], "date": 2020, "doi": 5, "cite_key": 12}
+
+    clean = publications.sanitise(values, set())
+
+    assert clean["entry_type"] == "misc"
+    assert (clean["date"], clean["doi"], clean["cite_key"]) == ("", "", "")
+
+
 # -------------------------------------------------------------------- the candidate
 
 

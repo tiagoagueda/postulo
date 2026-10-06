@@ -405,6 +405,12 @@ def sanitise(values: dict, taken) -> dict:
     A file is the one place a value arrives that no page has looked at (#687).
     """
     kept = dict(values)
+    # A file may say a number or a list where a page would have sent text.
+    for name in ("entry_type", "date", "cite_key"):
+        if not isinstance(kept.get(name, ""), str):
+            kept[name] = ""
+    if not isinstance(kept.get("doi", ""), (str, int, float)):
+        kept["doi"] = ""
     if kept.get("entry_type") not in TYPES:
         kept["entry_type"] = "misc"
     kept["doi"] = normalise_doi(kept.get("doi"))
