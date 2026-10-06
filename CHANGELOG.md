@@ -59,7 +59,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Messaging handles, several per person and per contact, each checked against its service (Matrix, XMPP, Signal, Telegram, Threema or Other): a Messaging block on Your details and on a contact, kept in the archive, the API and a merge, never printed on a CV unless chosen; plugins can add services. (#682)
 - On a phone, tapping the search icon opens the search field in the header in place of the logo and name, with a close button, Escape and the navigation menu's *Search* all working; with scripts off the icon still opens the search page. (#350)
 - The language picker in Settings can be searched by a language's own name or tag, and says plainly that a partly translated language shows English where its translation stops; TRANSLATING.md describes adding a language without a developer (#72)
-- On a phone, controls grow to 44px where the pointer is coarse, the Applications board shows one column at a time with swipe snapping, and the browser suite checks every page at 390px in both themes (#73).
+- On a phone, controls grow to 44px where the pointer is coarse, the Applications board shows one column at a time with swipe snapping, and the browser suite checks every page at 390px in both themes (#73)
 
 ### 🐛 Fixed
 
@@ -77,7 +77,7 @@ All notable changes to Postulo are recorded here. The format follows
 - The API tokens page now translates the name placeholder and lists each token's scopes as translated sentences, one per item, instead of raw keys like "captures, read". (#432)
 - The Tags page counts each tag's applications in one query instead of one per tag, so it no longer gets slower as a person keeps more tags. (#554)
 - A status change posted with htmx at a table row now redirects as a plain post does, instead of answering an empty row that no page asked for (#402)
-- Putting a reminder off until tomorrow or next week on an application's page now keeps keyboard focus on that reminder's actions button instead of dropping it to the start of the page (#520).
+- Putting a reminder off until tomorrow or next week on an application's page now keeps keyboard focus on that reminder's actions button instead of dropping it to the start of the page (#520)
 - The scheduler's closing-date and quiet-application announcers now handle each person once per pass instead of once per listing or application, cutting the repeated work on large accounts. (#400)
 - The monthly dependency upgrade pull request now gets the full CI run through a bot token, says what the workflow ran, and keeps the pre-commit ruff version in step with the lock (#585)
 
