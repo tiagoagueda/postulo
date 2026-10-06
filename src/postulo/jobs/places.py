@@ -92,8 +92,11 @@ def build_lookup(cities: Path, target: Path) -> int:
     provisioning; the file is replaced atomically, so a reader never sees half of one.
     """
     target.parent.mkdir(parents=True, exist_ok=True)
-    temporary = target.with_name(target.name + ".tmp")
-    temporary.unlink(missing_ok=True)
+    # Its own name per builder: three workers meeting an old install each build, and
+    # none may write into another's half-made file.
+    descriptor, name = tempfile.mkstemp(dir=target.parent, prefix=target.name, suffix=".tmp")
+    os.close(descriptor)
+    temporary = Path(name)
     connection = sqlite3.connect(temporary)
     try:
         connection.executescript(
