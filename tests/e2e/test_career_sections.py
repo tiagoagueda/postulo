@@ -21,7 +21,7 @@ def test_an_entry_takes_you_to_its_section_and_is_marked_there(live_server, page
     page.goto(f"{live_server.url}/career/")
 
     nav = page.locator('nav[aria-label="Career sections"]')
-    expect(nav.locator("a")).to_have_count(7)
+    expect(nav.locator("a")).to_have_count(8)
 
     nav.locator('a[href="#section-language"]').click()
 

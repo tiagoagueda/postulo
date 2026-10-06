@@ -54,7 +54,12 @@ def test_export_upload_read_the_plan_and_confirm(live_server, page: Page, furnis
         page.get_by_role("link", name="Download the file").click()
     kept = tmp_path / "kept.json"
     download_info.value.save_as(kept)
-    assert json.loads(kept.read_text(encoding="utf-8"))["postulo"]["companies_format"] == 1
+    from postulo.core import kind_files
+
+    assert (
+        json.loads(kept.read_text(encoding="utf-8"))["postulo"]["companies_format"]
+        == kind_files.FORMATS["companies"]
+    )
 
     page.locator("input[type=file]").set_input_files(str(a_companies_file(tmp_path / "in.json")))
     page.locator("[data-kind-upload] button[type=submit]").click()
