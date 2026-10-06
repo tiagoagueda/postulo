@@ -81,6 +81,14 @@ def errand(owner):
     return Errand.objects.create(owner=owner, kind="export")
 
 
+def import_errand(owner):
+    from postulo.core.models import Errand, ErrandState
+
+    return Errand.objects.create(
+        owner=owner, kind="csv_import", state=ErrandState.DONE, outcome={"filename": "h.csv"}
+    )
+
+
 def export_archive(owner):
     from django.core.files.base import ContentFile
     from django.utils import timezone
@@ -347,6 +355,7 @@ FACTORIES: dict[str, Callable] = {
     "core:errand": pk_of(errand),
     "core:errand_state": pk_of(errand),
     "core:export_archive": pk_of(export_archive),
+    "core:import_csv_done": pk_of(import_errand),
     # connections
     "connections:backfill": pk_of(connection),
     "connections:consent": pk_of(connection),

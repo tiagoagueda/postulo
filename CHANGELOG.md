@@ -80,6 +80,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Putting a reminder off until tomorrow or next week on an application's page now keeps keyboard focus on that reminder's actions button instead of dropping it to the start of the page (#520)
 - The scheduler's closing-date and quiet-application announcers now handle each person once per pass instead of once per listing or application, cutting the repeated work on large accounts. (#400)
 - The monthly dependency upgrade pull request now gets the full CI run through a bot token, says what the workflow ran, and keeps the pre-commit ruff version in step with the lock (#585)
+- Importing a spreadsheet now runs as a watched errand in chunks of 200 rows, so a large sheet no longer times out, rolls back or locks the database for everyone else; imported history is not announced to notifiers. (#555)
 
 ## [0.4.0] — 2026-10-04
 
