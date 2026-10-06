@@ -711,6 +711,7 @@ def test_erasing_a_referrer_says_the_applications_lost_them(user, application, f
         "referrals": 1,
         "interviews": 0,
         "listing_events": 0,
+        "reference_letters": 0,
     }
     assert "1 application kept, without its referrer." in report.summary()
     assert "main contact" not in report.summary()

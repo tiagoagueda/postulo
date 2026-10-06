@@ -569,8 +569,9 @@ def test_a_sheet_at_the_cap_is_imported_in_queries_that_do_not_grow_with_the_row
     assert Company.objects.for_user(user).count() == 50
 
 
-#: What writing one application with its timeline costs, measured at 16 with savepoints.
-PER_ROW_WRITES = 18
+#: What writing one application with its timeline costs, measured at 16 with savepoints, and
+#: one more for the career mark a posting or application clears on its company (#683).
+PER_ROW_WRITES = 19
 
 
 def test_a_second_run_of_the_same_sheet_creates_nothing_and_asks_once(

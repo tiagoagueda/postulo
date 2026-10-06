@@ -557,7 +557,10 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         ),
     )
     written_on = forms.DateField(
-        label=_("Written on"), required=False, widget=forms.DateInput(attrs={"type": "date"})
+        label=_("Written on"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=_("The date on the letter, as a date. Leave it empty when you do not know."),
     )
     valid_until = forms.DateField(
         label=_("Do not send after"),

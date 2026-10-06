@@ -94,6 +94,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.plugins.locale",
             "postulo.plugins.record",
             "postulo.plugins.secrets",
+            "postulo.resume.publications",
             "postulo.resume.translatable",
         ),
     ),
