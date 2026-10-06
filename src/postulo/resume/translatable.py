@@ -35,6 +35,14 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     "link": ("title", "description"),
 }
 
+#: The models that translate nothing, each with its reason: a decision written down, not an
+#: omission. `tests/test_career_sections.py` asks every section for one or the other.
+TRANSLATES_NOTHING: dict[str, str] = {
+    "certification": "both texts are the awarding body's wording",
+    "publication": "a paper's title is the paper",
+    "drivinglicence": "a code is a code, and a country is a country",
+}
+
 #: How long a stored field name may be. Longer than any name above, and bounded because it
 #: is a column.
 MAX_FIELD_LENGTH = 40

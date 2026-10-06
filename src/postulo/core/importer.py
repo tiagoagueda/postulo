@@ -45,6 +45,7 @@ from .export import (
     POSTING_FIELDS,
     PROFILE_FIELDS,
     RESUME_FIELDS,
+    RESUME_MODELS,
     SENT_FIELDS,
     TRANSLATION_SECTIONS,
     UPLOAD_FIELDS,
@@ -52,6 +53,24 @@ from .export import (
 
 # The manifest is text and every row of the person's data is in it: generous, but a cap.
 MANIFEST_MAX_BYTES = 256 * 1024 * 1024
+
+
+#: The career columns that hold a date, which an archive writes as text.
+DATE_FIELDS = {"start_date", "end_date", "issued_on", "expires_on", "first_issued_on"}
+
+
+def resume_section_models() -> dict:
+    """Each career block of an archive and the model it restores into.
+
+    Derived from `export.RESUME_MODELS`, which the archive is written from, so a section
+    added there is read back here; skills are left out because they are restored inside
+    their groups. `tests/test_career_sections.py` holds this against the registry.
+    """
+    from postulo.resume import models as resume
+
+    return {
+        block: getattr(resume, name) for block, name in RESUME_MODELS.items() if block != "skills"
+    }
 
 
 class ArchiveError(Exception):
@@ -1036,19 +1055,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
 
     # ------------------------------------------------------------------- career
     resume_map: dict[str, dict[int, object]] = {}
-    section_models = {
-        "experience": resume.Experience,
-        "education": resume.Education,
-        "projects": resume.Project,
-        "publications": resume.Publication,
-        "skill_groups": resume.SkillGroup,
-        "certifications": resume.Certification,
-        "languages": resume.LanguageSkill,
-        "driving_licences": resume.DrivingLicence,
-        "links": resume.Link,
-    }
+    section_models = resume_section_models()
     held_keys = set(resume.Publication.objects.for_user(user).values_list("cite_key", flat=True))
-    date_fields = {"start_date", "end_date", "issued_on", "expires_on", "first_issued_on"}
+    date_fields = DATE_FIELDS
     moment_fields = {"checked_at"}
     #: Experience primary key -> the name of the company it links to, applied once every
     #: company in the file has been made or matched (#683).

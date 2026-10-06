@@ -1,8 +1,9 @@
 """The kinds of thing a career is made of.
 
-Six models with near-identical editing screens would mean twenty-four near-identical
-view classes. A registry keeps one set of views and one set of templates, and adding a
-seventh kind later means adding one entry here.
+Many models with near-identical editing screens would mean as many near-identical view
+classes. A registry keeps one set of views and one set of templates. A new kind is an entry
+here and a dozen other places; ``tests/test_career_sections.py`` is the list of those
+places, and fails naming the section and the list a new kind is missing from.
 """
 
 from __future__ import annotations
