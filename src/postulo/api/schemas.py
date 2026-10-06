@@ -123,6 +123,14 @@ class CompanyOut(Schema):
     industries: list[str] = Field(default_factory=list)
     identifiers: list[IdentifierOut] = Field(default_factory=list)
     notes: str = ""
+    from_career: bool = Field(
+        default=False,
+        description=(
+            "Added from an entry in the person's career, and not yet used for a posting, a "
+            "contact or an application. Read-only: the career form sets it and the first "
+            "use clears it"
+        ),
+    )
     created_at: dt.datetime
     updated_at: dt.datetime
 
@@ -1402,6 +1410,7 @@ def company_out(company, *, detail: bool = False) -> dict:
             for i in company.identifiers.all()
         ],
         "notes": company.notes,
+        "from_career": company.from_career,
         "created_at": company.created_at,
         "updated_at": company.updated_at,
     }

@@ -511,7 +511,9 @@ class ApplicationForm(OwnerScopedModelForm):
         if posted and str(posted).isdigit():
             named.add(int(posted))
         everyone = set(agencies.values_list("pk", flat=True))
-        offered = intermediaries | (named & everyone)
+        # A company only the career added is not an agency to pick, unless the row names it (#683).
+        careers = set(agencies.filter(from_career=True).values_list("pk", flat=True))
+        offered = (intermediaries - careers) | (named & everyone)
         self.agencies_narrowed = not self.show_all_companies and offered != everyone
         field.offered = offered if self.agencies_narrowed else None
 

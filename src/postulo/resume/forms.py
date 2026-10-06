@@ -90,6 +90,7 @@ class ExperienceForm(ResumeItemForm):
             "order",
         )
         widgets = {
+            "organisation": forms.TextInput(attrs={"list": "company-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
@@ -98,10 +99,35 @@ class ExperienceForm(ResumeItemForm):
         #: `end_date` and `highlights` say their piece on the model already, and a model
         #: form takes that; repeating them here would be the same words twice.
         help_texts = {
+            "organisation": _(
+                "As a CV should print it. It is linked to the company of that name among "
+                "yours, and added to your companies if there is none."
+            ),
             "start_date": ENTRY_HELP["start_date"],
             "summary": ENTRY_HELP["summary"],
             "location": _("Where the work was, as you would write it on a CV."),
         }
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's own companies, former employers included (#683)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall
+
+        return {"company-suggestions": recall.companies(self.user, including_career=True)}
+
+    def save(self, commit=True):
+        """Link the organisation to a company of the person's own, adding one if need be."""
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        entry.company = companies.find_or_add(owner, entry.organisation) if owner else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 class EducationForm(ResumeItemForm):

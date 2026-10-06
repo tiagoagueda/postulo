@@ -458,7 +458,7 @@ def fingerprint(kind: str) -> str:
 
 #: What each version of each file looked like. A new shape is a new line, and a new format.
 SHAPES = {
-    "companies": {1: "21618cc7975ef9fb"},
+    "companies": {1: "21618cc7975ef9fb", 2: "2f357806aee6ae96"},
     "contacts": {1: "2147065eb442ef0d"},
     "listings": {1: "10895cbc17c8b6cd"},
     "applications": {1: "4a452b4efb03e98c"},
@@ -493,9 +493,9 @@ def test_what_a_file_writes_is_something_the_archive_writes():
 
 
 def test_the_archive_and_the_candidate_file_are_untouched_by_the_new_files():
-    assert export.FORMAT_VERSION == 43
-    assert export.CANDIDATE_FORMAT == 8
-    assert set(kind_files.FORMATS.values()) == {1}
+    assert export.FORMAT_VERSION == 46
+    assert export.CANDIDATE_FORMAT == 9
+    assert set(kind_files.FORMATS.values()) == {1, 2}
 
 
 def test_every_kind_is_named_in_the_settings_section_it_belongs_to():

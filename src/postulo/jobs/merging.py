@@ -353,6 +353,7 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Companies that are part of it"), children, str),
         _moved(_("Applications that went through it as an agency"), through, str),
         _moved(_("Industries"), industries, str),
+        _moved(_("Career entries"), other.career_entries.all(), lambda row: row.role),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -470,6 +471,19 @@ def merge_companies(kept, other) -> Plan:
     children.exclude(pk__in=above).update(parent=kept, updated_at=now)
 
     kept.industries.add(*other.industries.all())
+
+    # The career entries that named the other company name this one now, each keeping the
+    # text it had (#683). Moved here, because a link set to null on delete is an update to
+    # Django and would be cleared without a word.
+    other.career_entries.update(company=kept)
+    # The mark survives only where both had it, and not once there is work attached.
+    kept.from_career = kept.from_career and other.from_career
+    if kept.from_career and (
+        JobPosting.objects.filter(company=kept).exists()
+        or Contact.objects.filter(company=kept).exists()
+        or Application.objects.filter(through_agency=kept).exists()
+    ):
+        kept.from_career = False
 
     kept.parent = parent
     for name in ("website", "careers_url"):

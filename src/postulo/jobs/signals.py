@@ -21,7 +21,7 @@ import logging
 
 from django.contrib.contenttypes.models import ContentType
 from django.db import transaction
-from django.db.models.signals import post_delete
+from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from .history import ARTEFACTS
@@ -106,3 +106,27 @@ def remove_the_logo_from_disk(sender, instance, **kwargs) -> None:
             logger.warning("Could not remove %s from storage", name, exc_info=True)
 
     transaction.on_commit(remove)
+
+
+def _no_longer_only_the_career(sender, instance, **kwargs) -> None:
+    """A posting, a contact or an application attached to a company ends its mark (#683).
+
+    A company the career form added is left out of the places a company is picked for new
+    work until it is used for some. Everything that attaches one is a save of its own row,
+    so one receiver per kind of row sees them all, the importer's and the API's included.
+    """
+    ids = {
+        getattr(instance, name)
+        for name in ("company_id", "through_agency_id")
+        if getattr(instance, name, None)
+    }
+    if ids:
+        Company.objects.filter(pk__in=ids, from_career=True).update(from_career=False)
+
+
+for _label in ("jobs.JobPosting", "jobs.Contact", "applications.Application"):
+    post_save.connect(
+        _no_longer_only_the_career,
+        sender=_label,
+        dispatch_uid=f"jobs.career_mark.{_label}",
+    )

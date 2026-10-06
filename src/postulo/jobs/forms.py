@@ -190,6 +190,7 @@ class CompanyForm(OwnerScopedModelForm):
             "location",
             "industries",
             "notes",
+            "from_career",
         )
         widgets = {"notes": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -217,6 +218,11 @@ class CompanyForm(OwnerScopedModelForm):
         a cell refuses exactly what the page refuses (#135). Scoping a field that is not
         there would make that impossible for the sake of an assumption nothing needs.
         """
+        if "from_career" in self.fields and not self.instance.from_career:
+            # Only offered where it is on, to be switched off by hand (#683): nobody marks
+            # a company as from the career here, the career form does.
+            del self.fields["from_career"]
+
         if "parent" in self.fields and not structure.structure_allowed(self.user):
             # The feature is off, so the field is not offered. Not cleared: the link stays
             # exactly where it is and comes back when the feature does, which is what "off
@@ -664,7 +670,9 @@ class ContactForm(OwnerScopedModelForm):
         return typed
 
     def scope_querysets(self) -> None:
-        self.fields["company"].queryset = Company.objects.for_user(self.user)
+        self.fields["company"].queryset = Company.objects.for_user(self.user).offered(
+            including=self.instance.company_id
+        )
         if not structure.structure_allowed(self.user):
             # Off, so a contact is simply somebody at a company, which is what it was
             # before departments existed. The row keeps its department (#138).
@@ -769,7 +777,9 @@ class JobPostingForm(OwnerScopedModelForm):
         # was narrowed to is usually not this one (#135, #160).
         company = self.fields.get("company")
         if company is not None:
-            company.queryset = Company.objects.for_user(self.user)
+            company.queryset = Company.objects.for_user(self.user).offered(
+                including=self.instance.company_id
+            )
 
     def clean(self):
         cleaned = super().clean()

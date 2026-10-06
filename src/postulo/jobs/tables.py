@@ -122,6 +122,16 @@ class CompaniesTable(Table):
             lookups=("kind",),
             choices=tuple(CompanyKind.choices),
         ),
+        # Added by the career form and not yet used for new work (#683): left out of the table
+        # unless this filter asks for them, as the pickers leave them out.
+        Column(
+            "from_career",
+            _("From your career"),
+            sort=("from_career",),
+            filter="choice",
+            lookups=("from_career",),
+            choices=(("1", _("Yes")), ("0", _("No"))),
+        ),
         Column(
             "contacts",
             _("People"),

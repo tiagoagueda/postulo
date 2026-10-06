@@ -79,9 +79,9 @@ from postulo.core import (
 from postulo.core import web_links as links
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
+from . import companies, ordering, translating
 from . import forms as resume_forms
 from . import models as resume
-from . import ordering, translating
 
 #: The most a candidate file may be. One person's career with every entry translated three
 #: ways is some tens of kilobytes, and there is no picture in it to make it more; a megabyte
@@ -158,12 +158,15 @@ class Kind:
     sub: str = ""
     #: Whether an entry with a start and no end is still going.
     ongoing: bool = False
+    #: What the file says of an entry that its form does not take: read as a hint and held
+    #: with the entry, never a field of it.
+    hints: tuple[str, ...] = ()
 
     @property
     def held(self) -> tuple[str, ...]:
         """What is kept of an entry between reading the file and confirming it."""
         extra = ("group_id",) if self.block == "skills" else ()
-        return ("id", "order", *self.fields, *extra)
+        return ("id", "order", *self.fields, *self.hints, *extra)
 
 
 #: In the order the review shows them, which is the order the career page does -- and with
@@ -188,6 +191,9 @@ KINDS: tuple[Kind, ...] = (
         label="role",
         sub="organisation",
         ongoing=True,
+        # The company the entry links to, by name (#683): offered as the link where it is
+        # one of this account's, and never the reason to add one.
+        hints=("company",),
     ),
     Kind(
         block="education",
@@ -473,6 +479,8 @@ class Row:
     parent: Row | None = None
     #: A detail to fill in: the field, and what to put in it.
     fill: tuple[str, str] | None = None
+    #: The company of the account's an experience is offered as linked to (#683).
+    company: Any = None
     #: What one row of translations is made of: the field, and the text.
     texts: list[tuple[str, str]] = field(default_factory=list)
     language: str = ""
@@ -1306,7 +1314,24 @@ class _Planner:
             row.notes.append(
                 _("You have one like it with other dates. Both will be in your record.")
             )
+        if kind.block == "experience" and row.outcome == ADD:
+            self._link(row, entry.get("company"))
         return row
+
+    def _link(self, row: Row, named) -> None:
+        """Offer the entry as linked to the account's company of that name, if it has one.
+
+        A hint and nothing more: a file never adds a company, so a name that is not one of
+        the account's leaves the entry unlinked and says nothing (#683).
+        """
+        if not isinstance(named, str) or not named.strip():
+            return
+        found = companies.existing(self.user, named[:200])
+        if found is not None:
+            row.company = found
+            row.notes.append(
+                _("It will be linked to your company “%(name)s”.") % {"name": found.name}
+            )
 
     def _group_of(self, entry: dict, row: Row) -> str:
         """Which group a skill sits under, folded, having settled whether it can."""
@@ -1549,6 +1574,8 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
     for row in sorted(rows, key=lambda row: (row.order is None, row.order or 0, row.position)):
         item = row.instance
         item.owner = user
+        if kind.block == "experience":
+            item.company = row.company
         if kind.block == "skills":
             item.group = row.parent.target if row.parent is not None else None
             # `bulk_create` calls no `save`, which is where a skill works out which ESCO

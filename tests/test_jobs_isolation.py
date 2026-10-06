@@ -213,3 +213,30 @@ def test_another_accounts_handles_are_not_found_not_offered_and_not_touched(
         their_data["contact"].pk,
     )
     assert not mine.messaging_handles.exists(), "nothing of theirs was moved to mine either"
+
+
+def test_another_accounts_company_is_neither_offered_nor_linked_by_the_career(
+    client, user, other_user
+):
+    """The career form suggests and links only the person's own companies (#683)."""
+    from postulo.jobs.models import Company
+    from postulo.resume.forms import ExperienceForm
+
+    theirs = Company.objects.create(owner=other_user, name="Umbrella Corp", notes="Secret")
+    assert "Umbrella Corp" not in ExperienceForm(user=user).datalists["company-suggestions"]
+
+    client.force_login(user)
+    response = client.post(
+        reverse("resume:item_create", args=["experience"]),
+        {"role": "Engineer", "organisation": "Umbrella Corp", "start_date": "2020-01-01"},
+    )
+    assert response.status_code == 302
+    from postulo.resume.models import Experience
+
+    entry = Experience.objects.get(owner=user)
+    assert entry.company is not None and entry.company != theirs
+    assert entry.company.owner == user
+    theirs.refresh_from_db()
+    assert not theirs.career_entries.exists()
+    page = client.get(reverse("resume:item_update", args=["experience", entry.pk]))
+    assert "Secret" not in page.content.decode()

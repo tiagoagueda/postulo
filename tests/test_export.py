@@ -768,6 +768,78 @@ def _grow(user, label: str, how_many: int) -> None:
         WebLink.objects.create(url="https://example.org/", kind="website", **held)
 
 
+def _restored(document, user):
+    buffer = BytesIO()
+    with zipfile.ZipFile(buffer, "w") as written:
+        written.writestr("postulo.json", json.dumps(document))
+    buffer.seek(0)
+    return importer.load(user, zipfile.ZipFile(buffer))
+
+
+def test_the_career_link_and_the_marker_survive_the_round_trip(user, other_user):
+    kept = Company.objects.create(owner=user, name="Acme")
+    former = Company.objects.create(owner=user, name="Old Employer", from_career=True)
+    for company, text in ((kept, "Acme Ltd"), (former, "Old Employer")):
+        Experience.objects.create(
+            owner=user,
+            organisation=text,
+            company=company,
+            role="Dev",
+            start_date=dt.date(2020, 1, 1),
+        )
+    Experience.objects.create(
+        owner=user, organisation="Unlinked", role="Dev", start_date=dt.date(2019, 1, 1)
+    )
+    archive, document = read_archive(user)
+    assert {row["organisation"]: row["company"] for row in document["resume"]["experience"]} == {
+        "Acme Ltd": "Acme",
+        "Old Employer": "Old Employer",
+        "Unlinked": "",
+    }
+
+    importer.load(other_user, archive)
+
+    links = {e.organisation: e.company for e in Experience.objects.for_user(other_user)}
+    assert links["Acme Ltd"].name == "Acme"
+    assert links["Old Employer"].from_career is True
+    assert links["Old Employer"].owner == other_user
+    assert links["Unlinked"] is None
+    assert Company.objects.get(owner=other_user, name="Acme").from_career is False
+
+
+def test_an_older_archive_restores_every_entry_unlinked(user, other_user):
+    Company.objects.create(owner=user, name="Acme")
+    Experience.objects.create(
+        owner=user, organisation="Acme", role="Dev", start_date=dt.date(2020, 1, 1)
+    )
+    _archive, document = read_archive(user)
+    document["postulo"]["format"] = 44
+    for entry in document["resume"]["experience"]:
+        del entry["company"]
+    for company in document["companies"]:
+        del company["from_career"]
+
+    _restored(document, other_user)
+
+    assert Experience.objects.for_user(other_user).get().company is None
+    assert Company.objects.get(owner=other_user).from_career is False
+
+
+def test_a_name_the_archive_does_not_hold_leaves_the_entry_unlinked_and_adds_nothing(
+    user, other_user
+):
+    Experience.objects.create(
+        owner=user, organisation="Acme", role="Dev", start_date=dt.date(2020, 1, 1)
+    )
+    _archive, document = read_archive(user)
+    document["resume"]["experience"][0]["company"] = "Somebody Else's"
+
+    _restored(document, other_user)
+
+    assert Experience.objects.for_user(other_user).get().company is None
+    assert not Company.objects.for_user(other_user).exists()
+
+
 def test_the_archive_costs_the_same_queries_however_much_the_account_holds(populated):
     """The build runs inside the write lock, so a query per application, per contact and
     per sent document is every other request waiting on it (#557)."""

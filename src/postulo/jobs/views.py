@@ -104,6 +104,9 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         if search:
             queryset = queryset.filter(company_match(search))
         queryset = self._within_group(queryset)
+        # The companies only the career added are not in the table until a filter asks (#683).
+        if not self.table.given("from_career"):
+            queryset = queryset.filter(from_career=False)
         queryset = self.table.apply(queryset)
         # The search matches industries and identifiers through `Exists`, so it cannot
         # repeat a company. Only the Industries column joins a many-valued relation, where
@@ -181,6 +184,9 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
         rows = (
             Company.objects.for_user(self.request.user)
             .filter(location__gt="")
+            # A company only the career added has no place on the map until it has a
+            # posting (#683), which is when it stops being marked.
+            .filter(from_career=False)
             .values_list(
                 "location",
                 "name",
@@ -331,6 +337,8 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["group"] = structure.group_of(self.object, person)
         context["parent"] = structure.parent_of(self.object, person)
         context["children"] = structure.children_of(self.object, person)
+        # The entries of the career that name this company, newest first (#683).
+        context["career_entries"] = self.object.career_entries.order_by("-start_date", "-pk")
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
             "phone_numbers", "web_links", "messaging_handles"
         )
@@ -682,12 +690,29 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
             if number
         ]
         sent = RenderedDocument.objects.filter(application__in=applications).count()
+        kept = []
         if sent:
-            context["kept"] = ngettext(
-                "The %(count)d document you sent is kept, and still says where it went.",
-                "The %(count)d documents you sent are kept, and still say where they went.",
-                sent,
-            ) % {"count": sent}
+            kept.append(
+                ngettext(
+                    "The %(count)d document you sent is kept, and still says where it went.",
+                    "The %(count)d documents you sent are kept, and still say where they went.",
+                    sent,
+                )
+                % {"count": sent}
+            )
+        # The career is not deleted with a company (#683): an entry keeps its text.
+        entries = company.career_entries.count()
+        if entries:
+            kept.append(
+                ngettext(
+                    "%(count)d career entry keeps its text and loses the link.",
+                    "%(count)d career entries keep their text and lose the link.",
+                    entries,
+                )
+                % {"count": entries}
+            )
+        if kept:
+            context["kept"] = " ".join(kept)
         return context
 
     def form_valid(self, form):

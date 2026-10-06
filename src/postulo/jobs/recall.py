@@ -41,8 +41,12 @@ def _by_use(queryset, field: str) -> list[str]:
     return [row[field] for row in rows]
 
 
-def companies(user) -> list[str]:
-    """Every employer this person has recorded, commonest first."""
+def companies(user, *, including_career: bool = False) -> list[str]:
+    """Every employer this person has recorded, commonest first.
+
+    Without the companies only the career added (#683): a new application is not made
+    to a former employer. The career form asks for them too.
+    """
     from .models import Company, JobPosting
 
     counted = (
@@ -56,7 +60,10 @@ def companies(user) -> list[str]:
         # A company recorded with no posting against it yet is still one to offer: it is
         # there because somebody typed it, which is the whole signal this is built on.
         known = set(names)
-        for name in Company.objects.for_user(user).order_by("name").values_list("name", flat=True):
+        pool = Company.objects.for_user(user)
+        if not including_career:
+            pool = pool.offered()
+        for name in pool.order_by("name").values_list("name", flat=True):
             if name and name not in known:
                 names.append(name)
                 known.add(name)

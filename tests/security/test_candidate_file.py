@@ -711,3 +711,38 @@ def test_whose_a_handle_is_is_never_the_files_to_say(user, other_user):
     assert (row.owner, row.holder) == (user, user.profile)
     assert row.comparable == "@a:b.c"
     assert not MessagingHandle.objects.for_user(other_user).exists()
+
+
+# ------------------------------------------------------------- the company an entry names
+
+
+def test_a_file_never_adds_a_company_whatever_its_entries_say(user, other_user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=other_user, name="Initech")
+    data = a_file(resume={"experience": [a_role(company="Initech"), a_role(id=2, company="New")]})
+    candidate.apply(user, candidate.read(data))
+    assert not Company.objects.filter(owner=user).exists()
+    assert Experience.objects.filter(owner=user, company__isnull=False).count() == 0
+
+
+def test_a_hostile_company_is_a_name_to_look_for_and_nothing_else(user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=user, name="Initech")
+    for hostile in (MARKUP, SCRIPT, ["Initech"], {"id": 1}, 1, "x" * 100_000, None):
+        held = candidate.read(a_file(resume={"experience": [a_role(company=hostile)]}))
+        plan = candidate.plan(user, held)
+        assert outcomes(plan, "experience") == ["add"]
+        assert all(row.company is None for row in plan.rows())
+    assert Company.objects.filter(owner=user).count() == 1
+
+
+def test_a_name_that_is_one_of_the_accounts_companies_is_offered_as_the_link(user):
+    from postulo.jobs.models import Company
+
+    mine = Company.objects.create(owner=user, name="Initech")
+    held = candidate.read(a_file(resume={"experience": [a_role(company="initech")]}))
+    assert [row.company for row in candidate.plan(user, held).rows()] == [mine]
+    candidate.apply(user, held)
+    assert Experience.objects.get(owner=user).company == mine

@@ -73,6 +73,7 @@ All notable changes to Postulo are recorded here. The format follows
 - A company's page now warns, never blocking a save, when its register number and OpenCorporates id name different companies, or a stored identifier would be refused by its own kind today (#675)
 - Events as iCalendar: the calendar downloads as .ics, reminders become VTODO tasks in their own feed, and an .ics file is imported through a review with nothing made until you choose and no time guessed; the writer now runs on the icalendar library (#661)
 - A reference letter now records who wrote it, when, until when it is good to send and who sends it, shows its referee when you record what you sent and on the contact, and is off by default when copying to a new store (#666)
+- An experience's organisation is now linked to one of your companies, added and marked "from your career" if none matches, and kept out of the posting, contact and agency pickers, the map and the companies table until you use it for something (#683)
 
 ### 🐛 Fixed
 

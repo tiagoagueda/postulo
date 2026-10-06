@@ -122,7 +122,13 @@ logger = logging.getLogger(__name__)
 #: 44 added ``reference_letter`` on an upload of kind *Reference*: who wrote it (the contact's
 #: id), when, the date after which it should not be sent, and who sends it. An archive without
 #: it restores every upload as a file with no referee (#666).
-FORMAT_VERSION = 44
+#: 45 added ``from_career`` on a company: whether only an entry of the career added it, which
+#: keeps it out of the places a company is picked for new work; an archive without it
+#: restores every company as one that is not (#683).
+#: 46 added ``company`` on an experience: the name of the company of the person's it is linked
+#: to, or blank. An archive without it restores every entry unlinked, as they were written;
+#: the link is made in a pass once the companies exist, by name, and never adds one (#683).
+FORMAT_VERSION = 46
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -156,7 +162,10 @@ FORMAT_VERSION = 44
 #: 8 added ``messaging_handles`` on the profile, read back as a
 #: claim as a link's service is: a handle is kept under the service the importing side
 #: knows and the handle is one of its handles, and under *Other* otherwise (#682).
-CANDIDATE_FORMAT = 8
+#: 9 added ``company`` on an experience: the name of the company the entry links to, read back
+#: as a hint -- offered as the link where it is exactly the name of one of the importing
+#: account's companies, and never the reason to add one (#683).
+CANDIDATE_FORMAT = 9
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -256,6 +265,9 @@ COMPANY_FIELDS = (
     "careers_url",
     "location",
     "notes",
+    # Whether only the career added it (#683): read back as written, so a former employer
+    # stays out of the pickers after a restore as it was before.
+    "from_career",
     "logo_source",
     "logo_source_url",
     "logo_fetched_at",
@@ -442,6 +454,10 @@ RESUME_FIELDS = {
     "experience": (
         "id",
         "organisation",
+        # The name of the company the entry links to, or blank (#683). Never an id: the
+        # importer links by name once the companies exist, and a candidate file reads it
+        # as a hint and never adds the company.
+        "company",
         "role",
         "location",
         "start_date",
@@ -604,15 +620,27 @@ def _identifier_rows(profile) -> list[dict]:
     ]
 
 
+def _career_fields(item, names: tuple[str, ...]) -> dict:
+    """An entry's fields, with the company it links to written as its name (#683)."""
+    return {
+        name: (item.company.name if item.company_id else "")
+        if name == "company"
+        else _value(getattr(item, name))
+        for name in names
+    }
+
+
+def _career_rows(resume, key: str, user):
+    rows = getattr(resume, RESUME_MODELS[key]).objects.for_user(user)
+    return rows.select_related("company") if key == "experience" else rows
+
+
 def _resume_block(user) -> dict:
     """The career record: every entry of every kind, and what they say in other languages."""
     from postulo.resume import models as resume
 
     block: dict[str, Any] = {
-        key: [
-            _fields(item, names)
-            for item in getattr(resume, RESUME_MODELS[key]).objects.for_user(user)
-        ]
+        key: [_career_fields(item, names) for item in _career_rows(resume, key, user)]
         for key, names in RESUME_FIELDS.items()
     }
     # What those entries say in other languages. A section name and a local id rather than a

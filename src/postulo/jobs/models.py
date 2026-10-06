@@ -133,6 +133,24 @@ class CompanyQuerySet(OwnedQuerySet):
             company.name_key = slugs.name_key(company.name)
         return super().bulk_create(objs, *args, **kwargs)
 
+    def offered(self, *, including=()) -> CompanyQuerySet:
+        """The companies to pick from for new work: not the ones only the career added (#683).
+
+        A former employer is a company like any other, and stays out of the posting,
+        contact and agency pickers until something is attached to it. ``including`` is the
+        key of a company a row already names, which stays in its own picker so that editing
+        the row does not lose it.
+        """
+        keep = [
+            pk
+            for pk in (including if isinstance(including, (list, tuple, set)) else [including])
+            if pk
+        ]
+        query = models.Q(from_career=False)
+        if keep:
+            query |= models.Q(pk__in=keep)
+        return self.filter(query)
+
     def employers(self) -> CompanyQuerySet:
         """The companies that are employers: everything but the employment service (#202).
 
@@ -335,6 +353,20 @@ class Company(OwnedModel):
         Industry, blank=True, related_name="companies", verbose_name=_("industries")
     )
     notes = models.TextField(_("notes"), blank=True)
+    #: Added by the career form rather than by somebody looking for work there (#683): a
+    #: former employer is a company like any other, and is left out of every place a
+    #: company is picked for new work until a posting, a contact or an application is
+    #: attached to it, or the person says it is not. A column with a default, so every
+    #: company recorded before it is what it was.
+    from_career = models.BooleanField(
+        _("from your career"),
+        default=False,
+        help_text=_(
+            "Added from an entry in your career. It is left out of the lists where you "
+            "pick a company for new work, until you attach a listing, a person or an "
+            "application to it."
+        ),
+    )
 
     #: The logo, always a file of Postulo's own: fetched from an address, found on the
     #: company's site, or uploaded. Never a URL rendered into a page — that would tell

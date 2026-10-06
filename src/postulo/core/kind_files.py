@@ -57,8 +57,10 @@ MAX_NESTED = 200
 MAX_DETAILS = 20
 
 #: What each file starts at, and what its marker is called in the header. A block that
-#: changes shape is a new version, which `tests/test_kind_files.py` holds fast.
-FORMATS = {"companies": 1, "contacts": 1, "listings": 1, "applications": 1}
+#: changes shape is a new version, which `tests/test_kind_files.py` holds fast. The companies
+#: file went to 2 when the archive's company block gained ``from_career`` (#683): the file
+#: does not write it, and reads a version 1 file exactly as before.
+FORMATS = {"companies": 2, "contacts": 1, "listings": 1, "applications": 1}
 
 #: Telephone numbers are not read with a say in whether they were confirmed or are a way
 #: back in (#142, #144): neither is written.

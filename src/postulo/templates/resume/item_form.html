@@ -40,6 +40,13 @@
       </div>
     </form>
 
+    {% if object.company %}
+      <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
+        {% translate "Linked to the company" %}
+        <a class="underline" href="{{ object.company.get_absolute_url }}"><bdi>{{ object.company.name }}</bdi></a>.
+      </p>
+    {% endif %}
+
     {% if esco_name %}
       {% comment %} A skill whose name is one of the ESCO classification's says which, and
          what follows from it, so that a CV in another language printing the classification's

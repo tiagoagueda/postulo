@@ -904,11 +904,18 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     }
     date_fields = {"start_date", "end_date", "issued_on", "expires_on"}
     moment_fields = {"checked_at"}
+    #: Experience primary key -> the name of the company it links to, applied once every
+    #: company in the file has been made or matched (#683).
+    wants_company: dict[int, str] = {}
 
     for key, model in section_models.items():
         resume_map[key] = {}
         for entry in document.get("resume", {}).get(key, []):
             old_id = entry.pop("id", None)
+            # The company an experience links to, by name (format 46), taken out before the
+            # constructor sees the entry and linked once the companies exist. An archive
+            # without it restores every entry unlinked (#683).
+            company_name = entry.pop("company", "") if key == "experience" else ""
             values = {}
             for name, value in _carried(
                 entry, RESUME_FIELDS[key], report, f"A {key} entry"
@@ -920,6 +927,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 else:
                     values[name] = value
             created = model.objects.create(owner=user, **values)
+            if isinstance(company_name, str) and company_name.strip():
+                wants_company[created.pk] = company_name
             resume_map[key][old_id] = created
             report.resume_items += 1
 
@@ -1068,6 +1077,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         parent_name = (company_entry.pop("parent", "") or "").strip()
         company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
+        # A switch, read as one: anything but a true is not marked. An archive from before
+        # format 44 says nothing, and every company in it is one that is not (#683).
+        company_entry["from_career"] = company_entry.get("from_career") is True
 
         # A company is an identity keyed by its name, which is why intake matches on
         # it too. Importing attaches to one that already exists rather than colliding
@@ -1326,6 +1338,20 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             parent = by_name.get(name.casefold())
             if parent is not None and parent.pk != child_pk:
                 Company.objects.filter(pk=child_pk).update(parent=parent)
+
+    # The companies the career names, by name like an agency: one the file does not hold
+    # leaves the entry unlinked and its text as written, and nothing is added (#683).
+    if wants_company:
+        named = {
+            company.name_key: company
+            for company in Company.objects.for_user(user).filter(
+                name_key__in={slugs.name_key(name) for name in wants_company.values()}
+            )
+        }
+        for entry_pk, name in wants_company.items():
+            company = named.get(slugs.name_key(name))
+            if company is not None:
+                resume.Experience.objects.filter(pk=entry_pk).update(company=company)
 
     # And then which part of an employer each application was aimed at, once both the
     # departments and the tree they hang off exist. A department the archive names but the

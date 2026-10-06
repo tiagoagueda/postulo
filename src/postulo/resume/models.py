@@ -66,13 +66,25 @@ class ResumeItem(OwnedModel):
 class Experience(ResumeItem):
     """A job you have held.
 
-    ``organisation`` is free text rather than a link to
-    :class:`~postulo.jobs.models.Company`. Where you have worked and where you are
-    applying are unrelated lists, and joining them would put former employers into the
-    company picker for new applications.
+    ``organisation`` is the name the entry gives its employer, as text of its own: a CV
+    states the name an employer had when the person worked there, and companies are
+    renamed and merged. ``company`` links it to a :class:`~postulo.jobs.models.Company` of
+    the person's, found by that name when the entry is saved (#683). A company the career
+    added is marked ``from_career`` and kept out of the places a company is picked for new
+    work, so former employers do not crowd the posting picker. Deleting the company keeps
+    the entry and its text.
     """
 
     organisation = models.CharField(_("organisation"), max_length=200)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="career_entries",
+        verbose_name=_("company"),
+    )
     role = models.CharField(_("role"), max_length=200)
     location = models.CharField(_("location"), max_length=200, blank=True)
     start_date = models.DateField(_("from"))

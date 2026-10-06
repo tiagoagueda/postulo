@@ -382,6 +382,7 @@ def fingerprint() -> str:
 #: address in a file that does not say (#305). 5 added the date and place of birth (#679).
 #: 6 added the nationalities and their scope (#680). 7 added the gender (#681). 8 added the
 #: messaging handles a person is reached on, read back as a link's service is (#682).
+#: 9 added the company an experience links to, read back as a hint (#683).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -391,6 +392,7 @@ SHAPES = {
     6: "4ddd1e43407b6177",
     7: "e5e8e4a8666679f8",
     8: "2bc0ec0af53cd958",
+    9: "6cf32b0e61e73b80",
 }
 
 
@@ -1861,3 +1863,28 @@ def test_the_page_draws_what_a_whole_career_holds(client, somebody, other_user):
     body = response.content.decode()
     for title in titles:
         assert title in body
+
+
+def test_an_entrys_company_is_offered_as_a_link_only_where_the_account_has_it(user, other_user):
+    Company.objects.create(owner=other_user, name="Initech")
+    data = a_file(resume={"experience": [a_role(company="Initech")]})
+    assert [row.company for row in drawn(user, data).rows()] == [None]
+    mine = Company.objects.create(owner=user, name="Initech")
+    assert [row.company for row in drawn(user, data).rows()] == [mine]
+    add(user, data)
+    assert Experience.objects.get(owner=user).company == mine
+    assert Company.objects.filter(owner=user).count() == 1
+
+
+def test_the_file_writes_the_company_by_name(user):
+    company = Company.objects.create(owner=user, name="Initech")
+    Experience.objects.create(
+        owner=user,
+        organisation="Initech Ltd",
+        company=company,
+        role="Dev",
+        start_date=dt.date(2020, 1, 1),
+    )
+    entry = export.build_candidate_document(user)["resume"]["experience"][0]
+    assert entry["company"] == "Initech"
+    assert entry["organisation"] == "Initech Ltd"

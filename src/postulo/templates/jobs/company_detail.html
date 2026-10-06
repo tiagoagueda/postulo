@@ -209,6 +209,25 @@
         </c-empty>
       {% endif %}
 
+      {% if career_entries %}
+        <c-section-title class="mt-8">{% translate "Your history here" %}</c-section-title>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for entry in career_entries %}
+              <li class="px-4 py-3">
+                <a href="{% url 'resume:item_update' 'experience' entry.pk %}" class="inline-block py-1 font-medium hover:underline">
+                  <bdi>{{ entry.role }}</bdi>
+                </a>
+                <p class="text-sm text-ink-500 dark:text-ink-400">
+                  {{ entry.start_date|date:"YEAR_MONTH_FORMAT" }} –
+                  {% if entry.end_date %}{{ entry.end_date|date:"YEAR_MONTH_FORMAT" }}{% else %}{% translate "present" %}{% endif %}
+                </p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
       {% if children %}
         <c-section-title class="mt-8">{% translate "Part of this company" %}</c-section-title>
         <div class="card p-0">

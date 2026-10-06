@@ -308,6 +308,8 @@ def apply(owner, record: Record) -> Report:
     # Each section is placed as an entry typed by hand would be (#203, #618): by its date
     # where it has one, last where it has not, and dense numbers after. The rows are built
     # here and written once per section by `ordering.place_many`, which calls no `save`.
+    from .companies import existing as company_named
+
     experience = []
     for entry in record.experience:
         if not entry.get("start_date"):
@@ -326,6 +328,9 @@ def apply(owner, record: Record) -> Report:
                 owner=owner,
                 role=entry["role"][:200],
                 organisation=entry["organisation"][:200],
+                # Linked where the name is one of the person's companies, and never added:
+                # a file must not fill the list (#683).
+                company=company_named(owner, entry["organisation"][:200]),
                 location=entry["location"][:200],
                 start_date=entry["start_date"],
                 end_date=entry["end_date"],

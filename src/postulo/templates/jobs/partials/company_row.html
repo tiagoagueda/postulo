@@ -29,6 +29,8 @@
       </td>
     {% elif column.key == 'kind' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.get_kind_display }}</td>
+    {% elif column.key == 'from_career' %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{% if company.from_career %}{% translate "Yes" %}{% else %}{% translate "No" %}{% endif %}</td>
     {% elif column.key == 'location' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>
     {% elif column.key == 'industry' %}

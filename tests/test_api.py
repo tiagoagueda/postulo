@@ -312,6 +312,21 @@ def test_a_company_posted_with_a_greek_industry_has_it(client, user):
     assert response.json()["industries"] == ["Πληροφορική"]
 
 
+def test_a_company_shows_whether_only_the_career_added_it_and_cannot_be_told_to(client, user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=user, name="Old Employer", from_career=True)
+    bearer = issue(user, "write", "read")
+
+    listed = client.get("/api/v1/companies", **bearer).json()
+    assert [row["from_career"] for row in listed["items"]] == [True]
+
+    made = post(client, "/api/v1/companies", {"name": "New", "from_career": True}, **bearer)
+    assert made.status_code == 201
+    assert made.json()["from_career"] is False
+    assert Company.objects.get(owner=user, name="New").from_career is False
+
+
 def test_recording_an_application_and_applying_to_a_listing(client, user, search):
     bearer = issue(user, "write", "read")
     response = post(

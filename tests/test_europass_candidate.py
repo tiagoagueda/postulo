@@ -959,3 +959,29 @@ def test_every_skill_in_a_group_is_kept():
     (group,) = europass.read(data).skill_groups
 
     assert len(group["skills"]) == 55
+
+
+# ------------------------------------------------------------ the organisation as a company
+
+FROM_2020 = (
+    f"<eures:EmploymentPeriod><eures:StartDate>{when('2020')}</eures:StartDate>"
+    f"</eures:EmploymentPeriod>"
+)
+
+
+def test_a_europass_employer_is_linked_to_the_company_of_that_name_and_never_adds_one(user):
+    from postulo.jobs.models import Company
+
+    initech = Company.objects.create(owner=user, name="INITECH")
+    importing.apply(user, europass.read(candidate_xml(post("Engineer", FROM_2020))))
+    entry = Experience.objects.get(owner=user)
+    assert entry.company == initech
+    assert entry.organisation == "Initech"
+
+
+def test_a_europass_employer_with_no_company_of_that_name_adds_none(user):
+    from postulo.jobs.models import Company
+
+    importing.apply(user, europass.read(candidate_xml(post("Engineer", FROM_2020))))
+    assert Experience.objects.get(owner=user).company is None
+    assert not Company.objects.filter(owner=user).exists()
