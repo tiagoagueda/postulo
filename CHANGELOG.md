@@ -49,6 +49,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Uploads are now checked for what they are, kept with a size and checksum the archive carries (format 54), scrubbed on a schedule without ever deleting a damaged file, and orphans are swept after a grace period (#663)
 - Your career gains a Driving licences section: tick the categories you hold (AM to DE) and a CV prints "Driving licence: B, A2 (Portugal)"; the licence number and everything else on the card is never kept (#691)
 - A certification's issuer is linked to one of your companies (added if new, with no industry), offered with awarding bodies first, with a notice when it has no NACE industry; archive 52, candidate file 14 (#686)
 - An education entry now links its institution to a company of yours, offering places of learning first and adding the Education industry to a company the form creates; the archive goes to format 51 and the record file to 13 (#685)

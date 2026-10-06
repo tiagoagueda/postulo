@@ -245,7 +245,9 @@ def test_an_archive_without_the_figures_still_restores(user, other_user):
 
     importer.load(other_user, rebuilt_with(user, change))
     restored = UploadedDocument.objects.for_user(other_user).get()
-    assert restored.file.read() == PDF and restored.size == len(PDF)
+    with restored.file.open("rb") as handle:
+        assert handle.read() == PDF
+    assert restored.size == len(PDF)
 
 
 def test_a_sent_document_whose_checksum_does_not_match_its_bytes_is_reported(user, other_user):
