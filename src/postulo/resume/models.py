@@ -406,6 +406,11 @@ class Course(ResumeItem):
     text, and is what a CV prints; ``hours`` is the teaching or study time as the provider
     states it, from 1 to 10,000, and optional. The certificate is not a column here: it is a
     document, and ``url`` is only an address.
+
+    ``company`` links the provider to a :class:`~postulo.jobs.models.Company` of the person's,
+    found by that name when the entry is saved, as an issuer's is (#686): the text stays what a
+    CV prints, and a company the form adds is marked from the career and given no industry.
+    Deleting the company keeps the entry.
     """
 
     HOURS_MIN = 1
@@ -413,6 +418,15 @@ class Course(ResumeItem):
 
     title = models.CharField(_("title"), max_length=200)
     provider = models.CharField(_("provider"), max_length=200, blank=True)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="courses",
+        verbose_name=_("company"),
+    )
     start_date = models.DateField(_("from"), null=True, blank=True)
     end_date = models.DateField(_("until"), null=True, blank=True)
     hours = models.PositiveIntegerField(

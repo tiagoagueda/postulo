@@ -345,6 +345,8 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # And the honours it gave and the memberships it holds (#693).
         context["honours"] = self.object.honours.order_by("-awarded_on", "-pk")
         context["memberships"] = self.object.memberships.order_by("-start_date", "-pk")
+        # And the courses it gave (#695).
+        context["courses"] = self.object.courses.order_by("-end_date", "-pk")
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
             "phone_numbers", "web_links", "messaging_handles"
         )
@@ -712,6 +714,7 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
             + company.certifications.count()
             + company.honours.count()
             + company.memberships.count()
+            + company.courses.count()
         )
         if entries:
             kept.append(

@@ -351,6 +351,7 @@ class CourseForm(ResumeItemForm):
         model = Course
         fields = ("title", "provider", "start_date", "end_date", "hours", "summary", "url", "order")
         widgets = {
+            "provider": forms.TextInput(attrs={"list": "provider-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "hours": forms.NumberInput(attrs={"min": Course.HOURS_MIN, "max": Course.HOURS_MAX}),
@@ -358,13 +359,45 @@ class CourseForm(ResumeItemForm):
         }
         help_texts = {
             "title": COURSE_RULE,
-            "provider": _("A school, a company, a platform: as a CV should print it."),
+            "provider": _(
+                "A school, a company, a platform: as a CV should print it. It is linked to the "
+                "company of that name among yours, and added to your companies if there is none."
+            ),
             "start_date": ENTRY_HELP["start_date"],
             "end_date": ENTRY_HELP["end_date"],
             "hours": _("The hours of teaching or study as the provider states them, if it does."),
             "summary": ENTRY_HELP["summary"],
             "url": _("A public page for the course or its certificate."),
         }
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's companies, places of learning first and every other one below (#695)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall, roles
+
+        return {
+            "provider-suggestions": recall.companies(
+                self.user, including_career=True, role=roles.PLACE_OF_LEARNING
+            )
+        }
+
+    def save(self, commit=True):
+        """Link the provider to a company of the person's own, adding one if need be.
+
+        No industry is ever assigned to a company added here, as for an issuer: a software
+        company's academy is in no education division (#695).
+        """
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        entry.company = companies.find_or_add(owner, entry.provider) if owner else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 class DrivingLicenceForm(ResumeItemForm):

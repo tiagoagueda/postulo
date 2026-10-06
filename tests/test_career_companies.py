@@ -15,8 +15,8 @@ from django.utils import translation
 from postulo.applications.models import Application
 from postulo.jobs import industries, merging, recall, roles
 from postulo.jobs.models import Company, Contact, Industry, JobPosting
-from postulo.resume.forms import CertificationForm, EducationForm, ExperienceForm
-from postulo.resume.models import Certification, Education, Experience
+from postulo.resume.forms import CertificationForm, CourseForm, EducationForm, ExperienceForm
+from postulo.resume.models import Certification, Course, Education, Experience
 
 pytestmark = pytest.mark.django_db
 
@@ -706,3 +706,139 @@ def test_the_archive_writes_the_company_by_name_and_an_older_one_restores_unlink
     restore(other_user, older)
     assert Honour.objects.for_user(other_user).get().company is None
     assert Membership.objects.for_user(other_user).get().company is None
+
+
+# ----------------------------------------------------------------------- courses (#695)
+
+
+def save_course(user, provider: str, **extra) -> Course:
+    data = {"title": "SRE in practice", "provider": provider, **extra}
+    form = CourseForm(data, user=user)
+    assert form.is_valid(), form.errors
+    form.instance.owner = user
+    return form.save()
+
+
+def test_a_courses_provider_is_linked_by_name_in_any_case(user):
+    academy = Company.objects.create(owner=user, name="Linux Foundation")
+    entry = save_course(user, "linux foundation")
+    assert entry.company == academy
+    assert entry.provider == "linux foundation"
+
+
+def test_a_provider_that_is_no_company_is_added_marked_and_given_no_industry(user):
+    entry = save_course(user, "Acme Academy")
+    assert entry.company.name == "Acme Academy"
+    assert entry.company.from_career is True
+    assert not entry.company.industries.exists()
+
+
+def test_another_accounts_company_is_never_the_provider(user, other_user):
+    theirs = Company.objects.create(owner=other_user, name="Initech")
+    entry = save_course(user, "Initech")
+    assert entry.company != theirs and entry.company.owner == user
+    assert not theirs.courses.exists()
+
+
+def test_a_course_with_no_provider_links_nothing_and_clearing_it_unlinks(user):
+    assert save_course(user, "").company is None
+    assert not Company.objects.filter(owner=user).exists()
+    entry = save_course(user, "Acme Academy")
+    form = CourseForm({"title": "SRE", "provider": ""}, instance=entry, user=user)
+    assert form.is_valid(), form.errors
+    assert form.save().company is None
+
+
+def test_the_provider_box_offers_places_of_learning_first_and_loses_no_company(user):
+    Company.objects.create(owner=user, name="Zed Software")
+    school = Company.objects.create(owner=user, name="Universidade de Aveiro")
+    school.industries.set(Industry.named(user, ["Education"]))
+
+    offered = CourseForm(user=user).datalists["provider-suggestions"]
+
+    assert offered.index("Universidade de Aveiro") < offered.index("Zed Software")
+
+
+def test_the_company_page_lists_the_courses_it_gave(client, user):
+    entry = save_course(user, "Acme Academy", title="Welding basics")
+    client.force_login(user)
+    page = client.get(entry.company.get_absolute_url()).content.decode()
+    assert "Courses it gave" in page and "Welding basics" in page
+
+
+def test_deleting_the_company_keeps_the_course_and_the_dialog_says_so(client, user):
+    entry = save_course(user, "Acme Academy")
+    client.force_login(user)
+    page = client.get(reverse("jobs:company_delete", args=[entry.company.pk]))
+    assert "1 career entry keeps its text and loses the link" in page.content.decode()
+    client.post(reverse("jobs:company_delete", args=[entry.company.pk]))
+    entry.refresh_from_db()
+    assert entry.company is None and entry.provider == "Acme Academy"
+
+
+def test_a_merge_moves_the_courses_and_says_so(client, user):
+    kept = Company.objects.create(owner=user, name="Linux Foundation")
+    other = save_course(user, "The Linux Foundation").company
+    entry = Course.objects.get(company=other)
+    plan = merging.plan_companies(kept, other)
+    assert any(line.label == "Courses" for line in plan.moves)
+    client.force_login(user)
+    page = client.get(reverse("jobs:company_merge", args=[kept.pk]), {"with": other.pk})
+    assert "Courses" in page.content.decode()
+
+    merging.merge_companies(kept, other)
+    entry.refresh_from_db()
+    assert entry.company == kept
+    assert entry.provider == "The Linux Foundation"
+
+
+def test_a_course_company_survives_the_archive_round_trip_and_a_file_never_adds_one(
+    user, other_user
+):
+    import io
+    import json
+    import zipfile
+
+    from postulo.core import export, importer
+
+    academy = Company.objects.create(owner=user, name="Linux Foundation")
+    Course.objects.create(owner=user, title="SRE", provider="LF", company=academy)
+    Course.objects.create(owner=user, title="Unlinked", provider="A trainer")
+    document = export.build_document(user)
+    assert {row["title"]: row["company"] for row in document["resume"]["courses"]} == {
+        "SRE": "Linux Foundation",
+        "Unlinked": "",
+    }
+
+    def archive(doc):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as written:
+            written.writestr(export.MANIFEST_NAME, json.dumps(doc))
+        buffer.seek(0)
+        return zipfile.ZipFile(buffer)
+
+    importer.load(other_user, archive(document))
+    links = {c.title: c.company for c in Course.objects.for_user(other_user)}
+    assert links["SRE"].name == "Linux Foundation" and links["SRE"].owner == other_user
+    assert links["Unlinked"] is None
+
+
+def test_a_course_company_the_archive_does_not_hold_adds_nothing(user, other_user):
+    import io
+    import json
+    import zipfile
+
+    from postulo.core import export, importer
+
+    Course.objects.create(owner=user, title="SRE", provider="LF")
+    document = export.build_document(user)
+    document["resume"]["courses"][0]["company"] = "Somebody Else's"
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w") as written:
+        written.writestr(export.MANIFEST_NAME, json.dumps(document))
+    buffer.seek(0)
+
+    importer.load(other_user, zipfile.ZipFile(buffer))
+
+    assert Course.objects.for_user(other_user).get().company is None
+    assert not Company.objects.for_user(other_user).exists()

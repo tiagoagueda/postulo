@@ -376,6 +376,8 @@ KINDS: tuple[Kind, ...] = (
         dates=("start_date", "end_date"),
         label="title",
         sub="provider",
+        # The company the provider links to, by name, read back as an issuer's is (#695).
+        hints=("company",),
     ),
 )
 

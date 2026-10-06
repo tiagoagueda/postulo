@@ -303,6 +303,24 @@
         </div>
       {% endif %}
 
+      {% if courses %}
+        <c-section-title class="mt-8">{% translate "Courses it gave" %}</c-section-title>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for entry in courses %}
+              <li class="px-4 py-3">
+                <a href="{% url 'resume:item_update' 'course' entry.pk %}" class="inline-block py-1 font-medium hover:underline">
+                  <bdi>{{ entry.title }}</bdi>
+                </a>
+                {% if entry.years_text %}
+                  <p class="text-sm text-ink-500 dark:text-ink-400">{{ entry.years_text }}</p>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
       {% if children %}
         <c-section-title class="mt-8">{% translate "Part of this company" %}</c-section-title>
         <div class="card p-0">

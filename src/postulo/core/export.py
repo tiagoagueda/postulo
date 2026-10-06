@@ -167,7 +167,10 @@ logger = logging.getLogger(__name__)
 #: 59 added ``courses`` in the career: a title, a provider as text, two optional dates, the hours
 #: as a whole number from 1 to 10,000, a summary and a link. An archive without them restores
 #: none; hours outside the bounds restore none and say so (#695).
-FORMAT_VERSION = 59
+#: 60 added ``company`` on a course: the name of the company its provider is linked to, or
+#: blank; read back as on a certification -- by name, once the companies exist, never adding
+#: one (#695).
+FORMAT_VERSION = 60
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -228,7 +231,8 @@ FORMAT_VERSION = 59
 #: companies, and never the reason to add one (#693).
 #: 19 added ``courses``, read back through the form a person would have typed one into, so
 #: hours outside 1 to 10,000 are a refused row (#695).
-CANDIDATE_FORMAT = 19
+#: 20 added ``company`` on a course, read back as a hint, as a certification's is (#695).
+CANDIDATE_FORMAT = 20
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -642,6 +646,9 @@ RESUME_FIELDS = {
         "id",
         "title",
         "provider",
+        # The name of the company the provider links to, or blank (#695): read back by name and
+        # never the reason to add one.
+        "company",
         "start_date",
         "end_date",
         "hours",
@@ -771,8 +778,15 @@ def _identifier_rows(profile) -> list[dict]:
     ]
 
 
-#: The career entries that name a company, by the block that holds them (#683, #685, #686).
-LINKED_TO_A_COMPANY = ("experience", "education", "certifications", "honours", "memberships")
+#: The career entries that name a company, by the block that holds them (#683-#686, #693, #695).
+LINKED_TO_A_COMPANY = (
+    "experience",
+    "education",
+    "certifications",
+    "honours",
+    "memberships",
+    "courses",
+)
 
 
 def _career_fields(item, names: tuple[str, ...]) -> dict:
