@@ -132,6 +132,7 @@ READ = frozenset(
         "NetworksAndMemberships",
         "OrganizationAffiliations",
         "DigitalSkills",
+        "EmploymentReferences",
         *(section for section, _item, _label in SKILL_SECTIONS),
     }
 )
@@ -168,6 +169,7 @@ def read(root) -> Record:
         _read_skills(profile, record)
         _read_projects(profile, record)
         _read_memberships(profile, record)
+        _read_references(profile, record)
         _name_what_was_not_read(profile, record)
     if len(profiles) > 1:
         # A profile per language is allowed (BR-COM-02), and one career is one language
@@ -641,6 +643,100 @@ def _read_memberships(profile, record: Record) -> None:
                 "summary": "",
                 "url": _address_of(item),
             }
+        )
+
+
+#: How many referees are read. The cap the candidate reader keeps low for telephone numbers,
+#: addresses and links, for the same reason: a number is a question put to the instance (#696).
+MAX_REFEREES = 20
+
+#: What a ``Referee`` says that Postulo keeps nowhere, by element: the HR-Open type (professional,
+#: personal, verification), the years known, the comment a referee gave and a link. Nothing
+#: prints them, a number of years goes stale, and the relationship says what the person wants
+#: said, so each is named as not read rather than dropped in silence (#696).
+REFEREE_NOT_READ = ("RefereeTypeCode", "YearsKnownNumber", "Comment", "Link")
+
+
+def _referee_name(name_node) -> str:
+    """A referee's name as the file gives it: the formatted name, or the parts."""
+    if name_node is None:
+        return ""
+    formatted = _text(name_node, "FormattedName")
+    if formatted:
+        return formatted
+    return " ".join(
+        part
+        for part in (
+            _text(name_node, "GivenName"),
+            *(_text(family) for family in _all(name_node, "FamilyName")),
+        )
+        if part
+    )
+
+
+def _read_references(profile, record: Record) -> None:
+    """The people who will vouch for the person, as references the person still has to ask.
+
+    ``EmploymentReferences/Referee``: a name, how to reach them and a role. They arrive as
+    records without a word on whether they have agreed, and the importer makes each *Not asked*
+    whatever the file says, so nothing read here prints until the person has said so. At most
+    ``MAX_REFEREES`` are read, and what is left of a referee is named (#696).
+    """
+    holders = [
+        *_all(profile, "EmploymentReferences"),
+        *(
+            node
+            for history in _all(profile, "EmploymentHistory")
+            for node in _all(history, "EmploymentReferences")
+        ),
+    ]
+    referees = [referee for holder in holders for referee in _all(holder, "Referee")]
+    if not referees:
+        return
+    unread: list[str] = []
+    for referee in referees[:MAX_REFEREES]:
+        for name in REFEREE_NOT_READ:
+            if (
+                name not in unread
+                and _find(referee, name) is not None
+                and _has_text(_find(referee, name))
+            ):
+                unread.append(name)
+        name = _referee_name(_find(referee, "PersonName"))
+        if not name:
+            continue
+        email = phone = ""
+        for channel in _all(referee, "Communication"):
+            kind = _text(channel, "ChannelCode").casefold().replace(" ", "")
+            uri = _text(channel, "URI")
+            if kind == "email" and uri and not email:
+                email = uri
+            elif not uri and _find(channel, "DialNumber") is not None and not phone:
+                phone = _phone(channel)
+        record.references.append(
+            {
+                "name": name,
+                "relationship": _text(referee, "Role"),
+                "email": email,
+                "phone": phone,
+            }
+        )
+    if len(referees) > MAX_REFEREES:
+        record.skipped.append(
+            str(
+                _("The file lists %(count)d references, and only the first %(limit)d were read.")
+                % {"count": len(referees), "limit": MAX_REFEREES}
+            )
+        )
+    if unread:
+        record.skipped.append(
+            str(
+                _(
+                    "A reference's %(parts)s is not read: nothing prints it. Each reference "
+                    "is added as not yet asked, so none is printed until you say they agreed."
+                )
+                % {"parts": ", ".join(unread)}
+            )
         )
 
 

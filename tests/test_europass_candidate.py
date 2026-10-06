@@ -247,6 +247,7 @@ def test_the_format_europass_writes_today_reads():
         "languages": 2,
         "skills": 5,
         "projects": 1,
+        "references": 0,
     }
     assert record.person["first_name"] == "Alex"
     assert record.person["last_name"] == "Morgan"
@@ -1156,3 +1157,152 @@ def test_a_course_is_not_invented_from_an_education_entry(user):
 
     assert Education.objects.for_user(user).exists()
     assert not Course.objects.for_user(user).exists()
+
+
+# ------------------------------------------------------------------ referees (#696)
+
+
+def referee(name="Chell Johnson", *, role="Line manager", email="", phone="", extra="") -> str:
+    channels = ""
+    if email:
+        channels += (
+            f"<Communication><ChannelCode>Email</ChannelCode><URI>{email}</URI></Communication>"
+        )
+    if phone:
+        channels += (
+            "<Communication><ChannelCode>Telephone</ChannelCode>"
+            f"<CountryDialing>351</CountryDialing><oa:DialNumber>{phone}</oa:DialNumber>"
+            "</Communication>"
+        )
+    return (
+        "<Referee><PersonName><oa:GivenName>"
+        + name.split()[0]
+        + "</oa:GivenName><hr:FamilyName>"
+        + " ".join(name.split()[1:])
+        + f"</hr:FamilyName></PersonName>{channels}<Role>{role}</Role>{extra}</Referee>"
+    )
+
+
+def referees(*rows: str) -> bytes:
+    return candidate_xml(f"<EmploymentReferences>{''.join(rows)}</EmploymentReferences>")
+
+
+def test_a_referee_is_read_as_a_person_how_to_reach_them_and_a_role():
+    record = europass.read(referees(referee(email="chell@aperture.example", phone="912345678")))
+
+    assert record.references == [
+        {
+            "name": "Chell Johnson",
+            "relationship": "Line manager",
+            "email": "chell@aperture.example",
+            "phone": "+351912345678",
+        }
+    ]
+    assert not record.is_empty
+    assert record.counts()["references"] == 1
+    assert not any("nowhere to go" in line for line in record.skipped)
+
+
+def test_what_a_referee_says_that_is_not_kept_is_named_not_dropped():
+    extra = (
+        "<RefereeTypeCode>Professional</RefereeTypeCode><YearsKnownNumber>4</YearsKnownNumber>"
+        "<Comment>Superb</Comment><Link>https://example.org</Link>"
+    )
+    record = europass.read(referees(referee(extra=extra)))
+
+    (note,) = record.skipped
+    for name in ("RefereeTypeCode", "YearsKnownNumber", "Comment", "Link"):
+        assert name in note
+    assert "not yet asked" in note
+    assert record.references[0]["relationship"] == "Line manager"
+
+
+def test_more_than_twenty_referees_are_capped_and_said():
+    record = europass.read(referees(*(referee(f"Person {n}") for n in range(25))))
+
+    assert len(record.references) == candidate.MAX_REFEREES == 20
+    assert any("25 references" in line and "first 20" in line for line in record.skipped)
+
+
+def test_the_review_page_lists_each_person_before_anything_is_written(client, user):
+    from postulo.jobs.models import Contact
+    from postulo.resume.models import Reference
+
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+    client.post(url, {"file": upload("cv.xml", referees(referee()), "text/xml")})
+
+    page = client.get(url).content.decode()
+    assert "Chell Johnson" in page and "Line manager" in page
+    assert "none is printed on a CV until you say they agreed" in page
+    assert not Contact.objects.exists() and not Reference.objects.exists()
+
+    client.post(url, {"action": "confirm"})
+    (mine,) = Reference.objects.for_user(user)
+    assert mine.contact.name == "Chell Johnson"
+
+
+def test_an_imported_referee_is_always_not_asked_and_prints_nothing_until_agreed(user):
+    from postulo.documents import rendering
+    from postulo.documents.models import CV, CVItem
+    from postulo.resume.models import Reference
+
+    importing.apply(user, europass.read(referees(referee(email="chell@aperture.example"))))
+
+    (mine,) = Reference.objects.for_user(user)
+    assert (mine.permission, mine.show_details, mine.relationship) == (
+        "not_asked",
+        False,
+        "Line manager",
+    )
+    assert mine.contact.email == "chell@aperture.example"
+    from django.contrib.contenttypes.models import ContentType
+
+    cv = CV.objects.create(owner=user, name="Main", language="en-GB")
+    CVItem.objects.create(
+        owner=user,
+        cv=cv,
+        content_type=ContentType.objects.get_for_model(Reference),
+        object_id=mine.pk,
+    )
+    assert "Chell" not in rendering.cv_text(cv)
+
+
+def test_a_contact_with_the_same_name_and_address_is_reused_not_duplicated(user):
+    from postulo.jobs.models import Contact
+    from postulo.resume.models import Reference
+
+    known = Contact.objects.create(owner=user, name="chell johnson", email="Chell@Aperture.example")
+    importing.apply(user, europass.read(referees(referee(email="chell@aperture.example"))))
+
+    assert Contact.objects.for_user(user).count() == 1
+    assert Reference.objects.get(owner=user).contact == known
+
+    report = importing.apply(user, europass.read(referees(referee(email="chell@aperture.example"))))
+    assert Reference.objects.for_user(user).count() == 1
+    assert any("already one of your references" in line for line in report.skipped)
+
+
+def test_a_telephone_number_held_elsewhere_is_left_out_and_named_without_saying_why(
+    user, other_user
+):
+    from postulo.core.models import PhoneNumber
+
+    PhoneNumber.objects.create(
+        owner=other_user, holder=other_user.profile, number="+351912345678", is_primary=True
+    )
+    report = importing.apply(user, europass.read(referees(referee(phone="912345678"))))
+
+    assert not PhoneNumber.objects.filter(owner=user).exists()
+    assert report.skipped == ["The telephone number of Chell Johnson was not added."]
+    assert report.added["references"] == 1
+
+
+def test_a_number_nobody_holds_is_kept_on_the_new_contact(user):
+    from postulo.core import phone_numbers
+    from postulo.jobs.models import Contact
+
+    importing.apply(user, europass.read(referees(referee(phone="912345678"))))
+
+    contact = Contact.objects.get(owner=user)
+    assert phone_numbers.primary_for(contact).number == "+351912345678"

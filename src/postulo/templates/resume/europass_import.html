@@ -151,6 +151,23 @@
           </ul>
         {% endif %}
 
+        {% if found.references %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "References" %}</h3>
+          {% comment %} Other people, so each is listed before anything is written: each becomes
+             a contact, and none is printed on a CV until you have said they agreed (#696). {% endcomment %}
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.references %}
+              <li><bdi>{{ row.name }}</bdi>{% if row.relationship %} · <bdi>{{ row.relationship }}</bdi>{% endif %}</li>
+            {% endfor %}
+          </ul>
+          <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Each is added as one of your contacts and as a reference you have not asked yet,
+              so none is printed on a CV until you say they agreed.
+            {% endblocktranslate %}
+          </p>
+        {% endif %}
+
         {% if found.person %}
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Personal details" %}</h3>
           <p class="text-sm text-ink-600 dark:text-ink-300">

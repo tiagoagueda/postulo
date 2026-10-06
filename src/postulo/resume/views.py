@@ -686,6 +686,7 @@ COUNT_LABELS = {
     "skills": _("Skills"),
     "projects": _("Projects and achievements"),
     "memberships": _("Memberships"),
+    "references": _("References"),
 }
 
 PERSON_LABELS = {
@@ -786,6 +787,11 @@ def _summarise(record: importing.Record) -> dict:
         "skill_groups": record.skill_groups,
         "projects": [{"name": row["name"]} for row in record.projects],
         "memberships": [{"organisation": row["organisation"]} for row in record.memberships],
+        # Each person, by name, before anything is written: they become contacts (#696).
+        "references": [
+            {"name": row["name"], "relationship": row.get("relationship", "")}
+            for row in record.references
+        ],
     }
 
 
@@ -821,6 +827,7 @@ def _to_session(record: importing.Record) -> dict:
             }
             for row in record.memberships
         ],
+        "references": record.references,
     }
 
 
@@ -855,6 +862,7 @@ def _from_session(raw: dict) -> importing.Record:
             }
             for row in raw.get("memberships", [])
         ],
+        references=raw.get("references", []),
     )
 
 

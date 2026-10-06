@@ -44,6 +44,10 @@ class Record:
     #: a ``role`` (often empty), ``start_date`` and ``end_date``, a ``summary`` and a ``url``.
     #: Europass's Candidate format has two elements for them (#693).
     memberships: list[dict] = field(default_factory=list)
+    #: People who will vouch for the person: ``name``, ``relationship``, ``email``, ``phone``,
+    #: each text. They become contacts and references that nobody has been asked about yet
+    #: (``Not asked``), never printed until the person says they agreed (#696).
+    references: list[dict] = field(default_factory=list)
     #: Which format this came out of, as the importer names it. Europass says ``"candidate"``
     #: for the XML europass.europa.eu writes, ``"xml"`` and ``"json"`` for the format of the
     #: editor before it, and puts ``"pdf-"`` in front of the one it found attached to a PDF.
@@ -67,6 +71,7 @@ class Record:
                 self.skill_groups,
                 self.projects,
                 self.memberships,
+                self.references,
             )
         )
 
@@ -78,6 +83,7 @@ class Record:
             "skills": sum(len(group["skills"]) for group in self.skill_groups),
             "projects": len(self.projects),
             "memberships": len(self.memberships),
+            "references": len(self.references),
         }
 
 
@@ -469,5 +475,69 @@ def apply(owner, record: Record) -> Report:
     ordering.place_many(Membership, owner, memberships)
     if memberships:
         report.added["memberships"] = len(memberships)
+    _add_references(owner, record, report)
 
     return report
+
+
+#: How many references one import adds: the cap the reader keeps, held here as well because a
+#: plugin's record is whatever it says (#696).
+MAX_REFERENCES = 20
+
+
+def _add_references(owner, record: Record, report: Report) -> None:
+    """Add each reference as a contact the account may already have, and *Not asked* (#696).
+
+    A person with the same name and email address as a contact of the account's is that
+    contact. Their telephone number goes through the same uniqueness rule and throttle as one
+    typed on a contact (#90, #142), so a file is not a way to ask which numbers the instance
+    holds: a number that is refused is left out, named without saying why.
+    """
+    from django.core.validators import validate_email
+
+    from postulo.jobs.models import Contact
+
+    from .models import Reference, ReferencePermission
+
+    taken = set(Reference.objects.for_user(owner).values_list("contact_id", flat=True))
+    made = []
+    for entry in record.references[:MAX_REFERENCES]:
+        name = " ".join(str(entry.get("name") or "").split())[:200]
+        if not name:
+            continue
+        email = str(entry.get("email") or "").strip()[:254]
+        if email:
+            try:
+                validate_email(email)
+            except ValidationError:
+                email = ""
+        contact = (
+            Contact.objects.for_user(owner).filter(name__iexact=name, email__iexact=email).first()
+        )
+        if contact is not None and contact.pk in taken:
+            report.skipped.append(
+                str(_("%(name)s is already one of your references.") % {"name": name})
+            )
+            continue
+        if contact is None:
+            contact = Contact.objects.create(owner=owner, name=name, email=email)
+            number = phones.combine(str(entry.get("phone") or "").strip(), "")[:40]
+            if number:
+                if phone_numbers.refusal(owner, number):
+                    report.skipped.append(
+                        str(_("The telephone number of %(name)s was not added.") % {"name": name})
+                    )
+                else:
+                    phone_numbers.save_only_number(contact, owner, number)
+        taken.add(contact.pk)
+        made.append(
+            Reference(
+                owner=owner,
+                contact=contact,
+                relationship=str(entry.get("relationship") or "")[:200],
+                permission=ReferencePermission.NOT_ASKED,
+            )
+        )
+    ordering.place_many(Reference, owner, made)
+    if made:
+        report.added["references"] = len(made)
