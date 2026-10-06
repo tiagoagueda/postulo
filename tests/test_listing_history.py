@@ -295,6 +295,17 @@ def test_a_second_capture_is_bound_rather_than_discarded(user, listing):
     assert JobPosting.objects.count() == 1, "no second listing for one job"
 
 
+def test_binding_a_capture_empties_what_its_review_learned_from(user, listing):
+    capture = a_capture(user)
+    Capture.objects.filter(pk=capture.pk).update(learning={"hints": [{"x": 1}], "places": [1]})
+    capture.refresh_from_db()
+
+    bind_capture(capture, listing)
+
+    capture.refresh_from_db()
+    assert capture.learning == {}
+
+
 def test_a_capture_already_decided_is_not_bound(user, listing):
     capture = a_capture(user)
     Capture.objects.filter(pk=capture.pk).update(status=CaptureStatus.DISCARDED)

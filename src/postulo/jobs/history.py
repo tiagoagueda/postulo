@@ -238,10 +238,12 @@ def bind_capture(capture: Capture, posting: JobPosting, *, actor: str = "") -> L
     )
     locked.status = CaptureStatus.ACCEPTED
     locked.posting = posting
-    locked.save(update_fields=["status", "posting", "updated_at"])
+    # What a waiting capture's review learns from is nothing once it is decided (#267).
+    locked.learning = {}
+    locked.save(update_fields=["status", "posting", "learning", "updated_at"])
     # The caller's object is the one it goes on to use -- the next capture to review is
     # worked out from it -- so it says what the row now says.
-    capture.status, capture.posting = locked.status, posting
+    capture.status, capture.posting, capture.learning = locked.status, posting, {}
     return event
 
 
