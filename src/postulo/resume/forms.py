@@ -14,6 +14,7 @@ from postulo.jobs.forms import OwnerScopedModelForm
 from . import driving, publications, translatable
 from .models import (
     Certification,
+    Course,
     DrivingLicence,
     Education,
     Experience,
@@ -332,6 +333,38 @@ class CertificationForm(ResumeItemForm):
             entry.save()
             self.save_m2m()
         return entry
+
+
+#: Where a course ends and the other two sections begin, said once and used by the form and
+#: the career page (#695).
+COURSE_RULE = _(
+    "Learning you took, with or without a certificate of attendance. A programme that led to a "
+    "degree or diploma belongs in Education; a credential somebody can check, or that may "
+    "lapse, belongs in Certifications."
+)
+
+
+class CourseForm(ResumeItemForm):
+    date_range = ("start_date", "end_date")
+
+    class Meta:
+        model = Course
+        fields = ("title", "provider", "start_date", "end_date", "hours", "summary", "url", "order")
+        widgets = {
+            "start_date": DATE_WIDGET,
+            "end_date": DATE_WIDGET,
+            "hours": forms.NumberInput(attrs={"min": Course.HOURS_MIN, "max": Course.HOURS_MAX}),
+            "summary": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "title": COURSE_RULE,
+            "provider": _("A school, a company, a platform: as a CV should print it."),
+            "start_date": ENTRY_HELP["start_date"],
+            "end_date": ENTRY_HELP["end_date"],
+            "hours": _("The hours of teaching or study as the provider states them, if it does."),
+            "summary": ENTRY_HELP["summary"],
+            "url": _("A public page for the course or its certificate."),
+        }
 
 
 class DrivingLicenceForm(ResumeItemForm):

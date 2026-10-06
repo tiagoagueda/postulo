@@ -66,6 +66,7 @@ from postulo.jobs.models import (
 from postulo.plugins.base import JobPostingData
 from postulo.resume.models import (
     Certification,
+    Course,
     DrivingLicence,
     Education,
     Experience,
@@ -380,6 +381,7 @@ class Command(BaseCommand):
             Project,
             Publication,
             Certification,
+            Course,
             DrivingLicence,
             Honour,
             Membership,
@@ -540,6 +542,22 @@ class Command(BaseCommand):
         ]
         # The categories and the country, and never a number (#691).
         DrivingLicence.objects.create(owner=user, country="PT", categories=["A2", "B"], order=0)
+        # One with the hours the provider states and one without (#695).
+        courses = [
+            Course.objects.create(
+                owner=user,
+                title="Site Reliability Engineering in Practice",
+                provider="Linux Foundation",
+                start_date=dt.date(2022, 9, 1),
+                end_date=dt.date(2022, 11, 30),
+                hours=40,
+                summary="Service level objectives, error budgets and incident reviews.",
+                order=0,
+            ),
+            Course.objects.create(
+                owner=user, title="Evening class in pottery", provider="Casa da Cerâmica", order=1
+            ),
+        ]
         languages = [
             LanguageSkill.objects.create(
                 owner=user, name="Portuguese", code="pt-PT", proficiency="native", order=0
@@ -805,6 +823,7 @@ class Command(BaseCommand):
                     *certifications,
                     *honours,
                     *memberships,
+                    *courses,
                 ]
             ):
                 CVItem.objects.create(

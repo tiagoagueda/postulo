@@ -311,6 +311,26 @@ def _eqf_level(value, report: ImportReport, entry: dict) -> int | None:
     return None
 
 
+def _course_hours(value, report: ImportReport, entry: dict) -> int | None:
+    """A course's hours, kept when they are a whole number the page would take (#695).
+
+    The form's own bounds, from the model: a file cannot store what the page would refuse.
+    """
+    if value is None:
+        return None
+    from postulo.resume.models import Course
+
+    low, high = Course.HOURS_MIN, Course.HOURS_MAX
+    if isinstance(value, int) and not isinstance(value, bool) and low <= value <= high:
+        return value
+    name = str(entry.get("title") or "")[:80]
+    report.skipped.append(
+        f"Course {name!r}: hours of {str(value)[:20]!r} are not a whole number from {low} to "
+        f"{high:,}, and were left out"
+    )
+    return None
+
+
 def _licence_as_written(values: dict, report: ImportReport) -> dict | None:
     """A driving licence as a form would have kept it, or nothing where it cannot be (#691).
 
@@ -1088,6 +1108,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     values[name] = _dt(value)
                 elif name == "eqf_level":
                     values[name] = _eqf_level(value, report, entry)
+                elif name == "hours":
+                    values[name] = _course_hours(value, report, entry)
                 else:
                     values[name] = value
             if key == "publications":

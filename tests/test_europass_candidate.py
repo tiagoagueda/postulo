@@ -1145,3 +1145,14 @@ def test_the_review_page_lists_them_before_anything_is_saved_and_confirming_writ
     assert kept["Chess club"].end_date is None
     assert kept["Rowing Club"].url == "", "an address that is not a web address is not kept"
     assert kept["Member of the University's Film-Making Society"].url == "https://films.example.org"
+
+
+def test_a_course_is_not_invented_from_an_education_entry(user):
+    """The Candidate has no element for a course, and an attendance is filed as education:
+    deciding which are courses would be a guess (#695)."""
+    from postulo.resume.models import Course
+
+    importing.apply(user, europass.read(CANDIDATE.read_bytes()))
+
+    assert Education.objects.for_user(user).exists()
+    assert not Course.objects.for_user(user).exists()

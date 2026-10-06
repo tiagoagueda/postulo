@@ -164,7 +164,10 @@ logger = logging.getLogger(__name__)
 #: 58 added ``company`` on an honour and on a membership: the name of the company the giver or
 #: the organisation is linked to, or blank; read back as on a certification -- by name, in a
 #: pass once the companies exist, and never adding one (#693).
-FORMAT_VERSION = 58
+#: 59 added ``courses`` in the career: a title, a provider as text, two optional dates, the hours
+#: as a whole number from 1 to 10,000, a summary and a link. An archive without them restores
+#: none; hours outside the bounds restore none and say so (#695).
+FORMAT_VERSION = 59
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -223,7 +226,9 @@ FORMAT_VERSION = 58
 #: 18 added ``company`` on an honour and on a membership, read back the same way: a hint,
 #: offered as the link where it is exactly the name of one of the importing account's
 #: companies, and never the reason to add one (#693).
-CANDIDATE_FORMAT = 18
+#: 19 added ``courses``, read back through the form a person would have typed one into, so
+#: hours outside 1 to 10,000 are a refused row (#695).
+CANDIDATE_FORMAT = 19
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -316,6 +321,7 @@ TRANSLATION_SECTIONS = {
     "drivinglicence": "driving_licences",
     "honour": "honours",
     "membership": "memberships",
+    "course": "courses",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -632,6 +638,17 @@ RESUME_FIELDS = {
         "expires_on",
         "order",
     ),
+    "courses": (
+        "id",
+        "title",
+        "provider",
+        "start_date",
+        "end_date",
+        "hours",
+        "summary",
+        "url",
+        "order",
+    ),
     "links": (
         "id",
         "title",
@@ -658,6 +675,7 @@ RESUME_MODELS = {
     "memberships": "Membership",
     "languages": "LanguageSkill",
     "driving_licences": "DrivingLicence",
+    "courses": "Course",
     "links": "Link",
 }
 

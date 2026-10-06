@@ -148,6 +148,15 @@
       </section>
     {% endif %}
 
+    {% if courses %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Courses" %}</c-section-title>
+        <div class="card space-y-1 text-sm">
+          {% for item in courses %}<p><bdi>{{ item.cv_line }}</bdi></p>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% if certifications or languages %}
       <div class="grid gap-6 sm:grid-cols-2">
         {% if certifications %}

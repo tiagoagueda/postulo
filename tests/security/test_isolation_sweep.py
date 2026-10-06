@@ -843,6 +843,7 @@ def form_table(user, mine=None) -> dict:
         jobs.JobPostingForm: [{"user": user}],
         jobs.ListingEventForm: [{"user": user}],
         resume.CertificationForm: [{"user": user}],
+        resume.CourseForm: [{"user": user}],
         resume.DrivingLicenceForm: [{"user": user}],
         resume.EducationForm: [{"user": user}],
         resume.ExperienceForm: [{"user": user}],
@@ -1052,3 +1053,33 @@ def test_somebody_elses_membership_is_on_no_page_of_mine(client, user, other_use
     assert "Zebra union" not in client.get(reverse("resume:preview")).content.decode()
     assert search.search(user, "Zebra") == []
     assert search.search(user, "Quokka") == []
+
+
+# ----------------------------------------------------------------------- courses (#695)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_course_is_not_found(client, user, other_user, name):
+    from postulo.resume.models import Course
+
+    theirs = Course.objects.create(owner=other_user, title="Zebra husbandry", hours=20)
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["course", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["course", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert Course.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_course_is_on_no_page_of_mine(client, user, other_user):
+    from postulo.core import search
+    from postulo.resume.models import Course
+
+    Course.objects.create(owner=other_user, title="Zebra husbandry", provider="Savannah Academy")
+    client.force_login(user)
+
+    assert "Zebra husbandry" not in client.get(reverse("resume:overview")).content.decode()
+    assert "Zebra husbandry" not in client.get(reverse("resume:preview")).content.decode()
+    assert search.search(user, "Zebra") == []

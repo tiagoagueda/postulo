@@ -28,6 +28,8 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     "experience": ("role", "location", "summary", "highlights"),
     "education": ("qualification", "field_of_study", "location", "grade", "highlights"),
     "project": ("name", "role", "summary", "highlights"),
+    # A course's title and provider are the provider's wording; its summary is the person's (#695).
+    "course": ("summary",),
     "skillgroup": ("name",),
     "skill": ("name",),
     "languageskill": ("name",),

@@ -171,6 +171,19 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'course' %}
+          {% comment %} "Title, provider", then the hours and the year (`Course.hours_text`, `years_text`: the words the text and Word files carry); what it covered under the line (#695). {% endcomment %}
+          <ul class="courses">
+            {% for entry in section.items %}
+              <li>
+                <bdi>{{ entry.item.title }}</bdi>{% if entry.item.provider %}, <bdi>{{ entry.item.provider }}</bdi>{% endif %}
+                {% if entry.item.hours_text %}· {{ entry.item.hours_text }}{% endif %}
+                {% if entry.item.years_text %}<span class="dates">{{ entry.item.years_text }}</span>{% endif %}
+                {% if entry.item.summary %}<p>{{ entry.item.summary }}</p>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

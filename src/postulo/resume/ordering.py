@@ -33,6 +33,7 @@ DATE_FIELDS: dict[str, str] = {
     "Certification": "issued_on",
     "Honour": "awarded_on",
     "Membership": "start_date",
+    "Course": "end_date",
 }
 
 DIRECTIONS = ("up", "down")

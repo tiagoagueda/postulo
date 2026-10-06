@@ -113,6 +113,14 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Language"),
         _("Languages"),
     ),
+    "course": SectionSpec(
+        "course",
+        resume_models.Course,
+        resume_forms.CourseForm,
+        _("Course"),
+        _("Courses"),
+        resume_forms.COURSE_RULE,
+    ),
 }
 
 #: The sections shown on the overview page, in the order a CV usually reads.
@@ -128,4 +136,5 @@ OVERVIEW_ORDER = (
     "honour",
     "membership",
     "language",
+    "course",
 )

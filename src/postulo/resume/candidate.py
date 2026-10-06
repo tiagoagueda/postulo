@@ -103,9 +103,10 @@ MAX_CONTACT_ROWS = 20
 #: How many rows go to the database in one statement.
 BATCH = ordering.BATCH
 
-#: What an entry writes as a number and not as text: a level (#684). The form reads it as a
-#: choice, so a number outside the levels is a refused row like a word is.
-NUMBERS = frozenset({"eqf_level"})
+#: What an entry writes as a number and not as text: a level (#684) and a course's hours (#695).
+#: The form reads a level as a choice and the hours within their bounds, so a number outside
+#: either is a refused row like a word is.
+NUMBERS = frozenset({"eqf_level", "hours"})
 
 #: What an entry writes as a list of texts and not as one: a licence's categories (#691). Held
 #: as that list, bounded, and read by the form as the ticked boxes it would have been.
@@ -364,6 +365,17 @@ KINDS: tuple[Kind, ...] = (
         title=gettext_lazy("Languages"),
         fields=("code", "name", "proficiency"),
         names=("name",),
+    ),
+    Kind(
+        block="courses",
+        model=resume.Course,
+        form=resume_forms.CourseForm,
+        title=gettext_lazy("Courses"),
+        fields=("title", "provider", "start_date", "end_date", "hours", "summary", "url"),
+        names=("title", "provider"),
+        dates=("start_date", "end_date"),
+        label="title",
+        sub="provider",
     ),
 )
 

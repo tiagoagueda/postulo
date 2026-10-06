@@ -15,8 +15,9 @@ from __future__ import annotations
 
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils.translation import gettext
+from django.utils.translation import gettext, ngettext
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages
@@ -395,6 +396,68 @@ class Membership(ResumeItem):
         if end:
             return gettext("until %(year)s") % {"year": end.year}
         return ""
+
+
+class Course(ResumeItem):
+    """Learning that was taken: a short course, a bootcamp, an evening class (#695).
+
+    Neither a degree (*Education*, a qualification in a framework) nor a credential somebody
+    can check and that may lapse (*Certification*). ``provider`` is the body's own wording, as
+    text, and is what a CV prints; ``hours`` is the teaching or study time as the provider
+    states it, from 1 to 10,000, and optional. The certificate is not a column here: it is a
+    document, and ``url`` is only an address.
+    """
+
+    HOURS_MIN = 1
+    HOURS_MAX = 10_000
+
+    title = models.CharField(_("title"), max_length=200)
+    provider = models.CharField(_("provider"), max_length=200, blank=True)
+    start_date = models.DateField(_("from"), null=True, blank=True)
+    end_date = models.DateField(_("until"), null=True, blank=True)
+    hours = models.PositiveIntegerField(
+        _("hours"),
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(HOURS_MIN), MaxValueValidator(HOURS_MAX)],
+    )
+    summary = models.TextField(_("summary"), blank=True)
+    url = models.URLField(_("link"), blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("course")
+        verbose_name_plural = _("courses")
+
+    def __str__(self) -> str:
+        return self.title
+
+    @property
+    def hours_text(self) -> str:
+        """“40 hours”, in the language being read; nothing where none were stated."""
+        if not self.hours:
+            return ""
+        return ngettext("%(count)d hour", "%(count)d hours", self.hours) % {"count": self.hours}
+
+    @property
+    def years_text(self) -> str:
+        """The year, or the two years; “2024 – present” for one begun and not ended."""
+        first, last = self.start_date, self.end_date
+        if first and last and first.year != last.year:
+            return f"{first.year}–{last.year}"
+        if first and not last:
+            return f"{first.year} – {gettext('present')}"
+        day = last or first
+        return str(day.year) if day else ""
+
+    @property
+    def title_and_provider(self) -> str:
+        return f"{self.title}, {self.provider}" if self.provider.strip() else self.title
+
+    @property
+    def cv_line(self) -> str:
+        """“Title, Provider · 40 hours · 2024”: the words the text and Word files print."""
+        parts = [self.title_and_provider, self.hours_text, self.years_text]
+        return " · ".join(part for part in parts if part)
 
 
 class Publication(ResumeItem):

@@ -109,6 +109,12 @@
                             {% if item.role %}<bdi>{{ item.role }}</bdi>{% endif %}{% if item.role and item.cv_period %} · {% endif %}{{ item.cv_period }}
                           </p>
                         {% endif %}
+                      {% elif section.spec.slug == 'course' %}
+                        {% if item.provider or item.hours %}
+                          <p class="text-sm text-ink-500 dark:text-ink-400">
+                            {% if item.provider %}<bdi>{{ item.provider }}</bdi>{% endif %}{% if item.provider and item.hours %} · {% endif %}{{ item.hours_text }}
+                          </p>
+                        {% endif %}
                       {% elif section.spec.slug == 'skill-group' %}
                         <p class="text-sm text-ink-500 dark:text-ink-400">
                           {% if item.skill_names %}

@@ -1012,3 +1012,42 @@ def test_a_hostile_or_over_long_membership_stores_only_what_the_form_keeps(user,
         assert len(kept.organisation) <= 200 and len(kept.role) <= 200
         assert not kept.url.startswith("javascript:")
     assert outcomes(plan, "memberships") in ([candidate.REFUSED], [candidate.ADD])
+
+
+# ---------------------------------------------------------------------- courses (#695)
+
+
+@pytest.mark.parametrize(
+    "bad", [0, -5, 10_001, 10**9, 2.5, "forty", MARKUP, [40], {"h": 40}, True], ids=repr
+)
+def test_hours_the_page_would_refuse_are_a_refused_row_and_store_nothing(user, bad):
+    from postulo.resume.models import Course
+
+    data = a_file(resume={"courses": [{"title": "Welding", "hours": bad}]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "courses") == [candidate.REFUSED]
+    assert not Course.objects.for_user(user).exists()
+
+
+def test_a_hostile_course_title_provider_link_or_date_stores_nothing(user):
+    from postulo.resume.models import Course
+
+    data = a_file(
+        resume={
+            "courses": [
+                {"title": "x" * 5000},
+                {"title": "Welding", "provider": "y" * 5000},
+                {"title": "Welding", "url": SCRIPT},
+                {"title": "Welding", "start_date": MARKUP},
+            ]
+        }
+    )
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "courses") == [candidate.REFUSED] * 4
+    assert not Course.objects.for_user(user).exists()

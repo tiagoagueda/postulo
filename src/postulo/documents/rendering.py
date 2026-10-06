@@ -51,6 +51,7 @@ SECTION_LABELS = {
     "drivinglicence": _("Driving licence"),
     "honour": _("Honours and awards"),
     "membership": _("Memberships"),
+    "course": _("Courses"),
 }
 
 
@@ -519,8 +520,8 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
             )
             for one in entries
         ]
-    elif section.kind == "membership":
-        # One entry at a time, so that a summary can stand under its line (#693).
+    elif section.kind in ("membership", "course"):
+        # One entry at a time, so that a summary can stand under its line (#693, #695).
         return [
             block
             for one in entries
@@ -533,6 +534,8 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
                             _joined(", ", one.item.role, one.item.organisation),
                             one.item.cv_period,
                         )
+                        if section.kind == "membership"
+                        else one.item.cv_line
                     ]
                 ),
                 *([file_formats.paragraph(one.item.summary)] if one.item.summary.strip() else []),

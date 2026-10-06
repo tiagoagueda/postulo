@@ -25,6 +25,7 @@ from postulo.documents.rendering import build_sections, render_cv_html
 from postulo.resume import translating
 from postulo.resume.models import (
     Certification,
+    Course,
     Education,
     Experience,
     Publication,
@@ -105,6 +106,12 @@ def test_a_membership_translates_role_and_summary_not_organisation():
     from postulo.resume.models import Membership
 
     assert translating.fields_for(Membership) == ("role", "summary")
+
+
+def test_a_course_translates_its_summary_not_its_title_or_provider():
+    """A course's title and provider are the provider's wording; what it covered is the
+    person's own (#695)."""
+    assert translating.fields_for(Course) == ("summary",)
 
 
 def test_a_publication_translates_nothing():
