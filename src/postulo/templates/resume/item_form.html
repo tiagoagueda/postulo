@@ -68,6 +68,10 @@
       <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Linked to the company" %}
         <a class="underline" href="{{ object.company.get_absolute_url }}"><bdi>{{ object.company.name }}</bdi></a>.
+        {% if not_a_school %}
+          {% translate "None of this company's industries is Education, so it is not listed as a school or university." %}
+          <a class="underline" href="{% url 'jobs:company_update' object.company.pk %}">{% translate "Add an industry" %}</a>
+        {% endif %}
       </p>
     {% endif %}
 

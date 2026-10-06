@@ -840,6 +840,49 @@ def test_a_name_the_archive_does_not_hold_leaves_the_entry_unlinked_and_adds_not
     assert not Company.objects.for_user(other_user).exists()
 
 
+def test_the_education_link_survives_the_round_trip_and_an_older_archive_has_none(user, other_user):
+    from postulo.resume.models import Education
+
+    school = Company.objects.create(owner=user, name="Aveiro", from_career=True)
+    Education.objects.create(
+        owner=user, institution="Universidade de Aveiro", qualification="BSc", company=school
+    )
+    Education.objects.create(owner=user, institution="Self-taught", qualification="Rust")
+    archive, document = read_archive(user)
+    assert {row["institution"]: row["company"] for row in document["resume"]["education"]} == {
+        "Universidade de Aveiro": "Aveiro",
+        "Self-taught": "",
+    }
+
+    importer.load(other_user, archive)
+
+    links = {e.institution: e.company for e in Education.objects.for_user(other_user)}
+    assert links["Universidade de Aveiro"].name == "Aveiro"
+    assert links["Universidade de Aveiro"].owner == other_user
+    assert links["Self-taught"] is None
+
+    Education.objects.for_user(other_user).delete()
+    Company.objects.for_user(other_user).delete()
+    document["postulo"]["format"] = 50
+    for entry in document["resume"]["education"]:
+        del entry["company"]
+    _restored(document, other_user)
+    assert Education.objects.for_user(other_user).filter(company__isnull=False).count() == 0
+
+
+def test_an_education_name_the_archive_does_not_hold_adds_no_company(user, other_user):
+    from postulo.resume.models import Education
+
+    Education.objects.create(owner=user, institution="Aveiro", qualification="BSc")
+    _archive, document = read_archive(user)
+    document["resume"]["education"][0]["company"] = "Somebody Else's"
+
+    _restored(document, other_user)
+
+    assert Education.objects.for_user(other_user).get().company is None
+    assert not Company.objects.for_user(other_user).exists()
+
+
 def test_the_archive_costs_the_same_queries_however_much_the_account_holds(populated):
     """The build runs inside the write lock, so a query per application, per contact and
     per sent document is every other request waiting on it (#557)."""

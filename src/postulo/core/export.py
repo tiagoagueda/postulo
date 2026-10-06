@@ -140,7 +140,10 @@ logger = logging.getLogger(__name__)
 #: 50 added ``code`` on a language in the career record: the BCP 47 tag of the language
 #: chosen from the list, blank for one typed. An archive without it restores each language
 #: whose name is exactly one language with its code, and the rest as the text they were (#689).
-FORMAT_VERSION = 50
+#: 51 added ``company`` on an education entry, as 46 did on an experience: the name of the
+#: company the institution is linked to, or blank; an archive without it restores every entry
+#: unlinked, and the link is made by name once the companies exist, never adding one (#685).
+FORMAT_VERSION = 51
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -184,7 +187,10 @@ FORMAT_VERSION = 50
 #: 12 added ``code`` on a language, read back as a language code is: shaped like a tag or
 #: nothing; and a language is the same entry as one the file names by the same code, whatever
 #: the name it is written under (#689).
-CANDIDATE_FORMAT = 12
+#: 13 added ``company`` on an education entry, read back as a hint as an experience's is:
+#: offered as the link where it is exactly the name of one of the importing account's
+#: companies, and never the reason to add one (#685).
+CANDIDATE_FORMAT = 13
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -489,6 +495,8 @@ RESUME_FIELDS = {
     "education": (
         "id",
         "institution",
+        # The company the institution links to, by name, or blank (#685); see experience.
+        "company",
         "qualification",
         "field_of_study",
         "location",
@@ -678,7 +686,7 @@ def _career_fields(item, names: tuple[str, ...]) -> dict:
 
 def _career_rows(resume, key: str, user):
     rows = getattr(resume, RESUME_MODELS[key]).objects.for_user(user)
-    return rows.select_related("company") if key == "experience" else rows
+    return rows.select_related("company") if key in ("experience", "education") else rows
 
 
 def _resume_block(user) -> dict:

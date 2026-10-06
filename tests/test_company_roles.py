@@ -32,6 +32,43 @@ def test_the_intermediary_is_division_78_and_the_public_service_qualifies_alone(
     assert industries.name_for("78", "en") == "Employment activities"
 
 
+def test_the_place_of_learning_is_division_85_and_nothing_else():
+    learning = roles.role(roles.PLACE_OF_LEARNING)
+
+    assert learning.divisions == {"85"}
+    assert learning.kinds == frozenset()
+    assert industries.name_for("85", "en") == "Education"
+    assert industries.section_of("85") == "Q"
+
+
+def test_every_division_a_role_names_exists_in_the_vendored_file():
+    known = industries.classification()["divisions"]
+    for role in roles.ROLES.values():
+        assert role.divisions <= set(known), role.key
+
+
+def test_a_company_with_the_education_industry_qualifies_as_a_place_of_learning(user):
+    school = company(user, "Aveiro", "Education")
+    bank = company(user, "Bank", "Banking")
+    bare = company(user, "Bare")
+    agency = company(user, "Hays", "Employment activities")
+
+    learning = Company.objects.for_user(user).qualifying(roles.PLACE_OF_LEARNING)
+
+    assert list(learning) == [school]
+    assert not {bank, bare, agency} & set(learning)
+
+
+@pytest.mark.parametrize("language", ["fr", "pt-PT"])
+def test_the_translated_names_of_education_qualify_too(user, language):
+    name = industries.name_for("85", language)
+    assert name and name != "Education"
+    with translation.override(language):
+        made = company(user, f"Ecole {language}", name)
+
+    assert made in Company.objects.for_user(user).qualifying(roles.PLACE_OF_LEARNING)
+
+
 def test_an_unknown_role_is_refused_not_answered_with_nothing(user):
     with pytest.raises(ValueError):
         roles.role("landlord")

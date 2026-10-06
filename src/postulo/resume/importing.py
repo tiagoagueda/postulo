@@ -365,6 +365,8 @@ def apply(owner, record: Record) -> Report:
                 owner=owner,
                 qualification=entry["qualification"][:200],
                 institution=entry["institution"][:200],
+                # Linked where the name is one of the person's companies, never added (#685).
+                company=company_named(owner, entry["institution"][:200]),
                 location=entry["location"][:200],
                 start_date=entry["start_date"],
                 end_date=entry["end_date"],

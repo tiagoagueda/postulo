@@ -10,9 +10,9 @@ for ever (#140).
 
 **So the list is NACE**, the European Union's statistical classification of economic
 activities, at **division** level: 87 two-digit codes under 22 sections. That depth is a
-deliberate choice between three. Its 21 sections are coarser than the hand-made list ever
+deliberate choice between three. Its 22 sections are coarser than the hand-made list ever
 was — *Information and communication* was one word for software, telecoms, publishing and
-film. Its 615 classes are a form nobody fills in. The divisions are the level where the
+film. Its 651 classes are a form nobody fills in. The divisions are the level where the
 names still mean something to the person reading them.
 
 **The translations are the real argument, more than the taxonomy.** Eurostat publishes NACE

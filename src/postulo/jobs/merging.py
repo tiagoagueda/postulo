@@ -362,6 +362,9 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Applications that went through it as an agency"), through, str),
         _moved(_("Industries"), industries, str),
         _moved(_("Career entries"), other.career_entries.all(), lambda row: row.role),
+        _moved(
+            _("Education entries"), other.education_entries.all(), lambda row: row.qualification
+        ),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -484,6 +487,7 @@ def merge_companies(kept, other) -> Plan:
     # text it had (#683). Moved here, because a link set to null on delete is an update to
     # Django and would be cleared without a word.
     other.career_entries.update(company=kept)
+    other.education_entries.update(company=kept)
     # The mark survives only where both had it, and not once there is work attached.
     kept.from_career = kept.from_career and other.from_career
     if kept.from_career and (

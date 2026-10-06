@@ -6,9 +6,14 @@ A *role* is a question asked of that: "does this company do what an intermediary
 answered from the codes of its industries and never from a column of its own, so nothing
 new is stored and no archive, API or candidate format changes.
 
-**One role ships here, the intermediary** -- a company that stands between a listing and its
-employer: a recruitment agency, a staffing firm, a placement service. That is NACE division
-78, *Employment activities*. The next roles are a place of learning (division 85), an
+**Two roles ship**: the intermediary, a company that stands between a listing and its
+employer -- a recruitment agency, a staffing firm, a placement service -- which is NACE
+division 78, *Employment activities*; and the place of learning (#685), the institution an
+education entry names, which is division 85, *Education*. In Rev. 2.1 that division sits in
+section Q and holds universities (85.40), schools (85.10 to 85.33) and non-formal training
+(85.5) alike, so the whole division is taken and no class is needed. A research institute
+(72.10, 72.20) a person names as the place of a doctorate is not in 85 and is left out on
+purpose: the role's set is data, and one more division here adds it. The next roles are an
 awarding body (85 and 94) and a membership organisation (94); each adds a row to `ROLES`
 and nothing else. An *employer* is not a role: any company may be one.
 
@@ -43,6 +48,7 @@ class Role:
 
 
 INTERMEDIARY = "intermediary"
+PLACE_OF_LEARNING = "place_of_learning"
 
 ROLES: dict[str, Role] = {
     INTERMEDIARY: Role(
@@ -50,6 +56,11 @@ ROLES: dict[str, Role] = {
         label=_("Employment services and agencies"),
         divisions=frozenset({"78"}),
         kinds=frozenset({"employment_service"}),
+    ),
+    PLACE_OF_LEARNING: Role(
+        key=PLACE_OF_LEARNING,
+        label=_("Places of learning"),
+        divisions=frozenset({"85"}),
     ),
 }
 

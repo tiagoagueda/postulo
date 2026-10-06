@@ -386,6 +386,7 @@ def fingerprint() -> str:
 #: level of an education entry, read back through the form's choices (#684). 11 added the
 #: publications, read back through the form a person types one into (#687).
 #: 12 added the code of a spoken language (#689).
+#: 13 added the company an education entry links to, read back as a hint (#685).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -399,6 +400,7 @@ SHAPES = {
     10: "d61ddfdc2bf0ece2",
     11: "671549ba3d4d429b",
     12: "2480619d6cf51e42",
+    13: "e607ca58ae13bade",
 }
 
 
@@ -2030,3 +2032,28 @@ def test_a_publication_the_form_would_refuse_is_a_refused_row(user, changes):
 
     assert outcomes(plan, "publications") == [candidate.REFUSED]
     assert rows(plan, "publications")[0].notes
+
+
+def a_degree(**changes) -> dict:
+    return {"id": 3, "institution": "Universidade de Aveiro", "qualification": "BSc", **changes}
+
+
+def test_an_education_entrys_company_is_a_hint_and_never_adds_one(user, other_user):
+    Company.objects.create(owner=other_user, name="Universidade de Aveiro")
+    data = a_file(resume={"education": [a_degree(company="Universidade de Aveiro")]})
+    assert [row.company for row in drawn(user, data).rows()] == [None]
+    mine = Company.objects.create(owner=user, name="universidade de aveiro")
+    assert [row.company for row in drawn(user, data).rows()] == [mine]
+    add(user, data)
+    assert Education.objects.get(owner=user).company == mine
+    assert Company.objects.filter(owner=user).count() == 1
+
+
+def test_the_file_writes_an_education_entrys_company_by_name(user):
+    company = Company.objects.create(owner=user, name="Aveiro")
+    Education.objects.create(
+        owner=user, institution="Universidade de Aveiro", qualification="BSc", company=company
+    )
+    entry = export.build_candidate_document(user)["resume"]["education"][0]
+    assert entry["company"] == "Aveiro"
+    assert entry["institution"] == "Universidade de Aveiro"

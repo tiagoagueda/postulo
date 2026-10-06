@@ -49,6 +49,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- An education entry now links its institution to a company of yours, offering places of learning first and adding the Education industry to a company the form creates; the archive goes to format 51 and the record file to 13 (#685)
 - GitHub, Forgejo and SourceHut brand marks appear beside contact links, drawn in black or white where the owner's guidelines allow it, and an identifier scheme can name a mark (#654)
 - Your details can hold a gender, chosen from a short list or in your own words, and a CV prints it only when it is set to (#681)
 - Your details can hold your nationalities, one or several, or only whether you are a citizen of the EU, the EEA or Switzerland, and a CV prints them only when it is set to (#680)

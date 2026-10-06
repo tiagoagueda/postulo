@@ -1007,6 +1007,25 @@ def test_a_europass_employer_with_no_company_of_that_name_adds_none(user):
     assert not Company.objects.filter(owner=user).exists()
 
 
+def test_a_europass_institution_is_linked_to_an_existing_company_and_never_adds_one(user):
+    from postulo.jobs.models import Company
+
+    data = candidate_xml(
+        "<EducationHistory><EducationOrganizationAttendance>"
+        "<hr:OrganizationName>ISEL</hr:OrganizationName><hr:ProgramName>BSc</hr:ProgramName>"
+        "<AttendancePeriod><Ongoing>true</Ongoing></AttendancePeriod>"
+        "</EducationOrganizationAttendance></EducationHistory>"
+    )
+    importing.apply(user, europass.read(data))
+    assert Education.objects.get(owner=user).company is None
+    assert not Company.objects.filter(owner=user).exists()
+
+    isel = Company.objects.create(owner=user, name="isel")
+    Education.objects.all().delete()
+    importing.apply(user, europass.read(data))
+    assert Education.objects.get(owner=user).company == isel
+
+
 @pytest.mark.parametrize(
     "written,code",
     [

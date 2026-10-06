@@ -151,11 +151,16 @@ class EducationForm(ResumeItemForm):
             "order",
         )
         widgets = {
+            "institution": forms.TextInput(attrs={"list": "school-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "highlights": forms.Textarea(attrs={"rows": 4}),
         }
         help_texts = {
+            "institution": _(
+                "As a CV should print it. It is linked to the company of that name among "
+                "yours, and added to your companies if there is none."
+            ),
             "start_date": ENTRY_HELP["start_date"],
             "end_date": ENTRY_HELP["end_date"],
             "highlights": ENTRY_HELP["highlights"],
@@ -170,6 +175,38 @@ class EducationForm(ResumeItemForm):
             ),
             "location": _("Where you studied, as you would write it on a CV."),
         }
+
+    #: The company this save added, for the view to say so (#685).
+    added_school = None
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's companies, the places of learning first (#685)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall
+
+        return {"school-suggestions": recall.schools(self.user)}
+
+    def save(self, commit=True):
+        """Link the institution to a company of the person's own, adding one if need be."""
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        # An entry whose institution was not touched keeps its link: its company may have been
+        # renamed since, and the old text must not add a second one.
+        if entry.company_id and "institution" not in self.changed_data:
+            added = False
+        else:
+            entry.company, added = (
+                companies.find_or_add_school(owner, entry.institution) if owner else (None, False)
+            )
+        self.added_school = entry.company if added else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 class ProjectForm(ResumeItemForm):

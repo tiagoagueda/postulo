@@ -29,8 +29,8 @@ from postulo.jobs import esco
 from postulo.jobs.views import UserFormKwargsMixin
 from postulo.plugins import base
 
+from . import companies, importing, ordering, translating
 from . import forms as resume_forms
-from . import importing, ordering, translating
 from .models import (
     Certification,
     Education,
@@ -300,6 +300,16 @@ def say_what_is_missing(request: HttpRequest, form) -> None:
         )
 
 
+def say_school_added(request, form) -> None:
+    """Say that an institution not among the person's companies was added, and as what (#685)."""
+    company = getattr(form, "added_school", None)
+    if company is not None:
+        messages.info(
+            request,
+            _("“%(name)s” was added to your companies as Education.") % {"name": company.name},
+        )
+
+
 class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, CreateView):
     def get_queryset(self):
         return self.section.model.objects.for_user(self.request.user)
@@ -316,6 +326,7 @@ class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, C
         messages.success(self.request, _("Added."))
         say_what_is_missing(self.request, form)
         response = super().form_valid(form)
+        say_school_added(self.request, form)
         # Placed by its date, or last, unless the person typed a number themselves (#203).
         if "order" not in form.fields:
             ordering.place_new(self.object)
@@ -334,12 +345,21 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         ]
         # Which ESCO skill the name was recognised as, said where the name is edited (#266).
         context["esco_name"] = getattr(self.object, "esco_name", "")
+        # An institution linked to a company with no industry in Education says so (#685).
+        company = getattr(self.object, "company", None)
+        context["not_a_school"] = (
+            self.section.slug == "education"
+            and company is not None
+            and not companies.is_school(company)
+        )
         return context
 
     def form_valid(self, form):
         messages.success(self.request, _("Saved."))
         say_what_is_missing(self.request, form)
-        return super().form_valid(form)
+        response = super().form_valid(form)
+        say_school_added(self.request, form)
+        return response
 
 
 class ResumeItemDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):

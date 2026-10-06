@@ -131,9 +131,25 @@ class EqfLevel(models.IntegerChoices):
 
 
 class Education(ResumeItem):
-    """A qualification, finished or in progress."""
+    """A qualification, finished or in progress.
+
+    ``institution`` is the name the entry gives its school, as text of its own, which every
+    CV and file prints unchanged and which stays required: self-taught study is written as
+    text and never forced into a company. ``company`` links it to a
+    :class:`~postulo.jobs.models.Company` of the person's, found by that name when the entry
+    is saved, as an experience's is (#685). Deleting the company keeps the entry and its text.
+    """
 
     institution = models.CharField(_("institution"), max_length=200)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="education_entries",
+        verbose_name=_("company"),
+    )
     qualification = models.CharField(
         _("qualification"), max_length=200, help_text=_("For example, “BSc Computer Science”.")
     )

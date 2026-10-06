@@ -240,3 +240,30 @@ def test_another_accounts_company_is_neither_offered_nor_linked_by_the_career(
     assert not theirs.career_entries.exists()
     page = client.get(reverse("resume:item_update", args=["experience", entry.pk]))
     assert "Secret" not in page.content.decode()
+
+
+def test_another_accounts_company_is_neither_offered_nor_linked_by_an_education_entry(
+    client, user, other_user
+):
+    """The education form suggests and links only the person's own companies (#685)."""
+    from postulo.jobs.models import Company, Industry
+    from postulo.resume.forms import EducationForm
+    from postulo.resume.models import Education
+
+    theirs = Company.objects.create(owner=other_user, name="Miskatonic", notes="Secret")
+    theirs.industries.set(Industry.named(other_user, ["Education"]))
+    assert "Miskatonic" not in EducationForm(user=user).datalists["school-suggestions"]
+
+    client.force_login(user)
+    response = client.post(
+        reverse("resume:item_create", args=["education"]),
+        {"qualification": "BSc", "institution": "Miskatonic"},
+    )
+    assert response.status_code == 302
+    entry = Education.objects.get(owner=user)
+    assert entry.company is not None and entry.company != theirs
+    assert entry.company.owner == user
+    assert not theirs.education_entries.exists()
+    assert theirs.industries.count() == 1
+    page = client.get(reverse("resume:item_update", args=["education", entry.pk]))
+    assert "Secret" not in page.content.decode()

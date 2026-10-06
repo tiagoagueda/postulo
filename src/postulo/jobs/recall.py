@@ -72,6 +72,27 @@ def companies(user, *, including_career: bool = False) -> list[str]:
     return names
 
 
+def schools(user) -> list[str]:
+    """The person's companies for an education entry: the places of learning first (#685).
+
+    Those whose industries include NACE division 85, by name, then every other company
+    below them -- a typed box hides nothing, and no company carries that industry until
+    somebody gives it one.
+    """
+    from . import roles
+    from .models import Company
+
+    first = list(
+        Company.objects.for_user(user)
+        .qualifying(roles.PLACE_OF_LEARNING)
+        .order_by("name")
+        .values_list("name", flat=True)[:AT_MOST]
+    )
+    taken = set(first)
+    rest = [name for name in companies(user, including_career=True) if name not in taken]
+    return (first + rest)[:AT_MOST]
+
+
 def locations(user) -> list[str]:
     from .models import JobPosting
 

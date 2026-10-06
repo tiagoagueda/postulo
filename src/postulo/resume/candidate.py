@@ -225,6 +225,8 @@ KINDS: tuple[Kind, ...] = (
         dates=("start_date", "end_date"),
         label="qualification",
         sub="institution",
+        # As an experience's company: a hint, never the reason to add one (#685).
+        hints=("company",),
     ),
     Kind(
         block="projects",
@@ -535,7 +537,8 @@ class Row:
     parent: Row | None = None
     #: A detail to fill in: the field, and what to put in it.
     fill: tuple[str, str] | None = None
-    #: The company of the account's an experience is offered as linked to (#683).
+    #: The company of the account's an experience or education entry is offered as linked to
+    #: (#683, #685).
     company: Any = None
     #: What one row of translations is made of: the field, and the text.
     texts: list[tuple[str, str]] = field(default_factory=list)
@@ -1389,7 +1392,7 @@ class _Planner:
             row.notes.append(
                 _("You have one like it with other dates. Both will be in your record.")
             )
-        if kind.block == "experience" and row.outcome == ADD:
+        if kind.block in ("experience", "education") and row.outcome == ADD:
             self._link(row, entry.get("company"))
         return row
 
@@ -1656,7 +1659,7 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
     for row in sorted(rows, key=lambda row: (row.order is None, row.order or 0, row.position)):
         item = row.instance
         item.owner = user
-        if kind.block == "experience":
+        if kind.block in ("experience", "education"):
             item.company = row.company
         if kind.block == "publications":
             item.cite_key = item.free_cite_key(taken)

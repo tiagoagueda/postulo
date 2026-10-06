@@ -10,12 +10,13 @@ from __future__ import annotations
 
 import pytest
 from django.urls import reverse
+from django.utils import translation
 
 from postulo.applications.models import Application
-from postulo.jobs import merging, recall
-from postulo.jobs.models import Company, Contact, JobPosting
-from postulo.resume.forms import ExperienceForm
-from postulo.resume.models import Experience
+from postulo.jobs import industries, merging, recall, roles
+from postulo.jobs.models import Company, Contact, Industry, JobPosting
+from postulo.resume.forms import EducationForm, ExperienceForm
+from postulo.resume.models import Education, Experience
 
 pytestmark = pytest.mark.django_db
 
@@ -228,3 +229,155 @@ def test_nothing_of_the_companys_notes_reaches_a_cv_or_the_entry_text(user):
     assert entry.company == company
     assert "They pay late." not in entry.organisation
     assert "They pay late." not in str(entry)
+
+
+# ---------------------------------------------------------------- education (#685)
+
+
+def save_study(user, institution: str, **extra) -> Education:
+    data = {"qualification": "BSc", "institution": institution, **extra}
+    form = EducationForm(data, user=user)
+    assert form.is_valid(), form.errors
+    form.instance.owner = user
+    return form.save()
+
+
+def test_an_education_entry_links_to_the_company_of_that_name_and_gives_it_nothing(user):
+    uni = Company.objects.create(owner=user, name="Universidade de Aveiro")
+    entry = save_study(user, "universidade de aveiro")
+    assert entry.company == uni
+    assert entry.institution == "universidade de aveiro"
+    assert uni.industries.count() == 0
+
+
+def test_a_new_institution_is_added_marked_and_given_the_education_industry(user):
+    entry = save_study(user, "University of Aveiro")
+    company = entry.company
+    assert company.from_career is True
+    assert [(i.name, i.code) for i in company.industries.all()] == [("Education", "85")]
+    assert company in Company.objects.for_user(user).qualifying(roles.PLACE_OF_LEARNING)
+
+
+def test_the_industry_is_named_in_the_persons_language(user):
+    with translation.override("fr"):
+        entry = save_study(user, "Université de Lille")
+    industry = entry.company.industries.get()
+    assert industry.name == industries.name_for("85", "fr")
+    assert industry.code == "85"
+
+
+def test_another_accounts_company_is_never_linked_nor_classified_by_an_education_entry(
+    user, other_user
+):
+    theirs = Company.objects.create(owner=other_user, name="MIT")
+    entry = save_study(user, "MIT")
+    assert entry.company != theirs
+    assert entry.company.owner == user
+    assert theirs.industries.count() == 0
+
+
+def test_an_entry_saved_again_without_touching_its_institution_keeps_its_link(user):
+    entry = save_study(user, "Old Name")
+    entry.company.name = "New Name"
+    entry.company.save()
+    form = EducationForm(
+        {"qualification": "MSc", "institution": "Old Name"}, instance=entry, user=user
+    )
+    assert form.is_valid()
+    form.save()
+    assert Company.objects.for_user(user).count() == 1
+    assert form.added_school is None
+
+
+def test_the_form_offers_the_places_of_learning_first_and_hides_nothing(user):
+    Company.objects.create(owner=user, name="Aaa Bank")
+    school = Company.objects.create(owner=user, name="Zzz College")
+    school.industries.set(Industry.named(user, ["Education"]))
+    offered = EducationForm(user=user).datalists["school-suggestions"]
+    assert offered[0] == "Zzz College"
+    assert "Aaa Bank" in offered
+
+
+def test_the_education_form_says_where_the_link_goes(user):
+    assert "added to your companies" in str(
+        EducationForm(user=user).fields["institution"].help_text
+    )
+
+
+def test_the_view_says_a_company_was_added_as_education(client, user):
+    client.force_login(user)
+    response = client.post(
+        reverse("resume:item_create", args=["education"]),
+        {"qualification": "BSc", "institution": "University of Aveiro"},
+        follow=True,
+    )
+    assert "added to your companies as Education" in response.content.decode()
+
+
+def test_the_notice_shows_for_a_company_with_no_education_industry_and_never_blocks(client, user):
+    Company.objects.create(owner=user, name="Acme Training")
+    entry = save_study(user, "Acme Training")
+    client.force_login(user)
+    url = reverse("resume:item_update", args=["education", entry.pk])
+    page = client.get(url).content.decode()
+    assert "is Education, so it is not listed as a school or university" in page
+    assert reverse("jobs:company_update", args=[entry.company.pk]) in page
+    saved = client.post(url, {"qualification": "BSc", "institution": "Acme Training"})
+    assert saved.status_code == 302
+
+    entry.company.industries.set(Industry.named(user, ["Education"]))
+    assert "is Education, so it is not" not in client.get(url).content.decode()
+
+
+def test_the_company_page_lists_the_education_entries_that_name_it(client, user):
+    entry = save_study(user, "Acme", qualification="Diploma in Welding")
+    client.force_login(user)
+    page = client.get(entry.company.get_absolute_url()).content.decode()
+    assert "Your education here" in page
+    assert "Diploma in Welding" in page
+
+
+def test_a_merge_moves_education_entries_and_the_delete_dialog_counts_them(client, user):
+    kept = Company.objects.create(owner=user, name="Aveiro")
+    other = save_study(user, "Aveiro Uni").company
+    entry = Education.objects.get(company=other)
+    client.force_login(user)
+    dialog = client.get(reverse("jobs:company_delete", args=[other.pk]))
+    assert "1 career entry keeps its text" in dialog.content.decode()
+    plan = merging.plan_companies(kept, other)
+    assert any(line.label == "Education entries" for line in plan.moves)
+    merging.merge_companies(kept, other)
+    entry.refresh_from_db()
+    assert entry.company == kept
+    assert entry.institution == "Aveiro Uni"
+
+
+def test_deleting_the_company_keeps_the_education_entry(user):
+    entry = save_study(user, "Aveiro Uni")
+    entry.company.delete()
+    entry.refresh_from_db()
+    assert entry.company is None
+    assert entry.institution == "Aveiro Uni"
+
+
+def test_the_migration_links_exact_matches_only(user, other_user):
+    import importlib
+
+    from django.apps import apps
+
+    migration = importlib.import_module("postulo.resume.migrations.0016_education_company")
+    mine = Company.objects.create(owner=user, name="Aveiro")
+    Company.objects.create(owner=other_user, name="Lisbon")
+    linked = Education.objects.create(owner=user, qualification="A", institution=" aveiro ")
+    stranger = Education.objects.create(owner=user, qualification="B", institution="Lisbon")
+    unmatched = Education.objects.create(owner=user, qualification="C", institution="Nowhere")
+    before = Company.objects.count()
+
+    migration.link_where_one_company_has_the_name(apps, None)
+
+    for entry in (linked, stranger, unmatched):
+        entry.refresh_from_db()
+    assert linked.company == mine
+    assert stranger.company is None
+    assert unmatched.company is None
+    assert Company.objects.count() == before

@@ -931,7 +931,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     moment_fields = {"checked_at"}
     #: Experience primary key -> the name of the company it links to, applied once every
     #: company in the file has been made or matched (#683).
-    wants_company: dict[int, str] = {}
+    wants_company: dict[tuple[str, int], str] = {}
+    #: The career blocks that link to a company, and the model each one's link is set on:
+    #: an experience since format 46, an education entry since 51 (#683, #685).
+    career_links = {"experience": resume.Experience, "education": resume.Education}
 
     for key, model in section_models.items():
         resume_map[key] = {}
@@ -940,7 +943,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             # The company an experience links to, by name (format 46), taken out before the
             # constructor sees the entry and linked once the companies exist. An archive
             # without it restores every entry unlinked (#683).
-            company_name = entry.pop("company", "") if key == "experience" else ""
+            company_name = entry.pop("company", "") if key in career_links else ""
             values = {}
             for name, value in _carried(
                 entry, RESUME_FIELDS[key], report, f"A {key} entry"
@@ -965,7 +968,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 values["code"] = values.get("code") or language_names.match(values.get("name", ""))
             created = model.objects.create(owner=user, **values)
             if isinstance(company_name, str) and company_name.strip():
-                wants_company[created.pk] = company_name
+                wants_company[(key, created.pk)] = company_name
             resume_map[key][old_id] = created
             report.resume_items += 1
 
@@ -1391,10 +1394,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 name_key__in={slugs.name_key(name) for name in wants_company.values()}
             )
         }
-        for entry_pk, name in wants_company.items():
+        for (key, entry_pk), name in wants_company.items():
             company = named.get(slugs.name_key(name))
             if company is not None:
-                resume.Experience.objects.filter(pk=entry_pk).update(company=company)
+                career_links[key].objects.filter(pk=entry_pk).update(company=company)
 
     # And then which part of an employer each application was aimed at, once both the
     # departments and the tree they hang off exist. A department the archive names but the

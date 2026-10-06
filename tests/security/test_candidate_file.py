@@ -750,6 +750,35 @@ def test_a_name_that_is_one_of_the_accounts_companies_is_offered_as_the_link(use
     assert Experience.objects.get(owner=user).company == mine
 
 
+def a_degree(**changes) -> dict:
+    return {"id": 1, "institution": "Initech U", "qualification": "BSc", **changes}
+
+
+def test_an_education_file_never_adds_a_company_whatever_its_entries_say(user, other_user):
+    from postulo.jobs.models import Company
+    from postulo.resume.models import Education
+
+    Company.objects.create(owner=other_user, name="Initech U")
+    data = a_file(
+        resume={"education": [a_degree(company="Initech U"), a_degree(id=2, company="New")]}
+    )
+    candidate.apply(user, candidate.read(data))
+    assert not Company.objects.filter(owner=user).exists()
+    assert Education.objects.filter(owner=user, company__isnull=False).count() == 0
+
+
+def test_a_hostile_education_company_is_a_name_to_look_for_and_nothing_else(user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=user, name="Initech U")
+    for hostile in (MARKUP, SCRIPT, ["Initech U"], {"id": 1}, 1, "x" * 100_000, None):
+        held = candidate.read(a_file(resume={"education": [a_degree(company=hostile)]}))
+        plan = candidate.plan(user, held)
+        assert outcomes(plan, "education") == ["add"]
+        assert all(row.company is None for row in plan.rows())
+    assert Company.objects.filter(owner=user).count() == 1
+
+
 @pytest.mark.parametrize("level", [9, -1, 10**200, MARKUP, SCRIPT, "6; DROP TABLE", [6], {"n": 6}])
 def test_an_eqf_level_the_form_would_not_take_is_a_refused_row_and_stores_nothing(user, level):
     from postulo.resume.models import Education
