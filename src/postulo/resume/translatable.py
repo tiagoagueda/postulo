@@ -36,6 +36,9 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     # An honour says its summary in the person's own words; the prize and who gave it are
     # theirs, as a certification's two texts are (#693).
     "honour": ("summary",),
+    # A membership's organisation stays as written, as an experience's does; what the person
+    # was in it and what they say of it are theirs to put into another language (#693).
+    "membership": ("role", "summary"),
 }
 
 #: The models that translate nothing, each with its reason: a decision written down, not an

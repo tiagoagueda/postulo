@@ -79,6 +79,14 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Honours and awards"),
         _("Prizes, scholarships and distinctions: recognition somebody gave you."),
     ),
+    "membership": SectionSpec(
+        "membership",
+        resume_models.Membership,
+        resume_forms.MembershipForm,
+        _("Membership"),
+        _("Memberships"),
+        _("Associations, societies and clubs you belong or belonged to."),
+    ),
     "driving-licence": SectionSpec(
         "driving-licence",
         resume_models.DrivingLicence,
@@ -116,7 +124,8 @@ OVERVIEW_ORDER = (
     "link",
     "skill-group",
     "certification",
-    "honour",
     "driving-licence",
+    "honour",
+    "membership",
     "language",
 )

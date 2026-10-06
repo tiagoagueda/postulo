@@ -158,7 +158,10 @@ logger = logging.getLogger(__name__)
 #: restores no photo and every CV with it off (#668).
 #: 56 added ``honours`` in the career: a title, who gave it, the date, a summary and a link. An
 #: archive without them restores none (#693).
-FORMAT_VERSION = 56
+#: 57 added ``memberships`` in the career: an organisation, the person's role in it, a start and
+#: an end (an empty end with a start means still), a summary and a link. An archive without
+#: them restores none (#693).
+FORMAT_VERSION = 57
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -212,7 +215,9 @@ FORMAT_VERSION = 56
 #: in, and the same licence being the same country and the same categories (#691).
 #: 16 added ``honours``, read through the form a person would have typed one into, and the same
 #: honour being the same title, giver and date (#693).
-CANDIDATE_FORMAT = 16
+#: 17 added ``memberships``, the same membership being the same organisation, role and dates
+#: (#693).
+CANDIDATE_FORMAT = 17
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -304,6 +309,7 @@ TRANSLATION_SECTIONS = {
     "languageskill": "languages",
     "drivinglicence": "driving_licences",
     "honour": "honours",
+    "membership": "memberships",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -587,6 +593,16 @@ RESUME_FIELDS = {
         "order",
     ),
     "honours": ("id", "title", "awarded_by", "awarded_on", "summary", "url", "order"),
+    "memberships": (
+        "id",
+        "organisation",
+        "role",
+        "start_date",
+        "end_date",
+        "summary",
+        "url",
+        "order",
+    ),
     "languages": ("id", "name", "code", "proficiency", "order"),
     # The codes and the country and nothing a licence carries beside them (#691).
     "driving_licences": (
@@ -621,6 +637,7 @@ RESUME_MODELS = {
     "skills": "Skill",
     "certifications": "Certification",
     "honours": "Honour",
+    "memberships": "Membership",
     "languages": "LanguageSkill",
     "driving_licences": "DrivingLicence",
     "links": "Link",

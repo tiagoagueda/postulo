@@ -981,3 +981,34 @@ def test_a_hostile_or_over_long_honour_is_a_refused_row_and_stores_nothing(user,
         assert len(honour.title) <= 200 and len(honour.awarded_by) <= 200
         assert not honour.url.startswith("javascript:")
     assert outcomes(plan, "honours") in ([candidate.REFUSED], [candidate.ADD])
+
+
+# ------------------------------------------------------------ memberships (#693)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"organisation": MARKUP},
+        {"organisation": "O" * 5000},
+        {"organisation": "O", "role": "R" * 5000},
+        {"organisation": "O", "summary": "S" * 200_000},
+        {"organisation": "O", "url": SCRIPT},
+        {"organisation": "O", "start_date": MARKUP},
+        {"organisation": "O", "end_date": "9999-99-99"},
+        {"organisation": "e\x00"},
+        {"organisation": ["O"]},
+    ],
+)
+def test_a_hostile_or_over_long_membership_stores_only_what_the_form_keeps(user, bad):
+    from postulo.resume.models import Membership
+
+    data = a_file(resume={"memberships": [bad]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    for kept in Membership.objects.for_user(user):
+        assert len(kept.organisation) <= 200 and len(kept.role) <= 200
+        assert not kept.url.startswith("javascript:")
+    assert outcomes(plan, "memberships") in ([candidate.REFUSED], [candidate.ADD])

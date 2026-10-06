@@ -67,6 +67,7 @@ def test_it_reads_the_nested_shape_the_reader_was_first_written_to():
         "languages": 2,
         "skills": 5,
         "projects": 1,
+        "memberships": 0,
     }
     assert record.person["first_name"] == "Alex"
     assert record.person["email"] == "alex@example.org"
@@ -84,6 +85,7 @@ def test_it_reads_the_shape_the_schema_gives_a_cv(user):
         "languages": 2,
         "skills": 1,
         "projects": 1,
+        "memberships": 0,
     }
     assert record.person["phone"] == "+3225551234"
     assert record.person["website"] == "https://sam.example.org"
@@ -490,6 +492,7 @@ def test_what_is_held_between_the_two_steps_is_the_record_and_not_the_file(clien
         "languages",
         "skill_groups",
         "projects",
+        "memberships",
     }
     # Dates survive the round trip through JSON.
     assert held["experience"][0]["start_date"] == "2019-03-01"

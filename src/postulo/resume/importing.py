@@ -40,6 +40,10 @@ class Record:
     languages: list[dict] = field(default_factory=list)
     skill_groups: list[dict] = field(default_factory=list)
     projects: list[dict] = field(default_factory=list)
+    #: Associations, societies and clubs, each with an ``organisation`` as the file words it,
+    #: a ``role`` (often empty), ``start_date`` and ``end_date``, a ``summary`` and a ``url``.
+    #: Europass's Candidate format has two elements for them (#693).
+    memberships: list[dict] = field(default_factory=list)
     #: Which format this came out of, as the importer names it. Europass says ``"candidate"``
     #: for the XML europass.europa.eu writes, ``"xml"`` and ``"json"`` for the format of the
     #: editor before it, and puts ``"pdf-"`` in front of the one it found attached to a PDF.
@@ -56,7 +60,14 @@ class Record:
     @property
     def is_empty(self) -> bool:
         return not any(
-            (self.experience, self.education, self.languages, self.skill_groups, self.projects)
+            (
+                self.experience,
+                self.education,
+                self.languages,
+                self.skill_groups,
+                self.projects,
+                self.memberships,
+            )
         )
 
     def counts(self) -> dict[str, int]:
@@ -66,6 +77,7 @@ class Record:
             "languages": len(self.languages),
             "skills": sum(len(group["skills"]) for group in self.skill_groups),
             "projects": len(self.projects),
+            "memberships": len(self.memberships),
         }
 
 
@@ -196,7 +208,15 @@ def apply(owner, record: Record) -> Report:
     from postulo.accounts.models import PersonIdentifier
     from postulo.core import postal
 
-    from .models import Education, Experience, LanguageSkill, Project, Skill, SkillGroup
+    from .models import (
+        Education,
+        Experience,
+        LanguageSkill,
+        Membership,
+        Project,
+        Skill,
+        SkillGroup,
+    )
 
     report = Report()
 
@@ -425,5 +445,29 @@ def apply(owner, record: Record) -> Report:
     ordering.place_many(Project, owner, projects)
     if projects:
         report.added["projects"] = len(projects)
+
+    memberships = []
+    for entry in record.memberships:
+        organisation = (entry.get("organisation") or "").strip()[:200]
+        if not organisation:
+            continue
+        address = (entry.get("url") or "").strip()
+        memberships.append(
+            Membership(
+                owner=owner,
+                organisation=organisation,
+                role=(entry.get("role") or "").strip()[:200],
+                start_date=entry.get("start_date"),
+                end_date=entry.get("end_date"),
+                summary=entry.get("summary") or "",
+                # A file's address is a claim: only a web address that fits the column is kept.
+                url=address
+                if address.startswith(("http://", "https://")) and len(address) <= 200
+                else "",
+            )
+        )
+    ordering.place_many(Membership, owner, memberships)
+    if memberships:
+        report.added["memberships"] = len(memberships)
 
     return report

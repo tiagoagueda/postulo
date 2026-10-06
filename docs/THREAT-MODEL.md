@@ -54,6 +54,21 @@ they say a driver wears glasses. `tests/test_driving_licences.py` asserts the mo
 list, so a column of that kind fails a test before it is a decision. A category is checked
 against the table in `resume/driving.py` by the page, the archive and the candidate file alike.
 
+**A membership can say what Article 9(1) lists (#693).** The career has a section for the
+associations, societies and clubs a person belongs or belonged to, and the schema Europass uses
+for them names “political parties” and “membership in a union” among its examples; the
+GDPR lists political opinions, religious or philosophical beliefs and trade union membership
+as special categories of personal data (text as reproduced at gdpr-info.eu). So a membership has
+the standing the home address has above: it is an `OwnedModel`, so another account's entry is a
+`404` (`tests/security/test_isolation_sweep.py`); it is never written to a log, a metric or an
+error message, and no list of another account's or an administrator's shows one; and a CV prints
+it only where the person put that entry on that CV. The form says once that a membership of a
+union, a party or a congregation is theirs to leave off any CV, and nothing asks for one. There
+is no field-level encryption: the data is the person's own, in their own account, covered by the
+archive and by deletion, and an instance that must answer to a regulator should confirm this
+reading of Article 9 for itself. A membership number is never kept: it identifies the person at
+another body, and nobody asked for it.
+
 **A date and a place of birth sit beside it (#679), and so do nationalities (#680) and
 gender (#681).** They are what an identity check asks for, a nationality can reveal an ethnic
 origin, and gender is personal data that some regulators treat as sensitive, so they are the

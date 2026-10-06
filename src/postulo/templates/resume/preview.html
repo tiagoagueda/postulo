@@ -130,6 +130,15 @@
       </section>
     {% endif %}
 
+    {% if memberships %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Memberships" %}</c-section-title>
+        <div class="card space-y-1 text-sm">
+          {% for item in memberships %}<p><bdi>{{ item.cv_title }}</bdi>{% if item.cv_period %} · {{ item.cv_period }}{% endif %}</p>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% if driving_licences %}
       <section class="mb-8">
         <c-section-title>{% translate "Driving licences" %}</c-section-title>

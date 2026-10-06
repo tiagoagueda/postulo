@@ -241,6 +241,7 @@ def test_the_format_europass_writes_today_reads():
 
     assert record.source == "candidate"
     assert record.counts() == {
+        "memberships": 0,
         "experience": 2,
         "education": 1,
         "languages": 2,
@@ -1047,3 +1048,100 @@ def test_free_text_is_a_name_and_no_code():
     person = '<PrimaryLanguageCode typeCode="FREETEXT">French</PrimaryLanguageCode>'
 
     assert "code" not in europass.read(candidate_xml(person=person)).languages[0]
+
+
+# ------------------------------------------------------------ memberships (#693)
+
+MEMBERSHIPS = (
+    "<NetworksAndMemberships>"
+    "<NetworkAndMembership><Title>Member of the University's Film-Making Society</Title>"
+    "<Date><StartDate><hr:FormattedDateTime>2015-03</hr:FormattedDateTime></StartDate>"
+    "<EndDate><hr:FormattedDateTime>2018-06-30</hr:FormattedDateTime></EndDate></Date>"
+    "<oa:Description>&lt;p&gt;Shot two shorts.&lt;/p&gt;</oa:Description>"
+    "<Link>https://films.example.org</Link></NetworkAndMembership>"
+    "<NetworkAndMembership><Title>Chess club</Title>"
+    "<Date><StartDate><hr:FormattedDateTime>2020</hr:FormattedDateTime></StartDate>"
+    "<EndDate><hr:FormattedDateTime>2021</hr:FormattedDateTime></EndDate>"
+    "<Ongoing>true</Ongoing></Date></NetworkAndMembership>"
+    "</NetworksAndMemberships>"
+    "<OrganizationAffiliations><OrganizationAffiliation>"
+    '<hr:OrganizationName validFrom="2012-01-15" validTo="2014">Rowing Club</hr:OrganizationName>'
+    "<Link>javascript:alert(1)</Link>"
+    "</OrganizationAffiliation></OrganizationAffiliations>"
+)
+
+
+def test_the_two_membership_elements_are_read_as_memberships():
+    record = europass.read(candidate_xml(MEMBERSHIPS))
+
+    assert [row["organisation"] for row in record.memberships] == [
+        "Member of the University's Film-Making Society",
+        "Chess club",
+        "Rowing Club",
+    ]
+    film, chess, rowing = record.memberships
+    # A title is the organisation as written: splitting it into a role and a body is a guess.
+    assert film["role"] == ""
+    assert (film["start_date"], film["end_date"]) == (dt.date(2015, 3, 1), dt.date(2018, 6, 30))
+    assert film["summary"] == "Shot two shorts."
+    assert film["url"] == "https://films.example.org"
+    assert (chess["start_date"], chess["end_date"]) == (dt.date(2020, 1, 1), None)
+    assert (rowing["start_date"], rowing["end_date"]) == (dt.date(2012, 1, 15), dt.date(2014, 1, 1))
+    assert record.counts()["memberships"] == 3
+    assert not record.is_empty
+
+
+def test_memberships_are_no_longer_named_as_having_nowhere_to_go():
+    record = europass.read(candidate_xml(MEMBERSHIPS))
+
+    assert not any("NetworksAndMemberships" in note for note in record.skipped)
+    assert not any("OrganizationAffiliations" in note for note in record.skipped)
+
+
+def test_nothing_is_read_as_an_honour():
+    data = candidate_xml(
+        "<NetworksAndMemberships><NetworkAndMembership><Title>Club</Title>"
+        "<HonourAwardDate>2019</HonourAwardDate></NetworkAndMembership></NetworksAndMemberships>"
+    )
+
+    record = europass.read(data)
+
+    assert [row["organisation"] for row in record.memberships] == ["Club"]
+    assert not hasattr(record, "honours")
+
+
+def test_an_element_with_no_name_is_not_a_membership():
+    data = candidate_xml(
+        "<NetworksAndMemberships><NetworkAndMembership><Description>x</Description>"
+        "</NetworkAndMembership></NetworksAndMemberships>"
+        "<OrganizationAffiliations><OrganizationAffiliation/></OrganizationAffiliations>"
+    )
+
+    assert europass.read(data).memberships == []
+
+
+def test_the_review_page_lists_them_before_anything_is_saved_and_confirming_writes_them(
+    client, user
+):
+    from postulo.resume.models import Membership
+
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": upload("cv.xml", candidate_xml(MEMBERSHIPS), "text/xml")})
+    page = client.get(url).content.decode()
+
+    assert "Memberships" in page and "Chess club" in page
+    assert not Membership.objects.filter(owner=user).exists()
+
+    client.post(url, {"action": "confirm"})
+
+    kept = {m.organisation: m for m in Membership.objects.filter(owner=user)}
+    assert set(kept) == {
+        "Member of the University's Film-Making Society",
+        "Chess club",
+        "Rowing Club",
+    }
+    assert kept["Chess club"].end_date is None
+    assert kept["Rowing Club"].url == "", "an address that is not a web address is not kept"
+    assert kept["Member of the University's Film-Making Society"].url == "https://films.example.org"

@@ -73,6 +73,7 @@ from postulo.resume.models import (
     LanguageSkill,
     Link,
     LinkKind,
+    Membership,
     Project,
     Publication,
     Skill,
@@ -381,6 +382,7 @@ class Command(BaseCommand):
             Certification,
             DrivingLicence,
             Honour,
+            Membership,
             LanguageSkill,
             Link,
         ):
@@ -524,6 +526,15 @@ class Command(BaseCommand):
                 title="Best paper",
                 awarded_by="Lisbon Systems Workshop",
                 awarded_on=dt.date(2022, 9, 15),
+                order=0,
+            )
+        ]
+        memberships = [
+            Membership.objects.create(
+                owner=user,
+                organisation="Portuguese Association of Software Engineers",
+                role="Member",
+                start_date=dt.date(2016, 3, 1),
                 order=0,
             )
         ]
@@ -793,6 +804,7 @@ class Command(BaseCommand):
                     *publications,
                     *certifications,
                     *honours,
+                    *memberships,
                 ]
             ):
                 CVItem.objects.create(

@@ -100,6 +100,13 @@ def test_an_honour_translates_only_its_summary():
     assert translating.fields_for(Honour) == ("summary",)
 
 
+def test_a_membership_translates_role_and_summary_not_organisation():
+    """The body keeps its name, as an employer does; what the person was in it is theirs (#693)."""
+    from postulo.resume.models import Membership
+
+    assert translating.fields_for(Membership) == ("role", "summary")
+
+
 def test_a_publication_translates_nothing():
     """A paper's title is the paper, as a credential's name is the credential (#687)."""
     assert translating.fields_for(Publication) == ()

@@ -128,6 +128,9 @@ READ = frozenset(
         "PersonQualifications",
         "Projects",
         "Others",
+        # Memberships and affiliations, read as memberships (#693).
+        "NetworksAndMemberships",
+        "OrganizationAffiliations",
         "DigitalSkills",
         *(section for section, _item, _label in SKILL_SECTIONS),
     }
@@ -164,6 +167,7 @@ def read(root) -> Record:
         _read_languages(profile, record)
         _read_skills(profile, record)
         _read_projects(profile, record)
+        _read_memberships(profile, record)
         _name_what_was_not_read(profile, record)
     if len(profiles) > 1:
         # A profile per language is allowed (BR-COM-02), and one career is one language
@@ -576,6 +580,68 @@ def _read_projects(profile, record: Record) -> None:
             )
             if entry:
                 record.projects.append(entry)
+
+
+def _stated_date(period, which: str):
+    """A start or an end as the schema writes it, or as plain text where an export does."""
+    if period is None:
+        return None
+    found = _date(period, which)
+    if found is not None:
+        return found
+    match = _DATE.match(_text(period, which))
+    return _make_date(*match.groups()) if match else None
+
+
+def _address_of(item) -> str:
+    """The web address an element carries, as text or as a ``URI`` child."""
+    return _text(item, "Link", "URI") or _text(item, "Link")
+
+
+def _read_memberships(profile, record: Record) -> None:
+    """The Candidate's two elements for belonging to a body, both read as memberships (#693).
+
+    ``NetworkAndMembership`` is an activity: a title, a date with a start, an end and an
+    ongoing flag, a description and a link. ``OrganizationAffiliation`` is a name whose
+    ``validFrom`` and ``validTo`` attributes are the period. The title or the name is the
+    organisation as written -- “Member of the University's Film-Making Society” is the
+    schema's own example, and splitting it into a role and a body would be a guess.
+    Nothing is read as an honour: the format has no element for one.
+    """
+    networks = _find(profile, "NetworksAndMemberships")
+    for item in _all(networks, "NetworkAndMembership") if networks is not None else []:
+        title = _text(item, "Title")
+        if not title:
+            continue
+        period = _first(_find(item, "Date"), _find(item, "Period"))
+        record.memberships.append(
+            {
+                "organisation": title,
+                "role": "",
+                "start_date": _stated_date(period, "StartDate"),
+                "end_date": None if _true(period, "Ongoing") else _stated_date(period, "EndDate"),
+                "summary": _plain(_raw(item, "Description")),
+                "url": _address_of(item),
+            }
+        )
+    affiliations = _find(profile, "OrganizationAffiliations")
+    for item in _all(affiliations, "OrganizationAffiliation") if affiliations is not None else []:
+        name = _find(item, "OrganizationName")
+        organisation = " ".join((name.text or "").split()) if name is not None else ""
+        if not organisation:
+            continue
+        match_from = _DATE.match(name.get("validFrom") or "")
+        match_to = _DATE.match(name.get("validTo") or "")
+        record.memberships.append(
+            {
+                "organisation": organisation,
+                "role": "",
+                "start_date": _make_date(*match_from.groups()) if match_from else None,
+                "end_date": _make_date(*match_to.groups()) if match_to else None,
+                "summary": "",
+                "url": _address_of(item),
+            }
+        )
 
 
 def _name_what_was_not_read(profile, record: Record) -> None:

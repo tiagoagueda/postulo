@@ -159,6 +159,18 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'membership' %}
+          {% comment %} "Role, organisation" and "since 2015" or "2015–2018", the years only, with the summary under it (#693). {% endcomment %}
+          <ul class="memberships">
+            {% for entry in section.items %}
+              <li>
+                <bdi>{% if entry.item.role %}{{ entry.item.role }}, {% endif %}{{ entry.item.organisation }}</bdi>
+                {% if entry.item.cv_period %}<span class="dates">{{ entry.item.cv_period }}</span>{% endif %}
+                {% if entry.item.summary %}<span class="org">{{ entry.item.summary }}</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

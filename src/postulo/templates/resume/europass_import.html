@@ -144,6 +144,13 @@
           </ul>
         {% endif %}
 
+        {% if found.memberships %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Memberships" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.memberships %}<li><bdi>{{ row.organisation }}</bdi></li>{% endfor %}
+          </ul>
+        {% endif %}
+
         {% if found.person %}
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Personal details" %}</h3>
           <p class="text-sm text-ink-600 dark:text-ink-300">

@@ -103,6 +103,12 @@
                             {% if item.awarded_by %}<bdi>{{ item.awarded_by }}</bdi>{% endif %}{% if item.awarded_by and item.awarded_on %} · {% endif %}{% if item.awarded_on %}{{ item.awarded_on|date:"Y" }}{% endif %}
                           </p>
                         {% endif %}
+                      {% elif section.spec.slug == 'membership' %}
+                        {% if item.role or item.cv_period %}
+                          <p class="text-sm text-ink-500 dark:text-ink-400">
+                            {% if item.role %}<bdi>{{ item.role }}</bdi>{% endif %}{% if item.role and item.cv_period %} · {% endif %}{{ item.cv_period }}
+                          </p>
+                        {% endif %}
                       {% elif section.spec.slug == 'skill-group' %}
                         <p class="text-sm text-ink-500 dark:text-ink-400">
                           {% if item.skill_names %}

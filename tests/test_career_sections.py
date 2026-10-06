@@ -195,6 +195,9 @@ def _one_of_each(user) -> dict:
         "honour": lambda: m.Honour.objects.create(
             owner=user, title="Best paper", awarded_by="LSW", awarded_on=dt.date(2022, 9, 15)
         ),
+        "membership": lambda: m.Membership.objects.create(
+            owner=user, organisation="Engineers", role="Member", start_date=dt.date(2015, 3, 1)
+        ),
         "driving-licence": lambda: m.DrivingLicence.objects.create(
             owner=user, country="PT", categories=["B"]
         ),

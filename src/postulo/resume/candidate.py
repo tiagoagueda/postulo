@@ -330,6 +330,19 @@ KINDS: tuple[Kind, ...] = (
         sub="awarded_by",
     ),
     Kind(
+        block="memberships",
+        model=resume.Membership,
+        form=resume_forms.MembershipForm,
+        title=gettext_lazy("Memberships"),
+        fields=("organisation", "role", "start_date", "end_date", "summary", "url"),
+        # A membership is the body, what the person was in it and when (#693).
+        names=("organisation", "role"),
+        dates=("start_date", "end_date"),
+        label="organisation",
+        sub="role",
+        ongoing=True,
+    ),
+    Kind(
         block="driving_licences",
         model=resume.DrivingLicence,
         form=resume_forms.DrivingLicenceForm,

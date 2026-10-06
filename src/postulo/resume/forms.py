@@ -20,6 +20,7 @@ from .models import (
     Honour,
     LanguageSkill,
     Link,
+    Membership,
     Project,
     Publication,
     Skill,
@@ -521,6 +522,33 @@ class HonourForm(ResumeItemForm):
             ),
             "awarded_by": _("Who gave it, as a CV should print it."),
             "awarded_on": _("Only the year prints on a CV, so the day makes no difference."),
+            "summary": ENTRY_HELP["summary"],
+            "url": _("Where it can be read about. A CV does not print it."),
+        }
+
+
+class MembershipForm(ResumeItemForm):
+    """A body somebody belongs or belonged to (#693)."""
+
+    date_range = ("start_date", "end_date")
+
+    class Meta:
+        model = Membership
+        fields = ("organisation", "role", "start_date", "end_date", "summary", "url", "order")
+        widgets = {
+            "start_date": DATE_WIDGET,
+            "end_date": DATE_WIDGET,
+            "summary": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "organisation": _(
+                "The association, society or club, as a CV should print it. A membership of a "
+                "union, a party or a congregation says something about you, and is yours to "
+                "leave off any CV; nothing here asks for one."
+            ),
+            "role": _("What you are or were in it, if anything: “member”, “treasurer”."),
+            "start_date": _("A CV prints only the year, so the day makes no difference."),
+            "end_date": _("Leave it empty while it is still going; a CV then prints “since”."),
             "summary": ENTRY_HELP["summary"],
             "url": _("Where it can be read about. A CV does not print it."),
         }

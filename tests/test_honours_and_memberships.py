@@ -22,7 +22,7 @@ from postulo.core import export, importer
 from postulo.documents import docx, rendering
 from postulo.documents.models import CV, CVItem
 from postulo.resume import candidate, ordering
-from postulo.resume.models import Honour
+from postulo.resume.models import Honour, Membership
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
 pytestmark = pytest.mark.django_db
@@ -81,11 +81,11 @@ def honour(user, **changes) -> Honour:
     )
 
 
-def test_the_section_is_in_the_registry_after_the_certifications():
+def test_the_section_is_in_the_registry_after_the_driving_licences():
     assert SECTIONS["honour"].model is Honour
     assert str(SECTIONS["honour"].plural) == "Honours and awards"
     order = list(OVERVIEW_ORDER)
-    assert order.index("honour") == order.index("certification") + 1
+    assert order.index("honour") == order.index("driving-licence") + 1
 
 
 def test_an_honour_is_made_edited_moved_and_deleted_through_the_registry(client, user):
@@ -305,3 +305,281 @@ def test_the_candidate_file_writes_an_honour_and_reads_it_back(user, other_user)
     candidate.apply(other_user, candidate.read(json.dumps(document).encode()))
 
     assert Honour.objects.for_user(other_user).get().title == "Best paper"
+
+
+# ==================================================================== memberships
+
+
+def membership(user, **changes) -> Membership:
+    return Membership.objects.create(
+        owner=user,
+        **{
+            "organisation": "Portuguese Association of Engineers",
+            "role": "Treasurer",
+            "start_date": dt.date(2015, 3, 1),
+            **changes,
+        },
+    )
+
+
+def test_the_membership_section_is_after_the_honours():
+    assert SECTIONS["membership"].model is Membership
+    assert str(SECTIONS["membership"].plural) == "Memberships"
+    order = list(OVERVIEW_ORDER)
+    assert order.index("membership") == order.index("honour") + 1
+
+
+def test_a_membership_is_made_edited_moved_and_deleted_through_the_registry(client, user):
+    client.force_login(user)
+    create = reverse("resume:item_create", args=["membership"])
+
+    assert client.post(create, {"organisation": ""}).status_code == 200
+    assert (
+        client.post(create, {"organisation": "Chess club", "start_date": "2010-01-01"}).status_code
+        == 302
+    )
+    assert client.post(create, {"organisation": "Rowing club", "role": "Cox"}).status_code == 302
+    mine = Membership.objects.for_user(user).get(organisation="Chess club")
+
+    edit = reverse("resume:item_update", args=["membership", mine.pk])
+    assert (
+        client.post(edit, {"organisation": "Chess society", "start_date": "2010-01-01"}).status_code
+        == 302
+    )
+    mine.refresh_from_db()
+    assert mine.organisation == "Chess society"
+
+    before = [m.organisation for m in Membership.objects.for_user(user)]
+    other = Membership.objects.for_user(user).get(organisation="Rowing club")
+    client.post(reverse("resume:item_move", args=["membership", other.pk, "down"]))
+    after = [m.organisation for m in Membership.objects.for_user(user)]
+    assert after == before[::-1]
+
+    assert (
+        client.post(reverse("resume:item_delete", args=["membership", mine.pk])).status_code == 302
+    )
+    assert not Membership.objects.filter(pk=mine.pk).exists()
+
+
+def test_an_end_before_the_start_is_refused(client, user):
+    client.force_login(user)
+    sent = client.post(
+        reverse("resume:item_create", args=["membership"]),
+        {"organisation": "Club", "start_date": "2018-01-01", "end_date": "2015-01-01"},
+    )
+
+    assert sent.status_code == 200
+    assert not Membership.objects.exists()
+
+
+def test_a_new_membership_lands_by_its_start(user):
+    assert ordering.DATE_FIELDS["Membership"] == "start_date"
+    still = membership(user, organisation="Still", start_date=dt.date(2010, 1, 1), order=0)
+    older = membership(user, organisation="Older", start_date=dt.date(2001, 1, 1), order=1)
+    newer = membership(user, organisation="Newer", start_date=dt.date(2020, 1, 1), order=2)
+
+    ordering.place_new(newer)
+
+    assert [m.organisation for m in Membership.objects.for_user(user)] == [
+        "Newer",
+        "Still",
+        "Older",
+    ]
+    assert still.pk and older.pk
+
+
+def test_the_form_says_a_union_or_a_party_is_yours_to_leave_off(client, user):
+    client.force_login(user)
+
+    html = client.get(reverse("resume:item_create", args=["membership"])).content.decode()
+
+    assert "union, a party or a congregation" in html
+    assert "leave off any CV" in html
+    assert "your role" in html.lower()
+    assert {f.name for f in Membership._meta.get_fields() if f.concrete} == {
+        "id",
+        "owner",
+        "created_at",
+        "updated_at",
+        "order",
+        "organisation",
+        "role",
+        "start_date",
+        "end_date",
+        "summary",
+        "url",
+    }, "a membership number is not kept"
+
+
+def test_an_empty_end_with_a_start_means_since(user):
+    assert membership(user).cv_period == "since 2015"
+    assert membership(user, end_date=dt.date(2018, 6, 1)).cv_period == "2015–2018"
+    assert membership(user, end_date=dt.date(2015, 9, 1)).cv_period == "2015"
+    assert membership(user, start_date=None).cv_period == ""
+    assert membership(user, start_date=None, end_date=dt.date(2018, 1, 1)).cv_period == "until 2018"
+    assert membership(user, role="").cv_title == "Portuguese Association of Engineers"
+    assert membership(user).cv_title == "Treasurer, Portuguese Association of Engineers"
+
+
+@pytest.mark.parametrize("theme", ["plain", "classic"])
+def test_both_themes_print_role_organisation_and_the_years(user, cv, theme):
+    cv.theme = theme
+    cv.save(update_fields=["theme"])
+    put_on(cv, membership(user, summary="Kept the books."))
+    put_on(
+        cv, membership(user, organisation="Chess club", role="", end_date=dt.date(2018, 1, 1)), 1
+    )
+
+    html = rendering.render_cv_html(cv)
+
+    assert "Treasurer, Portuguese Association of Engineers" in html
+    assert "since 2015" in html
+    assert "2015-03-01" not in html
+    assert "Kept the books." in html
+    assert "Chess club" in html and "2015–2018" in html.replace("2015&ndash;2018", "2015–2018")
+    assert "Memberships" in html
+
+
+def test_the_membership_in_the_text_and_the_word_file_says_what_the_page_does(user, cv):
+    put_on(cv, membership(user, summary="Kept the books."))
+
+    text = rendering.cv_text(cv)
+    with zipfile.ZipFile(io.BytesIO(docx.write(rendering.cv_outline(cv)))) as package:
+        document = package.read("word/document.xml").decode()
+
+    assert "Treasurer, Portuguese Association of Engineers · since 2015" in text
+    assert "Kept the books." in text
+    assert "Treasurer, Portuguese Association of Engineers · since 2015" in document
+    assert "Kept the books." in document
+
+
+def test_a_portfolio_prints_a_membership_and_no_empty_heading(user):
+    portfolio = CV.objects.create(owner=user, name="Work", kind="portfolio", language="en-GB")
+    assert "Memberships" not in rendering.render_cv_html(portfolio)
+
+    put_on(portfolio, membership(user))
+
+    assert "Treasurer, Portuguese Association of Engineers" in rendering.render_cv_html(portfolio)
+
+
+def test_a_membership_is_only_on_a_cv_that_holds_it(user, cv):
+    membership(user)
+
+    assert "Portuguese Association" not in rendering.render_cv_html(cv)
+    assert "Portuguese Association" not in rendering.cv_text(cv)
+
+
+def test_a_membership_translates_role_and_summary_not_the_organisation():
+    from postulo.resume import translating
+
+    assert translating.fields_for(Membership) == ("role", "summary")
+
+
+def test_the_translated_role_is_what_a_cv_in_that_language_prints(user, cv):
+    from postulo.resume.models import Translation
+
+    cv.language = "fr-FR"
+    cv.save(update_fields=["language"])
+    mine = membership(user)
+    put_on(cv, mine)
+    Translation.objects.create(
+        owner=user,
+        content_type=ContentType.objects.get_for_model(Membership),
+        object_id=mine.pk,
+        language="fr-FR",
+        field="role",
+        text="Trésorier",
+    )
+
+    text = rendering.cv_text(cv)
+
+    assert "Trésorier, Portuguese Association of Engineers" in text
+
+
+def test_search_finds_a_membership_by_organisation_and_by_role(user):
+    from postulo.core import search
+
+    membership(user, organisation="Quokka Society", role="Zebra keeper")
+
+    for query in ("Quokka", "Zebra"):
+        (group,) = [g for g in search.search(user, query) if g.kind == "career"]
+        assert group.hits[0].url.endswith("#section-membership")
+
+
+def test_the_overview_and_the_preview_list_a_membership(client, user):
+    membership(user)
+    client.force_login(user)
+
+    overview = client.get(reverse("resume:overview")).content.decode()
+    preview = client.get(reverse("resume:preview")).content.decode()
+
+    assert 'id="section-membership"' in overview
+    assert "since 2015" in overview and "since 2015" in preview
+
+
+def test_the_archive_round_trips_a_membership_and_a_cv_with_one_of_each(user, other_user):
+    cv = CV.objects.create(owner=user, name="Both")
+    put_on(cv, membership(user, summary="Books", url="https://example.org"), 0)
+    put_on(cv, honour(user), 1)
+    archive, document = read_archive(user)
+
+    assert document["resume"]["memberships"][0]["end_date"] is None
+
+    importer.load(other_user, archive)
+
+    back = Membership.objects.for_user(other_user).get()
+    assert (back.organisation, back.role, back.start_date, back.end_date) == (
+        "Portuguese Association of Engineers",
+        "Treasurer",
+        dt.date(2015, 3, 1),
+        None,
+    )
+    assert back.summary == "Books"
+    kept = CV.objects.for_user(other_user).get()
+    assert {type(i.item) for i in kept.items.all()} == {Membership, Honour}
+
+
+def test_the_candidate_file_reads_a_membership_and_knows_it_again(user, other_user):
+    membership(user, end_date=dt.date(2018, 1, 1))
+    document = export.build_candidate_document(user)
+    data = json.dumps(document).encode()
+
+    assert outcomes(other_user, data) == [candidate.ADD]
+    candidate.apply(other_user, candidate.read(data))
+    back = Membership.objects.for_user(other_user).get()
+    assert (back.start_date, back.end_date) == (dt.date(2015, 3, 1), dt.date(2018, 1, 1))
+    assert outcomes(other_user, data) == [candidate.PRESENT]
+
+
+def test_a_membership_with_other_dates_is_another_one_and_says_so(user):
+    membership(user)
+    row = {
+        "id": 1,
+        "organisation": "Portuguese Association of Engineers",
+        "role": "Treasurer",
+        "start_date": "2001-01-01",
+    }
+    plan = candidate.plan(user, candidate.read(a_file("memberships", row)))
+
+    (entry,) = [r for section in plan.sections for r in section.rows]
+    assert entry.outcome == candidate.ADD
+    assert entry.notes, "the review says there is one like it with other dates"
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"organisation": ""},
+        {"organisation": "x" * 500},
+        {"organisation": "Club", "start_date": "2015"},
+        {"organisation": "Club", "start_date": "2018-01-01", "end_date": "2015-01-01"},
+        {"organisation": "Club", "url": "javascript:alert(1)"},
+        {"organisation": ["Club"]},
+    ],
+)
+def test_a_refused_membership_is_a_refused_row_and_stores_nothing(user, bad):
+    data = a_file("memberships", {"id": 1, **bad})
+
+    assert outcomes(user, data) == [candidate.REFUSED]
+    candidate.apply(user, candidate.read(data))
+    assert not Membership.objects.for_user(user).exists()

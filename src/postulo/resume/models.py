@@ -328,6 +328,52 @@ class Honour(ResumeItem):
         return ", ".join(part for part in (self.title, self.awarded_by) if part)
 
 
+class Membership(ResumeItem):
+    """A body you belong or belonged to: an association, a society, a club (#693).
+
+    ``organisation`` is the name as a CV should print it, as text of its own and never
+    translated, as an experience's is; ``role`` and ``summary`` are the person's words and
+    are. An empty end with a start means *still*. A membership can say something about the
+    person that is theirs to leave off any CV (a union, a party, a congregation), so nothing
+    here asks for one, and the entry is printed only on a CV the person put it on.
+    """
+
+    organisation = models.CharField(_("organisation"), max_length=200)
+    role = models.CharField(_("your role"), max_length=200, blank=True)
+    start_date = models.DateField(_("from"), null=True, blank=True)
+    end_date = models.DateField(_("until"), null=True, blank=True)
+    summary = models.TextField(_("summary"), blank=True)
+    url = models.URLField(_("link"), blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("membership")
+        verbose_name_plural = _("memberships")
+
+    def __str__(self) -> str:
+        return self.cv_title
+
+    @property
+    def cv_title(self) -> str:
+        """“Role, organisation”, or the organisation alone where there is no role.
+
+        For the person's own pages. A CV reads the two fields off the entry instead, because
+        the role may be translated and a property reads the entry that is not.
+        """
+        return ", ".join(part for part in (self.role, self.organisation) if part)
+
+    @property
+    def cv_period(self) -> str:
+        """“since 2015” or “2015–2018”: the years only, in the language being read."""
+        start, end = self.start_date, self.end_date
+        if start and end:
+            return str(start.year) if start.year == end.year else f"{start.year}–{end.year}"
+        if start:
+            return gettext("since %(year)s") % {"year": start.year}
+        if end:
+            return gettext("until %(year)s") % {"year": end.year}
+        return ""
+
+
 class Publication(ResumeItem):
     """A paper, a book, a chapter, a thesis, a dataset: shaped like a BibTeX entry (#687).
 
