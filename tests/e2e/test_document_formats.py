@@ -84,7 +84,7 @@ def test_a_draft_is_a_file_and_the_page_stays_where_it_was(page: Page, live_serv
     page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
 
     with page.expect_download() as taken:
-        page.get_by_role("link", name="Download draft PDF").click()
+        page.get_by_role("button", name="Download draft PDF").click()
 
     download = taken.value
     assert download.suggested_filename.endswith("(draft).pdf"), download.suggested_filename
@@ -130,7 +130,7 @@ def test_the_word_file_downloads_and_is_one(page: Page, live_server, cv):
     page.goto(f"{live_server.url}/documents/cvs/{cv.pk}/")
 
     with page.expect_download() as taken:
-        page.get_by_role("link", name="Download .docx").click()
+        page.get_by_role("button", name="Download .docx").click()
 
     download = taken.value
     assert download.suggested_filename.endswith(".docx")

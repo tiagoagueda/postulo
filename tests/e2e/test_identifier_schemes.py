@@ -130,7 +130,7 @@ def test_with_a_script_the_registrys_settings_are_a_dialog(
     # Put right and saved, it goes back to the page behind, which says so.
     box.fill(GOOD)
     dialog.get_by_role("button", name="Save", exact=True).click()
-    expect(page.get_by_text("Saved.")).to_be_visible()
+    expect(page.get_by_text("Saved.", exact=True)).to_be_visible()
     expect(page).to_have_url(f"{base}/server/plugins/")
     expect(drawn).to_be_hidden()
 
@@ -215,7 +215,7 @@ def test_without_a_script_the_same_control_leads_to_a_page(
         box.fill(GOOD)
         page.locator("main form").get_by_role("button", name="Save", exact=True).click()
         expect(page).to_have_url(f"{base}/server/plugins/")
-        expect(page.get_by_text("Saved.")).to_be_visible()
+        expect(page.get_by_text("Saved.", exact=True)).to_be_visible()
 
         assert "Badge" in offered_on_your_details(page, base)
     finally:
