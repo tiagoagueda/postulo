@@ -60,6 +60,8 @@ def test_a_page_without_a_translation_is_english_and_says_so(wiki, tmp_path):
     page = read(out, "fr/Installing-Postulo.html")
     assert "Pas encore traduite." in page and "Run it." in page
     assert 'lang="fr"' in page
+    assert '<div lang="en-GB" dir="ltr">' in page
+    assert "<div lang" not in read(out, "fr/Getting-started.html")
     assert "notice" not in read(out, "en-GB/Installing-Postulo.html").split("<main>")[1]
 
 

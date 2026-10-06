@@ -244,13 +244,24 @@ def _link(href: str, built: set[str]) -> str:
 
 
 def page_html(
-    wiki: Wiki, tag: str, page: str, tags: list[str], text: str, notice: str, md: MarkdownIt
+    wiki: Wiki,
+    tag: str,
+    page: str,
+    tags: list[str],
+    text: str,
+    notice: str,
+    md: MarkdownIt,
+    english: bool = False,
 ) -> str:
     words = wiki.words(tag)
     built = set(PUBLIC_PAGES)
     tokens = md.parse(text)
     rewrite_links(md, tokens, built, "../")
     body = md.renderer.render(tokens, md.options, {})
+    if english:
+        # English text under another language's page: say so to screen readers, and keep it
+        # left to right even where the page is right to left.
+        body = f'<div lang="{SOURCE_LANGUAGE}" dir="ltr">\n{body}</div>\n'
     here = ' aria-current="page"'
     nav = "".join(
         f'<li><a href="{_name(p)}.html"{here if p == page else ""}>'
@@ -332,6 +343,7 @@ def build(wiki: Wiki, out: Path) -> list[str]:
     for tag in tags:
         words = wiki.words(None if tag == SOURCE_LANGUAGE else tag)
         for page in PUBLIC_PAGES:
+            state = "current"
             if tag == SOURCE_LANGUAGE:
                 text, notice = wiki.source(page), ""
             else:
@@ -341,7 +353,11 @@ def build(wiki: Wiki, out: Path) -> list[str]:
                 else:
                     text = wiki.translation_path(tag, page).read_text(encoding="utf-8")
                     notice = words["outdated"] if state == "outdated" else ""
-            write(f"{tag}/{_name(page)}.html", page_html(wiki, tag, page, tags, text, notice, md))
+            fallback = tag != SOURCE_LANGUAGE and state == "missing"
+            write(
+                f"{tag}/{_name(page)}.html",
+                page_html(wiki, tag, page, tags, text, notice, md, english=fallback),
+            )
     write("index.html", landing(wiki, tags))
     return written
 

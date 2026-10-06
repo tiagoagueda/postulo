@@ -77,6 +77,7 @@ All notable changes to Postulo are recorded here. The format follows
 - An education entry can state its EQF level, 1 to 8, kept by the Europass import beside the grade, and a CV can print it as "EQF level 7" under a new switch, off by default (#684)
 - Your career record has a *Publications* section: papers, books, chapters, theses, datasets and software typed like BibTeX entries, printed as one line on a CV, and carried in the archive and your own record file (#687)
 - A spoken language on your career record is chosen from a list instead of typed, and a CV prints its name in the CV's own language (Inglês on a Portuguese CV, Anglais on a French one); archive format 50, candidate file format 12 (#689)
+- The wiki's pre-install pages (Home, Installing Postulo, Getting started) can be built into a static site in every language that has them, with an English fallback and a staleness check, and a Weblate setup for translators (#352)
 
 ### 🐛 Fixed
 
