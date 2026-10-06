@@ -47,6 +47,10 @@ MODULES = (
 EXCUSED = {
     # ----------------------------------------------------------- a label is enough
     "AddLanguageForm.language": "the label and the list are the whole of it",
+    "BackupScheduleForm.backup_schedule": "the choices are the answer, and they are named",
+    "FilePropertiesForm.title": "the label is the whole of it, and the section above explains them",
+    "FilePropertiesForm.author": "the label is the whole of it, and the section above explains them",
+    "FilePropertiesForm.subject": "the label is the whole of it, and the section above explains them",
     "ApplicationDetailsForm.status": "the choices are the answer, and they are named",
     "ApplicationForm.status": "the choices are the answer, and they are named",
     "ApplicationIntakeForm.status": "the choices are the answer, and they are named",
