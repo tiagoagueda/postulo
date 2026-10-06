@@ -143,7 +143,10 @@ logger = logging.getLogger(__name__)
 #: 51 added ``company`` on an education entry, as 46 did on an experience: the name of the
 #: company the institution is linked to, or blank; an archive without it restores every entry
 #: unlinked, and the link is made by name once the companies exist, never adding one (#685).
-FORMAT_VERSION = 51
+#: 52 added ``company`` on a certification: the name of the company its issuer is linked to,
+#: or blank; read back as on an experience -- by name, in a pass once the companies exist,
+#: and never adding one (#686).
+FORMAT_VERSION = 52
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -190,7 +193,10 @@ FORMAT_VERSION = 51
 #: 13 added ``company`` on an education entry, read back as a hint as an experience's is:
 #: offered as the link where it is exactly the name of one of the importing account's
 #: companies, and never the reason to add one (#685).
-CANDIDATE_FORMAT = 13
+#: 14 added ``company`` on a certification, read back the same way: a hint, offered as the
+#: link where it is exactly the name of one of the importing account's companies, and never
+#: the reason to add one (#686).
+CANDIDATE_FORMAT = 14
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -550,6 +556,9 @@ RESUME_FIELDS = {
         "id",
         "name",
         "issuer",
+        # The name of the company the issuer links to, or blank (#686): read back by name as an
+        # experience's is, and never the reason to add one.
+        "company",
         "issued_on",
         "expires_on",
         "credential_url",
@@ -674,6 +683,10 @@ def _identifier_rows(profile) -> list[dict]:
     ]
 
 
+#: The career entries that name a company, by the block that holds them (#683, #685, #686).
+LINKED_TO_A_COMPANY = ("experience", "education", "certifications")
+
+
 def _career_fields(item, names: tuple[str, ...]) -> dict:
     """An entry's fields, with the company it links to written as its name (#683)."""
     return {
@@ -686,7 +699,7 @@ def _career_fields(item, names: tuple[str, ...]) -> dict:
 
 def _career_rows(resume, key: str, user):
     rows = getattr(resume, RESUME_MODELS[key]).objects.for_user(user)
-    return rows.select_related("company") if key in ("experience", "education") else rows
+    return rows.select_related("company") if key in LINKED_TO_A_COMPANY else rows
 
 
 def _resume_block(user) -> dict:

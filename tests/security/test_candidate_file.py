@@ -869,3 +869,36 @@ def test_the_word_other_in_a_file_is_not_a_code(user):
     candidate.apply(user, candidate.read(data))
 
     assert LanguageSkill.objects.for_user(user).get().code == ""
+
+
+def a_certification(**changes) -> dict:
+    return {"id": 1, "name": "CKA", "issuer": "Initech", **changes}
+
+
+def test_a_file_never_adds_a_company_whatever_its_certifications_say(user, other_user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=other_user, name="Initech")
+    data = a_file(
+        resume={
+            "certifications": [
+                a_certification(company="Initech"),
+                a_certification(id=2, name="Other", company="New"),
+            ]
+        }
+    )
+    candidate.apply(user, candidate.read(data))
+    assert not Company.objects.filter(owner=user).exists()
+    assert Certification.objects.filter(owner=user, company__isnull=False).count() == 0
+
+
+def test_a_hostile_certification_company_is_a_name_to_look_for_and_nothing_else(user):
+    from postulo.jobs.models import Company
+
+    Company.objects.create(owner=user, name="Initech")
+    for hostile in (MARKUP, SCRIPT, ["Initech"], {"id": 1}, 1, "x" * 100_000, None):
+        held = candidate.read(a_file(resume={"certifications": [a_certification(company=hostile)]}))
+        plan = candidate.plan(user, held)
+        assert outcomes(plan, "certifications") == ["add"]
+        assert all(row.company is None for row in plan.rows())
+    assert Company.objects.filter(owner=user).count() == 1

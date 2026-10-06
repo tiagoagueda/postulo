@@ -365,6 +365,7 @@ def plan_companies(kept, other) -> Plan:
         _moved(
             _("Education entries"), other.education_entries.all(), lambda row: row.qualification
         ),
+        _moved(_("Certifications"), other.certifications.all(), str),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -488,6 +489,7 @@ def merge_companies(kept, other) -> Plan:
     # Django and would be cleared without a word.
     other.career_entries.update(company=kept)
     other.education_entries.update(company=kept)
+    other.certifications.update(company=kept)  # and the certifications it issued (#686)
     # The mark survives only where both had it, and not once there is work attached.
     kept.from_career = kept.from_career and other.from_career
     if kept.from_career and (

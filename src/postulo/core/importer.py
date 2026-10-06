@@ -36,6 +36,7 @@ from .export import (
     FORMAT_VERSION,
     INTERVIEW_FIELDS,
     LETTER_FIELDS,
+    LINKED_TO_A_COMPANY,
     MANIFEST_NAME,
     MEDIA_PREFIX,
     OFFER_FIELDS,
@@ -932,9 +933,6 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     #: Experience primary key -> the name of the company it links to, applied once every
     #: company in the file has been made or matched (#683).
     wants_company: dict[tuple[str, int], str] = {}
-    #: The career blocks that link to a company, and the model each one's link is set on:
-    #: an experience since format 46, an education entry since 51 (#683, #685).
-    career_links = {"experience": resume.Experience, "education": resume.Education}
 
     for key, model in section_models.items():
         resume_map[key] = {}
@@ -943,7 +941,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             # The company an experience links to, by name (format 46), taken out before the
             # constructor sees the entry and linked once the companies exist. An archive
             # without it restores every entry unlinked (#683).
-            company_name = entry.pop("company", "") if key in career_links else ""
+            company_name = entry.pop("company", "") if key in LINKED_TO_A_COMPANY else ""
             values = {}
             for name, value in _carried(
                 entry, RESUME_FIELDS[key], report, f"A {key} entry"
@@ -1397,7 +1395,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         for (key, entry_pk), name in wants_company.items():
             company = named.get(slugs.name_key(name))
             if company is not None:
-                career_links[key].objects.filter(pk=entry_pk).update(company=company)
+                section_models[key].objects.filter(pk=entry_pk).update(company=company)
 
     # And then which part of an employer each application was aimed at, once both the
     # departments and the tree they hang off exist. A department the archive names but the

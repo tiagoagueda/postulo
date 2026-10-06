@@ -402,6 +402,15 @@ class Company(OwnedModel):
     def get_absolute_url(self) -> str:
         return reverse("jobs:company_detail", args=[self.pk])
 
+    @property
+    def has_nace_industry(self) -> bool:
+        """Whether any of its industries is a division of the NACE list (#686).
+
+        Any division, not a particular set: a vendor that certifies its own users is
+        classified by what it sells, so the set of likely issuers only orders a list.
+        """
+        return self.industries.exclude(code="").exists()
+
     def save(self, *args, **kwargs) -> None:
         slugs.keep_name_key(self, kwargs)
         # A correction a person made is not a guess to be made again: the text it was

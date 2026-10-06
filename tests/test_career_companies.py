@@ -15,8 +15,8 @@ from django.utils import translation
 from postulo.applications.models import Application
 from postulo.jobs import industries, merging, recall, roles
 from postulo.jobs.models import Company, Contact, Industry, JobPosting
-from postulo.resume.forms import EducationForm, ExperienceForm
-from postulo.resume.models import Education, Experience
+from postulo.resume.forms import CertificationForm, EducationForm, ExperienceForm
+from postulo.resume.models import Certification, Education, Experience
 
 pytestmark = pytest.mark.django_db
 
@@ -360,6 +360,81 @@ def test_deleting_the_company_keeps_the_education_entry(user):
     assert entry.institution == "Aveiro Uni"
 
 
+def save_certification(user, issuer: str, **extra) -> Certification:
+    data = {"name": "CKA", "issuer": issuer, **extra}
+    form = CertificationForm(data, user=user)
+    assert form.is_valid(), form.errors
+    form.instance.owner = user
+    return form.save()
+
+
+def test_a_certifications_issuer_is_linked_by_name_in_any_case(user):
+    cncf = Company.objects.create(owner=user, name="CNCF")
+    entry = save_certification(user, "cncf")
+    assert entry.company == cncf
+    assert entry.issuer == "cncf"
+
+
+def test_an_issuer_that_is_no_company_is_added_marked_and_given_no_industry(user):
+    entry = save_certification(user, "Linux Foundation")
+    assert entry.company.name == "Linux Foundation"
+    assert entry.company.from_career is True
+    assert not entry.company.industries.exists()
+
+
+def test_another_accounts_company_is_never_the_issuer(user, other_user):
+    theirs = Company.objects.create(owner=other_user, name="Initech")
+    entry = save_certification(user, "Initech")
+    assert entry.company != theirs and entry.company.owner == user
+    assert not theirs.certifications.exists()
+
+
+def test_a_certification_with_no_issuer_saves_as_before(user):
+    entry = save_certification(user, "")
+    assert entry.company is None and entry.issuer == ""
+    assert not Company.objects.filter(owner=user).exists()
+
+
+def test_clearing_the_issuer_unlinks_the_entry(user):
+    entry = save_certification(user, "CNCF")
+    form = CertificationForm({"name": "CKA", "issuer": ""}, instance=entry, user=user)
+    assert form.is_valid(), form.errors
+    assert form.save().company is None
+
+
+def test_the_company_page_lists_the_certifications_it_issued(client, user):
+    entry = save_certification(user, "CNCF", name="Kubernetes Admin")
+    client.force_login(user)
+    page = client.get(entry.company.get_absolute_url()).content.decode()
+    assert "Certifications it issued" in page and "Kubernetes Admin" in page
+
+
+def test_deleting_the_company_keeps_the_certification_and_the_dialog_says_so(client, user):
+    entry = save_certification(user, "CNCF")
+    client.force_login(user)
+    page = client.get(reverse("jobs:company_delete", args=[entry.company.pk]))
+    assert "1 career entry keeps its text and loses the link" in page.content.decode()
+    client.post(reverse("jobs:company_delete", args=[entry.company.pk]))
+    entry.refresh_from_db()
+    assert entry.company is None and entry.issuer == "CNCF"
+
+
+def test_a_merge_moves_the_certifications_and_says_so(client, user):
+    kept = Company.objects.create(owner=user, name="CNCF")
+    other = save_certification(user, "Cloud Native Computing Foundation").company
+    entry = Certification.objects.get(company=other)
+    plan = merging.plan_companies(kept, other)
+    assert any(line.label == "Certifications" for line in plan.moves)
+    client.force_login(user)
+    page = client.get(reverse("jobs:company_merge", args=[kept.pk]), {"with": other.pk})
+    assert "Certifications" in page.content.decode()
+
+    merging.merge_companies(kept, other)
+    entry.refresh_from_db()
+    assert entry.company == kept
+    assert entry.issuer == "Cloud Native Computing Foundation"
+
+
 def test_the_migration_links_exact_matches_only(user, other_user):
     import importlib
 
@@ -381,3 +456,25 @@ def test_the_migration_links_exact_matches_only(user, other_user):
     assert stranger.company is None
     assert unmatched.company is None
     assert Company.objects.count() == before
+
+
+def test_the_certification_migration_links_exact_names_only(user, other_user):
+    import importlib
+
+    from django.apps import apps
+
+    migration = importlib.import_module("postulo.resume.migrations.0017_certification_company")
+    mine = Company.objects.create(owner=user, name="CNCF")
+    Company.objects.create(owner=other_user, name="Initech")
+    exact = Certification.objects.create(owner=user, name="A", issuer="cncf")
+    near = Certification.objects.create(owner=user, name="B", issuer="CNCF Inc")
+    theirs = Certification.objects.create(owner=user, name="C", issuer="Initech")
+    blank = Certification.objects.create(owner=user, name="D")
+
+    migration.link_where_a_company_has_the_name(apps, None)
+
+    for entry in (exact, near, theirs, blank):
+        entry.refresh_from_db()
+    assert exact.company == mine
+    assert near.company is None and theirs.company is None and blank.company is None
+    assert Company.objects.count() == 2

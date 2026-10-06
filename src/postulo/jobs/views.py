@@ -340,6 +340,8 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["career_entries"] = self.object.career_entries.order_by("-start_date", "-pk")
         # And the education entries that name it as their institution (#685).
         context["education_entries"] = self.object.education_entries.order_by("-end_date", "-pk")
+        # And the certifications it issued, as the person recorded them (#686).
+        context["certifications"] = self.object.certifications.order_by("-issued_on", "-pk")
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
             "phone_numbers", "web_links", "messaging_handles"
         )
@@ -701,7 +703,11 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
                 % {"count": sent}
             )
         # The career is not deleted with a company (#683): an entry keeps its text.
-        entries = company.career_entries.count() + company.education_entries.count()
+        entries = (
+            company.career_entries.count()
+            + company.education_entries.count()
+            + company.certifications.count()
+        )
         if entries:
             kept.append(
                 ngettext(

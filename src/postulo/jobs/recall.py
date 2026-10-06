@@ -41,11 +41,29 @@ def _by_use(queryset, field: str) -> list[str]:
     return [row[field] for row in rows]
 
 
-def companies(user, *, including_career: bool = False) -> list[str]:
+def _everyone(used: list[str], pool) -> list[str]:
+    """The names with postings, then every other company of the pool by name."""
+    known = set(used)
+    return used + [
+        name
+        for name in pool.order_by("name").values_list("name", flat=True)
+        if name and name not in known
+    ]
+
+
+def _after(first: list[str], rest: list[str], limit: int) -> list[str]:
+    """``first``, then the others in their own order, each name once, at most ``limit``."""
+    seen = set(first)
+    return (first + [name for name in rest if name not in seen])[:limit]
+
+
+def companies(user, *, including_career: bool = False, role: str = "") -> list[str]:
     """Every employer this person has recorded, commonest first.
 
     Without the companies only the career added (#683): a new application is not made
-    to a former employer. The career form asks for them too.
+    to a former employer. The career form asks for them too. With a ``role`` (`jobs.roles`),
+    the companies that play it come first, by name, and every other company follows below
+    them: the role puts likely names first and leaves none out (#686).
     """
     from .models import Company, JobPosting
 
@@ -56,6 +74,15 @@ def companies(user, *, including_career: bool = False) -> list[str]:
         .order_by("-uses", "company__name")[:AT_MOST]
     )
     names = [row["company__name"] for row in counted if row["company__name"]]
+    if role:
+        # Reordered after the cut is made, so the set offered is the same with or without a
+        # role; only its order changes. A company past the cut is reached by typing it.
+        pool = Company.objects.for_user(user)
+        if not including_career:
+            pool = pool.offered()
+        first = list(pool.qualifying(role).order_by("name").values_list("name", flat=True))
+        names = _after(first, _everyone(names, pool), AT_MOST)
+        return names
     if len(names) < AT_MOST:
         # A company recorded with no posting against it yet is still one to offer: it is
         # there because somebody typed it, which is the whole signal this is built on.

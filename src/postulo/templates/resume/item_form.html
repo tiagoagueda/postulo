@@ -75,6 +75,14 @@
       </p>
     {% endif %}
 
+    {% if unclassified_company %}
+      {% comment %} A certification's issuer with no NACE code among its industries (#686): said, and never a reason to refuse the entry. {% endcomment %}
+      <p class="mt-2 text-sm text-ink-500 dark:text-ink-400" data-unclassified-issuer>
+        {% translate "This company has none of its industries from the NACE list yet." %}
+        <a class="underline" href="{{ unclassified_company.get_absolute_url }}">{% translate "Open the company" %}</a>
+      </p>
+    {% endif %}
+
     {% if esco_name %}
       {% comment %} A skill whose name is one of the ESCO classification's says which, and
          what follows from it, so that a CV in another language printing the classification's

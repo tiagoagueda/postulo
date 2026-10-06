@@ -1,6 +1,6 @@
-"""The company an experience names as its organisation (#683).
+"""The company an experience names as its organisation (#683) and a certification as its issuer.
 
-The entry keeps its own text and links to a company of the person's beside it. Three
+(#686.) The entry keeps its own text and links to a company of the person's beside it. Three
 doors reach the link, and they differ on one point: the career form may add the company,
 a file never does. A stranger's file must not fill the list.
 """

@@ -958,3 +958,50 @@ def test_a_language_is_written_with_its_code_and_an_older_archive_has_its_names_
 
     restored = {row.name: row.code for row in LanguageSkill.objects.for_user(other_user)}
     assert restored == {"Francês": "fr", "Norwegian": ""}
+
+
+def test_a_certifications_company_survives_the_round_trip(user, other_user):
+    from postulo.resume.models import Certification
+
+    cncf = Company.objects.create(owner=user, name="CNCF")
+    Certification.objects.create(owner=user, name="CKA", issuer="Cloud Native", company=cncf)
+    Certification.objects.create(owner=user, name="Unlinked", issuer="A trainer")
+    archive, document = read_archive(user)
+    assert {row["name"]: row["company"] for row in document["resume"]["certifications"]} == {
+        "CKA": "CNCF",
+        "Unlinked": "",
+    }
+
+    importer.load(other_user, archive)
+
+    links = {c.name: c.company for c in Certification.objects.for_user(other_user)}
+    assert links["CKA"].name == "CNCF" and links["CKA"].owner == other_user
+    assert links["Unlinked"] is None
+
+
+def test_an_older_archive_restores_every_certification_unlinked(user, other_user):
+    from postulo.resume.models import Certification
+
+    Company.objects.create(owner=user, name="CNCF")
+    Certification.objects.create(owner=user, name="CKA", issuer="CNCF")
+    _archive, document = read_archive(user)
+    document["postulo"]["format"] = 50
+    for entry in document["resume"]["certifications"]:
+        del entry["company"]
+
+    _restored(document, other_user)
+
+    assert Certification.objects.for_user(other_user).get().company is None
+
+
+def test_a_certification_company_the_archive_does_not_hold_adds_nothing(user, other_user):
+    from postulo.resume.models import Certification
+
+    Certification.objects.create(owner=user, name="CKA", issuer="CNCF")
+    _archive, document = read_archive(user)
+    document["resume"]["certifications"][0]["company"] = "Somebody Else's"
+
+    _restored(document, other_user)
+
+    assert Certification.objects.for_user(other_user).get().company is None
+    assert not Company.objects.for_user(other_user).exists()

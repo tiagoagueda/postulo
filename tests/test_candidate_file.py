@@ -387,6 +387,7 @@ def fingerprint() -> str:
 #: publications, read back through the form a person types one into (#687).
 #: 12 added the code of a spoken language (#689).
 #: 13 added the company an education entry links to, read back as a hint (#685).
+#: 14 added the company a certification's issuer links to, read back the same way (#686).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -401,6 +402,7 @@ SHAPES = {
     11: "671549ba3d4d429b",
     12: "2480619d6cf51e42",
     13: "e607ca58ae13bade",
+    14: "TODO",
 }
 
 
@@ -2057,3 +2059,25 @@ def test_the_file_writes_an_education_entrys_company_by_name(user):
     entry = export.build_candidate_document(user)["resume"]["education"][0]
     assert entry["company"] == "Aveiro"
     assert entry["institution"] == "Universidade de Aveiro"
+
+
+def test_a_certifications_company_is_offered_as_a_link_only_where_the_account_has_it(
+    user, other_user
+):
+    cert = {"id": 1, "name": "CKA", "issuer": "CNCF", "company": "CNCF"}
+    data = a_file(resume={"certifications": [cert]})
+    Company.objects.create(owner=other_user, name="CNCF")
+    assert [row.company for row in drawn(user, data).rows()] == [None]
+    mine = Company.objects.create(owner=user, name="CNCF")
+    assert [row.company for row in drawn(user, data).rows()] == [mine]
+    add(user, data)
+    assert Certification.objects.get(owner=user).company == mine
+    assert Company.objects.filter(owner=user).count() == 1
+
+
+def test_the_file_writes_a_certifications_company_by_name(user):
+    company = Company.objects.create(owner=user, name="CNCF")
+    Certification.objects.create(owner=user, name="CKA", issuer="Cloud Native", company=company)
+    entry = export.build_candidate_document(user)["resume"]["certifications"][0]
+    assert entry["company"] == "CNCF"
+    assert entry["issuer"] == "Cloud Native"

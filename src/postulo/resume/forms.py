@@ -286,12 +286,49 @@ class CertificationForm(ResumeItemForm):
     class Meta:
         model = Certification
         fields = ("name", "issuer", "issued_on", "expires_on", "credential_url", "order")
-        widgets = {"issued_on": DATE_WIDGET, "expires_on": DATE_WIDGET}
+        widgets = {
+            "issuer": forms.TextInput(attrs={"list": "issuer-suggestions"}),
+            "issued_on": DATE_WIDGET,
+            "expires_on": DATE_WIDGET,
+        }
         help_texts = {
-            "issuer": _("Who awarded it."),
+            "issuer": _(
+                "Who awarded it, as a CV should print it. It is linked to the company of that "
+                "name among yours, and added to your companies if there is none."
+            ),
             "expires_on": _("Leave it empty if it does not expire."),
             "credential_url": _("Where somebody can check it. A CV prints it as a link."),
         }
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's companies, awarding bodies first and every other one below (#686)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall, roles
+
+        return {
+            "issuer-suggestions": recall.companies(
+                self.user, including_career=True, role=roles.AWARDING_BODY
+            )
+        }
+
+    def save(self, commit=True):
+        """Link the issuer to a company of the person's own, adding one if need be.
+
+        An entry with no issuer is linked to nothing, and no industry is ever assigned to a
+        company added here: a school can be classified from the form it was typed into, a
+        vendor or a professional body cannot (#686).
+        """
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        entry.company = companies.find_or_add(owner, entry.issuer) if owner else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 #: What the language menu says for a language that is not in it: the name is typed.

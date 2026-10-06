@@ -249,6 +249,24 @@
         </div>
       {% endif %}
 
+      {% if certifications %}
+        <c-section-title class="mt-8">{% translate "Certifications it issued" %}</c-section-title>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for entry in certifications %}
+              <li class="px-4 py-3">
+                <a href="{% url 'resume:item_update' 'certification' entry.pk %}" class="inline-block py-1 font-medium hover:underline">
+                  <bdi>{{ entry.name }}</bdi>
+                </a>
+                {% if entry.issued_on %}
+                  <p class="text-sm text-ink-500 dark:text-ink-400">{{ entry.issued_on|date:"YEAR_MONTH_FORMAT" }}</p>
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+
       {% if children %}
         <c-section-title class="mt-8">{% translate "Part of this company" %}</c-section-title>
         <div class="card p-0">

@@ -309,6 +309,8 @@ KINDS: tuple[Kind, ...] = (
         names=("name", "issuer"),
         dates=("issued_on", "expires_on"),
         sub="issuer",
+        # The company the issuer links to, by name, read back as an experience's is (#686).
+        hints=("company",),
     ),
     Kind(
         block="languages",
@@ -1392,7 +1394,7 @@ class _Planner:
             row.notes.append(
                 _("You have one like it with other dates. Both will be in your record.")
             )
-        if kind.block in ("experience", "education") and row.outcome == ADD:
+        if kind.block in export.LINKED_TO_A_COMPANY and row.outcome == ADD:
             self._link(row, entry.get("company"))
         return row
 
@@ -1659,7 +1661,7 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
     for row in sorted(rows, key=lambda row: (row.order is None, row.order or 0, row.position)):
         item = row.instance
         item.owner = user
-        if kind.block in ("experience", "education"):
+        if kind.block in export.LINKED_TO_A_COMPANY:
             item.company = row.company
         if kind.block == "publications":
             item.cite_key = item.free_cite_key(taken)

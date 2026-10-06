@@ -310,6 +310,21 @@ def say_school_added(request, form) -> None:
         )
 
 
+def say_what_is_unclassified(request: HttpRequest, form) -> None:
+    """For a certification whose issuer has no industry from the NACE list, one line.
+
+    A notice after the save and never a reason to refuse it (#686): a company is added with
+    no industry on purpose, and it is classified on its own page.
+    """
+    company = getattr(form.instance, "company", None)
+    if isinstance(form.instance, Certification) and company and not company.has_nace_industry:
+        messages.info(
+            request,
+            _("%(name)s has none of its industries from the NACE list yet.")
+            % {"name": company.name},
+        )
+
+
 class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, CreateView):
     def get_queryset(self):
         return self.section.model.objects.for_user(self.request.user)
@@ -327,6 +342,7 @@ class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, C
         say_what_is_missing(self.request, form)
         response = super().form_valid(form)
         say_school_added(self.request, form)
+        say_what_is_unclassified(self.request, form)
         # Placed by its date, or last, unless the person typed a number themselves (#203).
         if "order" not in form.fields:
             ordering.place_new(self.object)
@@ -352,6 +368,10 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
             and company is not None
             and not companies.is_school(company)
         )
+        # A certification's issuer that has no NACE industry yet is said so, with a link (#686).
+        company = getattr(self.object, "company", None)
+        if isinstance(self.object, Certification) and company and not company.has_nace_industry:
+            context["unclassified_company"] = company
         return context
 
     def form_valid(self, form):
@@ -359,6 +379,7 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         say_what_is_missing(self.request, form)
         response = super().form_valid(form)
         say_school_added(self.request, form)
+        say_what_is_unclassified(self.request, form)
         return response
 
 

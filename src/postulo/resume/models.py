@@ -264,8 +264,26 @@ class Project(ResumeItem):
 
 
 class Certification(ResumeItem):
+    """A credential somebody awarded.
+
+    ``issuer`` is the awarding body's own wording, as text of its own, and is what a CV
+    prints and nothing translates. ``company`` links it to a
+    :class:`~postulo.jobs.models.Company` of the person's, found by that name when the entry
+    is saved (#686), exactly as an experience's organisation is (#683). Optional: an entry
+    with no issuer, or a trainer for one, is text. Deleting the company keeps the entry.
+    """
+
     name = models.CharField(_("name"), max_length=200)
     issuer = models.CharField(_("issued by"), max_length=200, blank=True)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="certifications",
+        verbose_name=_("company"),
+    )
     issued_on = models.DateField(_("issued on"), null=True, blank=True)
     expires_on = models.DateField(_("expires on"), null=True, blank=True)
     credential_url = models.URLField(_("credential link"), blank=True)

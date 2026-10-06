@@ -267,3 +267,28 @@ def test_another_accounts_company_is_neither_offered_nor_linked_by_an_education_
     assert theirs.industries.count() == 1
     page = client.get(reverse("resume:item_update", args=["education", entry.pk]))
     assert "Secret" not in page.content.decode()
+
+
+def test_another_accounts_company_is_neither_offered_nor_linked_as_an_issuer(
+    client, user, other_user
+):
+    """The certification form suggests and links only the person's own companies (#686)."""
+    from postulo.jobs.models import Company
+    from postulo.resume.forms import CertificationForm
+    from postulo.resume.models import Certification
+
+    theirs = Company.objects.create(owner=other_user, name="Umbrella Academy", notes="Secret")
+    assert "Umbrella Academy" not in CertificationForm(user=user).datalists["issuer-suggestions"]
+
+    client.force_login(user)
+    response = client.post(
+        reverse("resume:item_create", args=["certification"]),
+        {"name": "CKA", "issuer": "Umbrella Academy"},
+    )
+    assert response.status_code == 302
+    entry = Certification.objects.get(owner=user)
+    assert entry.company is not None and entry.company != theirs
+    assert entry.company.owner == user
+    assert not theirs.certifications.exists()
+    page = client.get(reverse("resume:item_update", args=["certification", entry.pk]))
+    assert "Secret" not in page.content.decode()
