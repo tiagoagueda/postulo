@@ -328,6 +328,8 @@ KINDS: tuple[Kind, ...] = (
         dates=("awarded_on",),
         label="title",
         sub="awarded_by",
+        # The company the giver links to, by name, read back as an issuer's is (#693).
+        hints=("company",),
     ),
     Kind(
         block="memberships",
@@ -341,6 +343,7 @@ KINDS: tuple[Kind, ...] = (
         label="organisation",
         sub="role",
         ongoing=True,
+        hints=("company",),
     ),
     Kind(
         block="driving_licences",

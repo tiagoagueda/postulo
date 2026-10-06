@@ -161,7 +161,10 @@ logger = logging.getLogger(__name__)
 #: 57 added ``memberships`` in the career: an organisation, the person's role in it, a start and
 #: an end (an empty end with a start means still), a summary and a link. An archive without
 #: them restores none (#693).
-FORMAT_VERSION = 57
+#: 58 added ``company`` on an honour and on a membership: the name of the company the giver or
+#: the organisation is linked to, or blank; read back as on a certification -- by name, in a
+#: pass once the companies exist, and never adding one (#693).
+FORMAT_VERSION = 58
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -217,7 +220,10 @@ FORMAT_VERSION = 57
 #: honour being the same title, giver and date (#693).
 #: 17 added ``memberships``, the same membership being the same organisation, role and dates
 #: (#693).
-CANDIDATE_FORMAT = 17
+#: 18 added ``company`` on an honour and on a membership, read back the same way: a hint,
+#: offered as the link where it is exactly the name of one of the importing account's
+#: companies, and never the reason to add one (#693).
+CANDIDATE_FORMAT = 18
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -592,10 +598,22 @@ RESUME_FIELDS = {
         "credential_url",
         "order",
     ),
-    "honours": ("id", "title", "awarded_by", "awarded_on", "summary", "url", "order"),
+    "honours": (
+        "id",
+        "title",
+        "awarded_by",
+        # The name of the company the giver links to, or blank (#693): read back by name as an
+        # experience's is, and never the reason to add one.
+        "company",
+        "awarded_on",
+        "summary",
+        "url",
+        "order",
+    ),
     "memberships": (
         "id",
         "organisation",
+        "company",
         "role",
         "start_date",
         "end_date",
@@ -736,7 +754,7 @@ def _identifier_rows(profile) -> list[dict]:
 
 
 #: The career entries that name a company, by the block that holds them (#683, #685, #686).
-LINKED_TO_A_COMPANY = ("experience", "education", "certifications")
+LINKED_TO_A_COMPANY = ("experience", "education", "certifications", "honours", "memberships")
 
 
 def _career_fields(item, names: tuple[str, ...]) -> dict:

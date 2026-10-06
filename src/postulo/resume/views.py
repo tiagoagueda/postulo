@@ -51,6 +51,11 @@ from .registry import OVERVIEW_ORDER, SECTIONS
 logger = logging.getLogger(__name__)
 
 
+#: The entries whose company is the body that gave them: a notice follows one with no industry
+#: from the NACE list, and never refuses the entry (#686, #693).
+LINKED_BY_GIVER = (Certification, Honour, Membership)
+
+
 def get_section(slug: str):
     """Look up a section, or 404. Guards the URL against arbitrary model names."""
     try:
@@ -323,7 +328,7 @@ def say_what_is_unclassified(request: HttpRequest, form) -> None:
     no industry on purpose, and it is classified on its own page.
     """
     company = getattr(form.instance, "company", None)
-    if isinstance(form.instance, Certification) and company and not company.has_nace_industry:
+    if isinstance(form.instance, LINKED_BY_GIVER) and company and not company.has_nace_industry:
         messages.info(
             request,
             _("%(name)s has none of its industries from the NACE list yet.")
@@ -376,7 +381,7 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
         )
         # A certification's issuer that has no NACE industry yet is said so, with a link (#686).
         company = getattr(self.object, "company", None)
-        if isinstance(self.object, Certification) and company and not company.has_nace_industry:
+        if isinstance(self.object, LINKED_BY_GIVER) and company and not company.has_nace_industry:
             context["unclassified_company"] = company
         return context
 

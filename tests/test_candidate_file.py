@@ -392,6 +392,7 @@ def fingerprint() -> str:
 #: 15 added driving licences (#691).
 #: 16 added honours and awards (#693).
 #: 17 added memberships (#693).
+#: 18 added the company an honour's giver and a membership's body link to (#693).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -410,6 +411,7 @@ SHAPES = {
     15: "c0ae9b17fd1a35b6",
     16: "7a83373d72663f9d",
     17: "303042e30f770027",
+    18: "e7b3b17bffbf5c75",
 }
 
 

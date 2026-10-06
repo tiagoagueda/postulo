@@ -17,7 +17,9 @@ and no class is needed. A research institute (72.10, 72.20) a person names as th
 doctorate is not in 85 and is left out on purpose: the role's set is data, and one more
 division here adds it. A vendor that certifies its own users is classified by what it sells,
 so the awarding body's set only puts the likely issuers first and turns nothing away. The
-next role is a membership organisation (94); each adds a row to `ROLES` and nothing else. An
+membership organisation (94, #693) is the fourth, and an honour's giver is offered as an
+awarding body: universities, foundations, firms and governments all award things, so the role
+orders the list and restricts nothing. Each adds a row to `ROLES` and nothing else. An
 *employer* is not a role: any company may be one.
 
 **A kind can qualify on its own.** The public employment service (`CompanyKind`) is the
@@ -53,6 +55,7 @@ class Role:
 INTERMEDIARY = "intermediary"
 PLACE_OF_LEARNING = "place_of_learning"
 AWARDING_BODY = "awarding_body"
+MEMBERSHIP_ORGANISATION = "membership_organisation"
 
 ROLES: dict[str, Role] = {
     INTERMEDIARY: Role(
@@ -70,6 +73,14 @@ ROLES: dict[str, Role] = {
         key=AWARDING_BODY,
         label=_("Awarding bodies"),
         divisions=frozenset({"85", "94"}),
+    ),
+    # NACE division 94, *Activities of membership organisations*, offered first for a
+    # membership and never required: an association named for a sport or a trade may sit in
+    # another division (#693).
+    MEMBERSHIP_ORGANISATION: Role(
+        key=MEMBERSHIP_ORGANISATION,
+        label=_("Membership organisations"),
+        divisions=frozenset({"94"}),
     ),
 }
 

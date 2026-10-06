@@ -478,3 +478,231 @@ def test_the_certification_migration_links_exact_names_only(user, other_user):
     assert exact.company == mine
     assert near.company is None and theirs.company is None and blank.company is None
     assert Company.objects.count() == 2
+
+
+# ------------------------------------------- honours and memberships (#693)
+
+
+def save_honour(user, awarded_by: str, **extra):
+    from postulo.resume.forms import HonourForm
+
+    form = HonourForm({"title": "Best paper", "awarded_by": awarded_by, **extra}, user=user)
+    assert form.is_valid(), form.errors
+    form.instance.owner = user
+    return form.save()
+
+
+def save_membership(user, organisation: str, **extra):
+    from postulo.resume.forms import MembershipForm
+
+    form = MembershipForm({"organisation": organisation, **extra}, user=user)
+    assert form.is_valid(), form.errors
+    form.instance.owner = user
+    return form.save()
+
+
+def test_an_honours_giver_and_a_memberships_body_are_linked_by_name_in_any_case(user):
+    society = Company.objects.create(owner=user, name="Chess Society")
+
+    assert save_honour(user, "chess society").company == society
+    assert save_membership(user, "CHESS SOCIETY").company == society
+
+
+def test_a_company_the_form_adds_is_marked_and_given_no_industry(user):
+    for entry in (save_honour(user, "Quokka Prize Trust"), save_membership(user, "Quokka Club")):
+        assert entry.company.from_career is True
+        assert not entry.company.industries.exists()
+
+
+def test_another_accounts_company_is_never_linked_by_either(user, other_user):
+    theirs = Company.objects.create(owner=other_user, name="Initech")
+
+    honour = save_honour(user, "Initech")
+    member = save_membership(user, "Initech")
+
+    assert honour.company != theirs and honour.company.owner == user
+    assert member.company == honour.company
+    assert not theirs.honours.exists() and not theirs.memberships.exists()
+
+
+def test_an_entry_with_no_giver_or_body_is_linked_to_nothing(user):
+    assert save_honour(user, "").company is None
+    assert not Company.objects.filter(owner=user).exists()
+
+
+def test_the_forms_offer_the_matching_companies_first_and_hide_nothing(user):
+    from postulo.jobs.models import Industry
+    from postulo.resume.forms import HonourForm, MembershipForm
+
+    club = Company.objects.create(owner=user, name="Zed Club")
+    Company.objects.create(owner=user, name="Aardvark Ltd")
+    club.industries.add(*Industry.named(user, [industries.name_for("94", "en")]))
+
+    offered = MembershipForm(user=user).datalists["membership-suggestions"]
+    assert offered[0] == "Zed Club" and "Aardvark Ltd" in offered
+    assert "awarding-body-suggestions" in HonourForm(user=user).datalists
+
+
+def test_the_roles_have_a_membership_organisation_in_division_94():
+    assert roles.role(roles.MEMBERSHIP_ORGANISATION).divisions == frozenset({"94"})
+
+
+def test_the_forms_say_where_the_link_goes(user):
+    from postulo.resume.forms import HonourForm, MembershipForm
+
+    for form in (HonourForm(user=user), MembershipForm(user=user)):
+        help_text = str(
+            form.fields["awarded_by" if "awarded_by" in form.fields else "organisation"].help_text
+        )
+        assert "linked to the company of that name" in help_text
+
+
+def test_the_company_page_lists_what_it_gave_and_what_it_holds(client, user):
+    honour = save_honour(user, "Chess Society", title="Club champion")
+    save_membership(user, "Chess Society", role="Treasurer", start_date="2015-01-01")
+    client.force_login(user)
+
+    page = client.get(honour.company.get_absolute_url()).content.decode()
+
+    assert "Honours it gave" in page and "Club champion" in page
+    assert "Your membership here" in page and "Treasurer, Chess Society" in page
+
+
+def test_deleting_the_company_keeps_both_entries_and_the_dialog_counts_them(client, user):
+    honour = save_honour(user, "Chess Society")
+    member = save_membership(user, "Chess Society")
+    client.force_login(user)
+
+    page = client.get(reverse("jobs:company_delete", args=[honour.company.pk]))
+    assert "2 career entries keep their text and lose the link" in page.content.decode()
+    client.post(reverse("jobs:company_delete", args=[honour.company.pk]))
+
+    honour.refresh_from_db()
+    member.refresh_from_db()
+    assert honour.company is None and honour.awarded_by == "Chess Society"
+    assert member.company is None and member.organisation == "Chess Society"
+
+
+def test_a_merge_moves_the_honours_and_the_memberships_and_says_so(client, user):
+    kept = Company.objects.create(owner=user, name="Chess Society")
+    honour = save_honour(user, "The Chess Society of Lisbon")
+    member = save_membership(user, "The Chess Society of Lisbon")
+    other = honour.company
+    plan = merging.plan_companies(kept, other)
+    labels = {line.label for line in plan.moves}
+    assert {"Honours and awards", "Memberships"} <= labels
+    client.force_login(user)
+    page = client.get(reverse("jobs:company_merge", args=[kept.pk]), {"with": other.pk})
+    assert "Honours and awards" in page.content.decode()
+
+    merging.merge_companies(kept, other)
+
+    honour.refresh_from_db()
+    member.refresh_from_db()
+    assert honour.company == kept and member.company == kept
+    assert honour.awarded_by == "The Chess Society of Lisbon"
+    assert member.organisation == "The Chess Society of Lisbon"
+
+
+def test_the_notice_about_a_company_with_no_industry_follows_the_save_and_never_blocks(
+    client, user
+):
+    client.force_login(user)
+    sent = client.post(
+        reverse("resume:item_create", args=["membership"]),
+        {"organisation": "Quokka Club"},
+        follow=True,
+    )
+
+    assert Company.objects.get(owner=user, name="Quokka Club").from_career is True
+    assert "none of its industries from the NACE list yet" in sent.content.decode()
+
+
+def test_a_file_never_creates_a_company_for_either(user):
+    import json
+
+    from postulo.core import export
+    from postulo.resume import candidate
+    from postulo.resume.models import Honour, Membership
+
+    data = json.dumps(
+        {
+            "postulo": {"candidate_format": export.CANDIDATE_FORMAT, "version": "0.5.0"},
+            "resume": {
+                "honours": [{"id": 1, "title": "Prize", "company": "Nowhere Ltd"}],
+                "memberships": [{"id": 1, "organisation": "Club", "company": "Nowhere Ltd"}],
+            },
+        }
+    ).encode()
+
+    candidate.apply(user, candidate.read(data))
+
+    assert Honour.objects.for_user(user).get().company is None
+    assert Membership.objects.for_user(user).get().company is None
+    assert not Company.objects.filter(owner=user).exists()
+
+
+def test_a_file_links_to_a_company_the_account_already_has(user, other_user):
+    import json
+
+    from postulo.core import export
+    from postulo.resume import candidate
+    from postulo.resume.models import Honour, Membership
+
+    Company.objects.create(owner=other_user, name="Chess Society")
+    mine = Company.objects.create(owner=user, name="Chess Society")
+    data = json.dumps(
+        {
+            "postulo": {"candidate_format": export.CANDIDATE_FORMAT, "version": "0.5.0"},
+            "resume": {
+                "honours": [{"id": 1, "title": "Prize", "company": "chess society"}],
+                "memberships": [{"id": 1, "organisation": "Club", "company": "Chess Society"}],
+            },
+        }
+    ).encode()
+
+    candidate.apply(user, candidate.read(data))
+
+    assert Honour.objects.for_user(user).get().company == mine
+    assert Membership.objects.for_user(user).get().company == mine
+    assert Company.objects.filter(owner=user).count() == 1
+
+
+def test_the_archive_writes_the_company_by_name_and_an_older_one_restores_unlinked(
+    user, other_user
+):
+    import io
+    import json
+    import zipfile
+
+    from postulo.core import export, importer
+    from postulo.resume.models import Honour, Membership
+
+    save_honour(user, "Chess Society")
+    save_membership(user, "Chess Society")
+    document = export.build_document(user)
+    assert document["resume"]["honours"][0]["company"] == "Chess Society"
+    assert document["resume"]["memberships"][0]["company"] == "Chess Society"
+
+    def restore(into, doc):
+        buffer = io.BytesIO()
+        with zipfile.ZipFile(buffer, "w") as written:
+            written.writestr(export.MANIFEST_NAME, json.dumps(doc))
+        buffer.seek(0)
+        importer.load(into, zipfile.ZipFile(buffer))
+
+    restore(other_user, document)
+    assert Honour.objects.for_user(other_user).get().company.owner == other_user
+    assert Membership.objects.for_user(other_user).get().company.name == "Chess Society"
+
+    older = json.loads(json.dumps(document))
+    older["postulo"]["format"] = 57
+    for block in ("honours", "memberships"):
+        for entry in older["resume"][block]:
+            del entry["company"]
+    Company.objects.for_user(other_user).delete()
+    Honour.objects.for_user(other_user).delete()
+    Membership.objects.for_user(other_user).delete()
+    restore(other_user, older)
+    assert Honour.objects.for_user(other_user).get().company is None
+    assert Membership.objects.for_user(other_user).get().company is None

@@ -511,6 +511,7 @@ class HonourForm(ResumeItemForm):
         model = Honour
         fields = ("title", "awarded_by", "awarded_on", "summary", "url", "order")
         widgets = {
+            "awarded_by": forms.TextInput(attrs={"list": "awarding-body-suggestions"}),
             "awarded_on": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
         }
@@ -520,11 +521,43 @@ class HonourForm(ResumeItemForm):
                 "no expiry. A credential that may lapse is a certification, and a degree’s "
                 "classification, such as “cum laude”, is that education entry’s grade."
             ),
-            "awarded_by": _("Who gave it, as a CV should print it."),
+            "awarded_by": _(
+                "Who gave it, as a CV should print it. It is linked to the company of that name "
+                "among yours, and added to your companies if there is none."
+            ),
             "awarded_on": _("Only the year prints on a CV, so the day makes no difference."),
             "summary": ENTRY_HELP["summary"],
             "url": _("Where it can be read about. A CV does not print it."),
         }
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's companies, awarding bodies first and every other one below (#693)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall, roles
+
+        return {
+            "awarding-body-suggestions": recall.companies(
+                self.user, including_career=True, role=roles.AWARDING_BODY
+            )
+        }
+
+    def save(self, commit=True):
+        """Link the giver to a company of the person's own, adding one if need be.
+
+        No industry is ever assigned to a company added here: who gave a prize is not a
+        statement about what the giver does (#693, as #686's issuers).
+        """
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        entry.company = companies.find_or_add(owner, entry.awarded_by) if owner else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 class MembershipForm(ResumeItemForm):
@@ -536,15 +569,17 @@ class MembershipForm(ResumeItemForm):
         model = Membership
         fields = ("organisation", "role", "start_date", "end_date", "summary", "url", "order")
         widgets = {
+            "organisation": forms.TextInput(attrs={"list": "membership-suggestions"}),
             "start_date": DATE_WIDGET,
             "end_date": DATE_WIDGET,
             "summary": forms.Textarea(attrs={"rows": 3}),
         }
         help_texts = {
             "organisation": _(
-                "The association, society or club, as a CV should print it. A membership of a "
-                "union, a party or a congregation says something about you, and is yours to "
-                "leave off any CV; nothing here asks for one."
+                "The association, society or club, as a CV should print it. It is linked to "
+                "the company of that name among yours, and added to your companies if there "
+                "is none. A membership of a union, a party or a congregation says something "
+                "about you, and is yours to leave off any CV; nothing here asks for one."
             ),
             "role": _("What you are or were in it, if anything: “member”, “treasurer”."),
             "start_date": _("A CV prints only the year, so the day makes no difference."),
@@ -552,6 +587,31 @@ class MembershipForm(ResumeItemForm):
             "summary": ENTRY_HELP["summary"],
             "url": _("Where it can be read about. A CV does not print it."),
         }
+
+    @property
+    def datalists(self) -> dict[str, list[str]]:
+        """The person's companies, membership organisations first and every other below (#693)."""
+        if self.user is None:
+            return {}
+        from postulo.jobs import recall, roles
+
+        return {
+            "membership-suggestions": recall.companies(
+                self.user, including_career=True, role=roles.MEMBERSHIP_ORGANISATION
+            )
+        }
+
+    def save(self, commit=True):
+        """Link the organisation to a company of the person's own, adding one if need be."""
+        from . import companies
+
+        entry = super().save(commit=False)
+        owner = entry.owner if entry.owner_id else self.user
+        entry.company = companies.find_or_add(owner, entry.organisation) if owner else None
+        if commit:
+            entry.save()
+            self.save_m2m()
+        return entry
 
 
 class LinkForm(ResumeItemForm):

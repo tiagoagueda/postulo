@@ -306,11 +306,23 @@ class Honour(ResumeItem):
     classification, which is the education entry's grade. An honour has nothing to check and
     no expiry. ``awarded_by`` is the giver's own wording, as text of its own, and is what a CV
     prints; ``awarded_on`` is a date of which a CV prints the year. Only ``summary`` is
-    translated: a prize's name and the body that gave it are theirs.
+    translated: a prize's name and the body that gave it are theirs. ``company`` links the
+    giver to a :class:`~postulo.jobs.models.Company` of the person's, found by that name when
+    the entry is saved, as a certification's issuer is; the text stays the CV's wording, and
+    deleting the company keeps the entry.
     """
 
     title = models.CharField(_("title"), max_length=200)
     awarded_by = models.CharField(_("awarded by"), max_length=200, blank=True)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="honours",
+        verbose_name=_("company"),
+    )
     awarded_on = models.DateField(_("awarded on"), null=True, blank=True)
     summary = models.TextField(_("summary"), blank=True)
     url = models.URLField(_("link"), blank=True)
@@ -336,9 +348,20 @@ class Membership(ResumeItem):
     are. An empty end with a start means *still*. A membership can say something about the
     person that is theirs to leave off any CV (a union, a party, a congregation), so nothing
     here asks for one, and the entry is printed only on a CV the person put it on.
+    ``company`` links the organisation to a :class:`~postulo.jobs.models.Company` of the
+    person's, found by that name when the entry is saved; the text stays the CV's wording.
     """
 
     organisation = models.CharField(_("organisation"), max_length=200)
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        editable=False,
+        related_name="memberships",
+        verbose_name=_("company"),
+    )
     role = models.CharField(_("your role"), max_length=200, blank=True)
     start_date = models.DateField(_("from"), null=True, blank=True)
     end_date = models.DateField(_("until"), null=True, blank=True)

@@ -920,3 +920,22 @@ def test_the_figures_follow_a_merge(user, acme, limited):
     merging.merge_companies(acme, limited)
 
     assert [row.name for row in analytics.insights_for(user).by_agency] == ["Acme"]
+
+
+def test_a_merge_moves_the_links_of_honours_and_memberships(user):
+    from postulo.resume.models import Honour, Membership
+
+    kept = Company.objects.create(owner=user, name="Chess Society")
+    other = Company.objects.create(owner=user, name="The Chess Society of Lisbon")
+    honour = Honour.objects.create(owner=user, title="Prize", awarded_by=other.name, company=other)
+    member = Membership.objects.create(owner=user, organisation=other.name, company=other)
+
+    plan = merging.plan_companies(kept, other)
+    assert {"Honours and awards", "Memberships"} <= {line.label for line in plan.moves}
+
+    merging.merge_companies(kept, other)
+
+    honour.refresh_from_db()
+    member.refresh_from_db()
+    assert (honour.company, member.company) == (kept, kept)
+    assert (honour.awarded_by, member.organisation) == (other.name, other.name)

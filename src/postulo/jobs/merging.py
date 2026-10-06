@@ -366,6 +366,8 @@ def plan_companies(kept, other) -> Plan:
             _("Education entries"), other.education_entries.all(), lambda row: row.qualification
         ),
         _moved(_("Certifications"), other.certifications.all(), str),
+        _moved(_("Honours and awards"), other.honours.all(), str),
+        _moved(_("Memberships"), other.memberships.all(), str),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -490,6 +492,8 @@ def merge_companies(kept, other) -> Plan:
     other.career_entries.update(company=kept)
     other.education_entries.update(company=kept)
     other.certifications.update(company=kept)  # and the certifications it issued (#686)
+    other.honours.update(company=kept)  # and the honours it gave, the bodies it holds (#693)
+    other.memberships.update(company=kept)
     # The mark survives only where both had it, and not once there is work attached.
     kept.from_career = kept.from_career and other.from_career
     if kept.from_career and (

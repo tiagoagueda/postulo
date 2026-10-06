@@ -402,6 +402,7 @@ def test_the_form_says_a_union_or_a_party_is_yours_to_leave_off(client, user):
         "created_at",
         "updated_at",
         "order",
+        "company",
         "organisation",
         "role",
         "start_date",
