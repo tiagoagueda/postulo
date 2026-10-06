@@ -354,6 +354,17 @@ class CV(DeclaresALanguage, OwnedModel):
         ),
     )
 
+    #: Off (#696): the one sentence Europass advises where no referee is named, printed once at
+    #: the end, with or without references listed above it, and naming nobody.
+    references_on_request = models.BooleanField(
+        _("say that references are available on request"),
+        default=False,
+        help_text=_(
+            "A line at the end, which names nobody. A reference from your career is printed "
+            "only once the person has agreed, whatever this says."
+        ),
+    )
+
     class Meta:
         verbose_name = _("CV")
         verbose_name_plural = _("CVs")
@@ -440,6 +451,8 @@ def with_entries(items):
     querysets = [
         model.objects.prefetch_related("skills")
         if model._meta.model_name == "skillgroup"
+        else model.objects.select_related("contact__company")
+        if model._meta.model_name == "reference"
         else model.objects.all()
         for model in apps.get_app_config("resume").get_models()
         if issubclass(model, ResumeItem)

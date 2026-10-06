@@ -139,6 +139,16 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'reference' %}
+          {% comment %} Only the ones who have agreed, as a value with no contact behind it:
+             name, role and organisation, relationship, and the email address and number only
+             where the entry says so. The same line the text and Word files carry (#696). {% endcomment %}
+          <ul class="references">
+            {% for entry in section.items %}
+              <li><bdi>{{ entry.item.line }}</bdi></li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'drivinglicence' %}
           {% comment %} One line an entry, the same words the text and Word files carry
              (`DrivingLicence.cv_line`): the codes, the country if filled, never a date (#691). {% endcomment %}
@@ -219,5 +229,9 @@
         {% endif %}
       </section>
     {% endfor %}
+    {% if cv.references_on_request %}
+      {% comment %} The sentence, once, after every section; it names nobody (#696). {% endcomment %}
+      <p class="references-on-request">{% translate "References are available on request." %}</p>
+    {% endif %}
   </body>
 </html>

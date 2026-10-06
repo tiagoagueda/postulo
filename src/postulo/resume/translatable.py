@@ -49,6 +49,7 @@ TRANSLATES_NOTHING: dict[str, str] = {
     "certification": "both texts are the awarding body's wording",
     "publication": "a paper's title is the paper",
     "drivinglicence": "a code is a code, and a country is a country",
+    "reference": "the candidate file has no block for it, so a row would point at nothing (#696)",
 }
 
 #: How long a stored field name may be. Longer than any name above, and bounded because it

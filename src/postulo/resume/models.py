@@ -701,6 +701,115 @@ class DrivingLicence(ResumeItem):
         return f"{shown} ({self.country_name})" if self.country else shown
 
 
+class ReferencePermission(models.TextChoices):
+    """What the person has said about being named: a note of their own, not a consent form (#696).
+
+    Europass advises asking before a referee's details are given out. This is where the
+    account holder writes down how far that has got, and nothing more: it does not discharge
+    the instance operator's duties and it keeps no date, no witness and no means.
+    """
+
+    NOT_ASKED = "not_asked", _("Not asked")
+    ASKED = "asked", _("Asked")
+    AGREED = "agreed", _("Agreed")
+
+
+class Reference(ResumeItem):
+    """Somebody who will vouch for the account holder, and whether they have agreed to (#696).
+
+    **The person is a contact.** Their name, role, company, email address and numbers are
+    the contact's and are edited on the contact's page, so the instance's export, erasure,
+    retention and merge, which are keyed on a contact, reach a referee without a second
+    place to keep. A contact is one entry at most.
+
+    **Printed only when agreed.** A reference whose permission is not *Agreed* is left off
+    every CV, name included, since listing somebody as a referee says they agreed to be
+    one. Their email address and telephone number print only where ``show_details`` is on.
+    The renderer hands a theme a value built from these rules and never the entry or the
+    contact (`documents.rendering.Referee`).
+
+    This is not a letter of reference, which is a file (#666), and is not in the candidate
+    file: a file that moves the person's own career holds nobody else's address.
+    """
+
+    contact = models.ForeignKey(
+        "jobs.Contact",
+        on_delete=models.CASCADE,
+        related_name="career_references",
+        verbose_name=_("person"),
+    )
+    relationship = models.CharField(
+        _("relationship"),
+        max_length=200,
+        blank=True,
+        help_text=_(
+            "How they know your work, as a CV should say it: “Line manager at Aperture, "
+            "2019 to 2022”."
+        ),
+    )
+    permission = models.CharField(
+        _("permission"),
+        max_length=10,
+        choices=ReferencePermission,
+        default=ReferencePermission.NOT_ASKED,
+        help_text=_(
+            "Your own note of whether they have said yes. A CV prints a reference only when "
+            "this is Agreed."
+        ),
+    )
+    show_details = models.BooleanField(
+        _("print their email address and telephone number"),
+        default=False,
+        help_text=_(
+            "Off prints the name, the role and the relationship, and no way to reach them."
+        ),
+    )
+    note = models.TextField(
+        _("note"), blank=True, help_text=_("Yours. It is never printed on a document.")
+    )
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("reference")
+        verbose_name_plural = _("references")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "contact"),
+                name="resume_one_reference_per_contact",
+                violation_error_message=_("This person is already one of your references."),
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.contact.name
+
+    def clean(self) -> None:
+        super().clean()
+        self._check_contact_is_the_owners()
+
+    def _check_contact_is_the_owners(self) -> None:
+        from django.core.exceptions import ValidationError
+
+        contact = self.contact if self.contact_id else None
+        # A form validates before its owner is stamped, and checks the choice itself.
+        if contact is not None and self.owner_id and contact.owner_id != self.owner_id:
+            raise ValidationError({"contact": _("Choose one of your own contacts.")})
+
+    def save(self, *args, **kwargs):
+        # A column is not a permission: whoever writes the row, a contact of somebody else's
+        # is refused here as well as in the form.
+        self._check_contact_is_the_owners()
+        return super().save(*args, **kwargs)
+
+    @property
+    def is_agreed(self) -> bool:
+        return self.permission == ReferencePermission.AGREED
+
+    @property
+    def permission_text(self) -> str:
+        """The permission in words, for the pages that say what would print (#696)."""
+        return str(self.get_permission_display())
+
+
 class LinkKind(models.TextChoices):
     """What a link points at, which is enough for a reader to know whether to click."""
 

@@ -115,6 +115,23 @@
                             {% if item.provider %}<bdi>{{ item.provider }}</bdi>{% endif %}{% if item.provider and item.hours %} · {% endif %}{{ item.hours_text }}
                           </p>
                         {% endif %}
+                      {% elif section.spec.slug == 'reference' %}
+                        {% comment %} What would print, said in words and never in a colour:
+                           the permission, and whether the details go with the name (#696). {% endcomment %}
+                        <p class="text-sm text-ink-500 dark:text-ink-400">
+                          {% if item.relationship %}<bdi>{{ item.relationship }}</bdi> · {% endif %}{{ item.permission_text }}
+                        </p>
+                        <p class="text-xs text-ink-500 dark:text-ink-400">
+                          {% if item.is_agreed %}
+                            {% if item.show_details %}
+                              {% translate "Printed with their email address and telephone number." %}
+                            {% else %}
+                              {% translate "Printed with their name, role and relationship." %}
+                            {% endif %}
+                          {% else %}
+                            {% translate "Not printed on any CV until they have agreed." %}
+                          {% endif %}
+                        </p>
                       {% elif section.spec.slug == 'skill-group' %}
                         <p class="text-sm text-ink-500 dark:text-ink-400">
                           {% if item.skill_names %}

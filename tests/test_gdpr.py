@@ -116,10 +116,15 @@ def test_references_cover_every_relation_that_points_at_a_contact():
     """A new model that points at a contact must be taken into account here, in the way
     the merge's collector check makes it be there (#370)."""
     from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress
+    from postulo.resume.models import Reference
 
     covered = {queryset.model for queryset in gdpr.references(Contact(pk=0)).values()}
     # The person's own numbers, addresses and links reach them through generic relations.
+    # Their entry among the referees is deleted with them and so is not a reference that
+    # is kept: `career_references` answers for it (#696).
     own = {PhoneNumber, PostalAddress, WebLink, MessagingHandle}
+    assert gdpr.career_references(Contact(pk=0)).model is Reference
+    own |= {Reference}
     pointing = {relation.related_model for relation in Contact._meta.related_objects}
     through = {Interview.contacts.through}
 

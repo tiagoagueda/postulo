@@ -52,7 +52,14 @@ SECTION_LABELS = {
     "honour": _("Honours and awards"),
     "membership": _("Memberships"),
     "course": _("Courses"),
+    "reference": _("References"),
 }
+
+
+#: The sentence a CV says in place of naming anybody, or after those it names (#696): Europass's
+#: own wording. Marked for translation here and drawn through `gettext` inside the language
+#: override, so it is in the document's language.
+REFERENCES_ON_REQUEST = _("References are available on request.")
 
 
 def document_holder(document) -> str:
@@ -158,6 +165,77 @@ class Section:
     items: list = field(default_factory=list)
 
 
+@dataclass(frozen=True)
+class Referee:
+    """What a theme is handed for a reference: a value, never the entry or the contact (#696).
+
+    A reference is somebody else's data, so the two rules about printing it are applied
+    where this is made (`referee_for`) and a theme cannot step round them: it has no
+    ``contact`` to read, however it loops. Read-only, and every field text. The email address
+    and the number are empty unless the entry says they print.
+    """
+
+    name: str
+    role: str = ""
+    organisation: str = ""
+    relationship: str = ""
+    email: str = ""
+    phone: str = ""
+
+    @property
+    def rest(self) -> str:
+        """Everything after the name, as the themes, the text and the Word file say it."""
+        return _joined(
+            BETWEEN,
+            _joined(", ", self.role, self.organisation),
+            self.relationship,
+            self.email,
+            self.phone,
+        )
+
+    @property
+    def line(self) -> str:
+        return _joined(BETWEEN, self.name, self.rest)
+
+
+def referee_for(reference) -> Referee | None:
+    """The value a document prints for ``reference``, or nothing while it is not agreed.
+
+    Called inside the document's language override, as the telephone number is grouped the
+    way its own country writes it. The details are read only here, only when the entry says
+    they print.
+    """
+    from postulo.core import phone_numbers, phones
+
+    if not reference.is_agreed:
+        return None
+    contact = reference.contact
+    email = phone = ""
+    if reference.show_details:
+        email = contact.email
+        number = phone_numbers.primary_for(contact)
+        phone = phones.readable(number.number) if number else ""
+    return Referee(
+        name=contact.name,
+        role=contact.role,
+        organisation=contact.company.name if contact.company_id else "",
+        relationship=reference.relationship,
+        email=email,
+        phone=phone,
+    )
+
+
+def left_out(cv: CV) -> list:
+    """The references on this CV that it will not print, because they have not agreed (#696)."""
+    return [
+        cv_item.item
+        for cv_item in cv.included_items().order_by("order", "pk")
+        if cv_item.content_type.model == "reference"
+        and cv_item.item is not None
+        and not cv_item.item.is_agreed
+    ]
+
+
 @dataclass
 class Entry:
     """One entry as this CV prints it: in this CV's language, with its overrides.
@@ -182,6 +260,8 @@ class Entry:
         """
         from postulo.resume.models import split_highlights
 
+        if self.cv_item is None:
+            return []
         if self.cv_item.override_highlights.strip():
             return split_highlights(self.cv_item.override_highlights)
         return split_highlights(getattr(self.item, "highlights", ""))
@@ -219,6 +299,16 @@ def build_sections(cv: CV) -> list[Section]:
     sections: dict[str, Section] = {}
     for cv_item, entry in zip(cv_items, entries, strict=True):
         kind = cv_item.content_type.model
+        if kind == "reference":
+            # A value, and neither the entry nor the contact: and only if they have agreed
+            # (#696). A section with nobody in it is not drawn at all.
+            with languages.override(language):
+                referee = referee_for(entry)
+            if referee is not None:
+                sections.setdefault(
+                    kind, Section(kind=kind, label=str(SECTION_LABELS.get(kind, kind)))
+                ).items.append(Entry(cv_item=None, item=referee))
+            continue
         if kind not in sections:
             sections[kind] = Section(kind=kind, label=str(SECTION_LABELS.get(kind, kind)))
         found = overrides.get(translating.key_of(entry))
@@ -510,6 +600,9 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
     elif section.kind == "drivinglicence":
         # The one line the themes print, the codes and the country and never a date (#691).
         lines = [one.item.cv_line for one in entries]
+    elif section.kind == "reference":
+        # Only the agreed ones are here, as the value and not the contact (#696).
+        lines = [one.item.line for one in entries]
     elif section.kind == "publication":
         # The one neutral line, as the themes print it (#687).
         lines = [one.item.citation for one in entries]
@@ -598,6 +691,9 @@ def cv_outline(cv: CV, properties=None) -> file_formats.Outline:
         for section in build_sections(cv):
             blocks.append(file_formats.heading(section.label, 2))
             blocks.extend(_section_blocks(cv, section, as_portfolio=as_portfolio))
+        if cv.references_on_request:
+            # Once, at the end, with or without listed references; names nobody (#696).
+            blocks.append(file_formats.paragraph(str(REFERENCES_ON_REQUEST), apart=True))
         outline = file_formats.Outline(
             title=document_title(cv),
             language=language,

@@ -181,6 +181,7 @@ SWITCHES: dict[str, str] = {
     "gender": "show_gender",
     "photo": "show_photo",
     "eqf_level": "show_eqf_level",
+    "references_on_request": "references_on_request",
 }
 
 

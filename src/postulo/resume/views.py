@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import datetime as dt
 import logging
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -295,7 +296,21 @@ class SectionFormMixin(UserFormKwargsMixin):
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context["section"] = self.section
+        if self.section.slug == "reference":
+            context.update(self.contact_links())
         return context
+
+    def contact_links(self) -> dict:
+        """Where a reference's person is added and edited: on the contact's own pages, which
+        return here once saved (`next`, read through `safe_next`) (#696)."""
+        here = urlencode({"next": self.request.get_full_path()})
+        links = {"contact_add_url": f"{reverse('jobs:contact_create')}?{here}"}
+        contact_id = getattr(getattr(self, "object", None), "contact_id", None)
+        if contact_id:
+            links["contact_edit_url"] = (
+                f"{reverse('jobs:contact_update', args=[contact_id])}?{here}"
+            )
+        return links
 
 
 def say_what_is_missing(request: HttpRequest, form) -> None:

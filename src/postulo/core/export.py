@@ -170,7 +170,14 @@ logger = logging.getLogger(__name__)
 #: 60 added ``company`` on a course: the name of the company its provider is linked to, or
 #: blank; read back as on a certification -- by name, once the companies exist, never adding
 #: one (#695).
-FORMAT_VERSION = 60
+#: 61 added ``references`` under ``resume``: the people who will vouch for the account holder,
+#: each with the local id of its contact (``contact_id``), the relationship, the permission
+#: (not asked, asked, agreed), whether the details print and a note. Only the whole-account
+#: archive carries them, never the candidate file. An archive without them restores none; one
+#: whose contact is not in the file skips the entry and says so (#696).
+#: 62 added ``references_on_request`` among a CV's ``prints`` switches: whether it says
+#: that references are available on request. An archive without it restores it off (#696).
+FORMAT_VERSION = 62
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -804,6 +811,27 @@ def _career_rows(resume, key: str, user):
     return rows.select_related("company") if key in LINKED_TO_A_COMPANY else rows
 
 
+#: What is written for each reference, apart from the career's own blocks (#696): they hold
+#: somebody else's data, so they are written by `_references` into the whole-account archive
+#: alone and never reach the candidate document.
+REFERENCE_FIELDS = (
+    "id",
+    "contact_id",
+    "relationship",
+    "permission",
+    "show_details",
+    "note",
+    "order",
+)
+
+
+def _references(user) -> list[dict]:
+    """The account holder's referees, each with the local id of its contact in the file (#696)."""
+    from postulo.resume.models import Reference
+
+    return [_fields(row, REFERENCE_FIELDS) for row in Reference.objects.for_user(user)]
+
+
 def _resume_block(user) -> dict:
     """The career record: every entry of every kind, and what they say in other languages."""
     from postulo.resume import models as resume
@@ -984,7 +1012,9 @@ def build_document(user) -> dict:
         "tags": [_fields(tag, TAG_FIELDS) for tag in Tag.objects.for_user(user)],
         # The career, built by the function the candidate document calls too, so there is
         # one spelling of it and not two to keep in step (#181).
-        "resume": _resume_block(user),
+        # And the referees, apart from it: the candidate document calls `_resume_block` too
+        # and must not carry somebody else's contact (#696).
+        "resume": {**_resume_block(user), "references": _references(user)},
         # The people recorded at no company (#239). Every contact in the file used to be
         # written under its company, so somebody at none -- a friend, a former colleague,
         # exactly who refers people -- was in the account and not in the archive.

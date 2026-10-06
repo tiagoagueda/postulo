@@ -119,8 +119,23 @@ def test_a_skill_with_no_group_is_still_on_the_overview(client, user):
 # raising `AttributeError` in a renderer or being skipped on restore (#692).
 
 #: Sections allowed to be missing from a list, as (slug, list name), each with its reason.
-#: Empty today: `link` was the one, until the CV-entry map of the importer gained it (#470).
-EXCEPTIONS: dict[tuple[str, str], str] = {}
+#: `link` was one, until the CV-entry map of the importer gained it (#470). A reference is the
+#: exception that is on purpose (#696): somebody else's data, so it is written into the
+#: whole-account archive by `export._references` and never into the candidate file, and the
+#: importer restores it after the contacts (`importer._restore_references`).
+_NOT_IN_THE_CANDIDATE_FILE = (
+    "holds a contact, so it is carried by the account archive alone, apart from the career "
+    "block (#696)"
+)
+EXCEPTIONS: dict[tuple[str, str], str] = {
+    ("reference", "export.TRANSLATION_SECTIONS (also the importer's CV-entry map)"): (
+        "translates nothing; the importer's CV-entry map reads `reference` on its own"
+    ),
+    ("reference", "export.RESUME_MODELS"): _NOT_IN_THE_CANDIDATE_FILE,
+    ("reference", "export.RESUME_FIELDS"): _NOT_IN_THE_CANDIDATE_FILE,
+    ("reference", "candidate.KINDS_BY_BLOCK"): _NOT_IN_THE_CANDIDATE_FILE,
+    ("reference", "importer.resume_section_models"): _NOT_IN_THE_CANDIDATE_FILE,
+}
 
 
 def _missing(slug: str, listname: str, present: bool) -> str | None:
@@ -177,6 +192,7 @@ def test_the_importer_restores_what_the_archive_writes():
 
 def _one_of_each(user) -> dict:
     """One entry of each section, by slug. A new section adds its line here."""
+    from postulo.jobs.models import Contact
     from postulo.resume import models as m
 
     return {
@@ -200,6 +216,11 @@ def _one_of_each(user) -> dict:
         ),
         "driving-licence": lambda: m.DrivingLicence.objects.create(
             owner=user, country="PT", categories=["B"]
+        ),
+        "reference": lambda: m.Reference.objects.create(
+            owner=user,
+            contact=Contact.objects.create(owner=user, name="Chell"),
+            permission="agreed",
         ),
         "link": lambda: m.Link.objects.create(
             owner=user, title="Portfolio", url="https://alex.example.org"

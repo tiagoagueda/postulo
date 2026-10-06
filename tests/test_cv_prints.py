@@ -973,6 +973,7 @@ def test_the_archive_carries_the_choice_with_the_cv_by_what_each_row_says(person
         "gender": False,
         "photo": False,
         "eqf_level": False,
+        "references_on_request": False,
     }
     assert "pinned_phone" not in json.dumps(entry), "no row is named by an id"
 
@@ -1432,6 +1433,7 @@ def test_the_schema_describes_the_choice(person, client):
         "gender",
         "photo",
         "eqf_level",
+        "references_on_request",
     }
     assert "prints" in components["CVDetailOut"]["properties"]
     assert "patch" in schema["paths"]["/api/v1/cvs/{pk}"]

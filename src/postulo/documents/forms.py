@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 from django.utils.html import format_html
 from django.utils.text import format_lazy
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import personal, postal
@@ -170,6 +171,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             "show_gender",
             "show_photo",
             "show_eqf_level",
+            "references_on_request",
         )
         widgets = {"summary": forms.Textarea(attrs={"rows": 4})}
         help_texts = {
@@ -438,6 +440,17 @@ class CVItemForm(OwnerScopedModelForm):
         widgets = {"override_highlights": forms.Textarea(attrs={"rows": 6})}
 
 
+def _picker_label(entry) -> str:
+    """An entry as the picker names it; a reference that has not agreed says why it will be
+    left off (#696)."""
+    if getattr(entry, "is_agreed", True):
+        return str(entry)
+    return gettext("%(name)s (not printed: permission is “%(permission)s”)") % {
+        "name": entry,
+        "permission": entry.permission_text,
+    }
+
+
 class AddCVItemsForm(forms.Form):
     """Choose which career entries to put on a CV.
 
@@ -467,7 +480,7 @@ class AddCVItemsForm(forms.Form):
             self.fields[field_name] = forms.MultipleChoiceField(
                 label=spec.plural,
                 required=False,
-                choices=[(obj.pk, str(obj)) for obj in available],
+                choices=[(obj.pk, _picker_label(obj)) for obj in available],
                 widget=forms.CheckboxSelectMultiple,
             )
             # The bound field, not its name: a template cannot look a field up by a

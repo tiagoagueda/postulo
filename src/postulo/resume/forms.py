@@ -24,6 +24,7 @@ from .models import (
     Membership,
     Project,
     Publication,
+    Reference,
     Skill,
     SkillGroup,
 )
@@ -678,6 +679,54 @@ class MembershipForm(ResumeItemForm):
             entry.save()
             self.save_m2m()
         return entry
+
+
+class ReferenceForm(ResumeItemForm):
+    """A person who will vouch for you: one of your contacts, and what you have agreed (#696).
+
+    The name, role, company and means of reaching them are the contact's, edited on the
+    contact's page; this form holds only what is about the reference.
+    """
+
+    class Meta:
+        model = Reference
+        fields = ("contact", "relationship", "permission", "show_details", "note", "order")
+        widgets = {"note": forms.Textarea(attrs={"rows": 3})}
+        help_texts = {
+            "contact": _(
+                "One of your contacts. Their name, role, company and how to reach them are "
+                "kept on the contact’s page; a person who is not a contact yet is added there."
+            ),
+        }
+
+    def scope_querysets(self) -> None:
+        from postulo.jobs.models import Contact
+
+        self.fields["contact"].queryset = (
+            Contact.objects.for_user(self.user).select_related("company")
+            if self.user is not None
+            else Contact.objects.none()
+        )
+        self.fields["contact"].label_from_instance = _contact_label
+        # One entry a person, which the form says rather than the database (the owner is not
+        # a field here, so the constraint is not checked for it).
+        self.fields["contact"].error_messages["invalid_choice"] = _(
+            "Choose one of your own contacts."
+        )
+
+    def clean_contact(self):
+        contact = self.cleaned_data["contact"]
+        if self.user is not None:
+            clash = Reference.objects.for_user(self.user).filter(contact=contact)
+            if self.instance.pk:
+                clash = clash.exclude(pk=self.instance.pk)
+            if clash.exists():
+                raise forms.ValidationError(_("This person is already one of your references."))
+        return contact
+
+
+def _contact_label(contact) -> str:
+    return f"{contact.name} ({contact.company.name})" if contact.company_id else contact.name
 
 
 class LinkForm(ResumeItemForm):

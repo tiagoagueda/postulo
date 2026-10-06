@@ -862,6 +862,9 @@ class CVPrintsOut(Schema):
     eqf_level: bool = Field(
         description="Whether the EQF level of each qualification that states one is printed (#684)"
     )
+    references_on_request: bool = Field(
+        description="Whether the sentence “References are available on request.” is printed (#696)"
+    )
 
 
 class CVDetailOut(CVOut):
@@ -911,6 +914,7 @@ class CVPrintsIn(Schema):
     gender: bool | None = None
     photo: bool | None = None
     eqf_level: bool | None = None
+    references_on_request: bool | None = None
 
 
 class CVPatch(Schema):

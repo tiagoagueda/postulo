@@ -225,6 +225,8 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         # that kind, and that is said beside the preview, before the export (#308). Only
         # while the contact block is printed at all.
         context["gone"] = printing.gone(self.object) if self.object.show_contact_details else ()
+        # A reference that has not agreed is on the CV and left off its pages (#696).
+        context["left_out"] = rendering.left_out(self.object)
         return context
 
 

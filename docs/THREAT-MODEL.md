@@ -69,6 +69,19 @@ archive and by deletion, and an instance that must answer to a regulator should 
 reading of Article 9 for itself. A membership number is never kept: it identifies the person at
 another body, and nobody asked for it.
 
+**A referee is the account holder's data about somebody else, and is printed only when agreed
+and chosen (#696).** A reference is a contact, so the instance's export, erasure, retention and
+merge reach the person without a second place to look; the entry holds only how they are known,
+what has been agreed (a note of the account holder's own, not a consent record) and whether the
+details print. A CV prints a reference only when its permission is *Agreed*, and then the name,
+the role, the company and the relationship; the email address and the primary number only where
+the entry says so. The renderer hands a theme a read-only value built under those two rules and
+never the entry or the contact, so a theme from a plugin cannot step round them. Nothing about a
+referee is written to a list, a log or an error message, and the candidate file never carries
+one: a file moved to another instance should not hold other people's addresses. A CV already
+sent keeps the words it was sent with (#217), which the erasure and the merge say.
+`tests/test_references.py` and `tests/security/test_cv_prints.py` hold each of these.
+
 **A date and a place of birth sit beside it (#679), and so do nationalities (#680) and
 gender (#681).** They are what an identity check asks for, a nationality can reveal an ethnic
 origin, and gender is personal data that some regulators treat as sensitive, so they are the

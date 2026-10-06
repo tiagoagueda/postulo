@@ -18,6 +18,7 @@
   </div>
   <form method="post" novalidate>
     {% csrf_token %}
+    {% if return_to %}<input type="hidden" name="next" value="{{ return_to }}">{% endif %}
     {% if form.non_field_errors %}
       <div class="alert mb-4 max-w-2xl" data-variant="error">{{ form.non_field_errors }}</div>
     {% endif %}

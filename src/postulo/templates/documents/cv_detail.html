@@ -72,6 +72,24 @@
     </div>
   {% endif %}
 
+  {% if left_out %}
+    {% comment %} A reference is printed only once the person has agreed. One that has not is on
+       the CV and left off its pages, and that is said here, before the export (#696). {% endcomment %}
+    <div class="alert mb-6" data-variant="info" data-left-out>
+      <div class="min-w-0">
+        <p class="mb-2">{% translate "These references are left off, because they have not agreed to be named:" %}</p>
+        <ul class="ms-4 list-disc text-sm">
+          {% for reference in left_out %}
+            <li>
+              <a class="underline" href="{% url 'resume:item_update' 'reference' reference.pk %}"><bdi>{{ reference }}</bdi></a>
+              <span class="text-ink-600 dark:text-ink-300">— {{ reference.permission_text }}</span>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+  {% endif %}
+
   {% if classified %}
     {% comment %} A skill whose name is one of the ESCO classification's prints the name it
        gives the skill in this CV's language, where the person has written none of their own

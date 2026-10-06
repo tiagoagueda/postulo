@@ -77,6 +77,8 @@ from postulo.resume.models import (
     Membership,
     Project,
     Publication,
+    Reference,
+    ReferencePermission,
     Skill,
     SkillGroup,
     Translation,
@@ -385,6 +387,7 @@ class Command(BaseCommand):
             DrivingLicence,
             Honour,
             Membership,
+            Reference,
             LanguageSkill,
             Link,
         ):
@@ -647,6 +650,33 @@ class Command(BaseCommand):
                         email=f"{_ascii_fold(contact_name.split()[0]).lower()}@{website.removeprefix('https://')}",
                     )
                 ]
+
+        # ---- referees: two people, one of whom has agreed to be named (#696) ----
+        for order, (name, role, relationship, permission) in enumerate(
+            (
+                (
+                    "Dr. Mira Okafor",
+                    "Head of Engineering",
+                    "Line manager, 2019 to 2022",
+                    ReferencePermission.AGREED,
+                ),
+                (
+                    "Tomás Ribeiro",
+                    "Staff engineer",
+                    "Tech lead on the platform team, 2022 to 2024",
+                    ReferencePermission.NOT_ASKED,
+                ),
+            )
+        ):
+            Reference.objects.create(
+                owner=user,
+                contact=Contact.objects.create(
+                    owner=user, company=companies[0], name=name, role=role
+                ),
+                relationship=relationship,
+                permission=permission,
+                order=order,
+            )
 
         # ---- applications, with coherent timelines ---------------------------
         applications: list[Application] = []

@@ -64,6 +64,17 @@
       </div>
     </form>
 
+    {% if section.slug == 'reference' %}
+      {% comment %} The person is a contact, and is edited there; the contact's form comes back
+         to this one (`next`, through `safe_next`). {% endcomment %}
+      <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
+        {% if contact_edit_url %}
+          <a class="underline" href="{{ contact_edit_url }}">{% translate "Edit their details" %}</a> ·
+        {% endif %}
+        <a class="underline" href="{{ contact_add_url }}">{% translate "Add a person who is not a contact yet" %}</a>
+      </p>
+    {% endif %}
+
     {% if object.company %}
       <p class="mt-6 text-sm text-ink-500 dark:text-ink-400">
         {% translate "Linked to the company" %}

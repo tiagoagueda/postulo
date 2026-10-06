@@ -612,6 +612,20 @@ def plan_contacts(kept, other) -> Plan:
             lambda row: row.upload.title,
         )
     )
+    from postulo.resume.models import Reference
+
+    # Their entry among the referees moves to the kept person, who keeps their own where both
+    # have one (#696).
+    their_entry = Reference.objects.filter(owner_id=owner, contact=other)
+    if Reference.objects.filter(owner_id=owner, contact=kept).exists():
+        if their_entry.exists():
+            plan.left_behind.append(
+                _("Their entry among your references: you already have one for the other.")
+            )
+    else:
+        lines.append(
+            _moved(_("Their entry among your references"), their_entry, lambda row: row.contact)
+        )
     plan.moves = [line for line in lines if line is not None]
     if moving_links:
         plan.moves.insert(
@@ -721,6 +735,15 @@ def merge_contacts(kept, other) -> Plan:
     # The letters they wrote, for the same reason (#666).
     ReferenceLetter.objects.filter(owner_id=owner, referee=other).update(referee=kept)
 
+    # Their entry among the referees: moved where the kept person has none, and otherwise
+    # theirs goes and the kept person's stays, with the places it had on CVs (#696).
+    from postulo.resume.models import Reference
+
+    if Reference.objects.filter(owner_id=owner, contact=kept).exists():
+        Reference.objects.filter(owner_id=owner, contact=other).delete()
+    else:
+        Reference.objects.filter(owner_id=owner, contact=other).update(contact=kept)
+
     # An interview both were at has the kept person once, not twice.
     seats = Interview.contacts.through.objects
     both = seats.filter(contact=kept).values("interview_id")
@@ -750,7 +773,8 @@ def merge_contacts(kept, other) -> Plan:
 
     _write_entries(plan)
     _refuse_what_is_left(
-        other, expected={Contact, WebLink, MessagingHandle, Interview.contacts.through}
+        other,
+        expected={Contact, WebLink, MessagingHandle, Interview.contacts.through, Reference},
     )
     other.delete()
     return plan

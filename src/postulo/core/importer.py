@@ -763,6 +763,50 @@ def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> N
         address.save()
 
 
+def _restore_references(user, entries, contacts: dict, report: ImportReport) -> dict:
+    """The referees an archive carries, as ``{id in the file: entry made}`` (#696).
+
+    The contact is the file's local id, looked up among the contacts this import has just
+    made, so it can only ever be one of this account's. The permission is read as one of its
+    three words and is *Not asked* for anything else; a switch is read as a yes or no.
+    """
+    from postulo.resume import models as resume
+
+    made: dict = {}
+    if not isinstance(entries, list):
+        return made
+    taken = set(resume.Reference.objects.filter(owner=user).values_list("contact_id", flat=True))
+    permissions = set(resume.ReferencePermission.values)
+    for entry in entries:
+        if not isinstance(entry, dict):
+            continue
+        contact = contacts.get(entry.get("contact_id"))
+        if contact is None:
+            report.skipped.append(
+                f"Reference #{entry.get('id')}: its contact is not in the file, and it was left out"
+            )
+            continue
+        if contact.pk in taken:
+            report.skipped.append(
+                f"Reference to {contact.name}: you already have one for them, and it was left out"
+            )
+            continue
+        permission = entry.get("permission")
+        order = entry.get("order")
+        made[entry.get("id")] = resume.Reference.objects.create(
+            owner=user,
+            contact=contact,
+            relationship=str(entry.get("relationship") or "")[:200],
+            permission=permission if permission in permissions else "not_asked",
+            show_details=entry.get("show_details") is True,
+            note=str(entry.get("note") or ""),
+            order=order if isinstance(order, int) and order >= 0 else 0,
+        )
+        taken.add(contact.pk)
+        report.resume_items += 1
+    return made
+
+
 def _restore_phone_numbers(
     holder, owner, rows: list[dict], report: ImportReport | None = None, whose: str = ""
 ) -> None:
@@ -1600,6 +1644,14 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             if application is not None and agency is not None:
                 Application.objects.filter(pk=application.pk).update(through_agency=agency)
 
+    # The people who will vouch for the person, now that every contact in the file exists and
+    # before the CVs, whose entries may point at them (#696). Always *Not asked* unless the
+    # file says otherwise in one of the three words; one whose contact is not in the file is
+    # skipped and named, and so is one this account already has an entry for.
+    resume_map["references"] = _restore_references(
+        user, document.get("resume", {}).get("references") or [], contacts, report
+    )
+
     # ---------------------------------------------------------------- documents
     documents = document.get("documents", {})
 
@@ -1659,6 +1711,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
 
         for item in entries:
             section = TRANSLATION_SECTIONS.get(item.get("kind", ""))
+            if item.get("kind") == "reference":
+                # Not a section the candidate file or the translations know (#696).
+                section = "references"
             target = resume_map.get(section, {}).get(item.get("ref")) if section else None
             if target is None:
                 report.skipped.append(

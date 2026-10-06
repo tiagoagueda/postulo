@@ -276,7 +276,9 @@ def test_every_block_is_the_block_the_archive_writes(somebody):
     whole = export.build_document(somebody)
     own = export.build_candidate_document(somebody)
 
-    assert own["resume"] == whole["resume"]
+    # The one block the candidate file leaves out: the referees are other people's data (#696).
+    assert "references" in whole["resume"] and "references" not in own["resume"]
+    assert own["resume"] == {k: v for k, v in whole["resume"].items() if k != "references"}
     assert own["account"]["identifiers"] == whole["account"]["identifiers"]
     for name, value in own["account"]["profile"].items():
         assert value == whole["account"]["profile"][name], name
@@ -356,7 +358,7 @@ def test_the_archive_is_written_as_it_was(somebody):
         "web_links",
         "messaging_handles",
     ]
-    assert list(document["resume"]) == [*export.RESUME_FIELDS, "translations"]
+    assert list(document["resume"]) == [*export.RESUME_FIELDS, "translations", "references"]
     for block, names in export.RESUME_FIELDS.items():
         for entry in document["resume"][block]:
             assert list(entry) == list(names), block

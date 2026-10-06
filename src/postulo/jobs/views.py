@@ -679,6 +679,7 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 
         from postulo.applications.models import Application
         from postulo.documents.models import RenderedDocument
+        from postulo.resume.models import Reference
 
         context = super().get_context_data(**kwargs)
         company = self.object
@@ -716,6 +717,18 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
             + company.memberships.count()
             + company.courses.count()
         )
+        # A contact goes with its company, and so does a referee's entry (#696).
+        referees = Reference.objects.filter(contact__company=company).count()
+        if referees:
+            consequences = context["consequences"]
+            consequences.append(
+                ngettext(
+                    "%(count)d entry among your references",
+                    "%(count)d entries among your references",
+                    referees,
+                )
+                % {"count": referees}
+            )
         if entries:
             kept.append(
                 ngettext(
@@ -798,7 +811,31 @@ class IndustryDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
 # -------------------------------------------------------------------- contacts
 
 
+class ComesBackMixin:
+    """A contact form that returns to the page which sent the person, when one did (#696).
+
+    The reference form links to a contact's page to add or edit the person; ``next`` is the
+    reference form's own address, and `safe_next` refuses anything that is not on this host.
+    """
+
+    def return_to(self) -> str:
+        return safe_next(self.request, "")
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["return_to"] = self.return_to()
+        return context
+
+    def get_success_url(self) -> str:
+        if target := self.return_to():
+            return target
+        if self.object.company_id:
+            return reverse("jobs:company_detail", args=[self.object.company_id])
+        return reverse("jobs:company_list")
+
+
 class ContactCreateView(
+    ComesBackMixin,
     OwnedObjectMixin,
     UserFormKwargsMixin,
     OwnerFormMixin,
@@ -822,11 +859,6 @@ class ContactCreateView(
             initial["company"] = company_id
         return initial
 
-    def get_success_url(self) -> str:
-        if self.object.company_id:
-            return reverse("jobs:company_detail", args=[self.object.company_id])
-        return reverse("jobs:company_list")
-
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
         links = self.get_web_links()
@@ -849,6 +881,7 @@ class ContactCreateView(
 
 
 class ContactUpdateView(
+    ComesBackMixin,
     OwnedObjectMixin,
     UserFormKwargsMixin,
     GdprNoticeMixin,
@@ -878,11 +911,6 @@ class ContactUpdateView(
             for candidate in duplicates.for_contact(self.object)
         ]
         return context
-
-    def get_success_url(self) -> str:
-        if self.object.company_id:
-            return reverse("jobs:company_detail", args=[self.object.company_id])
-        return reverse("jobs:company_list")
 
     def form_valid(self, form):
         numbers = self.get_phone_numbers()

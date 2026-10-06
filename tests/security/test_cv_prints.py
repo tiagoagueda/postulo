@@ -664,3 +664,36 @@ def test_nobody_prints_or_names_another_accounts_cv_photo(client, user, cv, othe
         HTTP_AUTHORIZATION=f"Bearer {raw}",
     )
     assert "base64" not in sent.content.decode()
+
+
+def test_a_referees_details_reach_a_document_only_when_agreed_and_chosen_and_never_in_a_log(
+    user, cv, caplog
+):
+    """A referee is somebody else's data (#696): the two rules are applied where the value is
+    made, and what the value holds is not in a representation a log line could carry."""
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.documents.models import CVItem
+    from postulo.jobs.models import Contact
+    from postulo.resume.models import Reference
+
+    contact = Contact.objects.create(owner=user, name="Chell", email="chell@aperture.example")
+    mine = Reference.objects.create(owner=user, contact=contact, show_details=True)
+    CVItem.objects.create(
+        owner=user,
+        cv=cv,
+        content_type=ContentType.objects.get_for_model(Reference),
+        object_id=mine.pk,
+    )
+
+    for permission in ("not_asked", "asked"):
+        Reference.objects.filter(pk=mine.pk).update(permission=permission)
+        assert "chell@aperture.example" not in rendering.render_cv_html(cv)
+        assert "Chell" not in rendering.cv_text(cv)
+
+    Reference.objects.filter(pk=mine.pk).update(permission="agreed")
+    assert "chell@aperture.example" in rendering.cv_text(cv)
+    Reference.objects.filter(pk=mine.pk).update(show_details=False)
+    assert "chell@aperture.example" not in rendering.cv_text(cv)
+    assert "Chell" in rendering.cv_text(cv)
+    assert "chell@aperture.example" not in caplog.text

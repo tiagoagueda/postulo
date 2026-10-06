@@ -853,6 +853,7 @@ def form_table(user, mine=None) -> dict:
         resume.MembershipForm: [{"user": user}],
         resume.ProjectForm: [{"user": user}],
         resume.PublicationForm: [{"user": user}],
+        resume.ReferenceForm: [{"user": user}],
         resume.SkillForm: [{"user": user}],
         resume.SkillGroupForm: [{"user": user}],
     }
@@ -879,6 +880,7 @@ OFFERED = {
     ("InterviewForm", "contacts"),
     ("JobPostingForm", "company"),
     ("ListingEventForm", "contact"),
+    ("ReferenceForm", "contact"),
     ("ListingEventForm", "document"),
     ("ReminderForm", "application"),
 }
@@ -1083,3 +1085,50 @@ def test_somebody_elses_course_is_on_no_page_of_mine(client, user, other_user):
     assert "Zebra husbandry" not in client.get(reverse("resume:overview")).content.decode()
     assert "Zebra husbandry" not in client.get(reverse("resume:preview")).content.decode()
     assert search.search(user, "Zebra") == []
+
+
+# ---------------------------------------------------------------- references (#696)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_reference_is_not_found(client, user, other_user, name):
+    from postulo.jobs.models import Contact
+    from postulo.resume.models import Reference
+
+    their_contact = Contact.objects.create(owner=other_user, name="Zebra Referee")
+    theirs = Reference.objects.create(owner=other_user, contact=their_contact)
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["reference", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["reference", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert Reference.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_referee_is_on_no_page_of_mine_and_cannot_be_chosen(
+    client, user, other_user
+):
+    from postulo.documents.models import CV
+    from postulo.jobs.models import Contact
+    from postulo.resume.forms import ReferenceForm
+    from postulo.resume.models import Reference
+
+    their_contact = Contact.objects.create(owner=other_user, name="Zebra Referee")
+    theirs = Reference.objects.create(owner=other_user, contact=their_contact, permission="agreed")
+    client.force_login(user)
+
+    assert "Zebra Referee" not in client.get(reverse("resume:overview")).content.decode()
+    assert "Zebra Referee" not in str(ReferenceForm(user=user)["contact"])
+    assert not ReferenceForm({"contact": their_contact.pk}, user=user).is_valid()
+    posted = client.post(
+        reverse("resume:item_create", args=["reference"]), {"contact": their_contact.pk}
+    )
+    assert posted.status_code == 200
+    assert not Reference.objects.filter(owner=user).exists()
+
+    # Nor can it be put on my CV by naming its id.
+    cv = CV.objects.create(owner=user, name="Main", language="en-GB")
+    client.post(reverse("documents:cv_add_items", args=[cv.pk]), {"add_reference": [theirs.pk]})
+    assert not cv.items.exists()

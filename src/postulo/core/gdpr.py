@@ -59,7 +59,9 @@ DOCUMENT_NAME = "postulo-contact"
 #: that name the person (#370). 4 added ``messaging_handles``: how they are reached on
 #: Matrix, XMPP, Signal, Telegram, Threema or another service (#682). 5 added
 #: ``reference_letters``: the letters they wrote, with their dates and where each went (#666).
-DOCUMENT_VERSION = 5
+#: 6 added ``references``: where the person is one of the account holder's referees, with
+#: the relationship, the permission, whether details print and the note (#696).
+DOCUMENT_VERSION = 6
 
 
 def is_offered(person=None) -> bool:
@@ -190,6 +192,32 @@ def references(contact) -> dict:
     }
 
 
+def career_references(contact):
+    """The entries of the account holder's career that name this person as a referee (#696).
+
+    Not among `references`, whose rows are kept and lose the person: these are deleted with
+    them, being nothing without who they are about.
+    """
+    from postulo.resume.models import Reference
+
+    return Reference.objects.filter(contact=contact)
+
+
+def _career_reference_rows(entries) -> list[dict]:
+    """What the account holder wrote about this person as a referee: how they know them, what
+    has been agreed and whether the details print. The note is the account holder's words
+    about them, so it is here (#696)."""
+    return [
+        {
+            "relationship": row.relationship,
+            "permission": row.permission,
+            "prints_details": row.show_details,
+            "note": row.note,
+        }
+        for row in entries
+    ]
+
+
 def _application_rows(applications) -> list[dict]:
     """Applications named by role and company, the way they read on the page."""
     return [
@@ -255,6 +283,7 @@ def contact_document(contact) -> dict:
         "referrals": _application_rows(found["referrals"]),
         "interviews": _interview_rows(found["interviews"]),
         "reference_letters": _reference_letter_rows(found["reference_letters"]),
+        "references": _career_reference_rows(career_references(contact)),
         "plugins": plugins,
     }
     if "not_carried" in plugins:
@@ -339,6 +368,9 @@ class ErasureReport:
                 )
                 % {"count": self.unlinked["reference_letters"]}
             )
+        if self.deleted.get("references"):
+            # What was sent stays true: the copy of a CV that named them keeps its words (#217).
+            parts.append(_("A CV that was already sent keeps them, as it was sent."))
         return " ".join(parts) or _("Nothing was left to remove.")
 
 
@@ -359,6 +391,11 @@ def _counted_kind(key: str, count: int) -> str:
         "web_links": lambda: ngettext("%(count)d web link", "%(count)d web links", count),
         "messaging_handles": lambda: ngettext(
             "%(count)d messaging handle", "%(count)d messaging handles", count
+        ),
+        "references": lambda: ngettext(
+            "%(count)d entry among your references",
+            "%(count)d entries among your references",
+            count,
         ),
         "plugin_rows": lambda: ngettext("%(count)d plugin row", "%(count)d plugin rows", count),
     }.get(key)
@@ -419,6 +456,9 @@ def erase_contact(contact) -> ErasureReport:
             "postal_addresses": contact.postal_addresses.count(),
             "web_links": contact.web_links.count(),
             "messaging_handles": contact.messaging_handles.count(),
+            # Their entries among the referees go with them, and with those the places they
+            # had on CVs; a CV already sent keeps its words, as what was sent stays true (#696).
+            "references": career_references(contact).count(),
             "plugin_rows": removed,
         }
         # Each is kept and loses the person: an application its main contact (or whoever
@@ -470,6 +510,7 @@ def retention_dry_run(days: int | None = None) -> dict:
     """
     from postulo.applications.models import Application, Interview
     from postulo.jobs.models import Contact, ListingEvent
+    from postulo.resume.models import Reference
 
     days = days or retention_days()
     cutoff = retention_cutoff(days)
@@ -483,6 +524,7 @@ def retention_dry_run(days: int | None = None) -> dict:
         "postal_addresses": sum(c.postal_addresses.count() for c in contacts),
         "web_links": sum(c.web_links.count() for c in contacts),
         "messaging_handles": sum(c.messaging_handles.count() for c in contacts),
+        "references": Reference.objects.filter(contact__in=contacts).count(),
         # Every application that names them, as its contact or as who referred the
         # person: each is kept, and each loses the name (#239).
         "applications_unlinked": Application.objects.filter(
