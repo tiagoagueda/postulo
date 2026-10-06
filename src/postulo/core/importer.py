@@ -264,6 +264,24 @@ def _carried(entry: dict, names, report: ImportReport, what: str, *extra: str) -
     return kept
 
 
+def _eqf_level(value, report: ImportReport, entry: dict) -> int | None:
+    """An education entry's level, kept when it is a whole number from 1 to 8 (#684).
+
+    Anything else -- a nine, a word, a fraction -- is dropped, and the report says so, since
+    a row written straight to the model would otherwise keep it as written.
+    """
+    if value is None:
+        return None
+    if isinstance(value, int) and not isinstance(value, bool) and 1 <= value <= 8:
+        return value
+    name = str(entry.get("qualification") or "")[:80]
+    report.skipped.append(
+        f"Education entry {name!r}: an EQF level of {str(value)[:20]!r} is not a whole number "
+        "from 1 to 8, and was left out"
+    )
+    return None
+
+
 def _dt(value):
     return parse_datetime(value) if value else None
 
@@ -924,6 +942,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     values[name] = _d(value)
                 elif name in moment_fields:
                     values[name] = _dt(value)
+                elif name == "eqf_level":
+                    values[name] = _eqf_level(value, report, entry)
                 else:
                     values[name] = value
             created = model.objects.create(owner=user, **values)

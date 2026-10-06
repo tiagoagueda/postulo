@@ -111,6 +111,25 @@ class Experience(ResumeItem):
         return self.end_date is None
 
 
+class EqfLevel(models.IntegerChoices):
+    """The eight levels of the European Qualifications Framework (#684).
+
+    Stated by the person, from a diploma or its supplement, and never worked out from the
+    qualification's name, as a language's level is not (#235). Unset prints nothing.
+    """
+
+    __empty__ = _("Not stated")
+
+    L1 = 1, _("Level 1")
+    L2 = 2, _("Level 2")
+    L3 = 3, _("Level 3")
+    L4 = 4, _("Level 4")
+    L5 = 5, _("Level 5")
+    L6 = 6, _("Level 6")
+    L7 = 7, _("Level 7")
+    L8 = 8, _("Level 8")
+
+
 class Education(ResumeItem):
     """A qualification, finished or in progress."""
 
@@ -123,6 +142,9 @@ class Education(ResumeItem):
     start_date = models.DateField(_("from"), null=True, blank=True)
     end_date = models.DateField(_("until"), null=True, blank=True)
     grade = models.CharField(_("grade"), max_length=100, blank=True)
+    eqf_level = models.PositiveSmallIntegerField(
+        _("EQF level"), choices=EqfLevel, null=True, blank=True
+    )
     highlights = models.TextField(_("highlights"), blank=True)
 
     class Meta(ResumeItem.Meta):

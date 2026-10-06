@@ -746,3 +746,20 @@ def test_a_name_that_is_one_of_the_accounts_companies_is_offered_as_the_link(use
     assert [row.company for row in candidate.plan(user, held).rows()] == [mine]
     candidate.apply(user, held)
     assert Experience.objects.get(owner=user).company == mine
+
+
+@pytest.mark.parametrize("level", [9, -1, 10**200, MARKUP, SCRIPT, "6; DROP TABLE", [6], {"n": 6}])
+def test_an_eqf_level_the_form_would_not_take_is_a_refused_row_and_stores_nothing(user, level):
+    from postulo.resume.models import Education
+
+    data = a_file(
+        resume={
+            "education": [{"id": 1, "qualification": "BSc", "institution": "U", "eqf_level": level}]
+        }
+    )
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "education") == [candidate.REFUSED]
+    assert not Education.objects.for_user(user).exists()

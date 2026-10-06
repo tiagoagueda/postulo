@@ -49,6 +49,9 @@
               <li class="px-4 py-3">
                 <p class="font-medium">{{ item.qualification }}</p>
                 <p class="text-sm text-ink-500 dark:text-ink-400">{{ item.institution }}</p>
+                {% if item.eqf_level %}
+                  <p class="text-sm text-ink-500 dark:text-ink-400">{% blocktranslate with level=item.eqf_level %}EQF level {{ level }}{% endblocktranslate %}</p>
+                {% endif %}
               </li>
             {% endfor %}
           </ul>

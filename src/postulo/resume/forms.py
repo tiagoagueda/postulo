@@ -143,6 +143,7 @@ class EducationForm(ResumeItemForm):
             "start_date",
             "end_date",
             "grade",
+            "eqf_level",
             "highlights",
             "order",
         )
@@ -156,7 +157,14 @@ class EducationForm(ResumeItemForm):
             "end_date": ENTRY_HELP["end_date"],
             "highlights": ENTRY_HELP["highlights"],
             "field_of_study": _("What it was in, where the qualification's name does not say."),
-            "grade": _("As the institution words it. It prints only if you fill it in."),
+            "grade": _(
+                "As the institution words it. Kept in your record; a CV does not print it yet."
+            ),
+            "eqf_level": _(
+                "The level of the qualification in the European Qualifications Framework, "
+                "which a diploma or its supplement may state. Postulo never works it out "
+                "from the qualification’s name."
+            ),
             "location": _("Where you studied, as you would write it on a CV."),
         }
 

@@ -102,6 +102,10 @@ MAX_CONTACT_ROWS = 20
 #: How many rows go to the database in one statement.
 BATCH = ordering.BATCH
 
+#: What an entry writes as a number and not as text: a level (#684). The form reads it as a
+#: choice, so a number outside the levels is a refused row like a word is.
+NUMBERS = frozenset({"eqf_level"})
+
 #: A date as the file writes one, which is how `date.isoformat()` does. Matched rather than
 #: handed to a form, whose date field also reads whatever the reader's language writes --
 #: and the same file has to read the same way whoever opens it.
@@ -208,6 +212,7 @@ KINDS: tuple[Kind, ...] = (
             "start_date",
             "end_date",
             "grade",
+            "eqf_level",
             "highlights",
         ),
         names=("institution", "qualification"),
@@ -696,6 +701,11 @@ class _Planner:
             value = entry.get(name)
             if value is None:
                 data[name] = ""
+            elif name in NUMBERS and isinstance(value, int) and not isinstance(value, bool):
+                # A level is written as the number it is; the form judges whether it is one.
+                data[name] = str(value) if abs(value) < 10**6 else ""
+                if not data[name]:
+                    wrong.append((name, _not_text()))
             elif not isinstance(value, str):
                 wrong.append((name, _not_text()))
             elif name in dates and value.strip():

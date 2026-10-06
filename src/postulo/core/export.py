@@ -128,7 +128,10 @@ logger = logging.getLogger(__name__)
 #: 46 added ``company`` on an experience: the name of the company of the person's it is linked
 #: to, or blank. An archive without it restores every entry unlinked, as they were written;
 #: the link is made in a pass once the companies exist, by name, and never adds one (#683).
-FORMAT_VERSION = 46
+#: 47 added ``eqf_level`` on an education entry: its level in the European Qualifications
+#: Framework, 1 to 8 or none; an archive without it restores none, and one with a value
+#: outside 1 to 8 restores none and says so (#684).
+FORMAT_VERSION = 47
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -165,7 +168,9 @@ FORMAT_VERSION = 46
 #: 9 added ``company`` on an experience: the name of the company the entry links to, read back
 #: as a hint -- offered as the link where it is exactly the name of one of the importing
 #: account's companies, and never the reason to add one (#683).
-CANDIDATE_FORMAT = 9
+#: 10 added ``eqf_level`` on an education entry, read back through the form's own choices, so
+#: a level outside 1 to 8 is a refused row (#684).
+CANDIDATE_FORMAT = 10
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -475,6 +480,7 @@ RESUME_FIELDS = {
         "start_date",
         "end_date",
         "grade",
+        "eqf_level",
         "highlights",
         "order",
     ),

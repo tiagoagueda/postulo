@@ -382,7 +382,8 @@ def fingerprint() -> str:
 #: address in a file that does not say (#305). 5 added the date and place of birth (#679).
 #: 6 added the nationalities and their scope (#680). 7 added the gender (#681). 8 added the
 #: messaging handles a person is reached on, read back as a link's service is (#682).
-#: 9 added the company an experience links to, read back as a hint (#683).
+#: 9 added the company an experience links to, read back as a hint (#683). 10 added the EQF
+#: level of an education entry, read back through the form's choices (#684).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -393,6 +394,7 @@ SHAPES = {
     7: "e5e8e4a8666679f8",
     8: "2bc0ec0af53cd958",
     9: "6cf32b0e61e73b80",
+    10: "d61ddfdc2bf0ece2",
 }
 
 
