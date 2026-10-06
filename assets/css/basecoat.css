@@ -1199,3 +1199,24 @@
     padding-block: calc(var(--spacing) * 2);
   }
 }
+
+/*
+ * A finger is not a pointer (#73): where the primary pointer is coarse, a button grows to
+ * 44 pixels, the icon-only ones in both directions. `app.css` does the same for the tap
+ * targets and the row actions; the `.btn` half lives here because Basecoat owns the name.
+ */
+@media (pointer: coarse) {
+  .btn[data-size="xs"],
+  .btn[data-size="sm"],
+  .btn[data-size="icon"],
+  .btn[data-size="icon-xs"],
+  .btn[data-size="icon-sm"] {
+    min-block-size: 2.75rem;
+  }
+
+  .btn[data-size="icon"],
+  .btn[data-size="icon-xs"],
+  .btn[data-size="icon-sm"] {
+    min-inline-size: 2.75rem;
+  }
+}

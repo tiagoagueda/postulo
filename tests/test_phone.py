@@ -27,9 +27,14 @@ def coarse_block() -> str:
 
 def test_a_coarse_pointer_gets_forty_four_pixels_not_a_narrow_window():
     block = coarse_block()
-    assert block.count("2.75rem") >= 4
-    for selector in (".tap-target", '.btn[data-size="xs"]', "select", "textarea"):
+    assert block.count("2.75rem") >= 3
+    for selector in (".tap-target", "td[data-actions]", "select", "textarea"):
         assert selector in block
+    # `.btn` is Basecoat's name, so its half is painted in the style pack, not in app.css.
+    pack = (ROOT / "assets" / "css" / "basecoat.css").read_text(encoding="utf-8")
+    coarse = "".join(re.findall(r"@media \(pointer: coarse\) \{(.*?)\n\}\n", pack, re.S))
+    assert '.btn[data-size="xs"]' in coarse
+    assert coarse.count("2.75rem") >= 2
     # 16 pixels in a text box, or a phone's browser zooms in on it and stays zoomed.
     assert "font-size: 1rem" in block
 
