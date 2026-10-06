@@ -842,6 +842,7 @@ def form_table(user, mine=None) -> dict:
         jobs.JobPostingForm: [{"user": user}],
         jobs.ListingEventForm: [{"user": user}],
         resume.CertificationForm: [{"user": user}],
+        resume.DrivingLicenceForm: [{"user": user}],
         resume.EducationForm: [{"user": user}],
         resume.ExperienceForm: [{"user": user}],
         resume.LanguageSkillForm: [{"user": user}],
@@ -958,3 +959,31 @@ def test_somebody_elses_publication_is_on_no_page_of_mine(client, user, other_us
     assert "Zebra studies" not in client.get(reverse("resume:overview")).content.decode()
     assert "Zebra studies" not in client.get(reverse("resume:preview")).content.decode()
     assert search.search(user, "Zebra") == []
+
+
+# ---------------------------------------------------------- driving licences (#691)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_driving_licence_is_not_found(client, user, other_user, name):
+    from postulo.resume.models import DrivingLicence
+
+    theirs = DrivingLicence.objects.create(owner=other_user, country="PT", categories=["B"])
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["driving-licence", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["driving-licence", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert DrivingLicence.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_driving_licence_is_on_no_page_of_mine(client, user, other_user):
+    from postulo.resume.models import DrivingLicence
+
+    DrivingLicence.objects.create(owner=other_user, country="NZ", categories=["DE"])
+    client.force_login(user)
+
+    assert "DE (New Zealand)" not in client.get(reverse("resume:overview")).content.decode()
+    assert "DE (New Zealand)" not in client.get(reverse("resume:preview")).content.decode()

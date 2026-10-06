@@ -66,6 +66,7 @@ from postulo.jobs.models import (
 from postulo.plugins.base import JobPostingData
 from postulo.resume.models import (
     Certification,
+    DrivingLicence,
     Education,
     Experience,
     LanguageSkill,
@@ -377,6 +378,7 @@ class Command(BaseCommand):
             Project,
             Publication,
             Certification,
+            DrivingLicence,
             LanguageSkill,
             Link,
         ):
@@ -514,6 +516,8 @@ class Command(BaseCommand):
                 order=0,
             )
         ]
+        # The categories and the country, and never a number (#691).
+        DrivingLicence.objects.create(owner=user, country="PT", categories=["A2", "B"], order=0)
         languages = [
             LanguageSkill.objects.create(
                 owner=user, name="Portuguese", code="pt-PT", proficiency="native", order=0

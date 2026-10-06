@@ -7,13 +7,14 @@ from django.db import models as django_models
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import language_names, languages
+from postulo.core import language_names, languages, phones, postal
 from postulo.core.language_field import LanguageChoiceField
 from postulo.jobs.forms import OwnerScopedModelForm
 
-from . import publications, translatable
+from . import driving, publications, translatable
 from .models import (
     Certification,
+    DrivingLicence,
     Education,
     Experience,
     LanguageSkill,
@@ -329,6 +330,78 @@ class CertificationForm(ResumeItemForm):
             entry.save()
             self.save_m2m()
         return entry
+
+
+class DrivingLicenceForm(ResumeItemForm):
+    """A driving licence: a country, the categories it holds as the codes, two dates.
+
+    The categories are a fieldset of checkboxes, and none implies another. There is no box
+    for a number, a photograph or anything else a licence carries, and there never will be:
+    see `DrivingLicence` and `docs/THREAT-MODEL.md` (#691).
+    """
+
+    date_range = ("first_issued_on", "expires_on")
+    end_before_start_message = _("This is before the date it was first issued.")
+
+    country = forms.ChoiceField(
+        label=_("Country"),
+        required=False,
+        choices=[("", _("Not stated")), *phones.country_choices()],
+        widget=postal.CountrySelect,
+        help_text=_(
+            "Filled in, a CV prints it in brackets after the categories, since a British or "
+            "a Brazilian B is not an EU B. Leave it blank to leave it off."
+        ),
+    )
+    categories = forms.MultipleChoiceField(
+        label=_("Categories"),
+        required=False,
+        choices=[],
+        widget=forms.CheckboxSelectMultiple,
+        help_text=_(
+            "Tick each category the licence lists: none implies another, so somebody who holds "
+            "A ticks A. A CV prints the codes."
+        ),
+    )
+
+    class Meta:
+        model = DrivingLicence
+        fields = (
+            "country",
+            "categories",
+            "other_categories",
+            "first_issued_on",
+            "expires_on",
+            "order",
+        )
+        widgets = {"first_issued_on": DATE_WIDGET, "expires_on": DATE_WIDGET}
+        help_texts = {
+            "other_categories": _(
+                "National letters or classes the list lacks, as the licence prints them. "
+                "A CV prints them after the codes."
+            ),
+            "first_issued_on": _("Not printed on a CV."),
+            "expires_on": _("Leave it empty if it does not expire. Not printed on a CV."),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["categories"].choices = driving.choices()
+
+    def clean_categories(self) -> list[str]:
+        return driving.ordered(self.cleaned_data["categories"])
+
+    def clean(self):
+        cleaned = super().clean()
+        if not cleaned.get("categories") and not (cleaned.get("other_categories") or "").strip():
+            if "categories" not in self.errors:
+                self.add_error(
+                    "categories",
+                    forms.ValidationError(
+                        _("Tick a category, or write the national one below."), code="required"
+                    ),
+                )
+        return cleaned
 
 
 #: What the language menu says for a language that is not in it: the name is typed.

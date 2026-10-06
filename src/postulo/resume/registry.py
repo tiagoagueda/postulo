@@ -70,6 +70,17 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Certification"),
         _("Certifications"),
     ),
+    "driving-licence": SectionSpec(
+        "driving-licence",
+        resume_models.DrivingLicence,
+        resume_forms.DrivingLicenceForm,
+        _("Driving licence"),
+        _("Driving licences"),
+        _(
+            "The categories you hold, as codes. Postulo never keeps the licence number, a "
+            "photograph or anything else a licence carries."
+        ),
+    ),
     "link": SectionSpec(
         "link",
         resume_models.Link,
@@ -96,5 +107,6 @@ OVERVIEW_ORDER = (
     "link",
     "skill-group",
     "certification",
+    "driving-licence",
     "language",
 )

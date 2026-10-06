@@ -33,6 +33,7 @@ from . import companies, importing, ordering, translating
 from . import forms as resume_forms
 from .models import (
     Certification,
+    DrivingLicence,
     Education,
     Experience,
     LanguageSkill,
@@ -118,6 +119,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             "skill": Skill.objects.for_user(user).count(),
             "certification": Certification.objects.for_user(user).count(),
             "language": LanguageSkill.objects.for_user(user).count(),
+            "driving_licence": DrivingLicence.objects.for_user(user).count(),
             "skill_group": SkillGroup.objects.for_user(user).count(),
         }
         return context
@@ -433,6 +435,7 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "skill_groups": SkillGroup.objects.for_user(user).prefetch_related("skills"),
                 "certifications": Certification.objects.for_user(user),
                 "languages": LanguageSkill.objects.for_user(user),
+                "driving_licences": DrivingLicence.objects.for_user(user),
             },
         )
 

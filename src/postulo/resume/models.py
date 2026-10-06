@@ -16,14 +16,16 @@ from __future__ import annotations
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages
 from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
+from postulo.core.personal import validate_country_code
 from postulo.jobs import esco
 
-from . import publications, translatable
+from . import driving, publications, translatable
 
 
 def split_highlights(text: str) -> list[str]:
@@ -464,6 +466,64 @@ class LanguageSkill(ResumeItem):
 
     def __str__(self) -> str:
         return f"{self.shown_name} ({self.get_proficiency_display()})"
+
+
+class DrivingLicence(ResumeItem):
+    """That the person can drive, and in which categories: the codes, and nothing more (#691).
+
+    **What is kept is what a CV says**: the country, the categories as the Directive's codes
+    in its order, a note of national letters or classes the fifteen lack, and two dates. A
+    person may hold several, a Portuguese licence and a British one being two entries.
+
+    **What is never kept** is a licence number, a photograph, a signature, a residence or a
+    restriction code. The number is the most valuable line in a breach and does nothing for
+    a CV; the restriction codes (the Union model's field 12) are data concerning health where
+    they say a driver wears glasses, which GDPR Article 9(1) lists. A test asserts the field
+    list, so a column of that kind is a failing test before it is a decision.
+    """
+
+    country = models.CharField(
+        _("country"), max_length=2, blank=True, validators=[validate_country_code]
+    )
+    categories = models.JSONField(
+        _("categories"), default=list, blank=True, validators=[driving.validate]
+    )
+    other_categories = models.CharField(
+        _("other categories"), max_length=driving.MAX_OTHER, blank=True
+    )
+    first_issued_on = models.DateField(_("first issued on"), null=True, blank=True)
+    expires_on = models.DateField(_("expires on"), null=True, blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("driving licence")
+        verbose_name_plural = _("driving licences")
+
+    @property
+    def codes(self) -> str:
+        """What the licence is for, as a CV says it: the codes in order, then the note."""
+        held = driving.ordered(self.categories or [])
+        note = (self.other_categories or "").strip()
+        return ", ".join([*held, *([note] if note else [])])
+
+    @property
+    def country_name(self) -> str:
+        from postulo.core import phones
+
+        return phones.country_name(self.country) if self.country else ""
+
+    @property
+    def cv_line(self) -> str:
+        """“Driving licence: B, A2 (Portugal)”, in the language being read.
+
+        The country only where it is filled, so a person leaves it blank to leave it off, and
+        never a date. The same words the themes, the text and the Word file print.
+        """
+        line = gettext("Driving licence: %(categories)s") % {"categories": self.codes}
+        return f"{line} ({self.country_name})" if self.country else line
+
+    def __str__(self) -> str:
+        shown = self.codes or gettext("Driving licence")
+        return f"{shown} ({self.country_name})" if self.country else shown
 
 
 class LinkKind(models.TextChoices):

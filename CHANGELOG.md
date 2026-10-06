@@ -49,6 +49,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Your career gains a Driving licences section: tick the categories you hold (AM to DE) and a CV prints "Driving licence: B, A2 (Portugal)"; the licence number and everything else on the card is never kept (#691)
 - A certification's issuer is linked to one of your companies (added if new, with no industry), offered with awarding bodies first, with a notice when it has no NACE industry; archive 52, candidate file 14 (#686)
 - An education entry now links its institution to a company of yours, offering places of learning first and adding the Education industry to a company the form creates; the archive goes to format 51 and the record file to 13 (#685)
 - GitHub, Forgejo and SourceHut brand marks appear beside contact links, drawn in black or white where the owner's guidelines allow it, and an identifier scheme can name a mark (#654)

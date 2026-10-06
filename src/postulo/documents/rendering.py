@@ -48,6 +48,7 @@ SECTION_LABELS = {
     "skillgroup": _("Skills"),
     "certification": _("Certifications"),
     "languageskill": _("Languages"),
+    "drivinglicence": _("Driving licence"),
 }
 
 
@@ -500,6 +501,9 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
             _joined(BETWEEN, _joined(" — ", one.item.title, one.item.description), one.item.url)
             for one in entries
         ]
+    elif section.kind == "drivinglicence":
+        # The one line the themes print, the codes and the country and never a date (#691).
+        lines = [one.item.cv_line for one in entries]
     elif section.kind == "publication":
         # The one neutral line, as the themes print it (#687).
         lines = [one.item.citation for one in entries]

@@ -146,7 +146,11 @@ logger = logging.getLogger(__name__)
 #: 52 added ``company`` on a certification: the name of the company its issuer is linked to,
 #: or blank; read back as on an experience -- by name, in a pass once the companies exist,
 #: and never adding one (#686).
-FORMAT_VERSION = 52
+#: 53 added ``driving_licences`` in the career: a country, the categories as the Directive's
+#: codes, a note of national ones, and two dates -- never a number or anything else a licence
+#: carries. An archive without them restores none; a code outside the fifteen restores no
+#: licence and says so (#691).
+FORMAT_VERSION = 53
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -196,7 +200,9 @@ FORMAT_VERSION = 52
 #: 14 added ``company`` on a certification, read back the same way: a hint, offered as the
 #: link where it is exactly the name of one of the importing account's companies, and never
 #: the reason to add one (#686).
-CANDIDATE_FORMAT = 14
+#: 15 added ``driving_licences``, read back through the form a person would have ticked one
+#: in, and the same licence being the same country and the same categories (#691).
+CANDIDATE_FORMAT = 15
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -286,6 +292,7 @@ TRANSLATION_SECTIONS = {
     "skill": "skills",
     "certification": "certifications",
     "languageskill": "languages",
+    "drivinglicence": "driving_licences",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -565,6 +572,16 @@ RESUME_FIELDS = {
         "order",
     ),
     "languages": ("id", "name", "code", "proficiency", "order"),
+    # The codes and the country and nothing a licence carries beside them (#691).
+    "driving_licences": (
+        "id",
+        "country",
+        "categories",
+        "other_categories",
+        "first_issued_on",
+        "expires_on",
+        "order",
+    ),
     "links": (
         "id",
         "title",
@@ -588,6 +605,7 @@ RESUME_MODELS = {
     "skills": "Skill",
     "certifications": "Certification",
     "languages": "LanguageSkill",
+    "driving_licences": "DrivingLicence",
     "links": "Link",
 }
 

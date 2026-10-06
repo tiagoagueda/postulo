@@ -43,6 +43,17 @@ somebody can be found. Three consequences, and each is a rule rather than an int
   address reaching a stranger by default, and `Profile.location` staying its own line is the
   mechanism rather than a convention.
 
+**A driving licence is kept as its categories and never as the licence (#691).** A career
+entry holds a country, the categories as the fifteen codes of Directive 2006/126/EC (kept by
+Directive (EU) 2025/2205), a note of national letters, and two optional dates: what a CV says
+and nothing else. The licence **number** is an identifier people are defrauded with and does
+nothing for a CV, so it is the most valuable line a breach could hold and there is no column for
+it; neither is there one for the photograph, the signature, the residence or the restriction
+codes of the Union model's field 12, which are data concerning health (GDPR Article 9(1)) where
+they say a driver wears glasses. `tests/test_driving_licences.py` asserts the model's field
+list, so a column of that kind fails a test before it is a decision. A category is checked
+against the table in `resume/driving.py` by the page, the archive and the candidate file alike.
+
 **A date and a place of birth sit beside it (#679), and so do nationalities (#680) and
 gender (#681).** They are what an identity check asks for, a nationality can reveal an ethnic
 origin, and gender is personal data that some regulators treat as sensitive, so they are the

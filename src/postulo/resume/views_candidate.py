@@ -41,6 +41,7 @@ COUNTED = (
     ("skill_groups", capfirst(resume.SkillGroup._meta.verbose_name_plural)),
     ("skills", gettext_lazy("Skills")),
     ("certifications", gettext_lazy("Certifications")),
+    ("driving_licences", gettext_lazy("Driving licences")),
     ("languages", gettext_lazy("Languages")),
     ("translations", capfirst(resume.Translation._meta.verbose_name_plural)),
     ("phone_numbers", gettext_lazy("Telephone numbers")),

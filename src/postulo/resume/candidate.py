@@ -80,7 +80,7 @@ from postulo.core import (
 from postulo.core import web_links as links
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
-from . import companies, ordering, publications, translating
+from . import companies, driving, ordering, publications, translating
 from . import forms as resume_forms
 from . import models as resume
 
@@ -106,6 +106,11 @@ BATCH = ordering.BATCH
 #: What an entry writes as a number and not as text: a level (#684). The form reads it as a
 #: choice, so a number outside the levels is a refused row like a word is.
 NUMBERS = frozenset({"eqf_level"})
+
+#: What an entry writes as a list of texts and not as one: a licence's categories (#691). Held
+#: as that list, bounded, and read by the form as the ticked boxes it would have been.
+LISTS = frozenset({"categories"})
+MAX_LIST = 30
 
 #: A date as the file writes one, which is how `date.isoformat()` does. Matched rather than
 #: handed to a form, whose date field also reads whatever the reader's language writes --
@@ -313,6 +318,18 @@ KINDS: tuple[Kind, ...] = (
         hints=("company",),
     ),
     Kind(
+        block="driving_licences",
+        model=resume.DrivingLicence,
+        form=resume_forms.DrivingLicenceForm,
+        title=gettext_lazy("Driving licences"),
+        fields=("country", "categories", "other_categories", "first_issued_on", "expires_on"),
+        names=("country", "categories"),
+        dates=("first_issued_on", "expires_on"),
+        # The same licence is the same country and the same categories, whatever the order
+        # the file lists them in (#691).
+        identity=lambda get: _licence_identity(get),
+    ),
+    Kind(
         block="languages",
         model=resume.LanguageSkill,
         form=resume_forms.LanguageSkillForm,
@@ -323,6 +340,15 @@ KINDS: tuple[Kind, ...] = (
 )
 
 KINDS_BY_BLOCK = {kind.block: kind for kind in KINDS}
+
+
+def _licence_identity(get: Callable[[str], Any]) -> tuple[tuple, ...]:
+    """What makes two driving licences one: the country and the categories, in any order.
+
+    No date is part of it: the same licence, renewed, is still the one."""
+    held = get("categories")
+    codes = tuple(driving.ordered(held)) if isinstance(held, list) else ()
+    return (("licence", fold(get("country")), codes, fold(get("other_categories"))),)
 
 
 def _publication_identity(get: Callable[[str], Any]) -> tuple[tuple, ...]:
@@ -407,7 +433,14 @@ def _prune(entry, names: tuple[str, ...]):
     """One entry, down to what is read of it. ``None`` for a thing that is not an entry."""
     if not isinstance(entry, dict):
         return None
-    return {name: _kept(entry[name]) for name in names if name in entry}
+    return {name: _kept_value(name, entry[name]) for name in names if name in entry}
+
+
+def _kept_value(name: str, value):
+    """A value as `_kept` holds it, except a list of texts where the entry has one."""
+    if name in LISTS and isinstance(value, list):
+        return [_short(item, 20) if isinstance(item, str) else 0 for item in value[:MAX_LIST]]
+    return _kept(value)
 
 
 def read(data: bytes) -> dict:
@@ -757,6 +790,10 @@ class _Planner:
             value = entry.get(name)
             if value is None:
                 data[name] = ""
+            elif name in LISTS and isinstance(value, list):
+                data[name] = value
+                if not all(isinstance(item, str) for item in value):
+                    wrong.append((name, _not_text()))
             elif name in NUMBERS and isinstance(value, int) and not isinstance(value, bool):
                 # A level is written as the number it is; the form judges whether it is one.
                 data[name] = str(value) if abs(value) < 10**6 else ""
@@ -1355,6 +1392,8 @@ class _Planner:
         )
         if kind.block == "languages" and valid:
             row.sub = str(instance.get_proficiency_display()) if instance.proficiency else ""
+        if kind.block == "driving_licences":
+            row.label = str(instance) if valid else _("A driving licence")
         group = ""
         if kind.block == "skills":
             group = self._group_of(entry, row)

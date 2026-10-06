@@ -23,7 +23,7 @@ from postulo.documents.models import CV, RenderedDocument, UploadedDocument
 from postulo.jobs import logos
 from postulo.jobs.models import Company, CompanyLogo, Contact, JobPosting
 from postulo.plugins.models import Connection
-from postulo.resume.models import Publication
+from postulo.resume.models import DrivingLicence, Publication
 
 pytestmark = pytest.mark.django_db
 
@@ -59,6 +59,7 @@ def fill(user) -> dict[str, Path]:
     )
     cv = CV.objects.create(owner=user, name="CV")
     Publication.objects.create(owner=user, title="A paper", authors="Morgan, Alex")
+    DrivingLicence.objects.create(owner=user, country="PT", categories=["B"])
     upload = UploadedDocument.objects.create(
         owner=user, title="Designed CV", file=ContentFile(b"%PDF-1.7 mine", name="cv.pdf")
     )
@@ -109,6 +110,7 @@ def test_deleting_removes_every_owned_row_and_every_file(
         UploadedDocument,
         ApiToken,
         Publication,
+        DrivingLicence,
     ):
         assert model.objects.filter(owner=other_user).exists(), (
             f"{model.__name__}: the other person's rows must be untouched"

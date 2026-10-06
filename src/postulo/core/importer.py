@@ -25,7 +25,7 @@ from django.core.files.base import ContentFile
 from django.db import IntegrityError, transaction
 from django.utils.dateparse import parse_date, parse_datetime
 
-from . import language_names, personal, slugs
+from . import language_names, personal, phones, slugs
 from .export import (
     APPLICATION_FIELDS,
     CAPTURE_FIELDS,
@@ -281,6 +281,49 @@ def _eqf_level(value, report: ImportReport, entry: dict) -> int | None:
         "from 1 to 8, and was left out"
     )
     return None
+
+
+def _licence_as_written(values: dict, report: ImportReport) -> dict | None:
+    """A driving licence as a form would have kept it, or nothing where it cannot be (#691).
+
+    A row written straight to the model would keep a code outside the fifteen, a country
+    that is not on the list and a note as long as a file likes. So the codes are held to the
+    table and put in its order, the country to the list, and the note to its length; a code
+    that is not one, or no category at all, is a licence that is not restored, and the report
+    says which.
+    """
+    from postulo.resume import driving
+
+    held = values.get("categories")
+    note = values.get("other_categories")
+    note = note.strip()[: driving.MAX_OTHER] if isinstance(note, str) else ""
+    try:
+        driving.validate(held if held is not None else [])
+    except ValidationError as exc:
+        shown = str(held)[:40]
+        report.skipped.append(
+            f"A driving licence with the categories {shown}: {exc.messages[0]}, and left out"
+        )
+        return None
+    if not held and not note:
+        report.skipped.append(
+            "A driving licence with no category: it says nothing, and was left out"
+        )
+        return None
+    country = values.get("country")
+    if not isinstance(country, str) or country not in phones.BY_CODE:
+        if country:
+            report.skipped.append(
+                f"A driving licence: {str(country)[:20]!r} is not a country on the list, and "
+                "was left blank"
+            )
+        country = ""
+    return {
+        **values,
+        "categories": driving.ordered(held or []),
+        "other_categories": note,
+        "country": country,
+    }
 
 
 def _dt(value):
@@ -925,10 +968,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         "skill_groups": resume.SkillGroup,
         "certifications": resume.Certification,
         "languages": resume.LanguageSkill,
+        "driving_licences": resume.DrivingLicence,
         "links": resume.Link,
     }
     held_keys = set(resume.Publication.objects.for_user(user).values_list("cite_key", flat=True))
-    date_fields = {"start_date", "end_date", "issued_on", "expires_on"}
+    date_fields = {"start_date", "end_date", "issued_on", "expires_on", "first_issued_on"}
     moment_fields = {"checked_at"}
     #: Experience primary key -> the name of the company it links to, applied once every
     #: company in the file has been made or matched (#683).
@@ -959,6 +1003,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                 values = publications.sanitise(values, held_keys)
                 held_keys.add(values.get("cite_key", ""))
 
+            if key == "driving_licences":
+                # Held to the table of categories, as a page would have held it (#691).
+                values = _licence_as_written(values, report)
+                if values is None:
+                    continue
             if key == "languages":
                 # A code is read as a claim, as any language code is: shaped like a tag or
                 # nothing. An archive from before format 50 has none, and a name that is

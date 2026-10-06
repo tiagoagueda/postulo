@@ -132,6 +132,15 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'drivinglicence' %}
+          {% comment %} One line an entry, the same words the text and Word files carry
+             (`DrivingLicence.cv_line`): the codes, the country if filled, never a date (#691). {% endcomment %}
+          <ul class="driving-licences">
+            {% for entry in section.items %}
+              <li><bdi>{{ entry.item.cv_line }}</bdi></li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

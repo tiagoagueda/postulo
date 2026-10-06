@@ -121,6 +121,15 @@
       </section>
     {% endif %}
 
+    {% if driving_licences %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Driving licences" %}</c-section-title>
+        <div class="card space-y-1 text-sm">
+          {% for item in driving_licences %}<p><bdi>{{ item }}</bdi></p>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% if certifications or languages %}
       <div class="grid gap-6 sm:grid-cols-2">
         {% if certifications %}

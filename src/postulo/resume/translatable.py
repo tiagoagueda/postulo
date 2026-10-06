@@ -31,6 +31,7 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     "skillgroup": ("name",),
     "skill": ("name",),
     "languageskill": ("name",),
+    # `drivinglicence` is absent on purpose: a code is a code, and a country is a country (#691).
     "link": ("title", "description"),
 }
 

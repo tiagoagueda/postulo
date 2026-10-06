@@ -902,3 +902,50 @@ def test_a_hostile_certification_company_is_a_name_to_look_for_and_nothing_else(
         assert outcomes(plan, "certifications") == ["add"]
         assert all(row.company is None for row in plan.rows())
     assert Company.objects.filter(owner=user).count() == 1
+
+
+# ---------------------------------------------------------------- driving licences (#691)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        MARKUP,
+        SCRIPT,
+        "B" * 5000,
+        ["B", MARKUP],
+        [f"X{n}" for n in range(5000)],
+        {"B": 1},
+        ["e\x00"],
+        [["B"]],
+    ],
+)
+def test_a_hostile_or_over_long_licence_category_is_a_refused_row_and_stores_nothing(user, bad):
+    from postulo.resume.models import DrivingLicence
+
+    data = a_file(resume={"driving_licences": [{"country": "PT", "categories": bad}]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "driving_licences") == [candidate.REFUSED]
+    assert not DrivingLicence.objects.for_user(user).exists()
+
+
+def test_an_over_long_note_or_a_hostile_country_in_a_licence_is_refused(user):
+    from postulo.resume.models import DrivingLicence
+
+    data = a_file(
+        resume={
+            "driving_licences": [
+                {"country": "PT", "categories": ["B"], "other_categories": "x" * 5000},
+                {"country": MARKUP, "categories": ["B"]},
+            ]
+        }
+    )
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "driving_licences") == [candidate.REFUSED, candidate.REFUSED]
+    assert not DrivingLicence.objects.for_user(user).exists()
