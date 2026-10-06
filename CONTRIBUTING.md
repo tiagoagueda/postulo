@@ -468,6 +468,10 @@ names the same issue as the code, pushed when the code is.
   `[Configuration](Configuration)`.
 - **Images** go in `images/` and are referred to by a relative path, `images/postulo.png`;
   Forgejo serves them from the wiki repository.
+- **A page read before there is an instance** (*Home*, *Installing Postulo*, *Getting
+  started*) has translations under `lang/<tag>/` and is built into a static site by
+  `scripts/wiki_site.py`; when you change the English of one, run `wiki_site.py stale` and
+  say in the commit which translations now lag (*Translating*, `docs/TRANSLATING.md`, #352).
 - **Pictures of the interface are generated, never taken by hand** (#353). A page that
   describes a screen shows it with `![what it shows](images/board.png)`, and the alternative
   text says what the picture shows, because the reader may not see it. Add the page to

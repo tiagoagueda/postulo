@@ -280,6 +280,66 @@ without waiting for a release, and what they add shows up as soon as it is merge
 - **Plugins carry their own catalogues** and are completed, checked and offered the same
   way; a language is as complete as the interface somebody sees, core and plugins together.
 
+## The wiki in other languages
+
+Decided in #352: **a mix.** Forgejo's wiki has no notion of a page's language (no switcher, no
+fallback to English), so nothing is built out of page names inside it.
+
+- **While you use Postulo**, the translated text is the in-app help (#302), written as
+  templates and translated through the catalogues above. The wiki is not translated for it.
+- **Before you have an instance** (*Home*, *Installing Postulo*, *Getting started*) the pages
+  are a **static documentation site built from the wiki repository** by
+  `scripts/wiki_site.py`. Every other page stays English, on Forgejo, and the site says so.
+
+### What the wiki repository holds
+
+```
+Getting-started.md              the English source, as Forgejo shows it
+site.json                       the site's own few words (banners, labels)
+lang/<tag>/Getting-started.md   a translation; <tag> is a canonical BCP 47 tag (pt-PT, fr-FR)
+lang/<tag>/site.json            the same words in that language; a missing key falls back
+lang/stamps.json                which English each translation was read against
+```
+
+### The tool
+
+```sh
+uv run python scripts/wiki_site.py build ../postulo.wiki site/      # the whole site
+uv run python scripts/wiki_site.py stale ../postulo.wiki --strict   # fail if a source moved
+uv run python scripts/wiki_site.py stamp ../postulo.wiki fr-FR      # fr-FR has been read
+uv run python scripts/wiki_site.py components ../postulo.wiki       # what Weblate is set up with
+```
+
+- **Landing.** `index.html` lists the languages, each in its own name with `lang` set; each
+  language has the same pages, with links that stay inside it. A page with no translation is
+  the English page with a banner in the reader's language saying so, never a 404. Which
+  language a visitor is sent to first is the web server's job (`Accept-Language` on whatever
+  serves `site/`); the landing is what works with nothing.
+- **Staleness.** A stamp is a hash of the English file's text, so it needs no git history and
+  does not care what a translation platform does to the translated file. `build` puts a
+  banner on a translation whose English has moved, or that was never stamped; `stale` lists
+  them and `--strict` fails, so CI on the wiki can refuse a source change that leaves a
+  translation describing last year's interface unless it is marked. `stamp` is what a
+  reviewer runs after reading a translation against today's English: it is the page's
+  equivalent of deleting `draft` from a string.
+- **Weblate.** `components` prints one component per page plus one for `site.json`, in the
+  file mask, template and BCP language-code style Weblate needs (`lang/*/Page.md`,
+  with `pt-PT` written as `pt-PT`, not `pt_PT`). The component reads and commits the wiki
+  repository the way the catalogues' component does (#349). The components have not been created on
+  the live Weblate yet: check the `file_format` name in the output against the version the
+  instance runs when doing so, which the script cannot do. A translation arriving from
+  Weblate is not read by a speaker yet: it is *unstamped*, which the site shows as a banner
+  until somebody stamps it.
+- **Cost.** The three pages are about six thousand words, so a language costs a machine
+  draft and one review of that size, not the 77,000 of the whole wiki. Do *Getting started*
+  first.
+- **Images** are shared by every language, so a screenshot with words in it stays English
+  until the generated screenshots (#353) can be made per language.
+- **Commitments.** The output is HTML, one stylesheet and the wiki's images: no script and
+  nothing from a third party, both colour schemes, `dir="rtl"` for the languages `RTL` lists.
+  Raw HTML in a page is cut down to a picture, a link and a few inline tags, because a
+  translation comes from a platform others can write to.
+
 ## Plugins
 
 A plugin's strings are the plugin's to translate: its `locale/` directory sits beside the
