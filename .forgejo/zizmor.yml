@@ -4,8 +4,17 @@
 # instance, not GitHub, so pinning them to a GitHub commit hash would point at a commit
 # the instance may not have. A tag pin is what Forgejo can honour; everything else is
 # held to zizmor's defaults.
+#
+# ci.yml has no `permissions:` block because Forgejo 16 ignores the field and warns about
+# it; what a job may do beyond reading is granted by the instance's Authorized Integrations.
+# Every job in ci.yml only reads, so the audit that asks for the block is turned off for
+# that one file and nowhere else: the workflows that write (releases, the registry, the
+# dependency pull request) are still held to it.
 rules:
   unpinned-uses:
     config:
       policies:
         "actions/*": ref-pin
+  excessive-permissions:
+    ignore:
+      - ci.yml

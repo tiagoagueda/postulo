@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- CI no longer carries a `permissions:` block that Forgejo 16 ignores and warns about on every job; the workflow audit is told why for `ci.yml` alone, and the write grants of the release and image workflows are still to be given to the instance as Authorized Integrations (#727)
 - Deleting a listing now deletes the captures that became it, with their kept pages; a capture nobody saved can be deleted at once, and `manage.py prune_captures` finds saved captures already stranded without a listing (#664)
 - A profile picture, its Gravatar copy and a company logo are now rows in the database that go with their owner however it is deleted (page, merge, admin, account deletion), no longer files that could be left behind (#662)
 - The test suite now runs views inside the per-request transaction production uses, so a view that forgets non_atomic_requests fails in tests too. (#572)

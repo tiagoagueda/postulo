@@ -34,9 +34,11 @@ on:
     # library is noticed even in a week when nothing was pushed.
     - cron: "17 6 * * 1"
 
-# Every job here only reads the repository.
-permissions:
-  contents: read
+# Every job here only reads the repository, which is what a job has without asking. There
+# is no `permissions:` block on purpose: Forgejo 16 does not support the field and warns
+# that it is ignored, and capabilities beyond reading are granted to a job through the
+# instance's Authorized Integrations, not by the workflow. `.forgejo/zizmor.yml` says the
+# same to zizmor, which would otherwise ask for the block.
 
 env:
   # The one version of uv every job installs, the same one .pre-commit-config.yaml and
