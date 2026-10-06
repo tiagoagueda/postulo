@@ -38,6 +38,7 @@ import re
 
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import ngettext
 
 from postulo.core.language_names import ISO_639_2
 from postulo.plugins.api import Record, is_language_tag, language_tag
@@ -724,7 +725,11 @@ def _read_references(profile, record: Record) -> None:
     if len(referees) > MAX_REFEREES:
         record.skipped.append(
             str(
-                _("The file lists %(count)d references, and only the first %(limit)d were read.")
+                ngettext(
+                    "The file lists %(count)d reference, and only the first %(limit)d was read.",
+                    "The file lists %(count)d references, and only the first %(limit)d were read.",
+                    len(referees),
+                )
                 % {"count": len(referees), "limit": MAX_REFEREES}
             )
         )
