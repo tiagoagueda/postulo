@@ -619,3 +619,31 @@ def test_a_deactivated_account_has_no_copies_sent(user):
     user.is_active = True
     user.save(update_fields=["is_active"])
     assert send_pending() == (1, 0)
+
+
+# ------------------------------------------------------- reference letters (#666)
+
+
+def test_a_new_connection_has_the_reference_switch_off_and_every_other_on(client, user):
+    """A reference letter is somebody else's words and name: not copied unless asked."""
+    import re
+
+    client.force_login(user)
+    html = client.get(reverse("connections:create", args=["store", "shelf"])).content.decode()
+
+    def switch(kind):
+        tag = re.search(rf'<input[^>]*name="plugin_kind_{kind}"[^>]*>', html).group(0)
+        return "checked" in tag
+
+    assert not switch("reference")
+    assert switch("cv") and switch("certificate")
+    assert "somebody else" in html, "the reason is shown beside it"
+
+
+def test_an_existing_connection_keeps_the_setting_it_has_for_reference_letters(user):
+    from postulo.documents.stores import wants_kind
+
+    old = a_store(user, "Before #666")
+    assert "kind_reference" not in old.config
+    assert wants_kind(old.config, "reference") is True, "unset still means yes"
+    assert wants_kind(a_store(user, "Chose", kind_reference=False).config, "reference") is False

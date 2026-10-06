@@ -570,6 +570,15 @@ def plan_contacts(kept, other) -> Plan:
             lambda row: row.summary or row.posting.title,
         ),
     ]
+    from postulo.documents.models import ReferenceLetter
+
+    lines.append(
+        _moved(
+            _("Reference letters they wrote"),
+            ReferenceLetter.objects.filter(owner_id=owner, referee=other).select_related("upload"),
+            lambda row: row.upload.title,
+        )
+    )
     plan.moves = [line for line in lines if line is not None]
     if moving_links:
         plan.moves.insert(
@@ -652,6 +661,7 @@ def merge_contacts(kept, other) -> Plan:
     """Make the person ``other`` the same record as ``kept``, and delete the other."""
     from postulo.applications.models import Application, Interview
     from postulo.core.models import MessagingHandle, WebLink
+    from postulo.documents.models import ReferenceLetter
 
     _same_owner(kept, other)
     locked = {
@@ -675,6 +685,8 @@ def merge_contacts(kept, other) -> Plan:
     # clear it in silence when the other record goes, and the collector's question below
     # does not count a cleared link as something lost.
     ListingEvent.objects.filter(posting__owner_id=owner, contact=other).update(contact=kept)
+    # The letters they wrote, for the same reason (#666).
+    ReferenceLetter.objects.filter(owner_id=owner, referee=other).update(referee=kept)
 
     # An interview both were at has the kept person once, not twice.
     seats = Interview.contacts.through.objects

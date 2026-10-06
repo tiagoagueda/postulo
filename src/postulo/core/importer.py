@@ -1458,6 +1458,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         stored_name = upload_entry.pop("file", "")
         upload_entry.pop("created_at", None)
         copies = upload_entry.pop("copies", [])
+        letter_entry = upload_entry.pop("reference_letter", None)
 
         upload = UploadedDocument(
             owner=user, **_carried(upload_entry, UPLOAD_FIELDS, report, "An upload")
@@ -1471,6 +1472,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             upload.file.save(stored_name.rsplit("/", 1)[-1], ContentFile(content), save=False)
         upload.save()
         _restore_copies(user, copies, upload)
+        if isinstance(letter_entry, dict):
+            _restore_reference_letter(user, upload, letter_entry, contacts)
         uploads[old_id] = upload
         report.uploads += 1
         if replaces_id:
@@ -1634,6 +1637,33 @@ def _restore_listing_history(posting, entries: list, *, contacts: dict, pointabl
         )
         made += 1
     return made
+
+
+def _restore_reference_letter(user, upload, entry: dict, contacts: dict) -> None:
+    """The record of who wrote a reference letter, once the contacts exist (#666).
+
+    A referee the file does not carry is left blank, a date that does not read is left
+    empty, and a delivery it does not know is the default: the letter is still there, which
+    is what matters.
+    """
+    from postulo.documents.models import ReferenceDelivery, ReferenceLetter
+
+    def day(value):
+        try:
+            return _d(value) if isinstance(value, str) else None
+        except ValueError:
+            return None
+
+    referee_id = entry.get("referee_id")
+    delivery = entry.get("delivery")
+    ReferenceLetter.objects.create(
+        owner=user,
+        upload=upload,
+        referee=contacts.get(referee_id) if isinstance(referee_id, int) else None,
+        written_on=day(entry.get("written_on")),
+        valid_until=day(entry.get("valid_until")),
+        delivery=delivery if delivery in ReferenceDelivery.values else ReferenceDelivery.YOU,
+    )
 
 
 def _restore_remembered_place(user, row, report) -> int:

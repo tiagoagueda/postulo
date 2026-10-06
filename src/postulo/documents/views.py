@@ -1106,14 +1106,21 @@ class ApplicationDocumentsView(OwnedObjectMixin, DetailView):
 
         context = super().get_context_data(**kwargs)
         rendered = list(self.object.rendered_documents.all())
-        uploads = list(self.object.sent_uploads.all())
+        sent = list(
+            self.object.sent_uploads.select_related("reference_letter", "reference_letter__referee")
+        )
+        # A reference letter is named with its referee in a group of its own (#666); a file of
+        # that kind nobody described is an ordinary file.
+        letters = [upload for upload in sent if hasattr(upload, "reference_letter")]
+        uploads = [upload for upload in sent if not hasattr(upload, "reference_letter")]
         # Whether each has a version before it to be compared with. A query a document,
         # and an application is sent a CV and a letter, not fifty (#236).
         for document in rendered:
             document.has_earlier = document.previous() is not None
-        attach_copies([*rendered, *uploads])
+        attach_copies([*rendered, *letters, *uploads])
         context["rendered"] = rendered
         context["uploads"] = uploads
+        context["reference_letters"] = letters
         context["links"] = list(self.object.sent_links.all())
         context["has_stores"] = store_connections(self.request.user).exists()
         return context

@@ -78,6 +78,35 @@
   </form>
   {% comment %} The one contact as a card (#660), outside the form above: a form does not hold
      a form. Only for a contact that exists. {% endcomment %}
+  {% if reference_letters %}
+    {% comment %} What this person wrote about you, and where each went (#666). {% endcomment %}
+    <section class="mt-8 max-w-2xl" data-reference-letters>
+      <c-section-title>{% translate "Reference letters they wrote" %}</c-section-title>
+      <div class="card p-0">
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for letter in reference_letters %}
+            <li class="px-4 py-3">
+              <p class="font-medium"><bdi>{{ letter.upload.title }}</bdi></p>
+              <p class="text-xs text-ink-500 dark:text-ink-400">
+                {% if letter.written_on %}{{ letter.written_on|date:"DATE_FORMAT" }}{% else %}{% translate "Date not recorded" %}{% endif %}
+                {% if letter.is_expired %}· <span class="text-red-600 dark:text-red-400">{% translate "past its do-not-send-after date" %}</span>{% endif %}
+              </p>
+              {% if letter.upload.applications.all %}
+                <p class="text-sm">
+                  {% translate "Sent with:" %}
+                  {% for application in letter.upload.applications.all %}
+                    <a href="{{ application.get_absolute_url }}" class="underline"><bdi>{{ application.posting.title }} — {{ application.posting.company.name }}</bdi></a>{% if not forloop.last %}, {% endif %}
+                  {% endfor %}
+                </p>
+              {% elif letter.sent_by_referee %}
+                <p class="text-sm">{% translate "They send it themselves." %}</p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </section>
+  {% endif %}
   {% if object.pk %}
     <div class="mt-8 max-w-2xl">
       {% url 'jobs:contact_vcard' object.pk as card_url %}

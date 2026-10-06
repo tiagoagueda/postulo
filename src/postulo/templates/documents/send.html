@@ -53,6 +53,24 @@
           <c-field :field="field" />
         {% endfor %}
       </div>
+      {% if form.referee_sends %}
+        {% comment %} Not offered as files to attach: somebody else is sending these (#666). {% endcomment %}
+        <div class="card mb-6" data-referee-sends>
+          <p class="label">{% translate "Reference letters their authors send themselves" %}</p>
+          <ul class="mt-1 list-disc space-y-1 ps-5 text-sm text-ink-600 dark:text-ink-300">
+            {% for letter in form.referee_sends %}
+              <li>
+                <bdi>{{ letter.upload.title }}</bdi>
+                {% if letter.referee %}
+                  — {% blocktranslate trimmed with name=letter.referee.name %}to be sent by {{ name }}{% endblocktranslate %}
+                {% else %}
+                  — {% translate "to be sent by the referee" %}
+                {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
       {% if form.can_email %}
         {% comment %} A plain part of the form, so it works with scripts off: the box is
            ticked or it is not, and the server decides. Shown only to somebody with an

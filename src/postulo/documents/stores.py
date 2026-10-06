@@ -28,6 +28,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from postulo.plugins.api import DocumentMetadata, FieldSpec
 
@@ -133,14 +134,35 @@ def metadata_for(document, *, filename: str = "") -> DocumentMetadata:
 # ------------------------------------------------------------ which kinds go where
 
 
+#: The kinds a new connection does not copy until the person says so, and why.
+OFF_BY_DEFAULT = {
+    "reference": _(
+        "Off unless you turn it on: a reference letter is written by somebody else, and "
+        "is their words and their name."
+    ),
+}
+
+
 def kind_specs() -> list[FieldSpec]:
-    """The per-kind switches every store connection carries. All on by default.
+    """The per-kind switches every store connection carries. All on by default but one.
 
     From the registry, so a kind a plugin adds gets its own switch on every store's
     connection form without anything here being edited (#133).
+
+    **A reference letter is off on a new connection** (#666): it is third-party personal
+    data, and a connected Paperless would otherwise receive it the day it is uploaded. Only
+    the form's starting point changes. A connection saved before this has no value for it,
+    which `wants_kind` still reads as *yes*, so nobody's existing copies stop or start.
     """
     return [
-        FieldSpec(f"kind_{key}", str(label), type="boolean", required=False, default=True)
+        FieldSpec(
+            f"kind_{key}",
+            str(label),
+            type="boolean",
+            required=False,
+            default=key not in OFF_BY_DEFAULT,
+            help=str(OFF_BY_DEFAULT[key]) if key in OFF_BY_DEFAULT else "",
+        )
         for key, label in kinds.choices()
     ]
 

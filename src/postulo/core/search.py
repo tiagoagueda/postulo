@@ -410,18 +410,25 @@ def search_uploads(user, query: str, limit: int) -> Found:
     from postulo.documents.models import UploadedDocument
 
     rows = ranked(
-        UploadedDocument.objects.for_user(user).filter(contains(query, "title", "notes")),
+        UploadedDocument.objects.for_user(user)
+        .filter(contains(query, "title", "notes", "reference_letter__referee__name"))
+        .select_related("reference_letter__referee"),
         query,
         "title",
         "-created_at",
     )
 
     def build(upload) -> Hit:
+        # A reference letter is found by who wrote it (#666), and says so beside its kind.
+        letter = getattr(upload, "reference_letter", None)
+        referee = letter.referee.name if letter is not None and letter.referee_id else ""
         return Hit(
             kind="uploads",
             id=upload.pk,
             title=upload.title,
-            subtitle=upload.get_kind_display(),
+            subtitle=f"{upload.get_kind_display()} · {referee}"
+            if referee
+            else upload.get_kind_display(),
             url=upload.get_absolute_url(),
             excerpt=excerpt(_first_match(query, upload.notes), query) if upload.notes else "",
             in_title=query.lower() in upload.title.lower(),

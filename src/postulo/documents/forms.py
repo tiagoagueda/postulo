@@ -10,11 +10,13 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import personal, postal
-from postulo.jobs.forms import OwnerScopedModelForm
+from postulo.jobs.forms import OwnerScopedModelForm, who_and_where
+from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
 from . import themes
+from .kinds import DocumentKind
 from .models import (
     CV,
     LETTER_STARTERS,
@@ -24,6 +26,8 @@ from .models import (
     CVKind,
     LetterKind,
     Prints,
+    ReferenceDelivery,
+    ReferenceLetter,
     UploadedDocument,
 )
 from .properties import (
@@ -529,7 +533,80 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             "replaces": _("An older version of the same thing, kept but no longer offered."),
         }
 
+    #: What is known about a reference letter (#666). Not columns of the upload: they are
+    #: read into a `ReferenceLetter` when the kind is *Reference*, and are not on the form
+    #: at all for an existing file of another kind. A new file shows them whatever the kind
+    #: says, because the kind is chosen on the same page and nothing here needs a script.
+    REFERENCE_FIELDS = ("referee", "new_referee", "written_on", "valid_until", "delivery")
+
+    referee = forms.ModelChoiceField(
+        label=_("Referee"),
+        queryset=Contact.objects.none(),
+        required=False,
+        empty_label=_("Nobody yet"),
+        help_text=_("The person who wrote it, from your contacts."),
+    )
+    new_referee = forms.CharField(
+        label=_("Or a new contact"),
+        max_length=200,
+        required=False,
+        help_text=_(
+            "A referee who is not a contact yet. Their name is enough; it is added to your "
+            "contacts without a company, and is used instead of the choice above."
+        ),
+    )
+    written_on = forms.DateField(
+        label=_("Written on"), required=False, widget=forms.DateInput(attrs={"type": "date"})
+    )
+    valid_until = forms.DateField(
+        label=_("Do not send after"),
+        required=False,
+        widget=forms.DateInput(attrs={"type": "date"}),
+        help_text=_("Yours to set and never enforced: after it, Postulo warns and does not block."),
+    )
+    delivery = forms.ChoiceField(
+        label=_("How it reaches the employer"),
+        choices=ReferenceDelivery.choices,
+        initial=ReferenceDelivery.YOU,
+        required=False,
+        help_text=_(
+            "A letter the referee sends themselves is not offered as a file to attach to an "
+            "application."
+        ),
+    )
+
+    @property
+    def takes_reference(self) -> bool:
+        """Whether this form asks about a reference letter: a new file, or one that is."""
+        return not self.instance.pk or self.instance.kind == DocumentKind.REFERENCE
+
+    def reference_fields(self):
+        """The bound fields about the letter, none where the file is of another kind."""
+        return [self[name] for name in self.REFERENCE_FIELDS if name in self.fields]
+
+    def own_fields(self):
+        """Every field but the letter's, which the page draws in a group of their own."""
+        return [field for field in self if field.name not in self.REFERENCE_FIELDS]
+
     def scope_querysets(self) -> None:
+        if not self.takes_reference:
+            for name in self.REFERENCE_FIELDS:
+                del self.fields[name]
+        else:
+            # A contact of one's own and no other: a foreign id is not a choice, so it is
+            # refused as one rather than let through to a row (#666).
+            self.fields["referee"].queryset = Contact.objects.for_user(self.user).select_related(
+                "company"
+            )
+            self.fields["referee"].label_from_instance = who_and_where
+            letter = getattr(self.instance, "reference_letter", None) if self.instance.pk else None
+            if letter is not None and not self.is_bound:
+                self.initial.update(
+                    referee=letter.referee_id,
+                    written_on=letter.written_on,
+                    valid_until=letter.valid_until,
+                    delivery=letter.delivery,
+                )
         # The same picker the other documents use, with one word changed: blank here means
         # *nobody has said*, not "follow your profile", because this is a file Postulo has
         # never read (#283). The model field stays free text, as it is everywhere else, so
@@ -563,6 +640,37 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             )
         return uploaded
 
+    def clean(self):
+        cleaned = super().clean()
+        written, until = cleaned.get("written_on"), cleaned.get("valid_until")
+        if written and until and until < written:
+            self.add_error("valid_until", _("A letter cannot expire before it was written."))
+        return cleaned
+
+    def _keep_reference_letter(self, document: UploadedDocument) -> None:
+        """Write, or drop, the letter's record to match the kind the file now has (#666)."""
+        if document.kind != DocumentKind.REFERENCE:
+            # What the person says the file is no longer a reference: the record about it
+            # means nothing, and is not left to turn up on a CV.
+            ReferenceLetter.objects.filter(upload=document).delete()
+            return
+        if "referee" not in self.fields:
+            return
+        referee = self.cleaned_data.get("referee")
+        name = (self.cleaned_data.get("new_referee") or "").strip()
+        if name:
+            referee = Contact.objects.create(owner=document.owner, name=name)
+        ReferenceLetter.objects.update_or_create(
+            upload=document,
+            defaults={
+                "owner": document.owner,
+                "referee": referee,
+                "written_on": self.cleaned_data.get("written_on"),
+                "valid_until": self.cleaned_data.get("valid_until"),
+                "delivery": self.cleaned_data.get("delivery") or ReferenceDelivery.YOU,
+            },
+        )
+
     def save(self, commit: bool = True) -> UploadedDocument:
         document = super().save(commit=False)
         # A new version numbers itself from the one it supersedes, so the history reads
@@ -571,6 +679,16 @@ class UploadedDocumentForm(OwnerScopedModelForm):
             document.version = document.replaces.version + 1
         if commit:
             document.save()
+            self._keep_reference_letter(document)
+        else:
+            # The view saves the instance itself; the letter follows it.
+            original = self.save_m2m
+
+            def save_m2m():
+                original()
+                self._keep_reference_letter(document)
+
+            self.save_m2m = save_m2m
         return document
 
 
@@ -606,6 +724,14 @@ class FilePropertiesForm(forms.Form):
             "A language tag such as fr or pt-BR. A screen reader announces the file in it."
         ),
     )
+
+
+def _upload_choice(upload: UploadedDocument) -> str:
+    """A file as a choice: a reference letter says who wrote it, and when it stops being good."""
+    letter = getattr(upload, "reference_letter", None)
+    if letter is None or not letter.description:
+        return upload.title
+    return f"{upload.title} ({letter.description})"
 
 
 class SendDocumentsForm(forms.Form):
@@ -695,9 +821,20 @@ class SendDocumentsForm(forms.Form):
         self.fields["cover_letter"].queryset = letters.filter(
             Q(is_template=True) | Q(pk__in=self._posted_pks("cover_letter"))
         )
-        self.fields["uploads"].queryset = uploads.filter(
-            Q(replaced_by__isnull=True) | Q(pk__in=self._posted_pks("uploads"))
-        ).distinct()
+        # A reference letter the referee sends themselves is not a file to attach (#666): it
+        # is listed beside the choice, as something somebody else is sending.
+        offered = uploads.exclude(reference_letter__delivery=ReferenceDelivery.REFEREE)
+        self.fields["uploads"].queryset = (
+            offered.filter(Q(replaced_by__isnull=True) | Q(pk__in=self._posted_pks("uploads")))
+            .select_related("reference_letter", "reference_letter__referee")
+            .distinct()
+        )
+        self.fields["uploads"].label_from_instance = _upload_choice
+        self.referee_sends = list(
+            ReferenceLetter.objects.for_user(user)
+            .filter(delivery=ReferenceDelivery.REFEREE, upload__replaced_by__isnull=True)
+            .select_related("upload", "referee")
+        )
         self.fields["links"].queryset = Link.objects.for_user(user)
 
     def document_fields(self):

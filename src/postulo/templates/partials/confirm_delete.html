@@ -37,6 +37,16 @@
 
       <form method="post">
         {% csrf_token %}
+        {% comment %} A view that has something to ask beyond "are you sure" passes `choice`:
+           a name and a label, unticked, so the default is the kept thing (#666). {% endcomment %}
+        {% if choice %}
+          <p class="mb-6">
+            <label class="flex items-center gap-2 text-sm">
+              <input type="checkbox" name="{{ choice.name }}" value="1">
+              {{ choice.label }}
+            </label>
+          </p>
+        {% endif %}
         <div class="flex items-center gap-3">
           <button type="submit" class="btn" data-variant="destructive">
             {% translate "Delete" %}

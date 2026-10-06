@@ -57,8 +57,9 @@ from django.utils.translation import ngettext
 DOCUMENT_NAME = "postulo-contact"
 #: 3 added ``applications``, ``referrals`` and ``interviews``: the account holder's records
 #: that name the person (#370). 4 added ``messaging_handles``: how they are reached on
-#: Matrix, XMPP, Signal, Telegram, Threema or another service (#682).
-DOCUMENT_VERSION = 4
+#: Matrix, XMPP, Signal, Telegram, Threema or another service (#682). 5 added
+#: ``reference_letters``: the letters they wrote, with their dates and where each went (#666).
+DOCUMENT_VERSION = 5
 
 
 def is_offered(person=None) -> bool:
@@ -177,6 +178,7 @@ def references(contact) -> dict:
     belong to the person are not references: they are the person's own rows.
     """
     from postulo.applications.models import Application, Interview
+    from postulo.documents.models import ReferenceLetter
     from postulo.jobs.models import ListingEvent
 
     return {
@@ -184,6 +186,7 @@ def references(contact) -> dict:
         "referrals": Application.objects.filter(referred_by=contact),
         "interviews": Interview.objects.filter(contacts=contact),
         "listing_events": ListingEvent.objects.filter(contact=contact),
+        "reference_letters": ReferenceLetter.objects.filter(referee=contact),
     }
 
 
@@ -204,6 +207,25 @@ def _interview_rows(interviews) -> list[dict]:
             "company": row.application.posting.company.name,
         }
         for row in interviews.select_related("application__posting__company")
+    ]
+
+
+def _reference_letter_rows(letters) -> list[dict]:
+    """The letters this person wrote: the file's name, the dates, and where each went (#666).
+
+    The file itself is the account holder's and is not carried; what is about the person is
+    that the letter exists, when it was written and which applications it went with.
+    """
+    return [
+        {
+            "file": letter.upload.title,
+            "file_name": letter.upload.file.name.rsplit("/", 1)[-1] if letter.upload.file else "",
+            "written_on": letter.written_on.isoformat() if letter.written_on else "",
+            "valid_until": letter.valid_until.isoformat() if letter.valid_until else "",
+            "delivery": letter.delivery,
+            "applications": _application_rows(letter.upload.applications.all()),
+        }
+        for letter in letters.select_related("upload")
     ]
 
 
@@ -232,6 +254,7 @@ def contact_document(contact) -> dict:
         "applications": _application_rows(found["applications"]),
         "referrals": _application_rows(found["referrals"]),
         "interviews": _interview_rows(found["interviews"]),
+        "reference_letters": _reference_letter_rows(found["reference_letters"]),
         "plugins": plugins,
     }
     if "not_carried" in plugins:
@@ -306,6 +329,15 @@ class ErasureReport:
                     self.unlinked["interviews"],
                 )
                 % {"count": self.unlinked["interviews"]}
+            )
+        if self.unlinked.get("reference_letters"):
+            parts.append(
+                ngettext(
+                    "%(count)d reference letter kept, without its referee.",
+                    "%(count)d reference letters kept, without their referee.",
+                    self.unlinked["reference_letters"],
+                )
+                % {"count": self.unlinked["reference_letters"]}
             )
         return " ".join(parts) or _("Nothing was left to remove.")
 

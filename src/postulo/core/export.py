@@ -119,7 +119,10 @@ logger = logging.getLogger(__name__)
 #: subject and keywords or without them (#480).
 #: 43 added ``uid`` on a reminder, its calendar identifier, so a task written to a calendar is
 #: found again after a restore; an archive without it restores each with a fresh one (#661).
-FORMAT_VERSION = 43
+#: 44 added ``reference_letter`` on an upload of kind *Reference*: who wrote it (the contact's
+#: id), when, the date after which it should not be sent, and who sends it. An archive without
+#: it restores every upload as a file with no referee (#666).
+FORMAT_VERSION = 44
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -521,6 +524,23 @@ def _value(value: Any) -> Any:
 
 def _fields(instance, names: tuple[str, ...]) -> dict:
     return {name: _value(getattr(instance, name)) for name in names}
+
+
+def _reference_letter(upload) -> dict | None:
+    """What is known about an upload that is a reference letter, or nothing (#666).
+
+    The referee is the contact's id in this archive, which the importer maps to the contact it
+    made; a letter whose referee was deleted carries none.
+    """
+    letter = getattr(upload, "reference_letter", None)
+    if letter is None:
+        return None
+    return {
+        "referee_id": letter.referee_id,
+        "written_on": _value(letter.written_on),
+        "valid_until": _value(letter.valid_until),
+        "delivery": letter.delivery,
+    }
 
 
 def _phone_numbers(holder) -> list[dict]:
@@ -934,8 +954,11 @@ def build_document(user) -> dict:
             **_fields(upload, UPLOAD_FIELDS),
             "file": f"{MEDIA_PREFIX}{upload.file.name}" if upload.file else "",
             "copies": _copies(upload),
+            "reference_letter": _reference_letter(upload),
         }
-        for upload in UploadedDocument.objects.for_user(user).prefetch_related("copies")
+        for upload in UploadedDocument.objects.for_user(user)
+        .select_related("reference_letter")
+        .prefetch_related("copies")
     ]
     document["documents"]["sent"] = [
         {

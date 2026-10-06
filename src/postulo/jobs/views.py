@@ -828,6 +828,12 @@ class ContactUpdateView(
         # somebody recorded twice (#239). Worked out as the page is drawn; told, not done.
         merge_url = reverse("jobs:contact_merge", args=[self.object.pk])
         context["merge_url"] = merge_url
+        # The letters this person wrote, and the applications each went with (#666).
+        context["reference_letters"] = list(
+            self.object.reference_letters.select_related("upload").prefetch_related(
+                "upload__applications__posting__company"
+            )
+        )
         context["duplicates"] = [
             (candidate, f"{merge_url}?with={candidate.record.pk}")
             for candidate in duplicates.for_contact(self.object)
@@ -885,8 +891,37 @@ class ContactDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
     model = Contact
     template_name = "partials/confirm_delete.html"
 
+    def get_context_data(self, **kwargs):
+        """Say what happens to the letters this person wrote, and offer to delete them (#666).
+
+        They are the account holder's files holding the referee's words. The default keeps
+        them, without a referee; ticking the box deletes them with the contact.
+        """
+        from django.utils.translation import ngettext
+
+        context = super().get_context_data(**kwargs)
+        number = self.object.reference_letters.count()
+        if number:
+            context["kept"] = ngettext(
+                "%(count)d reference letter they wrote is kept, without a referee.",
+                "%(count)d reference letters they wrote are kept, without a referee.",
+                number,
+            ) % {"count": number}
+            context["choice"] = {
+                "name": "delete_letters",
+                "label": _("Delete the letters they wrote as well"),
+            }
+        return context
+
     def form_valid(self, form):
         from postulo.core import gdpr
+
+        # What was asked about their letters is done first, while the link is there to find
+        # them by (#666); the contact's erasure then counts what is left as unlinked.
+        letters = self.object.reference_letters.select_related("upload")
+        if self.request.POST.get("delete_letters"):
+            for letter in letters:
+                letter.upload.delete()
 
         # A deletion that does not say what it removed is a guess about its own effect, so
         # while the feature is offered the erasure carries the report and the person who

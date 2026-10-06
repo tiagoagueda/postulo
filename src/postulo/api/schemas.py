@@ -936,6 +936,20 @@ class LetterIn(Schema):
     is_template: bool = False
 
 
+class ReferenceLetterOut(Schema):
+    referee_id: int | None = Field(
+        default=None, description="The contact who wrote it; null once that contact is deleted"
+    )
+    written_on: dt.date | None = None
+    valid_until: dt.date | None = Field(
+        default=None,
+        description="Do not send after this date. Never enforced: a client should warn, not block",
+    )
+    delivery: str = Field(
+        description="'you' if you send it with an application; 'referee' if they send it"
+    )
+
+
 class DocumentOut(Schema):
     id: int
     source: str = Field(description="'upload' for a file you had; 'rendered' for a snapshot")
@@ -953,6 +967,11 @@ class DocumentOut(Schema):
         default=None,
         description="For a snapshot: whether the file was written with its properties (author, "
         "subject, keywords) or without them. Null for an upload, which Postulo did not write",
+    )
+    reference_letter: ReferenceLetterOut | None = Field(
+        default=None,
+        description="For an upload of kind `reference`: who wrote it, when, until when it is "
+        "good to send and who sends it. Null otherwise",
     )
     created_at: dt.datetime
     updated_at: dt.datetime
@@ -1446,6 +1465,18 @@ def contact_out(contact) -> dict:
     }
 
 
+def _reference_letter_out(document) -> dict | None:
+    letter = getattr(document, "reference_letter", None)
+    if letter is None:
+        return None
+    return {
+        "referee_id": letter.referee_id,
+        "written_on": letter.written_on,
+        "valid_until": letter.valid_until,
+        "delivery": letter.delivery,
+    }
+
+
 def document_out(request, document, *, source: str) -> dict:
     name = "postulo-api:document_download"
     return {
@@ -1456,6 +1487,7 @@ def document_out(request, document, *, source: str) -> dict:
         "language": getattr(document, "language", "") or "",
         "application_id": getattr(document, "application_id", None),
         "with_properties": getattr(document, "with_properties", None),
+        "reference_letter": _reference_letter_out(document),
         "created_at": document.created_at,
         "updated_at": document.updated_at,
         "download_url": request.build_absolute_uri(

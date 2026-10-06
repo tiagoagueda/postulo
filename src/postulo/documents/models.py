@@ -746,6 +746,94 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
         return f"{self.title}{suffix}"
 
 
+class ReferenceDelivery(models.TextChoices):
+    """How a reference letter reaches the employer (#666)."""
+
+    YOU = "you", _("You send it")
+    REFEREE = "referee", _("The referee sends it themselves")
+
+
+class ReferenceLetter(OwnedModel):
+    """What is known about a letter somebody wrote about you: who, when, and how it travels.
+
+    A side record rather than columns on the upload, because "valid until" and "who sends
+    it" mean nothing on a CV or a certificate, and a referee is a person. The file is the
+    upload it belongs to, so storage, checksum, copies and the version chain are unchanged;
+    deleting the upload deletes this (#666).
+
+    The referee is a `Contact`, which may have no company. **Deleting the contact unlinks
+    the letter and keeps it**: the file is the account holder's, and the name on it is not a
+    reason to lose it. The erasure screen offers to delete the letters as well.
+    """
+
+    upload = models.OneToOneField(
+        UploadedDocument,
+        on_delete=models.CASCADE,
+        related_name="reference_letter",
+        verbose_name=_("file"),
+    )
+    referee = models.ForeignKey(
+        "jobs.Contact",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="reference_letters",
+        verbose_name=_("referee"),
+    )
+    written_on = models.DateField(_("written on"), null=True, blank=True)
+    #: The person's own date, never enforced: it warns and does not block. Most letters have
+    #: none, so it is optional.
+    valid_until = models.DateField(_("do not send after"), null=True, blank=True)
+    delivery = models.CharField(
+        _("how it reaches the employer"),
+        max_length=10,
+        choices=ReferenceDelivery,
+        default=ReferenceDelivery.YOU,
+    )
+
+    class Meta:
+        verbose_name = _("reference letter")
+        verbose_name_plural = _("reference letters")
+
+    def __str__(self) -> str:
+        return str(self.upload.title)
+
+    def clean(self) -> None:
+        super().clean()
+        if self.written_on and self.valid_until and self.valid_until < self.written_on:
+            raise ValidationError(
+                {"valid_until": _("A letter cannot expire before it was written.")}
+            )
+
+    @property
+    def is_expired(self) -> bool:
+        """Whether the person's own "do not send after" date has passed."""
+        return bool(self.valid_until and self.valid_until < timezone.localdate())
+
+    @property
+    def sent_by_referee(self) -> bool:
+        return self.delivery == ReferenceDelivery.REFEREE
+
+    @property
+    def description(self) -> str:
+        """The line a list shows beside the file: who wrote it, when, and whether it is stale."""
+        from django.utils.formats import date_format
+
+        parts = []
+        if self.referee_id:
+            parts.append(_("from %(name)s") % {"name": self.referee.name})
+        if self.written_on:
+            parts.append(
+                _("written %(date)s") % {"date": date_format(self.written_on, "DATE_FORMAT")}
+            )
+        if self.is_expired:
+            parts.append(
+                _("not to be sent after %(date)s")
+                % {"date": date_format(self.valid_until, "DATE_FORMAT")}
+            )
+        return ", ".join(str(part) for part in parts)
+
+
 class RenderedDocument(RecordsALanguage, OwnedModel):
     """A PDF exactly as it was sent, kept unchanged.
 

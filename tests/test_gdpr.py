@@ -107,6 +107,7 @@ def test_the_document_the_erasure_and_the_dry_run_account_for_every_reference(us
         "referrals": 1,
         "interviews": 1,
         "listing_events": 1,
+        "reference_letters": 0,
     }
     assert "1 interview kept" in report.summary()
 
@@ -708,3 +709,46 @@ def test_the_data_protection_page_says_one_telephone_number_in_the_singular(clie
     html = response.content.decode()
     assert "1 telephone number," in html
     assert "1 telephone numbers" not in html
+
+
+# ------------------------------------------------------ reference letters (#666)
+
+
+def a_reference_letter(user, contact):
+    from django.core.files.base import ContentFile
+
+    from postulo.documents.models import ReferenceLetter, UploadedDocument
+
+    upload = UploadedDocument.objects.create(
+        owner=user, title="Letter", kind="reference", file=ContentFile(b"%PDF-1.7", name="l.pdf")
+    )
+    return ReferenceLetter.objects.create(
+        owner=user, upload=upload, referee=contact, written_on=dt.date(2026, 3, 1)
+    )
+
+
+def test_the_contacts_document_lists_the_letters_they_wrote_and_where_they_went(user):
+    company = make_company(user)
+    contact = make_contact(user, company)
+    application = make_application(user, company, contact)
+    letter = a_reference_letter(user, contact)
+    application.sent_uploads.add(letter.upload)
+
+    document = gdpr.contact_document(contact)
+
+    assert len(document["reference_letters"]) == 1
+    row = document["reference_letters"][0]
+    assert row["file"] == "Letter" and row["written_on"] == "2026-03-01"
+    assert row["applications"] == [{"role": application.posting.title, "company": company.name}]
+
+
+def test_erasure_unlinks_the_letters_by_default_and_counts_them(user):
+    contact = make_contact(user)
+    letter = a_reference_letter(user, contact)
+
+    report = gdpr.erase_contact(contact)
+
+    letter.refresh_from_db()
+    assert letter.referee is None, "the file stays, without its referee"
+    assert report.unlinked["reference_letters"] == 1
+    assert "1 reference letter kept, without its referee" in report.summary()

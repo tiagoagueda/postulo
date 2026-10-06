@@ -280,7 +280,7 @@ class _DocumentPages:
             if model is RenderedDocument:
                 queryset = queryset.defer("source_text", "plain_text")
             else:
-                queryset = queryset.defer("notes")
+                queryset = queryset.defer("notes").select_related("reference_letter")
             found.update({(name, row.pk): row for row in queryset})
         return [
             (k["source"], found[k["source"], k["pk"]])

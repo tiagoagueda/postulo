@@ -28,10 +28,27 @@
             </p>
           </div>
         {% endif %}
-        {% for field in form %}
+        {% for field in form.own_fields %}
           <c-field :field="field" />
         {% endfor %}
       </div>
+      {% if form.takes_reference %}
+        {% comment %} A group of its own, always drawn for a new file so it works with scripts
+           off: the kind is chosen on this same page, and a letter of any other kind simply
+           ignores what is here (#666). {% endcomment %}
+        <fieldset class="card mb-6" data-reference-fields>
+          <legend class="label px-1">{% translate "If this is a reference letter" %}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
+            {% blocktranslate trimmed %}
+              Who wrote it, when, and whether it is still good to send. Used only when the
+              type above is Reference.
+            {% endblocktranslate %}
+          </p>
+          {% for field in form.reference_fields %}
+            <c-field :field="field" />
+          {% endfor %}
+        </fieldset>
+      {% endif %}
       <div class="flex items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>
         <a href="{% url 'documents:upload_list' %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>

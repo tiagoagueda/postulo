@@ -74,6 +74,36 @@
       </div>
     {% endif %}
 
+    {% if reference_letters %}
+      <c-section-title>{% translate "Reference letters" %}</c-section-title>
+      <div class="card mb-8 p-0" data-reference-letters>
+        <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+          {% for document in reference_letters %}
+            <li class="flex items-center gap-3 px-4 py-3">
+              <div class="min-w-0 flex-1">
+                <p class="font-medium">{{ document.title }}</p>
+                <p class="text-xs text-ink-500 dark:text-ink-400">
+                  {% with letter=document.reference_letter %}
+                    {% if letter.referee %}
+                      {% blocktranslate trimmed with name=letter.referee.name %}Written by <bdi>{{ name }}</bdi>{% endblocktranslate %}
+                    {% else %}
+                      {% translate "Referee not recorded" %}
+                    {% endif %}
+                    {% if letter.written_on %}· {{ letter.written_on|date:"DATE_FORMAT" }}{% endif %}
+                    {% if letter.is_expired %}· <span class="text-red-600 dark:text-red-400">{% blocktranslate trimmed with date=letter.valid_until|date:"DATE_FORMAT" %}it said not to send it after {{ date }}{% endblocktranslate %}</span>{% endif %}
+                  {% endwith %}
+                </p>
+                {% url 'documents:upload_archive' document.pk as send_url %}
+                {% include "documents/partials/copies.html" with document=document send_url=send_url %}
+              </div>
+              <a href="{% url 'documents:upload_download' document.pk %}"
+                 class="btn" data-variant="ghost" data-size="xs">{% translate "Download" %}<span class="sr-only">: <bdi>{{ document.title }}</bdi></span></a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
+
     {% if uploads %}
       <c-section-title>{% translate "Files you already had" %}</c-section-title>
       <div class="card p-0">
