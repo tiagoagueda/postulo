@@ -419,7 +419,8 @@ def test_a_page_of_documents_reads_the_page_and_never_the_texts(client, user, to
 
     assert body["count"] == total + 1
     assert len(body["items"]) == min(20, total + 1)
-    sql = [q["sql"] for q in queries.captured_queries]
+    # The request's own transaction adds a SAVEPOINT and its RELEASE (#572); neither is a read.
+    sql = [q["sql"] for q in queries.captured_queries if "SAVEPOINT" not in q["sql"]]
     assert not [q for q in sql if "source_text" in q or "plain_text" in q]
     # Sign-in, the count, the page's keys and one fetch per table: the same handful of
     # queries whether there are 5 documents or 50, and the rows fetched are the page's.
