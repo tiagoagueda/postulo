@@ -40,9 +40,11 @@ def test_a_coarse_pointer_gets_forty_four_pixels_not_a_narrow_window():
 
 
 def test_the_board_snaps_to_a_column_on_a_phone():
-    match = re.search(r"@media \(width < 40rem\) \{\s*\.board-box \{(.*?)\}", CSS, re.S)
+    match = re.search(
+        r"@media \(width < 40rem\) and \(pointer: coarse\) \{\s*\.board-box \{(.*?)\}", CSS, re.S
+    )
     assert match and "scroll-snap-type: x proximity" in match.group(1)
-    assert "[data-board-section]" in CSS and "scroll-snap-align: start" in CSS
+    assert "[data-board-section]" in CSS and "scroll-snap-align: center" in CSS
 
 
 def test_an_open_column_is_nearly_the_window_wide_on_a_phone_and_288_from_sm():

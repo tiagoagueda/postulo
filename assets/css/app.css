@@ -1504,15 +1504,18 @@
    * hint, so below `sm` an open column is nearly the window's width and the box snaps
    * to the column it stops nearest -- a swipe moves a column, and the folded strips
    * beside it say what else there is. Drag and drop does not fire on a touch screen; each
-   * card's own status menu is the way to move one, and stays in the card.
+   * card's own status menu is the way to move one, and stays in the card. Only where the
+   * pointer is coarse: a narrow desktop window has a mouse, a card dragged near the box's
+   * edge scrolls it a few pixels at a time, and a snap would pull each of them back. The
+   * column snaps to the middle, where the page already brings the one pressed.
    */
-  @media (width < 40rem) {
+  @media (width < 40rem) and (pointer: coarse) {
     .board-box {
       scroll-snap-type: x proximity;
     }
 
     .board-box [data-board-section] {
-      scroll-snap-align: start;
+      scroll-snap-align: center;
     }
   }
 
