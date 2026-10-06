@@ -383,8 +383,8 @@ def fingerprint() -> str:
 #: 6 added the nationalities and their scope (#680). 7 added the gender (#681). 8 added the
 #: messaging handles a person is reached on, read back as a link's service is (#682).
 #: 9 added the company an experience links to, read back as a hint (#683). 10 added the EQF
-#: level of an education entry, read back through the form's choices (#684). 11 added the publications, read back through the form a person types
-#: one into (#687).
+#: level of an education entry, read back through the form's choices (#684). 11 added the
+#: publications, read back through the form a person types one into (#687).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
