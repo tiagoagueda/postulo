@@ -80,13 +80,13 @@
       </p>
 
       <h3 class="mb-1 text-sm font-semibold">{% translate "With Docker Compose" %}</h3>
-      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0"><code>docker compose --profile scheduler --profile worker stop
+      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0" role="group" aria-label="{% translate 'With Docker Compose' %}"><code>docker compose --profile scheduler --profile worker stop
 docker compose run --rm -e POSTULO_SKIP_MIGRATE=1 postulo \
   python manage.py restore {{ quoted_path }} --force
 docker compose --profile scheduler --profile worker up -d</code></pre>
 
       <h3 class="mb-1 text-sm font-semibold">{% translate "Without containers" %}</h3>
-      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0"><code># stop gunicorn, the scheduler and the worker, then:
+      <pre class="mb-4 scroll-x rounded border p-3 text-xs" tabindex="0" role="group" aria-label="{% translate 'Without containers' %}"><code># stop gunicorn, the scheduler and the worker, then:
 python manage.py restore {{ quoted_path }} --force
 # start them again</code></pre>
 

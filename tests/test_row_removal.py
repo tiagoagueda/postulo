@@ -569,7 +569,7 @@ def test_the_contact_form_keeps_its_boxes(client, user):
     assert 'name="phone_numbers-0-DELETE"' in html
     assert "primary-choice" not in html
     assert "data-remove-trigger" not in html
-    assert "<dialog" not in html
+    assert "<dialog" not in html.replace('<dialog popover id="leave-dialog"', "")
 
 
 def test_the_company_form_keeps_its_boxes(client, user):

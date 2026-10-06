@@ -212,9 +212,14 @@ class Command(BaseCommand):
         # and what it needs is its own claim on the slot, not this pass's. A failed one
         # never fails the pass that carries the reminders (#242).
         try:
-            from postulo.core import backups
+            from postulo.core import backups, errands
 
-            backups.start_if_due()
+            queue = None
+            if errands.worker_expected():
+                from postulo.core.tasks import scheduled_backup
+
+                queue = scheduled_backup.enqueue
+            backups.start_if_due(queue=queue)
         except Exception:
             logger.exception("Could not start the scheduled backup")
 

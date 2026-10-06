@@ -45,6 +45,10 @@ EXCUSED: dict[str, str] = {
         "a draft of a letter's PDF arriving as a download; the button is on the letter's "
         "page, which the suite visits (#236)"
     ),
+    "documents:letter_download": (
+        "a letter as a text, Word or OpenDocument file arriving as a download; the links are "
+        "on the letter's page, which the suite visits (#480)"
+    ),
     "documents:cv_download": (
         "a CV as a text file or a Word file arriving as a download; the links are on the "
         "CV's page, and the text itself is on `documents:cv_text`, both visited (#236)"

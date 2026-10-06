@@ -28,6 +28,7 @@ import re
 import shutil
 import tarfile
 import uuid
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from pathlib import Path
 from zoneinfo import ZoneInfo
@@ -371,22 +372,23 @@ def run_scheduled() -> None:
     apply_retention(keep)
 
 
-def start_if_due(now: dt.datetime | None = None) -> bool:
+def start_if_due(
+    now: dt.datetime | None = None, *, queue: Callable[[], object] | None = None
+) -> bool:
     """Called by every scheduler pass: start the backup when its slot has come.
 
-    With a worker it is queued, because a backup of a large media directory takes minutes
-    and a pass that takes minutes stops the heartbeat the scheduler's healthcheck reads.
+    With a worker the caller passes `queue`, because a backup of a large media directory takes
+    minutes and a pass that takes minutes stops the heartbeat the scheduler's healthcheck
+    reads. The queue is the caller's rather than this module's: the task that runs a backup
+    lives in `postulo.core.tasks`, which imports this module, so reaching for it from here
+    would close a cycle.
     """
-    from . import errands
-
     row = site.current()
     if not is_due(row, now) or not claim(row, now):
         return False
-    if errands.worker_expected():
+    if queue is not None:
         try:
-            from .tasks import scheduled_backup
-
-            scheduled_backup.enqueue()
+            queue()
             return True
         except Exception:
             logger.exception("Could not queue the scheduled backup; taking it here instead.")

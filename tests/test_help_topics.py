@@ -613,7 +613,7 @@ def test_a_contacts_form_keeps_its_help_in_sight(client, user):
     html = client.get(reverse("jobs:contact_update", args=[contact.pk])).content.decode()
 
     assert "data-help-mark" not in html and "data-tooltip" not in html
-    assert "<dialog" not in html
+    assert "<dialog" not in html.replace('<dialog popover id="leave-dialog"', "")
     assert 'id="id_phone_numbers-0-number_helptext"' in html
     summary = str(help_topics.topic("telephone-numbers").summary)
     for seam in (

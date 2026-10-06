@@ -294,6 +294,8 @@ SERVER_WIDE = [
     "/server/plugins/",
     "/server/logs/",
     "/server/design/",
+    # A table of archives with the actions beside each (#242).
+    "/server/backups/",
 ]
 
 #: The column beside the sidebar, with whatever the page put in the `measure` block.
