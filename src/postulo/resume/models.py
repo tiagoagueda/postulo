@@ -299,6 +299,35 @@ class Certification(ResumeItem):
         return self.name
 
 
+class Honour(ResumeItem):
+    """A prize, a scholarship, a distinction: recognition somebody gave (#693).
+
+    Not a certification, which says a standard was met and may lapse, and not a degree's
+    classification, which is the education entry's grade. An honour has nothing to check and
+    no expiry. ``awarded_by`` is the giver's own wording, as text of its own, and is what a CV
+    prints; ``awarded_on`` is a date of which a CV prints the year. Only ``summary`` is
+    translated: a prize's name and the body that gave it are theirs.
+    """
+
+    title = models.CharField(_("title"), max_length=200)
+    awarded_by = models.CharField(_("awarded by"), max_length=200, blank=True)
+    awarded_on = models.DateField(_("awarded on"), null=True, blank=True)
+    summary = models.TextField(_("summary"), blank=True)
+    url = models.URLField(_("link"), blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("honour or award")
+        verbose_name_plural = _("honours and awards")
+
+    def __str__(self) -> str:
+        return self.title
+
+    @property
+    def cv_line(self) -> str:
+        """“Title, awarded by”: what the themes, the text and the Word file print."""
+        return ", ".join(part for part in (self.title, self.awarded_by) if part)
+
+
 class Publication(ResumeItem):
     """A paper, a book, a chapter, a thesis, a dataset: shaped like a BibTeX entry (#687).
 

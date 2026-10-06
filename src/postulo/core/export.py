@@ -156,7 +156,9 @@ logger = logging.getLogger(__name__)
 #: 55 added ``cv_photo_file`` on the account: the photograph a CV may print, kept apart from
 #: the avatar, and ``photo`` among each CV's ``prints`` switches. An archive without them
 #: restores no photo and every CV with it off (#668).
-FORMAT_VERSION = 55
+#: 56 added ``honours`` in the career: a title, who gave it, the date, a summary and a link. An
+#: archive without them restores none (#693).
+FORMAT_VERSION = 56
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -208,7 +210,9 @@ FORMAT_VERSION = 55
 #: the reason to add one (#686).
 #: 15 added ``driving_licences``, read back through the form a person would have ticked one
 #: in, and the same licence being the same country and the same categories (#691).
-CANDIDATE_FORMAT = 15
+#: 16 added ``honours``, read through the form a person would have typed one into, and the same
+#: honour being the same title, giver and date (#693).
+CANDIDATE_FORMAT = 16
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -299,6 +303,7 @@ TRANSLATION_SECTIONS = {
     "certification": "certifications",
     "languageskill": "languages",
     "drivinglicence": "driving_licences",
+    "honour": "honours",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -581,6 +586,7 @@ RESUME_FIELDS = {
         "credential_url",
         "order",
     ),
+    "honours": ("id", "title", "awarded_by", "awarded_on", "summary", "url", "order"),
     "languages": ("id", "name", "code", "proficiency", "order"),
     # The codes and the country and nothing a licence carries beside them (#691).
     "driving_licences": (
@@ -614,6 +620,7 @@ RESUME_MODELS = {
     "skill_groups": "SkillGroup",
     "skills": "Skill",
     "certifications": "Certification",
+    "honours": "Honour",
     "languages": "LanguageSkill",
     "driving_licences": "DrivingLicence",
     "links": "Link",

@@ -17,6 +17,7 @@ from .models import (
     DrivingLicence,
     Education,
     Experience,
+    Honour,
     LanguageSkill,
     Link,
     Project,
@@ -500,6 +501,29 @@ class LanguageSkillForm(ResumeItemForm):
                     ),
                 )
         return cleaned
+
+
+class HonourForm(ResumeItemForm):
+    """A prize or a distinction (#693). Nothing here is checked against anybody."""
+
+    class Meta:
+        model = Honour
+        fields = ("title", "awarded_by", "awarded_on", "summary", "url", "order")
+        widgets = {
+            "awarded_on": DATE_WIDGET,
+            "summary": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "title": _(
+                "A prize, a scholarship, a “best paper”: recognition, with nothing to check and "
+                "no expiry. A credential that may lapse is a certification, and a degree’s "
+                "classification, such as “cum laude”, is that education entry’s grade."
+            ),
+            "awarded_by": _("Who gave it, as a CV should print it."),
+            "awarded_on": _("Only the year prints on a CV, so the day makes no difference."),
+            "summary": ENTRY_HELP["summary"],
+            "url": _("Where it can be read about. A CV does not print it."),
+        }
 
 
 class LinkForm(ResumeItemForm):

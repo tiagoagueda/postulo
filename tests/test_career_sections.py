@@ -192,6 +192,9 @@ def _one_of_each(user) -> dict:
         "certification": lambda: m.Certification.objects.create(
             owner=user, name="CKA", issuer="CNCF"
         ),
+        "honour": lambda: m.Honour.objects.create(
+            owner=user, title="Best paper", awarded_by="LSW", awarded_on=dt.date(2022, 9, 15)
+        ),
         "driving-licence": lambda: m.DrivingLicence.objects.create(
             owner=user, country="PT", categories=["B"]
         ),

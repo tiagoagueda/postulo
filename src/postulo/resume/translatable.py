@@ -33,6 +33,9 @@ TRANSLATABLE: dict[str, tuple[str, ...]] = {
     "languageskill": ("name",),
     # `drivinglicence` is absent on purpose: a code is a code, and a country is a country (#691).
     "link": ("title", "description"),
+    # An honour says its summary in the person's own words; the prize and who gave it are
+    # theirs, as a certification's two texts are (#693).
+    "honour": ("summary",),
 }
 
 #: The models that translate nothing, each with its reason: a decision written down, not an

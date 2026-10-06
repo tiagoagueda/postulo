@@ -390,6 +390,7 @@ def fingerprint() -> str:
 #: 13 added the company an education entry links to, read back as a hint (#685).
 #: 14 added the company a certification's issuer links to, read back the same way (#686).
 #: 15 added driving licences (#691).
+#: 16 added honours and awards (#693).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -406,6 +407,7 @@ SHAPES = {
     13: "e607ca58ae13bade",
     14: "61b3f3390533958b",
     15: "c0ae9b17fd1a35b6",
+    16: "7a83373d72663f9d",
 }
 
 

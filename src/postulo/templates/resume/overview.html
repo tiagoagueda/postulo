@@ -97,6 +97,12 @@
                           <bdi>{{ item.citation_text }}</bdi>
                         </p>
                         <p class="text-xs text-ink-500 dark:text-ink-400">{{ item.get_entry_type_display }}</p>
+                      {% elif section.spec.slug == 'honour' %}
+                        {% if item.awarded_by or item.awarded_on %}
+                          <p class="text-sm text-ink-500 dark:text-ink-400">
+                            {% if item.awarded_by %}<bdi>{{ item.awarded_by }}</bdi>{% endif %}{% if item.awarded_by and item.awarded_on %} · {% endif %}{% if item.awarded_on %}{{ item.awarded_on|date:"Y" }}{% endif %}
+                          </p>
+                        {% endif %}
                       {% elif section.spec.slug == 'skill-group' %}
                         <p class="text-sm text-ink-500 dark:text-ink-400">
                           {% if item.skill_names %}

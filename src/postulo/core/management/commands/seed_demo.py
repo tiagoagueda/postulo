@@ -69,6 +69,7 @@ from postulo.resume.models import (
     DrivingLicence,
     Education,
     Experience,
+    Honour,
     LanguageSkill,
     Link,
     LinkKind,
@@ -379,6 +380,7 @@ class Command(BaseCommand):
             Publication,
             Certification,
             DrivingLicence,
+            Honour,
             LanguageSkill,
             Link,
         ):
@@ -513,6 +515,15 @@ class Command(BaseCommand):
                 issuer="CNCF",
                 issued_on=dt.date(2023, 5, 1),
                 expires_on=dt.date(2026, 5, 1),
+                order=0,
+            )
+        ]
+        honours = [
+            Honour.objects.create(
+                owner=user,
+                title="Best paper",
+                awarded_by="Lisbon Systems Workshop",
+                awarded_on=dt.date(2022, 9, 15),
                 order=0,
             )
         ]
@@ -781,6 +792,7 @@ class Command(BaseCommand):
                     *projects,
                     *publications,
                     *certifications,
+                    *honours,
                 ]
             ):
                 CVItem.objects.create(

@@ -949,3 +949,35 @@ def test_an_over_long_note_or_a_hostile_country_in_a_licence_is_refused(user):
 
     assert outcomes(plan, "driving_licences") == [candidate.REFUSED, candidate.REFUSED]
     assert not DrivingLicence.objects.for_user(user).exists()
+
+
+# ------------------------------------------------------- honours and awards (#693)
+
+
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"title": MARKUP},
+        {"title": SCRIPT},
+        {"title": "T" * 5000},
+        {"title": "T", "awarded_by": "G" * 5000},
+        {"title": "T", "summary": "S" * 200_000},
+        {"title": "T", "url": "javascript:alert(1)"},
+        {"title": "T", "url": "https://example.org/" + "a" * 5000},
+        {"title": "T", "awarded_on": MARKUP},
+        {"title": "e\x00"},
+    ],
+)
+def test_a_hostile_or_over_long_honour_is_a_refused_row_and_stores_nothing(user, bad):
+    from postulo.resume.models import Honour
+
+    data = a_file(resume={"honours": [bad]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    for honour in Honour.objects.for_user(user):
+        # Whatever was kept is what the form keeps: bounded, and never a script address.
+        assert len(honour.title) <= 200 and len(honour.awarded_by) <= 200
+        assert not honour.url.startswith("javascript:")
+    assert outcomes(plan, "honours") in ([candidate.REFUSED], [candidate.ADD])

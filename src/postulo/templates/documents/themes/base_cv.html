@@ -149,6 +149,17 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'honour' %}
+          {% comment %} The title, who gave it and the year, as a certification is set; the summary is for the record (#693). {% endcomment %}
+          <ul class="honours">
+            {% for entry in section.items %}
+              <li>
+                <bdi>{{ entry.item.title }}{% if entry.item.awarded_by %}, {{ entry.item.awarded_by }}{% endif %}</bdi>
+                {% if entry.item.awarded_on %}<span class="dates">{{ entry.item.awarded_on|date:"Y" }}</span>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

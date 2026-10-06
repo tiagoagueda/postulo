@@ -93,6 +93,13 @@ def test_a_credential_is_the_awarding_bodys_wording_and_is_left_alone():
     assert translating.fields_for(Certification) == ()
 
 
+def test_an_honour_translates_only_its_summary():
+    """A prize's name and the body that gave it are theirs (#693)."""
+    from postulo.resume.models import Honour
+
+    assert translating.fields_for(Honour) == ("summary",)
+
+
 def test_a_publication_translates_nothing():
     """A paper's title is the paper, as a credential's name is the credential (#687)."""
     assert translating.fields_for(Publication) == ()

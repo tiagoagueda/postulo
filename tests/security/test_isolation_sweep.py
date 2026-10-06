@@ -846,6 +846,7 @@ def form_table(user, mine=None) -> dict:
         resume.DrivingLicenceForm: [{"user": user}],
         resume.EducationForm: [{"user": user}],
         resume.ExperienceForm: [{"user": user}],
+        resume.HonourForm: [{"user": user}],
         resume.LanguageSkillForm: [{"user": user}],
         resume.LinkForm: [{"user": user}],
         resume.ProjectForm: [{"user": user}],
@@ -988,3 +989,34 @@ def test_somebody_elses_driving_licence_is_on_no_page_of_mine(client, user, othe
 
     assert "DE (New Zealand)" not in client.get(reverse("resume:overview")).content.decode()
     assert "DE (New Zealand)" not in client.get(reverse("resume:preview")).content.decode()
+
+
+# --------------------------------------------------- honours and awards (#693)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_honour_is_not_found(client, user, other_user, name):
+    from postulo.resume.models import Honour
+
+    theirs = Honour.objects.create(owner=other_user, title="Theirs")
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["honour", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["honour", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert Honour.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_honour_is_on_no_page_of_mine(client, user, other_user):
+    from postulo.core import search
+    from postulo.resume.models import Honour
+
+    Honour.objects.create(owner=other_user, title="Zebra prize", awarded_by="Quokka Society")
+    client.force_login(user)
+
+    assert "Zebra prize" not in client.get(reverse("resume:overview")).content.decode()
+    assert "Zebra prize" not in client.get(reverse("resume:preview")).content.decode()
+    assert search.search(user, "Zebra") == []
+    assert search.search(user, "Quokka") == []

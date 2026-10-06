@@ -56,7 +56,14 @@ MANIFEST_MAX_BYTES = 256 * 1024 * 1024
 
 
 #: The career columns that hold a date, which an archive writes as text.
-DATE_FIELDS = {"start_date", "end_date", "issued_on", "expires_on", "first_issued_on"}
+DATE_FIELDS = {
+    "start_date",
+    "end_date",
+    "issued_on",
+    "expires_on",
+    "first_issued_on",
+    "awarded_on",
+}
 
 
 def resume_section_models() -> dict:

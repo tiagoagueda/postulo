@@ -318,6 +318,18 @@ KINDS: tuple[Kind, ...] = (
         hints=("company",),
     ),
     Kind(
+        block="honours",
+        model=resume.Honour,
+        form=resume_forms.HonourForm,
+        title=gettext_lazy("Honours and awards"),
+        fields=("title", "awarded_by", "awarded_on", "summary", "url"),
+        # An honour is its title, who gave it and when (#693).
+        names=("title", "awarded_by"),
+        dates=("awarded_on",),
+        label="title",
+        sub="awarded_by",
+    ),
+    Kind(
         block="driving_licences",
         model=resume.DrivingLicence,
         form=resume_forms.DrivingLicenceForm,
@@ -1408,7 +1420,8 @@ class _Planner:
             return row
 
         if kind.dates:
-            row.start, row.end = (said.get(name) for name in kind.dates)
+            # A kind with one date (an honour's) has a start and no end.
+            row.start, row.end = (said.get(name) for name in (*kind.dates, None)[:2])
         keys = self._keys(kind, said.get, group)
         key = keys[0]
         if key in seen:
