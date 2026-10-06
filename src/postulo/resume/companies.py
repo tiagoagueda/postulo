@@ -47,8 +47,7 @@ def find_or_add_school(owner, name: str):
     person's language, and the form says so. An existing company is never given an
     industry here: classifying a business already in the list is the person's act.
     """
-    from django.utils import translation
-
+    from postulo.core import languages
     from postulo.jobs import industries
     from postulo.jobs.models import Industry
 
@@ -58,7 +57,7 @@ def find_or_add_school(owner, name: str):
     company = find_or_add(owner, name)
     if company is None:
         return None, False
-    label = industries.name_for("85", translation.get_language() or "")
+    label = industries.name_for("85", languages.current())
     if label:
         company.industries.add(*Industry.named(owner, [label]))
     return company, True

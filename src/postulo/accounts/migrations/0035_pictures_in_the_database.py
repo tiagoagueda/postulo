@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('data', models.BinaryField(verbose_name='picture')),
                 ('media_type', models.CharField(editable=False, max_length=40, verbose_name='media type')),
                 ('stored_at', models.DateTimeField(default=django.utils.timezone.now, editable=False, verbose_name='stored at')),
-                ('kind', models.CharField(choices=[('upload', 'Uploaded'), ('gravatar', 'From Gravatar')], max_length=10, verbose_name='kind')),
+                ('kind', models.CharField(choices=[('upload', 'Uploaded'), ('gravatar', 'From Gravatar')], max_length=10, verbose_name='Type')),
                 ('profile', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='pictures', to='accounts.profile')),
             ],
             options={

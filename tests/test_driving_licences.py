@@ -314,7 +314,7 @@ def test_the_archive_carries_the_licence_and_a_restore_brings_it_back(user, othe
     put_on(cv, mine)
     archive, document = read_archive(user)
 
-    assert document["postulo"]["format"] == export.FORMAT_VERSION == 51
+    assert document["postulo"]["format"] == export.FORMAT_VERSION == 53
     assert document["resume"]["driving_licences"][0]["categories"] == ["A2", "B"]
     assert "number" not in json.dumps(document["resume"]["driving_licences"])
 

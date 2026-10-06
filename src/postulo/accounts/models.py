@@ -579,7 +579,7 @@ class ProfilePicture(StoredPicture):
     KINDS = ((UPLOAD, _("Uploaded")), (GRAVATAR, _("From Gravatar")))
 
     profile = models.ForeignKey(Profile, on_delete=models.CASCADE, related_name="pictures")
-    kind = models.CharField(_("kind"), max_length=10, choices=KINDS)
+    kind = models.CharField(_("Type"), max_length=10, choices=KINDS)
 
     class Meta:
         verbose_name = _("profile picture")

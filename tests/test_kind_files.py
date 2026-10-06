@@ -493,8 +493,8 @@ def test_what_a_file_writes_is_something_the_archive_writes():
 
 
 def test_the_archive_and_the_candidate_file_are_untouched_by_the_new_files():
-    assert export.FORMAT_VERSION == 51
-    assert export.CANDIDATE_FORMAT == 13
+    assert export.FORMAT_VERSION == 53
+    assert export.CANDIDATE_FORMAT == 15
     assert set(kind_files.FORMATS.values()) == {1, 2}
 
 
