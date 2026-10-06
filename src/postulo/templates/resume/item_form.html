@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{{ section.label }}{% endblock %}
 
@@ -19,7 +19,18 @@
       {% endif %}
       <div class="card mb-6">
         {% for field in form %}
-          <c-field :field="field" />
+          {% with follows=form.type_wrappers|get_item:field.name %}
+            {% if follows %}
+              {% comment %} A publication's field that follows its type (#687): drawn for the
+                 type the form was opened with, and shown or hidden by `app.js` as the type is
+                 chosen. Hidden is not refused: a hidden box is posted and kept. {% endcomment %}
+              <div data-type-field="{{ follows.types }}"{% if follows.hidden %} hidden{% endif %}>
+                <c-field :field="field" />
+              </div>
+            {% else %}
+              <c-field :field="field" />
+            {% endif %}
+          {% endwith %}
         {% endfor %}
         {% if 'order' not in form.fields %}
           {% comment %} The order number is hidden unless Settings > Appearance says

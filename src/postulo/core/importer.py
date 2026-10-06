@@ -768,6 +768,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     )
     from postulo.jobs.services import set_identifiers
     from postulo.resume import models as resume
+    from postulo.resume import publications
 
     document = read_manifest(archive)
     if not force and not account_is_empty(user):
@@ -915,11 +916,13 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         "experience": resume.Experience,
         "education": resume.Education,
         "projects": resume.Project,
+        "publications": resume.Publication,
         "skill_groups": resume.SkillGroup,
         "certifications": resume.Certification,
         "languages": resume.LanguageSkill,
         "links": resume.Link,
     }
+    held_keys = set(resume.Publication.objects.for_user(user).values_list("cite_key", flat=True))
     date_fields = {"start_date", "end_date", "issued_on", "expires_on"}
     moment_fields = {"checked_at"}
     #: Experience primary key -> the name of the company it links to, applied once every
@@ -946,6 +949,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     values[name] = _eqf_level(value, report, entry)
                 else:
                     values[name] = value
+            if key == "publications":
+                # What no page has looked at is held to what a page would have (#687).
+                values = publications.sanitise(values, held_keys)
+                held_keys.add(values.get("cite_key", ""))
             created = model.objects.create(owner=user, **values)
             if isinstance(company_name, str) and company_name.strip():
                 wants_company[created.pk] = company_name

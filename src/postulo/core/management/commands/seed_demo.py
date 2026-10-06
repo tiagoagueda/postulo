@@ -72,6 +72,7 @@ from postulo.resume.models import (
     Link,
     LinkKind,
     Project,
+    Publication,
     Skill,
     SkillGroup,
     Translation,
@@ -374,6 +375,7 @@ class Command(BaseCommand):
             Experience,
             Education,
             Project,
+            Publication,
             Certification,
             LanguageSkill,
             Link,
@@ -486,6 +488,19 @@ class Command(BaseCommand):
                 url="https://source.example/alexmorgan/postulo",
                 summary="A self-hosted job application manager.",
                 highlights="Django, htmx, WeasyPrint.\nRuns on a Raspberry Pi.",
+                order=0,
+            )
+        ]
+        publications = [
+            Publication.objects.create(
+                owner=user,
+                entry_type="inproceedings",
+                title="Boring deployments: what a small platform team can promise",
+                authors="Morgan, Alex\nSilva, Rita",
+                container_title="Proceedings of the Lisbon Systems Workshop",
+                date="2022-09",
+                pages="41-52",
+                doi="10.1000/182",
                 order=0,
             )
         ]
@@ -756,6 +771,7 @@ class Command(BaseCommand):
                     groups["Languages"],
                     groups["Infrastructure"],
                     *projects,
+                    *publications,
                     *certifications,
                 ]
             ):

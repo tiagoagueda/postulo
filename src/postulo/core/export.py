@@ -133,7 +133,11 @@ logger = logging.getLogger(__name__)
 #: outside 1 to 8 restores none and says so (#684).
 #: 48 added ``eqf_level`` among a CV's ``prints``: whether the EQF level of each qualification
 #: that states one is printed; an archive without it restores it off (#684).
-FORMAT_VERSION = 48
+#: 49 added ``publications`` in the career: each with its BibTeX-shaped ``entry_type`` and the
+#: fields that type uses -- names as typed, one per line, the date as an ISO 8601 reduced
+#: date, the DOI bare and the citation key -- each read back through the form's own rules;
+#: an archive without them restores none, and a CV's entry may name one (#687).
+FORMAT_VERSION = 49
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -172,7 +176,9 @@ FORMAT_VERSION = 48
 #: account's companies, and never the reason to add one (#683).
 #: 10 added ``eqf_level`` on an education entry, read back through the form's own choices, so
 #: a level outside 1 to 8 is a refused row (#684).
-CANDIDATE_FORMAT = 10
+#: 11 added ``publications``, read back through the form a person would have typed one in, and
+#: matched on the DOI, or on the title and the year (#687).
+CANDIDATE_FORMAT = 11
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -257,6 +263,7 @@ TRANSLATION_SECTIONS = {
     "experience": "experience",
     "education": "education",
     "project": "projects",
+    "publication": "publications",
     "skillgroup": "skill_groups",
     "skill": "skills",
     "certification": "certifications",
@@ -497,6 +504,30 @@ RESUME_FIELDS = {
         "highlights",
         "order",
     ),
+    "publications": (
+        "id",
+        "entry_type",
+        "title",
+        "authors",
+        "editors",
+        "container_title",
+        "publisher",
+        "institution",
+        "location",
+        "date",
+        "volume",
+        "number",
+        "pages",
+        "edition",
+        "series",
+        "chapter",
+        "doi",
+        "url",
+        "note",
+        "language",
+        "cite_key",
+        "order",
+    ),
     "skill_groups": ("id", "name", "order"),
     # The ESCO skill the name matches, beside the name (#266): written for whoever reads the
     # file, and never read back -- the importers work it out again from the name.
@@ -529,6 +560,7 @@ RESUME_MODELS = {
     "experience": "Experience",
     "education": "Education",
     "projects": "Project",
+    "publications": "Publication",
     "skill_groups": "SkillGroup",
     "skills": "Skill",
     "certifications": "Certification",

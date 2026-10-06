@@ -607,6 +607,20 @@
     }
   });
 
+  // A publication's type decides which of its fields are drawn (#687). The page is drawn for
+  // the type the entry has; choosing another shows the fields it uses and hides the others,
+  // each field's `data-type-field` listing the types that use it. Hidden is not refused: a
+  // hidden box is still posted, so what was typed under one type is kept under the next.
+  document.addEventListener("change", function (event) {
+    var select = event.target.closest && event.target.closest("[data-type-select]");
+    if (!select || !select.form) {
+      return;
+    }
+    Array.prototype.forEach.call(select.form.querySelectorAll("[data-type-field]"), function (box) {
+      box.hidden = box.getAttribute("data-type-field").split(" ").indexOf(select.value) === -1;
+    });
+  });
+
   // Dragging a card between board columns. No library and no new endpoint: on drop the
   // card's own status menu is set and its form submitted, so the server path is exactly
   // the one the menu already uses and the timeline entry is written the same way.

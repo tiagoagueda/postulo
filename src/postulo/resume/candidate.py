@@ -79,7 +79,7 @@ from postulo.core import (
 from postulo.core import web_links as links
 from postulo.core.models import MessagingHandle, PhoneNumber, PostalAddress, WebLink
 
-from . import companies, ordering, translating
+from . import companies, ordering, publications, translating
 from . import forms as resume_forms
 from . import models as resume
 
@@ -165,6 +165,11 @@ class Kind:
     #: What the file says of an entry that its form does not take: read as a hint and held
     #: with the entry, never a field of it.
     hints: tuple[str, ...] = ()
+    #: What makes two entries the same one where it is not simply `names` and `dates`: a
+    #: function of the entry's reader that returns its keys, the most telling first, any one
+    #: of which an entry already held may answer to (a publication is its DOI, or its title
+    #: and year).
+    identity: Callable[[Callable[[str], Any]], tuple[tuple, ...]] | None = None
 
     @property
     def held(self) -> tuple[str, ...]:
@@ -231,6 +236,37 @@ KINDS: tuple[Kind, ...] = (
         sub="role",
     ),
     Kind(
+        block="publications",
+        model=resume.Publication,
+        form=resume_forms.PublicationForm,
+        title=gettext_lazy("Publications"),
+        fields=(
+            "entry_type",
+            "title",
+            "authors",
+            "editors",
+            "container_title",
+            "publisher",
+            "institution",
+            "location",
+            "date",
+            "volume",
+            "number",
+            "pages",
+            "edition",
+            "series",
+            "chapter",
+            "doi",
+            "url",
+            "note",
+            "language",
+        ),
+        names=("title",),
+        label="title",
+        sub="container_title",
+        identity=lambda get: _publication_identity(get),
+    ),
+    Kind(
         block="links",
         model=resume.Link,
         form=resume_forms.LinkForm,
@@ -283,11 +319,25 @@ KINDS: tuple[Kind, ...] = (
 
 KINDS_BY_BLOCK = {kind.block: kind for kind in KINDS}
 
+
+def _publication_identity(get: Callable[[str], Any]) -> tuple[tuple, ...]:
+    """What makes two publications one: the DOI, or the title and the year.
+
+    Either is enough, so that a paper with its DOI and the same paper without it are found
+    to be one; a year apart is another publication."""
+    doi = publications.normalise_doi(get("doi")).lower()
+    by_title = ("title", fold(get("title")), publications.year_of(get("date") or ""))
+    return (("doi", doi), by_title) if doi else (by_title,)
+
+
 #: What the file writes of an entry and this does not read, and the whole of it. What
 #: another instance found when it asked whether a link still answered is not something
 #: this one knows: a link arrives unchecked, and *Check* is this instance's to press.
 NOT_READ: dict[str, tuple[str, ...]] = {
     "links": ("check_status", "check_detail", "checked_at"),
+    # A citation key is this person's own, one of theirs at most, and made from the entry
+    # where a file has none; another instance's is not asked (#687).
+    "publications": ("cite_key",),
     # Which ESCO skill a skill's name is follows the name, in the classification this
     # instance holds; another instance's answer is not asked, and `_place` works it out
     # again from the name (#266).
@@ -1234,6 +1284,12 @@ class _Planner:
 
     # ---------------------------------------------------------------------- the career
 
+    def _keys(self, kind: Kind, get: Callable[[str], Any], group: str = "") -> tuple[tuple, ...]:
+        """Every key an entry may be known by, the most telling first."""
+        if kind.identity is not None:
+            return kind.identity(get)
+        return (self._key(kind, get, group),)
+
     def _key(self, kind: Kind, get: Callable[[str], Any], group: str = "") -> tuple:
         names = tuple(
             _same_address(get(name)) if name == kind.address else fold(get(name))
@@ -1257,7 +1313,8 @@ class _Planner:
         for item in standing:
             group = fold(item.group.name) if getattr(item, "group_id", None) else ""
             says = partial(getattr, item)
-            mine.setdefault(self._key(kind, says, group), item)
+            for key in self._keys(kind, says, group):
+                mine.setdefault(key, item)
             alike.add(self._alike(kind, says))
         seen: dict[tuple, Row] = {}
         for position, entry in enumerate(self.held.get(kind.block) or []):
@@ -1301,7 +1358,8 @@ class _Planner:
 
         if kind.dates:
             row.start, row.end = (said.get(name) for name in kind.dates)
-        key = self._key(kind, said.get, group)
+        keys = self._keys(kind, said.get, group)
+        key = keys[0]
         if key in seen:
             # The second of two that say the same thing. It names the first, so that a
             # translation of either is a translation of the one entry there will be.
@@ -1311,7 +1369,7 @@ class _Planner:
             return row
         seen[key] = row
         self._name(kind.block, entry, row)
-        held = mine.get(key)
+        held = next((mine[each] for each in keys if each in mine), None)
         if held is not None:
             row.outcome, row.existing = PRESENT, held
             if any(
@@ -1581,11 +1639,21 @@ def _place(user, kind: Kind, rows: list[Row]) -> None:
     where it has not, and the person's to move from there.
     """
     items = []
+    # A publication's key is made from the entry, among the keys this person already holds
+    # and the ones made for the rows before it; `bulk_create` calls no `save` to do it.
+    taken = (
+        set(kind.model.objects.for_user(user).values_list("cite_key", flat=True))
+        if kind.block == "publications"
+        else set()
+    )
     for row in sorted(rows, key=lambda row: (row.order is None, row.order or 0, row.position)):
         item = row.instance
         item.owner = user
         if kind.block == "experience":
             item.company = row.company
+        if kind.block == "publications":
+            item.cite_key = item.free_cite_key(taken)
+            taken.add(item.cite_key)
         if kind.block == "skills":
             item.group = row.parent.target if row.parent is not None else None
             # `bulk_create` calls no `save`, which is where a skill works out which ESCO

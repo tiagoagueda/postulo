@@ -23,7 +23,7 @@ from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel
 from postulo.jobs import esco
 
-from . import translatable
+from . import publications, translatable
 
 
 def split_highlights(text: str) -> list[str]:
@@ -261,6 +261,104 @@ class Certification(ResumeItem):
 
     def __str__(self) -> str:
         return self.name
+
+
+class Publication(ResumeItem):
+    """A paper, a book, a chapter, a thesis, a dataset: shaped like a BibTeX entry (#687).
+
+    One table with a type, as BibTeX has it. The type decides which fields the form offers
+    (`publications.TYPES` is the table) and never which are kept: a value in a field the
+    type does not use stays where it is, so a type changed and changed back loses nothing.
+    Names are text as typed, one per line; splitting a name into its parts is the job of
+    whatever reads or writes a ``.bib`` file, where a wrong guess costs more than the typed
+    form does.
+
+    It translates nothing, as a `Certification` does: a paper's title is the paper.
+    """
+
+    entry_type = models.CharField(
+        _("type"),
+        max_length=20,
+        choices=publications.CHOICES,
+        default=publications.DEFAULT_TYPE,
+    )
+    title = models.CharField(_("title"), max_length=500)
+    authors = models.TextField(_("authors"), blank=True, max_length=2000)
+    editors = models.TextField(_("editors"), blank=True, max_length=2000)
+    container_title = models.CharField(_("published in"), max_length=300, blank=True)
+    publisher = models.CharField(_("publisher"), max_length=200, blank=True)
+    institution = models.CharField(_("institution"), max_length=200, blank=True)
+    location = models.CharField(_("place"), max_length=200, blank=True)
+    date = models.CharField(
+        _("date"),
+        max_length=10,
+        blank=True,
+        validators=[publications.validate_date],
+    )
+    volume = models.CharField(_("volume"), max_length=40, blank=True)
+    number = models.CharField(_("number"), max_length=40, blank=True)
+    pages = models.CharField(_("pages"), max_length=40, blank=True)
+    edition = models.CharField(_("edition"), max_length=40, blank=True)
+    series = models.CharField(_("series"), max_length=200, blank=True)
+    chapter = models.CharField(_("chapter"), max_length=40, blank=True)
+    doi = models.CharField(
+        _("DOI"),
+        max_length=publications.DOI_MAX_LENGTH,
+        blank=True,
+        validators=[publications.validate_doi],
+    )
+    url = models.URLField(_("link"), max_length=500, blank=True)
+    note = models.CharField(_("note"), max_length=500, blank=True)
+    language = LanguageField(_("language"), blank=True)
+    cite_key = models.CharField(
+        _("citation key"),
+        max_length=publications.CITE_KEY_MAX_LENGTH,
+        blank=True,
+        validators=[publications.validate_cite_key],
+    )
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("publication")
+        verbose_name_plural = _("publications")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("owner", "cite_key"),
+                condition=~models.Q(cite_key=""),
+                name="resume_one_cite_key_per_owner",
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.title
+
+    def save(self, *args, **kwargs) -> None:
+        self.doi = publications.normalise_doi(self.doi)
+        if not self.cite_key:
+            self.cite_key = self.free_cite_key()
+        super().save(*args, **kwargs)
+
+    def free_cite_key(self, taken=None) -> str:
+        """A key made from the entry, one nobody of this person's holds."""
+        if taken is None:
+            held = type(self).objects.for_user(self.owner).exclude(pk=self.pk)
+            taken = set(held.exclude(cite_key="").values_list("cite_key", flat=True))
+        return publications.free_key(
+            publications.suggest_key(self.authors, self.editors, self.date, self.title), taken
+        )
+
+    @property
+    def citation(self) -> str:
+        """The one neutral line a CV prints, in the language it is being drawn in."""
+        return publications.citation(self)
+
+    @property
+    def citation_text(self) -> str:
+        """The line without the DOI's address, which a page links."""
+        return publications.citation_parts(self)[0]
+
+    @property
+    def doi_url(self) -> str:
+        return publications.doi_url(self.doi)
 
 
 class Proficiency(models.TextChoices):

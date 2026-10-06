@@ -520,11 +520,11 @@ def _career_anchor(model) -> str:
 
 
 def search_career(user, query: str, limit: int) -> Found:
-    """Five models under one heading, each counted and capped on its own.
+    """Six models under one heading, each counted and capped on its own.
 
-    Ten queries rather than two, and that is the price of the heading: the five have no
+    Twelve queries rather than two, and that is the price of the heading: the six have no
     common table to count across and no field to order against each other by. It is a fixed
-    ten -- five experiences or five hundred, the page asks the same questions.
+    twelve -- five experiences or five hundred, the page asks the same questions.
     """
     from postulo.resume import models as resume
 
@@ -546,6 +546,12 @@ def search_career(user, query: str, limit: int) -> Found:
             ("name", "role", "summary", "highlights"),
             "name",
             lambda r: r.name,
+        ),
+        (
+            resume.Publication,
+            ("title", "authors", "editors", "container_title"),
+            "title",
+            lambda r: r.title,
         ),
         (resume.Certification, ("name", "issuer"), "name", lambda r: r.name),
         (resume.Skill, ("name",), "name", lambda r: r.name),

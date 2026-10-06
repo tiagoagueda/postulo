@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 
 from postulo.jobs.forms import OwnerScopedModelForm
 
-from . import translatable
+from . import publications, translatable
 from .models import (
     Certification,
     Education,
@@ -17,6 +17,7 @@ from .models import (
     LanguageSkill,
     Link,
     Project,
+    Publication,
     Skill,
     SkillGroup,
 )
@@ -278,6 +279,134 @@ class LinkForm(ResumeItemForm):
             ),
             "description": _("A few words about it, where the title does not say enough."),
         }
+
+
+class PublicationForm(ResumeItemForm):
+    """A publication, with the fields its type uses (#687).
+
+    Every field is on the form, in the page, and the ones the type does not use are drawn
+    hidden (`type_wrappers`): hidden and not refused, so what was typed under one type is
+    still there under the next and is saved with the rest. `app.js` shows and hides them as
+    the type is chosen; with scripts off the page is drawn for the type it was opened with,
+    and a changed type takes effect when it is saved.
+
+    What BibTeX asks of the type and the entry lacks is a hint (`missing_labels`), never an
+    error: somebody may hold nothing but a title.
+    """
+
+    class Meta:
+        model = Publication
+        fields = (
+            "entry_type",
+            "title",
+            "authors",
+            "editors",
+            "container_title",
+            "publisher",
+            "institution",
+            "location",
+            "date",
+            "volume",
+            "number",
+            "pages",
+            "edition",
+            "series",
+            "chapter",
+            "doi",
+            "url",
+            "note",
+            "language",
+            "cite_key",
+            "order",
+        )
+        widgets = {
+            # Read by `app.js`, which shows and hides the fields that follow the type.
+            "entry_type": forms.Select(attrs={"data-type-select": ""}),
+            "authors": forms.Textarea(attrs={"rows": 3}),
+            "editors": forms.Textarea(attrs={"rows": 2}),
+        }
+        help_texts = {
+            "entry_type": _(
+                "What sort of work it is. The fields below follow the type: choosing another "
+                "shows the ones it uses, and what you typed under the old one is kept. With "
+                "scripts off the change shows once you have saved."
+            ),
+            "title": _("As it was published."),
+            "publisher": _("Who published it: a press, a journal's publisher, a repository."),
+            "institution": _("The university, laboratory or body behind it: a thesis's school."),
+            "location": _("Where it was published, or the conference's city."),
+            "volume": _("The volume, as the publisher numbers it."),
+            "number": _("The issue or report number."),
+            "pages": _("A range such as 41–52, or one page."),
+            "edition": _("The edition or version, as it says on it."),
+            "series": _("The series it belongs to, if any."),
+            "chapter": _("The chapter's number or name, where you are citing a chapter."),
+            "note": _("Anything a reader should know, in a few words."),
+            "authors": _("One name per line, as you would write it: “Knuth, Donald E.”."),
+            "editors": _("One name per line, as for the authors."),
+            "container_title": _("The journal, the book or the proceedings it appeared in."),
+            "date": _("A year, a year and month, or a whole date: 2024, 2024-05 or 2024-05-17."),
+            "doi": _(
+                "Only checked for its shape and linked on a CV as https://doi.org/…; Postulo "
+                "never looks it up."
+            ),
+            "url": _("Where it can be read, where it has no DOI."),
+            "language": _("The language the work is written in."),
+            "cite_key": _(
+                "What a bibliography file would call it. Letters, digits and - _ : . + / only, "
+                "one of yours at most; left empty, Postulo makes one. Never printed."
+            ),
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, user=user, **kwargs)
+        from postulo.accounts.forms import LanguageSelect, with_what_is_held
+        from postulo.core import languages
+
+        field = self.fields["language"]
+        field.required = False
+        choices = [("", _("Not stated")), *languages.LANGUAGES]
+        field.widget = LanguageSelect(choices=with_what_is_held(choices, self["language"].value()))
+
+    @property
+    def current_type(self) -> str:
+        """The type the form is drawn for: what was posted, or what the entry has."""
+        value = self["entry_type"].value()
+        return value if value in publications.TYPES else publications.DEFAULT_TYPE
+
+    @property
+    def type_wrappers(self) -> dict[str, dict]:
+        """For each field that follows the type: which types use it, and whether it is
+        hidden for the one in force."""
+        current = set(publications.fields_for(self.current_type))
+        return {
+            name: {"types": " ".join(publications.types_using(name)), "hidden": name not in current}
+            for name in self.fields
+            if name in publications.FIELD_ORDER or name in publications.COMMON
+        }
+
+    def clean_doi(self) -> str:
+        return publications.normalise_doi(self.cleaned_data.get("doi"))
+
+    def clean_cite_key(self) -> str:
+        key = self.cleaned_data.get("cite_key", "")
+        owner = self.user if self.user is not None else getattr(self.instance, "owner", None)
+        if key and owner is not None:
+            clash = Publication.objects.for_user(owner).filter(cite_key=key)
+            if self.instance.pk:
+                clash = clash.exclude(pk=self.instance.pk)
+            if clash.exists():
+                raise forms.ValidationError(
+                    _("You already have a publication with this key."), code="unique"
+                )
+        return key
+
+    def missing_labels(self) -> list[str]:
+        """What BibTeX asks of this type that the saved entry does not say, by label."""
+        lacking = publications.missing_for(
+            self.cleaned_data.get("entry_type", ""), self.cleaned_data.get
+        )
+        return [str(self.fields[name].label or name) for name in lacking if name in self.fields]
 
 
 class TranslationForm(forms.Form):

@@ -44,6 +44,14 @@ SECTIONS: dict[str, SectionSpec] = {
     "project": SectionSpec(
         "project", resume_models.Project, resume_forms.ProjectForm, _("Project"), _("Projects")
     ),
+    "publication": SectionSpec(
+        "publication",
+        resume_models.Publication,
+        resume_forms.PublicationForm,
+        _("Publication"),
+        _("Publications"),
+        _("Papers, books, chapters, theses, datasets and software, as a bibliography lists them."),
+    ),
     "skill-group": SectionSpec(
         "skill-group",
         resume_models.SkillGroup,
@@ -84,6 +92,7 @@ OVERVIEW_ORDER = (
     "experience",
     "education",
     "project",
+    "publication",
     "link",
     "skill-group",
     "certification",

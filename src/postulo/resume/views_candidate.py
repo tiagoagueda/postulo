@@ -36,6 +36,7 @@ COUNTED = (
     ("experience", gettext_lazy("Experience")),
     ("education", gettext_lazy("Education")),
     ("projects", gettext_lazy("Projects")),
+    ("publications", gettext_lazy("Publications")),
     ("links", gettext_lazy("Links")),
     ("skill_groups", capfirst(resume.SkillGroup._meta.verbose_name_plural)),
     ("skills", gettext_lazy("Skills")),

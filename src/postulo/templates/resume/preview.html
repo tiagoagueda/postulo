@@ -59,6 +59,21 @@
       </section>
     {% endif %}
 
+    {% if publications %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Publications" %}</c-section-title>
+        <div class="card p-0">
+          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
+            {% for item in publications %}
+              <li class="px-4 py-3">
+                <p class="text-sm">{{ item.citation_text }}{% if item.doi %} <a href="{{ item.doi_url }}" rel="noopener" class="underline">{{ item.doi_url }}</a>{% endif %}</p>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </section>
+    {% endif %}
+
     {% if projects %}
       <section class="mb-8">
         <c-section-title>{% translate "Projects" %}</c-section-title>

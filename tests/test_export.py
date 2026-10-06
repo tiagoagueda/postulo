@@ -23,7 +23,7 @@ from postulo.core import importer
 from postulo.core.models import Tag
 from postulo.documents.models import CV, CoverLetter, CVItem, UploadedDocument
 from postulo.jobs.models import Company, Contact, JobPosting
-from postulo.resume.models import Experience, Link, Skill, SkillGroup
+from postulo.resume.models import Experience, Link, Publication, Skill, SkillGroup
 
 
 @pytest.fixture
@@ -858,3 +858,32 @@ def test_the_archive_costs_the_same_queries_however_much_the_account_holds(popul
     large = count()
 
     assert large == small
+
+
+def test_a_cv_holding_a_publication_and_a_link_keeps_both(populated, other_user):
+    """Both are written by model name and read back by the one map (#687, #470)."""
+    paper = Publication.objects.create(
+        owner=populated, entry_type="book", title="A book", authors="Morgan, Alex", date="2020"
+    )
+    link = Link.objects.create(owner=populated, title="Site", url="https://example.org/")
+    cv = CV.objects.for_user(populated).get()
+    for order, entry in enumerate((paper, link), start=5):
+        CVItem.objects.create(
+            owner=populated,
+            cv=cv,
+            content_type=ContentType.objects.get_for_model(type(entry)),
+            object_id=entry.pk,
+            order=order,
+        )
+    archive, document = read_archive(populated)
+    assert document["resume"]["publications"][0]["title"] == "A book"
+    assert document["postulo"]["format"] >= 44
+
+    importer.load(other_user, archive)
+
+    restored = CV.objects.for_user(other_user).get()
+    entries = {item.content_type.model: item.item for item in restored.items.all()}
+    assert entries["publication"].title == "A book"
+    assert entries["publication"].owner == other_user
+    assert entries["link"].title == "Site"
+    assert entries["link"].owner == other_user

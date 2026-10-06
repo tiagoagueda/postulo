@@ -45,20 +45,34 @@ def _not_a_date() -> ValidationError:
     )
 
 
-def parse_birth_date(value: str) -> tuple[int, int | None, int | None]:
-    """The year, the month and the day a date of birth says, the last two where it does not
-    go so far. Raises `ValidationError` for anything that is not a real, past date."""
-    text = value if isinstance(value, str) else ""
-    found = _REDUCED.fullmatch(text)
+def reduced_date_parts(value) -> tuple[int, int | None, int | None] | None:
+    """The year, the month and the day of an ISO 8601 reduced date, the last two where it
+    stops short, or ``None`` for anything that is not a real calendar date.
+
+    The one reading of ``2024``, ``2024-05`` and ``2024-05-17`` that a date of birth (#679)
+    and the date a publication appeared (#687) are both held to; what else each is held to
+    is theirs to say.
+    """
+    found = _REDUCED.fullmatch(value if isinstance(value, str) else "")
     if found is None:
-        raise _not_a_date()
+        return None
     year = int(found["year"])
     month = int(found["month"]) if found["month"] else None
     day = int(found["day"]) if found["day"] else None
     try:
         dt.date(year, 1 if month is None else month, 1 if day is None else day)
     except ValueError:
-        raise _not_a_date() from None
+        return None
+    return year, month, day
+
+
+def parse_birth_date(value: str) -> tuple[int, int | None, int | None]:
+    """The year, the month and the day a date of birth says, the last two where it does not
+    go so far. Raises `ValidationError` for anything that is not a real, past date."""
+    parts = reduced_date_parts(value)
+    if parts is None:
+        raise _not_a_date()
+    year, month, day = parts
     if year < EARLIEST_YEAR:
         raise ValidationError(
             _("A date of birth is not before %(year)s."),

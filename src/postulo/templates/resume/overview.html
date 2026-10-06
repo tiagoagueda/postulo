@@ -92,6 +92,11 @@
                           <input type="hidden" name="next" value="{{ request.get_full_path }}">
                           <button type="submit" class="text-xs text-ink-600 underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100">{% translate "Check it answers" %}</button>
                         </form>
+                      {% elif section.spec.slug == 'publication' %}
+                        <p class="text-sm text-ink-500 dark:text-ink-400">
+                          <bdi>{{ item.citation_text }}</bdi>
+                        </p>
+                        <p class="text-xs text-ink-500 dark:text-ink-400">{{ item.get_entry_type_display }}</p>
                       {% elif section.spec.slug == 'skill-group' %}
                         <p class="text-sm text-ink-500 dark:text-ink-400">
                           {% if item.skill_names %}

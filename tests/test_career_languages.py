@@ -22,7 +22,14 @@ from django.urls import reverse
 from postulo.documents.models import CV, CVItem
 from postulo.documents.rendering import build_sections, render_cv_html
 from postulo.resume import translating
-from postulo.resume.models import Certification, Education, Experience, SkillGroup, Translation
+from postulo.resume.models import (
+    Certification,
+    Education,
+    Experience,
+    Publication,
+    SkillGroup,
+    Translation,
+)
 
 pytestmark = pytest.mark.django_db
 
@@ -83,6 +90,11 @@ def test_a_name_that_belongs_to_somebody_else_is_not_translatable():
 def test_a_credential_is_the_awarding_bodys_wording_and_is_left_alone():
     """`Certification` translates nothing at all, which is a statement rather than a gap."""
     assert translating.fields_for(Certification) == ()
+
+
+def test_a_publication_translates_nothing():
+    """A paper's title is the paper, as a credential's name is the credential (#687)."""
+    assert translating.fields_for(Publication) == ()
 
 
 def test_a_field_nothing_may_translate_is_dropped_even_if_a_row_exists(user):

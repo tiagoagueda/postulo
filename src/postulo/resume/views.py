@@ -39,6 +39,7 @@ from .models import (
     Link,
     Proficiency,
     Project,
+    Publication,
     Skill,
     SkillGroup,
 )
@@ -113,6 +114,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             "experience": Experience.objects.for_user(user).count(),
             "education": Education.objects.for_user(user).count(),
             "project": Project.objects.for_user(user).count(),
+            "publication": Publication.objects.for_user(user).count(),
             "skill": Skill.objects.for_user(user).count(),
             "certification": Certification.objects.for_user(user).count(),
             "language": LanguageSkill.objects.for_user(user).count(),
@@ -283,6 +285,21 @@ class SectionFormMixin(UserFormKwargsMixin):
         return context
 
 
+def say_what_is_missing(request: HttpRequest, form) -> None:
+    """For a publication, what BibTeX asks of its type and the entry lacks: a hint, after the
+    save and never instead of it (#687)."""
+    lacking = form.missing_labels() if hasattr(form, "missing_labels") else []
+    if lacking:
+        messages.info(
+            request,
+            _(
+                "A bibliography usually also gives: %(fields)s. Nothing is wrong without "
+                "them; add them if you have them."
+            )
+            % {"fields": ", ".join(lacking)},
+        )
+
+
 class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, CreateView):
     def get_queryset(self):
         return self.section.model.objects.for_user(self.request.user)
@@ -297,6 +314,7 @@ class ResumeItemCreateView(OwnedObjectMixin, SectionFormMixin, OwnerFormMixin, C
 
     def form_valid(self, form):
         messages.success(self.request, _("Added."))
+        say_what_is_missing(self.request, form)
         response = super().form_valid(form)
         # Placed by its date, or last, unless the person typed a number themselves (#203).
         if "order" not in form.fields:
@@ -320,6 +338,7 @@ class ResumeItemUpdateView(OwnedObjectMixin, SectionFormMixin, UpdateView):
 
     def form_valid(self, form):
         messages.success(self.request, _("Saved."))
+        say_what_is_missing(self.request, form)
         return super().form_valid(form)
 
 
@@ -368,6 +387,7 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "experience": Experience.objects.for_user(user),
                 "education": Education.objects.for_user(user),
                 "projects": Project.objects.for_user(user),
+                "publications": Publication.objects.for_user(user),
                 "links": Link.objects.for_user(user),
                 "skill_groups": SkillGroup.objects.for_user(user).prefetch_related("skills"),
                 "certifications": Certification.objects.for_user(user),

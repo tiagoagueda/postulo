@@ -123,6 +123,15 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'publication' %}
+          {% comment %} One neutral line an entry, the same words the text and Word files
+             carry (`Publication.citation`); the DOI is the one part that is a link (#687). {% endcomment %}
+          <ul class="publications">
+            {% for entry in section.items %}
+              <li><bdi>{{ entry.item.citation_text }}</bdi>{% if entry.item.doi %} <a href="{{ entry.item.doi_url }}"><bdi>{{ entry.item.doi_url }}</bdi></a>{% endif %}</li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

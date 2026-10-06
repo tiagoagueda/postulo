@@ -36,6 +36,7 @@ from postulo.resume.models import (
     Experience,
     Link,
     Project,
+    Publication,
     Skill,
     SkillGroup,
     Translation,
@@ -763,3 +764,32 @@ def test_an_eqf_level_the_form_would_not_take_is_a_refused_row_and_stores_nothin
 
     assert outcomes(plan, "education") == [candidate.REFUSED]
     assert not Education.objects.for_user(user).exists()
+
+
+def test_a_hostile_publication_is_text_on_the_page_and_a_refused_row_where_it_is_an_address(
+    client, user
+):
+    """A DOI is a shape and a link is an address: neither carries a script into the page or
+    into a CV, and markup in a title arrives as the text it is (#687)."""
+    hostile = {
+        "entry_type": "article",
+        "title": "<script>alert(1)</script>",
+        "authors": "<img src=x onerror=alert(1)>",
+        "doi": "10.1000/<script>",
+        "url": "javascript:alert(1)",
+        "cite_key": "a{b}",
+    }
+    safe = {**hostile, "doi": "", "url": "", "title": "T"}
+    data = a_file(resume={"publications": [hostile, safe]})
+
+    plan = candidate.plan(user, candidate.read(data))
+
+    assert outcomes(plan, "publications") == [candidate.REFUSED, candidate.ADD]
+    candidate.apply(user, candidate.read(data))
+    stored = Publication.objects.for_user(user).get()
+    assert stored.url == "" and stored.doi == ""
+    assert "{" not in stored.cite_key
+
+    client.force_login(user)
+    page = client.get(reverse("resume:overview")).content.decode()
+    assert "<img src=x" not in page and "<script>alert(1)" not in page
