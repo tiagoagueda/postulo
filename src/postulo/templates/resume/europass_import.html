@@ -151,6 +151,13 @@
           </ul>
         {% endif %}
 
+        {% if found.participations %}
+          <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "Presentations, conferences and seminars" %}</h3>
+          <ul class="space-y-1 text-sm text-ink-600 dark:text-ink-300">
+            {% for row in found.participations %}<li><bdi>{{ row.event }}</bdi></li>{% endfor %}
+          </ul>
+        {% endif %}
+
         {% if found.references %}
           <h3 class="mt-4 mb-1 text-sm font-medium">{% translate "References" %}</h3>
           {% comment %} Other people, so each is listed before anything is written: each becomes

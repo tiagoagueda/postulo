@@ -45,6 +45,7 @@ COUNTED = (
     ("memberships", gettext_lazy("Memberships")),
     ("driving_licences", gettext_lazy("Driving licences")),
     ("courses", gettext_lazy("Courses")),
+    ("participations", gettext_lazy("Presentations, conferences and seminars")),
     ("languages", gettext_lazy("Languages")),
     ("translations", capfirst(resume.Translation._meta.verbose_name_plural)),
     ("phone_numbers", gettext_lazy("Telephone numbers")),

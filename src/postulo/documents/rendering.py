@@ -52,6 +52,7 @@ SECTION_LABELS = {
     "honour": _("Honours and awards"),
     "membership": _("Memberships"),
     "course": _("Courses"),
+    "participation": _("Presentations, conferences and seminars"),
     "reference": _("References"),
 }
 
@@ -612,6 +613,30 @@ def _section_blocks(cv: CV, section: Section, *, as_portfolio: bool) -> list:
                 BETWEEN, one.item.cv_line, one.item.awarded_on.year if one.item.awarded_on else ""
             )
             for one in entries
+        ]
+    elif section.kind == "participation":
+        # Read off the entry's own fields, so that a translated place is the one printed (#694).
+        return [
+            block
+            for one in entries
+            for block in (
+                file_formats.bullets(
+                    [
+                        _joined(
+                            BETWEEN,
+                            _joined(
+                                ", ",
+                                one.item.role_text,
+                                one.item.quoted_title,
+                                one.item.event,
+                                one.item.place,
+                            ),
+                            one.item.when,
+                        )
+                    ]
+                ),
+                *([file_formats.paragraph(one.item.summary)] if one.item.summary.strip() else []),
+            )
         ]
     elif section.kind in ("membership", "course"):
         # One entry at a time, so that a summary can stand under its line (#693, #695).

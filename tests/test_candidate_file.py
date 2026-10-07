@@ -397,6 +397,7 @@ def fingerprint() -> str:
 #: 18 added the company an honour's giver and a membership's body link to (#693).
 #: 19 added courses (#695).
 #: 20 added the company of a course's provider, read back as a hint (#695).
+#: 21 added presentations, conferences and seminars (#694).
 SHAPES = {
     1: "0941165cc7c21c64",
     2: "fe525ea84b2b6f93",
@@ -418,6 +419,7 @@ SHAPES = {
     18: "e7b3b17bffbf5c75",
     19: "2690ab0a47750437",
     20: "67a8f18ac8a96597",
+    21: "60a629657bd09269",
 }
 
 

@@ -851,6 +851,7 @@ def form_table(user, mine=None) -> dict:
         resume.LanguageSkillForm: [{"user": user}],
         resume.LinkForm: [{"user": user}],
         resume.MembershipForm: [{"user": user}],
+        resume.ParticipationForm: [{"user": user}],
         resume.ProjectForm: [{"user": user}],
         resume.PublicationForm: [{"user": user}],
         resume.ReferenceForm: [{"user": user}],
@@ -1132,3 +1133,36 @@ def test_somebody_elses_referee_is_on_no_page_of_mine_and_cannot_be_chosen(
     cv = CV.objects.create(owner=user, name="Main", language="en-GB")
     client.post(reverse("documents:cv_add_items", args=[cv.pk]), {"add_reference": [theirs.pk]})
     assert not cv.items.exists()
+
+
+# ------------------------------------------------------------ presentations and events (#694)
+
+
+@pytest.mark.parametrize("name", ["item_update", "item_delete", "item_languages"])
+def test_somebody_elses_event_is_not_found(client, user, other_user, name):
+    from postulo.resume.models import Participation
+
+    theirs = Participation.objects.create(owner=other_user, event="Zebra symposium")
+    client.force_login(user)
+    url = reverse(f"resume:{name}", args=["participation", theirs.pk])
+
+    assert client.get(url).status_code == 404
+    assert client.post(url).status_code == 404
+    move = reverse("resume:item_move", args=["participation", theirs.pk, "up"])
+    assert client.post(move).status_code == 404
+    assert Participation.objects.filter(pk=theirs.pk).exists()
+
+
+def test_somebody_elses_event_is_on_no_page_of_mine(client, user, other_user):
+    from postulo.core import search
+    from postulo.resume.models import Participation
+
+    Participation.objects.create(
+        owner=other_user, event="Zebra symposium", title="Quokka talk", place="Savannah"
+    )
+    client.force_login(user)
+
+    assert "Zebra symposium" not in client.get(reverse("resume:overview")).content.decode()
+    assert "Zebra symposium" not in client.get(reverse("resume:preview")).content.decode()
+    assert search.search(user, "Zebra") == []
+    assert search.search(user, "Quokka") == []

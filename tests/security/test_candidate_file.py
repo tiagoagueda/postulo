@@ -1051,3 +1051,45 @@ def test_a_hostile_course_title_provider_link_or_date_stores_nothing(user):
 
     assert outcomes(plan, "courses") == [candidate.REFUSED] * 4
     assert not Course.objects.for_user(user).exists()
+
+
+# ------------------------------------------------- presentations and events (#694)
+
+
+@pytest.mark.parametrize("field", ["role", "kind"])
+@pytest.mark.parametrize(
+    "bad", ["keynote", MARKUP, SCRIPT, "x" * 5000, 7, ["speaker"], {"r": "speaker"}, True], ids=repr
+)
+def test_a_role_or_type_outside_the_lists_is_a_refused_row_and_stores_nothing(user, field, bad):
+    from postulo.resume.models import Participation
+
+    data = a_file(resume={"participations": [{"event": "PyCon", field: bad}]})
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "participations") == [candidate.REFUSED]
+    assert not Participation.objects.for_user(user).exists()
+
+
+def test_a_hostile_or_over_long_event_stores_nothing(user):
+    from postulo.resume.models import Participation
+
+    data = a_file(
+        resume={
+            "participations": [
+                {"event": "x" * 5000},
+                {"event": "PyCon", "title": "y" * 5000},
+                {"event": "PyCon", "place": "z" * 5000},
+                {"event": "PyCon", "url": SCRIPT},
+                {"event": "PyCon", "start_date": MARKUP},
+                {"event": "PyCon", "start_date": "2025-10-18", "end_date": "2025-10-17"},
+            ]
+        }
+    )
+
+    plan = candidate.plan(user, candidate.read(data))
+    candidate.apply(user, candidate.read(data))
+
+    assert outcomes(plan, "participations") == [candidate.REFUSED] * 6
+    assert not Participation.objects.for_user(user).exists()

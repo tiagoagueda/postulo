@@ -195,6 +195,18 @@
             {% endfor %}
           </ul>
 
+        {% elif section.kind == 'participation' %}
+          {% comment %} Role, "title", event, place, then the month and year (`Participation.role_text`, `quoted_title`, `when`: the words the text and Word files carry); a role or a type nobody stated prints nothing (#694). {% endcomment %}
+          <ul class="participations">
+            {% for entry in section.items %}
+              <li>
+                <bdi>{% if entry.item.role %}{{ entry.item.role_text }}, {% endif %}{% if entry.item.title %}{{ entry.item.quoted_title }}, {% endif %}{{ entry.item.event }}{% if entry.item.place %}, {{ entry.item.place }}{% endif %}</bdi>
+                {% if entry.item.when %}<span class="dates">{{ entry.item.when }}</span>{% endif %}
+                {% if entry.item.summary %}<p>{{ entry.item.summary }}</p>{% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+
         {% elif section.kind == 'certification' %}
           <ul class="certifications">
             {% for entry in section.items %}

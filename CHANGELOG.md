@@ -90,6 +90,7 @@ All notable changes to Postulo are recorded here. The format follows
 - Your career gains Honours and awards and Memberships: a CV prints "title, awarded by" with the year and "role, organisation" with "since 2015" or the years, both link to your companies, and a Europass file's memberships are read (#693)
 - The career gains Courses: a title, a provider linked to your companies, dates, the hours, a summary and a link, printed on every CV as "title, provider · 40 hours · year" (#695)
 - Your career gains References, the people who will vouch for you, kept as contacts and printed on a CV only once they have agreed, with a CV switch for "References are available on request" and Europass referees read in as not yet asked (#696)
+- The career gains one section for presentations, conferences and seminars, with a role and a type that print nothing when not stated; a CV prints one line per event and Europass conferences and speaking history are read in (#694)
 
 ### 🐛 Fixed
 

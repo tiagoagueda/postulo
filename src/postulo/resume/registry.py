@@ -121,6 +121,14 @@ SECTIONS: dict[str, SectionSpec] = {
         _("Courses"),
         resume_forms.COURSE_RULE,
     ),
+    "participation": SectionSpec(
+        "participation",
+        resume_models.Participation,
+        resume_forms.ParticipationForm,
+        _("Event"),
+        _("Presentations, conferences and seminars"),
+        resume_forms.PARTICIPATION_RULE,
+    ),
     "reference": SectionSpec(
         "reference",
         resume_models.Reference,
@@ -144,6 +152,7 @@ OVERVIEW_ORDER = (
     "skill-group",
     "certification",
     "driving-licence",
+    "participation",
     "honour",
     "membership",
     "language",

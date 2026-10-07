@@ -331,6 +331,24 @@ def _course_hours(value, report: ImportReport, entry: dict) -> int | None:
     return None
 
 
+def _event_choice(value, choices, report: ImportReport, entry: dict, label: str) -> str:
+    """An event's role or type, kept when this version lists it, else *not stated* (#694).
+
+    A later Postulo may list a role this one has not heard of; what cannot be drawn is blank
+    and prints nothing, and the report says so, because inventing another would be a claim.
+    """
+    if value in (None, ""):
+        return ""
+    if isinstance(value, str) and value in choices.values:
+        return value
+    name = str(entry.get("event") or "")[:80]
+    report.skipped.append(
+        f"Event {name!r}: the {label} {str(value)[:20]!r} is not one this version lists, and "
+        "was left as not stated"
+    )
+    return ""
+
+
 def _licence_as_written(values: dict, report: ImportReport) -> dict | None:
     """A driving licence as a form would have kept it, or nothing where it cannot be (#691).
 
@@ -1154,6 +1172,14 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
                     values[name] = _eqf_level(value, report, entry)
                 elif name == "hours":
                     values[name] = _course_hours(value, report, entry)
+                elif key == "participations" and name in ("role", "kind"):
+                    values[name] = _event_choice(
+                        value,
+                        resume.ParticipationRole if name == "role" else resume.ParticipationKind,
+                        report,
+                        entry,
+                        name,
+                    )
                 else:
                     values[name] = value
             if key == "publications":

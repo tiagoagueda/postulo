@@ -132,6 +132,9 @@ READ = frozenset(
         # Memberships and affiliations, read as memberships (#693).
         "NetworksAndMemberships",
         "OrganizationAffiliations",
+        # Events the person took part in or spoke at, read as participations (#694).
+        "ConferencesAndSeminars",
+        "SpeakingHistory",
         "DigitalSkills",
         "EmploymentReferences",
         *(section for section, _item, _label in SKILL_SECTIONS),
@@ -170,6 +173,7 @@ def read(root) -> Record:
         _read_skills(profile, record)
         _read_projects(profile, record)
         _read_memberships(profile, record)
+        _read_participations(profile, record)
         _read_references(profile, record)
         _name_what_was_not_read(profile, record)
     if len(profiles) > 1:
@@ -644,6 +648,83 @@ def _read_memberships(profile, record: Record) -> None:
                 "summary": "",
                 "url": _address_of(item),
             }
+        )
+
+
+#: How many events are read, from the two elements together: the cap the other lists keep, for
+#: a file that is whatever its sender made it (#694).
+MAX_PARTICIPATIONS = 200
+
+
+def _read_participations(profile, record: Record) -> None:
+    """The Candidate's two elements for events, read as participations (#694).
+
+    ``ConferenceAndSeminar`` is an event the person took part in, in a role its documentation
+    lists in prose and the schema does not carry: the role and the type stay *not stated*,
+    because guessing a speaker from a description is a claim made on somebody's behalf.
+    ``SpeakingEvent`` is one at which the person was a lecturer or presenter, which the
+    element itself says, so it is read with the role *speaker*. Any link past the first is
+    named as not read.
+    """
+    extra_links = False
+    held = 0
+    holder = _find(profile, "ConferencesAndSeminars")
+    for item in _all(holder, "ConferenceAndSeminar") if holder is not None else []:
+        title = _text(item, "Title")
+        if not title:
+            continue
+        held += 1
+        if held > MAX_PARTICIPATIONS:
+            break
+        period = _first(_find(item, "Date"), _find(item, "Period"))
+        extra_links = extra_links or len(_all(item, "Link")) > 1
+        record.participations.append(
+            {
+                "event": title,
+                "title": "",
+                "role": "",
+                "kind": "",
+                "start_date": _stated_date(period, "StartDate"),
+                "end_date": None if _true(period, "Ongoing") else _stated_date(period, "EndDate"),
+                "place": _text(item, "Location") or _text(item, "Location", "Address", "CityName"),
+                "summary": _plain(_raw(item, "Description")),
+                "url": _address_of(item),
+            }
+        )
+    speaking = _find(profile, "SpeakingHistory")
+    for item in _all(speaking, "SpeakingEvent") if speaking is not None else []:
+        name = _text(item, "EventName")
+        if not name:
+            continue
+        held += 1
+        if held > MAX_PARTICIPATIONS:
+            break
+        record.participations.append(
+            {
+                "event": name,
+                "title": "",
+                "role": "speaker",
+                "kind": "",
+                "start_date": None,
+                "end_date": None,
+                "place": "",
+                "summary": _plain(_raw(item, "Description")),
+                "url": "",
+            }
+        )
+    if held > MAX_PARTICIPATIONS:
+        record.skipped.append(
+            str(
+                _(
+                    "The file lists more than %(limit)d events, and only the first %(limit)d "
+                    "were read."
+                )
+                % {"limit": MAX_PARTICIPATIONS}
+            )
+        )
+    if extra_links:
+        record.skipped.append(
+            str(_("An event’s links past the first are not read: an event keeps one address."))
         )
 
 

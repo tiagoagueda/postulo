@@ -28,6 +28,7 @@ from postulo.resume.models import (
     Course,
     Education,
     Experience,
+    Participation,
     Publication,
     SkillGroup,
     Translation,
@@ -112,6 +113,12 @@ def test_a_course_translates_its_summary_not_its_title_or_provider():
     """A course's title and provider are the provider's wording; what it covered is the
     person's own (#695)."""
     assert translating.fields_for(Course) == ("summary",)
+
+
+def test_a_participation_translates_its_place_and_summary_not_its_event_or_title():
+    """An event's name and what was presented there are theirs; where it was and what it
+    was about are the person's own words (#694)."""
+    assert translating.fields_for(Participation) == ("place", "summary")
 
 
 def test_a_publication_translates_nothing():

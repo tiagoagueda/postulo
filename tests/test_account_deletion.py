@@ -28,6 +28,7 @@ from postulo.resume.models import (
     DrivingLicence,
     Honour,
     Membership,
+    Participation,
     Publication,
     Reference,
 )
@@ -70,6 +71,7 @@ def fill(user) -> dict[str, Path]:
     Honour.objects.create(owner=user, title="Best paper")
     Membership.objects.create(owner=user, organisation="A chess club")
     Course.objects.create(owner=user, title="A course", hours=12)
+    Participation.objects.create(owner=user, event="A conference", role="speaker")
     Reference.objects.create(owner=user, contact=Contact.objects.get(owner=user, name="Cave"))
     upload = UploadedDocument.objects.create(
         owner=user, title="Designed CV", file=ContentFile(b"%PDF-1.7 mine", name="cv.pdf")
@@ -125,6 +127,7 @@ def test_deleting_removes_every_owned_row_and_every_file(
         Honour,
         Membership,
         Course,
+        Participation,
         Reference,
     ):
         assert model.objects.filter(owner=other_user).exists(), (

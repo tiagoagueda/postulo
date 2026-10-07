@@ -115,6 +115,15 @@
                             {% if item.provider %}<bdi>{{ item.provider }}</bdi>{% endif %}{% if item.provider and item.hours %} · {% endif %}{{ item.hours_text }}
                           </p>
                         {% endif %}
+                      {% elif section.spec.slug == 'participation' %}
+                        {% if item.role_text or item.kind_text or item.title or item.when %}
+                          <p class="text-sm text-ink-500 dark:text-ink-400">
+                            {% if item.role_text %}{{ item.role_text }}{% endif %}{% if item.role_text and item.title %} · {% endif %}{% if item.title %}<bdi>{{ item.title }}</bdi>{% endif %}
+                          </p>
+                          <p class="text-xs text-ink-500 dark:text-ink-400">
+                            {% if item.kind_text %}{{ item.kind_text }}{% endif %}{% if item.kind_text and item.when %} · {% endif %}{{ item.when }}
+                          </p>
+                        {% endif %}
                       {% elif section.spec.slug == 'reference' %}
                         {% comment %} What would print, said in words and never in a colour:
                            the permission, and whether the details go with the name (#696). {% endcomment %}

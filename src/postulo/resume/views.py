@@ -42,6 +42,7 @@ from .models import (
     LanguageSkill,
     Link,
     Membership,
+    Participation,
     Proficiency,
     Project,
     Publication,
@@ -132,6 +133,7 @@ class ResumeOverviewView(OwnedObjectMixin, TemplateView):
             "language": LanguageSkill.objects.for_user(user).count(),
             "driving_licence": DrivingLicence.objects.for_user(user).count(),
             "course": Course.objects.for_user(user).count(),
+            "participation": Participation.objects.for_user(user).count(),
             "skill_group": SkillGroup.objects.for_user(user).count(),
         }
         return context
@@ -465,6 +467,7 @@ class ResumePreviewView(OwnedObjectMixin, View):
                 "languages": LanguageSkill.objects.for_user(user),
                 "driving_licences": DrivingLicence.objects.for_user(user),
                 "courses": Course.objects.for_user(user),
+                "participations": Participation.objects.for_user(user),
             },
         )
 
@@ -686,6 +689,7 @@ COUNT_LABELS = {
     "skills": _("Skills"),
     "projects": _("Projects and achievements"),
     "memberships": _("Memberships"),
+    "participations": _("Presentations, conferences and seminars"),
     "references": _("References"),
 }
 
@@ -787,6 +791,7 @@ def _summarise(record: importing.Record) -> dict:
         "skill_groups": record.skill_groups,
         "projects": [{"name": row["name"]} for row in record.projects],
         "memberships": [{"organisation": row["organisation"]} for row in record.memberships],
+        "participations": [{"event": row["event"]} for row in record.participations],
         # Each person, by name, before anything is written: they become contacts (#696).
         "references": [
             {"name": row["name"], "relationship": row.get("relationship", "")}
@@ -827,6 +832,14 @@ def _to_session(record: importing.Record) -> dict:
             }
             for row in record.memberships
         ],
+        "participations": [
+            {
+                **row,
+                "start_date": _iso(row.get("start_date")),
+                "end_date": _iso(row.get("end_date")),
+            }
+            for row in record.participations
+        ],
         "references": record.references,
     }
 
@@ -861,6 +874,14 @@ def _from_session(raw: dict) -> importing.Record:
                 "end_date": _date(row.get("end_date")),
             }
             for row in raw.get("memberships", [])
+        ],
+        participations=[
+            {
+                **row,
+                "start_date": _date(row.get("start_date")),
+                "end_date": _date(row.get("end_date")),
+            }
+            for row in raw.get("participations", [])
         ],
         references=raw.get("references", []),
     )

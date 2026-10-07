@@ -557,6 +557,12 @@ def search_career(user, query: str, limit: int) -> Found:
         (resume.Honour, ("title", "awarded_by"), "title", lambda r: r.title),
         (resume.Membership, ("organisation", "role"), "organisation", lambda r: r.organisation),
         (resume.Course, ("title", "provider"), "title", lambda r: r.title),
+        (
+            resume.Participation,
+            ("event", "title", "place"),
+            "event",
+            lambda r: r.event,
+        ),
         (resume.Skill, ("name",), "name", lambda r: r.name),
     ]
     overview = reverse("resume:overview")

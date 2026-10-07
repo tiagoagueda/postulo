@@ -44,6 +44,11 @@ class Record:
     #: a ``role`` (often empty), ``start_date`` and ``end_date``, a ``summary`` and a ``url``.
     #: Europass's Candidate format has two elements for them (#693).
     memberships: list[dict] = field(default_factory=list)
+    #: Events the person took part in: ``event``, ``title``, ``role`` and ``kind`` (a code, or
+    #: empty where the file does not say), ``start_date`` and ``end_date``, ``place``,
+    #: ``summary`` and ``url``. Europass's Candidate format has two elements for them, and
+    #: neither states a role beyond a speaker's (#694).
+    participations: list[dict] = field(default_factory=list)
     #: People who will vouch for the person: ``name``, ``relationship``, ``email``, ``phone``,
     #: each text. They become contacts and references that nobody has been asked about yet
     #: (``Not asked``), never printed until the person says they agreed (#696).
@@ -71,6 +76,7 @@ class Record:
                 self.skill_groups,
                 self.projects,
                 self.memberships,
+                self.participations,
                 self.references,
             )
         )
@@ -83,6 +89,7 @@ class Record:
             "skills": sum(len(group["skills"]) for group in self.skill_groups),
             "projects": len(self.projects),
             "memberships": len(self.memberships),
+            "participations": len(self.participations),
             "references": len(self.references),
         }
 
@@ -219,6 +226,9 @@ def apply(owner, record: Record) -> Report:
         Experience,
         LanguageSkill,
         Membership,
+        Participation,
+        ParticipationKind,
+        ParticipationRole,
         Project,
         Skill,
         SkillGroup,
@@ -475,6 +485,34 @@ def apply(owner, record: Record) -> Report:
     ordering.place_many(Membership, owner, memberships)
     if memberships:
         report.added["memberships"] = len(memberships)
+
+    participations = []
+    for entry in record.participations:
+        event = (entry.get("event") or "").strip()[:200]
+        if not event:
+            continue
+        address = (entry.get("url") or "").strip()
+        role, kind = entry.get("role") or "", entry.get("kind") or ""
+        participations.append(
+            Participation(
+                owner=owner,
+                event=event,
+                title=(entry.get("title") or "").strip()[:200],
+                # A role or a type this version does not list is *not stated*, never made up.
+                role=role if role in ParticipationRole.values else "",
+                kind=kind if kind in ParticipationKind.values else "",
+                start_date=entry.get("start_date"),
+                end_date=entry.get("end_date"),
+                place=(entry.get("place") or "").strip()[:200],
+                summary=entry.get("summary") or "",
+                url=address
+                if address.startswith(("http://", "https://")) and len(address) <= 200
+                else "",
+            )
+        )
+    ordering.place_many(Participation, owner, participations)
+    if participations:
+        report.added["participations"] = len(participations)
     _add_references(owner, record, report)
 
     return report

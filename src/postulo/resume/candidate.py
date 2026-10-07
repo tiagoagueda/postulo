@@ -379,6 +379,29 @@ KINDS: tuple[Kind, ...] = (
         # The company the provider links to, by name, read back as an issuer's is (#695).
         hints=("company",),
     ),
+    Kind(
+        block="participations",
+        model=resume.Participation,
+        form=resume_forms.ParticipationForm,
+        title=gettext_lazy("Presentations, conferences and seminars"),
+        fields=(
+            "event",
+            "role",
+            "title",
+            "kind",
+            "start_date",
+            "end_date",
+            "place",
+            "url",
+            "summary",
+        ),
+        # An event is its name, what was presented and the role; the dates tell the same
+        # annual event in two years apart (#694).
+        names=("event", "title", "role"),
+        dates=("start_date", "end_date"),
+        label="event",
+        sub="title",
+    ),
 )
 
 KINDS_BY_BLOCK = {kind.block: kind for kind in KINDS}

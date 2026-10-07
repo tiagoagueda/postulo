@@ -17,7 +17,8 @@ from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelatio
 from django.contrib.contenttypes.models import ContentType
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.utils.translation import gettext, ngettext
+from django.utils import formats
+from django.utils.translation import gettext, ngettext, pgettext_lazy
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import languages
@@ -472,6 +473,107 @@ class Course(ResumeItem):
         """“Title, Provider · 40 hours · 2024”: the words the text and Word files print."""
         parts = [self.title_and_provider, self.hours_text, self.years_text]
         return " · ".join(part for part in parts if part)
+
+
+class ParticipationRole(models.TextChoices):
+    """What the person did at an event, as a closed list with an honest blank (#694).
+
+    **Not stated** prints nothing, for the reason a language level can be unstated: an importer
+    that reads an event does not decide the person spoke at it. Each label has a context of its
+    own, because *Role* is a job elsewhere in the catalogues and a translator is not asked to
+    make one word do both.
+    """
+
+    UNSET = "", _("Not stated")
+    SPEAKER = "speaker", pgettext_lazy("role at an event", "Speaker")
+    POSTER = "poster", pgettext_lazy("role at an event", "Poster presenter")
+    PANELLIST = "panellist", pgettext_lazy("role at an event", "Panellist")
+    WORKSHOP = "workshop", pgettext_lazy("role at an event", "Workshop leader")
+    ORGANISER = "organiser", pgettext_lazy("role at an event", "Organiser")
+    COMMITTEE = "committee", pgettext_lazy("role at an event", "Committee member")
+    ATTENDEE = "attendee", pgettext_lazy("role at an event", "Attendee")
+
+
+class ParticipationKind(models.TextChoices):
+    """The sort of event; **Not stated** prints nothing (#694)."""
+
+    UNSET = "", _("Not stated")
+    CONFERENCE = "conference", pgettext_lazy("type of event", "Conference")
+    SEMINAR = "seminar", pgettext_lazy("type of event", "Seminar")
+    WORKSHOP = "workshop", pgettext_lazy("type of event", "Workshop")
+    OTHER = "other", pgettext_lazy("type of event", "Other")
+
+
+class Participation(ResumeItem):
+    """A talk given, a workshop led, a committee sat on, an event attended (#694).
+
+    One section for presentations, conferences and seminars: a presentation is a role at an
+    event, not a kind of event, so the role and the type are two choices on one form. The model
+    is not called an event because ``ApplicationEvent`` and ``ListingEvent`` take the word.
+
+    ``event`` is the event's name and ``title`` what the person presented there; neither is
+    translated, as a credential's name is not. ``place`` and ``summary`` are. An event is one
+    place on set days; learning with a provider, a length and an outcome is a *Course*, and a
+    paper is a *Publication*. A role or a type nobody stated is blank and prints nothing.
+    """
+
+    event = models.CharField(_("event"), max_length=200)
+    title = models.CharField(_("what you presented"), max_length=200, blank=True)
+    role = models.CharField(
+        pgettext_lazy("role at an event", "your role"),
+        max_length=12,
+        choices=ParticipationRole,
+        default=ParticipationRole.UNSET,
+        blank=True,
+    )
+    kind = models.CharField(
+        pgettext_lazy("type of event", "type"),
+        max_length=12,
+        choices=ParticipationKind,
+        default=ParticipationKind.UNSET,
+        blank=True,
+    )
+    start_date = models.DateField(_("from"), null=True, blank=True)
+    end_date = models.DateField(_("until"), null=True, blank=True)
+    place = models.CharField(_("place"), max_length=200, blank=True)
+    url = models.URLField(_("link"), blank=True)
+    summary = models.TextField(_("summary"), blank=True)
+
+    class Meta(ResumeItem.Meta):
+        verbose_name = _("event")
+        verbose_name_plural = _("events")
+
+    def __str__(self) -> str:
+        return self.event
+
+    @property
+    def role_text(self) -> str:
+        """The role in the language being read, or nothing where none was stated."""
+        return str(self.get_role_display()) if self.role else ""
+
+    @property
+    def kind_text(self) -> str:
+        return str(self.get_kind_display()) if self.kind else ""
+
+    @property
+    def quoted_title(self) -> str:
+        """The title in quotation marks, in the language being read; nothing where none."""
+        title = self.title.strip()
+        return gettext("“%(title)s”") % {"title": title} if title else ""
+
+    @property
+    def when(self) -> str:
+        """The month and year, or the two: nothing where no date was given.
+
+        A start alone is just that month: an event is not *present* the way a job is.
+        """
+        first, last = self.start_date, self.end_date
+        if not first and not last:
+            return ""
+        start = formats.date_format(first or last, "YEAR_MONTH_FORMAT")
+        if not first or not last or (first.year, first.month) == (last.year, last.month):
+            return start
+        return f"{start} – {formats.date_format(last, 'YEAR_MONTH_FORMAT')}"
 
 
 class Publication(ResumeItem):

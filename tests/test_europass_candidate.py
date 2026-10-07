@@ -242,6 +242,7 @@ def test_the_format_europass_writes_today_reads():
     assert record.source == "candidate"
     assert record.counts() == {
         "memberships": 0,
+        "participations": 0,
         "experience": 2,
         "education": 1,
         "languages": 2,
@@ -1306,3 +1307,93 @@ def test_a_number_nobody_holds_is_kept_on_the_new_contact(user):
 
     contact = Contact.objects.get(owner=user)
     assert phone_numbers.primary_for(contact).number == "+351912345678"
+
+
+# --------------------------------------------------- conferences, seminars and speaking (#694)
+
+EVENTS = (
+    "<ConferencesAndSeminars>"
+    "<ConferenceAndSeminar><Title>PyCon Portugal 2025</Title>"
+    "<Date><StartDate><hr:FormattedDateTime>2025-10-17</hr:FormattedDateTime></StartDate>"
+    "<EndDate><hr:FormattedDateTime>2025-10-18</hr:FormattedDateTime></EndDate></Date>"
+    "<Location>Lisbon, Portugal</Location>"
+    "<oa:Description>&lt;p&gt;Gave a talk on error budgets.&lt;/p&gt;</oa:Description>"
+    "<Link>https://pycon.example/2025</Link><Link>https://pycon.example/slides</Link>"
+    "</ConferenceAndSeminar>"
+    "<ConferenceAndSeminar><Title>Annual seminar</Title>"
+    "<Date><StartDate><hr:FormattedDateTime>2020</hr:FormattedDateTime></StartDate>"
+    "<EndDate><hr:FormattedDateTime>2021</hr:FormattedDateTime></EndDate>"
+    "<Ongoing>true</Ongoing></Date></ConferenceAndSeminar>"
+    "<ConferenceAndSeminar><Description>No title</Description></ConferenceAndSeminar>"
+    "</ConferencesAndSeminars>"
+    "<SpeakingHistory><SpeakingEvent><EventName>Guest lecture, University of Porto</EventName>"
+    "<oa:Description>Four lectures.</oa:Description></SpeakingEvent>"
+    "<SpeakingEvent><Description>No name</Description></SpeakingEvent></SpeakingHistory>"
+)
+
+
+def test_a_conference_and_a_speaking_event_are_read_as_participations():
+    record = europass.read(candidate_xml(EVENTS))
+
+    assert [row["event"] for row in record.participations] == [
+        "PyCon Portugal 2025",
+        "Annual seminar",
+        "Guest lecture, University of Porto",
+    ]
+    pycon, seminar, lecture = record.participations
+    assert (pycon["start_date"], pycon["end_date"]) == (
+        dt.date(2025, 10, 17),
+        dt.date(2025, 10, 18),
+    )
+    assert pycon["place"] == "Lisbon, Portugal"
+    assert pycon["summary"] == "Gave a talk on error budgets."
+    assert pycon["url"] == "https://pycon.example/2025"
+    # The element does not say what the person did: it is not guessed from the prose.
+    assert (pycon["role"], pycon["kind"], pycon["title"]) == ("", "", "")
+    assert seminar["end_date"] is None, "an ongoing flag leaves the end empty"
+    assert (lecture["role"], lecture["summary"]) == ("speaker", "Four lectures.")
+    assert record.counts()["participations"] == 3
+    assert not record.is_empty
+
+
+def test_a_second_link_is_named_as_not_read_and_the_sections_are_not_named_as_missed():
+    record = europass.read(candidate_xml(EVENTS))
+
+    assert any("links past the first" in note for note in record.skipped)
+    assert not any("ConferencesAndSeminars" in note for note in record.skipped)
+    assert not any("SpeakingHistory" in note for note in record.skipped)
+
+
+def test_no_note_about_links_where_each_event_has_one():
+    data = candidate_xml(
+        "<ConferencesAndSeminars><ConferenceAndSeminar><Title>X</Title>"
+        "<Link>https://x.example</Link></ConferenceAndSeminar></ConferencesAndSeminars>"
+    )
+
+    assert not any("links" in note for note in europass.read(data).skipped)
+
+
+def test_the_review_page_lists_events_and_confirming_writes_them_unstated(client, user):
+    from postulo.resume.models import Participation
+
+    client.force_login(user)
+    url = reverse("resume:europass_import")
+
+    client.post(url, {"file": upload("cv.xml", candidate_xml(EVENTS), "text/xml")})
+    page = client.get(url).content.decode()
+
+    assert "Presentations, conferences and seminars" in page and "PyCon Portugal 2025" in page
+    assert not Participation.objects.filter(owner=user).exists()
+
+    client.post(url, {"action": "confirm"})
+
+    kept = {p.event: p for p in Participation.objects.filter(owner=user)}
+    assert set(kept) == {
+        "PyCon Portugal 2025",
+        "Annual seminar",
+        "Guest lecture, University of Porto",
+    }
+    assert kept["PyCon Portugal 2025"].role == "" and kept["PyCon Portugal 2025"].kind == ""
+    assert kept["Guest lecture, University of Porto"].role == "speaker"
+    assert kept["PyCon Portugal 2025"].start_date == dt.date(2025, 10, 17)
+    assert kept["Annual seminar"].end_date is None

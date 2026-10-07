@@ -22,6 +22,7 @@ from .models import (
     LanguageSkill,
     Link,
     Membership,
+    Participation,
     Project,
     Publication,
     Reference,
@@ -399,6 +400,52 @@ class CourseForm(ResumeItemForm):
             entry.save()
             self.save_m2m()
         return entry
+
+
+#: Where an event ends and a course or a publication begins, said once and used by the form and
+#: the career page (#694).
+PARTICIPATION_RULE = _(
+    "A talk, a workshop, a panel or a committee, or an event you took part in: one place on "
+    "set days. Learning with a provider, a length and an outcome belongs in Courses, and a "
+    "paper in Publications. Listing an event you only attended is your call."
+)
+
+
+class ParticipationForm(ResumeItemForm):
+    """An event the person took part in, the event and the role first (#694)."""
+
+    date_range = ("start_date", "end_date")
+
+    class Meta:
+        model = Participation
+        fields = (
+            "event",
+            "role",
+            "title",
+            "kind",
+            "start_date",
+            "end_date",
+            "place",
+            "url",
+            "summary",
+            "order",
+        )
+        widgets = {
+            "start_date": DATE_WIDGET,
+            "end_date": DATE_WIDGET,
+            "summary": forms.Textarea(attrs={"rows": 3}),
+        }
+        help_texts = {
+            "event": _("The event’s name, as a CV should print it: “PyCon Portugal 2025”."),
+            "role": _("What you did there. “Not stated” prints nothing."),
+            "title": _("What you presented, if you presented something."),
+            "kind": _("The sort of event. “Not stated” prints nothing."),
+            "start_date": ENTRY_HELP["start_date"],
+            "end_date": _("Leave it empty for a single day or when it has no end."),
+            "place": _("“Lisbon, Portugal” or “Online”."),
+            "url": _("A programme, the slides or a recording. A CV does not print it."),
+            "summary": ENTRY_HELP["summary"],
+        }
 
 
 class DrivingLicenceForm(ResumeItemForm):

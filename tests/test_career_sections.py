@@ -226,6 +226,9 @@ def _one_of_each(user) -> dict:
             owner=user, title="Portfolio", url="https://alex.example.org"
         ),
         "language": lambda: m.LanguageSkill.objects.create(owner=user, name="French"),
+        "participation": lambda: m.Participation.objects.create(
+            owner=user, event="PyCon Portugal 2025", role="speaker", title="Error budgets"
+        ),
         "course": lambda: m.Course.objects.create(
             owner=user, title="Site Reliability Engineering", provider="Linux Foundation", hours=40
         ),

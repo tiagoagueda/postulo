@@ -75,6 +75,7 @@ from postulo.resume.models import (
     Link,
     LinkKind,
     Membership,
+    Participation,
     Project,
     Publication,
     Reference,
@@ -387,6 +388,7 @@ class Command(BaseCommand):
             DrivingLicence,
             Honour,
             Membership,
+            Participation,
             Reference,
             LanguageSkill,
             Link,
@@ -559,6 +561,49 @@ class Command(BaseCommand):
             ),
             Course.objects.create(
                 owner=user, title="Evening class in pottery", provider="Casa da Cerâmica", order=1
+            ),
+        ]
+        # A talk, a workshop, a committee, one attended; a role nobody stated prints nothing (#694).
+        participations = [
+            Participation.objects.create(
+                owner=user,
+                event="PyCon Portugal 2025",
+                title="Error budgets for a team of four",
+                role="speaker",
+                kind="conference",
+                start_date=dt.date(2025, 10, 17),
+                end_date=dt.date(2025, 10, 18),
+                place="Lisbon, Portugal",
+                url="https://pycon.example/2025/talks/error-budgets",
+                order=0,
+            ),
+            Participation.objects.create(
+                owner=user,
+                event="Operability seminar, Instituto Superior Técnico",
+                title="Reading a post-incident review",
+                role="workshop",
+                kind="seminar",
+                start_date=dt.date(2024, 5, 9),
+                place="Online",
+                summary="Half a day with thirty students on a real incident, names removed.",
+                order=1,
+            ),
+            Participation.objects.create(
+                owner=user,
+                event="SREcon Europe 2023",
+                role="committee",
+                kind="conference",
+                start_date=dt.date(2023, 10, 1),
+                place="Dublin, Ireland",
+                order=2,
+            ),
+            Participation.objects.create(
+                owner=user,
+                event="KubeCon Europe 2022",
+                role="attendee",
+                start_date=dt.date(2022, 5, 17),
+                place="Valencia, Spain",
+                order=3,
             ),
         ]
         languages = [
@@ -854,6 +899,7 @@ class Command(BaseCommand):
                     *honours,
                     *memberships,
                     *courses,
+                    *participations,
                 ]
             ):
                 CVItem.objects.create(

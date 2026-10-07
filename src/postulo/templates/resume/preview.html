@@ -157,6 +157,15 @@
       </section>
     {% endif %}
 
+    {% if participations %}
+      <section class="mb-8">
+        <c-section-title>{% translate "Presentations, conferences and seminars" %}</c-section-title>
+        <div class="card space-y-1 text-sm">
+          {% for item in participations %}<p><bdi>{% if item.role %}{{ item.role_text }}, {% endif %}{% if item.title %}{{ item.quoted_title }}, {% endif %}{{ item.event }}{% if item.place %}, {{ item.place }}{% endif %}</bdi>{% if item.when %} · {{ item.when }}{% endif %}</p>{% endfor %}
+        </div>
+      </section>
+    {% endif %}
+
     {% if certifications or languages %}
       <div class="grid gap-6 sm:grid-cols-2">
         {% if certifications %}

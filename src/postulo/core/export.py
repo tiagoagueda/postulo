@@ -177,7 +177,11 @@ logger = logging.getLogger(__name__)
 #: whose contact is not in the file skips the entry and says so (#696).
 #: 62 added ``references_on_request`` among a CV's ``prints`` switches: whether it says
 #: that references are available on request. An archive without it restores it off (#696).
-FORMAT_VERSION = 62
+#: 63 added ``participations`` in the career: an event, what was presented there, the person's
+#: role and the type of event as codes (blank where not stated), two optional dates, a place,
+#: a link and a summary. An archive without them restores none; a role or a type this
+#: version does not list restores as not stated (#694).
+FORMAT_VERSION = 63
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -239,7 +243,9 @@ FORMAT_VERSION = 62
 #: 19 added ``courses``, read back through the form a person would have typed one into, so
 #: hours outside 1 to 10,000 are a refused row (#695).
 #: 20 added ``company`` on a course, read back as a hint, as a certification's is (#695).
-CANDIDATE_FORMAT = 20
+#: 21 added ``participations``, read back through the form a person would have typed one into,
+#: so a role or a type outside the lists is a refused row (#694).
+CANDIDATE_FORMAT = 21
 
 MANIFEST_NAME = "postulo.json"
 MEDIA_PREFIX = "media/"
@@ -333,6 +339,7 @@ TRANSLATION_SECTIONS = {
     "honour": "honours",
     "membership": "memberships",
     "course": "courses",
+    "participation": "participations",
     "link": "links",
 }
 TAG_FIELDS = ("id", "name", "slug", "colour", "icon")
@@ -663,6 +670,19 @@ RESUME_FIELDS = {
         "url",
         "order",
     ),
+    "participations": (
+        "id",
+        "event",
+        "title",
+        "role",
+        "kind",
+        "start_date",
+        "end_date",
+        "place",
+        "url",
+        "summary",
+        "order",
+    ),
     "links": (
         "id",
         "title",
@@ -690,6 +710,7 @@ RESUME_MODELS = {
     "languages": "LanguageSkill",
     "driving_licences": "DrivingLicence",
     "courses": "Course",
+    "participations": "Participation",
     "links": "Link",
 }
 
