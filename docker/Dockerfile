@@ -174,10 +174,11 @@ ENV PYTHONUNBUFFERED=1 \
 # fonts-noto-core is for the scripts. DejaVu draws Latin, Greek and Cyrillic and stops
 # there, so an Amharic or Tigrinya CV rendered in this image came out a page of empty
 # boxes, and a box on somebody's CV is worse than English. Noto's core set covers
-# Arabic and Ethiopic (#70), and the Indic scripts and Hebrew that #71 will want. CJK
-# is a separate package and a deliberate absence: the image does not double in size for
-# a language almost none of the installations will use, and the door for it is
-# POSTULO_EXTRA_APT_PACKAGES below (#74).
+# Arabic and Ethiopic (#70), and Devanagari, Bengali and Hebrew among the scripts #71
+# wanted. fonts-noto-cjk is a separate package, and it was a deliberate absence until
+# Chinese was settled for 0.5.0 (#728): Han is drawn from it now, and it is what makes the
+# image larger than it was, at a cost the maintainer accepted for two Chinese catalogues
+# (#74 had chosen to leave it out; this reverses that).
 # tests/test_fonts.py holds this list to the languages Postulo actually offers.
 #
 # What the declaration does not say — whether the machine actually has the fonts —
@@ -224,10 +225,9 @@ ENV PYTHONUNBUFFERED=1 \
 # The door for packages the default image does not carry (#74). It takes any number of
 # apt packages, in whatever form apt accepts, and installs them into this stage only.
 # The build stage's POSTULO_EXTRA_PACKAGES is the pip door, and the two are separate
-# questions: a Python package a plugin needs is not a font a document needs. The one
-# decision it exists to hold is written above — CJK is opt-in, and this is how it is
-# opted in:
-#     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-cjk ...
+# questions: a Python package a plugin needs is not a font a document needs. A script the
+# default fonts do not draw is the usual reason to reach for it:
+#     docker build --build-arg POSTULO_EXTRA_APT_PACKAGES=fonts-noto-extra ...
 ARG POSTULO_EXTRA_APT_PACKAGES=""
 # What makes the upgrade run a second time (#300). A layer is served from the builder's
 # cache for as long as its text and the layer under it are the same, and neither changes
@@ -253,7 +253,7 @@ RUN echo "Debian's packages as of: ${POSTULO_APT_REFRESH:-whenever this layer wa
     && apt-get upgrade -y \
     && apt-get install -y --no-install-recommends \
         libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz0b libharfbuzz-subset0 libfontconfig1 \
-        fonts-dejavu-core fonts-noto-core \
+        fonts-dejavu-core fonts-noto-core fonts-noto-cjk \
         ca-certificates curl \
     && if [ -n "$POSTULO_EXTRA_APT_PACKAGES" ]; then \
            apt-get install -y --no-install-recommends $POSTULO_EXTRA_APT_PACKAGES; \

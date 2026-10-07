@@ -25,8 +25,10 @@ CLDR_RULES: dict[str, tuple[str | None, str | None]] = {
     "cs": ("titlecase-firstword", "titlecase-firstword"),
     "da": (None, "titlecase-firstword"),
     "es": ("titlecase-firstword", "titlecase-firstword"),
+    "es-MX": ("titlecase-firstword", "titlecase-firstword"),
     "fi": (None, "titlecase-firstword"),
     "fr-FR": (None, "titlecase-firstword"),
+    "fr-CA": (None, "titlecase-firstword"),
     "hr": ("titlecase-firstword", "titlecase-firstword"),
     "it": ("titlecase-firstword", "titlecase-firstword"),
     "pt-PT": ("titlecase-firstword", "no-change"),
@@ -68,7 +70,7 @@ def test_a_language_with_no_language_asked_for_is_named_as_it_names_itself():
 
 
 def test_the_gaps_are_the_recorded_ones():
-    """671 of the 4,761 names of Postulo's own tags in one another are not in CLDR, all of
+    """719 of the 6,084 names of Postulo's own tags in one another are not in CLDR, all of
     them in 18 African display languages. A Babel that changes the number has changed the
     data beneath the fallback, and somebody has to look."""
     recorded = json.loads(GAPS.read_text(encoding="utf-8"))
@@ -83,7 +85,7 @@ def test_the_gaps_are_the_recorded_ones():
                 found.setdefault(shown, []).append(named)
 
     assert found == recorded["gaps"]
-    assert sum(len(names) for names in found.values()) == 671
+    assert sum(len(names) for names in found.values()) == 719
     assert len(found) == 18
 
 

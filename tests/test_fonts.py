@@ -36,9 +36,14 @@ COVERAGE: dict[str, tuple[str, ...]] = {
     "Ethi": ("fonts-noto-core",),
     "Hebr": ("fonts-noto-core",),
     "Deva": ("fonts-noto-core",),
+    "Beng": ("fonts-noto-core",),
     "Thai": ("fonts-noto-core",),
-    # CJK is its own package and its own size; #71 decides when it arrives.
+    # CJK is its own package and its own size. It arrived with the two Chinese catalogues
+    # (#728), which state their script (`zh-Hans`, `zh-Hant`) rather than leave it to the
+    # language, so what is offered is `Hans` and `Hant`, not `Hani`.
     "Hani": ("fonts-noto-cjk",),
+    "Hans": ("fonts-noto-cjk",),
+    "Hant": ("fonts-noto-cjk",),
     "Hira": ("fonts-noto-cjk",),
     "Hang": ("fonts-noto-cjk",),
 }
@@ -90,23 +95,31 @@ def test_every_non_latin_language_declares_its_script():
 def test_the_scripts_offered_are_the_ones_the_languages_need():
     offered = languages.scripts_offered()
     assert {"Arab", "Ethi", "Grek", "Cyrl"} <= offered
-    # Nothing from a later phase has crept in without its fonts being decided.
-    assert "Hani" not in offered and "Deva" not in offered
+    # The scripts #728 brought in with its languages: Hindi, Bengali and the two Chinese.
+    assert {"Deva", "Beng", "Hans", "Hant"} <= offered
+    # Nothing else from a later phase has crept in without its fonts being decided.
+    assert "Hani" not in offered and "Thai" not in offered
 
 
 def test_the_dockerfile_reader_ignores_comments():
     """The comment above the install names packages; a comment does not install one."""
     text = DOCKERFILE.read_text(encoding="utf-8")
     assert "# tests/test_fonts.py holds this list" in text, "the comment moved; check this still"
-    assert "fonts-noto-cjk" not in installed_font_packages()
+    # The Dockerfile's comment about the door for extra packages names this one; it is a
+    # comment, so it is not an install.
+    assert "fonts-noto-extra" in text
+    assert "fonts-noto-extra" not in installed_font_packages()
 
 
-# --------------------------------------- the decision #74 made and the door it left
+# ------------------------------------- the decision #74 made, and what #728 changed in it
 
 
-def test_cjk_is_not_the_default_image():
-    """Doubling the image for a language almost none of the installations will use (#74)."""
-    assert "fonts-noto-cjk" not in installed_font_packages()
+def test_cjk_is_in_the_default_image_since_chinese_is_offered():
+    """#74 left CJK out of the image, for a language almost none of the installations would
+    use, and left a door (POSTULO_EXTRA_APT_PACKAGES). #728 offers Chinese in 0.5.0, and a
+    language that is offered without a font that draws it is a CV of empty boxes, so the
+    package is in the image and the test above holds the two together."""
+    assert "fonts-noto-cjk" in installed_font_packages()
 
 
 def test_the_image_has_a_door_for_the_fonts_it_does_not_carry():

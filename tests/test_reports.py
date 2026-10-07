@@ -776,12 +776,12 @@ def test_a_period_at_the_edge_of_the_calendar_falls_back_to_today(client, user, 
 FIRST_DAY_OF_WEEK = {
     **dict.fromkeys(
         "en-GB ca cs cy da de es eu fi fr-FR gl hr hu ig it ka lt lv mk nb nl pl ro sk sr-Cyrl "
-        "sv tr uk bg bs el et ga hy is lb sl sq".split(),
+        "sv tr uk bg bs el et ga hy is lb sl sq zh-Hans".split(),
         1,
     ),
     **dict.fromkeys(
         "af ak am ar bm ee ff ha kab ln mg mt nr ny om pt-PT pt-BR rw sn so ss st sw ti tn ts "
-        "ve wo xh yo zu".split(),
+        "ve wo xh yo zu bn en-CA es-MX fr-CA hi id ur zh-Hant".split(),
         0,
     ),
 }

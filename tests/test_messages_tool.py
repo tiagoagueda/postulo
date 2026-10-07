@@ -297,7 +297,7 @@ def test_a_plugin_gets_every_slot_postulo_has_and_the_same_four_commands(tool, p
 
     assert tool.cmd_extract(check=False) == 0
     catalogues = sorted(locale.glob("*/LC_MESSAGES/django.po"))
-    assert len(catalogues) == len(tool.translated_languages()) == 68
+    assert len(catalogues) == len(tool.translated_languages()) == 77
     french = tool.parse(
         (locale / "fr_FR" / "LC_MESSAGES" / "django.po").read_text(encoding="utf-8")
     )
@@ -309,9 +309,9 @@ def test_a_plugin_gets_every_slot_postulo_has_and_the_same_four_commands(tool, p
     assert tool.cmd_extract(check=True) == 0, "current the moment it is written"
     assert tool.cmd_check() == 0
     assert tool.cmd_compile() == 0
-    assert len(list(locale.glob("*/LC_MESSAGES/django.mo"))) == 68
+    assert len(list(locale.glob("*/LC_MESSAGES/django.mo"))) == 77
     out = capsys.readouterr().out
-    assert "68 catalogues compiled" in out
+    assert "77 catalogues compiled" in out
 
 
 def test_the_tool_refuses_a_directory_that_is_not_a_project(tool, tmp_path):

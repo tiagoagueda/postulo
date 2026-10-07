@@ -184,4 +184,15 @@ def test_the_scripts_offered_are_what_the_tags_and_the_table_say():
     assert languages.script_of("sr-Cyrl") == "Cyrl", "stated"
     assert languages.script_of("bg") == "Cyrl", "usual"
     assert languages.script_of("pt-BR") == "Latn"
-    assert languages.scripts_offered() == {"Arab", "Armn", "Cyrl", "Ethi", "Geor", "Grek"}
+    assert languages.scripts_offered() == {
+        "Arab",
+        "Armn",
+        "Beng",
+        "Cyrl",
+        "Deva",
+        "Ethi",
+        "Geor",
+        "Grek",
+        "Hans",
+        "Hant",
+    }

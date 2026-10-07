@@ -49,6 +49,8 @@ PROBES: dict[str, tuple[str, str]] = {
     "Guru": ("pan", "\u0a05"),
     "Hang": ("kor", "\ud55c"),
     "Hani": ("zho", "\u4e2d"),
+    "Hans": ("zh-cn", "\u7b80"),
+    "Hant": ("zh-tw", "\u7e41"),
     "Hebr": ("heb", "\u05d1"),
     "Hira": ("jpn", "\u3042"),
     "Kana": ("jpn", "\u30ab"),

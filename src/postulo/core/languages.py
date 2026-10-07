@@ -71,6 +71,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "am": "ET",
     "bg": "BG",
     "bm": "ML",
+    "bn": "BD",
     "bs": "BA",
     "ca": "ES-CT",
     "cs": "CZ",
@@ -78,16 +79,21 @@ FLAG_COUNTRIES: dict[str, str] = {
     "da": "DK",
     "de": "DE",
     "el": "GR",
+    "en-CA": "CA",
     "es": "ES",
+    "es-MX": "MX",
     "et": "EE",
     "eu": "ES-PV",
     "fi": "FI",
     "fr-FR": "FR",
+    "fr-CA": "CA",
     "ga": "IE",
     "gl": "ES-GA",
+    "hi": "IN",
     "hr": "HR",
     "hu": "HU",
     "hy": "AM",
+    "id": "ID",
     "is": "IS",
     "it": "IT",
     "ka": "GE",
@@ -117,9 +123,12 @@ FLAG_COUNTRIES: dict[str, str] = {
     "tr": "TR",
     "ts": "ZA",
     "uk": "UA",
+    "ur": "PK",
     "ve": "ZA",
     "wo": "SN",
     "xh": "ZA",
+    "zh-Hans": "CN",
+    "zh-Hant": "TW",
     "zu": "ZA",
 }
 
@@ -144,6 +153,7 @@ NATIVE_NAMES: dict[str, str] = {
     "ar": "العربية",
     "bg": "български",
     "bm": "Bamanankan",
+    "bn": "বাংলা",
     "bs": "bosanski",
     "ca": "català",
     "cs": "čeština",
@@ -152,18 +162,23 @@ NATIVE_NAMES: dict[str, str] = {
     "de": "Deutsch",
     "ee": "Eʋegbe",
     "el": "Ελληνικά",
+    "en-CA": "English (Canada)",
     "es": "español",
+    "es-MX": "español (México)",
     "et": "eesti",
     "eu": "euskara",
     "ff": "Pulaar",
     "fi": "suomi",
     "fr-FR": "français (France)",
+    "fr-CA": "français (Canada)",
     "ga": "Gaeilge",
     "gl": "galego",
     "ha": "Hausa",
+    "hi": "हिन्दी",
     "hr": "hrvatski",
     "hu": "magyar",
     "hy": "հայերեն",
+    "id": "Bahasa Indonesia",
     "ig": "Igbo",
     "is": "íslenska",
     "it": "italiano",
@@ -204,10 +219,13 @@ NATIVE_NAMES: dict[str, str] = {
     "tr": "Türkçe",
     "ts": "Xitsonga",
     "uk": "українська",
+    "ur": "اردو",
     "ve": "Tshivenḓa",
     "wo": "Wolof",
     "xh": "isiXhosa",
     "yo": "Yorùbá",
+    "zh-Hans": "简体中文",
+    "zh-Hant": "繁體中文",
     "zu": "isiZulu",
 }
 
@@ -495,6 +513,7 @@ PLURAL_FORMS: dict[str, str] = {
     #: The same three-form rule as Croatian and Serbian, written out rather than
     #: shared: these are separate languages, and a shared constant would invite the
     #: next one to inherit a rule nobody checked.
+    "bn": "nplurals=2; plural=(n > 1);",
     "bs": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
@@ -509,15 +528,19 @@ PLURAL_FORMS: dict[str, str] = {
     "de": _TWO,
     "ee": _TWO,
     "el": _TWO,
+    "en-CA": _TWO,
     "es": _TWO,
+    "es-MX": _TWO,
     "et": _TWO,
     "eu": _TWO,
     "ff": _TWO,
     "fi": _TWO,
     "fr-FR": "nplurals=2; plural=(n > 1);",
+    "fr-CA": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),
     "gl": _TWO,
     "ha": _TWO,
+    "hi": "nplurals=2; plural=(n > 1);",
     "hr": (
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
         "(n%100<10 || n%100>=20) ? 1 : 2);"
@@ -527,6 +550,7 @@ PLURAL_FORMS: dict[str, str] = {
     #: French does — so the rule is `n > 1`. The noun after a numeral does not
     #: inflect either way, which is exactly what makes the wrong rule easy to miss.
     "hy": "nplurals=2; plural=(n > 1);",
+    "id": "nplurals=1; plural=0;",
     "ig": "nplurals=1; plural=0;",
     #: Not `_TWO`: two forms, but the last digit decides rather than the value. 21 and
     #: 31 take the singular like 1 — *tuttugu og ein umsókn* — while 11 takes the plural
@@ -592,10 +616,13 @@ PLURAL_FORMS: dict[str, str] = {
         "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : "
         "n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);"
     ),
+    "ur": _TWO,
     "ve": _TWO,
     "wo": "nplurals=1; plural=0;",
     "xh": _TWO,
     "yo": "nplurals=2; plural=(n > 1);",
+    "zh-Hans": "nplurals=1; plural=0;",
+    "zh-Hant": "nplurals=1; plural=0;",
     "zu": "nplurals=2; plural=(n > 1);",
 }
 
@@ -896,12 +923,15 @@ SCRIPTS: dict[str, str] = {
     "am": "Ethi",
     "ar": "Arab",
     "bg": "Cyrl",
+    "bn": "Beng",
     "el": "Grek",
+    "hi": "Deva",
     "hy": "Armn",
     "ka": "Geor",
     "mk": "Cyrl",
     "ti": "Ethi",
     "uk": "Cyrl",
+    "ur": "Arab",
 }
 
 #: A script's code → what it is called, for the two places that say it to a person: the
@@ -919,6 +949,8 @@ SCRIPT_NAMES: dict[str, str] = {
     "Guru": "Gurmukhi",
     "Hang": "Hangul",
     "Hani": "Han",
+    "Hans": "Han (Simplified)",
+    "Hant": "Han (Traditional)",
     "Hebr": "Hebrew",
     "Hira": "Hiragana",
     "Kana": "Katakana",
