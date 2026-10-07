@@ -45,11 +45,14 @@ def admin(db):
 # ------------------------------------------------------------- what ships
 
 
-def test_an_instance_starts_with_an_official_row_that_points_nowhere():
-    """Postulo publishes no catalogue, and a heading with nothing under it says less than
-    a row that says so."""
+def test_an_instance_starts_with_an_official_row_that_is_switched_off():
+    """It knows where Postulo's catalogue is (#official), and asks for nothing until an
+    administrator switches it on."""
+    from postulo.plugins import provenance
+
     official = PluginRepository.objects.get(tier=PluginRepository.Tier.OFFICIAL)
-    assert official.url == "" and official.public_key == ""
+    assert official.url == provenance.OFFICIAL_URL
+    assert official.public_key == provenance.OFFICIAL_KEY
     assert not official.enabled
     assert not official.usable
 

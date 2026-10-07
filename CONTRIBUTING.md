@@ -623,6 +623,30 @@ catalogue, so nothing enforces it there. `postulo-templates` is not a package an
 no version at all, deliberately: a template pack is copied, not installed.
 
 
+### Publishing an official plugin
+
+The official catalogue is `catalogue/official/index.json` and its detached signature
+`index.json.sig`, served from the raw URL of `main` (`provenance.OFFICIAL_URL`) to any
+instance whose administrator switched the *official* repository on. Nothing edits the index
+by hand: `plugins.toml` says what is listed, and `scripts/official_catalogue.py` does the rest.
+
+1. Tag the plugin's release and attach its wheel (`uv build --wheel`) to the Forgejo release.
+   The wheel is what is signed, so attach the file you built, not a rebuild of it.
+2. Add the release to `catalogue/official/plugins.toml`: the address of that asset, and
+   `requires_postulo` (`>=0.3,<1.0`, as above).
+3. `python scripts/official_catalogue.py build --wheels <dir with the wheels>` writes the index
+   with each checksum computed from its file.
+4. `POSTULO_CATALOGUE_KEY=<key> python scripts/official_catalogue.py sign` writes the signature.
+   The key is the Ed25519 private key in the project's password manager (*Postulo official
+   catalogue signing key*), and `sign` refuses any key but the one `provenance.OFFICIAL_KEY` names.
+5. `python scripts/official_catalogue.py verify --wheels <dir>` is what an instance runs;
+   `tests/test_official_catalogue.py` runs it too. Commit `plugins.toml`, the index and the
+   signature together.
+
+A leaked key means a new key: add it to `provenance.OFFICIAL_KEYS`, write a migration that gives
+the official row the new one, and sign again. An instance that has not upgraded keeps trusting what
+the old key signed, and no more.
+
 Every push to `main` that CI passes builds an image and publishes it as **`:dev`**,
 alongside a pinnable `:<version>-dev.<short sha>` — `dev-image.yml`. The job starts with the
 push and waits for the commit's CI (`scripts/release_tools.py wait-ci`), so a commit the

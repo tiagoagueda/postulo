@@ -1,0 +1,19 @@
+# The plugins the official catalogue lists. `scripts/official_catalogue.py build` turns this
+# and the wheels named below into `index.json`, and `sign` signs it; nothing else edits the
+# index. Newest release first, per plugin.
+#
+# A wheel is named by its address and nothing else: the checksum is computed from the file,
+# so what the index promises is what was built, not what somebody typed.
+
+[[plugin]]
+name = "postulo-helloworld"
+summary = "The smallest Postulo plugin there is: a capture source and a notifier, translated and tested. Copy it."
+maintainer = "Tiago Agueda"
+licence = "MIT"
+repository = "https://source.tiagoagueda.com/postulo/postulo-helloworld"
+
+[[plugin.release]]
+version = "0.3.0"
+url = "https://source.tiagoagueda.com/postulo/postulo-helloworld/releases/download/v0.3.0/postulo_helloworld-0.3.0-py3-none-any.whl"
+requires_postulo = ">=0.3,<1.0"
+provides = ["postulo.sources:helloworld", "postulo.notifiers:helloworld"]

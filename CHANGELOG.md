@@ -52,6 +52,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The official plugin catalogue is published, signed, with postulo-helloworld in it: *Server settings → Plugins → Where plugins may come from* has an *official* row that is off until an administrator switches it on, and a plugin whose file it signed is labelled Official. (#729)
 - Nine languages are scaffolded with empty catalogues for 0.5.0: Chinese (simplified and traditional), Hindi, Urdu, Bengali, Indonesian, Canadian English, Canadian French and Mexican Spanish; none is offered until a string is translated, and the image now carries a CJK font (#728)
 - Diploma and Diploma supplement are kinds of file, and a certificate, diploma or supplement can say which education or certification entry it proves; the Files list, the career page, the API and the archive carry the link (#669)
 - Uploads are now checked for what they are, kept with a size and checksum the archive carries (format 54), scrubbed on a schedule without ever deleting a damaged file, and orphans are swept after a grace period (#663)

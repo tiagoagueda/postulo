@@ -15,10 +15,9 @@ arrived by upload and a wheel that arrived by download are the same wheel or the
 
 **Which repository is official is decided by a key, never by a name.** Anybody can call
 their repository ``postulo``; nobody else can sign with Postulo's key. :data:`OFFICIAL_KEYS`
-is what this instance was built believing, and it is empty — Postulo publishes no catalogue
-yet, so *nothing is official today* and everything installed is custom or uploaded. That is
-the truthful answer rather than a placeholder, and the day there is a catalogue the answer
-changes by adding a key rather than by writing this again.
+is what this instance was built believing: the key of the catalogue the project publishes
+(:data:`OFFICIAL_URL`), which an administrator switches on in *Server settings → Plugins*.
+It is off until then, so nothing is official until somebody has asked for it.
 
 **What a label here does not mean.** Not safe: installing a plugin runs somebody else's code
 inside Postulo, and that is true of an official one. Not "its dependencies were checked": the
@@ -46,14 +45,23 @@ CUSTOM = "custom"
 #: judgement about the file: it is the whole truth about where it came from.
 UPLOADED = "uploaded"
 
-#: The public keys Postulo itself vouches for, base64 as a catalogue row carries them.
+#: Where the official catalogue is published: the signed index, and beside it ``.sig``.
+#: Built by ``scripts/official_catalogue.py`` from ``catalogue/official/``.
+OFFICIAL_URL = (
+    "https://source.tiagoagueda.com/postulo/postulo/raw/branch/main/catalogue/official/index.json"
+)
+
+#: The key that signs it, base64 as a catalogue row carries it. The private half is in the
+#: project's password manager and never in a repository.
+OFFICIAL_KEY = "p3GI+PsmgC3a4pcxgZUCUr79thUMtP8CaX5nhVtmeZ4="
+
+#: The public keys Postulo itself vouches for.
 #:
-#: Empty, and that is the current fact rather than an unfinished edge: Postulo publishes no
-#: catalogue. Every plugin an instance has today is therefore custom or uploaded, which is
-#: exactly what a page should say. A name would have been the easy thing to key on and the
-#: wrong one -- anybody can call their repository ``postulo`` -- so this is a key, because
-#: the point of the label is that it describes evidence.
-OFFICIAL_KEYS: tuple[str, ...] = ()
+#: A key and not a name, because the point of the label is that it describes evidence:
+#: anybody can call their repository ``postulo``. To rotate, add the new key beside the old
+#: one and write a migration that gives the official row the new one; an instance that has
+#: not upgraded yet still trusts what the old key signed.
+OFFICIAL_KEYS: tuple[str, ...] = (OFFICIAL_KEY,)
 
 LABELS = {
     INTERNAL: _("Internal"),

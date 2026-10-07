@@ -82,14 +82,10 @@ def a_signed_index(monkeypatch):
 # ------------------------------------------------------------- the three kinds
 
 
-def test_nothing_is_official_until_postulo_publishes_a_catalogue():
-    """The shipped answer, and it is a fact rather than an unfinished edge.
-
-    `OFFICIAL_KEYS` is empty because there is no official repository yet, so every plugin an
-    instance has today is custom or uploaded — which is what the page should say.
-    """
-    assert provenance.OFFICIAL_KEYS == ()
-    assert provenance.official_repositories() == set()
+def test_the_official_key_is_the_one_postulo_publishes_with():
+    """What this build believes. Nothing is *official* until the official repository is
+    switched on and has been checked, which is a decision an administrator makes."""
+    assert provenance.OFFICIAL_KEYS == (provenance.OFFICIAL_KEY,)
 
 
 def test_a_built_in_is_internal_and_cannot_be_removed():

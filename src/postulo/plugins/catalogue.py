@@ -115,9 +115,9 @@ def configured() -> dict[str, dict[str, str]]:
     both an address and a key appear: a catalogue without a key is not a catalogue Postulo
     will offer, and a half-filled row is a draft rather than a source of code.
 
-    Empty by default in every direction. Postulo publishes no catalogue yet, and pointing
-    at one stays a decision an operator makes rather than something an upgrade does for
-    them.
+    Empty by default in every direction. Postulo publishes one (``catalogue/official/``) and
+    the official row knows its address, but the row is switched off, and switching it on
+    stays a decision an operator makes rather than something an upgrade does for them.
 
     **A disabled repository disappears from here and nowhere else.** Plugins already
     installed from it go on working — their code is on the volume and the registry never
