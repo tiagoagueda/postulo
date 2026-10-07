@@ -152,10 +152,10 @@ OVERVIEW_ORDER = (
     "skill-group",
     "certification",
     "driving-licence",
-    "participation",
     "honour",
     "membership",
     "language",
     "course",
+    "participation",
     "reference",
 )
