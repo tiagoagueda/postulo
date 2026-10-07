@@ -94,6 +94,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.documents.filestore",
             "postulo.documents.integrity",
             "postulo.documents.outline",
+            # Which entry of the career a file proves (#669): looks the models up by name
+            # and imports nothing of Postulo's, read by the upload that holds the link.
+            "postulo.documents.proofs",
             "postulo.documents.themes",
             "postulo.jobs.esco",
             "postulo.jobs.industries",

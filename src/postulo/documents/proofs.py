@@ -83,7 +83,7 @@ def set_proof(upload, entry) -> None:
 
 def counts_for(entries) -> dict:
     """How many files prove each of these entries, keyed by the entry, in one query per model."""
-    from .models import UploadedDocument
+    uploads = apps.get_model("documents", "UploadedDocument")
 
     entries = list(entries)
     found: dict = {}
@@ -91,7 +91,7 @@ def counts_for(entries) -> dict:
         if model._meta.label not in PROVABLE.values():
             continue
         rows = (
-            UploadedDocument.objects.filter(
+            uploads.objects.filter(
                 proves_type=ContentType.objects.get_for_model(model),
                 proves_id__in=[e.pk for e in entries if type(e) is model],
             )
