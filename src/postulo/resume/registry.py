@@ -59,7 +59,10 @@ SECTIONS: dict[str, SectionSpec] = {
         resume_forms.SkillGroupForm,
         _("Skill group"),
         _("Skills"),
-        _("Group related skills under a heading, such as “Languages” or “Infrastructure”."),
+        _(
+            "Group related skills under a heading, such as “Programming languages” or "
+            "“Infrastructure”."
+        ),
     ),
     "skill": SectionSpec(
         "skill", resume_models.Skill, resume_forms.SkillForm, _("Skill"), _("Skills")

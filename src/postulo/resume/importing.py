@@ -436,9 +436,9 @@ def apply(owner, record: Record) -> Report:
     skills = []
     for group in record.skill_groups:
         group_name = group["name"][:100]
-        # A heading somebody already has is reused. Two "Languages" headings on one CV is
-        # a mess they then have to tidy, and adding the skills under the existing one is
-        # still only ever adding.
+        # A heading somebody already has is reused. Two "Programming languages" headings on
+        # one CV is a mess they then have to tidy, and adding the skills under the existing
+        # one is still only ever adding.
         made = SkillGroup.objects.filter(owner=owner, name=group_name).first()
         if made is None:
             made = SkillGroup(owner=owner, name=group_name)

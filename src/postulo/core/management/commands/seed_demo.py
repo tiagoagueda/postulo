@@ -484,7 +484,7 @@ class Command(BaseCommand):
         groups = {}
         for order, (name, skills) in enumerate(
             [
-                ("Languages", ["Python", "Go", "SQL", "TypeScript"]),
+                ("Programming languages", ["Python", "Go", "SQL", "TypeScript"]),
                 ("Infrastructure", ["Kubernetes", "PostgreSQL", "Redis", "Terraform", "AWS"]),
                 ("Practices", ["Observability", "Incident response", "Contract testing"]),
             ]
@@ -891,7 +891,7 @@ class Command(BaseCommand):
                 [
                     *experiences,
                     *languages,
-                    groups["Languages"],
+                    groups["Programming languages"],
                     groups["Infrastructure"],
                     *projects,
                     *publications,

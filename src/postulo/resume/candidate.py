@@ -303,7 +303,7 @@ KINDS: tuple[Kind, ...] = (
         title=gettext_lazy("Skills"),
         fields=("name",),
         # And the group it sits under, which `_Planner._entry` adds: *Python* under
-        # *Languages* and *Python* under *Tools* are two skills.
+        # *Programming languages* and *Python* under *Tools* are two skills.
         names=("name",),
     ),
     Kind(

@@ -8,7 +8,7 @@ from postulo.applications import analytics
 from postulo.applications.models import Application, Status
 from postulo.documents.models import CV, CoverLetter, UploadedDocument
 from postulo.jobs.models import Capture, Company, CompanyIdentifier, Contact
-from postulo.resume.models import Experience, Link
+from postulo.resume.models import Experience, LanguageSkill, Link, SkillGroup
 
 
 @pytest.fixture
@@ -29,6 +29,15 @@ def test_it_fills_every_part_of_the_application(seeded):
     assert {link.kind for link in links} == {"portfolio", "code", "video"}
     assert UploadedDocument.objects.for_user(seeded).count() == 1
     assert Capture.objects.for_user(seeded).count() == 2
+
+
+def test_the_demo_keeps_spoken_and_programming_languages_apart(seeded):
+    """A demo CV reads *Languages* for the spoken ones and *Programming languages* for the
+    code, never the same word twice for two things (#690)."""
+    assert LanguageSkill.objects.for_user(seeded).exists()
+    groups = set(SkillGroup.objects.for_user(seeded).values_list("name", flat=True))
+    assert "Programming languages" in groups
+    assert "Languages" not in groups
 
 
 def test_the_search_has_a_shape_insights_can_read(seeded):

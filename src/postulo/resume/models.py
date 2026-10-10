@@ -177,7 +177,7 @@ class Education(ResumeItem):
 
 
 class SkillGroup(ResumeItem):
-    """A heading a set of skills sits under, such as “Languages” or “Infrastructure”."""
+    """A heading a set of skills sits under, such as “Programming languages” or “Infrastructure”."""
 
     name = models.CharField(_("name"), max_length=100)
 

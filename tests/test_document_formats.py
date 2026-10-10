@@ -119,7 +119,7 @@ def cv(person):
         ),
         2,
     )
-    group = SkillGroup.objects.create(owner=person, name="Languages")
+    group = SkillGroup.objects.create(owner=person, name="Programming languages")
     group.skills.create(owner=person, name="Python")
     group.skills.create(owner=person, name="Go")
     put_on(variant, group, 3)
@@ -192,7 +192,7 @@ def test_the_text_says_what_the_page_says(cv):
         "September 2010 – July 2013",
         "Turret firmware",
         "Maintainer",
-        "- Languages: Python, Go",
+        "- Programming languages: Python, Go",
         "- French — C1 — advanced",
         "- Certified Kubernetes Administrator, CNCF · 2022",
         "- Portfolio — What I have built · https://alex.example.org",
