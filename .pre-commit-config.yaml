@@ -30,3 +30,15 @@ repos:
     rev: 0.12.17
     hooks:
       - id: uv-lock
+
+  # Translations are made in Weblate and come back as its pull request (#706): a commit
+  # made here may add an empty slot and change the English, and nothing else about a
+  # translation. CI reads every commit with the same check; this says so before it is made.
+  - repo: local
+    hooks:
+      - id: translations-come-from-weblate
+        name: translations come from Weblate
+        entry: uv run python scripts/messages.py guard --staged
+        language: system
+        files: \.po$
+        pass_filenames: false

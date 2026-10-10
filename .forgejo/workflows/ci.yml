@@ -280,6 +280,9 @@ jobs:
           # The token is not needed after the checkout; leaving it in .git/config
           # would hand it to every later step and any artifact that packs the tree.
           persist-credentials: false
+          # The whole history: the translation guard reads every commit of the push or the
+          # pull request, and needs `origin/main` to find where a new branch began.
+          fetch-depth: 0
 
       - name: Install uv
         run: |
@@ -315,6 +318,25 @@ jobs:
         run: |
           uv run python scripts/messages.py extract --check
           uv run python scripts/messages.py check
+
+      - name: Refuse translations written outside Weblate
+        # Every translation, correction and review is made at translate.tiagoagueda.com and
+        # comes back as Weblate's pull request (#706). Each commit of the push or the pull
+        # request is read, and one that writes, changes or reviews a translation is refused
+        # unless Weblate made it. The container runs as another user than the one that owns
+        # the checkout, which git refuses to read without being told it is safe.
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          uv run python scripts/messages.py guard --base "$BASE"
+
+      - name: Weblate's pull request leaves French and Portuguese complete
+        # The development gate of #347, where it can hold: a commit adds a string with an
+        # empty slot, Weblate drafts it by machine, and its pull request brings the drafts
+        # in. A draft counts.
+        if: github.head_ref == 'weblate'
+        run: uv run python scripts/messages.py gate fr-FR pt-PT
 
       - name: Production settings deployment check
         # check --deploy, and collectstatic with the manifest storage the image uses,

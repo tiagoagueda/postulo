@@ -1045,6 +1045,191 @@ def cmd_stats() -> int:
     return 0
 
 
+# ------------------------------------------------------------------- the guard
+
+#: The committer Weblate writes as: the identity its environment gives it
+#: (``WEBLATE_DEFAULT_COMMITER_EMAIL``), and its own default before that was set.
+WEBLATE_COMMITTERS = frozenset({"weblate@tiagoagueda.com", "noreply@weblate.org"})
+
+#: The trailer Weblate puts on every commit it makes, which survives a squash or a rebase
+#: merge that rewrites the committer.
+WEBLATE_TRAILER = re.compile(r"^Translate-URL: https://translate\.tiagoagueda\.com/", re.MULTILINE)
+
+#: A commit carrying this may move a translation to a renamed string without marking it a
+#: draft: an English edit that changes nothing a speaker would translate differently.
+CARRY_TRAILER = re.compile(r"^L10n-Carry: keep-review\s*$", re.MULTILINE)
+
+
+def _git(*args: str) -> str:
+    import subprocess
+
+    return subprocess.run(  # noqa: S603 - git, with arguments this module writes
+        ["git", *args],  # noqa: S607 - whichever git the shell finds, as every hook does
+        cwd=project().root,
+        capture_output=True,
+        check=True,
+    ).stdout.decode("utf-8")
+
+
+def _git_file(revision: str, path: str) -> str | None:
+    import subprocess
+
+    done = subprocess.run(  # noqa: S603 - git, with arguments this module writes
+        ["git", "show", f"{revision}:{path}"],  # noqa: S607 - as above
+        cwd=project().root,
+        capture_output=True,
+    )
+    return done.stdout.decode("utf-8") if done.returncode == 0 else None
+
+
+def from_weblate(committer: str, message: str, paths: list[str]) -> bool:
+    """Whether a commit is one of Weblate's: by its committer, or by its trailer.
+
+    The trailer alone counts only for a commit that touches nothing but catalogues: a
+    squash or rebase merge of Weblate's pull request makes the maintainer its committer,
+    and the trailer is what is left of where it came from. This catches a mistake, not an
+    attacker -- whoever can push here can write any committer they like.
+    """
+    if committer.lower() in WEBLATE_COMMITTERS:
+        return True
+    return bool(WEBLATE_TRAILER.search(message)) and all(p.endswith(".po") for p in paths)
+
+
+def translation_changes(before: str | None, after: str, *, carry_reviewed: bool) -> list[str]:
+    """What a change to one catalogue does to its translations that only Weblate may do.
+
+    Allowed: anything about the English, the references, the comments and the header; a
+    new string with an empty slot; a string the source lost. Not allowed: writing a
+    translation, changing or emptying one, and marking one a draft or a reviewed string.
+
+    One exception, because a script that renames a string should not lose what speakers
+    wrote for it: a new string may arrive with the exact translation of a string the same
+    change removed. It arrives as a draft -- the English changed, so a speaker should read
+    it again -- unless the commit says ``L10n-Carry: keep-review``.
+    """
+    new = parse(after)
+    if before is None:
+        return [
+            f"{m.msgid!r}: a new catalogue arrives with a translation in it"
+            for m in new.messages.values()
+            if any(m.msgstr)
+        ]
+    old = parse(before)
+    removed = {tuple(m.msgstr): m for key, m in old.messages.items() if key not in new.messages}
+    found: list[str] = []
+    for key, message in new.messages.items():
+        previous = old.messages.get(key)
+        if previous is not None:
+            if previous.msgstr != message.msgstr:
+                found.append(f"{message.msgid!r}: its translation was changed here")
+            elif previous.draft != message.draft and any(message.msgstr):
+                found.append(
+                    f"{message.msgid!r}: marked {'a draft' if message.draft else 'reviewed'}"
+                )
+            continue
+        if not any(message.msgstr):
+            continue
+        source = removed.get(tuple(message.msgstr))
+        if source is None or not source.translated:
+            found.append(f"{message.msgid!r}: a new string arrives with a translation")
+        elif not message.draft and not carry_reviewed:
+            found.append(
+                f"{message.msgid!r}: carried from {source.msgid!r} without being marked a "
+                "draft (or `L10n-Carry: keep-review`)"
+            )
+    return found
+
+
+def _commits(base: str, head: str) -> list[str]:
+    return _git("rev-list", "--reverse", "--no-merges", f"{base}..{head}").split()
+
+
+def guard_commit(commit: str) -> list[str]:
+    committer, _, message = _git("show", "-s", "--format=%ce%n%B", commit).partition("\n")
+    paths = _git("diff-tree", "--no-commit-id", "--name-only", "-r", "--root", commit).split()
+    if from_weblate(committer.strip(), message, paths):
+        return []
+    parent = f"{commit}^" if _git("rev-list", "--parents", "-n", "1", commit).split()[1:] else None
+    carry = bool(CARRY_TRAILER.search(message))
+    found = []
+    for path in paths:
+        if not path.endswith(".po"):
+            continue
+        after = _git_file(commit, path)
+        if after is None:
+            continue  # deleted
+        before = _git_file(parent, path) if parent else None
+        for problem in translation_changes(before, after, carry_reviewed=carry):
+            found.append(f"{commit[:9]} {path}: {problem}")
+    return found
+
+
+def guard_staged() -> list[str]:
+    paths = _git("diff", "--cached", "--name-only", "--diff-filter=AM").split()
+    found = []
+    for path in paths:
+        if not path.endswith(".po"):
+            continue
+        after = _git_file("", path)  # ":path" is the index
+        before = _git_file("HEAD", path)
+        for problem in translation_changes(before, after or "", carry_reviewed=False):
+            found.append(f"staged {path}: {problem}")
+    return found
+
+
+def cmd_guard(base: str | None, head: str, staged: bool) -> int:
+    """Refuse translations that did not come from Weblate (#706).
+
+    Every translation, correction and review is made in Weblate, which commits it back as
+    a pull request. This reads every commit in ``base..head`` -- or, with ``--staged``,
+    what is about to be committed -- and names each translation written anywhere else.
+    """
+    if staged:
+        problems = guard_staged()
+    else:
+        if not base or set(base) == {"0"}:
+            base = _git("merge-base", "origin/main", head).strip()
+        else:
+            base = _git("merge-base", base, head).strip()
+        problems = [p for commit in _commits(base, head) for p in guard_commit(commit)]
+    for problem in problems:
+        print(problem)
+    if problems:
+        print(
+            f"{len(problems)} translation(s) written outside Weblate. Translations are made "
+            "at https://translate.tiagoagueda.com and come back as its pull request; see "
+            "docs/TRANSLATING.md. Revert these and leave the slots empty."
+        )
+        return 1
+    print("no translation written outside Weblate")
+    return 0
+
+
+def cmd_gate(codes: list[str]) -> int:
+    """Every string, in every set, present in each of ``codes``: a draft counts (#347).
+
+    Run on Weblate's pull request, which is what brings the machine drafts of a new string
+    in, and before a release.
+    """
+    missing = 0
+    for subject in catalogue_sets():
+        for code in codes:
+            path = po_path(code, subject)
+            catalogue = parse(path.read_text(encoding="utf-8")) if path.exists() else None
+            untranslated = (
+                [m.msgid for m in catalogue.messages.values() if not m.translated]
+                if catalogue
+                else ["(no catalogue)"]
+            )
+            if untranslated:
+                missing += len(untranslated)
+                print(
+                    f"{subject.name} {code}: {len(untranslated)} missing, e.g. {untranslated[:3]}"
+                )
+    print("complete" if not missing else f"{missing} string(s) missing")
+    return 1 if missing else 0
+
+
 # ------------------------------------------------------------------------- main
 
 
@@ -1062,8 +1247,18 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("compile", help="write the .mo files, and locale/status.json")
     sub.add_parser("check", help="placeholders and plural forms agree")
     sub.add_parser("stats", help="how far along each language is")
+    guard = sub.add_parser("guard", help="refuse translations written outside Weblate")
+    guard.add_argument("--base", help="the commit before the range (default: origin/main)")
+    guard.add_argument("--head", default="HEAD", help="the last commit of the range")
+    guard.add_argument("--staged", action="store_true", help="check what is staged instead")
+    gate = sub.add_parser("gate", help="every string present in these languages")
+    gate.add_argument("codes", nargs="+", metavar="CODE")
     args = parser.parse_args(argv)
     project()
+    if args.command == "guard":
+        return cmd_guard(args.base, args.head, args.staged)
+    if args.command == "gate":
+        return cmd_gate(args.codes)
     if args.command == "extract":
         return cmd_extract(args.check)
     if args.command == "compile":
