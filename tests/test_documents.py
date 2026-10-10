@@ -1484,3 +1484,27 @@ def test_another_persons_entry_narrows_the_list_to_nothing(client, user, other_u
     ).content.decode()
 
     assert "Unrelated" not in html
+
+
+@pytest.mark.parametrize(
+    ("name", "heading"),
+    [
+        ("documents:cv_list", "CVs and portfolios"),
+        ("documents:letter_list", "Letters"),
+        ("documents:upload_list", "Files"),
+        ("documents:rendered_list", "Sent documents"),
+    ],
+)
+def test_every_documents_page_is_headed_documents_with_its_list_below(client, user, name, heading):
+    """One ``h1`` that says *Documents*, as Listings, Applications, Companies and the
+    Calendar have theirs, and the list's own name an ``h2`` under it (#846)."""
+    client.force_login(user)
+    html = client.get(reverse(name)).content.decode()
+
+    headings = [
+        (level, re.sub(r"\s+", " ", re.sub(r"<[^>]+>", "", text)).strip())
+        for level, text in re.findall(r"<h([12])\b[^>]*>(.*?)</h\1>", html, re.S)
+    ]
+    assert [text for level, text in headings if level == "1"] == ["Documents"]
+    assert ("2", heading) in headings, f"{heading} is a subheading, not the page's name"
+    assert headings.index(("1", "Documents")) < headings.index(("2", heading))
