@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import re
 
+from allauth.account.internal.userkit import filter_users_by_email
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -31,6 +32,7 @@ from django.http import HttpRequest
 from postulo.core import site
 
 from .adapter import pending_invite
+from .addresses import verified_holders
 from .models import unique_username
 from .validators import USERNAME_MAX_LENGTH, USERNAME_PATTERN, slug_from_email
 
@@ -76,6 +78,27 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
         if not sso.link_by_email():
             return False
         return super().can_authenticate_by_email(sociallogin, email)
+
+    def authenticate_by_email(self, sociallogin):
+        """The account that holds the provider's verified address **verified**, or nobody.
+
+        allauth finds the account with ``prefer_verified``, which prefers an account that
+        has verified the address but falls back to one that merely lists it. Any member can
+        list an address nobody holds, so the person it belongs to arriving through the
+        provider was signed in as the member who listed it; the password allauth wipes on
+        the way is one that member gets back by resetting it at their own verified address
+        (#730). Here the provider's word is matched against an address the account has
+        proved by a link, and an address only claimed matches nothing: the person is new,
+        and the sign-up rules apply as for any newcomer.
+        """
+        for address in (a.email for a in sociallogin.email_addresses if a.verified):
+            if not self.can_authenticate_by_email(sociallogin, address):
+                continue
+            users = filter_users_by_email(address, prefer_verified=True, for_login=True)
+            holders = verified_holders(users, address)
+            if holders:
+                return holders[0], address
+        return None
 
     def populate_user(self, request: HttpRequest, sociallogin, data):
         user = super().populate_user(request, sociallogin, data)

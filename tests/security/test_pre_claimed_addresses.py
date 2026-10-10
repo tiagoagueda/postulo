@@ -20,6 +20,7 @@ from django.core import mail
 from django.urls import reverse
 
 from postulo.core.models import SiteSettings
+from tests.test_sso import a_request, configured, social_login  # noqa: F401 - a fixture
 
 pytestmark = pytest.mark.django_db
 
@@ -131,3 +132,29 @@ def test_a_sign_in_code_still_reaches_a_verified_address(client, mallory, code_s
     client.post(reverse("account_request_login_code"), {"email": mallory.email})
 
     assert len(mailed_to(mallory.email)) == 1
+
+
+# ------------------------------------------------------------ single sign-on (#730)
+
+
+@pytest.mark.usefixtures("configured")
+def test_a_provider_asserting_a_claimed_address_does_not_sign_in_the_claimant(rf, mallory):
+    """The victim arrives through the identity provider with an address the provider verified.
+
+    Mallory had listed it on her own account, unverified. The provider's word used to be
+    matched to her account, its password wiped (which she undoes at her own address) and
+    the provider's identity connected to it, so the victim was signed in as mallory.
+    """
+    from allauth.core import context
+    from allauth.socialaccount.helpers import complete_social_login
+    from allauth.socialaccount.models import SocialAccount
+
+    EmailAddress.objects.create(user=mallory, email=VICTIM, verified=False, primary=False)
+    request = a_request(rf)
+
+    with context.request_context(request):
+        complete_social_login(request, social_login(VICTIM))
+
+    assert request.user != mallory, "signed in as the member who only claimed the address"
+    assert not SocialAccount.objects.filter(user=mallory).exists()
+    assert mallory.has_usable_password(), "and nothing was done to her account"

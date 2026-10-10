@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Single sign-on matches the provider's address only to an account that has verified it, so a member who listed somebody else's address can no longer have them signed in as that member. (#730)
 - A password reset key or a sign-in code is mailed only to an address its account has verified, so a member can no longer claim a stranger's unused address and receive its holder inside their own account. (#731)
 - The JSON log, the Logs page and the log collector no longer receive the query string of a request that ended in a 4xx, and the token in an invitation or recovery link is replaced by <token>; lines already written keep the old form until they rotate away. (#733)
 - A candidate file's review no longer says which telephone numbers other accounts hold once the number allowance is spent: every number is then refused in the same words, as the form does. (#735)
