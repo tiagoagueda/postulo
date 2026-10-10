@@ -27,6 +27,10 @@ on:
 
 env:
   UV_VERSION: "0.12.17"
+  # The sha256 of that version's install.sh, checked before it is run: the script is the
+  # trust root for the uv binary it then fetches, and `curl | sh` ran whatever the address
+  # answered (#790). Bump it with UV_VERSION, see CONTRIBUTING.md.
+  UV_INSTALLER_SHA256: "37b82230b28617c6c24fa52364fa28aa37f2aa40c114809a623f6b064a9730e5"
 
 jobs:
   upgrade:
@@ -50,7 +54,9 @@ jobs:
 
       - name: Install uv
         run: |
-          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" | sh
+          curl -LsSf "https://astral.sh/uv/${UV_VERSION}/install.sh" -o /tmp/uv-install.sh
+          echo "${UV_INSTALLER_SHA256}  /tmp/uv-install.sh" | sha256sum -c -
+          sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Upgrade the lock

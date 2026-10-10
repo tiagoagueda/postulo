@@ -540,7 +540,21 @@ the same by hand: `uv lock --upgrade`, run the suite, commit the lock file on it
 The tools CI runs are pinned as the lock is -- uv by version in every workflow, in
 `.pre-commit-config.yaml` and in `docker/Dockerfile`, and zizmor and pip-audit in `ci.yml`
 -- so that a push that changed nothing cannot fail on a tool that did. Bump them together,
-deliberately. `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
+deliberately.
+
+**Bumping uv takes four edits, and a test (`tests/test_supply_chain_pins.py`) refuses a half-done one (#790).**
+Each workflow checks the installer's sha256 before running it, and the Dockerfile copies uv from an
+image named by digest, so a new version is a new hash in both places:
+
+1. `UV_VERSION` in the five workflows, `rev:` in `.pre-commit-config.yaml` and the tag in
+   `docker/Dockerfile` (two lines).
+2. `UV_INSTALLER_SHA256` in the same workflows: `curl -sL https://astral.sh/uv/<version>/install.sh | sha256sum`.
+3. The image digest in `docker/Dockerfile` (both lines): the `Docker-Content-Digest` of
+   `ghcr.io/astral-sh/uv:<version>`, e.g. `docker buildx imagetools inspect ghcr.io/astral-sh/uv:<version>`.
+4. Push, and read the CI run: a wrong hash fails the install step before anything is built.
+
+The actions (`actions/checkout`, `upload-artifact`) stay pinned by tag: Forgejo resolves them against its own
+instance, and a hash from GitHub names a commit it may not have (`.forgejo/zizmor.yml`). `docs/THREAT-MODEL.md` says who the attackers are and which rules follow; a pull
 request that touches a boundary answers to it.
 
 ## Writing a changelog entry
