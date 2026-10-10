@@ -343,14 +343,14 @@ disabled by default and never required.
    structurally empty until it does.
 4. **Translation catalogues depend on contributors** — which turned out to be the wrong
    assumption, and the right one is subtler. Twenty-four languages shipped in 0.2.0
-   without waiting for anybody, machine-drafted and each entry flagged `draft` until a
+   without waiting for anybody, machine-drafted and each entry flagged as a draft until a
    speaker reads it, because a translation somebody can correct beats an English gap
    nobody notices. What still depends on contributors is **review**: every one of those
-   catalogues is complete and none has been read by a native speaker. Since 2026-09-16
-   that review has somewhere to happen -- Weblate at translate.tiagoagueda.com, one
-   component per catalogue set, pulling read-only from Forgejo -- with a consequence the
-   assumption did not foresee: translations now accumulate somewhere that is not the
-   repository, and bringing them back is a step somebody has to take. The twenty-nine
+   catalogues is complete and none has been read by a native speaker. That review happens
+   in Weblate at translate.tiagoagueda.com, one component per catalogue set, and since
+   #706 so does every translation: Weblate drafts new strings by machine, speakers correct
+   and approve them there, and Weblate sends them back as a pull request; a commit that
+   writes a translation anywhere else is refused (`scripts/messages.py guard`). The twenty-nine
    African catalogues exist and are empty, and a language is not offered until somebody
    has begun its catalogue — offering a language and handing back English is a promise
    with nothing behind it. Which language is begun next is decided by speakers, not by

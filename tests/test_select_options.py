@@ -373,11 +373,17 @@ def test_every_page_carries_what_the_control_is_built_from(client, user):
     assert 'data-required="Choose one of the options."' in attrs
     assert re.findall(r'data-icon="([a-z-]+)"', drawn) == ["chevron-down", "check"]
 
+    from django.utils import translation
+    from django.utils.html import escape
+
     user.profile.language = "pt-PT"
     user.profile.save(update_fields=["language"])
     html = client.get(reverse("core:home")).content.decode()
-    assert 'data-required="Escolha uma das opções."' in html
-    assert 'data-empty="Nada corresponde."' in html
+    with translation.override("pt-PT"):
+        required = translation.gettext("Choose one of the options.")
+        empty = translation.gettext("Nothing matches.")
+    assert f'data-required="{escape(required)}"' in html
+    assert f'data-empty="{escape(empty)}"' in html
 
 
 def sentences_in(code: str) -> list[str]:

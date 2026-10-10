@@ -392,7 +392,13 @@ def test_a_status_label_comes_out_in_the_readers_language_whatever_the_callers(
 
     notify(user, lambda: slow.BUILDERS["status_changed"](payload | {"application_id": 1}))
 
-    assert "En entretien" in mail.outbox[0].subject
+    with translation.override("fr-FR"):
+        french = str(Status.INTERVIEWING.label)
+    assert french in mail.outbox[0].subject
+    if french != "Interviewing":
+        assert "Interviewing" not in mail.outbox[0].subject, (
+            "the caller's language, not the reader's"
+        )
 
 
 def test_the_zone_is_the_profiles_then_the_instances_then_the_servers(user, settings):

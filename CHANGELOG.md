@@ -16,7 +16,8 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
-- The translation catalogues are written in Weblate's own layout, so what Weblate saves passes CI unchanged: a draft is flagged `fuzzy` (Weblate's *needs editing*) and still compiled, references name a file rather than a line, no header carries a date the tool sets, and `locale/status.json` is written by `compile` instead of being committed. (#349)
+- Translations are made in Weblate only: `docs/TRANSLATING.md`, the contributor guide and the assistant's instructions say how and what a commit may do with a string, and no test pins a translated word any more. (#706)
+- The catalogues are written in Weblate's layout, so what it saves passes CI unchanged: a draft is flagged `fuzzy` and still compiled, references name a file, the tool sets no header date, and `compile` writes `locale/status.json` instead of it being committed. (#349)
 - A test now fails, naming the section and the list, when a career section is missing from the archive, candidate file, CV headings, importer or translation lists, so a new section cannot be half added (#692)
 - CI no longer carries a `permissions:` block that Forgejo 16 ignores and warns about on every job; the workflow audit is told why for `ci.yml` alone, and the write grants of the release and image workflows are still to be given to the instance as Authorized Integrations (#727)
 - Deleting a listing now deletes the captures that became it, with their kept pages; a capture nobody saved can be deleted at once, and `manage.py prune_captures` finds saved captures already stranded without a listing (#664)

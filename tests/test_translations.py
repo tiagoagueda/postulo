@@ -615,12 +615,14 @@ def test_the_interface_says_type_and_never_kind_on_its_own():
         ids = {key[1] for key in catalogue.messages}
         assert not ids & {"Kind", "kind"}, f"{code} still has a standalone Kind label"
         assert {"Type", "type", "Typography", "Period"} <= ids
-    french = messages_tool.parse(messages_tool.po_path("fr-FR", core).read_text("utf-8"))
-    portuguese = messages_tool.parse(messages_tool.po_path("pt-PT", core).read_text("utf-8"))
-    assert french.messages[(None, "Type")].msgstr == ["Type"]
-    assert french.messages[(None, "Typography")].msgstr == ["Typographie"]
-    assert portuguese.messages[(None, "Type")].msgstr == ["Tipo"]
-    assert portuguese.messages[(None, "Typography")].msgstr == ["Tipografia"]
+    # Which words a language uses is Weblate's to say (#706); that the two are different
+    # words is what this repository asks of them.
+    for code in ("fr-FR", "pt-PT"):
+        catalogue = messages_tool.parse(messages_tool.po_path(code, core).read_text("utf-8"))
+        kind = catalogue.messages[(None, "Type")].msgstr[0]
+        typography = catalogue.messages[(None, "Typography")].msgstr[0]
+        if kind and typography:
+            assert kind != typography, f"{code} says Type and Typography with one word"
 
 
 # ------------------------------------------------------ a number beside a noun (#391)

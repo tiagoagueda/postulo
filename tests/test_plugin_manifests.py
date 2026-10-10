@@ -264,4 +264,6 @@ def test_a_shipped_plugins_description_is_in_the_readers_language():
         portuguese = description_of(plugin)
 
     assert english.startswith("The data the instance keeps")
-    assert portuguese.startswith("Os dados que a instância guarda")
+    with translation.override("pt-PT"):
+        assert portuguese == translation.gettext(english), "the plugin's own catalogue's"
+    assert portuguese != english, "and not the English"

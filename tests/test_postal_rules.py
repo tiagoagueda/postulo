@@ -1142,26 +1142,21 @@ def the_region_label_of_a_united_states_row(client, user, language: str) -> str:
     return re.search(r'<label for="id_addresses-0-region">([^<]*)</label>', html).group(1)
 
 
-@pytest.mark.parametrize(
-    ("language", "state", "status"),
-    [
-        ("de", "Bundesstaat", "Zustand"),
-        ("el", "Πολιτεία", "Κατάσταση"),
-        ("nl", "Staat", "Toestand"),
-    ],
-)
-def test_the_state_of_an_address_is_not_the_word_for_a_status(
-    client, user, language, state, status
-):
+@pytest.mark.parametrize("language", ["de", "el", "nl"])
+def test_the_state_of_an_address_is_not_the_word_for_a_status(client, user, language):
     """The plugin's label was the msgid `State` with no context, core has the same msgid
     for a status, and core's catalogue answers first for a message both define (#127). So
     the box read *Zustand*, a condition, and the plugin's *Bundesstaat* was never reached.
-    With a context it is a message of its own."""
+    With a context it is a message of its own. The words are asked of the catalogues,
+    which Weblate fills (#706); that they are two different words is what is held."""
+    with translation.override(language):
+        state = translation.pgettext("part of a postal address", "State")
+        status = translation.gettext("State")
+    assert state != status, "the address part and the status are one word again"
     assert the_region_label_of_a_united_states_row(client, user, language) == state
 
     with translation.override(language):
         assert str(postal_rules.label_for("region", "US")) == state
-        assert translation.gettext("State") == status, "and core's word still means a status"
 
 
 def test_no_message_of_the_address_plugin_is_one_of_cores():

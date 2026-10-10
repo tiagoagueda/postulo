@@ -5,8 +5,7 @@ Portuguese is the first case where **two regions of the same language** are offe
 and whatever is done here is the pattern for `es-419`, `de-AT` and the rest.
 
 The interesting failures are not about Portuguese. They are about what a variant needs that
-a new language does not: its own country, its own plural rule, and a catalogue that came from
-its sibling rather than from English — which is a different provenance and needs saying so.
+a new language does not: its own country, its own plural rule, and its own catalogue.
 """
 
 from __future__ import annotations
@@ -92,57 +91,20 @@ def test_the_catalogue_lands_in_the_right_directory():
     assert languages.locale_dir_name(VARIANT) == "pt_BR"
 
 
-# ------------------------------------------------------------- the seeding
+# ------------------------------------------------------------- the catalogue
 
 
-def test_every_string_came_across(catalogues):
-    """Seeded, not translated again: each string had already been thought about once."""
+def test_the_variant_has_a_slot_for_every_string_its_sibling_has(catalogues):
+    """The structure is this repository's; the words are Weblate's.
+
+    pt-BR was seeded from pt-PT and adapted (docs/TRANSLATING.md). Which words it uses --
+    *Salvar* for *Save*, *Excluir* for *Delete*, `ligação` left for a speaker -- used to be
+    pinned here, and is not any more: translations are made in Weblate only (#706), and a
+    speaker improving a word there must not turn its pull request red. What is held is what
+    a commit decides: the same strings, in the same place.
+    """
     variant, sibling = catalogues[VARIANT], catalogues[SIBLING]
     assert set(variant.messages) == set(sibling.messages)
-    assert not [m for m in variant.messages.values() if not m.translated]
-
-
-def test_nothing_is_claimed_as_reviewed(catalogues):
-    """Complete and unread are not the same thing, and the flag is what says which."""
-    unflagged = [m.msgid for m in catalogues[VARIANT].messages.values() if not m.draft]
-    assert not unflagged, f"{len(unflagged)} strings look reviewed, e.g. {unflagged[:3]}"
-
-
-def test_the_adaptation_actually_happened(catalogues):
-    """Otherwise this is pt-PT under another name, which helps nobody."""
-    variant = catalogues[VARIANT]
-    for msgid, expected in (
-        ("Save", "Salvar"),
-        ("Delete", "Excluir"),
-        ("Download", "Baixar"),
-        ("Settings", "Configurações"),
-        ("Password", "Senha"),
-        ("Files", "Arquivos"),
-        ("Contact", "Contato"),
-    ):
-        message = variant.messages.get((None, msgid))
-        if message is not None:
-            assert message.msgstr[0] == expected, msgid
-
-
-def test_a_word_boundary_kept_contracts_intact(catalogues):
-    """`rato` is Brazilian `mouse`, and it is also the tail of `contrato`.
-
-    Without the boundary this substitution produced "Cont**mouse** a termo". Recorded as a
-    test because the next variant will want the same list and the same mistake is one edit
-    away.
-    """
-    text = " ".join(" ".join(m.msgstr) for m in catalogues[VARIANT].messages.values())
-    assert "mouse" in text, "the real one was adapted"
-    assert "contmouse" not in text.lower()
-    assert "Contrato" in text
-
-
-def test_what_was_left_alone_was_left_alone(catalogues):
-    """`ligação` means both a *Connection* and a *link* here, and only a reader can tell
-    which. A script that guessed would have been confidently wrong in one of the two."""
-    text = " ".join(" ".join(m.msgstr) for m in catalogues[VARIANT].messages.values())
-    assert "ligaç" in text, "left for a speaker rather than guessed at"
 
 
 # ------------------------------------------------------------- the interface

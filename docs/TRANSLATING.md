@@ -4,6 +4,23 @@ Postulo's source language is **British English (`en-GB`)**. Every other language
 translation of it, kept as a `.po` catalogue under `src/postulo/locale/<locale>/LC_MESSAGES/`
 and compiled to the `.mo` Django reads at build time.
 
+**Every translation is made in Weblate, at
+[translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/), and
+nowhere else (#706).** That is true of a new translation, of a correction, and of reviewing a
+draft. Nobody translates by editing a `.po` file, a person or an assistant: what Weblate holds
+is the translation, and the catalogues in this repository are where it arrives. A pull request
+that writes a translation is refused by CI (`scripts/messages.py guard`) and is asked to be
+made in Weblate instead.
+
+What a commit here may still do to a catalogue, and nothing else:
+
+- **change the English** -- the source is in the code, and `extract` writes it into every
+  catalogue with an empty slot beside a new string;
+- **lose a string** the source no longer has;
+- **carry a translation to a renamed string**, by a script, as a draft (see
+  [Renaming strings in bulk](#renaming-strings-in-bulk));
+- **create a new language's catalogue**, empty.
+
 ## What a language code is
 
 A language is named by a **BCP 47 tag in its canonical form**: `pt-BR`, `en-GB`, `sr-Cyrl`,
@@ -44,15 +61,20 @@ Ukrainian and Welsh. The language picker in Settings is the authority on what is
 today. If your language is not in the current phase, a catalogue for it is still welcome —
 adding one is described below.
 
-The set grows in phases, one per release (#43):
+Which languages a build needs is decided in #347, in five points:
 
-| Release | Languages | State |
-| --- | --- | --- |
-| 0.2.0 | The 24 official languages of the European Union | Complete, machine-drafted |
-| 0.3.0 | The rest of Europe (#118) — 15 languages | Complete, machine-drafted |
-| 0.3.0 | Africa (#70) — 29 languages | Catalogues created, awaiting translation |
-| 0.4.0 | Asia and South America (#71) | Not started |
-| 0.5.0 | The rest of the world (#72) | Not started; the process is below |
+1. **Every language is scaffolded**: each has its catalogue, with a slot for every string.
+2. **A development build** needs every string present in **en-GB, fr-FR and pt-PT**, a draft
+   counting. A commit adds a string with its slots empty; Weblate drafts it by machine and
+   its pull request brings the drafts in, so that pull request is where this is held
+   (`scripts/messages.py gate fr-FR pt-PT` in CI). Between the two, a development build shows
+   the new string in English.
+3. **A release** needs every string present in **the languages selected for it**, a draft
+   counting (`uv run pytest -m release`).
+4. **0.4.0** selects no language beyond those it already carries.
+5. **0.5.0** adds **fr-CA** and **en-CA**; then any language of the European continent still
+   missing (Russian excepted); then **Chinese** (`zh-Hans`, `zh-Hant`) and **Arabic**, which may
+   move to 0.6.0.
 
 "Every language of Africa" is some two thousand of them, so the rule drawn for 0.3.0 is
 **a language with official or national status in at least one African state, plus the
@@ -82,23 +104,18 @@ so a screen reader says each name in its own language.
 `pt-BR` is the first case of two regions of one language both being offered, and it was
 added a particular way that the next one should copy.
 
-**Seed from the sibling, do not translate again.** Every string in `pt-PT` had already been
-translated once by somebody thinking about this application; what a variant wants is that
-work adapted, not a second independent pass from English. Each seeded entry carries the
-`draft` flag, and there it means something precise: *this came from the other catalogue and
-nobody who speaks this one has read it*.
+**It was seeded from the sibling, not translated again.** Every string in `pt-PT` had
+already been translated once by somebody thinking about this application; what a variant
+wants is that work adapted, not a second independent pass from English. A mechanical pass
+changed the terms where the two are simply different words -- *ficheiro* to *arquivo*,
+*palavra-passe* to *senha*, *definições* to *configurações* -- and left grammar, register and
+the ambiguous words (`ligação` is both a *Connection* and a *link*) to a speaker. Every seeded
+entry is a draft.
 
-**Then adapt only what is unambiguous.** A mechanical pass changed the terms where the two
-are simply different words — *ficheiro* to *arquivo*, *palavra-passe* to *senha*, *definições*
-to *configurações* — word-boundary anchored and case-preserving. Two near-misses are worth
-knowing about, because the next variant will meet their equivalents: `rato` is Brazilian
-*mouse* and also the tail of *contrato*, and `carregar` appears only inside *descarregar*.
-Where the Portuguese was ambiguous the **English msgid** settled it: *Guardar* is sometimes
-"keeps" and sometimes "Save", and only the msgid knows which.
-
-**And leave the rest.** `ligação` means both a *Connection* and a *link* here; the gerund,
-clitic placement and the choice of register are grammar rather than glossary. Those are a
-speaker's to fix, which is what the `draft` flag is for.
+That was done in the repository, before translations moved to Weblate. **A new variant is
+now started in Weblate**: `extract` creates its empty catalogue, Weblate drafts it by machine
+where it has a model for it, and a speaker adapts the drafts there -- with the sibling beside
+them, since Weblate shows the other languages' translations of the same string.
 
 **Check the plural rule rather than copying it.** Brazilian Portuguese treats zero as plural
 — *0 candidaturas* — where European Portuguese says *0 candidatura*. That is one line, and
@@ -109,16 +126,23 @@ or `fr-CA` catalogue is a directory and a line, if someone wants to keep it.
 
 ## Drafts, and what reviewing one means
 
-Every catalogue was first filled by machine-assisted translation, so that a language is
-usable on day one rather than English in the gaps. Each such entry carries the flag
-`draft`:
+A string written by a machine, and not yet read by somebody who speaks the language, is a
+**draft**. Weblate calls it *needs editing*, and the catalogue flags it `fuzzy`, which is the
+same thing in gettext's word:
 
 ```po
-#: src/postulo/templates/applications/application_list.html:64
-#, draft
+#: src/postulo/templates/applications/application_list.html
+#, fuzzy
 msgid "Applications"
 msgstr "Bewerbungen"
 ```
+
+Unlike gettext's own compiler, Postulo **compiles a draft**, so a language is usable on day
+one rather than English in the gaps -- unless the draft would fail to format, having lost a
+`%(placeholder)s`, which is left out and shows in English (`check` names it). Anyone using
+`msgfmt` on these catalogues needs `--use-fuzzy` to see the same. The flag used to be called
+`draft`; it was renamed when translations moved to Weblate, which never clears a flag it does
+not know.
 
 The language picker is a **disclosure** holding a list, not a dropdown: closed it is one
 line showing the language in use, and open it is every language grouped by how far along it
@@ -135,12 +159,10 @@ interface language, with words read out beside each symbol and the legend on the
 The wording is *written, not yet read by a speaker* rather than anything about machines. A
 variant seeded from a sibling catalogue and adapted by hand is not machine-translated, and
 `pt-BR` is exactly that; what is true of every language in that group is that no speaker has
-read it yet. **Reviewing a
-draft means reading it and deleting the flag**: if the translation is right, remove
-`draft`; if it is wrong, fix it and remove `draft`. That is the whole job, and it can be
-done a few strings at a time. A translation that needs a second opinion can carry
-`fuzzy` instead, which — as with every gettext tool — keeps it out of the compiled
-catalogue until someone settles it.
+read it yet. **Reviewing a draft means reading it in Weblate and saving it as
+translated**: as it is if it is right, corrected if it is not. Weblate clears the flag, and
+the string counts as read by a speaker from the next build. That is the whole job, and it can
+be done a few strings at a time; Weblate's *Needs editing* filter lists what is left.
 
 How far along each language is:
 
@@ -159,10 +181,19 @@ uv run python scripts/messages.py extract --check  # fail if a catalogue is out 
 uv run python scripts/messages.py check            # placeholders and plural forms agree (CI)
 uv run python scripts/messages.py compile          # write the .mo files Django loads, and status.json
 uv run python scripts/messages.py stats            # how far along each language is
+uv run python scripts/messages.py guard            # no commit since origin/main writes a translation (CI)
+uv run python scripts/messages.py gate fr-FR pt-PT # every string present in those languages
 ```
 
-`extract` keeps every existing translation and its flags, adds a slot for each new string
-and drops the ones the source no longer has. `check` refuses a translation that lost or
+The catalogues are written in **Weblate's own layout** -- translate-toolkit's, at a line
+width of 65535: a value split only after a newline, flags sorted, references naming a file and
+not a line, no date in the header that the tool sets -- so a file Weblate saves is one
+`extract --check` accepts byte for byte, and the other way round
+(`tests/test_po_roundtrip.py`). The settings on the Weblate components that make that true
+are in `scripts/weblate.py`.
+
+`extract` keeps every existing translation and its flags, adds an empty slot for each new
+string and drops the ones the source no longer has. `check` refuses a translation that lost or
 invented a `%(placeholder)s`, a plural entry with the wrong number of forms for its
 language, and a plural form that drops the count where its rule also covers twenty-one. Both run on every push, so a pull request that adds a string without a slot for
 it, or a translation that would raise at render time, does not get in.
@@ -179,15 +210,55 @@ per-plugin build to add or forget. `stats` and `status.json` report the sum, bec
 "português is complete" has to mean the interface somebody will see rather than the part
 of it that happens to live in core.
 
-## Editing a catalogue
+## Translating in Weblate
 
-Any text editor works; [Poedit](https://poedit.net/) or a similar tool shows the source
-beside the translation and knows the plural forms. Either way:
+[translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/) holds one
+component for Postulo's own catalogue, one for each plugin it ships, and one for each official
+plugin and browser extension with strings of its own. From a speaker's point of view:
 
-1. Edit `src/postulo/locale/<locale>/LC_MESSAGES/django.po`.
-2. `uv run python scripts/messages.py check`.
-3. Open a pull request. A reviewer who speaks the language is ideal; one who can read a
-   diff and run the checks is enough.
+1. **An account.** Sign-in is through the project's identity provider and registration is
+   closed, so an account is asked for: open an issue on the repository saying which language,
+   or write to the maintainer. (Who may translate, and under which terms a contribution comes
+   in, is #346; until it is settled a translation is taken under the project's licence,
+   AGPL-3.0-or-later.)
+2. **Translate, correct, review.** Pick the language, work through *Needs editing* (the
+   drafts) and *Untranslated*, and save. Weblate shows the placeholders, the plural forms of
+   your language and its checks beside each string, and the translations of other languages.
+3. **What happens next.** Weblate commits what was saved to a `weblate` branch within the
+   hour and opens -- or updates -- a pull request. CI checks it like any other change: the
+   layout, the placeholders, French and Portuguese complete. Once it is merged the
+   translation is in the next development build, and in the next release.
+
+**What comes in from the other side.** Weblate follows `main`: a Forgejo webhook tells it of
+every push, so a string added in a commit is in Weblate within minutes, in every language,
+with an empty slot -- and Weblate's machine translation drafts it as *needs editing* in every
+language it has a model for (LibreTranslate on the same host; the African languages,
+Croatian, Maltese and some others have none, and wait for a speaker).
+
+### What a commit does with a string
+
+- **A new string** gets an empty slot in every catalogue (`extract`). Weblate drafts it.
+- **A changed English string** is a new string: its old translations go with the old one,
+  and Weblate drafts the new one. A speaker sees the previous translation among Weblate's
+  suggestions.
+- **A removed string** goes from every catalogue, and from Weblate on its next update.
+- **A renamed string**, in bulk, is the case below.
+
+### Renaming strings in bulk
+
+A commit that renames many strings at once (#705 was one) would drop every translation of
+them that Weblate holds and the repository does not have yet. So, in this order, with
+`scripts/weblate.py`:
+
+1. `lock` -- nobody translates while it happens;
+2. `commit` and `push` -- Weblate's pending work goes to its pull request; merge it;
+3. `pull` -- Weblate is level with `main`;
+4. the rename, by a script that **carries each translation to the new string and flags it
+   `fuzzy`**, since the English changed and a speaker should read it again
+   (`L10n-Carry: keep-review` in the commit message carries them as reviewed, for an English
+   edit no translation would change for); `guard` checks the translation arrived from a
+   string the same commit removed;
+5. push, then `unlock`.
 
 ## The word for a classification: Type
 
@@ -258,17 +329,18 @@ help rather than fight that.
    added there is laid out correctly everywhere at once. The interface layout itself needs
    no work — that was done in #67 and is held by a lint and a browser suite that visits the
    application in a right-to-left language.
-4. `uv run python scripts/messages.py extract` creates the catalogue.
-5. Translate, `check`, and open a pull request.
+4. `uv run python scripts/messages.py extract` creates the catalogue, empty, and the commit
+   carries it. Weblate picks it up from `main` and drafts it by machine where it can; a
+   speaker takes it from there in Weblate.
 
 ## Adding a language without a developer
 
 The aim of the last phase is a process rather than a list: a speaker adds a language
 without waiting for a release, and what they add shows up as soon as it is merged (#72).
 
-- **A catalogue is a pull request**, or a translation made on the project's translation
-  platform; either way it is the `.po` file under `src/postulo/locale/<locale>/` and
-  nothing else. No code needs to change for a language already on the list.
+- **A translation is made in Weblate** and arrives as its pull request; it is the `.po`
+  file under `src/postulo/locale/<locale>/` and nothing else. No code needs to change for a
+  language already on the list.
 - **A language is offered once one string is translated** (`accounts/forms.py::language_choices`),
   and not before, so a scaffolded catalogue nobody has begun stays invisible.
 - **Partial is normal.** A language below 95% sits in the *Partly translated* group of the
@@ -321,7 +393,7 @@ uv run python scripts/wiki_site.py components ../postulo.wiki       # what Webla
   them and `--strict` fails, so CI on the wiki can refuse a source change that leaves a
   translation describing last year's interface unless it is marked. `stamp` is what a
   reviewer runs after reading a translation against today's English: it is the page's
-  equivalent of deleting `draft` from a string.
+  equivalent of approving a draft in Weblate.
 - **Weblate.** `components` prints one component per page plus one for `site.json`, in the
   file mask, template and BCP language-code style Weblate needs (`lang/*/Page.md`,
   with `pt-PT` written as `pt-PT`, not `pt_PT`). The component reads and commits the wiki
@@ -346,10 +418,14 @@ A plugin's strings are the plugin's to translate: its `locale/` directory sits b
 package and Postulo reads it when the plugin loads. See [Writing a plugin](https://source.tiagoagueda.com/postulo/postulo/wiki/Writing-a-plugin).
 
 That is true of the plugins Postulo ships as well. Their catalogues live beside their
-packages — `src/postulo/plugins/builtin/locale/` for the two built-in capture sources —
-and are edited, checked and reviewed exactly like the ones in `src/postulo/locale/`. The
-completeness rule for the European Union languages applies to each set separately, so a
-built-in cannot quietly fall behind.
+packages -- `src/postulo/plugins/builtin/locale/` for the two built-in capture sources -- and
+each set has its own component in Weblate, translated, checked and reviewed exactly like
+Postulo's own; `scripts/weblate.py components` names a set that has none. The completeness
+rules apply to each set separately, so a built-in cannot quietly fall behind.
+
+The rule of this page holds for every official plugin and extension too: each repository has
+its components, its `weblate` pull requests and the same guard in its CI. A third party's
+plugin is its author's to translate however they like.
 
 Postulo's own catalogue is read before any plugin's, so where both translate the same
 English string, Postulo's rendering is the one shown.

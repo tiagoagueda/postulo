@@ -392,6 +392,12 @@ def test_a_letter_frozen_by_the_worker_carries_the_owners_date_and_language(
     assert errand.state == "done", errand.error
     filed = RenderedDocument.objects.for_user(user).get()
     assert "30 septembre 2026" in filed.source_text and "1 octobre" not in filed.source_text
-    assert filed.sent_to == "Test Engineer chez Aperture Science"
+    with translation.override("fr-FR"):
+        sent_to = translation.gettext("%(role)s at %(company)s") % {
+            "role": "Test Engineer",
+            "company": "Aperture Science",
+        }
+        sent = translation.gettext("Documents sent")
+    assert filed.sent_to == sent_to
     event = application.events.get(kind=EventKind.NOTE)
-    assert event.summary == "Documents envoyés"
+    assert event.summary == sent

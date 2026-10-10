@@ -55,8 +55,12 @@ Four commitments are stated in the README and are not negotiable in code:
 - A new export or import picks JSON first, vCard 4.0 for contacts, iCalendar for events,
   and PDF, then ODT, then DOCX for documents (`CONTRIBUTING.md`, *Formats*).
 - Every user-facing string is wrapped for translation. After adding or changing one, run
-  `uv run python scripts/messages.py extract` so every catalogue gets its slot; a new
-  translation carries the `draft` flag until a speaker reviews it (`docs/TRANSLATING.md`).
+  `uv run python scripts/messages.py extract` so every catalogue gets its empty slot.
+  **Never write a translation**: no `msgstr`, in any language, by hand or by script.
+  Translations are made in Weblate only, which drafts new strings by machine and sends them
+  back as a pull request; `scripts/messages.py guard` refuses a commit that writes one
+  (`docs/TRANSLATING.md`, #706). A rename that carries translations follows *Renaming
+  strings in bulk* there.
 
 ## Before saying a change is done
 
@@ -65,6 +69,7 @@ uv run ruff check . && uv run ruff format --check .
 uv run pytest                                    # in-memory SQLite, warnings are errors
 uv run pytest -m e2e --browser chromium -n 4     # browser suite; what belongs there: CONTRIBUTING.md
 uv run python scripts/messages.py extract --check && uv run python scripts/messages.py check
+uv run python scripts/messages.py guard          # no translation written outside Weblate
 npm run build:css                                # then commit src/postulo/static/css/app.css
 ```
 

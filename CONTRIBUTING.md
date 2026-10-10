@@ -292,7 +292,8 @@ and hidden on focus, and a screen reader does not reliably read it.
    them, and the help of *Identifiers* gets the registers whose address can be pasted from
    the registry. No counts in the prose ("three cards"), no defaults ("off to begin with"),
    no list of kinds that a plugin can add to.
-3. Put the question mark on the card, and translate the new strings as drafts.
+3. Put the question mark on the card, and run `scripts/messages.py extract`: the new
+   strings are translated in Weblate, like every other (*Translations*, below).
 4. Where a wiki page says the same thing, give it a line pointing at the topic: the topic
    is what a person filling the card in reads, in their own language, and the wiki is
    where it is explained at length.
@@ -511,9 +512,19 @@ name fails the suite until its line is written.
 
 ## Translations
 
-Postulo is written in British English and translated from there. French and Portuguese
-catalogues exist and are waiting for contributors — see
-[docs/TRANSLATING.md](docs/TRANSLATING.md).
+Postulo is written in British English and translated from there, **in Weblate and
+nowhere else**: [translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/).
+A change adds or changes the English and runs `scripts/messages.py extract`, which leaves an
+empty slot in every catalogue; Weblate drafts the new strings by machine, speakers correct
+and approve them there, and Weblate brings them back as a pull request from its `weblate`
+branch. A pull request that writes a translation into a `.po` file is refused by CI
+(`scripts/messages.py guard`, and a pre-commit hook says so before the commit is made) and is
+asked to be made in Weblate instead. How to translate, what a commit may do with a string,
+and how to rename strings in bulk without losing translations: [docs/TRANSLATING.md](docs/TRANSLATING.md).
+
+**A test never pins a translation.** A speaker improving a word in Weblate must not turn a
+pull request red: a test that needs the French of a string asks gettext for it, under
+`translation.override("fr-FR")`, and compares with that.
 
 ## Keeping dependencies current
 
@@ -565,10 +576,10 @@ End the entry with the issue it closes, in brackets: `(#42)`.
 
 1. `uv run pytest -m release` — the promises that must hold in a published version rather
    than in every commit. Today that is the twenty-four European Union catalogues being
-   complete. Ordinary work translates English, French and European Portuguese; **this is
-   where the rest are swept up**, and it is the only check between an unfinished catalogue
-   and a published version. Fill what it names (`scripts/messages.py extract` first if the
-   strings are new) and run it again until it passes.
+   complete. A string missing in one of them is translated **in Weblate**, never here: merge
+   Weblate's open pull request first, and if the gate still names strings, they are ones
+   Weblate's machine translation has no model for and a speaker has to do them there
+   (`docs/TRANSLATING.md`). Run it again once that pull request is merged.
 1b. `uv run python scripts/screenshots.py --check` names the documentation's pictures that
    no longer match the interface. Run `uv run python scripts/screenshots.py` to retake them,
    look at what changed, and commit the new files: those in `assets/screenshots/` here, those

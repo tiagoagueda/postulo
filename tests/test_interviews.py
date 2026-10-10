@@ -905,13 +905,20 @@ def test_the_calendar_files_are_worded_in_the_owners_language(client, user, appl
     def summary(text: str) -> str:
         return next(line for line in text.split("\r\n") if line.startswith("SUMMARY:"))
 
+    from django.utils import translation
+
+    # The French word between the title and the company, asked of the catalogue (#706).
+    with translation.override("fr-FR"):
+        pattern = translation.gettext("%(kind)s: %(title)s at %(company)s")
+    at = pattern.split("%(title)s", 1)[1].split("%(company)s", 1)[0]
+
     client.force_login(user)
     for route in ("interview_ics", "interview_calendar"):
         args = [interview.pk] if route == "interview_ics" else []
         response = client.get(
             reverse(f"applications:{route}", args=args), HTTP_ACCEPT_LANGUAGE="de"
         )
-        assert " chez " in summary(response.content.decode()), route
+        assert at in summary(response.content.decode()), route
 
     client.logout()
     _record, raw = ApiToken.issue(user, "Agent", scopes=("read",))
@@ -920,7 +927,7 @@ def test_the_calendar_files_are_worded_in_the_owners_language(client, user, appl
         HTTP_AUTHORIZATION=f"Bearer {raw}",
         HTTP_ACCEPT_LANGUAGE="de",
     )
-    assert " chez " in summary(response.content.decode())
+    assert at in summary(response.content.decode())
 
 
 def test_editing_an_interview_keeps_a_contact_who_has_since_moved_company(

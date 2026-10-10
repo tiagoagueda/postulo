@@ -135,7 +135,9 @@ and answers for it. The assistant is a tool; the contributor is accountable. See
 Postulo speaks every official language of the European Union, Brazilian Portuguese
 beside the European, and the languages of Europe beyond the Union. The interface is a
 setting per person; the documentation is in English, and this paragraph says what
-Postulo is in each language so nobody has to guess.
+Postulo is in each language so nobody has to guess. Translations are made, corrected and
+reviewed at [translate.tiagoagueda.com](https://translate.tiagoagueda.com/projects/postulo/)
+([docs/TRANSLATING.md](docs/TRANSLATING.md)).
 
 - **български** — Postulo е самостоятелно хостван мениджър на кандидатури за работа: вашите кандидатури, CV-та и мотивационни писма, на вашия сървър, без платени функции.
 - **bosanski** — Postulo je samostalno hostovani upravitelj prijava za posao: vaše prijave, CV-jevi i motivaciona pisma na vašem serveru, bez plaćenih funkcija.
