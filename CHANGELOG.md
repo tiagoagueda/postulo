@@ -107,6 +107,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- A focused address field in Your details (a service's address with its fixed front) is ringed once, by its group, instead of twice. (#868)
 - Resizing a column no longer renders the whole list page in the background or leaves a stray "Columns saved." banner, and holding an arrow key on a handle saves once instead of on every repeat. (#521)
 - Exporting an account no longer runs a query per contact, application or sent document, so a large export holds the database write lock for far less time. (#557)
 - The Listings Applied and Everything tabs no longer make a query per applied row, so they cost the same however many listings you have applied to. (#558)

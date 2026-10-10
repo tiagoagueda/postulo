@@ -620,9 +620,10 @@
     text-align: end;
   }
 
-  .input-group[data-address-group] > input:focus-visible {
-    @apply outline-2 -outline-offset-2 outline-brand-500 outline-solid;
-  }
+  /* No outline inside it. The group has one control, so the group's own ring already says
+     where the focus is, and an outline on the box as well drew it twice (#868). The
+     telephone group keeps its inner outline because it holds two controls in one ring;
+     forced colours (below) draw no ring, so there the box keeps its outline. */
 
   /* What the field says under the group about a number already stored: the help's size,
      and room for the pill it begins with to sit on the first line of the sentence. */

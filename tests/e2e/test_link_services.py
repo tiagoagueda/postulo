@@ -735,3 +735,33 @@ def test_a_row_with_a_prefix_has_no_violations(
     if found:
         failures.append(describe(f"a name refused ({scheme})", found))
     assert not failures, "\n\n".join(failures)
+
+
+def test_a_focused_address_is_ringed_once_by_its_group_and_not_outlined_again(
+    page: Page, live_server, links
+):
+    """The group carries the ring; the one box inside it adds no outline of its own (#868).
+
+    The telephone group keeps an outline on whichever of its two controls has the focus,
+    because two controls share its ring. This group has one, so ringing the group and
+    outlining the box drew the focus twice.
+    """
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    row = rows_of(page, "social").nth(0)
+    address_of(row).focus()
+
+    seen = row.evaluate(
+        """(row) => {
+        const group = row.querySelector('[data-address-group]');
+        const box = group.querySelector('[data-address-box]');
+        const inside = getComputedStyle(box), around = getComputedStyle(group);
+        return {
+          boxOutline: inside.outlineStyle, boxWidth: inside.outlineWidth,
+          groupShadow: around.boxShadow, groupOutline: around.outlineStyle,
+        };
+    }"""
+    )
+
+    assert seen["boxOutline"] == "none", "the box draws its own outline inside the ringed group"
+    assert seen["groupShadow"] != "none", "and the group's ring is what shows the focus"
