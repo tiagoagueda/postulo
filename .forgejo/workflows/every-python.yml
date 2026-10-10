@@ -23,8 +23,8 @@ on:
     - cron: "47 6 * * 1"
   workflow_dispatch:
 
-permissions:
-  contents: read
+# No `permissions:` block: reading is what a job has without asking, and Forgejo 16 ignores
+# the field and warns about it (#727).
 
 env:
   # Kept in step with `ci.yml`, whose comments say why each is pinned.

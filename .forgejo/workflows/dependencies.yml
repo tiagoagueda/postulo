@@ -12,8 +12,10 @@
 # workflow does the part that was being forgotten.
 #
 # It writes a branch and opens a pull request, so it needs more than `contents: read`. That
-# is why it is its own file with its own permissions rather than a job in ci.yml, where every
-# job only reads.
+# is why it is its own file rather than a job in ci.yml, where every job only reads. What it
+# may write is the bot account's: the repository secret DEPENDENCIES_TOKEN is a token of
+# `postulo-bot`, whose team has write access to this repository alone. There is no
+# `permissions:` block because Forgejo 16 ignores the field and warns on every job (#727).
 name: Dependencies
 
 on:
@@ -23,8 +25,6 @@ on:
     - cron: "23 5 3 * *"
   workflow_dispatch:
 
-permissions: {}
-
 env:
   UV_VERSION: "0.12.17"
 
@@ -32,9 +32,6 @@ jobs:
   upgrade:
     name: Monthly dependency upgrade
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
     container:
       image: node:22-bookworm
 
