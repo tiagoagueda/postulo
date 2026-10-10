@@ -10,6 +10,11 @@
 # interpolates it: Compose would look for it in docker/.env, not there, and a password
 # written into a URL has to be escaped. The db container reads it from .env, and Postulo
 # reads the same variable on its own (#582).
+#
+# The db container is handed the whole .env, the secret keys included, though it only
+# reads POSTGRES_PASSWORD. That is accepted (#791, docs/THREAT-MODEL.md): giving it the
+# one variable needs the password interpolated and `--env-file .env` on every
+# docker compose command, which Compose would otherwise answer from docker/.env.
 
 # Named explicitly. Compose otherwise takes the project name from the directory the
 # file sits in, which here is "docker" — so the container becomes docker-postulo-1

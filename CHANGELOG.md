@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The PostgreSQL compose profile still hands its database container the whole .env, secret keys included; this is now stated in the threat model, the compose file, .env.example and the wiki, with how to close it. (#791)
 - On a bare-metal install the database directory, uploaded documents and the log are created readable by their owner alone (0700/0600) instead of by every account on the machine; the image is unchanged. (#789)
 - Anything sent as a download (the calendar file, the report as CSV and PDF, a contact's data-subject export) now carries Cache-Control: private, max-age=0, no-store, so no cache keeps it. (#788)
 - An invitation bound to an email address no longer marks that address verified at sign-up, since Postulo never mails the invitation: the address is confirmed by the usual link, and the invitation page says so. (#732)

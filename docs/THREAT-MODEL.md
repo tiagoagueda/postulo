@@ -136,6 +136,15 @@ applying. Three things follow, and each is a promise:
 - Denial of service against a personal instance. A reverse proxy's limits are the right
   place for that, and the wiki says how.
 - A compromised browser or operating system on the person's side.
+- The database container holding the instance's keys, **on the PostgreSQL profile
+  only** (#791, accepted). `docker/compose.postgres.yml` gives the `db` service the whole
+  `.env` through `env_file`, because Compose cannot pass it one variable without every
+  command carrying `--env-file`. The database image only reads `POSTGRES_PASSWORD`, but
+  its environment also holds `POSTULO_SECRET_KEY` and `POSTULO_FIELD_KEY`, so an attacker
+  who takes over that container reads the key that decrypts stored connection secrets
+  as well as the rows, which weakens "the key is held outside the database" for this
+  profile. The SQLite default is unaffected. An operator who minds can pass `db` only
+  its password by an `environment:` entry and `--env-file .env` on every command.
 
 ## The rules that follow
 
