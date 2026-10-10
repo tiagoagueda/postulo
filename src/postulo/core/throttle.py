@@ -130,6 +130,14 @@ def consume(action: str, who: object, rate: Rate) -> None:
         except ValueError:
             cache.set(key, 1, timeout=rate.seconds)
             used = 1
+        else:
+            # Django's generic `incr` (the database cache, the file cache) is a get and a
+            # `set` with the backend's default timeout, which is five minutes: a counter
+            # for `30/h` then expired five minutes after its last use, not at the end of
+            # its hour, and every limit longer than that was really "per five minutes of
+            # quiet" (#734). Put the expiry back to the end of the window. Redis and
+            # memcached increment in place and keep it, and touching them is harmless.
+            cache.touch(key, max(1, rate.seconds - int(_now()) % rate.seconds))
 
     if used > rate.times:
         elapsed = int(_now()) % rate.seconds

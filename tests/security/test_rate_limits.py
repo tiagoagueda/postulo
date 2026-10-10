@@ -435,3 +435,65 @@ def test_capture_is_the_tightest_of_them(settings):
 def test_the_clock_is_the_real_one():
     """Guards the monkeypatched test above from passing against a stub left behind."""
     assert abs(throttle._now() - time.time()) < 5
+
+
+def _seconds_left(fragment: str) -> int:
+    """How long the database cache will keep the counter, read from its own table.
+
+    The cache's expiry is the thing under test, and no ``cache`` call reports it, so this
+    reads the row. The test settings use the database cache, which is the stock one.
+    """
+    import datetime as dt
+
+    from django.db import connection
+
+    table = connection.ops.quote_name(settings_cache_table())
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT cache_key, expires FROM {table}")  # noqa: S608
+        rows = [(key, expires) for key, expires in cursor.fetchall() if fragment in key]
+    assert len(rows) == 1, rows
+    expires = rows[0][1]
+    if isinstance(expires, str):
+        expires = dt.datetime.fromisoformat(expires)
+    expires = expires.replace(tzinfo=None)
+    return int((expires - dt.datetime.now(dt.UTC).replace(tzinfo=None)).total_seconds())
+
+
+def settings_cache_table() -> str:
+    from django.conf import settings
+
+    return settings.CACHES["default"]["LOCATION"]
+
+
+@pytest.fixture
+def start_of_a_window(monkeypatch):
+    """The throttle's clock a second into an hour, so a window has its whole length left.
+
+    The window is aligned to the clock, so how long a counter should live depends on the
+    time the test happens to run; fixing the throttle's own clock makes it 3599 seconds,
+    which the cache's real clock then has to honour.
+    """
+    now = (int(time.time()) // 3600) * 3600 + 1
+    monkeypatch.setattr(throttle, "_now", lambda: now)
+
+
+def test_a_counter_lives_to_the_end_of_its_window_not_five_minutes_past_its_last_use(
+    start_of_a_window,
+):
+    """``incr`` on the database cache reset the expiry to the default five minutes (#734)."""
+    rate = throttle.Rate(30, 3600)
+    throttle.consume("probe-expiry", "someone", rate)
+    assert _seconds_left("probe-expiry") > 3000
+    throttle.consume("probe-expiry", "someone", rate)
+    assert _seconds_left("probe-expiry") > 3000, "the second use shortened the counter's life"
+
+
+def test_an_allowance_spent_is_still_spent_when_the_old_five_minutes_are_up(start_of_a_window):
+    """The visible effect: wait out the old five minutes and the allowance came back."""
+    rate = throttle.Rate(2, 3600)
+    throttle.consume("probe-spent", "someone", rate)
+    throttle.consume("probe-spent", "someone", rate)
+    # The counter's row outlives five minutes, so it has not been forgotten.
+    assert _seconds_left("probe-spent") > 300
+    with pytest.raises(throttle.TooOften):
+        throttle.consume("probe-spent", "someone", rate)
