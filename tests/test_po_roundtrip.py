@@ -143,10 +143,12 @@ def test_approving_in_weblate_makes_a_draft_reviewed(tool):
         tool.parse(weblate_save(original, "fr-FR", approve=True).decode("utf-8"))
     )
     assert before["drafts"], "the sample has drafts to approve"
-    # Every draft approved; the one left is the machine draft the same save added.
-    assert after["drafts"] == 1
-    assert after["reviewed"] == after["translated"] - 1
-    assert after["translated"] == before["translated"] + 1
+    # Every draft approved. The save also drafts one empty slot by machine, when there is
+    # one -- whether there is depends on how far Weblate has got, which is not this test's.
+    added = after["translated"] - before["translated"]
+    assert added in (0, 1)
+    assert after["drafts"] == added
+    assert after["reviewed"] == before["translated"]
 
 
 @pytest.mark.release
