@@ -186,6 +186,33 @@ def endpoint_tokens(app_configs=None, **kwargs) -> list[Warning]:
 
 
 @register("postulo")
+def sso_linking_unchosen(app_configs=None, **kwargs) -> list[Warning]:
+    """An instance with a provider that has not said whether addresses link accounts (#892).
+
+    Linking by address used to be on unless switched off. It is off unless switched on, which
+    changes what a running instance does for the people who signed in through the provider
+    by having the same address as an account: they now meet the sign-in page and connect the
+    provider once from their own account. Telling an operator who has a provider and set
+    nothing is how that is not a surprise.
+    """
+    from postulo.accounts import sso
+
+    if not sso.enabled() or getattr(settings, "POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN", True):
+        return []
+    return [
+        Warning(
+            "Single sign-on is configured and POSTULO_OIDC_LINK_BY_EMAIL is not set, so an "
+            "address the provider has verified no longer signs somebody in to the account "
+            "that holds it.",
+            hint="Set POSTULO_OIDC_LINK_BY_EMAIL=true to keep signing people in by address "
+            "(only if your provider marks an address verified when its owner proved it), or "
+            "=false to say this is what you want and silence this.",
+            id="postulo.W002",
+        )
+    ]
+
+
+@register("postulo")
 def footer_links(app_configs=None, **kwargs) -> list[Error]:
     """The two addresses the foot of every page links to, when they are the operator's (#212).
 

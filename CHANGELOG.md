@@ -26,6 +26,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Single sign-on no longer signs somebody into the account holding the same address unless POSTULO_OIDC_LINK_BY_EMAIL=true is set; an instance with a provider and the variable unset is warned at start-up (postulo.W002), and those people connect the provider once from their own account. (#892)
 - The skills section's example heading is now “Programming languages”, so “Languages” means the spoken ones wherever Postulo writes it; the demo data follows, and nothing in anybody's record changes. (#690)
 - CI runs the four-times-size Markdown worst cases in a step of their own, one process, after the unit suite: beside it they pushed the job over its memory limit. (#830)
 - Translations are made in Weblate only: `docs/TRANSLATING.md`, the contributor guide and the assistant's instructions say how and what a commit may do with a string, and no test pins a translated word any more. (#706)

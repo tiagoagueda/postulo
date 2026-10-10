@@ -38,6 +38,11 @@ PROVIDER = {
 def configured(settings):
     settings.SOCIALACCOUNT_PROVIDERS = PROVIDER
     settings.POSTULO_OIDC_AUTO_SIGNUP = False
+    # Linking by address is off unless an operator turns it on (#892); the handshake tests
+    # below are about what it does when it is on, so they turn it on, both ways it is read.
+    settings.POSTULO_OIDC_LINK_BY_EMAIL = True
+    settings.SOCIALACCOUNT_EMAIL_AUTHENTICATION = True
+    settings.SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = True
     return settings
 
 
@@ -97,7 +102,8 @@ def test_settings_from_the_environment_shape_the_provider(settings):
 
     assert base.SOCIALACCOUNT_LOGIN_ON_GET is True, "a POST would trip form-action 'self'"
     assert base.SOCIALACCOUNT_STORE_TOKENS is False
-    assert base.SOCIALACCOUNT_EMAIL_AUTHENTICATION is True
+    # Off unless the operator turns it on (#892), and allauth is told the same.
+    assert base.SOCIALACCOUNT_EMAIL_AUTHENTICATION is False
     assert base.SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX == "sso"
 
 
@@ -232,10 +238,54 @@ def test_an_operator_can_refuse_to_take_the_providers_word(rf, configured):
     assert User.objects.count() == 1, "and no second account was made either"
 
 
-def test_the_default_is_to_link_so_nothing_changes_for_instances_already_running(settings):
+def test_linking_by_address_is_off_unless_an_operator_turns_it_on(settings):
+    """The dangerous value is no longer the default (#892)."""
     from postulo.accounts import sso
 
-    assert sso.link_by_email() is True
+    del settings.POSTULO_OIDC_LINK_BY_EMAIL
+    assert sso.link_by_email() is False
+
+
+def test_the_shipped_setting_defaults_to_off():
+    import ast
+    import inspect
+
+    from postulo.config.settings import base
+
+    source = inspect.getsource(base)
+    tree = ast.parse(source)
+    default = next(
+        node.value.keywords[0].value.value
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Assign)
+        and getattr(node.targets[0], "id", "") == "POSTULO_OIDC_LINK_BY_EMAIL"
+    )
+    assert default is False
+
+
+def test_a_provider_with_no_choice_made_is_told_about_the_change(configured):
+    from postulo.core.checks import sso_linking_unchosen
+
+    configured.POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = False
+    problems = sso_linking_unchosen()
+
+    assert [problem.id for problem in problems] == ["postulo.W002"]
+    assert "POSTULO_OIDC_LINK_BY_EMAIL=true" in problems[0].hint
+
+
+def test_the_warning_goes_once_the_operator_has_chosen_either_way(configured):
+    from postulo.core.checks import sso_linking_unchosen
+
+    configured.POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = True
+    assert sso_linking_unchosen() == []
+
+
+def test_no_provider_means_nothing_to_warn_about(settings):
+    from postulo.core.checks import sso_linking_unchosen
+
+    settings.SOCIALACCOUNT_PROVIDERS = {}
+    settings.POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = False
+    assert sso_linking_unchosen() == []
 
 
 def test_the_sign_in_settings_page_says_what_it_trusts(client, configured, admin_user):

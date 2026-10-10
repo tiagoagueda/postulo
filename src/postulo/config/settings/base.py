@@ -353,8 +353,13 @@ SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
 # POSTULO_OIDC_AUTO_SIGNUP already stops a stranger creating an account. Linking to an
 # account that exists is a different door, and this is the one that closes it: off, a
 # person signs in locally first and connects the provider deliberately from their own
-# account page. On by default, because that is how the instances already running behave.
-POSTULO_OIDC_LINK_BY_EMAIL = env.bool("POSTULO_OIDC_LINK_BY_EMAIL", default=True)
+# account page. Off by default since #892: the dangerous value used to be the default,
+# chosen so instances already running did not change, and an instance paired with a weak
+# provider was one login from every local account. An operator who runs a provider they
+# trust turns it on, and `postulo.W002` says so to one who has a provider and has not chosen.
+POSTULO_OIDC_LINK_BY_EMAIL = env.bool("POSTULO_OIDC_LINK_BY_EMAIL", default=False)
+# Whether the operator said anything at all, for the check that reminds the ones who did not.
+POSTULO_OIDC_LINK_BY_EMAIL_CHOSEN = "POSTULO_OIDC_LINK_BY_EMAIL" in env.ENVIRON
 SOCIALACCOUNT_EMAIL_AUTHENTICATION = POSTULO_OIDC_LINK_BY_EMAIL
 SOCIALACCOUNT_EMAIL_AUTHENTICATION_AUTO_CONNECT = POSTULO_OIDC_LINK_BY_EMAIL
 SOCIALACCOUNT_EMAIL_REQUIRED = True

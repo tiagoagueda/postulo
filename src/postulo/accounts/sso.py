@@ -42,12 +42,13 @@ def auto_signup() -> bool:
 def link_by_email() -> bool:
     """Whether an address the provider has verified signs somebody into the account holding it.
 
-    On, this is the convenience that makes single sign-on worth having: nobody has to
+    Off unless the operator says otherwise (#892). On, this is the convenience that makes
+    single sign-on worth having: nobody has to
     connect anything by hand. It also means the instance is trusting the provider's word
     that the person proved they hold that address, which is a question about the
     provider rather than about Postulo — see *Hardening*.
     """
-    return bool(getattr(settings, "POSTULO_OIDC_LINK_BY_EMAIL", True))
+    return bool(getattr(settings, "POSTULO_OIDC_LINK_BY_EMAIL", False))
 
 
 def login_url() -> str:
