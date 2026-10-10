@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- On a bare-metal install the database directory, uploaded documents and the log are created readable by their owner alone (0700/0600) instead of by every account on the machine; the image is unchanged. (#789)
 - Anything sent as a download (the calendar file, the report as CSV and PDF, a contact's data-subject export) now carries Cache-Control: private, max-age=0, no-store, so no cache keeps it. (#788)
 - An invitation bound to an email address no longer marks that address verified at sign-up, since Postulo never mails the invitation: the address is confirmed by the usual link, and the invitation page says so. (#732)
 - Single sign-on matches the provider's address only to an account that has verified it, so a member who listed somebody else's address can no longer have them signed in as that member. (#730)

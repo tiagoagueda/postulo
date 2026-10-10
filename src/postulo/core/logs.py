@@ -280,6 +280,21 @@ class SharedRotatingFileHandler(logging.handlers.RotatingFileHandler):
     or the lock file cannot be made, this is the standard handler and nothing else.
     """
 
+    def _open(self):
+        """Open the log for the owner alone, whatever the umask is (#789).
+
+        The standard handler creates the file with the process's default mode, which on a
+        bare-metal install is world-readable; the log names people, companies and the
+        addresses they asked for. A file that exists keeps the mode it has.
+        """
+        return open(
+            self.baseFilename,
+            self.mode,
+            encoding=self.encoding,
+            errors=self.errors,
+            opener=lambda path, flags: os.open(path, flags, 0o600),
+        )
+
     def shouldRollover(self, record: logging.LogRecord) -> bool:
         if fcntl is not None and self.stream is not None and self._moved():
             self._let_go()
@@ -290,7 +305,7 @@ class SharedRotatingFileHandler(logging.handlers.RotatingFileHandler):
             super().doRollover()
             return
         try:
-            lock = os.open(self.baseFilename + LOCK_SUFFIX, os.O_RDONLY | os.O_CREAT, 0o644)
+            lock = os.open(self.baseFilename + LOCK_SUFFIX, os.O_RDONLY | os.O_CREAT, 0o600)
         except OSError:
             # A directory that will not take one more file. Rotating unguarded is what
             # happened before, and is better than a log that stops rotating at all.
@@ -555,6 +570,7 @@ def ensure_directory_at(place: str | Path) -> None:
     stops an instance from starting.
     """
     try:
-        os.makedirs(place, exist_ok=True)
+        # Owner only: the log names people, companies and what they typed (#789).
+        os.makedirs(place, mode=0o700, exist_ok=True)
     except OSError:
         pass

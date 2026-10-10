@@ -169,10 +169,9 @@ sqlite.apply_options(DATABASES["default"])
 # install fails on its very first command with "unable to open database file". The
 # development settings only avoid this by chance, because writing the development
 # secret key happens to create the same directory first.
-if "sqlite3" in DATABASES["default"]["ENGINE"]:
-    _db_path = Path(DATABASES["default"]["NAME"])
-    if _db_path.name != ":memory:":
-        _db_path.parent.mkdir(parents=True, exist_ok=True)
+# Made readable by its owner alone, so on a shared host nobody else reaches the database
+# or the documents beside it (#789).
+sqlite.ensure_private_directory(DATABASES["default"])
 
 # -------------------------------------------------------------------------- cache
 
@@ -533,6 +532,11 @@ STATICFILES_DIRS = [PACKAGE_DIR / "static"]
 # Every file is delivered through an ownership-checked view instead.
 MEDIA_URL = "media/"
 MEDIA_ROOT = env.path("POSTULO_MEDIA_ROOT", default=REPO_DIR / "data" / "media")
+# Uploaded documents and the directories made for them are the owner's alone. Django's
+# default is whatever the umask leaves, which on a bare-metal install is world-readable
+# (#789). The image runs as one user in a root-only volume and is unaffected.
+FILE_UPLOAD_PERMISSIONS = 0o600
+FILE_UPLOAD_DIRECTORY_PERMISSIONS = 0o700
 
 # Where plugins installed through the interface live. On the data volume, not in the
 # environment: the image is rebuilt on every upgrade and the volume is not, so a plugin

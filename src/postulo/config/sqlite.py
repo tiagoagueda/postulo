@@ -72,3 +72,20 @@ def apply_options(database: dict) -> dict:
     for key, value in FILE_OPTIONS.items():
         options.setdefault(key, value)
     return database
+
+
+def ensure_private_directory(database: dict) -> None:
+    """Make the directory a SQLite file lives in, readable by its owner alone (#789).
+
+    ``Path.mkdir`` obeys the process's umask, which on most hosts leaves a directory
+    world-readable, and the database file SQLite creates inside it has the same default.
+    With the directory at ``0o700`` nobody else can reach the file whatever its own mode.
+    Only a directory made here is restricted: one that exists is somebody's decision, an
+    operator's volume mount included, and is left as it is. A no-op for an in-memory
+    database and for anything that is not a file.
+    """
+    if not is_file(database):
+        return
+    directory = Path(database["NAME"]).parent
+    if not directory.exists():
+        directory.mkdir(parents=True, mode=0o700, exist_ok=True)
