@@ -44,6 +44,10 @@ PROJECT = "postulo"
 #: The vault item holding the key, and the field it is in.
 VAULT_ITEM = "Ouranos ❯ Services ❯ Weblate ❯ Tiago Agueda"
 VAULT_FIELD = "API-KEY"
+#: The Forgejo account Weblate pushes and opens pull requests as, and its token.
+BOT = "weblate"
+BOT_ITEM = "Forgejo ❯ Weblate"
+BOT_FIELD = "TOKEN"
 
 #: What every component is set to. The layout settings are what make a file Weblate saves
 #: one `scripts/messages.py extract --check` accepts byte for byte
@@ -91,25 +95,44 @@ OWNER = "https://source.tiagoagueda.com/Postulo/"
 _KEY: str | None = None
 
 
+def vault(item_name: str, field_name: str) -> str:
+    """One hidden field of one vault item, read through the Bitwarden CLI; never printed."""
+    bw = shutil.which("bw")
+    session = Path.home() / ".bw-session"
+    if not bw or not session.exists():
+        raise SystemExit("Needs the Bitwarden CLI and a session in ~/.bw-session.")
+    env = dict(os.environ, BW_SESSION=session.read_text(encoding="utf-8").strip())
+    listed = subprocess.run(  # noqa: S603 - the Bitwarden CLI, with fixed arguments
+        [bw, "list", "items", "--search", "Weblate"], capture_output=True, env=env, check=True
+    ).stdout
+    for item in json.loads(listed):
+        if item.get("name") == item_name:
+            for field in item.get("fields") or []:
+                if field.get("name") == field_name:
+                    return field.get("value")
+    raise SystemExit(f"No {field_name} on {item_name!r}; `bw sync` and try again.")
+
+
 def key() -> str:
     global _KEY
     if _KEY is None:
-        bw = shutil.which("bw")
-        session = Path.home() / ".bw-session"
-        if not bw or not session.exists():
-            raise SystemExit("Needs the Bitwarden CLI and a session in ~/.bw-session.")
-        env = dict(os.environ, BW_SESSION=session.read_text(encoding="utf-8").strip())
-        listed = subprocess.run(  # noqa: S603 - the Bitwarden CLI, with fixed arguments
-            [bw, "list", "items", "--search", "Weblate"], capture_output=True, env=env, check=True
-        ).stdout
-        for item in json.loads(listed):
-            if item.get("name") == VAULT_ITEM:
-                for field in item.get("fields") or []:
-                    if field.get("name") == VAULT_FIELD:
-                        _KEY = field.get("value")
-        if not _KEY:
-            raise SystemExit(f"No {VAULT_FIELD} on {VAULT_ITEM!r}; `bw sync` and try again.")
+        _KEY = vault(VAULT_ITEM, VAULT_FIELD)
     return _KEY
+
+
+def push_url(repo: str) -> str:
+    """Where a component pushes its `weblate` branch: its own repository, as the bot.
+
+    Weblate 2026.9 puts its configured credentials only on a fork's push URL, and pushes a
+    fork over SSH unless the repository URL carries credentials -- and Forgejo gives its SSH
+    address as a LAN IP, which Weblate refuses. So the token goes in the push URL, which
+    Weblate stores and does not show back (#349).
+    """
+    from urllib.parse import quote, urlparse
+
+    token = quote(vault(BOT_ITEM, BOT_FIELD), safe="")
+    parsed = urlparse(repo)
+    return f"{parsed.scheme}://{BOT}:{token}@{parsed.netloc}{parsed.path}"
 
 
 def call(path: str, method: str = "GET", data: dict | None = None):
@@ -251,7 +274,8 @@ def cmd_configure(args) -> int:
             settings.update(ROUND_TRIP)
             repo = str(component.get("repo", ""))
             if repo.lower().startswith(OWNER.lower()) and not repo.startswith(OWNER):
-                settings["repo"] = OWNER + repo[len(OWNER) :]
+                repo = settings["repo"] = OWNER + repo[len(OWNER) :]
+            settings["push"] = push_url(repo)
         call(f"components/{PROJECT}/{component['slug']}/", "PATCH", settings)
         print(f"configured: {component['slug']}{' (round trip)' if 'vcs' in settings else ''}")
     return 0

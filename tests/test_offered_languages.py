@@ -178,11 +178,16 @@ def test_a_visitor_whose_browser_asks_for_an_offered_language_is_given_it(client
 def test_a_visitor_is_not_given_a_language_nobody_has_begun(client, settings_row):
     from postulo.core import languages
 
+    # Whichever language stands at nothing today: which ones do is Weblate's to change, as
+    # speakers and machine drafts fill them (#706).
     status = languages.translation_status()
-    assert status["sw"]["translated"] == 0, "Swahili stands at nothing in the report"
+    untouched = sorted(code for code, row in status.items() if not row.get("translated"))
+    if not untouched:
+        pytest.skip("every language has begun, so none is left to be refused")
+    code = untouched[0]
     SiteSettings.objects.filter(pk=settings_row.pk).update(default_language="de")
 
-    assert served_in(client, HTTP_ACCEPT_LANGUAGE="sw") == ("de", "de")
+    assert served_in(client, HTTP_ACCEPT_LANGUAGE=code) == ("de", "de")
 
 
 def test_offering_it_again_brings_the_person_back(user, settings_row):

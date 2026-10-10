@@ -1180,26 +1180,25 @@ def test_no_message_of_the_address_plugin_is_one_of_cores():
     assert not ours & keys("postulo")
 
 
-def test_no_language_lost_its_word_when_the_labels_gained_a_context():
-    """The translations were carried to the entries with the context, not written again: a
-    language that has the plugin's other names of a region has these three."""
+def test_the_labels_with_a_context_left_none_without_one():
+    """The three labels moved to entries with a context, and no catalogue kept the old one.
+
+    This used to hold too that a language with the plugin's other words had these three --
+    true the day the translations were carried across, and not a promise since: a language
+    is filled in Weblate, by speakers and machine drafts, a word at a time (#706).
+    """
     from pathlib import Path
 
     from postulo.core import messages_tool
 
     messages_tool.use(Path(__file__).resolve().parents[1])
     subject = {s.name: s for s in messages_tool.catalogue_sets()}["plugins/postal_rules"]
-    translated = 0
     for code in messages_tool.translated_languages():
         path = messages_tool.po_path(code, subject)
         messages = messages_tool.parse(path.read_text(encoding="utf-8")).messages
-        if not any(messages[(None, "Province")].msgstr):
-            continue
-        translated += 1
         for msgid in ("State", "Address", "Country"):
-            assert any(messages[(A_PART, msgid)].msgstr), f"{code} lost its {msgid}"
+            assert (A_PART, msgid) in messages, f"{code} has no {msgid} with the context"
             assert (None, msgid) not in messages, f"{code} still has {msgid} with no context"
-    assert translated > 30, "the languages that have the plugin's words were found"
 
 
 # ----------------------------------------- the notes are whole sentences too (#642)
