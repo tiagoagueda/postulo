@@ -554,3 +554,58 @@ def test_an_outbound_request_leaves_no_address_in_the_log(caplog, monkeypatch, s
         if record.levelno <= logging.INFO and "SECRETID" in record.getMessage()
     ]
     assert told == [], "the path of an outbound request reached the log"
+
+
+# ------------------------------------- what an error line must not carry (#733)
+
+
+def _kept(tmp_path, settings, client_call):
+    """Run ``client_call`` with the real file handler on ``django.request``; the lines written."""
+    settings.POSTULO_LOG_DIR = str(tmp_path)
+    handler = logs.SharedRotatingFileHandler(tmp_path / "postulo.log", encoding="utf-8")
+    handler.setFormatter(logs.JSONFormatter())
+    logger = logging.getLogger("django.request")
+    logger.addHandler(handler)
+    try:
+        client_call()
+    finally:
+        logger.removeHandler(handler)
+        handler.close()
+    return (tmp_path / "postulo.log").read_text(encoding="utf-8")
+
+
+def test_a_refused_request_leaves_no_query_string_in_the_log(client, settings, tmp_path):
+    """Django logs every 4xx with the request, and its repr is the whole request line (#733).
+
+    A search term, a filter, what a member typed into the skill box when the suggestion limit
+    answered 429: it would sit in the file, on the Logs page and in the collector's feed.
+    """
+    written = _kept(
+        tmp_path, settings, lambda: client.get("/no-such-page/?note=QS-MARKER-7f3a9c&q=trade+union")
+    )
+
+    assert "Not Found: /no-such-page/" in written, "the record itself is still kept"
+    assert "QS-MARKER-7f3a9c" not in written and "trade" not in written
+    assert json.loads(written.splitlines()[0])["request"] == "GET /no-such-page/"
+
+
+def test_an_error_on_a_link_with_a_token_does_not_write_the_token(client, settings, tmp_path):
+    """An invitation or recovery address is the credential, and a 4xx on it names the path."""
+    secret = "tok3n-7f3a9c1d2e8b4a5f"
+    written = _kept(
+        tmp_path,
+        settings,
+        lambda: (
+            client.get(reverse("accounts:invite_accept", kwargs={"token": secret})),
+            client.get(reverse("accounts:recovery_open", kwargs={"token": secret})),
+        ),
+    )
+
+    assert secret not in written
+    assert "<token>" in written
+
+
+def test_scrub_leaves_every_other_path_alone():
+    assert logs.scrub("Not Found: /listings/12/") == "Not Found: /listings/12/"
+    first = reverse("accounts:invite_accept", kwargs={"token": "abc"})
+    assert logs.scrub(f"Gone: {first}") == f"Gone: {first[: -len('abc/')]}<token>/"

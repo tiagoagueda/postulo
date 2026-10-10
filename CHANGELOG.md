@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The JSON log, the Logs page and the log collector no longer receive the query string of a request that ended in a 4xx, and the token in an invitation or recovery link is replaced by <token>; lines already written keep the old form until they rotate away. (#733)
 - A candidate file's review no longer says which telephone numbers other accounts hold once the number allowance is spent: every number is then refused in the same words, as the form does. (#735)
 - Rate limits longer than five minutes (number collisions, capture, fetch, the API, texts, the wrong-token bar) now last their whole window on the stock database cache instead of expiring five minutes after their last use, so the allowances are no longer about twelve times what is set. (#734)
 - Every API list now refuses a limit above 200 with a 422 and declares the bound in the OpenAPI schema, so one call can no longer make a whole account the page while holding the database's write lock. (#434)

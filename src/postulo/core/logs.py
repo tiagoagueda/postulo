@@ -152,6 +152,69 @@ class ConsoleFormatter(logging.Formatter):
         return f"{line} [request {identifier}]" if identifier else line
 
 
+#: The routes whose address *is* the secret: an invitation and an account-recovery link
+#: (#103). Named by their URL names, so a renamed path cannot leave this list stale.
+SECRET_ROUTES = (
+    ("accounts:invite_accept", "token"),
+    ("accounts:recovery_open", "token"),
+)
+
+_MASK = "<token>"
+
+
+_secret_paths: list[re.Pattern[str]] = []
+
+
+def _secret_path_pattern() -> re.Pattern[str] | None:
+    """A pattern for the part of a path that holds a link's token, built from the URLconf.
+
+    Kept once it is built; a failure (the URLconf is not loaded yet, during start-up) is not
+    kept, so the next record tries again.
+    """
+    if _secret_paths:
+        return _secret_paths[0]
+    from django.urls import reverse
+
+    prefixes = []
+    for name, argument in SECRET_ROUTES:
+        try:
+            path = reverse(name, kwargs={argument: "TOKEN"})
+        except Exception:  # not routed yet (start-up) or not installed
+            return None
+        prefixes.append(re.escape(path.split("TOKEN")[0]))
+    _secret_paths.append(re.compile("(" + "|".join(prefixes) + ")" + r"[^/\s?#'\"]+"))
+    return _secret_paths[0]
+
+
+def scrub(text: str) -> str:
+    """``text`` with the token of an invitation or recovery link taken out of any path in it.
+
+    A 404 or a 500 on one of those routes is logged by Django with the path it was asked
+    for, and the path is the single-use credential. The log is read by every administrator
+    and handed to a collector (#733).
+    """
+    pattern = _secret_path_pattern()
+    return pattern.sub(lambda found: found.group(1) + _MASK, text) if pattern else text
+
+
+def _plain(value):
+    """What may be written for an attribute a caller attached to a record.
+
+    A request is written as its method and path, never ``repr(request)``: that is the whole
+    request line, query string included, which is what a member typed into a search box or
+    a filter (#733). Anything else the standard library cannot encode is kept as text.
+    """
+    from django.http import HttpRequest
+
+    if isinstance(value, HttpRequest):
+        return f"{value.method} {scrub(value.path)}"
+    try:
+        json.dumps(value)
+    except (TypeError, ValueError):
+        return scrub(repr(value))
+    return value
+
+
 class JSONFormatter(logging.Formatter):
     """One object per line: the time, the level, the logger, the message, the extras."""
 
@@ -162,7 +225,7 @@ class JSONFormatter(logging.Formatter):
             ),
             "level": record.levelname,
             "logger": record.name,
-            "message": record.getMessage(),
+            "message": scrub(record.getMessage()),
         }
         if record.exc_info:
             payload["traceback"] = self.formatException(record.exc_info)
@@ -173,11 +236,7 @@ class JSONFormatter(logging.Formatter):
                 # Outside any request there is nothing to correlate, and a field that is
                 # always present and usually empty is noise a reader learns to skip.
                 continue
-            try:
-                json.dumps(value)
-            except (TypeError, ValueError):
-                value = repr(value)
-            payload[key] = value
+            payload[key] = _plain(value)
         return json.dumps(payload, ensure_ascii=False, default=str)
 
 
