@@ -13,6 +13,7 @@ that loop needs a hand:
     uv run python scripts/weblate.py components        # name a catalogue set with no component
     uv run python scripts/weblate.py components --create   # and create the missing ones
     uv run python scripts/weblate.py configure [C…]    # apply the settings below to components
+    uv run python scripts/weblate.py addons [C…]       # squash commits, machine-draft new strings
 
 **Renaming strings in bulk** (a sweep like #705) would drop every translation Weblate holds
 for them that has not reached the repository yet, so it goes: `lock`, `commit`, `push`,
@@ -60,6 +61,32 @@ ROUND_TRIP = {
     "push_on_commit": True,
     "commit_pending_age": 1,
 }
+
+#: The add-ons. Squashing is for a component with a repository of its own: one commit per
+#: pull request update rather than one per language. Machine drafts are for every
+#: component, and fill **empty slots only** (`state:empty`): Weblate's default query is
+#: everything short of translated, which would retranslate every existing draft. What they
+#: write is a draft -- `fuzzy`, *needs editing* -- for a speaker to read.
+SQUASH = {
+    "name": "weblate.git.squash",
+    "configuration": {"squash": "all", "append_trailers": True, "commit_message": ""},
+}
+MACHINE_DRAFTS = {
+    "name": "weblate.autotranslate.autotranslate",
+    "configuration": {
+        "mode": "fuzzy",
+        "q": "state:empty",
+        "auto_source": "mt",
+        "component": "",
+        "engines": ["libretranslate"],
+        "threshold": 80,
+    },
+}
+
+#: Forgejo's own spelling of the organisation. The webhook is matched to a component by an
+#: exact comparison of addresses, so a component cloned from `postulo/…` never hears of a
+#: push to `Postulo/…` (#349).
+OWNER = "https://source.tiagoagueda.com/Postulo/"
 
 _KEY: str | None = None
 
@@ -221,8 +248,25 @@ def cmd_configure(args) -> int:
         settings = dict(LAYOUT)
         if args.round_trip and not linked(component):
             settings.update(ROUND_TRIP)
+            repo = str(component.get("repo", ""))
+            if repo.lower().startswith(OWNER.lower()) and not repo.startswith(OWNER):
+                settings["repo"] = OWNER + repo[len(OWNER) :]
         call(f"components/{PROJECT}/{component['slug']}/", "PATCH", settings)
         print(f"configured: {component['slug']}{' (round trip)' if 'vcs' in settings else ''}")
+    return 0
+
+
+def cmd_addons(args) -> int:
+    for component in chosen(args.components):
+        slug = component["slug"]
+        # The component lists its add-ons by address; the list endpoint only takes a POST.
+        present = {call(url)["name"] for url in component.get("addons") or []}
+        wanted = [MACHINE_DRAFTS] + ([] if linked(component) else [SQUASH])
+        for addon in wanted:
+            if addon["name"] in present:
+                continue
+            call(f"components/{PROJECT}/{slug}/addons/", "POST", addon)
+            print(f"{slug}: {addon['name']}")
     return 0
 
 
@@ -251,6 +295,9 @@ def main(argv: list[str] | None = None) -> int:
         "--round-trip", action="store_true", help="also the pull-request settings (#349)"
     )
     one.set_defaults(run=cmd_configure)
+    one = sub.add_parser("addons")
+    one.add_argument("components", nargs="*")
+    one.set_defaults(run=cmd_addons)
     args = parser.parse_args(argv)
     return args.run(args)
 
