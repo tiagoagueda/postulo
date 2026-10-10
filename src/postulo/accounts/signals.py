@@ -11,7 +11,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 from .adapter import INVITE_SESSION_KEY, pending_invite
-from .models import Profile
+from .models import AddressClaim, Profile
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid="postulo_create_profile")
@@ -101,3 +101,11 @@ def gravatar_follows_the_primary_address(
         # allauth's view is not ours to take out of its transaction, so the wait on Gravatar
         # starts once that transaction has committed (#357).
         transaction.on_commit(lambda: avatars.fetch_gravatar(profile))
+
+
+@receiver(post_save, sender=EmailAddress, dispatch_uid="postulo_date_an_address_claim")
+def date_an_address_claim(sender, instance, created, raw=False, **kwargs) -> None:
+    """Note when an unverified, non-primary address was put on an account (#891)."""
+    if raw or not created or instance.verified or instance.primary:
+        return
+    AddressClaim.objects.get_or_create(address=instance)

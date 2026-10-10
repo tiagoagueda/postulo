@@ -174,6 +174,7 @@ class Command(BaseCommand):
 
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
+        from postulo.accounts import claims
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.core import errands, site
         from postulo.core.slow import reap_archives
@@ -211,6 +212,9 @@ class Command(BaseCommand):
             # The pages of captures that never became a listing, past the days the
             # instance keeps them (#256). The captures stay; the copies of the pages go.
             pages_gone = pages.expire_unconfirmed()
+            # Addresses somebody listed on their account and never proved, past the life of
+            # the link mailed to confirm them (#891).
+            claims.expire_unconfirmed()
             # A slice of the uploads read against what was recorded, the least recently
             # checked first, and the files no row names once they are older than the grace
             # period (#663).

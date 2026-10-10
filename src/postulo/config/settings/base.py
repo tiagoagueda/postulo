@@ -233,6 +233,7 @@ ACCOUNT_FORMS = {
     "set_password": "postulo.accounts.forms.SetPasswordForm",
     "reset_password_from_key": "postulo.accounts.forms.ResetPasswordKeyForm",
     "reset_password": "postulo.accounts.forms.ResetPasswordForm",
+    "add_email": "postulo.accounts.forms.AddEmailForm",
     "request_login_code": "postulo.accounts.forms.RequestLoginCodeForm",
 }
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
@@ -247,6 +248,9 @@ ACCOUNT_EMAIL_VERIFICATION = "mandatory"
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_MAX_EMAIL_ADDRESSES = 5
+# Adding, removing or choosing an address asks for the password again, so a session left
+# open on a shared machine cannot put an address of its own choosing on the account (#891).
+ACCOUNT_REAUTHENTICATION_REQUIRED = True
 ACCOUNT_ADAPTER = "postulo.accounts.adapter.AccountAdapter"
 
 # Signing in with a code sent to the primary address (#153). This is on so that allauth

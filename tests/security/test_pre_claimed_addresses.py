@@ -48,8 +48,11 @@ def mallory(django_user_model):
 
 
 def pre_claim(client, account, address: str = VICTIM) -> None:
-    """Add ``address`` to ``account`` from the page that does it: an unverified claim."""
-    client.force_login(account)
+    """Add ``address`` to ``account`` from the page that does it: an unverified claim.
+
+    Signed in properly, because the page asks for the password again (#891).
+    """
+    client.post(reverse("account_login"), {"login": account.username, "password": PASSWORD})
     response = client.post(reverse("account_email"), {"email": address, "action_add": ""})
     assert response.status_code in (200, 302)
     assert EmailAddress.objects.filter(user=account, email=address, verified=False).exists()

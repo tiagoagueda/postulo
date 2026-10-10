@@ -7,6 +7,7 @@ import zoneinfo
 
 from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
+from allauth.account.forms import AddEmailForm as AllauthAddEmailForm
 from allauth.account.forms import ChangePasswordForm as AllauthChangePasswordForm
 from allauth.account.forms import LoginForm as AllauthLoginForm
 from allauth.account.forms import RequestLoginCodeForm as AllauthRequestLoginCodeForm
@@ -39,7 +40,7 @@ from postulo.core import (
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import addresses, addressing, avatars, identifiers
+from . import addresses, addressing, avatars, claims, identifiers
 from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
 
 
@@ -69,6 +70,22 @@ class LoginForm(AllauthLoginForm):
         self.fields["login"].label = _("Username or email")
         if "remember" in self.fields:
             self.fields["remember"].label = _("Stay signed in on this device")
+
+
+class AddEmailForm(AllauthAddEmailForm):
+    """Adding an address is refused where the several-addresses feature is off (#891).
+
+    The page hid its link when the feature was off, and the route behind it went on taking
+    addresses, so the switch was a suggestion. The refusal says why in words, not as the
+    "too many addresses" allauth would otherwise answer.
+    """
+
+    def clean_email(self) -> str:
+        if not addresses.is_offered(self.user):
+            raise ValidationError(
+                _("This instance keeps one address per account, so another cannot be added.")
+            )
+        return super().clean_email()
 
 
 class ResetPasswordForm(AllauthResetPasswordForm):
@@ -173,6 +190,16 @@ class SignupForm(AllauthSignupForm):
                 "Where Postulo writes to you, and what a CV prints if you let it show "
                 "contact details."
             )
+
+    def validate_unique_email(self, value):
+        """A claim on this address that nobody proved gives way to the person signing up.
+
+        Without this the sign-up for an address somebody else had listed on their own
+        account was answered as though an account held it, and its holder could never
+        register it (#891).
+        """
+        claims.displace(value)
+        return super().validate_unique_email(value)
 
     def save(self, request):
         user = super().save(request)

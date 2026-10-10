@@ -817,3 +817,28 @@ class Invite(models.Model):
         if spent:
             self.accepted_at, self.accepted_by = now, user
         return bool(spent)
+
+
+class AddressClaim(models.Model):
+    """When an address was put on an account without being proved (#891).
+
+    allauth stores any address nobody holds as an unverified ``EmailAddress`` on the
+    account that asked, and keeps no date for it, so nothing could tell a claim made
+    yesterday from one made a year ago. Without a date nothing can expire one, and an
+    address stored for ever on somebody else's account is an address its real holder can
+    never register (#731, #891). One row per unverified, non-primary address, made when the
+    address is: a primary unverified address is a sign-up waiting for its link, which has
+    a life of its own. Gone with the address, whether it is proved or removed.
+    """
+
+    address = models.OneToOneField(
+        "account.EmailAddress", on_delete=models.CASCADE, related_name="claim"
+    )
+    claimed_at = models.DateTimeField(default=timezone.now, db_index=True)
+
+    class Meta:
+        verbose_name = _("address claim")
+        verbose_name_plural = _("address claims")
+
+    def __str__(self) -> str:
+        return f"{self.address.email} since {self.claimed_at:%Y-%m-%d}"

@@ -82,6 +82,7 @@ EXCUSED = {
     "SignupForm.password2": "a confirmation of the box above it",
     "LoginForm.login": "allauth's, and the label names both things it accepts",
     "ResetPasswordKeyForm.password2": "a confirmation of the box above it",
+    "AddEmailForm.email": "allauth's: the address to add",
     "ResetPasswordForm.email": "allauth's: the address the key is sent to",
     "RequestLoginCodeForm.email": "allauth's: the address the code is sent to",
     "SetPasswordForm.password2": "a confirmation of the box above it",
