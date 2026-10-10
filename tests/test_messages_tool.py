@@ -53,7 +53,7 @@ def test_python_sources_yield_their_messages(tool):
     assert plural.plural == "%(n)s reminders"
     assert ("month name", "May") in found
     assert not any("ignored" in key[1] for key in found), "a method called _ is not gettext"
-    assert found[(None, "Applications")].references == ["x.py:4"]
+    assert found[(None, "Applications")].references == ["x.py"], "the file, never the line"
 
 
 def test_templates_yield_theirs_whatever_the_indentation(tool):
@@ -74,8 +74,8 @@ def test_templates_yield_theirs_whatever_the_indentation(tool):
 def test_a_catalogue_survives_the_round_trip(tool):
     message = tool.Message(
         msgid='Say "hello"\nto %(name)s',
-        references=["a.py:1"],
-        flags=["python-format", "draft"],
+        references=["a.py"],
+        flags=["python-format", "fuzzy"],
         msgstr=["Dire « bonjour »\nà %(name)s"],
         translator=["reviewed by nobody yet"],
     )
@@ -91,7 +91,7 @@ def test_a_catalogue_survives_the_round_trip(tool):
     again = tool.parse(text)
     assert again.header["Plural-Forms"] == "nplurals=2; plural=(n > 1);"
     back = again.messages[message.key]
-    assert back.msgstr == message.msgstr and back.flags == message.flags
+    assert back.msgstr == message.msgstr and back.flags == ["fuzzy", "python-format"], "sorted"
     assert back.translator == ["reviewed by nobody yet"]
     assert again.messages[plural.key].msgstr == ["%(n)s jour", "%(n)s jours"]
     assert again.messages[("month name", "May")].msgstr == ["mai"]
@@ -131,21 +131,25 @@ def test_merging_keeps_translations_and_drops_what_the_source_lost(tool):
     }
     merged = tool.merge(extracted, old, "pl")
     assert merged.messages[(None, "Keep")].msgstr == ["Garder"]
-    assert merged.messages[(None, "Keep")].flags == ["draft"]
+    assert merged.messages[(None, "Keep")].flags == ["fuzzy"], "draft is called fuzzy now"
     assert merged.messages[(None, "New")].msgstr == [""]
     assert (None, "Gone") not in merged.messages
     assert merged.messages[(None, "%(n)s cat")].msgstr == ["", "", ""], "Polish has three forms"
 
 
-def test_the_compiled_file_is_read_by_gettext_and_skips_fuzzy_only(tool):
+def test_the_compiled_file_is_read_by_gettext_and_carries_the_drafts(tool):
+    """A draft is usable on the day it is written; one that would fail to format is not."""
     catalogue = tool.Catalogue(
         header={
             "Content-Type": "text/plain; charset=UTF-8",
             "Plural-Forms": "nplurals=2; plural=(n > 1);",
         },
         messages={
-            (None, "Draft"): tool.Message(msgid="Draft", msgstr=["Brouillon"], flags=["draft"]),
-            (None, "Fuzzy"): tool.Message(msgid="Fuzzy", msgstr=["Flou"], flags=["fuzzy"]),
+            (None, "Draft"): tool.Message(msgid="Draft", msgstr=["Brouillon"], flags=["fuzzy"]),
+            (None, "Old"): tool.Message(msgid="Old", msgstr=["Ancien"], flags=["draft"]),
+            (None, "Hi %(name)s"): tool.Message(
+                msgid="Hi %(name)s", msgstr=["Salut %(nom)s"], flags=["fuzzy", "python-format"]
+            ),
             (None, "Empty"): tool.Message(msgid="Empty", msgstr=[""]),
             ("ctx", "May"): tool.Message(msgid="May", context="ctx", msgstr=["mai"]),
             (None, "%(n)s day"): tool.Message(
@@ -153,9 +157,11 @@ def test_the_compiled_file_is_read_by_gettext_and_skips_fuzzy_only(tool):
             ),
         },
     )
-    translations = gettext.GNUTranslations(io.BytesIO(tool.compile_catalogue(catalogue)))
+    compiled = tool.compile_catalogue(catalogue, "fr-FR")
+    translations = gettext.GNUTranslations(io.BytesIO(compiled))
     assert translations.gettext("Draft") == "Brouillon", "a draft is usable"
-    assert translations.gettext("Fuzzy") == "Fuzzy", "a fuzzy entry is not"
+    assert translations.gettext("Old") == "Ancien", "and so is one still flagged the old way"
+    assert translations.gettext("Hi %(name)s") == "Hi %(name)s", "unless it would raise"
     assert translations.gettext("Empty") == "Empty"
     assert translations.pgettext("ctx", "May") == "mai"
     assert translations.ngettext("%(n)s day", "%(n)s days", 1) == "%(n)s jour"
@@ -219,46 +225,26 @@ def test_a_form_that_also_counts_twenty_one_cannot_spell_out_one(tool):
 
 
 def test_stats_count_drafts_apart_from_reviewed_work(tool):
+    """A draft is flagged ``fuzzy`` -- Weblate's *needs editing* -- and a reviewed string is
+    one a speaker saved there, which cleared it. The two add up to what is translated, which
+    is what the translation bar draws (#312, #706)."""
     catalogue = tool.Catalogue(
         header={},
         messages={
-            (None, "A"): tool.Message(msgid="A", msgstr=["a"], flags=["draft"]),
+            (None, "A"): tool.Message(msgid="A", msgstr=["a"], flags=["fuzzy"]),
             (None, "B"): tool.Message(msgid="B", msgstr=["b"]),
             (None, "C"): tool.Message(msgid="C", msgstr=[""]),
-            (None, "D"): tool.Message(msgid="D", msgstr=["d"], flags=["fuzzy"]),
+            (None, "D"): tool.Message(msgid="D", msgstr=["d"], flags=["draft"]),
+            (None, "E"): tool.Message(msgid="E", msgstr=[""], flags=["fuzzy"]),
         },
     )
     assert tool.stats_for(catalogue) == {
-        "total": 4,
+        "total": 5,
         "translated": 3,
-        "drafts": 1,
-        "fuzzy": 1,
-        # B alone. D has text in it and is not a draft, but nobody has settled it and
-        # nobody reads it, so it is not reviewed either; it used to be counted as if it
-        # were (#312).
+        "drafts": 2,
         "reviewed": 1,
-        "percent": 75,
+        "percent": 60,
     }
-
-
-def test_a_fuzzy_draft_is_counted_once(tool):
-    """Flagged both ways, it is a draft and it is fuzzy, and it is still not reviewed: the
-    parts the translation bar draws come out of these counts and must add up (#312)."""
-    catalogue = tool.Catalogue(
-        header={},
-        messages={
-            (None, "A"): tool.Message(msgid="A", msgstr=["a"], flags=["draft", "fuzzy"]),
-            (None, "B"): tool.Message(msgid="B", msgstr=[""], flags=["fuzzy"]),
-        },
-    )
-    stats = tool.stats_for(catalogue)
-
-    assert (stats["translated"], stats["drafts"], stats["fuzzy"], stats["reviewed"]) == (
-        1,
-        1,
-        2,
-        0,
-    )
 
 
 # ------------------------------------------- the tool in a plugin's repository (#187)
@@ -408,10 +394,17 @@ def test_a_plugin_without_a_url_or_licence_claims_neither(tool, plugin_repo):
     assert tool.cmd_extract(check=True) == 0
 
 
-# `scripts/messages.py stats --check` in CI's Checks job, once per push (#725).
-@pytest.mark.step
-def test_the_committed_status_report_is_what_the_catalogues_give(tool):
-    # The picker and *Defaults* read locale/status.json and nothing else, so a file nobody
-    # refreshed shows languages as complete that are not (#495). CI runs `stats --check`.
-    stored = (tool.project().locale / "status.json").read_text(encoding="utf-8")
-    assert stored == tool._status_text(tool.build_report()), "run `stats --write`"
+def test_compile_writes_the_status_report_the_picker_reads(tool, tmp_path, monkeypatch):
+    """The picker and *Defaults* read locale/status.json and nothing else (#495). It is
+    written with the .mo files rather than committed: every translation saved in Weblate
+    changes it, and a committed copy was stale on every one of its pull requests (#349)."""
+    written = {}
+
+    def capture(self, text, **kwargs):
+        written[self.name] = text
+
+    monkeypatch.setattr(tool, "compile_catalogue", lambda catalogue, code=None: b"")
+    monkeypatch.setattr(Path, "write_bytes", lambda self, data: None)
+    monkeypatch.setattr(Path, "write_text", capture)
+    assert tool.cmd_compile() == 0
+    assert written["status.json"] == tool._status_text(tool.build_report())

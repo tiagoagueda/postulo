@@ -100,6 +100,10 @@ dev = [
     "pre-commit>=4.0",
     "django-stubs[compatible-mypy]>=5.1 ; python_version < '3.14'",
     "pytest-xdist>=3.8",
+    # Weblate's own PO writer, at the version translate.tiagoagueda.com runs (Weblate
+    # 2026.9.1): tests/test_po_roundtrip.py proves a file either side writes is one the other
+    # leaves alone. Moved together with Weblate, never on its own (#349).
+    "translate-toolkit==3.19.19",
 ]
 e2e = [
     "playwright>=1.62",

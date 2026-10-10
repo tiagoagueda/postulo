@@ -193,16 +193,26 @@ def test_every_language_has_a_catalogue_with_the_right_plural_rule(name, code, c
     A catalogue with the wrong number of plural slots cannot be filled correctly later, so
     this is the thing to get right before anybody starts translating rather than after.
     """
+    from postulo.core.messages_tool import same_plural_rule
+
     catalogue = catalogues[name, code]
     assert catalogue.messages, f"{name} {code}: empty catalogue"
-    assert catalogue.header["Plural-Forms"] == languages.PLURAL_FORMS[code]
+    # The same rule, however it is spelt: Weblate writes its own spelling of it (#349).
+    assert same_plural_rule(catalogue.header["Plural-Forms"], languages.PLURAL_FORMS[code])
 
 
 # `scripts/messages.py check` in CI's Checks job, once per push (#725).
 @pytest.mark.step
 @pytest.mark.parametrize(("name", "code"), EVERY, ids=str)
 def test_every_translation_keeps_its_placeholders_and_plural_forms(name, code, catalogues, tool):
-    problems = tool.problems_in(catalogues[name, code], code)
+    """Every reviewed one. A draft with a problem is a machine translation nobody has read,
+    left out of the .mo file and shown to its next reader in Weblate (#706)."""
+    problems = [
+        problem
+        for message in catalogues[name, code].messages.values()
+        if not message.draft
+        for problem in tool.message_problems(message, code)
+    ]
     assert not problems, "\n".join(problems[:10])
 
 
@@ -229,25 +239,22 @@ def test_the_catalogues_are_current(name, tool):
 @pytest.mark.step
 @pytest.mark.parametrize("name", NAMES)
 def test_the_catalogues_are_what_a_fresh_extraction_writes(name, tool):
-    """Byte for byte, dates aside -- which is a stricter question than the one above.
+    """Byte for byte -- which is a stricter question than the one above.
 
     The test before this compares the *set* of messages, so a catalogue keeps passing it
     while the `#:` lines beside every string name source lines that have moved. That is
     what `scripts/messages.py extract --check` catches, it runs in CI, and it was the only
     one of the pair the suite did not ask -- so a local run said "no problems" about a tree
-    CI then refused (#292).
+    CI then refused (#292). There are no dates to set aside any more: the tool writes
+    none, and the ones Weblate writes it keeps as found (#349).
     """
-    from postulo.core.messages_tool import _without_dates
-
     subject = next(s for s in SETS if s.name == name)
     extracted = tool.extract_all(subject)
     for code in CODES:
         path = tool.po_path(code, subject)
         current = path.read_text(encoding="utf-8")
         fresh = tool.dump(tool.merge(extracted, tool.parse(current), code), code, subject)
-        assert _without_dates(current) == _without_dates(fresh), (
-            f"{name} {code}: run scripts/messages.py extract"
-        )
+        assert current == fresh, f"{name} {code}: run scripts/messages.py extract"
 
 
 def test_a_string_belongs_to_exactly_one_set(tool):

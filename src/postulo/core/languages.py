@@ -652,8 +652,9 @@ def locale_dir_name(code: str) -> str:
 def translation_status() -> dict[str, dict[str, int]]:
     """How far along each catalogue is, from the ``status.json`` the tooling writes.
 
-    Read once per process; the file changes only when a catalogue does, and the tooling
-    rewrites it then. An installation without the file simply shows names alone.
+    ``scripts/messages.py compile`` writes it beside the .mo files, at build time, and it is
+    not committed (#349). Read once per process. An installation without the file -- a
+    checkout nobody compiled -- simply shows names alone.
     """
     global _STATUS
     if _STATUS is None:
@@ -725,11 +726,9 @@ class TranslationProgress:
 
     ``status.json`` counts what ``scripts/messages.py stats`` finds in the catalogues:
     ``translated`` is every string with something written in each form, ``drafts`` those
-    of them still flagged ``draft``, and ``reviewed`` those of them flagged neither
-    ``draft`` nor ``fuzzy`` -- what a speaker has read and settled. A ``fuzzy`` string with
-    text in it is therefore translated and not reviewed, and lands with the drafts, which
-    is where it belongs: somebody wrote it and nobody has settled it. One with nothing
-    written is untranslated, like any other string with nothing written.
+    of them flagged ``fuzzy`` -- written by a machine, *needs editing* in Weblate -- and
+    ``reviewed`` the rest: what a speaker saved in Weblate, which clears the flag (#706).
+    One with nothing written is untranslated, like any other string with nothing written.
     """
 
     total: int

@@ -104,7 +104,7 @@ def test_every_string_came_across(catalogues):
 
 def test_nothing_is_claimed_as_reviewed(catalogues):
     """Complete and unread are not the same thing, and the flag is what says which."""
-    unflagged = [m.msgid for m in catalogues[VARIANT].messages.values() if "draft" not in m.flags]
+    unflagged = [m.msgid for m in catalogues[VARIANT].messages.values() if not m.draft]
     assert not unflagged, f"{len(unflagged)} strings look reviewed, e.g. {unflagged[:3]}"
 
 

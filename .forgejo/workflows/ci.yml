@@ -308,12 +308,13 @@ jobs:
           DJANGO_SETTINGS_MODULE: postulo.config.settings.test
 
       - name: Check the translation catalogues are current and consistent
-        # Every string in the source has a slot in every catalogue, every translation
-        # keeps the placeholders of its original, and the plural rules match the table.
+        # Every string in the source has a slot in every catalogue, in the exact layout
+        # Weblate writes, every reviewed translation keeps the placeholders of its
+        # original, and the plural rules match the table. `status.json` is not checked:
+        # `compile` writes it at build time (#349).
         run: |
           uv run python scripts/messages.py extract --check
           uv run python scripts/messages.py check
-          uv run python scripts/messages.py stats --check
 
       - name: Production settings deployment check
         # check --deploy, and collectstatic with the manifest storage the image uses,

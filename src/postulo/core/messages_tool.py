@@ -7,23 +7,30 @@ that every contributor and every build can run it.
 
     uv run python scripts/messages.py extract          # refresh every .po from the source
     uv run python scripts/messages.py extract --check  # fail if a .po is out of date
-    uv run python scripts/messages.py compile          # write the .mo files Django loads
-    uv run python scripts/messages.py stats [--write|--check]  # how far along each language is
+    uv run python scripts/messages.py compile          # the .mo files Django loads, and status.json
+    uv run python scripts/messages.py stats            # how far along each language is
     uv run python scripts/messages.py check            # placeholders and plural forms agree
 
-**A plugin repository runs the same four commands against itself** as ``postulo-messages``,
+**A plugin repository runs the same commands against itself** as ``postulo-messages``,
 the console script this module is installed as, from the repository's root (#187). A
 plugin is a project like Postulo's own -- a ``pyproject.toml``, a package under ``src/``,
-a ``locale/`` inside it -- and the rule is the same on both sides of the plugin boundary:
-English is the source, French and European Portuguese while working, the full set at a
-release. Until this, an official plugin had a copy of the compiler and two catalogues
-made by hand, and no way to make the other sixty-six at all. :func:`use` points the
-module at a project; the script points it at the current directory.
+a ``locale/`` inside it -- and the rule is the same on both sides of the plugin boundary.
+:func:`use` points the module at a project; the script points it at the current directory.
 
-One deliberate difference from ``msgfmt``: an entry flagged ``draft`` — a machine-assisted
-translation nobody has reviewed yet — is compiled, so a language is usable on day one.
-An entry flagged ``fuzzy`` is not, as everywhere else. Reviewing a draft means reading it
-and deleting the flag.
+**This tool writes slots, never translations (#706).** Every translation is made in
+Weblate, which commits it back as a pull request; what this writes is the English, the
+empty slot beside it, and the layout. So the layout is Weblate's own -- translate-toolkit's
+at a line width of 65535: a value is split only after a newline, flags are sorted,
+references name a file and not a line, and no header carries a date this tool sets -- and a
+file either side writes is one the other leaves byte for byte as it found it
+(``tests/test_po_roundtrip.py``).
+
+One deliberate difference from ``msgfmt``: an entry flagged ``fuzzy`` -- a draft, written by
+a machine and not yet read by a speaker, which Weblate shows as *needs editing* -- is
+compiled, so a language is usable on day one, unless it would fail to format. Reviewing a
+draft means saving it in Weblate as translated, which clears the flag. ``msgfmt`` users
+need ``--use-fuzzy`` to see the same. The flag used to be called ``draft``; ``extract``
+renames it.
 """
 
 from __future__ import annotations
@@ -230,6 +237,11 @@ def core_set() -> CatalogueSet:
 
 PLACEHOLDER = re.compile(r"%\((\w+)\)[sdifr]|%[sdifr%]|\{(\w*)\}")
 
+#: What marks a draft. ``fuzzy`` is gettext's and Weblate's; ``draft`` is what this tool
+#: wrote before Weblate held the translations, and ``merge`` renames it.
+DRAFT = "fuzzy"
+DRAFT_FLAGS = frozenset({DRAFT, "draft"})
+
 
 # ------------------------------------------------------------------ the model
 
@@ -252,6 +264,11 @@ class Message:
     @property
     def translated(self) -> bool:
         return all(form for form in self.msgstr)
+
+    @property
+    def draft(self) -> bool:
+        """Written and not yet read by a speaker: ``fuzzy``, or ``draft`` as it was called."""
+        return bool(DRAFT_FLAGS & set(self.flags))
 
     @property
     def python_format(self) -> bool:
@@ -335,7 +352,10 @@ def extract_python(source: str, origin: str) -> list[Message]:
             args, i = _strings_in(tokens, i + 1)
             msgid = args[msg_index] if len(args) > msg_index else None
             if msgid:
-                message = Message(msgid=msgid, references=[f"{origin}:{tok.start[0]}"])
+                # The file, not the line: a line number moves whenever anything above the
+                # call does, which rewrote the reference beside a translation Weblate was
+                # changing and made the two conflict on every rebase (#349).
+                message = Message(msgid=msgid, references=[origin])
                 if plural_index is not None and len(args) > plural_index and args[plural_index]:
                     message.plural = args[plural_index]
                 if context_index is not None and len(args) > context_index:
@@ -413,7 +433,9 @@ def extract_all(subject: CatalogueSet | None = None) -> dict[tuple[str | None, s
 
 def _reference_key(reference: str):
     path, _, line = reference.rpartition(":")
-    return (path, int(line) if line.isdigit() else 0)
+    if not line.isdigit():
+        return (reference, 0)  # a file alone, which is what extraction writes now
+    return (path, int(line))
 
 
 # ------------------------------------------------------------------ .po files
@@ -433,15 +455,21 @@ def _quote(text: str) -> str:
     return f'"{escaped}"'
 
 
+#: One segment of a value as translate-toolkit lays it out: up to and including a newline.
+_SEGMENT = re.compile(r"[^\n]*\n|[^\n]+")
+
+
 def _write_field(out: list[str], name: str, value: str) -> None:
-    if "\n" in value.rstrip("\n") or len(value) > 72:
+    """A value as Weblate writes it at a line width of 65535: one line per newline.
+
+    Split after each newline and nowhere else; a value of one segment stays on the keyword's
+    line however long it is, and one of several starts with ``""``. That is exactly what
+    translate-toolkit writes, so an entry Weblate re-saves comes back unchanged.
+    """
+    segments = _SEGMENT.findall(value)
+    if len(segments) >= 2:
         out.append(f'{name} ""')
-        parts = value.split("\n")
-        for index, part in enumerate(parts):
-            if index < len(parts) - 1:
-                out.append(_quote(part + "\n"))
-            elif part:
-                out.append(_quote(part))
+        out.extend(_quote(segment) for segment in segments)
     else:
         out.append(f"{name} {_quote(value)}")
 
@@ -466,7 +494,8 @@ def dump(catalogue: Catalogue, code: str, subject: CatalogueSet | None = None) -
         for chunk in _chunks(message.references, 76):
             out.append("#: " + " ".join(chunk))
         if message.flags:
-            out.append("#, " + ", ".join(message.flags))
+            # Sorted, because translate-toolkit sorts a flag line whenever it rewrites one.
+            out.append("#, " + ", ".join(sorted(message.flags)))
         if message.context is not None:
             _write_field(out, "msgctxt", message.context)
         _write_field(out, "msgid", message.msgid)
@@ -587,9 +616,23 @@ def translated_languages() -> list[str]:
     return [code for code, _name in LANGUAGES if code != SOURCE]
 
 
+#: Header keys Weblate writes when a translation is saved, kept here as found.
+WEBLATE_KEYS = ("PO-Revision-Date", "Last-Translator", "Language-Team", "X-Generator")
+
+
 def header_for(code: str, existing: dict[str, str]) -> dict[str, str]:
-    now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M%z")
+    """The header, in a fixed order, owning only what is this project's to say.
+
+    No ``POT-Creation-Date``: a date rewritten on every extraction is a line changed in
+    every catalogue on every commit, next to the lines Weblate changes when it saves a
+    translation, and that was a conflict on every rebase (#349). The keys Weblate writes are
+    kept as found, and so is a ``Plural-Forms`` that says the same as ours in Weblate's
+    spelling. Any other key a writer added is kept after these.
+    """
     current = project()
+    today = datetime.now(UTC).strftime("%Y-%m-%d %H:%M%z")
+    ours = PLURAL_FORMS.get(code, "nplurals=2; plural=(n != 1);")
+    found = existing.get("Plural-Forms", "")
     header = {
         "Project-Id-Version": "Postulo" if current.is_postulo else current.name,
         "Report-Msgid-Bugs-To": (
@@ -597,22 +640,51 @@ def header_for(code: str, existing: dict[str, str]) -> dict[str, str]:
             if current.is_postulo
             else current.issues_url
         ),
-        "POT-Creation-Date": now,
-        "PO-Revision-Date": existing.get("PO-Revision-Date", now),
+        "PO-Revision-Date": existing.get("PO-Revision-Date", today),
         "Last-Translator": existing.get("Last-Translator", "Postulo contributors"),
         "Language-Team": existing.get("Language-Team", NATIVE_NAMES.get(code, code)),
         "Language": code.replace("-", "_") if "-" not in code else _django_locale(code),
         "MIME-Version": "1.0",
         "Content-Type": "text/plain; charset=UTF-8",
         "Content-Transfer-Encoding": "8bit",
-        "Plural-Forms": PLURAL_FORMS.get(code, "nplurals=2; plural=(n != 1);"),
-        "X-Generator": "postulo scripts/messages.py" if current.is_postulo else "postulo-messages",
+        "Plural-Forms": found if found and same_plural_rule(found, ours) else ours,
+        "X-Generator": existing.get(
+            "X-Generator",
+            "postulo scripts/messages.py" if current.is_postulo else "postulo-messages",
+        ),
     }
     if not header["Report-Msgid-Bugs-To"]:
         del header["Report-Msgid-Bugs-To"]
-    if "--check" in sys.argv:
-        header["POT-Creation-Date"] = existing.get("POT-Creation-Date", now)
+    for key, value in existing.items():
+        if key not in header and key not in ("POT-Creation-Date", "Report-Msgid-Bugs-To"):
+            header[key] = value
     return header
+
+
+def _plural_rule(header: str):
+    """``(nplurals, function)`` for a ``Plural-Forms`` value, or None if it cannot be read."""
+    number = re.search(r"nplurals\s*=\s*(\d+)", header)
+    formula = re.search(r"plural\s*=\s*(.+?)\s*;?\s*$", header)
+    if not number or not formula:
+        return None
+    try:
+        return int(number.group(1)), gettext.c2py(formula.group(1))
+    except ValueError:
+        return None
+
+
+@functools.cache
+def same_plural_rule(one: str, other: str) -> bool:
+    """Whether two ``Plural-Forms`` values say the same thing, however each is spelt.
+
+    Weblate writes its own spelling of a rule -- ``n > 1`` for ``(n > 1)`` -- and a check that
+    compared the text failed every catalogue it saved. The same number of forms, and the
+    same form for every count up to a thousand, is the same rule.
+    """
+    a, b = _plural_rule(one), _plural_rule(other)
+    if a is None or b is None or a[0] != b[0]:
+        return False
+    return all(a[1](n) == b[1](n) for n in range(1001))
 
 
 def _django_locale(code: str) -> str:
@@ -639,9 +711,12 @@ def merge(extracted: dict, existing: Catalogue | None, code: str) -> Catalogue:
         if previous is not None:
             message.translator = list(previous.translator)
             for flag in previous.flags:
+                # `draft` was this tool's word for what gettext and Weblate call `fuzzy`.
+                flag = DRAFT if flag in DRAFT_FLAGS else flag
                 if flag not in message.flags and flag != "python-format":
                     message.flags.append(flag)
             message.msgstr = list(previous.msgstr)
+        message.flags.sort()
         wanted = forms if message.plural is not None else 1
         message.msgstr = (message.msgstr + [""] * wanted)[:wanted]
         messages[key] = message
@@ -669,7 +744,7 @@ def cmd_extract(check: bool) -> int:
             text = dump(catalogue, code, subject)
             if check:
                 current = path.read_text(encoding="utf-8") if path.exists() else ""
-                if _without_dates(current) != _without_dates(text):
+                if current != text:
                     stale.append(str(path.relative_to(project().root)))
                 continue
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -686,20 +761,26 @@ def cmd_extract(check: bool) -> int:
     return 0
 
 
-def _without_dates(text: str) -> str:
-    return re.sub(r'"(POT-Creation|PO-Revision)-Date: [^"]*"', "", text)
-
-
 # -------------------------------------------------------------------- .mo files
 
 
-def compile_catalogue(catalogue: Catalogue) -> bytes:
-    """A GNU .mo file: the entries with a translation, ``fuzzy`` ones left out."""
+def compile_catalogue(catalogue: Catalogue, code: str | None = None) -> bytes:
+    """A GNU .mo file: every entry with a translation, drafts included.
+
+    A draft is compiled because a language is meant to be usable on the day it is drafted.
+    Not a draft that would fail to format, though: a machine translation nobody has read
+    may have lost a placeholder, and the page that formats it would raise. Given the
+    language's ``code`` that is checked; a draft with a problem is left out and shows in
+    English, and ``check`` names it.
+    """
+    code = code or _code_of(catalogue)
     entries: list[tuple[bytes, bytes]] = []
     header = "".join(f"{k}: {v}\n" for k, v in catalogue.header.items())
     entries.append((b"", header.encode()))
     for message in catalogue.messages.values():
-        if "fuzzy" in message.flags or not message.translated:
+        if not message.translated:
+            continue
+        if message.draft and code and message_problems(message, code):
             continue
         key = message.msgid
         if message.context is not None:
@@ -745,7 +826,22 @@ def cmd_compile() -> int:
             path.with_suffix(".mo").write_bytes(compile_catalogue(catalogue))
             written += 1
     print(f"{written} catalogues compiled.")
+    if project().is_postulo:
+        # Built with the .mo files rather than committed: every translation saved in
+        # Weblate changes it, and a committed copy made every one of Weblate's pull
+        # requests stale the moment it was opened (#349).
+        status = project().locale / "status.json"
+        status.write_text(_status_text(build_report()), encoding="utf-8", newline="\n")
+        print(f"written {status.relative_to(project().root)}")
     return 0
+
+
+def _code_of(catalogue: Catalogue) -> str | None:
+    """The language a catalogue is in, from its ``Language`` header."""
+    from django.utils.translation import to_language
+
+    language = catalogue.header.get("Language", "")
+    return find(to_language(language)) if language else None
 
 
 # ----------------------------------------------------------------------- checks
@@ -795,42 +891,56 @@ def _fails_to_format(source: str, form: str, singular: bool) -> str | None:
 
 def problems_in(catalogue: Catalogue, code: str) -> list[str]:
     found: list[str] = []
+    for message in catalogue.messages.values():
+        found.extend(message_problems(message, code))
+    return found
+
+
+def message_problems(message: Message, code: str) -> list[str]:
+    """What is wrong with one translated entry: its plural forms and its placeholders."""
+    found: list[str] = []
+    if not message.translated:
+        return found
     forms = nplurals(code)
     beyond = counts_beyond_one(code)
-    for message in catalogue.messages.values():
-        if not message.translated:
+    if message.plural is not None and len(message.msgstr) != forms:
+        found.append(f"{message.msgid!r}: {len(message.msgstr)} forms, {code} has {forms}")
+    sources_ = [message.msgid] if message.plural is None else [message.msgid, message.plural]
+    expected = {p for s in sources_ for p in placeholders(s)}
+    named = {p for p in expected if p.startswith("%(") or p.startswith("{")}
+    python_format = "python-format" in message.flags or any(
+        "%" in p for s_ in sources_ for p in placeholders(s_)
+    )
+    for index, form in enumerate(message.msgstr):
+        got = set(placeholders(form))
+        if python_format and (
+            error := _fails_to_format(message.msgid, form, message.plural is None)
+        ):
+            found.append(f"{message.msgid!r} → {form!r}: would fail to format ({error})")
             continue
-        if message.plural is not None and len(message.msgstr) != forms:
-            found.append(f"{message.msgid!r}: {len(message.msgstr)} forms, {code} has {forms}")
-        sources_ = [message.msgid] if message.plural is None else [message.msgid, message.plural]
-        expected = {p for s in sources_ for p in placeholders(s)}
-        named = {p for p in expected if p.startswith("%(") or p.startswith("{")}
-        python_format = "python-format" in message.flags or any(
-            "%" in p for s_ in sources_ for p in placeholders(s_)
-        )
-        for index, form in enumerate(message.msgstr):
-            got = set(placeholders(form))
-            if python_format and (
-                error := _fails_to_format(message.msgid, form, message.plural is None)
-            ):
-                found.append(f"{message.msgid!r} → {form!r}: would fail to format ({error})")
-                continue
-            counts_higher = index < len(beyond) and beyond[index]
-            # A form that only ever says *one* may drop the count ("one application"); a
-            # form that also counts higher must carry every named placeholder; and nothing
-            # may be invented.
-            if not got <= expected or (named and message.plural is None and got != expected):
-                found.append(f"{message.msgid!r} → {form!r}: placeholders differ")
-            elif message.plural is not None and named - got and counts_higher:
-                found.append(
-                    f"{message.msgid!r} → {form!r}: form {index} also counts higher than one, "
-                    f"so it cannot drop {sorted(named - got)}"
-                )
+        counts_higher = index < len(beyond) and beyond[index]
+        # A form that only ever says *one* may drop the count ("one application"); a
+        # form that also counts higher must carry every named placeholder; and nothing
+        # may be invented.
+        if not got <= expected or (named and message.plural is None and got != expected):
+            found.append(f"{message.msgid!r} → {form!r}: placeholders differ")
+        elif message.plural is not None and named - got and counts_higher:
+            found.append(
+                f"{message.msgid!r} → {form!r}: form {index} also counts higher than one, "
+                f"so it cannot drop {sorted(named - got)}"
+            )
     return found
 
 
 def cmd_check() -> int:
-    failures = 0
+    """Fail on a problem in a reviewed entry; name the ones in drafts.
+
+    A draft with a problem is a machine translation nobody has read: it is not compiled
+    (`compile_catalogue`), so it cannot break a page, and Weblate shows the same failing
+    check beside it for whoever reads it next. Failing the build on it would turn every one
+    of Weblate's pull requests red for something only a speaker can fix.
+    """
+    failures = warnings = 0
     for subject in catalogue_sets():
         where = "" if subject.is_core else f"{subject.name} "
         for code in translated_languages():
@@ -841,12 +951,19 @@ def cmd_check() -> int:
                 continue
             catalogue = parse(path.read_text(encoding="utf-8"))
             plural_forms = catalogue.header.get("Plural-Forms", "")
-            if plural_forms != PLURAL_FORMS.get(code):
-                print(f"{where}{code}: Plural-Forms header differs from postulo.core.languages")
+            if not same_plural_rule(plural_forms, PLURAL_FORMS.get(code, "")):
+                print(f"{where}{code}: Plural-Forms is not the rule postulo.core.languages has")
                 failures += 1
-            for problem in problems_in(catalogue, code):
-                print(f"{where}{code}: {problem}")
-                failures += 1
+            for message in catalogue.messages.values():
+                for problem in message_problems(message, code):
+                    if message.draft:
+                        print(f"{where}{code}: (draft, not compiled) {problem}")
+                        warnings += 1
+                    else:
+                        print(f"{where}{code}: {problem}")
+                        failures += 1
+    if warnings:
+        print(f"{warnings} draft(s) with a problem, left out of the .mo files")
     print("no problems" if not failures else f"{failures} problem(s)")
     return 1 if failures else 0
 
@@ -858,28 +975,18 @@ def stats_for(catalogue: Catalogue) -> dict[str, int]:
     """How far along one catalogue is.
 
     ``translated`` is every string with something written in each form, and ``drafts`` and
-    ``reviewed`` divide some of those between them: a draft is still flagged ``draft``, and
-    a reviewed string is flagged neither ``draft`` nor ``fuzzy``. A ``fuzzy`` one is left
-    out of both on purpose. It is not compiled, so nobody reads it, and nobody has settled
-    it either; counting it as reviewed, which ``translated - drafts`` did, would draw
-    somebody's unsettled doubt in the colour of a speaker's approval (#312). ``fuzzy``
-    counts every string so flagged, translated or not.
+    ``reviewed`` divide all of those between them: a draft is flagged ``fuzzy`` (Weblate's
+    *needs editing*), and a reviewed string is one a speaker saved in Weblate, which clears
+    the flag (#312, #706).
     """
     total = len(catalogue.messages)
     translated = sum(1 for m in catalogue.messages.values() if m.translated)
-    drafts = sum(1 for m in catalogue.messages.values() if m.translated and "draft" in m.flags)
-    fuzzy = sum(1 for m in catalogue.messages.values() if "fuzzy" in m.flags)
-    reviewed = sum(
-        1
-        for m in catalogue.messages.values()
-        if m.translated and "draft" not in m.flags and "fuzzy" not in m.flags
-    )
+    drafts = sum(1 for m in catalogue.messages.values() if m.translated and m.draft)
     return {
         "total": total,
         "translated": translated,
         "drafts": drafts,
-        "fuzzy": fuzzy,
-        "reviewed": reviewed,
+        "reviewed": translated - drafts,
         "percent": round(100 * translated / total) if total else 0,
     }
 
@@ -925,27 +1032,16 @@ def build_report() -> dict[str, dict[str, int]]:
     return report
 
 
-def cmd_stats(write: bool, check: bool = False) -> int:
-    """Print the report; --write stores it, --check fails if the stored one is stale (#495)."""
+def cmd_stats() -> int:
+    """Print the report. ``compile`` writes it to ``locale/status.json`` for the picker."""
     report = build_report()
     width = max((len(NATIVE_NAMES[c]) for c in report), default=10)
     for code, row in report.items():
         state = f"{row['percent']:3d} %"
         if row["drafts"]:
             state += f"  ({row['drafts']} draft)"
-        if row["fuzzy"]:
-            state += f"  ({row['fuzzy']} fuzzy)"
         counts = f"{row['translated']:4}/{row['total']:<4}"
         print(f"{code:6} {NATIVE_NAMES[code]:{width}}  {counts} {state}")
-    status = project().locale / "status.json"
-    if check:
-        stored = status.read_text(encoding="utf-8") if status.exists() else None
-        if stored != _status_text(report):
-            print("locale/status.json is out of date: run `stats --write`", file=sys.stderr)
-            return 1
-    if write:
-        status.write_text(_status_text(report), encoding="utf-8", newline="\n")
-        print(f"written to {status.relative_to(project().root)}")
     return 0
 
 
@@ -963,13 +1059,9 @@ def main(argv: list[str] | None = None) -> int:
     extract.add_argument(
         "--check", action="store_true", help="only report whether they are current"
     )
-    sub.add_parser("compile", help="write the .mo files")
+    sub.add_parser("compile", help="write the .mo files, and locale/status.json")
     sub.add_parser("check", help="placeholders and plural forms agree")
-    stats = sub.add_parser("stats", help="how far along each language is")
-    stats.add_argument("--write", action="store_true", help="also write locale/status.json")
-    stats.add_argument(
-        "--check", action="store_true", help="fail if locale/status.json is out of date"
-    )
+    sub.add_parser("stats", help="how far along each language is")
     args = parser.parse_args(argv)
     project()
     if args.command == "extract":
@@ -978,4 +1070,4 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_compile()
     if args.command == "check":
         return cmd_check()
-    return cmd_stats(args.write, args.check)
+    return cmd_stats()

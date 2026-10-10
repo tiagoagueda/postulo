@@ -4,7 +4,7 @@ repository. A plugin repository runs the same tool as `postulo-messages` (#187).
     uv run python scripts/messages.py extract          # refresh every .po from the source
     uv run python scripts/messages.py extract --check  # fail if a .po is out of date
     uv run python scripts/messages.py compile          # write the .mo files Django loads
-    uv run python scripts/messages.py stats [--write]  # how far along each language is
+    uv run python scripts/messages.py stats            # how far along each language is
     uv run python scripts/messages.py check            # placeholders and plural forms agree
 """
 

@@ -157,8 +157,8 @@ and `compilemessages` shell out to `xgettext` and `msgfmt` for:
 uv run python scripts/messages.py extract          # refresh every catalogue from the source
 uv run python scripts/messages.py extract --check  # fail if a catalogue is out of date (CI)
 uv run python scripts/messages.py check            # placeholders and plural forms agree (CI)
-uv run python scripts/messages.py compile          # write the .mo files Django loads
-uv run python scripts/messages.py stats [--write|--check]  # progress; --write refreshes status.json, --check (CI) fails if stale
+uv run python scripts/messages.py compile          # write the .mo files Django loads, and status.json
+uv run python scripts/messages.py stats            # how far along each language is
 ```
 
 `extract` keeps every existing translation and its flags, adds a slot for each new string
@@ -167,8 +167,9 @@ invented a `%(placeholder)s`, a plural entry with the wrong number of forms for 
 language, and a plural form that drops the count where its rule also covers twenty-one. Both run on every push, so a pull request that adds a string without a slot for
 it, or a translation that would raise at render time, does not get in.
 
-Compiled `.mo` files are build artefacts and are not committed; the container image, the
-release wheel and the test suite each compile their own.
+Compiled `.mo` files are build artefacts and are not committed, and neither is
+`locale/status.json`, which `compile` writes beside them for the language picker; the
+container image, the release wheel and the test suite each compile their own.
 
 Every command walks **every set of catalogues**, not only Postulo's own: a plugin Postulo
 ships carries its own, beside its package. `extract` writes each string to the set that
@@ -184,8 +185,7 @@ Any text editor works; [Poedit](https://poedit.net/) or a similar tool shows the
 beside the translation and knows the plural forms. Either way:
 
 1. Edit `src/postulo/locale/<locale>/LC_MESSAGES/django.po`.
-2. `uv run python scripts/messages.py check`, then `stats --write` so the picker's note
-   about the language stays true.
+2. `uv run python scripts/messages.py check`.
 3. Open a pull request. A reviewer who speaks the language is ideal; one who can read a
    diff and run the checks is enough.
 
@@ -259,7 +259,7 @@ help rather than fight that.
    no work — that was done in #67 and is held by a lint and a browser suite that visits the
    application in a right-to-left language.
 4. `uv run python scripts/messages.py extract` creates the catalogue.
-5. Translate, `check`, `stats --write`, and open a pull request.
+5. Translate, `check`, and open a pull request.
 
 ## Adding a language without a developer
 
