@@ -7,9 +7,9 @@
 #
 # ci.yml has no `permissions:` block because Forgejo 16 ignores the field and warns about
 # it; what a job may do beyond reading is granted by the instance's Authorized Integrations.
-# Every job in ci.yml only reads, so the audit that asks for the block is turned off for
-# that one file and nowhere else: the workflows that write (releases, the registry, the
-# dependency pull request) are still held to it.
+# The same goes for release.yml, image.yml and dev-image.yml, whose writes go through the
+# automatic token (releases) or a secret (the registry), neither of which a block could change
+# (#727). dependencies.yml keeps its block until its token question is settled.
 rules:
   unpinned-uses:
     config:
@@ -18,3 +18,6 @@ rules:
   excessive-permissions:
     ignore:
       - ci.yml
+      - release.yml
+      - image.yml
+      - dev-image.yml

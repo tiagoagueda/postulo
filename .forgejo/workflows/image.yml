@@ -34,18 +34,16 @@ on:
         description: "The release tag to build, for example v0.3.0"
         required: true
 
-# Nothing is granted by default; this needs to read the code and write to the registry.
-permissions: {}
+# There is no `permissions:` block on purpose: Forgejo 16 ignores the field and warns about it
+# on every job. The registry is written with the REGISTRY_USER and REGISTRY_TOKEN secrets, and the
+# bill of materials is attached to the release with the automatic token, which can write
+# releases (checked on 16.0.5).
+# `.forgejo/zizmor.yml` says the same to zizmor, which would otherwise ask for the block (#727).
 
 jobs:
   image:
     name: "Release image: build, scan, push"
     runs-on: docker
-    permissions:
-      # `contents: write` is for one thing: attaching the bill of materials to the release
-      # once the image is known to be in the registry. The checkout does not keep the token.
-      contents: write
-      packages: write
     steps:
       - uses: actions/checkout@v4
         with:

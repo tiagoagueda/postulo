@@ -23,8 +23,10 @@ on:
   push:
     tags: ["v*"]
 
-# Nothing is granted by default; the release job needs to write releases, nothing else.
-permissions: {}
+# There is no `permissions:` block on purpose: Forgejo 16 ignores the field and warns about it
+# on every job. The release job creates the release and attaches the files with the
+# automatic token, which Forgejo lets write releases without being asked (checked on 16.0.5).
+# `.forgejo/zizmor.yml` says the same to zizmor, which would otherwise ask for the block (#727).
 
 env:
   # The same pin as ci.yml, .pre-commit-config.yaml and docker/Dockerfile (#233).
@@ -34,8 +36,6 @@ jobs:
   release:
     name: Publish the release
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     container:
       image: node:22-bookworm
     steps:
