@@ -245,7 +245,8 @@ def cmd_components(args) -> int:
 
 def cmd_configure(args) -> int:
     for component in chosen(args.components):
-        settings = dict(LAYOUT)
+        # The layout is gettext's; the extensions' WebExtension JSON components keep theirs.
+        settings = dict(LAYOUT) if component.get("file_format") == "po" else {}
         if args.round_trip and not linked(component):
             settings.update(ROUND_TRIP)
             repo = str(component.get("repo", ""))
