@@ -231,6 +231,8 @@ ACCOUNT_FORMS = {
     "change_password": "postulo.accounts.forms.ChangePasswordForm",
     "set_password": "postulo.accounts.forms.SetPasswordForm",
     "reset_password_from_key": "postulo.accounts.forms.ResetPasswordKeyForm",
+    "reset_password": "postulo.accounts.forms.ResetPasswordForm",
+    "request_login_code": "postulo.accounts.forms.RequestLoginCodeForm",
 }
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"

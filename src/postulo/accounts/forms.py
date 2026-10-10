@@ -5,9 +5,12 @@ from __future__ import annotations
 import re
 import zoneinfo
 
+from allauth.account import app_settings as allauth_settings
 from allauth.account.adapter import get_adapter
 from allauth.account.forms import ChangePasswordForm as AllauthChangePasswordForm
 from allauth.account.forms import LoginForm as AllauthLoginForm
+from allauth.account.forms import RequestLoginCodeForm as AllauthRequestLoginCodeForm
+from allauth.account.forms import ResetPasswordForm as AllauthResetPasswordForm
 from allauth.account.forms import ResetPasswordKeyForm as AllauthResetPasswordKeyForm
 from allauth.account.forms import SetPasswordForm as AllauthSetPasswordForm
 from allauth.account.forms import SignupForm as AllauthSignupForm
@@ -36,7 +39,7 @@ from postulo.core import (
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import addressing, avatars, identifiers
+from . import addresses, addressing, avatars, identifiers
 from .models import ADDRESSING_MAX_LENGTH, Invite, PersonIdentifier, Profile
 
 
@@ -66,6 +69,38 @@ class LoginForm(AllauthLoginForm):
         self.fields["login"].label = _("Username or email")
         if "remember" in self.fields:
             self.fields["remember"].label = _("Stay signed in on this device")
+
+
+class ResetPasswordForm(AllauthResetPasswordForm):
+    """A reset key is only mailed to an address its account has verified.
+
+    allauth looks the address up and, when nobody holds it verified, falls back to an
+    unverified claim. A member can store any unused address as an unverified claim on their
+    own account, so the address's real holder, asking for a reset, was handed the claimant's
+    account together with its username (#731). An address nobody has proved is not a
+    credential. The answer for an address that matches no account is the one allauth already
+    gives (the same page, no mail), so nothing here says which addresses are claimed.
+    """
+
+    def clean_email(self) -> str:
+        email = super().clean_email()
+        self.users = addresses.verified_holders(self.users, self.cleaned_data["email"])
+        if not self.users and not allauth_settings.PREVENT_ENUMERATION:
+            raise get_adapter().validation_error("unknown_email")
+        return email
+
+
+class RequestLoginCodeForm(AllauthRequestLoginCodeForm):
+    """A sign-in code is only mailed to an address its account has verified (#731)."""
+
+    def clean_email(self) -> str:
+        email = super().clean_email()
+        user = getattr(self, "_user", None)
+        if email and user is not None and not addresses.holds_verified(user, email):
+            self._user = None
+            if not allauth_settings.PREVENT_ENUMERATION:
+                raise get_adapter().validation_error("unknown_email")
+        return email
 
 
 class AddPasskeyForm(AllauthAddWebAuthnForm):

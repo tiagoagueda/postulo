@@ -33,3 +33,22 @@ def is_offered(person) -> bool:
     if len(addresses) > 1:
         return True
     return bool(addresses) and not addresses[0].verified
+
+
+def holds_verified(user, email: str) -> bool:
+    """Whether ``user`` has proved they hold ``email``, by a link sent to it.
+
+    allauth's lookups by address fall back to an *unverified* claim when nobody holds the
+    address verified, which is how somebody could store a stranger's address on their own
+    account and have a password reset, a sign-in code or a single sign-on login meant for
+    that stranger arrive in their account instead (#730, #731). Anything that acts on
+    behalf of an address asks this first.
+    """
+    from allauth.account.models import EmailAddress
+
+    return EmailAddress.objects.filter(user=user, email__iexact=email, verified=True).exists()
+
+
+def verified_holders(users, email: str) -> list:
+    """The accounts among ``users`` that hold ``email`` verified."""
+    return [user for user in users if holds_verified(user, email)]
