@@ -248,3 +248,30 @@ class RequestIDMiddleware:
             response = self.get_response(request)
         response[logs.REQUEST_ID_HEADER] = identifier
         return response
+
+
+class DownloadsAreNotCachedMiddleware:
+    """Anything handed over as a download is never kept by a cache (#788).
+
+    ``SECURITY.md`` promises that files are delivered with ``Cache-Control: no-store``, and
+    most downloads said so themselves: the vCards, the candidate file, the archive, uploaded
+    and rendered documents. The calendar file, the report as CSV and PDF and a contact's
+    data-subject export did not, an oversight rather than a decision, so interview dates,
+    company names and a person's own record could stay in a shared or proxy cache.
+
+    One rule at the edge instead of a line in every view that a new download could forget:
+    a response that is an attachment and does not already forbid storing is given
+    ``private, max-age=0, no-store``. A view that says something stricter keeps it.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        disposition = str(response.get("Content-Disposition", "")).lstrip().lower()
+        if disposition.startswith("attachment") and "no-store" not in response.get(
+            "Cache-Control", ""
+        ):
+            response["Cache-Control"] = "private, max-age=0, no-store"
+        return response

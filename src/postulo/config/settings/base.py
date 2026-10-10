@@ -111,6 +111,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
+    # Anything sent as an attachment is never kept by a cache (#788).
+    "postulo.core.middleware.DownloadsAreNotCachedMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     # After it, so `request.htmx` is there to read, and outside everything that answers a
