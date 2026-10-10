@@ -67,10 +67,13 @@ def first_account_is_the_administrator(request, user, **kwargs) -> None:
 def consume_invite(request, user, **kwargs) -> None:
     """Spend the invitation that permitted this signup.
 
-    An invitation addressed to one email address was delivered to that address, and
-    following its link is proof of holding the mailbox — the same proof a verification
-    link would give. So the address is recorded as verified here, before allauth decides
-    whether to send one, and the invited person is not asked to prove it twice.
+    An invitation bound to an address is *not* proof of holding that mailbox: Postulo
+    never sends the invitation, the administrator hands the link over however they like,
+    and whoever ends up holding it can type the bound address. Marking the address
+    verified here made a mis-delivered link a verified identity that was never proven, and
+    skipped the defences that rest on an address being verified (#732). So the address is
+    left for allauth's own verification, which mails a link to it, and the person proves it
+    the way anybody does.
 
     An invitation is one account. If it turns out to be spent already, by a sign-up that
     overlapped this one, and nothing else opened the door, this account is refused: the
@@ -80,12 +83,7 @@ def consume_invite(request, user, **kwargs) -> None:
 
     invite = pending_invite(request)
     if invite is not None:
-        if invite.accept(user):
-            if invite.email and invite.email.casefold() == (user.email or "").casefold():
-                EmailAddress.objects.filter(user=user, email__iexact=user.email).update(
-                    verified=True
-                )
-        elif not site.signup_open_now():
+        if not invite.accept(user) and not site.signup_open_now():
             raise PermissionDenied("This invitation has already been used.")
     request.session.pop(INVITE_SESSION_KEY, None)
 

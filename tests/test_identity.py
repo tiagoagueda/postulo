@@ -188,17 +188,24 @@ def test_an_unproven_address_cannot_sign_in_yet(client):
 # ----------------------------------------------------------------- invitations
 
 
-def test_an_invitation_to_an_address_is_proof_enough(client, settings, staff_user):
+def test_an_invitation_to_an_address_is_not_proof_of_the_mailbox(client, settings, staff_user):
+    """Postulo never sends the invitation, so following its link proves nothing (#732).
+
+    The administrator hands the link over however they like; whoever holds it can type the
+    address it is bound to. The address is verified the way any other is, by a link mailed
+    to it, and until then the account cannot sign in.
+    """
     settings.POSTULO_REGISTRATION_OPEN = False
     _invite, token = Invite.issue(created_by=staff_user, email="alex.morgan@example.org")
     client.get(reverse("accounts:invite_accept", args=[token]))
     response = client.post(reverse("account_signup"), SIGNUP)
     assert response.status_code == 302
-    assert response.url != reverse("account_email_verification_sent")
+    assert response.url == reverse("account_email_verification_sent")
     address = EmailAddress.objects.get(email="alex.morgan@example.org")
-    assert address.verified, "the link went to that mailbox; that is the proof"
-    assert not mail.outbox, "no second proof asked for"
-    assert response.wsgi_request.user.is_authenticated
+    assert not address.verified, "a link nobody mailed to that mailbox proves nothing about it"
+    assert [m.to for m in mail.outbox] == [["alex.morgan@example.org"]], "the real proof"
+    assert not response.wsgi_request.user.is_authenticated
+    assert Invite.objects.get(pk=_invite.pk).is_accepted, "and the invitation is spent"
 
 
 def test_an_open_invitation_still_needs_the_click(client, settings, staff_user):
