@@ -34,6 +34,7 @@ uv run pytest -n auto        # every core; plain `uv run pytest` is the same sui
                              # (CI runs `-n 2`: its jobs share one host, see ci.yml)
 uv run manage.py makemigrations --check --dry-run
 uv run pytest -m step         # the catalogue and static-file checks CI's Checks job runs
+uv run pytest -m heavy -p no:xdist  # what needs a process to itself; CI runs it after the suite
 npm run build:css            # only if you touched assets/css/ or a template's classes
 ```
 

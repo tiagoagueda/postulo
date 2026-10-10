@@ -38,8 +38,11 @@ WORST_CASES = {
 }
 
 
+#: Four times the size is `heavy`: run beside the rest of the suite, in a worker that has
+#: grown through thousands of tests, it pushed CI's 2 GB job container over and the kernel
+#: killed the worker (2026-10-10, three runs). Same cases, a process of their own.
 @pytest.mark.parametrize("name", WORST_CASES)
-@pytest.mark.parametrize("factor", [1, 4])
+@pytest.mark.parametrize("factor", [1, pytest.param(4, marks=pytest.mark.heavy)])
 def test_the_worst_cases_finish_in_bounded_time_and_still_pass_the_allowlist(name, factor):
     source = WORST_CASES[name] * factor
     started = time.monotonic()

@@ -16,6 +16,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- CI runs the four-times-size Markdown worst cases in a step of their own, one process, after the unit suite: beside it they pushed the job over its memory limit. (#830)
 - Translations are made in Weblate only: `docs/TRANSLATING.md`, the contributor guide and the assistant's instructions say how and what a commit may do with a string, and no test pins a translated word any more. (#706)
 - The catalogues are written in Weblate's layout, so what it saves passes CI unchanged: a draft is flagged `fuzzy` and still compiled, references name a file, the tool sets no header date, and `compile` writes `locale/status.json` instead of it being committed. (#349)
 - A test now fails, naming the section and the list, when a career section is missing from the archive, candidate file, CV headings, importer or translation lists, so a new section cannot be half added (#692)

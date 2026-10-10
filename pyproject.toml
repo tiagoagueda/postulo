@@ -188,11 +188,12 @@ testpaths = ["tests"]
 python_files = ["test_*.py"]
 # Browser, release and CI-step tests are opted into with `-m e2e`, `-m release` or `-m step`;
 # a command-line -m replaces this one.
-addopts = "--strict-markers --strict-config -m 'not e2e and not release and not step'"
+addopts = "--strict-markers --strict-config -m 'not e2e and not release and not step and not heavy'"
 markers = [
     "e2e: drives a real browser against a live server; needs `playwright install chromium`",
     "release: a promise that must hold in a published version, not in every commit",
     "step: the same check a step of CI's Checks job makes once per push; run with `-m step`",
+    "heavy: needs a process to itself for its memory; CI runs these after the suite with `-m heavy`",
 ]
 filterwarnings = ["error"]
 # A test still running after five minutes has its threads' stacks written to the log, so a

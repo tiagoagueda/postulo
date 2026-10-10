@@ -263,6 +263,13 @@ jobs:
         run: uv run pytest -n 2 --durations=25 --cov --cov-report=term-missing
         timeout-minutes: 30
 
+      - name: Test what needs a process to itself
+        # The `heavy` tests, one process, after the suite: four-times-size hostile Markdown,
+        # which in a worker grown through the rest of the suite took the 2 GB job container
+        # over its limit and had the worker killed (2026-10-10).
+        run: uv run pytest -m heavy -p no:xdist
+        timeout-minutes: 10
+
   checks:
     # "Checks" first: the release gate requires a job whose name starts with it
     # (`scripts/release_tools.py`, REQUIRED_JOBS), since lint and the catalogues left the
