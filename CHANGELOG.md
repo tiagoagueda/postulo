@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A candidate file's review no longer says which telephone numbers other accounts hold once the number allowance is spent: every number is then refused in the same words, as the form does. (#735)
 - Rate limits longer than five minutes (number collisions, capture, fetch, the API, texts, the wrong-token bar) now last their whole window on the stock database cache instead of expiring five minutes after their last use, so the allowances are no longer about twelve times what is set. (#734)
 - Every API list now refuses a limit above 200 with a 422 and declares the bound in the OpenAPI schema, so one call can no longer make a whole account the page while holding the database's write lock. (#434)
 - Importing an archive reads every file, and the manifest, through a size cap, so an entry that unpacks to gigabytes is left out and reported instead of exhausting memory, and an imported avatar or company logo goes through the same checks as an uploaded one (an SVG is sanitised, a picture re-encoded). (#466)

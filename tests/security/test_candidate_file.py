@@ -1093,3 +1093,29 @@ def test_a_hostile_or_over_long_event_stores_nothing(user):
 
     assert outcomes(plan, "participations") == [candidate.REFUSED] * 6
     assert not Participation.objects.for_user(user).exists()
+
+
+@override_settings(POSTULO_NUMBER_RATE="2/h")
+def test_an_allowance_spent_in_an_earlier_draw_answers_nothing_in_the_next(user, other_user):
+    """The free-or-held bit must not stay readable after the allowance is gone (#735).
+
+    The file used to look the number up first and charge only a held answer, and the plan is
+    redrawn on every visit, so a spent allowance left a free number shown as *Add* and a held
+    one as *Refused* for ever, a request or two per file. After the allowance is spent a
+    free and a held number draw the same outcome with the same words, in any later draw.
+    """
+    held_by_somebody_else(other_user, "+351912345001", "+351912345002")
+    candidate.plan(
+        user, candidate.read(numbers_in_a_file("+351912345001", "+351912345002"))
+    )  # the two held answers spend the allowance
+
+    free = candidate.plan(user, candidate.read(numbers_in_a_file("+351912345999")))
+    held = candidate.plan(user, candidate.read(numbers_in_a_file("+351912345001")))
+
+    assert outcomes(free, "phone_numbers") == outcomes(held, "phone_numbers") == [candidate.REFUSED]
+    assert notes(free, "phone_numbers") == notes(held, "phone_numbers")
+    assert "available again" in notes(free, "phone_numbers")[0]
+    assert "somebody else" not in notes(free, "phone_numbers")[0]
+    # And the button, which redraws the plan, adds nothing that was free either.
+    candidate.apply(user, candidate.read(numbers_in_a_file("+351912345999")))
+    assert not user.profile.phone_numbers.exists()

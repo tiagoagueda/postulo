@@ -1130,19 +1130,33 @@ class _Planner:
             row.outcome = REFUSED
             row.notes.append(self.silenced)
             return
+        # Asked before the lookup and without using anything, the way the form does it: an
+        # allowance spent in an earlier draw refuses this number whether or not it is held.
+        # Looking first and charging only the informative answer left the free/held bit
+        # readable for ever, two requests at a time (#735).
+        try:
+            phone_numbers.ensure_allowance(self.user)
+        except throttle.TooOften as too_often:
+            self.silenced = self._asked_too_often(too_often)
+            row.outcome = REFUSED
+            row.notes.append(self.silenced)
+            return
         if not phone_numbers.taken_elsewhere(row.instance.number):
             return
         row.outcome = REFUSED
         try:
             phone_numbers.collision_noticed(self.user)
         except throttle.TooOften as too_often:
-            self.silenced = str(
-                phone_numbers.ASKED_TOO_OFTEN
-                % {"minutes": max(1, round(too_often.retry_after / 60))}
-            )
+            self.silenced = self._asked_too_often(too_often)
             row.notes.append(self.silenced)
         else:
             row.notes.append(str(phone_numbers.ALREADY_IN_USE))
+
+    @staticmethod
+    def _asked_too_often(too_often: throttle.TooOften) -> str:
+        return str(
+            phone_numbers.ASKED_TOO_OFTEN % {"minutes": max(1, round(too_often.retry_after / 60))}
+        )
 
     def _addresses(self) -> Section:
         section = Section("postal_addresses", gettext_lazy("Postal addresses"))
