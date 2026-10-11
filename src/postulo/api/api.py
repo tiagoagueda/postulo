@@ -406,6 +406,22 @@ def _as_output(request, capture: Capture, *, keeping=None, note: str = "") -> di
     }
 
 
+def _as_listed(request, capture: Capture, **kwargs) -> dict:
+    """A capture as the *list* shows it: in full to a token that may read, narrowed otherwise.
+
+    A token that only holds ``captures`` exists to send pages to review, not to read the queue
+    back (#761). It is told what it could be told about an address it asked about -- the
+    title, when, and the review link -- and the address, company, location and source of
+    everything else waiting are left empty. The fields stay in the shape, empty, so a client
+    written against it does not break.
+    """
+    row = _as_output(request, capture, **kwargs)
+    token: ApiToken = request.auth
+    if not token.has_scope("read"):
+        row.update(url="", company_name="", location="", source="")
+    return row
+
+
 @api.get("/me", response=TokenOut, summary="Check a token")
 def whoami(request):
     """Confirm a token works, and say who it belongs to and what it may do.
@@ -651,7 +667,7 @@ def _read(payload: PageIn, owner):
     tags=["captures"],
     summary="List captures awaiting review",
 )
-@paginate(Page, row=_as_output)
+@paginate(Page, row=_as_listed)
 def list_captures(
     request,
     updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
@@ -663,6 +679,10 @@ def list_captures(
     them over, while the wiki promised every list took ``limit`` and ``offset`` and came
     back as ``{"items", "count"}``. A queue nobody has kept up with runs past fifty, and
     nothing said so (#230).
+
+    A token holding only ``captures`` sees the title, the dates and the review link of what is
+    waiting; the address, company, location and source are empty unless it also holds ``read``
+    (#761).
     """
     token: ApiToken = request.auth
     captures = (
