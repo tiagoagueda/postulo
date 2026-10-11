@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Authenticator secrets and recovery-code seeds are encrypted in the database under the instance's field key, and the ones already stored are encrypted by a migration (#743)
 - An API token no longer survives the password it was made under: changing, resetting or recovering the password, or a single-sign-on link wiping it, ends the account's active tokens (#742)
 - An account that signs in only through the identity provider must have done so within the last few minutes before deleting an account, taking a backup or making a recovery link, since allauth lets it through unasked (#741)
 - Making a recovery link, appointing or demoting an administrator and deleting an account from Server settings ask for a recent sign-in, as the backups do (#740)

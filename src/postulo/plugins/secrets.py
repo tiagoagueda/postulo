@@ -87,3 +87,30 @@ def decrypt(token: str) -> dict:
             )
         ) from exc
     return json.loads(raw.decode("utf-8"))
+
+
+#: What marks a stored string as encrypted, so one written before encryption was added still
+#: reads (#743). Neither a TOTP secret (base32) nor a recovery-code seed (hex) can start so.
+TEXT_PREFIX = "enc1:"
+
+
+def encrypt_text(text: str) -> str:
+    """One string, encrypted under the instance's key and marked as such."""
+    if not text or text.startswith(TEXT_PREFIX):
+        return text
+    return TEXT_PREFIX + Fernet(_key()).encrypt(text.encode("utf-8")).decode("ascii")
+
+
+def decrypt_text(stored: str) -> str:
+    """The string `encrypt_text` made; an unmarked value is legacy plaintext, returned as is."""
+    if not stored or not stored.startswith(TEXT_PREFIX):
+        return stored
+    try:
+        return Fernet(_key()).decrypt(stored[len(TEXT_PREFIX) :].encode("ascii")).decode("utf-8")
+    except InvalidToken as exc:
+        raise SecretsUnreadable(
+            _(
+                "An authenticator's secret cannot be read: it was encrypted under a different "
+                "key. If SECRET_KEY was rotated, set POSTULO_FIELD_KEY to the old key."
+            )
+        ) from exc

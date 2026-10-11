@@ -21,6 +21,23 @@ from allauth.mfa.adapter import DefaultMFAAdapter
 
 
 class MFAAdapter(DefaultMFAAdapter):
+    def encrypt(self, text: str) -> str:
+        """An authenticator's secret is encrypted before it reaches the database (#743).
+
+        The TOTP seed and the recovery-code seed were stored as they are, so a copy of the
+        database was a copy of every second factor. Under the instance's field key, as a
+        connection's password is.
+        """
+        from postulo.plugins import secrets
+
+        return secrets.encrypt_text(text)
+
+    def decrypt(self, encrypted_text: str) -> str:
+        """The counterpart; a value stored before this existed is still read as it is."""
+        from postulo.plugins import secrets
+
+        return secrets.decrypt_text(encrypted_text)
+
     def get_public_key_credential_rp_entity(self) -> dict[str, str]:
         """Name the instance, and stay on the host the browser is actually on.
 
