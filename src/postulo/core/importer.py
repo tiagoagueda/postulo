@@ -844,13 +844,33 @@ def _restore_phone_numbers(
     the record in the archive (``whose``) and the last digits of the number, never the
     account that holds it (#562).
     """
+    from postulo.core import throttle
     from postulo.core.models import PhoneNumber
-    from postulo.core.phone_numbers import taken_elsewhere
+    from postulo.core.phone_numbers import collision_noticed, ensure_allowance, taken_elsewhere
 
     primary_taken = _held(PhoneNumber, holder).filter(is_primary=True).exists()
+    # Whether another account holds a number is something this instance tells a person only
+    # within an allowance (#142). An archive is a file the person makes, with any numbers in it,
+    # as often as the import itself is allowed: each lookup is charged as the form's is, and once
+    # the allowance is spent no number is looked up, so a free one and a held one are skipped in
+    # the same words and the answer is not readable from the difference (#890).
+    silenced: throttle.TooOften | None = None
+    not_asked = 0
     for row in rows:
         number = (row.get("number") or "").strip()
+        if silenced is None:
+            try:
+                ensure_allowance(owner)
+            except throttle.TooOften as too_often:
+                silenced = too_often
+        if silenced is not None:
+            not_asked += 1
+            continue
         if taken_elsewhere(number):
+            try:
+                collision_noticed(owner)
+            except throttle.TooOften as too_often:
+                silenced = too_often
             if report is not None:
                 ending = "".join(ch for ch in number if ch.isdigit())[-2:]
                 report.skipped.append(
@@ -877,6 +897,12 @@ def _restore_phone_numbers(
             is_primary=wants_primary,
         )
         primary_taken = primary_taken or wants_primary
+    if not_asked and report is not None:
+        report.skipped.append(
+            f"{not_asked} telephone number{'s' if not_asked != 1 else ''} {whose} not restored: "
+            "you have asked about a lot of numbers; try the import again in "
+            f"{silenced.retry_after} seconds"
+        )
 
 
 def load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportReport:
