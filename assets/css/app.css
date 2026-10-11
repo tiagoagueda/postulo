@@ -1624,6 +1624,24 @@
    * more than its fill to be told from the rest -- a border that survives forced colours and the
    * word's weight -- and every link is at least 24 pixels high (WCAG 2.5.8).
    */
+  /* Button labels (#852). A button with an icon and words draws the words in `.btn-label`.
+     Icons only: the words stay as the button's name and `app.js` makes them its tooltip.
+     Labels only: the icon is left out. A group of buttons (`role="group"`) is icons only below `sm`, whatever
+     the choice, unless the choice is labels. */
+  body[data-buttons="icons"] .btn-label {
+    @apply sr-only;
+  }
+
+  body[data-buttons="labels"] :has(> .btn-label) > svg[data-icon] {
+    display: none;
+  }
+
+  @media (width < 40rem) {
+    body:not([data-buttons="labels"]) [role="group"] .btn-label {
+      @apply sr-only;
+    }
+  }
+
   .tab-nav {
     @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
   }

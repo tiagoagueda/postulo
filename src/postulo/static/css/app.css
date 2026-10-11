@@ -7072,6 +7072,33 @@
       margin-inline-start: auto;
     }
   }
+  body[data-buttons="icons"] .btn-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  body[data-buttons="labels"] :has(> .btn-label) > svg[data-icon] {
+    display: none;
+  }
+  @media (width < 40rem) {
+    body:not([data-buttons="labels"]) [role="group"] .btn-label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border-width: 0;
+    }
+  }
   .tab-nav {
     display: inline-flex;
     max-width: 100%;

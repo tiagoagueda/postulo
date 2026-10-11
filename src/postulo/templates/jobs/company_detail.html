@@ -51,11 +51,11 @@
          (#239): the comparison finds *Acme* and *Acme Ltd*, and somebody who knows that
          *Google* and *Alphabet* are the same employer to them knows something it cannot. {% endcomment %}
       <div class="button-group" role="group" aria-label="{% translate 'This company' %}" data-company-actions>
-        <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% icon "pencil" %}<span class="sr-only sm:not-sr-only">{% translate "Edit" %}</span></a>
-        <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="outline">{% icon "git-merge" %}<span class="sr-only sm:not-sr-only">{% translate "Merge" %}</span></a>
-        <button type="button" class="btn" data-variant="outline" popovertarget="export-company" aria-haspopup="dialog">{% icon "download" %}<span class="sr-only sm:not-sr-only">{% translate "Export" %}</span></button>
+        <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% icon "pencil" %}<span class="btn-label">{% translate "Edit" %}</span></a>
+        <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="outline">{% icon "git-merge" %}<span class="btn-label">{% translate "Merge" %}</span></a>
+        <button type="button" class="btn" data-variant="outline" popovertarget="export-company" aria-haspopup="dialog">{% icon "download" %}<span class="btn-label">{% translate "Export" %}</span></button>
         <button type="button" class="btn" data-variant="destructive-ghost"
-                popovertarget="delete-company">{% icon "trash-2" %}<span class="sr-only sm:not-sr-only">{% translate "Delete" %}</span></button>
+                popovertarget="delete-company">{% icon "trash-2" %}<span class="btn-label">{% translate "Delete" %}</span></button>
       </div>
       {% comment %} Which format, and whether the notes go with it: a question asked before the
          file is made. A plain GET form in a popover, so it works with no script. {% endcomment %}

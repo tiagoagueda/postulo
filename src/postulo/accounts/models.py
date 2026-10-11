@@ -456,6 +456,20 @@ class Profile(models.Model):
         ),
         default="both",
     )
+    #: How the buttons that carry both an icon and a label are drawn (#852): both, only the
+    #: icons (the label stays as the button's name and is its tooltip), or only the labels. Only
+    #: buttons built with a `.btn-label` beside their icon follow it; a text-only button is
+    #: untouched, and *labels only* leaves out their icons.
+    button_labels = models.CharField(
+        _("button labels"),
+        max_length=8,
+        choices=(
+            ("both", _("Icons and labels")),
+            ("icons", _("Icons only")),
+            ("labels", _("Labels only")),
+        ),
+        default="both",
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

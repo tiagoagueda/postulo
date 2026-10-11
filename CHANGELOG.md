@@ -105,6 +105,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Appearance has a setting for buttons that carry an icon and words: both, icons only (the words become a tooltip) or labels only (#852)
 - A company's page groups Edit, Merge, Export and Delete with icons, and Export offers the company as a vCard or as JSON, with or without your notes (#851)
 - A plugin can place a dated calendar entry that belongs to no application (add_reminder, idempotent by uid, never unticks) and end it (retire_reminder); removing the plugin retires its entries (#887)
 - A connected plugin may offer up to six https links on its connection's card (an optional links method), drawn as external links (#889)

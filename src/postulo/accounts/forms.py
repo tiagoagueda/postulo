@@ -1251,23 +1251,33 @@ class AppearanceForm(forms.ModelForm):
         "theme",
         "density",
         "identifier_style",
+        "button_labels",
         "quiet_after_days",
         "closing_notice_days",
     )
 
     class Meta:
         model = Profile
-        fields = ("theme", "density", "identifier_style", "quiet_after_days", "closing_notice_days")
+        fields = (
+            "theme",
+            "density",
+            "identifier_style",
+            "button_labels",
+            "quiet_after_days",
+            "closing_notice_days",
+        )
         widgets = {
             "theme": forms.RadioSelect,
             "density": forms.RadioSelect,
             "identifier_style": forms.RadioSelect,
+            "button_labels": forms.RadioSelect,
         }
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
             "closing_notice_days": _("Warn me before a listing closes by"),
             "density": _("How much room to leave"),
             "identifier_style": _("How a company's identifiers read"),
+            "button_labels": _("How buttons read"),
         }
         help_texts = {
             # Under Appearance rather than Accessibility, by the rule #281 set: file a
@@ -1282,7 +1292,16 @@ class AppearanceForm(forms.ModelForm):
                 "On a company's page each identifier is a badge. With the icon only, the "
                 "label is a tooltip, and a screen reader still reads it."
             ),
+            "button_labels": _(
+                "Buttons that have both an icon and words show both. With icons only the "
+                "words become a tooltip, and a screen reader still reads them; with labels "
+                "only the icons are left out. Buttons with words alone do not change."
+            ),
         }
+
+    def clean_button_labels(self):
+        """Left out, as by a page drawn before the setting existed, it stays as it was (#852)."""
+        return self.cleaned_data.get("button_labels") or self.instance.button_labels or "both"
 
     def clean_identifier_style(self):
         """Left out, as by a page drawn before the setting existed, it stays as it was (#855)."""
@@ -1292,7 +1311,12 @@ class AppearanceForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         # Left blank, either threshold goes back to its default rather than refusing to save.
         # Not every field is here when one is saved on its own (#656).
-        for name in ("quiet_after_days", "closing_notice_days", "identifier_style"):
+        for name in (
+            "quiet_after_days",
+            "closing_notice_days",
+            "identifier_style",
+            "button_labels",
+        ):
             if name in self.fields:
                 self.fields[name].required = False
 

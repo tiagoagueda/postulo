@@ -124,6 +124,7 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "nav_underline",
         "density",
         "identifier_style",
+        "button_labels",
         "keep_page_source",
         "keep_page_rendering",
         "closing_notice_days",

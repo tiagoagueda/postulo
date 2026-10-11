@@ -6950,4 +6950,26 @@
 
   onContentReady(readyNoticeCollection);
 
+  /* ----------------------------------------------- buttons drawn as icons only (#852)
+   *
+   * With "icons only" chosen the stylesheet takes the words out of sight and they stay the
+   * button's name. This gives them back as a tooltip, which is the browser's own `title`,
+   * since a button is not a field and the tooltips above are a field's. Set once, and only
+   * where the person chose it: in the default the words are on screen and a `title` that
+   * repeats them is read out twice.
+   */
+  function readyButtonTooltips() {
+    if (!document.body || document.body.getAttribute("data-buttons") !== "icons") {
+      return;
+    }
+    Array.prototype.forEach.call(document.querySelectorAll(".btn > .btn-label"), function (label) {
+      var button = label.parentNode;
+      if (!button.hasAttribute("title")) {
+        button.setAttribute("title", label.textContent.trim());
+      }
+    });
+  }
+
+  onContentReady(readyButtonTooltips);
+
 })();

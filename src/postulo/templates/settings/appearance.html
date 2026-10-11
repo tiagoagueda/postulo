@@ -69,6 +69,22 @@
         </fieldset>
       </div>
       <div class="card mb-6">
+        {% comment %} Whether buttons with an icon and words show both (#852). {% endcomment %}
+        <fieldset{% if form.button_labels.aria_describedby %} aria-describedby="{{ form.button_labels.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.button_labels.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.button_labels.auto_id }}_helptext">{{ form.button_labels.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.button_labels|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.button_labels" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
         <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
           <legend class="label mb-1">{{ form.navigation.label }}</legend>
           {% comment %} The help sits above the choices here rather than under them, so it keeps its

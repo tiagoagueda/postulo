@@ -313,6 +313,7 @@ PROFILE_FIELDS = (
     "nav_underline",
     "density",
     "identifier_style",
+    "button_labels",
     "plugins_off",
     "keep_page_source",
     "keep_page_rendering",
