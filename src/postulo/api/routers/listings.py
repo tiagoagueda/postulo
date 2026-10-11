@@ -148,7 +148,9 @@ def add_listing_event(request, pk: int, payload: ListingEventIn):
     name. The contact and the file are ids of the caller's own, looked up before anything is
     written, and one that is somebody else's gets the same answer as one that does not
     exist. A capture entry is not offered: the review screen writes those, pointing at the
-    capture. Sent again with the same ``external_id``, the first entry comes back with 200.
+    capture. Sent again with the same ``external_id``, the first entry comes back with 200 --
+    to the token that wrote it, or to one that may read; to another that may only bind it is the
+    identifying fields without the text (#763).
     """
     listing = owned_or_404(request, owned(request, JobPosting.objects), pk)
     allowed = [
@@ -191,7 +193,21 @@ def add_listing_event(request, pk: int, payload: ListingEventIn):
         artefact=document,
         external_id=payload.external_id,
     )
-    return Status(201 if created else 200, listing_event_out(event))
+    shown = listing_event_out(event)
+    if not created and not request.auth.has_scope("read") and event.actor != actor_of(request):
+        # An entry replayed by id is echoed to the token that wrote it. Another token that
+        # may only bind (not read) is told it exists, with the identifying fields, and not
+        # what it says (#763): replaying an external_id must not read a history back.
+        shown = {
+            **shown,
+            "summary": "",
+            "body": "",
+            "contact_id": None,
+            "document_id": None,
+            "capture_id": None,
+            "actor": "",
+        }
+    return Status(201 if created else 200, shown)
 
 
 @router.post("", response={201: ListingDetailOut}, auth=scope("write"), summary="Add a listing")
