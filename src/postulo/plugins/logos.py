@@ -165,7 +165,10 @@ def _render(data: bytes) -> tuple[bytes, str]:
     try:
         if pictures.looks_like_svg(data):
             return pictures.sanitise_svg(data), "image/svg+xml"
-        return pictures.as_stored(data, budget=MAX_STORED_BYTES), "image/png"
+        return (
+            pictures.as_stored(data, budget=MAX_STORED_BYTES, kinds=pictures.LOGO_KINDS),
+            "image/png",
+        )
     except pictures.UnusablePicture as error:
         raise Unusable(str(error)) from error
 

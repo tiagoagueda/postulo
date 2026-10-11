@@ -63,6 +63,7 @@ MAX_STORED_BYTES = 1024 * 1024
 #: Re-exported so the rest of this module and its tests read one name for it. The guard
 #: itself is `core.pictures`': it bounds what decoding allocates, not what is stored.
 MAX_PIXELS = pictures.MAX_PIXELS
+KINDS = pictures.LOGO_KINDS
 
 ALLOWED_CONTENT_TYPES = frozenset(
     {
@@ -106,7 +107,7 @@ def process(data: bytes) -> ContentFile:
     if pictures.looks_like_svg(data):
         return ContentFile(_svg(data))
     try:
-        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES))
+        return ContentFile(pictures.as_stored(data, budget=MAX_STORED_BYTES, kinds=KINDS))
     except pictures.UnusablePicture as error:
         raise UnusableLogo(str(error)) from error
 

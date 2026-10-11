@@ -79,6 +79,11 @@ class WrongKind(UnusablePicture):
 SAME_KIND_AS = {"MPO": "JPEG"}
 
 
+#: The kinds of picture a company's or a plugin's logo may arrive as; everything else Pillow can
+#: read is refused before it is decoded (#777). An SVG is handled apart, by its own allowlist.
+LOGO_KINDS = frozenset({"image/png", "image/jpeg", "image/gif", "image/webp", "image/x-icon"})
+
+
 def content_type_of(image: Image.Image) -> str:
     """What an opened image is, as a content type: ``image/png``. Read from the file's own
     bytes, never from its name or from what an upload said it was."""
@@ -106,9 +111,10 @@ def decode(
     ``draft_to`` lets a JPEG be decoded at a fraction of its size when that is still at
     least this many pixels on the longest edge, which makes the decode itself cheaper (#482).
     """
+    was = Image.MAX_IMAGE_PIXELS
     Image.MAX_IMAGE_PIXELS = max_pixels
     try:
-        image = Image.open(io.BytesIO(data))
+        image = Image.open(io.BytesIO(data), formats=_formats_for(kinds))
         if kinds is not None and content_type_of(image) not in kinds:
             raise WrongKind(str(_("That file could not be read as an image.")))
         if image.width * image.height > max_pixels:
@@ -135,6 +141,28 @@ def decode(
         raise UnusablePicture(str(_("That file could not be read as an image."))) from error
     except (Image.DecompressionBombError, OSError, ValueError) as error:
         raise UnusablePicture(str(_("That file could not be read as an image."))) from error
+    finally:
+        # Pillow's guard is a setting of the whole process; put back what was there (#777).
+        Image.MAX_IMAGE_PIXELS = was
+
+
+def _formats_for(kinds) -> list[str] | None:
+    """The formats Pillow may try for the content types a caller keeps, or all where it keeps
+    any (#777).
+
+    Pillow identifies about forty formats, each with a decoder of its own, and a picture that
+    is going to be refused for its kind is refused after it has been identified -- so the list
+    is given to ``Image.open``, which then tries those decoders and no others. An EPS is never
+    handed to Ghostscript for a logo.
+    """
+    if kinds is None:
+        return None
+    Image.init()
+    wanted = set(kinds)
+    names = [
+        name for name in Image.OPEN if Image.MIME.get(SAME_KIND_AS.get(name, name), "") in wanted
+    ]
+    return names or ["PNG"]
 
 
 def encode_within(image: Image.Image, *, budget: int = DEFAULT_BUDGET) -> bytes:
