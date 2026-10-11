@@ -6850,6 +6850,55 @@
 
   onContentReady(readyEveryPushCard);
 
+  /* ---------------------------------------- signing out takes this browser off push (#753)
+   *
+   * A push subscription belongs to the browser, not to the session. Signing out of a shared
+   * browser left it subscribed and the worker registered, so reminders went on arriving on a
+   * screen somebody else was now using. So the sign-out form is held for a moment while the
+   * subscription is dropped and the worker unregistered, and then goes on exactly as it
+   * would have. A browser with no worker, or one that is slow, is not made to wait: the form
+   * is sent after a second and a half whatever has happened.
+   */
+  document.addEventListener("submit", function (event) {
+    var form = event.target;
+    var action = form && form.getAttribute ? form.getAttribute("action") || "" : "";
+    if (!/\/logout\/?$/.test(action) || form.hasAttribute("data-signing-out")) {
+      return;
+    }
+    if (!("serviceWorker" in navigator) || !navigator.serviceWorker.getRegistration) {
+      return;
+    }
+    event.preventDefault();
+    form.setAttribute("data-signing-out", "");
+    var sent = false;
+    function proceed() {
+      if (!sent) {
+        sent = true;
+        HTMLFormElement.prototype.submit.call(form);
+      }
+    }
+    window.setTimeout(proceed, 1500);
+    navigator.serviceWorker
+      .getRegistration("/")
+      .then(function (registration) {
+        if (!registration) {
+          return null;
+        }
+        var held = registration.pushManager
+          ? registration.pushManager.getSubscription()
+          : Promise.resolve(null);
+        return held
+          .then(function (subscription) {
+            return subscription ? subscription.unsubscribe() : null;
+          })
+          .then(function () {
+            return registration.unregister();
+          });
+      })
+      .catch(function () {})
+      .then(proceed);
+  });
+
   // Only somewhere on this site, for the reason the worker gives.
   function sameSiteAddress(address) {
     try {
