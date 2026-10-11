@@ -139,7 +139,7 @@ def end_recovery_links_when_the_password_changes(request, user, **kwargs) -> Non
     """A password set by the person themselves closes the door an administrator opened (#739)."""
     from . import recovery
 
-    recovery.revoke_for(user)
+    recovery.end_old_credentials(user)
 
 
 @receiver(user_logged_in, dispatch_uid="postulo_recovery_links_sign_in")

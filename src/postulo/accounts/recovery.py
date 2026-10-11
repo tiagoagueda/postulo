@@ -66,6 +66,23 @@ def issue(person, *, by):
     return link, token
 
 
+def end_old_credentials(person) -> int:
+    """End what was made with the old password's trust: API tokens, and live recovery links.
+
+    An API token minted while an account was held by somebody else keeps working after the
+    password is changed, reset, recovered or wiped by a single-sign-on link -- a web session
+    dies with the password, a token does not (#742). So every way the password is replaced
+    ends the account's active tokens as well; the person makes new ones, which is the cost of
+    having got the account back. Returns how many tokens ended.
+    """
+    from django.apps import apps
+    from django.utils import timezone
+
+    revoke_for(person)
+    tokens = apps.get_model("api", "ApiToken")
+    return tokens.objects.active().filter(owner=person).update(revoked_at=timezone.now())
+
+
 def revoke_for(person) -> int:
     """End every live link for ``person``: they have got in, or changed the password, themselves.
 
@@ -109,6 +126,7 @@ def spend(link, new_password: str) -> None:
         person.save(update_fields=["password"])
         link.used_at = timezone.now()
         link.save(update_fields=["used_at"])
+        end_old_credentials(person)
 
 
 # ------------------------------------------------------- who this route reaches

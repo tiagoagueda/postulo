@@ -110,6 +110,11 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             users = filter_users_by_email(address, prefer_verified=True, for_login=True)
             holders = verified_holders(users, address)
             if holders:
+                # allauth wipes the password of the account it signs in this way. What was
+                # made with the old one -- an API token above all -- goes with it (#742).
+                from . import recovery
+
+                recovery.end_old_credentials(holders[0])
                 return holders[0], address
         return None
 
