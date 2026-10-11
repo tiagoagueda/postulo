@@ -500,6 +500,28 @@ class CVItem(OwnedModel):
     def __str__(self) -> str:
         return str(self.item) if self.item else str(_("Missing entry"))
 
+    def check_owner(self) -> None:
+        """The CV and the entry it points at are both its owner's, or it is not written (#774).
+
+        Asked on every save, as `UploadedDocument.check_proves` is, so no way of writing the
+        link -- the form, the importer, a plugin, the shell -- can print somebody else's
+        employment entry on this person's CV.
+        """
+        if self.cv_id and self.cv.owner_id != self.owner_id:
+            raise ValidationError(_("That CV is not yours."))
+        if self.content_type_id is None or self.object_id is None:
+            return
+        model = self.content_type.model_class()
+        if (
+            model is not None
+            and not model.objects.filter(pk=self.object_id, owner_id=self.owner_id).exists()
+        ):
+            raise ValidationError(_("That entry is not one of yours."))
+
+    def save(self, *args, **kwargs):
+        self.check_owner()
+        super().save(*args, **kwargs)
+
 
 class LetterKind(models.TextChoices):
     """What sort of letter this is, which decides its shape rather than its wording.
