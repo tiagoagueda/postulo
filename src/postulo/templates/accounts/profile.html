@@ -42,8 +42,9 @@
     {% comment %} The column beside the sidebar stops at `max-w-2xl`, at its start edge, as
        every card inside Settings does (#320): the frame takes the screen (#198) and the
        measure is on the parts, so a text box is 622 pixels on any monitor rather than the
-       2,214 it was at 2560. {% endcomment %}
-    <div class="min-w-0 max-w-2xl flex-1">
+       2,214 it was at 2560. From `2xl` the column takes what the sidebar leaves and the
+       cards lie in two of equal width (#871), so a text box is still about 600. {% endcomment %}
+    <div class="min-w-0 max-w-2xl flex-1 2xl:max-w-[85.5rem]">
     <form method="post" enctype="multipart/form-data" novalidate>
       {% csrf_token %}
       {% if form.non_field_errors %}
@@ -60,6 +61,13 @@
          `tips` and `refused` are the view's: while anything on the page has been refused,
          no help on it is a tooltip and every card's sentence is under its title, because
          that is when it is wanted and nothing may lie over a refusal. {% endcomment %}
+      {% comment %} From `2xl` the cards are the cells of a grid, filled row by row, so the
+         source order -- which a keyboard and a screen reader follow -- is also the order
+         across and then down (#871). The margins the cards carry are the single column's;
+         the grid's gap replaces them. The postal addresses stay in one column: their
+         rows are drawn for the measure of one, and spanning both would give a street
+         box a width nobody reads. {% endcomment %}
+      <div class="2xl:mb-6 2xl:grid 2xl:grid-cols-2 2xl:items-start 2xl:gap-6 2xl:*:mb-0" data-cards>
       <div class="card mb-4" data-picture id="section-picture">
         <c-section-title help="your-picture" anchor="section-picture" :in_sight="refused">{% translate "Your picture" %}</c-section-title>
         <div class="flex flex-wrap items-start gap-6">
@@ -321,6 +329,8 @@
         </details>
         <p class="text-xs text-ink-500 dark:text-ink-400">{% translate "Save to add another identifier." %}</p>
       </fieldset>
+
+      </div>
 
       <div class="flex items-center gap-3">
         <button type="submit" class="btn">{% translate "Save" %}</button>

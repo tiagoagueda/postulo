@@ -195,7 +195,9 @@ def test_your_details_and_settings_keep_the_measure_on_a_wide_screen(
             assert card["width"] <= MEASURE, f"{path}: a card {card['width']} wide"
             assert card["x"] > parts["sidebar"]["right"], f"{path}: a card under the sidebar"
         starts = {round(card["x"]) for card in parts["cards"]}
-        assert len(starts) == 1, f"{path}: the cards do not share the start edge: {starts}"
+        # Your details has two columns from `2xl` (#871), each at the measure.
+        allowed = 2 if path == "/accounts/profile/" else 1
+        assert len(starts) == allowed, f"{path}: the cards do not share the start edge: {starts}"
         for box in parts["boxes"]:
             assert box["width"] < MEASURE, f"{path}: {box['name']} is {box['width']} wide"
 
@@ -224,8 +226,9 @@ def test_the_measure_beside_the_sidebar_mirrors_right_to_left(
         assert page.locator("html").get_attribute("dir") == "rtl"
         parts = page.evaluate(PARTS)
         ends = {round(card["right"]) for card in parts["cards"]}
-        assert len(ends) == 1, f"{path}: the cards do not share the start edge: {ends}"
-        (end,) = ends
+        # Your details has two columns from `2xl` (#871); the first ends at the start edge.
+        assert len(ends) == (2 if path == "/accounts/profile/" else 1), f"{path}: {ends}"
+        end = max(ends)
         assert end < parts["sidebar"]["x"], f"{path}: a card under the sidebar"
         assert end > WIDE / 2, f"{path}: the cards sit at the left-hand end"
         assert all(card["width"] <= MEASURE for card in parts["cards"]), path
@@ -519,7 +522,45 @@ def test_nothing_changed_here_scrolls_sideways_on_a_phone(
         assert not result["reached"], f"{path} scrolls {result['reached']}px sideways at 320"
 
 
-# ---------------------------------------------------------------- Your career
+# ---------------------------------------------------------------- Your details in two columns
+
+
+def test_your_details_is_two_columns_of_cards_from_2xl_and_one_below(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """From 1536 the cards lie in two columns of equal width, filled row by row, each at most
+    the measure wide; below it they are one column, as before (#871)."""
+    sign_in(page, live_server.url)
+
+    page.set_viewport_size({"width": 1920, "height": 1200})
+    page.goto(f"{live_server.url}/accounts/profile/")
+    picture = page.locator("#section-picture").bounding_box()
+    cv_photo = page.locator("#section-cv-photo").bounding_box()
+    name = page.locator("#section-name").bounding_box()
+    addresses = page.locator("#section-addresses").bounding_box()
+    form = page.locator("main form").first.bounding_box()
+    assert picture and cv_photo and name and addresses and form
+    assert picture["x"] < cv_photo["x"], "the second card is beside the first, not under it"
+    assert abs(picture["width"] - cv_photo["width"]) <= 1, "two columns of equal width"
+    assert (
+        name["y"] >= max(picture["y"] + picture["height"], cv_photo["y"] + cv_photo["height"]) - 1
+    ), "row by row: the third card starts a row of its own"
+    assert addresses["width"] <= MEASURE, "the postal addresses keep the measure of one column"
+    assert (
+        max(picture["x"] + picture["width"], cv_photo["x"] + cv_photo["width"]) - form["x"]
+        <= 2 * MEASURE + 25
+    )
+    assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]
+
+    page.set_viewport_size({"width": 1400, "height": 1200})
+    page.goto(f"{live_server.url}/accounts/profile/")
+    picture = page.locator("#section-picture").bounding_box()
+    cv_photo = page.locator("#section-cv-photo").bounding_box()
+    assert picture and cv_photo
+    assert cv_photo["y"] >= picture["y"] + picture["height"] - 1, "one column below 2xl"
+    assert picture["width"] <= MEASURE + 1
 
 
 def test_your_career_takes_the_screen_and_keeps_a_measure_for_its_prose(
