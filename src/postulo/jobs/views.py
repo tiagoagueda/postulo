@@ -40,9 +40,17 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query, company_match
 
-from . import duplicates, identifiers, logos, mapping, merging
+from . import duplicates, identifier_removals, identifiers, logos, mapping, merging
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
-from .models import Company, CompanyLogo, Contact, DiscardReason, Industry, JobPosting
+from .models import (
+    Company,
+    CompanyIdentifier,
+    CompanyLogo,
+    Contact,
+    DiscardReason,
+    Industry,
+    JobPosting,
+)
 from .tables import CompaniesTable
 
 
@@ -402,6 +410,8 @@ class CompanyIdentifiersMixin:
         context = super().get_context_data(**kwargs)
         context.setdefault("identifiers", self.get_identifiers())
         context["identifier_schemes"] = identifiers.schemes().values()
+        # A saved identifier goes at once, after asking, as on *Your details* (#857).
+        context["identifier_removals"] = identifier_removals.offer(context["identifiers"])
         return context
 
     def refuse_bad_identifiers(self, form):
@@ -425,6 +435,42 @@ class CompanyIdentifiersMixin:
                     row.instance.company = self.object
                 formset.save()
         return response
+
+
+class CompanyIdentifierRemoveView(OwnedObjectMixin, View):
+    """Take one identifier off a company, there and then, after the dialog's question (#857).
+
+    The row is looked up among this person's own (a foreign id and a made-up one both answer
+    404, so nothing is learnt about other accounts, #759). A GET removes nothing and leads
+    back to the company's form: it is where somebody lands who confirmed after their session
+    ended and signed in again. The answer to the script is JSON, the same shape
+    ``accounts.RemoveRowView`` gives, so the page's own script takes the row off.
+    """
+
+    def _row(self, request, pk: int):
+        return get_object_or_404(
+            CompanyIdentifier.objects.for_user(request.user).select_related("company"), pk=pk
+        )
+
+    @staticmethod
+    def _form(row) -> str:
+        return f"{reverse('jobs:company_update', args=[row.company_id])}#section-identifiers"
+
+    def get(self, request, pk: int):
+        return redirect(self._form(self._row(request, pk)))
+
+    def post(self, request, pk: int):
+        row = self._row(request, pk)
+        said = str(identifier_removals.said(identifier_removals.words(row)))
+        company = row.company
+        with transaction.atomic():
+            row.delete()
+        if request.htmx:
+            return JsonResponse(
+                {"removed": True, "said": said, "count": company.identifiers.count()}
+            )
+        messages.success(request, said)
+        return redirect(self._form(row))
 
 
 class LogoFormMixin:

@@ -572,7 +572,9 @@ def test_the_contact_form_keeps_its_boxes(client, user):
     assert "<dialog" not in html.replace('<dialog popover id="leave-dialog"', "")
 
 
-def test_the_company_form_keeps_its_boxes(client, user):
+def test_the_company_form_takes_an_identifier_off_by_its_bin_too(client, user):
+    """The company's identifiers go at once, after a question, as Your details' rows do
+    (#857); it no longer keeps the Remove box a saved row used to carry."""
     from postulo.jobs.models import Company, CompanyIdentifier
 
     company = Company.objects.create(owner=user, name="Aperture")
@@ -581,8 +583,8 @@ def test_the_company_form_keeps_its_boxes(client, user):
 
     html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
 
-    assert 'name="identifiers-0-DELETE"' in html
-    assert "data-remove-trigger" not in html
+    assert 'name="identifiers-0-DELETE"' not in html
+    assert "data-remove-trigger" in html
 
 
 def test_a_row_removed_at_once_does_not_trip_the_next_save(client, user):

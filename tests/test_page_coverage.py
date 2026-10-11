@@ -173,6 +173,10 @@ EXCUSED: dict[str, str] = {
         "a POST from a row's dialog on Your details, answered with a redirect back to it, "
         "or JSON for the script; a GET is that redirect and nothing else"
     ),
+    "jobs:company_identifier_remove": (
+        "a POST from an identifier's dialog on the company form, answered with a redirect "
+        "back to it, or JSON for the script; a GET is that redirect and nothing else"
+    ),
     "accounts:theme": "a POST from the theme switch in the header",
     "accounts:invite_revoke": "a POST that withdraws an invitation",
     "applications:status": "a POST from the board and from the application page",

@@ -23,6 +23,11 @@ urlpatterns = [
         name="company_logo_action",
     ),
     path("companies/<int:pk>/delete/", views.CompanyDeleteView.as_view(), name="company_delete"),
+    path(
+        "identifiers/<int:pk>/remove/",
+        views.CompanyIdentifierRemoveView.as_view(),
+        name="company_identifier_remove",
+    ),
     path("companies/<int:pk>/merge/", views.CompanyMergeView.as_view(), name="company_merge"),
     path("industries/", views.IndustryListView.as_view(), name="industry_list"),
     path("industries/new/", views.IndustryCreateView.as_view(), name="industry_create"),

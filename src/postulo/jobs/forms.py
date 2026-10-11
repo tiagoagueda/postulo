@@ -12,6 +12,7 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
+from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
 from . import employment_services, esco, identifiers, industries, logos, mapping, structure
@@ -488,8 +489,12 @@ class CompanyIdentifierForm(IdentifierRow, forms.ModelForm):
         return data
 
 
-class BaseCompanyIdentifierFormSet(OneOfEachKind, forms.BaseInlineFormSet):
-    """The rows together: one of each kind, no value twice, and the owner filled in."""
+class BaseCompanyIdentifierFormSet(RowsAlreadyGone, OneOfEachKind, forms.BaseInlineFormSet):
+    """The rows together: one of each kind, no value twice, and the owner filled in.
+
+    A row taken off at once by its dialog (#857) and still posted back by a copy of the page
+    that drew it is treated as one marked for removal (`RowsAlreadyGone`).
+    """
 
     def clean(self) -> None:
         super().clean()

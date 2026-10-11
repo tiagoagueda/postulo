@@ -378,6 +378,14 @@ def person_identifier(owner):
     return PersonIdentifier.objects.create(profile=owner.profile, scheme="wikidata", value="Q95")
 
 
+def company_identifier(owner):
+    from postulo.jobs.models import CompanyIdentifier
+
+    return CompanyIdentifier.objects.create(
+        owner=owner, company=company(owner), scheme="wikidata", value="Q96"
+    )
+
+
 def pk_of(make: Callable, **extra) -> Callable:
     return lambda owner: {"pk": make(owner).pk, **extra}
 
@@ -474,6 +482,7 @@ FACTORIES: dict[str, Callable] = {
     "jobs:capture_bind": pk_of(capture),
     "jobs:company_cell": pk_of(company, column="name"),
     "jobs:company_delete": pk_of(company),
+    "jobs:company_identifier_remove": pk_of(company_identifier),
     "jobs:company_detail": pk_of(company),
     "jobs:company_logo": pk_of(logo_kept),
     "jobs:company_logo_action": pk_of(company, action="find"),
