@@ -38,7 +38,9 @@ SCOPES = {
     ),
     "read": _("Read everything: applications, listings, companies, documents, insights"),
     "write": _(
-        "Record and change: applications, listings, notes, reminders, letters, your details"
+        "Record and change: applications, listings, notes, reminders, letters, your details. "
+        "A call that changes a record answers with the whole record, timeline and contacts "
+        "included, so this can see what it touches"
     ),
     "documents:read": _("Download the files themselves"),
 }

@@ -129,9 +129,13 @@ api = Described(
         "details (`/profile`) among them, and which of them a CV prints (`/cvs/{id}`); "
         "`documents:read` downloads files. A `PATCH` "
         "answers with the record as it stands after the change, so a token holding `write` "
-        "sees what it changes, without holding `read`. What it did not change it is not "
-        "shown: the rows of the owner's details a CV may be told to print (`offered`) are "
-        "in the answer to `PATCH /cvs/{id}` only for a token that holds `read` as well."
+        "sees what it changes, without holding `read` -- and that is the whole record, an "
+        "application's timeline, reminders, interviews and offers, a company's contacts, a "
+        "listing's description and history, whether or not the call changed anything: `write` "
+        "can read every record it can touch, one at a time, by number (#765). Give it only to "
+        "a tool trusted with that. The one place the answer is narrower is the rows of the "
+        "owner's details a CV may be told to print (`offered`), which `PATCH /cvs/{id}` "
+        "answers with only for a token that holds `read` as well."
     ),
 )
 

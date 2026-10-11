@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The write scope's label and the API's description now say plainly that a write call answers with the whole record, so a token holding write can read every record it can touch (#765)
 - Making an API token asks for a recent sign-in, starts on a one-year expiry instead of never, is limited to ten an hour, and the page says how many are live (POSTULO_API_TOKEN_RATE) (#764)
 - Replaying an external_id no longer reads a listing's history entry back to a token that may only bind: another writer's text is left out of the answer (#763)
 - GET /me no longer tells a token that only holds captures whose account it belongs to; a token that may read still sees the address (#762)
