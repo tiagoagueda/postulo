@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 {% load i18n %}
 
-{% block title %}{% translate "Companies on a map" %}{% endblock %}
+{% block title %}{% translate "Maps" %}{% endblock %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
-      <c-page-title>{% translate "Companies on a map" %}</c-page-title>
+      <c-page-title>{% translate "Maps" %}</c-page-title>
       <p class="text-sm text-ink-500 dark:text-ink-400">
         {% translate "The places your companies are in, and the companies at each. The map draws the same list." %}
       </p>
@@ -81,4 +81,17 @@
       {% translate "No places yet. When a company has a location, the place is listed here and drawn on the map." %}
     </c-empty>
   {% endif %}
+
+  {% comment %} The credit GeoNames' licence (CC BY 3.0) asks for where its data is used, and the
+     others' with it (#882). Always drawn, because the places and the outline are on this
+     page whether or not there is a dot to show. {% endcomment %}
+  <p class="mt-6 text-xs text-ink-500 dark:text-ink-400" data-map-credits>
+    {% blocktranslate trimmed %}
+      Places from <a href="https://www.geonames.org" class="underline" rel="noopener noreferrer external">GeoNames</a>
+      (<a href="https://creativecommons.org/licenses/by/3.0/" class="underline" rel="noopener noreferrer external">CC BY 3.0</a>);
+      country names from the Unicode CLDR, through Babel; the world outline from
+      <a href="https://www.naturalearthdata.com" class="underline" rel="noopener noreferrer external">Natural Earth</a>
+      (public domain).
+    {% endblocktranslate %}
+  </p>
 {% endblock %}

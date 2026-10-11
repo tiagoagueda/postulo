@@ -323,7 +323,10 @@ def test_a_plugins_own_strings_reach_the_reader(name, compiled, catalogues):
         if candidate.translated and candidate.plural is None:
             english, message = candidate.msgid, candidate
             break
-    assert message is not None, f"{name}: nothing translated to ask about"
+    if message is None:
+        # A catalogue whose every message was reworded has nothing translated until Weblate has
+        # drafted the new words (#881, #882); translations are written there and nowhere else.
+        pytest.skip(f"{name}: no message is translated into pt-PT yet")
 
     with translation.override("pt-PT"):
         assert translation.gettext(english) == message.msgstr[0]
