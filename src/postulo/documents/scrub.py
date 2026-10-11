@@ -100,17 +100,42 @@ def grace() -> dt.timedelta:
     return dt.timedelta(hours=max(1, int(settings.POSTULO_MEDIA_SWEEP_GRACE_HOURS)))
 
 
+#: The most of the files an unattended pass may remove, and the number below which the share is
+#: not asked (#775). A database that names nothing -- a wrong URL after an upgrade, an empty
+#: schema, a restore that has replaced the database and not yet the media -- makes every file
+#: a stray, and a pass that agreed would delete every person's documents. A real backlog of
+#: orphans is a few files from failed requests, never most of what is kept.
+SWEEP_MAX_SHARE = 0.5
+SWEEP_SMALL = 10
+
+
 def sweep(*, now=None) -> list[str]:
     """Remove the files no row names that are older than the grace period. Their names.
 
     The scheduled pass's half of "no orphan survives": a request that fails after its file
     was written rolls the row back and leaves the file, and Django offers no hook for that.
     Logged line by line, and off with ``POSTULO_MEDIA_SWEEP=false``.
+
+    **It has a floor** (#775): a pass that finds more than `SWEEP_MAX_SHARE` of the files kept to
+    be strays, once there are more than `SWEEP_SMALL` of them, removes nothing and says so in
+    the log, because the likelier fault is the database it is looking at. Someone who really
+    has that many orphans removes them with ``manage.py prune_media``, which asks.
     """
     if not settings.POSTULO_MEDIA_SWEEP:
         return []
     removed: list[str] = []
-    for stored in strays(grace=grace()):
+    found = list(strays(grace=grace()))
+    if len(found) > SWEEP_SMALL:
+        kept = sum(1 for _ in filestore.listing())
+        if kept and len(found) > kept * SWEEP_MAX_SHARE:
+            logger.error(
+                "The media sweep would remove %d of %d files; it removed none. If the database "
+                "is the right one, run `manage.py prune_media`.",
+                len(found),
+                kept,
+            )
+            return []
+    for stored in found:
         try:
             filestore.delete(stored.name)
         except OSError:  # pragma: no cover - a file already gone is the outcome wanted

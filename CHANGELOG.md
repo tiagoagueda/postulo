@@ -134,6 +134,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The unattended media sweep refuses a pass that would remove most of the files kept, so a wrong or empty database cannot delete every person's documents (#775)
 - A plugin repository's address on Server settings → Plugins wraps instead of pushing the page sideways at 320 pixels. (#894)
 - Every page under Documents now has the heading “Documents” and its list's name as a subheading, as Listings, Applications, Companies and the Calendar do. (#846)
 - A focused address field in Your details (a service's address with its fixed front) is ringed once, by its group, instead of twice. (#868)
