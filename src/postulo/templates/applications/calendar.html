@@ -3,6 +3,7 @@
 {% block main_width %}{% endblock %}
 {% load i18n postulo %}
 
+{% block site_search %}<c-site-search :table="site_scope" :shortcuts="keyboard_shortcuts" :hints="key_hints" />{% endblock %}
 {% block title %}{% translate "Calendar" %}{% endblock %}
 
 {% comment %} One event, wherever it is drawn (#204, #238): a link the height of a target,
@@ -176,6 +177,7 @@
       <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3 p-4">
         {% if page.view != "month" %}<input type="hidden" name="view" value="{{ page.view }}">{% endif %}
         {% if page.kinds_value %}<input type="hidden" name="kinds" value="{{ page.kinds_value }}">{% endif %}
+        {% if page.search %}<input type="hidden" name="q" value="{{ page.search }}">{% endif %}
         <div class="field">
           <label for="calendar-picker-on">{% translate "Go to the day" %}</label>
           <input type="date" id="calendar-picker-on" name="on" value="{{ page.on|date:'Y-m-d' }}" class="input" required>
@@ -193,6 +195,19 @@
       {% endfor %}
     </div>
   </nav>
+
+  {% comment %} Said when a search is narrowing the page, and where to go to look further (#848):
+     the period on screen, not all time. {% endcomment %}
+  {% if page.search %}
+    <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" data-search-note>
+      {% url 'core:search' as everything_url %}
+      {% blocktranslate trimmed with period=page.title query=page.search %}
+        Showing what matches “{{ query }}” in {{ period }}.
+        <a href="{{ everything_url }}?q={{ query|urlencode }}" class="underline">Search everything</a>
+      {% endblocktranslate %}
+      · <a href="{{ page.unsearched }}" class="underline">{% translate "Clear the search" %}</a>
+    </p>
+  {% endif %}
 
   {% comment %} The key and the filter in one row (#238). Four kinds share this page, so
      something has to say which colour is which -- and a key beside a separate set of

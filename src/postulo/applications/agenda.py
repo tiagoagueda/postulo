@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import datetime as dt
 from dataclasses import dataclass, field
+from urllib.parse import quote
 
 from django.conf import settings
 from django.urls import reverse
@@ -487,6 +488,8 @@ class Day:
     column: int = 0
     #: The kinds the page is narrowed to, so the day it opens is narrowed the same way (#452).
     kinds: frozenset[str] = field(default_factory=lambda: frozenset(ALL_KINDS))
+    #: What the masthead's search narrowed the page to, carried in the day's own link (#848).
+    search: str = ""
 
     @property
     def shown(self) -> list[Event]:
@@ -498,7 +501,7 @@ class Day:
 
     @property
     def url(self) -> str:
-        return url_for("day", self.date, self.kinds)
+        return url_for("day", self.date, self.kinds, self.search)
 
     @property
     def menu_align(self) -> str:
@@ -586,16 +589,19 @@ def kinds_parameter(kinds) -> str:
     return ",".join(kind for kind, _label, _tone in KINDS if kind in wanted)
 
 
-def url_for(view: str, day: dt.date, kinds=None) -> str:
+def url_for(view: str, day: dt.date, kinds=None, search: str = "") -> str:
     """The address of one view on one day: the month by its month, the rest by their day.
 
-    The kinds travel with it, so *Earlier* does not quietly widen a narrowed calendar.
+    The kinds travel with it, so *Earlier* does not quietly widen a narrowed calendar, and
+    the search with them, for the same reason (#848).
     """
     base = reverse("applications:calendar")
     query = f"month={day:%Y-%m}" if view == DEFAULT_VIEW else f"view={view}&on={day:%Y-%m-%d}"
     narrowed = kinds_parameter(kinds)
     if narrowed:
         query += f"&kinds={narrowed}"
+    if search:
+        query += f"&q={quote(search, safe='')}"
     return f"{base}?{query}"
 
 
@@ -645,6 +651,8 @@ class Page:
     #: weekday names in full. Set by `build`, which knows whose page it is.
     labels: bool = True
     long_weekdays: bool = False
+    #: What the masthead's search narrowed this page to, if it did (#848).
+    search: str = ""
 
     @property
     def weekday_pairs(self) -> list[tuple[str, str]]:
@@ -675,7 +683,12 @@ class Page:
     def switcher(self) -> list[tuple[str, str, str, bool]]:
         """(view, label, url, current) for each shape, on the day this page is on."""
         return [
-            (view, VIEW_LABELS[view], url_for(view, self.on, self.kinds), view == self.view)
+            (
+                view,
+                VIEW_LABELS[view],
+                url_for(view, self.on, self.kinds, self.search),
+                view == self.view,
+            )
             for view in VIEWS
         ]
 
@@ -697,7 +710,13 @@ class Page:
             showing = kind in self.kinds
             wanted = set(self.kinds) - {kind} if showing else set(self.kinds) | {kind}
             rows.append(
-                (kind, label, tone, showing, url_for(self.view, self.on, wanted or ALL_KINDS))
+                (
+                    kind,
+                    label,
+                    tone,
+                    showing,
+                    url_for(self.view, self.on, wanted or ALL_KINDS, self.search),
+                )
             )
         return rows
 
@@ -706,9 +725,14 @@ class Page:
         return self.kinds != ALL_KINDS
 
     @property
+    def unsearched(self) -> str:
+        """This same period with the search taken off (#848)."""
+        return url_for(self.view, self.on, self.kinds)
+
+    @property
     def everything(self) -> str:
         """This same period with every kind back. The way out of a calendar narrowed to one."""
-        return url_for(self.view, self.on, ALL_KINDS)
+        return url_for(self.view, self.on, ALL_KINDS, self.search)
 
     @property
     def empty(self) -> bool:
@@ -738,14 +762,53 @@ VIEW_LABELS = {
 }
 
 
-def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None) -> Page:
+def build(
+    user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None, search: str = ""
+) -> Page:
     """The page for one view on one day, dressed in this person's calendar choices (#859)."""
     page = _build(user, view, on, today=today, kinds=kinds)
     profile = getattr(user, "profile", None)
     if profile is not None:
         page.labels = profile.calendar_labels
         page.long_weekdays = profile.weekday_names == "long"
+    if search.strip():
+        narrow(page, search.strip())
     return page
+
+
+def _matches(event: Event, needle: str) -> bool:
+    return needle in f"{event.title} {event.detail}".casefold()
+
+
+def narrow(page: Page, search: str) -> None:
+    """Keep only the events of the period shown that hold ``search``, and carry it in the links.
+
+    The period shown, not all time (#848): a calendar that searched every year would be a list,
+    and the list is the global search's. The links to the period before and after, to the other
+    shapes and to each day keep the search, so it is a question that can be walked through.
+    """
+    needle = search.casefold()
+
+    def keep(events):
+        return [event for event in events if _matches(event, needle)]
+
+    page.search = search
+    page.events = keep(page.events)
+    page.overdue = keep(page.overdue)
+    page.further = keep(page.further)
+    page.listed = [(day, keep(events)) for day, events in page.listed]
+    page.listed = [(day, events) for day, events in page.listed if events or page.view == "day"]
+    for week in page.weeks:
+        for day in week:
+            day.events = keep(day.events)
+            day.search = search
+    for day in page.days:
+        day.events = keep(day.events)
+        day.search = search
+    suffix = f"&q={quote(search, safe='')}"
+    page.earlier += suffix
+    page.later += suffix
+    page.today += suffix
 
 
 def _build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None) -> Page:
@@ -836,7 +899,14 @@ def page_for(params, user, *, today: dt.date | None = None) -> Page:
     on = day_from(params.get("on", "")) or month_from(params.get("month", "")) or today
     if view == DEFAULT_VIEW and "on" not in params and "month" in params:
         on = month_from(params.get("month", "")) or today
-    return build(user, view, on, today=today, kinds=kinds_from(params.get("kinds", "")))
+    return build(
+        user,
+        view,
+        on,
+        today=today,
+        kinds=kinds_from(params.get("kinds", "")),
+        search=params.get("q", "")[:200],
+    )
 
 
 #: How far ahead the feed carries deadlines and closing dates. The interviews in it are

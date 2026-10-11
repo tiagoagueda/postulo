@@ -1170,8 +1170,14 @@ class CalendarView(LoginRequiredMixin, View):
     template_name = "applications/calendar.html"
 
     def get(self, request: HttpRequest) -> HttpResponse:
+        from postulo.core.search_scope import SearchScope
+
         page = agenda.page_for(request.GET, request.user)
-        return render(request, self.template_name, {"page": page})
+        # The masthead's search narrows what the calendar shows, in the period on screen (#848).
+        scope = SearchScope(
+            request, _("Search the calendar"), keep=("view", "on", "month", "kinds")
+        )
+        return render(request, self.template_name, {"page": page, "site_scope": scope})
 
 
 class InterviewListView(OwnedObjectMixin, ListView):

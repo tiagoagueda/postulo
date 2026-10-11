@@ -183,16 +183,46 @@ class DraftMixin(PDFErrorMixin):
 # --------------------------------------------------------------------------- CVs
 
 
-class CVListView(OwnedObjectMixin, ListView):
+class SearchedListMixin:
+    """The masthead's search narrows the list on screen, and says what it is searching (#848).
+
+    The fields are the ones the search over everything reads for this kind of document, so
+    the two agree about what a match is. *Search everything* is a button in the same box.
+    """
+
+    search_fields: tuple[str, ...] = ()
+    search_label = ""
+    search_keep: tuple[str, ...] = ()
+
+    def narrowed_by_search(self, queryset):
+        from postulo.core.search import contains
+
+        query = self.request.GET.get("q", "").strip()
+        if query and self.search_fields:
+            queryset = queryset.filter(contains(query, *self.search_fields))
+        return queryset
+
+    def get_context_data(self, **kwargs) -> dict:
+        from postulo.core.search_scope import SearchScope
+
+        context = super().get_context_data(**kwargs)
+        context["site_scope"] = SearchScope(self.request, self.search_label, self.search_keep)
+        return context
+
+
+class CVListView(SearchedListMixin, OwnedObjectMixin, ListView):
     model = CV
     template_name = "documents/cv_list.html"
     context_object_name = "cvs"
+    search_fields = ("name", "headline", "summary")
+    search_label = _("Search CVs and portfolios")
 
     def get_queryset(self):
         # `owner__profile` because a card asks each CV what language it is in, and a blank
         # field means "follow your profile" -- without the join that is two queries a row
         # rather than one for the page (#280).
-        return super().get_queryset().select_related("owner__profile").prefetch_related("items")
+        queryset = super().get_queryset().select_related("owner__profile")
+        return self.narrowed_by_search(queryset).prefetch_related("items")
 
 
 class CVDetailView(OwnedObjectMixin, DetailView):
@@ -490,12 +520,15 @@ class CVDownloadView(OwnedObjectMixin, View):
 # ------------------------------------------------------------------ cover letters
 
 
-class CoverLetterListView(OwnedObjectMixin, ListView):
+class CoverLetterListView(SearchedListMixin, OwnedObjectMixin, ListView):
     """Every letter, of every kind, with a filter for when there are several kinds."""
 
     model = CoverLetter
     template_name = "documents/letter_list.html"
     context_object_name = "letters"
+    search_fields = ("name", "subject", "body")
+    search_label = _("Search letters")
+    search_keep = ("kind",)
 
     def get_queryset(self):
         # `owner__profile` for the language each row shows; see CVListView (#280).
@@ -503,7 +536,7 @@ class CoverLetterListView(OwnedObjectMixin, ListView):
         kind = self.request.GET.get("kind", "")
         if kind in LetterKind.values:
             queryset = queryset.filter(kind=kind)
-        return queryset
+        return self.narrowed_by_search(queryset)
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
@@ -683,10 +716,13 @@ class CopiesContextMixin:
         return context
 
 
-class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
+class UploadListView(SearchedListMixin, CopiesContextMixin, OwnedObjectMixin, ListView):
     model = UploadedDocument
     template_name = "documents/upload_list.html"
     context_object_name = "documents"
+    search_fields = ("title", "notes", "reference_letter__referee__name")
+    search_label = _("Search files")
+    search_keep = ("kind", "proves")
 
     def get_queryset(self):
         queryset = super().get_queryset().prefetch_related("replaced_by", "proves")
@@ -702,7 +738,7 @@ class UploadListView(CopiesContextMixin, OwnedObjectMixin, ListView):
         # An unknown kind is ignored, as the letters list ignores one (#667).
         if self.request.GET.get("kind", "") in dict(kinds.choices()):
             queryset = queryset.filter(kind=self.request.GET["kind"])
-        return queryset
+        return self.narrowed_by_search(queryset)
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
@@ -916,14 +952,16 @@ class RenderedCompareView(OwnedObjectMixin, View):
         )
 
 
-class RenderedListView(CopiesContextMixin, OwnedObjectMixin, ListView):
+class RenderedListView(SearchedListMixin, CopiesContextMixin, OwnedObjectMixin, ListView):
     model = RenderedDocument
     template_name = "documents/rendered_list.html"
     context_object_name = "documents"
     paginate_by = 50
+    search_fields = ("title", "source_text")
+    search_label = _("Search what you sent")
 
     def get_queryset(self):
-        return (
+        return self.narrowed_by_search(
             super()
             .get_queryset()
             # `source` is a generic link with no join to follow, so the content type

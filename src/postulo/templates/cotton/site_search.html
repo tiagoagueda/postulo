@@ -97,22 +97,23 @@
         <input type="search" id="site-search" name="q" value="{{ table.search }}"
                placeholder="{{ table.search_label }}"{% if shortcuts %} aria-keyshortcuts="/"{% endif %}
                data-search-shortcut data-table-search
-               hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
+               {% if table_id %}hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
                hx-sync="#{{ form_id }}:replace"
-               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
+               hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}
                class="h-auto self-stretch px-2.5 text-base text-ellipsis lg:w-32 lg:py-1 lg:text-sm lg:transition-[width]">
         <button type="submit" class="btn size-11 lg:size-7" data-variant="ghost" data-size="icon"
                 aria-label="{{ table.search_label }}" title="{{ table.search_label }}" data-search-here
-                hx-get="{{ request.path }}" hx-include="#site-search, #{{ form_id }}"
+                {% if table_id %}hx-get="{{ request.path }}" hx-include="#site-search, #{{ form_id }}"
                 hx-sync="#{{ form_id }}:replace"
-                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true">{% icon "search" class="size-4" %}</button>
+                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"{% endif %}>{% icon "search" class="size-4" %}</button>
         <button type="submit" formaction="{% url 'core:search' %}" class="btn size-11 lg:size-7" data-variant="ghost" data-size="icon"
                 aria-label="{% translate 'Search everything' %}" title="{% translate 'Search everything' %}"
                 data-search-everything>{% icon "globe" class="size-4" %}</button>
       </div>
       <button type="button" class="btn size-11" data-variant="ghost" data-size="icon" data-search-close
               aria-label="{% translate 'Close search' %}" title="{% translate 'Close search' %}">{% icon "x" class="size-5" %}</button>
-      <noscript>{% for name, value in table.search_keeps %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}</noscript>
+      {% comment %} A page with no swap target (#848) sends the question with the form, always. {% endcomment %}
+      {% if table_id %}<noscript>{% for name, value in table.search_keeps %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}</noscript>{% else %}{% for name, value in table.search_keeps %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}{% endif %}
     </form>
   </div>
 {% else %}
