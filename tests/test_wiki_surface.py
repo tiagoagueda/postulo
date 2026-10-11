@@ -134,3 +134,27 @@ def test_every_kind_of_plugin_is_documented_with_its_group():
     assert groups, "the reader found no entry-point groups"
     missing = [group for group in groups if f"`{group}`" not in text]
     assert not missing, f"*Writing a plugin* does not say which kind registers in: {missing}"
+
+
+# ---------------------------------------------- what the pages say about the settings (#404)
+
+
+def all_wiki_text() -> str:
+    return "\n".join(path.read_text(encoding="utf-8") for path in sorted(WIKI.glob("*.md")))
+
+
+def test_every_rate_setting_is_named_in_the_wiki():
+    from postulo.core import checks
+
+    text = all_wiki_text()
+    missing = [name for name in checks.rate_settings() if name not in text]
+
+    assert not missing, f"the wiki does not name: {missing}"
+
+
+def test_the_configuration_page_does_not_say_what_the_code_no_longer_does():
+    text = " ".join(page("Configuration").split())
+
+    assert "unreadable also means no limit" not in text, "start-up refuses a rate it cannot read"
+    assert "not offered yet" not in text, "implicit TLS on 465 is offered"
+    assert "postulo.E002" in text
