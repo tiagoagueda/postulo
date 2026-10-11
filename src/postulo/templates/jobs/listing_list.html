@@ -73,9 +73,22 @@
   </div>
 {% endpartialdef %}
 
+{% comment %} Columns and Views, at the end of the filter row and only while a table is drawn
+   (#840). An empty tab, or a filter that matches nothing and so draws a header over no rows,
+   is a table; *Discarded* with no discarded listing is the sentence alone, and a Columns menu
+   over a sentence is a control over nothing (#160). Swapped with the table, as an out-of-band
+   part of the same answer, so a filter that empties the table takes them away without a reload. {% endcomment %}
+{% partialdef controls %}
+  <div id="listing-controls" class="ms-auto flex flex-wrap items-center gap-2"{% if oob %} hx-swap-oob="true"{% endif %}>
+    {% if listings or table.filters_active and has_listings %}
+      {% include "partials/table/columns.html" %}{% include "partials/table/views.html" %}
+    {% endif %}
+  </div>
+{% endpartialdef %}
+
 {% partialdef htmx %}
   {% partial table %}
-  {% with oob=True %}{% partial count %}{% endwith %}
+  {% with oob=True %}{% partial count %}{% partial controls %}{% endwith %}
 {% endpartialdef %}
 
 {% block content %}
@@ -87,10 +100,6 @@
       {% if has_listings %}{% partial count %}{% endif %}
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      {% comment %} The table's own controls appear once there is a table to control. A
-         Columns menu and a filter row over nothing at all is worse than the sentence that
-         used to be the whole of this page at zero listings (#160). {% endcomment %}
-      {% if has_listings %}{% include "partials/table/columns.html" %}{% include "partials/table/views.html" %}{% endif %}
       {% comment %} The two ways to start a listing as one group (#841), both the page's main
          action: pasting a posting's address, and typing one in. {% endcomment %}
       <div class="button-group" role="group" aria-label="{% translate 'New listing' %}" data-new-listing>
@@ -163,23 +172,26 @@
        and with scripts off the search in force rides along hidden. Every live control takes
        its turn on this form (`hx-sync`). `max-md:hidden`, because a phone filters under
        *Narrow*, whose own button is then the one *Apply* on the page (#622). {% endcomment %}
-    <form method="get" id="listing-filters" class="mb-6 flex flex-wrap items-end gap-3 max-md:hidden"
-          hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
-          hx-include="[data-table-search]" hx-sync="this:replace"
-          hx-target="#listings-table" hx-swap="outerHTML" hx-push-url="true">
-      <noscript><input type="hidden" name="q" value="{{ table.search }}"></noscript>
-      {% comment %} Which tab is open travels with the filters, so narrowing inside
-         *Discarded* stays inside it rather than falling back to *To decide*. Left out on the
-         usual tab, for the reason the tab links are: it would make every page look narrowed.
-      {% endcomment %}
-      {% if current_filter != 'undecided' %}
-        <input type="hidden" name="state" value="{{ current_filter }}">
-      {% endif %}
-      <button type="submit" class="btn" data-variant="outline">{% translate "Apply" %}</button>
-      {% if table.filters_active %}
-        <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
-      {% endif %}
-    </form>
+    <div class="mb-6 flex flex-wrap items-end gap-3" data-filter-row>
+      <form method="get" id="listing-filters" class="flex flex-wrap items-end gap-3 max-md:hidden"
+            hx-get="{{ request.path }}" hx-trigger="input changed delay:300ms, change, submit"
+            hx-include="[data-table-search]" hx-sync="this:replace"
+            hx-target="#listings-table" hx-swap="outerHTML" hx-push-url="true">
+        <noscript><input type="hidden" name="q" value="{{ table.search }}"></noscript>
+        {% comment %} Which tab is open travels with the filters, so narrowing inside
+           *Discarded* stays inside it rather than falling back to *To decide*. Left out on the
+           usual tab, for the reason the tab links are: it would make every page look narrowed.
+        {% endcomment %}
+        {% if current_filter != 'undecided' %}
+          <input type="hidden" name="state" value="{{ current_filter }}">
+        {% endif %}
+        <button type="submit" class="btn" data-variant="outline">{% translate "Apply" %}</button>
+        {% if table.filters_active %}
+          <a href="{{ table.clear_url }}" class="btn" data-variant="ghost">{% translate "Clear" %}</a>
+        {% endif %}
+      </form>
+      {% partial controls %}
+    </div>
   {% endif %}
 
   {% partial table %}
