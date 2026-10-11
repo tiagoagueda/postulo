@@ -56,6 +56,10 @@ FORWARDING_HEADERS = (
 )
 
 
+#: The request's `META` key naming a peer that forwarded headers but is not a trusted proxy.
+UNTRUSTED_FORWARDER = "POSTULO_UNTRUSTED_FORWARDER"
+
+
 def _networks(values: Iterable[str]) -> list[ipaddress.IPv4Network | ipaddress.IPv6Network]:
     networks = []
     for value in values:
@@ -147,6 +151,11 @@ class TrustedProxyMiddleware:
                 request.META["REMOTE_ADDR"] = client_address(remote_addr, forwarded_for)
                 request.META["POSTULO_PROXY_ADDR"] = remote_addr
         else:
+            # Evidence that there is a proxy that is not trusted (#757): something forwarding
+            # for other clients, so every one of them arrives from this one address and shares
+            # whatever is counted per address. Kept before the headers are removed.
+            if any(request.META.get(header) for header in FORWARDING_HEADERS):
+                request.META[UNTRUSTED_FORWARDER] = remote_addr
             for header in FORWARDING_HEADERS:
                 request.META.pop(header, None)
         return self.get_response(request)

@@ -26,6 +26,7 @@ round for a limit whose purpose is to stop a machine being ridden, not to meter 
 
 from __future__ import annotations
 
+import logging
 import re
 import time
 from dataclasses import dataclass
@@ -33,6 +34,8 @@ from dataclasses import dataclass
 from django.conf import settings
 from django.core.cache import caches
 from django.utils.translation import ngettext
+
+logger = logging.getLogger(__name__)
 
 #: `20/h`, `5/m`, `600/d`. Empty, `0` or anything unparseable means no limit, because an
 #: operator who mistypes a rate should get their instance working rather than locked.
@@ -211,8 +214,33 @@ def barred(name: str, request) -> None:
     """
     used = _store().get(_key(f"endpoint-refused:{name}", _caller(request), REFUSED), 0)
     if used > REFUSED.times:
+        _say_the_proxy_is_not_trusted(request)
         elapsed = int(_now()) % REFUSED.seconds
         raise TooOften(REFUSED, retry_after=max(1, REFUSED.seconds - elapsed))
+
+
+def _say_the_proxy_is_not_trusted(request) -> None:
+    """When an address is barred and it is a forwarder Postulo does not trust, say so once an hour.
+
+    Everyone behind a proxy that is not in POSTULO_TRUSTED_PROXIES arrives from the proxy's
+    address, so one person's wrong tokens bar the collector that holds the right one (#757).
+    The fix is one line of configuration; this is the line in the log that points at it.
+    """
+    from . import proxy
+
+    forwarder = request.META.get(proxy.UNTRUSTED_FORWARDER)
+    if not forwarder:
+        return
+    try:
+        first = _store().add(f"postulo:proxy-warned:{forwarder}", True, 3600)
+    except Exception:  # a store that is down is no reason to fail the refusal itself
+        return
+    if first:
+        logger.warning(
+            "Wrong tokens from %s have used up its allowance. It forwards for other clients but "
+            "is not in POSTULO_TRUSTED_PROXIES, so they all share one allowance. Add it there.",
+            forwarder,
+        )
 
 
 def refused(name: str, request) -> None:
