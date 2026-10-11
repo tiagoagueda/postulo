@@ -102,6 +102,8 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.core.phone_numbers import taken_by_asking as phone_number_is_taken
     from postulo.core.phones import COUNTRY_CODES
     from postulo.core.redirects import safe_next
+    from postulo.core.transfers import Transfer
+    from postulo.core.transfers import register as register_transfer
     from postulo.core.vcard import Address as VCardAddress
     from postulo.core.vcard import Card as VCard
     from postulo.core.vcard import Link as VCardLink
@@ -228,6 +230,7 @@ __all__ = [
     "TextMessage",
     "Theme",
     "ThemeKind",
+    "Transfer",
     "TransportPlugin",
     "VCard",
     "VCardAddress",
@@ -265,6 +268,7 @@ __all__ = [
     "record_listing_event",
     "refuse_unreadable",
     "register_document_format",
+    "register_transfer",
     "reminder_lines",
     "reschedule_interview",
     "retire_reminder",
@@ -322,6 +326,8 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     "add_appointment": ("postulo.applications.services", "add_appointment"),
     "add_reminder": ("postulo.applications.services", "add_reminder"),
     "retire_reminder": ("postulo.applications.services", "retire_reminder"),
+    "Transfer": ("postulo.core.transfers", "Transfer"),
+    "register_transfer": ("postulo.core.transfers", "register"),
     "get_or_create_company": ("postulo.applications.services", "get_or_create_company"),
     "record_event": ("postulo.applications.services", "record_event"),
     "reschedule_interview": ("postulo.applications.services", "reschedule_interview"),

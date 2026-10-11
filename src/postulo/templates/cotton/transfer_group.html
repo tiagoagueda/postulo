@@ -1,0 +1,37 @@
+{% load i18n postulo %}
+<c-vars subject />
+{% comment %} Import and Export as one button group (#862): `<c-transfer-group subject="calendar" />`.
+
+   What stands behind each button is the registry in `core.transfers`. A direction with one
+   transfer is a link straight to it; with several it is a button that opens a popover listing
+   them, a plain list of links so it needs no script. A direction with none is not drawn, and
+   a page with neither draws nothing. The words follow the choice of icons or labels (#852). {% endcomment %}
+{% transfers subject as group %}
+{% if group.imports or group.exports %}
+  <div class="button-group" role="group" aria-label="{% translate 'Import and export' %}" data-transfers="{{ subject }}">
+    {% if group.imports|length == 1 %}
+      <a href="{{ group.imports.0.1 }}" class="btn" data-variant="outline" data-transfer="import">{% icon "file-up" %}<span class="btn-label">{% translate "Import" %}</span></a>
+    {% elif group.imports %}
+      <button type="button" class="btn" data-variant="outline" data-transfer="import" popovertarget="import-{{ subject }}" aria-haspopup="true">{% icon "file-up" %}<span class="btn-label">{% translate "Import" %}</span></button>
+    {% endif %}
+    {% if group.exports|length == 1 %}
+      <a href="{{ group.exports.0.1 }}" class="btn" data-variant="outline" data-transfer="export"{% if subject == "calendar" %} download data-calendar-download{% endif %}>{% icon "file-down" %}<span class="btn-label">{% translate "Export" %}</span></a>
+    {% elif group.exports %}
+      <button type="button" class="btn" data-variant="outline" data-transfer="export" popovertarget="export-{{ subject }}" aria-haspopup="true">{% icon "file-down" %}<span class="btn-label">{% translate "Export" %}</span></button>
+    {% endif %}
+  </div>
+  {% if group.imports|length > 1 %}
+    <div id="import-{{ subject }}" popover data-popover data-align="end" class="card p-2">
+      <ul class="flex flex-col gap-1" aria-label="{% translate 'Import from' %}">
+        {% for label, url in group.imports %}<li><a href="{{ url }}" class="menu-item">{{ label }}</a></li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+  {% if group.exports|length > 1 %}
+    <div id="export-{{ subject }}" popover data-popover data-align="end" class="card p-2">
+      <ul class="flex flex-col gap-1" aria-label="{% translate 'Export as' %}">
+        {% for label, url in group.exports %}<li><a href="{{ url }}" class="menu-item">{{ label }}</a></li>{% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+{% endif %}

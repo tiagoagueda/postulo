@@ -6197,10 +6197,6 @@ msgstr "Prenesi .%(extension)s"
 msgid "Download as a vCard"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html
-msgid "Download as iCalendar"
-msgstr ""
-
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "Download CSV"
@@ -6249,10 +6245,6 @@ msgstr "Prenesi predlogo"
 
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Download these people as a vCard"
-msgstr ""
-
-#: src/postulo/templates/accounts/profile.html
-msgid "Download your card"
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -6662,6 +6654,10 @@ msgstr "opravila"
 msgid "ESCO skill"
 msgstr "Spretnost ESCO"
 
+#: src/postulo/core/transfers.py
+msgid "Europass"
+msgstr ""
+
 #: src/postulo/templates/resume/europass_import.html
 #, fuzzy
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
@@ -6838,6 +6834,11 @@ msgstr "Vse, kar API ponuja, je opisano na <code>%(url)s</code>, v OpenAPI."
 msgid "Everything with a date is here: interviews, appointments with an adviser, reminders, an application's deadline, the day a listing closes and the day an offer must be answered. The key above the calendar names the colours, and each name switches that kind off and on."
 msgstr ""
 
+#: src/postulo/templates/accounts/profile.html
+#, python-format
+msgid "Everything you have recorded, not only these details, is under <a href=\"%(everything_url)s\" class=\"underline\">Export everything</a>."
+msgstr ""
+
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Everything you have written"
@@ -6928,8 +6929,8 @@ msgstr "poteče dne"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Pojasniti, kaj je šlo narobe, pogosto pomeni povedati, katere povezave, katerega podjetja ali katerega dokumenta se je tikalo. Tu ni vsebine nobenega dokumenta, a s to stranjo ravnajte kot z ostalo instanco, preden karkoli od nje delite."
 
+#: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
-#: src/postulo/templates/resume/overview.html
 #, fuzzy
 msgid "Export"
 msgstr "Izvoz"
@@ -6944,6 +6945,10 @@ msgstr "arhiv izvoza"
 msgid "export archives"
 msgstr "arhivi izvoza"
 
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Export as"
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6956,7 +6961,6 @@ msgstr "Izvozi vse"
 msgid "Export or import"
 msgstr ""
 
-#: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/core/export.html
 #, fuzzy
 msgid "Export or import your record"
@@ -8049,6 +8053,10 @@ msgstr "Hibridno"
 msgid "I have already applied to this one"
 msgstr "Sem sem se že prijavil/-a"
 
+#: src/postulo/core/transfers.py
+msgid "iCalendar"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "icon"
@@ -8205,7 +8213,7 @@ msgid "Ignore this column"
 msgstr "Prezri ta stolpec"
 
 #: src/postulo/templates/core/import_csv_map.html
-#: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/cotton/transfer_group.html
 #, fuzzy
 msgid "Import"
 msgstr "Uvozi"
@@ -8216,15 +8224,22 @@ msgstr "Uvozi"
 msgid "Import a Europass CV"
 msgstr "Uvozi življenjepis Europass"
 
-#: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
+msgstr ""
+
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Import and export"
 msgstr ""
 
 #: src/postulo/templates/core/import_csv_done.html
 #, fuzzy
 msgid "Import another file"
 msgstr "Uvozi še eno datoteko"
+
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Import from"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/import_csv.html
@@ -19267,7 +19282,7 @@ msgstr "Spremenljivo plačilo"
 msgid "Variants"
 msgstr "Različice"
 
-#: src/postulo/templates/jobs/company_detail.html
+#: src/postulo/core/transfers.py src/postulo/templates/jobs/company_detail.html
 msgid "vCard"
 msgstr ""
 
@@ -21014,16 +21029,11 @@ msgstr "Vaš rok"
 msgid "Your details"
 msgstr "Vaši podatki"
 
-#: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
 #, fuzzy
 msgid "Your details and your career in one JSON file: to keep, to read, or to hand to another Postulo. Nothing about where you applied is in it."
 msgstr "Vaši podatki in vaša kariera v eni datoteki JSON: za hrambo, branje ali predajo drugi namestitvi Postulo. O tem, kam ste se prijavili, ni v njej ničesar."
-
-#: src/postulo/templates/accounts/profile.html
-msgid "Your details as a vCard"
-msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -21111,10 +21121,6 @@ msgstr "Vaše ime zanjo: »Telegram«, »Paperless doma«."
 msgid "Your name, and under it what is chosen here from <a href=\"%(details_url)s\" class=\"underline\">Your details</a>, read again every time the document is drawn. Until you choose, that is your primary number, your account's address, the primary link of each kind, every identifier and where you are."
 msgstr "Vaše ime in pod njim tisto, kar je tu izbrano iz <a href=\"%(details_url)s\" class=\"underline\">Vaši podatki</a>, ponovno prebrano ob vsakem risanju dokumenta. Dokler ne izberete, je to vaša glavna številka, naslov vašega računa, glavna povezava vsake vrste, vsak identifikator in kje ste."
 
-#: src/postulo/templates/accounts/profile.html
-msgid "Your name, headline, email address, number, links and town, as the CV you have not changed prints them, in a file an address book reads. It is never read back here."
-msgstr ""
-
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Your own name"
@@ -21175,7 +21181,10 @@ msgstr "Vaš glavni profil na družbenem omrežju"
 msgid "Your primary website"
 msgstr "Vaše glavno spletno mesto"
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/core/transfers.py
+msgid "Your record (JSON)"
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html

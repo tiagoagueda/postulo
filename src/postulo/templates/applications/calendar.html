@@ -148,6 +148,10 @@
              {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
         {% endfor %}
       </nav>
+      {% comment %} The file is what this page is showing: the same period and the same kinds,
+         carried in the address, and the same list (#661); the import is a page of its own,
+         which shows what a file holds before it adds anything. Both from the registry (#862). {% endcomment %}
+      <c-transfer-group subject="calendar" />
       {% comment %} A reminder for no day in particular, which the form then asks for. Each
          day has its own as well, with the day already in it (#316). {% endcomment %}
       <a href="{% url 'applications:reminder_create' %}?next={{ request.get_full_path|urlencode:'' }}" class="btn">
@@ -157,18 +161,6 @@
       <a href="{% url 'applications:appointment_create' %}?next={{ request.get_full_path|urlencode:'' }}"
          class="btn" data-variant="outline" data-new-appointment>
         {% icon "plus" %}{% translate "New appointment" %}
-      </a>
-    </div>
-    {% comment %} The file is what this page is showing: the same period and the same kinds,
-       carried in the address, and the same list (#661). The import is a page of its own,
-       which shows what a file holds before it adds anything. {% endcomment %}
-    <div class="flex w-full flex-wrap items-center gap-2">
-      <a href="{% url 'applications:calendar_download' %}{% if request.GET %}?{{ request.GET.urlencode }}{% endif %}"
-         class="btn" data-variant="outline" data-size="sm" download data-calendar-download>
-        {% translate "Download as iCalendar" %}
-      </a>
-      <a href="{% url 'applications:ical_import' %}" class="btn" data-variant="outline" data-size="sm">
-        {% translate "Import an iCalendar file" %}
       </a>
     </div>
   </div>

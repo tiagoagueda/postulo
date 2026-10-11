@@ -11,9 +11,9 @@
       <c-page-title help="career">{% translate "Your career" %}</c-page-title>
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">
-      <a href="{% url 'resume:europass_import' %}" class="btn" data-variant="ghost">{% translate "Import" %}</a>
-      {# Your details and this page as one file, and the page that reads one back (#181). #}
-      <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="ghost">{% translate "Export" %}</a>
+      {% comment %} Import (Europass, or your record) and Export (your record) as one group; what
+         is behind each is the registry in `core.transfers`, which a plugin can add to (#862). {% endcomment %}
+      <c-transfer-group subject="career" />
       <a href="{% url 'resume:preview' %}" class="btn" data-variant="outline">{% translate "Preview" %}</a>
       <a href="{% url 'documents:cv_list' %}" class="btn">{% translate "Your CVs" %}</a>
     </div>

@@ -95,6 +95,22 @@ def icon(name: str, label: str = "", **attrs: str) -> str:
     return mark_safe(source.replace("<svg", "<svg " + " ".join(rendered), 1))  # noqa: S308
 
 
+@register.simple_tag(takes_context=True)
+def transfers(context, subject: str) -> dict:
+    """What a page can be imported from and exported to, as ``{"imports": …, "exports": …}``.
+
+    Each is a list of ``(label, url)`` in the order they are drawn, from the registry in
+    `core.transfers`, so a plugin that registers a format appears here (#862).
+    """
+    from postulo.core import transfers as registry
+
+    request = context.get("request")
+    return {
+        "imports": [(t.label, t.url(request)) for t in registry.offered(subject, registry.IMPORT)],
+        "exports": [(t.label, t.url(request)) for t in registry.offered(subject, registry.EXPORT)],
+    }
+
+
 @register.simple_tag
 def brand(name: str, label: str = "", **attrs: str) -> str:
     """Inline a brand mark: ``{% brand "mastodon" class="size-4" %}`` (#654).

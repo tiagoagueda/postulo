@@ -689,7 +689,8 @@ def test_the_calendar_page_links_to_the_download_and_the_import(client, user):
     client.force_login(user)
     page = client.get(reverse("applications:calendar"), {"view": "agenda", "kinds": "reminder"})
     html = page.content.decode()
-    assert "Download as iCalendar" in html and "Import an iCalendar file" in html
+    assert 'data-transfer="export"' in html and 'data-transfer="import"' in html
+    assert reverse("applications:ical_import") in html
     assert "download.ics?view=agenda&amp;kinds=reminder" in html, "the kinds travel with it"
 
 

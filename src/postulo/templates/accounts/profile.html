@@ -7,6 +7,7 @@
 
 {% block content %}
   <div>
+    <div class="mb-0 flex flex-wrap items-start gap-4">
     <div class="max-w-2xl">
       <c-page-title>
         {% translate "Your details" %}
@@ -20,6 +21,10 @@
         {% endblocktranslate %}
         </c-slot>
       </c-page-title>
+    </div>
+    {% comment %} Import and Export beside the heading (#862): your record as JSON, and your
+       card as a vCard, from the registry in `core.transfers`. {% endcomment %}
+    <div class="ms-auto"><c-transfer-group subject="details" /></div>
     </div>
 
   {% comment %} One record in several parts down one page, so it is navigated rather than
@@ -371,32 +376,15 @@
       </form>
     {% endif %}
 
-    {% comment %} One person's own record, taken out on its own and put back (#181). Below
-       the form rather than inside it: nothing here is saved by the button above. {% endcomment %}
-    <div class="mt-10 border-t border-ink-200 pt-6 dark:border-ink-800" data-candidate-file>
-      <c-section-title>
-        {% translate "Your record as a file" %}
-        <c-slot name="subtitle">{% blocktranslate trimmed %}
-          Your details and your career in one JSON file: to keep, to read, or to hand to
-          another Postulo. Nothing about where you applied is in it.
-        {% endblocktranslate %}</c-slot>
-      </c-section-title>
-      <a href="{% url 'resume:candidate_file' %}" class="btn" data-variant="outline">{% translate "Export or import your record" %}</a>
-    </div>
-
-    {% comment %} Your own card (#660): what your default CV prints, as a vCard to hand to
-       an address book. Export only; a card is never read back into these details. {% endcomment %}
-    <div class="mt-6" data-own-vcard>
-      <c-section-title>
-        {% translate "Your details as a vCard" %}
-        <c-slot name="subtitle">{% blocktranslate trimmed %}
-          Your name, headline, email address, number, links and town, as the CV you have not
-          changed prints them, in a file an address book reads. It is never read back here.
-        {% endblocktranslate %}</c-slot>
-      </c-section-title>
-      {% url 'jobs:own_vcard' as own_card_url %}
-      <c-vcard-download :url="own_card_url" label="{% translate 'Download your card' %}" />
-    </div>
+    {% comment %} Your record and your card are the Import and Export beside the heading
+       (#862); what is left here is the way to everything else (#181). {% endcomment %}
+    <p class="mt-10 border-t border-ink-200 pt-6 text-sm text-ink-500 dark:border-ink-800 dark:text-ink-400" data-full-archive>
+      {% url 'core:export' as everything_url %}
+      {% blocktranslate trimmed %}
+        Everything you have recorded, not only these details, is under
+        <a href="{{ everything_url }}" class="underline">Export everything</a>.
+      {% endblocktranslate %}
+    </p>
     </div>
   </div>
   </div>

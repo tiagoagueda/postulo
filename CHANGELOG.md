@@ -106,6 +106,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Import and Export are a button group beside the heading of the Calendar, Your details and Your career, from a registry of formats a plugin can add to (#862)
 - Appearance has a setting for buttons that carry an icon and words: both, icons only (the words become a tooltip) or labels only (#852)
 - A company's page groups Edit, Merge, Export and Delete with icons, and Export offers the company as a vCard or as JSON, with or without your notes (#851)
 - A plugin can place a dated calendar entry that belongs to no application (add_reminder, idempotent by uid, never unticks) and end it (retire_reminder); removing the plugin retires its entries (#887)

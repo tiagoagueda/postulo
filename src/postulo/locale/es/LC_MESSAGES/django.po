@@ -5993,10 +5993,6 @@ msgstr "Descargar .%(extension)s"
 msgid "Download as a vCard"
 msgstr ""
 
-#: src/postulo/templates/applications/calendar.html
-msgid "Download as iCalendar"
-msgstr ""
-
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "Download CSV"
@@ -6045,10 +6041,6 @@ msgstr "Descargar la plantilla"
 
 #: src/postulo/templates/jobs/company_detail.html
 msgid "Download these people as a vCard"
-msgstr ""
-
-#: src/postulo/templates/accounts/profile.html
-msgid "Download your card"
 msgstr ""
 
 #: src/postulo/templates/server/backups.html
@@ -6458,6 +6450,10 @@ msgstr "tareas"
 msgid "ESCO skill"
 msgstr "competencia ESCO"
 
+#: src/postulo/core/transfers.py
+msgid "Europass"
+msgstr ""
+
 #: src/postulo/templates/resume/europass_import.html
 #, fuzzy
 msgid "Europass records five levels per language and Postulo keeps one, so the lowest is taken. Where the file states none, none is written: a level is a claim about yourself that somebody will test, so it is yours to make afterwards."
@@ -6634,6 +6630,11 @@ msgstr "Todo lo que ofrece la API está descrito en <code>%(url)s</code>, en Ope
 msgid "Everything with a date is here: interviews, appointments with an adviser, reminders, an application's deadline, the day a listing closes and the day an offer must be answered. The key above the calendar names the colours, and each name switches that kind off and on."
 msgstr ""
 
+#: src/postulo/templates/accounts/profile.html
+#, python-format
+msgid "Everything you have recorded, not only these details, is under <a href=\"%(everything_url)s\" class=\"underline\">Export everything</a>."
+msgstr ""
+
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
 msgid "Everything you have written"
@@ -6724,8 +6725,8 @@ msgstr "caduca el"
 msgid "Explaining what went wrong often means saying which connection, which company or which document it happened to. Nothing here contains a document's contents, but treat this page as you would the rest of the instance before you share any of it."
 msgstr "Explicar qué falló suele implicar decir a qué conexión, a qué empresa o a qué documento le ocurrió. Aquí no hay contenido de ningún documento, pero trata esta página como el resto de la instancia antes de compartir nada de ella."
 
+#: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
-#: src/postulo/templates/resume/overview.html
 #, fuzzy
 msgid "Export"
 msgstr "Exportar"
@@ -6740,6 +6741,10 @@ msgstr "archivo de exportación"
 msgid "export archives"
 msgstr "archivos de exportación"
 
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Export as"
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/resume/candidate_file.html
@@ -6752,7 +6757,6 @@ msgstr "Exportar todo"
 msgid "Export or import"
 msgstr ""
 
-#: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/core/export.html
 #, fuzzy
 msgid "Export or import your record"
@@ -7845,6 +7849,10 @@ msgstr "Híbrido"
 msgid "I have already applied to this one"
 msgstr "Ya he presentado candidatura a esta"
 
+#: src/postulo/core/transfers.py
+msgid "iCalendar"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "icon"
@@ -8001,7 +8009,7 @@ msgid "Ignore this column"
 msgstr "Ignorar esta columna"
 
 #: src/postulo/templates/core/import_csv_map.html
-#: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/cotton/transfer_group.html
 #, fuzzy
 msgid "Import"
 msgstr "Importar"
@@ -8012,15 +8020,22 @@ msgstr "Importar"
 msgid "Import a Europass CV"
 msgstr "Importar un CV Europass"
 
-#: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
 msgid "Import an iCalendar file"
+msgstr ""
+
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Import and export"
 msgstr ""
 
 #: src/postulo/templates/core/import_csv_done.html
 #, fuzzy
 msgid "Import another file"
 msgstr "Importar otro archivo"
+
+#: src/postulo/templates/cotton/transfer_group.html
+msgid "Import from"
+msgstr ""
 
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/core/import_csv.html
@@ -18979,7 +18994,7 @@ msgstr "Retribución variable"
 msgid "Variants"
 msgstr "Variantes"
 
-#: src/postulo/templates/jobs/company_detail.html
+#: src/postulo/core/transfers.py src/postulo/templates/jobs/company_detail.html
 msgid "vCard"
 msgstr ""
 
@@ -20718,16 +20733,11 @@ msgstr "Tu plazo"
 msgid "Your details"
 msgstr "Tus datos"
 
-#: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
 #, fuzzy
 msgid "Your details and your career in one JSON file: to keep, to read, or to hand to another Postulo. Nothing about where you applied is in it."
 msgstr "Tus datos y tu trayectoria en un archivo JSON: para guardar, para leer o para entregar a otro Postulo. No contiene nada sobre dónde te presentaste."
-
-#: src/postulo/templates/accounts/profile.html
-msgid "Your details as a vCard"
-msgstr ""
 
 #: src/postulo/documents/forms.py
 #, fuzzy
@@ -20815,10 +20825,6 @@ msgstr "Tu nombre para ella: «Telegram», «Paperless en casa»."
 msgid "Your name, and under it what is chosen here from <a href=\"%(details_url)s\" class=\"underline\">Your details</a>, read again every time the document is drawn. Until you choose, that is your primary number, your account's address, the primary link of each kind, every identifier and where you are."
 msgstr "Tu nombre y, bajo él, lo que se elige aquí de <a href=\"%(details_url)s\" class=\"underline\">Tus datos</a>, que se vuelve a leer cada vez que se dibuja el documento. Hasta que elijas, es tu número principal, la dirección de tu cuenta, el enlace principal de cada tipo, todos los identificadores y dónde estás."
 
-#: src/postulo/templates/accounts/profile.html
-msgid "Your name, headline, email address, number, links and town, as the CV you have not changed prints them, in a file an address book reads. It is never read back here."
-msgstr ""
-
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "Your own name"
@@ -20879,7 +20885,10 @@ msgstr "Tu perfil social principal"
 msgid "Your primary website"
 msgstr "Tu sitio web principal"
 
-#: src/postulo/templates/accounts/profile.html
+#: src/postulo/core/transfers.py
+msgid "Your record (JSON)"
+msgstr ""
+
 #: src/postulo/templates/core/export.html
 #: src/postulo/templates/resume/candidate_file.html
 #: src/postulo/templates/resume/europass_import.html

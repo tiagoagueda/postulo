@@ -23,7 +23,11 @@ class CoreConfig(AppConfig):
         # Registers the dashboard widgets core owns, and the export archive as a piece
         # of slow work (#247), and the configuration checks `manage.py check` runs before
         # the first request (#233).
-        from . import checks, signals, slow, widgets_builtin  # noqa: F401
+        from . import checks, signals, slow, transfers, widgets_builtin  # noqa: F401
+
+        # What the Calendar, Your details and Your career can be imported from and exported
+        # to, said once so a plugin can add a format (#862).
+        transfers.register_the_ones_postulo_has()
 
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
