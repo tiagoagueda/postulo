@@ -275,3 +275,30 @@ class DownloadsAreNotCachedMiddleware:
         ):
             response["Cache-Control"] = "private, max-age=0, no-store"
         return response
+
+
+class PrivatePagesAreNotKeptMiddleware:
+    """A page drawn for a signed-in person is never kept by the browser's history cache (#787).
+
+    Without it, Back after *Sign out* shows the previous page from the back/forward cache with
+    no request reaching the server: the home address on *Your details*, the applications, the
+    companies. ``private, no-store`` keeps the page out of that cache and out of every shared
+    one. It is given to HTML only, for a person who is signed in when the page is answered, and
+    a view that says something of its own about caching keeps what it said. The sign-in page
+    itself, drawn for nobody, is left to cache as it was.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        user = getattr(request, "user", None)
+        if (
+            user is not None
+            and user.is_authenticated
+            and "Cache-Control" not in response
+            and str(response.get("Content-Type", "")).startswith("text/html")
+        ):
+            response["Cache-Control"] = "private, max-age=0, no-store"
+        return response

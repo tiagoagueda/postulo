@@ -113,6 +113,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     # Anything sent as an attachment is never kept by a cache (#788).
     "postulo.core.middleware.DownloadsAreNotCachedMiddleware",
+    # And no page drawn for a signed-in person, so Back after sign-out shows nothing (#787).
+    "postulo.core.middleware.PrivatePagesAreNotKeptMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     # After it, so `request.htmx` is there to read, and outside everything that answers a

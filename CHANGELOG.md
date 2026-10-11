@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Pages drawn for a signed-in person carry `Cache-Control: private, no-store`, so Back after sign-out no longer restores them from the browser's history cache (#787)
 - Every workflow checks the uv installer's sha256 before running it, and the Dockerfile copies uv from an image named by digest, so a moved tag or a changed script can no longer alter the tool that builds a release. (#790)
 - An unverified address claim is dated and expires after the confirmation link's three days, gives way to its real holder's sign-up, and cannot be added without the password or where the several-addresses feature is off. (#891)
 - The PostgreSQL compose profile still hands its database container the whole .env, secret keys included; this is now stated in the threat model, the compose file, .env.example and the wiki, with how to close it. (#791)
