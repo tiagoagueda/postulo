@@ -634,6 +634,9 @@ def _mint_uid() -> str:
     return f"{uuid.uuid4()}@postulo"
 
 
+mint_uid = _mint_uid
+
+
 class ReminderQuerySet(models.QuerySet):
     def for_user(self, user) -> ReminderQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):
@@ -641,7 +644,8 @@ class ReminderQuerySet(models.QuerySet):
         return self.filter(owner=user)
 
     def outstanding(self) -> ReminderQuerySet:
-        return self.filter(done_at__isnull=True)
+        """Not done, and not retired by the plugin that placed it (#887)."""
+        return self.filter(done_at__isnull=True, retired_at__isnull=True)
 
     def due(self, at=None) -> ReminderQuerySet:
         """Outstanding reminders whose moment has arrived."""
@@ -667,6 +671,14 @@ class Reminder(OwnedModel):
     #: Stable across edits and across an export, so a task a calendar was given once is
     #: found again and not made a second time (#661).
     uid = models.CharField(_("calendar identifier"), max_length=64, default=_mint_uid)
+    #: The plugin that placed it, by name: blank for a reminder a person made, or read from a
+    #: calendar file. Drawn beside the entry, so the person sees where it came from (#887).
+    source = models.CharField(_("placed by"), max_length=60, blank=True)
+    #: What the plugin said about it, shown with it. A person's own reminders have none.
+    note = models.TextField(_("note"), blank=True)
+    #: When the plugin that placed it ended it, or was removed. A retired entry is kept and
+    #: neither drawn nor announced; the plugin placing it again brings it back (#887).
+    retired_at = models.DateTimeField(_("retired on"), null=True, blank=True)
 
     objects = ReminderQuerySet.as_manager()
 

@@ -13,6 +13,7 @@ class ApplicationsConfig(AppConfig):
         # Registers this app's dashboard widgets.
         # Registers the report render as a piece of slow work (#247).
         from . import (
+            signals,  # noqa: F401
             slow,  # noqa: F401
             tables,  # noqa: F401
             widgets,  # noqa: F401

@@ -332,6 +332,7 @@ def search_reminders(user, query: str, limit: int) -> Found:
 
     rows = (
         Reminder.objects.for_user(user)
+        .filter(retired_at__isnull=True)
         .select_related("application", "application__posting")
         .filter(contains(query, "summary"))
         .order_by("-due_at")

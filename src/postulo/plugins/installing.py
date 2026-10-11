@@ -1017,6 +1017,10 @@ def remove(name: str) -> Installed:
     _prune_empty_directories()
     write_record([item for item in read_record() if canonicalise(item.name) != canonicalise(name)])
     _forget_metadata_cache()
+    # Whoever placed things on its behalf hears of it: the calendar ends what it put there (#887).
+    from .signals import plugin_removed
+
+    plugin_removed.send(sender=None, name=entry.name)
     return entry
 
 

@@ -36,8 +36,8 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 
 from .ical_reader import NO_DATE, RECURS, UNREADABLE, Entry, aware, stored_uid
-from .models import Application, Interview, InterviewKind, Reminder
-from .services import DEFAULT_INTERVIEW_LENGTH, schedule_interview
+from .models import Application, Interview, InterviewKind, Reminder, mint_uid
+from .services import DEFAULT_INTERVIEW_LENGTH, add_reminder, schedule_interview
 
 #: Held in the session between reading a file and confirming it.
 SESSION_KEY = "ical_file"
@@ -291,13 +291,15 @@ def apply(user, rows: list[Row], filename: str) -> Report:
                 report.interviews += 1
             else:
                 due = _day_due(entry.day) if entry.day is not None else form.moment()
-                Reminder.objects.create(
-                    owner=user,
-                    application=form.cleaned_data.get("application"),
+                # The same writer a plugin uses (#887), with no source: it is the person's.
+                add_reminder(
+                    user,
                     summary=entry.summary or _("(untitled)"),
                     due_at=due,
-                    done_at=timezone.now() if entry.completed else None,
-                    **({"uid": uid} if uid else {}),
+                    uid=uid or mint_uid(),
+                    source="",
+                    application=form.cleaned_data.get("application"),
+                    done=entry.completed,
                 )
                 report.reminders += 1
     return report

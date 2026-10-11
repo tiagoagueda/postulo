@@ -1350,6 +1350,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             summary=reminder_entry.get("summary", ""),
             due_at=due_at,
             done_at=_dt(reminder_entry.get("done_at")),
+            # Format 66 (#887): which plugin placed it, what it said, and when it ended it. An
+            # archive without them is a reminder somebody made.
+            source=str(reminder_entry.get("source") or "")[:60],
+            note=str(reminder_entry.get("note") or ""),
+            retired_at=_dt(reminder_entry.get("retired_at")),
             **_restored_uid(Reminder, user, reminder_entry.get("uid")),
         )
         report.reminders += 1

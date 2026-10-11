@@ -741,6 +741,82 @@ def postpone_reminder(reminder: Reminder, due: dt.datetime) -> Reminder:
     return reminder
 
 
+# --------------------------------------------------------- entries a plugin places (#887)
+
+
+def add_reminder(
+    owner,
+    *,
+    summary: str,
+    due_at,
+    uid: str,
+    source: str,
+    note: str = "",
+    application=None,
+    done: bool = False,
+) -> Reminder:
+    """Put a dated entry on the calendar for ``owner``, or move the one this ``uid`` already is.
+
+    For a plugin that learns of something with a date that belongs to no application -- a
+    monthly declaration, an expected payment -- and for the calendar-file import, which is the
+    same act. **Idempotent by ``uid``**: a second call updates the summary, the date and the
+    note in place, brings back one that was retired, and never touches ``done_at``, so a
+    person who ticked it keeps it ticked. ``source`` is the plugin's name, drawn beside the
+    entry; blank is a person's own, as the import writes it.
+
+    Refused with a ``ValueError`` when ``uid`` is already a reminder the person made and the
+    caller is a plugin (or the other way round): a plugin may not overwrite what a person wrote,
+    nor a person's import what a plugin placed.
+    """
+    if not uid or not summary:
+        raise ValueError("A calendar entry needs a uid and a summary.")
+    existing = Reminder.objects.filter(owner=owner, uid=uid).first()
+    if existing is None:
+        return Reminder.objects.create(
+            owner=owner,
+            application=application,
+            summary=summary[:250],
+            due_at=due_at,
+            uid=uid,
+            source=source[:60],
+            note=note,
+            done_at=timezone.now() if done else None,
+        )
+    if existing.source != source[:60]:
+        raise ValueError("That calendar entry was placed by someone else.")
+    moved_later = due_at > existing.due_at
+    existing.summary, existing.note = summary[:250], note
+    existing.due_at, existing.retired_at = due_at, None
+    if moved_later:
+        # Moved into the future, so not yet announced, as `postpone_reminder` says.
+        existing.notified_at = None
+    existing.save(
+        update_fields=["summary", "note", "due_at", "retired_at", "notified_at", "updated_at"]
+    )
+    return existing
+
+
+def retire_reminder(owner, uid: str) -> bool:
+    """End an entry a plugin placed: kept, but neither drawn nor announced. Whether there was one.
+
+    Only an entry with a ``source`` can be retired this way; one a person made is theirs to
+    delete, and a plugin that names its uid gets ``False`` and changes nothing (#887).
+    """
+    found = (
+        Reminder.objects.filter(owner=owner, uid=uid, retired_at__isnull=True)
+        .exclude(source="")
+        .update(retired_at=timezone.now(), updated_at=timezone.now())
+    )
+    return bool(found)
+
+
+def retire_reminders_of(source: str) -> int:
+    """Retire everything a plugin placed, for every account: the plugin was removed (#887)."""
+    return Reminder.objects.filter(source=source, retired_at__isnull=True).update(
+        retired_at=timezone.now(), updated_at=timezone.now()
+    )
+
+
 # ---------------------------------------------------------------------- offers
 
 #: How far ahead of the answer-by date its reminder falls due.

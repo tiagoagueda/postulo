@@ -29,7 +29,9 @@ def list_reminders(
     updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
     after_id: int | None = Query(None, description=AFTER_ID),
 ):
-    reminders = owned(request, Reminder.objects).order_by("due_at", "pk")
+    # An entry a plugin placed and has ended is kept and not listed (#887).
+    reminders = owned(request, Reminder.objects).filter(retired_at__isnull=True)
+    reminders = reminders.order_by("due_at", "pk")
     if due:
         reminders = reminders.due()
     elif outstanding:

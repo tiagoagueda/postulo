@@ -78,9 +78,11 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     )
     from postulo.applications.services import (
         add_appointment,
+        add_reminder,
         get_or_create_company,
         record_event,
         reschedule_interview,
+        retire_reminder,
         settle_interview,
     )
     from postulo.applications.suggestions import suggest
@@ -234,6 +236,7 @@ __all__ = [
     "VCardRefused",
     "access_token",
     "add_appointment",
+    "add_reminder",
     "approve_host",
     "calendar_status",
     "check_destination",
@@ -264,6 +267,7 @@ __all__ = [
     "register_document_format",
     "reminder_lines",
     "reschedule_interview",
+    "retire_reminder",
     "safe_next",
     "save_phone_number",
     "save_web_link",
@@ -316,6 +320,8 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # calendar is guessing, and a guess belongs in a queue a person answers, not in the
     # record.
     "add_appointment": ("postulo.applications.services", "add_appointment"),
+    "add_reminder": ("postulo.applications.services", "add_reminder"),
+    "retire_reminder": ("postulo.applications.services", "retire_reminder"),
     "get_or_create_company": ("postulo.applications.services", "get_or_create_company"),
     "record_event": ("postulo.applications.services", "record_event"),
     "reschedule_interview": ("postulo.applications.services", "reschedule_interview"),

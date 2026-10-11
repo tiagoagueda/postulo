@@ -81,7 +81,8 @@ def announce_due_reminders() -> tuple[int, int]:
                 }
                 url = absolute_url(application.get_absolute_url())
             else:
-                body = ""
+                # A plugin's entry says whose it is, in the plugin's own words (#887).
+                body = " · ".join(part for part in (reminder.source, reminder.note) if part)
                 # The reminders on the calendar, from whatever day the link is opened on:
                 # this one leads them until it is done (#316).
                 url = absolute_url(agenda.reminders_address())

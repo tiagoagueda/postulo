@@ -296,7 +296,13 @@ def appointment_events(user, lower: dt.datetime, upper: dt.datetime) -> list[Eve
 
 
 def _reminders(user):
-    return Reminder.objects.for_user(user).select_related("application", "application__posting")
+    """The person's reminders that are not retired: one a plugin placed and has since ended is
+    kept and not drawn (#887)."""
+    return (
+        Reminder.objects.for_user(user)
+        .filter(retired_at__isnull=True)
+        .select_related("application", "application__posting")
+    )
 
 
 def reminder_event(reminder: Reminder) -> Event:
@@ -316,11 +322,27 @@ def reminder_event(reminder: Reminder) -> Event:
             else reverse("applications:reminder_update", args=[reminder.pk])
         ),
         starts_at=reminder.due_at,
-        detail=application.posting.title if application is not None else "",
+        detail=_reminder_detail(reminder),
         muted=reminder.is_done,
         reminder=reminder,
         returns=application is None,
     )
+
+
+def _reminder_detail(reminder: Reminder) -> str:
+    """The second line of a reminder: its role if it is about an application, and the plugin
+    that placed it if one did, so the person sees where it came from (#887)."""
+    parts = []
+    if reminder.application_id is not None:
+        parts.append(reminder.application.posting.title)
+    if reminder.source:
+        from postulo.plugins.registry import find_any
+
+        plugin = find_any(reminder.source)
+        parts.append(str(getattr(plugin, "label", "") or reminder.source))
+    if reminder.note:
+        parts.append(reminder.note)
+    return " · ".join(parts)
 
 
 def overdue_reminders(user, before: dt.date, *, now: dt.datetime | None = None) -> list[Event]:
@@ -851,9 +873,9 @@ def feed_reminders(reminders) -> list[Reminder]:
     since = timezone.now() - dt.timedelta(days=FEED_DAYS)
     return [
         reminder
-        for reminder in reminders.select_related("application", "application__posting").order_by(
-            "due_at", "pk"
-        )
+        for reminder in reminders.filter(retired_at__isnull=True)
+        .select_related("application", "application__posting")
+        .order_by("due_at", "pk")
         if reminder.done_at is None or reminder.done_at >= since
     ]
 

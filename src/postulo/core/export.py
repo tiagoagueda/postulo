@@ -191,7 +191,10 @@ logger = logging.getLogger(__name__)
 #: file and the reminder made for it, nested. A reminder made for an appointment is written
 #: there and not among the reminders about no application. An archive without them restores
 #: none (#888).
-FORMAT_VERSION = 65
+#: 66 added ``source``, ``note`` and ``retired_at`` on a reminder: the plugin that placed an
+#: entry on the calendar, what it said about it, and when it ended it. An archive without them
+#: restores every reminder as one a person made, outstanding as it was (#887).
+FORMAT_VERSION = 66
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -461,7 +464,7 @@ LISTING_EVENT_FIELDS = (
     "actor",
     "created_at",
 )
-REMINDER_FIELDS = ("id", "uid", "summary", "due_at", "done_at")
+REMINDER_FIELDS = ("id", "uid", "summary", "due_at", "done_at", "source", "note", "retired_at")
 APPOINTMENT_FIELDS = (
     "id",
     "uid",

@@ -106,6 +106,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.plugins.locale",
             "postulo.plugins.record",
             "postulo.plugins.secrets",
+            # A signal and nothing else: what the plugins layer says to whatever is above it (#887).
+            "postulo.plugins.signals",
             "postulo.resume.driving",
             "postulo.resume.publications",
             "postulo.resume.translatable",
