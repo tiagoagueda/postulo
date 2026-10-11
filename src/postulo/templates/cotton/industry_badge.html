@@ -1,0 +1,11 @@
+{% load postulo %}
+<c-vars industry />
+{% comment %} An industry drawn as a badge with an icon and a tone (#856).
+
+   `<c-industry-badge :industry="industry" />`
+
+   The look is its NACE section's (`jobs.industries.LOOKS`), so every division inherits it and
+   a word somebody made up draws plain. The name is always there: the icon is `aria-hidden`
+   and the tone says nothing a screen reader needs, so neither is the only cue.
+{% endcomment %}
+{% with look=industry.look %}<span class="badge" data-tone="{{ look.1 }}"{% if industry.code %} title="NACE {{ industry.code }}"{% endif %}>{% icon look.0 class="size-3" %}<bdi>{{ industry.name }}</bdi></span>{% endwith %}

@@ -84,6 +84,11 @@ class Industry(OwnedModel):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def look(self) -> tuple[str, str]:
+        """``(icon, tone)`` it is drawn with: its NACE section's, or plain (#856)."""
+        return industries.look_of(self.code)
+
     def save(self, *args, **kwargs):
         # The code follows the name rather than being set beside it. Renaming an industry
         # to a division's name gives it that division; renaming it away takes it back. One

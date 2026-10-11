@@ -154,6 +154,44 @@ def section_of(code: str) -> str:
     return entry["section"] if entry else ""
 
 
+#: How an industry is drawn (#856): an icon and a tone for each NACE section, so every
+#: division inherits the look of the section it sits in and two neighbouring badges differ at
+#: a glance. Seven of the badge's tones carry the 22 sections, never the only cue -- the
+#: name is always beside them.
+LOOKS: dict[str, tuple[str, str]] = {
+    "A": ("wheat", "green"),
+    "B": ("pickaxe", "amber"),
+    "C": ("factory", "amber"),
+    "D": ("zap", "amber"),
+    "E": ("droplets", "teal"),
+    "F": ("hard-hat", "amber"),
+    "G": ("shopping-cart", "rose"),
+    "H": ("truck", "blue"),
+    "I": ("utensils", "rose"),
+    "J": ("radio-tower", "violet"),
+    "K": ("laptop", "blue"),
+    "L": ("banknote", "teal"),
+    "M": ("home", "teal"),
+    "N": ("flask-conical", "violet"),
+    "O": ("briefcase-business", "grey"),
+    "P": ("landmark", "grey"),
+    "Q": ("graduation-cap", "brand"),
+    "R": ("heart-pulse", "rose"),
+    "S": ("palette", "violet"),
+    "T": ("wrench", "grey"),
+    "U": ("users", "grey"),
+    "V": ("globe", "grey"),
+}
+
+#: A word somebody made up has no section, and draws plainly.
+PLAIN_LOOK: tuple[str, str] = ("tag", "grey")
+
+
+def look_of(code: str) -> tuple[str, str]:
+    """``(icon, tone)`` for a division code, or the plain look where it has none (#856)."""
+    return LOOKS.get(section_of(code), PLAIN_LOOK)
+
+
 @lru_cache(maxsize=32)
 def _by_name(reading: str) -> dict[str, str]:
     """``{folded name: code}`` for one language, so a typed name can find its division."""

@@ -38,8 +38,8 @@
         <div class="mt-2 flex flex-wrap gap-1" data-industries>
           {% for industry in company.industries.all %}
             <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}"
-               class="rounded bg-ink-100 px-1.5 py-0.5 text-xs text-ink-600 hover:bg-ink-200 dark:bg-ink-800 dark:text-ink-300 dark:hover:bg-ink-700">
-              {{ industry.name }}
+               class="rounded hover:opacity-80">
+              <c-industry-badge :industry="industry" />
             </a>
           {% endfor %}
         </div>

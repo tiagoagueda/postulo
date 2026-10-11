@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Industries are drawn as coloured badges with an icon and a tone taken from their NACE section, on the company page and in the companies table (#856)
 - Listings: Columns and Views move into the filter row, at its end, and are drawn only while a table is (#840)
 - The Listings state strip is drawn like Basecoat's tabs (a tab-nav component of links, not an ARIA tablist) (#842)
 - Documents, Calendar and Your career have a question mark beside the heading: the sentence on hover and the help in a drawer (#847)

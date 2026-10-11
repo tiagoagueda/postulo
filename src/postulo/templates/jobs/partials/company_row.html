@@ -45,10 +45,7 @@
           {% if held %}
             <span class="flex flex-wrap items-center gap-1">
               {% for industry in held|slice:":4" %}
-                <span class="badge" data-tone="grey"
-                      {% if industry.code %}title="NACE {{ industry.code }}"{% endif %}>
-                  <span>{{ industry.name }}</span>
-                </span>
+                <c-industry-badge :industry="industry" />
               {% endfor %}
               {% if held|length > 4 %}
                 <span class="text-xs tabular-nums">
