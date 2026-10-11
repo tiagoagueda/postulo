@@ -5,8 +5,15 @@ from __future__ import annotations
 import logging
 
 from allauth.account.models import EmailAddress
-from allauth.account.signals import email_changed, user_signed_up
+from allauth.account.signals import (
+    email_changed,
+    password_changed,
+    password_reset,
+    password_set,
+    user_signed_up,
+)
 from django.conf import settings
+from django.contrib.auth.signals import user_logged_in
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.db.models.signals import post_save
@@ -123,3 +130,21 @@ def date_an_address_claim(sender, instance, created, raw=False, **kwargs) -> Non
     if raw or not created or instance.verified or instance.primary:
         return
     AddressClaim.objects.get_or_create(address=instance)
+
+
+@receiver(password_changed, dispatch_uid="postulo_recovery_links_password_changed")
+@receiver(password_set, dispatch_uid="postulo_recovery_links_password_set")
+@receiver(password_reset, dispatch_uid="postulo_recovery_links_password_reset")
+def end_recovery_links_when_the_password_changes(request, user, **kwargs) -> None:
+    """A password set by the person themselves closes the door an administrator opened (#739)."""
+    from . import recovery
+
+    recovery.revoke_for(user)
+
+
+@receiver(user_logged_in, dispatch_uid="postulo_recovery_links_sign_in")
+def end_recovery_links_when_the_person_gets_in(sender, request, user, **kwargs) -> None:
+    """Signing in by any route is the person getting in: the link is not needed (#739)."""
+    from . import recovery
+
+    recovery.revoke_for(user)

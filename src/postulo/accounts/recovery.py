@@ -66,6 +66,21 @@ def issue(person, *, by):
     return link, token
 
 
+def revoke_for(person) -> int:
+    """End every live link for ``person``: they have got in, or changed the password, themselves.
+
+    A link an administrator made is for somebody who cannot get in. Once they have -- by
+    remembering the password, by another route, by changing it under Settings -- the link is
+    a way into the account for whoever else holds it (a chat log, a screenshot) for the rest
+    of its hour, and nothing is gained by leaving it live (#739).
+    """
+    from django.utils import timezone
+
+    from .models import RecoveryLink
+
+    return RecoveryLink.objects.live().filter(person=person).update(revoked_at=timezone.now())
+
+
 def find(token: str):
     """The live link this token opens, or raise. Never says which kind of no it is."""
     from .models import RecoveryLink
