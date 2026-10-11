@@ -45,13 +45,15 @@ Sources, so a list can be argued with rather than guessed at:
   Eng.ª, Prof.ª).
 - Brazilian Portuguese: the Federal Senate's *Manual de Comunicação* (Sr., Sra., Dr.,
   Dra., Prof., Prof.ª). *Eng.* before a name is Portuguese usage rather than Brazilian.
-- Gender (#681): three plain words per language -- the woman, the man and the non-binary
-  answer -- and no more, since *Other…* is there for the rest and a list that offers only
+- Gender (#681): three plain words per language -- the female, the male and the non-binary
+  answer, which #864 named as *Female*, *Male* and *Non-binary* (fr *Féminin*, *Masculin*,
+  *Non binaire*; pt *Feminino*, *Masculino*, *Não binário*) after the lists first said
+  *Woman* and *Man* -- and no more, since *Other…* is there for the rest and a list that offers only
   two would be wrong for many people. No authority publishes a list of genders for the forms
   of any of these languages, and none is claimed: the words are the ones the general
   dictionaries carry for each (the *Oxford English Dictionary* has *non-binary*, *Le Robert*
-  has *non binaire*, and the Portuguese dictionaries have *não binário*), with *Mulher* and
-  *Homem* the same in both Portuguese norms. What is stored is the word itself, so the
+  has *non binaire*, and the Portuguese dictionaries have *não binário*), with the words
+  the same in both Portuguese norms. What is stored is the word itself, so the
   mapping to vCard's ``GENDER`` that #660 will write is the stored word as the free-text
   identity with an empty sex component (``GENDER:;Non-binary``), never a guess at ``M`` or
   ``F``, and a card read back never sets the field without the person confirming it.
@@ -87,11 +89,30 @@ PRONOUNS: dict[str, tuple[str, ...]] = {
 #: What gender somebody says, by language, in the order a form in that language lists them
 #: (#681). Not a statement that these are all there is: see the module's note.
 GENDERS: dict[str, tuple[str, ...]] = {
-    "en": ("Woman", "Man", "Non-binary"),
-    "fr": ("Femme", "Homme", "Non binaire"),
-    "pt-PT": ("Mulher", "Homem", "Não binário"),
-    "pt-BR": ("Mulher", "Homem", "Não binário"),
+    "en": ("Female", "Male", "Non-binary"),
+    "fr": ("Féminin", "Masculin", "Non binaire"),
+    "pt-PT": ("Feminino", "Masculino", "Não binário"),
+    "pt-BR": ("Feminino", "Masculino", "Não binário"),
 }
+
+#: The words the lists offered before #864, each with the word that replaced it. What is
+#: stored is the word itself, so a profile, an archive and a candidate file written before
+#: carry these: the migration, the importer and the candidate reader all put the new word
+#: in their place, and a word that is not one of these -- *Other…* text included -- is left
+#: as it was typed. No two languages share an old word, so no language is needed to map one.
+LEGACY_GENDERS: dict[str, str] = {
+    "Woman": "Female",
+    "Man": "Male",
+    "Femme": "Féminin",
+    "Homme": "Masculin",
+    "Mulher": "Feminino",
+    "Homem": "Masculino",
+}
+
+
+def current_gender_word(word: str) -> str:
+    """The word the lists offer now for one they offered before (#864), else ``word`` as it is."""
+    return LEGACY_GENDERS.get(word, word)
 
 
 def language_of(profile) -> str:

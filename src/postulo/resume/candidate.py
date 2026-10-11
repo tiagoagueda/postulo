@@ -62,6 +62,7 @@ from django.utils.text import capfirst
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy, ngettext
 
+from postulo.accounts import addressing
 from postulo.accounts.forms import PersonIdentifierForm
 from postulo.accounts.models import PersonIdentifier, Profile
 from postulo.core import (
@@ -954,6 +955,9 @@ class _Planner:
                 column.run_validators(value)
                 if name == "record_language":
                     value = self._language(value)
+                if name == "gender":
+                    # A file written before #864 holds the words the list offered then.
+                    value = addressing.current_gender_word(value)
             except ValidationError as error:
                 section.rows.append(Row(label, REFUSED, sub=raw[:80], notes=error.messages))
                 continue

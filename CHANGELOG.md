@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The gender list offers Female, Male and Non-binary (Féminin, Masculin; Feminino, Masculino), and a profile, an archive or a candidate file that holds an old word is carried over to the new one (#864)
 - Your details is a sidebar and two columns of cards from 2xl, filled row by row, each no wider than before (#871)
 - Your career takes the whole screen like Your details, its sections keeping the measure of prose (#872)
 - The sidebar's label on Your details and Your career names the page, larger, once its heading has scrolled behind the masthead, in place of the section's title (#869)

@@ -211,7 +211,7 @@ def test_gender_is_the_owners_own_and_needs_the_same_scopes(client, user, other_
         "Zanzibarian"
         not in client.get("/api/v1/profile", **issue(other_user, "read")).content.decode()
     )
-    assert patch(client, {"gender": "Man"}, **issue(other_user, "write")).status_code == 200
+    assert patch(client, {"gender": "Male"}, **issue(other_user, "write")).status_code == 200
     user.profile.refresh_from_db()
     assert user.profile.gender == "Zanzibarian"
 

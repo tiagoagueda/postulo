@@ -165,6 +165,11 @@ def _profile_value(profile, name: str, value):
         return _REFUSED
     if isinstance(value, str) and not value and not column.blank:
         return _REFUSED
+    if name == "gender" and isinstance(value, str):
+        # An archive written before #864 holds the words the list offered then.
+        from postulo.accounts import addressing
+
+        value = addressing.current_gender_word(value)
     if name == "nationalities":
         # One function holds a list of nationalities to the rule at every door (#680).
         if not isinstance(value, list):
