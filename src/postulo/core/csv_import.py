@@ -637,10 +637,13 @@ def parse_date(text: str, *, day_first: bool = True) -> dt.date | None:
             if month > 12 and day <= 12:
                 day, month = month, day
             return dt.date(year, month, day)
-        except ValueError:
+        except (ValueError, OverflowError):
             return None
     words = re.findall(r"[^\W\d_]+|\d+", text.lower())
-    numbers = [int(word) for word in words if word.isdigit()]
+    # ASCII digits, and few of them: `isdigit` is true of other scripts' digits, and a number
+    # of thirty digits made `date()` raise OverflowError, a 500 on the import page until the
+    # session was reset (#767).
+    numbers = [int(word) for word in words if word.isascii() and word.isdigit() and len(word) < 7]
     names = _month_names()
     month = next((names[word] for word in words if word in names), None)
     if month and len(numbers) >= 2:
@@ -652,7 +655,7 @@ def parse_date(text: str, *, day_first: bool = True) -> dt.date | None:
         if day and year:
             try:
                 return dt.date(year if year > 99 else 2000 + year, month, day)
-            except ValueError:
+            except (ValueError, OverflowError):
                 return None
     return None
 

@@ -23,7 +23,10 @@ class CoreConfig(AppConfig):
         # Registers the dashboard widgets core owns, and the export archive as a piece
         # of slow work (#247), and the configuration checks `manage.py check` runs before
         # the first request (#233).
-        from . import checks, signals, slow, transfers, widgets_builtin  # noqa: F401
+        from . import checks, safe_choices, signals, slow, transfers, widgets_builtin  # noqa: F401
+
+        # A number past what the database holds is an invalid choice, not a 500 (#767).
+        safe_choices.install()
 
         # What the Calendar, Your details and Your career can be imported from and exported
         # to, said once so a plugin can add a format (#862).

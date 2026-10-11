@@ -594,7 +594,13 @@ class CaptureDiscardSelectedView(OwnedObjectMixin, View):
         return Capture.objects.for_user(self.request.user)
 
     def post(self, request: HttpRequest) -> HttpResponse:
-        chosen = [value for value in request.POST.getlist("selected") if value.isdigit()]
+        # ASCII digits and a length a row's number can have: `isdigit` is true of other scripts'
+        # digits and of thirty-digit numbers, and the query raised on both (#767).
+        chosen = [
+            value
+            for value in request.POST.getlist("selected")
+            if value.isascii() and value.isdigit() and len(value) < 19
+        ]
         count = (
             self.get_queryset()
             .filter(pk__in=chosen, status=CaptureStatus.PENDING)

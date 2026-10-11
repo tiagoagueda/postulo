@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A number past what a row can be called, or a foreign-script digit, in a bulk selection, a capture discard, a model choice or a spreadsheet date is dropped or refused as an invalid choice instead of crashing with a 500 (#767)
 - The API refuses an id, an offset, an amount or a moment the database cannot hold with a 422 that names the parameter, where it used to answer 500 (offsets and ids to 2^31-1, moments between 1970 and 2100, amounts to twelve digits) (#766)
 - A next address that is a bare word, a number or a dotted name falls back instead of crashing the page with a 500: only a path from the root of this site, or an absolute address on this host, is kept (#768)
 - The write scope's label and the API's description now say plainly that a write call answers with the whole record, so a token holding write can read every record it can touch (#765)

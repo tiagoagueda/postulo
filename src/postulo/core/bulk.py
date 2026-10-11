@@ -67,6 +67,10 @@ class Action:
     choices: tuple = field(default_factory=tuple)
 
 
+#: The largest number a row can be called: under what any database the project runs on holds.
+MAX_ROW_ID = 2**63 - 1
+
+
 def chosen_ids(request) -> list[int]:
     """The ids that were ticked, as integers, bounded and de-duplicated.
 
@@ -76,9 +80,13 @@ def chosen_ids(request) -> list[int]:
     seen: dict[int, None] = {}
     for raw in request.POST.getlist(CHOSEN)[:MAX_CHOSEN]:
         try:
-            seen.setdefault(int(raw), None)
+            number = int(raw)
         except (TypeError, ValueError):
             continue
+        # Past what a database holds is not a row of anybody's, and handing it to a query
+        # raised OverflowError and answered 500 (#767).
+        if 0 < number < MAX_ROW_ID:
+            seen.setdefault(number, None)
     return list(seen)
 
 
