@@ -33,7 +33,7 @@ from dataclasses import dataclass, field
 from django.utils.translation import gettext_lazy as _
 
 from postulo.accounts.identifiers import OTHER
-from postulo.core import personal
+from postulo.core import demonyms, languages, personal
 from postulo.core.identifiers import PERSON, as_restored, find
 
 from .models import CV, Prints
@@ -437,7 +437,11 @@ def resolve(owner, cv: CV | None = None) -> Printed:
         if cv.show_birth_place:
             printed.birth_place = personal.place_text(profile.birth_place, profile.birth_country)
         if cv.show_nationality:
-            printed.nationalities = personal.country_names(profile.nationalities)
+            # Named as a person of the country is (#865): the word in the document's language,
+            # agreeing with their gender, else the country's name as it always was.
+            printed.nationalities = demonyms.nationalities(
+                profile.nationalities, languages.current(), profile.gender
+            )
             if not printed.nationalities and profile.nationality_scope in personal.SCOPES:
                 printed.nationality_scope = profile.nationality_scope
         if cv.show_gender:

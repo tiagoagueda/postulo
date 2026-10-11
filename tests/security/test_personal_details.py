@@ -168,7 +168,7 @@ def test_a_document_that_did_not_choose_prints_no_nationality(user):
     assert "Portugal" not in rendering.cv_text(cv)
     cv.show_nationality = True
     cv.save()
-    assert "Nationality: Portugal, Brazil" in rendering.cv_text(cv)
+    assert "Nationality: Portuguese, Brazilian" in rendering.cv_text(cv)
 
 
 def test_the_page_refusing_a_menu_does_not_save_the_others(client, user):

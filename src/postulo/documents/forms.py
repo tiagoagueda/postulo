@@ -10,7 +10,7 @@ from django.utils.text import format_lazy
 from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
-from postulo.core import personal, postal
+from postulo.core import demonyms, languages, personal, postal
 from postulo.jobs.forms import OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import Contact
 from postulo.resume.models import Link
@@ -299,7 +299,9 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             if gender
             else GIVES_NONE
         )
-        said = personal.country_names(getattr(profile, "nationalities", None))
+        said = demonyms.nationalities(
+            getattr(profile, "nationalities", None), languages.current(), gender
+        )
         scope = personal.scope_text(getattr(profile, "nationality_scope", ""))
         self.fields["show_nationality"].help_text = (
             format_html(str(_("As things stand: {value}.")), value=_typed(", ".join(said) or scope))

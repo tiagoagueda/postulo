@@ -28,6 +28,7 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext
 
 from postulo.core import (
+    demonyms,
     language_field,
     languages,
     personal,
@@ -833,10 +834,17 @@ class ProfileForm(forms.ModelForm):
             self.fields[name] = forms.ChoiceField(
                 label=_("Nationality %(number)s") % {"number": number},
                 required=False,
-                choices=[("", _("Not stated")), *phones.country_choices()],
+                # The people, then the country in brackets so that either finds it (#865).
+                choices=[("", _("Not stated")), *self._nationality_choices()],
                 widget=postal.CountrySelect,
             )
             self.initial[name] = held[number - 1] if number <= len(held) else ""
+
+    def _nationality_choices(self) -> list[tuple[str, str]]:
+        """The countries as a person of each is called in the language of the career record,
+        agreeing with the gender held, with the country's name beside it (#865)."""
+        profile = self.instance
+        return demonyms.choices(addressing.language_of(profile), getattr(profile, "gender", ""))
 
     @property
     def nationality_menus(self) -> list:

@@ -287,7 +287,7 @@ def test_it_is_one_of_the_personal_details_on_their_line(user):
     cv = a_cv(user, show_birth_date=True, show_nationality=True, show_gender=True)
     assert rendering.contact_details(user, cv)["personal"] == [
         "Born 1990",
-        "Nationality: Portugal",
+        "Nationality: Portuguese",
         "Gender: Male",
     ]
 

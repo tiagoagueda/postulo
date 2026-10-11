@@ -249,7 +249,7 @@ def test_nothing_is_printed_by_default(user):
 def test_the_switch_prints_the_line_in_the_preview_the_text_and_the_word_file(user, theme, kind):
     holding(user, "PT", "BR")
     cv = a_cv(user, theme=theme, kind=kind, show_nationality=True)
-    line = "Nationality: Portugal, Brazil"
+    line = "Nationality: Portuguese, Brazilian"
     assert rendering.render_cv_html(cv).count(line) == 1
     assert rendering.cv_text(cv).count(line) == 1
     outline = rendering.cv_outline(cv)
@@ -276,7 +276,7 @@ def test_it_goes_on_the_one_line_with_the_birth_details(user):
     cv = a_cv(user, show_birth_date=True, show_nationality=True)
     assert rendering.contact_details(user, cv)["personal"] == [
         "Born 1990",
-        "Nationality: Portugal",
+        "Nationality: Portuguese",
     ]
 
 
