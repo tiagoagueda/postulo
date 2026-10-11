@@ -187,6 +187,8 @@ def test_the_production_settings_are_what_the_policy_says(production_settings):
     assert prod["DEBUG"] is False
     assert prod["SECURE_HSTS_SECONDS"] >= 31536000
     assert prod["SESSION_COOKIE_SECURE"] and prod["CSRF_COOKIE_SECURE"]
+    # And HttpOnly, as the threat model says of every cookie (#538).
+    assert prod["SESSION_COOKIE_HTTPONLY"] and prod["CSRF_COOKIE_HTTPONLY"]
     assert prod["SECURE_SSL_REDIRECT"]
     # Exactly two, both anchored. `SecurityMiddleware` matches with `re.search`, so an
     # unanchored pattern would exempt every path containing the word -- a worse bug than

@@ -805,6 +805,9 @@ SECURE_CSP = {
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 CSRF_COOKIE_SAMESITE = "Lax"
+# Script does not need the CSRF cookie: `app.js` takes the token from the form it is sending, and
+# the threat model says every cookie is HttpOnly (#538).
+CSRF_COOKIE_HTTPONLY = True
 
 # ---------------------------------------------------------------------- email
 
