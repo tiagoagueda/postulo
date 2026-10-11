@@ -1,5 +1,7 @@
 """Single sign-on through OpenID Connect: configured from the environment, native."""
 
+import re
+
 import pytest
 from allauth.account.models import EmailAddress
 from allauth.core import context
@@ -100,7 +102,7 @@ def test_the_callback_is_the_exact_address_to_register(rf, configured):
 def test_settings_from_the_environment_shape_the_provider(settings):
     from postulo.config.settings import base
 
-    assert base.SOCIALACCOUNT_LOGIN_ON_GET is True, "a POST would trip form-action 'self'"
+    assert base.SOCIALACCOUNT_LOGIN_ON_GET is False, "a link started it from any page (#737)"
     assert base.SOCIALACCOUNT_STORE_TOKENS is False
     # Off unless the operator turns it on (#892), and allauth is told the same.
     assert base.SOCIALACCOUNT_EMAIL_AUTHENTICATION is False
@@ -379,3 +381,35 @@ def test_a_bound_invitation_is_for_its_address_on_the_provider_path_too(rf, conf
     assert adapter.is_open_for_signup(request, social_login("Wanted@Example.org")) is True
     invite.refresh_from_db()
     assert invite.accepted_at is None, "refusing does not spend it"
+
+
+def test_a_link_to_the_provider_asks_before_it_starts_and_starts_nothing(
+    client, configured, monkeypatch
+):
+    """The handshake is a POST with a token (#737): a GET only shows a page that asks."""
+    import requests
+
+    def no_network(*args, **kwargs):
+        raise AssertionError("a GET started the handshake and went to the provider")
+
+    monkeypatch.setattr(requests.Session, "request", no_network)
+
+    response = client.get(sso.login_url() + "?process=login")
+
+    assert response.status_code == 200
+    html = response.content.decode()
+    assert re.search(r'<form[^>]*method="post"', html) and "csrfmiddlewaretoken" in html
+    assert "Authentik" in html
+
+
+def test_the_policy_lets_the_form_answer_with_a_redirect_to_the_provider_only(settings):
+    from postulo.config.settings import base
+
+    origins = base._OIDC_FORM_ORIGINS
+
+    assert all(o.startswith("https://") or o.startswith("http://") for o in origins)
+    assert base.SECURE_CSP["form-action"][0] == "'self'"
+    if base.POSTULO_OIDC_SERVER_URL:
+        assert origins and origins[0] in base.SECURE_CSP["form-action"]
+    else:
+        assert origins == [] and base.SECURE_CSP["form-action"] == ["'self'"]

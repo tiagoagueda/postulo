@@ -7,6 +7,7 @@ this file. See ``.env.example`` for the full set of recognised variables.
 import os
 from datetime import timedelta
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import environ
 from django.utils.csp import CSP
@@ -314,6 +315,13 @@ MFA_TRUST_COOKIE_AGE = timedelta(days=30)
 POSTULO_OIDC_NAME = env("POSTULO_OIDC_NAME", default="Single sign-on")
 POSTULO_OIDC_SERVER_URL = env("POSTULO_OIDC_SERVER_URL", default="")
 POSTULO_OIDC_CLIENT_ID = env("POSTULO_OIDC_CLIENT_ID", default="")
+# The provider's origin, for the policy's `form-action` (#737): the sign-in button is a form,
+# and its answer is a redirect to the provider. Nothing when none is configured.
+_OIDC_FORM_ORIGINS = (
+    [f"{urlsplit(POSTULO_OIDC_SERVER_URL).scheme}://{urlsplit(POSTULO_OIDC_SERVER_URL).netloc}"]
+    if POSTULO_OIDC_SERVER_URL and POSTULO_OIDC_CLIENT_ID
+    else []
+)
 POSTULO_OIDC_CLIENT_SECRET = env("POSTULO_OIDC_CLIENT_SECRET", default="")
 # By default single sign-on signs in accounts that exist; the identity provider is not an
 # invitation unless the operator says so.
@@ -337,9 +345,11 @@ SOCIALACCOUNT_PROVIDERS = (
     if POSTULO_OIDC_SERVER_URL and POSTULO_OIDC_CLIENT_ID
     else {}
 )
-# The provider round-trip carries its own state; a plain link avoids the content security
-# policy (form-action 'self') silently blocking the redirect a POST form would make.
-SOCIALACCOUNT_LOGIN_ON_GET = True
+# The handshake is started by a POST, with the CSRF token, and not by a link (#737): a GET
+# started it from any page the person visited, which is login CSRF at a provider that has
+# none of its own. The content security policy's `form-action` names the provider's origin
+# below, because Chrome checks the redirect that answers a form post against it.
+SOCIALACCOUNT_LOGIN_ON_GET = False
 SOCIALACCOUNT_OPENID_CONNECT_URL_PREFIX = "sso"
 
 # Somebody arriving through the provider is signed in as the existing local account
@@ -750,7 +760,7 @@ SECURE_CSP = {
     "worker-src": [CSP.SELF],
     "manifest-src": [CSP.SELF],
     "object-src": [CSP.NONE],
-    "form-action": [CSP.SELF],
+    "form-action": [CSP.SELF, *_OIDC_FORM_ORIGINS],
     # Two directives about frames, pointing opposite ways. `frame-ancestors` is who may put
     # *Postulo* in a frame: nobody. `frame-src` is what a Postulo page may put in a frame
     # of its own: since #293 the CV and letter previews, which are whole documents with
