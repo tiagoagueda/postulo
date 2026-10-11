@@ -159,6 +159,10 @@ applying. Three things follow, and each is a promise:
    not HTTP goes through `postulo.core.destinations.approve()` — same three rules,
    different protocol: refuse private addresses unless the operator allowed them, check
    every address the name answers with, and connect to the one that was checked.
+   `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is a decision of the
+   operator for the whole instance, not for one plugin or one account: where it is on, every
+   account can map the private network through the Test buttons, and that is accepted, and
+   written in `.env.example` and the wiki, rather than hidden (#779).
 6. A new secret is stored hashed if it only needs checking, encrypted if it needs using.
    The encrypted set now includes a mail password typed into *Server settings*, under the
    same key as every plugin connection's credentials — which is why #111 made a weak
