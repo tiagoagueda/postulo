@@ -101,6 +101,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A connected plugin may offer up to six https links on its connection's card (an optional links method), drawn as external links (#889)
 - A company's identifiers are badges with the scheme's mark or icon, and a setting chooses icon and label, icon only or label only (#855)
 - Appointments with an adviser at a public employment service, typed by hand: on the calendar, in the diary feed, in the report, in the archive and on the plugin surface (#888)
 - A question mark beside the Listings heading shows the page's summary on hover and opens its help in a drawer, replacing the helper paragraph; page titles can take a help topic. (#839)

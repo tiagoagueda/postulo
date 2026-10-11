@@ -44,6 +44,19 @@
                 {% if row.summary %}
                   <p class="truncate text-xs text-ink-500 dark:text-ink-400">{{ row.summary }}</p>
                 {% endif %}
+                {% comment %} What the plugin offers a person to open on the service's own site (#889). {% endcomment %}
+                {% if row.links %}
+                  <ul class="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-xs" data-connection-links>
+                    {% for label, address in row.links %}
+                      <li>
+                        <a href="{{ address }}" rel="noopener noreferrer external" target="_blank"
+                           class="inline-flex items-center gap-1 text-brand-600 underline dark:text-brand-400">
+                          <bdi>{{ label }}</bdi>{% icon "external-link" class="size-3" %}<span class="sr-only">{% translate "(opens in a new tab)" %}</span>
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
                 {% if row.is_sync and row.connection.last_summary %}
                   <p class="truncate text-xs text-ink-500 dark:text-ink-400">
                     {% blocktranslate with when=row.connection.synced_at|date:"DATETIME_FORMAT" report=row.connection.last_summary trimmed %}Last run {{ when }}: {{ report }}{% endblocktranslate %}

@@ -86,6 +86,54 @@ def _summary(plugin, connection: Connection) -> str:
         return ""
 
 
+#: The most links a connection's card may offer (#889): a card is a line of facts, not a menu.
+MAX_CARD_LINKS = 6
+
+
+def _links(plugin, connection: Connection) -> list[tuple[str, str]]:
+    """The links a plugin offers on its connection's card: ``(label, https address)``.
+
+    For a service that has no API a person can use but does have a space of their own -- the
+    page where a monthly declaration is made, its messages -- so the card can save the search.
+    Optional, like `summary`, and as safe to ask: a plugin that fails to describe itself, or
+    offers an address that is not an ``https`` page (`page_address` is the check a posting's
+    address passes), loses that link and is logged, never drawn (#889). At most
+    `MAX_CARD_LINKS`.
+    """
+    from urllib.parse import urlsplit
+
+    from postulo.core.addresses import page_address
+
+    offered = getattr(plugin, "links", None)
+    if offered is None:
+        return []
+    try:
+        raw = list(offered(connection.full_config) or [])
+    except SecretsUnreadable:
+        return []
+    except Exception:
+        logger.exception(
+            "Plugin %r could not list the links of connection %s", plugin.name, connection.pk
+        )
+        return []
+    links: list[tuple[str, str]] = []
+    for item in raw:
+        try:
+            label, address = item
+            label = str(label).strip()
+            address = page_address(str(address))
+            parts = urlsplit(address)
+            if not label or parts.scheme != "https" or not parts.netloc:
+                raise ValueError("not an https page with a label")
+        except (TypeError, ValueError):
+            logger.warning("Plugin %r offered a link that was dropped: %r", plugin.name, item)
+            continue
+        links.append((label[:80], address))
+        if len(links) == MAX_CARD_LINKS:
+            break
+    return links
+
+
 class PluginLogoView(LoginRequiredMixin, View):
     """A plugin's logo, served by this instance, as a PNG (#106).
 
@@ -158,6 +206,7 @@ class ConnectionListView(OwnedObjectMixin, ListView):
                     "plugin": plugin,
                     "kind_label": KIND_LABELS.get(connection.kind, connection.kind),
                     "summary": _summary(plugin, connection),
+                    "links": _links(plugin, connection),
                     "is_store": connection.kind == "store",
                     "is_sync": connection.kind == "sync",
                 }

@@ -842,6 +842,10 @@ class ConnectedPlugin(Protocol):
     - ``summary(config) -> str`` is one line for the connections list: which services a
       connection reaches, with every secret part masked. Secrets are never shown back,
       so this is how a person tells two connections to the same plugin apart.
+    - ``links(config) -> list[tuple[str, str]]`` is a list of ``(label, address)`` for the
+      connection's card: a link to the person's own space on the service, to the page where
+      a declaration is made, to its messages. At most six; an address that is not an ``https``
+      page (`page_address`) is dropped and logged, never drawn (#889).
     - ``form_attributes() -> dict[str, str]`` is put on the connection form's card as
       ``data-<name>`` attributes, for a plugin whose setup happens in the browser and needs
       Postulo's script to know something -- the browser notifier's public key (#209). Names
