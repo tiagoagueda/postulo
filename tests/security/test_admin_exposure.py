@@ -504,3 +504,30 @@ def test_the_name_that_was_typed_five_times_is_told_it_is_locked(client, adminis
     again = guess(client, "root", "not-the-password", "198.51.100.60")
 
     assert "Too many failed login attempts" in again.content.decode()
+
+
+# -------------------------------------- nothing that identifies a person, inlines included
+
+
+def test_no_admin_form_offers_what_the_profile_holds_about_a_person():
+    """The inline once listed every column of the profile, birth data and gender included (#749)."""
+    from postulo.accounts.admin import ProfileInline, UserAdmin
+
+    personal = {
+        "birth_date",
+        "birth_place",
+        "birth_country",
+        "nationalities",
+        "gender",
+        "pronouns",
+        "form_of_address",
+        "location",
+        "headline",
+        "summary",
+    }
+    offered = set(ProfileInline.fields)
+
+    assert not offered & personal, offered & personal
+    assert ProfileInline in UserAdmin.inlines
+    named = {f.name for f in ProfileInline.model._meta.get_fields()}
+    assert offered <= named, "and every column offered is a real one"

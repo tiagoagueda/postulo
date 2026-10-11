@@ -6,14 +6,20 @@ from django.utils.translation import gettext_lazy as _
 
 from .models import Invite, Profile, User
 
+#: What the admin may show of a profile (#749): the preferences that make an account usable
+#: and nothing that identifies the person. The threat model promises that date and place of
+#: birth, nationality, gender, pronouns and the like are never in a list an administrator
+#: reads; an inline that offered every column of the profile broke that for anybody holding
+#: the admin, and edited them past `core/personal.py`'s rules. A column is listed here on
+#: purpose or it is not shown.
+PROFILE_COLUMNS = ("language", "time_zone", "theme", "density")
+
 
 class ProfileInline(admin.StackedInline):
     model = Profile
     can_delete = False
     extra = 0
-    # The old file fields are not edited here (#662): a picture is a row, written by
-    # `avatars.store` after it has been decoded and re-encoded, and nothing else.
-    exclude = ("avatar", "gravatar_image")
+    fields = PROFILE_COLUMNS
 
 
 class CleanUsernameMixin:

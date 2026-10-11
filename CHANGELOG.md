@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The Django admin's profile inline shows only the preferences that make an account usable, not birth data, nationality, gender or anything else that identifies a person (#749)
 - The OAuth consent state carries a nonce held in the session and spent on use, so a captured state cannot be replayed with another person's code; the connection is looked up among the signed-in person's own (#748)
 - A wildcard in POSTULO_ALLOWED_HOSTS is refused at start-up in production, and the links and the name in a message come from POSTULO_PUBLIC_URL when it is set, not from the Host header (#747)
 - A next address on an https instance must be https, whichever page takes it: sign-in, sign-out, sign-up and single sign-on follow the same rule as the rest of the interface (#746)
