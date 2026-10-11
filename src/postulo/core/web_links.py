@@ -620,6 +620,9 @@ class WebLinkForm(forms.ModelForm):
             **{
                 key: {
                     "data-icon": service.icon_name,
+                    # The mark of the service where Postulo ships one; it is drawn in the
+                    # place of the icon (#867).
+                    **({"data-brand": service.brand_name} if service.brand_name else {}),
                     "data-hosts": " ".join(service.hosts),
                     # Only where there is one: the script shows it in front of the name.
                     **({"data-prefix": service.prefix} if service.prefix else {}),
@@ -678,6 +681,16 @@ class WebLinkForm(forms.ModelForm):
             return ""
         facts = self.fields["service"].widget.facts
         return facts.get(self["service"].value() or "", {}).get("data-icon", "")
+
+    @property
+    def service_brand(self) -> str:
+        """The brand mark of the service the row is on, where Postulo ships one (#867): drawn
+        beside the select in the place of ``service_icon``, which a service without one
+        keeps."""
+        if "service" not in self.fields:
+            return ""
+        facts = self.fields["service"].widget.facts
+        return facts.get(self["service"].value() or "", {}).get("data-brand", "")
 
     def clean(self):
         data = super().clean()

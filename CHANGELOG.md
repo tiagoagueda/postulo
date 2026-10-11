@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Social-profile and repository rows draw the service's own brand mark where Postulo ships one, in the row and in the list of services (#867)
 - A contact row reads star, type, boxes, bin on one line, and a postal address carries its star and bin on the line of its type (#866)
 - A board card's status is changed from a pencil menu at its corner (a row per status, the current one ticked) instead of a select at the foot of the card; dragging and the keyboard keep working. (#845)
 - A company's identifiers are removed with a bin that asks first and takes the row off at once, as on Your details, instead of a Remove tick box applied on Save. (#857)

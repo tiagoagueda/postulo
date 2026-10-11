@@ -9,6 +9,7 @@ they were.
 from __future__ import annotations
 
 import json
+import re
 
 import pytest
 from django.db import IntegrityError, transaction
@@ -817,3 +818,32 @@ def test_a_row_saved_as_it_was_beside_a_new_one_is_not_its_own_duplicate(user, c
     assert formset.is_valid(), formset.errors
     formset.save()
     assert contact.web_links.count() == 2
+
+
+def test_a_service_with_a_mark_draws_it_in_the_place_of_its_icon(client, user):
+    """The row and the options of the service select name the brand mark of a service that
+    has one, and a service that has none keeps its icon (#867)."""
+    WebLink.objects.create(
+        owner=user,
+        holder=user.profile,
+        kind="repository",
+        service="github",
+        url="https://github.com/alex/thing",
+        is_primary=True,
+    )
+    client.force_login(user)
+
+    html = client.get(reverse("accounts:profile")).content.decode()
+
+    block = html[html.index('data-web-links="repository"') :]
+    block = block[: block.index("</fieldset>")]
+    options = {
+        re.search(r'value="([^"]*)"', tag)[1]: tag for tag in re.findall(r"<option[^>]*>", block)
+    }
+    assert 'data-brand="github"' in options["github"]
+    assert "data-brand" not in options["gitlab"] and "data-icon" in options["gitlab"]
+    template = block[block.index("<template data-option-icons>") :]
+    assert 'data-brand="github"' in template, "the mark is drawn once, for the script to copy"
+    row = block[block.index("<li ") : block.index("</li>")]
+    mark = row[row.index("data-option-mark") : row.index("<select")]
+    assert 'data-brand="github"' in mark and "data-icon" not in mark

@@ -19,7 +19,7 @@ from itertools import pairwise
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
-from .selects import DRAWN, button_of, choose
+from .selects import DRAWN, button_of, choose, open_list
 from .test_accessibility import axe_source, describe, violations_on  # noqa: F401
 from .test_reflow import SCROLLS_SIDEWAYS, SPILLS
 from .test_row_removal import sign_in
@@ -107,8 +107,11 @@ def shown_icon(row) -> list[str]:
     the select's own button where scripts run, and the server's, beside the native select,
     where they do not -- never both (#301)."""
     return row.locator(
-        ".input-group :is([data-option-mark], [data-select-mark]) svg[data-icon]"
-    ).evaluate_all("(icons) => icons.filter((i) => i.checkVisibility()).map((i) => i.dataset.icon)")
+        ".input-group :is([data-option-mark], [data-select-mark]) svg:is([data-icon], [data-brand])"
+    ).evaluate_all(
+        "(marks) => marks.filter((i) => i.checkVisibility())"
+        ".map((i) => i.dataset.icon || 'brand:' + i.dataset.brand)"
+    )
 
 
 def in_one_line(boxes: dict, *names: str) -> None:
@@ -232,7 +235,9 @@ def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, 
     expect(name).to_be_hidden()
 
     select.select_option("mastodon")
-    assert shown_icon(row) == ["at-sign"]
+    assert shown_icon(row) == ["brand:mastodon"], (
+        "the service's own mark where Postulo ships one (#867)"
+    )
     expect(name).to_be_hidden()
 
     select.select_option("other")
@@ -240,15 +245,32 @@ def test_the_icon_beside_the_select_follows_the_choice(page: Page, live_server, 
     expect(name).to_be_visible()
 
     select.select_option("youtube")
-    assert shown_icon(row) == ["video"]
+    assert shown_icon(row) == ["brand:youtube"]
     expect(name).to_be_hidden()
 
     # Chosen from the list, as a person does, it is the same.
     choose(page, select, "Bluesky")
     expect(select).to_have_value("bluesky")
-    assert shown_icon(row) == ["at-sign"]
+    assert shown_icon(row) == ["brand:bluesky"]
 
-    assert shown_icon(rows_of(page, "repository").nth(0)) == ["git-branch"]
+    assert shown_icon(rows_of(page, "repository").nth(0)) == ["brand:forgejo"]
+
+
+def test_the_list_draws_a_services_own_mark_and_an_icon_for_one_without(
+    page: Page, live_server, links
+):
+    """In the list of services a service Postulo has the mark of draws that mark, unmodified
+    and beside its name; one it has none of keeps its icon (#867)."""
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    panel = open_list(page, rows_of(page, "social").nth(0).locator("select"))
+
+    mastodon = panel.get_by_role("option", name="Mastodon", exact=True)
+    expect(mastodon.locator("svg[data-brand=mastodon]")).to_have_count(1)
+    expect(mastodon.locator("svg[data-icon]")).to_have_count(0)
+    linkedin = panel.get_by_role("option", name="LinkedIn", exact=True)
+    expect(linkedin.locator("svg[data-icon=user]")).to_have_count(1)
+    expect(linkedin.locator("svg[data-brand]")).to_have_count(0)
 
 
 def test_an_address_pasted_into_a_new_row_chooses_its_service_at_once(
@@ -321,7 +343,7 @@ def test_a_refused_address_says_what_one_looks_like_beside_it(page: Page, live_s
     )
     # What was chosen is still chosen, and drawn.
     expect(row.locator("select")).to_have_value("github")
-    assert shown_icon(row) == ["git-branch"]
+    assert shown_icon(row) == ["brand:github"]
 
 
 # -------------------------------------------------------------------- with scripts off
@@ -361,8 +383,8 @@ def test_with_scripts_off_choosing_other_shows_the_name_and_saves_it(
         wiki = WebLink.objects.get(url="https://wiki.example.org/alex")
         assert (wiki.service, wiki.label) == ("", "A wiki")
         assert WebLink.objects.get(url="https://github.com/alex/thing").service == "github"
-        # And the saved rows are drawn with what was saved: the icon included.
-        assert shown_icon(rows_of(page, "repository").nth(1)) == ["git-branch"]
+        # And the saved rows are drawn with what was saved: the mark included.
+        assert shown_icon(rows_of(page, "repository").nth(1)) == ["brand:github"]
         expect(rows_of(page, "social").nth(3).locator('input[name$="-label"]')).to_be_visible()
     finally:
         context.close()

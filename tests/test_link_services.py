@@ -921,7 +921,7 @@ def test_each_option_says_its_icon_and_its_hosts_and_the_chosen_icon_is_the_one_
 
     assert re.search(r'<option value="linkedin" data-icon="user" data-hosts="linkedin.com"', html)
     assert re.search(
-        r'<option value="mastodon" selected data-icon="at-sign" '
+        r'<option value="mastodon" selected data-icon="at-sign" data-brand="mastodon" '
         r'data-hosts="mastodon.social mastodon.online">',
         html,
     )
@@ -931,6 +931,7 @@ def test_each_option_says_its_icon_and_its_hosts_and_the_chosen_icon_is_the_one_
     # and after the select every icon its list can show, once each, for the select's own
     # control to copy (#301).
     assert row.service_icon == "at-sign"
+    assert row.service_brand == "mastodon", "and the mark where the service has one (#867)"
     after = html[html.index("</select>") :]
     assert re.match(r"</select>\s*<template data-option-icons>", after)
     assert sorted(re.findall(r'data-icon="([a-z-]+)"', after)) == [

@@ -3540,6 +3540,26 @@
     return optionIcons[name] ? optionIcons[name].cloneNode(true) : null;
   }
 
+  // A brand mark the `{% option_brands %}` tag drew, found by the name the option carries.
+  var optionBrands = {};
+
+  function optionBrand(name) {
+    if (!optionBrands[name]) {
+      var wanted = '[data-brand="' + CSS.escape(name) + '"]';
+      Array.prototype.some.call(
+        document.querySelectorAll("template[data-option-icons]"),
+        function (template) {
+          var drawn = template.content.querySelector(wanted);
+          if (drawn) {
+            optionBrands[name] = drawn.cloneNode(true);
+          }
+          return Boolean(drawn);
+        }
+      );
+    }
+    return optionBrands[name] ? optionBrands[name].cloneNode(true) : null;
+  }
+
   // The image the `{% flag %}` tag draws, from the address an option carries: static
   // files are served under a content hash, so there is no pattern to build one from.
   function optionFlag(url) {
@@ -3560,13 +3580,15 @@
   function drawOptionMark(holder, option) {
     var flag = option ? option.getAttribute("data-flag") : "";
     var icon = option ? option.getAttribute("data-icon") : "";
-    var key = flag ? "flag " + flag : icon ? "icon " + icon : "";
+    var brand = option ? option.getAttribute("data-brand") : "";
+    var key = flag ? "flag " + flag : brand ? "brand " + brand : icon ? "icon " + icon : "";
     if (holder.getAttribute("data-select-mark") === key) {
       return;
     }
     holder.setAttribute("data-select-mark", key);
     holder.textContent = "";
-    var drawn = flag ? optionFlag(flag) : optionIcon(icon);
+    // A service's own mark where Postulo ships one, else its icon (#867).
+    var drawn = flag ? optionFlag(flag) : (brand && optionBrand(brand)) || optionIcon(icon);
     if (drawn) {
       holder.appendChild(drawn);
     }

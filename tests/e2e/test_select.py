@@ -705,8 +705,8 @@ def test_each_kind_draws_its_icon_in_the_list_and_in_the_button(page: Page, live
         owner=applicant,
         holder=profile,
         kind="repository",
-        service="codeberg",
-        url="https://codeberg.org/alex/postulo",
+        service="gitlab",
+        url="https://gitlab.com/alex/postulo",
     )
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")

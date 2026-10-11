@@ -144,6 +144,21 @@ def option_icons(names) -> str:
 
 
 @register.simple_tag
+def option_brands(names) -> str:
+    """The brand marks a select's options name in ``data-brand``, for the script to copy:
+    ``{% option_brands names %}`` (#867). The counterpart of ``option_icons`` for a service
+    that has a mark of its own; the script looks a mark up by ``data-brand``. Nothing is
+    drawn for no names, and a name Postulo does not ship is left out rather than raised on.
+    """
+    from postulo.core.option_icons import distinct_brands
+
+    drawn = [brand(name) for name in distinct_brands(names or ())]
+    if not drawn:
+        return ""
+    return mark_safe(f"<template data-option-icons>{''.join(drawn)}</template>")  # noqa: S308
+
+
+@register.simple_tag
 def language_flag(code: str, css_class: str = "flag", **attrs: str) -> str:
     """The flag that stands for a language: ``{% language_flag "pt-PT" %}``.
 

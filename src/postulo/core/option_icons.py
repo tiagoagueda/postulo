@@ -10,6 +10,9 @@ server, as data on the ``<option>``:
 - ``data-icon`` is the name of an icon out of the Lucide set Postulo ships, for a kind: a
   telephone number's, a postal address's, an identifier's, the service a web link is on,
   an application's status. A generic icon, never somebody's mark (``TRADEMARKS.md``).
+- ``data-brand`` is the name of a brand mark Postulo ships, for a service that has one
+  (#867): it takes the place of the option's icon, in the list and in the closed control.
+  Drawn once each into the same ``<template>`` by ``{% option_brands %}``.
 
 An icon is an inline ``<svg>``, drawn in the colour of the words beside it, so unlike a
 flag it has no address to point an image at; and a script may not build one from a string,
@@ -55,6 +58,15 @@ def distinct(names: Iterable[str]) -> list[str]:
     return [name for name in dict.fromkeys(names) if shipped(name)]
 
 
+def distinct_brands(names: Iterable[str | None]) -> list[str]:
+    """The brand marks to draw for a list: each one once, in the order first asked for, and
+    only the ones Postulo ships (`brands.brand_exists`). A mark is somebody's logo and goes
+    where ``TRADEMARKS.md`` says: unmodified, beside the service it names (#867)."""
+    from postulo.core.brands import brand_exists
+
+    return [name for name in dict.fromkeys(n for n in names if n) if brand_exists(name)]
+
+
 class OptionIcons:
     """Mixin for a `forms.Select` whose options each name an icon.
 
@@ -87,6 +99,11 @@ class OptionIcons:
                     option["attrs"] = {"data-icon": icon, **option["attrs"]}
                 named.append(icon)
         context["widget"]["option_icons"] = distinct(named)
+        context["widget"]["option_brands"] = distinct_brands(
+            option["attrs"].get("data-brand")
+            for _group, options, _index in context["widget"]["optgroups"]
+            for option in options
+        )
         return context
 
 
