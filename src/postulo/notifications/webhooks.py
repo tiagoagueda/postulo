@@ -17,6 +17,7 @@ from __future__ import annotations
 import datetime as dt
 import logging
 
+from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext as _
 
@@ -167,6 +168,9 @@ def deliver(row) -> bool:
         row.last_error = ""
         row.next_attempt_at = None
         row.sent_at = now
+        # The text of a notification (the role, the company, a note, an offer's terms) has done
+        # its job once the receiver has it, and is not kept for the row's whole life (#752).
+        row.body = ""
         row.save()
         connection.record_test(True)
         return True
@@ -182,6 +186,22 @@ def deliver(row) -> bool:
     # A client error will not fix itself by being retried; 408 and 429 are the two that
     # mean *later*, and are treated as the transient failures they are.
     return fail(answered, final=400 <= status < 500 and status not in (408, 429))
+
+
+#: How long a delivered or given-up row is kept, for the connection's page to say what
+#: happened lately; a notification's text is not worth more than that (#752).
+KEEP_DAYS = 7
+
+
+def forget_old(*, days: int = KEEP_DAYS) -> int:
+    """Delete the rows whose story is over and a week old: sent, or given up. How many went."""
+    cutoff = timezone.now() - dt.timedelta(days=days)
+    done = WebhookDelivery.objects.filter(
+        status__in=(DeliveryStatus.SENT, DeliveryStatus.GIVEN_UP)
+    ).filter(
+        models.Q(sent_at__lt=cutoff) | models.Q(sent_at__isnull=True, last_attempt_at__lt=cutoff)
+    )
+    return done.delete()[0]
 
 
 def send_pending(*, limit: int = BATCH) -> tuple[int, int]:

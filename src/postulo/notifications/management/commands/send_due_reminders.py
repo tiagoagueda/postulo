@@ -210,6 +210,8 @@ class Command(BaseCommand):
             # pass that already exists rather than by a second timer.
             errands.fail_interrupted()
             reaped = reap_archives() + errands.forget_old() + inbox.forget_old()
+            # What a webhook was told, a week on (#752).
+            webhooks.forget_old()
             # The pages of captures that never became a listing, past the days the
             # instance keeps them (#256). The captures stay; the copies of the pages go.
             pages_gone = pages.expire_unconfirmed()

@@ -163,6 +163,7 @@ def test_a_key_means_one_delivery_however_often_it_is_announced(user):
 def test_the_scheduler_delivers_signed_and_records_the_answer(user):
     webhook_connection(user)
     notify(user, Notification(event="reminder_due", title="Chase them", key="reminder:1"))
+    queued = WebhookDelivery.objects.get().body
     seen = {}
 
     def fake_post(url, secret, body, *, event, delivery):
@@ -179,7 +180,10 @@ def test_the_scheduler_delivers_signed_and_records_the_answer(user):
     assert row.status == DeliveryStatus.SENT and row.last_status == 200 and row.sent_at
     assert seen["url"] == "https://hooks.example.org/postulo" and seen["secret"] == SECRET
     assert seen["event"] == "reminder_due" and seen["delivery"] == str(row.pk)
-    assert seen["body"] == row.body, "the bytes that were signed are the bytes that were sent"
+    # The text is kept only until the receiver has it (#752), so what was signed is compared
+    # with what was queued, not with a row that no longer holds it.
+    assert seen["body"] == queued
+    assert row.body == ""
     assert webhooks.send_pending() == (0, 0), "and not again"
 
 

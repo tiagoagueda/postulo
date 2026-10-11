@@ -59,7 +59,9 @@ class WebhookDelivery(OwnedModel):
 
     connection = models.ForeignKey(
         "plugins.Connection",
-        on_delete=models.SET_NULL,
+        # With the connection, body and all (#752): the row holds the notification's text and
+        # means nothing without the receiver it was for.
+        on_delete=models.CASCADE,
         null=True,
         related_name="webhook_deliveries",
         verbose_name=_("connection"),
