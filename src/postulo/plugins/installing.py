@@ -156,6 +156,9 @@ class PackageInfo:
     pure_python: bool = True
     filename: str = ""
     sha256: str = ""
+    #: Whether the wheel ships a ``.pth`` file, whose ``import`` lines Python runs at start-up
+    #: in any directory it processes as a site directory (#784).
+    has_pth: bool = False
 
     @property
     def is_plugin(self) -> bool:
@@ -238,6 +241,7 @@ def read_wheel(path: Path) -> PackageInfo:
             value for value in (headers.get_all("Requires-Dist") or []) if "extra ==" not in value
         ],
         entry_points=entry_points,
+        has_pth=any(name.lower().endswith(".pth") for name in names),
         pure_python=any(PURE_PYTHON in tag for tag in tags)
         or path.name.endswith(f"-{PURE_PYTHON}.whl"),
         filename=path.name,
@@ -472,6 +476,16 @@ def check(info: PackageInfo) -> None:
                 )
             )
             % {"name": info.name, "groups": ", ".join(plugin_groups())}
+        )
+    if info.has_pth:
+        raise InstallError(
+            str(
+                _(
+                    "%(name)s ships a .pth file, which Python runs when it starts whether or not "
+                    "the plugin is switched on. A plugin does not need one."
+                )
+            )
+            % {"name": info.name}
         )
     problems = conflicts_with_core(info)
     if problems:
@@ -769,8 +783,8 @@ def roll_back() -> list[Installed]:
 #: does -- by group, from the directory that was just installed into -- and imports what
 #: each one names. Printing nothing and exiting 0 is the whole of "it loads".
 _VERIFY = """
-import sys, site
-site.addsitedir(sys.argv[1])
+import sys
+sys.path.append(sys.argv[1])
 from importlib.metadata import entry_points
 wanted = set(sys.argv[2].split(",")) if sys.argv[2] else set()
 failed = []

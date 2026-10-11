@@ -17,7 +17,6 @@ import json
 import logging
 import os
 import re
-import site
 import sys
 import threading
 from dataclasses import asdict, dataclass, field, replace
@@ -98,14 +97,17 @@ def record_path() -> Path:
 def activate() -> None:
     """Put the plugins directory on the import path, if it exists.
 
-    ``site.addsitedir`` rather than a plain ``sys.path`` append, so that ``.pth`` files a
-    package ships are honoured, exactly as they would be in a normal installation.
+    A plain ``sys.path`` append and **not** ``site.addsitedir`` (#784): that would run every
+    ``import`` line of every ``.pth`` file in the directory at every start, whatever the record
+    says about a plugin being switched off, and "off" is a promise that its code is not there.
+    A wheel that ships one is refused when it is installed (`installing.check`); one that arrived
+    inside a dependency is never run.
     """
     directory = plugins_dir()
     if not directory.is_dir():
         return
     if str(directory) not in sys.path:
-        site.addsitedir(str(directory))
+        sys.path.append(str(directory))
 
 
 # ------------------------------------------------------------------- the record
