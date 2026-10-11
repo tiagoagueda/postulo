@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Expired sessions, and the imports they were holding for review, are deleted by the scheduler's pass and by the hourly tidy-up that pages ask for (#751)
 - Deleting an account also deletes the invitation it accepted, which carried its address and an administrator's note, and the sessions it was signed in on, with the imports they held (#750)
 - The Django admin's profile inline shows only the preferences that make an account usable, not birth data, nationality, gender or anything else that identifies a person (#749)
 - The OAuth consent state carries a nonce held in the session and spent on use, so a captured state cannot be replayed with another person's code; the connection is looked up among the signed-in person's own (#748)

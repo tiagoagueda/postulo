@@ -178,5 +178,8 @@ def tidy_up_if_due() -> None:
             return
     except Exception:  # a cache that is down is no reason to fail an export page
         return
+    from postulo.accounts import sessions
+
     reap_archives()
     pages.expire_unconfirmed()
+    sessions.clear_expired()

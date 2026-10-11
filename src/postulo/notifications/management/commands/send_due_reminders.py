@@ -175,7 +175,7 @@ class Command(BaseCommand):
 
     def one_pass(self, every: int, *, budget: int) -> None:
         """Everything the clock has made due, once."""
-        from postulo.accounts import claims
+        from postulo.accounts import claims, sessions
         from postulo.applications.quiet import announce_quiet_applications
         from postulo.core import errands, site
         from postulo.core.slow import reap_archives
@@ -216,6 +216,9 @@ class Command(BaseCommand):
             # Addresses somebody listed on their account and never proved, past the life of
             # the link mailed to confirm them (#891).
             claims.expire_unconfirmed()
+            # Sessions past their expiry, and the imports they were holding for review: Django
+            # only stops using them, it never deletes them (#751).
+            sessions.clear_expired()
             # A slice of the uploads read against what was recorded, the least recently
             # checked first, and the files no row names once they are older than the grace
             # period (#663).
