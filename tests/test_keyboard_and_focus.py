@@ -236,7 +236,7 @@ def test_the_move_help_hangs_off_the_menu_rather_than_the_card(client, user, boa
 
     assert 'id="board-move-help"' in html
     assert "board-drag-help" not in html
-    assert re.search(r'<select[^>]*aria-describedby="board-move-help"', html)
+    assert re.search(r'<button[^>]*aria-describedby="board-move-help"', html)
 
 
 def test_nothing_on_the_board_is_draggable_without_a_script(client, user, board):

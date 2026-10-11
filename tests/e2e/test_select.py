@@ -31,6 +31,7 @@ import re
 import pytest
 from playwright.sync_api import Browser, Page, expect
 
+from .card_menu import open_menu, row, trigger_of
 from .selects import active_option, button_of, choose, list_of, open_list, options_of
 from .test_accessibility import (  # noqa: F401
     axe_source,
@@ -867,11 +868,13 @@ LEFT_BEHIND = """() => {
 }"""
 
 
-def test_on_a_boards_card_the_status_has_its_icons_and_a_choice_moves_the_card_once(
+def test_on_a_boards_card_the_status_menu_has_its_icons_and_a_choice_moves_the_card_once(
     page: Page,
     live_server,
     search,  # noqa: F811
 ):
+    """The status is changed from a menu at the card's corner (#845): a row for each status
+    with its icon, the current one ticked and not offered, and a press moves the card once."""
     from postulo.applications.models import Application, ApplicationEvent
 
     draft = Application.objects.get(posting__title="Resonance Technician")
@@ -880,30 +883,24 @@ def test_on_a_boards_card_the_status_has_its_icons_and_a_choice_moves_the_card_o
     page.set_viewport_size(WIDE)
     page.goto(f"{live_server.url}/applications/?view=board")
 
-    # A list is built when it is opened, and not before: a board is all buttons.
     assert page.locator("[data-card]").count() >= 4
-    assert page.locator('[data-card] [role="option"]').count() == 0
-    # The icons are drawn once for the board, not once a card.
-    assert page.locator("template[data-option-icons]").count() == 1
+    assert page.locator("[data-card] select").count() == 0, "no card carries a select any more"
 
     card = page.locator(f"[data-card='{draft.pk}']")
-    select = card.locator("select[name=status]")
-    button = button_of(select)
+    button = trigger_of(card)
     expect(button).to_have_accessible_name("Status of Resonance Technician at Black Mesa")
     expect(button).to_have_accessible_description(
-        "Choose a status to move this card to another column. From the keyboard the move is "
-        "made when you press Enter or leave the menu, so passing over a status on the way "
-        "does not record it. Cards can also be dragged between columns with a mouse."
+        "Open the menu and choose a status to move this card to another column. Cards can "
+        "also be dragged between columns with a mouse."
     )
     expect(button.locator("svg[data-icon=pencil]")).to_have_count(1)
 
     button.focus()
     page.keyboard.press("ArrowDown")
-    panel = list_of(page, select)
-    found = placed(page, panel)
-    assert found["inside"] and found["reachable"], found
-    icons = panel.locator('[role="option"]').evaluate_all(
-        "(rows) => rows.map((row) => row.querySelector('[data-select-mark] svg').dataset.icon)"
+    panel = card.locator("[data-card-status-menu] [data-popover]")
+    expect(panel).to_be_visible()
+    icons = panel.locator('[role="menuitemradio"]').evaluate_all(
+        "(rows) => rows.map((row) => row.querySelector('svg').dataset.icon)"
     )
     assert icons == [
         "pencil",
@@ -918,10 +915,13 @@ def test_on_a_boards_card_the_status_has_its_icons_and_a_choice_moves_the_card_o
         "circle-minus",
         "ghost",
     ]
-    # Three statuses are passed over on the way to the fourth, and only the fourth is kept.
-    for _ in range(3):
-        page.keyboard.press("ArrowDown")
-    page.keyboard.press("Enter")
+    current = panel.locator('[role="menuitemradio"][aria-checked="true"]')
+    expect(current).to_have_count(1)
+    expect(current).to_be_disabled()
+    expect(panel.locator("[role=menuitemradio]:focus")).to_have_attribute("value", "applied")
+
+    row(card, "screening").click()
+
     expect(page.locator(f"[data-board-column=screening] [data-card='{draft.pk}']")).to_be_visible()
     draft.refresh_from_db()
     assert draft.status == "screening"
@@ -1544,8 +1544,8 @@ def test_axe_is_clean_with_a_list_open(
     check("the gallery's dialog with its list open")
 
     page.goto(f"{base}/applications/?view=board")
-    open_list(page, page.locator("[data-card] select[name=status]").first)
-    check("the board with a card's status open")
+    open_menu(page.locator("[data-card]").first)
+    check("the board with a card's status menu open")
 
     page.goto(f"{base}/accounts/profile/")
     for name in ("phone_numbers-0-number_0", "record_language"):

@@ -57,7 +57,6 @@ from .models import (
     BOARD_STATUSES,
     END_STATUSES,
     SETTLED_OUTCOMES,
-    STATUS_ICONS,
     Application,
     EventKind,
     Interview,
@@ -159,7 +158,6 @@ class ApplicationFilterMixin:
             # The same statuses with the icon each draws in a card's list, and the icons
             # themselves, drawn once for the whole board (#301).
             "status_options": status_options(),
-            "status_icons": list(STATUS_ICONS.values()),
             "tags": Tag.objects.for_user(self.request.user),
         }
 

@@ -7,9 +7,33 @@
    The `aria-describedby` is not here either: it was on this `<article>`, which nothing can
    focus, so the help it names was never announced to anybody. It hangs off the status menu
    below, which is the control it describes and the thing the keyboard lands on. {% endcomment %}
-<article class="card p-3" data-card="{{ application.pk }}"
+<article class="card relative p-3" data-card="{{ application.pk }}"
          data-status="{{ application.status }}">
-  <a href="{{ application.get_absolute_url }}" class="block font-medium hover:underline">
+  {% comment %} The status is changed from a pencil at the card's corner (#845): a menu with one
+     row for each status, the current one ticked, each with its status icon. Named by its
+     application, not "Change status" thirty times over: a board is a page of these, and a
+     list of controls that all say the same thing is a list nobody can choose from (#227).
+     A row is a submit button of the form it sits in, so the choice is made, with no script
+     at all, by the press that chooses it; and a dragged card is moved by `app.js` pressing
+     the same button. The title is padded clear of the corner so it never runs under it. {% endcomment %}
+  <div class="absolute end-2 top-2" data-card-status-menu>
+    <c-dropdown-menu trigger_describedby="board-move-help"
+                     label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
+      <c-slot name="trigger">{% icon "pencil" %}</c-slot>
+      <form method="post" action="{% url 'applications:status' application.pk %}" role="none">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        {% for value, label, icon in status_options %}
+          <button type="submit" role="menuitemradio" name="status" value="{{ value }}"
+                  aria-checked="{% if value == application.status %}true{% else %}false{% endif %}"
+                  {% if value == application.status %}disabled{% endif %}>
+            {% icon icon %}{{ label }}{% if value == application.status %}{% icon "check" class="ms-auto size-4" %}{% endif %}
+          </button>
+        {% endfor %}
+      </form>
+    </c-dropdown-menu>
+  </div>
+  <a href="{{ application.get_absolute_url }}" class="block pe-8 font-medium hover:underline">
     {{ application.posting.title }}
   </a>
   <p class="truncate text-sm text-ink-500 dark:text-ink-400">
@@ -53,26 +77,5 @@
     {% else %}
       <span class="text-xs text-ink-400">{% translate "Not sent yet" %}</span>
     {% endif %}
-
-    {# Advancing a card is one click, because the alternative is not updating it at all. #}
-    {% comment %} Named by its application, not "Change status" thirty times over: a board
-       is a page of these, and a list of controls that all say the same thing is a list
-       nobody can choose from (#227).
-
-       Each status says its icon (#301, #315), which the list `app.js` builds beside this
-       select draws; the icons themselves are drawn once for the board, by the page, and
-       not once a card. With the script blocked this is the native select and *Move*. {% endcomment %}
-    <form method="post" action="{% url 'applications:status' application.pk %}" class="shrink-0">
-      {% csrf_token %}
-      <input type="hidden" name="next" value="{{ request.get_full_path }}">
-      <select name="status" class="w-40 px-2 py-1 text-xs" data-autosubmit
-              aria-describedby="board-move-help"
-              aria-label="{% blocktranslate trimmed with title=application.posting.title company=application.posting.company.name %}Status of {{ title }} at {{ company }}{% endblocktranslate %}">
-        {% for value, label, icon in status_options %}
-          <option value="{{ value }}" data-icon="{{ icon }}" {% if value == application.status %}selected{% endif %}>{{ label }}</option>
-        {% endfor %}
-      </select>
-      <noscript><button type="submit" class="btn" data-variant="ghost" data-size="xs">{% translate "Move" %}</button></noscript>
-    </form>
   </div>
 </article>

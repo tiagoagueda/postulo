@@ -1008,8 +1008,10 @@
     if (!status || column === from) {
       return;
     }
-    var select = card.querySelector("select[name='status']");
-    if (!select) {
+    // The row of the card's menu that chooses this status: a submit button of the card's
+    // own form, pressed in place of the person pressing it (#845).
+    var choice = card.querySelector("button[name='status'][value='" + status + "']");
+    if (!choice) {
       return;
     }
     // Optimistic: the card moves now, and the form that was already there does the
@@ -1034,16 +1036,14 @@
     if (quiet || folded) {
       oneFewerOnThePage();
     }
-    select.value = status;
-    selectChanged(select);
-    if (select.form) {
+    if (choice.form) {
       var filters = boardFilters();
-      var back = select.form.elements.namedItem("next");
+      var back = choice.form.elements.namedItem("next");
       if (boardOwed && filters && back) {
         back.value = theQuestionAsItStands(filters);
       }
       dragging.moved = true;
-      select.form.requestSubmit();
+      choice.form.requestSubmit(choice);
     }
   });
 
@@ -2928,7 +2928,7 @@
   // no anchor at all, so the stylesheet could not put it anywhere near the row.
   function menuItems(menu) {
     return Array.prototype.slice
-      .call(menu.querySelectorAll('[role="menuitem"]'))
+      .call(menu.querySelectorAll('[role="menuitem"], [role="menuitemradio"]'))
       .filter(function (item) {
         return !item.disabled && item.getAttribute("aria-disabled") !== "true";
       });

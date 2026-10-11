@@ -137,7 +137,7 @@
      row are bare words on the canvas (#277). Basecoat's classes are painted here; the
      project's own get the same in app.css. */
   .btn,
-  .dropdown-menu [role="menuitem"] {
+  .dropdown-menu :is([role="menuitem"], [role="menuitemradio"]) {
     border: 1px solid ButtonText;
   }
 }
@@ -190,7 +190,7 @@
     @apply w-70;
   }
 
-  .dropdown-menu [role="menuitem"] {
+  .dropdown-menu :is([role="menuitem"], [role="menuitemradio"]) {
     @apply cursor-pointer gap-2 px-3 py-2 text-start text-sm whitespace-normal text-ink-700
       hover:bg-accent hover:text-accent-foreground
       focus-visible:bg-accent focus-visible:text-accent-foreground

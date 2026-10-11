@@ -45,6 +45,7 @@ from playwright.sync_api import Browser, Page, expect
 
 from . import test_accessibility as walks
 from . import test_application_filters as filter_tests
+from .card_menu import choose_status, trigger_of
 from .test_accessibility import describe, sign_in, violations_on
 from .test_application_filters import (
     asked,
@@ -965,6 +966,7 @@ def test_a_strip_takes_the_card_and_counts_it_before_the_page_answers(
     page.evaluate(
         """() => document.addEventListener('submit', (event) => {
             window.sentBy = event.target.getAttribute('action');
+            window.sentStatus = event.submitter ? event.submitter.value : null;
             event.preventDefault();
         }, true)"""
     )
@@ -995,7 +997,7 @@ def test_a_strip_takes_the_card_and_counts_it_before_the_page_answers(
     assert moved not in now["applied"]["cards"]
     expect(card).to_be_hidden()
     assert card.evaluate("(card) => card.parentElement.dataset.boardColumn") == "offer"
-    assert card.evaluate("(card) => card.querySelector('select').value") == "offer"
+    assert page.evaluate("() => window.sentStatus") == "offer", "the row for the column it went to"
     assert page.evaluate("() => window.sentBy") == f"/applications/{moved}/status/"
 
 
@@ -1018,7 +1020,7 @@ def test_a_card_moved_by_its_menu_into_a_folded_column_leaves_the_open_one(
     before = columns(page)
 
     with page.expect_navigation():
-        page.locator(f"[data-card='{moved}'] select[name=status]").select_option("offer")
+        choose_status(page.locator(f"[data-card='{moved}']"), "offer")
 
     assert Application.objects.get(pk=moved).status == Status.OFFER
     says_status_once(page, "applied")
@@ -1313,7 +1315,7 @@ def test_a_card_moved_by_its_menu_leaves_the_board_where_it_was_scrolled(
     assert abs(scrolled) > 200, scrolled
 
     with page.expect_navigation():
-        card.locator("select[name=status]").select_option("assessment")
+        choose_status(card, "assessment")
 
     assert Application.objects.get(pk=moved).status == Status.ASSESSMENT
     page.wait_for_function(f"(scrolled) => Math.abs(({SCROLL})() - scrolled) <= 1", arg=scrolled)
@@ -1597,7 +1599,7 @@ def test_under_reduced_motion_the_board_scrolls_only_by_hand(page: Page, live_se
 
     page.evaluate("() => { document.querySelector('[data-board]').scrollLeft = 300; }")
     assert scroll_of(page) == 300, "by hand it scrolls"
-    expect(card.locator("select[name=status]")).to_be_visible()
+    expect(trigger_of(card)).to_be_visible()
 
     # The same held card, told to the page rather than made by the browser.
     page.evaluate("() => { document.querySelector('[data-board]').scrollLeft = 0; }")
@@ -1889,6 +1891,7 @@ def test_what_a_drop_counts_is_what_the_page_comes_back_with(
         """() => {
             window.keptBack = (event) => {
                 window.sentForm = event.target;
+                window.sentSubmitter = event.submitter;
                 event.preventDefault();
             };
             document.addEventListener('submit', window.keptBack, true);
@@ -1907,7 +1910,7 @@ def test_what_a_drop_counts_is_what_the_page_comes_back_with(
         page.evaluate(
             """() => {
                 document.removeEventListener('submit', window.keptBack, true);
-                window.sentForm.requestSubmit();
+                window.sentForm.requestSubmit(window.sentSubmitter);
             }"""
         )
     assert Application.objects.get(pk=moved).status == Status.INTERVIEWING

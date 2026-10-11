@@ -251,10 +251,10 @@ def test_a_cvs_language_carries_its_flags(client, user):
 
 
 @pytest.mark.django_db
-def test_the_board_says_each_statuss_icon_and_draws_the_icons_once(client, user):
-    """Two hundred cards share one set of statuses: each card's options name their icons,
-    and the icons are drawn once, by the page, outside what the live filters swap."""
-    from postulo.applications.models import STATUS_ICONS, Application
+def test_the_boards_cards_draw_each_statuss_icon_in_their_menu(client, user):
+    """Each card's status menu has a row per status with its icon (#845); no card carries a
+    select any more, so the page draws no list of icons for a script to copy."""
+    from postulo.applications.models import STATUS_ICONS, Application, status_options
     from postulo.jobs.models import Company, JobPosting
 
     company = Company.objects.create(owner=user, name="Aperture Science")
@@ -265,20 +265,20 @@ def test_the_board_says_each_statuss_icon_and_draws_the_icons_once(client, user)
 
     html = client.get(reverse("applications:list") + "?view=board").content.decode()
     assert html.count("data-card=") == 3
-    assert html.count("<template data-option-icons>") == 1
-    table = html[html.index('id="applications-table"') :]
-    assert "<template data-option-icons>" not in table, "inside what a filter swaps"
-    drawn = icons_after(html)
-    assert drawn == list(dict.fromkeys(STATUS_ICONS.values()))
-    for value, attrs in options_of(table, "status"):
-        assert f'data-icon="{STATUS_ICONS[value]}"' in attrs, value
+    assert "<template data-option-icons>" not in html
+    card = html[html.index("data-card=") :]
+    card = card[: card.index("</article>")]
+    rows = re.findall(
+        r'<button[^>]*role="menuitemradio"[^>]*value="(\w+)"[^>]*>(.*?)</button>', card, re.S
+    )
+    assert [value for value, _ in rows] == [value for value, _label, _icon in status_options()]
+    for value, body in rows:
+        assert f'data-icon="{STATUS_ICONS[value]}"' in body, value
 
-    # The fragment a live filter asks for is the board alone, and its cards name the icons
-    # the page already holds.
+    # The fragment a live filter asks for is the board alone, with the same rows.
     fragment = client.get(
         reverse("applications:list") + "?view=board", headers={"HX-Request": "true"}
     ).content.decode()
-    assert "<template data-option-icons>" not in fragment
     assert 'data-icon="send"' in fragment
 
     # The table has no such list, and draws none.

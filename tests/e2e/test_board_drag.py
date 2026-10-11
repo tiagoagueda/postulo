@@ -13,6 +13,7 @@ import datetime as dt
 import pytest
 from playwright.sync_api import Page, expect
 
+from tests.e2e.card_menu import choose_status, trigger_of
 from tests.e2e.signing_in import sign_in
 
 pytestmark = pytest.mark.e2e
@@ -95,9 +96,9 @@ def test_the_status_menu_still_does_the_same_thing(live_server, page: Page, appl
     page.goto(f"{base}/applications/?view=board")
 
     card = page.locator(f"[data-card='{application.pk}']")
-    assert card.locator("select[name='status']").count() == 1
+    assert trigger_of(card).count() == 1
     with page.expect_navigation():
-        card.locator("select[name='status']").select_option("offer")
+        choose_status(card, "offer")
 
     application.refresh_from_db()
     assert application.status == Status.OFFER
