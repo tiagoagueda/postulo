@@ -1010,7 +1010,18 @@ class SiteSettings(models.Model):
         _("tagline"),
         max_length=200,
         blank=True,
-        help_text=_("A line under the name on the sign-in page. Optional."),
+        help_text=_(
+            "A line under the name on the home page, and the web app's description. Optional."
+        ),
+    )
+    motto = models.CharField(
+        _("motto"),
+        max_length=200,
+        blank=True,
+        help_text=_(
+            "The line in the footer of every page, after the name. "
+            "Empty shows “your job search, your data”."
+        ),
     )
     registration_open = models.BooleanField(
         _("registration open"),

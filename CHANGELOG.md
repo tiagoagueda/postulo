@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The footer's line is the administrator's motto (a new field under Server settings → Defaults, starting as the tagline it showed), defaulting to “your job search, your data”, and is left out on phones so the footer starts with “Powered by Postulo”. (#835)
 - The footer's “Powered by Postulo” no longer shows the version and links to the releases page for everybody, signed in or not. (#836)
 - Single sign-on no longer signs somebody into the account holding the same address unless POSTULO_OIDC_LINK_BY_EMAIL=true is set; an instance with a provider and the variable unset is warned at start-up (postulo.W002), and those people connect the provider once from their own account. (#892)
 - The skills section's example heading is now “Programming languages”, so “Languages” means the spoken ones wherever Postulo writes it; the demo data follows, and nothing in anybody's record changes. (#690)

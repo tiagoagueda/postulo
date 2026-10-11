@@ -281,6 +281,10 @@ def tagline() -> str:
     return current().tagline
 
 
+def motto() -> str:
+    return current().motto
+
+
 def is_empty() -> bool:
     """No accounts at all: the state of a fresh installation."""
     return not get_user_model().objects.exists()

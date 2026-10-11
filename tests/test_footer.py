@@ -126,40 +126,75 @@ def test_the_signed_in_allauth_pages_have_the_same_foot_and_still_no_version(cli
 # ------------------------------------------------------------------- this instance
 
 
-def test_an_instance_nobody_named_keeps_postulos_slogan(client):
+def test_an_instance_nobody_named_says_postulos_slogan(client):
     footer = footer_of(client.get(reverse("core:home")))
-    assert "your job search, on your server" in footer
+    assert "Postulo — your job search, your data." in footer
+    assert "on your server" not in footer
 
 
-def test_a_named_instance_says_its_own_name_instead(client):
+def test_a_named_instance_says_its_own_name_and_the_default_slogan(client):
     SiteSettings.objects.create(pk=1, instance_name="Chercheurs d'emploi")
 
     footer = footer_of(client.get(reverse("core:home")))
 
-    assert "<bdi>Chercheurs d&#x27;emploi</bdi>" in footer
-    assert "your job search, on your server" not in footer
+    assert "<bdi>Chercheurs d&#x27;emploi</bdi> — your job search, your data" in footer
+    assert "on your server" not in footer
 
 
-def test_a_tagline_follows_the_name(client):
-    SiteSettings.objects.create(pk=1, instance_name="Acme", tagline="وظائف للجميع")
+def test_a_motto_follows_the_name(client):
+    SiteSettings.objects.create(pk=1, instance_name="Acme", motto="وظائف للجميع")
 
     footer = footer_of(client.get(reverse("core:home")))
 
     assert "<bdi>Acme</bdi> — <bdi>وظائف للجميع</bdi>" in footer
-    assert "your job search, on your server" not in footer
+    assert "your job search, your data" not in footer
 
 
-def test_a_tagline_on_an_unnamed_instance_replaces_the_slogan_too(client):
-    SiteSettings.objects.create(pk=1, tagline="For the Tuesday group")
+def test_a_motto_on_an_unnamed_instance_replaces_the_slogan_too(client):
+    SiteSettings.objects.create(pk=1, motto="For the Tuesday group")
 
     footer = footer_of(client.get(reverse("core:home")))
 
     assert "<bdi>Postulo</bdi> — <bdi>For the Tuesday group</bdi>" in footer
-    assert "your job search, on your server" not in footer
+    assert "your job search, your data" not in footer
+
+
+def test_the_tagline_is_not_the_footers_line(client):
+    """The tagline is the home page's; the footer's line is the motto (#835)."""
+    SiteSettings.objects.create(pk=1, instance_name="Acme", tagline="Only for the home page")
+
+    assert "Only for the home page" not in footer_of(client.get(reverse("core:home")))
+    assert "Only for the home page" in client.get(reverse("core:home")).content.decode()
+
+
+def test_an_instances_existing_tagline_becomes_its_motto_so_the_footer_reads_the_same():
+    """The migration copies what the footer was printing."""
+    import importlib
+
+    migration = importlib.import_module("postulo.core.migrations.0032_site_motto")
+    from django.apps import apps
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"tagline": "Kept", "motto": ""})
+    migration.keep_what_the_footer_said(apps, None)
+    assert SiteSettings.objects.get(pk=1).motto == "Kept"
+
+    SiteSettings.objects.update_or_create(pk=1, defaults={"tagline": "Old", "motto": "Chosen"})
+    migration.keep_what_the_footer_said(apps, None)
+    assert SiteSettings.objects.get(pk=1).motto == "Chosen", "one already written is left alone"
+
+
+def test_on_a_phone_the_line_gives_way_to_powered_by_postulo(client):
+    """Hidden below `sm`, so what is left of the footer starts with the first link (#835)."""
+    footer = footer_of(client.get(reverse("core:home")))
+    line = re.search(r"<p\b[^>]*data-motto[^>]*>", footer)[0]
+
+    assert "hidden" in line and "sm:block" in line
+    assert footer.index("data-powered") > footer.index("data-motto"), "and it is the first link"
+    assert footer.index("data-powered") < footer.index("data-source")
 
 
 def test_what_an_administrator_typed_is_escaped(client):
-    SiteSettings.objects.create(pk=1, instance_name="<b>Acme</b>", tagline="<script>x</script>")
+    SiteSettings.objects.create(pk=1, instance_name="<b>Acme</b>", motto="<script>x</script>")
 
     footer = footer_of(client.get(reverse("core:home")))
 

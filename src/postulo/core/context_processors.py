@@ -89,6 +89,9 @@ def ui(request: HttpRequest) -> dict:
         "registration_open": site.signup_open_now(),
         "instance_name": name,
         "instance_tagline": site.tagline(),
+        # The footer's line, which the administrator sets (#835). Not the tagline, which
+        # is the home page's and the web app's description.
+        "instance_motto": site.motto(),
         # Whether an administrator gave this instance a name of its own. The footer then
         # says that name where it said Postulo's slogan, which belongs to an instance
         # nobody has named (#212).

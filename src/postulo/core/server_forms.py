@@ -276,7 +276,7 @@ class OfferedLanguagesForm(forms.ModelForm):
 class DefaultsForm(PinnedPolicyForm):
     class Meta:
         model = SiteSettings
-        fields = ("instance_name", "tagline", "default_language", "default_time_zone")
+        fields = ("instance_name", "tagline", "motto", "default_language", "default_time_zone")
 
     def __init__(self, *args, **kwargs):
         from django.conf import settings

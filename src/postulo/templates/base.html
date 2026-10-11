@@ -287,9 +287,10 @@
        request for money, which is asked in the README and on Server settings -> Overview
        and nowhere else (#172).
 
-       The instance says its own name, and its tagline when it has one; Postulo's slogan is
-       for an instance nobody has named. Both are typed text in any script, so each is a
-       `<bdi>` and neither is translated.
+       The instance says its own name and its motto (#835), the administrator's line, and
+       Postulo's slogan "your job search, your data" where there is none. Both are typed text
+       in any script, so each is a `<bdi>`. Below `sm` that line is hidden and "Powered by
+       Postulo" takes its place, first and at the start: a phone's footer is the links.
 
        *Powered by Postulo* is said to everybody, without the version: the version is the
        first thing a stranger would want in order to know which advisories apply, and it is
@@ -305,14 +306,14 @@
        `py-1` on each item, so a link at this size is 24 pixels tall -- the target size a
        pointer wants -- without leaning on the space around it. {% endcomment %}
     <footer class="flex flex-wrap items-center justify-between gap-x-4 px-4 pb-10 text-xs text-ink-500 dark:text-ink-400">
-      <p class="py-1">
-        {% if instance_tagline %}
-          <bdi>{{ instance_name }}</bdi> — <bdi>{{ instance_tagline }}</bdi>
+      <p class="hidden py-1 sm:block" data-motto>
+        {% if instance_motto %}
+          <bdi>{{ instance_name }}</bdi> — <bdi>{{ instance_motto }}</bdi>
         {% elif instance_named %}
-          <bdi>{{ instance_name }}</bdi>
+          <bdi>{{ instance_name }}</bdi> — {% translate "your job search, your data" %}
         {% else %}
           {% blocktranslate trimmed %}
-            Postulo — your job search, on your server.
+            Postulo — your job search, your data.
           {% endblocktranslate %}
         {% endif %}
       </p>

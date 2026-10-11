@@ -458,6 +458,7 @@ def test_defaults_name_the_instance_and_seed_new_accounts(client, admin):
         {
             "instance_name": "Jobs at Home",
             "tagline": "Where the search lives.",
+            "motto": "Our footer line.",
             "default_language": "pt-PT",
             "default_time_zone": "Europe/Lisbon",
         },

@@ -74,7 +74,7 @@ def manifest(request: HttpRequest) -> JsonResponse:
         {
             "name": name,
             "short_name": name,
-            "description": str(site.tagline() or _("Your job search, on your server.")),
+            "description": str(site.tagline() or _("Your job search, your data.")),
             "start_url": reverse("core:home"),
             "display": "standalone",
             "background_color": "#f8fafc",
