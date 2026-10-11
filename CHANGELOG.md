@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The section menu of Your details and Your career has the look of vertical tabs, still anchors to sections of one page (#870)
 - The calendar's view switch sits beside the period, aligned to the end, and the heading's row keeps Import, Export and the new-entry buttons (#861)
 - The calendar's week view is one card of seven days divided by borders, with no gaps between them (#860)
 - The calendar's Earlier, Today and Later are a button group of Previous, This month/week/day and Next, and the period opens a date picker (#858)

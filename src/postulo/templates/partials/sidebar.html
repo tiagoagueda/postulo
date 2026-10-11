@@ -7,7 +7,11 @@
   the screen, which app.js sets for anchors since only the browser knows. A horizontal
   strip that scrolls on a narrow screen, a column from `lg` up.
 {% endcomment %}
-<nav aria-label="{{ label }}">
+{% comment %} The sections of one page (an entry with an `anchor`) are drawn with the look of
+  vertical tabs (#870): a muted track, the section on the screen raised. They stay anchors, with
+  every section on the page and one form, so they are links and not an ARIA tablist; the look
+  is `nav[data-vertical-tabs]` in the stylesheet. The pages of an area keep the plain list. {% endcomment %}
+<nav aria-label="{{ label }}"{% if entries.0.anchor %} data-vertical-tabs{% endif %}>
   <ul class="flex gap-1 scroll-x lg:flex-col">
     {% for entry in entries %}
       <li class="shrink-0">

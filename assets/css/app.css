@@ -1642,6 +1642,23 @@
     }
   }
 
+  /* The section menu of a long page as vertical tabs (#870): the same muted track and raised
+     tab as `.tab-nav`, standing up from `lg` and lying down on a phone. Anchors, not an ARIA
+     tablist. */
+  nav[data-vertical-tabs] > ul {
+    @apply rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
+  }
+
+  nav[data-vertical-tabs] a {
+    @apply rounded-md border border-transparent px-3 py-1.5 text-sm font-medium text-ink-600
+      no-underline hover:text-ink-900 dark:text-ink-300 dark:hover:text-ink-100;
+  }
+
+  nav[data-vertical-tabs] a.nav-link-active {
+    @apply border-ink-200 bg-white text-ink-900 no-underline shadow-sm dark:border-ink-700
+      dark:bg-ink-950 dark:text-ink-50;
+  }
+
   .tab-nav {
     @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
   }
