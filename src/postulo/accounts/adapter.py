@@ -171,6 +171,24 @@ class AccountAdapter(DefaultAccountAdapter):
             for stage in stages
         ]
 
+    def is_safe_url(self, url: str) -> bool:
+        """allauth's rule, and https where the instance is: one rule for every ``next`` (#746).
+
+        allauth accepts an absolute address on any host the instance answers to with either
+        scheme, so a sign-in, a sign-out or a sign-up could be sent on to the http address of
+        an instance that is served over https -- which is the downgrade `core.redirects.safe_next`
+        refuses everywhere else. A relative address has no scheme and is untouched.
+        """
+        from urllib.parse import urlsplit
+
+        from allauth.core import context
+
+        if not super().is_safe_url(url):
+            return False
+        request = getattr(context, "request", None)
+        scheme = urlsplit(url).scheme
+        return not (request is not None and request.is_secure() and scheme == "http")
+
     def is_open_for_signup(self, request: HttpRequest) -> bool:
         if site.signup_open_now():
             return True

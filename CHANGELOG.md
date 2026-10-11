@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A next address on an https instance must be https, whichever page takes it: sign-in, sign-out, sign-up and single sign-on follow the same rule as the rest of the interface (#746)
 - An account can try only so many usernames in an hour (POSTULO_USERNAME_RATE, 10/h), since naming a taken one says it is taken (#745)
 - A sign-in lock no longer shows which names belong to one account: the account's count refuses in the ordinary words, and only the typed name's own count says too many attempts (#744)
 - Authenticator secrets and recovery-code seeds are encrypted in the database under the instance's field key, and the ones already stored are encrypted by a migration (#743)
