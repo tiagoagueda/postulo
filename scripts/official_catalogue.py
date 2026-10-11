@@ -20,10 +20,12 @@ from __future__ import annotations
 
 import argparse
 import base64
+import datetime as dt
 import hashlib
 import json
 import os
 import sys
+import time
 import tomllib
 from pathlib import Path
 
@@ -53,7 +55,7 @@ def render(document: dict) -> bytes:
     return (json.dumps(document, indent=2, sort_keys=True, ensure_ascii=False) + "\n").encode()
 
 
-def build(wheels: Path) -> dict:
+def build(wheels: Path, expires_days: int = 0) -> dict:
     source = tomllib.loads(SOURCE.read_text(encoding="utf-8"))
     plugins = []
     for entry in source.get("plugin", []):
@@ -77,7 +79,15 @@ def build(wheels: Path) -> dict:
                 "releases": releases,
             }
         )
-    return {"plugins": plugins}
+    # A counter that only goes up, signed with the rest (#783): an instance remembers the highest
+    # it has seen, and refuses an older index served again by whoever hosts it. Seconds since the
+    # epoch are monotonic without anybody keeping a number. `--expires-days` also signs an expiry.
+    document = {"plugins": plugins, "serial": int(time.time())}
+    if expires_days:
+        document["expires"] = (dt.datetime.now(dt.UTC) + dt.timedelta(days=expires_days)).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+    return document
 
 
 def private_key(key_file: str | None):
@@ -130,6 +140,12 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="command", required=True)
     built = sub.add_parser("build", help="write index.json from plugins.toml and the wheels")
     built.add_argument("--wheels", type=Path, required=True)
+    built.add_argument(
+        "--expires-days",
+        type=int,
+        default=0,
+        help="also sign an expiry this many days ahead (an instance refuses an index past it)",
+    )
     signed = sub.add_parser("sign", help="write index.json.sig")
     signed.add_argument("--key-file")
     verified = sub.add_parser("verify", help="check the pair as an instance would")
@@ -137,7 +153,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.command == "build":
-        INDEX.write_bytes(render(build(args.wheels)))
+        INDEX.write_bytes(render(build(args.wheels, args.expires_days)))
         SIGNATURE.unlink(missing_ok=True)
         print(f"Wrote {INDEX.relative_to(ROOT)}; it is unsigned until `sign` runs.")
         return 0

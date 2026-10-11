@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+import datetime as dt
 import json
 import logging
 import tempfile
@@ -35,6 +36,7 @@ from pathlib import Path
 
 import httpx
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext as _
 
 from . import http
@@ -84,6 +86,9 @@ class Catalogue:
     url: str
     public_key: str
     listings: list[Listing] = field(default_factory=list)
+    #: The index's counter, when it signs one: it only goes up, and an index with a lower number
+    #: than one already seen is a rollback (#783).
+    serial: int | None = None
 
 
 def from_environment() -> dict[str, dict[str, str]]:
@@ -220,6 +225,55 @@ def parse(payload: bytes, *, catalogue: str = "") -> list[Listing]:
     return listings
 
 
+def freshness(payload: bytes) -> tuple[int | None, dt.datetime | None]:
+    """The signed ``serial`` and ``expires`` of an index, ``None`` for each it lacks (#783).
+
+    Both are optional so that an index signed before they existed still works; the check that
+    uses them is applied to whatever is there. ``expires`` is an ISO 8601 moment, and one with
+    no zone is read as UTC. A value that is not a counter or a moment is a refusal: it is signed,
+    so it is the publisher's mistake and not noise.
+    """
+    try:
+        document = json.loads(payload.decode("utf-8"))
+    except (UnicodeDecodeError, ValueError):
+        return None, None
+    serial, expires = document.get("serial"), document.get("expires")
+    if serial is not None and (
+        not isinstance(serial, int) or isinstance(serial, bool) or serial < 0
+    ):
+        raise CatalogueError(str(_("The catalogue's serial number is not a counter.")))
+    if expires is not None:
+        try:
+            moment = dt.datetime.fromisoformat(str(expires).replace("Z", "+00:00"))
+        except ValueError as error:
+            raise CatalogueError(str(_("The catalogue's expiry is not a date."))) from error
+        expires = moment if moment.tzinfo else moment.replace(tzinfo=dt.UTC)
+    return serial, expires
+
+
+def refuse_stale(name: str, key: str, serial: int | None, expires: dt.datetime | None) -> None:
+    """Refuse an index that has run out, or that is older than one already seen (#783).
+
+    The signature says the publisher signed these bytes, not when, so a signed index that
+    listed a release since withdrawn can be served again by whoever controls the hosting. Two
+    things the publisher can sign make that visible: an expiry, and a counter that only goes up,
+    remembered per repository and key (a new key is a repository not yet seen).
+    """
+    if expires is not None and expires < timezone.now():
+        raise CatalogueError(
+            str(_("The catalogue expired on %(date)s; an old copy may have been served."))
+            % {"date": expires.date().isoformat()}
+        )
+    if serial is None:
+        return
+    seen = kept_digests().get(name, {})
+    if seen.get("key") == key and isinstance(seen.get("serial"), int) and serial < seen["serial"]:
+        raise CatalogueError(
+            str(_("The catalogue is older than one already seen (%(old)d, after %(new)d)."))
+            % {"old": serial, "new": seen["serial"]}
+        )
+
+
 def fetch(name: str) -> Catalogue:
     """Fetch one catalogue's index and its signature, and check the one against the other."""
     known = configured()
@@ -232,8 +286,14 @@ def fetch(name: str) -> Catalogue:
         payload = _get(client, url, MAX_INDEX_BYTES)
         signature = _get(client, url + ".sig", 4096).decode("ascii", "replace").strip()
     verify(payload, signature, known[name]["key"])
+    serial, expires = freshness(payload)
+    refuse_stale(name, known[name]["key"], serial, expires)
     fetched = Catalogue(
-        name=name, url=url, public_key=known[name]["key"], listings=parse(payload, catalogue=name)
+        name=name,
+        url=url,
+        public_key=known[name]["key"],
+        listings=parse(payload, catalogue=name),
+        serial=serial,
     )
     # What the plugins pages label an upload by. Kept now, while somebody asked for this
     # fetch, so that no page has to make one (#602).
@@ -266,7 +326,21 @@ def remember(one: Catalogue) -> None:
     )
     try:
         held = cache.get(DIGESTS_CACHE_KEY) or {}
-        held[one.name] = {"key": one.public_key, "digests": digests}
+        before = held.get(one.name, {})
+        # The highest counter seen for this key, which only goes up (#783).
+        counters = [
+            number
+            for number in (
+                one.serial,
+                before.get("serial") if before.get("key") == one.public_key else None,
+            )
+            if isinstance(number, int)
+        ]
+        held[one.name] = {
+            "key": one.public_key,
+            "digests": digests,
+            **({"serial": max(counters)} if counters else {}),
+        }
         cache.set(DIGESTS_CACHE_KEY, held, None)
     except Exception:  # pragma: no cover - a cache that is down costs a label, not a page
         logger.warning("Could not keep the checksums of repository %r", one.name, exc_info=True)

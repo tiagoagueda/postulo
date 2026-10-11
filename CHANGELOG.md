@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A signed catalogue index may carry a rising serial and an expiry, and an index past its expiry or older than one already seen is refused, so an old signed index cannot be replayed (#783)
 - The GeoNames download and the update check are read through a bounded GET: at most 64 MiB, a table of at most 512 MiB unpacked, and a deadline (#782)
 - A webhook, a push service, a link check and a name lookup are held to a total time, never read an answer they do not use and never inflate one, so a hostile receiver cannot stall a worker or the scheduler (#781)
 - What Postulo fetches from strangers (a posting, a link check, a logo) dials the web's ports only, 80, 443, 8080 and 8443 by default (#780)
