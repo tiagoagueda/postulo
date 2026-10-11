@@ -866,6 +866,11 @@ def urls():
     for pattern in patterns:
         if getattr(pattern, "name", None) in OUTSIDE_A_TRANSACTION:
             transaction.non_atomic_requests(pattern.callback)
+        if getattr(pattern, "name", None) == "api-root":
+            # ninja's own home for the API answers a bare 404 page; it goes where every other
+            # address nothing owns goes (#760).
+            pattern.callback = _no_such_address
+            continue
         _answer_a_wrong_method_as_a_problem(pattern)
     # Last, so that it only sees what no address above took: a mistyped path, or an id the
     # `{int:pk}` converter turned away (#430).
@@ -892,6 +897,10 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
     def answering(request, *args, **kwargs):
         response = view(request, *args, **kwargs)
         if response.status_code == 405 and response.get("Content-Type") != problems.CONTENT_TYPE:
+            if not _has_a_live_token(request):
+                # No token, no route table (#760): the methods an address allows are part of
+                # what it would tell a stranger, and are said only to someone who may ask.
+                return problems.refuse(request, api, 401, problems.no_token())
             refusal = problems.refuse(request, api, 405)
             if "Allow" in response:
                 refusal["Allow"] = response["Allow"]
@@ -901,15 +910,20 @@ def _answer_a_wrong_method_as_a_problem(pattern) -> None:
     pattern.callback = answering
 
 
+def _has_a_live_token(request) -> bool:
+    """Whether the request carries a bearer token that is live, whatever it is for."""
+    from .auth import lookup
+
+    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
+    return scheme.lower() == "bearer" and lookup(raw.strip()) is not None
+
+
 def _no_such_address(request, *args, **kwargs):
     """What an address under `api/v1/` that nothing owns is answered with (#430).
 
     A 401 for a request with no live token, as for every other call, so the route table is
     not probed without one; a 404 for one that has.
     """
-    from .auth import lookup
-
-    scheme, _space, raw = request.META.get("HTTP_AUTHORIZATION", "").partition(" ")
-    if scheme.lower() == "bearer" and lookup(raw.strip()) is not None:
+    if _has_a_live_token(request):
         return problems.refuse(request, api, 404, str(_("Nothing of yours is at this address.")))
     return problems.refuse(request, api, 401, problems.no_token())
