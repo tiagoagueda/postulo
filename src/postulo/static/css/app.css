@@ -2928,6 +2928,72 @@
       align-items: center;
     }
   }
+  .button-group {
+    isolation: isolate;
+    display: inline-flex;
+    width: fit-content;
+    align-items: stretch;
+    &:has(> :is(.dropdown-menu, .popover, .select) > [data-popover][aria-hidden='false']) {
+      position: relative;
+      z-index: 50;
+    }
+    > .input {
+      flex: 1;
+    }
+    > *:focus-visible, > :is(.dropdown-menu, .popover, .select) > button:focus-visible {
+      position: relative;
+      z-index: 10;
+    }
+    > hr[role='separator'] {
+      position: relative;
+      margin-inline: 0px;
+      margin-block: 1px;
+      height: auto;
+      width: 1px;
+      flex-shrink: 0;
+      align-self: stretch;
+      border-style: var(--tw-border-style);
+      border-width: 0px;
+    }
+    &:not([data-orientation='vertical']) {
+      > *:not(:first-child), > :is(.dropdown-menu, .popover, .select):not(:first-child) > button {
+        border-start-start-radius: 0;
+        border-end-start-radius: 0;
+        border-inline-start-style: var(--tw-border-style);
+        border-inline-start-width: 0px;
+      }
+      > *:not(:last-child), > :is(.dropdown-menu, .popover, .select):not(:last-child) > button {
+        border-start-end-radius: 0;
+        border-end-end-radius: 0;
+      }
+    }
+    &[data-orientation='vertical'] {
+      flex-direction: column;
+      > hr[role='separator'] {
+        margin-inline: 1px;
+        margin-block: 0px;
+        height: 1px;
+        width: auto;
+      }
+      > *:not(:first-child), > :is(.dropdown-menu, .popover, .select):not(:first-child) > button {
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+        border-top-style: var(--tw-border-style);
+        border-top-width: 0px;
+      }
+      > *:not(:last-child), > :is(.dropdown-menu, .popover, .select):not(:last-child) > button {
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    }
+  }
+  .button-group > :is(span, label, output) {
+    display: flex;
+    align-items: center;
+    & svg {
+      pointer-events: none;
+    }
+  }
   .fieldset {
     display: flex;
     flex-direction: column;

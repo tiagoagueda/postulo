@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {# A grid: this page empties `main_width` and takes the whole screen (#188). #}
 {% block main_width %}{% endblock %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Captures" %}{% endblock %}
 
@@ -23,7 +23,7 @@
       {% if showing != "all" %}
         <a href="?show=all" class="btn" data-variant="outline">{% translate "Show all" %}</a>
       {% endif %}
-      <a href="{% url 'jobs:capture_create' %}" class="btn">{% translate "Capture a posting" %}</a>
+      <a href="{% url 'jobs:capture_create' %}" class="btn">{% icon "clipboard-paste" %}{% translate "Capture a posting" %}</a>
     </div>
   </div>
 

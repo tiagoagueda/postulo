@@ -92,8 +92,12 @@
          Columns menu and a filter row over nothing at all is worse than the sentence that
          used to be the whole of this page at zero listings (#160). {% endcomment %}
       {% if has_listings %}{% include "partials/table/columns.html" %}{% include "partials/table/views.html" %}{% endif %}
-      <a href="{% url 'jobs:capture_create' %}" class="btn" data-variant="outline">{% translate "Capture a posting" %}</a>
-      <a href="{% url 'listings:create' %}" class="btn">{% translate "Add a listing" %}</a>
+      {% comment %} The two ways to start a listing as one group (#841), both the page's main
+         action: pasting a posting's address, and typing one in. {% endcomment %}
+      <div class="button-group" role="group" aria-label="{% translate 'New listing' %}" data-new-listing>
+        <a href="{% url 'jobs:capture_create' %}" class="btn">{% icon "clipboard-paste" %}{% translate "Capture a posting" %}</a>
+        <a href="{% url 'listings:create' %}" class="btn">{% icon "plus" %}{% translate "Add a listing" %}</a>
+      </div>
     </div>
   </div>
 
