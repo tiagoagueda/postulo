@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- An account that signs in only through the identity provider must have done so within the last few minutes before deleting an account, taking a backup or making a recovery link, since allauth lets it through unasked (#741)
 - Making a recovery link, appointing or demoting an administrator and deleting an account from Server settings ask for a recent sign-in, as the backups do (#740)
 - A recovery link is revoked when the person it was made for signs in or changes their password themselves, instead of staying usable for its whole hour (#739)
 - Two sign-ups that overlap on PostgreSQL can no longer both become administrator: the check is taken under a lock on the settings row, and the event is logged (#738)

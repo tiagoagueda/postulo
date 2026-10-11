@@ -17,7 +17,6 @@ from pathlib import Path
 from typing import ClassVar
 
 import django
-from allauth.account.decorators import reauthentication_required
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -35,6 +34,7 @@ from django.views.generic import RedirectView, TemplateView, UpdateView
 
 from postulo import __version__
 from postulo.accounts import deletion
+from postulo.accounts.reauth import reauthentication_required
 from postulo.plugins.forms import PluginRepositoryForm
 
 from . import backups, errands, languages, proxy, scheduler, site, updates

@@ -28,7 +28,6 @@ import tarfile
 import tempfile
 from pathlib import Path
 
-from allauth.account.decorators import reauthentication_required
 from django.conf import settings
 from django.contrib import messages
 from django.db import transaction
@@ -41,6 +40,8 @@ from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy
 from django.views import View
 from django.views.generic import UpdateView
+
+from postulo.accounts.reauth import reauthentication_required
 
 from . import backups, errands, site
 from .backup import (

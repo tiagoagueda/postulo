@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from allauth.account.decorators import reauthentication_required
 from allauth.account.views import LoginView as AllauthLoginView
 from django.contrib import messages
 from django.contrib.auth import logout
@@ -32,6 +31,7 @@ from . import avatars, deletion, removals
 from .adapter import INVITE_SESSION_KEY
 from .forms import InviteForm, PersonIdentifierFormSet, ProfileForm
 from .models import Invite, Profile, ProfilePicture, Theme
+from .reauth import reauthentication_required
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
