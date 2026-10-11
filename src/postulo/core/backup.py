@@ -29,6 +29,7 @@ written: the manifest is read back and the database's checksum compared.
 from __future__ import annotations
 
 import hashlib
+import hmac
 import io
 import json
 import os
@@ -58,6 +59,8 @@ from postulo.documents import filestore
 #: fingerprint existed still restores, without them.
 BACKUP_FORMAT = 2
 MANIFEST = "manifest.json"
+#: The last member: a digest of every file under media/ and plugins/, and a MAC over them (#772).
+INTEGRITY = "integrity.json"
 MEDIA_PREFIX = "media"
 PLUGINS_PREFIX = "plugins"
 
@@ -78,6 +81,12 @@ class BackupReport:
     plugins: list[str] = field(default_factory=list)
 
 
+#: What `authenticity` can say of an archive (#772).
+AUTHENTIC = "authentic"  # signed under this instance's key, and every member is what was signed
+UNSIGNED = "unsigned"  # written before archives were signed: nobody can say who wrote it
+UNVERIFIED = "unverified"  # signed, but not under this key, or not what was signed
+
+
 @dataclass
 class RestoreReport:
     counts: dict[str, int] = field(default_factory=dict)
@@ -96,6 +105,12 @@ class RestoreReport:
     #: mail consent, and the mail and text transports' secrets (#481). Counted beside the
     #: connections because they are under the same key and are read for every message.
     site_secrets: int = 0
+    #: Whether the archive was signed by this instance's key, and so what it holds is what an
+    #: instance with this key wrote (#772). Anything else is restored only when asked for.
+    authenticity: str = UNSIGNED
+    #: Files under plugins/ left unwritten because the archive was not authentic: a plugins
+    #: directory is code that runs at every start.
+    plugins_withheld: int = 0
 
 
 def database_vendor() -> str:
@@ -111,6 +126,58 @@ def _not_in_a_transaction() -> None:
     """
     if connection.in_atomic_block:
         raise BackupError("A backup cannot be taken or restored from inside a transaction.")
+
+
+def _canonical(document: dict) -> bytes:
+    """A document's bytes in one order and spelling, so the same content is the same bytes."""
+    return json.dumps(document, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode(
+        "utf-8"
+    )
+
+
+def _signed_manifest(manifest: dict) -> str:
+    """The MAC of a manifest without its own signature (#772)."""
+    from postulo.plugins import secrets
+
+    unsigned = {key: value for key, value in manifest.items() if key != "authentication"}
+    return secrets.backup_mac(_canonical(unsigned))
+
+
+def _add_tree(archive: tarfile.TarFile, root: Path, prefix: str, digests: dict[str, str]) -> None:
+    """Add a directory under ``prefix``, plain files and directories only, noting each file's
+    SHA-256 as it goes in so that the integrity record needs no second read (#772)."""
+    archive.add(root, arcname=prefix, recursive=False, filter=_plain_files_only)
+    for current, directories, names in os.walk(root):
+        directories.sort()
+        for name in sorted(names + directories):
+            path = Path(current) / name
+            arcname = f"{prefix}/{path.relative_to(root).as_posix()}"
+            if path.is_symlink() or not (path.is_file() or path.is_dir()):
+                continue
+            if path.is_dir():
+                archive.add(path, arcname=arcname, recursive=False, filter=_plain_files_only)
+                continue
+            info = _plain_files_only(archive.gettarinfo(str(path), arcname=arcname))
+            if info is None:
+                continue
+            digest = hashlib.sha256()
+            with path.open("rb") as handle:
+                archive.addfile(info, _Hashing(handle, digest, info.size))
+            digests[arcname] = digest.hexdigest()
+
+
+class _Hashing:
+    """A file object that hashes what is read from it, and no more than the size it was told."""
+
+    def __init__(self, handle, digest, size: int) -> None:
+        self.handle, self.digest, self.left = handle, digest, size
+
+    def read(self, size: int = -1) -> bytes:
+        size = self.left if size is None or size < 0 else min(size, self.left)
+        chunk = self.handle.read(size)
+        self.left -= len(chunk)
+        self.digest.update(chunk)
+        return chunk
 
 
 def _sha256(path: Path) -> str:
@@ -465,7 +532,11 @@ def write_backup(
             },
             "counts": _counts(),
         }
+        # Signed under the instance's key (#772): nothing else in an archive says who wrote it,
+        # and a restore writes a database, files, and a directory that runs at every start.
+        manifest["authentication"] = {"algorithm": "hmac-sha256", "mac": _signed_manifest(manifest)}
         manifest_bytes = json.dumps(manifest, indent=2).encode("utf-8")
+        digests: dict[str, str] = {}
 
         with tarfile.open(path, "w:gz") as archive:
             info = tarfile.TarInfo(MANIFEST)
@@ -474,13 +545,21 @@ def write_backup(
             archive.addfile(info, io.BytesIO(manifest_bytes))
             archive.add(dump, arcname=member)
             if with_media:
-                archive.add(
-                    media_root, arcname=MEDIA_PREFIX, recursive=True, filter=_plain_files_only
-                )
+                _add_tree(archive, media_root, MEDIA_PREFIX, digests)
             if with_plugins:
-                archive.add(
-                    plugins_root, arcname=PLUGINS_PREFIX, recursive=True, filter=_plain_files_only
-                )
+                _add_tree(archive, plugins_root, PLUGINS_PREFIX, digests)
+            # Last, because the digests are known only once the files are in. The manifest is
+            # first so the Backups page can read it without decompressing the rest.
+            from postulo.plugins import secrets as _secrets
+
+            record = {"members": digests, "database": manifest["database"]["sha256"]}
+            trailer = json.dumps({**record, "mac": _secrets.backup_mac(_canonical(record))}).encode(
+                "utf-8"
+            )
+            tail = tarfile.TarInfo(INTEGRITY)
+            tail.size = len(trailer)
+            tail.mtime = int(timezone.now().timestamp())
+            archive.addfile(tail, io.BytesIO(trailer))
 
     verify_backup(path)
     return BackupReport(
@@ -617,13 +696,56 @@ def _unknown_migrations() -> list[str]:
     )
 
 
+def authenticity(archive: tarfile.TarFile, manifest: dict) -> tuple[str, dict[str, str]]:
+    """Whether this instance's key signed the archive, and the digest each file should have.
+
+    ``unsigned`` for an archive written before they were signed. ``unverified`` when the
+    signature does not check out under this key -- an archive altered after it was written, one
+    written under another key, or one whose files are not the ones signed -- which this cannot
+    tell apart, and does not need to: neither is something to restore code from on trust (#772).
+    """
+    from postulo.plugins import secrets
+
+    claimed = (manifest.get("authentication") or {}).get("mac")
+    if not claimed:
+        return UNSIGNED, {}
+    if not hmac.compare_digest(str(claimed), _signed_manifest(manifest)):
+        return UNVERIFIED, {}
+    try:
+        handle = archive.extractfile(INTEGRITY)
+        trailer = json.loads(handle.read().decode("utf-8")) if handle else None
+    except (KeyError, ValueError):
+        return UNVERIFIED, {}
+    if not isinstance(trailer, dict) or not isinstance(trailer.get("members"), dict):
+        return UNVERIFIED, {}
+    record = {"members": trailer["members"], "database": trailer.get("database")}
+    mac = secrets.backup_mac(_canonical(record))
+    if not hmac.compare_digest(str(trailer.get("mac", "")), mac):
+        return UNVERIFIED, {}
+    if trailer.get("database") != manifest["database"]["sha256"]:
+        return UNVERIFIED, {}
+    return AUTHENTIC, {str(k): str(v) for k, v in trailer["members"].items()}
+
+
 def restore_backup(
-    path: Path | str, *, force: bool = False, allow_newer: bool = False
+    path: Path | str,
+    *,
+    force: bool = False,
+    allow_newer: bool = False,
+    unverified: bool = False,
 ) -> RestoreReport:
     """Put an archive back: database, then media and plugins, then migrations.
 
     An archive written by a newer Postulo is refused unless ``allow_newer``: ``migrate``
     cannot go backwards, so the database would carry a schema this code does not know.
+
+    **An archive that this instance's key did not sign is not restored on trust** (#772). The
+    manifest and a digest of every file are signed with a MAC under a key derived from the
+    instance's own, so an archive altered after it was written -- a copy in a place others can
+    write to -- does not check out; neither does one written under another key. That is refused
+    unless ``unverified`` says the operator knows where it came from. An archive written before
+    signing is restored without its ``plugins/`` directory, which is code that runs at every
+    start, unless ``unverified`` says the same.
     """
     from postulo.plugins import secrets
 
@@ -667,6 +789,16 @@ def restore_backup(
         tarfile.open(path, "r:gz") as archive,
         tempfile.TemporaryDirectory(prefix="postulo-restore-") as scratch,
     ):
+        report.authenticity, signed = authenticity(archive, manifest)
+        if report.authenticity == UNVERIFIED and not unverified:
+            raise BackupError(
+                "This archive was not signed by this instance's key: it was altered after it was "
+                "written, or it was written under another key (POSTULO_FIELD_KEY, or SECRET_KEY "
+                "where there is none). Restoring it would put back a database, files and a "
+                "plugins directory nobody can vouch for, and the plugins run at every start. "
+                "Nothing was changed. Restore it where the key is the same, or pass --unverified "
+                "if you know where the archive has been."
+            )
         member = manifest["database"]["member"]
         dump = Path(scratch) / "database"
         handle = archive.extractfile(member)
@@ -679,7 +811,7 @@ def restore_backup(
         # nothing at all rather than half of something.
         files = []
         for entry in archive.getmembers():
-            if entry.name == MANIFEST or entry.name == member:
+            if entry.name in (MANIFEST, INTEGRITY) or entry.name == member:
                 continue
             prefix = _prefix_of(entry.name)
             if prefix is None:
@@ -697,6 +829,23 @@ def restore_backup(
             if not destination.resolve().is_relative_to(roots[prefix].resolve()):
                 raise BackupError(f"Refusing a member that escapes the {prefix} directory")
             files.append((entry, prefix, relative))
+            if signed:
+                # Every file is read and compared with what was signed before anything is
+                # written: a file that is not the one signed means the archive is not either.
+                source = archive.extractfile(entry)
+                digest = hashlib.sha256()
+                for chunk in iter(lambda source=source: source.read(1 << 20), b""):
+                    digest.update(chunk)
+                if signed.get(entry.name) != digest.hexdigest():
+                    raise BackupError(
+                        f"{entry.name!r} is not the file this archive was signed with. "
+                        "Nothing was changed."
+                    )
+        if report.authenticity != AUTHENTIC and not unverified:
+            # Code that runs at every start is not put back on trust (#772).
+            kept = [item for item in files if item[1] != PLUGINS_PREFIX]
+            report.plugins_withheld = len(files) - len(kept)
+            files = kept
 
         load_database(dump, member)
         if not allow_newer and (unknown := _unknown_migrations()):

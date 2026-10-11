@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Backup archives are signed with a MAC under the instance's key, with a digest of every media and plugin file, and a restore refuses one that does not check out, or restores it without its plugins directory, unless told otherwise (#772)
 - Sync now is limited per account (POSTULO_CONNECTION_SYNC_RATE, 20 an hour), as Test is (#786)
 - The built-in local store can no longer be connected by hand through its create address, and a connection to it never gets copies (#785)
 - A plugin's .pth files are never run at start-up and a wheel that ships one is refused, so switching a plugin off stops its code (#784)

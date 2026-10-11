@@ -38,10 +38,22 @@ class Command(BaseCommand):
             ),
         )
 
+        parser.add_argument(
+            "--unverified",
+            action="store_true",
+            help=(
+                "Restore an archive this instance's key did not sign, plugins directory "
+                "included, which runs at every start. Only for one whose whole history you know."
+            ),
+        )
+
     def handle(self, *args, **options) -> None:
         try:
             report = restore_backup(
-                options["archive"], force=options["force"], allow_newer=options["allow_newer"]
+                options["archive"],
+                force=options["force"],
+                allow_newer=options["allow_newer"],
+                unverified=options["unverified"],
             )
         except BackupError as error:
             raise CommandError(str(error)) from error
@@ -50,6 +62,22 @@ class Command(BaseCommand):
         for name, value in report.counts.items():
             self.stdout.write(f"  {value} {name}")
         self.stdout.write(f"  {report.media_files} media files written")
+        if report.authenticity == "authentic":
+            self.stdout.write("  signed by this instance's key")
+        else:
+            what = (
+                "was written before archives were signed"
+                if report.authenticity == "unsigned"
+                else "was not signed by this instance's key"
+            )
+            self.stdout.write(self.style.WARNING(f"  the archive {what}"))
+        if report.plugins_withheld:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"  {report.plugins_withheld} files of the plugins directory were left out: "
+                    "it is code that runs at every start. Pass --unverified to restore it."
+                )
+            )
         if report.media_skipped:
             self.stdout.write(
                 self.style.WARNING(

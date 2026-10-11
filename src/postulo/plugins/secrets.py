@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import base64
 import hashlib
+import hmac
 import json
 
 from cryptography.fernet import Fernet, InvalidToken
@@ -51,6 +52,18 @@ def fingerprint() -> str:
     """
     marked = b"postulo-field-key-fingerprint:" + _material().encode("utf-8")
     return hashlib.sha256(marked).hexdigest()
+
+
+def backup_mac(payload: bytes) -> str:
+    """A MAC of ``payload`` under a key derived from the instance's key, for a backup (#772).
+
+    Under its own domain prefix, like `fingerprint`, so what an archive carries is neither the
+    encryption key nor a way to the connection secrets. It says one thing: whoever wrote the
+    manifest and the member digests held this instance's key, which an attacker who can only
+    alter a copy of the archive does not.
+    """
+    key = hashlib.sha256(b"postulo-backup-mac:" + _material().encode("utf-8")).digest()
+    return hmac.new(key, payload, hashlib.sha256).hexdigest()
 
 
 def encrypt(data: dict) -> str:

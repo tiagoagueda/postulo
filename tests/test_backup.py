@@ -409,7 +409,8 @@ def test_a_newer_archive_restores_when_asked_to(tmp_path):
         return manifest
 
     archive = rewritten_manifest(source, tmp_path / "newer.tar.gz", newer)
-    assert restore_backup(archive, force=True, allow_newer=True).counts
+    # Its manifest was rewritten, which is exactly what a signature exists to notice (#772).
+    assert restore_backup(archive, force=True, allow_newer=True, unverified=True).counts
 
 
 def test_a_database_with_migrations_this_code_lacks_is_refused(tmp_path, monkeypatch):
@@ -508,11 +509,12 @@ def test_a_restore_under_another_key_says_so_loudly(tmp_path, settings, capsys):
     # failure: the rows come back, the passwords in them are ciphertext nobody can open.
     settings.POSTULO_FIELD_KEY = "an-entirely-different-key-42"
 
-    report = restore_backup(archive)
+    # Another key did not sign this archive, so it is restored only when told to (#772).
+    report = restore_backup(archive, unverified=True)
     assert report.key_matches is False
     assert report.connections_with_secrets == 1
 
-    call_command("restore", str(archive), "--force")
+    call_command("restore", str(archive), "--force", "--unverified")
     out = capsys.readouterr().out
     assert "CANNOT be read here" in out and "POSTULO_FIELD_KEY" in out
 
@@ -530,12 +532,12 @@ def test_a_restore_under_another_key_counts_the_mail_secrets_too(tmp_path, setti
     User.objects.all().delete()
     settings.POSTULO_FIELD_KEY = "an-entirely-different-key-42"
 
-    report = restore_backup(archive)
+    report = restore_backup(archive, unverified=True)
     assert report.key_matches is False
     assert report.connections_with_secrets == 0
     assert report.site_secrets == 1
 
-    call_command("restore", str(archive), "--force")
+    call_command("restore", str(archive), "--force", "--unverified")
     out = capsys.readouterr().out
     assert "nothing is lost" not in out
     assert "CANNOT be read here" in out and "Server settings" in out
@@ -550,6 +552,7 @@ def test_an_archive_from_before_the_plugins_went_in_still_restores(tmp_path, set
         manifest["postulo"]["backup_format"] = 1
         del manifest["plugins"]
         del manifest["secrets"]
+        del manifest["authentication"]  # nor were archives signed then (#772)
         return manifest
 
     old = rewritten_manifest(archive, tmp_path / "old.tar.gz", to_format_one)
