@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- An account can try only so many usernames in an hour (POSTULO_USERNAME_RATE, 10/h), since naming a taken one says it is taken (#745)
 - A sign-in lock no longer shows which names belong to one account: the account's count refuses in the ordinary words, and only the typed name's own count says too many attempts (#744)
 - Authenticator secrets and recovery-code seeds are encrypted in the database under the instance's field key, and the ones already stored are encrypted by a migration (#743)
 - An API token no longer survives the password it was made under: changing, resetting or recovering the password, or a single-sign-on link wiping it, ends the account's active tokens (#742)

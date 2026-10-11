@@ -1784,6 +1784,16 @@ class AccountForm(forms.ModelForm):
         username = self.cleaned_data["username"].strip().casefold()
         if username == self.instance.username:
             return username
+        # Naming a taken username answers that it is taken, which is how a name is found out;
+        # the number of names one account may try in an hour is bounded (#745).
+        from postulo.core import throttle
+
+        try:
+            throttle.consume(
+                "username-change", self.instance, throttle.rate_for("POSTULO_USERNAME_RATE")
+            )
+        except throttle.TooOften as too_often:
+            raise ValidationError(str(too_often)) from too_often
         return get_adapter().clean_username(username)
 
 
