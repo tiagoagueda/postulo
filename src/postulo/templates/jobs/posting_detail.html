@@ -50,8 +50,8 @@
         </form>
       {% endif %}
       <a href="{% url 'jobs:posting_update' posting.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
-      <a href="{% url 'jobs:posting_delete' posting.pk %}"
-         class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
+      <button type="button" class="btn" data-variant="destructive-ghost"
+              popovertarget="delete-posting">{% translate "Delete" %}</button>
     </div>
   </div>
 
@@ -190,4 +190,6 @@
       {% endif %}
     </aside>
   </div>
+  {% url 'jobs:posting_delete' posting.pk as delete_url %}
+  <c-delete-dialog id="delete-posting" :action="delete_url" :name="posting" :facts="deletion" />
 {% endblock %}

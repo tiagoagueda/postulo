@@ -23,7 +23,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import identifier_order, slugs, tables, throttle
+from postulo.core import deletions, identifier_order, slugs, tables, throttle
 from postulo.core.cells import EditableCellView
 from postulo.core.files import serve_stored_picture
 from postulo.core.mixins import (
@@ -316,6 +316,8 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
             self.object.identifiers.all(), getattr(person, "profile", None)
         )
         context["identifier_rows"] = shown
+        # What deleting it would take with it, for the dialog on this page (#854).
+        context["deletion"] = deletions.facts_for(CompanyDeleteView, self.request, self.object)
         context["identifiers_hidden"] = len(hidden)
         # Which of the company's identifiers do not fit together, worked out as the page is
         # drawn and told, never refused (#675). Hidden ones count: a warning concerns them too.
@@ -1088,6 +1090,8 @@ class PostingDetailView(OwnedObjectMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(listing_page_context(self.request, self.object))
+        # What deleting it would take with it, for the dialog on this page (#854).
+        context["deletion"] = deletions.facts_for(PostingDeleteView, self.request, self.object)
         return context
 
 

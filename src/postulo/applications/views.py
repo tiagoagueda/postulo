@@ -28,7 +28,7 @@ from django.views.generic import (
     UpdateView,
 )
 
-from postulo.core import languages, tables
+from postulo.core import deletions, languages, tables
 from postulo.core.mixins import (
     ConfirmDeleteMixin,
     OwnedObjectMixin,
@@ -528,6 +528,8 @@ class ApplicationDetailView(OwnedObjectMixin, DetailView):
         # the application was made (#270): the first part of one history, stored once.
         context["listing_events"] = history_of(self.object.posting)
         context["reminders"] = self.object.reminders.filter(done_at__isnull=True)
+        # What deleting it would take with it, for the dialog on this page (#854).
+        context["deletion"] = deletions.facts_for(ApplicationDeleteView, self.request, self.object)
         context["offers"] = list(self.object.offers.all())
         interviews = list(self.object.interviews.prefetch_related("contacts"))
         context["scheduled_interviews"] = [i for i in interviews if i.is_scheduled]

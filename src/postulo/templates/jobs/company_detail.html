@@ -63,8 +63,8 @@
          *Acme* and *Acme Ltd*, and somebody who knows that *Google* and *Alphabet* are
          the same employer to them knows something it cannot. {% endcomment %}
       <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="ghost">{% translate "Merge" %}</a>
-      <a href="{% url 'jobs:company_delete' company.pk %}"
-         class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</a>
+      <button type="button" class="btn" data-variant="destructive-ghost"
+              popovertarget="delete-company">{% translate "Delete" %}</button>
     </div>
 
     {% if company.website and not company.has_logo or company.has_logo and company.logo_source_url %}
@@ -431,4 +431,8 @@
       </div>
     </aside>
   </div>
+  {% comment %} *Delete* asks here, in a dialog, and not on a page of its own (#854); the
+     page at the same address is still what a link without the script reaches. {% endcomment %}
+  {% url 'jobs:company_delete' company.pk as delete_url %}
+  <c-delete-dialog id="delete-company" :action="delete_url" :name="company" :facts="deletion" />
 {% endblock %}

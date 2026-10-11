@@ -35,9 +35,8 @@
       <a href="{% url 'applications:update' application.pk %}" class="btn" data-variant="outline">
         {% translate "Edit" %}
       </a>
-      <a href="{% url 'applications:delete' application.pk %}" class="btn" data-variant="destructive-ghost">
-        {% translate "Delete" %}
-      </a>
+      <button type="button" class="btn" data-variant="destructive-ghost"
+              popovertarget="delete-application">{% translate "Delete" %}</button>
     </div>
   </div>
 
@@ -345,4 +344,6 @@
       </div>
     </aside>
   </div>
+  {% url 'applications:delete' application.pk as delete_url %}
+  <c-delete-dialog id="delete-application" :action="delete_url" :name="application" :facts="deletion" />
 {% endblock %}

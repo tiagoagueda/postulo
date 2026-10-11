@@ -1,0 +1,30 @@
+{% load i18n %}
+<c-vars id action name facts />
+{% comment %} The question *Are you sure?* asked over the object's own page, not on a page of its
+   own (#854): `<c-delete-dialog id="delete-company" :action="delete_url" :name="company"
+   :facts="deletion" />`, and a button anywhere on the page with `popovertarget` naming it.
+
+   It says what `partials/confirm_delete.html` says, from the same facts (the counted
+   consequences, what is kept, the optional choice), and posts to the same view, so the page is
+   still what a link without the script reaches and what the view renders on a GET. The
+   dialog is `<c-dialog>`: a popover that opens with no script and a modal where one runs.
+   Drawn outside any form, because it is one. {% endcomment %}
+<c-dialog :id="id" :action="action">
+  <c-slot name="title">{% blocktranslate trimmed with name=name %}Delete “<bdi>{{ name }}</bdi>”?{% endblocktranslate %}</c-slot>
+  <c-slot name="description">{% if facts.consequences %}{% translate "It will be deleted permanently, and this also deletes:" %}{% else %}{% translate "It will be deleted permanently, and anything belonging to it goes too." %}{% endif %}</c-slot>
+  {% if facts.consequences %}
+    <ul class="list-disc space-y-1 ps-5 text-sm text-ink-600 dark:text-ink-300" data-consequences>
+      {% for line in facts.consequences %}<li>{{ line }}</li>{% endfor %}
+    </ul>
+  {% endif %}
+  {% if facts.kept %}<p class="mt-3 text-sm text-ink-600 dark:text-ink-300" data-kept>{{ facts.kept }}</p>{% endif %}
+  {% if facts.choice %}
+    <p class="mt-3">
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="{{ facts.choice.name }}" value="1">
+        {{ facts.choice.label }}
+      </label>
+    </p>
+  {% endif %}
+  <c-slot name="footer"><button type="submit" class="btn" data-variant="destructive">{% translate "Delete" %}</button></c-slot>
+</c-dialog>

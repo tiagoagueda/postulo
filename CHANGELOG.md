@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Delete on a company, a listing or an application asks in a dialog over its own page, with the same counted consequences, instead of on a page of its own; the page still answers at its address. (#854)
 - On phones the table searches (Listings, Applications, Companies) open in the masthead row like the page search, with the + menu hidden meanwhile and 16px text; the bar under the masthead stays for tablets and without scripts. (#833)
 - The account menu is a quarter wider, and a long address is cut short with an ellipsis (whole in the page and in a tooltip) instead of wrapping. (#834)
 - The footer's line is the administrator's motto (a new field under Server settings → Defaults, starting as the tagline it showed), defaulting to “your job search, your data”, and is left out on phones so the footer starts with “Powered by Postulo”. (#835)
