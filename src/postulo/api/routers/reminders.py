@@ -5,14 +5,13 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.applications import agenda
 from postulo.applications.models import Application, Reminder
 from postulo.applications.services import postpone_reminder
 
 from ..auth import scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..problems import refuses
 from ..schemas import ReminderIn, ReminderOut, ReminderPatch, reminder_out
 from .common import owned, owned_or_404
@@ -26,8 +25,8 @@ def list_reminders(
     request,
     due: bool = Query(False, description="Only outstanding reminders whose time has come"),
     outstanding: bool = Query(False, description="Only reminders not yet done"),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     # An entry a plugin placed and has ended is kept and not listed (#887).
     reminders = owned(request, Reminder.objects).filter(retired_at__isnull=True)

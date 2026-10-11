@@ -31,7 +31,6 @@ schema is what a client consumes anyway.
 # the model for a call's query parameters in its own module, where a postponed annotation
 # naming anything but a builtin cannot be resolved.
 import datetime as dt
-from decimal import Decimal
 from typing import Annotated
 from urllib.parse import urlsplit
 
@@ -44,7 +43,7 @@ from ninja.errors import HttpError, ValidationError
 from ninja.pagination import paginate
 from ninja.renderers import JSONRenderer
 from ninja.responses import NinjaJSONEncoder
-from pydantic import AfterValidator, AwareDatetime, ConfigDict, Field
+from pydantic import AfterValidator, ConfigDict, Field
 from pydantic import ValidationError as PydanticValidationError
 
 from postulo.core import errands, site, throttle
@@ -58,7 +57,7 @@ from postulo.plugins.fetching import fetch_page
 from . import idempotency, problems
 from .auth import ScopedAuth, TokenAuth, for_readers_of_the_api, scope
 from .models import ApiToken
-from .paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from .paging import AFTER_ID, UPDATED_SINCE, Moment, Money, Page, RowId, changed_since
 from .routers import (
     applications,
     companies,
@@ -179,8 +178,8 @@ class CorrectionsIn(Schema):
     remote_type: str | None = None
     employment_type: str | None = None
     description: str | None = None
-    salary_min: Decimal | None = None
-    salary_max: Decimal | None = None
+    salary_min: Money | None = None
+    salary_max: Money | None = None
     salary_currency: str | None = None
     salary_period: str | None = None
     posted_at: dt.date | None = None
@@ -678,8 +677,8 @@ def _read(payload: PageIn, owner):
 @paginate(Page, row=_as_listed)
 def list_captures(
     request,
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     """What is still waiting to be reviewed, newest first.
 

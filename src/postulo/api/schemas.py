@@ -17,7 +17,7 @@ from typing import Annotated, Literal
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from ninja import Field, Schema
-from pydantic import AfterValidator, AwareDatetime, BeforeValidator
+from pydantic import AfterValidator, BeforeValidator
 
 from postulo.accounts.models import Profile, User
 from postulo.core import personal, phones
@@ -25,6 +25,8 @@ from postulo.core.addresses import web_address
 from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
 from postulo.jobs.models import currency_code
+
+from .paging import Moment, Money, RowId
 
 #: An address that is going to be stored and later drawn as a link. The routers set these
 #: with ``setattr`` rather than through a form, so this annotation is where the check the
@@ -456,11 +458,11 @@ class ListingEventIn(Schema):
         max_length=BODY_MAX_CHARS,
         description="The message, the email's text, or what was said. At most 40,000 characters.",
     )
-    occurred_at: AwareDatetime | None = Field(default=None, description="Now, if unset")
-    contact_id: int | None = Field(
+    occurred_at: Moment | None = Field(default=None, description="Now, if unset")
+    contact_id: RowId | None = Field(
         default=None, description="Who it came from: one of your contacts"
     )
-    document_id: int | None = Field(
+    document_id: RowId | None = Field(
         default=None,
         description="A file of yours it is about. Needed for a document entry.",
     )
@@ -490,8 +492,8 @@ class ListingIn(Schema):
     remote_type: str = Field(default="", max_length=20)
     employment_type: str = Field(default="", max_length=20)
     source: str = Field(default="", max_length=120)
-    salary_min: Decimal | None = None
-    salary_max: Decimal | None = None
+    salary_min: Money | None = None
+    salary_max: Money | None = None
     salary_currency: CurrencyCode = Field(default="EUR", max_length=3)
     salary_period: str = Field(default="year", max_length=10)
     closes_at: dt.date | None = None
@@ -532,11 +534,11 @@ class ApplicationDetailsIn(Schema):
         ),
     )
     tags: list[str] = Field(default_factory=list, description="Tag names; unknown ones are made.")
-    referred_by_id: int | None = Field(
+    referred_by_id: RowId | None = Field(
         default=None,
         description="The contact who referred you: one of your own, at any company or none.",
     )
-    through_agency_id: int | None = Field(
+    through_agency_id: RowId | None = Field(
         default=None,
         description=(
             "The recruitment agency it went through: one of your own companies. The "
@@ -613,14 +615,12 @@ class InterviewOut(Schema):
 
 
 class InterviewIn(Schema):
-    application_id: int
+    application_id: RowId
     kind: str = "video"
-    starts_at: AwareDatetime
-    ends_at: AwareDatetime | None = Field(
-        default=None, description="An hour after the start if unset"
-    )
+    starts_at: Moment
+    ends_at: Moment | None = Field(default=None, description="An hour after the start if unset")
     location: str = Field(default="", max_length=500)
-    contact_ids: list[int] = Field(default_factory=list)
+    contact_ids: list[RowId] = Field(default_factory=list)
     notes: str = ""
     remind: bool = Field(default=True, description="Make a reminder for the day before")
 
@@ -629,10 +629,10 @@ class InterviewPatch(Schema):
     """Only the fields sent change; a `null` means "leave it", as on every other patch."""
 
     kind: str | None = None
-    starts_at: AwareDatetime | None = None
-    ends_at: AwareDatetime | None = None
+    starts_at: Moment | None = None
+    ends_at: Moment | None = None
     location: str | None = Field(default=None, max_length=500)
-    contact_ids: list[int] | None = None
+    contact_ids: list[RowId] | None = None
     notes: str | None = None
 
 
@@ -728,13 +728,13 @@ class EventIn(Schema):
     kind: str = "note"
     summary: str = Field(default="", max_length=250)
     body: str = ""
-    occurred_at: AwareDatetime | None = None
+    occurred_at: Moment | None = None
 
 
 class ReminderIn(Schema):
-    application_id: int | None = None
+    application_id: RowId | None = None
     summary: _required(250)
-    due_at: AwareDatetime
+    due_at: Moment
 
 
 class ReminderPatch(Schema):
@@ -750,9 +750,9 @@ class ReminderPatch(Schema):
     in the future or in the wrong order.
     """
 
-    application_id: int | None = None
+    application_id: RowId | None = None
     summary: _required(250) | None = None
-    due_at: AwareDatetime | None = None
+    due_at: Moment | None = None
 
 
 # ------------------------------------------------------------------ documents
@@ -888,7 +888,7 @@ class CVPrintsOneIn(Schema):
 
 class CVPrintsIdentifiersIn(Schema):
     choice: str = Field(description="default, chosen or none")
-    ids: list[int] = Field(
+    ids: list[RowId] = Field(
         default_factory=list,
         max_length=200,
         description="With `chosen`: ids `offered` lists. Left out otherwise",

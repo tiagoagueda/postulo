@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.core.files import serve_private_file
 from postulo.documents import printing
@@ -19,7 +18,7 @@ from postulo.documents.models import (
 )
 
 from ..auth import scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..schemas import (
     CVDetailOut,
     CVOut,
@@ -131,8 +130,8 @@ def _letter_out(letter: CoverLetter, *, detail: bool = False) -> dict:
 @paginate(Page, row=lambda request, cv: _cv_out(cv))
 def list_cvs(
     request,
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     return changed_since(owned(request, CV.objects).order_by("name", "pk"), updated_since, after_id)
 
@@ -214,8 +213,8 @@ def patch_cv(request, pk: int, payload: CVPatch):
 @paginate(Page, row=lambda request, letter: _letter_out(letter))
 def list_letters(
     request,
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     return changed_since(
         owned(request, CoverLetter.objects).order_by("name", "pk"), updated_since, after_id
@@ -298,7 +297,7 @@ class _DocumentPages:
 def list_documents(
     request,
     source: str | None = Query(None, description="upload or rendered; both by default"),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
 ):
     """Uploads and snapshots in one list.
 

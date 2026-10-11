@@ -2,12 +2,11 @@
 
 from ninja import Query, Router
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.applications.models import Offer
 
 from ..auth import scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..schemas import OfferOut, offer_out
 from .common import owned, owned_or_404
 
@@ -24,9 +23,9 @@ def _queryset(request):
 @paginate(Page, row=offer_out)
 def list_offers(
     request,
-    application: int | None = Query(None, description="Only this application's"),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    application: RowId | None = Query(None, description="Only this application's"),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     offers = _queryset(request).order_by("-created_at", "-pk")
     if application:

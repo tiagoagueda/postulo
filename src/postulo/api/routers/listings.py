@@ -11,7 +11,6 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.applications.models import Channel
 from postulo.applications.models import Status as ApplicationStatus
@@ -28,7 +27,7 @@ from postulo.jobs.models import (
 )
 
 from ..auth import actor_of, scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..schemas import (
     ApplicationDetailOut,
     ApplicationDetailsIn,
@@ -73,9 +72,9 @@ def list_listings(
         "undecided",
         description="undecided (default), new, shortlisted, discarded, applied, closed or all",
     ),
-    company: int | None = Query(None),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    company: RowId | None = Query(None),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     listings = _queryset(request)
     if state == "undecided":
@@ -107,8 +106,8 @@ def list_listing_choices(
         "all",
         description="all (default), undecided, new, shortlisted, discarded, applied or closed",
     ),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     """The person's listings, as little of each as recognising it takes (#270).
 

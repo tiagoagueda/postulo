@@ -23,12 +23,13 @@ from __future__ import annotations
 
 import datetime as dt
 from collections.abc import Callable
-from typing import Any
+from decimal import Decimal
+from typing import Annotated, Any
 
 from django.db.models import Q
 from ninja import Schema
 from ninja.pagination import LimitOffsetPagination
-from pydantic import Field
+from pydantic import AfterValidator, AwareDatetime, Field
 
 #: What every list says about its cursor, written once so every list says the same thing.
 UPDATED_SINCE = (
@@ -49,6 +50,32 @@ AFTER_ID = (
 #: unbounded `limit` let one token make a whole account the page (#434).
 MAX_LIMIT = 200
 
+#: The largest number that is a row's id, a page's offset or a count anywhere in the API, a
+#: little under what a 32-bit column holds (#766). A number past what the database can hold
+#: reached the database layer and answered 500 (`OverflowError`, `IntegrityError`); it is a
+#: 422 now, at the edge, where the client is told which parameter.
+MAX_ID = 2**31 - 1
+MAX_OFFSET = MAX_ID
+
+#: Moments the API accepts: a window in which a calendar and a database both behave. `datetime`
+#: allows the year 1 and 9999, and a timezone shifts those out of range (#766).
+FIRST_MOMENT = dt.datetime(1970, 1, 1, tzinfo=dt.UTC)
+LAST_MOMENT = dt.datetime(2100, 1, 1, tzinfo=dt.UTC)
+
+
+def _inside_the_window(value: dt.datetime) -> dt.datetime:
+    if not FIRST_MOMENT <= value <= LAST_MOMENT:
+        raise ValueError("must be between 1970 and 2100")
+    return value
+
+
+#: A row's id, as a client names one in a body or a query.
+RowId = Annotated[int, Field(ge=1, le=MAX_ID)]
+#: A moment, as a client names one.
+Moment = Annotated[AwareDatetime, AfterValidator(_inside_the_window)]
+#: An amount of money: twelve digits, two of them after the point, never negative.
+Money = Annotated[Decimal, Field(ge=0, max_digits=12, decimal_places=2)]
+
 
 class Page(LimitOffsetPagination):
     """``limit`` and ``offset``, with the rows shaped after the page is cut, not before.
@@ -60,7 +87,7 @@ class Page(LimitOffsetPagination):
 
     class Input(Schema):
         limit: int = Field(100, ge=1, le=MAX_LIMIT)
-        offset: int = Field(0, ge=0)
+        offset: int = Field(0, ge=0, le=MAX_OFFSET)
 
     def __init__(self, *, row: Callable[[Any, Any], dict] | None = None, **kwargs: Any) -> None:
         super().__init__(**kwargs)

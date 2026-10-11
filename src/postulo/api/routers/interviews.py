@@ -5,7 +5,6 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.applications import agenda, ical
 from postulo.applications.models import (
@@ -23,7 +22,7 @@ from postulo.applications.services import (
 from postulo.jobs.models import Contact
 
 from ..auth import actor_of, scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..problems import refuses
 from ..schemas import InterviewIn, InterviewOut, InterviewOutcomeIn, InterviewPatch, interview_out
 from .common import choice_or_422, owned, owned_or_404
@@ -43,10 +42,10 @@ def list_interviews(
         "upcoming",
         description="upcoming (default: scheduled and not over), scheduled, past or all",
     ),
-    application: int | None = Query(None, description="Only this application's"),
-    since: AwareDatetime | None = Query(None, description="Starting on or after this moment"),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    application: RowId | None = Query(None, description="Only this application's"),
+    since: Moment | None = Query(None, description="Starting on or after this moment"),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     interviews = _queryset(request)
     if state == "upcoming":

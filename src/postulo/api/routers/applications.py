@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 from ninja import Query, Router, Status
 from ninja.errors import HttpError
 from ninja.pagination import paginate
-from pydantic import AwareDatetime
 
 from postulo.applications.models import (
     END_STATUSES,
@@ -26,7 +25,7 @@ from postulo.applications.services import (
 )
 
 from ..auth import actor_of, scope
-from ..paging import AFTER_ID, UPDATED_SINCE, Page, changed_since
+from ..paging import AFTER_ID, UPDATED_SINCE, Moment, Page, RowId, changed_since
 from ..schemas import (
     ApplicationDetailOut,
     ApplicationIn,
@@ -54,14 +53,14 @@ router = Router(tags=["applications"], auth=scope("read"))
 def list_applications(
     request,
     status: str | None = Query(None, description="One status, e.g. applied"),
-    company: int | None = Query(None, description="A company id"),
+    company: RowId | None = Query(None, description="A company id"),
     since: dt.date | None = Query(None, description="Applied on or after this date"),
     open_only: bool = Query(False, description="Only applications still undecided"),
     quiet: bool = Query(
         False, description="Only applications that have gone quiet by the owner's threshold"
     ),
-    updated_since: AwareDatetime | None = Query(None, description=UPDATED_SINCE),
-    after_id: int | None = Query(None, description=AFTER_ID),
+    updated_since: Moment | None = Query(None, description=UPDATED_SINCE),
+    after_id: RowId | None = Query(None, description=AFTER_ID),
 ):
     applications = (
         owned(request, Application.objects)
