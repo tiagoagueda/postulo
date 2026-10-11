@@ -1,5 +1,5 @@
 {% load i18n %}
-<c-vars id="" />
+<c-vars id="" help="" />
 {% comment %} A page's own name, and the sentence under it (#292).
 
    `<c-page-title>Accessibility</c-page-title>`
@@ -27,8 +27,20 @@
    The subtitle is a slot rather than an attribute so it can hold a `blocktranslate`, which
    an attribute cannot.
 {% endcomment %}
+{% if help %}
+  {% comment %} A question mark beside the heading (#839): `<c-page-title help="listings">`.
+     The topic's one sentence is the mark's tooltip, and with scripts off the line under the
+     heading, where the page's own helper sentence used to be; the whole of it opens in the
+     drawer, or on a page of its own where there is no script (`c-help-mark`). A page that
+     has a topic has no `subtitle` of its own. {% endcomment %}
+  <div class="page-title-help">
+    <h1 {% if id %}id="{{ id }}"{% endif %} class="text-title font-semibold tracking-tight">{{ slot }}</h1>
+    <c-help-mark :topic="help" :anchor="id" />
+  </div>
+{% else %}
 <h1 {% if id %}id="{{ id }}"{% endif %}
     class="{% if subtitle %}mb-1 {% endif %}text-title font-semibold tracking-tight">{{ slot }}</h1>
+{% endif %}
 {% if subtitle %}
   <p class="mb-6 text-sm text-ink-500 dark:text-ink-400">{{ subtitle }}</p>
 {% endif %}

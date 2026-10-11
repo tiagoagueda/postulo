@@ -890,6 +890,18 @@
     grid-column: 1;
   }
 
+  /* The same beside a page's heading (#839): the heading and the mark on one line, and the
+     sentence, which is a line under the heading until a script makes it the mark's tooltip, on
+     a line of its own below them. */
+  .page-title-help {
+    @apply flex flex-wrap items-center;
+    column-gap: calc(var(--spacing) * 1);
+  }
+
+  .page-title-help > [data-help-summary]:not([popover]) {
+    @apply order-last basis-full text-sm text-ink-500 dark:text-ink-400;
+  }
+
   fieldset:has(> [data-help-mark]) {
     position: relative;
   }

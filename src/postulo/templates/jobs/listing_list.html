@@ -81,10 +81,9 @@
 {% block content %}
   <div class="mb-6 flex flex-wrap items-start gap-4">
     <div>
-      <c-page-title>{% translate "Listings" %}</c-page-title>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Every posting you have noticed, until you decide: shortlist it, discard it, or apply." %}
-      </p>
+      {% comment %} The sentence that used to stand under the heading is the topic's summary
+         now (#839): the mark's tooltip with a script, the line under the heading without one. {% endcomment %}
+      <c-page-title help="listings">{% translate "Listings" %}</c-page-title>
       {% if has_listings %}{% partial count %}{% endif %}
     </div>
     <div class="ms-auto flex flex-wrap items-center gap-2">

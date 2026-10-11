@@ -6369,6 +6369,27 @@
   .section-title:has(> [data-help-mark]) > :is(h2, h3, p) {
     grid-column: 1;
   }
+  .page-title-help {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: calc(var(--spacing) * 1);
+  }
+  .page-title-help > [data-help-summary]:not([popover]) {
+    order: 9999;
+    flex-basis: 100%;
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    color: var(--color-ink-500);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
   fieldset:has(> [data-help-mark]) {
     position: relative;
   }

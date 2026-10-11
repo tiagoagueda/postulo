@@ -74,6 +74,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A question mark beside the Listings heading shows the page's summary on hover and opens its help in a drawer, replacing the helper paragraph; page titles can take a help topic. (#839)
 - “Capture a posting” and “Add a listing” on the Listings page are one button group with icons; the capture buttons elsewhere take the icon too. (#841)
 - The footer's “Help” link has a book icon beside it, and only the icon on phones (the word stays for screen readers and as a tooltip). (#838)
 - The footer's “Source code” link carries the Forgejo mark where the address is on a Forgejo host, and only the mark on phones (the words stay for screen readers and as a tooltip). (#837)

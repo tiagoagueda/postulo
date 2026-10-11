@@ -137,6 +137,17 @@ TOPICS: dict[str, Topic] = {
             template="help/identifiers.html",
             context=_pasted_whole,
         ),
+        Topic(
+            slug="listings",
+            title=_("Listings"),
+            summary=_(
+                "Every posting you have noticed, until you decide: shortlist it, discard it, "
+                "or apply."
+            ),
+            template="help/listings.html",
+            home="listings:list",
+            back=_("Back to Listings"),
+        ),
     )
 }
 

@@ -92,8 +92,14 @@ def paragraph(html: str, element_id: str) -> str:
 # ---------------------------------------------------------------------- the topics
 
 
-def test_a_card_has_a_topic_and_every_topic_a_card():
-    assert set(CARDS.values()) == set(help_topics.TOPICS)
+#: Topics of a page's heading rather than of a card of *Your details* (#839).
+PAGE_TOPICS = {"listings": "listings:list"}
+
+
+def test_a_card_has_a_topic_and_every_topic_a_card_or_a_page():
+    assert set(CARDS.values()) | set(PAGE_TOPICS) == set(help_topics.TOPICS)
+    for slug, home in PAGE_TOPICS.items():
+        assert help_topics.topic(slug).home == home
 
 
 @pytest.mark.parametrize("slug", sorted(help_topics.TOPICS))
@@ -110,7 +116,7 @@ def test_a_topic_is_a_page_of_its_own(client, user, slug):
     assert re.search(rf"<h1[^>]*>\s*Help: {re.escape(str(topic.title))}\s*</h1>", html)
     assert help_text_of(html).startswith("<p>")
     assert f'href="{reverse(topic.home)}"' in html
-    assert "Back to Your details" in html
+    assert str(topic.back) in html
 
 
 def test_a_topic_is_for_somebody_signed_in(client):
@@ -344,7 +350,7 @@ def test_the_drawer_says_what_the_page_says(client, user):
     """One template draws both, through one tag, so they cannot say different things."""
     html = details(client, user)
 
-    for slug in help_topics.TOPICS:
+    for slug in set(help_topics.TOPICS) - set(PAGE_TOPICS):
         drawer = html[html.index(f'<dialog id="help-{slug}"') :]
         drawer = drawer[: drawer.index("</dialog>")]
         page = client.get(reverse("core:help_topic", args=[slug])).content.decode()
@@ -363,6 +369,51 @@ def test_the_sentence_of_your_name_is_what_its_two_menus_are_described_by(client
     assert "Neither is printed anywhere unless a CV says so" in help_text_of(
         html[html.index('<dialog id="help-your-name"') :]
     )
+
+
+# ------------------------------------------- a question mark beside a page's heading (#839)
+
+
+def listings_page(client, user) -> str:
+    client.force_login(user)
+    return client.get(reverse("listings:list")).content.decode()
+
+
+def test_the_listings_heading_has_a_question_mark_with_the_sentence_and_the_drawer(client, user):
+    html = listings_page(client, user)
+
+    heading = re.search(r'<div class="page-title-help">(.*?)<dialog', html, re.S)[1]
+    assert re.search(r"<h1[^>]*>\s*Listings\s*</h1>", heading)
+    assert "data-help-mark" in heading and 'data-opens-dialog="help-listings"' in heading
+    assert "Help: Listings" in heading
+    summary = paragraph(html, re.search(r'aria-describedby="([^"]+)"', heading)[1])
+    assert "data-tooltip" in summary, "a tooltip where a script runs"
+    assert str(help_topics.topic("listings").summary) in html
+    assert '<dialog id="help-listings"' in html, "and the whole of it in the drawer"
+
+
+def test_the_listings_page_no_longer_says_the_sentence_twice(client, user):
+    html = listings_page(client, user)
+
+    sentence = "Every posting you have noticed, until you decide"
+    assert html.count(sentence) == 1, "it is the topic's summary now, not also a paragraph"
+
+
+def test_the_mark_leads_to_the_topics_page_and_back_to_listings(client, user):
+    html = listings_page(client, user)
+    client.force_login(user)
+
+    assert reverse("core:help_topic", args=["listings"]) in html
+    page = client.get(
+        reverse("core:help_topic", args=["listings"]) + "?next=" + reverse("listings:list")
+    ).content.decode()
+    assert f'href="{reverse("listings:list")}"' in page and "Back to Listings" in page
+
+
+def test_a_page_title_without_a_topic_draws_what_it_always_did():
+    html = render("{% load postulo %}<c-page-title>Applications</c-page-title>")
+
+    assert "page-title-help" not in html and "data-help-mark" not in html
 
 
 # ----------------------------------------------------- which help is a tooltip, and which stays
