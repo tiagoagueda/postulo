@@ -336,9 +336,14 @@
             </a>
           </li>
           <li>
+            {% comment %} The book icon beside the word; below `sm` the icon alone, the word
+               `sr-only` so the link keeps its name, with a tooltip and a 24 by 24 target (#838). {% endcomment %}
             <a href="{{ postulo_help_url }}" rel="noopener noreferrer external" target="_blank"
-               class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
-               data-help>{% translate "Help" %}</a>
+               class="inline-flex min-h-6 min-w-6 items-center justify-center gap-1.5 py-1 hover:text-ink-700 sm:justify-start dark:hover:text-ink-200"
+               title="{% translate 'Help' %}" data-help>
+              {% icon "book-text" class="size-4" %}
+              <span class="underline underline-offset-2 sr-only sm:not-sr-only">{% translate "Help" %}</span>
+            </a>
           </li>
           {% if postulo_legal_notice_url %}
             <li>

@@ -408,3 +408,24 @@ def test_the_source_link_is_the_mark_alone_on_a_phone_and_keeps_its_name(
     assert box["width"] >= 24 and box["height"] >= 24, box
     expect(page.locator("footer").get_by_role("link", name="Source code")).to_be_visible()
     assert link.get_attribute("title") == "Source code"
+
+
+def test_the_help_link_is_the_icon_alone_on_a_phone_and_keeps_its_name(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """The book and the word on a laptop; on a phone the book, 24 pixels, still named (#838)."""
+    link = page.locator("footer [data-help]")
+
+    page.set_viewport_size({"width": 1280, "height": 800})
+    page.goto(f"{live_server.url}/accounts/login/")
+    expect(link.locator("svg[data-icon=book-text]")).to_be_visible()
+    expect(link.get_by_text("Help")).to_be_visible()
+
+    page.set_viewport_size(PHONE)
+    page.goto(f"{live_server.url}/accounts/login/")
+    expect(link.locator("svg[data-icon=book-text]")).to_be_visible()
+    box = link.bounding_box()
+    assert box["width"] >= 24 and box["height"] >= 24, box
+    expect(page.locator("footer").get_by_role("link", name="Help")).to_be_visible()

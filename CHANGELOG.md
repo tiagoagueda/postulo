@@ -70,6 +70,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The footer's “Help” link has a book icon beside it, and only the icon on phones (the word stays for screen readers and as a tooltip). (#838)
 - The footer's “Source code” link carries the Forgejo mark where the address is on a Forgejo host, and only the mark on phones (the words stay for screen readers and as a tooltip). (#837)
 - `scripts/messages.py guard` refuses, in CI and before a commit, any translation written outside Weblate, `gate` holds Weblate's pull requests to complete French and Portuguese, and `scripts/weblate.py` locks, syncs and checks the Weblate project. (#706)
 - The official plugin catalogue is published, signed, with postulo-helloworld in it: *Server settings → Plugins → Where plugins may come from* has an *official* row that is off until an administrator switches it on, and a plugin whose file it signed is labelled Official. (#729)

@@ -338,3 +338,17 @@ def test_a_look_alike_host_is_not_taken_for_a_forgejo(client, settings):
     settings.POSTULO_SOURCE_URL = "https://source.tiagoagueda.com.evil.test/postulo"
 
     assert "data-brand" not in source_link(client)
+
+
+# ------------------------------------------------ the book icon beside "Help" (#838)
+
+
+def test_the_help_link_has_the_book_icon_and_gives_the_word_up_on_a_phone(client):
+    footer = footer_of(client.get(reverse("core:home")))
+    link = re.search(r"<a\b[^>]*data-help[^>]*>.*?</a>", footer, re.DOTALL)[0]
+
+    assert 'data-icon="book-text"' in link and "aria-hidden" in link
+    assert 'title="Help"' in link
+    label = re.search(r"<span[^>]*>\s*Help\s*</span>", link)[0]
+    assert "sr-only" in label and "sm:not-sr-only" in label
+    assert "min-h-6" in link and "min-w-6" in link, "a target of at least 24 by 24"
