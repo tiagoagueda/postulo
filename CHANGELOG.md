@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The account menu is a quarter wider, and a long address is cut short with an ellipsis (whole in the page and in a tooltip) instead of wrapping. (#834)
 - The footer's line is the administrator's motto (a new field under Server settings → Defaults, starting as the tagline it showed), defaulting to “your job search, your data”, and is left out on phones so the footer starts with “Powered by Postulo”. (#835)
 - The footer's “Powered by Postulo” no longer shows the version and links to the releases page for everybody, signed in or not. (#836)
 - Single sign-on no longer signs somebody into the account holding the same address unless POSTULO_OIDC_LINK_BY_EMAIL=true is set; an instance with a provider and the variable unset is warned at start-up (postulo.W002), and those people connect the provider once from their own account. (#892)

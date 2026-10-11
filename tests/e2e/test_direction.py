@@ -232,3 +232,24 @@ def test_the_default_language_row_keeps_its_tag_whole(live_server, page: Page, r
     expect(tag).to_have_text("pt-PT")
     expect(tag).to_have_attribute("dir", "ltr")
     assert tag.evaluate("e => getComputedStyle(e).unicodeBidi") in ("isolate", "isolate-override")
+
+
+def test_the_account_menu_is_a_quarter_wider_and_still_fits_a_phone(
+    live_server, page: Page, applicant
+):
+    """17.5rem on a laptop, against the 14rem the other menus keep; clamped to the screen (#834)."""
+    base = live_server.url
+    sign_in(page, base)
+    panel = page.locator("header [data-menu]:has([aria-label^='Account menu']) > [popover]")
+
+    page.set_viewport_size({"width": 1280, "height": 800})
+    page.goto(f"{base}/")
+    page.get_by_label("Account menu", exact=False).click()
+    expect(panel).to_be_visible()
+    assert abs(panel.bounding_box()["width"] - 280) <= 1.5, panel.bounding_box()
+
+    page.set_viewport_size({"width": 320, "height": 640})
+    page.goto(f"{base}/")
+    page.get_by_label("Account menu", exact=False).click()
+    expect(panel).to_be_visible()
+    assert panel.bounding_box()["width"] <= 320 - 32 + 1.5, "the gutter still holds"

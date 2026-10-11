@@ -184,6 +184,12 @@
       text-popover-foreground shadow-floating;
   }
 
+  /* The account menu is a quarter wider than the others, 17.5rem against 14, so a name and an
+     address fit on a line more often (#834). The clamp above still holds on a phone. */
+  .dropdown-menu[data-account-menu] > [data-popover] {
+    @apply w-70;
+  }
+
   .dropdown-menu [role="menuitem"] {
     @apply cursor-pointer gap-2 px-3 py-2 text-start text-sm whitespace-normal text-ink-700
       hover:bg-accent hover:text-accent-foreground

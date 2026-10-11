@@ -157,3 +157,29 @@ def test_avatar_is_a_decorative_tile_with_a_stable_colour():
     assert 'aria-hidden="true"' in first
     assert any(colour in first for colour in AVATAR_COLOURS)
     assert "<script" not in render(FakeUser("<script>", "x", "<script> x"))
+
+
+def test_the_account_menu_is_marked_and_its_address_is_cut_short_not_wrapped(client, user):
+    """A hook the stylesheet widens it by, an address that truncates, and the whole of it
+    still in the page and in a title (#834)."""
+    client.force_login(user)
+    header = client.get(reverse("core:home")).content.decode().split("<header", 1)[1]
+    header = header.split("</header>", 1)[0]
+
+    assert "data-account-menu" in header
+    import re
+
+    line = re.search(rf'<div class="([^"]*)" title="{user.email}">{user.email}</div>', header)
+    assert line, "the whole address is in the page, and in a title"
+    assert "truncate" in line[1] and "break-words" not in line[1]
+
+
+def test_only_the_account_menu_is_widened():
+    from pathlib import Path
+
+    css = (Path(__file__).resolve().parents[1] / "assets" / "css" / "basecoat.css").read_text(
+        encoding="utf-8"
+    )
+
+    assert ".dropdown-menu[data-account-menu] > [data-popover]" in css
+    assert css.count("@apply w-70;") == 1, "the other popovers keep w-56"
