@@ -325,9 +325,15 @@
                data-powered>{% translate "Powered by Postulo" %}</a>
           </li>
           <li>
+            {% comment %} The Forgejo mark where the address is on a Forgejo (#837). Below `sm` the
+               words are `sr-only` and the mark stands for them, so the link keeps its name and
+               is at least 24 by 24; with no mark the words stay at every width. {% endcomment %}
             <a href="{{ postulo_source_url }}" rel="noopener noreferrer external" target="_blank"
-               class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
-               data-source>{% translate "Source code" %}</a>
+               class="inline-flex min-h-6 min-w-6 items-center gap-1.5 py-1 hover:text-ink-700 dark:hover:text-ink-200{% if postulo_source_brand %} justify-center sm:justify-start{% endif %}"
+               {% if postulo_source_brand %}title="{% translate 'Source code' %}" {% endif %}data-source>
+              {% if postulo_source_brand %}{% brand postulo_source_brand class="size-4" %}{% endif %}
+              <span class="underline underline-offset-2{% if postulo_source_brand %} sr-only sm:not-sr-only{% endif %}">{% translate "Source code" %}</span>
+            </a>
           </li>
           <li>
             <a href="{{ postulo_help_url }}" rel="noopener noreferrer external" target="_blank"

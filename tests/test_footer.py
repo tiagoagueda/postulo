@@ -33,7 +33,8 @@ def links_in(footer: str) -> dict[str, str]:
     """Each link's text, whitespace folded, mapped to its whole tag."""
     found = {}
     for match in re.finditer(r"(<a\b[^>]*>)(.*?)</a>", footer, re.DOTALL):
-        found[" ".join(match.group(2).split())] = match.group(1)
+        text = re.sub(r"<[^>]+>", " ", match.group(2))
+        found[" ".join(text.split())] = match.group(1)
     return found
 
 
@@ -293,3 +294,47 @@ def test_the_version_is_read_from_the_metadata_once_however_many_pages(client, u
         updates.installed_version.cache_clear()
 
     assert len(calls) <= 1
+
+
+# ----------------------------------------------- the Forgejo mark beside "Source code" (#837)
+
+
+def source_link(client) -> str:
+    footer = footer_of(client.get(reverse("core:home")))
+    return re.search(r"<a\b[^>]*data-source[^>]*>.*?</a>", footer, re.DOTALL)[0]
+
+
+def test_upstreams_source_link_carries_the_forgejo_mark_and_keeps_its_words(client):
+    link = source_link(client)
+
+    assert 'data-brand="forgejo"' in link
+    assert "aria-hidden" in link, "the words name it; the mark is decoration"
+    assert 'title="Source code"' in link, "the tooltip a phone's mark alone is read by"
+    label = re.search(r"<span[^>]*>\s*Source code\s*</span>", link)[0]
+    assert "sr-only" in label and "sm:not-sr-only" in label, "the words give way on a phone"
+
+
+def test_a_fork_on_another_forge_gets_the_words_alone(client, settings):
+    settings.POSTULO_SOURCE_URL = "https://github.com/acme/postulo"
+
+    link = source_link(client)
+
+    assert "data-brand" not in link, "a Forgejo mark beside GitHub names the wrong place"
+    assert "title=" not in link
+    assert "sr-only" not in link, "so the words stay at every width"
+
+
+@pytest.mark.parametrize(
+    "address",
+    ["https://codeberg.org/acme/postulo", "https://forgejo.example.org/acme/postulo"],
+)
+def test_another_forgejo_host_is_known_by_its_name(client, settings, address):
+    settings.POSTULO_SOURCE_URL = address
+
+    assert 'data-brand="forgejo"' in source_link(client)
+
+
+def test_a_look_alike_host_is_not_taken_for_a_forgejo(client, settings):
+    settings.POSTULO_SOURCE_URL = "https://source.tiagoagueda.com.evil.test/postulo"
+
+    assert "data-brand" not in source_link(client)

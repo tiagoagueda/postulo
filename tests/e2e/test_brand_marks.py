@@ -77,7 +77,9 @@ def open_company(page: Page, live_server, company, scheme: str = "light") -> Non
 
 
 def mark(page: Page, slug: str):
-    return page.locator(f'svg[data-brand="{slug}"]')
+    """A mark in the page's content. The footer's Forgejo mark beside "Source code" (#837) is
+    the footer's own and is counted separately below."""
+    return page.locator(f'main svg[data-brand="{slug}"]')
 
 
 #: What the page's box for a mark says: where it is, how big, what colour, and what a
@@ -168,9 +170,13 @@ def test_a_service_without_a_mark_draws_none_and_the_page_has_only_these(
     page: Page, live_server, company
 ):
     open_company(page, live_server, company)
-    assert page.locator("svg[data-brand]").evaluate_all(
+    assert page.locator("main svg[data-brand]").evaluate_all(
         "(all) => all.map((svg) => svg.dataset.brand).sort()"
     ) == ["forgejo", "github", "mastodon"]
+    # And the footer's single mark, the Forgejo one beside the link to the source (#837).
+    assert page.locator("footer svg[data-brand]").evaluate_all(
+        "(all) => all.map((svg) => svg.dataset.brand)"
+    ) == ["forgejo"]
     expect(page.locator('main a[href="https://x.com/glados"]')).to_be_visible()
 
 

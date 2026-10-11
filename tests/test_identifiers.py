@@ -525,7 +525,8 @@ def test_a_company_page_draws_no_mark_beside_the_schemes_postulo_ships(signed_in
 
 def test_the_identifier_form_draws_no_mark(signed_in):
     html = signed_in.get(reverse("jobs:company_create")).content.decode()
-    assert "data-brand=" not in html, "a select draws icons only (#301)"
+    # The page itself; the footer's Forgejo mark beside "Source code" is not the form's (#837).
+    assert "data-brand=" not in html.split("<footer")[0], "a select draws icons only (#301)"
 
 
 # ------------------------------------------- identifiers that disagree with each other (#675)

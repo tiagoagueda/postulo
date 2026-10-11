@@ -386,3 +386,25 @@ def test_more_opens_with_scripts_off(live_server, browser: Browser, furnished): 
         expect(page).to_have_url(f"{base}/jobs/companies/")
     finally:
         context.close()
+
+
+def test_the_source_link_is_the_mark_alone_on_a_phone_and_keeps_its_name(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """Mark and words on a laptop; on a phone the mark alone, 24 pixels and still named (#837)."""
+    link = page.locator("footer [data-source]")
+
+    page.set_viewport_size({"width": 1280, "height": 800})
+    page.goto(f"{live_server.url}/accounts/login/")
+    expect(link.locator("svg[data-brand=forgejo]")).to_be_visible()
+    expect(link.get_by_text("Source code")).to_be_visible()
+
+    page.set_viewport_size(PHONE)
+    page.goto(f"{live_server.url}/accounts/login/")
+    expect(link.locator("svg[data-brand=forgejo]")).to_be_visible()
+    box = link.bounding_box()
+    assert box["width"] >= 24 and box["height"] >= 24, box
+    expect(page.locator("footer").get_by_role("link", name="Source code")).to_be_visible()
+    assert link.get_attribute("title") == "Source code"

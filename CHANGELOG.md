@@ -70,6 +70,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The footer's “Source code” link carries the Forgejo mark where the address is on a Forgejo host, and only the mark on phones (the words stay for screen readers and as a tooltip). (#837)
 - `scripts/messages.py guard` refuses, in CI and before a commit, any translation written outside Weblate, `gate` holds Weblate's pull requests to complete French and Portuguese, and `scripts/weblate.py` locks, syncs and checks the Weblate project. (#706)
 - The official plugin catalogue is published, signed, with postulo-helloworld in it: *Server settings → Plugins → Where plugins may come from* has an *official* row that is off until an administrator switches it on, and a plugin whose file it signed is labelled Official. (#729)
 - Nine languages are scaffolded with empty catalogues for 0.5.0: Chinese (simplified and traditional), Hindi, Urdu, Bengali, Indonesian, Canadian English, Canadian French and Mexican Spanish; none is offered until a string is translated, and the image now carries a CJK font (#728)

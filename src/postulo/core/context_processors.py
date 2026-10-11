@@ -100,6 +100,8 @@ def ui(request: HttpRequest) -> dict:
         # any more (#836); it is on /healthz and under Server settings.
         "postulo_releases_url": releases_url(),
         "postulo_source_url": settings.POSTULO_SOURCE_URL,
+        # The mark beside it, only where it names the place the link goes (#837).
+        "postulo_source_brand": source_brand(),
         "postulo_help_url": HELP_URL,
         "postulo_legal_notice_url": settings.POSTULO_LEGAL_NOTICE_URL,
     }
@@ -108,6 +110,20 @@ def ui(request: HttpRequest) -> dict:
 #: The documentation, which is the upstream wiki whoever runs the instance: an operator's
 #: own changes are theirs to document, and Postulo's pages are still Postulo's (#212).
 HELP_URL = "https://source.tiagoagueda.com/postulo/postulo/wiki"
+
+#: Hosts known to run Forgejo: the upstream repository's, and Codeberg's. A fork on another
+#: forge, or on an operator's own server, gets the words alone: the mark is Forgejo's, and a
+#: Forgejo mark beside a GitHub address names the wrong place (`TRADEMARKS.md`, #837).
+FORGEJO_HOSTS = frozenset({"source.tiagoagueda.com", "codeberg.org"})
+
+
+def source_brand() -> str:
+    """The mark for the "Source code" link: ``forgejo`` on a Forgejo host, else nothing."""
+    from urllib.parse import urlsplit
+
+    host = (urlsplit(settings.POSTULO_SOURCE_URL).hostname or "").lower()
+    return "forgejo" if host in FORGEJO_HOSTS or host.startswith("forgejo.") else ""
+
 
 #: Where the releases are: the Forgejo releases the release workflow makes from the changelog,
 #: all of them, so the footer says what Postulo is without saying which build this is (#836).

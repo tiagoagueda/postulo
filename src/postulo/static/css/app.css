@@ -699,6 +699,9 @@
   .min-w-0 {
     min-width: 0px;
   }
+  .min-w-6 {
+    min-width: calc(var(--spacing) * 6);
+  }
   .min-w-20 {
     min-width: calc(var(--spacing) * 20);
   }
@@ -1649,8 +1652,21 @@
     }
   }
   @media (width >= 40rem) {
+    .sm\:not-sr-only {
+      position: static;
+      width: auto;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+      white-space: normal;
+    }
     .sm\:col-span-2 {
       grid-column: span 2 / span 2;
+    }
+    .sm\:block {
+      display: block;
     }
     .sm\:w-36 {
       width: calc(var(--spacing) * 36);
@@ -1720,6 +1736,9 @@
     }
     .sm\:items-start {
       align-items: flex-start;
+    }
+    .sm\:justify-start {
+      justify-content: flex-start;
     }
   }
   @media (width >= 48rem) {
