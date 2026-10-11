@@ -211,6 +211,8 @@ def _connected_plugins():
         for kind, classes in registry.builtins().items()
         if kind in CONNECTED_KINDS
         for plugin_class in classes
+        # One that needs no connection has no form to draw, and its address answers 404 (#785).
+        if getattr(plugin_class, "needs_connection", True)
     ]
 
 

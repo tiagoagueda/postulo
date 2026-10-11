@@ -50,6 +50,10 @@ def _plugin_or_404(kind: str, name: str, person=None):
     plugin = find_plugin(kind, name)
     if plugin is None:
         raise Http404("That plugin is not installed.")
+    # One that needs no connection is not on the pick page, and its address is not a way round it:
+    # the built-in local store, connected by hand, made a second file beside every document (#785).
+    if not getattr(plugin, "needs_connection", True):
+        raise Http404("That plugin needs no connection.")
     # An address for a plugin the person is not offered is not theirs to open (#362).
     if person is not None and not decide(name, person).offered:
         raise Http404("That plugin is not available.")

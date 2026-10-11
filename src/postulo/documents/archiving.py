@@ -85,6 +85,11 @@ def schedule_copies(document, *, connections=None) -> list[DocumentCopy]:
         connections = store_connections(document.owner)
     created: list[DocumentCopy] = []
     for connection in connections:
+        # The built-in local store is the place a document already is: a copy there would write a
+        # second file beside the first and leave it with nothing that names it (#785). It is left
+        # out of `store_connections`; a connection made for it by hand is left out here as well.
+        if connection.plugin == "local":
+            continue
         if not wants_kind(connection.config, document.kind) or not allows(connection):
             continue
         copy, was_created = DocumentCopy.objects.get_or_create(
