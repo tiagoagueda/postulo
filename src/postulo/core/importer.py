@@ -125,6 +125,7 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "density",
         "identifier_style",
         "button_labels",
+        "show_breadcrumb",
         "calendar_labels",
         "weekday_names",
         "first_weekday",

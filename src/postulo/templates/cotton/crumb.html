@@ -1,0 +1,6 @@
+{% load postulo %}
+<c-vars href="" current=False />
+{% comment %} One step of a `<c-breadcrumb>` (#831): a link with a separator after it, or, with
+   `current`, the page itself. {% endcomment %}
+{% if current %}<li><span aria-current="page"><bdi>{{ slot }}</bdi></span></li>{% else %}<li><a href="{{ href }}"><bdi>{{ slot }}</bdi></a></li>
+<li aria-hidden="true" data-rtl-flip><span aria-hidden="true">{% icon "chevron-right" class="size-3.5" %}</span></li>{% endif %}

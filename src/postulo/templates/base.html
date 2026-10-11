@@ -250,6 +250,10 @@
             </div>
           {% endif %}
         </div>
+        {% comment %} Where this page sits, for the people who switched it on (#831). Inside the
+           header, so it is sticky with it and counted in `--header-height` with no code of its
+           own. A page fills `breadcrumb` with `<c-breadcrumb>`; one that does not draws nothing. {% endcomment %}
+        {% if show_breadcrumb %}{% block breadcrumb %}{% endblock %}{% endif %}
       </header>
     {% endblock %}
 

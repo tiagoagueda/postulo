@@ -2,6 +2,17 @@
 {% load i18n postulo %}
 
 {% block title %}{% translate "Company" %}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'jobs:company_list' %}">{% translate "Companies" %}</c-crumb>
+    {% if object %}
+      <c-crumb href="{{ object.get_absolute_url }}">{{ object.name }}</c-crumb>
+      <c-crumb current>{% translate "Edit" %}</c-crumb>
+    {% else %}
+      <c-crumb current>{% translate "New company" %}</c-crumb>
+    {% endif %}
+  </c-breadcrumb>
+{% endblock %}
 {# Two columns on a wide screen: this page empties `main_width` and takes the whole screen (#210). #}
 {% block main_width %}{% endblock %}
 

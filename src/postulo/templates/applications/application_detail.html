@@ -2,6 +2,12 @@
 {% load i18n %}
 
 {% block title %}{{ application.posting.title }}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'applications:list' %}">{% translate "Applications" %}</c-crumb>
+    <c-crumb current>{{ application.posting.title }}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-start gap-4">

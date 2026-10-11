@@ -314,6 +314,7 @@ PROFILE_FIELDS = (
     "density",
     "identifier_style",
     "button_labels",
+    "show_breadcrumb",
     "calendar_labels",
     "weekday_names",
     "first_weekday",

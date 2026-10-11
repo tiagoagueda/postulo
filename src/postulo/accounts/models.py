@@ -456,6 +456,9 @@ class Profile(models.Model):
         ),
         default="both",
     )
+    #: A breadcrumb under the navigation bar, sticky with it (#831). Off by default: it is a
+    #: second line the masthead keeps for itself on every page, and not everybody wants one.
+    show_breadcrumb = models.BooleanField(_("show the breadcrumb"), default=False)
     #: How the buttons that carry both an icon and a label are drawn (#852): both, only the
     #: icons (the label stays as the button's name and is its tooltip), or only the labels. Only
     #: buttons built with a `.btn-label` beside their icon follow it; a text-only button is

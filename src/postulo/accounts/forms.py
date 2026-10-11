@@ -1094,6 +1094,7 @@ class AccessibilityForm(forms.ModelForm):
         "keyboard_shortcuts",
         "show_key_hints",
         "nav_underline",
+        "show_breadcrumb",
     )
 
     class Meta:
@@ -1103,6 +1104,7 @@ class AccessibilityForm(forms.ModelForm):
             "keyboard_shortcuts",
             "show_key_hints",
             "nav_underline",
+            "show_breadcrumb",
             "save_as_you_go",
         )
         labels = {
@@ -1111,6 +1113,7 @@ class AccessibilityForm(forms.ModelForm):
             "keyboard_shortcuts": _("Let a single key do something"),
             "show_key_hints": _("Show the keys beside the controls that have one"),
             "nav_underline": _("Underline the page you are on"),
+            "show_breadcrumb": _("Show a breadcrumb under the navigation bar"),
         }
         help_texts = {
             "save_as_you_go": _(
@@ -1134,6 +1137,12 @@ class AccessibilityForm(forms.ModelForm):
                 "A small key cap beside Save and next, Discard and next, Skip to the next and "
                 "the search box. Turning it off hides the caps only; the keys keep working "
                 "(see above), and a screen reader is still told about them."
+            ),
+            "show_breadcrumb": _(
+                "A line under the navigation bar that says where you are — Companies, then "
+                "this company — with a link back to each step. It stays with the bar as you "
+                "scroll. Pages that have no place in a hierarchy draw none, and a phone's "
+                "narrow screen never does."
             ),
             "nav_underline": _(
                 "The link for the page you are on is underlined as well as shaded and set "

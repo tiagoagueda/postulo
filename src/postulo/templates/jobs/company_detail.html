@@ -2,6 +2,12 @@
 {% load i18n postulo %}
 
 {% block title %}{{ company.name }}{% endblock %}
+{% block breadcrumb %}
+  <c-breadcrumb>
+    <c-crumb href="{% url 'jobs:company_list' %}">{% translate "Companies" %}</c-crumb>
+    <c-crumb current>{{ company.name }}</c-crumb>
+  </c-breadcrumb>
+{% endblock %}
 
 {% block content %}
   {% comment %} The logo is changed on the edit page, by pressing it (#853). {% endcomment %}

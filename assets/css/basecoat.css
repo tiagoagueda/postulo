@@ -179,6 +179,24 @@
 }
 
 @layer components {
+  /* The breadcrumb's paint (#831): small and quiet, the page itself a weight heavier, and the
+     separators fainter than the words. The structure is Basecoat's `breadcrumb.css`. */
+  .breadcrumb {
+    @apply text-sm text-ink-600 dark:text-ink-300;
+  }
+
+  .breadcrumb a {
+    @apply underline-offset-2 hover:text-ink-900 hover:underline dark:hover:text-ink-100;
+  }
+
+  .breadcrumb [aria-current="page"] {
+    @apply font-medium text-ink-900 dark:text-ink-100;
+  }
+
+  .breadcrumb li[aria-hidden="true"] {
+    @apply px-1.5 text-ink-400 dark:text-ink-500;
+  }
+
   [data-popover] {
     @apply w-56 max-w-[calc(100vw-2rem)] rounded-xl border border-border bg-popover py-1
       text-popover-foreground shadow-floating;
