@@ -59,9 +59,10 @@
    newest request is always the whole of the question as it stands.
 
    **On a phone the mode goes with it.** Below `lg` the icon that is a link above becomes
-   the button that opens the same form, in a panel under the masthead: a popover, which the
-   browser opens and closes with no script, closes on Escape and gives focus back to its
-   button. From `lg` up the same element is drawn in the row, open, and is not a popover in
+   the button that opens the same form. With scripts, it opens in the masthead row exactly as
+   the box over everything does (#833, below); without them, in a panel under the masthead: a
+   popover, which the browser opens and closes with no script, closes on Escape and gives
+   focus back to its button. From `lg` up the same element is drawn in the row, open, and is not a popover in
    anything but name -- the stylesheet undoes what the browser does to one. One form and one
    box at every width, so there is one search landmark on the page and one input named `q`.
 
@@ -74,22 +75,32 @@
    Escape and the close button put the wordmark back and the focus on the icon, which says
    `aria-expanded` meanwhile. 16 pixels of text, so that iOS does not zoom the page.
 
+   **The table's box opens in the row too** (#833). `app.js` takes the tap on the popover's
+   button as it takes the link's: it keeps the browser from opening the popover, marks the
+   masthead `data-search-open`, and the stylesheet draws the same form, input group, live
+   narrowing and all, in the row in place of the wordmark, the `+` menu and the icon, with
+   the close button where the icon was; only the account button stays. Below `md` only: from there
+   to `lg` the masthead still holds the navigation row and the popover bar is kept. 16 pixels of
+   text below `lg`. The popover under the masthead is what scripts-off gets, and is no longer opened
+   with them.
+
    Not `autofocus` in the panel, which would take the focus on every page load wherever the
    box is drawn in the row: `app.js` puts the focus in the box when the panel opens. {% endcomment %}
 {% if table %}
   <button type="button" popovertarget="site-search-panel" class="btn size-11 lg:hidden" data-variant="ghost" data-size="icon"
           data-search-link aria-label="{% translate 'Search' %}">{% icon "search" class="size-5" %}</button>
   <div popover id="site-search-panel" class="site-search" data-site-search>
-    <form method="get" action="{{ request.path }}" role="search" aria-label="{{ table.search_label }}">
+    <form method="get" action="{{ request.path }}" role="search" aria-label="{{ table.search_label }}"
+          data-site-search-form>
       <label for="site-search" class="sr-only">{{ table.search_label }}</label>
-      <div class="input-group">
+      <div class="input-group" data-search-group>
         <input type="search" id="site-search" name="q" value="{{ table.search }}"
                placeholder="{{ table.search_label }}"{% if shortcuts %} aria-keyshortcuts="/"{% endif %}
                data-search-shortcut data-table-search
                hx-get="{{ request.path }}" hx-include="#{{ form_id }}" hx-trigger="input changed delay:300ms"
                hx-sync="#{{ form_id }}:replace"
                hx-target="#{{ table_id }}" hx-swap="outerHTML" hx-push-url="true"
-               class="h-auto self-stretch px-2.5 text-sm text-ellipsis lg:w-32 lg:py-1 lg:transition-[width]">
+               class="h-auto self-stretch px-2.5 text-base text-ellipsis lg:w-32 lg:py-1 lg:text-sm lg:transition-[width]">
         <button type="submit" class="btn size-11 lg:size-7" data-variant="ghost" data-size="icon"
                 aria-label="{{ table.search_label }}" title="{{ table.search_label }}" data-search-here
                 hx-get="{{ request.path }}" hx-include="#site-search, #{{ form_id }}"
@@ -99,6 +110,8 @@
                 aria-label="{% translate 'Search everything' %}" title="{% translate 'Search everything' %}"
                 data-search-everything>{% icon "globe" class="size-4" %}</button>
       </div>
+      <button type="button" class="btn size-11" data-variant="ghost" data-size="icon" data-search-close
+              aria-label="{% translate 'Close search' %}" title="{% translate 'Close search' %}">{% icon "x" class="size-5" %}</button>
       <noscript>{% for name, value in table.search_keeps %}<input type="hidden" name="{{ name }}" value="{{ value }}">{% endfor %}</noscript>
     </form>
   </div>

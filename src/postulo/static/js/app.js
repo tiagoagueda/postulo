@@ -2632,13 +2632,15 @@
    * focus back to the icon, which says `aria-expanded` meanwhile -- set from here, with
    * `role="button"`, because a link may not carry it. So does "/". Past `lg` the box is drawn in the
    * row and none of this applies, and it is shut as the window grows. Where the box narrows
-   * the page's table the icon is a popover's button, not a link, and is left to the
-   * browser (#313).
+   * the page's table the icon is a popover's button rather than a link, and it opens the
+   * box in the row just the same (#833): the click is taken before the browser opens the
+   * popover, which is what scripts-off gets.
    */
   var searchHeader = document.querySelector("[data-site-header]");
-  var searchIcon = searchHeader && searchHeader.querySelector("a[data-search-link]");
+  var searchIcon = searchHeader && searchHeader.querySelector("[data-search-link]");
   var searchBox = searchIcon && searchHeader.querySelector("[data-site-search-form] input");
   var searchWide = window.matchMedia ? window.matchMedia("(min-width: 64rem)") : null;
+  var searchTablet = window.matchMedia ? window.matchMedia("(min-width: 48rem)") : null;
 
   function searchIsOpen() {
     return !!searchHeader && searchHeader.hasAttribute("data-search-open");
@@ -2660,11 +2662,19 @@
   }
 
   if (searchIcon && searchBox) {
-    searchIcon.setAttribute("role", "button");
+    if (searchIcon.tagName === "A") {
+      searchIcon.setAttribute("role", "button");
+    }
     searchIcon.setAttribute("aria-expanded", "false");
     searchIcon.setAttribute("aria-controls", searchBox.id);
     searchIcon.addEventListener("click", function (event) {
       if (searchWide && searchWide.matches) {
+        return;
+      }
+      // Between `md` and `lg` the masthead still holds the navigation row, and there is no
+      // room to open a table's box in it: the popover bar under the masthead is left to the
+      // browser there, as before (#833).
+      if (searchIcon.tagName !== "A" && searchTablet && searchTablet.matches) {
         return;
       }
       event.preventDefault();

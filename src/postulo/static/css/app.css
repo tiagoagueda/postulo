@@ -1358,6 +1358,10 @@
     font-size: var(--text-5xl);
     line-height: var(--tw-leading, var(--text-5xl--line-height));
   }
+  .text-base {
+    font-size: var(--text-base);
+    line-height: var(--tw-leading, var(--text-base--line-height));
+  }
   .text-lg {
     font-size: var(--text-lg);
     line-height: var(--tw-leading, var(--text-lg--line-height));
@@ -1846,6 +1850,10 @@
     }
     .lg\:py-1 {
       padding-block: var(--spacing);
+    }
+    .lg\:text-sm {
+      font-size: var(--text-sm);
+      line-height: var(--tw-leading, var(--text-sm--line-height));
     }
     .lg\:transition-\[width\] {
       transition-property: width;
@@ -7253,6 +7261,24 @@ select[data-select-ready] {
   }
   [data-site-header][data-search-open] [data-search-close] {
     display: inline-flex;
+  }
+  [data-site-header][data-search-open] [data-new-menu] {
+    display: none;
+  }
+  [data-site-header][data-search-open] .site-search[popover] {
+    position: static;
+    inset: auto;
+    display: flex;
+    flex: 1 1 0%;
+    min-width: 0;
+    padding: 0;
+    border-width: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  [data-site-header][data-search-open] .site-search [data-search-group] {
+    flex: 1 1 0%;
+    min-width: 0;
   }
 }
 details[data-menu] > summary {

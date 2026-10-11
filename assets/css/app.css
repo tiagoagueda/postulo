@@ -2000,6 +2000,31 @@ select[data-select-ready] {
   [data-site-header][data-search-open] [data-search-close] {
     display: inline-flex;
   }
+
+  /* The + menu gives way as well (#833): only the account button stays beside the box. */
+  [data-site-header][data-search-open] [data-new-menu] {
+    display: none;
+  }
+
+  /* The box that narrows a table is a popover under the masthead with scripts off. With them
+     it opens here, in the row (#833): the browser's popover treatment undone as it is from
+     `lg` up, and the form, its input group and its buttons take the room the wordmark left. */
+  [data-site-header][data-search-open] .site-search[popover] {
+    position: static;
+    inset: auto;
+    display: flex;
+    flex: 1 1 0%;
+    min-width: 0;
+    padding: 0;
+    border-width: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  [data-site-header][data-search-open] .site-search [data-search-group] {
+    flex: 1 1 0%;
+    min-width: 0;
+  }
 }
 
 /* The disclosures that are not menus -- the column chooser, the saved views, the language

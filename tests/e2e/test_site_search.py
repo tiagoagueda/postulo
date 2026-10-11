@@ -599,49 +599,83 @@ def many_companies(tables):
     return tables
 
 
-@pytest.mark.parametrize("size", NARROW)
-def test_the_open_panel_closes_when_the_focus_leaves_it(
+PHONE_ONLY = ((390, 740), (320, 640))
+
+
+@pytest.mark.parametrize("size", PHONE_ONLY)
+def test_the_table_search_opens_in_the_masthead_row_like_the_page_search(
     page: Page, live_server, many_companies, size
 ):
-    """SC 2.4.11, Focus Not Obscured. The panel is a bar in the top layer just under the
-    masthead, which is where the browser puts whatever it scrolls into view, and a popover
-    stays open when Tab leaves it: the table's header, its sort links and every few rows
-    took the focus behind it. So it closes as the focus goes anywhere else -- except to its
-    own button, which is in the masthead and is how it is closed by hand."""
+    """With scripts the box that narrows a table opens in the masthead row (#833), as the box
+    over everything does: the wordmark, the + menu and the magnifier give way and only the
+    account button stays. It is no longer a bar over the page, so the masthead keeps its height
+    and nothing that has the focus can be behind it; the popover is what scripts-off gets."""
     base = live_server.url
     sign_in(page, base)
     page.set_viewport_size({"width": size[0], "height": size[1]})
     page.goto(f"{base}/jobs/companies/")
-    trigger = page.locator("header [data-search-link]")
+    header = page.locator("header[data-site-header]")
+    trigger = header.locator("[data-search-link]")
     box = page.locator("#site-search")
+    before = header.bounding_box()["height"]
 
     trigger.click()
-    expect(box).to_be_focused()
-    page.keyboard.press("Shift+Tab")
-    expect(trigger).to_be_focused()
-    expect(box).to_be_visible()
-    page.keyboard.press("Tab")
-    expect(box).to_be_focused()
 
-    # On through the panel's two buttons and out, and then down into the table: the panel
-    # is open only while the focus is in it, and nothing focused is ever under it.
-    seen = []
-    for _ in range(30):
+    expect(header).to_have_attribute("data-search-open", "")
+    expect(box).to_be_focused()
+    assert (
+        page.evaluate("() => document.querySelector('[data-site-search]').matches(':popover-open')")
+        is False
+    )
+    expect(header.locator("[data-wordmark]")).to_be_hidden()
+    expect(header.locator("[data-new-menu]")).to_be_hidden()
+    expect(trigger).to_be_hidden()
+    expect(header.get_by_label("Account menu", exact=False)).to_be_visible()
+    expect(header.locator("[data-search-close]")).to_be_visible()
+    assert abs(header.bounding_box()["height"] - before) <= 2, "still one row"
+    assert box.evaluate("el => getComputedStyle(el).fontSize") == "16px", "so iOS does not zoom"
+    assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]
+
+    # Tab on out of the row and into the page: no bar over it, so nothing is ever behind one.
+    for _ in range(12):
         page.keyboard.press("Tab")
-        where = page.evaluate(FOCUS_AND_PANEL)
-        seen.append(where)
-        assert not where["under"], where
-        assert where["inside"] or not where["open"], f"the panel stayed open: {where}"
-    assert [where["inside"] for where in seen[:3]] == [True, True, False], seen[:3]
-    assert any(where["what"] == "#sort-name" for where in seen), "the walk reached the table"
-    expect(box).to_be_hidden()
+        under = page.evaluate(
+            """() => {
+              const el = document.activeElement, bar = document.querySelector('[data-site-header]');
+              if (!el || el === document.body) return false;
+              const r = el.getBoundingClientRect(), h = bar.getBoundingClientRect();
+              if (bar.contains(el) || r.height === 0) return false;
+              return r.top < h.bottom - 1 && r.bottom > h.bottom;
+            }"""
+        )
+        assert not under, "the focus is behind the masthead"
 
-    # And back up into it again: opened by its button, left by Shift+Tab past the button.
-    trigger.click()
-    expect(box).to_be_focused()
-    page.keyboard.press("Shift+Tab")
-    page.keyboard.press("Shift+Tab")
-    expect(box).to_be_hidden()
+    # The close button puts it all back and hands the focus to the magnifier.
+    header.locator("[data-search-close]").click()
+    expect(header).not_to_have_attribute("data-search-open", "")
+    expect(header.locator("[data-wordmark]")).to_be_visible()
+    expect(header.locator("[data-new-menu]")).to_be_visible()
+    expect(trigger).to_be_visible()
+    expect(trigger).to_be_focused()
+
+
+def test_on_a_tablet_the_table_search_is_still_the_bar_under_the_masthead(
+    page: Page, live_server, many_companies
+):
+    """From `md` the masthead holds the navigation row, so there is no room to open the box in
+    it; the popover bar is what is kept between `md` and `lg` (#833)."""
+    base = live_server.url
+    sign_in(page, base)
+    page.set_viewport_size({"width": 800, "height": 740})
+    page.goto(f"{base}/jobs/companies/")
+
+    page.locator("header [data-search-link]").click()
+
+    expect(page.locator("#site-search")).to_be_focused()
+    assert page.evaluate(
+        "() => document.querySelector('[data-site-search]').matches(':popover-open')"
+    )
+    expect(page.locator("header[data-site-header]")).not_to_have_attribute("data-search-open", "")
 
 
 @pytest.mark.parametrize("size", NARROW)
