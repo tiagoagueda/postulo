@@ -52,6 +52,11 @@ urlpatterns = [
         name="company_vcard",
     ),
     path(
+        "companies/<int:pk>/export/",
+        vcard_views.CompanyExportView.as_view(),
+        name="company_export",
+    ),
+    path(
         "companies/<int:pk>/contacts.vcf",
         vcard_views.CompanyContactsVCardView.as_view(),
         name="company_contacts_vcard",

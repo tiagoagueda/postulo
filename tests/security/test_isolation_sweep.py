@@ -506,6 +506,7 @@ FACTORIES: dict[str, Callable] = {
     "jobs:contact_export": pk_of(contact),
     "jobs:contact_vcard": pk_of(contact),
     "jobs:company_vcard": pk_of(company),
+    "jobs:company_export": pk_of(company),
     "jobs:company_contacts_vcard": pk_of(company),
     "jobs:contact_merge": pk_of(contact),
     "jobs:contact_update": pk_of(contact),

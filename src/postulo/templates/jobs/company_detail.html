@@ -44,14 +44,32 @@
         </div>
       {% endif %}
     </div>
-    <div class="ms-auto flex flex-wrap items-center gap-2">
-      <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% translate "Edit" %}</a>
-      {% comment %} Always offered, not only beside a notice (#239): the comparison finds
-         *Acme* and *Acme Ltd*, and somebody who knows that *Google* and *Alphabet* are
-         the same employer to them knows something it cannot. {% endcomment %}
-      <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="ghost">{% translate "Merge" %}</a>
-      <button type="button" class="btn" data-variant="destructive-ghost"
-              popovertarget="delete-company">{% translate "Delete" %}</button>
+    <div class="ms-auto">
+      {% comment %} Edit, Merge, Export and Delete as one group with an icon each (#851). Below
+         `sm` the words leave the screen and stay for a screen reader, so the group fits a
+         phone; wider, the words are drawn. Merge is always offered, not only beside a notice
+         (#239): the comparison finds *Acme* and *Acme Ltd*, and somebody who knows that
+         *Google* and *Alphabet* are the same employer to them knows something it cannot. {% endcomment %}
+      <div class="button-group" role="group" aria-label="{% translate 'This company' %}" data-company-actions>
+        <a href="{% url 'jobs:company_update' company.pk %}" class="btn" data-variant="outline">{% icon "pencil" %}<span class="sr-only sm:not-sr-only">{% translate "Edit" %}</span></a>
+        <a href="{% url 'jobs:company_merge' company.pk %}" class="btn" data-variant="outline">{% icon "git-merge" %}<span class="sr-only sm:not-sr-only">{% translate "Merge" %}</span></a>
+        <button type="button" class="btn" data-variant="outline" popovertarget="export-company" aria-haspopup="dialog">{% icon "download" %}<span class="sr-only sm:not-sr-only">{% translate "Export" %}</span></button>
+        <button type="button" class="btn" data-variant="destructive-ghost"
+                popovertarget="delete-company">{% icon "trash-2" %}<span class="sr-only sm:not-sr-only">{% translate "Delete" %}</span></button>
+      </div>
+      {% comment %} Which format, and whether the notes go with it: a question asked before the
+         file is made. A plain GET form in a popover, so it works with no script. {% endcomment %}
+      <div id="export-company" popover data-popover data-align="end" class="card w-72 p-4">
+        <form method="get" action="{% url 'jobs:company_export' company.pk %}" class="flex flex-col gap-3">
+          <fieldset class="flex flex-col gap-2">
+            <legend class="label mb-1">{% translate "Format" %}</legend>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" class="input" name="format" value="vcard" checked> {% translate "vCard" %}</label>
+            <label class="flex items-center gap-2 text-sm"><input type="radio" class="input" name="format" value="json"> {% translate "JSON" %}</label>
+          </fieldset>
+          <label class="flex items-center gap-2 text-sm"><input type="checkbox" class="input" name="notes" value="1"> {% translate "Include my notes" %}</label>
+          <button type="submit" class="btn">{% icon "download" %}{% translate "Download" %}</button>
+        </form>
+      </div>
     </div>
 
   </div>
@@ -415,14 +433,12 @@
           {% translate "Nobody recorded here yet." %}
         </c-empty>
       {% endif %}
-      {% comment %} What is held here as cards (#660): the people, and the company itself. {% endcomment %}
+      {% comment %} What is held here as cards (#660): the people. The company itself is exported from the buttons at the top (#851). {% endcomment %}
       <div class="mt-4 flex flex-col gap-3" data-vcards>
         {% if contacts %}
           {% url 'jobs:company_contacts_vcard' company.pk as people_url %}
           <c-vcard-download :url="people_url" label="{% translate 'Download these people as a vCard' %}" notes />
         {% endif %}
-        {% url 'jobs:company_vcard' company.pk as company_url %}
-        <c-vcard-download :url="company_url" label="{% translate 'Download the company as a vCard' %}" notes />
       </div>
     </aside>
   </div>

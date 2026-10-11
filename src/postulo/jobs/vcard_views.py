@@ -63,6 +63,37 @@ class CompanyVCardView(LoginRequiredMixin, View):
         return _download(vcard.card_to_text(card), f"postulo-company-{company.pk}.vcf")
 
 
+class CompanyExportView(LoginRequiredMixin, View):
+    """One company as a file in the format asked for: ``?format=vcard`` or ``json`` (#851).
+
+    The page's *Export* popover submits here. Both are the writers the whole set uses, narrowed
+    to the one company; the person's notes leave only when ``notes=1`` says so, as they do from
+    the vCard buttons.
+    """
+
+    def get(self, request: HttpRequest, pk: int) -> HttpResponse:
+        from django.http import JsonResponse
+
+        from postulo.core import kind_files
+
+        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        notes = _with_notes(request)
+        if request.GET.get("format") == "json":
+            response = JsonResponse(
+                kind_files.build_document(
+                    request.user, "companies", only=[company.pk], notes=notes
+                ),
+                json_dumps_params={"ensure_ascii": False, "indent": 2},
+            )
+            response["Content-Disposition"] = content_disposition_header(
+                True, f"postulo-company-{company.pk}.json"
+            )
+            response["Cache-Control"] = "private, max-age=0, no-store"
+            return response
+        card = vcards.card_for_company(company, notes=notes)
+        return _download(vcard.card_to_text(card), f"postulo-company-{company.pk}.vcf")
+
+
 class AllContactsVCardView(LoginRequiredMixin, View):
     def get(self, request: HttpRequest) -> HttpResponse:
         contacts = vcards.contacts_of(Contact.objects.for_user(request.user))

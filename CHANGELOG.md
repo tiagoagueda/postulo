@@ -105,6 +105,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A company's page groups Edit, Merge, Export and Delete with icons, and Export offers the company as a vCard or as JSON, with or without your notes (#851)
 - A plugin can place a dated calendar entry that belongs to no application (add_reminder, idempotent by uid, never unticks) and end it (retire_reminder); removing the plugin retires its entries (#887)
 - A connected plugin may offer up to six https links on its connection's card (an optional links method), drawn as external links (#889)
 - A company's identifiers are badges with the scheme's mark or icon, and a setting chooses icon and label, icon only or label only (#855)

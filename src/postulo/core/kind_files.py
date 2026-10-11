@@ -260,8 +260,21 @@ _ROW = {
 }
 
 
-def build_document(user, kind: str) -> dict:
-    """One kind of record belonging to ``user``, as a document of its own."""
+def build_document(user, kind: str, *, only=None, notes: bool = True) -> dict:
+    """One kind of record belonging to ``user``, as a document of its own.
+
+    ``only`` narrows it to those primary keys, which is how one company's file is the same
+    writer as the whole set's (#851). ``notes=False`` leaves the person's own notes out,
+    keeping the key so that the file still reads as a file of this kind.
+    """
+    records = _queryset(user, kind)
+    if only is not None:
+        records = records.filter(pk__in=only)
+    rows = [_ROW[kind](record) for record in records]
+    if not notes:
+        for row in rows:
+            if "notes" in row:
+                row["notes"] = ""
     return {
         "postulo": {
             f"{kind}_format": FORMATS[kind],
@@ -270,7 +283,7 @@ def build_document(user, kind: str) -> dict:
             "note": NOTES[kind]
             + " Identifiers are not written: a record is the same as another by what it says.",
         },
-        kind: [_ROW[kind](record) for record in _queryset(user, kind)],
+        kind: rows,
     }
 
 

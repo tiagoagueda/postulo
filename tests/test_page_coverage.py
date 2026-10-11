@@ -105,8 +105,12 @@ EXCUSED: dict[str, str] = {
         "bytes. The page that offers it, the contact's form, is walked (#660)"
     ),
     "jobs:company_vcard": (
-        "a company as a vCard file arriving as a download; the company's page, which offers "
-        "it, is walked (#660)"
+        "a company as a vCard file arriving as a download; kept as the address it has always "
+        "had, the company's page now offers `jobs:company_export` (#660, #851)"
+    ),
+    "jobs:company_export": (
+        "a company as a vCard or JSON file arriving as a download; the company's page, which "
+        "offers it, is walked (#851)"
     ),
     "jobs:company_contacts_vcard": (
         "a company's contacts as a vCard file arriving as a download; the company's page, "
