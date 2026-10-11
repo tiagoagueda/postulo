@@ -35,6 +35,7 @@ from django.db.models import F, Min
 from django.utils import formats, timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.core import weeks
 from postulo.jobs.models import Company, CompanyKind
 
 from . import endings
@@ -69,16 +70,12 @@ MIN_YEAR, MAX_YEAR = 1900, 2200
 
 
 def week_start(day: dt.date) -> dt.date:
-    """The first day of the week ``day`` falls in, for the locale in force.
+    """The first day of the week ``day`` falls in: the person's choice, else the locale's (#859).
 
     Not always a Monday. Django knows which day a week starts on in each language, and a
     report handed to somebody is laid out in their weeks rather than in ISO's.
     """
-    first = formats.get_format("FIRST_DAY_OF_WEEK")
-    try:
-        first = int(first)
-    except (TypeError, ValueError):
-        first = 1
+    first = weeks.first_day()
     return day - dt.timedelta(days=(day.isoweekday() % 7 - first % 7) % 7)
 
 

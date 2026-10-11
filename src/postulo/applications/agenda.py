@@ -641,6 +641,20 @@ class Page:
     #: shape, which draws its period and nothing else.
     overdue: list[Event] = field(default_factory=list)
     further: list[Event] = field(default_factory=list)
+    #: The person's two calendar choices (#859): the words on the period buttons, and the
+    #: weekday names in full. Set by `build`, which knows whose page it is.
+    labels: bool = True
+    long_weekdays: bool = False
+
+    @property
+    def weekday_pairs(self) -> list[tuple[str, str]]:
+        """(abbreviated, in full) for each column of the grid, in the grid's order."""
+        if not self.weeks:
+            return []
+        return [
+            (formats.date_format(day.date, "D"), formats.date_format(day.date, "l"))
+            for day in self.weeks[0]
+        ]
 
     @property
     def steps(self) -> dict[str, str]:
@@ -725,6 +739,16 @@ VIEW_LABELS = {
 
 
 def build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None) -> Page:
+    """The page for one view on one day, dressed in this person's calendar choices (#859)."""
+    page = _build(user, view, on, today=today, kinds=kinds)
+    profile = getattr(user, "profile", None)
+    if profile is not None:
+        page.labels = profile.calendar_labels
+        page.long_weekdays = profile.weekday_names == "long"
+    return page
+
+
+def _build(user, view: str, on: dt.date, *, today: dt.date | None = None, kinds=None) -> Page:
     today = today or timezone.localdate()
     view = view if view in VIEWS else DEFAULT_VIEW
     kinds = frozenset(kinds) if kinds else frozenset(ALL_KINDS)

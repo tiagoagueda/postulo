@@ -1252,8 +1252,25 @@ class AppearanceForm(forms.ModelForm):
         "density",
         "identifier_style",
         "button_labels",
+        "calendar_labels",
+        "weekday_names",
         "quiet_after_days",
         "closing_notice_days",
+    )
+
+    #: Radio buttons rather than a tick box, so that "chevrons only" is a choice that is drawn
+    #: and not the absence of one -- and so a form posted without it leaves it as it was (#859).
+    calendar_labels = forms.TypedChoiceField(
+        label=_("The calendar's period buttons"),
+        choices=(("True", _("Words and chevrons")), ("False", _("Chevrons only"))),
+        coerce=lambda value: value == "True",
+        empty_value=None,
+        required=False,
+        widget=forms.RadioSelect,
+        help_text=_(
+            "Previous, This month and Next. With chevrons only, the words are still the "
+            "buttons' names for a screen reader."
+        ),
     )
 
     class Meta:
@@ -1263,6 +1280,8 @@ class AppearanceForm(forms.ModelForm):
             "density",
             "identifier_style",
             "button_labels",
+            "calendar_labels",
+            "weekday_names",
             "quiet_after_days",
             "closing_notice_days",
         )
@@ -1271,6 +1290,7 @@ class AppearanceForm(forms.ModelForm):
             "density": forms.RadioSelect,
             "identifier_style": forms.RadioSelect,
             "button_labels": forms.RadioSelect,
+            "weekday_names": forms.RadioSelect,
         }
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
@@ -1278,6 +1298,7 @@ class AppearanceForm(forms.ModelForm):
             "density": _("How much room to leave"),
             "identifier_style": _("How a company's identifiers read"),
             "button_labels": _("How buttons read"),
+            "weekday_names": _("Weekday names on the calendar"),
         }
         help_texts = {
             # Under Appearance rather than Accessibility, by the rule #281 set: file a
@@ -1292,12 +1313,24 @@ class AppearanceForm(forms.ModelForm):
                 "On a company's page each identifier is a badge. With the icon only, the "
                 "label is a tooltip, and a screen reader still reads it."
             ),
+            "weekday_names": _(
+                "Abbreviated is Mon, Tue; in full is Monday, Tuesday. A narrow screen "
+                "keeps the abbreviation whichever you choose."
+            ),
             "button_labels": _(
                 "Buttons that have both an icon and words show both. With icons only the "
                 "words become a tooltip, and a screen reader still reads them; with labels "
                 "only the icons are left out. Buttons with words alone do not change."
             ),
         }
+
+    def clean_calendar_labels(self):
+        """Left out, as by a page drawn before the setting existed, it stays as it was (#859)."""
+        value = self.cleaned_data.get("calendar_labels")
+        return self.instance.calendar_labels if value is None else value
+
+    def clean_weekday_names(self):
+        return self.cleaned_data.get("weekday_names") or self.instance.weekday_names or "short"
 
     def clean_button_labels(self):
         """Left out, as by a page drawn before the setting existed, it stays as it was (#852)."""
@@ -1316,6 +1349,7 @@ class AppearanceForm(forms.ModelForm):
             "closing_notice_days",
             "identifier_style",
             "button_labels",
+            "weekday_names",
         ):
             if name in self.fields:
                 self.fields[name].required = False
@@ -1556,7 +1590,7 @@ class LocaleForm(forms.ModelForm):
 
     class Meta:
         model = Profile
-        fields = ("language", "time_zone")
+        fields = ("language", "time_zone", "first_weekday")
 
     def language_groups(self) -> list[dict]:
         """The language list, ready to render as rows inside a disclosure.
@@ -1693,6 +1727,24 @@ class LocaleForm(forms.ModelForm):
             choices=time_zone_choices,
             required=False,
             help_text=_("Every date and time on these pages is shown in it."),
+        )
+        # Beside the language whose default it overrides (#859). Numbered as Django numbers
+        # a week, 0 being Sunday; the names come from Django's own, in the language in force.
+        from django.utils.dates import WEEKDAYS
+
+        self.fields["first_weekday"] = forms.TypedChoiceField(
+            label=_("First day of the week"),
+            choices=[
+                ("", _("The language's usual")),
+                *((str(n), WEEKDAYS[(n - 1) % 7]) for n in range(7)),
+            ],
+            coerce=int,
+            empty_value=None,
+            required=False,
+            help_text=_(
+                "The calendar and the reports start their weeks on it. Left at the "
+                "language's usual, it follows the language you read Postulo in."
+            ),
         )
 
 

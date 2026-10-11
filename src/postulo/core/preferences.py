@@ -44,6 +44,12 @@ def apply(profile, request=None) -> None:
         # the whole request down; fall back to the instance default.
         timezone.deactivate()
 
+    # The first day of the week, held the same way and for the same reason: set on every call,
+    # so the previous visitor's choice is not the next one's (#859).
+    from . import weeks
+
+    weeks.choose(getattr(profile, "first_weekday", None) if profile else None)
+
     # A language an administrator has stopped offering is not applied, and the stored
     # value is left exactly where it is: withdrawing a language must not silently
     # rewrite a hundred people's settings, because it may be offered again tomorrow.

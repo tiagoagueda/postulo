@@ -164,9 +164,9 @@
      of the period, so one input serves every view and needs no script. {% endcomment %}
   <nav class="mb-4 flex flex-wrap items-center gap-3" aria-label="{% translate 'Period' %}" data-period>
     <div class="button-group" role="group" aria-label="{% translate 'Move the calendar' %}">
-      <a href="{{ page.earlier }}" class="btn" data-variant="outline" aria-label="{{ page.steps.previous }}" data-step="previous">{% icon "chevron-left" %}<span class="btn-label">{% translate "Previous" %}</span></a>
-      <a href="{{ page.today }}" class="btn" data-variant="outline" aria-label="{{ page.steps.today }}" data-step="today">{% icon "calendar-1" %}<span class="btn-label">{{ page.steps.today }}</span></a>
-      <a href="{{ page.later }}" class="btn" data-variant="outline" aria-label="{{ page.steps.next }}" data-step="next">{% icon "chevron-right" %}<span class="btn-label">{% translate "Next" %}</span></a>
+      <a href="{{ page.earlier }}" class="btn" data-variant="outline" aria-label="{{ page.steps.previous }}" data-step="previous">{% icon "chevron-left" %}<span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{% translate "Previous" %}</span></a>
+      <a href="{{ page.today }}" class="btn" data-variant="outline" aria-label="{{ page.steps.today }}" data-step="today">{% icon "calendar-1" %}<span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{{ page.steps.today }}</span></a>
+      <a href="{{ page.later }}" class="btn" data-variant="outline" aria-label="{{ page.steps.next }}" data-step="next">{% icon "chevron-right" %}<span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{% translate "Next" %}</span></a>
     </div>
     <h2 class="text-lg font-medium">
       <button type="button" class="btn text-lg" data-variant="ghost" popovertarget="calendar-picker" aria-haspopup="dialog"
@@ -252,8 +252,8 @@
         <caption class="sr-only">{{ page.title }}</caption>
         <thead>
           <tr>
-            {% for name in page.weekday_names %}
-              <th scope="col" class="px-2 py-2 text-start text-xs text-ink-500 dark:text-ink-400">{{ name }}</th>
+            {% for short, long in page.weekday_pairs %}
+              <th scope="col" class="px-2 py-2 text-start text-xs text-ink-500 dark:text-ink-400">{% if page.long_weekdays %}<span class="sm:hidden">{{ short }}</span><span class="hidden sm:inline">{{ long }}</span>{% else %}{{ short }}{% endif %}</th>
             {% endfor %}
           </tr>
         </thead>
@@ -320,7 +320,7 @@
         <section class="p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
           <div class="mb-2 flex items-center justify-between gap-1">
             <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="text-sm font-medium">
-              <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D" }} {{ day.date|date:"j" }}</a>
+              <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{% if page.long_weekdays %}<span class="sm:hidden">{{ day.date|date:"D" }}</span><span class="hidden sm:inline">{{ day.date|date:"l" }}</span>{% else %}{{ day.date|date:"D" }}{% endif %} {{ day.date|date:"j" }}</a>
             </h3>
             {% with on=day.date %}{% partial new_on_day %}{% endwith %}
           </div>

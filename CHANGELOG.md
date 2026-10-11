@@ -108,6 +108,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The calendar has three settings: words or only chevrons on its period buttons and abbreviated or full weekday names (Appearance), and the first day of the week (Language and time), which the week view, the month grid and the reports all follow (#859)
 - Import and Export are a button group beside the heading of the Calendar, Your details and Your career, from a registry of formats a plugin can add to (#862)
 - Appearance has a setting for buttons that carry an icon and words: both, icons only (the words become a tooltip) or labels only (#852)
 - A company's page groups Edit, Merge, Export and Delete with icons, and Export offers the company as a vCard or as JSON, with or without your notes (#851)

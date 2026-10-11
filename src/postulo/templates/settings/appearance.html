@@ -69,6 +69,36 @@
         </fieldset>
       </div>
       <div class="card mb-6">
+        {% comment %} The calendar's own two: the words on its period buttons, and the weekday
+           names (#859). The first day of the week is under Language and time. {% endcomment %}
+        <fieldset class="mb-6"{% if form.calendar_labels.aria_describedby %} aria-describedby="{{ form.calendar_labels.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.calendar_labels.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.calendar_labels.auto_id }}_helptext">{{ form.calendar_labels.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.calendar_labels|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.calendar_labels" errors-only /></div>
+        </fieldset>
+        <fieldset{% if form.weekday_names.aria_describedby %} aria-describedby="{{ form.weekday_names.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.weekday_names.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.weekday_names.auto_id }}_helptext">{{ form.weekday_names.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.weekday_names|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.weekday_names" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
         {% comment %} Whether buttons with an icon and words show both (#852). {% endcomment %}
         <fieldset{% if form.button_labels.aria_describedby %} aria-describedby="{{ form.button_labels.aria_describedby }}"{% endif %}>
           <legend class="label mb-1">{{ form.button_labels.label }}</legend>

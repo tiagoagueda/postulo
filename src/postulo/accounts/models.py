@@ -470,6 +470,24 @@ class Profile(models.Model):
         ),
         default="both",
     )
+    #: The calendar's period buttons show their words as well as the chevrons (#859). Off,
+    #: the words stay for a screen reader and the chevrons are all that is drawn.
+    calendar_labels = models.BooleanField(_("words on the calendar's buttons"), default=True)
+    #: Whether the calendar's weekday headings are abbreviated or in full (#859). A narrow
+    #: screen keeps the abbreviation whatever this says, because seven long names do not fit.
+    weekday_names = models.CharField(
+        _("weekday names"),
+        max_length=5,
+        choices=(("short", _("Abbreviated")), ("long", _("In full"))),
+        default="short",
+    )
+    #: The day a week starts on, 0 (Sunday) to 6; empty is the language's own (#859).
+    first_weekday = models.PositiveSmallIntegerField(
+        _("first day of the week"),
+        null=True,
+        blank=True,
+        validators=[MaxValueValidator(6)],
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.
