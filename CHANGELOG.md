@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The company form answers a made-up identifier id and another account's the same way, and a test holds it so (#759)
 - When a forwarder that is not in POSTULO_TRUSTED_PROXIES has been barred for wrong tokens, the log now says so once an hour and names the setting, since everyone behind it shares one allowance (#757)
 - Postulo's own rate limits are counted in a file store beside the data, outside the request's transaction, so a charge survives a view that raises after spending it (POSTULO_RATELIMIT_DIR) (#756)
 - The database cache that holds the rate limits and the sign-in lockout keeps 200,000 entries instead of 300, so an outsider cannot push a counter out by making the cache grow (POSTULO_CACHE_MAX_ENTRIES) (#755)
