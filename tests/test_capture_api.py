@@ -17,6 +17,7 @@ from postulo.api.api import CaptureIn
 from postulo.api.models import ApiToken
 from postulo.applications.models import Application
 from postulo.jobs.models import Capture, CaptureStatus
+from tests.recently import signed_in_recently
 
 POSTING = {
     "@context": "https://schema.org/",
@@ -69,7 +70,7 @@ def test_a_token_identifies_its_owner(client, bearer, user):
     response = client.get("/api/v1/me", **bearer)
 
     assert response.status_code == 200
-    assert response.json()["owner"] == user.email
+    assert response.json()["owner"] == "", "a captures-only token is not told whose it is (#762)"
 
 
 @pytest.mark.parametrize("header", [{}, {"HTTP_AUTHORIZATION": "Bearer nonsense"}])
@@ -560,7 +561,7 @@ def test_another_accounts_token_is_not_listed(client, user, other_user):
 
 
 def test_a_token_is_shown_once_and_then_never_again(client, user):
-    client.force_login(user)
+    signed_in_recently(client, user)
 
     made = client.post(reverse("api:token_create"), {"name": "Laptop", "scopes": ["captures"]})
     afterwards = client.get(reverse("api:token_list"))
@@ -590,7 +591,7 @@ def test_a_new_tokens_secret_never_reaches_the_session_table(client, user, monke
         return issued[-1]
 
     monkeypatch.setattr(ApiToken, "issue", remembered)
-    client.force_login(user)
+    signed_in_recently(client, user)
 
     client.post(reverse("api:token_create"), {"name": "Laptop", "scopes": ["captures"]})
 

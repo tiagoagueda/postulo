@@ -512,6 +512,9 @@ POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
 # taken username says so, which is how a name is found out; the sign-up form is bounded by
 # allauth's per-address limit and cannot be bounded per account, there being none yet.
 POSTULO_USERNAME_RATE = env("POSTULO_USERNAME_RATE", default="10/h")
+# API tokens one account may make in an hour (#764). Each is a way in with no password and no
+# second factor; making a handful an hour is a person, making fifty is not.
+POSTULO_API_TOKEN_RATE = env("POSTULO_API_TOKEN_RATE", default="10/h")
 # Tests of a connection, and of the instance's mail settings, one account may run in an
 # hour. Each is a real message or a real request at a press of a button, and the button
 # had no bound at all (#232).

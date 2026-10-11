@@ -17,6 +17,14 @@
       </c-slot>
     </c-page-title>
 
+    <p class="mb-4 text-sm text-ink-600 dark:text-ink-300" data-live-tokens>
+      {% blocktranslate count counter=live_tokens trimmed %}
+        One token is good for something right now.
+      {% plural %}
+        {{ counter }} tokens are good for something right now.
+      {% endblocktranslate %}
+    </p>
+
     {% if new_token %}
       <div class="alert mb-6 flex-col items-start" data-variant="success">
         <p class="mb-2 font-medium">{% translate "Copy this now" %}</p>

@@ -11,6 +11,7 @@ from postulo.api.models import SCOPES, ApiToken
 from postulo.applications.models import Application, Reminder, Status
 from postulo.documents.models import CV, CoverLetter, UploadedDocument
 from postulo.jobs.models import Company, Contact, Industry, JobPosting
+from tests.recently import signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -511,7 +512,7 @@ def test_reading_the_schema_is_not_using_the_api(client, user):
 def test_tokens_are_made_with_scopes_and_expiry_from_settings(client, user):
     from django.urls import reverse
 
-    client.force_login(user)
+    signed_in_recently(client, user)
     html = client.get(reverse("api:token_list")).content.decode()
     assert "API tokens" in html and 'name="scopes"' in html and 'name="expires"' in html
 

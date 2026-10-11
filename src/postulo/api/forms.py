@@ -29,7 +29,11 @@ class ApiTokenForm(forms.Form):
         widget=forms.CheckboxSelectMultiple,
         initial=["captures"],
     )
-    expires = forms.ChoiceField(label=_("Expires"), choices=EXPIRY_CHOICES, required=False)
+    #: A year unless the person says otherwise (#764): a token that never expires is the one
+    #: nobody remembers to revoke. "Never" is still a choice, no longer the one made for them.
+    expires = forms.ChoiceField(
+        label=_("Expires"), choices=EXPIRY_CHOICES, required=False, initial="365"
+    )
 
     def __init__(self, *args, user=None, **kwargs):
         self.user = user

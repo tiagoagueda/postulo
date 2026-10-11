@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Making an API token asks for a recent sign-in, starts on a one-year expiry instead of never, is limited to ten an hour, and the page says how many are live (POSTULO_API_TOKEN_RATE) (#764)
 - Replaying an external_id no longer reads a listing's history entry back to a token that may only bind: another writer's text is left out of the answer (#763)
 - GET /me no longer tells a token that only holds captures whose account it belongs to; a token that may read still sees the address (#762)
 - A token that holds only captures sees the title, dates and review link of what is waiting, not its address, company, location or source, unless it also holds read (#761)
