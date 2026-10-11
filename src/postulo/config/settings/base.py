@@ -478,6 +478,10 @@ POSTULO_RECOVERY_RATE = env("POSTULO_RECOVERY_RATE", default="10/h")
 # hour. Each is a real message or a real request at a press of a button, and the button
 # had no bound at all (#232).
 POSTULO_CONNECTION_TEST_RATE = env("POSTULO_CONNECTION_TEST_RATE", default="10/h")
+# *Sync now* presses of one account in an hour (#786). Each runs a sync inline, which is a run of
+# real requests to somebody's server; the scheduler runs a connection at most every fifteen
+# minutes, so the button is for the odd moment and not for a loop.
+POSTULO_CONNECTION_SYNC_RATE = env("POSTULO_CONNECTION_SYNC_RATE", default="20/h")
 # What the skill box asks for as somebody types, per account (#266): names from the ESCO
 # classification beginning with what has been typed. A request at each pause in typing is a
 # handful a skill, so six hundred an hour is a long afternoon of writing a career down, and

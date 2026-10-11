@@ -509,6 +509,25 @@ class ConnectionSyncNowView(OwnedObjectMixin, View):
         connection = get_object_or_404(self.get_queryset(), pk=pk)
         if refused := _switched_off(request, connection):
             return refused
+        from postulo.core import throttle
+
+        # A run is a series of real requests to somebody's server, made at a press of a button,
+        # and the scheduler's own fifteen minutes between runs did not apply to it (#786).
+        try:
+            throttle.consume(
+                "connection-sync", request.user, throttle.rate_for("POSTULO_CONNECTION_SYNC_RATE")
+            )
+        except throttle.TooOften as too_often:
+            messages.error(
+                request,
+                ngettext(
+                    "That is a lot of syncs. Try again in %(seconds)d second.",
+                    "That is a lot of syncs. Try again in %(seconds)d seconds.",
+                    too_often.retry_after,
+                )
+                % {"seconds": too_often.retry_after},
+            )
+            return redirect("connections:list")
         report = sync_connection(connection)
         if report.already_running:
             messages.info(request, report.notes[0])

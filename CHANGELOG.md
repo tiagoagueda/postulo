@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Sync now is limited per account (POSTULO_CONNECTION_SYNC_RATE, 20 an hour), as Test is (#786)
 - The built-in local store can no longer be connected by hand through its create address, and a connection to it never gets copies (#785)
 - A plugin's .pth files are never run at start-up and a wheel that ships one is refused, so switching a plugin off stops its code (#784)
 - A signed catalogue index may carry a rising serial and an expiry, and an index past its expiry or older than one already seen is refused, so an old signed index cannot be replayed (#783)
