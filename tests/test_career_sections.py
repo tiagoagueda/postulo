@@ -78,7 +78,7 @@ def test_the_settings_sidebar_still_marks_its_page(client, user):
 
 
 def test_the_label_over_the_list_is_the_hook_and_keeps_its_text(client, user):
-    """The script swaps the label for the section's title; without it the text stays (#677)."""
+    """The script swaps the label for the page's name; without it the text stays (#869)."""
     html = the_page(client, user)
     label = re.search(r"<p[^>]*data-section-label[^>]*>(.*?)</p>", html, re.S)
     assert label and label.group(1).strip() == "On this page"

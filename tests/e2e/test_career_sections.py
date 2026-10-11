@@ -52,21 +52,24 @@ def label_text(page: Page) -> str:
     return page.locator("[data-section-label]").inner_text().strip()
 
 
-@pytest.mark.parametrize("address", ["/career/", "/accounts/profile/"])
-def test_the_label_names_the_section_once_its_title_is_behind_the_masthead(
+@pytest.mark.parametrize(
+    ("address", "name"), [("/career/", "Your career"), ("/accounts/profile/", "Your details")]
+)
+def test_the_label_names_the_page_once_its_heading_is_behind_the_masthead(
     live_server,
     page: Page,
     furnished,  # noqa: F811
     applicant,
     address,
+    name,
 ):
-    """The label says *On this page* until the section's title scrolls away, then that
-    title, and the text again on the way back (#677)."""
+    """The label says *On this page* until the page's heading scrolls away, then the page's
+    name, larger and as a title, whichever section is being read, and the text again on the
+    way back (#869, which replaced the section's title of #677)."""
     import datetime as dt
 
     from postulo.resume.models import Experience
 
-    # A section several screens long, which is what the label is for.
     for year in range(2000, 2012):
         Experience.objects.create(
             owner=applicant,
@@ -78,29 +81,40 @@ def test_the_label_names_the_section_once_its_title_is_behind_the_masthead(
     page.set_viewport_size({"width": 1280, "height": 500})
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}{address}")
-    expect(page.locator("[data-section-label]")).to_have_text("On this page")
+    label = page.locator("[data-section-label]")
+    expect(label).to_have_text("On this page")
     assert page.locator("[data-section-label][aria-live]").count() == 0
+    small = page.evaluate(
+        "(el) => parseFloat(getComputedStyle(el).fontSize)", label.element_handle()
+    )
 
-    # Somewhere inside a section, its title gone behind the masthead.
+    heading = page.locator("main h1").first
+    bottom = page.evaluate(
+        "(el) => el.getBoundingClientRect().bottom + window.scrollY", heading.element_handle()
+    )
     header = page.locator("header").first.bounding_box()["height"]
-    # The first section tall enough that, a few pixels past its title, it is still the one
-    # being read: its top above the reading line two-fifths down, and the next one below it.
-    tallest = page.evaluate(
-        """() => [...document.querySelectorAll("[data-section-link]")]
-            .map((link) => document.getElementById(link.dataset.sectionLink))
-            .filter(Boolean)
-            .find((section) => section.offsetHeight > 220).id"""
+    page.evaluate(f"window.scrollTo(0, {bottom - header + 4})")
+    expect(label).to_have_text(name)
+    large = page.evaluate(
+        "(el) => parseFloat(getComputedStyle(el).fontSize)", label.element_handle()
     )
-    section = page.locator(f"#{tallest}")
-    title = section.locator("h2, legend").first
-    top = page.evaluate(
-        "(el) => el.getBoundingClientRect().bottom + window.scrollY", title.element_handle()
+    assert large > small, "the page's name is drawn larger than the hint was"
+
+    # Deep in a section it is still the page's name, not the section's.
+    page.evaluate(
+        """() => document.getElementById(
+            document.querySelectorAll("[data-section-link]")[2].dataset.sectionLink
+        ).scrollIntoView()"""
     )
-    page.evaluate(f"window.scrollTo(0, {top - header + 4})")
-    expect(page.locator("[data-section-label]")).to_have_text(title.inner_text().strip())
+    page.evaluate("window.scrollBy(0, 100)")
+    expect(label).to_have_text(name)
 
     page.evaluate("window.scrollTo(0, 0)")
-    expect(page.locator("[data-section-label]")).to_have_text("On this page")
+    expect(label).to_have_text("On this page")
+    assert (
+        page.evaluate("(el) => parseFloat(getComputedStyle(el).fontSize)", label.element_handle())
+        == small
+    )
 
 
 def test_on_a_phone_the_label_stays_as_it_is(live_server, page: Page, furnished):  # noqa: F811

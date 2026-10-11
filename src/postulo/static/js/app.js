@@ -6305,10 +6305,12 @@
    * and the person who scrolled to it is looking at it. Without this the list still
    * navigates; it only stops saying where you are.
    *
-   * The label over the list says "On this page" until the title of the section being
-   * read has scrolled behind the masthead, and then says that title, so somebody deep in
-   * a long section still sees which one it is (#677). Only from `lg` up, where the list
-   * stays in view; the text it puts back is the template's, so nothing English is here.
+   * The label over the list says "On this page" until the page's own heading has scrolled
+   * behind the masthead, and then names the page, larger, as a title: the list already
+   * marks the section being read, so the label says where that list is (#869; it said the
+   * section's title in #677). Only from `lg` up, where the list stays in view; the text
+   * it puts back and the classes it takes on are the template's, so nothing English is
+   * here.
    */
   (function () {
     var links = document.querySelectorAll("[data-section-link]");
@@ -6327,6 +6329,9 @@
     }
     var label = document.querySelector("[data-section-label]");
     var original = label ? label.textContent : "";
+    var originalClass = label ? label.className : "";
+    var awayClass = label ? label.getAttribute("data-away-class") : "";
+    var heading = document.querySelector("main h1");
     var wide = window.matchMedia("(min-width: 64rem)");
     var scheduled = false;
     function mark() {
@@ -6355,11 +6360,14 @@
         }
       });
       if (label) {
-        var title = current.querySelector("h2, legend");
-        var away = wide.matches && title && title.getBoundingClientRect().bottom <= covered;
-        var wanted = away ? title.textContent.trim() : original;
+        var away = wide.matches && heading && heading.getBoundingClientRect().bottom <= covered;
+        var wanted = away ? heading.textContent.trim() : original;
         if (label.textContent !== wanted) {
           label.textContent = wanted;
+        }
+        var wantedClass = away && awayClass ? awayClass : originalClass;
+        if (label.className !== wantedClass) {
+          label.className = wantedClass;
         }
       }
     }
