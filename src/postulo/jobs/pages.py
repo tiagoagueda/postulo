@@ -335,6 +335,11 @@ def _claim_rendering(
     and the row takes it only where the rendering is still empty: made with it when there is
     no row yet, which the unique capture column settles, or updated where it is blank. The
     loser's file is taken back at once.
+
+    **And a check after the write** (#776): the account's room was read before the bytes were
+    taken and nothing serialised it against the other requests, so the total is counted again
+    once this rendering is the row's, and a rendering that took the account past its cap is
+    given back with a refusal.
     """
     blank = CapturedPage(owner_id=capture.owner_id, capture_id=capture.pk)
     blank.rendering.save(_name(capture, EXTENSIONS[kind]), content, save=False)
@@ -362,6 +367,14 @@ def _claim_rendering(
         storage.delete(stored)
     page.refresh_from_db()
     capture.page = page
+    if claimed and weight_of(capture.owner) > site.capture_account_max_bytes():
+        # The room was read before the bytes were taken, and nothing held the account still
+        # meanwhile: requests that arrived together all found room. Counted again now that the
+        # row is there, and the one that tips the account over takes its rendering back (#776).
+        # More than one may, if they tip it together; the person's client sends again, and
+        # nothing stays past the cap.
+        forget(page, source=False)
+        raise _no_room()
     return page, claimed
 
 
