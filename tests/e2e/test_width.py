@@ -517,3 +517,22 @@ def test_nothing_changed_here_scrolls_sideways_on_a_phone(
         page.goto(f"{live_server.url}{path}")
         result = page.evaluate(SCROLLS_SIDEWAYS)
         assert not result["reached"], f"{path} scrolls {result['reached']}px sideways at 320"
+
+
+# ---------------------------------------------------------------- Your career
+
+
+def test_your_career_takes_the_screen_and_keeps_a_measure_for_its_prose(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """The page is uncapped like Your details, and its sections stop at the measure of
+    prose at the start edge of the column beside the sidebar (#872)."""
+    page.set_viewport_size({"width": WIDE, "height": 1200})
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/career/")
+
+    assert width_of(page, "main") > 2400, "Your career is still in a 1280px column"
+    assert width_of(page, "#section-experience") <= 896 + 1, "a paragraph keeps its measure"
+    assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"]

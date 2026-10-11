@@ -46,6 +46,8 @@ WIDE = [
     "/documents/files/",
     # A frame with a sidebar is a grid at the top level, whatever the page inside it (#198).
     "/accounts/profile/",
+    # And Your career, whose sections keep the measure of prose on their own column (#872).
+    "/career/",
     "/settings/appearance/",
     "/export/",
     # Five that were lists or grids and kept the measure anyway (#273).
@@ -65,7 +67,6 @@ WIDE = [
 MEASURED = [
     "/applications/new/",
     "/documents/letters/new/",
-    "/career/",
     # Three cards that could sit two by two, but two of its 768-pixel columns need a window
     # of 1592, above `2xl`; at 1536 each would be 740, narrower than the one it has (#320).
     "/listings/new/",

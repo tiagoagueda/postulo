@@ -27,6 +27,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Your career takes the whole screen like Your details, its sections keeping the measure of prose (#872)
 - The sidebar's label on Your details and Your career names the page, larger, once its heading has scrolled behind the masthead, in place of the section's title (#869)
 - Social-profile and repository rows draw the service's own brand mark where Postulo ships one, in the row and in the list of services (#867)
 - A contact row reads star, type, boxes, bin on one line, and a postal address carries its star and bin on the line of its type (#866)

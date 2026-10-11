@@ -2,6 +2,8 @@
 {% load i18n postulo %}
 
 {% block title %}{% translate "Your career" %}{% endblock %}
+{# A frame with a sidebar, like Your details: this page empties `main_width` and takes the whole screen (#872). #}
+{% block main_width %}{% endblock %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
@@ -40,7 +42,9 @@
       </p>
       {% sidebar section_nav _("Career sections") %}
     </aside>
-    <div class="min-w-0 flex-1 space-y-8">
+    {% comment %} The page takes the screen, and the sections keep the measure of prose: an
+         entry's description is a paragraph, and a wide page is not a wide paragraph (#872). {% endcomment %}
+    <div class="min-w-0 max-w-4xl flex-1 space-y-8">
       {% for section in sections %}
         <section id="section-{{ section.spec.slug }}">
           <div class="mb-3 flex items-center gap-3">
