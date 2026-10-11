@@ -360,3 +360,22 @@ def test_server_settings_show_the_provider_and_the_callback(client, configured):
     assert 'data-sso="on"' in html and "Authentik" in html
     assert "/accounts/sso/oidc/login/callback/" in html
     assert "existing accounts only" in html
+
+
+def test_a_bound_invitation_is_for_its_address_on_the_provider_path_too(rf, configured, user):
+    from postulo.accounts.adapter import INVITE_SESSION_KEY
+
+    staff = User.objects.create_user(email="s2@example.org", password=PASSWORD, is_staff=True)
+    invite = Invite.objects.create(created_by=staff, email="wanted@example.org")
+    request = a_request(rf)
+    request.session[INVITE_SESSION_KEY] = invite.token_fingerprint
+    adapter = SocialAccountAdapter()
+
+    assert adapter.is_open_for_signup(request, social_login("gatecrasher@example.org")) is False
+    assert (
+        adapter.is_open_for_signup(request, social_login("wanted@example.org", verified=False))
+        is False
+    )
+    assert adapter.is_open_for_signup(request, social_login("Wanted@Example.org")) is True
+    invite.refresh_from_db()
+    assert invite.accepted_at is None, "refusing does not spend it"

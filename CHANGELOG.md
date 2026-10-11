@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Single sign-on no longer spends an invitation addressed to somebody else: the provider's verified address has to be the one it names (#736)
 - The archive import charges its phone-number lookups to the allowance, and once it is spent skips free and held numbers alike in one line (#890)
 - Backup archives are signed with a MAC under the instance's key, with a digest of every media and plugin file, and a restore refuses one that does not check out, or restores it without its plugins directory, unless told otherwise (#772)
 - Sync now is limited per account (POSTULO_CONNECTION_SYNC_RATE, 20 an hour), as Test is (#786)

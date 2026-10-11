@@ -59,7 +59,20 @@ class SocialAccountAdapter(DefaultSocialAccountAdapter):
             return True
         if site.signup_open_now():
             return True
-        return pending_invite(request) is not None
+        invite = pending_invite(request)
+        if invite is None:
+            return False
+        # An invitation addressed to somebody is for that address (#736). On the form
+        # `AccountAdapter.clean_email` holds the line; here no form is shown, so the provider's
+        # verified address has to be the one the invitation names, or anyone holding the link
+        # and an identity at the provider spends it for somebody else.
+        if invite.email:
+            wanted = invite.email.casefold()
+            return any(
+                address.verified and address.email.casefold() == wanted
+                for address in sociallogin.email_addresses
+            )
+        return True
 
     def can_authenticate_by_email(self, sociallogin, email: str) -> bool:
         """Whether a verified address from the provider signs somebody into that account.
