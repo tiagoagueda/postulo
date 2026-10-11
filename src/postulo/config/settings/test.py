@@ -66,6 +66,9 @@ CACHES = {
         "OPTIONS": {"MAX_ENTRIES": POSTULO_CACHE_MAX_ENTRIES},
     }
 }
+# The allowances share the test database's cache table, so a test that clears the default cache
+# starts every allowance afresh, and the rollback between tests undoes what a test spent.
+CACHES["ratelimit"] = dict(CACHES["default"])
 POSTULO_BACKGROUND_WORK = False
 
 # WhiteNoise warns about a missing static root; give it a real, empty directory.

@@ -203,6 +203,21 @@ POSTULO_CACHE_MAX_ENTRIES = env.int("POSTULO_CACHE_MAX_ENTRIES", default=200_000
 if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
     CACHES["default"].setdefault("OPTIONS", {}).setdefault("MAX_ENTRIES", POSTULO_CACHE_MAX_ENTRIES)
 
+# Where Postulo's own allowances (`core.throttle`) are counted (#756). In the database cache a
+# counter is a row in the request's own transaction (ATOMIC_REQUESTS), so a charge made before
+# a view raised -- a 404, a refused permission -- was rolled back with everything else, and the
+# allowance it was meant to spend was not spent. A file store beside the data is shared by every
+# worker and container on the volume, survives a restart, and belongs to no transaction. With
+# Redis or Memcached for the default cache, that is what counts, as before.
+if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
+    CACHES["ratelimit"] = {
+        "BACKEND": "django.core.cache.backends.filebased.FileBasedCache",
+        "LOCATION": str(env.path("POSTULO_RATELIMIT_DIR", default=REPO_DIR / "data" / "ratelimit")),
+        "OPTIONS": {"MAX_ENTRIES": POSTULO_CACHE_MAX_ENTRIES},
+    }
+else:
+    CACHES["ratelimit"] = dict(CACHES["default"])
+
 # Widgets are rendered by the project's own template engine rather than by a private one
 # of Django's, so a widget template can live beside every other template. The phone field
 # needs it: it is two controls in one, and building that markup as a string in Python

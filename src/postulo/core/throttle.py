@@ -31,7 +31,7 @@ import time
 from dataclasses import dataclass
 
 from django.conf import settings
-from django.core.cache import cache
+from django.core.cache import caches
 from django.utils.translation import ngettext
 
 #: `20/h`, `5/m`, `600/d`. Empty, `0` or anything unparseable means no limit, because an
@@ -92,6 +92,11 @@ class TooOften(Exception):
         )
 
 
+def _store():
+    """The cache allowances are counted in: outside any request's transaction (#756)."""
+    return caches["ratelimit"]
+
+
 def _now() -> float:
     """The clock, behind a seam.
 
@@ -122,13 +127,13 @@ def consume(action: str, who: object, rate: Rate) -> None:
     # `add` only sets when the key is absent, so the first request of a window creates it
     # and the rest increment. `incr` raises when the key expired between the two, which is
     # a window boundary and means this request is the first of the next one.
-    if cache.add(key, 1, timeout=rate.seconds):
+    if _store().add(key, 1, timeout=rate.seconds):
         used = 1
     else:
         try:
-            used = cache.incr(key)
+            used = _store().incr(key)
         except ValueError:
-            cache.set(key, 1, timeout=rate.seconds)
+            _store().set(key, 1, timeout=rate.seconds)
             used = 1
         else:
             # Django's generic `incr` (the database cache, the file cache) is a get and a
@@ -137,7 +142,7 @@ def consume(action: str, who: object, rate: Rate) -> None:
             # its hour, and every limit longer than that was really "per five minutes of
             # quiet" (#734). Put the expiry back to the end of the window. Redis and
             # memcached increment in place and keep it, and touching them is harmless.
-            cache.touch(key, max(1, rate.seconds - int(_now()) % rate.seconds))
+            _store().touch(key, max(1, rate.seconds - int(_now()) % rate.seconds))
 
     if used > rate.times:
         elapsed = int(_now()) % rate.seconds
@@ -153,7 +158,7 @@ def spent(action: str, who: object, rate: Rate) -> int:
     """
     if not rate:
         return 0
-    if cache.get(_key(action, who, rate), 0) < rate.times:
+    if _store().get(_key(action, who, rate), 0) < rate.times:
         return 0
     elapsed = int(_now()) % rate.seconds
     return max(1, rate.seconds - elapsed)
@@ -204,7 +209,7 @@ def barred(name: str, request) -> None:
     Asked before the token is read, so that an address which has been guessing is refused
     whatever it presents for the rest of the window, a lucky guess included.
     """
-    used = cache.get(_key(f"endpoint-refused:{name}", _caller(request), REFUSED), 0)
+    used = _store().get(_key(f"endpoint-refused:{name}", _caller(request), REFUSED), 0)
     if used > REFUSED.times:
         elapsed = int(_now()) % REFUSED.seconds
         raise TooOften(REFUSED, retry_after=max(1, REFUSED.seconds - elapsed))

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Postulo's own rate limits are counted in a file store beside the data, outside the request's transaction, so a charge survives a view that raises after spending it (POSTULO_RATELIMIT_DIR) (#756)
 - The database cache that holds the rate limits and the sign-in lockout keeps 200,000 entries instead of 300, so an outsider cannot push a counter out by making the cache grow (POSTULO_CACHE_MAX_ENTRIES) (#755)
 - The shipped gunicorn access log no longer writes the secret in a recovery, invitation, password-reset or confirmation link, or the code in a consent callback (#754)
 - Signing out drops the browser's push subscription and unregisters its worker, so reminders stop arriving on a shared browser, and sign-out goes on at once where the browser has no worker (#753)
