@@ -69,7 +69,8 @@ def company_form_parts(page: Page) -> tuple[dict, dict, dict]:
     details = page.locator("main form .card").first.bounding_box()
     identifiers = page.locator("main form [data-identifiers]").bounding_box()
     # By its type rather than its name: the right-to-left test reads the page in Arabic.
-    save = page.locator('main form button[type="submit"]').first.bounding_box()
+    # The last: the logo dialog's own forms come before the form this is about (#853).
+    save = page.locator('main form button[type="submit"]').last.bounding_box()
     assert details and identifiers and save
     return details, identifiers, save
 

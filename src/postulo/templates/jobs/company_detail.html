@@ -59,8 +59,8 @@
       </div>
       {% comment %} Which format, and whether the notes go with it: a question asked before the
          file is made. A plain GET form in a popover, so it works with no script. {% endcomment %}
-      <div id="export-company" popover data-popover data-align="end" class="card w-72 p-4">
-        <form method="get" action="{% url 'jobs:company_export' company.pk %}" class="flex flex-col gap-3">
+      <div id="export-company" popover data-popover data-align="end" class="w-72">
+        <form method="get" action="{% url 'jobs:company_export' company.pk %}" class="flex flex-col gap-3 p-4">
           <fieldset class="flex flex-col gap-2">
             <legend class="label mb-1">{% translate "Format" %}</legend>
             <label class="flex items-center gap-2 text-sm"><input type="radio" class="input" name="format" value="vcard" checked> {% translate "vCard" %}</label>

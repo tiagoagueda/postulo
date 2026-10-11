@@ -172,8 +172,8 @@
       <button type="button" class="btn text-lg" data-variant="ghost" popovertarget="calendar-picker" aria-haspopup="dialog"
               aria-label="{% blocktranslate trimmed with period=page.title %}{{ period }}: choose another{% endblocktranslate %}">{{ page.title }}</button>
     </h2>
-    <div id="calendar-picker" popover data-popover data-align="start" class="card w-72 p-4">
-      <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3">
+    <div id="calendar-picker" popover data-popover data-align="start" class="w-72">
+      <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3 p-4">
         {% if page.view != "month" %}<input type="hidden" name="view" value="{{ page.view }}">{% endif %}
         {% if page.kinds_value %}<input type="hidden" name="kinds" value="{{ page.kinds_value }}">{% endif %}
         <div class="field">
@@ -186,9 +186,9 @@
     {% comment %} Four shapes of the same days (#861), now beside the period they change: month
        first, and the agenda for a phone, where a month grid is thirty-one cells of nothing.
        Links, so each is an address; the open one is filled and carries `aria-current`. {% endcomment %}
-    <div class="button-group ms-auto" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
+    <div class="button-group ms-auto max-sm:w-full" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
       {% for view, label, url, current in page.switcher %}
-        <a href="{{ url }}" class="btn" data-variant="{% if current %}primary{% else %}outline{% endif %}"
+        <a href="{{ url }}" class="btn max-sm:min-w-0 max-sm:flex-1 max-sm:px-1" data-variant="{% if current %}primary{% else %}outline{% endif %}"
            {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
       {% endfor %}
     </div>

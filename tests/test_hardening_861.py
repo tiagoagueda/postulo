@@ -20,7 +20,9 @@ def test_the_switch_is_in_the_period_row_aligned_to_the_end(client, user):
     html = page(client)
 
     nav = re.search(r"<nav[^>]*data-period.*?</nav>", html, re.S)[0]
-    views = re.search(r'<div class="button-group ms-auto"[^>]*data-views>(.*?)</div>', nav, re.S)[1]
+    views = re.search(
+        r'<div class="button-group ms-auto[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S
+    )[1]
     assert re.findall(r">\s*([A-Za-z]+)\s*</a>", views) == ["Month", "Week", "Day", "Agenda"]
     assert views.count('aria-current="page"') == 1
     assert 'aria-label="Calendar views"' in nav
