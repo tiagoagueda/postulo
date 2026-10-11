@@ -63,6 +63,7 @@ from django.forms import modelform_factory
 from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.dateparse import parse_datetime
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -98,7 +99,13 @@ def moved_on(obj, stamp: str) -> bool:
     browser sent something odd would be a worse failure than the one this prevents.
     """
     held = getattr(obj, "updated_at", None)
-    seen = parse_datetime(stamp) if stamp else None
+    try:
+        seen = parse_datetime(stamp) if stamp else None
+    except ValueError:  # well-formed but impossible: hour 25, month 13 (#769)
+        return False
+    if seen is not None and timezone.is_naive(seen):
+        # No zone to compare in: not a stamp this page wrote, and comparing it raised.
+        return False
     return bool(held and seen and held.replace(microsecond=0) > seen.replace(microsecond=0))
 
 

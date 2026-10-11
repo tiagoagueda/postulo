@@ -424,9 +424,13 @@ def _through_the_form(model, names: tuple[str, ...], row: dict) -> tuple[dict, l
     problems: list[str] = []
     for name in names:
         value = row.get(name)
-        if isinstance(value, list):
+        if isinstance(value, (list, dict, bool)):
             problems.append(_("%(field)s: this is not text.") % {"field": _label(model, name)})
             value = ""
+        elif isinstance(value, (int, float)):
+            # A bare number where text is expected: the form reads it as the text it spells,
+            # and says so if that is not a date or whatever the field is (#769).
+            value = str(value)
         elif value is None:
             model_field = model._meta.get_field(name)
             value = model_field.get_default() if model_field.has_default() else ""
@@ -993,7 +997,12 @@ def plan(user, held: dict) -> dict:
 def _moment(text):
     from django.utils.dateparse import parse_datetime
 
-    return parse_datetime(text) if isinstance(text, str) and text else None
+    if not (isinstance(text, str) and text):
+        return None
+    try:
+        return parse_datetime(text)
+    except ValueError:  # well-formed but impossible: hour 25, month 13 (#769)
+        return None
 
 
 @dataclass

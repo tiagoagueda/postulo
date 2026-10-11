@@ -861,6 +861,14 @@ class SendDocumentsForm(forms.Form):
         help_text=_("Leave it empty to send the text of the letter you chose."),
     )
 
+    def clean_subject(self) -> str:
+        """One line (#769): Django's mail refuses a subject with a line break as a bad header,
+        after the person's outbox allowance was spent, and the page answered 500."""
+        subject = self.cleaned_data.get("subject", "")
+        if "\n" in subject or "\r" in subject:
+            raise forms.ValidationError(_("The subject has to be one line."))
+        return subject
+
     def __init__(self, *args, user=None, application=None, **kwargs):
         self.user = user
         super().__init__(*args, **kwargs)
