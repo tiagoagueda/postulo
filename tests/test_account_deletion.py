@@ -32,6 +32,7 @@ from postulo.resume.models import (
     Publication,
     Reference,
 )
+from tests.recently import signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -297,7 +298,7 @@ def test_an_administrator_deletes_another_account_files_included(
     client, admin_only, person, django_capture_on_commit_callbacks
 ):
     files = fill(person)
-    client.force_login(admin_only)
+    signed_in_recently(client, admin_only)
     page = client.get(reverse("server:person_delete", args=[person.pk])).content.decode()
     assert "alex" in page and "Type the username" in page
 
@@ -319,7 +320,7 @@ def test_an_administrator_deletes_another_account_files_included(
 def test_an_administrator_cannot_delete_themselves_or_the_last_administrator_there(
     client, admin_only
 ):
-    client.force_login(admin_only)
+    signed_in_recently(client, admin_only)
     page = client.get(reverse("server:person_delete", args=[admin_only.pk])).content.decode()
     assert "from Settings" in page
     response = client.post(

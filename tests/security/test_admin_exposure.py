@@ -35,6 +35,7 @@ from django.test import override_settings
 from django.urls import NoReverseMatch, clear_url_caches, reverse
 
 # The code is made from the clock `pinned_clock` stands still, as in test_mfa.py (#719).
+from tests.recently import signed_in_recently
 from tests.test_mfa import current_code, pinned_clock  # noqa: F401
 
 pytestmark = [pytest.mark.django_db, pytest.mark.usefixtures("pinned_clock")]
@@ -381,7 +382,7 @@ def test_an_appointed_administrator_is_offered_nothing_in_the_admin(
         email="boss@example.org", username="boss", password=PASSWORD, is_staff=True
     )
     application = an_application(other_user)
-    client.force_login(boss)
+    signed_in_recently(client, boss)
 
     client.post(reverse("server:person_admin", args=[user.pk]))
     user.refresh_from_db()

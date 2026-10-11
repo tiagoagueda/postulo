@@ -26,6 +26,7 @@ from django.utils import timezone
 from postulo.accounts import recovery
 from postulo.accounts.models import RecoveryLink
 from postulo.notifications import transport
+from tests.recently import signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -242,7 +243,7 @@ def test_only_an_administrator_may_issue_one(client, person):
 
 
 def test_the_link_is_shown_once(client, admin, person):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     made = client.post(reverse("server:person_recovery", args=[person.pk]))
     again = client.get(reverse("server:person_recovery", args=[person.pk]))
@@ -252,7 +253,7 @@ def test_the_link_is_shown_once(client, admin, person):
 
 
 def test_the_page_lists_what_became_of_them(client, admin, person):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     client.post(reverse("server:person_recovery", args=[person.pk]))
 
     html = client.get(reverse("server:person_recovery", args=[person.pk])).content.decode()
@@ -262,7 +263,7 @@ def test_the_page_lists_what_became_of_them(client, admin, person):
 
 
 def test_an_administrator_can_stop_one_working(client, admin, person):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     _link, token = recovery.issue(person, by=admin)
 
     client.post(reverse("server:person_recovery", args=[person.pk]), {"revoke": "1"})
@@ -272,7 +273,7 @@ def test_an_administrator_can_stop_one_working(client, admin, person):
 
 
 def test_the_page_says_a_link_for_yourself_is_not_a_way_back_in(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     html = client.get(reverse("server:person_recovery", args=[admin.pk])).content.decode()
 
@@ -282,7 +283,7 @@ def test_the_page_says_a_link_for_yourself_is_not_a_way_back_in(client, admin):
 @override_settings(POSTULO_RECOVERY_RATE="2/h")
 def test_issuing_is_bounded(client, admin, person):
     """Each one is a whole account in a URL, so a compromised session cannot mint fifty."""
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     for _ in range(2):
         client.post(reverse("server:person_recovery", args=[person.pk]))
 

@@ -12,6 +12,7 @@ from postulo.accounts.models import Profile
 from postulo.core import site
 from postulo.core.models import SiteSettings
 from postulo.core.server_sections import SECTIONS
+from tests.recently import signed_in_recently
 
 pytestmark = pytest.mark.django_db
 
@@ -57,7 +58,7 @@ def test_every_section_is_for_administrators_only(client, user, url_name):
 @pytest.mark.parametrize("url_name", ["server:overview", "settings:index"])
 def test_the_sidebar_stays_in_view_and_never_runs_past_the_window(client, admin, url_name):
     """Sticky under the masthead from `lg` up, capped at the window's height (#699)."""
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse(url_name), follow=True).content.decode()
     aside = re.search(r"<aside[^>]*data-sidebar-frame[^>]*>", html)
 
@@ -80,14 +81,14 @@ def test_the_status_never_says_whether_an_account_exists(client, user, other_use
     client.force_login(user)
     assert client.get(present).status_code == client.get(missing).status_code == 403
     assert client.post(present).status_code == client.post(missing).status_code == 403
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     assert client.get(present).status_code == 200
     assert client.get(missing).status_code == 404
 
 
 @pytest.mark.parametrize("url_name", SECTION_URLS)
 def test_every_section_renders_inside_the_sidebar(client, admin, url_name):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.get(reverse(url_name))
     assert response.status_code == 200
     html = response.content.decode()
@@ -102,7 +103,7 @@ def test_every_section_renders_inside_the_sidebar(client, admin, url_name):
 )
 def test_the_person_pages_mark_the_people_entry_as_current(client, admin, other_user, url_name):
     """The four pages for one account sit under People, and say so (#486)."""
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.get(reverse(f"server:{url_name}", kwargs={"pk": other_user.pk}))
     assert response.status_code == 200
     html = response.content.decode()
@@ -118,7 +119,7 @@ def test_the_menu_shows_server_settings_to_administrators_only(client, user, adm
     html = client.get(reverse("core:home")).content.decode()
     assert reverse("server:index") not in html
     assert reverse("accounts:invite_list") not in html, "no longer in the main navigation"
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("core:home")).content.decode()
     header = html[: html.index("</header>")]
     assert reverse("server:index") in header
@@ -127,7 +128,7 @@ def test_the_menu_shows_server_settings_to_administrators_only(client, user, adm
 
 
 def test_invitations_now_live_under_people(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
     assert reverse("accounts:invite_list") in html
     html = client.get(reverse("accounts:invite_list")).content.decode()
@@ -140,7 +141,7 @@ def test_invitations_now_live_under_people(client, admin):
 def test_the_overview_says_what_is_running(client, admin):
     from postulo import __version__
 
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:overview")).content.decode()
     assert f"<dd data-version>{__version__}</dd>" in html
     assert "sqlite" in html
@@ -160,7 +161,7 @@ def test_the_overview_does_not_walk_the_media_directory_on_every_visit(client, a
         return 3, 2048
 
     monkeypatch.setattr(filestore, "totals", counted)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     for _visit in range(2):
         assert client.get(reverse("server:overview")).status_code == 200
     assert len(calls) <= 1
@@ -174,7 +175,7 @@ def test_the_overview_says_which_scripts_this_machine_draws(client, admin):
     """
     from postulo.documents import fonts
 
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:overview")).content.decode()
     if fonts.renderable_scripts() is None:
         assert 'data-fonts="unknown"' in html
@@ -195,7 +196,7 @@ def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(clien
     work asks for money, and name this page -- the administrator's own -- as the one
     exception. Both halves are checked: the card is here, and the dashboard has none of it.
     """
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:overview")).content.decode()
 
     assert "buymeacoffee.com/tiagoagueda" in html
@@ -213,7 +214,7 @@ def test_the_overview_says_how_to_keep_postulo_going_and_nothing_else_does(clien
 
 
 def test_people_lists_accounts_and_makes_or_unmakes_administrators(client, admin, user):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
     assert 'data-person="applicant"' in html and "Member" in html
     assert "1 administrator" in html
@@ -240,7 +241,7 @@ def test_the_row_actions_are_one_menu_rather_than_four_buttons(client, admin, us
     They are a menu now. Every action is still there and still a word; what changed is that
     the words are inside a disclosure rather than laid end to end across the row.
     """
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
 
     # A popover each (#310), which the table's scroll box cannot cut off.
@@ -258,7 +259,7 @@ def test_the_row_actions_are_one_menu_rather_than_four_buttons(client, admin, us
 
 def test_a_person_still_cannot_act_on_their_own_account_from_the_list(client, admin):
     """Deactivate and Delete are left out of an administrator's own menu, as before."""
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
 
     assert reverse("server:person_delete", args=[admin.pk]) not in html
@@ -273,7 +274,7 @@ def test_every_cell_keeps_its_meaning_when_the_table_becomes_cards(client, admin
     Without this a screen reader on a narrow screen hears "Administrator" as a loose word
     rather than as the Role of a row.
     """
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
 
     assert "table-cards" in html
@@ -293,7 +294,7 @@ def test_each_person_has_a_picture_that_says_nothing(client, admin, user):
     screen reader and a picture has an empty `alt`; the column's header, which axe asks for,
     is for a screen reader alone. On a phone the tile heads the card, with the username."""
     Profile.objects.filter(user=user).update(has_avatar=True)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:people")).content.decode()
 
     head = html[html.index("<thead") : html.index("</thead>")]
@@ -319,7 +320,7 @@ def test_the_pictures_cost_one_query_however_many_people_there_are(
 ):
     """The tile reads the profile, so the list fetches the profiles with the people rather
     than one at a time as each row is drawn (#310)."""
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     client.get(reverse("server:people"))  # the session and the caches, settled
     for number in range(3):
         User.objects.create_user(email=f"p{number}@example.org", username=f"person-{number}")
@@ -333,7 +334,7 @@ def test_the_pictures_cost_one_query_however_many_people_there_are(
 
 
 def test_the_last_administrator_cannot_be_removed_or_deactivated(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(reverse("server:person_admin", args=[admin.pk]), follow=True)
     assert "last administrator" in response.content.decode()
     admin.refresh_from_db()
@@ -346,7 +347,7 @@ def test_the_last_administrator_cannot_be_removed_or_deactivated(client, admin):
 
 
 def test_an_administrator_can_change_a_username_but_never_to_one_in_use(client, admin, user):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     page = client.get(reverse("server:person_username", args=[user.pk]))
     assert page.status_code == 200 and "signs in as" in page.content.decode()
 
@@ -377,7 +378,7 @@ def test_an_administrator_can_change_a_username_but_never_to_one_in_use(client, 
 
 def test_deactivating_keeps_the_data_and_blocks_the_sign_in(client, admin, user):
     EmailAddress.objects.create(user=user, email=user.email, verified=True, primary=True)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     client.post(reverse("server:person_active", args=[user.pk]))
     user.refresh_from_db()
     assert not user.is_active
@@ -399,7 +400,7 @@ def test_registration_follows_the_page_unless_the_environment_pins_it(
     client, admin, user, settings, monkeypatch
 ):
     assert site.registration_open() is False
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(reverse("server:signin"), {"registration_open": "true"})
     assert response.status_code == 302
     assert SiteSettings.get().registration_open is True
@@ -424,7 +425,7 @@ def test_not_set_here_is_saved_as_unset_and_drawn_selected(client, admin):
     row = SiteSettings.get()
     row.registration_open = True
     row.save()
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(reverse("server:signin"), {"registration_open": ""})
     assert response.status_code == 302
     assert SiteSettings.get().registration_open is None
@@ -443,7 +444,7 @@ def test_unset_means_the_codes_default_which_a_test_may_change(settings):
 def test_capture_policy_reaches_the_fetcher(client, admin):
     from postulo.plugins.fetching import robots_allow
 
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     client.post(reverse("server:capture"), {"capture_ignore_robots": "true"})
     assert site.capture_ignore_robots() is True
     assert robots_allow("https://example.org/anything") is True
@@ -452,7 +453,7 @@ def test_capture_policy_reaches_the_fetcher(client, admin):
 
 
 def test_defaults_name_the_instance_and_seed_new_accounts(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(
         reverse("server:defaults"),
         {
@@ -490,7 +491,7 @@ def test_a_refused_language_list_leaves_the_form_above_it_as_stored(client, admi
     row.default_time_zone = "Europe/Lisbon"
     row.save()
     reads_english(admin)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     def name_input(html: str) -> str:
         return re.search(r'<input[^>]*name="instance_name"[^>]*>', html).group(0)
@@ -538,7 +539,7 @@ def test_the_instance_default_time_zone_applies_to_a_profile_without_one(client,
 
 
 def test_a_test_message_proves_the_mail_settings(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:email")).content.decode()
     assert "locmem" in html and 'name="to"' in html
     response = client.post(reverse("server:email_test"), {"to": "prove@example.org"}, follow=True)
@@ -555,7 +556,7 @@ def test_a_test_message_proves_the_mail_settings(client, admin):
 
 
 def test_plugins_lists_the_built_in_sources(client, admin):
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:plugins")).content.decode()
     assert "built in" in html and "postulo.sources" in html
     assert 'data-source="schema.org"' in html
@@ -612,7 +613,7 @@ def test_the_overview_says_how_old_the_newest_backup_is(client, admin, settings,
     with tarfile.open(archive, "w:gz") as handle:
         handle.add(__file__, arcname="manifest.json")
     settings.POSTULO_BACKUP_DIR = str(tmp_path)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     response = client.get(reverse("server:overview"))
 
@@ -633,7 +634,7 @@ def test_a_backup_older_than_a_week_says_so(client, admin, settings, tmp_path):
     old = time.time() - 8 * 24 * 3600
     os.utime(archive, (old, old))
     settings.POSTULO_BACKUP_DIR = str(tmp_path)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     body = client.get(reverse("server:overview")).content.decode()
 
@@ -642,7 +643,7 @@ def test_a_backup_older_than_a_week_says_so(client, admin, settings, tmp_path):
 
 def test_an_empty_backup_directory_still_says_none_yet(client, admin, settings, tmp_path):
     settings.POSTULO_BACKUP_DIR = str(tmp_path)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
 
     assert "none yet" in client.get(reverse("server:overview")).content.decode()
 
@@ -653,7 +654,7 @@ def test_saving_sign_in_keeps_a_stored_answer_the_environment_pins(client, admin
     row.registration_open = True
     row.save()
     monkeypatch.setenv("POSTULO_REGISTRATION_OPEN", "false")
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(reverse("server:signin"), {"email_sign_in": "true"})
     assert response.status_code == 302
     row = SiteSettings.get()
@@ -666,7 +667,7 @@ def test_saving_defaults_keeps_a_stored_time_zone_the_environment_pins(client, a
     row.default_time_zone = "Europe/Lisbon"
     row.save()
     monkeypatch.setenv("POSTULO_TIME_ZONE", "UTC")
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     response = client.post(reverse("server:defaults"), {"instance_name": "Jobs at Home"})
     assert response.status_code == 302
     row = SiteSettings.get()
@@ -687,7 +688,7 @@ def test_defaults_label_their_blank_options_with_the_built_in_fallback(client, a
         pk=1, defaults={"default_language": "de", "default_time_zone": "Asia/Tokyo"}
     )
     reads_english(admin)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:defaults")).content.decode()
 
     assert re.search(r'<option value=""[^>]*>English \(United Kingdom\) en-GB — Default</', html)
@@ -701,7 +702,7 @@ def test_defaults_label_their_blank_options_with_the_built_in_fallback(client, a
 def test_in_force_now_names_the_language(client, admin):
     SiteSettings.objects.update_or_create(pk=1, defaults={"default_language": "pt-PT"})
     reads_english(admin)
-    client.force_login(admin)
+    signed_in_recently(client, admin)
     html = client.get(reverse("server:defaults")).content.decode()
 
     assert "In force now: português (Portugal)," in " ".join(html.split())

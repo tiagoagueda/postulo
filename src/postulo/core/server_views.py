@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import ClassVar
 
 import django
+from allauth.account.decorators import reauthentication_required
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import get_user_model
@@ -234,8 +235,13 @@ def _last_administrator(user) -> bool:
 
 
 class PersonAdminView(StaffRequiredMixin, View):
-    """Make somebody an administrator, or stop them being one. Never the last one."""
+    """Make somebody an administrator, or stop them being one. Never the last one.
 
+    Behind a recent authentication, as the pages that take the instance's data are (#740): a
+    session left open on a borrowed browser is not enough to appoint or demote.
+    """
+
+    @method_decorator(reauthentication_required)
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         person = get_object_or_404(get_user_model(), pk=pk)
         if person.is_staff:
@@ -311,6 +317,8 @@ class PersonDeleteView(StaffRequiredMixin, View):
             },
         )
 
+    # Deleting somebody's account and everything in it needs a recent authentication (#740).
+    @method_decorator(reauthentication_required)
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         person = get_object_or_404(get_user_model(), pk=pk)
         blocked = self._blocked(request, person)
@@ -358,6 +366,9 @@ class PersonRecoveryView(StaffRequiredMixin, View):
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         return render(request, "server/person_recovery.html", self._context(request, pk))
 
+    # A recovery link opens somebody's account, so making one needs a recent authentication
+    # (#740): a left-open administrator session is not enough to take a member's account.
+    @method_decorator(reauthentication_required)
     def post(self, request: HttpRequest, pk: int) -> HttpResponse:
         from postulo.accounts import recovery
         from postulo.core import throttle
