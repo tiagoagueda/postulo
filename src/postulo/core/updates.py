@@ -83,6 +83,20 @@ def is_behind(current: str, latest: str) -> bool:
         return False
 
 
+def _web_address(value) -> str:
+    """``value`` if it is an http or https address, else nothing (#770).
+
+    The release page's address comes from a server Postulo does not run, and is drawn as a
+    link on the overview page; a scheme that runs script there is not an address to follow.
+    """
+    from .addresses import page_address
+
+    try:
+        return page_address(str(value or ""))
+    except ValueError:
+        return ""
+
+
 def check() -> dict:
     """Ask the configured source, store the answer, and return it.
 
@@ -96,7 +110,7 @@ def check() -> dict:
         release = _fetch(source())
         answer = {
             "latest": _version_of(release),
-            "url": str(release.get("html_url") or ""),
+            "url": _web_address(release.get("html_url")),
             "published": str(release.get("published_at") or ""),
             "checked_at": now,
             "error": "",

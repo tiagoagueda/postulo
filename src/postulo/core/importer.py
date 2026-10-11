@@ -413,6 +413,48 @@ def _d(value):
     return parse_date(value) if value else None
 
 
+#: The keys whose value is an address a page will draw as a link: a web link, a listing's page, a
+#: company's site, a copy's place in a store, a career entry's own address and its credential.
+ADDRESS_KEYS = frozenset(
+    {"url", "website", "careers_url", "external_url", "logo_source_url", "credential_url"}
+)
+
+
+def _is_a_web_address(value: str) -> bool:
+    """Whether ``value`` is empty or an http or https address (#770)."""
+    from .addresses import page_address
+
+    try:
+        page_address(value)
+    except ValueError:
+        return False
+    return True
+
+
+def drop_unsafe_addresses(node) -> int:
+    """Blank every address in the document that is not http or https. How many were blanked.
+
+    An archive is a file somebody may have edited. The importer wrote an address as it found
+    it, and a page draws it as a link, so ``javascript:`` or ``data:`` in a contact's web link
+    was stored and rendered as ``href`` (#770). The content security policy stops a current
+    browser running it; this is the rule the interface already holds everywhere else, kept at
+    the one door every restore comes through, so a section added tomorrow is covered.
+    """
+    dropped = 0
+    if isinstance(node, dict):
+        for key, value in node.items():
+            if key in ADDRESS_KEYS and isinstance(value, str):
+                if value.strip() and not _is_a_web_address(value):
+                    node[key] = ""
+                    dropped += 1
+            else:
+                dropped += drop_unsafe_addresses(value)
+    elif isinstance(node, list):
+        for item in node:
+            dropped += drop_unsafe_addresses(item)
+    return dropped
+
+
 def read_manifest(archive: zipfile.ZipFile) -> dict:
     try:
         archive.getinfo(MANIFEST_NAME)
@@ -429,6 +471,7 @@ def read_manifest(archive: zipfile.ZipFile) -> dict:
     header = document.get("postulo") or {}
     if "format" not in header:
         raise ArchiveError("That does not look like a Postulo export.")
+    document["_addresses_dropped"] = drop_unsafe_addresses(document)
     # Every format so far has added keys and sections, so an older archive reads as it is
     # and a newer one cannot be read as if it were current: a new key on a record ends in
     # a traceback and a new section is dropped while the import reports success. Refuse it
@@ -1040,6 +1083,11 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     wanted, not_taken = _wanted_username(account, user)
 
     report = ImportReport()
+    if document.get("_addresses_dropped"):
+        report.skipped.append(
+            f"{document['_addresses_dropped']} web addresses that were not http or https "
+            "were left out"
+        )
     if not_taken:
         report.skipped.append(not_taken)
     _languages_as_written(document, report)

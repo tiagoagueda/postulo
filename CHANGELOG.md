@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Restoring an archive or reading a kind file blanks any web address that is not http or https, and the update check keeps a release address only if it is, instead of storing a script address to be drawn as a link (#770)
 - A bare number or object where a file expects text, an impossible exported-at or save stamp, and a mail subject with a line break are refused or ignored instead of ending in a 500 (#769)
 - A number past what a row can be called, or a foreign-script digit, in a bulk selection, a capture discard, a model choice or a spreadsheet date is dropped or refused as an invalid choice instead of crashing with a 500 (#767)
 - The API refuses an id, an offset, an amount or a moment the database cannot hold with a 422 that names the parameter, where it used to answer 500 (offsets and ids to 2^31-1, moments between 1970 and 2100, amounts to twelve digits) (#766)

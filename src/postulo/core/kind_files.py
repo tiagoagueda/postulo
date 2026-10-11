@@ -375,6 +375,11 @@ def read(kind: str, data: bytes, name: str = "") -> dict:
     if not isinstance(rows, list):
         raise Refused(_not_one_of_these(kind))
     kept = [_prune(row, SCHEMAS[kind]) for row in rows[:MAX_ROWS]]
+    # An address that is not http or https is blanked, as the archive importer does (#770): the
+    # rows go on to the same restore functions, and a page draws what they write as a link.
+    from postulo.core import importer
+
+    importer.drop_unsafe_addresses(kept)
     return {
         "kind": kind,
         "format": min(version, 2**31 - 1),
