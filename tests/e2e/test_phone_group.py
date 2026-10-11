@@ -157,7 +157,9 @@ def test_on_a_phone_the_number_has_a_line_of_its_own(page: Page, live_server, nu
     assert at["number"]["bottom"] <= at["group"]["bottom"] + 1, "and inside the group's frame"
     assert abs(at["group"]["width"] - at["kind"]["width"]) <= 2, "no wider than the row"
     assert at["kind"]["bottom"] <= at["group"]["top"], "the kind comes first, above it"
-    assert at["group"]["bottom"] <= at["primary"]["top"], "and what is done with it, after"
+    assert at["primary"]["bottom"] <= at["kind"]["top"], (
+        "the star above it, on the row's first line"
+    )
     assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0
     assert not page.evaluate(SPILLS)
 
@@ -177,7 +179,7 @@ def test_with_room_the_chooser_and_the_number_share_a_line(page: Page, live_serv
     assert at["flag"]["right"] <= at["words"]["left"] + 1, "before the country's words"
     assert on_one_line(at["kind"], at["number"]), "and the kind is on that line too (#213)"
     assert at["kind"]["right"] <= at["group"]["left"], "first, as it is read"
-    assert at["group"]["bottom"] <= at["primary"]["top"]
+    assert at["primary"]["right"] <= at["kind"]["left"], "and the star before them all (#866)"
 
 
 def test_the_group_is_not_a_size_container(page: Page, live_server, numbers):
@@ -281,7 +283,10 @@ def test_on_a_wide_screen_the_kind_sits_on_one_line_with_the_number(
             assert plain["kind"]["right"] <= plain["group"]["left"], f"the kind first: {where}"
             assert on_one_line(plain["chooser"], plain["number"]), f"the group whole: {where}"
             assert plain["number"]["width"] >= 176, where
-            assert plain["group"]["bottom"] <= plain["primary"]["top"], where
+            star, kind = plain["primary"], plain["kind"]
+            assert star["right"] <= kind["left"] or star["bottom"] <= kind["top"], (
+                f"the star first, before the kind or above it when words need room: {where}"
+            )
 
             assert other["name"]["drawn"], where
             assert on_one_line(other["kind"], other["name"]), where

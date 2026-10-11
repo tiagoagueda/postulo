@@ -1206,8 +1206,8 @@ def test_the_row_holds_the_kind_the_name_and_the_group_in_one_grid(client, user,
     for url in (reverse("accounts:profile"), reverse("jobs:contact_update", args=[contact.pk])):
         html = client.get(url).content.decode()
         row = html[html.index('id="section-phones"') :]
-        row = row[row.index('<div class="phone-row') : row.index("</li>")]
-        group = row[: row.index("primary")]
+        row = row[row.index('<div class="phone-row') : row.index("data-row-bin")]
+        group = row
         assert "data-if-other" in row[: row.index(">")]
         order = [
             group.index('name="phone_numbers-0-kind"'),

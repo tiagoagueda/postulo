@@ -72,16 +72,38 @@
            stylesheet follows as the select changes, so it is there with scripts off the
            moment Other is chosen; kept whatever the kind while it holds something (#284,
            `data-if-other` in app.css). {% endcomment %}
-        <div class="address-line mb-3" data-narrow="menu" data-if-other{% if row.label.value %} data-has-name{% endif %}>
-          <div class="field"{% if row.kind.errors %} data-invalid="true"{% endif %}>
-            <label for="{{ row.kind.id_for_label }}">{% translate "Type" %}</label>
-            {{ row.kind }}
-            {% if row.kind.errors %}<div class="field"><c-field-feedback :field="row.kind" /></div>{% endif %}
+        {% comment %} The star and the bin share the line of what the address is, at its end
+           (#866): the controls that act on the row at the top, where the row begins, and not
+           on a line of their own below it. The line wraps under `sm` and both stay up here. {% endcomment %}
+        <div class="mb-3 flex items-start justify-between gap-3" data-address-head>
+          <div class="address-line min-w-0 flex-1" data-narrow="menu" data-if-other{% if row.label.value %} data-has-name{% endif %}>
+            <div class="field"{% if row.kind.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ row.kind.id_for_label }}">{% translate "Type" %}</label>
+              {{ row.kind }}
+              {% if row.kind.errors %}<div class="field"><c-field-feedback :field="row.kind" /></div>{% endif %}
+            </div>
+            <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
+              <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
+              {{ row.label }}
+              <div class="field"><c-field-feedback :field="row.label" :tip="tips" /></div>
+            </div>
           </div>
-          <div class="field" data-name-if-other{% if row.label.errors %} data-invalid="true"{% endif %}>
-            <label for="{{ row.label.id_for_label }}">{% translate "Name" %}</label>
-            {{ row.label }}
-            <div class="field"><c-field-feedback :field="row.label" :tip="tips" /></div>
+          <div class="flex flex-none items-center gap-x-3 pt-6 text-sm" data-row-actions>
+            {% if remove_at_once %}
+              <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+              {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
+            {% else %}
+              <label class="inline-flex items-center gap-2 py-1.5">
+                <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
+                       {% if row.instance.is_primary %}checked{% endif %}>
+                <span>{% translate "Primary" %}</span>
+              </label>
+              {% if row.instance.pk %}
+                <label class="inline-flex items-center gap-2 py-1.5">
+                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
+                </label>
+              {% endif %}
+            {% endif %}
           </div>
         </div>
         {% comment %} Then the address, a line for each line its country writes. The
@@ -130,27 +152,6 @@
         {% for note in row.country_notes %}
           <p class="mb-1 text-xs text-amber-700 dark:text-amber-300" data-country-note>{{ note }}</p>
         {% endfor %}
-        {% comment %} Last, what acts on the row. Each its own hit area with room around it:
-           WCAG 2.2 2.5.8 wants 24 by 24, and a radio touching a checkbox is one target
-           partially obscuring another. The padding is what makes the label the target.
-        {% endcomment %}
-        <div class="flex flex-wrap items-center justify-end {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 text-sm" data-row-actions>
-          {% if remove_at_once %}
-            <c-primary-choice name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
-            {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
-          {% else %}
-            <label class="inline-flex items-center gap-2 py-1.5">
-              <input type="radio" class="input" name="{{ addresses.prefix }}-primary" value="{{ row.prefix }}"
-                     {% if row.instance.is_primary %}checked{% endif %}>
-              <span>{% translate "Primary" %}</span>
-            </label>
-            {% if row.instance.pk %}
-              <label class="inline-flex items-center gap-2 py-1.5">
-                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
-              </label>
-            {% endif %}
-          {% endif %}
-        </div>
       </li>
       {% endif %}
     {% endfor %}

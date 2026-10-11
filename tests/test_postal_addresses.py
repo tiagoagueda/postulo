@@ -1015,15 +1015,16 @@ def test_a_europass_file_is_never_refused_for_an_address_and_brings_it_marked(cl
 
 def test_on_your_details_a_row_says_what_it_is_then_the_address_then_its_controls(client, user):
     """Kind first, as #213 describes for a telephone number; the name beside it, for a kind
-    of Other; the address; and the star and the bin, which #303 drew, at the end."""
+    of Other; the star and the bin, which #303 drew, at the end of that line (#866); then the
+    address."""
     an_address(user, is_primary=True)
     client.force_login(user)
 
     [kept, empty] = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
     parts = ["street", "postcode", "municipality", "region", "country"]
-    assert kept["controls"] == ["kind", "label", *parts, "primary", "remove"]
-    assert empty["controls"] == ["kind", "label", *parts, "primary"], "nothing to remove yet"
+    assert kept["controls"] == ["kind", "label", "primary", "remove", *parts]
+    assert empty["controls"] == ["kind", "label", "primary", *parts], "nothing to remove yet"
 
 
 def test_the_parts_are_in_the_order_their_country_writes_them(client, user):
@@ -1044,7 +1045,7 @@ def test_the_parts_are_in_the_order_their_country_writes_them(client, user):
 
     rows = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
-    order = {row["chosen"]["country"]: row["controls"][2:7] for row in rows[:4]}
+    order = {row["chosen"]["country"]: row["controls"][4:9] for row in rows[:4]}
     assert order == {
         "PT": ["street", "postcode", "municipality", "region", "country"],
         "US": ["street", "municipality", "region", "postcode", "country"],
@@ -1060,7 +1061,7 @@ def test_a_row_sent_back_is_drawn_in_the_order_of_the_country_that_was_posted(cl
     )
 
     [row] = rows_of(response.content.decode())
-    assert row["controls"][2:7] == ["street", "municipality", "region", "postcode", "country"]
+    assert row["controls"][3:8] == ["street", "municipality", "region", "postcode", "country"]
 
 
 def test_switched_off_every_country_is_drawn_in_the_plain_order(client, user):
@@ -1070,14 +1071,14 @@ def test_switched_off_every_country_is_drawn_in_the_plain_order(client, user):
 
     [kept, _empty] = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
-    assert kept["controls"][2:7] == ["street", "postcode", "municipality", "region", "country"]
+    assert kept["controls"][4:9] == ["street", "postcode", "municipality", "region", "country"]
 
 
 def test_a_page_that_saves_at_its_foot_reads_in_the_same_order_and_keeps_its_boxes(user):
     """The rows as a second page would draw them, without `remove_at_once`: the contact
     form's arrangement for its telephone numbers, where *Primary* is a radio with its word
     and *Remove* a box that goes when the page is saved. The same order, kind first and the
-    two controls last. No page draws address rows this way today: the contact form has
+    two controls beside it (#866). No page draws address rows this way today: the contact form has
     none."""
     from django.template.loader import render_to_string
 
@@ -1088,8 +1089,8 @@ def test_a_page_that_saves_at_its_foot_reads_in_the_same_order_and_keeps_its_box
 
     [kept, empty] = rows_of(html)
     parts = ["street", "postcode", "municipality", "region", "country"]
-    assert kept["controls"] == ["kind", "label", *parts, "primary", "DELETE"]
-    assert empty["controls"] == ["kind", "label", *parts, "primary"]
+    assert kept["controls"] == ["kind", "label", "primary", "DELETE", *parts]
+    assert empty["controls"] == ["kind", "label", "primary", *parts]
     assert "data-remove-trigger" not in html and "popovertarget" not in html
     assert ">Primary<" in html and ">Remove<" in html
 

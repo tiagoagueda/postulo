@@ -1560,6 +1560,59 @@
     @apply outline-solid outline-2 outline-offset-2 outline-brand-500;
   }
 
+  /*
+   * A row of contact details (#866): the star, then what the row is, then its boxes, then
+   * the bin, on one line from 640 pixels up -- telephone numbers, messaging and links.
+   * Under that the boxes take a line each and the star and the bin are kept on the first,
+   * the bin at its far end: they come first by `order`, the source being in the order the
+   * row reads on a wide screen. A telephone row's boxes begin lower than its controls
+   * would, because each box has a label above it; its controls are level with the first box
+   * and not with the label. The postal address's two controls are in `[data-address-head]`
+   * beside the line that says what it is, and are not part of this.
+   */
+  .contact-row {
+    @apply flex flex-wrap items-end gap-3;
+  }
+
+  .contact-row[data-phone-row] {
+    @apply items-start;
+  }
+
+  @media (width >= 40rem) {
+    .contact-row[data-phone-row] > [data-row-star],
+    .contact-row[data-phone-row] > [data-row-bin] {
+      margin-block-start: 1.9rem;
+    }
+  }
+
+  /*
+   * Where the controls are words and not a star and a bin -- a contact's form -- they are
+   * as wide as *Primary* and *Remove*, and the form's column is too narrow at every width
+   * for the country and the number to share a line with them. A telephone row there keeps
+   * the stacked arrangement at all widths: the controls on the first line, the boxes below.
+   */
+  .contact-row[data-words] > [data-row-star] {
+    order: -2;
+    margin-block-start: 0;
+  }
+
+  .contact-row[data-words] > [data-row-bin] {
+    order: -1;
+    margin-inline-start: auto;
+    margin-block-start: 0;
+  }
+
+  @media (width < 40rem) {
+    .contact-row > [data-row-star] {
+      order: -2;
+    }
+
+    .contact-row > [data-row-bin] {
+      order: -1;
+      margin-inline-start: auto;
+    }
+  }
+
   /* An entry in a menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-ink-700

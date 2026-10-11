@@ -1040,9 +1040,9 @@ def row_markup(html: str, kind: str, index: int = 0) -> str:
 
 
 @pytest.mark.parametrize("page", ["profile", "contact"])
-def test_a_row_reads_service_then_name_then_address_then_its_controls(client, user, contact, page):
-    """What it is first, then the value (#213), in the order written -- which is the order
-    read, tabbed through and announced. The name box is marked for the stylesheet, which
+def test_a_row_reads_star_service_name_address_then_the_bin(client, user, contact, page):
+    """The star, what it is, then the value (#213, #866), in the order written -- which is
+    the order read, tabbed through and announced. The name box is marked for the stylesheet, which
     shows it only while Other is chosen or it holds something, with no script."""
     holder = user.profile if page == "profile" else contact
     add(holder, user, "https://www.linkedin.com/in/alex", service="linkedin", primary=True)
@@ -1061,13 +1061,13 @@ def test_a_row_reads_service_then_name_then_address_then_its_controls(client, us
 
     for row in (on_a_service, other, new):
         places = [
-            row.index('name="social_profiles-'),
+            row.index("-primary"),
             row.index("-service"),
             row.index("-label"),
             row.index("-url"),
-            row.index("-primary"),
+            row.index("data-row-bin"),
         ]
-        assert places == sorted(places), "service, name, address, then the controls"
+        assert places == sorted(places), "the star, service, name, address, then the bin (#866)"
         assert "data-if-other" in row and "data-name-if-other" in row
         assert not re.search(r"\border-", row), "no order utilities: the source is the order"
     assert "data-has-name" not in on_a_service, "hidden: a named service needs no name"

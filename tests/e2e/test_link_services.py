@@ -40,6 +40,7 @@ BOXES = """(row) => {
     name: box('input[name$="-label"]'),
     address: box('[data-address-box]'),
     primary: box('.primary-choice, input[type="radio"]'),
+    bin: box('[data-remove-trigger]'),
   };
 }""".replace("__DRAWN__", DRAWN)
 
@@ -132,8 +133,8 @@ def in_a_column(boxes: dict, *names: str) -> None:
 
 @pytest.mark.parametrize("where", ["profile", "contact"])
 def test_at_a_desk_a_row_is_one_line_service_first(page: Page, live_server, links, contact, where):
-    """From `sm` up: the service, the name when the service is Other, the address, then the
-    star and the bin -- in that order, because that is the order they are written in.
+    """From `sm` up: the star, the service, the name when the service is Other, the address, then
+    the bin -- in that order, because that is the order they are written in.
 
     On *Your details* the controls are a star and a bin and end the line. A contact's form
     still words them, *Primary* and *Remove*, and beside a name there is no room for the
@@ -147,18 +148,17 @@ def test_at_a_desk_a_row_is_one_line_service_first(page: Page, live_server, link
 
     on_a_service = social.nth(0).evaluate(BOXES)
     assert on_a_service["name"] is None, "a named service needs no name"
-    in_one_line(on_a_service, "service", "address", "primary")
+    in_one_line(on_a_service, "primary", "service", "address")
 
     other = social.nth(2 if where == "profile" else 1).evaluate(BOXES)
     if where == "profile":
-        in_one_line(other, "service", "name", "address", "primary")
+        in_one_line(other, "primary", "service", "name", "address", "bin")
     else:
-        in_one_line(other, "service", "name", "address")
-        assert other["primary"]["top"] >= other["address"]["top"], other
+        in_one_line(other, "primary", "service", "name", "address")
 
     new = social.last.evaluate(BOXES)
     assert new["name"] is None, "nothing chosen yet, so no name to ask for"
-    in_one_line(new, "service", "address", "primary")
+    in_one_line(new, "primary", "service", "address")
 
 
 def test_at_a_desk_a_website_has_its_name_and_no_select(page: Page, live_server, links):
@@ -170,7 +170,7 @@ def test_at_a_desk_a_website_has_its_name_and_no_select(page: Page, live_server,
     website = rows_of(page, "website").first.evaluate(BOXES)
 
     assert website["service"] is None
-    in_one_line(website, "name", "address", "primary")
+    in_one_line(website, "primary", "name", "address", "bin")
 
 
 def test_on_a_phone_a_row_is_a_column_in_the_same_order(page: Page, live_server, links):
@@ -179,16 +179,16 @@ def test_on_a_phone_a_row_is_a_column_in_the_same_order(page: Page, live_server,
     page.goto(f"{live_server.url}/accounts/profile/")
     social = rows_of(page, "social")
 
-    in_a_column(social.nth(0).evaluate(BOXES), "service", "address", "primary")
-    in_a_column(social.nth(2).evaluate(BOXES), "service", "name", "address", "primary")
+    in_a_column(social.nth(0).evaluate(BOXES), "service", "address")
+    in_a_column(social.nth(2).evaluate(BOXES), "service", "name", "address")
     assert page.evaluate(SPILLS) == []
     assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"], "the page scrolls sideways at 320"
 
 
 def test_the_order_read_is_the_order_tabbed(page: Page, live_server, links):
-    """The source order is the reading order, so Tab goes service, name, address, and then
-    the row's controls. The star is one radio of a group, so Tab stops on the chosen one:
-    on the primary row it is next after the address, and on any other row the bin is."""
+    """The source order is the reading order, so Tab goes star, service, name, address, and then
+    the bin (#866). The star is one radio of a group, so Tab stops only on the chosen one,
+    and it comes before the service, so from the service the next stop is the address."""
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")
 
@@ -205,9 +205,8 @@ def test_the_order_read_is_the_order_tabbed(page: Page, live_server, links):
             )
         return visited
 
-    primary = tabbed_from(rows_of(page, "social").nth(0), 3)
-    assert primary[0].endswith("-url") and primary[1].endswith("-primary"), primary
-    assert primary[2].startswith("Remove "), primary
+    primary = tabbed_from(rows_of(page, "social").nth(0), 2)
+    assert primary[0].endswith("-url") and primary[1].startswith("Remove "), primary
 
     other = tabbed_from(rows_of(page, "social").nth(2), 3)
     assert other[0].endswith("-label") and other[1].endswith("-url"), other

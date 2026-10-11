@@ -61,7 +61,18 @@
              in its list and the chosen one in itself, and this one is put away (#301), as
              the flag beside a country is (#88).
           {% endcomment %}
-          <div class="flex flex-wrap items-end gap-3" data-link-row{% if block.has_services %} data-if-other{% if row.label.value %} data-has-name{% endif %}{% endif %}>
+          <div class="contact-row" data-link-row{% if block.has_services %} data-if-other{% if row.label.value %} data-has-name{% endif %}{% endif %}>
+            <div class="flex flex-none items-center pb-1 text-sm" data-row-star>
+              {% if remove_at_once %}
+                <c-primary-choice name="{{ block.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+              {% else %}
+                <label class="inline-flex items-center gap-2 py-1.5">
+                  <input type="radio" class="input" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
+                         {% if row.instance.is_primary %}checked{% endif %}>
+                  <span>{% translate "Primary" %}</span>
+                </label>
+              {% endif %}
+            </div>
             {% if block.has_services %}
               <div class="field w-full sm:w-auto sm:max-w-full sm:flex-none">
                 <label for="{{ row.service.id_for_label }}">{% translate "Service" %}</label>
@@ -98,21 +109,13 @@
               {% endif %}
               {% endwith %}
             </div>
-            <div class="flex flex-none flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+            <div class="flex flex-none items-center pb-1 text-sm" data-row-bin>
               {% if remove_at_once %}
-                <c-primary-choice name="{{ block.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
                 {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
-              {% else %}
+              {% elif row.instance.pk %}
                 <label class="inline-flex items-center gap-2 py-1.5">
-                  <input type="radio" class="input" name="{{ block.prefix }}-primary" value="{{ row.prefix }}"
-                         {% if row.instance.is_primary %}checked{% endif %}>
-                  <span>{% translate "Primary" %}</span>
+                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
                 </label>
-                {% if row.instance.pk %}
-                  <label class="inline-flex items-center gap-2 py-1.5">
-                    {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
-                  </label>
-                {% endif %}
               {% endif %}
             </div>
           </div>

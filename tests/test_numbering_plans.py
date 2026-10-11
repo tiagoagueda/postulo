@@ -546,8 +546,8 @@ def test_a_valid_stored_number_survives_a_save_that_did_not_touch_it(client, use
 
 
 def test_the_row_says_what_it_is_before_the_number(client, user, contact):
-    """The telephone half of #213: the kind, the name the kind *Other* asks for, the
-    country and the number as one group, then what is done with the row. The markup is in
+    """The telephone half of #213: the star, the kind, the name the kind *Other* asks for,
+    the country and the number as one group, then the bin (#866). The markup is in
     that order, which is the reading order and the tab order. On both pages that draw it."""
     keep(user.profile, user, "+351912345678")
     keep(contact, user, "+351211111111")
@@ -558,11 +558,12 @@ def test_the_row_says_what_it_is_before_the_number(client, user, contact):
         row = html[html.index('id="section-phones"') :]
         row = row[row.index("<li") : row.index("</li>")]
         order = [
+            row.index('name="phone_numbers-primary"'),
             row.index('name="phone_numbers-0-kind"'),
             row.index('name="phone_numbers-0-label"'),
             row.index('name="phone_numbers-0-number_0"'),
             row.index('name="phone_numbers-0-number_1"'),
-            row.index('name="phone_numbers-primary"'),
+            row.index("data-row-bin"),
         ]
         assert order == sorted(order), url
         assert not re.search(r"(?<![\w-])order-", row), "by the markup, not by a utility"

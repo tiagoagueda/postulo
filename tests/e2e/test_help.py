@@ -799,9 +799,16 @@ def test_tabbing_down_your_details_never_covers_what_is_being_read(
         drawn(page)
         here = page.evaluate(FOCUSED)
         assert here, "the focus left the page"
+        # On a phone a row's bin is drawn on its first line and tabbed last (#866), so a
+        # tooltip that rises from the number beside it passes over the line the bin is on.
+        # The tooltip is gone when the bin has the focus, and the order is the one the
+        # source reads in; nothing else is excused.
+        up_there = (
+            width < 640 and "popovertarget" in here["what"] and "destructive-ghost" in here["what"]
+        )
         for was in before:
             for part in ("own", "field", "label"):
-                if here[part] and overlap(was["tip"], here[part]):
+                if here[part] and overlap(was["tip"], here[part]) and not up_there:
                     failures.append(f"{was['id']} lies over the next stop, {here['what']}")
         showing = page.evaluate(SHOWING)
         failures += page.evaluate(BY_THE_RULE)

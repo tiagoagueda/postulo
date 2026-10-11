@@ -34,6 +34,7 @@ BOXES = """(row) => {
     name: box('input[name$="-label"]'),
     handle: box('input[name$="-handle"]'),
     primary: box('.primary-choice, input[type="radio"]'),
+    bin: box('[data-remove-trigger]'),
   };
 }""".replace("__DRAWN__", DRAWN)
 
@@ -78,15 +79,15 @@ def in_a_column(boxes: dict, *names: str) -> None:
         assert after["top"] >= before["bottom"] - 0.5, (names, boxes)
 
 
-def test_at_a_desk_a_row_is_one_line_service_first(page: Page, live_server, handles):
+def test_at_a_desk_a_row_is_one_line_star_first_and_bin_last(page: Page, live_server, handles):
     page.set_viewport_size({"width": 1280, "height": 900})
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")
 
     on_a_service = rows(page).nth(0).evaluate(BOXES)
     assert on_a_service["name"] is None, "a named service needs no name"
-    in_one_line(on_a_service, "service", "handle", "primary")
-    in_one_line(rows(page).nth(2).evaluate(BOXES), "service", "name", "handle", "primary")
+    in_one_line(on_a_service, "primary", "service", "handle", "bin")
+    in_one_line(rows(page).nth(2).evaluate(BOXES), "primary", "service", "name", "handle", "bin")
 
 
 def test_on_a_phone_a_row_is_a_column_in_the_same_order_and_nothing_scrolls_sideways(
@@ -96,8 +97,16 @@ def test_on_a_phone_a_row_is_a_column_in_the_same_order_and_nothing_scrolls_side
     sign_in(page, live_server.url)
     page.goto(f"{live_server.url}/accounts/profile/")
 
-    in_a_column(rows(page).nth(0).evaluate(BOXES), "service", "handle", "primary")
-    in_a_column(rows(page).nth(2).evaluate(BOXES), "service", "name", "handle", "primary")
+    on_a_service = rows(page).nth(0).evaluate(BOXES)
+    in_a_column(on_a_service, "service", "handle")
+    in_a_column(rows(page).nth(2).evaluate(BOXES), "service", "name", "handle")
+    # The star and the bin are kept on the first line, the bin at its far end (#866).
+    star, bin_ = on_a_service["primary"], on_a_service["bin"]
+    assert (
+        star["bottom"] <= on_a_service["service"]["top"]
+        and bin_["bottom"] <= on_a_service["service"]["top"]
+    )
+    assert star["right"] <= bin_["left"] and abs(star["top"] - bin_["top"]) < 8, on_a_service
     assert page.evaluate(SPILLS) == []
     assert not page.evaluate(SCROLLS_SIDEWAYS)["reached"], "the page scrolls sideways at 320"
 

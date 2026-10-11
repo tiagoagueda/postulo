@@ -1,11 +1,12 @@
 """The postal address rows of *Your details*, in a real browser (#306).
 
 What only a browser can say about them. A row reads in the order somebody decides it --
-what the address is, the address, then the star and the bin -- and the address's parts sit
-on the lines its country writes them on, so the rows are measured: side by side from 640
-pixels up with every box of a line level, whatever is written under one of them, and one
-under another on a phone. A part its country refuses says so beside its own box. And the
-name of a kind of *Other* is the stylesheet's to show, so it has to appear with scripts off.
+what the address is with the star and the bin at its end, then the address -- and the
+address's parts sit on the lines its country writes them on, so the rows are measured:
+side by side from 640 pixels up with every box of a line level, whatever is written under
+one of them, and one under another on a phone. A part its country refuses says so beside
+its own box. And the name of a kind of *Other* is the stylesheet's to show, so it has to
+appear with scripts off.
 
 The unit tests (`tests/test_postal_addresses.py`, `tests/test_postal_rules.py`) hold what is
 refused and what the markup says; nothing here counts lines of text, which CI's font and
@@ -128,10 +129,10 @@ def test_at_1280_a_refusal_sits_beside_its_box_and_the_line_stays_level(
     row = page.evaluate(ROW, 0)
     assert [control["name"] for control in row["controls"]] == [
         "kind",
-        *PARTS,
         "primary",
         "remove",
-    ], "what it is, then the address, then the star and the bin"
+        *PARTS,
+    ], "what it is with the star and the bin at its end, then the address (#866)"
 
     [line] = [
         line
@@ -222,10 +223,10 @@ def test_at_320_every_box_is_a_line_of_its_own_with_a_refusal_showing(
         ]
         tops = [box["top"] for box in boxes]
         assert tops == sorted(tops) and len(set(tops)) == len(tops), (index, boxes)
-        last = max(box["bottom"] for box in boxes)
+        kind = next(box for box in boxes if box["name"] == "kind")
         for control in row["controls"]:
             if control["name"] in ("primary", "remove"):
-                assert control["top"] >= last - 1, "the star and the bin end the row"
+                assert control["top"] < kind["bottom"], "the star and the bin on the kind's line"
 
     assert page.evaluate(SPILLS) == []
     assert page.evaluate(SCROLLS_SIDEWAYS)["reached"] == 0

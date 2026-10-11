@@ -23,7 +23,18 @@
       <li class="rounded-lg border border-ink-200 p-3 dark:border-ink-800">
         {% for hidden in row.hidden_fields %}{{ hidden }}{% endfor %}
         {% comment %} The name box follows the select with no script: `data-if-other` hides it unless Other is chosen or it already holds something. The icon beside the select is the chosen service's, drawn by the server, so the row is right without a script; with one, the select's own control draws each service's icon (#301). {% endcomment %}
-        <div class="flex flex-wrap items-end gap-3" data-messaging-row data-if-other{% if row.label.value %} data-has-name{% endif %}>
+        <div class="contact-row" data-messaging-row data-if-other{% if row.label.value %} data-has-name{% endif %}>
+          <div class="flex flex-none items-center pb-1 text-sm" data-row-star>
+            {% if remove_at_once %}
+              <c-primary-choice name="{{ messaging.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
+            {% else %}
+              <label class="inline-flex items-center gap-2 py-1.5">
+                <input type="radio" class="input" name="{{ messaging.prefix }}-primary" value="{{ row.prefix }}"
+                       {% if row.instance.is_primary %}checked{% endif %}>
+                <span>{% translate "Primary" %}</span>
+              </label>
+            {% endif %}
+          </div>
           <div class="field w-full sm:w-auto sm:max-w-full sm:flex-none">
             <label for="{{ row.service.id_for_label }}">{% translate "Service" %}</label>
             <div class="input-group">
@@ -39,21 +50,13 @@
             <label for="{{ row.handle.id_for_label }}">{% translate "Handle" %}</label>
             {{ row.handle }}
           </div>
-          <div class="flex flex-none flex-wrap items-center {% if remove_at_once %}gap-x-3{% else %}gap-x-6{% endif %} gap-y-1 pb-1 text-sm">
+          <div class="flex flex-none items-center pb-1 text-sm" data-row-bin>
             {% if remove_at_once %}
-              <c-primary-choice name="{{ messaging.prefix }}-primary" value="{{ row.prefix }}" :checked="row.instance.is_primary" />
               {% if row.removal %}<c-remove-button :removal="row.removal" />{% endif %}
-            {% else %}
+            {% elif row.instance.pk %}
               <label class="inline-flex items-center gap-2 py-1.5">
-                <input type="radio" class="input" name="{{ messaging.prefix }}-primary" value="{{ row.prefix }}"
-                       {% if row.instance.is_primary %}checked{% endif %}>
-                <span>{% translate "Primary" %}</span>
+                {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
               </label>
-              {% if row.instance.pk %}
-                <label class="inline-flex items-center gap-2 py-1.5">
-                  {{ row.DELETE|add_class:"input" }} <span>{% translate "Remove" %}</span>
-                </label>
-              {% endif %}
             {% endif %}
           </div>
         </div>
