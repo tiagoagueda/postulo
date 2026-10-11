@@ -495,6 +495,13 @@ class LogoFormMixin:
     writes in its own, and the download between them holds no lock.
     """
 
+    def get_context_data(self, **kwargs):
+        from postulo.jobs.forms import CompanyLogoForm
+
+        context = super().get_context_data(**kwargs)
+        context["logo_form"] = CompanyLogoForm()
+        return context
+
     def form_valid(self, form):
         response = super().form_valid(form)
         problem = form.apply_logo(self.object)
@@ -588,6 +595,8 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
             logos.clear(company)
             messages.success(request, _("The logo is gone."))
             return redirect(safe_next(request, company.get_absolute_url()))
+        if action == "set":
+            return self._set(request, company)
         if action not in ("website", "refresh"):
             raise Http404
         # The other two read the company's site and then try up to six images, one round
@@ -616,6 +625,37 @@ class CompanyLogoActionView(OwnedObjectMixin, View):
                 state_context(errand, in_dialog=True, first=True),
             )
         return redirect("core:errand", pk=errand.pk)
+
+    def _set(self, request: HttpRequest, company: Company) -> HttpResponse:
+        """An address or an upload, from the logo dialog on the edit page (#853).
+
+        Its own form, so that putting a logo on a company saves nothing else of what is on
+        the page. An address is a fetch, so it spends one use of the fetch allowance like
+        *Find logo* does; a file read from the request spends none.
+        """
+        from postulo.jobs.forms import CompanyLogoForm
+
+        back = safe_next(request, reverse("jobs:company_update", args=[company.pk]))
+        form = CompanyLogoForm(request.POST, request.FILES)
+        if not form.is_valid():
+            for problems in form.errors.values():
+                for problem in problems:
+                    messages.error(request, problem)
+            return redirect(back)
+        if form.cleaned_data.get("logo_url") and not form.cleaned_data.get("logo_upload"):
+            try:
+                throttle.fetch(request.user)
+            except throttle.TooOften as too_often:
+                messages.error(request, str(too_often))
+                return redirect(back)
+        problem = form.apply_logo(company)
+        if problem:
+            messages.warning(
+                request, _("The logo was not changed: %(problem)s") % {"problem": problem}
+            )
+        else:
+            messages.success(request, _("The logo was changed."))
+        return redirect(back)
 
 
 class MergeView(LoginRequiredMixin, View):

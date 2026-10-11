@@ -442,6 +442,26 @@ class CompanyForm(OwnerScopedModelForm):
         return name
 
 
+class CompanyLogoForm(forms.Form):
+    """The logo dialog's own form: an address or an upload, and nothing else of the company (#853).
+
+    Changing a logo does not save the rest of the company, as Your details' picture does not
+    save the rest of the profile. The fields are the ones `CompanyForm` has always carried,
+    with the same checks, so what is refused is refused in the same words.
+    """
+
+    logo_url = CompanyForm.base_fields["logo_url"]
+    logo_upload = CompanyForm.base_fields["logo_upload"]
+    clean_logo_upload = CompanyForm.clean_logo_upload
+    apply_logo = CompanyForm.apply_logo
+
+    def clean(self):
+        cleaned = super().clean()
+        if not (cleaned.get("logo_url") or cleaned.get("logo_upload")) and not self.errors:
+            raise forms.ValidationError(_("Give an address or choose a file."))
+        return cleaned
+
+
 class CompanyIdentifierForm(IdentifierRow, forms.ModelForm):
     """One row of the identifiers block: a scheme, the value, and a name when it is Other."""
 

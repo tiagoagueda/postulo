@@ -43,11 +43,6 @@
       {% translate "That did not work." %}
     </p>
     <p class="mt-1 text-sm text-ink-500 dark:text-ink-400">{{ errand.message }}</p>
-    {% if in_dialog and errand.kind == "logo" and errand.subject_id %}
-      <p class="mt-3 text-sm">
-        <a href="{% url 'jobs:company_update' errand.subject_id %}" class="underline">{% translate "Paste an address or upload a file instead" %}</a>
-      </p>
-    {% endif %}
     {% if in_dialog %}
       <button type="button" class="btn mt-4" data-variant="outline" data-dialog-done>{% translate "Close" %}</button>
     {% endif %}

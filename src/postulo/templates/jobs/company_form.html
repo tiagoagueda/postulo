@@ -6,7 +6,56 @@
 {% block main_width %}{% endblock %}
 
 {% block content %}
-  <h1 class="mb-6 text-title font-semibold tracking-tight">{% translate "Company" %}</h1>
+  {% comment %} The logo is a button that opens a dialog of its own (#853), outside the form
+     below: it has its own forms, since changing a logo should not save the rest of the page,
+     and nested forms do not exist. The head is a region so the dialog can have it drawn again
+     once a logo has been found (#674). {% endcomment %}
+  <div id="company-head" class="mb-6 flex items-center gap-4">
+    {% if object %}
+      <button type="button" id="logo-action" class="rounded-lg" popovertarget="logo-dialog"
+              aria-label="{% translate 'Change the logo' %}" title="{% translate 'Change the logo' %}">
+        {% company_logo object "size-14 text-lg" %}
+      </button>
+    {% endif %}
+    <h1 class="text-title font-semibold tracking-tight">{% translate "Company" %}</h1>
+    {% if object %}
+      <c-dialog id="logo-dialog" tone="plain" data-refresh="company-head">
+        <c-slot name="title">{% translate "Change the logo" %}</c-slot>
+        <c-slot name="description">{% translate "Find one from the website, give an address, upload a file, or take it away. Nothing else on this page is saved." %}</c-slot>
+        {% if object.website and not object.has_logo or object.has_logo and object.logo_source_url %}
+          {% comment %} What the press leaves behind, and where the answer comes: htmx posts this
+             same form and puts the errand's state in its place (a plain post redirects, as it
+             does with no script). The region is polite and announces the change (#674). {% endcomment %}
+          <div id="logo-dialog-result" role="status" aria-live="polite" aria-atomic="true" class="mb-4">
+            <form method="post" action="{% url 'jobs:company_logo_action' object.pk object.has_logo|yesno:'refresh,website' %}"
+                  hx-post="{% url 'jobs:company_logo_action' object.pk object.has_logo|yesno:'refresh,website' %}"
+                  hx-target="#logo-dialog-result" hx-swap="innerHTML" hx-sync="this:drop">
+              {% csrf_token %}
+              <button type="submit" class="btn">{% if object.has_logo %}{% translate "Refresh logo" %}{% else %}{% translate "Find logo" %}{% endif %}</button>
+              <span class="text-sm text-ink-500 dark:text-ink-400">
+                {% if object.has_logo %}{% blocktranslate trimmed with address=object.logo_source_url %}Fetched again from <bdi>{{ address }}</bdi>.{% endblocktranslate %}{% else %}{% blocktranslate trimmed with address=object.website %}Read from <bdi>{{ address }}</bdi>.{% endblocktranslate %}{% endif %}
+              </span>
+            </form>
+          </div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data" class="mb-4"
+              action="{% url 'jobs:company_logo_action' object.pk 'set' %}">
+          {% csrf_token %}
+          <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+          <c-field :field="logo_form.logo_url" />
+          <c-field :field="logo_form.logo_upload" />
+          <button type="submit" class="btn">{% translate "Use this logo" %}</button>
+        </form>
+        {% if object.has_logo %}
+          <form method="post" action="{% url 'jobs:company_logo_action' object.pk 'remove' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{% url 'jobs:company_update' object.pk %}">
+            <button type="submit" class="btn" data-variant="destructive-ghost">{% translate "Remove the logo" %}</button>
+          </form>
+        {% endif %}
+      </c-dialog>
+    {% endif %}
+  </div>
   <form method="post" novalidate>
     {% csrf_token %}
     {% if form.non_field_errors %}
@@ -40,6 +89,9 @@
         <c-field :field="form.location" />
         {% comment %} The place, said exactly, when the guess sat in the wrong one (#108). {% endcomment %}
         <c-field :field="form.location_correction" />
+        {% comment %} Never drawn before, so saving a company took it out of its parent whenever
+           the structure was on (#853). Absent where the feature is off. {% endcomment %}
+        {% if form.parent %}<c-field :field="form.parent" />{% endif %}
 
         <fieldset class="mb-4" data-industries {% if form.industries.aria_describedby %}aria-describedby="{{ form.industries.aria_describedby }}"{% endif %}
                   {% include "partials/label_attrs.html" with field=form.industries new_field=form.new_industries %}>

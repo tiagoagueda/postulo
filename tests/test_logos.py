@@ -447,12 +447,15 @@ def test_a_company_page_shows_the_logo_and_never_the_far_address(client, user, c
     client.force_login(user)
     html = client.get(company.get_absolute_url()).content.decode()
     assert "BM" in html, "initials until there is a logo"
-    assert "Find logo" in html
+    assert "Find logo" not in html, "changing the logo is done on the edit page (#853)"
+    edit = reverse("jobs:company_update", args=[company.pk])
+    assert "Find logo" in client.get(edit).content.decode()
 
     web["responses"]["https://cdn.example/logo.png"] = (200, an_image(), "image/png")
     logos.from_url(company, "https://cdn.example/logo.png")
     html = client.get(company.get_absolute_url()).content.decode()
     assert reverse("jobs:company_logo", args=[company.pk]) in html
+    html = client.get(edit).content.decode()
     # Said in words in the refresh dialog (#674), never drawn: nothing is loaded from it.
     assert html.count("cdn.example") == html.count("<bdi>https://cdn.example/logo.png</bdi>"), (
         "the far address appears only as text in the dialog, never as an attribute"
@@ -544,9 +547,7 @@ def test_a_plain_press_still_lands_on_the_errand_page(client, user, company, web
     assert response["Location"].startswith(reverse("core:errand", args=[1])[:-2])
 
 
-def test_a_failure_in_the_dialog_gives_its_reason_and_the_other_ways(
-    client, user, company, web, monkeypatch
-):
+def test_a_failure_in_the_dialog_gives_its_reason(client, user, company, web, monkeypatch):
     monkeypatch.setattr(
         logos.fetching,
         "fetch_page",
@@ -560,7 +561,8 @@ def test_a_failure_in_the_dialog_gives_its_reason_and_the_other_ways(
     )
     html = response.content.decode()
     assert "answered 403" in html
-    assert reverse("jobs:company_update", args=[company.pk]) in html
+    # The other ways are in the dialog itself, below the answer (#853), not a link away.
+    assert reverse("jobs:company_update", args=[company.pk]) not in html
 
 
 def test_the_state_fragment_keeps_its_dialog_wording_while_it_polls(
@@ -580,9 +582,9 @@ def test_the_state_fragment_keeps_its_dialog_wording_while_it_polls(
     assert "You can close this" in boxed and "?dialog=1" in boxed
 
 
-def test_the_company_page_opens_the_logo_dialog_with_a_button(client, user, company):
+def test_the_edit_page_opens_the_logo_dialog_with_a_button(client, user, company):
     client.force_login(user)
-    html = client.get(company.get_absolute_url()).content.decode()
+    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
     assert 'popovertarget="logo-dialog"' in html
     assert 'id="logo-dialog"' in html and 'id="company-head"' in html
     assert "blackmesa.test" in html

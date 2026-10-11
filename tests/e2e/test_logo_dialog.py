@@ -1,4 +1,4 @@
-"""*Find logo* and *Refresh logo* in a dialog on the company's page (#674).
+"""*Find logo* and *Refresh logo* in a dialog on the company's edit page (#674, #853).
 
 The button is a `popovertarget` one, so with a script the dialog is modal and without one it
 is a popover whose form posts as it always did. The press is a second one, inside the dialog;
@@ -8,10 +8,12 @@ finishes, and when the work is done the company's header is drawn again with the
 
 from __future__ import annotations
 
+import re
 from types import SimpleNamespace
 
 import pytest
 from django.core.files.base import ContentFile
+from django.urls import reverse
 from playwright.sync_api import Browser, Page, expect
 
 from postulo.core import errands
@@ -36,6 +38,10 @@ def company(applicant):
     return Company.objects.create(
         owner=applicant, name="Black Mesa", website="https://blackmesa.test/"
     )
+
+
+def edit_page(company) -> str:
+    return reverse("jobs:company_update", args=[company.pk])
 
 
 def a_logo() -> ContentFile:
@@ -70,9 +76,9 @@ def finds_nothing(monkeypatch):
 def test_with_a_script_it_is_modal_and_the_header_shows_the_logo_when_done(
     page: Page, live_server, applicant, company, finds_a_logo
 ):
-    sign_in(page, live_server.url, company.get_absolute_url())
+    sign_in(page, live_server.url, edit_page(company))
     opener = page.locator("#logo-action")
-    dialog = page.get_by_role("dialog", name="Find logo")
+    dialog = page.get_by_role("dialog", name="Change the logo")
     drawn = page.locator("#logo-dialog > *")
     expect(page.locator("#company-head img")).to_have_count(0)
 
@@ -80,9 +86,7 @@ def test_with_a_script_it_is_modal_and_the_header_shows_the_logo_when_done(
     page.keyboard.press("Enter")
     expect(drawn).to_be_visible()
     assert dialog.evaluate("(dialog) => dialog.matches(':modal')")
-    expect(dialog).to_have_accessible_description(
-        "Postulo will read https://blackmesa.test/ and keep the first image that works as the logo."
-    )
+    expect(dialog).to_have_accessible_description(re.compile("Nothing else on this page is saved"))
 
     dialog.get_by_role("button", name="Find logo").click()
     result = page.locator("#errand-state")
@@ -92,7 +96,7 @@ def test_with_a_script_it_is_modal_and_the_header_shows_the_logo_when_done(
     dialog.get_by_role("button", name="Done").click()
     expect(drawn).to_be_hidden()
     expect(page.locator("#company-head img")).to_have_count(1)
-    expect(page.locator("#logo-action")).to_have_text("Refresh logo")
+    expect(page.locator("#logo-action")).to_have_accessible_name("Change the logo")
     expect(page.locator("#logo-action")).to_be_focused()
 
 
@@ -106,9 +110,9 @@ def test_progress_comes_first_and_then_the_result(
         tasks, "perform_errand", SimpleNamespace(enqueue=lambda *args, **kwargs: None)
     )
 
-    sign_in(page, live_server.url, company.get_absolute_url())
+    sign_in(page, live_server.url, edit_page(company))
     page.locator("#logo-action").click()
-    dialog = page.get_by_role("dialog", name="Find logo")
+    dialog = page.get_by_role("dialog", name="Change the logo")
     dialog.get_by_role("button", name="Find logo").click()
     result = page.locator("#errand-state")
     expect(result).to_contain_text("You can close this. The work carries on without you.")
@@ -123,15 +127,13 @@ def test_progress_comes_first_and_then_the_result(
 def test_a_failure_shows_its_reason_and_the_other_ways(
     page: Page, live_server, applicant, company, finds_nothing
 ):
-    sign_in(page, live_server.url, company.get_absolute_url())
+    sign_in(page, live_server.url, edit_page(company))
     page.locator("#logo-action").click()
-    dialog = page.get_by_role("dialog", name="Find logo")
+    dialog = page.get_by_role("dialog", name="Change the logo")
     dialog.get_by_role("button", name="Find logo").click()
     expect(dialog).to_contain_text("That did not work.")
     expect(dialog).to_contain_text("The address answered 403.")
-    expect(
-        dialog.get_by_role("link", name="Paste an address or upload a file instead")
-    ).to_be_visible()
+    expect(dialog.get_by_label("Logo address")).to_be_visible()
 
     dialog.get_by_role("button", name="Close").click()
     expect(page.locator("#logo-dialog > *")).to_be_hidden()
@@ -140,7 +142,7 @@ def test_a_failure_shows_its_reason_and_the_other_ways(
     expect(page.locator("#logo-dialog")).not_to_contain_text("That did not work")
     page.locator("#logo-action").click()
     expect(
-        page.get_by_role("dialog", name="Find logo").get_by_role("button", name="Find logo")
+        page.get_by_role("dialog", name="Change the logo").get_by_role("button", name="Find logo")
     ).to_be_visible()
 
 
@@ -155,9 +157,9 @@ def test_the_dialog_has_no_violations_asking_or_answering(
     scheme,
 ):
     page.emulate_media(color_scheme=scheme)
-    sign_in(page, live_server.url, company.get_absolute_url())
+    sign_in(page, live_server.url, edit_page(company))
     page.locator("#logo-action").click()
-    dialog = page.get_by_role("dialog", name="Find logo")
+    dialog = page.get_by_role("dialog", name="Change the logo")
     expect(page.locator("#logo-dialog > *")).to_be_visible()
     asking = accessibility.violations_on(page, axe)
     assert not asking, accessibility.describe(f"asking ({scheme})", asking)
@@ -174,7 +176,7 @@ def test_without_a_script_it_is_a_popover_and_the_form_posts_as_before(
     context = browser.new_context(java_script_enabled=False)
     page = context.new_page()
     try:
-        sign_in(page, live_server.url, company.get_absolute_url())
+        sign_in(page, live_server.url, edit_page(company))
         dialog = page.locator("#logo-dialog")
         page.locator("#logo-action").click()
         assert dialog.evaluate("(dialog) => dialog.matches(':popover-open')")
