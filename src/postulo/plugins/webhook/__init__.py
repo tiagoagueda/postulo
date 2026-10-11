@@ -61,6 +61,8 @@ MIN_SECRET = 16
 #: How long one delivery may take, in seconds. A receiver is a machine and answers at once
 #: or is down; waiting longer holds the scheduler's pass for nothing.
 TIMEOUT = 10.0
+#: The most a whole delivery may take, whatever the receiver does with the waits between (#781).
+TOTAL = 30.0
 #: The version of the payload's shape. A receiver checks it before reading the rest.
 PAYLOAD_VERSION = 1
 
@@ -246,8 +248,13 @@ def post(url: str, secret: str, body: str, *, event: str, delivery: str):
     }
     # Not followed: a redirected POST is re-sent as a GET with no body, and the receiver
     # would never hear the event while the answer to the GET looked like success (#550).
-    with client(timeout=TIMEOUT, follow_redirects=False) as http:
-        return http.post(url, content=body.encode("utf-8"), headers=headers)
+    # Streamed and never read: the status and a redirect's address are all that is used, and a
+    # receiver is free to send a body of any size, or an inflating one. No compression is asked
+    # for, and the request is held to TOTAL seconds, however slowly the answer comes (#781).
+    headers["Accept-Encoding"] = "identity"
+    with client(timeout=TIMEOUT, total=TOTAL, follow_redirects=False) as http:
+        with http.stream("POST", url, content=body.encode("utf-8"), headers=headers) as response:
+            return response
 
 
 def redirect_message(response) -> str:

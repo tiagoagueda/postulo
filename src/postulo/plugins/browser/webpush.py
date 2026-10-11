@@ -210,6 +210,10 @@ def parse_subscription(raw) -> Subscription | None:
 # ------------------------------------------------------------------------ sending one
 
 
+#: The most one push may take, the waits between included (#781).
+TOTAL_SECONDS = 20.0
+
+
 def _client():
     """The guarded client, not following redirects: a push service that redirects is wrong.
 
@@ -220,7 +224,7 @@ def _client():
     """
     from postulo.plugins.api import public_only_client
 
-    return public_only_client(follow_redirects=False)
+    return public_only_client(follow_redirects=False, total=TOTAL_SECONDS)
 
 
 def push(subscription: Subscription, payload: dict, *, ttl: int = TIME_TO_LIVE) -> int:
@@ -237,8 +241,13 @@ def push(subscription: Subscription, payload: dict, *, ttl: int = TIME_TO_LIVE) 
         "Content-Type": "application/octet-stream",
         "Authorization": vapid_authorization(subscription.endpoint),
     }
+    # Streamed and never read: the status is all that is used, and a push service is somebody
+    # else's server, asked once for each browser in a scheduler pass that serves every account;
+    # the request is held to TOTAL_SECONDS however slowly it answers (#781).
+    headers["Accept-Encoding"] = "identity"
     with _client() as client:
-        response = client.post(subscription.endpoint, content=body, headers=headers)
+        with client.stream("POST", subscription.endpoint, content=body, headers=headers) as sent:
+            response = sent
     if response.status_code in (404, 410):
         raise PushFailed(
             "The browser has withdrawn this subscription.",

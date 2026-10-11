@@ -34,6 +34,8 @@ from postulo.plugins.fetching import UnsafeURL, require_web_port, validate_publi
 from .models import Link, LinkStatus
 
 TIMEOUT = 8.0
+#: The most one check may take, whatever the site does with the waits between (#781).
+TOTAL = 20.0
 MAX_REDIRECTS = 3
 #: Seconds *Check them all* may spend in all, well inside gunicorn's `--timeout` (#357).
 DEADLINE = 60.0
@@ -89,7 +91,16 @@ def _ask(url: str) -> tuple[str, str]:
         return LinkStatus.BROKEN, str(error)
 
     try:
-        with http.public_only_client(timeout=TIMEOUT, max_redirects=MAX_REDIRECTS) as client:
+        # Held to a total, with nothing inflated: a redirect's body is read whole by httpx
+        # before it follows one, and a hostile site could make that as large as it liked (#781).
+        with (
+            http.until(http.deadline_in(TOTAL)),
+            http.public_only_client(
+                timeout=TIMEOUT,
+                max_redirects=MAX_REDIRECTS,
+                headers={"Accept-Encoding": "identity"},
+            ) as client,
+        ):
             response = client.head(url)
             # Plenty of sites answer HEAD with 403 or 405 and are perfectly fine; ask
             # again properly rather than telling somebody their portfolio is broken.

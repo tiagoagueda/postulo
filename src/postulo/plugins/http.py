@@ -283,7 +283,9 @@ def _public_only(request: httpx.Request) -> None:
         request.headers["Host"] = original
 
 
-def _build(guard, timeout: float, kwargs: dict, *, bounded: bool = False) -> httpx.Client:
+def _build(
+    guard, timeout: float, kwargs: dict, *, bounded: bool = False, total: float | None = None
+) -> httpx.Client:
     headers = {"User-Agent": USER_AGENT, **kwargs.pop("headers", {})}
     hooks = kwargs.pop("event_hooks", {})
     hooks = {
@@ -297,19 +299,40 @@ def _build(guard, timeout: float, kwargs: dict, *, bounded: bool = False) -> htt
     _fall_back_between_addresses(built)
     if bounded:
         _hold_to_deadlines(built)
+    if total is not None:
+        # The whole of each request, its redirects and the wait for its headers included, is
+        # held to `total` seconds: `timeout` bounds each wait, not their sum, and a server
+        # sending a byte every few seconds never trips it (#781). A streamed body is read
+        # after `send` returns, so the caller reads it with `read_body` and a deadline of its own.
+        send = built.send
+
+        def send_within_total(request, **options):
+            with until(deadline_in(total)):
+                return send(request, **options)
+
+        built.send = send_within_total
     return built
 
 
-def client(*, timeout: float = DEFAULT_TIMEOUT, **kwargs) -> httpx.Client:
+def client(
+    *, timeout: float = DEFAULT_TIMEOUT, total: float | None = None, **kwargs
+) -> httpx.Client:
     """An ``httpx.Client`` with Postulo's defaults and the destination policy attached.
 
     Use it as a context manager. Extra keyword arguments go to ``httpx.Client``; a
     plugin needing basic auth, for instance, passes ``auth=``.
+
+    Every wait is held to a deadline once one is open (`until`), and ``total`` opens one per
+    request: what a plugin dials is somebody else's server, and the one that answers a byte
+    at a time must not hold a worker, or the scheduler, for as long as it likes (#781). A body
+    is read with `read_body`, or not at all.
     """
-    return _build(_guard, timeout, kwargs)
+    return _build(_guard, timeout, kwargs, bounded=True, total=total)
 
 
-def public_only_client(*, timeout: float = DEFAULT_TIMEOUT, **kwargs) -> httpx.Client:
+def public_only_client(
+    *, timeout: float = DEFAULT_TIMEOUT, total: float | None = None, **kwargs
+) -> httpx.Client:
     """Like :func:`client`, but private addresses are refused however the instance is set.
 
     The hook runs on every request the client makes rather than once on the address it
@@ -320,9 +343,10 @@ def public_only_client(*, timeout: float = DEFAULT_TIMEOUT, **kwargs) -> httpx.C
     never saw.
 
     What it fetches comes from a stranger, so every wait on the network it makes inside an
-    `until` block is cut to what is left of that block's deadline (#321).
+    `until` block is cut to what is left of that block's deadline (#321), and ``total`` opens
+    one for each request the client sends, as `client` does (#781).
     """
-    return _build(_public_only, timeout, kwargs, bounded=True)
+    return _build(_public_only, timeout, kwargs, bounded=True, total=total)
 
 
 # ------------------------------------------------------------ a deadline for the whole download

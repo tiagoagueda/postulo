@@ -520,6 +520,7 @@ def redirecting_receiver(status=301):
         return httpx.Response(200)
 
     def make_client(**kwargs):
+        kwargs.pop("total", None)
         return httpx.Client(transport=httpx.MockTransport(handler), **kwargs)
 
     return requests, make_client

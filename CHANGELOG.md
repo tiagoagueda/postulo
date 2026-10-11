@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A webhook, a push service, a link check and a name lookup are held to a total time, never read an answer they do not use and never inflate one, so a hostile receiver cannot stall a worker or the scheduler (#781)
 - What Postulo fetches from strangers (a posting, a link check, a logo) dials the web's ports only, 80, 443, 8080 and 8443 by default (#780)
 - The capture parser limits the tree to 512 levels, so a page of thousands of unclosed tags no longer costs minutes of CPU (#778)
 - A company or plugin logo is decoded as PNG, JPEG, GIF, WebP or ICO only, not as any of the forty formats Pillow reads, and Pillow's pixel guard is put back after use (#777)

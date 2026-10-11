@@ -18,6 +18,8 @@ from __future__ import annotations
 
 import ipaddress
 import socket
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as FutureTimeout
 from urllib.parse import urlparse, urlunparse
 
 from django.utils.translation import gettext as _
@@ -41,9 +43,19 @@ class Unresolvable(UnsafeURL):
     """The name did not resolve. Not the same as private: a resolver can answer next time (#549)."""
 
 
+#: How long a name may take to resolve, and the threads that wait for it (#781). The system
+#: resolver has no timeout of its own that Python can set, so the lookup runs in a thread that
+#: is waited for this long; one that never comes back keeps its thread and no more than that.
+RESOLVE_SECONDS = 5.0
+_LOOKUPS = ThreadPoolExecutor(max_workers=8, thread_name_prefix="postulo-dns")
+
+
 def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
     try:
-        infos = socket.getaddrinfo(host, None, proto=socket.IPPROTO_TCP)
+        lookup = _LOOKUPS.submit(socket.getaddrinfo, host, None, proto=socket.IPPROTO_TCP)
+        infos = lookup.result(timeout=RESOLVE_SECONDS)
+    except FutureTimeout as exc:
+        raise Unresolvable(_("That hostname took too long to resolve.")) from exc
     except (socket.gaierror, UnicodeError) as exc:
         # `UnicodeError`: the name is encoded before it is looked up, and one with an empty
         # label or one over 63 characters cannot be. Nothing answers to such a name either.
