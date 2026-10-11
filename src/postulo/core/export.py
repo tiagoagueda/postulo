@@ -315,6 +315,7 @@ PROFILE_FIELDS = (
     "identifier_style",
     "button_labels",
     "show_breadcrumb",
+    "breadcrumb_on_hover",
     "calendar_labels",
     "weekday_names",
     "first_weekday",

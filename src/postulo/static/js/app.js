@@ -7027,4 +7027,39 @@
 
   onContentReady(readyBirthPicker);
 
+  /* ---------------------------------------- the breadcrumb that opens on hover (#832)
+   *
+   * Escape puts an opened breadcrumb away, as it does a tooltip (SC 1.4.13): the focus leaves
+   * it and it stays shut until the pointer has gone and come back. `data-dismissed` is what the
+   * stylesheet reads; it is cleared when the pointer leaves or the focus moves out.
+   */
+  document.addEventListener("keydown", function (event) {
+    if (event.key !== "Escape") {
+      return;
+    }
+    var bar = document.querySelector("body[data-breadcrumb-hover] [data-breadcrumb]");
+    if (!bar || !(bar.matches(":hover") || bar.contains(document.activeElement))) {
+      return;
+    }
+    bar.setAttribute("data-dismissed", "");
+    if (bar.contains(document.activeElement) && document.activeElement.blur) {
+      document.activeElement.blur();
+    }
+  });
+
+  function releaseBreadcrumb(event) {
+    var bar = document.querySelector("body[data-breadcrumb-hover] [data-breadcrumb][data-dismissed]");
+    if (bar && !bar.matches(":hover") && !bar.contains(document.activeElement)) {
+      bar.removeAttribute("data-dismissed");
+    }
+    return event;
+  }
+
+  document.addEventListener("pointerout", releaseBreadcrumb);
+  document.addEventListener("focusout", function (event) {
+    window.setTimeout(function () {
+      releaseBreadcrumb(event);
+    }, 0);
+  });
+
 })();

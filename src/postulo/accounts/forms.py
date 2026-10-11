@@ -1095,6 +1095,7 @@ class AccessibilityForm(forms.ModelForm):
         "show_key_hints",
         "nav_underline",
         "show_breadcrumb",
+        "breadcrumb_on_hover",
     )
 
     class Meta:
@@ -1105,6 +1106,7 @@ class AccessibilityForm(forms.ModelForm):
             "show_key_hints",
             "nav_underline",
             "show_breadcrumb",
+            "breadcrumb_on_hover",
             "save_as_you_go",
         )
         labels = {
@@ -1114,6 +1116,7 @@ class AccessibilityForm(forms.ModelForm):
             "show_key_hints": _("Show the keys beside the controls that have one"),
             "nav_underline": _("Underline the page you are on"),
             "show_breadcrumb": _("Show a breadcrumb under the navigation bar"),
+            "breadcrumb_on_hover": _("Show the breadcrumb only while I point at it"),
         }
         help_texts = {
             "save_as_you_go": _(
@@ -1143,6 +1146,11 @@ class AccessibilityForm(forms.ModelForm):
                 "this company — with a link back to each step. It stays with the bar as you "
                 "scroll. Pages that have no place in a hierarchy draw none, and a phone's "
                 "narrow screen never does."
+            ),
+            "breadcrumb_on_hover": _(
+                "The breadcrumb is a thin line under the bar that opens while the pointer or "
+                "the keyboard focus is on it, and closes on Escape. A touch screen has no "
+                "hover, so there it is drawn whole."
             ),
             "nav_underline": _(
                 "The link for the page you are on is underlined as well as shaded and set "

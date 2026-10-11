@@ -51,6 +51,7 @@ def ui(request: HttpRequest) -> dict:
     # is signed in: the generous interface is the one the conformance claim rests on (#292).
     density = "comfortable"
     show_breadcrumb = False
+    breadcrumb_on_hover = False
     button_labels = "both"
     user = getattr(request, "user", None)
     if user is not None and user.is_authenticated:
@@ -62,6 +63,7 @@ def ui(request: HttpRequest) -> dict:
             nav_underline = profile.nav_underline
             density = profile.density
             show_breadcrumb = profile.show_breadcrumb
+            breadcrumb_on_hover = profile.show_breadcrumb and profile.breadcrumb_on_hover
             button_labels = profile.button_labels
         # "system" means stamp nothing and let the operating system preference apply.
         if choice in {"light", "dark"}:
@@ -90,6 +92,7 @@ def ui(request: HttpRequest) -> dict:
         "ui_density": density,
         # Whether the masthead draws a breadcrumb under the bar, for the pages that fill one (#831).
         "show_breadcrumb": show_breadcrumb,
+        "breadcrumb_on_hover": breadcrumb_on_hover,
         # Likewise: the stylesheet hides the icon or the label, and `app.js` gives an icon-only
         # button its tooltip (#852).
         "ui_button_labels": button_labels,

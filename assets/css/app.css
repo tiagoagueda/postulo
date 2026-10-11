@@ -1643,6 +1643,47 @@
     }
   }
 
+  /* The breadcrumb's bar, in the masthead (#831). Here and not as utilities on the element, so
+     the collapsed form below can replace them. */
+  [data-breadcrumb] {
+    @apply border-t border-ink-100 px-4 py-1.5 dark:border-ink-800;
+  }
+
+  /* The breadcrumb as a thin line that opens (#832). Only for a fine pointer: a touch screen
+     has no hover, so there the breadcrumb is drawn whole whatever the setting says. The line
+     is a real border, so it is still seen under forced colours. The opened trail is drawn over
+     the page below the line, out of the header's flow, so the height the header reserves
+     (`--header-height`, which the sticky sidebars and the scroll padding read) stays the
+     line's and nothing moves as it opens. It stays in the tab order: focus on a link opens it,
+     which is how a keyboard reaches it; Escape (`app.js`) closes it. */
+  @media (hover: hover) and (pointer: fine) {
+    body[data-breadcrumb-hover] [data-breadcrumb] {
+      @apply relative h-1.5 border-t-0 border-b-4 border-ink-300 p-0 dark:border-ink-600;
+    }
+
+    body[data-breadcrumb-hover] [data-breadcrumb] > nav {
+      @apply pointer-events-none absolute inset-x-0 top-full z-10 border-b border-ink-200 bg-white
+        px-4 py-1.5 opacity-0 dark:border-ink-800 dark:bg-ink-900;
+    }
+
+    body[data-breadcrumb-hover] [data-breadcrumb]:is(:hover, :focus-within):not([data-dismissed]) > nav {
+      @apply pointer-events-auto opacity-100;
+    }
+  }
+
+  @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+    body[data-breadcrumb-hover] [data-breadcrumb] > nav {
+      transition:
+        opacity 150ms ease,
+        translate 150ms ease;
+      translate: 0 -0.25rem;
+    }
+
+    body[data-breadcrumb-hover] [data-breadcrumb]:is(:hover, :focus-within):not([data-dismissed]) > nav {
+      translate: 0 0;
+    }
+  }
+
   /* The section menu of a long page as vertical tabs (#870): the same muted track and raised
      tab as `.tab-nav`, standing up from `lg` and lying down on a phone. Anchors, not an ARIA
      tablist. */

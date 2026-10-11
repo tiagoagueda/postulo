@@ -109,6 +109,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The breadcrumb can be a thin line that opens while it is pointed at or focused and closes on Escape; a touch screen draws it whole (#832)
 - An optional breadcrumb under the navigation bar, sticky with it, switched on under Accessibility; the company, listing and application pages fill it (#831)
 - The date of birth has a calendar beside its day, month and year boxes, which stay as the form and take a year alone (#863)
 - The calendar has three settings: words or only chevrons on its period buttons and abbreviated or full weekday names (Appearance), and the first day of the week (Language and time), which the week view, the month grid and the reports all follow (#859)

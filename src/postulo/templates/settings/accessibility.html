@@ -46,6 +46,8 @@
         <c-field :field="form.nav_underline" />
         {% comment %} Where you are, as a line under the bar (#831). {% endcomment %}
         <c-field :field="form.show_breadcrumb" />
+        {% comment %} Only a choice once there is a breadcrumb to collapse (#832). {% endcomment %}
+        {% if form.instance.show_breadcrumb %}<c-field :field="form.breadcrumb_on_hover" />{% endif %}
       </div>
 
       <div class="card mb-6">
