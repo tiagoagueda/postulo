@@ -1,5 +1,7 @@
 """Production settings for a self-hosted instance behind HTTPS."""
 
+from django.core.exceptions import ImproperlyConfigured
+
 from .base import *
 from .base import env
 from .keys import refuse_a_weak_key
@@ -16,6 +18,16 @@ if POSTULO_FIELD_KEY:
     refuse_a_weak_key(POSTULO_FIELD_KEY, name="POSTULO_FIELD_KEY", allow_weak=_allow_weak)
 
 DEBUG = False
+
+# A wildcard host makes the Host header whatever the sender says it is (#747). Links in mail
+# are on POSTULO_PUBLIC_URL when it is set, but the host check is the first defence, and a
+# `*` switches it off. Refused as a weak key is: name the hosts the instance answers to.
+if "*" in ALLOWED_HOSTS and not env.bool("POSTULO_ALLOW_WILDCARD_HOSTS", default=False):
+    raise ImproperlyConfigured(
+        "POSTULO_ALLOWED_HOSTS contains '*', which accepts any Host header. List the names "
+        "the instance is reached by instead. To start anyway while you plan that, set "
+        "POSTULO_ALLOW_WILDCARD_HOSTS=true."
+    )
 
 SECURE_HSTS_SECONDS = env.int("POSTULO_HSTS_SECONDS", default=31536000)
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env.bool("POSTULO_HSTS_INCLUDE_SUBDOMAINS", default=True)

@@ -179,15 +179,19 @@ def wants(config: dict, event: str, plugin=None) -> bool:
 def absolute_url(path: str, request: HttpRequest | None = None) -> str:
     """A link a message can carry.
 
-    From the request when there is one; from ``POSTULO_PUBLIC_URL`` when a scheduled job
-    has no request; otherwise the bare path, which is still better than nothing.
+    From ``POSTULO_PUBLIC_URL`` when the operator set one; else from the request when there is
+    one; otherwise the bare path, which is still better than nothing.
     """
     if path.startswith(("http://", "https://")):
         return path
+    base = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
+    # The address the operator named wins over the one the request claims (#747): a Host header
+    # is the sender's to choose, and a link in a message goes to whoever receives it.
+    if base:
+        return f"{base}{path}"
     if request is not None:
         return request.build_absolute_uri(path)
-    base = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
-    return f"{base}{path}" if base else path
+    return path
 
 
 #: At most this many titles are named in one announcement: a notification is a line on a

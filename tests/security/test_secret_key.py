@@ -59,6 +59,12 @@ CASES: dict[str, dict[str, str]] = {
         "POSTULO_ALLOW_WEAK_SECRET_KEY": "true",
     },
     "allowed-empty": {"POSTULO_SECRET_KEY": "", "POSTULO_ALLOW_WEAK_SECRET_KEY": "true"},
+    "wildcard-host": {"POSTULO_SECRET_KEY": GOOD, "POSTULO_ALLOWED_HOSTS": "postulo.example.org,*"},
+    "wildcard-host-allowed": {
+        "POSTULO_SECRET_KEY": GOOD,
+        "POSTULO_ALLOWED_HOSTS": "*",
+        "POSTULO_ALLOW_WILDCARD_HOSTS": "true",
+    },
 }
 
 #: Runs every case in one interpreter. The settings modules are dropped between cases so
@@ -240,3 +246,18 @@ def test_the_threshold_is_djangos_own():
 
     # 55 characters, 5 distinct: over both thresholds and nothing else to object to.
     assert not keys.weakness_of("q7vNx" * 11)
+
+
+# ------------------------------------------------------------ a wildcard host (#747)
+
+
+def test_a_wildcard_in_the_allowed_hosts_is_refused_and_says_how_to_go_on_anyway(outcomes):
+    refused = outcomes["wildcard-host"]
+
+    assert not refused.started
+    assert "accepts any Host header" in refused.error
+    assert "POSTULO_ALLOW_WILDCARD_HOSTS" in refused.error
+
+
+def test_it_can_be_allowed_on_purpose(outcomes):
+    assert outcomes["wildcard-host-allowed"].started, outcomes["wildcard-host-allowed"].error

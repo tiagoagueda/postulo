@@ -61,6 +61,20 @@ def account_named(login: str) -> int | None:
     )
 
 
+def _on_the_public_address(url: str) -> str:
+    """``url`` with its scheme and host replaced by ``POSTULO_PUBLIC_URL``, where that is set."""
+    from urllib.parse import urlsplit
+
+    from django.conf import settings
+
+    base = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
+    if not base:
+        return url
+    parts = urlsplit(url)
+    rest = parts.path + (f"?{parts.query}" if parts.query else "")
+    return f"{base}{rest}"
+
+
 class AccountAdapter(DefaultAccountAdapter):
     """Close registration unless the operator opened it or an invitation was followed.
 
@@ -170,6 +184,56 @@ class AccountAdapter(DefaultAccountAdapter):
             else stage
             for stage in stages
         ]
+
+    def send_mail(self, template_prefix: str, email: str, context: dict) -> None:
+        """Name the instance in a message by its own name and public address (#747).
+
+        allauth names "the site" from the Host header of the request, so a mail asked for
+        with a Host of the sender's choosing greeted its recipient from the sender's domain.
+        The instance has a name (`site.instance_name`) and, when the operator set one, an
+        address; the greeting and the sign-off use those.
+        """
+        from types import SimpleNamespace
+        from urllib.parse import urlsplit
+
+        from django.conf import settings
+
+        public = (getattr(settings, "POSTULO_PUBLIC_URL", "") or "").rstrip("/")
+        if public and "current_site" not in context:
+            context = {
+                **context,
+                "current_site": SimpleNamespace(
+                    name=site.instance_name(), domain=urlsplit(public).netloc
+                ),
+            }
+        super().send_mail(template_prefix, email, context)
+
+    def format_email_subject(self, subject: str) -> str:
+        """``[Postulo] Password reset``, not ``[the-host-header] Password reset`` (#747)."""
+        from django.conf import settings
+
+        if getattr(settings, "POSTULO_PUBLIC_URL", ""):
+            from allauth.account import app_settings
+
+            if app_settings.EMAIL_SUBJECT_PREFIX is None:
+                return f"[{site.instance_name()}] {subject}"
+        return super().format_email_subject(subject)
+
+    def get_reset_password_from_key_url(self, key: str) -> str:
+        """The link in the reset mail, on the address the operator named when they named one (#747).
+
+        allauth builds it from the Host header of the request that asked for the mail, so a
+        request with a Host of the sender's choosing made a mail to the victim whose link
+        pointed at the sender's server. With ``POSTULO_PUBLIC_URL`` set, the link is on that.
+        """
+        url = super().get_reset_password_from_key_url(key)
+        return _on_the_public_address(url)
+
+    def get_email_confirmation_url(self, request: HttpRequest, emailconfirmation) -> str:
+        """The same for the confirmation mail (#747)."""
+        return _on_the_public_address(
+            super().get_email_confirmation_url(request, emailconfirmation)
+        )
 
     def is_safe_url(self, url: str) -> bool:
         """allauth's rule, and https where the instance is: one rule for every ``next`` (#746).
