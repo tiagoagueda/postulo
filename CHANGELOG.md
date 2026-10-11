@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- GET /me no longer tells a token that only holds captures whose account it belongs to; a token that may read still sees the address (#762)
 - A token that holds only captures sees the title, dates and review link of what is waiting, not its address, company, location or source, unless it also holds read (#761)
 - The API answers a wrong method, and its root, with 401 and no Allow header when there is no live token, so the route table is not probed without one (#760)
 - The company form answers a made-up identifier id and another account's the same way, and a test holds it so (#759)

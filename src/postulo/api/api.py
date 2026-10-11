@@ -428,11 +428,15 @@ def whoami(request):
 
     A client needs some way to tell a mistyped token from a network problem without
     creating anything.
+
+    The address of the account is told only to a token that may read (#762): a token that
+    only sends pages to review needs the scopes and the time zone, not whose they are, and a
+    stolen one should not hand over an identity to aim a sign-in attempt at.
     """
     token: ApiToken = request.auth
     return {
         "name": token.name,
-        "owner": token.owner.email,
+        "owner": token.owner.email if token.has_scope("read") else "",
         "scopes": token.scopes,
         "time_zone": getattr(token.owner.profile, "time_zone", "") or site.default_time_zone(),
         "expires_at": token.expires_at,
