@@ -984,6 +984,11 @@ class ExportArchive(OwnedModel):
         return self.filename
 
     @property
+    def storage_prefix(self) -> str:
+        """The folder this person's archives are kept under, and no other's (#773)."""
+        return f"exports/{self.owner_id}/"
+
+    @property
     def has_expired(self) -> bool:
         from django.utils import timezone as when
 

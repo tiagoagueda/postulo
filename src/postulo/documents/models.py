@@ -1055,6 +1055,11 @@ class RenderedDocument(RecordsALanguage, OwnedModel):
     download_url_name = "documents:rendered_download"
 
     @property
+    def storage_prefix(self) -> str:
+        """The folder this person's snapshots are kept under, and no other's (#773)."""
+        return f"documents/{self.owner_id}/"
+
+    @property
     def download_name(self) -> str:
         """What the file is called on the way out. A render is always a PDF Postulo drew."""
         return f"{self.title}.pdf"

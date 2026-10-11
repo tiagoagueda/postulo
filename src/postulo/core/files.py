@@ -72,6 +72,18 @@ def resolve_media_path(name: str) -> Path:
 FILE_POLICY = "default-src 'none'; sandbox"
 
 
+def _lies_under(name: str, folder: str) -> bool:
+    """Whether the stored ``name`` is inside ``folder``, as a path and not as a string (#773).
+
+    A name that climbs out and back in (``documents/1/../2/x``) starts with the folder and is
+    not under it, so the name is normalised first and a ``..`` step refuses it outright.
+    """
+    parts = name.replace("\\", "/").split("/")
+    if ".." in parts:
+        return False
+    return posixpath.normpath(name).startswith(folder.rstrip("/") + "/")
+
+
 def _type_by_extension(filename: str) -> str:
     """The media type for a file name, from its extension and nothing else (#771).
 
@@ -106,7 +118,7 @@ def serve_private_file(
 
     if not file_field or not getattr(file_field, "name", ""):
         raise Http404("No file associated with this record.")
-    if within is not None and not file_field.name.startswith(within):
+    if within is not None and not _lies_under(file_field.name, within):
         raise Http404("File not found.")
 
     try:

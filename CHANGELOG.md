@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Rendered-document and export downloads check the owner's folder as uploads do, and the check compares paths and not strings (#773)
 - A downloaded file's media type comes from its extension alone, so a title that reads like a `data:` URL cannot steer the Content-Type (#771)
 - A CV entry cannot be saved pointing at another person's entry or CV, whoever writes it (#774)
 - Pages drawn for a signed-in person carry `Cache-Control: private, no-store`, so Back after sign-out no longer restores them from the browser's history cache (#787)

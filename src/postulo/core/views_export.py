@@ -87,7 +87,11 @@ def export_archive(request: HttpRequest, pk: int) -> HttpResponse:
     if archive.has_expired or not _on_disk(archive):
         raise Http404(_("That export has expired. Ask for a new one."))
     response = serve_private_file(
-        request, archive.file, download_name=archive.filename, as_attachment=True
+        request,
+        archive.file,
+        download_name=archive.filename,
+        as_attachment=True,
+        within=archive.storage_prefix,
     )
     response["Cache-Control"] = "private, max-age=0, no-store"
     return response

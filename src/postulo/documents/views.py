@@ -799,7 +799,12 @@ class RenderedDownloadView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
         document = get_object_or_404(self.get_queryset(), pk=pk)
-        return serve_private_file(request, document.file, download_name=document.download_name)
+        return serve_private_file(
+            request,
+            document.file,
+            download_name=document.download_name,
+            within=document.storage_prefix,
+        )
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
