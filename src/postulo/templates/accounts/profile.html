@@ -207,6 +207,25 @@
                 {{ box }}
               </div>
             {% endfor %}
+            {% comment %} A calendar beside the boxes, added to them and not instead of them
+               (#863): a birth date is known and typed faster than it is picked, and a picker
+               cannot say a year alone, which the record allows. The button is hidden until
+               `app.js` runs, because without it the picker would fill nothing; the boxes are
+               the whole form. The picker is the browser's own date input in a popover,
+               chosen with the calendar's (#858) so no library is vendored for either. {% endcomment %}
+            <div class="field mb-2 self-end">
+              <button type="button" class="btn" data-variant="outline" data-size="icon" hidden
+                      data-birth-picker popovertarget="birth-picker" aria-haspopup="dialog"
+                      aria-label="{% translate 'Choose the date of birth from a calendar' %}"
+                      title="{% translate 'Choose the date of birth from a calendar' %}">{% icon "calendar-days" %}</button>
+            </div>
+          </div>
+          <div id="birth-picker" popover data-popover data-align="start" class="w-72">
+            <div class="field p-4">
+              <label for="birth-picker-input">{% translate "Pick a day" %}</label>
+              <input type="date" id="birth-picker-input" class="input" min="1900-01-01" max="{% now 'Y-m-d' %}" data-birth-picker-input>
+              <p class="mt-2 text-sm text-ink-500 dark:text-ink-400">{% translate "It fills the day, month and year boxes. To give a year alone, type it in the box." %}</p>
+            </div>
           </div>
           <c-field-feedback :field="form.birth_year" />
         </fieldset>

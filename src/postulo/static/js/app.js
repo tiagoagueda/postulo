@@ -6972,4 +6972,59 @@
 
   onContentReady(readyButtonTooltips);
 
+  /* ------------------------------------------- the date of birth's calendar (#863)
+   *
+   * The day, month and year boxes are the form; this adds a calendar beside them. The button
+   * is hidden in the markup, because without a script a picker would fill nothing, and shown
+   * here. Choosing a day writes its three parts into the boxes and closes the popover; opening
+   * it starts from the boxes when they hold a whole date. A year alone cannot be picked, and
+   * is typed in the box, as before.
+   */
+  function readyBirthPicker() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-birth-picker]"), function (button) {
+      if (button.getAttribute("data-ready")) {
+        return;
+      }
+      button.setAttribute("data-ready", "true");
+      button.hidden = false;
+      var fieldset = button.closest("fieldset");
+      var input = document.querySelector("[data-birth-picker-input]");
+      var panel = document.getElementById(button.getAttribute("popovertarget"));
+      if (!fieldset || !input || !panel) {
+        return;
+      }
+      function box(autocomplete) {
+        return fieldset.querySelector('input[autocomplete="' + autocomplete + '"]');
+      }
+      function pad(text, width) {
+        text = String(text || "").trim();
+        while (text.length < width) {
+          text = "0" + text;
+        }
+        return text;
+      }
+      button.addEventListener("click", function () {
+        var day = box("bday-day"), month = box("bday-month"), year = box("bday-year");
+        if (day && month && year && day.value && month.value && /^\d{4}$/.test(year.value.trim())) {
+          input.value = pad(year.value, 4) + "-" + pad(month.value, 2) + "-" + pad(day.value, 2);
+        }
+      });
+      input.addEventListener("change", function () {
+        var parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(input.value);
+        if (!parts) {
+          return;
+        }
+        box("bday-year").value = parts[1];
+        box("bday-month").value = String(parseInt(parts[2], 10));
+        box("bday-day").value = String(parseInt(parts[3], 10));
+        if (panel.hidePopover) {
+          panel.hidePopover();
+        }
+        box("bday-day").focus();
+      });
+    });
+  }
+
+  onContentReady(readyBirthPicker);
+
 })();
