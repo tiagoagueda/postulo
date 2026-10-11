@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The module "Employers with a structure" is now "Companies with a structure", with the pyramid icon added for its logo (#881)
 - POSTULO_CONNECTIONS_ALLOW_PRIVATE is documented as one switch for the whole instance that lets every account probe the private network through the Test buttons (#779)
 - Nationalities are named as nationalities (Portuguese, portugaise, portuguesa), not as countries, on a CV and in the menus of Your details, in English, French and Portuguese (#865)
 - The gender list offers Female, Male and Non-binary (Féminin, Masculin; Feminino, Masculino), and a profile, an archive or a candidate file that holds an old word is carried over to the new one (#864)

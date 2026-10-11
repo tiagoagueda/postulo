@@ -41,11 +41,11 @@ EMPLOYER_STRUCTURE = "employer-structure"
 @declares(
     shipped(
         name=EMPLOYER_STRUCTURE,
-        label=_("Employers with a structure"),
+        label=_("Companies with a structure"),
         kind="feature",
         description=_(
             "Record that one company is part of another, keep departments inside a "
-            "company, and say which part of an employer an application was aimed at. "
+            "company, and say which part of a company an application was aimed at. "
             "Switched off, Postulo shows one company per posting and nothing else; the "
             "parents, the departments and the attachments stay recorded and come back "
             "untouched when it is switched on again."
