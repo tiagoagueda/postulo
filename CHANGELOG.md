@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The Listings state strip is drawn like Basecoat's tabs (a tab-nav component of links, not an ARIA tablist) (#842)
 - Documents, Calendar and Your career have a question mark beside the heading: the sentence on hover and the help in a drawer (#847)
 - "Companies on a map" is now "Maps", credits GeoNames, the Unicode CLDR and Natural Earth in its description and on the map page, and has the map icon (#882)
 - The module "Employers with a structure" is now "Companies with a structure", with the pyramid icon added for its logo (#881)

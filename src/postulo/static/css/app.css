@@ -7069,6 +7069,125 @@
       margin-inline-start: auto;
     }
   }
+  .tab-nav {
+    display: inline-flex;
+    max-width: 100%;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--spacing);
+    border-radius: var(--radius-lg);
+    background-color: var(--color-ink-100);
+    padding: var(--spacing);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-800);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-800);
+      }
+    }
+  }
+  .tab-nav > a {
+    display: inline-flex;
+    min-height: calc(var(--spacing) * 7);
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+    border-radius: var(--radius-md);
+    border-style: var(--tw-border-style);
+    border-width: 1px;
+    border-color: transparent;
+    padding-inline: calc(var(--spacing) * 3);
+    padding-block: var(--spacing);
+    font-size: var(--text-sm);
+    line-height: var(--tw-leading, var(--text-sm--line-height));
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+    color: var(--color-ink-600);
+    &:hover {
+      @media (hover: hover) {
+        color: var(--color-ink-900);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-300);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-300);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      &:hover {
+        @media (hover: hover) {
+          color: var(--color-ink-100);
+        }
+      }
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        &:hover {
+          @media (hover: hover) {
+            color: var(--color-ink-100);
+          }
+        }
+      }
+    }
+  }
+  .tab-nav > a[aria-current="page"] {
+    border-color: var(--color-ink-200);
+    background-color: var(--color-white);
+    color: var(--color-ink-900);
+    --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+    box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      border-color: var(--color-ink-700);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        border-color: var(--color-ink-700);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      background-color: var(--color-ink-950);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        background-color: var(--color-ink-950);
+      }
+    }
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-50);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-50);
+      }
+    }
+  }
+  .tab-nav-count {
+    font-size: var(--text-xs);
+    line-height: var(--tw-leading, var(--text-xs--line-height));
+    --tw-font-weight: var(--font-weight-normal);
+    font-weight: var(--font-weight-normal);
+    color: var(--color-ink-500);
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,) var(--tw-numeric-fraction,);
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      color: var(--color-ink-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        color: var(--color-ink-400);
+      }
+    }
+  }
+  @media (forced-colors: active) {
+    .tab-nav > a[aria-current="page"] {
+      border-color: CanvasText;
+      text-decoration: underline;
+    }
+  }
   .menu-item {
     display: flex;
     width: 100%;

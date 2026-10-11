@@ -1,0 +1,22 @@
+{% load i18n %}
+<c-vars items label param="state" default="" />
+{% comment %} A strip of links that look like Basecoat's tabs and are links (#842).
+
+   `<c-tab-nav :items="filters" label="Listing filters" param="state" default="undecided" />`
+
+   Each item has `value`, `label`, `count` and `active`. The strip is a `<nav>` of whole-page
+   links with `aria-current="page"` on the one open, because moving between them is a page
+   load on purpose: the counts change. It is **not** an ARIA tablist and carries no
+   `role="tab"`, which would tell a screen reader there are panels and arrow-key movement that
+   do not exist; what it takes from Basecoat's tabs is the look -- a muted track, the open one
+   raised -- painted by `.tab-nav` in `basecoat.css`. The item named `default` links to the bare
+   page, so the usual tab never makes a page look narrowed. {% endcomment %}
+<nav class="tab-nav mb-4" aria-label="{{ label }}">
+  {% for item in items %}
+    <a href="{% if item.value == default %}{{ request.path }}{% else %}?{{ param }}={{ item.value }}{% endif %}"
+       {% if item.active %}aria-current="page"{% endif %}>
+      {{ item.label }}
+      {% if item.count is not None %}<span class="tab-nav-count">{{ item.count }}</span>{% endif %}
+    </a>
+  {% endfor %}
+</nav>

@@ -156,19 +156,7 @@
      not stored anywhere — *applied* is read from the applications, *closed* from two dates —
      and each one carries the count that is the reason to look at it. Whole-page links rather
      than swaps, because moving between them changes the counts too (#160). {% endcomment %}
-  <nav class="mb-4 flex flex-wrap gap-1" aria-label="{% translate 'Listing filters' %}">
-    {% for filter in filters %}
-      {% comment %} The usual tab links to the bare page rather than to `?state=undecided`:
-         the tab counts as a filter, and a page that says "Clear filters" when nothing has
-         been narrowed is a page crying wolf. {% endcomment %}
-      <a href="{% if filter.value == 'undecided' %}{{ request.path }}{% else %}?state={{ filter.value }}{% endif %}"
-         class="{% if filter.active %}nav-link-active{% else %}nav-link{% endif %} flex items-center gap-2"
-         {% if filter.active %}aria-current="page"{% endif %}>
-        {{ filter.label }}
-        <span class="text-xs tabular-nums text-ink-400">{{ filter.count }}</span>
-      </a>
-    {% endfor %}
-  </nav>
+  <c-tab-nav :items="filters" label="{% translate 'Listing filters' %}" param="state" default="undecided" />
 
   {% if has_listings %}
     {% comment %} The search is the masthead's box (#313): it and this form include each other,

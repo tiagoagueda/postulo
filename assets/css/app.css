@@ -1617,6 +1617,39 @@
     }
   }
 
+  /*
+   * A strip of links drawn as Basecoat draws tabs (#842): a muted track with the open one raised.
+   * Only the look; the links stay links, with `aria-current="page"` and no `role="tab"`, because
+   * they load another page and there are no panels (`cotton/tab_nav.html`). The open one needs
+   * more than its fill to be told from the rest -- a border that survives forced colours and the
+   * word's weight -- and every link is at least 24 pixels high (WCAG 2.5.8).
+   */
+  .tab-nav {
+    @apply inline-flex max-w-full flex-wrap items-center gap-1 rounded-lg bg-ink-100 p-1 dark:bg-ink-800;
+  }
+
+  .tab-nav > a {
+    @apply inline-flex min-h-7 items-center gap-2 rounded-md border border-transparent px-3 py-1
+      text-sm font-medium whitespace-nowrap text-ink-600 hover:text-ink-900 dark:text-ink-300
+      dark:hover:text-ink-100;
+  }
+
+  .tab-nav > a[aria-current="page"] {
+    @apply border-ink-200 bg-white text-ink-900 shadow-sm dark:border-ink-700 dark:bg-ink-950
+      dark:text-ink-50;
+  }
+
+  .tab-nav-count {
+    @apply text-xs font-normal tabular-nums text-ink-500 dark:text-ink-400;
+  }
+
+  @media (forced-colors: active) {
+    .tab-nav > a[aria-current="page"] {
+      border-color: CanvasText;
+      text-decoration: underline;
+    }
+  }
+
   /* An entry in a menu: link or button, same look. */
   .menu-item {
     @apply flex w-full items-center gap-2 px-3 py-2 text-start text-sm text-ink-700
