@@ -264,7 +264,10 @@ def test_guesses_at_one_account_are_counted_together_however_it_is_named(
 
     sixth = guess(client, "rOOt", PASSWORD, "198.51.100.99")
 
-    assert "Too many failed login attempts" in sixth.content.decode()
+    # Refused even when it is right, and in the ordinary words (#744): the lock is the
+    # account's, and saying so would tell a stranger which names belong together.
+    assert "are not correct" in sixth.content.decode()
+    assert "Too many failed login attempts" not in sixth.content.decode()
     assert who_is_signed_in(client) is None, "the sixth is refused even when it is right"
     # And it is that account's count: the next person signs in from the same address.
     assert guess(client, user.email, "not-a-real-password", "198.51.100.99").status_code == 302
@@ -319,7 +322,8 @@ def test_the_count_does_not_start_again_under_another_host_name(client, administ
         HTTP_HOST="postulo.example.org",
     )
 
-    assert "Too many failed login attempts" in sixth.content.decode()
+    assert "are not correct" in sixth.content.decode()
+    assert who_is_signed_in(client) is None, "refused even when right: the count carried over"
 
 
 # ------------------------------------------------------ nobody's records in it (#368)
@@ -475,3 +479,28 @@ def test_the_admin_add_form_asks_for_the_username_and_the_name(with_an_admin, rf
     fields = admin.site._registry[type(superuser)].get_form(request).base_fields
 
     assert {"username", "first_name", "last_name"} <= set(fields)
+
+
+def test_the_lock_does_not_tell_which_names_belong_together(client, administrator, user):
+    """Spend an account's guesses on one name, then probe others: no answer differs (#744)."""
+    for number in range(5):
+        guess(client, "root", "not-the-password", f"198.51.100.{number + 1}")
+
+    same_account = guess(client, "root@example.org", "not-the-password", "198.51.100.50")
+    other_account = guess(client, user.email, "not-the-password", "198.51.100.51")
+    nobody = guess(client, "nobody-at-all@example.org", "not-the-password", "198.51.100.52")
+
+    answers = {
+        r.content.decode().count("are not correct") for r in (same_account, other_account, nobody)
+    }
+    assert answers == {1}
+    assert "Too many failed login attempts" not in same_account.content.decode()
+
+
+def test_the_name_that_was_typed_five_times_is_told_it_is_locked(client, administrator):
+    for number in range(5):
+        guess(client, "root", "not-the-password", f"198.51.100.{number + 1}")
+
+    again = guess(client, "root", "not-the-password", "198.51.100.60")
+
+    assert "Too many failed login attempts" in again.content.decode()

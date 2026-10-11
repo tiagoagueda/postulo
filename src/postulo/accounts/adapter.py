@@ -94,6 +94,68 @@ class AccountAdapter(DefaultAccountAdapter):
             return f"name:{named.casefold()}"
         return f"account:{account}"
 
+    def _typed_name_key(self, **credentials) -> str:
+        named = (credentials.get("email") or credentials.get("username") or "").strip()
+        return f"name:{named.casefold()}"
+
+    def pre_authenticate(self, request: HttpRequest, **credentials) -> None:
+        """Count each guess twice, and say a lock only when the name that was typed is spent (#744).
+
+        The count under the account is what stops a guesser who spreads their five guesses over
+        an account's names (#489). But if the answer to the sixth guess differs by which names
+        the account has, trying a name and seeing "too many attempts" tells you it belongs to the
+        account that was being guessed at, and anyone could shut anybody's password sign-in for
+        five minutes and read it off. So there are two counts: the **typed name's**, which says
+        "too many attempts" because only the person who typed it is told anything, and the
+        **account's**, which refuses just the same but in the ordinary words for a wrong
+        password. The lock holds either way; it is only the telling that is even.
+        """
+        from allauth.account import app_settings
+        from allauth.core.internal import ratelimit
+
+        by_name = ratelimit.consume(
+            request,
+            config=app_settings.RATE_LIMITS,
+            action="login_failed",
+            key=self._typed_name_key(**credentials),
+        )
+        self._login_failed_rl_usage = by_name
+        if not by_name:
+            raise self.validation_error("too_many_login_attempts")
+        key = self._get_login_attempts_cache_key(request, **credentials)
+        if key.startswith("account:"):
+            # Only the per-name part of the rate: the per-address part was spent by the first
+            # count, and spending it twice halved what an address was allowed.
+            configured = str(app_settings.RATE_LIMITS.get("login_failed") or "")
+            per_name = ",".join(r for r in configured.split(",") if r.strip().endswith("/key"))
+            by_account = ratelimit.consume(
+                request, config={"login_failed": per_name}, action="login_failed", key=key
+            )
+            self._account_login_failed_rl_usage = by_account
+            if not by_account:
+                by_name.rollback()
+                raise self.validation_error("username_password_mismatch")
+
+    def _rollback_login_failed_rl_usage(self) -> None:
+        super()._rollback_login_failed_rl_usage()
+        usage = getattr(self, "_account_login_failed_rl_usage", None)
+        if usage:
+            usage.rollback()
+            self._account_login_failed_rl_usage = None
+
+    def _delete_login_attempts_cached_email(self, request: HttpRequest, **credentials) -> None:
+        """A password reset clears both counts, as it cleared the one (#744)."""
+        from allauth.account import app_settings
+        from allauth.core.internal import ratelimit
+
+        super()._delete_login_attempts_cached_email(request, **credentials)
+        ratelimit.clear(
+            request,
+            config=app_settings.RATE_LIMITS,
+            action="login_failed",
+            key=self._typed_name_key(**credentials),
+        )
+
     def get_login_stages(self) -> list[str]:
         """allauth's steps after a sign-in, with Postulo's own second-factor rule.
 
