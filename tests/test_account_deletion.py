@@ -437,4 +437,4 @@ def test_the_admins_profile_form_offers_no_way_to_put_a_picture_past_the_checks(
     from django.contrib import admin
 
     inline = admin.site._registry[get_user_model()].inlines[0]
-    assert {"avatar", "gravatar_image"} <= set(inline.exclude)
+    assert not {"avatar", "gravatar_image"} & set(inline.fields)  # listed columns only (#749)

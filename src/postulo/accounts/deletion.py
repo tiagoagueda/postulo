@@ -99,6 +99,7 @@ def delete_account(user) -> DeletionReport:
             f"{user.username} is the last administrator. Appoint another before deleting."
         )
 
+    from postulo.accounts import sessions
     from postulo.accounts.models import Invite
 
     report = DeletionReport(username=user.username, email=user.email)
@@ -109,6 +110,14 @@ def delete_account(user) -> DeletionReport:
         report.rows["pending invitations revoked"] = (
             Invite.objects.filter(created_by=user).pending().delete()[0]
         )
+        # The invitation this person accepted names the address it was meant for and carries
+        # the administrator's note about them, and nothing else deletes it (#750).
+        report.rows["accepted invitations removed"] = Invite.objects.filter(
+            accepted_by=user
+        ).delete()[0]
+        # What a session holds -- an import under review: a parsed CV, a spreadsheet, a vCard
+        # -- is personal data in a table the account does not own (#750).
+        report.rows["sessions ended"] = sessions.end_all_of(user)
         _count, per_model = user.delete()
         for label, count in per_model.items():
             report.rows[label.split(".")[-1].lower()] = count
