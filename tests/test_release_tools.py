@@ -260,9 +260,10 @@ def test_the_version_shows_in_the_footer_and_the_health_check(client, user):
     health = client.get(reverse("core:healthz")).json()
     assert health["version"] == __version__
 
+    # Not in the footer any more (#836): the version is for whoever asks the instance.
     client.force_login(user)
     footer = client.get(reverse("core:home")).content.decode()
-    assert f"Postulo {__version__}" in footer
+    assert f"Postulo {__version__}" not in footer
 
 
 # ------------------------------------------------------------- the CI gate (#233)

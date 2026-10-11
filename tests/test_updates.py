@@ -130,7 +130,7 @@ def test_the_overview_reads_the_stored_answer_and_never_asks(client, admin, sett
 
 
 def test_the_overview_says_when_it_is_up_to_date(client, admin, settings, monkeypatch):
-    from postulo.core.context_processors import installed_version
+    from postulo.core.updates import installed_version
 
     settings.POSTULO_UPDATE_CHECK = True
     a_release(monkeypatch, tag=f"v{installed_version()}")

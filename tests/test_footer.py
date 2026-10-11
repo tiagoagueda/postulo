@@ -48,24 +48,38 @@ def test_a_stranger_is_told_what_runs_here_but_not_which_version(client):
     footer = footer_of(client.get(reverse("core:home")))
 
     assert "Powered by Postulo" in footer
-    assert __version__ not in footer, "the exact version is for people signed in"
+    assert __version__ not in footer, "the exact version is for the instance to say if asked"
     assert "data-version" not in footer
-    assert set(links_in(footer)) == {"Source code", "Help"}
+    assert set(links_in(footer)) == {"Powered by Postulo", "Source code", "Help"}
 
 
-def test_somebody_signed_in_gets_the_version_linked_to_its_release_notes(client, user):
+def test_powered_by_postulo_is_the_same_link_for_everybody_and_goes_to_the_releases(client, user):
+    """No version, signed in or not; the releases page, not one release's notes (#836)."""
+    stranger = links_in(footer_of(client.get(reverse("core:home"))))
     client.force_login(user)
+    member_footer = footer_of(client.get(reverse("core:home")))
+    member = links_in(member_footer)
+
+    for links in (stranger, member):
+        powered = links["Powered by Postulo"]
+        assert "data-powered" in powered
+        assert href(powered) == f"{UPSTREAM}/releases/"
+        assert 'target="_blank"' in powered and "noopener noreferrer external" in powered
+    assert __version__ not in member_footer
+    assert set(member) == {"Powered by Postulo", "Source code", "Help"}
+
+
+def test_the_releases_link_is_upstreams_even_when_the_source_is_a_fork(client, settings):
+    settings.POSTULO_SOURCE_URL = "https://git.example.org/acme/postulo"
+
     links = links_in(footer_of(client.get(reverse("core:home"))))
 
-    version = links[f"Powered by Postulo {__version__}"]
-    assert "data-version" in version
-    assert href(version) == f"{UPSTREAM}/releases/tag/v{__version__}"
-    assert set(links) == {f"Powered by Postulo {__version__}", "Source code", "Help"}
+    assert href(links["Powered by Postulo"]) == f"{UPSTREAM}/releases/"
+    assert href(links["Source code"]) == "https://git.example.org/acme/postulo"
 
 
-def test_the_release_notes_are_named_by_the_tag_a_release_is_given():
-    """`v` + `__version__`, which `release_tools.py check` holds the tag to."""
-    assert context_processors.release_notes_url().endswith(f"/releases/tag/v{__version__}")
+def test_the_releases_page_is_one_address():
+    assert context_processors.releases_url() == f"{UPSTREAM}/releases/"
 
 
 @pytest.mark.parametrize(
@@ -102,10 +116,11 @@ def test_the_second_factor_page_has_it_too_and_still_no_version(client):
     assert __version__ not in footer
 
 
-def test_the_signed_in_allauth_pages_carry_the_version(client, user):
+def test_the_signed_in_allauth_pages_have_the_same_foot_and_still_no_version(client, user):
     client.force_login(user)
     footer = footer_of(client.get("/accounts/password/change/"))
-    assert f"Powered by Postulo {__version__}" in footer
+    assert "Powered by Postulo" in footer
+    assert __version__ not in footer
 
 
 # ------------------------------------------------------------------- this instance

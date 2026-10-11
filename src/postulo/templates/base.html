@@ -291,12 +291,10 @@
        for an instance nobody has named. Both are typed text in any script, so each is a
        `<bdi>` and neither is translated.
 
-       The version is for people signed in. It is the first thing a stranger would want in
-       order to know which advisories apply, and a stranger has no other use for it; *Powered
-       by Postulo* is said to everybody. Not a secret -- `/healthz` still says it, to a
-       monitor -- but no longer on every page a crawler reads. It links to that release's
-       notes: the release it says it is, since nothing a build records says which commit it
-       came from.
+       *Powered by Postulo* is said to everybody, without the version: the version is the
+       first thing a stranger would want in order to know which advisories apply, and it is
+       one request away for anybody who has a use for it (`/healthz`, Server settings). It
+       links to the releases, all of them (#836).
 
        *Source code* is the offer of source the AGPL asks of a modified Postulo run as a
        service, pointing wherever `POSTULO_SOURCE_URL` says the operator's code lives. The
@@ -321,13 +319,9 @@
       <nav aria-label="{% translate 'About this instance' %}">
         <ul class="flex flex-wrap gap-x-4">
           <li>
-            {% if user.is_authenticated %}
-              <a href="{{ postulo_release_url }}" rel="noopener noreferrer external" target="_blank"
-                 class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
-                 data-version>{% blocktranslate trimmed with version=postulo_version %}Powered by Postulo {{ version }}{% endblocktranslate %}</a>
-            {% else %}
-              <span class="inline-block py-1">{% translate "Powered by Postulo" %}</span>
-            {% endif %}
+            <a href="{{ postulo_releases_url }}" rel="noopener noreferrer external" target="_blank"
+               class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+               data-powered>{% translate "Powered by Postulo" %}</a>
           </li>
           <li>
             <a href="{{ postulo_source_url }}" rel="noopener noreferrer external" target="_blank"

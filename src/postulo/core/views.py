@@ -53,7 +53,7 @@ def healthz(request: HttpRequest) -> JsonResponse:
         connection.ensure_connection()
     except Exception:  # pragma: no cover - only on a broken database
         return JsonResponse({"status": "error", "database": "unavailable"}, status=503)
-    from .context_processors import installed_version
+    from .updates import installed_version
 
     return JsonResponse({"status": "ok", "database": "ok", "version": installed_version()})
 

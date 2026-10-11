@@ -278,14 +278,14 @@ def test_the_dashboard_runs_the_ui_processor_once_not_once_per_widget(client, us
     from postulo.core import context_processors
 
     # `ui` is bound by the engine at start-up, so count what it calls on every run.
-    real = context_processors.release_notes_url
+    real = context_processors.releases_url
     calls = []
 
     def counting(*args, **kwargs):
         calls.append(1)
         return real(*args, **kwargs)
 
-    monkeypatch.setattr(context_processors, "release_notes_url", counting)
+    monkeypatch.setattr(context_processors, "releases_url", counting)
     arrange(user, widgets.default_keys())
     client.force_login(user)
 

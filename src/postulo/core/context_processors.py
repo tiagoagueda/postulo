@@ -6,7 +6,6 @@ from django.utils.translation import gettext as _
 
 # The running version is asked by pages and by the update check alike, so it lives with the
 # check (#248). Read here for the footer, and still handed out here to the health endpoint.
-from .updates import installed_version
 
 #: What one press of the header switch moves to. Light, dark, then back to the system.
 NEXT_THEME = {"light": "dark", "dark": "system", "system": "light"}
@@ -94,10 +93,9 @@ def ui(request: HttpRequest) -> dict:
         # says that name where it said Postulo's slogan, which belongs to an instance
         # nobody has named (#212).
         "instance_named": name != "Postulo",
-        "postulo_version": installed_version(),
-        # The foot of every page (#212). The version's release notes are shown only to
-        # somebody signed in, and the template decides that; these are only addresses.
-        "postulo_release_url": release_notes_url(),
+        # The foot of every page (#212): only addresses. Nobody is told the version there
+        # any more (#836); it is on /healthz and under Server settings.
+        "postulo_releases_url": releases_url(),
         "postulo_source_url": settings.POSTULO_SOURCE_URL,
         "postulo_help_url": HELP_URL,
         "postulo_legal_notice_url": settings.POSTULO_LEGAL_NOTICE_URL,
@@ -108,25 +106,16 @@ def ui(request: HttpRequest) -> dict:
 #: own changes are theirs to document, and Postulo's pages are still Postulo's (#212).
 HELP_URL = "https://source.tiagoagueda.com/postulo/postulo/wiki"
 
-#: Where a release's notes are: the Forgejo release the release workflow makes from the
-#: changelog, under the tag `v` + the version (#212).
-RELEASE_NOTES_URL = "https://source.tiagoagueda.com/postulo/postulo/releases/tag/v{version}"
+#: Where the releases are: the Forgejo releases the release workflow makes from the changelog,
+#: all of them, so the footer says what Postulo is without saying which build this is (#836).
+RELEASES_URL = "https://source.tiagoagueda.com/postulo/postulo/releases/"
 
 
-def release_notes_url() -> str:
-    """The notes of the release this code is.
+def releases_url() -> str:
+    """The page of Postulo's releases, upstream's even where the operator's source is a fork.
 
-    From ``__version__`` rather than from the installed metadata the footer prints, because
-    the tag is ``v`` + ``__version__`` exactly -- `release_tools.py check` refuses a tag that
-    is anything else -- and packaging normalises the other (``1.0.0-rc.1`` is installed as
-    ``1.0.0rc1``). The upstream release even where `POSTULO_SOURCE_URL` names a fork: the
-    number is upstream's, and so are its notes.
-
-    A build between two releases carries the number of the last one, and nothing a build
-    records says which commit it was made from, so this is that release's notes. Linking a
-    commit would need the image to be told it at build time; until then there is nothing
-    true to link to.
+    The footer used to link the notes of the running version, which told anybody who could
+    see it which version to look for advisories against. It now links all of them, and the
+    version is for people who ask the instance (`/healthz`, Server settings).
     """
-    from postulo import __version__
-
-    return RELEASE_NOTES_URL.format(version=__version__)
+    return RELEASES_URL

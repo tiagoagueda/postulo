@@ -218,8 +218,8 @@ def test_nothing_on_a_page_ends_up_behind_the_bar(live_server, page: Page, furni
 
     # The last line of the page scrolls clear of it.
     page.evaluate("window.scrollTo(0, document.documentElement.scrollHeight)")
-    expect(page.locator("footer [data-version]")).to_be_in_viewport()
-    version = page.locator("footer [data-version]").bounding_box()
+    expect(page.locator("footer [data-powered]")).to_be_in_viewport()
+    version = page.locator("footer [data-powered]").bounding_box()
     assert version["y"] + version["height"] <= bar_top(page), "the footer ends under the bar"
 
     # A link lying behind the bar is scrolled clear of it when focus lands on it (SC 2.4.11).
