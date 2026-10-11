@@ -366,10 +366,12 @@ ENV GUNICORN_CMD_ARGS="--timeout 120 --max-requests 500 --max-requests-jitter 50
 ENTRYPOINT ["postulo-entrypoint"]
 # The access line is gunicorn's default with one field added at the end: the X-Request-ID
 # the response carries, which is the id every Postulo log line for that request carries too
-# (#233). Laid side by side, the two logs now say which line belongs to which.
+# (#233). Laid side by side, the two logs now say which line belongs to which. The logger class
+# takes the one-time secrets out of addresses -- a recovery or reset link, an invitation -- so a
+# collected log is not a collection of working links (#754).
 CMD ["gunicorn", "postulo.config.wsgi:application", \
      "--bind", "0.0.0.0:8000", \
      "--workers", "3", \
-     "--access-logfile", "-", \
+     "--access-logfile", "-",      "--logger-class", "postulo.config.gunicorn_logging.RedactingLogger", \
      "--access-logformat", "%(h)s %(l)s %(u)s %(t)s \"%(r)s\" %(s)s %(b)s \"%(f)s\" \"%(a)s\" request=%({x-request-id}o)s", \
      "--error-logfile", "-"]
