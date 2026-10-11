@@ -294,7 +294,10 @@ def start_consent(request, config: dict | None = None) -> str:
         raise TokenUnavailable(
             str(_("Register this instance with the provider first, and save the client ID."))
         )
-    state = signing.dumps({"by": request.user.pk}, salt=CONSENT_SALT)
+    state = signing.dumps(
+        {"by": request.user.pk, "nonce": consent.make_nonce(request, "instance-mail")},
+        salt=CONSENT_SALT,
+    )
     query = {
         "response_type": "code",
         "client_id": client_id,
@@ -341,6 +344,8 @@ def finish_consent(request, code: str, state: str) -> None:
     user = request.user
     if payload.get("by") != getattr(user, "pk", None) or not getattr(user, "is_staff", False):
         raise TokenUnavailable(str(_("Only the administrator who started this can finish it.")))
+    if not consent.spend_nonce(request, "instance-mail", payload.get("nonce", "")):
+        raise TokenUnavailable(str(_("That reply did not come from a request Postulo made.")))
 
     config = site.email_settings()
     chosen = provider(str(config.get("oauth_provider") or ""))

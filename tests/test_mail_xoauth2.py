@@ -479,7 +479,16 @@ def test_microsoft_is_asked_for_offline_access_or_mail_stops_in_an_hour(client, 
 
 
 def _state_for(user):
-    return signing.dumps({"by": user.pk}, salt=mail_auth.CONSENT_SALT)
+    return signing.dumps(
+        {"by": user.pk, "nonce": "held-by-the-browser"}, salt=mail_auth.CONSENT_SALT
+    )
+
+
+def _holds_the_nonce(client) -> None:
+    """The browser that started the flow holds the nonce its state carries (#748)."""
+    session = client.session
+    session[consent.NONCE_SESSION_KEY] = {"instance-mail": "held-by-the-browser"}
+    session.save()
 
 
 def test_the_provider_coming_back_keeps_the_refresh_token(client, admin, monkeypatch):
@@ -488,6 +497,7 @@ def test_the_provider_coming_back_keeps_the_refresh_token(client, admin, monkeyp
     )
     mailbox()
     client.force_login(admin)
+    _holds_the_nonce(client)
 
     response = client.get(
         reverse("connections:consent_callback"), {"code": "c", "state": _state_for(admin)}

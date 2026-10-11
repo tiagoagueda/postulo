@@ -37,6 +37,7 @@ the timeout and the redirect limit every other outbound request gets, rather tha
 
 from __future__ import annotations
 
+import secrets
 import time
 
 from django.core import signing
@@ -107,6 +108,39 @@ def callback_url(request) -> str:
 
 # ------------------------------------------------------------------ the round trip
 
+#: Where the nonces of the flows under way are kept, by flow (#748).
+NONCE_SESSION_KEY = "consent-nonces"
+
+
+def make_nonce(request, flow: str) -> str:
+    """A random value held in this browser's session for ``flow``, to go into the state.
+
+    A signed state proves Postulo made it, not that *this browser* is the one it was made for:
+    a captured state plus a code from the attacker's own authorisation at the provider would
+    bind the attacker's account to the victim's connection. The nonce is in the session and
+    in the state, and the callback needs both to agree (#748).
+    """
+    nonce = secrets.token_urlsafe(24)
+    held = dict(request.session.get(NONCE_SESSION_KEY) or {})
+    held[flow] = nonce
+    request.session[NONCE_SESSION_KEY] = held
+    return nonce
+
+
+def spend_nonce(request, flow: str, offered: str) -> bool:
+    """Whether ``offered`` is the nonce this session holds for ``flow``; it is spent either way.
+
+    Popped before it is compared, so a state is good once: a second callback with the same
+    value finds nothing held.
+    """
+    session = getattr(request, "session", None)
+    if session is None:
+        return False
+    held = dict(session.get(NONCE_SESSION_KEY) or {})
+    expected = held.pop(flow, "")
+    session[NONCE_SESSION_KEY] = held
+    return bool(expected) and bool(offered) and secrets.compare_digest(expected, str(offered))
+
 
 def start(connection, plugin, request) -> str:
     """Where to send the person, with a state value only this instance could have made."""
@@ -121,7 +155,13 @@ def start(connection, plugin, request) -> str:
             str(_("Register this instance with the provider first, and save the client id."))
         )
 
-    state = signing.dumps({"connection": connection.pk, "owner": connection.owner_id})
+    state = signing.dumps(
+        {
+            "connection": connection.pk,
+            "owner": connection.owner_id,
+            "nonce": make_nonce(request, f"connection:{connection.pk}"),
+        }
+    )
     query = {
         "response_type": "code",
         "client_id": client_id,
@@ -150,11 +190,17 @@ def finish(request, code: str, state: str):
             str(_("That reply did not come from a request Postulo made."))
         ) from error
 
-    connection = Connection.objects.filter(pk=payload.get("connection")).first()
+    # One answer for all three, so the reply says nothing about which was wrong (#748): the
+    # lookup is among the signed-in person's own connections, and the state has to be the one
+    # this browser was given and has not yet used.
+    gone = ConsentFailed(str(_("That reply did not come from a request Postulo made.")))
+    connection = (
+        Connection.objects.for_user(request.user).filter(pk=payload.get("connection")).first()
+    )
     if connection is None or connection.owner_id != payload.get("owner"):
-        raise ConsentFailed(str(_("That connection no longer exists.")))
-    if connection.owner_id != getattr(request.user, "pk", None):
-        raise ConsentFailed(str(_("That connection belongs to somebody else.")))
+        raise gone
+    if not spend_nonce(request, f"connection:{connection.pk}", payload.get("nonce", "")):
+        raise gone
 
     from .policy import active_plugin
 

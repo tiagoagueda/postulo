@@ -61,8 +61,14 @@ def configured():
     return row
 
 
-def state(user_pk):
-    return signing.dumps({"by": user_pk}, salt=mail_auth.CONSENT_SALT)
+def state(user_pk, client=None):
+    """A state as `start_consent` makes one; with a client, the browser holds its nonce (#748)."""
+    nonce = "a-nonce-this-browser-was-given"
+    if client is not None:
+        session = client.session
+        session[consent.NONCE_SESSION_KEY] = {"instance-mail": nonce}
+        session.save()
+    return signing.dumps({"by": user_pk, "nonce": nonce}, salt=mail_auth.CONSENT_SALT)
 
 
 def finish(client, value, code="c"):
@@ -155,7 +161,7 @@ def test_a_state_past_its_allowance_is_refused(client, admin, configured, provid
 
 def test_the_tokens_and_secret_are_never_in_plain_text(client, admin, configured, provider):
     client.force_login(admin)
-    finish(client, state(admin.pk))
+    finish(client, state(admin.pk, client))
 
     row = SiteSettings.get()
     stored = row.email_oauth_secrets_encrypted
@@ -182,3 +188,46 @@ def test_the_tokens_do_not_travel_in_an_export(admin, configured, provider):
 
     assert b"refresh-xyz" not in everything
     assert b"client-secret-value" not in everything
+
+
+# ------------------------------------------------------------ the same browser, once (#748)
+
+
+def test_the_browser_that_started_it_can_finish_it_once(client, admin, configured, provider):
+    client.force_login(admin)
+    made = state(admin.pk, client)
+
+    finish(client, made)
+    again = finish(client, made)
+
+    assert len(provider) == 1, "the second callback with the same state exchanged nothing"
+    assert again.status_code in (200, 302)
+
+
+def test_a_state_taken_to_another_browser_is_refused(client, admin, configured, provider):
+    """A state captured from the victim, with the attacker's code, in the attacker's session."""
+    client.force_login(admin)
+    session = client.session
+    session[consent.NONCE_SESSION_KEY] = {}
+    session.save()
+
+    finish(client, state(admin.pk))
+
+    assert provider == []
+    assert not SiteSettings.get().has_email_consent
+
+
+def test_the_state_start_makes_carries_a_nonce_the_session_holds(rf, admin, configured):
+    from django.contrib.sessions.middleware import SessionMiddleware
+
+    request = rf.get("/", HTTP_HOST="testserver")
+    SessionMiddleware(lambda r: None).process_request(request)
+    request.user = admin
+
+    where = mail_auth.start_consent(request)
+
+    from urllib.parse import parse_qs, urlsplit
+
+    made = parse_qs(urlsplit(where).query)["state"][0]
+    payload = signing.loads(made, salt=mail_auth.CONSENT_SALT)
+    assert payload["nonce"] == request.session[consent.NONCE_SESSION_KEY]["instance-mail"]

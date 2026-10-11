@@ -115,6 +115,25 @@ def connection(user):
     return row
 
 
+def a_session(request):
+    """A request with a session, which is what a callback needs to prove it is the same browser."""
+    from django.contrib.sessions.middleware import SessionMiddleware
+
+    SessionMiddleware(lambda r: None).process_request(request)
+    return request
+
+
+def a_state(request, connection, owner=None):
+    """The state `flow.start` would have made for this browser, without the redirect."""
+    return signing.dumps(
+        {
+            "connection": connection.pk,
+            "owner": owner if owner is not None else connection.owner_id,
+            "nonce": flow.make_nonce(request, f"connection:{connection.pk}"),
+        }
+    )
+
+
 def a_reply(payload: dict, status: int = 200):
     """One httpx response from the provider's token endpoint."""
     response = mock.Mock()
@@ -162,7 +181,7 @@ def test_something_that_is_not_a_consent_is_ignored():
 
 
 def test_the_provider_is_asked_for_what_the_plugin_declared(rf, connection, user):
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
     request.user = user
 
     with installed(Consenting):
@@ -175,7 +194,7 @@ def test_the_provider_is_asked_for_what_the_plugin_declared(rf, connection, user
 
 
 def test_the_state_is_signed_so_only_postulo_could_have_made_it(rf, connection, user):
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
     request.user = user
 
     with installed(Consenting):
@@ -185,7 +204,8 @@ def test_the_state_is_signed_so_only_postulo_could_have_made_it(rf, connection, 
     from urllib.parse import unquote
 
     payload = signing.loads(unquote(state), max_age=flow.STATE_MAX_AGE)
-    assert payload == {"connection": connection.pk, "owner": user.pk}
+    held = request.session[flow.NONCE_SESSION_KEY][f"connection:{connection.pk}"]
+    assert payload == {"connection": connection.pk, "owner": user.pk, "nonce": held}
 
 
 def test_without_a_client_id_it_says_what_to_do(rf, connection, user):
@@ -212,7 +232,7 @@ def test_a_connection_that_does_not_use_consent_refuses(rf, connection, user):
 
 
 def test_a_forged_state_is_refused(rf, user):
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
     request.user = user
 
     with pytest.raises(flow.ConsentFailed) as raised:
@@ -228,19 +248,20 @@ def test_somebody_else_s_connection_cannot_be_reached_through_a_callback(
     stranger = django_user_model.objects.create_user(
         email="stranger@example.org", username="stranger", password="a-long-enough-password-42"
     )
-    state = signing.dumps({"connection": connection.pk, "owner": connection.owner_id})
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
+    state = a_state(request, connection)
     request.user = stranger
 
     with installed(Consenting), pytest.raises(flow.ConsentFailed) as raised:
         flow.finish(request, "a-code", state)
 
-    assert "belongs to somebody else" in str(raised.value)
+    # The same words as any other refusal (#748): nothing says whose it is.
+    assert "did not come from a request Postulo made" in str(raised.value)
 
 
 def test_a_stale_state_is_refused(rf, connection, user, monkeypatch):
-    state = signing.dumps({"connection": connection.pk, "owner": user.pk})
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
+    state = a_state(request, connection, user.pk)
     request.user = user
     monkeypatch.setattr(flow, "STATE_MAX_AGE", -1)
 
@@ -249,8 +270,8 @@ def test_a_stale_state_is_refused(rf, connection, user, monkeypatch):
 
 
 def test_finishing_keeps_the_refresh_token(rf, connection, user):
-    state = signing.dumps({"connection": connection.pk, "owner": user.pk})
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
+    state = a_state(request, connection, user.pk)
     request.user = user
     reply = a_reply({"access_token": "an-access", "refresh_token": "a-refresh", "expires_in": 3600})
 
@@ -263,8 +284,8 @@ def test_finishing_keeps_the_refresh_token(rf, connection, user):
 
 
 def test_the_tokens_are_not_stored_in_plain_text(rf, connection, user):
-    state = signing.dumps({"connection": connection.pk, "owner": user.pk})
-    request = rf.get("/")
+    request = a_session(rf.get("/"))
+    state = a_state(request, connection, user.pk)
     request.user = user
     reply = a_reply({"access_token": "an-access", "refresh_token": "a-refresh", "expires_in": 3600})
 
@@ -461,3 +482,41 @@ def test_testing_a_consenting_connection_reports_a_withdrawn_grant(client, user,
         response = client.post(reverse("connections:test", args=[connection.pk]), follow=True)
 
     assert "agree to it again" in response.content.decode()
+
+
+# ------------------------------------------------------- the browser it was made for (#748)
+
+
+def test_a_state_is_good_once(rf, connection, user):
+    request = a_session(rf.get("/"))
+    state = a_state(request, connection, user.pk)
+    request.user = user
+    reply = a_reply({"access_token": "an-access", "refresh_token": "a-refresh", "expires_in": 3600})
+
+    with installed(Consenting), mock.patch("postulo.plugins.http.client", return_value=reply):
+        flow.finish(request, "a-code", state)
+        with pytest.raises(flow.ConsentFailed):
+            flow.finish(request, "a-code", state)
+
+
+def test_a_state_in_another_browser_binds_nothing(rf, connection, user):
+    """The state was captured; the code is the attacker's; the session is not the victim's."""
+    victim = a_session(rf.get("/"))
+    state = a_state(victim, connection, user.pk)
+    attacker_side = a_session(rf.get("/"))
+    attacker_side.user = user
+
+    with installed(Consenting), pytest.raises(flow.ConsentFailed):
+        flow.finish(attacker_side, "the-attackers-code", state)
+
+    connection.refresh_from_db()
+    assert not flow.is_connected(connection)
+
+
+def test_a_state_made_without_a_session_is_never_accepted(rf, connection, user):
+    state = signing.dumps({"connection": connection.pk, "owner": user.pk, "nonce": "x"})
+    request = rf.get("/")
+    request.user = user
+
+    with installed(Consenting), pytest.raises(flow.ConsentFailed):
+        flow.finish(request, "a-code", state)
