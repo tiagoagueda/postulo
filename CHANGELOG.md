@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Two sign-ups that overlap on PostgreSQL can no longer both become administrator: the check is taken under a lock on the settings row, and the event is logged (#738)
 - Single sign-on is started by a POST with the CSRF token behind a page that asks, not by a link on any page, and the content security policy's form-action names the provider's origin (#737)
 - Single sign-on no longer spends an invitation addressed to somebody else: the provider's verified address has to be the one it names (#736)
 - The archive import charges its phone-number lookups to the allowance, and once it is spent skips free and held numbers alike in one line (#890)

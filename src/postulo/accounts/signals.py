@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import logging
+
 from allauth.account.models import EmailAddress
 from allauth.account.signals import email_changed, user_signed_up
 from django.conf import settings
@@ -12,6 +14,8 @@ from django.dispatch import receiver
 
 from .adapter import INVITE_SESSION_KEY, pending_invite
 from .models import AddressClaim, Profile
+
+logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL, dispatch_uid="postulo_create_profile")
@@ -54,13 +58,23 @@ def first_account_is_the_administrator(request, user, **kwargs) -> None:
     form is the only candidate. Their address is trusted for the same reason the
     console's is: there is nobody else yet to send a verification link on whose behalf.
     """
+    from postulo.core.models import SiteSettings
+
     User = type(user)
-    if User.objects.exclude(pk=user.pk).exists():
-        return
-    user.is_staff = True
-    user.is_superuser = True
-    user.save(update_fields=["is_staff", "is_superuser"])
-    EmailAddress.objects.filter(user=user, email__iexact=user.email).update(verified=True)
+    # Two sign-ups that overlap each saw no other account and both became administrators on
+    # PostgreSQL, where the check ran unlocked (#738). The instance's one settings row is a
+    # sentinel every sign-up queues on: the second waits until the first has committed and
+    # then looks again, so exactly one is first. SQLite serialises writers anyway.
+    with transaction.atomic():
+        SiteSettings.objects.select_for_update().filter(pk=SiteSettings.get().pk).first()
+        if User.objects.exclude(pk=user.pk).exists():
+            return
+        user.is_staff = True
+        user.is_superuser = True
+        user.save(update_fields=["is_staff", "is_superuser"])
+        EmailAddress.objects.filter(user=user, email__iexact=user.email).update(verified=True)
+    # An event an operator would want to see in the log whoever it was (#738).
+    logger.warning("The first account (%s) was made the administrator of this instance", user.pk)
 
 
 @receiver(user_signed_up, dispatch_uid="postulo_consume_invite")
