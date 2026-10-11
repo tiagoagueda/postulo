@@ -311,9 +311,12 @@
        nearer edge of the week, as in a month's cell. No one menu could do both -- whichever
        way it opened, it would open off the screen in one of the two shapes -- and the one
        not shown is `display: none`, so neither the keyboard nor a screen reader meets it. {% endcomment %}
-    <div class="grid gap-3 lg:grid-cols-7" data-calendar="week">
+    {% comment %} The seven days are one card, divided by borders, with no gaps (#860): side
+       by side from `lg`, stacked inside the one card below it. {% endcomment %}
+    <div class="card overflow-clip p-0">
+    <div class="grid divide-y divide-ink-200 lg:grid-cols-7 lg:divide-x lg:divide-y-0 dark:divide-ink-800" data-calendar="week">
       {% for day in page.days %}
-        <section class="card p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
+        <section class="p-3" aria-labelledby="day-{{ day.date|date:'Y-m-d' }}" {% if day.today %}aria-current="date"{% endif %}>
           <div class="mb-2 flex items-center justify-between gap-1">
             <h3 id="day-{{ day.date|date:'Y-m-d' }}" class="text-sm font-medium">
               <a href="{{ day.url }}" class="inline-flex min-h-6 items-center hover:underline {% if day.today %}text-brand-700 dark:text-brand-300{% endif %}">{{ day.date|date:"D" }} {{ day.date|date:"j" }}</a>
@@ -341,6 +344,7 @@
           {% endif %}
         </section>
       {% endfor %}
+    </div>
     </div>
   {% else %}
     <div data-calendar="{{ page.view }}">

@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The calendar's week view is one card of seven days divided by borders, with no gaps between them (#860)
 - The calendar's Earlier, Today and Later are a button group of Previous, This month/week/day and Next, and the period opens a date picker (#858)
 - A company's logo is changed from a dialog on its edit page, with its own form for an address or an upload; the company form now draws its parent (#853)
 - Industries are drawn as coloured badges with an icon and a tone taken from their NACE section, on the company page and in the companies table (#856)
