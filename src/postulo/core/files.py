@@ -72,6 +72,17 @@ def resolve_media_path(name: str) -> Path:
 FILE_POLICY = "default-src 'none'; sandbox"
 
 
+def _type_by_extension(filename: str) -> str:
+    """The media type for a file name, from its extension and nothing else (#771).
+
+    ``mimetypes.guess_type`` reads a name that begins ``data:`` as a data URL and returns the
+    type written inside it, and a title is whatever somebody typed. Only the last extension is
+    looked at, on a name that cannot be anything but a file name.
+    """
+    extension = posixpath.splitext(filename)[1]
+    return mimetypes.guess_type(f"file{extension}")[0] or "application/octet-stream"
+
+
 def serve_private_file(
     request: HttpRequest,
     file_field,
@@ -112,7 +123,7 @@ def serve_private_file(
         raise Http404("File not found.")
 
     filename = download_name or posixpath.basename(file_field.name)
-    content_type = mimetypes.guess_type(filename)[0] or "application/octet-stream"
+    content_type = _type_by_extension(filename)
     # Django escapes what a quoted name cannot hold, refuses nothing, and adds the
     # RFC 6266 UTF-8 form for names with accents; a title is whatever somebody typed (#376).
     content_disposition = content_disposition_header(as_attachment, filename)
