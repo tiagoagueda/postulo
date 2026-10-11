@@ -21,14 +21,14 @@
     {% endif %}
   </div>
   {% if group.imports|length > 1 %}
-    <div id="import-{{ subject }}" popover data-popover data-align="end" class="card p-2">
+    <div id="import-{{ subject }}" popover data-popover data-align="end" class="card max-w-xs p-2">
       <ul class="flex flex-col gap-1" aria-label="{% translate 'Import from' %}">
         {% for label, url in group.imports %}<li><a href="{{ url }}" class="menu-item">{{ label }}</a></li>{% endfor %}
       </ul>
     </div>
   {% endif %}
   {% if group.exports|length > 1 %}
-    <div id="export-{{ subject }}" popover data-popover data-align="end" class="card p-2">
+    <div id="export-{{ subject }}" popover data-popover data-align="end" class="card max-w-xs p-2">
       <ul class="flex flex-col gap-1" aria-label="{% translate 'Export as' %}">
         {% for label, url in group.exports %}<li><a href="{{ url }}" class="menu-item">{{ label }}</a></li>{% endfor %}
       </ul>

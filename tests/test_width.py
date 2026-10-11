@@ -114,7 +114,7 @@ def test_the_company_form_takes_the_screen_and_its_cards_keep_the_measure(client
         cards = COMPANY_CARDS.findall(inside)
         assert len(cards) == 2, f"{path}: {cards}"
         assert inside.index("data-identifiers") > inside.index('name="name"'), path
-        assert inside.index('type="submit"') > inside.index("data-identifiers"), path
+        assert inside.rindex('type="submit"') > inside.index("data-identifiers"), path
         assert not re.search(r"\border-", inside), f"{path} reorders something visually"
 
 

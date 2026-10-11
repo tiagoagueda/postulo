@@ -148,6 +148,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # A person's own language and zone, asked of the policy row; the one place a sync
             # or an errand puts them in force outside a request (#335, #383).
             "postulo.core.preferences",
+            # Which day a week starts on, put in force beside them and read by the reports (#859).
+            "postulo.core.weeks",
             "postulo.core.identifiers",
             "postulo.plugins.identifiers*",
             # What a web link's service is, which the model reads to name a row (#305). The
