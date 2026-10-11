@@ -662,6 +662,15 @@ POSTULO_CAPTURE_PAGE_KEEP_DAYS = env.int("POSTULO_CAPTURE_PAGE_KEEP_DAYS", defau
 # are encrypted under a key derived from SECRET_KEY unless a dedicated one is given, so
 # that rotating Django's key does not silently lock every connection.
 POSTULO_FIELD_KEY = env("POSTULO_FIELD_KEY", default="")
+# The ports a fetch of something public -- a posting, a link, a logo -- may dial (#780). A
+# connection is the operator's own choice and may use any port.
+_fetch_ports = env.list("POSTULO_FETCH_PORTS", default=["80", "443", "8080", "8443"])
+# `*` lifts the restriction, for a test that serves a page on a port of its own.
+POSTULO_FETCH_PORTS = (
+    "*"
+    if "*" in _fetch_ports
+    else tuple(int(port) for port in _fetch_ports if port.strip().isdigit())
+)
 # Capture refuses private addresses because the URL came from a stranger's page. A
 # connection's destination is what the person typed, and self-hosted services live on
 # private networks, so the operator decides — once — whether plugins may reach them.

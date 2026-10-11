@@ -45,6 +45,7 @@ from .public_addresses import (  # noqa: F401 - re-exported: resume.links, serve
     USER_AGENT,
     UnsafeURL,
     public_addresses_for,
+    require_web_port,
     validate_public_url,
 )
 
@@ -288,6 +289,7 @@ def fetch_page(url: str) -> FetchedPage:
 
 
 def _fetch(url: str) -> FetchedPage:
+    require_web_port(url)
     current = validate_public_url(url)
 
     with http.public_only_client(
@@ -325,6 +327,7 @@ def _fetch(url: str) -> FetchedPage:
                             # own: that one was pinned to a number, and a relative redirect
                             # joined to it would ask the next hop for the number rather than
                             # for the site.
+                            require_web_port(urljoin(current, location))
                             current = validate_public_url(urljoin(current, location))
                             continue
 

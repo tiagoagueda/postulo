@@ -51,6 +51,32 @@ def _addresses_for(host: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Addr
     return [ipaddress.ip_address(info[4][0]) for info in infos]
 
 
+def web_ports() -> frozenset[int] | None:
+    """The ports a fetch of something public may dial (#780): the operator's
+    ``POSTULO_FETCH_PORTS``, the ordinary web ports by default, and ``*`` for any port."""
+    from django.conf import settings
+
+    ports = getattr(settings, "POSTULO_FETCH_PORTS", (80, 443, 8080, 8443))
+    return None if ports == "*" else frozenset(ports)
+
+
+def require_web_port(url: str) -> None:
+    """Refuse a port outside the web's, for something fetched from a stranger (#780).
+
+    A posting, a link or a logo has no business on any port of any public host: each answer
+    would be a port scanner run from the instance's own address. A connection is the
+    operator's own choice and may use any port, so it does not ask. Asked beside
+    `public_addresses_for` and not inside it, so a connection's check is unchanged.
+    """
+    try:
+        port = urlparse(url.strip()).port
+    except ValueError as exc:
+        raise UnsafeURL(_("That does not look like a complete web address.")) from exc
+    allowed = web_ports()
+    if port is not None and allowed is not None and port not in allowed:
+        raise UnsafeURL(_("Postulo only fetches from the ordinary web ports."))
+
+
 def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv6Address]:
     """Every address ``url``'s host answers with, once they have all been approved.
 
@@ -62,6 +88,7 @@ def public_addresses_for(url: str) -> list[ipaddress.IPv4Address | ipaddress.IPv
     with a one-second lifetime is free to answer with a public address for the check and
     a private one a moment later, and the check would have passed on an address nobody
     ever contacted.
+
     """
     try:
         parts = urlparse(url.strip())

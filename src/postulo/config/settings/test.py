@@ -72,3 +72,7 @@ STATIC_ROOT = tempfile.mkdtemp(prefix="postulo-test-static-")
 STORAGES["staticfiles"] = {
     "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
 }
+
+# The fetch tests serve a page from a socket on a port of the operator system's choosing; the
+# restriction itself is tested with the setting put back (tests/test_hardening_780.py).
+POSTULO_FETCH_PORTS = "*"

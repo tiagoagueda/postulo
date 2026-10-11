@@ -30,6 +30,7 @@ from .public_addresses import (
     Unresolvable,
     UnsafeURL,
     public_addresses_for,
+    require_web_port,
     validate_public_url,
 )
 
@@ -273,6 +274,7 @@ def _public_only(request: httpx.Request) -> None:
     """
     original = request.headers.get("Host")
     try:
+        require_web_port(str(request.url))
         addresses = public_addresses_for(str(request.url))
     except UnsafeURL as exc:
         raise DestinationRefused(str(exc)) from exc

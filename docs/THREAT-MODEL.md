@@ -158,8 +158,9 @@ applying. Three things follow, and each is a promise:
 5. A new outbound request goes through `postulo.plugins.http.client()`, and one that is
    not HTTP goes through `postulo.core.destinations.approve()` — same three rules,
    different protocol: refuse private addresses unless the operator allowed them, check
-   every address the name answers with, and connect to the one that was checked.
-   `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is a decision of the
+   every address the name answers with, and connect to the one that was checked. What is
+   fetched from a stranger -- a posting, a link, a logo -- also dials the web's ports only
+   (`POSTULO_FETCH_PORTS`, #780). `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is a decision of the
    operator for the whole instance, not for one plugin or one account: where it is on, every
    account can map the private network through the Test buttons, and that is accepted, and
    written in `.env.example` and the wiki, rather than hidden (#779).

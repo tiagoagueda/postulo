@@ -29,7 +29,7 @@ from django.utils.translation import gettext as _
 
 from postulo.core import throttle
 from postulo.plugins import http
-from postulo.plugins.fetching import UnsafeURL, validate_public_url
+from postulo.plugins.fetching import UnsafeURL, require_web_port, validate_public_url
 
 from .models import Link, LinkStatus
 
@@ -83,6 +83,7 @@ def _ask(url: str) -> tuple[str, str]:
     # Checked here as well as in the hook so a private address gives the person the
     # sentence explaining why, rather than the hook's refusal wrapped in a transport error.
     try:
+        require_web_port(url)
         validate_public_url(url)
     except UnsafeURL as error:
         return LinkStatus.BROKEN, str(error)
