@@ -247,7 +247,7 @@ class FakeClient:
 def gravatar(monkeypatch):
     FakeClient.calls = []
     FakeClient.answer = FakeResponse(404)
-    monkeypatch.setattr(avatars.http, "client", FakeClient)
+    monkeypatch.setattr(avatars.http, "public_only_client", FakeClient)
     return FakeClient
 
 
@@ -359,7 +359,7 @@ def test_a_failing_gravatar_is_reported_not_fatal(client, user, monkeypatch):
         def get(self, url):
             raise OSError("no route")
 
-    monkeypatch.setattr(avatars.http, "client", Boom)
+    monkeypatch.setattr(avatars.http, "public_only_client", Boom)
     client.force_login(user)
     response = profile_page(client, user, use_gravatar="on")
     assert response.status_code == 302

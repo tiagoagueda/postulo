@@ -231,7 +231,7 @@ def fetch_gravatar(profile) -> str:
     """
     outcome = "error"
     try:
-        with http.client(timeout=8.0) as client:
+        with http.public_only_client(timeout=8.0) as client:
             response = client.get(gravatar_url(profile.user.email))
         with transaction.atomic():
             if response.status_code == 404:

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Gravatar is fetched through the public-only client, like a logo, and the Hardening page lists what POSTULO_CONNECTIONS_ALLOW_PRIVATE widens and what it never does (#537)
 - The CSRF cookie is HttpOnly like the session cookie, as the threat model says of every cookie; the script takes the token from the form it sends (#538)
 - Restoring an archive or reading a kind file blanks any web address that is not http or https, and the update check keeps a release address only if it is, instead of storing a script address to be drawn as a link (#770)
 - A bare number or object where a file expects text, an impossible exported-at or save stamp, and a mail subject with a line break are refused or ignored instead of ending in a 500 (#769)

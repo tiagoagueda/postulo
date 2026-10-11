@@ -253,6 +253,36 @@ def test_a_logo_from_the_open_web_still_arrives(monkeypatch, settings):
     assert str(seen[0].url.host) == "93.184.216.34"
 
 
+def test_a_gravatar_is_fetched_publicly_even_where_connections_may_be_private(
+    monkeypatch, settings, django_user_model
+):
+    """Gravatar is a public service, like a logo (#537): the switch for connections is not its."""
+    from postulo.accounts import avatars
+
+    settings.POSTULO_CONNECTIONS_ALLOW_PRIVATE = True
+    resolving(monkeypatch, {})
+    seen: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(snapshot(request))
+        return httpx.Response(200, content=b"x")
+
+    real = http.public_only_client
+    monkeypatch.setattr(
+        http,
+        "public_only_client",
+        lambda **kwargs: real(transport=httpx.MockTransport(handler), **kwargs),
+    )
+    user = django_user_model.objects.create_user(
+        email="g@example.org", username="g", password="x" * 14
+    )
+
+    outcome = avatars.fetch_gravatar(user.profile)
+
+    assert outcome == "error", "the address was refused, as the resolver found nothing public"
+    assert seen == [], "and no request was made"
+
+
 # --------------------------------------------------------------------------- robots.txt
 
 
