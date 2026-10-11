@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The database cache that holds the rate limits and the sign-in lockout keeps 200,000 entries instead of 300, so an outsider cannot push a counter out by making the cache grow (POSTULO_CACHE_MAX_ENTRIES) (#755)
 - The shipped gunicorn access log no longer writes the secret in a recovery, invitation, password-reset or confirmation link, or the code in a consent callback (#754)
 - Signing out drops the browser's push subscription and unregisters its worker, so reminders stop arriving on a shared browser, and sign-out goes on at once where the browser has no worker (#753)
 - A webhook delivery's body is cleared once the receiver has it, finished rows are deleted after a week, and deleting a connection deletes its deliveries (#752)

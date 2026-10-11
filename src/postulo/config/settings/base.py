@@ -193,6 +193,15 @@ CACHE_TABLE = "postulo_cache"
 CACHES = {
     "default": env.cache_url("POSTULO_CACHE_URL", default=f"dbcache://{CACHE_TABLE}"),
 }
+# Django's database cache keeps 300 entries and, past that, deletes the *lexicographically
+# smallest* third of the keys, not the oldest (#755). The rate limits and the sign-in lockout
+# are keys in it, so anyone able to make the cache grow could push a counter out and start
+# a guesser's five tries again. Raised far past anything honest traffic reaches, so that an
+# eviction takes a flood nobody could miss. Redis and Memcached have their own policy and are
+# left as they are.
+POSTULO_CACHE_MAX_ENTRIES = env.int("POSTULO_CACHE_MAX_ENTRIES", default=200_000)
+if CACHES["default"]["BACKEND"].endswith("db.DatabaseCache"):
+    CACHES["default"].setdefault("OPTIONS", {}).setdefault("MAX_ENTRIES", POSTULO_CACHE_MAX_ENTRIES)
 
 # Widgets are rendered by the project's own template engine rather than by a private one
 # of Django's, so a widget template can live beside every other template. The phone field

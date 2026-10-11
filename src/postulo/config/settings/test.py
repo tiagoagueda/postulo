@@ -62,6 +62,8 @@ CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.db.DatabaseCache",
         "LOCATION": CACHE_TABLE,
+        # The production setting (#755), so the tests meet the same culling the instance does.
+        "OPTIONS": {"MAX_ENTRIES": POSTULO_CACHE_MAX_ENTRIES},
     }
 }
 POSTULO_BACKGROUND_WORK = False
