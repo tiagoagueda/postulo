@@ -27,7 +27,7 @@ import httpx
 from django.core.management.base import BaseCommand, CommandError
 
 from postulo.jobs import places
-from postulo.plugins.http import public_only_client
+from postulo.plugins.http import BodyRefused, get_bytes, public_only_client
 
 CITIES_URL = "https://download.geonames.org/export/dump/cities1000.zip"
 COUNTRIES_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
@@ -35,6 +35,10 @@ COUNTRIES_URL = "https://download.geonames.org/export/dump/countryInfo.txt"
 #: A minute and a half for a file of a few dozen megabytes; more than that is a connection
 #: in trouble, not a dataset.
 TIMEOUT = 90.0
+#: What a download may weigh as it arrives, and what its one table may weigh unpacked (#782).
+#: The real city table is about ten megabytes zipped and fifty unpacked.
+MAX_DOWNLOAD_BYTES = 64 * 1024 * 1024
+MAX_TABLE_BYTES = 512 * 1024 * 1024
 
 #: The cities1000 table is some 170,000 rows; an answer with a handful is not the
 #: table, and the download is a refusal in a different coat.
@@ -80,20 +84,35 @@ class Command(BaseCommand):
         )
 
     def _fetch(self, client, url: str, what: str) -> str:
-        response = client.get(url)
-        if response.status_code != 200:
-            raise CommandError(f"the download of {what} answered {response.status_code}: {url}")
+        # Streamed and bounded (#782): this runs at first start with nobody behind it, against
+        # a host the operator does not control, and a bomb here would kill the provisioning.
+        try:
+            status, body = get_bytes(client, url, limit=MAX_DOWNLOAD_BYTES, seconds=TIMEOUT)
+        except BodyRefused as refused:
+            raise CommandError(f"the download of {what} was refused: {refused}: {url}") from None
+        if status != 200:
+            raise CommandError(f"the download of {what} answered {status}: {url}")
         if url.endswith(".zip"):
             try:
-                with zipfile.ZipFile(io.BytesIO(response.content)) as archive:
+                with zipfile.ZipFile(io.BytesIO(body)) as archive:
                     if len(archive.namelist()) != 1:
                         raise ValueError
-                    return archive.read(archive.namelist()[0]).decode("utf-8")
+                    member = archive.infolist()[0]
+                    if member.file_size > MAX_TABLE_BYTES:
+                        raise ValueError
+                    with archive.open(member) as inflated:
+                        text = inflated.read(MAX_TABLE_BYTES + 1)
+                    if len(text) > MAX_TABLE_BYTES:
+                        raise ValueError
+                    return text.decode("utf-8")
             except (zipfile.BadZipFile, ValueError, UnicodeDecodeError):
                 raise CommandError(
                     f"the download of {what} was not the zip of one tab-separated table: {url}"
                 ) from None
-        return response.text
+        try:
+            return body.decode("utf-8")
+        except UnicodeDecodeError:
+            raise CommandError(f"the download of {what} was not text: {url}") from None
 
     def _validate(self, cities: str, countries: str) -> None:
         """What the loader will read, checked before anything is replaced."""

@@ -469,6 +469,28 @@ def _hold_to_deadlines(client: httpx.Client) -> None:
 # ------------------------------------------------------------ reading what comes back
 
 
+def get_bytes(
+    client: httpx.Client, url: str, *, limit: int, seconds: float = 60.0, headers=None
+) -> tuple[int, bytes]:
+    """The status and the body of one GET, the body never larger than ``limit`` and the whole of
+    it done within ``seconds`` (#782).
+
+    For a download whose size nobody has vouched for: it is streamed, asked for with
+    `ACCEPT_ENCODING`, inflated a piece at a time and stopped at the limit and at the deadline,
+    which ``client.get`` does none of. A status other than 200 comes back with no body.
+    Raises `BodyRefused` (a subclass says why) when the body is over the limit, too slow or in
+    a coding nobody asked for.
+    """
+    deadline = deadline_in(seconds)
+    with until(deadline):
+        with client.stream(
+            "GET", url, headers={"Accept-Encoding": ACCEPT_ENCODING, **(headers or {})}
+        ) as response:
+            if response.status_code != 200:
+                return response.status_code, b""
+            return 200, read_body(response, limit=limit, deadline=deadline)
+
+
 def read_body(response: httpx.Response, *, limit: int, deadline: float) -> bytes:
     """The body of a *streamed* response, never holding more than ``limit`` and one chunk.
 

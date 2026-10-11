@@ -19,6 +19,7 @@ last check stored, and a page never fetches.
 from __future__ import annotations
 
 import functools
+import json
 import logging
 from datetime import timedelta
 
@@ -31,6 +32,9 @@ logger = logging.getLogger(__name__)
 #: Where the last answer is kept, for every process to read. No expiry: a stale answer with
 #: its date is more use than none, and the next check overwrites it.
 CACHE_KEY = "postulo:update-check"
+
+#: The most a release feed's answer may weigh (#782).
+MAX_ANSWER_BYTES = 1024 * 1024
 
 #: How often the scheduler asks. A release is not an hourly event.
 EVERY = timedelta(days=1)
@@ -47,12 +51,21 @@ def source() -> str:
 def _fetch(url: str) -> dict:
     """The one request. Through the public-only client: the address is public by
     definition, so the operator's own destination policy does not widen what it may dial."""
-    from postulo.plugins.http import public_only_client
+    from postulo.plugins.http import get_bytes, public_only_client
 
     with public_only_client(timeout=10.0) as client:
-        response = client.get(url, headers={"Accept": "application/json"})
-        response.raise_for_status()
-        return response.json()
+        # Bounded (#782): a release feed is a few kilobytes, and what answers for a configured
+        # address is somebody else's server; the scheduler that asks is shared by every account.
+        status, body = get_bytes(
+            client,
+            url,
+            limit=MAX_ANSWER_BYTES,
+            seconds=30.0,
+            headers={"Accept": "application/json"},
+        )
+        if status != 200:
+            raise ValueError(f"The release feed answered {status}.")
+        return json.loads(body.decode("utf-8"))
 
 
 def _version_of(release: dict) -> str:

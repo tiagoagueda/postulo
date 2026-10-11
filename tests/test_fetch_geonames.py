@@ -111,6 +111,21 @@ class FakeClient:
         self.requests.append(url)
         return self.answers[url]
 
+    def stream(self, method, url, headers=None):
+        """What the command asks for now: the answer streamed, as httpx hands one over."""
+        import contextlib
+
+        import httpx
+
+        self.requests.append(url)
+        answer = self.answers[url]
+
+        @contextlib.contextmanager
+        def opened():
+            yield httpx.Response(answer.status_code, content=answer.content)
+
+        return opened()
+
 
 @pytest.fixture(autouse=True)
 def fresh_loader():
