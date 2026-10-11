@@ -643,6 +643,21 @@ class Page:
     further: list[Event] = field(default_factory=list)
 
     @property
+    def steps(self) -> dict[str, str]:
+        """The words of the three period buttons for this view (#858).
+
+        ``previous`` and ``next`` are the full accessible names, which say the unit -- the
+        button shows only *Previous* and *Next* -- and ``today`` is the middle one, which
+        is the period containing today and so is named for the view.
+        """
+        return STEPS[self.view]
+
+    @property
+    def kinds_value(self) -> str:
+        """The narrowed kinds as the address carries them, or empty when all are showing."""
+        return kinds_parameter(self.kinds) or ""
+
+    @property
     def switcher(self) -> list[tuple[str, str, str, bool]]:
         """(view, label, url, current) for each shape, on the day this page is on."""
         return [
@@ -685,6 +700,21 @@ class Page:
     def empty(self) -> bool:
         return not (self.events or self.overdue or self.further)
 
+
+STEPS = {
+    "month": {
+        "previous": _("Previous month"),
+        "today": _("This month"),
+        "next": _("Next month"),
+    },
+    "week": {"previous": _("Previous week"), "today": _("This week"), "next": _("Next week")},
+    "day": {"previous": _("Previous day"), "today": _("Today"), "next": _("Next day")},
+    "agenda": {
+        "previous": _("Previous 30 days"),
+        "today": _("Today"),
+        "next": _("Next 30 days"),
+    },
+}
 
 VIEW_LABELS = {
     "month": _("Month"),

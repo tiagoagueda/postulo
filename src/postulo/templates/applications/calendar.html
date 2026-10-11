@@ -173,11 +173,32 @@
     </div>
   </div>
 
-  <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Period' %}">
-    <a href="{{ page.earlier }}" class="btn" data-variant="ghost">{% translate "Earlier" %}</a>
-    <a href="{{ page.today }}" class="btn" data-variant="ghost">{% translate "Today" %}</a>
-    <a href="{{ page.later }}" class="btn" data-variant="ghost">{% translate "Later" %}</a>
-    <h2 class="ms-2 text-lg font-medium">{{ page.title }}</h2>
+  {% comment %} Previous, this period and Next as one group, and the period itself in the
+     middle as a button that opens a picker (#858). The buttons say only *Previous* and *Next*
+     and are named for the unit (*Previous month*), so the name contains the words on show.
+     The picker is a plain GET form in a popover with a native date input: `on=` takes any day
+     of the period, so one input serves every view and needs no script. {% endcomment %}
+  <nav class="mb-4 flex flex-wrap items-center gap-3" aria-label="{% translate 'Period' %}" data-period>
+    <div class="button-group" role="group" aria-label="{% translate 'Move the calendar' %}">
+      <a href="{{ page.earlier }}" class="btn" data-variant="outline" aria-label="{{ page.steps.previous }}" data-step="previous">{% icon "chevron-left" %}<span class="btn-label">{% translate "Previous" %}</span></a>
+      <a href="{{ page.today }}" class="btn" data-variant="outline" aria-label="{{ page.steps.today }}" data-step="today">{% icon "calendar-1" %}<span class="btn-label">{{ page.steps.today }}</span></a>
+      <a href="{{ page.later }}" class="btn" data-variant="outline" aria-label="{{ page.steps.next }}" data-step="next">{% icon "chevron-right" %}<span class="btn-label">{% translate "Next" %}</span></a>
+    </div>
+    <h2 class="text-lg font-medium">
+      <button type="button" class="btn text-lg" data-variant="ghost" popovertarget="calendar-picker" aria-haspopup="dialog"
+              aria-label="{% blocktranslate trimmed with period=page.title %}{{ period }}: choose another{% endblocktranslate %}">{{ page.title }}</button>
+    </h2>
+    <div id="calendar-picker" popover data-popover data-align="start" class="card w-72 p-4">
+      <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3">
+        {% if page.view != "month" %}<input type="hidden" name="view" value="{{ page.view }}">{% endif %}
+        {% if page.kinds_value %}<input type="hidden" name="kinds" value="{{ page.kinds_value }}">{% endif %}
+        <div class="field">
+          <label for="calendar-picker-on">{% translate "Go to the day" %}</label>
+          <input type="date" id="calendar-picker-on" name="on" value="{{ page.on|date:'Y-m-d' }}" class="input" required>
+        </div>
+        <button type="submit" class="btn">{% translate "Go" %}</button>
+      </form>
+    </div>
   </nav>
 
   {% comment %} The key and the filter in one row (#238). Four kinds share this page, so
