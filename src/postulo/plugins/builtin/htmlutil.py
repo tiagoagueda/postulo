@@ -148,6 +148,14 @@ _IMPLIED_END: dict[str, tuple[frozenset[str], frozenset[str]]] = {
     "optgroup": (frozenset({"option", "optgroup"}), frozenset({"select", "datalist"})),
 }  # fmt: skip
 
+#: How many elements deep the tree may go (#778). Browsers stop at 512; a real page is a few dozen.
+#: Every end tag and every implied close scans the open elements, and `main_text` and the hints
+#: read the text of each nested landmark, so a page of twenty thousand unclosed ``<div>`` was
+#: quadratic work -- minutes of CPU for a few hundred kilobytes, in a web worker or the errand
+#: worker. Past the depth an element is still read, as a child of the one at the limit, but it
+#: is not opened, so what follows it stays beside it and the stack stays short.
+MAX_DEPTH = 512
+
 #: A start tag of these closes an open ``<p>``, which cannot hold them.
 _CLOSES_P = frozenset(
     {
@@ -209,7 +217,7 @@ class _TreeBuilder(HTMLParser):
             self._here,
         )
         self._here.children.append(element)
-        if tag not in VOID_TAGS:
+        if tag not in VOID_TAGS and len(self._open) < MAX_DEPTH:
             self._open.append(element)
 
     def handle_startendtag(self, tag: str, attrs) -> None:
