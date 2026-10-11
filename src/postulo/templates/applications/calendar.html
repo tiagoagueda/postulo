@@ -135,10 +135,9 @@
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
     <div>
-      <c-page-title>{% translate "Calendar" %}</c-page-title>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Interviews, appointments, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder or an appointment here, on any day." %}
-      </p>
+      {% comment %} The sentence under the heading is the help's summary now (#847): a question
+         mark beside the heading, the sentence on hover and the rest in a drawer. {% endcomment %}
+      <c-page-title help="calendar">{% translate "Calendar" %}</c-page-title>
     </div>
     {% comment %} Four shapes of the same days: month first, and the agenda for a phone,
        where a month grid is thirty-one cells of nothing. Links, so each is an address. {% endcomment %}

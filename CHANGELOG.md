@@ -42,6 +42,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Documents, Calendar and Your career have a question mark beside the heading: the sentence on hover and the help in a drawer (#847)
 - "Companies on a map" is now "Maps", credits GeoNames, the Unicode CLDR and Natural Earth in its description and on the map page, and has the map icon (#882)
 - The module "Employers with a structure" is now "Companies with a structure", with the pyramid icon added for its logo (#881)
 - POSTULO_CONNECTIONS_ALLOW_PRIVATE is documented as one switch for the whole instance that lets every account probe the private network through the Test buttons (#779)

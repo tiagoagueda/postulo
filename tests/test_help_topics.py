@@ -93,7 +93,12 @@ def paragraph(html: str, element_id: str) -> str:
 
 
 #: Topics of a page's heading rather than of a card of *Your details* (#839).
-PAGE_TOPICS = {"listings": "listings:list"}
+PAGE_TOPICS = {
+    "listings": "listings:list",
+    "documents": "documents:cv_list",
+    "calendar": "applications:calendar",
+    "career": "resume:overview",
+}
 
 
 def test_a_card_has_a_topic_and_every_topic_a_card_or_a_page():
@@ -698,3 +703,42 @@ def test_the_gallerys_question_mark_is_named_for_its_own_card(client):
 
     mark = re.search(r'id="design-help-card".*?<a\b[^>]*data-help-mark[^>]*>(.*?)</a>', html, re.S)
     assert '<span class="sr-only">Help: A card with a question mark</span>' in mark.group(1)
+
+
+# ------------------------------------- the same beside Documents, Calendar and Your career (#847)
+
+#: Each page with a question mark beside its heading: the topic, the heading it draws, and the
+#: sentence that used to stand under it, now the topic's summary and said once.
+HEADED = {
+    "documents": ("documents:cv_list", "Documents", "Your CVs and portfolios, your letters"),
+    "calendar": ("applications:calendar", "Calendar", "Interviews, appointments, reminders"),
+    "career": ("resume:overview", "Your career", "Written once, here."),
+}
+
+
+@pytest.mark.parametrize("slug", sorted(HEADED))
+def test_the_heading_has_a_question_mark_with_the_sentence_and_the_drawer(client, user, slug):
+    url, heading_text, sentence = HEADED[slug]
+    client.force_login(user)
+    html = client.get(reverse(url)).content.decode()
+
+    heading = re.search(r'<div class="page-title-help">(.*?)<dialog', html, re.S)[1]
+    assert re.search(rf"<h1[^>]*>\s*{heading_text}\s*</h1>", heading)
+    assert "data-help-mark" in heading and f'data-opens-dialog="help-{slug}"' in heading
+    summary = paragraph(html, re.search(r'aria-describedby="([^"]+)"', heading)[1])
+    assert "data-tooltip" in summary
+    assert str(help_topics.topic(slug).summary).startswith(sentence)
+    assert html.count(sentence) == 1, "said once, as the topic's summary"
+    assert f'<dialog id="help-{slug}"' in html
+
+
+@pytest.mark.parametrize("slug", sorted(HEADED))
+def test_the_topics_page_leads_back_to_the_page(client, user, slug):
+    url = HEADED[slug][0]
+    client.force_login(user)
+
+    page = client.get(
+        reverse("core:help_topic", args=[slug]) + "?next=" + reverse(url)
+    ).content.decode()
+
+    assert f'href="{reverse(url)}"' in page and str(help_topics.topic(slug).back) in page

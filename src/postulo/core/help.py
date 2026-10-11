@@ -148,6 +148,40 @@ TOPICS: dict[str, Topic] = {
             home="listings:list",
             back=_("Back to Listings"),
         ),
+        Topic(
+            slug="documents",
+            title=_("Documents"),
+            summary=_(
+                "Your CVs and portfolios, your letters, the files you keep, and what you "
+                "sent: four lists, each one click from the others."
+            ),
+            template="help/documents.html",
+            home="documents:cv_list",
+            back=_("Back to Documents"),
+        ),
+        Topic(
+            slug="calendar",
+            title=_("Calendar"),
+            summary=_(
+                "Interviews, appointments, reminders, deadlines and closing dates, by day. "
+                "Schedule an interview from an application's page, and make a reminder or an "
+                "appointment here, on any day."
+            ),
+            template="help/calendar.html",
+            home="applications:calendar",
+            back=_("Back to the calendar"),
+        ),
+        Topic(
+            slug="career",
+            title=_("Your career"),
+            summary=_(
+                "Written once, here. Every CV variant draws on this, so correcting a job "
+                "title corrects it everywhere."
+            ),
+            template="help/career.html",
+            home="resume:overview",
+            back=_("Back to Your career"),
+        ),
     )
 }
 
