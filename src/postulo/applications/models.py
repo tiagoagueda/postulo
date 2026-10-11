@@ -34,7 +34,7 @@ from django.db.models import (
 )
 from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import formats, timezone
 from django.utils.formats import number_format
 from django.utils.html import format_html, format_html_join
 from django.utils.translation import gettext_lazy as _
@@ -885,6 +885,116 @@ class Interview(OwnedModel):
     @property
     def duration(self):
         return self.ends_at - self.starts_at
+
+
+class AppointmentHow(models.TextChoices):
+    """How an appointment with an employment service is held (#888)."""
+
+    IN_PERSON = "in_person", _("In person")
+    PHONE = "phone", _("By phone")
+    VIDEO = "video", _("By video")
+
+
+class AppointmentQuerySet(models.QuerySet):
+    def for_user(self, user) -> AppointmentQuerySet:
+        if user is None or not getattr(user, "is_authenticated", False):
+            return self.none()
+        return self.filter(owner=user)
+
+    def with_display_data(self) -> AppointmentQuerySet:
+        return self.select_related("company", "contact", "reminder")
+
+    def upcoming(self, at=None) -> AppointmentQuerySet:
+        """Appointments that have not finished yet, soonest first."""
+        return self.filter(ends_at__gte=at or timezone.now()).order_by("starts_at", "pk")
+
+
+class Appointment(OwnedModel):
+    """A meeting with an adviser at a public employment service, typed by hand (#888).
+
+    A person registered with France Travail, the Bundesagentur für Arbeit or IEFP has meetings
+    with an adviser, and no service publishes a job seeker's own appointments, so there is
+    nowhere to read them from. An :class:`Interview` is about an application and its outcome,
+    stages and timeline mean nothing here; this is a date, a place and the adviser, with what
+    was said afterwards.
+
+    It belongs to a company of the kind *Public employment service*, and to the adviser as a
+    contact at that company when they are recorded. It is a kind of its own on the calendar,
+    in the diary feed and in the report addressed to the adviser (*meetings attended*).
+    """
+
+    company = models.ForeignKey(
+        "jobs.Company",
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        verbose_name=_("employment service"),
+    )
+    #: The adviser, when recorded. They may move on or be erased; the appointment stays.
+    contact = models.ForeignKey(
+        "jobs.Contact",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="appointments",
+        verbose_name=_("adviser"),
+    )
+    starts_at = models.DateTimeField(_("starts"), db_index=True)
+    ends_at = models.DateTimeField(_("ends"), null=True, blank=True)
+    how = models.CharField(
+        _("how"), max_length=20, choices=AppointmentHow, default=AppointmentHow.IN_PERSON
+    )
+    place = models.CharField(
+        _("where"),
+        max_length=500,
+        blank=True,
+        help_text=_("An address, a telephone number or the link to the call."),
+    )
+    notes = models.TextField(_("preparation notes"), blank=True)
+    outcome_notes = models.TextField(_("what was agreed"), blank=True)
+    #: Whether the meeting took place, for the report's *meetings attended*. Nothing is
+    #: assumed from the date: a meeting in the past is attended only when somebody says so.
+    attended = models.BooleanField(_("attended"), default=False)
+    #: Stable across edits, so a calendar that imported the meeting once can find it again.
+    uid = models.CharField(_("calendar identifier"), max_length=64, default=_mint_uid)
+    #: The nudge made when it was entered, if one was. Moving the appointment moves it.
+    reminder = models.OneToOneField(
+        Reminder,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="appointment",
+        verbose_name=_("reminder"),
+    )
+
+    objects = AppointmentQuerySet.as_manager()
+
+    class Meta:
+        verbose_name = _("appointment")
+        verbose_name_plural = _("appointments")
+        ordering = ("starts_at", "pk")
+        constraints = [
+            models.UniqueConstraint(fields=("owner", "uid"), name="appointment_uid_per_owner"),
+        ]
+
+    def __str__(self) -> str:
+        when = formats.date_format(timezone.localtime(self.starts_at), "DATETIME_FORMAT")
+        return f"{self.company.name} — {when}"
+
+    def get_absolute_url(self) -> str:
+        return reverse("applications:appointment_update", args=[self.pk])
+
+    @property
+    def is_link(self) -> bool:
+        """Whether the place is somewhere to click rather than somewhere to go."""
+        return self.place.startswith(("http://", "https://"))
+
+    @property
+    def is_over(self) -> bool:
+        return (self.ends_at or self.starts_at) < timezone.now()
+
+    @property
+    def length(self):
+        return (self.ends_at - self.starts_at) if self.ends_at else None
 
 
 class SuggestionStatus(models.TextChoices):

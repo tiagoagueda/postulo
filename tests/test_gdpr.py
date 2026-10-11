@@ -15,7 +15,7 @@ from django.contrib.messages import get_messages
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.applications.models import Application, Interview
+from postulo.applications.models import Application, Appointment, Interview
 from postulo.core import gdpr
 from postulo.core.models import SiteSettings, Tag, WebLink
 from postulo.jobs.models import Company, Contact, JobPosting, ListingEvent
@@ -79,6 +79,9 @@ def reference_all_four_ways(user, contact):
     )
     interview.contacts.set([contact])
     ListingEvent.objects.create(posting=main.posting, summary="Rang", contact=contact)
+    Appointment.objects.create(
+        owner=user, company=company, contact=contact, starts_at=starts, ends_at=None
+    )
 
 
 def test_the_document_the_erasure_and_the_dry_run_account_for_every_reference(user):
@@ -101,11 +104,14 @@ def test_the_document_the_erasure_and_the_dry_run_account_for_every_reference(us
     assert [row["summary"] for row in document["listing_events"]] == ["Rang"]
     assert would["applications_unlinked"] == 2
     assert would["interviews_unlinked"] == 1
+    assert would["appointments_unlinked"] == 1
+    assert [row["service"] for row in document["appointments"]] == ["Black Mesa"]
     assert would["listing_events_unlinked"] == 1
     assert report.unlinked == {
         "applications": 1,
         "referrals": 1,
         "interviews": 1,
+        "appointments": 1,
         "listing_events": 1,
         "reference_letters": 0,
     }

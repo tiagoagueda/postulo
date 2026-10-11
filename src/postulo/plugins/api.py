@@ -69,12 +69,15 @@ if TYPE_CHECKING:  # pragma: no cover - the names `__getattr__` resolves at run 
     from postulo.applications.ical_reader import read as read_calendar
     from postulo.applications.models import (
         Application,
+        Appointment,
+        AppointmentHow,
         EventKind,
         Interview,
         InterviewOutcome,
         Suggestion,
     )
     from postulo.applications.services import (
+        add_appointment,
         get_or_create_company,
         record_event,
         reschedule_interview,
@@ -180,6 +183,8 @@ __all__ = [
     "MEDIUMS",
     "TEXT",
     "Application",
+    "Appointment",
+    "AppointmentHow",
     "CalendarEntry",
     "CalendarRefused",
     "ConnectedPlugin",
@@ -228,6 +233,7 @@ __all__ = [
     "VCardPhone",
     "VCardRefused",
     "access_token",
+    "add_appointment",
     "approve_host",
     "calendar_status",
     "check_destination",
@@ -292,6 +298,8 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # with `for_user()` like anything else -- these are `OwnedModel`s, and the promise
     # about ownership is the same one.
     "Application": ("postulo.applications.models", "Application"),
+    "Appointment": ("postulo.applications.models", "Appointment"),
+    "AppointmentHow": ("postulo.applications.models", "AppointmentHow"),
     "Contact": ("postulo.jobs.models", "Contact"),
     "EventKind": ("postulo.applications.models", "EventKind"),
     "Interview": ("postulo.applications.models", "Interview"),
@@ -307,6 +315,7 @@ _ELSEWHERE: dict[str, tuple[str, str]] = {
     # is for. `suggest` is the one to reach for first -- a plugin reading a mailbox or a
     # calendar is guessing, and a guess belongs in a queue a person answers, not in the
     # record.
+    "add_appointment": ("postulo.applications.services", "add_appointment"),
     "get_or_create_company": ("postulo.applications.services", "get_or_create_company"),
     "record_event": ("postulo.applications.services", "record_event"),
     "reschedule_interview": ("postulo.applications.services", "reschedule_interview"),

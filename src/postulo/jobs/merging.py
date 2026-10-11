@@ -369,6 +369,7 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Honours and awards"), other.honours.all(), str),
         _moved(_("Memberships"), other.memberships.all(), str),
         _moved(_("Courses"), other.courses.all(), str),
+        _moved(_("Appointments"), other.appointments.all(), str),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -496,6 +497,7 @@ def merge_companies(kept, other) -> Plan:
     other.honours.update(company=kept)  # and the honours it gave, the bodies it holds (#693)
     other.memberships.update(company=kept)
     other.courses.update(company=kept)  # and the courses it gave (#695)
+    other.appointments.update(company=kept)  # and the meetings with its advisers (#888)
     # The mark survives only where both had it, and not once there is work attached.
     kept.from_career = kept.from_career and other.from_career
     if kept.from_career and (
@@ -567,13 +569,14 @@ def _handle_moves(kept, other) -> tuple[list, list]:
 
 def plan_contacts(kept, other) -> Plan:
     """What merging the person ``other`` into ``kept`` would do."""
-    from postulo.applications.models import Application, Interview
+    from postulo.applications.models import Application, Appointment, Interview
 
     _same_owner(kept, other)
     plan = Plan(kept=kept, other=other)
     owner = kept.owner_id
 
     sent = Application.objects.filter(owner_id=owner).select_related("posting", "posting__company")
+    appointments = Appointment.objects.filter(owner_id=owner, contact=other)
     main = sent.filter(contact=other)
     referred = sent.filter(referred_by=other)
     interviews = Interview.objects.filter(owner_id=owner, contacts=other).select_related(
@@ -593,6 +596,7 @@ def plan_contacts(kept, other) -> Plan:
         _moved(_("Applications they are the main contact for"), main, str),
         _moved(_("Applications they referred you to"), referred, str),
         _moved(_("Interviews they were at"), interviews, str),
+        _moved(_("Appointments they are the adviser at"), appointments, str),
         # What they sent or said about a listing (#270). The link is `SET_NULL`, which the
         # check before the delete does not see as a loss, so it is moved by name here.
         _moved(
@@ -706,7 +710,7 @@ def _move_held(rows, kept, *, kinds: bool, now) -> None:
 @transaction.atomic
 def merge_contacts(kept, other) -> Plan:
     """Make the person ``other`` the same record as ``kept``, and delete the other."""
-    from postulo.applications.models import Application, Interview
+    from postulo.applications.models import Application, Appointment, Interview
     from postulo.core.models import MessagingHandle, WebLink
     from postulo.documents.models import ReferenceLetter
 
@@ -734,6 +738,8 @@ def merge_contacts(kept, other) -> Plan:
     ListingEvent.objects.filter(posting__owner_id=owner, contact=other).update(contact=kept)
     # The letters they wrote, for the same reason (#666).
     ReferenceLetter.objects.filter(owner_id=owner, referee=other).update(referee=kept)
+    # And the meetings they were the adviser at (#888), for the same reason.
+    Appointment.objects.filter(owner_id=owner, contact=other).update(contact=kept)
 
     # Their entry among the referees: moved where the kept person has none, and otherwise
     # theirs goes and the kept person's stays, with the places it had on CVs (#696).

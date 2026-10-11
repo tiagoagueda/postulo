@@ -13,9 +13,9 @@ nothing loaded. A calendar library is a decision to take deliberately if a week 
 view ever wants one, and neither does yet.
 
 **One shape for the page to draw.** An :class:`Event` is a moment, a span or a whole day,
-a title, a link, and a kind for its colour and its words. Four kinds fill it: an interview, a
-reminder, an application's deadline and a listing's closing date. An appointment at the
-employment office can fill it later without the page changing, the way the report reads its
+a title, a link, and a kind for its colour and its words. Kinds fill it: an interview, a
+reminder, an application's deadline, a listing's closing date, an offer's answer date and, since
+#888, an appointment at the employment office, typed by hand -- the way the report reads its
 rows through `reports.Evidence`. A reminder that is done is drawn as done rather than
 dropped, and so is an interview that was cancelled: the calendar is a record of the month as
 well as a plan for it.
@@ -62,7 +62,15 @@ from django.utils.translation import ngettext_lazy
 from postulo.jobs.models import JobPosting
 
 from . import ical
-from .models import Application, Interview, InterviewOutcome, Offer, Reminder, Status
+from .models import (
+    Application,
+    Appointment,
+    Interview,
+    InterviewOutcome,
+    Offer,
+    Reminder,
+    Status,
+)
 from .reports import MAX_YEAR, MIN_YEAR, week_start
 
 VIEWS = ("month", "week", "day", "agenda")
@@ -79,6 +87,7 @@ REMINDER = "reminder"
 DEADLINE = "deadline"
 CLOSING = "closing"
 ANSWER = "answer"
+APPOINTMENT = "appointment"
 
 #: Every kind, in the order the legend draws them, with what it is called and the tone the
 #: stylesheet paints it. A tuple rather than a set because the legend is a row somebody
@@ -89,6 +98,7 @@ KINDS: tuple[tuple[str, object, str], ...] = (
     (DEADLINE, _("Deadlines"), "rose"),
     (CLOSING, _("Closing dates"), "teal"),
     (ANSWER, _("Answers due"), "violet"),
+    (APPOINTMENT, _("Appointments"), "sky"),
 )
 
 #: The state of an interview the other side did not come to, as `Event.state` holds it.
@@ -119,6 +129,8 @@ SPOKEN: dict[tuple[str, bool], object] = {
     (CLOSING, True): _("Already decided —"),
     (ANSWER, False): "",
     (ANSWER, True): _("Already answered —"),
+    (APPOINTMENT, False): _("Appointment:"),
+    (APPOINTMENT, True): _("Appointment attended:"),
 }
 
 #: Said instead of `SPOKEN` for an event whose `state` is one of these: an interview nobody came
@@ -168,6 +180,8 @@ class Event:
     returns: bool = False
     #: The interview itself, for the file the calendar can be downloaded as (#661).
     interview: Interview | None = field(default=None, compare=False, repr=False)
+    #: And an appointment at the employment office, for the same file (#888).
+    appointment: Appointment | None = field(default=None, compare=False, repr=False)
 
     @property
     def day(self) -> dt.date:
@@ -236,6 +250,8 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
                 interview=interview,
             )
         )
+    if APPOINTMENT in wanted:
+        events += appointment_events(user, lower, upper)
     reminders = (
         _reminders(user).filter(due_at__gte=lower, due_at__lt=upper) if REMINDER in wanted else ()
     )
@@ -248,6 +264,35 @@ def events_between(user, start: dt.date, end: dt.date, kinds=None) -> list[Event
         events += _answers(user, start, end)
     events.sort(key=lambda event: (event.starts_at, event.kind, event.title))
     return events
+
+
+def appointment_event(appointment: Appointment) -> Event:
+    """One appointment with an adviser as the calendar draws it (#888): the service's name, and
+    below it how it is held and with whom. Drawn as over, not dropped, once it was attended."""
+    detail = appointment.get_how_display()
+    if appointment.contact_id:
+        detail = f"{detail} · {appointment.contact.name}"
+    return Event(
+        kind=APPOINTMENT,
+        title=str(appointment.company.name),
+        url=appointment.get_absolute_url(),
+        starts_at=appointment.starts_at,
+        ends_at=appointment.ends_at,
+        detail=detail,
+        muted=appointment.attended,
+        returns=True,
+        appointment=appointment,
+    )
+
+
+def appointment_events(user, lower: dt.datetime, upper: dt.datetime) -> list[Event]:
+    """Every appointment starting in ``[lower, upper)``, as events."""
+    return [
+        appointment_event(appointment)
+        for appointment in Appointment.objects.for_user(user)
+        .with_display_data()
+        .filter(starts_at__gte=lower, starts_at__lt=upper)
+    ]
 
 
 def _reminders(user):
@@ -780,8 +825,11 @@ def download_for(events: list[Event], absolute) -> str:
     """
     interviews = [event.interview for event in events if event.interview is not None]
     reminders = [event.reminder for event in events if event.reminder is not None]
+    appointments = [event.appointment for event in events if event.appointment is not None]
     return ical.calendar(
         interviews,
+        appointments=appointments,
+        appointment_url_for=lambda a: absolute(a.get_absolute_url()),
         url_for=lambda i: absolute(i.application.get_absolute_url()),
         days=day_entries(events, absolute),
         reminders=reminders,

@@ -517,7 +517,7 @@ def test_the_calendar_says_where_a_reminder_is_made(client, user):
     client.force_login(user)
     page = client.get(CALENDAR).content.decode()
     assert "a reminder from Reminders" not in page
-    assert "make a reminder here, on any day" in page
+    assert "make a reminder or an appointment here, on any day" in page
 
 
 def test_a_search_finds_a_reminder_on_its_day_and_does_not_offer_every_reminder(user):

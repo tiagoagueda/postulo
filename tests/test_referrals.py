@@ -710,6 +710,7 @@ def test_erasing_a_referrer_says_the_applications_lost_them(user, application, f
         "applications": 0,
         "referrals": 1,
         "interviews": 0,
+        "appointments": 0,
         "listing_events": 0,
         "reference_letters": 0,
     }

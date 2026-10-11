@@ -93,6 +93,7 @@ class ImportReport:
     events: int = 0
     reminders: int = 0
     interviews: int = 0
+    appointments: int = 0
     resume_items: int = 0
     cvs: int = 0
     cover_letters: int = 0
@@ -958,6 +959,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
     from postulo.applications.models import (
         Application,
         ApplicationEvent,
+        Appointment,
+        AppointmentHow,
         Interview,
         InterviewKind,
         InterviewOutcome,
@@ -1330,6 +1333,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
 
     for company_entry in document.get("companies", []):
         contact_entries = company_entry.pop("contacts", [])
+        # Format 65 (#888); an older archive has none.
+        appointment_entries = company_entry.pop("appointments", None)
+        if not isinstance(appointment_entries, list):
+            appointment_entries = []
         posting_entries = company_entry.pop("postings", [])
         company_entry.pop("id", None)
         company_entry.pop("created_at", None)
@@ -1438,6 +1445,56 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
 
         for contact_entry in contact_entries:
             restore_contact(contact_entry, company)
+
+        for appointment_entry in (
+            appointment_entries if isinstance(appointment_entries, list) else []
+        ):
+            if not isinstance(appointment_entry, dict):
+                continue
+            starts_at = _dt(appointment_entry.get("starts_at"))
+            if starts_at is None:
+                report.skipped.append(
+                    f"An appointment at “{company.name}”: it has no date, and was left out"
+                )
+                continue
+            uid = appointment_entry.get("uid")
+            if (
+                isinstance(uid, str)
+                and SAFE_UID.fullmatch(uid)
+                and Appointment.objects.filter(owner=user, uid=uid).exists()
+            ):
+                continue
+            ends_at = _dt(appointment_entry.get("ends_at"))
+            if ends_at is not None and ends_at <= starts_at:
+                ends_at = None
+            reminder = None
+            reminder_entry = appointment_entry.get("reminder")
+            if isinstance(reminder_entry, dict) and _dt(reminder_entry.get("due_at")):
+                reminder = Reminder.objects.create(
+                    owner=user,
+                    application=None,
+                    summary=str(reminder_entry.get("summary", ""))[:250],
+                    due_at=_dt(reminder_entry.get("due_at")),
+                    done_at=_dt(reminder_entry.get("done_at")),
+                    **_restored_uid(Reminder, user, reminder_entry.get("uid")),
+                )
+                report.reminders += 1
+            how = appointment_entry.get("how")
+            Appointment.objects.create(
+                owner=user,
+                company=company,
+                contact=contacts.get(appointment_entry.get("contact_id")),
+                starts_at=starts_at,
+                ends_at=ends_at,
+                how=how if how in AppointmentHow.values else AppointmentHow.IN_PERSON,
+                place=str(appointment_entry.get("place") or "")[:500],
+                notes=str(appointment_entry.get("notes") or ""),
+                outcome_notes=str(appointment_entry.get("outcome_notes") or ""),
+                attended=appointment_entry.get("attended") is True,
+                reminder=reminder,
+                **_restored_uid(Appointment, user, uid),
+            )
+            report.appointments += 1
 
         for posting_entry in posting_entries:
             application_entries = posting_entry.pop("applications", [])

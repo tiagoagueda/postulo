@@ -16,6 +16,7 @@ from postulo.jobs import esco, recall
 from postulo.jobs.forms import POSTING_HELP, OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import (
     Company,
+    CompanyKind,
     Contact,
     DescriptionFormat,
     EmploymentType,
@@ -29,6 +30,7 @@ from .models import (
     SYSTEM_EVENT_KINDS,
     Application,
     ApplicationEvent,
+    Appointment,
     Channel,
     EndReason,
     EventKind,
@@ -689,6 +691,93 @@ class InterviewForm(OwnerScopedModelForm):
         starts, ends = cleaned.get("starts_at"), cleaned.get("ends_at")
         if starts and ends and ends <= starts:
             self.add_error("ends_at", _("It cannot end before it starts."))
+        return cleaned
+
+
+class AppointmentForm(OwnerScopedModelForm):
+    """An appointment with an adviser at a public employment service, typed by hand (#888).
+
+    The service is one of the person's own companies of that kind, and the adviser is one of the
+    people recorded at it. The times are read as the interview form reads them: in the person's
+    zone, with an end left blank lasting an hour.
+    """
+
+    remind = forms.BooleanField(
+        label=_("Remind me the day before"),
+        required=False,
+        initial=True,
+        help_text=_("A reminder falls due a day ahead, when there is a day ahead."),
+    )
+
+    class Meta:
+        model = Appointment
+        fields = (
+            "company",
+            "contact",
+            "starts_at",
+            "ends_at",
+            "how",
+            "place",
+            "notes",
+            "outcome_notes",
+            "attended",
+        )
+        help_texts = {
+            "company": _(
+                "The public employment service you are registered with. Add it under "
+                "Companies, as a public employment service, if it is not here."
+            ),
+            "how": _("How the meeting is held. The place below is where, or the number or link."),
+            "contact": _("Your adviser, where you have recorded them at that service."),
+            "starts_at": _("In your time zone."),
+            "ends_at": _("Left blank, it lasts an hour."),
+            "notes": _("Yours, to prepare with. Nothing here is sent to anybody."),
+            "outcome_notes": _("What was said or agreed, to write down afterwards."),
+            "attended": _(
+                "Tick it once you have been. The report addressed to your adviser counts "
+                "the meetings attended."
+            ),
+        }
+        widgets = {
+            "starts_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
+            "ends_at": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
+            "notes": forms.Textarea(attrs={"rows": 3}),
+            "outcome_notes": forms.Textarea(attrs={"rows": 3}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for name in ("starts_at", "ends_at"):
+            self.fields[name].input_formats = DATETIME_INPUT_FORMATS
+        self.fields["ends_at"].required = False
+        self.fields["contact"].required = False
+        if self.instance.pk:
+            self.initial["remind"] = self.instance.reminder_id is not None
+
+    def scope_querysets(self) -> None:
+        services = Company.objects.for_user(self.user).filter(kind=CompanyKind.EMPLOYMENT_SERVICE)
+        self.fields["company"].queryset = services.order_by("name")
+        # Most people are registered with one office, and there is nothing to choose.
+        if not self.instance.pk and not self.initial.get("company"):
+            only = list(services.values_list("pk", flat=True)[:2])
+            if len(only) == 1:
+                self.initial["company"] = only[0]
+        contacts = Contact.objects.for_user(self.user).filter(company__in=services)
+        self.fields["contact"].queryset = contacts.select_related("company").order_by("name")
+        self.fields["contact"].label_from_instance = who_and_where
+
+    def clean(self):
+        cleaned = super().clean()
+        starts, ends = cleaned.get("starts_at"), cleaned.get("ends_at")
+        if starts and ends and ends <= starts:
+            self.add_error("ends_at", _("It cannot end before it starts."))
+        company, contact = cleaned.get("company"), cleaned.get("contact")
+        if company and contact and contact.company_id != company.pk:
+            self.add_error("contact", _("That person is not recorded at this service."))
         return cleaned
 
 

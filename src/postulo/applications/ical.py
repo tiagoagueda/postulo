@@ -43,7 +43,7 @@ from django.utils.translation import gettext as _
 
 from postulo import __version__
 
-from .models import Interview, InterviewOutcome, Reminder
+from .models import Appointment, Interview, InterviewOutcome, Reminder
 
 PRODID = f"-//Postulo//Postulo {__version__}//EN"
 
@@ -208,6 +208,55 @@ def event_lines(interview: Interview, *, url: str = "", alarm: bool = False) -> 
     return lines_of(event_component(interview, url=url, alarm=alarm))
 
 
+def appointment_component(appointment: Appointment, *, url: str = "") -> icalendar.Event:
+    """The VEVENT for one appointment with an adviser at an employment service (#888).
+
+    A meeting like an interview, written the same way: UTC moments, the place as its
+    location, the adviser's name and email, and the notes the person wrote to prepare. What
+    was agreed afterwards is the person's own record and is not written, because the file goes
+    to a calendar that may be shared. An end left blank lasts an hour. An attended appointment
+    is still ``CONFIRMED``: it happened.
+    """
+    adviser = appointment.contact
+    description: list[str] = []
+    if appointment.notes:
+        description.append(appointment.notes)
+    if adviser is not None:
+        description.append(_("With: %(people)s") % {"people": adviser.name})
+    url = without_controls(url)
+    if url:
+        description.append(url)
+
+    ends = appointment.ends_at or appointment.starts_at + dt.timedelta(hours=1)
+    event = icalendar.Event()
+    event.add("uid", without_controls(appointment.uid))
+    event.add("dtstamp", _moment(timezone.now()))
+    event.add("dtstart", _moment(appointment.starts_at))
+    event.add("dtend", _moment(ends))
+    summary = _("Appointment: %(company)s") % {"company": appointment.company.name}
+    event.add("summary", clean(summary))
+    event.add("status", "CONFIRMED")
+    event.add("created", _moment(appointment.created_at))
+    event.add("last-modified", _moment(appointment.updated_at))
+    if appointment.place:
+        event.add("location", clean(appointment.place))
+    if description:
+        event.add("description", clean("\n".join(description)))
+    if url:
+        event.add("url", url)
+    if adviser is not None and adviser.email:
+        address = without_controls(adviser.email)
+        event.add(
+            "attendee",
+            icalendar.vCalAddress(f"mailto:{address}"),
+            parameters={
+                "CN": without_controls(adviser.name.replace('"', "")),
+                "ROLE": "REQ-PARTICIPANT",
+            },
+        )
+    return event
+
+
 def address_uid(address: str) -> str:
     """An identifier made from an address: the same address is always the same identifier."""
     return f"{uuid.uuid5(uuid.NAMESPACE_URL, address)}@postulo"
@@ -333,6 +382,8 @@ def calendar(
     reminders: Iterable[Reminder] = (),
     reminder_url_for=None,
     reminder_identity_for=None,
+    appointments: Iterable[Appointment] = (),
+    appointment_url_for=None,
 ) -> str:
     """A complete iCalendar document holding these interviews, whole days and reminders.
 
@@ -345,6 +396,12 @@ def calendar(
     wrapper = _wrapper()
     for interview in interviews:
         wrapper.add_component(event_component(interview, url=url_for(interview) if url_for else ""))
+    for appointment in appointments:
+        wrapper.add_component(
+            appointment_component(
+                appointment, url=appointment_url_for(appointment) if appointment_url_for else ""
+            )
+        )
     for entry in days:
         wrapper.add_component(day_component(entry))
     for reminder in reminders:

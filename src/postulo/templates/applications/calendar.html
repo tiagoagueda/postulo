@@ -137,7 +137,7 @@
     <div>
       <c-page-title>{% translate "Calendar" %}</c-page-title>
       <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder here, on any day." %}
+        {% translate "Interviews, appointments, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder or an appointment here, on any day." %}
       </p>
     </div>
     {% comment %} Four shapes of the same days: month first, and the agenda for a phone,
@@ -153,6 +153,11 @@
          day has its own as well, with the day already in it (#316). {% endcomment %}
       <a href="{% url 'applications:reminder_create' %}?next={{ request.get_full_path|urlencode:'' }}" class="btn">
         {% icon "plus" %}{% translate "New reminder" %}
+      </a>
+      {% comment %} A meeting with an adviser at the employment service, typed by hand (#888). {% endcomment %}
+      <a href="{% url 'applications:appointment_create' %}?next={{ request.get_full_path|urlencode:'' }}"
+         class="btn" data-variant="outline" data-new-appointment>
+        {% icon "plus" %}{% translate "New appointment" %}
       </a>
     </div>
     {% comment %} The file is what this page is showing: the same period and the same kinds,

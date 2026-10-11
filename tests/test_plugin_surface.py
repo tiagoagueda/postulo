@@ -393,6 +393,8 @@ def test_the_surface_holds_what_a_sync_needs():
 
     for name in (
         "Application",
+        "Appointment",
+        "AppointmentHow",
         "Contact",
         "EventKind",
         "Interview",
@@ -400,6 +402,7 @@ def test_the_surface_holds_what_a_sync_needs():
         "LinkKind",
         "Suggestion",
         "SyncLink",
+        "add_appointment",
         "calendar_status",
         "event_lines",
         "get_or_create_company",

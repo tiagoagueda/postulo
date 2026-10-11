@@ -95,6 +95,20 @@ msgstr[0] "%(count)d candidatura, com o seu histórico"
 msgstr[1] "%(count)d candidaturas, com o seu histórico"
 
 #: src/postulo/jobs/views.py
+#, python-format
+msgid "%(count)d appointment"
+msgid_plural "%(count)d appointments"
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/core/gdpr.py
+#, python-format
+msgid "%(count)d appointment kept, without its adviser."
+msgid_plural "%(count)d appointments kept, without their adviser."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "%(count)d capture that became it"
 msgid_plural "%(count)d captures that became it"
@@ -1978,6 +1992,10 @@ msgstr "um camião com reboque"
 msgid "a medium-sized lorry with a trailer"
 msgstr "um camião de dimensão média com reboque"
 
+#: src/postulo/templates/applications/appointment_form.html
+msgid "A meeting with your adviser at the public employment service you are registered with. Postulo cannot read these from the service, so you enter them here."
+msgstr ""
+
 #: src/postulo/core/messaging_handles.py
 #, fuzzy
 msgid "A messaging handle needs a handle."
@@ -2823,6 +2841,10 @@ msgstr "Administrador"
 msgid "Advertising and marketing"
 msgstr "Publicidade e marketing"
 
+#: src/postulo/applications/models.py
+msgid "adviser"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #: src/postulo/templates/applications/report_print.html
 #, fuzzy, python-format
@@ -3010,6 +3032,10 @@ msgstr "Uma morada registada antes de as moradas serem verificadas, ou trazida p
 #, fuzzy
 msgid "An address that could not be read"
 msgstr "Uma morada que não foi possível ler"
+
+#: src/postulo/applications/models.py
+msgid "An address, a telephone number or the link to the call."
+msgstr ""
 
 #: src/postulo/applications/models.py
 #, fuzzy
@@ -3512,6 +3538,50 @@ msgstr "Aplicar às linhas assinaladas"
 msgid "Apply: %(title)s"
 msgstr "Candidatar: %(title)s"
 
+#: src/postulo/applications/models.py
+msgid "appointment"
+msgstr ""
+
+#: src/postulo/templates/applications/appointment_form.html
+msgid "Appointment"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Appointment attended:"
+msgstr ""
+
+#: src/postulo/applications/services.py
+#, python-format
+msgid "Appointment tomorrow: %(company)s at %(time)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py
+msgid "Appointment:"
+msgstr ""
+
+#: src/postulo/applications/ical.py
+#, python-format
+msgid "Appointment: %(company)s"
+msgstr ""
+
+#: src/postulo/applications/agenda.py src/postulo/jobs/merging.py
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Appointments"
+msgstr ""
+
+#: src/postulo/applications/models.py
+msgid "appointments"
+msgstr ""
+
+#: src/postulo/templates/applications/report.html
+#: src/postulo/templates/applications/report_print.html
+msgid "Appointments attended"
+msgstr ""
+
+#: src/postulo/jobs/merging.py
+msgid "Appointments they are the adviser at"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 #, fuzzy
 msgid "Apprenticeship"
@@ -3668,6 +3738,14 @@ msgstr "Oceano Atlântico"
 #, fuzzy
 msgid "attempts"
 msgstr "tentativas"
+
+#: src/postulo/applications/models.py
+msgid "attended"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Attended"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy
@@ -4011,10 +4089,18 @@ msgstr "Por setor"
 msgid "By name, or by NACE code"
 msgstr "Por nome, ou por código NACE"
 
+#: src/postulo/applications/models.py
+msgid "By phone"
+msgstr ""
+
 #: src/postulo/templates/widgets/sources.html
 #, fuzzy
 msgid "By referrer"
 msgstr "Por quem o recomendou"
+
+#: src/postulo/applications/models.py
+msgid "By video"
+msgstr ""
 
 #: src/postulo/resume/models.py
 #, fuzzy
@@ -4063,6 +4149,7 @@ msgstr "URL de retorno a registar no fornecedor"
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
+#: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
@@ -5582,6 +5669,7 @@ msgid "Defence"
 msgstr "Defesa"
 
 #: src/postulo/templates/applications/application_detail.html
+#: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/tag_list.html
 #: src/postulo/templates/cotton/delete_dialog.html
 #: src/postulo/templates/cotton/reminder_actions.html
@@ -6339,6 +6427,10 @@ msgstr "Enviado por e-mail e registado o que enviou."
 #, fuzzy
 msgid "Employer"
 msgstr "Empregador"
+
+#: src/postulo/applications/models.py
+msgid "employment service"
+msgstr ""
 
 #: src/postulo/jobs/roles.py
 #, fuzzy
@@ -7687,6 +7779,10 @@ msgstr "Hotelaria e turismo"
 msgid "hours"
 msgstr "horas"
 
+#: src/postulo/applications/models.py
+msgid "how"
+msgstr ""
+
 #: src/postulo/jobs/widgets.py
 #, fuzzy
 msgid "How choosy you have been"
@@ -7778,6 +7874,10 @@ msgstr "Como alguém pode ser contactado no Matrix, XMPP, Signal, Telegram ou no
 #, fuzzy
 msgid "How the first rows will be read"
 msgstr "Como as primeiras linhas serão lidas"
+
+#: src/postulo/applications/forms.py
+msgid "How the meeting is held. The place below is where, or the number or link."
+msgstr ""
 
 #: src/postulo/core/server_forms.py
 #, fuzzy
@@ -8088,6 +8188,10 @@ msgstr "Em grupos, com uma opção desativada"
 msgid "In other formats"
 msgstr "Noutros formatos"
 
+#: src/postulo/applications/models.py
+msgid "In person"
+msgstr ""
+
 #: src/postulo/core/search.py
 #, fuzzy, python-format
 msgid "in the cover letter rendered on %(when)s"
@@ -8178,6 +8282,10 @@ msgstr "no relatório que enviou a %(company)s em %(when)s"
 #, fuzzy
 msgid "In this version, and not in the one before"
 msgstr "Nesta versão, e não na anterior"
+
+#: src/postulo/applications/forms.py
+msgid "In your time zone."
+msgstr ""
 
 #: src/postulo/applications/forms.py
 #, fuzzy
@@ -8412,9 +8520,8 @@ msgid "Interviews they were at"
 msgstr "Entrevistas em que esta pessoa esteve"
 
 #: src/postulo/templates/applications/calendar.html
-#, fuzzy
-msgid "Interviews, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder here, on any day."
-msgstr "Entrevistas, lembretes, prazos e datas de fecho, por dia. Marque uma entrevista a partir da página de uma candidatura, e crie um lembrete aqui, em qualquer dia."
+msgid "Interviews, appointments, reminders, deadlines and closing dates, by day. Schedule an interview from an application's page, and make a reminder or an appointment here, on any day."
+msgstr ""
 
 #: src/postulo/accounts/models.py
 #, fuzzy
@@ -10178,6 +10285,11 @@ msgstr "Nova"
 msgid "New accounts"
 msgstr "Novas contas"
 
+#: src/postulo/templates/applications/appointment_form.html
+#: src/postulo/templates/applications/calendar.html
+msgid "New appointment"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_list.html
 #, fuzzy
 msgid "New CV or portfolio"
@@ -10300,6 +10412,10 @@ msgstr "Sem candidatura"
 #, fuzzy
 msgid "No application is touched, so no timeline changes."
 msgstr "Nenhuma candidatura é afetada, por isso nenhuma cronologia muda."
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "No appointments yet."
+msgstr ""
 
 #: src/postulo/templates/server/backups.html
 #, fuzzy
@@ -14233,6 +14349,7 @@ msgstr "Sábado"
 #: src/postulo/templates/accounts/profile.html
 #: src/postulo/templates/applications/application_form.html
 #: src/postulo/templates/applications/application_intake.html
+#: src/postulo/templates/applications/appointment_form.html
 #: src/postulo/templates/applications/interview_form.html
 #: src/postulo/templates/applications/offer_form.html
 #: src/postulo/templates/applications/reminder_form.html
@@ -16437,6 +16554,10 @@ msgstr[1] "Essa página demorou mais de %(seconds)s segundos a chegar, por isso 
 msgid "That page was sent with the content encoding “%(coding)s”, which Postulo does not unpack, so it was not read."
 msgstr "Essa página foi enviada com a codificação de conteúdo «%(coding)s», que o Postulo não descomprime, por isso não foi lida."
 
+#: src/postulo/applications/forms.py
+msgid "That person is not recorded at this service."
+msgstr ""
+
 #: src/postulo/accounts/avatars.py
 #, fuzzy, python-format
 msgid "That picture is over %(megabytes)s MB. A smaller one, please."
@@ -17378,6 +17499,10 @@ msgstr "O fornecedor não vai renovar isto. Alguém tem de consentir de novo."
 #, fuzzy
 msgid "The provider's reply was not readable."
 msgstr "A resposta do fornecedor não era legível."
+
+#: src/postulo/applications/forms.py
+msgid "The public employment service you are registered with. Add it under Companies, as a public employment service, if it is not here."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -18404,6 +18529,10 @@ msgstr "Marque quantos servirem. A lista é sua — Setores, ao lado de Empresas
 #, fuzzy
 msgid "Tick each category the licence lists: none implies another, so somebody who holds A ticks A. A CV prints the codes."
 msgstr "Assinale cada categoria que a carta indica: nenhuma implica outra, por isso quem tem A assinala A. Um CV imprime os códigos."
+
+#: src/postulo/applications/forms.py
+msgid "Tick it once you have been. The report addressed to your adviser counts the meetings attended."
+msgstr ""
 
 #: src/postulo/templates/partials/table/bulk.html
 #, fuzzy
@@ -19680,10 +19809,18 @@ msgstr "O que há a fazer. É o que o lembrete diz quando chega a altura."
 msgid "What type of employer"
 msgstr "Que tipo de empregador"
 
+#: src/postulo/applications/models.py
+msgid "what was agreed"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "what was asked"
 msgstr "o que foi pedido"
+
+#: src/postulo/applications/forms.py
+msgid "What was said or agreed, to write down afterwards."
+msgstr ""
 
 #: src/postulo/templates/applications/report.html
 #, fuzzy
@@ -20680,6 +20817,10 @@ msgstr "O endereço da sua conta"
 #, fuzzy
 msgid "Your addresses on the web, a card for each sort, with one of each marked as the one to show."
 msgstr "Os seus endereços na web, um cartão para cada género, com um de cada assinalado como o que se mostra."
+
+#: src/postulo/applications/forms.py
+msgid "Your adviser, where you have recorded them at that service."
+msgstr ""
 
 #: src/postulo/templates/applications/application_intake.html
 #, fuzzy

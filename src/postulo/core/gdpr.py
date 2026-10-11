@@ -179,7 +179,7 @@ def references(contact) -> dict:
     entry in a listing's history as who it came from. The numbers, addresses and links that
     belong to the person are not references: they are the person's own rows.
     """
-    from postulo.applications.models import Application, Interview
+    from postulo.applications.models import Application, Appointment, Interview
     from postulo.documents.models import ReferenceLetter
     from postulo.jobs.models import ListingEvent
 
@@ -187,6 +187,8 @@ def references(contact) -> dict:
         "applications": Application.objects.filter(contact=contact),
         "referrals": Application.objects.filter(referred_by=contact),
         "interviews": Interview.objects.filter(contacts=contact),
+        # The adviser at an appointment with an employment service (#888).
+        "appointments": Appointment.objects.filter(contact=contact),
         "listing_events": ListingEvent.objects.filter(contact=contact),
         "reference_letters": ReferenceLetter.objects.filter(referee=contact),
     }
@@ -238,6 +240,20 @@ def _interview_rows(interviews) -> list[dict]:
     ]
 
 
+def _appointment_rows(appointments) -> list[dict]:
+    """The meetings this person was the adviser at (#888): when, how it was held and where.
+    What the account holder wrote about them -- the notes -- is theirs and is not carried."""
+    return [
+        {
+            "starts_at": row.starts_at.isoformat(),
+            "how": row.how,
+            "place": row.place,
+            "service": row.company.name,
+        }
+        for row in appointments.select_related("company")
+    ]
+
+
 def _reference_letter_rows(letters) -> list[dict]:
     """The letters this person wrote: the file's name, the dates, and where each went (#666).
 
@@ -282,6 +298,7 @@ def contact_document(contact) -> dict:
         "applications": _application_rows(found["applications"]),
         "referrals": _application_rows(found["referrals"]),
         "interviews": _interview_rows(found["interviews"]),
+        "appointments": _appointment_rows(found["appointments"]),
         "reference_letters": _reference_letter_rows(found["reference_letters"]),
         "references": _career_reference_rows(career_references(contact)),
         "plugins": plugins,
@@ -358,6 +375,15 @@ class ErasureReport:
                     self.unlinked["interviews"],
                 )
                 % {"count": self.unlinked["interviews"]}
+            )
+        if self.unlinked.get("appointments"):
+            parts.append(
+                ngettext(
+                    "%(count)d appointment kept, without its adviser.",
+                    "%(count)d appointments kept, without their adviser.",
+                    self.unlinked["appointments"],
+                )
+                % {"count": self.unlinked["appointments"]}
             )
         if self.unlinked.get("reference_letters"):
             parts.append(
@@ -508,7 +534,7 @@ def retention_dry_run(days: int | None = None) -> dict:
     contacts, of the accounts that hold them, and of what an erasure would remove. The
     erasure itself is a person's act on their own contact's page.
     """
-    from postulo.applications.models import Application, Interview
+    from postulo.applications.models import Application, Appointment, Interview
     from postulo.jobs.models import Contact, ListingEvent
     from postulo.resume.models import Reference
 
@@ -531,6 +557,7 @@ def retention_dry_run(days: int | None = None) -> dict:
             Q(contact__in=contacts) | Q(referred_by__in=contacts)
         ).count(),
         "interviews_unlinked": Interview.objects.filter(contacts__in=contacts).distinct().count(),
+        "appointments_unlinked": Appointment.objects.filter(contact__in=contacts).count(),
         "listing_events_unlinked": ListingEvent.objects.filter(contact__in=contacts).count(),
     }
     return {

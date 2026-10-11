@@ -202,6 +202,16 @@ def reminder(owner):
     )
 
 
+def appointment(owner):
+    from postulo.applications.models import Appointment
+    from postulo.jobs.models import Company, CompanyKind
+
+    office = Company.objects.create(
+        owner=owner, name="Theirs Office", kind=CompanyKind.EMPLOYMENT_SERVICE
+    )
+    return Appointment.objects.create(owner=owner, company=office, starts_at=timezone.now())
+
+
 def offer(owner):
     from postulo.applications.models import Offer
 
@@ -406,6 +416,8 @@ FACTORIES: dict[str, Callable] = {
     "applications:delete": pk_of(application),
     "applications:detail": pk_of(application),
     "applications:event_create": pk_of(application),
+    "applications:appointment_delete": pk_of(appointment),
+    "applications:appointment_update": pk_of(appointment),
     "applications:interview_create": pk_of(application),
     "applications:quiet_action": pk_of(application),
     "applications:status": pk_of(application),
@@ -836,6 +848,7 @@ def form_table(user, mine=None) -> dict:
     return {
         applications.ApplicationForm: [{"user": user}, {"user": user, "instance": mine}],
         applications.ReminderForm: [{"user": user}],
+        applications.AppointmentForm: [{"user": user}],
         applications.InterviewForm: [
             {"user": user, "application": mine},
             {"user": user, "instance": interview(user)},
@@ -893,6 +906,8 @@ OFFERED = {
     ("ReferenceForm", "contact"),
     ("ListingEventForm", "document"),
     ("ReminderForm", "application"),
+    ("AppointmentForm", "company"),
+    ("AppointmentForm", "contact"),
 }
 
 

@@ -357,6 +357,12 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         context["memberships"] = self.object.memberships.order_by("-start_date", "-pk")
         # And the courses it gave (#695).
         context["courses"] = self.object.courses.order_by("-end_date", "-pk")
+        # The meetings with an adviser, for a company that is a public employment service (#888).
+        context["appointments"] = (
+            self.object.appointments.select_related("contact").order_by("-starts_at", "-pk")
+            if self.object.is_employment_service
+            else []
+        )
         context["contacts"] = self.object.contacts.select_related("department").prefetch_related(
             "phone_numbers", "web_links", "messaging_handles"
         )
@@ -735,6 +741,7 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
         postings = company.postings.count()
         applied = applications.count()
         contacts = company.contacts.count()
+        appointments = company.appointments.count()
         # Each ngettext carries its two texts as literals: the extractor reads call sites.
         context["consequences"] = [
             text % {"count": number}
@@ -742,6 +749,10 @@ class CompanyDeleteView(ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
                 (postings, ngettext("%(count)d posting", "%(count)d postings", postings)),
                 (applied, ngettext("%(count)d application", "%(count)d applications", applied)),
                 (contacts, ngettext("%(count)d contact", "%(count)d contacts", contacts)),
+                (
+                    appointments,
+                    ngettext("%(count)d appointment", "%(count)d appointments", appointments),
+                ),
             )
             if number
         ]

@@ -27,6 +27,8 @@ from .models import (
     SETTLED_OUTCOMES,
     Application,
     ApplicationEvent,
+    Appointment,
+    AppointmentHow,
     EndReason,
     EventKind,
     Interview,
@@ -457,6 +459,100 @@ def schedule_interview(
         )
         interview.save(update_fields=["reminder", "updated_at"])
     return interview
+
+
+APPOINTMENT_REMINDER_LEAD = dt.timedelta(days=1)
+
+
+def _appointment_reminder_summary(appointment) -> str:
+    """What the reminder for an appointment says; rebuilt whenever the appointment moves,
+    for the reason `_interview_reminder_summary` is (#224)."""
+    return str(
+        _("Appointment tomorrow: %(company)s at %(time)s")
+        % {
+            "company": appointment.company.name,
+            "time": formats.date_format(timezone.localtime(appointment.starts_at), "TIME_FORMAT"),
+        }
+    )
+
+
+@transaction.atomic
+def sync_appointment_reminder(appointment, *, remind: bool) -> None:
+    """Make, move or take away the reminder for an appointment, to match what was asked (#888).
+
+    A reminder falls due a day ahead and only when there is a day ahead, as an interview's
+    does; one asked for too late is not made, and a reminder already made is moved with the
+    appointment. It belongs to no application: an appointment at the employment office is
+    about none.
+    """
+    now = timezone.now()
+    due = appointment.starts_at - APPOINTMENT_REMINDER_LEAD
+    reminder = appointment.reminder
+    if not remind or due <= now:
+        if reminder is not None:
+            appointment.reminder = None
+            appointment.save(update_fields=["reminder", "updated_at"])
+            reminder.delete()
+        return
+    summary = _appointment_reminder_summary(appointment)
+    if reminder is None:
+        appointment.reminder = Reminder.objects.create(
+            owner=appointment.owner, summary=summary, due_at=due
+        )
+        appointment.save(update_fields=["reminder", "updated_at"])
+    elif (reminder.summary, reminder.due_at) != (summary, due):
+        # The stamp goes with the time, as `postpone_reminder` explains: a reminder moved into
+        # the future has not been announced yet.
+        reminder.summary, reminder.due_at, reminder.notified_at = summary, due, None
+        reminder.save(update_fields=["summary", "due_at", "notified_at", "updated_at"])
+
+
+@transaction.atomic
+def add_appointment(
+    company,
+    *,
+    starts_at,
+    ends_at=None,
+    how: str = "in_person",
+    place: str = "",
+    notes: str = "",
+    contact=None,
+    remind: bool = True,
+    uid: str = "",
+) -> Appointment:
+    """Put a meeting with an adviser in the diary, and a reminder a day ahead of it (#888).
+
+    For a plugin that can learn of one -- none can today, since no employment service publishes
+    a job seeker's own appointments -- and the one call that writes them besides the form. The
+    owner is the company's, as a listing's history takes it from the listing: a plugin never
+    says whose diary it writes. ``company`` has to be a public employment service, and
+    ``contact`` somebody recorded there; either mistake is a ``ValueError`` rather than a row
+    in the wrong place. An end left out lasts an hour. ``uid`` is the calendar identifier it is
+    kept under, for a meeting that came out of a calendar file.
+    """
+    from postulo.jobs.models import CompanyKind
+
+    if company.kind != CompanyKind.EMPLOYMENT_SERVICE:
+        raise ValueError("An appointment is with a public employment service.")
+    if contact is not None and (
+        contact.company_id != company.pk or contact.owner_id != company.owner_id
+    ):
+        raise ValueError("The adviser is not recorded at that service.")
+    if how not in AppointmentHow.values:
+        how = AppointmentHow.IN_PERSON
+    appointment = Appointment.objects.create(
+        **({"uid": uid} if uid else {}),
+        owner=company.owner,
+        company=company,
+        contact=contact,
+        starts_at=starts_at,
+        ends_at=ends_at or starts_at + DEFAULT_INTERVIEW_LENGTH,
+        how=how,
+        place=place,
+        notes=notes,
+    )
+    sync_appointment_reminder(appointment, remind=remind)
+    return appointment
 
 
 @transaction.atomic

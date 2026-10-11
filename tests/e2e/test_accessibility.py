@@ -90,13 +90,14 @@ def furnished(applicant):
 
     from postulo.applications.models import (
         Application,
+        Appointment,
         EventKind,
         InterviewKind,
         Reminder,
         Status,
     )
     from postulo.applications.services import change_status, schedule_interview
-    from postulo.jobs.models import Company, Contact, Industry, JobPosting
+    from postulo.jobs.models import Company, CompanyKind, Contact, Industry, JobPosting
     from postulo.resume.models import Experience
 
     company = Company.objects.create(owner=applicant, name="Aperture Science", location="Cambridge")
@@ -134,6 +135,19 @@ def furnished(applicant):
     )
     schedule_interview(
         application, kind=InterviewKind.VIDEO, starts_at=timezone.now() + dt.timedelta(days=2)
+    )
+    # A meeting with an adviser at the employment office, on the calendar, the office's own
+    # page and its form (#888).
+    office = Company.objects.create(
+        owner=applicant, name="Jobcentre Plus", kind=CompanyKind.EMPLOYMENT_SERVICE
+    )
+    appointment = Appointment.objects.create(
+        owner=applicant,
+        company=office,
+        contact=Contact.objects.create(owner=applicant, company=office, name="Mme Durand"),
+        starts_at=timezone.now() + dt.timedelta(days=2, hours=1),
+        ends_at=timezone.now() + dt.timedelta(days=2, hours=2),
+        place="12 rue de la Paix",
     )
     experience = Experience.objects.create(
         owner=applicant,
@@ -391,6 +405,8 @@ def furnished(applicant):
         "tag": tag,
         "capture": capture,
         "interview": interview,
+        "office": office,
+        "appointment": appointment,
         "reminder": reminder,
         "offer": offer,
         "connection": connection,
@@ -465,6 +481,8 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     posting = it.get("posting", a)
     interview = it.get("interview", a)
     reminder = it.get("reminder", a)
+    office = it.get("office", c)
+    appointment = it.get("appointment", a)
     offer = it.get("offer", a)
     connection = it.get("connection", a)
     errand = it.get("errand", a)
@@ -493,6 +511,12 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/reminders/new/",
         # The form as a day on the calendar opens it, with that day in it (#316).
         "/applications/reminders/new/?on=2026-10-03&next=/applications/calendar/",
+        # And a meeting with an adviser at the employment office (#888).
+        "/applications/appointments/new/",
+        f"/applications/appointments/new/?company={office.pk}",
+        f"/applications/appointments/{appointment.pk}/edit/",
+        f"/applications/appointments/{appointment.pk}/delete/",
+        f"/jobs/companies/{office.pk}/",
         "/applications/calendar/",
         "/applications/calendar/?view=week",
         "/applications/calendar/?view=day",

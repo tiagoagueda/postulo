@@ -11,6 +11,7 @@ from postulo.applications import agenda, ical
 from postulo.applications.models import (
     SETTLED_OUTCOMES,
     Application,
+    Appointment,
     Interview,
     InterviewKind,
 )
@@ -75,6 +76,10 @@ def calendar_feed(request):
         _queryset(request).upcoming(),
         url_for=lambda i: request.build_absolute_uri(i.application.get_absolute_url()),
         days=agenda.dated_days(request.auth.owner, request.build_absolute_uri),
+        appointments=Appointment.objects.for_user(request.auth.owner)
+        .with_display_data()
+        .upcoming(),
+        appointment_url_for=lambda a: request.build_absolute_uri(a.get_absolute_url()),
     )
     return HttpResponse(text, content_type="text/calendar; charset=utf-8")
 

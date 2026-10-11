@@ -185,7 +185,13 @@ logger = logging.getLogger(__name__)
 #: block it is in and its local id, or none. An archive without it restores every upload
 #: proving nothing, and one naming an entry the file does not hold restores none and says
 #: so (#669).
-FORMAT_VERSION = 64
+#: 65 added ``appointments`` under a company that is a public employment service: the meetings
+#: with an adviser typed by hand, each with its calendar identifier, times, how it is held,
+#: place, the two notes, whether it was attended, the adviser by the id of their contact in the
+#: file and the reminder made for it, nested. A reminder made for an appointment is written
+#: there and not among the reminders about no application. An archive without them restores
+#: none (#888).
+FORMAT_VERSION = 65
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -455,6 +461,18 @@ LISTING_EVENT_FIELDS = (
     "created_at",
 )
 REMINDER_FIELDS = ("id", "uid", "summary", "due_at", "done_at")
+APPOINTMENT_FIELDS = (
+    "id",
+    "uid",
+    "starts_at",
+    "ends_at",
+    "how",
+    "place",
+    "notes",
+    "outcome_notes",
+    "attended",
+    "created_at",
+)
 INTERVIEW_FIELDS = (
     "id",
     "uid",
@@ -899,6 +917,18 @@ def _resume_block(user) -> dict:
 CONTACT_CHANNELS = ("phone_numbers", "postal_addresses", "web_links", "messaging_handles")
 
 
+def _appointment(appointment) -> dict:
+    """One meeting with an adviser (#888): the adviser by the id their contact has in the file,
+    and the reminder made for it nested, since it belongs to no application to be found under."""
+    return {
+        **_fields(appointment, APPOINTMENT_FIELDS),
+        "contact_id": appointment.contact_id,
+        "reminder": (
+            _fields(appointment.reminder, REMINDER_FIELDS) if appointment.reminder_id else None
+        ),
+    }
+
+
 def _contact(contact) -> dict:
     """One person, with everything recorded about how to reach them."""
     return {
@@ -983,7 +1013,7 @@ def counts(user) -> dict[str, int]:
     everything here is filtered by owner exactly as the document's queries are, and
     `tests/test_export.py` holds the two together.
     """
-    from postulo.applications.models import Application, Interview
+    from postulo.applications.models import Application, Appointment, Interview
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
     from postulo.jobs.models import Capture, CapturedPage, Company, FieldHint, ListingEvent
 
@@ -998,6 +1028,7 @@ def counts(user) -> dict[str, int]:
         "listing_events": ListingEvent.objects.for_user(user).count(),
         "applications": Application.objects.for_user(user).count(),
         "interviews": Interview.objects.for_user(user).count(),
+        "appointments": Appointment.objects.for_user(user).count(),
         "cvs": CV.objects.for_user(user).count(),
         "cover_letters": CoverLetter.objects.for_user(user).count(),
         "uploads": UploadedDocument.objects.for_user(user).count(),
@@ -1009,7 +1040,7 @@ def counts(user) -> dict[str, int]:
 def build_document(user) -> dict:
     """Assemble everything belonging to ``user`` as one nested document."""
     from postulo.accounts.models import Profile
-    from postulo.applications.models import Reminder
+    from postulo.applications.models import Appointment, Reminder
     from postulo.core.models import Tag
     from postulo.documents import printing
     from postulo.documents.models import CV, CoverLetter, RenderedDocument, UploadedDocument
@@ -1068,7 +1099,9 @@ def build_document(user) -> dict:
         # the archive.
         "reminders": [
             _fields(reminder, REMINDER_FIELDS)
-            for reminder in Reminder.objects.for_user(user).filter(application__isnull=True)
+            for reminder in Reminder.objects.for_user(user).filter(
+                application__isnull=True, appointment__isnull=True
+            )
         ],
         "companies": [],
         "documents": {},
@@ -1097,6 +1130,10 @@ def build_document(user) -> dict:
             "postings__applications__events",
             "postings__applications__reminders",
             "postings__applications__interviews__contacts",
+            Prefetch(
+                "appointments",
+                queryset=Appointment.objects.select_related("reminder"),
+            ),
             "postings__applications__department__company",
             "postings__applications__through_agency",
             "postings__applications__sent_links",
@@ -1129,6 +1166,7 @@ def build_document(user) -> dict:
                     for i in company.identifiers.all()
                 ],
                 "contacts": [_contact(contact) for contact in company.contacts.all()],
+                "appointments": [_appointment(a) for a in company.appointments.all()],
                 "postings": [
                     {
                         **_fields(posting, POSTING_FIELDS),
@@ -1289,6 +1327,7 @@ def build_document(user) -> dict:
             for posting in company["postings"]
             for application in posting["applications"]
         ),
+        "appointments": sum(len(company["appointments"]) for company in document["companies"]),
         "cvs": len(document["documents"]["cvs"]),
         "cover_letters": len(document["documents"]["cover_letters"]),
         "uploads": len(document["documents"]["uploads"]),

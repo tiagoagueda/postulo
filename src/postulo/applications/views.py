@@ -40,12 +40,14 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import application_match, clean_query
 from postulo.jobs.history import history_of
+from postulo.jobs.models import Company
 from postulo.jobs.views import UserFormKwargsMixin
 
 from . import agenda, endings, ical, quiet, reports, suggestions
 from .forms import (
     ApplicationForm,
     ApplicationIntakeForm,
+    AppointmentForm,
     EventForm,
     InterviewForm,
     OfferForm,
@@ -58,6 +60,7 @@ from .models import (
     END_STATUSES,
     SETTLED_OUTCOMES,
     Application,
+    Appointment,
     EventKind,
     Interview,
     InterviewOutcome,
@@ -80,6 +83,7 @@ from .services import (
     revise_offer,
     schedule_interview,
     settle_interview,
+    sync_appointment_reminder,
     withdraw_offer,
 )
 from .tables import ApplicationsTable
@@ -854,6 +858,8 @@ class ReminderListView(RedirectView):
 #: The hour a reminder made for a day starts at, when the day is all that was chosen: the
 #: start of a working morning, rather than a midnight that would announce it in the night.
 REMINDER_HOUR = 9
+#: The hour an appointment opens at when it is made from a day of the calendar (#888).
+APPOINTMENT_HOUR = 10
 
 
 class ReminderFormMixin:
@@ -973,6 +979,87 @@ class ReminderDeleteView(ReminderFormMixin, ConfirmDeleteMixin, OwnedObjectMixin
 
     def get_cancel_url(self) -> str:
         return self.get_success_url()
+
+
+class AppointmentFormMixin:
+    """Where an appointment's form goes afterwards, and where *Cancel* goes: back to the page it
+    was opened from when that page said so (`next`), otherwise to the calendar (#888)."""
+
+    def fallback_url(self) -> str:
+        return reverse("applications:calendar")
+
+    def get_success_url(self) -> str:
+        return safe_next(self.request, self.fallback_url())
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context["cancel_url"] = safe_next(self.request, self.fallback_url())
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        sync_appointment_reminder(self.object, remind=form.cleaned_data["remind"])
+        return response
+
+
+class AppointmentCreateView(
+    AppointmentFormMixin, OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView
+):
+    """A new appointment with an adviser, from the calendar, where the day clicked is its day,
+    or from the employment service's own page, where that service is its company (#888)."""
+
+    model = Appointment
+    form_class = AppointmentForm
+    template_name = "applications/appointment_form.html"
+
+    def get_initial(self) -> dict:
+        initial = super().get_initial()
+        company_id = as_pk(self.request.GET.get("company"))
+        if company_id:
+            initial["company"] = company_id
+        day = agenda.day_from(self.request.GET.get("on", ""))
+        if day is not None:
+            initial["starts_at"] = datetime(day.year, day.month, day.day, APPOINTMENT_HOUR)
+        return initial
+
+    def fallback_url(self) -> str:
+        company_id = as_pk(self.request.GET.get("company"))
+        if (
+            company_id
+            and Company.objects.for_user(self.request.user).filter(pk=company_id).exists()
+        ):
+            return reverse("jobs:company_detail", args=[company_id])
+        return super().fallback_url()
+
+
+class AppointmentUpdateView(
+    AppointmentFormMixin, OwnedObjectMixin, UserFormKwargsMixin, UpdateView
+):
+    model = Appointment
+    form_class = AppointmentForm
+    template_name = "applications/appointment_form.html"
+
+    def get_queryset(self):
+        return super().get_queryset().select_related("company", "contact", "reminder")
+
+
+class AppointmentDeleteView(AppointmentFormMixin, ConfirmDeleteMixin, OwnedObjectMixin, DeleteView):
+    """Deleting an appointment, confirmed first, with the reminder made for it (#888)."""
+
+    model = Appointment
+    template_name = "partials/confirm_delete.html"
+
+    def get_cancel_url(self) -> str:
+        return self.get_success_url()
+
+    def form_valid(self, form):
+        # Not `AppointmentFormMixin.form_valid`: there is no `remind` to read, and the reminder
+        # goes with the appointment it was made for.
+        reminder = self.object.reminder
+        response = DeleteView.form_valid(self, form)
+        if reminder is not None:
+            reminder.delete()
+        return response
 
 
 class ReminderLaterView(OwnedObjectMixin, View):

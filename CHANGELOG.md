@@ -82,6 +82,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Appointments with an adviser at a public employment service, typed by hand: on the calendar, in the diary feed, in the report, in the archive and on the plugin surface (#888)
 - A question mark beside the Listings heading shows the page's summary on hover and opens its help in a drawer, replacing the helper paragraph; page titles can take a help topic. (#839)
 - “Capture a posting” and “Add a listing” on the Listings page are one button group with icons; the capture buttons elsewhere take the icon too. (#841)
 - The footer's “Help” link has a book icon beside it, and only the icon on phones (the word stays for screen readers and as a tooltip). (#838)

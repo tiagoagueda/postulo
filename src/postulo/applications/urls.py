@@ -21,6 +21,17 @@ urlpatterns = [
     path("<int:pk>/quiet/", views.ApplicationQuietActionView.as_view(), name="quiet_action"),
     path("reminders/", views.ReminderListView.as_view(), name="reminder_list"),
     path("reminders/new/", views.ReminderCreateView.as_view(), name="reminder_create"),
+    path("appointments/new/", views.AppointmentCreateView.as_view(), name="appointment_create"),
+    path(
+        "appointments/<int:pk>/edit/",
+        views.AppointmentUpdateView.as_view(),
+        name="appointment_update",
+    ),
+    path(
+        "appointments/<int:pk>/delete/",
+        views.AppointmentDeleteView.as_view(),
+        name="appointment_delete",
+    ),
     path(
         "reminders/<int:pk>/done/", views.ReminderCompleteView.as_view(), name="reminder_complete"
     ),

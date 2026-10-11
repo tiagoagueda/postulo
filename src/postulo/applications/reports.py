@@ -42,6 +42,7 @@ from .analytics import RESPONSE_STATUSES, interviews_held
 from .models import (
     Application,
     ApplicationEvent,
+    Appointment,
     Channel,
     Status,
 )
@@ -401,6 +402,10 @@ class Report:
     #: the office asks first. Counted whether or not there is an office, so it is a fact of
     #: the period either way, and shown when there is one.
     through_service: int = 0
+    #: Meetings with an adviser the person says they attended in the period (#888): the
+    #: other half of what an employment office asks for, beside the applications. Counted
+    #: whether or not there is an office, shown when there is one.
+    appointments_attended: int = 0
 
     @property
     def total(self) -> int:
@@ -510,6 +515,11 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
 
     report.through_service = sum(
         1 for application in inside if application.channel == Channel.EMPLOYMENT_SERVICE
+    )
+    report.appointments_attended = (
+        Appointment.objects.for_user(user)
+        .filter(attended=True, starts_at__date__gte=period.start, starts_at__date__lte=period.end)
+        .count()
     )
     office = (
         Company.objects.for_user(user)
