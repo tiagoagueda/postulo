@@ -2564,7 +2564,7 @@ def test_the_row_is_marked_where_it_is_edited_and_has_no_link(outgrown, client, 
 
     shown = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
     shown = shown[shown.index("data-identifiers") :]
-    shown = shown[: shown.index("</dl>")]
+    shown = shown[: shown.index("</ul>")]
     assert "552081317" in shown and "<a " not in shown
 
     # A row its scheme accepts is not marked, and is linked.
@@ -2994,7 +2994,7 @@ def test_a_value_that_is_a_step_of_the_path_has_no_link(value, client, user, com
     client.force_login(user)
     shown = client.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
     shown = shown[shown.index("data-identifiers") :]
-    shown = shown[: shown.index("</dl>")]
+    shown = shown[: shown.index("</ul>")]
     assert "<a " not in shown and "example.org" not in shown
 
 

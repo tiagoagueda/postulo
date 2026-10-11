@@ -443,6 +443,19 @@ class Profile(models.Model):
         choices=(("comfortable", _("Comfortable")), ("compact", _("Compact"))),
         default="comfortable",
     )
+    #: How a company's identifiers read on its page (#855): each is a badge, and this says what
+    #: is in it besides the value -- the scheme's mark or icon and its label, only the mark or
+    #: icon (the label becomes a tooltip and stays for a screen reader), or only the label.
+    identifier_style = models.CharField(
+        _("identifiers"),
+        max_length=8,
+        choices=(
+            ("both", _("Icon and label")),
+            ("icon", _("Icon only")),
+            ("label", _("Label only")),
+        ),
+        default="both",
+    )
     #: Plugins this person has switched off for themselves. Stored as what was turned
     #: *off*, like `hidden_nav_items` and for the same reason: a plugin installed in a
     #: later release should be available without anybody having to opt into it.

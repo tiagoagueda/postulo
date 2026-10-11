@@ -509,18 +509,18 @@ def test_a_company_page_draws_the_mark_beside_the_scheme_and_not_beside_one_with
     company = company_with(user, "Acme", ("wikidata", "Q95"), ("lei", LEI))
     html = signed_in.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
     listing = html[html.index("data-identifiers") :]
-    listing = listing[: listing.index("</dl>")]
-    assert listing.count("<svg") == 1
+    listing = listing[: listing.index("</ul>")]
+    assert listing.count("data-brand=") == 1, "the scheme with a mark; the other has its icon"
     assert 'data-brand="orcid"' in listing and 'data-brand-mode="single-colour"' in listing
     assert 'aria-hidden="true"' in listing, "decorative: the scheme's name is written beside it"
-    assert "role=" not in listing.split("<dt", 1)[1].split("</dt>")[0]
+    assert "role=" not in listing.split("<svg", 1)[1].split("</svg>")[0]
 
 
 def test_a_company_page_draws_no_mark_beside_the_schemes_postulo_ships(signed_in, user):
     company = company_with(user, "Acme", ("wikidata", "Q95"), ("lei", LEI))
     html = signed_in.get(reverse("jobs:company_detail", args=[company.pk])).content.decode()
     listing = html[html.index("data-identifiers") :]
-    assert "<svg" not in listing[: listing.index("</dl>")]
+    assert "data-brand" not in listing[: listing.index("</ul>")]
 
 
 def test_the_identifier_form_draws_no_mark(signed_in):

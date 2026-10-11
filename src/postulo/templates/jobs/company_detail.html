@@ -98,21 +98,11 @@
   {% if identifier_rows or identifiers_hidden %}
     <div class="mb-6 flex flex-wrap gap-x-6 gap-y-2 text-sm">
       {% if identifier_rows %}
-        <dl class="flex flex-wrap gap-x-6 gap-y-2" data-identifiers>
+        <ul class="flex flex-wrap gap-2" data-identifiers>
           {% for identifier in identifier_rows %}
-            <div class="flex items-baseline gap-2">
-              <dt class="text-ink-500 dark:text-ink-400">{% if identifier.brand %}{% brand identifier.brand class="inline-block size-4 align-text-bottom" %} {% endif %}{{ identifier.scheme_label }}</dt>
-              <dd class="tabular-nums">
-                {% if identifier.url %}
-                  <a href="{{ identifier.url }}" rel="noopener noreferrer external" target="_blank"
-                     class="text-brand-600 underline dark:text-brand-400">{{ identifier.value }}</a>
-                {% else %}
-                  {{ identifier.value }}
-                {% endif %}
-              </dd>
-            </div>
+            <c-identifier-badge :identifier="identifier" :style="identifier_style" />
           {% endfor %}
-        </dl>
+        </ul>
       {% endif %}
       {% if identifiers_hidden %}
         {% comment %} What Settings → Appearance switched off is counted, never lost: the edit form has every one (#672). Outside the list, which holds only term and value pairs. {% endcomment %}

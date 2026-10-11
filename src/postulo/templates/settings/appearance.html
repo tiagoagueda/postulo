@@ -52,6 +52,23 @@
         </fieldset>
       </div>
       <div class="card mb-6">
+        {% comment %} How a company's identifiers read (#855): its own question, apart from the
+           button labels, because an identifier without its label is a different thing to ask. {% endcomment %}
+        <fieldset{% if form.identifier_style.aria_describedby %} aria-describedby="{{ form.identifier_style.aria_describedby }}"{% endif %}>
+          <legend class="label mb-1">{{ form.identifier_style.label }}</legend>
+          <p class="mb-3 text-sm text-ink-500 dark:text-ink-400" id="{{ form.identifier_style.auto_id }}_helptext">{{ form.identifier_style.help_text }}</p>
+          <div class="space-y-2">
+            {% for choice in form.identifier_style|widgets_classed:"input" %}
+              <label class="flex items-center gap-3 text-sm text-ink-800 dark:text-ink-200">
+                {{ choice.tag }}
+                <span>{{ choice.choice_label }}</span>
+              </label>
+            {% endfor %}
+          </div>
+          <div class="field"><c-field-feedback :field="form.identifier_style" errors-only /></div>
+        </fieldset>
+      </div>
+      <div class="card mb-6">
         <fieldset{% if form.navigation.aria_describedby %} aria-describedby="{{ form.navigation.aria_describedby }}"{% endif %}>
           <legend class="label mb-1">{{ form.navigation.label }}</legend>
           {% comment %} The help sits above the choices here rather than under them, so it keeps its

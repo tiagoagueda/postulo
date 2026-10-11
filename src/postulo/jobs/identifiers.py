@@ -74,6 +74,12 @@ def brand_for(key: str) -> str:
     return registry.brand_for(key, COMPANY)
 
 
+def icon_for(key: str) -> str:
+    """The Lucide icon of the scheme, the generic one for *Other* or an unknown key (#855)."""
+    scheme = registry.find(key, COMPANY)
+    return scheme.icon_name if scheme is not None else registry.ICON
+
+
 def normalise(scheme_key: str, raw: str) -> str:
     """Tidy ``raw`` into the canonical spelling for its scheme."""
     return registry.normalise(COMPANY, scheme_key, raw)

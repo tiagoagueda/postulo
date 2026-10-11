@@ -160,10 +160,10 @@ def test_the_identifier_lines_draw_no_mark_for_schemes_that_have_none(
     version would be a recolouring) and an LEI none; ORCID's mark has no read-only place
     that shows it yet, which tests/test_identifiers.py holds on the page with a double."""
     open_company(page, live_server, company)
-    entries = page.locator("[data-identifiers] > div")
+    entries = page.locator("[data-identifiers] > li")
     expect(entries).to_have_count(2)
-    expect(page.locator("[data-identifiers] svg")).to_have_count(0)
-    expect(entries.filter(has_text="Wikidata").locator("dt")).to_have_text("Wikidata")
+    expect(page.locator("[data-identifiers] svg[data-brand]")).to_have_count(0)
+    expect(entries.filter(has_text="Wikidata").locator("span").first).to_have_text("Wikidata")
 
 
 def test_a_service_without_a_mark_draws_none_and_the_page_has_only_these(

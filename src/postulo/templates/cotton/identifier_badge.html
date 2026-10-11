@@ -1,0 +1,16 @@
+{% load i18n postulo %}
+<c-vars identifier style="both" />
+{% comment %} A company's identifier as a badge (#855): `<c-identifier-badge :identifier="row" :style="style" />`.
+
+   The scheme's brand mark where Postulo ships one, otherwise its icon, then the label, then
+   the value -- a link inside the badge where the scheme has an address. `style` is the
+   person's setting: `both`, `icon` (the label is a tooltip, and stays in the page for a screen
+   reader as `sr-only`) or `label` (no mark or icon). The mark is decorative, the label is
+   always in the name, so colour and picture are never the only carrier (#274). {% endcomment %}
+<li class="badge h-auto min-w-0 max-w-full shrink" data-tone="grey" data-identifier="{{ identifier.scheme }}"{% if style == "icon" %} title="{{ identifier.scheme_label }}"{% endif %}>
+  {% if style != "label" %}{% if identifier.brand %}{% brand identifier.brand class="size-3.5" %}{% else %}{% icon identifier.icon class="size-3.5" %}{% endif %}{% endif %}
+  <span{% if style == "icon" %} class="sr-only"{% else %} class="min-w-0 whitespace-normal [overflow-wrap:anywhere]"{% endif %}>{{ identifier.scheme_label }}</span>
+  <span class="min-w-0 whitespace-normal tabular-nums [overflow-wrap:anywhere]">
+    {% if identifier.url %}<a href="{{ identifier.url }}" rel="noopener noreferrer external" target="_blank" class="underline">{{ identifier.value }}</a>{% else %}{{ identifier.value }}{% endif %}
+  </span>
+</li>

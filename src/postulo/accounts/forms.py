@@ -1247,16 +1247,27 @@ class AppearanceForm(forms.ModelForm):
 
     #: The fields that can be saved as they change (#656). Not the navigation, which is a
     #: list changed row by row and moved with arrows: it is saved whole, by *Save*.
-    save_as_you_go_fields = ("theme", "density", "quiet_after_days", "closing_notice_days")
+    save_as_you_go_fields = (
+        "theme",
+        "density",
+        "identifier_style",
+        "quiet_after_days",
+        "closing_notice_days",
+    )
 
     class Meta:
         model = Profile
-        fields = ("theme", "density", "quiet_after_days", "closing_notice_days")
-        widgets = {"theme": forms.RadioSelect, "density": forms.RadioSelect}
+        fields = ("theme", "density", "identifier_style", "quiet_after_days", "closing_notice_days")
+        widgets = {
+            "theme": forms.RadioSelect,
+            "density": forms.RadioSelect,
+            "identifier_style": forms.RadioSelect,
+        }
         labels = {
             "quiet_after_days": _("Consider an application quiet after"),
             "closing_notice_days": _("Warn me before a listing closes by"),
             "density": _("How much room to leave"),
+            "identifier_style": _("How a company's identifiers read"),
         }
         help_texts = {
             # Under Appearance rather than Accessibility, by the rule #281 set: file a
@@ -1267,13 +1278,21 @@ class AppearanceForm(forms.ModelForm):
                 "the space around cards and inside tables so that more fits on a screen; "
                 "nothing you can click or tap gets smaller."
             ),
+            "identifier_style": _(
+                "On a company's page each identifier is a badge. With the icon only, the "
+                "label is a tooltip, and a screen reader still reads it."
+            ),
         }
+
+    def clean_identifier_style(self):
+        """Left out, as by a page drawn before the setting existed, it stays as it was (#855)."""
+        return self.cleaned_data.get("identifier_style") or self.instance.identifier_style or "both"
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # Left blank, either threshold goes back to its default rather than refusing to save.
         # Not every field is here when one is saved on its own (#656).
-        for name in ("quiet_after_days", "closing_notice_days"):
+        for name in ("quiet_after_days", "closing_notice_days", "identifier_style"):
             if name in self.fields:
                 self.fields[name].required = False
 

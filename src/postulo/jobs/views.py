@@ -324,6 +324,10 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
             self.object.identifiers.all(), getattr(person, "profile", None)
         )
         context["identifier_rows"] = shown
+        # How each reads: the mark or icon, the label, or both (#855).
+        context["identifier_style"] = getattr(
+            getattr(person, "profile", None), "identifier_style", "both"
+        )
         # What deleting it would take with it, for the dialog on this page (#854).
         context["deletion"] = deletions.facts_for(CompanyDeleteView, self.request, self.object)
         context["identifiers_hidden"] = len(hidden)

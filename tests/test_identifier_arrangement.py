@@ -50,8 +50,8 @@ def a_company(user):
 
 
 def drawn_schemes(html: str) -> list[str]:
-    block = re.search(r"<dl[^>]*data-identifiers>(.*?)</dl>", html, re.S).group(1)
-    return re.findall(r"<dt[^>]*>\s*(.*?)\s*</dt>", block, re.S)
+    block = re.search(r"<ul[^>]*data-identifiers>(.*?)</ul>", html, re.S).group(1)
+    return re.findall(r"<li[^>]*data-identifier=.*?<span[^>]*>\s*(.*?)\s*</span>", block, re.S)
 
 
 # ------------------------------------------------------------------ the helper

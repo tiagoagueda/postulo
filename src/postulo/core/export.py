@@ -309,6 +309,7 @@ PROFILE_FIELDS = (
     "show_key_hints",
     "nav_underline",
     "density",
+    "identifier_style",
     "plugins_off",
     "keep_page_source",
     "keep_page_rendering",

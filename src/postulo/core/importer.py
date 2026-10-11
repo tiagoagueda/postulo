@@ -123,6 +123,7 @@ _CHECKED_PROFILE_FIELDS = frozenset(
         "show_key_hints",
         "nav_underline",
         "density",
+        "identifier_style",
         "keep_page_source",
         "keep_page_rendering",
         "closing_notice_days",
