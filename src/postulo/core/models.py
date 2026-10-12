@@ -263,11 +263,19 @@ class PhoneNumber(OwnedModel):
     form last saved. That is what makes "switched off shows the primary" a question with
     exactly one answer, in the database, at every point in the code that asks it.
 
-    **Uniqueness reaches across the whole instance**, which is a deliberate choice by the
-    maintainer and a disclosure worth naming: refusing a number because somebody already
-    holds it tells whoever typed it that *some other account on this server has it*. There
-    is no way to enforce the rule without saying so, which is why the message says it in
-    those words instead of pretending the collision was something else.
+    **A person's own number is unique across the whole instance**, which is a deliberate
+    choice by the maintainer and a disclosure worth naming: refusing a number because
+    somebody already holds it tells whoever typed it that *some other account on this
+    server has it*. There is no way to enforce the rule without saying so, which is why the
+    message says it in those words instead of pretending the collision was something else.
+
+    **A number somebody merely recorded is not** (#329). A contact's line and a company's
+    switchboard are numbers a person wrote down, never numbers they *are*: two people
+    registered with one employment office both record its line, and a recruiter's direct
+    line may be the company's too. So the instance-wide rule binds the rows that identify
+    their owner -- a profile's, `identifies_owner` -- and every other row is unique only
+    within its holder. That also stops a contact entry from blocking the number's real
+    holder from adding it to their own profile.
 
     Only a number that reached international form takes part. A number the numbering
     plans cannot place -- a short number, words, a national number from before a country
@@ -300,6 +308,11 @@ class PhoneNumber(OwnedModel):
     #: form: a value the constraint depends on cannot be somebody's to type.
     normalised = models.CharField(max_length=40, blank=True, db_index=True)
     is_primary = models.BooleanField(_("primary"), default=False)
+    #: Whether the holder is the owner's own profile, so the number is one this account *is*
+    #: rather than one it recorded (#329). Written by ``save`` from the holder's type, never by
+    #: a form, because the instance-wide constraint is conditioned on it; a content type id
+    #: differs between databases, so the condition cannot name the type itself.
+    identifies_owner = models.BooleanField(default=False, editable=False)
     #: When somebody proved they hold this number, or NULL for never. NULL is the only
     #: state any existing row may have: numbers have been storable and first-come-first-
     #: served since #90, so every one recorded before this existed is a claim nobody
@@ -335,10 +348,17 @@ class PhoneNumber(OwnedModel):
                 condition=Q(is_primary=True),
                 name="one_primary_phone_number_per_holder",
             ),
+            # A person's own numbers, across the instance; a recorded one, within its holder
+            # (#329).
             models.UniqueConstraint(
                 fields=("normalised",),
-                condition=~Q(normalised=""),
+                condition=~Q(normalised="") & Q(identifies_owner=True),
                 name="phone_number_unique_across_the_instance",
+            ),
+            models.UniqueConstraint(
+                fields=("content_type", "object_id", "normalised"),
+                condition=~Q(normalised=""),
+                name="phone_number_once_per_holder",
             ),
             # One way back in per account, in the database rather than in whichever form
             # saved last -- the same argument the primary constraint makes, for a flag with
@@ -358,6 +378,9 @@ class PhoneNumber(OwnedModel):
         previous = self.normalised
         self.number = (self.number or "").strip()
         self.normalised = phones.normalise(self.number)
+        self.identifies_owner = self._holder_is_a_profile()
+        if "update_fields" in kwargs and kwargs["update_fields"] is not None:
+            kwargs["update_fields"] = {*kwargs["update_fields"], "identifies_owner"}
         if self.kind != self.Kind.OTHER:
             self.label = ""
         # Editing the digits makes this a different number, and a proof of the old one says
@@ -462,7 +485,7 @@ class PhoneNumber(OwnedModel):
 
 
 class PostalAddress(OwnedModel):
-    """One postal address belonging to a person or to a contact.
+    """One postal address belonging to a person, a contact or a company (#329).
 
     A generic relation, for the reason :class:`PhoneNumber` gives: the holder is
     heterogeneous, and two nullable foreign keys with a check constraint would say the same
@@ -474,8 +497,10 @@ class PostalAddress(OwnedModel):
     family instance share one -- and a family instance is exactly the kind of small
     self-hosted deployment this project is built for. A uniqueness constraint would refuse
     the second member of a household their own address *and* disclose, in refusing it, that
-    somebody else on this server lives there. So: unique **per owner**, so one person cannot
-    list the same address twice, and freely shared between accounts (#92).
+    somebody else on this server lives there. So: unique **per holder**, so one person, contact
+    or company does not list the same address twice, and freely shared between accounts (#92)
+    and between the holders of one account -- a company and the people who work in its
+    building (#329).
 
     **Valid cannot mean verified.** Deciding whether an address exists needs a per-country
     reference database or a paid lookup service -- a network dependency, a cost, and a
@@ -557,12 +582,13 @@ class PostalAddress(OwnedModel):
                 condition=Q(is_primary=True),
                 name="one_primary_address_per_holder",
             ),
-            # Per owner, never across the instance. Somebody listing the same address twice
-            # is a mistake worth catching; two people sharing one is a household.
+            # Per holder, never across the instance. One holder listing the same address twice
+            # is a mistake worth catching; two people sharing one is a household, and a
+            # company and the people who work in its building share one too (#329).
             models.UniqueConstraint(
-                fields=("owner", "comparable"),
+                fields=("content_type", "object_id", "comparable"),
                 condition=~Q(comparable=""),
-                name="address_unique_per_owner",
+                name="address_unique_per_holder",
             ),
         ]
         indexes = [models.Index(fields=("content_type", "object_id"))]
@@ -775,8 +801,9 @@ class MessagingHandle(OwnedModel):
     service the handle has been normalised and checked where it was taken in; the model
     stores what it is given, so that nothing already stored is refused in retrospect.
 
-    **Never a way back in.** A number is unique across the instance and may be verified and
-    made the recovery number, because a number is a way into an account (#142, #144). A handle
+    **Never a way back in.** A person's own number is unique across the instance and may be
+    verified and made the recovery number, because a number is a way into an account (#142,
+    #144). A handle
     is none of that: unique per holder, service and folded form, never verified, never
     recovery. Refusing a second holder would disclose that somebody else here has the same
     handle (``docs/THREAT-MODEL.md``), exactly as it would for a web link or an address.

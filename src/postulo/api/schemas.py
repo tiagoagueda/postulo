@@ -115,6 +115,29 @@ class IdentifierIn(Schema):
     label: str = Field(default="", max_length=60)
 
 
+class PhoneNumberOut(Schema):
+    kind: str = ""
+    label: str = ""
+    #: As it is stored: the international form, digits and nothing else, where it has one.
+    number: str
+    #: The same number grouped the way its own country writes it, for showing to somebody
+    #: (#304). Read-only: it is drawn from `number` and is never what a client sends.
+    formatted: str = ""
+    is_primary: bool = False
+
+
+class PostalAddressOut(Schema):
+    kind: str = ""
+    label: str = ""
+    street: str = ""
+    postcode: str = ""
+    municipality: str = ""
+    region: str = ""
+    #: ISO 3166-1 alpha-2, in capitals.
+    country: str = ""
+    is_primary: bool = False
+
+
 class CompanyOut(Schema):
     id: int
     name: str
@@ -122,6 +145,11 @@ class CompanyOut(Schema):
     kind: str = "employer"
     website: str = ""
     careers_url: str = ""
+    #: Its general mailbox, its numbers and its offices (#329), in the shape a contact's
+    #: numbers have.
+    email: str = ""
+    phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
+    postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
     location: str = ""
     industries: list[str] = Field(default_factory=list)
     identifiers: list[IdentifierOut] = Field(default_factory=list)
@@ -164,14 +192,27 @@ def _a_currency(value: str) -> str:
 CurrencyCode = Annotated[str, AfterValidator(_a_currency)]
 
 
-class PhoneNumberOut(Schema):
-    kind: str = ""
-    label: str = ""
-    #: As it is stored: the international form, digits and nothing else, where it has one.
-    number: str
-    #: The same number grouped the way its own country writes it, for showing to somebody
-    #: (#304). Read-only: it is drawn from `number` and is never what a client sends.
-    formatted: str = ""
+class PhoneNumberIn(Schema):
+    """A number to write on a company (#329), checked against its country's numbering plan."""
+
+    number: str = Field(min_length=1, max_length=40)
+    #: The country a national number is in; blank where the number is international.
+    country: PhoneCountry = ""
+    kind: str = Field(default="", description="mobile, work, home, switchboard, fax or other")
+    label: str = Field(default="", max_length=60, description="Its name, with kind other")
+    is_primary: bool = False
+
+
+class PostalAddressIn(Schema):
+    """An address to write on a company (#329): the parts, as the page takes them."""
+
+    kind: str = Field(default="", description="home, work, postal or other")
+    label: str = Field(default="", max_length=60, description="Its name, with kind other")
+    street: str = Field(default="", max_length=500)
+    postcode: str = Field(default="", max_length=20)
+    municipality: str = Field(default="", max_length=120)
+    region: str = Field(default="", max_length=120)
+    country: str = Field(default="", max_length=2)
     is_primary: bool = False
 
 
@@ -280,6 +321,13 @@ class CompanyIn(Schema):
     )
     website: WebAddress = Field(default="", max_length=200)
     careers_url: WebAddress = Field(default="", max_length=200)
+    email: str = Field(default="", max_length=254, description="Its general mailbox")
+    phone_numbers: list[PhoneNumberIn] = Field(
+        default_factory=list, description="Added beside any it already has"
+    )
+    postal_addresses: list[PostalAddressIn] = Field(
+        default_factory=list, description="Added beside any it already has"
+    )
     location: str = Field(default="", max_length=200)
     industries: list[str] = Field(
         default_factory=list, description="Names; unknown ones join the owner's vocabulary."
@@ -295,6 +343,13 @@ class CompanyPatch(Schema):
     name: _required(200) | None = None
     website: WebAddress | None = Field(default=None, max_length=200)
     careers_url: WebAddress | None = Field(default=None, max_length=200)
+    email: str | None = Field(default=None, max_length=254)
+    phone_numbers: list[PhoneNumberIn] | None = Field(
+        default=None, description="Replaces the whole list"
+    )
+    postal_addresses: list[PostalAddressIn] | None = Field(
+        default=None, description="Replaces the whole list"
+    )
     location: str | None = Field(default=None, max_length=200)
     industries: list[str] | None = Field(default=None, description="Replaces the whole list")
     identifiers: list[IdentifierIn] | None = Field(
@@ -1468,6 +1523,21 @@ def company_out(company, *, detail: bool = False) -> dict:
         "kind": company.kind,
         "website": company.website,
         "careers_url": company.careers_url,
+        "email": company.email,
+        "phone_numbers": [_number_out(row) for row in company.phone_numbers.all()],
+        "postal_addresses": [
+            {
+                "kind": row.kind,
+                "label": row.label,
+                "street": row.street,
+                "postcode": row.postcode,
+                "municipality": row.municipality,
+                "region": row.region,
+                "country": row.country,
+                "is_primary": row.is_primary,
+            }
+            for row in company.postal_addresses.all()
+        ],
         "location": company.location,
         "industries": [industry.name for industry in company.industries.all()],
         "identifiers": [
@@ -1483,6 +1553,16 @@ def company_out(company, *, detail: bool = False) -> dict:
         data["contacts"] = [contact_out(c) for c in company.contacts.all()]
         data["listing_ids"] = [p.pk for p in company.postings.all()]
     return data
+
+
+def _number_out(row) -> dict:
+    return {
+        "kind": row.kind,
+        "label": row.label,
+        "number": row.number,
+        "formatted": phones.readable(row.number),
+        "is_primary": row.is_primary,
+    }
 
 
 def _primary_number(holder) -> str:

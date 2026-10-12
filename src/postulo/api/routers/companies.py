@@ -39,7 +39,7 @@ def list_companies(
 ):
     companies = (
         owned(request, Company.objects)
-        .prefetch_related("industries", "identifiers")
+        .prefetch_related("industries", "identifiers", "phone_numbers", "postal_addresses")
         .order_by("name", "pk")
     )
     if q:
@@ -72,13 +72,81 @@ def add_company(request, payload: CompanyIn):
             company.industries.add(*Industry.named(request.auth.owner, payload.industries))
         if payload.identifiers:
             identifiers_or_422(company, payload.identifiers)
+        _write_reached(
+            company,
+            request.auth.owner,
+            email=payload.email or None,
+            numbers=payload.phone_numbers,
+            addresses=payload.postal_addresses,
+        )
     return Status(201, company_out(_detail(request, company.pk), detail=True))
+
+
+def _write_reached(company, owner, *, email=None, numbers=None, addresses=None, replace=False):
+    """Its mailbox, numbers and addresses (#329), checked as the page checks them.
+
+    A number is checked against its country's numbering plan; an impossible one is a 422
+    and nothing is written. A company's number is one the person recorded, so it collides
+    with nothing on the instance; one the company already lists is not listed twice.
+    """
+    from django.core.exceptions import ValidationError
+    from django.core.validators import validate_email
+
+    from postulo.core import importer, phones
+    from postulo.core.models import PhoneNumber, PostalAddress
+
+    if email is not None:
+        email = email.strip()
+        if email:
+            try:
+                validate_email(email)
+            except ValidationError as exc:
+                raise HttpError(422, "; ".join(exc.messages)) from exc
+        company.email = email
+        company.save(update_fields=["email", "updated_at"])
+    if numbers is not None:
+        rows = []
+        for row in numbers:
+            if row.kind and row.kind not in PhoneNumber.Kind.values:
+                raise HttpError(422, _("%(kind)s is not a kind of number.") % {"kind": row.kind})
+            verdict = phones.check(row.number, row.country)
+            if verdict.impossible:
+                raise HttpError(422, verdict.sentence(notes=True))
+            rows.append(
+                {
+                    "number": phones.combine(row.number, row.country),
+                    "kind": row.kind,
+                    "label": row.label if row.kind == PhoneNumber.Kind.OTHER else "",
+                    "is_primary": row.is_primary,
+                }
+            )
+        if replace:
+            company.phone_numbers.all().delete()
+        importer._restore_phone_numbers(company, owner, rows)
+    if addresses is not None:
+        rows = []
+        for row in addresses:
+            if row.kind and row.kind not in PostalAddress.Kind.values:
+                raise HttpError(422, _("%(kind)s is not a kind of address.") % {"kind": row.kind})
+            rows.append({**row.dict(), "country": (row.country or "").upper()})
+        if replace:
+            company.postal_addresses.all().delete()
+        importer._restore_postal_addresses(
+            company, owner, importer._address_rows({"postal_addresses": rows})
+        )
 
 
 def _detail(request, pk: int) -> Company:
     return owned_or_404(
         request,
-        Company.objects.prefetch_related("contacts", "postings", "industries", "identifiers"),
+        Company.objects.prefetch_related(
+            "contacts",
+            "postings",
+            "industries",
+            "identifiers",
+            "phone_numbers",
+            "postal_addresses",
+        ),
         pk,
     )
 
@@ -107,6 +175,9 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     data = payload.dict(exclude_unset=True)
     industries = data.pop("industries", None)
     data.pop("identifiers", None)
+    email = data.pop("email", None)
+    data.pop("phone_numbers", None)
+    data.pop("postal_addresses", None)
     if data.get("name") is not None:
         data["name"] = _name_or_refusal(request, company, data["name"])
     with transaction.atomic():  # a refusal below undoes the saves above it (#435)
@@ -118,6 +189,14 @@ def patch_company(request, pk: int, payload: CompanyPatch):
             company.industries.set(Industry.named(request.auth.owner, industries))
         if payload.identifiers is not None:
             identifiers_or_422(company, payload.identifiers, replace=True)
+        _write_reached(
+            company,
+            request.auth.owner,
+            email=email,
+            numbers=payload.phone_numbers,
+            addresses=payload.postal_addresses,
+            replace=True,
+        )
     return company_out(_detail(request, pk), detail=True)
 
 
@@ -170,15 +249,10 @@ def add_contact(request, pk: int, payload: ContactIn):
     verdict = phones.check(number, country)
     if verdict.impossible:
         raise HttpError(422, verdict.sentence(notes=True))
+    # A contact's number is one this account recorded, never one it is, so it collides with
+    # nothing on the instance and nothing is asked or spent (#329; the bound of #142 and
+    # #374 is for a person's own numbers).
     number = phones.combine(number, country)
-    if phones.normalise(number):
-        # The API is the surface a sweep would actually use, so it is bounded exactly as
-        # the form is -- one limit, keyed on the account rather than on the token (#142).
-        # Once it is spent every number is answered alike, with the 429 and its
-        # `Retry-After`, held or not (#374).
-        phone_numbers.ensure_allowance(request.auth.owner)
-        if phone_numbers.taken_elsewhere(number):
-            raise HttpError(422, phone_numbers.collision_message(request.auth.owner))
     contact = Contact.objects.create(owner=request.auth.owner, company=company, **fields)
     if number:
         phone_numbers.save_only_number(contact, request.auth.owner, number)

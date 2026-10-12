@@ -170,6 +170,8 @@ class CompanyForm(OwnerScopedModelForm):
         "known_service",
         "website",
         "careers_url",
+        "email",
+        "phone",
         "location",
         "location_correction",
         "industries",
@@ -188,6 +190,7 @@ class CompanyForm(OwnerScopedModelForm):
             "parent",
             "website",
             "careers_url",
+            "email",
             "location",
             "industries",
             "notes",
@@ -266,6 +269,22 @@ class CompanyForm(OwnerScopedModelForm):
             # service has one; `clean` puts it back to required otherwise.
             self.fields["name"].required = False
 
+        # Its switchboard (#329): one box while *Several telephone numbers* is off, as a
+        # contact's is, and the rows are their own block on the page while it is on. Only
+        # on the company's own form, never on a cell edited in the table.
+        self.several_numbers = phone_numbers.several_allowed(self.user)
+        if not self.several_numbers and "name" in self.fields and "notes" in self.fields:
+            self.fields["phone"] = phone_field.PhoneField(
+                label=_("Phone"),
+                required=False,
+                default_country=phones.default_country(_language_of(self.user)),
+                has_notes=True,
+            )
+            if self.instance and self.instance.pk:
+                primary = phone_numbers.primary_for(self.instance)
+                self.fields["phone"].initial = primary.number if primary else ""
+            self.order_fields(self.field_order)
+
         if "industries" in self.fields:
             self.fields["industries"].queryset = Industry.objects.for_user(self.user)
         if "logo_url" in self.fields and self.instance.pk and self.instance.logo_source_url:
@@ -335,6 +354,10 @@ class CompanyForm(OwnerScopedModelForm):
         company = super().save(commit=commit)
         if commit:
             self._add_new_industries(company)
+            if "phone" in self.fields:
+                phone_numbers.save_only_number(
+                    company, self.user, self.cleaned_data.get("phone", "")
+                )
         else:
             save_m2m = self.save_m2m
 
@@ -687,8 +710,10 @@ class ContactForm(OwnerScopedModelForm):
     def clean_phone(self) -> str:
         typed = (self.cleaned_data.get("phone") or "").strip()
         primary = phone_numbers.primary_for(self.instance) if self.instance.pk else None
+        # A contact's number is one this account recorded, so it collides with nothing on
+        # the instance and asking spends nothing (#329).
         refused = phone_numbers.refusal(
-            self.user, typed, exclude_pk=primary.pk if primary else None
+            self.user, typed, exclude_pk=primary.pk if primary else None, identifies_owner=False
         )
         if refused:
             raise forms.ValidationError(refused)

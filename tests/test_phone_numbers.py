@@ -86,7 +86,19 @@ def test_a_number_nobody_could_parse_is_kept_and_compared_with_nothing(contact, 
 # ------------------------------------------------------- unique across the instance
 
 
-def test_two_accounts_cannot_both_hold_one_number(contact, user, other_user):
+def test_two_people_cannot_both_hold_one_number_as_their_own(user, other_user):
+    """A person's own number is unique across the instance (#90, #329)."""
+    add(user.profile, user, "+351912345678", primary=True)
+
+    assert phone_numbers.taken_elsewhere("+351912345678")
+    with pytest.raises(IntegrityError):
+        with transaction.atomic():
+            add(other_user.profile, other_user, "+351 912 345 678", primary=True)
+
+
+def test_two_accounts_can_both_record_one_switchboard(contact, user, other_user):
+    """A number somebody merely recorded is unique within its holder and nowhere else
+    (#329): two people registered with one office both record its line."""
     from postulo.jobs.models import Company, Contact
 
     add(contact, user, "+351912345678", primary=True)
@@ -95,15 +107,34 @@ def test_two_accounts_cannot_both_hold_one_number(contact, user, other_user):
         company=Company.objects.create(owner=other_user, name="Black Mesa"),
         name="Gordon",
     )
+    add(theirs, other_user, "+351 912 345 678", primary=True)
+    office = Company.objects.create(owner=other_user, name="IEFP")
+    add(office, other_user, "+351912345678", primary=True)
 
-    assert phone_numbers.taken_elsewhere("+351912345678")
+    assert PhoneNumber.objects.filter(normalised="+351912345678").count() == 3
+    assert not phone_numbers.taken_elsewhere("+351912345678"), "nobody holds it as their own"
+
+
+def test_a_recorded_number_does_not_keep_its_real_holder_out(contact, user, other_user):
+    """Whoever records a stranger's mobile on a contact used to make it impossible for that
+    stranger, on the same instance, to add it to their own profile (#329)."""
+    add(contact, user, "+351912345678", primary=True)
+
+    add(other_user.profile, other_user, "+351912345678", primary=True)
+
+    assert other_user.profile.phone_numbers.get().identifies_owner
+
+
+def test_one_holder_still_lists_a_number_once(contact, user):
+    add(contact, user, "+351912345678", primary=True)
+
     with pytest.raises(IntegrityError):
         with transaction.atomic():
-            add(theirs, other_user, "+351 912 345 678", primary=True)
+            add(contact, user, "+351 912 345 678")
 
 
-def test_the_same_number_written_three_ways_is_one_number(contact, user):
-    add(contact, user, "+351912345678", primary=True)
+def test_the_same_number_written_three_ways_is_one_number(user):
+    add(user.profile, user, "+351912345678", primary=True)
     for spelling in ("+351 912 345 678", "00351912345678", "+351912345678"):
         assert phone_numbers.taken_elsewhere(spelling), spelling
 
@@ -114,21 +145,30 @@ def test_two_unparseable_numbers_do_not_collide(contact, user):
     assert contact.phone_numbers.count() == 2, "incomparable is not the same as equal"
 
 
-def test_the_form_says_what_the_rule_discloses(client, user, contact, other_user):
+def test_the_form_says_what_the_rule_discloses(user, other_user):
     """The message names the disclosure rather than hiding it, which is the honest half.
 
-    Instance-wide uniqueness cannot be enforced without telling whoever typed a number
-    that somebody else may hold it. A vaguer message would disclose exactly as much and
-    leave the person guessing at what had happened.
+    A person's own numbers are unique across the instance, and that cannot be enforced
+    without telling whoever typed one that somebody else may hold it. A vaguer message
+    would disclose exactly as much and leave the person guessing at what had happened.
     """
-    from postulo.jobs.models import Company, Contact
+    add(other_user.profile, other_user, "+351912345678", primary=True)
 
-    theirs = Contact.objects.create(
-        owner=other_user,
-        company=Company.objects.create(owner=other_user, name="Black Mesa"),
-        name="Gordon",
+    formset = phone_numbers.formset_for(
+        user.profile,
+        asked_by=user,
+        data=stored_number_rows((None, "", "+351912345678", False)),
     )
-    add(theirs, other_user, "+351912345678", primary=True)
+
+    assert not formset.is_valid()
+    assert "may belong to somebody else" in str(formset.errors)
+
+
+def test_a_contact_may_carry_a_number_somebody_holds_as_their_own(
+    client, user, contact, other_user, answers_spent
+):
+    """The contact page asks nothing and spends nothing about a recorded number (#329)."""
+    add(other_user.profile, other_user, "+351912345678", primary=True)
     switch_off(user)
     client.force_login(user)
 
@@ -145,9 +185,9 @@ def test_the_form_says_what_the_rule_discloses(client, user, contact, other_user
         },
     )
 
-    assert response.status_code == 200, "the form came back rather than saving"
-    assert "already recorded on this instance" in response.content.decode()
-    assert not contact.phone_numbers.exists()
+    assert response.status_code == 302
+    assert contact.phone_numbers.get().normalised == "+351912345678"
+    assert answers_spent == []
 
 
 # ---------------------------------------------------- what switching it off does not do
@@ -479,14 +519,14 @@ def test_a_stored_number_row_can_take_the_number_of_one_removed_further_down(
 
 
 def test_a_number_somebody_else_holds_is_still_refused_and_still_counted(
-    user, other_user, contact, answers_spent
+    user, other_user, answers_spent
 ):
     """Only a row this save removes gives its number up. Another account's row does not,
     whatever is ticked here, and the answer about it is the rationed one."""
     add(other_user.profile, other_user, "+351912345678")
-    mine = add(contact, user, "+351211111111", primary=True)
+    mine = add(user.profile, user, "+351211111111", primary=True)
     formset = phone_numbers.formset_for(
-        contact,
+        user.profile,
         asked_by=user,
         data=stored_number_rows(
             (mine.pk, "", "+351211111111", True),

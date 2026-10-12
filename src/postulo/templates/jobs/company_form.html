@@ -97,6 +97,10 @@
         <c-field :field="form.known_service" />
         <c-field :field="form.website" />
         <c-field :field="form.careers_url" />
+        {% comment %} Its general mailbox, and its switchboard while several numbers are off
+           (#329). {% endcomment %}
+        <c-field :field="form.email" />
+        {% if form.phone %}<c-field :field="form.phone" />{% endif %}
         <c-field :field="form.location" />
         {% comment %} The place, said exactly, when the guess sat in the wrong one (#108). {% endcomment %}
         <c-field :field="form.location_correction" />
@@ -140,7 +144,12 @@
         {% if form.from_career %}<c-field :field="form.from_career" />{% endif %}
       </div>
 
-      <fieldset class="card mb-6 max-w-2xl 2xl:flex-1" data-identifiers id="section-identifiers">
+      <div class="max-w-2xl 2xl:flex-1" data-company-rows>
+      {% comment %} What the company answers on and where it is (#329), the rows a contact
+         has, above its identifiers. {% endcomment %}
+      {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
+      {% include "partials/postal_addresses.html" %}
+      <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="label px-1">{% translate "Identifiers" %}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">
           {% translate "Public ids for this employer, so it can be matched wherever it turns up. Paste a whole address if that is what you have; Postulo keeps the id." %}
@@ -166,6 +175,7 @@
         </details>
         <p class="text-xs text-ink-500 dark:text-ink-400">{% translate "Save the company to add another identifier." %}</p>
       </fieldset>
+      </div>
     </div>
     <div class="flex items-center gap-3">
       <button type="submit" class="btn">{% translate "Save" %}</button>

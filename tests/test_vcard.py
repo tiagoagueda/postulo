@@ -481,14 +481,17 @@ def test_a_value_that_is_refused_is_reported_and_the_rest_of_the_card_still_impo
 
 
 @pytest.mark.django_db
-def test_a_number_somebody_else_holds_is_refused_in_the_collision_words(user, other_user):
+def test_a_number_somebody_else_holds_is_recorded_on_the_contact(user, other_user):
+    """A card's number is one this account records, never one it is, so it collides with
+    nothing on the instance, not even somebody's own number (#329)."""
     holder = Contact.objects.create(owner=other_user, name="Theirs")
     PhoneNumber.objects.create(owner=other_user, holder=holder, number="+351912345678")
+    PhoneNumber.objects.create(owner=other_user, holder=other_user.profile, number="+351912345678")
     text = "BEGIN:VCARD\nVERSION:4.0\nFN:Sam\nTEL:+351 912 345 678\nEND:VCARD\n"
     report = vcards.apply(user, _read(text), {0})
     assert report.contacts == 1
-    assert not PhoneNumber.objects.filter(owner=user).exists()
-    assert any("already recorded" in problem for problem in report.problems)
+    assert PhoneNumber.objects.get(owner=user).normalised == "+351912345678"
+    assert not any("already recorded" in problem for problem in report.problems)
 
 
 @pytest.mark.django_db

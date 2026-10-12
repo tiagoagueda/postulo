@@ -112,6 +112,28 @@
     </div>
   {% endif %}
 
+  {% comment %} What it answers on and where it is (#329): its mailbox, its numbers -- the
+     primary alone while several are off, as a contact's -- and its addresses, each on a line
+     of its own, before its links. {% endcomment %}
+  {% if company.email or company_numbers or company_addresses %}
+    <div class="mb-4 space-y-1 text-sm" data-company-reached>
+      {% if company.email %}
+        <p><a href="mailto:{{ company.email }}" class="text-brand-600 underline dark:text-brand-400">{{ company.email }}</a></p>
+      {% endif %}
+      {% for number in company_numbers %}
+        <p>
+          {% phone_link number.number %}
+          {% if number.kind_label %}<span class="text-xs text-ink-500 dark:text-ink-400">{{ number.kind_label }}</span>{% endif %}
+        </p>
+      {% endfor %}
+      {% for address in company_addresses %}
+        <p class="text-ink-600 dark:text-ink-300">
+          {% if address.kind %}<span class="text-xs text-ink-500 dark:text-ink-400">{% if address.kind == "other" %}{{ address.label }}{% else %}{{ address.get_kind_display }}{% endif %}</span> {% endif %}<bdi>{{ address.one_line }}</bdi>
+        </p>
+      {% endfor %}
+    </div>
+  {% endif %}
+
   {% if company.website or company.careers_url %}
     <div class="mb-6 flex flex-wrap gap-4 text-sm">
       {% if company.website %}

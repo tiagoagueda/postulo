@@ -814,7 +814,7 @@ def test_the_company_form_in_two_columns_has_no_violations(
     for path in ("/jobs/companies/new/", f"/jobs/companies/{furnished['company'].pk}/edit/"):
         page.goto(f"{base}{path}")
         details = page.locator("main form .card").first.bounding_box()
-        identifiers = page.locator("main form [data-identifiers]").bounding_box()
+        identifiers = page.locator("main form [data-company-rows]").bounding_box()
         assert details["y"] == identifiers["y"], f"{path} is not in two columns at 2560"
         found = violations_on(page, axe_source)
         if found:

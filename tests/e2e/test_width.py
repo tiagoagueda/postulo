@@ -67,7 +67,8 @@ TWO_COLUMNS = 1536
 
 def company_form_parts(page: Page) -> tuple[dict, dict, dict]:
     details = page.locator("main form .card").first.bounding_box()
-    identifiers = page.locator("main form [data-identifiers]").bounding_box()
+    # The column beside the details: numbers, addresses and identifiers (#329).
+    identifiers = page.locator("main form [data-company-rows]").bounding_box()
     # By its type rather than its name: the right-to-left test reads the page in Arabic.
     # The last: the logo dialog's own forms come before the form this is about (#853).
     save = page.locator('main form button[type="submit"]').last.bounding_box()
@@ -387,9 +388,14 @@ def test_below_the_breakpoint_a_contact_is_one_column(live_server, page: Page, f
         assert round(merge["x"] + merge["width"]) == round(details["x"] + details["width"])
 
 
-def test_a_contact_with_no_rows_is_one_column_at_any_width(live_server, page: Page, furnished):  # noqa: F811
-    """Every feature that draws a row switched off: nothing for a second column, and the
-    details keep their measure at the start edge, *Merge* still at the end of it."""
+def test_a_contact_with_every_switchable_row_off_keeps_its_addresses_beside_it(
+    live_server,
+    page: Page,
+    furnished,  # noqa: F811
+):
+    """Every feature that draws a row switched off: the addresses, which no feature governs,
+    are the second column alone (#329), and the details keep their measure at the start
+    edge, *Merge* still at the end of it."""
     from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
     from postulo.plugins.models import PluginPolicy
     from postulo.plugins.phone_numbers import PHONE_NUMBERS
@@ -405,9 +411,11 @@ def test_a_contact_with_no_rows_is_one_column_at_any_width(live_server, page: Pa
     page.set_viewport_size({"width": WIDE, "height": 1200})
     page.goto(f"{live_server.url}/jobs/contacts/{furnished['contact'].pk}/edit/")
     details, rows, save = contact_form_parts(page)
-    assert rows is None
+    assert rows is not None and rows["y"] == details["y"]
+    assert page.locator("main form [data-contact-rows] [data-postal-addresses]").count() == 1
+    assert page.locator("main form [data-phone-numbers]").count() == 0
     assert details["width"] == MEASURE and round(details["x"]) == 16
-    assert save["y"] >= details["y"] + details["height"]
+    assert save["y"] >= max(details["y"] + details["height"], rows["y"] + rows["height"])
     merge = merge_button(page)
     assert round(merge["x"] + merge["width"]) == round(details["x"] + details["width"])
 

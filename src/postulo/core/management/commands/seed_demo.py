@@ -297,9 +297,9 @@ def _seed_messaging(holder, owner, service: str, handle: str) -> None:
 
 def _seed_phone(holder, owner, number: str) -> None:
     """Give a seeded holder its primary number, skipping one already on this instance."""
-    from postulo.core.phone_numbers import save_only_number, taken_elsewhere
+    from postulo.core.phone_numbers import identifies, save_only_number, taken_elsewhere
 
-    if not taken_elsewhere(number):
+    if not taken_elsewhere(number, identifies_owner=identifies(holder)):
         save_only_number(holder, owner, number)
 
 

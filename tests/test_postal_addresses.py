@@ -435,10 +435,9 @@ def test_a_row_changed_into_what_another_is_changing_out_of(client, user):
     assert streets == ["Rua B 2", "Rua C 3"]
 
 
-def test_an_address_a_contact_already_holds_is_said_and_not_a_crash(client, user):
-    """The constraint is per owner and not per holder, and a contact can hold addresses --
-    an archive brings them. The form compared the page's rows only with one another, so
-    this was left for the database to refuse."""
+def test_an_address_a_contact_already_holds_is_yours_too(client, user):
+    """Unique per holder since #329, not per owner: the person and a contact of theirs at
+    one address -- a colleague in the same building -- both keep it."""
     from postulo.jobs.models import Company, Contact
 
     company = Company.objects.create(owner=user, name="Aperture")
@@ -450,9 +449,32 @@ def test_an_address_a_contact_already_holds_is_said_and_not_a_crash(client, user
         reverse("accounts:profile"), your_details(**address_rows("Rua do Exemplo 1"))
     )
 
+    assert response.status_code == 302
+    assert postal.for_holder(user.profile).count() == 1
+
+
+def test_a_company_and_one_of_its_contacts_at_one_address_both_save(user):
+    """#329's case: the company's office and the recruiter who works in it."""
+    from postulo.jobs.models import Company, Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    someone = Contact.objects.create(owner=user, company=company, name="Cave Johnson")
+    an_address(user, holder=someone)
+    an_address(user, holder=company)
+
+    assert company.postal_addresses.count() == someone.postal_addresses.count() == 1
+
+
+def test_one_holder_still_lists_an_address_once(client, user):
+    an_address(user)
+    client.force_login(user)
+
+    response = client.post(
+        reverse("accounts:profile"), your_details(**address_rows("Rua do Exemplo 1"))
+    )
+
     assert response.status_code == 200
     assert "This address is already listed." in response.content.decode()
-    assert not postal.for_holder(user.profile).exists()
 
 
 def test_somebody_elses_contact_holding_it_is_nobodys_business(client, user, other_user):
@@ -1095,10 +1117,9 @@ def test_a_page_that_saves_at_its_foot_reads_in_the_same_order_and_keeps_its_box
     assert ">Primary<" in html and ">Remove<" in html
 
 
-def test_the_contact_form_draws_no_address_rows(client, user):
-    """Written down because #306 speaks of the contact form: it has telephone numbers and
-    links, and has never drawn addresses. A contact holds one only where an archive or a
-    merge brought it."""
+def test_the_contact_form_draws_the_address_rows(client, user):
+    """A person card's ADR lands here (#329): the contact form has addresses now, saved with
+    the contact or not at all."""
     from postulo.jobs.models import Company, Contact
 
     company = Company.objects.create(owner=user, name="Aperture")
@@ -1107,7 +1128,7 @@ def test_the_contact_form_draws_no_address_rows(client, user):
 
     html = client.get(reverse("jobs:contact_update", args=[someone.pk])).content.decode()
 
-    assert "data-postal-addresses" not in html
+    assert "data-postal-addresses" in html
 
 
 # ------------------------------------------------------ the name, only for a kind of Other

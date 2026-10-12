@@ -373,17 +373,17 @@ def test_a_spent_allowance_refuses_a_taken_number_and_a_free_one_alike(user, dja
 
 
 @override_settings(POSTULO_NUMBER_RATE="1/h")
-def test_the_contact_pages_charge_the_account_that_asked(
+def test_the_contact_pages_neither_refuse_nor_charge_a_recorded_number(
     client, user, other_user, django_user_model
 ):
-    """Nobody's collisions spend anybody else's allowance: the contact views once built their
-    formset without saying who was asking, and the allowance was one shared bucket (#374)."""
+    """A contact's number is one somebody recorded, never one they are, so the contact page
+    asks nothing about it and spends nothing, for any account (#329; #374 was the bucket
+    the pages used to share)."""
     from django.urls import reverse
 
-    from postulo.jobs.models import Company
+    from postulo.jobs.models import Company, Contact
 
     _held_by_somebody_else(django_user_model)
-    sentences = []
     for person in (user, other_user):
         company = Company.objects.create(owner=person, name="Aperture")
         client.force_login(person)
@@ -398,8 +398,6 @@ def test_the_contact_pages_charge_the_account_that_asked(
                 **_rows("+351912345678"),
             },
         )
-        assert response.status_code == 200
-        sentences.append(response.content.decode())
-
-    assert all("already recorded on this instance" in page for page in sentences)
-    assert not any("available again" in page for page in sentences)
+        assert response.status_code == 302
+        assert Contact.objects.get(owner=person).phone_numbers.count() == 1
+    assert "already recorded" in phone_numbers.collision_message(user), "nothing was spent"

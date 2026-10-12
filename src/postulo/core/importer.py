@@ -797,18 +797,17 @@ def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> N
     """Recreate a holder's addresses.
 
     No skipping, and that is the difference from the numbers above. Addresses are unique
-    per owner rather than across the instance, so an archive can never collide with
-    somebody else's -- two people at one address is a household. Within one import a
-    repeated address is dropped, because listing the same one twice is the mistake the
-    constraint exists to catch. The same goes for one the owner already has, on this holder
-    or another, and a holder that already has a primary keeps it (#375).
+    per holder rather than across the instance (#329), so an archive can never collide with
+    somebody else's -- two people at one address is a household, and a company and a
+    contact in its building share one. Within one import a repeated address is dropped,
+    because one holder listing the same one twice is the mistake the constraint exists to
+    catch. The same goes for one this holder already has, and a holder that already has a
+    primary keeps it (#375).
     """
     from postulo.core.models import PostalAddress
 
     primary_taken = _held(PostalAddress, holder).filter(is_primary=True).exists()
-    seen: set[str] = set(
-        PostalAddress.objects.filter(owner=owner).values_list("comparable", flat=True)
-    )
+    seen: set[str] = set(_held(PostalAddress, holder).values_list("comparable", flat=True))
     for row in rows:
         address = PostalAddress(
             owner=owner,
@@ -886,18 +885,31 @@ def _restore_phone_numbers(
 ) -> None:
     """Recreate a holder's numbers, skipping any this instance already has.
 
-    Numbers are unique across the instance, so an archive carrying one somebody here
-    already holds cannot be imported as it stands. Skipping that row is the only answer
-    that neither fails the whole import nor takes a number away from whoever already had
-    it, and the rest of the archive lands intact. Each skip is a line in ``report``, naming
-    the record in the archive (``whose``) and the last digits of the number, never the
-    account that holds it (#562).
+    A person's own numbers are unique across the instance (#329), so an archive carrying
+    one somebody here already holds cannot be imported as it stands. Skipping that row is
+    the only answer that neither fails the whole import nor takes a number away from whoever
+    already had it, and the rest of the archive lands intact. Each skip is a line in
+    ``report``, naming the record in the archive (``whose``) and the last digits of the
+    number, never the account that holds it (#562).
     """
-    from postulo.core import throttle
+    from postulo.core import phones, throttle
     from postulo.core.models import PhoneNumber
-    from postulo.core.phone_numbers import collision_noticed, ensure_allowance, taken_elsewhere
+    from postulo.core.phone_numbers import (
+        collision_noticed,
+        ensure_allowance,
+        identifies,
+        taken_elsewhere,
+    )
 
     primary_taken = _held(PhoneNumber, holder).filter(is_primary=True).exists()
+    # Only a person's own numbers are unique across the instance (#329). A contact's or a
+    # company's collides with nothing beyond its holder, so it is never asked about and
+    # costs nothing; one the holder already lists is simply not written twice. A person's
+    # own is asked about as before, which reports one the profile already holds.
+    own = identifies(holder)
+    listed = set(
+        _held(PhoneNumber, holder).exclude(normalised="").values_list("normalised", flat=True)
+    )
     # Whether another account holds a number is something this instance tells a person only
     # within an allowance (#142). An archive is a file the person makes, with any numbers in it,
     # as often as the import itself is allowed: each lookup is charged as the form's is, and once
@@ -907,15 +919,18 @@ def _restore_phone_numbers(
     not_asked = 0
     for row in rows:
         number = (row.get("number") or "").strip()
-        if silenced is None:
+        comparable = phones.normalise(number)
+        if not own and comparable and comparable in listed:
+            continue
+        if own and silenced is None:
             try:
                 ensure_allowance(owner)
             except throttle.TooOften as too_often:
                 silenced = too_often
-        if silenced is not None:
+        if own and silenced is not None:
             not_asked += 1
             continue
-        if taken_elsewhere(number):
+        if own and taken_elsewhere(number):
             try:
                 collision_noticed(owner)
             except throttle.TooOften as too_often:
@@ -946,6 +961,8 @@ def _restore_phone_numbers(
             is_primary=wants_primary,
         )
         primary_taken = primary_taken or wants_primary
+        if comparable:
+            listed.add(comparable)
     if not_asked and report is not None:
         report.skipped.append(
             f"{not_asked} telephone number{'s' if not_asked != 1 else ''} {whose} not restored: "
@@ -1444,6 +1461,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # Resolved after every company in the file exists: a parent may be named before it
         # has been read, and an archive written before format 5 names none at all.
         parent_name = (company_entry.pop("parent", "") or "").strip()
+        # Its switchboard and its offices, as a contact's are written (#329); format 67 is the
+        # first to carry them, and an older archive simply has none.
+        company_numbers = _phone_rows(company_entry)
+        company_addresses = _address_rows(company_entry)
         company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
         # A switch, read as one: anything but a true is not marked. An archive from before
@@ -1495,6 +1516,10 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             wants_parent[company.pk] = parent_name
         if industry_names:
             company.industries.add(*Industry.named(user, industry_names))
+        _restore_phone_numbers(
+            company, user, company_numbers, report, f"on the company “{company.name}”"
+        )
+        _restore_postal_addresses(company, user, company_addresses, report)
         for department_name in department_names:
             Department.objects.get_or_create(
                 owner=user,

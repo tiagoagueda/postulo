@@ -194,7 +194,10 @@ logger = logging.getLogger(__name__)
 #: 66 added ``source``, ``note`` and ``retired_at`` on a reminder: the plugin that placed an
 #: entry on the calendar, what it said about it, and when it ended it. An archive without them
 #: restores every reminder as one a person made, outstanding as it was (#887).
-FORMAT_VERSION = 66
+#: 67 added ``email``, ``phone_numbers`` and ``postal_addresses`` on a company, in the shape a
+#: contact's have: its general mailbox, its switchboard and its offices. An archive without
+#: them restores none (#329).
+FORMAT_VERSION = 67
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -369,6 +372,7 @@ COMPANY_FIELDS = (
     "kind",
     "website",
     "careers_url",
+    "email",
     "location",
     "notes",
     # Whether only the career added it (#683): read back as written, so a former employer
@@ -1149,6 +1153,8 @@ def build_document(user) -> dict:
             "postings__applications__sent_links",
             "postings__applications__sent_uploads",
             "departments",
+            "phone_numbers",
+            "postal_addresses",
         )
     )
     logo_types = dict(
@@ -1171,6 +1177,9 @@ def build_document(user) -> dict:
                 # department nobody had been recorded at -- and a team you applied to before
                 # you knew anybody there is exactly the ordinary case (#138).
                 "departments": [team.name for team in company.departments.all()],
+                # What it answers on and where it is, as a contact's are written (#329).
+                "phone_numbers": _phone_numbers(company),
+                "postal_addresses": _postal_addresses(company),
                 "identifiers": [
                     {"scheme": i.scheme, "value": i.value, "label": i.label}
                     for i in company.identifiers.all()

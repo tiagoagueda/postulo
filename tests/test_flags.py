@@ -201,7 +201,8 @@ def test_every_country_option_carries_its_own_flag_for_the_script(client, user):
     html = client.get(reverse("jobs:contact_create")).content.decode()
 
     options = re.findall(r'<option value="([A-Z]{2})" data-flag="([^"]*)"', html)
-    assert len(options) == len(phones.COUNTRIES)
+    # Two choosers on the page since #329: the telephone number's and the address's.
+    assert len(options) == 2 * len(phones.COUNTRIES)
     for code, url in options:
         assert url.endswith(".svg"), f"{code} has no flag"
         assert f"/flags/{code.lower()}" in url

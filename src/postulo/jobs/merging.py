@@ -370,6 +370,8 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Memberships"), other.memberships.all(), str),
         _moved(_("Courses"), other.courses.all(), str),
         _moved(_("Appointments"), other.appointments.all(), str),
+        _moved(_("Telephone numbers"), other.phone_numbers.all(), lambda row: row.number),
+        _moved(_("Postal addresses"), other.postal_addresses.all(), lambda row: row.one_line()),
     ]
     plan.moves = [line for line in lines if line is not None]
     if moving_teams or folding_teams:
@@ -387,7 +389,7 @@ def plan_companies(kept, other) -> Plan:
         )
 
     # ------------------------------------------------ the fields that hold one value
-    for name in ("website", "careers_url", "location"):
+    for name in ("website", "careers_url", "email", "location"):
         ours, theirs = getattr(kept, name), getattr(other, name)
         if theirs and not ours:
             plan.fills.append(Filled(_label(Company, name), theirs))
@@ -488,6 +490,12 @@ def merge_companies(kept, other) -> Plan:
 
     kept.industries.add(*other.industries.all())
 
+    # What it answers on and where it is (#329), as a contact's are moved; one the kept
+    # company already lists is not listed twice.
+    for rows in (list(other.phone_numbers.all()), list(other.postal_addresses.all())):
+        if rows:
+            _move_held(rows, kept, kinds=False, now=now)
+
     # The career entries that named the other company name this one now, each keeping the
     # text it had (#683). Moved here, because a link set to null on delete is an update to
     # Django and would be cleared without a word.
@@ -508,7 +516,7 @@ def merge_companies(kept, other) -> Plan:
         kept.from_career = False
 
     kept.parent = parent
-    for name in ("website", "careers_url"):
+    for name in ("website", "careers_url", "email"):
         if not getattr(kept, name):
             setattr(kept, name, getattr(other, name))
     if other.location and not kept.location:
@@ -695,9 +703,20 @@ def _move_held(rows, kept, *, kinds: bool, now) -> None:
     the one that stays: a row arriving beside a primary stops being one, and a row
     arriving where there is none keeps the flag it came with.
     """
-    ours = type(rows[0]).objects.filter(
-        content_type_id=rows[0].content_type_id, object_id=kept.pk, is_primary=True
-    )
+    model = type(rows[0])
+    held = model.objects.filter(content_type_id=rows[0].content_type_id, object_id=kept.pk)
+    # A number or an address is unique within its holder (#329), so one the kept record
+    # already lists is not moved beside its twin: the other's copy goes with the other.
+    for column in ("normalised", "comparable"):
+        if rows and hasattr(rows[0], column):
+            listed = set(held.exclude(**{column: ""}).values_list(column, flat=True))
+            twins = [row.pk for row in rows if (getattr(row, column) or None) in listed]
+            if twins:
+                model.objects.filter(pk__in=twins).delete()
+                rows = [row for row in rows if row.pk not in twins]
+    if not rows:
+        return
+    ours = held.filter(is_primary=True)
     taken = set(ours.values_list("kind", flat=True)) if kinds else set()
     has_primary = ours.exists()
     for row in rows:

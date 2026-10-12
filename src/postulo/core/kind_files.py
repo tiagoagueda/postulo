@@ -58,9 +58,10 @@ MAX_DETAILS = 20
 
 #: What each file starts at, and what its marker is called in the header. A block that
 #: changes shape is a new version, which `tests/test_kind_files.py` holds fast. The companies
-#: file went to 2 when the archive's company block gained ``from_career`` (#683): the file
-#: does not write it, and reads a version 1 file exactly as before.
-FORMATS = {"companies": 2, "contacts": 1, "listings": 1, "applications": 1}
+#: file went to 2 when the archive's company block gained ``from_career`` (#683), and to 3
+#: when it gained ``email``, ``phone_numbers`` and ``postal_addresses`` (#329): the file
+#: writes none of them, and reads an older file exactly as before.
+FORMATS = {"companies": 3, "contacts": 1, "listings": 1, "applications": 1}
 
 #: Telephone numbers are not read with a say in whether they were confirmed or are a way
 #: back in (#142, #144): neither is written.
@@ -698,7 +699,7 @@ def _create_contact(user, verdict: Verdict) -> int:
     numbers = [
         row
         for row in importer._phone_rows({"phone_numbers": details["phone_numbers"]})
-        if not phone_numbers.refusal(user, _text(row.get("number"), 40))
+        if not phone_numbers.refusal(user, _text(row.get("number"), 40), identifies_owner=False)
     ]
     importer._restore_phone_numbers(contact, user, numbers)
     importer._restore_postal_addresses(

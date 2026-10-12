@@ -107,6 +107,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Only a person's own telephone number is unique across the instance: a number recorded on a contact or a company is unique within it, asks nothing and spends no allowance, and an address is unique per holder rather than per account (#329)
 - The companies' map fills the window, with the heading, a Table button, the list of places and the footer's line drawn over it, darker tiles in the dark theme, and the table's Map button carries the map icon (#849)
 - The companies' map is drawn by Leaflet over OpenStreetMap's tiles by default; Server settings → Plugins → Maps (or POSTULO_MAP_TILES) chooses a tile server of your own or no tiles, and only the map page's security policy opens to the tile server (#898)
 - Who may use a plugin or module, switch it for themselves and change its settings is a list of rules for groups and accounts, kept on a page of its own with a Groups page under People; the checkbox Each person may change it is replaced by Everybody may switch it on that page (#886)
@@ -183,6 +184,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A company keeps its general email address, its telephone numbers and its postal addresses, on its form and page, in the API, an export and a merge, and a contact's form edits its addresses (#329)
 - Near me on the companies' map moves it to where you are, asking the browser only when pressed and sending the position nowhere; every other page forbids asking (#850)
 - The hello-world plugin is at 0.3.1 in the official catalogue, with its notifier under the name helloworld-notifier so Postulo no longer leaves it out (#593)
 - Postulo installs as an app on Chromium browsers and Safari: a completed manifest with a maskable icon and shortcuts, title-bar colours for both themes, Install in the account menu, and an offline page, the one thing the worker keeps (#895)

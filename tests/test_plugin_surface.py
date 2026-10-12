@@ -689,16 +689,20 @@ def test_a_plugin_asking_whether_a_number_is_held_spends_the_account_allowance(
     PhoneNumber.objects.create(owner=other_user, holder=other_user.profile, number="+351912345678")
 
     def asked(number):
-        return api.phone_number_is_taken(number, asked_by=user)
+        return api.phone_number_is_taken(number, asked_by=user, holder=user.profile)
 
     assert asked("+351912345679") is False, "free, and free numbers cost nothing"
     assert asked("+351912345678") is True
     assert asked("+351912345679") is False, "one answer left"
     assert asked("+351912345678") is True
     assert asked("+351912345679") is True, "spent: the free number reads as taken"
-    assert api.phone_number_is_taken("+351912345679", asked_by=other_user) is False, (
-        "the allowance is per account"
-    )
+    assert (
+        api.phone_number_is_taken("+351912345679", asked_by=other_user, holder=other_user.profile)
+        is False
+    ), "the allowance is per account"
+    # A number a plugin records on a contact collides with nothing beyond its holder (#329),
+    # so it is never taken and asking costs nothing, whatever is spent.
+    assert api.phone_number_is_taken("+351912345678", asked_by=user) is False
 
     with pytest.warns(DeprecationWarning, match="asked_by"):
         assert api.phone_number_is_taken("+351912345679") is False

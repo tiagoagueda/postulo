@@ -341,38 +341,34 @@ def test_a_file_cannot_say_that_a_number_was_confirmed_or_is_a_way_back_in(user)
     assert number.verified_at is None and not number.is_recovery
 
 
-def test_a_number_another_account_holds_is_left_off_and_says_nothing_of_whose(user, other_user):
-    from django.contrib.contenttypes.models import ContentType
-
+def test_a_contacts_number_is_recorded_whoever_else_holds_it(user, other_user):
+    """A contact's number is one this account records, never one it is (#329): it collides
+    with nothing on the instance, so the file is told nothing about anybody else's."""
     friend = Contact.objects.create(owner=other_user, name="Theirs")
     PhoneNumber.objects.create(owner=other_user, holder=friend, number="+351912345678")
+    PhoneNumber.objects.create(owner=other_user, holder=other_user.profile, number="+351912345678")
     row = {"name": "Ada", "phone_numbers": [{"number": "+351912345678"}]}
     held = kind_files.read("contacts", a_file("contacts", row))
 
-    review = kind_files.plan(user, held)
+    kind_files.plan(user, held)
     kind_files.apply(user, held)
 
-    assert not PhoneNumber.objects.filter(owner=user).exists()
-    assert "351912345678" not in json.dumps(review, default=str)
-    assert ContentType.objects.get_for_model(Contact)
+    assert PhoneNumber.objects.get(owner=user).normalised == "+351912345678"
 
 
-def test_the_number_allowance_is_spent_like_the_forms_and_then_every_number_is_left_off(
-    user, other_user
-):
-    """A file is a way of asking about a great many numbers at once (#142): it is asked
-    through the form's own allowance, so after it runs out nothing is told apart."""
-    from postulo.core import phone_numbers, throttle
+def test_a_file_of_contacts_spends_none_of_the_number_allowance(user, other_user):
+    """A file of contacts asks about nobody's own number, so the allowance of #142, which
+    bounds how many of those one account may learn about, is not touched (#329)."""
+    from postulo.core import phone_numbers
 
-    friend = Contact.objects.create(owner=other_user, name="Theirs")
-    PhoneNumber.objects.create(owner=other_user, holder=friend, number="+351912345678")
+    PhoneNumber.objects.create(owner=other_user, holder=other_user.profile, number="+351912345678")
     rows = [{"name": f"P{n}", "phone_numbers": [{"number": "+351912345678"}]} for n in range(40)]
     held = kind_files.read("contacts", a_file("contacts", *rows))
     kind_files.apply(user, held)
-    with pytest.raises(throttle.TooOften):
-        phone_numbers.ensure_allowance(user)
+
+    phone_numbers.ensure_allowance(user)
     assert Contact.objects.for_user(user).count() == 40
-    assert not PhoneNumber.objects.filter(owner=user).exists()
+    assert PhoneNumber.objects.filter(owner=user).count() == 40
 
 
 @pytest.mark.parametrize("bad", [5, True])

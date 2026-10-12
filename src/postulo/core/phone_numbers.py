@@ -45,8 +45,9 @@ KIND_ICONS = {
 #: vaguer message would not remove that — it would only leave the person guessing at what
 #: had happened while disclosing exactly as much.
 ALREADY_IN_USE = _(
-    "That number is already recorded on this instance. Telephone numbers are kept unique "
-    "across every account here, so it may belong to somebody else's records."
+    "That number is already recorded on this instance as somebody's own. A person's own "
+    "telephone numbers are kept unique across every account here, so it may belong to "
+    "somebody else."
 )
 
 
@@ -134,8 +135,27 @@ def can_get_back_in(person) -> bool:
     return recovery_number(person) is not None
 
 
-def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=()) -> bool:
-    """Whether some other row on this instance already holds this number.
+def identifies(holder) -> bool:
+    """Whether a number held by ``holder`` is one its owner *is*, rather than one recorded.
+
+    Only a person's own profile (#329). A contact's and a company's numbers are numbers
+    somebody wrote down; they are unique within their holder and collide with nothing else,
+    so asking about them tells nothing and spends nothing. A holder not made yet -- a
+    contact or a company on its create page -- is never a profile, whose page always has one.
+    """
+    from postulo.accounts.models import Profile
+
+    return isinstance(holder, Profile)
+
+
+def taken_elsewhere(
+    number: str, *, exclude_pk: int | None = None, exclude_pks=(), identifies_owner: bool = True
+) -> bool:
+    """Whether some other person on this instance already holds this number as their own.
+
+    Only a person's own numbers are unique across the instance (#329), so only they are
+    compared, and only for a number that would be somebody's own: ``identifies_owner`` false
+    -- a number being recorded on a contact or a company -- is never taken.
 
     Only a number that reached international form can be compared at all; one that did not
     is kept as typed and takes part in nothing, which is the rule ``phones.py`` sets and
@@ -145,10 +165,12 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=(
     rows the same save is removing: they will not hold anything once it is done, so a
     number moved from one of them to another row is not somebody else's (#461).
     """
+    if not identifies_owner:
+        return False
     normalised = phones.normalise(number)
     if not normalised:
         return False
-    rows = PhoneNumber.objects.filter(normalised=normalised)
+    rows = PhoneNumber.objects.filter(normalised=normalised, identifies_owner=True)
     if exclude_pk is not None:
         rows = rows.exclude(pk=exclude_pk)
     if exclude_pks:
@@ -157,7 +179,7 @@ def taken_elsewhere(number: str, *, exclude_pk: int | None = None, exclude_pks=(
 
 
 def taken_by_asking(
-    number: str, *, exclude_pk: int | None = None, asked_by=None, exclude_pks=()
+    number: str, *, exclude_pk: int | None = None, asked_by=None, exclude_pks=(), holder=None
 ) -> bool:
     """``taken_elsewhere`` for a plugin, charged to the account it asks for (#333).
 
@@ -172,6 +194,11 @@ def taken_by_asking(
     Without ``asked_by`` nobody is charged, which is the bare question the surface used to
     hand out; it still answers, with a ``DeprecationWarning``, until the release that
     removes it.
+
+    Since #329 a number recorded on a contact or a company collides with nothing beyond its
+    holder, so a plugin writing one -- every card a sync pulls -- is answered *no* without
+    being charged. ``holder`` says whose the number would be; left out, it is taken to be
+    somebody recorded, which is what a plugin writes. Only a profile's is asked about.
     """
     if asked_by is None:
         import warnings
@@ -182,7 +209,14 @@ def taken_by_asking(
             DeprecationWarning,
             stacklevel=2,
         )
-        return taken_elsewhere(number, exclude_pk=exclude_pk, exclude_pks=exclude_pks)
+        return taken_elsewhere(
+            number,
+            exclude_pk=exclude_pk,
+            exclude_pks=exclude_pks,
+            identifies_owner=holder is not None and identifies(holder),
+        )
+    if holder is None or not identifies(holder):
+        return False
     from . import throttle
 
     if not phones.normalise(number):
@@ -229,7 +263,14 @@ def ensure_allowance(person) -> None:
         raise throttle.TooOften(rate, retry_after=wait)
 
 
-def refusal(person, number: str, *, exclude_pk: int | None = None, exclude_pks=()) -> str:
+def refusal(
+    person,
+    number: str,
+    *,
+    exclude_pk: int | None = None,
+    exclude_pks=(),
+    identifies_owner: bool = True,
+) -> str:
     """The sentence a new or changed number is refused with, or nothing when it may be kept.
 
     A number held elsewhere is refused with the collision sentence, which spends one of the
@@ -240,6 +281,10 @@ def refusal(person, number: str, *, exclude_pk: int | None = None, exclude_pks=(
     """
     from . import throttle
 
+    if not identifies_owner:
+        # A recorded number collides with nothing beyond its holder, which the holder's own
+        # rows answer: nothing to ask, and nothing spent (#329).
+        return ""
     normalised = phones.normalise(number)
     if not normalised:
         return ""
@@ -506,7 +551,13 @@ class BasePhoneNumberFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFor
                 seen.add(normalised)
                 continue
             seen.add(normalised)
-            refused = refusal(self.asked_by, typed, exclude_pk=form.instance.pk, exclude_pks=going)
+            refused = refusal(
+                self.asked_by,
+                typed,
+                exclude_pk=form.instance.pk,
+                exclude_pks=going,
+                identifies_owner=identifies(holder),
+            )
             if refused:
                 form.add_error("number", refused)
 

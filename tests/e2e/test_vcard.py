@@ -88,8 +88,8 @@ def test_a_contact_goes_out_of_one_account_and_into_another(
     expect(page.get_by_text("1 card was added.")).to_be_visible()
     arrived = Contact.objects.get(owner=second)
     assert arrived.name == "Cave Johnson" and arrived.company.name == "Aperture Science"
-    # A number is held by one account on the instance, and the first account holds this one:
-    # the card still arrives, and the number is reported as left out.
-    expect(page.get_by_text("already recorded on this instance")).to_be_visible()
-    assert not arrived.phone_numbers.exists()
+    # A contact's number is one this account records, never one it is, so the first
+    # account's holding it keeps nothing out (#329): the card arrives with it.
+    expect(page.get_by_text("already recorded on this instance")).to_have_count(0)
+    assert arrived.phone_numbers.count() == 1
     assert Contact.objects.filter(owner=second).count() == 1

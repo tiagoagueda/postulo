@@ -340,6 +340,20 @@ class Company(OwnedModel):
     careers_url = models.URLField(
         _("careers page"), blank=True, help_text=_("Where this company lists its openings.")
     )
+    #: Its general mailbox, the one a CardDAV card's ``EMAIL`` holds: one, as a contact has
+    #: (#329). A person's own address at the company is a contact's.
+    email = models.EmailField(
+        _("email address"),
+        blank=True,
+        help_text=_(
+            "Its general mailbox, such as jobs@ or info@. A person's address goes on a contact."
+        ),
+    )
+    #: What it answers on and where it is, as a contact's are: a switchboard, an office.
+    #: Deleting the company deletes them. A company's number is one a person recorded, never
+    #: one they are, so it is unique within the company and nowhere else (#329).
+    phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
+    postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
     location = models.CharField(_("location"), max_length=200, blank=True)
     #: Where the location points on the map, when an offline dataset places it (#108).
     #: City level, deliberately: a search at street precision is a map of where the

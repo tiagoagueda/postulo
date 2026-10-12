@@ -34,6 +34,7 @@ from postulo.core.mixins import (
     OwnerFormMixin,
     PageOrFragmentMixin,
     PhoneNumbersMixin,
+    PostalAddressesMixin,
     WebLinksMixin,
 )
 from postulo.core.params import as_pk
@@ -393,6 +394,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
         context["several_numbers"] = phone_numbers.several_allowed(person)
+        # The company's own numbers and addresses (#329), on the same terms as a contact's.
+        context["company_numbers"] = phone_numbers.numbers_for(self.object, person)
+        context["company_addresses"] = list(self.object.postal_addresses.all())
         # The kinds of link this person is offered several of; a contact's other rows of
         # a kind that is off stay unlisted, exactly as the numbers do (#189).
         context["several_links"] = web_links.offered_kinds(person)
@@ -458,7 +462,25 @@ class CompanyIdentifiersMixin:
                 for row in formset.forms:
                     row.instance.company = self.object
                 formset.save()
+            # Its numbers and addresses (#329), with the company or not at all.
+            numbers, addresses = getattr(self, "held_rows", (None, None))
+            self.save_phone_numbers(numbers, self.object)
+            self.save_addresses(addresses, self.object)
         return response
+
+    def refuse_bad_rows(self, form):
+        """The page again if a number or an address is wrong; None when the save may go on.
+
+        Kept on the view for the save, which runs further down the chain (#329).
+        """
+        numbers = self.get_phone_numbers()
+        addresses = self.get_addresses()
+        if self.phone_numbers_invalid(numbers) or self.addresses_invalid(addresses):
+            return self.render_to_response(
+                self.get_context_data(form=form, numbers=numbers, addresses=addresses)
+            )
+        self.held_rows = (numbers, addresses)
+        return None
 
 
 class CompanyIdentifierRemoveView(OwnedObjectMixin, View):
@@ -533,6 +555,8 @@ class CompanyCreateView(
     UserFormKwargsMixin,
     OwnerFormMixin,
     CompanyIdentifiersMixin,
+    PhoneNumbersMixin,
+    PostalAddressesMixin,
     CreateView,
 ):
     model = Company
@@ -542,13 +566,21 @@ class CompanyCreateView(
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:
             return refused
+        if (refused := self.refuse_bad_rows(form)) is not None:
+            return refused
         messages.success(self.request, _("Company added."))
         return super().form_valid(form)
 
 
 @method_decorator(transaction.non_atomic_requests, name="dispatch")
 class CompanyUpdateView(
-    LogoFormMixin, OwnedObjectMixin, UserFormKwargsMixin, CompanyIdentifiersMixin, UpdateView
+    LogoFormMixin,
+    OwnedObjectMixin,
+    UserFormKwargsMixin,
+    CompanyIdentifiersMixin,
+    PhoneNumbersMixin,
+    PostalAddressesMixin,
+    UpdateView,
 ):
     model = Company
     form_class = CompanyForm
@@ -556,6 +588,8 @@ class CompanyUpdateView(
 
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:
+            return refused
+        if (refused := self.refuse_bad_rows(form)) is not None:
             return refused
         messages.success(self.request, _("Company updated."))
         return super().form_valid(form)
@@ -958,6 +992,7 @@ class ContactCreateView(
     OwnerFormMixin,
     GdprNoticeMixin,
     PhoneNumbersMixin,
+    PostalAddressesMixin,
     WebLinksMixin,
     MessagingHandlesMixin,
     CreateView,
@@ -978,19 +1013,28 @@ class ContactCreateView(
 
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
+        addresses = self.get_addresses()
         links = self.get_web_links()
         messaging = self.get_messaging()
         if (
             self.phone_numbers_invalid(numbers)
+            or self.addresses_invalid(addresses)
             or self.web_links_invalid(links)
             or self.messaging_invalid(messaging)
         ):
             return self.render_to_response(
-                self.get_context_data(form=form, numbers=numbers, links=links, messaging=messaging)
+                self.get_context_data(
+                    form=form,
+                    numbers=numbers,
+                    addresses=addresses,
+                    links=links,
+                    messaging=messaging,
+                )
             )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
+            self.save_addresses(addresses, self.object)
             self.save_web_links(links, self.object)
             self.save_messaging(messaging, self.object)
         messages.success(self.request, _("Contact added."))
@@ -1003,6 +1047,7 @@ class ContactUpdateView(
     UserFormKwargsMixin,
     GdprNoticeMixin,
     PhoneNumbersMixin,
+    PostalAddressesMixin,
     WebLinksMixin,
     MessagingHandlesMixin,
     UpdateView,
@@ -1031,19 +1076,28 @@ class ContactUpdateView(
 
     def form_valid(self, form):
         numbers = self.get_phone_numbers()
+        addresses = self.get_addresses()
         links = self.get_web_links()
         messaging = self.get_messaging()
         if (
             self.phone_numbers_invalid(numbers)
+            or self.addresses_invalid(addresses)
             or self.web_links_invalid(links)
             or self.messaging_invalid(messaging)
         ):
             return self.render_to_response(
-                self.get_context_data(form=form, numbers=numbers, links=links, messaging=messaging)
+                self.get_context_data(
+                    form=form,
+                    numbers=numbers,
+                    addresses=addresses,
+                    links=links,
+                    messaging=messaging,
+                )
             )
         with transaction.atomic():
             response = super().form_valid(form)
             self.save_phone_numbers(numbers, self.object)
+            self.save_addresses(addresses, self.object)
             self.save_web_links(links, self.object)
             self.save_messaging(messaging, self.object)
         return response

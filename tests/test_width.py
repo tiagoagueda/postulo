@@ -94,7 +94,8 @@ def test_everything_else_keeps_its_measure(client, user, path):
 
 
 #: The company form's two parts, each a card with the measure on it (#210).
-COMPANY_CARDS = re.compile(r'<(?:div|fieldset) class="card mb-6 max-w-2xl 2xl:flex-1"')
+#: The details card, and the column beside it of numbers, addresses and identifiers (#329).
+COMPANY_CARDS = re.compile(r'<(?:div|fieldset) class="(?:card mb-6 )?max-w-2xl 2xl:flex-1"')
 
 
 def test_the_company_form_takes_the_screen_and_its_cards_keep_the_measure(client, user):
@@ -422,9 +423,12 @@ def test_a_contact_s_details_and_rows_are_two_columns_each_with_the_measure(clie
     assert "Merge with another contact" in inside[buttons:], "Merge is in the button row"
 
 
-def test_with_every_row_switched_off_a_contact_is_one_column(client, furnished):  # noqa: F811
-    """No telephone numbers, no messaging handles and no kind of link: nothing to put in a
-    second column, so there is none, and the details keep their measure on their own (#320)."""
+def test_with_every_row_switched_off_a_contact_keeps_its_addresses_beside_it(
+    client,
+    furnished,  # noqa: F811
+):
+    """No telephone numbers, no messaging handles and no kind of link: the second column holds
+    the addresses alone, and the details keep their measure (#320, #329)."""
     from postulo.plugins.messaging_contacts import MESSAGING_CONTACTS
     from postulo.plugins.models import PluginPolicy
     from postulo.plugins.phone_numbers import PHONE_NUMBERS
@@ -439,8 +443,11 @@ def test_with_every_row_switched_off_a_contact_is_one_column(client, furnished):
         )
     client.force_login(person)
     inside = a_contact_page(client, furnished["contact"])
-    assert "data-contact-rows" not in inside
+    # The postal addresses are not switched by any plugin (#329), so the second column holds
+    # them alone and keeps the measure beside the details.
     assert "data-phone-numbers" not in inside and "data-web-links" not in inside
+    rows = inside[inside.index("data-contact-rows") :]
+    assert "data-postal-addresses" in rows
     assert '<div class="card mb-6 max-w-2xl 2xl:flex-1">' in inside
 
 

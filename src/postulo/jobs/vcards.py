@@ -433,7 +433,8 @@ def _numbers(user, contact: Contact, card: vcard.Card, report: Report) -> None:
         if key in seen:
             continue
         seen.add(key)
-        refused = phone_numbers.refusal(user, number)
+        # A contact's number is recorded, never one somebody is: nothing to ask (#329).
+        refused = phone_numbers.refusal(user, number, identifies_owner=False)
         if refused:
             report.problems.append(
                 _("%(name)s: the number %(value)s was left out. %(why)s")

@@ -227,6 +227,49 @@ class PhoneNumbersMixin:
         return context
 
 
+class PostalAddressesMixin:
+    """The postal rows on a view whose object holds them: a contact, a company (#329).
+
+    For the reasons the telephone mixin gives, less one: no feature governs addresses
+    (#92), so the rows are always offered. A create view has no holder to bind them to until
+    its object exists, and they are saved inside the same transaction as the form or not at
+    all. ``addresses`` in the context is the formset.
+    """
+
+    addresses_prefix = "addresses"
+
+    def address_holder(self):
+        return getattr(self, "object", None)
+
+    def get_addresses(self):
+        from postulo.core import phones, postal
+
+        profile = getattr(self.request.user, "profile", None)
+        posted = f"{self.addresses_prefix}-TOTAL_FORMS" in self.request.POST
+        return postal.formset_for(
+            self.address_holder(),
+            default_country=phones.default_country(getattr(profile, "language", "")),
+            data=self.request.POST if self.request.method == "POST" and posted else None,
+            prefix=self.addresses_prefix,
+            person=self.request.user,
+        )
+
+    def addresses_invalid(self, formset) -> bool:
+        return formset is not None and formset.is_bound and not formset.is_valid()
+
+    def save_addresses(self, formset, holder) -> None:
+        """Bind the rows to the holder and write them; a new row's owner is the holder's."""
+        if formset is None or not formset.is_bound:
+            return
+        formset.instance = holder
+        formset.save()
+
+    def get_context_data(self, **kwargs) -> dict:
+        context = super().get_context_data(**kwargs)
+        context.setdefault("addresses", self.get_addresses())
+        return context
+
+
 class MessagingHandlesMixin:
     """The messaging rows on a view whose object holds them (#682).
 

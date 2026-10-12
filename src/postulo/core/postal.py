@@ -5,10 +5,10 @@ specified as a companion to telephone numbers and the two are asked the same que
 the same pages.
 
 **What is different is uniqueness, and it is the whole reason this is a separate issue.** A
-telephone number belongs to one person and is unique across the instance. An address does
-not and is not: spouses share one, flatmates share one, an adult child at home shares one.
-Unique per owner, so nobody lists the same address twice; freely shared between accounts,
-because a household is not a mistake.
+person's own telephone number belongs to them and is unique across the instance. An
+address does not and is not: spouses share one, flatmates share one, an adult child at home
+shares one. Unique per holder (#329), so no person, contact or company lists the same address
+twice; freely shared between accounts, because a household is not a mistake.
 
 **What is different is also that nothing is verified.** Postulo is not going to post
 anything, so it has no way to learn whether an address exists and no use for the answer.
@@ -321,7 +321,13 @@ class PostalAddressForm(forms.ModelForm):
     TYPED = ("street", "postcode", "municipality", "region")
 
     def __init__(
-        self, *args, default_country: str = "", person=None, refuses: bool = True, **kwargs
+        self,
+        *args,
+        default_country: str = "",
+        person=None,
+        refuses: bool = True,
+        own: bool = True,
+        **kwargs,
     ):
         super().__init__(*args, **kwargs)
         from postulo.core import phones
@@ -363,6 +369,11 @@ class PostalAddressForm(forms.ModelForm):
             # right with scripts off.
             widget=CountrySelect(attrs={"autocomplete": "country-name", "data-flag-select": ""}),
         )
+        if not own:
+            # A contact's or a company's address is somebody else's (#329): the browser is not
+            # invited to fill in the person's own, which is what the tokens above ask of it.
+            for name in (*self.TYPED, "country"):
+                self.fields[name].widget.attrs["autocomplete"] = "off"
         if not self.instance.pk and default_country:
             self.fields["country"].initial = default_country
         for name in self.TYPED:
@@ -523,45 +534,41 @@ class PostalAddressForm(forms.ModelForm):
 
 
 class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
-    """The rows together: nothing listed twice **by this person**.
+    """The rows together: nothing listed twice **by this holder**.
 
-    Only by this person. Addresses are not unique across the instance and must not be: two
+    Only by this holder. Addresses are not unique across the instance and must not be: two
     people at one address is a household, and refusing the second would also disclose that
-    somebody else on this server lives there (#92).
+    somebody else on this server lives there (#92). Nor across one account's holders: a
+    company and a recruiter working in its building share one (#329).
 
     A row the page still carries and the table no longer holds has already been removed
     (`RowsAlreadyGone`).
 
-    **The constraint is per owner and the page is per holder**, and the rows used to be
-    compared only with one another, so two ordinary edits got past the form and were
-    answered by the database with a 500 (#458). Somebody moving house changed their first
-    address into their second and removed the second: the first row's UPDATE ran while the
-    second still existed. And an address typed on *Your details* that a contact of theirs
-    already held met nothing in the form to say so. So the form now answers for everything
-    the constraint will ask -- what the account lists anywhere outside these rows -- and
-    the rows are written in an order in which none is in another's way.
+    **The page answers for everything the constraint will ask**, because two ordinary edits
+    once got past it and were answered by the database with a 500 (#458): somebody moving
+    house changed their first address into their second and removed the second, and the
+    first row's UPDATE ran while the second still existed. So the rows are compared with
+    one another and with this holder's rows the page does not carry, and written in an
+    order in which none is in another's way.
     """
 
     #: Whose rows these are while there is no holder to ask. Set by `formset_for`.
     person = None
 
     def _listed_elsewhere(self) -> set[str]:
-        """What this account already lists that is not one of the rows on this page.
+        """What this holder already lists that is not one of the rows on this page.
 
-        Another holder's -- a contact's, which an archive brings -- and this holder's own
-        where the page does not carry it: a row added from a second tab since this copy
-        was drawn. The rows the page does carry are left out whole, kept and removed
-        alike, because what they will hold after the save is what was posted, and that is
-        compared below.
+        A row added from a second tab since this copy was drawn. The rows the page does
+        carry are left out whole, kept and removed alike, because what they will hold after
+        the save is what was posted, and that is compared below. A holder not made yet lists
+        nothing.
         """
         holder = self.instance
-        owner = owner_of(holder) if holder is not None and holder.pk else self.person
-        if owner is None:
+        if holder is None or not holder.pk:
             return set()
         here = [form.instance.pk for form in self.initial_forms if form.instance.pk]
         return set(
-            PostalAddress.objects.filter(owner=owner)
-            .exclude(comparable="")
+            holder.postal_addresses.exclude(comparable="")
             .exclude(pk__in=here)
             .values_list("comparable", flat=True)
         )
@@ -642,6 +649,12 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
         return saved
 
 
+def _is_a_profile(holder) -> bool:
+    from postulo.accounts.models import Profile
+
+    return isinstance(holder, Profile)
+
+
 def formset_for(
     holder, *, default_country: str = "", data=None, prefix: str = "addresses", person=None
 ):
@@ -665,7 +678,12 @@ def formset_for(
         data=data,
         instance=holder,
         prefix=prefix,
-        form_kwargs={"default_country": default_country, "person": person},
+        form_kwargs={
+            "default_country": default_country,
+            "person": person,
+            # Only a person's own addresses are theirs for the browser to fill (#329).
+            "own": _is_a_profile(holder),
+        },
     )
     formset.person = person
     # Read by the template: what is refused and how forgiving a postcode is, said once under

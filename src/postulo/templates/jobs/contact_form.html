@@ -23,12 +23,12 @@
       <div class="alert mb-4 max-w-2xl" data-variant="error">{{ form.non_field_errors }}</div>
     {% endif %}
     {% comment %} The details in one column and the rows -- telephone numbers while that
-       feature is on, one card of links per kind switched on -- in the other, from `2xl`;
+       feature is on, the postal addresses always (#329), one card of links per kind switched
+       on -- in the other, from `2xl`;
        one under the other below it, which is how it always read (#320). The company form's
        arrangement (#210): `max-w-2xl` on each column at the start edge, `flex-1` sharing the
        row out, so each is 672 pixels at 1536 and at 2560 alike, with what is left over at
-       the end. Every feature off, there are no rows and no second column, and the details
-       keep their measure alone. Source order is the reading order in both layouts, and a
+       the end. Source order is the reading order in both layouts, and a
        flex row follows the direction of the text, so the details lead in Arabic too.
     {% endcomment %}
     <div class="2xl:flex 2xl:items-start 2xl:gap-6">
@@ -56,13 +56,14 @@
           </datalist>
         {% endif %}
       </div>
-      {% if numbers or links or messaging %}
+      {% comment %} The postal addresses are always offered, so this column always is: a person
+         card's ADR lands here (#329). {% endcomment %}
         <div class="max-w-2xl 2xl:flex-1" data-contact-rows>
           {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
+          {% include "partials/postal_addresses.html" %}
           {% include "partials/web_links.html" %}
           {% if messaging %}{% include "partials/messaging_handles.html" %}{% endif %}
         </div>
-      {% endif %}
     </div>
     {% comment %} *Save* after both columns. The row keeps the measure, so *Merge* sits at
        the end of one column's width in either layout -- under the details, which say who
