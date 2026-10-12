@@ -78,15 +78,35 @@ def test_a_restored_archive_carries_no_script_address(user, other_user):
     assert any("were left out" in line for line in report.skipped)
 
 
-def test_the_kind_file_reader_blanks_them_too(user):
-    company = Company.objects.create(owner=user, name="Aperture", website="https://aperture.test")
+def test_a_company_file_with_a_script_address_is_refused_by_the_plan(user):
+    Company.objects.create(owner=user, name="Aperture", website="https://aperture.test")
     document = kind_files.build_document(user, "companies")
     document["companies"][0]["website"] = SCRIPT
-
+    document["companies"][0]["name"] = "Another"
     held = kind_files.read("companies", json.dumps(document).encode())
 
-    assert held["rows"][0]["website"] == ""
-    assert company.pk
+    plan = kind_files.plan(user, held)
+
+    assert [row["outcome"] for row in plan["sections"][0]["rows"]] == ["refused"]
+
+
+def test_a_contact_file_leaves_out_a_script_link(user):
+    contact = Contact.objects.create(owner=user, name="Alex")
+    WebLink.objects.create(
+        owner=user,
+        holder=contact,
+        kind=WebLink.Kind.WEBSITE,
+        url="https://alex.test",
+        is_primary=True,
+    )
+    document = kind_files.build_document(user, "contacts")
+    document["contacts"][0]["web_links"][0]["url"] = SCRIPT
+    document["contacts"][0]["name"] = "Someone Else"
+    held = kind_files.read("contacts", json.dumps(document).encode())
+
+    kind_files.apply(user, held)
+
+    assert not WebLink.objects.filter(url__startswith="javascript").exists()
 
 
 def test_the_update_check_does_not_keep_a_release_address_that_runs_script(monkeypatch, settings):

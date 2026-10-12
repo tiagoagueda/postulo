@@ -7,7 +7,10 @@ itself lives in `core.logredact`, where the tests reach it.
 
 from __future__ import annotations
 
-from gunicorn.glogging import Logger
+try:
+    from gunicorn.glogging import Logger
+except ImportError:  # gunicorn is in the image, not in a development environment
+    Logger = object  # type: ignore[assignment,misc]
 
 from postulo.core.logredact import redact
 

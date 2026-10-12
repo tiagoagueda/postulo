@@ -375,11 +375,6 @@ def read(kind: str, data: bytes, name: str = "") -> dict:
     if not isinstance(rows, list):
         raise Refused(_not_one_of_these(kind))
     kept = [_prune(row, SCHEMAS[kind]) for row in rows[:MAX_ROWS]]
-    # An address that is not http or https is blanked, as the archive importer does (#770): the
-    # rows go on to the same restore functions, and a page draws what they write as a link.
-    from postulo.core import importer
-
-    importer.drop_unsafe_addresses(kept)
     return {
         "kind": kind,
         "format": min(version, 2**31 - 1),
@@ -709,9 +704,10 @@ def _create_contact(user, verdict: Verdict) -> int:
     importer._restore_postal_addresses(
         contact, user, importer._address_rows({"postal_addresses": details["postal_addresses"]})
     )
-    importer._restore_web_links(
-        contact, user, importer._link_rows({"web_links": details["web_links"]})
-    )
+    links = importer._link_rows({"web_links": details["web_links"]})
+    # Not through a form, so an address that is not http or https is left out here (#770).
+    importer.drop_unsafe_addresses(links)
+    importer._restore_web_links(contact, user, links)
     importer._restore_messaging_handles(
         contact, user, importer._messaging_rows({"messaging_handles": details["messaging_handles"]})
     )

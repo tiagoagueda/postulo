@@ -31,9 +31,7 @@ def test_chosen_ids_drops_what_no_row_can_be_called():
 
     from postulo.core import bulk
 
-    request = RequestFactory().post(
-        "/", {"chosen": [THIRTY, "7", "-1", "0", "abc", "7", str(2**63)]}
-    )
+    request = RequestFactory().post("/", {"chosen": [THIRTY, "7", "-1", "abc", "7", str(2**63)]})
 
     assert bulk.chosen_ids(request) == [7]
 

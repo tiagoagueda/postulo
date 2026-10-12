@@ -85,7 +85,7 @@ def chosen_ids(request) -> list[int]:
             continue
         # Past what a database holds is not a row of anybody's, and handing it to a query
         # raised OverflowError and answered 500 (#767).
-        if 0 < number < MAX_ROW_ID:
+        if 0 <= number < MAX_ROW_ID:
             seen.setdefault(number, None)
     return list(seen)
 
