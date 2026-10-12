@@ -83,6 +83,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The companies' map fills the window, with the heading, a Table button, the list of places and the footer's line drawn over it, darker tiles in the dark theme, and the table's Map button carries the map icon (#849)
 - The companies' map is drawn by Leaflet over OpenStreetMap's tiles by default; Server settings → Plugins → Maps (or POSTULO_MAP_TILES) chooses a tile server of your own or no tiles, and only the map page's security policy opens to the tile server (#898)
 - Who may use a plugin or module, switch it for themselves and change its settings is a list of rules for groups and accounts, kept on a page of its own with a Groups page under People; the checkbox Each person may change it is replaced by Everybody may switch it on that page (#886)
 - Browser, Email and Webhooks are the sub-modules of a new module, Built-in notifications, and are named Browser notifications, Email notifications and Webhooks, each with its icon (#876)

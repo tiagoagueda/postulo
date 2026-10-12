@@ -351,11 +351,20 @@
   .sticky {
     position: sticky;
   }
+  .inset-0 {
+    inset: 0px;
+  }
+  .inset-x-3 {
+    inset-inline: calc(var(--spacing) * 3);
+  }
   .inset-y-0 {
     inset-block: 0px;
   }
   .-start-1\.5 {
     inset-inline-start: calc(var(--spacing) * -1.5);
+  }
+  .start-3 {
+    inset-inline-start: calc(var(--spacing) * 3);
   }
   .end-0 {
     inset-inline-end: calc(var(--spacing) * 0);
@@ -368,6 +377,15 @@
   }
   .top-2 {
     top: calc(var(--spacing) * 2);
+  }
+  .top-3 {
+    top: calc(var(--spacing) * 3);
+  }
+  .bottom-3 {
+    bottom: calc(var(--spacing) * 3);
+  }
+  .bottom-14 {
+    bottom: calc(var(--spacing) * 14);
   }
   .z-10 {
     z-index: 10;
@@ -585,6 +603,10 @@
     width: 55%;
     height: 55%;
   }
+  .size-full {
+    width: 100%;
+    height: 100%;
+  }
   .h-1\.5 {
     height: calc(var(--spacing) * 1.5);
   }
@@ -606,14 +628,14 @@
   .h-28 {
     height: calc(var(--spacing) * 28);
   }
-  .h-96 {
-    height: calc(var(--spacing) * 96);
-  }
   .h-auto {
     height: auto;
   }
   .max-h-96 {
     max-height: calc(var(--spacing) * 96);
+  }
+  .max-h-\[50\%\] {
+    max-height: 50%;
   }
   .min-h-6 {
     min-height: calc(var(--spacing) * 6);
@@ -693,6 +715,9 @@
   .max-w-24 {
     max-width: calc(var(--spacing) * 24);
   }
+  .max-w-\[calc\(100\%-1\.5rem\)\] {
+    max-width: calc(100% - 1.5rem);
+  }
   .max-w-full {
     max-width: 100%;
   }
@@ -701,6 +726,9 @@
   }
   .max-w-md {
     max-width: var(--container-md);
+  }
+  .max-w-none {
+    max-width: none;
   }
   .max-w-prose {
     max-width: 65ch;
@@ -1342,6 +1370,9 @@
   .pt-6 {
     padding-top: calc(var(--spacing) * 6);
   }
+  .pt-28 {
+    padding-top: calc(var(--spacing) * 28);
+  }
   .pb-1 {
     padding-bottom: var(--spacing);
   }
@@ -1353,6 +1384,9 @@
   }
   .pb-10 {
     padding-bottom: calc(var(--spacing) * 10);
+  }
+  .pb-16 {
+    padding-bottom: calc(var(--spacing) * 16);
   }
   .text-center {
     text-align: center;
@@ -1713,6 +1747,18 @@
       clip-path: none;
       white-space: normal;
     }
+    .sm\:inset-x-auto {
+      inset-inline: auto;
+    }
+    .sm\:end-3 {
+      inset-inline-end: calc(var(--spacing) * 3);
+    }
+    .sm\:top-3 {
+      top: calc(var(--spacing) * 3);
+    }
+    .sm\:bottom-auto {
+      bottom: auto;
+    }
     .sm\:col-span-2 {
       grid-column: span 2 / span 2;
     }
@@ -1725,6 +1771,9 @@
     .sm\:inline {
       display: inline;
     }
+    .sm\:max-h-\[calc\(100\%-9rem\)\] {
+      max-height: calc(100% - 9rem);
+    }
     .sm\:w-36 {
       width: calc(var(--spacing) * 36);
     }
@@ -1734,8 +1783,14 @@
     .sm\:w-72 {
       width: calc(var(--spacing) * 72);
     }
+    .sm\:w-80 {
+      width: calc(var(--spacing) * 80);
+    }
     .sm\:w-auto {
       width: auto;
+    }
+    .sm\:max-w-\[60\%\] {
+      max-width: 60%;
     }
     .sm\:max-w-full {
       max-width: 100%;
@@ -1864,9 +1919,6 @@
     .lg\:size-7 {
       width: calc(var(--spacing) * 7);
       height: calc(var(--spacing) * 7);
-    }
-    .lg\:h-\[32rem\] {
-      height: 32rem;
     }
     .lg\:max-h-\[calc\(100dvh-var\(--header-height\,3\.5rem\)-2rem\)\] {
       max-height: calc(100dvh - var(--header-height,3.5rem) - 2rem);
@@ -8354,46 +8406,120 @@ html {
     fill: GrayText;
   }
 }
-@layer components {
-  .map-canvas {
-    isolation: isolate;
-    z-index: 0;
+.map-canvas {
+  isolation: isolate;
+  z-index: 0;
+}
+.map-canvas.leaflet-container {
+  background: transparent;
+  font: inherit;
+}
+.map-canvas .leaflet-control-attribution {
+  font-size: 0.75rem;
+}
+.map-canvas .leaflet-control-attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+.map-canvas .map-dot {
+  fill: var(--color-brand-600);
+  fill-opacity: 0.7;
+  stroke: var(--color-brand-600);
+  stroke-width: 1.5;
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    fill: var(--color-brand-400);
+    stroke: var(--color-brand-400);
   }
-  .map-canvas.leaflet-container {
-    background: transparent;
-    font: inherit;
-  }
-  .map-canvas .leaflet-control-attribution a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.5rem;
-  }
-  .map-canvas .map-dot {
-    fill: var(--color-brand-600);
-    fill-opacity: 0.7;
-    stroke: var(--color-brand-600);
-    stroke-width: 1.5;
-    &:where([data-theme="dark"], [data-theme="dark"] *) {
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
       fill: var(--color-brand-400);
       stroke: var(--color-brand-400);
     }
-    @media (prefers-color-scheme: dark) {
-      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
-        fill: var(--color-brand-400);
-        stroke: var(--color-brand-400);
+  }
+}
+.map-stage {
+  height: calc(100dvh - var(--header-height, 4.25rem) - var(--bottom-bar-height, 0px));
+  min-height: 24rem;
+}
+.map-overlay {
+  border-radius: var(--radius-lg);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  border-color: var(--color-ink-200);
+  background-color: color-mix(in srgb, #fff 95%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    background-color: color-mix(in oklab, var(--color-white) 95%, transparent);
+  }
+  --tw-shadow: 0 1px 3px 0 var(--tw-shadow-color, rgb(0 0 0 / 0.1)), 0 1px 2px -1px var(--tw-shadow-color, rgb(0 0 0 / 0.1));
+  box-shadow: var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    border-color: var(--color-ink-800);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      border-color: var(--color-ink-800);
+    }
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background-color: color-mix(in srgb, oklch(0.19 0.012 250) 95%, transparent);
+    @supports (color: color-mix(in lab, red, red)) {
+      background-color: color-mix(in oklab, var(--color-ink-900) 95%, transparent);
+    }
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background-color: color-mix(in srgb, oklch(0.19 0.012 250) 95%, transparent);
+      @supports (color: color-mix(in lab, red, red)) {
+        background-color: color-mix(in oklab, var(--color-ink-900) 95%, transparent);
       }
     }
   }
-  .map-canvas .map-outline {
-    fill: var(--color-ink-200);
-    stroke: none;
-    &:where([data-theme="dark"], [data-theme="dark"] *) {
+  z-index: 1;
+}
+.map-stage .leaflet-bottom {
+  bottom: 6.5rem;
+  @media (width >= 40rem) {
+    bottom: 3rem;
+  }
+}
+.map-canvas .leaflet-tile-pane:where([data-theme="dark"], [data-theme="dark"] *) {
+  filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+}
+@media (prefers-color-scheme: dark) {
+  .map-canvas .leaflet-tile-pane:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
+  }
+}
+:is(.map-canvas .leaflet-bar a, .map-canvas .leaflet-control-attribution):where([data-theme="dark"], [data-theme="dark"] *) {
+  background-color: var(--color-ink-900);
+  color: var(--color-ink-200);
+  border-color: var(--color-ink-700);
+}
+@media (prefers-color-scheme: dark) {
+  :is(.map-canvas .leaflet-bar a, .map-canvas .leaflet-control-attribution):where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+    background-color: var(--color-ink-900);
+    color: var(--color-ink-200);
+    border-color: var(--color-ink-700);
+  }
+}
+.map-canvas .leaflet-control-attribution a:where([data-theme="dark"], [data-theme="dark"] *) {
+  color: var(--color-brand-400);
+}
+@media (prefers-color-scheme: dark) {
+  .map-canvas .leaflet-control-attribution a:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+    color: var(--color-brand-400);
+  }
+}
+.map-canvas .map-outline {
+  fill: var(--color-ink-200);
+  stroke: none;
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    fill: var(--color-ink-700);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
       fill: var(--color-ink-700);
-    }
-    @media (prefers-color-scheme: dark) {
-      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
-        fill: var(--color-ink-700);
-      }
     }
   }
 }

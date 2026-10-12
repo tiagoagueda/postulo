@@ -7331,6 +7331,12 @@
       if (card) {
         card.hidden = false;
       }
+      // The list of places is open for scripts-off and wide screens; on a phone it would cover
+      // the map it describes, so it starts closed there and opens from its summary (#849).
+      var drawer = document.querySelector("[data-map-drawer]");
+      if (drawer && window.matchMedia("(width < 40rem)").matches) {
+        drawer.open = false;
+      }
       var map = L.map(canvas, {
         zoomControl: false,
         attributionControl: false,
@@ -7338,8 +7344,10 @@
         minZoom: 1,
         maxZoom: parseInt(canvas.getAttribute("data-map-max-zoom"), 10) || 19,
       });
+      // Bottom right, clear of the heading drawn over the top of the map (#849).
       L.control
         .zoom({
+          position: "bottomright",
           zoomInTitle: canvas.getAttribute("data-map-zoom-in") || "+",
           zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
         })

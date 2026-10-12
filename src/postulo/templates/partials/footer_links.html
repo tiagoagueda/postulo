@@ -1,0 +1,49 @@
+{% load i18n postulo %}
+<p class="hidden py-1 sm:block" data-motto>
+  {% if instance_motto %}
+    <bdi>{{ instance_name }}</bdi> — <bdi>{{ instance_motto }}</bdi>
+  {% elif instance_named %}
+    <bdi>{{ instance_name }}</bdi> — {% translate "your job search, your data" %}
+  {% else %}
+    {% blocktranslate trimmed %}
+      Postulo — your job search, your data.
+    {% endblocktranslate %}
+  {% endif %}
+</p>
+<nav aria-label="{% translate 'About this instance' %}">
+  <ul class="flex flex-wrap gap-x-4">
+    <li>
+      <a href="{{ postulo_releases_url }}" rel="noopener noreferrer external" target="_blank"
+         class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+         data-powered>{% translate "Powered by Postulo" %}</a>
+    </li>
+    <li>
+      {% comment %} The Forgejo mark where the address is on a Forgejo (#837). Below `sm` the
+         words are `sr-only` and the mark stands for them, so the link keeps its name and
+         is at least 24 by 24; with no mark the words stay at every width. {% endcomment %}
+      <a href="{{ postulo_source_url }}" rel="noopener noreferrer external" target="_blank"
+         class="inline-flex min-h-6 min-w-6 items-center gap-1.5 py-1 hover:text-ink-700 dark:hover:text-ink-200{% if postulo_source_brand %} justify-center sm:justify-start{% endif %}"
+         {% if postulo_source_brand %}title="{% translate 'Source code' %}" {% endif %}data-source>
+        {% if postulo_source_brand %}{% brand postulo_source_brand class="size-4" %}{% endif %}
+        <span class="underline underline-offset-2{% if postulo_source_brand %} sr-only sm:not-sr-only{% endif %}">{% translate "Source code" %}</span>
+      </a>
+    </li>
+    <li>
+      {% comment %} The book icon beside the word; below `sm` the icon alone, the word
+         `sr-only` so the link keeps its name, with a tooltip and a 24 by 24 target (#838). {% endcomment %}
+      <a href="{{ postulo_help_url }}" rel="noopener noreferrer external" target="_blank"
+         class="inline-flex min-h-6 min-w-6 items-center justify-center gap-1.5 py-1 hover:text-ink-700 sm:justify-start dark:hover:text-ink-200"
+         title="{% translate 'Help' %}" data-help>
+        {% icon "book-text" class="size-4" %}
+        <span class="underline underline-offset-2 sr-only sm:not-sr-only">{% translate "Help" %}</span>
+      </a>
+    </li>
+    {% if postulo_legal_notice_url %}
+      <li>
+        <a href="{{ postulo_legal_notice_url }}" rel="noopener noreferrer external" target="_blank"
+           class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200"
+           data-legal-notice>{% translate "Legal notice" %}</a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>

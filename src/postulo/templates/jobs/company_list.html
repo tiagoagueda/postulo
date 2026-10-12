@@ -86,7 +86,7 @@
     <div class="ms-auto flex flex-wrap items-center gap-2">
       {% include "partials/table/columns.html" %}
       {% include "partials/table/views.html" %}
-      {% if map_offered %}<a href="{% url 'jobs:company_map' %}" class="btn" data-variant="outline">{% translate "Map" %}</a>{% endif %}
+      {% if map_offered %}<a href="{% url 'jobs:company_map' %}" class="btn" data-variant="outline" data-map-switch>{% icon "map" %}{% translate "Map" %}</a>{% endif %}
       <a href="{% url 'jobs:industry_list' %}" class="btn" data-variant="outline">{% translate "Industries" %}</a>
       {% module_on "format-vcard" as vcard_on %}
       {% if vcard_on %}<a href="{% url 'jobs:contact_vcards' %}" class="btn" data-variant="outline">{% translate "Contacts as vCard" %}</a>{% endif %}

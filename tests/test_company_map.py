@@ -375,3 +375,55 @@ def test_a_correction_a_person_made_is_drawn_and_survives_the_switch(
 
     (entry,) = page(client, user).context["places"]
     assert entry["lon"] == pytest.approx(13.41053)
+
+
+def test_the_map_is_the_whole_window_with_its_heading_over_it(client, user):
+    """#849: the heading reads Companies, a Table button goes back, and the page's own
+    padding and footer give way to the map."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert "data-map-stage" in html
+    assert "<h1" in html and ">Companies<" in html.replace("\n", "").replace("  ", "")
+    assert f'href="{reverse("jobs:company_list")}"' in html and "data-map-table" in html
+    assert 'data-icon="table"' in html
+    assert 'class="mx-auto max-w-none  outline-none"' in html, "no padding around the map"
+
+
+def test_the_footers_links_are_drawn_once_over_the_map(client, user):
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert html.count("data-source") == 1, "the footer's line is over the map, not below it"
+    assert html.count("data-powered") == 1
+    assert "map-footer" in html
+
+
+def test_the_places_are_a_list_that_opens_without_a_script(client, user):
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert "<details" in html and "data-map-drawer" in html
+    drawer = html[html.index("<details") : html.index(">", html.index("<details"))]
+    assert " open" in drawer
+
+
+def test_the_table_offers_the_map_with_its_icon(client, user):
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:company_list")).content.decode()
+
+    switch = html[html.index("data-map-switch") - 200 : html.index("data-map-switch") + 300]
+    assert 'data-icon="map"' in switch
+
+
+def test_every_other_page_keeps_its_footer_and_padding(client, user):
+    client.force_login(user)
+
+    html = client.get(reverse("jobs:company_list")).content.decode()
+
+    assert html.count("data-source") == 1
+    assert "px-4 py-8" in html

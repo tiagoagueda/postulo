@@ -2634,44 +2634,95 @@ html {
  * colour and the outline the page's quiet one, in both themes, the way the SVG map's did; the
  * container takes the page's background, so the world's outline sits on the card.
  */
-@layer components {
-  .map-canvas {
-    isolation: isolate;
-    z-index: 0;
+/* Unlayered, on purpose: Leaflet's own stylesheet is unlayered and loaded after this one,
+   and an unlayered rule beats every layer, so these win only out here, by being more specific. */
+.map-canvas {
+  isolation: isolate;
+  z-index: 0;
+}
+
+.map-canvas.leaflet-container {
+  background: transparent;
+  font: inherit;
+}
+
+.map-canvas .leaflet-control-attribution {
+  font-size: 0.75rem;
+}
+
+/* The credit's links are targets like any other: 24 pixels tall at the least (WCAG 2.2 SC
+   2.5.8), which Leaflet's 11-pixel line does not give them. */
+.map-canvas .leaflet-control-attribution a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.5rem;
+}
+
+.map-canvas .map-dot {
+  fill: var(--color-brand-600);
+  fill-opacity: 0.7;
+  stroke: var(--color-brand-600);
+  stroke-width: 1.5;
+
+  @variant dark {
+    fill: var(--color-brand-400);
+    stroke: var(--color-brand-400);
   }
+}
 
-  .map-canvas.leaflet-container {
-    background: transparent;
-    font: inherit;
+/* The whole window under the masthead, and above the phone's bottom bar (#849). */
+.map-stage {
+  height: calc(100dvh - var(--header-height, 4.25rem) - var(--bottom-bar-height, 0px));
+  min-height: 24rem;
+}
+
+/* What is drawn over the map: the heading, the list of places, the footer's line. Over
+   Leaflet's own stacking context, which the canvas keeps to itself. */
+.map-overlay {
+  @apply rounded-lg border border-ink-200 bg-white/95 shadow-sm dark:border-ink-800 dark:bg-ink-900/95;
+  z-index: 1;
+}
+
+/* Leaflet's bottom corners sit above the footer's line, and on a phone above the closed
+   list of places too, so neither covers the zoom buttons or the credit. */
+.map-stage .leaflet-bottom {
+  bottom: 6.5rem;
+
+  @media (width >= 40rem) {
+    bottom: 3rem;
   }
+}
 
-  /* The credit's links are targets like any other: 24 pixels tall at the least (WCAG 2.2 SC
-     2.5.8), which Leaflet's 11-pixel line does not give them. */
-  .map-canvas .leaflet-control-attribution a {
-    display: inline-flex;
-    align-items: center;
-    min-height: 1.5rem;
+/* Dark tiles in the dark theme (#849): a raster basemap has no dark style of its own, so
+   the tile pane is inverted and turned back to its hues, and the dots and credit stay as
+   they are. */
+.map-canvas .leaflet-tile-pane {
+  @variant dark {
+    filter: invert(1) hue-rotate(180deg) brightness(0.9) contrast(0.9);
   }
+}
 
-  .map-canvas .map-dot {
-    fill: var(--color-brand-600);
-    fill-opacity: 0.7;
-    stroke: var(--color-brand-600);
-    stroke-width: 1.5;
-
-    @variant dark {
-      fill: var(--color-brand-400);
-      stroke: var(--color-brand-400);
-    }
+.map-canvas .leaflet-bar a,
+.map-canvas .leaflet-control-attribution {
+  @variant dark {
+    background-color: var(--color-ink-900);
+    color: var(--color-ink-200);
+    border-color: var(--color-ink-700);
   }
+}
 
-  .map-canvas .map-outline {
-    fill: var(--color-ink-200);
-    stroke: none;
+.map-canvas .leaflet-control-attribution a {
+  @variant dark {
+    color: var(--color-brand-400);
+  }
+}
 
-    @variant dark {
-      fill: var(--color-ink-700);
-    }
+.map-canvas .map-outline {
+  fill: var(--color-ink-200);
+  stroke: none;
+
+  @variant dark {
+    fill: var(--color-ink-700);
   }
 }
 

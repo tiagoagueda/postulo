@@ -7,28 +7,23 @@
   <link rel="stylesheet" href="{% static 'js/vendor/leaflet/leaflet.css' %}">
 {% endblock %}
 
-{% block content %}
-  <div class="mb-6 flex flex-wrap items-center gap-4">
-    <div>
-      <c-page-title>{% translate "Maps" %}</c-page-title>
-      <p class="text-sm text-ink-500 dark:text-ink-400">
-        {% translate "The places your companies are in, and the companies at each. The map draws the same list." %}
-      </p>
-    </div>
-    <div class="ms-auto">
-      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="outline">{% translate "Companies" %}</a>
-    </div>
-  </div>
+{% comment %} The whole window (#849): only the masthead, and the bottom bar on a phone, around the
+   map; the heading, the way back to the table, the list of places and the footer's line drawn
+   over it. The page is still the list (#108): with scripts off the map stays hidden and the
+   stage holds the heading, the open list and the footer, in that order. {% endcomment %}
+{% block main_width %}max-w-none{% endblock %}
+{% block main_padding %}{% endblock %}
+{% block footer %}{% endblock %}
 
-  {% if places %}
-    <div class="grid items-start gap-6 lg:grid-cols-2">
+{% block content %}
+  <div class="map-stage relative" data-map-stage>
+    {% if places %}
       {% comment %} The drawing (#898): Leaflet over the basemap the operator chose, with the
-         same places the list beside it names, given as data and never as markup. The list is
-         the page and this is a picture of it (#108): with scripts off the box stays hidden and
-         nothing is lost. The credit the tiles' licence asks for is drawn on the map; typed
-         text is escaped by the script before Leaflet writes it. {% endcomment %}
-      <div class="card overflow-hidden p-0" data-map-card hidden>
-        <div class="map-canvas h-96 lg:h-[32rem]" data-map role="region"
+         same places the list names, given as data and never as markup. The credit the tiles'
+         licence asks for is drawn on the map; typed text is escaped by the script before
+         Leaflet writes it. {% endcomment %}
+      <div class="absolute inset-0" data-map-card hidden>
+        <div class="map-canvas size-full" data-map role="region"
              aria-label="{% translate 'Map of the places listed' %}"
              data-map-places="{{ drawn|as_json }}"
              {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
@@ -39,60 +34,80 @@
              data-map-zoom-in="{% translate 'Zoom in' %}"
              data-map-zoom-out="{% translate 'Zoom out' %}"></div>
       </div>
-      <div>
-        <h2 class="sr-only">{% translate "Places" %}</h2>
-        <div class="card p-0">
-          <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-            {% for place in places %}
-              <li class="px-4 py-3">
-                <div class="flex flex-wrap items-baseline gap-2">
-                  <p class="font-medium">{{ place.label }}</p>
-                  <span class="text-xs text-ink-500 dark:text-ink-400">
-                    {% blocktranslate trimmed count total=place.count %}
-                      {{ total }} company
-                    {% plural %}
-                      {{ total }} companies
-                    {% endblocktranslate %}
-                  </span>
-                </div>
-                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
-                  {% for name, url in place.companies %}{% if not forloop.first %}, {% endif %}<a href="{{ url }}" class="underline">{{ name }}</a>{% endfor %}
-                </p>
-                {% if place.lat is None %}
-                  <p class="mt-1 text-xs text-ink-400 dark:text-ink-500">
-                    {% translate "Not on the map: the place is not in the city dataset, or it was taken off the map by hand." %}
-                  </p>
-                {% endif %}
-              </li>
-            {% endfor %}
-          </ul>
-        </div>
-        {% if not dataset_available %}
-          <p class="mt-3 text-xs text-ink-500 dark:text-ink-400">
-            {% translate "The city dataset has not been downloaded on this instance, so no place is on the map: run manage.py fetch_geonames to download it." %}
-          </p>
-        {% endif %}
-      </div>
-    </div>
-  {% else %}
-    <c-empty icon="map-pin">
-      {% translate "No places yet. When a company has a location, the place is listed here and drawn on the map." %}
-    </c-empty>
-  {% endif %}
+    {% endif %}
 
-  {% comment %} The credit GeoNames' licence (CC BY 3.0) asks for where its data is used, and the
-     others' with it (#882). Always drawn, because the places and the outline are on this
-     page whether or not there is a dot to show. {% endcomment %}
-  <p class="mt-6 text-xs text-ink-500 dark:text-ink-400" data-map-credits>
-    {% blocktranslate trimmed %}
-      Places from <a href="https://www.geonames.org" class="underline" rel="noopener noreferrer external">GeoNames</a>
-      (<a href="https://creativecommons.org/licenses/by/3.0/" class="underline" rel="noopener noreferrer external">CC BY 3.0</a>);
-      country names from the Unicode CLDR, through Babel; the world outline from
-      <a href="https://www.naturalearthdata.com" class="underline" rel="noopener noreferrer external">Natural Earth</a>
-      (public domain); the map drawn by
-      <a href="https://leafletjs.com" class="underline" rel="noopener noreferrer external">Leaflet</a>.
-    {% endblocktranslate %}
-  </p>
+    <div class="map-overlay absolute start-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">
+      <div>
+        <c-page-title>{% translate "Companies" %}</c-page-title>
+        <p class="text-sm text-ink-500 dark:text-ink-400" data-map-count>
+          {% blocktranslate trimmed count total=places|length %}
+            One place
+          {% plural %}
+            {{ total }} places
+          {% endblocktranslate %}
+        </p>
+      </div>
+      <a href="{% url 'jobs:company_list' %}" class="btn" data-variant="outline" data-map-table>
+        {% icon "table" %}{% translate "Table" %}
+      </a>
+    </div>
+
+    {% if places %}
+      {% comment %} The list of places: the accessible form of the page, open unless a phone's
+         screen is too small to share, where the script closes it. A <details> the browser opens
+         itself, so it works with scripts off. {% endcomment %}
+      <details class="map-overlay map-drawer absolute inset-x-3 bottom-14 max-h-[50%] overflow-y-auto sm:inset-x-auto sm:end-3 sm:top-3 sm:bottom-auto sm:max-h-[calc(100%-9rem)] sm:w-80" open data-map-drawer>
+        <summary class="cursor-pointer px-4 py-3 font-medium">
+          <h2 class="inline">{% translate "Places" %}</h2>
+        </summary>
+        <ul class="divide-y divide-ink-100 border-t border-ink-100 dark:divide-ink-800 dark:border-ink-800">
+          {% for place in places %}
+            <li class="px-4 py-3">
+              <div class="flex flex-wrap items-baseline gap-2">
+                <p class="font-medium">{{ place.label }}</p>
+                <span class="text-xs text-ink-500 dark:text-ink-400">
+                  {% blocktranslate trimmed count total=place.count %}
+                    {{ total }} company
+                  {% plural %}
+                    {{ total }} companies
+                  {% endblocktranslate %}
+                </span>
+              </div>
+              <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
+                {% for name, url in place.companies %}{% if not forloop.first %}, {% endif %}<a href="{{ url }}" class="inline-block min-h-6 py-0.5 underline">{{ name }}</a>{% endfor %}
+              </p>
+              {% if place.lat is None %}
+                <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+                  {% translate "Not on the map: the place is not in the city dataset, or it was taken off the map by hand." %}
+                </p>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+        <div class="space-y-2 border-t border-ink-100 px-4 py-3 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+          {% if not dataset_available %}
+            <p>{% translate "The city dataset has not been downloaded on this instance, so no place is on the map: run manage.py fetch_geonames to download it." %}</p>
+          {% endif %}
+          {% include "jobs/partials/map_credits.html" %}
+        </div>
+      </details>
+    {% else %}
+      <div class="flex size-full items-center justify-center px-4 pt-28 pb-16">
+        <div class="max-w-md">
+          <c-empty icon="map-pin">
+            {% translate "No places yet. When a company has a location, the place is listed here and drawn on the map." %}
+          </c-empty>
+          <div class="mt-3 text-xs text-ink-500 dark:text-ink-400">{% include "jobs/partials/map_credits.html" %}</div>
+        </div>
+      </div>
+    {% endif %}
+
+    {% comment %} The footer's one line, over the map's foot (#849): the same links every page
+       ends with, the legal notice among them, which an instance may be required to show. {% endcomment %}
+    <footer class="map-overlay map-footer absolute start-3 bottom-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 px-3 text-xs text-ink-500 sm:max-w-[60%] dark:text-ink-400">
+      {% include "partials/footer_links.html" %}
+    </footer>
+  </div>
 {% endblock %}
 
 {% block scripts %}
