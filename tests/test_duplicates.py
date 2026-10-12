@@ -369,7 +369,7 @@ def test_a_contact_that_looks_like_another_is_saved_all_the_same(client, user):
 
 def test_the_company_page_says_what_it_noticed_and_offers_to_merge(client, user):
     acme = company(user, "Acme", website="https://acme.example")
-    limited = company(user, "Acme Ltd", website="https://acme.example", location="Leeds")
+    limited = company(user, "Acme Ltd", website="https://acme.example", location="Leeds, GB")
     client.force_login(user)
 
     page = client.get(acme.get_absolute_url()).content.decode()
@@ -508,7 +508,7 @@ def test_a_person_is_told_apart_by_what_they_do_where_and_their_address(user):
 def test_a_company_is_told_apart_by_where_it_is(user):
     html = drawn(
         '{% cotton told-apart :record="record" class="text-ink-500" / %}',
-        record=company(user, "Acme", location="Leeds"),
+        record=company(user, "Acme", location="Leeds, GB"),
     )
 
     assert "<bdi>Leeds, United Kingdom</bdi>" in html and "·" not in html
@@ -528,7 +528,7 @@ def test_the_notice_says_it_in_words_and_offers_only_the_page_that_shows_first(u
     """Colour is never the only thing saying something: the box is tinted, and the heading,
     the sentence and each reason say it whether or not anybody sees the tint."""
     acme = company(user, "Acme")
-    company(user, "Acme Ltd", location="Leeds")
+    company(user, "Acme Ltd", location="Leeds, GB")
     found = [(candidate, "/merge/?with=2") for candidate in duplicates.for_company(acme)]
 
     html = drawn('{% cotton duplicates :candidates="found" / %}', found=found)

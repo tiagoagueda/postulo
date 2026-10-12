@@ -92,7 +92,7 @@ def limited(user):
         "Acme Ltd",
         website="https://acme.example",
         careers_url="https://acme.example/jobs",
-        location="Leeds",
+        location="Leeds, GB",
         notes="Met them at the fair.",
     )
     limited.industries.set(Industry.named(user, ["Robotics"]))
@@ -144,13 +144,13 @@ def test_the_kept_company_takes_what_it_had_nothing_in(user, acme, limited):
 
 def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_down(user):
     kept = company(
-        user, "Acme", website="https://acme.example", location="London", notes="The good one."
+        user, "Acme", website="https://acme.example", location="London, GB", notes="The good one."
     )
     other = company(
         user,
         "Acme Ltd",
         website="https://acme.co.uk",
-        location="Leeds",
+        location="Leeds, GB",
         notes="Met them at the fair.",
         kind=CompanyKind.EMPLOYMENT_SERVICE,
     )

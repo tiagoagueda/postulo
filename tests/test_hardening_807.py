@@ -11,7 +11,7 @@ pytestmark = pytest.mark.django_db
 
 
 def test_extra_fields_beside_the_cell_are_ignored(client, user):
-    company = Company.objects.create(owner=user, name="Aperture", location="Cambridge")
+    company = Company.objects.create(owner=user, name="Aperture", location="Cambridge, GB")
     client.force_login(user)
     response = client.post(
         reverse("jobs:company_cell", args=[company.pk, "name"]),
