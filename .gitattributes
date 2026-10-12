@@ -31,3 +31,9 @@ uv.lock linguist-generated=true
 
 # The official catalogue is signed over its exact bytes, so nothing may rewrite them.
 catalogue/official/* -text
+
+# Vendored exactly as the package ships it. leaflet's stylesheet and licence arrive with CRLF line
+# endings, and `npm run sync:vendor` copies bytes: normalising them to LF here made the copy in the
+# repository differ from the copy in node_modules on every machine that is not a Windows one.
+src/postulo/static/js/vendor/leaflet/LICENSE.txt -text
+src/postulo/static/js/vendor/leaflet/leaflet.css -text
