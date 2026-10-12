@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- X-Request-ID is accepted from a trusted proxy only; from anybody else Postulo mints its own, so a stranger cannot write a chosen id into the log (#798)
 - The log says how many orphan files the sweep removed and not which, and a failed capture or logo names its source or company number and not the page's address (#797)
 - An account can make the server ask Gravatar five times an hour; the next ask answers that it is a lot of tries and requests nothing (#796)
 - The threat model states that administrators can fetch any account's profile picture, as the People page draws them, and members cannot (#795)

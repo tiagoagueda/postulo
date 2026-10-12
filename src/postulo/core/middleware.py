@@ -15,7 +15,7 @@ from django.middleware.locale import LocaleMiddleware as DjangoLocaleMiddleware
 from django.shortcuts import resolve_url
 from django.urls import NoReverseMatch, reverse
 
-from postulo.core import languages, logs, preferences
+from postulo.core import languages, logs, preferences, proxy
 
 #: Statuses that are a redirect and carry a ``Location``. 307 and 308 are here for
 #: completeness; nothing in Postulo answers with either.
@@ -232,7 +232,8 @@ class RequestIDMiddleware:
     read it off the answer. gunicorn's access log prints the same header.
 
     Second in the chain, after the proxy check, so that a refusal the security middleware
-    makes is logged with the id too. The id from outside is accepted only when it is made
+    makes is logged with the id too. The id from outside is accepted only from a trusted
+    proxy (#798), and only when it is made
     of the characters an id is made of; anything else is replaced, never cleaned, because a
     log line is one place a newline a stranger typed must not land.
     """
@@ -242,6 +243,10 @@ class RequestIDMiddleware:
 
     def __call__(self, request):
         given = request.headers.get(logs.REQUEST_ID_HEADER, "")
+        # Taken only from a proxy Postulo trusts (#798): from anybody else the id is theirs to
+        # choose, and a stranger could write another request's id into the log.
+        if given and not proxy.is_trusted(request.META.get("REMOTE_ADDR", "")):
+            given = ""
         identifier = given if logs.acceptable(given) else logs.new_request_id()
         request.request_id = identifier
         with logs.request_scope(identifier):
