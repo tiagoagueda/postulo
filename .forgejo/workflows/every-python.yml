@@ -88,7 +88,7 @@ jobs:
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
-          restore-keys: uv-${{ runner.os }}-${{ matrix.python-version }}-
+          restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-{1}-', runner.os, matrix.python-version) || '' }}
 
       - name: Install dependencies
         # Without the browser group: Playwright is 136 MB of tool this job never starts, and
