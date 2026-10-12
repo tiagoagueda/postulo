@@ -44,6 +44,7 @@ from django.utils.text import get_text_list
 from django.utils.translation import gettext as _
 
 from postulo.core import pictures
+from postulo.core.throttle import Rate
 from postulo.plugins import http
 
 from .models import ProfilePicture
@@ -220,6 +221,10 @@ def forget(profile, kind: str) -> None:
         profile.save(update_fields=[flag, *legacy, "updated_at"])
 
 
+#: How often one account may make the server ask Gravatar (#796).
+GRAVATAR_RATE = Rate(5, 3600)
+
+
 def fetch_gravatar(profile) -> str:
     """Ask Gravatar once for the primary address's picture. Returns found, none or error.
 
@@ -228,7 +233,16 @@ def fetch_gravatar(profile) -> str:
 
     The request is made first and holds no transaction; what it brought back is written in
     one of its own (#357), so a caller must not be inside one while it waits.
+
+    **A few an hour per account** (#796): each one is a request from the server to somebody
+    else's, so one account cannot ride it. The answer is `throttled`, and nothing is asked.
     """
+    from postulo.core import throttle
+
+    try:
+        throttle.consume("gravatar", profile.user, GRAVATAR_RATE)
+    except throttle.TooOften:
+        return "throttled"
     outcome = "error"
     try:
         with http.public_only_client(timeout=8.0) as client:
@@ -259,6 +273,8 @@ def report_gravatar(request, outcome: str, *, found: str = "") -> None:
     if outcome == "found":
         if found:
             messages.success(request, found)
+    elif outcome == "throttled":
+        messages.warning(request, _("That is a lot of tries. Wait a little before asking again."))
     elif outcome == "none":
         messages.info(
             request, _("Gravatar has no picture for your address, so your initials stay.")
