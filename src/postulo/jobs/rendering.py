@@ -25,7 +25,6 @@ that never finishes is killed; one that exhausts its memory dies alone.
 from __future__ import annotations
 
 import logging
-import os
 import subprocess
 import sys
 import tempfile
@@ -34,7 +33,7 @@ from dataclasses import dataclass
 from django.utils.translation import gettext as _
 from django.utils.translation import gettext_lazy, ngettext
 
-from postulo.core import site
+from postulo.core import childenv, site
 
 from . import rendering_child
 
@@ -48,37 +47,7 @@ DRAW_SECONDS = 45
 #: What is run to draw. A list so that a test can stand something else in its place.
 COMMAND: tuple[str, ...] = (sys.executable, "-B", "-m", "postulo.jobs.rendering_child")
 
-#: What the renderer is given of this process's environment (#814): what a program needs to
-#: find its libraries, its fonts and its temporary files, and nothing else. The child draws a
-#: stranger's page, so it must not inherit the secret key, the database address, an API token
-#: or a mail password along with it.
-ENVIRONMENT_KEPT = (
-    "PATH",
-    "LANG",
-    "LANGUAGE",
-    "LC_ALL",
-    "LC_CTYPE",
-    "TZ",
-    "SYSTEMROOT",
-    "WINDIR",
-    "TEMP",
-    "TMP",
-    "TMPDIR",
-    "HOME",
-    "XDG_CACHE_HOME",
-    "XDG_DATA_DIRS",
-    "FONTCONFIG_PATH",
-    "FONTCONFIG_FILE",
-    "LD_LIBRARY_PATH",
-    "DYLD_LIBRARY_PATH",
-    "PYTHONPATH",
-    "VIRTUAL_ENV",
-)
-
-
-def child_environment() -> dict[str, str]:
-    """The environment the renderer starts with: an allow-list, not a copy."""
-    return {name: os.environ[name] for name in ENVIRONMENT_KEPT if name in os.environ}
+# What the renderer is given of this process's environment is `core.childenv`'s (#814).
 
 
 class CannotDraw(Exception):
@@ -138,7 +107,7 @@ def draw(html: str, *, using: Renderer | None = None) -> bytes:
                 capture_output=True,
                 timeout=DRAW_SECONDS,
                 check=False,
-                env=child_environment(),
+                env=childenv.child_environment(),
                 cwd=scratch,
             )
     except subprocess.TimeoutExpired as error:

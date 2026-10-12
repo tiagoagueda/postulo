@@ -65,6 +65,8 @@ from pathlib import Path
 
 from django.utils.translation import gettext as _
 
+from postulo.core.childenv import child_environment
+
 # The record and its directory, which everything that asks about a plugin reads, live below
 # the registry that this module imports (#248). Handed out here as well, under the names the
 # policy, the catalogue, the transport interlock, the plugins page, the metrics, the backup
@@ -826,6 +828,9 @@ def verify_imports(names: list[str]) -> list[str]:
             text=True,
             timeout=VERIFY_TIMEOUT,
             check=False,
+            # Somebody else's code is being imported: it is not handed the secret key or the
+            # database password along with it (#820).
+            env=child_environment(),
         )
     except subprocess.TimeoutExpired:
         return [

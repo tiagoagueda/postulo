@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Importing a newly installed plugin to see whether it loads happens in a child with an allow-listed environment, and the threat model states plainly that an installed plugin can read every account's rows and stored secrets (#820)
 - A wheel downloaded from a catalogue keeps the address's file name only when it is a well-formed wheel name, otherwise a name made here, and a file that cannot be written is a catalogue refusal and not a crash (#819)
 - A captured page address with a user name or password is refused, and a board recipe and a posting's source are chosen by the host that is fetched rather than by the whole authority (#818)
 - The server's outbound requests no longer honour HTTP_PROXY, HTTPS_PROXY or NO_PROXY unless POSTULO_OUTBOUND_USE_ENV_PROXY is true, since a pinned request through a proxy was verified against the address and not the name (#817)

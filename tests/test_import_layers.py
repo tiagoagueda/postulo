@@ -63,6 +63,7 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.core.currencies",
             "postulo.core.destinations",
             "postulo.core.brands",
+            "postulo.core.childenv",
             "postulo.core.flags",
             # A translated sentence with markup pieces, escaped (#806): Django and nothing else.
             "postulo.core.htmlstrings",

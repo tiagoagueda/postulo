@@ -6,6 +6,7 @@ import subprocess
 
 import pytest
 
+from postulo.core import childenv
 from postulo.jobs import rendering
 
 pytestmark = pytest.mark.django_db
@@ -16,7 +17,7 @@ def test_the_secrets_in_this_process_are_not_in_the_child_environment(monkeypatc
     monkeypatch.setenv("POSTULO_DATABASE_URL", "postgres://user:pw@db/postulo")
     monkeypatch.setenv("POSTULO_FIELD_KEY", "field")
     monkeypatch.setenv("PATH", "/usr/bin")
-    environment = rendering.child_environment()
+    environment = childenv.child_environment()
     assert environment["PATH"] == "/usr/bin"
     assert not {k for k in environment if k.startswith("POSTULO_")}
     assert "the-secret-key" not in " ".join(environment.values())
@@ -42,4 +43,4 @@ def test_what_the_child_is_started_with_is_that_environment_in_an_empty_director
 
 @pytest.mark.parametrize("name", ["PATH"])
 def test_what_a_program_needs_to_find_its_libraries_is_kept(name):
-    assert name in rendering.ENVIRONMENT_KEPT
+    assert name in childenv.ENVIRONMENT_KEPT
