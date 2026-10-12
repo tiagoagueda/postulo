@@ -60,7 +60,9 @@ def test_leaflet_draws_a_dot_per_place_over_openstreetmap(live_server, page: Pag
     sign_in(page, live_server.url, "/jobs/companies/map/")
 
     expect(page.locator("[data-map].leaflet-container")).to_be_visible()
-    expect(page.locator("path.map-dot")).to_have_count(2)
+    # Aveiro alone, and Lisbon's two companies at one spot gathered into a cluster of two (#703).
+    expect(page.locator(".map-pin")).to_have_count(1)
+    expect(page.locator(".map-cluster")).to_have_text("2Companies here: 2")
     expect(page.locator(".leaflet-control-attribution")).to_contain_text(
         "© OpenStreetMap contributors"
     )
@@ -82,7 +84,7 @@ def test_with_no_tiles_the_outline_is_drawn_and_nothing_is_fetched(live_server, 
     sign_in(page, live_server.url, "/jobs/companies/map/")
 
     expect(page.locator("path.map-outline")).to_have_count(1)
-    expect(page.locator("path.map-dot")).to_have_count(2)
+    expect(page.locator(".map-pin, .map-cluster")).to_have_count(2)
     page.wait_for_load_state("networkidle")
     assert tiles == []
     assert breaches == []
@@ -92,7 +94,7 @@ def test_a_dot_opens_the_place_with_its_companies_as_links(live_server, page: Pa
     watch(page)
     sign_in(page, live_server.url, "/jobs/companies/map/")
 
-    page.locator("path.map-dot").last.click(force=True)
+    page.locator(".map-pin").first.click()
 
     popup = page.locator(".leaflet-popup-content")
     expect(popup).to_be_visible()

@@ -106,9 +106,9 @@ def test_a_place_without_coordinates_is_listed_and_not_drawn(client, user, tmp_p
 def test_the_dots_are_proportional_to_the_companies_at_the_place(
     client, user, monkeypatch, tmp_path
 ):
-    """The question the map answers is where the search is spread: the size of a dot
-    is the number of companies at the place, so a place of five is bigger than a
-    place of one (#108)."""
+    """The question the map answers is where the search is spread: each place counts its
+    companies, and the map draws one marker per address, gathered into clusters that count
+    companies (#108, #703)."""
     (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON, BERLIN), encoding="utf-8")
     monkeypatch.setattr(places, "DATA_DIR", tmp_path)
     Company.objects.create(owner=user, name="A", location="Lisbon")
@@ -120,8 +120,9 @@ def test_the_dots_are_proportional_to_the_companies_at_the_place(
     by_label = {entry["label"]: entry for entry in context["places"]}
     assert by_label["Lisbon, Portugal"]["count"] == 1
     assert by_label["Berlin, Germany"]["count"] == 5
-    drawn = {entry["label"]: entry["count"] for entry in context["drawn"]}
-    assert drawn == {"Berlin, Germany": 5, "Lisbon, Portugal": 1}, "a dot is sized by its count"
+    # One marker per address since #703, which the clusters gather and count by company.
+    assert len(context["drawn"]) == 6
+    assert len({entry["company"] for entry in context["drawn"]}) == 6
 
 
 def test_the_map_is_drawn_by_leaflet_from_this_instance(client, user):
@@ -507,3 +508,70 @@ def test_near_me_is_offered_in_the_readers_words(client, user):
     assert "data-map-locate-refused=" in html and "data-map-locate-failed=" in html
     assert 'role="status" data-map-status' in html
     assert 'data-icon="locate-fixed"' in html
+
+
+# ------------------------------------------------------- several addresses, several pins (#703)
+
+
+def test_a_company_with_two_towns_is_at_both(client, user, monkeypatch, tmp_path):
+    from postulo.core.models import PostalAddress
+
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
+    company = Company.objects.create(owner=user, name="Aperture", location="Lisbon")
+    PostalAddress.objects.create(
+        owner=user, holder=company, kind="work", municipality="Berlin", country="DE"
+    )
+
+    context = page(client, user).context
+
+    counts = {entry["label"]: entry["count"] for entry in context["places"]}
+    assert counts == {"Lisbon, Portugal": 1, "Berlin, Germany": 1}
+    assert len(context["drawn"]) == 2
+    assert {entry["company"] for entry in context["drawn"]} == {context["drawn"][0]["company"]}
+    assert context["counted_at_several"]
+    assert "counted at each" in page(client, user).content.decode()
+
+
+def test_two_spellings_of_one_town_are_one_place(client, user, monkeypatch, tmp_path):
+    with_cities(monkeypatch, tmp_path, ("Lisbon", "38.72509", "-9.1498", "PT", 517802))
+    from postulo.core.models import PostalAddress
+
+    one = Company.objects.create(owner=user, name="One")
+    two = Company.objects.create(owner=user, name="Two")
+    PostalAddress.objects.create(owner=user, holder=one, municipality="Lisbon", country="PT")
+    PostalAddress.objects.create(owner=user, holder=two, municipality="LISBON", country="PT")
+
+    (place,) = page(client, user).context["places"]
+
+    assert place["count"] == 2
+
+
+def test_two_offices_of_one_company_in_one_town_count_it_once(client, user, monkeypatch, tmp_path):
+    from postulo.core.models import PostalAddress
+
+    with_cities(monkeypatch, tmp_path, LISBON)
+    company = Company.objects.create(owner=user, name="Aperture", location="Lisbon")
+    PostalAddress.objects.create(
+        owner=user,
+        holder=company,
+        kind="postal",
+        street="Apartado 1",
+        municipality="Lisbon",
+        country="PT",
+    )
+
+    context = page(client, user).context
+
+    (place,) = context["places"]
+    assert place["count"] == 1
+    assert [row["primary"] for row in place["companies"]] == [True, False]
+    assert not context["counted_at_several"], "said only when it is true"
+
+
+def test_the_clusters_are_counted_in_the_readers_words(client, user):
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert 'data-map-cluster="Companies here: {count}"' in html
+    assert "leaflet.markercluster.js" in html and "MarkerCluster.css" in html

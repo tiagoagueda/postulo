@@ -225,6 +225,8 @@ def pinned_addresses(person) -> list[dict]:
                 "url": url,
                 "what": what,
                 "company": is_company,
+                "key": f"{row.content_type_id}:{row.object_id}",
+                "primary": row.is_primary,
                 "lat": lat,
                 "lon": lon,
             }
@@ -341,45 +343,70 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
         from . import places as places_data
 
         context = super().get_context_data(**kwargs)
-        places: dict[str, dict] = {}
-        for pinned in pinned_addresses(self.request.user):
-            entry = places.setdefault(
-                pinned["place"],
+        pinned = pinned_addresses(self.request.user)
+        # A place is where an address resolves to, not how its town was spelt (#703): two
+        # spellings of one town are one dot. An address the tables cannot place is a place of
+        # its own words, listed and not drawn.
+        places: dict[tuple, dict] = {}
+        where_each: dict[str, set] = {}
+        # Which address is the primary is worth saying only of a company with more than one.
+        addresses_of: dict[str, int] = {}
+        for entry in pinned:
+            addresses_of[entry["key"]] = addresses_of.get(entry["key"], 0) + 1
+        for entry in pinned:
+            if entry["lat"] is not None:
+                key = ("at", round(entry["lat"], 4), round(entry["lon"], 4))
+            else:
+                key = ("text", entry["place"].casefold())
+            place = places.setdefault(
+                key,
                 {
-                    "label": pinned["place"],
+                    "label": entry["place"],
                     "count": 0,
                     "companies": [],
                     "people": [],
-                    "lat": None,
-                    "lon": None,
+                    "lat": entry["lat"],
+                    "lon": entry["lon"],
+                    "_seen": set(),
                 },
             )
-            if pinned["company"]:
-                if (pinned["name"], pinned["url"]) not in entry["companies"]:
-                    entry["companies"].append((pinned["name"], pinned["url"]))
-                    entry["count"] += 1
+            if entry["company"]:
+                place["companies"].append(
+                    {
+                        "name": entry["name"],
+                        "url": entry["url"],
+                        "what": entry["what"],
+                        "primary": entry["primary"] and addresses_of[entry["key"]] > 1,
+                    }
+                )
+                # A place counts its companies, not their addresses: two offices of one
+                # company in one town are one company there.
+                if entry["key"] not in place["_seen"]:
+                    place["_seen"].add(entry["key"])
+                    place["count"] += 1
+                where_each.setdefault(entry["key"], set()).add(key)
             else:
-                entry["people"].append((pinned["name"], pinned["url"], pinned["what"]))
-            if entry["lat"] is None and pinned["lat"] is not None:
-                entry["lat"] = pinned["lat"]
-                entry["lon"] = pinned["lon"]
+                place["people"].append((entry["name"], entry["url"], entry["what"]))
+        for place in places.values():
+            del place["_seen"]
         context["places"] = sorted(
             places.values(), key=lambda entry: (-entry["count"], entry["label"].casefold())
         )
-        # What Leaflet draws: the placed ones only, in the list's order, as data rather than
-        # markup, so the script never builds HTML out of a company's name.
+        # Said only when it is true: a company at several places is counted at each (#703).
+        context["counted_at_several"] = any(len(keys) > 1 for keys in where_each.values())
+        # What Leaflet draws: one marker per address, as data, each saying whose it is, so
+        # the clusters count companies and a company never reaches the page as markup.
         context["drawn"] = [
             {
-                "label": entry["label"],
-                "count": entry["count"],
                 "lat": entry["lat"],
                 "lon": entry["lon"],
-                "companies": [{"name": name, "url": url} for name, url in entry["companies"]],
-                "people": [
-                    {"name": name, "url": url, "what": what} for name, url, what in entry["people"]
-                ],
+                "name": entry["name"],
+                "url": entry["url"],
+                "what": entry["what"],
+                "place": entry["place"],
+                "company": entry["key"] if entry["company"] else "",
             }
-            for entry in context["places"]
+            for entry in pinned
             if entry["lat"] is not None
         ]
         context["dataset_available"] = places_data.available()

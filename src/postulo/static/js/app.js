@@ -7448,19 +7448,47 @@
           L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" }).addTo(map);
         }
       }
-      var places = readJson(canvas, "data-map-places");
+      // One marker per address (#703), gathered into clusters that count companies: two
+      // offices of one company close together are one company in the cluster's number.
+      var markers = readJson(canvas, "data-map-places");
       var points = [];
-      places.forEach(function (place) {
-        var point = [place.lat, place.lon];
+      var clusterWords = canvas.getAttribute("data-map-cluster") || "{count}";
+      var layer = L.markerClusterGroup
+        ? L.markerClusterGroup({
+            showCoverageOnHover: false,
+            maxClusterRadius: 48,
+            iconCreateFunction: function (cluster) {
+              var companies = {};
+              var count = 0;
+              cluster.getAllChildMarkers().forEach(function (marker) {
+                var key = marker.options.company || "person:" + L.stamp(marker);
+                if (!companies[key]) {
+                  companies[key] = true;
+                  count += 1;
+                }
+              });
+              var label = escapeHtml(clusterWords.replace("{count}", String(count)));
+              return L.divIcon({
+                html: '<span aria-hidden="true">' + count + '</span><span class="sr-only">' + label + "</span>",
+                className: "map-cluster",
+                iconSize: [36, 36],
+              });
+            },
+          })
+        : L.layerGroup();
+      markers.forEach(function (entry) {
+        var point = [entry.lat, entry.lon];
         points.push(point);
-        L.circleMarker(point, {
-          className: "map-dot",
-          radius: Math.min(6 + 3 * Math.sqrt(place.count || 1), 20),
+        L.marker(point, {
+          icon: L.divIcon({ className: entry.company ? "map-pin" : "map-pin map-pin-person", iconSize: [24, 24] }),
+          title: entry.name + (entry.what ? " · " + entry.what : ""),
+          alt: entry.name,
+          company: entry.company,
         })
-          .bindTooltip(place.label)
-          .bindPopup(placePopup(place))
-          .addTo(map);
+          .bindPopup(placePopup({ label: entry.place, companies: [entry] }))
+          .addTo(layer);
       });
+      layer.addTo(map);
       if (points.length) {
         map.fitBounds(L.latLngBounds(points), { padding: [32, 32], maxZoom: 10 });
       } else {

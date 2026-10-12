@@ -2717,6 +2717,53 @@ html {
   }
 }
 
+/* An address on the map, and a cluster of them (#703): the brand's colour, a person's own or a
+   contact's ringed rather than filled, and a cluster a disc with its count of companies. */
+/* The pin's box is 24 pixels, a target a finger or a pointer can take (WCAG 2.2 SC 2.5.8); the
+   dot drawn in it is smaller. */
+.map-canvas .map-pin::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px var(--color-brand-600);
+
+  @variant dark {
+    background: var(--color-brand-400);
+    border-color: var(--color-ink-900);
+    box-shadow: 0 0 0 1px var(--color-brand-400);
+  }
+}
+
+.map-canvas .map-pin-person::after {
+  background: white;
+  border-color: var(--color-brand-600);
+
+  @variant dark {
+    background: var(--color-ink-900);
+    border-color: var(--color-brand-400);
+  }
+}
+
+.map-canvas .map-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand-600) 35%, transparent);
+
+  @variant dark {
+    background: var(--color-brand-400);
+    color: var(--color-ink-950);
+  }
+}
+
 /* *Near me*'s button, the size of Leaflet's zoom buttons, with its icon centred (#850), and
    the browser's position, ringed so it reads as something other than a company. */
 .map-canvas .map-locate {

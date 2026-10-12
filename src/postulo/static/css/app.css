@@ -8533,6 +8533,65 @@ html {
     color: var(--color-brand-400);
   }
 }
+.map-canvas .map-pin::after {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  border: 2px solid white;
+  box-shadow: 0 0 0 1px var(--color-brand-600);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background: var(--color-brand-400);
+    border-color: var(--color-ink-900);
+    box-shadow: 0 0 0 1px var(--color-brand-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background: var(--color-brand-400);
+      border-color: var(--color-ink-900);
+      box-shadow: 0 0 0 1px var(--color-brand-400);
+    }
+  }
+}
+.map-canvas .map-pin-person::after {
+  background: white;
+  border-color: var(--color-brand-600);
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background: var(--color-ink-900);
+    border-color: var(--color-brand-400);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background: var(--color-ink-900);
+      border-color: var(--color-brand-400);
+    }
+  }
+}
+.map-canvas .map-cluster {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  background: var(--color-brand-600);
+  color: white;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 0 0 4px color-mix(in srgb, oklch(0.55 0.19 250) 35%, transparent);
+  @supports (color: color-mix(in lab, red, red)) {
+    box-shadow: 0 0 0 4px color-mix(in oklch, var(--color-brand-600) 35%, transparent);
+  }
+  &:where([data-theme="dark"], [data-theme="dark"] *) {
+    background: var(--color-brand-400);
+    color: var(--color-ink-950);
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+      background: var(--color-brand-400);
+      color: var(--color-ink-950);
+    }
+  }
+}
 .map-canvas .map-locate {
   display: flex;
   align-items: center;

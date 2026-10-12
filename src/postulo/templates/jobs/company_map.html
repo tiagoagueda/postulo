@@ -5,6 +5,7 @@
 
 {% block head %}
   <link rel="stylesheet" href="{% static 'js/vendor/leaflet/leaflet.css' %}">
+  <link rel="stylesheet" href="{% static 'js/vendor/leaflet.markercluster/MarkerCluster.css' %}">
 {% endblock %}
 
 {% comment %} The whole window (#849): only the masthead, and the bottom bar on a phone, around the
@@ -33,6 +34,7 @@
              data-map-attribution-url="{{ tiles.attribution_url }}"
              data-map-zoom-in="{% translate 'Zoom in' %}"
              data-map-zoom-out="{% translate 'Zoom out' %}"
+             data-map-cluster="{% translate 'Companies here: {count}' %}"
              data-map-locate="{% translate 'Near me' %}"
              data-map-here="{% translate 'You are about here' %}"
              data-map-locate-refused="{% translate 'The browser was not allowed to say where you are, so the map stays where it was.' %}"
@@ -83,11 +85,13 @@
                   {% endblocktranslate %}
                 </span>
               </div>
-              {% if place.companies %}
-                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
-                  {% for name, url in place.companies %}{% if not forloop.first %}, {% endif %}<a href="{{ url }}" class="inline-block min-h-6 py-0.5 underline">{{ name }}</a>{% endfor %}
+              {% comment %} Each company at the place, with which of its addresses this is and
+                 the primary marked (#703). {% endcomment %}
+              {% for company in place.companies %}
+                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300" data-map-company>
+                  <a href="{{ company.url }}" class="inline-block min-h-6 py-0.5 underline">{{ company.name }}</a>{% if company.what %} <span class="text-xs text-ink-500 dark:text-ink-400">{{ company.what }}</span>{% endif %}{% if company.primary %} <span class="badge" data-tone="grey">{% translate "Primary" %}</span>{% endif %}
                 </p>
-              {% endif %}
+              {% endfor %}
               {% comment %} A contact's or your own address, only where it was asked for (#702):
                  whose it is and what kind, never the street. {% endcomment %}
               {% for name, url, what in place.people %}
@@ -104,6 +108,9 @@
           {% endfor %}
         </ul>
         <div class="space-y-2 border-t border-ink-100 px-4 py-3 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+          {% if counted_at_several %}
+            <p data-counted-at-several>{% translate "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are." %}</p>
+          {% endif %}
           {% if dataset_available and not postcodes_available %}
             <p data-no-postcodes>{% translate "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)." %}</p>
           {% endif %}
@@ -133,5 +140,7 @@
 {% endblock %}
 
 {% block scripts %}
-  <script src="{% static 'js/vendor/leaflet/leaflet.js' %}" defer data-leaflet></script>
+  <script src="{% static 'js/vendor/leaflet/leaflet.js' %}" defer></script>
+  {% comment %} The clusters (#703), after Leaflet; the map is drawn when this, the last, has run. {% endcomment %}
+  <script src="{% static 'js/vendor/leaflet.markercluster/leaflet.markercluster.js' %}" defer data-leaflet></script>
 {% endblock %}
