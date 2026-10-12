@@ -595,7 +595,7 @@ def test_the_three_features_are_plugins_an_administrator_can_see(client, django_
     )
     client.force_login(admin)
     html = client.get(reverse("server:plugins")).content.decode()
-    for label in ("Several social profiles", "Several code repositories", "Several websites"):
+    for label in ("Multiple social profiles", "Multiple code repositories", "Multiple websites"):
         assert label in html
 
 

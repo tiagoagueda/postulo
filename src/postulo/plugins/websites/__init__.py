@@ -19,8 +19,11 @@ WEBSITES = "websites"
 @declares(
     shipped(
         name=WEBSITES,
-        label=_("Several websites"),
+        label=_("Multiple websites"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="globe",
         description=_(
             "Keep more than one website for yourself and for the people you deal with — a "
             "personal site, a blog, a portfolio — with one of them marked as the one to "

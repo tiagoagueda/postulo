@@ -136,7 +136,7 @@ def test_every_plugin_postulo_ships_declares_the_full_set():
     assert not missing, "\n".join(missing)
 
 
-def test_there_are_twenty_three_of_them_across_ten_kinds():
+def test_these_are_the_plugins_that_ship_across_ten_kinds():
     """Named rather than counted, so that losing one to a bad import is a failure rather
     than a quiet absence — and so that adding one is a line somebody wrote.
 
@@ -167,6 +167,9 @@ def test_there_are_twenty_three_of_them_across_ten_kinds():
 
     `messaging-services` is the same for a messaging handle (#682), and `messaging-contacts`
     governs whether a person and their contacts may hold handles at all.
+
+    `multiple-fields` is a module with no behaviour of its own: the parent of the six features
+    that let a field hold more than one value (#875), whose switch is theirs.
     """
     found = {
         manifest_of(plugin_class()).name
@@ -199,6 +202,7 @@ def test_there_are_twenty_three_of_them_across_ten_kinds():
         "messaging-services",
         "gdpr",
         "maps",
+        "multiple-fields",
     }
 
 

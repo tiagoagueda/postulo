@@ -27,8 +27,11 @@ MESSAGING_CONTACTS = "messaging-contacts"
 @declares(
     shipped(
         name=MESSAGING_CONTACTS,
-        label=_("Messaging contacts"),
+        label=_("Multiple messaging contacts"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="message-circle",
         description=_(
             "Keep the ways you and the people you deal with are reached on Matrix, XMPP, "
             "Signal, Telegram, Threema or another messaging service, as many as you like, "

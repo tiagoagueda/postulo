@@ -19,8 +19,11 @@ REPOSITORIES = "repositories"
 @declares(
     shipped(
         name=REPOSITORIES,
-        label=_("Several code repositories"),
+        label=_("Multiple code repositories"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="git-graph",
         description=_(
             "Keep more than one code repository or forge profile for yourself and for the "
             "people you deal with — a GitHub, a Codeberg, the one project worth showing — "

@@ -272,7 +272,7 @@ def test_the_feature_is_a_plugin_an_administrator_can_see(client, django_user_mo
     )
     client.force_login(admin)
     html = client.get(reverse("server:plugins")).content.decode()
-    assert "Several telephone numbers" in html
+    assert "Multiple telephone numbers" in html
 
 
 def test_one_persons_numbers_are_never_another_persons(user, other_user, contact):

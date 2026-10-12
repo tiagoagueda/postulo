@@ -28,8 +28,11 @@ SOCIAL_PROFILES = "social-profiles"
 @declares(
     shipped(
         name=SOCIAL_PROFILES,
-        label=_("Several social profiles"),
+        label=_("Multiple social profiles"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="waypoints",
         description=_(
             "Keep more than one social profile for yourself and for the people you deal "
             "with — a LinkedIn, a Mastodon, a Bluesky — with one of them marked as the one "

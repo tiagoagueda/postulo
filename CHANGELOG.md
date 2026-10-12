@@ -78,6 +78,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The six features that let a field hold more than one value are the sub-modules of a new module, Multiple fields, and are named Multiple email addresses, telephone numbers, code repositories, social profiles, websites and messaging contacts, each with its icon (#875)
 - The wiki, CONTRIBUTING, PLAN and the CI header describe the project as it is now, and checks keep the settings pages, the container name and the CI header right (#406)
 - The plugin author's page and the logo docstrings describe the code: all seven notifier events, a logo as a file name, the real size limits and every shipped plugin, with checks that keep them so (#405)
 - The wiki's Configuration page now says an unreadable rate stops start-up, that implicit TLS is offered and names every rate setting, and two checks keep it so (#404)

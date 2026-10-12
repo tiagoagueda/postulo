@@ -91,7 +91,7 @@ BLOCKS: tuple[Block, ...] = (
         ),
         kept_back_contact=_(
             "Some social profiles are kept for this contact and not shown, because "
-            "<em>Several social profiles</em> is switched off."
+            "<em>Multiple social profiles</em> is switched off."
         ),
     ),
     Block(
@@ -112,7 +112,7 @@ BLOCKS: tuple[Block, ...] = (
         ),
         kept_back_contact=_(
             "Some code repositories are kept for this contact and not shown, because "
-            "<em>Several code repositories</em> is switched off."
+            "<em>Multiple code repositories</em> is switched off."
         ),
     ),
     Block(
@@ -128,7 +128,7 @@ BLOCKS: tuple[Block, ...] = (
         label=_("Website"),
         help_text=_("Your own site, if you have one."),
         kept_back=_(
-            "Some websites are kept and not shown, because <em>Several websites</em> is "
+            "Some websites are kept and not shown, because <em>Multiple websites</em> is "
             "switched off. They come back untouched if it is switched on."
         ),
         kept_back_contact=_(

@@ -14,6 +14,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.gdpr import GdprFeature
         from postulo.plugins.maps import MapsFeature
         from postulo.plugins.messaging_contacts import MessagingContactsFeature
+        from postulo.plugins.multiple_fields import MultipleFieldsFeature
         from postulo.plugins.phone_numbers import PhoneNumbersFeature
         from postulo.plugins.postal_rules import PostalRulesFeature
         from postulo.plugins.repositories import RepositoriesFeature
@@ -32,6 +33,8 @@ class CoreConfig(AppConfig):
         # to, said once so a plugin can add a format (#862).
         transfers.register_the_ones_postulo_has()
 
+        # The module the "multiple …" features are sub-modules of (#875).
+        registry.register_builtin("feature", MultipleFieldsFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
         registry.register_builtin("feature", MessagingContactsFeature)

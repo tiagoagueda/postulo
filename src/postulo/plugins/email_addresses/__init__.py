@@ -53,8 +53,11 @@ EMAIL_ADDRESSES = "email-addresses"
 @declares(
     shipped(
         name=EMAIL_ADDRESSES,
-        label=_("Several email addresses"),
+        label=_("Multiple email addresses"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="mails",
         description=_(
             "Keep more than one address on your account — a personal one, a work one — with "
             "any of them signing you in and one of them marked as the one Postulo writes to. "

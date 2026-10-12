@@ -32,8 +32,11 @@ PHONE_NUMBERS = "phone-numbers"
 @declares(
     shipped(
         name=PHONE_NUMBERS,
-        label=_("Several telephone numbers"),
+        label=_("Multiple telephone numbers"),
         kind="feature",
+        parent="multiple-fields",
+        categories=("contacts",),
+        icon="phone",
         description=_(
             "Keep more than one number for yourself and for the people you deal with — a "
             "mobile, a desk line, a switchboard — with one of them marked as the one to "
