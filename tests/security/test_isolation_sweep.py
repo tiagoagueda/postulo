@@ -16,6 +16,7 @@ person's record, or in `EXCUSED` with a reason. Adding a page without deciding f
 from __future__ import annotations
 
 import datetime as dt
+import gzip
 import itertools
 import json
 from collections.abc import Callable
@@ -272,7 +273,7 @@ def kept_page(owner):
     CapturedPage.objects.create(
         owner=owner,
         capture=theirs,
-        source=ContentFile(b"\x1f\x8b theirs", name="theirs.txt.gz"),
+        source=ContentFile(gzip.compress(b"theirs"), name="theirs.txt.gz"),
         rendering=ContentFile(b"\x89PNG\r\n\x1a\n theirs", name="theirs.png"),
         rendering_type="image/png",
     )
@@ -346,6 +347,24 @@ def connection(owner):
 
     return Connection.objects.create(
         owner=owner, kind="notifier", plugin="email", label="Their mail", config={}
+    )
+
+
+def store_connection(owner):
+    """A document store, which is the kind *Send everything* is for (#825)."""
+    from postulo.plugins.models import Connection
+
+    return Connection.objects.create(
+        owner=owner, kind="store", plugin="local", label="Their store", config={}
+    )
+
+
+def sync_connection(owner):
+    """A synchronisation, which is the kind *Sync now* is for (#825)."""
+    from postulo.plugins.models import Connection
+
+    return Connection.objects.create(
+        owner=owner, kind="sync", plugin="theirs", label="Their sync", config={}
     )
 
 
@@ -445,11 +464,11 @@ FACTORIES: dict[str, Callable] = {
     "core:export_archive": pk_of(export_archive),
     "core:import_csv_done": pk_of(import_errand),
     # connections
-    "connections:backfill": pk_of(connection),
+    "connections:backfill": pk_of(store_connection),
     "connections:consent": pk_of(connection),
     "connections:delete": pk_of(connection),
     "connections:edit": pk_of(connection),
-    "connections:sync_now": pk_of(connection),
+    "connections:sync_now": pk_of(sync_connection),
     "connections:test": pk_of(connection),
     # documents
     "documents:application_documents": pk_of(application),
@@ -501,7 +520,7 @@ FACTORIES: dict[str, Callable] = {
     "jobs:company_identifier_remove": pk_of(company_identifier),
     "jobs:company_detail": pk_of(company),
     "jobs:company_logo": pk_of(logo_kept),
-    "jobs:company_logo_action": pk_of(company, action="find"),
+    "jobs:company_logo_action": pk_of(company, action="remove"),
     # The record that would be kept, in the address. The one merged into it is named in
     # the query, and tests/test_merging.py asks for somebody else's there as well (#239).
     "jobs:company_merge": pk_of(company),
@@ -1195,3 +1214,62 @@ def test_somebody_elses_event_is_on_no_page_of_mine(client, user, other_user):
     assert "Zebra symposium" not in client.get(reverse("resume:preview")).content.decode()
     assert search.search(user, "Zebra") == []
     assert search.search(user, "Quokka") == []
+
+
+# -------------------------------------------- the sweep proves it can fail (#825)
+
+#: Addresses whose own record the generic request below does not reach, and why. An entry
+#: here is a place where "404 for somebody else's" proves nothing by itself, so each names
+#: the test that does prove it.
+OWN_RECORD_NOT_REACHED_HERE: dict[str, str] = {
+    "jobs:capture_bind": (
+        "the listing it names is in the body, which this request does not carry; "
+        "test_a_capture_cannot_be_bound_across_accounts below asks for both"
+    ),
+}
+
+
+@pytest.mark.parametrize("name", sorted(FACTORIES))
+def test_the_owners_own_record_reaches_the_view(client, user, name):
+    """Without this a sweep entry that is always 404 -- a wrong action, a wrong kind of
+    connection, a body the view wants -- passes for the wrong reason. The same request, made
+    by the owner for their own record, must get *past* the lookup: anything but a 404."""
+    if name in OWN_RECORD_NOT_REACHED_HERE:
+        pytest.skip(OWN_RECORD_NOT_REACHED_HERE[name])
+    url = reverse(name, kwargs=FACTORIES[name](user))
+    client.force_login(user)
+
+    answers = {}
+    for method in (client.get, client.post):
+        response = method(url)
+        answers[method.__name__] = response.status_code
+        # The header walk (#825): whatever an owner is handed as a download is never kept by a
+        # cache, from every route this sweep reaches and not only the ones somebody listed.
+        if str(response.get("Content-Disposition", "")).lstrip().lower().startswith("attachment"):
+            assert "no-store" in response.get("Cache-Control", ""), (
+                f"{name} hands over a download a cache may keep: {response.get('Cache-Control')!r}"
+            )
+        response.close()  # a streamed file is open until it is closed
+    assert any(code not in (404, 405) for code in answers.values()), (
+        f"{name} {url} is 404 for the owner too ({answers}), so the sweep's 404 for somebody "
+        "else's proves nothing: give the entry a request the view accepts, or list it in "
+        "OWN_RECORD_NOT_REACHED_HERE with the test that does prove it"
+    )
+
+
+def test_a_capture_cannot_be_bound_across_accounts(client, user, other_user):
+    """Both records are looked up among the person's own (#825): somebody else's capture and
+    somebody else's listing are each a 404, and the person's own pair goes through."""
+    mine, theirs = capture(user), capture(other_user)
+    my_listing = posting(user)
+    their_listing = posting(other_user)
+    client.force_login(user)
+
+    def bind(capture_pk, listing_pk):
+        return client.post(
+            reverse("jobs:capture_bind", kwargs={"pk": capture_pk}), {"listing": listing_pk}
+        )
+
+    assert bind(theirs.pk, my_listing.pk).status_code == 404, "somebody else's capture"
+    assert bind(mine.pk, their_listing.pk).status_code == 404, "somebody else's listing"
+    assert bind(mine.pk, my_listing.pk).status_code == 302, "their own pair is bound"
