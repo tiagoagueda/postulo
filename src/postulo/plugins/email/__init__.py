@@ -84,8 +84,11 @@ def _body(notification: Notification) -> str:
 @declares(
     shipped(
         name="email",
-        label=_lazy("Email"),
+        label=_lazy("Email notifications"),
         kind="notifier",
+        parent="builtin-notifications",
+        categories=("notifications",),
+        icon="mail",
         description=_lazy(
             "Sends a notification as plain email, through whatever this instance uses to send mail."
         ),

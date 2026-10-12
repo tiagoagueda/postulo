@@ -20,6 +20,7 @@ class NotificationsConfig(AppConfig):
         )
         from postulo.plugins import installing
         from postulo.plugins.browser import BrowserNotifier
+        from postulo.plugins.builtin_notifications import BuiltinNotificationsFeature
         from postulo.plugins.email import EmailNotifier
         from postulo.plugins.own_mail import OwnMail
         from postulo.plugins.registry import register_builtin
@@ -29,6 +30,8 @@ class NotificationsConfig(AppConfig):
         # The package that carries the selected mail transport cannot be switched off or
         # removed while mail is the last way back into accounts; asked of every route in (#595).
         installing.add_lock(transport.refuse_removing_distribution)
+        # The module the three notifiers below are sub-modules of (#876).
+        register_builtin("feature", BuiltinNotificationsFeature)
         register_builtin("notifier", EmailNotifier)
         # The notifier for a machine: signed JSON to an address, delivered by the scheduler
         # with backoff, so an automation no longer has to poll the API and diff (#240).

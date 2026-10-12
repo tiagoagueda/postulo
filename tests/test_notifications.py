@@ -163,7 +163,7 @@ def test_links_come_from_the_request_the_public_url_or_stay_bare(rf, settings):
 
 
 def test_the_email_notifier_ships_in_the_box(client, user):
-    assert registry.find_plugin("notifier", "email").label == "Email"
+    assert registry.find_plugin("notifier", "email").label == "Email notifications"
     client.force_login(user)
     html = client.get(reverse("connections:pick")).content.decode()
     assert reverse("connections:create", args=["notifier", "email"]) in html

@@ -49,10 +49,13 @@ def _payload(title: str, body: str = "", url: str = "", tag: str = "") -> dict:
 @declares(
     shipped(
         name="browser",
-        label=_lazy("Browser"),
+        label=_lazy("Browser notifications"),
         kind="notifier",
+        parent="builtin-notifications",
+        categories=("notifications",),
+        icon="message-square-dot",
         description=_lazy(
-            "Shows a notification in your browser: pushed to it when it can receive one, "
+            "Shows an HTML5 notification in your browser: pushed to it when it can receive one, "
             "otherwise the next time Postulo is open in it."
         ),
     )

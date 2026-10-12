@@ -131,8 +131,11 @@ def encode(payload: dict) -> str:
 @declares(
     shipped(
         name="webhook",
-        label="Webhook",
+        label=_lazy("Webhooks"),
         kind="notifier",
+        parent="builtin-notifications",
+        categories=("notifications",),
+        icon="webhook",
         description=_lazy(
             "Posts every event as signed JSON to an address you give, for an automation or a "
             "script to act on. Delivered by the scheduler, retried if the receiver is down."
