@@ -139,8 +139,10 @@ def sweep(*, now=None) -> list[str]:
         try:
             filestore.delete(stored.name)
         except OSError:  # pragma: no cover - a file already gone is the outcome wanted
-            logger.warning("Could not remove the orphan %s", stored.name, exc_info=True)
+            logger.warning("Could not remove an orphan file", exc_info=True)
             continue
-        logger.info("Removed %s: no record names it", stored.name)
         removed.append(stored.name)
+    if removed:
+        # How many, never which: a file's name carries what its owner called it (#797).
+        logger.info("Removed %d orphan file(s): no record names them", len(removed))
     return removed

@@ -451,7 +451,9 @@ def parse_page(
                 else:
                     parsed = source.parse(url, html)
             except Exception:
-                logger.exception("Capture source %r failed on %r", source.name, url)
+                # The address is a person's activity and the log is staff's (#797): the source's
+                # name and the traceback say what failed, the address is not repeated.
+                logger.exception("Capture source %r failed on a page", source.name)
                 continue
             if parsed is not None:
                 return parsed, source
@@ -476,7 +478,7 @@ def page_places(url: str, html: str) -> list[dict]:
         return hints.places(url, html)
     except Exception:
         # Learning is a courtesy to the next capture; a page that defeats it costs nothing.
-        logger.exception("Could not list the places on %r", url)
+        logger.exception("Could not list the places on a page")
         return []
 
 

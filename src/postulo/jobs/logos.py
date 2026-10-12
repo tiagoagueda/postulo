@@ -410,7 +410,7 @@ def find_on_website(company) -> str:
     try:
         parser.feed(page.html)
     except Exception:  # pragma: no cover - a broken page is not an error worth showing
-        logger.exception("Could not read the markup of %r", website)
+        logger.exception("Could not read the markup of company %s's website", company.pk)
     base = page.url or website
     # Five declared images at most, so that the conventional favicon is always the sixth try.
     candidates = [urljoin(base, href) for href in parser.candidates()][:5]
@@ -425,8 +425,9 @@ def find_on_website(company) -> str:
             continue
         return candidate
     host = urlsplit(base).hostname or website
-    for problem in problems[1:]:
-        logger.info("Logo for %s: %s", host, problem)
+    # The company by number, not its host (#797): the log is staff's and a host is what a
+    # person is looking at.
+    logger.info("Logo for company %s: %d candidate(s) refused", company.pk, len(problems))
     raise UnusableLogo(
         str(_("Nothing on %(host)s could be used as a logo: %(reason)s"))
         % {"host": host, "reason": problems[0] if problems else ""}
