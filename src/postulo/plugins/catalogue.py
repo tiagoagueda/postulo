@@ -76,6 +76,9 @@ class Listing:
     repository: str = ""
     releases: tuple[Release, ...] = ()
     catalogue: str = ""
+    #: Slugs a plugin is filed under (#883), shown as badges and filterable. Words come from
+    #: :mod:`postulo.plugins.categories`; a slug it does not know is shown as it is.
+    categories: tuple[str, ...] = ()
 
     @property
     def latest(self) -> Release | None:
@@ -223,6 +226,9 @@ def parse(payload: bytes, *, catalogue: str = "") -> list[Listing]:
                 repository=str(entry.get("repository", "")),
                 releases=tuple(releases),
                 catalogue=catalogue,
+                categories=tuple(str(item) for item in entry.get("categories", []))
+                if isinstance(entry.get("categories", []), list)
+                else (),
             )
         )
     return listings

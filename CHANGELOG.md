@@ -151,6 +151,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Server settings -> Plugins draws an installed package that registers several plugins as a parent row whose switch is its sub-plugins' master, and catalogue listings carry categories shown as badges and filterable (#883)
 - Server settings -> Plugins draws a Settings button under the switch of every plugin or module that names a settings page in its manifest, hidden when it has none and shown disabled, with the reason as its tooltip, to someone who may not change them (#885)
 - A new module, Extend file formats, holds PDF (always on and impossible to switch off), DOCX, ODT, iCalendar, vCard and Europass; a format that is off is not offered in menus or buttons and its download, import and feed answer 404 until it is on again, and the text of a Word or OpenDocument file you upload is kept so that a search finds it (files uploaded from now on) (#877)
 - A plugin or catalogue release can name the plugins and modules it needs; one whose need is missing or off is off with the reason beside it, an install that lacks one is refused naming it and offering it from the same catalogue, and a plugin others need cannot be removed (#884)

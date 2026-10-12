@@ -81,7 +81,7 @@
              The label names what is switched and the switch says whether it is (#311). {% endcomment %}
           <div class="flex w-full shrink-0 flex-col gap-2 sm:w-64" data-controls="{{ row.name }}">
             <label class="tap-target inline-flex items-center gap-3">
-              <input type="checkbox" role="switch" class="input" name="on:{{ row.name }}"
+              <input type="checkbox" role="switch" class="input" name="{% if row.package %}pkg-on{% else %}on{% endif %}:{{ row.name }}"
                      {% if row.on %}checked{% endif %}
                      {% if row.parent %}data-follows="{{ row.parent }}"{% endif %}
                      {% if row.held %}disabled aria-describedby="why-{{ row.name }}"
@@ -96,13 +96,15 @@
                   {{ row.held_because }}
                 </p>
               {% else %}
-                <input type="hidden" name="row:{{ row.name }}" value="1">
+                <input type="hidden" name="{% if row.package %}pkg-row{% else %}row{% endif %}:{{ row.name }}" value="1">
               {% endif %}
+              {% if not row.package %}
               <label class="tap-target inline-flex items-center gap-3">
                 <input type="checkbox" class="input" name="free:{{ row.name }}" {% if row.free %}checked{% endif %}
                        {% if row.held_by_parent %}disabled{% endif %}>
                 <span class="text-sm">{% translate "Each person may change it" %}<span class="sr-only">: {{ row.label }}</span></span>
               </label>
+              {% endif %}
               {% if row.hidden %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" data-hidden="{{ row.name }}">
                   {% translate "Not offered at all, and kept that way while it stays off." %}
@@ -435,12 +437,23 @@
           <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Check for updates" %}</button>
         </form>
       </div>
+      {% if listing_categories %}
+        <nav class="flex flex-wrap items-center gap-2 border-b border-ink-100 px-4 py-2 dark:border-ink-800" aria-label="{% translate 'Categories' %}" data-listing-categories>
+          <a href="{% url 'server:plugins' %}" class="badge" data-tone="grey" {% if not listing_category %}aria-current="true"{% endif %}>{% translate "All" %}</a>
+          {% for category in listing_categories %}
+            <a href="?category={{ category.slug }}" class="badge" data-tone="grey" data-category="{{ category.slug }}" {% if category.chosen %}aria-current="true"{% endif %}>{{ category.label }}</a>
+          {% endfor %}
+        </nav>
+      {% endif %}
       {% if listings %}
         <ul>
           {% for listing in listings %}
             <li class="flex flex-wrap items-start gap-3 px-4 py-3">
               <div class="min-w-0 flex-1">
-                <p class="font-medium">{{ listing.name }} {{ listing.version }}</p>
+                <p class="font-medium">
+                  {{ listing.name }} {{ listing.version }}
+                  {% for category in listing.category_labels %}<span class="ms-1 badge" data-tone="grey" data-category="{{ category.slug }}">{{ category.label }}</span>{% endfor %}
+                </p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">
                   {{ listing.summary }}
                   {% if listing.licence %} · {{ listing.licence }}{% endif %}

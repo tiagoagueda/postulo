@@ -1068,7 +1068,30 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["identifier_schemes_form"] = IdentifierSchemesForm.showing(site.current()).focused()
 
         context["pending"] = self.request.session.get("plugin_pending")
-        context["listings"] = self.request.session.get("plugin_listings", [])
+        from postulo.plugins import categories
+
+        listings = self.request.session.get("plugin_listings", [])
+        # Filterable by category (#883): the chips are every slug the listings carry, and the
+        # one asked for narrows the list.
+        slugs = sorted({slug for item in listings for slug in item.get("categories", [])})
+        chosen = self.request.GET.get("category", "")
+        context["listing_categories"] = [
+            {"slug": slug, "label": categories.label_for(slug), "chosen": slug == chosen}
+            for slug in slugs
+        ]
+        context["listing_category"] = chosen if chosen in slugs else ""
+        context["listings"] = [
+            {
+                **item,
+                "category_labels": [
+                    {"slug": slug, "label": categories.label_for(slug)}
+                    for slug in item.get("categories", [])
+                ],
+            }
+            for item in listings
+            if not context["listing_category"]
+            or context["listing_category"] in item.get("categories", [])
+        ]
         return context
 
 
@@ -1269,6 +1292,8 @@ def _policy_rows(person=None, user=None) -> list[dict]:
                 "decided_at": row.decided_at if row else None,
             }
         )
+    if person is None:
+        rows = _packaged(rows, user)
     rows = _nested(rows)
     for row in rows:
         # A plugin whose requirement is missing or off is held the way a child is: off, with
@@ -1302,6 +1327,62 @@ def _policy_rows(person=None, user=None) -> list[dict]:
             }
         )
     return rows
+
+
+def _packaged(rows: list[dict], user=None) -> list[dict]:
+    """Group what one installed package registers under a row for the package (#883).
+
+    A package is the plugin (level 0) and its entry points are its sub-plugins (level 1): the
+    shape that already exists, drawn as such. The package's switch is the one the installed list
+    below has, so switching it off stops it loading, which is what takes its sub-plugins away.
+    A package with one entry point is one row and not a parent with a single child.
+    """
+    from postulo.plugins import base, dependencies, kinds
+    from postulo.plugins.record import read_record
+
+    added: list[dict] = []
+    for entry in read_record():
+        if entry.disabled or len(entry.entry_points) < 2:
+            continue
+        inside = dependencies.provided_by(entry.name)
+        mine = [row for row in rows if row["name"] in inside and not row["parent"]]
+        if len(mine) < 2:
+            continue
+        for row in mine:
+            row["parent"] = entry.name
+        added.append(
+            {
+                "name": entry.name,
+                "label": entry.name,
+                "description": entry.summary,
+                "kind": "package",
+                "kind_label": _("Package"),
+                "kind_tone": kinds.tone_for("package"),
+                "manifest": base.Manifest(
+                    name=entry.name,
+                    version=entry.version,
+                    author=entry.author,
+                    licence=entry.licence,
+                    source_url=entry.source_url,
+                ),
+                "plugin": None,
+                "state": None,
+                "on": True,
+                "free": False,
+                "hidden": False,
+                "parent": "",
+                "categories": [],
+                "settings_url": "",
+                "settings_allowed": False,
+                "held": False,
+                "why": "",
+                "decided_by": None,
+                "decided_at": None,
+                "follows_default": False,
+                "package": True,
+            }
+        )
+    return [*added, *rows]
 
 
 def _nested(rows: list[dict]) -> list[dict]:
@@ -1359,6 +1440,28 @@ def _settings_url(plugin) -> str:
         return ""
 
 
+def _save_packages(request: HttpRequest) -> int:
+    """A package's switch, drawn above its sub-plugins (#883): the same as the installed list's."""
+    from postulo.plugins.installing import InstallError, installed, set_disabled
+
+    changed = 0
+    for key, value in request.POST.items():
+        if not key.startswith("pkg-row:") or value != "1":
+            continue
+        name = key.removeprefix("pkg-row:")
+        entry = installed(name)
+        wanted_on = f"pkg-on:{name}" in request.POST
+        if entry is None or entry.disabled != wanted_on:
+            continue
+        try:
+            set_disabled(name, not wanted_on)
+        except InstallError as error:
+            messages.error(request, str(error))
+            continue
+        changed += 1
+    return changed
+
+
 def _save_policies(request: HttpRequest, person=None) -> int:
     """Write what was submitted, keeping only the decisions that are not the default.
 
@@ -1377,6 +1480,8 @@ def _save_policies(request: HttpRequest, person=None) -> int:
         else {}
     )
     changed = 0
+    if person is None:
+        changed += _save_packages(request)
     for plugin in _governed_plugins():
         # A checkbox that is not ticked submits nothing, so "off" and "not on the page"
         # look the same in the POST. The marker each row carries is what tells them apart:
@@ -1766,6 +1871,7 @@ class PluginActionView(StaffRequiredMixin, View):
                         "installed": installing.installed(listing.name) is not None,
                         "requires_postulo": release.requires_postulo,
                         "compatible": installing.compatible(release.requires_postulo),
+                        "categories": list(listing.categories),
                         "needs": needs,
                     }
                 )
