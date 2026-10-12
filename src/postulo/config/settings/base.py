@@ -484,6 +484,8 @@ POSTULO_CAPTURE_RATE = env("POSTULO_CAPTURE_RATE", default="30/h")
 POSTULO_FETCH_RATE = env("POSTULO_FETCH_RATE", default="300/h")
 # Per token rather than per account, so revoking one revokes its allowance with it.
 POSTULO_API_RATE = env("POSTULO_API_RATE", default="600/h")
+# What every token of one account may do together (#799), since tokens are free to make.
+POSTULO_API_ACCOUNT_RATE = env("POSTULO_API_ACCOUNT_RATE", default="3000/h")
 # Mail somebody sends as themselves (#149). Per account, and low: this is the one surface
 # where a mistake reaches strangers rather than the person who made it, and a job search is
 # a few messages a day rather than a mailing list.

@@ -195,6 +195,9 @@ def fetch(user) -> None:
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))
+    # And one allowance for the account behind its tokens (#799): token issuance is not
+    # bounded, so a per-token allowance alone is one an account can multiply at will.
+    consume("api-account", token.owner, rate_for("POSTULO_API_ACCOUNT_RATE"))
 
 
 #: How many wrong tokens one address may present to `/logs` or `/metrics` in an hour. A
@@ -206,17 +209,24 @@ def _caller(request) -> str:
     return request.META.get("REMOTE_ADDR") or "unknown"
 
 
-def barred(name: str, request) -> None:
+#: How many wrong API tokens one address may present in an hour (#799). Looser than `REFUSED`:
+#: a client left holding a revoked token retries without anybody noticing, and must not bar
+#: everybody who shares its address for long.
+API_REFUSED = Rate(60, 3600)
+
+
+def barred(name: str, request, rate: Rate | None = None) -> None:
     """Raise :class:`TooOften` for an address that has spent its wrong-token allowance.
 
     Asked before the token is read, so that an address which has been guessing is refused
     whatever it presents for the rest of the window, a lucky guess included.
     """
-    used = _store().get(_key(f"endpoint-refused:{name}", _caller(request), REFUSED), 0)
-    if used > REFUSED.times:
+    rate = rate or REFUSED
+    used = _store().get(_key(f"endpoint-refused:{name}", _caller(request), rate), 0)
+    if used > rate.times:
         _say_the_proxy_is_not_trusted(request)
-        elapsed = int(_now()) % REFUSED.seconds
-        raise TooOften(REFUSED, retry_after=max(1, REFUSED.seconds - elapsed))
+        elapsed = int(_now()) % rate.seconds
+        raise TooOften(rate, retry_after=max(1, rate.seconds - elapsed))
 
 
 def _say_the_proxy_is_not_trusted(request) -> None:
@@ -243,9 +253,9 @@ def _say_the_proxy_is_not_trusted(request) -> None:
         )
 
 
-def refused(name: str, request) -> None:
+def refused(name: str, request, rate: Rate | None = None) -> None:
     """Count a wrong token against the address that presented it, or raise."""
-    consume(f"endpoint-refused:{name}", _caller(request), REFUSED)
+    consume(f"endpoint-refused:{name}", _caller(request), rate or REFUSED)
 
 
 def endpoint(name: str, request) -> None:

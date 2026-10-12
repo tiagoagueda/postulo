@@ -39,6 +39,25 @@ def _within_its_allowance(record: ApiToken) -> None:
         ) from None
 
 
+def _barred(request) -> None:
+    """Refuse an address that has presented too many wrong tokens, before reading one (#799)."""
+    try:
+        throttle.barred("api", request, throttle.API_REFUSED)
+    except throttle.TooOften as too_often:
+        raise problems.Refused(
+            429, str(too_often), kind="rate-limited", retry_after=too_often.retry_after
+        ) from None
+
+
+def _wrong_token(request) -> None:
+    """Count a token that matched nothing against the address that presented it (#799)."""
+    try:
+        throttle.refused("api", request, throttle.API_REFUSED)
+    except throttle.TooOften:
+        # The next call is refused by `_barred`; this one is still the 401 it always was.
+        pass
+
+
 def lookup(raw: str) -> ApiToken | None:
     if not raw:
         return None
@@ -75,8 +94,10 @@ class TokenAuth(HttpBearer):
     """Any active token. Used only where knowing the token is the point, such as /me."""
 
     def authenticate(self, request, token: str):
+        _barred(request)
         record = lookup(token)
         if record is None:
+            _wrong_token(request)
             return None
         _in_their_own_words(request, record)
         _within_its_allowance(record)
@@ -100,10 +121,15 @@ class ScopedAuth(HttpBearer):
         self.scopes = (scope, *others)
 
     def authenticate(self, request, token: str):
+        _barred(request)
         record = lookup(token)
         if record is None:
+            _wrong_token(request)
             return None
         _in_their_own_words(request, record)
+        # The allowance first (#799): a token without the scope spends it like any other call, so
+        # it cannot probe for the endpoints it lacks at no cost.
+        _within_its_allowance(record)
         if not any(record.has_scope(name) for name in self.scopes):
             # Typed, with the scope beside it: a client refused here has something to do
             # about it -- ask for a token carrying that scope -- and should not have to
@@ -128,7 +154,6 @@ class ScopedAuth(HttpBearer):
                 scope=self.scope,
                 scopes=list(self.scopes),
             )
-        _within_its_allowance(record)
         record.record_use()
         return record
 
