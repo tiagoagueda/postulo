@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The avatar, logo and plugin tiles escape the picture address, the classes and the initials they are given, instead of trusting the caller (#805)
 - The messages partial treats a message as HTML only when one of its tags is exactly safe, not when those letters appear inside another tag (#804)
 - captures/known answers the similar-by-title matches only to a token that may read, so a captures-only token cannot probe for a listing it did not make (#803)
 - Listing remote type, employment type and salary period must be one of the model's choices and a contact's email must be an address, each a 422 otherwise; a refused capture correction no longer repeats the value that was sent (#802)

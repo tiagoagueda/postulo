@@ -306,19 +306,28 @@ def _tile(
     classes = css_class.split()
     box = " ".join(c for c in classes if not c.startswith("text-"))
     text = " ".join(c for c in classes if c.startswith("text-"))
+    # `format_html` escapes every part, so a picture address from a caller that did not make
+    # it safe cannot close the attribute (#805).
     if picture:
-        return mark_safe(  # noqa: S308
-            f'<span class="avatar {escape(box)} {shape}"><img src="{picture}" alt=""></span>'
+        return format_html(
+            '<span class="avatar {} {}"><img src="{}" alt=""></span>', box, shape, picture
         )
     if glyph:
-        drawn = icon(glyph, **{"class": "size-[55%]"})
-        return mark_safe(  # noqa: S308
-            f'<span class="avatar {escape(box)} {colour} {shape} text-white" '
-            f'aria-hidden="true">{drawn}</span>'
+        return format_html(
+            '<span class="avatar {} {} {} text-white" aria-hidden="true">{}</span>',
+            box,
+            colour,
+            shape,
+            icon(glyph, **{"class": "size-[55%]"}),
         )
-    return mark_safe(  # noqa: S308
-        f'<span class="avatar {escape(box)} {colour} {shape} font-semibold text-white" '
-        f'aria-hidden="true"><span class="{escape(text)}">{escape(letters)}</span></span>'
+    return format_html(
+        '<span class="avatar {} {} {} font-semibold text-white" aria-hidden="true">'
+        '<span class="{}">{}</span></span>',
+        box,
+        colour,
+        shape,
+        text,
+        letters,
     )
 
 
