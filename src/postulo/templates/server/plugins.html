@@ -48,15 +48,15 @@
     {% csrf_token %}
     <ul>
       {% for row in policy_rows %}
-        <li class="flex flex-wrap items-start gap-4 px-4 py-3" data-policy="{{ row.name }}">
+        <li class="flex flex-wrap items-start gap-4 px-4 py-3{% if row.child %} ps-10 sm:ps-14{% endif %}" data-policy="{{ row.name }}"
+            {% if row.parent %}data-parent="{{ row.parent }}"{% endif %}{% if row.has_children %} data-has-children{% endif %}>
           {% comment %} Served by this instance, never by whoever wrote the plugin: an
              image at their server would tell them which instances run their code, how
              many people use it and when (#106). {% endcomment %}
           {% plugin_logo row.plugin "size-8 text-xs" %}
           <div class="min-w-0 flex-1">
             <p class="font-medium">
-              {{ row.label }}
-              <span class="ms-1 badge" data-tone="grey">{{ row.kind }}</span>
+              {% include "partials/plugin_title.html" %}
             </p>
             {% if row.description %}<p class="text-xs text-ink-500 dark:text-ink-400">{{ row.description }}</p>{% endif %}
             {% comment %} Who wrote it, under what licence, and where the code is. Every
@@ -83,7 +83,9 @@
             <label class="tap-target inline-flex items-center gap-3">
               <input type="checkbox" role="switch" class="input" name="on:{{ row.name }}"
                      {% if row.on %}checked{% endif %}
-                     {% if row.held %}disabled aria-describedby="why-{{ row.name }}"{% endif %}>
+                     {% if row.parent %}data-follows="{{ row.parent }}"{% endif %}
+                     {% if row.held %}disabled aria-describedby="why-{{ row.name }}"
+                     {% elif row.held_by_parent %}disabled aria-describedby="parent-{{ row.name }}"{% endif %}>
               <span class="text-sm">{% translate "Enabled" %}<span class="sr-only">: {{ row.label }}</span></span>
             </label>
             {% if row.held %}
@@ -97,9 +99,16 @@
                    data-opens-dialog="settings-{{ row.name }}">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></a>
               {% endif %}
             {% else %}
-              <input type="hidden" name="row:{{ row.name }}" value="1">
+              {% if row.held_by_parent %}
+                <p class="text-xs text-ink-500 dark:text-ink-400" id="parent-{{ row.name }}" data-held-by-parent="{{ row.name }}">
+                  {% translate "Off while the module above it is off." %}
+                </p>
+              {% else %}
+                <input type="hidden" name="row:{{ row.name }}" value="1">
+              {% endif %}
               <label class="tap-target inline-flex items-center gap-3">
-                <input type="checkbox" class="input" name="free:{{ row.name }}" {% if row.free %}checked{% endif %}>
+                <input type="checkbox" class="input" name="free:{{ row.name }}" {% if row.free %}checked{% endif %}
+                       {% if row.held_by_parent %}disabled{% endif %}>
                 <span class="text-sm">{% translate "Each person may change it" %}<span class="sr-only">: {{ row.label }}</span></span>
               </label>
               {% if row.hidden %}

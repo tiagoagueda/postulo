@@ -1216,7 +1216,7 @@ def _policy_rows(person=None) -> list[dict]:
     plugins list above does, and a hidden-for-one-person exception was the four-way menu's
     least used answer. A row that is nobody's to decide is `held`, with the reason.
     """
-    from postulo.plugins import base, policy
+    from postulo.plugins import base, categories, kinds, policy
     from postulo.plugins.models import PluginPolicy
 
     stored = {row.plugin: row for row in PluginPolicy.objects.filter(person=person)}
@@ -1240,6 +1240,8 @@ def _policy_rows(person=None) -> list[dict]:
                 "label": manifest.label,
                 "description": manifest.description,
                 "kind": manifest.kind or "source",
+                "kind_label": kinds.label_for(manifest.kind or "source"),
+                "kind_tone": kinds.tone_for(manifest.kind or "source"),
                 "manifest": manifest,
                 # The instance itself, so the template can ask for a logo rather than
                 # being handed one it has no way to fall back from (#106).
@@ -1250,12 +1252,18 @@ def _policy_rows(person=None) -> list[dict]:
                 "hidden": state == PluginPolicy.State.UNAVAILABLE,
                 # Drawn from the instance's decision, not the person's own, and said so.
                 "follows_default": bool(person) and own is None and row is not None,
+                "parent": manifest.parent,
+                "categories": [
+                    {"slug": slug, "label": categories.label_for(slug)}
+                    for slug in manifest.categories
+                ],
                 "held": False,
                 "why": "",
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,
             }
         )
+    rows = _nested(rows)
     for plugin in _ungoverned_plugins():
         manifest = base.manifest_of(plugin)
         rows.append(
@@ -1282,6 +1290,44 @@ def _policy_rows(person=None) -> list[dict]:
     return rows
 
 
+def _nested(rows: list[dict]) -> list[dict]:
+    """The governed rows with each module's sub-modules directly under it (#873).
+
+    A child is marked ``child`` and carries ``parent_on``, whether its parent's switch is on
+    as drawn, which is what the page disables its switch by. A child whose parent is not
+    among the rows (a parent that is not installed) is drawn where it was, as an ordinary
+    row: nothing is hidden because of a name nobody can find.
+    """
+    by_name = {row["name"]: row for row in rows}
+    ordered: list[dict] = []
+    placed: set[str] = set()
+    for row in rows:
+        if row["name"] in placed:
+            continue
+        if row["parent"] and row["parent"] in by_name:
+            continue
+        ordered.append(row)
+        placed.add(row["name"])
+        row["child"] = False
+        row["parent_on"] = True
+        for child in rows:
+            if child["parent"] == row["name"]:
+                child["child"] = True
+                child["parent_on"] = row["on"]
+                # Not editable while the parent is off: the form leaves its marker out, so
+                # a switch the browser did not submit is not read as "off" (#873).
+                child["held_by_parent"] = not row["on"]
+                ordered.append(child)
+                placed.add(child["name"])
+                row["has_children"] = True
+    for row in rows:
+        if row["name"] not in placed:
+            row["child"] = False
+            row["parent_on"] = True
+            ordered.append(row)
+    return ordered
+
+
 def _settings_url(plugin) -> str:
     """Where a shipped plugin's own settings are, if it has a page of them here."""
     from django.urls import NoReverseMatch
@@ -1301,6 +1347,7 @@ def _save_policies(request: HttpRequest, person=None) -> int:
     A row per plugin per person would be a table that grows with the product of two things
     that both grow. Absence means available, so the common answer is stored nowhere.
     """
+    from postulo.plugins import policy
     from postulo.plugins.models import PluginPolicy
 
     # What a person with no row of their own gets: the instance's decision. A person's row is
@@ -1330,6 +1377,14 @@ def _save_policies(request: HttpRequest, person=None) -> int:
             wanted = PluginPolicy.State.UNAVAILABLE
         else:
             wanted = PluginPolicy.State.FORCED_OFF
+        if on and existing and existing.state == PluginPolicy.State.FORCED_OFF:
+            # A parent switched back on brings every sub-module with it, forgetting which
+            # were off (#873); each can then be switched off on its own.
+            PluginPolicy.objects.filter(
+                plugin__in=policy.children_of(plugin.name),
+                person=person,
+                state=PluginPolicy.State.FORCED_OFF,
+            ).delete()
         if wanted == instance.get(plugin.name, PluginPolicy.State.AVAILABLE):
             # What they would get anyway: no row of their own.
             if existing:

@@ -1949,6 +1949,10 @@ msgstr ""
 msgid "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr "Farsími, borðlína, skiptiborð — eins mörg og þess virði er að geyma, með eitt merkt sem það sem á að nota. Skjöl prenta það."
 
+#: src/postulo/plugins/provenance.py
+msgid "A module: it ships inside Postulo and cannot be removed."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "A month"
@@ -2443,7 +2447,7 @@ msgstr "Reikningur"
 msgid "Account menu, %(name)s"
 msgstr "Reikningsvalmynd, %(name)s"
 
-#: src/postulo/accounts/apps.py
+#: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
 #, fuzzy
 msgid "Accounts"
 msgstr "Reikningar"
@@ -3926,6 +3930,7 @@ msgid "C2 — proficient"
 msgstr "C2 — fullnusta"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4019,7 +4024,8 @@ msgstr ""
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/jobs/models.py src/postulo/templates/server/capture.html
+#: src/postulo/jobs/models.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/capture.html
 #: src/postulo/templates/settings/capture.html
 #, fuzzy
 msgid "Capture"
@@ -4644,7 +4650,7 @@ msgstr ""
 
 #: src/postulo/core/kind_files.py src/postulo/core/navigation.py
 #: src/postulo/core/search.py src/postulo/jobs/tables.py
-#: src/postulo/templates/core/export.html
+#: src/postulo/plugins/categories.py src/postulo/templates/core/export.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_list.html
@@ -4873,7 +4879,7 @@ msgstr "Tengilið bætt við."
 msgid "Contact block"
 msgstr "Tengiliðareitur"
 
-#: src/postulo/core/kind_files.py
+#: src/postulo/core/kind_files.py src/postulo/plugins/categories.py
 msgid "Contacts"
 msgstr ""
 
@@ -6627,7 +6633,8 @@ msgstr "Vistað undir Send skjöl, dagsett í dag, svo það sem þú afhentir v
 msgid "filename"
 msgstr ""
 
-#: src/postulo/core/search.py src/postulo/templates/cotton/documents_nav.html
+#: src/postulo/core/search.py src/postulo/plugins/categories.py
+#: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -8033,7 +8040,7 @@ msgstr "stofnun"
 msgid "Insurance"
 msgstr "Tryggingar"
 
-#: src/postulo/core/server_views.py src/postulo/plugins/provenance.py
+#: src/postulo/core/server_views.py
 #, fuzzy
 msgid "Internal"
 msgstr "Innri"
@@ -9527,6 +9534,10 @@ msgstr "Færsla vantar"
 msgid "Mobile"
 msgstr "Farsími"
 
+#: src/postulo/plugins/provenance.py
+msgid "Module"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "Monday"
 msgstr ""
@@ -10971,8 +10982,8 @@ msgstr ""
 msgid "notice before a listing closes"
 msgstr ""
 
-#: src/postulo/notifications/apps.py src/postulo/plugins/kinds.py
-#: src/postulo/plugins/views.py
+#: src/postulo/notifications/apps.py src/postulo/plugins/categories.py
+#: src/postulo/plugins/kinds.py src/postulo/plugins/views.py
 #, fuzzy
 msgid "Notifications"
 msgstr "Tilkynningar"
@@ -11003,10 +11014,19 @@ msgstr ""
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
 
+#: src/postulo/templates/server/person_plugins.html
+#: src/postulo/templates/server/plugins.html
+msgid "Off while the module above it is off."
+msgstr ""
+
 #: src/postulo/plugins/models.py
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "Slökkt — og þau mega ekki kveikja á því"
+
+#: src/postulo/plugins/policy.py
+msgid "Off, because the module it belongs to is off."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -11885,7 +11905,8 @@ msgstr ""
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
+#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "People"
@@ -12041,6 +12062,7 @@ msgstr "Staðgenglar"
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Staðgenglar á borð við {{ company }} eru fylltir út við sendingu."
 
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_map.html
 msgid "Places"
 msgstr ""
@@ -14176,11 +14198,6 @@ msgstr ""
 #, fuzzy
 msgid "Shape"
 msgstr "Útlit"
-
-#: src/postulo/plugins/provenance.py
-#, fuzzy
-msgid "Ships inside Postulo. It cannot be removed."
-msgstr "Tilheyrir Postulo. Ekki er hægt að fjarlægja það."
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy

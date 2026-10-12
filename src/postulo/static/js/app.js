@@ -7111,4 +7111,37 @@
     }, 0);
   });
 
+  /* A module's switch is its sub-modules' master (#873). Switching it on switches each of them
+   * on and lets them be moved one by one; switching it off turns them off and takes their
+   * controls away, and a control taken away is not submitted, so the row's marker goes with
+   * it -- the save reads an absent marker as "not drawn", which leaves the stored answer be.
+   * Without a script the page does the same on the next load. */
+  document.addEventListener("change", function (event) {
+    var master = event.target;
+    if (!master.matches || !master.matches('li[data-has-children] input[role="switch"]')) {
+      return;
+    }
+    var name = master.closest("li").getAttribute("data-policy");
+    Array.prototype.forEach.call(
+      document.querySelectorAll('li[data-parent="' + name + '"]'),
+      function (row) {
+        var child = row.getAttribute("data-policy");
+        var marker = row.querySelector('input[name="row:' + child + '"]');
+        if (master.checked && !marker) {
+          marker = document.createElement("input");
+          marker.type = "hidden";
+          marker.name = "row:" + child;
+          marker.value = "1";
+          row.querySelector("[data-controls]").appendChild(marker);
+        }
+        Array.prototype.forEach.call(row.querySelectorAll("[data-controls] input"), function (input) {
+          if (input.type === "checkbox" && input.getAttribute("role") === "switch") {
+            input.checked = master.checked;
+          }
+          input.disabled = !master.checked;
+        });
+      }
+    );
+  });
+
 })();

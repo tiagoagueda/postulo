@@ -1,0 +1,10 @@
+{% load i18n %}
+{% comment %} A governed plugin's name on a page of switches: the label, the kind it is and
+   the categories it carries (#873). Takes `row`, as `_policy_rows` builds it. The kind is
+   the translated word in its colour, as `plugin_tags.html` draws it elsewhere; a category is
+   a plain grey label, because it groups and does not classify. {% endcomment %}
+{{ row.label }}
+<span class="ms-1 badge" data-tone="{{ row.kind_tone }}">{{ row.kind_label }}</span>
+{% for category in row.categories %}
+  <span class="ms-1 badge" data-tone="grey" data-category="{{ category.slug }}">{{ category.label }}</span>
+{% endfor %}

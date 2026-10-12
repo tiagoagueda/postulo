@@ -2007,6 +2007,10 @@ msgstr ""
 msgid "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr "Mobiil, lauatelefon, kesknumber — nii palju, kui tasub hoida, üks neist märgitud kasutatavaks. Dokumendid trükivad selle."
 
+#: src/postulo/plugins/provenance.py
+msgid "A module: it ships inside Postulo and cannot be removed."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "A month"
@@ -2537,7 +2541,7 @@ msgstr "Konto"
 msgid "Account menu, %(name)s"
 msgstr "Kontomenüü, %(name)s"
 
-#: src/postulo/accounts/apps.py
+#: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
 #, fuzzy
 msgid "Accounts"
 msgstr "Kontod"
@@ -4107,6 +4111,7 @@ msgid "C2 — proficient"
 msgstr "C2 — vilunud"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4203,7 +4208,8 @@ msgstr "ei saa sellel masinal kontrollida"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/jobs/models.py src/postulo/templates/server/capture.html
+#: src/postulo/jobs/models.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/capture.html
 #: src/postulo/templates/settings/capture.html
 #, fuzzy
 msgid "Capture"
@@ -4866,7 +4872,7 @@ msgstr "Kompaktne"
 
 #: src/postulo/core/kind_files.py src/postulo/core/navigation.py
 #: src/postulo/core/search.py src/postulo/jobs/tables.py
-#: src/postulo/templates/core/export.html
+#: src/postulo/plugins/categories.py src/postulo/templates/core/export.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_list.html
@@ -5100,7 +5106,7 @@ msgstr "Kontakt lisatud."
 msgid "Contact block"
 msgstr "Kontaktplokk"
 
-#: src/postulo/core/kind_files.py
+#: src/postulo/core/kind_files.py src/postulo/plugins/categories.py
 msgid "Contacts"
 msgstr ""
 
@@ -6945,7 +6951,8 @@ msgstr "Salvestatud jaotisse Saadetud dokumendid tänase kuupäevaga, nii et see
 msgid "filename"
 msgstr "failinimi"
 
-#: src/postulo/core/search.py src/postulo/templates/cotton/documents_nav.html
+#: src/postulo/core/search.py src/postulo/plugins/categories.py
+#: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -8400,7 +8407,7 @@ msgstr "õppeasutus"
 msgid "Insurance"
 msgstr "Kindlustus"
 
-#: src/postulo/core/server_views.py src/postulo/plugins/provenance.py
+#: src/postulo/core/server_views.py
 #, fuzzy
 msgid "Internal"
 msgstr "Sisemine"
@@ -9973,6 +9980,10 @@ msgstr "Puuduv kirje"
 msgid "Mobile"
 msgstr "Mobiil"
 
+#: src/postulo/plugins/provenance.py
+msgid "Module"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "Monday"
 msgstr ""
@@ -11487,8 +11498,8 @@ msgstr ""
 msgid "notice before a listing closes"
 msgstr "teade enne kuulutuse sulgumist"
 
-#: src/postulo/notifications/apps.py src/postulo/plugins/kinds.py
-#: src/postulo/plugins/views.py
+#: src/postulo/notifications/apps.py src/postulo/plugins/categories.py
+#: src/postulo/plugins/kinds.py src/postulo/plugins/views.py
 #, fuzzy
 msgid "Notifications"
 msgstr "Teavitused"
@@ -11519,10 +11530,19 @@ msgstr ""
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
 
+#: src/postulo/templates/server/person_plugins.html
+#: src/postulo/templates/server/plugins.html
+msgid "Off while the module above it is off."
+msgstr ""
+
 #: src/postulo/plugins/models.py
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "Väljas — ja nad ei tohi seda sisse lülitada"
+
+#: src/postulo/plugins/policy.py
+msgid "Off, because the module it belongs to is off."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -12458,7 +12478,8 @@ msgstr "Pension, kindlustus, toetused, varustus: mis iganes oli nimetatud."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
+#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "People"
@@ -12618,6 +12639,7 @@ msgstr "Kohatäited"
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Kohatäited nagu {{ company }} täidetakse saatmisel."
 
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "Places"
@@ -14845,11 +14867,6 @@ msgstr "Seitse värvi, igaüks häälestatud 3:1 kaardi suhtes mõlemas teemas."
 #, fuzzy
 msgid "Shape"
 msgstr "Kuju"
-
-#: src/postulo/plugins/provenance.py
-#, fuzzy
-msgid "Ships inside Postulo. It cannot be removed."
-msgstr "Kuulub Postulo koosseisu. Seda ei saa eemaldada."
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy

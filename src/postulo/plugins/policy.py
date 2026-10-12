@@ -29,6 +29,13 @@ documents somewhere". Sources and features are the exception: they need nothing 
 anybody, so forcing one on genuinely turns it on. The interface has to say which of those
 it means, and :func:`decide` returns enough for it to.
 
+**A sub-module follows its parent** (#873). A module may have sub-modules, each with exactly one
+parent, and what the parent decides reaches them first: a child of a parent that is off is
+off, and its switch is not the person's or the administrator's to move until the parent is
+on again. Switching a parent *on* clears its children's *off* rows, as the page does, so they
+all come on together and can then be switched one by one. A parent is an ordinary row with
+no behaviour of its own, so nothing here knows what it governs; it is only asked.
+
 **Switching a feature off does not delete what it governs.** It stops Postulo offering and
 using that part of itself; the rows stay, and switching it back on finds them unchanged.
 That is the same promise every other kind here makes, and it is not weaker for the kind
@@ -111,6 +118,7 @@ class Decision:
             "person": _("You chose this."),
             "default": _("Available; you have not changed it."),
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
+            "parent": _("Off, because the module it belongs to is off."),
         }[self.decided_by]
 
 
@@ -142,6 +150,33 @@ def is_ungoverned(plugin_name: str) -> bool:
     )
 
 
+def parent_of(plugin_name: str) -> str:
+    """The module this plugin is a sub-module of, or nothing (#873).
+
+    Read off the manifest of whatever is registered under the name. A name nothing is
+    registered under has no parent, which is what a policy row left behind by a plugin since
+    removed should mean.
+    """
+    from . import base
+    from .registry import find_any
+
+    plugin = find_any(plugin_name)
+    return base.manifest_of(plugin).parent if plugin is not None else ""
+
+
+def children_of(plugin_name: str) -> list[str]:
+    """The names of the sub-modules of a module, in the order the registry lists them."""
+    from . import base
+    from .registry import plugins
+
+    return [
+        item.name
+        for kind in GOVERNED_KINDS
+        for item in plugins(kind)
+        if base.manifest_of(item).parent == plugin_name
+    ]
+
+
 def _answers() -> dict:
     """This request's answers, in `memo.decisions` (#231)."""
     from .installing import record_stamp
@@ -170,6 +205,12 @@ def _decide(plugin_name: str, person) -> Decision:
     # `set_choice` with a transport's name and switching the mail off for somebody.
     if is_ungoverned(plugin_name):
         return Decision(on=True, offered=False, theirs=False, decided_by="infrastructure")
+
+    parent = parent_of(plugin_name)
+    if parent:
+        above = decide(parent, person)
+        if not above.on:
+            return Decision(on=False, offered=above.offered, theirs=False, decided_by="parent")
 
     rows = {
         row.person_id: row

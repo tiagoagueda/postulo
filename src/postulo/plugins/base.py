@@ -173,6 +173,11 @@ class Manifest:
     ``logo`` names an image file inside this plugin's package, which Postulo serves beside
     its name: a sanitised SVG or a re-encoded PNG (#106, #264). It is a file name, never a
     path or an address, and a plugin without one shows the initials tile.
+
+    ``parent`` names the module this one is a sub-module of (#873), and ``categories`` are
+    display labels, a tuple of slugs from :mod:`postulo.plugins.categories`. A kind is what
+    the registry loads by and stays; a category only groups what the page draws. A parent
+    has no parent of its own: the hierarchy is two levels, and a test holds it to that.
     """
 
     name: str
@@ -184,10 +189,17 @@ class Manifest:
     licence: str = ""
     source_url: str = ""
     logo: str = ""
+    parent: str = ""
+    categories: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.name:
             raise ValueError("A manifest needs a name: it is what the registry keys on.")
+        if self.parent == self.name:
+            raise ValueError("A plugin cannot be its own parent.")
+        if isinstance(self.categories, str):
+            raise TypeError("categories is a tuple of slugs, not one string.")
+        object.__setattr__(self, "categories", tuple(self.categories))
         # A plugin that gave no name in words gets its identifier, rather than a blank
         # where a heading should be.
         if not self.label:
@@ -297,7 +309,16 @@ SHIPPED_LICENCE = "AGPL-3.0-or-later"
 SHIPPED_SOURCE_URL = "https://source.tiagoagueda.com/postulo/postulo"
 
 
-def shipped(*, name: str, label: str, kind: str, description, logo: str = "") -> Manifest:
+def shipped(
+    *,
+    name: str,
+    label: str,
+    kind: str,
+    description,
+    logo: str = "",
+    parent: str = "",
+    categories: tuple[str, ...] = (),
+) -> Manifest:
     """A manifest for a plugin that ships inside Postulo.
 
     The version is Postulo's own, because that is the truth: these ship with the application
@@ -320,6 +341,8 @@ def shipped(*, name: str, label: str, kind: str, description, logo: str = "") ->
         licence=SHIPPED_LICENCE,
         source_url=SHIPPED_SOURCE_URL,
         logo=logo,
+        parent=parent,
+        categories=categories,
     )
 
 

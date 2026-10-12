@@ -2131,6 +2131,10 @@ msgstr ""
 msgid "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr "Ffôn symudol, llinell ddesg, switsfwrdd — cynifer ag sy'n werth eu cadw, gydag un wedi'i nodi fel yr un i'w ddefnyddio. Dyna'r un y mae dogfennau'n ei argraffu."
 
+#: src/postulo/plugins/provenance.py
+msgid "A module: it ships inside Postulo and cannot be removed."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "A month"
@@ -2629,7 +2633,7 @@ msgstr "Cyfrif"
 msgid "Account menu, %(name)s"
 msgstr "Dewislen y cyfrif, %(name)s"
 
-#: src/postulo/accounts/apps.py
+#: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
 #, fuzzy
 msgid "Accounts"
 msgstr "Cyfrifon"
@@ -4126,6 +4130,7 @@ msgid "C2 — proficient"
 msgstr "C2 — meistrolaeth"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4219,7 +4224,8 @@ msgstr ""
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/jobs/models.py src/postulo/templates/server/capture.html
+#: src/postulo/jobs/models.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/capture.html
 #: src/postulo/templates/settings/capture.html
 #, fuzzy
 msgid "Capture"
@@ -4846,7 +4852,7 @@ msgstr ""
 
 #: src/postulo/core/kind_files.py src/postulo/core/navigation.py
 #: src/postulo/core/search.py src/postulo/jobs/tables.py
-#: src/postulo/templates/core/export.html
+#: src/postulo/plugins/categories.py src/postulo/templates/core/export.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_list.html
@@ -5075,7 +5081,7 @@ msgstr "Ychwanegwyd y cyswllt."
 msgid "Contact block"
 msgstr "Bloc cyswllt"
 
-#: src/postulo/core/kind_files.py
+#: src/postulo/core/kind_files.py src/postulo/plugins/categories.py
 msgid "Contacts"
 msgstr ""
 
@@ -6831,7 +6837,8 @@ msgstr "Wedi'i ffeilio dan Dogfennau a anfonwyd, gyda dyddiad heddiw, fel bod yr
 msgid "filename"
 msgstr ""
 
-#: src/postulo/core/search.py src/postulo/templates/cotton/documents_nav.html
+#: src/postulo/core/search.py src/postulo/plugins/categories.py
+#: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -8241,7 +8248,7 @@ msgstr "sefydliad"
 msgid "Insurance"
 msgstr "Yswiriant"
 
-#: src/postulo/core/server_views.py src/postulo/plugins/provenance.py
+#: src/postulo/core/server_views.py
 #, fuzzy
 msgid "Internal"
 msgstr "Mewnol"
@@ -9739,6 +9746,10 @@ msgstr "Cofnod ar goll"
 msgid "Mobile"
 msgstr "Symudol"
 
+#: src/postulo/plugins/provenance.py
+msgid "Module"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "Monday"
 msgstr ""
@@ -11187,8 +11198,8 @@ msgstr ""
 msgid "notice before a listing closes"
 msgstr ""
 
-#: src/postulo/notifications/apps.py src/postulo/plugins/kinds.py
-#: src/postulo/plugins/views.py
+#: src/postulo/notifications/apps.py src/postulo/plugins/categories.py
+#: src/postulo/plugins/kinds.py src/postulo/plugins/views.py
 #, fuzzy
 msgid "Notifications"
 msgstr "Hysbysiadau"
@@ -11219,10 +11230,19 @@ msgstr ""
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
 
+#: src/postulo/templates/server/person_plugins.html
+#: src/postulo/templates/server/plugins.html
+msgid "Off while the module above it is off."
+msgstr ""
+
 #: src/postulo/plugins/models.py
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "I ffwrdd — ac ni chânt ei droi ymlaen"
+
+#: src/postulo/plugins/policy.py
+msgid "Off, because the module it belongs to is off."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -12139,7 +12159,8 @@ msgstr ""
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
+#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "People"
@@ -12295,6 +12316,7 @@ msgstr "Deiliaid lle"
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Caiff deiliaid lle fel {{ company }} eu llenwi wrth anfon."
 
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_map.html
 msgid "Places"
 msgstr ""
@@ -14438,11 +14460,6 @@ msgstr ""
 #, fuzzy
 msgid "Shape"
 msgstr "Siâp"
-
-#: src/postulo/plugins/provenance.py
-#, fuzzy
-msgid "Ships inside Postulo. It cannot be removed."
-msgstr "Rhan o Postulo. Ni ellir ei dynnu."
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy

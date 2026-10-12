@@ -2042,6 +2042,10 @@ msgstr "um miniautocarro com reboque"
 msgid "A mobile, a desk line, a switchboard — as many as are worth keeping, with one of them marked as the one to use. Documents print that one."
 msgstr "Um telemóvel, uma linha fixa, uma central — tantos quantos valha a pena guardar, com um assinalado como aquele a usar. Os documentos imprimem esse."
 
+#: src/postulo/plugins/provenance.py
+msgid "A module: it ships inside Postulo and cannot be removed."
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "A month"
@@ -2589,7 +2593,7 @@ msgstr "Conta"
 msgid "Account menu, %(name)s"
 msgstr "Menu da conta, %(name)s"
 
-#: src/postulo/accounts/apps.py
+#: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
 #, fuzzy
 msgid "Accounts"
 msgstr "Contas"
@@ -4181,6 +4185,7 @@ msgid "C2 — proficient"
 msgstr "C2 — proficiente"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -4278,7 +4283,8 @@ msgstr "não é possível verificar nesta máquina"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/jobs/models.py src/postulo/templates/server/capture.html
+#: src/postulo/jobs/models.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/capture.html
 #: src/postulo/templates/settings/capture.html
 #, fuzzy
 msgid "Capture"
@@ -4961,7 +4967,7 @@ msgstr "Compacto"
 
 #: src/postulo/core/kind_files.py src/postulo/core/navigation.py
 #: src/postulo/core/search.py src/postulo/jobs/tables.py
-#: src/postulo/templates/core/export.html
+#: src/postulo/plugins/categories.py src/postulo/templates/core/export.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/company_list.html
@@ -5197,7 +5203,7 @@ msgstr "Contacto adicionado."
 msgid "Contact block"
 msgstr "Bloco de contactos"
 
-#: src/postulo/core/kind_files.py
+#: src/postulo/core/kind_files.py src/postulo/plugins/categories.py
 #, fuzzy
 msgid "Contacts"
 msgstr "Contactos"
@@ -7079,7 +7085,8 @@ msgstr "Arquivado em Documentos enviados, com a data de hoje, para guardar o que
 msgid "filename"
 msgstr "nome do ficheiro"
 
-#: src/postulo/core/search.py src/postulo/templates/cotton/documents_nav.html
+#: src/postulo/core/search.py src/postulo/plugins/categories.py
+#: src/postulo/templates/cotton/documents_nav.html
 #: src/postulo/templates/documents/upload_list.html
 #: src/postulo/templates/server/backup_restore.html
 #, fuzzy
@@ -8569,7 +8576,7 @@ msgstr "instituição"
 msgid "Insurance"
 msgstr "Seguros"
 
-#: src/postulo/core/server_views.py src/postulo/plugins/provenance.py
+#: src/postulo/core/server_views.py
 #, fuzzy
 msgid "Internal"
 msgstr "Interno"
@@ -10190,6 +10197,10 @@ msgstr "Entrada em falta"
 msgid "Mobile"
 msgstr "Telemóvel"
 
+#: src/postulo/plugins/provenance.py
+msgid "Module"
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "Monday"
@@ -11738,8 +11749,8 @@ msgstr "Nada: já tem esta empresa, e não é alterada."
 msgid "notice before a listing closes"
 msgstr "aviso antes de um anúncio fechar"
 
-#: src/postulo/notifications/apps.py src/postulo/plugins/kinds.py
-#: src/postulo/plugins/views.py
+#: src/postulo/notifications/apps.py src/postulo/plugins/categories.py
+#: src/postulo/plugins/kinds.py src/postulo/plugins/views.py
 #, fuzzy
 msgid "Notifications"
 msgstr "Notificações"
@@ -11774,10 +11785,19 @@ msgstr "Desligado, imprime o nome, a função e a relação, e nenhum meio de os
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr "Desligado, a menos que o ligue: uma carta de referência é escrita por outra pessoa, com as palavras e o nome dela."
 
+#: src/postulo/templates/server/person_plugins.html
+#: src/postulo/templates/server/plugins.html
+msgid "Off while the module above it is off."
+msgstr ""
+
 #: src/postulo/plugins/models.py
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "Desligado — e não podem ligá-lo"
+
+#: src/postulo/plugins/policy.py
+msgid "Off, because the module it belongs to is off."
+msgstr ""
 
 #: src/postulo/templates/settings/account.html
 #, fuzzy
@@ -12724,7 +12744,8 @@ msgstr "Pensão, seguro, subsídios, equipamento: o que tiver sido nomeado."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_detail.html
+#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "People"
@@ -12886,6 +12907,7 @@ msgstr "Marcadores"
 msgid "Placeholders such as {{ company }} are filled in when sent."
 msgstr "Os marcadores como {{ company }} são preenchidos no envio."
 
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_map.html
 #, fuzzy
 msgid "Places"
@@ -15155,11 +15177,6 @@ msgstr "Sete cores, cada uma afinada a 3:1 sobre o cartão, nos dois temas."
 #, fuzzy
 msgid "Shape"
 msgstr "Forma"
-
-#: src/postulo/plugins/provenance.py
-#, fuzzy
-msgid "Ships inside Postulo. It cannot be removed."
-msgstr "Faz parte do Postulo. Não pode ser removido."
 
 #: src/postulo/core/widgets_builtin.py
 #, fuzzy

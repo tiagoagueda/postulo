@@ -64,14 +64,14 @@ OFFICIAL_KEY = "p3GI+PsmgC3a4pcxgZUCUr79thUMtP8CaX5nhVtmeZ4="
 OFFICIAL_KEYS: tuple[str, ...] = (OFFICIAL_KEY,)
 
 LABELS = {
-    INTERNAL: _("Internal"),
+    INTERNAL: _("Module"),
     OFFICIAL: _("Official"),
     CUSTOM: _("Custom"),
     UPLOADED: _("Uploaded"),
 }
 
 EXPLANATIONS = {
-    INTERNAL: _("Ships inside Postulo. It cannot be removed."),
+    INTERNAL: _("A module: it ships inside Postulo and cannot be removed."),
     OFFICIAL: _("Its file matches what the official repository signed."),
     CUSTOM: _("Its file matches what a repository on this instance signed."),
     UPLOADED: _("Uploaded. Nothing here signed this file, so nothing vouches for it."),
