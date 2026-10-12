@@ -27,6 +27,7 @@ from tests.e2e.test_accessibility import VISITED_URL_NAMES
 #: like "hard to set up" belongs in the list of things to fix, not here.
 EXCUSED: dict[str, str] = {
     "core:healthz": "a JSON status document for monitoring to poll",
+    "core:csp_report": "an endpoint a browser posts violation reports to; it draws nothing (#822)",
     "core:manifest": "the JSON manifest a browser reads when installing the app",
     "notifications:worker": "the service worker's script, which a browser runs rather than shows",
     "notifications:waiting": (

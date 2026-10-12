@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import functools
+import json
+import logging
 from pathlib import Path
 
 from django.db import connection
@@ -10,8 +12,12 @@ from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 
 from . import arranging, widgets
+
+logger = logging.getLogger(__name__)
 
 
 def home(request: HttpRequest):
@@ -86,6 +92,45 @@ def _is_administrator(request: HttpRequest) -> bool:
 #: tokens; the page head says the dark ones (`base.html`), because a manifest has no way to.
 THEME_COLOUR = "#ffffff"
 BACKGROUND_COLOUR = "#f8fafc"
+
+#: The most of a violation report that is read: a report is a few hundred bytes.
+CSP_REPORT_MAX_BYTES = 8 * 1024
+
+
+@csrf_exempt
+@require_POST
+def csp_report(request: HttpRequest) -> HttpResponse:
+    """A browser's report that the content security policy stopped something (#822).
+
+    Written to the log as one line and nothing else: no row, no echo. A browser sends it
+    unasked and without the person's cookies, so it is bounded three ways: the body is read only
+    up to a few kilobytes, only the directive and the kind of address are kept (never a whole
+    address, which is the person's activity), and each address may send a handful an hour.
+    """
+    from . import throttle
+
+    try:
+        throttle.consume(
+            "csp-report", request.META.get("REMOTE_ADDR") or "unknown", throttle.Rate(30, 3600)
+        )
+    except throttle.TooOften:
+        return HttpResponse(status=204)
+    try:
+        report = json.loads(request.body[:CSP_REPORT_MAX_BYTES].decode("utf-8", "replace"))
+        body = report.get("csp-report", report) if isinstance(report, dict) else {}
+        directive = str(body.get("effective-directive") or body.get("violated-directive") or "")
+        blocked = str(body.get("blocked-uri") or body.get("blockedURL") or "")
+    except (ValueError, AttributeError):
+        return HttpResponse(status=204)
+    kind = (
+        blocked.split(":", 1)[0]
+        if ":" in blocked[:12]
+        else ("inline" if not blocked else "same-site")
+    )
+    logger.warning(
+        "Content security policy: %s stopped a %s", directive[:60] or "a rule", kind[:20] or "load"
+    )
+    return HttpResponse(status=204)
 
 
 def manifest(request: HttpRequest) -> JsonResponse:

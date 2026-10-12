@@ -839,7 +839,12 @@ SECURE_CSP = {
     # which is `'none'`, and the browser refuses the frame silently.
     "frame-src": [CSP.SELF],
     "frame-ancestors": [CSP.NONE],
-    "base-uri": [CSP.SELF],
+    # No page uses a `<base>` element, so none is allowed: one injected into markup would
+    # otherwise re-point every relative address on the page (#822).
+    "base-uri": [CSP.NONE],
+    # A violation is written to the log, so one in production is seen and not only in a
+    # browser's console (#822). Log-only: it stores nothing and answers 204.
+    "report-uri": ["/csp-report/"],
 }
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
