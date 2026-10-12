@@ -43,6 +43,7 @@ EMPLOYER_STRUCTURE = "employer-structure"
         name=EMPLOYER_STRUCTURE,
         label=_("Companies with a structure"),
         kind="feature",
+        icon="pyramid",
         description=_(
             "Record that one company is part of another, keep departments inside a "
             "company, and say which part of a company an application was aimed at. "

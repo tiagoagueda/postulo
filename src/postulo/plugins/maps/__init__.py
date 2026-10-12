@@ -32,6 +32,7 @@ MAPS = "maps"
         name=MAPS,
         label=_("Maps"),
         kind="feature",
+        icon="map",
         description=_(
             "Show where the companies are on a map, and place a company from the town "
             "typed in its location, using a table of cities kept on this server. "

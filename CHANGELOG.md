@@ -149,6 +149,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A module can name a Lucide icon in its manifest, drawn where a logo goes; Companies with a structure wears the pyramid and Maps the map (#874)
 - A module may have sub-modules, each with exactly one parent, and categories; switching a parent off turns its sub-modules off and takes their switches away, and switching it on brings them all back (#873)
 - The breadcrumb can be a thin line that opens while it is pointed at or focused and closes on Escape; a touch screen draws it whole (#832)
 - An optional breadcrumb under the navigation bar, sticky with it, switched on under Accessibility; the company, listing and application pages fill it (#831)

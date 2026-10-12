@@ -268,7 +268,13 @@ def company_identifier(company, column_key: str) -> str:
 
 
 def _tile(
-    css_class: str, shape: str, *, picture: str = "", colour: str = "", letters: str = ""
+    css_class: str,
+    shape: str,
+    *,
+    picture: str = "",
+    colour: str = "",
+    letters: str = "",
+    glyph: str = "",
 ) -> str:
     """Basecoat's `avatar` (#291): a box that holds a picture, or initials on a colour.
 
@@ -284,6 +290,12 @@ def _tile(
     if picture:
         return mark_safe(  # noqa: S308
             f'<span class="avatar {escape(box)} {shape}"><img src="{picture}" alt=""></span>'
+        )
+    if glyph:
+        drawn = icon(glyph, **{"class": "size-[55%]"})
+        return mark_safe(  # noqa: S308
+            f'<span class="avatar {escape(box)} {colour} {shape} text-white" '
+            f'aria-hidden="true">{drawn}</span>'
         )
     return mark_safe(  # noqa: S308
         f'<span class="avatar {escape(box)} {colour} {shape} font-semibold text-white" '
@@ -347,12 +359,17 @@ def plugin_logo(plugin, css_class: str = "size-6 text-[0.6rem]") -> str:
         return ""
     name = getattr(plugin, "name", "") or ""
     label = str(getattr(plugin, "label", "") or name)
-    from postulo.plugins import logos
+    from postulo.plugins import base, logos
 
     if logos.logo_for(plugin) is not None:
         url = reverse("connections:logo", args=[name])
         return _tile(css_class, "rounded", picture=url)
     colour = AVATAR_COLOURS[zlib.crc32(name.encode("utf-8")) % len(AVATAR_COLOURS)]
+    glyph = base.manifest_of(plugin).icon
+    if glyph:
+        # A module's icon is Postulo's own Lucide icon on the same tile an initial would be
+        # (#874); a file the plugin shipped beat it above.
+        return _tile(css_class, "rounded", colour=colour, glyph=glyph)
     letters = "".join(word[0] for word in label.replace(".", " ").split()[:2]).upper() or "?"
     return _tile(css_class, "rounded", colour=colour, letters=letters)
 

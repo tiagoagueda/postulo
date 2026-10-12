@@ -178,6 +178,11 @@ class Manifest:
     display labels, a tuple of slugs from :mod:`postulo.plugins.categories`. A kind is what
     the registry loads by and stays; a category only groups what the page draws. A parent
     has no parent of its own: the hierarchy is two levels, and a test holds it to that.
+
+    ``icon`` is the name of a Lucide icon Postulo draws where a logo would go (#874). It is
+    for what ships inside Postulo, whose icon is Postulo's own vocabulary; a package that
+    has a logo of its own ships the file and names it in ``logo``, which goes through the
+    checks files go through, and an icon never does. When both are given the file wins.
     """
 
     name: str
@@ -191,6 +196,7 @@ class Manifest:
     logo: str = ""
     parent: str = ""
     categories: tuple[str, ...] = ()
+    icon: str = ""
 
     def __post_init__(self) -> None:
         if not self.name:
@@ -318,6 +324,7 @@ def shipped(
     logo: str = "",
     parent: str = "",
     categories: tuple[str, ...] = (),
+    icon: str = "",
 ) -> Manifest:
     """A manifest for a plugin that ships inside Postulo.
 
@@ -343,6 +350,7 @@ def shipped(
         logo=logo,
         parent=parent,
         categories=categories,
+        icon=icon,
     )
 
 
