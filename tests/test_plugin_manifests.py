@@ -214,6 +214,7 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
         "format-odt",
         "format-icalendar",
         "format-vcard",
+        "format-geojson",
     }
 
 

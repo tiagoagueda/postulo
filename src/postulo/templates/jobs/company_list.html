@@ -90,6 +90,8 @@
       <a href="{% url 'jobs:industry_list' %}" class="btn" data-variant="outline">{% translate "Industries" %}</a>
       {% module_on "format-vcard" as vcard_on %}
       {% if vcard_on %}<a href="{% url 'jobs:contact_vcards' %}" class="btn" data-variant="outline">{% translate "Contacts as vCard" %}</a>{% endif %}
+      {% module_on "format-geojson" as geojson_on %}
+      {% if geojson_on %}<a href="{% url 'jobs:company_places' %}" class="btn" data-variant="outline" data-places-geojson>{% translate "Places as GeoJSON" %}</a>{% endif %}
       <a href="{% url 'jobs:company_create' %}" class="btn">
         {% translate "Add a company" %}
       </a>

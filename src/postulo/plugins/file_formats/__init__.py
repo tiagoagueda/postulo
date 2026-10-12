@@ -18,8 +18,8 @@ that would still be a CV. Its switch is drawn on and disabled, and it stays on w
 module above it says.
 
 Europass is the importer that has shipped since #129; it names this module as its parent
-and is not declared again here. References (#879) and GeoJSON (#880) will join as
-sub-modules of their own when they exist.
+and is not declared again here. GeoJSON (#880) is one too, and needs the map; References
+(#879) will join when it exists.
 """
 
 from __future__ import annotations
@@ -36,6 +36,7 @@ DOCX = "format-docx"
 ODT = "format-odt"
 ICALENDAR = "format-icalendar"
 VCARD = "format-vcard"
+GEOJSON = "format-geojson"
 
 
 @declares(
@@ -152,3 +153,24 @@ class ICalendarFormat:
 )
 class VCardFormat:
     """vCard, on or off."""
+
+
+@declares(
+    shipped(
+        name=GEOJSON,
+        label=_("GeoJSON"),
+        kind="feature",
+        parent=FILE_FORMATS,
+        categories=("files",),
+        icon="map",
+        # The places it writes and reads are the map's (#884): off with it.
+        requires=("maps",),
+        description=_(
+            "The companies' places as a GeoJSON file, out, and points read in that place a "
+            "company's address by hand once you have ticked them. It needs Maps. Switched "
+            "off, neither is offered and their addresses answer as if there were nothing there."
+        ),
+    )
+)
+class GeoJsonFormat:
+    """GeoJSON, on or off, and never without the map (#880)."""

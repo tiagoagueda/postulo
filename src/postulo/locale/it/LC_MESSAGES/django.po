@@ -130,6 +130,13 @@ msgstr[0] "%(count)d azienda modificata."
 msgstr[1] "%(count)d aziende modificate."
 
 #: src/postulo/jobs/views.py
+#, python-format
+msgid "%(count)d company placed by hand."
+msgid_plural "%(count)d companies placed by hand."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/postulo/jobs/views.py
 #, fuzzy, python-format
 msgid "%(count)d contact"
 msgid_plural "%(count)d contacts"
@@ -1527,6 +1534,10 @@ msgstr ""
 #, fuzzy, python-format
 msgid "A %(kind)s entry names the file: send %(field)s."
 msgstr "Una voce %(kind)s indica il file: invia %(field)s."
+
+#: src/postulo/templates/jobs/company_places.html
+msgid "A .geojson file"
+msgstr ""
 
 #: src/postulo/core/slow.py
 msgid "A backup is already running."
@@ -4651,7 +4662,8 @@ msgid "Choose a Europass file first."
 msgstr "Scegli prima un file Europass."
 
 #: src/postulo/applications/views_ical.py src/postulo/core/views_kind_files.py
-#: src/postulo/jobs/vcard_views.py src/postulo/resume/views_candidate.py
+#: src/postulo/jobs/vcard_views.py src/postulo/jobs/views.py
+#: src/postulo/resume/views_candidate.py
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Scegli prima un file."
@@ -6158,6 +6170,10 @@ msgstr "Scarica .%(extension)s"
 msgid "Download as a vCard"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_places.html
+msgid "Download companies.geojson"
+msgstr ""
+
 #: src/postulo/templates/applications/report.html
 #, fuzzy
 msgid "Download CSV"
@@ -6677,6 +6693,10 @@ msgstr "Ogni account di questa istanza. Gli amministratori vedono gli account, m
 msgid "Every application, in order"
 msgstr "Tutte le candidature, in ordine"
 
+#: src/postulo/templates/jobs/company_places.html
+msgid "Every company address on the map, with the company's name, page, industries and how precise its point is: at its town, its postcode, by hand or from Wikidata. A contact's address and your own are never in it."
+msgstr ""
+
 #: src/postulo/jobs/forms.py
 #, fuzzy
 msgid "Every company under this industry moves to the one chosen, and this one goes."
@@ -6908,6 +6928,7 @@ msgstr "Spiegare cosa è andato storto spesso significa dire a quale connessione
 
 #: src/postulo/templates/cotton/transfer_group.html
 #: src/postulo/templates/jobs/company_detail.html
+#: src/postulo/templates/jobs/company_places.html
 #, fuzzy
 msgid "Export"
 msgstr "Esporta"
@@ -7368,6 +7389,10 @@ msgstr "Dimentica la password salvata"
 #, fuzzy
 msgid "Forget the token"
 msgstr "Dimentica il gettone"
+
+#: src/postulo/templates/jobs/company_places.html
+msgid "Forget this file"
+msgstr ""
 
 #: src/postulo/templates/settings/capture.html
 #, fuzzy, python-format
@@ -8243,6 +8268,7 @@ msgstr "Ignora questa colonna"
 
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/cotton/transfer_group.html
+#: src/postulo/templates/jobs/company_places.html
 #, fuzzy
 msgid "Import"
 msgstr "Importa"
@@ -10865,6 +10891,10 @@ msgstr "Ancora nessuna persona registrata in questa azienda. Aggiungile dalla <a
 msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
 msgstr ""
 
+#: src/postulo/jobs/views.py
+msgid "No point was ticked, so nothing was placed."
+msgstr ""
+
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
 msgid "No postings recorded anywhere in this group."
@@ -11095,6 +11125,10 @@ msgstr "Nessuna scelta finora"
 
 #: src/postulo/templates/resume/item_form.html
 msgid "None of this company's industries is Education, so it is not listed as a school or university."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_places.html
+msgid "None of your companies has this name or identifier."
 msgstr ""
 
 #: src/postulo/templates/resume/translations.html
@@ -12968,6 +13002,10 @@ msgstr ""
 msgid "place on the page"
 msgstr "luogo nella pagina"
 
+#: src/postulo/templates/jobs/company_places.html
+msgid "Place the ticked companies"
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "placed"
 msgstr ""
@@ -12995,6 +13033,12 @@ msgstr "I segnaposto come {{ company }} vengono compilati all'invio."
 #, fuzzy
 msgid "Places"
 msgstr "Luoghi"
+
+#: src/postulo/templates/jobs/company_list.html
+#: src/postulo/templates/jobs/company_map.html
+#: src/postulo/templates/jobs/company_places.html
+msgid "Places as GeoJSON"
+msgstr ""
 
 #: src/postulo/templates/jobs/partials/map_credits.html
 msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>; its postal codes <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
@@ -13118,6 +13162,11 @@ msgstr "Immagine PNG"
 #, fuzzy
 msgid "PNG, JPEG, GIF, WebP or SVG. It is re-encoded at its own size, with nothing else the file carried; an SVG is kept as a vector and stripped of everything but the drawing."
 msgstr "PNG, JPEG, GIF, WebP o SVG. Viene ricodificata alla sua dimensione, senza nient'altro che il file conteneva; un SVG viene conservato come vettoriale e privato di tutto tranne il disegno."
+
+#: src/postulo/templates/jobs/company_places.html
+#, python-format
+msgid "Points are matched to your companies by name, or by a wikidata property; at most %(limit)s are read. Nothing is placed until you tick it."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -13887,6 +13936,7 @@ msgstr "Letto dall'XML Europass allegato al PDF, nel formato precedente che l'ed
 msgid "Read from the Europass XML attached to the PDF, the format europass.europa.eu has written since 2020."
 msgstr "Letto dall'XML Europass allegato al PDF, il formato che europass.europa.eu scrive dal 2020."
 
+#: src/postulo/templates/jobs/company_places.html
 #: src/postulo/templates/resume/europass_import.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -16571,8 +16621,9 @@ msgstr "Quel file è vuoto."
 #: src/postulo/applications/ical_reader.py
 #: src/postulo/applications/views_ical.py src/postulo/core/kind_files.py
 #: src/postulo/core/vcard.py src/postulo/core/views_kind_files.py
-#: src/postulo/jobs/vcard_views.py src/postulo/plugins/base.py
-#: src/postulo/resume/candidate.py src/postulo/resume/views_candidate.py
+#: src/postulo/jobs/geojson.py src/postulo/jobs/vcard_views.py
+#: src/postulo/plugins/base.py src/postulo/resume/candidate.py
+#: src/postulo/resume/views_candidate.py
 #, fuzzy, python-format
 msgid "That file is larger than %(limit)s MB, so it was not read."
 msgstr "Quel file supera %(limit)s MB, quindi non è stato letto."
@@ -16593,6 +16644,14 @@ msgstr "Questo file è più grande di quanto un logo debba essere."
 msgid "That file is larger than the %(mb)s MB this instance accepts."
 msgstr ""
 
+#: src/postulo/jobs/geojson.py
+msgid "That file is not a GeoJSON collection of features."
+msgstr ""
+
+#: src/postulo/jobs/geojson.py
+msgid "That file is not GeoJSON."
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, fuzzy, python-format
 msgid "That file is over %(limit)s MB. A CV is not that big."
@@ -16611,6 +16670,10 @@ msgstr[1] "Quel file ha impiegato più di %(seconds)s secondi ad arrivare."
 
 #: src/postulo/jobs/vcard_views.py
 msgid "That file was read, and there was no card in it to import."
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "That file was read, and there was no point in it."
 msgstr ""
 
 #: src/postulo/core/views_kind_files.py src/postulo/resume/views.py
@@ -17198,9 +17261,17 @@ msgstr "Il repository di codice scelto per questo CV non è più nei tuoi dati, 
 msgid "The Common European Framework levels. “Not stated” prints nothing at all, which is the honest answer where you have never been tested — a level is a claim somebody may test in an interview."
 msgstr "I livelli del Quadro comune europeo di riferimento. «Non indicato» non stampa nulla, che è la risposta onesta dove non sei mai stato valutato — un livello è un'affermazione che qualcuno può verificare in un colloquio."
 
+#: src/postulo/templates/jobs/company_places.html
+msgid "The companies' addresses on the map, as a file other mapping tools read, and points read back in."
+msgstr ""
+
 #: src/postulo/core/kind_files.py
 #, python-format
 msgid "The company %(name)s is not in your account, and is added with it."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_places.html
+msgid "The company has no address to place."
 msgstr ""
 
 #: src/postulo/templates/jobs/company_wikidata.html

@@ -618,6 +618,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         # Contacts as vCard: what is offered, before a file is read (#660). The half that
         # comes after one has a test of its own in tests/e2e/test_vcard.py.
         "/jobs/contacts/vcard/",
+        "/jobs/companies/places/",
         "/jobs/industries/new/",
         "/jobs/captures/new/",
         "/career/education/new/",

@@ -31,6 +31,7 @@ SUB_MODULES = {
     "format-odt": ("ODT", "file-type-2"),
     "format-icalendar": ("iCalendar", "calendar-days"),
     "format-vcard": ("vCard", "contact-round"),
+    "format-geojson": ("GeoJSON", "map"),
     "europass": ("Europass", "id-card"),
 }
 

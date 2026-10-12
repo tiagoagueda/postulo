@@ -9,11 +9,17 @@ app_name = "jobs"
 #: vCard is a module (#877): while it is off its downloads and its import answer as if there
 #: were nothing there.
 vcard = modules.required("format-vcard")
+geojson = modules.required("format-geojson")
 
 urlpatterns = [
     path("companies/", views.CompanyListView.as_view(), name="company_list"),
     path("companies/map/", views.CompanyMapView.as_view(), name="company_map"),
     path("addresses/<int:pk>/place/", views.AddressPlaceView.as_view(), name="address_place"),
+    path(
+        "companies/places/",
+        geojson(views.CompanyPlacesView.as_view()),
+        name="company_places",
+    ),
     path(
         "companies/<int:pk>/wikidata/",
         views.CompanyWikidataView.as_view(),

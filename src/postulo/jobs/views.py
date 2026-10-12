@@ -419,6 +419,86 @@ class CompanyNamesView(LoginRequiredMixin, View):
         return redirect(back)
 
 
+class CompanyPlacesView(LoginRequiredMixin, TemplateView):
+    """The companies' places as GeoJSON: the file, and points read in (#880).
+
+    Two steps on one address, as the vCard import is: a file is read and what was read is
+    held in the session, the page says what each point would do with **none ticked**, and
+    nothing is placed until somebody ticks a point and presses the button.
+    """
+
+    template_name = "jobs/company_places.html"
+
+    def get(self, request, *args, **kwargs):
+        if request.GET.get("download"):
+            import json as json_module
+
+            from . import geojson
+
+            response = HttpResponse(
+                json_module.dumps(geojson.export(request.user), ensure_ascii=False, indent=1),
+                content_type="application/geo+json; charset=utf-8",
+            )
+            response["Content-Disposition"] = 'attachment; filename="companies.geojson"'
+            return response
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs) -> dict:
+        from . import geojson
+
+        context = super().get_context_data(**kwargs)
+        points = geojson.held(self.request.session.get(geojson.SESSION_KEY))
+        context["entries"] = geojson.review(self.request.user, points) if points else None
+        context["limit"] = geojson.MAX_FEATURES
+        return context
+
+    def post(self, request, *args, **kwargs):
+        from django.utils.translation import ngettext
+
+        from . import geojson
+
+        action = request.POST.get("action")
+        if action == "forget":
+            request.session.pop(geojson.SESSION_KEY, None)
+            return redirect("jobs:company_places")
+        if action == "confirm":
+            points = geojson.held(request.session.get(geojson.SESSION_KEY))
+            chosen = {
+                int(value)
+                for value in request.POST.getlist("chosen")
+                if value.isdigit() and len(value) < 6
+            }
+            if not chosen:
+                messages.info(request, _("No point was ticked, so nothing was placed."))
+                return redirect("jobs:company_places")
+            placed = geojson.apply(request.user, points, chosen)
+            request.session.pop(geojson.SESSION_KEY, None)
+            messages.success(
+                request,
+                ngettext(
+                    "%(count)d company placed by hand.",
+                    "%(count)d companies placed by hand.",
+                    placed,
+                )
+                % {"count": placed},
+            )
+            return redirect("jobs:company_map")
+        upload = request.FILES.get("file")
+        if not upload:
+            messages.error(request, _("Choose a file first."))
+            return redirect("jobs:company_places")
+        try:
+            points = geojson.read(upload.read(geojson.MAX_BYTES + 1))
+        except geojson.GeoJsonRefused as refused:
+            messages.error(request, str(refused))
+            return redirect("jobs:company_places")
+        if not points:
+            messages.warning(request, _("That file was read, and there was no point in it."))
+            return redirect("jobs:company_places")
+        request.session[geojson.SESSION_KEY] = geojson.hold(points)
+        return redirect("jobs:company_places")
+
+
 class AddressPlaceView(LoginRequiredMixin, View):
     """Put one address on the map by hand, or take a hand-placed point off (#702).
 

@@ -14,6 +14,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.file_formats import (
             DocxFormat,
             FileFormatsFeature,
+            GeoJsonFormat,
             ICalendarFormat,
             OdtFormat,
             PdfFormat,
@@ -51,6 +52,7 @@ class CoreConfig(AppConfig):
             OdtFormat,
             ICalendarFormat,
             VCardFormat,
+            GeoJsonFormat,
         ):
             registry.register_builtin("feature", format_module)
         # The module the "multiple …" features are sub-modules of (#875).
