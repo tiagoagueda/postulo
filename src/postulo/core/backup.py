@@ -157,7 +157,16 @@ def _add_tree(archive: tarfile.TarFile, root: Path, prefix: str, digests: dict[s
             if path.is_dir():
                 archive.add(path, arcname=arcname, recursive=False, filter=_plain_files_only)
                 continue
-            info = _plain_files_only(archive.gettarinfo(str(path), arcname=arcname))
+            info = archive.gettarinfo(str(path), arcname=arcname)
+            if info.islnk():
+                # A second name for a file already in the archive is written by tarfile as a
+                # hard-link member, which `_plain_files_only` then dropped and a restore
+                # refuses (#809). Each name is a file of its own here, with its own bytes, so
+                # the copy is whole and the restore reads nothing but plain files.
+                info.type = tarfile.REGTYPE
+                info.linkname = ""
+                info.size = path.stat().st_size
+            info = _plain_files_only(info)
             if info is None:
                 continue
             digest = hashlib.sha256()
