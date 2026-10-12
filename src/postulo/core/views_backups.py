@@ -72,6 +72,16 @@ class BackupsMixin(ServerSectionMixin):
         return super().handle_no_permission()
 
 
+def may_download(user) -> bool:
+    """Whether this person may take a backup through the browser (#810), by the instance's rule."""
+    rule = str(getattr(settings, "POSTULO_BACKUP_DOWNLOAD", "administrators")).strip().lower()
+    if rule == "console":
+        return False
+    if rule == "operator":
+        return bool(getattr(user, "is_superuser", False))
+    return bool(getattr(user, "is_staff", False))
+
+
 def _archive(name: str):
     try:
         return backups.archive_path(name)
@@ -134,6 +144,7 @@ class BackupsView(BackupsMixin, UpdateView):
                 "scheduled": row.backup_schedule != backups.OFF,
                 "missed": backups.is_missed(row),
                 "upload_max_mb": settings.POSTULO_BACKUP_UPLOAD_MAX_MB,
+                "may_download": may_download(self.request.user),
                 "background_work": errands.worker_expected(),
             }
         )
@@ -185,6 +196,8 @@ class BackupDownloadView(BackupsMixin, View):
 
     @method_decorator(reauthentication_required)
     def get(self, request: HttpRequest, name: str) -> HttpResponse:
+        if not may_download(request.user):
+            raise Http404
         path = _archive(name)
         logger.warning("Backup %s downloaded by %s.", name, request.user.get_username())
         response = FileResponse(

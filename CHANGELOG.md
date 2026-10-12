@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- POSTULO_BACKUP_DOWNLOAD says whether every administrator, only the operator's own account or nobody may download a backup through the browser, and the threat model names the exception (#810)
 - Every name of a hard-linked media file is written into the backup as a plain file with its own bytes, where the second name used to be dropped without a word (#809)
 - Importing a kind file creates each application as a draft and moves it to the file's status through change_status, and leaves out the status-change and interview entries a file supplies, so the log says what the fields do (#808)
 - An editable table cell drops every field of the page form but the one it edits, so a post carrying an industry to add or a location correction beside the cell changes nothing else (#807)

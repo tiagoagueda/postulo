@@ -110,7 +110,7 @@
                   {% csrf_token %}
                   <button type="submit" class="btn" data-variant="outline" data-size="sm">{% translate "Check" %}<span class="sr-only"> {{ archive.name }}</span></button>
                 </form>
-                <a href="{% url 'server:backup_download' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% icon "download" %}{% translate "Download" %}<span class="sr-only"> {{ archive.name }}</span></a>
+                {% if may_download %}<a href="{% url 'server:backup_download' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% icon "download" %}{% translate "Download" %}<span class="sr-only"> {{ archive.name }}</span></a>{% endif %}
                 <a href="{% url 'server:backup_restore' archive.name %}" class="btn" data-variant="outline" data-size="sm">{% translate "Restore" %}<span class="sr-only"> {{ archive.name }}</span></a>
                 <a href="{% url 'server:backup_delete' archive.name %}" class="btn" data-variant="ghost" data-size="sm">{% translate "Delete" %}<span class="sr-only"> {{ archive.name }}</span></a>
               </div>

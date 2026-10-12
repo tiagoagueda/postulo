@@ -628,6 +628,11 @@ POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / 
 # upload is checked against this before any of it is kept; a reverse proxy in front has its
 # own, smaller limit that has to be raised to match (#242).
 POSTULO_BACKUP_UPLOAD_MAX_MB = env.int("POSTULO_BACKUP_UPLOAD_MAX_MB", default=512)
+# Who may download a backup through the browser (#810). A backup holds every account's rows and
+# files, so this is the one place an administrator is more than an administrator of accounts:
+# `administrators` (the default) is every administrator, `operator` only the operator's own
+# account (the superuser), and `console` nobody -- the files are taken from the data volume.
+POSTULO_BACKUP_DOWNLOAD = env("POSTULO_BACKUP_DOWNLOAD", default="administrators")
 
 # Where this instance is reached from outside, for the links in messages sent when no
 # request is around — a reminder falling due at three in the morning. Unset, such links
