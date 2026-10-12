@@ -143,6 +143,10 @@ def is_public(address: Address) -> bool:
             return False
         if not all(is_public(carried) for carried in carried_ipv4(address)):
             return False
+    # Multicast, reserved and unspecified are never a destination a server should dial (#816);
+    # `is_global` passes some of them, as it does a global-scope multicast group.
+    if address.is_multicast or address.is_reserved or address.is_unspecified:
+        return False
     return address.is_global
 
 
