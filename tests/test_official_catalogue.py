@@ -104,7 +104,7 @@ def test_the_index_lists_what_the_source_names_and_no_more():
         for entry in index["plugins"]
     }
     assert listed == wanted
-    assert list(listed) == ["postulo-helloworld"], "for now, only the reference plugin"
+    assert list(listed) == ["postulo-helloworld", "postulo-templates"], "what is listed, in order"
 
 
 def test_every_release_it_lists_fits_this_postulo_and_is_a_plain_wheel():
@@ -196,7 +196,10 @@ def test_a_switched_on_official_repository_lists_helloworld_and_vouches_for_it(o
 
     fetched = catalogue.fetch("official")
 
-    assert [listing.name for listing in fetched.listings] == ["postulo-helloworld"]
+    assert [listing.name for listing in fetched.listings] == [
+        "postulo-helloworld",
+        "postulo-templates",
+    ]
     release = fetched.listings[0].latest
     assert release.version == "0.3.0"
     assert provenance.official_repositories() == {"official"}

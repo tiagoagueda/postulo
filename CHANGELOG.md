@@ -152,6 +152,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- The official catalogue lists Postulo Templates 0.3.0, the curated document themes, beside the hello-world plugin (#729)
 - Server settings -> Plugins draws an installed package that registers several plugins as a parent row whose switch is its sub-plugins' master, and catalogue listings carry categories shown as badges and filterable (#883)
 - Server settings -> Plugins draws a Settings button under the switch of every plugin or module that names a settings page in its manifest, hidden when it has none and shown disabled, with the reason as its tooltip, to someone who may not change them (#885)
 - A module, Extend file formats, holds PDF (always on), DOCX, ODT, iCalendar, vCard and Europass: one that is off is not offered and its download, import and feed answer 404; the text of Word and OpenDocument files you upload is kept for search (#877)
