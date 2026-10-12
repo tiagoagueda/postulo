@@ -213,7 +213,7 @@ def test_the_api_answers_per_posting_and_stores_nothing(client, user):
 
     response = ask(
         client,
-        bearer_for(user),
+        bearer_for(user, "captures", "read"),
         [
             {
                 "url": "http://example.org/jobs/42",
@@ -305,3 +305,19 @@ def test_the_cost_of_asking_does_not_grow_with_the_account(client, user):
         a_listing(user, url=f"https://www.indeed.com/viewjob?jk=old{n}")
         a_capture(user, url=f"https://www.indeed.com/viewjob?jk=waiting{n}")
     assert queries() == few
+
+
+def test_a_token_that_may_not_read_is_not_told_about_similar_listings(client, user):
+    """The match by title says whether the owner holds a listing the token did not make (#803)."""
+    a_listing(user, "https://board.example/view?id=7")
+    posting = {
+        "url": "https://board.example/view?id=8",
+        "title": "research engineer",
+        "company": "black mesa",
+    }
+
+    narrow = ask(client, bearer_for(user), [posting]).json()[0]
+    wide = ask(client, bearer_for(user, "captures", "read"), [posting]).json()[0]
+
+    assert narrow["similar"] == []
+    assert wide["similar"], "a token that may read still gets it"

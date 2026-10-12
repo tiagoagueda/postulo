@@ -839,6 +839,7 @@ def known_captures(request, payload: KnownIn):
             ),
         }
 
+    may_read = request.auth.has_scope("read")
     answers = []
     for asked in payload.postings:
         seen = known(owner, asked.url, asked.title, asked.company)
@@ -847,7 +848,9 @@ def known_captures(request, payload: KnownIn):
                 "url": asked.url,
                 "listings": [listing(posting) for posting in seen.listings],
                 "captures": [waiting(capture) for capture in seen.captures],
-                "similar": [listing(posting) for posting in seen.similar],
+                # The soft match by title tells a captures-only token whether the owner holds a
+                # listing there that it did not make, so it is for a token that may read (#803).
+                "similar": [listing(posting) for posting in seen.similar] if may_read else [],
             }
         )
     return answers
