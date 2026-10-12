@@ -56,9 +56,29 @@ def healthz(request: HttpRequest) -> JsonResponse:
         connection.ensure_connection()
     except Exception:  # pragma: no cover - only on a broken database
         return JsonResponse({"status": "error", "database": "unavailable"}, status=503)
-    from .updates import installed_version
+    answer = {"status": "ok", "database": "ok"}
+    # The exact version is for the container's own probe and for an administrator (#800): it
+    # is what a stranger would pick a known flaw by, and the footer already keeps it from
+    # them. A proxy's client arrives with its own address, so only a local peer is the probe.
+    if _is_local(request) or _is_administrator(request):
+        from .updates import installed_version
 
-    return JsonResponse({"status": "ok", "database": "ok", "version": installed_version()})
+        answer["version"] = installed_version()
+    return JsonResponse(answer)
+
+
+def _is_local(request: HttpRequest) -> bool:
+    import ipaddress
+
+    try:
+        return ipaddress.ip_address(request.META.get("REMOTE_ADDR", "")).is_loopback
+    except ValueError:
+        return False
+
+
+def _is_administrator(request: HttpRequest) -> bool:
+    user = getattr(request, "user", None)
+    return bool(getattr(user, "is_authenticated", False) and getattr(user, "is_staff", False))
 
 
 #: The colours an installed window is drawn in: its title bar, and the ground it shows while

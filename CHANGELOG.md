@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- /healthz answers the status and the database to anybody, and the exact version only to the container's own probe and to a signed-in administrator (#800)
 - Wrong API tokens count against the address that presents them (sixty an hour, then 429), a token without the scope now spends its allowance, and one account's tokens share POSTULO_API_ACCOUNT_RATE (#799)
 - X-Request-ID is accepted from a trusted proxy only; from anybody else Postulo mints its own, so a stranger cannot write a chosen id into the log (#798)
 - The log says how many orphan files the sweep removed and not which, and a failed capture or logo names its source or company number and not the page's address (#797)
