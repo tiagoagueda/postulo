@@ -27,6 +27,7 @@ from postulo.plugins.api import FieldSpec, TestResult, declares, shipped
         name="smtp",
         label="SMTP",
         kind="transport",
+        settings="server:email",
         description=_lazy("Sends mail over SMTP, the way a mail server expects to be spoken to."),
     )
 )

@@ -139,6 +139,15 @@ class Decision:
         }[self.decided_by]
 
 
+def may_change_settings(user, plugin_name: str) -> bool:
+    """Whether this person may change the plugin's settings (#885).
+
+    The settings pages are administrators', so someone who is not one may not. Until an access
+    list says otherwise (#886) every administrator may, as they always have.
+    """
+    return bool(getattr(user, "is_staff", False) and getattr(user, "is_active", True))
+
+
 def shipped_inside(plugin_name: str) -> bool:
     """Whether this plugin ships inside Postulo, which makes it the administrator's.
 

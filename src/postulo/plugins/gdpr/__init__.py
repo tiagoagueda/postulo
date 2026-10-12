@@ -42,6 +42,7 @@ GDPR = "gdpr"
         name=GDPR,
         label=_("Data protection"),
         kind="feature",
+        settings="server:data_protection",
         description=_(
             "The data the instance keeps about other people: what it holds on one contact, "
             "asked in one document, the erasure of one that says what it removed, a "

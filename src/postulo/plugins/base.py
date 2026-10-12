@@ -189,6 +189,11 @@ class Manifest:
     requirement is missing, or is switched off, is off itself (see :mod:`postulo.plugins.policy`),
     so it never runs half-served. A module's version is Postulo's.
 
+    ``settings`` names the URL (as ``reverse`` takes it) of the page where this plugin's settings
+    are changed, if it has one (#885). The administrator's plugins list draws a *Settings*
+    button under its switch from it, hidden for a plugin with none and shown disabled, saying
+    so, to someone who may not change them.
+
     ``required`` marks what cannot be switched off (#877): its switch is drawn on and disabled
     and no policy row can turn it off, not even its parent's. Postulo cannot work without it
     -- the PDF writer is one -- and a switch that could only break the application is not a
@@ -209,6 +214,7 @@ class Manifest:
     icon: str = ""
     requires: tuple[str, ...] = ()
     required: bool = False
+    settings: str = ""
 
     def __post_init__(self) -> None:
         if not self.name:
@@ -342,6 +348,7 @@ def shipped(
     icon: str = "",
     requires: tuple[str, ...] = (),
     required: bool = False,
+    settings: str = "",
 ) -> Manifest:
     """A manifest for a plugin that ships inside Postulo.
 
@@ -370,6 +377,7 @@ def shipped(
         icon=icon,
         requires=requires,
         required=required,
+        settings=settings,
     )
 
 

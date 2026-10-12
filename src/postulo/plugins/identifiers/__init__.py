@@ -61,6 +61,7 @@ IDENTIFIERS = "identifiers"
     shipped(
         name=IDENTIFIERS,
         label=_("External identifiers"),
+        settings="server:identifier_schemes",
         kind="identifier",
         description=_(
             "Which external identifiers Postulo understands — ORCID, ISNI, Wikidata, a "

@@ -1637,6 +1637,12 @@
     display: none;
   }
 
+  /* A button the person may not press, that says why on hover and focus (#885): `disabled`
+     cannot show a tooltip on focus and drops out of the tab order, so it is `aria-disabled`. */
+  .btn[aria-disabled="true"] {
+    @apply cursor-not-allowed opacity-50;
+  }
+
   @media (width < 40rem) {
     body:not([data-buttons="labels"]) [role="group"] .btn-label {
       @apply sr-only;

@@ -90,14 +90,6 @@
             </label>
             {% if row.held %}
               <p class="text-xs text-ink-500 dark:text-ink-400" id="why-{{ row.name }}">{{ row.why }}</p>
-              {% comment %} A plugin with settings of its own among these pages (#311). A
-                 link to the page they are on, which is the whole of it with scripts off;
-                 where a script runs, `app.js` opens the dialog the link names instead,
-                 drawn after this form because a form cannot hold another. {% endcomment %}
-              {% if row.settings_url %}
-                <a href="{{ row.settings_url }}" class="btn self-start" data-variant="outline" data-size="sm"
-                   data-opens-dialog="settings-{{ row.name }}">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></a>
-              {% endif %}
             {% else %}
               {% if row.held_by_parent %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" id="parent-{{ row.name }}" data-held-by-parent="{{ row.name }}">
@@ -115,6 +107,24 @@
                 <p class="text-xs text-ink-500 dark:text-ink-400" data-hidden="{{ row.name }}">
                   {% translate "Not offered at all, and kept that way while it stays off." %}
                 </p>
+              {% endif %}
+            {% endif %}
+            {% comment %} The Settings button (#885), for every row that has settings, under the
+               switch. A link to the page they are on, which is the whole of it with scripts
+               off; where a script runs, `app.js` opens the dialog the link names instead,
+               drawn after this form because a form cannot hold another (#311). Shown but
+               `aria-disabled` to someone who may not change them, with the reason as its
+               tooltip: a `disabled` button shows no tooltip on focus and leaves the tab order
+               (SC 4.1.2). The words are `btn-label`, so they follow the person's choice of
+               icons or words and are the button's name when only the icon shows (#852). {% endcomment %}
+            {% if row.settings_url %}
+              {% if row.settings_allowed %}
+                <a href="{{ row.settings_url }}" class="btn self-start" data-variant="outline" data-size="sm"
+                   data-opens-dialog="settings-{{ row.name }}" data-settings="{{ row.name }}">{% icon "settings" %}<span class="btn-label">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></span></a>
+              {% else %}
+                <button type="button" class="btn self-start" data-variant="outline" data-size="sm"
+                        aria-disabled="true" data-settings="{{ row.name }}"
+                        title="{% translate 'You are not authorised to change settings.' %}">{% icon "settings" %}<span class="btn-label">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}. {% translate "You are not authorised to change settings." %}</span></span></button>
               {% endif %}
             {% endif %}
           </div>

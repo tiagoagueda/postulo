@@ -87,6 +87,7 @@ def _body(notification: Notification) -> str:
         label=_lazy("Email notifications"),
         kind="notifier",
         parent="builtin-notifications",
+        settings="server:email",
         categories=("notifications",),
         icon="mail",
         description=_lazy(

@@ -1061,7 +1061,7 @@ class PluginsView(ServerSectionMixin, TemplateView):
         context["catalogues_configured"] = sorted(catalogue.configured())
         context["repositories"] = _repositories()
         context["repository_form"] = kwargs.get("repository_form") or PluginRepositoryForm()
-        context["policy_rows"] = _policy_rows()
+        context["policy_rows"] = _policy_rows(user=self.request.user)
         # The identifier registry's settings, in the dialog its row opens (#311). The same
         # form `IdentifierSchemesView` draws as a page, which is where the row's link goes
         # when no script runs and where the dialog posts.
@@ -1205,7 +1205,7 @@ def _ungoverned_plugins() -> list:
     return sorted(found, key=lambda item: (getattr(item, "kind", ""), item.name))
 
 
-def _policy_rows(person=None) -> list[dict]:
+def _policy_rows(person=None, user=None) -> list[dict]:
     """What is decided for each plugin, and by whom.
 
     Since #286 each row carries the two controls the page draws instead of a four-way menu:
@@ -1254,6 +1254,10 @@ def _policy_rows(person=None) -> list[dict]:
                 # Drawn from the instance's decision, not the person's own, and said so.
                 "follows_default": bool(person) and own is None and row is not None,
                 "parent": manifest.parent,
+                # The Settings button under the switch: hidden with none, disabled for someone
+                # who may not change them (#885). On the instance's page only.
+                "settings_url": _settings_url(plugin) if person is None else "",
+                "settings_allowed": policy.may_change_settings(user, plugin.name),
                 "categories": [
                     {"slug": slug, "label": categories.label_for(slug)}
                     for slug in manifest.categories
@@ -1294,6 +1298,7 @@ def _policy_rows(person=None) -> list[dict]:
                 # A plugin Postulo ships may have a page of settings among these ones, and
                 # names it; the instance's page draws a button for it on this row (#311).
                 "settings_url": _settings_url(plugin) if person is None else "",
+                "settings_allowed": policy.may_change_settings(user, plugin.name),
             }
         )
     return rows
@@ -1343,7 +1348,9 @@ def _settings_url(plugin) -> str:
     """Where a shipped plugin's own settings are, if it has a page of them here."""
     from django.urls import NoReverseMatch
 
-    name = getattr(plugin, "settings_url_name", "")
+    from postulo.plugins import base
+
+    name = base.manifest_of(plugin).settings or getattr(plugin, "settings_url_name", "")
     if not name:
         return ""
     try:
