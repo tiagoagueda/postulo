@@ -30,9 +30,12 @@ import binascii
 import datetime as dt
 import json
 import logging
+import re
+import secrets
 import tempfile
 from dataclasses import dataclass, field
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import httpx
 from django.conf import settings
@@ -433,12 +436,36 @@ DOWNLOAD_TIMEOUT = 5.0
 DOWNLOAD_BUDGET = 15.0
 
 
+#: What a wheel's file name looks like (PEP 427): the name, the version, an optional build tag and
+#: the three tags. The installer reads them off the name, so a download keeps a real one -- but
+#: only when the address's last segment *is* one (#819).
+_WHEEL_NAME = re.compile(
+    r"^[A-Za-z0-9_.]+-[A-Za-z0-9_.!+]+(-[0-9][A-Za-z0-9_.]*)?-[A-Za-z0-9_.]+-[A-Za-z0-9_.]+"
+    r"-[A-Za-z0-9_.]+\.whl$"
+)
+
+
+def _wheel_file_name(url: str) -> str:
+    """The name to save a download under: the address's own if it is a wheel's, else a made-up one.
+
+    The last segment of a release address is the publisher's, and a file named from it could be
+    one the filesystem refuses, an over-long name or a name that means something to the
+    platform. Only a well-formed wheel file name is used; anything else is a random one, which
+    the installer then refuses for not being the wheel it was told it is.
+    """
+    segment = urlsplit(url).path.rstrip("/").rsplit("/", 1)[-1]
+    if _WHEEL_NAME.match(segment) and len(segment) <= 200:
+        return segment
+    token = secrets.token_hex(8)
+    return f"download-{token}-0-py3-none-any.whl"
+
+
 def download(release: Release, into: Path) -> Path:
     """Fetch a wheel and check it against the checksum the signed index carried."""
     from .installing import digest_of
 
     into.mkdir(parents=True, exist_ok=True)
-    target = into / (release.url.rstrip("/").rsplit("/", 1)[-1] or "plugin.whl")
+    target = into / _wheel_file_name(release.url)
     deadline = http.deadline_in(DOWNLOAD_BUDGET)
     with (
         http.client(timeout=DOWNLOAD_TIMEOUT) as client,
@@ -450,7 +477,11 @@ def download(release: Release, into: Path) -> Path:
                 % {"url": release.url, "code": response.status_code}
             )
         written = 0
-        with target.open("wb") as handle:
+        try:
+            handle = target.open("wb")
+        except OSError as error:
+            raise CatalogueError(str(_("The download could not be saved here."))) from error
+        with handle:
             for chunk in response.iter_bytes():
                 written += len(chunk)
                 if http.past(deadline):
