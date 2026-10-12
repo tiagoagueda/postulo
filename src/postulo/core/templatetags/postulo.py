@@ -105,10 +105,29 @@ def transfers(context, subject: str) -> dict:
     from postulo.core import transfers as registry
 
     request = context.get("request")
+    user = getattr(request, "user", None)
     return {
-        "imports": [(t.label, t.url(request)) for t in registry.offered(subject, registry.IMPORT)],
-        "exports": [(t.label, t.url(request)) for t in registry.offered(subject, registry.EXPORT)],
+        "imports": [
+            (t.label, t.url(request)) for t in registry.offered(subject, registry.IMPORT, user)
+        ],
+        "exports": [
+            (t.label, t.url(request)) for t in registry.offered(subject, registry.EXPORT, user)
+        ],
     }
+
+
+@register.simple_tag(takes_context=True)
+def module_on(context, name: str) -> bool:
+    """Whether the module called ``name`` is on for the person looking.
+
+    ``{% module_on "format-vcard" as on %}``: for a link or a block that belongs to a file
+    format and should not be drawn while the module that adds it is off (#877). The view behind
+    it answers 404 as well.
+    """
+    from postulo.core import modules
+
+    request = context.get("request")
+    return modules.is_on(getattr(request, "user", None), name)
 
 
 @register.simple_tag

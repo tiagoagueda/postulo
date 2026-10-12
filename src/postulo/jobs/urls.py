@@ -1,8 +1,14 @@
 from django.urls import path
 
+from postulo.core import modules
+
 from . import capture_views, page_views, vcard_views, views
 
 app_name = "jobs"
+
+#: vCard is a module (#877): while it is off its downloads and its import answer as if there
+#: were nothing there.
+vcard = modules.required("format-vcard")
 
 urlpatterns = [
     path("companies/", views.CompanyListView.as_view(), name="company_list"),
@@ -40,15 +46,19 @@ urlpatterns = [
     path("contacts/<int:pk>/merge/", views.ContactMergeView.as_view(), name="contact_merge"),
     # Contacts as vCard 4.0 (#660): the page that offers the files and reads one, and the
     # downloads. None takes an id but a record's own, and that is looked up for the owner.
-    path("contacts/vcard/", vcard_views.ContactVCardsView.as_view(), name="contact_vcards"),
-    path("contacts/all.vcf", vcard_views.AllContactsVCardView.as_view(), name="contacts_vcard"),
-    path("contacts/me.vcf", vcard_views.OwnCardView.as_view(), name="own_vcard"),
+    path("contacts/vcard/", vcard(vcard_views.ContactVCardsView.as_view()), name="contact_vcards"),
     path(
-        "contacts/<int:pk>/card.vcf", vcard_views.ContactVCardView.as_view(), name="contact_vcard"
+        "contacts/all.vcf", vcard(vcard_views.AllContactsVCardView.as_view()), name="contacts_vcard"
+    ),
+    path("contacts/me.vcf", vcard(vcard_views.OwnCardView.as_view()), name="own_vcard"),
+    path(
+        "contacts/<int:pk>/card.vcf",
+        vcard(vcard_views.ContactVCardView.as_view()),
+        name="contact_vcard",
     ),
     path(
         "companies/<int:pk>/card.vcf",
-        vcard_views.CompanyVCardView.as_view(),
+        vcard(vcard_views.CompanyVCardView.as_view()),
         name="company_vcard",
     ),
     path(
@@ -58,7 +68,7 @@ urlpatterns = [
     ),
     path(
         "companies/<int:pk>/contacts.vcf",
-        vcard_views.CompanyContactsVCardView.as_view(),
+        vcard(vcard_views.CompanyContactsVCardView.as_view()),
         name="company_contacts_vcard",
     ),
     # Every capture waiting, and the discarded ones with the way to put each back (#380).

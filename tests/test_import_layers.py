@@ -97,6 +97,9 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             # Which entry of the career a file proves (#669): looks the models up by name
             # and imports nothing of Postulo's, read by the upload that holds the link.
             "postulo.documents.proofs",
+            # The words of a Word or OpenDocument file (#877): a zip reader and nothing of
+            # Postulo's, called by the upload that holds the file.
+            "postulo.documents.readers",
             "postulo.documents.themes",
             "postulo.jobs.esco",
             "postulo.jobs.industries",
@@ -171,6 +174,8 @@ LAYERS: list[tuple[str, tuple[str, ...]]] = [
             "postulo.plugins.catalogue",
             "postulo.plugins.consent",
             "postulo.plugins.data",
+            # What a plugin needs of the others (#884), asked by the policy and the installer.
+            "postulo.plugins.dependencies",
             "postulo.plugins.installing",
             "postulo.plugins.logos",
             "postulo.plugins.policy",

@@ -188,6 +188,11 @@ class Manifest:
     each with an optional version specifier, ``("maps", "helloworld>=0.3")``. A plugin whose
     requirement is missing, or is switched off, is off itself (see :mod:`postulo.plugins.policy`),
     so it never runs half-served. A module's version is Postulo's.
+
+    ``required`` marks what cannot be switched off (#877): its switch is drawn on and disabled
+    and no policy row can turn it off, not even its parent's. Postulo cannot work without it
+    -- the PDF writer is one -- and a switch that could only break the application is not a
+    choice.
     """
 
     name: str
@@ -203,6 +208,7 @@ class Manifest:
     categories: tuple[str, ...] = ()
     icon: str = ""
     requires: tuple[str, ...] = ()
+    required: bool = False
 
     def __post_init__(self) -> None:
         if not self.name:
@@ -335,6 +341,7 @@ def shipped(
     categories: tuple[str, ...] = (),
     icon: str = "",
     requires: tuple[str, ...] = (),
+    required: bool = False,
 ) -> Manifest:
     """A manifest for a plugin that ships inside Postulo.
 
@@ -362,6 +369,7 @@ def shipped(
         categories=categories,
         icon=icon,
         requires=requires,
+        required=required,
     )
 
 

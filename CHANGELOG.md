@@ -151,6 +151,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A new module, Extend file formats, holds PDF (always on and impossible to switch off), DOCX, ODT, iCalendar, vCard and Europass; a format that is off is not offered in menus or buttons and its download, import and feed answer 404 until it is on again, and the text of a Word or OpenDocument file you upload is kept so that a search finds it (files uploaded from now on) (#877)
 - A plugin or catalogue release can name the plugins and modules it needs; one whose need is missing or off is off with the reason beside it, an install that lacks one is refused naming it and offering it from the same catalogue, and a plugin others need cannot be removed (#884)
 - A module can name a Lucide icon in its manifest, drawn where a logo goes; Companies with a structure wears the pyramid and Maps the map (#874)
 - A module may have sub-modules, each with exactly one parent, and categories; switching a parent off turns its sub-modules off and takes their switches away, and switching it on brings them all back (#873)

@@ -715,6 +715,11 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: so and the person replaces it (#663).
     verified_at = models.DateTimeField(_("last checked"), null=True, blank=True, editable=False)
     damage = models.CharField(_("damage"), max_length=10, blank=True, editable=False)
+    #: The plain text of a Word or OpenDocument file, read once when it arrives so that a
+    #: search can find a word inside it (#877). Not the file's content: the file is kept as
+    #: it came, and this is only what a search looks at. Empty for every other kind of file,
+    #: and while the module for that format is off.
+    text = models.TextField(_("text"), blank=True, editable=False)
 
     #: The entry of the career this file is the proof of (#669), as a `CVItem` points at one:
     #: a generic link, so a section added later needs one line in `proofs.PROVABLE` and no
@@ -757,6 +762,9 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
     #: kinds" has to mean if it is to survive a fourth (#133).
     archive_origin = "upload"
     download_url_name = "documents:upload_download"
+    #: Set by whoever saves a new file and knows the format's module is on for its owner: the
+    #: words of a Word or OpenDocument file are then read as it arrives (#877). Not a column.
+    reads_text = False
     #: A file somebody put here is a file they meant to keep, so a store is always offered
     #: it. See `RenderedDocument.goes_to_stores` for the one that is not always (#236).
     goes_to_stores = True
@@ -801,8 +809,9 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
             # that arrived damaged is not given the figures of the damage (#663).
             self.checksum = self.checksum or digest.hexdigest()
             self.size = length if self.size is None else self.size
+            self._read_text()
             if "update_fields" in kwargs and kwargs["update_fields"] is not None:
-                kwargs["update_fields"] = [*kwargs["update_fields"], "checksum", "size"]
+                kwargs["update_fields"] = [*kwargs["update_fields"], "checksum", "size", "text"]
         # The file is written as the row is saved. A row the database then refuses must not
         # leave the bytes behind with nothing pointing at them (#663).
         fresh = bool(self.file) and not self.file._committed
@@ -812,6 +821,28 @@ class UploadedDocument(RecordsALanguage, OwnedModel):
             if fresh and self.file._committed:
                 self.file.storage.delete(self.file.name)
             raise
+
+    def _read_text(self) -> None:
+        """Keep the words of a `.docx` or an `.odt`, when that format's module is on (#877).
+
+        The upload succeeds whatever happens here: a file that cannot be read has no text. It
+        is asked only when whoever saves has said so with ``reads_text``, because whether the
+        format's module is on is the policy's to say and the policy is above this model; the
+        upload form says it (#877). The file is not touched.
+        """
+        from . import readers
+
+        extension = readers.format_of(self.file.name)
+        if not self.reads_text or not extension or self.text:
+            return
+        handle = self.file.file
+        try:
+            handle.seek(0)
+            self.text = readers.text_of(handle, extension)
+        except (OSError, ValueError):
+            self.text = ""
+        finally:
+            handle.seek(0)
 
     @property
     def archived_at(self):

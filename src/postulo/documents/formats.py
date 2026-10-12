@@ -113,6 +113,9 @@ class Format:
     #: leave out or edit (#480). Plain text has none; a plugin's format says so if it does,
     #: and is handed an outline already carrying the choice.
     has_properties: bool = False
+    #: The module whose switch decides whether this is offered (#877): ``format-docx`` for Word.
+    #: Empty for plain text and for a plugin's format, which no module governs.
+    module: str = ""
 
 
 #: Every format, in the order a page should offer them.
@@ -153,6 +156,25 @@ def all_formats() -> list[Format]:
     return list(REGISTRY.values())
 
 
+def offered_to(user) -> list[Format]:
+    """What a page offers this person: every format whose module is on for them (#877)."""
+    from postulo.core import modules
+
+    return [one for one in REGISTRY.values() if not one.module or modules.is_on(user, one.module)]
+
+
+def get_for(user, key: str) -> Format | None:
+    """The format, unless its module is off for this person -- then it is not there (#877)."""
+    found = REGISTRY.get(key)
+    if found is None:
+        return None
+    from postulo.core import modules
+
+    if found.module and not modules.is_on(user, found.module):
+        return None
+    return found
+
+
 def register_the_ones_postulo_has() -> None:
     """Postulo's own formats, described once.
 
@@ -177,6 +199,7 @@ def register_the_ones_postulo_has() -> None:
             content_type=odt.CONTENT_TYPE,
             write=odt.write,
             has_properties=True,
+            module="format-odt",
         ),
         Format(
             key="docx",
@@ -185,6 +208,7 @@ def register_the_ones_postulo_has() -> None:
             content_type=docx.CONTENT_TYPE,
             write=docx.write,
             has_properties=True,
+            module="format-docx",
         ),
     )
     for one in described:

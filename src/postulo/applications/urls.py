@@ -1,8 +1,14 @@
 from django.urls import path
 
+from postulo.core import modules
+
 from . import views, views_ical
 
 app_name = "applications"
+
+#: iCalendar is a module (#877): while it is off its downloads, its import and its feeds answer
+#: as if there were nothing there, and answer again at the same address when it is on.
+icalendar = modules.required("format-icalendar")
 
 urlpatterns = [
     path("", views.ApplicationListView.as_view(), name="list"),
@@ -47,17 +53,23 @@ urlpatterns = [
     path("interviews/", views.InterviewListView.as_view(), name="interview_list"),
     path("calendar/", views.CalendarView.as_view(), name="calendar"),
     path(
-        "calendar/download.ics", views_ical.CalendarDownloadView.as_view(), name="calendar_download"
+        "calendar/download.ics",
+        icalendar(views_ical.CalendarDownloadView.as_view()),
+        name="calendar_download",
     ),
-    path("calendar/import/", views_ical.CalendarImportView.as_view(), name="ical_import"),
+    path(
+        "calendar/import/",
+        icalendar(views_ical.CalendarImportView.as_view()),
+        name="ical_import",
+    ),
     path(
         "reminders/calendar.ics",
-        views_ical.ReminderCalendarView.as_view(),
+        icalendar(views_ical.ReminderCalendarView.as_view()),
         name="reminder_calendar",
     ),
     path(
         "interviews/calendar.ics",
-        views.InterviewCalendarView.as_view(),
+        icalendar(views.InterviewCalendarView.as_view()),
         name="interview_calendar",
     ),
     path("<int:pk>/interviews/new/", views.InterviewCreateView.as_view(), name="interview_create"),
@@ -69,7 +81,7 @@ urlpatterns = [
     ),
     path(
         "interviews/<int:pk>/calendar.ics",
-        views.InterviewCalendarView.as_view(),
+        icalendar(views.InterviewCalendarView.as_view()),
         name="interview_ics",
     ),
     path("<int:pk>/offers/new/", views.OfferCreateView.as_view(), name="offer_create"),

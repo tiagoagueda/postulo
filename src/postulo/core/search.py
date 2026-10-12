@@ -412,7 +412,7 @@ def search_uploads(user, query: str, limit: int) -> Found:
 
     rows = ranked(
         UploadedDocument.objects.for_user(user)
-        .filter(contains(query, "title", "notes", "reference_letter__referee__name"))
+        .filter(contains(query, "title", "notes", "text", "reference_letter__referee__name"))
         .select_related("reference_letter__referee"),
         query,
         "title",
@@ -431,7 +431,9 @@ def search_uploads(user, query: str, limit: int) -> Found:
             if referee
             else upload.get_kind_display(),
             url=upload.get_absolute_url(),
-            excerpt=excerpt(_first_match(query, upload.notes), query) if upload.notes else "",
+            excerpt=excerpt(_first_match(query, upload.notes, upload.text), query)
+            if upload.notes or upload.text
+            else "",
             in_title=query.lower() in upload.title.lower(),
         )
 

@@ -52,6 +52,9 @@ class Transfer:
     url: Callable[[HttpRequest], str]
     #: Lower comes first. Postulo's own sit at 100, a plugin's at 200 unless it says otherwise.
     order: int = 200
+    #: The module whose switch decides whether this is offered (#877): ``format-vcard`` for the
+    #: vCard export. Empty for a transfer that no module governs.
+    module: str = ""
 
 
 REGISTRY: dict[str, Transfer] = {}
@@ -77,9 +80,20 @@ def forget(key: str = "") -> None:
         REGISTRY.clear()
 
 
-def offered(subject: str, direction: str) -> list[Transfer]:
-    """The transfers for one subject and direction, in the order they are drawn."""
-    found = [t for t in REGISTRY.values() if t.subject == subject and t.direction == direction]
+def offered(subject: str, direction: str, user=None) -> list[Transfer]:
+    """The transfers for one subject and direction, in the order they are drawn.
+
+    Given a person, the ones whose module is off for them are left out (#877).
+    """
+    from postulo.core import modules
+
+    found = [
+        t
+        for t in REGISTRY.values()
+        if t.subject == subject
+        and t.direction == direction
+        and (user is None or not t.module or modules.is_on(user, t.module))
+    ]
     return sorted(found, key=lambda t: (t.order, t.key))
 
 
@@ -96,7 +110,15 @@ def _calendar_download(request: HttpRequest) -> str:
 def register_the_ones_postulo_has() -> None:
     """Postulo's own, described once. Idempotent, so a test may call it again."""
     described = (
-        Transfer("calendar-ical-export", CALENDAR, EXPORT, _("iCalendar"), _calendar_download, 100),
+        Transfer(
+            "calendar-ical-export",
+            CALENDAR,
+            EXPORT,
+            _("iCalendar"),
+            _calendar_download,
+            100,
+            "format-icalendar",
+        ),
         Transfer(
             "calendar-ical-import",
             CALENDAR,
@@ -104,6 +126,7 @@ def register_the_ones_postulo_has() -> None:
             _("iCalendar"),
             _to("applications:ical_import"),
             100,
+            "format-icalendar",
         ),
         Transfer(
             "details-record-export",
@@ -113,7 +136,15 @@ def register_the_ones_postulo_has() -> None:
             _to("resume:candidate_file"),
             100,
         ),
-        Transfer("details-vcard-export", DETAILS, EXPORT, _("vCard"), _to("jobs:own_vcard"), 110),
+        Transfer(
+            "details-vcard-export",
+            DETAILS,
+            EXPORT,
+            _("vCard"),
+            _to("jobs:own_vcard"),
+            110,
+            "format-vcard",
+        ),
         Transfer(
             "details-record-import",
             DETAILS,
@@ -129,6 +160,7 @@ def register_the_ones_postulo_has() -> None:
             _("Europass"),
             _to("resume:europass_import"),
             100,
+            "europass",
         ),
         Transfer(
             "career-record-import",

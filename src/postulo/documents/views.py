@@ -102,7 +102,7 @@ def written_file(request: HttpRequest, document, outline, key: str):
     format is looked up, and a format that fails -- it may be a plugin's -- is a message on
     the document's own page rather than a traceback about it (#236).
     """
-    chosen = formats.get(key)
+    chosen = formats.get_for(request.user, key)
     if chosen is None:
         raise Http404("No such format.")
     try:
@@ -237,7 +237,7 @@ class CVDetailView(OwnedObjectMixin, DetailView):
         context["renders"] = newest_versions(self.object.renders)
         # What it can leave as beside the PDF: the registry's list, so a format a plugin
         # brings is on the page without the page being edited (#236).
-        context["formats"] = formats.all_formats()
+        context["formats"] = formats.offered_to(self.request.user)
         # What the file will say about itself, before anybody exports it (#480).
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
@@ -504,7 +504,7 @@ class CVDownloadView(OwnedObjectMixin, View):
     def get(self, request: HttpRequest, pk: int, format: str) -> HttpResponse:
         # The record first, so that somebody else's CV is a 404 whatever was asked of it.
         cv = get_object_or_404(self.get_queryset(), pk=pk)
-        chosen = formats.get(format)
+        chosen = formats.get_for(request.user, format)
         if chosen is None:
             raise Http404("No such format.")
         # A format may be a plugin's, and its failing is not a reason to show somebody a
@@ -563,7 +563,7 @@ class CoverLetterDetailView(OwnedObjectMixin, DetailView):
             .order_by("-created_at")[:50]
         )
         # What the file will say about itself, and the formats it can leave as (#480).
-        context["formats"] = formats.all_formats()
+        context["formats"] = formats.offered_to(self.request.user)
         context["properties_form"] = FilePropertiesForm(
             initial=rendering.file_defaults(self.object)
         )
@@ -689,7 +689,7 @@ class CoverLetterDownloadView(OwnedObjectMixin, View):
 
     def get(self, request: HttpRequest, pk: int, format: str) -> HttpResponse:
         letter = get_object_or_404(self.get_queryset(), pk=pk)
-        if formats.get(format) is None:
+        if formats.get_for(request.user, format) is None:
             raise Http404("No such format.")
         outline = rendering.letter_outline(
             letter, chosen_application(request), chosen_properties(request)

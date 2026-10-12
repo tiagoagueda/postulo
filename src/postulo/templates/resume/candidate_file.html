@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{% translate "Your record as a file" %}{% endblock %}
 
@@ -88,7 +88,8 @@
       <div class="flex flex-wrap items-center gap-3">
         <a href="{% url 'resume:overview' %}" class="btn" data-variant="outline">{% translate "Your career" %}</a>
         <a href="{% url 'accounts:profile' %}" class="btn" data-variant="outline">{% translate "Your details" %}</a>
-        <a href="{% url 'resume:europass_import' %}" class="btn" data-variant="ghost">{% translate "Import a Europass CV" %}</a>
+        {% module_on "europass" as europass_on %}
+        {% if europass_on %}<a href="{% url 'resume:europass_import' %}" class="btn" data-variant="ghost">{% translate "Import a Europass CV" %}</a>{% endif %}
       </div>
     {% else %}
       <section class="card mb-6" aria-labelledby="in-the-file" data-candidate-review>

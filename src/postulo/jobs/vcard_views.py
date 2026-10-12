@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpRequest, HttpResponse
+from django.http import Http404, HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.http import content_disposition_header
 from django.utils.translation import gettext as _
@@ -18,7 +18,7 @@ from django.utils.translation import ngettext
 from django.views import View
 from django.views.generic import TemplateView
 
-from postulo.core import vcard
+from postulo.core import modules, vcard
 
 from . import vcards
 from .models import Company, Contact
@@ -78,6 +78,9 @@ class CompanyExportView(LoginRequiredMixin, View):
 
         company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
         notes = _with_notes(request)
+        # The JSON is Postulo's own; the card is the vCard module's (#877).
+        if request.GET.get("format") != "json" and not modules.is_on(request.user, "format-vcard"):
+            raise Http404
         if request.GET.get("format") == "json":
             response = JsonResponse(
                 kind_files.build_document(

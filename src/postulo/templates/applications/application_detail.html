@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block title %}{{ application.posting.title }}{% endblock %}
 {% block breadcrumb %}
@@ -294,9 +294,12 @@
                     {% endif %}
                   </div>
                   <div class="flex shrink-0 flex-col items-end gap-1">
+                    {% module_on "format-icalendar" as ical_on %}
+                    {% if ical_on %}
                     <a href="{% url 'applications:interview_ics' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                       {% translate "Calendar" %}
                     </a>
+                    {% endif %}
                     <a href="{% url 'applications:interview_update' interview.pk %}" class="btn" data-variant="ghost" data-size="xs">
                       {% translate "Edit" %}
                     </a>

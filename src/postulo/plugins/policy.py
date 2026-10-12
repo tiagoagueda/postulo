@@ -41,6 +41,10 @@ modules it cannot work without; one that is missing, or is off for this person, 
 off too, with the labels of what is wanted beside it. Asked after the parent and before the
 rows, so that a plugin forced on by an administrator is still not run without its need.
 
+**What is required is on** (#877). A manifest marked ``required`` answers yes before anything
+else is asked: its parent being off does not reach it, and a row an administrator wrote for it
+is not read. It is not the person's or the administrator's, and the page says so.
+
 **Switching a feature off does not delete what it governs.** It stops Postulo offering and
 using that part of itself; the rows stay, and switching it back on finds them unchanged.
 That is the same promise every other kind here makes, and it is not weaker for the kind
@@ -163,6 +167,15 @@ def is_ungoverned(plugin_name: str) -> bool:
     )
 
 
+def is_required(plugin_name: str) -> bool:
+    """Whether Postulo cannot work without this one, so no row or parent can turn it off (#877)."""
+    from . import base
+    from .registry import find_any
+
+    plugin = find_any(plugin_name)
+    return bool(plugin is not None and base.manifest_of(plugin).required)
+
+
 def parent_of(plugin_name: str) -> str:
     """The module this plugin is a sub-module of, or nothing (#873).
 
@@ -253,6 +266,9 @@ def _decide(plugin_name: str, person) -> Decision:
     # `set_choice` with a transport's name and switching the mail off for somebody.
     if is_ungoverned(plugin_name):
         return Decision(on=True, offered=False, theirs=False, decided_by="infrastructure")
+
+    if is_required(plugin_name):
+        return Decision(on=True, offered=True, theirs=False, decided_by="required")
 
     parent = parent_of(plugin_name)
     if parent:

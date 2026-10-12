@@ -1247,8 +1247,9 @@ def _policy_rows(person=None) -> list[dict]:
                 # being handed one it has no way to fall back from (#106).
                 "plugin": plugin,
                 "state": state,
-                "on": state in (PluginPolicy.State.AVAILABLE, PluginPolicy.State.FORCED_ON),
-                "free": state == PluginPolicy.State.AVAILABLE,
+                "on": manifest.required
+                or state in (PluginPolicy.State.AVAILABLE, PluginPolicy.State.FORCED_ON),
+                "free": state == PluginPolicy.State.AVAILABLE and not manifest.required,
                 "hidden": state == PluginPolicy.State.UNAVAILABLE,
                 # Drawn from the instance's decision, not the person's own, and said so.
                 "follows_default": bool(person) and own is None and row is not None,
@@ -1257,8 +1258,9 @@ def _policy_rows(person=None) -> list[dict]:
                     {"slug": slug, "label": categories.label_for(slug)}
                     for slug in manifest.categories
                 ],
-                "held": False,
-                "why": "",
+                # What Postulo cannot work without is drawn on and held, with the reason (#877).
+                "held": manifest.required,
+                "why": policy.decide(plugin.name, person).explain() if manifest.required else "",
                 "decided_by": row.decided_by if row else None,
                 "decided_at": row.decided_at if row else None,
             }
@@ -1373,6 +1375,8 @@ def _save_policies(request: HttpRequest, person=None) -> int:
         # look the same in the POST. The marker each row carries is what tells them apart:
         # a row the form did not draw is left exactly as it was (#286).
         if request.POST.get(f"row:{plugin.name}") != "1":
+            continue
+        if policy.is_required(plugin.name):
             continue
         existing = PluginPolicy.objects.filter(plugin=plugin.name, person=person).first()
         on = f"on:{plugin.name}" in request.POST

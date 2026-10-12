@@ -90,7 +90,7 @@ def is_present(need: Need) -> bool:
     its dependents as off for that reason, not for this one.
     """
     from . import base
-    from .installing import installed
+    from .record import installed
 
     plugin = _registered(need.name)
     if plugin is not None:

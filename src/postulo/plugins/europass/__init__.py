@@ -35,8 +35,11 @@ _CANDIDATE = re.compile(rb"<(?:[A-Za-z_][\w.-]*:)?Candidate[\s>/]")
 @declares(
     shipped(
         name="europass",
-        label="Europass",
+        label=_("Europass"),
         kind="importer",
+        parent="file-formats",
+        categories=("files",),
+        icon="id-card",
         description=_(
             "The European CV format: the PDF europass.europa.eu gives you and the XML "
             "attached to it, and the older XML and JSON of the Europass service before it."

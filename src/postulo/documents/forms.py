@@ -16,7 +16,7 @@ from postulo.jobs.models import Contact
 from postulo.resume.models import Link
 from postulo.resume.registry import OVERVIEW_ORDER, SECTIONS
 
-from . import integrity, proofs, themes
+from . import integrity, proofs, readers, themes
 from .kinds import PROOF_KINDS, DocumentKind
 from .models import (
     CV,
@@ -621,6 +621,14 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         """The bound fields about the letter, none where the file is of another kind."""
         return [self[name] for name in self.REFERENCE_FIELDS if name in self.fields]
 
+    def _text_is_read(self, document: UploadedDocument) -> bool:
+        """Whether the words of this file are kept: it is Word or OpenDocument, and that
+        format's module is on for this person (#877)."""
+        from postulo.core import modules
+
+        extension = readers.format_of(document.file.name or "")
+        return bool(extension) and modules.is_on(self.user, f"format-{extension}")
+
     def _write_proof(self, document: UploadedDocument) -> None:
         """Point the file at the entry chosen, or at none; a kind that proves nothing clears it."""
         if "proves" not in self.fields:
@@ -744,6 +752,7 @@ class UploadedDocumentForm(OwnerScopedModelForm):
         if document.replaces_id and not self.instance.pk:
             document.version = document.replaces.version + 1
         self._write_proof(document)
+        document.reads_text = self._text_is_read(document)
         if commit:
             document.save()
             self._keep_reference_letter(document)

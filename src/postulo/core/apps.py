@@ -11,6 +11,14 @@ class CoreConfig(AppConfig):
     def ready(self) -> None:
         from postulo.plugins import registry
         from postulo.plugins.employer_structure import EmployerStructureFeature
+        from postulo.plugins.file_formats import (
+            DocxFormat,
+            FileFormatsFeature,
+            ICalendarFormat,
+            OdtFormat,
+            PdfFormat,
+            VCardFormat,
+        )
         from postulo.plugins.gdpr import GdprFeature
         from postulo.plugins.maps import MapsFeature
         from postulo.plugins.messaging_contacts import MessagingContactsFeature
@@ -33,6 +41,17 @@ class CoreConfig(AppConfig):
         # to, said once so a plugin can add a format (#862).
         transfers.register_the_ones_postulo_has()
 
+        # The module the file-format sub-modules belong to: PDF, Word, OpenDocument, iCalendar
+        # and vCard, with Europass beside them (#877).
+        for format_module in (
+            FileFormatsFeature,
+            PdfFormat,
+            DocxFormat,
+            OdtFormat,
+            ICalendarFormat,
+            VCardFormat,
+        ):
+            registry.register_builtin("feature", format_module)
         # The module the "multiple …" features are sub-modules of (#875).
         registry.register_builtin("feature", MultipleFieldsFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)

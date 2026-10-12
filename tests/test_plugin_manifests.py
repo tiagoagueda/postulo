@@ -170,7 +170,9 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
 
     `multiple-fields` is a module with no behaviour of its own: the parent of the six features
     that let a field hold more than one value (#875), whose switch is theirs, and
-    `builtin-notifications` is the same for the three notifiers that ship (#876).
+    `builtin-notifications` is the same for the three notifiers that ship (#876), and
+    `file-formats` for the formats Postulo reads and writes: PDF, which is required, Word,
+    OpenDocument, iCalendar and vCard, with Europass beside them (#877).
     """
     found = {
         manifest_of(plugin_class()).name
@@ -205,6 +207,12 @@ def test_these_are_the_plugins_that_ship_across_ten_kinds():
         "maps",
         "multiple-fields",
         "builtin-notifications",
+        "file-formats",
+        "format-pdf",
+        "format-docx",
+        "format-odt",
+        "format-icalendar",
+        "format-vcard",
     }
 
 
