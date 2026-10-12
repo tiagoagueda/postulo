@@ -143,9 +143,13 @@ def is_public(address: Address) -> bool:
             return False
         if not all(is_public(carried) for carried in carried_ipv4(address)):
             return False
-    # Multicast, reserved and unspecified are never a destination a server should dial (#816);
-    # `is_global` passes some of them, as it does a global-scope multicast group.
-    if address.is_multicast or address.is_reserved or address.is_unspecified:
+    # Multicast and unspecified are never a destination a server should dial, and neither is
+    # the IPv4 block reserved for future use (#816); `is_global` passes some of them, as it does
+    # a global-scope multicast group. IPv6's own `is_reserved` is not asked: it covers `::/8`,
+    # which holds the well-known NAT64 prefix that DNS64 answers with.
+    if address.is_multicast or address.is_unspecified:
+        return False
+    if address.version == 4 and address.is_reserved:
         return False
     return address.is_global
 

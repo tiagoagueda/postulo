@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The server's outbound requests no longer honour HTTP_PROXY, HTTPS_PROXY or NO_PROXY unless POSTULO_OUTBOUND_USE_ENV_PROXY is true, since a pinned request through a proxy was verified against the address and not the name (#817)
 - The destination guard refuses multicast, reserved and unspecified addresses, which it used to pass as public (#816)
 - The threat model and the Hardening page say that OpenID Connect discovery, token and userinfo calls are made by allauth's session and not the guarded client, and why that is acceptable (#815)
 - The process that draws a captured page as a PDF is started with an allow-listed environment and in an empty directory of its own, so it does not inherit the secret key or the database credentials (#814)

@@ -634,6 +634,11 @@ POSTULO_BACKUP_UPLOAD_MAX_MB = env.int("POSTULO_BACKUP_UPLOAD_MAX_MB", default=5
 # The largest request body any other page accepts, refused on its declared length before it is
 # read (#812). A document is 20 MB at most; the rest is for the form around it.
 POSTULO_UPLOAD_CEILING_MB = env.int("POSTULO_UPLOAD_CEILING_MB", default=25)
+# Whether outbound requests honour HTTP_PROXY, HTTPS_PROXY and NO_PROXY (#817). Off: behind a
+# proxy the destination check is made on an address the tunnel then verifies a certificate for
+# instead of the name, so the check and the connection can disagree. For an instance whose only
+# way out is a proxy, and whose operator accepts that.
+POSTULO_OUTBOUND_USE_ENV_PROXY = env.bool("POSTULO_OUTBOUND_USE_ENV_PROXY", default=False)
 # Who may download a backup through the browser (#810). A backup holds every account's rows and
 # files, so this is the one place an administrator is more than an administrator of accounts:
 # `administrators` (the default) is every administrator, `operator` only the operator's own

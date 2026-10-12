@@ -22,6 +22,7 @@ from collections.abc import Iterator
 
 import httpcore
 import httpx
+from django.conf import settings
 from django.utils.translation import gettext as _
 
 from .public_addresses import (
@@ -295,6 +296,12 @@ def _build(
     }
     kwargs.setdefault("follow_redirects", True)
     kwargs.setdefault("max_redirects", MAX_REDIRECTS)
+    # The environment's proxy variables are ignored unless the operator says otherwise (#817):
+    # behind a proxy a pinned request's tunnel verifies the certificate against the address that
+    # was pinned and not the name somebody typed, so a proxy in HTTP_PROXY would quietly break
+    # the guarantee `_pin` makes. `POSTULO_OUTBOUND_USE_ENV_PROXY=true` is the operator's
+    # decision to accept that, for an instance that has no other way out.
+    kwargs.setdefault("trust_env", bool(getattr(settings, "POSTULO_OUTBOUND_USE_ENV_PROXY", False)))
     built = httpx.Client(timeout=timeout, headers=headers, event_hooks=hooks, **kwargs)
     _fall_back_between_addresses(built)
     if bounded:

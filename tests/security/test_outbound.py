@@ -1245,9 +1245,11 @@ def test_every_wait_on_a_connection_is_cut_to_what_is_left(monkeypatch):
     ]
 
 
-def test_a_proxy_from_the_environment_is_held_to_the_deadline_as_well(monkeypatch):
+def test_a_proxy_from_the_environment_is_held_to_the_deadline_as_well(monkeypatch, settings):
     """httpx opens a pool of its own for each proxy the environment names, beside the
-    client's. Each of them hands out connections, so each of them is bounded."""
+    client's. Each of them hands out connections, so each of them is bounded. An operator who
+    has chosen to honour the environment's proxy (#817) gets that."""
+    settings.POSTULO_OUTBOUND_USE_ENV_PROXY = True
     monkeypatch.setenv("HTTPS_PROXY", "http://proxy.example:3128")
 
     with http.public_only_client() as client:
