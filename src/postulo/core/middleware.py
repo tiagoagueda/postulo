@@ -255,6 +255,49 @@ class RequestIDMiddleware:
         return response
 
 
+class UploadCeilingMiddleware:
+    """Refuse a request whose declared body is past what any page of this instance takes (#812).
+
+    Every upload form checks its own file's size, but only after Django has read the whole body
+    and spooled it to disk, so a stranger-sized body is read before anything can say no. The
+    declared `Content-Length` costs nothing to read, so a request that announces more than the
+    biggest thing the instance accepts is answered 413 before its body is touched. A client that
+    lies about the length is the reverse proxy's to stop (`client_max_body_size`, in the Compose
+    notes): this is the floor for a deployment that has none.
+
+    The ceiling is the instance's backup limit on the backup upload, a plugin wheel's on the
+    plugin page, and `POSTULO_UPLOAD_CEILING_MB` everywhere else.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if request.method in ("POST", "PUT", "PATCH"):
+            try:
+                declared = int(request.META.get("CONTENT_LENGTH") or 0)
+            except ValueError:
+                declared = 0
+            if declared > self._ceiling(request):
+                return HttpResponse(
+                    "That request is larger than this instance accepts.\n",
+                    status=413,
+                    content_type="text/plain",
+                )
+        return self.get_response(request)
+
+    @staticmethod
+    def _ceiling(request) -> int:
+        megabytes = settings.POSTULO_UPLOAD_CEILING_MB
+        path = request.path_info
+        if path.rstrip("/").endswith("/server/backups/upload"):
+            megabytes = settings.POSTULO_BACKUP_UPLOAD_MAX_MB
+        elif path.rstrip("/").endswith("/server/plugins/action"):
+            megabytes = max(megabytes, 64)
+        # A little over, for the form's other fields and the multipart framing.
+        return (megabytes + 1) * 1024 * 1024
+
+
 class DownloadsAreNotCachedMiddleware:
     """Anything handed over as a download is never kept by a cache (#788).
 

@@ -98,6 +98,9 @@ MIDDLEWARE = [
     # Second, so that every line a request logs -- a refusal the security middleware makes
     # included -- carries the request's id, and the answer echoes it (#233).
     "postulo.core.middleware.RequestIDMiddleware",
+    # Before anything reads a body: an upload larger than any page takes is refused on its
+    # declared length (#812).
+    "postulo.core.middleware.UploadCeilingMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.middleware.csp.ContentSecurityPolicyMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -628,6 +631,9 @@ POSTULO_BACKUP_DIR = env.path("POSTULO_BACKUP_DIR", default=REPO_DIR / "data" / 
 # upload is checked against this before any of it is kept; a reverse proxy in front has its
 # own, smaller limit that has to be raised to match (#242).
 POSTULO_BACKUP_UPLOAD_MAX_MB = env.int("POSTULO_BACKUP_UPLOAD_MAX_MB", default=512)
+# The largest request body any other page accepts, refused on its declared length before it is
+# read (#812). A document is 20 MB at most; the rest is for the form around it.
+POSTULO_UPLOAD_CEILING_MB = env.int("POSTULO_UPLOAD_CEILING_MB", default=25)
 # Who may download a backup through the browser (#810). A backup holds every account's rows and
 # files, so this is the one place an administrator is more than an administrator of accounts:
 # `administrators` (the default) is every administrator, `operator` only the operator's own
