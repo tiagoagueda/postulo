@@ -9,7 +9,10 @@
         {% translate "Every account on this instance. Administrators see accounts, never anyone's applications or documents, but they can install plugins, so appoint only people you would trust with the database." %}
       </p>
     </div>
-    <a href="{% url 'accounts:invite_list' %}" class="btn ms-auto">{% translate "Invitations" %}</a>
+    <div class="ms-auto flex flex-wrap gap-2">
+      <a href="{% url 'server:groups' %}" class="btn" data-variant="outline">{% icon "users" %}<span class="btn-label">{% translate "Groups" %}</span></a>
+      <a href="{% url 'accounts:invite_list' %}" class="btn">{% translate "Invitations" %}</a>
+    </div>
   </div>
 
   {% comment %} `table-cards` makes each row a card below the md breakpoint, where five

@@ -1926,6 +1926,10 @@ msgstr "Oblik oslovljavanja je ono što se piše ispred imena, a zamjenice kažu
 msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
 msgstr "Oblik oslovljavanja piše se ispred vašeg imena, a vaše zamjenice kažu kako se obraćati vama. Oboje je neobavezno i ništa se ne pretpostavlja kad su prazni."
 
+#: src/postulo/core/views_access.py
+msgid "A group needs a name."
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A handle is at most %(max)s characters, on one line."
@@ -2116,6 +2120,10 @@ msgstr ""
 #, fuzzy
 msgid "A month"
 msgstr "Mjesec"
+
+#: src/postulo/templates/server/groups.html
+msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2627,6 +2635,15 @@ msgstr "prihvaćeno dana"
 msgid "accepted by"
 msgstr "prihvatio/la"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Access"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+#, python-format
+msgid "Access to %(name)s"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/settings/accessibility.html
 #, fuzzy
@@ -2639,12 +2656,17 @@ msgstr "Pristupačnost"
 msgid "Account"
 msgstr "Račun"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "account"
+msgstr ""
+
 #: src/postulo/templates/base.html
 #, fuzzy, python-format
 msgid "Account menu, %(name)s"
 msgstr "Izbornik računa, %(name)s"
 
 #: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Accounts"
 msgstr "Računi"
@@ -2686,6 +2708,7 @@ msgstr "Radnje za: %(what)s"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/due_reminders.html
 #, fuzzy
@@ -2732,6 +2755,10 @@ msgstr ""
 #, fuzzy
 msgid "Add a repository"
 msgstr "Dodaj repozitorij"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Add a rule"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy
@@ -3943,16 +3970,21 @@ msgstr "Natrag na pozivnice"
 msgid "Back to Listings"
 msgstr ""
 
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/person_plugins.html
+#, fuzzy
+msgid "Back to people"
+msgstr "Natrag na osobe"
+
 #: src/postulo/templates/server/person_delete.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "Back to People"
 msgstr "Natrag na Ljude"
 
-#: src/postulo/templates/server/person_plugins.html
-#, fuzzy
-msgid "Back to people"
-msgstr "Natrag na osobe"
+#: src/postulo/templates/server/plugin_access.html
+msgid "Back to plugins"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -4663,6 +4695,10 @@ msgstr "Najprije odaberite datoteku Europass."
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Najprije odaberite datoteku."
+
+#: src/postulo/core/views_access.py
+msgid "Choose a group or an account."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Choose a language"
@@ -5778,6 +5814,7 @@ msgstr "Obrana"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/resume/overview.html
 #: src/postulo/templates/server/backups.html
+#: src/postulo/templates/server/groups.html
 #, fuzzy
 msgid "Delete"
 msgstr "Izbriši"
@@ -6322,11 +6359,6 @@ msgstr "Svaki izbornik nudi ono što je u uporabi na jeziku vašeg životopisnog
 msgid "Each one is frozen as it is now, so what they received stays readable."
 msgstr "Svaki se zamrzava onakav kakav je sada, pa ono što su primili ostaje čitljivo."
 
-#: src/postulo/templates/server/plugins.html
-#, fuzzy
-msgid "Each person may change it"
-msgstr "Svaka osoba to može promijeniti"
-
 #: src/postulo/templates/widgets/funnel.html
 #, fuzzy
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -6748,6 +6780,14 @@ msgstr "Svako spremište već ima ovaj dokument."
 
 #: src/postulo/core/models.py
 msgid "Every week"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody may switch it for themselves"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7259,6 +7299,7 @@ msgid "Food and agriculture"
 msgstr "Hrana i poljoprivreda"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "For"
 msgstr "Za"
@@ -7704,13 +7745,28 @@ msgstr "Bruto, prije poreza. Ostavite prazno ako oglas navodi samo jedan iznos."
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Bruto, prije poreza. Dovoljan je i samo jedan kraj raspona — većina oglasa navodi jedan."
 
-#: src/postulo/resume/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
 msgstr "grupa"
 
+#: src/postulo/core/views_access.py
+msgid "Group deleted."
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Group made."
+msgstr ""
+
 #: src/postulo/resume/registry.py
 msgid "Group related skills under a heading, such as “Programming languages” or “Infrastructure”."
+msgstr ""
+
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/people.html
+#: src/postulo/templates/server/plugin_access.html
+msgid "Groups"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -9868,6 +9924,10 @@ msgstr "Napravi poveznicu"
 msgid "Make administrator"
 msgstr "Postavi za administratora"
 
+#: src/postulo/templates/server/groups.html
+msgid "Make it"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -9929,10 +9989,22 @@ msgstr "Prati operacijski sustav"
 msgid "Matched from the city dataset"
 msgstr "Pronađeno u skupu podataka o gradovima"
 
+#: src/postulo/plugins/models.py
+msgid "may change its settings"
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 #, fuzzy
 msgid "May create accounts"
 msgstr "Može stvarati račune"
+
+#: src/postulo/plugins/models.py
+msgid "may switch it for themselves"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "may use it"
+msgstr ""
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
@@ -9975,6 +10047,10 @@ msgstr ""
 #, fuzzy
 msgid "Member"
 msgstr "Član"
+
+#: src/postulo/templates/server/groups.html
+msgid "Members"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "membership"
@@ -10272,6 +10348,7 @@ msgstr "naziv"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -10397,6 +10474,10 @@ msgstr ""
 #, fuzzy
 msgid "New CV or portfolio"
 msgstr "Novi životopis ili portfelj"
+
+#: src/postulo/templates/server/groups.html
+msgid "New group"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -10628,6 +10709,10 @@ msgstr "Nema datoteke"
 msgid "No files of this type yet."
 msgstr "Još nema datoteka ove vrste."
 
+#: src/postulo/templates/server/groups.html
+msgid "No groups yet."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "No icon"
@@ -10744,6 +10829,10 @@ msgstr "Nije postavljeno ograničenje čuvanja, pa nema pravila koje bi se izvel
 #, fuzzy
 msgid "no role"
 msgstr "nema pozicije"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "No rules: the default applies to everybody."
+msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
 #, fuzzy
@@ -12632,8 +12721,9 @@ msgid "Pension, insurance, allowances, equipment: whatever was named."
 msgstr "Mirovina, osiguranje, dodaci, oprema: sve što je navedeno."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
-#: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/core/server_views.py src/postulo/core/views_access.py
+#: src/postulo/jobs/merging.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
@@ -12844,6 +12934,14 @@ msgstr ""
 msgid "plugin"
 msgstr "dodatak"
 
+#: src/postulo/plugins/models.py
+msgid "plugin access rule"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin access rules"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 #, fuzzy
 msgid "plugin not installed"
@@ -12871,7 +12969,8 @@ msgstr "repozitorij dodataka"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/plugins/apps.py src/postulo/templates/server/backup_restore.html
+#: src/postulo/core/views_access.py src/postulo/plugins/apps.py
+#: src/postulo/templates/server/backup_restore.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/plugins.html
 #, fuzzy
@@ -14127,6 +14226,7 @@ msgstr "udaljena adresa"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Remove"
@@ -14497,9 +14597,11 @@ msgstr ""
 #: src/postulo/templates/server/data_protection.html
 #: src/postulo/templates/server/defaults.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_plugins.html
 #: src/postulo/templates/server/person_username.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
@@ -14560,7 +14662,8 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Spremljeno u vaše oglase. Odlučite kad budete spremni."
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
-#: src/postulo/core/views_backups.py src/postulo/resume/views.py
+#: src/postulo/core/views_access.py src/postulo/core/views_backups.py
+#: src/postulo/resume/views.py
 #, fuzzy
 msgid "Saved."
 msgstr "Spremljeno."
@@ -14971,6 +15074,10 @@ msgid "Set by the person recording it"
 msgstr "Postavila osoba koja bilježi"
 
 #: src/postulo/plugins/policy.py
+msgid "Set by your administrator."
+msgstr ""
+
+#: src/postulo/plugins/policy.py
 #, fuzzy
 msgid "Set for your account."
 msgstr "Postavljeno za vaš račun."
@@ -15000,6 +15107,7 @@ msgstr "Postavite kad radno mjesto više nije dostupno."
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/base.html
 #, fuzzy
@@ -15853,6 +15961,14 @@ msgstr "Površine"
 msgid "surname"
 msgstr "prezime"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "Switch"
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Switch it on first: while it is off for everybody this does not apply."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Switch off"
@@ -16482,6 +16598,10 @@ msgstr "To nije datoteka koju ova stranica čita. Čita JSON datoteku koju nudi 
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
 msgstr "To nije vrsta slike koju Postulo čuva. Upotrijebite %(formats)s."
 
+#: src/postulo/core/views_access.py
+msgid "That is not a name this group can have."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy, python-format
 msgid "That is not a number %(country)s uses. It is one %(territory)s uses: choose %(choice)s beside the number."
@@ -16719,6 +16839,10 @@ msgstr "Taj je dodatak za vas isključen."
 #, fuzzy
 msgid "That reply did not come from a request Postulo made."
 msgstr "Taj odgovor nije došao od zahtjeva koji je Postulo poslao."
+
+#: src/postulo/core/views_access.py
+msgid "That rule existed, and is changed."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -18089,6 +18213,10 @@ msgstr ""
 msgid "There are no links to check."
 msgstr "Nema poveznica za provjeru."
 
+#: src/postulo/core/views_access.py
+msgid "There is a group of that name already."
+msgstr ""
+
 #: src/postulo/jobs/slow.py
 #, fuzzy
 msgid "There is no address to fetch it from again."
@@ -18596,6 +18724,10 @@ msgstr "Ovaj je zahtjev došao s <code>%(peer)s</code>, što nije pouzdan proxy.
 #, fuzzy, python-format
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr "Ovaj je zahtjev došao preko <code>%(peer)s</code>, što je pouzdano."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "This ships inside Postulo, so it is never a person's to switch; the rules below say who may use it and who may change its settings."
+msgstr ""
 
 #: src/postulo/plugins/fetching.py
 #, fuzzy
@@ -19190,6 +19322,10 @@ msgstr "Prenesene datoteke"
 #, fuzzy
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Preneseno. Ništa ovdje nije potpisalo ovu datoteku, pa za nju ništa ne jamči."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Use"
+msgstr ""
 
 #: src/postulo/accounts/validators.py
 #, fuzzy
@@ -20413,6 +20549,10 @@ msgstr "Od koga je došlo, ako je to netko koga ste zabilježili."
 #, fuzzy
 msgid "Who may create an account here."
 msgstr "Tko ovdje može stvoriti račun."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Who may use it, who may switch it for themselves, and who may change its settings. A rule for an account counts over the rules for its groups, and a rule for a group over the default for everybody."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who published it: a press, a journal's publisher, a repository."

@@ -2108,6 +2108,10 @@ msgstr "Is é foirm bheannachta an rud a scríobhtar roimh ainm, agus deir forai
 msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
 msgstr "Scríobhtar foirm bheannachta roimh d’ainm, agus deir do chuid forainmneacha conas tagairt a dhéanamh duit. Tá an dá cheann roghnach, agus ní ghlactar le rud ar bith nuair atá siad bán."
 
+#: src/postulo/core/views_access.py
+msgid "A group needs a name."
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A handle is at most %(max)s characters, on one line."
@@ -2298,6 +2302,10 @@ msgstr ""
 #, fuzzy
 msgid "A month"
 msgstr "Mí"
+
+#: src/postulo/templates/server/groups.html
+msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2813,6 +2821,15 @@ msgstr "glactha ar"
 msgid "accepted by"
 msgstr "glactha ag"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Access"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+#, python-format
+msgid "Access to %(name)s"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/settings/accessibility.html
 #, fuzzy
@@ -2825,12 +2842,17 @@ msgstr "Inrochtaineacht"
 msgid "Account"
 msgstr "Cuntas"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "account"
+msgstr ""
+
 #: src/postulo/templates/base.html
 #, fuzzy, python-format
 msgid "Account menu, %(name)s"
 msgstr "Roghchlár cuntais, %(name)s"
 
 #: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Accounts"
 msgstr "Cuntais"
@@ -2872,6 +2894,7 @@ msgstr "Gníomhartha do %(what)s"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/due_reminders.html
 #, fuzzy
@@ -2918,6 +2941,10 @@ msgstr ""
 #, fuzzy
 msgid "Add a repository"
 msgstr "Cuir stór leis"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Add a rule"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy
@@ -4143,16 +4170,21 @@ msgstr "Ar ais chuig cuirí"
 msgid "Back to Listings"
 msgstr ""
 
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/person_plugins.html
+#, fuzzy
+msgid "Back to people"
+msgstr "Ar ais chuig daoine"
+
 #: src/postulo/templates/server/person_delete.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "Back to People"
 msgstr "Ar ais go Daoine"
 
-#: src/postulo/templates/server/person_plugins.html
-#, fuzzy
-msgid "Back to people"
-msgstr "Ar ais chuig daoine"
+#: src/postulo/templates/server/plugin_access.html
+msgid "Back to plugins"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -4865,6 +4897,10 @@ msgstr "Roghnaigh comhad Europass ar dtús."
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Roghnaigh comhad ar dtús."
+
+#: src/postulo/core/views_access.py
+msgid "Choose a group or an account."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Choose a language"
@@ -5982,6 +6018,7 @@ msgstr "Cosaint"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/resume/overview.html
 #: src/postulo/templates/server/backups.html
+#: src/postulo/templates/server/groups.html
 #, fuzzy
 msgid "Delete"
 msgstr "Scrios"
@@ -6526,11 +6563,6 @@ msgstr "Tairgeann gach roghchlár an méid atá in úsáid i dteanga do thaifid 
 msgid "Each one is frozen as it is now, so what they received stays readable."
 msgstr "Reoitear gach ceann mar atá sé anois, ionas go bhfanann an méid a fuair siad inléite."
 
-#: src/postulo/templates/server/plugins.html
-#, fuzzy
-msgid "Each person may change it"
-msgstr "Féadann gach duine é a athrú"
-
 #: src/postulo/templates/widgets/funnel.html
 #, fuzzy
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -6952,6 +6984,14 @@ msgstr "Tá an doiciméad seo ag gach stór cheana."
 
 #: src/postulo/core/models.py
 msgid "Every week"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody may switch it for themselves"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7463,6 +7503,7 @@ msgid "Food and agriculture"
 msgstr "Bia agus talmhaíocht"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "For"
 msgstr "Do"
@@ -7908,13 +7949,28 @@ msgstr "Comhlán, roimh cháin. Fág folamh é má ainmníonn an fógra poist fi
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Comhlán, roimh cháin. Tá ceann amháin ina aonar ceart go leor — tugann formhór na bhfógraí poist ceann amháin."
 
-#: src/postulo/resume/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
 msgstr "grúpa"
 
+#: src/postulo/core/views_access.py
+msgid "Group deleted."
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Group made."
+msgstr ""
+
 #: src/postulo/resume/registry.py
 msgid "Group related skills under a heading, such as “Programming languages” or “Infrastructure”."
+msgstr ""
+
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/people.html
+#: src/postulo/templates/server/plugin_access.html
+msgid "Groups"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -10080,6 +10136,10 @@ msgstr "Déan nasc"
 msgid "Make administrator"
 msgstr "Déan ina riarthóir"
 
+#: src/postulo/templates/server/groups.html
+msgid "Make it"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -10141,10 +10201,22 @@ msgstr "Lean an córas oibriúcháin"
 msgid "Matched from the city dataset"
 msgstr "Meaitseáilte ón tacar sonraí cathrach"
 
+#: src/postulo/plugins/models.py
+msgid "may change its settings"
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 #, fuzzy
 msgid "May create accounts"
 msgstr "Féadann cuntais a chruthú"
+
+#: src/postulo/plugins/models.py
+msgid "may switch it for themselves"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "may use it"
+msgstr ""
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
@@ -10187,6 +10259,10 @@ msgstr ""
 #, fuzzy
 msgid "Member"
 msgstr "Ball"
+
+#: src/postulo/templates/server/groups.html
+msgid "Members"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "membership"
@@ -10484,6 +10560,7 @@ msgstr "ainm"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -10609,6 +10686,10 @@ msgstr ""
 #, fuzzy
 msgid "New CV or portfolio"
 msgstr "CV nó punann nua"
+
+#: src/postulo/templates/server/groups.html
+msgid "New group"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -10840,6 +10921,10 @@ msgstr "Gan comhad"
 msgid "No files of this type yet."
 msgstr "Níl aon chomhaid den chineál seo ann go fóill."
 
+#: src/postulo/templates/server/groups.html
+msgid "No groups yet."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "No icon"
@@ -10956,6 +11041,10 @@ msgstr "Níl aon teorainn choinneála socraithe, mar sin níl aon pholasaí le r
 #, fuzzy
 msgid "no role"
 msgstr "gan ról"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "No rules: the default applies to everybody."
+msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
 #, fuzzy
@@ -12886,8 +12975,9 @@ msgid "Pension, insurance, allowances, equipment: whatever was named."
 msgstr "Pinsean, árachas, liúntais, trealamh: cibé rud a ainmníodh."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
-#: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/core/server_views.py src/postulo/core/views_access.py
+#: src/postulo/jobs/merging.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
@@ -13098,6 +13188,14 @@ msgstr ""
 msgid "plugin"
 msgstr "breiseán"
 
+#: src/postulo/plugins/models.py
+msgid "plugin access rule"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin access rules"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 #, fuzzy
 msgid "plugin not installed"
@@ -13125,7 +13223,8 @@ msgstr "stór breiseán"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/plugins/apps.py src/postulo/templates/server/backup_restore.html
+#: src/postulo/core/views_access.py src/postulo/plugins/apps.py
+#: src/postulo/templates/server/backup_restore.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/plugins.html
 #, fuzzy
@@ -14389,6 +14488,7 @@ msgstr "cianseoladh"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Remove"
@@ -14759,9 +14859,11 @@ msgstr ""
 #: src/postulo/templates/server/data_protection.html
 #: src/postulo/templates/server/defaults.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_plugins.html
 #: src/postulo/templates/server/person_username.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
@@ -14822,7 +14924,8 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Sábháilte i do chuid fógraí. Déan cinneadh faoi nuair a bheidh tú réidh."
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
-#: src/postulo/core/views_backups.py src/postulo/resume/views.py
+#: src/postulo/core/views_access.py src/postulo/core/views_backups.py
+#: src/postulo/resume/views.py
 #, fuzzy
 msgid "Saved."
 msgstr "Sábháilte."
@@ -15233,6 +15336,10 @@ msgid "Set by the person recording it"
 msgstr "Socraithe ag an duine a thaifeadann é"
 
 #: src/postulo/plugins/policy.py
+msgid "Set by your administrator."
+msgstr ""
+
+#: src/postulo/plugins/policy.py
 #, fuzzy
 msgid "Set for your account."
 msgstr "Socraithe do do chuntas."
@@ -15262,6 +15369,7 @@ msgstr "Socraigh nuair nach bhfuil an folúntas ar fáil a thuilleadh."
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/base.html
 #, fuzzy
@@ -16115,6 +16223,14 @@ msgstr "Dromchlaí"
 msgid "surname"
 msgstr "sloinne"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "Switch"
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Switch it on first: while it is off for everybody this does not apply."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Switch off"
@@ -16750,6 +16866,10 @@ msgstr "Ní comhad é sin a léann an leathanach seo. Léann sé an comhad JSON 
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
 msgstr "Ní cineál pictiúir é sin a choinníonn Postulo. Úsáid %(formats)s."
 
+#: src/postulo/core/views_access.py
+msgid "That is not a name this group can have."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy, python-format
 msgid "That is not a number %(country)s uses. It is one %(territory)s uses: choose %(choice)s beside the number."
@@ -16989,6 +17109,10 @@ msgstr "Tá an breiseán sin múchta duitse."
 #, fuzzy
 msgid "That reply did not come from a request Postulo made."
 msgstr "Níor tháinig an freagra sin ó iarratas a rinne Postulo."
+
+#: src/postulo/core/views_access.py
+msgid "That rule existed, and is changed."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -18373,6 +18497,10 @@ msgstr ""
 msgid "There are no links to check."
 msgstr "Níl aon nasc le seiceáil."
 
+#: src/postulo/core/views_access.py
+msgid "There is a group of that name already."
+msgstr ""
+
 #: src/postulo/jobs/slow.py
 #, fuzzy
 msgid "There is no address to fetch it from again."
@@ -18882,6 +19010,10 @@ msgstr "Tháinig an t-iarratas seo ó <code>%(peer)s</code>, nach seachfhreastal
 #, fuzzy, python-format
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr "Tháinig an t-iarratas seo trí <code>%(peer)s</code>, atá iontaofa."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "This ships inside Postulo, so it is never a person's to switch; the rules below say who may use it and who may change its settings."
+msgstr ""
 
 #: src/postulo/plugins/fetching.py
 #, fuzzy
@@ -19480,6 +19612,10 @@ msgstr "Comhaid uaslódáilte"
 #, fuzzy
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Uaslódáilte. Níor shínigh aon rud anseo an comhad seo, mar sin níl aon rud ina bhannaí air."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Use"
+msgstr ""
 
 #: src/postulo/accounts/validators.py
 #, fuzzy
@@ -20703,6 +20839,10 @@ msgstr "Cé óna dtáinig sé, más duine a thaifead tú é."
 #, fuzzy
 msgid "Who may create an account here."
 msgstr "Cé a fhéadann cuntas a chruthú anseo."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Who may use it, who may switch it for themselves, and who may change its settings. A rule for an account counts over the rules for its groups, and a rule for a group over the default for everybody."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who published it: a press, a journal's publisher, a repository."

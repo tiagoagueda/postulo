@@ -372,8 +372,9 @@ def test_each_row_is_a_switch_and_a_choice_not_a_menu(client, admin):
     row = re.search(rf'<li[^>]*data-policy="{PLUGIN}".*?</li>', html, re.S).group(0)
     assert f'role="switch" class="input" name="on:{PLUGIN}"' in row
     assert "checked" in row.split('role="switch"')[1].split(">")[0], "available means on"
-    assert f'name="free:{PLUGIN}"' in row and f'name="row:{PLUGIN}" value="1"' in row
-    assert "Each person may change it" in row
+    assert f'name="row:{PLUGIN}" value="1"' in row
+    assert f'name="free:{PLUGIN}"' not in row, "who may switch it is on the access page (#886)"
+    assert reverse("server:plugin_access", args=[PLUGIN]) in row
 
 
 def the_switch_of(html: str, plugin: str) -> tuple[str, str]:
@@ -448,7 +449,7 @@ def test_a_hidden_plugin_stays_hidden_while_it_stays_off(client, admin):
     assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "unavailable"
 
     client.post(reverse("server:plugin_policy"), {f"row:{PLUGIN}": "1", f"on:{PLUGIN}": "on"})
-    assert PluginPolicy.objects.get(plugin=PLUGIN, person=None).state == "on"
+    assert not PluginPolicy.objects.filter(plugin=PLUGIN, person=None).exists(), "back to default"
 
 
 def test_the_own_mail_outbox_is_governed_like_any_connected_plugin(client, admin, user):

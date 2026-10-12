@@ -2017,6 +2017,10 @@ msgstr "Forma ta' indirizzar hija dak li jinkiteb qabel isem, u l-pronomi jgħid
 msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
 msgstr "Forma ta' indirizzar tinkiteb qabel ismek, u l-pronomi tiegħek jgħidu kif tiġi riferit int. It-tnejn huma fakultattivi, u xejn ma jiġi preżunt meta jkunu vojta."
 
+#: src/postulo/core/views_access.py
+msgid "A group needs a name."
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A handle is at most %(max)s characters, on one line."
@@ -2207,6 +2211,10 @@ msgstr ""
 #, fuzzy
 msgid "A month"
 msgstr "Xahar"
+
+#: src/postulo/templates/server/groups.html
+msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2720,6 +2728,15 @@ msgstr "aċċettata fi"
 msgid "accepted by"
 msgstr "aċċettata minn"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Access"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+#, python-format
+msgid "Access to %(name)s"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/settings/accessibility.html
 #, fuzzy
@@ -2732,12 +2749,17 @@ msgstr "Aċċessibbiltà"
 msgid "Account"
 msgstr "Kont"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "account"
+msgstr ""
+
 #: src/postulo/templates/base.html
 #, fuzzy, python-format
 msgid "Account menu, %(name)s"
 msgstr "Menu tal-kont, %(name)s"
 
 #: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Accounts"
 msgstr "Kontijiet"
@@ -2779,6 +2801,7 @@ msgstr "Azzjonijiet għal %(what)s"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/due_reminders.html
 #, fuzzy
@@ -2825,6 +2848,10 @@ msgstr ""
 #, fuzzy
 msgid "Add a repository"
 msgstr "Żid repożitorju"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Add a rule"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy
@@ -4043,16 +4070,21 @@ msgstr "Lura għall-istediniet"
 msgid "Back to Listings"
 msgstr ""
 
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/person_plugins.html
+#, fuzzy
+msgid "Back to people"
+msgstr "Lura għall-persuni"
+
 #: src/postulo/templates/server/person_delete.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "Back to People"
 msgstr "Lura għal Nies"
 
-#: src/postulo/templates/server/person_plugins.html
-#, fuzzy
-msgid "Back to people"
-msgstr "Lura għall-persuni"
+#: src/postulo/templates/server/plugin_access.html
+msgid "Back to plugins"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -4764,6 +4796,10 @@ msgstr "Agħżel fajl tal-Europass l-ewwel."
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Agħżel fajl l-ewwel."
+
+#: src/postulo/core/views_access.py
+msgid "Choose a group or an account."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Choose a language"
@@ -5880,6 +5916,7 @@ msgstr "Difiża"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/resume/overview.html
 #: src/postulo/templates/server/backups.html
+#: src/postulo/templates/server/groups.html
 #, fuzzy
 msgid "Delete"
 msgstr "Ħassar"
@@ -6424,11 +6461,6 @@ msgstr "Kull menu joffri dak li huwa fl-użu fil-lingwa tar-rekord tal-karriera 
 msgid "Each one is frozen as it is now, so what they received stays readable."
 msgstr "Kull wieħed jiġi ffriżat kif inhu issa, biex dak li rċevew jibqa' jinqara."
 
-#: src/postulo/templates/server/plugins.html
-#, fuzzy
-msgid "Each person may change it"
-msgstr "Kull persuna tista' tbiddlu"
-
 #: src/postulo/templates/widgets/funnel.html
 #, fuzzy
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -6850,6 +6882,14 @@ msgstr "Kull maħżen diġà għandu dan id-dokument."
 
 #: src/postulo/core/models.py
 msgid "Every week"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody may switch it for themselves"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7361,6 +7401,7 @@ msgid "Food and agriculture"
 msgstr "Ikel u agrikoltura"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "For"
 msgstr "Għal"
@@ -7806,13 +7847,28 @@ msgstr "Gross, qabel it-taxxa. Ħalliha vojta jekk l-avviż jgħid figura waħda
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Gross, qabel it-taxxa. Tarf wieħed waħdu huwa tajjeb — il-biċċa l-kbira tal-avviżi jagħtu wieħed."
 
-#: src/postulo/resume/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
 msgstr "grupp"
 
+#: src/postulo/core/views_access.py
+msgid "Group deleted."
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Group made."
+msgstr ""
+
 #: src/postulo/resume/registry.py
 msgid "Group related skills under a heading, such as “Programming languages” or “Infrastructure”."
+msgstr ""
+
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/people.html
+#: src/postulo/templates/server/plugin_access.html
+msgid "Groups"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -9974,6 +10030,10 @@ msgstr "Agħmel link"
 msgid "Make administrator"
 msgstr "Agħmel amministratur"
 
+#: src/postulo/templates/server/groups.html
+msgid "Make it"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -10035,10 +10095,22 @@ msgstr "Segwi s-sistema operattiva"
 msgid "Matched from the city dataset"
 msgstr "Imqabbel mid-dataset tal-bliet"
 
+#: src/postulo/plugins/models.py
+msgid "may change its settings"
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 #, fuzzy
 msgid "May create accounts"
 msgstr "Jista' joħloq kontijiet"
+
+#: src/postulo/plugins/models.py
+msgid "may switch it for themselves"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "may use it"
+msgstr ""
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
@@ -10081,6 +10153,10 @@ msgstr ""
 #, fuzzy
 msgid "Member"
 msgstr "Membru"
+
+#: src/postulo/templates/server/groups.html
+msgid "Members"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "membership"
@@ -10378,6 +10454,7 @@ msgstr "isem"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -10503,6 +10580,10 @@ msgstr ""
 #, fuzzy
 msgid "New CV or portfolio"
 msgstr "CV jew portafoll ġdid"
+
+#: src/postulo/templates/server/groups.html
+msgid "New group"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -10734,6 +10815,10 @@ msgstr "L-ebda fajl"
 msgid "No files of this type yet."
 msgstr "Għad m'hemm l-ebda fajl ta' dan it-tip."
 
+#: src/postulo/templates/server/groups.html
+msgid "No groups yet."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "No icon"
@@ -10850,6 +10935,10 @@ msgstr "Ma ġie stabbilit l-ebda limitu ta' żamma, għalhekk m'hemm l-ebda poli
 #, fuzzy
 msgid "no role"
 msgstr "l-ebda rwol"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "No rules: the default applies to everybody."
+msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
 #, fuzzy
@@ -12759,8 +12848,9 @@ msgid "Pension, insurance, allowances, equipment: whatever was named."
 msgstr "Pensjoni, assigurazzjoni, allowances, tagħmir: kull ma ssemma."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
-#: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/core/server_views.py src/postulo/core/views_access.py
+#: src/postulo/jobs/merging.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
@@ -12971,6 +13061,14 @@ msgstr ""
 msgid "plugin"
 msgstr "plugin"
 
+#: src/postulo/plugins/models.py
+msgid "plugin access rule"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin access rules"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 #, fuzzy
 msgid "plugin not installed"
@@ -12998,7 +13096,8 @@ msgstr "repożitorju tal-plugins"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/plugins/apps.py src/postulo/templates/server/backup_restore.html
+#: src/postulo/core/views_access.py src/postulo/plugins/apps.py
+#: src/postulo/templates/server/backup_restore.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/plugins.html
 #, fuzzy
@@ -14258,6 +14357,7 @@ msgstr "indirizz remot"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Remove"
@@ -14628,9 +14728,11 @@ msgstr ""
 #: src/postulo/templates/server/data_protection.html
 #: src/postulo/templates/server/defaults.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_plugins.html
 #: src/postulo/templates/server/person_username.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
@@ -14691,7 +14793,8 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Issejvjat fl-avviżi tiegħek. Iddeċiedi dwaru meta tkun lest."
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
-#: src/postulo/core/views_backups.py src/postulo/resume/views.py
+#: src/postulo/core/views_access.py src/postulo/core/views_backups.py
+#: src/postulo/resume/views.py
 #, fuzzy
 msgid "Saved."
 msgstr "Issejvjat."
@@ -15102,6 +15205,10 @@ msgid "Set by the person recording it"
 msgstr "Issettjat mill-persuna li tirreġistra"
 
 #: src/postulo/plugins/policy.py
+msgid "Set by your administrator."
+msgstr ""
+
+#: src/postulo/plugins/policy.py
 #, fuzzy
 msgid "Set for your account."
 msgstr "Issettjat għall-kont tiegħek."
@@ -15131,6 +15238,7 @@ msgstr "Issettja meta l-post vakanti ma jibqax disponibbli."
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/base.html
 #, fuzzy
@@ -15984,6 +16092,14 @@ msgstr "Uċuħ"
 msgid "surname"
 msgstr "kunjom"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "Switch"
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Switch it on first: while it is off for everybody this does not apply."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Switch off"
@@ -16616,6 +16732,10 @@ msgstr "Dak mhuwiex fajl li taqra din il-paġna. Taqra l-fajl JSON li toffri li 
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
 msgstr "Dak mhuwiex tip ta' stampa li Postulo jżomm. Uża %(formats)s."
 
+#: src/postulo/core/views_access.py
+msgid "That is not a name this group can have."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy, python-format
 msgid "That is not a number %(country)s uses. It is one %(territory)s uses: choose %(choice)s beside the number."
@@ -16854,6 +16974,10 @@ msgstr "Dak il-plugin huwa mitfi għalik."
 #, fuzzy
 msgid "That reply did not come from a request Postulo made."
 msgstr "Dik it-tweġiba ma ġietx minn talba li għamel Postulo."
+
+#: src/postulo/core/views_access.py
+msgid "That rule existed, and is changed."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -18231,6 +18355,10 @@ msgstr ""
 msgid "There are no links to check."
 msgstr "M'hemm l-ebda link x'jiġi ċċekkjat."
 
+#: src/postulo/core/views_access.py
+msgid "There is a group of that name already."
+msgstr ""
+
 #: src/postulo/jobs/slow.py
 #, fuzzy
 msgid "There is no address to fetch it from again."
@@ -18739,6 +18867,10 @@ msgstr "Din it-talba ġiet minn <code>%(peer)s</code>, li mhuwiex proxy fdat."
 #, fuzzy, python-format
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr "Din it-talba għaddiet minn <code>%(peer)s</code>, li hu fdat."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "This ships inside Postulo, so it is never a person's to switch; the rules below say who may use it and who may change its settings."
+msgstr ""
 
 #: src/postulo/plugins/fetching.py
 #, fuzzy
@@ -19335,6 +19467,10 @@ msgstr "Fajls imtella'"
 #, fuzzy
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Mtella'. Xejn hawn ma ffirma dan il-fajl, mela xejn ma jiggarantixxih."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Use"
+msgstr ""
 
 #: src/postulo/accounts/validators.py
 #, fuzzy
@@ -20558,6 +20694,10 @@ msgstr "Minn ġie, jekk huwa xi ħadd li rreġistrajt."
 #, fuzzy
 msgid "Who may create an account here."
 msgstr "Min jista' joħloq kont hawn."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Who may use it, who may switch it for themselves, and who may change its settings. A rule for an account counts over the rules for its groups, and a rule for a group over the default for everybody."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who published it: a press, a journal's publisher, a repository."

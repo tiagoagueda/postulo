@@ -1835,6 +1835,10 @@ msgstr "Обръщението е онова, което се пише пред 
 msgid "A form of address is written before your name, and your pronouns say how to refer to you. Both are optional, and nothing is assumed when they are blank."
 msgstr "Обръщението се пише пред името ви, а местоименията казват как да се говори за вас. И двете са по избор и нищо не се предполага, когато са празни."
 
+#: src/postulo/core/views_access.py
+msgid "A group needs a name."
+msgstr ""
+
 #: src/postulo/core/messaging_services.py
 #, python-format
 msgid "A handle is at most %(max)s characters, on one line."
@@ -2025,6 +2029,10 @@ msgstr ""
 #, fuzzy
 msgid "A month"
 msgstr "Месец"
+
+#: src/postulo/templates/server/groups.html
+msgid "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at."
+msgstr ""
 
 #: src/postulo/core/messaging_services.py
 #, python-format
@@ -2534,6 +2542,15 @@ msgstr "прието на"
 msgid "accepted by"
 msgstr "прието от"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Access"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+#, python-format
+msgid "Access to %(name)s"
+msgstr ""
+
 #: src/postulo/accounts/settings_views.py src/postulo/core/settings_sections.py
 #: src/postulo/templates/settings/accessibility.html
 #, fuzzy
@@ -2546,12 +2563,17 @@ msgstr "Достъпност"
 msgid "Account"
 msgstr "Акаунт"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "account"
+msgstr ""
+
 #: src/postulo/templates/base.html
 #, fuzzy, python-format
 msgid "Account menu, %(name)s"
 msgstr "Меню на акаунта, %(name)s"
 
 #: src/postulo/accounts/apps.py src/postulo/plugins/categories.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "Accounts"
 msgstr "Акаунти"
@@ -2593,6 +2615,7 @@ msgstr "Действия за %(what)s"
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/resume/overview.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/widgets/due_reminders.html
 #, fuzzy
@@ -2639,6 +2662,10 @@ msgstr ""
 #, fuzzy
 msgid "Add a repository"
 msgstr "Добавяне на хранилище"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Add a rule"
+msgstr ""
 
 #: src/postulo/templates/resume/overview.html
 #, fuzzy
@@ -3843,16 +3870,21 @@ msgstr "Обратно към поканите"
 msgid "Back to Listings"
 msgstr ""
 
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/person_plugins.html
+#, fuzzy
+msgid "Back to people"
+msgstr "Обратно към хората"
+
 #: src/postulo/templates/server/person_delete.html
 #: src/postulo/templates/server/person_recovery.html
 #, fuzzy
 msgid "Back to People"
 msgstr "Обратно към Хора"
 
-#: src/postulo/templates/server/person_plugins.html
-#, fuzzy
-msgid "Back to people"
-msgstr "Обратно към хората"
+#: src/postulo/templates/server/plugin_access.html
+msgid "Back to plugins"
+msgstr ""
 
 #: src/postulo/templates/jobs/capture_page.html
 #, fuzzy
@@ -4562,6 +4594,10 @@ msgstr "Първо изберете файл на Europass."
 #, fuzzy
 msgid "Choose a file first."
 msgstr "Първо изберете файл."
+
+#: src/postulo/core/views_access.py
+msgid "Choose a group or an account."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Choose a language"
@@ -5676,6 +5712,7 @@ msgstr "Отбрана"
 #: src/postulo/templates/partials/confirm_delete.html
 #: src/postulo/templates/resume/overview.html
 #: src/postulo/templates/server/backups.html
+#: src/postulo/templates/server/groups.html
 #, fuzzy
 msgid "Delete"
 msgstr "Изтриване"
@@ -6220,11 +6257,6 @@ msgstr "Всяко меню предлага онова, което се изп�
 msgid "Each one is frozen as it is now, so what they received stays readable."
 msgstr "Всеки се замразява такъв, какъвто е сега, така че полученото от тях да остане четимо."
 
-#: src/postulo/templates/server/plugins.html
-#, fuzzy
-msgid "Each person may change it"
-msgstr "Всеки човек може да го променя"
-
 #: src/postulo/templates/widgets/funnel.html
 #, fuzzy
 msgid "Each stage counts applications that ever reached it, whatever happened afterwards."
@@ -6646,6 +6678,14 @@ msgstr "Всяко хранилище вече има този документ.
 
 #: src/postulo/core/models.py
 msgid "Every week"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody"
+msgstr ""
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Everybody may switch it for themselves"
 msgstr ""
 
 #: src/postulo/jobs/listing_views.py src/postulo/templates/server/logs.html
@@ -7157,6 +7197,7 @@ msgid "Food and agriculture"
 msgstr "Храни и земеделие"
 
 #: src/postulo/templates/accounts/invite_list.html
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "For"
 msgstr "За"
@@ -7602,13 +7643,28 @@ msgstr "Бруто, преди данъци. Оставете го празно,
 msgid "Gross, before tax. One end on its own is fine — most postings give one."
 msgstr "Бруто, преди данъци. Един край сам е добре — повечето обяви дават само един."
 
-#: src/postulo/resume/models.py
+#: src/postulo/plugins/models.py src/postulo/resume/models.py
+#: src/postulo/templates/server/plugin_access.html
 #, fuzzy
 msgid "group"
 msgstr "група"
 
+#: src/postulo/core/views_access.py
+msgid "Group deleted."
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Group made."
+msgstr ""
+
 #: src/postulo/resume/registry.py
 msgid "Group related skills under a heading, such as “Programming languages” or “Infrastructure”."
+msgstr ""
+
+#: src/postulo/templates/server/groups.html
+#: src/postulo/templates/server/people.html
+#: src/postulo/templates/server/plugin_access.html
+msgid "Groups"
 msgstr ""
 
 #: src/postulo/core/models.py
@@ -9762,6 +9818,10 @@ msgstr "Направи връзка"
 msgid "Make administrator"
 msgstr "Направи администратор"
 
+#: src/postulo/templates/server/groups.html
+msgid "Make it"
+msgstr ""
+
 #: src/postulo/templates/settings/account.html
 #, fuzzy
 msgid "Manage"
@@ -9823,10 +9883,22 @@ msgstr "Следване на операционната система"
 msgid "Matched from the city dataset"
 msgstr "Съпоставено от набора данни за градове"
 
+#: src/postulo/plugins/models.py
+msgid "may change its settings"
+msgstr ""
+
 #: src/postulo/templates/server/signin.html
 #, fuzzy
 msgid "May create accounts"
 msgstr "Може да създава акаунти"
+
+#: src/postulo/plugins/models.py
+msgid "may switch it for themselves"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "may use it"
+msgstr ""
 
 #: src/postulo/jobs/industries.py src/postulo/templates/server/overview.html
 #, fuzzy
@@ -9869,6 +9941,10 @@ msgstr ""
 #, fuzzy
 msgid "Member"
 msgstr "Член"
+
+#: src/postulo/templates/server/groups.html
+msgid "Members"
+msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "membership"
@@ -10166,6 +10242,7 @@ msgstr "име"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/people.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
@@ -10291,6 +10368,10 @@ msgstr ""
 #, fuzzy
 msgid "New CV or portfolio"
 msgstr "Нова автобиография или портфолио"
+
+#: src/postulo/templates/server/groups.html
+msgid "New group"
+msgstr ""
 
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
@@ -10522,6 +10603,10 @@ msgstr "Без файл"
 msgid "No files of this type yet."
 msgstr "Все още няма файлове от този тип."
 
+#: src/postulo/templates/server/groups.html
+msgid "No groups yet."
+msgstr ""
+
 #: src/postulo/core/models.py
 #, fuzzy
 msgid "No icon"
@@ -10638,6 +10723,10 @@ msgstr "Не е зададен срок на съхранение, така че
 #, fuzzy
 msgid "no role"
 msgstr "без позиция"
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "No rules: the default applies to everybody."
+msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
 #, fuzzy
@@ -12505,8 +12594,9 @@ msgid "Pension, insurance, allowances, equipment: whatever was named."
 msgstr "Пенсия, застраховка, добавки, оборудване: каквото е било посочено."
 
 #: src/postulo/core/search.py src/postulo/core/server_sections.py
-#: src/postulo/core/server_views.py src/postulo/jobs/merging.py
-#: src/postulo/jobs/tables.py src/postulo/plugins/categories.py
+#: src/postulo/core/server_views.py src/postulo/core/views_access.py
+#: src/postulo/jobs/merging.py src/postulo/jobs/tables.py
+#: src/postulo/plugins/categories.py
 #: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/server/people.html
 #, fuzzy
@@ -12717,6 +12807,14 @@ msgstr ""
 msgid "plugin"
 msgstr "добавка"
 
+#: src/postulo/plugins/models.py
+msgid "plugin access rule"
+msgstr ""
+
+#: src/postulo/plugins/models.py
+msgid "plugin access rules"
+msgstr ""
+
 #: src/postulo/templates/connections/list.html
 #, fuzzy
 msgid "plugin not installed"
@@ -12744,7 +12842,8 @@ msgstr "хранилище за приставки"
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/core/settings_sections.py
-#: src/postulo/plugins/apps.py src/postulo/templates/server/backup_restore.html
+#: src/postulo/core/views_access.py src/postulo/plugins/apps.py
+#: src/postulo/templates/server/backup_restore.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/plugins.html
 #, fuzzy
@@ -13996,6 +14095,7 @@ msgstr "отдалечен адрес"
 #: src/postulo/templates/partials/postal_addresses.html
 #: src/postulo/templates/partials/web_links.html
 #: src/postulo/templates/server/design.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Remove"
@@ -14366,9 +14466,11 @@ msgstr ""
 #: src/postulo/templates/server/data_protection.html
 #: src/postulo/templates/server/defaults.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/identifier_schemes.html
 #: src/postulo/templates/server/person_plugins.html
 #: src/postulo/templates/server/person_username.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/server/signin.html
 #: src/postulo/templates/settings/accessibility.html
@@ -14429,7 +14531,8 @@ msgid "Saved to your listings. Decide about it when you are ready."
 msgstr "Запазено във вашите обяви. Решете, когато сте готови."
 
 #: src/postulo/accounts/settings_views.py src/postulo/core/server_views.py
-#: src/postulo/core/views_backups.py src/postulo/resume/views.py
+#: src/postulo/core/views_access.py src/postulo/core/views_backups.py
+#: src/postulo/resume/views.py
 #, fuzzy
 msgid "Saved."
 msgstr "Запазено."
@@ -14840,6 +14943,10 @@ msgid "Set by the person recording it"
 msgstr "Зададено от човека, който го записва"
 
 #: src/postulo/plugins/policy.py
+msgid "Set by your administrator."
+msgstr ""
+
+#: src/postulo/plugins/policy.py
 #, fuzzy
 msgid "Set for your account."
 msgstr "Зададено за вашия профил."
@@ -14869,6 +14976,7 @@ msgstr "Задайте, когато позицията вече не е нал�
 #: src/postulo/templates/core/kind_file.html
 #: src/postulo/templates/documents/cv_detail.html
 #: src/postulo/templates/server/email.html
+#: src/postulo/templates/server/plugin_access.html
 #: src/postulo/templates/server/plugins.html
 #: src/postulo/templates/settings/base.html
 #, fuzzy
@@ -15722,6 +15830,14 @@ msgstr "Повърхности"
 msgid "surname"
 msgstr "фамилно име"
 
+#: src/postulo/templates/server/plugin_access.html
+msgid "Switch"
+msgstr ""
+
+#: src/postulo/core/views_access.py
+msgid "Switch it on first: while it is off for everybody this does not apply."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Switch off"
@@ -16348,6 +16464,10 @@ msgstr "Това не е файл, който тази страница чете
 msgid "That is not a kind of picture Postulo keeps. Use %(formats)s."
 msgstr "Това не е вид снимка, която Postulo пази. Използвайте %(formats)s."
 
+#: src/postulo/core/views_access.py
+msgid "That is not a name this group can have."
+msgstr ""
+
 #: src/postulo/core/phones.py
 #, fuzzy, python-format
 msgid "That is not a number %(country)s uses. It is one %(territory)s uses: choose %(choice)s beside the number."
@@ -16584,6 +16704,10 @@ msgstr "Тази добавка е изключена за вас."
 #, fuzzy
 msgid "That reply did not come from a request Postulo made."
 msgstr "Този отговор не идва от заявка, направена от Postulo."
+
+#: src/postulo/core/views_access.py
+msgid "That rule existed, and is changed."
+msgstr ""
 
 #: src/postulo/applications/views.py
 #, fuzzy
@@ -17947,6 +18071,10 @@ msgstr ""
 msgid "There are no links to check."
 msgstr "Няма връзки за проверка."
 
+#: src/postulo/core/views_access.py
+msgid "There is a group of that name already."
+msgstr ""
+
 #: src/postulo/jobs/slow.py
 #, fuzzy
 msgid "There is no address to fetch it from again."
@@ -18453,6 +18581,10 @@ msgstr "Тази заявка дойде от <code>%(peer)s</code>, който 
 #, fuzzy, python-format
 msgid "This request came through <code>%(peer)s</code>, which is trusted."
 msgstr "Тази заявка мина през <code>%(peer)s</code>, който е доверен."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "This ships inside Postulo, so it is never a person's to switch; the rules below say who may use it and who may change its settings."
+msgstr ""
 
 #: src/postulo/plugins/fetching.py
 #, fuzzy
@@ -19045,6 +19177,10 @@ msgstr "Качени файлове"
 #, fuzzy
 msgid "Uploaded. Nothing here signed this file, so nothing vouches for it."
 msgstr "Качен. Нищо тук не е подписало този файл, така че нищо не гарантира за него."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Use"
+msgstr ""
 
 #: src/postulo/accounts/validators.py
 #, fuzzy
@@ -20268,6 +20404,10 @@ msgstr "От кого идва, ако е някой, когото сте зап
 #, fuzzy
 msgid "Who may create an account here."
 msgstr "Кой може да създаде акаунт тук."
+
+#: src/postulo/templates/server/plugin_access.html
+msgid "Who may use it, who may switch it for themselves, and who may change its settings. A rule for an account counts over the rules for its groups, and a rule for a group over the default for everybody."
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Who published it: a press, a journal's publisher, a repository."

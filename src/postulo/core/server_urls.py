@@ -1,6 +1,7 @@
 from django.urls import path
 
 from . import server_views as views
+from . import views_access
 from . import views_backups as backups
 
 app_name = "server"
@@ -35,6 +36,12 @@ urlpatterns = [
         "people/<int:pk>/plugins/",
         views.PersonPluginsView.as_view(),
         name="person_plugins",
+    ),
+    path("people/groups/", views_access.GroupsView.as_view(), name="groups"),
+    path(
+        "plugins/<str:name>/access/",
+        views_access.PluginAccessView.as_view(),
+        name="plugin_access",
     ),
     path(
         "plugins/repositories/",

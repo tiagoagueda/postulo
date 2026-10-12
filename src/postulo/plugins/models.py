@@ -174,6 +174,80 @@ class PluginPolicy(models.Model):
         forget_decisions()
 
 
+class PluginAccess(models.Model):
+    """Who may use a plugin or module, switch it for themselves, and change its settings (#886).
+
+    A rule for one account or one group, kept by administrators only. It replaces the single
+    checkbox *Each person may change it*: *Everyone* is still the instance's row in
+    :class:`PluginPolicy` (available, or forced on), and these are the exceptions to it, an
+    account's over its groups' over the default.
+
+    ``may_use`` false takes the plugin away from them as *unavailable* does. ``may_switch``
+    lets them turn an installed plugin off and on for themselves, which for what ships inside
+    Postulo is never theirs (#200). ``may_change_settings`` is the right to use the plugin's
+    settings page, for an administrator who is not the operator.
+
+    **Groups are Django's own** (``auth.Group``), already in the schema and the admin.
+    Several groups that apply to one account are read together and the most permissive wins:
+    a person put in a group to be let in is not locked out by another that says nothing.
+    """
+
+    plugin = models.CharField(_("plugin"), max_length=60)
+    person = models.ForeignKey(
+        "accounts.User",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="plugin_access",
+        verbose_name=_("person"),
+    )
+    group = models.ForeignKey(
+        "auth.Group",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="plugin_access",
+        verbose_name=_("group"),
+    )
+    may_use = models.BooleanField(_("may use it"), default=True)
+    may_switch = models.BooleanField(_("may switch it for themselves"), default=False)
+    may_change_settings = models.BooleanField(_("may change its settings"), default=False)
+
+    class Meta:
+        verbose_name = _("plugin access rule")
+        verbose_name_plural = _("plugin access rules")
+        ordering = ("plugin", "group_id", "person_id")
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(person__isnull=False, group__isnull=True)
+                | models.Q(person__isnull=True, group__isnull=False),
+                name="plugin_access_has_one_subject",
+            ),
+            models.UniqueConstraint(
+                fields=("plugin", "person"),
+                condition=models.Q(person__isnull=False),
+                name="one_plugin_access_per_person",
+            ),
+            models.UniqueConstraint(
+                fields=("plugin", "group"),
+                condition=models.Q(group__isnull=False),
+                name="one_plugin_access_per_group",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.plugin}: {self.person or self.group}"
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        PluginPolicy._forget()
+
+    def delete(self, *args, **kwargs):
+        result = super().delete(*args, **kwargs)
+        PluginPolicy._forget()
+        return result
+
+
 class ConnectionQuerySet(models.QuerySet):
     def for_user(self, user) -> ConnectionQuerySet:
         if user is None or not getattr(user, "is_authenticated", False):

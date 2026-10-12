@@ -69,7 +69,7 @@ def invitation(administrator):
 def address(name: str, victim, invitation) -> str:
     """The route's address, with whatever it captures filled in with a real record."""
     pk = invitation.pk if name.startswith("accounts:") else victim.pk
-    for kwargs in ({}, {"pk": pk}):
+    for kwargs in ({}, {"pk": pk}, {"name": "websites"}):
         try:
             return reverse(name, kwargs=kwargs)
         except NoReverseMatch:

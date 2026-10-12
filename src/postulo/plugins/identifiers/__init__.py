@@ -86,6 +86,8 @@ class Identifiers:
     #: where an administrator defines the instance's schemes. The Plugins page draws a
     #: button for it on this plugin's row (#311).
     settings_url_name = "server:identifier_schemes"
+    #: Its settings open in a dialog on the plugins page, drawn there (#311); others are a link.
+    settings_dialog = True
 
     def defined(self, text: str, *, taken: Iterable[str] = ()):
         """What an instance's own definitions come to: a `core.identifiers.Reading`.

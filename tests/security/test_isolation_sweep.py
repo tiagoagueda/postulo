@@ -54,6 +54,10 @@ EXCUSED: dict[str, str] = {
         "administrators only, on an account; a member's GET and POST are refused in "
         "tests/security/test_staff_only.py"
     ),
+    "server:plugin_access": (
+        "administrators only, on a plugin named in the address rather than an owned record; a "
+        "member's GET and POST are refused in tests/security/test_staff_only.py"
+    ),
     "server:person_plugins": (
         "administrators only, on an account; a member's GET and POST are refused in "
         "tests/security/test_staff_only.py"

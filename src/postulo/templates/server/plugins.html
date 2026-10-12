@@ -99,11 +99,8 @@
                 <input type="hidden" name="{% if row.package %}pkg-row{% else %}row{% endif %}:{{ row.name }}" value="1">
               {% endif %}
               {% if not row.package %}
-              <label class="tap-target inline-flex items-center gap-3">
-                <input type="checkbox" class="input" name="free:{{ row.name }}" {% if row.free %}checked{% endif %}
-                       {% if row.held_by_parent %}disabled{% endif %}>
-                <span class="text-sm">{% translate "Each person may change it" %}<span class="sr-only">: {{ row.label }}</span></span>
-              </label>
+                {% comment %} Who may use it, switch it and change its settings is a list, on a page of its own (#886). {% endcomment %}
+                <a href="{% url 'server:plugin_access' row.name %}" class="btn self-start" data-variant="outline" data-size="sm" data-access="{{ row.name }}">{% icon "users" %}<span class="btn-label">{% translate "Access" %}<span class="sr-only">: {{ row.label }}</span></span></a>
               {% endif %}
               {% if row.hidden %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" data-hidden="{{ row.name }}">
@@ -122,7 +119,7 @@
             {% if row.settings_url %}
               {% if row.settings_allowed %}
                 <a href="{{ row.settings_url }}" class="btn self-start" data-variant="outline" data-size="sm"
-                   data-opens-dialog="settings-{{ row.name }}" data-settings="{{ row.name }}">{% icon "settings" %}<span class="btn-label">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></span></a>
+                   {% if row.settings_dialog %}data-opens-dialog="settings-{{ row.name }}"{% endif %} data-settings="{{ row.name }}">{% icon "settings" %}<span class="btn-label">{% translate "Settings" %}<span class="sr-only">: {{ row.label }}</span></span></a>
               {% else %}
                 <button type="button" class="btn self-start" data-variant="outline" data-size="sm"
                         aria-disabled="true" data-settings="{{ row.name }}"

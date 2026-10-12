@@ -78,6 +78,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Who may use a plugin or module, switch it for themselves and change its settings is a list of rules for groups and accounts, kept on a page of its own with a Groups page under People; the checkbox Each person may change it is replaced by Everybody may switch it on that page (#886)
 - Browser, Email and Webhooks are the sub-modules of a new module, Built-in notifications, and are named Browser notifications, Email notifications and Webhooks, each with its icon (#876)
 - The six features that let a field hold more than one value are the sub-modules of a new module, Multiple fields, and are named Multiple email addresses, telephone numbers, code repositories, social profiles, websites and messaging contacts, each with its icon (#875)
 - The wiki, CONTRIBUTING, PLAN and the CI header describe the project as it is now, and checks keep the settings pages, the container name and the CI header right (#406)
@@ -153,7 +154,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 - Server settings -> Plugins draws an installed package that registers several plugins as a parent row whose switch is its sub-plugins' master, and catalogue listings carry categories shown as badges and filterable (#883)
 - Server settings -> Plugins draws a Settings button under the switch of every plugin or module that names a settings page in its manifest, hidden when it has none and shown disabled, with the reason as its tooltip, to someone who may not change them (#885)
-- A new module, Extend file formats, holds PDF (always on and impossible to switch off), DOCX, ODT, iCalendar, vCard and Europass; a format that is off is not offered in menus or buttons and its download, import and feed answer 404 until it is on again, and the text of a Word or OpenDocument file you upload is kept so that a search finds it (files uploaded from now on) (#877)
+- A module, Extend file formats, holds PDF (always on), DOCX, ODT, iCalendar, vCard and Europass: one that is off is not offered and its download, import and feed answer 404; the text of Word and OpenDocument files you upload is kept for search (#877)
 - A plugin or catalogue release can name the plugins and modules it needs; one whose need is missing or off is off with the reason beside it, an install that lacks one is refused naming it and offering it from the same catalogue, and a plugin others need cannot be removed (#884)
 - A module can name a Lucide icon in its manifest, drawn where a logo goes; Companies with a structure wears the pyramid and Maps the map (#874)
 - A module may have sub-modules, each with exactly one parent, and categories; switching a parent off turns its sub-modules off and takes their switches away, and switching it on brings them all back (#873)

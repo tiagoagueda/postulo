@@ -1,0 +1,50 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Groups" %}
+    <c-slot name="subtitle">
+      {% translate "A name for a set of accounts. A group has no powers of its own: it is what an access rule on a plugin or a module points at." %}
+    </c-slot>
+  </c-page-title>
+
+  <form method="post" class="card mb-6 flex max-w-xl flex-wrap items-end gap-3" data-group-new>
+    {% csrf_token %}
+    <input type="hidden" name="action" value="create">
+    <div class="grow">
+      <label for="group-name" class="label">{% translate "New group" %}</label>
+      <input id="group-name" name="name" class="input" maxlength="150" required>
+    </div>
+    <button type="submit" class="btn">{% translate "Make it" %}</button>
+  </form>
+
+  {% for entry in groups %}
+    <form method="post" class="card mb-4" data-group="{{ entry.group.pk }}">
+      {% csrf_token %}
+      <input type="hidden" name="group" value="{{ entry.group.pk }}">
+      <div class="mb-3 max-w-md">
+        <label for="group-{{ entry.group.pk }}" class="label">{% translate "Name" %}</label>
+        <input id="group-{{ entry.group.pk }}" name="name" class="input" value="{{ entry.group.name }}" maxlength="150" required>
+      </div>
+      <fieldset class="mb-3">
+        <legend class="label mb-1">{% translate "Members" %}</legend>
+        <div class="grid gap-1 sm:grid-cols-2">
+          {% for person in people %}
+            <label class="tap-target inline-flex items-center gap-2 text-sm">
+              <input type="checkbox" class="input" name="members" value="{{ person.pk }}" {% if person.pk in entry.members %}checked{% endif %}>
+              {{ person.username }}
+            </label>
+          {% endfor %}
+        </div>
+      </fieldset>
+      <div class="flex gap-2">
+        <button type="submit" name="action" value="save" class="btn">{% translate "Save" %}</button>
+        <button type="submit" name="action" value="delete" class="btn" data-variant="destructive-ghost">{% translate "Delete" %}</button>
+      </div>
+    </form>
+  {% empty %}
+    <c-empty variant="quiet">{% translate "No groups yet." %}</c-empty>
+  {% endfor %}
+  <p class="mt-4"><a href="{% url 'server:people' %}" class="btn" data-variant="ghost">{% translate "Back to people" %}</a></p>
+{% endblock %}

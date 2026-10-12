@@ -60,6 +60,7 @@ from __future__ import annotations
 import threading
 from dataclasses import dataclass
 
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import memo
@@ -136,16 +137,52 @@ class Decision:
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
             "parent": _("Off, because the module it belongs to is off."),
             "required": _("Always on: Postulo cannot work without it."),
+            "access": _("Set by your administrator."),
         }[self.decided_by]
 
 
-def may_change_settings(user, plugin_name: str) -> bool:
-    """Whether this person may change the plugin's settings (#885).
+def access_for(plugin_name: str, person):
+    """The access rule that applies to this person for this plugin, or ``None`` (#886).
 
-    The settings pages are administrators', so someone who is not one may not. Until an access
-    list says otherwise (#886) every administrator may, as they always have.
+    The account's own rule over its groups': with several groups the most permissive reading
+    wins on each of the three rights. ``None`` means nobody said, and the default stands.
     """
-    return bool(getattr(user, "is_staff", False) and getattr(user, "is_active", True))
+    from .models import PluginAccess
+
+    pk = getattr(person, "pk", None)
+    if not pk:
+        return None
+    rules = list(
+        PluginAccess.objects.filter(plugin=plugin_name).filter(
+            models.Q(person_id=pk) | models.Q(group__user=pk)
+        )
+    )
+    for rule in rules:
+        if rule.person_id == pk:
+            return rule
+    if not rules:
+        return None
+    return PluginAccess(
+        plugin=plugin_name,
+        may_use=any(rule.may_use for rule in rules),
+        may_switch=any(rule.may_switch for rule in rules),
+        may_change_settings=any(rule.may_change_settings for rule in rules),
+    )
+
+
+def may_change_settings(user, plugin_name: str) -> bool:
+    """Whether this person may change the plugin's settings (#885, #886).
+
+    The operator (a superuser) always may. Another administrator may unless a rule for them, or
+    for their groups, says they may not; anyone who is not an administrator never reaches the
+    page. A rule is an exception to the default, which is that an administrator may.
+    """
+    if not (getattr(user, "is_staff", False) and getattr(user, "is_active", True)):
+        return False
+    if getattr(user, "is_superuser", False):
+        return True
+    rule = access_for(plugin_name, user)
+    return True if rule is None else rule.may_change_settings
 
 
 def shipped_inside(plugin_name: str) -> bool:
@@ -303,6 +340,24 @@ def _decide(plugin_name: str, person) -> Decision:
         return Decision(
             on=False, offered=False, theirs=False, decided_by="administrator", who=row.decided_by
         )
+    # An access list narrows the instance's default for this account or its groups (#886). It
+    # is an exception to the default and never to an administrator's row for this very person.
+    rule = None
+    if state != PluginPolicy.State.FORCED_OFF and getattr(row, "person_id", None) is None:
+        rule = access_for(plugin_name, person)
+    if rule is not None:
+        if not rule.may_use:
+            return Decision(on=False, offered=False, theirs=False, decided_by="access")
+        if not shipped_inside(plugin_name):
+            if rule.may_switch:
+                chosen_off = plugin_name in _their_choices(person)
+                return Decision(
+                    on=not chosen_off,
+                    offered=True,
+                    theirs=True,
+                    decided_by="person" if chosen_off else "default",
+                )
+            return Decision(on=True, offered=True, theirs=False, decided_by="access")
     if state == PluginPolicy.State.FORCED_ON:
         return Decision(
             on=True, offered=True, theirs=False, decided_by="administrator", who=row.decided_by

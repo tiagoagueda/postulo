@@ -24,6 +24,7 @@ SECTIONS: tuple[SettingsSection, ...] = (
             "server:person_recovery",
             "server:person_delete",
             "server:person_plugins",
+            "server:groups",
         ),
     ),
     SettingsSection(
@@ -44,7 +45,7 @@ SECTIONS: tuple[SettingsSection, ...] = (
         icon="link",
         order=50,
         # The identifier registry's settings are a page of this section (#311).
-        match=("server:identifier_schemes",),
+        match=("server:identifier_schemes", "server:plugin_access"),
     ),
     SettingsSection(
         slug="capture", label=_("Capture"), url_name="server:capture", icon="search", order=60

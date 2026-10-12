@@ -1281,6 +1281,7 @@ def _policy_rows(person=None, user=None) -> list[dict]:
                 # who may not change them (#885). On the instance's page only.
                 "settings_url": _settings_url(plugin) if person is None else "",
                 "settings_allowed": policy.may_change_settings(user, plugin.name),
+                "settings_dialog": bool(getattr(plugin, "settings_dialog", False)),
                 "categories": [
                     {"slug": slug, "label": categories.label_for(slug)}
                     for slug in manifest.categories
@@ -1324,6 +1325,7 @@ def _policy_rows(person=None, user=None) -> list[dict]:
                 # names it; the instance's page draws a button for it on this row (#311).
                 "settings_url": _settings_url(plugin) if person is None else "",
                 "settings_allowed": policy.may_change_settings(user, plugin.name),
+                "settings_dialog": bool(getattr(plugin, "settings_dialog", False)),
             }
         )
     return rows
@@ -1492,7 +1494,12 @@ def _save_policies(request: HttpRequest, person=None) -> int:
             continue
         existing = PluginPolicy.objects.filter(plugin=plugin.name, person=person).first()
         on = f"on:{plugin.name}" in request.POST
-        free = f"free:{plugin.name}" in request.POST
+        if person is None and f"free:{plugin.name}" not in request.POST:
+            # The instance page no longer has the checkbox (#886): whether everyone may switch
+            # it is on the plugin's access page, and what is stored stays as it was.
+            free = not (existing and existing.state == PluginPolicy.State.FORCED_ON)
+        else:
+            free = f"free:{plugin.name}" in request.POST
         if on:
             wanted = PluginPolicy.State.AVAILABLE if free else PluginPolicy.State.FORCED_ON
         elif PluginPolicy.State.UNAVAILABLE in (
