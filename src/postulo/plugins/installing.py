@@ -853,6 +853,7 @@ def install_wheel(
     requires_postulo: str = "",
     disabled: bool = False,
     installed_at: str = "",
+    requires: list[str] | None = None,
 ) -> Installed:
     """Check a wheel, install it into the plugins directory, and record it.
 
@@ -923,6 +924,7 @@ def install_wheel(
             author=info.author,
             source_url=info.source_url,
             requires_postulo=requires_postulo,
+            requires=list(requires or []),
         )
         record = [
             item for item in read_record() if canonicalise(item.name) != canonicalise(info.name)
@@ -1006,6 +1008,11 @@ def remove(name: str) -> Installed:
     if entry is None:
         raise InstallError(str(_("%(name)s is not installed.")) % {"name": name})
     if refusal := data.refuse_removing(name):
+        raise InstallError(refusal)
+    # Something installed that needs this one would be left without it (#884).
+    from .dependencies import refuse_removing
+
+    if refusal := refuse_removing(entry.name):
         raise InstallError(refusal)
     going = [entry.name, *unshared_dependencies(entry)]
     for package in going:
@@ -1214,6 +1221,7 @@ def sync(*, fetch=None) -> tuple[list[str], list[str]]:
                 requires_postulo=entry.requires_postulo,
                 disabled=entry.disabled,
                 installed_at=entry.installed_at,
+                requires=list(entry.requires),
             )
             restored.append(entry.name)
         except InstallError:

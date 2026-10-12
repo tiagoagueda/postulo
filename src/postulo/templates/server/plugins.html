@@ -101,7 +101,7 @@
             {% else %}
               {% if row.held_by_parent %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" id="parent-{{ row.name }}" data-held-by-parent="{{ row.name }}">
-                  {% translate "Off while the module above it is off." %}
+                  {{ row.held_because }}
                 </p>
               {% else %}
                 <input type="hidden" name="row:{{ row.name }}" value="1">
@@ -438,7 +438,31 @@
                   · <code>{{ listing.catalogue }}</code>
                 </p>
               </div>
-              {% if listing.compatible %}
+              {% if listing.needs %}
+                {% comment %} What this release needs that is not here (#884). Each one the same
+                   catalogue lists has its own button: installing runs code, so it is never done
+                   on the administrator's behalf, and the release's own button waits. {% endcomment %}
+                <div class="flex flex-col gap-1 text-xs" data-needs="{{ listing.name }}">
+                  <p class="text-amber-800 dark:text-amber-200">
+                    {% translate "Needs, installed first:" %}
+                    {% for need in listing.needs %}<code>{{ need.wanted }}</code>{% if not forloop.last %}, {% endif %}{% endfor %}
+                  </p>
+                  {% for need in listing.needs %}
+                    {% if need.offered %}
+                      <form method="post" action="{% url 'server:plugin_action' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="name" value="{{ need.name }}">
+                        <input type="hidden" name="catalogue" value="{{ need.catalogue }}">
+                        <input type="hidden" name="version" value="{{ need.version }}">
+                        <input type="hidden" name="action" value="install">
+                        <button type="submit" class="btn" data-variant="outline" data-size="sm">
+                          {% blocktranslate with name=need.name trimmed %}Install {{ name }}{% endblocktranslate %}
+                        </button>
+                      </form>
+                    {% endif %}
+                  {% endfor %}
+                </div>
+              {% elif listing.compatible %}
                 <form method="post" action="{% url 'server:plugin_action' %}">
                   {% csrf_token %}
                   <input type="hidden" name="name" value="{{ listing.name }}">

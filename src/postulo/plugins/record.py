@@ -77,6 +77,10 @@ class Installed:
     #: them is what lets an administrator see what is actually in their instance without a
     #: shell, and notice when an update quietly brings something new.
     dependencies: list[str] = field(default_factory=list)
+    #: The plugins and modules the release said it needs (#884), as written in the catalogue:
+    #: names with an optional version specifier. Kept so that removing one of them can say what
+    #: would be left without, even when the plugin that needs it is not loaded.
+    requires: list[str] = field(default_factory=list)
 
     @property
     def is_from_catalogue(self) -> bool:

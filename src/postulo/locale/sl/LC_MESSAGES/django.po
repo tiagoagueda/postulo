@@ -1046,6 +1046,11 @@ msgstr ""
 msgid "%(name)s is listed by several catalogues (%(catalogues)s); say which."
 msgstr "%(name)s je v več katalogih (%(catalogues)s); navedite, v katerem."
 
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s is needed by %(others)s. Remove those first."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, fuzzy, python-format
 msgid "%(name)s is no longer an administrator."
@@ -1105,6 +1110,11 @@ msgstr "%(name)s je spet vklopljen."
 #, fuzzy, python-format
 msgid "%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
 msgstr "%(name)s je jezik, v katerem se začne nov račun, zato ga ni mogoče nehati ponujati. Najprej spremenite privzeti jezik."
+
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s needs %(missing)s, which is not installed. Install that first."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -3156,6 +3166,10 @@ msgstr "Zgodi se tudi samo od sebe, ko se spremeni vaš primarni naslov."
 #, fuzzy, python-format
 msgid "Also in %(names)s"
 msgstr "Tudi v jeziku %(names)s"
+
+#: src/postulo/plugins/policy.py
+msgid "Always on: Postulo cannot work without it."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -8576,6 +8590,11 @@ msgid "Install"
 msgstr "Namesti"
 
 #: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Install %(name)s"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Install a package"
 msgstr "Namestitev paketa"
@@ -10441,6 +10460,10 @@ msgstr "Navigacija"
 msgid "navigation order"
 msgstr "vrstni red navigacije"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Needs, installed first:"
+msgstr ""
+
 #: src/postulo/templates/help/your_name.html
 #, fuzzy
 msgid "Neither is printed anywhere unless a CV says so: each CV has a switch for the form of address and one for the pronouns under its own <em>Settings</em>. Letters print neither."
@@ -11746,8 +11769,7 @@ msgstr ""
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
 
-#: src/postulo/templates/server/person_plugins.html
-#: src/postulo/templates/server/plugins.html
+#: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr ""
 
@@ -11755,6 +11777,11 @@ msgstr ""
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "Izklopljeno — in ne smejo ga vklopiti"
+
+#: src/postulo/plugins/policy.py
+#, python-format
+msgid "Off, because it needs %(names)s, which is off or not installed."
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 msgid "Off, because the module it belongs to is off."

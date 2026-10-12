@@ -1046,6 +1046,11 @@ msgstr ""
 msgid "%(name)s is listed by several catalogues (%(catalogues)s); say which."
 msgstr "%(name)s huwa elenkat minn diversi katalgi (%(catalogues)s); għid liema."
 
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s is needed by %(others)s. Remove those first."
+msgstr ""
+
 #: src/postulo/core/server_views.py
 #, fuzzy, python-format
 msgid "%(name)s is no longer an administrator."
@@ -1105,6 +1110,11 @@ msgstr "%(name)s huwa mixgħul mill-ġdid."
 #, fuzzy, python-format
 msgid "%(name)s is what a new account starts in, so it cannot stop being offered. Change the default first."
 msgstr "%(name)s hija l-lingwa li biha jibda kont ġdid, għalhekk ma tistax tieqaf tiġi offruta. Ibdel l-ewwel il-lingwa awtomatika."
+
+#: src/postulo/plugins/dependencies.py
+#, python-format
+msgid "%(name)s needs %(missing)s, which is not installed. Install that first."
+msgstr ""
 
 #: src/postulo/core/views_backups.py
 #, python-format
@@ -3156,6 +3166,10 @@ msgstr "Jiġri wkoll waħdu meta jinbidel l-indirizz primarju tiegħek."
 #, fuzzy, python-format
 msgid "Also in %(names)s"
 msgstr "Ukoll bil-%(names)s"
+
+#: src/postulo/plugins/policy.py
+msgid "Always on: Postulo cannot work without it."
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -8576,6 +8590,11 @@ msgid "Install"
 msgstr "Installa"
 
 #: src/postulo/templates/server/plugins.html
+#, python-format
+msgid "Install %(name)s"
+msgstr ""
+
+#: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Install a package"
 msgstr "Installa pakkett"
@@ -10441,6 +10460,10 @@ msgstr "Navigazzjoni"
 msgid "navigation order"
 msgstr "ordni tan-navigazzjoni"
 
+#: src/postulo/templates/server/plugins.html
+msgid "Needs, installed first:"
+msgstr ""
+
 #: src/postulo/templates/help/your_name.html
 #, fuzzy
 msgid "Neither is printed anywhere unless a CV says so: each CV has a switch for the form of address and one for the pronouns under its own <em>Settings</em>. Letters print neither."
@@ -11746,8 +11769,7 @@ msgstr ""
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
 
-#: src/postulo/templates/server/person_plugins.html
-#: src/postulo/templates/server/plugins.html
+#: src/postulo/core/server_views.py
 msgid "Off while the module above it is off."
 msgstr ""
 
@@ -11755,6 +11777,11 @@ msgstr ""
 #, fuzzy
 msgid "Off — and they may not switch it on"
 msgstr "Mitfi — u ma jistgħux jixegħluh"
+
+#: src/postulo/plugins/policy.py
+#, python-format
+msgid "Off, because it needs %(names)s, which is off or not installed."
+msgstr ""
 
 #: src/postulo/plugins/policy.py
 msgid "Off, because the module it belongs to is off."

@@ -1264,6 +1264,13 @@ def _policy_rows(person=None) -> list[dict]:
             }
         )
     rows = _nested(rows)
+    for row in rows:
+        # A plugin whose requirement is missing or off is held the way a child is: off, with
+        # its controls taken away and the names beside it (#884).
+        decision = policy.decide(row["name"], person)
+        if decision.decided_by == "requires":
+            row["held_by_parent"] = True
+            row["held_because"] = decision.explain()
     for plugin in _ungoverned_plugins():
         manifest = base.manifest_of(plugin)
         rows.append(
@@ -1317,6 +1324,8 @@ def _nested(rows: list[dict]) -> list[dict]:
                 # Not editable while the parent is off: the form leaves its marker out, so
                 # a switch the browser did not submit is not read as "off" (#873).
                 child["held_by_parent"] = not row["on"]
+                if not row["on"]:
+                    child["held_because"] = _("Off while the module above it is off.")
                 ordered.append(child)
                 placed.add(child["name"])
                 row["has_children"] = True
@@ -1705,12 +1714,36 @@ class PluginActionView(StaffRequiredMixin, View):
         catalogues, problems = catalogue.fetch_all()
         for problem in problems:
             messages.error(request, problem)
+        from postulo.plugins import dependencies
+
         listings = []
         for one in catalogues:
+            offered_here = {
+                catalogue.canonicalise(item.name): item
+                for item in one.listings
+                if item.latest is not None
+            }
             for listing in one.listings:
                 release = listing.latest
                 if release is None:
                     continue
+                # What this release needs that is not here, and for each whether this very
+                # catalogue lists it, so the page can offer it. Offered, never installed on
+                # the administrator's behalf (#884).
+                needs = []
+                for need in dependencies.unmet(release.requires):
+                    found = offered_here.get(catalogue.canonicalise(need.name))
+                    needs.append(
+                        {
+                            "name": need.name,
+                            "wanted": str(need),
+                            "catalogue": one.name,
+                            "version": found.latest.version if found else "",
+                            "offered": bool(
+                                found and installing.compatible(found.latest.requires_postulo)
+                            ),
+                        }
+                    )
                 listings.append(
                     {
                         "name": listing.name,
@@ -1722,6 +1755,7 @@ class PluginActionView(StaffRequiredMixin, View):
                         "installed": installing.installed(listing.name) is not None,
                         "requires_postulo": release.requires_postulo,
                         "compatible": installing.compatible(release.requires_postulo),
+                        "needs": needs,
                     }
                 )
         request.session["plugin_listings"] = listings

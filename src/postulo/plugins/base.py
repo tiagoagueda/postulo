@@ -183,6 +183,11 @@ class Manifest:
     for what ships inside Postulo, whose icon is Postulo's own vocabulary; a package that
     has a logo of its own ships the file and names it in ``logo``, which goes through the
     checks files go through, and an icon never does. When both are given the file wins.
+
+    ``requires`` is what this plugin needs of the others (#884): names of plugins or modules,
+    each with an optional version specifier, ``("maps", "helloworld>=0.3")``. A plugin whose
+    requirement is missing, or is switched off, is off itself (see :mod:`postulo.plugins.policy`),
+    so it never runs half-served. A module's version is Postulo's.
     """
 
     name: str
@@ -197,6 +202,7 @@ class Manifest:
     parent: str = ""
     categories: tuple[str, ...] = ()
     icon: str = ""
+    requires: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         if not self.name:
@@ -206,6 +212,9 @@ class Manifest:
         if isinstance(self.categories, str):
             raise TypeError("categories is a tuple of slugs, not one string.")
         object.__setattr__(self, "categories", tuple(self.categories))
+        if isinstance(self.requires, str):
+            raise TypeError("requires is a tuple of names, not one string.")
+        object.__setattr__(self, "requires", tuple(self.requires))
         # A plugin that gave no name in words gets its identifier, rather than a blank
         # where a heading should be.
         if not self.label:
@@ -325,6 +334,7 @@ def shipped(
     parent: str = "",
     categories: tuple[str, ...] = (),
     icon: str = "",
+    requires: tuple[str, ...] = (),
 ) -> Manifest:
     """A manifest for a plugin that ships inside Postulo.
 
@@ -351,6 +361,7 @@ def shipped(
         parent=parent,
         categories=categories,
         icon=icon,
+        requires=requires,
     )
 
 

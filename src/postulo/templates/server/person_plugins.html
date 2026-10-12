@@ -87,7 +87,7 @@
             {% else %}
               {% if row.held_by_parent %}
                 <p class="text-xs text-ink-500 dark:text-ink-400" id="parent-{{ row.name }}" data-held-by-parent="{{ row.name }}">
-                  {% translate "Off while the module above it is off." %}
+                  {{ row.held_because }}
                 </p>
               {% else %}
                 <input type="hidden" name="row:{{ row.name }}" value="1">

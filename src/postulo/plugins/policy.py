@@ -36,6 +36,11 @@ on again. Switching a parent *on* clears its children's *off* rows, as the page 
 all come on together and can then be switched one by one. A parent is an ordinary row with
 no behaviour of its own, so nothing here knows what it governs; it is only asked.
 
+**A plugin follows what it needs** (#884). A manifest's ``requires`` names the plugins and
+modules it cannot work without; one that is missing, or is off for this person, makes this one
+off too, with the labels of what is wanted beside it. Asked after the parent and before the
+rows, so that a plugin forced on by an administrator is still not run without its need.
+
 **Switching a feature off does not delete what it governs.** It stops Postulo offering and
 using that part of itself; the rows stay, and switching it back on finds them unchanged.
 That is the same promise every other kind here makes, and it is not weaker for the kind
@@ -48,6 +53,7 @@ a person holds, and *forced off* for a transport would be an account nobody can 
 
 from __future__ import annotations
 
+import threading
 from dataclasses import dataclass
 
 from django.utils.translation import gettext_lazy as _
@@ -96,6 +102,8 @@ class Decision:
     #: decided is the point; no longer on the person's page, where on nearly every instance
     #: it named the reader to themselves (#287).
     who: object = None
+    #: For ``requires``: the labels of what is missing or off, said beside the row (#884).
+    because: tuple[str, ...] = ()
 
     @property
     def imposed(self) -> bool:
@@ -112,6 +120,10 @@ class Decision:
         themselves in the tone of a permission held over them. The row is still shown and
         still disabled; what is dropped is the attribution, not the visibility.
         """
+        if self.decided_by == "requires":
+            return _("Off, because it needs %(names)s, which is off or not installed.") % {
+                "names": ", ".join(self.because)
+            }
         return {
             "administrator": _("Set for your account."),
             "shipped": "",
@@ -119,6 +131,7 @@ class Decision:
             "default": _("Available; you have not changed it."),
             "infrastructure": _("How this instance works, rather than a choice anybody holds."),
             "parent": _("Off, because the module it belongs to is off."),
+            "required": _("Always on: Postulo cannot work without it."),
         }[self.decided_by]
 
 
@@ -162,6 +175,41 @@ def parent_of(plugin_name: str) -> str:
 
     plugin = find_any(plugin_name)
     return base.manifest_of(plugin).parent if plugin is not None else ""
+
+
+#: The names being decided in this thread right now, so that two plugins which need each other
+#: are not an infinite regress: the second to ask is told yes, and a test holds what ships to
+#: no cycle at all (#884).
+_deciding = threading.local()
+
+
+def _unmet_needs(plugin_name: str, person) -> list[str]:
+    """The labels of what this plugin needs that is missing, or off for this person (#884)."""
+    from . import dependencies
+    from .registry import find_any
+
+    plugin = find_any(plugin_name)
+    if plugin is None:
+        return []
+    needs = dependencies.needs_of(plugin)
+    if not needs:
+        return []
+    asking = getattr(_deciding, "names", None)
+    if asking is None:
+        asking = _deciding.names = set()
+    if plugin_name in asking:
+        return []
+    asking.add(plugin_name)
+    try:
+        found = []
+        for need in needs:
+            if not dependencies.is_present(need):
+                found.append(dependencies.label_of(need.name))
+            elif find_any(need.name) is not None and not decide(need.name, person).on:
+                found.append(dependencies.label_of(need.name))
+        return found
+    finally:
+        asking.discard(plugin_name)
 
 
 def children_of(plugin_name: str) -> list[str]:
@@ -211,6 +259,11 @@ def _decide(plugin_name: str, person) -> Decision:
         above = decide(parent, person)
         if not above.on:
             return Decision(on=False, offered=above.offered, theirs=False, decided_by="parent")
+
+    if wanting := _unmet_needs(plugin_name, person):
+        return Decision(
+            on=False, offered=True, theirs=False, decided_by="requires", because=tuple(wanting)
+        )
 
     rows = {
         row.person_id: row

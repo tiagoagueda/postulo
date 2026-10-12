@@ -61,6 +61,8 @@ class Release:
     sha256: str
     requires_postulo: str = ""
     provides: tuple[str, ...] = ()
+    #: The plugins and modules this release needs, written as requirements (#884).
+    requires: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -209,6 +211,7 @@ def parse(payload: bytes, *, catalogue: str = "") -> list[Listing]:
                     sha256=str(release["sha256"]).lower(),
                     requires_postulo=str(release.get("requires_postulo", "")),
                     provides=tuple(str(item) for item in release.get("provides", [])),
+                    requires=tuple(str(item) for item in release.get("requires", [])),
                 )
             )
         listings.append(
@@ -498,6 +501,7 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
             )
     listing, release = find(catalogues, plugin, version, catalogue=catalogue)
     refuse_unless_it_fits(listing, release)
+    refuse_unless_it_has_what_it_needs(listing, release)
     with tempfile.TemporaryDirectory(prefix="postulo-plugin-") as scratch:
         wheel = download(release, Path(scratch))
         return install_wheel(
@@ -507,7 +511,21 @@ def install(plugin: str, *, by: str = "", catalogue: str = "", version: str = ""
             by=by,
             expected_sha256=release.sha256,
             requires_postulo=release.requires_postulo,
+            requires=list(release.requires),
         )
+
+
+def refuse_unless_it_has_what_it_needs(listing: Listing, release: Release) -> None:
+    """The fourth check: the plugins and modules a release names must already be here (#884).
+
+    Before the download, and refused rather than installed on the administrator's behalf:
+    installing runs code (#94), so each plugin that is wanted is a decision of its own. The
+    page offers the missing plugin when the same catalogue lists it.
+    """
+    from .dependencies import refuse_installing
+
+    if sentence := refuse_installing(listing.name, release.requires):
+        raise CatalogueError(sentence)
 
 
 def refuse_unless_it_fits(listing: Listing, release: Release) -> None:
