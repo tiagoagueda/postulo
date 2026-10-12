@@ -82,6 +82,6 @@ def test_the_worker_is_script_from_the_root_and_about_nobody(client, user):
     assert signed_in["Content-Type"].startswith("text/javascript")
     assert signed_in.content == signed_out.content, "nothing in it depends on who asked"
     assert b"showNotification" in signed_in.content
-    assert b'addEventListener("fetch"' not in signed_in.content, (
-        "a worker that intercepts requests is a second copy of the application"
-    )
+    # It answers page loads now, for the offline page alone (#895); what it may keep is
+    # held to that in `tests/security/test_offline_page.py`.
+    assert b"caches.match(OFFLINE_PAGE" in signed_in.content

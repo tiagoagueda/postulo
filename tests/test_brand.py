@@ -33,6 +33,7 @@ BRAND = Path(__file__).resolve().parents[1] / "src" / "postulo" / "static" / "br
         "apple-touch-icon.png",
         "icon-192.png",
         "icon-512.png",
+        "icon-maskable-512.png",
         "logo-64.png",
         "logo-256.png",
     ],
@@ -138,8 +139,8 @@ def test_the_manifest_names_this_instance_not_the_project(client):
         "a home screen saying Postulo on an instance called something else is somebody "
         "else's software"
     )
-    assert payload["start_url"] == reverse("core:home")
     assert {icon["sizes"] for icon in payload["icons"]} == {"192x192", "512x512"}
+    assert payload["start_url"] == reverse("applications:board"), "it opens on the board (#895)"
 
 
 def test_the_manifest_is_linked_from_every_page(client, user):

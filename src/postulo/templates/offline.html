@@ -1,0 +1,19 @@
+{% load i18n %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE|default:'en-GB' }}" dir="{{ text_direction|default:'ltr' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ instance_name }} &gt; {% translate "No connection" %}</title>
+    {% comment %} Shown by the service worker when the server cannot be reached, so nothing it links could be fetched either: the 500 page's rules, inlined under this response's nonce, which the worker keeps along with the page (#895). {% endcomment %}
+    <style nonce="{{ csp_nonce }}">{{ styles|safe }}</style>
+  </head>
+  <body>
+    <main>
+      <h1>{% blocktranslate trimmed with name=instance_name %}{{ name }} cannot reach its server{% endblocktranslate %}</h1>
+      <p class="detail">
+        {% translate "Either this device is offline or the server is not answering. Try again once the connection is back." %}
+      </p>
+      <p>{% comment %} An empty address is the page that failed: this one is shown in its place, at its address. {% endcomment %}<a href="">{% translate "Try again" %}</a></p>
+    </main>
+  </body>
+</html>

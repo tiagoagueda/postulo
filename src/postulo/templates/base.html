@@ -42,7 +42,21 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'brand/favicon-32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'brand/favicon-16.png' %}">
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'brand/apple-touch-icon.png' %}">
-    <link rel="manifest" href="{% url 'core:manifest' %}">
+    {% comment %} With credentials, so the manifest is in the account's language rather than the browser's guess at it (#895). {% endcomment %}
+    <link rel="manifest" href="{% url 'core:manifest' %}" crossorigin="use-credentials">
+    {% comment %} The colour of the installed app's title bar, and of a phone browser's own bar: the masthead's, in the theme the page is drawn in. Somebody who chose one gets it whatever the system says; otherwise the system's preference picks, as it does for the page. {% endcomment %}
+    {% if ui_theme == "dark" %}
+      <meta name="theme-color" content="#101419">
+    {% elif ui_theme == "light" %}
+      <meta name="theme-color" content="#ffffff">
+    {% else %}
+      <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">
+      <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101419">
+    {% endif %}
+    {% comment %} What Safari reads when it adds the page to a home screen or the Dock: the name under the icon, and a status bar that keeps the page below it. {% endcomment %}
+    <meta name="apple-mobile-web-app-title" content="{{ instance_name }}">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
     <link rel="stylesheet" href="{% static 'css/app.css' %}">
     <script src="{% static 'js/vendor/htmx.min.js' %}" defer></script>
     <script src="{% static 'js/app.js' %}" defer></script>
@@ -54,7 +68,8 @@
      those off; the switch is under Settings → Appearance and its answer is written here, where
      `app.js` reads it before acting on a key. Only "off" is spelled out, so the attribute
      appears when somebody has asked for something and not otherwise (#227). {% endcomment %}
-  <body class="min-h-screen"{% if not keyboard_shortcuts %} data-shortcuts="off"{% endif %}{% if not nav_underline %} data-nav-underline="off"{% endif %}{% if ui_density == "compact" %} data-density="compact"{% endif %}{% if ui_button_labels != "both" %} data-buttons="{{ ui_button_labels }}"{% endif %}{% if breadcrumb_on_hover %} data-breadcrumb-hover{% endif %}{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}>
+  {% comment %} The worker that keeps the offline page, for anybody signed in (#895). Signing out unregisters it again (#753), which is why it is not offered to a visitor. {% endcomment %}
+  <body class="min-h-screen"{% if not keyboard_shortcuts %} data-shortcuts="off"{% endif %}{% if not nav_underline %} data-nav-underline="off"{% endif %}{% if ui_density == "compact" %} data-density="compact"{% endif %}{% if ui_button_labels != "both" %} data-buttons="{{ ui_button_labels }}"{% endif %}{% if breadcrumb_on_hover %} data-breadcrumb-hover{% endif %}{% if browser_notices %} data-browser-notices="{% url 'notifications:waiting' %}" data-browser-notices-token="{{ csrf_token }}"{% endif %}{% if user.is_authenticated %} data-service-worker="{% url 'notifications:worker' %}"{% endif %}>
     {# The first thing Tab reaches: past the header, straight to the page. #}
     <a href="#main" class="skip-link">{% translate "Skip to content" %}</a>
     {% comment %} What a failed htmx request says (#226). Every live filter, sort and page
@@ -229,6 +244,13 @@
                     {% icon "shield" %}{% translate "Server settings" %}
                   </a>
                 {% endif %}
+                {% comment %} Installing Postulo as an app (#895), hidden until a script knows it can be done here: the first where the browser offers to install it, the second on Safari, which does not offer and is told how from its own menu. Neither shows once it is installed, and nothing else ever asks. {% endcomment %}
+                <button type="button" class="menu-item" data-install-app hidden>
+                  {% icon "download" %}{% blocktranslate trimmed with name=instance_name %}Install {{ name }}{% endblocktranslate %}
+                </button>
+                <a href="{% url 'core:help_topic' 'install' %}" class="menu-item" data-install-help hidden>
+                  {% icon "download" %}{% blocktranslate trimmed with name=instance_name %}Install {{ name }}{% endblocktranslate %}
+                </a>
                 <div class="my-1 border-t border-ink-200 dark:border-ink-800" role="separator"></div>
                 {% comment %} The theme switch, as a row of the menu it belongs to: a
                    preference of the person whose menu this is, and the corner then holds

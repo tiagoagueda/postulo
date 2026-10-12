@@ -182,6 +182,17 @@ TOPICS: dict[str, Topic] = {
             home="resume:overview",
             back=_("Back to Your career"),
         ),
+        Topic(
+            slug="install",
+            title=_("Installing it as an app"),
+            summary=_(
+                "Most browsers can install this site as an app of its own, with its own icon "
+                "and window and without the address bar."
+            ),
+            template="help/install.html",
+            home="core:home",
+            back=_("Back to the dashboard"),
+        ),
     )
 }
 

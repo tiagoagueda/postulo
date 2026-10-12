@@ -98,6 +98,8 @@ PAGE_TOPICS = {
     "documents": "documents:cv_list",
     "calendar": "applications:calendar",
     "career": "resume:overview",
+    # Where the account menu's *Install* leads on Safari, which has no prompt (#895).
+    "install": "core:home",
 }
 
 

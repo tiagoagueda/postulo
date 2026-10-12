@@ -834,6 +834,11 @@ msgstr ""
 msgid "%(name)s can sign in again."
 msgstr "%(name)s pode volver acceder."
 
+#: src/postulo/templates/offline.html
+#, python-format
+msgid "%(name)s cannot reach its server"
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy, python-format
 msgid "%(name)s declares no Postulo entry point, so installing it would do nothing. A plugin registers under one of: %(groups)s."
@@ -1450,6 +1455,22 @@ msgid "<strong>%(name)s</strong>: %(rows)s row. The guesses below come from the 
 msgid_plural "<strong>%(name)s</strong>: %(rows)s rows. The guesses below come from the header names; correct any of them, then check the preview before importing."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/help/install.html
+msgid "<strong>Chrome, Edge, Brave and other browsers built on Chromium:</strong> the account menu offers <em>Install</em> where the browser allows it. The browser's own menu has the same entry, and on a computer so does the icon at the end of the address bar."
+msgstr ""
+
+#: src/postulo/templates/help/install.html
+msgid "<strong>Firefox on Android:</strong> choose <em>Add to Home screen</em> from the browser's menu. Firefox on Windows can add a site to the taskbar once <em>Add sites to your taskbar</em> is switched on under <em>Settings → Firefox Labs</em>. Firefox on other computers does not install sites as apps; open this site in one of the browsers above."
+msgstr ""
+
+#: src/postulo/templates/help/install.html
+msgid "<strong>Safari on a Mac:</strong> choose <em>Add to Dock</em> from the <em>File</em> menu, or from the Share button."
+msgstr ""
+
+#: src/postulo/templates/help/install.html
+msgid "<strong>Safari on an iPhone or iPad:</strong> press the Share button, then <em>Add to Home Screen</em>."
+msgstr ""
 
 #: src/postulo/documents/models.py
 #, fuzzy
@@ -2282,6 +2303,10 @@ msgid "A single-use link that lets %(name)s choose a new password, good for %(mi
 msgid_plural "A single-use link that lets %(name)s choose a new password, good for %(minutes)s minutes. Postulo does not send it anywhere: you hand it over yourself, by whatever means you already trust."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/help/install.html
+msgid "A site can only be installed when it is served over HTTPS. If no browser offers to install it, ask whoever runs this server."
+msgstr ""
 
 #: src/postulo/accounts/forms.py
 msgid "A small key cap beside Save and next, Discard and next, Skip to the next and the search box. Turning it off hides the caps only; the keys keep working (see above), and a screen reader is still told about them."
@@ -3732,6 +3757,10 @@ msgstr ""
 msgid "Back to the calendar"
 msgstr ""
 
+#: src/postulo/core/help.py
+msgid "Back to the dashboard"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_text.html
 #: src/postulo/templates/documents/rendered_compare.html
 msgid "Back to the document"
@@ -3843,7 +3872,7 @@ msgstr ""
 msgid "Blue"
 msgstr ""
 
-#: src/postulo/applications/tables.py
+#: src/postulo/applications/tables.py src/postulo/core/views.py
 #: src/postulo/templates/applications/partials/board.html
 #, fuzzy
 msgid "Board"
@@ -3977,7 +4006,7 @@ msgid "C2 — proficient"
 msgstr "C2 — dominio"
 
 #: src/postulo/core/help.py src/postulo/core/navigation.py
-#: src/postulo/plugins/categories.py
+#: src/postulo/core/views.py src/postulo/plugins/categories.py
 #: src/postulo/templates/applications/application_detail.html
 #: src/postulo/templates/applications/calendar.html
 #: src/postulo/templates/applications/ical_import.html
@@ -6062,6 +6091,10 @@ msgstr "formación"
 msgid "Education entries"
 msgstr ""
 
+#: src/postulo/templates/offline.html
+msgid "Either this device is offline or the server is not answering. Try again once the connection is back."
+msgstr ""
+
 #: src/postulo/applications/models.py src/postulo/core/server_sections.py
 #: src/postulo/core/server_views.py src/postulo/templates/server/email.html
 #: src/postulo/templates/server/people.html
@@ -8072,7 +8105,7 @@ msgstr ""
 msgid "Install"
 msgstr "Instalar"
 
-#: src/postulo/templates/server/plugins.html
+#: src/postulo/templates/base.html src/postulo/templates/server/plugins.html
 #, python-format
 msgid "Install %(name)s"
 msgstr ""
@@ -8097,10 +8130,18 @@ msgstr "Instálao con: uv sync --extra chromium, e despois: uv run playwright in
 msgid "Installed on this instance"
 msgstr "Instalado nesta instalación"
 
+#: src/postulo/templates/help/install.html
+msgid "Installed, it opens in a window of its own, from an icon on the home screen, in the Dock or in the list of apps, without the browser's address bar and tabs. It is still this site: you sign in the same way, and everything stays on the server."
+msgstr ""
+
 #: src/postulo/templates/server/plugins.html
 #, fuzzy
 msgid "Installing a plugin runs somebody else's code inside Postulo."
 msgstr "Instalar un complemento executa código doutra persoa dentro de Postulo."
+
+#: src/postulo/core/help.py
+msgid "Installing it as an app"
+msgstr ""
 
 #: src/postulo/core/models.py
 #, fuzzy
@@ -9169,7 +9210,8 @@ msgstr "Filtros de ofertas"
 
 #: src/postulo/core/help.py src/postulo/core/kind_files.py
 #: src/postulo/core/navigation.py src/postulo/core/search.py
-#: src/postulo/jobs/tables.py src/postulo/templates/applications/report.html
+#: src/postulo/core/views.py src/postulo/jobs/tables.py
+#: src/postulo/templates/applications/report.html
 #: src/postulo/templates/core/import_csv_done.html
 #: src/postulo/templates/core/import_csv_map.html
 #: src/postulo/templates/jobs/listing_list.html
@@ -9681,6 +9723,10 @@ msgstr "Máis"
 msgid "More than %(limit)s rows; split the file."
 msgstr "Máis de %(limit)s filas; divide o ficheiro."
 
+#: src/postulo/core/help.py
+msgid "Most browsers can install this site as an app of its own, with its own icon and window and without the address bar."
+msgstr ""
+
 #: src/postulo/templates/server/capture.html
 msgid "Most kept for one account"
 msgstr ""
@@ -10102,6 +10148,10 @@ msgstr "Aínda non hai empresas. Créanse soas cando rexistras unha candidatura.
 #, fuzzy
 msgid "no company"
 msgstr "sen empresa"
+
+#: src/postulo/templates/offline.html
+msgid "No connection"
+msgstr ""
 
 #: src/postulo/core/server_views.py
 #, fuzzy, python-format
@@ -18009,6 +18059,10 @@ msgstr "segredos do transporte"
 msgid "Trusted:"
 msgstr ""
 
+#: src/postulo/templates/offline.html
+msgid "Try again"
+msgstr ""
+
 #: src/postulo/templates/core/search.html
 #, fuzzy
 msgid "Try fewer words, or a different spelling."
@@ -19551,6 +19605,10 @@ msgstr "Con: %(people)s"
 #, fuzzy
 msgid "Withdrawn"
 msgstr "Retirada"
+
+#: src/postulo/templates/help/install.html
+msgid "Without a connection, the installed app shows a page saying it cannot reach its server, instead of the browser's own error. That page is the only thing it keeps on the device: nothing of your applications, documents or contacts is stored there."
+msgstr ""
 
 #: src/postulo/templates/server/backup_restore.html
 msgid "Without containers"

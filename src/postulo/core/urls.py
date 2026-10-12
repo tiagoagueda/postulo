@@ -20,6 +20,8 @@ urlpatterns = [
     path("", views.home, name="home"),
     path("healthz", views.healthz, name="healthz"),
     path("manifest.webmanifest", views.manifest, name="manifest"),
+    # What the installed app shows with no server to reach; the service worker keeps it (#895).
+    path("offline/", views.offline, name="offline"),
     # Off unless an operator turns it on, and a 404 rather than a 403 when it is off.
     path("logs", views_logs.collect, name="logs_endpoint"),
     path("metrics", views_metrics.scrape, name="metrics"),

@@ -68,6 +68,10 @@ DERIVED = {
     # The manifest's two, for a phone that installs it.
     "icon-192.png": (192, 0.08, None),
     "icon-512.png": (512, 0.08, None),
+    # The same, for a launcher that crops every icon to its own shape (#895). Opaque, and
+    # padded until the mark sits inside the central circle of 40% radius that every
+    # launcher keeps; one file serving both purposes would be cropped into the mark.
+    "icon-maskable-512.png": (512, 0.2, APPLE_BACKGROUND),
     # The wordmark's companion in the header, and the one the README shows.
     "logo-64.png": (64, 0.0, None),
     "logo-256.png": (256, 0.0, None),

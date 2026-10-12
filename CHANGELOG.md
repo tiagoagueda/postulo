@@ -153,6 +153,7 @@ All notable changes to Postulo are recorded here. The format follows
 ### ✨ Added
 
 - The hello-world plugin is at 0.3.1 in the official catalogue, with its notifier under the name helloworld-notifier so Postulo no longer leaves it out (#593)
+- Postulo installs as an app on Chromium browsers and Safari: a completed manifest with a maskable icon and shortcuts, title-bar colours for both themes, Install in the account menu, and an offline page, the one thing the worker keeps (#895)
 - The official catalogue lists Postulo Templates 0.3.0, the curated document themes, beside the hello-world plugin (#729)
 - Server settings -> Plugins draws an installed package that registers several plugins as a parent row whose switch is its sub-plugins' master, and catalogue listings carry categories shown as badges and filterable (#883)
 - Server settings -> Plugins draws a Settings button under the switch of every plugin or module that names a settings page in its manifest, hidden when it has none and shown disabled, with the reason as its tooltip, to someone who may not change them (#885)

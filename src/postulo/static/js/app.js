@@ -7144,4 +7144,123 @@
     );
   });
 
+
+  /* ------------------------------------------------ installed as an app (#895)
+   *
+   * Four things for a site that can be installed. The worker that keeps the offline page is
+   * registered for anybody signed in, not only when push is switched on, and told the page's
+   * language so the page it keeps speaks it. The account menu offers *Install* where the
+   * browser lets a page ask, and on Safari, which never does, leads to the help that says
+   * how; neither shows once the site is installed, and nothing else asks. And in an
+   * installed window, which has no address bar to say where a link went and no Back button
+   * to return, a link to another site opens in the browser instead.
+   */
+  function runningInstalled() {
+    return (
+      window.navigator.standalone === true ||
+      (window.matchMedia &&
+        (window.matchMedia("(display-mode: standalone)").matches ||
+          window.matchMedia("(display-mode: fullscreen)").matches))
+    );
+  }
+
+  function readyServiceWorker() {
+    var body = document.body;
+    var address = body && body.dataset.serviceWorker;
+    if (!address || body.hasAttribute("data-service-worker-ready")) {
+      return;
+    }
+    body.setAttribute("data-service-worker-ready", "");
+    if (!window.isSecureContext || !("serviceWorker" in navigator)) {
+      return;
+    }
+    navigator.serviceWorker
+      .register(address, { scope: "/" })
+      .then(function () {
+        return navigator.serviceWorker.ready;
+      })
+      .then(function (registration) {
+        var worker = navigator.serviceWorker.controller || registration.active;
+        if (worker) {
+          worker.postMessage({ type: "offline-page", language: document.documentElement.lang || "" });
+        }
+      })
+      .catch(function () {
+        // A private window, or a browser with workers switched off: the site works as it
+        // did, and the browser shows its own page when the network is gone.
+      });
+  }
+
+  onContentReady(readyServiceWorker);
+
+  var installOffer = null;
+
+  function showInstallEntries() {
+    var installed = runningInstalled();
+    Array.prototype.forEach.call(document.querySelectorAll("[data-install-app]"), function (button) {
+      button.hidden = installed || !installOffer;
+    });
+    // Safari has no prompt to keep: an iPhone or iPad says so by `navigator.standalone`,
+    // and a Mac by being Safari and nothing built on it.
+    var agent = window.navigator.userAgent || "";
+    var safari =
+      "standalone" in window.navigator ||
+      (/Macintosh/.test(agent) && /Safari\//.test(agent) && !/Chrome|Chromium|CriOS|Edg|Firefox|FxiOS|OPR/.test(agent));
+    Array.prototype.forEach.call(document.querySelectorAll("[data-install-help]"), function (link) {
+      link.hidden = installed || !!installOffer || !safari || "onbeforeinstallprompt" in window;
+    });
+  }
+
+  window.addEventListener("beforeinstallprompt", function (event) {
+    // Kept for the menu rather than shown: the browser's own banner is the nagging this
+    // leaves out, and the address bar's install icon is still there for anybody who looks.
+    event.preventDefault();
+    installOffer = event;
+    showInstallEntries();
+  });
+
+  window.addEventListener("appinstalled", function () {
+    installOffer = null;
+    showInstallEntries();
+  });
+
+  document.addEventListener("click", function (event) {
+    var button = event.target && event.target.closest ? event.target.closest("[data-install-app]") : null;
+    if (!button || !installOffer) {
+      return;
+    }
+    var offer = installOffer;
+    installOffer = null;
+    offer.prompt();
+    // Asked once: the browser fires the event again if it may be asked again.
+    Promise.resolve(offer.userChoice).catch(function () {}).then(showInstallEntries);
+  });
+
+  onContentReady(showInstallEntries);
+
+  document.addEventListener("click", function (event) {
+    if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
+    var link = event.target && event.target.closest ? event.target.closest("a[href]") : null;
+    if (!link || link.hasAttribute("download") || !runningInstalled()) {
+      return;
+    }
+    var target = link.getAttribute("target");
+    if (target && target !== "_self") {
+      return;
+    }
+    var address;
+    try {
+      address = new URL(link.href, window.location.href);
+    } catch (error) {
+      return;
+    }
+    if (!/^https?:$/.test(address.protocol) || address.origin === window.location.origin) {
+      return;
+    }
+    event.preventDefault();
+    window.open(address.href, "_blank", "noopener,noreferrer");
+  });
+
 })();

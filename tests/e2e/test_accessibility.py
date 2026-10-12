@@ -715,6 +715,8 @@ SIGNED_OUT_PATHS: tuple[str, ...] = (
     "/accounts/password/reset/",
     "/accounts/login/code/",
     "/",
+    # What the installed app shows with no server to reach, drawn by its own rules (#895).
+    "/offline/",
 )
 
 
