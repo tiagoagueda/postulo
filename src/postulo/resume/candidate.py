@@ -450,7 +450,10 @@ CONTACT_BLOCKS: dict[str, tuple[str, ...]] = {
     "phone_numbers": tuple(
         name for name in export.PHONE_NUMBER_FIELDS if name not in NOT_THE_FILES_TO_SAY
     ),
-    "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
+    # Without the map's part (#702): where this instance draws an address is its own.
+    "postal_addresses": tuple(
+        name for name in export.POSTAL_ADDRESS_FIELDS if name not in export.ADDRESS_MAP_FIELDS
+    ),
     "web_links": export.WEB_LINK_FIELDS,
     "messaging_handles": export.MESSAGING_FIELDS,
 }
@@ -1175,7 +1178,11 @@ class _Planner:
             self.profile.pk if self.profile is not None else None,
         )
         seen: set[str] = set()
-        names = tuple(name for name in export.POSTAL_ADDRESS_FIELDS if name != "is_primary")
+        names = tuple(
+            name
+            for name in export.POSTAL_ADDRESS_FIELDS
+            if name != "is_primary" and name not in export.ADDRESS_MAP_FIELDS
+        )
         for entry in self.held.get("postal_addresses") or []:
             if not isinstance(entry, dict):
                 section.rows.append(_not_a_record())

@@ -197,7 +197,12 @@ logger = logging.getLogger(__name__)
 #: 67 added ``email``, ``phone_numbers`` and ``postal_addresses`` on a company, in the shape a
 #: contact's have: its general mailbox, its switchboard and its offices. An archive without
 #: them restores none (#329).
-FORMAT_VERSION = 67
+#: 68 stopped writing a company's ``location``, which is its primary address's town and
+#: country since #702, and added ``latitude``, ``longitude``, ``placed_by`` and ``on_map`` on
+#: every postal address. An archive with a ``location`` and no addresses on a company
+#: restores it as the town and country of a primary one; a point placed by hand or from
+#: Wikidata is restored as it was, and any other is placed again from the address (#702).
+FORMAT_VERSION = 68
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -373,7 +378,6 @@ COMPANY_FIELDS = (
     "website",
     "careers_url",
     "email",
-    "location",
     "notes",
     # Whether only the career added it (#683): read back as written, so a former employer
     # stays out of the pickers after a restore as it was before.
@@ -402,7 +406,15 @@ POSTAL_ADDRESS_FIELDS = (
     "region",
     "country",
     "is_primary",
+    # Where the map draws it and how that was decided, and whether a home is drawn (#702).
+    "latitude",
+    "longitude",
+    "placed_by",
+    "on_map",
 )
+#: The map's part of an address (#702): this instance's knowledge of where it is, which the
+#: candidate file -- a person's career, taken to another instance -- does not carry.
+ADDRESS_MAP_FIELDS = ("latitude", "longitude", "placed_by", "on_map")
 #: What one address on the web is, in the file: every link a holder has, of every kind, in
 #: order, with the primary of each kind marked -- not the primaries alone (#189). The
 #: service is the key of the one the address is on, and blank for *Other* (#305).

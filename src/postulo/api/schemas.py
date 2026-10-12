@@ -136,6 +136,11 @@ class PostalAddressOut(Schema):
     #: ISO 3166-1 alpha-2, in capitals.
     country: str = ""
     is_primary: bool = False
+    #: Where the map draws it, and how that was decided: ``town``, ``postcode``, ``manual``
+    #: or ``wikidata``, blank where it is not on the map (#702). Read-only.
+    latitude: float | None = None
+    longitude: float | None = None
+    placed_by: str = ""
 
 
 class CompanyOut(Schema):
@@ -1535,6 +1540,9 @@ def company_out(company, *, detail: bool = False) -> dict:
                 "region": row.region,
                 "country": row.country,
                 "is_primary": row.is_primary,
+                "latitude": row.latitude,
+                "longitude": row.longitude,
+                "placed_by": row.placed_by,
             }
             for row in company.postal_addresses.all()
         ],

@@ -29,7 +29,7 @@ work with no notice beside it, or a work committed here and not listed, fails th
 
 ## Data downloaded when an instance is provisioned
 
-Two datasets are not committed and not installed with the dependencies: an operator
+Three datasets are not committed and not installed with the dependencies: an operator
 fetches them with a management command, and they are then used from the instance's own
 disk. The licence notice for each is committed in `src/postulo/jobs/data/`, beside the
 NACE file, so the attribution is in the tree even though the data is not.
@@ -37,6 +37,7 @@ NACE file, so the attribution is in the tree even though the data is not.
 | Data | Fetched by | Whose | Licence | Notice |
 | --- | --- | --- | --- | --- |
 | GeoNames place names | `manage.py fetch_geonames` | [GeoNames](https://www.geonames.org) | CC BY 3.0 | `src/postulo/jobs/data/GEONAMES-LICENCE.md` |
+| GeoNames postal codes, only when asked for (#702) | `manage.py fetch_geonames --postcodes`, or `POSTULO_GEONAMES_POSTCODES=1` | [GeoNames](https://www.geonames.org) | CC BY 4.0; the British, Canadian and Dutch codes are the first part of each, and the full British file, under a Royal Mail notice, is not used | `src/postulo/jobs/data/GEONAMES-LICENCE.md` |
 | ESCO skills and occupations | `manage.py fetch_esco` | the European Commission ([ESCO](https://esco.ec.europa.eu)) | CC BY 4.0 | `src/postulo/jobs/data/ESCO-LICENCE.md` |
 
 ## Fetched by the viewer's browser

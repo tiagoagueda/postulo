@@ -13,6 +13,7 @@ vcard = modules.required("format-vcard")
 urlpatterns = [
     path("companies/", views.CompanyListView.as_view(), name="company_list"),
     path("companies/map/", views.CompanyMapView.as_view(), name="company_map"),
+    path("addresses/<int:pk>/place/", views.AddressPlaceView.as_view(), name="address_place"),
     path("companies/bulk/", views.CompanyBulkView.as_view(), name="company_bulk"),
     path("companies/new/", views.CompanyCreateView.as_view(), name="company_create"),
     path("companies/<int:pk>/", views.CompanyDetailView.as_view(), name="company_detail"),

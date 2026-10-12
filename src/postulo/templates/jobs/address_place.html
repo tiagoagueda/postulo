@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% load i18n static postulo %}
+
+{% block title %}{% translate "Place on the map" %}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'js/vendor/leaflet/leaflet.css' %}">
+{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% translate "Place on the map" %}
+      <c-slot name="subtitle"><bdi>{{ address.one_line }}</bdi></c-slot>
+    </c-page-title>
+    <p class="mb-4 text-sm text-ink-600 dark:text-ink-300">
+      {% translate "Drop the pin where the address is, or type the two numbers. The point is kept on this instance and nothing is looked up anywhere; changing the address afterwards does not move it." %}
+    </p>
+  </div>
+
+  {% comment %} The map is a way of filling the two boxes below, which are the form: with
+     scripts off, or with a keyboard, the numbers are typed (#702). {% endcomment %}
+  <div class="card mb-4 max-w-3xl overflow-hidden p-0" data-map-card hidden>
+    <div class="map-canvas h-96" data-map-pick role="region"
+         aria-label="{% translate 'Map: click to drop the pin' %}"
+         data-map-tiles="{{ tiles.url }}"
+         data-map-max-zoom="{{ tiles.max_zoom }}"
+         data-map-attribution="{{ tiles.attribution }}"
+         data-map-attribution-url="{{ tiles.attribution_url }}"
+         {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
+         {% if address.is_placed %}data-map-point="{{ address.latitude|stringformat:'f' }},{{ address.longitude|stringformat:'f' }}"{% endif %}
+         data-map-zoom-in="{% translate 'Zoom in' %}"
+         data-map-zoom-out="{% translate 'Zoom out' %}"></div>
+  </div>
+
+  <form method="post" class="card mb-4 max-w-2xl">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ back }}">
+    <div class="flex flex-wrap gap-4">
+      <div class="field">
+        <label for="latitude">{% translate "Latitude" %}</label>
+        <input class="input" type="text" inputmode="decimal" id="latitude" name="latitude" autocomplete="off"
+               value="{% if address.is_placed %}{{ address.latitude|stringformat:'f' }}{% endif %}" data-map-latitude>
+      </div>
+      <div class="field">
+        <label for="longitude">{% translate "Longitude" %}</label>
+        <input class="input" type="text" inputmode="decimal" id="longitude" name="longitude" autocomplete="off"
+               value="{% if address.is_placed %}{{ address.longitude|stringformat:'f' }}{% endif %}" data-map-longitude>
+      </div>
+    </div>
+    <div class="mt-2 flex flex-wrap items-center gap-3">
+      <button type="submit" class="btn">{% translate "Place it here" %}</button>
+      <a href="{{ back }}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+    </div>
+  </form>
+
+  {% if address.placed_by == "manual" %}
+    <form method="post" class="max-w-2xl">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ back }}">
+      <button type="submit" name="take_off" value="1" class="btn" data-variant="outline">{% translate "Take it off by hand" %}</button>
+    </form>
+  {% endif %}
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/vendor/leaflet/leaflet.js' %}" defer data-leaflet></script>
+{% endblock %}

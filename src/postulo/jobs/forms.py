@@ -15,7 +15,7 @@ from postulo.core import phone_field, phone_numbers, phones, slugs, web_links
 from postulo.core.formsets import RowsAlreadyGone
 from postulo.core.identifiers import IdentifierRow, OneOfEachKind, SchemeSelect, offering
 
-from . import employment_services, esco, identifiers, industries, logos, mapping, structure
+from . import employment_services, esco, identifiers, industries, logos, structure
 from .models import (
     Company,
     CompanyIdentifier,
@@ -25,7 +25,6 @@ from .models import (
     Industry,
     JobPosting,
     ListingEvent,
-    LocationSource,
 )
 
 #: What a posting's fields say about themselves, in one place (#205).
@@ -151,18 +150,6 @@ class CompanyForm(OwnerScopedModelForm):
         ),
     )
     remove_logo = forms.BooleanField(label=_("Remove the logo"), required=False)
-    location_correction = forms.CharField(
-        label=_("Or, exactly where"),
-        required=False,
-        max_length=200,
-        help_text=_(
-            "For when the location names a place that exists more than once, and the "
-            "pin sat in the wrong one. Type the place with its country; Postulo looks "
-            "it up in the same offline table and stops guessing for this company. "
-            "Leave it blank again and the guess comes back."
-        ),
-        widget=forms.TextInput(attrs={"autocomplete": "off", "spellcheck": "false"}),
-    )
 
     field_order = (
         "name",
@@ -172,8 +159,6 @@ class CompanyForm(OwnerScopedModelForm):
         "careers_url",
         "email",
         "phone",
-        "location",
-        "location_correction",
         "industries",
         "new_industries",
         "logo_url",
@@ -191,7 +176,6 @@ class CompanyForm(OwnerScopedModelForm):
             "website",
             "careers_url",
             "email",
-            "location",
             "industries",
             "notes",
             "from_career",
@@ -206,10 +190,6 @@ class CompanyForm(OwnerScopedModelForm):
             "website": _(
                 "Used by Find logo, and only when you press it. Postulo fetches nothing "
                 "from here on its own."
-            ),
-            "location": _(
-                "Where they are, as you would write it. Postulo places it on the map "
-                "from an offline table of cities; nothing is sent to a geocoding service."
             ),
             "notes": _("Yours. They never appear on a document or go anywhere else."),
         }
@@ -248,17 +228,6 @@ class CompanyForm(OwnerScopedModelForm):
             # Not required, so that a form posted without it -- an older client, a script,
             # a test that predates kinds -- records an employer, which is the default.
             self.fields["kind"].required = False
-
-        if "location" in self.fields and not mapping.map_offered(self.user):
-            # Off (#700), nothing places a location, so the help text does not promise it.
-            self.fields["location"].help_text = _("Where they are, as you would write it.")
-            self.fields.pop("location_correction", None)
-
-        if "location_correction" in self.fields:
-            # A correction a person made is shown where it is, so it can be seen and
-            # taken off; a guess is not shown, because blank already means "guess".
-            if self.instance.pk and self.instance.location_resolved_by == LocationSource.MANUAL:
-                self.fields["location_correction"].initial = self.instance.location_resolved_from
 
         if "known_service" in self.fields:
             self.fields["known_service"].choices = [
@@ -350,7 +319,6 @@ class CompanyForm(OwnerScopedModelForm):
         return ""
 
     def save(self, commit: bool = True) -> Company:
-        self._apply_location_correction()
         company = super().save(commit=commit)
         if commit:
             self._add_new_industries(company)
@@ -372,37 +340,6 @@ class CompanyForm(OwnerScopedModelForm):
         names = Industry.split(self.cleaned_data.get("new_industries", ""))
         if names:
             company.industries.add(*Industry.named(company.owner, names))
-
-    def _apply_location_correction(self) -> None:
-        """Put a person's correction where the guess was wrong (#108).
-
-        The correction is a place name, not a coordinate, because that is the one
-        somebody can know; the table is asked for it, and a correction that the
-        table cannot place is refused in `clean`, not saved as a hole. Marked as a
-        person's rather than a guess, so the save that follows keeps it; taken off
-        again, the location text guesses.
-        """
-        if "location_correction" not in self.fields:
-            return
-        correction = (self.cleaned_data.get("location_correction") or "").strip()
-        instance = self.instance
-        if correction:
-            from . import places
-
-            answer = places.resolve(correction)
-            if answer is not None:
-                instance.location_lat = answer["lat"]
-                instance.location_lon = answer["lon"]
-                instance.location_resolved_from = correction
-                instance.location_resolved_at = timezone.now()
-                instance.location_resolved_by = LocationSource.MANUAL
-        elif instance.location_resolved_by == LocationSource.MANUAL:
-            # The correction is taken off; the hook in the model's save guesses again.
-            instance.location_lat = None
-            instance.location_lon = None
-            instance.location_resolved_from = ""
-            instance.location_resolved_at = None
-            instance.location_resolved_by = ""
 
     def clean(self) -> dict:
         """A known service picked means an employment service, named and addressed as the
@@ -432,19 +369,6 @@ class CompanyForm(OwnerScopedModelForm):
                 data["website"] = service.website
         elif not name and "name" not in self.errors:
             self.add_error("name", self.fields["name"].error_messages["required"])
-        if "location_correction" in self.fields:
-            correction = (data.get("location_correction") or "").strip()
-            if correction:
-                from . import places
-
-                if places.resolve(correction) is None:
-                    self.add_error(
-                        "location_correction",
-                        _(
-                            "Postulo cannot find this place in its offline table; the "
-                            "pin stays where it is."
-                        ),
-                    )
         return data
 
     def clean_name(self) -> str:

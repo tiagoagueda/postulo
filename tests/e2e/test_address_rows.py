@@ -132,7 +132,8 @@ def test_at_1280_a_refusal_sits_beside_its_box_and_the_line_stays_level(
         "primary",
         "remove",
         *PARTS,
-    ], "what it is with the star and the bin at its end, then the address (#866)"
+        "on_map",
+    ], "what it is with the star and the bin at its end, the address, then the map (#866, #702)"
 
     [line] = [
         line

@@ -389,7 +389,7 @@ def plan_companies(kept, other) -> Plan:
         )
 
     # ------------------------------------------------ the fields that hold one value
-    for name in ("website", "careers_url", "email", "location"):
+    for name in ("website", "careers_url", "email"):
         ours, theirs = getattr(kept, name), getattr(other, name)
         if theirs and not ours:
             plan.fills.append(Filled(_label(Company, name), theirs))
@@ -518,18 +518,6 @@ def merge_companies(kept, other) -> Plan:
     kept.parent = parent
     for name in ("website", "careers_url", "email"):
         if not getattr(kept, name):
-            setattr(kept, name, getattr(other, name))
-    if other.location and not kept.location:
-        # The place goes with the words for it, a person's correction included: left
-        # behind, the kept company would guess again at what the other had been told.
-        for name in (
-            "location",
-            "location_lat",
-            "location_lon",
-            "location_resolved_from",
-            "location_resolved_at",
-            "location_resolved_by",
-        ):
             setattr(kept, name, getattr(other, name))
     if other.has_logo and not kept.has_logo:
         # A row moves to the kept company. The other's, where the kept one has its own,

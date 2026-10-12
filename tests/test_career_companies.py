@@ -157,7 +157,8 @@ def test_the_table_leaves_a_career_company_out_until_a_filter_asks(client, user)
 
 def test_the_map_leaves_a_career_company_out(client, user):
     company = save_entry(user, "Former Employer", location="Lisbon").company
-    Company.objects.filter(pk=company.pk).update(location="Lisbon")
+    company.location = "Lisbon"
+    company.save()
     client.force_login(user)
     response = client.get(reverse("jobs:company_map"))
     if response.status_code == 200:

@@ -60,8 +60,10 @@ DOCUMENT_NAME = "postulo-contact"
 #: Matrix, XMPP, Signal, Telegram, Threema or another service (#682). 5 added
 #: ``reference_letters``: the letters they wrote, with their dates and where each went (#666).
 #: 6 added ``references``: where the person is one of the account holder's referees, with
-#: the relationship, the permission, whether details print and the note (#696).
-DOCUMENT_VERSION = 6
+#: the relationship, the permission, whether details print and the note (#696). 7 added
+#: ``latitude``, ``longitude`` and ``shown_on_map`` on each address: where the map draws it,
+#: and whether the account holder asked for that (#702).
+DOCUMENT_VERSION = 7
 
 
 def is_offered(person=None) -> bool:
@@ -115,6 +117,10 @@ def _address_rows(contact) -> list[dict]:
             "region": row.region,
             "country": row.country,
             "primary": row.is_primary,
+            # Where the map draws it, and whether it does (#702): a point is data about them.
+            "latitude": row.latitude,
+            "longitude": row.longitude,
+            "shown_on_map": row.on_map,
         }
         for row in contact.postal_addresses.all()
     ]

@@ -10,7 +10,7 @@ from __future__ import annotations
 import pytest
 
 from postulo.jobs import places
-from postulo.jobs.models import Company, LocationSource
+from postulo.jobs.models import Company
 
 
 def city_row(
@@ -196,29 +196,39 @@ def test_without_the_dataset_the_answer_is_nothing_and_not_an_error(tmp_path, mo
 # ---------------------------------------------------------------- the record
 
 
+def where(company):
+    """The company's primary address, read fresh."""
+    return company.postal_addresses.get(is_primary=True)
+
+
 def test_a_saved_location_is_placed_from_the_dataset(user, data_dir):
+    """A typed location is the town and country of the primary address since #702, and the
+    address is placed at its town."""
     company = Company.objects.create(owner=user, name="A company", location="Lisboa, Portugal")
 
-    assert company.location_lat == 38.7167
-    assert company.location_lon == -9.1333
-    assert company.location_resolved_from == "Lisboa, Portugal"
-    assert company.location_resolved_by == LocationSource.GUESSED
-    assert company.location_resolved_at is not None
+    address = where(company)
+    assert (address.municipality, address.country) == ("Lisboa", "PT")
+    assert (address.latitude, address.longitude) == (38.7167, -9.1333)
+    assert address.placed_by == "town"
+    assert address.placed_at is not None
+    assert company.location == "Lisboa, Portugal"
 
 
 def test_a_location_the_dataset_does_not_place_is_not_an_error(user, data_dir):
     company = Company.objects.create(owner=user, name="A company", location="Remote")
 
-    assert company.location_lat is None and company.location_lon is None
-    assert company.location_resolved_from == "Remote"
-    assert company.location_resolved_by == ""
+    address = where(company)
+    assert address.municipality == "Remote"
+    assert address.latitude is None and address.longitude is None
+    assert address.placed_by == ""
 
 
 def test_the_same_saved_again_is_not_a_new_guess(user, data_dir, monkeypatch):
-    """The resolution runs when the location is saved, and a save of the same text is
-    not a save of the location (#108)."""
+    """The point is worked out when the address's words change, and a save that changes
+    nothing in them asks nothing (#108, #702)."""
     company = Company.objects.create(owner=user, name="A company", location="Berlin")
-    assert company.location_resolved_by == LocationSource.GUESSED
+    address = where(company)
+    assert address.placed_by == "town"
 
     calls = []
     original = places.resolve
@@ -228,49 +238,107 @@ def test_the_same_saved_again_is_not_a_new_guess(user, data_dir, monkeypatch):
         return original(text)
 
     monkeypatch.setattr(places, "resolve", counting)
+    address.street = "Unter den Linden 1"
+    address.save()
     company.name = "A renamed company"
     company.save()
 
     assert calls == []
 
 
-def test_a_changed_location_is_guessed_again(user, data_dir):
+def test_a_changed_town_is_placed_again(user, data_dir):
     company = Company.objects.create(owner=user, name="A company", location="Berlin")
-    company.location = "Lisboa, Portugal"
-    company.save()
+    address = where(company)
+    address.municipality, address.country = "Lisboa", "PT"
+    address.save()
 
-    assert company.location_resolved_from == "Lisboa, Portugal"
-    assert company.location_lat == 38.7167
-    assert company.location_resolved_by == LocationSource.GUESSED
+    assert address.latitude == 38.7167
+    assert address.placed_by == "town"
 
 
-def test_a_changed_location_that_places_nowhere_clears_the_old_guess(user, data_dir):
+def test_a_changed_town_that_places_nowhere_clears_the_old_point(user, data_dir):
     company = Company.objects.create(owner=user, name="A company", location="Berlin")
-    company.location = "Atlantis"
-    company.save()
+    address = where(company)
+    address.municipality, address.country = "Atlantis", ""
+    address.save()
 
-    assert company.location_lat is None and company.location_lon is None
-    assert company.location_resolved_from == "Atlantis"
-    assert company.location_resolved_by == ""
+    assert address.latitude is None and address.longitude is None
+    assert address.placed_by == ""
 
 
-def test_a_correction_a_person_made_outlives_the_next_save(user, data_dir, monkeypatch):
-    """The manual answer is not one the location would produce, and is not re-guessed."""
+def test_a_point_a_person_placed_outlives_a_change_of_words(user, data_dir, monkeypatch):
+    """A point placed by hand is not one the words would produce, and is not placed again."""
+    from postulo.jobs import placing
+
     company = Company.objects.create(owner=user, name="A company", location="Berlin")
-    company.location_lat = 39.7817
-    company.location_lon = -6.9052
-    company.location_resolved_by = LocationSource.MANUAL
-    company.save()
+    address = where(company)
+    placing.place_by_hand(address, 39.7817, -6.9052)
 
     calls = []
     monkeypatch.setattr(places, "resolve", lambda text: calls.append(text))
-    company.name = "A renamed company"
-    company.save()
-    company.refresh_from_db()
+    address.municipality = "Lisboa"
+    address.save()
+    address.refresh_from_db()
 
     assert calls == []
-    assert company.location_lon == -6.9052
-    assert company.location_resolved_by == LocationSource.MANUAL
+    assert (address.latitude, address.longitude) == (39.7817, -6.9052)
+    assert address.placed_by == "manual"
+
+
+def test_taking_a_hand_placed_point_off_places_it_from_its_words(user, data_dir):
+    from postulo.jobs import placing
+
+    company = Company.objects.create(owner=user, name="A company", location="Berlin")
+    address = where(company)
+    placing.place_by_hand(address, 1.0, 2.0)
+
+    placing.take_off_by_hand(address)
+
+    address.refresh_from_db()
+    assert address.placed_by == "town"
+    assert address.longitude == 13.41053 or address.longitude != 2.0
+
+
+def test_a_postcode_is_placed_at_its_centroid_where_the_codes_were_downloaded(user, data_dir):
+    """The step between a town and a street, offline (#702)."""
+    rows = "\n".join(
+        [
+            "PT\t1000-001\tLisboa\t\t\t\t\t\t\t38.7253\t-9.15\t6",
+            "PT\t1000-001\tLisboa\t\t\t\t\t\t\t38.7255\t-9.152\t6",
+            "GB\tSW1A\tLondon\t\t\t\t\t\t\t51.5\t-0.14\t4",
+        ]
+    )
+    (data_dir / places.POSTCODES_FILE).write_text(rows + "\n", encoding="utf-8")
+    places.build_postcode_lookup(
+        data_dir / places.POSTCODES_FILE, data_dir / places.POSTCODES_LOOKUP_FILE
+    )
+    company = Company.objects.create(owner=user, name="A company")
+    from postulo.core.models import PostalAddress
+
+    address = PostalAddress.objects.create(
+        owner=user, holder=company, postcode="1000 001", municipality="Lisboa", country="PT"
+    )
+
+    assert address.placed_by == "postcode"
+    assert round(address.latitude, 4) == 38.7254
+    assert places.resolve_postcode("SW1A 1AA", "GB") == {"lat": 51.5, "lon": -0.14}, (
+        "the British file holds the first half of a code, and that half is what is matched"
+    )
+
+
+def test_with_the_map_off_nothing_is_placed(user, data_dir):
+    from postulo.plugins.maps import MAPS
+    from postulo.plugins.models import PluginPolicy
+    from postulo.plugins.policy import forget_decisions
+
+    PluginPolicy.objects.create(plugin=MAPS, person=user, state=PluginPolicy.State.FORCED_OFF)
+    forget_decisions()
+
+    company = Company.objects.create(owner=user, name="A company", location="Berlin")
+
+    address = where(company)
+    assert address.municipality == "Berlin"
+    assert address.latitude is None and address.placed_from == ""
 
 
 def test_a_region_that_is_also_a_capital_is_not_a_country(data_dir):
@@ -323,8 +391,8 @@ def test_a_country_name_two_countries_share_keeps_both(data_dir, monkeypatch):
 
 
 def test_a_save_reads_the_lookup_and_never_parses_the_table(data_dir, monkeypatch, user):
-    """The table is parsed at provisioning (#399): with its lookup beside it, a company
-    saved with a location reads that and nothing else, so no request pays for the build."""
+    """The table is parsed at provisioning (#399): with its lookup beside it, an address
+    saved with a town reads that and nothing else, so no request pays for the build."""
     places.build_lookup(data_dir / places.CITIES_FILE, data_dir / places.LOOKUP_FILE)
 
     def refuse(*args, **kwargs):
@@ -333,7 +401,8 @@ def test_a_save_reads_the_lookup_and_never_parses_the_table(data_dir, monkeypatc
     monkeypatch.setattr(places, "build_lookup", refuse)
     company = Company.objects.create(owner=user, name="Acme", location="Lisboa, Portugal")
 
-    assert (company.location_lat, company.location_lon) == (38.7167, -9.1333)
+    address = where(company)
+    assert (address.latitude, address.longitude) == (38.7167, -9.1333)
 
 
 def test_a_table_without_a_lookup_gets_one_built_beside_it(data_dir):

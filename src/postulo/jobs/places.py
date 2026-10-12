@@ -54,6 +54,17 @@ COUNTRIES_FILE = "geonames-countryinfo.txt"
 #: What the cities table is indexed into at provisioning, so no process parses it (#399).
 LOOKUP_FILE = "geonames-cities1000.sqlite"
 
+#: GeoNames' postal codes, the step between a town and a street (#702): a centroid per
+#: postcode for about a hundred countries, CC BY 4.0, downloaded only when an operator asks
+#: (``manage.py fetch_geonames --postcodes``). For Canada, the Netherlands and the United
+#: Kingdom the file holds the first part of each code only, and that part is what is matched.
+POSTCODES_FILE = "geonames-postcodes.txt"
+POSTCODES_LOOKUP_FILE = "geonames-postcodes.sqlite"
+
+#: The countries whose codes the file holds only the first part of, and how a typed code
+#: is cut to it: before the space, or the four digits of a Dutch code.
+OUTWARD_ONLY = {"GB": "space", "CA": "space", "NL": "digits"}
+
 #: Once is enough to say the dataset is not there; the absence is not an error to repeat.
 _warned = False
 
@@ -234,6 +245,120 @@ def _translated_countries(known: frozenset[str]) -> Iterator[tuple[str, str]]:
         for code, name in territories.items():
             if code in known:
                 yield code, name
+
+
+def postcode_key(code: str) -> str:
+    """A postcode as it is compared: capitals, no spaces and no hyphens."""
+    return "".join(ch for ch in (code or "").upper() if ch.isalnum())
+
+
+def _outward(code: str, country: str) -> str:
+    """The part of a code the file holds for a country it holds only part of, keyed."""
+    cut = OUTWARD_ONLY.get(country)
+    raw = (code or "").strip().upper()
+    if cut == "space":
+        return postcode_key(raw.split()[0]) if " " in raw else postcode_key(raw)[:-3]
+    if cut == "digits":
+        return "".join(ch for ch in raw if ch.isdigit())[:4]
+    return postcode_key(raw)
+
+
+def build_postcode_lookup(source: Path, target: Path) -> int:
+    """Index GeoNames' postal codes at ``source`` into ``target``; how many codes.
+
+    One centroid per country and code: where the file lists several places under one code,
+    their mean, which is what a code that covers a few villages is centred on. Written to a
+    temporary file and moved into place, as the cities' lookup is.
+    """
+    target.parent.mkdir(parents=True, exist_ok=True)
+    sums: dict[tuple[str, str], list[float]] = {}
+    with source.open(encoding="utf-8") as handle:
+        for line in handle:
+            columns = line.rstrip("\r\n").split("\t")
+            if len(columns) < 11 or not columns[0] or not columns[9] or not columns[10]:
+                continue
+            country = columns[0].upper()
+            # The file's own codes: for the three countries it holds part of, that part.
+            key = postcode_key(columns[1])
+            if not key:
+                continue
+            try:
+                lat, lon = float(columns[9]), float(columns[10])
+            except ValueError:
+                continue
+            entry = sums.setdefault((country, key), [0.0, 0.0, 0])
+            entry[0] += lat
+            entry[1] += lon
+            entry[2] += 1
+    descriptor, name = tempfile.mkstemp(dir=target.parent, prefix=target.name, suffix=".tmp")
+    os.close(descriptor)
+    temporary = Path(name)
+    connection = sqlite3.connect(temporary)
+    try:
+        connection.execute(
+            "CREATE TABLE codes (country TEXT, key TEXT, lat REAL, lon REAL,"
+            " PRIMARY KEY (country, key)) WITHOUT ROWID"
+        )
+        connection.executemany(
+            "INSERT INTO codes VALUES (?, ?, ?, ?)",
+            [
+                (country, key, lat / count, lon / count)
+                for (country, key), (lat, lon, count) in sums.items()
+            ],
+        )
+        connection.commit()
+    finally:
+        connection.close()
+    os.replace(temporary, target)
+    return len(sums)
+
+
+def _postcodes_lookup() -> Path | None:
+    path = DATA_DIR / POSTCODES_LOOKUP_FILE
+    return path if path.is_file() else None
+
+
+def postcodes_available() -> bool:
+    """Whether the postal codes were downloaded on this machine at all (#702)."""
+    return _postcodes_lookup() is not None
+
+
+def resolve_postcode(code: str, country: str) -> dict | None:
+    """The centroid of a postcode in a country, or ``None`` where the file has none."""
+    lookup = _postcodes_lookup()
+    country = (country or "").upper()
+    if lookup is None or not code or len(country) != 2:
+        return None
+    key = _outward(code, country) if country in OUTWARD_ONLY else postcode_key(code)
+    if not key:
+        return None
+    connection = sqlite3.connect(f"{lookup.as_uri()}?mode=ro", uri=True)
+    try:
+        row = connection.execute(
+            "SELECT lat, lon FROM codes WHERE country = ? AND key = ?", (country, key)
+        ).fetchone()
+    finally:
+        connection.close()
+    return {"lat": row[0], "lon": row[1]} if row else None
+
+
+def place(postcode: str, town: str, country: str) -> tuple[str, dict] | None:
+    """Where an address is, offline: its postcode's centroid, else its town (#702).
+
+    ``("postcode", point)`` or ``("town", point)``, or ``None`` where neither is known. A
+    town is read as the city table reads a typed location, narrowed by the address's
+    country; nothing here is ever sent anywhere.
+    """
+    found = resolve_postcode(postcode, country)
+    if found is not None:
+        return "postcode", found
+    town = (town or "").strip()
+    if not town:
+        return None
+    answer = resolve(f"{town}, {country}" if country else town)
+    if answer is None:
+        return None
+    return "town", {"lat": answer["lat"], "lon": answer["lon"]}
 
 
 def available() -> bool:

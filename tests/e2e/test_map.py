@@ -23,20 +23,16 @@ PIXEL = base64.b64decode(
 
 @pytest.fixture
 def placed(applicant):
-    from postulo.jobs.models import Company, LocationSource
+    from postulo.jobs import placing
+    from postulo.jobs.models import Company
 
     for name, place, lat, lon in (
         ("Aveiro Labs", "Aveiro", 40.64, -8.65),
         ("Lisbon Works", "Lisbon", 38.72, -9.14),
         ("Lisbon Two", "Lisbon", 38.72, -9.14),
     ):
-        company = Company.objects.create(owner=applicant, name=name, location=place)
-        Company.objects.filter(pk=company.pk).update(
-            location_lat=lat,
-            location_lon=lon,
-            location_resolved_from=place,
-            location_resolved_by=LocationSource.MANUAL,
-        )
+        company = Company.objects.create(owner=applicant, name=name, location=f"{place}, PT")
+        placing.place_by_hand(company.postal_addresses.get(), lat, lon)
     return applicant
 
 
@@ -149,3 +145,23 @@ def test_near_me_says_so_when_the_browser_will_not_tell(live_server, page: Page,
 
     expect(page.locator("[data-map-status]")).to_contain_text("The browser")
     expect(page.locator("path.map-here")).to_have_count(0)
+
+
+def test_a_click_on_the_map_places_an_address_by_hand(live_server, page: Page, placed):
+    """#702: the pin dropped on the small map fills the two numbers, which are the form."""
+    from postulo.jobs.models import Company
+
+    address = Company.objects.get(owner=placed, name="Aveiro Labs").postal_addresses.get()
+    watch(page)
+    sign_in(page, live_server.url, f"/jobs/addresses/{address.pk}/place/")
+
+    canvas = page.locator("[data-map-pick].leaflet-container")
+    expect(canvas).to_be_visible()
+    box = canvas.bounding_box()
+    page.mouse.click(box["x"] + box["width"] / 3, box["y"] + box["height"] / 3)
+    expect(page.locator("#latitude")).not_to_have_value("40.640000")
+    page.get_by_role("button", name="Place it here").click()
+
+    address.refresh_from_db()
+    assert address.placed_by == "manual"
+    assert (address.latitude, address.longitude) != (40.64, -8.65)

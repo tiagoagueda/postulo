@@ -183,14 +183,25 @@ def application_match(query: str) -> Q:
 
 def company_match(query: str) -> Q:
     """What makes a company match: the same for the search and the Companies table's box."""
-    from postulo.jobs.models import CompanyIdentifier, Industry
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.core.models import PostalAddress
+    from postulo.jobs.models import Company, CompanyIdentifier, Industry
 
     industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
     identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
+    # Where it is, by its addresses' towns and regions since the location became an address
+    # (#702); never by a street, which the search does not read.
+    address = PostalAddress.objects.filter(
+        owner=OuterRef("owner"),
+        content_type=ContentType.objects.get_for_model(Company),
+        object_id=OuterRef("pk"),
+    ).filter(Q(municipality__icontains=query) | Q(region__icontains=query))
     return (
-        contains(query, "name", "notes", "location", "website")
+        contains(query, "name", "notes", "website")
         | Q(Exists(industry))
         | Q(Exists(identifier))
+        | Q(Exists(address))
     )
 
 
@@ -270,7 +281,9 @@ def search_companies(user, query: str, limit: int) -> Found:
     from postulo.jobs.models import Company
 
     rows = ranked(
-        Company.objects.for_user(user).prefetch_related("industries").filter(company_match(query)),
+        Company.objects.for_user(user)
+        .prefetch_related("industries", "postal_addresses")
+        .filter(company_match(query)),
         query,
         "name",
         "name",

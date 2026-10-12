@@ -1045,8 +1045,11 @@ def test_on_your_details_a_row_says_what_it_is_then_the_address_then_its_control
     [kept, empty] = rows_of(client.get(reverse("accounts:profile")).content.decode())
 
     parts = ["street", "postcode", "municipality", "region", "country"]
-    assert kept["controls"] == ["kind", "label", "primary", "remove", *parts]
-    assert empty["controls"] == ["kind", "label", "primary", *parts], "nothing to remove yet"
+    # And the map's choice last, on a person's own address while the map is on (#702).
+    assert kept["controls"] == ["kind", "label", "primary", "remove", *parts, "on_map"]
+    assert empty["controls"] == ["kind", "label", "primary", *parts, "on_map"], (
+        "nothing to remove yet"
+    )
 
 
 def test_the_parts_are_in_the_order_their_country_writes_them(client, user):
@@ -1111,8 +1114,8 @@ def test_a_page_that_saves_at_its_foot_reads_in_the_same_order_and_keeps_its_box
 
     [kept, empty] = rows_of(html)
     parts = ["street", "postcode", "municipality", "region", "country"]
-    assert kept["controls"] == ["kind", "label", "primary", "DELETE", *parts]
-    assert empty["controls"] == ["kind", "label", "primary", *parts]
+    assert kept["controls"] == ["kind", "label", "primary", "DELETE", *parts, "on_map"]
+    assert empty["controls"] == ["kind", "label", "primary", *parts, "on_map"]
     assert "data-remove-trigger" not in html and "popovertarget" not in html
     assert ">Primary<" in html and ">Remove<" in html
 

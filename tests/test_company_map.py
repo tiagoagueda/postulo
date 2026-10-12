@@ -118,10 +118,10 @@ def test_the_dots_are_proportional_to_the_companies_at_the_place(
     context = page(client, user).context
 
     by_label = {entry["label"]: entry for entry in context["places"]}
-    assert by_label["Lisbon"]["count"] == 1
-    assert by_label["Berlin"]["count"] == 5
+    assert by_label["Lisbon, Portugal"]["count"] == 1
+    assert by_label["Berlin, Germany"]["count"] == 5
     drawn = {entry["label"]: entry["count"] for entry in context["drawn"]}
-    assert drawn == {"Berlin": 5, "Lisbon": 1}, "the script sizes each dot by its count"
+    assert drawn == {"Berlin, Germany": 5, "Lisbon, Portugal": 1}, "a dot is sized by its count"
 
 
 def test_the_map_is_drawn_by_leaflet_from_this_instance(client, user):
@@ -166,76 +166,75 @@ def test_the_missing_dataset_is_said_plainly(client, user, monkeypatch):
     assert "fetch_geonames" in html
 
 
-def edit(client, user, company, **fields):
+def address_of(company):
+    return company.postal_addresses.get(is_primary=True)
+
+
+def place_by_hand(client, user, address, **data):
     client.force_login(user)
-    fields = {"name": company.name, "location": company.location, **fields}
-    return client.post(reverse("jobs:company_update", args=[company.pk]), fields)
+    return client.post(reverse("jobs:address_place", args=[address.pk]), data)
 
 
-def test_a_wrong_guess_is_corrected_on_the_companys_form(client, user, monkeypatch, tmp_path):
-    """Somewhere to correct a wrong guess by hand: the company's own form, where the
-    correction is a place name and the record keeps it as a person's, not a guess (#108).
-    """
-    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON, BERLIN), encoding="utf-8")
-    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+def test_a_wrong_guess_is_placed_by_hand(client, user, monkeypatch, tmp_path):
+    """Somewhere to put an address where it really is: the address's own page, where the
+    pin is dropped or the two numbers typed, and the point is kept as a person's (#702)."""
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    address = address_of(company)
 
-    response = edit(client, user, company, location_correction="Berlin")
+    response = place_by_hand(client, user, address, latitude="52.52437", longitude="13.41053")
 
     assert response.status_code == 302
-    company.refresh_from_db()
-    assert company.location_resolved_by == "manual"
-    assert company.location_resolved_from == "Berlin"
-    assert (company.location_lat, company.location_lon) == (52.52437, 13.41053)
-
-    # The correction is a fact a person made, and the next save of the same location
-    # does not guess it away.
-    company.save()
-    company.refresh_from_db()
-    assert company.location_resolved_by == "manual"
-    assert company.location_resolved_from == "Berlin"
+    address.refresh_from_db()
+    assert address.placed_by == "manual"
+    assert (address.latitude, address.longitude) == (52.52437, 13.41053)
 
 
-def test_a_correction_the_table_cannot_place_is_refused(client, user, monkeypatch, tmp_path):
-    """A correction the table cannot place is refused in the form, and the guess stands
-    where it was: a correction that would leave the pin nowhere is not saved as a hole."""
-    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON), encoding="utf-8")
-    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+def test_a_point_off_the_globe_is_refused(client, user, monkeypatch, tmp_path):
+    with_cities(monkeypatch, tmp_path, LISBON)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    address = address_of(company)
 
-    response = edit(client, user, company, location_correction="Nowhere")
+    place_by_hand(client, user, address, latitude="95", longitude="0")
+    place_by_hand(client, user, address, latitude="north", longitude="0")
 
-    assert response.status_code == 200, "the form comes back with the reason"
-    company.refresh_from_db()
-    assert company.location_resolved_by == "geonames"
-    assert company.location_resolved_from == "Lisbon"
+    address.refresh_from_db()
+    assert address.placed_by == "town"
 
 
-def test_taking_a_correction_off_guesses_again(client, user, monkeypatch, tmp_path):
-    """The form shows a correction where it is, and blank again means the location text
-    guesses (#108)."""
-    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON, BERLIN), encoding="utf-8")
-    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+def test_taking_a_hand_placed_point_off_places_it_from_its_town(
+    client, user, monkeypatch, tmp_path
+):
+    with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    address = address_of(company)
+    place_by_hand(client, user, address, latitude="52.52437", longitude="13.41053")
 
-    edit(client, user, company, location_correction="Berlin")
-    company.refresh_from_db()
-    assert company.location_resolved_by == "manual"
+    place_by_hand(client, user, address, take_off="1")
 
+    address.refresh_from_db()
+    assert address.placed_by == "town"
+    assert (address.latitude, address.longitude) == (38.72509, -9.1498)
+
+
+def test_another_accounts_address_cannot_be_placed(client, user, other_user):
+    company = Company.objects.create(owner=other_user, name="Theirs", location="Lisbon")
+    address = address_of(company)
     client.force_login(user)
-    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
-    assert "Or, exactly where" in html
-    assert "Berlin" in html, "the correction a person made is shown where it is"
 
-    response = edit(client, user, company, location_correction="")
-
-    assert response.status_code == 302
-    company.refresh_from_db()
-    assert company.location_resolved_by == "geonames"
-    assert (company.location_lat, company.location_lon) == (38.72509, -9.1498)
+    assert client.get(reverse("jobs:address_place", args=[address.pk])).status_code == 404
+    assert place_by_hand(client, user, address, latitude="1", longitude="1").status_code == 404
 
 
-# The switch (#700): one feature decides whether the map is offered, and off deletes nothing.
+def test_the_place_page_draws_over_the_tiles_and_allows_only_them(client, user):
+    company = Company.objects.create(owner=user, name="One", location="Lisbon")
+    client.force_login(user)
+
+    response = client.get(reverse("jobs:address_place", args=[address_of(company).pk]))
+
+    assert response.status_code == 200
+    assert "tile.openstreetmap.org" in response.headers["Content-Security-Policy"]
+    assert "data-map-pick" in response.content.decode()
 
 
 def switch_off(person) -> None:
@@ -297,84 +296,143 @@ def test_off_the_companies_page_does_not_offer_the_map(client, user):
     assert url not in client.get(reverse("jobs:company_list")).content.decode()
 
 
-def test_off_the_form_does_not_offer_the_correction(client, user):
+def test_off_an_address_says_nothing_of_the_map(client, user):
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
-    client.force_login(user)
-    url = reverse("jobs:company_update", args=[company.pk])
-    assert "Or, exactly where" in client.get(url).content.decode()
-
     switch_off(user)
-    html = client.get(url).content.decode()
+    client.force_login(user)
 
-    assert "Or, exactly where" not in html
-    assert "offline table of cities" not in html
+    html = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+
+    assert "data-map-status-line" not in html
+    address = address_of(company)
+    assert client.get(reverse("jobs:address_place", args=[address.pk])).status_code == 404
 
 
 def test_off_nothing_is_placed_and_nothing_stored_is_touched(client, user, monkeypatch, tmp_path):
     with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
-    assert company.location_resolved_by == "geonames"
-    stored = (company.location_lat, company.location_lon, company.location_resolved_at)
-
     switch_off(user)
-    edit(client, user, company, location="Berlin")
 
-    company.refresh_from_db()
-    assert company.location == "Berlin"
-    assert (company.location_lat, company.location_lon) == stored[:2], "the old place is kept"
-    assert company.location_resolved_from == "Lisbon", "the text it belongs to is kept too"
-    assert company.location_resolved_at == stored[2]
+    address = address_of(company)
+    address.municipality, address.country = "Berlin", "DE"
+    address.save()
 
-    new = Company.objects.create(owner=user, name="Two", location="Berlin")
-    assert new.location_lat is None and new.location_resolved_by == ""
+    address.refresh_from_db()
+    assert (address.latitude, address.longitude) == (38.72509, -9.1498), "kept as it was"
+    assert address.placed_from == "|lisbon|pt", "the words it was placed from, still"
 
 
-def test_switching_back_on_guesses_again_on_the_next_save(client, user, monkeypatch, tmp_path):
+def test_switching_back_on_places_again_on_the_next_save(client, user, monkeypatch, tmp_path):
     with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
     switch_off(user)
-    edit(client, user, company, location="Berlin")
-
+    address = address_of(company)
+    address.municipality, address.country = "Berlin", "DE"
+    address.save()
     switch_on(user)
-    company.refresh_from_db()
-    company.save()
 
-    company.refresh_from_db()
-    assert (company.location_lat, company.location_lon) == (52.52437, 13.41053)
-    assert company.location_resolved_from == "Berlin"
+    address.save()
+
+    assert (address.latitude, address.longitude) == (52.52437, 13.41053)
 
 
-def test_a_company_edited_while_off_is_drawn_where_its_text_says(
+def test_an_address_changed_while_off_is_drawn_where_its_words_say(
     client, user, monkeypatch, tmp_path
 ):
-    """The stored coordinate belongs to the old text; the page does not draw it there."""
+    """The stored point belongs to the old words; the page does not draw it there."""
     with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
     switch_off(user)
-    edit(client, user, company, location="Berlin")
+    address = address_of(company)
+    address.municipality, address.country = "Berlin", "DE"
+    address.save()
     switch_on(user)
 
-    response = page(client, user)
+    (entry,) = page(client, user).context["places"]
 
-    (entry,) = response.context["places"]
-    assert entry["label"] == "Berlin"
+    assert entry["label"] == "Berlin, Germany"
     assert entry["lon"] == pytest.approx(13.41053)
-    company.refresh_from_db()
-    assert company.location_resolved_from == "Lisbon", "a page view writes nothing"
+    address.refresh_from_db()
+    assert address.longitude == pytest.approx(-9.1498), "a page view writes nothing"
 
 
-def test_a_correction_a_person_made_is_drawn_and_survives_the_switch(
+def test_a_point_placed_by_hand_is_drawn_and_survives_the_switch(
     client, user, monkeypatch, tmp_path
 ):
     with_cities(monkeypatch, tmp_path, LISBON, BERLIN)
     company = Company.objects.create(owner=user, name="One", location="Lisbon")
-    edit(client, user, company, location_correction="Berlin")
+    place_by_hand(client, user, address_of(company), latitude="52.52437", longitude="13.41053")
 
     switch_off(user)
     switch_on(user)
 
     (entry,) = page(client, user).context["places"]
     assert entry["lon"] == pytest.approx(13.41053)
+
+
+# ------------------------------------------------- a contact's and your own addresses (#702)
+
+
+def an_address(owner, holder, **extra):
+    from postulo.core.models import PostalAddress
+
+    fields = {"municipality": "Lisbon", "country": "PT", **extra}
+    return PostalAddress.objects.create(owner=owner, holder=holder, **fields)
+
+
+def test_a_contacts_address_is_drawn_only_when_asked(client, user, monkeypatch, tmp_path):
+    from postulo.jobs.models import Contact
+
+    with_cities(monkeypatch, tmp_path, LISBON)
+    company = Company.objects.create(owner=user, name="Aperture")
+    someone = Contact.objects.create(owner=user, company=company, name="Caroline")
+    address = an_address(user, someone, kind="home", street="Rua Secreta 1")
+
+    assert page(client, user).context["places"] == []
+
+    address.on_map = True
+    address.save()
+    html = page(client, user).content.decode()
+
+    (entry,) = page(client, user).context["places"]
+    assert entry["people"] == [
+        ("Caroline", reverse("jobs:contact_update", args=[someone.pk]), "Home")
+    ]
+    assert "Rua Secreta" not in html, "never a street on the overview"
+
+
+def test_your_own_address_is_never_drawn_unless_asked(client, user, monkeypatch, tmp_path):
+    with_cities(monkeypatch, tmp_path, LISBON)
+    address = an_address(user, user.profile, kind="home")
+
+    assert page(client, user).context["places"] == []
+    address.on_map = True
+    address.save()
+    (entry,) = page(client, user).context["places"]
+    assert entry["people"][0][0] == "You"
+
+
+def test_another_accounts_addresses_are_never_drawn(client, user, other_user):
+    theirs = Company.objects.create(owner=other_user, name="Theirs", location="Lisbon")
+    an_address(other_user, other_user.profile, on_map=True)
+
+    assert page(client, user).context["places"] == []
+    assert theirs.postal_addresses.count() == 1
+
+
+def test_a_contacts_form_offers_the_map_choice(client, user):
+    from postulo.jobs.models import Contact
+
+    company = Company.objects.create(owner=user, name="Aperture")
+    someone = Contact.objects.create(owner=user, company=company, name="Caroline")
+    an_address(user, someone)
+    client.force_login(user)
+
+    contact_page = client.get(reverse("jobs:contact_update", args=[someone.pk])).content.decode()
+    company_page = client.get(reverse("jobs:company_update", args=[company.pk])).content.decode()
+
+    assert "on_map" in contact_page
+    assert "on_map" not in company_page, "a company's addresses are always drawn"
 
 
 def test_the_map_is_the_whole_window_with_its_heading_over_it(client, user):

@@ -15,10 +15,12 @@ class JobsConfig(AppConfig):
         # Connects the receiver that removes a kept page's files with its row (#256), and
         # the ones that unlink a listing's history from a capture or a file that goes (#270).
         # Registers the system check that names two ESCO revisions in the data directory (#535).
-        # Tells the company model who is offered the map, which it cannot import itself (#700).
-        from . import mapping, models
+        # And tells a postal address how it is put on the map as it is saved (#702).
+        from postulo.core import models as core_models
 
-        models.placing_offered = mapping.map_offered
+        from . import placing
+
+        core_models.address_placer = placing.place
 
         from . import (
             checks,  # noqa: F401

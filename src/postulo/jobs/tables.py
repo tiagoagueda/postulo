@@ -66,12 +66,13 @@ class CompaniesTable(Table):
             editable="name",
             edit_label=_("Rename %(what)s"),
         ),
+        # The town of its primary address (#702), annotated by `with_table_data`.
         Column(
             "location",
             _("Location"),
-            sort=("location",),
+            sort=("location_town",),
             filter="text",
-            lookups=("location",),
+            lookups=("location_town",),
             default=True,
         ),
         # Several per company, so no single value to sort by; the filter matches any.

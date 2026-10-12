@@ -26,7 +26,8 @@ fi
 # without a network is a map without dots until one returns, and the map page says the
 # dataset is not there; the rest of Postulo does not care. POSTULO_SKIP_GEONAMES=1
 # turns the download off (put geonames-cities1000.txt and geonames-countryinfo.txt in
-# that directory by hand to have the map anyway).
+# that directory by hand to have the map anyway). POSTULO_GEONAMES_POSTCODES=1 also downloads
+# the postal codes (#702), so an address is placed at its postcode rather than its town.
 geonames_dir="${POSTULO_GEOLOCATIONS_DIR:-/app/data/geonames}"
 if [ "${POSTULO_SKIP_GEONAMES:-}" != "1" ] && [ ! -f "$geonames_dir/geonames-cities1000.txt" ]; then
     mkdir -p "$geonames_dir"

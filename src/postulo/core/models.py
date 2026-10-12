@@ -484,6 +484,12 @@ class PhoneNumber(OwnedModel):
         self.save(update_fields=["verified_at", "updated_at"])
 
 
+#: What places an address on the map as it is saved (#702): set by ``postulo.jobs`` at start-up,
+#: because the offline tables and the map's switch are that app's, and core imports nothing of
+#: it. ``None`` until then, and an address saved with nothing to place it is simply not placed.
+address_placer = None
+
+
 class PostalAddress(OwnedModel):
     """One postal address belonging to a person, a contact or a company (#329).
 
@@ -567,6 +573,35 @@ class PostalAddress(OwnedModel):
     country = models.CharField(_("country"), max_length=2, blank=True)
     is_primary = models.BooleanField(_("primary"), default=False)
 
+    class Placed(models.TextChoices):
+        """How an address came to be on the map (#702, #701)."""
+
+        TOWN = "town", _("its town")
+        POSTCODE = "postcode", _("its postcode")
+        MANUAL = "manual", _("by hand")
+        WIKIDATA = "wikidata", _("from Wikidata")
+
+    #: Where the map draws it, and how that was decided (#702). Placed offline when the
+    #: address is saved -- its postcode's centroid where the postal codes were downloaded,
+    #: else its town -- and never by a service. A point put there by hand or fetched from
+    #: Wikidata is kept when the address's words change: it was not derived from them.
+    latitude = models.FloatField(_("latitude"), null=True, blank=True, editable=False)
+    longitude = models.FloatField(_("longitude"), null=True, blank=True, editable=False)
+    placed_by = models.CharField(
+        _("placed by"), max_length=10, choices=Placed.choices, blank=True, editable=False
+    )
+    #: The parts the point was placed from, so an edit that changes nothing places nothing.
+    placed_from = models.CharField(max_length=300, blank=True, editable=False)
+    placed_at = models.DateTimeField(_("placed"), null=True, blank=True, editable=False)
+    #: Whether a person's own or a contact's address is drawn on the map (#702). Off unless
+    #: they ask: a home is somewhere somebody can be found. A company's addresses are drawn
+    #: whatever this says.
+    on_map = models.BooleanField(
+        _("show on the map"),
+        default=False,
+        help_text=_("Off unless you ask: a home address is somewhere somebody can be found."),
+    )
+
     #: What the uniqueness constraint compares: the parts, folded, joined. Written by
     #: `save`, never by a form -- a value a constraint depends on cannot be somebody's to
     #: type. Case and spacing vary in what people type and mean nothing here.
@@ -603,7 +638,34 @@ class PostalAddress(OwnedModel):
         if self.kind != self.Kind.OTHER:
             self.label = ""
         self.comparable = self.comparable_form()
+        placed = (self.latitude, self.longitude, self.placed_by, self.placed_from)
+        if address_placer is not None:
+            address_placer(self)
+        if (
+            "update_fields" in kwargs
+            and kwargs["update_fields"] is not None
+            and (self.latitude, self.longitude, self.placed_by, self.placed_from) != placed
+        ):
+            kwargs["update_fields"] = {
+                *kwargs["update_fields"],
+                "latitude",
+                "longitude",
+                "placed_by",
+                "placed_from",
+                "placed_at",
+            }
         return super().save(*args, **kwargs)
+
+    def place_key(self) -> str:
+        """The parts a point is placed from: the postcode, the town and the country (#702)."""
+        return "|".join(
+            " ".join(str(part or "").split()).casefold()
+            for part in (self.postcode, self.municipality, self.country)
+        )[:300]
+
+    @property
+    def is_placed(self) -> bool:
+        return self.latitude is not None and self.longitude is not None
 
     def comparable_form(self) -> str:
         """The parts folded to something two typings of one address agree on.

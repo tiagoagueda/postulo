@@ -313,7 +313,16 @@ class PostalAddressForm(forms.ModelForm):
 
     class Meta:
         model = PostalAddress
-        fields = ("kind", "label", "street", "postcode", "municipality", "region", "country")
+        fields = (
+            "kind",
+            "label",
+            "street",
+            "postcode",
+            "municipality",
+            "region",
+            "country",
+            "on_map",
+        )
 
     #: The five parts that are the address. The kind and its name are about it, not of it.
     PARTS = ("street", "postcode", "municipality", "region", "country")
@@ -327,6 +336,8 @@ class PostalAddressForm(forms.ModelForm):
         person=None,
         refuses: bool = True,
         own: bool = True,
+        pinnable: bool = False,
+        mapped: bool = False,
         **kwargs,
     ):
         super().__init__(*args, **kwargs)
@@ -369,6 +380,11 @@ class PostalAddressForm(forms.ModelForm):
             # right with scripts off.
             widget=CountrySelect(attrs={"autocomplete": "country-name", "data-flag-select": ""}),
         )
+        # Whether the map is on for this person, and whether this address is one they choose
+        # to draw: a contact's or their own, never a company's, which is always drawn (#702).
+        self.mapped = mapped
+        if not (mapped and pinnable):
+            self.fields.pop("on_map", None)
         if not own:
             # A contact's or a company's address is somebody else's (#329): the browser is not
             # invited to fill in the person's own, which is what the tokens above ask of it.
@@ -378,6 +394,21 @@ class PostalAddressForm(forms.ModelForm):
             self.fields["country"].initial = default_country
         for name in self.TYPED:
             self.fields[name].required = False
+
+    @property
+    def map_status(self) -> dict | None:
+        """Where a saved address is on the map, for the line under it (#702), or nothing."""
+        from django.urls import reverse
+
+        if not self.mapped or not self.instance.pk:
+            return None
+        address = self.instance
+        return {
+            "placed": address.is_placed,
+            "how": address.get_placed_by_display() if address.placed_by else "",
+            "by_hand": address.placed_by == address.Placed.MANUAL,
+            "url": reverse("jobs:address_place", args=[address.pk]),
+        }
 
     def has_changed(self) -> bool:
         """Whether there is a row here to keep, for a row being added.
@@ -649,6 +680,22 @@ class BasePostalAddressFormSet(RowsAlreadyGone, BaseGenericInlineFormSet):
         return saved
 
 
+def _pinnable(holder) -> bool:
+    from postulo.jobs.models import Company
+
+    return not isinstance(holder, Company)
+
+
+def _mapped(person) -> bool:
+    """Whether the map is on for ``person``: the maps feature's answer (#700)."""
+    if person is None:
+        return False
+    from postulo.plugins.maps import MAPS
+    from postulo.plugins.policy import decide
+
+    return bool(decide(MAPS, person).on)
+
+
 def _is_a_profile(holder) -> bool:
     from postulo.accounts.models import Profile
 
@@ -656,7 +703,13 @@ def _is_a_profile(holder) -> bool:
 
 
 def formset_for(
-    holder, *, default_country: str = "", data=None, prefix: str = "addresses", person=None
+    holder,
+    *,
+    default_country: str = "",
+    data=None,
+    prefix: str = "addresses",
+    person=None,
+    pinnable: bool | None = None,
 ):
     """The rows for one holder, ready to render or to save.
 
@@ -683,6 +736,10 @@ def formset_for(
             "person": person,
             # Only a person's own addresses are theirs for the browser to fill (#329).
             "own": _is_a_profile(holder),
+            # A contact's and a person's own address are drawn only when asked; a company's
+            # always (#702). A page making a company says so, having no holder to ask yet.
+            "pinnable": _pinnable(holder) if pinnable is None else pinnable,
+            "mapped": _mapped(person),
         },
     )
     formset.person = person

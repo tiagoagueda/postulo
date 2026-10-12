@@ -820,7 +820,18 @@ def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> N
             region=(row.get("region") or ""),
             country=(row.get("country") or ""),
             is_primary=bool(row.get("is_primary")) and not primary_taken,
+            on_map=row.get("on_map") is True,
         )
+        # A point a person put there by hand, or fetched from Wikidata, is kept as the file
+        # has it; any other is placed again from the address as it is saved (#702).
+        if row.get("placed_by") in ("manual", "wikidata"):
+            try:
+                lat, lon = float(row.get("latitude")), float(row.get("longitude"))
+            except (TypeError, ValueError):
+                lat = lon = None
+            if lat is not None and -90 <= lat <= 90 and -180 <= lon <= 180:
+                address.latitude, address.longitude = lat, lon
+                address.placed_by = row["placed_by"]
         comparable = address.comparable_form()
         if comparable in seen:
             named = ", ".join(
@@ -1465,6 +1476,8 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # first to carry them, and an older archive simply has none.
         company_numbers = _phone_rows(company_entry)
         company_addresses = _address_rows(company_entry)
+        # Before format 68 a company's place was one line; since #702 it is an address.
+        legacy_location = str(company_entry.pop("location", "") or "")[:200]
         company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
         # A switch, read as one: anything but a true is not marked. An archive from before
@@ -1520,6 +1533,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             company, user, company_numbers, report, f"on the company “{company.name}”"
         )
         _restore_postal_addresses(company, user, company_addresses, report)
+        if legacy_location.strip() and not company_addresses:
+            company.location = legacy_location
+            company.save()
         for department_name in department_names:
             Department.objects.get_or_create(
                 owner=user,

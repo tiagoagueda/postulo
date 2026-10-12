@@ -369,7 +369,8 @@ def fingerprint() -> str:
     shape = {
         "profile": export.CANDIDATE_PROFILE_FIELDS,
         "phone_numbers": export.PHONE_NUMBER_FIELDS,
-        "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
+        # What the candidate file writes of an address: the archive's, less the map's (#702).
+        "postal_addresses": candidate.CONTACT_BLOCKS["postal_addresses"],
         "web_links": export.WEB_LINK_FIELDS,
         "messaging_handles": export.MESSAGING_FIELDS,
         "resume": export.RESUME_FIELDS,
@@ -452,7 +453,9 @@ def test_what_reads_the_file_knows_every_field_that_is_written_to_it():
 
     wrote = {
         "phone_numbers": export.PHONE_NUMBER_FIELDS,
-        "postal_addresses": export.POSTAL_ADDRESS_FIELDS,
+        "postal_addresses": tuple(
+            name for name in export.POSTAL_ADDRESS_FIELDS if name not in export.ADDRESS_MAP_FIELDS
+        ),
         "web_links": export.WEB_LINK_FIELDS,
         "messaging_handles": export.MESSAGING_FIELDS,
     }

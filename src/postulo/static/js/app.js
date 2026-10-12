@@ -7298,13 +7298,16 @@
     title.textContent = place.label;
     box.appendChild(title);
     var list = document.createElement("ul");
-    (place.companies || []).forEach(function (company) {
+    (place.companies || []).concat(place.people || []).forEach(function (entry) {
       var item = document.createElement("li");
       var link = document.createElement("a");
-      link.href = company.url;
+      link.href = entry.url;
       link.className = "underline";
-      link.textContent = company.name;
+      link.textContent = entry.name;
       item.appendChild(link);
+      if (entry.what) {
+        item.appendChild(document.createTextNode(" · " + entry.what));
+      }
       list.appendChild(item);
     });
     box.appendChild(list);
@@ -7467,5 +7470,91 @@
   }
 
   onContentReady(readyMaps);
+
+  /* Placing one address by hand (#702): a map whose click drops the pin and fills the two
+   * boxes of the form under it, which stay the form -- typed, they move the pin back.
+   */
+  function readyPickers() {
+    var canvas = document.querySelector("[data-map-pick]:not([data-map-drawn])");
+    if (!canvas) {
+      return;
+    }
+    if (!window.L) {
+      var loader = document.querySelector("script[data-leaflet]");
+      if (loader) {
+        loader.addEventListener("load", readyPickers, { once: true });
+      }
+      return;
+    }
+    var L = window.L;
+    canvas.setAttribute("data-map-drawn", "");
+    var card = canvas.closest("[data-map-card]");
+    if (card) {
+      card.hidden = false;
+    }
+    var latitude = document.querySelector("[data-map-latitude]");
+    var longitude = document.querySelector("[data-map-longitude]");
+    var map = L.map(canvas, { zoomControl: false, attributionControl: false, minZoom: 1,
+      maxZoom: parseInt(canvas.getAttribute("data-map-max-zoom"), 10) || 19 });
+    L.control.zoom({
+      position: "bottomright",
+      zoomInTitle: canvas.getAttribute("data-map-zoom-in") || "+",
+      zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
+    }).addTo(map);
+    L.control.attribution({ prefix: '<a href="https://leafletjs.com" rel="noopener noreferrer external">Leaflet</a>' }).addTo(map);
+    var credit = escapeHtml(canvas.getAttribute("data-map-attribution"));
+    var creditUrl = canvas.getAttribute("data-map-attribution-url");
+    if (credit && creditUrl) {
+      credit = '<a href="' + escapeHtml(creditUrl) + '" rel="noopener noreferrer external">' + credit + "</a>";
+    }
+    var tiles = canvas.getAttribute("data-map-tiles");
+    if (tiles) {
+      L.tileLayer(tiles, { attribution: credit, maxZoom: map.getMaxZoom(), referrerPolicy: "strict-origin-when-cross-origin" }).addTo(map);
+    } else {
+      var rings = readJson(canvas, "data-map-outline");
+      if (rings.length) {
+        L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" }).addTo(map);
+      }
+    }
+    var pin = null;
+    function put(point, fly) {
+      if (pin) {
+        pin.setLatLng(point);
+      } else {
+        pin = L.circleMarker(point, { className: "map-dot", radius: 9 }).addTo(map);
+      }
+      if (fly) {
+        map.setView(point, Math.max(map.getZoom(), 15));
+      }
+    }
+    var start = (canvas.getAttribute("data-map-point") || "").split(",").map(parseFloat);
+    if (start.length === 2 && !isNaN(start[0]) && !isNaN(start[1])) {
+      map.setView(start, 15);
+      put(start, false);
+    } else {
+      map.setView([20, 0], 2);
+    }
+    map.on("click", function (event) {
+      var point = [event.latlng.lat, L.Util.wrapNum(event.latlng.lng, [-180, 180], true)];
+      put(point, false);
+      if (latitude && longitude) {
+        latitude.value = point[0].toFixed(6);
+        longitude.value = point[1].toFixed(6);
+      }
+    });
+    function typed() {
+      var lat = parseFloat(latitude.value);
+      var lon = parseFloat(longitude.value);
+      if (!isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+        put([lat, lon], true);
+      }
+    }
+    if (latitude && longitude) {
+      latitude.addEventListener("change", typed);
+      longitude.addEventListener("change", typed);
+    }
+  }
+
+  onContentReady(readyPickers);
 
 })();

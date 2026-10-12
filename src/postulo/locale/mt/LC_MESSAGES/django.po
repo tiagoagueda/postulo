@@ -3081,6 +3081,10 @@ msgstr ""
 msgid "address claims"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_map.html
+msgid "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)."
+msgstr ""
+
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "Administrator"
@@ -4371,6 +4375,10 @@ msgstr "Minn"
 msgid "By agency"
 msgstr "Skont l-aġenzija"
 
+#: src/postulo/core/models.py
+msgid "by hand"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 #, fuzzy
 msgid "By industry"
@@ -4455,6 +4463,7 @@ msgstr "URL ta' callback biex tirreġistra mal-fornitur"
 #: src/postulo/templates/documents/letter_form.html
 #: src/postulo/templates/documents/send.html
 #: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -6041,11 +6050,6 @@ msgstr ""
 msgid "Deleted. The capture itself is unchanged."
 msgstr "Mħassar. Il-qbid innifsu ma nbidilx."
 
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Deliberately not placed"
-msgstr "Mhux mqiegħed apposta"
-
 #: src/postulo/accounts/models.py
 #, fuzzy
 msgid "density"
@@ -6468,6 +6472,14 @@ msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "driving licences"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Drop the pin on the map, or give a latitude between -90 and 90 and a longitude between -180 and 180."
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Drop the pin where the address is, or type the two numbers. The point is kept on this instance and nothing is looked up anywhere; changing the address afterwards does not move it."
 msgstr ""
 
 #: src/postulo/applications/widgets.py
@@ -7491,11 +7503,6 @@ msgstr ""
 msgid "For this, sign in again with your identity provider, then try it."
 msgstr ""
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "For when the location names a place that exists more than once, and the pin sat in the wrong one. Type the place with its country; Postulo looks it up in the same offline table and stops guessing for this company. Leave it blank again and the guess comes back."
-msgstr "Għal meta l-post jisma post li jeżisti iktar minn darba, u l-pin kien fil-post ħażin. Ittajpja l-post bil-pajjiż tiegħu; Postulo jfittxu fl-istess tabella offline u jieqaf jstraħ għal din il-kumpanija. Ħalliha vojta mill-ġdid u t-tbassir jerġa' lura."
-
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "For you, not for the employer: “Backend, English”."
@@ -7672,6 +7679,10 @@ msgstr "Mil-livell"
 #, fuzzy
 msgid "from status"
 msgstr "mill-istatus"
+
+#: src/postulo/core/models.py
+msgid "from Wikidata"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "from your career"
@@ -9151,8 +9162,16 @@ msgstr "Ismu, bejn il-kwotazzjonijiet doppji, jew isem wieħed għal kull lingwa
 msgid "Its notes:"
 msgstr "In-noti tiegħu:"
 
+#: src/postulo/core/models.py
+msgid "its postcode"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Its properties are what a recruiter's software and a file manager read: the title, the author and the rest. They start as what the file has always carried; change them for this file only."
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "its town"
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -9560,10 +9579,14 @@ msgstr "l-aħħar li ħadem"
 msgid "Later"
 msgstr "Aktar tard"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/core/models.py
 #, fuzzy
 msgid "latitude"
 msgstr "latitudni"
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Latitude"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -9904,27 +9927,12 @@ msgid "location"
 msgstr "post"
 
 #: src/postulo/applications/forms.py src/postulo/applications/tables.py
-#: src/postulo/core/csv_import.py src/postulo/jobs/models.py
-#: src/postulo/jobs/tables.py
+#: src/postulo/core/csv_import.py src/postulo/core/kind_files.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy
 msgid "Location"
 msgstr "Post"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved"
-msgstr "post solvut"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved by"
-msgstr "post solvut minn"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved from"
-msgstr "post solvut minn"
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -9962,10 +9970,14 @@ msgstr "L-itwal waqfa"
 msgid "Longest gap, in days"
 msgstr "L-itwal waqfa, f’ġranet"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/core/models.py
 #, fuzzy
 msgid "longitude"
 msgstr "lonġitudni"
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Longitude"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -10144,6 +10156,10 @@ msgstr ""
 msgid "map tiles"
 msgstr ""
 
+#: src/postulo/templates/jobs/address_place.html
+msgid "Map: click to drop the pin"
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/server/maps.html
 msgid "Maps"
@@ -10166,11 +10182,6 @@ msgstr ""
 #, fuzzy
 msgid "Match the operating system"
 msgstr "Segwi s-sistema operattiva"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Matched from the city dataset"
-msgstr "Imqabbel mid-dataset tal-bliet"
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -10484,6 +10495,10 @@ msgstr "Ċaqlaq 'l isfel"
 #, fuzzy
 msgid "Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
 msgstr "Mexxi kull widget bil-vleġeġ tiegħu, neħħi dak li qatt ma taqra, u żid mil-lista t'hawn taħt. Agħfas Lest meta jkun tajjeb."
+
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Move it"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/status_card.html
 #, fuzzy
@@ -10991,9 +11006,8 @@ msgid "No people recorded at this company yet. Add them from <a href=\"%(company
 msgstr "L-ebda persuna rreġistrata f'din il-kumpanija għalissa. Żidhom mill-<a href=\"%(company_url)s\" class=\"underline\">paġna tal-kumpanija</a> biex issemmi ma' min qed tiltaqa'."
 
 #: src/postulo/templates/jobs/company_map.html
-#, fuzzy
-msgid "No places yet. When a company has a location, the place is listed here and drawn on the map."
-msgstr "Għad m'hemm l-ebda post. Meta kumpanija jkollha post, il-post jiġi elenkat hawnhekk u mfassal fuq il-mappa."
+msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
@@ -11091,6 +11105,10 @@ msgstr "M’hemm ebda tema installata li tista’ tifformatja dan id-dokument."
 
 #: src/postulo/jobs/tiles.py
 msgid "No tiles: the world's outline only"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "No town given"
 msgstr ""
 
 #: src/postulo/documents/printing.py
@@ -11354,9 +11372,12 @@ msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Mhux offrut xejn, u jinżamm hekk sakemm jibqa' mitfi."
 
 #: src/postulo/templates/jobs/company_map.html
-#, fuzzy
-msgid "Not on the map: the place is not in the city dataset, or it was taken off the map by hand."
-msgstr "Mhux fuq il-mappa: il-post mhuwiex fid-dataset tal-bliet, jew tneħħa mill-mappa bl-idejn."
+msgid "Not on the map: neither its postcode nor its town is in the offline tables."
+msgstr ""
+
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Not on the map: no postcode or town that the offline tables know."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -11948,6 +11969,10 @@ msgstr ""
 msgid "Off prints the name, the role and the relationship, and no way to reach them."
 msgstr ""
 
+#: src/postulo/core/models.py
+msgid "Off unless you ask: a home address is somewhere somebody can be found."
+msgstr ""
+
 #: src/postulo/documents/stores.py
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
@@ -12098,6 +12123,11 @@ msgstr "Fuq il-kalendarju, b'tfakkira l-jum ta' qabel."
 #, fuzzy
 msgid "On the capture review, “d” discards and moves on and “j” skips; “/” jumps to the search box anywhere. Turn this off if you dictate to your computer, or if a key pressed by accident does more than you meant. Shortcuts that need Ctrl go on working either way."
 msgstr "Fir-reviżjoni tal-qbid, “d” jiskarta u jkompli u “j” jaqbeż; “/” jaqbeż għall-kaxxa tat-tiftix kullimkien. Itfi dan jekk tiddetta lill-kompjuter tiegħek, jew jekk tast magħfus bl-addoċċ jagħmel aktar milli ridt. Ix-shortcuts li jeħtieġu Ctrl jibqgħu jaħdmu xorta waħda."
+
+#: src/postulo/templates/partials/postal_addresses.html
+#, python-format
+msgid "On the map at %(how)s."
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 #, fuzzy
@@ -12615,11 +12645,6 @@ msgstr ""
 msgid "Or upload one"
 msgstr "Jew tella' wieħed"
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Or, exactly where"
-msgstr "Jew, eżattament fejn"
-
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "ORCID"
@@ -13102,8 +13127,20 @@ msgstr "Post"
 msgid "place"
 msgstr ""
 
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Place it by hand"
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Place it here"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "place of birth"
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Place on the map"
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -13111,8 +13148,16 @@ msgstr ""
 msgid "place on the page"
 msgstr "post fuq il-paġna"
 
-#: src/postulo/applications/models.py
+#: src/postulo/core/models.py
+msgid "placed"
+msgstr ""
+
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "placed by"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Placed by hand. Changing the address will not move it."
 msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
@@ -13132,7 +13177,7 @@ msgid "Places"
 msgstr "Postijiet"
 
 #: src/postulo/templates/jobs/partials/map_credits.html
-msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
+msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>; its postal codes <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
 msgstr ""
 
 #: src/postulo/jobs/roles.py
@@ -13394,11 +13439,6 @@ msgstr "Avviżi fil-grupp %(name)s kollu"
 #, fuzzy
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "Avviżi moqrija minn paġna, jistennew li tikkonfermahom."
-
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Postulo cannot find this place in its offline table; the pin stays where it is."
-msgstr "Postulo ma jistax isib dan il-post fit-tabella offline tiegħu; il-pin jibqa' fejn hu."
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -15317,11 +15357,6 @@ msgstr "Issettjat mill-ambjent: <code>%(variable)s</code>. Neħħih mill-ambjent
 msgid "Set by the operator"
 msgstr "Issettjat mill-operatur"
 
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Set by the person recording it"
-msgstr "Issettjat mill-persuna li tirreġistra"
-
 #: src/postulo/plugins/policy.py
 msgid "Set by your administrator."
 msgstr ""
@@ -15459,6 +15494,10 @@ msgstr "Uriħ bħala test"
 
 #: src/postulo/accounts/models.py
 msgid "show key hints"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "show on the map"
 msgstr ""
 
 #: src/postulo/templates/applications/interview_list.html
@@ -16355,6 +16394,10 @@ msgstr "imfassal għal dan"
 msgid "Take %(name)s off"
 msgstr "Neħħi %(name)s"
 
+#: src/postulo/templates/jobs/address_place.html
+msgid "Take it off by hand"
+msgstr ""
+
 #: src/postulo/templates/core/partials/errand_state.html
 #, fuzzy
 msgid "Take me to it"
@@ -16363,6 +16406,10 @@ msgstr "Ħudni għaliha"
 #: src/postulo/templates/server/overview.html
 #, python-format
 msgid "Take, download and schedule backups under <a href=\"%(backups_url)s\" class=\"underline\">Backups</a>, or run <code>manage.py backup</code>; see the wiki page on backups for restoring."
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Taken off by hand: it is placed from its address again."
 msgstr ""
 
 #: src/postulo/core/slow.py
@@ -20691,15 +20738,6 @@ msgstr "Fejn it-tnejn jiddifferenzjaw"
 msgid "Where the work was, as you would write it on a CV."
 msgstr "Fejn kien ix-xogħol, kif tikteb fuq CV."
 
-#: src/postulo/jobs/forms.py
-msgid "Where they are, as you would write it."
-msgstr ""
-
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Where they are, as you would write it. Postulo places it on the map from an offline table of cities; nothing is sent to a geocoding service."
-msgstr "Fejn huma, kif tikteb. Postulo jqiegħdu fuq il-mappa minn tabella offline ta' bliet; xejn ma jintbagħat lil servizz ta' ġeokodifikazzjoni."
-
 #: src/postulo/applications/widgets.py
 #, fuzzy
 msgid "Where they came from"
@@ -21258,6 +21296,10 @@ msgstr "Iva: min jasal permezz tal-fornitur tal-identità jidħol direttament, m
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Iva: min insa l-password jista' jitlob kodiċi fuq l-indirizz primarju tiegħu u jerġa' jiktbu. Kodiċi u mhux link, għax l-iskaners tal-posta jsegwu l-links u jonfquh qabel ma l-persuna taqrah. Qatt mhu tieni fattur: l-app ta' awtentikazzjoni xorta tintalab. Offrut biss sakemm il-posta ta' din l-istanza tabilħaqq tasal."
 
+#: src/postulo/jobs/views.py
+msgid "You"
+msgstr ""
+
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #, fuzzy
 msgid "You already have a company with that name."
@@ -21777,10 +21819,12 @@ msgstr "Tiegħek. Ma jmorru imkien mal-fajl."
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr "Tiegħek. Qatt ma jidhru fuq dokument u ma jmorru imkien ieħor."
 
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr ""
 
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"
 msgstr ""

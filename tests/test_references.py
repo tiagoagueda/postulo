@@ -360,7 +360,7 @@ def test_the_sentence_is_set_in_the_documents_language(user, monkeypatch):
 def test_the_contacts_document_carries_the_reference_including_the_note(user):
     mine = a_reference(user, permission="agreed", note="Asked over coffee")
     document = gdpr.contact_document(mine.contact)
-    assert document["version"] == gdpr.DOCUMENT_VERSION == 6
+    assert document["version"] == gdpr.DOCUMENT_VERSION == 7
     assert document["references"] == [
         {
             "relationship": "Line manager 2019 to 2022",

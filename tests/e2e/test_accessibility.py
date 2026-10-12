@@ -411,6 +411,11 @@ def furnished(applicant):
         "offer": offer,
         "connection": connection,
         "suggestion": suggestion,
+        # The company's primary address, for the page that places it by hand (#702).
+        "address": company.postal_addresses.first()
+        or company.postal_addresses.create(
+            owner=applicant, municipality="Cambridge", country="GB", is_primary=True
+        ),
     }
 
 
@@ -478,6 +483,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
     capture = it.get("capture", a)
     contact = it.get("contact", a)
     industry = it.get("industry", a)
+    address = it.get("address", a)
     posting = it.get("posting", a)
     interview = it.get("interview", a)
     reminder = it.get("reminder", a)
@@ -528,6 +534,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/applications/tags/",
         "/jobs/companies/",
         "/jobs/companies/map/",
+        f"/jobs/addresses/{address.pk}/place/",
         "/jobs/companies/new/",
         f"/jobs/companies/{c.pk}/",
         f"/jobs/companies/{c.pk}/edit/",
@@ -1157,6 +1164,7 @@ def walked_url_names() -> frozenset[str]:
                     "reminder",
                     "offer",
                     "connection",
+                    "address",
                 ),
                 stand_in,
             ),

@@ -237,6 +237,9 @@ class PostalAddressesMixin:
     """
 
     addresses_prefix = "addresses"
+    #: Whether a row offers *Show on the map*: a contact's does; a company's is always drawn,
+    #: so its page sets this off (#702).
+    addresses_pinnable = True
 
     def address_holder(self):
         return getattr(self, "object", None)
@@ -252,6 +255,7 @@ class PostalAddressesMixin:
             data=self.request.POST if self.request.method == "POST" and posted else None,
             prefix=self.addresses_prefix,
             person=self.request.user,
+            pinnable=self.addresses_pinnable,
         )
 
     def addresses_invalid(self, formset) -> bool:

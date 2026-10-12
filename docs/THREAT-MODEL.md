@@ -108,19 +108,20 @@ test:
 not going to post anything, so *valid* means well-formed enough to be used. An address can
 never become a recovery route by accident, because there is no flag on it that could.
 
-**The map knows the city and stops there, unless a person places an address.** A company's
-location is placed from an offline table of cities, and the coordinate it keeps is city level
-by default (#108, #700): a search at street precision is a map of where the person will be at
+**The map knows a town or a postcode, unless a person places an address by hand.** A postal
+address is placed offline at its postcode's centroid, where an operator downloaded the
+postal codes, or else at its town (#108, #700, #702): a search at street precision is a map of where the person will be at
 nine in the morning if any of it works out, sitting in the same database as the CV that carries
 the home address. Nothing about a location is ever sent to a geocoding service to be placed.
 The map is drawn by Leaflet, served from the instance, over tiles the operator chooses, and
 that choice is the one way the neighbourhood of somebody's search can leave the instance.
 Three things follow, and each is a promise:
 
-- **A finer pin is an act, not a default.** A pin at the precision of an address exists only
-  for one address a person deliberately places (#702). Their own home address is never pinned
-  unless they ask, and a contact's address, which is somebody else's personal data, only on
-  request. A coordinate is stored on the instance and never leaves it.
+- **A finer pin is an act, not a default.** A pin at the precision of a street exists only
+  for one address a person deliberately places by hand (#702). A company's addresses are
+  drawn; a person's own home and a contact's address, which is somebody else's personal data,
+  only when they ask, address by address. A point is stored on the instance, is in the
+  contact's data-subject export and goes when the contact is erased, and never leaves it.
 - **A tile server learns the area a person looks at, and the operator chooses which.** By
   default the browser fetches OpenStreetMap's public tiles (#898, reversing #700's choice of
   no tiles): the foundation's servers see the viewer's address and which tiles they ask for,

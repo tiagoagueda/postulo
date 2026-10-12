@@ -511,7 +511,7 @@ def test_a_company_is_told_apart_by_where_it_is(user):
         record=company(user, "Acme", location="Leeds"),
     )
 
-    assert "<bdi>Leeds</bdi>" in html and "·" not in html
+    assert "<bdi>Leeds, United Kingdom</bdi>" in html and "·" not in html
     assert 'class="block text-xs wrap-anywhere text-ink-500"' in html
 
 

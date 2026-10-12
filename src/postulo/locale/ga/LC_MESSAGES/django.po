@@ -3176,6 +3176,10 @@ msgstr ""
 msgid "address claims"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_map.html
+msgid "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)."
+msgstr ""
+
 #: src/postulo/templates/server/people.html
 #, fuzzy
 msgid "Administrator"
@@ -4471,6 +4475,10 @@ msgstr "Ag"
 msgid "By agency"
 msgstr "De réir gníomhaireachta"
 
+#: src/postulo/core/models.py
+msgid "by hand"
+msgstr ""
+
 #: src/postulo/applications/widgets.py
 #, fuzzy
 msgid "By industry"
@@ -4555,6 +4563,7 @@ msgstr "URL aisghlaoch le clárú leis"
 #: src/postulo/templates/documents/letter_form.html
 #: src/postulo/templates/documents/send.html
 #: src/postulo/templates/documents/upload_form.html
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/jobs/contact_form.html
@@ -6143,11 +6152,6 @@ msgstr ""
 msgid "Deleted. The capture itself is unchanged."
 msgstr "Scriosta. Níor athraigh an ghabháil féin."
 
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Deliberately not placed"
-msgstr "Gan áit a thabhairt d’aon ghnó"
-
 #: src/postulo/accounts/models.py
 #, fuzzy
 msgid "density"
@@ -6570,6 +6574,14 @@ msgstr ""
 
 #: src/postulo/resume/models.py
 msgid "driving licences"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Drop the pin on the map, or give a latitude between -90 and 90 and a longitude between -180 and 180."
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Drop the pin where the address is, or type the two numbers. The point is kept on this instance and nothing is looked up anywhere; changing the address afterwards does not move it."
 msgstr ""
 
 #: src/postulo/applications/widgets.py
@@ -7593,11 +7605,6 @@ msgstr ""
 msgid "For this, sign in again with your identity provider, then try it."
 msgstr ""
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "For when the location names a place that exists more than once, and the pin sat in the wrong one. Type the place with its country; Postulo looks it up in the same offline table and stops guessing for this company. Leave it blank again and the guess comes back."
-msgstr "Don chás a ainmníonn an suíomh áit atá ann níos mó ná uair amháin, agus a raibh an bior san áit mhícheart. Clóscríobh an áit lena tír; féachann Postulo í suas sa tábla as líne céanna agus stopann sé ag buille faoi thuairim don chuideachta seo. Fág bán arís é agus filleann an buille faoi thuairim."
-
 #: src/postulo/documents/models.py
 #, fuzzy
 msgid "For you, not for the employer: “Backend, English”."
@@ -7774,6 +7781,10 @@ msgstr "Ón leibhéal"
 #, fuzzy
 msgid "from status"
 msgstr "ó stádas"
+
+#: src/postulo/core/models.py
+msgid "from Wikidata"
+msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "from your career"
@@ -9256,8 +9267,16 @@ msgstr "A ainm, idir comharthaí athfhriotail dúbailte, nó ainm amháin do gac
 msgid "Its notes:"
 msgstr "A nótaí:"
 
+#: src/postulo/core/models.py
+msgid "its postcode"
+msgstr ""
+
 #: src/postulo/templates/documents/cv_detail.html
 msgid "Its properties are what a recruiter's software and a file manager read: the title, the author and the rest. They start as what the file has always carried; change them for this file only."
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "its town"
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -9665,10 +9684,14 @@ msgstr "oibrithe go deireanach"
 msgid "Later"
 msgstr "Níos déanaí"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/core/models.py
 #, fuzzy
 msgid "latitude"
 msgstr "domhanleithead"
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Latitude"
+msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Learning you took, with or without a certificate of attendance. A programme that led to a degree or diploma belongs in Education; a credential somebody can check, or that may lapse, belongs in Certifications."
@@ -10009,27 +10032,12 @@ msgid "location"
 msgstr "suíomh"
 
 #: src/postulo/applications/forms.py src/postulo/applications/tables.py
-#: src/postulo/core/csv_import.py src/postulo/jobs/models.py
-#: src/postulo/jobs/tables.py
+#: src/postulo/core/csv_import.py src/postulo/core/kind_files.py
+#: src/postulo/jobs/models.py src/postulo/jobs/tables.py
 #: src/postulo/templates/applications/application_detail.html
 #, fuzzy
 msgid "Location"
 msgstr "Suíomh"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved"
-msgstr "suíomh réitithe"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved by"
-msgstr "suíomh réitithe ag"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "location resolved from"
-msgstr "suíomh réitithe ó"
 
 #: src/postulo/jobs/models.py
 #, fuzzy
@@ -10067,10 +10075,14 @@ msgstr "An bhearna is faide"
 msgid "Longest gap, in days"
 msgstr "An bhearna is faide, i laethanta"
 
-#: src/postulo/jobs/models.py
+#: src/postulo/core/models.py
 #, fuzzy
 msgid "longitude"
 msgstr "domhanfhad"
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Longitude"
+msgstr ""
 
 #: src/postulo/jobs/slow.py
 #, fuzzy
@@ -10250,6 +10262,10 @@ msgstr ""
 msgid "map tiles"
 msgstr ""
 
+#: src/postulo/templates/jobs/address_place.html
+msgid "Map: click to drop the pin"
+msgstr ""
+
 #: src/postulo/core/server_views.py src/postulo/templates/jobs/company_map.html
 #: src/postulo/templates/server/maps.html
 msgid "Maps"
@@ -10272,11 +10288,6 @@ msgstr ""
 #, fuzzy
 msgid "Match the operating system"
 msgstr "Lean an córas oibriúcháin"
-
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Matched from the city dataset"
-msgstr "Meaitseáilte ón tacar sonraí cathrach"
 
 #: src/postulo/plugins/models.py
 msgid "may change its settings"
@@ -10590,6 +10601,10 @@ msgstr "Bog síos"
 #, fuzzy
 msgid "Move each widget with its arrows, take off what you never read, and add from the list below. Press Done when it is right."
 msgstr "Bog gach giuirléid lena saigheada, bain amach an rud nach léann tú riamh, agus cuir leis ón liosta thíos. Brúigh Déanta nuair atá sé mar is ceart."
+
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Move it"
+msgstr ""
 
 #: src/postulo/templates/applications/partials/status_card.html
 #, fuzzy
@@ -11097,9 +11112,8 @@ msgid "No people recorded at this company yet. Add them from <a href=\"%(company
 msgstr "Níl aon duine taifeadta ag an gcuideachta seo fós. Cuir leis iad ó <a href=\"%(company_url)s\" class=\"underline\">leathanach na cuideachta</a> chun a ainmniú cé leis a bhfuil tú ag bualadh."
 
 #: src/postulo/templates/jobs/company_map.html
-#, fuzzy
-msgid "No places yet. When a company has a location, the place is listed here and drawn on the map."
-msgstr "Níl aon áiteanna ann go fóill. Nuair a bhíonn suíomh ag cuideachta, liostaítear an áit anseo agus tarraingítear ar an léarscáil í."
+msgid "No places yet. When a company has an address, its town is listed here and drawn on the map."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
@@ -11197,6 +11211,10 @@ msgstr "Níl aon téama suiteáilte atá in ann an cháipéis seo a leagan amach
 
 #: src/postulo/jobs/tiles.py
 msgid "No tiles: the world's outline only"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "No town given"
 msgstr ""
 
 #: src/postulo/documents/printing.py
@@ -11460,9 +11478,12 @@ msgid "Not offered at all, and kept that way while it stays off."
 msgstr "Ní thairgtear ar chor ar bith é, agus fanann sé mar sin fad is atá sé as."
 
 #: src/postulo/templates/jobs/company_map.html
-#, fuzzy
-msgid "Not on the map: the place is not in the city dataset, or it was taken off the map by hand."
-msgstr "Ní ar an léarscáil: níl an áit sa tacar sonraí cathrach, nó baineadh den léarscáil de láimh í."
+msgid "Not on the map: neither its postcode nor its town is in the offline tables."
+msgstr ""
+
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Not on the map: no postcode or town that the offline tables know."
+msgstr ""
 
 #: src/postulo/jobs/capture_views.py
 #, fuzzy
@@ -12056,6 +12077,10 @@ msgstr ""
 msgid "Off prints the name, the role and the relationship, and no way to reach them."
 msgstr ""
 
+#: src/postulo/core/models.py
+msgid "Off unless you ask: a home address is somewhere somebody can be found."
+msgstr ""
+
 #: src/postulo/documents/stores.py
 msgid "Off unless you turn it on: a reference letter is written by somebody else, and is their words and their name."
 msgstr ""
@@ -12206,6 +12231,11 @@ msgstr "Ar an bhfeilire, le meabhrúchán an lá roimhe."
 #, fuzzy
 msgid "On the capture review, “d” discards and moves on and “j” skips; “/” jumps to the search box anywhere. Turn this off if you dictate to your computer, or if a key pressed by accident does more than you meant. Shortcuts that need Ctrl go on working either way."
 msgstr "Ar athbhreithniú na ngabhálacha, caitheann “d” i leataobh agus bogann ar aghaidh agus scipeálann “j”; léimeann “/” chuig an mbosca cuardaigh áit ar bith. Múch é seo má dhéanann tú deachtú chuig do ríomhaire, nó má dhéanann eochair a bhrúitear de thaisme níos mó ná a bhí i gceist agat. Leanann aicearraí a bhfuil Ctrl de dhíth orthu ag obair ar aon nós."
+
+#: src/postulo/templates/partials/postal_addresses.html
+#, python-format
+msgid "On the map at %(how)s."
+msgstr ""
 
 #: src/postulo/templates/applications/suggestion_list.html
 #, fuzzy
@@ -12743,11 +12773,6 @@ msgstr ""
 msgid "Or upload one"
 msgstr "Nó uaslódáil ceann"
 
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Or, exactly where"
-msgstr "Nó, go díreach cá háit"
-
 #: src/postulo/resume/views.py
 #, fuzzy
 msgid "ORCID"
@@ -13230,8 +13255,20 @@ msgstr "Áit"
 msgid "place"
 msgstr ""
 
+#: src/postulo/templates/partials/postal_addresses.html
+msgid "Place it by hand"
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Place it here"
+msgstr ""
+
 #: src/postulo/accounts/models.py
 msgid "place of birth"
+msgstr ""
+
+#: src/postulo/templates/jobs/address_place.html
+msgid "Place on the map"
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -13239,8 +13276,16 @@ msgstr ""
 msgid "place on the page"
 msgstr "áit ar an leathanach"
 
-#: src/postulo/applications/models.py
+#: src/postulo/core/models.py
+msgid "placed"
+msgstr ""
+
+#: src/postulo/applications/models.py src/postulo/core/models.py
 msgid "placed by"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Placed by hand. Changing the address will not move it."
 msgstr ""
 
 #: src/postulo/templates/documents/letter_detail.html
@@ -13260,7 +13305,7 @@ msgid "Places"
 msgstr "Áiteanna"
 
 #: src/postulo/templates/jobs/partials/map_credits.html
-msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
+msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>; its postal codes <a href=\"https://creativecommons.org/licenses/by/4.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 4.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
 msgstr ""
 
 #: src/postulo/jobs/roles.py
@@ -13522,11 +13567,6 @@ msgstr "Fógraí ar fud ghrúpa %(name)s"
 #, fuzzy
 msgid "Postings read from a page, waiting for you to confirm them."
 msgstr "Fógraí a léadh ó leathanach, ag fanacht ort iad a dheimhniú."
-
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Postulo cannot find this place in its offline table; the pin stays where it is."
-msgstr "Ní féidir le Postulo an áit seo a aimsiú ina thábla as líne; fanann an bior san áit a bhfuil sé."
 
 #: src/postulo/templates/base.html
 #, fuzzy
@@ -15449,11 +15489,6 @@ msgstr "Socraithe ag an timpeallacht: <code>%(variable)s</code>. Bain den timpea
 msgid "Set by the operator"
 msgstr "Socraithe ag an oibreoir"
 
-#: src/postulo/jobs/models.py
-#, fuzzy
-msgid "Set by the person recording it"
-msgstr "Socraithe ag an duine a thaifeadann é"
-
 #: src/postulo/plugins/policy.py
 msgid "Set by your administrator."
 msgstr ""
@@ -15591,6 +15626,10 @@ msgstr "Taispeáin mar théacs é"
 
 #: src/postulo/accounts/models.py
 msgid "show key hints"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "show on the map"
 msgstr ""
 
 #: src/postulo/templates/applications/interview_list.html
@@ -16487,6 +16526,10 @@ msgstr "curtha in oiriúint dó seo"
 msgid "Take %(name)s off"
 msgstr "Bain %(name)s de"
 
+#: src/postulo/templates/jobs/address_place.html
+msgid "Take it off by hand"
+msgstr ""
+
 #: src/postulo/templates/core/partials/errand_state.html
 #, fuzzy
 msgid "Take me to it"
@@ -16495,6 +16538,10 @@ msgstr "Tóg mé chuige"
 #: src/postulo/templates/server/overview.html
 #, python-format
 msgid "Take, download and schedule backups under <a href=\"%(backups_url)s\" class=\"underline\">Backups</a>, or run <code>manage.py backup</code>; see the wiki page on backups for restoring."
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Taken off by hand: it is placed from its address again."
 msgstr ""
 
 #: src/postulo/core/slow.py
@@ -20837,15 +20884,6 @@ msgstr "An áit a bhfuil an dá cheann difriúil"
 msgid "Where the work was, as you would write it on a CV."
 msgstr "An áit a raibh an obair, mar a scríobhfá ar CV é."
 
-#: src/postulo/jobs/forms.py
-msgid "Where they are, as you would write it."
-msgstr ""
-
-#: src/postulo/jobs/forms.py
-#, fuzzy
-msgid "Where they are, as you would write it. Postulo places it on the map from an offline table of cities; nothing is sent to a geocoding service."
-msgstr "An áit a bhfuil siad, mar a scríobhfá é. Cuireann Postulo ar an léarscáil é ó thábla as líne de chathracha; ní sheoltar aon rud chuig seirbhís geacódúcháin."
-
 #: src/postulo/applications/widgets.py
 #, fuzzy
 msgid "Where they came from"
@@ -21405,6 +21443,10 @@ msgstr "Tá: síníonn duine a thagann tríd an soláthraí céannachta isteach 
 msgid "Yes: somebody who has forgotten their password can ask for a code at their primary address and type it back. A code rather than a link, because mail scanners follow links and would spend one before the person read it. It is never a second factor: an authenticator app is still asked for. Offered only while this instance's mail is actually getting through."
 msgstr "Tá: is féidir le duine a rinne dearmad ar a phasfhocal cód a iarraidh ar a phríomhsheoladh agus é a chlóscríobh ar ais. Cód seachas nasc, mar leanann scanóirí poist naisc agus chaithfidís é sula léifeadh an duine é. Ní dara fachtóir é riamh: iarrtar an aip fhíordheimhnithe fós. Ní thairgtear é ach fad a bhíonn post an áis seo ag teacht i ndáiríre."
 
+#: src/postulo/jobs/views.py
+msgid "You"
+msgstr ""
+
 #: src/postulo/api/routers/companies.py src/postulo/jobs/forms.py
 #, fuzzy
 msgid "You already have a company with that name."
@@ -21927,10 +21969,12 @@ msgstr "Do cheann féin. Ní théann siad áit ar bith leis an gcomhad."
 msgid "Yours. They never appear on a document or go anywhere else."
 msgstr "Do cheann féin. Ní fheictear iad riamh ar cháipéis ná ní théann siad áit ar bith eile."
 
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom in"
 msgstr ""
 
+#: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/company_map.html
 msgid "Zoom out"
 msgstr ""

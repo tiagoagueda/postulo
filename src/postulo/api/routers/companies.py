@@ -45,7 +45,7 @@ def list_companies(
     if q:
         companies = companies.filter(
             Q(name__icontains=q)
-            | Q(location__icontains=q)
+            | Q(postal_addresses__municipality__icontains=q)
             | Q(industries__name__icontains=q)
             | Q(identifiers__value__icontains=q)
         ).distinct()

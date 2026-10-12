@@ -83,18 +83,30 @@
                   {% endblocktranslate %}
                 </span>
               </div>
-              <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
-                {% for name, url in place.companies %}{% if not forloop.first %}, {% endif %}<a href="{{ url }}" class="inline-block min-h-6 py-0.5 underline">{{ name }}</a>{% endfor %}
-              </p>
+              {% if place.companies %}
+                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300">
+                  {% for name, url in place.companies %}{% if not forloop.first %}, {% endif %}<a href="{{ url }}" class="inline-block min-h-6 py-0.5 underline">{{ name }}</a>{% endfor %}
+                </p>
+              {% endif %}
+              {% comment %} A contact's or your own address, only where it was asked for (#702):
+                 whose it is and what kind, never the street. {% endcomment %}
+              {% for name, url, what in place.people %}
+                <p class="mt-1 text-sm text-ink-600 dark:text-ink-300" data-map-person>
+                  <a href="{{ url }}" class="inline-block min-h-6 py-0.5 underline">{{ name }}</a>{% if what %} <span class="text-xs text-ink-500 dark:text-ink-400">{{ what }}</span>{% endif %}
+                </p>
+              {% endfor %}
               {% if place.lat is None %}
                 <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
-                  {% translate "Not on the map: the place is not in the city dataset, or it was taken off the map by hand." %}
+                  {% translate "Not on the map: neither its postcode nor its town is in the offline tables." %}
                 </p>
               {% endif %}
             </li>
           {% endfor %}
         </ul>
         <div class="space-y-2 border-t border-ink-100 px-4 py-3 text-xs text-ink-500 dark:border-ink-800 dark:text-ink-400">
+          {% if dataset_available and not postcodes_available %}
+            <p data-no-postcodes>{% translate "Addresses are placed at their town: the postal codes have not been downloaded on this instance (manage.py fetch_geonames --postcodes)." %}</p>
+          {% endif %}
           {% if not dataset_available %}
             <p>{% translate "The city dataset has not been downloaded on this instance, so no place is on the map: run manage.py fetch_geonames to download it." %}</p>
           {% endif %}
@@ -105,7 +117,7 @@
       <div class="flex size-full items-center justify-center px-4 pt-28 pb-16">
         <div class="max-w-md">
           <c-empty icon="map-pin">
-            {% translate "No places yet. When a company has a location, the place is listed here and drawn on the map." %}
+            {% translate "No places yet. When a company has an address, its town is listed here and drawn on the map." %}
           </c-empty>
           <div class="mt-3 text-xs text-ink-500 dark:text-ink-400">{% include "jobs/partials/map_credits.html" %}</div>
         </div>

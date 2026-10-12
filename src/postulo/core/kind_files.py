@@ -59,9 +59,12 @@ MAX_DETAILS = 20
 #: What each file starts at, and what its marker is called in the header. A block that
 #: changes shape is a new version, which `tests/test_kind_files.py` holds fast. The companies
 #: file went to 2 when the archive's company block gained ``from_career`` (#683), and to 3
-#: when it gained ``email``, ``phone_numbers`` and ``postal_addresses`` (#329): the file
-#: writes none of them, and reads an older file exactly as before.
-FORMATS = {"companies": 3, "contacts": 1, "listings": 1, "applications": 1}
+#: when it gained ``email``, ``phone_numbers`` and ``postal_addresses`` (#329), and to 4 when
+#: the archive's block stopped carrying ``location`` (#702): the file still writes the line,
+#: which becomes the town and country of the company's primary address, and reads an older
+#: file exactly as before.
+#: The contacts file went to 2 when an address gained its point and its map choice (#702).
+FORMATS = {"companies": 4, "contacts": 2, "listings": 1, "applications": 1}
 
 #: Telephone numbers are not read with a say in whether they were confirmed or are a way
 #: back in (#142, #144): neither is written.
@@ -70,6 +73,9 @@ NOT_THE_FILES_TO_SAY = ("verified_at", "is_recovery")
 # ------------------------------------------------------------------ what each file holds
 
 COMPANY_FIELDS = ("name", "kind", "website", "careers_url", "location", "notes")
+#: What the company's own form checks. The location is a line of its primary address since
+#: #702, written through `Company.location` rather than through a field of the form.
+COMPANY_FORM_FIELDS = tuple(name for name in COMPANY_FIELDS if name != "location")
 IDENTIFIER_FIELDS = ("scheme", "value", "label")
 CONTACT_FIELDS = ("name", "role", "email", "notes")
 CONTACT_DETAILS: dict[str, tuple[str, ...]] = {
@@ -546,7 +552,12 @@ def _moment_date(value) -> dt.date | None:
 def _assess_company(run: _Run, row: dict) -> Verdict:
     from postulo.jobs.models import Company
 
-    clean, problems = _through_the_form(Company, COMPANY_FIELDS, row)
+    clean, problems = _through_the_form(Company, COMPANY_FORM_FIELDS, row)
+    location = row.get("location")
+    if location is not None and not isinstance(location, str):
+        problems.append(_("%(field)s: this is not text.") % {"field": _("Location")})
+    else:
+        clean["location"] = _text(location, 200)
     name = _text(row.get("name"), 200)
     if problems or not name:
         return Verdict(

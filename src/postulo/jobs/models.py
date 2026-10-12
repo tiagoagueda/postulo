@@ -44,14 +44,25 @@ from postulo.core.stored_pictures import StoredPicture
 from . import esco, identifiers, industries, roles
 
 
-def _always_placing(person) -> bool:
-    return True
+def split_location(text: str) -> tuple[str, str]:
+    """A typed location as a town and a country code, read the way the map reads one (#702).
 
+    "Lisboa, Portugal" is Lisboa in PT; "Berlin" is Berlin in whatever country the city table
+    places it in; "Remote" or "Berlin (hybrid)" is a town nobody can place, kept as typed,
+    with no country.
+    """
+    from . import places
 
-#: Whether this person's locations are placed on the map. The answer is the maps feature's,
-#: which sits above the models, so `JobsConfig.ready` plugs `mapping.map_offered` in here
-#: rather than the model importing upward; until then everything is placed (#700).
-placing_offered = _always_placing
+    text = " ".join((text or "").split())
+    if not text:
+        return "", ""
+    parts = [part.strip() for part in text.replace(";", ",").split(",") if part.strip()]
+    found = places.resolve(text)
+    if found is not None:
+        return parts[0][:120], found["country"]
+    if len(parts) > 1 and len(parts[-1]) == 2 and parts[-1].isalpha():
+        return ", ".join(parts[:-1])[:120], parts[-1].upper()
+    return text[:120], ""
 
 
 class Industry(OwnedModel):
@@ -246,6 +257,18 @@ class CompanyQuerySet(OwnedQuerySet):
                 .values("occurred_at")[:1]
             ),
         }
+        # Where it is: its primary address's town, which is what the Location column shows,
+        # sorts by and narrows on since the location became an address (#702).
+        PostalAddress = apps.get_model("core", "PostalAddress")
+        ContentType = apps.get_model("contenttypes", "ContentType")
+        annotations["location_town"] = Subquery(
+            PostalAddress.objects.filter(
+                content_type=ContentType.objects.get_for_model(self.model),
+                object_id=OuterRef("pk"),
+            )
+            .order_by("-is_primary", "created_at", "pk")
+            .values("municipality")[:1]
+        )
         # The columns the table has: Postulo's own schemes, as `tables.py` lists them.
         for key in identifiers.shipped():
             if key == identifiers.OTHER:
@@ -285,20 +308,6 @@ class CompanyKind(models.TextChoices):
 
     EMPLOYER = "employer", _("Employer")
     EMPLOYMENT_SERVICE = "employment_service", _("Public employment service")
-
-
-class LocationSource(models.TextChoices):
-    """Where a company's coordinates came from: a geocode is a guess, and the record says so (#108).
-
-    A match from the offline city dataset is a guess a person can correct; a correction
-    is a fact they made, and it outlives the next save of the same location. *Unplaced*
-    is the deliberate answer — "Remote" is not a place at all, and a company a person
-    removed from the map is not one the next save quietly puts back.
-    """
-
-    GUESSED = "geonames", _("Matched from the city dataset")
-    MANUAL = "manual", _("Set by the person recording it")
-    UNPLACED = "unplaced", _("Deliberately not placed")
 
 
 class Company(OwnedModel):
@@ -354,21 +363,6 @@ class Company(OwnedModel):
     #: one they are, so it is unique within the company and nowhere else (#329).
     phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
     postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
-    location = models.CharField(_("location"), max_length=200, blank=True)
-    #: Where the location points on the map, when an offline dataset places it (#108).
-    #: City level, deliberately: a search at street precision is a map of where the
-    #: person will be in the morning, and that is not a column to keep.
-    location_lat = models.FloatField(_("latitude"), null=True, blank=True, editable=False)
-    location_lon = models.FloatField(_("longitude"), null=True, blank=True, editable=False)
-    location_resolved_from = models.CharField(
-        _("location resolved from"), max_length=200, blank=True
-    )
-    location_resolved_at = models.DateTimeField(
-        _("location resolved"), null=True, blank=True, editable=False
-    )
-    location_resolved_by = models.CharField(
-        _("location resolved by"), max_length=20, choices=LocationSource, blank=True
-    )
     industries = models.ManyToManyField(
         Industry, blank=True, related_name="companies", verbose_name=_("industries")
     )
@@ -432,47 +426,68 @@ class Company(OwnedModel):
 
     def save(self, *args, **kwargs) -> None:
         slugs.keep_name_key(self, kwargs)
-        # A correction a person made is not a guess to be made again: the text it was
-        # made from is not this location's text, so the comparison below would not
-        # keep it either way.
-        # Switched off (#700), nothing is placed and nothing already placed is touched:
-        # the text stays unresolved, so the first save after it is back on guesses again.
-        if (
-            self.location_resolved_by != LocationSource.MANUAL
-            and self.location != self.location_resolved_from
-            and self._map_offered()
-        ):
-            self.apply_location_guess()
-        super().save(*args, **kwargs)
+        # The location is no column (#702): a save that names it writes the address below.
+        if kwargs.get("update_fields") is not None and "location" in kwargs["update_fields"]:
+            kwargs["update_fields"] = [f for f in kwargs["update_fields"] if f != "location"]
+        if kwargs.get("update_fields") != []:
+            super().save(*args, **kwargs)
+        pending = self.__dict__.pop("_pending_location", None)
+        if pending:
+            self._write_location(pending)
 
-    def _map_offered(self) -> bool:
-        return placing_offered(self.owner)
+    # ------------------------------------------------------------------ where it is (#702)
+    #
+    # A company's location was one line of text with a city-level point beside it (#108).
+    # Since #702 where a company is lives in its postal addresses, which can say a street, be
+    # several and be placed at a postcode; the line is what the primary one says, town and
+    # country, and the old columns are gone. Everything that wrote a line -- the API, a CSV, a
+    # capture, an archive from before format 68 -- still can: the line is written as a town
+    # and a country into the primary address when the company is saved.
 
-    def apply_location_guess(self) -> None:
-        """Put this location on the map from the offline dataset, or nowhere at all (#108).
+    @property
+    def location(self) -> str:
+        """Its primary address's town and country, as one line; never a street."""
+        from postulo.core import phones
 
-        Run when the location is saved and never in the background, the rule capture
-        already follows: the resolution is a guess made of a table this machine has,
-        and it happens the moment its row is written. A location that resolves to
-        nothing is not an error — it is a place the map does not draw, and the list
-        beside the map still says where the company is. A correction a person made for
-        this same text is not re-guessed, because it is not one the location would
-        produce: the record keeps the text the coordinates belong to, and the same
-        text produces no new guess.
+        pending = self.__dict__.get("_pending_location")
+        if pending is not None:
+            return pending
+        if not self.pk:
+            return ""
+        rows = list(self.postal_addresses.all())
+        address = next((row for row in rows if row.is_primary), rows[0] if rows else None)
+        if address is None:
+            return ""
+        parts = [address.municipality.strip(), phones.country_name(address.country)]
+        return ", ".join(part for part in parts if part)
+
+    @location.setter
+    def location(self, value) -> None:
+        self.__dict__["_pending_location"] = " ".join(str(value or "").split())[:200]
+
+    def _write_location(self, text: str) -> None:
+        """A typed line as the town and country of the primary address.
+
+        Into a primary that holds no more than a town and a country, which is what a line
+        could ever have said; beside a fuller one, as an address of its own; and not at all
+        where an address already says it.
         """
-        from . import places
+        from postulo.core.models import PostalAddress
 
-        self.location_resolved_from = self.location
-        self.location_resolved_at = timezone.now()
-        answer = places.resolve(self.location)
-        if answer is None:
-            self.location_lat = None
-            self.location_lon = None
-            self.location_resolved_by = ""
-        else:
-            self.location_lat = answer["lat"]
-            self.location_lon = answer["lon"]
-            self.location_resolved_by = LocationSource.GUESSED
+        town, country = split_location(text)
+        addresses = list(self.postal_addresses.all())
+        probe = PostalAddress(
+            owner=self.owner, holder=self, kind="work", municipality=town, country=country
+        )
+        if any(row.comparable == probe.comparable_form() for row in addresses):
+            return
+        primary = next((row for row in addresses if row.is_primary), None)
+        if primary is not None and not (primary.street or primary.postcode):
+            primary.municipality, primary.country, primary.region = town, country, ""
+            primary.save()
+            return
+        probe.is_primary = primary is None
+        probe.save()
 
     @property
     def is_employment_service(self) -> bool:

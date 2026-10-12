@@ -102,7 +102,7 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
             .get_queryset()
             .with_table_data()
             .select_related("parent")
-            .prefetch_related("industries", "identifiers")
+            .prefetch_related("industries", "identifiers", "postal_addresses")
         )
         # Through `clean_query`, as the search over everything reads its own: the words
         # with their spaces tidied, and no more than two hundred characters of them. An
@@ -159,6 +159,160 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         return context
 
 
+def pinned_addresses(person) -> list[dict]:
+    """Every address the map draws for ``person``, as text first (#702).
+
+    A company's addresses, every one (a company only the career added waits until it has a
+    posting, #683); a contact's and the person's own only where they asked for it, because a
+    home is somewhere somebody can be found. Each says whose it is and what kind, and where:
+    its town and country, never its street. A point placed while the map was switched off
+    for the words it has now is worked out here, without writing anything.
+    """
+    from django.contrib.contenttypes.models import ContentType
+
+    from postulo.accounts.models import Profile
+    from postulo.core import phones
+    from postulo.core.models import PostalAddress
+
+    from . import placing
+    from .models import Contact
+
+    types = ContentType.objects.get_for_models(Company, Contact, Profile)
+    company_type, contact_type, profile_type = (types[m].pk for m in (Company, Contact, Profile))
+    rows = PostalAddress.objects.for_user(person).filter(
+        Q(content_type_id=company_type)
+        | Q(content_type_id__in=[contact_type, profile_type], on_map=True)
+    )
+    companies = {
+        company.pk: company
+        for company in Company.objects.for_user(person).filter(from_career=False)
+    }
+    contacts = {contact.pk: contact for contact in Contact.objects.for_user(person)}
+    found = []
+    for row in rows.order_by("municipality", "pk"):
+        if row.content_type_id == company_type:
+            company = companies.get(row.object_id)
+            if company is None:
+                continue
+            name, url, is_company = (
+                company.name,
+                reverse("jobs:company_detail", args=[company.pk]),
+                True,
+            )
+        elif row.content_type_id == contact_type:
+            contact = contacts.get(row.object_id)
+            if contact is None:
+                continue
+            name, url, is_company = (
+                contact.name,
+                reverse("jobs:contact_update", args=[contact.pk]),
+                False,
+            )
+        else:
+            name, url, is_company = str(_("You")), reverse("accounts:profile"), False
+        lat, lon = row.latitude, row.longitude
+        if row.placed_by not in placing.KEPT and row.place_key() != row.placed_from:
+            placed = places_data_place(row)
+            lat, lon = (placed["lat"], placed["lon"]) if placed else (None, None)
+        place = ", ".join(
+            part for part in (row.municipality.strip(), phones.country_name(row.country)) if part
+        ) or str(_("No town given"))
+        what = row.label if row.kind == PostalAddress.Kind.OTHER else row.get_kind_display()
+        found.append(
+            {
+                "place": place,
+                "name": name,
+                "url": url,
+                "what": what,
+                "company": is_company,
+                "lat": lat,
+                "lon": lon,
+            }
+        )
+    return found
+
+
+def places_data_place(row) -> dict | None:
+    from . import places
+
+    answer = places.place(row.postcode, row.municipality, row.country)
+    return answer[1] if answer else None
+
+
+class AddressPlaceView(LoginRequiredMixin, View):
+    """Put one address on the map by hand, or take a hand-placed point off (#702).
+
+    The one way an address is placed at a street's precision: a person drops the pin where
+    it is, on a map drawn over the operator's tiles, or types the two numbers. Nothing is
+    looked up anywhere; the point is stored on the instance and never leaves it. Taken off,
+    the address is placed from its postcode or town again as it would be on a save.
+    """
+
+    template_name = "jobs/address_place.html"
+
+    def _address(self, request, pk: int):
+        from postulo.core.models import PostalAddress
+
+        if not mapping.map_offered(request.user):
+            raise Http404
+        return get_object_or_404(PostalAddress.objects.for_user(request.user), pk=pk)
+
+    def _back(self, request, address) -> str:
+        from postulo.accounts.models import Profile
+
+        from .models import Contact
+
+        holder = address.holder
+        if isinstance(holder, Company):
+            fallback = reverse("jobs:company_update", args=[holder.pk])
+        elif isinstance(holder, Contact):
+            fallback = reverse("jobs:contact_update", args=[holder.pk])
+        elif isinstance(holder, Profile):
+            fallback = reverse("accounts:profile")
+        else:
+            fallback = reverse("jobs:company_map")
+        return safe_next(request, fallback)
+
+    def get(self, request, pk: int):
+        address = self._address(request, pk)
+        current = tiles.current()
+        context = {
+            "address": address,
+            "back": self._back(request, address),
+            "tiles": current,
+            "outline": [] if current.fetched else outline.rings(),
+        }
+        response = render(request, self.template_name, context)
+        response._csp_config = tiles.policy_for(current)
+        return response
+
+    def post(self, request, pk: int):
+        from . import placing
+
+        address = self._address(request, pk)
+        if request.POST.get("take_off"):
+            placing.take_off_by_hand(address)
+            messages.success(request, _("Taken off by hand: it is placed from its address again."))
+            return redirect(self._back(request, address))
+        try:
+            lat = float(request.POST.get("latitude", ""))
+            lon = float(request.POST.get("longitude", ""))
+        except ValueError:
+            lat = lon = None
+        if lat is None or not (-90 <= lat <= 90) or not (-180 <= lon <= 180):
+            messages.error(
+                request,
+                _(
+                    "Drop the pin on the map, or give a latitude between -90 and 90 and a "
+                    "longitude between -180 and 180."
+                ),
+            )
+            return redirect(request.path)
+        placing.place_by_hand(address, round(lat, 6), round(lon, 6))
+        messages.success(request, _("Placed by hand. Changing the address will not move it."))
+        return redirect(self._back(request, address))
+
+
 class CompanyMapView(LoginRequiredMixin, TemplateView):
     """The places the person's companies are in, and the map that draws them (#108, #898).
 
@@ -185,43 +339,30 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs) -> dict:
         from . import places as places_data
-        from .models import LocationSource
 
         context = super().get_context_data(**kwargs)
         places: dict[str, dict] = {}
-        rows = (
-            Company.objects.for_user(self.request.user)
-            .filter(location__gt="")
-            # A company only the career added has no place on the map until it has a
-            # posting (#683), which is when it stops being marked.
-            .filter(from_career=False)
-            .values_list(
-                "location",
-                "name",
-                "pk",
-                "location_lat",
-                "location_lon",
-                "location_resolved_from",
-                "location_resolved_by",
-            )
-            .order_by("location", "name")
-        )
-        for location, name, pk, lat, lon, resolved_from, resolved_by in rows:
-            if resolved_by != LocationSource.MANUAL and location != resolved_from:
-                # The text changed while the map was switched off, so the stored
-                # coordinate belongs to the old text. Placed here and not saved: a page
-                # view writes nothing.
-                answer = places_data.resolve(location)
-                lat, lon = (answer["lat"], answer["lon"]) if answer else (None, None)
+        for pinned in pinned_addresses(self.request.user):
             entry = places.setdefault(
-                location,
-                {"label": location, "count": 0, "companies": [], "lat": None, "lon": None},
+                pinned["place"],
+                {
+                    "label": pinned["place"],
+                    "count": 0,
+                    "companies": [],
+                    "people": [],
+                    "lat": None,
+                    "lon": None,
+                },
             )
-            entry["count"] += 1
-            entry["companies"].append((name, reverse("jobs:company_detail", args=[pk])))
-            if entry["lat"] is None and lat is not None:
-                entry["lat"] = lat
-                entry["lon"] = lon
+            if pinned["company"]:
+                if (pinned["name"], pinned["url"]) not in entry["companies"]:
+                    entry["companies"].append((pinned["name"], pinned["url"]))
+                    entry["count"] += 1
+            else:
+                entry["people"].append((pinned["name"], pinned["url"], pinned["what"]))
+            if entry["lat"] is None and pinned["lat"] is not None:
+                entry["lat"] = pinned["lat"]
+                entry["lon"] = pinned["lon"]
         context["places"] = sorted(
             places.values(), key=lambda entry: (-entry["count"], entry["label"].casefold())
         )
@@ -234,11 +375,15 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
                 "lat": entry["lat"],
                 "lon": entry["lon"],
                 "companies": [{"name": name, "url": url} for name, url in entry["companies"]],
+                "people": [
+                    {"name": name, "url": url, "what": what} for name, url, what in entry["people"]
+                ],
             }
             for entry in context["places"]
             if entry["lat"] is not None
         ]
         context["dataset_available"] = places_data.available()
+        context["postcodes_available"] = places_data.postcodes_available()
         context["tiles"] = tiles.current()
         context["outline"] = [] if context["tiles"].fetched else outline.rings()
         return context
@@ -562,6 +707,7 @@ class CompanyCreateView(
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
+    addresses_pinnable = False
 
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:
@@ -585,6 +731,7 @@ class CompanyUpdateView(
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
+    addresses_pinnable = False
 
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:

@@ -139,7 +139,7 @@ def test_the_kept_company_takes_what_it_had_nothing_in(user, acme, limited):
     assert acme.name == "Acme", "the name that was kept is the name"
     assert acme.website == "https://acme.example"
     assert acme.careers_url == "https://acme.example/jobs"
-    assert acme.location == "Leeds"
+    assert acme.location == "Leeds, United Kingdom", "its address moved, and is the primary"
 
 
 def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_down(user):
@@ -160,13 +160,16 @@ def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_dow
     plan = merging.merge_companies(kept, other)
 
     kept.refresh_from_db()
-    assert (kept.website, kept.location) == ("https://acme.example", "London")
+    assert (kept.website, kept.location) == ("https://acme.example", "London, United Kingdom")
+    assert sorted(kept.postal_addresses.values_list("municipality", flat=True)) == [
+        "Leeds",
+        "London",
+    ], "the other's address moved beside the kept one's, which stays the primary"
     assert kept.kind == CompanyKind.EMPLOYER
     assert [row.value for row in kept.identifiers.all()] == ["Q95"]
     differed = {row.label: (row.kept, row.other) for row in plan.differences}
     assert differed == {
         "Website": ("https://acme.example", "https://acme.co.uk"),
-        "Location": ("London", "Leeds"),
         "Type": ("Employer", "Public employment service"),
         "Wikidata": ("Q95", "Q96"),
     }
@@ -174,7 +177,6 @@ def test_where_both_say_something_the_kept_one_wins_and_the_other_is_written_dow
         "The good one.",
         "Merged with Acme Ltd on ",
         "Website: https://acme.co.uk",
-        "Location: Leeds",
         "Type: Public employment service",
         "Wikidata: Q96",
         "Met them at the fair.",
@@ -258,24 +260,20 @@ def test_a_logo_the_kept_company_has_no_room_for_is_said_and_then_gone(user, acm
     assert "Its logo" in acme.notes
 
 
-def test_the_place_goes_with_the_words_for_it(user, acme):
-    from postulo.jobs.models import LocationSource
+def test_the_place_goes_with_the_address_it_is_of(user, acme):
+    """A point placed by hand moves with its address, and is not placed again (#702)."""
+    from postulo.jobs import placing
 
     other = company(user, "Acme Ltd", location="Springfield")
-    Company.objects.filter(pk=other.pk).update(
-        location_lat=39.8,
-        location_lon=-89.6,
-        location_resolved_from="Springfield, Illinois",
-        location_resolved_by=LocationSource.MANUAL,
-    )
-    other.refresh_from_db()
+    address = other.postal_addresses.get()
+    placing.place_by_hand(address, 39.8, -89.6)
 
     merging.merge_companies(acme, other)
 
-    acme.refresh_from_db()
-    assert acme.location == "Springfield"
-    assert (acme.location_lat, acme.location_lon) == (39.8, -89.6)
-    assert acme.location_resolved_by == LocationSource.MANUAL, "a correction is not guessed again"
+    moved = acme.postal_addresses.get()
+    assert moved.pk == address.pk and moved.municipality == "Springfield"
+    assert (moved.latitude, moved.longitude) == (39.8, -89.6)
+    assert moved.placed_by == "manual", "a point put there by hand is not guessed again"
 
 
 # --------------------------------------------------------------- the ownership tree
@@ -486,7 +484,8 @@ def test_the_list_offers_only_the_persons_own(client, user, other_user, acme):
 def test_the_page_shows_what_would_move_before_anything_does(client, user, acme, limited):
     contact(user, "Cave Johnson", company=limited)
     applied(user, limited)
-    Company.objects.filter(pk=acme.pk).update(location="London")
+    acme.location = "London"
+    acme.save()
     client.force_login(user)
 
     page = " ".join(client.get(company_page(acme, limited)).content.decode().split())
@@ -506,12 +505,13 @@ def test_the_page_shows_what_would_move_before_anything_does(client, user, acme,
         "Wikidata: Q95",
         "Industries",
         "Robotics",
+        "Postal addresses",
+        "Leeds",
     ):
         assert line in moves, line
-    fills = page[page.index("data-merge-fills") : page.index("data-merge-differences")]
+    fills = page[page.index("data-merge-fills") :]
     assert "Website" in fills and "https://acme.example" in fills
-    differences = page[page.index("data-merge-differences") : page.index("data-merge-written")]
-    assert "Location" in differences and "London" in differences and "Leeds" in differences
+    assert "data-merge-differences" not in page, "an address moves; it is not a difference"
     assert "1 application gets a line on its timeline" in page
     assert 'method="post"' in page and f'name="with" value="{limited.pk}"' in page
     assert f'href="{company_page(limited, acme)}"' in page, "and the two can be exchanged"

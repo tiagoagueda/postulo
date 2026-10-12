@@ -520,6 +520,8 @@ FACTORIES: dict[str, Callable] = {
     "jobs:company_identifier_remove": pk_of(company_identifier),
     "jobs:company_detail": pk_of(company),
     "jobs:company_logo": pk_of(logo_kept),
+    # placing an address by hand: somebody's own address, on their *Your details* (#702)
+    "jobs:address_place": pk_of(postal_address),
     "jobs:company_logo_action": pk_of(company, action="remove"),
     # The record that would be kept, in the address. The one merged into it is named in
     # the query, and tests/test_merging.py asks for somebody else's there as well (#239).

@@ -26,6 +26,6 @@ def test_extra_fields_beside_the_cell_are_ignored(client, user):
     assert response.status_code == 200, response.content
     company.refresh_from_db()
     assert company.name == "Aperture Science"
-    assert company.location == "Cambridge", "only the named field changed"
+    assert company.location == "Cambridge, United Kingdom", "only the named field changed"
     assert company.website == ""
     assert not Industry.objects.for_user(user).filter(name="Smuggling").exists()
