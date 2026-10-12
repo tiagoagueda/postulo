@@ -816,3 +816,29 @@ def test_the_count_detector_knows_the_difference():
         uncounted_counts("{% blocktranslate with name=n %}Hello {{ name }}{% endblocktranslate %}")
         == []
     )
+
+
+# htmx is told not to run what a response carries (#823): `allowEval` off refuses `hx-on`, the
+# `js:` prefixes and trigger filters, and `allowScriptTags` off leaves a `<script>` in a swapped
+# fragment alone. The content security policy already forbids both; this keeps the setting and
+# the templates true to it, so nothing is written that only works where the policy is weakened.
+HTMX_SCRIPTING = re.compile(
+    r"""\bhx-on[:\-]|\bhx-on=|\bhx-vals\s*=\s*["']\s*js:|\bhx-headers\s*=\s*["']\s*js:|"""
+    r"""\bhx-trigger\s*=\s*["'][^"']*\[[^"']*\]|javascript:""",
+    re.IGNORECASE,
+)
+
+
+def test_htmx_is_configured_not_to_run_what_a_response_carries():
+    base = next(p for p in TEMPLATES if p.name == "base.html" and p.parent.name == "templates")
+    text = base.read_text(encoding="utf-8")
+    assert '"allowEval":false' in text and '"allowScriptTags":false' in text
+
+
+@pytest.mark.parametrize(
+    "path", TEMPLATES, ids=lambda p: str(p.relative_to(TEMPLATES[0].parents[3]))
+)
+def test_no_template_uses_an_htmx_scripting_surface(path: Path):
+    text = COMMENT.sub("", path.read_text(encoding="utf-8"))
+    found = HTMX_SCRIPTING.search(text)
+    assert not found, f"{path.name}: {found.group(0)!r} is script htmx would have to evaluate"
