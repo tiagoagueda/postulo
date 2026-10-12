@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A password change, reset or set, an address change and a second-factor change now send a notification to the primary address (ACCOUNT_EMAIL_NOTIFICATIONS) (#793)
 - Only the operator's own account can remove another account's superuser flag from People; an ordinary administrator is refused, and both outcomes are logged (#792)
 - Gravatar is fetched through the public-only client, like a logo, and the Hardening page lists what POSTULO_CONNECTIONS_ALLOW_PRIVATE widens and what it never does (#537)
 - The CSRF cookie is HttpOnly like the session cookie, as the threat model says of every cookie; the script takes the token from the form it sends (#538)

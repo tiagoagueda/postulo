@@ -264,6 +264,10 @@ ACCOUNT_FORMS = {
     "request_login_code": "postulo.accounts.forms.RequestLoginCodeForm",
 }
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
+# Tell the account holder when a password, an address or a second factor changes (#793): a
+# session somebody else holds would otherwise change them and be noticed at the next sign-in.
+# Sent through the adapter's own `send_mail`, so the pluggable mail backend carries it.
+ACCOUNT_EMAIL_NOTIFICATIONS = True
 ACCOUNT_USER_MODEL_EMAIL_FIELD = "email"
 ACCOUNT_PRESERVE_USERNAME_CASING = False
 ACCOUNT_USERNAME_MIN_LENGTH = 3
