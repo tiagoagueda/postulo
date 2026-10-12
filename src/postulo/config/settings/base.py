@@ -723,7 +723,13 @@ POSTULO_CONNECTIONS_ALLOW_PRIVATE = env.bool("POSTULO_CONNECTIONS_ALLOW_PRIVATE"
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    # The stylesheet and scripts are public: read by the web server's user, not the one that ran
+    # collectstatic. They must not take the owner-only modes the uploads above are given, or the
+    # image, which collects them as root and runs as another user, cannot serve its own files.
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "OPTIONS": {"file_permissions_mode": 0o644, "directory_permissions_mode": 0o755},
+    },
 }
 
 # ---------------------------------------------------------------------- tasks
