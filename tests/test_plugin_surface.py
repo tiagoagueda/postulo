@@ -62,6 +62,10 @@ REACHING_PAST: dict[str, dict[str, str]] = {
             "plugin holds no rows, and a notice has to outlive the send that left it, scoped "
             "to its owner by Postulo rather than by the plugin (#209)"
         ),
+        "postulo.notifications.pushkey": (
+            "the salt the signing key is derived with, which lives in the instance's settings "
+            "row and depends on whether a subscription exists; a plugin holds neither (#821)"
+        ),
     },
     "own_mail": {
         "postulo.core.mail": (

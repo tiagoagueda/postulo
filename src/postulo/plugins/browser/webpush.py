@@ -9,7 +9,8 @@ hundred lines that match the RFC's own worked example are easier to audit than t
 packages that are not.
 
 **The signing key is derived, not stored.** It comes from the same material that encrypts a
-connection's secrets (`POSTULO_FIELD_KEY`, else `SECRET_KEY`). A subscription is kept as one of
+connection's secrets (`POSTULO_FIELD_KEY`, else `SECRET_KEY`) and, on an instance that began with
+no subscription, a random salt kept in the database (#821). A subscription is kept as one of
 those secrets, so the day that material changes the subscriptions are unreadable anyway, and a
 key that changes on the same day costs nothing extra. A stored key would be one more thing to
 back up, and one that could outlive the subscriptions it signs for.
@@ -32,6 +33,8 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 from django.conf import settings
 from django.utils.translation import gettext as _
+
+from postulo.notifications import pushkey
 
 #: The order of P-256, which a derived private key has to be below.
 _P256_ORDER = 0xFFFFFFFF00000000FFFFFFFFFFFFFFFFBCE6FAADA7179E84F3B9CAC2FC632551
@@ -89,13 +92,23 @@ def _raw_public(key: ec.EllipticCurvePublicKey) -> bytes:
 
 
 def application_key() -> ec.EllipticCurvePrivateKey:
-    """This instance's VAPID key, the same every time for the same secret material.
+    """This instance's VAPID key, the same every time for the same secret material and salt.
 
     SHA-512 rather than SHA-256 so that reducing the digest into the curve's order leaves no
-    bias worth the name.
+    bias worth the name. With a salt (see `pushkey.salt`) the key is an HKDF of the material and the
+    salt, so the public point is not a function of the material alone (#821).
     """
     material = getattr(settings, "POSTULO_FIELD_KEY", "") or settings.SECRET_KEY
-    digest = hashlib.sha512(b"postulo-web-push-vapid:" + material.encode("utf-8")).digest()
+    salt = pushkey.salt()
+    if salt:
+        digest = HKDF(
+            algorithm=hashes.SHA512(),
+            length=64,
+            salt=salt,
+            info=b"postulo-web-push-vapid-v2",
+        ).derive(material.encode("utf-8"))
+    else:
+        digest = hashlib.sha512(b"postulo-web-push-vapid:" + material.encode("utf-8")).digest()
     scalar = int.from_bytes(digest, "big") % (_P256_ORDER - 1) + 1
     return ec.derive_private_key(scalar, ec.SECP256R1())
 

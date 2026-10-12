@@ -1161,6 +1161,13 @@ class SiteSettings(models.Model):
     #: a readable password in the policy row would be a new kind of secret in a codebase
     #: that has deliberately avoided having one. Read through `email_password`.
     email_password_encrypted = models.TextField(_("password"), blank=True)
+    #: Random bytes, as hex, that the browser notifications' signing key is derived with (#821).
+    #: Written once, the first time a key is needed on an instance that has no browser
+    #: subscription yet. Without it the public key every signed-in person is handed would be a
+    #: pure function of the instance's secret material; with it that point cannot be tested
+    #: against a guess of the material by anybody who lacks this row. Empty means the older
+    #: derivation, which an instance with subscriptions keeps so they go on being delivered.
+    web_push_salt = models.CharField(max_length=64, blank=True, editable=False)
     #: How the connection is encrypted, as one choice rather than two booleans. Django's
     #: SMTP backend raises on `use_tls` and `use_ssl` together, and rightly -- they are
     #: alternatives, not layers -- so a checkbox each would offer a pair that cannot be
