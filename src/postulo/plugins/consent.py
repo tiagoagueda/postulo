@@ -286,13 +286,20 @@ def exchange(token_url: str, *, client_id: str, client_secret: str, form: dict) 
 
     body = {**form, "client_id": client_id, "client_secret": client_secret}
     try:
-        with http.client() as session:
+        # No redirects (#794): the body carries the client secret and the grant, and a 307 or
+        # 308 would deliver both to wherever the answer points. A token endpoint that
+        # redirects is a failure to be reported, not followed.
+        with http.client(follow_redirects=False) as session:
             response = session.post(token_url, data=body)
     except http.DestinationRefused as error:
         raise ConsentFailed(str(error)) from error
     except httpx.HTTPError as error:
         raise ConsentFailed(f"{type(error).__name__}: {error}") from error
 
+    if 300 <= response.status_code < 400:
+        raise ConsentFailed(
+            str(_("The provider's token address redirected, and Postulo does not follow it."))
+        )
     if response.status_code in (400, 401) and _says_the_grant_is_gone(response):
         raise ConsentWithdrawn(
             str(_("The provider will not renew this. Somebody has to agree to it again."))
