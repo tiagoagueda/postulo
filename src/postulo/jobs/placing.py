@@ -51,7 +51,7 @@ def place_by_hand(address, lat: float, lon: float) -> None:
 
 
 def take_off_by_hand(address) -> None:
-    """Forget a hand-placed point: the address is placed from its words again."""
+    """Forget a point put there by hand or from Wikidata (#701): placed from its words again."""
     address.placed_by = ""
     address.placed_from = ""
     address.latitude = address.longitude = None

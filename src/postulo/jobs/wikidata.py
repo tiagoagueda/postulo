@@ -112,6 +112,39 @@ def names_from(labels: dict) -> dict[str, str]:
     return found
 
 
+#: The Earth, as Wikidata names the globe a coordinate is on; a crater on the Moon is not a
+#: place on the map.
+EARTH = "http://www.wikidata.org/entity/Q2"
+
+
+def point_from(claims: dict) -> tuple[float, float] | None:
+    """Where the item is, from its coordinate location (P625), or ``None`` (#701).
+
+    The statement ranked *preferred*, or the only one there is; none, or several with none
+    preferred, is nothing rather than a guess. A headquarters (P159) is another item and
+    another request, and is not followed.
+    """
+    statements = [
+        row
+        for row in (claims.get("P625") if isinstance(claims, dict) else None) or []
+        if isinstance(row, dict) and row.get("rank") != "deprecated"
+    ]
+    preferred = [row for row in statements if row.get("rank") == "preferred"]
+    chosen = preferred if preferred else statements
+    if len(chosen) != 1:
+        return None
+    value = (((chosen[0].get("mainsnak") or {}).get("datavalue") or {}).get("value")) or {}
+    if not isinstance(value, dict) or value.get("globe", EARTH) != EARTH:
+        return None
+    try:
+        lat, lon = float(value["latitude"]), float(value["longitude"])
+    except (KeyError, TypeError, ValueError):
+        return None
+    if not (-90 <= lat <= 90 and -180 <= lon <= 180):
+        return None
+    return lat, lon
+
+
 def fetch(qid: str) -> Item:
     """Ask Wikidata for one item. Raises `WikidataRefused` with the reason."""
     qid = (qid or "").strip().upper()
@@ -125,7 +158,11 @@ def fetch(qid: str) -> Item:
     found_qid, entity = next(iter(entities.items()))
     if not isinstance(entity, dict):
         raise WikidataRefused(_("Wikidata's answer was not an item."))
-    return Item(qid=str(found_qid), names=names_from(entity.get("labels") or {}))
+    return Item(
+        qid=str(found_qid),
+        names=names_from(entity.get("labels") or {}),
+        point=point_from(entity.get("claims") or {}),
+    )
 
 
 def _get(url: str) -> dict:

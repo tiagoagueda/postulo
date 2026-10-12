@@ -329,3 +329,113 @@ def test_the_api_lists_the_names_beside_the_name(client, user):
     assert body["names"] == [
         {"language": "pt", "name": "Universidade de Aveiro", "source": "typed"}
     ]
+
+
+# ------------------------------------------------------------- where it is (#701)
+
+
+def point_claim(lat, lon, rank="normal", globe="http://www.wikidata.org/entity/Q2"):
+    return {
+        "rank": rank,
+        "mainsnak": {"datavalue": {"value": {"latitude": lat, "longitude": lon, "globe": globe}}},
+    }
+
+
+def with_point(*claims):
+    body = json.loads(json.dumps(AVEIRO))
+    body["entities"]["Q29671"]["claims"] = {"P625": list(claims)}
+    return body
+
+
+def test_the_coordinate_comes_from_the_same_answer(wikidata_answers):
+    answers, seen = wikidata_answers
+    an_item(answers, body=with_point(point_claim(40.63027778, -8.6575)))
+
+    item = wikidata.fetch("Q29671")
+
+    assert item.point == (40.63027778, -8.6575)
+    assert len(seen) == 1, "one request for the names and the place"
+
+
+@pytest.mark.parametrize(
+    "claims, expected",
+    [
+        ([], None),
+        ([point_claim(1, 2), point_claim(3, 4)], None),
+        ([point_claim(1, 2), point_claim(3, 4, rank="preferred")], (3.0, 4.0)),
+        ([point_claim(1, 2, rank="deprecated"), point_claim(3, 4)], (3.0, 4.0)),
+        ([point_claim(1, 2, globe="http://www.wikidata.org/entity/Q405")], None),
+        ([point_claim(91, 2)], None),
+    ],
+)
+def test_only_one_place_on_earth_is_a_point(claims, expected):
+    assert wikidata.point_from({"P625": claims}) == expected
+
+
+def keep_after_fetch(client, user, company):
+    client.force_login(user)
+    client.post(reverse("jobs:company_wikidata", args=[company.pk]))
+    client.post(reverse("jobs:company_wikidata", args=[company.pk]), {"keep": "1"})
+
+
+def test_kept_the_point_places_the_primary_address(client, user, wikidata_answers):
+    answers, _seen = wikidata_answers
+    an_item(answers, body=with_point(point_claim(40.63, -8.6575)))
+    company = aperture(user)
+    company.location = "Aveiro, PT"
+    company.save()
+
+    keep_after_fetch(client, user, company)
+
+    address = company.postal_addresses.get()
+    assert (address.latitude, address.longitude, address.placed_by) == (40.63, -8.6575, "wikidata")
+    address.street = "Campus Universitário"
+    address.municipality = "Aveiro City"
+    address.save()
+    address.refresh_from_db()
+    assert address.latitude == 40.63, "editing the words does not move it"
+
+
+def test_a_point_placed_by_hand_beats_wikidatas(client, user, wikidata_answers):
+    from postulo.jobs import placing
+
+    answers, _seen = wikidata_answers
+    an_item(answers, body=with_point(point_claim(40.63, -8.6575)))
+    company = aperture(user)
+    company.location = "Aveiro, PT"
+    company.save()
+    placing.place_by_hand(company.postal_addresses.get(), 1.0, 2.0)
+
+    keep_after_fetch(client, user, company)
+
+    address = company.postal_addresses.get()
+    assert (address.latitude, address.placed_by) == (1.0, "manual")
+
+
+def test_a_company_with_no_address_keeps_no_point(client, user, wikidata_answers):
+    answers, _seen = wikidata_answers
+    an_item(answers, body=with_point(point_claim(40.63, -8.6575)))
+    company = aperture(user)
+    client.force_login(user)
+    client.post(reverse("jobs:company_wikidata", args=[company.pk]))
+
+    preview = client.get(reverse("jobs:company_wikidata", args=[company.pk])).content.decode()
+    client.post(reverse("jobs:company_wikidata", args=[company.pk]), {"keep": "1"})
+
+    assert "has no address to put it on" in preview
+    assert not company.postal_addresses.exists()
+
+
+def test_taking_wikidatas_point_off_places_it_from_its_words(client, user, wikidata_answers):
+    answers, _seen = wikidata_answers
+    an_item(answers, body=with_point(point_claim(40.63, -8.6575)))
+    company = aperture(user)
+    company.location = "Aveiro, PT"
+    company.save()
+    keep_after_fetch(client, user, company)
+    address = company.postal_addresses.get()
+
+    client.post(reverse("jobs:address_place", args=[address.pk]), {"take_off": "1"})
+
+    address.refresh_from_db()
+    assert address.placed_by != "wikidata"

@@ -54,11 +54,11 @@
     </div>
   </form>
 
-  {% if address.placed_by == "manual" %}
+  {% if address.placed_by == "manual" or address.placed_by == "wikidata" %}
     <form method="post" class="max-w-2xl">
       {% csrf_token %}
       <input type="hidden" name="next" value="{{ back }}">
-      <button type="submit" name="take_off" value="1" class="btn" data-variant="outline">{% translate "Take it off by hand" %}</button>
+      <button type="submit" name="take_off" value="1" class="btn" data-variant="outline">{% if address.placed_by == "wikidata" %}{% translate "Take Wikidata's point off" %}{% else %}{% translate "Take it off by hand" %}{% endif %}</button>
     </form>
   {% endif %}
 {% endblock %}

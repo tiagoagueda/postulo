@@ -250,6 +250,11 @@ def wikidata_offered(person) -> bool:
     return bool(decide(WIKIDATA, person).on)
 
 
+def _primary_address(company):
+    rows = list(company.postal_addresses.all())
+    return next((row for row in rows if row.is_primary), rows[0] if rows else None)
+
+
 class CompanyWikidataView(LoginRequiredMixin, View):
     """*Fetch from Wikidata*, what came back, and keeping it (#673).
 
@@ -265,7 +270,9 @@ class CompanyWikidataView(LoginRequiredMixin, View):
         if not wikidata_offered(request.user):
             raise Http404
         return get_object_or_404(
-            Company.objects.for_user(request.user).prefetch_related("identifiers", "names"),
+            Company.objects.for_user(request.user).prefetch_related(
+                "identifiers", "names", "postal_addresses"
+            ),
             pk=pk,
         )
 
@@ -287,10 +294,18 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             ),
             key=lambda row: row[0].casefold(),
         )
+        address = _primary_address(company)
         return render(
             request,
             self.template_name,
-            {"company": company, "held": held, "names": names},
+            {
+                "company": company,
+                "held": held,
+                "names": names,
+                # Where the point would go, and whether a hand-placed one is in its way (#701).
+                "address": address,
+                "by_hand": address is not None and address.placed_by == address.Placed.MANUAL,
+            },
         )
 
     def post(self, request, pk: int):
@@ -350,7 +365,21 @@ class CompanyWikidataView(LoginRequiredMixin, View):
             self.keep_point(company, held)
 
     def keep_point(self, company, held) -> None:
-        """Where it is, from the same answer (#701): nothing here yet."""
+        """Where it is, from the same answer, on the primary address (#701).
+
+        A point a person placed by hand beats Wikidata's, which beats one placed from the
+        address's postcode or town; a company with no address keeps no point.
+        """
+        point = held.get("point")
+        address = point and _primary_address(company)
+        if not address or address.placed_by == address.Placed.MANUAL:
+            return
+        address.latitude, address.longitude = float(point[0]), float(point[1])
+        address.placed_by = address.Placed.WIKIDATA
+        address.placed_at = timezone.now()
+        address.save(
+            update_fields=["latitude", "longitude", "placed_by", "placed_at", "updated_at"]
+        )
 
 
 class CompanyNamesView(LoginRequiredMixin, View):

@@ -22,7 +22,23 @@
       {% else %}
         <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "The item has no name in a language Postulo speaks." %}</p>
       {% endif %}
-      {% block point %}{% endblock %}
+      {% comment %} Where it is, from the same answer (#701): a building, usually, which goes on
+         the primary address; never over a point somebody put there by hand. {% endcomment %}
+      <c-section-title class="mt-4">{% translate "Where it is" %}</c-section-title>
+      {% if held.point %}
+        <p class="text-sm" data-wikidata-point>{{ held.point.0|floatformat:5 }}, {{ held.point.1|floatformat:5 }}</p>
+        <p class="mt-1 text-xs text-ink-500 dark:text-ink-400">
+          {% if not address %}
+            {% translate "The company has no address to put it on: add one, and fetch again." %}
+          {% elif by_hand %}
+            {% translate "Its primary address was placed by hand, and stays where you put it." %}
+          {% else %}
+            {% blocktranslate trimmed with address=address.one_line %}Kept, it places <bdi>{{ address }}</bdi> here on the map, and changing the address's words will not move it.{% endblocktranslate %}
+          {% endif %}
+        </p>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "The item gives no single place." %}</p>
+      {% endif %}
     </div>
     <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
       {% translate "Wikidata's data is in the public domain (CC0). Keeping these replaces any name you typed for the same language, and takes off a name an earlier fetch gave that this one did not." %}
