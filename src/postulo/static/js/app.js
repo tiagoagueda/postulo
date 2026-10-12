@@ -7171,7 +7171,7 @@
       return;
     }
     body.setAttribute("data-service-worker-ready", "");
-    if (!window.isSecureContext || !("serviceWorker" in navigator)) {
+    if (!window.isSecureContext || !("serviceWorker" in navigator) || typeof navigator.serviceWorker.register !== "function") {
       return;
     }
     navigator.serviceWorker

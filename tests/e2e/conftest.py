@@ -108,6 +108,22 @@ def _orphaned_live_server_connections():
     _close_connections_left_behind()
 
 
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    """No service worker, except in the tests about it (#895).
+
+    Since Postulo installs as an app, every signed-in page registers the worker, and the
+    worker fetches the offline page in the background as it installs: in a fresh context,
+    which is every test, one more request the test never asked for, still in flight when
+    it may already be over. A request answered after the session has shut the live
+    server's database down fails a run whose tests all passed, which is what a connection
+    left open by `test_web_app.py` did on the first push. So the rest of the suite runs as
+    it did before, and the worker has `test_web_app.py` to itself, which allows it and
+    takes it down before each test ends.
+    """
+    return {**browser_context_args, "service_workers": "block"}
+
+
 def pytest_terminal_summary(terminalreporter):
     """Page loads a walk asked for twice, so a stall stays in the log without failing it."""
     # Only where this run loaded the walks: the unit job has no Playwright to import them with.

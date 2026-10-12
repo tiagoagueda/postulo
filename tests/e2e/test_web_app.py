@@ -28,6 +28,31 @@ KEPT = """async () => {
 }"""
 
 
+@pytest.fixture
+def browser_context_args(browser_context_args):
+    """The worker, which the rest of the suite blocks (`conftest.py`)."""
+    return {**browser_context_args, "service_workers": "allow"}
+
+
+#: Every registration gone and nothing it started still running.
+TAKEN_DOWN = """async () => {
+  const registrations = await navigator.serviceWorker.getRegistrations();
+  await Promise.all(registrations.map((registration) => registration.unregister()));
+  return registrations.length;
+}"""
+
+
+@pytest.fixture(autouse=True)
+def _no_worker_outlives_the_test(page: Page, live_server):
+    """A worker left running can still be fetching when the live server is gone (#895)."""
+    yield
+    try:
+        page.goto(f"{live_server.url}/healthz")
+        page.evaluate(TAKEN_DOWN)
+    finally:
+        page.context.close()
+
+
 def test_the_manifest_is_one_a_browser_installs_from(page: Page, live_server, applicant):
     sign_in(page, live_server.url)
 
@@ -43,9 +68,17 @@ def test_the_manifest_is_one_a_browser_installs_from(page: Page, live_server, ap
     body = manifest["body"]
     assert body["display"] == "standalone" and body["scope"] == "/" and body["id"] == "/"
     assert any(icon.get("purpose") == "maskable" for icon in body["icons"])
-    for icon in body["icons"]:
-        response = page.request.get(f"{live_server.url}{icon['src']}")
-        assert response.ok and response.headers["content-type"] == "image/png", icon["src"]
+    # From the page rather than `page.request`, whose connection to the live server is kept
+    # open after the test and answered by a thread the session has already shut down.
+    icons = page.evaluate(
+        """(sources) => Promise.all(sources.map(async (source) => {
+          const response = await fetch(source);
+          return [source, response.ok, response.headers.get('content-type')];
+        }))""",
+        [icon["src"] for icon in body["icons"]],
+    )
+    for source, ok, kind in icons:
+        assert ok and kind == "image/png", source
 
 
 def test_with_no_network_the_installed_app_shows_its_offline_page(
