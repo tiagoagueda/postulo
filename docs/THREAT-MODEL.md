@@ -171,7 +171,12 @@ Three things follow, and each is a promise:
    (`POSTULO_FETCH_PORTS`, #780). `POSTULO_CONNECTIONS_ALLOW_PRIVATE` is a decision of the
    operator for the whole instance, not for one plugin or one account: where it is on, every
    account can map the private network through the Test buttons, and that is accepted, and
-   written in `.env.example` and the wiki, rather than hidden (#779).
+   written in `.env.example` and the wiki, rather than hidden (#779). **The one exception is
+   OpenID Connect**: discovery, token and userinfo calls are made by allauth's own HTTP session
+   and not through the guarded client. The provider's address is an environment setting only the
+   operator can write, never a field on a page, so there is no stranger's address for the
+   destination policy to refuse; if that address ever becomes configurable from a page it must
+   be checked with `check_destination` first (#815).
 6. A new secret is stored hashed if it only needs checking, encrypted if it needs using.
    The encrypted set now includes a mail password typed into *Server settings*, under the
    same key as every plugin connection's credentials — which is why #111 made a weak
