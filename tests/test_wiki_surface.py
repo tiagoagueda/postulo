@@ -214,3 +214,29 @@ def test_the_consent_example_imports_the_surface():
 
     assert "from postulo.plugins.api import Consent, FieldSpec, access_token" in text
     assert "postulo.plugins.base import Consent" not in text
+
+
+# --------------------------------------------- pages that sent people to the wrong place (#406)
+
+
+def test_no_page_sends_the_accessibility_choices_to_appearance():
+    for path in sorted(WIKI.glob("*.md")):
+        text = " ".join(path.read_text(encoding="utf-8").split())
+        for choice in ("Keyboard shortcuts", "order number"):
+            assert f"Settings → Appearance → {choice}" not in text, path.name
+            assert not re.search(rf"{choice}[^.]*under \*Settings → Appearance\*", text), path.name
+
+
+def test_no_page_names_a_container_that_does_not_exist():
+    for path in sorted(WIKI.glob("*.md")):
+        assert "docker logs postulo" not in path.read_text(encoding="utf-8"), path.name
+
+
+def test_the_ci_header_names_every_action_the_workflow_uses():
+    workflow = (ROOT / ".forgejo" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+    header = "".join(line for line in workflow.splitlines(keepends=True) if line.startswith("#"))
+    used = sorted(set(re.findall(r"uses:\s*(actions/[a-z-]+)@", workflow)))
+
+    assert used, "the reader found no action"
+    missing = [name for name in used if name not in header]
+    assert not missing, f"ci.yml's header does not name: {missing}"

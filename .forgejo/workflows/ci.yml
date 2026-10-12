@@ -5,10 +5,15 @@
 # under Settings -> Actions -> Runners. A label no runner has does not fail the job: it
 # queues it for ever, which looks exactly like CI passing until somebody checks.
 #
-# Only `actions/checkout` is used, and nothing else from any action marketplace. Forgejo
-# resolves bare action names against its own instance rather than GitHub, so an action
-# published only on GitHub -- setup-uv and setup-node among them -- may not resolve at
-# all. Installing those two tools directly is a few more lines and no guesswork.
+# Three actions are used, all of them from Forgejo's own copy of the standard set, and
+# nothing else from any action marketplace: `actions/checkout`, which every job needs;
+# `actions/cache`, which keeps uv's downloads and the browser between runs and is
+# `continue-on-error`, so a cache that is down costs time and fails nothing; and
+# `actions/upload-artifact`, kept on v3 because v4 depends on GitHub's own artifact
+# backend, which Forgejo does not have, and also `continue-on-error`. Forgejo resolves
+# bare action names against its own instance rather than GitHub, so an action published
+# only on GitHub -- setup-uv and setup-node among them -- may not resolve at all.
+# Installing those two tools directly is a few more lines and no guesswork.
 #
 # The jobs start in the order this file lists them. The runner takes two jobs at a time
 # and hands them out in file order, so the longest one comes first: listed last, the
