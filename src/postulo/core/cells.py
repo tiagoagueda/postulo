@@ -156,6 +156,9 @@ class EditableCellView(View):
             column.editable,
             instance,
             data,
+            # Only the column's own field (#807): the page form's other declared fields, an
+            # industry to add or a location correction, are not for a cell to be handed.
+            alone=True,
             user=self.request.user,
         )
 
