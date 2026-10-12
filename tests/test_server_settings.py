@@ -224,9 +224,17 @@ def test_people_lists_accounts_and_makes_or_unmakes_administrators(client, admin
     assert user.is_staff, "appointed"
     assert not user.is_superuser, "and not handed every table in a mounted admin (#368)"
 
-    # Whoever already held the flag, from before #368 or from the console, loses it too.
+    # Whoever already held the flag, from before #368 or from the console, is the operator's,
+    # and an ordinary administrator cannot remove it (#792).
     type(user).objects.filter(pk=user.pk).update(is_superuser=True)
+    type(admin).objects.filter(pk=admin.pk).update(is_superuser=False)
 
+    client.post(reverse("server:person_admin", args=[user.pk]))
+    user.refresh_from_db()
+    assert user.is_staff and user.is_superuser, "refused, and nothing changed"
+
+    # The operator may, and the flag goes with the role.
+    type(admin).objects.filter(pk=admin.pk).update(is_superuser=True)
     client.post(reverse("server:person_admin", args=[user.pk]))
     user.refresh_from_db()
     assert not user.is_staff and not user.is_superuser

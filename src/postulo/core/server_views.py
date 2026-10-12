@@ -247,10 +247,22 @@ class PersonAdminView(StaffRequiredMixin, View):
         if person.is_staff:
             if _last_administrator(person):
                 messages.error(request, _("That is the last administrator. Appoint another first."))
+            elif person.is_superuser and not request.user.is_superuser:
+                # The operator's own flag is not an ordinary administrator's to remove, and
+                # nothing here gives it back (#792): it is restored at the console.
+                logger.warning(
+                    "%s tried to demote the operator %s", request.user.username, person.username
+                )
+                messages.error(
+                    request, _("Only the operator's own account can stop being an administrator.")
+                )
             else:
                 person.is_staff = False
                 person.is_superuser = False
                 person.save(update_fields=["is_staff", "is_superuser"])
+                logger.warning(
+                    "%s removed the administrator %s", request.user.username, person.username
+                )
                 messages.success(
                     request, _("%(name)s is no longer an administrator.") % {"name": person}
                 )

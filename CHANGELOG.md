@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Only the operator's own account can remove another account's superuser flag from People; an ordinary administrator is refused, and both outcomes are logged (#792)
 - Gravatar is fetched through the public-only client, like a logo, and the Hardening page lists what POSTULO_CONNECTIONS_ALLOW_PRIVATE widens and what it never does (#537)
 - The CSRF cookie is HttpOnly like the session cookie, as the threat model says of every cookie; the script takes the token from the form it sends (#538)
 - Restoring an archive or reading a kind file blanks any web address that is not http or https, and the update check keeps a release address only if it is, instead of storing a script address to be drawn as a link (#770)
