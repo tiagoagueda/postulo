@@ -36,10 +36,11 @@ from django.db.models.functions import Coalesce, Now
 from django.urls import reverse
 from django.utils import formats, timezone
 from django.utils.formats import number_format
-from django.utils.html import format_html, format_html_join
+from django.utils.html import format_html_join
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext
 
+from postulo.core.htmlstrings import sentence
 from postulo.core.models import OwnedModel, Tag
 from postulo.jobs.models import Contact, JobPosting, SalaryPeriod, currency_code
 
@@ -862,7 +863,7 @@ class Interview(OwnedModel):
         people = self._people()
         if people is None:
             return ""
-        return format_html(
+        return sentence(
             pgettext(
                 "introduces the people at an interview, after its place; {people} is their names",
                 "with {people}",
@@ -876,7 +877,7 @@ class Interview(OwnedModel):
         people = self._people()
         if people is None:
             return ""
-        return format_html(
+        return sentence(
             pgettext(
                 "introduces the people at an interview, on a line of its own; "
                 "{people} is their names",

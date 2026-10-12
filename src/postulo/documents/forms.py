@@ -11,6 +11,7 @@ from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 
 from postulo.core import demonyms, languages, personal, postal
+from postulo.core.htmlstrings import sentence
 from postulo.jobs.forms import OwnerScopedModelForm, who_and_where
 from postulo.jobs.models import Contact
 from postulo.resume.models import Link
@@ -196,7 +197,7 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             rows = printing.offered(owner, detail.key) if owner is not None else []
             value = getattr(printed, detail.key)
             if value:
-                help_text = format_html(str(PRINTED_NOW), value=_typed(value))
+                help_text = sentence(PRINTED_NOW, value=_typed(value))
             elif rows or detail.key == "email":
                 help_text = NONE_PRINTED_NOW
             else:
@@ -261,8 +262,8 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         profile = getattr(owner, "profile", None)
         where = postal.printed_location(profile)
         self.fields["show_location"].help_text = (
-            format_html(
-                str(_("The line your details give, never a street. As things stand: {value}.")),
+            sentence(
+                _("The line your details give, never a street. As things stand: {value}."),
                 value=_typed(where),
             )
             if where
@@ -271,16 +272,14 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
         for name in ("form_of_address", "pronouns"):
             said = (getattr(profile, name, "") or "").strip()
             self.fields[f"show_{name}"].help_text = (
-                format_html(str(_("As things stand: {value}.")), value=_typed(said))
-                if said
-                else GIVES_NONE
+                sentence(_("As things stand: {value}."), value=_typed(said)) if said else GIVES_NONE
             )
         # What each would print as things stand, and said so where there is nothing to print:
         # a switch for a date nobody has given would otherwise look broken (#679). The values
         # are the person's own, drawn only on their own form, as the neighbours' are.
         if profile is not None and profile.birth_date:
-            self.fields["show_birth_date"].help_text = format_html(
-                str(_("As things stand: {value}.")),
+            self.fields["show_birth_date"].help_text = sentence(
+                _("As things stand: {value}."),
                 value=_typed(personal.birth_date_text(profile.birth_date) or profile.birth_date),
             )
         else:
@@ -289,22 +288,18 @@ class CVForm(ThemeChoiceMixin, LanguageChoiceMixin, OwnerScopedModelForm):
             getattr(profile, "birth_place", ""), getattr(profile, "birth_country", "")
         )
         self.fields["show_birth_place"].help_text = (
-            format_html(str(_("As things stand: {value}.")), value=_typed(place))
-            if place
-            else GIVES_NONE
+            sentence(_("As things stand: {value}."), value=_typed(place)) if place else GIVES_NONE
         )
         gender = (getattr(profile, "gender", "") or "").strip()
         self.fields["show_gender"].help_text = (
-            format_html(str(_("As things stand: {value}.")), value=_typed(gender))
-            if gender
-            else GIVES_NONE
+            sentence(_("As things stand: {value}."), value=_typed(gender)) if gender else GIVES_NONE
         )
         said = demonyms.nationalities(
             getattr(profile, "nationalities", None), languages.current(), gender
         )
         scope = personal.scope_text(getattr(profile, "nationality_scope", ""))
         self.fields["show_nationality"].help_text = (
-            format_html(str(_("As things stand: {value}.")), value=_typed(", ".join(said) or scope))
+            sentence(_("As things stand: {value}."), value=_typed(", ".join(said) or scope))
             if said or scope
             else GIVES_NONE
         )

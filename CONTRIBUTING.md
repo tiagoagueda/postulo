@@ -527,6 +527,12 @@ and how to rename strings in bulk without losing translations: [docs/TRANSLATING
 pull request red: a test that needs the French of a string asks gettext for it, under
 `translation.override("fr-FR")`, and compares with that.
 
+**A translation is text, never markup.** A sentence with a link or an emphasised word in it
+is built with `postulo.core.htmlstrings.sentence(_("See {link}."), link=...)`, which escapes the
+translated text and fills only its plain `{name}` slots. Never hand a translated string to
+`format_html` as its format string: that marks the translator's words safe, and a catalogue is
+edited on a server by people nobody vets one string at a time (#806).
+
 ## Keeping dependencies current
 
 The `Dependencies` workflow runs `uv lock --upgrade` once a month (and on demand from

@@ -26,6 +26,7 @@ from django.views import View
 from django.views.generic import DeleteView, ListView
 
 from postulo.core import errands, site, throttle
+from postulo.core.htmlstrings import sentence
 from postulo.core.mixins import ConfirmDeleteMixin, OwnedObjectMixin
 from postulo.plugins.policy import plugins_for
 
@@ -449,7 +450,7 @@ class CaptureBindView(OwnedObjectMixin, View):
             return redirect(listing.get_absolute_url())
         messages.success(
             request,
-            format_html(
+            sentence(
                 _("Added to the history of {listing}."),
                 listing=format_html(
                     '<a href="{}" class="underline">{}</a>', listing.get_absolute_url(), listing
@@ -494,7 +495,7 @@ class CaptureDiscardView(OwnedObjectMixin, View):
         capture.save(update_fields=["status", "learning", "updated_at"])
         messages.success(
             request,
-            format_html(_("Capture discarded. It is in {link}."), link=discarded_link()),
+            sentence(_("Capture discarded. It is in {link}."), link=discarded_link()),
             extra_tags="safe",
         )
         if request.POST.get("next"):
@@ -609,7 +610,7 @@ class CaptureDiscardSelectedView(OwnedObjectMixin, View):
         if count:
             messages.success(
                 request,
-                format_html(
+                sentence(
                     _("Captures discarded: {count}. They are in {link}."),
                     count=count,
                     link=discarded_link(),
