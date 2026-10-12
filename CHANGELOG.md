@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The container's entrypoint gives gunicorn the list in POSTULO_TRUSTED_PROXIES, two more forwarding headers are stripped from strangers, and docker/compose.hardened.yml is an opt-in override with a read-only root, no capabilities, no new privileges and memory and process limits (#824)
 - htmx is configured with allowEval and allowScriptTags off, and a template lint fails on hx-on, js: prefixes, trigger filters and javascript: addresses (#823)
 - base-uri is now none, and a browser's policy-violation reports are written to the log as one line without the address, so a violation in production is seen (#822)
 - A new instance derives the browser notifications' signing key from its secret and a random salt kept in the database, so the public key every member is handed cannot be tested against a guess of the secret; an instance that already has subscriptions keeps its key so they go on working (#821)

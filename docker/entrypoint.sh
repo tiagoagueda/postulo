@@ -38,4 +38,13 @@ fi
 # start-up rather than at the first request.
 python manage.py check --deploy --fail-level ERROR
 
+# gunicorn trusts X-Forwarded-* from its own list, which is 127.0.0.1 unless told otherwise,
+# while Postulo's middleware trusts POSTULO_TRUSTED_PROXIES. Two lists that disagree are one
+# that is wrong somewhere, so gunicorn is given the same one (#824). An operator who sets
+# FORWARDED_ALLOW_IPS themselves keeps what they set.
+if [ -z "${FORWARDED_ALLOW_IPS:-}" ] && [ -n "${POSTULO_TRUSTED_PROXIES:-}" ]; then
+    FORWARDED_ALLOW_IPS="$POSTULO_TRUSTED_PROXIES"
+    export FORWARDED_ALLOW_IPS
+fi
+
 exec "$@"

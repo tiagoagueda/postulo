@@ -1,0 +1,39 @@
+# An override that narrows what the containers may do (#824). Layer it over the file you run:
+#
+#   docker compose -f docker/compose.yml -f docker/compose.hardened.yml up -d
+#
+# Nothing here is on by default, because each line is a thing that can stop a particular host
+# from working, and none of it has been run on yours: try it, read `docker compose logs`, and
+# loosen what a line breaks. What it asks for:
+#
+#   read_only        the image's own files cannot be written to; the data volume and the
+#                    scratch directories below are the only places that can be
+#   cap_drop ALL     Postulo needs no Linux capability: it listens on 8000 as an ordinary user
+#   no-new-privileges  nothing inside can gain more than it started with
+#   mem_limit, pids_limit  one runaway request or a rendering that never ends cannot take the
+#                    host with it; raise mem_limit if you draw very long documents
+#
+# `/tmp` and the home directory's cache are memory-backed because Python, WeasyPrint's font
+# lookup and the plugin installer write there.
+
+x-hardened: &hardened
+  read_only: true
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  tmpfs:
+    - /tmp
+    - /home/postulo/.cache
+  pids_limit: 512
+
+services:
+  postulo:
+    <<: *hardened
+    mem_limit: 1g
+  scheduler:
+    <<: *hardened
+    mem_limit: 512m
+  worker:
+    <<: *hardened
+    mem_limit: 1g
