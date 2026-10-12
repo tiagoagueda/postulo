@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- A file is handed to nginx or Apache only if it is a PDF, a Word or OpenDocument file, a picture that is not markup or an archive; HTML, XML, scripts, SVG and unknown types are streamed by Django with its own policy headers, and the wiki has the Apache block beside the nginx one (#813)
 - A request that declares a body longer than anything its page accepts (25 MB, the backup limit on the backup upload) is answered 413 before the body is read; POSTULO_UPLOAD_CEILING_MB sets it (#812)
 - The backup manifest holds a scrypt mark of the field key with its own salt instead of an unsalted SHA-256, so a copy of a backup is no longer a cheap offline test of a guessed key; archives from before still restore (#811)
 - POSTULO_BACKUP_DOWNLOAD says whether every administrator, only the operator's own account or nobody may download a backup through the browser, and the threat model names the exception (#810)

@@ -21,8 +21,10 @@ Three delivery strategies are supported, in order of preference:
 Behind nginx or Apache the proxy's own response is the one the browser gets, and nginx
 carries over only a few of an upstream's headers on an internal redirect. The proxy must
 therefore add ``Content-Security-Policy`` (``FILE_POLICY``) and ``X-Content-Type-Options``
-itself for the files it sends. An SVG is never handed over: it is always streamed by
-Django, so the one type the policy exists for does not depend on the proxy (#415).
+itself for the files it sends. A type that a browser could run -- an SVG, HTML, XML, a script
+-- is never handed over: it is always streamed by Django, so the types the policy exists for
+do not depend on the proxy (#415, #813). Only the inert types in `HAND_OVER_TYPES` go to a
+proxy at all, and the wiki's *Hardening* page has the location block that adds the headers.
 """
 
 from __future__ import annotations
@@ -36,6 +38,27 @@ from django.conf import settings
 from django.core.exceptions import SuspiciousFileOperation
 from django.http import FileResponse, Http404, HttpRequest, HttpResponse
 from django.utils.http import content_disposition_header
+
+#: What may be handed to a proxy to send (#813): documents, pictures that are not markup, and
+#: archives, none of which a browser runs. Anything else -- the active types above all, but also
+#: a type nobody listed -- is streamed by Django, which sets the policy and `nosniff` itself.
+HAND_OVER_TYPES = frozenset(
+    {
+        "application/pdf",
+        "application/msword",
+        "application/rtf",
+        "text/rtf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        "application/vnd.oasis.opendocument.text",
+        "application/zip",
+        "application/x-zip-compressed",
+        "application/gzip",
+        "image/png",
+        "image/jpeg",
+        "image/gif",
+        "image/webp",
+    }
+)
 
 
 class UnsafeMediaPath(Exception):
@@ -141,7 +164,7 @@ def serve_private_file(
     content_disposition = content_disposition_header(as_attachment, filename)
 
     accel_prefix = getattr(settings, "POSTULO_MEDIA_ACCEL_PREFIX", "")
-    handed_over = content_type != "image/svg+xml"
+    handed_over = content_type in HAND_OVER_TYPES
     if accel_prefix and handed_over:
         response = HttpResponse(content_type=content_type)
         response["X-Accel-Redirect"] = posixpath.join(

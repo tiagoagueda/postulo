@@ -157,6 +157,33 @@ def test_an_svg_is_never_handed_to_the_proxy(serve, settings):
     assert response["X-Content-Type-Options"] == "nosniff"
 
 
+@pytest.mark.parametrize(
+    "name", ["page.html", "doc.xhtml", "feed.xml", "run.js", "mark.svg", "odd.xyz"]
+)
+def test_only_inert_types_are_handed_to_the_proxy(serve, settings, name):
+    """A type a browser could run, or one nobody listed, is streamed by Django (#813)."""
+    path = Path(settings.MEDIA_ROOT) / "logos" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"<x/>")
+    settings.POSTULO_MEDIA_ACCEL_PREFIX = "/protected-media/"
+    settings.POSTULO_MEDIA_SENDFILE = True
+
+    response = serve(FakeFieldFile(f"logos/{name}"))
+
+    assert not response.has_header("X-Accel-Redirect") and not response.has_header("X-Sendfile")
+    assert response["Content-Security-Policy"] == FILE_POLICY
+
+
+@pytest.mark.parametrize("name", ["cv.pdf", "cv.docx", "cv.odt", "scan.png", "scan.jpg", "all.zip"])
+def test_an_inert_type_still_goes_to_the_proxy(serve, settings, name):
+    path = Path(settings.MEDIA_ROOT) / "cvs" / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(b"x")
+    settings.POSTULO_MEDIA_ACCEL_PREFIX = "/protected-media/"
+
+    assert serve(FakeFieldFile(f"cvs/{name}")).has_header("X-Accel-Redirect")
+
+
 def test_apache_serves_the_bytes_when_configured(serve, settings, stored_file):
     settings.POSTULO_MEDIA_ACCEL_PREFIX = ""
     settings.POSTULO_MEDIA_SENDFILE = True
