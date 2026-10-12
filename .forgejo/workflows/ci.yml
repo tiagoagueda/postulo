@@ -90,6 +90,9 @@ jobs:
           sh /tmp/uv-install.sh
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
+      # Only a push to a branch the project controls may fall back to an older cache by prefix: on
+      # a pull request the key is exact, so a run of somebody else's code cannot read or seed what
+      # `main` restores (#827).
       - name: Keep uv's downloads and the browser between runs
         uses: actions/cache@v4
         continue-on-error: true
@@ -98,7 +101,7 @@ jobs:
             ~/.cache/uv
             ~/.cache/ms-playwright
           key: browser-${{ runner.os }}-${{ hashFiles('uv.lock') }}
-          restore-keys: browser-${{ runner.os }}-
+          restore-keys: ${{ github.event_name != 'pull_request' && format('browser-{0}-', runner.os) || '' }}
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --group e2e
@@ -222,7 +225,7 @@ jobs:
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-${{ matrix.python-version }}-${{ hashFiles('uv.lock') }}
-          restore-keys: uv-${{ runner.os }}-${{ matrix.python-version }}-
+          restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-{1}-', runner.os, matrix.python-version) || '' }}
 
       - name: Install dependencies
         # Without the browser group: Playwright is 136 MB of tool this job never starts, and
@@ -317,7 +320,7 @@ jobs:
         with:
           path: ~/.cache/uv
           key: uv-${{ runner.os }}-3.14-${{ hashFiles('uv.lock') }}
-          restore-keys: uv-${{ runner.os }}-3.14-
+          restore-keys: ${{ github.event_name != 'pull_request' && format('uv-{0}-3.14-', runner.os) || '' }}
 
       - name: Install dependencies
         run: uv sync --locked --python 3.14 --no-group e2e

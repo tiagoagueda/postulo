@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- On a pull request the CI caches are restored by their exact key and never by a prefix, so a run of somebody else's code cannot read what a run on main restores or leave behind a poisoned fallback (#827)
 - The isolation sweep now asks the owner's own record to get past the lookup (and fixes the five entries that never did), checks every download it reaches for no-store, and a ratchet test fails on a new query of an owned model with no for_user or owner (#825)
 - The container's entrypoint gives gunicorn the list in POSTULO_TRUSTED_PROXIES, two more forwarding headers are stripped from strangers, and docker/compose.hardened.yml is an opt-in override with a read-only root, no capabilities, no new privileges and memory and process limits (#824)
 - htmx is configured with allowEval and allowScriptTags off, and a template lint fails on hx-on, js: prefixes, trigger filters and javascript: addresses (#823)
