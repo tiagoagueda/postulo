@@ -1,8 +1,9 @@
-"""The companies' map: the list is the page, and the map draws the same list (#108).
+"""The companies' map: the list is the page, and the map draws the same list (#108, #898).
 
-A map is the classic screen-reader failure, so these tests hold the two promises the
-screen makes: everything the drawing says is text on the page, and the drawing is
-something the server writes rather than a script that fetches tiles.
+A map is the classic screen-reader failure, so these tests hold the promise the screen
+makes: everything the drawing says is text on the page, and what Leaflet draws is handed to
+it as data. Where its tiles come from, and what the page's policy then allows, is held in
+`tests/test_map_tiles.py`.
 """
 
 from __future__ import annotations
@@ -79,16 +80,16 @@ def test_the_places_and_the_companies_at_them_are_the_page(client, user, other_u
 
 
 def test_a_place_with_coordinates_is_drawn(client, user, monkeypatch, tmp_path):
-    """The dot is where the data puts it, in the outline's own projection (#108)."""
+    """The dot is where the data puts it, handed to Leaflet as data (#108, #898)."""
     (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON), encoding="utf-8")
     monkeypatch.setattr(places, "DATA_DIR", tmp_path)
     Company.objects.create(owner=user, name="One", location="Lisbon")
 
     html = page(client, user).content.decode()
 
-    # cx = lon + 180, cy = 90 - lat: the projection the outline is drawn in.
-    assert 'cx="170.9"' in html
-    assert 'cy="51.3"' in html
+    (drawn,) = page(client, user).context["drawn"]
+    assert (drawn["lat"], drawn["lon"]) == (38.72509, -9.1498)
+    assert "data-map-places=" in html and "38.72509" in html
 
 
 def test_a_place_without_coordinates_is_listed_and_not_drawn(client, user, tmp_path, monkeypatch):
@@ -99,6 +100,7 @@ def test_a_place_without_coordinates_is_listed_and_not_drawn(client, user, tmp_p
 
     assert "Remote" in html
     assert "Not on the map" in html
+    assert page(client, user).context["drawn"] == [], "listed, and nothing handed to the map"
 
 
 def test_the_dots_are_proportional_to_the_companies_at_the_place(
@@ -118,19 +120,34 @@ def test_the_dots_are_proportional_to_the_companies_at_the_place(
     by_label = {entry["label"]: entry for entry in context["places"]}
     assert by_label["Lisbon"]["count"] == 1
     assert by_label["Berlin"]["count"] == 5
-    assert by_label["Berlin"]["radius"] > by_label["Lisbon"]["radius"]
+    drawn = {entry["label"]: entry["count"] for entry in context["drawn"]}
+    assert drawn == {"Berlin": 5, "Lisbon": 1}, "the script sizes each dot by its count"
 
 
-def test_the_map_is_the_servers_own_drawing(client, user):
-    """The drawing is an SVG the server writes: the outline is in the page, and no
-    tile server or map library is asked for (#108)."""
+def test_the_map_is_drawn_by_leaflet_from_this_instance(client, user):
+    """Leaflet and its stylesheet come from Postulo's own origin, on this page alone (#898)."""
     Company.objects.create(owner=user, name="One", location="Lisbon")
 
-    html = page(client, user).content.decode().lower()
+    html = page(client, user).content.decode()
 
-    assert "m358.1 107.5" in html, "the server's own outline is in the page"
-    assert "openstreetmap" not in html
-    assert "leaflet" not in html
+    assert "js/vendor/leaflet/leaflet.js" in html
+    assert "js/vendor/leaflet/leaflet.css" in html
+    assert "unpkg.com" not in html and "cdn" not in html.lower().replace("cdnjs", "")
+    client.force_login(user)
+    elsewhere = client.get(reverse("jobs:company_list")).content.decode()
+    assert "leaflet" not in elsewhere.lower(), "no other page loads it"
+
+
+def test_a_company_name_reaches_the_map_as_data_only(client, user, monkeypatch, tmp_path):
+    """A name with markup in it is escaped into the attribute and never becomes markup."""
+    (tmp_path / places.CITIES_FILE).write_text(city_table(LISBON), encoding="utf-8")
+    monkeypatch.setattr(places, "DATA_DIR", tmp_path)
+    Company.objects.create(owner=user, name='<img src=x onerror="alert(1)">', location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert '<img src=x onerror="alert(1)">' not in html
+    assert "&lt;img src=x onerror=" in html
 
 
 def test_the_empty_page_says_what_to_do_next(client, user):
@@ -341,7 +358,7 @@ def test_a_company_edited_while_off_is_drawn_where_its_text_says(
 
     (entry,) = response.context["places"]
     assert entry["label"] == "Berlin"
-    assert entry["cx"] == pytest.approx(13.41053 + 180.0)
+    assert entry["lon"] == pytest.approx(13.41053)
     company.refresh_from_db()
     assert company.location_resolved_from == "Lisbon", "a page view writes nothing"
 
@@ -357,4 +374,4 @@ def test_a_correction_a_person_made_is_drawn_and_survives_the_switch(
     switch_on(user)
 
     (entry,) = page(client, user).context["places"]
-    assert entry["cx"] == pytest.approx(13.41053 + 180.0)
+    assert entry["lon"] == pytest.approx(13.41053)

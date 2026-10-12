@@ -1,7 +1,11 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static postulo %}
 
 {% block title %}{% translate "Maps" %}{% endblock %}
+
+{% block head %}
+  <link rel="stylesheet" href="{% static 'js/vendor/leaflet/leaflet.css' %}">
+{% endblock %}
 
 {% block content %}
   <div class="mb-6 flex flex-wrap items-center gap-4">
@@ -18,28 +22,22 @@
 
   {% if places %}
     <div class="grid items-start gap-6 lg:grid-cols-2">
-      {% comment %} The drawing: the outline the dots sit on, and the dots. An SVG the
-         server writes: no tiles, no provider, no script, and nothing it says that the
-         list beside it does not say as text — a map is the classic screen-reader
-         failure, so the list is the page and this is decorative (#108). The outline
-         takes the page's quiet colour; the dots take the brand's. {% endcomment %}
-      <div class="card p-0">
-        <div class="text-ink-200 dark:text-ink-700">
-          <svg viewBox="0 0 360 180" class="block w-full" role="img" aria-hidden="true">
-            {% include "jobs/map/world_outline.html" %}
-            <g class="text-brand-600 dark:text-brand-400">
-              {% for place in places %}
-                {% if place.lat is not None %}
-                  <circle cx="{{ place.cx|floatformat:1 }}" cy="{{ place.cy|floatformat:1 }}"
-                          r="{{ place.radius|floatformat:1 }}"
-                          fill="currentColor" fill-opacity="0.7">
-                    <title>{{ place.label }} — {{ place.count }}</title>
-                  </circle>
-                {% endif %}
-              {% endfor %}
-            </g>
-          </svg>
-        </div>
+      {% comment %} The drawing (#898): Leaflet over the basemap the operator chose, with the
+         same places the list beside it names, given as data and never as markup. The list is
+         the page and this is a picture of it (#108): with scripts off the box stays hidden and
+         nothing is lost. The credit the tiles' licence asks for is drawn on the map; typed
+         text is escaped by the script before Leaflet writes it. {% endcomment %}
+      <div class="card overflow-hidden p-0" data-map-card hidden>
+        <div class="map-canvas h-96 lg:h-[32rem]" data-map role="region"
+             aria-label="{% translate 'Map of the places listed' %}"
+             data-map-places="{{ drawn|as_json }}"
+             {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
+             data-map-tiles="{{ tiles.url }}"
+             data-map-max-zoom="{{ tiles.max_zoom }}"
+             data-map-attribution="{{ tiles.attribution }}"
+             data-map-attribution-url="{{ tiles.attribution_url }}"
+             data-map-zoom-in="{% translate 'Zoom in' %}"
+             data-map-zoom-out="{% translate 'Zoom out' %}"></div>
       </div>
       <div>
         <h2 class="sr-only">{% translate "Places" %}</h2>
@@ -91,7 +89,12 @@
       (<a href="https://creativecommons.org/licenses/by/3.0/" class="underline" rel="noopener noreferrer external">CC BY 3.0</a>);
       country names from the Unicode CLDR, through Babel; the world outline from
       <a href="https://www.naturalearthdata.com" class="underline" rel="noopener noreferrer external">Natural Earth</a>
-      (public domain).
+      (public domain); the map drawn by
+      <a href="https://leafletjs.com" class="underline" rel="noopener noreferrer external">Leaflet</a>.
     {% endblocktranslate %}
   </p>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{% static 'js/vendor/leaflet/leaflet.js' %}" defer data-leaflet></script>
 {% endblock %}

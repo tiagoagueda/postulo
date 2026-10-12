@@ -40,6 +40,8 @@ THIRD_PARTY = {
     "assets/support": "NOTICE.txt",
     "src/postulo/static/js/vendor/zxcvbn": "LICENSE.txt",
     "src/postulo/static/js/vendor": "htmx.LICENSE.txt",
+    "src/postulo/static/js/vendor/leaflet": "LICENSE.txt",
+    "src/postulo/static/js/vendor/leaflet.markercluster": "LICENSE.txt",
     "src/postulo/static/css": "basecoat.LICENSE.txt",
     "src/postulo/templates/jobs/map": "LICENCE.txt",
     "src/postulo/jobs/data": "LICENCE.md",
@@ -81,7 +83,17 @@ def test_every_licence_file_in_the_tree_sits_in_a_directory_the_register_names()
 
 
 def test_the_register_names_every_work_and_the_copyright_holder():
-    for work in ("Lucide", "flag-icons", "Tailwind CSS", "basecoat-css", "htmx", "zxcvbn"):
+    for work in (
+        "Lucide",
+        "flag-icons",
+        "Tailwind CSS",
+        "basecoat-css",
+        "htmx",
+        "zxcvbn",
+        "Leaflet",
+        "Leaflet.markercluster",
+        "OpenStreetMap",
+    ):
         assert work in REGISTER, f"{work} is shipped and not registered"
     assert "Copyright (C) 2026 Postulo contributors" in REGISTER
     assert "Copyright (C) 2026 Postulo contributors" in TEXT
@@ -113,6 +125,11 @@ def test_the_notices_are_the_real_ones():
     assert "Dan Wheeler and Dropbox" in zxcvbn and "@zxcvbn-ts" in zxcvbn
     basecoat = (REPO / "src/postulo/static/css/basecoat.LICENSE.txt").read_text(encoding="utf-8")
     assert "Ronan Berder" in basecoat and "MIT" in basecoat
+    vendor = REPO / "src/postulo/static/js/vendor"
+    leaflet = (vendor / "leaflet/LICENSE.txt").read_text(encoding="utf-8")
+    assert "Volodymyr Agafonkin" in leaflet and "BSD" in leaflet
+    clusters = (vendor / "leaflet.markercluster/LICENSE.txt").read_text(encoding="utf-8")
+    assert "David Leaver" in clusters and "MIT" in clusters
     htmx = (REPO / "src/postulo/static/js/vendor/htmx.LICENSE.txt").read_text(encoding="utf-8")
     assert "Zero-Clause BSD" in htmx or "0BSD" in htmx or "Permission to use" in htmx
 
@@ -129,12 +146,17 @@ def test_every_vendored_script_has_a_pinned_provenance():
     assert package["license"] == "AGPL-3.0-or-later"
     pinned = package["devDependencies"]
     sync = (REPO / "scripts/sync-vendor.mjs").read_text(encoding="utf-8")
-    for name in ("htmx.org", "@zxcvbn-ts/core"):
+    for name in ("htmx.org", "@zxcvbn-ts/core", "leaflet", "leaflet.markercluster"):
         assert name in pinned, f"{name} is vendored and not a dependency"
         assert f'["{name}/' in sync, f"{name} is not in the sync script's list"
     assert re.fullmatch(r"\d+\.\d+\.\d+", pinned["htmx.org"]), "exact, not a range"
     bundle = (REPO / "src/postulo/static/js/vendor/htmx.min.js").read_text(encoding="utf-8")
     assert f'version:"{pinned["htmx.org"]}"' in bundle, "the served bundle is the pinned version"
+    # Leaflet and its clusters draw the map (#898): exact pins, and the served file is the pin.
+    for name in ("leaflet", "leaflet.markercluster"):
+        assert re.fullmatch(r"\d+\.\d+\.\d+", pinned[name]), f"{name}: exact, not a range"
+    leaflet = (REPO / "src/postulo/static/js/vendor/leaflet/leaflet.js").read_text(encoding="utf-8")
+    assert f't.version="{pinned["leaflet"]}"' in leaflet, "the served Leaflet is the pinned one"
 
 
 @pytest.mark.parametrize(

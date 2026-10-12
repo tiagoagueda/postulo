@@ -586,6 +586,7 @@ def signed_in_paths(a, c, me, entry=None, recovery_link: str = "", things=None) 
         "/server/plugins/websites/access/",
         "/server/people/groups/",
         "/server/capture/",
+        "/server/maps/",
         "/server/defaults/",
         "/server/data-protection/",
         "/server/record-of-processing/",

@@ -19,6 +19,8 @@ work with no notice beside it, or a work committed here and not listed, fails th
 | basecoat-css | compiled into `src/postulo/static/css/app.css` (the components named in `assets/css/app.css`) | [Ronan Berder](https://basecoatui.com) | MIT | The `/*! basecoat-css … */` banner in the stylesheet, and `basecoat.LICENSE.txt` beside it. |
 | htmx | `src/postulo/static/js/vendor/htmx.min.js` | [Big Sky Software](https://htmx.org) | 0BSD | `htmx.LICENSE.txt` beside it. 0BSD asks for no notice; it is carried all the same. |
 | @zxcvbn-ts | `src/postulo/static/js/vendor/zxcvbn/` (core and two dictionaries) | Dan Wheeler and Dropbox, Inc.; [@zxcvbn-ts](https://github.com/zxcvbn-ts/zxcvbn) | MIT | `LICENSE.txt` beside the three files; the three packages carry one identical text. |
+| Leaflet 1.9.4 | `src/postulo/static/js/vendor/leaflet/` (script, stylesheet and its images) | Volodymyr Agafonkin and the [Leaflet](https://leafletjs.com) contributors | BSD-2-Clause | `LICENSE.txt` beside the files. Draws the companies' map; loaded by that page alone (#898). |
+| Leaflet.markercluster 1.5.3 | `src/postulo/static/js/vendor/leaflet.markercluster/` | David Leaver and the [Leaflet.markercluster](https://github.com/Leaflet/Leaflet.markercluster) contributors | MIT | `LICENSE.txt` beside the files. Groups the companies at one place on the map (#703). |
 | Natural Earth world outline | `src/postulo/templates/jobs/map/world_outline.html` | [Natural Earth](https://www.naturalearthdata.com) | Public domain | `LICENCE.txt` beside it. A drawing of the 1:110m data, not a copy of it. |
 | Babel and CLDR country names | not in the tree: the `babel` package, installed with the dependencies; read by `src/postulo/jobs/places.py` | [Babel](https://babel.pocoo.org) (the Babel team) and the Unicode CLDR data it carries (Unicode, Inc.) | BSD-3-Clause (Babel); Unicode License v3 (CLDR) | Both notices travel in the installed package's `licenses` files; nothing is copied into this repository. |
 | NACE Rev. 2.1 sections and divisions | `src/postulo/jobs/data/nace-2.1.json` | Eurostat; published by the [Publications Office of the European Union](https://op.europa.eu) | CC BY 4.0 (Commission Decision 2011/833/EU) | `LICENCE.md` beside it, saying where the file came from and what was changed. |
@@ -37,6 +39,12 @@ NACE file, so the attribution is in the tree even though the data is not.
 | GeoNames place names | `manage.py fetch_geonames` | [GeoNames](https://www.geonames.org) | CC BY 3.0 | `src/postulo/jobs/data/GEONAMES-LICENCE.md` |
 | ESCO skills and occupations | `manage.py fetch_esco` | the European Commission ([ESCO](https://esco.ec.europa.eu)) | CC BY 4.0 | `src/postulo/jobs/data/ESCO-LICENCE.md` |
 
+## Fetched by the viewer's browser
+
+| Data | When | Whose | Licence | Credit |
+| --- | --- | --- | --- | --- |
+| OpenStreetMap map tiles | the companies' map, unless an administrator chose other tiles or none (#898) | the [OpenStreetMap](https://www.openstreetmap.org) contributors; served by the OpenStreetMap Foundation | ODbL 1.0 (the data); the tiles are a Produced Work | "© OpenStreetMap contributors", linked to the copyright page, drawn on the map itself as the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/) asks. |
+
 ## How they get here, and how they stay right
 
 Nothing in the table above is fetched at run time: the content security policy allows scripts and
@@ -47,8 +55,9 @@ committed. Three scripts do the copying and each carries the notice with the wor
 - `npm run sync:brands` — the brand marks, from `simple-icons`, with `NOTICE.txt`; it
   refuses a mark whose own licence is outside `assets/brand-terms.txt`.
 - `npm run sync:flags` — the flags, from `flag-icons`, with `LICENSE.txt`.
-- `npm run sync:vendor` — htmx and zxcvbn, from their packages at the versions
-  `package.json` pins, with their notices; and Basecoat's notice beside the stylesheet.
+- `npm run sync:vendor` — htmx, zxcvbn, Leaflet and Leaflet.markercluster, from their
+  packages at the versions `package.json` pins, with their notices; and Basecoat's notice
+  beside the stylesheet.
 
 `npm run build:css` compiles the stylesheet, keeping Tailwind's banner and the Basecoat one.
 

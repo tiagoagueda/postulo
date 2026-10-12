@@ -749,3 +749,14 @@ def ticked_counts(rows) -> str:
             % {"count": number_format(number)}
         )
     return json.dumps(counts, ensure_ascii=False)
+
+
+@register.filter
+def as_json(value) -> str:
+    """``value`` as compact JSON, for a ``data-*`` attribute a script parses (#898).
+
+    Not marked safe: written into an attribute, autoescaping turns its quotes into entities
+    and the browser hands the script the JSON back unchanged, so a company's name can never
+    step out of the attribute it is in.
+    """
+    return json.dumps(value, ensure_ascii=False, separators=(",", ":"))

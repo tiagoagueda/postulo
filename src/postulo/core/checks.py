@@ -30,6 +30,7 @@ CHOICES: dict[str, tuple[str, ...]] = {
     "POSTULO_EMAIL_AUTH": ("password", "xoauth2"),
     "POSTULO_PDF_BACKEND": ("auto", "weasyprint", "chromium"),
     "POSTULO_LOG_FORMAT": ("simple", "json"),
+    "POSTULO_MAP_TILES": ("osm", "custom", "none"),
 }
 
 #: Where a request has to be reachable from: the two schemes a browser will follow.

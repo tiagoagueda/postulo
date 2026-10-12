@@ -33,11 +33,15 @@ MAPS = "maps"
         label=_("Maps"),
         kind="feature",
         icon="map",
+        settings="server:maps",
         description=_(
             "Show where the companies are on a map, and place a company from the town "
             "typed in its location, using a table of cities kept on this server. "
-            "Places come from GeoNames (CC BY 3.0), the country names from the Unicode CLDR "
-            "through Babel, and the world outline from Natural Earth (public domain). "
+            "The map is drawn by Leaflet (BSD-2-Clause) over OpenStreetMap's tiles "
+            "(© OpenStreetMap contributors, ODbL) unless Settings chooses other tiles or "
+            "none; OpenStreetMap then learns each viewer's address and the area they look "
+            "at. Places come from GeoNames (CC BY 3.0), the country names from the Unicode "
+            "CLDR through Babel, and the world outline from Natural Earth (public domain). "
             "Switched off, there is no map page and no location is placed; the "
             "coordinates already stored stay recorded and come back untouched when it is "
             "switched on again."

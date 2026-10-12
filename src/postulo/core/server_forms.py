@@ -169,6 +169,75 @@ class CaptureForm(PinnedPolicyForm):
             self.initial[field] = effective[field]()
 
 
+class MapsForm(PinnedPolicyForm):
+    """Where the companies' map takes its tiles (#898).
+
+    The address is checked here, before it is stored, by the rule the map reads it with
+    (`postulo.jobs.tiles.url_problem`), so a value the map would refuse never reaches the row.
+    """
+
+    map_tiles = forms.ChoiceField(
+        label=_("Tiles"),
+        widget=forms.RadioSelect,
+        help_text=_(
+            "What the map is drawn on. Tiles fetched from another server tell that server "
+            "each viewer's address and the area they look at."
+        ),
+    )
+
+    class Meta:
+        model = SiteSettings
+        fields = ("map_tiles", "map_tile_url", "map_tile_attribution")
+        help_texts = {
+            "map_tile_url": _(
+                "Used with “A tile server of your own”: an https:// address, or a path on "
+                "this instance's own address, with {z}, {x} and {y} where each tile's numbers "
+                "go. For example: https://tiles.example.org/{z}/{x}/{y}.png"
+            ),
+            "map_tile_attribution": _(
+                "The credit the tiles' licence asks for, drawn on the map as plain text. "
+                "For example: © OpenStreetMap contributors"
+            ),
+        }
+
+    def __init__(self, *args, **kwargs):
+        from postulo.jobs import tiles
+
+        super().__init__(*args, **kwargs)
+        self.fields["map_tiles"].choices = tiles.SOURCE_CHOICES
+        self.fields["map_tile_url"].required = False
+        self.fields["map_tile_attribution"].required = False
+        if not self.initial.get("map_tiles"):
+            self.initial["map_tiles"] = tiles.current().source
+        in_force = tiles.current()
+        effective = {
+            "map_tiles": in_force.source,
+            "map_tile_url": in_force.url if in_force.source == tiles.CUSTOM else "",
+            "map_tile_attribution": in_force.attribution,
+        }
+        for field in self.pinned:
+            self.initial[field] = effective[field]
+
+    def clean(self):
+        from postulo.jobs import tiles
+
+        cleaned = super().clean()
+        source = cleaned.get("map_tiles", self.initial.get("map_tiles"))
+        if source == tiles.CUSTOM:
+            url = cleaned.get("map_tile_url", tiles.current().url)
+            if "map_tile_url" not in self.pinned and (problem := tiles.url_problem(url)):
+                self.add_error("map_tile_url", problem)
+            if (
+                "map_tile_attribution" not in self.pinned
+                and not cleaned.get("map_tile_attribution", "").strip()
+            ):
+                self.add_error(
+                    "map_tile_attribution",
+                    _("Say whose tiles they are: their licence asks for a credit on the map."),
+                )
+        return cleaned
+
+
 class OfferedLanguagesForm(forms.ModelForm):
     """Which languages this instance offers at all.
 

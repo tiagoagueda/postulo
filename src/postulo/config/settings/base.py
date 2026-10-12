@@ -645,6 +645,15 @@ POSTULO_SOURCE_URL = env(
 # can state, so it is never guessed. Checked at start-up like the one above.
 POSTULO_LEGAL_NOTICE_URL = env("POSTULO_LEGAL_NOTICE_URL", default="").strip()
 
+# Where the companies' map takes its tiles (#898): `osm` (OpenStreetMap's public tiles, fetched
+# by the viewer's browser), `custom` (the URL template below, https:// or a path on this
+# instance's own origin) or `none` (the world's outline, nothing fetched). Each also changeable
+# under Server settings -> Plugins -> Maps when not set here. `postulo.jobs.tiles` says what
+# each tells whom.
+POSTULO_MAP_TILES = env("POSTULO_MAP_TILES", default="osm").strip().lower()
+POSTULO_MAP_TILE_URL = env("POSTULO_MAP_TILE_URL", default="").strip()
+POSTULO_MAP_TILE_ATTRIBUTION = env("POSTULO_MAP_TILE_ATTRIBUTION", default="").strip()
+
 # Optional hand-off to the web server once Django has authorised a download. Leave both
 # unset to have Django stream the file itself, which is correct but ties up a worker.
 # nginx: an `internal` location, e.g. "/protected-media/".

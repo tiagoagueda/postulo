@@ -51,6 +51,10 @@ CLIPPED = r"""() => {
   for (const el of document.querySelectorAll('body *')) {
     if (!el.textContent.trim()) continue;
     if (el.closest('.sr-only, [hidden], svg')) continue;
+    // A map's viewport clips its panes by design: the map is panned inside it, and tiles
+    // off to either side are what it holds (#898). The text over it -- the credit, the zoom
+    // buttons -- is held inside the box by `tests/e2e/test_map.py`.
+    if (el.classList.contains('leaflet-container')) continue;
     const style = getComputedStyle(el);
     if (style.display === 'none' || style.visibility === 'hidden') continue;
     if (style.clip === 'rect(0px, 0px, 0px, 0px)') continue;

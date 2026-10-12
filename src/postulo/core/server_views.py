@@ -46,6 +46,7 @@ from .server_forms import (
     EmailForm,
     GdprForm,
     IdentifierSchemesForm,
+    MapsForm,
     OfferedLanguagesForm,
     SignInForm,
     TestEmailForm,
@@ -610,6 +611,27 @@ class CaptureView(PolicyView):
         context["no_renderer"] = rendering.why_not()
         # Whether anything on the form is this page's to change. Every field pinned is a
         # form with nothing to save, and a button that saves nothing is a lie.
+        context["editable"] = len(context["pinned"]) < len(self.pinned_fields)
+        return context
+
+
+class MapsView(PolicyView):
+    """Where the companies' map takes its tiles, and what the choice tells whom (#898).
+
+    Reached from the Maps plugin's *Settings* under Plugins rather than from a section of its
+    own: it is that plugin's setting, and with the plugin off there is no map to draw.
+    """
+
+    form_class = MapsForm
+    template_name = "server/maps.html"
+    section_title = _("Maps")
+    pinned_fields = ("map_tiles", "map_tile_url", "map_tile_attribution")
+
+    def get_context_data(self, **kwargs):
+        from postulo.jobs import tiles
+
+        context = super().get_context_data(**kwargs)
+        context["tiles"] = tiles.current()
         context["editable"] = len(context["pinned"]) < len(self.pinned_fields)
         return context
 

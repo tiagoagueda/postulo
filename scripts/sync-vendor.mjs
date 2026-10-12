@@ -4,7 +4,7 @@
 // security policy allows scripts from Postulo's own origin only, so nothing is ever loaded
 // from a CDN.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 const DESTINATION = "src/postulo/static/js/vendor";
@@ -21,6 +21,9 @@ const NOTICES = [
   ["@zxcvbn-ts/core/LICENSE.txt", "src/postulo/static/js/vendor/zxcvbn/LICENSE.txt"],
   ["htmx.org/LICENSE", "src/postulo/static/js/vendor/htmx.LICENSE.txt"],
   ["basecoat-css/LICENSE.md", "src/postulo/static/css/basecoat.LICENSE.txt"],
+  // Leaflet (BSD-2-Clause) and its clustering plugin (MIT) draw the companies' map (#898).
+  ["leaflet/LICENSE", "src/postulo/static/js/vendor/leaflet/LICENSE.txt"],
+  ["leaflet.markercluster/MIT-LICENCE.txt", "src/postulo/static/js/vendor/leaflet.markercluster/LICENSE.txt"],
 ];
 
 // [source in node_modules, name under DESTINATION]
@@ -41,7 +44,26 @@ const FILES = [
   ["@zxcvbn-ts/core/dist/zxcvbn-ts.js", "zxcvbn/core.js"],
   ["@zxcvbn-ts/language-common/dist/zxcvbn-ts.js", "zxcvbn/language-common.js"],
   ["@zxcvbn-ts/language-en/dist/zxcvbn-ts.js", "zxcvbn/language-en.js"],
+  // Leaflet draws the companies' map, and its clustering plugin groups the companies at one
+  // place into one marker until the map is close enough to tell them apart (#898, #703).
+  // Loaded by the map page alone. The stylesheets come too: they are what positions the
+  // tiles, and the policy allows stylesheets from Postulo's own origin only.
+  ["leaflet/dist/leaflet.js", "leaflet/leaflet.js"],
+  ["leaflet/dist/leaflet.css", "leaflet/leaflet.css"],
+  ["leaflet.markercluster/dist/leaflet.markercluster.js", "leaflet.markercluster/leaflet.markercluster.js"],
+  ["leaflet.markercluster/dist/MarkerCluster.css", "leaflet.markercluster/MarkerCluster.css"],
+  ["leaflet.markercluster/dist/MarkerCluster.Default.css", "leaflet.markercluster/MarkerCluster.Default.css"],
 ];
+
+// Images a vendored stylesheet points at, copied byte for byte. The manifest storage refuses a
+// stylesheet whose url() names a file that is not there, so Leaflet's images travel with it.
+const BINARIES = [
+  "layers.png",
+  "layers-2x.png",
+  "marker-icon.png",
+  "marker-icon-2x.png",
+  "marker-shadow.png",
+].map((name) => [`leaflet/dist/images/${name}`, `leaflet/images/${name}`]);
 
 let failed = false;
 for (const [source, name] of FILES) {
@@ -58,6 +80,18 @@ for (const [source, name] of FILES) {
   // file that points at nothing, so the pointer goes; the code is unchanged.
   const text = readFileSync(from, "utf8").replace(/^\/\/# sourceMappingURL=.*\n?$/m, "");
   writeFileSync(to, text);
+  console.log(`${name} <- ${source}`);
+}
+for (const [source, name] of BINARIES) {
+  const from = join("node_modules", source);
+  if (!existsSync(from)) {
+    console.error(`${from} is missing; run "npm ci" first.`);
+    failed = true;
+    continue;
+  }
+  const to = join(DESTINATION, name);
+  mkdirSync(dirname(to), { recursive: true });
+  copyFileSync(from, to);
   console.log(`${name} <- ${source}`);
 }
 for (const [source, to] of NOTICES) {

@@ -40,7 +40,7 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query, company_match
 
-from . import duplicates, identifier_removals, identifiers, logos, mapping, merging
+from . import duplicates, identifier_removals, identifiers, logos, mapping, merging, outline, tiles
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import (
     Company,
@@ -159,18 +159,18 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
 
 
 class CompanyMapView(LoginRequiredMixin, TemplateView):
-    """The places the person's companies are in, and the map that draws them (#108).
+    """The places the person's companies are in, and the map that draws them (#108, #898).
 
-    The list is the page and the map is beside it: a map is the classic
-    screen-reader failure, so every place, every company and every count is text
-    before any of it is drawn, and the page works with scripts off — the drawing
-    is an SVG the server writes, not a script that fetches tiles, and a tile
-    request would tell a tile server where somebody is applying.
+    The list is the page and the map is beside it: a map is the classic screen-reader
+    failure, so every place, every company and every count is text before any of it is
+    drawn, and the page works with scripts off. Leaflet draws the same places over the
+    basemap the operator chose (`postulo.jobs.tiles`): OpenStreetMap's tiles by default, a
+    tile server of their own, or the world's outline with nothing fetched.
 
-    A place is a company's location text as recorded; its dot, when one is
-    drawn, is the coordinate one of the companies there carries, and its size is
-    the number of companies at the place — the question the map answers is where
-    the search is spread, not where any single office sits.
+    A place is a company's location text as recorded; its dot, when one is drawn, is the
+    coordinate one of the companies there carries, and its size is the number of companies
+    at the place -- the question the map answers is where the search is spread, not where
+    any single office sits.
     """
 
     template_name = "jobs/company_map.html"
@@ -221,21 +221,32 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
             if entry["lat"] is None and lat is not None:
                 entry["lat"] = lat
                 entry["lon"] = lon
-        for entry in places.values():
-            # The equirectangular projection the outline is drawn in: a degree of
-            # longitude is a unit of the width, a degree of latitude one of the
-            # height, so the dot sits on the coast the data puts it on.
-            if entry["lat"] is not None:
-                entry["cx"] = entry["lon"] + 180.0
-                entry["cy"] = 90.0 - entry["lat"]
-                entry["radius"] = min(1.5 + 1.8 * entry["count"] ** 0.5, 9.0)
-            else:
-                entry["cx"] = entry["cy"] = entry["radius"] = None
         context["places"] = sorted(
             places.values(), key=lambda entry: (-entry["count"], entry["label"].casefold())
         )
+        # What Leaflet draws: the placed ones only, in the list's order, as data rather than
+        # markup, so the script never builds HTML out of a company's name.
+        context["drawn"] = [
+            {
+                "label": entry["label"],
+                "count": entry["count"],
+                "lat": entry["lat"],
+                "lon": entry["lon"],
+                "companies": [{"name": name, "url": url} for name, url in entry["companies"]],
+            }
+            for entry in context["places"]
+            if entry["lat"] is not None
+        ]
         context["dataset_available"] = places_data.available()
+        context["tiles"] = tiles.current()
+        context["outline"] = [] if context["tiles"].fetched else outline.rings()
         return context
+
+    def render_to_response(self, context, **response_kwargs):
+        response = super().render_to_response(context, **response_kwargs)
+        # The one page whose images may come from the tile server, and only from it (#898).
+        response._csp_config = tiles.policy_for(context["tiles"])
+        return response
 
 
 class CompanyCellView(LoginRequiredMixin, EditableCellView):

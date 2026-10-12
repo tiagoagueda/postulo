@@ -66,5 +66,6 @@ urlpatterns = [
     path("backups/<str:name>/restore/", backups.BackupRestoreView.as_view(), name="backup_restore"),
     path("design/", views.DesignView.as_view(), name="design"),
     path("capture/", views.CaptureView.as_view(), name="capture"),
+    path("maps/", views.MapsView.as_view(), name="maps"),
     path("defaults/", views.DefaultsView.as_view(), name="defaults"),
 ]

@@ -7263,4 +7263,127 @@
     window.open(address.href, "_blank", "noopener,noreferrer");
   });
 
+  /* ------------------------------------------------------------- the companies' map (#898)
+   *
+   * Leaflet draws the places the list beside it names, over the basemap the operator chose:
+   * tiles from the address in `data-map-tiles`, or, with none, the world's outline in
+   * `data-map-outline`. Everything arrives as data; a company's name only ever reaches the
+   * page through `textContent`. Leaflet itself loads after this script (it is the map page's
+   * alone), so the map is drawn when that script's own load event says it has run.
+   *
+   * The credit the tiles' licence asks for is drawn on the map, and Leaflet's attribution
+   * control writes it with innerHTML: the text is escaped here first, so an operator's typed
+   * credit is shown as typed. The tile images carry their own referrer policy, the origin
+   * alone, because OpenStreetMap asks for a Referer and the site's policy sends none to
+   * another origin.
+   */
+  function escapeHtml(text) {
+    var holder = document.createElement("span");
+    holder.textContent = text || "";
+    return holder.innerHTML;
+  }
+
+  function readJson(element, name) {
+    try {
+      return JSON.parse(element.getAttribute(name) || "[]");
+    } catch (error) {
+      return [];
+    }
+  }
+
+  function placePopup(place) {
+    var box = document.createElement("div");
+    var title = document.createElement("p");
+    title.className = "font-medium";
+    title.textContent = place.label;
+    box.appendChild(title);
+    var list = document.createElement("ul");
+    (place.companies || []).forEach(function (company) {
+      var item = document.createElement("li");
+      var link = document.createElement("a");
+      link.href = company.url;
+      link.className = "underline";
+      link.textContent = company.name;
+      item.appendChild(link);
+      list.appendChild(item);
+    });
+    box.appendChild(list);
+    return box;
+  }
+
+  function readyMaps() {
+    var canvases = document.querySelectorAll("[data-map]:not([data-map-drawn])");
+    if (!canvases.length) {
+      return;
+    }
+    if (!window.L) {
+      // Deferred after this script: drawn the moment Leaflet itself has run.
+      var loader = document.querySelector("script[data-leaflet]");
+      if (loader) {
+        loader.addEventListener("load", readyMaps, { once: true });
+      }
+      return;
+    }
+    var L = window.L;
+    Array.prototype.forEach.call(canvases, function (canvas) {
+      canvas.setAttribute("data-map-drawn", "");
+      var card = canvas.closest("[data-map-card]");
+      if (card) {
+        card.hidden = false;
+      }
+      var map = L.map(canvas, {
+        zoomControl: false,
+        attributionControl: false,
+        worldCopyJump: true,
+        minZoom: 1,
+        maxZoom: parseInt(canvas.getAttribute("data-map-max-zoom"), 10) || 19,
+      });
+      L.control
+        .zoom({
+          zoomInTitle: canvas.getAttribute("data-map-zoom-in") || "+",
+          zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
+        })
+        .addTo(map);
+      var credit = escapeHtml(canvas.getAttribute("data-map-attribution"));
+      var creditUrl = canvas.getAttribute("data-map-attribution-url");
+      if (credit && creditUrl) {
+        credit = '<a href="' + escapeHtml(creditUrl) + '" rel="noopener noreferrer external">' + credit + "</a>";
+      }
+      L.control.attribution({ prefix: '<a href="https://leafletjs.com" rel="noopener noreferrer external">Leaflet</a>' }).addTo(map);
+      var tiles = canvas.getAttribute("data-map-tiles");
+      if (tiles) {
+        L.tileLayer(tiles, {
+          attribution: credit,
+          maxZoom: map.getMaxZoom(),
+          referrerPolicy: "strict-origin-when-cross-origin",
+        }).addTo(map);
+      } else {
+        var rings = readJson(canvas, "data-map-outline");
+        if (rings.length) {
+          L.polygon(rings, { className: "map-outline", interactive: false, fillRule: "evenodd" }).addTo(map);
+        }
+      }
+      var places = readJson(canvas, "data-map-places");
+      var points = [];
+      places.forEach(function (place) {
+        var point = [place.lat, place.lon];
+        points.push(point);
+        L.circleMarker(point, {
+          className: "map-dot",
+          radius: Math.min(6 + 3 * Math.sqrt(place.count || 1), 20),
+        })
+          .bindTooltip(place.label)
+          .bindPopup(placePopup(place))
+          .addTo(map);
+      });
+      if (points.length) {
+        map.fitBounds(L.latLngBounds(points), { padding: [32, 32], maxZoom: 10 });
+      } else {
+        map.setView([20, 0], 1);
+      }
+    });
+  }
+
+  onContentReady(readyMaps);
+
 })();

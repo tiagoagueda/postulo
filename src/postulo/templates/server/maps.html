@@ -1,0 +1,45 @@
+{% extends "server/base.html" %}
+{% load i18n postulo %}
+
+{% block measure %}max-w-2xl{% endblock %}{# this page keeps the measure: see `server/base.html` (#320) #}
+
+{% block content %}
+  <c-page-title>
+    {% translate "Maps" %}
+    <c-slot name="subtitle">
+    {% translate "Where the companies' map takes the tiles it is drawn on." %}
+    </c-slot>
+  </c-page-title>
+
+  {% comment %} What the choice in force tells whom, said before the switch that changes it
+     (#898): a basemap fetched from somebody else's server is a request from every viewer's
+     browser naming the part of the world their companies are in. {% endcomment %}
+  <div class="card mb-4 text-sm" data-map-tiles="{{ tiles.source }}">
+    {% if tiles.source == "osm" %}
+      <p>{% translate "The map is drawn on OpenStreetMap's public tiles. Each viewer's browser fetches them from tile.openstreetmap.org, which learns that browser's address and the area it looks at — where that person's companies are. It is sent this instance's address as the page asking, never the page itself." %}</p>
+      <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">{% translate "OpenStreetMap's tile servers are run by volunteers, and their policy allows them to block heavy use without notice. An instance with many people on it should use a tile server of its own." %}</p>
+    {% elif tiles.source == "custom" %}
+      <p>{% translate "The map is drawn on the tiles at the address below. When it is on another server, that server learns each viewer's address and the area they look at; on this instance's own address, nothing is sent anywhere." %}</p>
+    {% else %}
+      <p>{% translate "The map is drawn on the world's outline, kept on this instance. Nothing is fetched from anywhere, and the map cannot show streets." %}</p>
+    {% endif %}
+  </div>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    <div class="card mb-6">
+      {% for field in form %}
+        {% with variable=pinned|get_item:field.name %}
+          {% if variable %}
+            {% pinned_field field variable %}
+          {% else %}
+            <c-field :field="field" />
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
+    </div>
+    {% if editable %}
+      <button type="submit" class="btn">{% translate "Save" %}</button>
+    {% endif %}
+  </form>
+{% endblock %}

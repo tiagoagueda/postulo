@@ -51,6 +51,10 @@ ENV_OVERRIDES = {
     "email_oauth_tenant": "POSTULO_EMAIL_OAUTH_TENANT",
     "email_oauth_client_id": "POSTULO_EMAIL_OAUTH_CLIENT_ID",
     "email_oauth_client_secret": "POSTULO_EMAIL_OAUTH_CLIENT_SECRET",
+    # Where the companies' map takes its tiles (#898); `postulo.jobs.tiles` reads them.
+    "map_tiles": "POSTULO_MAP_TILES",
+    "map_tile_url": "POSTULO_MAP_TILE_URL",
+    "map_tile_attribution": "POSTULO_MAP_TILE_ATTRIBUTION",
 }
 
 #: Email field on the policy row → the key the SMTP backend wants. One mapping, so the

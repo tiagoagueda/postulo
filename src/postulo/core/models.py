@@ -1067,6 +1067,14 @@ class SiteSettings(models.Model):
         blank=True,
         validators=[MinValueValidator(1), MaxValueValidator(100)],
     )
+    #: Where the companies' map takes its tiles (#898): ``osm``, ``custom`` or ``none``, and
+    #: blank for "not set here", which reads as the environment's answer, OpenStreetMap by
+    #: default. `postulo.jobs.tiles` says what each tells whom.
+    map_tiles = models.CharField(_("map tiles"), max_length=10, blank=True)
+    map_tile_url = models.CharField(_("tile address"), max_length=500, blank=True)
+    #: Plain text, never markup: Leaflet writes the credit with ``innerHTML``, so the page
+    #: escapes it before handing it over.
+    map_tile_attribution = models.CharField(_("tile credit"), max_length=300, blank=True)
     sso_is_second_factor = models.BooleanField(
         _("single sign-on counts as the second factor"),
         null=True,

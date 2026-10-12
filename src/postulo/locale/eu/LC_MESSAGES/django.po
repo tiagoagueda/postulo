@@ -2361,6 +2361,10 @@ msgstr "Hiru letrako ISO 4217 kode bat, EUR, GBP edo USD adibidez."
 msgid "A tile"
 msgstr ""
 
+#: src/postulo/jobs/tiles.py
+msgid "A tile server of your own"
+msgstr ""
+
 #: src/postulo/templates/api/token_list.html
 #, fuzzy
 msgid "A token lets a tool outside Postulo act for you — a browser extension handing over a posting, an agent reading your search — and does only what its scopes allow. It is not a sign-in: it never reaches the web interface, and two-factor authentication does not apply to it."
@@ -7224,6 +7228,10 @@ msgstr "Eman %(name)s(r)i aurrez aurre, telefonoz, edo zu zarela frogatuko zenuk
 msgid "Give nationalities as a list of country codes."
 msgstr ""
 
+#: src/postulo/jobs/tiles.py
+msgid "Give the address of the tiles."
+msgstr ""
+
 #: src/postulo/documents/forms.py
 msgid "Give the email a subject."
 msgstr ""
@@ -9462,6 +9470,15 @@ msgid "Map a column to Company and one to Role first."
 msgstr "Lotu lehenik zutabe bat Enpresarekin eta beste bat Lanpostuarekin."
 
 #: src/postulo/templates/jobs/company_map.html
+msgid "Map of the places listed"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "map tiles"
+msgstr ""
+
+#: src/postulo/core/server_views.py src/postulo/templates/jobs/company_map.html
+#: src/postulo/templates/server/maps.html
 msgid "Maps"
 msgstr ""
 
@@ -10364,6 +10381,10 @@ msgstr "Ez dago «%(theme)s» izeneko gairik instalatuta."
 #, fuzzy
 msgid "No theme is installed that can set this document."
 msgstr "Ez dago dokumentu hau maketa dezakeen gairik instalatuta."
+
+#: src/postulo/jobs/tiles.py
+msgid "No tiles: the world's outline only"
+msgstr ""
 
 #: src/postulo/documents/printing.py
 msgid "No website"
@@ -11724,6 +11745,14 @@ msgstr "Lanpostu hutsak"
 msgid "opens as this"
 msgstr ""
 
+#: src/postulo/jobs/tiles.py
+msgid "OpenStreetMap's public tiles"
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "OpenStreetMap's tile servers are run by volunteers, and their policy allows them to block heavy use without notice. An instance with many people on it should use a tile server of its own."
+msgstr ""
+
 #: src/postulo/core/models.py
 msgid "Optional, and decoration: the word is what is read aloud."
 msgstr ""
@@ -12241,7 +12270,7 @@ msgid "Places"
 msgstr ""
 
 #: src/postulo/templates/jobs/company_map.html
-msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain)."
+msgid "Places from <a href=\"https://www.geonames.org\" class=\"underline\" rel=\"noopener noreferrer external\">GeoNames</a> (<a href=\"https://creativecommons.org/licenses/by/3.0/\" class=\"underline\" rel=\"noopener noreferrer external\">CC BY 3.0</a>); country names from the Unicode CLDR, through Babel; the world outline from <a href=\"https://www.naturalearthdata.com\" class=\"underline\" rel=\"noopener noreferrer external\">Natural Earth</a> (public domain); the map drawn by <a href=\"https://leafletjs.com\" class=\"underline\" rel=\"noopener noreferrer external\">Leaflet</a>."
 msgstr ""
 
 #: src/postulo/jobs/roles.py
@@ -13875,6 +13904,7 @@ msgstr ""
 #: src/postulo/templates/server/email.html
 #: src/postulo/templates/server/groups.html
 #: src/postulo/templates/server/identifier_schemes.html
+#: src/postulo/templates/server/maps.html
 #: src/postulo/templates/server/person_plugins.html
 #: src/postulo/templates/server/person_username.html
 #: src/postulo/templates/server/plugin_access.html
@@ -13978,6 +14008,10 @@ msgstr ""
 
 #: src/postulo/documents/forms.py
 msgid "Say who to send it to."
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Say whose tiles they are: their licence asks for a credit on the map."
 msgstr ""
 
 #: src/postulo/templates/applications/application_detail.html
@@ -15837,6 +15871,10 @@ msgstr ""
 msgid "That is not a username on %(service)s. Type the name alone, with no spaces or slashes, as it ends %(example)s; choose “Other” to list an address of another shape."
 msgstr ""
 
+#: src/postulo/jobs/tiles.py
+msgid "That is not a web address."
+msgstr ""
+
 #: src/postulo/plugins/installing.py
 #, fuzzy
 msgid "That is not a wheel: Postulo installs .whl files."
@@ -16097,6 +16135,10 @@ msgstr "Helbideak %(code)s erantzun du."
 msgid "The address answered with nothing."
 msgstr "Helbideak ezer gabe erantzun du."
 
+#: src/postulo/jobs/tiles.py
+msgid "The address must hold {z}, {x} and {y}, where each tile's numbers go."
+msgstr ""
+
 #: src/postulo/core/server_forms.py
 msgid "The address people see it came from. Many servers refuse to send as an address they do not host."
 msgstr ""
@@ -16276,6 +16318,10 @@ msgstr ""
 #, fuzzy
 msgid "The copy could not be sent; the document says why."
 msgstr "Kopia ezin izan da bidali; dokumentuak dio zergatik."
+
+#: src/postulo/core/server_forms.py
+msgid "The credit the tiles' licence asks for, drawn on the map as plain text. For example: © OpenStreetMap contributors"
+msgstr ""
 
 #: src/postulo/templates/settings/appearance.html
 #, fuzzy
@@ -16710,6 +16756,18 @@ msgstr ""
 #, fuzzy
 msgid "The mailbox this instance sends from"
 msgstr "Instantzia honek bidaltzen duen postontzia"
+
+#: src/postulo/templates/server/maps.html
+msgid "The map is drawn on OpenStreetMap's public tiles. Each viewer's browser fetches them from tile.openstreetmap.org, which learns that browser's address and the area it looks at — where that person's companies are. It is sent this instance's address as the page asking, never the page itself."
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "The map is drawn on the tiles at the address below. When it is on another server, that server learns each viewer's address and the area they look at; on this instance's own address, nothing is sent anywhere."
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "The map is drawn on the world's outline, kept on this instance. Nothing is fetched from anywhere, and the map cannot show streets."
+msgstr ""
 
 #: src/postulo/templates/resume/preview.html
 #, fuzzy
@@ -17881,6 +17939,18 @@ msgstr "Markak orriak dirauen bitartean irauten dute. Iragazki bat aldatzeak ber
 msgid "tier"
 msgstr "maila"
 
+#: src/postulo/core/models.py
+msgid "tile address"
+msgstr ""
+
+#: src/postulo/core/models.py
+msgid "tile credit"
+msgstr ""
+
+#: src/postulo/core/server_forms.py
+msgid "Tiles"
+msgstr ""
+
 #: src/postulo/resume/views.py
 #, python-format
 msgid "Time ran out: %(count)d link was not reached. Check again for the rest."
@@ -18355,6 +18425,10 @@ msgstr ""
 msgid "Use 3 to 32 lowercase letters, digits, dots, underscores or hyphens, starting and ending with a letter or digit."
 msgstr "Erabili 3 eta 32 minuskula, zifra, puntu, azpimarra edo marratxo artean, letra edo zifra batekin hasi eta amaituta."
 
+#: src/postulo/jobs/tiles.py
+msgid "Use an https:// address, or a path starting with / on this instance's own address."
+msgstr ""
+
 #: src/postulo/accounts/forms.py
 #, fuzzy
 msgid "Use my Gravatar"
@@ -18401,6 +18475,10 @@ msgstr ""
 #, fuzzy
 msgid "Used where a cell does not say. A cell with a symbol or a code wins."
 msgstr "Gelaxka batek esaten ez duenean erabiltzen da. Sinboloa edo kodea duen gelaxka batek agintzen du."
+
+#: src/postulo/core/server_forms.py
+msgid "Used with “A tile server of your own”: an https:// address, or a path on this instance's own address, with {z}, {x} and {y} where each tile's numbers go. For example: https://tiles.example.org/{z}/{x}/{y}.png"
+msgstr ""
 
 #: src/postulo/accounts/models.py
 #, fuzzy
@@ -18990,6 +19068,10 @@ msgstr ""
 msgid "What the kept record takes"
 msgstr ""
 
+#: src/postulo/core/server_forms.py
+msgid "What the map is drawn on. Tiles fetched from another server tell that server each viewer's address and the area they look at."
+msgstr ""
+
 #: src/postulo/templates/applications/suggestion_list.html
 #, fuzzy
 msgid "What the plugins that read for you think happened. Nothing here is in your record until you say so."
@@ -19268,6 +19350,10 @@ msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Where somebody can check it. A CV prints it as a link."
+msgstr ""
+
+#: src/postulo/templates/server/maps.html
+msgid "Where the companies' map takes the tiles it is drawn on."
 msgstr ""
 
 #: src/postulo/jobs/models.py
@@ -20306,6 +20392,14 @@ msgstr ""
 
 #: src/postulo/jobs/forms.py
 msgid "Yours. They never appear on a document or go anywhere else."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_map.html
+msgid "Zoom in"
+msgstr ""
+
+#: src/postulo/templates/jobs/company_map.html
+msgid "Zoom out"
 msgstr ""
 
 #: src/postulo/templates/cotton/table/head.html

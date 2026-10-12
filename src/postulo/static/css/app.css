@@ -606,6 +606,9 @@
   .h-28 {
     height: calc(var(--spacing) * 28);
   }
+  .h-96 {
+    height: calc(var(--spacing) * 96);
+  }
   .h-auto {
     height: auto;
   }
@@ -1495,9 +1498,6 @@
   .text-emerald-950 {
     color: var(--color-emerald-950);
   }
-  .text-ink-200 {
-    color: var(--color-ink-200);
-  }
   .text-ink-400 {
     color: var(--color-ink-400);
   }
@@ -1864,6 +1864,9 @@
     .lg\:size-7 {
       width: calc(var(--spacing) * 7);
       height: calc(var(--spacing) * 7);
+    }
+    .lg\:h-\[32rem\] {
+      height: 32rem;
     }
     .lg\:max-h-\[calc\(100dvh-var\(--header-height\,3\.5rem\)-2rem\)\] {
       max-height: calc(100dvh - var(--header-height,3.5rem) - 2rem);
@@ -2270,14 +2273,6 @@
   @media (prefers-color-scheme: dark) {
     .dark\:text-ink-500:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
       color: var(--color-ink-500);
-    }
-  }
-  .dark\:text-ink-700:where([data-theme="dark"], [data-theme="dark"] *) {
-    color: var(--color-ink-700);
-  }
-  @media (prefers-color-scheme: dark) {
-    .dark\:text-ink-700:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
-      color: var(--color-ink-700);
     }
   }
   .dark\:text-red-100:where([data-theme="dark"], [data-theme="dark"] *) {
@@ -8357,6 +8352,49 @@ html {
   }
   .translation-bar > [data-part="untranslated"] {
     fill: GrayText;
+  }
+}
+@layer components {
+  .map-canvas {
+    isolation: isolate;
+    z-index: 0;
+  }
+  .map-canvas.leaflet-container {
+    background: transparent;
+    font: inherit;
+  }
+  .map-canvas .leaflet-control-attribution a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+  .map-canvas .map-dot {
+    fill: var(--color-brand-600);
+    fill-opacity: 0.7;
+    stroke: var(--color-brand-600);
+    stroke-width: 1.5;
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      fill: var(--color-brand-400);
+      stroke: var(--color-brand-400);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        fill: var(--color-brand-400);
+        stroke: var(--color-brand-400);
+      }
+    }
+  }
+  .map-canvas .map-outline {
+    fill: var(--color-ink-200);
+    stroke: none;
+    &:where([data-theme="dark"], [data-theme="dark"] *) {
+      fill: var(--color-ink-700);
+    }
+    @media (prefers-color-scheme: dark) {
+      &:where(:root:not([data-theme="light"]), :root:not([data-theme="light"]) *) {
+        fill: var(--color-ink-700);
+      }
+    }
   }
 }
 @media print {

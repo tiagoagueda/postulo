@@ -2628,6 +2628,53 @@ html {
  * 200 becomes 800 -- and the same rules come out as ink on white. The scroll boxes show the
  * whole of a table rather than the strip that was on the screen, and the chrome -- the
  * header, the skip link, the footer, the failure alert -- stays off the paper. */
+/*
+ * The companies' map (#898). Leaflet's panes stack up to z-index 1000, so the canvas is its own
+ * stacking context and never draws over the masthead or a menu. The dots take the brand's
+ * colour and the outline the page's quiet one, in both themes, the way the SVG map's did; the
+ * container takes the page's background, so the world's outline sits on the card.
+ */
+@layer components {
+  .map-canvas {
+    isolation: isolate;
+    z-index: 0;
+  }
+
+  .map-canvas.leaflet-container {
+    background: transparent;
+    font: inherit;
+  }
+
+  /* The credit's links are targets like any other: 24 pixels tall at the least (WCAG 2.2 SC
+     2.5.8), which Leaflet's 11-pixel line does not give them. */
+  .map-canvas .leaflet-control-attribution a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
+  }
+
+  .map-canvas .map-dot {
+    fill: var(--color-brand-600);
+    fill-opacity: 0.7;
+    stroke: var(--color-brand-600);
+    stroke-width: 1.5;
+
+    @variant dark {
+      fill: var(--color-brand-400);
+      stroke: var(--color-brand-400);
+    }
+  }
+
+  .map-canvas .map-outline {
+    fill: var(--color-ink-200);
+    stroke: none;
+
+    @variant dark {
+      fill: var(--color-ink-700);
+    }
+  }
+}
+
 @media print {
   :root {
     color-scheme: light;
