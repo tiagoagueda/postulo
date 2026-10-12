@@ -153,6 +153,9 @@ class CompanyOut(Schema):
     #: Its general mailbox, its numbers and its offices (#329), in the shape a contact's
     #: numbers have.
     email: str = ""
+    #: Its name in other languages (#673): ``language`` a BCP 47 tag, ``source`` ``wikidata``
+    #: or ``typed``. Read-only here; ``name`` stays the one name that identifies it.
+    names: list[dict] = Field(default_factory=list)
     phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
     postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
     location: str = ""
@@ -1529,6 +1532,10 @@ def company_out(company, *, detail: bool = False) -> dict:
         "website": company.website,
         "careers_url": company.careers_url,
         "email": company.email,
+        "names": [
+            {"language": row.language, "name": row.name, "source": row.source}
+            for row in company.names.all()
+        ],
         "phone_numbers": [_number_out(row) for row in company.phone_numbers.all()],
         "postal_addresses": [
             {

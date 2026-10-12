@@ -38,6 +38,7 @@ from django.utils.translation import gettext_lazy as _
 from postulo.core import slugs
 from postulo.core.addresses import same_url
 from postulo.core.identifiers import COMPANY, MAX_VALUE_LENGTH, KeepsItsScheme, scheme_field
+from postulo.core.language_field import LanguageField
 from postulo.core.models import OwnedModel, OwnedQuerySet
 from postulo.core.stored_pictures import StoredPicture
 
@@ -489,6 +490,24 @@ class Company(OwnedModel):
         probe.is_primary = primary is None
         probe.save()
 
+    def name_in(self, language: str) -> str:
+        """Its name in ``language``: that one, then its base language's, then `name` (#673)."""
+        from postulo.core import languages
+
+        stored = {row.language: row.name for row in self.names.all()}
+        if stored and language:
+            best = languages.match(language, list(stored))
+            if best:
+                return stored[best]
+        return self.name
+
+    def wikidata_id(self) -> str:
+        """The Wikidata item it carries, or nothing (#42)."""
+        row = next(
+            (row for row in self.identifiers.all() if row.scheme == identifiers.WIKIDATA), None
+        )
+        return row.value if row is not None else ""
+
     @property
     def is_employment_service(self) -> bool:
         return self.kind == CompanyKind.EMPLOYMENT_SERVICE
@@ -633,6 +652,42 @@ class Company(OwnedModel):
             .first()
         )
         return found.company if found else None
+
+
+class CompanyName(OwnedModel):
+    """A company's name in one language: from its Wikidata item, or typed (#673).
+
+    ``Company.name`` stays the one name that identifies the company -- uniqueness, the
+    duplicate notice, a merge's matching and a CSV's all read it -- and these sit beside it,
+    for the documents written in a language the company has a name in. A name from Wikidata
+    is replaced only by fetching again, or removed; a typed one is allowed only for a
+    language Wikidata gave none for, so where a name came from always means something.
+    """
+
+    class Source(models.TextChoices):
+        WIKIDATA = "wikidata", _("Wikidata")
+        TYPED = "typed", _("Typed")
+
+    company = models.ForeignKey(
+        "Company", on_delete=models.CASCADE, related_name="names", verbose_name=_("company")
+    )
+    language = LanguageField(_("language"))
+    name = models.CharField(_("name"), max_length=200)
+    source = models.CharField(_("source"), max_length=10, choices=Source.choices)
+    fetched_at = models.DateTimeField(_("fetched"), null=True, blank=True)
+
+    class Meta:
+        verbose_name = _("company name")
+        verbose_name_plural = _("company names")
+        ordering = ("language", "pk")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("company", "language"), name="one_company_name_per_language"
+            )
+        ]
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class CompanyIdentifier(KeepsItsScheme, OwnedModel):

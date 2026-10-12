@@ -28,6 +28,7 @@ class CoreConfig(AppConfig):
         from postulo.plugins.repositories import RepositoriesFeature
         from postulo.plugins.social_profiles import SocialProfilesFeature
         from postulo.plugins.websites import WebsitesFeature
+        from postulo.plugins.wikidata import WikidataFeature
 
         # Registers the dashboard widgets core owns, and the export archive as a piece
         # of slow work (#247), and the configuration checks `manage.py check` runs before
@@ -54,6 +55,8 @@ class CoreConfig(AppConfig):
             registry.register_builtin("feature", format_module)
         # The module the "multiple …" features are sub-modules of (#875).
         registry.register_builtin("feature", MultipleFieldsFeature)
+        # A company's names and place, read from its Wikidata item on a press (#673, #701).
+        registry.register_builtin("feature", WikidataFeature)
         registry.register_builtin("feature", PhoneNumbersFeature)
         # How somebody is reached on Signal, Matrix, Telegram, XMPP (#682).
         registry.register_builtin("feature", MessagingContactsFeature)

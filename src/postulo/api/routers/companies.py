@@ -39,7 +39,7 @@ def list_companies(
 ):
     companies = (
         owned(request, Company.objects)
-        .prefetch_related("industries", "identifiers", "phone_numbers", "postal_addresses")
+        .prefetch_related("industries", "identifiers", "phone_numbers", "postal_addresses", "names")
         .order_by("name", "pk")
     )
     if q:
@@ -146,6 +146,7 @@ def _detail(request, pk: int) -> Company:
             "identifiers",
             "phone_numbers",
             "postal_addresses",
+            "names",
         ),
         pk,
     )

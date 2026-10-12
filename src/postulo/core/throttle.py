@@ -192,6 +192,11 @@ def fetch(user) -> None:
     consume("fetch", user, rate_for("POSTULO_FETCH_RATE"))
 
 
+def wikidata(user) -> None:
+    """One *Fetch from Wikidata*, against the account's own allowance (#673)."""
+    consume("wikidata", user, rate_for("POSTULO_WIKIDATA_RATE"))
+
+
 def api(token) -> None:
     """Per token rather than per account, so revoking one revokes its allowance with it."""
     consume("api", token, rate_for("POSTULO_API_RATE"))

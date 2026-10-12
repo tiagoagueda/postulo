@@ -50,6 +50,7 @@ from .models import (
     Company,
     CompanyIdentifier,
     CompanyLogo,
+    CompanyName,
     Contact,
     Department,
     JobPosting,
@@ -371,6 +372,11 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Courses"), other.courses.all(), str),
         _moved(_("Appointments"), other.appointments.all(), str),
         _moved(_("Telephone numbers"), other.phone_numbers.all(), lambda row: row.number),
+        _moved(
+            _("Names in other languages"),
+            other.names.exclude(language__in=kept.names.values("language")),
+            lambda row: row.name,
+        ),
         _moved(_("Postal addresses"), other.postal_addresses.all(), lambda row: row.one_line()),
     ]
     plan.moves = [line for line in lines if line is not None]
@@ -490,6 +496,8 @@ def merge_companies(kept, other) -> Plan:
 
     kept.industries.add(*other.industries.all())
 
+    # Its names in other languages (#673): the kept company's own wins a language it has.
+    other.names.exclude(language__in=kept.names.values("language")).update(company=kept)
     # What it answers on and where it is (#329), as a contact's are moved; one the kept
     # company already lists is not listed twice.
     for rows in (list(other.phone_numbers.all()), list(other.postal_addresses.all())):
@@ -533,7 +541,14 @@ def merge_companies(kept, other) -> Plan:
 
     _write_entries(plan)
     _refuse_what_is_left(
-        other, expected={Company, CompanyIdentifier, CompanyLogo, Company.industries.through}
+        other,
+        expected={
+            Company,
+            CompanyIdentifier,
+            CompanyLogo,
+            Company.industries.through,
+            CompanyName,
+        },
     )
     other.delete()
     return plan

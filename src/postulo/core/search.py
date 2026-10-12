@@ -186,10 +186,14 @@ def company_match(query: str) -> Q:
     from django.contrib.contenttypes.models import ContentType
 
     from postulo.core.models import PostalAddress
-    from postulo.jobs.models import Company, CompanyIdentifier, Industry
+    from postulo.jobs.models import Company, CompanyIdentifier, CompanyName, Industry
 
     industry = Industry.objects.filter(companies=OuterRef("pk"), name__icontains=query)
     identifier = CompanyIdentifier.objects.filter(company=OuterRef("pk"), value__icontains=query)
+    # And by any of its names in other languages (#673).
+    named = CompanyName.objects.filter(
+        owner=OuterRef("owner"), company=OuterRef("pk"), name__icontains=query
+    )
     # Where it is, by its addresses' towns and regions since the location became an address
     # (#702); never by a street, which the search does not read.
     address = PostalAddress.objects.filter(
@@ -202,6 +206,7 @@ def company_match(query: str) -> Q:
         | Q(Exists(industry))
         | Q(Exists(identifier))
         | Q(Exists(address))
+        | Q(Exists(named))
     )
 
 

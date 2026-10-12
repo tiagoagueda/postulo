@@ -782,7 +782,8 @@ def letter_values(letter: CoverLetter, application=None) -> dict[str, str]:
         "contact": "",
     }
     if application is not None:
-        values["company"] = application.posting.company.name
+        # Its name in the letter's language where it has one (#673), else the one typed.
+        values["company"] = application.posting.company.name_in(document_language(letter))
         values["role"] = application.posting.title
         values["location"] = application.posting.location
         values["contact"] = application.contact.name if application.contact_id else ""
@@ -829,6 +830,8 @@ def render_letter_html(
                 # in the body prints, rather than a literal English pattern (#387).
                 "date": values["date"],
                 "application": application,
+                # Who it is to, by its name in the letter's language where it has one (#673).
+                "recipient": values["company"],
                 "document_direction": document_direction(letter),
                 "csp_nonce": nonce,
                 **_properties_context(letter, contact["name"], properties),
@@ -855,7 +858,9 @@ def letter_outline(letter: CoverLetter, application=None, properties=None) -> fi
         if details:
             blocks.append(file_formats.paragraph(BETWEEN.join(details)))
         if application is not None:
-            blocks.append(file_formats.paragraph(application.posting.company.name, apart=True))
+            blocks.append(
+                file_formats.paragraph(application.posting.company.name_in(language), apart=True)
+            )
         blocks.append(file_formats.paragraph(values["date"], apart=True))
         subject = fill_placeholders(letter.subject, values).strip()
         if subject:

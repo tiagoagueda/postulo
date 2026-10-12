@@ -793,6 +793,42 @@ def _restore_messaging_handles(holder, owner, rows: list[dict], report=None) -> 
         )
 
 
+def _restore_company_names(company, owner, rows) -> None:
+    """A company's names in other languages (#673): one per language, the company's own kept.
+
+    A language the registry does not know, an empty name, or a source that is neither is
+    left out rather than guessed at; the text is cleaned as a fetched label is.
+    """
+    from postulo.core import languages
+    from postulo.jobs import wikidata
+    from postulo.jobs.models import CompanyName
+
+    if not isinstance(rows, list):
+        return
+    held = set(company.names.values_list("language", flat=True))
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        tag = languages.tag(row.get("language", ""))
+        name = wikidata.clean(row.get("name"))
+        source = row.get("source")
+        if not name or tag in held or source not in CompanyName.Source.values:
+            continue
+        if not languages.well_formed(tag) or not languages.match(tag, list(languages.NATIVE_NAMES)):
+            continue
+        CompanyName.objects.create(
+            owner=owner,
+            company=company,
+            language=tag,
+            name=name,
+            source=source,
+            fetched_at=_dt(row.get("fetched_at"))
+            if source == CompanyName.Source.WIKIDATA
+            else None,
+        )
+        held.add(tag)
+
+
 def _restore_postal_addresses(holder, owner, rows: list[dict], report=None) -> None:
     """Recreate a holder's addresses.
 
@@ -1478,6 +1514,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         company_addresses = _address_rows(company_entry)
         # Before format 68 a company's place was one line; since #702 it is an address.
         legacy_location = str(company_entry.pop("location", "") or "")[:200]
+        company_names = company_entry.pop("names", None) or []
         company_entry = _carried(company_entry, COMPANY_FIELDS, report, "A company")
         company_entry["logo_fetched_at"] = _dt(company_entry.get("logo_fetched_at"))
         # A switch, read as one: anything but a true is not marked. An archive from before
@@ -1536,6 +1573,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if legacy_location.strip() and not company_addresses:
             company.location = legacy_location
             company.save()
+        _restore_company_names(company, user, company_names)
         for department_name in department_names:
             Department.objects.get_or_create(
                 owner=user,

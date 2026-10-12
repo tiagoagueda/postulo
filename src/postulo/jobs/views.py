@@ -11,6 +11,7 @@ from django.db.models import Count, Q
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse, reverse_lazy
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -239,6 +240,154 @@ def places_data_place(row) -> dict | None:
 
     answer = places.place(row.postcode, row.municipality, row.country)
     return answer[1] if answer else None
+
+
+def wikidata_offered(person) -> bool:
+    """Whether *Fetch from Wikidata* is offered to ``person``: the feature's answer (#673)."""
+    from postulo.plugins.policy import decide
+    from postulo.plugins.wikidata import WIKIDATA
+
+    return bool(decide(WIKIDATA, person).on)
+
+
+class CompanyWikidataView(LoginRequiredMixin, View):
+    """*Fetch from Wikidata*, what came back, and keeping it (#673).
+
+    A POST with nothing more fetches: one request for the company's own item, charged to the
+    person's allowance, and the answer is held in their session, not stored. The GET shows
+    it. A POST of ``keep`` stores it: each name in its language, replacing a typed one there,
+    and a name an earlier fetch gave that this one did not is taken off.
+    """
+
+    template_name = "jobs/company_wikidata.html"
+
+    def _company(self, request, pk: int) -> Company:
+        if not wikidata_offered(request.user):
+            raise Http404
+        return get_object_or_404(
+            Company.objects.for_user(request.user).prefetch_related("identifiers", "names"),
+            pk=pk,
+        )
+
+    @staticmethod
+    def _held_key(company) -> str:
+        return f"wikidata-{company.pk}"
+
+    def get(self, request, pk: int):
+        from postulo.core import languages
+
+        company = self._company(request, pk)
+        held = request.session.get(self._held_key(company))
+        if not held:
+            return redirect("jobs:company_detail", pk=company.pk)
+        names = sorted(
+            (
+                (languages.native_name(tag, tag), tag, name)
+                for tag, name in (held.get("names") or {}).items()
+            ),
+            key=lambda row: row[0].casefold(),
+        )
+        return render(
+            request,
+            self.template_name,
+            {"company": company, "held": held, "names": names},
+        )
+
+    def post(self, request, pk: int):
+        from postulo.core import throttle
+
+        from . import wikidata
+
+        company = self._company(request, pk)
+        key = self._held_key(company)
+        if request.POST.get("keep"):
+            held = request.session.pop(key, None)
+            if held:
+                self._keep(company, held)
+                messages.success(request, _("Kept what Wikidata said."))
+            return redirect("jobs:company_detail", pk=company.pk)
+        qid = company.wikidata_id()
+        if not qid:
+            messages.error(request, _("Give the company its Wikidata identifier first."))
+            return redirect("jobs:company_detail", pk=company.pk)
+        try:
+            throttle.wikidata(request.user)
+            item = wikidata.fetch(qid)
+        except throttle.TooOften as too_often:
+            messages.error(request, str(too_often))
+            return redirect("jobs:company_detail", pk=company.pk)
+        except wikidata.WikidataRefused as refused:
+            messages.error(request, str(refused))
+            return redirect("jobs:company_detail", pk=company.pk)
+        request.session[key] = {
+            "qid": item.qid,
+            "names": item.names,
+            "point": list(item.point) if item.point else None,
+            "at": timezone.now().isoformat(),
+        }
+        return redirect("jobs:company_wikidata", pk=company.pk)
+
+    def _keep(self, company, held) -> None:
+        from .models import CompanyName
+
+        now = timezone.now()
+        names = {tag: name for tag, name in (held.get("names") or {}).items() if tag and name}
+        with transaction.atomic():
+            company.names.filter(source=CompanyName.Source.WIKIDATA).exclude(
+                language__in=list(names)
+            ).delete()
+            for tag, name in names.items():
+                CompanyName.objects.update_or_create(
+                    owner=company.owner,
+                    company=company,
+                    language=tag,
+                    defaults={
+                        "name": name[:200],
+                        "source": CompanyName.Source.WIKIDATA,
+                        "fetched_at": now,
+                    },
+                )
+            self.keep_point(company, held)
+
+    def keep_point(self, company, held) -> None:
+        """Where it is, from the same answer (#701): nothing here yet."""
+
+
+class CompanyNamesView(LoginRequiredMixin, View):
+    """Type a company's name for a language Wikidata gave none for, or take one off (#673)."""
+
+    def post(self, request, pk: int):
+        from postulo.core import languages
+
+        from .models import CompanyName
+
+        company = get_object_or_404(Company.objects.for_user(request.user), pk=pk)
+        back = reverse("jobs:company_detail", args=[company.pk])
+        if request.POST.get("remove"):
+            company.names.filter(pk=as_pk(request.POST.get("remove"))).delete()
+            return redirect(back)
+        tag = languages.tag(request.POST.get("language", ""))
+        name = " ".join((request.POST.get("name") or "").split())[:200]
+        if not name or not languages.well_formed(tag) or tag not in languages.NATIVE_NAMES:
+            messages.error(request, _("Choose a language and type the name."))
+            return redirect(back)
+        held = company.names.filter(language=tag).first()
+        if held is not None and held.source == CompanyName.Source.WIKIDATA:
+            messages.error(
+                request,
+                _(
+                    "Wikidata gives its name in that language. Fetch again to change it, or "
+                    "take it off first."
+                ),
+            )
+            return redirect(back)
+        CompanyName.objects.update_or_create(
+            owner=company.owner,
+            company=company,
+            language=tag,
+            defaults={"name": name, "source": CompanyName.Source.TYPED, "fetched_at": None},
+        )
+        return redirect(back)
 
 
 class AddressPlaceView(LoginRequiredMixin, View):
@@ -495,7 +644,9 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
             super()
             .get_queryset()
             .select_related("parent")
-            .prefetch_related("industries", "identifiers")
+            .prefetch_related(
+                "industries", "identifiers", "names", "phone_numbers", "postal_addresses"
+            )
         )
 
     def get_context_data(self, **kwargs) -> dict:
@@ -566,6 +717,17 @@ class CompanyDetailView(OwnedObjectMixin, DetailView):
         # Decided once for the page rather than per contact: it is one answer about one
         # person, and asking it per row would be a query per row for the same answer.
         context["several_numbers"] = phone_numbers.several_allowed(person)
+        # Its names in other languages, and whether Wikidata may be asked for them (#673).
+        from postulo.core import languages
+
+        context["company_names"] = [
+            (languages.native_name(row.language, row.language), row)
+            for row in self.object.names.all()
+        ]
+        context["wikidata_offered"] = wikidata_offered(person)
+        context["name_languages"] = sorted(
+            languages.NATIVE_NAMES.items(), key=lambda pair: pair[1].casefold()
+        )
         # The company's own numbers and addresses (#329), on the same terms as a contact's.
         context["company_numbers"] = phone_numbers.numbers_for(self.object, person)
         context["company_addresses"] = list(self.object.postal_addresses.all())

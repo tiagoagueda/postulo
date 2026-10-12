@@ -202,7 +202,10 @@ logger = logging.getLogger(__name__)
 #: every postal address. An archive with a ``location`` and no addresses on a company
 #: restores it as the town and country of a primary one; a point placed by hand or from
 #: Wikidata is restored as it was, and any other is placed again from the address (#702).
-FORMAT_VERSION = 68
+#: 69 added ``names`` on a company: its name in other languages, each with its language, where
+#: it came from (``wikidata`` or ``typed``) and when it was fetched. An archive without them
+#: restores none (#673).
+FORMAT_VERSION = 69
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -1167,6 +1170,7 @@ def build_document(user) -> dict:
             "departments",
             "phone_numbers",
             "postal_addresses",
+            "names",
         )
     )
     logo_types = dict(
@@ -1189,6 +1193,16 @@ def build_document(user) -> dict:
                 # department nobody had been recorded at -- and a team you applied to before
                 # you knew anybody there is exactly the ordinary case (#138).
                 "departments": [team.name for team in company.departments.all()],
+                # Its names in other languages (#673).
+                "names": [
+                    {
+                        "language": row.language,
+                        "name": row.name,
+                        "source": row.source,
+                        "fetched_at": row.fetched_at,
+                    }
+                    for row in company.names.all()
+                ],
                 # What it answers on and where it is, as a contact's are written (#329).
                 "phone_numbers": _phone_numbers(company),
                 "postal_addresses": _postal_addresses(company),

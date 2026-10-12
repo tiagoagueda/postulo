@@ -518,6 +518,9 @@ FACTORIES: dict[str, Callable] = {
     "jobs:company_cell": pk_of(company, column="name"),
     "jobs:company_delete": pk_of(company),
     "jobs:company_identifier_remove": pk_of(company_identifier),
+    # its names in other languages, and what Wikidata said of it (#673)
+    "jobs:company_wikidata": pk_of(company),
+    "jobs:company_names": pk_of(company),
     "jobs:company_detail": pk_of(company),
     "jobs:company_logo": pk_of(logo_kept),
     # placing an address by hand: somebody's own address, on their *Your details* (#702)

@@ -4089,6 +4089,7 @@ msgstr "Ona kaydedilecek geri dönüş adresi"
 #: src/postulo/templates/jobs/address_place.html
 #: src/postulo/templates/jobs/capture_page_forget.html
 #: src/postulo/templates/jobs/company_form.html
+#: src/postulo/templates/jobs/company_wikidata.html
 #: src/postulo/templates/jobs/contact_form.html
 #: src/postulo/templates/jobs/industry_form.html
 #: src/postulo/templates/jobs/listing_apply.html
@@ -4460,6 +4461,10 @@ msgstr ""
 
 #: src/postulo/resume/forms.py
 msgid "Choose a language"
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Choose a language and type the name."
 msgstr ""
 
 #: src/postulo/resume/forms.py
@@ -4850,6 +4855,14 @@ msgstr ""
 
 #: src/postulo/jobs/models.py
 msgid "company logos"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "company name"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "company names"
 msgstr ""
 
 #: src/postulo/jobs/views.py
@@ -6681,10 +6694,18 @@ msgstr "Faks"
 msgid "Feature"
 msgstr "Özellik"
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Fetch from Wikidata"
+msgstr ""
+
 #: src/postulo/templates/accounts/profile.html
 #, fuzzy
 msgid "Fetch my Gravatar again"
 msgstr "Gravatar'ımı yeniden al"
+
+#: src/postulo/jobs/models.py
+msgid "fetched"
+msgstr ""
 
 #: src/postulo/templates/jobs/company_form.html
 #, python-format
@@ -7161,6 +7182,10 @@ msgstr "eski durum"
 msgid "from Wikidata"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "From Wikidata"
+msgstr ""
+
 #: src/postulo/jobs/models.py
 msgid "from your career"
 msgstr ""
@@ -7265,6 +7290,14 @@ msgstr ""
 
 #: src/postulo/jobs/tiles.py
 msgid "Give the address of the tiles."
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Give the company its Wikidata identifier first."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Give the company its Wikidata identifier, under Edit, to fetch its names from there."
 msgstr ""
 
 #: src/postulo/documents/forms.py
@@ -8563,6 +8596,10 @@ msgstr ""
 msgid "Its logo: %(name)s has one of its own, and a picture cannot be kept in a note."
 msgstr ""
 
+#: src/postulo/templates/jobs/company_detail.html
+msgid "Its name in that language"
+msgstr ""
+
 #: src/postulo/templates/cotton/identifier_schemes.html
 msgid "Its name, in double quotes, or one name for each language, as in the example. A reader is shown the one closest to their language."
 msgstr ""
@@ -8666,6 +8703,10 @@ msgstr ""
 msgid "Keep the source of the pages I capture"
 msgstr ""
 
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Keep these"
+msgstr ""
+
 #: src/postulo/templates/partials/table/views.html
 msgid "Keep this view as"
 msgstr ""
@@ -8738,6 +8779,10 @@ msgstr ""
 msgid "Kept pages are never deleted by the instance, only by the person whose they are."
 msgstr ""
 
+#: src/postulo/jobs/views.py
+msgid "Kept what Wikidata said."
+msgstr ""
+
 #: src/postulo/api/models.py src/postulo/notifications/models.py
 #, fuzzy
 msgid "key"
@@ -8775,12 +8820,13 @@ msgstr ""
 
 #: src/postulo/accounts/forms.py src/postulo/documents/forms.py
 #: src/postulo/resume/forms.py src/postulo/resume/registry.py
+#: src/postulo/templates/jobs/company_detail.html
 #, fuzzy
 msgid "Language"
 msgstr "Dil"
 
 #: src/postulo/accounts/models.py src/postulo/documents/models.py
-#: src/postulo/resume/models.py
+#: src/postulo/jobs/models.py src/postulo/resume/models.py
 #, fuzzy
 msgid "language"
 msgstr "dil"
@@ -9925,6 +9971,11 @@ msgstr ""
 msgid "name, if Other"
 msgstr "ad, Diğer ise"
 
+#: src/postulo/jobs/merging.py src/postulo/templates/jobs/company_detail.html
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Names in other languages"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_form.html
 #, fuzzy
 msgid "Naming an address restricts the invitation to that person. Leaving it blank creates a link that anyone holding it may use once."
@@ -10585,6 +10636,10 @@ msgstr "henüz yok"
 #, fuzzy
 msgid "None yet."
 msgstr "Henüz yok."
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "None yet. Documents print the name above in every language."
+msgstr ""
 
 #: src/postulo/templates/resume/translations.html
 #, fuzzy
@@ -11614,6 +11669,10 @@ msgid "One record was added. Nothing you already had was changed or removed."
 msgid_plural "%(total)s records were added. Nothing you already had was changed or removed."
 msgstr[0] ""
 msgstr[1] ""
+
+#: src/postulo/templates/jobs/company_detail.html
+msgid "One request to www.wikidata.org for this company's item; nothing is kept until you say so."
+msgstr ""
 
 #: src/postulo/templates/help/postal_addresses.html
 msgid "One row for each address you want to keep. <em>Kind</em> says which it is and can be left blank. Choose <em>Other</em> and a box asks what to call it."
@@ -13622,6 +13681,7 @@ msgstr "uzak adres"
 #: src/postulo/templates/connections/list.html
 #: src/postulo/templates/cotton/identifier_row.html
 #: src/postulo/templates/documents/cv_detail.html
+#: src/postulo/templates/jobs/company_detail.html
 #: src/postulo/templates/jobs/company_form.html
 #: src/postulo/templates/partials/messaging_handles.html
 #: src/postulo/templates/partials/phone_numbers.html
@@ -15981,6 +16041,10 @@ msgstr "Bu bir tekerlek değil: Postulo .whl dosyalarını kurar."
 msgid "That is not a widget Postulo knows about."
 msgstr "Bu, Postulo'nun bildiği bir bileşen değil."
 
+#: src/postulo/jobs/wikidata.py
+msgid "That is not a Wikidata item's identifier."
+msgstr ""
+
 #: src/postulo/templates/server/design.html
 msgid "That is not an address Postulo can use."
 msgstr ""
@@ -16687,6 +16751,10 @@ msgstr "Kurucu onu geri çevirdi: %(error)s"
 
 #: src/postulo/resume/forms.py
 msgid "The issue or report number."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "The item has no name in a language Postulo speaks."
 msgstr ""
 
 #: src/postulo/documents/models.py
@@ -18364,6 +18432,10 @@ msgstr "Bir tane bulmak için yazın, ya da yeni bir tane ekleyin"
 msgid "Type your address, %(email)s, to confirm"
 msgstr "Onaylamak için adresinizi, %(email)s, yazın"
 
+#: src/postulo/jobs/models.py
+msgid "Typed"
+msgstr ""
+
 #: src/postulo/resume/candidate.py
 msgid "Typed on Your details it would be refused. It is imported as it is, and marked there until you change it."
 msgstr ""
@@ -19737,6 +19809,55 @@ msgstr "zaten sunulmuş bileşenler"
 #, fuzzy
 msgid "Width of {column}"
 msgstr "{column} sütununun genişliği"
+
+#: src/postulo/jobs/models.py
+msgid "Wikidata"
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+#, python-format
+msgid "Wikidata answered %(status)s."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata asked for fewer requests. Try again later."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata could not be reached."
+msgstr ""
+
+#: src/postulo/jobs/views.py
+msgid "Wikidata gives its name in that language. Fetch again to change it, or take it off first."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata has no item with that identifier."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata redirected too many times."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata sent the request somewhere else."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata took too long to answer."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata's answer was larger than an item should be."
+msgstr ""
+
+#: src/postulo/jobs/wikidata.py
+msgid "Wikidata's answer was not an item."
+msgstr ""
+
+#: src/postulo/templates/jobs/company_wikidata.html
+msgid "Wikidata's data is in the public domain (CC0). Keeping these replaces any name you typed for the same language, and takes off a name an earlier fetch gave that this one did not."
+msgstr ""
 
 #: src/postulo/core/file_review.py
 msgid "Will be added"

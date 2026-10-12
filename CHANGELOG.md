@@ -192,6 +192,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A company keeps its names in other languages, fetched from its Wikidata item on a press or typed where Wikidata has none; a letter in that language prints it, and search, the API, a merge and the archive (format 69) carry it (#673)
 - Postal addresses are placed on the map offline, at their postcode where the GeoNames postal codes were downloaded (fetch_geonames --postcodes) or at their town, or by hand on a page of their own; a contact's and your own are drawn only when you tick Show on the map (#702)
 - A company keeps its general email address, its telephone numbers and its postal addresses, on its form and page, in the API, an export and a merge, and a contact's form edits its addresses (#329)
 - Near me on the companies' map moves it to where you are, asking the browser only when pressed and sending the position nowhere; every other page forbids asking (#850)

@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% translate "From Wikidata" %}{% endblock %}
+
+{% block content %}
+  <div class="max-w-2xl">
+    <c-page-title>
+      {% translate "From Wikidata" %}
+      <c-slot name="subtitle"><bdi>{{ company.name }}</bdi> · {{ held.qid }}</c-slot>
+    </c-page-title>
+    {% comment %} What came back, before anything is kept (#673). Wikidata is edited by anyone,
+       so each name is shown as the plain text it was cleaned to, and in its own direction. {% endcomment %}
+    <div class="card mb-4">
+      <c-section-title>{% translate "Names in other languages" %}</c-section-title>
+      {% if names %}
+        <dl class="space-y-1 text-sm" data-wikidata-names>
+          {% for language, tag, name in names %}
+            <div class="flex flex-wrap gap-x-3"><dt class="w-40 text-ink-500 dark:text-ink-400">{{ language }}</dt><dd><bdi lang="{{ tag }}">{{ name }}</bdi></dd></div>
+          {% endfor %}
+        </dl>
+      {% else %}
+        <p class="text-sm text-ink-500 dark:text-ink-400">{% translate "The item has no name in a language Postulo speaks." %}</p>
+      {% endif %}
+      {% block point %}{% endblock %}
+    </div>
+    <p class="mb-4 text-xs text-ink-500 dark:text-ink-400">
+      {% translate "Wikidata's data is in the public domain (CC0). Keeping these replaces any name you typed for the same language, and takes off a name an earlier fetch gave that this one did not." %}
+    </p>
+    <form method="post" class="flex flex-wrap items-center gap-3">
+      {% csrf_token %}
+      <button type="submit" name="keep" value="1" class="btn">{% translate "Keep these" %}</button>
+      <a href="{% url 'jobs:company_detail' company.pk %}" class="btn" data-variant="ghost">{% translate "Cancel" %}</a>
+    </form>
+  </div>
+{% endblock %}
