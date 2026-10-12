@@ -25,8 +25,10 @@ that never finishes is killed; one that exhausts its memory dies alone.
 from __future__ import annotations
 
 import logging
+import os
 import subprocess
 import sys
+import tempfile
 from dataclasses import dataclass
 
 from django.utils.translation import gettext as _
@@ -45,6 +47,38 @@ DRAW_SECONDS = 45
 
 #: What is run to draw. A list so that a test can stand something else in its place.
 COMMAND: tuple[str, ...] = (sys.executable, "-B", "-m", "postulo.jobs.rendering_child")
+
+#: What the renderer is given of this process's environment (#814): what a program needs to
+#: find its libraries, its fonts and its temporary files, and nothing else. The child draws a
+#: stranger's page, so it must not inherit the secret key, the database address, an API token
+#: or a mail password along with it.
+ENVIRONMENT_KEPT = (
+    "PATH",
+    "LANG",
+    "LANGUAGE",
+    "LC_ALL",
+    "LC_CTYPE",
+    "TZ",
+    "SYSTEMROOT",
+    "WINDIR",
+    "TEMP",
+    "TMP",
+    "TMPDIR",
+    "HOME",
+    "XDG_CACHE_HOME",
+    "XDG_DATA_DIRS",
+    "FONTCONFIG_PATH",
+    "FONTCONFIG_FILE",
+    "LD_LIBRARY_PATH",
+    "DYLD_LIBRARY_PATH",
+    "PYTHONPATH",
+    "VIRTUAL_ENV",
+)
+
+
+def child_environment() -> dict[str, str]:
+    """The environment the renderer starts with: an allow-list, not a copy."""
+    return {name: os.environ[name] for name in ENVIRONMENT_KEPT if name in os.environ}
 
 
 class CannotDraw(Exception):
@@ -95,13 +129,18 @@ def draw(html: str, *, using: Renderer | None = None) -> bytes:
 
     most = site.capture_rendering_max_bytes()
     try:
-        finished = subprocess.run(  # noqa: S603 - the argument list is built here
-            [*chosen.command, str(most)],
-            input=html.encode("utf-8", errors="replace"),
-            capture_output=True,
-            timeout=DRAW_SECONDS,
-            check=False,
-        )
+        # An empty directory of its own to run in, so nothing the web process left lying
+        # about is on the child's path, and the allow-listed environment (#814).
+        with tempfile.TemporaryDirectory(prefix="postulo-render-") as scratch:
+            finished = subprocess.run(  # noqa: S603 - the argument list is built here
+                [*chosen.command, str(most)],
+                input=html.encode("utf-8", errors="replace"),
+                capture_output=True,
+                timeout=DRAW_SECONDS,
+                check=False,
+                env=child_environment(),
+                cwd=scratch,
+            )
     except subprocess.TimeoutExpired as error:
         raise CannotDraw(
             str(
@@ -127,7 +166,7 @@ def draw(html: str, *, using: Renderer | None = None) -> bytes:
         logger.warning(
             "The page renderer ended with %s: %s",
             finished.returncode,
-            (finished.stderr or b"").decode("utf-8", errors="replace")[-500:],
+            (finished.stderr or b"").decode("utf-8", errors="replace")[-300:],
         )
         raise CannotDraw(str(_("The page could not be drawn.")))
     if not finished.stdout.startswith(b"%PDF-"):
