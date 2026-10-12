@@ -15,6 +15,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 
 from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.urls import reverse
 from ninja import Field, Schema
 from pydantic import AfterValidator, BeforeValidator
@@ -24,7 +25,7 @@ from postulo.core import personal, phones
 from postulo.core.addresses import web_address
 from postulo.core.postal import printed_location
 from postulo.jobs.history import BODY_MAX_CHARS, EXTERNAL_ID_MAX_CHARS, SUMMARY_MAX_CHARS
-from postulo.jobs.models import currency_code
+from postulo.jobs.models import EmploymentType, RemoteType, SalaryPeriod, currency_code
 
 from .paging import Moment, Money, RowId
 
@@ -302,10 +303,34 @@ class CompanyPatch(Schema):
     notes: str | None = None
 
 
+def _one_of(choices, *, allow_blank: bool):
+    """A value from a model's choices, so the API stores what a page could have (#802)."""
+    allowed = set(choices.values)
+
+    def check(value: str) -> str:
+        if value == "" and allow_blank:
+            return value
+        if value not in allowed:
+            raise ValueError("must be one of: " + ", ".join(sorted(allowed)))
+        return value
+
+    return AfterValidator(check)
+
+
+def _an_email_address(value: str) -> str:
+    """An address that is one, or nothing: it reaches vCard files and `mailto:` links (#802)."""
+    if value:
+        try:
+            validate_email(value)
+        except ValidationError as error:
+            raise ValueError("not an email address") from error
+    return value
+
+
 class ContactIn(Schema):
     name: _required(200)
     role: str = Field(default="", max_length=200)
-    email: str = Field(default="", max_length=254)
+    email: Annotated[str, AfterValidator(_an_email_address)] = Field(default="", max_length=254)
     #: Checked against its country's numbering plan (#304), as the field on the page is.
     phone: str = Field(
         default="",
@@ -489,13 +514,24 @@ class ListingIn(Schema):
     title: _required(250)
     url: WebAddress = Field(default="", max_length=500)
     location: str = Field(default="", max_length=200)
-    remote_type: str = Field(default="", max_length=20)
-    employment_type: str = Field(default="", max_length=20)
+    remote_type: Annotated[str, _one_of(RemoteType, allow_blank=True)] = Field(
+        default="", max_length=20, description="onsite, hybrid or remote; empty if not said."
+    )
+    employment_type: Annotated[str, _one_of(EmploymentType, allow_blank=True)] = Field(
+        default="",
+        max_length=20,
+        description=(
+            "full_time, part_time, contract, freelance, internship or apprenticeship; "
+            "empty if not said."
+        ),
+    )
     source: str = Field(default="", max_length=120)
     salary_min: Money | None = None
     salary_max: Money | None = None
     salary_currency: CurrencyCode = Field(default="EUR", max_length=3)
-    salary_period: str = Field(default="year", max_length=10)
+    salary_period: Annotated[str, _one_of(SalaryPeriod, allow_blank=False)] = Field(
+        default="year", max_length=10, description="year, month, day or hour."
+    )
     closes_at: dt.date | None = None
     description: str = ""
     description_format: Literal["plain", "markdown"] = Field(

@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Listing remote type, employment type and salary period must be one of the model's choices and a contact's email must be an address, each a 422 otherwise; a refused capture correction no longer repeats the value that was sent (#802)
 - With POSTULO_METRICS_ENABLED on and no POSTULO_METRICS_TOKEN, /metrics answers 503 and logs why instead of serving whoever asks (#801)
 - /healthz answers the status and the database to anybody, and the exact version only to the container's own probe and to a signed-in administrator (#800)
 - Wrong API tokens count against the address that presents them (sixty an hour, then 429), a token without the scope now spends its allowance, and one account's tokens share POSTULO_API_ACCOUNT_RATE (#799)

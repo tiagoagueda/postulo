@@ -424,7 +424,8 @@ def test_a_page_of_documents_reads_the_page_and_never_the_texts(client, user, to
     assert not [q for q in sql if "source_text" in q or "plain_text" in q]
     # Sign-in, the count, the page's keys and one fetch per table: the same handful of
     # queries whether there are 5 documents or 50, and the rows fetched are the page's.
-    assert len(sql) <= 12
+    # Two of them count the call against the token and against its account's allowance (#799).
+    assert len(sql) <= 14
     assert len(body["items"]) <= 20
 
 

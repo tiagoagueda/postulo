@@ -500,7 +500,9 @@ def _capture(request, owner, payload: CaptureIn, answer) -> dict:
             raise ValidationError(
                 [
                     {**error, "loc": ("body", "payload", "data", *error["loc"])}
-                    for error in exc.errors(include_url=False, include_context=False)
+                    for error in exc.errors(
+                        include_url=False, include_context=False, include_input=False
+                    )
                 ]
             ) from exc
 
