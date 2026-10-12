@@ -535,7 +535,7 @@ def write_backup(
             # The mark of the key, never the key: an archive is a copy of the database and
             # this is what says whether the secrets in it are still readable.
             "secrets": {
-                "field_key_sha256": secrets.fingerprint(),
+                "field_key_mark": secrets.mark(),
                 "field_key_source": secrets.key_source(),
                 "connections": _connections_with_secrets(),
             },
@@ -890,7 +890,9 @@ def restore_backup(
     report.counts = _counts()
     report.connections_with_secrets = _connections_with_secrets()
     report.site_secrets = _site_secrets()
-    recorded = (manifest.get("secrets") or {}).get("field_key_sha256")
+    held = manifest.get("secrets") or {}
+    # The salted mark, or the unsalted one an archive from before #811 carries.
+    recorded = held.get("field_key_mark") or held.get("field_key_sha256")
     if recorded:
-        report.key_matches = recorded == secrets.fingerprint()
+        report.key_matches = secrets.matches(recorded)
     return report

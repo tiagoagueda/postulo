@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- The backup manifest holds a scrypt mark of the field key with its own salt instead of an unsalted SHA-256, so a copy of a backup is no longer a cheap offline test of a guessed key; archives from before still restore (#811)
 - POSTULO_BACKUP_DOWNLOAD says whether every administrator, only the operator's own account or nobody may download a backup through the browser, and the threat model names the exception (#810)
 - Every name of a hard-linked media file is written into the backup as a plain file with its own bytes, where the second name used to be dropped without a word (#809)
 - Importing a kind file creates each application as a draft and moves it to the file's status through change_status, and leaves out the status-change and interview entries a file supplies, so the log says what the fields do (#808)

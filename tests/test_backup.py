@@ -441,7 +441,8 @@ def test_the_archive_carries_the_plugins_and_a_mark_of_the_key(tmp_path, setting
     manifest = manifest_of(report.path)
     assert manifest["plugins"]["included"] is True
     assert manifest["plugins"]["installed"] == ["postulo-imap==0.3.0"]
-    assert manifest["secrets"]["field_key_sha256"] == secrets.fingerprint()
+    assert secrets.matches(manifest["secrets"]["field_key_mark"])
+    assert "field_key_sha256" not in manifest["secrets"], "no unsalted hash of the key (#811)"
     assert manifest["secrets"]["field_key_source"] == "SECRET_KEY"
     # The mark, and never the key itself, in any form.
     with tarfile.open(report.path, "r:gz") as archive:

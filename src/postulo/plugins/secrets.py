@@ -18,6 +18,7 @@ import base64
 import hashlib
 import hmac
 import json
+import secrets as secrets_module
 
 from cryptography.fernet import Fernet, InvalidToken
 from django.conf import settings
@@ -43,15 +44,50 @@ def key_source() -> str:
 
 
 def fingerprint() -> str:
-    """A one-way mark of the key, for a backup's manifest to carry instead of the key.
+    """The unsalted mark of the key that archives before #811 carry. Read, no longer written.
 
-    Under its own domain prefix, so that what a manifest publishes is not the encryption
-    key and cannot be turned back into one. It answers exactly one question, which is the
-    question a restore has to ask: is this the same key the secrets were written under?
-    An equality test needs nothing more.
+    A plain SHA-256 of the material is a verifier for it that costs one hash a guess, so a copy
+    of any backup was an offline test of a guessed key. :func:`mark` replaces it.
     """
     marked = b"postulo-field-key-fingerprint:" + _material().encode("utf-8")
     return hashlib.sha256(marked).hexdigest()
+
+
+#: scrypt's cost for the mark: tens of milliseconds a guess, which is nothing to a restore
+#: and a great deal to someone guessing a key from a copy of a backup (#811).
+_MARK_COST = {"n": 2**14, "r": 8, "p": 1}
+
+
+def _stretched(salt: bytes) -> str:
+    return hashlib.scrypt(
+        b"postulo-field-key-mark:" + _material().encode("utf-8"),
+        salt=salt,
+        dklen=32,
+        **_MARK_COST,
+    ).hex()
+
+
+def mark() -> dict:
+    """A salted, stretched mark of the key, for a backup's manifest to carry (#811).
+
+    A fresh random salt per archive and scrypt over the material, so the manifest is not a
+    cheap verifier for a guessed key and two archives of one instance do not show the same
+    value. It still answers the one question a restore has to ask -- is this the same key the
+    secrets were written under? -- through :func:`matches`.
+    """
+    salt = secrets_module.token_bytes(16)
+    return {"kdf": "scrypt", "salt": salt.hex(), "mark": _stretched(salt)}
+
+
+def matches(recorded) -> bool:
+    """Whether a manifest's mark, new or old, is this instance's key."""
+    if isinstance(recorded, dict):
+        try:
+            salt = bytes.fromhex(str(recorded.get("salt", "")))
+        except ValueError:
+            return False
+        return bool(salt) and hmac.compare_digest(str(recorded.get("mark", "")), _stretched(salt))
+    return hmac.compare_digest(str(recorded or ""), fingerprint())
 
 
 def backup_mac(payload: bytes) -> str:
