@@ -32,8 +32,18 @@
              data-map-attribution="{{ tiles.attribution }}"
              data-map-attribution-url="{{ tiles.attribution_url }}"
              data-map-zoom-in="{% translate 'Zoom in' %}"
-             data-map-zoom-out="{% translate 'Zoom out' %}"></div>
+             data-map-zoom-out="{% translate 'Zoom out' %}"
+             data-map-locate="{% translate 'Near me' %}"
+             data-map-here="{% translate 'You are about here' %}"
+             data-map-locate-refused="{% translate 'The browser was not allowed to say where you are, so the map stays where it was.' %}"
+             data-map-locate-failed="{% translate 'The browser could not say where you are. The map stays where it was.' %}"></div>
+        {% comment %} The icon of *Near me* (#850), drawn by the server and cloned into the control
+           by the script, the way every icon here is one file Postulo serves. {% endcomment %}
+        <template data-map-locate-icon>{% icon "locate-fixed" %}</template>
       </div>
+      {% comment %} What *Near me* has to say when the browser does not answer: a status, read
+         out by a screen reader, over the map. {% endcomment %}
+      <p class="map-overlay absolute start-1/2 bottom-16 max-w-[calc(100%-1.5rem)] -translate-x-1/2 px-4 py-2 text-sm empty:pointer-events-none empty:opacity-0 sm:bottom-14" role="status" data-map-status></p>
     {% endif %}
 
     <div class="map-overlay absolute start-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3">

@@ -427,3 +427,25 @@ def test_every_other_page_keeps_its_footer_and_padding(client, user):
 
     assert html.count("data-source") == 1
     assert "px-4 py-8" in html
+
+
+def test_only_the_map_may_ask_where_the_browser_is(client, user):
+    """#850: Near me asks on the map, and nothing else may raise the prompt."""
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    on_the_map = page(client, user)
+    elsewhere = client.get(reverse("jobs:company_list"))
+
+    assert on_the_map.headers["Permissions-Policy"] == "geolocation=(self)"
+    assert elsewhere.headers["Permissions-Policy"] == "geolocation=()"
+
+
+def test_near_me_is_offered_in_the_readers_words(client, user):
+    Company.objects.create(owner=user, name="One", location="Lisbon")
+
+    html = page(client, user).content.decode()
+
+    assert 'data-map-locate="Near me"' in html
+    assert "data-map-locate-refused=" in html and "data-map-locate-failed=" in html
+    assert 'role="status" data-map-status' in html
+    assert 'data-icon="locate-fixed"' in html

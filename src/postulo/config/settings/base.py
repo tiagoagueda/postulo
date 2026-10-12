@@ -116,6 +116,8 @@ MIDDLEWARE = [
     "postulo.core.middleware.DownloadsAreNotCachedMiddleware",
     # And no page drawn for a signed-in person, so Back after sign-out shows nothing (#787).
     "postulo.core.middleware.PrivatePagesAreNotKeptMiddleware",
+    # No page may ask for the browser's location but the map, which says so itself (#850).
+    "postulo.core.middleware.PermissionsPolicyMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "django_htmx.middleware.HtmxMiddleware",
     # After it, so `request.htmx` is there to read, and outside everything that answers a

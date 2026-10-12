@@ -126,3 +126,26 @@ def test_the_credit_stays_inside_the_map_on_a_phone_with_wider_text(
         }"""
     )
     assert inside, "a control or the credit is cut off by the map's edge"
+
+
+def test_near_me_moves_the_map_to_the_browser_when_pressed(live_server, page: Page, placed):
+    watch(page)
+    page.context.grant_permissions(["geolocation"])
+    page.context.set_geolocation({"latitude": 41.15, "longitude": -8.61})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+
+    expect(page.locator("path.map-here")).to_have_count(0)
+    page.get_by_role("button", name="Near me").click()
+
+    expect(page.locator("path.map-here")).to_have_count(1)
+    assert page.locator("[data-map-status]").inner_text() == ""
+
+
+def test_near_me_says_so_when_the_browser_will_not_tell(live_server, page: Page, placed):
+    watch(page)
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+
+    page.get_by_role("button", name="Near me").click()
+
+    expect(page.locator("[data-map-status]")).to_contain_text("The browser")
+    expect(page.locator("path.map-here")).to_have_count(0)

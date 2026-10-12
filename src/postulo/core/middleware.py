@@ -277,6 +277,29 @@ class DownloadsAreNotCachedMiddleware:
         return response
 
 
+#: What every page says about the browser's location (#850): nobody may ask for it. The
+#: companies' map is the one page that may, and says so on its own response.
+PERMISSIONS_POLICY = "geolocation=()"
+
+
+class PermissionsPolicyMiddleware:
+    """No page may ask for the browser's location, unless it says it may (#850).
+
+    The map's *Near me* asks, when pressed, and the map's view sends
+    ``geolocation=(self)``; every other response gets ``geolocation=()``, so a script that
+    found its way onto any other page could not even raise the prompt.
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+        if "Permissions-Policy" not in response:
+            response["Permissions-Policy"] = PERMISSIONS_POLICY
+        return response
+
+
 class PrivatePagesAreNotKeptMiddleware:
     """A page drawn for a signed-in person is never kept by the browser's history cache (#787).
 

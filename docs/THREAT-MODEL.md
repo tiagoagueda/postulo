@@ -129,6 +129,10 @@ Three things follow, and each is a promise:
   on the map page alone. *Server settings → Plugins → Maps*, or `POSTULO_MAP_TILES`,
   switches to a tile server of the operator's own, which on the instance's own origin sends
   nothing anywhere, or to no tiles, the world's outline drawn from the instance.
+- **Where the browser is stays in the browser.** *Near me* on the map asks the browser for its
+  position only when pressed, moves the map there and sends it nowhere; nothing stores it.
+  Every other page is served with `Permissions-Policy: geolocation=()`, so nothing on them can
+  even raise the prompt (#850).
 - **The map can be switched off.** The `maps` feature plugin decides whether the map, the
   placing of a location and any pin are offered. Off, nothing is shown and nothing is
   deleted: every stored coordinate stays for the day it is switched back on.

@@ -246,6 +246,9 @@ class CompanyMapView(LoginRequiredMixin, TemplateView):
         response = super().render_to_response(context, **response_kwargs)
         # The one page whose images may come from the tile server, and only from it (#898).
         response._csp_config = tiles.policy_for(context["tiles"])
+        # The one page that may ask where the browser is, and only when *Near me* is pressed
+        # (#850); every other response forbids it (`core.middleware`).
+        response["Permissions-Policy"] = "geolocation=(self)"
         return response
 
 

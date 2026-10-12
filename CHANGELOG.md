@@ -159,6 +159,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Near me on the companies' map moves it to where you are, asking the browser only when pressed and sending the position nowhere; every other page forbids asking (#850)
 - The hello-world plugin is at 0.3.1 in the official catalogue, with its notifier under the name helloworld-notifier so Postulo no longer leaves it out (#593)
 - Postulo installs as an app on Chromium browsers and Safari: a completed manifest with a maskable icon and shortcuts, title-bar colours for both themes, Install in the account menu, and an offline page, the one thing the worker keeps (#895)
 - The official catalogue lists Postulo Templates 0.3.0, the curated document themes, beside the hello-world plugin (#729)

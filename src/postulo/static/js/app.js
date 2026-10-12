@@ -7311,6 +7311,79 @@
     return box;
   }
 
+  /* *Near me* (#850): asks the browser where it is only when pressed, and moves the map
+   * there. Nothing is stored and nothing is sent: the position goes from the browser to the
+   * map and no further. Only the map page's policy lets it ask at all.
+   */
+  function locateControl(L, map, canvas) {
+    var status = document.querySelector("[data-map-status]");
+    var here = null;
+    var timer = null;
+    function say(text) {
+      if (!status) {
+        return;
+      }
+      status.textContent = text || "";
+      window.clearTimeout(timer);
+      if (text) {
+        timer = window.setTimeout(function () {
+          status.textContent = "";
+        }, 8000);
+      }
+    }
+    var Locate = L.Control.extend({
+      options: { position: "bottomright" },
+      onAdd: function () {
+        var bar = L.DomUtil.create("div", "leaflet-bar leaflet-control");
+        var button = L.DomUtil.create("a", "map-locate", bar);
+        var label = canvas.getAttribute("data-map-locate") || "";
+        button.href = "#";
+        button.setAttribute("role", "button");
+        button.setAttribute("aria-label", label);
+        button.title = label;
+        var icon = document.querySelector("template[data-map-locate-icon]");
+        if (icon) {
+          button.appendChild(icon.content.cloneNode(true));
+        }
+        L.DomEvent.disableClickPropagation(bar);
+        L.DomEvent.on(button, "click", function (event) {
+          L.DomEvent.preventDefault(event);
+          if (!navigator.geolocation) {
+            say(canvas.getAttribute("data-map-locate-failed"));
+            return;
+          }
+          button.setAttribute("aria-busy", "true");
+          navigator.geolocation.getCurrentPosition(
+            function (position) {
+              button.removeAttribute("aria-busy");
+              say("");
+              var point = [position.coords.latitude, position.coords.longitude];
+              if (here) {
+                here.setLatLng(point);
+              } else {
+                here = L.circleMarker(point, { className: "map-here", radius: 7 })
+                  .bindTooltip(canvas.getAttribute("data-map-here") || "")
+                  .addTo(map);
+              }
+              map.setView(point, Math.max(map.getZoom(), 11));
+            },
+            function (error) {
+              button.removeAttribute("aria-busy");
+              say(
+                canvas.getAttribute(
+                  error && error.code === 1 ? "data-map-locate-refused" : "data-map-locate-failed"
+                )
+              );
+            },
+            { enableHighAccuracy: false, timeout: 10000, maximumAge: 60000 }
+          );
+        });
+        return bar;
+      },
+    });
+    return new Locate();
+  }
+
   function readyMaps() {
     var canvases = document.querySelectorAll("[data-map]:not([data-map-drawn])");
     if (!canvases.length) {
@@ -7352,6 +7425,7 @@
           zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
         })
         .addTo(map);
+      locateControl(L, map, canvas).addTo(map);
       var credit = escapeHtml(canvas.getAttribute("data-map-attribution"));
       var creditUrl = canvas.getAttribute("data-map-attribution-url");
       if (credit && creditUrl) {
