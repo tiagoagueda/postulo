@@ -255,11 +255,11 @@ def test_an_address_pasted_with_a_line_break_at_its_end_is_still_one():
 
 
 def test_an_address_is_logged_on_one_line_whatever_it_holds(monkeypatch, caplog):
-    """`%r`, not `%s`, at every place the capture path writes an address it was handed.
+    """No place the capture path logs writes the address it was handed (#797).
 
-    The refusal above is the gate; this is what holds if something reaches the log without
-    passing it -- a plugin, an address kept from before -- because `repr` writes a line break
-    as the two characters it takes to spell one.
+    The refusal above is the gate; this holds if something reaches the log without passing it
+    -- a plugin, an address kept from before. It once wrote the address with `%r`, so a line
+    break was spelled out; now nothing of the address is written, which is stricter.
     """
     from postulo.plugins import registry
     from postulo.plugins.builtin import BoardSource, hints
@@ -288,7 +288,7 @@ def test_an_address_is_logged_on_one_line_whatever_it_holds(monkeypatch, caplog)
     assert len(messages) == 3, messages
     for message in messages:
         assert "\n" not in message, message
-        assert "\\n2026-09-29" in message, "the address is there, spelled out"
+        assert "2026-09-29" not in message, "the address is not written down at all (#797)"
     """A plugin is third-party code; the schema every source's output passes is the gate."""
     from postulo.plugins.base import JobPostingData
 
