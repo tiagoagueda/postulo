@@ -19,7 +19,13 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.urls import reverse
 from django.utils import timezone
 
-from postulo.applications.models import Application, ApplicationEvent, Interview, Status
+from postulo.applications.models import (
+    SYSTEM_EVENT_KINDS,
+    Application,
+    ApplicationEvent,
+    Interview,
+    Status,
+)
 from postulo.applications.services import (
     create_application,
     get_or_create_company,
@@ -222,12 +228,17 @@ def test_an_application_arrives_with_its_timeline_its_interviews_and_where_it_ca
     assert application.status == Status.APPLIED
     assert application.applied_at is not None
     assert application.interviews.count() == 1
-    # Everything the first account's timeline said, and one entry saying which file it is
-    # from: provenance is never in doubt.
-    theirs = ApplicationEvent.objects.filter(application__owner=user).count()
+    # What the first account's timeline said that a file may say, and one entry saying which
+    # file it is from: provenance is never in doubt. The entries the record writes for itself
+    # are not copied, since `change_status` writes the one for the status (#808).
     mine = ApplicationEvent.objects.filter(application=application)
-    assert mine.count() == theirs + 1
     assert mine.filter(summary="Imported from theirs.json").count() == 1
+    assert mine.filter(kind="status_change").count() == 1, "one move, written by the record"
+    kept = ApplicationEvent.objects.filter(application__owner=user).exclude(
+        kind__in=SYSTEM_EVENT_KINDS
+    )
+    for event in kept:
+        assert mine.filter(summary=event.summary).exists()
     # It has no reminders, offers or contact of the first account's.
     assert not application.reminders.exists()
 
@@ -578,3 +589,30 @@ def test_the_contacts_file_costs_the_same_queries_however_many_contacts(user):
     for number in range(10):
         Contact.objects.create(owner=user, name=f"Person {number}")
     assert queries() == few
+
+
+def test_a_file_cannot_supply_the_entries_the_record_writes_for_itself(user, other_user):
+    """Status changes and interview entries in a file are left out (#808)."""
+    furnish(user)
+    document = document_of(user, "applications")
+    rows = document["items"] if "items" in document else document.get("applications", [])
+    assert rows, "the file holds an application to forge an entry in"
+    for row in rows:
+        row.setdefault("events", []).append(
+            {"kind": "status_change", "summary": "Draft to Offer, says the file", "actor": "me"}
+        )
+    add(other_user, "applications", document)
+    application = Application.objects.for_user(other_user).get()
+    summaries = list(
+        ApplicationEvent.objects.filter(application=application).values_list("summary", flat=True)
+    )
+    assert "Draft to Offer, says the file" not in summaries
+    assert application.status == Status.APPLIED
+
+
+def test_the_status_of_an_imported_application_is_a_move_the_log_records(user, other_user):
+    furnish(user)
+    add(other_user, "applications", document_of(user, "applications"))
+    application = Application.objects.for_user(other_user).get()
+    move = ApplicationEvent.objects.get(application=application, kind="status_change")
+    assert "Applied" in move.summary

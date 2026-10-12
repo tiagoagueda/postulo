@@ -8,6 +8,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔒 Security
 
+- Importing a kind file creates each application as a draft and moves it to the file's status through change_status, and leaves out the status-change and interview entries a file supplies, so the log says what the fields do (#808)
 - An editable table cell drops every field of the page form but the one it edits, so a post carrying an industry to add or a location correction beside the cell changes nothing else (#807)
 - A translated sentence that carries a link or a piece of the person's own text is built by htmlstrings.sentence, which escapes the translation and fills only its plain slots, instead of handing the catalogue to format_html as markup (#806)
 - The avatar, logo and plugin tiles escape the picture address, the classes and the initials they are given, instead of trusting the caller (#805)

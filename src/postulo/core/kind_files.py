@@ -792,7 +792,12 @@ def _create_listing(user, verdict: Verdict) -> int:
 
 
 def _assess_application(run: _Run, row: dict) -> Verdict:
-    from postulo.applications.models import Application, ApplicationEvent, Interview
+    from postulo.applications.models import (
+        SYSTEM_EVENT_KINDS,
+        Application,
+        ApplicationEvent,
+        Interview,
+    )
 
     company_name = _company_name(row)
     listing_row = row.get("listing") if isinstance(row.get("listing"), dict) else {}
@@ -829,7 +834,10 @@ def _assess_application(run: _Run, row: dict) -> Verdict:
     events, left_out = [], 0
     for entry in row.get("events") or []:
         done, bad = _through_the_form(ApplicationEvent, EVENT_FIELDS, entry)
-        if bad:
+        # The kinds the record writes for itself are not a file's to supply (#808): the status
+        # change below is written by `change_status`, and an interview by its own row, so a
+        # file cannot make the log say what the fields do not.
+        if bad or done.get("kind") in SYSTEM_EVENT_KINDS:
             left_out += 1
         else:
             events.append(done)
@@ -870,7 +878,7 @@ def _create_application(user, verdict: Verdict, provenance: str) -> int:
         EventKind,
         Interview,
     )
-    from postulo.applications.services import get_or_create_company, record_event
+    from postulo.applications.services import change_status, get_or_create_company, record_event
     from postulo.jobs.models import Department, JobPosting
 
     held = verdict.clean
@@ -881,7 +889,26 @@ def _create_application(user, verdict: Verdict, provenance: str) -> int:
     if posting.decided_at is None:
         posting.decided_at = timezone.now()
         posting.save(update_fields=["decided_at", "updated_at"])
-    application = Application.objects.create(owner=user, posting=posting, **held["fields"])
+    # Created as a draft and moved to the status the file gives through `change_status`, as the
+    # spreadsheet import does (#808), so the log has the entry for it and the dates follow the
+    # same rules; the file's own dates are put back afterwards, since they are what it says.
+    fields = dict(held["fields"])
+    wanted_status = fields.pop("status", None) or Application._meta.get_field("status").default
+    dates = {name: fields.pop(name) for name in ("applied_at", "closed_at") if fields.get(name)}
+    fields.pop("applied_at", None)
+    fields.pop("closed_at", None)
+    application = Application.objects.create(owner=user, posting=posting, **fields)
+    if wanted_status != application.status:
+        change_status(
+            application,
+            wanted_status,
+            occurred_at=dates.get("applied_at"),
+            actor=provenance,
+            mark_applied=bool(dates.get("applied_at")),
+        )
+    if dates:
+        Application.objects.filter(pk=application.pk).update(**dates)
+        application.refresh_from_db()
     if held["department"]:
         department = (
             Department.objects.for_user(user)
