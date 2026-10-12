@@ -201,12 +201,12 @@ def test_a_switched_on_official_repository_lists_helloworld_and_vouches_for_it(o
         "postulo-templates",
     ]
     release = fetched.listings[0].latest
-    assert release.version == "0.3.0"
+    assert release.version == "0.3.1"
     assert provenance.official_repositories() == {"official"}
 
     entry = installing.Installed(
         name="postulo-helloworld",
-        version="0.3.0",
+        version="0.3.1",
         origin="upload",
         sha256=release.sha256,
     )
