@@ -71,6 +71,7 @@ def build(wheels: Path, expires_days: int = 0) -> dict:
                     "sha256": sha256_of(wheel),
                     "requires_postulo": release.get("requires_postulo", ""),
                     "provides": list(release.get("provides", [])),
+                    **({"requires": list(release["requires"])} if release.get("requires") else {}),
                 }
             )
         plugins.append(
