@@ -9,7 +9,7 @@
       <div class="alert wrap-anywhere"
            data-variant="{% if message.level_tag == 'error' %}error{% elif message.level_tag == 'warning' %}warning{% elif message.level_tag == 'success' %}success{% else %}info{% endif %}"
            role="{% if message.level_tag == 'error' %}alert{% else %}status{% endif %}">
-        {% if 'safe' in message.extra_tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+        {% if 'safe' in message.extra_tags.split %}{{ message|safe }}{% else %}{{ message }}{% endif %}
       </div>
     {% endfor %}
   </div>
