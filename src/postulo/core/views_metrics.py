@@ -5,18 +5,22 @@ A log entry names a connection, a company, an application. A metric here is a co
 things on the instance and carries nothing about anybody — which is why this one may
 reasonably be left open on a private network, and why the log endpoint may not.
 
-That is also why the answer when no token is set is *serve it* rather than *refuse*: the
-numbers are not secret. The administration page says plainly that anybody who can reach
-the instance can read them, so the choice is made with the facts in view.
+**A token is required (#801).** The numbers carry nothing about anybody, but they do name the
+exact version of Postulo, Python and Django and say how many accounts there are, which is what
+somebody picking a target wants. So with the endpoint on and no token set it refuses with a 503
+and a line in the log, as `/logs` does, instead of serving whoever asks.
 """
 
 from __future__ import annotations
 
 import hmac
+import logging
 
 from django.http import Http404, HttpRequest, HttpResponse
 
 from . import metrics, throttle
+
+logger = logging.getLogger(__name__)
 
 #: What Prometheus expects to be handed.
 CONTENT_TYPE = "text/plain; version=0.0.4; charset=utf-8"
@@ -25,8 +29,7 @@ CONTENT_TYPE = "text/plain; version=0.0.4; charset=utf-8"
 def _authorised(request: HttpRequest) -> bool:
     expected = metrics.token()
     if not expected:
-        # Nothing to check against, and nothing secret to protect. Documented as such.
-        return True
+        return False
     header = request.headers.get("Authorization", "")
     scheme, _, presented = header.partition(" ")
     if scheme.lower() != "bearer" or not presented:
@@ -37,6 +40,17 @@ def _authorised(request: HttpRequest) -> bool:
 def scrape(request: HttpRequest) -> HttpResponse:
     if not metrics.enabled():
         raise Http404
+
+    if not metrics.token():
+        logger.error(
+            "The /metrics endpoint is enabled but POSTULO_METRICS_TOKEN is not set, so it "
+            "refuses to serve. Set a token or turn the endpoint off."
+        )
+        return HttpResponse(
+            "This endpoint is enabled but has no token configured.\n",
+            status=503,
+            content_type="text/plain",
+        )
 
     # Wrong tokens are counted per address; see `views_logs.collect` (#472).
     try:

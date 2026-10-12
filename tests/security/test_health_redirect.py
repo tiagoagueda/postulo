@@ -78,12 +78,16 @@ def test_the_health_check_can_now_report_a_broken_database(client, monkeypatch, 
     assert response.json()["database"] == "unavailable"
 
 
-@override_settings(POSTULO_METRICS_ENABLED=True, POSTULO_METRICS_TOKEN="")
+@override_settings(
+    POSTULO_METRICS_ENABLED=True, POSTULO_METRICS_TOKEN="a-metrics-token-that-is-long"
+)
 def test_a_scraper_inside_the_deployment_reaches_the_metrics(client, as_deployed):
     """A scraper reaching the container directly is on the same plain-HTTP hop as the
     health check, and the numbers it collects carry nothing about anybody."""
     with as_deployed:
-        response = client.get(reverse("core:metrics"))
+        response = client.get(
+            reverse("core:metrics"), HTTP_AUTHORIZATION="Bearer a-metrics-token-that-is-long"
+        )
 
     assert response.status_code == 200
     assert "postulo_" in response.content.decode()

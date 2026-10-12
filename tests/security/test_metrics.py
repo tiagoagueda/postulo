@@ -22,11 +22,11 @@ TOKEN = "a-long-random-monitoring-token"
 @pytest.fixture
 def on(settings):
     settings.POSTULO_METRICS_ENABLED = True
-    settings.POSTULO_METRICS_TOKEN = ""
+    settings.POSTULO_METRICS_TOKEN = TOKEN
     return settings
 
 
-def fetch(client, token: str = ""):
+def fetch(client, token: str | None = TOKEN):
     headers = {"HTTP_AUTHORIZATION": f"Bearer {token}"} if token else {}
     return client.get(reverse("core:metrics"), **headers)
 
@@ -49,9 +49,7 @@ def test_being_off_holds_even_with_a_token(client, settings):
 
 
 def test_with_a_token_set_nothing_else_gets_in(client, on):
-    on.POSTULO_METRICS_TOKEN = TOKEN
-
-    assert fetch(client).status_code == 401
+    assert fetch(client, "").status_code == 401
     assert fetch(client, "not-the-token").status_code == 401
     assert fetch(client, TOKEN).status_code == 200
 
@@ -65,16 +63,15 @@ def test_a_token_with_a_byte_above_ascii_is_refused_not_a_crash(client, on):
     assert response.status_code == 401
 
 
-def test_without_a_token_it_serves_because_there_is_nothing_secret_in_it(client, on):
-    """Unlike the log endpoint, which refuses. These are counts, not records.
+def test_without_a_token_it_refuses_rather_than_serve_anybody(client, on):
+    """Unlike what this once did (#801): the numbers name the exact versions and the number of
+    accounts, which is not for whoever can reach the instance."""
+    on.POSTULO_METRICS_TOKEN = ""
 
-    The administration page says plainly that anybody who can reach the instance can read
-    them, so the choice is made with the facts in view rather than by a surprise.
-    """
-    response = fetch(client)
+    response = fetch(client, "")
 
-    assert response.status_code == 200
-    assert response["Content-Type"].startswith("text/plain")
+    assert response.status_code == 503
+    assert b"postulo_" not in response.content
 
 
 # ------------------------------------------------------------- what it says
@@ -160,7 +157,11 @@ def test_the_administration_page_says_whether_they_are_open(
 
     html = client.get(reverse("server:logs")).content.decode()
     assert 'data-metrics-endpoint="on"' in html
-    assert "anybody who can reach this instance can read them" in html
+    assert "behind the token in" in html
+
+    on.POSTULO_METRICS_TOKEN = ""
+    html = client.get(reverse("server:logs")).content.decode()
+    assert "refuses to answer" in html
 
     on.POSTULO_METRICS_TOKEN = TOKEN
     html = client.get(reverse("server:logs")).content.decode()
