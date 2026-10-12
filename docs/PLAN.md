@@ -163,7 +163,7 @@ Two items in the original plan did not survive contact with the packages:
 ```
 postulo/
 ├── manage.py
-├── pyproject.toml            # uv-managed; extras: postgres, weasyprint, chromium
+├── pyproject.toml            # uv-managed; extras: postgres, chromium, server
 ├── docker/                   # Dockerfile, compose files, entrypoint            (M6)
 ├── docs/                     # PLAN.md, THREAT-MODEL.md, TRANSLATING.md; PLUGINS.md
 │                             # only points at the wiki
@@ -178,12 +178,13 @@ postulo/
 │   ├── applications/         # Application, events, reminders, calendar, insights (M2/M5)
 │   ├── notifications/        # events, the dispatcher, transports, the scheduler
 │   ├── plugins/              # registry, the api surface, policy, installing, and the
-│   │   │                     # fifteen plugins Postulo ships -- each a package with its
+│   │   │                     # plugins Postulo ships -- each a package with its
 │   │   │                     # manifest, locale/ and code, none of it in core, and
 │   │   │                     # tests/test_plugin_surface.py saying so:
 │   │   ├── builtin/  europass/  email/  smtp/  own_mail/  localstore/  browser/
 │   │   ├── identifiers/  phone_numbers/  postal_rules/  email_addresses/
-│   │   └── social_profiles/  websites/  employer_structure/  repositories/
+│   │   ├── social_profiles/  websites/  employer_structure/  repositories/
+│   │   └── link_services/  messaging_services/  messaging_contacts/  maps/  gdpr/  webhook/
 │   └── api/                  # ninja routers, tokens, the change feed            (M4)
 └── tests/                    # incl. tests/security/ and the browser suite tests/e2e/
 ```
@@ -337,10 +338,11 @@ disabled by default and never required.
    sets no upper pin and installs and migrates cleanly. It is installed and configured,
    `core/scheduler.py` holds the lease and the heartbeat the container's health check
    reads, and `config/sqlite.py` and the document views already reason about not blocking
-   a worker -- and still nothing enqueues a task: the slow work runs in the request or in
-   the scheduler's loop. The assumption said to re-check when something queued work; the
-   answer is that #247 is where that happens, and the queue the Overview counts is
-   structurally empty until it does.
+   a worker. Since #247 the slow work *is* queued -- `core/errands.py` enqueues an errand
+   when `POSTULO_BACKGROUND_WORK` is on -- and the `worker` profile in `docker/compose.yml`
+   is the process that empties the queue the Overview counts; with it off the slow work
+   runs in the request, as it always did. The classifier gap is still the open part: the
+   assumption stands until `django-tasks-db` declares the Django this project runs.
 4. **Translation catalogues depend on contributors** — which turned out to be the wrong
    assumption, and the right one is subtler. Twenty-four languages shipped in 0.2.0
    without waiting for anybody, machine-drafted and each entry flagged as a draft until a

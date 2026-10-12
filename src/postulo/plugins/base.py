@@ -170,9 +170,9 @@ class Manifest:
     code is entitled to an answer to. ``licence`` is an SPDX identifier. ``source_url`` is
     where the code actually lives, which is the only claim in here anybody can go and check.
 
-    ``logo`` names an image this plugin would like shown beside its name. Nothing renders it
-    yet; the field exists so that shipping one (#106) is a matter of pointing at an image
-    rather than of inventing somewhere to put it.
+    ``logo`` names an image file inside this plugin's package, which Postulo serves beside
+    its name: a sanitised SVG or a re-encoded PNG (#106, #264). It is a file name, never a
+    path or an address, and a plugin without one shows the initials tile.
     """
 
     name: str

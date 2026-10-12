@@ -78,6 +78,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The plugin author's page and the logo docstrings describe the code: all seven notifier events, a logo as a file name, the real size limits and every shipped plugin, with checks that keep them so (#405)
 - The wiki's Configuration page now says an unreadable rate stops start-up, that implicit TLS is offered and names every rate setting, and two checks keep it so (#404)
 - The masthead search narrows the Documents lists and the Calendar first, with Search everything beside it; on the Calendar it narrows the period on screen (#848)
 - The section menu of Your details and Your career has the look of vertical tabs, still anchors to sections of one page (#870)

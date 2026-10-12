@@ -206,7 +206,16 @@ def test_something_far_too_large_is_refused_before_it_is_decoded(loaded, plugin_
 # -------------------------------------------------------- what a name may not be
 
 
-@pytest.mark.parametrize("name", ["../secrets.png", "sub/mark.png", ".env", "..\\mark.png"])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "../secrets.png",
+        "sub/mark.png",
+        ".env",
+        "..\\mark.png",
+        "https://example.org/your-plugin/logo.png",
+    ],
+)
 def test_a_logo_is_a_file_name_and_never_a_path(loaded, monkeypatch, name):
     """The manifest is written by whoever wrote the plugin, so it is input.
 

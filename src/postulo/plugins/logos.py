@@ -18,11 +18,11 @@ transfers exactly: the production policy is ``img-src 'self'``, and an ``<img>``
 a vendor's CDN would tell that vendor which instances run their plugin, how many people use
 it, and when. Postulo serves it or it is not shown.
 
-**Raster only**, for the reason that module gives: SVG is the format logos usually arrive in
-and the one that needs care, because it can carry scripts and references to other files, and
-a direct visit to the file is not the ``<img>`` context where a browser refuses to run them.
-The bytes are decoded and written out again as PNG, so what is served is an image Postulo
-produced from what the plugin shipped rather than the plugin's file passed through.
+**SVG is the preferred form, and PNG is accepted**, each written out again by Postulo and
+never passed through: an SVG is sanitised down to its drawing (it can carry scripts and
+references to other files, and a direct visit to the file is not the ``<img>`` context where
+a browser refuses to run them), and a raster file is decoded and re-encoded as PNG at its own
+shape. What is served is an image Postulo produced from what the plugin shipped (#264).
 
 **A plugin with no logo is normal**, not an error: the interface falls back to the initials
 tile it already uses for a person with no picture and a company with no logo, so nothing is
@@ -45,7 +45,6 @@ logger = logging.getLogger(__name__)
 #: Refused before it is decoded. A logo is not a photograph.
 MAX_BYTES = 2 * 1024 * 1024
 
-#: What a resolved logo is: the PNG bytes, and the plugin they belong to.
 #: What is served for each plugin, and what it is. The type travels with the bytes since
 #: #264: a mark may be a sanitised SVG or a re-encoded PNG, and a cache holding only bytes
 #: left the view to guess.
@@ -119,7 +118,9 @@ def raw_bytes(plugin) -> bytes:
 
 
 def logo_for(plugin) -> tuple[bytes, str] | None:
-    """The logo as a square PNG, or ``None`` where there is not one to show.
+    """The logo as ``(bytes, content type)``, or ``None`` where there is not one to show.
+
+    A sanitised SVG or a re-encoded PNG at its own shape: the type says which.
 
     Never raises: a plugin whose logo is missing or unreadable shows the initials tile,
     exactly as one that declares no logo does. A broken image beside a plugin's name would

@@ -158,3 +158,59 @@ def test_the_configuration_page_does_not_say_what_the_code_no_longer_does():
     assert "unreadable also means no limit" not in text, "start-up refuses a rate it cannot read"
     assert "not offered yet" not in text, "implicit TLS on 465 is offered"
     assert "postulo.E002" in text
+
+
+# ------------------------------------------------ what the plugin author is told (#405)
+
+
+def test_every_notifier_event_is_on_the_plugin_page():
+    from postulo.notifications.base import EVENTS
+
+    text = page("Writing-a-plugin")
+    missing = [key for key in EVENTS if f"`{key}`" not in text]
+
+    assert not missing, f"*Writing a plugin* does not name the events: {missing}"
+
+
+def test_every_plugin_Postulo_ships_is_in_the_page_tree():
+    plugins = ROOT / "src" / "postulo" / "plugins"
+    shipped = sorted(
+        directory.name
+        for directory in plugins.iterdir()
+        if (directory / "__init__.py").is_file()
+        and "shipped(" in (directory / "__init__.py").read_text(encoding="utf-8")
+    )
+    text = page("Writing-a-plugin")
+
+    assert shipped, "the reader found no shipped plugin"
+    missing = [name for name in shipped if f"    {name}/" not in text and f"{name}/ " not in text]
+    assert not missing, f"the tree on *Writing a plugin* leaves out: {missing}"
+
+
+def test_no_manifest_example_gives_a_logo_with_a_separator():
+    for found in re.findall(r'logo="([^"]*)"', page("Writing-a-plugin")):
+        assert "/" not in found and "\\" not in found and not found.startswith("."), found
+
+
+def test_the_logo_size_limits_on_the_page_are_the_ones_in_the_code():
+    from postulo.core.pictures import MAX_SVG_BYTES
+    from postulo.plugins.logos import MAX_BYTES
+
+    text = " ".join(page("Writing-a-plugin").split())
+
+    assert f"Under {MAX_BYTES // (1024 * 1024)} MB in for a raster file" in text
+    assert f"under {MAX_SVG_BYTES // 1024} KB for an SVG" in text
+
+
+def test_no_docstring_describes_the_logo_as_it_was_before_it_was_built():
+    for name in ("base.py", "logos.py"):
+        source = (ROOT / "src" / "postulo" / "plugins" / name).read_text(encoding="utf-8")
+        for stale in ("Nothing renders it yet", "Raster only", "square PNG"):
+            assert stale not in source, f"{name} still says {stale!r}"
+
+
+def test_the_consent_example_imports_the_surface():
+    text = (ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    assert "from postulo.plugins.api import Consent, FieldSpec, access_token" in text
+    assert "postulo.plugins.base import Consent" not in text
