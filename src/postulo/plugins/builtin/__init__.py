@@ -357,7 +357,7 @@ def _from_posting(posting: dict, url: str, *, description_is_html: bool) -> JobP
         posted_at=_date(posting.get("datePosted")),
         closes_at=_date(posting.get("validThrough")),
         url=url,
-        source=urlparse(url).netloc,
+        source=urlparse(url).hostname or "",
     )
 
 

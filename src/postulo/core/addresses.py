@@ -69,11 +69,18 @@ def page_address(raw: str) -> str:
         )
     refusal = _("Only http and https addresses can be captured.")
     try:
-        scheme = urlparse(value).scheme.lower()
+        parsed = urlparse(value)
+        scheme = parsed.scheme.lower()
+        carries_credentials = bool(parsed.username or parsed.password)
     except ValueError as exc:
         raise ValueError(str(refusal)) from exc
     if scheme not in WEB_SCHEMES:
         raise ValueError(str(refusal))
+    if carries_credentials:
+        # A user name in the authority is read differently by whoever looks at it (#818): the
+        # recipe chosen for the address and the host fetched must be one host, and a captured
+        # address has no business holding a password.
+        raise ValueError(str(_("An address cannot carry a user name or a password.")))
     return value
 
 

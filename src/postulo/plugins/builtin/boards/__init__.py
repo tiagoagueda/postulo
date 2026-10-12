@@ -61,7 +61,7 @@ BOARDS: tuple[Board, ...] = (
 def recipe_for(url: str) -> Board | None:
     """The recipe for this address, if a board claims it."""
     try:
-        host = urlparse(url).netloc.split(":")[0].lower()
+        host = (urlparse(url).hostname or "").lower()
     except ValueError:
         return None
     if not host:
