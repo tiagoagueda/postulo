@@ -7295,9 +7295,10 @@
    * page through `textContent`. Leaflet itself loads after this script (it is the map page's
    * alone), so the map is drawn when that script's own load event says it has run.
    *
-   * The credit the tiles' licence asks for is drawn on the map, and Leaflet's attribution
-   * control writes it with innerHTML: the text is escaped here first, so an operator's typed
-   * credit is shown as typed. The tile images carry their own referrer policy, the origin
+   * The credit the tiles' licence asks for is the end of the footer's line over the map,
+   * written by the server; the dialog that places one address, which has no footer, keeps
+   * Leaflet's attribution box, and the text is escaped here before Leaflet writes it with
+   * innerHTML, so an operator's typed credit is shown as typed. The tile images carry their own referrer policy, the origin
    * alone, because OpenStreetMap asks for a Referer and the site's policy sends none to
    * another origin.
    */
@@ -7453,16 +7454,16 @@
         })
         .addTo(map);
       locateControl(L, map, canvas).addTo(map);
-      var credit = escapeHtml(canvas.getAttribute("data-map-attribution"));
-      var creditUrl = canvas.getAttribute("data-map-attribution-url");
-      if (credit && creditUrl) {
-        credit = '<a href="' + escapeHtml(creditUrl) + '" rel="noopener noreferrer external">' + credit + "</a>";
+      // The credit is the end of the footer's line over the map, written by the server; it
+      // is shown now there is a map for it to credit, and Leaflet draws no box of its own.
+      var stage = canvas.closest("[data-map-stage]");
+      var credit = stage && stage.querySelector("[data-map-tile-credit]");
+      if (credit) {
+        credit.hidden = false;
       }
-      L.control.attribution({ prefix: '<a href="https://leafletjs.com" rel="noopener noreferrer external">Leaflet</a>' }).addTo(map);
       var tiles = canvas.getAttribute("data-map-tiles");
       if (tiles) {
         L.tileLayer(tiles, {
-          attribution: credit,
           maxZoom: map.getMaxZoom(),
           referrerPolicy: "strict-origin-when-cross-origin",
         }).addTo(map);

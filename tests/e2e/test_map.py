@@ -63,9 +63,10 @@ def test_leaflet_draws_a_dot_per_place_over_openstreetmap(live_server, page: Pag
     # Aveiro alone, and Lisbon's two companies at one spot gathered into a cluster of two (#703).
     expect(page.locator(".map-pin")).to_have_count(1)
     expect(page.locator(".map-cluster")).to_have_text("2Companies here: 2")
-    expect(page.locator(".leaflet-control-attribution")).to_contain_text(
-        "© OpenStreetMap contributors"
-    )
+    credit = page.locator("footer [data-map-tile-credit]")
+    expect(credit).to_contain_text("© OpenStreetMap contributors")
+    expect(credit.get_by_role("link", name="Leaflet")).to_be_visible()
+    expect(page.locator(".leaflet-control-attribution")).to_have_count(0)
     page.wait_for_load_state("networkidle")
     assert tiles, "the browser asked for tiles"
     referers = {headers.get("referer", "") for headers in tiles}
@@ -84,6 +85,8 @@ def test_with_no_tiles_the_outline_is_drawn_and_nothing_is_fetched(live_server, 
     sign_in(page, live_server.url, "/jobs/companies/map/")
 
     expect(page.locator("path.map-outline")).to_have_count(1)
+    credit = page.locator("footer [data-map-tile-credit]")
+    expect(credit).to_have_text("Leaflet")  # no tiles, so nobody else to credit
     expect(page.locator(".map-pin, .map-cluster")).to_have_count(2)
     page.wait_for_load_state("networkidle")
     assert tiles == []
@@ -112,12 +115,13 @@ def test_the_credit_stays_inside_the_map_on_a_phone_with_wider_text(
     page.set_viewport_size({"width": 360, "height": 740})
     sign_in(page, live_server.url, "/jobs/companies/map/")
     page.evaluate(ADOPT, TEXT_SPACING)
-    expect(page.locator(".leaflet-control-attribution")).to_be_visible()
+    expect(page.locator("[data-map-tile-credit]")).to_be_visible()
 
     inside = page.evaluate(
         """() => {
           const box = document.querySelector('[data-map]').getBoundingClientRect();
-          return [...document.querySelectorAll('.leaflet-control, .leaflet-control a')]
+          return [...document.querySelectorAll(
+              '.leaflet-control, .leaflet-control a, [data-map-tile-credit] a')]
             .map(el => el.getBoundingClientRect())
             .every(r => r.left >= box.left - 1 && r.right <= box.right + 1
                         && r.top >= box.top - 1 && r.bottom <= box.bottom + 1);

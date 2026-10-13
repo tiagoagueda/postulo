@@ -21,8 +21,8 @@
     {% if places %}
       {% comment %} The drawing (#898): Leaflet over the basemap the operator chose, with the
          same places the list names, given as data and never as markup. The credit the tiles'
-         licence asks for is drawn on the map; typed text is escaped by the script before
-         Leaflet writes it. {% endcomment %}
+         licence asks for is not Leaflet's box: it is written by the server into the footer's
+         line over the map's foot, below. {% endcomment %}
       <div class="absolute inset-0" data-map-card hidden>
         <div class="map-canvas size-full" data-map role="region"
              aria-label="{% translate 'Map of the places listed' %}"
@@ -30,8 +30,6 @@
              {% if outline %}data-map-outline="{{ outline|as_json }}"{% endif %}
              data-map-tiles="{{ tiles.url }}"
              data-map-max-zoom="{{ tiles.max_zoom }}"
-             data-map-attribution="{{ tiles.attribution }}"
-             data-map-attribution-url="{{ tiles.attribution_url }}"
              data-map-zoom-in="{% translate 'Zoom in' %}"
              data-map-zoom-out="{% translate 'Zoom out' %}"
              data-map-cluster="{% translate 'Companies here: {count}' %}"
@@ -134,9 +132,27 @@
     {% endif %}
 
     {% comment %} The footer's one line, over the map's foot (#849): the same links every page
-       ends with, the legal notice among them, which an instance may be required to show. {% endcomment %}
+       ends with, the legal notice among them, which an instance may be required to show. The
+       map's own credit is the end of that line rather than a second box in the other corner:
+       the tiles' attribution, which their licence asks to see on the map, and Leaflet. Written
+       by the server, so a typed credit is escaped like any text, and shown by the script once
+       the map is drawn, since with scripts off there is no map to credit. {% endcomment %}
     <footer class="map-overlay map-footer absolute start-3 bottom-3 flex max-w-[calc(100%-1.5rem)] flex-wrap items-center gap-x-4 px-3 text-xs text-ink-500 sm:max-w-[60%] dark:text-ink-400">
       {% include "partials/footer_links.html" %}
+      {% if places %}
+        <p class="flex flex-wrap gap-x-4" data-map-tile-credit hidden>
+          {% if tiles.url %}
+            {% if tiles.attribution_url %}
+              <a href="{{ tiles.attribution_url }}" rel="noopener noreferrer external" target="_blank"
+                 class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200">{{ tiles.attribution }}</a>
+            {% else %}
+              <span class="inline-block py-1">{{ tiles.attribution }}</span>
+            {% endif %}
+          {% endif %}
+          <a href="https://leafletjs.com" rel="noopener noreferrer external" target="_blank"
+             class="inline-block py-1 underline underline-offset-2 hover:text-ink-700 dark:hover:text-ink-200">Leaflet</a>
+        </p>
+      {% endif %}
     </footer>
   </div>
 {% endblock %}

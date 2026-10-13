@@ -9,6 +9,8 @@ plain text.
 
 from __future__ import annotations
 
+import re
+
 import pytest
 from django.core.management import call_command
 from django.core.management.base import SystemCheckError
@@ -74,8 +76,12 @@ def test_the_page_hands_leaflet_the_tiles_and_their_credit(client, user):
     html = map_page(client, user).content.decode()
 
     assert 'data-map-tiles="https://tile.openstreetmap.org/{z}/{x}/{y}.png"' in html
-    assert 'data-map-attribution="© OpenStreetMap contributors"' in html
-    assert 'data-map-attribution-url="https://www.openstreetmap.org/copyright"' in html
+    credit = re.search(r"<p[^>]*data-map-tile-credit[^>]*>.*?</p>", html, re.S)[0]
+    assert "hidden" in credit.split(">")[0], "shown by the script once the map is drawn"
+    assert 'href="https://www.openstreetmap.org/copyright"' in credit
+    assert "© OpenStreetMap contributors" in credit and ">Leaflet</a>" in credit
+    footer = re.search(r"<footer[^>]*map-footer.*?</footer>", html, re.S)[0]
+    assert "data-map-tile-credit" in footer, "the credit is the end of the footer's line"
     assert "data-map-outline" not in html, "the outline is for a map without tiles"
 
 
