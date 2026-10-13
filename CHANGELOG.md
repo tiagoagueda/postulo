@@ -196,6 +196,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- Seven more European languages are scaffolded with empty catalogues for 0.5.0: Azerbaijani, Belarusian, Kazakh, Montenegrin, Norwegian Nynorsk, Romansh and Faroese; none is offered until a string is translated (#269)
 - A company holds social profiles, its LinkedIn page and its accounts, as a contact does: on its form, on its page with each service's mark, in the API, in the archive and through a merge (#906)
 - The calendar's Month, Week, Day and Agenda buttons each carry an icon, drawn alone on a small screen (#904)
 - The companies' places export as GeoJSON, and a GeoJSON file's points, matched to companies by name or Wikidata identifier and ticked, place their addresses by hand; a GeoJSON sub-module of file formats that needs Maps (#880)

@@ -70,9 +70,11 @@ def test_a_language_with_no_language_asked_for_is_named_as_it_names_itself():
 
 
 def test_the_gaps_are_the_recorded_ones():
-    """719 of the 6,084 names of Postulo's own tags in one another are not in CLDR, all of
-    them in 18 African display languages. A Babel that changes the number has changed the
-    data beneath the fallback, and somebody has to look."""
+    """870 of the 7,225 names of Postulo's own tags in one another are not in CLDR. One
+    language is named nowhere: CLDR has no name for Montenegrin under `cnr`, so every
+    language falls back to *crnogorski*. The other 785 are all in 18 African display
+    languages. A Babel that changes either number has changed the data beneath the
+    fallback, and somebody has to look."""
     recorded = json.loads(GAPS.read_text(encoding="utf-8"))
     assert recorded["cldr"] == language_names.CLDR_VERSION
 
@@ -85,8 +87,12 @@ def test_the_gaps_are_the_recorded_ones():
                 found.setdefault(shown, []).append(named)
 
     assert found == recorded["gaps"]
-    assert sum(len(names) for names in found.values()) == 719
-    assert len(found) == 18
+    assert sum(len(names) for names in found.values()) == 870
+    nowhere = [named for named in TAGS if all(named in found.get(shown, []) for shown in TAGS)]
+    assert nowhere == ["cnr"]
+    rest = {shown: [n for n in names if n not in nowhere] for shown, names in found.items()}
+    assert sum(len(names) for names in rest.values()) == 785
+    assert len([shown for shown, names in rest.items() if names]) == 18
 
 
 def test_a_gap_is_never_blank():

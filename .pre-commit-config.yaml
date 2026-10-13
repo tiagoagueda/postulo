@@ -9,7 +9,9 @@ repos:
       - id: check-added-large-files
         # The browser suite's own DejaVu Sans, which it draws every page in so a desktop
         # and CI measure the same widths (#717): two of the four faces are over 500 KB.
-        exclude: ^tests/e2e/fonts/
+        # And a new language's catalogue: an empty one holds a slot for every string the
+        # core has, which passed 500 KB with the seven languages of #269.
+        exclude: ^(tests/e2e/fonts/|src/postulo/(plugins/[^/]+/)?locale/[^/]+/LC_MESSAGES/django\.po$)
       - id: check-merge-conflict
       - id: check-toml
       - id: check-yaml

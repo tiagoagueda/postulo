@@ -10,9 +10,9 @@ either.
 country names): 633 languages, each named in as many as 1,082 languages, reviewed by the
 speakers of each. Nothing here is a table of names, and no name is made by a machine.
 
-**A gap falls back and is never blank.** Not every language is named in every other (the 18
-African display languages that have names for 69 of them name 21 to 68 of them, 671 gaps
-among 4,761 pairs of Postulo's own tags, listed in `tests/test_language_names.py`). In
+**A gap falls back and is never blank.** Not every language is named in every other (870 gaps
+among 7,225 pairs of Postulo's own tags: Montenegrin, which CLDR names nowhere, and 785 in 18
+African display languages, listed in `tests/data/language_name_gaps.json`). In
 order: CLDR's name in the language asked for, read through that language's own parents --
 `pt-AO` reads as `pt-PT` -- then what the language calls itself, then CLDR's English, then the
 code as it was given. A well-formed code nobody has a name for is shown as the code.

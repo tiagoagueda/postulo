@@ -173,6 +173,34 @@ def test_norwegian_is_both_no_and_nb():
     assert languages.match("nb", ["no", "nb"]) == "nb", "its own name first"
 
 
+def test_nynorsk_has_its_own_catalogue_and_norwegian_still_means_bokmal():
+    """Nynorsk joins Bokmål on the list (#269), and the registry files both under `no`. A
+    bare `no` stays Bokmål, the first of the two on the list; each written form finds its
+    own catalogue and is never handed the other's; and a Nynorsk reader is given ESCO's
+    Norwegian rather than English."""
+    assert languages.match("nn") == "nn"
+    assert languages.match("nn-NO") == "nn"
+    assert languages.match("nb") == "nb"
+    assert languages.match("no") == "nb"
+    assert languages.matches("no", ["nb", "nn"]) == ("nb", "nn")
+    assert languages.catalogue("no-NO") == "nb"
+    assert languages.match("nb", ["en", "nn"]) == ""
+    assert languages.match("nn", ["en", "nb"]) == ""
+    assert languages.match("nn", ["en", "no"]) == "no"
+
+
+def test_montenegrin_is_a_three_letter_language_and_not_serbian():
+    """`cnr` is the first tag on the list with a primary subtag of three letters (#269).
+    It is written, stored and filed as it is, and Serbian in the Latin script is still read
+    as the Serbian catalogue there is rather than as Montenegrin."""
+    assert languages.tag("CNR_me") == "cnr-ME"
+    assert languages.well_formed("cnr-ME")
+    assert languages.locale_dir_name("cnr") == "cnr"
+    assert languages.catalogue("cnr-ME") == "cnr"
+    assert languages.catalogue("sr-Latn-ME") == "sr-Cyrl"
+    assert languages.match("cnr", ["sr-Cyrl", "en"]) == ""
+
+
 def test_every_match_closest_first():
     assert languages.matches("pt-zz", ["en-GB", "pt-PT", "pt-BR"]) == ("pt-PT", "pt-BR")
     assert languages.matches("pt-br", ["pt", "pt-PT", "pt-BR"]) == ("pt-BR", "pt", "pt-PT")

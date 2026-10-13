@@ -69,11 +69,14 @@ FLAG_COUNTRIES: dict[str, str] = {
     "af": "ZA",
     "ak": "GH",
     "am": "ET",
+    "az": "AZ",
+    "be": "BY",
     "bg": "BG",
     "bm": "ML",
     "bn": "BD",
     "bs": "BA",
     "ca": "ES-CT",
+    "cnr": "ME",
     "cs": "CZ",
     "cy": "GB-WLS",
     "da": "DK",
@@ -85,6 +88,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "et": "EE",
     "eu": "ES-PV",
     "fi": "FI",
+    "fo": "FO",
     "fr-FR": "FR",
     "fr-CA": "CA",
     "ga": "IE",
@@ -98,6 +102,7 @@ FLAG_COUNTRIES: dict[str, str] = {
     "it": "IT",
     "ka": "GE",
     "kab": "DZ",
+    "kk": "KZ",
     "lb": "LU",
     "lt": "LT",
     "lv": "LV",
@@ -106,11 +111,13 @@ FLAG_COUNTRIES: dict[str, str] = {
     "mt": "MT",
     "nb": "NO",
     "nl": "NL",
+    "nn": "NO",
     "nr": "ZA",
     "ny": "MW",
     "pl": "PL",
     "pt-PT": "PT",
     "pt-BR": "BR",
+    "rm": "CH",
     "ro": "RO",
     "rw": "RW",
     "sk": "SK",
@@ -151,11 +158,14 @@ NATIVE_NAMES: dict[str, str] = {
     "ak": "Akan",
     "am": "አማርኛ",
     "ar": "العربية",
+    "az": "azərbaycan",
+    "be": "беларуская",
     "bg": "български",
     "bm": "Bamanankan",
     "bn": "বাংলা",
     "bs": "bosanski",
     "ca": "català",
+    "cnr": "crnogorski",
     "cs": "čeština",
     "cy": "Cymraeg",
     "da": "dansk",
@@ -169,6 +179,7 @@ NATIVE_NAMES: dict[str, str] = {
     "eu": "euskara",
     "ff": "Pulaar",
     "fi": "suomi",
+    "fo": "føroyskt",
     "fr-FR": "français (France)",
     "fr-CA": "français (Canada)",
     "ga": "Gaeilge",
@@ -184,6 +195,7 @@ NATIVE_NAMES: dict[str, str] = {
     "it": "italiano",
     "ka": "ქართული",
     "kab": "Taqbaylit",
+    "kk": "қазақ тілі",
     "lb": "Lëtzebuergesch",
     "ln": "Lingála",
     "lt": "lietuvių",
@@ -193,12 +205,14 @@ NATIVE_NAMES: dict[str, str] = {
     "mt": "Malti",
     "nb": "norsk bokmål",
     "nl": "Nederlands",
+    "nn": "norsk nynorsk",
     "nr": "isiNdebele",
     "ny": "Chichewa",
     "om": "Afaan Oromoo",
     "pl": "polski",
     "pt-PT": "português (Portugal)",
     "pt-BR": "português (Brasil)",
+    "rm": "rumantsch",
     "ro": "română",
     "rw": "Ikinyarwanda",
     "sk": "slovenčina",
@@ -505,6 +519,13 @@ PLURAL_FORMS: dict[str, str] = {
         "nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : "
         "n%100>=11 ? 4 : 5);"
     ),
+    "az": _TWO,
+    #: Three, by the last digit, as Ukrainian: 1 and 21 take the first form, 2-4 and
+    #: 22-24 the second, 11-14 and everything else the third.
+    "be": (
+        "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
+        "(n%100<10 || n%100>=20) ? 1 : 2);"
+    ),
     "bg": _TWO,
     #: One. Bamanankan, Igbo, chiShona and Wolof do not distinguish number on the
     #: noun at all, so their catalogues carry a single form and a second would be
@@ -519,6 +540,12 @@ PLURAL_FORMS: dict[str, str] = {
         "(n%100<10 || n%100>=20) ? 1 : 2);"
     ),
     "ca": _TWO,
+    #: Montenegrin counts as Serbian, Croatian and Bosnian do; written out for the same
+    #: reason as Bosnian's.
+    "cnr": (
+        "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && "
+        "(n%100<10 || n%100>=20) ? 1 : 2);"
+    ),
     "cs": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
     #: Four, and the one language here whose rule singles out particular numbers:
     #: 1 and 2 take their own forms, 8 and 11 share a fourth, and everything else
@@ -535,6 +562,7 @@ PLURAL_FORMS: dict[str, str] = {
     "eu": _TWO,
     "ff": _TWO,
     "fi": _TWO,
+    "fo": _TWO,
     "fr-FR": "nplurals=2; plural=(n > 1);",
     "fr-CA": "nplurals=2; plural=(n > 1);",
     "ga": ("nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : (n>2 && n<7) ? 2 :(n>6 && n<11) ? 3 : 4);"),
@@ -559,6 +587,7 @@ PLURAL_FORMS: dict[str, str] = {
     "it": _TWO,
     "ka": _TWO,
     "kab": "nplurals=2; plural=(n > 1);",
+    "kk": _TWO,
     "lb": _TWO,
     "ln": "nplurals=2; plural=(n > 1);",
     "lt": (
@@ -576,6 +605,7 @@ PLURAL_FORMS: dict[str, str] = {
     ),
     "nb": _TWO,
     "nl": _TWO,
+    "nn": _TWO,
     "nr": _TWO,
     "ny": _TWO,
     "om": _TWO,
@@ -588,6 +618,7 @@ PLURAL_FORMS: dict[str, str] = {
     #: `n != 1`. Copying the European line without looking would make every count on
     #: every page ungrammatical for the language's largest population.
     "pt-BR": "nplurals=2; plural=(n > 1);",
+    "rm": _TWO,
     "ro": "nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < 20)) ? 1 : 2);",
     "rw": _TWO,
     "sk": "nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;",
@@ -921,12 +952,14 @@ def direction(code: str) -> str:
 SCRIPTS: dict[str, str] = {
     "am": "Ethi",
     "ar": "Arab",
+    "be": "Cyrl",
     "bg": "Cyrl",
     "bn": "Beng",
     "el": "Grek",
     "hi": "Deva",
     "hy": "Armn",
     "ka": "Geor",
+    "kk": "Cyrl",
     "mk": "Cyrl",
     "ti": "Ethi",
     "uk": "Cyrl",
