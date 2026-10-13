@@ -217,6 +217,37 @@ def test_the_harvest_is_reshaped_to_the_shape_the_loader_reads(data_dir, harvest
     assert occupation["names"]["fr"] == "Développeur logiciel"
 
 
+def test_the_occupations_are_searched_in_full_and_keep_their_nace_divisions(data_dir, harvest):
+    """ESCO's companion correspondence links an occupation to NACE Rev. 2.1 groups and
+    classes, and only a full search answers it; each is cut to its division (#897). A code
+    the vendored NACE file has no division for is left out and said."""
+    linked = [dict(item) for item in OCCUPATIONS]
+    # The full form answers some names with a space at an end; the file keeps them trimmed.
+    linked[2]["preferredLabel"] = {"en": "Software developer ", "fr": " Développeur logiciel"}
+    linked[2]["_links"] = {
+        "hasNACECode": [
+            {"code": "62.1", "uri": "http://data.europa.eu/ux2/nace2.1/621"},
+            {"code": "63.12", "uri": "http://data.europa.eu/ux2/nace2.1/6312"},
+            {"code": "00.1", "uri": "http://data.europa.eu/ux2/nace2.1/001"},
+        ]
+    }
+    pages = {**tables(), (OCCUPATION_TYPE, "v9.9.9", 0): Answer(page(linked))}
+
+    client = harvest(pages)
+
+    document = json.loads((data_dir / "esco-9.9.9.json").read_text(encoding="utf-8"))
+    assert document["occupations"]["2512.1.1"]["nace"] == ["62", "63"]
+    assert document["occupations"]["2512.1.1"]["names"] == {
+        "en": "Software developer",
+        "fr": "Développeur logiciel",
+    }
+    assert document["occupations"]["2512.1"]["nace"] == []
+    occupation_query = next(r for r in client.requests if r.get("type") == OCCUPATION_TYPE)
+    assert occupation_query["full"] == "true"
+    assert occupation_query["limit"] == fetch_esco.FULL_PAGE_SIZE
+    assert all(r["full"] == "false" for r in client.requests if r.get("type") != OCCUPATION_TYPE)
+
+
 def test_the_occupations_are_indexed_within_their_unit_group(data_dir, harvest):
     harvest(tables())
 

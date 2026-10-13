@@ -258,15 +258,45 @@ def code_for(name: str, language: str = "") -> str:
     )
 
 
-def suggestions(exclude=(), language: str = "") -> list[str]:
+@lru_cache(maxsize=1)
+def _divisions_by_group() -> dict[str, frozenset[str]]:
+    """``{unit group: NACE divisions}``, the union over the group's occupations (#897)."""
+    found: dict[str, set[str]] = {}
+    for entry in classification()["occupations"].values():
+        found.setdefault(entry["isco"], set()).update(entry.get("nace") or ())
+    return {group: frozenset(divisions) for group, divisions in found.items()}
+
+
+def divisions_for(unit_group: str) -> frozenset[str]:
+    """The NACE divisions the occupations of a unit group are usually employed in, through
+    ESCO's companion correspondence (#897). Empty for a code nothing here has, and for a
+    file harvested before the correspondence was."""
+    return _divisions_by_group().get(unit_group, frozenset())
+
+
+def suggestions(exclude=(), language: str = "", sections=()) -> list[str]:
     """What a picker offers, minus anything the person already has.
 
     The unit groups in code order: the level a person recognises, which is why the
     occupations are not offered — a picker is not a directory, and the occupations are
-    there to be matched, not chosen.
+    there to be matched, not chosen. Where a company's ``sections`` are known, the groups
+    whose occupations ESCO places in them come first (#897); nothing is left out.
     """
+    from . import industries
+
     taken = {str(name).casefold() for name in exclude}
-    return [name for _code, name in unit_groups(language) if name.casefold() not in taken]
+    offered = [(code, name) for code, name in unit_groups(language) if name.casefold() not in taken]
+    wanted = set(sections or ())
+    if not wanted:
+        return [name for _code, name in offered]
+
+    def near(pair) -> bool:
+        return bool(wanted & set(industries.sections_for(divisions_for(pair[0]))))
+
+    return [
+        name
+        for _code, name in [p for p in offered if near(p)] + [p for p in offered if not near(p)]
+    ]
 
 
 # ------------------------------------------------------------------------------ skills
@@ -534,6 +564,7 @@ def forget() -> None:
         classification,
         _occupations_by_name,
         _unit_groups_by_name,
+        _divisions_by_group,
         skills_about,
         _skill_identifiers,
         _skill_names,

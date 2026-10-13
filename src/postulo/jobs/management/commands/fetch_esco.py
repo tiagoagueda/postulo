@@ -24,6 +24,14 @@ written. What is written is checked
 against the shape the loader reads before anything is replaced, nothing is written until
 both halves are, and the command says what it found. Nothing in a request path calls
 this; it runs once, at provisioning.
+
+**The occupations come with the NACE divisions they are employed in (#897).** Since v1.2.1
+each occupation links to the NACE Rev. 2.1 groups and classes ESCO's companion
+correspondence maps it to, ``_links.hasNACECode``, which the API answers only in a search's
+full form. So the occupations are searched in full, in pages small enough to be a few
+megabytes each, and each code is cut to its division, ``62.1`` to ``62``: the level
+``industries.py`` holds. A code that is not a division of the vendored classification is
+left out and counted, rather than refusing the harvest.
 """
 
 from __future__ import annotations
@@ -38,7 +46,7 @@ from pathlib import Path
 import httpx
 from django.core.management.base import BaseCommand, CommandError
 
-from postulo.jobs import esco
+from postulo.jobs import esco, industries
 from postulo.jobs.esco import DATA_DIR, FALLBACK
 from postulo.plugins.http import public_only_client
 
@@ -61,6 +69,12 @@ SKILL_TYPE = "skill"
 #: One page of the harvest. The occupations answer in one of these and the skills in two;
 #: the API reads ``offset`` as a number of pages of this size, not of concepts.
 PAGE_SIZE = 10000
+
+#: One page of the occupations, searched in full for their NACE codes (#897): each answers
+#: in about forty kilobytes in its 28 languages, so a hundred are a page of a few megabytes
+#: the API serves in well under a minute (two hundred timed out), where ten thousand would
+#: be a hundred megabytes.
+FULL_PAGE_SIZE = 100
 
 #: What the tail of a skill's identifier may be. Every one in v1.2.1 is a UUID; this is
 #: what a line of the file can safely hold, and a tail outside it is refused.
@@ -107,9 +121,11 @@ LANGUAGES = (
 
 PUBLISHER = "European Commission, Directorate-General for Employment, Social Affairs and Inclusion"
 
-#: A minute is enough for one of the pages this harvest makes, which are a few
-#: megabytes; more than that is a server in trouble, not a classification.
-TIMEOUT = 60.0
+#: Three minutes for one of the pages this harvest makes, which are a few megabytes: the
+#: occupations searched in full answer slowly, and one in a run took longer than a minute
+#: (#897). A page that times out is asked again, twice, before the run gives up.
+TIMEOUT = 180.0
+ATTEMPTS = 3
 
 
 class Command(BaseCommand):
@@ -143,6 +159,7 @@ class Command(BaseCommand):
             },
         ) as client:
             units, occupations = self._harvest(client, f"v{version}")
+            unknown = sorted({c for e in occupations.values() for c in e.pop("unknown_nace")})
             uncoded = sorted(i for i, e in occupations.items() if not e["code"])
             if uncoded:
                 raise CommandError(
@@ -171,6 +188,11 @@ class Command(BaseCommand):
             f"{len(document['occupations'])} occupations, revision "
             f"{document['revision']}."
         )
+        if unknown:
+            self.stdout.write(
+                f"{len(unknown)} NACE codes the occupations carry are not divisions of "
+                f"{industries.revision()} and were left out: {', '.join(unknown[:10])}."
+            )
         skills_target = DATA_DIR / f"esco-skills-{version}.zip"
         size = write_skills(skills_target, about, identifiers, names)
         self.stdout.write(
@@ -214,15 +236,22 @@ class Command(BaseCommand):
             entry = units.setdefault(code, {"major": code[0], "names": {}})
             self._labels(concept, entry["names"])
         for concept in self._search(
-            client, {"type": OCCUPATION_TYPE, "selectedVersion": selected_version}
+            client,
+            {"type": OCCUPATION_TYPE, "selectedVersion": selected_version},
+            full=True,
         ):
             identifier = identifier_of(concept)
             if not identifier:
                 continue
-            entry = occupations.setdefault(identifier, {"code": "", "names": {}})
+            entry = occupations.setdefault(
+                identifier, {"code": "", "names": {}, "nace": set(), "unknown_nace": set()}
+            )
             if not entry["code"]:
                 entry["code"] = occupation_code(concept)
             self._labels(concept, entry["names"])
+            for division in nace_divisions(concept):
+                known = industries.section_of(division)
+                entry["nace" if known else "unknown_nace"].add(division)
         return units, occupations
 
     def _harvest_skills(self, client, selected_version) -> dict[str, dict[str, str]]:
@@ -261,7 +290,7 @@ class Command(BaseCommand):
             if isinstance(value, str) and value and language not in names:
                 names[language] = value
 
-    def _search(self, client, params) -> list[dict]:
+    def _search(self, client, params, full: bool = False) -> list[dict]:
         """Every concept a search returns, the pages followed until the total is in.
 
         **``offset`` is a page, not a concept.** Asked with ``limit=2``, ``offset=1`` answers
@@ -276,14 +305,15 @@ class Command(BaseCommand):
         seen: set[str] = set()
         page = 0
         total = 0
+        size = min(PAGE_SIZE, FULL_PAGE_SIZE) if full else PAGE_SIZE
         while True:
             response = self._query(
                 client,
                 {
                     **params,
-                    "full": "false",
+                    "full": "true" if full else "false",
                     "language": NEGOTIATED_LANGUAGE,
-                    "limit": PAGE_SIZE,
+                    "limit": size,
                     "offset": page,
                 },
             )
@@ -316,7 +346,7 @@ class Command(BaseCommand):
                     seen.add(key)
                 concepts.append(item)
             page += 1
-            if not items or len(concepts) >= total or page * PAGE_SIZE >= total:
+            if not items or len(concepts) >= total or page * size >= total:
                 break
         if len(concepts) < total:
             raise CommandError(
@@ -328,10 +358,17 @@ class Command(BaseCommand):
     def _query(self, client, params) -> httpx.Response:
         """One query to the API, with the URL and the answer in the error where it fails."""
         url = API_BASE + SEARCH_PATH
-        try:
-            response = client.get(url, params=params)
-        except httpx.HTTPError as exc:
-            raise CommandError(f"the ESCO API did not answer {url}: {exc}") from exc
+        for attempt in range(1, ATTEMPTS + 1):
+            try:
+                response = client.get(url, params=params)
+                break
+            except httpx.TimeoutException as exc:
+                if attempt == ATTEMPTS:
+                    raise CommandError(
+                        f"the ESCO API did not answer {url} in {ATTEMPTS} tries: {exc}"
+                    ) from exc
+            except httpx.HTTPError as exc:
+                raise CommandError(f"the ESCO API did not answer {url}: {exc}") from exc
         if response.status_code == 429:
             raise CommandError(
                 "the ESCO API is rate-limiting the harvest; wait a minute and run the command again"
@@ -355,8 +392,14 @@ class Command(BaseCommand):
             for position, identifier in enumerate(identifiers, start=1):
                 entry = occupations[identifier]
                 code = entry["code"] if "." in entry["code"] else f"{group}.{position}"
-                names = {lang: entry["names"][lang] for lang in sorted(entry["names"])}
-                occupation_entries[code] = {"isco": group, "names": names}
+                # Trimmed: the full search answers some names with a space at an end, which
+                # the short form never did and a match on a typed title must not need (#897).
+                names = {lang: entry["names"][lang].strip() for lang in sorted(entry["names"])}
+                occupation_entries[code] = {
+                    "isco": group,
+                    "names": names,
+                    "nace": sorted(entry.get("nace", ())),
+                }
         unit_entries = {}
         for code in sorted(units):
             entry = units[code]
@@ -392,6 +435,12 @@ class Command(BaseCommand):
             problems.append("a unit group has no English name")
         if any(not entry["names"].get(FALLBACK) for entry in occupations.values()):
             problems.append("an occupation has no English name")
+        if any(
+            not re.fullmatch(r"\d{2}", code)
+            for entry in occupations.values()
+            for code in entry.get("nace", ())
+        ):
+            problems.append("an occupation's NACE code is not a two-digit division")
         if problems:
             shown = "\n".join(f"- {problem}" for problem in problems)
             raise CommandError(f"the download is not the shape the loader reads:\n{shown}")
@@ -475,6 +524,25 @@ def identifier_of(concept) -> str:
     """The identifier a concept carries, the URI the API gives it."""
     value = concept.get("uri")
     return value if isinstance(value, str) and value else ""
+
+
+def nace_divisions(concept) -> set[str]:
+    """The NACE divisions an occupation is employed in, from the codes of the groups and
+    classes ESCO links it to: ``59.11`` and ``62`` are divisions ``59`` and ``62`` (#897)."""
+    links = concept.get("_links") if isinstance(concept, dict) else None
+    found = links.get("hasNACECode") if isinstance(links, dict) else None
+    if isinstance(found, dict):
+        found = [found]
+    divisions: set[str] = set()
+    for link in found if isinstance(found, list) else ():
+        code = link.get("code") if isinstance(link, dict) else None
+        if not isinstance(code, str) or not code.strip():
+            uri = link.get("uri", "") if isinstance(link, dict) else ""
+            code = uri.rsplit("/", 1)[-1] if isinstance(uri, str) else ""
+        head = re.match(r"\s*(\d{2})", code or "")
+        if head:
+            divisions.add(head.group(1))
+    return divisions
 
 
 def unit_group_code(concept) -> str:

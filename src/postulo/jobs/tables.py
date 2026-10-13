@@ -5,13 +5,22 @@ from django.utils.translation import ngettext_lazy
 
 from postulo.core.tables import Column, Table, register
 
-from . import identifiers
+from . import identifiers, industries
 from .models import (
     CompanyKind,
     DiscardReason,
     EmploymentType,
     RemoteType,
 )
+
+
+class SectorChoices:
+    """The 22 NACE sections as a choice filter's ``(value, label)`` pairs, read each time
+    they are listed so the names are the reader's language's, not the one the module was
+    imported in (#897)."""
+
+    def __iter__(self):
+        return iter(industries.sections())
 
 
 @register
@@ -73,6 +82,17 @@ class CompaniesTable(Table):
             sort=("location_town",),
             filter="text",
             lookups=("location_town",),
+            default=True,
+        ),
+        # Its industries' NACE sections (#897): read off them, so a company in two sectors is
+        # in both and there is no single value to sort by; the filter is the 22 sections in
+        # the reader's language.
+        Column(
+            "sector",
+            _("Sector"),
+            filter="choice",
+            lookups=("industries__section",),
+            choices=SectorChoices(),
             default=True,
         ),
         # Several per company, so no single value to sort by; the filter matches any.

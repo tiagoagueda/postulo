@@ -66,6 +66,30 @@ DATE_FIELDS = {
 }
 
 
+def industries_from_entries(user, entries) -> list:
+    """A company's industries out of an archive: each a name, or since format 70 a
+    ``{"name", "sector"}`` whose sector was chosen by hand (#897). A sector that is not one
+    of the 22 sections is dropped and the name kept; an industry already known keeps the
+    sector it has."""
+    from postulo.jobs import industries
+    from postulo.jobs.models import Industry
+
+    held = []
+    for entry in entries if isinstance(entries, list) else []:
+        if isinstance(entry, dict):
+            name = entry.get("name")
+            sector = entry.get("sector") if isinstance(entry.get("sector"), str) else ""
+        else:
+            name, sector = entry, ""
+        if not isinstance(name, str) or not name.strip():
+            continue
+        found = Industry.named(
+            user, [name], section=sector if industries.is_section(sector) else ""
+        )
+        held.extend(found)
+    return held
+
+
 def resume_section_models() -> dict:
     """Each career block of an archive and the model it restores into.
 
@@ -1565,7 +1589,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         if parent_name:
             wants_parent[company.pk] = parent_name
         if industry_names:
-            company.industries.add(*Industry.named(user, industry_names))
+            company.industries.add(*industries_from_entries(user, industry_names))
         _restore_phone_numbers(
             company, user, company_numbers, report, f"on the company “{company.name}”"
         )

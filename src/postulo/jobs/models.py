@@ -84,6 +84,11 @@ class Industry(OwnedModel):
     #: what makes a report legible to an employment office that thinks in NACE, and nothing
     #: else depends on it (#140).
     code = models.CharField(_("NACE division"), max_length=4, blank=True)
+    #: The NACE section above it, the *sector* (#897): its division's where it has a code, so
+    #: the two never disagree; one of Postulo's short names' where it is one of those; chosen
+    #: by hand for a word of the person's own, and empty where nobody chose, which is allowed
+    #: and draws plainly. A company's sectors are its industries' sections.
+    section = models.CharField(_("sector"), max_length=1, blank=True)
 
     class Meta:
         verbose_name = _("industry")
@@ -98,24 +103,51 @@ class Industry(OwnedModel):
 
     @property
     def look(self) -> tuple[str, str]:
-        """``(icon, tone)`` it is drawn with: its NACE section's, or plain (#856)."""
-        return industries.look_of(self.code)
+        """``(icon, tone)`` it is drawn with: its sector's, or plain (#856, #897)."""
+        return industries.LOOKS.get(self.section, industries.PLAIN_LOOK)
+
+    @property
+    def sector_name(self) -> str:
+        """Its sector's name in the reader's language, or empty where it has none."""
+        return industries.section_name(self.section)
+
+    @property
+    def sector_by_hand(self) -> bool:
+        """Whether its sector was chosen rather than read off the name: the only case an
+        archive carries it, since a division's or a short name's is derivable (#897)."""
+        return bool(self.section) and self.section != industries.section_for_name(self.name)
 
     def save(self, *args, **kwargs):
         # The code follows the name rather than being set beside it. Renaming an industry
         # to a division's name gives it that division; renaming it away takes it back. One
-        # invariant, and no way for the two to disagree (#140).
+        # invariant, and no way for the two to disagree (#140). The sector follows the code
+        # where there is one; otherwise what was chosen stays, and a short name with no
+        # sector chosen takes the one it implies (#897).
         self.code = industries.code_for(self.name)
+        if self.code:
+            self.section = industries.section_of(self.code)
+        elif not industries.is_section(self.section):
+            self.section = industries.starter_section(self.name)
         slugs.save_with_slug(self, "industry", args, kwargs, super().save)
 
     @classmethod
-    def named(cls, owner, names) -> list[Industry]:
+    def named(cls, owner, names, section: str = "") -> list[Industry]:
         """The owner's industries with these names, made if missing, in the order given.
 
         Matching is by name, so capitals, accents and spacing do not breed duplicates; a
-        name already known keeps the spelling it was first entered with (#356).
+        name already known keeps the spelling it was first entered with (#356). A
+        ``section`` is given to the ones made here, where their name implies none (#897):
+        the sector somebody had chosen while typing them. One already known keeps its own.
         """
-        return slugs.named(cls, owner, names, fallback="industry")
+        if not industries.is_section(section):
+            return slugs.named(cls, owner, names, fallback="industry")
+        known = set(cls.objects.filter(owner=owner).values_list("pk", flat=True))
+        found = slugs.named(cls, owner, names, fallback="industry")
+        for industry in found:
+            if industry.pk not in known and not industry.section:
+                industry.section = section
+                industry.save(update_fields=["section"])
+        return found
 
     @classmethod
     def split(cls, text: str) -> list[str]:
@@ -621,6 +653,26 @@ class Company(OwnedModel):
     def industry_names(self) -> str:
         """The industries as one line, for places that want text rather than labels."""
         return ", ".join(industry.name for industry in self.industries.all())
+
+    @property
+    def sectors(self) -> list[str]:
+        """The NACE sections of its industries, in letter order, each once (#897): a
+        company's sectors are read off its industries, as its roles are, and stored nowhere."""
+        return sorted({i.section for i in self.industries.all() if i.section})
+
+    @property
+    def sector_names(self) -> list[str]:
+        """Its sectors' names in the reader's language."""
+        return [industries.section_name(letter) for letter in self.sectors]
+
+    @property
+    def sector_looks(self) -> list[tuple[str, str, str, str]]:
+        """``(letter, name, icon, tone)`` for each of its sectors, as a badge draws one."""
+        return [
+            (letter, industries.section_name(letter), *industries.LOOKS[letter])
+            for letter in self.sectors
+            if letter in industries.LOOKS
+        ]
 
     def identifier(self, scheme: str) -> CompanyIdentifier | None:
         """The identifier under ``scheme``, from the prefetched set when there is one."""

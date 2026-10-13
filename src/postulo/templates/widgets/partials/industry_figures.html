@@ -1,0 +1,11 @@
+{% load i18n postulo %}{% comment %} One row's figures in *By sector and industry* (#897): a sector's and each of its industries'. {% endcomment %}
+<td class="tabular-nums">{{ row.applied }}</td>
+<td class="tabular-nums">
+  {{ row.responded }}
+  {% if row.response_rate is not None %}
+    <span class="text-xs text-ink-400">({{ row.response_rate|floatformat:0|percent }})</span>
+  {% endif %}
+</td>
+<td class="tabular-nums">{{ row.interviewed }}</td>
+<td class="tabular-nums">{{ row.offers }}</td>
+<td class="tabular-nums">{{ row.quiet }}</td>

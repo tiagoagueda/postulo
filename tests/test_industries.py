@@ -314,7 +314,9 @@ def test_the_industry_table_is_a_dashboard_widget(client, user):
     profile.save(update_fields=["dashboard_widgets"])
     client.force_login(user)
     body = client.get(reverse("core:home")).content.decode()
-    assert "data-by-industry" in body and "By industry" in body
+    assert "data-by-industry" in body and "By sector and industry" in body
+    # Software is a short name in section K, and its line sits under that sector (#897).
+    assert body.index('data-sector="K"') < body.index("Software", body.index('data-sector="K"'))
 
 
 # -------------------------------------------------- the name is the identity, not the slug (#356)

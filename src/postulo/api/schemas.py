@@ -160,6 +160,12 @@ class CompanyOut(Schema):
     postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
     location: str = ""
     industries: list[str] = Field(default_factory=list)
+    #: Its industries' NACE sections (#897), read-only: a company's sectors are read off its
+    #: industries, so they change by changing those.
+    sectors: list[str] = Field(
+        default_factory=list,
+        description="The NACE Rev. 2.1 sections of its industries, as letters; read-only",
+    )
     identifiers: list[IdentifierOut] = Field(default_factory=list)
     notes: str = ""
     from_career: bool = Field(
@@ -1555,6 +1561,7 @@ def company_out(company, *, detail: bool = False) -> dict:
         ],
         "location": company.location,
         "industries": [industry.name for industry in company.industries.all()],
+        "sectors": company.sectors,
         "identifiers": [
             {"scheme": i.scheme, "value": i.value, "label": i.label, "url": i.url}
             for i in company.identifiers.all()

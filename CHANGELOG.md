@@ -113,6 +113,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- Companies are classified by sector, the NACE section, above their industries: the company form narrows by it, and the table, industries page, report and insights group by it; ESCO's NACE links order the suggestions (#897)
 - The companies map credits its tiles and Leaflet at the end of the footer's line over the map, in the same look, instead of in a second box of Leaflet's own (#908)
 - The calendar's kinds of entry, its key and filter, come after the month, week, day or agenda rather than above it (#903)
 - The companies' map draws a marker for every address, gathered into clusters that count companies; places are grouped by where they resolve to, so two spellings of a town are one, and the list names each address's kind and says when a company is counted at several places (#703)

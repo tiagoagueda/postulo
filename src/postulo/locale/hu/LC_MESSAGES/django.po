@@ -1693,15 +1693,9 @@ msgstr "Egy cég nem lehet önmaga része."
 msgid "A company carries one identifier per scheme."
 msgstr "Egy cégnek sémánként egy azonosítója van."
 
-#: src/postulo/templates/applications/report.html
-#, fuzzy
-msgid "A company in several fields counts in each of them, so these can add up to more than everything."
-msgstr "A több ágazatban működő cég mindegyikben számít, így az összeg meghaladhatja az egészet."
-
 #: src/postulo/templates/widgets/industries.html
-#, fuzzy
-msgid "A company in several industries counts in each of them."
-msgstr "A több iparágban tevékenykedő cég mindegyikben beleszámít."
+msgid "A company in several sectors or industries counts in each of them."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -3370,6 +3364,10 @@ msgstr "Bármelyik bekapcsolt értesítő megmondja, ha egy hirdetés, amelyről
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Bármelyikkel bejelentkezhet. Az elsődleges kapja a Postulo leveleit."
 
+#: src/postulo/jobs/forms.py
+msgid "Any sector"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_created.html
 #, fuzzy
 msgid "Anyone holding the link may use it, once. Send it however you like."
@@ -4194,11 +4192,6 @@ msgstr "Ügynökség szerint"
 msgid "by hand"
 msgstr ""
 
-#: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "By industry"
-msgstr "Iparág szerint"
-
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "By name, or by NACE code"
@@ -4212,6 +4205,14 @@ msgstr ""
 #, fuzzy
 msgid "By referrer"
 msgstr "Ajánló szerint"
+
+#: src/postulo/applications/widgets.py
+msgid "By sector and industry"
+msgstr ""
+
+#: src/postulo/templates/applications/report.html
+msgid "By sector, and the industries in each beneath it. A company in several sectors or industries counts in each of them, so these can add up to more than everything."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "By video"
@@ -8530,7 +8531,6 @@ msgstr "Indiai-óceán"
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
 #: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industries"
 msgstr "Iparágak"
@@ -8546,7 +8546,6 @@ msgid "industry"
 msgstr "iparág"
 
 #: src/postulo/templates/jobs/industry_form.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industry"
 msgstr "Iparág"
@@ -10412,6 +10411,13 @@ msgstr "Saját választás"
 msgid "NACE division"
 msgstr "NACE-ágazat"
 
+#: src/postulo/templates/applications/partials/report_tally.html
+#: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/widgets/industries.html
+msgid "NACE section"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/api/models.py
 #: src/postulo/core/models.py src/postulo/documents/models.py
 #: src/postulo/jobs/models.py src/postulo/plugins/models.py
@@ -10927,6 +10933,11 @@ msgstr "nincs pozíció"
 
 #: src/postulo/templates/server/plugin_access.html
 msgid "No rules: the default applies to everybody."
+msgstr ""
+
+#: src/postulo/applications/analytics.py src/postulo/applications/reports.py
+#: src/postulo/jobs/forms.py src/postulo/jobs/views.py
+msgid "No sector"
 msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
@@ -14977,6 +14988,22 @@ msgstr "titkok"
 msgid "Sections of this page"
 msgstr "Az oldal szakaszai"
 
+#: src/postulo/jobs/forms.py src/postulo/jobs/tables.py
+msgid "Sector"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "sector"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sector and industry"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sectors and industries"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy
 msgid "Security"
@@ -15210,6 +15237,11 @@ msgstr "Automatikusan beállítódik, amikor az állapot először „Elküldve�
 #, fuzzy, python-format
 msgid "Set by <code>%(variable)s</code> in the environment; change it there."
 msgstr "A környezetben a(z) <code>%(variable)s</code> állítja be; ott módosítsa."
+
+#: src/postulo/jobs/forms.py
+#, python-format
+msgid "Set by its NACE division, %(code)s. Rename it to a word of your own to choose another."
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 #, fuzzy, python-format
@@ -17929,6 +17961,14 @@ msgid_plural "The page was not drawn within %(seconds)s seconds, so it was left.
 msgstr[0] "Az oldal nem lett kirajzolva %(seconds)s másodpercen belül, ezért kihagytuk."
 msgstr[1] "Az oldal nem lett kirajzolva %(seconds)s másodpercen belül, ezért kihagytuk."
 
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy this industry is in. You may leave it empty."
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy, python-format
 msgid "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -18113,9 +18153,8 @@ msgid "The same entries without the layout, in this document's language. None of
 msgstr "Ugyanezek a bejegyzések elrendezés nélkül, a dokumentum nyelvén. Ezek egyike sem kerül iktatásra elküldött változatként."
 
 #: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "The same figures by field. A company in three fields counts in all three."
-msgstr "Ugyanazok a számok iparág szerint. A három iparágban működő cég mindháromban számít."
+msgid "The same figures by sector, and by industry within each. A company in three fields counts in all three."
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format

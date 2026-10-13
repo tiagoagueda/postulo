@@ -23,6 +23,7 @@ from django.db.models.functions import TruncMonth
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+from postulo.jobs import industries
 from postulo.jobs.models import JobPosting, ListingState
 
 from . import endings
@@ -77,6 +78,9 @@ class Stage:
 @dataclass
 class SourceRow:
     name: str
+    #: For a sector's line, its NACE section, and its industries one level down (#897).
+    code: str = ""
+    children: list = field(default_factory=list)
     applied: int = 0
     responded: int = 0
     interviewed: int = 0
@@ -155,6 +159,8 @@ class Insights:
     #: The same figures by the company's industries. A company in three fields counts in
     #: all three, which is the honest reading.
     industries: list[SourceRow] = field(default_factory=list)
+    #: The same figures by sector, each with its industries beneath (#897).
+    sectors: list[SourceRow] = field(default_factory=list)
     by_month: list[tuple[dt.date, int]] = field(default_factory=list)
     #: Gone quiet: open, sent, silent past the person's threshold, nothing planned.
     quiet_now: int = 0
@@ -580,14 +586,30 @@ def build(user) -> Insights:
     insights.by_agency = by_size(by_agency.values())
 
     # ------------------------------------------------------------- industries
+    # By sector, each with its industries beneath (#897): an application counts once in a
+    # sector however many of its industries the company is in, and once in each industry.
     by_industry: dict[str, SourceRow] = {}
+    by_sector: dict[str, SourceRow] = {}
+    beneath: dict[str, dict[str, SourceRow]] = {}
     for application in ever_applied:
-        names = [i.name for i in application.posting.company.industries.all()] or [
-            str(_("Not recorded"))
-        ]
-        for name in names:
+        held = list(application.posting.company.industries.all())
+        if not held:
+            name = str(_("Not recorded"))
             count(by_industry.setdefault(name, SourceRow(name=name)), application)
+            count(by_sector.setdefault("\x00", SourceRow(name=name)), application)
+            continue
+        for section in {industry.section for industry in held}:
+            label = industries.section_name(section) if section else str(_("No sector"))
+            count(by_sector.setdefault(section, SourceRow(name=label, code=section)), application)
+        for industry in held:
+            count(by_industry.setdefault(industry.name, SourceRow(name=industry.name)), application)
+            rows_in = beneath.setdefault(industry.section, {})
+            count(rows_in.setdefault(industry.name, SourceRow(name=industry.name)), application)
     insights.industries = by_size(by_industry.values())
+    for section, row in by_sector.items():
+        row.children = by_size(beneath.get(section, {}).values())
+    unrecorded = by_sector.pop("\x00", None)
+    insights.sectors = by_size(by_sector.values()) + ([unrecorded] if unrecorded else [])
 
     # ---------------------------------------------------------------- endings
     insights.endings = _endings(applications)

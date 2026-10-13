@@ -17,6 +17,17 @@ Postulo keeps a copy of the ESCO classification in `src/postulo/jobs/data/`, in 
 Neither is committed: megabytes of reference data are not a repository's job to carry, and
 `manage.py fetch_esco` is how they get into `data/`.
 
+**The ESCO–NACE correspondence (#897).** Each occupation in the first file also lists the
+NACE Rev. 2.1 divisions it is usually employed in (`nace`). They come from ESCO's companion
+correspondence between its occupations and NACE Rev. 2.1, published by the same
+Directorate-General as the *ESCO–NACE rev. 2.1 crosswalk* (February 2026, re-issuing the
+December 2025 crosswalk against Rev. 2.1, with a technical report) on the portal's *other
+crosswalks* page, and carried by the API since v1.2.1 as each occupation's `hasNACECode`.
+The harvest reads it from the API; each group or class code is cut to its two-digit
+division, which is the level `industries.py` holds, and a code that is not a division of
+the vendored NACE file is left out. It is reference data on the same terms and under the
+same attribution as the rest of the file.
+
 **Who publishes it.** The Directorate-General for Employment, Social Affairs and
 Inclusion of the European Commission maintains ESCO and publishes it, free of charge, in
 SKOS-RDF and CSV, on <https://esco.ec.europa.eu>. The classification is built on ISCO-08,
@@ -38,7 +49,8 @@ itself rather than one this project hands on.
 
 **Changes made, as required.** Only shape, never wording. The first file holds the unit
 groups and the occupations — see `postulo/jobs/esco.py` for why the unit group is the
-level a title keeps. The second holds each skill's identifier and its preferred names and
+level a title keeps — and, beside each occupation, the NACE divisions of the
+correspondence, cut from the group or class ESCO links it to. The second holds each skill's identifier and its preferred names and
 nothing else: no alternative names, no descriptions, no relations between skills, and none
 of the qualifications. Space at either end of a skill's name, and a line break inside one,
 are taken out, because a line of that file is one name; no letter is changed, and the

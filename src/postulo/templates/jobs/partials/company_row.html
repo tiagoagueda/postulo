@@ -33,6 +33,19 @@
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{% if company.from_career %}{% translate "Yes" %}{% else %}{% translate "No" %}{% endif %}</td>
     {% elif column.key == 'location' %}
       <td class="px-4 py-3 text-ink-500 dark:text-ink-400">{{ company.location|default:"—" }}</td>
+    {% elif column.key == 'sector' %}
+      {% comment %} Its industries' sectors (#897), each once, in the industries' tones. {% endcomment %}
+      <td class="px-4 py-3 text-ink-500 dark:text-ink-400" data-sectors>
+        {% with held=company.sector_looks %}
+          {% if held %}
+            <span class="flex flex-wrap items-center gap-1">
+              {% for letter, name, icon_name, tone in held %}
+                <span class="badge" data-tone="{{ tone }}" title="{% translate 'NACE section' %} {{ letter }}">{% icon icon_name class="size-3" %}{{ name }}</span>
+              {% endfor %}
+            </span>
+          {% else %}—{% endif %}
+        {% endwith %}
+      </td>
     {% elif column.key == 'industry' %}
       {% comment %} Labels rather than a comma-separated run, and the same chip the form
          draws (#141). A bank that is also an insurer and a software house is three; a

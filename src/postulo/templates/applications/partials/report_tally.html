@@ -6,19 +6,32 @@
    A share as well as a count, because "eleven from a job board" means one thing in a
    period of twelve and another in a period of ninety.
 {% endcomment %}
-<section class="card p-0" aria-labelledby="tally-{{ key }}">
+<section class="card min-w-0 p-0" aria-labelledby="tally-{{ key }}">
   <h2 id="tally-{{ key }}" class="border-b border-ink-100 px-4 py-3 font-medium dark:border-ink-800">
     {{ heading }}
   </h2>
   {% if rows %}
     <ul class="divide-y divide-ink-100 text-sm dark:divide-ink-800">
       {% for row in rows %}
-        <li class="flex items-baseline justify-between gap-3 px-4 py-2">
-          <span class="min-w-0 truncate"><bdi>{{ row.name }}</bdi></span>
-          <span class="shrink-0 tabular-nums">
-            {{ row.count }}
-            <span class="text-ink-500 dark:text-ink-400">· {% widthratio row.count total 100 %}%</span>
-          </span>
+        <li class="px-4 py-2"{% if row.code %} data-section="{{ row.code }}"{% endif %}>
+          <div class="flex items-baseline justify-between gap-3">
+            <span class="min-w-0 wrap-anywhere{% if row.children %} font-medium{% endif %}">{% if row.code %}<span class="tabular-nums text-ink-500 dark:text-ink-400" title="{% translate 'NACE section' %}"><span class="sr-only">{% translate 'NACE section' %} </span>{{ row.code }}</span> {% endif %}<bdi>{{ row.name }}</bdi></span>
+            <span class="shrink-0 tabular-nums">
+              {{ row.count }}
+              <span class="text-ink-500 dark:text-ink-400">· {% widthratio row.count total 100 %}%</span>
+            </span>
+          </div>
+          {% if row.children %}
+            {% comment %} One level down: the industries of the sector (#897). {% endcomment %}
+            <ul class="mt-1 space-y-1 ps-4 text-ink-600 dark:text-ink-300">
+              {% for child in row.children %}
+                <li class="flex items-baseline justify-between gap-3">
+                  <span class="min-w-0 wrap-anywhere"><bdi>{{ child.name }}</bdi></span>
+                  <span class="shrink-0 tabular-nums">{{ child.count }}</span>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
         </li>
       {% endfor %}
     </ul>

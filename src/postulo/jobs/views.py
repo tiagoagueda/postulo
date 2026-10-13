@@ -42,7 +42,17 @@ from postulo.core.params import as_pk
 from postulo.core.redirects import safe_next
 from postulo.core.search import clean_query, company_match
 
-from . import duplicates, identifier_removals, identifiers, logos, mapping, merging, outline, tiles
+from . import (
+    duplicates,
+    identifier_removals,
+    identifiers,
+    industries,
+    logos,
+    mapping,
+    merging,
+    outline,
+    tiles,
+)
 from .forms import CompanyForm, CompanyIdentifierFormSet, ContactForm, IndustryForm, JobPostingForm
 from .models import (
     Company,
@@ -121,7 +131,7 @@ class CompanyListView(PageOrFragmentMixin, OwnedObjectMixin, ListView):
         # repeat a company. Only the Industries column joins a many-valued relation, where
         # a company in two matching industries is still one row; the plain table skips the
         # de-duplication, which made every count and page dearer (#552).
-        if self.table.given("industry"):
+        if self.table.given("industry") or self.table.given("sector"):
             queryset = queryset.distinct()
         return queryset
 
@@ -1358,6 +1368,10 @@ class IndustryListView(OwnedObjectMixin, ListView):
     A row appears here only once a company has been given that industry -- the classification
     is a list of *suggestions*, not a list of rows -- so this page grows at the speed somebody
     actually uses it, which is the reason it was safe to make the suggestions long.
+
+    **Grouped by sector (#897)**, in NACE's own order, the industries with no sector last:
+    the level above is what makes a list of dozens of words readable, and the search
+    matches a sector's name as well.
     """
 
     model = Industry
@@ -1368,14 +1382,39 @@ class IndustryListView(OwnedObjectMixin, ListView):
         found = super().get_queryset().annotate(company_count=Count("companies", distinct=True))
         wanted = self.request.GET.get("q", "").strip()
         if wanted:
-            found = found.filter(Q(name__icontains=wanted) | Q(code__startswith=wanted))
+            named = [
+                letter
+                for letter, name in industries.sections()
+                if wanted.casefold() in name.casefold()
+            ]
+            found = found.filter(
+                Q(name__icontains=wanted) | Q(code__startswith=wanted) | Q(section__in=named)
+            )
         return found
 
     def get_context_data(self, **kwargs) -> dict:
         context = super().get_context_data(**kwargs)
         context["q"] = self.request.GET.get("q", "").strip()
         context["total"] = Industry.objects.for_user(self.request.user).count()
+        context["sectors"] = industries_by_sector(context["industries"])
         return context
+
+
+def industries_by_sector(rows) -> list[dict]:
+    """``[{"section", "name", "industries"}]`` in NACE's order, the ones with none last (#897)."""
+    grouped: dict[str, list] = {}
+    for industry in rows:
+        grouped.setdefault(industry.section, []).append(industry)
+    order = [letter for letter, _name in industries.sections()]
+    return [
+        {
+            "section": letter,
+            "name": industries.section_name(letter) if letter else _("No sector"),
+            "industries": grouped[letter],
+        }
+        for letter in [*order, ""]
+        if letter in grouped
+    ]
 
 
 class IndustryCreateView(OwnedObjectMixin, UserFormKwargsMixin, OwnerFormMixin, CreateView):

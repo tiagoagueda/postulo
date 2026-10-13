@@ -40,6 +40,20 @@ statistician writes. Both are legitimate answers to "what does this company do".
 buys beyond coverage: a report (#56) can say *62* to an employment office that thinks in
 NACE, while the person goes on reading their own word for it. A name nobody recognises has
 no code, and that is not a lesser kind of industry.
+
+**Above the industry, the sector (#897).** NACE groups its divisions into 22 *sections*, and
+those are the level a company is classified at when the question is "what part of the
+economy": *Public administration*, *Education*, *Human health and social work* are sectors
+nobody calls industries. The section is the industry's own (``Industry.section``): the one
+its division sits in where the name is a division's, one of Postulo's short names' where it
+is one of those, chosen by hand where the word is the person's own, and nothing where nobody
+chose. A company's sectors are the sections of its industries, the way its roles are
+(`roles.py`), so nothing is stored on the company.
+
+Eurostat publishes the section names in capitals, the way a statistical table heads its
+rows. They are shown in sentence case (`section_name`), which for German keeps the capital
+on every noun: the 22 names are fixed data, so the few small words that stay lower case
+are listed rather than guessed.
 """
 
 from __future__ import annotations
@@ -97,6 +111,46 @@ STARTER_INDUSTRIES = (
     _("Defence"),
 )
 
+#: The section each of Postulo's short names sits in, so the sector chooser can offer them
+#: under it and a company given one of them has a sector without anybody choosing it (#897).
+#: Keyed by the English name, which is the message id: a short name typed in the reader's
+#: language is matched through its translation. Where a word spans sections, the one most
+#: of its employers are in is taken, and the person can change it on the industry.
+STARTER_SECTIONS: dict[str, str] = {
+    "Software": "K",
+    "Information technology": "K",
+    "Telecommunications": "K",
+    "Finance": "L",
+    "Banking": "L",
+    "Insurance": "L",
+    "Consulting": "N",
+    "Health": "R",
+    "Pharmaceuticals": "C",
+    "Biotechnology": "N",
+    "Education": "Q",
+    "Research": "N",
+    "Public sector": "P",
+    "Non-profit": "T",
+    "Energy": "D",
+    "Utilities": "D",
+    "Manufacturing": "C",
+    "Engineering": "N",
+    "Construction": "F",
+    "Automotive": "C",
+    "Aerospace": "C",
+    "Transport and logistics": "H",
+    "Retail": "G",
+    "E-commerce": "G",
+    "Hospitality and tourism": "I",
+    "Food and agriculture": "A",
+    "Media": "J",
+    "Advertising and marketing": "N",
+    "Gaming": "J",
+    "Real estate": "M",
+    "Legal": "N",
+    "Defence": "P",
+}
+
 
 @lru_cache(maxsize=1)
 def classification() -> dict:
@@ -152,6 +206,66 @@ def name_for(code: str, language: str = "") -> str:
 def section_of(code: str) -> str:
     entry = classification()["divisions"].get(code)
     return entry["section"] if entry else ""
+
+
+#: The words of the German section names that stay lower case in a sentence: German
+#: capitalises every noun, so lower-casing the whole name would be wrong, and the 22 names
+#: are fixed, so the small words are listed (#897).
+GERMAN_LOWER = frozenset(
+    {
+        "und", "von", "sowie", "der", "den", "des", "dem", "die", "das", "mit", "durch",
+        "für", "ohne", "zur", "zum", "oder", "auf", "im", "in", "private", "sonstiger",
+        "sonstigen", "wissenschaftlichen", "technischen", "wirtschaftlichen", "ausgeprägten",
+    }
+)  # fmt: skip
+
+#: Words that stay capitals inside a section name, in any language.
+ACRONYMS = {"it": "IT"}
+
+
+def _sentence_case(text: str, language: str) -> str:
+    """A name Eurostat writes in capitals, as a sentence: the first letter a capital, and
+    in German every noun as well (`GERMAN_LOWER`). The soft hyphens the French names carry
+    for a narrow column are taken out."""
+    text = " ".join(text.replace("\xad", "").split()).lower()
+
+    def word(match: re.Match[str]) -> str:
+        token = match.group(0)
+        if token in ACRONYMS:
+            return ACRONYMS[token]
+        if language == "de" and token not in GERMAN_LOWER:
+            return token[:1].upper() + token[1:]
+        return token
+
+    text = re.sub(r"[^\W\d_]+", word, text)
+    return text[:1].upper() + text[1:]
+
+
+def sections(language: str = "") -> list[tuple[str, str]]:
+    """Every NACE section as ``(letter, name)``, in letter order, in the reader's language."""
+    return [(letter, section_name(letter, language)) for letter in classification()["sections"]]
+
+
+def section_name(letter: str, language: str = "") -> str:
+    """What a section is called, in sentence case, or empty where there is no such section."""
+    names = classification()["sections"].get(letter or "")
+    if not names:
+        return ""
+    reading = _reading(language)
+    if names.get(reading):
+        return _sentence_case(names[reading], reading)
+    return _sentence_case(names.get(FALLBACK, ""), FALLBACK)
+
+
+def is_section(letter: str) -> bool:
+    return bool(letter) and letter in classification()["sections"]
+
+
+def sections_for(divisions) -> list[str]:
+    """The sections a set of division codes sits in, in letter order, each once (#897)."""
+    found = {section_of(code) for code in divisions or ()}
+    found.discard("")
+    return sorted(found)
 
 
 #: How an industry is drawn (#856): an icon and a tone for each NACE section, so every
@@ -215,25 +329,58 @@ def code_for(name: str, language: str = "") -> str:
     return _by_name(reading).get(folded) or _by_name(FALLBACK).get(folded, "")
 
 
-def suggestions(exclude=(), language: str = "") -> list[str]:
-    """What the input offers, minus anything the person already has.
+def _english(starter) -> str:
+    """The message id of one of Postulo's short names: what `STARTER_SECTIONS` is keyed by."""
+    args = getattr(starter, "_args", None)
+    return args[0] if args else str(starter)
+
+
+def starter_section(name: str) -> str:
+    """The section one of Postulo's short names sits in, the name read in the reader's
+    language or in English; empty for any other word (#897)."""
+    folded = (name or "").strip().casefold()
+    if not folded:
+        return ""
+    for starter in STARTER_INDUSTRIES:
+        english = _english(starter)
+        if folded in (str(starter).casefold(), english.casefold()):
+            return STARTER_SECTIONS.get(english, "")
+    return ""
+
+
+def section_for_name(name: str, language: str = "") -> str:
+    """The section a name implies on its own: its division's, else a short name's, else none."""
+    return section_of(code_for(name, language)) or starter_section(name)
+
+
+def offered(exclude=(), language: str = "", first=()) -> list[tuple[str, str]]:
+    """What the input offers, as ``(name, section)``, minus anything the person already has.
 
     Postulo's own short names first: a datalist shows its options in order until somebody
     types, and *Software* being visible before *Manufacture of coke and refined petroleum
-    products* is the difference between a helpful list and a statistical yearbook.
+    products* is the difference between a helpful list and a statistical yearbook. The
+    divisions named in ``first`` come before both: the ones the company's postings point at,
+    through the ESCO–NACE correspondence (#897).
     """
     taken = {str(name).casefold() for name in exclude}
-    offered = [str(name) for name in STARTER_INDUSTRIES]
-    offered += [name for _code, name in divisions(language)]
+    wanted = set(first or ())
+    pairs = [(name, code) for code, name in divisions(language) if code in wanted]
+    pairs += [(str(name), "") for name in STARTER_INDUSTRIES]
+    pairs += [(name, code) for code, name in divisions(language)]
     seen: set[str] = set()
-    kept: list[str] = []
-    for name in offered:
+    kept: list[tuple[str, str]] = []
+    for name, code in pairs:
         folded = name.casefold()
         if folded in taken or folded in seen:
             continue
         seen.add(folded)
-        kept.append(name)
+        kept.append((name, section_of(code) if code else starter_section(name)))
     return kept
+
+
+def suggestions(exclude=(), language: str = "") -> list[str]:
+    """The names `offered` holds, without their sections."""
+    return [name for name, _section in offered(exclude, language)]
 
 
 def names_with_separators(language: str = "") -> list[str]:

@@ -91,8 +91,33 @@ class OwnerScopedModelForm(forms.ModelForm):
         """Narrow any related-object fields to ``self.user``."""
 
 
+def sector_choices(blank) -> list[tuple[str, str]]:
+    """The 22 NACE sections as choices, in the reader's language, after a blank one (#897)."""
+    return [("", blank), *industries.sections()]
+
+
+class SectionedCheckboxes(forms.CheckboxSelectMultiple):
+    """The person's industries, each box saying the sector it is in as ``data-section``, so
+    the script can set the sector chooser from a box ticked (#897)."""
+
+    sections: dict = {}
+
+    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
+        section = self.sections.get(getattr(value, "value", value))
+        if section:
+            option["attrs"]["data-section"] = section
+        return option
+
+
 class CompanyForm(OwnerScopedModelForm):
     """A company, and the industries it operates in: pick from your own, or type new ones.
+
+    **A sector above them (#897).** The sector is not the company's own: its sectors are its
+    industries' sections. The chooser narrows the suggestions to one section's divisions and
+    Postulo's short names in it, and a word of the person's own typed while a sector is
+    chosen is filed under that sector. An industry with a division sets the chooser back to
+    its section, so the two never disagree.
 
     Or the employment service the person is registered with (#202): a kind, and beside it
     the services Postulo knows by country, so that adding France Travail is a choice
@@ -109,11 +134,21 @@ class CompanyForm(OwnerScopedModelForm):
             "here is kept instead."
         ),
     )
+    sector = forms.ChoiceField(
+        # Translators: the NACE section, the coarse level above an industry (a NACE
+        # division): "Education", "Human health and social work". Keep the two words apart.
+        label=_("Sector"),
+        required=False,
+        help_text=_(
+            "The part of the economy it is in. Narrows the suggestions below, and an "
+            "industry of your own added here is filed under it."
+        ),
+    )
     industries = forms.ModelMultipleChoiceField(
         label=_("Industries"),
         queryset=Industry.objects.none(),
         required=False,
-        widget=forms.CheckboxSelectMultiple,
+        widget=SectionedCheckboxes,
         help_text=_(
             "Tick as many as fit. The list is your own — Industries, beside Companies, "
             "is where it is kept."
@@ -159,6 +194,7 @@ class CompanyForm(OwnerScopedModelForm):
         "careers_url",
         "email",
         "phone",
+        "sector",
         "industries",
         "new_industries",
         "logo_url",
@@ -255,7 +291,19 @@ class CompanyForm(OwnerScopedModelForm):
             self.order_fields(self.field_order)
 
         if "industries" in self.fields:
-            self.fields["industries"].queryset = Industry.objects.for_user(self.user)
+            mine = Industry.objects.for_user(self.user)
+            self.fields["industries"].queryset = mine
+            widget = self.fields["industries"].widget
+            widget.sections = dict(mine.exclude(section="").values_list("pk", "section"))
+        if "sector" in self.fields:
+            if "industries" not in self.fields:
+                del self.fields["sector"]
+            else:
+                self.fields["sector"].choices = sector_choices(_("Any sector"))
+                self.fields["sector"].widget.attrs["data-industry-sector"] = ""
+                held = self.instance.sectors if self.instance.pk else []
+                if len(held) == 1:
+                    self.fields["sector"].initial = held[0]
         if "logo_url" in self.fields and self.instance.pk and self.instance.logo_source_url:
             self.fields["logo_url"].initial = self.instance.logo_source_url
         if "remove_logo" in self.fields and not (self.instance.pk and self.instance.has_logo):
@@ -283,15 +331,31 @@ class CompanyForm(OwnerScopedModelForm):
         return upload
 
     @property
-    def suggestions(self) -> list[str]:
-        """What the datalist offers: Postulo's short names, then the NACE divisions.
+    def suggestions(self) -> list[tuple[str, str]]:
+        """What the datalist offers, as ``(name, section)``: Postulo's short names, then the
+        NACE divisions, each with the sector it sits in for the chooser to narrow by.
 
         Minus anything this person already has, because a suggestion for something already
-        on their list is a line of noise (#140).
+        on their list is a line of noise (#140). A company with no industries yet whose
+        listings have titles ESCO knows is offered, first, the divisions ESCO's companion
+        correspondence employs those occupations in (#897): offered, never required.
         """
-        return industries.suggestions(
-            exclude=self.fields["industries"].queryset.values_list("name", flat=True)
+        return industries.offered(
+            exclude=self.fields["industries"].queryset.values_list("name", flat=True),
+            first=self.divisions_from_postings(),
         )
+
+    def divisions_from_postings(self) -> list[str]:
+        """The NACE divisions the titles of this company's listings point at, most first,
+        while it has no industries (#897)."""
+        company = self.instance
+        if not company.pk or company.industries.exists():
+            return []
+        counted: dict[str, int] = {}
+        for group in company.postings.exclude(isco_code="").values_list("isco_code", flat=True):
+            for division in esco.divisions_for(group):
+                counted[division] = counted.get(division, 0) + 1
+        return sorted(counted, key=lambda code: (-counted[code], code))
 
     def apply_logo(self, company: Company) -> str:
         """Do what the logo fields asked for. Returns a problem to show, or "".
@@ -339,7 +403,8 @@ class CompanyForm(OwnerScopedModelForm):
     def _add_new_industries(self, company: Company) -> None:
         names = Industry.split(self.cleaned_data.get("new_industries", ""))
         if names:
-            company.industries.add(*Industry.named(company.owner, names))
+            sector = self.cleaned_data.get("sector", "")
+            company.industries.add(*Industry.named(company.owner, names, section=sector))
 
     def clean(self) -> dict:
         """A known service picked means an employment service, named and addressed as the
@@ -513,7 +578,17 @@ CompanyIdentifierFormSet = forms.inlineformset_factory(
 
 
 class IndustryForm(OwnerScopedModelForm):
-    """Rename an industry, or fold it into another one."""
+    """Rename an industry, choose its sector, or fold it into another one.
+
+    The sector is chosen only for a word of the person's own: a division's name has its
+    section, and the box says so rather than offering a choice the save would undo (#897).
+    """
+
+    section = forms.ChoiceField(
+        label=_("Sector"),
+        required=False,
+        help_text=_("The part of the economy this industry is in. You may leave it empty."),
+    )
 
     merge_into = forms.ModelChoiceField(
         label=_("Merge into"),
@@ -526,9 +601,16 @@ class IndustryForm(OwnerScopedModelForm):
 
     class Meta:
         model = Industry
-        fields = ("name",)
+        fields = ("name", "section")
 
     def scope_querysets(self) -> None:
+        self.fields["section"].choices = sector_choices(_("No sector"))
+        if self.instance.pk and self.instance.code:
+            self.fields["section"].disabled = True
+            self.fields["section"].help_text = _(
+                "Set by its NACE division, %(code)s. Rename it to a word of your own to "
+                "choose another."
+            ) % {"code": self.instance.code}
         if self.instance.pk:
             self.fields["merge_into"].queryset = Industry.objects.for_user(self.user).exclude(
                 pk=self.instance.pk
@@ -767,9 +849,27 @@ class JobPostingForm(OwnerScopedModelForm):
         """What the title's ``<datalist>`` offers: the ESCO unit groups, in the language read.
 
         Classification, not records, so a form with no user attached offers the same thing
-        one with a user does — there is nobody else's data in it to keep apart (#266).
+        one with a user does — there is nobody else's data in it to keep apart (#266). Where
+        the listing's company is known and has sectors, the unit groups ESCO's companion
+        correspondence places in them come first, and nothing is left out (#897).
         """
-        return {"title-suggestions": esco.suggestions()}
+        return {"title-suggestions": esco.suggestions(sections=self.company_sectors())}
+
+    def company_sectors(self) -> list[str]:
+        """The sectors of the company this listing is for, where that is already known."""
+        company = None
+        if self.instance.pk and self.instance.company_id:
+            company = self.instance.company
+        else:
+            chosen = self.initial.get("company") or self.data.get("company")
+            if chosen and self.user is not None:
+                pk = getattr(chosen, "pk", chosen)
+                company = (
+                    Company.objects.for_user(self.user).filter(pk=pk).first()
+                    if str(pk).isdigit()
+                    else None
+                )
+        return company.sectors if company is not None else []
 
 
 def who_and_where(contact) -> str:

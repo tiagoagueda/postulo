@@ -391,11 +391,12 @@ def test_a_company_in_three_fields_counts_in_all_three(user):
         industry, _made = Industry.objects.get_or_create(owner=user, name=name)
         application.posting.company.industries.add(industry)
 
-    names = [
-        row.name for row in reports.build(user, march(), today=dt.date(2026, 3, 31)).industries
-    ]
+    rows = reports.build(user, march(), today=dt.date(2026, 3, 31)).industries
 
-    assert set(names) == {"Software", "Finance"}
+    # By sector, each with its industries beneath (#897): Software is in K, Finance in L.
+    assert {row.code for row in rows} == {"K", "L"}
+    assert {child.name for row in rows for child in row.children} == {"Software", "Finance"}
+    assert all(row.count == 1 for row in rows)
 
 
 def test_the_employment_service_is_not_an_employer_in_the_tallies(user):
@@ -416,7 +417,8 @@ def test_the_employment_service_is_not_an_employer_in_the_tallies(user):
     report = reports.build(user, march(), today=dt.date(2026, 3, 31))
 
     assert report.total == 2, "sent is sent"
-    assert [row.name for row in report.industries] == ["Software"]
+    assert [row.code for row in report.industries] == ["K"]
+    assert [child.name for child in report.industries[0].children] == ["Software"]
 
 
 def test_the_report_is_addressed_to_the_office_when_there_is_one(client, user):

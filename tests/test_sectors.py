@@ -74,7 +74,10 @@ def test_one_industry_is_one_label(client, user):
 
     row = row_for(client.get(reverse("jobs:company_list")).content.decode(), company)
 
-    assert row.count('class="badge"') == 1
+    # The Sector cell draws the sector above it, once (#897); the Industries cell the label.
+    sector, rest = row.split("data-sectors", 1)[1].split("</td>", 1)
+    assert sector.count('class="badge"') == 1
+    assert rest.count('class="badge"') == 1
 
 
 def test_three_are_three(client, user):

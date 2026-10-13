@@ -1969,15 +1969,9 @@ msgstr "Ní féidir le cuideachta a bheith ina cuid di féin."
 msgid "A company carries one identifier per scheme."
 msgstr "Tá aitheantóir amháin in aghaidh na scéime ag cuideachta."
 
-#: src/postulo/templates/applications/report.html
-#, fuzzy
-msgid "A company in several fields counts in each of them, so these can add up to more than everything."
-msgstr "Cuirtear comhlacht atá i roinnt earnálacha san áireamh i ngach ceann acu, mar sin féadfaidh an t-iomlán a bheith níos mó ná an t-iomlán ceart."
-
 #: src/postulo/templates/widgets/industries.html
-#, fuzzy
-msgid "A company in several industries counts in each of them."
-msgstr "Comhaireann cuideachta atá i roinnt tionscal i ngach ceann acu."
+msgid "A company in several sectors or industries counts in each of them."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -3673,6 +3667,10 @@ msgstr "Insíonn aon fhógróir a chuir tú air nuair atá liostáil nár shocra
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Síníonn aon cheann acu isteach thú. Faigheann an príomhcheann ríomhphost Postulo."
 
+#: src/postulo/jobs/forms.py
+msgid "Any sector"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_created.html
 #, fuzzy
 msgid "Anyone holding the link may use it, once. Send it however you like."
@@ -4497,11 +4495,6 @@ msgstr "De réir gníomhaireachta"
 msgid "by hand"
 msgstr ""
 
-#: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "By industry"
-msgstr "De réir tionscail"
-
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "By name, or by NACE code"
@@ -4515,6 +4508,14 @@ msgstr ""
 #, fuzzy
 msgid "By referrer"
 msgstr "De réir tarchuirtheora"
+
+#: src/postulo/applications/widgets.py
+msgid "By sector and industry"
+msgstr ""
+
+#: src/postulo/templates/applications/report.html
+msgid "By sector, and the industries in each beneath it. A company in several sectors or industries counts in each of them, so these can add up to more than everything."
+msgstr ""
 
 #: src/postulo/applications/models.py
 msgid "By video"
@@ -8845,7 +8846,6 @@ msgstr "An tAigéan Indiach"
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
 #: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industries"
 msgstr "Tionscail"
@@ -8861,7 +8861,6 @@ msgid "industry"
 msgstr "tionscal"
 
 #: src/postulo/templates/jobs/industry_form.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industry"
 msgstr "Tionscal"
@@ -10733,6 +10732,13 @@ msgstr "Mo rogha féin"
 msgid "NACE division"
 msgstr "rannán NACE"
 
+#: src/postulo/templates/applications/partials/report_tally.html
+#: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/widgets/industries.html
+msgid "NACE section"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/api/models.py
 #: src/postulo/core/models.py src/postulo/documents/models.py
 #: src/postulo/jobs/models.py src/postulo/plugins/models.py
@@ -11248,6 +11254,11 @@ msgstr "gan ról"
 
 #: src/postulo/templates/server/plugin_access.html
 msgid "No rules: the default applies to everybody."
+msgstr ""
+
+#: src/postulo/applications/analytics.py src/postulo/applications/reports.py
+#: src/postulo/jobs/forms.py src/postulo/jobs/views.py
+msgid "No sector"
 msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
@@ -15376,6 +15387,22 @@ msgstr "rúin"
 msgid "Sections of this page"
 msgstr "Rannáin den leathanach seo"
 
+#: src/postulo/jobs/forms.py src/postulo/jobs/tables.py
+msgid "Sector"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "sector"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sector and industry"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sectors and industries"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy
 msgid "Security"
@@ -15609,6 +15636,11 @@ msgstr "Socraítear go huathoibríoch é an chéad uair a éiríonn an stádas �
 #, fuzzy, python-format
 msgid "Set by <code>%(variable)s</code> in the environment; change it there."
 msgstr "Socraithe ag <code>%(variable)s</code> sa timpeallacht; athraigh ansin é."
+
+#: src/postulo/jobs/forms.py
+#, python-format
+msgid "Set by its NACE division, %(code)s. Rename it to a word of your own to choose another."
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 #, fuzzy, python-format
@@ -18361,6 +18393,14 @@ msgstr[2] "Níor tarraingíodh an leathanach laistigh de %(seconds)s soicind, ma
 msgstr[3] "Níor tarraingíodh an leathanach laistigh de %(seconds)s soicind, mar sin fágadh é."
 msgstr[4] "Níor tarraingíodh an leathanach laistigh de %(seconds)s soicind, mar sin fágadh é."
 
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy this industry is in. You may leave it empty."
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy, python-format
 msgid "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -18545,9 +18585,8 @@ msgid "The same entries without the layout, in this document's language. None of
 msgstr "Na hiontrálacha céanna gan an leagan amach, i dteanga na cáipéise seo. Ní chomhdaítear aon cheann acu seo mar leagan a sheol tú."
 
 #: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "The same figures by field. A company in three fields counts in all three."
-msgstr "Na figiúirí céanna de réir earnála. Cuideachta i dtrí earnáil, cuntar í sna trí cinn."
+msgid "The same figures by sector, and by industry within each. A company in three fields counts in all three."
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, fuzzy, python-format

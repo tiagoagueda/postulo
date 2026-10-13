@@ -105,6 +105,12 @@
            the structure was on (#853). Absent where the feature is off. {% endcomment %}
         {% if form.parent %}<c-field :field="form.parent" />{% endif %}
 
+        {% if form.sector %}
+          {% comment %} The sector above the industries (#897): not stored on the company, whose
+             sectors are its industries'; it narrows the suggestions and files a word of the
+             person's own under it. {% endcomment %}
+          <c-field :field="form.sector" />
+        {% endif %}
         <fieldset class="mb-4" data-industries {% if form.industries.aria_describedby %}aria-describedby="{{ form.industries.aria_describedby }}"{% endif %}
                   {% include "partials/label_attrs.html" with field=form.industries new_field=form.new_industries %}>
           <legend class="label" id="labels-{{ form.industries.html_name }}-heading">{{ form.industries.label }}</legend>
@@ -127,7 +133,7 @@
             <label for="{{ form.new_industries.id_for_label }}">{{ form.new_industries.label }}</label>
             {{ form.new_industries }}
             <datalist id="industry-suggestions">
-              {% for name in form.suggestions %}<option value="{{ name }}">{% endfor %}
+              {% for name, section in form.suggestions %}<option value="{{ name }}"{% if section %} data-section="{{ section }}"{% endif %}>{% endfor %}
             </datalist>
           </div>
           {% comment %} Outside the two boxes the chips hide, so what a refusal says stays on the page (#522). {% endcomment %}

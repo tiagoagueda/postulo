@@ -205,7 +205,20 @@ logger = logging.getLogger(__name__)
 #: 69 added ``names`` on a company: its name in other languages, each with its language, where
 #: it came from (``wikidata`` or ``typed``) and when it was fetched. An archive without them
 #: restores none (#673).
-FORMAT_VERSION = 69
+#: 70 let an entry of a company's ``industries`` be ``{"name", "sector"}`` instead of a name,
+#: where the industry's sector, its NACE section, was chosen by hand: a division's or one of
+#: Postulo's short names' is derived from the name and is not written twice. An archive with
+#: names only restores every sector the names imply, and none other (#897).
+FORMAT_VERSION = 70
+
+
+def industry_entry(industry) -> str | dict:
+    """One of a company's industries as the archive writes it: its name, or its name and
+    its sector where that sector was chosen by hand and cannot be read off the name (#897)."""
+    if industry.sector_by_hand:
+        return {"name": industry.name, "sector": industry.section}
+    return industry.name
+
 
 #: The version of the *candidate* document: one person's own record and nothing else (#181).
 #:
@@ -1187,7 +1200,7 @@ def build_document(user) -> dict:
                 # is what the importer can resolve against companies it has just made or
                 # matched. An empty string is a company that belongs to nobody.
                 "parent": company.parent.name if company.parent_id else "",
-                "industries": [industry.name for industry in company.industries.all()],
+                "industries": [industry_entry(industry) for industry in company.industries.all()],
                 # The teams inside this company, as records of their own. They used to
                 # travel only as a name beside a contact, which silently dropped every
                 # department nobody had been recorded at -- and a team you applied to before

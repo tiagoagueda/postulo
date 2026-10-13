@@ -276,8 +276,11 @@ register(
 register(
     Widget(
         key="industries",
-        label=_("By industry"),
-        blurb=_("The same figures by field. A company in three fields counts in all three."),
+        label=_("By sector and industry"),
+        blurb=_(
+            "The same figures by sector, and by industry within each. A company in three "
+            "fields counts in all three."
+        ),
         template="widgets/industries.html",
         context=_insight,
         width="full",

@@ -756,7 +756,7 @@ def test_the_text_columns_sort_and_an_identifier_sorts_and_narrows(client, user,
 
     table = CompaniesTable(client.get(url).wsgi_request, {})
     unsortable = [column.key for column in table.columns if not column.sortable]
-    assert unsortable == ["industry", "notes"], "each with its reason written beside it"
+    assert unsortable == ["sector", "industry", "notes"], "each with its reason written beside it"
     assert all(column.filter for column in table.columns), "and every column narrows"
 
 

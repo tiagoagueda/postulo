@@ -5779,7 +5779,7 @@
   }
 
   function labelValues(box) {
-    /* Every option this control knows, as {name, on, set(bool)}. */
+    /* Every option this control knows, as {name, section, on, set(bool)}. */
     var found = labelSources(box);
     if (!found) {
       return [];
@@ -5789,6 +5789,7 @@
         var label = input.closest("label") || input.parentNode;
         return {
           name: (label ? label.textContent : input.value).trim(),
+          section: input.getAttribute("data-section") || "",
           get on() {
             return input.checked;
           },
@@ -5877,6 +5878,13 @@
 
     if (options && input) {
       options.textContent = "";
+      var listed = {};
+      values.forEach(function (value) {
+        listed[value.name.toLowerCase()] = true;
+      });
+      typed.forEach(function (name) {
+        listed[name.toLowerCase()] = true;
+      });
       values
         .filter(function (value) {
           return !value.on;
@@ -5886,6 +5894,19 @@
           option.value = value.name;
           options.appendChild(option);
         });
+      // And what the box for new ones offers, which it hides (#897): the classification's
+      // names, narrowed to the sector chosen, after the person's own.
+      var offered = newField && newField.list;
+      if (offered) {
+        Array.prototype.forEach.call(offered.options, function (suggestion) {
+          if (listed[suggestion.value.toLowerCase()]) {
+            return;
+          }
+          var option = document.createElement("option");
+          option.value = suggestion.value;
+          options.appendChild(option);
+        });
+      }
       input.disabled = !newField && !options.childElementCount;
     }
   }
@@ -5945,7 +5966,9 @@
     })[0];
     if (match) {
       match.set(true);
+      followSector(box, match.section);
     } else if (newField) {
+      followSector(box, suggestedSection(newField, wanted));
       var typed = typedNames(newField);
       if (
         !typed.some(function (name) {
@@ -5962,6 +5985,98 @@
     sayIt(box, box.dataset.labelsAdded, wanted);
     drawLabels(box);
   }
+
+  /* ------------------------------------------- the sector above the industries (#897)
+   *
+   * The company form's sector chooser narrows what the industries box offers to one NACE
+   * section: its divisions and Postulo's short names in it. Every suggestion says its section
+   * in `data-section`; the full list is kept the first time it is narrowed, and the list is
+   * rebuilt from it each time, since a datalist option cannot be hidden. An industry chosen
+   * that has a section sets the chooser to it, so the sector and the industries never
+   * disagree. With no script the chooser still files a new word under it on the server.
+   */
+  var allSuggestions = new WeakMap();
+
+  function sectorChooser(box) {
+    var form = box.closest("form");
+    return form ? form.querySelector("select[data-industry-sector]") : null;
+  }
+
+  function suggestionList(box) {
+    var newField = box.dataset.labelsNew ? document.getElementById(box.dataset.labelsNew) : null;
+    return newField ? newField.list : null;
+  }
+
+  function suggestedSection(newField, name) {
+    var list = newField && newField.list;
+    var all = list ? allSuggestions.get(list) || Array.prototype.slice.call(list.options) : [];
+    var wanted = name.toLowerCase();
+    var found = all.filter(function (option) {
+      return option.value.toLowerCase() === wanted;
+    })[0];
+    return found ? found.getAttribute("data-section") || "" : "";
+  }
+
+  function narrowSuggestions(box) {
+    var chooser = sectorChooser(box);
+    var list = suggestionList(box);
+    if (!chooser || !list) {
+      return;
+    }
+    if (!allSuggestions.has(list)) {
+      allSuggestions.set(list, Array.prototype.slice.call(list.options));
+    }
+    var sector = chooser.value;
+    list.textContent = "";
+    allSuggestions.get(list).forEach(function (option) {
+      if (!sector || option.getAttribute("data-section") === sector) {
+        list.appendChild(option);
+      }
+    });
+    if (box.dataset.labelsReady) {
+      drawLabels(box);
+    }
+  }
+
+  function followSector(box, section) {
+    var chooser = sectorChooser(box);
+    if (!chooser || !section || chooser.value === section) {
+      return;
+    }
+    chooser.value = section;
+    selectChanged(chooser);
+    narrowSuggestions(box);
+  }
+
+  document.addEventListener("change", function (event) {
+    var chooser = event.target;
+    if (!chooser.matches || !chooser.matches("select[data-industry-sector]")) {
+      return;
+    }
+    var form = chooser.closest("form");
+    var box = form && form.querySelector("[data-labels][data-industries]");
+    if (box) {
+      narrowSuggestions(box);
+    }
+  });
+
+  // Where the person has no industries yet there are no chips, and the box for new ones is
+  // the control: a name typed there sets the sector the same way.
+  document.addEventListener("change", function (event) {
+    var field = event.target;
+    var box = field.closest && field.closest("[data-labels][data-industries]");
+    if (!box || !field.matches("[data-labels-newbox] input")) {
+      return;
+    }
+    var names = typedNames(field);
+    if (names.length) {
+      followSector(box, suggestedSection(field, names[names.length - 1]));
+    }
+  });
+
+  onContentReady(function () {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-labels][data-industries]"), narrowSuggestions);
+  });
 
   function readyLabels(box) {
     if (box.dataset.labelsReady || !labelSources(box)) {
@@ -6049,6 +6164,7 @@
       newBox.hidden = true;
     }
     drawLabels(box);
+    narrowSuggestions(box);
   }
 
   function readyEveryLabelBox() {

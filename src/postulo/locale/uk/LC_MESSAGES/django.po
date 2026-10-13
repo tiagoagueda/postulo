@@ -1761,15 +1761,9 @@ msgstr "Компанія не може бути частиною самої се
 msgid "A company carries one identifier per scheme."
 msgstr "Компанія має один ідентифікатор на схему."
 
-#: src/postulo/templates/applications/report.html
-#, fuzzy
-msgid "A company in several fields counts in each of them, so these can add up to more than everything."
-msgstr "Компанія, що працює в кількох галузях, рахується в кожній із них, тож сума може перевищити ціле."
-
 #: src/postulo/templates/widgets/industries.html
-#, fuzzy
-msgid "A company in several industries counts in each of them."
-msgstr "Компанія в кількох галузях рахується в кожній із них."
+msgid "A company in several sectors or industries counts in each of them."
+msgstr ""
 
 #: src/postulo/templates/jobs/company_map.html
 msgid "A company with addresses in several places is counted at each, so the counts add up to more than the companies there are."
@@ -3333,6 +3327,10 @@ msgstr ""
 msgid "Any of them signs you in. The primary one receives Postulo's mail."
 msgstr "Будь-яка з них дає вам вхід. Основна отримує пошту від Postulo."
 
+#: src/postulo/jobs/forms.py
+msgid "Any sector"
+msgstr ""
+
 #: src/postulo/templates/accounts/invite_created.html
 msgid "Anyone holding the link may use it, once. Send it however you like."
 msgstr ""
@@ -4115,11 +4113,6 @@ msgstr ""
 msgid "by hand"
 msgstr ""
 
-#: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "By industry"
-msgstr "За галуззю"
-
 #: src/postulo/templates/jobs/industry_list.html
 #, fuzzy
 msgid "By name, or by NACE code"
@@ -4131,6 +4124,14 @@ msgstr ""
 
 #: src/postulo/templates/widgets/sources.html
 msgid "By referrer"
+msgstr ""
+
+#: src/postulo/applications/widgets.py
+msgid "By sector and industry"
+msgstr ""
+
+#: src/postulo/templates/applications/report.html
+msgid "By sector, and the industries in each beneath it. A company in several sectors or industries counts in each of them, so these can add up to more than everything."
 msgstr ""
 
 #: src/postulo/applications/models.py
@@ -8272,7 +8273,6 @@ msgstr ""
 #: src/postulo/jobs/forms.py src/postulo/jobs/merging.py
 #: src/postulo/jobs/tables.py src/postulo/templates/jobs/company_list.html
 #: src/postulo/templates/jobs/industry_list.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industries"
 msgstr "Галузі"
@@ -8288,7 +8288,6 @@ msgid "industry"
 msgstr "галузь"
 
 #: src/postulo/templates/jobs/industry_form.html
-#: src/postulo/templates/widgets/industries.html
 #, fuzzy
 msgid "Industry"
 msgstr "Галузь"
@@ -10078,6 +10077,13 @@ msgstr ""
 msgid "NACE division"
 msgstr "розділ NACE"
 
+#: src/postulo/templates/applications/partials/report_tally.html
+#: src/postulo/templates/jobs/industry_list.html
+#: src/postulo/templates/jobs/partials/company_row.html
+#: src/postulo/templates/widgets/industries.html
+msgid "NACE section"
+msgstr ""
+
 #: src/postulo/accounts/models.py src/postulo/api/models.py
 #: src/postulo/core/models.py src/postulo/documents/models.py
 #: src/postulo/jobs/models.py src/postulo/plugins/models.py
@@ -10574,6 +10580,11 @@ msgstr "без посади"
 
 #: src/postulo/templates/server/plugin_access.html
 msgid "No rules: the default applies to everybody."
+msgstr ""
+
+#: src/postulo/applications/analytics.py src/postulo/applications/reports.py
+#: src/postulo/jobs/forms.py src/postulo/jobs/views.py
+msgid "No sector"
 msgstr ""
 
 #: src/postulo/core/destinations.py src/postulo/core/mail.py
@@ -14465,6 +14476,22 @@ msgstr "секрети"
 msgid "Sections of this page"
 msgstr ""
 
+#: src/postulo/jobs/forms.py src/postulo/jobs/tables.py
+msgid "Sector"
+msgstr ""
+
+#: src/postulo/jobs/models.py
+msgid "sector"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sector and industry"
+msgstr ""
+
+#: src/postulo/templates/widgets/industries.html
+msgid "Sectors and industries"
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy
 msgid "Security"
@@ -14689,6 +14716,11 @@ msgstr "Задається автоматично, коли статус упе�
 #, fuzzy, python-format
 msgid "Set by <code>%(variable)s</code> in the environment; change it there."
 msgstr "Задано через <code>%(variable)s</code> у середовищі; змінюйте там."
+
+#: src/postulo/jobs/forms.py
+#, python-format
+msgid "Set by its NACE division, %(code)s. Rename it to a word of your own to choose another."
+msgstr ""
 
 #: src/postulo/templates/server/signin.html
 #, fuzzy, python-format
@@ -17289,6 +17321,14 @@ msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy it is in. Narrows the suggestions below, and an industry of your own added here is filed under it."
+msgstr ""
+
+#: src/postulo/jobs/forms.py
+msgid "The part of the economy this industry is in. You may leave it empty."
+msgstr ""
+
 #: src/postulo/templates/server/email.html
 #, fuzzy, python-format
 msgid "The password is set by <code>%(variable)s</code> in the environment; change it there. It is never shown here."
@@ -17460,9 +17500,8 @@ msgid "The same entries without the layout, in this document's language. None of
 msgstr ""
 
 #: src/postulo/applications/widgets.py
-#, fuzzy
-msgid "The same figures by field. A company in three fields counts in all three."
-msgstr "Ті самі цифри за галузями. Компанія у трьох галузях рахується в усіх трьох."
+msgid "The same figures by sector, and by industry within each. A company in three fields counts in all three."
+msgstr ""
 
 #: src/postulo/jobs/duplicates.py
 #, python-format

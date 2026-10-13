@@ -362,10 +362,14 @@ class Evidence:
 
 @dataclass
 class Tally:
-    """Where the effort went, under one heading."""
+    """Where the effort went, under one heading: and, for a sector, under each of its
+    industries one level down (#897)."""
 
     name: str
     count: int
+    #: The NACE section a sector's line is, or empty.
+    code: str = ""
+    children: list[Tally] = field(default_factory=list)
 
 
 @dataclass
@@ -385,6 +389,8 @@ class Report:
     evidence: list[Evidence] = field(default_factory=list)
     happened: Happened = field(default_factory=Happened)
     sources: list[Tally] = field(default_factory=list)
+    #: By sector, each with its industries beneath (#897): a report an office reads says
+    #: *section J, division 62*, and the person's own words are the line below.
     industries: list[Tally] = field(default_factory=list)
     #: Drafted in the period and never sent. Counted so the page can say what it leaves out.
     drafts: int = 0
@@ -529,20 +535,47 @@ def build(user, period: Period, *, today: dt.date | None = None) -> Report:
         adviser = office.contacts.order_by("pk").first()
         report.adviser = adviser.name if adviser else ""
 
-    by_industry: dict[str, int] = {}
+    by_sector: dict[str, int] = {}
+    by_industry: dict[str, dict[str, int]] = {}
     for application in inside:
         # The office is not an employer, so its industries are nobody's effort (#202).
         if application.posting.company.kind != CompanyKind.EMPLOYER:
             continue
-        names = [i.name for i in application.posting.company.industries.all()] or [unrecorded]
-        for name in names:
-            by_industry[name] = by_industry.get(name, 0) + 1
-    report.industries = [
-        Tally(name, count)
-        for name, count in sorted(by_industry.items(), key=lambda pair: (-pair[1], pair[0]))
-    ]
+        held = list(application.posting.company.industries.all())
+        if not held:
+            by_sector[UNRECORDED] = by_sector.get(UNRECORDED, 0) + 1
+            continue
+        # Once per sector, however many of its industries the company is in.
+        for section in {industry.section for industry in held}:
+            by_sector[section] = by_sector.get(section, 0) + 1
+        for industry in held:
+            names = by_industry.setdefault(industry.section, {})
+            names[industry.name] = names.get(industry.name, 0) + 1
+    report.industries = sector_tallies(by_sector, by_industry, unrecorded)
 
     return report
+
+
+#: The key the applications to companies with no industries are gathered under.
+UNRECORDED = "\x00unrecorded"
+
+
+def sector_tallies(by_sector, by_industry, unrecorded) -> list[Tally]:
+    """The sector lines, largest first, each with its industries beneath, largest first; the
+    industries with no sector under *No sector*, and the companies with none at all last."""
+    from postulo.jobs import industries
+
+    def ordered(counts: dict) -> list[tuple[str, int]]:
+        return sorted(counts.items(), key=lambda pair: (-pair[1], str(pair[0])))
+
+    lines = []
+    for section, count in ordered({k: v for k, v in by_sector.items() if k != UNRECORDED}):
+        name = industries.section_name(section) if section else str(_("No sector"))
+        children = [Tally(n, c) for n, c in ordered(by_industry.get(section, {}))]
+        lines.append(Tally(name, count, code=section, children=children))
+    if UNRECORDED in by_sector:
+        lines.append(Tally(unrecorded, by_sector[UNRECORDED]))
+    return lines
 
 
 # -------------------------------------------------------------------------- CSV

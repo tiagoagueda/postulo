@@ -1,11 +1,12 @@
 {% load i18n postulo %}
 <c-section-title>{{ widget.label }}</c-section-title>
-{% if insights.industries %}
-  <c-scroll-box class="card p-0" label="{% translate 'Industries' %}" data-by-industry>
+{% if insights.sectors %}
+  {% comment %} By sector, the industries of each beneath it (#897). {% endcomment %}
+  <c-scroll-box class="card p-0" label="{% translate 'Sectors and industries' %}" data-by-industry>
     <table class="table">
       <thead>
         <tr>
-          <th scope="col">{% translate "Industry" %}</th>
+          <th scope="col">{% translate "Sector and industry" %}</th>
           <th scope="col">{% translate "Sent" %}</th>
           <th scope="col">{% translate "Replied" %}</th>
           <th scope="col">{% translate "Interviews" %}</th>
@@ -14,26 +15,23 @@
         </tr>
       </thead>
       <tbody>
-        {% for row in insights.industries %}
-          <tr>
-            <td>{{ row.name }}</td>
-            <td class="tabular-nums">{{ row.applied }}</td>
-            <td class="tabular-nums">
-              {{ row.responded }}
-              {% if row.response_rate is not None %}
-                <span class="text-xs text-ink-400">({{ row.response_rate|floatformat:0|percent }})</span>
-              {% endif %}
-            </td>
-            <td class="tabular-nums">{{ row.interviewed }}</td>
-            <td class="tabular-nums">{{ row.offers }}</td>
-            <td class="tabular-nums">{{ row.quiet }}</td>
+        {% for row in insights.sectors %}
+          <tr data-sector="{{ row.code }}">
+            <th scope="row" class="font-medium">{% if row.code %}<span class="tabular-nums text-ink-400" title="{% translate 'NACE section' %}"><span class="sr-only">{% translate 'NACE section' %} </span>{{ row.code }}</span> {% endif %}{{ row.name }}</th>
+            {% include "widgets/partials/industry_figures.html" %}
           </tr>
+          {% for row in row.children %}
+            <tr data-industry>
+              <td class="ps-8">{{ row.name }}</td>
+              {% include "widgets/partials/industry_figures.html" %}
+            </tr>
+          {% endfor %}
         {% endfor %}
       </tbody>
     </table>
   </c-scroll-box>
   <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
-    {% translate "A company in several industries counts in each of them." %}
+    {% translate "A company in several sectors or industries counts in each of them." %}
   </p>
 {% else %}
   <c-empty variant="quiet">

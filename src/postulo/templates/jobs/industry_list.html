@@ -37,9 +37,15 @@
     {% endif %}
 
     {% if industries %}
+      {% comment %} One card per sector, in NACE's order, the words with no sector last (#897). {% endcomment %}
+      {% for sector in sectors %}
+      <section class="mb-4" aria-labelledby="sector-{{ sector.section|default:'none' }}" data-sector="{{ sector.section }}">
+        <h2 class="mb-2 text-sm font-medium text-ink-600 dark:text-ink-300" id="sector-{{ sector.section|default:'none' }}">
+          {% if sector.section %}<span class="tabular-nums text-ink-400" title="{% translate 'NACE section' %}"><span class="sr-only">{% translate 'NACE section' %} </span>{{ sector.section }}</span> {% endif %}{{ sector.name }}
+        </h2>
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
-          {% for industry in industries %}
+          {% for industry in sector.industries %}
             <li class="flex flex-wrap items-center gap-3 px-4 py-3">
               <a href="{% url 'jobs:company_list' %}?industry={{ industry.name|urlencode }}"
                  class="min-w-0 flex-1 hover:underline">
@@ -70,6 +76,8 @@
           {% endfor %}
         </ul>
       </div>
+      </section>
+      {% endfor %}
       <p class="mt-2 text-xs text-ink-500 dark:text-ink-400">
         {% translate "Two spellings of the same thing? Edit one and merge it into the other." %}
       </p>
