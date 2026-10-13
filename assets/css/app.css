@@ -2707,12 +2707,14 @@ html {
 }
 
 /* Leaflet's bottom corners sit above the footer's line, and on a phone above the closed
-   list of places too, so neither covers the zoom buttons or the credit. */
+   list of places too, so neither covers the zoom and *Near me* buttons, which are at the
+   bottom of the start side (#907). The script measures how far that is and sets
+   --map-corner-lift; these are what stands until it has. The credit is the footer's (#908). */
 .map-stage .leaflet-bottom {
-  bottom: 6.5rem;
+  bottom: var(--map-corner-lift, 6.5rem);
 
   @media (width >= 40rem) {
-    bottom: 3rem;
+    bottom: var(--map-corner-lift, 4.5rem);
   }
 }
 

@@ -171,3 +171,54 @@ def test_a_click_on_the_map_places_an_address_by_hand(live_server, page: Page, p
     address.refresh_from_db()
     assert address.placed_by == "manual"
     assert (address.latitude, address.longitude) != (40.64, -8.65)
+
+
+# ------------------------------------------------- the buttons on the start side (#907)
+
+
+def corner_of_buttons(page: Page) -> dict:
+    """Where the zoom and Near me buttons sit, against the map and the footer's line."""
+    return page.evaluate(
+        """() => {
+          const map = document.querySelector('[data-map]').getBoundingClientRect();
+          const footer = document.querySelector('.map-footer').getBoundingClientRect();
+          const boxes = [...document.querySelectorAll(
+              '.leaflet-control-zoom, .leaflet-control:has(.map-locate)')]
+            .map(el => el.getBoundingClientRect());
+          return {
+            count: boxes.length,
+            start: boxes.every(r => r.left < map.left + map.width / 2),
+            end: boxes.every(r => r.right > map.left + map.width / 2),
+            above_footer: boxes.every(r => r.bottom <= footer.top + 1),
+          };
+        }"""
+    )
+
+
+@pytest.mark.parametrize("width", [1280, 390])
+def test_the_buttons_are_at_the_bottom_of_the_start_side_above_the_footer(
+    live_server, page: Page, placed, width
+):
+    watch(page)
+    page.set_viewport_size({"width": width, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+
+    where = corner_of_buttons(page)
+    assert where["count"] == 2 and where["start"] and where["above_footer"], where
+    expect(page.locator(".leaflet-bottom.leaflet-right .leaflet-control")).to_have_count(0)
+
+
+def test_right_to_left_the_buttons_follow_the_footer_to_the_right(
+    live_server, page: Page, placed, applicant
+):
+    profile = applicant.profile
+    profile.language = "ar"
+    profile.save(update_fields=["language"])
+    watch(page)
+    page.set_viewport_size({"width": 1280, "height": 800})
+    sign_in(page, live_server.url, "/jobs/companies/map/")
+    expect(page.locator(".leaflet-control-zoom")).to_be_visible()
+
+    where = corner_of_buttons(page)
+    assert where["count"] == 2 and where["end"] and where["above_footer"], where

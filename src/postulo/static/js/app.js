@@ -7459,7 +7459,49 @@
    * there. Nothing is stored and nothing is sent: the position goes from the browser to the
    * map and no further. Only the map page's policy lets it ask at all.
    */
-  function locateControl(L, map, canvas) {
+  // The bottom corner on the side the page starts from (#907): left, and right on a page
+  // written right to left. Leaflet's corners are physical, and the overlays over the map
+  // are placed by start and end, so the buttons follow the footer to whichever side it is.
+  function startCorner(canvas) {
+    return getComputedStyle(canvas).direction === "rtl" ? "bottomright" : "bottomleft";
+  }
+
+  // How far the bottom corners are lifted: past the top of the footer's line, and of the
+  // closed list of places where it sits at the foot (on a phone), whatever their height
+  // in this language and at this width (#907). Measured, since the footer wraps onto a
+  // second line when its words are long, and written as a custom property through the
+  // CSSOM, which the policy allows; the stylesheet's own lift stands until then.
+  function liftCorners(canvas) {
+    var stage = canvas.closest("[data-map-stage]");
+    if (!stage) {
+      return;
+    }
+    var below = Array.prototype.slice.call(
+      stage.querySelectorAll(".map-footer, [data-map-drawer]")
+    );
+    function measure() {
+      var box = canvas.getBoundingClientRect();
+      var lift = 0;
+      below.forEach(function (element) {
+        var part = element.getBoundingClientRect();
+        // Only what sits in the lower half of the map is under the corners.
+        if (part.height && part.top > box.top + box.height / 2) {
+          lift = Math.max(lift, box.bottom - part.top);
+        }
+      });
+      stage.style.setProperty("--map-corner-lift", Math.ceil(lift + 8) + "px");
+    }
+    measure();
+    if (window.ResizeObserver) {
+      var watcher = new ResizeObserver(measure);
+      below.forEach(function (element) {
+        watcher.observe(element);
+      });
+      watcher.observe(canvas);
+    }
+  }
+
+  function locateControl(L, map, canvas, corner) {
     var status = document.querySelector("[data-map-status]");
     var here = null;
     var timer = null;
@@ -7525,7 +7567,7 @@
         return bar;
       },
     });
-    return new Locate();
+    return new Locate(corner ? { position: corner } : {});
   }
 
   function readyMaps() {
@@ -7561,15 +7603,20 @@
         minZoom: 1,
         maxZoom: parseInt(canvas.getAttribute("data-map-max-zoom"), 10) || 19,
       });
-      // Bottom right, clear of the heading drawn over the top of the map (#849).
+      // At the bottom of the start side, above the footer's line (#907): clear of the
+      // heading drawn over the top of the map (#849) and of the list of places at the
+      // end, on the side a reader's eye starts from, and the stylesheet lifts that corner
+      // over the footer and, on a phone, over the closed list.
+      var corner = startCorner(canvas);
       L.control
         .zoom({
-          position: "bottomright",
+          position: corner,
           zoomInTitle: canvas.getAttribute("data-map-zoom-in") || "+",
           zoomOutTitle: canvas.getAttribute("data-map-zoom-out") || "-",
         })
         .addTo(map);
-      locateControl(L, map, canvas).addTo(map);
+      locateControl(L, map, canvas, corner).addTo(map);
+      liftCorners(canvas);
       // The credit is the end of the footer's line over the map, written by the server; it
       // is shown now there is a map for it to credit, and Leaflet draws no box of its own.
       var stage = canvas.closest("[data-map-stage]");
