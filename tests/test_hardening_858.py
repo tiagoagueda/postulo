@@ -31,7 +31,7 @@ def test_every_view_has_the_group_named_for_its_unit(client, user, view):
     previous, middle, following = UNITS[view]
     for name in (previous, middle, following):
         assert f'aria-label="{name}"' in nav, name
-    assert nav.count('class="button-group"') == 1
+    assert nav.count('aria-label="Move the calendar"') == 1, "one step group"
     assert 'data-icon="chevron-left"' in nav and 'data-icon="calendar-1"' in nav
     assert 'data-icon="chevron-right"' in nav
     assert ">Previous</span>" in nav and ">Next</span>" in nav

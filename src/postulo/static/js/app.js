@@ -3059,10 +3059,34 @@
       return;
     }
     var left = fromLeft ? box.left : box.right - wide;
+    // A panel marked `data-align="center"` sits under the middle of its trigger: the
+    // calendar's picker, under a period name that is itself centred (#900).
+    if (panel.getAttribute("data-align") === "center") {
+      left = box.left + box.width / 2 - wide / 2;
+    }
     left = Math.max(PANEL_EDGE, Math.min(left, width - wide - PANEL_EDGE));
     style.left = left + "px";
     style.right = "auto";
   }
+
+  // A centred panel is placed by hand in every browser (#900), before it is drawn and once it is.
+  ["beforetoggle", "toggle"].forEach(function (name) {
+    document.addEventListener(
+      name,
+      function (event) {
+        var panel = event.target;
+        if (
+          event.newState === "open" &&
+          panel &&
+          panel.nodeType === 1 &&
+          panel.matches('[data-popover][popover][data-align="center"]')
+        ) {
+          placePanel(panel);
+        }
+      },
+      true
+    );
+  });
 
   function isMenuPanel(node) {
     return node && node.nodeType === 1 && node.matches("[data-popover][popover]");

@@ -1893,6 +1893,17 @@ progress.funnel-bar::-moz-progress-bar {
     position-area: block-end span-inline-end;
   }
 
+  /* Centred under its trigger (#900): the calendar's picker, under a name that is itself
+     centred. Placed by `app.js` in every browser, as panels are where anchoring is missing:
+     Chromium's anchor-center put it beside the trigger's middle, not on it. The panel keeps
+     its own width rather than Basecoat's full-width minimum. */
+  [data-popover][popover][data-align="center"] {
+    min-inline-size: 0;
+    /* Basecoat centres such a panel with a half-width shift of its own; the script has
+       already placed it on the trigger's middle. */
+    translate: none;
+  }
+
   @position-try --menu-scrolls {
     max-block-size: calc(100% - 0.5rem);
     min-block-size: 10rem;

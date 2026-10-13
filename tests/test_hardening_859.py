@@ -116,12 +116,14 @@ def test_abbreviated_is_the_default_and_in_full_adds_the_name_for_wide_screens(c
 
 def test_without_words_the_buttons_keep_them_for_a_screen_reader_only(client, user):
     client.force_login(user)
-    nav = re.search(r"<nav[^>]*data-period.*?</nav>", calendar(client), re.S)[0]
+    # The step group only: the views beside it have labels of their own since #904.
+    steps = r'<div class="button-group[^"]*"[^>]*aria-label="Move the calendar">.*?</div>'
+    nav = re.search(steps, calendar(client), re.S)[0]
     assert nav.count('class="btn-label"') == 3
 
     user.profile.calendar_labels = False
     user.profile.save()
-    nav = re.search(r"<nav[^>]*data-period.*?</nav>", calendar(client), re.S)[0]
+    nav = re.search(steps, calendar(client), re.S)[0]
 
     assert 'class="btn-label"' not in nav
     assert nav.count('class="sr-only"') == 3

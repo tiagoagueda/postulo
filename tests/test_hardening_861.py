@@ -21,7 +21,7 @@ def test_the_switch_is_in_the_period_row_aligned_to_the_end(client, user):
 
     nav = re.search(r"<nav[^>]*data-period.*?</nav>", html, re.S)[0]
     views = re.search(
-        r'<div class="button-group ms-auto[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S
+        r'<div class="button-group[^"]*justify-self-end[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S
     )[1]
     # Each word in its label span, beside its icon, since #904.
     words = re.findall(r'<span class="btn-label">\s*([A-Za-z]+)\s*</span>\s*</a>', views)

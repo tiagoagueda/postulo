@@ -165,17 +165,21 @@
      round on a right-to-left page (#902).
      The picker is a plain GET form in a popover with a native date input: `on=` takes any day
      of the period, so one input serves every view and needs no script. {% endcomment %}
-  <nav class="mb-4 flex flex-wrap items-center gap-3" aria-label="{% translate 'Period' %}" data-period>
-    <div class="button-group" role="group" aria-label="{% translate 'Move the calendar' %}">
+  {% comment %} Three tracks on a wide screen, so the period's name is at the centre of the page
+     whatever width the groups either side of it take, in either direction of writing (#900):
+     the step group at the start, the name in the middle track, the views at the end. Narrower,
+     one under another in the same order, the name centred on its own line. {% endcomment %}
+  <nav class="mb-4 grid grid-cols-1 items-center gap-3 xl:grid-cols-[1fr_auto_1fr]" aria-label="{% translate 'Period' %}" data-period>
+    <div class="button-group justify-self-start" role="group" aria-label="{% translate 'Move the calendar' %}">
       <a href="{{ page.earlier }}" class="btn" data-variant="outline" aria-label="{{ page.steps.previous }}" data-step="previous">{% icon "chevron-left" data_rtl_flip="" %}<span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{% translate "Previous" %}</span></a>
       <a href="{{ page.today }}" class="btn" data-variant="outline" aria-label="{{ page.steps.today }}" data-step="today">{% icon "calendar-1" %}<span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{{ page.steps.today }}</span></a>
       <a href="{{ page.later }}" class="btn" data-variant="outline" aria-label="{{ page.steps.next }}" data-step="next"><span class="{% if page.labels %}btn-label{% else %}sr-only{% endif %}">{% translate "Next" %}</span>{% icon "chevron-right" data_rtl_flip="" %}</a>
     </div>
-    <h2 class="text-lg font-medium">
+    <h2 class="justify-self-center text-center text-lg font-medium">
       <button type="button" class="btn text-lg" data-variant="ghost" popovertarget="calendar-picker" aria-haspopup="dialog"
               aria-label="{% blocktranslate trimmed with period=page.title %}{{ period }}: choose another{% endblocktranslate %}">{{ page.title }}</button>
     </h2>
-    <div id="calendar-picker" popover data-popover data-align="start" class="w-72">
+    <div id="calendar-picker" popover data-popover data-align="center" class="w-72">
       <form method="get" action="{% url 'applications:calendar' %}" class="flex flex-col gap-3 p-4">
         {% if page.view != "month" %}<input type="hidden" name="view" value="{{ page.view }}">{% endif %}
         {% if page.kinds_value %}<input type="hidden" name="kinds" value="{{ page.kinds_value }}">{% endif %}
@@ -190,7 +194,7 @@
     {% comment %} Four shapes of the same days (#861), now beside the period they change: month
        first, and the agenda for a phone, where a month grid is thirty-one cells of nothing.
        Links, so each is an address; the open one is filled and carries `aria-current`. {% endcomment %}
-    <div class="button-group ms-auto max-sm:w-full" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
+    <div class="button-group max-sm:w-full sm:justify-self-end" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
       {% comment %} Each with its icon and its word (#904): the word in `.btn-label`, so below
          `sm` the group draws icons alone and above it the buttons follow the person's choice
          of icons, labels or both (#852); `aria-label` keeps the name whichever shows. {% endcomment %}
