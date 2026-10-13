@@ -162,7 +162,7 @@ def test_the_kinds_travel_with_every_link_on_the_page(user):
     assert "kinds=deadline" in page.earlier
     assert "kinds=deadline" in page.later
     assert "kinds=deadline" in page.today
-    assert all("kinds=deadline" in url for _view, _label, url, _current in page.switcher)
+    assert all("kinds=deadline" in url for _view, _label, url, _current, _icon in page.switcher)
     assert page.narrowed
     assert "kinds=" not in page.everything, "the way back is the address without one"
 

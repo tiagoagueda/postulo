@@ -263,11 +263,11 @@ def test_week_day_and_agenda_are_the_same_events_in_another_shape(client, user, 
 def test_every_shape_is_an_address_the_switcher_offers(client, user):
     client.force_login(user)
     page = client.get(reverse(CALENDAR), {"view": "week", "on": "2026-09-10"}).context["page"]
-    urls = {view: url for view, _label, url, _current in page.switcher}
+    urls = {view: url for view, _label, url, _current, _icon in page.switcher}
     assert urls["month"].endswith("?month=2026-09")
     assert urls["day"].endswith("?view=day&on=2026-09-10")
     assert urls["agenda"].endswith("?view=agenda&on=2026-09-10")
-    assert [current for _v, _l, _u, current in page.switcher] == [False, True, False, False]
+    assert [current for _v, _l, _u, current, _i in page.switcher] == [False, True, False, False]
 
 
 # ------------------------------------------------------------------ the navigation

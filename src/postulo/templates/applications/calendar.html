@@ -191,9 +191,13 @@
        first, and the agenda for a phone, where a month grid is thirty-one cells of nothing.
        Links, so each is an address; the open one is filled and carries `aria-current`. {% endcomment %}
     <div class="button-group ms-auto max-sm:w-full" role="group" aria-label="{% translate 'Calendar views' %}" data-views>
-      {% for view, label, url, current in page.switcher %}
-        <a href="{{ url }}" class="btn max-sm:min-w-0 max-sm:flex-1 max-sm:px-1" data-variant="{% if current %}primary{% else %}outline{% endif %}"
-           {% if current %}aria-current="page"{% endif %}>{{ label }}</a>
+      {% comment %} Each with its icon and its word (#904): the word in `.btn-label`, so below
+         `sm` the group draws icons alone and above it the buttons follow the person's choice
+         of icons, labels or both (#852); `aria-label` keeps the name whichever shows. {% endcomment %}
+      {% for view, label, url, current, view_icon in page.switcher %}
+        <a href="{{ url }}" class="btn max-sm:min-w-0 max-sm:flex-1" data-variant="{% if current %}primary{% else %}outline{% endif %}"
+           aria-label="{{ label }}" data-view="{{ view }}"
+           {% if current %}aria-current="page"{% endif %}>{% icon view_icon %}<span class="btn-label">{{ label }}</span></a>
       {% endfor %}
     </div>
   </nav>

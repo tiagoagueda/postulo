@@ -23,7 +23,9 @@ def test_the_switch_is_in_the_period_row_aligned_to_the_end(client, user):
     views = re.search(
         r'<div class="button-group ms-auto[^"]*"[^>]*data-views>(.*?)</div>', nav, re.S
     )[1]
-    assert re.findall(r">\s*([A-Za-z]+)\s*</a>", views) == ["Month", "Week", "Day", "Agenda"]
+    # Each word in its label span, beside its icon, since #904.
+    words = re.findall(r'<span class="btn-label">\s*([A-Za-z]+)\s*</span>\s*</a>', views)
+    assert words == ["Month", "Week", "Day", "Agenda"]
     assert views.count('aria-current="page"') == 1
     assert 'aria-label="Calendar views"' in nav
 

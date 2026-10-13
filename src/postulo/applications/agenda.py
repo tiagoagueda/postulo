@@ -680,14 +680,15 @@ class Page:
         return kinds_parameter(self.kinds) or ""
 
     @property
-    def switcher(self) -> list[tuple[str, str, str, bool]]:
-        """(view, label, url, current) for each shape, on the day this page is on."""
+    def switcher(self) -> list[tuple[str, str, str, bool, str]]:
+        """(view, label, url, current, icon) for each shape, on the day this page is on."""
         return [
             (
                 view,
                 VIEW_LABELS[view],
                 url_for(view, self.on, self.kinds, self.search),
                 view == self.view,
+                VIEW_ICONS[view],
             )
             for view in VIEWS
         ]
@@ -759,6 +760,15 @@ VIEW_LABELS = {
     "week": _("Week"),
     "day": _("Day"),
     "agenda": _("Agenda"),
+}
+
+#: The icon beside each view's name (#904). Not `calendar-1` for the day: that is the period
+#: group's *Today*, and one icon with two meanings on a page is two meanings too many.
+VIEW_ICONS = {
+    "month": "calendar-days",
+    "week": "calendar-range",
+    "day": "calendar-clock",
+    "agenda": "list-clock",
 }
 
 
