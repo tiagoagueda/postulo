@@ -113,6 +113,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🔧 Changed
 
+- The calendar's kinds of entry, its key and filter, come after the month, week, day or agenda rather than above it (#903)
 - The companies' map draws a marker for every address, gathered into clusters that count companies; places are grouped by where they resolve to, so two spellings of a town are one, and the list names each address's kind and says when a company is counted at several places (#703)
 - A company's Location is the town and country of its primary postal address: each location becomes a Work address on upgrade, keeping its point, the form's Location and correction boxes go, and the API, CSV and kind files still take a location line (archive format 68) (#702)
 - Only a person's own telephone number is unique across the instance: a number recorded on a contact or a company is unique within it, asks nothing and spends no allowance, and an address is unique per holder rather than per account (#329)

@@ -219,37 +219,6 @@
     </p>
   {% endif %}
 
-  {% comment %} The key and the filter in one row (#238). Four kinds share this page, so
-     something has to say which colour is which -- and a key beside a separate set of
-     checkboxes is two things to read and two things to disagree. Each item is a link that
-     takes its kind out or puts it back, so a narrowed calendar is an address, works with no
-     script, and cannot drift from the key it is drawn as.
-
-     `aria-pressed` on a link would be wrong -- it is not a button, and it navigates -- so
-     what is on and what is off is said in the link's own name: *Hide interviews* is showing,
-     *Show interviews* is not. The fill is the second signal, never the only one (#274).
-  {% endcomment %}
-  <nav class="mb-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Types of entry' %}" data-legend>
-    {% for kind, label, tone, showing, url in page.legend %}
-      <a href="{{ url }}" data-kind="{{ kind }}" {% if showing %}data-showing="true"{% endif %}
-         class="cal-legend-item {% if showing %}cal-{{ tone }} border-transparent{% else %}border-ink-300 text-ink-500 dark:border-ink-600 dark:text-ink-400{% endif %}">
-        <span aria-hidden="true">{{ label }}</span>
-        <span class="sr-only">
-          {% if showing %}
-            {% blocktranslate trimmed with what=label %}Hide {{ what }}{% endblocktranslate %}
-          {% else %}
-            {% blocktranslate trimmed with what=label %}Show {{ what }}{% endblocktranslate %}
-          {% endif %}
-        </span>
-      </a>
-    {% endfor %}
-    {% if page.narrowed %}
-      <a href="{{ page.everything }}" class="text-xs text-brand-600 underline dark:text-brand-400">
-        {% translate "Show everything" %}
-      </a>
-    {% endif %}
-  </nav>
-
   {% if page.view == 'month' %}
     {% comment %} Seven columns and a row per week, drawn by the server (#204). The day
        number is a link to that day, big enough to hit; a cell shows two of its events
@@ -377,4 +346,37 @@
       {% partial listed %}
     </div>
   {% endif %}
+
+  {% comment %} The key and the filter in one row (#238), after the calendar it describes, as on
+     a printed calendar or a map: the dates first, then what the colours mean (#903). A narrowed
+     calendar stays narrowed from period to period, because the kinds are in the address. Four kinds share this page, so
+     something has to say which colour is which -- and a key beside a separate set of
+     checkboxes is two things to read and two things to disagree. Each item is a link that
+     takes its kind out or puts it back, so a narrowed calendar is an address, works with no
+     script, and cannot drift from the key it is drawn as.
+
+     `aria-pressed` on a link would be wrong -- it is not a button, and it navigates -- so
+     what is on and what is off is said in the link's own name: *Hide interviews* is showing,
+     *Show interviews* is not. The fill is the second signal, never the only one (#274).
+  {% endcomment %}
+  <nav class="mt-4 flex flex-wrap items-center gap-2" aria-label="{% translate 'Types of entry' %}" data-legend>
+    {% for kind, label, tone, showing, url in page.legend %}
+      <a href="{{ url }}" data-kind="{{ kind }}" {% if showing %}data-showing="true"{% endif %}
+         class="cal-legend-item {% if showing %}cal-{{ tone }} border-transparent{% else %}border-ink-300 text-ink-500 dark:border-ink-600 dark:text-ink-400{% endif %}">
+        <span aria-hidden="true">{{ label }}</span>
+        <span class="sr-only">
+          {% if showing %}
+            {% blocktranslate trimmed with what=label %}Hide {{ what }}{% endblocktranslate %}
+          {% else %}
+            {% blocktranslate trimmed with what=label %}Show {{ what }}{% endblocktranslate %}
+          {% endif %}
+        </span>
+      </a>
+    {% endfor %}
+    {% if page.narrowed %}
+      <a href="{{ page.everything }}" class="text-xs text-brand-600 underline dark:text-brand-400">
+        {% translate "Show everything" %}
+      </a>
+    {% endif %}
+  </nav>
 {% endblock %}
