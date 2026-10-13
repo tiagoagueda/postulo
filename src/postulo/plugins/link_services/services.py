@@ -254,7 +254,6 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("facebook.com", "fb.com"),
             icon="user",
-            brand="facebook",
             example="https://www.facebook.com/name",
             prefix="https://www.facebook.com/",
         ),
@@ -282,7 +281,6 @@ SERVICES: dict[str, LinkService] = {
             ),
             hosts=("instagram.com",),
             icon="user",
-            brand="instagram",
             example="https://www.instagram.com/name",
             prefix="https://www.instagram.com/",
         ),
@@ -344,7 +342,6 @@ SERVICES: dict[str, LinkService] = {
             _path(rf"/{_not(*_FORGEJO_PAGES)}(?P<handle>{PART}(?:/{PART})?){REST}"),
             hosts=("codeberg.org",),
             icon="git-branch",
-            brand="codeberg",
             example="https://codeberg.org/name/project",
         ),
         LinkService(

@@ -100,9 +100,8 @@ def test_a_brand_is_inline_svg_decorative_by_default_and_marked_with_data_brand(
     assert 'class="size-4 shrink-0"' in html
     assert 'viewBox="0 0 24 24"' in html
     assert "<title>" not in html and "role=" not in html
-    assert 'data-brand-mode="brand"' in html
-    assert 'fill="#6364FF"' in html, "the owner's published colour, and no currentColor"
-    assert "currentColor" not in html
+    assert 'data-brand-mode="single-colour"' in html, "black or white since #905"
+    assert 'fill="currentColor"' in html and not re.search(r'fill="#', html)
     assert "data-icon" not in html, "icons and marks are read by different selectors"
     assert not re.search(r"\s(width|height)=", html)
 
@@ -197,8 +196,42 @@ def test_the_marks_that_are_single_colour_are_the_ones_whose_guidelines_were_rea
     """The decision per candidate, recorded in the list: GitHub, SourceHut, Forgejo and
     ORCID are published by their owners in black or white (or as a monochrome file), and X,
     Threads, Xing, Bitbucket and GitLab are not here, for want of a page showing it."""
-    assert single_colour() == {"github", "sourcehut", "forgejo", "orcid"}
+    assert single_colour() == {
+        "github",
+        "sourcehut",
+        "forgejo",
+        "orcid",
+        "bluesky",
+        "mastodon",
+        "youtube",
+    }
     assert not listed() & {"x", "threads", "xing", "bitbucket", "gitlab", "linkedin"}
+    # Their owners allow the colour logo or a white one and no black one (#905).
+    assert not listed() & {"codeberg", "facebook", "instagram"}
+
+
+def test_no_mark_a_link_service_draws_is_in_its_brand_colour():
+    """A service select lists marks in the option's ink, never a row of coloured logos
+    (#905): every service's mark is single-colour, or the service has none and draws its
+    Lucide icon."""
+    from postulo.core.link_services import registry
+
+    services = registry().values()
+    assert any(service.brand for service in services), "the shipped services were read"
+    for service in services:
+        if service.brand:
+            assert service.brand in listed(), f"{service.key}: {service.brand} is not shipped"
+            assert modes()[service.brand] == "single-colour", service.key
+
+
+@pytest.mark.parametrize(
+    ("key", "icon"), [("codeberg", "git-branch"), ("facebook", "user"), ("instagram", "user")]
+)
+def test_a_service_whose_owner_allows_no_black_mark_draws_its_icon(key, icon):
+    from postulo.core.link_services import registry
+
+    service = registry()[key]
+    assert service.brand == "" and service.icon == icon
 
 
 def test_every_brand_mark_clears_three_to_one_on_both_pages():

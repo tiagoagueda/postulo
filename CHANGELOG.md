@@ -270,6 +270,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### 🐛 Fixed
 
+- The social-profile and repository service lists draw every mark in one colour: Bluesky, Mastodon and YouTube in black or white as their owners allow, and Codeberg, Facebook and Instagram, whose owners allow no black version, by their icon (#905)
 - A module's icon is centred in its tile on both plugin pages, and the connection pages draw each plugin with the same tile (#901)
 - The calendar's period name is centred on the page in every view, between the step buttons and the views, and its picker opens under it (#900)
 - The calendar's Next button reads Next › with its chevron after the word, and both chevrons, like the breadcrumb's, turn round on a right-to-left page (#902)

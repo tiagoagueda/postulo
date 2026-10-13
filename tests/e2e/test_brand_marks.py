@@ -29,8 +29,8 @@ MARKS = {
     # on the dark one, whichever ink the words beside it are in.
     "github": ("single-colour", {"light": LIGHT, "dark": DARK}),
     "forgejo": ("single-colour", {"light": LIGHT, "dark": DARK}),
-    # The owner's published colour, in both themes.
-    "mastodon": ("brand", {"light": "rgb(99, 100, 255)", "dark": "rgb(99, 100, 255)"}),
+    # Mastodon's purple until #905; its owner allows the mark in black and white.
+    "mastodon": ("single-colour", {"light": LIGHT, "dark": DARK}),
 }
 
 

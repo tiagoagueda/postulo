@@ -273,6 +273,76 @@ def test_the_list_draws_a_services_own_mark_and_an_icon_for_one_without(
     expect(linkedin.locator("svg[data-brand]")).to_have_count(0)
 
 
+#: Each mark in an open list: its service, its colour, and its contrast with the option's
+#: background, the nearest one painted, which is the highlight's while the option is
+#: highlighted.
+OPTION_MARKS = r"""(panel) => {
+  // Any CSS colour, oklch() included, as the browser paints it: red, green, blue, alpha.
+  const pen = document.createElement('canvas').getContext('2d', {willReadFrequently: true});
+  const rgb = (text) => {
+    pen.clearRect(0, 0, 1, 1);
+    pen.fillStyle = text;
+    pen.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = pen.getImageData(0, 0, 1, 1).data;
+    return [r, g, b, a / 255];
+  };
+  const lum = ([r, g, b]) => {
+    const f = (c) => (c /= 255) <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+  };
+  // What the option is drawn on: each translucent tint laid over the one beneath it,
+  // down to the first opaque background (the page's white where there is none).
+  const ground = (el) => {
+    const tints = [];
+    let base = [255, 255, 255];
+    for (; el; el = el.parentElement) {
+      const c = rgb(getComputedStyle(el).backgroundColor);
+      if (c[3] >= 1) { base = c.slice(0, 3); break; }
+      if (c[3] > 0) tints.push(c);
+    }
+    return tints.reverse().reduce(
+      (under, [r, g, b, a]) => [r, g, b].map((v, i) => v * a + under[i] * (1 - a)), base);
+  };
+  return [...panel.querySelectorAll('[role=option] svg[data-brand]')].map((svg) => {
+    const ink = rgb(getComputedStyle(svg).color);
+    const [a, b] = [lum(ink), lum(ground(svg.closest('[role=option]')))].sort((x, y) => y - x);
+    return {
+      brand: svg.dataset.brand,
+      mode: svg.dataset.brandMode,
+      fill: svg.getAttribute('fill'),
+      ratio: (a + 0.05) / (b + 0.05),
+    };
+  });
+}"""
+
+
+@pytest.mark.parametrize("scheme", ["light", "dark"])
+@pytest.mark.parametrize("kind", ["social", "repository"])
+def test_every_mark_in_a_service_list_is_one_colour_and_legible(
+    page: Page, live_server, links, kind, scheme
+):
+    """No coloured logo among the options (#905): each mark is in one colour, black on the
+    light page and white on the dark one, and clears 3:1 on its option, at rest and while
+    the option is highlighted."""
+    page.emulate_media(color_scheme=scheme)
+    sign_in(page, live_server.url)
+    page.goto(f"{live_server.url}/accounts/profile/")
+    panel = open_list(page, rows_of(page, kind).nth(0).locator("select"))
+
+    at_rest = panel.evaluate(OPTION_MARKS)
+    assert at_rest, "the list draws marks"
+    for found in at_rest:
+        assert found["mode"] == "single-colour" and found["fill"] == "currentColor", found
+        assert found["ratio"] >= 3, (scheme, found)
+    for option in panel.locator("[role=option]:has(svg[data-brand])").all():
+        option.hover()
+        brand = option.locator("svg[data-brand]").get_attribute("data-brand")
+        lit = next(f for f in panel.evaluate(OPTION_MARKS) if f["brand"] == brand)
+        assert lit["ratio"] >= 3, (scheme, "highlighted", lit)
+    for gone in ("codeberg", "facebook", "instagram"):
+        expect(panel.locator(f"svg[data-brand={gone}]")).to_have_count(0)
+
+
 def test_an_address_pasted_into_a_new_row_chooses_its_service_at_once(
     page: Page, live_server, links
 ):

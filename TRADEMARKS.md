@@ -65,7 +65,7 @@ project. They are not.
 
 | What | Where | Whose | Under |
 | --- | --- | --- | --- |
-| Brand marks of Bluesky, Codeberg, Facebook, Forgejo, GitHub, Instagram, Mastodon, ORCID, SourceHut and YouTube | `src/postulo/static/brands/` | Their owners, via [Simple Icons](https://simpleicons.org) | Shown beside a link to say which service it goes to, unmodified and in one of the two modes the rule below allows (the owner's published colour, or black and white where the owner's guidelines say so). The notice beside them names each owner and says no endorsement is claimed. |
+| Brand marks of Bluesky, Forgejo, GitHub, Mastodon, ORCID, SourceHut and YouTube | `src/postulo/static/brands/` | Their owners, via [Simple Icons](https://simpleicons.org) | Shown beside a link to say which service it goes to, unmodified and in one of the two modes the rule below allows (the owner's published colour, or black and white where the owner's guidelines say so). The notice beside them names each owner and says no endorsement is claimed. |
 | Buy Me a Coffee banner and QR code | `assets/support/` | Buy Me a Coffee | Both published by Buy Me a Coffee for people to use, and used to link to the project's own account. The code is scaled and nothing else. See the notice beside them. |
 
 That is a mark, which is not licensed at all — hence this file. The works shipped here
@@ -118,7 +118,11 @@ and each mark there has one recorded mode, in `NOTICE.txt` beside it:
   (ORCID's say the iD icon may be the high-contrast black and white icon, or the
   reversed-out white one on a darker background, and no other colourway; GitHub's say the
   logo should appear only in white, black or, in a few cases, grey or green; Forgejo
-  publishes a monochrome logo and SourceHut one in black and one in white). The page that
+  publishes a monochrome logo and SourceHut one in black and one in white; Bluesky's say to
+  use a black or white variant beside other social icons; Mastodon offers its mark in black
+  and in white; YouTube provides its icon in "monochromatic black, and monochromatic white").
+  Every mark a link service draws is in this mode since #905, so a select lists marks in
+  the option's ink rather than a row of coloured logos. The page that
   says so, and its words, are recorded in `assets/brands.txt` and in `NOTICE.txt`, and
   `npm run sync:brands` refuses a single-colour mark without them. Black and white are
   used because they are the colours those guidelines name and the two that clear 3:1 on
@@ -128,7 +132,11 @@ and each mark there has one recorded mode, in `NOTICE.txt` beside it:
   generic icon. A guess about what an owner allows does not count: X, Threads, Xing,
   Bitbucket and GitLab are in this case, and so is Wikidata, whose official logo is three
   coloured bars: Simple Icons' flat one-colour version would be a recolouring, which
-  the Wikimedia trademark policy does not allow without separate permission.
+  the Wikimedia trademark policy does not allow without separate permission. A mark a link
+  service draws is also none, whatever its contrast, where its owner allows no black and
+  white version, because the service selects list marks in one colour (#905): Facebook and
+  Instagram, whose owner allows only the colour logo or a white one, and Codeberg, whose
+  kit is blue or white and whose guidelines forbid tinting it.
 
 LinkedIn has no mark here, and none is taken from elsewhere: the one source Postulo
 weighed dropped it on the strength of LinkedIn's own terms.
