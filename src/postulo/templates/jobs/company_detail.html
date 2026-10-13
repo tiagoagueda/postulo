@@ -146,6 +146,23 @@
       {% endif %}
     </div>
   {% endif %}
+  {% comment %} Its social profiles (#906), under the website and the careers page, each with
+     its service's mark: all of them while *Several social profiles* is on, the one to show
+     while it is off, as a contact's are drawn. {% endcomment %}
+  {% with profiles=company.web_links.all %}
+    {% if profiles %}
+      <ul class="-mt-4 mb-6 flex flex-wrap gap-x-4 gap-y-1 text-sm" aria-label="{% translate 'Social profiles' %}" data-company-links>
+        {% for link in profiles %}
+          {% if link.is_primary or link.kind in several_links %}
+            <li class="wrap-anywhere">
+              {% if link.brand %}{% brand link.brand class="inline-block size-4 align-text-bottom" %} {% endif %}<a href="{{ link.url }}" rel="noopener noreferrer external" target="_blank"
+                 class="text-brand-600 underline dark:text-brand-400">{{ link.display }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
 
   <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
     <div class="lg:col-span-2">

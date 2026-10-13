@@ -395,6 +395,9 @@ class Company(OwnedModel):
     #: Deleting the company deletes them. A company's number is one a person recorded, never
     #: one they are, so it is unique within the company and nowhere else (#329).
     phone_numbers = GenericRelation("core.PhoneNumber", verbose_name=_("telephone numbers"))
+    #: Its social profiles (#906): its LinkedIn page, its accounts, as a contact holds
+    #: theirs. A company is offered the social kind alone; its website stays a column.
+    web_links = GenericRelation("core.WebLink", verbose_name=_("web links"))
     postal_addresses = GenericRelation("core.PostalAddress", verbose_name=_("postal addresses"))
     industries = models.ManyToManyField(
         Industry, blank=True, related_name="companies", verbose_name=_("industries")

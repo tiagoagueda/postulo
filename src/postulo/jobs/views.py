@@ -915,10 +915,13 @@ class CompanyIdentifiersMixin:
                 for row in formset.forms:
                     row.instance.company = self.object
                 formset.save()
-            # Its numbers and addresses (#329), with the company or not at all.
-            numbers, addresses = getattr(self, "held_rows", (None, None))
+            # Its numbers, addresses (#329) and social profiles (#906), with the company or
+            # not at all.
+            numbers, addresses, links = getattr(self, "held_rows", (None, None, None))
             self.save_phone_numbers(numbers, self.object)
             self.save_addresses(addresses, self.object)
+            if links is not None:
+                self.save_web_links(links, self.object)
         return response
 
     def refuse_bad_rows(self, form):
@@ -928,11 +931,16 @@ class CompanyIdentifiersMixin:
         """
         numbers = self.get_phone_numbers()
         addresses = self.get_addresses()
-        if self.phone_numbers_invalid(numbers) or self.addresses_invalid(addresses):
+        links = self.get_web_links()
+        if (
+            self.phone_numbers_invalid(numbers)
+            or self.addresses_invalid(addresses)
+            or self.web_links_invalid(links)
+        ):
             return self.render_to_response(
-                self.get_context_data(form=form, numbers=numbers, addresses=addresses)
+                self.get_context_data(form=form, numbers=numbers, addresses=addresses, links=links)
             )
-        self.held_rows = (numbers, addresses)
+        self.held_rows = (numbers, addresses, links)
         return None
 
 
@@ -1010,12 +1018,14 @@ class CompanyCreateView(
     CompanyIdentifiersMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
+    WebLinksMixin,
     CreateView,
 ):
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
     addresses_pinnable = False
+    links_for_company = True
 
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:
@@ -1034,12 +1044,14 @@ class CompanyUpdateView(
     CompanyIdentifiersMixin,
     PhoneNumbersMixin,
     PostalAddressesMixin,
+    WebLinksMixin,
     UpdateView,
 ):
     model = Company
     form_class = CompanyForm
     template_name = "jobs/company_form.html"
     addresses_pinnable = False
+    links_for_company = True
 
     def form_valid(self, form):
         if (refused := self.refuse_bad_identifiers(form)) is not None:

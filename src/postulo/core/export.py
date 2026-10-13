@@ -209,7 +209,9 @@ logger = logging.getLogger(__name__)
 #: where the industry's sector, its NACE section, was chosen by hand: a division's or one of
 #: Postulo's short names' is derived from the name and is not written twice. An archive with
 #: names only restores every sector the names imply, and none other (#897).
-FORMAT_VERSION = 70
+#: 71 added ``web_links`` on a company: its social profiles, in the shape a contact's are
+#: written. An archive without them restores none (#906).
+FORMAT_VERSION = 71
 
 
 def industry_entry(industry) -> str | dict:
@@ -1183,6 +1185,7 @@ def build_document(user) -> dict:
             "departments",
             "phone_numbers",
             "postal_addresses",
+            "web_links",
             "names",
         )
     )
@@ -1219,6 +1222,8 @@ def build_document(user) -> dict:
                 # What it answers on and where it is, as a contact's are written (#329).
                 "phone_numbers": _phone_numbers(company),
                 "postal_addresses": _postal_addresses(company),
+                # Its social profiles, as a contact's are written (#906).
+                "web_links": _web_links(company),
                 "identifiers": [
                     {"scheme": i.scheme, "value": i.value, "label": i.label}
                     for i in company.identifiers.all()

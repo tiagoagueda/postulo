@@ -289,6 +289,11 @@ class CompanyForm(OwnerScopedModelForm):
                 primary = phone_numbers.primary_for(self.instance)
                 self.fields["phone"].initial = primary.number if primary else ""
             self.order_fields(self.field_order)
+        # Its social profiles (#906): one box while *Several social profiles* is off, as a
+        # contact's, and the rows a block of their own on the page while it is on. Only on
+        # the company's own form, never on a cell edited in the table.
+        if "name" in self.fields and "notes" in self.fields:
+            web_links.add_single_boxes(self, self.user, holder=self.instance, company=True)
 
         if "industries" in self.fields:
             mine = Industry.objects.for_user(self.user)
@@ -382,6 +387,11 @@ class CompanyForm(OwnerScopedModelForm):
                 return str(error)
         return ""
 
+    @property
+    def link_boxes(self) -> list:
+        """The social-profile box while *Several social profiles* is off (#906)."""
+        return web_links.single_boxes(self, company=True)
+
     def save(self, commit: bool = True) -> Company:
         company = super().save(commit=commit)
         if commit:
@@ -390,12 +400,14 @@ class CompanyForm(OwnerScopedModelForm):
                 phone_numbers.save_only_number(
                     company, self.user, self.cleaned_data.get("phone", "")
                 )
+            web_links.save_single_boxes(self, company, self.user, company=True)
         else:
             save_m2m = self.save_m2m
 
             def save_m2m_and_new():
                 save_m2m()
                 self._add_new_industries(company)
+                web_links.save_single_boxes(self, company, self.user, company=True)
 
             self.save_m2m = save_m2m_and_new
         return company

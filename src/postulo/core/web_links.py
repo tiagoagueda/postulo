@@ -22,7 +22,7 @@ as it is stored, so nothing is refused in retrospect.
 from __future__ import annotations
 
 import unicodedata
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 from django import forms
 from django.contrib.contenttypes import forms as generic_forms
@@ -141,6 +141,35 @@ BLOCKS: tuple[Block, ...] = (
 #: Every kind's value, in the order the page shows them.
 KINDS: tuple[str, ...] = tuple(block.kind for block in BLOCKS)
 
+#: What a company holds (#906): its social profiles, worded for a company -- its LinkedIn
+#: page, its accounts -- rather than for a person, and nothing a document prints. Its website
+#: stays the column it has always been, so the website kind is not offered here, and a
+#: company has no code repositories to speak of.
+COMPANY_BLOCKS: tuple[Block, ...] = (
+    replace(
+        BLOCKS[0],
+        intro=_(
+            "The company's own pages: its LinkedIn page, its Mastodon or Bluesky account, "
+            "its YouTube channel — as many as are worth keeping, with one marked as the "
+            "one to show."
+        ),
+        help_text=_("The company's LinkedIn page, or wherever it posts."),
+        kept_back_contact=_(
+            "Some social profiles are kept for this company and not shown, because "
+            "<em>Several social profiles</em> is switched off."
+        ),
+    ),
+)
+
+#: The kinds a company holds.
+COMPANY_KINDS: tuple[str, ...] = tuple(block.kind for block in COMPANY_BLOCKS)
+
+
+def blocks(company: bool = False) -> tuple[Block, ...]:
+    """The blocks a holder is offered: a person's or a contact's every kind, a company's
+    social profiles alone (#906)."""
+    return COMPANY_BLOCKS if company else BLOCKS
+
 
 def block_for(kind: str) -> Block:
     for block in BLOCKS:
@@ -186,7 +215,7 @@ def links_for(holder, person, kind: str | None = None) -> list[WebLink]:
     return shown
 
 
-def kept_back(holder, person) -> list[tuple[Block, int]]:
+def kept_back(holder, person, *, company: bool = False) -> list[tuple[Block, int]]:
     """How many links of each kind are being kept and not shown, because its feature is off.
 
     Told to the person, so that "switched off" reads as *not offered* rather than as
@@ -194,7 +223,7 @@ def kept_back(holder, person) -> list[tuple[Block, int]]:
     at all in the ordinary case.
     """
     found: list[tuple[Block, int]] = []
-    for block in BLOCKS:
+    for block in blocks(company):
         if several_allowed(person, block.kind):
             continue
         count = holder.web_links.filter(kind=block.kind, is_primary=False).count()
@@ -394,13 +423,13 @@ def add_links(holder, owner, rows: list[dict]) -> list[WebLink]:
 # ------------------------------------------------------------- the one box on a form
 
 
-def add_single_boxes(form: forms.Form, person, holder=None) -> None:
+def add_single_boxes(form: forms.Form, person, holder=None, *, company: bool = False) -> None:
     """One URL box per kind whose feature is off, and none for a kind that is on.
 
     The rows of a kind that is on are a formset of their own, and two controls writing
     the same primary row would be two answers to one question.
     """
-    for block in BLOCKS:
+    for block in blocks(company):
         if several_allowed(person, block.kind):
             continue
         box = forms.URLField(
@@ -416,13 +445,13 @@ def add_single_boxes(form: forms.Form, person, holder=None) -> None:
         form.fields[block.field] = box
 
 
-def single_boxes(form: forms.Form) -> list[forms.BoundField]:
+def single_boxes(form: forms.Form, *, company: bool = False) -> list[forms.BoundField]:
     """The boxes `add_single_boxes` put on this form, for a template to lay out."""
-    return [form[block.field] for block in BLOCKS if block.field in form.fields]
+    return [form[block.field] for block in blocks(company) if block.field in form.fields]
 
 
-def save_single_boxes(form: forms.Form, holder, owner) -> None:
-    for block in BLOCKS:
+def save_single_boxes(form: forms.Form, holder, owner, *, company: bool = False) -> None:
+    for block in blocks(company):
         if block.field in form.fields:
             save_only_link(holder, owner, block.kind, form.cleaned_data.get(block.field, ""))
 
@@ -821,9 +850,9 @@ class BaseWebLinkFormSet(RowsAlreadyGone, generic_forms.BaseGenericInlineFormSet
         return saved
 
 
-def formset_for(holder, kind: str, *, data=None, prefix: str | None = None):
+def formset_for(holder, kind: str, *, data=None, prefix: str | None = None, company: bool = False):
     """The rows of one kind for one holder, ready to render or to save."""
-    block = block_for(kind)
+    block = next(b for b in blocks(company) if b.kind == kind)
     factory = generic_forms.generic_inlineformset_factory(
         WebLink,
         form=WebLinkForm,
@@ -845,16 +874,19 @@ def formset_for(holder, kind: str, *, data=None, prefix: str | None = None):
     return formset
 
 
-def formsets_for(holder, person, *, data=None) -> list:
+def formsets_for(holder, person, *, data=None, company: bool = False) -> list:
     """One formset per kind this person is offered several of, bound where posted.
 
     A form posted without a block -- an older client, a script -- means no change to that
-    kind's rows, not an error about a missing management form.
+    kind's rows, not an error about a missing management form. A company is offered its
+    social profiles alone (#906).
     """
     found = []
-    for block in BLOCKS:
+    for block in blocks(company):
         if not several_allowed(person, block.kind):
             continue
         posted = data is not None and f"{block.prefix}-TOTAL_FORMS" in data
-        found.append(formset_for(holder, block.kind, data=data if posted else None))
+        found.append(
+            formset_for(holder, block.kind, data=data if posted else None, company=company)
+        )
     return found

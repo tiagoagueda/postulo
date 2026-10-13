@@ -132,6 +132,9 @@ class WebLinksMixin:
     are the whole control (#189).
     """
 
+    #: A company's form: its social profiles alone, worded for a company (#906).
+    links_for_company = False
+
     def link_holder(self):
         return getattr(self, "object", None)
 
@@ -139,7 +142,9 @@ class WebLinksMixin:
         from postulo.core import web_links
 
         data = self.request.POST if self.request.method == "POST" else None
-        return web_links.formsets_for(self.link_holder(), self.request.user, data=data)
+        return web_links.formsets_for(
+            self.link_holder(), self.request.user, data=data, company=self.links_for_company
+        )
 
     def web_links_invalid(self, formsets: list) -> bool:
         return any(formset.is_bound and not formset.is_valid() for formset in formsets)
@@ -160,7 +165,9 @@ class WebLinksMixin:
         context.setdefault("links", self.get_web_links())
         holder = self.link_holder()
         context["links_kept_back"] = (
-            web_links.kept_back(holder, self.request.user) if holder is not None else []
+            web_links.kept_back(holder, self.request.user, company=self.links_for_company)
+            if holder is not None
+            else []
         )
         return context
 

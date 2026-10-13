@@ -699,6 +699,23 @@ def _link_rows(entry: dict) -> list[dict]:
     return [row for row in rows if (row.get("url") or "").strip() and row.get("kind") in KINDS]
 
 
+def _company_link_rows(entry: dict) -> list[dict]:
+    """A company's social profiles out of its entry, the key removed (#906). Any other kind
+    a file holds is left out: a company is offered the social kind alone."""
+    from postulo.core.web_links import COMPANY_KINDS
+
+    rows = entry.pop("web_links", None)
+    if not isinstance(rows, list):
+        return []
+    return [
+        row
+        for row in rows
+        if isinstance(row, dict)
+        and row.get("kind") in COMPANY_KINDS
+        and str(row.get("url") or "").strip()
+    ]
+
+
 def _messaging_rows(entry: dict) -> list[dict]:
     """Take the messaging handles out of a record. Format 34 is the first to write any; the
     key is removed from ``entry`` because what remains is passed straight to a model that
@@ -1536,6 +1553,9 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
         # first to carry them, and an older archive simply has none.
         company_numbers = _phone_rows(company_entry)
         company_addresses = _address_rows(company_entry)
+        # Its social profiles (#906), format 71's. Not `_link_rows`: that one reads an old
+        # file's `website` column as a link, and a company's `website` is its own column.
+        company_links = _company_link_rows(company_entry)
         # Before format 68 a company's place was one line; since #702 it is an address.
         legacy_location = str(company_entry.pop("location", "") or "")[:200]
         company_names = company_entry.pop("names", None) or []
@@ -1594,6 +1614,7 @@ def _load(user, archive: zipfile.ZipFile, *, force: bool = False) -> ImportRepor
             company, user, company_numbers, report, f"on the company “{company.name}”"
         )
         _restore_postal_addresses(company, user, company_addresses, report)
+        _restore_web_links(company, user, company_links, report)
         if legacy_location.strip() and not company_addresses:
             company.location = legacy_location
             company.save()

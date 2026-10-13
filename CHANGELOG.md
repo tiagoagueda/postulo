@@ -196,6 +196,7 @@ All notable changes to Postulo are recorded here. The format follows
 
 ### ✨ Added
 
+- A company holds social profiles, its LinkedIn page and its accounts, as a contact does: on its form, on its page with each service's mark, in the API, in the archive and through a merge (#906)
 - The calendar's Month, Week, Day and Agenda buttons each carry an icon, drawn alone on a small screen (#904)
 - The companies' places export as GeoJSON, and a GeoJSON file's points, matched to companies by name or Wikidata identifier and ticked, place their addresses by hand; a GeoJSON sub-module of file formats that needs Maps (#880)
 - Fetch from Wikidata also reads where the company is, and keeping it places its primary address there, unless a person placed that address by hand; taking it off places it from its words again (#701)

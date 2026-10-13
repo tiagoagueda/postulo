@@ -143,6 +143,10 @@
           </div>
         </fieldset>
 
+        {% for box in form.link_boxes %}<c-field :field="box" />{% endfor %}
+        {% for block, count in links_kept_back %}
+          <p class="mb-4 text-sm text-ink-500 dark:text-ink-400">{{ block.kept_back_contact|safe }}</p>
+        {% endfor %}
         <c-field :field="form.notes" />
         {% if form.from_career %}<c-field :field="form.from_career" />{% endif %}
       </div>
@@ -152,6 +156,9 @@
          has, above its identifiers. {% endcomment %}
       {% if numbers %}{% include "partials/phone_numbers.html" %}{% endif %}
       {% include "partials/postal_addresses.html" %}
+      {% comment %} Its social profiles (#906), the rows a contact's are, while *Several social
+         profiles* is on; the one box beside the website while it is off. {% endcomment %}
+      {% include "partials/web_links.html" %}
       <fieldset class="card mb-6" data-identifiers id="section-identifiers">
         <legend class="label px-1">{% translate "Identifiers" %}</legend>
         <p class="mb-3 text-sm text-ink-500 dark:text-ink-400">

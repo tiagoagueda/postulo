@@ -380,6 +380,16 @@ def plan_companies(kept, other) -> Plan:
         _moved(_("Postal addresses"), other.postal_addresses.all(), lambda row: row.one_line()),
     ]
     plan.moves = [line for line in lines if line is not None]
+    # Its social profiles (#906), the ones the kept company does not list already.
+    moving_links, _already = _link_moves(kept, other)
+    if moving_links:
+        plan.moves.append(
+            Moved(
+                label=str(_("Social profiles")),
+                count=len(moving_links),
+                names=[row.url for row in moving_links[:NAMES_SHOWN]],
+            )
+        )
     if moving_teams or folding_teams:
         teams = [team.name for team in moving_teams] + [team.name for team, _twin in folding_teams]
         plan.moves.append(
@@ -445,6 +455,7 @@ def merge_companies(kept, other) -> Plan:
     a double click -- run one after the other and the second finds its record gone.
     """
     from postulo.applications.models import Application
+    from postulo.core.models import WebLink
 
     _same_owner(kept, other)
     locked = {
@@ -503,6 +514,11 @@ def merge_companies(kept, other) -> Plan:
     for rows in (list(other.phone_numbers.all()), list(other.postal_addresses.all())):
         if rows:
             _move_held(rows, kept, kinds=False, now=now)
+    # Its social profiles (#906), as a contact's move: one the kept company lists at the
+    # same address is not listed twice, and goes with the other in the delete below.
+    moving_links, _already = _link_moves(kept, other)
+    if moving_links:
+        _move_held(moving_links, kept, kinds=True, now=now)
 
     # The career entries that named the other company name this one now, each keeping the
     # text it had (#683). Moved here, because a link set to null on delete is an update to
@@ -548,6 +564,7 @@ def merge_companies(kept, other) -> Plan:
             CompanyLogo,
             Company.industries.through,
             CompanyName,
+            WebLink,
         },
     )
     other.delete()

@@ -39,7 +39,9 @@ def list_companies(
 ):
     companies = (
         owned(request, Company.objects)
-        .prefetch_related("industries", "identifiers", "phone_numbers", "postal_addresses", "names")
+        .prefetch_related(
+            "industries", "identifiers", "phone_numbers", "postal_addresses", "web_links", "names"
+        )
         .order_by("name", "pk")
     )
     if q:
@@ -78,11 +80,14 @@ def add_company(request, payload: CompanyIn):
             email=payload.email or None,
             numbers=payload.phone_numbers,
             addresses=payload.postal_addresses,
+            links=[row.dict() for row in payload.web_links],
         )
     return Status(201, company_out(_detail(request, company.pk), detail=True))
 
 
-def _write_reached(company, owner, *, email=None, numbers=None, addresses=None, replace=False):
+def _write_reached(
+    company, owner, *, email=None, numbers=None, addresses=None, links=None, replace=False
+):
     """Its mailbox, numbers and addresses (#329), checked as the page checks them.
 
     A number is checked against its country's numbering plan; an impossible one is a 422
@@ -134,6 +139,21 @@ def _write_reached(company, owner, *, email=None, numbers=None, addresses=None, 
         importer._restore_postal_addresses(
             company, owner, importer._address_rows({"postal_addresses": rows})
         )
+    if links is not None:
+        # Its social profiles (#906), checked as a contact's are: a link filed under a
+        # service has to be one of that service's addresses. A company holds the social
+        # kind alone, so another kind is refused rather than kept where nothing shows it.
+        from postulo.core import web_links
+
+        if any(row.get("kind") not in web_links.COMPANY_KINDS for row in links):
+            raise HttpError(422, _("A company's links are its social profiles."))
+        try:
+            links = web_links.checked_rows(links)
+        except ValidationError as exc:
+            raise HttpError(422, "; ".join(exc.messages)) from exc
+        if replace:
+            company.web_links.all().delete()
+        web_links.add_links(company, owner, links)
 
 
 def _detail(request, pk: int) -> Company:
@@ -146,6 +166,7 @@ def _detail(request, pk: int) -> Company:
             "identifiers",
             "phone_numbers",
             "postal_addresses",
+            "web_links",
             "names",
         ),
         pk,
@@ -179,6 +200,7 @@ def patch_company(request, pk: int, payload: CompanyPatch):
     email = data.pop("email", None)
     data.pop("phone_numbers", None)
     data.pop("postal_addresses", None)
+    data.pop("web_links", None)
     if data.get("name") is not None:
         data["name"] = _name_or_refusal(request, company, data["name"])
     with transaction.atomic():  # a refusal below undoes the saves above it (#435)
@@ -196,6 +218,9 @@ def patch_company(request, pk: int, payload: CompanyPatch):
             email=email,
             numbers=payload.phone_numbers,
             addresses=payload.postal_addresses,
+            links=(
+                [row.dict() for row in payload.web_links] if payload.web_links is not None else None
+            ),
             replace=True,
         )
     return company_out(_detail(request, pk), detail=True)

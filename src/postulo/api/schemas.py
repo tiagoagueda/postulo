@@ -158,6 +158,8 @@ class CompanyOut(Schema):
     names: list[dict] = Field(default_factory=list)
     phone_numbers: list[PhoneNumberOut] = Field(default_factory=list)
     postal_addresses: list[PostalAddressOut] = Field(default_factory=list)
+    #: Its social profiles (#906), each on a service or on none, as a contact's are.
+    web_links: list[WebLinkOut] = Field(default_factory=list)
     location: str = ""
     industries: list[str] = Field(default_factory=list)
     #: Its industries' NACE sections (#897), read-only: a company's sectors are read off its
@@ -342,6 +344,13 @@ class CompanyIn(Schema):
     postal_addresses: list[PostalAddressIn] = Field(
         default_factory=list, description="Added beside any it already has"
     )
+    #: Its social profiles (#906), as a contact's are written: social ones only, since a
+    #: company's website is `website`.
+    web_links: list[WebLinkIn] = Field(
+        default_factory=list,
+        max_length=MAX_WEB_LINKS,
+        description="Social profiles, each with its service. Twenty at most.",
+    )
     location: str = Field(default="", max_length=200)
     industries: list[str] = Field(
         default_factory=list, description="Names; unknown ones join the owner's vocabulary."
@@ -363,6 +372,11 @@ class CompanyPatch(Schema):
     )
     postal_addresses: list[PostalAddressIn] | None = Field(
         default=None, description="Replaces the whole list"
+    )
+    web_links: list[WebLinkIn] | None = Field(
+        default=None,
+        max_length=MAX_WEB_LINKS,
+        description="Replaces the whole list of social profiles (#906)",
     )
     location: str | None = Field(default=None, max_length=200)
     industries: list[str] | None = Field(default=None, description="Replaces the whole list")
@@ -1559,6 +1573,7 @@ def company_out(company, *, detail: bool = False) -> dict:
             }
             for row in company.postal_addresses.all()
         ],
+        "web_links": [_link_out(row) for row in company.web_links.all()],
         "location": company.location,
         "industries": [industry.name for industry in company.industries.all()],
         "sectors": company.sectors,
@@ -1575,6 +1590,17 @@ def company_out(company, *, detail: bool = False) -> dict:
         data["contacts"] = [contact_out(c) for c in company.contacts.all()]
         data["listing_ids"] = [p.pk for p in company.postings.all()]
     return data
+
+
+def _link_out(row) -> dict:
+    """One web link as the API answers it, a contact's or a company's (#189, #906)."""
+    return {
+        "kind": row.kind,
+        "service": row.service,
+        "label": row.label,
+        "url": row.url,
+        "is_primary": row.is_primary,
+    }
 
 
 def _number_out(row) -> dict:
@@ -1618,16 +1644,7 @@ def contact_out(contact) -> dict:
             for row in contact.phone_numbers.all()
         ],
         "linkedin_url": _primary_link(contact, "social"),
-        "web_links": [
-            {
-                "kind": row.kind,
-                "service": row.service,
-                "label": row.label,
-                "url": row.url,
-                "is_primary": row.is_primary,
-            }
-            for row in contact.web_links.all()
-        ],
+        "web_links": [_link_out(row) for row in contact.web_links.all()],
         "messaging_handles": [
             {
                 "service": row.service,
