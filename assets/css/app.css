@@ -2629,6 +2629,18 @@ html {
  * whole of a table rather than the strip that was on the screen, and the chrome -- the
  * header, the skip link, the footer, the failure alert -- stays off the paper. */
 /*
+ * A chevron that points the way the reading goes turns round on a right-to-left page: the
+ * calendar's Previous and Next (#902) and the breadcrumb's separator. Marked where it is
+ * drawn, with `data-rtl-flip`, because an icon that means "forward" and one that is merely
+ * an arrow look the same to a stylesheet.
+ */
+@layer components {
+  [dir="rtl"] [data-rtl-flip] {
+    transform: scaleX(-1);
+  }
+}
+
+/*
  * The companies' map (#898). Leaflet's panes stack up to z-index 1000, so the canvas is its own
  * stacking context and never draws over the masthead or a menu. The dots take the brand's
  * colour and the outline the page's quiet one, in both themes, the way the SVG map's did; the
