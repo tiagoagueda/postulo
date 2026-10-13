@@ -313,8 +313,10 @@ def _tile(
             '<span class="avatar {} {}"><img src="{}" alt=""></span>', box, shape, picture
         )
     if glyph:
+        # Inside the inner span, as the initials are (#901): Basecoat centres what is in that
+        # span and nothing put straight into the tile, so the icon sat in the top corner.
         return format_html(
-            '<span class="avatar {} {} {} text-white" aria-hidden="true">{}</span>',
+            '<span class="avatar {} {} {} text-white" aria-hidden="true"><span>{}</span></span>',
             box,
             colour,
             shape,

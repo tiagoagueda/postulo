@@ -1,5 +1,5 @@
 {% extends "settings/base.html" %}
-{% load i18n %}
+{% load i18n postulo %}
 
 {% block content %}
   <div class="max-w-2xl">
@@ -14,8 +14,11 @@
       <div class="card p-0">
         <ul class="divide-y divide-ink-100 dark:divide-ink-800">
           {% for entry in plugins %}
-            <li class="flex items-center gap-3 px-4 py-3">
-              <div class="min-w-0 flex-1">
+            <li class="flex flex-wrap items-center gap-3 px-4 py-3">
+              {% comment %} The tile every plugin is drawn with (#901): its logo, its module's
+                 icon or its initials, as on the plugin pages. {% endcomment %}
+              {% plugin_logo entry.plugin "size-8 text-xs" %}
+              <div class="min-w-0 grow basis-40">
                 <p class="font-medium">{{ entry.plugin.label }}</p>
                 <p class="text-xs text-ink-500 dark:text-ink-400">{{ entry.kind_label }} · <code>{{ entry.plugin.name }}</code> {{ entry.plugin.version }}</p>
               </div>
